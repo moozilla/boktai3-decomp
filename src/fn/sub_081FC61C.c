@@ -13,13 +13,13 @@ struct Unk081FC61C {
 };
 
 void Memory_Clear(void *, u32);
-void sub_081FC618(void *, void (*)(void));
-void sub_081FBE2C(void);
+void Ratatosk_SetAnimatedParticleUpdateCallback(void *, void (*)(void));
+void Ratatosk_OnAnimatedParticleUpdate(void);
 
-void sub_081FC61C(struct Unk081FC61C *p)
+void Ratatosk_InitAnimatedParticleParams(struct Unk081FC61C *p)
 {
     Memory_Clear(p, 0x1C);
-    sub_081FC618(p, sub_081FBE2C);
+    Ratatosk_SetAnimatedParticleUpdateCallback(p, Ratatosk_OnAnimatedParticleUpdate);
     p->unk0 = 0;
     p->unk2 = 20;
     p->unk8 = 5;

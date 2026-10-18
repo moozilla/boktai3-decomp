@@ -1,11 +1,11 @@
 #include "global.h"
 
-void sub_08223270(void);
+void Serial_StopCommunication(void);
 
-s32 sub_08108EA4(void *p)
+s32 LinkHandshake_OnDestroy(void *p)
 {
     if (*(u32 *)((u8 *)p + 0x30) == 0) {
-        sub_08223270();
+        Serial_StopCommunication();
     }
     return *(u32 *)0x020004B0 = 0;
 }

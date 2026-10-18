@@ -7,7 +7,7 @@ struct E {
 extern s32 gUnk_02000238;
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
-s32 sub_081A3468(struct E *e)
+s32 Hresvelgr_DestroyShotPool(struct E *e)
 {
     s32 i;
     e = (struct E *)((u8 *)e + 0x48);

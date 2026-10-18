@@ -2,7 +2,7 @@
 
 void SceneActorEffects_ReleaseResources(void);
 
-s32 sub_080CFC08(void)
+s32 Golem_OnDestroy(void)
 {
     SceneActorEffects_ReleaseResources();
     return 0;

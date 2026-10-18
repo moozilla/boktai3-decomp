@@ -57,7 +57,7 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
-void sub_08025D60(ActorAnimation *p)
+void SceneActorAnimation_UpdateSwingHeavy(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {

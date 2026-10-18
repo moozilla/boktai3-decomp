@@ -6,7 +6,7 @@ struct Data *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(struct Data *, struct Data *);
 u16 sub_0822D604(u32);
 void sub_0821983C(u8 *, struct Data *, u32, u32, u32, u32, u32, void *);
-void sub_08234F18(u8 *p)
+void HealthRestoreEffect_InitAnimation(u8 *p)
 {
     struct Data data;
     struct Data *source = ScriptProc_Start(0xcb05, 0x5d04);

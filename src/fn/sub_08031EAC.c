@@ -10,7 +10,7 @@ struct TextState {
     u8 pad20[0xE8];
     u8 depth, styles[7];
 };
-void sub_08031EAC(struct TextState *p)
+void TextState_AdvanceLine(struct TextState *p)
 {
     if (p->wrap == 1)
         goto clear;

@@ -6,7 +6,7 @@ void sub_081DEC2C(void);
 void sub_081DEDF4(void);
 s32 sub_081DEE38(void *);
 
-void *sub_081DF0AC(void)
+void *Time_CreateDateMenu(void)
 {
     void *r = Task_Create(0xb, 0x740);
     if (r != 0) {

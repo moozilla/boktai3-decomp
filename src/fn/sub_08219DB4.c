@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+/* Memory_FillWords: Fills the requested number of 32-bit words with a supplied value using an unrolled loop */
+#define Memory_FillWords sub_08219DB4
 
 void sub_08219DB4(u32 *p, u32 v, s32 n)
 {

@@ -8,14 +8,14 @@ struct S {
 extern u8 *gUnk_02000710;
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_08033A38(u32, u32, void *);
-void sub_080337FC(u32);
-void sub_08111D00(struct S *s)
+void TextWindow_SetString(u32, u32, void *);
+void TextWindow_StartPlayback(u32);
+void StageResults_ShowSummaryText(struct S *s)
 {
     u8 *q = gUnk_02000710 + 0x790;
     u32 *p = &s->b;
     TextWindow_SetScript(*p, s->a);
     TextWindow_Refresh(*p, 0);
-    sub_08033A38(*p, 1, q);
-    sub_080337FC(*p);
+    TextWindow_SetString(*p, 1, q);
+    TextWindow_StartPlayback(*p);
 }

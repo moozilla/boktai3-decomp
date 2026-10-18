@@ -1,4 +1,6 @@
 #include "scalar_approach.h"
+/* ScalarApproach_UnwrapAngleArray: Rewrites each signed halfword angle to its nearest representative relative to the corresponding target */
+#define ScalarApproach_UnwrapAngleArray sub_08221C80
 #define ScalarApproach_UnwrapAngleArray sub_08221C80
 void ScalarApproach_UnwrapAngleArray(s16 *values, const s16 *targets, s32 count)
 {

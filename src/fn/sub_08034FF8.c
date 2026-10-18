@@ -47,9 +47,9 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_08036230(struct Engine *);
-void sub_08036BD4(int);
-void sub_08224CA4(void);
+int Wireless_BeginChildTransfer(struct Engine *);
+void Wireless_SetStatus(int);
+void RfuManager_RequestMscCycleCompletion(void);
 extern u16 gUnk_03005260[];
 static inline void requestUpdate(struct Engine *p)
 {
@@ -81,7 +81,7 @@ static inline void finish(struct Engine *p, int operation, u8 byteZero, u32 word
     p->ticks = wordZero;
     p->pending = 1;
 }
-int sub_08034FF8(struct Engine *p)
+int Wireless_UpdateChildHandshake(struct Engine *p)
 {
     register u8 *slot asm("r5");
     int flags;
@@ -95,7 +95,7 @@ int sub_08034FF8(struct Engine *p)
         slot = initial;
         if (state == 0x46) {
             if (p->scratch[1])
-                sub_08036230(p);
+                Wireless_BeginChildTransfer(p);
             {
                 register u32 offset asm("r3") = 0x134;
                 u8 *marker;
@@ -147,7 +147,7 @@ send:;
                         register int sendMask asm("r0") = one;
                         asm("" : "+r"(sendMask));
                         if (rfu_NI_setSendData((u8)(sendMask << *slot), 6, data, 4)) {
-                            sub_08036BD4(2);
+                            Wireless_SetStatus(2);
                             return 0;
                         }
                         p->mask = (p->mask & ~1) | 2;
@@ -191,7 +191,7 @@ complete:
         second = 0xFFBF;
         value &= second;
         p->mask = value;
-        sub_08224CA4();
+        RfuManager_RequestMscCycleCompletion();
         finish(p, 12, zeroByte, zeroWord);
         return 0;
     }

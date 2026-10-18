@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_08036468(struct Engine *p)
+int Wireless_EnterChildTransferWait(struct Engine *p)
 {
     u8 *pending = &p->pending;
     if (*pending)

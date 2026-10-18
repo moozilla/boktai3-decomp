@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
 s32 sub_08228DB8(void);
-s32 sub_080174C4(s16 *p)
+s32 Weather_GetStormVolume(s16 *p)
 {
     s32 r, v;
     if (*(s16 *)(gUnk_02000710 + 0x612) != 0)

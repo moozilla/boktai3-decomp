@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0816381C(u16 *out, u8 *c)
+void Palette_UpdateHighlightPulse(u16 *out, u8 *c)
 {
     u32 v = *c;
     u32 r = 0x1f;

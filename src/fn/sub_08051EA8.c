@@ -38,7 +38,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
             u32 row = gUnk_030052F4->rows[z];
             cell = row + x;
         }
-        properties = sub_0821D64C(cell, 1);
+        properties = TerrainModifiers_FindCellOverride(cell, 1);
         if (properties)
             properties += 4;
         else {

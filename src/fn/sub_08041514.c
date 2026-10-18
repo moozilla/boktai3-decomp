@@ -3,7 +3,7 @@ extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
 void ModifierMenu_BeginClose(struct ModifierMenu *);
 void Sound_PlaySong(u32);
-s32 sub_08221338(u32, u8 *, u32, s32, s32);
+s32 Input_UpdateKeyRepeat(u32, u8 *, u32, s32, s32);
 static inline s32 ModifierMenu_ReadRepeatPair(u8 *counterArg, u32 negative, u32 positive)
 {
     u8 *counter = counterArg;
@@ -11,11 +11,11 @@ static inline s32 ModifierMenu_ReadRepeatPair(u8 *counterArg, u32 negative, u32 
     s32 period = 15;
     s32 change;
     temp = *counter;
-    change = sub_08221338(0, &temp, negative, -1, period);
+    change = Input_UpdateKeyRepeat(0, &temp, negative, -1, period);
     if (change == 0) {
         u32 previous = temp;
         temp = *counter;
-        change = sub_08221338(0, &temp, positive, 1, period);
+        change = Input_UpdateKeyRepeat(0, &temp, positive, 1, period);
         if (change == 0 && previous != 0)
             temp = previous;
     }

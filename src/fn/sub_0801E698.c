@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801EF58(void);
+void SceneObject_UpdateInactiveIdle(void);
 void SceneObjects_SetInactive(u8 *p, u16 id)
 {
     int i = 0;
@@ -9,7 +9,7 @@ void SceneObjects_SetInactive(u8 *p, u16 id)
         int zero;
         void *fn;
         zero = 0;
-        fn = sub_0801EF58;
+        fn = SceneObject_UpdateInactiveIdle;
         two = 2;
         do {
             u8 *s = *base + 140 * i;

@@ -10,7 +10,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-u32 sub_081089D8(u8 *p)
+u32 AnimatedTile_OnManagerDestroy(u8 *p)
 {
     s32 i = 0;
     u32 *m = (u32 *)(p + 0x154);

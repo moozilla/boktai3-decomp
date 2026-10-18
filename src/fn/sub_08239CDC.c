@@ -19,11 +19,11 @@ struct P08239CDC {
     u8 fAC6[2];
     u8 fAC8;
 };
-void sub_08239C80(void *);
+void LinkPlayer_InitAnimationSlots(void *);
 void sub_08239A20(void *, s32);
-void sub_08239CDC(struct P08239CDC *p)
+void LinkPlayer_InitAnimationState(struct P08239CDC *p)
 {
-    sub_08239C80(p);
+    LinkPlayer_InitAnimationSlots(p);
     p->fAC4 = 0xFFFF;
     p->fAC8 = 0xFF;
     p->fC6 = p->fAB0;

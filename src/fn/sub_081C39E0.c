@@ -9,7 +9,7 @@ struct S {
 };
 void sub_081C3A98(void);
 
-void sub_081C39E0(struct S *p)
+void RegistryF3E4_StartDisappearing(struct S *p)
 {
     void (*f)(void) = sub_081C3A98;
     p->f4 = f;

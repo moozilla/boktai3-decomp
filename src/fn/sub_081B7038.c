@@ -11,7 +11,7 @@ struct A {
 };
 void sub_081B6888(void *, void *, s32);
 
-s32 sub_081B7038(struct A *p, u16 v)
+s32 VanargandProjectilePool_Init(struct A *p, u16 v)
 {
     s32 i;
     struct E *e;

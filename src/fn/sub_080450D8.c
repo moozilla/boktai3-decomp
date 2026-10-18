@@ -1,5 +1,7 @@
 #define EncodedRecord_DecodeFields sub_080450D8
 #include "encoded_record.h"
+/* EncodedRecord_DecodeFields: Unmasks the first record format and unpacks eleven fields plus five name bytes while restoring scaled values */
+#define EncodedRecord_DecodeFields sub_080450D8
 void EncodedRecord_DecodeFields(struct EncodedRecordFields *fields, u8 *record, s32 skip)
 {
     u32 bit;

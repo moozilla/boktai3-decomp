@@ -42,7 +42,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
-int sub_080360C8(struct Engine *p)
+int Wireless_PollParentNiReceive(struct Engine *p)
 {
     u8 *slot;
     int state;

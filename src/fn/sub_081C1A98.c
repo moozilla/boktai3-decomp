@@ -8,7 +8,7 @@ struct T {
     u16 h;
 };
 extern struct T *gUnk_02000580;
-void sub_081C1A98(struct S *p)
+void ControlPanel_UpdateSustainedInputTimer(struct S *p)
 {
     if (gUnk_02000580->h > 3)
         p->h = p->h + 1;

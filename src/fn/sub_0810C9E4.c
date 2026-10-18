@@ -4,15 +4,15 @@ struct P {
     u8 f[0xf40];
     void *cb;
 };
-s32 sub_08109464(void);
-void sub_080335B4(void);
+s32 Registry1745_GetSessionState(void);
+void ScrollingDialogue_HideImmediately(void);
 void Task_Kill(void *);
 void sub_0824923C(void *, void *);
 
-s32 sub_0810C9E4(struct P *p)
+s32 RegistryF246_Update(struct P *p)
 {
-    if (sub_08109464() == 0) {
-        sub_080335B4();
+    if (Registry1745_GetSessionState() == 0) {
+        ScrollingDialogue_HideImmediately();
         Task_Kill(p);
         return -1;
     }

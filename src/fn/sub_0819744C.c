@@ -1,15 +1,15 @@
 #include "global.h"
 
-void sub_0818ECAC(void *);
-void sub_08194480(void *);
-void sub_08194598(void *);
-void sub_081937F8(void *);
+void Nidhoggr_ClearEffectPools(void *);
+void Nidhoggr_DestroyParts(void *);
+void Nidhoggr_DestroySuspendedObjectSprite(void *);
+void Nidhoggr_UnregisterTerrainCells(void *);
 
-s32 sub_0819744C(u8 *t)
+s32 Nidhoggr_Destroy(u8 *t)
 {
-    sub_0818ECAC(t + 0x54);
-    sub_08194480(t);
-    sub_08194598(t);
-    sub_081937F8(t);
+    Nidhoggr_ClearEffectPools(t + 0x54);
+    Nidhoggr_DestroyParts(t);
+    Nidhoggr_DestroySuspendedObjectSprite(t);
+    Nidhoggr_UnregisterTerrainCells(t);
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_082248DC(void)
+void RfuManager_StartPendingRecovery(void)
 {
     u8 *p = (u8 *)0x03005390;
     if (p[6] == 0 && p[0xa] == 1) {

@@ -42,8 +42,8 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08224E0C(void *, u8 *);
-int sub_0803536C(struct Engine *p)
+void Wireless_EnqueuePacket(void *, u8 *);
+int Wireless_ReceiveChildUniPacket(struct Engine *p)
 {
     u8 *scratch = p->scratch;
     int result = 0;
@@ -74,7 +74,7 @@ int sub_0803536C(struct Engine *p)
                 sequence = incoming;
             }
             if (next == received) {
-                sub_08224E0C(p->message, sequence);
+                Wireless_EnqueuePacket(p->message, sequence);
             } else {
                 register int old asm("r0") = (u8)last;
                 register u8 *counter asm("r1");

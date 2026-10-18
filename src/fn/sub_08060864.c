@@ -15,8 +15,8 @@ s32 SceneInventory_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
         current = panel->selection;
         if (saved == current)
             return 0;
-        oldKind = sub_0822D6E0(saved);
-        newKind = sub_0822D6E0(current);
+        oldKind = Inventory_GetEquipmentId(saved);
+        newKind = Inventory_GetEquipmentId(current);
         if (oldKind == 255 && newKind == 255)
             return 0;
         if (panel->valueMode == 1)
@@ -38,7 +38,7 @@ s32 SceneInventory_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
         }
         if (selected <= 15) {
             register u32 reread asm("r5") = *(volatile u8 *)selection;
-            if (sub_0822D6E0(reread) == 255)
+            if (Inventory_GetEquipmentId(reread) == 255)
                 return 4;
         }
     }

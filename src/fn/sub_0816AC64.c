@@ -1,24 +1,24 @@
 #include "global.h"
-void sub_08163F14(u8 *, u32, u32, u32, u32);
-void sub_08165ACC(u8 *);
+void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
+void PauseMenu_HideAllSprites(u8 *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-void sub_08163EA0(u8 *, void *);
+void Hud_SetUpdateCallback(u8 *, void *);
 void sub_0816AF5C(void);
-void sub_0816AC64(u8 *s)
+void Hud_InitRetryPanel(u8 *s)
 {
     u32 zero;
     u16 *p;
     u8 *a, *b, *initial;
 
-    sub_08030BF8();
-    sub_08033468();
-    sub_08033590();
-    sub_08030F20(1, 1, 28, 6);
-    sub_08030C84(*(u32 *)(s + 0x58));
-    sub_08030B78(1);
-    sub_08163F14(s, *(u32 *)(s + 0x18), 0, 2, *(u32 *)(s + 0x2C));
-    sub_08165ACC(s);
+    MessageWindow_Clear();
+    ScrollingDialogue_ClearScript();
+    ScrollingDialogue_RequestHide();
+    MessageWindow_SetBounds(1, 1, 28, 6);
+    MessageWindow_SetMessageTable(*(u32 *)(s + 0x58));
+    MessageWindow_SetDisplayMode(1);
+    Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 2, *(u32 *)(s + 0x2C));
+    PauseMenu_HideAllSprites(s);
     *(u32 *)(s + 0x3BE8) &= ~1;
     p = (u16 *)(s + 0x3C00);
     zero = 0;
@@ -33,6 +33,6 @@ void sub_0816AC64(u8 *s)
     a = s + 0x3D00;
     Anim_LoadKeyframe(a, b, 0x1D, 1);
     Anim_SetKeyframes(a, b, 10, 1, zero);
-    sub_08030DBC(0);
-    sub_08163EA0(s, sub_0816AF5C);
+    MessageWindow_ShowMessage(0);
+    Hud_SetUpdateCallback(s, sub_0816AF5C);
 }

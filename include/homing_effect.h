@@ -85,22 +85,22 @@ extern void (*gUnk_08604A54[])(void *, u32);
 extern EffectParticleUpdate gUnk_08604A78[][5];
 
 void sub_0800A800(void);
-u32 sub_0800A80C(struct EffectManager *, struct Effect *);
-s32 sub_0800A830(void *);
+u32 EffectManager_RemoveEffect(struct EffectManager *, struct Effect *);
+s32 EffectManager_RemoveActiveEffects(void *);
 u32 GunDelHell_Create(void *);
 s32 EffectManager_UpdateParticles(struct EffectManager *, struct Effect *, struct EffectContext *);
 s32 EffectManager_UpdateAll(struct EffectManager *);
-s32 sub_0800AB18(struct EffectManager *);
+s32 EffectManager_DestroyManager(struct EffectManager *);
 s32 EffectManager_Init(struct EffectManager *, void *);
-void *sub_0800AC00(void *);
+void *EffectManager_Create(void *);
 
 /* Engine helpers. */
 void Sound_PlaySongChecked(u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 s32 Math_Atan2(s32, s32);
 void Effect_Remove(void *);
-void sub_08217E60(void *, void *, u32);
-void sub_08217ECC(void *, u32);
+void Effect_Initialize(void *, void *, u32);
+void Effect_SetPalette(void *, u32);
 void *AnimData_FindEntry(u32);
 void *ScriptProc_Start(u32, u32);
 void *Task_Create(u32, u32);

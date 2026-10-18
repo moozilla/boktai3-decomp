@@ -23,10 +23,10 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
     if (referenceIndex < 0)
         reference = 0;
     else
-        reference = sub_0822E288(referenceIndex);
+        reference = GameState_GetConsumableDescriptor(referenceIndex);
     SceneInputPanel_GetEquippedValues(&primaryValue, &secondaryValue, &equipped, 0);
     if (candidate) {
-        sub_0822D740(candidate, converted);
+        Inventory_InitEquipmentEntryFromDescriptor(candidate, converted);
         value = sub_08159030(converted, reference);
         comparison = 0;
         if (value > primaryValue)
@@ -36,7 +36,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
         SceneInputPanel_SplitThreeDigits(value, digits);
     } else {
         if (primaryValue > 0) {
-            sub_0822D740(&equipped, converted);
+            Inventory_InitEquipmentEntryFromDescriptor(&equipped, converted);
             value = sub_08159030(converted, reference);
         } else
             value = 0;

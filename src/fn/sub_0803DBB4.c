@@ -7,7 +7,7 @@ struct B {
     u8 pad[0x16c];
     s32 k;
 };
-void sub_0803DBB4(struct A *a, struct B *b)
+void ScenePool_ApplyScheduledSpeedControl(struct A *a, struct B *b)
 {
     switch (b->k) {
         case 1:

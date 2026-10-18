@@ -40,9 +40,9 @@ struct DamageController {
 void DamageController_AccumulateHit(struct DamageCollider *attack, struct DamageCollider *target,
                                     struct DamageController *controller);
 s32 DamageController_Update(struct DamageController *);
-u32 sub_0800C954(struct DamageController *);
+u32 DamageController_Destroy(struct DamageController *);
 s32 DamageController_Initialize(struct DamageController *, u32 id);
-void *sub_0800CB60(u32);
+void *DamageController_Create(u32);
 
 /* Engine helpers. */
 void Script_Call(u32, void *);
@@ -53,7 +53,7 @@ s32 Script_GetValue(void);
 void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
-void sub_0821FF7C(void *, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 s32 Collider_Refresh(void *);
 void Collider_Remove(void *);
 void *Task_Create(s32, s32);

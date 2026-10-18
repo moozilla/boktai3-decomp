@@ -3,7 +3,7 @@
 extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 
-u32 sub_08090118(u8 *p)
+u32 Slime_GetRandomVariantFlags(u8 *p)
 {
     s32 v;
     u32 r;

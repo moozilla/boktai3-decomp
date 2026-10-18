@@ -17,7 +17,7 @@ struct BossTask {
     u8 pad4E9;
     u8 step, field4EB;
 };
-void *sub_0802140C(u32 slot);
+void *SceneActors_GetBySlot(u32 slot);
 /* Shared state change of the boss tasks (as in Vanargand_ResetFromScript). */
 static inline void setState(struct BossTask *p, u8 state)
 {
@@ -31,7 +31,7 @@ static inline void setState(struct BossTask *p, u8 state)
    (+0x4EA), entering state 8, 10 or 3, then clears +0xB3, +0x4EB, +0x4E8. */
 void BossSlot2_AdvanceStepFromScript(void)
 {
-    struct BossTask *task = sub_0802140C(2);
+    struct BossTask *task = SceneActors_GetBySlot(2);
     struct BossTask *p = task;
     if (p) {
         if (p->step == 0) {

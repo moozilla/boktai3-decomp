@@ -1,4 +1,6 @@
 #include "global.h"
+/* TentacleBody_ClearStateEntryFlag: Clears the pending state-entry byte when set */
+#define TentacleBody_ClearStateEntryFlag sub_080A7188
 
 void sub_080A7188(u8 *p)
 {

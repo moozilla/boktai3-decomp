@@ -56,7 +56,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-void sub_08025714(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateRecoilSlide(ActorAnimation *p, int tick)
 {
     u8 *position = (u8 *)p + 0x48;
     if (p->changed)

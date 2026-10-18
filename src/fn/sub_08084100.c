@@ -8,7 +8,7 @@ static inline u8 Test(u8 *s)
         return 1;
     return 0;
 }
-u32 sub_08084100(u8 *s)
+u32 SceneActorControl_TryActivateProximityResponse(u8 *s)
 {
     u8 *p;
     s32 distance;

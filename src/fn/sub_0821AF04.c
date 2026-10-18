@@ -1,4 +1,6 @@
 #include "global.h"
+/* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
+#define Script_RestoreContext sub_0821AF04
 
 struct Block0821AF04 {
     u32 w[4];

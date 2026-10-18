@@ -10,7 +10,7 @@ struct S {
     u8 pad[0x18];
     struct E e[1];
 };
-struct E *sub_08120294(struct S *s, u32 k)
+struct E *RegistryA8CB_FindEntryByName(struct S *s, u32 k)
 {
     s32 i;
     for (i = 0; i < 1; i++) {

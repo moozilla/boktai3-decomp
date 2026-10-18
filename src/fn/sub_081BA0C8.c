@@ -1,11 +1,11 @@
 #include "global.h"
 
-void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
-void sub_081B984C(void *, void (*)(void));
-void sub_081BA244(void);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+void Registry2388_SetUpdate(void *, void (*)(void));
+void Registry2388_UpdateScriptDelay(void);
 
-void sub_081BA0C8(void *p)
+void Registry2388_BeginFadeOut(void *p)
 {
-    sub_082279A8(3, 5, 4, 4, 4, 0xFFFF, 0xFFFF);
-    sub_081B984C(p, sub_081BA244);
+    ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xFFFF, 0xFFFF);
+    Registry2388_SetUpdate(p, Registry2388_UpdateScriptDelay);
 }

@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-void sub_0821A894(void)
+void Script_ResetArgumentStack(void)
 {
     gUnk_02000610.sp = gUnk_02000610.stk + 25;
 }

@@ -2,7 +2,7 @@
 
 void sub_0824923C(u8 *, u32);
 
-void sub_0819A0E0(u8 *p)
+void CannonBattery_UpdateMuzzleFlash(u8 *p)
 {
     if (*(p + 0xB7)) {
         u32 z = 0;

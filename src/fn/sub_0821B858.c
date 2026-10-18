@@ -1,7 +1,7 @@
 #include "global.h"
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-void sub_0821B6C8(u8 *, u8 *);
-s32 sub_0821B858(u8 *p)
+void Script_ConvertTextToShiftJis(u8 *, u8 *);
+s32 Script_ExecutePrint(u8 *p)
 {
     u8 buffer[512];
     s32 type, value;
@@ -10,7 +10,7 @@ s32 sub_0821B858(u8 *p)
         if (!type)
             break;
         if (type == 7)
-            sub_0821B6C8(buffer, (u8 *)value);
+            Script_ConvertTextToShiftJis(buffer, (u8 *)value);
         else if (type == 14) {
             u8 *q = (u8 *)value;
             while (*q)

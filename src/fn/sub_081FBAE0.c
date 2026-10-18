@@ -6,7 +6,7 @@ extern u8 *gUnk_020005E0;
 void sub_081FB82C(u8 *, struct E *, s32);
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
-u32 sub_081FBAE0(u8 *a)
+u32 RatatoskParticle_Init(u8 *a)
 {
     struct E *e;
     s32 i;

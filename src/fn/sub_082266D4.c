@@ -7,7 +7,7 @@ u32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void Camera_ReadMoveRate(u32);
 void Camera_PanTo(s32, struct Packed *);
-void sub_082266D4(void)
+void Camera_PanToFromScript(void)
 {
     struct Packed pos;
     if (Script_SeekToKeyword('f')) {

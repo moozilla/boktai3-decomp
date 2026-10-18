@@ -3,11 +3,11 @@
 typedef struct {
     s16 x, y, z, pad;
 } Vec;
-void *sub_0821A2C4(int);
+void *ResourceRegistry_GetResource(int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_0821E4D4(u16, void *);
+void Terrain_GetBoxMinPosition(u16, void *);
 int SceneObjects_Append(void *, u16, void *, int, u8, u8, u8, int, int, int, int, void *, u8, int);
 int SceneObjects_ScriptAppend(void)
 {
@@ -21,7 +21,7 @@ int SceneObjects_ScriptAppend(void)
     u8 field44;
     int flags, field41, i, found;
     register int *out asm("r5");
-    p = sub_0821A2C4(0x85e6);
+    p = ResourceRegistry_GetResource(0x85e6);
     if (!p)
         return -1;
     id = Script_GetKeywordValue(0x6e, 0);
@@ -48,7 +48,7 @@ int SceneObjects_ScriptAppend(void)
         field41 = 0;
     }
     if (Script_SeekToKeyword(0x74))
-        sub_0821E4D4(Script_GetValue(), &position);
+        Terrain_GetBoxMinPosition(Script_GetValue(), &position);
     else {
         found = Script_SeekToKeyword(0x70);
         if (found) {

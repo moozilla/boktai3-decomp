@@ -1,11 +1,11 @@
 #include "global.h"
 extern void *gUnk_02000058;
-void *sub_080138F0(int, int);
+void *ScaledShadowManager_Create(int, int);
 void ScaledShadow_Update(void *);
-void sub_0801373C(void *);
+void ScaledShadow_UpdateNoOp(void *);
 void AnimData_Load(void *, int);
 void Sprite_Init(void *, void *, int);
-void sub_080136B4(void *, void *);
+void ScaledShadowManager_AddShadow(void *, void *);
 int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, int extra,
                             int maxHeight, int minHeight, int shift, int nearShift, int mode)
 {
@@ -13,7 +13,7 @@ int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, in
     u8 *resource, *sprite;
     int zero;
     if (!m) {
-        m = sub_080138F0(0, 0);
+        m = ScaledShadowManager_Create(0, 0);
         if (!m)
             return -1;
     }
@@ -34,13 +34,13 @@ int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, in
     if (!mode)
         *(void (**)(void *))(p + 0x60) = ScaledShadow_Update;
     else
-        *(void (**)(void *))(p + 0x60) = sub_0801373C;
+        *(void (**)(void *))(p + 0x60) = ScaledShadow_UpdateNoOp;
     resource = p + 0x38;
     AnimData_Load(resource, 0x1C1B);
     sprite = p + 12;
     Sprite_Init(sprite, resource, 514);
     *(u16 *)(sprite + 16) = 5;
     p[0x13] = 2;
-    sub_080136B4(m, p);
+    ScaledShadowManager_AddShadow(m, p);
     return 0;
 }

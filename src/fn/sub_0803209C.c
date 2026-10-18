@@ -1,6 +1,6 @@
 #include "global.h"
-int sub_08031FEC(int *, int);
-void sub_0803209C(u8 *buffer, volatile int value)
+int Text_ExtractDecimalDigit(int *, int);
+void Text_FormatDecimal(u8 *buffer, volatile int value)
 {
     int started = 0;
     u8 *out = buffer;
@@ -16,31 +16,31 @@ void sub_0803209C(u8 *buffer, volatile int value)
         out++;
         value = -value;
     }
-    digit = sub_08031FEC(&value, 100000);
+    digit = Text_ExtractDecimalDigit(&value, 100000);
     if (digit) {
         *out = digit + '0';
         started = 1;
         out++;
     }
-    digit = sub_08031FEC(&value, 10000);
+    digit = Text_ExtractDecimalDigit(&value, 10000);
     if (digit || started) {
         *out = digit + '0';
         started = 1;
         out++;
     }
-    digit = sub_08031FEC(&value, 1000);
+    digit = Text_ExtractDecimalDigit(&value, 1000);
     if (digit || started) {
         *out = digit + '0';
         started = 1;
         out++;
     }
-    digit = sub_08031FEC(&value, 100);
+    digit = Text_ExtractDecimalDigit(&value, 100);
     if (digit || started) {
         *out = digit + '0';
         started = 1;
         out++;
     }
-    digit = sub_08031FEC(&value, 10);
+    digit = Text_ExtractDecimalDigit(&value, 10);
     if (digit || started) {
         *out = digit + '0';
         out++;

@@ -2,7 +2,7 @@
 
 extern u16 gUnk_03004CF0, gUnk_03004CFC, gUnk_03004D08, gUnk_03004CF8;
 
-void sub_08216F78(u32 n, u32 a, u32 b, u32 c, u32 d)
+void Video_SetWindowBounds(u32 n, u32 a, u32 b, u32 c, u32 d)
 {
     if (n == 0) {
         gUnk_03004CF0 = (a << 8) | c;

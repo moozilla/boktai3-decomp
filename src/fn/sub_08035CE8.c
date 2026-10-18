@@ -41,9 +41,9 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Bg_ClearTilemap(void);
-int sub_080341B0(struct Engine *, int);
+int WirelessController_SetLocalInput(struct Engine *, int);
 extern u16 gUnk_03005270;
-int sub_08035CE8(struct Engine *p)
+int Wireless_PublishLocalInput(struct Engine *p)
 {
     if (p->pending) {
         p->pending = 0;
@@ -53,7 +53,7 @@ int sub_08035CE8(struct Engine *p)
         int input = gUnk_03005270;
         int mask = 0x2000;
         input |= mask;
-        sub_080341B0(p, input);
+        WirelessController_SetLocalInput(p, input);
     }
     p->flag31 = 1;
 }

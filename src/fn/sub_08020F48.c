@@ -1,4 +1,6 @@
 #include "global.h"
+/* SceneMessages_IsActive: Returns whether the global controller exists and its playback state equals one. */
+#define SceneMessages_IsActive sub_08020F48
 #define SceneMessages_IsActive sub_08020F48
 extern u8 *gUnk_0200047C;
 int SceneMessages_IsActive(void)

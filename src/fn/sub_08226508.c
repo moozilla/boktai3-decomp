@@ -2,7 +2,7 @@
 
 void Camera_FollowPlayer(u32);
 
-void sub_08226508(u32 a)
+void Camera_FollowPlayerWithoutCompletion(u32 a)
 {
     u8 *s = *(u8 **)0x03005420;
     if (s != 0) {

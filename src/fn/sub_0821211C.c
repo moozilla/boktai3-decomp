@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0821211C(u8 *arg)
+void ForgingBook_UpdateHighlightPulse(u8 *arg)
 {
     u8 *p = arg;
     s32 v = *((s16 *)(p + 0x384));

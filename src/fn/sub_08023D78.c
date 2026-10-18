@@ -28,7 +28,7 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->reset = zero;
     p->pending = zero;
 }
-int sub_0802AD0C(void *);
+int GridAttack_SelectNextAction(void *);
 void sub_08027214(void *);
 static inline u8 chk(struct Common *p)
 {
@@ -47,7 +47,7 @@ static inline void action(struct Common *p, int one, int id, int zero)
     p->actionTimer = zero;
     p->entered = one;
 }
-int sub_08023D78(struct Common *p)
+int SceneActorState_TryStartDeathOrFlaggedAction(struct Common *p)
 {
     if (p->health <= 0 && p->healthCheck) {
         u32 mask = 2;

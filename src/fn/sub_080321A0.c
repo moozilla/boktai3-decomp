@@ -1,5 +1,5 @@
 #include "global.h"
-int sub_080321A0(const u8 *p, int n)
+int Text_ParseDecimal(const u8 *p, int n)
 {
     int value = 0, power = 1;
     if (value < n) {

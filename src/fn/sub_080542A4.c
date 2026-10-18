@@ -1,5 +1,5 @@
 #include "hit_switch.h"
-void sub_0821D698(struct SceneCellRef *, u32, u32, s32, u32, u32);
+void TerrainModifiers_RegisterCell(struct SceneCellRef *, u32, u32, s32, u32, u32);
 void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
 {
     u32 kind;
@@ -24,6 +24,6 @@ void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
                 height = -(-y >> 8);
         }
     }
-    sub_0821D698(&entry->cellRef, entry->cellIndex, kind, height, 255, 0);
+    TerrainModifiers_RegisterCell(&entry->cellRef, entry->cellIndex, kind, height, 255, 0);
     entry->cellRegistered = 1;
 }

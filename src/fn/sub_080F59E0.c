@@ -22,7 +22,7 @@ struct Obj {
 };
 s32 Div(s32, s32);
 void sub_080F5B68(struct Obj *);
-void sub_080F59E0(struct Obj *p)
+void Sword_UpdateSpinningLunge(struct Obj *p)
 {
     p->rotation += p->byte1DD;
     p->x = p->startX + Div(p->dx * p->timer, 100);

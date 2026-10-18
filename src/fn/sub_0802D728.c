@@ -10,16 +10,16 @@ struct Object {
     struct Motion motion;
     u8 vector[8];
 };
-void sub_08225AB4(void *, int, int, int, int, void *);
-int sub_08225B20(void *, void *);
-int sub_0802D728(struct Object *p, int a, int b, int kind)
+void SceneBody_Init(void *, int, int, int, int, void *);
+int SceneBody_SetPositionTarget(void *, void *);
+int Actor_InitMotion(struct Object *p, int a, int b, int kind)
 {
     struct Motion *m;
     int result;
     p->kind = kind;
     m = &p->motion;
-    sub_08225AB4(m, a, b, (u8)kind, 7, p);
-    result = sub_08225B20(m, p->vector);
+    SceneBody_Init(m, a, b, (u8)kind, 7, p);
+    result = SceneBody_SetPositionTarget(m, p->vector);
     {
         u32 mask = 4;
         m->flags |= mask;

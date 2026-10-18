@@ -10,7 +10,7 @@ struct List {
 };
 extern struct List gUnk_03005280[14];
 extern u32 gUnk_0300523C;
-void sub_08219F94(struct Task *);
+void Task_UnlinkFromPriorityList(struct Task *);
 void Heap_Free(struct Task *);
 void TaskSystem_RunFrame(void)
 {
@@ -27,7 +27,7 @@ void TaskSystem_RunFrame(void)
                 } else {
                     if (task->destroy)
                         task->destroy(task);
-                    sub_08219F94(task);
+                    Task_UnlinkFromPriorityList(task);
                     Heap_Free(task);
                 }
                 task = following;

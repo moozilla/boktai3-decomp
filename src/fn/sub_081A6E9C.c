@@ -7,7 +7,7 @@ struct A {
     u16 h;
 };
 
-void sub_081A6E9C(struct A *p, u16 v)
+void Vanargand_SetPendingCue(struct A *p, u16 v)
 {
     u32 m = 0x200000;
     p->fl |= m;

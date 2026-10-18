@@ -41,9 +41,9 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_08034240(struct Engine *);
-int sub_08034258(struct Engine *);
-int sub_08034CFC(struct Engine *p)
+int WirelessController_ConsumePeerRefreshRequest(struct Engine *);
+int WirelessController_ConsumeAdvanceRequest(struct Engine *);
+int Wireless_UpdatePeerHandshake(struct Engine *p)
 {
     int bits;
     if (p->pending) {
@@ -51,7 +51,7 @@ int sub_08034CFC(struct Engine *p)
         p->entered = 0;
         p->flag = 0;
     }
-    if (sub_08034240(p)) {
+    if (WirelessController_ConsumePeerRefreshRequest(p)) {
         if (!p->scratch[1] && !(p->mask & 0x238))
             p->mask = 0x105 | p->mask;
         p->entered = 0;
@@ -95,7 +95,7 @@ receive:;
         if (connected) {
             int blocked = bits & 0x168;
             if (!blocked && connected == gUnk_03006A80->connSlotFlag) {
-                if (sub_08034258(p)) {
+                if (WirelessController_ConsumeAdvanceRequest(p)) {
                     setOperation(p, 9, blocked);
                     return 0;
                 }

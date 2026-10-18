@@ -13,7 +13,7 @@ struct S {
     struct T *t;
 };
 
-s32 sub_080D7408(struct S *s)
+s32 Mummy_CanPassMovementThreshold(struct S *s)
 {
     struct T *t = s->t;
     if (s->v >= t->v6d8 && t->h6d0 != 0)

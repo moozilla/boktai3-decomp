@@ -1,6 +1,5 @@
 #ifndef GUARD_MODIFIER_LIST_H
 #define GUARD_MODIFIER_LIST_H
-/* Tentative: selected source records used by the adjacent stat modifier routines. */
 #include "engine.h"
 struct ModifierRecord {
     s32 order : 8;

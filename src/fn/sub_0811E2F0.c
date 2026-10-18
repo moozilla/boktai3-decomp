@@ -4,7 +4,7 @@ void sub_0811DF78(void *);
 void sub_0811E038(void *);
 void sub_0811E134(void *);
 void sub_0811E224(void *);
-void sub_0811E2F0(void *p)
+void Modifier_LoadTablesFromScript(void *p)
 {
     sub_0811DEEC(p);
     sub_0811DF78(p);

@@ -72,7 +72,7 @@ static inline void effect(u8 *p, int id, int mode, int duration)
     } else if (p[0x38e] == 1)
         p[0x38c] = 0;
 }
-void sub_0802797C(ActorAnimation *p)
+void SceneActors_UpdateEightDirectionTurn(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

@@ -1,6 +1,6 @@
 #include "terrain_edge_marker.h"
-struct TerrainMarkerRegion *sub_0821E104(u16, u16 *);
-u8 *sub_0821D64C(u32, u32);
+struct TerrainMarkerRegion *Terrain_FindBoxesById(u16, u16 *);
+u8 *TerrainModifiers_FindCellOverride(u32, u32);
 void TerrainEdgeMarker_AddRegionFromScript(void)
 {
     u16 count;
@@ -11,7 +11,7 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
         tag = Script_GetValue();
     else
         tag = 0;
-    region = sub_0821E104((u16)tag, &count);
+    region = Terrain_FindBoxesById((u16)tag, &count);
     if (region) {
         s32 x;
         s32 z;
@@ -51,7 +51,7 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
             index = 0;
         else
             index = gUnk_030052F4->rows[z] + x;
-        cell = sub_0821D64C(index, 1);
+        cell = TerrainModifiers_FindCellOverride(index, 1);
         if (cell)
             cell += 4;
         else {

@@ -12,13 +12,13 @@ struct Obj {
 };
 void sub_081C0AA0(struct Obj *);
 u32 sub_081C3FBC(s32, s32);
-s32 sub_081C06C4(struct Obj *);
+s32 SceneActorSequence_BeginFadeIn(struct Obj *);
 static inline void fill32(void *dst, u32 *tmp, u32 ctl)
 {
     *tmp = 0;
     CpuSet(tmp, dst, ctl);
 }
-s32 sub_081C0B24(struct Obj *p)
+s32 SceneActorSequence_InitFromScript(struct Obj *p)
 {
     u32 zero;
     u32 e;
@@ -34,5 +34,5 @@ s32 sub_081C0B24(struct Obj *p)
     p->f58 = 0x70;
     p->f5A = 0x68;
     p->f5C = 0x64;
-    return sub_081C06C4(p);
+    return SceneActorSequence_BeginFadeIn(p);
 }

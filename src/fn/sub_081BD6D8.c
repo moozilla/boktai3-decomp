@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_081BD6D8(void)
+s32 DarkLoan_GetDefaultRate(void)
 {
     s16 v = *(s16 *)(gUnk_02000710 + 0x876);
     s32 r;

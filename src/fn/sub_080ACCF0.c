@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_080ACCF0(u8 *unused, u8 *obj, u8 *ctx)
+void Vorn_OnContactEvent(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

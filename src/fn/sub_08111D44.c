@@ -1,10 +1,10 @@
 #include "global.h"
-void sub_0803381C(u32);
-void sub_08111D44(u8 *p)
+void TextWindow_Clear(u32);
+void StageResults_DestroyTextWindows(u8 *p)
 {
     u32 *q = (u32 *)(p + 0x11CC);
     s32 i = 2;
     do {
-        sub_0803381C(*q++);
+        TextWindow_Clear(*q++);
     } while (--i >= 0);
 }

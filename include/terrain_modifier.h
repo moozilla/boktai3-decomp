@@ -3,7 +3,6 @@
 
 #include "engine.h"
 
-/* Tentative: a modifier applied to a map cell (tile/height override). */
 struct TerrainModifier {
     u16 id;
     u8 active; // registration is live
@@ -36,20 +35,20 @@ struct TerrainScriptVec {
 
 extern struct TerrainModifierManager *gUnk_02000028;
 
-void sub_0821D698(void *, s32, s32, s32, s32, s32);
+void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 
-u32 sub_08005E1C(struct TerrainModifier *);
-u32 sub_08005E40(struct TerrainModifier *);
+u32 TerrainModifiers_AddToList(struct TerrainModifier *);
+u32 TerrainModifiers_RemoveFromList(struct TerrainModifier *);
 s32 TerrainModifiers_Create(s32 id, struct TerrainVec *position, s32 kind, s32 tile, s32 flags);
-u32 sub_08005F40(struct TerrainModifier *);
-s32 sub_08005F78(void);
-s32 sub_08005FA8(u16 id);
-s32 sub_08005FE4(u16 id);
-s32 sub_0800602C(u32 id);
+u32 TerrainModifiers_Destroy(struct TerrainModifier *);
+s32 TerrainModifiers_DestroyAll(void);
+s32 TerrainModifiers_DestroyById(u16 id);
+s32 TerrainModifiers_Deactivate(u16 id);
+s32 TerrainModifiers_Activate(u32 id);
 s32 TerrainModifiers_Change(s32 id, s32 tile, s32 kind, s32 flags, s32 cell, s32 height);
-u32 sub_0800611C(void);
-u32 sub_08006120(void);
-s32 sub_08006134(struct TerrainModifierManager *manager, s32 unused);
-void *sub_08006144(s32 a, s32 unused);
+u32 TerrainModifierManager_Update(void);
+u32 TerrainModifierManager_Destroy(void);
+s32 TerrainModifierManager_Init(struct TerrainModifierManager *manager, s32 unused);
+void *TerrainModifierManager_Create(s32 a, s32 unused);
 
 #endif

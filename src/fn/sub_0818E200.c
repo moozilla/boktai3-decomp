@@ -19,7 +19,7 @@ static inline u8 reset(u8 *p)
     }
     return 0;
 }
-void sub_0818E200(u8 *p)
+void Armor_StartPartReturnMotion(u8 *p)
 {
     if (reset(p))
         *(void (**)(void))(p + 0x1d0) = sub_0818D21C;

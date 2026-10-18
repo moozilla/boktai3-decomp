@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
 extern u8 gUnk_08E6092C[][32];
-u8 *sub_0822D6C8(int);
+u8 *Inventory_GetEquipmentEntry(int);
 void SelectionMenu_ActorAvailability(u8 *p)
 {
     int i, mask;
@@ -20,7 +20,7 @@ void SelectionMenu_ActorAvailability(u8 *p)
         i--;
     } while (i >= 0);
     for (i = 0; i < 16; i++) {
-        u8 *actor = sub_0822D6C8(i);
+        u8 *actor = Inventory_GetEquipmentEntry(i);
         if (*actor != 255) {
             int id = *actor;
             u8 *data = gUnk_08E6092C[id];

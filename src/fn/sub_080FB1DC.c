@@ -10,7 +10,7 @@ struct S080FB1DC {
     struct Q *q;
 };
 
-void sub_080FB1DC(struct S080FB1DC *s)
+void Axe_InitRoutePointHistory(struct S080FB1DC *s)
 {
     struct Q *q = s->q;
     s32 i;

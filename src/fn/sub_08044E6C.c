@@ -6,7 +6,7 @@ struct EncodedRecordSession {
     u32 value;
 };
 s32 Div(s32, s32);
-u32 sub_082215A4(const void *, u32, u32);
+u32 Crc_ComputeIbm16(const void *, u32, u32);
 void EncodedRecord_EncodeFields(u8 *record)
 {
     u32 bit;
@@ -88,7 +88,7 @@ padNames:
 namesDone:
     EncodedRecord_WriteBits(record, 0, &bit, 144 - bit, 6);
     EncodedRecord_XorRange(record, 4, 24, 0x8C159, skip, 63);
-    value = sub_082215A4(record, 3, 24);
+    value = Crc_ComputeIbm16(record, 3, 24);
     bit = 0;
     EncodedRecord_WriteBits(record, value, &bit, 16, 6);
 }

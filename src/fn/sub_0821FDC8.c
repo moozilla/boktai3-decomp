@@ -15,7 +15,7 @@ struct M {
     u16 c2;
 };
 extern struct M *gUnk_03001688;
-void sub_0821FDC8(struct Nd *n)
+void Collider_Register(struct Nd *n)
 {
     struct Nd *p;
     if (gUnk_03001688 == 0)

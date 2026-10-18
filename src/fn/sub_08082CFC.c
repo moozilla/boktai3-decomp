@@ -2,7 +2,7 @@
 
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
 
-void sub_08082CFC(u8 *p)
+void SceneActorControl_ResetDirectionalAnimation(u8 *p)
 {
     if (p[0x2b2] != 0)
         p[0x2b2] = 0;

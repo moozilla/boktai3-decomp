@@ -7,7 +7,7 @@ struct A {
     struct H *f10;
 };
 extern struct A *gUnk_030052F4;
-u8 *sub_0821E748(u32 i)
+u8 *Path_GetDefinition(u32 i)
 {
     struct H *h = gUnk_030052F4->f10;
     return i < h->n ? (u8 *)h + 4 + (i << 2) : 0;

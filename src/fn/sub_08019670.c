@@ -6,7 +6,7 @@ struct S {
 };
 extern u32 gUnk_020000A4;
 void Heap_Free(u32);
-u32 sub_08019670(struct S *p)
+u32 TileAnimation_Destroy(struct S *p)
 {
     if (p->a != 0) {
         Heap_Free(p->a);

@@ -3,7 +3,7 @@ extern u8 *gUnk_02000710;
 s32 Div(s32, s32);
 /* Bucket the share of counter 0x638 in 0x638 + 0x63C (in 1/128ths):
  * above 70 -> 0, 59-70 -> 2, else 1; stored at 0x660. */
-s32 sub_08228028(void)
+s32 GameState_UpdateCounterBalanceRank(void)
 {
     s32 total, share, rank;
     if (*(u32 *)(gUnk_02000710 + 0x638) == 0)

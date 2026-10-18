@@ -43,14 +43,14 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
-void sub_08222330(void *, void *);
+void PolarInterpolation_SetCurrentFromPoint(void *, void *);
 void sub_082222BC(void *, void *, int);
 int sub_08222358(void *, void *);
 void Sound_PlaySongChecked(int);
 int SceneActorGraphics_GetResourceId(void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
-void sub_080251C4(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
@@ -69,7 +69,7 @@ void sub_080251C4(ActorAnimation *p, int tick)
             SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
                                                      1, 1, 4);
         }
-        sub_08222330((u8 *)p + 0x30c, (u8 *)p + 0x54);
+        PolarInterpolation_SetCurrentFromPoint((u8 *)p + 0x30c, (u8 *)p + 0x54);
         sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, *(u16 *)((u8 *)p + 0x354));
         if (*(u16 *)((u8 *)p + 0x354) <= 64)
             Sound_PlaySongChecked(840);

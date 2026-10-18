@@ -6,7 +6,7 @@ static inline u8 chk(u32 m)
         return 1;
     return 0;
 }
-u32 sub_081403D8(u32 x)
+u32 Player_IsStatusBit3ActionActive(u32 x)
 {
     if (x & 0x80) {
         if (chk(8))

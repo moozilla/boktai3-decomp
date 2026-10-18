@@ -2,7 +2,7 @@
 
 u32 sub_08184FE8(u8 *, u32);
 
-u32 sub_081851C4(u8 *p, u32 v)
+u32 ActorController_StartAlternateTurn(u8 *p, u32 v)
 {
     s32 d;
     *(p + 0xB3A) = v;

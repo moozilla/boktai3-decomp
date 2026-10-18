@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0816B954(s32 x)
+s32 MapScreen_GetMarkerFlipFlags(s32 x)
 {
     return x >> 4;
 }

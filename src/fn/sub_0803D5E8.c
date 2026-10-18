@@ -7,7 +7,7 @@ struct S {
     u8 *items;
 };
 
-u8 *sub_0803D5E8(struct S *s, u32 *idx)
+u8 *ScenePool_FindFreeEntry(struct S *s, u32 *idx)
 {
     u32 i;
     u8 *e = s->items;

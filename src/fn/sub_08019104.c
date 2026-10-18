@@ -1,13 +1,13 @@
 #include "global.h"
-void sub_0801901C(void);
+void CircleWindow_ResetState(void);
 void VBlankIntrWait(void);
-void sub_08216F78(int, int, int, int, int);
+void Video_SetWindowBounds(int, int, int, int, int);
 extern void *gUnk_0200009C;
 int CircleWindow_Destroy(void)
 {
-    sub_0801901C();
+    CircleWindow_ResetState();
     VBlankIntrWait();
-    sub_08216F78(0, 0, 0, 240, 160);
+    Video_SetWindowBounds(0, 0, 0, 240, 160);
     gUnk_0200009C = 0;
     return 0;
 }

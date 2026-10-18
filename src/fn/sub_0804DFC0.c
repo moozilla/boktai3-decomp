@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_0200010C;
-s32 sub_0804DFC0(u32 a)
+s32 AreaEffect_HasEnabledTerrainValue(u32 a)
 {
     u8 *g = gUnk_0200010C;
     u8 *np;

@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_082250D8(void)
+void SceneLifecycle_OnTransitionCleanup(void)
 {
 }

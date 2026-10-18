@@ -18,7 +18,7 @@ init:
     do {
         *active = 0;
         sub_08217DE0(sprite, pool->graphics, 0);
-        sub_08217EC4(sprite, -8, -10);
+        Effect_SetOrigin(sprite, -8, -10);
         sprite->renderMode = 2;
         sprite->flags |= 1;
         active += sizeof(struct SparkParticle);

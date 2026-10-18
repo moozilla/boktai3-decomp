@@ -9,7 +9,7 @@ struct S {
 extern u8 gUnk_03005430[];
 void Sound_PlaySong(u32);
 void SunClock_GetBaseHour(void);
-void sub_081E4518(struct S *p)
+void Actor_UpdateInteractionSoundDelay(struct S *p)
 {
     if (--p->timer == 0) {
         p->callback = 0;

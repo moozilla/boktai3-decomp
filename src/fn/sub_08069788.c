@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "bouncing_object.h"
+/* BouncingObject_IsActive: Returns true for a nonnull object with a nonnegative slot index and nonzero timer whose state is not 2 */
+#define BouncingObject_IsActive sub_08069788
 #define BouncingObject_IsActive sub_08069788
 u32 BouncingObject_IsActive(struct BouncingObject *input)
 {

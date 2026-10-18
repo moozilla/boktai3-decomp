@@ -5,7 +5,7 @@ struct Item {
     u8 pad28[0x30];
     u32 flags2;
 };
-void sub_080399D4(void *p, struct Item *q)
+void WirelessGameItems_UpdateHiddenItem(void *p, struct Item *q)
 {
     if (q->entered) {
         q->entered = 0;

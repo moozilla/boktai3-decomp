@@ -1,12 +1,12 @@
 #include "global.h"
 
-void sub_0822B45C(void);
+void Sound_ResumePersistentSongs(void);
 
-void sub_0822505C(void)
+void SceneLifecycle_ResumeScene(void)
 {
     u32 *p;
     u32 m;
-    sub_0822B45C();
+    Sound_ResumePersistentSongs();
     p = (u32 *)0x0300523C;
     m = ~2;
     *p = *p & m;

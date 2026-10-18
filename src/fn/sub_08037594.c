@@ -32,18 +32,18 @@ void *ScriptProc_Start(int, int);
 void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
-void sub_08220D20(void *, void *, int, int, int);
+void Anim_RestartSequence(void *, void *, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Memory_Copy(void *, const void *, int);
-void sub_08036CF0(const u8 *, u8 *, int);
-void *sub_08037DCC(int);
+void WirelessText_DecodeString(const u8 *, u8 *, int);
+void *WirelessExchange_GetPeerEntry(int);
 void TextWindow_Refresh(int, int);
-int sub_08036AC4(void);
-int sub_08037594(void)
+int Wireless_GetConnectedSlotMask(void);
+int WirelessPeerMenu_GetFirstConnectedPlayer(void)
 {
-    int slots = sub_08036AC4();
+    int slots = Wireless_GetConnectedSlotMask();
     int i = 0;
     int result;
     do {

@@ -15,7 +15,7 @@ struct S {
     u32 f2cc;
 };
 
-s32 sub_081C6710(struct S *p)
+s32 StateActor_EnterPendingState(struct S *p)
 {
     s32 r;
     if ((u8)(p->b5 - 1) <= 0xd) {

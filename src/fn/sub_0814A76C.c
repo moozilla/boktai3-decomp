@@ -10,9 +10,9 @@ struct P0814A76C {
     u8 fBF5;
 };
 s32 sub_0814A530(void *, void *, s32);
-s32 sub_0814A698(void *, s32, s32);
+s32 Player_GetSpecialAttackPower(void *, s32, s32);
 
-s32 sub_0814A76C(struct P0814A76C *p, s32 d)
+s32 Player_CalculateBaseAttackPower(struct P0814A76C *p, s32 d)
 {
     u8 *q = (u8 *)p + 0x32C;
     s32 sum = *(s16 *)(q + 10) + p->f420 + d;
@@ -22,7 +22,7 @@ s32 sub_0814A76C(struct P0814A76C *p, s32 d)
         case 2:
             return sub_0814A530(p, (u8 *)p + 0xB44, sum);
         case 4:
-            return sub_0814A698(p, p->fBF4, sum);
+            return Player_GetSpecialAttackPower(p, p->fBF4, sum);
         default:
             return 1;
     }

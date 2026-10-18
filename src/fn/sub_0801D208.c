@@ -1,10 +1,10 @@
 #include "global.h"
-void sub_0801C17C(void *);
+void ResultGame_ShowTargetMarker(void *);
 int ResultTutorial_SlideMarkerIn(u8 *p)
 {
     switch (p[0xaf]) {
         case 0:
-            sub_0801C17C(p);
+            ResultGame_ShowTargetMarker(p);
             *(int *)(p + 0x8c) = 0;
             *(int *)(p + 0x9c) = 0;
             ++p[0xaf];

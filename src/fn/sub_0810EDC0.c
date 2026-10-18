@@ -18,22 +18,22 @@ struct G2 {
 extern struct G2 *gUnk_020004B4;
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_08033A38(u32, u32, void *);
-void sub_080337FC(u32);
-void sub_0810EDC0(struct H *h)
+void TextWindow_SetString(u32, u32, void *);
+void TextWindow_StartPlayback(u32);
+void LinkLobbyPanel_RefreshPlayerNames(struct H *h)
 {
     struct G2 *g = gUnk_020004B4;
     if (g != 0 && g->b == 1 && g->a != 0) {
         TextWindow_SetScript(h->c, h->a);
         TextWindow_Refresh(h->c, 0);
-        sub_08033A38(h->c, 1, g->c);
-        sub_080337FC(h->c);
+        TextWindow_SetString(h->c, 1, g->c);
+        TextWindow_StartPlayback(h->c);
         g = gUnk_020004B4;
         if (g != 0 && g->b == 1 && g->e != 0) {
             TextWindow_SetScript(h->d, h->a);
             TextWindow_Refresh(h->d, 1);
-            sub_08033A38(h->d, 2, g->g);
-            sub_080337FC(h->d);
+            TextWindow_SetString(h->d, 2, g->g);
+            TextWindow_StartPlayback(h->d);
         }
     }
 }

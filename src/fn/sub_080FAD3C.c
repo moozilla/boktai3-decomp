@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080FAD3C(u16 x, s32 *a, s32 *b)
+void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b)
 {
     s32 v = ((x + 0x70) >> 5) & 7;
     s32 r;

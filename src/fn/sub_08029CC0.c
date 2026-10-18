@@ -31,9 +31,9 @@ struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
-void sub_0802A4F4(void *);
-void sub_0802A53C(void *);
-void sub_0802A63C(void *);
+void GridAttackActor_UpdateDamageHold(void *);
+void GridAttackActor_UpdateDamageRecovery(void *);
+void GridAttack_UpdateDeathState(void *);
 static inline void action(struct Common *p, int id, int zero)
 {
     int one = 1;
@@ -43,7 +43,7 @@ static inline void action(struct Common *p, int id, int zero)
     p->actionTimer = zero;
     p->entered = one;
 }
-int sub_08029CC0(struct Common *p, int kind, int damage)
+int GridAttackActor_OnDamage(struct Common *p, int kind, int damage)
 {
     u8 *position = (u8 *)p + 0x48;
     struct Packed size;
@@ -56,11 +56,11 @@ int sub_08029CC0(struct Common *p, int kind, int damage)
                 DamageNumberDisplay_Show((u8 *)p + 0x818, damage, 0, (u8 *)p + 0x54, &size, 1);
             }
             action(p, 0, 0);
-            state(p, sub_0802A4F4, 5);
+            state(p, GridAttackActor_UpdateDamageHold, 5);
             break;
         case 2:
             action(p, 1, 0);
-            state(p, sub_0802A53C, 6);
+            state(p, GridAttackActor_UpdateDamageRecovery, 6);
             {
                 int angle = position[9];
                 *((u8 *)p + 0x17e) = angle;
@@ -76,7 +76,7 @@ int sub_08029CC0(struct Common *p, int kind, int damage)
                 p->flags |= mask;
             }
             action(p, 3, zero);
-            state(p, sub_0802A63C, 8);
+            state(p, GridAttack_UpdateDeathState, 8);
         } break;
     }
     return 1;

@@ -4,7 +4,7 @@ struct P {
     u8 *o;
 };
 void sub_0813F9EC(u8 *, s32);
-void sub_08168CC4(struct P *p)
+void PauseMenu_ApplySelectedEquipment(struct P *p)
 {
     s8 *q = (s8 *)p + 0xC72;
     s8 *r;

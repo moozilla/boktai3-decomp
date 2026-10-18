@@ -9,14 +9,14 @@ struct A {
     struct E e[24];
 };
 extern u32 gUnk_02000604;
-void sub_0820D2A0(struct A *, struct E *, s32);
-u32 sub_0820D5AC(struct A *a)
+void EnemyParticle_ReleaseSlot(struct A *, struct E *, s32);
+u32 EnemyParticle_DestroyPool(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;
     do {
         if (a->w18 & (1 << i))
-            sub_0820D2A0(a, e, i);
+            EnemyParticle_ReleaseSlot(a, e, i);
         i++;
         e++;
     } while (i <= 0xF);

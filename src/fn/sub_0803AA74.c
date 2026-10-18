@@ -13,7 +13,7 @@ struct Display {
 };
 void Anim_LoadKeyframe(void *, void *, int, int);
 void Sound_PlaySong(int);
-void sub_0803AA74(struct Display *p)
+void WirelessGameDisplay_UpdateChimeAnimation(struct Display *p)
 {
     if (p->entered) {
         struct Drawing *q;

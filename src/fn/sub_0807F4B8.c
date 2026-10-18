@@ -3,8 +3,8 @@
 #include "scene_actor_reset.h"
 void sub_0807C72C(struct SceneActorBehaviorView *, u32, u32, u32);
 extern const u8 gUnk_0824E114[];
-void sub_0812E084(void *, const void *, u32);
-void sub_0807FC90(u8 *);
+void SceneActorReaction_ResetResponseState(void *, const void *, u32);
+void SceneActorControl_OnIdle(u8 *);
 #include "scene_actor_contact_list.h"
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
@@ -90,9 +90,9 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             *(u16 *)((u8 *)route + 0x14) = zero;
             route->timer = zero;
         }
-        sub_0812E084((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
+        SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
         {
-            register void *control asm("r12") = (void *)sub_0807FC90;
+            register void *control asm("r12") = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
             u32 offset = 0x2B2;
             u32 one;

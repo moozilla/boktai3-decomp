@@ -2,7 +2,7 @@
 
 extern u32 gUnk_0200005C;
 
-void sub_082321D4(void)
+void SceneActorEffects_DestroyManager(void)
 {
     gUnk_0200005C = 0;
 }

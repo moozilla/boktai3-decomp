@@ -5,7 +5,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, void *);
 extern u8 gUnk_0824F6F8[];
-u32 sub_0819A5AC(u8 *s)
+u32 PaletteCycleBackground_Init(u8 *s)
 {
     struct Blob {
         u32 words[8];

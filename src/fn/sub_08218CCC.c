@@ -1,11 +1,11 @@
 #include "global.h"
 
-u32 *sub_08218CC4(void);
+u32 *Text_GetGlyphCache(void);
 
-s32 sub_08218CCC(u32 a, u32 b, u32 c, u32 d)
+s32 Text_FindCachedGlyph(u32 a, u32 b, u32 c, u32 d)
 {
     u32 key = (a | (b << 16) | (c << 18) | (d << 20)) & 0x3FFFFF;
-    u32 *p = sub_08218CC4();
+    u32 *p = Text_GetGlyphCache();
     s32 i = 0;
     do {
         u32 v = *p;

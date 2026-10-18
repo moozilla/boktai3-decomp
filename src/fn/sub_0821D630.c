@@ -6,7 +6,7 @@ struct R {
     u8 f5;
     u16 f6;
 };
-void sub_0821D630(struct R *r, u16 a, u32 b, u32 c, u8 d, u16 e)
+void TerrainModifiers_InitCell(struct R *r, u16 a, u32 b, u32 c, u8 d, u16 e)
 {
     r->f2 = a;
     r->f0 = 0;

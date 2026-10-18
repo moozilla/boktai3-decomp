@@ -5,7 +5,7 @@ struct S {
     u8 f1[0x13];
     u32 c4;
 };
-void sub_081EF8F0(struct S *p)
+void SingletonSlot7_UpdatePrimaryTransitionWait(struct S *p)
 {
     u8 *q = &p->b0;
     if (*q) {

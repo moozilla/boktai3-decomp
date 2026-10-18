@@ -5,8 +5,8 @@ struct E {
     u8 pad[6];
 };
 extern u32 gUnk_020004C4;
-void sub_08112E70(void *);
-s32 sub_08113310(u8 *s)
+void SceneDebris_ReleaseVisual(void *);
+s32 SceneDebrisPool_Destroy(u8 *s)
 {
     s32 i;
     u32 z;
@@ -14,7 +14,7 @@ s32 sub_08113310(u8 *s)
     i = 0x3f;
     do {
         if (p->b != 0)
-            sub_08112E70(p);
+            SceneDebris_ReleaseVisual(p);
         p++;
     } while (--i >= 0);
     z = 0;

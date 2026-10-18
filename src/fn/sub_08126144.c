@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_08126144(u8 *s)
+u8 *ScriptedParticle_AllocateSlot(u8 *s)
 {
     s32 i = 0;
     u8 *a = s + 0x88;

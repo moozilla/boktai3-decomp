@@ -6,7 +6,7 @@ struct S08238B28 {
     u8 f64;
 };
 
-void sub_08238B28(struct S08238B28 *p)
+void Player_OnDirectionalEffectAnimationEvent(struct S08238B28 *p)
 {
     if (p->f64 != 0)
         p->f64 = 0;

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_081BDA10(u32 a, s32 v)
+s32 Storage_FindEquippedItemSlot(u32 a, s32 v)
 {
     s32 i;
     s16 *q;

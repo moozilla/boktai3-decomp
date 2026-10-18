@@ -18,7 +18,7 @@ void Anim_LoadKeyframe(void *, void *, int, int);
 void Sound_PlaySong(int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_0803A9CC(struct Display *arg)
+void WirelessGameDisplay_UpdateShakeAnimation(struct Display *arg)
 {
     register struct Display *p asm("r6") = arg;
     struct Drawing *q;

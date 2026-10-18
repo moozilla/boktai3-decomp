@@ -6,7 +6,7 @@ struct S {
     u8 p[0xc];
     u32 w;
 };
-void sub_08231788(struct S *s)
+void SceneActorEffects_FinishSlot(struct S *s)
 {
     s->b0 = 0;
     s->h2 = 0;

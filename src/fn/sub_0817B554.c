@@ -9,7 +9,7 @@ static inline u8 test(u8 *p)
     }
     return 0;
 }
-void sub_0817B554(u8 *p)
+void SceneActors_UpdateTransitionToState16(u8 *p)
 {
     if (test(p)) {
         u32 x = 0x10;

@@ -7,7 +7,7 @@ struct S {
     const u8 *p;
 };
 
-void sub_080E8768(struct S *s)
+void Mimic_InitActionTable(struct S *s)
 {
     s->p = gUnk_086062AC;
 }

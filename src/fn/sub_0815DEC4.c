@@ -8,7 +8,7 @@ struct P {
 
 s32 Collider_Refresh(void *);
 
-void sub_0815DEC4(struct P *p)
+void Player_UpdateColliderRefreshCountdown(struct P *p)
 {
     u8 *q = &p->c;
     if (*q != 0) {

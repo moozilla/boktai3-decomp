@@ -1,6 +1,6 @@
 #include "global.h"
 
-double sub_08229468(s32 unused, u32 year, s32 month, s32 day)
+double Time_CalculateModifiedJulianDate(s32 unused, u32 year, s32 month, s32 day)
 {
     u32 yearDays, monthDays, y;
     s32 m;

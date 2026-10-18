@@ -1,16 +1,16 @@
 #include "global.h"
 
-void sub_08195014(u8 *, s32, s32);
-void sub_08195078(u8 *, s32, s32);
-void sub_08195A4C(u8 *, u32);
-void sub_081959C0(u8 *);
+void Nidhoggr_InitRelativeMotion(u8 *, s32, s32);
+void Nidhoggr_UpdateAnchoredSway(u8 *, s32, s32);
+void Nidhoggr_SetBehavior(u8 *, u32);
+void Nidhoggr_ResetAllPartHealth(u8 *);
 
-void sub_08196674(u8 *t)
+void Nidhoggr_UpdateRetreat(u8 *t)
 {
     u8 *state = t + 0x724a;
     switch (*state) {
         case 0:
-            sub_08195014(t, 0x200, 0x980);
+            Nidhoggr_InitRelativeMotion(t, 0x200, 0x980);
             *(s32 *)(t + 0x72b4) = -0x600;
             (*state)++;
         case 1: {
@@ -24,10 +24,10 @@ void sub_08196674(u8 *t)
             *vel += 6;
             if (*vel > -0x30)
                 *vel = -0x30;
-            sub_08195078(t, 0x200, 0x980);
+            Nidhoggr_UpdateAnchoredSway(t, 0x200, 0x980);
             if (*(s16 *)(t + 0x5404) <= 0) {
-                sub_08195A4C(t, 4);
-                sub_081959C0(t);
+                Nidhoggr_SetBehavior(t, 4);
+                Nidhoggr_ResetAllPartHealth(t);
             }
             break;
         }

@@ -28,8 +28,8 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->reset = zero;
     p->pending = zero;
 }
-int sub_0802AD0C(void *);
-void sub_0802A63C(void *);
+int GridAttack_SelectNextAction(void *);
+void GridAttack_UpdateDeathState(void *);
 static inline u8 chk(struct Common *p)
 {
     if (p->entered) {
@@ -48,7 +48,7 @@ static inline void action(struct Common *p, int id, int zero)
     p->actionTimer = zero;
     p->entered = one;
 }
-void sub_0802B660(struct Common *p)
+void GridAttack_UpdateDamageAction(struct Common *p)
 {
     struct Common *base = p;
     if (chk(p) == 1) {

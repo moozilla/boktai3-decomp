@@ -10,7 +10,7 @@ struct Q {
     s16 a;
     s16 b;
 };
-void sub_080211B0(struct S *p, u32 x, struct Q *q)
+void SceneCommands_SetPosition(struct S *p, u32 x, struct Q *q)
 {
     p->a = q->a;
     p->b = q->b;

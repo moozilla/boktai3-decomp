@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_StepAngleTowardTarget: Steps along the shortest angular difference without overshooting the target */
+#define Math_StepAngleTowardTarget sub_0819B200
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {

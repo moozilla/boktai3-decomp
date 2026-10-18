@@ -1,4 +1,6 @@
 #include "falling_objects.h"
+/* FallingObjectManager_ClearGlobal: clears the global FallingObjectManager pointer (gUnk_0200046C); already aliased this way in src/falling_objects.c */
+#define FallingObjectManager_ClearGlobal sub_0800CBA0
 
 #define FallingObjectManager_ClearGlobal sub_0800CBA0
 
@@ -7,7 +9,7 @@ void FallingObjectManager_ClearGlobal(void)
     gUnk_0200046C = 0;
 }
 
-void sub_0800CBAC(struct FallingHit *a, u32 unused, struct FallingObject *b)
+void FallingObject_ReceiveHit(struct FallingHit *a, u32 unused, struct FallingObject *b)
 {
     struct FallingObject *c = b;
     if (c->type == 0) {
@@ -23,11 +25,11 @@ void sub_0800CBAC(struct FallingHit *a, u32 unused, struct FallingObject *b)
     }
 }
 
-void sub_0800CBDC(void)
+void FallingObject_ReceiveAttackHit(void)
 {
 }
 
-u32 sub_0800CBE0(struct FallingObjectManager *head, struct FallingObject *n)
+u32 FallingObjectManager_AddObject(struct FallingObjectManager *head, struct FallingObject *n)
 {
     struct FallingObject **slot;
     struct FallingObject *t;
@@ -42,7 +44,7 @@ u32 sub_0800CBE0(struct FallingObjectManager *head, struct FallingObject *n)
     return 0;
 }
 
-u32 sub_0800CC08(struct FallingObjectManager *head, struct FallingObject *n)
+u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *head, struct FallingObject *n)
 {
     struct FallingObject *prev = n->previous;
     struct FallingObject *next = n->next;
@@ -57,23 +59,23 @@ u32 sub_0800CC08(struct FallingObjectManager *head, struct FallingObject *n)
     return 0;
 }
 
-void sub_08013B74(void *effect);
+void ScaledShadow_Destroy(void *effect);
 
-void sub_0800CC34(void *object)
+void FallingObject_ClearEffect(void *object)
 {
     struct FallingObject *p = object;
     if (p->effectActive) {
-        sub_08013B74(p->effect);
+        ScaledShadow_Destroy(p->effect);
         p->effectActive = 0;
     }
 }
 
-u32 sub_0800CC50(struct FallingObject *s)
+u32 FallingObject_Destroy(struct FallingObject *s)
 {
     Sprite_Remove(&s->sprite);
     if (gUnk_0200046C != 0)
-        sub_0800CC08(gUnk_0200046C, s);
-    sub_0800CC34(s);
+        FallingObjectManager_RemoveObject(gUnk_0200046C, s);
+    FallingObject_ClearEffect(s);
     if (s->collider != 0) {
         Collider_Remove(s->collider);
         Heap_Free(s->collider);
@@ -90,9 +92,9 @@ struct Cell {
 
 extern u16 gUnk_08604ABC[];
 
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
 void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 
@@ -106,7 +108,7 @@ static inline s32 cellIndex(struct FallingVec *pos)
 
 static inline struct Cell *getCell(s32 index)
 {
-    u8 *dynamic = sub_0821D64C(index, 1);
+    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return (struct Cell *)(dynamic + 4);
     return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
@@ -120,7 +122,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     s32 variant;
     struct FallingVec *pos;
     void *resource;
-    if (!gUnk_0200046C && !sub_0800D828((void *)0xc0db, 0))
+    if (!gUnk_0200046C && !FallingObjectManager_Create((void *)0xc0db, 0))
         return -1;
     p = Heap_Alloc(sizeof(*p));
     if (!p)
@@ -193,7 +195,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
             offset.z = 0;
         }
         Collider_Init(p->collider, p->id, 0x4001, 0, 16, &size, &offset);
-        Collider_SetCallback(p->collider, sub_0800CBAC, p);
+        Collider_SetCallback(p->collider, FallingObject_ReceiveHit, p);
         Collider_Refresh(p->collider);
         Collider_SetPosition(p->collider, pos, 0);
     } else
@@ -226,8 +228,8 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         if (!p->type)
             attackFlags = 0x200004;
         Collider_Init(p->attack, p->id, 0x2001, 0, 32, &size, &offset);
-        sub_0821FF58(p->attack, power, force, 65536, attackFlags, 60);
-        Collider_SetCallback(p->attack, sub_0800CBDC, p);
+        Collider_SetAttackProperties(p->attack, power, force, 65536, attackFlags, 60);
+        Collider_SetCallback(p->attack, FallingObject_ReceiveAttackHit, p);
         Collider_SetPosition(p->attack, pos, 0);
     } else
         p->attack = 0;
@@ -255,7 +257,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     p->remove = 0;
     p->previous = 0;
     p->next = 0;
-    return sub_0800CBE0(gUnk_0200046C, p);
+    return FallingObjectManager_AddObject(gUnk_0200046C, p);
 }
 
 s32 FallingObject_CreateFromScript(void)
@@ -339,7 +341,7 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
     if (object->entered) {
         object->entered = 0;
         Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 2, 0, 0);
-        sub_0800CC34(object);
+        FallingObject_ClearEffect(object);
         sub_08015F60((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8, 0, 256, 24,
                      16);
     }
@@ -379,14 +381,14 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
 
 void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
 
-void sub_082260A4(u32);
+void Camera_RequestShake(u32);
 
 void FallingObject_UpdateShatter(struct FallingObject *object)
 {
     struct FallingPackedVec low, high;
     if (object->entered) {
         object->entered = 0;
-        sub_0800CC34(object);
+        FallingObject_ClearEffect(object);
         if (!(gUnk_030053F4 & 2048)) {
             low.x = -15;
             low.y = 8;
@@ -400,7 +402,7 @@ void FallingObject_UpdateShatter(struct FallingObject *object)
     }
     if (object->timer < 12) {
         object->position.y += 8;
-        sub_082260A4(40);
+        Camera_RequestShake(40);
     } else {
         object->position.y -= 4;
         if (object->position.y < object->ground)
@@ -438,7 +440,7 @@ void FallingObject_UpdateBounceAway(struct FallingObject *object)
     }
     if (object->timer < 15) {
         object->position.y -= (object->timer >> 2) - 16;
-        sub_082260A4(40);
+        Camera_RequestShake(40);
     } else {
         s32 amount = object->timer - 15;
         if (amount < 16)
@@ -459,7 +461,7 @@ void FallingObject_UpdateBounceAway(struct FallingObject *object)
     else
         object->sprite.flags &= ~1;
     if (object->timer++ > object->parameter) {
-        sub_0800CC34(object);
+        FallingObject_ClearEffect(object);
         object->remove = 1;
     }
 }
@@ -482,7 +484,7 @@ void FallingObject_UpdateWaiting(struct FallingObject *object)
     }
 }
 
-void sub_0800CC34(void *);
+void FallingObject_ClearEffect(void *);
 
 s32 AnimatedParticles_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
 
@@ -507,7 +509,7 @@ void FallingObject_UpdateFinish(struct FallingObject *object)
             result |= flags;
             ((u16 *)object->collider)[3] = result;
         }
-        sub_0800CC34(object);
+        FallingObject_ClearEffect(object);
     }
     if (object->animationDone) {
         if (!object->remove)
@@ -533,7 +535,7 @@ s32 FallingObjectManager_Update(struct FallingObjectManager *manager)
     for (; p; p = next) {
         next = p->next;
         if (p->remove) {
-            sub_0800CC50(p);
+            FallingObject_Destroy(p);
             continue;
         }
         if (p->animated) {
@@ -604,18 +606,18 @@ s32 FallingObjectManager_Update(struct FallingObjectManager *manager)
     return 0;
 }
 
-u32 sub_0800D7D4(struct FallingObjectManager *s)
+u32 FallingObjectManager_Destroy(struct FallingObjectManager *s)
 {
     struct FallingObject *n = s->head;
     while (n != 0) {
         struct FallingObject *next = n->next;
-        sub_0800CC50(n);
+        FallingObject_Destroy(n);
         n = next;
     }
     return (u32)(gUnk_0200046C = 0);
 }
 
-s32 sub_0800D800(struct FallingObjectManager *p, void *unused)
+s32 FallingObjectManager_Initialize(struct FallingObjectManager *p, void *unused)
 {
     gUnk_0200046C = p;
     p->animation = ScriptProc_Start(0x922E, 0x931E);
@@ -623,15 +625,15 @@ s32 sub_0800D800(struct FallingObjectManager *p, void *unused)
     return 0;
 }
 
-void *sub_0800D828(void *a, u32 unused)
+void *FallingObjectManager_Create(void *a, u32 unused)
 {
     struct FallingObjectManager *p;
     if (gUnk_0200046C != 0)
         return gUnk_0200046C;
     p = Task_Create(8, 0x20);
     if (p != 0) {
-        Task_SetCallbacks(p, (void *)FallingObjectManager_Update, (void *)sub_0800D7D4);
-        if (sub_0800D800(p, a) < 0) {
+        Task_SetCallbacks(p, (void *)FallingObjectManager_Update, (void *)FallingObjectManager_Destroy);
+        if (FallingObjectManager_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
         }

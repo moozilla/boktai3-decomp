@@ -8,7 +8,7 @@ struct Q {
 };
 void sub_081B9E58(void *);
 
-void sub_081BA1D4(struct Q *p)
+void Registry2388_UpdateSelection(struct Q *p)
 {
     s32 v;
     if (p->p558 == 0)

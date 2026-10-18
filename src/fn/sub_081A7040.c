@@ -4,9 +4,9 @@ void Sprite_Init(u8 *, u8 *, u32);
 void *ScriptProc_Start(u32, u32);
 void sub_081A6FF4(u8 *, u8 *);
 void sub_081A6F34(u8 *);
-void sub_081A6EBC(void);
-void sub_0815F6F0(u8 *, u8 *, void (*)(void));
-void sub_081A7040(u8 *s, u8 *t)
+void Vanargand_OnPartTrigger(void);
+void TargetRegistry_RegisterSceneActor(u8 *, u8 *, void (*)(void));
+void Vanargand_InitPart(u8 *s, u8 *t)
 {
     u8 *obj = t + 0x2C;
     u8 *coords;
@@ -27,7 +27,7 @@ void sub_081A7040(u8 *s, u8 *t)
     *(u16 *)(coords + 4) = width;
     sub_081A6FF4(s, coords + 0x44);
     sub_081A6F34(t);
-    sub_0815F6F0(t + 0x110, t + 0xA8, sub_081A6EBC);
+    TargetRegistry_RegisterSceneActor(t + 0x110, t + 0xA8, Vanargand_OnPartTrigger);
     *(u16 *)(t + 0x120) = zero;
     *(u32 *)(t + height) = zero;
     *(u16 *)(t + 0x106) = zero;

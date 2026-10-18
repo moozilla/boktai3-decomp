@@ -42,9 +42,9 @@ struct FloorSwitch {
     u16 field8C, field8E;
 };
 extern void *gUnk_020001A8;
-void *sub_08100A0C(void);
-struct FloorSwitch *sub_0810033C(void *);
-struct SceneObjectList *sub_08225AA0(void);
+void *FloorSwitch_GetOrCreateManager(void);
+struct FloorSwitch *FloorSwitch_AllocateSlot(void *);
+struct SceneObjectList *SceneBody_GetRegistry(void);
 s32 Region_FindContaining(struct Vec16 *);
 static inline s32 optionalValue(void)
 {
@@ -66,11 +66,11 @@ void FloorSwitch_Create(void)
     struct Vec16 delta;
     s32 i, f;
     if (!manager) {
-        manager = sub_08100A0C();
+        manager = FloorSwitch_GetOrCreateManager();
         if (!manager)
             return;
     }
-    e = sub_0810033C(manager);
+    e = FloorSwitch_AllocateSlot(manager);
     if (!e)
         return;
     e->field86 = 1;
@@ -113,10 +113,10 @@ void FloorSwitch_Create(void)
         p->field10 = 0;
         AnimData_SelectPaletteBank(e->anim, 0x16C);
     }
-    if (sub_08225AA0()) {
+    if (SceneBody_GetRegistry()) {
         struct SceneObject *o;
         struct Vec16 *d = &delta;
-        for (o = sub_08225AA0()->head; o; o = o->next) {
+        for (o = SceneBody_GetRegistry()->head; o; o = o->next) {
             if (!(o->flags & 2)) {
                 d->x = o->x - e->x;
                 d->y = o->y - e->y;

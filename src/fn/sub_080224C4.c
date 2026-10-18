@@ -6,7 +6,7 @@ struct S {
     u8 g[0x298];
     u8 b;
 };
-void sub_080224C4(struct S *p, u32 v)
+void SceneActorState_SetValueClampedWhenActive(struct S *p, u32 v)
 {
     if (p->b == 1)
         v = 3;

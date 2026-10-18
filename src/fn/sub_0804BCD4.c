@@ -1,7 +1,7 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
 #include "game_state.h"
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 sub_08100AD4(struct ContactPosition *);
 static inline u8 *propertiesAt(struct ContactPosition *input)
 {
@@ -14,7 +14,7 @@ static inline u8 *propertiesAt(struct ContactPosition *input)
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {

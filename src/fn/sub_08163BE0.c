@@ -2,7 +2,7 @@
 
 void Effect_Remove(u8 *);
 
-s32 sub_08163BE0(u8 *p)
+s32 ParticlePool_OnDestroy(u8 *p)
 {
     u8 *q = p + 0x74;
     s32 i = 15;

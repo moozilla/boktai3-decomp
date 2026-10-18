@@ -2,7 +2,7 @@
 u32 Script_SeekToKeyword(u32);
 u32 Script_GetValue(void);
 extern u8 *gUnk_02000710;
-void sub_08210A60(void)
+void Collection_UnlockEntryFromScript(void)
 {
     if (Script_SeekToKeyword(0x69)) {
         u32 v = Script_GetValue();

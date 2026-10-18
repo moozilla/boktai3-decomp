@@ -16,6 +16,6 @@ struct SceneActorRouteCursor {
     struct SceneActorRouteDefinition *definition;
     struct SceneActorRoutePoint *point;
 };
-u32 sub_0821E618(void *);
+u32 Route_AdvancePoint(void *);
 u32 sub_0821E8C8(struct SceneActorRouteCursor *, const struct ContactPosition *, u32, u32);
 #endif

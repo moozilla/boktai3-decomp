@@ -3,7 +3,7 @@
 
 extern const s16 gUnk_0824F598[];
 
-void sub_08195254(u8 *t)
+void Nidhoggr_TrackPlayerDepth(u8 *t)
 {
     s32 d = gUnk_02000710->positionZ - (*(s16 *)(t + 0x5410) - gUnk_0824F598[2]);
     s32 target;

@@ -1,7 +1,7 @@
 #include "global.h"
 
-u16 *sub_08036CA4(void);
-u32 sub_08036CAC(u8 i)
+u16 *WirelessText_GetCharacterTable(void);
+u32 WirelessText_GetCharacterTableByte(u8 i)
 {
-    return sub_08036CA4()[i];
+    return WirelessText_GetCharacterTable()[i];
 }

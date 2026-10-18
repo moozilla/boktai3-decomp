@@ -27,7 +27,7 @@ struct Task081979B4 {
 };
 extern u8 *gUnk_030042E4;
 
-void sub_081979B4(struct Task081979B4 *t, s32 frame)
+void PaletteEffect_ApplyBufferedPalette(struct Task081979B4 *t, s32 frame)
 {
     u32 target = t->target;
     struct Anim081979B4 *anim = (target & 1) ? NULL : (struct Anim081979B4 *)target;

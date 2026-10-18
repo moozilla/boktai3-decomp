@@ -2,17 +2,17 @@
 
 #include "engine.h"
 extern u8 *gUnk_02000580[];
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 void PlayerCue_OverlaySet(u8 *, s32);
-void sub_0814F828(u8 *);
+void ScriptActor_EnableCompletionScript(u8 *);
 /* Script: on the scripted actor picked by -i, posts request 1 with id
-   -p + 0x16E (+0xAE4/+0xAD6) and runs sub_0814F828 (tentative). */
+   -p + 0x16E (+0xAE4/+0xAD6) and runs ScriptActor_EnableCompletionScript (tentative). */
 void ScriptActor_RequestFromScript(void)
 {
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     u8 *actor = gUnk_02000580[i];
     if (actor && Script_SeekToKeyword('p')) {
         PlayerCue_OverlaySet(actor, Script_GetValue() + 0x16E);
-        sub_0814F828(actor);
+        ScriptActor_EnableCompletionScript(actor);
     }
 }

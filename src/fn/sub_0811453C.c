@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_08113678(void *, void (*)(void));
-void sub_08113684(void);
+void NativeEffect_SetState(void *, void (*)(void));
+void NativeEffect_DestroyEntry(void);
 
-void sub_0811453C(void *p)
+void NativeEffect_OnColliderExpire(void *p)
 {
-    sub_08113678(p, sub_08113684);
+    NativeEffect_SetState(p, NativeEffect_DestroyEntry);
 }

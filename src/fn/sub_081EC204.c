@@ -6,9 +6,9 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
-u32 sub_081DC1B4(u32);
+u32 Menu_StartFadeIn(u32);
 void sub_081E0818(u8 *);
-u32 sub_081EC204(u8 *s)
+u32 Results_Initialize(u8 *s)
 {
     u32 zero;
     u32 value;
@@ -46,5 +46,5 @@ u32 sub_081EC204(u8 *s)
     ResourceHeader_Relocate(obj2, q);
     sub_0821983C(s + 0xA0, obj2, 0x80, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0x134) = 3;
-    return sub_081DC1B4(3);
+    return Menu_StartFadeIn(3);
 }

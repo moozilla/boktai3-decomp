@@ -69,7 +69,7 @@ static inline void effect(u8 *p, int mode, int id, int duration)
 }
 void SceneActors_UpdateAnimation(void *, void *, void *);
 void BackgroundFlash_BeginAlternating(void *);
-void sub_08026780(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateFlashAlternating(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {

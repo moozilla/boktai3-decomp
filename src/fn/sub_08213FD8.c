@@ -10,9 +10,9 @@ extern u16 gUnk_03004C20[], gUnk_03004BEC, gUnk_03004BF0[], gUnk_03004270;
 extern u32 gUnk_03004C18[], gUnk_03004278, gUnk_03003A00, gUnk_03004260, gUnk_03004264;
 extern s16 gUnk_03004274;
 void m4aSoundVSync(void);
-u32 sub_08034090(void);
-void sub_08223BA4(void);
-void sub_08228848(void);
+u32 WirelessController_IsCreated(void);
+void RfuManager_CheckVBlankSync(void);
+void SunClock_TickFrame(void);
 void sub_08213FD8(void)
 {
     m4aSoundVSync();
@@ -86,9 +86,9 @@ void sub_08213FD8(void)
             (void)dma->control;
         }
         gUnk_03004260 = 1;
-        if (sub_08034090())
-            sub_08223BA4();
-        sub_08228848();
+        if (WirelessController_IsCreated())
+            RfuManager_CheckVBlankSync();
+        SunClock_TickFrame();
         gUnk_03004264++;
     }
     *(vu16 *)0x03007ff8 = 1;

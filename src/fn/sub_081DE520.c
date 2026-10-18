@@ -6,7 +6,6 @@ struct ScreenParams328 {
     s32 o, c, p, f;
 };
 extern struct ScreenParams328 gUnk_02000328;
-/* Script: -h and -k blocks, -o, -c, -p and -f (default 5). */
 void ScreenParams328_SetFromScript(void)
 {
     if (Script_SeekToKeyword('h'))

@@ -6,10 +6,10 @@
 /* Sun clock state at gUnk_03005430: a base time, two times A and B, their
  * spans from the base, and the light phase/level derived from them. */
 struct SunClock {
-    u32 stamp;               /* 0x00: sub_0822874C */
+    u32 stamp;               /* 0x00: Clock_PackDate */
     u8 baseHour, baseMinute; /* 0x04 */
     u8 extra6, extra7;       /* 0x06 */
-    u8 field8;               /* 0x08: sub_0822867C */
+    u8 field8;               /* 0x08: Clock_CalculateWeekday */
     u8 pad9;
     u8 hourA, minuteA;         /* 0x0A */
     u8 hourB, minuteB;         /* 0x0C */
@@ -25,7 +25,7 @@ u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);
 u8 sub_08228DB8(void);
 extern u32 gUnk_0300546C;
-void sub_08229380(void);
+void Clock_SyncFromRtc(void);
 static inline void SunClock_Update(void)
 {
     struct SunClock *c = &gUnk_03005430;

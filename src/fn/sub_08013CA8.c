@@ -6,17 +6,17 @@ struct N {
     struct N *n50;
 };
 extern u32 gUnk_02000470;
-void sub_08013684(u8 *);
-void sub_08013C74(void *, void *);
+void Shadow_Destroy(u8 *);
+void ShadowRegistry_UnlinkEntry(void *, void *);
 void Heap_Free(void *);
-u32 sub_08013CA8(u8 *p)
+u32 ShadowRegistry_OnDestroy(u8 *p)
 {
     struct N *e = *(struct N **)(p + 0x18);
     struct N *nx;
     while (e != 0) {
         nx = e->n50;
-        sub_08013684((u8 *)e + 0xc);
-        sub_08013C74(p, e);
+        Shadow_Destroy((u8 *)e + 0xc);
+        ShadowRegistry_UnlinkEntry(p, e);
         Heap_Free(e);
         e = nx;
     }

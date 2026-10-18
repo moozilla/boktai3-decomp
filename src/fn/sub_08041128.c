@@ -2,7 +2,7 @@
 #include "modifier_list.h"
 u32 Modifier_TestSelection(struct ModifierSelection *, s32);
 void sub_080339B8(s32, s32, s32, s32, s32);
-s32 sub_080337FC(u32);
+s32 TextWindow_StartPlayback(u32);
 void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
@@ -18,7 +18,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             sub_080339B8(*window, 1, 6, 28, 6);
             TextWindow_SetScript(*window, menu->textSources[0]);
             TextWindow_Refresh(*window, 7);
-            sub_080337FC(*window);
+            TextWindow_StartPlayback(*window);
             break;
         case 1:
             count = 0;
@@ -31,7 +31,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             sub_080339B8(*window, 13, y, 16, 2);
             TextWindow_SetScript(*window, menu->textSources[5]);
             TextWindow_Refresh(*window, id);
-            sub_080337FC(*window++);
+            TextWindow_StartPlayback(*window++);
             y += 2;
             count++;
             {
@@ -65,7 +65,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                         asm("" : "+r"(menu));
                         TextWindow_SetScript(*window, menu->textSources[0]);
                         TextWindow_Refresh(*window, 5);
-                        sub_080337FC(*window++);
+                        TextWindow_StartPlayback(*window++);
                         row += 2;
                         id++;
                         {
@@ -85,7 +85,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                     sub_080339B8(*window, 13, 4, 16, 2);
                     TextWindow_SetScript(*window, menu->textSources[6]);
                     TextWindow_Refresh(*window, count);
-                    sub_080337FC(*window);
+                    TextWindow_StartPlayback(*window);
                 }
             } while (--id >= 0);
             break;

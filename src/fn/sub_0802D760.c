@@ -21,14 +21,14 @@ struct Object {
 };
 int DisplayAnimation_InitializeKeyframes(void *, int, int, void *);
 int DisplayAnimation_InitializeSequence(void *, int, int, int, void *);
-void sub_08225B30(void *);
-void sub_08225B28(void *, void *);
+void SceneBody_SetKeyframeDisplay(void *);
+void SceneBody_SetSprite(void *, void *);
 int DisplayAnimation_SetPriority(void *, int);
 struct Model {
     u8 pad[0x3a];
     u16 frames;
 };
-int sub_0802D760(struct Object *p, int kind, int a, int b, int c)
+int Actor_InitDrawable(struct Object *p, int kind, int a, int b, int c)
 {
     void *d = &p->drawable;
     int status = -1;
@@ -39,14 +39,14 @@ int sub_0802D760(struct Object *p, int kind, int a, int b, int c)
             register struct Model *m asm("r1") = (struct Model *)p->pad100;
             p->frames = m->frames;
         }
-        sub_08225B30(p->motion);
+        SceneBody_SetKeyframeDisplay(p->motion);
     } else if (kind == 1) {
         status = DisplayAnimation_InitializeSequence(d, a, b, c, p->pos);
         {
             struct Part *part = &p->part;
             p->frames = part->frames;
         }
-        sub_08225B28(p->motion, p->transform);
+        SceneBody_SetSprite(p->motion, p->transform);
     }
     p->savedFrames = p->frames;
     result = DisplayAnimation_SetPriority(d, 2);

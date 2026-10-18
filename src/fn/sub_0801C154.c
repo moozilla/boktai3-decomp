@@ -5,7 +5,7 @@ struct O {
     u8 g[0x14];
     u16 h;
 };
-void sub_0801C154(u8 *p)
+void ResultGame_ShowPressMarker(u8 *p)
 {
     struct O *o = (struct O *)(p + 0x1a4);
     o->h = p[0xc0];

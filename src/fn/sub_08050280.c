@@ -6,18 +6,18 @@ void CellGate_UpdatePassageBarrier(struct CellGate *p)
     if (r != 0) {
         if (CellGate_TestPlayerCell(p) != 0 && (r = CellGate_TestPassage(p)) == 0) {
             if (p->registered != 0) {
-                sub_0821D6D0(p->registration);
+                TerrainModifiers_UnregisterCell(p->registration);
                 p->registered = r;
                 sub_08158CD8(gUnk_02000580);
                 if (p->scriptId != 0)
                     Script_Call(p->scriptId, 0);
             }
         } else if (p->registered == 0) {
-            sub_0821D698(p->registration, p->cell, 0, p->height, 0xff, 0x82a);
+            TerrainModifiers_RegisterCell(p->registration, p->cell, 0, p->height, 0xff, 0x82a);
             p->registered = 1;
         }
     } else if (p->registered != 0) {
-        sub_0821D6D0(p->registration);
+        TerrainModifiers_UnregisterCell(p->registration);
         p->registered = r;
     }
 }

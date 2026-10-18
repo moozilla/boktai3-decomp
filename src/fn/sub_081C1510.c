@@ -10,7 +10,7 @@ struct S {
 struct Q *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void sub_081C1434(void *);
-void sub_081C1510(struct S *p)
+void RecordDisplay_LoadAnimationResources(struct S *p)
 {
     struct Q *r;
     u32 id = 0xCB05;

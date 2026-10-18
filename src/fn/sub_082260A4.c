@@ -3,7 +3,7 @@
 extern u8 *gUnk_03005420;
 extern u32 gUnk_030053F4;
 
-void sub_082260A4(s32 a)
+void Camera_RequestShake(s32 a)
 {
     u8 *s = gUnk_03005420;
     if (s != 0) {

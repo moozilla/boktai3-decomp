@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000580;
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 struct S {
     u8 pad[0x9C];
     s16 z;
@@ -48,12 +48,12 @@ one:
 zero:
     return 0;
 }
-void sub_080A0054(struct S *s)
+void Crow_BeginScriptedAction(struct S *s)
 {
     u32 zero = Blocked(s);
     if (zero == 0 && gUnk_02000580) {
         struct S *p = s->other;
-        void (*fn)(void) = sub_0807FC90;
+        void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u8 one;
         u8 zero8;

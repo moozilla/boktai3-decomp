@@ -8,7 +8,7 @@ struct S0813B3E8 {
 };
 extern struct S0813B3E8 *gUnk_02000710;
 
-s32 sub_0813B3E8(void)
+s32 Player_GetSelectedSlotActionScale(void)
 {
     s32 r;
     s32 v = *(s16 *)((u8 *)gUnk_02000710 + gUnk_02000710->idx * 2 + 0x88);

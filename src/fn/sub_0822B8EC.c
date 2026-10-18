@@ -4,7 +4,7 @@ u32 Script_GetValue(void);
 u32 Script_GetPc(void);
 void sub_0822B640(void);
 extern u8 *gUnk_030025FC;
-u32 sub_0822B8EC(u8 *p)
+u32 SceneStimulus_InitFromScript(u8 *p)
 {
     if (Script_SeekToKeyword(0x61)) {
         u32 *q = (u32 *)(p + 0x98);

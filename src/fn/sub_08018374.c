@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000090;
-int sub_080174B8(void *, int);
+int Weather_EnterPhase(void *, int);
 int Weather_Stop(void)
 {
     u8 *p = gUnk_02000090;
@@ -12,7 +12,7 @@ int Weather_Stop(void)
         case 1:
         case 2:
         case 3:
-            sub_080174B8(p, 4);
+            Weather_EnterPhase(p, 4);
             break;
     }
     p[32] = 0;

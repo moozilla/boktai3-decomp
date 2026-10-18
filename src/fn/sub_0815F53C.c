@@ -9,7 +9,7 @@ struct O {
 };
 extern struct O *gUnk_02000580[];
 
-u8 *sub_0815F53C(u32 i)
+u8 *Player_GetEffectivePosition(u32 i)
 {
     struct O *o = gUnk_02000580[i];
     if (o == 0)

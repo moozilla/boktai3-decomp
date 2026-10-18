@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 u32 sub_0811DD94(s32, s32);
-void sub_0803343C(const u8 *);
+void ScrollingDialogue_SetScript(const u8 *);
 extern const u8 gUnk_086058C8[];
 void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
 {
@@ -79,7 +79,7 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
             break;
     }
     if (text)
-        sub_0803343C(text);
+        ScrollingDialogue_SetScript(text);
     else
-        sub_0803343C(gUnk_086058C8);
+        ScrollingDialogue_SetScript(gUnk_086058C8);
 }

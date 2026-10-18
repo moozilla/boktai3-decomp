@@ -5,11 +5,11 @@ void sub_0816D868(void *);
 void sub_08166B7C(void *, int);
 void sub_0816DAF8(void *);
 void Sound_PlaySong(int);
-void sub_0816B614(void *);
+void Hud_SaveGridSelection(void *);
 void sub_081704B4(void);
-void sub_08163EB8(void *, void (*)(void), int);
+void Hud_SetInteractionCallback(void *, void (*)(void), int);
 extern u16 gUnk_03005260[];
-void sub_0817040C(u8 *p)
+void PauseMenu_OnSwapSelectionUpdate(u8 *p)
 {
     u8 *q = p + 0x4384;
     if (sub_0816B59C(q, 0xf0)) {
@@ -24,10 +24,10 @@ void sub_0817040C(u8 *p)
     } else if (1 & gUnk_03005260[1]) {
         u8 *a;
         Sound_PlaySong(0xdd);
-        sub_0816B614(q);
+        Hud_SaveGridSelection(q);
         *((u32 *)(p + 0x1668)) &= ~1;
         a = p + 0x1680;
         sub_0816D920(a, p[0x438a]);
-        sub_08163EB8(p, sub_081704B4, 1);
+        Hud_SetInteractionCallback(p, sub_081704B4, 1);
     }
 }

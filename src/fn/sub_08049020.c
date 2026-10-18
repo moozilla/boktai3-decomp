@@ -1,6 +1,6 @@
 #include "tether_actor.h"
 void TetherActor_EmitDirectionalEffect(struct TetherActor *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
 {
     if (actor->soundCooldown)
@@ -27,7 +27,7 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
                     cell = 0;
                 else
                     cell = gUnk_030052F4->rows[z] + x;
-                properties = sub_0821D64C(cell, 1);
+                properties = TerrainModifiers_FindCellOverride(cell, 1);
                 if (properties)
                     properties += 4;
                 else {

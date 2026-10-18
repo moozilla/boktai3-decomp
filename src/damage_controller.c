@@ -62,7 +62,7 @@ s32 DamageController_Update(struct DamageController *controller)
     return 0;
 }
 
-u32 sub_0800C954(struct DamageController *controller)
+u32 DamageController_Destroy(struct DamageController *controller)
 {
     Collider_Remove(&controller->collider);
     return 0;
@@ -107,7 +107,7 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
     Collider_Init(collider, (u16)id, 0x4001, 0, (u16)controller->height, &size, &offset);
     Collider_SetPosition(collider, &position, 0);
     Collider_SetCallback(collider, DamageController_AccumulateHit, controller);
-    sub_0821FF7C(collider, 0, 0, 0);
+    Collider_SetBodyProperties(collider, 0, 0, 0);
     Collider_Refresh(collider);
     controller->flags = Script_GetKeywordValue(102, 0);
     if (Script_SeekToKeyword(119)) {
@@ -129,12 +129,12 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
     return 0;
 }
 
-void *sub_0800CB60(u32 arg)
+void *DamageController_Create(u32 arg)
 {
     void *obj;
     obj = Task_Create(8, 0x90);
     if (obj != 0) {
-        Task_SetCallbacks(obj, DamageController_Update, sub_0800C954);
+        Task_SetCallbacks(obj, DamageController_Update, DamageController_Destroy);
         if (DamageController_Initialize(obj, arg) < 0) {
             Task_Kill(obj);
             return 0;

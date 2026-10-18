@@ -9,7 +9,7 @@ struct S {
     s32 v;
 };
 
-void sub_080EBCF0(struct S *s)
+void Octopus_InitProfileId(struct S *s)
 {
     s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
 }

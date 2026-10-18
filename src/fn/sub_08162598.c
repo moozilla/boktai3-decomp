@@ -3,7 +3,7 @@
 extern u32 gUnk_0200059C;
 s32 Sprite_Remove(u8 *);
 
-s32 sub_08162598(u8 *p)
+s32 PlayerAttackEffect_Destroy(u8 *p)
 {
     u8 *q = p + 0xc4;
     s32 i = 15;

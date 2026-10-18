@@ -3,7 +3,7 @@
 #include "contact_actor.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline void FillResolved(struct ContactPosition *position, s32 index)
 {
     s32 column, row;
@@ -11,7 +11,7 @@ static inline void FillResolved(struct ContactPosition *position, s32 index)
     column = Mod(index, SceneGrid_Width());
     row = Div(index, SceneGrid_Width());
     position->x = column * 256 + 128;
-    properties = sub_0821D64C(index, 1);
+    properties = TerrainModifiers_FindCellOverride(index, 1);
     if (properties)
         properties += 4;
     else {

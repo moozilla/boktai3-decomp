@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801B5C8(u8 *p)
+void TransformMarker_ClearVector(u8 *p)
 {
     p[4] = 0;
     p[5] = 0;

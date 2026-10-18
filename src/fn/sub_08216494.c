@@ -7,7 +7,7 @@ struct Bg {
 };
 extern struct Bg gUnk_03004C30[];
 
-void sub_08216494(u32 n)
+void Bg_ResetScale(u32 n)
 {
     struct Bg *bg = &gUnk_03004C30[n];
     bg->f10 = 0x1000;

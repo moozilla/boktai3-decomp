@@ -16,16 +16,16 @@ struct Object {
     s8 target;
     u8 count, slot;
 };
-void *sub_0802C678(void);
-struct Object *sub_0802CA8C(int);
+void *ActorPool_GetManager(void);
+struct Object *Actor_GetPartyTarget(int);
 int Math_Atan2(int, int);
-int sub_0802CAAC(struct Object *p)
+int Actor_FindTargetInFacingArc(struct Object *p)
 {
     int i;
-    if (!sub_0802C678())
+    if (!ActorPool_GetManager())
         return -1;
     for (i = 0; i < (s8)p->count; i++) {
-        struct Object *t = sub_0802CA8C(i);
+        struct Object *t = Actor_GetPartyTarget(i);
         if (t) {
             struct Vec *src = &p->pos;
             struct Vec *dst = &t->pos;

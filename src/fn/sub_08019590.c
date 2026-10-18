@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_08019518(void *);
+void PaletteFrames_CaptureColors(void *);
 
-s32 sub_08019590(void *p)
+s32 PaletteFrames_Initialize(void *p)
 {
-    sub_08019518(p);
+    PaletteFrames_CaptureColors(p);
     return 0;
 }

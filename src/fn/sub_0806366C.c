@@ -1,11 +1,11 @@
 #include "scene_event_dispatch.h"
-void sub_0822AE7C(s32);
+void Sound_PlayTrackedSong(s32);
 void Trigger_ConsumePending(void *, s32);
 /* Preserve the signed full-word command argument observed at this call site. */
 void SceneAudioEvent_StartTrackedSong(struct SceneEventDispatchTask *owner,
                                       struct SceneEventReceiver *receiver,
                                       struct SceneEventCommand *command)
 {
-    sub_0822AE7C(command->value);
+    Sound_PlayTrackedSong(command->value);
     Trigger_ConsumePending(receiver, 1);
 }

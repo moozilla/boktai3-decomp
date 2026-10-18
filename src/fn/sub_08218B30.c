@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08218B30(void)
+void Video_OnFrameNoOp(void)
 {
 }

@@ -1,10 +1,10 @@
 #include "global.h"
-u16 *sub_08036CA4(void);
-u16 sub_08036CAC(u8);
-int sub_08036CC4(u16);
-int sub_08036CC4(u16 code)
+u16 *WirelessText_GetCharacterTable(void);
+u16 WirelessText_GetCharacterTableByte(u8);
+int WirelessText_FindCharacterIndex(u16);
+int WirelessText_FindCharacterIndex(u16 code)
 {
-    u16 *base = sub_08036CA4();
+    u16 *base = WirelessText_GetCharacterTable();
     u16 *table;
     int i = 0;
     int result;

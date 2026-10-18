@@ -6,7 +6,7 @@ struct E {
 };
 extern u32 gUnk_02000240;
 void Sprite_Remove(void *);
-void sub_081A46EC(u8 *p)
+void Hresvelgr_DestroyEffectPool(u8 *p)
 {
     struct E *e = (struct E *)(p + 0x5c);
     s32 i = 0x1f;

@@ -20,11 +20,11 @@ extern const EEPROMConfig *gUnk_03006A9C;
 #define REG_DMA3CNT_H         (*(vu16 *)0x040000DE)
 #define REG_VCOUNT            (*(vu16 *)0x04000006)
 #define REG_EEPROM            (*(u16 *)0x0d000000)
-void sub_08248634(const void *, void *, u16);
-u16 sub_082486B4(u16, u16 *);
-u16 sub_08248778(u16, const u16 *, u8);
-u16 sub_082488D8(u16, const u16 *);
-u16 sub_082486B4(u16 address, u16 *data)
+void Eeprom_TransferDma3(const void *, void *, u16);
+u16 Eeprom_ReadBlock(u16, u16 *);
+u16 Eeprom_WriteBlock(u16, const u16 *, u8);
+u16 Eeprom_VerifyBlock(u16, const u16 *);
+u16 Eeprom_ReadBlock(u16 address, u16 *data)
 {
     u16 buffer[0x44];
 
@@ -47,9 +47,9 @@ u16 sub_082486B4(u16 address, u16 *data)
         *(ptr--) = 1;
         *ptr = 1;
         // send address to eeprom
-        sub_08248634(buffer, (u16 *)0xd000000, gEEPROMConfig->address_width + 3);
+        Eeprom_TransferDma3(buffer, (u16 *)0xd000000, gEEPROMConfig->address_width + 3);
         // recieve data
-        sub_08248634((u16 *)0xd000000, buffer, 0x44);
+        Eeprom_TransferDma3((u16 *)0xd000000, buffer, 0x44);
         // 4 bit junk
         ptr = buffer + 4;
         data += 3;

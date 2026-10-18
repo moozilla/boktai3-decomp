@@ -4,7 +4,7 @@ struct S {
     u32 a;
     u32 b;
 };
-void sub_081C0470(struct S *p, u32 v)
+void ScenePaletteFade_SetState(struct S *p, u32 v)
 {
     p->a = v;
     p->b = 0;

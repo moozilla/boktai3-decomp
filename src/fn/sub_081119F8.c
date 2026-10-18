@@ -5,7 +5,7 @@ struct S {
     u16 b;
 };
 extern struct S *gUnk_020001D8;
-void sub_081119F8(s32 a, s32 b)
+void PaletteFade_SetScrollPosition(s32 a, s32 b)
 {
     struct S *s = gUnk_020001D8;
     if (s != 0) {

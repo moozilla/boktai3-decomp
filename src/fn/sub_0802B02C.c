@@ -19,7 +19,7 @@ static inline u8 chk(struct S *p)
     }
     return 0;
 }
-void sub_0802B02C(struct S *p)
+void GridAttack_UpdateIdleAction(struct S *p)
 {
     u8 r = chk(p);
     if (r == 1) {

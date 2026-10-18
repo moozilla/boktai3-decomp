@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-void sub_0808005C(void *);
+void SceneActorReaction_PlayAnimationBUntilComplete(void *);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 {
     register u32 offset asm("r2") = 0x2B2;
@@ -33,7 +33,7 @@ void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *acto
         u8 kind;
         actor->flags2CC |= mask;
         command = (void *)((u8 *)group + 0x8C);
-        callback = (void *)sub_0808005C;
+        callback = (void *)SceneActorReaction_PlayAnimationBUntilComplete;
         one = 1;
         command->duration = 30;
         command->payload = callback;

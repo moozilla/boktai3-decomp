@@ -7,9 +7,9 @@ struct Q {
     u8 g[0x34];
     s32 cnt;
 };
-void sub_081BAAA0(void *);
+void Registry3F74_StartSelection(void *);
 
-void sub_081BAA2C(struct Q *p)
+void Registry3F74_UpdateOpeningDelay(struct Q *p)
 {
     s32 v;
     if (p->p == 0)
@@ -19,5 +19,5 @@ void sub_081BAA2C(struct Q *p)
     p->sel = v;
     p->cnt++;
     if (p->cnt > 0x3c)
-        sub_081BAAA0(p);
+        Registry3F74_StartSelection(p);
 }

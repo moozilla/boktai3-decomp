@@ -10,7 +10,7 @@ struct S {
 void Sprite_Remove(u8 *);
 void Effect_Remove(struct E *);
 
-s32 sub_082340B4(struct S *p)
+s32 SolarBomb_OnTaskDestroy(struct S *p)
 {
     struct E *e;
     s32 i;

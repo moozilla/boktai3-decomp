@@ -8,7 +8,7 @@ typedef struct {
     unsigned count : 16;
     int *values;
 } Args;
-Entry *sub_0822D6C8(int);
+Entry *Inventory_GetEquipmentEntry(int);
 void Script_Call(int, Args *);
 static inline int clamp(int x)
 {
@@ -22,7 +22,7 @@ void Transformation_ReportResult(u8 *p)
 {
     int values[7];
     Args args;
-    Entry *entry = sub_0822D6C8(p[0xba]);
+    Entry *entry = Inventory_GetEquipmentEntry(p[0xba]);
     values[0] = clamp(*(int *)(p + 0xd8));
     values[1] = clamp(*(int *)(p + 0xdc));
     values[2] = clamp(*(int *)(p + 0xe0));

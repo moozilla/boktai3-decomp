@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_08138168(u8 *p)
+u32 Registry1745_ConsumeStateEntry(u8 *p)
 {
     if (p[0x22]) {
         p[0x22] = 0;

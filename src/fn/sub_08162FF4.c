@@ -8,7 +8,7 @@ struct P {
     u8 f2[4];
     u16 d;
 };
-void sub_08162FF4(struct P *p)
+void GameOver_UpdateExitDelay(struct P *p)
 {
     p->d++;
     if (p->d > 0x59)

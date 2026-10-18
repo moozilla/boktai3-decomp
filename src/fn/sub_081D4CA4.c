@@ -11,7 +11,7 @@ struct S {
 void DisplayAnimation_Destroy(struct E *);
 void Sprite_Remove(u8 *);
 
-s32 sub_081D4CA4(struct S *p)
+s32 BestiaryDisplay_OnTaskDestroy(struct S *p)
 {
     s32 i;
     for (i = 0; i <= 5; i++) {

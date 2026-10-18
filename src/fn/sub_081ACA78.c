@@ -11,7 +11,7 @@ struct A {
 };
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 
-void sub_081ACA78(struct A *p)
+void Vanargand_OnAlternateStopState(struct A *p)
 {
     u32 m = 4;
     p->fl |= m;

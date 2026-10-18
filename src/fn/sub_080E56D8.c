@@ -7,7 +7,7 @@ struct S {
     const u8 *p;
 };
 
-void sub_080E56D8(struct S *s)
+void Dog_SetControlPreset(struct S *s)
 {
     s->p = gUnk_08606214;
 }

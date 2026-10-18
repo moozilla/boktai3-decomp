@@ -4,10 +4,10 @@ void sub_0811C168(u8 *);
 void sub_0811EE0C(u8 *);
 void sub_0811C09C(u8 *);
 void Sound_PlaySong(u32);
-void sub_0803C008(u32, u8 *, u8 *, u32);
+void ScenePool_ReleaseActorSlot(u32, u8 *, u8 *, u32);
 s32 Mod(s32, s32);
 
-u32 sub_0803ECCC(u32 a, u8 *b, u8 *e, u32 d)
+u32 ScenePool_StatePlayRemovalEffects(u32 a, u8 *b, u8 *e, u32 d)
 {
     u32 f;
     u32 z;
@@ -39,7 +39,7 @@ u32 sub_0803ECCC(u32 a, u8 *b, u8 *e, u32 d)
         }
     }
     if (*(u32 *)(e + 0x44) > 0x77)
-        sub_0803C008(a, b, e, d);
+        ScenePool_ReleaseActorSlot(a, b, e, d);
     (*(u32 *)(e + 0x44))++;
     return 0;
 }

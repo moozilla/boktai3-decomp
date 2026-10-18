@@ -4,7 +4,7 @@ struct G {
     s16 f596;
 };
 extern struct G *gUnk_02000710;
-s32 sub_08212FC4(void)
+s32 CollectionBook_CountCollectedEntries(void)
 {
     s32 n = 0;
     s32 i = 0;

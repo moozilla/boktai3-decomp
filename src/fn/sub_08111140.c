@@ -4,7 +4,7 @@ struct S {
     s32 a;
 };
 extern struct S *gUnk_020004B8;
-s32 sub_08111140(void)
+s32 SceneTilemap_GetLayoutLength(void)
 {
     if (!gUnk_020004B8)
         return -1;

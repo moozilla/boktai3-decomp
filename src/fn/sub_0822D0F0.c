@@ -1,12 +1,12 @@
 #include "global.h"
-s32 sub_0822CDA8(u8 *);
+s32 Inventory_GetItemId(u8 *);
 void sub_0822D080(u8 *, u8 *);
-void sub_0822D0F0(u8 *p)
+void Inventory_SortConsumables(u8 *p)
 {
     s32 count = 0, gaps = 0, i, j;
     for (i = 0; i < 16; i++) {
         u8 *q = p + i;
-        if (sub_0822CDA8(q) < 0)
+        if (Inventory_GetItemId(q) < 0)
             gaps++;
         else {
             count++;
@@ -17,7 +17,7 @@ void sub_0822D0F0(u8 *p)
     if (count > 1) {
         for (i = 0; i < count - 1; i++)
             for (j = i; j < count; j++) {
-                if (sub_0822CDA8(p + i) > sub_0822CDA8(p + j))
+                if (Inventory_GetItemId(p + i) > Inventory_GetItemId(p + j))
                     sub_0822D080(p + i, p + j);
             }
     }

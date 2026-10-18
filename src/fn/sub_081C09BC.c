@@ -6,13 +6,13 @@ struct S {
     void (*cb)(void *);
     u32 n;
 };
-void sub_081C3700(void *);
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
-void sub_081C09F8(void *);
-void sub_081C09BC(struct S *p)
+void RegistryF3E4_ClearState(void *);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
+void SceneActorSequence_UpdateCompletionDelay(void *);
+void SceneActorSequence_BeginFadeOut(struct S *p)
 {
-    sub_081C3700(p->a);
-    sub_082279A8(1, 6, 4, 4, 4, 0xFFFF, 0);
-    p->cb = sub_081C09F8;
+    RegistryF3E4_ClearState(p->a);
+    ScreenTransition_SendCommand(1, 6, 4, 4, 4, 0xFFFF, 0);
+    p->cb = SceneActorSequence_UpdateCompletionDelay;
     p->n = 0;
 }

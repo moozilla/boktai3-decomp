@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_080E848C(void)
+s32 Mimic_OnBehaviorComplete(void)
 {
     return 0;
 }

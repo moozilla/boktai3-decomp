@@ -6,11 +6,11 @@ struct Slot {
     u8 pad;
     u32 val;
 };
-struct Slot *sub_0821A1C8(u16);
+struct Slot *ResourceRegistry_FindEntry(u16);
 
-void sub_0821A2AC(u16 id)
+void ResourceRegistry_UnregisterResource(u16 id)
 {
-    struct Slot *s = sub_0821A1C8(id);
+    struct Slot *s = ResourceRegistry_FindEntry(id);
     if (s != 0)
         s->flags = 0;
 }

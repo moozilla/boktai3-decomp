@@ -4,14 +4,14 @@ struct S {
     u8 pad[0x18];
     u32 f18;
 };
-u32 sub_081C3010(u32);
-void sub_081C3700(u32);
-void sub_081C4C70(struct S *);
+u32 RegistryF3E4_GetStateResult(u32);
+void RegistryF3E4_ClearState(u32);
+void SceneTransition_StartCompletionDelay(struct S *);
 
-void sub_081C4E80(struct S *p)
+void RegistryC281_UpdateFinalMovement(struct S *p)
 {
-    if (sub_081C3010(p->f18)) {
-        sub_081C3700(p->f18);
-        sub_081C4C70(p);
+    if (RegistryF3E4_GetStateResult(p->f18)) {
+        RegistryF3E4_ClearState(p->f18);
+        SceneTransition_StartCompletionDelay(p);
     }
 }

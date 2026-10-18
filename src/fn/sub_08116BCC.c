@@ -5,7 +5,7 @@ struct S {
     u32 a;
 };
 extern struct S *gUnk_020004F0;
-void sub_08116BCC(void)
+void Player_SaveCurrentHealth(void)
 {
     if (gUnk_020004F0)
         *(u16 *)(gUnk_02000710 + 0x758) = gUnk_020004F0->a;

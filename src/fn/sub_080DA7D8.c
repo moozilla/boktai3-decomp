@@ -11,7 +11,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080DA7D8(struct S *s)
+void Mummy_UpdateTemporaryFlagTimer(struct S *s)
 {
     u8 *p = &s->t->cnt;
     if (*p != 0)

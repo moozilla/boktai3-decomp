@@ -11,7 +11,7 @@ struct Unk0810C1E8 {
     u16 vals[8]; // 0x300
 };
 
-void sub_0810C210(struct Unk0810C1E8 *p, s32 i)
+void RegistryF246_ShowSlotDefaultFrame(struct Unk0810C1E8 *p, s32 i)
 {
     p->elems[i].flags &= ~1;
     p->vals[i] = 0x2a;

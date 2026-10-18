@@ -39,7 +39,7 @@ void Memory_Clear(void *, int);
 #include "rfu_compat.h"
 #undef rfu_clearSlot
 u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
-void sub_0803451C(struct Engine *p)
+void WirelessController_PollPeerRosterSend(struct Engine *p)
 {
     int changed = 0;
     if (p->mask & 2) {

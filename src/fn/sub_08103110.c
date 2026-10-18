@@ -55,19 +55,19 @@ struct NamedObjectManager {
 };
 extern struct NamedObjectManager *gUnk_020001AC;
 extern u8 *gUnk_02000580;
-struct NamedObject *sub_08100BC8(struct NamedObjectManager *);
-void sub_0821E7EC(void *, u32, u32);
-void sub_08225AB4(void *, s32, void *, s32, s32, void *);
-void sub_08225B28(void *, void *);
-void sub_08225B4C(void *, void *, u32, u32, u32);
+struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
+void Path_GetPointPositionById(void *, u32, u32);
+void SceneBody_Init(void *, s32, void *, s32, s32, void *);
+void SceneBody_SetSprite(void *, void *);
+void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void sub_081028F8(u32, s32);
-void sub_08159404(void *, s32, u32);
-void sub_0821D698(void *, s32, s32, s32, s32, s32);
-void sub_081593A0(void *, void *);
+void Player_AddAttachmentFlags(void *, s32, u32);
+void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
+void Player_SetPositionAndSave(void *, void *);
 void TetherActor_SetPosition(void *);
 void TetherActor_AddStatusFlags(s32, u32);
 void sub_08103060(struct NamedObjectManager *, struct NamedObject *);
-u8 sub_08100F28(void *, void *, s32);
+u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32);
 void sub_08101E6C(void);
 void sub_08102570(void);
 void sub_08101D2C(void);
@@ -102,7 +102,7 @@ void NamedObject_CreateFromScript(void)
     if (!manager)
         return;
     sequence = 0;
-    e = sub_08100BC8(manager);
+    e = NamedObject_AllocateSlot(manager);
     if (!e)
         return;
     e->flags = sequence;
@@ -112,7 +112,7 @@ void NamedObject_CreateFromScript(void)
         e->fieldF0 = optionalValue();
         e->fieldF1 = 0;
         e->fieldF2 = optionalValue();
-        sub_0821E7EC(&sprite->x, e->fieldF0, e->fieldF2);
+        Path_GetPointPositionById(&sprite->x, e->fieldF0, e->fieldF2);
     }
     e->kind = Script_GetKeywordValue('k', 0);
     if (Script_GetKeywordValue('O', 0))
@@ -231,9 +231,9 @@ void NamedObject_CreateFromScript(void)
     ActorAttachment_StepSprite((struct ContactSwarmSprite *)sprite, &e->sequence);
     sprite->flags &= ~1;
     sprite->field7 = 2;
-    sub_08225AB4(&e->body, e->index + 0xD0E9, &sprite->x, 0, 7, e);
-    sub_08225B28(&e->body, sprite);
-    sub_08225B4C(&e->body, e->fieldF4, e->fieldF0, e->fieldF1, e->fieldF2);
+    SceneBody_Init(&e->body, e->index + 0xD0E9, &sprite->x, 0, 7, e);
+    SceneBody_SetSprite(&e->body, sprite);
+    SceneBody_StartRoute(&e->body, e->fieldF4, e->fieldF0, e->fieldF1, e->fieldF2);
     e->body.field1C = 0;
     sprite->x -= 0x100;
     if (Script_GetKeywordValue('d', 0))
@@ -256,7 +256,7 @@ void NamedObject_CreateFromScript(void)
         }
         sub_081028F8(manager->field1370, 0);
         manager->field1370 = e->name;
-        sub_08159404(gUnk_02000580, 1, e->name);
+        Player_AddAttachmentFlags(gUnk_02000580, 1, e->name);
         e->flags |= 8;
         gUnk_02000580[0x701] |= 1;
         x = e->body.x >> 8;
@@ -265,9 +265,9 @@ void NamedObject_CreateFromScript(void)
             cell = 0;
         else
             cell = gUnk_030052F4->rows[z] + x;
-        sub_0821D698(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
+        TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
         e->flags |= 1;
-        sub_081593A0(gUnk_02000580, &e->body.x);
+        Player_SetPositionAndSave(gUnk_02000580, &e->body.x);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.x);
             sub_081028F8(manager->field1374, 1);
@@ -282,7 +282,7 @@ void NamedObject_CreateFromScript(void)
         case 0:
         case 1:
         case 3:
-            if (sub_08100F28(sprite, &e->body.x, (s16)e->fieldBE))
+            if (NamedObject_IsWithinSpriteBounds(sprite, &e->body.x, (s16)e->fieldBE))
                 e->state = 3;
             break;
     }

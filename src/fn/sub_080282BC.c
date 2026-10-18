@@ -62,7 +62,7 @@ typedef struct {
 } Point;
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 u8 sub_082212DC(int *, int, int, int);
-void sub_080282BC(ActorAnimation *p, int tick)
+void SceneActors_UpdateBlinkReaction(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

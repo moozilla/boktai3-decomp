@@ -1,4 +1,4 @@
 #include "global.h"
-void sub_081C46D0(void)
+void Registry6A37_OnDestroy(void)
 {
 }

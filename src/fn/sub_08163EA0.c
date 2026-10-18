@@ -7,7 +7,7 @@ struct P {
     u32 w;
 };
 
-void sub_08163EA0(struct P *p, u32 w)
+void Hud_SetUpdateCallback(struct P *p, u32 w)
 {
     p->w = w;
     p->h = 0;

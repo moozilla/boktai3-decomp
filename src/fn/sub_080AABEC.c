@@ -26,7 +26,7 @@ static inline u8 Pred(struct T *p)
         return 1;
     return 0;
 }
-void sub_080AABEC(struct S *s)
+void TentacleActor_EnterHitReaction(struct S *s)
 {
     struct T *p = s->other;
     u8 active = Pred(p);

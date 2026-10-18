@@ -95,19 +95,19 @@ static inline void FallingObject_SetState(struct FallingObject *object, u32 stat
 typedef void (*FallingObjectState)(struct FallingObject *);
 extern FallingObjectState gUnk_08604ACC[][4]; // [type][state]
 
-void sub_0800CC34(void *object); // release the attached effect
-u32 sub_0800CC50(struct FallingObject *object);
+void FallingObject_ClearEffect(void *object); // release the attached effect
+u32 FallingObject_Destroy(struct FallingObject *object);
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
                          u32 power, u32 force, struct FallingVec *position);
 s32 FallingObject_CreateFromScript(void);
 s32 FallingObject_SpawnFinishParticles(struct FallingObject *object);
-void sub_0800CBAC(struct FallingHit *hit, u32 unused, struct FallingObject *object);
-void sub_0800CBDC(void);
-u32 sub_0800CBE0(struct FallingObjectManager *manager, struct FallingObject *object);
-u32 sub_0800CC08(struct FallingObjectManager *manager, struct FallingObject *object);
-u32 sub_0800D7D4(struct FallingObjectManager *manager);
-s32 sub_0800D800(struct FallingObjectManager *manager, void *unused);
-void *sub_0800D828(void *a, u32 unused);
+void FallingObject_ReceiveHit(struct FallingHit *hit, u32 unused, struct FallingObject *object);
+void FallingObject_ReceiveAttackHit(void);
+u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager, struct FallingObject *object);
+u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *manager, struct FallingObject *object);
+u32 FallingObjectManager_Destroy(struct FallingObjectManager *manager);
+s32 FallingObjectManager_Initialize(struct FallingObjectManager *manager, void *unused);
+void *FallingObjectManager_Create(void *a, u32 unused);
 s32 FallingObjectManager_Update(struct FallingObjectManager *manager);
 
 #endif

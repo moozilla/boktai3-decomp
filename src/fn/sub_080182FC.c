@@ -5,15 +5,15 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_08018028(u8 *);
 void Task_Kill(u8 *);
 void Weather_Update(void);
-void sub_08018014(void);
-u8 *sub_080182FC(void)
+void Weather_Destroy(void);
+u8 *Weather_Create(void)
 {
     u8 *r;
     if (gUnk_02000090 != 0)
         return gUnk_02000090;
     r = Task_Create(9, 0x8ec);
     if (r) {
-        Task_SetCallbacks(r, Weather_Update, sub_08018014);
+        Task_SetCallbacks(r, Weather_Update, Weather_Destroy);
         if (sub_08018028(r) < 0) {
             Task_Kill(r);
             return 0;

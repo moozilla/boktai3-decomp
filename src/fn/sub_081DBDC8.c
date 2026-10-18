@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03004BD8;
 void Anim_Remove(u8 *);
-void sub_081DBDC8(u8 *p)
+void ScreenParams2E8_DestroyScreen(u8 *p)
 {
     u16 *r = &gUnk_03004BD8;
     u32 m = ~3;

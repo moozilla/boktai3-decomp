@@ -15,9 +15,9 @@ struct Args {
     u32 reserved : 16;
     u32 *values;
 };
-void sub_08224F20(u32, struct Args *);
-void sub_08224F08(u32, struct Args *);
-void sub_0821E040(struct Trigger *trigger, struct Trap *trap, u16 event)
+void Script_CallProcedureWrapper(u32, struct Args *);
+void Script_ExecuteBlockWrapper(u32, struct Args *);
+void Trap_DispatchEvent(struct Trigger *trigger, struct Trap *trap, u16 event)
 {
     u32 values[14];
     struct Args args;
@@ -38,7 +38,7 @@ void sub_0821E040(struct Trigger *trigger, struct Trap *trap, u16 event)
     args.count = 14;
     args.values = values;
     if (trap->flags & 0x20)
-        sub_08224F20(command, &args);
+        Script_CallProcedureWrapper(command, &args);
     else
-        sub_08224F08(command, &args);
+        Script_ExecuteBlockWrapper(command, &args);
 }

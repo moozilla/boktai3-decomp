@@ -1,4 +1,6 @@
 #include "transient_sprite_effects.h"
+/* TransientSpriteEffects_SpawnFromScript: Reads script keywords for effect kind options position velocity and damping then spawns a transient sprite effect */
+#define TransientSpriteEffects_SpawnFromScript sub_080475F8
 #define TransientSpriteEffects_SpawnFromScript sub_080475F8
 s32 TransientSpriteEffects_Spawn(u32, u32, const struct ContactPosition *,
                                  const struct ContactPosition *, u32, u32);

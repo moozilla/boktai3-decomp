@@ -1,21 +1,27 @@
 #include "palette_controller.h"
+/* Palette_ClearActiveController: zeroes gUnk_02000468 (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
+#define Palette_ClearActiveController sub_08002AD4
+/* Palette_NoOpCallback: empty stub with no identified caller or callee; placeholder callback body */
+#define Palette_NoOpCallback sub_08002E7C
+/* Palette_SetBlendFromScript: reads the 'r' script keyword and forwards it to Palette_SetBlend */
+#define Palette_SetBlendFromScript sub_08003494
 
-void sub_08002AA8(struct PaletteController *p, u32 x)
+void Palette_SetPendingFlags(struct PaletteController *p, u32 x)
 {
     p->pending |= x;
 }
 
-void sub_08002AB0(struct PaletteController *p, u32 x)
+void Palette_ClearPendingFlags(struct PaletteController *p, u32 x)
 {
     p->pending &= ~x;
 }
 
-u32 sub_08002AB8(struct PaletteController *p, u32 x)
+u32 Palette_TestPendingFlags(struct PaletteController *p, u32 x)
 {
     return p->pending & x;
 }
 
-u16 *sub_08002AC0(struct PaletteController *p, u32 set, u32 slot)
+u16 *Palette_GetColorSet(struct PaletteController *p, u32 set, u32 slot)
 {
     return p->colorSets[set][slot];
 }
@@ -110,7 +116,7 @@ void Palette_ScaleRange(u16 *dest, const u16 *source, u32 brightness, s32 first,
 
 void sub_08227950(u16 *, u16 *);
 
-void sub_08002C38(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_PickTransitionColors(struct PaletteController *p, struct PaletteTransition *t)
 {
     u16 x[2];
     u16 *y = &x[1];
@@ -119,7 +125,7 @@ void sub_08002C38(struct PaletteController *p, struct PaletteTransition *t)
     t->to = p->colorSets[PALETTE_SET_VARIANT][*y];
 }
 
-s32 sub_08002C70(void)
+s32 Palette_GetBrightnessThreshold(void)
 {
     u8 v = gUnk_03005430.state - 1;
     if (v <= 2) {
@@ -128,7 +134,7 @@ s32 sub_08002C70(void)
     return 0x40;
 }
 
-void sub_08002C90(struct PaletteTransition *t)
+void Palette_BrightnessIdle(struct PaletteTransition *t)
 {
     u32 z = 0;
     t->brightness = z;
@@ -138,44 +144,44 @@ void sub_08002C90(struct PaletteTransition *t)
     }
 }
 
-void sub_08002CB0(struct PaletteTransition *t)
+void Palette_BrightnessFadeIn(struct PaletteTransition *t)
 {
     s32 current;
     current = t->brightness;
-    if (current < sub_08002C70()) {
+    if (current < Palette_GetBrightnessThreshold()) {
         t->brightness += 4;
         return;
     }
-    t->brightness = sub_08002C70();
+    t->brightness = Palette_GetBrightnessThreshold();
     t->mode = 2;
 }
 
-void sub_08002CD8(struct PaletteTransition *t)
+void Palette_BrightnessHold(struct PaletteTransition *t)
 {
     s32 d;
     s32 a;
     u32 v;
     u32 *q;
     u32 u;
-    s32 f1 = sub_08002C70();
+    s32 f1 = Palette_GetBrightnessThreshold();
     u = t->brightness;
     d = u - f1;
     if (d < 0)
         d = -d;
-    if ((s32)u < sub_08002C70()) {
+    if ((s32)u < Palette_GetBrightnessThreshold()) {
         a = d;
         if (a > 8)
             a = 8;
         v = t->brightness + a;
     } else {
         u = t->brightness;
-        if ((s32)u > sub_08002C70()) {
+        if ((s32)u > Palette_GetBrightnessThreshold()) {
             a = d;
             if (a > 8)
                 a = 8;
             v = t->brightness - a;
         } else {
-            v = sub_08002C70();
+            v = Palette_GetBrightnessThreshold();
         }
     }
     t->brightness = v;
@@ -186,7 +192,7 @@ void sub_08002CD8(struct PaletteTransition *t)
     }
 }
 
-void sub_08002D3C(struct PaletteTransition *t)
+void Palette_BrightnessFadeOut(struct PaletteTransition *t)
 {
     if (t->brightness > 1) {
         t->brightness -= 2;
@@ -196,7 +202,7 @@ void sub_08002D3C(struct PaletteTransition *t)
     }
 }
 
-void sub_08002D58(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_BlendTransitionColors(struct PaletteController *p, struct PaletteTransition *t)
 {
     u16 *buf = p->blendBuffer;
     u16 *b = t->from;
@@ -206,7 +212,7 @@ void sub_08002D58(struct PaletteController *p, struct PaletteTransition *t)
     p->dirty = 1;
 }
 
-void sub_08002D90(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_BlendOverlay(struct PaletteController *p, struct PaletteTransition *t)
 {
     u16 *r;
     u16 *d;
@@ -215,7 +221,7 @@ void sub_08002D90(struct PaletteController *p, struct PaletteTransition *t)
     } else if (p->flags & 8) {
         r = p->palettes[p->selected];
     } else {
-        r = sub_08002AC0(p, 0, p->selected);
+        r = Palette_GetColorSet(p, 0, p->selected);
     }
     d = p->effectBuffer;
     Palette_BlendRange(d, r, t->colors, t->brightness, 0, 0xD0);
@@ -223,32 +229,32 @@ void sub_08002D90(struct PaletteController *p, struct PaletteTransition *t)
     p->dirty = 1;
 }
 
-void sub_08002E00(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_BuildOverlayColors(struct PaletteController *p, struct PaletteTransition *t)
 {
-    u16 *r = sub_08002AC0(p, 0, 2);
+    u16 *r = Palette_GetColorSet(p, 0, 2);
     Palette_ScaleRange(t->colors, r, 0x32, 0, 0xD0);
 }
 
-void sub_08002E28(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_AdvanceTransitionBlend(struct PaletteController *p, struct PaletteTransition *t)
 {
-    sub_08002D58(p, t);
+    Palette_BlendTransitionColors(p, t);
     t->level++;
     if (t->level > 0x3f)
         t->level = 0x40;
 }
 
-void sub_08002E48(struct PaletteController *p, struct PaletteTransition *t)
+void Palette_ApplyOverlayBlend(struct PaletteController *p, struct PaletteTransition *t)
 {
-    sub_08002D90(p, t);
+    Palette_BlendOverlay(p, t);
 }
 
-void sub_08002E54(struct PaletteController *p)
+void Palette_ResetTransition(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
-    sub_08002C38(p, t);
+    Palette_PickTransitionColors(p, t);
     t->level = 0x40;
-    sub_08002E00(p, t);
-    sub_08002D58(p, t);
+    Palette_BuildOverlayColors(p, t);
+    Palette_BlendTransitionColors(p, t);
 }
 
 void sub_08002E7C(void)
@@ -281,7 +287,7 @@ void Palette_UpdateOscillation(struct PaletteController *p)
 
 s32 Div(s32, s32);
 
-void sub_08002EE4(struct PaletteController *p)
+void Palette_UpdateBlendSlide(struct PaletteController *p)
 {
     struct PaletteSlide *s = &p->slide;
     s32 r;
@@ -302,7 +308,7 @@ end:
     p->blend = s->value;
 }
 
-void sub_08002F2C(struct PaletteController *p)
+void Palette_InitBlendSlide(struct PaletteController *p)
 {
     struct PaletteSlide *s = &p->slide;
     s->start = 0x40;
@@ -350,7 +356,7 @@ void Palette_BlendVariants(struct PaletteController *p)
     p->dirty = 1;
 }
 
-void sub_0800301C(struct PaletteController *p)
+void Palette_SetVariantsFromSource(struct PaletteController *p)
 {
     u16 **q = p->colorSets[PALETTE_SET_SOURCE];
     s32 i = 3;
@@ -361,7 +367,7 @@ void sub_0800301C(struct PaletteController *p)
     } while (i >= 0);
 }
 
-void sub_08003038(struct PaletteController *p)
+void Palette_SetVariantsFromPalettes(struct PaletteController *p)
 {
     s32 i = 3;
     u16 *v = p->palettes[3];
@@ -372,10 +378,10 @@ void sub_08003038(struct PaletteController *p)
         t--;
         i--;
     } while (i >= 0);
-    sub_08002C38(p, &p->transition);
+    Palette_PickTransitionColors(p, &p->transition);
 }
 
-s32 sub_08017444(void);
+s32 Weather_IsActive(void);
 
 extern void *gUnk_0860499C[];
 
@@ -386,31 +392,31 @@ void Palette_ApplyFrame(struct PaletteController *p)
         if (p->flags & 2)
             Palette_UpdateOscillation(p);
         else
-            sub_08002EE4(p);
+            Palette_UpdateBlendSlide(p);
         if (p->blend != p->previousBlend)
-            sub_08002AA8(p, 7);
+            Palette_SetPendingFlags(p, 7);
     }
     if (p->flags & 1) {
         if (gUnk_03005430.state != p->previousState) {
-            sub_08002C38(p, t);
+            Palette_PickTransitionColors(p, t);
             t->level = 0;
         }
         if (t->level <= 63)
-            sub_08002AA8(p, 6);
+            Palette_SetPendingFlags(p, 6);
     } else
-        sub_08002AB0(p, 2);
-    if (sub_08017444() || (p->flags & 16)) {
+        Palette_ClearPendingFlags(p, 2);
+    if (Weather_IsActive() || (p->flags & 16)) {
         sub_0824923C(t, gUnk_0860499C[t->mode]);
         if (t->brightness != t->previousBrightness)
-            sub_08002AA8(p, 4);
+            Palette_SetPendingFlags(p, 4);
     } else
-        sub_08002AB0(p, 4);
-    if (sub_08002AB8(p, 1))
+        Palette_ClearPendingFlags(p, 4);
+    if (Palette_TestPendingFlags(p, 1))
         Palette_BlendVariants(p);
-    if (sub_08002AB8(p, 2))
-        sub_08002E28(p, t);
-    if (sub_08002AB8(p, 4))
-        sub_08002E48(p, t);
+    if (Palette_TestPendingFlags(p, 2))
+        Palette_AdvanceTransitionBlend(p, t);
+    if (Palette_TestPendingFlags(p, 4))
+        Palette_ApplyOverlayBlend(p, t);
     if (p->current) {
         if (p->flags & 32)
             CpuSet(p->current, p->hardware, 0x04000060);
@@ -431,7 +437,7 @@ s32 Palette_Update(struct PaletteController *p)
     p->previousState = gUnk_03005430.state;
 }
 
-u32 sub_080031E0(void)
+u32 Palette_Destroy(void)
 {
     gUnk_02000468 = 0;
 }
@@ -488,13 +494,13 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         }
     }
     if (p->flags & 8)
-        sub_08003038(p);
+        Palette_SetVariantsFromPalettes(p);
     else
-        sub_0800301C(p);
+        Palette_SetVariantsFromSource(p);
     p->blend = 0;
     p->selected = Script_GetKeywordValue('c', 0);
     p->current = p->colorSets[PALETTE_SET_SOURCE][p->selected];
-    sub_08002F2C(p);
+    Palette_InitBlendSlide(p);
     if (p->flags & 2) {
         p->flags |= 8;
         if (Script_SeekToKeyword('a')) {
@@ -517,11 +523,11 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         w->phase = 0;
     }
     if (p->flags & 1)
-        sub_08002E54(p);
+        Palette_ResetTransition(p);
     if (blendEnabled(p) && (p->flags & 2))
         Palette_BlendVariants(p);
     if (p->flags & 1)
-        sub_08002D58(p, t);
+        Palette_BlendTransitionColors(p, t);
     if (p->current)
         CpuSet(p->current, p->hardware, 0x04000068);
     p->previousState = gUnk_03005430.state;
@@ -529,14 +535,14 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     return 0;
 }
 
-struct PaletteController *sub_080033FC(void)
+struct PaletteController *Palette_GetOrCreate(void)
 {
     struct PaletteController *r;
     if (gUnk_02000468 != 0)
         return gUnk_02000468;
     r = Task_Create(11, 0xe94);
     if (r) {
-        Task_SetCallbacks(r, Palette_Update, sub_080031E0);
+        Task_SetCallbacks(r, Palette_Update, Palette_Destroy);
         if (Palette_InitializeFromScript(r) < 0) {
             Task_Kill(r);
             return 0;
@@ -545,7 +551,7 @@ struct PaletteController *sub_080033FC(void)
     return r;
 }
 
-void sub_08003448(u32 v)
+void Palette_SetBrightnessMode(u32 v)
 {
     if (gUnk_02000468) {
         struct PaletteTransition *t = &gUnk_02000468->transition;
@@ -553,14 +559,14 @@ void sub_08003448(u32 v)
     }
 }
 
-u8 sub_08003460(void)
+u8 Palette_IsDirty(void)
 {
     if (gUnk_02000468 == 0)
         return 0;
     return gUnk_02000468->dirty;
 }
 
-void sub_0800347C(u32 v)
+void Palette_SetBlend(u32 v)
 {
     if (gUnk_02000468) {
         gUnk_02000468->blend = v;
@@ -569,7 +575,7 @@ void sub_0800347C(u32 v)
 
 void sub_08003494(void)
 {
-    sub_0800347C(Script_GetKeywordValue('r', 0));
+    Palette_SetBlend(Script_GetKeywordValue('r', 0));
 }
 
 void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
@@ -585,20 +591,20 @@ void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
                 u16 first, second;
                 sub_08227950(&first, &second);
                 if (first == 2)
-                    sub_08002E00(p, &p->transition);
-                sub_08002E54(p);
+                    Palette_BuildOverlayColors(p, &p->transition);
+                Palette_ResetTransition(p);
             }
             if (p->flags & 8)
-                sub_08003038(p);
+                Palette_SetVariantsFromPalettes(p);
             else
-                sub_0800301C(p);
+                Palette_SetVariantsFromSource(p);
             p->previousBlend = -1;
             p->previousState = -1;
         }
     }
 }
 
-void sub_08003540(void)
+void Palette_ReplaceResourceFromScript(void)
 {
     if (gUnk_02000468 != 0) {
         s32 a = Script_GetKeywordValue(0x73, 0);
@@ -609,7 +615,7 @@ void sub_08003540(void)
     }
 }
 
-void sub_08003588(u32 a, u32 b, u32 c)
+void Palette_StartSlide(u32 a, u32 b, u32 c)
 {
     struct PaletteController *p = gUnk_02000468;
     if (p != 0) {
@@ -620,16 +626,16 @@ void sub_08003588(u32 a, u32 b, u32 c)
         q->time = 0;
         q->duration = c;
         p->flags |= 0xc;
-        sub_08003038(p);
+        Palette_SetVariantsFromPalettes(p);
     }
 }
 
-void sub_080035C0(void)
+void Palette_StartSlideFromScript(void)
 {
     s32 a = Script_GetKeywordValue(0x73, 0);
     s32 b = Script_GetKeywordValue(0x61, 0);
     s32 c = Script_GetKeywordValue(0x74, 0);
-    sub_08003588(a, b, c);
+    Palette_StartSlide(a, b, c);
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -659,7 +665,7 @@ void Palette_SetBrightnessFromScript(void)
         if (enabled) {
             if (immediate) {
                 t->mode = 2;
-                t->brightness = sub_08002C70();
+                t->brightness = Palette_GetBrightnessThreshold();
                 goto complete;
             }
             if (t->mode == 1)
@@ -693,12 +699,12 @@ void Palette_SetBrightnessFromScript(void)
     }
 }
 
-u32 sub_080036C0(void)
+u32 Palette_GetTransitionLevel(void)
 {
     return gUnk_02000468 ? gUnk_02000468->transition.level : 0x40;
 }
 
-u32 sub_080036DC(void)
+u32 Palette_GetBrightness(void)
 {
     struct PaletteController *q = gUnk_02000468;
     u32 r;

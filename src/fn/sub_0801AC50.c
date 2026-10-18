@@ -5,7 +5,7 @@ void SelectionMenu_PopulateActors(u8 *);
 s32 Script_ParseStringRef(s32);
 s32 Text_LookupString(void);
 void Presentation_UpdateActorGraphic(u8 *, s32);
-void sub_0801AC50(u8 *p)
+void SelectionMenu_RefreshActorPage(u8 *p)
 {
     SelectionMenu_ActorAvailability(p);
     SelectionMenu_PositionInventoryMarkers(p);

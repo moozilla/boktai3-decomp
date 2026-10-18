@@ -13,7 +13,7 @@ struct O {
 };
 void sub_081B78CC(void *);
 
-void sub_081B7978(struct O *p)
+void GrowthHazard_UpdateIdle(struct O *p)
 {
     struct S *s = &p->s;
     s32 m = ~4;

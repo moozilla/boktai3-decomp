@@ -4,27 +4,27 @@ struct Task {
     void *listener;
     u16 state;
 };
-void sub_082279A8(int, int, int, int, int, int, int);
-void sub_08036C54(void);
-void *sub_08037DC0(void);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
+void Wireless_RequestDestroyController(void);
+void *WirelessExchange_Get(void);
 void Task_Kill(void *);
-int sub_08034084(void);
+int WirelessController_GetInstance(void);
 void Script_Call(void *, int);
-int sub_080394D4(struct Task *p)
+int WirelessExit_Update(struct Task *p)
 {
     switch (p->state) {
         case 0:
-            sub_082279A8(4, 0, 0, 0, 0, 65535, 0);
-            sub_08036C54();
+            ScreenTransition_SendCommand(4, 0, 0, 0, 0, 65535, 0);
+            Wireless_RequestDestroyController();
             {
-                void *q = sub_08037DC0();
+                void *q = WirelessExchange_Get();
                 if (q)
                     Task_Kill(q);
             }
             p->state++;
             break;
         case 1:
-            if (!sub_08034084())
+            if (!WirelessController_GetInstance())
                 p->state++;
             break;
         case 2:

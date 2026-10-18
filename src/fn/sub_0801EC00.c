@@ -1,8 +1,8 @@
 #include "global.h"
-u8 *sub_0821A2C4(int);
+u8 *ResourceRegistry_GetResource(int);
 int SceneObjects_HasTypeTwoResource(int id)
 {
-    u8 *p = sub_0821A2C4(0x85e6);
+    u8 *p = ResourceRegistry_GetResource(0x85e6);
     int i;
     if (p)
         goto scan;

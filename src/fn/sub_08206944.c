@@ -10,7 +10,7 @@ struct S {
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
-void sub_08206944(struct S *p)
+void VulcanCannon_ReadScriptValueList(struct S *p)
 {
     s32 i;
     s16 *d;

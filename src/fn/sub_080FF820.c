@@ -8,7 +8,7 @@ static inline u8 Tst(u32 m, s32 one, s32 i)
     return FALSE;
 }
 
-u8 *sub_080FF820(u32 x)
+u8 *WoodenCrate_FindByName(u32 x)
 {
     u8 *b = gUnk_020001A4;
     s32 i;

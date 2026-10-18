@@ -5,7 +5,7 @@ struct P {
     u8 pad2[0x14];
     u32 v[5];
 };
-u32 sub_08032BEC(struct P *p)
+u32 TextState_GetActiveStream(struct P *p)
 {
     u32 r;
     switch (p->k) {

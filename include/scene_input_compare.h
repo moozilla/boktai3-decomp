@@ -11,15 +11,15 @@ struct SceneInputEquipmentView {
     u8 unknown52[0x16];
     s16 primary[8], secondary[8];
 };
-void sub_0822D808(u32, struct SceneInputItemDescriptor *);
-void *sub_0822E5F4(u32);
-s32 sub_081590E4(const struct SceneInputItemDescriptor *);
-s32 sub_081590FC(const void *);
-void sub_0822D740(const void *, void *);
+void Inventory_GetEquippedDescriptor(u32, struct SceneInputItemDescriptor *);
+void *GameState_GetUnlockDescriptor(u32);
+s32 Player_GetEquipmentValue(const struct SceneInputItemDescriptor *);
+s32 Player_GetEquipmentLevelBonus(const void *);
+void Inventory_InitEquipmentEntryFromDescriptor(const void *, void *);
 s32 sub_08159030(const void *, const void *);
-void *sub_0822E288(u32);
-s32 sub_0815A384(s32);
-s32 sub_0815A3C4(s32, s32);
+void *GameState_GetConsumableDescriptor(u32);
+s32 Player_GetCurrentAttribute(s32);
+s32 Player_GetCandidateAttribute(s32, s32);
 void SceneInputPanel_SplitThreeDigits(s32, s32 *);
 void SceneInputPanel_GetEquippedValues(s32 *, s32 *, struct SceneInputItemDescriptor *, u32 *);
 #endif

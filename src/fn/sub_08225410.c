@@ -1,15 +1,15 @@
 #include "global.h"
 u8 *Script_GetPc(void);
-void sub_0821B148(void);
-u8 *sub_0821B5BC(u8 *);
-s32 sub_08225410(void)
+void GameState_BackupActiveRegions(void);
+u8 *Script_BackupVariableOperand(u8 *);
+s32 Script_SaveVariables(void)
 {
     u8 *p = Script_GetPc();
     if (p == 0) {
-        sub_0821B148();
+        GameState_BackupActiveRegions();
     } else {
         while (*p != 0)
-            p = sub_0821B5BC(p);
+            p = Script_BackupVariableOperand(p);
     }
     return 0;
 }

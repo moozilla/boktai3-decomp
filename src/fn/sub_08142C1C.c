@@ -12,7 +12,7 @@ static inline u32 tst(u32 *a, u32 m)
     return *a & m;
 }
 
-s32 sub_08142C1C(struct P08142C1C *p)
+s32 Player_CanRecoverResourceWhileFlagged(struct P08142C1C *p)
 {
     if (tst(&p->f20, 0x10) != 0 && p->f428 < p->f42A)
         return 1;

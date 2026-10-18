@@ -7,7 +7,7 @@ struct S {
 };
 extern struct S *gUnk_02000150;
 u32 AnimData_FindEntry(u32);
-s32 sub_081260BC(struct S *s)
+s32 SceneMovingParticle_InitPool(struct S *s)
 {
     s->p = AnimData_FindEntry(0x1c1e);
     s->c = 0;

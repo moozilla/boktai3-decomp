@@ -42,7 +42,7 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
     }
     position = (void *)&packet;
     cell = firstCellAtPosition(position);
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
@@ -71,7 +71,7 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
         struct ContactPosition *point = (void *)&packet;
         prop->height = (point->y >> 8) + 1;
     }
-    sub_0821D698(prop->terrainRegistration, prop->cell, 0, prop->height, 255, 0x103);
+    TerrainModifiers_RegisterCell(prop->terrainRegistration, prop->cell, 0, prop->height, 255, 0x103);
     BreakableProp_InitializeSprite(prop, &packet);
     BreakableProp_InitializeCollider(prop, id, &packet);
     script = Script_SeekToKeyword('R');

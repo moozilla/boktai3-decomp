@@ -6,7 +6,7 @@ struct S {
 };
 extern struct S *gUnk_02000298;
 
-s32 sub_081D372C(void)
+s32 PlayerParticleCloud_RequestStop(void)
 {
     struct S *p = gUnk_02000298;
     s32 r;

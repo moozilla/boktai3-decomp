@@ -3,7 +3,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
-void sub_0813FC08(u8 *p)
+void Player_InitEventProcedureFromScript(u8 *p)
 {
     s32 v;
 

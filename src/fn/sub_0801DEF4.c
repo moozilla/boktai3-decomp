@@ -6,10 +6,10 @@ Resource *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 int ResultTutorial_ReadScript(void *);
 void ResultMenu_CreateGraphics(void *);
-void sub_0801B534(void *, void *);
+void ResultMenu_SetPhase(void *, void *);
 void ResultTutorial_Open(void *);
 extern u32 gUnk_0300523C;
-void sub_0822AE7C(int);
+void Sound_PlayTrackedSong(int);
 int ResultTutorial_Initialize(u8 *p, void *owner)
 {
     Resource *r;
@@ -43,8 +43,8 @@ int ResultTutorial_Initialize(u8 *p, void *owner)
     p[0xb6] = zero;
     *((int *)(p + 0x50)) = 3;
     ResultMenu_CreateGraphics(p);
-    sub_0801B534(p, ResultTutorial_Open);
-    sub_0822AE7C(0xaa);
+    ResultMenu_SetPhase(p, ResultTutorial_Open);
+    Sound_PlayTrackedSong(0xaa);
     gUnk_0300523C |= four;
     return 0;
 }

@@ -9,7 +9,7 @@ struct State0819594C {
     u16 hp[9];
 };
 
-void sub_0819594C(struct State0819594C *t)
+void Nidhoggr_InitFirstPhaseParts(struct State0819594C *t)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {

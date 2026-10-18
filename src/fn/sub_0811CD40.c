@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0811CD40(u8 *p, u32 m)
+void CharacterModel_ClearAnimationFlags(u8 *p, u32 m)
 {
     u32 *q;
     s32 i;

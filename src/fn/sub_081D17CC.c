@@ -1,6 +1,6 @@
 #include "global.h"
 void Trigger_ConsumePending(u8 *, u32);
-void sub_081D17CC(u8 *a, u8 *p)
+void TaggedSceneNpc_UpdateMode21(u8 *a, u8 *p)
 {
     u8 *q = p + 0x20;
     if (p[8] != 0) {

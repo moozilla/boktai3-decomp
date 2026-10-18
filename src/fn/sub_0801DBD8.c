@@ -5,10 +5,10 @@ typedef struct {
     void *values;
 } Args;
 extern volatile u32 gUnk_0300523C;
-void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0822AFE8(int);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
+void Sound_PauseChannel10(int);
 void Script_Call(int, Args *);
-void sub_08033590(void);
+void ScrollingDialogue_RequestHide(void);
 void Task_Kill(void *);
 int ResultTutorial_Close(u8 *p)
 {
@@ -16,8 +16,8 @@ int ResultTutorial_Close(u8 *p)
     Args args;
     switch (p[0xaf]) {
         case 0:
-            sub_082279A8(3, 4, 4, 4, 4, 0xffff, 0);
-            sub_0822AFE8(5);
+            ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
+            Sound_PauseChannel10(5);
             ++p[0xaf];
             *(u16 *)(p + 0xaa) = 0;
             break;
@@ -33,7 +33,7 @@ int ResultTutorial_Close(u8 *p)
                     mask = ~4;
                     *flags &= mask;
                 }
-                sub_08033590();
+                ScrollingDialogue_RequestHide();
                 Task_Kill(p);
                 return 1;
             }

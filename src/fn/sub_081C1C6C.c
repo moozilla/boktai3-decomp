@@ -7,7 +7,7 @@ struct S {
     u8 f[0x250];
     struct E e[6];
 };
-void sub_081C1C6C(struct S *p)
+void ControlPanel_HideMultiplierSprites(struct S *p)
 {
     s32 i;
     u32 m = 1;

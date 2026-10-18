@@ -29,7 +29,7 @@ static inline void project(struct V *out, struct V *in)
     out->y = c - gUnk_03005418.y + 80;
     out->z = d - gUnk_03005418.z;
 }
-s32 sub_081999CC(void)
+s32 SceneEffectQueue_QueueTypeTwoEffect(void)
 {
     struct P in;
     struct V out;

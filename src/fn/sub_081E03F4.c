@@ -11,7 +11,6 @@ struct ScreenParams358Params {
     s32 S;
 };
 extern struct ScreenParams358Params gUnk_02000358;
-/* Script: sets the parameter block (see the option letters). */
 void ScreenParams358_SetFromScript(void)
 {
     struct ScreenParams358Params *p = &gUnk_02000358;

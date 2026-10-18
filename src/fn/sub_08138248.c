@@ -5,7 +5,7 @@ static inline u16 get(u8 *p, s32 i)
         return 0xFFFF;
     return ((u16 *)*(u32 *)(p + 0x40))[i];
 }
-u32 sub_08138248(u8 *p, s32 n)
+u32 Registry1745_HasParticipantCount(u8 *p, s32 n)
 {
     s32 cnt = 0;
     s32 i = 0;

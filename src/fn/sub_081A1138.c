@@ -20,7 +20,7 @@ static inline void setf(struct S *p, u32 m)
     p->f9c |= m;
 }
 
-void sub_081A1138(struct S *p)
+void Hresvelgr_OnActionTwentyEight(struct S *p)
 {
     clr(p);
     p->h[0] = 0;

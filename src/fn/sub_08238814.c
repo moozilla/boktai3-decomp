@@ -29,7 +29,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_08238814(State *s)
+void Player_UpdateOrbitingAuraEffect(State *s)
 {
     if (s->active) {
         s32 angle;

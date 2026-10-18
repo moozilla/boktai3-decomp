@@ -6,16 +6,16 @@ void Task_SetCallbacks(void *, void *, void *);
 s32 sub_081625C0(void *, void *, void *, void *);
 void Task_Kill(void *);
 void sub_0816233C(void);
-void sub_08162598(void);
+void PlayerAttackEffect_Destroy(void);
 
-void *sub_081626E0(void *a, void *b, void *c)
+void *PlayerAttackEffect_Create(void *a, void *b, void *c)
 {
     void *r;
     if (gUnk_0200059C != 0)
         return gUnk_0200059C;
     r = Task_Create(0xa, 0x5A8);
     if (r != 0) {
-        Task_SetCallbacks(r, sub_0816233C, sub_08162598);
+        Task_SetCallbacks(r, sub_0816233C, PlayerAttackEffect_Destroy);
         if (sub_081625C0(r, a, b, c) < 0) {
             Task_Kill(r);
             return 0;

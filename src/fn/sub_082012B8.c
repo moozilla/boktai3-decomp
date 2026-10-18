@@ -9,7 +9,7 @@ struct S {
     u16 h1a;
     u16 h1c;
 };
-void sub_082012B8(struct S *p, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f)
+void PlayerClone_SetColliderExtents(struct S *p, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f)
 {
     p->h10 = a;
     p->h12 = b;

@@ -14,7 +14,7 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
                     mask |= value;
                     *(u16 *)(gate->registration + 6) = mask;
                 } else {
-                    sub_0821D6D0(gate->registration);
+                    TerrainModifiers_UnregisterCell(gate->registration);
                     gate->registered = retained;
                     sub_08158CD8(gUnk_02000580);
                 }
@@ -24,16 +24,16 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
         } else {
             if (CellGate_TestTraversalMode(gate) && CellGate_TestPlayerEdge(gate, 64)) {
                 if (!gate->registered) {
-                    sub_0821D698(gate->registration, gate->cell, 0, gate->height, 255, 0x82A);
+                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x82A);
                     gate->registered = 1;
                 }
             } else if (gate->registered) {
-                sub_0821D6D0(gate->registration);
+                TerrainModifiers_UnregisterCell(gate->registration);
                 gate->registered = 0;
             }
         }
     } else if (gate->registered) {
-        sub_0821D6D0(gate->registration);
+        TerrainModifiers_UnregisterCell(gate->registration);
         gate->registered = result;
     }
 }

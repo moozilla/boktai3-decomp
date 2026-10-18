@@ -14,15 +14,15 @@ struct NumericOverlay {
     u16 mapId, paletteId;
     u16 *buffer; // working palette (gUnk_03005160)
     u16 *source; // palette resource
-    u16 dirty;   // bit mask of displays to redraw (set to 15 by sub_0800F6B0)
+    u16 dirty;   // bit mask of displays to redraw (set to 15 by NumericOverlay_RefreshDisplay)
     u16 pad2A;
 };
 
 extern struct NumericOverlay *gUnk_02000048; // the live overlay, or NULL
 
-u16 *sub_0800F4C4(u32 bg, u32 x, s32 y); // same as sub_0800E3E0
+u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y); // same as StatusScreen_GetTilePtr
 void sub_0800F4EC(struct NumericOverlay *);
-void sub_0800F6B0(struct NumericOverlay *);
+void NumericOverlay_RefreshDisplay(struct NumericOverlay *);
 s32 sub_0800F6F8(struct NumericOverlay *, u16 id);
 
 #endif

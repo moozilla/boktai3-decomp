@@ -8,7 +8,7 @@ void Task_Kill(u8 *);
 void sub_08178B98(void);
 void sub_08178BCC(void);
 
-u8 *sub_081791E0(u32 a)
+u8 *Hud_CreateStandardLayout(u32 a)
 {
     u8 *p;
     if (gUnk_02000214 != 0)

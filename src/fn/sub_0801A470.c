@@ -4,7 +4,7 @@ struct Z {
     u32 y;
 };
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
-void sub_0801A470(u8 *p)
+void SelectionMenu_InitHighlight(u8 *p)
 {
     struct Z z;
     u32 m = 0xFFFF0000;

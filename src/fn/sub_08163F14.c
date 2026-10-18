@@ -4,7 +4,7 @@ void Bg_SetupLayers(s32, s32, s32, s32, s32, s32, u32 *);
 void Bg_SetLayerMap(s32, s32, s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 
-void sub_08163F14(s32 a, s32 b, s32 c, s32 d, u32 e)
+void Hud_SetupBackgroundLayer(s32 a, s32 b, s32 c, s32 d, u32 e)
 {
     u32 z = 0;
     Bg_SetupLayers(0, (s16)c, b, 0, 0, 1, &z);

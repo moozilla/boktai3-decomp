@@ -7,7 +7,7 @@ struct S {
     void (*cb)(void);
 };
 void sub_08117948(void);
-void sub_08117294(struct S *s)
+void Glove_BeginStopping(struct S *s)
 {
     void (*f)(void) = sub_08117948;
     u8 *p = &s->on;

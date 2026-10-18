@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_081D4DF4(u32);
-void sub_081D7290(u8 *p)
+void BestiaryDisplay_Hide(u32);
+void TextSequence_OnDestroy(u8 *p)
 {
-    sub_081D4DF4(*(u32 *)(p + 0x318));
+    BestiaryDisplay_Hide(*(u32 *)(p + 0x318));
 }

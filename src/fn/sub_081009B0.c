@@ -20,7 +20,7 @@ struct S {
     u32 mask;
 };
 
-u32 sub_081009B0(struct S *b)
+u32 FloorSwitch_OnManagerDestroy(struct S *b)
 {
     s32 i = 0;
     u32 *m = &b->mask;

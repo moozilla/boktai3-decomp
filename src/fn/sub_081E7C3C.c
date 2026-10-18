@@ -35,9 +35,9 @@ struct S {
     void (*fn)(void *);
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -58,7 +58,7 @@ static inline u32 frame_factor(u16 v)
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
-void sub_081E7C3C(struct S *p)
+void Actor_UpdateNotifyingAnimation(struct S *p)
 {
     struct Obj *o;
     struct Anim *a;

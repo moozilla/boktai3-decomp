@@ -58,7 +58,7 @@ static inline int trunc12(int x)
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
 void AnimatedHazard_Create(void *, int, int);
-void sub_08027CF8(ActorAnimation *p, int tick)
+void SceneActors_UpdateHazardAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {

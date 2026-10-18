@@ -4,7 +4,7 @@ struct Z {
 };
 void DamageNumberDisplay_Show(u8 *, s32, u32, u8 *, struct Z *, u32);
 void RoamingObjectB_SetState(u8 *, u32);
-s32 sub_08063F84(u8 *p, u32 b, s32 c)
+s32 RoamingObjectB_OnDamage(u8 *p, u32 b, s32 c)
 {
     u8 *q = *(u8 **)(p + 0x50);
     if (b == 0) {

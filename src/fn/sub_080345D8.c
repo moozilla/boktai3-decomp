@@ -45,7 +45,7 @@ static inline void reset(struct Engine *p, int operation, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_080345D8(u8 command)
+void WirelessController_OnLinkEvent(u8 command)
 {
     int key = command;
     struct Engine *p = gUnk_02000484;

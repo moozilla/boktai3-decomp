@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_08019470(void)
+u32 ClockEvents_Destroy(void)
 {
     return 0;
 }

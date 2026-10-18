@@ -1,12 +1,12 @@
 #include "global.h"
-int sub_08019F2C(void *);
-void sub_082279A8(int, int, int, int, int, int, int);
+int SelectionMenu_ConsumeCallbackFlag(void *);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 void Script_Call(int, void *);
 extern u32 gUnk_0300523C;
 void SelectionMenu_Close(u8 *p)
 {
-    if (sub_08019F2C(p))
-        sub_082279A8(3, 4, 4, 4, 4, 0xffff, 0);
+    if (SelectionMenu_ConsumeCallbackFlag(p))
+        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
     if (*(u32 *)(p + 0x28) == 20) {
         {
             u32 *state = &gUnk_0300523C;

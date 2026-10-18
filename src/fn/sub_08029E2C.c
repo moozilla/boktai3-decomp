@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-int sub_08029E2C(u8 *p)
+int GridAttackActor_SelectAttackAnimation(u8 *p)
 {
     int start, i, index;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;

@@ -40,6 +40,6 @@ s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *s
             sub_08219728(widget, resource, 0x4C);
     }
     if (blink)
-        sub_0816381C(widget->palette + 12, blink);
+        Palette_UpdateHighlightPulse(widget->palette + 12, blink);
     return -1;
 }

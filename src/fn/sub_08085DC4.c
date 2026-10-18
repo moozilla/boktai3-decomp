@@ -2,7 +2,7 @@
 
 void sub_0807E9D0(void);
 
-void sub_08085DC4(void)
+void Ghoul_OnBodyCollision(void)
 {
     sub_0807E9D0();
 }

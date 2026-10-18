@@ -6,7 +6,7 @@ struct E {
     u8 b;
 };
 void sub_08184FE8(struct E *, s32);
-void sub_0818646C(struct E *p)
+void Armor_StopAndFinishBehavior(struct E *p)
 {
     sub_08184FE8(p, 0);
     p->a = 0xff;

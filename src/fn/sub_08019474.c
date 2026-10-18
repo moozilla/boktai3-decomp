@@ -8,7 +8,7 @@ struct Clock {
 };
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
-int sub_08228DA0(void);
+int SunClock_GetSecond(void);
 int Script_GetKeywordValue(int, int);
 int ClockEvents_Initialize(struct Clock *p)
 {
@@ -16,7 +16,7 @@ int ClockEvents_Initialize(struct Clock *p)
     u8 *q;
     p->hour = SunClock_GetBaseHour();
     p->minute = SunClock_GetBaseMinute();
-    p->second = sub_08228DA0();
+    p->second = SunClock_GetSecond();
     p->seconds = p->hour * 3600 + p->minute * 60 + p->second;
     p->window = Script_GetKeywordValue('d', 60);
     p->script = (void *)Script_GetKeywordValue('p', 0);

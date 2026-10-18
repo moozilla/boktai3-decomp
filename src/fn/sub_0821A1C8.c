@@ -9,7 +9,7 @@ struct Slot {
 extern struct Slot gUnk_0203B000[];
 extern s32 gUnk_030052F0;
 
-struct Slot *sub_0821A1C8(u16 id)
+struct Slot *ResourceRegistry_FindEntry(u16 id)
 {
     struct Slot *s = gUnk_0203B000;
     s32 i = 0;

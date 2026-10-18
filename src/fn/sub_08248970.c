@@ -2,9 +2,9 @@
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // CFLAGS: -O0 -mthumb-interwork
 extern u8 gUnk_030035C6;
-void sub_08249210(void);
+void Rtc_EnableGpioReads(void);
 void Rtc_Initialize(void)
 {
-    sub_08249210();
+    Rtc_EnableGpioReads();
     gUnk_030035C6 = 0;
 }

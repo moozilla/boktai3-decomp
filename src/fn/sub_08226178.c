@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08226178(void)
+void Camera_ClearTargetOffset(void)
 {
     u8 *p = *(u8 **)0x03005420;
     if (p != 0) {

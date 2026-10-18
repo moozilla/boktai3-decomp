@@ -4,16 +4,16 @@
 // 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)
 void Bg_SetLayerMap(u32, u32, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
-void sub_081BC664(u8 *);
+void DarkLoan_HideSprites(u8 *);
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void sub_081BC3B4(u8 *);
 void sub_081BC5F0(u8 *);
 void sub_081BC468(u8 *);
 void AnimData_SelectPaletteBank(u8 *, u32);
-void sub_08030DBC(u32);
+void MessageWindow_ShowMessage(u32);
 void sub_081BCCD4(void);
-void sub_081BC694(u8 *, void (*)(void));
+void DarkLoan_SetState(u8 *, void (*)(void));
 void sub_081BC820(u8 *s)
 {
     u32 zero, latezero, mask, mask2, mask3, value;
@@ -26,7 +26,7 @@ void sub_081BC820(u8 *s)
     s32 i, j;
     Bg_SetLayerMap(0, *(u32 *)(s + 0x8E0), 4);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero = 0);
-    sub_081BC664(s);
+    DarkLoan_HideSprites(s);
     value = *(u32 *)(s + 0x60);
     value &= (mask = ~1);
     *(u32 *)(s + 0x60) = value;
@@ -62,13 +62,13 @@ void sub_081BC820(u8 *s)
     AnimData_SelectPaletteBank(s + 0x8C4, 0x1B4);
     ((struct Word8 *)(s + 0x7D8))->flags &= mask3;
     ((struct Word8 *)(s + 0x838))->flags &= mask3;
-    sub_08030DBC(4);
+    MessageWindow_ShowMessage(4);
     *(u16 *)(s + 0x8FA) = latezero;
     *(u16 *)(s + 0x8FC) = latezero;
     *(u16 *)(s + 0x8FE) = latezero;
     *(u16 *)(s + 0x900) = latezero;
     *(u16 *)(s + 0x8F8) = latezero;
-    sub_081BC694(s, sub_081BCCD4);
+    DarkLoan_SetState(s, sub_081BCCD4);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081BC820);

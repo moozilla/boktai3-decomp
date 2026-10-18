@@ -84,9 +84,9 @@ void SceneInventory_BuildUnlockedEquipmentCatalog(struct SceneInventoryScriptCat
         } while (page <= 6);
     }
     if (Script_SeekToKeyword(0x77))
-        p->equipmentText = sub_08227E90();
+        p->equipmentText = Script_GetTextSourcePc();
     if (Script_SeekToKeyword(0x63)) {
-        p->equipmentLabel = sub_08227E90();
+        p->equipmentLabel = Script_GetTextSourcePc();
         if (p->equipmentLabel) {
             p->equipmentLabel =
                 (u32)Text_LookupString(Script_ParseStringRef((void *)p->equipmentLabel) + 1);

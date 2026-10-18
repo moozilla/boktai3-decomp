@@ -5,7 +5,7 @@ struct S08238460 {
     u16 v;
 };
 
-u16 sub_08238460(struct S08238460 *p, u16 m)
+u16 Player_GetSecondaryActionFlags(struct S08238460 *p, u16 m)
 {
     return p->v & m;
 }

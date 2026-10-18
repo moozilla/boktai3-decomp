@@ -26,8 +26,8 @@ struct TileDrawable {
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);
 void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *, s32, u32);
 void sub_08217DE0(void *, void *, s32);
-void sub_08217EC4(void *, s32, s32);
-void sub_08217ECC(void *, s32);
+void Effect_SetOrigin(void *, s32, s32);
+void Effect_SetPalette(void *, s32);
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 static inline void Step(struct SpriteEffectController *owner, struct SequenceDrawable *inputSprite,
                         struct DisplaySequenceState *inputState, u32 inputOne)
@@ -314,7 +314,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
                 resource = ScriptProc_Start(key, resourceContext);
             }
             sub_08217DE0(sprite, ((struct TileDrawable *)slot->drawable)->graphics, 0);
-            sub_08217EC4(sprite, 0U - (u32)biasX, 0U - (u32)biasY);
+            Effect_SetOrigin(sprite, 0U - (u32)biasX, 0U - (u32)biasY);
             {
                 u32 full = sequence;
                 u32 narrowSequence;
@@ -331,7 +331,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
                 }
                 Anim_SetSequence(&slot->sequence, resource, narrowSequence, row, flagsByte);
             }
-            sub_08217ECC(sprite, palette);
+            Effect_SetPalette(sprite, palette);
             {
                 u32 value = sprite->flags;
                 u32 lowOne;

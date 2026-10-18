@@ -7,7 +7,7 @@ struct S {
     u8 p2[0x175 - 0xa3];
     u8 b175;
 };
-void sub_081FC68C(struct S *p)
+void SceneProjectile_UpdateSpriteRotation(struct S *p)
 {
 
     u32 t;

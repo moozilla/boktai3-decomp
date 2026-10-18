@@ -6,7 +6,6 @@ struct ScreenParams2E8 {
     s32 o, c, f;
 };
 extern struct ScreenParams2E8 gUnk_020002E8;
-/* Script: -l block, -o, -c (default 0) and -f (default 0). */
 void ScreenParams2E8_SetFromScript(void)
 {
     struct ScreenParams2E8 *p = &gUnk_020002E8;

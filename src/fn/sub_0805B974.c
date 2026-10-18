@@ -12,6 +12,6 @@ void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
         u16 *fade = &panel->arrivalRampFrame;
         if (*fade <= 59)
             *fade += 1;
-        sub_082260A4(*fade >> 1);
+        Camera_RequestShake(*fade >> 1);
     }
 }

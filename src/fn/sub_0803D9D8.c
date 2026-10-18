@@ -15,7 +15,7 @@ struct P {
     u8 b6c[1];
 };
 void Memory_Clear(u8 *, u32);
-u32 sub_0803D9D8(struct P *p)
+u32 ScenePool_SelectStateAtPositionLimit(struct P *p)
 {
     if (p->w14 >= p->w34) {
         if (p->w58 < 0) {

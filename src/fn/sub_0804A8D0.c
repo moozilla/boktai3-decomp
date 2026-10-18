@@ -6,7 +6,7 @@ struct H {
 struct Z {
     struct H a, b;
 };
-void sub_0821FF7C(void *, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 struct TetherChargeContactView;
 void TetherActor_OnChargeContact(struct TetherChargeContactView *, void *, struct TetherActor *);
 void TetherActor_InitChargeCollider(struct TetherActor *p)
@@ -29,7 +29,7 @@ void TetherActor_InitChargeCollider(struct TetherActor *p)
     else
         t = 2;
     Collider_Init(q, p->entry, 0x4081, 0, t, &s1, &s2);
-    sub_0821FF7C(q, 0, 0, 0);
+    Collider_SetBodyProperties(q, 0, 0, 0);
     Collider_SetCallback(q, TetherActor_OnChargeContact, p);
     Collider_SetPosition(q, &p->position, 0);
     Collider_Refresh(q);

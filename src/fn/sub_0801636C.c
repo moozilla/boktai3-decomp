@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_0200006C;
 void Effect_Remove(u8 *);
-u32 sub_0801636C(u8 *p)
+u32 FadingParticleManager_Destroy(u8 *p)
 {
     s32 i = 0;
     do {

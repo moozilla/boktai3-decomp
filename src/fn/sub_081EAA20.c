@@ -1,7 +1,7 @@
 #include "global.h"
 /* Release the nine animated display objects. */
 void Anim_Remove(void *);
-void sub_081EAA20(u8 *p)
+void TimeDisplay_RemoveAnimatedObjects(u8 *p)
 {
     Anim_Remove(p + 0x3d0);
     Anim_Remove(p + 0x348);

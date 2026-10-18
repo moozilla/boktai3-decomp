@@ -6,7 +6,7 @@ struct S {
     u8 fb;
 };
 extern struct S *gUnk_030053F8;
-void sub_082254A8(void)
+void GameState_ClearSessionFlags(void)
 {
     if (gUnk_030053F8) {
         gUnk_030053F8->f9 = 0;

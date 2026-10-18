@@ -20,7 +20,7 @@ static inline u8 TestMask(u8 *flags, u32 mask)
     return FALSE;
 }
 
-void sub_080A9374(u8 *p, void *arg)
+void TentacleBody_UpdateSegmentMotion(u8 *p, void *arg)
 {
     struct Group080A9374 *g = *(struct Group080A9374 **)(p + 0x3d0);
     struct Entry080A9374 *e = g->entries;

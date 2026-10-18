@@ -1,7 +1,7 @@
 #include "global.h"
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-u32 sub_0822874C(s32 a, s32 b, s32 c)
+u32 Clock_PackDate(s32 a, s32 b, s32 c)
 {
     s32 d0, d1, d2, d3, e0, e1, f0, f1, sum, tmp;
     u32 result;

@@ -20,7 +20,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_08023D0C(struct S *p)
+void SceneActorState_PlayAnimation39AndConsumeTrigger(struct S *p)
 {
     if (chk(p)) {
         u32 k = 0x27;

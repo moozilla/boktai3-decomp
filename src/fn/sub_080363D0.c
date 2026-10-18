@@ -43,7 +43,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
-void sub_080363D0(struct Engine *p)
+void Wireless_PollChildNiSend(struct Engine *p)
 {
     int lost = 0;
     if (p->mask & 2) {

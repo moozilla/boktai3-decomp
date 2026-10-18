@@ -57,7 +57,7 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
         } while (page <= 6);
     }
     if (Script_SeekToKeyword(0x61)) {
-        u32 value = sub_08227E90();
+        u32 value = Script_GetTextSourcePc();
         u32 textOffset = 0x1A98;
         register u32 *text asm("r1");
         text = (u32 *)((u8 *)p + textOffset);

@@ -13,7 +13,7 @@ struct S {
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
 void sub_081C5190(void);
 
-void sub_081C50E0(struct S *p)
+void Registry1909_StartFalling(struct S *p)
 {
     void (*f)(void);
     u32 z;

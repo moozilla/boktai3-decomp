@@ -2,7 +2,7 @@
 
 void ResultMenu_DestroyGraphics(void *);
 
-s32 sub_0801CF60(void *p)
+s32 ResultMenu_OnTaskExit(void *p)
 {
     ResultMenu_DestroyGraphics(p);
     return 0;

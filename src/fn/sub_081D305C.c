@@ -6,7 +6,7 @@ struct S {
 };
 void sub_0824923C(struct S *, u32);
 
-void sub_081D305C(struct S *p)
+void FrostEmitter_Update(struct S *p)
 {
     if (p->f3a0)
         sub_0824923C(p, p->f3a0);

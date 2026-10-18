@@ -3,8 +3,8 @@ extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 extern u8 *gUnk_02000580;
 u32 sub_0824923C(u8 *, void *);
-void sub_0802CC94(u8 *);
-void sub_0802D080(u8 *, u32, u32, u32, u32, u32);
+void Actor_StepFacingAngle(u8 *);
+void Actor_SetFacingAnimationEntry(u8 *, u32, u32, u32, u32, u32);
 void MotionPool_InitializeParams(void *);
 void MotionPool_SetLifetimeAndVelocity(void *, u32, u32, u32, u32);
 void MotionPool_SetTracking(void *, u32, u32, u32);
@@ -17,7 +17,7 @@ struct VD218 {
     s32 y : 16;
     s32 z : 16;
 };
-void sub_0802D218(u8 *p, u32 tick)
+void Actor_OnTrackingAction(u8 *p, u32 tick)
 {
     u8 buf[0x44];
     struct VD218 v;
@@ -30,8 +30,8 @@ void sub_0802D218(u8 *p, u32 tick)
     fn = *(void **)(p + 0x120);
     if (fn && sub_0824923C(p, fn))
         return;
-    sub_0802CC94(p);
-    sub_0802D080(p, 1, 0, 1, 0, 0);
+    Actor_StepFacingAngle(p);
+    Actor_SetFacingAnimationEntry(p, 1, 0, 1, 0, 0);
     if ((tick & 3) == 0) {
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
         {

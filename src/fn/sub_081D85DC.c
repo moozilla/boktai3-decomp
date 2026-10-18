@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081D85DC(u8 *p)
+u32 Task4E01_OnAlternateTimedAnimation(u8 *p)
 {
     u32 two = 2;
     *(u32 *)(p + 4) |= two;

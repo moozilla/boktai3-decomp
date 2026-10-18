@@ -23,7 +23,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_081F77A4(struct S *p)
+void SceneActor_UpdateState31AndRestartCommand(struct S *p)
 {
     if (chk(p)) {
         u32 k = 0x1F;

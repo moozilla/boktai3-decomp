@@ -7,7 +7,7 @@ struct S {
     u8 f[0x98];
     struct E e[8];
 };
-void sub_081C0C58(struct S *p)
+void PlayStats_HideEntryAnimations(struct S *p)
 {
     s32 i;
     u32 m = 1;

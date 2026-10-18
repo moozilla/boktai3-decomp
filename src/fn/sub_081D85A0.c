@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081D85A0(u8 *p)
+u32 Task4E01_OnDefaultTimedAnimation(u8 *p)
 {
     u32 two = 2;
     *(u32 *)(p + 4) |= two;

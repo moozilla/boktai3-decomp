@@ -26,16 +26,16 @@ extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
 void sub_08218ED8(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
-void sub_08032C80(struct TextState *, int, int, int, int);
+void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
-const u8 *sub_08032BEC(struct TextState *);
-int sub_08032B24(struct TextState *);
-int sub_08031F58(struct TextState *, int);
-void sub_08032E8C(struct TextState *);
-void sub_08032E98(struct TextState *);
-void sub_08032F78(struct Window *);
-int sub_08033468(void);
-void sub_08032F78(struct Window *p)
+const u8 *TextState_GetActiveStream(struct TextState *);
+int TextState_StepPlayback(struct TextState *);
+int TextState_DrawNarrowGlyph(struct TextState *, int);
+void TextState_ClearSelectedChoices(struct TextState *);
+void TextState_RunSelectedProcedures(struct TextState *);
+void ScrollingDialogue_UpdatePlayback(struct Window *);
+int ScrollingDialogue_ClearScript(void);
+void ScrollingDialogue_UpdatePlayback(struct Window *p)
 {
     struct TextState *t = &p->text;
     int advance;
@@ -64,7 +64,7 @@ void sub_08032F78(struct Window *p)
         p->blocked = 0;
     if (!p->wait && !p->scrolling && p->column == 31 && (p->ticks & 15) == 8) {
         {
-            const u8 *q = sub_08032BEC(t);
+            const u8 *q = TextState_GetActiveStream(t);
             if (q) {
                 int c = (s8)*q;
                 if (c < 0) {
@@ -82,16 +82,16 @@ void sub_08032F78(struct Window *p)
     TextWindow_BlankRect(p->row, 18, 1, 2);
     sub_08218ED8(p->row, 18, 1, 2);
     p->row++;
-    s = sub_08032BEC(t);
+    s = TextState_GetActiveStream(t);
     if (!s)
         goto wrap;
 tags:
     if (*s != '<')
         goto render;
-    sub_08032B24(t);
+    TextState_StepPlayback(t);
     if (!t->padE)
         goto render;
-    s = sub_08032BEC(t);
+    s = TextState_GetActiveStream(t);
     if (t->style)
         goto tags;
     if (*s)
@@ -103,7 +103,7 @@ render:
         TextState_SetBounds(&p->text, p->column, 18, 1, 2);
         p->column++;
         if (p->wait > 0) {
-            sub_08031F58(t, 0);
+            TextState_DrawNarrowGlyph(t, 0);
             p->wait--;
             if (p->wait > 0)
                 goto wrap;
@@ -111,7 +111,7 @@ render:
             p->wait = 0;
             goto wrap;
         }
-        if (sub_08032B24(t))
+        if (TextState_StepPlayback(t))
             p->wait = 8;
         goto wrap;
     }
@@ -124,7 +124,7 @@ render:
         goto wrap;
 paintWide:
     if (p->wait > 0) {
-        sub_08031F58(t, 0);
+        TextState_DrawNarrowGlyph(t, 0);
         p->column++;
         p->wait--;
         if (p->wait > 0)
@@ -134,7 +134,7 @@ paintWide:
     } else {
         TextState_SetBounds(&p->text, p->column, 18, 2, 2);
         p->column += 2;
-        if (sub_08032B24(t))
+        if (TextState_StepPlayback(t))
             p->wait = 8;
     }
 wrap:
@@ -147,5 +147,5 @@ wrap:
         p->row -= 32;
 done:
     if (!p->scrolling)
-        sub_08032F78(p);
+        ScrollingDialogue_UpdatePlayback(p);
 }

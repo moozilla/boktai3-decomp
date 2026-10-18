@@ -1,11 +1,11 @@
 #include "global.h"
-void sub_080A3C00(u8 *);
+void Spider_ClearGroupFlag(u8 *);
 void sub_080A3E28(u8 *);
 void sub_080A3EBC(u8 *);
 void SceneActorPlacement_EmitTimedParticles(u8 *);
-u32 sub_080A2F04(u8 *p)
+u32 Spider_UpdatePreAction(u8 *p)
 {
-    sub_080A3C00(p);
+    Spider_ClearGroupFlag(p);
     sub_080A3E28(p);
     sub_080A3EBC(p);
     SceneActorPlacement_EmitTimedParticles(p);

@@ -1,6 +1,6 @@
 #include "global.h"
 void Effect_Remove(u8 *);
-u32 sub_08017700(u8 *p)
+u32 Weather_ClearEffects(u8 *p)
 {
     u8 *e = p + 0x16c;
     s32 i = 0x1f;

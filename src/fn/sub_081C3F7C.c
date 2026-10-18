@@ -8,7 +8,7 @@ void sub_081C3EF0(struct S *);
 void sub_081C3950(struct S *);
 void sub_0824923C(struct S *, u32);
 
-void sub_081C3F7C(struct S *p)
+void RegistryF3E4_OnTaskUpdate(struct S *p)
 {
     sub_081C3EF0(p);
     if (p->f4) {

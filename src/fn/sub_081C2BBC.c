@@ -3,7 +3,7 @@
 void sub_081C29A4(u8 *);
 void sub_081C2838(u8 *);
 
-void sub_081C2BBC(u8 *p)
+void SparkleEmitter_UpdateEmitting(u8 *p)
 {
     u32 *c = (u32 *)(p + 0x770);
     if ((*c & 1) == 0) {

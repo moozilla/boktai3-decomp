@@ -18,7 +18,7 @@ struct Part6030 {
     u8 pad[8];
     u32 flags;
 };
-void sub_08086B6C(u8 *s, s32 arg, u32 unused)
+void Ghoul_UpdateHiddenRecovery(u8 *s, s32 arg, u32 unused)
 {
     u32 queued = take6030(s);
     if (queued) {

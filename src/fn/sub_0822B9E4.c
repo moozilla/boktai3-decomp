@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0822B9E4(u32 *p, u32 v)
+s32 SceneStimulus_FindExclusionRegionSlot(u32 *p, u32 v)
 {
     s32 f = 0x10;
     s32 i = 0;

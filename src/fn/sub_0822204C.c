@@ -1,4 +1,6 @@
 #include "scalar_approach.h"
+/* ScalarApproach_StepHalfArrayWithSnap: Steps signed halfword elements halfway toward targets and snaps when the step magnitude is below the threshold */
+#define ScalarApproach_StepHalfArrayWithSnap sub_0822204C
 #define ScalarApproach_Snap2Array sub_0822204C
 void ScalarApproach_Snap2Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
 {

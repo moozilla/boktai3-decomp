@@ -8,7 +8,7 @@ struct VM {
 };
 extern struct VM gUnk_02000610;
 u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
-s32 sub_0821B80C(u8 *p)
+s32 Script_SetResultFromOperand(u8 *p)
 {
     u32 a, b;
     Script_DecodeOperand(p, &a, &b);

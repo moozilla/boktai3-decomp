@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine.h"
-void *sub_0802140C(u32 slot);
+void *SceneActors_GetBySlot(u32 slot);
 /* Script: for the actor in singleton slot 7 (registry 5856): +0x5DC = -t
    (default 128), +0x5A6 = 3, +0x5EA = 0, +0x5EC = 1 (tentative). */
 void SingletonSlot7_SetTimerFromScript(void)
 {
     s32 t = 0x80;
-    u8 *p = sub_0802140C(7);
+    u8 *p = SceneActors_GetBySlot(7);
     if (p) {
         u16 zero;
         u16 *timer;

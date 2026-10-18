@@ -4,7 +4,7 @@ void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081C5AF0(u8 *);
 void sub_081C5B6C(u8 *);
-void sub_081C5C2C(u8 *s)
+void ChallengeMenu_InitAnimations(u8 *s)
 {
     struct Blob {
         u32 words[8];

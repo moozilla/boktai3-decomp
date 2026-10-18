@@ -10,7 +10,7 @@ struct S {
     u32 e;
 };
 void sub_08110C9C(void *);
-s32 sub_08110E14(struct S *s)
+s32 SceneTilemap_Update(struct S *s)
 {
     s->e = s->c;
     if (s->p != 0 && s->a != 1)

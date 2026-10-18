@@ -12,7 +12,7 @@ void ScenePanel_InitBackground(struct ScenePanel *panel)
         s32 mask = ~0x200;
         *control = mask & *control;
     }
-    sub_08215A74(1, 0);
+    Bg_SetPriority(1, 0);
     *(vu16 *)0x04000050 = 0x3C42;
     *(vu16 *)0x04000052 = 0x810;
     *(vu16 *)0x04000054 = 0;

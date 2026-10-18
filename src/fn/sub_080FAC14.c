@@ -8,7 +8,7 @@ struct S080FAC14 {
 };
 u32 SceneActorProfiles_FindOrAdd(u8, u32);
 
-void sub_080FAC14(struct S080FAC14 *s)
+void Axe_InitProfile(struct S080FAC14 *s)
 {
     s->b = SceneActorProfiles_FindOrAdd(s->a, 0);
 }

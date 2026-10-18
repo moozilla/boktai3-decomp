@@ -8,7 +8,7 @@ struct S {
     u8 f2[0x118 - 0xB1];
     u8 d[1];
 };
-void sub_081A68CC(void *);
+void Vanargand_StopActionSequence(void *);
 void Trigger_ConsumePending(void *, s32);
 static inline u8 chk(struct S *p)
 {
@@ -20,12 +20,12 @@ static inline u8 chk(struct S *p)
     }
     return FALSE;
 }
-void sub_081A7454(struct S *p)
+void Vanargand_UpdateMode26(struct S *p)
 {
     u8 *q;
     if (chk(p) == 1) {
         u32 v = 0x1a;
-        sub_081A68CC((u8 *)p + 0x21C);
+        Vanargand_StopActionSequence((u8 *)p + 0x21C);
         p->st = v;
     }
     if (p->af != 0)

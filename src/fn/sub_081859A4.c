@@ -20,8 +20,8 @@ struct S {
     s16 z;
 };
 s32 sub_08184FE8(struct S *, s32);
-void sub_081851F8(struct S *, s32);
-void sub_081859A4(struct S *p)
+void ActorController_SetBehavior(struct S *, s32);
+void Armor_UpdateAction13Transition(struct S *p)
 {
     switch (p->b3d) {
         case 0:
@@ -30,7 +30,7 @@ void sub_081859A4(struct S *p)
             break;
         case 1:
             if (p->b40 == 0xff)
-                sub_081851F8(p, 0xb);
+                ActorController_SetBehavior(p, 0xb);
             break;
     }
 }

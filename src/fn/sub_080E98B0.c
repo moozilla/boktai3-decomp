@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_080E98B0(void)
+void Octopus_OnAttackContact(void)
 {
 }

@@ -1,4 +1,6 @@
 #include "homing_effect.h"
+/* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
+#define EffectManager_ClearGlobal sub_0800A800
 // MATCHING_CONCESSION: register-pinning
 
 #define EffectManager_ClearGlobal sub_0800A800
@@ -7,7 +9,7 @@ void EffectManager_ClearGlobal(void)
     gUnk_02000040 = 0;
 }
 
-u32 sub_0800A80C(struct EffectManager *manager, struct Effect *effect)
+u32 EffectManager_RemoveEffect(struct EffectManager *manager, struct Effect *effect)
 {
     struct EffectSprite *sprite = &effect->particles[0].sprite;
     s32 i;
@@ -18,7 +20,7 @@ u32 sub_0800A80C(struct EffectManager *manager, struct Effect *effect)
     effect->active = 0;
 }
 
-s32 sub_0800A830(void *unused)
+s32 EffectManager_RemoveActiveEffects(void *unused)
 {
     struct EffectManager *manager = gUnk_02000040;
     struct Effect *effect;
@@ -28,7 +30,7 @@ s32 sub_0800A830(void *unused)
     effect = manager->effects;
     for (i = 5; i >= 0; i--) {
         if (effect->active != 0)
-            sub_0800A80C(manager, effect);
+            EffectManager_RemoveEffect(manager, effect);
         effect++;
     }
     return 0;
@@ -36,7 +38,7 @@ s32 sub_0800A830(void *unused)
 
 u32 GunDelHell_Create(void *p)
 {
-    return sub_0800A830(p);
+    return EffectManager_RemoveActiveEffects(p);
 }
 
 s32 EffectManager_UpdateParticles(struct EffectManager *manager, struct Effect *effect,
@@ -180,7 +182,7 @@ done:
     return 0;
 }
 
-s32 sub_0800AB18(struct EffectManager *manager)
+s32 EffectManager_DestroyManager(struct EffectManager *manager)
 {
     s32 i;
     for (i = 0; i <= 5; i++) {
@@ -217,8 +219,8 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
         sprite = &effect->particles[0].sprite;
         for (j = 3; j >= 0;
              sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle)), j--) {
-            sub_08217E60(sprite, manager->graphics, 1);
-            sub_08217ECC(sprite, 1);
+            Effect_Initialize(sprite, manager->graphics, 1);
+            Effect_SetPalette(sprite, 1);
         }
     }
     manager->counter = 0;
@@ -238,11 +240,11 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     }
 }
 
-void *sub_0800AC00(void *a)
+void *EffectManager_Create(void *a)
 {
     void *p = Task_Create(8, 0x7DC);
     if (p != 0) {
-        Task_SetCallbacks(p, EffectManager_UpdateAll, sub_0800AB18);
+        Task_SetCallbacks(p, EffectManager_UpdateAll, EffectManager_DestroyManager);
         if (EffectManager_Init(p, a) < 0) {
             Task_Kill(p);
             return 0;
@@ -899,7 +901,7 @@ void EffectParticle_UpdateFinish(struct EffectManager *manager, struct Effect *e
         sprite->flags |= 1;
         effect->count--;
         if (!effect->count)
-            sub_0800A80C(manager, effect);
+            EffectManager_RemoveEffect(manager, effect);
     }
 }
 
@@ -1010,6 +1012,6 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
         sprite->flags |= 1;
         effect->count--;
         if (!effect->count)
-            sub_0800A80C(manager, effect);
+            EffectManager_RemoveEffect(manager, effect);
     }
 }

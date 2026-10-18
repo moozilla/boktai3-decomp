@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_0814DDB4(u32 x)
+s32 Player_GetAttackElementType(u32 x)
 {
     s32 r;
     switch (x) {

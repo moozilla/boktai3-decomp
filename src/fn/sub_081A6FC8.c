@@ -8,7 +8,7 @@ struct A {
 };
 void Sprite_Remove(void *);
 
-void sub_081A6FC8(struct A *p)
+void Vanargand_RemovePartSprites(struct A *p)
 {
     if (p != 0) {
         if (p->b != 0)

@@ -11,7 +11,7 @@ struct Q {
 };
 s32 Script_GetKeywordValue(s32, s32);
 
-void sub_080B126C(struct P *p)
+void Vorn_InitTimedAction(struct P *p)
 {
     p->c = 0x78;
     p->b = 0x78;

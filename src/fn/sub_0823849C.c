@@ -11,7 +11,7 @@ static inline s32 gid(void)
         return -1;
     return gUnk_020004B4->id;
 }
-void sub_0823849C(s32 a, u32 b)
+void Player_StopLocalSong(s32 a, u32 b)
 {
     if (a == gid())
         Sound_StopSong(b);

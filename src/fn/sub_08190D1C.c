@@ -24,7 +24,7 @@ struct Sprite {
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 s32 Anim_Step(void *, void *);
 void Sound_PlaySongChecked(s32);
-void sub_08190D1C(u8 *p, int i)
+void SceneAnimation_UpdateSlotSequenceFourReveal(u8 *p, int i)
 {
     u8 *q;
     u32 old;

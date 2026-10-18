@@ -7,12 +7,12 @@ struct S {
     u8 h[0xc];
     u16 b;
 };
-void sub_081DAD0C(void *, void (*)(void));
-void sub_081D9D14(void);
-s32 sub_081D9CDC(u8 *p)
+void Projectile_SetUpdateCallback(void *, void (*)(void));
+void Projectile_UpdateResetDelay(void);
+s32 Projectile_InitResetDelay(u8 *p)
 {
     u8 *q;
-    sub_081DAD0C(p + 0x18, sub_081D9D14);
+    Projectile_SetUpdateCallback(p + 0x18, Projectile_UpdateResetDelay);
     if (!(*(u16 *)(p + 0x18) & 0x2000)) {
         q = p + 0x8c;
         *(u16 *)(q + 0x10) = 0x19;

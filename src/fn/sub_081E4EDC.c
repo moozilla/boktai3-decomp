@@ -5,7 +5,7 @@
 #define W(o)     (*(u32 *)((u8 *)g + (o)))
 #define OWNER(o) (*(u16 *)(*(u8 **)((u8 *)g + 0x18) + (o)))
 extern u8 *gUnk_020003C8;
-u8 *sub_081EA730(s32, s32);
+u8 *Actor_EnsureController(s32, s32);
 struct G {
     u8 f0[0xE2C];
     u16 e2c;
@@ -26,12 +26,12 @@ s32 Script_SeekToKeyword(s32);
 void Actor_ProjectAndClampToScreen(void *);
 s32 Script_GetValue(void);
 s32 Script_GetKeywordValue(s32, s32);
-void sub_081E4EDC(void)
+void Actor_BeginCurveToRest(void)
 {
     struct G *g = (struct G *)gUnk_020003C8;
     u32 three = 2;
     if (g == 0) {
-        g = (struct G *)sub_081EA730(0xBB34, 0);
+        g = (struct G *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }

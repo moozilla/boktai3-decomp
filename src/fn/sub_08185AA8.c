@@ -5,8 +5,8 @@ struct S {
     u8 g[0xB40 - 0xB3E];
 };
 s32 sub_08184FE8(void *, s32);
-void sub_081850B4(void *, s32);
-void sub_08185AA8(struct S *p)
+void ActorController_ForceAction(void *, s32);
+void Armor_UpdateAction15(struct S *p)
 {
     u8 *q = &p->st;
     switch (*q) {

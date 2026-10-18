@@ -4,7 +4,7 @@ void Sprite_Init(u8 *, u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 void Anim_SetSequence(u8 *, u32, u32, u32, u32);
 void AnimData_SelectPaletteBank(u8 *, u32);
-void sub_08114664(u8 *p)
+void NativeEffect_InitTypeZeroSprite(u8 *p)
 {
     u8 *q = p + 0x44;
     if (AnimData_Load(q, 0x409C) != 0) {

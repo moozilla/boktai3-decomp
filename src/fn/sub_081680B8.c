@@ -8,7 +8,7 @@ struct P {
     struct S *s;
 };
 extern u32 gUnk_030053F4;
-s32 sub_081680B8(struct P *p)
+s32 PauseMenu_IsEquipmentSelectionEnabled(struct P *p)
 {
     if (gUnk_030053F4 & 0x1000)
         goto zero;

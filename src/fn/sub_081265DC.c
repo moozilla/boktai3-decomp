@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000154;
-s32 sub_081265DC(u8 *s)
+s32 ScriptedParticle_InitPool(u8 *s)
 {
     u8 *p;
     s32 i;

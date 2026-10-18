@@ -41,7 +41,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void sub_08024CE0(ActorAnimation *p)
+void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     if (!p->locked)

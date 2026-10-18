@@ -5,7 +5,7 @@ struct E {
     u32 c;
 };
 extern struct E gUnk_03005260[];
-u32 sub_08221338(u32 idx, u8 *p, u32 m, u32 c, s32 max)
+u32 Input_UpdateKeyRepeat(u32 idx, u8 *p, u32 m, u32 c, s32 max)
 {
     u32 ret = 0;
     s32 v = *p;

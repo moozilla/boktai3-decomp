@@ -11,7 +11,7 @@ struct P0814A4B0 {
 u8 sub_08141BAC(void *);
 void sub_0813ADD0(void *);
 
-s32 sub_0814A4B0(struct P0814A4B0 *p)
+s32 Player_UpdateAttackFacing(struct P0814A4B0 *p)
 {
     s32 r = 0;
     if (p->f34C != -1 && p->f4B6 == 0) {

@@ -2,7 +2,7 @@
 void Sound_PlaySong(u32);
 void Anim_Step(u8 *, u8 *);
 void sub_081BC76C(u8 *);
-void sub_081BCB18(u8 *p)
+void DarkLoan_UpdateOpeningAnimation(u8 *p)
 {
     u16 *c;
     Anim_Step(p + 0x58, p + 0x18);

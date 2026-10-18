@@ -8,11 +8,11 @@ struct Sequence {
 };
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_081E2DA0(void *);
-void sub_081E2E7C(void *);
+void Presentation_InitializeBackground(void *);
+void Presentation_InitializeSprites(void *);
 void Presentation_ConfigureLayout(void *);
 void Presentation_ConfigureFrameRange(void *);
-s32 sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
+s32 ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 // Parse sequence options and initialize its scripted presentation components.
 s32 Presentation_Initialize(struct Sequence *p)
 {
@@ -27,9 +27,9 @@ s32 Presentation_Initialize(struct Sequence *p)
         p->parameter = Script_GetValue();
     else
         p->parameter = found;
-    sub_081E2DA0(p);
-    sub_081E2E7C(p);
+    Presentation_InitializeBackground(p);
+    Presentation_InitializeSprites(p);
     Presentation_ConfigureLayout(p);
     Presentation_ConfigureFrameRange(p);
-    return sub_082279A8(0, 4, 4, 4, 4, 0xffff, 0);
+    return ScreenTransition_SendCommand(0, 4, 4, 4, 4, 0xffff, 0);
 }

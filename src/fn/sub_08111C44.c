@@ -7,7 +7,7 @@ struct S {
 };
 u32 ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, u32, u32, u32, u32, void *);
-void sub_08111C44(struct S *s)
+void StageResults_LoadBackgroundResources(struct S *s)
 {
     u32 x;
     s->a = ScriptProc_Start(0xC091, 0xCE15);

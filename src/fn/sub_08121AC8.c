@@ -10,7 +10,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-u32 sub_08121AC8(u8 *p)
+u32 SceneColliderEffect_DestroyPool(u8 *p)
 {
     s32 i = 0;
 

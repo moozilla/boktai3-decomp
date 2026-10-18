@@ -13,7 +13,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_080F9374(u8 *p)
+void Axe_OnAnimationReset(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectProfileEntry(p, 1);

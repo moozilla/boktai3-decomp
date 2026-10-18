@@ -7,7 +7,7 @@ struct S {
 };
 extern struct S *gUnk_02000194;
 u32 AnimData_FindEntry(u32);
-s32 sub_0812D9A8(struct S *s)
+s32 ParticleEffectPool_Init(struct S *s)
 {
     s->p = AnimData_FindEntry(0x1c1e);
     s->c = 0;

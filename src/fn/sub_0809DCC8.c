@@ -3,7 +3,7 @@
 extern u8 *gUnk_02000580;
 void sub_0812F12C(u8 *);
 
-u32 sub_0809DCC8(u8 *p)
+u32 Lun_OnPlayerTargetInit(u8 *p)
 {
     *(u8 **)(p + 0xdc) = gUnk_02000580 + 0x24;
     sub_0812F12C(p);

@@ -19,11 +19,11 @@ extern const EEPROMConfig *gUnk_03006A9C;
 #define REG_DMA3CNT_H         (*(vu16 *)0x040000DE)
 #define REG_VCOUNT            (*(vu16 *)0x04000006)
 #define REG_EEPROM            (*(u16 *)0x0d000000)
-void sub_08248634(const void *, void *, u16);
-u16 sub_082486B4(u16, u16 *);
-u16 sub_08248778(u16, const u16 *, u8);
-u16 sub_082488D8(u16, const u16 *);
-void sub_08248634(const void *src, void *dest, u16 count)
+void Eeprom_TransferDma3(const void *, void *, u16);
+u16 Eeprom_ReadBlock(u16, u16 *);
+u16 Eeprom_WriteBlock(u16, const u16 *, u8);
+u16 Eeprom_VerifyBlock(u16, const u16 *);
+void Eeprom_TransferDma3(const void *src, void *dest, u16 count)
 {
     u32 temp;
 

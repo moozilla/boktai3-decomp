@@ -7,7 +7,7 @@ struct Entry {
 };
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
-void sub_08211288(u8 *s)
+void CollectionMenu_DestroyGraphics(u8 *s)
 {
     struct Object *obj = (struct Object *)(s + 0x65c);
     struct Entry *p;

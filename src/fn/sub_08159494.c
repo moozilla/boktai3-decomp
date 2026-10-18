@@ -8,7 +8,7 @@ struct P08159494 {
     u16 f426;
 };
 
-void sub_08159494(struct P08159494 *p, u32 d)
+void Player_IncreaseLifeTowardLimit(struct P08159494 *p, u32 d)
 {
     if (p->f1c == 1) {
         p->f424 += d;

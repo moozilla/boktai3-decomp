@@ -11,7 +11,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_080E1CB8(u8 *p)
+void Dog_UpdateAnimationSixteenReaction(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0x10);

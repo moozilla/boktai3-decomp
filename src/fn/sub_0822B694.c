@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_030025FC;
 /* The word return contains a zero-extended 16-bit table tag. */
-u32 sub_0822B694(u16 *o, u32 inputIndex)
+u32 SceneStimulus_GetTaggedPosition(u16 *o, u32 inputIndex)
 {
     u8 i = inputIndex;
     u8 *e = gUnk_030025FC;

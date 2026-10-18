@@ -6,7 +6,7 @@ struct S0813BFE0 {
     u8 f64;
 };
 
-void sub_0813BFE0(struct S0813BFE0 *p)
+void Player_OnOrbitingEffectIdle(struct S0813BFE0 *p)
 {
     if (p->f64 != 0)
         p->f64 = 0;

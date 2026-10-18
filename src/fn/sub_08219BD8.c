@@ -1,6 +1,6 @@
 #include "global.h"
 
-u16 sub_08219BD8(u8 *s)
+u16 String_Hash(u8 *s)
 {
     u16 h = 0;
     while (*s != 0) {

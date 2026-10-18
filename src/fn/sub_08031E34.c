@@ -5,7 +5,7 @@ struct S {
     u32 a;
 };
 extern struct S *gUnk_020000DC;
-u32 sub_08031E34(void)
+u32 MessageWindow_GetTextCompletionState(void)
 {
     struct S *p = gUnk_020000DC;
     if (!p)

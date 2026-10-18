@@ -9,7 +9,7 @@ struct T {
     s16 a;
 };
 void Trigger_ConsumePending(u32, u32);
-void sub_08020AC0(struct S *p, u32 x, struct T *t)
+void SceneMessages_SetDelay(struct S *p, u32 x, struct T *t)
 {
     s32 v = t->a;
     p->a = v;

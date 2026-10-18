@@ -6,7 +6,7 @@ struct Game {
     u32 flags;
 };
 extern struct Game *gUnk_02000710;
-int sub_08032300(void)
+int TextState_GetPairSpeakerLabel(void)
 {
     int v = gUnk_02000710->form;
     int result;

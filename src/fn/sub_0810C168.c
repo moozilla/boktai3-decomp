@@ -2,7 +2,7 @@
 
 void Anim_Remove(u8 *);
 
-void sub_0810C168(u8 *p)
+void RegistryF246_RemoveAnimations(u8 *p)
 {
     u8 *q = p + 0x20;
     s32 i;

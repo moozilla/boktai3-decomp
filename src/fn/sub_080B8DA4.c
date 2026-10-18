@@ -7,14 +7,14 @@ struct P {
     u32 v;
 };
 void sub_080B6210(struct P *);
-void sub_080B5F18(struct P *);
+void Skeleton_UpdateActionCooldown(struct P *);
 
-s32 sub_080B8DA4(struct P *p)
+s32 Skeleton_UpdateActionFlags(struct P *p)
 {
     u32 m;
     u16 *q;
     sub_080B6210(p);
-    sub_080B5F18(p);
+    Skeleton_UpdateActionCooldown(p);
     m = 0x200;
     q = &p->fl;
     if ((*q & m) == 0) {

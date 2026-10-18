@@ -21,7 +21,7 @@ struct S {
 };
 extern const u32 gUnk_0824F014[];
 void sub_0824923C(struct S *, u32);
-void sub_08186BF8(struct S *p)
+void Armor_DispatchBehaviorUpdate(struct S *p)
 {
     const u32 *t = gUnk_0824F014;
     u8 *q = &p->b3c;

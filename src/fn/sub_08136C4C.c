@@ -1,6 +1,6 @@
 #include "global.h"
 void Route_Start(u8 *, u16, u16, u16);
-void sub_08136C4C(u8 *p, u16 *q)
+void SceneActorScript_ApplyRouteStartCommand(u8 *p, u16 *q)
 {
     if (*(s16 *)(p + 0x9c) > 0) {
         u16 a = q[1];

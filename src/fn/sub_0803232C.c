@@ -17,19 +17,19 @@ struct TextVm {
     u32 selectedCount;
     u8 selected[32];
 };
-int sub_08032168(const u8 *, const u8 *, int);
-const u8 *sub_08032254(struct TextVm *, const u8 *);
-int sub_080321A0(const u8 *, int);
-void sub_08031E54(struct TextVm *, int);
-void sub_08031EFC(struct TextVm *, int);
-int sub_08031F58(struct TextVm *, int);
-void sub_0803209C(u8 *, int);
+int Text_ComparePrefix(const u8 *, const u8 *, int);
+const u8 *TextState_ParseTagValue(struct TextVm *, const u8 *);
+int Text_ParseDecimal(const u8 *, int);
+void TextState_PushStream(struct TextVm *, int);
+void TextState_PlayGlyphSound(struct TextVm *, int);
+int TextState_DrawNarrowGlyph(struct TextVm *, int);
+void Text_FormatDecimal(u8 *, int);
 void Sound_PlaySong(int);
 const u8 *Text_FindChar(const u8 *, u8);
-const u8 *sub_08227878(void);
-const u8 *sub_0811D1B0(void);
-int sub_08032300(void);
-int sub_080322B4(void);
+const u8 *PlayerName_GetBuffer(void);
+const u8 *GameState_GetBikeName(void);
+int TextState_GetPairSpeakerLabel(void);
+int TextState_GetPlayerSpeakerLabel(void);
 struct Sun {
     u8 pad[0x12];
     s16 level;
@@ -93,7 +93,7 @@ extern const u8 gUnk_0824DE48[]; /* /LABEL */
 extern const u8 gUnk_0824DE50[]; /* /PAREN */
 extern const u8 gUnk_0824DE58[]; /* /ALTER */
 // MATCHING_CONCESSION: register-pinning
-const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
+const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
 {
     const u8 *end = s;
     int value;
@@ -104,185 +104,185 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
     int pushStyle;
     if (*s == '/')
         goto close;
-    if (!sub_08032168(s, gUnk_0824DC80, 6)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DC80, 6)) {
         paletteValue = 1;
         goto palette;
     }
-    if (!sub_08032168(s, gUnk_0824DC88, 6)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DC88, 6)) {
         paletteValue = 2;
         goto palette;
     }
-    if (!sub_08032168(s, gUnk_0824DC90, 6)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DC90, 6)) {
         paletteValue = 2;
         asm("" : "+r"(paletteValue));
         goto palette;
     }
-    if (!sub_08032168(s, gUnk_0824DC98, 4)) {
-        end = sub_08032254(p, s);
+    if (!Text_ComparePrefix(s, gUnk_0824DC98, 4)) {
+        end = TextState_ParseTagValue(p, s);
         if (p->hasValue && p->length)
-            p->mode = sub_080321A0(p->text, p->length);
+            p->mode = Text_ParseDecimal(p->text, p->length);
         else {
             int level = gUnk_02000710->level;
             p->mode = level;
         }
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DCA0, 4)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DCA0, 4)) {
         int value;
-        end = sub_08032254(p, s);
+        end = TextState_ParseTagValue(p, s);
         if (p->hasValue && p->length)
-            value = sub_080321A0(p->text, p->length);
+            value = Text_ParseDecimal(p->text, p->length);
         else
             value = 0;
         p->selected[p->selectedCount] = value;
         p->selectedCount++;
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DCA8, 4)) {
-        p->streams[0] = sub_08227878();
-        sub_08031E54(p, 1);
+    if (!Text_ComparePrefix(s, gUnk_0824DCA8, 4)) {
+        p->streams[0] = PlayerName_GetBuffer();
+        TextState_PushStream(p, 1);
         findPtr = s;
         goto findAdvanceCall;
     }
-    if (!sub_08032168(s, gUnk_0824DCB0, 4)) {
-        p->streams[3] = sub_0811D1B0();
-        sub_08031E54(p, 4);
+    if (!Text_ComparePrefix(s, gUnk_0824DCB0, 4)) {
+        p->streams[3] = GameState_GetBikeName();
+        TextState_PushStream(p, 4);
         findPtr = s;
         asm("" : "+r"(findPtr));
         goto findAdvanceCall;
     }
-    if (!sub_08032168(s, gUnk_0824DCB8, 5)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DCB8, 5)) {
         const u8 *name;
-        end = sub_08032254(p, s);
+        end = TextState_ParseTagValue(p, s);
         if (!p->hasValue)
             goto unknown;
         if (!p->length)
             goto unknown;
         name = p->text;
-        if (!sub_08032168(name, gUnk_0824DCC0, 4))
+        if (!Text_ComparePrefix(name, gUnk_0824DCC0, 4))
             goto unknown;
-        value = sub_08032168(name, gUnk_0824DCC8, 8);
+        value = Text_ComparePrefix(name, gUnk_0824DCC8, 8);
         if (!value)
             goto selected;
-        value = sub_08032168(name, gUnk_0824DCD4, 8);
+        value = Text_ComparePrefix(name, gUnk_0824DCD4, 8);
         if (!value)
             goto selected;
-        value = sub_08032168(name, gUnk_0824DCE0, 8);
+        value = Text_ComparePrefix(name, gUnk_0824DCE0, 8);
         if (!value)
             goto selected;
-        if (!sub_08032168(name, gUnk_0824DCEC, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DCEC, 6)) {
             value = 3;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DCF4, 8)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DCF4, 8)) {
             value = 5;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD00, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD00, 6)) {
             value = 4;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD08, 5)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD08, 5)) {
             value = 6;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD10, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD10, 4)) {
             value = 7;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD18, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD18, 4)) {
             value = 8;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD20, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD20, 6)) {
             value = 9;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD28, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD28, 4)) {
             value = 10;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD30, 3)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD30, 3)) {
             value = 11;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD34, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD34, 6)) {
             value = 12;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD3C, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD3C, 4)) {
             value = 13;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD44, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD44, 6)) {
             value = 14;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD4C, 5)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD4C, 5)) {
             value = 15;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD54, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD54, 7)) {
             value = 16;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD5C, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD5C, 7)) {
             value = 17;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD64, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD64, 7)) {
             value = 18;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD6C, 9)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD6C, 9)) {
             value = 19;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD78, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD78, 4)) {
             value = 20;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD80, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD80, 4)) {
             value = 21;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD88, 4)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD88, 4)) {
             value = 22;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD90, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD90, 7)) {
             value = 23;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DD98, 9)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DD98, 9)) {
             value = 24;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DDA0, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DDA0, 7)) {
             value = 25;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DDA8, 7)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DDA8, 7)) {
             value = 26;
             goto selected;
         }
-        if (!sub_08032168(name, gUnk_0824DDB0, 6)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DDB0, 6)) {
             value = 27;
             goto selected;
         }
         {
             register const u8 *alias asm("r6") = name;
-            if (!sub_08032168(alias, gUnk_0824DDB8, 11)) {
+            if (!Text_ComparePrefix(alias, gUnk_0824DDB8, 11)) {
                 value = 30;
                 goto selected;
             }
-            if (!sub_08032168(alias, gUnk_0824DDC4, 6)) {
-                value = sub_08032300();
+            if (!Text_ComparePrefix(alias, gUnk_0824DDC4, 6)) {
+                value = TextState_GetPairSpeakerLabel();
                 goto selected;
             }
         }
-        if (!sub_08032168(name, gUnk_0824DDCC, 6)) {
-            value = sub_080322B4();
+        if (!Text_ComparePrefix(name, gUnk_0824DDCC, 6)) {
+            value = TextState_GetPlayerSpeakerLabel();
             goto selected;
         }
     unknown:
@@ -300,23 +300,23 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
         findPtr = end;
         goto findEndCall;
     }
-    if (!sub_08032168(s, gUnk_0824DDD4, 7)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DDD4, 7)) {
         p->selection = -1;
         goto findS;
     }
-    if (!sub_08032168(s, gUnk_0824DDDC, 4)) {
-        end = sub_08032254(p, end);
+    if (!Text_ComparePrefix(s, gUnk_0824DDDC, 4)) {
+        end = TextState_ParseTagValue(p, end);
         if (p->hasValue && p->length)
-            value = sub_080321A0(p->text, p->length);
+            value = Text_ParseDecimal(p->text, p->length);
         else
             value = 0;
         p->frame = value;
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DDE4, 6)) {
-        end = sub_08032254(p, end);
+    if (!Text_ComparePrefix(s, gUnk_0824DDE4, 6)) {
+        end = TextState_ParseTagValue(p, end);
         if (p->hasValue && p->length)
-            value = sub_080321A0(p->text, p->length);
+            value = Text_ParseDecimal(p->text, p->length);
         else
             value = 0;
         {
@@ -330,21 +330,21 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
         pushStyle = 3;
         goto push;
     }
-    if (!sub_08032168(s, gUnk_0824DDEC, 5)) {
-        end = sub_08032254(p, end);
+    if (!Text_ComparePrefix(s, gUnk_0824DDEC, 5)) {
+        end = TextState_ParseTagValue(p, end);
         if (p->hasValue && p->length)
-            value = sub_080321A0(p->text, p->length);
+            value = Text_ParseDecimal(p->text, p->length);
         else
             value = 221;
         Sound_PlaySong(value);
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DDF4, 3)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DDF4, 3)) {
         u8 *buffer;
         int number;
-        end = sub_08032254(p, end);
+        end = TextState_ParseTagValue(p, end);
         if (p->hasValue && p->length)
-            number = sub_080321A0(p->text, p->length);
+            number = Text_ParseDecimal(p->text, p->length);
         else
             number = 0;
         buffer = p->numberText;
@@ -353,13 +353,13 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
             s32 *slot;
             slot = p->numbers;
             slot = (s32 *)((u8 *)slot + index);
-            sub_0803209C(buffer, *slot);
+            Text_FormatDecimal(buffer, *slot);
         }
         p->streams[1] = buffer;
         pushP = p;
         pushStyle = 2;
     push:
-        sub_08031E54(pushP, pushStyle);
+        TextState_PushStream(pushP, pushStyle);
     findAdvance:
         findPtr = end;
     findAdvanceCall:
@@ -367,65 +367,65 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
         p->advance = 1;
         goto done;
     }
-    cmp = sub_08032168(s, gUnk_0824DDF8, 6);
+    cmp = Text_ComparePrefix(s, gUnk_0824DDF8, 6);
     if (!cmp) {
         const u8 *name;
-        end = sub_08032254(p, end);
+        end = TextState_ParseTagValue(p, end);
         name = p->text;
-        if (!sub_08032168(name, gUnk_0824DE00, 13)) {
+        if (!Text_ComparePrefix(name, gUnk_0824DE00, 13)) {
             p->voice = cmp;
             goto done;
         }
-        if (!sub_08032168(name, gUnk_0824DE10, 11))
+        if (!Text_ComparePrefix(name, gUnk_0824DE10, 11))
             p->voice = 1;
         else
             p->voice = cmp;
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DE1C, 3)) {
-        p->streams[0] = sub_08227878();
+    if (!Text_ComparePrefix(s, gUnk_0824DE1C, 3)) {
+        p->streams[0] = PlayerName_GetBuffer();
         end = Text_FindChar(end, '>');
         p->fresh = 1;
         goto done;
     }
-    if (!sub_08032168(s, gUnk_0824DE20, 5)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DE20, 5)) {
         if (p->brackets) {
-            sub_08031EFC(p, 91);
-            sub_08031F58(p, 59);
+            TextState_PlayGlyphSound(p, 91);
+            TextState_DrawNarrowGlyph(p, 59);
         }
         findPtr = end;
         asm("" : "+r"(findPtr));
         goto findEndCall;
     }
-    if (!sub_08032168(s, gUnk_0824DE28, 5)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DE28, 5)) {
         p->palette = 1;
         findPtr = end;
         goto findEndCall;
     }
     goto done;
 close:
-    value = sub_08032168(s, gUnk_0824DE30, 7);
+    value = Text_ComparePrefix(s, gUnk_0824DE30, 7);
     if (!value)
         goto paletteClose;
-    value = sub_08032168(s, gUnk_0824DE38, 7);
+    value = Text_ComparePrefix(s, gUnk_0824DE38, 7);
     if (!value)
         goto paletteClose;
-    value = sub_08032168(s, gUnk_0824DE40, 7);
+    value = Text_ComparePrefix(s, gUnk_0824DE40, 7);
     if (!value)
         goto paletteClose;
-    if (!sub_08032168(s, gUnk_0824DE48, 6)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DE48, 6)) {
         p->busy = 0;
         p->mode = p->previousMode;
         goto findS;
     }
-    if (!sub_08032168(s, gUnk_0824DE50, 5)) {
+    if (!Text_ComparePrefix(s, gUnk_0824DE50, 5)) {
         if (p->brackets) {
-            sub_08031EFC(p, 93);
-            sub_08031F58(p, 61);
+            TextState_PlayGlyphSound(p, 93);
+            TextState_DrawNarrowGlyph(p, 61);
         }
         goto findS;
     }
-    value = sub_08032168(s, gUnk_0824DE58, 6);
+    value = Text_ComparePrefix(s, gUnk_0824DE58, 6);
     if (value)
         goto done;
 paletteClose:

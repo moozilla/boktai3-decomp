@@ -11,5 +11,5 @@ struct SceneInventoryScriptCatalog {
     u8 page, pageCount, itemPageCount;
     s8 catalog[0x134];
 };
-u32 sub_08227E90(void);
+u32 Script_GetTextSourcePc(void);
 #endif

@@ -11,7 +11,7 @@ struct P {
     struct Q *q;
 };
 void SceneActorRegistry_SendToCategory(s32, s16 *);
-void sub_080B416C(struct P *p)
+void Vorn_BroadcastPosition(struct P *p)
 {
     struct Q *q = p->q;
     s16 s[2];

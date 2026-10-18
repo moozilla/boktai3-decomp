@@ -70,7 +70,7 @@ struct Obj {
 };
 extern void (*const gUnk_0824F158[])(struct Obj *);
 void sub_0818E4BC(struct Obj *);
-void sub_0818E574(struct Obj *p)
+void Armor_UpdatePart(struct Obj *p)
 {
     s32 mask = 16;
     u8 flags = p->flags119;

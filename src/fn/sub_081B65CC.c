@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_081B65CC(u8 *p)
+s32 Vanargand_GetComponentWithFlag10(u8 *p)
 {
     u32 m = 0x10;
     if (*(u32 *)(p + 0x1f8) & m)

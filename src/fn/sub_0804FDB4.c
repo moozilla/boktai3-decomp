@@ -2,8 +2,8 @@
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_08225AB4(void *, u16, struct RepeatedEffectPosition *, u32, u32, struct RepeatedEffect *);
-void sub_08003C00(void *);
+void SceneBody_Init(void *, u16, struct RepeatedEffectPosition *, u32, u32, struct RepeatedEffect *);
+void TerrainOverlay_QueueAddActor(void *);
 void RepeatedEffect_InitSprite(struct RepeatedEffect *effect,
                                struct RepeatedEffectPosition *position, u32 bodyEnabled)
 {
@@ -16,7 +16,7 @@ void RepeatedEffect_InitSprite(struct RepeatedEffect *effect,
     effect->bodyRegistered = bodyEnabled;
     if ((u8)bodyEnabled) {
         void *body = effect->body;
-        sub_08225AB4(body, effect->tag, &effect->sprite.position, 0, 7, effect);
-        sub_08003C00(body);
+        SceneBody_Init(body, effect->tag, &effect->sprite.position, 0, 7, effect);
+        TerrainOverlay_QueueAddActor(body);
     }
 }

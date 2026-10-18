@@ -1,8 +1,8 @@
 #include "global.h"
-u16 *sub_08036CA4(void);
-u16 sub_08036CAC(u8);
-u8 sub_08036CC4(u32);
-void sub_08036D2C(const u8 *source, u8 *destination, int count)
+u16 *WirelessText_GetCharacterTable(void);
+u16 WirelessText_GetCharacterTableByte(u8);
+u8 WirelessText_FindCharacterIndex(u32);
+void WirelessText_EncodeString(const u8 *source, u8 *destination, int count)
 {
     const u8 **alias;
     int i = 0;
@@ -25,7 +25,7 @@ void sub_08036D2C(const u8 *source, u8 *destination, int count)
             }
             source += 2;
         }
-        destination[i] = sub_08036CC4(code);
+        destination[i] = WirelessText_FindCharacterIndex(code);
         i++;
     }
 

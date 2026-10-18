@@ -1,7 +1,7 @@
 #include "global.h"
 extern const u32 gUnk_0861074C[];
 void sub_0824923C(u8 *, u32);
-u32 sub_08126568(u8 *p)
+u32 ScriptedParticle_UpdatePool(u8 *p)
 {
     const u32 *t = gUnk_0861074C;
     u8 *r = p + 0x74;

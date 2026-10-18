@@ -5,7 +5,7 @@ s32 Time_LoadRegionList(void *);
 void Task_Kill(void *);
 void Time_HandleRegionKeypad(void);
 void Time_DestroyRegionMenu(void);
-void *sub_081DCDF4(void)
+void *Time_CreateRegionMenu(void)
 {
     void *p = Task_Create(0xb, 0x5b8);
     if (p) {

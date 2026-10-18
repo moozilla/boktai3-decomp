@@ -44,10 +44,10 @@ void *ScriptProc_Start(int, int);
 void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
-void sub_08220D20(void *, void *, int, int, int);
+void Anim_RestartSequence(void *, void *, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 
-int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
+int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kind)
 {
     register struct PeerPanel *p asm("r9") = panel;
     int type = kind;
@@ -83,7 +83,7 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
     }
     initialSprite = &p->sprite;
     Sprite_Init(initialSprite, glyph, style->priority | 48);
-    sub_08220D20(&animation, resource, style->animation, 0, 0);
+    Anim_RestartSequence(&animation, resource, style->animation, 0, 0);
     sprite = initialSprite;
     a = &animation;
     {

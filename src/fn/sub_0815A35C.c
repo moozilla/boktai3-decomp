@@ -7,7 +7,7 @@ struct O0815A35C {
 extern struct O0815A35C *gUnk_02000580;
 extern u8 *gUnk_030042E4;
 
-u32 sub_0815A35C(void)
+u32 Player_GetCollisionData(void)
 {
     if (gUnk_02000580 == 0)
         return (u32)(gUnk_030042E4 + 0x540);

@@ -11,7 +11,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080DA948(struct S *s)
+void Mummy_ClearInactiveActionFlags(struct S *s)
 {
     if (s->b != 0x27) {
         u16 *p = &s->t->h;

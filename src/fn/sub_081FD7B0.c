@@ -5,14 +5,14 @@ struct S {
     s32 w3a4;
 };
 void Sound_PlaySong(u32);
-void sub_081FE928(void *, void (*)(void));
+void SunOrb_SetUpdateCallback(void *, void (*)(void));
 void sub_081FD7EC(void);
-u32 sub_081FD7B0(struct S *p)
+u32 OrbitEffect_UpdateExpansion(struct S *p)
 {
     p->w3a4 += 0x4000;
     if (p->w3a4 > 0x40000) {
         Sound_PlaySong(0x564);
-        sub_081FE928((u8 *)p + 0x14, sub_081FD7EC);
+        SunOrb_SetUpdateCallback((u8 *)p + 0x14, sub_081FD7EC);
     }
     return 0;
 }

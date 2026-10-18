@@ -2,7 +2,7 @@
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, void *);
-void sub_081E2E7C(u8 *s)
+void Presentation_InitializeSprites(u8 *s)
 {
     struct Blob {
         u32 words[8];

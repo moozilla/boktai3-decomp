@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_03001688;
 
-void sub_08220AAC(void)
+void Collider_ResetManagerLists(void)
 {
     u8 *p = gUnk_03001688;
     if (p != 0) {

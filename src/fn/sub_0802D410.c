@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0802CF74(void);
+void Actor_UpdateCollisionAndEffectTimers(void);
 
-void sub_0802D410(void)
+void Actor_UpdateControllerCollisionAndTimers(void)
 {
-    sub_0802CF74();
+    Actor_UpdateCollisionAndEffectTimers();
 }

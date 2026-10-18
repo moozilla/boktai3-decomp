@@ -9,7 +9,7 @@ struct Task {
 extern u16 gUnk_03005240;
 struct Task *Heap_Alloc(u32);
 void Memory_Clear(struct Task *, u32);
-void sub_08219F74(struct Task *);
+void Task_LinkToPriorityList(struct Task *);
 
 struct Task *Task_Create(u32 a, u32 b)
 {
@@ -22,6 +22,6 @@ struct Task *Task_Create(u32 a, u32 b)
         gUnk_03005240++;
     t->f10 = gUnk_03005240;
     gUnk_03005240++;
-    sub_08219F74(t);
+    Task_LinkToPriorityList(t);
     return t;
 }

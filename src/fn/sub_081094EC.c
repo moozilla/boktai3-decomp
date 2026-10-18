@@ -2,7 +2,7 @@
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 extern u8 gUnk_03004FC0[];
-void sub_081094EC(u8 *s)
+void LinkConnectionMenu_LoadBackground(u8 *s)
 {
     u32 value;
     void *p;

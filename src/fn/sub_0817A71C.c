@@ -6,7 +6,7 @@ struct Packed {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_0806A160(void *, int, void *, int, int, int, int, int);
-void sub_0817A71C(u8 *p)
+void SceneActors_EmitRandomBursts(u8 *p)
 {
     u8 *graphics = p + 0x2CC;
     struct Packed size;

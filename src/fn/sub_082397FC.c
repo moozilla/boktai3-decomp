@@ -11,7 +11,7 @@ struct P0813C94C {
 };
 extern u8 *gUnk_030042E4;
 
-void sub_082397FC(struct P0813C94C *p)
+void LinkPlayer_LoadAnimationParameters(struct P0813C94C *p)
 {
     u16 *t;
     s32 i;

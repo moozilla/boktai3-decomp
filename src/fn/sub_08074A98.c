@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u32 TerrainHeight(struct SceneActorRegistryActor *actor, u32 index)
 {
     const struct ContactPosition *position = &actor->position;
-    u8 *cell = sub_0821D64C(index, 1);
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind, height;
     if (cell)
         cell += 4;

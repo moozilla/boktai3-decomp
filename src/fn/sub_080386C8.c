@@ -8,16 +8,16 @@ struct P {
 };
 extern u32 gUnk_0300523C;
 void PaletteLevels_Reset(void);
-int sub_08037FB4(struct P *, int, const u32 *, int);
-void sub_08038128(struct P *, int);
-void sub_08038138(struct P *);
-void sub_0803A6F8(void);
+int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
+void WirelessGameItems_StartOutgoingItems(void);
 void sub_08178404(void);
 static inline void set(u32 mask)
 {
     gUnk_0300523C |= mask;
 }
-void sub_080386C8(struct P *p)
+void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
 {
     u32 data;
     u32 bits;
@@ -27,11 +27,11 @@ void sub_080386C8(struct P *p)
         p->entered = zero;
         PaletteLevels_Reset();
         data = zero;
-        sub_08037FB4(p, 1, &data, 1);
+        WirelessExchange_SendPacket(p, 1, &data, 1);
         set(4);
-        sub_08038128(p, 1);
+        WirelessGameMenu_SetStatusPanelState(p, 1);
         p->flag = zero;
-        sub_0803A6F8();
+        WirelessGameItems_StartOutgoingItems();
     }
     bits = 128;
     flags = p->flags;
@@ -57,7 +57,7 @@ void sub_080386C8(struct P *p)
         p->entered = 1;
         p->timer = bits;
     }
-    sub_08038138(p);
+    WirelessGameMenu_SignalStatusPanel(p);
     return;
 tick:
     p->timer++;

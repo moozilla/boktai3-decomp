@@ -42,10 +42,10 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
 void SceneActors_RunFirstEventScript(void *, void *);
 void ContactSequencePool_BeginAllDeaths(void *);
@@ -62,12 +62,12 @@ static inline void effect(ActorAnimation *p, int mode, int id, int duration)
     } else if (*((u8 *)p + 0x1bc) == 1)
         *((u8 *)p + 0x1ba) = 0;
 }
-void sub_0802A63C(ActorAnimation *p)
+void GridAttack_UpdateDeathState(ActorAnimation *p)
 {
     ActorAnimation *base = p;
     if (p->changed) {
         p->changed = 0;
-        sub_080297FC(p, 10, 1, 8);
+        GridAttackActor_SetAnimation(p, 10, 1, 8);
         SceneActors_RunFirstEventScript(p, (u8 *)p + 0x8a4);
         ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
         effect(p, 2, 349, 1);

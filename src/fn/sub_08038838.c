@@ -16,20 +16,20 @@ struct P {
     struct Entry entry;
 };
 
-void sub_080397D4(int, int);
-int sub_08037FB4(struct P *, int, const u32 *, int);
-void sub_08038128(struct P *, int);
-void sub_080385E0(struct P *);
-void sub_08038634(struct P *);
-void sub_08037F5C(struct P *);
-void sub_08038138(struct P *);
+void WirelessGame_AddWeightedScore(int, int);
+int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void WirelessGameMenu_ConsumeSelectedItem(struct P *);
+void WirelessGameMenu_ConsumeSelectedEquipment(struct P *);
+void WirelessExchange_ApplyReceivedCounts(struct P *);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
 
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
 
-void sub_08038838(struct P *p)
+void WirelessGameMenu_UpdateSelectionExchange(struct P *p)
 {
     u32 data;
     if (p->entered) {
@@ -72,18 +72,18 @@ void sub_08038838(struct P *p)
             shift += 4;
         } while (i <= 3);
         if (total > 0)
-            sub_080397D4(3, 1);
+            WirelessGame_AddWeightedScore(3, 1);
         data |= packed;
-        sub_08037FB4(p, 2, &data, 1);
-        sub_08038128(p, 1);
-        sub_080385E0(p);
-        sub_08038634(p);
+        WirelessExchange_SendPacket(p, 2, &data, 1);
+        WirelessGameMenu_SetStatusPanelState(p, 1);
+        WirelessGameMenu_ConsumeSelectedItem(p);
+        WirelessGameMenu_ConsumeSelectedEquipment(p);
     }
     if (test(&p->flags, 12) == 12) {
         u32 five;
         u8 *state;
         u32 zero;
-        sub_08037F5C(p);
+        WirelessExchange_ApplyReceivedCounts(p);
         {
             u32 mask = ~12;
             p->flags &= mask;
@@ -94,7 +94,7 @@ void sub_08038838(struct P *p)
         *state = five;
         p->entered = 1;
         p->timer = zero;
-        sub_08038138(p);
+        WirelessGameMenu_SignalStatusPanel(p);
     } else {
         p->timer++;
     }

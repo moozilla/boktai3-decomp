@@ -21,7 +21,7 @@ static inline s32 rnd(u16 *table)
     v = table[gUnk_03005308];
     return v >> 3;
 }
-void sub_082349A0(struct Elem *p)
+void HealthRestoreEffect_InitRisingParticle(struct Elem *p)
 {
     u16 *table;
     u32 zero;

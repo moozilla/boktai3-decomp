@@ -1,7 +1,7 @@
 #include "global.h"
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Anim_Step(void *, void *);
-void sub_0811CC24(u8 *s, u8 *t)
+void CharacterModel_SetComponentKeyframes(u8 *s, u8 *t)
 {
     s32 i = 0;
     do {

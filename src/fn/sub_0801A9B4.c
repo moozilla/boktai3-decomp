@@ -5,7 +5,7 @@ typedef struct {
     s16 x, y;
     u8 tail[60];
 } Graphic;
-void sub_08019F18(void *, void (*)(void));
+void SelectionMenu_SetCallback(void *, void (*)(void));
 void SelectionMenu_Choose(void);
 void SelectionMenu_ReviewChoice(void);
 void sub_0801B600(int, int, void *);
@@ -18,9 +18,9 @@ void SelectionMenu_AdvanceChoice(u8 *p)
         g->x = 104;
     g->y = 40;
     if (++p[0x1e] <= 1)
-        sub_08019F18(p, SelectionMenu_Choose);
+        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
     else {
         sub_0801B600(p[0x21], p[0x22], p + 0xd94);
-        sub_08019F18(p, SelectionMenu_ReviewChoice);
+        SelectionMenu_SetCallback(p, SelectionMenu_ReviewChoice);
     }
 }
