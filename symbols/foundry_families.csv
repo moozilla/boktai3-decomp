@@ -696,3 +696,4 @@ addr,function,name,family,note
 0814139C,sub_0814139C,Player_UpdateTimedScriptEvent,"Player","accumulates per-slot ticks and invokes a script event after 36000 ticks"
 08141404,sub_08141404,Player_TickModeParticles,"Player","emit mode-dependent particles every fifteen eligible ticks"
 08141858,sub_08141858,Player_UpdateCameraInput,"Player","update camera offset while the input and action permit it"
+081418DC,sub_081418DC,Player_BlendCameraTarget,"Player","blend player camera target with the current camera position"
