@@ -262,3 +262,4 @@ addr,function,name,family,note
 08122B00,sub_08122B00,StateSprite_InitAnimation,"StateSpritePool","initializes animation and variant metadata"
 0812549C,sub_0812549C,SpriteNotice_CreateBetweenPositions,"SpriteNotice","creates a midpoint sprite when horizontal separation exceeds 32 units"
 081258DC,sub_081258DC,PairSlotPool_Allocate,"PairSlotPool","allocates one of two bitmap-tracked slots"
+08125E74,sub_08125E74,EffectSlot_Release,"EffectSlotPool","clears the slot bitmap and removes its effect"
