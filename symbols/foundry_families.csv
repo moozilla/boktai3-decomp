@@ -75,3 +75,4 @@ addr,function,name,family,note
 080B8AB8,sub_080B8AB8,SceneActorScript_ReadCallScriptConfig,"SceneActorScript / SceneActorRegistry","after seeking script keyword 'x', reads a script id and call-limit from the script (or zeros them), then always resets the call counter"
 080B8B38,sub_080B8B38,SceneActorScript_TriggerCallOnCount,"SceneActorScript / SceneActorRegistry","increments the actor's script-call counter and, once it reaches the stored limit, calls the stored script id and resets id/limit/counter"
 080B8D14,sub_080B8D14,SceneActorReaction_TickHiddenResponse,"SceneActorReaction","updates hidden reaction flags or profile state and countdown"
+080B9030,sub_080B9030,SceneActorReaction_TryStartContact,"SceneActorReaction","conditionally starts a contact reaction and sets its timer"
