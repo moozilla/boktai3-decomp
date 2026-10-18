@@ -159,3 +159,4 @@ addr,function,name,family,note
 081003D0,sub_081003D0,FloorSwitch_RunStateScript,"FloorSwitch","runs the selected switch script with ten arguments"
 08100AD4,sub_08100AD4,NamedObject_FindNearPosition,"NamedObject","find an active named object inside contact bounds"
 08100F60,sub_08100F60,NamedObject_StepTowardTarget,"NamedObject","step toward target on a cardinal heading or snap within bounds"
+08101550,sub_08101550,NamedObject_IsPlayerWithinContactBounds,"NamedObject","test player proximity using shared signed contact bounds"
