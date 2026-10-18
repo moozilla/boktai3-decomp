@@ -428,3 +428,4 @@ addr,function,name,family,note
 0816DD70,sub_0816DD70,SceneHud_FinishRandomActionReturn,"SceneHud","waits for icon motion, plays the special-item cue and restores action input"
 0816DE28,sub_0816DE28,InventoryGrid_UpdateNumberPhase,"InventoryGrid","moves digit sprites upward briefly and hides them at tick 32"
 0816DEA8,sub_0816DEA8,InventoryGrid_BeginNumberPhase,"InventoryGrid","shows the numeric value after icon motion completes"
+0816DF48,sub_0816DF48,InventoryGrid_BeginIconTransfer,"InventoryGrid","transfers a selected inventory icon toward the fixed display position"
