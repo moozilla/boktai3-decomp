@@ -912,3 +912,4 @@ addr,function,name,family,note
 08183874,sub_08183874,ActorController_UpdateFadeAnimationTransition,"ActorController","plays directional animations then waits for a white fade"
 08183A88,sub_08183A88,ActorController_UpdatePaletteAnimationTransition,"ActorController","starts directional animation and resets palette transition state"
 08183B54,sub_08183B54,ActorController_UpdateLayeredAnimationTransition,"ActorController","plays sounded directional animation with alternate layer visibility"
+08183C3C,sub_08183C3C,DirectionalActor_UpdateSequence,"directional actor state callbacks","starts a direction-selected sequence and waits for completion"
