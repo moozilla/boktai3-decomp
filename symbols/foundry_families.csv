@@ -869,3 +869,4 @@ addr,function,name,family,note
 08180638,sub_08180638,SpriteComponent_Destroy,"SpriteComponent","disable update, invoke destructor and clear it"
 08180654,sub_08180654,SpriteComponent_Suspend,"SpriteComponent","set sprite flag bit zero and stop song 0x202 once"
 08180678,sub_08180678,SpriteComponent_Resume,"SpriteComponent","clear sprite flag bit zero and restart song 0x202 once"
+081806A0,sub_081806A0,SpriteComponent_ConfigureCollider,"SpriteComponent","configure embedded collider with two zero parameters"
