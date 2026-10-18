@@ -1029,3 +1029,4 @@ addr,function,name,family,note
 081A8BA4,sub_081A8BA4,ActorSoundPhase_EnterPhase21,"ActorSoundPhase","enter phase 21 and notify attachment on entry"
 081A8CC0,sub_081A8CC0,ActorSoundPhase_StartFlaggedAnimation,"ActorSoundPhase","set flag 0x40 and start pending animation before callback"
 081AB3DC,sub_081AB3DC,ActorSoundPhase_StartTimedAnimation,"ActorSoundPhase","set mode 3, start pending animation, set timer to eight"
+081AC9A8,sub_081AC9A8,ActorSoundPhase_StartAnimation15,"ActorSoundPhase","initialize mode fields and start animation 15"
