@@ -507,3 +507,4 @@ addr,function,name,family,note
 08176020,sub_08176020,PauseMenu_BeginSleepPrompt,"PauseMenu","opens sleep confirmation text after A input"
 081760A4,sub_081760A4,SelectionPanel_ProcessChoice,"SelectionPanel (tentative)","branches between cancel and accept panel transitions"
 0817610C,sub_0817610C,SelectionPanel_WaitThenSleep,"SelectionPanel / sleep prompt (tentative)","waits 120 ticks and enters hardware sleep"
+08176174,sub_08176174,PauseMenu_InitSleepTab,"PauseMenu","initializes sleep tab resources and input callback"
