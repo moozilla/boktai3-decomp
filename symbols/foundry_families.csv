@@ -1127,3 +1127,4 @@ addr,function,name,family,note
 081D4E80,sub_081D4E80,ThresholdTrack_SelectInterval,"ThresholdTrack","finds the position interval and stores its remainder"
 081D4EDC,sub_081D4EDC,ThresholdTrack_ClassifyPosition,"ThresholdTrack","classifies a position using four table boundaries"
 081D5444,sub_081D5444,BackgroundPanel_ReleaseHandles,"BackgroundPanel","releases eight handles marks the panel and clears background zero"
+081D7240,sub_081D7240,ScreenTransition_WaitForCompletion,"ScreenTransition","waits until combined transition timing expires"
