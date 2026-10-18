@@ -1,10 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
 void HitSwitch_AnimateBobbingCompletion(struct HitSwitchEntry *entry)
 {
-    register u16 *frame asm("r4") = &entry->frame;
-    if (*frame == 0)
+    s32 k2 = 0;
+    u16 *frame = &entry->frame;
+    if ((*frame) == k2) {
         Sound_PlaySong(426);
+    }
     {
         u32 next = *frame + 1;
         *frame = next;
