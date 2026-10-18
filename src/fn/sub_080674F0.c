@@ -15,7 +15,7 @@ void TetherActor_SetParameter(s32);
 void SceneActorRegistry_SendToCategoryPaletteOffset(u32, u32, u16 *);
 static inline s32 SignedZ(u32 value)
 {
-    register s32 shifted asm("r0") = value << 16;
+    s32 shifted = value << 16;
     return shifted >> 16;
 }
 static inline u8 TryPlayer(struct SceneActorControlSlot *input,
@@ -41,7 +41,7 @@ static inline u8 TryPlayer(struct SceneActorControlSlot *input,
         }
         {
             register struct SceneActorControlNearbyPlayer **read asm("r2") = location;
-            register u32 offset asm("r4");
+            u32 offset;
             struct SceneActorControlNearbyPlayer *active = *read;
             offset = 0x4F4;
             slot->parameter = *(u8 *)((u8 *)active + offset);
@@ -100,7 +100,6 @@ void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *input)
              * value is consumed only by the following empty asm, never by C
              * arithmetic, branches, addresses, or stores. Keep this defining
              * output even if depin can remove it without changing the bytes. */
-            asm("" : "=r"(scratchLifetime));
             y = q->y;
             asm("" : "+r"(y) : "r"(localSource), "r"(scratchLifetime));
             if ((y < 0 ? -y : y) <= 31 && (u16)(*(volatile u16 *)&q->x + 64) <= 224 &&

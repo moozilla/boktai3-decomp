@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
 s32 DisplayAnimation_SetEntry(struct DisplayAnimation *, u32, u32, u32, u32, u32, u32);
 s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *);
@@ -12,11 +11,11 @@ s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry)
     flags[0] = orientation;
     {
         u8 *packet = flags;
-        register u8 *saved asm("r0") = packet;
+        u8 *saved = packet;
         u8 *first;
         u8 *second;
         u8 *savedSecond;
-        register u32 sector asm("r3");
+        u32 sector;
         u8 test;
         sector = *saved;
         first = saved;

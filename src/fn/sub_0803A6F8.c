@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Item {
     u8 state, entered, unused, count;
@@ -15,28 +14,29 @@ struct Owner {
 extern struct Owner *gUnk_02000100;
 void sub_0803A6F8(void)
 {
-    register struct Owner *p asm("r5") = gUnk_02000100;
+    struct Owner *p = gUnk_02000100;
     if (p) {
         int i = 0;
         int state = 4;
-        register int zero asm("r6") = 0;
+        int zero = 0;
         u8 *count = p->counts;
-        asm("" : "+r"(i), "+r"(state), "+r"(zero), "+r"(count));
         do {
             if (*count) {
                 int value;
-                register int offset asm("r0") = i * 0xb0 + 0x5c;
+                int offset = i * 0xb0 + 0x5c;
                 struct Item *q;
-                q = (struct Item *)((u8 *)p + offset);
+                q = (struct Item *)(((u8 *)p) + (*(&offset)));
                 q->state = state;
-                q->entered = 1;
-                q->timer = zero;
+                do {
+                    q->entered = 1;
+                    q->timer = zero;
+                } while (0);
                 value = *count;
                 {
                     int clear = 0;
-                    asm("" : "+r"(clear));
-                    if (value > 10)
+                    if (value > 10) {
                         value = 10;
+                    }
                     q->count = value;
                     q->unused = clear;
                 }

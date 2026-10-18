@@ -10,7 +10,6 @@ void StackedActor_UpdateSegments(struct StackedActor *actor)
             u32 offset;
             actor->segments[0].flags &= ~1;
             worldY = (u16 *)&actor->world.y;
-            asm("" : : "r"(worldY));
             y = 2 - *height;
             offset = 171;
             y *= offset;

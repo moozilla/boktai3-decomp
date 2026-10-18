@@ -22,7 +22,7 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 s8 *item;
                 s32 categoryArg = *category;
                 s32 tableIndex;
-                register const u8 **table asm("r1");
+                const u8 **table;
                 item = &menu->choice.cursor.index;
                 if (!sub_0811DD94(categoryArg, *item))
                     goto unavailable;

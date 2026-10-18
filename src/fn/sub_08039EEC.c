@@ -53,7 +53,7 @@ void sub_08039EEC(struct Owner *owner, struct Item *p, int indexArg)
     if (p->entered) {
         int choice;
         int y;
-        register void *draw asm("r3");
+        void *draw;
         void *resource;
         p->entered = 0;
         {
@@ -89,7 +89,6 @@ void sub_08039EEC(struct Owner *owner, struct Item *p, int indexArg)
                 asm("" : "+r"(initial));
                 x = initial;
             }
-            asm("" : "+r"(x), "+r"(entry));
             {
                 register int value asm("r1") = *entry;
                 x += value;
@@ -113,7 +112,7 @@ void sub_08039EEC(struct Owner *owner, struct Item *p, int indexArg)
     {
         u32 x = drawing->x;
         u32 y = drawing->y;
-        register struct Sprite *dest asm("r2");
+        struct Sprite *dest;
         dest = sprite;
         dest->x = x;
         dest->y = y;
@@ -147,7 +146,6 @@ void sub_08039EEC(struct Owner *owner, struct Item *p, int indexArg)
             {
                 int offset = 0x1c;
                 u8 *array;
-                asm("" : "+r"(offset));
                 array = (u8 *)(offset + (u32)owner);
                 pending = array;
             }

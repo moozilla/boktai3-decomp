@@ -56,7 +56,7 @@ void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *acto
             u8 byteZero;
             register u16 *halfField asm("r0");
             u32 *field;
-            register u32 clearMask asm("r1");
+            u32 clearMask;
             u32 animationOffset;
             u32 state;
             asm("" : "+r"(fieldOffset));

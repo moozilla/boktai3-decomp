@@ -29,7 +29,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
         }
         {
             u32 index = rowSlot + 5;
-            register u32 scaled asm("r0");
+            u32 scaled;
             struct SceneInventoryWidgetFlags *base;
             scaled = index * 0x60;
             base = flagsBase;
@@ -127,7 +127,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
         register s32 remaining asm("r1");
         {
             struct SceneInventoryWidgetFlags *base = flagsBase;
-            register u32 offset asm("r1") = 41 * 0x60;
+            u32 offset = 41 * 0x60;
             entry = (void *)((u32)base + offset);
         }
         remaining = 7;

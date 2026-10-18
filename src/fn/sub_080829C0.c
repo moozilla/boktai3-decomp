@@ -29,7 +29,7 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
                                               struct SceneActorBehaviorContactView *destination,
                                               struct SceneActorRegistryResetView *actor)
 {
-    register u32 index asm("r0");
+    u32 index;
     s32 power;
     u32 sample;
     if (Unavailable(actor))

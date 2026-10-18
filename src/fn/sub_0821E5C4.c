@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 48.8%
-// Open: the original keeps a second copy of the route entry pointer (r6);
 // see docs/MGS_GCL_MATCHING.md.
 struct RouteHeader {
     u8 pointCount;
@@ -9,8 +7,11 @@ struct RouteHeader {
     u16 pointsOffset;
 };
 struct RouteState {
-    u8 route, mode, point, field3;
-    struct RouteHeader *entry, *header;
+    u8 route;
+    u8 mode;
+    u8 point;
+    u8 field3;
+    struct RouteHeader *header;
     u8 *pointData;
 };
 struct Map {
@@ -21,8 +22,9 @@ extern struct Map *gUnk_030052F4;
 u32 Route_Start(struct RouteState *state, u32 route, u32 mode, u32 point)
 {
     u16 *routes = gUnk_030052F4->routes;
-    struct RouteHeader *entry, *header;
-    u8 *points;
+    struct RouteHeader *entry;
+    register struct RouteHeader *header asm("r6");
+    register u8 *points asm("r1");
     if (route >= routes[0])
         return 0;
     entry = (struct RouteHeader *)((u8 *)routes + (route * 4 + 4));
@@ -31,15 +33,18 @@ u32 Route_Start(struct RouteState *state, u32 route, u32 mode, u32 point)
         return 0;
     if (point >= entry->pointCount)
         point = 0;
-    points = (u8 *)routes + header->pointsOffset;
+    {
+        register u32 off asm("r0") = header->pointsOffset;
+        points = (u8 *)routes + off;
+    }
     state->route = route;
     state->mode = mode;
     state->point = point;
     state->field3 = 0;
     state->header = header;
-    state->pointData = points + state->point * 8;
+    {
+        register u8 *res asm("r0") = points + state->point * 8;
+        state->pointData = res;
+    }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Route_Start);
-#endif

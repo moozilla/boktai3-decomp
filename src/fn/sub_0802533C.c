@@ -61,7 +61,7 @@ static inline int trunc12(int x)
 }
 static inline void decay(s16 *p)
 {
-    register s16 *dst asm("r1") = p;
+    s16 *dst = p;
     u32 old = (u16)*dst;
     register int next asm("r0");
     next = *dst > 23 ? old - 24 : 0;
@@ -103,14 +103,14 @@ void sub_0802533C(ActorAnimation *p, int tick)
         p->flags |= mask;
         if (!p->reset(p)) {
             if (tick <= 63) {
-                register int rate asm("r0") = ((int)mask - tick) >> 3;
-                register s16 *velocity asm("r3") = (s16 *)(position + 20);
+                int rate = ((int)mask - tick) >> 3;
+                s16 *velocity = (s16 *)(position + 20);
                 u32 angle = position[9];
-                register int speed asm("r6");
+                int speed;
                 speed = -rate;
                 {
                     int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-                    register int zero asm("r0") = 0;
+                    int zero = 0;
                     velocity[0] = x;
                     velocity[1] = zero;
                 }

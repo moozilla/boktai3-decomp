@@ -2,7 +2,7 @@
 #include "scene_input_panel.h"
 void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
 {
-    register struct SceneInputPanel *incoming asm("r0") = owner;
+    struct SceneInputPanel *incoming = owner;
     struct SceneInputPanel *panel;
     struct SceneInputPackedPosition position;
     struct DisplaySequenceState sequence;
@@ -10,7 +10,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     void *sequenceResource;
     register const volatile u16 *command asm("r6");
     register struct DisplaySequenceState *state asm("r5");
-    register struct SceneInputPanelDrawable *drawable asm("r6");
+    struct SceneInputPanelDrawable *drawable;
     void *graphics;
     struct SceneInputPanelDrawable *active;
     u32 flags, duration, mask;
@@ -43,15 +43,11 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     Sprite_Init(drawable, graphics, 0x30);
     sub_08220D20(&sequence, sequenceResource, gUnk_0824DF1E[mode], 0, 0);
     active = drawable;
-    asm("" : "+r"(active));
     state = &sequence;
-    asm("" : "+r"(state));
     {
         register u32 offset asm("r0") = state->index << 1;
         register const u16 *table asm("r1");
-        asm("" : "+r"(offset));
         table = sequence.commands;
-        asm("" : "+r"(table));
         command = (void *)((u32)table + offset);
     }
     {
@@ -64,7 +60,6 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
         u32 input = state->flags;
         register u32 first asm("r1");
         bit = 1;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -291,8 +286,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                                          priority;
                                      }),
                                      ({
-                                         register struct SceneInputPackedPosition *out asm("r1") =
-                                             &position;
+                                         struct SceneInputPackedPosition *out = &position;
                                          out;
                                      }));
                         lastPosition = cachedPosition;
@@ -307,8 +301,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                     out = &position;
                     out->y = 0;
                     sub_0821983C(({
-                                     register u32 offset asm("r4") =
-                                         (u32) & ((struct SceneInputPanel *)0)->prompt;
+                                     u32 offset = (u32) & ((struct SceneInputPanel *)0)->prompt;
                                      (void *)((u32)panel + offset);
                                  }),
                                  lateResource, 0x4B, 0x11, 0, 0, ({

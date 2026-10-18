@@ -32,7 +32,7 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
             *frame = 0;
             {
                 register u32 offset asm("r1") = 0x115;
-                register u8 *status asm("r5");
+                u8 *status;
                 asm("" : "+r"(offset));
                 status = (void *)((u8 *)actor + offset);
                 if (!*status) {

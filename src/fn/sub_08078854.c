@@ -8,7 +8,7 @@ static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
 {
     u32 result;
     if (actor) {
-        register u32 mask asm("r1") = 0x40;
+        u32 mask = 0x40;
         u32 offset = 0x2D4;
         u32 value;
         value = *(u16 *)((u32)actor + offset);
@@ -92,8 +92,8 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     sub_0812F520(actor, source, destination);
     actor->payload2E0 = source->kind;
     {
-        register u32 parameter asm("r1") = source->parameter34;
-        register u32 reaction asm("r2") = source->reactionFlags;
+        u32 parameter = source->parameter34;
+        u32 reaction = source->reactionFlags;
         u32 offset = 0x2D8;
         *(u32 *)((u32)actor + offset) = parameter;
         {

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "script_selector.h"
 extern u16 gUnk_03005260[];
 void ScriptSelector_MoveSelection(struct ScriptSelector *, s32);
@@ -9,7 +8,7 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
     u32 held = keys[0];
     u32 vertical = held & 0xC0;
     if (vertical) {
-        register u32 up asm("r1") = held & 0x40;
+        u32 up = held & 0x40;
         s32 step;
         step = 1;
         if (up)

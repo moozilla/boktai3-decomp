@@ -32,7 +32,7 @@ ActorAttachment_CreateFixedSpriteSlot(struct ContactPosition *anchor, void *upda
     u8 *activePointer;
     u8 *activeLow;
     u8 *kindLow;
-    register u8 *resourceLow asm("r3");
+    u8 *resourceLow;
     u8 *resourcePointer;
     register u8 *kindPointer asm("r6");
     struct ContactSwarmSprite *sprite;
@@ -89,7 +89,7 @@ gotManager:
             }
             slot->source = source;
             {
-                register u32 offset asm("r6") = 0x134;
+                u32 offset = 0x134;
                 struct ActorAttachmentFollowView **dst;
                 dst = (void *)((u32)slot + offset);
                 {
@@ -154,7 +154,7 @@ gotManager:
         slot->offset.z = zOffset;
     }
     {
-        register struct ContactSwarmSprite *low asm("r1") = sprite;
+        struct ContactSwarmSprite *low = sprite;
         register u32 flags asm("r0");
         register struct ContactSwarmSprite *dst asm("r2");
         flags = low->flags;
@@ -181,8 +181,8 @@ gotManager:
         low->priority = one;
     }
     {
-        register u32 offset asm("r0") = 0x10E;
-        register u16 *p asm("r1");
+        u32 offset = 0x10E;
+        u16 *p;
         p = (void *)((u32)slot + offset);
         *p = 255;
     }
@@ -207,7 +207,7 @@ gotManager:
             break;
     }
     {
-        register u32 offset asm("r6") = 0x104;
+        u32 offset = 0x104;
         struct DisplaySequenceState *state;
         state = (void *)((u32)slot + offset);
         Anim_SetSequence(state, sequence, *framePointer, 0, 0);

@@ -13,7 +13,7 @@ void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
     s32 i;
     for (i = 0;;) {
         struct SceneRigSprite *sprite = &rig->primary[i];
-        register struct SceneRigSprite *output asm("r4") = sprite;
+        struct SceneRigSprite *output = sprite;
         s32 radius;
         radius =
             scale12(absolute(gUnk_086149C4[((sprite->randomPhase & 255) + 64) & 255]) * 40) + 60;
@@ -143,7 +143,7 @@ void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
             i += step;
         }
         {
-            register s32 compare asm("r1") = i;
+            s32 compare = i;
             if (compare > 7)
                 break;
         }

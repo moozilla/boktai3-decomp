@@ -142,6 +142,69 @@ Register pins can be the problem rather than the fix. `sub_0802D44C`
 removed. Of the 25 drafts with pins, it is the only one; the others get worse
 without theirs. `autosolve.py` tries both versions.
 
+## The pin farm: removing pins from matched code
+
+Units marked `// MATCHING_CONCESSION: register-pinning` already match, and
+the C is right apart from the hints. With the hints removed only register
+allocation differs, so they are the solver's best input. `tools/pinfarm.py`
+turns the chain into a background job.
+
+Measured on 2026-10-17 (all 677 marked units, then a random 40 of the 596
+functions left):
+
+| Step | Result |
+|---|---|
+| `depin.py`, one pass | 324 units improved, 5,575 -> 4,265 hints, 64 units clean |
+| `depin.py`, repeated to a fixed point | 39 more units; 23 functions only lost their last pins this way |
+| autosolve sample, 40 functions | 6 matched: 3 unpinned copies already matched (depin's old single pass missed them), 3 translated by the solver |
+| near misses | 5 functions within 1-2 bytes after the C search; 8 more within 10 |
+| failures | 2 functions `rasolve.py` cannot assemble (gas rejects its line-info output); 1 renamed by `#define` and 1 isolated with a helper's body (both fixed) |
+
+So about 8% of the remaining functions translate, 15% counting what the
+fixed-point depin now catches first. Time: 323 s of wall time per function
+per worker on average (120 s compiler search, 300 s C search, less when
+the solver finds nothing), with four workers under `nice -n 10` on a
+machine shared with another solver run. All 596 take about 13 hours with
+four workers.
+
+The translations seen so far are small: empty `do { } while (0)` blocks
+around two or three statements (they raise the uses' loop-depth weight), a
+re-read `*(&offset)`, a pointer alias re-declared inside a loop.
+
+### Running it
+
+On a 16 GB machine use four workers at most (one crashed at `-j10`), each
+`autosolve.py -j 1`, under `nice -n 10`. Build `build/agbcc-instr` first
+(`tools/agbcc-instr.sh`) and a full `make` so `build/asm/` exists.
+
+```sh
+python3 tools/depin.py -j 4 --write $(grep -rl 'MATCHING_CONCESSION: register-pinning' src)
+build/venv/bin/python tools/pinfarm.py list --shards 4        # wip/farm/list.tsv, list-K.tsv, iso/
+for k in 0 1 2 3; do
+  nohup nice -n 10 build/venv/bin/python tools/autosolve.py wip/farm/list-$k.tsv \
+    -j 1 --out wip/farm/out/s$k > wip/farm/shard$k.log 2>&1 &
+done
+```
+
+Each worker appends to `wip/farm/out/sK/results.tsv` and skips functions
+already there, so a stopped worker restarts with the same command. Re-run
+`pinfarm.py list` only between runs: it rewrites `iso/`.
+
+Whenever results come in (they can be applied while the workers run):
+
+```sh
+cat wip/farm/out/s*/results.tsv > wip/farm/results.tsv
+build/venv/bin/python tools/pinfarm.py apply wip/farm/results.tsv --list wip/farm/list.tsv --commit
+```
+
+`apply` splices each `MATCHES` or `TRANSLATED` function into its unit,
+undoes every hunk of the translation the match does not need (the permuter
+re-spells lines as it goes), drops the marker when the unit has no hints
+left, runs clang-format and `check.py`, and makes one commit per function.
+Review the commits like permuter output, then run the combined ROM build
+before integrating. Rows other than matches are the next work: `C search
+at 1 bytes` is worth a longer `translate.py --seconds` run by hand.
+
 ## Compile speed
 
 Per candidate on an idle machine (A4FC-sized function, 694-line base):

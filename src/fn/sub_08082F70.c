@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -27,7 +26,7 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
             u32 offset = 0x134;
-            register struct ContactCollider *collider asm("r2") = (void *)((u8 *)actor + offset);
+            struct ContactCollider *collider = (void *)((u8 *)actor + offset);
             collider->flags |= 4;
         }
     }
@@ -70,7 +69,7 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
         actor->field2C8 = 0;
         {
             u32 *flags = &actor->flags114;
-            register u32 mask asm("r1") = ~1;
+            u32 mask = ~1;
             *flags &= mask;
         }
         actor->word104 = 0;

@@ -76,7 +76,7 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             for (; index <= 15; index++) {
                 register u32 random asm("r1") = *current;
                 s32 value;
-                register s32 duration asm("r1");
+                s32 duration;
                 random = (random + 1) & mask;
                 value = *(u16 *)((random << 1) + (u32)table);
                 value &= 15;

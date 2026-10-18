@@ -67,7 +67,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
     {
         u16 *address;
-        register u32 zero asm("r5");
+        u32 zero;
         {
             u32 direction = actor->direction120;
             u8 *destination = &actor->direction;
@@ -150,7 +150,6 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         u32 value;
         value = 0xFFFB;
         value &= savedFlags;
-        asm("" : "+r"(value));
         zero = 0;
         collider->flags = value;
         offset = 0x1EA;

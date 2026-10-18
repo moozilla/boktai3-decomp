@@ -12,7 +12,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
     u32 present;
     {
         u32 count = manager->count;
-        register u32 offset asm("r0") = count * 0x118 + 0x3C;
+        u32 offset = count * 0x118 + 0x3C;
         entry = (struct HitSwitchEntry *)((u8 *)manager + offset);
     }
     {

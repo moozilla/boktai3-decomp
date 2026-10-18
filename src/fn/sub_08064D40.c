@@ -5,10 +5,10 @@ void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 i
     s32 index = indexInput;
     if (gUnk_02000124 != NULL) {
         if (*slot->value <= slot->thresholds[index]) {
-            register u8 *status asm("r6");
+            u8 *status;
             s32 indexLow;
             {
-                register u8 *statusBase asm("r0") = slot->status;
+                u8 *statusBase = slot->status;
                 indexLow = index;
                 status = statusBase + indexLow;
             }
@@ -20,7 +20,7 @@ void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 i
                 struct ActorAttachmentSlotView *part;
                 u32 smallMask;
                 s32 x;
-                register u32 zero asm("r8");
+                u32 zero;
                 u32 sample;
                 random = *randomIndex + 1;
                 mask = 0x3FF;

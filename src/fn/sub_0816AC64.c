@@ -7,10 +7,10 @@ void sub_08163EA0(u8 *, void *);
 void sub_0816AF5C(void);
 void sub_0816AC64(u8 *s)
 {
-    s32 mark; // the halfword goes through a word register (found by tools/autosolve.py)
     u32 zero;
-    u8 *a, *b, *initial;
     u16 *p;
+    u8 *a, *b, *initial;
+
     sub_08030BF8();
     sub_08033468();
     sub_08033590();
@@ -22,8 +22,10 @@ void sub_0816AC64(u8 *s)
     *(u32 *)(s + 0x3BE8) &= ~1;
     p = (u16 *)(s + 0x3C00);
     zero = 0;
-    mark = 0xFFA8;
-    *p = mark;
+    {
+        u32 v = 0xFFA8;
+        *p = v;
+    }
     *(u16 *)(s + 0x3C02) = 0x20;
     initial = s + 0x3BE0;
     b = s + 0xC4;

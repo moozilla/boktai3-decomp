@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_restoration.h"
 void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryActor *actor, s32 frame)
 {
@@ -22,7 +21,7 @@ void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryActo
         {
             u32 offset = 0x114;
             u32 *field;
-            register u32 mask asm("r1");
+            u32 mask;
             field = (void *)((u8 *)owner + offset);
             mask = ~1;
             *field &= mask;

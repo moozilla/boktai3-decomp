@@ -4,7 +4,7 @@
 void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;
-    register u16 *framePointer asm("r9") = &panel->frame;
+    u16 *framePointer = &panel->frame;
     u32 frame;
     asm("" : "+r"(panel));
     {
@@ -20,7 +20,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         s32 sourceX;
         u32 direction;
         {
-            register u16 *sourceFrame asm("r2") = framePointer;
+            u16 *sourceFrame = framePointer;
             divisor = 6 - *sourceFrame;
         }
         sourceX = gUnk_02000488->position.x;
@@ -71,7 +71,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         ScenePanel_SetEffectState((void *)panel, 2);
     } else if (panel->variant == 1) {
         s32 anyActive;
-        register u32 count asm("r0");
+        u32 count;
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         sub_0815C99C(SCENE_PANEL_PLAYER);
         anyActive = 0;

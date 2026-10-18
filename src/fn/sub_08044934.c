@@ -86,7 +86,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
             }
             destination = &slot->display.animation.draw.sprite.position;
             {
-                register const struct ContactPosition *source asm("r2") = position;
+                const struct ContactPosition *source = position;
                 struct ContactPosition copy;
                 struct ContactSwarmDrawPacket *view;
                 copy = *source;
@@ -104,7 +104,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 view->graphics.paletteData = palette;
             }
             {
-                register u32 offset asm("r2") = (u8 *)slot->shadow - (u8 *)slot;
+                u32 offset = (u8 *)slot->shadow - (u8 *)slot;
                 ActorShadow_Enable((u8 *)slot + offset);
             }
             collider = &slot->resourceCollider;

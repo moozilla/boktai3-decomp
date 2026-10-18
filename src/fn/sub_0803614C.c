@@ -39,7 +39,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->operation = op;
     p->ticks = zero;
     {
-        register u8 *pending asm("r1") = &p->pending;
+        u8 *pending = &p->pending;
         *pending = 1;
     }
 }

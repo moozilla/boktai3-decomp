@@ -7,7 +7,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
 {
     if (gUnk_02000710->unk618 > 0) {
         register u16 frame asm("r5") = panel->mode;
-        register u32 shifted asm("r4") = (u32)frame << 16;
+        u32 shifted = (u32)frame << 16;
         u32 value;
         s32 alpha;
         value = shifted >> 16;
@@ -93,7 +93,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 } position, velocity;
                 const u16 *table;
                 register u32 indexMask asm("r8");
-                register u32 highMask asm("r6");
+                u32 highMask;
                 register union ScenePanelPackedVector *positionWords asm("r9");
                 u32 next;
                 position.packed = panel->center;
@@ -125,7 +125,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 gUnk_03005308 = (gUnk_03005308 + 1) & indexMask;
                 {
                     s32 offset = Mod(table[gUnk_03005308], 500);
-                    register s32 coordinate asm("r1") = ((s32)position.words.xy >> 16) - 250;
+                    s32 coordinate = ((s32)position.words.xy >> 16) - 250;
                     coordinate += offset;
                     coordinate = (u32)coordinate << 16;
                     {
@@ -174,7 +174,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 *shadow = mask | *shadow;
             }
             {
-                register u16 *lowFrame asm("r1") = frame;
+                u16 *lowFrame = frame;
                 register u32 frameValue asm("r0");
                 register s32 alpha asm("r2");
                 frameValue = *lowFrame;
@@ -187,7 +187,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             {
                 u16 *conditionFrame = frame;
                 if (!(*conditionFrame & 7)) {
-                    register u32 shakeOffset asm("r3") = 0x132A;
+                    u32 shakeOffset = 0x132A;
                     s16 *shake;
                     shake = (void *)((u8 *)panel + shakeOffset);
                     if (*shake <= 6)

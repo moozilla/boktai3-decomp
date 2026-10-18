@@ -71,14 +71,14 @@ int sub_08030BF8(void)
 run:
     result = TextWindow_BlankRect(p->x, p->y, p->width, p->height);
     {
-        register void *fn asm("r2") = sub_080317CC;
+        void *fn = sub_080317CC;
         void **dst;
         dst = &p->callback;
         *dst = fn;
     }
     p->flags |= 1;
     {
-        register struct State *state asm("r2") = &p->state;
+        struct State *state = &p->state;
         state->current = -1;
     }
     p->render.flags |= 1;

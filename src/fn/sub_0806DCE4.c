@@ -73,15 +73,15 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
         }
     }
     {
-        register u16 *low asm("r1") = frames;
+        u16 *low = frames;
         if (*low == 4) {
             union EmissionPosition position;
             {
-                register struct RouteSpriteActor *low asm("r2") = actor;
+                struct RouteSpriteActor *low = actor;
                 AnimData_SelectPaletteBank(*(void **)&low->sprite.unknown8[4], 0x143);
             }
             {
-                register struct RouteSpriteActor *low asm("r2") = actor;
+                struct RouteSpriteActor *low = actor;
                 position.position = low->sprite.position;
             }
             position.packed.y -= 60;
@@ -91,13 +91,12 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
         }
     }
     {
-        register struct RouteSpriteActor *primaryLow asm("r2");
+        struct RouteSpriteActor *primaryLow;
         const volatile u16 *command; /* preserve observed packed-command reads */
         u32 coreEnded, duration, flags, bit;
         {
             u32 offset = sequence->index << 1;
             const volatile u16 *table;
-            asm("" : "+r"(offset));
             primaryLow = actor;
             table = primaryLow->sequence.commands;
             command = (const volatile u16 *)((u32)table + offset);
@@ -114,7 +113,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
             {
                 register u32 value asm("r0");
                 if (first != (((*command & 0x30) >> 4) & bit)) {
-                    register struct RouteSpriteActor *low asm("r1") = actor;
+                    struct RouteSpriteActor *low = actor;
                     value = low->sprite.flags;
                     value |= 4;
                 } else {
@@ -124,7 +123,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
                     value &= ~4;
                 }
                 {
-                    register struct RouteSpriteActor *low asm("r2") = actor;
+                    struct RouteSpriteActor *low = actor;
                     low->sprite.flags = value;
                 }
             }
@@ -244,12 +243,12 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
         }
         if (*cycles) {
             u32 offset = 0x152;
-            register u8 *state asm("r1");
+            u8 *state;
             state = (void *)((u32)actor + offset);
             *state = 2;
         } else {
             u32 offset = 0x152;
-            register u8 *state asm("r1");
+            u8 *state;
             state = (void *)((u32)actor + offset);
             *state = 5;
         }

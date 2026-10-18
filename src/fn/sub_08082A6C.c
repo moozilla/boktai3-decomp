@@ -39,7 +39,6 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
     now = Tick();
     if (now < start) {
         register s32 wrap asm("r3") = -256;
-        asm("" : "+r"(wrap));
         {
             s32 adjusted = start + wrap;
             asm("" : "+r"(adjusted) : "r"(wrap));
@@ -67,7 +66,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
             direction = &actor->direction;
             {
                 u32 prior = *saved;
-                register u32 current asm("r2");
+                u32 current;
                 current = *direction;
                 if (prior != current) {
                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);

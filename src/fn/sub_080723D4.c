@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_script.h"
 static inline s32 ReadOrMinusOne(void)
 {
@@ -31,7 +30,7 @@ void SceneActorScript_SetPropertiesFromScript(void)
         value = ReadOrMinusOne();
         if (value >= 0) {
             u32 square;
-            register u32 *firstSquare asm("r2");
+            u32 *firstSquare;
             actor->range = value;
             actor->rangeCopy = value;
             firstSquare = &actor->rangeSquared;

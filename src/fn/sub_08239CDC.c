@@ -1,26 +1,34 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 63.6%
-// 8 differing instruction runs; first diff at +0x0 (push {r4, r5, lr} vs push {r4, lr})
-void sub_08239C80(u8 *);
-void sub_08239A20(u8 *, s32);
-void sub_08239CDC(u8 *p)
+struct O08239CDC {
+    u8 f0[6];
+    u16 f6;
+    u8 f8[4];
+    u32 fC;
+};
+struct P08239CDC {
+    u8 f0[0xC6];
+    u16 fC6;
+    u8 fC8[0xC];
+    u32 fD4;
+    u8 fD8[0x178 - 0xD8];
+    struct O08239CDC *f178;
+    u8 f17C[0xAB0 - 0x17C];
+    u16 fAB0;
+    u8 fAB2[0xAC4 - 0xAB2];
+    u16 fAC4;
+    u8 fAC6[2];
+    u8 fAC8;
+};
+void sub_08239C80(void *);
+void sub_08239A20(void *, s32);
+void sub_08239CDC(struct P08239CDC *p)
 {
-    u16 *a;
-    u8 **link;
-    u8 *value;
     sub_08239C80(p);
-    *(u16 *)(p + 0xac4) = 0xffff;
-    p[0xac8] = 255;
-    a = (u16 *)(p + 0xab0);
-    *(u16 *)(p + 0xc6) = *a;
-    value = p + 0x360;
-    *(u8 **)(p + 0xd4) = value;
-    link = (u8 **)(p + 0x178);
-    *(u16 *)(*link + 6) = *a;
-    *(u8 **)(*link + 12) = value;
+    p->fAC4 = 0xFFFF;
+    p->fAC8 = 0xFF;
+    p->fC6 = p->fAB0;
+    p->fD4 = (u32)p + 0x360;
+    p->f178->f6 = p->fAB0;
+    p->f178->fC = (u32)p + 0x360;
     sub_08239A20(p, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08239CDC);
-#endif

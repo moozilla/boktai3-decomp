@@ -30,7 +30,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                 resource = pool->graphics;
                 {
                     u32 offset = state->index << 1;
-                    register const u16 *table asm("r1") = state->commands;
+                    const u16 *table = state->commands;
                     command = (const volatile u16 *)((u32)table + offset);
                 }
                 {
@@ -114,7 +114,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                     }
                     {
                         u32 offset = state->index << 1;
-                        register const u16 *table asm("r1") = state->commands;
+                        const u16 *table = state->commands;
                         command = (const volatile u16 *)((u32)table + offset);
                     }
                     state->duration = ((*command & 15) * (s32)state->speed) >> 6;
@@ -141,7 +141,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
             particle++;
             {
                 s32 step = -1;
-                register s32 test asm("r1");
+                s32 test;
                 remaining += step;
                 test = remaining;
                 if (test < 0)

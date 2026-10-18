@@ -31,7 +31,7 @@ void sub_0803ACD0(u8 *p)
                 category = 1;
         }
         {
-            register int initialOffset asm("r1") = 576;
+            int initialOffset = 576;
             void *first;
             void *descriptor;
             register int base asm("r4");

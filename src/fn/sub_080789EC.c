@@ -13,7 +13,7 @@ static inline u8 Test(u32 value, u32 mask)
 }
 static inline u16 *CounterAddress(u32 inputOffset)
 {
-    register u8 *base asm("r0") = (void *)gUnk_02000710;
+    u8 *base = (void *)gUnk_02000710;
     u32 offset = inputOffset;
     return (void *)(base + offset);
 }

@@ -33,7 +33,7 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         display = &actor->display.animation;
         DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
     } else {
-        register const u16 *palette asm("r0");
+        const u16 *palette;
         u16 *buffer;
         const u16 *source;
         u16 *destination;

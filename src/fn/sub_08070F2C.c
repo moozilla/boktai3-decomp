@@ -29,8 +29,8 @@ static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disab
 }
 u32 SceneActorRegistry_TestCategoryFlags(s32 inputCategory, u32 inputFlags)
 {
-    register s32 category asm("r5") = inputCategory;
-    register u32 flags asm("r4") = inputFlags;
+    s32 category = inputCategory;
+    u32 flags = inputFlags;
     register struct SceneActorRegistryActor *actor asm("r1") = SceneActorRegistry_GetFirstActor();
     if (actor)
         goto initialize;

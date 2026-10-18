@@ -77,44 +77,44 @@ int sub_08030DBC(int index)
             p->scriptIndex = index;
             {
                 void *pc = sub_080313C8(p, p->scriptIndex);
-                register struct State *dst asm("r3") = state;
+                struct State *dst = state;
                 dst->pc = pc;
             }
             {
                 u8 mode;
                 {
-                    register u32 offset asm("r1") = 0x182;
-                    register u8 *ptr asm("r0");
+                    u32 offset = 0x182;
+                    u8 *ptr;
                     ptr = (u8 *)p + offset;
                     mode = *ptr;
                 }
                 if (!mode) {
                     {
-                        register void *fn asm("r0") = sub_080316A4;
-                        register void **dst asm("r1");
-                        register u32 offset asm("r2") = 0x2cc;
+                        void *fn = sub_080316A4;
+                        void **dst;
+                        u32 offset = 0x2cc;
                         dst = (void **)((u8 *)p + offset);
                         *dst = fn;
                     }
                     {
-                        register u32 offset asm("r3") = 0x187;
-                        register u8 *mode asm("r1");
+                        u32 offset = 0x187;
+                        u8 *mode;
                         mode = (u8 *)p + offset;
                         *mode = 3;
                     }
                 } else {
                     {
-                        register u32 offset asm("r0") = 0x19c;
+                        u32 offset = 0x19c;
                         u32 *counter;
                         counter = (u32 *)((u8 *)p + offset);
                         {
-                            register u32 zero asm("r0") = 0;
+                            u32 zero = 0;
                             *counter = zero;
                         }
                     }
                     {
                         register void *fn asm("r1") = sub_080317D8;
-                        register u32 offset asm("r2");
+                        u32 offset;
                         register void **dst asm("r0");
                         offset = 0x2cc;
                         dst = (void **)((u8 *)p + offset);
@@ -124,8 +124,8 @@ int sub_08030DBC(int index)
             }
             TextState_Reset(state);
             {
-                register u32 offset asm("r3") = 0x196;
-                register u16 *wait asm("r1");
+                u32 offset = 0x196;
+                u16 *wait;
                 wait = (u16 *)((u8 *)p + offset);
                 {
                     u32 value = 65535;
@@ -133,11 +133,11 @@ int sub_08030DBC(int index)
                 }
             }
             {
-                register u32 offset asm("r0") = 0x218;
+                u32 offset = 0x218;
                 u32 *flags;
                 flags = (u32 *)((u8 *)p + offset);
                 {
-                    register u32 value asm("r0") = *flags;
+                    u32 value = *flags;
                     u32 mask = 1;
                     value |= mask;
                     *flags = value;

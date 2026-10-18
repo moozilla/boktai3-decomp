@@ -13,7 +13,7 @@ u16 Sqrt(u32);
 void CircleWindow_GenerateScanlines(struct Circle *p, int bank)
 {
     int radius = p->radius >> 4;
-    register int savedRadius asm("r3") = radius;
+    int savedRadius = radius;
     int square;
     int top, bottom, i;
     u16 *out;
@@ -25,7 +25,7 @@ void CircleWindow_GenerateScanlines(struct Circle *p, int bank)
     if (bottom > 160)
         bottom = 160;
     {
-        register int relativeTop asm("r0") = savedRadius - p->y;
+        int relativeTop = savedRadius - p->y;
         asm("" : : "r"(relativeTop));
     }
     out = p->rows[bank];

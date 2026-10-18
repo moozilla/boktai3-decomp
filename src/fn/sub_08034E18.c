@@ -52,7 +52,7 @@ int sub_08034E18(struct Engine *p)
     sub_08034270(p);
     {
         u8 *initial = &p->count;
-        register int available asm("r2") = *initial;
+        int available = *initial;
         {
             u8 *savedCount = initial;
             count = savedCount;

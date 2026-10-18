@@ -166,11 +166,11 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
         p->health--;
         if ((s16)p->health <= 0) {
             int angle, speed;
-            register int count asm("r1");
+            int count;
             const u16 *table;
             u32 *indexPtr;
             u32 mask;
-            register u32 smallMask asm("r8");
+            u32 smallMask;
             register u32 index asm("r0");
             size.x = 164;
             size.y = 16;

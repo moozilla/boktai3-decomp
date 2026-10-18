@@ -2,7 +2,6 @@
 // fuzzy: 97.9%
 /* Readable distance limiter; only four scratch-register differences remain. */
 #include "tether_actor.h"
-// MATCHING_CONCESSION: register-pinning
 void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *);
 static inline s32 truncateShift(s32 value, u32 shift)
 {
@@ -13,18 +12,17 @@ static inline s32 truncateShift(s32 value, u32 shift)
 static inline s32 cosine(s32 angle, s32 radius)
 {
     s32 sample = gUnk_086149C4[(angle + 64) & 255];
-    register s32 product asm("r0");
+    s32 product;
     product = radius;
     product *= sample;
     {
         s32 result = truncateShift(product, 12);
-        asm("" : "+r"(result));
         return result;
     }
 }
 static inline s32 sine(s32 angle, s32 radius)
 {
-    register s32 sample asm("r1") = gUnk_086149C4[angle & 255];
+    s32 sample = gUnk_086149C4[angle & 255];
     s32 product;
     product = radius;
     product *= sample;
@@ -35,17 +33,17 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *input)
     struct TetherActor *actor = input;
     struct TetherPlayer **savedSlot;
     s32 angle;
-    register s32 offsetX asm("r10");
+    s32 offsetX;
     s32 offsetZ;
-    register s16 *savedX asm("r8");
-    register s16 *savedZ asm("r9");
+    s16 *savedX;
+    s16 *savedZ;
     s16 *sourceX;
     s16 *sourceZ;
     s32 dx;
     s32 dz;
     {
-        register struct TetherPlayer **slot asm("r3") = gUnk_02000580;
-        register u32 value asm("r0") = (*slot)->facing;
+        struct TetherPlayer **slot = gUnk_02000580;
+        u32 value = (*slot)->facing;
         const s16 *table;
         s32 sample;
         s32 product;
@@ -68,13 +66,13 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *input)
         s32 value = player->position.x + offsetX;
         sourceX = &actor->position.x;
         {
-            register s32 other asm("r1") = *sourceX;
+            s32 other = *sourceX;
             dx = value - other;
         }
         value = player->position.z + offsetZ;
         sourceZ = &actor->position.z;
         {
-            register s32 other asm("r1") = *sourceZ;
+            s32 other = *sourceZ;
             dz = value - other;
         }
     }
@@ -95,8 +93,8 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *input)
         s32 radialX = cosine(angle, 150);
         s32 radialZ = sine(angle, 150);
         s32 targetX;
-        register s32 targetZ asm("r4");
-        register s16 *axis asm("r3") = savedX;
+        s32 targetZ;
+        s16 *axis = savedX;
         s32 sample = *axis;
         s32 value = offsetX;
         sample -= value;
@@ -114,17 +112,16 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *input)
         }
         value = (*savedSlot)->position.z * 3 + targetZ;
         {
-            register s32 result asm("r1") = truncateShift(value, 2);
+            s32 result = truncateShift(value, 2);
             (*savedSlot)->position.z = result;
         }
         TetherActor_BlockPlayerAcrossTerrain(actor);
         {
             u32 *words = (u32 *)*savedSlot;
-            register u32 offset asm("r3") = 0x168;
-            register u32 *destination asm("r2");
+            u32 offset = 0x168;
+            u32 *destination;
             u32 second;
             u32 first;
-            asm("" : "+r"(offset));
             destination = (u32 *)((u8 *)words + offset);
             second = words[0x34 / 4];
             first = words[0x30 / 4];

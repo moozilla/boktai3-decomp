@@ -35,7 +35,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             y += 2;
             count++;
             {
-                register struct ModifierSelection *base asm("r1") = current;
+                struct ModifierSelection *base = current;
                 s32 selectedCount;
                 selectedCount = base->count;
                 if (count >= selectedCount)
@@ -50,7 +50,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             {
                 s32 capacity;
                 {
-                    register struct ModifierSelection *base asm("r1") = current;
+                    struct ModifierSelection *base = current;
                     capacity = base->capacity;
                 }
                 if (id < capacity) {

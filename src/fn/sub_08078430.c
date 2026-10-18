@@ -23,8 +23,8 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(
 {
     struct SceneActorBehaviorDestination *descriptor = inputDescriptor;
     u32 rangeX = inputRangeX;
-    register u32 rangeZ asm("r8") = inputRangeZ;
-    register s32 actorX asm("r5");
+    u32 rangeZ = inputRangeZ;
+    s32 actorX;
     s32 actorZ;
     s32 dx;
     s32 dz;
@@ -38,7 +38,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(
         coordinate = descriptor->destination.z;
         position = (void *)((u32)position + 4);
         {
-            register s32 value asm("r2") = *position;
+            s32 value = *position;
             actorZ = value;
             dz = coordinate - value;
         }

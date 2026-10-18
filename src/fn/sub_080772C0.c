@@ -3,7 +3,7 @@
 static inline u32 Unavailable(struct SceneActorRegistryResetView *actor, u32 flags)
 {
     u32 result;
-    register u32 test asm("r2");
+    u32 test;
     u32 mask;
     if (!actor)
         goto available;
@@ -35,8 +35,7 @@ done:
     asm("" : "+r"(result));
     return result;
 }
-void sub_080772C0(struct SceneActorRegistryResetView *actor,
-                                        const u16 *inputArgument)
+void sub_080772C0(struct SceneActorRegistryResetView *actor, const u16 *inputArgument)
 {
     const u16 *argument = inputArgument;
     u32 prior, currentFlags;
@@ -61,7 +60,7 @@ void sub_080772C0(struct SceneActorRegistryResetView *actor,
         default: {
             u32 mask = 1;
             if (actor->flags2CC & mask) {
-                register u32 offset asm("r3");
+                u32 offset;
                 SceneActorRegistry_RestoreActorDefaults((void *)actor);
                 offset = 0x178;
                 {
@@ -136,7 +135,7 @@ void sub_080772C0(struct SceneActorRegistryResetView *actor,
         case 1: {
             register u32 offset asm("r6");
             u32 *flags;
-            register u32 mask asm("r1");
+            u32 mask;
             mode = Unavailable(actor, currentFlags);
             if (mode)
                 return;
@@ -146,7 +145,7 @@ void sub_080772C0(struct SceneActorRegistryResetView *actor,
             *flags &= mask;
             SceneActorRegistry_ResetRoute((void *)actor);
             {
-                register u32 state asm("r1") = 3;
+                u32 state = 3;
                 u32 stateOffset = 0x2A8;
                 register u32 phaseOffset asm("r3");
                 register void *control asm("r3");
@@ -179,7 +178,7 @@ void sub_080772C0(struct SceneActorRegistryResetView *actor,
                 }
                 state -= 0x94;
                 {
-                    register void **field asm("r0") = (void *)((u8 *)actor + state);
+                    void **field = (void *)((u8 *)actor + state);
                     *field = control;
                 }
             }
@@ -188,8 +187,8 @@ void sub_080772C0(struct SceneActorRegistryResetView *actor,
     }
     actor->field2C8 = mode;
     {
-        register u32 offset asm("r3") = 0x114;
-        register u32 *field asm("r2");
+        u32 offset = 0x114;
+        u32 *field;
         u32 mask;
         field = (void *)((u8 *)actor + offset);
         mask = ~1;

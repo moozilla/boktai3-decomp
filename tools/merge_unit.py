@@ -44,7 +44,7 @@ def items(text):
         code = re.sub(r"//.*|\"(\\.|[^\"])*\"|'(\\.|[^'])*'", "", line)
         depth += code.count("{") + code.count("(") - code.count("}") - code.count(")")
         s = code.strip()
-        if depth == 0 and (s.endswith(";") or s.endswith("}") or s.startswith("//") or s.endswith("*/")):
+        if depth == 0 and (s.endswith(";") or s.endswith("}") or line.lstrip().startswith("//") or s.endswith("*/")):
             out.append("\n".join(cur))
             cur = []
     if cur:

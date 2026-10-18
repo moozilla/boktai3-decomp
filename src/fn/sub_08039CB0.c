@@ -50,7 +50,7 @@ void sub_08039CB0(struct Owner *owner, struct Item *p, int indexArg)
     if (p->entered) {
         int choice;
         int y;
-        register void *draw asm("r3");
+        void *draw;
         void *resource;
         p->entered = 0;
         sprite->value = p->count;
@@ -78,7 +78,7 @@ void sub_08039CB0(struct Owner *owner, struct Item *p, int indexArg)
     sub_08039998(&drawing->x, p->timer, p->velocity);
     *(struct Pair *)&sprite->x = *(struct Pair *)&drawing->x;
     if (p->timer > 31) {
-        register int offset asm("r0") = (index & ~4) * 0xb0 + 0x5c;
+        int offset = (index & ~4) * 0xb0 + 0x5c;
         struct Item *target;
         int count;
         target = (struct Item *)((u8 *)owner + offset);
