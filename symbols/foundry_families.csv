@@ -986,3 +986,4 @@ addr,function,name,family,note
 0819C51C,sub_0819C51C,ColliderActor_UpdateCameraOffset,"ColliderActor (tentative)","interpolate camera offset toward actor position"
 0819C794,sub_0819C794,SceneMover_SetSideTarget,"SceneMover (tentative)","sets a target vector using the side flag and anchor position"
 0819C7E4,sub_0819C7E4,SceneMover_IsNearTarget,"SceneMover (tentative)","tests squared horizontal target distance against a scaled threshold"
+0819C83C,sub_0819C83C,DirectionGate_IsAngleInModeRange,"DirectionGate (tentative)","tests an angle against the mode-selected half-circle range"
