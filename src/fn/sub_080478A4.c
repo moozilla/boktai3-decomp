@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
 u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *);
 void BackgroundFlash_SetState(struct BackgroundFlashController *, u32);
@@ -16,29 +15,38 @@ void BackgroundFlash_UpdateAppearing(struct BackgroundFlashController *controlle
     visible = 0x200;
     control = &gUnk_03004BD8;
     previous = *control;
+    do {
     flags = visible;
-    asm("" : "+r"(flags));
     flags |= previous;
     *control = flags;
+    } while (0);
     frame = controller->stateFrame;
-    if (frame > 14)
+    if (frame > 14) {
         goto middle;
-    if ((frame & 3) > 2)
+    }
+    if ((frame & 3) > 2) {
         goto checked;
+    }
     goto hidden;
 middle:
-    if (frame > 29)
+    if (frame > 29) {
         goto last;
-    if ((frame & 3) > 1)
+    }
+
+    if ((frame & 3) > 1) {
         goto checked;
+    }
     goto hidden;
 last:
-    if (frame & 3)
+    if (frame & 3) {
         goto checked;
+    }
+
 hidden:
     flags &= ~visible;
     *control = flags;
 checked:
-    if (frame > 44)
+    if (frame > 44) {
         BackgroundFlash_SetState(controller, 2);
+    }
 }
