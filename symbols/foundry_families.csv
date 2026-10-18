@@ -1193,3 +1193,4 @@ addr,function,name,family,note
 081F3084,sub_081F3084,Ratatosk_FindPointFarthestFromPosition,"Ratatosk","returns the farthest of nine movement points in X/Z"
 081F3130,sub_081F3130,Ratatosk_GetPlayerOffsetFarthestFromSelf,"Ratatosk","writes the farthest of four player-relative positions from Ratatosk"
 081F31FC,sub_081F31FC,Ratatosk_GetPlayerOffsetNearestSelf,"Ratatosk","writes the nearest of four player-relative positions to Ratatosk"
+081F33F0,sub_081F33F0,SceneDistance_ClearLinkedEntry,"SceneDistanceSet","clears the first word of a linked entry"
