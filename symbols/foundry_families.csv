@@ -1339,3 +1339,4 @@ addr,function,name,family,note
 08232F68,sub_08232F68,EffectQuad_StartRemoteEntry,"EffectQuad","start animation 0x33 at a remote player's supplied position"
 08233038,sub_08233038,TemporarySpritePool_Update,"TemporarySpritePool","expire and remove sprites in sixteen timed slots"
 082330D4,sub_082330D4,SpritePool_CreateSingleton,"SpritePool","creates the singleton task containing sixteen sprite slots"
+08233714,sub_08233714,TimedDisplay_AdvanceIntro,"TimedDisplay","advances display updates and changes state after thirty-two ticks"
