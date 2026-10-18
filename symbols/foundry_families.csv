@@ -1237,3 +1237,4 @@ addr,function,name,family,note
 081FC900,sub_081FC900,SceneProjectile_InitSlot,"Scene projectile (tentative)","initializes projectile animation sprite and two colliders"
 081FD3D8,sub_081FD3D8,Projectile_InitParameters,"Projectile 4 (auto, tentative)","clears projectile configuration and installs default parameters"
 081FD704,sub_081FD704,OrbitEffect_FireProjectileOnContact,"OrbitEffect","fires toward player after contact"
+081FDB40,sub_081FDB40,RisingActor_LowerHeight,"Rising actor controller (tentative)","lowers height every fourth tick and changes callback at threshold"
