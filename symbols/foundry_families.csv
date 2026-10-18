@@ -516,3 +516,4 @@ addr,function,name,family,note
 08176424,sub_08176424,SceneDialog_FinishSuccessfulResult,"SceneDialog","plays the successful result sound and returns after 120 ticks"
 08176488,sub_08176488,SceneDialog_FinishFailedResult,"SceneDialog","plays the alternate result sound and returns after 120 ticks"
 08176590,sub_08176590,SceneDialog_ConfigureVariantSlot,"SceneDialog","runs variant callback and configures slot three"
+081765D4,sub_081765D4,PauseMenu_SaveDisplayState,"PauseMenu","backs up background and display state for menu entry"
