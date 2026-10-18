@@ -21,7 +21,8 @@ u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
     return r;
 }
 
-s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct DirectionalController *p, s32 index)
+s32 DirectionalController_InitSlot(struct DirectionalManager *manager,
+                                   struct DirectionalController *p, s32 index)
 {
     void *animation = p->animation;
     s32 r;
@@ -37,7 +38,8 @@ s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct Di
 }
 
 /* Finds the enabled controller with the given script id; optionally returns its slot index. */
-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
+struct DirectionalController *
+DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
 {
     struct DirectionalController *e;
     s32 i;
@@ -63,8 +65,9 @@ u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u3
 }
 
 /* Places the controller and its marker around the given point. */
-u32 DirectionalController_SetPosition(struct DirectionalManager *manager, struct DirectionalController *p,
-                 struct DirectionalPackedVec *in)
+u32 DirectionalController_SetPosition(struct DirectionalManager *manager,
+                                      struct DirectionalController *p,
+                                      struct DirectionalPackedVec *in)
 {
     struct DirectionalDrawable *q = &p->drawable;
     p->position.x = in->x;

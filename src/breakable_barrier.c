@@ -370,7 +370,8 @@ void *BatCurtain_Create(void)
     void *obj;
     obj = Task_Create(8, 0x2FC);
     if (obj != 0) {
-        Task_SetCallbacks(obj, (void (*)(void *))BreakableBarriers_Update, (void (*)(void *))BreakableBarriers_Destroy);
+        Task_SetCallbacks(obj, (void (*)(void *))BreakableBarriers_Update,
+                          (void (*)(void *))BreakableBarriers_Destroy);
         if (BreakableBarriers_Initialize(obj) < 0) {
             Task_Kill(obj);
             return 0;

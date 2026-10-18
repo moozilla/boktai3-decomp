@@ -1,4 +1,4 @@
-#define gPlayers                   gUnk_02000580
+#define gPlayers gUnk_02000580
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
 struct PackedItemPosition {

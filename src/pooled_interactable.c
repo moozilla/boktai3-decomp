@@ -112,7 +112,8 @@ void sub_08008C18(void)
 {
 }
 
-void Breakable_UpdateAnimation(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
+void Breakable_UpdateAnimation(struct PooledInteractableManager *manager,
+                               struct PooledInteractable *slot)
 {
     if (Breakable_ConsumeEnteredFlag(slot)) {
         void *q = &slot->drawable;

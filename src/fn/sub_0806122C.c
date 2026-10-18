@@ -46,7 +46,8 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
         if (item < 0)
             goto invalid;
         {
-            struct SceneInventoryControlConsumable *definition = GameState_GetConsumableDescriptor(item);
+            struct SceneInventoryControlConsumable *definition =
+                GameState_GetConsumableDescriptor(item);
             s32 value = definition->baseValue;
             result = -1;
             if (!value)

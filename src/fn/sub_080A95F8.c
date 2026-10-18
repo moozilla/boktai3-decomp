@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 struct Entry080A9 {
     u32 field0;
     u8 pad4[0x105 - 4];

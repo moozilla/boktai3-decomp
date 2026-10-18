@@ -18,7 +18,8 @@ void TimedPresentation_Update(struct TimedSequence *p)
             if (p->timer > p->duration - (1 << p->fadeShift)) {
                 p->state = 1;
                 Menu_StartFadeOut(p->fadeShift);
-            } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() && (gUnk_03005260[1] & 1)) {
+            } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() &&
+                       (gUnk_03005260[1] & 1)) {
                 p->state = 1;
                 Menu_StartFadeOut(p->fadeShift);
             }

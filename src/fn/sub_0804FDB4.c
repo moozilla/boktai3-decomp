@@ -2,7 +2,8 @@
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
-void SceneBody_Init(void *, u16, struct RepeatedEffectPosition *, u32, u32, struct RepeatedEffect *);
+void SceneBody_Init(void *, u16, struct RepeatedEffectPosition *, u32, u32,
+                    struct RepeatedEffect *);
 void TerrainOverlay_QueueAddActor(void *);
 void RepeatedEffect_InitSprite(struct RepeatedEffect *effect,
                                struct RepeatedEffectPosition *position, u32 bodyEnabled)

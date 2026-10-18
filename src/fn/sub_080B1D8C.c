@@ -31,5 +31,6 @@ void SceneActor_InitContextColliders(struct SceneActorRegistryResetView *p)
     ((struct ContactPosition *)&offset)->x = 0;
     ((struct ContactPosition *)&offset)->y = 0x80;
     ((struct ContactPosition *)&offset)->z = 0;
-    SceneActorCollision_InitExternalAttack(p, q + 0x628, &size, &offset, Vorn_OnScriptActionRequest, 1, p);
+    SceneActorCollision_InitExternalAttack(p, q + 0x628, &size, &offset, Vorn_OnScriptActionRequest,
+                                           1, p);
 }

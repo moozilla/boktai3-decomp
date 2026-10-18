@@ -66,7 +66,6 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
     }
 }
 
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 direction)
@@ -119,7 +118,6 @@ void Scene_PlayNeighborStepSound(u32 type)
         Sound_PlaySong(0x151);
     }
 }
-
 
 u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 direction)
 {
@@ -248,7 +246,6 @@ void SceneObjects_PlayPushSound(s32 type)
             break;
     }
 }
-
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
@@ -992,7 +989,8 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
+                    register void (*callback)(struct SceneObject *) asm("r1") =
+                        Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1016,7 +1014,8 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
+                    register void (*callback)(struct SceneObject *) asm("r1") =
+                        Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1305,7 +1304,8 @@ struct SceneObjectManager *SceneObjects_CreateTask(void *a)
         return gUnk_02000024;
     p = Task_Create(8, 0x74);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update, (void (*)(void))SceneObjects_DestroyTask);
+        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update,
+                          (void (*)(void))SceneObjects_DestroyTask);
         p->count = Script_GetKeywordValue(0x6d, 8);
         if (SceneObjects_InitPool(p, a) < 0) {
             Task_Kill(p);
@@ -1356,9 +1356,9 @@ s32 TerrainOverlay_QueueAddActor(struct SceneBody *);
 static inline void initializeCell(void *cell, s32 index, s32 height)
 {
     TerrainModifiers_RegisterCell(cell, index, 0, height, 255, ({
-                     register s32 zero asm("r2") = 0;
-                     zero;
-                 }));
+                                      register s32 zero asm("r2") = 0;
+                                      zero;
+                                  }));
 }
 
 static inline void setStepFlags(struct SceneCollider *c)
@@ -1596,15 +1596,14 @@ s32 SceneObjects_CreateFromScript(void)
     return 0;
 }
 
-
 s32 SceneObjects_SwitchPaletteFromScript(void)
 {
     struct SceneObjectManager *manager = gUnk_02000024;
     struct SceneObject *p;
     struct SceneDraw *draw;
     s32 id, mode, sound;
-    if (!manager || !(id = Script_GetKeywordValue('n', 0)) || !(p = SceneObjects_FindByScriptId(manager, id)) ||
-        p->type != 6)
+    if (!manager || !(id = Script_GetKeywordValue('n', 0)) ||
+        !(p = SceneObjects_FindByScriptId(manager, id)) || p->type != 6)
         return -1;
     draw = &p->draw;
     mode = Script_GetKeywordValue('s', 0);

@@ -9,7 +9,8 @@ u8 *HealthBurstEffect_Create(u32 a, u32 b)
 {
     u8 *r = Task_Create(11, 0x354);
     if (r) {
-        Task_SetCallbacks(r, (void (*)(void))HealthBurstEffect_OnUpdate, (void (*)(void))sub_08235984);
+        Task_SetCallbacks(r, (void (*)(void))HealthBurstEffect_OnUpdate,
+                          (void (*)(void))sub_08235984);
         if (sub_08235C30(r, a, b) < 0) {
             Task_Kill(r);
             return 0;

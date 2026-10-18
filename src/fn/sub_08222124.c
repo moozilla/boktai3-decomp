@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepSixteenthArrayWithSnap: Steps signed halfword elements one sixteenth toward targets and snaps when the step magnitude is below the threshold */
 #define ScalarApproach_StepSixteenthArrayWithSnap sub_08222124
-#define ScalarApproach_Snap16Array sub_08222124
+#define ScalarApproach_Snap16Array                sub_08222124
 void ScalarApproach_Snap16Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
 {
     s32 initialLimit = threshold;

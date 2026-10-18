@@ -26,8 +26,8 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 void sub_08091E58(struct SceneActorBehaviorContactView *source,
-                                              struct SceneActorBehaviorContactView *destination,
-                                              struct SceneActorRegistryResetView *actor)
+                  struct SceneActorBehaviorContactView *destination,
+                  struct SceneActorRegistryResetView *actor)
 {
     register u32 index asm("r0");
     s32 power;

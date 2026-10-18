@@ -109,7 +109,7 @@ struct SceneActorRegistryResetView {
     u8 unknown274[8];
     void **callbacks27C, **callbacks280, **callbacks284;
     void **alternateBehaviorCallbacks; /* +0x288: indexed by behavior2AA. */
-    void **behaviorCallbacks; /* +0x28C: indexed by behavior2AA. */
+    void **behaviorCallbacks;          /* +0x28C: indexed by behavior2AA. */
     void **callbacks290, **callbacks294;
     void **phaseCallbacks; /* +0x298: indexed by phase2A9. */
     void **callbacks29C, **callbacks2A0;

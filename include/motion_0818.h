@@ -33,11 +33,11 @@ struct Motion0818Object {
     u8 pad160[0x70];
     void (*callback)(struct Motion0818Object *); /* +1d0 */
     u16 pad1D4;
-    s16 timer; /* +1d6 */
+    s16 timer;                 /* +1d6 */
     u8 targetRotation, pad1D9; /* +1d8: turn target */
-    s8 turnDirection; /* +1da: wrapping turn increment */
-    u8 done, pad1DC; /* +1db: phase-dependent signed turn-step count */
-    s8 byte1DD; /* +1dd: signed spin increment */
+    s8 turnDirection;          /* +1da: wrapping turn increment */
+    u8 done, pad1DC;           /* +1db: phase-dependent signed turn-step count */
+    s8 byte1DD;                /* +1dd: signed spin increment */
 };
 
 /* Packed temporary owner displacement used by the final motion segment. */

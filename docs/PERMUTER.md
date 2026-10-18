@@ -182,9 +182,24 @@ python3 tools/depin.py -j 4 --write $(grep -rl 'MATCHING_CONCESSION: register-pi
 build/venv/bin/python tools/pinfarm.py list --shards 4        # wip/farm/list.tsv, list-K.tsv, iso/
 for k in 0 1 2 3; do
   nohup nice -n 10 build/venv/bin/python tools/autosolve.py wip/farm/list-$k.tsv \
-    -j 1 --out wip/farm/out/s$k > wip/farm/shard$k.log 2>&1 &
+    -j 2 --fast --out wip/farm/out/s$k > wip/farm/shard$k.log 2>&1 &
 done
 ```
+
+`--fast` (2026-10-18) is what makes the farm practical. It checks each
+function with one compile and skips it if it is more than 64 halfwords away;
+in the sample those never reached the C search. Its budgets are counts, not
+seconds: rasolve stops after 5,000 compiles, translate after 2 steps with
+beam 2. Time budgets lost matches whenever other jobs loaded the machine.
+Every sample match came from the top beam states within two steps. On the
+40-function sample it keeps all 3 translations and runs at about 97 s per
+solved function per worker, at load 25-36. translate.py's neighbor
+generation is also 15-30 times faster: it copies only the edited function
+(a slot clone), not the whole preprocessed file, and reuses the printed
+text of the other top-level items. It produces the same neighbors, checked
+on 12 functions. autosolve also passes `-j` to rasolve, which otherwise
+used every core in every worker, and kills a timed-out run's process group,
+which left agbcc servers behind.
 
 Each worker appends to `wip/farm/out/sK/results.tsv` and skips functions
 already there, so a stopped worker restarts with the same command. Re-run

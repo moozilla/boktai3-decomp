@@ -6,8 +6,8 @@ struct Snapshot {
 extern struct Snapshot gUnk_030054D0;
 extern u32 gUnk_03004278, gUnk_03003A00, gUnk_03002608, gUnk_0300546C;
 extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
-void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void), m4aSoundVSyncOn(void),
-    Solar_PauseMeasurement(void), Solar_ResumeMeasurement(void);
+void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void),
+    m4aSoundVSyncOn(void), Solar_PauseMeasurement(void), Solar_ResumeMeasurement(void);
 u32 Save_SuspendRuntimeForTransfer(void)
 {
     gUnk_030054D0.a = gUnk_03004278;

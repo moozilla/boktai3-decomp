@@ -30,6 +30,6 @@ void SceneActorGraphics_InitializeBody(u8 *p)
         if (test)
             flags = 0x40800;
         Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0, flags,
-                     *(s16 *)(p + 0x360));
+                                     *(s16 *)(p + 0x360));
     }
 }

@@ -20,7 +20,8 @@ struct O {
     u32 w34;
 };
 
-void PositionMotion_InitParameterizedApproach(struct O *o, u32 d, struct P *a, u32 h1, u32 h2, u32 h3, u32 b1, u32 b2)
+void PositionMotion_InitParameterizedApproach(struct O *o, u32 d, struct P *a, u32 h1, u32 h2,
+                                              u32 h3, u32 b1, u32 b2)
 {
     if (o != 0 && d != 0 && a != 0) {
         o->w0 = d;

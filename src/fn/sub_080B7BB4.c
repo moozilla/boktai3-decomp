@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-
 static inline s32 SceneActorScript_GetValue(void)
 {
     if (Script_GetPc())
@@ -14,8 +13,7 @@ void SceneActorScript_ReadPParameters(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->context;
 
-    if (Script_SeekToKeyword('P'))
-    {
+    if (Script_SeekToKeyword('P')) {
         s32 i;
 
         for (i = 0; i <= 3; i++)

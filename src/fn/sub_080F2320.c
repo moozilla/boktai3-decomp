@@ -47,7 +47,8 @@ void sub_0821FF8C(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
-void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b, struct ColorPulse *p)
+void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
+                             struct ColorPulse *p)
 {
     if (p->callback == sub_080F421C)
         return;

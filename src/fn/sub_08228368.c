@@ -3,7 +3,8 @@ struct Args08228368 {
     u16 count;
     u32 *values;
 };
-void *Task_CreateFromHeapEnd(u32 list, u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
+void *Task_CreateFromHeapEnd(u32 list,
+                             u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
 void Task_SetCallbacks(void *, void *, void *);
 void sub_082282DC(u8 *);
 void DelayedScript_OnDestroy(u8 *);

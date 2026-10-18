@@ -25,7 +25,8 @@ void sub_0823EDDC(u8 *p)
     }
     resource = Player_GetConfiguredActionPower(p);
     AnimData_SelectPaletteBank(p + 0xb70, 76);
-    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero, *(u16 *)(p + 0xbfe));
+    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero,
+                                 *(u16 *)(p + 0xbfe));
     p[0xbce] = *angle;
     *(u16 *)(p + 0xc0a) = zero;
 }

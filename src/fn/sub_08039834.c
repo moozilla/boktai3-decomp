@@ -15,6 +15,8 @@ void WirelessGame_InitDisplayAndLinkCallbacks(struct Panel *p)
 {
     WirelessGameItems_Create(0, 0);
     p->task = WirelessGameDisplay_Create();
-    Wireless_SetTransferCallbacks(WirelessExchange_OnPacketSent, WirelessExchange_OnPacketReceived, WirelessExchange_OnSendFailure, WirelessExchange_OnReceiveFailure);
+    Wireless_SetTransferCallbacks(WirelessExchange_OnPacketSent, WirelessExchange_OnPacketReceived,
+                                  WirelessExchange_OnSendFailure,
+                                  WirelessExchange_OnReceiveFailure);
     WirelessLinkIndicator_SetPosition(4, 24);
 }

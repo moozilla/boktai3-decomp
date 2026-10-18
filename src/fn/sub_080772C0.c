@@ -35,7 +35,8 @@ done:
     asm("" : "+r"(result));
     return result;
 }
-void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *actor, const u16 *inputArgument)
+void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *actor,
+                                         const u16 *inputArgument)
 {
     const u16 *argument = inputArgument;
     u32 prior, currentFlags;

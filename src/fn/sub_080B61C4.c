@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "animated_hazard.h"
 
-
 struct VornData {
     u8 unknown0[0x678];
 };

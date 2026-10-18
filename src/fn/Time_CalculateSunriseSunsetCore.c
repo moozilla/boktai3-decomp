@@ -38,14 +38,17 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
         c.n[3] = 0;
         Time_CalculateSolarRiseTransitSet(&c, 1, midpoint, (s32)c.d[11], longitude, latitude);
         transit = c.d[1];
-        Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset), longitude, latitude);
+        Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset),
+                                          longitude, latitude);
     }
     {
         double old = c.d[0], current;
         middle = c.d[2];
-        Time_CalculateSolarRiseTransitSet(&c, 1, old, (s32)transform(old, offset), longitude, latitude);
+        Time_CalculateSolarRiseTransitSet(&c, 1, old, (s32)transform(old, offset), longitude,
+                                          latitude);
         current = c.d[0];
-        Time_CalculateSolarRiseTransitSet(&c, 1, current, (s32)transform(current, offset), longitude, latitude);
+        Time_CalculateSolarRiseTransitSet(&c, 1, current, (s32)transform(current, offset),
+                                          longitude, latitude);
         {
             double result = c.d[0], difference;
             if (current > result)
@@ -64,9 +67,11 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
         double old;
         double intermediate = (middle - 40000.0) * 1.002737909 + 0.671262;
         double offset2 = longitude / 360.0;
-        Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude, latitude);
+        Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude,
+                                          latitude);
         old = c.d[2];
-        Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude, latitude);
+        Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude,
+                                          latitude);
         {
             double result = c.d[2], difference;
             if (old > result)

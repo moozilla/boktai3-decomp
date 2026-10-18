@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepAngleByDivisor: Computes a divisor-controlled wrapped angle step with minimum-step and snap thresholds */
 #define ScalarApproach_StepAngleByDivisor sub_08221A48
-#define ScalarApproach_DivideAngleStep sub_08221A48
+#define ScalarApproach_DivideAngleStep    sub_08221A48
 s32 ScalarApproach_DivideAngleStep(s32 current, s32 target, s32 divisor)
 {
     s32 step, magnitude, near, integerStep;

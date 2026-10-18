@@ -65,7 +65,6 @@ u32 TerrainOverlay_QueueRemoveActor(u32 *p)
     return TerrainOverlay_QueueCommand(1, *p);
 }
 
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 void Sprite_LinkToList(struct TerrainOverlayDrawable *, s32);

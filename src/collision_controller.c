@@ -24,7 +24,7 @@ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *
 }
 
 void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
-                  struct CollisionSlot *slot)
+                                    struct CollisionSlot *slot)
 {
     u32 m = 0x4000;
     if ((collider->contactFlags2 & m) == 0) {

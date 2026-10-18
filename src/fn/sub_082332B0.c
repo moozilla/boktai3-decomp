@@ -5,7 +5,8 @@ struct Vec {
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec *, struct Vec *);
 void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, u32, u8 *);
-void ExplosionEffect_InitCollider(u8 *owner, u8 *emitter, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6)
+void ExplosionEffect_InitCollider(u8 *owner, u8 *emitter, u32 flag, s32 duration, s32 arg4,
+                                  s32 arg5, s32 arg6)
 {
     struct Vec scale, offset;
     u32 type;

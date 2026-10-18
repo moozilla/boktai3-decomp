@@ -93,7 +93,7 @@ void ChoiceMenu_ReloadFromScript(void);
                 f;                                                                                 \
             }) &&                                                                                  \
             length)                                                                                \
-            value = Text_ParseDecimal(p->scratch, length);                                              \
+            value = Text_ParseDecimal(p->scratch, length);                                         \
         else                                                                                       \
             value = 0;                                                                             \
         value;                                                                                     \
@@ -124,7 +124,7 @@ void ChoiceMenu_ReloadFromScript(void);
                 f;                                                                                 \
             }) &&                                                                                  \
             length) {                                                                              \
-            s32 value = Text_ParseDecimal(p->scratch, length);                                          \
+            s32 value = Text_ParseDecimal(p->scratch, length);                                     \
             register u8 *out asm("r2") = &p->explicitWidth;                                        \
             asm("" : : "r"(out));                                                                  \
             *out = value;                                                                          \

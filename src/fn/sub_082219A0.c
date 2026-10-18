@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepAngleEighth: Approaches the target along the wrapped angle difference by one eighth with a minimum unit step */
 #define ScalarApproach_StepAngleEighth sub_082219A0
-#define ScalarApproach_EighthAngle sub_082219A0
+#define ScalarApproach_EighthAngle     sub_082219A0
 s32 ScalarApproach_EighthAngle(s32 current, s32 target)
 {
     s16 angle = ((u32)current - (u32)target) & 255;
