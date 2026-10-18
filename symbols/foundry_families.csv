@@ -772,3 +772,4 @@ addr,function,name,family,note
 0816A4EC,sub_0816A4EC,ScenePanel_BeginSelection,"ScenePanel","resets sprite coordinates, starts keyframes and installs selection callback"
 0816A5A8,sub_0816A5A8,ScenePanel_BeginDetail,"ScenePanel","initializes detail sprites and installs detail callback"
 0816A700,sub_0816A700,StatusPanel_BeginAnimatedTransition,"StatusPanel","resets background, starts animation, plays sound, and switches callback"
+0816A7D8,sub_0816A7D8,MenuPrompt_RampDisplay,"MenuPrompt (tentative)","ramps paired display levels while stepping animation"
