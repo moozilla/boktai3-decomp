@@ -522,3 +522,4 @@ addr,function,name,family,note
 08176874,sub_08176874,SceneDialog_FindPreviousEnabledEntry,"SceneDialog","finds the previous enabled entry in a wrapping ten-entry list"
 081768AC,sub_081768AC,SceneDialog_UpdateEntryFade,"SceneDialog","updates a sixteen-tick fade and enters the next phase"
 08176928,sub_08176928,Hud_UpdateBlendRamp,"HudManager","advances blend ramp and changes phase after sixteen ticks"
+08176974,sub_08176974,SceneHud_UpdatePageInput,"SceneHud","updates page selection from shoulder buttons"
