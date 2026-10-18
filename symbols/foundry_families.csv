@@ -94,3 +94,4 @@ addr,function,name,family,note
 080C52BC,sub_080C52BC,Skeleton_ClearPendingFlag,"Skeleton","clears t->h628 bit 0x80000 unless f2B5==9, flags&0x100, or f2A8's low 24 bits ==0x200"
 080C62EC,sub_080C62EC,Skeleton_ClearDirectionalEntryFlag,"Skeleton","consumes the one-shot directional-entry flag to select a directional animation and clear restart, then clears the sequence's hE timer when h8==1"
 080D0E20,sub_080D0E20,SceneActor_UpdateAnimationCheckpoint,"scene actor animation","selects animation five and saves a timed checkpoint"
+080D0EBC,sub_080D0EBC,SceneActor_UpdateDirectionalAnimation,"scene actor animation","faces along motion and updates animation completion flags"
