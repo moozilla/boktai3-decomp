@@ -1404,3 +1404,4 @@ addr,function,name,family,note
 0813F784,sub_0813F784,ActorParameter_GetModeValue,"ActorParameter","looks up an actor parameter in one of two mode-dependent tables"
 0813F9EC,sub_0813F9EC,Player_SetActionRequest,"Player action requests","sets action request and resets its latch and timers"
 0819ED6C,sub_0819ED6C,Hresvelgr_UpdateBurstPhase,"Hresvelgr","starts animation and emits four directional effects"
+0819EFD0,sub_0819EFD0,Hresvelgr_UpdateAdjacentBurstPhase,"Hresvelgr","emits burst at adjacent directional offset"
