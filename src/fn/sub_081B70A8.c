@@ -2,25 +2,51 @@
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define VanargandProjectile_Create sub_081B70A8
+#define VanargandProjectile_Create     sub_081B70A8
 #define gVanargandProjectileProperties gUnk_08612114
 #include "global.h"
-struct ProjectilePosition { s16 x, y, z, pad; };
-struct ProjectileSprite { u32 flags; u8 pad4[0x18]; struct ProjectilePosition position; u8 tail[8]; };
-struct ProjectileCollider { u8 pad0[6]; u16 flags; u16 pad8, extent; u8 tail[0x48]; };
+struct ProjectilePosition {
+    s16 x, y, z, pad;
+};
+struct ProjectileSprite {
+    u32 flags;
+    u8 pad4[0x18];
+    struct ProjectilePosition position;
+    u8 tail[8];
+};
+struct ProjectileCollider {
+    u8 pad0[6];
+    u16 flags;
+    u16 pad8, extent;
+    u8 tail[0x48];
+};
 struct VanargandProjectile {
-    u8 entered, state, type; u8 pad3[3]; u16 timer;
-    u8 trailIndex, direction; u16 targetAngle, angle, steeringTimer, speed;
-    u8 pad12[2]; struct ProjectilePosition position, history[6];
-    u8 pad4c[8]; struct ProjectilePosition *target; u32 unknown58;
+    u8 entered, state, type;
+    u8 pad3[3];
+    u16 timer;
+    u8 trailIndex, direction;
+    u16 targetAngle, angle, steeringTimer, speed;
+    u8 pad12[2];
+    struct ProjectilePosition position, history[6];
+    u8 pad4c[8];
+    struct ProjectilePosition *target;
+    u32 unknown58;
     u8 angles[6], radii[6];
     struct ProjectileCollider collider, healthCollider;
-    struct ProjectileSprite sprites[6]; u8 animation[0x1c];
+    struct ProjectileSprite sprites[6];
+    u8 animation[0x1c];
 };
-struct VanargandProjectilePool { u8 pad0[0x18]; u32 activeMask; u16 attack; };
-struct ProjectileProperties { s32 first, second; };
+struct VanargandProjectilePool {
+    u8 pad0[0x18];
+    u32 activeMask;
+    u16 attack;
+};
+struct ProjectileProperties {
+    s32 first, second;
+};
 extern const struct ProjectileProperties gUnk_08612114[];
-struct VanargandProjectile *VanargandProjectilePool_FindFreeSlot(struct VanargandProjectilePool *, s32 *);
+struct VanargandProjectile *VanargandProjectilePool_FindFreeSlot(struct VanargandProjectilePool *,
+                                                                 s32 *);
 void Sprite_LinkToList(void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Collider_SetPosition(void *, void *, u32);
@@ -35,7 +61,8 @@ s32 sub_081B70A8(struct VanargandProjectilePool *pool, struct ProjectilePosition
     s32 i;
     struct ProjectileCollider *attack, *body;
     struct ProjectilePosition *pos;
-    if (!projectile) return -1;
+    if (!projectile)
+        return -1;
     {
         u32 zero = 0;
         projectile->state = zero;
@@ -69,10 +96,11 @@ s32 sub_081B70A8(struct VanargandProjectilePool *pool, struct ProjectilePosition
     body->flags |= 4;
     attack->extent = 16;
     body->extent = 16;
-    { s32 property = gUnk_08612114[projectile->type].first;
-    Collider_SetAttackProperties(attack, pool->attack, 30, 16, property, 30); }
-    Collider_SetBodyProperties(body, 0,
-                               gUnk_08612114[projectile->type].first,
+    {
+        s32 property = gUnk_08612114[projectile->type].first;
+        Collider_SetAttackProperties(attack, pool->attack, 30, 16, property, 30);
+    }
+    Collider_SetBodyProperties(body, 0, gUnk_08612114[projectile->type].first,
                                gUnk_08612114[projectile->type].second);
     pool->activeMask |= 1 << index;
     return 0;

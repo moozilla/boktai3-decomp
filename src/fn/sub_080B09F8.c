@@ -50,7 +50,8 @@ void sub_080B09F8(struct SceneActorRegistryResetView *p)
         *flags = mask & *flags;
         SceneActorAnimation_SelectDirectionalEntry((void *)p, 0);
         sub_080B2858(p, 1);
-    } else ++p->counter2AC;
+    } else
+        ++p->counter2AC;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080B09F8);

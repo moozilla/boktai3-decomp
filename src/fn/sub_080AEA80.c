@@ -18,12 +18,14 @@ static inline u8 ConsumeFlag(struct SceneActorAnimationView *p)
 static inline u8 LinkActive(struct SceneActorAnimationLink *p)
 {
     u32 mask = 0x40;
-    if (p->flags & mask) return 1;
+    if (p->flags & mask)
+        return 1;
     return 0;
 }
 static inline s32 AngleIndex(s32 angle)
 {
-    if (angle >= 0) return angle >> 5;
+    if (angle >= 0)
+        return angle >> 5;
     return -((-angle) >> 5);
 }
 static inline s32 RandomByte(void)
@@ -53,7 +55,8 @@ void sub_080AEA80(struct SceneActorAnimationView *p)
                 else
                     SceneActorAnimation_SelectDirectionalEntry(p, 0);
             }
-        } else SceneActorAnimation_SelectDirectionalEntry(p, 1);
+        } else
+            SceneActorAnimation_SelectDirectionalEntry(p, 1);
     }
 }
 #else

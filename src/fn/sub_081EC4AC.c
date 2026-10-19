@@ -3,8 +3,8 @@
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define ActorEffect_SpawnBurstAtAnchor sub_081EC4AC
-#define gEffectRandomIndex gUnk_03005304
-#define gEffectRandomTable gUnk_086141BC
+#define gEffectRandomIndex             gUnk_03005304
+#define gEffectRandomTable             gUnk_086141BC
 #include "global.h"
 struct BurstActor {
     u8 pad0[0x268];
@@ -17,8 +17,14 @@ struct BurstActor {
 };
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-struct EffectVector { s32 x:16; s32 y:16; s32 z:16; s32 unused:16; };
-void sub_08113398(struct EffectVector *, struct EffectVector *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+struct EffectVector {
+    s32 x : 16;
+    s32 y : 16;
+    s32 z : 16;
+    s32 unused : 16;
+};
+void sub_08113398(struct EffectVector *, struct EffectVector *, u32, u32, u32, u32, u32, u32, u32,
+                  u32, u32, u32, u32, u32);
 void sub_081EC4AC(struct BurstActor *actor, u32 variant)
 {
     struct EffectVector position;
@@ -32,9 +38,11 @@ void sub_081EC4AC(struct BurstActor *actor, u32 variant)
     velocity.y = -(gUnk_086141BC[gUnk_03005304] & 1);
     velocity.z = 0;
     if (variant == 0)
-        sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 5, 0, 0, 0, 2, 42, 0, 512, 1, 0);
+        sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 5, 0, 0, 0, 2, 42, 0,
+                     512, 1, 0);
     else
-        sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 6, 0, 0, 0, 2, 30, 0, 512, 1, 0);
+        sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 6, 0, 0, 0, 2, 30, 0,
+                     512, 1, 0);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081EC4AC);

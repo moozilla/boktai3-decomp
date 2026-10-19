@@ -17,10 +17,16 @@ void Vorn_SpawnHazard(struct SceneActorRegistryResetView *, s32);
 void sub_080B7C10(struct SceneActorRegistryResetView *);
 static inline u8 TakeReady(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) { actor->field2B1 = 0; return 1; }
+    if (actor->field2B1) {
+        actor->field2B1 = 0;
+        return 1;
+    }
     return 0;
 }
-static inline void ClearFlags(u16 *p, u32 mask) { *p &= mask; }
+static inline void ClearFlags(u16 *p, u32 mask)
+{
+    *p &= mask;
+}
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u32 zero)
 {
     u8 code = 3;
@@ -31,7 +37,9 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
     }
     do {
         u32 field = 0x2B0;
-        do { ((u8 *)actor)[field] = zero8; } while (0);
+        do {
+            ((u8 *)actor)[field] = zero8;
+        } while (0);
         field += 5;
         ((u8 *)actor)[field] = code;
         actor->target = fn;

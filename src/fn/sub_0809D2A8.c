@@ -19,8 +19,12 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
     mask &= attr;
     height = mask << 8;
     switch (kind) {
-    case 1: height -= ((u8 *)p)[4]; break;
-    case 2: height -= ((u8 *)p)[0]; break;
+        case 1:
+            height -= ((u8 *)p)[4];
+            break;
+        case 2:
+            height -= ((u8 *)p)[0];
+            break;
     }
     return height;
 }

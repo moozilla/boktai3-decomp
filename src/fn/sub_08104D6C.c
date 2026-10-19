@@ -3,7 +3,7 @@
 // fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define CallbackPool_UpdateEntries sub_08104D6C
-#define gCallbackPoolUpdateTable gUnk_086064E8
+#define gCallbackPoolUpdateTable   gUnk_086064E8
 #include "global.h"
 
 #include "callback_pool.h"
@@ -11,7 +11,8 @@ extern void *gUnk_086064E8[];
 s32 sub_08249240(void *, void *, void *);
 static inline u8 CallbackPool_IsActive(u32 *mask, s32 i)
 {
-    if (*mask & (1 << i)) return TRUE;
+    if (*mask & (1 << i))
+        return TRUE;
     return FALSE;
 }
 s32 sub_08104D6C(struct CallbackPool *pool)

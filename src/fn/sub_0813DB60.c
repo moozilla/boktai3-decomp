@@ -14,7 +14,8 @@ u32 sub_0813DB60(struct ActorBlinkState *s, u32 value)
     u16 *timer = &s->timer;
     if (*timer) {
         (*timer)--;
-        if ((*timer >> 2) & 1) goto alternate;
+        if ((*timer >> 2) & 1)
+            goto alternate;
     }
     return value;
 alternate:

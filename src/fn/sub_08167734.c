@@ -5,9 +5,16 @@
 #define PlayerPanel_RemoveEffects sub_08167734
 #include "global.h"
 #include "engine.h"
-struct PanelParticle { u8 unknown[0x40]; };
-struct PanelParticleGroup { struct PanelParticle particles[8]; u8 unknown200[8]; };
-struct PanelEffect { u8 unknown[0x28]; };
+struct PanelParticle {
+    u8 unknown[0x40];
+};
+struct PanelParticleGroup {
+    struct PanelParticle particles[8];
+    u8 unknown200[8];
+};
+struct PanelEffect {
+    u8 unknown[0x28];
+};
 struct PlayerPanel {
     u8 unknown0[0x4458];
     struct PanelParticleGroup groups[2];
@@ -21,13 +28,19 @@ void sub_08167734(struct PlayerPanel *panel)
     s32 i;
     do {
         struct PanelParticle *particle = (struct PanelParticle *)((u8 *)panel + (offset + 0x4458));
-        for (i = 7; i >= 0; i--) { Effect_Remove(particle); particle++; }
+        for (i = 7; i >= 0; i--) {
+            Effect_Remove(particle);
+            particle++;
+        }
         group++;
         offset += 0x208;
     } while (group < 2);
     {
         struct PanelEffect *effect = panel->effects;
-        for (group = 3; group >= 0; group--) { Effect_Remove(effect); effect++; }
+        for (group = 3; group >= 0; group--) {
+            Effect_Remove(effect);
+            effect++;
+        }
     }
 }
 #else

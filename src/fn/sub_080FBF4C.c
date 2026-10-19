@@ -3,10 +3,10 @@
 // fuzzy: 94.3%
 // foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
 #define ActorRoute_SelectDistantPoint sub_080FBF4C
-#define ActorRoute_RememberPoint Axe_RecordRoutePoint
-#define ActorRoute_IsRecentPoint Axe_IsRoutePointRecent
-#define gRandomTableIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define ActorRoute_RememberPoint      Axe_RecordRoutePoint
+#define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
+#define gRandomTableIndex             gUnk_03005308
+#define gRandomTable                  gUnk_0203B400
 #include "global.h"
 #include "scene_actor_reset.h"
 struct RoutePointSelection {
@@ -16,10 +16,10 @@ struct RoutePointSelection {
     u16 *entry;
 };
 struct RouteSelectionPosition {
-    s32 x:16;
-    s32 y:16;
-    s32 z:16;
-    s32 pad:16;
+    s32 x : 16;
+    s32 y : 16;
+    s32 z : 16;
+    s32 pad : 16;
 };
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
@@ -39,7 +39,10 @@ void sub_080FBF4C(struct SceneActorRegistryResetView *actor, struct ContactPosit
     struct RoutePointSelection point;
     struct RouteSelectionPosition delta;
     s32 bestDistance, i, distance;
-    union { s32 value; u8 bytes[4]; } bestIndex;
+    union {
+        s32 value;
+        u8 bytes[4];
+    } bestIndex;
     Route_Start((void *)&route, *(s16 *)((u8 *)actor->context + 0xeb6), 0, 0);
     bestDistance = 0;
     bestIndex.value = -1;

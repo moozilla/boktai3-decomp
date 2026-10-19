@@ -3,8 +3,8 @@
 // fuzzy: 94.4%
 // foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
 #define Armor_UpdateStrafeWithMotion sub_08182B14
-#define gArmorAnimTable3 gUnk_0824EBB4
-#define gSineTable gUnk_086149C4
+#define gArmorAnimTable3             gUnk_0824EBB4
+#define gSineTable                   gUnk_086149C4
 #include "global.h"
 
 struct ActorAnimationFlags {

@@ -2,10 +2,10 @@
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 87.3%); what differs is mostly register allocation and instruction order
-#define AnimatedBodyPool_Destroy sub_0812286C
+#define AnimatedBodyPool_Destroy       sub_0812286C
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
-#define SceneBody_Release SceneBody_Unregister
-#define gAnimatedBodyPool gUnk_02000140
+#define SceneBody_Release              SceneBody_Unregister
+#define gAnimatedBodyPool              gUnk_02000140
 #include "global.h"
 
 struct AnimatedBodySlot {
@@ -14,7 +14,10 @@ struct AnimatedBodySlot {
     u16 flags;
     u16 unk142;
 };
-struct AnimatedBodyFlagsView { u16 flags; u8 unk02[0x142]; };
+struct AnimatedBodyFlagsView {
+    u16 flags;
+    u8 unk02[0x142];
+};
 struct AnimatedBodyPool {
     u8 unk00[0x3c];
     struct AnimatedBodySlot slots[4];

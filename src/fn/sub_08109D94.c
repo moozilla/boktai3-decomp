@@ -3,7 +3,7 @@
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define ScriptPanel_ConfirmSelection sub_08109D94
-#define ScriptPanel_SetSelection Registry1745_SetMenuRequest
+#define ScriptPanel_SetSelection     Registry1745_SetMenuRequest
 #include "global.h"
 struct ScriptPanel {
     u8 unk0[0x23];
@@ -30,10 +30,14 @@ s32 sub_08109D94(struct ScriptPanel *p)
         base = p->buttons;
         zero = 0;
         button = &p->buttons[3];
-        do { *button-- = zero; } while ((s32)button >= (s32)base);
+        do {
+            *button-- = zero;
+        } while ((s32)button >= (s32)base);
     }
-    if (p->counter > 10) Registry1745_SetMenuRequest(3);
-    if (p->selection != 3) return 0;
+    if (p->counter > 10)
+        Registry1745_SetMenuRequest(3);
+    if (p->selection != 3)
+        return 0;
     Script_Call(p->script, 0);
     Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
     p->selection = 0;

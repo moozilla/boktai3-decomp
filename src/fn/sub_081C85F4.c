@@ -82,8 +82,7 @@ void sub_081C85F4(u32 a, struct S *p, s32 a2)
         Sound_PlaySong(0x577);
     }
     switch (p->b18) {
-        case 0:
-        {
+        case 0: {
             s32 color;
             s16 base;
             s32 hi;
@@ -94,22 +93,21 @@ void sub_081C85F4(u32 a, struct S *p, s32 a2)
                 goto colorUpper;
             color = 0x40;
             goto colorDone;
-colorUpper:
+        colorUpper:
             if (a2 < 0x78)
                 goto colorCompute;
             color = 0;
             goto colorDone;
-colorCompute:
-            {
-                s32 t = a2 * (s32)0xFFFFC000;
-                t = __divsi3(t, 0x78);
-                if (t < 0)
-                    t = -(-t >> 8);
-                else
-                    t = t >> 8;
-                color = t + 0x40;
-            }
-colorDone:
+        colorCompute: {
+            s32 t = a2 * (s32)0xFFFFC000;
+            t = __divsi3(t, 0x78);
+            if (t < 0)
+                t = -(-t >> 8);
+            else
+                t = t >> 8;
+            color = t + 0x40;
+        }
+        colorDone:
             DisplayAnimation_SetPalette(p->d4, color, color, 0);
             base = p->h56;
             hi = base + 0x40;
@@ -117,26 +115,25 @@ colorDone:
                 goto posUpper;
             r2 = base;
             goto posDone;
-posUpper:
+        posUpper:
             if (a2 < 0x78)
                 goto posCompute;
             r2 = hi;
             goto posDone;
-posCompute:
-            {
-                s32 d = hi - base;
-                d = d << 8;
-                d = __divsi3(d * a2, 0x78);
-                if (d < 0)
-                    d = -(-d >> 8);
-                else
-                    d = d >> 8;
-                r2 = base + d;
-            }
-posDone:
+        posCompute: {
+            s32 d = hi - base;
+            d = d << 8;
+            d = __divsi3(d * a2, 0x78);
+            if (d < 0)
+                d = -(-d >> 8);
+            else
+                d = d >> 8;
+            r2 = base + d;
+        }
+        posDone:
             p->h6a = r2;
             break;
-finalize:
+        finalize:
             DisplayAnimation_SetPalette(p->d4, 0x40, 0x40, 0);
             DisplayAnimation_ClearFlags(p->d4, 2);
             sub_081FED40(base20[1]);
@@ -147,8 +144,7 @@ finalize:
             }
             break;
         }
-        case 1:
-        {
+        case 1: {
             u16 mask = 0x100;
             p->h0e |= mask;
             p->b7 = 1;

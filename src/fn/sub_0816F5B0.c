@@ -16,7 +16,10 @@ void SceneHud_ShowActionPreview(void *);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
-static inline s32 MaskFrame(s32 mask, u16 frame) { return mask & frame; }
+static inline s32 MaskFrame(s32 mask, u16 frame)
+{
+    return mask & frame;
+}
 void sub_0816F5B0(struct SceneHudState *s)
 {
     u16 frame;

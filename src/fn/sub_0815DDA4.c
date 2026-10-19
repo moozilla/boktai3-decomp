@@ -2,8 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 99.3%
 // foundry draft (worker best 99.3%); what differs is mostly register allocation and instruction order
-#define PlayerCue_InitAttackCollider sub_0815DDA4
-#define PlayerCue_ComputeColliderPower Player_ScaleLevelValue
+#define PlayerCue_InitAttackCollider    sub_0815DDA4
+#define PlayerCue_ComputeColliderPower  Player_ScaleLevelValue
 #define PlayerCue_RecordColliderContact Player_OnStateOneEvent
 #include "global.h"
 #include "player.h"
@@ -23,16 +23,17 @@ void sub_0815DDA4(struct Player *p, void *position, u32 flags, s32 scale)
     offset.x = 0;
     offset.y = 120;
     offset.z = 0;
-    Collider_Init(collider, 0, 0x2001, 0, (0x10000u << p->movementRequestBlocked) >> 16, &size, &offset);
+    Collider_Init(collider, 0, 0x2001, 0, (0x10000u << p->movementRequestBlocked) >> 16, &size,
+                  &offset);
     if (gUnk_030053F4 & 0x1000) {
         s32 bonus = gUnk_02000710->unk874;
         s32 level = gUnk_02000710->level;
         bonus += 50;
         bonus = bonus + level;
         Collider_SetAttackProperties(collider, bonus, 40, 16, 0x40000, 10);
-    }
-    else
-        Collider_SetAttackProperties(collider, Player_ScaleLevelValue(flags, scale), 40, 1, flags | 0x40000, 10);
+    } else
+        Collider_SetAttackProperties(collider, Player_ScaleLevelValue(flags, scale), 40, 1,
+                                     flags | 0x40000, 10);
     Collider_SetCallback(collider, Player_OnStateOneEvent, p);
     Collider_SetPosition(collider, position, 0);
     p->cueColliderPhase = 6;

@@ -33,8 +33,10 @@ void sub_080B0850(struct SceneActorRegistryResetView *p)
         SelectControl(p, control, kind);
     }
     if (sub_080B335C(p)) {
-        if ((u8)Callback_InvokeActor(p, p->update270)) return;
-        if (sub_0812F3CC(p)) return;
+        if ((u8)Callback_InvokeActor(p, p->update270))
+            return;
+        if (sub_0812F3CC(p))
+            return;
     }
     if (PhaseComplete(p)) {
         u32 state = 3;
@@ -60,15 +62,16 @@ void sub_080B0850(struct SceneActorRegistryResetView *p)
                 *flags &= mask;
             }
             {
-            u16 duration = 40;
-            p->word104 = (u32)sub_080AE940;
-            p->word108 = zero;
-            p->word10C = zero;
-            p->word110 = duration;
-            *flags = one;
+                u16 duration = 40;
+                p->word104 = (u32)sub_080AE940;
+                p->word108 = zero;
+                p->word10C = zero;
+                p->word110 = duration;
+                *flags = one;
             }
         }
-    } else ++p->counter2AC;
+    } else
+        ++p->counter2AC;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080B0850);

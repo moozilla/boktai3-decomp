@@ -17,7 +17,8 @@ void sub_0818E9B8(struct SpriteColliderGroup *p, s32 requested)
     s32 i;
     struct SpriteColliderPartState *part;
     i = 0;
-    if (i >= p->count) return;
+    if (i >= p->count)
+        return;
     part = (struct SpriteColliderPartState *)((u8 *)p + 0x119);
     for (; i < p->count; part++, i++) {
         if (!part->active) {

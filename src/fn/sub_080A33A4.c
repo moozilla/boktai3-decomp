@@ -7,7 +7,10 @@
 #include "scene_actor_reset.h"
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
-    if (s->field2B1) { s->field2B1 = 0; return 1; }
+    if (s->field2B1) {
+        s->field2B1 = 0;
+        return 1;
+    }
     return 0;
 }
 void sub_080A33A4(struct SceneActorRegistryResetView *s)
@@ -23,7 +26,11 @@ void sub_080A33A4(struct SceneActorRegistryResetView *s)
         s->field2B5 = two;
         s->target = fn;
         s->field2C8 = zero;
-        { u32 *flags = &s->flags114; s32 mask = -2; *flags &= mask; }
+        {
+            u32 *flags = &s->flags114;
+            s32 mask = -2;
+            *flags &= mask;
+        }
         s->word104 = zero;
     } else if (s->field2B0) {
         u8 *group = (u8 *)s + 0x3D4;
@@ -42,9 +49,15 @@ void sub_080A33A4(struct SceneActorRegistryResetView *s)
         s->field2B5 = kind;
         s->target = fn;
         s->field2C8 = entered;
-        { u32 *flags = &s->flags114; s32 mask = -2; *flags &= mask; }
+        {
+            u32 *flags = &s->flags114;
+            s32 mask = -2;
+            *flags &= mask;
+        }
         s->word104 = entered;
-    } else { ++s->counter2AC; }
+    } else {
+        ++s->counter2AC;
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080A33A4);

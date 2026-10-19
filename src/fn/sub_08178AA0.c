@@ -3,12 +3,15 @@
 // fuzzy: 92.0%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
 #define SceneHud_InitializeOwner sub_08178AA0
-#define gSceneHud gUnk_02000214
-#define gSceneHudOwnerSource gUnk_020004B4
-#define gPartyActors gUnk_02000580
+#define gSceneHud                gUnk_02000214
+#define gSceneHudOwnerSource     gUnk_020004B4
+#define gPartyActors             gUnk_02000580
 #include "global.h"
 #include "scene_hud_display.h"
-struct SceneHudOwnerSource { u8 unknown0[0x18]; s16 index; };
+struct SceneHudOwnerSource {
+    u8 unknown0[0x18];
+    s16 index;
+};
 extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
 extern struct Player *gPartyActors[];
 extern struct SceneHudState *gSceneHud;
@@ -18,7 +21,8 @@ void SceneHud_InitGameplayResources(struct SceneHudState *);
 void SceneHud_RefreshGameplayDisplay(struct SceneHudState *);
 static inline s32 OwnerIndex(void)
 {
-    if (!gSceneHudOwnerSource) return -1;
+    if (!gSceneHudOwnerSource)
+        return -1;
     return gSceneHudOwnerSource->index;
 }
 s32 sub_08178AA0(struct SceneHudState *s)

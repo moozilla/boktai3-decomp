@@ -3,11 +3,11 @@
 // fuzzy: 99.1%
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_RevealWhenCellVacant sub_081B7A2C
-#define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect
-#define gPlayers gUnk_02000580
-#define gTerrainMap gUnk_030052F4
-#define gTerrainWidth gUnk_030052F8
-#define gTerrainHeight gUnk_030052FC
+#define GrowthHazard_EmitRevealEffects    GrowthHazard_PlayImpactEffect
+#define gPlayers                          gUnk_02000580
+#define gTerrainMap                       gUnk_030052F4
+#define gTerrainWidth                     gUnk_030052F8
+#define gTerrainHeight                    gUnk_030052FC
 #include "global.h"
 #include "engine.h"
 #include "player.h"

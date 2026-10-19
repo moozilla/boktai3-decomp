@@ -3,7 +3,7 @@
 // fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 #define MenuPanel_CyclePage sub_081BD9A0
-#define gMenuKeys gUnk_03005260
+#define gMenuKeys           gUnk_03005260
 #include "global.h"
 struct MenuPanel {
     u8 pad0[0x1754];

@@ -4,10 +4,16 @@
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
 #define ActorPalette_LoadScriptBanks sub_0818171C
 #include "global.h"
-struct ActorPaletteSource { u8 unknown0[0x74]; u16 banks[3][16]; };
+struct ActorPaletteSource {
+    u8 unknown0[0x74];
+    u16 banks[3][16];
+};
 struct ActorPaletteOwner {
     u8 unknown0[0x650];
-    struct { u32 callbacks[2]; u16 banks[16][16]; } palettes;
+    struct {
+        u32 callbacks[2];
+        u16 banks[16][16];
+    } palettes;
     u8 unknown858[0x282];
     u8 selected;
 };

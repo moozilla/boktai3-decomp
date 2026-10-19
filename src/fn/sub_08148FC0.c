@@ -131,30 +131,30 @@ void sub_08148FC0(u8 *p)
         }
     }
     if (*(u16 *)(p + 0x404) == 2) {
-      u16 z = *(u16 *)(p + 0x40a);
-      u8 *fx;
-      if (z == 0) {
-        fx = p + 0x30;
-        if (RepeatedEffect_RequestNearby(fx)) {
-            if (p[0x46a]) {
-                p[0x46a] = z;
-                Player_PlayPositionEffect(p, fx, 1, 1, fx, z, 0x163);
+        u16 z = *(u16 *)(p + 0x40a);
+        u8 *fx;
+        if (z == 0) {
+            fx = p + 0x30;
+            if (RepeatedEffect_RequestNearby(fx)) {
+                if (p[0x46a]) {
+                    p[0x46a] = z;
+                    Player_PlayPositionEffect(p, fx, 1, 1, fx, z, 0x163);
+                } else {
+                    p[0x46a] = 1;
+                    Player_PlayPositionEffect(p, fx, 1, 1, fx, 0, 0x162);
+                }
             } else {
-                p[0x46a] = 1;
-                Player_PlayPositionEffect(p, fx, 1, 1, fx, 0, 0x162);
+                if (p[0x46a]) {
+                    p[0x46a] = 0;
+                    Sound_PlaySong(0xc7);
+                } else {
+                    p[0x46a] = 1;
+                    Sound_PlaySong(0xc8);
+                }
+                if (global_bit())
+                    Player_PlayPositionEffect(p, fx, 1, 2, 0, 0, 0);
             }
-        } else {
-            if (p[0x46a]) {
-                p[0x46a] = 0;
-                Sound_PlaySong(0xc7);
-            } else {
-                p[0x46a] = 1;
-                Sound_PlaySong(0xc8);
-            }
-            if (global_bit())
-                Player_PlayPositionEffect(p, fx, 1, 2, 0, 0, 0);
         }
-      }
     }
 }
 #else

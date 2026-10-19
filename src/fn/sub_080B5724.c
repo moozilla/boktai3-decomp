@@ -3,7 +3,7 @@
 // fuzzy: 97.4%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_RestartBehavior57 sub_080B5724
-#define SceneActorControl_EnterResetMode SceneActorPlacement_ResetActorState
+#define SceneActorControl_EnterResetMode    SceneActorPlacement_ResetActorState
 #include "global.h"
 #include "scene_actor_reset.h"
 void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);

@@ -4,12 +4,21 @@
 // foundry draft (worker best 94.1%); what differs is mostly register allocation and instruction order
 #define LargeEffectPool_AllocateSlot sub_0812B084
 
-struct LargeEffectPoolSlot { u8 unknown[0x177]; u8 index; u8 tail[0x14]; };
-struct LargeEffectPool { u8 unknown[0x1C]; u32 used; struct LargeEffectPoolSlot slots[8]; };
+struct LargeEffectPoolSlot {
+    u8 unknown[0x177];
+    u8 index;
+    u8 tail[0x14];
+};
+struct LargeEffectPool {
+    u8 unknown[0x1C];
+    u32 used;
+    struct LargeEffectPoolSlot slots[8];
+};
 void Memory_Clear(void *, u32);
 static inline u8 LargeEffectPool_IsUsed(u32 *used, u32 mask)
 {
-    if (*used & mask) return TRUE;
+    if (*used & mask)
+        return TRUE;
     return FALSE;
 }
 struct LargeEffectPoolSlot *sub_0812B084(u8 *pool)

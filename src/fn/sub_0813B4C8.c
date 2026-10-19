@@ -21,14 +21,16 @@ void sub_0813B4C8(struct Player *p)
         i = 2;
         do {
             *dest = stats[0] + stats[4];
-            if (*dest > 120) *dest = cap;
+            if (*dest > 120)
+                *dest = cap;
             dest++;
             stats++;
         } while (--i >= 0);
     } else {
         s32 level = gUnk_02000710->level + 10;
         s32 remainder, quotient, value;
-        if (level > 99) level = 99;
+        if (level > 99)
+            level = 99;
         remainder = level - 1;
         remainder *= 2;
         quotient = Div(remainder, 3);
@@ -44,7 +46,8 @@ void sub_0813B4C8(struct Player *p)
                 (*dest)++;
                 remainder--;
             }
-            if (*dest > 120) *dest = cap;
+            if (*dest > 120)
+                *dest = cap;
             dest++;
             stats++;
         } while (--i >= 0);

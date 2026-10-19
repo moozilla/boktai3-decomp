@@ -48,19 +48,21 @@ void sub_0818CB30(struct ArmorPart *p)
     p->z = parent->orbitZ + Div(sine[*angle] * 200, 4096);
     if (--p->timer == zero) {
         state = parent->state;
-        if (state == 3) goto change;
+        if (state == 3)
+            goto change;
         if (state <= 3) {
-            if (state == 2) goto change;
+            if (state == 2)
+                goto change;
             return;
         }
-        if (state != 4) return;
-        change:
-        {
-            u8 one = 1;
-            p->byte11E = one;
-            p->byte11F = state;
-            p->flags119 |= one;
-        }
+        if (state != 4)
+            return;
+    change: {
+        u8 one = 1;
+        p->byte11E = one;
+        p->byte11F = state;
+        p->flags119 |= one;
+    }
     }
 }
 #else

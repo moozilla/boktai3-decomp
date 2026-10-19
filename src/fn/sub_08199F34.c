@@ -2,16 +2,20 @@
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // foundry draft (worker best 91.0%); what differs is mostly register allocation and instruction order
-#define CannonBattery_InitProjectile sub_08199F34
-#define gCannonBatteryProjectileSize gUnk_0824F6E8
+#define CannonBattery_InitProjectile   sub_08199F34
+#define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
 #include "global.h"
 #include "engine.h"
-struct CannonBatteryPosition { s16 x, y, z, unk6; };
+struct CannonBatteryPosition {
+    s16 x, y, z, unk6;
+};
 struct CannonBatteryCollider {
     u8 unk0[0x14];
     struct CannonBatteryPosition size, offset;
-    u8 unk24[0x1E]; u8 direction; u8 unk43[0x11];
+    u8 unk24[0x1E];
+    u8 direction;
+    u8 unk43[0x11];
 };
 struct CannonBatteryProjectile {
     u32 update, destroy;
@@ -19,9 +23,13 @@ struct CannonBatteryProjectile {
     struct CannonBatteryPosition position;
     u8 unk48[8], sequence[0x10];
     struct CannonBatteryCollider collider;
-    u16 startCoordinate; u8 direction, unkB7;
+    u16 startCoordinate;
+    u8 direction, unkB7;
 };
-struct CannonBatteryPool { u8 unk0[0x20]; u16 attack, attackFlags; };
+struct CannonBatteryPool {
+    u8 unk0[0x20];
+    u16 attack, attackFlags;
+};
 u32 CannonBattery_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
@@ -34,7 +42,8 @@ static inline void CannonBattery_SetProjectileShape(struct CannonBatteryCollider
     collider->size = gUnk_0824F6E8;
     collider->offset = gUnk_0824F6F0;
 }
-void sub_08199F34(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p, struct CannonBatteryPosition *origin, s32 horizontal)
+void sub_08199F34(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
+                  struct CannonBatteryPosition *origin, s32 horizontal)
 {
     void *resource = (void *)CannonBattery_LoadAnimation();
     struct CannonBatteryCollider *collider;
@@ -58,11 +67,17 @@ void sub_08199F34(struct CannonBatteryPool *pool, struct CannonBatteryProjectile
     CannonBattery_SetProjectileShape(collider);
     if (horizontal) {
         p->direction = 0x10;
-        { u32 direction = 0x80; p->collider.direction = direction; }
+        {
+            u32 direction = 0x80;
+            p->collider.direction = direction;
+        }
         p->startCoordinate = p->position.x;
     } else {
         p->direction = 0;
-        { u32 direction = 0xC0; p->collider.direction = direction; }
+        {
+            u32 direction = 0xC0;
+            p->collider.direction = direction;
+        }
         p->startCoordinate = p->position.z;
     }
     Collider_SetCallback(collider, CannonBattery_OnProjectileCollision, p);

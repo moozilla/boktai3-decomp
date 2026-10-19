@@ -24,7 +24,8 @@ struct SceneActorAttachment {
 };
 void sub_08180570(struct SceneActorAttachment *p)
 {
-    if (p->flags & 1) Sound_PlaySong(0x202);
+    if (p->flags & 1)
+        Sound_PlaySong(0x202);
     p->flags &= ~1;
     p->position = p->targetPosition;
     {

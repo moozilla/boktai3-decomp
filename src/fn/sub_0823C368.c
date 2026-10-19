@@ -12,17 +12,21 @@ s32 sub_0823C368(struct Player *s)
     direction = history[1];
     if (direction != -1) {
         if (direction & 1) {
-returnDirection:
+        returnDirection:
             return direction;
         }
         clockwise = (direction + 1) & 7;
         counterclockwise = (direction + 7) & 7;
         for (i = 2; i < 10; i++) {
             previous = history[i];
-            if (previous == -1) continue;
-            if (previous == clockwise) return previous;
-            if (previous == counterclockwise) return previous;
-            if (previous != direction) goto returnDirection;
+            if (previous == -1)
+                continue;
+            if (previous == clockwise)
+                return previous;
+            if (previous == counterclockwise)
+                return previous;
+            if (previous != direction)
+                goto returnDirection;
         }
     }
     return s->facing;

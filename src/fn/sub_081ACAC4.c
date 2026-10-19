@@ -15,7 +15,7 @@ struct Vanargand {
     u8 finished;
     u8 padB0;
     u8 pending;
-    u8 padB2[0xf18-0xb2];
+    u8 padB2[0xf18 - 0xb2];
     u32 counterF18;
     u32 counterF1C;
     u16 delayF20;

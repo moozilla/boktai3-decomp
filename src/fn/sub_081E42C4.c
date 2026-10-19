@@ -3,7 +3,7 @@
 // fuzzy: 89.7%
 // foundry draft (worker best 88.9%); what differs is mostly register allocation and instruction order
 #define ActorAnim_WaitForIdleTransition sub_081E42C4
-#define ActorAnim_UpdateIdleTransition Actor_UpdateIdlePhaseRestoration
+#define ActorAnim_UpdateIdleTransition  Actor_UpdateIdlePhaseRestoration
 
 struct ActorAnimController {
     u8 pad0[0xdfa];
@@ -55,7 +55,10 @@ void sub_081E42C4(struct ActorAnimController *p)
             p->savedFrame = p->frame;
             p->savedTimer = p->animTimer;
         }
-        { u32 mask = 1; p->flags = mask | p->flags; }
+        {
+            u32 mask = 1;
+            p->flags = mask | p->flags;
+        }
         p->callback = Actor_UpdateIdlePhaseRestoration;
         p->count = 0;
         p->savedAngle = p->angle;

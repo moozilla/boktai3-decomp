@@ -30,7 +30,9 @@ void sub_080A8144(struct SceneActorRegistryResetView *p)
         }
         do {
             u32 offset = 0x2B0;
-            do { *((u8 *)p + offset) = zero; } while (0);
+            do {
+                *((u8 *)p + offset) = zero;
+            } while (0);
             offset += 5;
             *((u8 *)p + (savedOffset = offset)) = kind;
             p->target = (void *)control;

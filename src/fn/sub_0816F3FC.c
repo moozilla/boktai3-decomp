@@ -21,13 +21,13 @@ void sub_0816F3FC(struct SceneHudState *s)
     }
     frame = s->actionTransferDelay;
     {
-    s32 mask = 7;
-    s32 phase = mask;
-    phase &= frame;
-    if (phase < mask - (s32)(frame >> 3))
-        s->motionWidgets[14].flags |= 1;
-    else
-        s->motionWidgets[14].flags &= ~1;
+        s32 mask = 7;
+        s32 phase = mask;
+        phase &= frame;
+        if (phase < mask - (s32)(frame >> 3))
+            s->motionWidgets[14].flags |= 1;
+        else
+            s->motionWidgets[14].flags &= ~1;
     }
     if (++s->actionTransferDelay > 55)
         Hud_SetInteractionCallback(s, SceneHud_RefillActionStatB, 1);

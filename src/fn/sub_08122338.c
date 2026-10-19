@@ -3,8 +3,8 @@
 // fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define SpriteEffect_SpawnTowardObject sub_08122338
-#define gEffectRandomIndex gUnk_03005308
-#define gEffectRandomTable gUnk_0203B400
+#define gEffectRandomIndex             gUnk_03005308
+#define gEffectRandomTable             gUnk_0203B400
 #include "global.h"
 
 struct EffectMotion {
@@ -20,9 +20,11 @@ struct EffectSourceObject {
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Div(s32, s32);
-s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *, struct EffectSourceObject *, struct EffectMotion *, u32, u32, u32, u32);
+s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *, struct EffectSourceObject *,
+                                 struct EffectMotion *, u32, u32, u32, u32);
 
-s32 sub_08122338(struct EffectSourceObject *source, struct EffectSourceObject *target, u32 a, u32 b, u32 c, u32 d)
+s32 sub_08122338(struct EffectSourceObject *source, struct EffectSourceObject *target, u32 a, u32 b,
+                 u32 c, u32 d)
 {
     struct EffectMotion motion;
     s32 duration;

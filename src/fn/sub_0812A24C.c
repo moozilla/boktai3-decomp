@@ -4,12 +4,21 @@
 // foundry draft (worker best 93.9%); what differs is mostly register allocation and instruction order
 #define EffectPool_AllocateSlot sub_0812A24C
 
-struct EffectPoolSlot { u8 unknown[0xF3]; u8 index; u8 tail[8]; };
-struct EffectPool { u8 unknown[0x38]; u32 used; struct EffectPoolSlot slots[12]; };
+struct EffectPoolSlot {
+    u8 unknown[0xF3];
+    u8 index;
+    u8 tail[8];
+};
+struct EffectPool {
+    u8 unknown[0x38];
+    u32 used;
+    struct EffectPoolSlot slots[12];
+};
 void Memory_Clear(void *, u32);
 static inline u8 EffectPool_IsUsed(u32 *used, u32 mask)
 {
-    if (*used & mask) return TRUE;
+    if (*used & mask)
+        return TRUE;
     return FALSE;
 }
 struct EffectPoolSlot *sub_0812A24C(u8 *pool)

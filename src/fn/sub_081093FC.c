@@ -6,13 +6,14 @@
 #include "global.h"
 #include "area_effect_link.h"
 struct LinkScriptArgs {
-    u32 count:16, unused:16;
+    u32 count : 16, unused : 16;
     s32 *values;
 };
 void Script_Call(u32, struct LinkScriptArgs *);
 static inline u8 *LinkSession_GetData(struct AreaEffectLinkState *p)
 {
-    if (!p || p->unavailable) return NULL;
+    if (!p || p->unavailable)
+        return NULL;
     return p->sessionData;
 }
 void sub_081093FC(struct AreaEffectPosition *position, s32 value)

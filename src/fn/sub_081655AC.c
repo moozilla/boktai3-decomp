@@ -10,7 +10,9 @@ void sub_081655AC(s32 count, u32 x, u32 y)
     u16 *p = Hud_GetTilemapCell(0, x, y);
     if (count > 0) {
         s32 i = count;
-        do { *p++ = 0xF090; } while (--i);
+        do {
+            *p++ = 0xF090;
+        } while (--i);
     }
 }
 #else

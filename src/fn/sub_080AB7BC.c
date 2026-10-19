@@ -21,20 +21,34 @@ struct P {
     u8 *f3d0;
 };
 
-static inline u32 tsth(u16 *a, u32 m) { return *a & m; }
-static inline u32 tstw(u32 m, u32 *a) { return *a & m; }
+static inline u32 tsth(u16 *a, u32 m)
+{
+    return *a & m;
+}
+static inline u32 tstw(u32 m, u32 *a)
+{
+    return *a & m;
+}
 
-static inline u8 isset(u32 m, u8 *a) { if (*a & m) return TRUE; return FALSE; }
+static inline u8 isset(u32 m, u8 *a)
+{
+    if (*a & m)
+        return TRUE;
+    return FALSE;
+}
 
 static inline u8 chk(struct P *p)
 {
     if (p != 0) {
         u32 m = 0x40;
         u32 o = 0x2d4;
-        if (*(u16 *)((u8 *)p + o) & m) return TRUE;
+        if (*(u16 *)((u8 *)p + o) & m)
+            return TRUE;
         o -= 4;
-        if (tstw(0x20000, (u32 *)((u8 *)p + o))) return TRUE;
-        if (p->f9c > 0) return FALSE;
+        if (tstw(0x20000, (u32 *)((u8 *)p + o)))
+            return TRUE;
+        if (p->f9c > 0)
+            return FALSE;
         return TRUE;
     }
     return FALSE;
@@ -49,9 +63,11 @@ void sub_080AB7BC(struct P *pp)
     u8 *a, *b, *c, *fl;
     s32 off;
 
-    if (chk(pp)) return;
+    if (chk(pp))
+        return;
     i = 0;
-    if (i >= *(s16 *)(base + 0x8da)) return;
+    if (i >= *(s16 *)(base + 0x8da))
+        return;
     b = base + 0x41c;
     a = base + 0x3f0;
     c = base + 0x470;
@@ -73,10 +89,12 @@ void sub_080AB7BC(struct P *pp)
                 Collider_Refresh(b);
                 if (H(p, 0x2d4) & 0x100) {
                     H(a, 0x32) &= ~0x100;
-                    Collider_SetAttackProperties(b, H(p, 0xb6), H(p, 0xbe), 0, W(p, 0xd0), H(p, 0x12));
+                    Collider_SetAttackProperties(b, H(p, 0xb6), H(p, 0xbe), 0, W(p, 0xd0),
+                                                 H(p, 0x12));
                 } else {
                     H(base + off + 0x41c, 6) |= 0x100;
-                    Collider_SetAttackProperties(b, H(p, 0xb4), H(p, 0xbc), 0, W(p, 0xcc), H(p, 0x1));
+                    Collider_SetAttackProperties(b, H(p, 0xb4), H(p, 0xbc), 0, W(p, 0xcc),
+                                                 H(p, 0x1));
                 }
             }
         }

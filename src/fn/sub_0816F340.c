@@ -4,9 +4,9 @@
 // fuzzy: 96.6%
 // foundry draft (worker best 96.6%); what differs is mostly register allocation and instruction order
 #define SceneHud_AnimateActionResult sub_0816F340
-#define SceneHud_TickWidgetMotion PauseMenu_UpdateSpriteMotion
-#define SceneHud_BeginPaletteBlend PauseMenu_StartPaletteTransition
-#define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
+#define SceneHud_TickWidgetMotion    PauseMenu_UpdateSpriteMotion
+#define SceneHud_BeginPaletteBlend   PauseMenu_StartPaletteTransition
+#define SceneHud_SetWidgetPalette    PauseMenu_SetSpritePalette
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_SetSpritePalette(void *, u32);
 void PauseMenu_StartPaletteTransition(void *, u32, u32, s32);

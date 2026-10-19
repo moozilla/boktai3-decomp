@@ -36,46 +36,51 @@ void sub_0817F21C(struct SceneEventActor *actor)
         actor->timer = 0;
         Sound_StopSong(0x239);
     }
-    { u32 mask = 0x400004; actor->flags |= mask; }
+    {
+        u32 mask = 0x400004;
+        actor->flags |= mask;
+    }
     switch (actor->phase) {
-    case 0:
-        if (++actor->timer > 8 && !actor->wait) {
-            SceneVolume_ResetPendingSequence(actor);
-            actor->phase = 1;
-            actor->timer = 0;
-        }
-        break;
-    case 2:
-    default:
-        break;
-    case 1:
-        if (!actor->timer) {
-            SceneActors_StartUnmirroredAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC, 0x12F, 2, 4);
-            actor->timer++;
-        }
-        if (actor->animationComplete) {
-            u32 zero;
-            u32 phase;
-            int shifted;
-            u32 facing;
-            facing = 0x20;
-            actor->angle = facing;
-            zero = 0;
-            shifted = actor->angle + 0x60;
-            shifted >>= 6;
-            phase = 2;
-            facing = 3;
-            facing &= shifted;
-            actor->facing = facing;
-            shifted = (actor->angle + 0x70) >> 5;
-            facing = 7 & shifted;
-            actor->facing8 = facing;
-            SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC, 0xF4, 1, 1, 4);
-            actor->phase = phase;
-            actor->timer = zero;
-            actor->finished = 1;
-        }
-        break;
+        case 0:
+            if (++actor->timer > 8 && !actor->wait) {
+                SceneVolume_ResetPendingSequence(actor);
+                actor->phase = 1;
+                actor->timer = 0;
+            }
+            break;
+        case 2:
+        default:
+            break;
+        case 1:
+            if (!actor->timer) {
+                SceneActors_StartUnmirroredAnimation(actor, (u8 *)actor + 0x2CC,
+                                                     (u8 *)actor + 0x2AC, 0x12F, 2, 4);
+                actor->timer++;
+            }
+            if (actor->animationComplete) {
+                u32 zero;
+                u32 phase;
+                int shifted;
+                u32 facing;
+                facing = 0x20;
+                actor->angle = facing;
+                zero = 0;
+                shifted = actor->angle + 0x60;
+                shifted >>= 6;
+                phase = 2;
+                facing = 3;
+                facing &= shifted;
+                actor->facing = facing;
+                shifted = (actor->angle + 0x70) >> 5;
+                facing = 7 & shifted;
+                actor->facing8 = facing;
+                SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC,
+                                                         (u8 *)actor + 0x2AC, 0xF4, 1, 1, 4);
+                actor->phase = phase;
+                actor->timer = zero;
+                actor->finished = 1;
+            }
+            break;
     }
 }
 #else

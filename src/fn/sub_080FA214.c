@@ -5,7 +5,7 @@
 #define SceneActorControl_ApplyDampedMotion sub_080FA214
 #include "global.h"
 #include "rotation_phase.h"
-s32 Mod(s32,s32);
+s32 Mod(s32, s32);
 struct DampedMotionState {
     u8 unknown0[0xF14];
     s16 x;
@@ -15,15 +15,15 @@ struct DampedMotionState {
 void sub_080FA214(struct SceneActorRegistryResetView *actor)
 {
     struct DampedMotionState *state = actor->context;
-    if(SceneActorControl_TakeFlag(&actor->field2B1))
-        RotationPhase_Change(actor,actor->entryTarget224,2);
+    if (SceneActorControl_TakeFlag(&actor->field2B1))
+        RotationPhase_Change(actor, actor->entryTarget224, 2);
     actor->motion.x += state->x;
     actor->motion.z += state->z;
-    if(Mod(actor->counter2AC,4)==0) {
+    if (Mod(actor->counter2AC, 4) == 0) {
         state->x >>= 1;
         state->z >>= 1;
     }
-    if(actor->field2B0) {
+    if (actor->field2B0) {
         u32 offset = 0x2A8;
         u8 *field = (u8 *)actor + offset;
         *field = 0;

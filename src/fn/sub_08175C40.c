@@ -13,26 +13,37 @@ s32 sub_08175C40(u8 *s)
     u8 *row;
     if (keys & 0x10) {
         row = s + 0x48C0;
-        if (*row > 1) goto toggle;
-        { u8 *option = s + 0x48C1;
-        option += *row;
-        if (*option > 1) *option = 0;
-        else *option += 1;
-        goto changed; }
+        if (*row > 1)
+            goto toggle;
+        {
+            u8 *option = s + 0x48C1;
+            option += *row;
+            if (*option > 1)
+                *option = 0;
+            else
+                *option += 1;
+            goto changed;
+        }
     }
-    if (!(keys & 0x20)) goto vertical;
+    if (!(keys & 0x20))
+        goto vertical;
     row = s + 0x48C0;
     if (*row <= 1) {
-        { u8 *option = s + 0x48C1;
-        option += *row;
-        if (*option == 0) *option = 2;
-        else *option -= 1;
-        goto changed; }
+        {
+            u8 *option = s + 0x48C1;
+            option += *row;
+            if (*option == 0)
+                *option = 2;
+            else
+                *option -= 1;
+            goto changed;
+        }
     }
-toggle:
-    { u8 *option = s + 0x48C1;
+toggle: {
+    u8 *option = s + 0x48C1;
     option += *row;
-    *option = 1 - *option; }
+    *option = 1 - *option;
+}
 changed:
     Sound_PlaySong(0x19A);
     MenuSelection_RefreshOptionText(s);
@@ -42,13 +53,18 @@ vertical:
     up &= keys;
     if (up) {
         row = s + 0x48C0;
-        if (*row == 0) *row = 2;
-        else *row -= 1;
+        if (*row == 0)
+            *row = 2;
+        else
+            *row -= 1;
     } else if (0x80 & keys) {
         row = s + 0x48C0;
-        if (*row == 2) *row = up;
-        else *row += 1;
-    } else goto none;
+        if (*row == 2)
+            *row = up;
+        else
+            *row += 1;
+    } else
+        goto none;
     Sound_PlaySong(0xDC);
     return 1;
 none:

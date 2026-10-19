@@ -42,8 +42,10 @@ void sub_08171AF8(struct SceneHudState *p)
             return;
         }
         Sound_PlaySong(0x38A);
-        if (Inventory_GetConsumableId(*selection) >= 0) SceneHud_PrepareActionTransferToSlot(p, 0, *selection, *cursor);
-        if (Inventory_GetConsumableId(*cursor) >= 0) SceneHud_PrepareActionTransferToSlot(p, 1, *cursor, *selection);
+        if (Inventory_GetConsumableId(*selection) >= 0)
+            SceneHud_PrepareActionTransferToSlot(p, 0, *selection, *cursor);
+        if (Inventory_GetConsumableId(*cursor) >= 0)
+            SceneHud_PrepareActionTransferToSlot(p, 1, *cursor, *selection);
         p->categoryWidgets[*selection + 10].flags |= one;
         p->categoryWidgets[*cursor + 10].flags |= one;
         sub_0816676C(p, 3);
@@ -51,7 +53,8 @@ void sub_08171AF8(struct SceneHudState *p)
     } else {
         u32 two = 2;
         two &= keys;
-        if (!two) return;
+        if (!two)
+            return;
         Hud_SetInteractionCallback(p, sub_081719A8, 1);
         p->categoryWidgets[6].flags |= one;
         Hud_RestoreGridSelection(input);

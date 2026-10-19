@@ -34,28 +34,29 @@ void sub_08163144(struct TransitionPanel *p)
     i = 0;
     sprite = p->sprites;
     {
-    u8 *animation = sprite->animation;
-    struct TransitionPanelSprite *drawable = sprite;
-    x = 56;
-    do {
-        sprite->baseX = x;
-        sprite->baseY = 72;
-        if (i > 3) sprite->baseX += 16;
-        AnimData_Load(animation, 0x654B);
-        Sprite_InitUnlinked(drawable, animation, 0);
-        sprite->priority = 0;
-        sprite->flags = 0x1033;
-        sprite->x = sprite->baseX;
-        sprite->y = sprite->baseY;
-        sprite->scaleX = p->extentA;
-        sprite->scaleY = p->extentB;
-        sprite->frame = i;
-        sprite++;
-        animation += 0x50;
-        drawable++;
-        x += 16;
-        i++;
-    } while (i < 8);
+        u8 *animation = sprite->animation;
+        struct TransitionPanelSprite *drawable = sprite;
+        x = 56;
+        do {
+            sprite->baseX = x;
+            sprite->baseY = 72;
+            if (i > 3)
+                sprite->baseX += 16;
+            AnimData_Load(animation, 0x654B);
+            Sprite_InitUnlinked(drawable, animation, 0);
+            sprite->priority = 0;
+            sprite->flags = 0x1033;
+            sprite->x = sprite->baseX;
+            sprite->y = sprite->baseY;
+            sprite->scaleX = p->extentA;
+            sprite->scaleY = p->extentB;
+            sprite->frame = i;
+            sprite++;
+            animation += 0x50;
+            drawable++;
+            x += 16;
+            i++;
+        } while (i < 8);
     }
 }
 #else

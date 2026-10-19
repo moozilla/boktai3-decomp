@@ -23,7 +23,8 @@ void sub_0818EA3C(struct SpriteColliderGroup *p)
     u8 total;
     i = 0;
     total = p->count;
-    if (i >= total) goto done;
+    if (i >= total)
+        goto done;
     one = 1;
     five = 5;
     count = &p->count;

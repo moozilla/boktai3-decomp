@@ -26,7 +26,8 @@ void sub_08110F5C(struct Background *bg)
         bg->tileCount = 0;
         for (;;) {
             values[bg->tileCount] = Script_GetValue();
-            if (values[bg->tileCount] < 0) break;
+            if (values[bg->tileCount] < 0)
+                break;
             bg->tileCount++;
         }
         bg->tiles = Heap_Alloc(bg->tileCount * 2);

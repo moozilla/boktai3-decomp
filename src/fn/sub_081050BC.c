@@ -3,14 +3,15 @@
 // fuzzy: 83.8%
 // foundry draft (worker best 82.7%); what differs is mostly register allocation and instruction order
 #define CallbackPool_SpawnHitParticles sub_081050BC
-#define gShakeRandomTable gUnk_0203B400
-#define gShakeRandomIndex gUnk_03005308
+#define gShakeRandomTable              gUnk_0203B400
+#define gShakeRandomIndex              gUnk_03005308
 #include "global.h"
 #include "scene_object.h"
 #include "callback_pool.h"
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32, u32);
+void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
+                  u32);
 static inline void ClearVector(void *dest, u32 *zero)
 {
     *zero = 0;

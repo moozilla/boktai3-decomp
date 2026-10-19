@@ -45,33 +45,34 @@ void sub_081AA330(struct A *p)
         p->timer = 0;
     }
     {
-    u8 st = p->state;
-    switch (st) {
-    case 0:
-        if (p->timer == 0) {
-            struct T t;
-            switch (PairedSceneActor_GetActiveMask(p->obj)) {
+        u8 st = p->state;
+        switch (st) {
             case 0:
-                t = gUnk_0824F790;
-                PairedSceneActor_ApplyToSelectedHalves(p->obj, t.v[(rnd() >> 4) & 1], 1);
+                if (p->timer == 0) {
+                    struct T t;
+                    switch (PairedSceneActor_GetActiveMask(p->obj)) {
+                        case 0:
+                            t = gUnk_0824F790;
+                            PairedSceneActor_ApplyToSelectedHalves(p->obj, t.v[(rnd() >> 4) & 1],
+                                                                   1);
+                            break;
+                        case 1:
+                            PairedSceneActor_ApplyToSelectedHalves(p->obj, 2, 1);
+                            break;
+                        case 2:
+                            PairedSceneActor_ApplyToSelectedHalves(p->obj, 1, 1);
+                            break;
+                    }
+                    p->timer++;
+                } else if (PairedSceneActor_AreSelectedHalvesFinished(p->obj) != 0) {
+                    p->state = 1;
+                    p->timer = 0;
+                }
                 break;
             case 1:
-                PairedSceneActor_ApplyToSelectedHalves(p->obj, 2, 1);
+                p->f_af = 1;
                 break;
-            case 2:
-                PairedSceneActor_ApplyToSelectedHalves(p->obj, 1, 1);
-                break;
-            }
-            p->timer++;
-        } else if (PairedSceneActor_AreSelectedHalvesFinished(p->obj) != 0) {
-            p->state = 1;
-            p->timer = 0;
         }
-        break;
-    case 1:
-        p->f_af = 1;
-        break;
-    }
     }
 }
 #else

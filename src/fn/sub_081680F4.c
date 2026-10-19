@@ -4,13 +4,19 @@
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define Hud_LoadConditionalPaletteRows sub_081680F4
 #include "global.h"
-struct Hud { u8 pad0[0xc70]; u8 paletteEnabled; u8 padC71[0x77f]; u8 paletteState; };
+struct Hud {
+    u8 pad0[0xc70];
+    u8 paletteEnabled;
+    u8 padC71[0x77f];
+    u8 paletteState;
+};
 extern const u16 gUnk_08610E78[];
 extern u16 gUnk_03005164[];
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
 void Palette_UpdateHighlightPulse(u16 *);
-void sub_081680F4(struct Hud *input) {
+void sub_081680F4(struct Hud *input)
+{
     register s32 i;
     struct Hud *hud = input;
     const u16 *source = gUnk_08610E78;
@@ -25,7 +31,8 @@ void sub_081680F4(struct Hud *input) {
         i++;
         j = 3;
         do {
-            if (hud->paletteEnabled) *primary++ = *source;
+            if (hud->paletteEnabled)
+                *primary++ = *source;
             if (!PauseMenu_IsEquipmentSelectionEnabled(hud)) {
                 *secondary++ = *source;
                 *tertiary++ = *source;

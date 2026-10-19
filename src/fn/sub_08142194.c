@@ -158,14 +158,14 @@ void sub_08142194(struct P *p)
             p->a7c8 = state;
             if (t != d4 && t != d5) {
                 if (Player_IsWithinCoordinateBand(p)) {
-                if (SceneObjects_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
-                    if (p != 0 && isTwo(p)) {
-                        ActorSequence_Begin(p, 0, 0);
-                    } else {
-                        ActorSequence_Begin(p, 5, 0);
-                        p->a4a4 = 0;
+                    if (SceneObjects_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
+                        if (p != 0 && isTwo(p)) {
+                            ActorSequence_Begin(p, 0, 0);
+                        } else {
+                            ActorSequence_Begin(p, 5, 0);
+                            p->a4a4 = 0;
+                        }
                     }
-                }
                 }
             } else {
                 int s, idx, d;
@@ -217,27 +217,27 @@ void sub_08142194(struct P *p)
             b = p->pos;
             d = p->dir;
             if (d == 1) {
-                    a.x += 0x1c;
-                    a.y += 0x2c;
-                    a.z -= 0x4c;
-                    b.x += 0x40;
-                    b.z -= 0x80;
+                a.x += 0x1c;
+                a.y += 0x2c;
+                a.z -= 0x4c;
+                b.x += 0x40;
+                b.z -= 0x80;
             } else if (d == 3) {
-                    a.x -= 0x34;
-                    b.x += 0x80;
-                    b.z += 0x40;
+                a.x -= 0x34;
+                b.x += 0x80;
+                b.z += 0x40;
             } else if (d == 5) {
-                    a.x += 0xc;
-                    a.y += 0x2c;
-                    a.z -= 0x20;
-                    b.x += 0x40;
-                    b.z += 0x80;
+                a.x += 0xc;
+                a.y += 0x2c;
+                a.z -= 0x20;
+                b.x += 0x40;
+                b.z += 0x80;
             } else if (d == 7) {
-                    a.x -= 0x40;
-                    a.y += 0x44;
-                    a.z += 0x2c;
-                    b.x -= 0x80;
-                    b.z += 0x40;
+                a.x -= 0x40;
+                a.y += 0x44;
+                a.z += 0x2c;
+                b.x -= 0x80;
+                b.z += 0x40;
             }
             c = p->pos;
             c.x -= scale(gUnk_086149C4[((((p->dir + 1) & 7) << 5) + 0x40) & 0xff] * 50);

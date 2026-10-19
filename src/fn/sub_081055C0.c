@@ -3,8 +3,8 @@
 // fuzzy: 93.8%
 // foundry draft (worker best 92.9%); what differs is mostly register allocation and instruction order
 #define CallbackPool_RunSpawnScript sub_081055C0
-#define gShakeRandomTable gUnk_0203B400
-#define gShakeRandomIndex gUnk_03005308
+#define gShakeRandomTable           gUnk_0203B400
+#define gShakeRandomIndex           gUnk_03005308
 #include "global.h"
 #include "directional_interaction.h"
 #include "callback_pool.h"

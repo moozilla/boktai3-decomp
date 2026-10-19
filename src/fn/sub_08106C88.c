@@ -3,7 +3,7 @@
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define RegionActorPool_DestroyActors sub_08106C88
-#define gRegionActorPool gUnk_020001B4
+#define gRegionActorPool              gUnk_020001B4
 #include "global.h"
 #include "region_actor.h"
 extern struct RegionActorPool *gUnk_020001B4;
@@ -16,13 +16,15 @@ static inline u8 IsUsed(struct RegionActorPool *pool, s32 index)
 {
     u32 *used = &pool->used;
     u32 mask = 1U << index;
-    if (*used & mask) return 1;
+    if (*used & mask)
+        return 1;
     return 0;
 }
 static inline u8 TestFlags(struct RegionActor *actor)
 {
     u32 mask = 0x20;
-    if (actor->behaviorFlags & mask) return 1;
+    if (actor->behaviorFlags & mask)
+        return 1;
     return 0;
 }
 s32 sub_08106C88(struct RegionActorPool *pool)
@@ -37,11 +39,14 @@ s32 sub_08106C88(struct RegionActorPool *pool)
                 SceneBody_Unregister(actor->overlay);
             }
             {
-            u32 *flags = &actor->behaviorFlags;
-            if (TestFlags(actor)) {
-                TerrainModifiers_UnregisterCell(actor->resource);
-                { u32 mask = ~0x20; *flags &= mask; }
-            }
+                u32 *flags = &actor->behaviorFlags;
+                if (TestFlags(actor)) {
+                    TerrainModifiers_UnregisterCell(actor->resource);
+                    {
+                        u32 mask = ~0x20;
+                        *flags &= mask;
+                    }
+                }
             }
             Heap_Free(actor);
         }

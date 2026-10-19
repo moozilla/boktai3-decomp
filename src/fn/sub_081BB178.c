@@ -3,8 +3,12 @@
 // fuzzy: 94.7%
 // foundry draft (worker best 94.4%); what differs is mostly register allocation and instruction order
 #define ResourceSprite_GetEntry sub_081BB178
-struct ResourceSpriteEntry { s32 values[4]; };
-struct ResourceSpriteHeader { u32 words[8]; };
+struct ResourceSpriteEntry {
+    s32 values[4];
+};
+struct ResourceSpriteHeader {
+    u32 words[8];
+};
 struct ResourceSprite {
     u8 pad0[0x18];
     u8 sprite[0x60];

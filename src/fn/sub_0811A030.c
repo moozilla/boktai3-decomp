@@ -32,10 +32,29 @@ void sub_081182E4(void);
 void sub_08119B80(struct MotionActor *);
 void ActorStats_ApplyPendingIncrement(struct MotionActorState *);
 void StageIconDisplay_Create(u32, u32, void (*)(void), void *);
-static inline u8 TestActorFlags(struct MotionActor *p, u32 mask) { if (p->state.flags & mask) return 1; return 0; }
-static inline u8 TestStateFlags(u8 *p, u32 mask) { if (*p & mask) return 1; return 0; }
-static inline u8 IsUpdated(struct MotionActor *p) { if (p) { u32 flags = p->flags; if (flags & 1) return 1; } return 0; }
-static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u32 zero) {
+static inline u8 TestActorFlags(struct MotionActor *p, u32 mask)
+{
+    if (p->state.flags & mask)
+        return 1;
+    return 0;
+}
+static inline u8 TestStateFlags(u8 *p, u32 mask)
+{
+    if (*p & mask)
+        return 1;
+    return 0;
+}
+static inline u8 IsUpdated(struct MotionActor *p)
+{
+    if (p) {
+        u32 flags = p->flags;
+        if (flags & 1)
+            return 1;
+    }
+    return 0;
+}
+static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u32 zero)
+{
     p->scriptRequested = 1;
     p->callback = callback;
     p->scriptTimer = zero;
@@ -53,24 +72,25 @@ void sub_0811A030(struct MotionActor *actor)
         zero = 0;
         *flags = mask;
         SetCallback(actor, sub_08116E44, zero);
-        { u32 mask = 0x800;
-        if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
-            StageIconDisplay_Create(1, 0, 0, actor);
+        {
+            u32 mask = 0x800;
+            if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
+                StageIconDisplay_Create(1, 0, 0, actor);
         }
         state->mode = zero;
         state->pending = zero;
     } else {
-      u16 testMask = 2;
-      u8 *flags = &state->flags;
-      if (TestStateFlags(flags, testMask)) {
-        s32 mask = ~2;
-        u16 zero;
-        mask &= *flags;
-        zero = 0;
-        *flags = mask;
-        SetCallback(actor, sub_081182E4, zero);
-        return;
-      }
+        u16 testMask = 2;
+        u8 *flags = &state->flags;
+        if (TestStateFlags(flags, testMask)) {
+            s32 mask = ~2;
+            u16 zero;
+            mask &= *flags;
+            zero = 0;
+            *flags = mask;
+            SetCallback(actor, sub_081182E4, zero);
+            return;
+        }
     }
     sub_08119B80(actor);
     if (!IsUpdated(actor))

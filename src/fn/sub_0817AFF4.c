@@ -22,7 +22,8 @@ struct SceneVolume {
 s32 sub_0817AFF4(struct SceneVolume *volume)
 {
     if ((volume->mode == 2 || volume->mode == 10) && volume->phase == 4 &&
-        (*(u32 *)((u8 *)volume + 0x464) & 7) && !volume->owner->disabled && !*(u8 *)((u8 *)volume + 0x473))
+        (*(u32 *)((u8 *)volume + 0x464) & 7) && !volume->owner->disabled &&
+        !*(u8 *)((u8 *)volume + 0x473))
         return 1;
     return 0;
 }

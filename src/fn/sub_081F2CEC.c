@@ -2,9 +2,9 @@
 #ifdef NONMATCHING
 // fuzzy: 98.6%
 // foundry draft (worker best 98.6%); what differs is mostly register allocation and instruction order
-#define PaletteEffect_RefreshPalette sub_081F2CEC
+#define PaletteEffect_RefreshPalette  sub_081F2CEC
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
-#define gEffectPaletteBanks gUnk_030042E4
+#define gEffectPaletteBanks           gUnk_030042E4
 #include "global.h"
 struct PaletteEffect {
     u8 unknown0[0x394];
@@ -24,18 +24,21 @@ void sub_081F2CEC(struct PaletteEffect *p)
 {
     s32 index, bank;
     if (p->dirty) {
-        p->state=0;
-        p->dirty=0;
-        p->paletteIndex=ActorResource_GetFixedId(p);
-        index=ActorResource_GetFixedId(p); bank=index;
-        if(index==0) p->palette=p->paletteDefault;
-        else if(index==501) p->palette=p->paletteAlternate;
+        p->state = 0;
+        p->dirty = 0;
+        p->paletteIndex = ActorResource_GetFixedId(p);
+        index = ActorResource_GetFixedId(p);
+        bank = index;
+        if (index == 0)
+            p->palette = p->paletteDefault;
+        else if (index == 501)
+            p->palette = p->paletteAlternate;
         else {
             void *dest;
-            void *source = gUnk_030042E4+(bank<<5);
-            dest=p->paletteCopy;
-            CpuSet(source,p->paletteCopy,0x04000008);
-            p->palette=dest;
+            void *source = gUnk_030042E4 + (bank << 5);
+            dest = p->paletteCopy;
+            CpuSet(source, p->paletteCopy, 0x04000008);
+            p->palette = dest;
         }
     }
 }

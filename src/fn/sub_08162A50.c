@@ -3,9 +3,11 @@
 #ifdef NONMATCHING
 // fuzzy: 85.1%
 // foundry draft (worker best 83.6%); what differs is mostly register allocation and instruction order
-#define SceneMarker_InitSprites sub_08162A50
+#define SceneMarker_InitSprites     sub_08162A50
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
-struct SceneMarkerVector { u32 x:16, y:16, z:16; };
+struct SceneMarkerVector {
+    u32 x : 16, y : 16, z : 16;
+};
 struct SceneMarkerSprite {
     u8 unknown0[7];
     u8 mode;

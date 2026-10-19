@@ -3,13 +3,15 @@
 // fuzzy: 96.1%
 // foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
 #define MapMenu_DrawActiveMarkers sub_0816B958
-#define MapMenu_GetMarkerKind MapScreen_GetMarkerType
-#define MapMenu_GetMarkerVariant MapScreen_GetMarkerFlipFlags
-#define MapMenu_GetTileAddress Hud_GetTilemapCell
-#define gGameState gUnk_02000710
+#define MapMenu_GetMarkerKind     MapScreen_GetMarkerType
+#define MapMenu_GetMarkerVariant  MapScreen_GetMarkerFlipFlags
+#define MapMenu_GetTileAddress    Hud_GetTilemapCell
+#define gGameState                gUnk_02000710
 #include "global.h"
 #include "game_state.h"
-struct MapMenuMarker { u8 type, page, x, y; };
+struct MapMenuMarker {
+    u8 type, page, x, y;
+};
 struct MapMenu {
     u8 unknown0[0x4900];
     struct MapMenuMarker *markers;
@@ -51,17 +53,21 @@ void sub_0816B958(struct MapMenu *menu, s32 left, s32 top)
             continue;
         tile = 0;
         switch (kind) {
-        case 1: tile = 15; break;
-        case 3:
-        case 4: tile = 1; break;
-        case 5:
-            if (!menu->hideSpecialMarkers)
-                tile = 21;
-            break;
-        case 6:
-            if (!menu->hideSpecialMarkers)
-                tile = 19;
-            break;
+            case 1:
+                tile = 15;
+                break;
+            case 3:
+            case 4:
+                tile = 1;
+                break;
+            case 5:
+                if (!menu->hideSpecialMarkers)
+                    tile = 21;
+                break;
+            case 6:
+                if (!menu->hideSpecialMarkers)
+                    tile = 19;
+                break;
         }
         dest = Hud_GetTilemapCell(1, x, y);
         tile |= MapMenu_MarkerAttributes(MapScreen_GetMarkerFlipFlags(marker->type));

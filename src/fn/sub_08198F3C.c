@@ -4,8 +4,13 @@
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define SceneEffect_InitializeRing sub_08198F3C
 
-struct RingVector { u32 x, y; };
-struct RingCollider { u8 pad[0x14]; struct RingVector size, offset; };
+struct RingVector {
+    u32 x, y;
+};
+struct RingCollider {
+    u8 pad[0x14];
+    struct RingVector size, offset;
+};
 struct SceneEffectRing {
     void (*update)(void *);
     void (*destroy)(void *);
@@ -20,7 +25,10 @@ struct SceneEffectRing {
     u8 padA3[0x11];
     u8 mode, age;
 };
-struct RingOwner { u8 pad[0x24]; u16 attack, element; };
+struct RingOwner {
+    u8 pad[0x24];
+    u16 attack, element;
+};
 u32 SceneEffect_LoadRingAnimation(void);
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -43,7 +51,8 @@ static inline u8 Ring_SetMode(struct SceneEffectRing *ring, u32 mode)
     }
 }
 
-void sub_08198F3C(struct RingOwner *owner, struct SceneEffectRing *ring, struct RingVector *pos, u32 mode)
+void sub_08198F3C(struct RingOwner *owner, struct SceneEffectRing *ring, struct RingVector *pos,
+                  u32 mode)
 {
     u8 flags;
     u32 animation = SceneEffect_LoadRingAnimation();

@@ -25,9 +25,12 @@ void sub_08175494(u8 *s)
             s32 i;
             u32 tile = 0xF020;
             i = 5;
-            do { *p++ = tile; } while (--i >= 0);
+            do {
+                *p++ = tile;
+            } while (--i >= 0);
         } else {
-            SceneHud_DrawDecimalDigits(Hud_GetMinimum(SceneCatalog_GetLevelScaledValue(s), max), divisor, 23, 5, zero);
+            SceneHud_DrawDecimalDigits(Hud_GetMinimum(SceneCatalog_GetLevelScaledValue(s), max),
+                                       divisor, 23, 5, zero);
         }
     } else {
         SceneHud_DrawDecimalDigits(Hud_GetMinimum(gUnk_02000710->level + 10, 99), 10, 21, 3, 0);

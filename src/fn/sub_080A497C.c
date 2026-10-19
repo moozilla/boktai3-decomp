@@ -12,8 +12,10 @@ s32 sub_080A497C(struct SceneActorRegistryResetView *p)
     u8 byteZero;
     u32 one;
     u16 stateOffset;
-    if (p->reactionSoundVariant == 0) Sound_PlaySong(0x211);
-    else Sound_PlaySong(0x112);
+    if (p->reactionSoundVariant == 0)
+        Sound_PlaySong(0x211);
+    else
+        Sound_PlaySong(0x112);
     if (p->field2DC & 0x40000) {
         u32 mask = 32;
         u16 *flags = &p->flags2D4;
@@ -59,7 +61,10 @@ s32 sub_080A497C(struct SceneActorRegistryResetView *p)
             offset = 0x2AC;
             *(u32 *)((u8 *)p + offset) = zero;
             phaseOffset += 8;
-            { u8 *field = (u8 *)p + phaseOffset; *field = one; }
+            {
+                u8 *field = (u8 *)p + phaseOffset;
+                *field = one;
+            }
         }
     }
     {

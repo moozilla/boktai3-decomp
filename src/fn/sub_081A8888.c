@@ -8,13 +8,13 @@
 struct VanargandTransition {
     u8 pad0[0x9C];
     u32 flags;
-    u8 padA0[0xAA-0xA0];
+    u8 padA0[0xAA - 0xA0];
     u8 state;
     u8 previousState, phase, subphase;
     u8 mode, active, pending;
-    u8 padB1[0xC4-0xB1];
+    u8 padB1[0xC4 - 0xB1];
     u32 counter;
-    u8 padC8[0xF24-0xC8];
+    u8 padC8[0xF24 - 0xC8];
     u32 alternate;
 };
 void Vanargand_StopActionSequence(void *);

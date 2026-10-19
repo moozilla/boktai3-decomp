@@ -9,7 +9,8 @@ struct ActorGroupPhaseState {
     u8 unknown0[0xe4c];
     u32 flags;
 };
-static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase, u32 behavior)
+static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
+                              u32 behavior)
 {
     actor->state2A8 = state;
     actor->phase2A9 = phase;

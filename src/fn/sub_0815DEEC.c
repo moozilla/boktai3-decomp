@@ -15,7 +15,8 @@ static inline u32 ReadMaskedFlags(u32 mask, u32 *flags)
 }
 static inline u32 PlayerCue_TestFlags(struct Player *p, u32 mask)
 {
-    if (p == 0) return 0;
+    if (p == 0)
+        return 0;
     return ReadMaskedFlags(mask, &p->actionFlags);
 }
 void sub_0815DEEC(struct Player *p, void *collider)
@@ -30,20 +31,25 @@ void sub_0815DEEC(struct Player *p, void *collider)
     if (PlayerCue_TestFlags(p, 0x400000))
         scale -= Div(13 * gUnk_02000710->unk876, 10);
     switch (SunClock_GetPhase()) {
-    case 1: case 2: case 3:
-        if (PlayerCue_TestFlags(p, 0x100000))
-            scale -= 13;
-        if (PlayerCue_TestFlags(p, 0x2000000))
-            scale += 13;
-        break;
-    case 0: case 4: case 5:
-        if (PlayerCue_TestFlags(p, 0x200000))
-            scale -= 13;
-        if (PlayerCue_TestFlags(p, 0x4000000))
-            scale += 13;
-        break;
+        case 1:
+        case 2:
+        case 3:
+            if (PlayerCue_TestFlags(p, 0x100000))
+                scale -= 13;
+            if (PlayerCue_TestFlags(p, 0x2000000))
+                scale += 13;
+            break;
+        case 0:
+        case 4:
+        case 5:
+            if (PlayerCue_TestFlags(p, 0x200000))
+                scale -= 13;
+            if (PlayerCue_TestFlags(p, 0x4000000))
+                scale += 13;
+            break;
     }
-    if (scale < 0) scale = 1;
+    if (scale < 0)
+        scale = 1;
     Collider_SetContactMode(collider, scale);
 }
 #else

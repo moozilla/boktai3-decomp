@@ -3,27 +3,36 @@
 // fuzzy: 80.0%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
 #define ActorPhase_ApproachNeutral sub_080F4AB4
-#define gRandomIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gRandomIndex               gUnk_03005308
+#define gRandomTable               gUnk_0203B400
 #include "global.h"
 struct PhaseActor {
-    u8 unknown0[9]; s8 phase;
-    u8 unknownA[0x10F]; u8 flags119;
-    u8 unknown11A[4]; u8 field11E, field11F;
-    u8 unknown120[0x44]; void (*update164)(void);
-    u8 unknown168[4]; void (*update16C)(void);
-    u8 unknown170[0x1A]; s8 direction;
-    u8 unknown18B[4]; u8 phaseStep;
+    u8 unknown0[9];
+    s8 phase;
+    u8 unknownA[0x10F];
+    u8 flags119;
+    u8 unknown11A[4];
+    u8 field11E, field11F;
+    u8 unknown120[0x44];
+    void (*update164)(void);
+    u8 unknown168[4];
+    void (*update16C)(void);
+    u8 unknown170[0x1A];
+    s8 direction;
+    u8 unknown18B[4];
+    u8 phaseStep;
 };
 extern u32 gRandomIndex;
 extern const u16 gRandomTable[];
 void Ivy_BeginChildPulse(void);
 void sub_080F60B8(void);
-void sub_080F4AB4(struct PhaseActor *p) {
+void sub_080F4AB4(struct PhaseActor *p)
+{
     s32 phase = p->phase;
     if (phase > 64) {
         phase += (s8)p->phaseStep;
-        if (phase < 64) phase = 64;
+        if (phase < 64)
+            phase = 64;
     }
     p->phase = phase;
     if (phase == 64) {
@@ -38,7 +47,8 @@ void sub_080F4AB4(struct PhaseActor *p) {
         one = 1;
         random &= one;
         direction = -1;
-        if (random) direction = 1;
+        if (random)
+            direction = 1;
         p->direction = direction;
         p->field11E = one;
         p->field11F = one;

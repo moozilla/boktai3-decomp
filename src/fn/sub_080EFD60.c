@@ -3,7 +3,7 @@
 // fuzzy: 99.4%
 // foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateTargetApproachPhase sub_080EFD60
-#define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
+#define SceneActorControl_UpdateDirectionalIdle     Ivy_UpdateActiveState
 #include "global.h"
 #include "scene_actor_control_phase.h"
 struct SceneActorTargetWaitState {
@@ -26,7 +26,8 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->word104 = 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind, u8 zero8, u32 zero)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind,
+                              u8 zero8, u32 zero)
 {
     actor->field2B2 = 1;
     actor->field2B0 = zero8;
@@ -40,7 +41,8 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = zero;
 }
-static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 behavior, u8 zero8, u32 zero)
+static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 behavior, u8 zero8,
+                              u32 zero)
 {
     actor->state2A8 = zero8;
     actor->phase2A9 = zero8;
