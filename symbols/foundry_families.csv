@@ -1473,3 +1473,4 @@ addr,function,name,family,note
 081BAD08,sub_081BAD08,SelectionList_SelectNearestEnabledEntry,"SelectionList","returns the nearest eligible XY entry index"
 081BADFC,sub_081BADFC,SelectionList_ProcessCursorInput,"SelectionList","moves the cursor and navigates linked entries with L/R"
 081BAFD4,sub_081BAFD4,MenuCursor_UpdateState,"Menu cursor (auto, tentative)","updates callback requests and selected-entry state"
+081BB1A0,sub_081BB1A0,MenuCursor_Create,"MenuCursor / ResourceSprite","creates a menu cursor with entries and initial selection"
