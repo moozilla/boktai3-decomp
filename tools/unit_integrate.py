@@ -18,6 +18,7 @@ build/unitize/SLUG.json ("integrated": PR number). With --loop the script
 repeats every MINUTES until no verified units are left and unitize.py is idle.
 """
 import argparse
+import glob
 import json
 import os
 import subprocess
@@ -28,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from romlib import ROOT  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "unitize")
+JOBS = 3          # build parallelism: the machine has 10 cores and 16 GB shared with workers
 
 
 def git(*a, check=False, inp=None):
@@ -52,27 +54,72 @@ def save(st):
 
 
 def own_patch(st):
+    """The unit's own changes, without its src/fn/ deletions (returned separately: main may have
+    edited those files since, e.g. renamed callees, and the unit replaces them whatever they hold)."""
     b, s = st["branch"], st["slug"]
-    names = git("diff", "--name-only", f"{b}~1", b).stdout.split()
-    keep = [n for n in names if n in (f"src/{s}.c", f"include/{s}.h") or n.startswith(("src/fn/", "symbols/", "notes/"))]
-    return git("diff", "--binary", f"{b}~1", b, "--", *keep).stdout if keep else ""
+    status = [l.split("\t") for l in git("diff", "--name-status", f"{b}~1", b).stdout.splitlines()]
+    deleted = [f for k, f, *_ in status if k == "D" and f.startswith("src/fn/")]
+    keep = [f for k, f, *_ in status if f not in deleted and
+            (f in (f"src/{s}.c", f"include/{s}.h") or f.startswith(("src/fn/", "symbols/", "notes/")))]
+    return (git("diff", "--binary", f"{b}~1", b, "--", *keep).stdout if keep else ""), deleted
+
+
+def current_names():
+    """sub_XXXXXXXX -> name, from main's symbols/functions.csv."""
+    import csv
+    return {f"sub_{r['addr'].upper()}": r["name"] for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "functions.csv")))}
+
+
+def refresh(st):
+    """Bring the unit up to date with main: renamed callees, and functions main has matched since
+    the unit's base (their C moves from src/fn/ into the unit, replacing its INCLUDE_ASM)."""
+    import re
+    s = st["slug"]
+    names = current_names()
+    paths = [os.path.join(ROOT, p) for p in (f"src/{s}.c", f"include/{s}.h") if os.path.exists(os.path.join(ROOT, p))]
+    for p in paths:
+        text = open(p).read()
+        text = re.sub(r"\bsub_[0-9A-F]{8}\b", lambda m: names.get(m.group(0), m.group(0)), text)
+        open(p, "w").write(text)
+    unit = os.path.join(ROOT, "src", f"{s}.c")
+    if not os.path.exists(unit):
+        return
+    text = open(unit).read()
+    for m in list(re.finditer(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\);\n', text, re.M)):
+        fn = m.group(1)
+        hits = [p for p in glob.glob(os.path.join(ROOT, "src", "fn", "*.c"))
+                if re.search(r"^[^\n;]*\b" + re.escape(fn) + r"\s*\([^;]*\)\s*\{", open(p).read(), re.M)]
+        if len(hits) == 1:
+            body = open(hits[0]).read()
+            body = "\n".join(l for l in body.split("\n") if not l.startswith("#include"))
+            text = text.replace(m.group(0), body.strip() + "\n", 1)
+            git("rm", "-q", os.path.relpath(hits[0], ROOT))
+    open(unit, "w").write(text)
 
 
 def build_ok():
     subprocess.run(["make", "format"], cwd=ROOT, capture_output=True)
-    r = subprocess.run(["make", "-j6"], cwd=ROOT, capture_output=True, text=True)
+    r = subprocess.run(["make", f"-j{JOBS}"], cwd=ROOT, capture_output=True, text=True)
+    open(os.path.join(ROOT, "build", "integrate-build.log"), "w").write(r.stdout + r.stderr)
     return "build/boktai3.gba: OK" in r.stdout + r.stderr
 
 
 def attempt(batch, dry):
     """Apply BATCH on a fresh branch from origin/main; build; return the units that applied, or None."""
     git("fetch", "-q", "origin")
+    git("reset", "-q", "--hard")                          # leftovers of a failed attempt
+    git("clean", "-fdq", "src", "include", "notes")
     name = f"claude/units-{int(time.time())}"
     git("checkout", "-q", "-B", name, "origin/main", check=True)
     applied = []
     for st in batch:
-        p = own_patch(st)
+        p, deleted = own_patch(st)
         r = git("apply", "-3", "--whitespace=nowarn", inp=p) if p else None
+        if p and not r.returncode:
+            for f in deleted:
+                if os.path.exists(os.path.join(ROOT, f)):
+                    git("rm", "-q", f)
+            refresh(st)
         if not p or r.returncode or git("diff", "--name-only", "--diff-filter=U").stdout.strip():
             git("reset", "-q", "--hard")                  # drop this unit's partial apply only
             st["conflict"] = True
@@ -89,6 +136,8 @@ def attempt(batch, dry):
         print(f"  dry run: {len(applied)} units apply")
         return applied, name
     if not build_ok():
+        tail = open(os.path.join(ROOT, "build", "integrate-build.log")).read()[-1500:]
+        print("  build failed:\n" + "\n".join("    " + l for l in tail.splitlines()[-12:]))
         return None, name
     if git("status", "--porcelain", "--", "src", "include").stdout.strip():      # make format changes
         git("add", "-A", "src", "include")
