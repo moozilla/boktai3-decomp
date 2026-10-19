@@ -1,0 +1,339 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 84.4%
+// Control flow and core work line up (regions.py core distance 6/444); allocation and spills
+// differ: the ROM spills the health and +0x2D8 pointers to the stack, keeps mode in sl and a
+// constant 1 in sb across SceneHud_SetTimedState. UpdateHitFlags is inlined twice; the second
+// copy reuses the caller's +0x2CC pointer.
+#include "scene_actor_reset.h"
+#include "area_effect_link.h"
+u8 sub_08131D5C(void *);
+void sub_08135F38(void *);
+u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
+void SceneActorMovement_ProjectProbe(void *, u32, u32);
+void SceneActorBehavior_PlayReactionSound(void *);
+void sub_08134398(void *);
+void SceneActorTerrain_ClearCollisionTimers(void *);
+void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
+void CpuSet(const void *, void *, u32);
+void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
+void AnimData_SelectPaletteBank(void *, s32);
+extern u8 *gUnk_030042E4;
+
+#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
+
+static inline u8 Test(u32 value, u32 mask)
+{
+    if (value & mask)
+        return 1;
+    return 0;
+}
+static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
+{
+    if (actor->field2E6 == 0)
+        return 0;
+    return 1;
+}
+static inline s32 LocalPlayer(void)
+{
+    if (!gUnk_020004B4)
+        return -1;
+    return gUnk_020004B4->localPlayer;
+}
+static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+{
+    if (Test(gUnk_030053F4, 0x4800)) {
+        register u32 *owner asm("r1") = &actor->field2E0;
+        register u32 mask asm("r3") = *owner;
+        if (!(mask & 0x20) && mask) {
+            switch (LocalPlayer()) {
+                case 0:
+                    if (*owner != 1)
+                        return 0;
+                    break;
+                case 1:
+                    if (*owner != 2)
+                        return 0;
+                    break;
+                case 2:
+                    if (*owner != 4)
+                        return 0;
+                    break;
+                case 3:
+                    if (*owner != 8)
+                        return 0;
+                    break;
+            }
+        }
+    }
+    return 1;
+}
+static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u32 flags)
+{
+    if (actor) {
+        if (flags & 0x40)
+            return 1;
+        {
+            u32 mask = 0x20000;
+            if (actor->flags2D0 & mask)
+                return 1;
+        }
+        if (actor->health <= 0)
+            return 1;
+    }
+    return 0;
+}
+static inline void UpdateHitFlags(struct SceneActorRegistryResetView *actor, u16 *flags2D4)
+{
+    u32 flags = *flags2D4;
+    if (flags) {
+        u32 down = IsDown(actor, flags);
+        if (down) {
+            u32 zero = 0;
+            *flags2D4 = 0x40;
+            actor->field2E6 = zero;
+            {
+                u16 *flags2D6 = &actor->flags2D6;
+                s32 mask = ~0x980;
+                *flags2D6 &= mask;
+            }
+            return;
+        }
+        {
+            u32 mask = 0x803E;
+            flags = *flags2D4;
+            if (!(mask & flags))
+                goto clear;
+        }
+        {
+            u32 *flags2CC;
+            {
+                s32 mask = ~0x201;
+                *flags2D4 = mask & flags;
+            }
+            flags2CC = &actor->flags2CC;
+            {
+                u32 mask = ~0x4000;
+                *flags2CC &= mask;
+            }
+            {
+                struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+                s32 mask = ~0x10;
+                motion->flags &= mask;
+            }
+            {
+                u32 test = 0x20;
+                if (!(*flags2D4 & test)) {
+                    u32 mask = ~0x80;
+                    *flags2CC &= mask;
+                }
+            }
+            {
+                u32 *flags2D0 = &actor->flags2D0;
+                u32 mask = 0xFFEFFFFB;
+                *flags2D0 &= mask;
+            }
+            {
+                u32 bit = 0x400;
+                actor->flags2D6 |= bit;
+            }
+            actor->field2E6 = down;
+            {
+                u32 bit = 0x2000;
+                *flags2CC |= bit;
+            }
+            return;
+        }
+    }
+clear: {
+    u32 *flags2CC = &actor->flags2CC;
+    u32 mask = ~0x2000;
+    *flags2CC &= mask;
+}
+}
+
+static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *actor, u16 *flags2D4,
+                                        u32 *flags2CC)
+{
+    u32 flags = *flags2D4;
+    if (flags) {
+        u32 down = IsDown(actor, flags);
+        if (down) {
+            u32 zero = 0;
+            *flags2D4 = 0x40;
+            actor->field2E6 = zero;
+            {
+                u16 *flags2D6 = &actor->flags2D6;
+                s32 mask = ~0x980;
+                *flags2D6 &= mask;
+            }
+            return;
+        }
+        {
+            u32 mask = 0x803E;
+            flags = *flags2D4;
+            if (!(mask & flags))
+                goto clearShared;
+        }
+        {
+            {
+                s32 mask = ~0x201;
+                *flags2D4 = mask & flags;
+            }
+            {
+                u32 mask = ~0x4000;
+                *flags2CC &= mask;
+            }
+            {
+                struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+                s32 mask = ~0x10;
+                motion->flags &= mask;
+            }
+            {
+                u32 test = 0x20;
+                if (!(*flags2D4 & test)) {
+                    u32 mask = ~0x80;
+                    *flags2CC &= mask;
+                }
+            }
+            {
+                u32 *flags2D0 = &actor->flags2D0;
+                u32 mask = 0xFFEFFFFB;
+                *flags2D0 &= mask;
+            }
+            {
+                u32 bit = 0x400;
+                actor->flags2D6 |= bit;
+            }
+            actor->field2E6 = down;
+            {
+                u32 bit = 0x2000;
+                *flags2CC |= bit;
+            }
+            return;
+        }
+    }
+clearShared: {
+    u32 mask = ~0x2000;
+    *flags2CC &= mask;
+}
+}
+
+static inline void Fill(u32 *zero, void *dst)
+{
+    *zero = 0;
+    CpuSet(zero, dst, 0x05000002);
+}
+
+u8 sub_08135F70(struct SceneActorRegistryResetView *actor)
+{
+    u16 *flags2D4;
+    s16 *health;
+    u32 mode;
+    u32 *flags2D8;
+    u32 *flags2CC;
+    register u32 updated asm("r5");
+    u32 four;
+    u32 bits;
+
+    if (!HasPendingHit(actor)) {
+        if (sub_08131D5C(actor)) {
+            flags2D4 = &actor->flags2D4;
+            UpdateHitFlags(actor, flags2D4);
+            sub_08135F38(actor);
+            return 1;
+        }
+        return 0;
+    }
+    if (SceneActorBehavior_DispatchFlaggedCategory(actor))
+        return 1;
+    sub_08135F38(actor);
+    SceneActorMovement_ProjectProbe(actor, FIELD(actor, 0x174, u16), FIELD(actor, 0x174, u16));
+    {
+        u32 d = actor->reactionSoundVariant;
+        health = &actor->health;
+        *health -= d;
+    }
+    updated = 0x20;
+    flags2D4 = &actor->flags2D4;
+    updated |= *flags2D4;
+    *flags2D4 = updated;
+    {
+        u32 v = actor->field2E6;
+        four = 4;
+        bits = four & v;
+        mode = 1;
+        if (bits)
+            mode = four;
+    }
+    flags2D8 = &actor->field2D8;
+    {
+        u32 blocked = *flags2D8 & 0x20000;
+        flags2CC = &actor->flags2CC;
+        if (blocked)
+            goto done;
+    }
+    {
+        if ((mode & four) && !(updated & four)) {
+            SceneActorBehavior_PlayReactionSound(actor);
+            FIELD(actor, 0x30C, u16) = 12;
+        }
+        flags2CC = &actor->flags2CC;
+        if (mode) {
+            {
+                u16 bank = FIELD(actor, 0x1E2, u16);
+                if (actor->drawableKind == 0)
+                    AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+                else
+                    FIELD(actor->drawable, 0x68, u8 *) = gUnk_030042E4 + bank * 32;
+            }
+            {
+                u32 eight = 8;
+                actor->field1E8 = eight;
+            }
+            flags2CC = &actor->flags2CC;
+            if ((mode & 4) && actor->category == 0x19) {
+                {
+                    u32 bit = 0x2000000;
+                    *flags2CC |= bit;
+                }
+                {
+                    u32 v = 0x41;
+                    actor->field1EA = v;
+                }
+            }
+            {
+                u32 bit = 0x8000;
+                *flags2CC |= bit;
+            }
+            if (ShouldShowDamage(actor)) {
+                u32 zero;
+                u32 buffer[2];
+                {
+                    s32 h = *health;
+                    s32 maxh = FIELD(actor, 0xB0, u16);
+                    s32 kind = FIELD(actor, 0xB2, s16);
+                    s32 param = FIELD(actor, 0x9A, s16);
+                    SceneHud_SetTimedState(actor->id, h, maxh, kind, mode >> 2, param);
+                }
+                Fill(&zero, buffer);
+                if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
+                    DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
+                                             &actor->position, buffer, 1);
+            }
+        }
+    }
+done: {
+    u32 keep = 0x80;
+    u32 value = *flags2CC;
+    keep &= value;
+    *flags2CC = (value & 0xFFFEBE3F) | keep;
+}
+    sub_08134398(actor);
+    UpdateHitFlagsShared(actor, flags2D4, flags2CC);
+    SceneActorTerrain_ClearCollisionTimers(actor);
+    return 1;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08135F70);
+#endif
