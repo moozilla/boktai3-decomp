@@ -14,14 +14,14 @@ struct Q {
     u32 w1a4;
 };
 s16 SelectionList_FindEntryAtCursor(void *);
-s32 sub_081BADFC(void *);
+s32 SelectionList_ProcessCursorInput(void *);
 
 void MenuCursor_UpdateInput(struct Q *p)
 {
     u32 m;
     p->ha0 = SelectionList_FindEntryAtCursor(p);
     p->p38 = p->p98;
-    if (sub_081BADFC(p) == 0) {
+    if (SelectionList_ProcessCursorInput(p) == 0) {
         m = 2;
         p->w1a4 |= m;
     }

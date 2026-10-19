@@ -559,8 +559,23 @@ def batch(n, bucket_filter=None, lo=0, hi=1 << 32):
     active_p = os.path.join(SCALE, "active.txt")
     claimed = set(open(claimed_p).read().split()) if os.path.exists(claimed_p) else set()
     active = set(open(active_p).read().split("\n")) if os.path.exists(active_p) else set()
-    rows = [ln.rstrip("\n").split("\t") for ln in open(q)]
-    names = {f["name"]: f["addr"] for f in __import__("worklist").functions()}
+    import worklist
+    fs = worklist.functions()
+    names = {f["name"]: f["addr"] for f in fs}
+    by_addr = {f["addr"]: f["name"] for f in fs}
+    done = worklist.done_names()
+    rows = []
+    for ln in open(q):
+        r = ln.rstrip("\n").split("\t")
+        # names go stale when promote_names renames a callee: resolve by address
+        a = names.get(r[0])
+        if a is None and re.fullmatch(r"sub_[0-9A-F]{8}", r[0]):
+            a = int(r[0][4:], 16)
+        cur = by_addr.get(a)
+        if cur is None or cur in done:
+            continue
+        rows.append([cur] + r[1:])
+        names[cur] = a
     take, sub = [], None
     for r in rows:
         if r[0] in claimed or (bucket_filter and r[2] != bucket_filter) or not lo <= names[r[0]] < hi:
@@ -670,10 +685,18 @@ def scale_report():
 
 def committable():
     """Matched functions not yet in src/: (func, source file)."""
+    import csv
+    import worklist
+    # matched elsewhere meanwhile (a unit run, another session), possibly under a new name:
+    # compare addresses, not names
+    by_name = {r["name"]: r["addr"].upper() for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "functions.csv")))}
+    defined = {f"sub_{by_name.get(n, n[4:] if n.startswith('sub_') else '').upper()}" for n in worklist.done_names()}
     out = []
     seen = set()
     for rp in glob.glob(os.path.join(OUT, "sub_*", "result.txt")):
         func = os.path.basename(os.path.dirname(rp))
+        if func in defined:
+            continue
         sp = os.path.join(OUT, func, "stages.json")
         try:
             st = json.load(open(sp)) if os.path.exists(sp) else None
