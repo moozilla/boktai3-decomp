@@ -17,8 +17,8 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
         {
             register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_Close;
             do {
-            p->state = state;
-            p->timer = 0;
+                p->state = state;
+                p->timer = 0;
             } while (0);
         }
     }
@@ -71,9 +71,10 @@ void StatusScreen_WaitForClose(struct StatusScreen *p)
         if (p->timer++ >= p->times[2]) {
             {
                 register void (*state)(struct StatusScreen *) asm("r1") = sub_0800E974;
-                asm("" : "+r"(p) : "r"(state));
+                do {
                 p->state = state;
                 p->timer = 0;
+                } while (0);
             }
             p->noise = StatusScreen_ClearScanlineNoise;
         }
