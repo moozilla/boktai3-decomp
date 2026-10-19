@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-void ScenePanelSubject_TickActive(struct ScenePanelSubjectView *owner)
+void ScenePanelSubject_TickActive(struct ScenePanelSubject *owner)
 {
     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 3, owner->sequenceRow,
                      owner->sequenceVariant);

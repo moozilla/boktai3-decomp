@@ -37,8 +37,9 @@ struct GameState {
     s16 selected;            /* (guess) index into the slot tables */
     s16 actionAuxiliarySlot; /* 0x54: selects the auxiliary action descriptor (tentative) */
     u8 unk56[2];
-    s16 party[4]; /* (guess) ids, searched by GameState_HasEquippedConsumable */
-    u8 unk60[0x8];
+    s16 party[4];       /* (guess) ids, searched by GameState_HasEquippedConsumable */
+    s16 abilityVariant; /* 0x60: selects alternate-mode ability four or five (tentative) */
+    u8 unk62[6];
     s16 inventory[16]; /* (guess) -1 is empty */
     s16 slots88[12];   /* (guess) indexed by `selected` */
     s16 table0A0[48];  /* (guess) */
@@ -74,7 +75,9 @@ struct GameState {
     u16 counter576; /* (guess) capped at 9999 */
     u8 unk578[0x4];
     u16 counter57C; /* (guess) capped at 9999 */
-    u8 unk57E[0x18];
+    u8 unk57E[0xC];
+    s16 targetFlagBonuses[5]; /* 0x58A: flag 7..11 modifier bonuses, units of 1/64 (tentative) */
+    u8 unk594[2];
     s16 flags596; /* (guess) bit mask, bits 0-9 */
     u8 unk598[0x8];
     s32 region; /* current region/scene id (guess); compared by interactable controllers */

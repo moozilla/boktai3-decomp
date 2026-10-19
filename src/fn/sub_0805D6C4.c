@@ -1,5 +1,5 @@
 #include "scene_panel_subject_tail.h"
-void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *subject)
+void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
 {
     if (subject->byteTimer)
         subject->byteTimer--;
