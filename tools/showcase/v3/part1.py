@@ -28,7 +28,7 @@ import record  # noqa: E402
 import romx  # noqa: E402
 import run  # noqa: E402
 from figures import Otenko, Player, Sprite, screen_to_world  # noqa: E402
-from show import (COUNTER, DJ, OT, STORY, Call, Cutscene, Proc, Set, Show, bgm, bgm_out, cam, cam_follow,  # noqa: E402
+from show import (COUNTER, DJ, OT, STORY, Call, Cutscene, Proc, Set, Show, bgm, bgm_out, cam, cam_follow, r700,  # noqa: E402
                   command, fade, hud, keyframe_manager, kf_frame, kf_glide, kf_hide, kf_mirror, kf_show,
                   particles, quake, sound, stage_of, top_messages, track)
 from rom import big_sprite_frame_pixels  # noqa: E402
@@ -397,8 +397,10 @@ def cold(show, cast):
 
 
 def end(cut, t, speed=4):
-    """Close a piece: fade the picture and the music out from t."""
+    """Close a piece: fade the picture and the music out from t, then hide
+    the HUD (the cutscene's end would otherwise flash it on the black)."""
     cut.at(t, fade(1, speed, 0, 0, 0), bgm_out(speed))
+    cut.at(t + 50, hud(7))
     cut.hold(t + 60)
 
 
@@ -631,30 +633,45 @@ def count(show, cast):
     counts = [Sprite(cut, 0x7300 + k, pkg, {}, y=Y).add(1, CX, CZ, frame=60, hidden=k > 0)
               for k, pkg in enumerate(cast.count)]
     count0 = counts[0]
-    dj.aim(20, 1)
-    cut.hold(50)
-    cut.say([COUNT + '"Foolish Solar Boy!\nYour light cannot touch me!"'])
-    # the fight: three shots; he goes to bats, and they reform beside Django
-    for i in range(3):
-        dj.shoot(4 + 14 * i, 1)
+    # in the middle of the fight: the Count swoops in, side-steps two shots,
+    # lunges, and goes to bats at the third; they reform beside Django. His
+    # swoop and lunge frames face right, so moving left (toward Django) they
+    # are mirrored.
+    dj.aim(14, 1)
+    count0.frame(8, 13, mirror=1)
+    count0.glide(8, 1930, 1720, 20)                       # swooping in, toward Django
+    count0.frame(18, 14)
+    dj.shoot(34, 1)
+    count0.frame(36, 16, mirror=0)
+    count0.glide(36, 2090, 1660, 9)                       # a side-step right
+    cut.at(36, sound(1243))
+    dj.shoot(48, 1)
+    count0.frame(50, 19, mirror=1)
+    count0.glide(50, 1950, 1860, 9)                       # and back left
+    count0.frame(62, 20, mirror=1)                        # the lunge
+    count0.frame(66, 21)
+    count0.glide(62, 1840, 1900, 10)
+    dj.shoot(64, 1)                                       # point blank: he scatters into bats
     for i, f in enumerate([62, 63, 64, 65, 66]):
-        count0.frame(8 + 3 * i, f)
-    cut.at(10, sound(1243))
-    count0.cycle(23, [67, 68, 69, 70, 71, 72, 73, 74, 75], 44, step=4)
-    count0.glide(23, PX, PZ, 44)
+        count0.frame(70 + 3 * i, f, mirror=0)
+    cut.at(70, sound(1243))
+    count0.cycle(85, [67, 68, 69, 70, 71, 72, 73, 74, 75], 44, step=4)
+    count0.glide(85, PX, PZ, 44)
     for i, f in enumerate([66, 65, 64, 63, 62, 60]):
-        count0.frame(67 + 3 * i, f)
-    # the claw: Django is hit and goes down on one knee
-    count0.frame(92, 50, mirror=1)     # his strikes face right; Django is to his left
-    count0.frame(100, 49)
-    count0.frame(104, 48)
-    # knocked back and flat (motion 30). Not 43 (a freeze: it leaves him blue) or 11-14 (Sabata's)
-    dj.aim_end(102, 1)
-    dj.raw(104, 17, 1, 0, 0)
-    cut.at(104, quake(60, 16), sound(1244))
-    count0.frame(124, 60, mirror=0)
-    dj.aim(186, 1)                  # he gets up by himself (about 70 frames on the floor) and aims again
-    cut.hold(200)
+        count0.frame(129 + 3 * i, f)
+    cut.hold(152)
+    cut.say([COUNT + '"Foolish Solar Boy!\nYour light cannot touch me!"'])
+    # the claw: Django is knocked back and flat (motion 30; not 43, a freeze
+    # that leaves him blue, or 11-14, Sabata's)
+    count0.frame(2, 50, mirror=1)     # his strikes face right; Django is to his left
+    count0.frame(10, 49)
+    count0.frame(14, 48)
+    dj.aim_end(12, 1)
+    dj.raw(14, 17, 1, 0, 0)
+    cut.at(14, quake(60, 16), sound(1244))
+    count0.frame(34, 60, mirror=0)
+    dj.aim(96, 1)                     # he gets up by himself (about 70 frames on the floor) and aims again
+    cut.hold(110)
     cut.say([DJ + '"Ugh... my sunlight\nisn\'t working!"'])
     cut.say([COUNT + '"Ha ha ha!\nI have you now, Solar Boy!"'])
     # the last lunge, and someone in the corner
@@ -739,11 +756,16 @@ def message_audio(n):
     return message(AUDIO, 8, 6, [n, 0])
 
 
+OTENKO_STEP = r700(0x33F, 1)     # Otenko's bob counter, beside the motion tracks' (TRACK_STEP)
+
+
 def otenko_kf(cut, cast, t, x, z, y, frame=0):
-    """Otenko floating as a keyframe sprite, bobbing gently."""
+    """Otenko floating as a keyframe sprite, bobbing gently. The bob runs on
+    the game's repeating timer: as timed actions it would stretch the
+    cutscene's segment to its last bob."""
     o = Sprite(cut, 0x7006, cast.otenko, {}, y=y + 80).add(t, x, z, frame=frame)
-    for i in range(12):
-        o.glide(t + 10 + 30 * i, x, z, 28, y=y + (96 if i % 2 == 0 else 72))
+    steps = [[kf_glide(o.tag, x, z, 28, y=y + (96 if i % 2 == 0 else 72))] for i in range(200)]
+    cut.at(t + 10, *track(o.tag + 0x80, steps, every=30, var=OTENKO_STEP))
     return o
 
 
@@ -822,20 +844,43 @@ SUN = "{GS+0x876}"             # GameState+0x876: the sun level the HUD draws (f
 SUN_STATE = "{SENSOR+0x19}"    # the sensor task's state byte: 1 holds it there, so the level is ours
 
 
+GAUGE_CELL = 0x050001B4     # the SUN gauge's cell color: BG palette bank 13, color 10 (a palette dump mid-overload)
+GAUGE_COLORS = (0x0177, 0x001F, 0x7FFF, 0x03FF)    # its own orange, then red, white, yellow
+HUD_SCROLL = 0x04000010     # BG0 (the HUD) horizontal and vertical scroll: nudged to shake it
+
+
 def overload_events(page, start):
     """Harness lines: calibrate the sensor, fill the gauge with light, then
-    push the level past full one cell at a time (record.py events)."""
+    push the level past full one cell at a time (record.py events). Past
+    full the cells flash red and white, faster and faster, and the HUD
+    shakes. Returns (events, when the overload starts, when it ends)."""
     ev = [(page, start, "poke 030025C4 E8")]
     t = start
     for lux in range(235, 50, -15):
         ev.append((page, t, f"lux {lux}"))
         t += 10
     t += 40
+    t_over = t
     ev.append((page, t, f"freeze {SUN_STATE}:1 1"))
     for level in range(11, 52):
         ev.append((page, t, f"freeze {SUN}:2 {level:x}"))
         t += max(3, 9 - (level - 11) // 5)
-    return ev, t
+    # the flashing and the shaking, from a third of the way in
+    k, tt = 0, t_over + (t - t_over) // 3
+    while tt < t:
+        gap = max(2, int(10 - 8 * (tt - t_over) / (t - t_over)))
+        ev.append((page, tt, f"freeze {GAUGE_CELL:08X}:2 {GAUGE_COLORS[1 + k % 2]:x}"))
+        dx, dy = ((2, 1), (-2, 0), (1, -1), (-1, 1))[k % 4]
+        ev.append((page, tt, f"freeze {HUD_SCROLL:08X}:2 {dx & 0x1FF:x}"))
+        ev.append((page, tt, f"freeze {HUD_SCROLL + 2:08X}:2 {dy & 0x1FF:x}"))
+        k += 1
+        tt += gap
+    ev += [(page, t, f"freeze {GAUGE_CELL:08X}:2 {GAUGE_COLORS[2]:x}"), (page, t, f"freeze {HUD_SCROLL:08X}:2 0"),
+           (page, t, f"freeze {HUD_SCROLL + 2:08X}:2 0")]
+    return ev, t_over, t
+
+
+OVERHEAT_BEEP, CHARGE_START, CHARGE_HUM, OVERHEAT_SWELL = 772, 923, 1271, 507   # proofs.sfx audition
 
 
 def light_pool(cut, cast, x, z, colors, t=1, hidden=False):
@@ -878,10 +923,21 @@ def reveal(show, cast):
     cut.at(0, hud(1), top_messages())
     dj.walk(2, X, Z)
     dj.aim(40, 1)
-    ev, t_end = overload_events(2, 60)
+    ev, t_over, t_end = overload_events(2, 60)
     sc.events = ev
-    for i, t in enumerate(range(240, t_end + 40, 24)):
-        cut.at(t, quake(10 + 4 * i, 24), sound(1407) if i % 2 == 0 else particles(X, Z, 20, y=Y + 64, kind=FLAME))
+    # the charge: the gun's charge sound and its hum while the gauge fills
+    cut.at(40, sound(CHARGE_START))
+    for t in range(70, t_over, 140):
+        cut.at(t, sound(CHARGE_HUM))
+    # past full: a rising beep, faster and faster, the shaking growing, and a swell before it blows
+    t, gap = t_over, 36
+    while t < t_end:
+        cut.at(t, sound(OVERHEAT_BEEP))
+        t += gap
+        gap = max(5, int(gap * 0.86))
+    for i, t in enumerate(range(t_over + 10, t_end + 40, 24)):
+        cut.at(t, quake(10 + 4 * i, 24), particles(X, Z, 20, y=Y + 64, kind=FLAME))
+    cut.at(t_end - 60, sound(OVERHEAT_SWELL))
     # the stranger rushes in from the side to stop it
     SX, SZ = X - 360, Z + 80
     st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y + 200).add(t_end - 80, SX - 600, SZ - 300,
@@ -1137,8 +1193,12 @@ def sunback(show, cast):
     cut.say([CL2 + '"The sun is in\nYOUR hands now."'])
     for i in range(3):
         cut.at(10 + 30 * i, particles(X, Z, 30, y=Y + 96, kind=GOLD))
+    # the white-out: a swell into a bright shimmer, held white (the edit fades from it into part 2)
+    cut.at(20, sound(1407))
     cut.at(70, fade(1, 3, 31, 31, 31), bgm_out(4))
-    cut.hold(170)
+    cut.at(100, sound(1414), particles(X, Z, 60, y=Y + 96, kind=GOLD))
+    cut.at(140, hud(7))
+    cut.hold(260)
     ev = [(2, 0, "poke 030025C4 E8")]
     for k, lux in enumerate(range(235, 50, -12)):
         ev.append((2, 30 + 8 * k, f"lux {lux}"))
@@ -1203,14 +1263,14 @@ def title(show):
     return pid
 
 
-CREDITS = [            # at most four lines of 26 characters: the parade walks below them
-    "BOKTAI 3\nDECOMPILED",
+CREDITS = [            # at most five lines of 26 characters: the parade walks below them
+    "BOKTAI 3\nDECOMPILED DEMO",
     "<WEIGHT>Direction</WEIGHT>\nmoozilla (a.k.a. Spikeman)",
     "<WEIGHT>Decompilation, tools</WEIGHT>\n<WEIGHT>and this video</WEIGHT>\nClaude Opus 5.5",
     "<WEIGHT>With help from</WEIGHT>\nClaude Sonnet\nClaude Haiku\nGPT-6 Astra, GPT-6.1 Sol",
     "<WEIGHT>Claudesona sprites</WEIGHT>\ndrawn for this video,\ninspired by vgel, thebes,\nN8python and Eidoverse",
     "<WEIGHT>Built with</WEIGHT>\npret's agbcc\ndecomp-permuter\nmGBA",
-    "<WEIGHT>Special thanks</WEIGHT>\nDarth Nemesis, Spikeman,\nLordHuffnPuff and the\nfan translation team",
+    "<WEIGHT>The original fan</WEIGHT>\n<WEIGHT>translation team</WEIGHT>\nDarthNemesis\nLordHuffnPuff\nSpikeman",
     "<WEIGHT>Boktai 3</WEIGHT>\nShin Bokura no Taiyou:\nGyakushuu no Sabata\n(c) 2005 Konami",
     "github.com/moozilla/\nboktai3-decomp\n\n<WEIGHT>Contributions welcome!</WEIGHT>",
 ]
@@ -1252,7 +1312,7 @@ def parade(show, cast):
         s_ = sy * 32 / 3 + (CX + CZ - CY) + y
         return int((s_ + d) / 2), int((s_ - d) / 2)
     cut.at(0, cam(CX, CZ, 1, y=CY))
-    ROW = 68                  # feet this far below the screen's middle: under four lines of text
+    ROW = 74                  # feet this far below the screen's middle: under five lines of text
     walk = ["walk_dr1", "walk_dr2", "walk_dr3", "walk_dr4"]
     lead = Sprite(cut, 0x7001, cast.claude, cast.cf).add(2, *at(140, ROW), frame="walk_dr1")
     lead.mirror(2, 1)
@@ -1276,11 +1336,11 @@ def parade(show, cast):
     lead.frame(480, "shrug", mirror=0)
     lead.frame(560, "stand_dl")
     # 3: a third Claude rides by on a coffin, waving
-    rider = Sprite(cut, 0x7003, cast.claude, cast.cf).add(898, *at(150, ROW + 6), y=286, frame="ride")
+    rider = Sprite(cut, 0x7003, cast.claude, cast.cf).add(898, *at(150, ROW + 4), y=286, frame="ride")
     rider.mirror(898, 1)
-    mount = Sprite(cut, 0x7014, cast.coffins[5], {}).add(898, *at(150, ROW + 6), frame=2)
-    rider.glide(900, *at(-150, ROW + 6), 420, y=286)
-    mount.glide(900, *at(-150, ROW + 6), 420)
+    mount = Sprite(cut, 0x7014, cast.coffins[5], {}).add(898, *at(150, ROW + 4), frame=2)
+    rider.glide(900, *at(-150, ROW + 4), 420, y=286)
+    mount.glide(900, *at(-150, ROW + 4), 420)
     for i in range(12):
         rider.frame(910 + 32 * i, "wave" if i % 2 == 0 else "ride")
     lead.frame(960, "cheer")
@@ -1329,9 +1389,31 @@ def credits(show, cast):
                       later])
 
 
+FONT = os.path.join(run.OUT, "font8x16.npy")     # the game's text font, for the edit's cards (ROM-derived: build/ only)
+
+
+def export_font(show):
+    """The fan translation's 8x16 font (the fnt resource: glyph c at
+    0xC + (c - 0x20) * 64, two 4bpp tiles) as an array [96][16][8] of 0-3."""
+    import archive
+    import numpy as np
+    rom = bytes(show.r.rom)
+    _, a, s = next(ents for label, t, b, ents in archive.archives(rom) if label == "fnt")[0]
+    font = rom[a - 0x08000000:a - 0x08000000 + s]
+    out = np.zeros((96, 16, 8), np.uint8)
+    for c in range(96):
+        o = 0xC + c * 64
+        for t in (0, 1):
+            for r in range(8):
+                for x in range(8):
+                    out[c, t * 8 + r, x] = (font[o + t * 32 + r * 4 + x // 2] >> (4 * (x & 1))) & 15
+    np.save(FONT, out)
+
+
 def build():
     show = Show(STRINGS, SLOTS)
     cast = Cast(show)
+    export_font(show)
     scenes = {}
     for name, fn in PIECES.items():
         sc = fn(show, cast)
