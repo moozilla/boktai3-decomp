@@ -16,6 +16,7 @@
 --   set REGION OFF TYPE[.BIT] VALUE   write a script variable (region r700,
 --                         r708 or gs; TYPE as gcx.py prints it: 1 s16, 2 byte,
 --                         4 one bit, 9 word), e.g. `set r708 0x3c 1 120`
+--   get REGION OFF TYPE[.BIT]   log a script variable's value (as `set` names it)
 --   pos X Y Z             move the player (world units, 256 per cell)
 --   keys KEYS N           hold keys for N frames (A+UP, START, ...), then release
 --   shot NAME             screenshot -> NAME.png
@@ -109,6 +110,9 @@ local function next_step()
   elseif op == "set" then
     local t, b = a[3]:match("^(%d+)%.?(%d*)$")
     setvar(a[1], num(a[2]), tonumber(t), b ~= "" and tonumber(b) or nil, num(a[4]))
+  elseif op == "get" then
+    local t, b = a[3]:match("^(%d+)%.?(%d*)$")
+    say(string.format("get %s %s %s = %s", a[1], a[2], a[3], tostring(getvar(a[1], num(a[2]), tonumber(t), b ~= "" and tonumber(b) or nil))))
   elseif op == "pos" then
     -- the player object (0x02000580) keeps its position at +0x30 and copies
     -- at +0xAC and +0x10C (s16 x, y, z); GameState +0x30 mirrors it

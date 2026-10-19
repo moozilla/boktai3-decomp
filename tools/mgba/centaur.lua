@@ -803,6 +803,7 @@ function story()
   for i, v in ipairs(STORY_VARS) do m.vars[i] = read_var(v) or false end
   return m
 end
+function getvar(r, o, t, b) return read_var({ r = r, o = o, t = t, b = b }) end
 function setvar(r, o, t, b, value)
   write_var({ r = r, o = o, t = t, b = b }, value)
   LOG(string.format("set %s[0x%x%s]:t%d = %d", r, o, t == 4 and ("." .. (b or 0)) or "", t, value))
