@@ -95,7 +95,7 @@ def state_path(s):
     return os.path.join(OUT, s["slug"] + ".json")
 
 
-def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fallback=None):
+def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fallback=None, floor=QUOTA_FLOOR):
     st = {"name": s["name"], "slug": s["slug"]}
     if os.path.exists(state_path(s)):
         st = json.load(open(state_path(s)))
@@ -110,7 +110,7 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         elif st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
             return st
     if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
-                                              "--floor", str(QUOTA_FLOOR)]).returncode:
+                                              "--floor", str(floor)]).returncode:
         if not fallback:
             return {**st, "state": "paused (Codex quota below floor)"}
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
@@ -186,7 +186,7 @@ def cmd_run(a):
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
-        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback), todo):
+        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback, a.floor), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
 
@@ -213,6 +213,7 @@ def main():
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
     p.add_argument("--recheck", action="store_true", help="re-verify finished worktrees; run no workers")
+    p.add_argument("--floor", type=float, default=QUOTA_FLOOR, help="stop Codex below this %% of the weekly quota")
     p.add_argument("--range", help="START-END: only subsystems inside this address range")
     p.add_argument("--fallback", help="Claude model (e.g. sonnet) to use once the Codex quota floor is reached")
     sp.add_parser("status")
