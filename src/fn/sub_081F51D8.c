@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
-#define Ratatosk_UpdateDirectionalRecovery sub_081F51D8
 struct Ratatosk {
     u8 pad0[0x51];
     u8 angle;
@@ -46,7 +45,7 @@ static inline void Ratatosk_SetFacing(struct Ratatosk *p, int angle)
     p->facing8 = value;
 }
 s32 Callback_InvokeActor(void *, void *);
-void sub_081F51D8(struct Ratatosk *p, s32 timer)
+void Ratatosk_UpdateDirectionalRecovery(struct Ratatosk *p, s32 timer)
 {
     struct Ratatosk *p2 = p;
     u16 zero;
@@ -79,5 +78,5 @@ void sub_081F51D8(struct Ratatosk *p, s32 timer)
         p->complete = 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F51D8);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDirectionalRecovery);
 #endif

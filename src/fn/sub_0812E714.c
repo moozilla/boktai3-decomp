@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 93.3%
 // foundry draft (worker best 92.2%); what differs is mostly register allocation and instruction order
-#define gRandomTableIndex             gUnk_03005308
-#define gRandomTable                  gUnk_0203B400
-#define ActorParticles_SpawnWideBurst sub_0812E714
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
@@ -16,7 +15,7 @@ static inline u16 ActorParticles_NextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308];
 }
-void sub_0812E714(struct SceneActorRegistryResetView *actor)
+void ActorParticles_SpawnWideBurst(struct SceneActorRegistryResetView *actor)
 {
     struct SceneExtent velocity, spread;
     u32 count;
@@ -37,5 +36,5 @@ void sub_0812E714(struct SceneActorRegistryResetView *actor)
                  (struct SceneExtent *)&actor->position, &velocity, &spread, 60, 63);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812E714);
+INCLUDE_ASM("asm/nonmatching", ActorParticles_SpawnWideBurst);
 #endif

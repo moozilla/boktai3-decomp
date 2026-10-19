@@ -1,10 +1,10 @@
 #include "global.h"
 
-void sub_081EC670(void *);
+void ScreenLayers_HidePair(void *);
 void Task_Kill(void *);
 
 void SceneActors_DestroyTask(void *p)
 {
-    sub_081EC670(p);
+    ScreenLayers_HidePair(p);
     Task_Kill(p);
 }

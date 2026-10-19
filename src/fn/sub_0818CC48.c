@@ -3,10 +3,9 @@
 #ifdef NONMATCHING
 // fuzzy: 93.5%
 // foundry draft (worker best 92.9%); what differs is mostly register allocation and instruction order
-#define Armor_BeginPartTravelToPlayer sub_0818CC48
-#define gPlayerObject                 gUnk_02000710
-#define gRandomTableIndex             gUnk_03005308
-#define gRandomTable                  gUnk_0203B400
+#define gPlayerObject     gUnk_02000710
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
 struct ArmorTravelTarget {
@@ -42,7 +41,7 @@ struct ArmorPart {
 };
 void Armor_UpdatePartTravelXWave(struct ArmorPart *);
 void Armor_UpdatePartTravelZWave(struct ArmorPart *);
-void sub_0818CC48(struct ArmorPart *p)
+void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
 {
     s32 delta;
     if (!(p->parent->flags5C2 & 3))
@@ -84,5 +83,5 @@ void sub_0818CC48(struct ArmorPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818CC48);
+INCLUDE_ASM("asm/nonmatching", Armor_BeginPartTravelToPlayer);
 #endif

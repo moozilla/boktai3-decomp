@@ -7,11 +7,11 @@ void sub_0816701C(void *, int, int, int, int, int);
 int SceneInput_NavigateGridKeys(void *, int);
 void Hud_SaveGridSelection(void *);
 void SceneHud_RefreshEquippedActionIcons(void *);
-void sub_08172638(void *);
+void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 void SceneHud_SetActionCursorPosition(void *, u32);
 void PauseInventory_ReturnToEquipmentSelection(void *);
-void sub_08172100(void *);
-u8 sub_08172270(void *);
+void SolarFruit_ToggleEquipSlot(void *);
+u8 GameState_ToggleUnlockEquipSlot(void *);
 void SceneHud_ShowSelectionDescription(void *);
 void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
 {
@@ -42,12 +42,12 @@ void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
             InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, 0);
     } else if (gUnk_03005260[1] & 1) {
         if (!unlockGroup)
-            sub_08172100(grid);
-        else if (sub_08172270(grid)) {
+            SolarFruit_ToggleEquipSlot(grid);
+        else if (GameState_ToggleUnlockEquipSlot(grid)) {
             u32 result = InventoryPanel_UpdateSelectedUnlock(p, 0, 0, 1, moved);
             InventoryPanel_SetEntryRow(p, 3, 14, result, moved, 0x47);
         }
-        sub_08172638(p);
+        PauseMenu_RefreshFruitAndUnlockIcons(p);
         {
             u32 selected = p->actionCursor;
             s32 group = 1;

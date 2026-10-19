@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: rises, then dives until it lands and spawns a ground burst */
-#define Hresvelgr_UpdateGroundSlam sub_0819E7F0
 
 struct BurstVector {
     s16 x, y, z, pad;

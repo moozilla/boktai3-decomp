@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 80.0%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
-#define ActorPhase_ApproachNeutral sub_080F4AB4
-#define gRandomIndex               gUnk_03005308
-#define gRandomTable               gUnk_0203B400
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 struct PhaseActor {
     u8 unknown0[9];
     s8 phase;
@@ -26,7 +25,7 @@ extern u32 gRandomIndex;
 extern const u16 gRandomTable[];
 void Ivy_BeginChildPulse(void);
 void sub_080F60B8(void);
-void sub_080F4AB4(struct PhaseActor *p)
+void ActorPhase_ApproachNeutral(struct PhaseActor *p)
 {
     s32 phase = p->phase;
     if (phase > 64) {
@@ -57,5 +56,5 @@ void sub_080F4AB4(struct PhaseActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F4AB4);
+INCLUDE_ASM("asm/nonmatching", ActorPhase_ApproachNeutral);
 #endif

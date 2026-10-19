@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* EffectGroup_Spawn: sets a 4-part effect group kind (installing its update callback), spawns one part at the source position projected to screen space plus an offset, and toggles flag 0x200 on all parts for kind 2 (provisional name) */
-#define EffectGroup_Spawn sub_082315A8
 
 struct Unk082315A8Vec {
     s16 x, y, z, pad;
@@ -54,8 +53,8 @@ static inline s32 Scale(s32 v)
     return r;
 }
 
-s32 sub_082315A8(struct Unk082315A8Group *group, u32 kind, u32 parameter,
-                 struct Unk082315A8Vec *position)
+s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
+                      struct Unk082315A8Vec *position)
 {
     struct Unk082315A8Graphics *graphics = gUnk_0200005C;
     u32 spawned;

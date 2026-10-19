@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: dispatches queued scene messages by command type */
-#define SceneActor_DispatchCommands sub_08120DAC
 
 struct Cmd {
     u8 pad0[6];
@@ -77,8 +76,8 @@ void Sound_PlaySong(u32);
 void TimedSpriteEffect_RequestStop(s32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
 void SceneMessages_SetPendingTrigger(void *, void *);
-void sub_08120894(void);
-void sub_08120618(void);
+void SceneActor_UpdateKnockbackFall(void);
+void SceneActor_UpdateFallState(void);
 
 static inline u8 IsActive(struct Motion *m)
 {
@@ -135,14 +134,14 @@ int SceneActor_DispatchCommands(struct Obj *p)
                     m->b = cmd->d;
                     m->c = cmd->e;
                     m->d = cmd->f;
-                    SetState(p, sub_08120894);
+                    SetState(p, SceneActor_UpdateKnockbackFall);
                     break;
                 case 1: {
                     s32 x = cmd->x;
                     s32 y = cmd->y;
                     sub_0811D6C8(self, x, y, CharacterModel_GetPrimaryPaletteIndex(p->model),
                                  self->unk7E, cmd->c, 4, 0);
-                    SetState(p, sub_08120618);
+                    SetState(p, SceneActor_UpdateFallState);
                     break;
                 }
                 case 2:

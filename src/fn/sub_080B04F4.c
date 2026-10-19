@@ -1,13 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-/* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (sub_080C2BE0) with control sub_080AEA80 and halfword flags at +0x6D4 (provisional name) */
-#define SceneActorControl_UpdateProbeApproach_080B04F4 sub_080B04F4
+/* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (SceneActorControl_UpdateProbeApproach) with control SceneActorPhase_SelectLinkedAnimation and halfword flags at +0x6D4 (provisional name) */
 
 #include "scene_actor_control_phase.h"
-u8 sub_080B335C(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void sub_080AEA80(void);
+void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u32 NavMesh_ConsumeProbeEvent(void *);
@@ -61,7 +60,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct SceneActorRegistryRes
     u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetControl(actor, sub_080AEA80, 0x27);
+        SetControl(actor, SceneActorPhase_SelectLinkedAnimation, 0x27);
         {
             u32 bit = 0x20;
             u16 *flags = (u16 *)(control + 0x6D4);
@@ -69,7 +68,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct SceneActorRegistryRes
             *flags = bit;
         }
     }
-    if (sub_080B335C(actor)) {
+    if (SceneActor_IsFacingNearbyTarget(actor)) {
         if ((u8)Callback_InvokeActor(actor, actor->update270))
             return;
         if (sub_0812F3CC(actor))

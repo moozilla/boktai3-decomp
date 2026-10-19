@@ -5,10 +5,9 @@
 // foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
 // Temporary compatibility aliases for the local ELF's pre-promotion symbols.
 
-#define PreviewActor_ReplaceProjectileTowardPlayer sub_081F9E20
-#define Projectile_InitParams                      Projectile_InitializeParams
-#define Projectile_RemoveByIndex                   Task4E01_RemoveEntry
-#define Projectile_CreateAtPosition                Projectile_Spawn
+#define Projectile_InitParams       Projectile_InitializeParams
+#define Projectile_RemoveByIndex    Task4E01_RemoveEntry
+#define Projectile_CreateAtPosition Projectile_Spawn
 struct PositionWords {
     u32 a, b;
 };
@@ -48,8 +47,8 @@ static inline struct PositionWords *CopyPosition(struct PositionWords *dest,
     *dest = *src;
     return dest;
 }
-void sub_081F9E20(struct PreviewProjectileContact *contact, void *unused,
-                  struct PreviewActor *actor)
+void PreviewActor_ReplaceProjectileTowardPlayer(struct PreviewProjectileContact *contact,
+                                                void *unused, struct PreviewActor *actor)
 {
     u8 params[0x58];
     s16 origin[4], target[4];
@@ -76,5 +75,5 @@ void sub_081F9E20(struct PreviewProjectileContact *contact, void *unused,
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F9E20);
+INCLUDE_ASM("asm/nonmatching", PreviewActor_ReplaceProjectileTowardPlayer);
 #endif

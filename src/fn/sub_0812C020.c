@@ -5,8 +5,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
-#define PursuingActors_ReleaseAll sub_0812C020
-#define gPursuingActorManager     gUnk_02000184
+#define gPursuingActorManager gUnk_02000184
 void Sprite_Remove(void *);
 extern struct PursuingActorManager *gUnk_02000184;
 static inline u8 IsActive(struct PursuingActorManager *manager, s32 index)
@@ -15,7 +14,7 @@ static inline u8 IsActive(struct PursuingActorManager *manager, s32 index)
         return 1;
     return 0;
 }
-u32 sub_0812C020(struct PursuingActorManager *manager)
+u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
 {
     s32 i, j;
     for (i = 0; i < 8; i++) {
@@ -34,5 +33,5 @@ u32 sub_0812C020(struct PursuingActorManager *manager)
     return (u32)(gUnk_02000184 = 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812C020);
+INCLUDE_ASM("asm/nonmatching", PursuingActors_ReleaseAll);
 #endif

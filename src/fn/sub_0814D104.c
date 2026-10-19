@@ -5,14 +5,13 @@
 #ifdef NONMATCHING
 // fuzzy: 83.1%
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
-#define Player_ComputeActionScale sub_0814D104
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);
 static inline u32 Test(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-s32 sub_0814D104(struct Player *p, struct SceneCollider *contact)
+s32 Player_ComputeActionScale(struct Player *p, struct SceneCollider *contact)
 {
     s32 scale = 64;
     if (p && Test(&p->actionFlags, 0x8000000))
@@ -50,5 +49,5 @@ s32 sub_0814D104(struct Player *p, struct SceneCollider *contact)
     return scale;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814D104);
+INCLUDE_ASM("asm/nonmatching", Player_ComputeActionScale);
 #endif

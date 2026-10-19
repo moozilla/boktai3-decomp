@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.1%
 // foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
-#define TargetMotion_UpdateFlashingExit sub_080F6220
 struct TargetMotionVector {
     u32 x : 16;
     s32 y : 16;
@@ -53,7 +52,7 @@ static inline u8 TargetMotion_TakeExitFlag(struct TargetMotionExit *p)
     }
     return 0;
 }
-void sub_080F6220(struct TargetMotionExit *p)
+void TargetMotion_UpdateFlashingExit(struct TargetMotionExit *p)
 {
     struct TargetMotionOwner *owner = p->owner;
     struct TargetMotionVector position, size;
@@ -87,5 +86,5 @@ void sub_080F6220(struct TargetMotionExit *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F6220);
+INCLUDE_ASM("asm/nonmatching", TargetMotion_UpdateFlashingExit);
 #endif

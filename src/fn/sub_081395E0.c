@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: hides the sprite and spawns three randomly scattered bursts */
-#define SpriteEffect_HideWithScatterBurst sub_081395E0
 
 struct Vec3 {
     s32 x, y, z, w;

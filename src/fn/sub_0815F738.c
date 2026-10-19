@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
-#define SceneLink_RemoveNode sub_0815F738
-#define gSceneLinkList       gUnk_02000598
+#define gSceneLinkList gUnk_02000598
 struct SceneLinkNode {
     u8 unknown0[0xC];
     struct SceneLinkNode *next;
@@ -14,7 +13,7 @@ struct SceneLinkList {
     struct SceneLinkNode *head;
 };
 extern struct SceneLinkList *gUnk_02000598;
-void sub_0815F738(struct SceneLinkNode *target)
+void SceneLink_RemoveNode(struct SceneLinkNode *target)
 {
     struct SceneLinkList *list = gUnk_02000598;
     if (list) {
@@ -33,5 +32,5 @@ void sub_0815F738(struct SceneLinkNode *target)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815F738);
+INCLUDE_ASM("asm/nonmatching", SceneLink_RemoveNode);
 #endif

@@ -4,7 +4,7 @@
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
-void sub_08172638(void *);
+void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 static inline void SetPosition(struct SceneVec *position, s16 x, s16 y, s16 z)
 {
     position->x = x;
@@ -29,7 +29,7 @@ void SceneHud_LayoutActionGrid_08172950(struct SceneHudState *p)
         p->categoryWidgets[i + 18].position.x += Mod(i, 3) * 24;
         p->categoryWidgets[i + 18].position.y += Div(i, 3) * 24;
     }
-    sub_08172638(p);
+    PauseMenu_RefreshFruitAndUnlockIcons(p);
     {
         struct SceneInputWidget *a = &p->actionPanelWidgets[0];
         a->flags &= ~1;

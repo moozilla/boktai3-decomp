@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: copies a palette bank, optionally brightening each channel capped at 31 */
-#define PaletteFade_ApplyBrightenedPalette sub_0813C798
 
 struct PalFadeObj {
     u8 pad0[0x360];

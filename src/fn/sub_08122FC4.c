@@ -21,7 +21,7 @@ struct SpriteNoticeManager {
 extern struct SpriteNoticeManager *gSpriteNoticeManager;
 struct SpriteNoticeManager *SpriteNotice_GetManager(void);
 struct SpriteNotice *SpriteNotice_AllocateSlot(struct SpriteNoticeManager *);
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 s32 SpriteNotice_Create(struct SpriteNoticePosition *position, u32 mode)
@@ -40,7 +40,7 @@ s32 SpriteNotice_Create(struct SpriteNoticePosition *position, u32 mode)
     if (!slot)
         return -1;
     slot->position = *position;
-    sub_08217DE0(slot, manager->spriteData, 0);
+    ParticleSprite_Initialize(slot, manager->spriteData, 0);
     Effect_SetOrigin(slot, -8, -8);
     {
         u32 zero = 0;

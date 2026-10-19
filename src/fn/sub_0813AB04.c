@@ -38,7 +38,7 @@ extern const u16 gUnk_086141BC[];
 struct ScreenMoteManager *SpriteParticle_GetOrCreateManager(void);
 struct ScreenMoteState *SpriteParticle_AllocateSlot(struct ScreenMoteManager *);
 s32 Mod(s32, s32);
-void sub_08217DE0(struct ScreenMoteSprite *, void *, u32);
+void ParticleSprite_Initialize(struct ScreenMoteSprite *, void *, u32);
 void Effect_SetOrigin(struct ScreenMoteSprite *, s32, s32);
 void Effect_SetPalette(struct ScreenMoteSprite *, u32);
 void SpriteDrawable_SelectTileFrame(struct ScreenMoteSprite *, void *, u32);
@@ -76,7 +76,7 @@ s32 ScreenMote_SpawnBatch(union ScreenMotePosition *origin, union ScreenMotePosi
             if (range[1])
                 s->position.axis.y += Mod(NextRandom(), range[1] * 2) - range[1];
         }
-        sub_08217DE0(sprite, m->resource, 0);
+        ParticleSprite_Initialize(sprite, m->resource, 0);
         Effect_SetOrigin(sprite, -4, -4);
         SpriteDrawable_SelectTileFrame(sprite, m->resource, 2);
         sprite->flags |= 0x11 | flags;

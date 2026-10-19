@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: parses n/P/s/p script keywords into actor fields */
-#define ActorScript_ParseParams sub_081200C8
 
 struct ScriptPosition {
     s32 x, y, z, unused;

@@ -2,7 +2,6 @@
 #include "global.h"
 
 /* tentative: positions two sprites relative to camera and steps their frame animation */
-#define SpritePair_UpdateAnimation sub_0813A620
 
 struct PairVec {
     s16 x, y, z, pad;

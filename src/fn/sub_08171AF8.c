@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.6%
 // foundry draft (worker best 98.6%); what differs is mostly register allocation and instruction order
-#define SceneHud_UpdateActionSwapSelection sub_08171AF8
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
 void MenuDisplay_UpdateActionPrompt(void *, int);
@@ -18,7 +17,7 @@ void sub_0816676C(void *, s32);
 void SceneHud_PrepareActionTransferToSlot(void *, s32, s32, s32);
 void PauseInventory_UpdateConsumableSwapAnimation(void);
 void sub_081719A8(void);
-void sub_08171AF8(struct SceneHudState *p)
+void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
 {
     u8 *input = p->actionInput;
     u16 one;
@@ -64,5 +63,5 @@ void sub_08171AF8(struct SceneHudState *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08171AF8);
+INCLUDE_ASM("asm/nonmatching", SceneHud_UpdateActionSwapSelection);
 #endif

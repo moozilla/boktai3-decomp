@@ -6,7 +6,7 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void SceneHud_BeginEquipmentSelection(void *);
 void Sound_PlaySong(int);
 void Hud_SaveGridSelection(void *);
-void sub_08173E68(void);
+void SceneHud_TickEquipmentSwap(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 extern u16 gUnk_03005260[];
 void sub_08173D2C(u8 *p)
@@ -28,6 +28,6 @@ void sub_08173D2C(u8 *p)
         *((u32 *)(p + 0x1668)) &= ~1;
         a = p + 0x1680;
         SceneHud_GetActionIconPosition(a, p[0x438a]);
-        Hud_SetInteractionCallback(p, sub_08173E68, 1);
+        Hud_SetInteractionCallback(p, SceneHud_TickEquipmentSwap, 1);
     }
 }

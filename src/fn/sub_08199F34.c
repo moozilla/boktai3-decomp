@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // foundry draft (worker best 91.0%); what differs is mostly register allocation and instruction order
-#define CannonBattery_InitProjectile   sub_08199F34
 #define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
 struct CannonBatteryPosition {
@@ -42,8 +41,8 @@ static inline void CannonBattery_SetProjectileShape(struct CannonBatteryCollider
     collider->size = gUnk_0824F6E8;
     collider->offset = gUnk_0824F6F0;
 }
-void sub_08199F34(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
-                  struct CannonBatteryPosition *origin, s32 horizontal)
+void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
+                                  struct CannonBatteryPosition *origin, s32 horizontal)
 {
     void *resource = (void *)CannonBattery_LoadAnimation();
     struct CannonBatteryCollider *collider;
@@ -89,5 +88,5 @@ void sub_08199F34(struct CannonBatteryPool *pool, struct CannonBatteryProjectile
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08199F34);
+INCLUDE_ASM("asm/nonmatching", CannonBattery_InitProjectile);
 #endif

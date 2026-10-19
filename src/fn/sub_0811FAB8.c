@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: applies knockback velocity away from attacker and stun timer */
-#define Actor_ApplyKnockback sub_0811FAB8
 
 struct Vec3s {
     s16 x, y, z, w;

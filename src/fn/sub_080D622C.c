@@ -1,6 +1,5 @@
 #include "scene_actor_control_phase.h"
 /* SceneActorControl_UpdatePersistentPhase_080D622C: SceneActorControl_UpdatePersistentPhase variant: control sub_080D3D60 kind 39, no shadow toggle, update callback via Callback_InvokeActor (provisional name) */
-#define SceneActorControl_UpdatePersistentPhase_080D622C sub_080D622C
 #include "scene_actor_reaction.h"
 void sub_080D3D60(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);

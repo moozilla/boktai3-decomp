@@ -19,7 +19,7 @@ struct M {
 };
 
 extern void *AnimData_FindEntry(u32);
-extern void sub_08217DE0(struct P *, void *, u32);
+extern void ParticleSprite_Initialize(struct P *, void *, u32);
 extern void Effect_SetOrigin(struct P *, s32, s32);
 extern void Effect_SetPalette(struct P *, u32);
 extern void SpriteDrawable_SelectTileFrame(struct P *, void *, u32);
@@ -38,7 +38,7 @@ void OrbitEffect_InitTrailSprites(struct M *m)
     p = (struct P *)((u8 *)m + 0x100);
     i = 11;
     do {
-        sub_08217DE0(p, *r, 1);
+        ParticleSprite_Initialize(p, *r, 1);
         Effect_SetOrigin(p, -4, -4);
         if (m->mode == 2) {
             SpriteDrawable_SelectTileFrame(p, *r, 1);

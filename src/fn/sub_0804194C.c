@@ -2,9 +2,9 @@
 #include "modifier_list.h"
 extern u32 gUnk_030053F0;
 extern struct ModifierMenuActor *gUnk_020004B4;
-void sub_0811C9F8(u8 *, u8 *, u32);
+void ActorSprite_InitPartDrawings(u8 *, u8 *, u32);
 void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
-void sub_0811CB68(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
+void CharacterPreview_PositionParts(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
 void CharacterModel_SetAnimationFlags(u8 *, s32);
 void CharacterModel_SetComponentRenderMode(u8 *, s32);
 void CharacterModel_InitPalettes(u8 *, s32);
@@ -34,9 +34,9 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     }
     resource = (u8 *)menu + 0x83C;
     model = (u8 *)menu + 0xE34;
-    sub_0811C9F8(resource, model, 0x3D99);
+    ActorSprite_InitPartDrawings(resource, model, 0x3D99);
     ModifierMenu_RefreshPreviewModel(menu);
-    sub_0811CB68(resource, model, &origin, 0);
+    CharacterPreview_PositionParts(resource, model, &origin, 0);
     CharacterModel_SetAnimationFlags(model, 16);
     CharacterModel_SetComponentRenderMode(model, 1);
     CharacterModel_InitPalettes(model, gUnk_02000710->unk81A);

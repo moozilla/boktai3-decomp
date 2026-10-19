@@ -32,8 +32,9 @@ static inline u32 Random(void)
     gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
     return *(u16 *)(gRandomTableIndex * 2 + (u32)gRandomTable);
 }
-void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor, struct ContactPosition *out,
-                  struct RouteSelectionPosition *origin, s32 limit)
+void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
+                                      struct ContactPosition *out,
+                                      struct RouteSelectionPosition *origin, s32 limit)
 {
     struct RoutePointSelection route;
     struct RoutePointSelection point;

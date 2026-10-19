@@ -2,11 +2,10 @@
 #ifdef NONMATCHING
 // fuzzy: 95.8%
 // foundry draft (worker best 95.8%); what differs is mostly register allocation and instruction order
-#define MenuSelection_ProcessOptionInput sub_08175C40
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void MenuSelection_RefreshOptionText(u8 *);
-s32 sub_08175C40(u8 *s)
+s32 MenuSelection_ProcessOptionInput(u8 *s)
 {
     u32 keys = gUnk_03005260[1];
     u16 up;
@@ -71,5 +70,5 @@ none:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08175C40);
+INCLUDE_ASM("asm/nonmatching", MenuSelection_ProcessOptionInput);
 #endif

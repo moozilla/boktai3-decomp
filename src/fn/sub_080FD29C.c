@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.0%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
-#define ActorGroup_ResetActivePhase sub_080FD29C
 struct ActorGroupPhaseState {
     u8 unknown0[0xe4c];
     u32 flags;
@@ -18,7 +17,7 @@ static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 sta
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-void sub_080FD29C(struct SceneActorRegistryResetView *actor)
+void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
 {
     struct ActorGroupPhaseState *group = actor->context;
     if (actor->field2B1)
@@ -32,5 +31,5 @@ void sub_080FD29C(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FD29C);
+INCLUDE_ASM("asm/nonmatching", ActorGroup_ResetActivePhase);
 #endif

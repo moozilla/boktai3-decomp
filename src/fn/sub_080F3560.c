@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.8%
 // foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
-#define ChildGroup_ShowDamageNumber sub_080F3560
 struct ChildGroup {
     u8 pad0[0x7E];
     s16 field7E;
@@ -29,7 +28,7 @@ static inline void clearOffset(void *dst)
     u32 zero = 0;
     CpuSet(&zero, dst, 0x05000002);
 }
-void sub_080F3560(struct ChildGroup *p, u32 flags, s32 mode)
+void ChildGroup_ShowDamageNumber(struct ChildGroup *p, u32 flags, s32 mode)
 {
     struct {
         u32 fill;
@@ -46,5 +45,5 @@ void sub_080F3560(struct ChildGroup *p, u32 flags, s32 mode)
     p->damage = 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F3560);
+INCLUDE_ASM("asm/nonmatching", ChildGroup_ShowDamageNumber);
 #endif

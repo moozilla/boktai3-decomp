@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: strafe motion along 0xB3B with backward animation mode */
-#define Armor_UpdateStrafeMotion sub_08182B14
 
 /* tentative: picks a directional animation and moves along the facing with a nudge near the cell edge */
 

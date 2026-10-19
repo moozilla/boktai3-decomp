@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: state machine on 0xB40 starting armor animation, playing songs by armor type */
-#define ActorController_UpdateArmorAnimationTransition sub_08184D18
 
 struct ActorAnimationLayer {
     u16 unknown[3];
@@ -15,7 +14,7 @@ extern u32 gUnk_0824EF00[];
 void Armor_SetAnimationFromStart(u32 a, u32 b);
 void Sound_PlaySongChecked(u32 a);
 void Armor_InitPaletteBanks(void *p);
-void sub_08184FE8(void *p, u32 a);
+void DirectionalActor_TryBeginState(void *p, u32 a);
 
 void ActorController_UpdateArmorAnimationTransition(u8 *p)
 {
@@ -91,7 +90,7 @@ void ActorController_UpdateArmorAnimationTransition(u8 *p)
         case 2:
             if (p[0xB43] != 0) {
                 p[0xB41] = 1;
-                sub_08184FE8(p, 0);
+                DirectionalActor_TryBeginState(p, 0);
             }
             break;
     }

@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: fixed-speed armor motion along facing with cell nudge and burst */
-#define ArmorActor_UpdateFixedSpeedMotion sub_08183E4C
 
 /* tentative: faces a direction, sets a fixed-speed motion vector, nudges toward the cell centre and spawns a particle burst */
 

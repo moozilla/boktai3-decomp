@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: per-frame damped fall with offset decay and facing update */
-#define ActorMotion_UpdateFallFrame sub_081203A8
 
 struct Actor {
     u8 pad0[4];
@@ -51,7 +50,7 @@ void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Actor *);
 void sub_0811D91C(struct Actor *);
-void sub_0811BD30(struct Actor *, u8 *);
+void Actor_UpdateShadowSpriteParts(struct Actor *, u8 *);
 void sub_0811BF44(struct Actor *);
 void CharacterModel_UpdateAccessoryAnimations(u8 *);
 
@@ -118,7 +117,7 @@ void ActorMotion_UpdateFallFrame(struct Actor *p)
     }
     p->lastX = x;
     sub_0811D91C(self);
-    sub_0811BD30(self, p->model);
+    Actor_UpdateShadowSpriteParts(self, p->model);
     if (self->flags & 4)
         sub_0811BF44(self);
     if (self->flags & 2)

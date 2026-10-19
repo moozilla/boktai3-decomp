@@ -25,7 +25,7 @@ struct ArmorTarget {
 extern struct ArmorTarget *gUnk_02000710;
 s32 Math_Atan2(s32, s32);
 u32 ActorController_StartAlternateTurn(struct ArmorActor *, u32);
-s32 sub_08184FE8(struct ArmorActor *, s32);
+s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
 
 void Armor_UpdateFacingActionSequence(struct ArmorActor *p)
 {
@@ -46,11 +46,11 @@ void Armor_UpdateFacingActionSequence(struct ArmorActor *p)
             *q = 1;
         }
         case 1:
-            if (sub_08184FE8(p, 0x19))
+            if (DirectionalActor_TryBeginState(p, 0x19))
                 p->phase = 2;
             break;
         case 2:
-            if (p->timer > 9 && sub_08184FE8(p, 0x2b)) {
+            if (p->timer > 9 && DirectionalActor_TryBeginState(p, 0x2b)) {
                 r = 3;
                 goto st;
             }

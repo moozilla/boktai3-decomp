@@ -3,13 +3,12 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 94.8%); what differs is mostly register allocation and instruction order
-#define MenuSelection_DrawNumericSummary sub_08175494
 u16 *Hud_GetTilemapCell(u32, u32, u32);
 s32 Hud_GetMinimum(s32, s32);
 void SceneHud_DrawDecimalDigits(s32, s32, s32, s32, s32);
-void sub_081655AC(s32, s32, s32);
+void ResultPanel_FillTileRun(s32, s32, s32);
 s32 SceneCatalog_GetLevelScaledValue(u8 *);
-void sub_08175494(u8 *s)
+void MenuSelection_DrawNumericSummary(u8 *s)
 {
     if ((*(u8 **)(s + 0xA40))[0x418] != 6) {
         s32 zero;
@@ -34,12 +33,12 @@ void sub_08175494(u8 *s)
         }
     } else {
         SceneHud_DrawDecimalDigits(Hud_GetMinimum(gUnk_02000710->level + 10, 99), 10, 21, 3, 0);
-        sub_081655AC(6, 23, 4);
-        sub_081655AC(6, 23, 5);
-        sub_081655AC(2, 20, 8);
+        ResultPanel_FillTileRun(6, 23, 4);
+        ResultPanel_FillTileRun(6, 23, 5);
+        ResultPanel_FillTileRun(2, 20, 8);
         SceneHud_DrawDecimalDigits(99, 10, 25, 8, 0);
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08175494);
+INCLUDE_ASM("asm/nonmatching", MenuSelection_DrawNumericSummary);
 #endif

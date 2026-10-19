@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 89.9%
 // foundry draft (worker best 89.0%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_UpdateRouteResponse sub_080A33A4
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
     if (s->field2B1) {
@@ -13,7 +12,7 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void sub_080A33A4(struct SceneActorRegistryResetView *s)
+void SceneActorControl_UpdateRouteResponse(struct SceneActorRegistryResetView *s)
 {
     u8 entered = TakeEntry(s);
     if (entered) {
@@ -60,5 +59,5 @@ void sub_080A33A4(struct SceneActorRegistryResetView *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A33A4);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateRouteResponse);
 #endif

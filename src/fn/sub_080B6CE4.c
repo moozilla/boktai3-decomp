@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.6%
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
-#define SceneActorReaction_UpdateGate sub_080B6CE4
 struct SceneActorReactionContext {
     u8 unknown0[0x6D0];
     u8 active;
@@ -13,7 +12,7 @@ struct SceneActorReactionContext {
 };
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 void sub_080B7C10(struct SceneActorRegistryResetView *);
-void sub_080B6BA8(struct SceneActorRegistryResetView *);
+void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
 {
@@ -54,7 +53,7 @@ static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
     v |= p->flags2D4;
     p->flags2D4 = v;
 }
-void sub_080B6CE4(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorReactionContext *context = p->context;
     u8 active = HasReaction(p);
@@ -66,7 +65,7 @@ void sub_080B6CE4(struct SceneActorRegistryResetView *p)
             if (!ContextBlocked(context))
                 sub_080B7C10(p);
         } else {
-            sub_080B6BA8(p);
+            SceneActorControl_SelectBehaviorByTargetAngle(p);
         }
     } else {
         u32 one = 1;
@@ -90,5 +89,5 @@ void sub_080B6CE4(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B6CE4);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateGate);
 #endif

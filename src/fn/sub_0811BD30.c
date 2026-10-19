@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: positions sprite parts, easing two toward terrain clearance */
-#define Actor_UpdateShadowSpriteParts sub_0811BD30
 
 struct H {
     u32 lo : 16;

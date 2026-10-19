@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: arms the attack collider from facing tables with half power */
-#define ActorController_UpdateAttackCollider sub_08183078
 
 struct ActorAnimationLayer {
     u16 unknown[3];

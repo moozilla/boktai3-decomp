@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 96.9%
 // foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
-#define ActorMovement_FindQuarterTurnPoint sub_0817A16C
-#define ActorMovement_TestPoint            ActorPosition_TestPath
+#define ActorMovement_TestPoint ActorPosition_TestPath
 extern const s16 gUnk_086149C4[];
 s32 ActorMovement_TestPoint(void *, void *);
 struct MovementSearchActor {
@@ -20,7 +19,7 @@ static inline s32 trunc12(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0817A16C(struct MovementSearchActor *p, struct ContactPosition *out)
+void ActorMovement_FindQuarterTurnPoint(struct MovementSearchActor *p, struct ContactPosition *out)
 {
     struct ContactPosition point;
     struct ContactPosition *center = p->center;
@@ -59,5 +58,5 @@ void sub_0817A16C(struct MovementSearchActor *p, struct ContactPosition *out)
     *out = *center;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817A16C);
+INCLUDE_ASM("asm/nonmatching", ActorMovement_FindQuarterTurnPoint);
 #endif

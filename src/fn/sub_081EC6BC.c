@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 92.8%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
-#define ActorDisplay_UpdateScreenAnchor sub_081EC6BC
-#define gActorDisplayCamera             gUnk_020004B8
+#define gActorDisplayCamera gUnk_020004B8
 struct WorldPosition {
     s32 x, y, z;
 };
@@ -39,7 +38,7 @@ struct PackedAnchor {
 extern struct DisplayCamera *gUnk_020004B8;
 void sub_081ED8A0(void);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
-void sub_081EC6BC(struct ActorDisplay *actor)
+void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
 {
     if (!actor->screenSpace) {
         struct WorldPosition *position = &actor->position;
@@ -76,5 +75,5 @@ void sub_081EC6BC(struct ActorDisplay *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EC6BC);
+INCLUDE_ASM("asm/nonmatching", ActorDisplay_UpdateScreenAnchor);
 #endif

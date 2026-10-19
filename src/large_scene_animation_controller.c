@@ -1143,7 +1143,7 @@ void Anim_Remove(void *);
 
 void Collider_Remove(void *);
 
-void sub_0815F738(void *);
+void SceneLink_RemoveNode(void *);
 
 void Nidhoggr_DestroyParts(struct Nidhoggr *p)
 {
@@ -1153,7 +1153,7 @@ void Nidhoggr_DestroyParts(struct Nidhoggr *p)
     do {
         Anim_Remove(b);
         Collider_Remove(&p->colliders[i]);
-        sub_0815F738(a);
+        SceneLink_RemoveNode(a);
         a += 0x10;
         b += 0x60;
         i++;

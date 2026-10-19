@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: moves two meter values toward their goals each frame, then restores the action HUD */
-#define MenuTransition_AnimateMetersToTarget sub_0816EF4C
 
 void Sound_PlaySong(int);
 void Sound_StopSong(int);

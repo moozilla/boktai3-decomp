@@ -2,7 +2,6 @@
 #include "global.h"
 
 /* tentative: per-frame active state: counts down, re-arms the collider and restarts the animation */
-#define ParticleBurstEffect_TickActive sub_08139798
 
 #include "actor_attachment_sprite_playback.h"
 
@@ -38,7 +37,7 @@ void Collider_SetFixedPositionWithYOffset(void *, struct BurstPos *, u32);
 void SpatialIndex_InsertEntry(void *);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void ParticleBurstEffect_SetStateCallback(struct BurstEntry *, void (*)(struct BurstEntry *));
-void sub_081395E0(struct BurstEntry *);
+void SpriteEffect_HideWithScatterBurst(struct BurstEntry *);
 
 void ParticleBurstEffect_TickActive(struct BurstEntry *p)
 {
@@ -75,5 +74,5 @@ skip: {
     ActorAttachment_StepSprite(&p->sprite, &p->anim);
     SpatialIndex_InsertEntry(p->collider);
     if (--p->duration == 0)
-        ParticleBurstEffect_SetStateCallback(p, sub_081395E0);
+        ParticleBurstEffect_SetStateCallback(p, SpriteEffect_HideWithScatterBurst);
 }

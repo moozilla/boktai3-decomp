@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
-#define PlayerPanel_RemoveEffects sub_08167734
 struct PanelParticle {
     u8 unknown[0x40];
 };
@@ -21,7 +20,7 @@ struct PlayerPanel {
     u8 unknown4868[0x478];
     struct PanelEffect effects[4];
 };
-void sub_08167734(struct PlayerPanel *panel)
+void PlayerPanel_RemoveEffects(struct PlayerPanel *panel)
 {
     s32 group = 0;
     u32 offset = 0;
@@ -44,5 +43,5 @@ void sub_08167734(struct PlayerPanel *panel)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08167734);
+INCLUDE_ASM("asm/nonmatching", PlayerPanel_RemoveEffects);
 #endif

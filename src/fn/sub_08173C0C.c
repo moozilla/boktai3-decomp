@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.2%
 // foundry draft (worker best 86.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_TickEquipmentToggle  sub_08173C0C
 #define SceneInventory_IsSlotEquipped Inventory_IsEquipmentAssigned
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -21,7 +20,7 @@ void SceneHud_FillDigitCells(u32, u32, u32, u32);
 void InventoryPanel_SetEntryRow(void *, u32, u32, u32, u32, u32);
 void SceneHud_RefreshEquipmentIcons(void *, int);
 void SceneHud_BeginEquipmentSelection(void *);
-void sub_08173C0C(struct SceneHudState *p)
+void SceneHud_TickEquipmentToggle(struct SceneHudState *p)
 {
     s32 equipped;
     s32 slot;
@@ -60,5 +59,5 @@ void sub_08173C0C(struct SceneHudState *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08173C0C);
+INCLUDE_ASM("asm/nonmatching", SceneHud_TickEquipmentToggle);
 #endif

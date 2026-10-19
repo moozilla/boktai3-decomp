@@ -16,7 +16,7 @@ struct ActorManager {
 extern void *gUnk_0200020C;
 extern u32 gUnk_030053F4, gUnk_030053F0;
 void Anim_Remove(void *);
-void sub_0811B394(void *);
+void SpatialIndex_RemoveEntry(void *);
 void SceneMessages_UnregisterReceiver(void *);
 static inline void DestroyActors(struct ActorManager *manager, s32 i, u32 mask)
 {
@@ -30,7 +30,7 @@ static inline void DestroyActors(struct ActorManager *manager, s32 i, u32 mask)
                 anim += 0x60;
             } while (--j >= 0);
             actor = &manager->actors[i];
-            sub_0811B394(actor->contact);
+            SpatialIndex_RemoveEntry(actor->contact);
             if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
                 SceneMessages_UnregisterReceiver(actor->drawable);
         }

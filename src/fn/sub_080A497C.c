@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 80.2%
 // foundry draft (worker best 80.2%); what differs is mostly register allocation and instruction order
-#define SceneActorPlacement_BeginDefaultResponse sub_080A497C
-s32 sub_080A497C(struct SceneActorRegistryResetView *p)
+s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView *p)
 {
     u32 offset;
     u32 control;
@@ -82,5 +81,5 @@ s32 sub_080A497C(struct SceneActorRegistryResetView *p)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A497C);
+INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_BeginDefaultResponse);
 #endif

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
-#define SceneParticle_Create     sub_0812D7D0
 #define SceneParticle_Allocate   SceneMovingParticle_AllocateEntry_0812D670
 #define SceneParticle_CreatePool ParticleEffectPool_GetOrCreate
 #define gSceneParticlePool       gUnk_02000194
@@ -34,13 +33,13 @@ struct SceneParticlePool {
 extern struct SceneParticlePool *gUnk_02000194;
 struct SceneParticlePool *ParticleEffectPool_GetOrCreate(void);
 struct SceneParticle *SceneMovingParticle_AllocateEntry_0812D670(struct SceneParticlePool *);
-void sub_08217DE0(struct SceneParticle *, void *, u32);
+void ParticleSprite_Initialize(struct SceneParticle *, void *, u32);
 void Effect_SetOrigin(struct SceneParticle *, s32, s32);
 void SpriteDrawable_SelectTileFrame(struct SceneParticle *, void *, u32);
 void Effect_SetPalette(struct SceneParticle *, u32);
-struct SceneParticle *sub_0812D7D0(struct SceneParticleVector *position,
-                                   struct SceneParticleVector *velocity, u32 lifetime, u32 kind,
-                                   u32 mode)
+struct SceneParticle *SceneParticle_Create(struct SceneParticleVector *position,
+                                           struct SceneParticleVector *velocity, u32 lifetime,
+                                           u32 kind, u32 mode)
 {
     struct SceneParticlePool *pool = gUnk_02000194;
     struct SceneParticle *p;
@@ -95,7 +94,7 @@ struct SceneParticle *sub_0812D7D0(struct SceneParticleVector *position,
         p->timer = three;
     }
     p->position = *position;
-    sub_08217DE0(p, pool->resource, 0);
+    ParticleSprite_Initialize(p, pool->resource, 0);
     Effect_SetOrigin(p, -4, -4);
     SpriteDrawable_SelectTileFrame(p, pool->resource, p->baseFrame);
     Effect_SetPalette(p, 1);
@@ -104,5 +103,5 @@ struct SceneParticle *sub_0812D7D0(struct SceneParticleVector *position,
     return p;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812D7D0);
+INCLUDE_ASM("asm/nonmatching", SceneParticle_Create);
 #endif

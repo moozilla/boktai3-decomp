@@ -7,7 +7,7 @@ struct SceneActorDirectionalSequence {
     u8 unknownA[4];
     u16 timer;
 };
-void sub_080DDD28(struct SceneActorRegistryResetView *);
+void Actor_InitLaunchVelocity(struct SceneActorRegistryResetView *);
 s32 Math_Atan2(s32, s32);
 static inline u8 TakeFlag(u8 *flag)
 {
@@ -27,7 +27,7 @@ void SceneActor_UpdateDirectionalAnimation(struct SceneActorRegistryResetView *a
     struct SceneActorDirectionalSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
     if (TakeFlag(&actor->field2B2)) {
         u32 mask;
-        sub_080DDD28(actor);
+        Actor_InitLaunchVelocity(actor);
         direction[9] = Math_Atan2(actor->secondaryMotion.x, actor->secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;

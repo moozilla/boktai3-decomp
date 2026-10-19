@@ -86,7 +86,7 @@ void SceneNpc_SetKindMotionVector(struct SceneNpc *, s32);
 void SceneCharacter_OnStateChange(void);
 void SceneNpc_UpdateCommands(void);
 void SceneCharacter_OnCommandUpdate(void);
-void sub_081CC64C(void);
+void Actor_TickCallbacks(void);
 void SceneCharacter_UpdateDisplay(void);
 void SceneCharacter_OnDestroy(void);
 void Actor_OnIdleUpdate(void);

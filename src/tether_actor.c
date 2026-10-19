@@ -275,7 +275,7 @@ s32 DisplayAnimation_SetEntry(struct DisplayAnimation *, u32, u32, u32, u32, u32
 
 s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *);
 
-u32 sub_0821FCDC(void *);
+u32 Navigation_FindContainingRegion(void *);
 
 void ProximityVolume_TranslateBounds(void *, void *);
 
@@ -577,7 +577,7 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
     s32 remaining = 6;
     do {
         void *resource = AnimData_FindEntry(0x1C1C);
-        sub_08217DE0(segment, resource, 0);
+        ParticleSprite_Initialize(segment, resource, 0);
         Effect_SetOrigin(segment, offset, offset);
         segment->priority = 255;
         segment->flags |= 1;
@@ -1144,7 +1144,7 @@ u32 TetherActor_TestInteractionPath(struct TetherActor *p)
     u8 *a = (u8 *)&p->position;
     u8 *b;
     u32 r;
-    if (sub_0821FCDC(a) == 0xFF ||
+    if (Navigation_FindContainingRegion(a) == 0xFF ||
         (b = (u8 *)&p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
          sub_0821F2EC(b, a, (u8 *)&p->interactionTarget) == 0))
         r = 0;
@@ -1537,7 +1537,7 @@ void TetherActor_SetInteractionPathFromScript(void)
             p->interactionScriptId = Script_GetValue();
         if (p->state == 3) {
             a = &p->position.x;
-            if (sub_0821FCDC(a) == 0xFF ||
+            if (Navigation_FindContainingRegion(a) == 0xFF ||
                 (b = &p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
                  sub_0821F2EC(b, a, &p->interactionTarget.x) == 0))
                 TetherActor_SetState(p, 0);

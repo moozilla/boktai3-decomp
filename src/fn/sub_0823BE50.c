@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: drifts the player along a direction while global modifier 08 is set */
-#define Player_UpdateModifier08Drift sub_0823BE50
 
 struct Obj {
     u8 pad0[0x18];
@@ -29,7 +28,7 @@ struct Obj {
 extern const s16 gUnk_086149C4[];
 u32 Player_IsFlaggedWithGlobalModifier08(u32 x);
 void Player_PlayLocalSong(s32, u32);
-s32 sub_0823BC54(struct Obj *obj);
+s32 Actor_ProbeDiagonalTurnDir(struct Obj *obj);
 
 static inline s32 scale(s32 value)
 {
@@ -54,7 +53,7 @@ void Player_UpdateModifier08Drift(struct Obj *p)
                 p->timer = 0;
                 p->active = 0;
             } else {
-                p->dir = sub_0823BC54(p);
+                p->dir = Actor_ProbeDiagonalTurnDir(p);
                 angle = ((p->dir + 5) & 7) * 32;
                 p->dx = scale(gUnk_086149C4[(angle + 64) & 255] * 10);
                 p->dz = scale(gUnk_086149C4[angle] * 10);

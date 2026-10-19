@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.6%
 // foundry draft (worker best 93.6%); what differs is mostly register allocation and instruction order
-#define SceneNpc_UpdateBlinkPhase sub_081CF490
 struct SceneNpc {
     u8 unknown0[7];
     u8 phaseComplete, unknown8, phaseEntered;
@@ -15,7 +14,7 @@ struct SceneNpc {
     void *callback;
 };
 s32 Callback_InvokeActor(void *, void *);
-void sub_081CF490(void *unused, struct SceneNpc *npc)
+void SceneNpc_UpdateBlinkPhase(void *unused, struct SceneNpc *npc)
 {
     u8 phase;
     u32 frame;
@@ -41,5 +40,5 @@ void sub_081CF490(void *unused, struct SceneNpc *npc)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081CF490);
+INCLUDE_ASM("asm/nonmatching", SceneNpc_UpdateBlinkPhase);
 #endif

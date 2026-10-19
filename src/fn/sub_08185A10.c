@@ -14,7 +14,7 @@ struct ArmorPackedPosition {
 extern u8 *gUnk_02000710;
 s32 sub_0821F7A8(void *, void *, struct ArmorPackedPosition *);
 u32 sub_0821FB8C(void *, void *, u32, u32);
-s32 sub_08184FE8(struct Armor *, s32);
+s32 DirectionalActor_TryBeginState(struct Armor *, s32);
 void Armor_UpdateTargetFacing(struct Armor *p)
 {
     struct ArmorPackedPosition pos;
@@ -27,7 +27,7 @@ void Armor_UpdateTargetFacing(struct Armor *p)
     }
     sub_0821FB8C(p->navigation, p->position, p->direction, 0x40);
     if (p->state == 0) {
-        if (sub_08184FE8(p, 0x1c))
+        if (DirectionalActor_TryBeginState(p, 0x1c))
             p->state = 255;
     }
 }

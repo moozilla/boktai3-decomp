@@ -6,13 +6,12 @@
 #ifdef NONMATCHING
 // fuzzy: 99.3%
 // foundry draft (worker best 99.3%); what differs is mostly register allocation and instruction order
-#define PlayerCue_InitAttackCollider    sub_0815DDA4
 #define PlayerCue_ComputeColliderPower  Player_ScaleLevelValue
 #define PlayerCue_RecordColliderContact Player_OnStateOneEvent
 s32 Player_ScaleLevelValue(u32, s32);
 void Player_OnStateOneEvent(u32, u32, struct Player *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void sub_0815DDA4(struct Player *p, void *position, u32 flags, s32 scale)
+void PlayerCue_InitAttackCollider(struct Player *p, void *position, u32 flags, s32 scale)
 {
     struct PlayerCueCollider *collider = &p->cueCollider;
     struct PlayerColliderVector size;
@@ -40,5 +39,5 @@ void sub_0815DDA4(struct Player *p, void *position, u32 flags, s32 scale)
     p->cueCollider.direction = ((p->facing + 1) & 7) << 5;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815DDA4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_InitAttackCollider);
 #endif

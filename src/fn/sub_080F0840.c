@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 92.2%
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
-#define SceneActor_FindNearbyPlayerTarget sub_080F0840
-#define gPlayerSlots                      gUnk_02000580
-void *sub_080F0840(struct SceneActorRegistryResetView *actor)
+#define gPlayerSlots gUnk_02000580
+void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *actor)
 {
     void *target = 0;
     s32 limit = actor->distanceLimitF8 * 2;
@@ -52,5 +51,5 @@ void *sub_080F0840(struct SceneActorRegistryResetView *actor)
     return target;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F0840);
+INCLUDE_ASM("asm/nonmatching", SceneActor_FindNearbyPlayerTarget);
 #endif

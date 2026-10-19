@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
-#define LinkSelection_WaitForParticipantChoices sub_0810B238
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
@@ -27,7 +26,7 @@ static inline u8 IsChoiceSlot(u32 value, u32 mask)
         return 1;
     return 0;
 }
-s32 sub_0810B238(struct AreaEffectLinkState *p)
+s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
 {
     s32 count, selected, i, length;
     if (Registry1745_ConsumeStateEntry(p)) {
@@ -68,5 +67,5 @@ s32 sub_0810B238(struct AreaEffectLinkState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810B238);
+INCLUDE_ASM("asm/nonmatching", LinkSelection_WaitForParticipantChoices);
 #endif

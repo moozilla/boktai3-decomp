@@ -11,13 +11,13 @@ struct P {
 
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
-void sub_0814FA10(void);
+void Player_TurnTowardTargetFacing(void);
 
 void PlayerCue_Face(struct P *p, u8 b, u32 c)
 {
     p->b = b;
     p->c = c;
-    p->fn = sub_0814FA10;
+    p->fn = Player_TurnTowardTargetFacing;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0, 0);
 }

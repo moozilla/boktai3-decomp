@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: 4-state armor defeat sequence with particle bursts */
-#define Armor_UpdateDefeatSequence sub_081842B0
 
 struct ActorAnimationLayer {
     u16 unknown[3];
@@ -18,14 +17,14 @@ void Armor_SpawnDirectionalParticleFan(u8 *);
 void Anim_UnlinkFromList(void *, u32);
 void ScaledShadow_Disable(void *);
 void ActorMarker_InitMovingSprite(void *);
-void sub_08180E68(u8 *);
+void SceneCombatActor_SpawnBouncingEffect(u8 *);
 void sub_08181514(u8 *, u32);
-void sub_0818EA3C(void *);
-void sub_08181134(u8 *);
+void SpriteColliderGroup_ResetActiveParts(void *);
+void ActorMarker_InitOffsetPosition(u8 *);
 static inline void Armor_CheckFlagRefresh(u8 *q)
 {
     if (*(u16 *)(q + 0xb32) & 1)
-        sub_08181134(q);
+        ActorMarker_InitOffsetPosition(q);
 }
 void Armor_UpdateDefeatSequence(u8 *p)
 {
@@ -64,9 +63,9 @@ void Armor_UpdateDefeatSequence(u8 *p)
             Armor_SpawnDirectionalParticleFan(p);
             Armor_SpawnDirectionalParticleFan(p);
             ActorMarker_InitMovingSprite(p);
-            sub_08180E68(p);
+            SceneCombatActor_SpawnBouncingEffect(p);
             sub_08181514(p, 0);
-            sub_0818EA3C(p + 0xb58);
+            SpriteColliderGroup_ResetActiveParts(p + 0xb58);
             {
                 u8 v = *s + 1;
                 u8 zero = 0;

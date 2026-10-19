@@ -26,7 +26,8 @@ struct ArmorAnimationRequest {
 extern const u8 gUnk_0824EB60[];
 extern const u16 gUnk_0824E920[][2][36];
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationRequest *request, u32 flags)
+void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationRequest *request,
+                                  u32 flags)
 {
     u32 index = request->index;
     u16 side;

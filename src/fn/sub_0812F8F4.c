@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.3%
 // foundry draft (worker best 80.3%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_UpdateEntryTransition sub_0812F8F4
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 static inline u8 SceneActorControl_TakeFlag(u8 *flag)
 {
@@ -38,7 +37,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     actor->flags114 &= ~1;
     actor->word104 = zero;
 }
-void sub_0812F8F4(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
 {
     u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group;
@@ -65,5 +64,5 @@ void sub_0812F8F4(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812F8F4);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateEntryTransition);
 #endif

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.5%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
-#define Slot7_UpdateMotionPhase sub_081EF440
 struct Slot7Motion {
     u8 pad0[0xAE];
     u8 phase, reset, entered;
@@ -27,7 +26,7 @@ static inline void BeginPhase(struct PhaseState *p, s32 phase)
     p->timer = 0;
     p->entered = 1;
 }
-void sub_081EF440(struct Slot7Motion *p)
+void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
 {
     struct PhaseState *other = (struct PhaseState *)p;
     if (p->reset) {
@@ -47,5 +46,5 @@ void sub_081EF440(struct Slot7Motion *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EF440);
+INCLUDE_ASM("asm/nonmatching", Slot7_UpdateMotionPhase);
 #endif

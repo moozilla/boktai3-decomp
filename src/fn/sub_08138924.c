@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
-#define PlayerSlotDisplay_Initialize sub_08138924
-#define gPlayerSlotDisplay           gUnk_020004C0
+#define gPlayerSlotDisplay gUnk_020004C0
 struct PlayerSlotDisplaySprite {
     u32 flags;
     u8 unknown4[3], priority;
@@ -25,7 +24,7 @@ struct PlayerSlotDisplay {
     void *sequenceResource;
 };
 extern struct PlayerSlotDisplay *gPlayerSlotDisplay;
-s32 sub_08138924(register struct PlayerSlotDisplay *manager)
+s32 PlayerSlotDisplay_Initialize(register struct PlayerSlotDisplay *manager)
 {
     s32 i = 0;
     u8 *buffer = manager->slots[0].buffer;
@@ -61,5 +60,5 @@ s32 sub_08138924(register struct PlayerSlotDisplay *manager)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08138924);
+INCLUDE_ASM("asm/nonmatching", PlayerSlotDisplay_Initialize);
 #endif

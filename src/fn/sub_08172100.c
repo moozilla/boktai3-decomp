@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: adds or removes an inventory slot from the 8-entry equipped list */
-#define SolarFruit_ToggleEquipSlot sub_08172100
 
 extern u8 *gUnk_02000710;
 s32 SolarFruit_GetInventorySlot(s32);

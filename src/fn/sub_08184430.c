@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: 4-state break-apart sequence with particles and camera shake */
-#define ActorController_UpdateBreakApartTransition sub_08184430
 
 struct Layer {
     u16 unknown[3];
@@ -41,9 +40,9 @@ void Anim_UnlinkFromList(void *, u32);
 void ScaledShadow_Disable(void *);
 void Armor_SpawnDirectionalParticleFan(void *);
 void ActorMarker_InitMovingSprite(void *);
-void sub_08180E68(void *);
+void SceneCombatActor_SpawnBouncingEffect(void *);
 void sub_08181514(void *, u32);
-void sub_0818EA3C(void *);
+void SpriteColliderGroup_ResetActiveParts(void *);
 void Collider_SetAttackPowerAndForce(void *, u32, u32);
 u16 Math_Atan2(s32, s32);
 void Armor_SpawnRandomDirectionalParticle(void *);
@@ -129,9 +128,9 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             Armor_SpawnDirectionalParticleFan(p);
             Armor_SpawnDirectionalParticleFan(p);
             ActorMarker_InitMovingSprite(p);
-            sub_08180E68(p);
+            SceneCombatActor_SpawnBouncingEffect(p);
             sub_08181514(p, 1);
-            sub_0818EA3C(p + 0xB58);
+            SpriteColliderGroup_ResetActiveParts(p + 0xB58);
             (*s)++;
             *t = zero;
             SetLayers(p);

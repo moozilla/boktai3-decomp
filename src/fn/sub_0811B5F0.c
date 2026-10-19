@@ -13,7 +13,7 @@ struct CollisionManager {
     u8 pad0[0x18];
     struct CollisionGroup groups[10];
 };
-void sub_0811B094(struct CollisionManager *, struct CollisionGroup *, s32);
+void Collider_ScheduleUpdates(struct CollisionManager *, struct CollisionGroup *, s32);
 void Collision_DispatchOverlaps(struct CollisionBody *, struct CollisionBodyLink *);
 void Heap_Free(void *);
 s32 Collision_ProcessGroups(struct CollisionManager *manager)
@@ -21,7 +21,7 @@ s32 Collision_ProcessGroups(struct CollisionManager *manager)
     s32 i;
     for (i = 0; i < 10; i++) {
         struct CollisionBodyLink *node;
-        sub_0811B094(manager, &manager->groups[i], i);
+        Collider_ScheduleUpdates(manager, &manager->groups[i], i);
         node = manager->groups[i].pending;
         while (node) {
             struct CollisionBodyLink *old;

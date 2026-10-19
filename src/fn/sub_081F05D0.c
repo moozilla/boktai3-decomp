@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.1%
 // foundry draft (worker best 97.1%); what differs is mostly register allocation and instruction order
-#define SingletonSlot7_OnTargetContact sub_081F05D0
 struct Slot7Actor {
     u8 pad0[0x5c0];
     u16 duration, flashTimer;
@@ -16,7 +15,7 @@ struct Slot7Target {
     struct Slot7Actor *owner;
 };
 void Sound_PlaySong(u32);
-s32 sub_081F05D0(struct Slot7Target *target, s32 event, s32 amount)
+s32 SingletonSlot7_OnTargetContact(struct Slot7Target *target, s32 event, s32 amount)
 {
     struct Slot7Actor *actor = target->owner;
     u32 duration;
@@ -41,5 +40,5 @@ s32 sub_081F05D0(struct Slot7Target *target, s32 event, s32 amount)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F05D0);
+INCLUDE_ASM("asm/nonmatching", SingletonSlot7_OnTargetContact);
 #endif

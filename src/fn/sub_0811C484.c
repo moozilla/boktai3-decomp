@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: counts a held charge, spawning particles, and fires the callback on release */
-#define ChargeMarker_TickHold sub_0811C484
 
 struct Pos {
     s16 x, y, z, w;

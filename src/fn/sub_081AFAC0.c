@@ -39,7 +39,7 @@ struct ActorStatus {
     u16 strengthShift;
 };
 void ActorStatus_InitializeContact(struct ContactActor *actor, struct ContactActor *other,
-                  struct ActorStatus *status)
+                                   struct ActorStatus *status)
 {
     u8 *world = gUnk_02000580;
     s32 strength, shift, scaled;

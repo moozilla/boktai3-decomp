@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
-#define PlayerClone_BeginActiveReactions sub_082012D4
-#define gPlayerCloneManager              gUnk_020005F8
+#define gPlayerCloneManager gUnk_020005F8
 struct ClonePosition {
     u16 x, y, z, pad;
 };
@@ -50,7 +49,7 @@ static inline u32 enableClone(u32 value)
     u32 one = 1;
     return one | value;
 }
-void sub_082012D4(void)
+void PlayerClone_BeginActiveReactions(void)
 {
     struct PlayerCloneManager *manager = gUnk_020005F8;
     if (manager) {
@@ -89,5 +88,5 @@ void sub_082012D4(void)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082012D4);
+INCLUDE_ASM("asm/nonmatching", PlayerClone_BeginActiveReactions);
 #endif

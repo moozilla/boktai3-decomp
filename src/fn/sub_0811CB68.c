@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 90.0%); what differs is mostly register allocation and instruction order
-#define CharacterPreview_PositionParts sub_0811CB68
-void sub_0811CB68(void *resource, struct ModifierDisplayObject *parts,
-                  struct ModifierPreviewOrigin *origin, u16 flags)
+void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject *parts,
+                                    struct ModifierPreviewOrigin *origin, u16 flags)
 {
     u16 flip = flags;
     s32 i = 0;
@@ -30,5 +29,5 @@ void sub_0811CB68(void *resource, struct ModifierDisplayObject *parts,
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811CB68);
+INCLUDE_ASM("asm/nonmatching", CharacterPreview_PositionParts);
 #endif

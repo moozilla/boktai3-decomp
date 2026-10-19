@@ -3,7 +3,7 @@
 #include "area_effect_link.h"
 #include "game_state.h"
 void Registry1745_ToggleConnectionRole(struct AreaEffectLinkState *);
-void sub_081381CC(struct AreaEffectLinkState *);
+void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *);
 static inline u8 ReceiveBit(void)
 {
     struct AreaEffectLinkState *p = gUnk_020004B4;
@@ -18,7 +18,7 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, 
         p->sendBit++;
     if (flags & 2) {
         Registry1745_ToggleConnectionRole(p);
-        sub_081381CC(p);
+        LinkSession_UpdatePlayerValueAverage(p);
         p->sendBit = 0;
         p->receiveBits = (u16)gUnk_02000710->unk874 >> 2;
         i = 0;

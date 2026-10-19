@@ -4,22 +4,19 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-#define CallbackPool_ApplyDamage          sub_08104F98
-#define CallbackPool_RefreshHitState      sub_081050BC
-#define CallbackPool_RefreshHealthDisplay sub_081056A0
 void sub_0821FF8C(void *);
 void SceneHud_SetTimedState(void *, s32, s32, u32, s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
-void sub_081050BC(void *);
-void sub_081056A0(void *);
+void CallbackPool_SpawnHitParticles(void *);
+void CallbackPool_RefreshHealthDisplay(void *);
 void Sound_PlaySong(u32);
 static inline void ClearVector(void *dest, u32 *zero)
 {
     *zero = 0;
     CpuSet(zero, dest, 0x05000002);
 }
-void sub_08104F98(struct CallbackPoolEntry *source, struct CallbackPoolEntry *target,
-                  struct CallbackPoolEntry *entry)
+void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackPoolEntry *target,
+                              struct CallbackPoolEntry *entry)
 {
     struct CallbackPoolEntry *recipient = target;
     s32 damage;
@@ -44,8 +41,8 @@ void sub_08104F98(struct CallbackPoolEntry *source, struct CallbackPoolEntry *ta
     DamageNumberDisplay_Show(recipient, damage, 0, &entry->position, vector, 1);
     entry->hitTimer = 3;
     entry->shakeTimer = 10;
-    sub_081050BC(entry);
-    sub_081056A0(entry);
+    CallbackPool_SpawnHitParticles(entry);
+    CallbackPool_RefreshHealthDisplay(entry);
     if (entry->damage)
         Sound_PlaySong(0x13e);
     else
@@ -56,5 +53,5 @@ void sub_08104F98(struct CallbackPoolEntry *source, struct CallbackPoolEntry *ta
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08104F98);
+INCLUDE_ASM("asm/nonmatching", CallbackPool_ApplyDamage);
 #endif

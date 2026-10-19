@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: steps a keyframe state machine for a category-14 scene actor */
-#define SceneActor14_UpdateAnimState sub_0812266C
 
 struct Obj {
     u8 unk0[8];

@@ -5,8 +5,6 @@
 #include "gba/macro.h"
 #include "gba/syscall.h"
 
-#define Ivy_UpdateHold sub_080ED914
-
 struct Player;
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -206,7 +204,7 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
  * inline's frame, addressed through r8), the drawable mode byte is a bitfield (its store
  * leaves the zero the ROM reuses), and the wrapped tick difference goes through an inline
  * so combine does not refold it. */
-void sub_080ED914(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct IvyContext *context = actor->context;
     void *group = (u8 *)actor + 0x3D4;
