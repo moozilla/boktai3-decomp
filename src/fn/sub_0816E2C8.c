@@ -5,7 +5,7 @@ void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestHide(void);
 void SceneHud_GetActionIconPosition(void *, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-s32 sub_0822D604(s32);
+s32 Selection_GetDisplayFrame(s32);
 void SceneHud_BeginIconMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void SceneMenuPanel_FinishMotionDelay(void);
@@ -47,7 +47,7 @@ void MenuTransition_BeginSelectedWidget(u8 *s)
     w.y = 48;
     w.z = 0;
     SceneHud_GetActionIconPosition(v, *kind);
-    result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
+    result = Selection_GetDisplayFrame(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = (*kind) + 10;
     SceneHud_BeginIconMotion(s, 0, result, ((struct MenuTransitionView *)s)->elems[later].v, v, &w,
                              0x18, 0x10);

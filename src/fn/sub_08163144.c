@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.2%
 // foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
-#define TransitionPanel_InitSprites sub_08163144
 struct TransitionPanelSprite {
     u32 flags;
     u8 unknown4[3], priority, scaleX, scaleY, unknownA[6];
@@ -24,7 +23,7 @@ struct TransitionPanel {
 };
 s32 AnimData_Load(void *, u32);
 void Sprite_InitUnlinked(void *, void *, s32);
-void sub_08163144(struct TransitionPanel *p)
+void TransitionPanel_InitSprites(struct TransitionPanel *p)
 {
     s32 i;
     s32 x;
@@ -60,5 +59,5 @@ void sub_08163144(struct TransitionPanel *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08163144);
+INCLUDE_ASM("asm/nonmatching", TransitionPanel_InitSprites);
 #endif

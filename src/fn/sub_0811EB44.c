@@ -11,12 +11,12 @@ struct ModifierActor {
     u8 unknown58[0x78];
     struct StatModifier modifiers[24];
 };
-s32 sub_0811E728(u8 *, s32);
-s32 sub_0811E77C(u8 *, s32);
+s32 StatModifier_ScaleForGlobalMode(u8 *, s32);
+s32 StatModifier_AddForGlobalMode(u8 *, s32);
 s32 Modifier_ScaleKindSevenStat(u8 *, s32);
 s32 Modifier_AddKindThreeStat(u8 *, s32);
 s32 Modifier_ScaleKindFourStat(u8 *, s32);
-s32 sub_0811E7C8(u8 *, s32);
+s32 StatModifier_AddForOwnerMode(u8 *, s32);
 s32 Modifier_AddKindSixStat(u8 *, s32);
 s32 Modifier_ScaleKindEightToTenStat(u8 *, s32);
 s32 StatModifier_ScaleAtOwnerThreshold(u8 *, s32);
@@ -44,11 +44,11 @@ void StatModifier_InitializeCallbacks(struct ModifierActor *p, struct StatModifi
         ScriptRecord_FindModifierRecord((struct ModifierRecord *)&slots[i].order, sources->ids[i]);
         switch (slots[i].kind) {
             case 1:
-                slots[i].callback = sub_0811E728;
+                slots[i].callback = StatModifier_ScaleForGlobalMode;
                 slots[i].enabled = 1;
                 break;
             case 2:
-                slots[i].callback = sub_0811E77C;
+                slots[i].callback = StatModifier_AddForGlobalMode;
                 slots[i].enabled = 1;
                 break;
             case 7:
@@ -64,7 +64,7 @@ void StatModifier_InitializeCallbacks(struct ModifierActor *p, struct StatModifi
                 slots[i].enabled = 1;
                 break;
             case 5:
-                slots[i].callback = sub_0811E7C8;
+                slots[i].callback = StatModifier_AddForOwnerMode;
                 slots[i].enabled = 1;
                 break;
             case 6:

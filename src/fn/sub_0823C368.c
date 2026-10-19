@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.8%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-#define Player_SelectHistoryDirection sub_0823C368
-s32 sub_0823C368(struct Player *s)
+s32 Player_SelectHistoryDirectionB(struct Player *s)
 {
     s32 i, previous, direction, clockwise, counterclockwise;
     s16 *history = s->directionHistory;
@@ -32,5 +31,5 @@ s32 sub_0823C368(struct Player *s)
     return s->facing;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823C368);
+INCLUDE_ASM("asm/nonmatching", Player_SelectHistoryDirectionB);
 #endif

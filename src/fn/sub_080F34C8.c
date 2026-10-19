@@ -2,8 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.8%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
-#define ChildGroup_WaitForInactiveMembers sub_080F34C8
-#define ChildGroup_BeginInactiveState     sub_080F3ABC
 
 struct ChildGroupMember {
     u8 active;
@@ -26,8 +24,8 @@ struct ChildGroup {
     u8 padD2A[2];
     u8 count;
 };
-void sub_080F3ABC(struct ChildGroup *);
-void sub_080F34C8(struct ChildGroup *p)
+void ChildGroup_BeginInactiveState(struct ChildGroup *);
+void ChildGroup_WaitForInactiveMembers(struct ChildGroup *p)
 {
     s32 active = 0;
     s32 n;
@@ -49,12 +47,12 @@ void sub_080F34C8(struct ChildGroup *p)
         p->state92 = one;
         p->state93 = one;
         p->inactive = 1;
-        p->callbackCC8 = sub_080F3ABC;
+        p->callbackCC8 = ChildGroup_BeginInactiveState;
     } else if (active < p->count) {
         if (++p->timer <= 7)
-            p->callbackCE4 = sub_080F34C8;
+            p->callbackCE4 = ChildGroup_WaitForInactiveMembers;
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F34C8);
+INCLUDE_ASM("asm/nonmatching", ChildGroup_WaitForInactiveMembers);
 #endif

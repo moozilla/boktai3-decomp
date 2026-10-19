@@ -87,7 +87,10 @@ route              set_actor_route only
 choice             a choice menu
 exit               leaves through a door_transition among other things
 set_state          assignments only, no calls
-FILE ROLE          most calls in one library file (stage, doors, enemies, objects, items, ...)"""
+FILE ROLE          most calls in one library file (stage, doors, enemies, objects, items, ...)
+CALLEE             else its first call that is not bookkeeping (begin_event, HUD, sound...), in snake_case:
+                   game_state_set_area_flag, show_stage_icon
+calc               no calls, returns a value"""
 
 
 @functools.lru_cache(None)
@@ -235,7 +238,26 @@ def _body_role(lines, names, file_of):
         role, n = votes.most_common(1)[0]
         if n * 2 > len(heads):
             return role, f"{n} of {len(heads)} calls are {role} procedures"
+    # last: what it mainly does, after its first significant call
+    for h in heads:
+        if h in BOOKKEEPING or h.startswith(("Sound_", "Hud_", "proc_")):
+            continue
+        return snake(h), f"first call {h}"
+    if not heads and "return " in text:
+        return "calc", "computes a value, no calls"
     return None
+
+
+# calls that set up or tidy rather than say what a procedure is for
+BOOKKEEPING = {"begin_event", "end_event", "nop", "run_continue_proc", "restore_hud", "end_event_restore_hud",
+               "Script_ScheduleOnce", "ensure_scene_actor_manager", "print"}
+
+
+def snake(name):
+    """GameState_SetAreaFlag -> game_state_set_area_flag; SceneObjects_ScriptActivate ->
+    scene_objects_activate; snake_case names stay."""
+    name = re.sub(r"_Script(?=[A-Z])", "_", name)
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower().replace("__", "_")
 
 
 def _ref_role(refs):

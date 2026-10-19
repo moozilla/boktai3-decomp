@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 98.1%
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
-#define ClockPanel_CaptureSnapshot sub_08109AEC
-#define gSunClock                  gUnk_03005430
-#define gGameState                 gUnk_02000710
+#define gSunClock  gUnk_03005430
+#define gGameState gUnk_02000710
 struct ClockPanelSnapshot {
     u8 bytes[0x20];
     u16 time;
@@ -25,7 +24,7 @@ struct ClockPanel {
 s32 GameState_GetChallengeBestScore(u32);
 u32 GameState_HasEquippedConsumable(s32);
 void SceneActorStyle_InitializeFromGameState(void *);
-void sub_08109AEC(struct ClockPanel *p)
+void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
 {
     struct ClockPanelSnapshot *s = &p->snapshot;
     u8 *record;
@@ -79,5 +78,5 @@ void sub_08109AEC(struct ClockPanel *p)
     SceneActorStyle_InitializeFromGameState(record);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08109AEC);
+INCLUDE_ASM("asm/nonmatching", ClockPanel_CaptureSnapshot);
 #endif

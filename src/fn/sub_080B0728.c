@@ -16,7 +16,7 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     }
     p->word104 = 0;
 }
-u8 sub_080B335C(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
 void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView *p)
 {
     if (SceneActorControl_TakeFlag(&p->field2B1)) {
@@ -24,7 +24,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView 
         u32 kind = 2;
         SelectControl(p, control, kind);
     }
-    if (sub_080B335C(p)) {
+    if (SceneActor_IsFacingNearbyTarget(p)) {
         if ((u8)Callback_InvokeActor(p, p->update270))
             return;
         if (sub_0812F3CC(p))

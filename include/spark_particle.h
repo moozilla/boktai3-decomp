@@ -43,7 +43,7 @@ void sub_0806A420(void);
 s32 SparkParticle_InitPool(struct SparkParticlePool *);
 struct SparkParticlePool *SparkParticle_CreatePool(void);
 void SparkParticle_ClearPool(void);
-void sub_08217DE0(void *, const void *, u32);
+void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, u32);
 #endif

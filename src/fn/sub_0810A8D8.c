@@ -16,7 +16,7 @@ u8 ByteSequence_AdvanceEncodedValue(void *, void *, s32);
 u8 LinkSession_ReceiveSelectionByte(void *, void *, s32, s32);
 void SceneActorStyle_InitializeFromGameState(void *);
 void ScriptPanel_OpenTextWindow(void);
-void sub_0810A9D0(void);
+void LinkSelection_WaitForEmptySlots(void);
 static inline u8 IsPayloadMode(u16 value)
 {
     value &= 0x3c00;
@@ -39,7 +39,7 @@ s32 LinkMenu_ExchangePayload(struct AreaEffectLinkState *p)
     if (Registry1745_CheckSessionReady(p) < 0)
         goto fail;
     if (IsPayloadMode(*p->selection)) {
-        Registry1745_SetState(p, 14, sub_0810A9D0);
+        Registry1745_SetState(p, 14, LinkSelection_WaitForEmptySlots);
         return 0;
     }
     ByteSequence_AdvanceEncodedValue(p, session + 0xc0, 0x24);

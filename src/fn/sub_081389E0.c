@@ -3,7 +3,7 @@
 extern u8 *gUnk_020004C0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_08138924(u8 *);
+s32 PlayerSlotDisplay_Initialize(u8 *);
 void Task_Kill(u8 *);
 void sub_08138778(void);
 void PositionEffectDisplay_Destroy(void);
@@ -16,7 +16,7 @@ u8 *PositionEffectDisplay_Create(void)
     p = Task_Create(0xa, 0x19c);
     if (p != 0) {
         Task_SetCallbacks(p, sub_08138778, PositionEffectDisplay_Destroy);
-        if (sub_08138924(p) < 0) {
+        if (PlayerSlotDisplay_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }

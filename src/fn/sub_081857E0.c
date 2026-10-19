@@ -25,7 +25,7 @@ struct S {
 };
 void ActorController_ForceAction(struct S *, s32);
 s32 Armor_TryStartAction(struct S *, s32);
-s32 sub_08184FE8(struct S *, s32);
+s32 DirectionalActor_TryBeginState(struct S *, s32);
 void Armor_SpawnPairedProjectiles(struct S *);
 void Armor_UpdatePairedProjectileAttack(struct S *p)
 {
@@ -38,7 +38,7 @@ void Armor_UpdatePairedProjectileAttack(struct S *p)
             }
             break;
         case 1:
-            if (sub_08184FE8(p, 0xc)) {
+            if (DirectionalActor_TryBeginState(p, 0xc)) {
                 p->b3d = 2;
                 p->b3e = 0;
                 Armor_SpawnPairedProjectiles(p);

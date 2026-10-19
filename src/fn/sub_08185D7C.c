@@ -6,7 +6,7 @@ struct S {
     u8 b40;
 };
 void ActorController_ForceAction(struct S *, s32);
-s32 sub_08184FE8(struct S *, s32);
+s32 DirectionalActor_TryBeginState(struct S *, s32);
 void Armor_FinalizeDefeat(struct S *);
 void Armor_UpdateDeathSequence(struct S *p)
 {
@@ -17,7 +17,7 @@ void Armor_UpdateDeathSequence(struct S *p)
             break;
         case 1:
             if (p->b40 == 0xff) {
-                sub_08184FE8(p, 0x12);
+                DirectionalActor_TryBeginState(p, 0x12);
                 p->b3d = 2;
             }
             break;

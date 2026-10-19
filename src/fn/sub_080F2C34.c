@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 78.2%
 // foundry draft (worker best 93.1%); what differs is mostly register allocation and instruction order
-#define PhaseObject_TickCountdown sub_080F2C34
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];
@@ -37,7 +36,7 @@ struct PhaseObject {
 };
 void sub_080F3B60(struct PhaseObject *);
 void sub_080F2BE4(struct PhaseObject *);
-void sub_080F2C34(struct PhaseObject *p)
+void PhaseObject_TickCountdown(struct PhaseObject *p)
 {
     s32 i;
     if (!(p->frame & 3)) {
@@ -75,5 +74,5 @@ void sub_080F2C34(struct PhaseObject *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F2C34);
+INCLUDE_ASM("asm/nonmatching", PhaseObject_TickCountdown);
 #endif

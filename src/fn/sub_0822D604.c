@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 67.3%
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
-#define Selection_GetDisplayFrame sub_0822D604
-s32 sub_0822D604(s32 selection)
+s32 Selection_GetDisplayFrame(s32 selection)
 {
     if (selection <= 29)
         selection += 0x151;
@@ -21,5 +20,5 @@ s32 sub_0822D604(s32 selection)
     return selection;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0822D604);
+INCLUDE_ASM("asm/nonmatching", Selection_GetDisplayFrame);
 #endif

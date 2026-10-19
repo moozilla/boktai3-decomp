@@ -8,7 +8,7 @@ void Registry1745_BeginShutdown(void *, void (*)(void));
 void Registry1745_SetState(void *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_UpdateSelection(void);
-void sub_0810A540(void);
+void LinkMenu_WaitSelectionMode(void);
 void RegistryF246_Close(void);
 s32 SessionMenu_WaitForSelection(struct AreaEffectLinkState *p)
 {
@@ -21,7 +21,7 @@ s32 SessionMenu_WaitForSelection(struct AreaEffectLinkState *p)
             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
             RegistryF246_Close();
         } else {
-            Registry1745_SetState(p, 8, sub_0810A540);
+            Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
         }
     }
     return 0;

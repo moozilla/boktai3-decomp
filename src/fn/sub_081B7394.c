@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
-#define EffectPool_InitSlot sub_081B7394
 struct EffectPoolSprite {
     u8 pad0[7];
     u8 mode;
@@ -24,7 +23,7 @@ struct EffectPoolSlot {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void sub_081B7394(void *pool, struct EffectPoolSlot *slot, s32 index)
+void EffectPool_InitSlot(void *pool, struct EffectPoolSlot *slot, s32 index)
 {
     vu32 zero;
     struct EffectPoolSprite *sprite;
@@ -44,5 +43,5 @@ void sub_081B7394(void *pool, struct EffectPoolSlot *slot, s32 index)
     CpuSet(source, position, 0x05000002);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B7394);
+INCLUDE_ASM("asm/nonmatching", EffectPool_InitSlot);
 #endif

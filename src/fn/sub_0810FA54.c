@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.8%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
-#define RecordList_InitializeSprites sub_0810FA54
 struct RecordList {
     u8 unknown[0x24];
     struct RecordMenuSprite sprites[18];
@@ -20,7 +19,7 @@ static inline void SetSpriteProc(void *proc, struct RecordList *list)
 {
     list->spriteProc = proc;
 }
-void sub_0810FA54(struct RecordList *list)
+void RecordList_InitializeSprites(struct RecordList *list)
 {
     s32 i;
     struct RecordMenuSprite *sprite;
@@ -39,5 +38,5 @@ void sub_0810FA54(struct RecordList *list)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810FA54);
+INCLUDE_ASM("asm/nonmatching", RecordList_InitializeSprites);
 #endif

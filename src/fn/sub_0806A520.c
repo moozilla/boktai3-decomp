@@ -17,7 +17,7 @@ init:
     i = 47;
     do {
         *active = 0;
-        sub_08217DE0(sprite, pool->graphics, 0);
+        ParticleSprite_Initialize(sprite, pool->graphics, 0);
         Effect_SetOrigin(sprite, -8, -10);
         sprite->renderMode = 2;
         sprite->flags |= 1;

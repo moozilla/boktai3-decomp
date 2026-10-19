@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 81.4%
 // foundry draft (worker best 81.4%); what differs is mostly register allocation and instruction order
-#define GameRecords_UpdateMinimum sub_0811D5A8
-#define gGameState                gUnk_02000710
+#define gGameState gUnk_02000710
 static inline s32 ClampRecord(s32 value)
 {
     s32 result = value;
@@ -14,7 +13,7 @@ static inline s32 ClampRecord(s32 value)
         result = 0;
     return result;
 }
-s32 sub_0811D5A8(u32 index, s32 value)
+s32 GameRecords_UpdateMinimum(u32 index, s32 value)
 {
     s32 *record;
     if (index > 11 || value < 0)
@@ -34,5 +33,5 @@ update:
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811D5A8);
+INCLUDE_ASM("asm/nonmatching", GameRecords_UpdateMinimum);
 #endif

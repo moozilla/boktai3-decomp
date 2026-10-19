@@ -21,7 +21,7 @@ void SceneHud_ShowActionPreview(void *);
 void PauseMenu_SetPromptIconPositions(void *, s32, s32);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
-void sub_0816FCD0(void);
+void PauseMenu_UpdateItemActions(void);
 void PauseInventory_InitEquipmentPage(u8 *p)
 {
     u8 *flag = p + 0x4860;
@@ -56,5 +56,5 @@ void PauseInventory_InitEquipmentPage(u8 *p)
     SceneHud_ShowActionPreview(p);
     PauseMenu_SetPromptIconPositions(p, 0, 0);
     MenuDisplay_UpdateActionPrompt(p, 4);
-    Hud_SetInteractionCallback(p, sub_0816FCD0, 0);
+    Hud_SetInteractionCallback(p, PauseMenu_UpdateItemActions, 0);
 }

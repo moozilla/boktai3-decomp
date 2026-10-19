@@ -2,10 +2,9 @@
 #ifdef NONMATCHING
 // fuzzy: 98.8%
 // foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
-#define ChildGroup_UpdateAlternatingCallbacks sub_080F40C8
-#define ChildGroup_UpdateVerticalOscillation  Ivy_UpdateBobbing
-#define gChildGroupRandomIndex                gUnk_03005308
-#define gChildGroupRandomTable                gUnk_0203B400
+#define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
+#define gChildGroupRandomIndex               gUnk_03005308
+#define gChildGroupRandomTable               gUnk_0203B400
 struct ChildGroup {
     u8 pad0[0x8D];
     u8 flags;
@@ -45,7 +44,7 @@ static inline u8 EnterState(struct ChildGroup *p)
     }
     return 0;
 }
-void sub_080F40C8(struct ChildGroup *p)
+void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
 {
     if (EnterState(p)) {
         p->timerD28 = 0;
@@ -90,5 +89,5 @@ void sub_080F40C8(struct ChildGroup *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F40C8);
+INCLUDE_ASM("asm/nonmatching", ChildGroup_UpdateAlternatingCallbacks);
 #endif

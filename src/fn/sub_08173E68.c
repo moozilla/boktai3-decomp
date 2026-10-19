@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
-#define SceneHud_TickEquipmentSwap        sub_08173E68
 #define SceneHud_GetEquipmentSlotPosition SceneHud_GetActionIconPosition
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -20,7 +19,7 @@ void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Hud_RestoreGridSelection(void *);
 void Hud_SetGridPosition(void *, int, int);
 void PauseInventory_GetItemCursorPosition(void *, void *);
-void sub_08173E68(struct SceneHudState *p)
+void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
 {
     void *q = p->actionInput;
     u16 one;
@@ -59,5 +58,5 @@ void sub_08173E68(struct SceneHudState *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08173E68);
+INCLUDE_ASM("asm/nonmatching", SceneHud_TickEquipmentSwap);
 #endif

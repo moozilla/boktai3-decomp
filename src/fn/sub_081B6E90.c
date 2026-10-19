@@ -3,10 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-#define ActorEffect_UpdateRadialExpiry sub_081B6E90
-#define ActorEffect_UpdateRadialTrail  sub_081B6AB8
-#define gEffectRandomTable             gUnk_0203B400
-#define gEffectRandomIndex             gUnk_03005308
+#define gEffectRandomTable gUnk_0203B400
+#define gEffectRandomIndex gUnk_03005308
 struct EffectPosition {
     s16 x, y, z, pad;
 };
@@ -34,7 +32,7 @@ struct EffectOwner;
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 s32 Math_Atan2(s32, s32);
-void sub_081B6AB8(struct ActorEffect *);
+void ActorEffect_UpdateRadialTrail(struct ActorEffect *);
 u32 ActorEffect_RemoveSprites(struct EffectOwner *, struct ActorEffect *, u32);
 static inline s32 NextRandom(void)
 {
@@ -43,7 +41,8 @@ static inline s32 NextRandom(void)
     offset = gUnk_03005308 * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
-void sub_081B6E90(struct EffectOwner *owner, struct ActorEffect *effect, u32 index)
+void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffect *effect,
+                                    u32 index)
 {
     if (effect->entered) {
         s32 i;
@@ -62,12 +61,12 @@ void sub_081B6E90(struct EffectOwner *owner, struct ActorEffect *effect, u32 ind
             effect->radii[i] = (NextRandom() & 15) + 24;
         }
     }
-    sub_081B6AB8(effect);
+    ActorEffect_UpdateRadialTrail(effect);
     if (effect->timer > 29)
         ActorEffect_RemoveSprites(owner, effect, index);
     else
         effect->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B6E90);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateRadialExpiry);
 #endif

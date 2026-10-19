@@ -24,7 +24,7 @@ void Player_UpdateFacingSide(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
-void sub_081507F4(void);
+void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
 
 void PlayerCue_Motion7Front(struct P *p, u32 b, u32 w)

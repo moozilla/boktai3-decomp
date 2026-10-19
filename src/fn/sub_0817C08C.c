@@ -31,13 +31,14 @@ static inline u8 consumeReset(struct ActorDecisionState *p)
     }
     return 0;
 }
-void sub_0817A16C(struct ActorDecisionState *, struct ActorDecisionPosition *);
+void ActorMovement_FindQuarterTurnPoint(struct ActorDecisionState *,
+                                        struct ActorDecisionPosition *);
 void ActorDecision_UpdateThresholdPhase(struct ActorDecisionState *p)
 {
     struct ActorDecisionState *s = p;
     if (consumeReset(p)) {
         s->mode = 3;
-        sub_0817A16C(s, &s->savedPosition);
+        ActorMovement_FindQuarterTurnPoint(s, &s->savedPosition);
         {
             u32 phase = 4;
             p->phase = phase;
@@ -45,7 +46,7 @@ void ActorDecision_UpdateThresholdPhase(struct ActorDecisionState *p)
     } else if (p->timer < 60 && p->threshold > 0x10000) {
         if (p->pending == 1) {
             s->mode = 3;
-            sub_0817A16C(s, &s->savedPosition);
+            ActorMovement_FindQuarterTurnPoint(s, &s->savedPosition);
             {
                 u32 phase = 4;
                 p->phase = phase;

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 81.9%
 // foundry draft (worker best 81.5%); what differs is mostly register allocation and instruction order
-#define StateActor_RunPaletteFlashSequence sub_081C85F4
 struct S {
     u8 f0[1];
     u8 b1;
@@ -29,7 +28,7 @@ s32 DisplayAnimation_SetPalette(void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 s32 __divsi3(s32, s32);
 void sub_081FED40(s32);
-void sub_081C85F4(u32 a, struct S *p, s32 a2)
+void StateActor_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
 {
     s32 *base20 = (s32 *)((u8 *)p + 0x20);
     {
@@ -153,5 +152,5 @@ void sub_081C85F4(u32 a, struct S *p, s32 a2)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C85F4);
+INCLUDE_ASM("asm/nonmatching", StateActor_RunPaletteFlashSequence);
 #endif

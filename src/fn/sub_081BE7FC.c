@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_input_grid.h"
 s32 Inventory_GetItemId(u32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void Storage_GetSlotPosition(struct SceneInputPosition *, u32);
 struct StoragePanel {
     u8 unknown0[0x1558];
@@ -28,7 +28,7 @@ void Storage_BeginItemSpecialMove(struct StoragePanel *panel)
     struct SceneInputPosition *target;
     enabled[0] = 1;
     display->widgets[panel->selection + 8].flags |= 1;
-    frames[0] = sub_0822D604(Inventory_GetItemId(panel->items[panel->selection]));
+    frames[0] = Selection_GetDisplayFrame(Inventory_GetItemId(panel->items[panel->selection]));
     {
         u32 attribute = 0x373;
         savedAttribute = attribute;

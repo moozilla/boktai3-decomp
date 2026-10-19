@@ -36,7 +36,7 @@ struct Obj {
     s8 delta8;
     s8 delta9;
 };
-void sub_080F4AB4(struct Obj *);
+void ActorPhase_ApproachNeutral(struct Obj *);
 void sub_080F4A4C(struct Obj *p)
 {
     s32 a = p->byte8, b = p->byte9;
@@ -55,6 +55,6 @@ void sub_080F4A4C(struct Obj *p)
     if (b == 127) {
         p->byte8 = 64;
         p->delta9 = -16;
-        p->callback = sub_080F4AB4;
+        p->callback = ActorPhase_ApproachNeutral;
     }
 }

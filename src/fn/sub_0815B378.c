@@ -27,7 +27,7 @@ void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_Motion7Turn(struct P *, s32);
 void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
-void sub_081507F4(void);
+void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
 
 void PlayerCue_KneelDown(struct P *p, s32 v)
@@ -38,5 +38,5 @@ void PlayerCue_KneelDown(struct P *p, s32 v)
     Player_UpdateFacingSide(p);
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0x15, 1);
-    p->fn = sub_081507F4;
+    p->fn = Player_UpdateTimedCueAnimation;
 }

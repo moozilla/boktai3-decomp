@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
-#define SceneActor_TickRandomReaction sub_080B1170
-#define gRandomIndex                  gUnk_03005308
-#define gRandomTable                  gUnk_0203B400
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 struct SceneActorRandomReaction {
     u8 unknown0[0x690];
     u16 timer, period;
@@ -43,7 +42,7 @@ static inline u32 blocked(struct SceneActorRegistryResetView *p)
     u32 mask = 0xe33f;
     return p->flags2D4 & mask;
 }
-void sub_080B1170(struct SceneActorRegistryResetView *p)
+void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRandomReaction *context = p->context;
     if (!unavailable(p) && !blocked(p) && p->field2B5 == 0x23 && active(context)) {
@@ -71,5 +70,5 @@ void sub_080B1170(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B1170);
+INCLUDE_ASM("asm/nonmatching", SceneActor_TickRandomReaction);
 #endif

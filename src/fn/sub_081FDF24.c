@@ -2,9 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 92.9%
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
-#define OrbitEffect_SpawnHomingTrail sub_081FDF24
-#define gOrbitEffectRandomTable      gUnk_0203B400
-#define gOrbitEffectRandomIndex      gUnk_03005308
+#define gOrbitEffectRandomTable gUnk_0203B400
+#define gOrbitEffectRandomIndex gUnk_03005308
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
 };
@@ -39,7 +38,7 @@ static inline s32 RandomValue(const u16 *table)
     offset = gUnk_03005308 * 2;
     return *(const u16 *)(offset + (u32)table);
 }
-void sub_081FDF24(struct OrbitEffect *p, struct OrbitEffectPosition *origin)
+void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosition *origin)
 {
     u32 timer = p->trailTimer + 1;
     p->trailTimer = timer;
@@ -80,5 +79,5 @@ void sub_081FDF24(struct OrbitEffect *p, struct OrbitEffectPosition *origin)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FDF24);
+INCLUDE_ASM("asm/nonmatching", OrbitEffect_SpawnHomingTrail);
 #endif

@@ -12,7 +12,7 @@ struct O {
     u8 g2[3];
     u8 b100;
 };
-void sub_081B7954(void *);
+void AnimatedMarker_BeginStateThree(void *);
 
 void GrowthHazard_UpdateCooldown(struct O *p)
 {
@@ -20,5 +20,5 @@ void GrowthHazard_UpdateCooldown(struct O *p)
     s32 m = ~4;
     s->fl &= m;
     if (*(u8 *)((u8 *)p + 0x100) == 0 && *(s16 *)((u8 *)p + 0xfc) <= 0)
-        sub_081B7954(p);
+        AnimatedMarker_BeginStateThree(p);
 }

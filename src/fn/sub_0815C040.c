@@ -1,7 +1,7 @@
 #include "global.h"
 void Player_EnterKindTwo(u8 *);
 void ActorSequence_Begin(u8 *, u32, u32);
-void sub_0814FAE8(void);
+void Player_UpdateTransitionAnimation(void);
 void PlayerCue_Windblown(u8 *p, s32 a, u32 b)
 {
     if (a != 0) {
@@ -19,5 +19,5 @@ void PlayerCue_Windblown(u8 *p, s32 a, u32 b)
     *(u32 *)(p + 0x5a4) = b;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0, 0);
-    *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
+    *(u32 *)(p + 0x58c) = (u32)Player_UpdateTransitionAnimation;
 }

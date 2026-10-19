@@ -6,12 +6,11 @@
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
-#define SceneHud_CanApplySelectedAction sub_0816D4E4
-#define SceneHud_TestActionFlag         Inventory_GetUsePermissionFlag
-#define SceneHud_GetActionEffectKind    Inventory_GetItemUseCondition
-#define gActionDefinitions              gUnk_08E61280
-#define gGameState                      gUnk_02000710
-#define gPlayers                        gUnk_02000580
+#define SceneHud_TestActionFlag      Inventory_GetUsePermissionFlag
+#define SceneHud_GetActionEffectKind Inventory_GetItemUseCondition
+#define gActionDefinitions           gUnk_08E61280
+#define gGameState                   gUnk_02000710
+#define gPlayers                     gUnk_02000580
 extern struct GameState *gUnk_02000710;
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 u32 Inventory_GetUsePermissionFlag(u32);
@@ -32,7 +31,7 @@ static inline struct SceneValueEquipment *GetEquipment(s16 *p)
 {
     return Inventory_GetEquipmentEntry(*p);
 }
-u32 sub_0816D4E4(u32 action)
+u32 SceneHud_CanApplySelectedAction(u32 action)
 {
     struct Player *p = gUnk_02000580[0];
     s32 i;
@@ -89,5 +88,5 @@ u32 sub_0816D4E4(u32 action)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816D4E4);
+INCLUDE_ASM("asm/nonmatching", SceneHud_CanApplySelectedAction);
 #endif

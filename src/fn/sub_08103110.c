@@ -70,7 +70,7 @@ void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *, struct NamedO
 u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32);
 void sub_08101E6C(void);
 void sub_08102570(void);
-void sub_08101D2C(void);
+void NamedObject_UpdateTerrainRegistration(void);
 void sub_08101FF8(void);
 void sub_0810271C(void);
 void sub_081021DC(void);
@@ -147,7 +147,7 @@ void NamedObject_CreateFromScript(void)
             e->state = 1;
             e->handlers[0] = sub_08101E6C;
             e->handlers[1] = sub_08102570;
-            e->handlers[2] = sub_08101D2C;
+            e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
             AnimData_SelectPaletteBank(e->anim, 0x240);
             m = Script_GetKeywordValue('m', 0);
@@ -162,7 +162,7 @@ void NamedObject_CreateFromScript(void)
             e->state = 1;
             e->handlers[0] = sub_08101E6C;
             e->handlers[1] = sub_08102570;
-            e->handlers[2] = sub_08101D2C;
+            e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
             AnimData_SelectPaletteBank(e->anim, 0x246);
             m = Script_GetKeywordValue('m', 0);
@@ -177,7 +177,7 @@ void NamedObject_CreateFromScript(void)
             e->state = 1;
             e->handlers[0] = sub_08101FF8;
             e->handlers[1] = sub_0810271C;
-            e->handlers[2] = sub_08101D2C;
+            e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 2;
             switch (e->row) {
                 case 0:
@@ -201,7 +201,7 @@ void NamedObject_CreateFromScript(void)
             e->state = 4;
             e->handlers[0] = sub_081021DC;
             e->handlers[1] = sub_081023CC;
-            e->handlers[2] = sub_08101D2C;
+            e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 0;
             switch (e->row) {
                 case 0:

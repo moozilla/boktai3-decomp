@@ -14,7 +14,7 @@ struct CollisionActor {
 void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(void),
                             void *);
 void SpatialIndex_InsertEntry(void *);
-void sub_0811FAB8(void);
+void Actor_ApplyKnockback(void);
 void ActorMotion_SetKnockback(void);
 void ActorCollision_InitBounds(struct CollisionActor *actor)
 {
@@ -30,8 +30,8 @@ void ActorCollision_InitBounds(struct CollisionActor *actor)
     offset.x = 0;
     offset.y = -(s16)size.y;
     offset.z = -size.z;
-    SpatialIndex_InitEntry(actor->contact, &position, &size, &offset, 20, 5, 1, 0, 12, sub_0811FAB8,
-                           actor);
+    SpatialIndex_InitEntry(actor->contact, &position, &size, &offset, 20, 5, 1, 0, 12,
+                           Actor_ApplyKnockback, actor);
     position.x = actor->x;
     y = actor->y - 96;
     ((s16 *)&position)[1] = y;

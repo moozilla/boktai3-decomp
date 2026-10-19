@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08199F34(void *, void *, s32, s32);
+void CannonBattery_InitProjectile(void *, void *, s32, s32);
 void CannonBattery_SpawnProjectile(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
@@ -14,5 +14,5 @@ void CannonBattery_SpawnProjectile(u8 *p, s32 a, s32 b)
         i++;
     }
     if (q)
-        sub_08199F34(p, q, a, b);
+        CannonBattery_InitProjectile(p, q, a, b);
 }

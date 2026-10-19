@@ -4,10 +4,9 @@
 #ifdef NONMATCHING
 // fuzzy: 80.7%
 // foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
-#define LinkMenu_WaitSelectionMode sub_0810A540
-#define LinkMenu_SetState          Registry1745_SetState
-#define LinkMenu_CheckSelection    Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+#define LinkMenu_SetState       Registry1745_SetState
+#define LinkMenu_CheckSelection Registry1745_CheckSessionReady
+#define LinkMenu_ResetSelection Registry1745_BeginShutdown
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void (*)(void));
@@ -32,7 +31,7 @@ static inline u8 IsMode4(u16 value)
     return 0;
 }
 void RegistryF246_Close(void);
-s32 sub_0810A540(struct AreaEffectLinkState *p)
+s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
 {
     void (*next)(void);
     u32 mode;
@@ -50,5 +49,5 @@ s32 sub_0810A540(struct AreaEffectLinkState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810A540);
+INCLUDE_ASM("asm/nonmatching", LinkMenu_WaitSelectionMode);
 #endif

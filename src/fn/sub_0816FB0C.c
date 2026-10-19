@@ -10,7 +10,7 @@ void MenuTransition_BeginSelectedWidget(void *);
 void sub_0816E570(void *);
 void PauseMenu_BeginCharacterItemUse(void *, u32);
 void sub_0816ECF0(void *, u32);
-void sub_0816F240(void *);
+void ScenePanel_BeginRandomTransition(void *);
 void PauseMenu_BeginTypeThirteenItemUse(void *);
 void PauseMenu_BeginTypeFourteenItemUse(void *);
 void SceneHud_BeginSelectedActionTransfer(void *);
@@ -57,7 +57,7 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
             sub_0816ECF0(p, gUnk_08E61280[index].unknown6);
             break;
         case 11:
-            sub_0816F240(p);
+            ScenePanel_BeginRandomTransition(p);
             break;
         case 6:
         case 12:

@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 84.0%
 // foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
-#define SpriteGroup_UpdateEntries sub_08121E28
-#define gSpriteGroupEntryUpdates  gUnk_086106D4
+#define gSpriteGroupEntryUpdates gUnk_086106D4
 struct SpriteGroupEntry {
     u8 pad[10];
     u8 state;
@@ -23,7 +22,7 @@ static inline u8 Occupied(u32 *used, u32 mask)
         return 1;
     return 0;
 }
-s32 sub_08121E28(struct SpriteGroup *input)
+s32 SpriteGroup_UpdateEntries(struct SpriteGroup *input)
 {
     struct SpriteGroup *pool = input;
     struct SpriteGroupEntry *slot;
@@ -43,5 +42,5 @@ s32 sub_08121E28(struct SpriteGroup *input)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08121E28);
+INCLUDE_ASM("asm/nonmatching", SpriteGroup_UpdateEntries);
 #endif
