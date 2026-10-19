@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 static inline u8 test(volatile u32 *p, s32 one, s32 i)
 {
     s32 mask = one;
@@ -21,9 +20,9 @@ u8 *SceneMovingParticle_AllocateEntry(u8 *s)
             entry += 0x40;
             ++i;
         } else {
-            register s32 bit asm("r1");
+            s32 bit;
             bit = one;
-            bit <<= i;
+            *(&bit) <<= i;
             *flags |= bit;
             *kind = i;
             return entry;
