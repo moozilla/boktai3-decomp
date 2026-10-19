@@ -1458,3 +1458,4 @@ addr,function,name,family,note
 081B7568,sub_081B7568,GrowthHazard_FindNearestActiveEntry,"GrowthHazard","finds nearest state-2 entry in X/Z and optionally copies its position"
 081B7744,sub_081B7744,GrowthHazard_ApplyAnimationEvent,"GrowthHazard","updates entry counters and cooldowns from animation event flags"
 081B77F4,sub_081B77F4,GrowthHazard_PlayImpactEffect,"GrowthHazard","plays two effect layers at the hazard position"
+081B8CB0,sub_081B8CB0,OrbitMotion_UpdateAngle,"OrbitMotion","interpolates angle and writes orbit position"
