@@ -15,9 +15,9 @@
 * `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6% (25 bytes).
-  Every instruction matches. Left: stack slots of four spilled GCSE/PRE reaching registers, and six
-  register choices from cse2 (see "Third round" below; they do *not* follow from the slots).
+* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.7% (13 bytes).
+  Only the stack slots of four spilled GCSE/PRE reaching registers differ, and they need the GCSE hash
+  table size to be 2267..2345 instead of 2597 (see "Third round" below).
   Structural differences went 2875 -> 0 with the changes below.
 
 ## Techniques found on 08123194 (apply to any big function)
@@ -124,4 +124,13 @@ without changing the code. Variable placement and declaration order only move T 
   `cell+1` read Seek's `target` (r9). In ours, cse2's `make_regs_eqv` makes the reaching register
   canonical, because its last use (the dead `i = cell + 1` in the next Seek copy) is 58 insns after
   `target`'s last use (cuid 3011 vs 2953; 6052 vs 5995 for the else path). Vetoing that alone does not give the ROM:
-  it makes `i` canonical instead, so the full set of equivalences differs. Still open.
+  it makes `i` canonical instead. Keeping `target` canonical (`CSE_KEEP`) matches. **Fixed in C** by a
+  shared `s32 target` variable in each path (`target = cell + 1; Seek(..., target); target = cell - 1;
+  Seek(..., target)`): integrate then uses that pseudo as the parameter, it lives through both copies,
+  and cse2 keeps it.
+* **Where to look for the T drop.** At GCSE, CellHeight accounts for about 840 insns (72 copies) and Properties
+  for 1700 (160 copies), and the narrowed u8/u16 arithmetic leaves about 280 shift pairs that combine removes
+  later. Every way of de-narrowing the Seek sites tried so far also changes loop.c's hoisting of the 15
+  (loop size 112, and the second 15 hoists once the loop is under 90 insns). The switch form of
+  CellHeight (`switch (shape) { case 1: ...; case 2: ...; }`, as in Shadow_UpdateTerrain) is
+  byte-identical and leaves T unchanged.

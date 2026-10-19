@@ -2,11 +2,11 @@
 #include "scene_grid.h"
 #include "area_effect_link.h"
 #ifdef NONMATCHING
-// fuzzy: 99.6% (25 differing bytes). Bounce-shot terrain probe: may the shot enter the next cell,
-// else slide it along a wall or up a slope toward the player. Every instruction matches. Left: the
-// stack slots of four spilled GCSE/PRE reaching registers (the original's expression hash table had
-// 2267..2347 buckets, ours 2593), and six register choices where cse2 makes the reaching register
-// canonical instead of Seek's target (it lives ~58 insns longer). See notes/cloud-08122DF4.md.
+// fuzzy: 99.7% (13 differing bytes). Bounce-shot terrain probe: may the shot enter the next cell,
+// else slide it along a wall or up a slope toward the player. Every instruction and register
+// matches except the stack slots of four spilled GCSE/PRE reaching registers: the original's
+// expression hash table had 2267..2345 buckets (insns at GCSE / 2), ours 2597. With that one
+// number forced in a patched agbcc the function matches. See notes/cloud-08122DF4.md.
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
