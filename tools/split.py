@@ -29,6 +29,17 @@ INSN = re.compile(r"^\t(?!\.)(?!\w+_func_start)[a-z]")
 NONENTRIES = os.path.join(ROOT, "symbols", "function_nonentries.csv")
 
 
+EXTRA_STARTS = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
+
+
+def extra_function_starts(path=EXTRA_STARTS):
+    """Reviewed function starts the disassembler left as plain labels."""
+    if not os.path.exists(path):
+        return set()
+    with open(path, newline="") as source:
+        return {int(row["address"], 16) for row in csv.DictReader(source)}
+
+
 def function_nonentries(path=NONENTRIES):
     """Reviewed disassembler labels inside real function bodies."""
     if not os.path.exists(path):

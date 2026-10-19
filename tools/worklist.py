@@ -14,7 +14,7 @@ import os
 import re
 
 from romlib import ROOT
-from split import c_functions, function_nonentries
+from split import c_functions, extra_function_starts, function_nonentries
 
 LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
            (0x08248590, 0x082485EC, "libagbsyscall")]
@@ -23,9 +23,19 @@ LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
 def functions():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
     nonentries = function_nonentries()
+    extra = extra_function_starts()
     out = []
     cur = prev = None
     for ln in code:
+        m = re.match(r"^_([0-9A-F]{8}):", ln)
+        if m and int(m.group(1), 16) in extra:
+            # A reviewed start the disassembler left as a plain label
+            # (symbols/build_extra_functions.csv).
+            prev = cur
+            cur = {"name": "sub_" + m.group(1), "addr": int(m.group(1), 16), "insns": 0,
+                   "calls": 0, "branches": 0, "jt": False}
+            out.append(cur)
+            continue
         m = re.match(r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start (\S+)", ln)
         if m:
             prev = cur
