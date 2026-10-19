@@ -30,10 +30,12 @@ make -s -C gbadisasm
 fetch agbcc https://github.com/pret/agbcc.git da598c1d918402c42c0c0d7128ba14567f3175e9
 [ -x agbcc/agbcc ] || (cd agbcc && ./build.sh)
 
-# armips: for translation hacks (patch assembly)
+# armips: for translation hacks (patch assembly). MINIMAL=1 skips it and the mGBA harness.
+if [ -z "$MINIMAL" ]; then
 fetch armips https://github.com/Kingcom/armips.git 62adab4ef30da765f5cf22a451eb08a59c54dc8b
 git -C armips submodule update -q --init --recursive
 [ -x armips/build/armips ] || (mkdir -p armips/build && cd armips/build && cmake -DCMAKE_BUILD_TYPE=Release .. >/dev/null && make -s)
+fi
 
 # Optional matching search; its parser is bundled, and Python needs toml.
 # The project patch adds agbcc passes, crash fixes and --focus support
@@ -49,6 +51,6 @@ elif ! git -C decomp-permuter apply --reverse --check "$PATCH" 2>/dev/null; then
 fi
 
 # mGBA harness
-make -s -C ../../tools/emu
+[ -n "$MINIMAL" ] || make -s -C ../../tools/emu
 
 echo "tools ready in build/tools"
