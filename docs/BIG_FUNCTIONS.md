@@ -84,6 +84,16 @@ When a difference survives every idea, find the pass that decides it.
   hoisting decision (rule below).
 * `rtlprobe.py gcse FILE.c --scan LO:HI` lists PRE's reaching registers in bucket
   order and how the order changes with the table size (below).
+* `rtlprobe.py try-env FILE.c 'CSE_KEEP=2093' 'AGBCC_GCSE_T=2301 CSE_KEEP=2093'`
+  checks the file with the instrumented compiler (`sh tools/agbcc-instr.sh`)
+  under each set of knobs. `try-t T...` is the shorthand for the GCSE table size.
+  A knob that removes a group of differences proves they have one cause; what
+  stays has another. CSE_KEEP / CSE_NOCANON steer cse's choice of canonical
+  register (`make_regs_eqv` prefers the pseudo that lives longest), and
+  CSE_DEBUG=N traces it.
+* `rtlprobe.py perline FILE.c` counts insns per source line after CSE (what GCSE
+  sees, and so T) against after local-alloc, largest surplus first: where the
+  front end leaves work that later passes delete.
 * Allocation-only differences go to [REGALLOC.md](REGALLOC.md) and
   [PERMUTER.md](PERMUTER.md) (`regdiag`, `rasolve`, `translate`). rasolve
   answers "not allocation" when the cause is CSE, PRE or instruction
@@ -166,7 +176,15 @@ On 08123194 any T in 2267..2347 fixes all four stack slots and nothing else:
 differences have a separate cause. They come from cse2: `make_regs_eqv` makes
 the PRE reaching register canonical over Seek's `target` parameter because the
 reaching register's last use is later. Use the forced T this way to split any
-residual into independent causes. Free T reductions that keep the code
+residual into independent causes. The register differences left after that were
+fixed with `CSE_KEEP`: keeping the ROM-side pseudo canonical gave 0 diffs, and
+then C that lengthens its life (one shared `target` variable for both Seek
+calls of a path) made it canonical for real; the draft then matches exactly
+when T is forced to 2301. `perline` shows where the surplus insns at GCSE come
+from: the front end's narrowing of `(*p >> 4) & 15` (168) and `(*p & 15) << 8`
+(80), Properties' map and offset lines (2 × 128), CellAttributes (40); the
+inline parameter copies are not it (a macro Properties moved T by −6).
+Free T reductions that keep the code
 byte-identical: a `u32 Shape(i) { u32 b = *Properties(i); return b >> 4; }`
 accessor in CanEnter (−4 per site). The same accessor in Seek, a u8→s32 return
 from Seek (−56) and a u32 `CellAttributes` (−60) all change loop hoisting or
