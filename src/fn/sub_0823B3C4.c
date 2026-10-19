@@ -1,6 +1,5 @@
 #include "global.h"
 /* Player_ClampCameraOffsets_0823B3C4: same code as Player_ClampCameraOffsets at another address (ported by relatives.py; provisional name) */
-#define Player_ClampCameraOffsets_0823B3C4 sub_0823B3C4
 #include "player.h"
 void Player_ClampCameraOffsets_0823B3C4(struct Player *p)
 {

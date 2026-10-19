@@ -1,4 +1,3 @@
-#define ChallengeMenu_ScriptOpen sub_081C5D40
 
 #include "global.h"
 
@@ -30,7 +29,7 @@ struct ChallengeMenu {
     s32 unk310;
 };
 
-s32 sub_081C5D40(struct ChallengeMenu *s)
+s32 ChallengeMenu_ScriptOpen(struct ChallengeMenu *s)
 {
     if (Script_SeekToKeyword('e')) {
         s32 *out = s->ranks;

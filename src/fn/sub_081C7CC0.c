@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_UpdateAnimation18State sub_081C7CC0
 struct S {
     u8 f[1];
     u8 b1;
@@ -22,10 +21,29 @@ void StateActor_UpdateAnimation18State(u32 a, struct S *p)
         p->b9 = 0;
         p->b7 = 0;
         switch (p->b1) {
-            case 4: case 5: case 6: case 7: case 8: case 9: case 10:
-            case 11: case 12: case 13: case 14: case 15: case 16:
-            case 17: case 18: case 19: case 20: case 21: case 22:
-            case 23: case 24: case 25: case 26:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+            case 26:
                 r = 0;
                 break;
             case 27:
@@ -43,32 +61,51 @@ void StateActor_UpdateAnimation18State(u32 a, struct S *p)
 
     state = B(0x18);
     switch (state) {
-    case 0:
-        if (DisplayAnimation_TestFinished(p->d4) == 0)
+        case 0:
+            if (DisplayAnimation_TestFinished(p->d4) == 0)
+                break;
+            B(0x18)++;
+            switch (p->b1) {
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                    r = 0;
+                    break;
+                case 27:
+                    r = 0x13;
+                    break;
+                case 28:
+                case 29:
+                default:
+                    r = 0;
+                    break;
+            }
+            Actor_PlayAnimationEntry(p, r, 2, 0, 4);
             break;
-        B(0x18)++;
-        switch (p->b1) {
-            case 4: case 5: case 6: case 7: case 8: case 9: case 10:
-            case 11: case 12: case 13: case 14: case 15: case 16:
-            case 17: case 18: case 19: case 20: case 21: case 22:
-            case 23: case 24: case 25: case 26:
-                r = 0;
+        case 1:
+            if (DisplayAnimation_TestFinished(p->d4) == 0)
                 break;
-            case 27:
-                r = 0x13;
-                break;
-            case 28:
-            case 29:
-            default:
-                r = 0;
-                break;
-        }
-        Actor_PlayAnimationEntry(p, r, 2, 0, 4);
-        break;
-    case 1:
-        if (DisplayAnimation_TestFinished(p->d4) == 0)
+            p->b7 = state;
             break;
-        p->b7 = state;
-        break;
     }
 }

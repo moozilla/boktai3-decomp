@@ -1,4 +1,3 @@
-#define DarkLoan_BeginAlternateOpening  sub_081BCA74
 #define DarkLoan_UpdateAlternateOpening StatGauge_UpdateClosing
 #include "global.h"
 #include "dark_loan_panel.h"
@@ -12,7 +11,7 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 MessageWindow_ShowMessage(s32);
 void DarkLoan_SetState(void *, void (*)(void));
 void StatGauge_UpdateClosing(void);
-void sub_081BCA74(struct DarkLoanPanel *p)
+void DarkLoan_BeginAlternateOpening(struct DarkLoanPanel *p)
 {
     u32 zero;
     StatGauge_ResetBackground(p);

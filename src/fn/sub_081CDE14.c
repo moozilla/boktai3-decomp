@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define SceneCharacter_UpdatePaletteFade sub_081CDE14
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
 typedef struct {
@@ -11,7 +10,7 @@ typedef struct {
     u32 bankA;
 } SceneCharacterPaletteFade;
 
-s32 sub_081CDE14(u8 *a, u8 *b)
+s32 SceneCharacter_UpdatePaletteFade(u8 *a, u8 *b)
 {
     s16 zero = 0;
     SceneCharacterPaletteFade *fade = (SceneCharacterPaletteFade *)(b + 0x20);

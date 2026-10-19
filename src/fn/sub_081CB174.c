@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define StateActor_UpdateHoverBob sub_081CB174
-
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 
@@ -16,7 +14,7 @@ static inline s32 shift12(s32 x)
     return -((-x) >> 12);
 }
 
-void sub_081CB174(u32 a, void *p, u32 flags)
+void StateActor_UpdateHoverBob(u32 a, void *p, u32 flags)
 {
     u32 r;
     if (B(9) != 0) {

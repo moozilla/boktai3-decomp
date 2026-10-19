@@ -1,6 +1,5 @@
 #include "global.h"
 /* Player_BeginTerrainRecovery_0823BA78: same code as Player_BeginTerrainRecovery at another address (ported by relatives.py; provisional name) */
-#define Player_BeginTerrainRecovery_0823BA78 sub_0823BA78
 #include "player.h"
 #include "engine.h"
 s32 Player_BeginTerrainRecovery_0823BA78(struct Player *p)

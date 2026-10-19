@@ -1,9 +1,7 @@
 #include "global.h"
 
-#define Armor_BindPaletteBanks sub_08181778
-#define ArmorPalette_CopyKindBanks sub_08181634
 #define gArmorPaletteResources gUnk_0824E8A8
-#define gArmorPaletteBank gUnk_0824E8F8
+#define gArmorPaletteBank      gUnk_0824E8F8
 #define gArmorPaletteOtherBank gUnk_0824E90C
 
 struct ArmorPaletteController {
@@ -52,9 +50,10 @@ extern const u32 gUnk_0824E8A8[];
 extern const u8 gUnk_0824E8F8[];
 extern const u8 gUnk_0824E90C[];
 void *ScriptProc_Start(u16 key, u16 context);
-void sub_08181634(struct ArmorPaletteController *c, void *src, u32 bank, u32 otherBank);
+void ArmorPalette_CopyKindBanks(struct ArmorPaletteController *c, void *src, u32 bank,
+                                u32 otherBank);
 
-void sub_08181778(struct Armor *p)
+void Armor_BindPaletteBanks(struct Armor *p)
 {
     struct ArmorPaletteController *c = &p->paletteController;
     u32 index = p->kind;
@@ -82,7 +81,7 @@ void sub_08181778(struct Armor *p)
         c->bank = bank;
         c->otherBank = otherBank;
     }
-    sub_08181634(c, src, bank, otherBank);
+    ArmorPalette_CopyKindBanks(c, src, bank, otherBank);
     p->paletteId = tag;
     p->palette = (u8 *)c + 0x208;
     p->bankId0 = c->bank + tag;

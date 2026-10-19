@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define StateActor_UpdateKind29AttackEffect sub_081CB3F4
-
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
@@ -11,7 +9,7 @@ struct VecCB3F4 {
     s16 x, y, z, pad;
 };
 
-void sub_081CB3F4(u32 a, u8 *b, u32 c)
+void StateActor_UpdateKind29AttackEffect(u32 a, u8 *b, u32 c)
 {
     u32 anim;
     if (b[9]) {

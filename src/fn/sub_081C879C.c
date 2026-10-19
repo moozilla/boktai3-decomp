@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_StartAndMaybeFinishAnim sub_081C879C
 struct S {
     u8 f0[1];
     u8 b1;
@@ -11,7 +10,7 @@ struct S {
     u8 b18;
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-void sub_081C879C(u32 a, struct S *p, s32 a2)
+void StateActor_StartAndMaybeFinishAnim(u32 a, struct S *p, s32 a2)
 {
     u8 *base20 = (u8 *)p + 0x20;
     if (p->b9 != 0) {
