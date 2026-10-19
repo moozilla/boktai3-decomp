@@ -1,9 +1,9 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 52.9%
+// fuzzy: 58.1%
 // Special-animation start (categories 5/6/7 select sequences 0x63/0x65/0x67 through an inline
 // copy of SceneActorAnimation_SelectDirectionalEntryFlags with an explicit selection), then the
-// shared chase (include/scene_actor_chase.h). First draft: control flow and calls line up.
+// shared chase (include/scene_actor_chase.h).
 #include "scene_actor_chase.h"
 #include "scene_actor_profile.h"
 
@@ -95,7 +95,7 @@ static inline void StartSpecialAnimation(struct SceneActorRegistryResetView *act
         actor->field2B0 = 1;
     } else {
         void *target = SceneActorReaction_PlayAnimationBUntilComplete;
-        SceneActorChase_SetControl(actor, 0xA, target);
+        Chase_SetCtl(actor, target, 0xA);
     }
 }
 
@@ -103,7 +103,7 @@ void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
 
-    if (SceneActorChase_TakeFlag2B1(actor)) {
+    if (Chase_TakeArrived(actor)) {
         u8 *category;
         actor->direction = actor->fieldE9;
         category = &actor->category;
@@ -120,13 +120,9 @@ void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
         *(u16 *)((u8 *)actor + 0x418) = *(u16 *)((u8 *)actor + 0x416);
     }
     if (actor->field2B0) {
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0xC;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
-        SceneActorChase_SetControl(actor, 0x1A, *(void **)(group + 0x48));
-        SceneActorChase_Pursue(actor);
+        Chase_SetBehavior(actor, 12);
+        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
+        Chase_Arrive(actor);
     } else
         actor->counter2AC++;
 }

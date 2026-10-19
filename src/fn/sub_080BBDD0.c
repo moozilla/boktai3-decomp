@@ -1,9 +1,9 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 59.6%
+// fuzzy: 67.2%
 // Push/settle state: decays the push offset at +0x318/+0x31C into motion, then (once settled)
-// chases the player through two copies of SceneActorChase_Pursue (include/scene_actor_chase.h),
-// falling back to SceneActorChase_MoveToward toward the chased object. First draft.
+// chases the player through two copies of Chase_Arrive (include/scene_actor_chase.h), falling
+// back to Chase_TryRoute toward the chased object.
 #include "scene_actor_chase.h"
 
 static inline u8 TakeFlag2B2(struct SceneActorRegistryResetView *actor)
@@ -66,41 +66,32 @@ void sub_080BBDD0(struct SceneActorRegistryResetView *actor)
         actor->flags2D6 |= 2;
         return;
     }
-    if (SceneActorChase_TestFlags2D4(actor, 0x80)) {
+    if (Chase_MotionFlags(actor, 0x80)) {
         *flags2CC = flags | 0x80;
         *(u16 *)(group + 0x40) |= 4;
         actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
-        if (!SceneActorChase_Pursue(actor) &&
-            !SceneActorChase_MoveToward(actor, *(void **)(group + 0x1FC),
-                                        (struct ContactPosition *)((u8 *)actor->fieldDC + 0xC))) {
+        if (!Chase_Arrive(actor) &&
+            !Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+                            &((struct ChaseTarget *)actor->fieldDC)->position)) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;
         }
-        SceneActorChase_SetControl(actor, 0x1A, *(void **)(group + 0x48));
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0xC;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
+        Chase_SetBehavior(actor, 12);
     } else {
         actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
         *flags2CC = flags | 0x10;
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-        if (!SceneActorChase_Pursue(actor)) {
+        if (!Chase_Arrive(actor)) {
             *(u16 *)(body + 0x6F0) = 0;
-            if (!SceneActorChase_MoveToward(
-                    actor, *(void **)(group + 0x1FC),
-                    (struct ContactPosition *)((u8 *)actor->fieldDC + 0xC))) {
+            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+                                &((struct ChaseTarget *)actor->fieldDC)->position)) {
                 Callback_InvokeActor(actor, *(void **)(group + 0x224));
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, 1, actor->entryTarget228);
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 7;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        Chase_SetCtl(actor, actor->entryTarget228, 1);
+        Chase_SetBehavior(actor, 7);
         actor->field2C2 = 0x20;
     }
 }
