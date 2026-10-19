@@ -6493,6 +6493,7 @@ addr,name,mode,confidence,source,notes
 081CB090,SceneCharacter_UpdateAnimationFiveToIdle,thumb,low,src-alias,State callback plays kind 15 animation 5 then animation 0 before completing
 081CB174,StateActor_UpdateHoverBob,thumb,low,src-alias,
 081CB3F4,StateActor_UpdateKind29AttackEffect,thumb,low,src-alias,
+081CB6AC,StateActor_UpdateFacingAnimation,thumb,low,src-alias,
 081CB940,SceneCharacter_UpdateAnimationThirteen,thumb,low,src-alias,State callback plays kind 29 animation 13 and waits for completion
 081CBA04,SceneCharacter_UpdatePalettePulse,thumb,low,src-alias,State callback blends the actor palette between banks 0x680 and 0x2E80 over a repeating 128-frame cycle
 081CBA80,SceneCharacter_UpdateAlternatePalettePulse,thumb,low,src-alias,State callback initializes the actor palette then pulses between banks 0x680 and 0x2DE0
