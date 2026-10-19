@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-void ScenePanelSubject_TickAppearing(struct ScenePanelSubjectView *owner)
+void ScenePanelSubject_TickAppearing(struct ScenePanelSubject *owner)
 {
     if (owner->appearDelay)
         owner->appearDelay--;

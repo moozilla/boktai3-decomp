@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_tail.h"
 #include "scene_panel_subject_playback.h"
-s32 ScenePanelSubject_Initialize(struct ScenePanelSubjectView *subject,
+s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
                                  const struct ContactPosition *home, u32 row, u32 variant,
                                  u32 initialState, u32 kind, u32 contactLimit, u32 colliderSetting,
                                  u32 appearDelay)
