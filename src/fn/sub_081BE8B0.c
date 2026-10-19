@@ -1,9 +1,7 @@
-#define Storage_BeginEquipmentSpecialMove sub_081BE8B0
-#define Storage_GetSlotPosition           sub_081BD934
 #include "global.h"
 #include "scene_input_grid.h"
 s32 Inventory_GetEquipmentId(u32);
-void sub_081BD934(struct SceneInputPosition *, u32);
+void Storage_GetSlotPosition(struct SceneInputPosition *, u32);
 struct StoragePanel {
     u8 unknown0[0x1558];
     struct SceneInputPair pair;
@@ -19,7 +17,7 @@ struct StorageWidgetFlags {
 struct StorageFlagsView {
     struct SceneInputWidget widgets[1];
 };
-void sub_081BE8B0(struct StoragePanel *panel)
+void Storage_BeginEquipmentSpecialMove(struct StoragePanel *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
     u32 enabled[2], frames[2], attributes[2];
@@ -34,9 +32,9 @@ void sub_081BE8B0(struct StoragePanel *panel)
         savedAttribute = attribute;
         attributes[0] = attribute;
     }
-    sub_081BD934(starts, panel->selection);
+    Storage_GetSlotPosition(starts, panel->selection);
     target = targets;
-    sub_081BD934(target, 32);
+    Storage_GetSlotPosition(target, 32);
     {
         u32 *frameOut;
         u32 placeholder;

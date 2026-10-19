@@ -1,6 +1,3 @@
-#define Storage_UpdateModeSelection sub_081BFA4C
-#define Storage_BeginCategoryMode sub_081BF440
-#define Storage_RefreshCategoryWidgets sub_081BFAE0
 #define gStorageInputKeys gUnk_03005260
 #include "global.h"
 #include "scene_input_navigation.h"
@@ -25,30 +22,30 @@ struct SceneInventoryCategoryMenu {
 void Storage_SetInteractionMode(struct SceneInventoryCategoryMenu *, u8);
 void Sound_PlaySong(u32);
 void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void sub_081BF440(struct SceneInventoryCategoryMenu *, u32);
+void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *, u32);
 u32 SceneInput_NavigateGrid(struct SceneInputGridView *);
-void sub_081BFAE0(struct SceneInventoryCategoryMenu *);
+void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void sub_081BFA4C(struct SceneInventoryCategoryMenu *p)
+void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *p)
 {
     Storage_SetInteractionMode(p, 1);
     if (gUnk_03005260[1] & 1) {
         Sound_PlaySong(0xDD);
         SceneInventory_SetCategoryPalette(p, p->colors);
         switch (p->grid.selection) {
-        case 0x22:
-            sub_081BF440(p, 1);
-            break;
-        case 0x21:
-            sub_081BF440(p, 3);
-            break;
-        case 0x20:
-            sub_081BF440(p, 2);
-            break;
+            case 0x22:
+                Storage_BeginCategoryMode(p, 1);
+                break;
+            case 0x21:
+                Storage_BeginCategoryMode(p, 3);
+                break;
+            case 0x20:
+                Storage_BeginCategoryMode(p, 2);
+                break;
         }
     } else {
         if (SceneInput_NavigateGrid(&p->grid)) {
-            sub_081BFAE0(p);
+            Storage_RefreshCategoryWidgets(p);
             Storage_UpdateCursorPosition(&p->grid, p->cursor);
         }
     }

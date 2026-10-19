@@ -1,7 +1,6 @@
 #include "global.h"
 #include "game_state.h"
 
-#define DarkLoan_UpdateBalanceDigits sub_081BC3B4
 #define gGameState gUnk_02000710
 
 struct DarkLoanDigitAnim {
@@ -20,7 +19,7 @@ struct DarkLoanDisplay {
 s32 Div(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
-void sub_081BC3B4(struct DarkLoanDisplay *s)
+void DarkLoan_UpdateBalanceDigits(struct DarkLoanDisplay *s)
 {
     s32 digits[4];
     s32 value;

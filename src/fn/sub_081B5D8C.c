@@ -1,4 +1,3 @@
-#define PairedSceneActor_UpdateHalves  sub_081B5D8C
 #define gPairedSceneHalfStateCallbacks gUnk_086120A0
 #define gActorUpdatePaused             gUnk_0300523C
 #include "global.h"
@@ -23,7 +22,7 @@ void sub_081AFF98(struct PairedSceneHalf *);
 void sub_081AF7F4(struct PairedSceneHalf *);
 void sub_081AFD10(struct PairedSceneActor *, struct PairedSceneHalf *);
 void sub_08249244(struct PairedSceneActor *, struct PairedSceneHalf *, s32, void *);
-void sub_081B5D8C(struct PairedSceneActor *actor)
+void PairedSceneActor_UpdateHalves(struct PairedSceneActor *actor)
 {
     s32 i;
     struct PairedSceneHalf *half;

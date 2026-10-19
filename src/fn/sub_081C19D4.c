@@ -2,8 +2,6 @@
 #include "scene_input.h"
 #include "game_state.h"
 
-#define ControlPanel_ShowRewardBalanceDigits sub_081C19D4
-
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 s32 Div(s32, s32);
 
@@ -14,7 +12,7 @@ struct S {
     struct SceneInputWidget digits[4];
 };
 
-void sub_081C19D4(struct S *p)
+void ControlPanel_ShowRewardBalanceDigits(struct S *p)
 {
     s32 value = gUnk_02000710->menuRewardBalance;
     s32 digits[4];

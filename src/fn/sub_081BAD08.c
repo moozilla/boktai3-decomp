@@ -2,8 +2,6 @@
 
 // Tentative selection-list interpretation; offsets are shared by neighboring cursor code.
 
-#define SelectionList_SelectNearestEnabledEntry sub_081BAD08
-
 struct SelectionEntry {
     s16 x, y;
     u8 unknown04[8];
@@ -19,7 +17,7 @@ struct SelectionList {
     s16 selected, entryCount;
     struct SelectionEntry entries[1];
 };
-s32 sub_081BAD08(struct SelectionList *list)
+s32 SelectionList_SelectNearestEnabledEntry(struct SelectionList *list)
 {
     s32 x = list->cursorX;
     s32 y = list->cursorY;

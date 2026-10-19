@@ -1,4 +1,3 @@
-#define Hresvelgr_UpdateTimedPose sub_081A1BE0
 #include "global.h"
 struct MotionPosition {
     s16 x, y, z, pad;
@@ -33,7 +32,7 @@ static inline void SetPose(struct MotionPosition *p, s16 x, s16 y, s16 z)
     p->y = y;
     p->z = z;
 }
-void sub_081A1BE0(struct Hresvelgr *actor)
+void Hresvelgr_UpdateTimedPose(struct Hresvelgr *actor)
 {
     struct Hresvelgr *saved = actor;
     u8 *action = actor->action;

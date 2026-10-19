@@ -1,4 +1,3 @@
-#define Vanargand_UpdateMode20 sub_081A8A74
 #include "global.h"
 struct Vanargand {
     u8 pad0[0xAA];
@@ -17,7 +16,7 @@ static inline u8 entered(struct Vanargand *p)
     }
     return FALSE;
 }
-void sub_081A8A74(struct Vanargand *p)
+void Vanargand_UpdateMode20(struct Vanargand *p)
 {
     if (entered(p)) {
         u32 state = 20;

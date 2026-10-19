@@ -1,4 +1,3 @@
-#define Vanargand_InitSpriteGroup sub_081ADF38
 #include "global.h"
 
 struct VanargandGroupSprite {
@@ -30,7 +29,8 @@ struct VanargandSpriteGroup {
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void sub_081ADF38(u8 *owner, struct VanargandSpriteGroup *group, void *arg2, void *arg3)
+void Vanargand_InitSpriteGroup(u8 *owner, struct VanargandSpriteGroup *group, void *arg2,
+                               void *arg3)
 {
     struct VanargandGroupAnimation *animation;
     struct VanargandGroupSprite *sprite;

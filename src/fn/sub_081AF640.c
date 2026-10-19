@@ -1,8 +1,5 @@
 #include "global.h"
 
-#define Vanargand_InitTransientEffect sub_081AF640
-#define Vanargand_ProjectEffectOffset sub_081AF540
-
 struct VanargandEffectVec {
     s16 x, y, z;
 };
@@ -27,10 +24,10 @@ struct VanargandTransientEffect {
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_081AF540(struct VanargandEffectVec *, s16, s16, s32);
+void Vanargand_ProjectEffectOffset(struct VanargandEffectVec *, s16, s16, s32);
 
-s32 sub_081AF640(struct VanargandTransientEffect *effect, struct VanargandEffectVec *origin,
-                 s32 variant)
+s32 Vanargand_InitTransientEffect(struct VanargandTransientEffect *effect,
+                                  struct VanargandEffectVec *origin, s32 variant)
 {
     struct VanargandEffectVec offset;
     struct VanargandEffectVec *position;
@@ -41,7 +38,7 @@ s32 sub_081AF640(struct VanargandTransientEffect *effect, struct VanargandEffect
     sprite->scale = (effect->timer >> 4) + 6;
     effect->sprite.mode = 1;
     effect->sprite.flags |= 0x200;
-    sub_081AF540(&offset, 0, 8, 0x40);
+    Vanargand_ProjectEffectOffset(&offset, 0, 8, 0x40);
     position = &effect->sprite.position;
     position->x = origin->x + offset.x;
     position->y = origin->y + offset.y;

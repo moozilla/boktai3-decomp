@@ -1,8 +1,3 @@
-#define Storage_RefreshCategoryWidgets sub_081BFAE0
-#define Storage_UpdateSwapSelection sub_081BF04C
-#define Storage_RefreshItemSlots sub_081BE16C
-#define Storage_RefreshEquipmentSlots sub_081BE504
-#define Storage_RefreshConsumableSlots sub_081BE2E0
 #include "global.h"
 #include "scene_input_navigation.h"
 struct StorageSlotFlags {
@@ -25,11 +20,11 @@ struct StorageCategoryWidgets {
     u8 categoryKinds[0x17F4 - 0x1758];
     void (*state)(struct StorageCategoryWidgets *);
 };
-void sub_081BE16C(struct StorageCategoryWidgets *);
-void sub_081BE504(struct StorageCategoryWidgets *);
-void sub_081BE2E0(struct StorageCategoryWidgets *);
-void sub_081BF04C(struct StorageCategoryWidgets *);
-void sub_081BFAE0(struct StorageCategoryWidgets *p)
+void Storage_RefreshItemSlots(struct StorageCategoryWidgets *);
+void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *);
+void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *);
+void Storage_UpdateSwapSelection(struct StorageCategoryWidgets *);
+void Storage_RefreshCategoryWidgets(struct StorageCategoryWidgets *p)
 {
     u32 hide = 1;
     s32 i;
@@ -39,15 +34,15 @@ void sub_081BFAE0(struct StorageCategoryWidgets *p)
         widget++;
     }
     switch (p->categoryKinds[p->category] >> 1) {
-    case 0:
-        sub_081BE16C(p);
-        break;
-    case 1:
-        sub_081BE504(p);
-        break;
-    case 2:
-        sub_081BE2E0(p);
-        break;
+        case 0:
+            Storage_RefreshItemSlots(p);
+            break;
+        case 1:
+            Storage_RefreshEquipmentSlots(p);
+            break;
+        case 2:
+            Storage_RefreshConsumableSlots(p);
+            break;
     }
     if (p->selectingMode) {
         if (((u8 *)p)[0x1763] == 0x21)
@@ -56,7 +51,7 @@ void sub_081BFAE0(struct StorageCategoryWidgets *p)
             SceneInput_SetGlyphPair(&p->glyphs, 0, -1);
     } else {
         if (p->mode == 1) {
-            if (p->state == sub_081BF04C)
+            if (p->state == Storage_UpdateSwapSelection)
                 SceneInput_SetGlyphPair(&p->glyphs, 0, 3);
             else
                 SceneInput_SetGlyphPair(&p->glyphs, 0, -1);

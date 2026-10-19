@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GrowthHazard_ApplyAnimationEvent sub_081B7744
 #define gGrowthHazardManager gUnk_02000258
 
 struct GrowthHazardAnimationEvent {
@@ -31,31 +30,39 @@ struct GrowthHazardManager {
 extern struct GrowthHazardManager *gUnk_02000258;
 u32 Hresvelgr_GetAnimationIdentifier(void);
 
-static inline u32 TestWord(u32 *value, u32 mask) { return *value & mask; }
-static inline u32 TestHalf(u16 *value, u32 mask) { return *value & mask; }
+static inline u32 TestWord(u32 *value, u32 mask)
+{
+    return *value & mask;
+}
+static inline u32 TestHalf(u16 *value, u32 mask)
+{
+    return *value & mask;
+}
 
-void sub_081B7744(struct GrowthHazardAnimationEvent *event, u32 unused, struct GrowthHazardEntry *entry)
+void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, u32 unused,
+                                      struct GrowthHazardEntry *entry)
 {
     u32 identifier = event->identifier;
     if (identifier != Hresvelgr_GetAnimationIdentifier()) {
         switch (entry->state) {
-        case 0:
-            if (entry->cooldown == 0 && TestWord(&event->flags38, 0x20)) {
-                entry->eventCount++;
-                entry->cooldown = event->cooldown;
-                entry->mode = 0;
-                gUnk_02000258->flags |= 1;
-            }
-            break;
-        case 2:
-            if (TestHalf(&event->flagsA, 0x10) && entry->cooldown == 0 && entry->remaining > 0) {
-                if (--entry->remaining > 0) {
-                    entry->cooldown = 0x20;
-                    entry->mode = 1;
-                    gUnk_02000258->flags |= 2;
+            case 0:
+                if (entry->cooldown == 0 && TestWord(&event->flags38, 0x20)) {
+                    entry->eventCount++;
+                    entry->cooldown = event->cooldown;
+                    entry->mode = 0;
+                    gUnk_02000258->flags |= 1;
                 }
-            }
-            break;
+                break;
+            case 2:
+                if (TestHalf(&event->flagsA, 0x10) && entry->cooldown == 0 &&
+                    entry->remaining > 0) {
+                    if (--entry->remaining > 0) {
+                        entry->cooldown = 0x20;
+                        entry->mode = 1;
+                        gUnk_02000258->flags |= 2;
+                    }
+                }
+                break;
         }
     }
 }

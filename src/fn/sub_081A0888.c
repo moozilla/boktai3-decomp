@@ -1,5 +1,4 @@
-#define Hresvelgr_UpdateAlternatingOrbit sub_081A0888
-#define gSceneAngleSineTable             gUnk_086149C4
+#define gSceneAngleSineTable gUnk_086149C4
 #include "global.h"
 /* Tentative Hresvelgr layout and behavior names, inferred from static consumers. */
 typedef struct HresvelgrPosition {
@@ -30,7 +29,7 @@ static inline void add(HresvelgrPosition *a, HresvelgrPosition *b)
     b->y += a->y;
     b->z += a->z;
 }
-void sub_081A0888(HresvelgrActor *p, int tick)
+void Hresvelgr_UpdateAlternatingOrbit(HresvelgrActor *p, int tick)
 {
     u32 angle;
     int speed;

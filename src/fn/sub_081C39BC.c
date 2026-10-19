@@ -9,13 +9,13 @@ struct S {
     void (*f4)(void);
     u32 f8;
 };
-void sub_081C3A20(void);
+void SpriteController_AnimateGrowing(void);
 
 void RegistryF3E4_StartAppearing(struct S *p)
 {
     void (*f)(void);
     p->f34 &= ~1;
-    f = sub_081C3A20;
+    f = SpriteController_AnimateGrowing;
     p->f4 = f;
     p->f8 = 0;
     p->d8 = 0;

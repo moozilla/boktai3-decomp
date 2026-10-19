@@ -13,7 +13,7 @@ struct SceneInventoryCategoryMenu {
 };
 void SceneInventory_SortSelectedCategory(struct SceneInventoryCategoryMenu *);
 void Storage_HideItemDetails(struct SceneInventoryCategoryMenu *);
-void sub_081BFC14(struct SceneInventoryCategoryMenu *, s32);
+void Storage_BeginModeSelection(struct SceneInventoryCategoryMenu *, s32);
 void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *p)
 {
     s32 result =
@@ -22,9 +22,9 @@ void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *p)
         Sound_PlaySong(0xDD);
         SceneInventory_SortSelectedCategory(p);
         Storage_HideItemDetails(p);
-        sub_081BFC14(p, p->returnState);
+        Storage_BeginModeSelection(p, p->returnState);
     } else if (result == 0) {
         Sound_PlaySong(0xDE);
-        sub_081BFC14(p, p->returnState);
+        Storage_BeginModeSelection(p, p->returnState);
     }
 }

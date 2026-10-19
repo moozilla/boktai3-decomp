@@ -1,5 +1,4 @@
-#define ScenePanel_DispatchTransitionCommands sub_081A7828
-#define gSceneEventDispatchState              gUnk_0200047C
+#define gSceneEventDispatchState gUnk_0200047C
 #include "global.h"
 #include "scene_event_dispatch.h"
 struct ScenePanelCommandState {
@@ -21,7 +20,7 @@ static inline void ScenePanel_RequestTransition(struct ScenePanelCommandState *p
     panel->counter = 0;
     panel->pending = 1;
 }
-void sub_081A7828(struct ScenePanelCommandState *panel)
+void ScenePanel_DispatchTransitionCommands(struct ScenePanelCommandState *panel)
 {
     struct SceneEventReceiver *receiver = &panel->receiver;
     s32 i = 0;

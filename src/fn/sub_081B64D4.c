@@ -1,4 +1,3 @@
-#define PairedSceneActor_AreSelectedHalvesFinished sub_081B64D4
 #include "global.h"
 struct PairedSceneHalf {
     u8 unknown0[0x160];
@@ -24,7 +23,7 @@ static inline u8 IsPositive(struct PairedSceneHalf *half)
         result = 1;
     return result;
 }
-u32 sub_081B64D4(struct PairedSceneActor *p)
+u32 PairedSceneActor_AreSelectedHalvesFinished(struct PairedSceneActor *p)
 {
     if (p->selectedMask & 1) {
         if (IsPositive(&p->halves[0])) {

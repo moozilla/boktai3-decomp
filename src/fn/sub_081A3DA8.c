@@ -1,4 +1,3 @@
-#define Hresvelgr_InitHomingShotCollider sub_081A3DA8
 #include "global.h"
 /* Tentative homing-shot layout, established by its collider and position uses. */
 struct HomingShot {
@@ -23,7 +22,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Hresvelgr_OnHomingShotCollision(void);
-void sub_081A3DA8(struct HomingShot *shot, s32 attack, s32 force, s32 arg)
+void Hresvelgr_InitHomingShotCollider(struct HomingShot *shot, s32 attack, s32 force, s32 arg)
 {
     struct ColliderVector size, offset;
     void *collider = shot->collider;

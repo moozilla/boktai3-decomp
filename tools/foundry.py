@@ -685,8 +685,12 @@ def scale_report():
 
 def committable():
     """Matched functions not yet in src/: (func, source file)."""
+    import csv
     import worklist
-    defined = worklist.done_names()  # matched elsewhere meanwhile (a unit run, another session)
+    # matched elsewhere meanwhile (a unit run, another session), possibly under a new name:
+    # compare addresses, not names
+    by_name = {r["name"]: r["addr"].upper() for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "functions.csv")))}
+    defined = {f"sub_{by_name.get(n, n[4:] if n.startswith('sub_') else '').upper()}" for n in worklist.done_names()}
     out = []
     seen = set()
     for rp in glob.glob(os.path.join(OUT, "sub_*", "result.txt")):

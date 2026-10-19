@@ -1,8 +1,5 @@
-#define Storage_UpdateBrowse           sub_081BFD00
-#define Storage_TickCategorySelection  sub_081BD9A0
-#define Storage_RefreshCategoryDisplay sub_081BFAE0
-#define gStorageCategoryKeyframes      gUnk_0824F928
-#define gStorageKeys                   gUnk_03005260
+#define gStorageCategoryKeyframes gUnk_0824F928
+#define gStorageKeys              gUnk_03005260
 #include "global.h"
 #include "scene_input.h"
 
@@ -34,7 +31,7 @@ struct StorageCategoryKeyframes {
 };
 extern const struct StorageCategoryKeyframes gStorageCategoryKeyframes;
 s32 Storage_TickCategorySelection(struct StorageMenu *);
-void Storage_RefreshCategoryDisplay(struct StorageMenu *);
+void Storage_RefreshCategoryWidgets(struct StorageMenu *);
 void Storage_InitSlotMapping(struct StorageMenu *, s32);
 void Storage_UpdateCloseDelay(void);
 void Storage_SetUpdateCallback(struct StorageMenu *, void (*)(void));
@@ -51,7 +48,7 @@ static inline void HideWidget(struct SceneInputWidget *widget)
     widget->flags &= ~1;
 }
 
-void sub_081BFD00(struct StorageMenu *p)
+void Storage_UpdateBrowse(struct StorageMenu *p)
 {
     if (p->active) {
         p->blinkCounter++;
@@ -67,7 +64,7 @@ void sub_081BFD00(struct StorageMenu *p)
             struct StorageCategoryKeyframes keyframes;
             Sound_PlaySong(0x10A);
             Storage_InitSlotMapping(p, (p->categories[p->categorySelection] & 1) << 4);
-            Storage_RefreshCategoryDisplay(p);
+            Storage_RefreshCategoryWidgets(p);
             category = p->categories[p->categorySelection];
             Anim_LoadKeyframe(p->categoryAnimation, p->animationData, category + 0xD3, 0);
             category = p->categories[p->categorySelection];

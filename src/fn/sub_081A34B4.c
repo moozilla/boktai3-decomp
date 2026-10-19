@@ -1,4 +1,3 @@
-#define Hresvelgr_InitShotCollider sub_081A34B4
 #include "global.h"
 struct HresvelgrShot {
     u8 unknown00[0x1C];
@@ -14,7 +13,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 s32 Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Hresvelgr_OnShotCollision(void);
-s32 sub_081A34B4(struct HresvelgrShot *shot, s32 a, s32 b, s32 c)
+s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *shot, s32 a, s32 b, s32 c)
 {
     struct HresvelgrColliderVector size;
     struct HresvelgrColliderVector offset;

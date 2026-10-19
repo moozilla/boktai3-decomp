@@ -1,6 +1,3 @@
-#define Hresvelgr_PlayTargetedTravel sub_081A0A88
-#define Hresvelgr_GetTravelTarget    sub_0819C5D4
-#define Hresvelgr_UpdateTravel       sub_0819CB7C
 #include "global.h"
 /* Tentative Hresvelgr layout and behavior names, inferred from static consumers. */
 typedef struct HresvelgrPosition {
@@ -23,17 +20,17 @@ typedef struct HresvelgrActor {
     u8 animation[0x20];
 } HresvelgrActor;
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819C5D4(HresvelgrActor *, HresvelgrPosition *);
+void Hresvelgr_GetTravelTarget(HresvelgrActor *, HresvelgrPosition *);
 s32 ColliderActor_SetTargetPosition(HresvelgrActor *, HresvelgrPosition *);
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-int sub_0819CB7C(HresvelgrActor *);
-void sub_081A0A88(HresvelgrActor *p)
+int Hresvelgr_UpdateTravel(HresvelgrActor *);
+void Hresvelgr_PlayTargetedTravel(HresvelgrActor *p)
 {
     HresvelgrPosition target;
     if (p->changed) {
         p->changed = 0;
-        sub_0819C5D4(p, &target);
+        Hresvelgr_GetTravelTarget(p, &target);
         ColliderActor_SetTargetPosition(p, &target);
         Hresvelgr_SetAnimation(p, p->animation, p->animationData, 0, 1, 0);
     }
@@ -44,7 +41,7 @@ void sub_081A0A88(HresvelgrActor *p)
     if (!(u8)Callback_InvokeActor(p, p->callback)) {
         if (p->pulse)
             Sound_PlaySong(0x3d9);
-        if (sub_0819CB7C(p) || p->tick > 128)
+        if (Hresvelgr_UpdateTravel(p) || p->tick > 128)
             p->finished = 1;
     }
 }

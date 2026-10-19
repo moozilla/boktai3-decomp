@@ -1,23 +1,26 @@
-#define Vanargand_UpdateQueuedActionTransition sub_081A8938
 #include "global.h"
 struct VanargandTransition {
     u8 pad0[0xAA];
     u8 state, previousState, phase, subphase, mode, active, pending;
-    u8 padB1[0xC4-0xB1];
+    u8 padB1[0xC4 - 0xB1];
     u32 counter;
-    u8 padC8[0x502-0xC8];
+    u8 padC8[0x502 - 0xC8];
     u16 condition;
-    u8 pad504[0xF28-0x504];
+    u8 pad504[0xF28 - 0x504];
     u32 queued[3];
     s32 queueIndex;
 };
 void Vanargand_StopActionSequence(void *);
 static inline u8 Vanargand_ConsumePending(struct VanargandTransition *p)
 {
-    if (p->pending) { p->pending=0; p->active=0; return TRUE; }
+    if (p->pending) {
+        p->pending = 0;
+        p->active = 0;
+        return TRUE;
+    }
     return FALSE;
 }
-void sub_081A8938(void *object)
+void Vanargand_UpdateQueuedActionTransition(void *object)
 {
     struct VanargandTransition *p = object;
     struct VanargandTransition *q = object;

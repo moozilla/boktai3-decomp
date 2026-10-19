@@ -1,8 +1,3 @@
-#define Registry2388_InitializeFromScript  sub_081BA3D4
-#define Registry2388_CreateSelectionCursor sub_081BA2E4
-#define Registry2388_LoadResources         sub_081B9ED0
-#define Registry2388_ConfigureVideo        sub_081B9FD4
-#define Registry2388_ApplySunPhase         sub_081B9C00
 #include "global.h"
 
 struct Registry2388 {
@@ -20,23 +15,23 @@ void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void sub_08217F4C(void);
 void sub_08214B44(void);
 void sub_08219624(void);
-void sub_081B9FD4(struct Registry2388 *);
-void sub_081B9ED0(struct Registry2388 *);
-void sub_081B9C00(struct Registry2388 *, s32);
-void sub_081BA2E4(struct Registry2388 *, s32);
+void Registry2388_InitializeBackground(struct Registry2388 *);
+void Registry2388_InitializeAnimations(struct Registry2388 *);
+void Registry2388_ApplyPalettePhase(struct Registry2388 *, s32);
+void Registry2388_CreateSelectionCursor(struct Registry2388 *, s32);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
 s32 SunClock_GetPhase(void);
 void MenuCursor_Hide(void *);
 void Registry2388_BeginFadeIn(void *);
 
-s32 sub_081BA3D4(struct Registry2388 *object, void *arg)
+s32 Registry2388_InitializeFromScript(struct Registry2388 *object, void *arg)
 {
     s32 i;
     s32 *value;
     Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
-    sub_081B9FD4(object);
-    sub_081B9ED0(object);
+    Registry2388_InitializeBackground(object);
+    Registry2388_InitializeAnimations(object);
     if (Script_SeekToKeyword(0x70)) {
         value = object->entryValues;
         i = 8;
@@ -70,10 +65,10 @@ s32 sub_081BA3D4(struct Registry2388 *object, void *arg)
     object->selection = object->initialSelection;
     object->unknown524 = 0;
     if (Script_SeekToKeyword(0x62))
-        sub_081B9C00(object, Script_GetValue());
+        Registry2388_ApplyPalettePhase(object, Script_GetValue());
     else
-        sub_081B9C00(object, SunClock_GetPhase());
-    sub_081BA2E4(object, object->initialSelection);
+        Registry2388_ApplyPalettePhase(object, SunClock_GetPhase());
+    Registry2388_CreateSelectionCursor(object, object->initialSelection);
     MenuCursor_Hide(object->selectionCursor);
     Registry2388_BeginFadeIn(object);
     return 0;

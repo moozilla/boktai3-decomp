@@ -8,7 +8,7 @@ struct SceneInventoryCategoryMenu {
     u8 unknown1518[0x2B0];
     u16 paletteTarget[16];
 };
-void sub_081BFAE0(struct SceneInventoryCategoryMenu *);
+void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
 void Storage_RefreshSelectedItemDetails(struct SceneInventoryCategoryMenu *);
 void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
 void SceneInventory_UpdateCategoryBrowse(struct SceneInventoryCategoryMenu *);
@@ -22,7 +22,7 @@ void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *p)
 {
     EnableWidget(&p->categoryWidget);
     EnableWidget(&p->primaryWidget);
-    sub_081BFAE0(p);
+    Storage_RefreshCategoryWidgets(p);
     Storage_RefreshSelectedItemDetails(p);
     SceneInventory_SetCategoryPalette(p, p->paletteTarget);
     SceneInventory_SetState(p, SceneInventory_UpdateCategoryBrowse, 0);

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define Registry1909_UpdateFalling sub_081C5190
 
 struct S {
     u8 pad[0x38];

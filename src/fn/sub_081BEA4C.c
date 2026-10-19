@@ -1,4 +1,3 @@
-#define Storage_ShowEquipmentDescription sub_081BEA4C
 #include "global.h"
 #include "scene_inventory_panel.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
@@ -22,7 +21,7 @@ struct EquipmentDescriptor {
     u32 words[8];
 };
 void Storage_HideItemDetails(struct StoragePanel *);
-void sub_081BEA4C(struct StoragePanel *panel)
+void Storage_ShowEquipmentDescription(struct StoragePanel *panel)
 {
     struct EquipmentDescriptor descriptor;
     struct SceneValueEquipment *entry = 0;

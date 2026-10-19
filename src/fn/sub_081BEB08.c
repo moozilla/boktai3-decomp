@@ -1,5 +1,4 @@
-#define Storage_ShowConsumableDescription sub_081BEB08
-#define gGameState                        gUnk_02000710
+#define gGameState gUnk_02000710
 #include "global.h"
 #include "scene_inventory_panel.h"
 struct StoragePanel {
@@ -16,7 +15,7 @@ struct StoragePanel {
     u8 unknown1764[0x2c];
     u8 items[1];
 };
-void sub_081BEB08(struct StoragePanel *panel)
+void Storage_ShowConsumableDescription(struct StoragePanel *panel)
 {
     s32 item;
     if (panel->selection <= 7) {

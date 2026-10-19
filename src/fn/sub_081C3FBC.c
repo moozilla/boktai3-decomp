@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define RegistryF3E4_CreateHidden sub_081C3FBC
-
 struct F3E4Actor {
     u8 pad0[0x18];
     u8 animData[0x1C];

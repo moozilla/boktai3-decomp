@@ -1,4 +1,3 @@
-#define Vanargand_UpdateMode2 sub_081A74F4
 #include "global.h"
 /* Tentative boss state names; offsets agree with the timed mode sibling. */
 struct VanargandBoss {
@@ -30,7 +29,7 @@ static inline u8 Vanargand_ConsumeModeEntry(struct VanargandBoss *boss)
     }
     return FALSE;
 }
-void sub_081A74F4(struct VanargandBoss *boss)
+void Vanargand_UpdateMode2(struct VanargandBoss *boss)
 {
     struct VanargandBoss *owner = boss;
     if (Vanargand_ConsumeModeEntry(boss) == 1) {

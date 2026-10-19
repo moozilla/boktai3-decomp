@@ -1,4 +1,3 @@
-#define ActorStatus_BeginTimedState sub_081AFA28
 #include "global.h"
 
 struct ActorStatus {
@@ -26,7 +25,7 @@ static inline u32 masked(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-s32 sub_081AFA28(struct ActorStatusOwner *owner, s32 cancel, s32 duration)
+s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *owner, s32 cancel, s32 duration)
 {
     struct ActorStatus *status = owner->status;
     if (cancel == 0) {

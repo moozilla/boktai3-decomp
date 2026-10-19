@@ -1,8 +1,15 @@
-#define Vanargand_InitPartCollider sub_081A6F34
 #include "global.h"
-struct ColliderExtentPair { u32 lo:16, hi:16; };
-struct ColliderExtentTail { u32 lo:16; u32 :16; };
-struct ColliderExtents { struct ColliderExtentPair a; struct ColliderExtentTail b; };
+struct ColliderExtentPair {
+    u32 lo : 16, hi : 16;
+};
+struct ColliderExtentTail {
+    u32 lo : 16;
+    u32 : 16;
+};
+struct ColliderExtents {
+    struct ColliderExtentPair a;
+    struct ColliderExtentTail b;
+};
 struct VanargandPart {
     u8 unk0[0x1c];
     s16 position[3];
@@ -16,7 +23,7 @@ void Collider_SetBodyProperties(void *, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Vanargand_OnPartContact(void);
-void sub_081A6F34(struct VanargandPart *part)
+void Vanargand_InitPartCollider(struct VanargandPart *part)
 {
     struct ColliderExtents size, offset;
     void *collider = part->collider;

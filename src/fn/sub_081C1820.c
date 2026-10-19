@@ -1,11 +1,9 @@
 #include "global.h"
 #include "player.h"
 
-#define ControlPanel_ResetPlayerForInteractionPrompt sub_081C1820
-
 void ControlPanel_ClearPlayerInputHistory(void);
 
-void sub_081C1820(struct Player *p)
+void ControlPanel_ResetPlayerForInteractionPrompt(struct Player *p)
 {
     gUnk_02000580[0]->kind = 1;
     gUnk_02000580[0]->tetherMode = 0x25;
@@ -19,17 +17,17 @@ void sub_081C1820(struct Player *p)
     ControlPanel_ClearPlayerInputHistory();
     gUnk_02000580[0]->interactionPromptFlags = 1;
     switch (p->interactionPromptCategory) {
-    case 0:
-        gUnk_02000580[0]->interactionPromptFlags |= 0x20;
-        break;
-    case 1:
-        gUnk_02000580[0]->interactionPromptFlags |= 0x40;
-        break;
-    case 2:
-        gUnk_02000580[0]->interactionPromptFlags |= 0x10;
-        break;
-    case 3:
-        gUnk_02000580[0]->interactionPromptFlags |= 0x80;
-        break;
+        case 0:
+            gUnk_02000580[0]->interactionPromptFlags |= 0x20;
+            break;
+        case 1:
+            gUnk_02000580[0]->interactionPromptFlags |= 0x40;
+            break;
+        case 2:
+            gUnk_02000580[0]->interactionPromptFlags |= 0x10;
+            break;
+        case 3:
+            gUnk_02000580[0]->interactionPromptFlags |= 0x80;
+            break;
     }
 }

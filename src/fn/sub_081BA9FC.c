@@ -5,7 +5,7 @@ struct Q {
     s32 sel;
     u8 *p;
 };
-void sub_081BA79C(void *);
+void Registry3F74_ConfirmSelection(void *);
 
 void Registry3F74_UpdateSelection(struct Q *p)
 {
@@ -15,5 +15,5 @@ void Registry3F74_UpdateSelection(struct Q *p)
     else
         v = *(s16 *)(p->p + 0xa0);
     p->sel = v;
-    sub_081BA79C(p);
+    Registry3F74_ConfirmSelection(p);
 }

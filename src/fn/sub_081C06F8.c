@@ -1,4 +1,3 @@
-#define SceneActorSequence_UpdateFadeIn sub_081C06F8
 #include "global.h"
 
 struct ScreenTransition {

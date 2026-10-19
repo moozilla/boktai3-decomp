@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define GrowthHazard_FindNearestActiveEntry sub_081B7568
-
 struct GrowthHazardPosition {
     s16 x, y, z, unk6;
 };
@@ -20,8 +18,8 @@ struct GrowthHazardManager {
     struct GrowthHazardEntry entries[1];
 };
 
-s32 sub_081B7568(void *object, struct GrowthHazardPosition *position,
-                 struct GrowthHazardPosition *out)
+s32 GrowthHazard_FindNearestActiveEntry(void *object, struct GrowthHazardPosition *position,
+                                        struct GrowthHazardPosition *out)
 {
     struct GrowthHazardManager *collection = object;
     struct GrowthHazardEntry *entry = collection->entries;

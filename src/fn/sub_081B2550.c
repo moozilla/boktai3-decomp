@@ -1,4 +1,3 @@
-#define SceneBurstActor_UpdateTimedBurst sub_081B2550
 #include "global.h"
 #include "scene_vec.h"
 
@@ -25,7 +24,7 @@ struct SceneBurstActor {
     u32 state;
 };
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
-void sub_081B2550(void *unused, struct SceneBurstActor *actor)
+void SceneBurstActor_UpdateTimedBurst(void *unused, struct SceneBurstActor *actor)
 {
     struct SceneVec point;
     struct SceneVec *out;

@@ -2,9 +2,6 @@
 #define Presentation_PlaySelectionSound sub_0801A0D0
 #define SelectionMenu_HideMarkers       sub_0801A614
 
-#define SelectionMenu_InitCursors  sub_0801A3C0
-#define SelectionMenu_InitMarkers  sub_0801A418
-#define SelectionMenu_NavigateGrid sub_0801ACB8
 void ActionRecord_CopyFromEntry(u8 *, void *);
 void Presentation_ApplyGraphicData(void *, void *);
 void Presentation_ApplyGraphicSettings(u8 *, u32);
@@ -745,7 +742,7 @@ moved:
     return index;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0801ACB8);
+INCLUDE_ASM("asm/nonmatching", SelectionMenu_NavigateGrid);
 #endif
 
 // MATCHING_CONCESSION: register-pinning

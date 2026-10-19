@@ -1,4 +1,3 @@
-#define OffsetActor_PlayTargetSequence sub_0819FB4C
 #include "global.h"
 struct TargetVector {
     s16 x, y, z;
@@ -21,7 +20,7 @@ static inline void SetTarget(struct TargetVector *v, s32 x, s32 y, s32 z)
     v->y = y;
     v->z = z;
 }
-void sub_0819FB4C(struct OffsetActor *object)
+void OffsetActor_PlayTargetSequence(struct OffsetActor *object)
 {
     u8 *p = (u8 *)object;
     struct OffsetActor *actor = object;
