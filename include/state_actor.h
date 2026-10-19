@@ -54,7 +54,10 @@ struct StateActor {
     u8 angle;                    /* 0x65, initialized from targetAngle by 081D1A44. */
     u8 unk66[2];
     struct StateActorPos position; /* 0x68 */
-    u8 unk70[0x168 - 0x70];
+    u8 unk70[0xD4 - 0x70];
+    u8 animation[1]; /* 0xD4: embedded animation descriptor, extent unknown
+                       * (Actor_PlayAnimationEntry, DisplayAnimation_TestFinished). */
+    u8 unkD5[0x168 - 0xD5];
     u8 receiver[0x2CC - 0x168];  /* 0x168: scene message receiver */
     void (*stateCallback)(void); /* 0x2CC */
     u8 unk2D0[0x2E4 - 0x2D0];
