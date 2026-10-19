@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 53.2%
+// fuzzy: 53.5%
 // Idle/chase state built on SceneActorChase_Pursue (include/scene_actor_chase.h). The
 // counter2AC <= 60 increment is the shared tail at 080C0644. The not-chasing branch inlines a
 // second move-toward step (flags2D4 &= ~0x200 via bics with the 0x200 offset constant).

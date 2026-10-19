@@ -163,7 +163,29 @@ static inline void SceneActorChase_StartTurn(struct SceneActorRegistryResetView 
     actor->field2C2 = 0x20;
 }
 
-static inline void SceneActorChase_Pursue(struct SceneActorRegistryResetView *input)
+/* Step the mover toward a point; clears flags2D4 bit 0x200 when it cannot. */
+static inline u8 SceneActorChase_MoveToward(struct SceneActorRegistryResetView *actor, void *mover,
+                                            struct ContactPosition *to)
+{
+    s32 result;
+    if (!sub_0821F204(mover, &actor->position, to)) {
+        actor->flags2D4 &= ~0x200;
+        result = 0;
+    } else {
+        result = sub_0821F7A8(mover, &actor->position, to);
+        if (result == 0) {
+            actor->flags2D4 &= ~0x200;
+            result = 0;
+        } else {
+            if (result != 2)
+                Memory_Clear(&actor->motion, 8);
+            result = 1;
+        }
+    }
+    return result;
+}
+
+static inline u8 SceneActorChase_Pursue(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     u8 *group = (u8 *)&actor->group;
@@ -183,7 +205,7 @@ static inline void SceneActorChase_Pursue(struct SceneActorRegistryResetView *in
         u8 *object = *chased;
         if (!object || (index = SceneActorChase_PlayerIndex(object)) < 0) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
-            return;
+            return 0;
         }
         cell = gUnk_02000580[index]->body->cell;
     } else {
@@ -192,7 +214,7 @@ static inline void SceneActorChase_Pursue(struct SceneActorRegistryResetView *in
     }
     if (cell == actor->terrainCell || (gUnk_02000580[index]->flags & 0x20000)) {
         if (SceneActorChase_TestFlags2D4(actor, 0x400))
-            return;
+            return 0;
         {
             u16 *flags = (u16 *)(group + 0x40);
             s32 mask = ~4;
@@ -228,27 +250,12 @@ static inline void SceneActorChase_Pursue(struct SceneActorRegistryResetView *in
         SceneActorChase_StartTurn(actor, (u8 *)&actor->group);
     } else {
         struct ContactPosition center;
-        void *mover;
-        s32 result;
         SceneActorTerrain_GetCenter(cell, &center);
-        mover = *(void **)(group + 0x1FC);
-        if (!sub_0821F204(mover, &actor->position, &center)) {
-            actor->flags2D4 &= ~0x200;
-            result = 0;
-        } else {
-            result = sub_0821F7A8(mover, &actor->position, &center);
-            if (result == 0) {
-                actor->flags2D4 &= ~0x200;
-                result = 0;
-            } else {
-                if (result != 2)
-                    Memory_Clear(&actor->motion, 8);
-                result = 1;
-            }
-        }
-        if (!result)
-            Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        if (SceneActorChase_MoveToward(actor, *(void **)(group + 0x1FC), &center))
+            return 1;
+        Callback_InvokeActor(actor, *(void **)(group + 0x224));
     }
+    return 0;
 }
 
 #endif

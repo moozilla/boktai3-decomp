@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 60.1%
+// fuzzy: 59.8%
 // Golem chase state. The chase (SceneActorChase_Pursue, include/scene_actor_chase.h) is
 // shared with 080BBDD0/080BF0E4/080BFCC4/080C12FC. Still differs: the ROM copies the group
 // pointer into sl for the turn helper, keeps a zero in r8 for the byte stores, and keeps the
