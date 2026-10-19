@@ -1219,7 +1219,7 @@ def music_piece(song, secs):
 
 
 ENCORE_SONG = 92     # the true ending's end roll: under the title, the cards, Claude's ride and the credits
-for _song, _secs in ((57, 300), (CHASE_SONG, 120), (ENCORE_SONG, 200)):
+for _song, _secs in ((57, 420), (CHASE_SONG, 120), (ENCORE_SONG, 200)):
     piece(music_piece(_song, _secs))
 
 
