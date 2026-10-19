@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32 state)
@@ -14,12 +13,12 @@ s32 SceneActorRegistry_CountLivingByCategory(s32 state)
     count = 0;
     while (actor) {
         if (actor->health > 0) {
-            register u32 offset asm("r6") = 0x2d0;
-            register u32 *field asm("r0");
-            asm("" : "+r"(offset));
-            field = (void *)((u8 *)actor + offset);
-            if (!(*field & 0x20000) && actor->category == state)
+            u32 offset = 0x2d0;
+            u32 *field;
+            field = (void *)(((u8 *)actor) - (-offset));
+            if ((!((*field) & 0x20000)) && (actor->category == state)) {
                 count++;
+            }
         }
         node = node->next;
         actor = node->actor;
