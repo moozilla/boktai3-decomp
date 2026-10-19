@@ -2,4 +2,6 @@ address,evidence
 0806070C,Interior push in 08060708 prologue after push r4-r6/lr and mov r6/r8; single return restores the complete saved set; sole caller targets 08060708
 08060D10,Interior push in 08060D0C prologue after push r4-r6/lr and mov r6/r8; single return restores the complete saved set; callers target 08060D0C
 080800AC,Interior push r5-r7 after prologue at080800A4 saves r4-r7/lr and copies sl/sb/r8; return restores all saved registers; no decoded ROM BL targets080800AC; raw pointer-shaped word at0878EB14 lies inside map resourceE44F at+15EC
-080BEEE8,"Tail of 080BD1F0: no prologue; reads sp+0x8C..0x98 of 080BD1F0's 0x9C frame and returns through add sp #0x9C / pop r8-sl, r4-r7; its only caller is the far-branch bl at 080BDC7E inside 080BD1F0 (agbcc long-branch idiom, like bl _080BEF02 and bl _080BEEF4 nearby)"
+080BEEE8,Interior long-branch target in 080BD1F0: no prologue, uses that frame (sp+0x8c..0x98) and epilogue add sp #0x9c/pop r8-sl; reached only by bl/jump-table entries _080BEF02/_080BEF00/_080BEEFE from 080BD1F0
+080C0644,Interior tail of 080BFCC4: increments a counter and falls into its shared epilogue (add sp #0x9c; pop r8-sl) at 080C0648; reached only by branches from 080BFCC4
+080C09F8,Interior push r5-r7 after prologue at 080C09F0 saves r4-r7/lr and copies sl/sb/r8; the single epilogue restores the complete saved set

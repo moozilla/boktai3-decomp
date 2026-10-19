@@ -12,7 +12,9 @@ def page(path, kicker, title, body, secs=8.0, ready=None, actions=None, where=""
         if still:
             t.hold(0)
             return
-        if actions:
+        if actions and getattr(actions, "captions", False):     # it changes the caption as it goes
+            actions(t, k, n)
+        elif actions:
             actions(t)
         else:
             t.hold(secs)
@@ -142,10 +144,12 @@ def dungeon(t):
 
 
 def map_terrain(t):
-    """Scroll down to the map, then switch the collision overlay on."""
+    """Scroll the map's room to the middle of the view, then switch the
+    collision overlay on."""
     import time
     y = t.inner("(function(){var c=document.querySelector('#view canvas'); var v=document.querySelector('#view');"
-                " return c.getBoundingClientRect().top + v.scrollTop - 110})()") or 0
+                " var r=c.getBoundingClientRect(), vr=v.getBoundingClientRect();"
+                " return Math.max(0, r.top - vr.top + v.scrollTop + r.height / 2 - v.clientHeight / 2)})()") or 0
     scroll_box(t, "document.querySelector('#view')", 0, y, secs=1.6, hold=3.0)
     t.inner("var cb=[...document.querySelectorAll('#view input[type=checkbox]')].find(c => "
             "c.parentElement.textContent.includes('terrain')); cb.click(); 1")
@@ -153,79 +157,145 @@ def map_terrain(t):
     t.hold(4.0)
 
 
+GCL_PROC = 1939          # a scene script with dialogue and the developers' Japanese debug print
+
+
+def gcl_bytes(pid):
+    """The bytecode of script procedure `pid` as hex lines (ROM-derived: shown, never stored)."""
+    import os
+    import sys
+    here = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(os.path.dirname(os.path.dirname(here)))
+    sys.path[:0] = [os.path.join(root, "tools"), os.path.join(root, "tools", "assets")]
+    import gcx
+    from romlib import load_rom
+    rom = load_rom()
+    img = gcx.Image(rom)
+    o = img.proc_address(pid - 1)
+    st, n = gcx.length(bytes(rom), o)
+    b = bytes(rom[o:st + n])
+    return [" ".join(f"{x:02X}" for x in b[i:i + 16]) for i in range(0, min(len(b), 16 * 26), 16)]
+
+
+def gcl_steps(t, k, n):
+    """Three views of one script: its bytecode, the GCL it decompiles to
+    (Konami-style, as the compiler laid it out, Japanese and all), and our
+    readable version. The caption changes with each."""
+    import json
+    rows = gcl_bytes(GCL_PROC)
+    t.inner("(function(){ var b = document.getElementById('body'); if (!b) return 0;"
+            " b.scrollIntoView({block: 'start'}); document.getElementById('view').scrollBy(0, -60);"
+            " b.dataset.keep = b.textContent; b.textContent = %s;"
+            " b.previousElementSibling.textContent = 'Bytecode, as it is stored in the ROM.'; return 1; })()"
+            % json.dumps("\n".join(rows)))
+    t.hold(6.5)
+    t.caption("Scripts", "GCL, as Konami <b>wrote it</b>",
+              ["We decompiled the virtual machine, then the bytecode itself: back into GCL as Konami's compiler "
+               "laid it out, down to the developers' debug messages in Japanese."], k, n, "/scripts")
+    t.inner("(function(){ var c = document.getElementById('readable'); if (c.checked) c.click(); return 1; })()")
+    import time
+    time.sleep(1.2)
+    t.inner("document.getElementById('body').scrollIntoView({block: 'start'}); document.getElementById('view').scrollBy(0, -60); 1")
+    t.hold(6.5)
+    t.caption("Scripts", "...and as you can <b>read it</b>",
+              ["Then into a readable form, with the names we recovered for procedures, variables and commands. "
+               "Our assembler writes it all back, byte for byte."], k, n, "/scripts")
+    t.inner("(function(){ var c = document.getElementById('readable'); if (!c.checked) c.click(); return 1; })()")
+    time.sleep(1.2)
+    t.inner("document.getElementById('body').scrollIntoView({block: 'start'}); document.getElementById('view').scrollBy(0, -60); 1")
+    t.hold(6.5)
+
+
+gcl_steps.captions = True
+
+
+def cutscene_beats(t, k, n):
+    t.hold(5.5)
+    t.caption("Browse > Cutscenes", "...and the tool that <b>reads them</b>",
+              ["The Studio decodes EVERY cutscene table into a timeline you can read and edit. "
+               "The scenes in this video were written the same way."], k, n, "/atlas#cut:0")
+    scroll_by(t, 420, hold=4.5)
+
+
+cutscene_beats.captions = True
+
+
 TOOLS = gcard("The <b>tools</b> behind it", [
     ("agbcc, built for agents", "pret's GBA compiler, instrumented to explain its register allocation, so an agent can see which C change gives the right registers."),
     ("A faster permuter", "decomp-permuter reworked to search faster and waste less, so agents can run it on every stubborn function."),
-    ("Centaur", "Our mGBA fork with a Lua harness that humans and agents share, talking to the Studio in real time: warps, captures, story state, live edits."),
-    ("A headless harness", "Plays the game from scripts, records coverage and video. Every byte of data can move and the game still plays."),
-    ("A GCL assembler", "Writes Konami's scripting language back into the ROM, byte for byte. Every scene in this video is one."),
-    ("Dozens of Python tools", "Pointers, relocations, assets, coverage, ROM maps: the tooling that keeps every byte accounted for."),
+    ("Centaur", "Our mGBA fork with a Lua harness that humans and agents share, talking to the Studio in real time."),
+    ("A headless harness", "Plays the game from scripts and records coverage, screenshots and video, many copies at once."),
+    ("A GCL assembler", "Writes Konami's scripting language back into the ROM, byte for byte."),
+    ("Dozens of Python tools", "Pointers, relocations, assets, coverage, ROM maps: the tooling that keeps EVERY byte accounted for."),
 ])
 
 CLOSING = gcard("Boktai 3, <b>decompiled</b>", [
-    ("31% matching C", "C that compiles back to the exact original bytes, and growing. Contributions welcome!"),
-    ("Every script and cutscene", "Decoded, readable, and writable."),
-    ("Every room and object", "Mapped, linked, and editable in the Studio."),
+    ("41% matching C", "C that compiles back to the exact original bytes, and growing. Contributions welcome!"),
+    ("EVERY script and cutscene", "Decoded, readable, and writable."),
+    ("EVERY room and object", "Mapped, linked, and editable in the Studio."),
     ("All you need is the ROM", "The decomp and the Studio are open source."),
 ], foot="<b>github.com/moozilla/boktai3-decomp</b>   Contributions welcome!")
 
 
+def big_card(lines, secs):
+    """A card of statements in the game's font: (text, scale) lines."""
+    html = "".join(f'<div class="gf" data-scale="{sc}" data-text="{x}"></div><div class="gap"></div>' for x, sc in lines)
+    return card(html, secs=secs)
+
+
 STOPS = [
-    card(gcard("How it was <b>done</b>", text="We decompiled Boktai 3: its C code, its script engine, its cutscene "
-                                              "director and every asset it loads. Then we built the Boktai 3 Studio to "
-                                              "explore all of it, in your browser.")),
-    page("/atlas", "Browse", "The whole game, <b>understood</b>",
-         ["Not just the code: the story, the cast, every monster, room, cutscene, script, sprite and song, "
-          "decoded from the ROM and linked together."], secs=6.0),
-    page("/atlas#node:Story", "Browse > Story", "Every <b>beat</b> of the story",
-         ["The game keeps its whole plot in one number. We know every value it takes, where it is set, "
-          "and which doors it opens."], secs=6.5),
-    page("/atlas#cut:0", "Browse > Cutscenes", "We decompiled the <b>cutscene engine</b>",
-         ["Every camera move, line and sound is a table played by a small director in the game's code.",
-          "Every scene you saw in this video ran in the actual game."],
-         actions=lambda t: (t.hold(2.5), scroll_by(t, 420, hold=3.5))),
-    page("/scripts#file=scene_6554", "Scripts", "A second language, <b>reverse engineered</b>",
-         ["The game's story isn't in its C code. It's in GCL, the scripting language Konami built for "
-          "Metal Gear Solid, compiled to bytecode for its own virtual machine.",
-          "So on top of decompiling the game, we decoded GCL itself: the machine, the bytecode, and an "
-          "assembler that writes it back byte for byte."],
-         actions=lambda t: (t.hold(3.5), scroll_by(t, 500, secs=2.0, hold=4.0))),
-    page("/atlas#char:9820", "Browse > Cast", "Every character, <b>every line</b>",
-         ["Portraits from the game's own speaker table, and everything each character says, "
-          "beside the fan translation."],
-         actions=lambda t: (t.hold(2.5), scroll_by(t, 600, hold=3.0))),
-    page("/atlas#actor:05A5", "Browse > Bestiary", "One ghoul, <b>many colors</b>",
-         ["A single option in a monster's script picks its palette.",
-          "The twenty ghouls in the cold open were twenty new palettes."], secs=7.0),
-    page("/actors", "Actors", "Everything a script can <b>spawn</b>",
-         ["Doors, switches, enemies, Vanargand: named from Konami's own hashed identifiers and linked "
-          "to the code that runs them."], secs=6.0),
-    page("/world", "World", "Every room, and how they <b>connect</b>",
-         ["Scenes grouped into areas by their doors. The doors are data too, which is how they could lie."],
-         secs=6.0),
-    page("/gfx#dungeon/3", "Dungeons", "Whole places, <b>stitched</b>",
-         ["Every room of Lifeless Town laid out by its doors, rebuilt from the game's own map data."],
-         actions=dungeon, ready="document.querySelectorAll('#dbox canvas').length > 20", settle=3.0),
-    page("/gfx#maps/2C6E-CEBA-7E8B/2712.7", "Maps", "Stages, <b>rebuilt</b>",
-         ["Map, tileset and the collision underneath, with every door, item and enemy where the scripts put them.",
-          "This is the skylight room."],
-         actions=map_terrain, ready="document.querySelectorAll('#view canvas').length > 0", settle=4.0),
-    page("/gfx#sprites/DE23", "Sprites", "Every sprite, in its <b>real colors</b>",
-         ["Palettes traced through the code to the sprites that really use them."],
-         secs=6.0, ready="document.querySelectorAll('#view canvas').length > 3"),
-    page("/sound#18", "Sound", "Every song, <b>in your browser</b>",
-         ["A player built for the Studio plays the game's own sequence data, track by track."],
-         actions=play_song),
-    page("/#5460", "Text", "Every line, <b>editable</b>",
-         ["The Japanese script and the fan translation side by side, previewed in the game's own font."],
-         secs=6.0),
-    page("/rom", "ROM", "The whole ROM, <b>mapped</b>",
-         ["Every byte: what it is, and how well we understand it."],
-         actions=lambda t: (t.hold(2.0), hover_path(t, [(120, 300), (300, 420), (520, 380), (760, 450), (1000, 300)], 5.0))),
-    page("/code#0805592C", "Code", "<b>31%</b> matching C, and growing",
-         ["C that compiles back to the exact original bytes. Contributions welcome!",
+    big_card([("Every scene you just watched was written <b>directly into the ROM</b>", 4),
+              ("and played by the game's own cutscene engine.", 4),
+              ("<m>This is just a taste of what a full decompilation makes possible.</m>", 3)], 7.0),
+    big_card([("...and that's <b>not all</b>.", 5),
+              ("We're also releasing the <b>Boktai 3 Studio</b>: a complete toolkit", 3),
+              ("to explore and edit EVERY piece of data in the game.", 3)], 6.5),
+    page("/atlas", "Browse", "The whole game, <b>decoded</b>",
+         ["EVERY script, cutscene, line of text, object, map, sprite and song, decoded and linked together:",
+          "5,615 scripts, 240 cutscenes, 9,977 lines of text, 722 object types, 287 maps, 1,022 songs and sounds."],
+         secs=8.0),
+    page("/code#0805592C", "Code", "<b>41%</b> matching C, and growing",
+         ["The game's code is ARM assembly. We're rewriting it as C that compiles back to the exact same bytes. "
+          "Contributions welcome!",
           "This function adds a keyframe sprite: everything the stranger did on screen went through it."],
-         secs=7.0),
+         secs=8.0),
+    page(f"/scripts#{GCL_PROC}", "Scripts", "A second language, <b>decompiled</b>",
+         ["Boktai's story, scenes and events aren't in the C code at all. They're bytecode for GCL, the scripting "
+          "language Konami built for the Metal Gear Solid engine and adapted for the GBA, run by its own virtual "
+          "machine inside the game. So we decompiled that too."],
+         actions=gcl_steps, ready="document.getElementById('body') && document.getElementById('body').textContent.length > 50",
+         settle=2.0),
+    page("/atlas#cut:0", "Browse > Cutscenes", "How the cutscene <b>engine</b> works",
+         ["A cutscene is a table of steps. Each step sends messages to receivers: the camera, the screen, the music, "
+          "Django, Otenko, Vanargand. Then it waits: for some frames, a camera move, or the player to close a message."],
+         actions=cutscene_beats),
+    page("/#5460", "Text", "EVERY line, in <b>both languages</b>",
+         ["The Japanese script and the 2007 fan translation side by side, previewed in the game's own font, and editable."],
+         secs=6.5),
+    page("/actors", "Actors", "EVERY object, <b>named</b>",
+         ["Scripts spawn objects by hashed name. We recovered Konami's names and linked EVERY object to the code "
+          "that runs it."], secs=6.5),
+    page("/world", "World", "Rooms, connected by their <b>doors</b>",
+         ["Rooms connect through door data. The Studio follows the doors to group EVERY scene into its area."],
+         secs=6.0),
+    page("/gfx#dungeon/3", "Dungeons", "Whole areas, <b>stitched</b>",
+         ["...and lays out whole areas room by room, drawn from the game's own map data."],
+         actions=dungeon, ready="document.querySelectorAll('#dbox canvas').length > 20", settle=3.0),
+    page("/gfx#maps/2C6E-CEBA-7E8B/2712.7", "Maps", "EVERY stage, <b>rebuilt</b>",
+         ["Map, tileset and the collision layer underneath, with every door, item and enemy where the scripts "
+          "put them. This is the skylight room."],
+         actions=map_terrain, ready="document.querySelectorAll('#view canvas').length > 0", settle=4.0),
+    page("/gfx#sprites/DE23", "Sprites", "EVERY sprite in its <b>real colors</b>",
+         ["Sprites don't carry their own palettes: the code picks one at run time. We traced the palettes through "
+          "the code, so EVERY sprite shows in its real colors."],
+         secs=7.0, ready="document.querySelectorAll('#view canvas').length > 3"),
+    page("/sound#18", "Sound", "EVERY song, <b>in your browser</b>",
+         ["The music is sequence data for the GBA's sound engine. The Studio's own player synthesizes EVERY song "
+          "in the browser, track by track."],
+         actions=play_song),
+    page("/rom", "ROM", "The whole ROM, <b>mapped</b>",
+         ["EVERY byte, classified: code, data, text, graphics or sound."],
+         actions=lambda t: (t.hold(2.0), hover_path(t, [(120, 300), (300, 420), (520, 380), (760, 450), (1000, 300)], 5.0))),
 ]
 
 
@@ -318,6 +388,77 @@ def live(t, k, n, still=False):
     t.meta["live_end"] = t.now()
 
 
+def centaur(t, k, n, still=False):
+    """Centaur: the Studio's Live page following a running game (live_tour.lua
+    walks Django around the skylight room at the GBA's frame rate and saves
+    its frames for the edit to lay in beside the Studio). The screen
+    inspector captures it every two seconds; a sprite is picked; the
+    palettes and BG layers tabs; the map with the player on it."""
+    import json
+    import os
+    import subprocess
+    import time
+    import urllib.request
+    here = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(os.path.dirname(os.path.dirname(here)))
+    out = os.path.join(root, "build", "showcase", "v3", "livetour")
+    t.caption("Live", "Centaur: the Studio, linked to <b>a running game</b>",
+              ["Centaur is our fork of mGBA, with a Lua harness that humans and agents share. The Live page follows "
+               "the game as it plays: the scene, the story state, the objects on screen."], k, n, "/live")
+    t.top("document.getElementById('gamebox').style.height = '336px'; 1")
+    t.meta["game_box"] = t.top("(function(){ var b = document.getElementById('gamebox').getBoundingClientRect(); "
+                               "return [Math.round(b.left), Math.round(b.top), 480, 320]; })()")
+    if still:
+        t.go("/live")
+        t.hold(0)
+        return
+    os.makedirs(out, exist_ok=True)          # reused: frames are overwritten
+    state = os.path.join(root, "build", "centaur", "scenarios", "panel", "panel_860.ss")
+    rom = os.path.join(root, "build", "showcase", "v3", "plain.gba")
+    env = dict(os.environ, LIVE_STATE=state, LIVE_OUT=out, LIVE_FRAMES="2700")
+    game = subprocess.Popen([os.path.join(root, "tools", "mgba", "headless.sh"), os.path.join(here, "live_tour.lua"), rom],
+                            env=env, stdout=open(os.path.join(out, "log.txt"), "w"), stderr=subprocess.STDOUT)
+
+    def connected():
+        try:
+            return json.load(urllib.request.urlopen(t.url + "/api/live")).get("connected")
+        except OSError:
+            return False
+    for _ in range(240):
+        if connected() and os.path.exists(os.path.join(out, "g_00010.png")):
+            break
+        time.sleep(0.25)
+    t.meta["game_start"] = t.now() - 10 / 59.7275
+    t.go("/live")
+    t.hold(4.0, step=1 / 4)
+    # the screen inspector, following the game
+    t.inner("document.getElementById('screenview').closest('.card').scrollIntoView({block: 'start'}); 1")
+    for _ in range(3):                      # the inspector captures the running game (its Refresh)
+        t.inner("snap(); 1")
+        t.hold(1.75, step=1 / 4)
+    t.caption("Live", "Capture <b>anything</b>",
+              ["A capture maps EVERY sprite, tile and palette on screen back to its data. Click a sprite and the "
+               "Studio tells you what it is, which frame, and which palette."], k, n, "/live")
+    t.inner("snap(); 1")
+    t.hold(1.5, step=1 / 4)
+    t.inner("(function(){ var obs = [...document.querySelectorAll('#screenview .screen .ob')];"
+            " obs.sort((a, b) => b.offsetWidth * b.offsetHeight - a.offsetWidth * a.offsetHeight);"
+            " if (obs[0]) obs[0].click(); return obs.length; })()")
+    t.hold(4.0, step=1 / 4)
+    for tab in ("palettes", "layers"):
+        t.inner("(function(){ var b = document.querySelector('#screenview .tabs button[data-t=%s]'); if (b) b.click();"
+                " document.querySelector('#screenview .tabs').scrollIntoView({block: 'start'}); return 1; })()" % json.dumps(tab))
+        t.hold(3.0, step=1 / 4)
+    t.caption("Live", "...and follow it on <b>the map</b>",
+              ["The same link puts the player on the stage map, with the doors, items and enemies around them."],
+              k, n, "/live")
+    t.inner("document.getElementById('livemap').scrollIntoView({block: 'start'}); 1")
+    t.hold(5.0, step=1 / 4)
+    t.meta["game_end"] = t.now()
+    game.terminate()
+
+
+STOPS.append({"title": "centaur", "run": centaur})
 STOPS.append({"title": "live", "run": live})
 STOPS.append(card(TOOLS, secs=12.0))
 STOPS.append(card(CLOSING, secs=9.0))
