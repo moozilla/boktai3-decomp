@@ -1,8 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
-#define SceneActorReaction_DefeatRecordStats sub_08132D2C
 void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
 void Player_NotifyFirstSelectedSlot(u32, u32);
@@ -24,10 +22,10 @@ static inline s32 clamp(s32 v)
     return v;
 }
 /* Saturating defeat counters in the game-state block. */
-#define STAT_INC(n) H(STATS, n) = H(STATS, n) < 9999 ? H(STATS, n) + 1 : 9999
+#define STAT_INC(n) Count(&H(STATS, n))
 #define STAT_ADD(n) H(STATS, n) = clamp(H(STATS, n) + 1)
 #define KILL_KIND(flags)                                                                           \
-    do {                                                                                           \
+    {                                                                                              \
         if ((flags) & 0x80)                                                                        \
             STAT_ADD(0x58A);                                                                       \
         else if ((flags) & 0x100)                                                                  \
@@ -38,13 +36,20 @@ static inline s32 clamp(s32 v)
             STAT_ADD(0x590);                                                                       \
         else if ((flags) &= 0x800)                                                                 \
             STAT_ADD(0x592);                                                                       \
-    } while (0)
+    }
 #define CASE_BODY(n)                                                                               \
-    do {                                                                                           \
-        register u32 flags asm("r4") = *(u32 *)(hit + 0x38);                                       \
+    {                                                                                              \
+        u32 flags = *(u32 *)(hit + 0x38);                                                          \
         STAT_INC(n);                                                                               \
         KILL_KIND(flags);                                                                          \
-    } while (0)
+    }
+static inline void Count(s16 *p)
+{
+    if (*p < 9999)
+        *p = *p + 1;
+    else
+        *p = 9999;
+}
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
