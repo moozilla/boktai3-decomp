@@ -51,8 +51,6 @@ INCLUDE_ASM("asm/nonmatching", sub_080C9848);
 
 INCLUDE_ASM("asm/nonmatching", sub_080C9C04);
 
-INCLUDE_ASM("asm/nonmatching", sub_080CBE22);
-
 void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
@@ -115,8 +113,6 @@ void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
 }
 
 INCLUDE_ASM("asm/nonmatching", sub_080CBF24);
-
-INCLUDE_ASM("asm/nonmatching", sub_080CC80C);
 
 void Golem_InitActionHandlers(struct SceneActorRegistryResetView *actor)
 {
