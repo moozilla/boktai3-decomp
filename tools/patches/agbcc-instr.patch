@@ -868,3 +868,49 @@
    n = expr_hash_table_size * sizeof (struct expr *);
    expr_hash_table = (struct expr **) gmalloc (n);
  }
+--- a/cse.c
++++ b/cse.c
+@@ -835,6 +835,27 @@
+ /* Make reg NEW equivalent to reg OLD.
+    OLD is not changing; NEW is.  */
+ 
++/* Instrumentation: CSE_KEEP=r1,r2 never replaces those registers as a
++   class's canonical register; CSE_NOCANON=N keeps pseudo N from becoming
++   canonical; CSE_DEBUG=N traces make_regs_eqv for NEW >= N to stderr.  */
++
++static int
++keep_reg_p (r)
++     int r;
++{
++  char *p = getenv ("CSE_KEEP");
++  while (p && *p)
++    {
++      if (atoi (p) == r)
++	return 1;
++      while (*p && *p != ',')
++	p++;
++      if (*p == ',')
++	p++;
++    }
++  return 0;
++}
++
+ static void
+ make_regs_eqv (new, old)
+      register int new, old;
+@@ -854,7 +875,14 @@
+      hard regs.  Among pseudos, if NEW will live longer than any other reg
+      of the same qty, and that is beyond the current basic block,
+      make it the new canonical replacement for this qty.  */
+-  if (! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
++  if (getenv ("CSE_DEBUG") && *getenv ("CSE_DEBUG") && new >= atoi (getenv ("CSE_DEBUG")))
++    fprintf (stderr, "eqv new=%d old=%d first=%d newlast=%d newfirst=%d firstlast=%d bb=%d..%d\n",
++	     new, old, firstr, uid_cuid[REGNO_LAST_UID (new)], uid_cuid[REGNO_FIRST_UID (new)],
++	     firstr >= FIRST_PSEUDO_REGISTER ? uid_cuid[REGNO_LAST_UID (firstr)] : -1,
++	     cse_basic_block_start, cse_basic_block_end);
++  if (!(getenv ("CSE_KEEP") && keep_reg_p (firstr))
++      && !(getenv ("CSE_NOCANON") && *getenv ("CSE_NOCANON") && new == atoi (getenv ("CSE_NOCANON")))
++      && ! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
+       /* Certain fixed registers might be of the class NO_REGS.  This means
+ 	 that not only can they not be allocated by the compiler, but
+ 	 they cannot be used in substitutions or canonicalizations
