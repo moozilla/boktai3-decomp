@@ -1538,3 +1538,4 @@ addr,function,name,family,note
 081BB864,sub_081BB864,SolarBank_UpdateSelection,"Solar bank panel (tentative)","processes confirm cancel and left-right selection input"
 081BC6AC,sub_081BC6AC,DarkLoan_BeginOpening,"Dark loan panel","sets up the panel and starts its opening transition"
 081BC76C,sub_081BC76C,DarkLoan_FinishOpening,"Dark loan panel","switches the opened panel to its selection state"
+081BCA74,sub_081BCA74,DarkLoan_BeginAlternateOpening,"Dark loan panel","opens the alternate panel display with message thirteen"
