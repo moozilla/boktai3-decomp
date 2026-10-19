@@ -2,7 +2,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 91.8% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: agent draft, 145 insns off by tools/anchordiff.py (was 261); see notes/cloud-08122DF4.md
+
 /* Golem: converge on the saved motion target; once at rest either hand control to the
  * 0x5DC callback, or (flag 0x80) chase the player / walk the route (tentative). */
 
@@ -28,6 +29,10 @@ struct GolemRouteLink {
 };
 struct GolemFlags16 {
     u16 value;
+};
+#define HOME (*(struct ContactPosition **)(group + 0x200))
+struct GolemTurn {
+    u8 direction, savedDirection, mode;
 };
 struct GolemSavedControl {
     void *target;
@@ -128,7 +133,7 @@ static inline u32 CellIndex(struct ContactPosition *p)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
+static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
     u32 shape, height;
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
@@ -175,13 +180,21 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
         }
     }
 }
+static inline u32 Random(const u16 *table, u32 *seed, u32 wrap, u32 bits)
+{
+    u32 index = (*seed + 1) & wrap;
+    u32 v;
+    *seed = index;
+    index *= 2;
+    v = *(const u16 *)(index + (u32)table);
+    v &= bits;
+    return v;
+}
 static inline u32 RandomDirectionExcept(u32 current)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {
-        u32 d;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        d = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        u32 d = Random(gUnk_0203B400, &gUnk_03005308, 0x3FF, 3) << 6;
         if (d != current)
             return d;
     }
@@ -192,7 +205,7 @@ static inline void Wander(struct SceneActorRegistryResetView *input, u8 directio
     struct SceneActorRegistryResetView *actor = input;
     u8 *group = (u8 *)&actor->group;
     if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
-        group[0x204] = RandomDirectionExcept(actor->direction);
+        ((struct GolemTurn *)(group + 0x204))->direction = RandomDirectionExcept(actor->direction);
         ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
         ((struct GolemSavedControl *)(group + 0x8C))->kind = actor->field2B5;
         ((struct GolemSavedControl *)(group + 0x8C))->state = actor->state2A8;
@@ -222,7 +235,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         struct GolemRouteLink *link = (void *)&actor->route;
         dest->x = link->point->x;
         dest->z = link->point->z;
-        dest->y = CellHeight(dest, CellIndex(dest));
+        dest->y = CellHeight(CellIndex(dest), dest);
     }
     if (Test(gUnk_030053F4, 0x4800)) {
         u8 *target = (u8 *)*targetp;
@@ -262,12 +275,10 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
                 struct GolemRouteLink *link = (struct GolemRouteLink *)(group + 0x74);
                 dest->x = link->point->x;
                 dest->z = link->point->z;
-                dest->y = CellHeight(dest, CellIndex(dest));
+                dest->y = CellHeight(CellIndex(dest), dest);
+                HOME->y = CellHeight(CellIndex(HOME), HOME);
+                HOME->pad = 0;
             }
-            (*(struct ContactPosition **)(group + 0x200))->y =
-                CellHeight(*(struct ContactPosition **)(group + 0x200),
-                           CellIndex(*(struct ContactPosition **)(group + 0x200)));
-            (*(struct ContactPosition **)(group + 0x200))->pad = 0;
         }
         Wander(input, actor->direction);
         sub_0807E334(input);
@@ -298,9 +309,9 @@ void sub_080C8774(struct SceneActorRegistryResetView *actor)
         {
             u32 mask = 0x20;
             u16 *flags = &actor->flags2D4;
-            u32 v = mask | *flags;
-            v &= ~0x100;
-            *flags = v;
+            mask |= *flags;
+            mask &= ~0x100;
+            *flags = mask;
         }
     }
     {
@@ -387,6 +398,7 @@ moving: {
     actor->flags2CC |= mask;
 }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080C8774);
 #endif
