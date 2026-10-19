@@ -74,8 +74,9 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
 {
     int factor = p->fade, red, green, blue, base, bank, i;
     int other;
-    if (factor > 256)
+    if (factor > 256) {
         factor = 256;
+    }
     other = 256 - factor;
     red = p->blend & 31;
     green = p->blend & 992;
@@ -88,13 +89,15 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
             int nextBank = bank + 1;
             for (; i < *end; i++) {
                 u16 *source = &p->source[base + i], *dest = &p->buffer[base + i];
-                register int color asm("r1") = *source;
+                int color = *source;
                 int r;
                 int g;
                 int b;
+                do {
                 r = ((color & 31) * factor + other * red) & 0x1F00;
                 g = ((color & 992) * factor + other * green) & 0x3E000;
                 b = color & 31744;
+                } while (0);
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
             }
