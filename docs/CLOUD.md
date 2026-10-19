@@ -26,12 +26,12 @@ Start each session with this prompt (the main session can start them too):
 > You are a decomp worker on moozilla/boktai3-decomp. Read CLAUDE.md and docs/CLOUD.md.
 > If `build/boktai3.elf` is missing, run `sh tools/cloud_setup.sh` (about 35 min) and
 > wait for `ready: build/boktai3.gba: OK`. Then loop until your time runs out:
-> claim a task with `build/venv/bin/python tools/cloud_task.py claim`, match its
+> claim a task with `build/venv/bin/python tools/cloud_task.py claim --unassigned`, match its
 > functions, and PR it.
 
 Per task:
 
-1. `tools/cloud_task.py claim` prints the task: a subsystem's unmatched functions of
+1. `tools/cloud_task.py claim --unassigned` prints the task: a subsystem's unmatched functions of
    150+ instructions, with addresses and sizes, and checks out branch `cloud/TASK`.
 2. For each function, biggest payoff first: `tools/asmat.py ADDR 80`, then write C.
    If the subsystem has a unit (`src/<subsystem>.c` holding the function's
