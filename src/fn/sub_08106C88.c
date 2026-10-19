@@ -1,11 +1,11 @@
+#include "global.h"
+#include "region_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define RegionActorPool_DestroyActors sub_08106C88
 #define gRegionActorPool              gUnk_020001B4
-#include "global.h"
-#include "region_actor.h"
 extern struct RegionActorPool *gUnk_020001B4;
 void Sprite_Remove(void *);
 u32 TerrainOverlay_QueueRemoveActor(u32 *);

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define ContactCollider_GetImpactDirection sub_08238520
-#include "global.h"
-#include "contact_actor.h"
 s32 Math_Atan2(s32, s32);
 s32 sub_08238520(struct ContactCollider *a, struct ContactCollider *b)
 {

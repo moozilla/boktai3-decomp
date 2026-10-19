@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
 #define SceneLink_RemoveNode sub_0815F738
 #define gSceneLinkList       gUnk_02000598
-#include "global.h"
 struct SceneLinkNode {
     u8 unknown0[0xC];
     struct SceneLinkNode *next;

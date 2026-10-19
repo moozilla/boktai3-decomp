@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.5%
 // foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
 #define Vanargand_UpdateOffsetMotion sub_081AB438
-#include "global.h"
 struct MotionTrackVector {
     s16 x, y, z, padding;
 };

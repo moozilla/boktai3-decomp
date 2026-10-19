@@ -1,11 +1,11 @@
+#include "global.h"
+#include "player.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.1%
 // foundry draft (worker best 92.5%); what differs is mostly register allocation and instruction order
 #define PlayerCue_ApplyColliderScale sub_0815DEEC
-#include "global.h"
-#include "player.h"
-#include "game_state.h"
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);
 void Collider_SetContactMode(void *, u32);

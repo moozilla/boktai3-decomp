@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.7%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define EffectGroup_FadeFirstActive sub_082314C4
-#include "global.h"
 struct EffectGroupEntry {
     u8 state, fadeTimer;
     u16 frame;

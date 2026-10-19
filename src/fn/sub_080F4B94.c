@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 #define ActorPhase_OrbitParent sub_080F4B94
-#include "global.h"
 struct PhaseParent {
     u8 unknown0[0xB84];
     s16 x;

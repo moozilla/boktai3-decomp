@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.5%
 // foundry draft (worker best 84.8%); what differs is mostly register allocation and instruction order
-#define OffsetActor_SetTravelTarget sub_0819CA38
-#include "global.h"
+#define OffsetActor_SetTravelTarget Hresvelgr_RefreshTarget
 struct OffsetActorVector {
     s16 x, y, z, pad;
 };
@@ -53,7 +53,7 @@ static inline void Subtract(struct OffsetActorVector *a, struct OffsetActorVecto
     a->y = a->y - b->y;
     a->z = a->z - b->z;
 }
-s32 sub_0819CA38(struct OffsetActor *p)
+s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
 {
     struct OffsetActorAngles angles = gUnk_0824F724;
     struct OffsetActorVector v;
@@ -72,5 +72,5 @@ s32 sub_0819CA38(struct OffsetActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819CA38);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_RefreshTarget);
 #endif

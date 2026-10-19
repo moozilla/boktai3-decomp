@@ -1,3 +1,5 @@
+#include "global.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.0%
@@ -5,8 +7,6 @@
 #define CannonBattery_InitProjectile   sub_08199F34
 #define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
-#include "global.h"
-#include "engine.h"
 struct CannonBatteryPosition {
     s16 x, y, z, unk6;
 };

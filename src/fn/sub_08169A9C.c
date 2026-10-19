@@ -1,15 +1,15 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
-#define SceneHud_DrawThreeDigitValue sub_08169A9C
+#define SceneHud_DrawThreeDigitValue StatusPanel_DrawDecimalValue
 #define SceneHud_GetTextDestination  Hud_GetTilemapCell
 #define SceneHud_MapDigitGlyph       Hud_GetStyleTileIndex
-#include "global.h"
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Hud_GetStyleTileIndex(s32, s32);
-void sub_08169A9C(void *owner, s32 x, s32 y, s32 value)
+void StatusPanel_DrawDecimalValue(void *owner, s32 x, s32 y, s32 value)
 {
     s32 digits[3];
     s32 started;
@@ -42,5 +42,5 @@ void sub_08169A9C(void *owner, s32 x, s32 y, s32 value)
     *dest = 0xD07B;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08169A9C);
+INCLUDE_ASM("asm/nonmatching", StatusPanel_DrawDecimalValue);
 #endif

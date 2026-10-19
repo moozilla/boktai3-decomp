@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
 #define SingletonSlot7_Update sub_081F1B14
-#include "global.h"
 
 struct SingletonSlot7Actor {
     u8 pad0[0x90];

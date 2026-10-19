@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.9%
 // foundry draft (worker best 91.9%); what differs is mostly register allocation and instruction order
-#define System_EnterSleep      sub_08227D70
+#define System_EnterSleep      Power_EnterSleep
 #define System_WaitFrame       InterruptsAndVideo_WaitForVBlank
 #define gDisplayRefreshPending gUnk_03005404
 
@@ -11,7 +11,7 @@ void SoundBiasReset(void);
 void SoundBiasSet(void);
 extern u32 gDisplayRefreshPending;
 
-void sub_08227D70(void)
+void Power_EnterSleep(void)
 {
     *(vu16 *)0x04000000 |= 0x80;
     System_WaitFrame();
@@ -27,5 +27,5 @@ void sub_08227D70(void)
     System_WaitFrame();
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08227D70);
+INCLUDE_ASM("asm/nonmatching", Power_EnterSleep);
 #endif

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.4%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define SceneActor_TryRequestFacingReaction sub_080AB604
-#include "global.h"
-#include "scene_actor_reset.h"
 s32 Math_Atan2(s32, s32);
 struct ActorReactionTarget {
     u8 unknown0[0xC];

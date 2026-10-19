@@ -1,12 +1,12 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 84.5%
 // foundry draft (worker best 84.5%); what differs is mostly register allocation and instruction order
-#define WoodenCrate_ReactToHit    sub_08100144
+#define WoodenCrate_ReactToHit    WoodenCrate_ReactToHit
 #define WoodenCrate_TestFlag      WoodenCrate_HasFlags
 #define WoodenCrate_SetFlag       WoodenCrate_SetFlags
 #define WoodenCrate_StartSequence WoodenCrate_BeginToggleAnimation
-#include "global.h"
 struct WoodenCrate {
     u8 pad0[0xA4];
     u16 timer;
@@ -44,7 +44,7 @@ static inline void react(struct CrateHit *hit, struct WoodenCrate *p)
     } else
         return;
 }
-void sub_08100144(struct CrateHit *hit, void *unused, struct WoodenCrate *p)
+void WoodenCrate_ReactToHit(struct CrateHit *hit, void *unused, struct WoodenCrate *p)
 {
     if (WoodenCrate_HasFlags(p, 16) || !hitFlags(hit, 0x17)) {
         if (!p->shakeTimer)
@@ -62,5 +62,5 @@ void sub_08100144(struct CrateHit *hit, void *unused, struct WoodenCrate *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08100144);
+INCLUDE_ASM("asm/nonmatching", WoodenCrate_ReactToHit);
 #endif

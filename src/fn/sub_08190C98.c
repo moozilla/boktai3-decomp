@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.9%
 // foundry draft (worker best 88.9%); what differs is mostly register allocation and instruction order
-#define BossParts_SetState sub_08190C98
+#define BossParts_SetState Nidhoggr_ChangeCompletedPartState
 struct BossParts {
     u8 unknown0[0x71C2];
     u8 state[26];
@@ -10,7 +10,7 @@ struct BossParts {
     u8 progressB[26];
     u8 ready[26];
 };
-s32 sub_08190C98(struct BossParts *boss, s32 index, s32 state)
+s32 Nidhoggr_ChangeCompletedPartState(struct BossParts *boss, s32 index, s32 state)
 {
     u8 *base = (u8 *)boss;
     u8 *ready;
@@ -33,5 +33,5 @@ s32 sub_08190C98(struct BossParts *boss, s32 index, s32 state)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08190C98);
+INCLUDE_ASM("asm/nonmatching", Nidhoggr_ChangeCompletedPartState);
 #endif

@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_vec.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.5%
@@ -5,8 +7,6 @@
 #define PlayerOrbitEffect_UpdateParticles sub_0815FA78
 #define PlayerOrbitEffect_UpdateParticle  sub_0815F7F4
 #define PlayerOrbitEffect_MoveParticle    PlayerBurst_UpdateParticle
-#include "global.h"
-#include "scene_vec.h"
 struct PlayerOrbitParticle {
     u32 flags;
     u8 unknown4[0x14];

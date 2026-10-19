@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define PlayerClone_SetAnimation sub_08200288
 #define Anim_SetFrame            Anim_SetFrameDurationScale
-#include "global.h"
 
 struct PlayerClone {
     u8 unknown000[0x1b8];

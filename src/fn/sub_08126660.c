@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 95.0%); what differs is mostly register allocation and instruction order
-#define SmallEffectPool_Allocate sub_08126660
+#define SmallEffectPool_Allocate SceneStatusIndicator_Allocate
 struct SmallEffectSlot {
     u8 unknown[0x2B];
     u8 index;
@@ -19,7 +19,7 @@ static inline u8 SmallEffectPool_IsAllocated(volatile u32 *allocated, s32 one, s
         return TRUE;
     return FALSE;
 }
-struct SmallEffectSlot *sub_08126660(struct SmallEffectPool *pool)
+struct SmallEffectSlot *SceneStatusIndicator_Allocate(struct SmallEffectPool *pool)
 {
     s32 index = 0;
     volatile u32 *allocated = &pool->allocated;
@@ -42,5 +42,5 @@ struct SmallEffectSlot *sub_08126660(struct SmallEffectPool *pool)
     return NULL;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08126660);
+INCLUDE_ASM("asm/nonmatching", SceneStatusIndicator_Allocate);
 #endif

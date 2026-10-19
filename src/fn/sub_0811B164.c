@@ -1,11 +1,11 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 // foundry draft (worker best 93.9%); what differs is mostly register allocation and instruction order
-#define SpatialIndex_SetPosition sub_0811B164
+#define SpatialIndex_SetPosition SpatialIndex_SetPosition
 #define SpatialIndex_RemoveEntry sub_0811B394
 #define gSpatialIndex            gUnk_02000200
-#include "global.h"
 struct SpatialEntry {
     u32 flags;
     u8 unknown4[12];
@@ -42,7 +42,7 @@ static inline u8 NeedsReinsert(struct SpatialEntry *entry, s32 bucket)
         return 0;
     return 1;
 }
-void sub_0811B164(struct SpatialEntry *entry, s32 x, s32 y, s32 z)
+void SpatialIndex_SetPosition(struct SpatialEntry *entry, s32 x, s32 y, s32 z)
 {
     struct SpatialIndex *index = gSpatialIndex;
     s32 bucket;
@@ -70,5 +70,5 @@ void sub_0811B164(struct SpatialEntry *entry, s32 x, s32 y, s32 z)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811B164);
+INCLUDE_ASM("asm/nonmatching", SpatialIndex_SetPosition);
 #endif

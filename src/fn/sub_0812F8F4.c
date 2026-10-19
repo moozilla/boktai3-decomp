@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.3%
 // foundry draft (worker best 80.3%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateEntryTransition sub_0812F8F4
-#include "global.h"
-#include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 static inline u8 SceneActorControl_TakeFlag(u8 *flag)
 {

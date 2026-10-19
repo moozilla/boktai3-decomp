@@ -1,10 +1,10 @@
+#include "global.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
 #define LinkSession_CallPositionScript sub_081093FC
-#include "global.h"
-#include "area_effect_link.h"
 struct LinkScriptArgs {
     u32 count : 16, unused : 16;
     s32 *values;

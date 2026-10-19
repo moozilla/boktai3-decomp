@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 89.9%
 // foundry draft (worker best 89.0%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateRouteResponse sub_080A33A4
-#include "global.h"
-#include "scene_actor_reset.h"
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
     if (s->field2B1) {

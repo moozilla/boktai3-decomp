@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.0%
@@ -5,7 +6,6 @@
 #define ActorPhase_ApproachNeutral sub_080F4AB4
 #define gRandomIndex               gUnk_03005308
 #define gRandomTable               gUnk_0203B400
-#include "global.h"
 struct PhaseActor {
     u8 unknown0[9];
     s8 phase;

@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.4%
 // foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
 #define Vanargand_UpdateTimedAlternateTransition sub_081A8888
-#include "global.h"
 /* Tentative: action state transition, with restart on flag 0x20000. */
 struct VanargandTransition {
     u8 pad0[0x9C];

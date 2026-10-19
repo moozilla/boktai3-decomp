@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
 #define SpriteGroup_RemoveSprites sub_08121E90
 #define gSpriteGroup              gUnk_02000138
-#include "global.h"
 struct SpriteGroupEntry {
     u8 pad[10];
     u8 state;

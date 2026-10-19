@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 78.2%
 // foundry draft (worker best 93.1%); what differs is mostly register allocation and instruction order
 #define PhaseObject_TickCountdown sub_080F2C34
-#include "global.h"
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];

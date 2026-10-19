@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
 #define AnimatedMarker_BeginStateThree sub_081B7954
-#include "global.h"
 struct AnimatedMarkerSprite {
     u8 pad0[6];
     u16 flags;

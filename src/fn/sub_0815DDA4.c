@@ -1,3 +1,7 @@
+#include "global.h"
+#include "player.h"
+#include "engine.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 99.3%
@@ -5,10 +9,6 @@
 #define PlayerCue_InitAttackCollider    sub_0815DDA4
 #define PlayerCue_ComputeColliderPower  Player_ScaleLevelValue
 #define PlayerCue_RecordColliderContact Player_OnStateOneEvent
-#include "global.h"
-#include "player.h"
-#include "engine.h"
-#include "game_state.h"
 s32 Player_ScaleLevelValue(u32, s32);
 void Player_OnStateOneEvent(u32, u32, struct Player *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);

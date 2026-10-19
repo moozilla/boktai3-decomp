@@ -1,3 +1,6 @@
+#include "global.h"
+#include "scene_object.h"
+#include "callback_pool.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.8%
@@ -5,9 +8,6 @@
 #define CallbackPool_SpawnHitParticles sub_081050BC
 #define gShakeRandomTable              gUnk_0203B400
 #define gShakeRandomIndex              gUnk_03005308
-#include "global.h"
-#include "scene_object.h"
-#include "callback_pool.h"
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,

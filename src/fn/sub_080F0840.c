@@ -1,12 +1,12 @@
+#include "global.h"
+#include "scene_actor_reset.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.2%
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
 #define SceneActor_FindNearbyPlayerTarget sub_080F0840
 #define gPlayerSlots                      gUnk_02000580
-#include "global.h"
-#include "scene_actor_reset.h"
-#include "player.h"
 void *sub_080F0840(struct SceneActorRegistryResetView *actor)
 {
     void *target = 0;

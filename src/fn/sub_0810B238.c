@@ -1,10 +1,10 @@
+#include "global.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 #define LinkSelection_WaitForParticipantChoices sub_0810B238
-#include "global.h"
-#include "area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));

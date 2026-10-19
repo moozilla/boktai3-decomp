@@ -1,20 +1,20 @@
+#include "global.h"
+#include "scene_hud_display.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_CyclePrimarySecondaryOptions sub_08169868
+#define SceneHud_CyclePrimarySecondaryOptions SceneHud_CyclePrimarySecondaryOptions
 #define SceneHud_RefreshPrimaryOptions        SelectionPanel_RefreshVisibleEntries
 #define SceneHud_RefreshSecondaryOptions      sub_0816902C
 #define SceneHud_TickWidgetSlides             sub_08168EE8
 #define gSceneHudInput                        gUnk_03005164
-#include "global.h"
-#include "scene_hud_display.h"
-#include "game_state.h"
 extern u16 gUnk_03005164[];
 void SelectionPanel_RefreshVisibleEntries(struct SceneHudState *);
 void sub_0816902C(struct SceneHudState *);
 void sub_08168EE8(struct SceneHudState *);
-void sub_08169868(struct SceneHudState *p)
+void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
 {
     if ((gUnk_03005260[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible > 1) {
         Sound_PlaySong(0x10B);
@@ -39,5 +39,5 @@ void sub_08169868(struct SceneHudState *p)
     Palette_UpdateHighlightPulse(gUnk_03005164, p->unknown13F0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08169868);
+INCLUDE_ASM("asm/nonmatching", SceneHud_CyclePrimarySecondaryOptions);
 #endif

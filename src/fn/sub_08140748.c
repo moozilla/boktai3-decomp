@@ -1,10 +1,10 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 84.6%
 // foundry draft (worker best 84.6%); what differs is mostly register allocation and instruction order
 #define Player_BeginTerrainFacingAction sub_08140748
-#include "global.h"
-#include "player.h"
 s32 Math_Atan2(s32, s32);
 s32 sub_08140748(struct Player *p)
 {

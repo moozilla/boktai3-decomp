@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 // foundry draft (worker best 85.1%); what differs is mostly register allocation and instruction order
 #define Nidhoggr_StepPoolAnimation sub_0818EE38
-#include "global.h"
 
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;

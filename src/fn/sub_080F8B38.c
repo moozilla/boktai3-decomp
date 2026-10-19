@@ -1,11 +1,11 @@
+#include "global.h"
+#include "rotation_phase.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // foundry draft (worker best 98.5%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_TiltRotation    sub_080F8B38
 #define SceneActorControl_RecoverRotation sub_080F8C40
-#include "global.h"
-#include "rotation_phase.h"
 void sub_080F8C40(void);
 static inline s32 FoldAngle(s32 a)
 {

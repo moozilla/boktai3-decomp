@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.6%
@@ -5,7 +6,6 @@
 #define PaletteEffect_RefreshPalette  sub_081F2CEC
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
 #define gEffectPaletteBanks           gUnk_030042E4
-#include "global.h"
 struct PaletteEffect {
     u8 unknown0[0x394];
     void *palette;

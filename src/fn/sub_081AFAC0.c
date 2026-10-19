@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.4%
 // foundry draft (worker best 81.4%); what differs is mostly register allocation and instruction order
-#define ActorStatus_InitializeContact sub_081AFAC0
-#include "global.h"
+#define ActorStatus_InitializeContact ActorStatus_InitializeContact
 s32 Math_Atan2(s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
@@ -38,7 +38,7 @@ struct ActorStatus {
     u8 contactDirection;
     u16 strengthShift;
 };
-void sub_081AFAC0(struct ContactActor *actor, struct ContactActor *other,
+void ActorStatus_InitializeContact(struct ContactActor *actor, struct ContactActor *other,
                   struct ActorStatus *status)
 {
     u8 *world = gUnk_02000580;
@@ -74,5 +74,5 @@ void sub_081AFAC0(struct ContactActor *actor, struct ContactActor *other,
     PlayerStats_AddContactHundredths(actor, other, 5);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AFAC0);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_InitializeContact);
 #endif

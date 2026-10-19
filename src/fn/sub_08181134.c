@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.9%
 // foundry draft (worker best 83.8%); what differs is mostly register allocation and instruction order
 #define ActorMarker_InitOffsetPosition sub_08181134
-#include "global.h"
 struct ActorMarker {
     u8 pad0[0xd4];
     u16 position[3];

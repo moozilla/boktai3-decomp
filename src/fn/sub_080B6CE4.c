@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.6%
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
 #define SceneActorReaction_UpdateGate sub_080B6CE4
-#include "global.h"
-#include "scene_actor_reset.h"
 struct SceneActorReactionContext {
     u8 unknown0[0x6D0];
     u8 active;

@@ -1,11 +1,11 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.4%
 // foundry draft (worker best 90.4%); what differs is mostly register allocation and instruction order
 #define SceneActor_DispatchContextAction sub_080B3ADC
 #define SceneActor_IsFacingNearbyTarget  sub_080B335C
-#include "global.h"
-#include "scene_actor_reset.h"
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void sub_080B23A0(void *, u32);

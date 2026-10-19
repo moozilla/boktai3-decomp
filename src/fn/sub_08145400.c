@@ -1,3 +1,5 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.2%
@@ -6,8 +8,6 @@
 #define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
 #define Player_SetSequenceCallback   Player_SetPendingCallback
 #define Player_ClearAnimationFlagTwo Player_OnFadeMotionExit
-#include "global.h"
-#include "player.h"
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnFadeMotionExit(struct Player *);

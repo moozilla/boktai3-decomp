@@ -1,3 +1,6 @@
+#include "global.h"
+#include "scene_actor_reset.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.2%
@@ -5,9 +8,6 @@
 #define SceneActor_FindNearbyActivePlayer sub_080E7F54
 #define gPlayerSlots                      gUnk_02000580
 #define gPlayerSlotFlags                  gUnk_02000560
-#include "global.h"
-#include "scene_actor_reset.h"
-#include "player.h"
 extern u32 gUnk_02000560[4];
 static inline s32 Square(s32 x)
 {

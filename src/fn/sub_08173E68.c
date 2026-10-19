@@ -1,11 +1,11 @@
+#include "global.h"
+#include "scene_hud_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
 #define SceneHud_TickEquipmentSwap        sub_08173E68
 #define SceneHud_GetEquipmentSlotPosition SceneHud_GetActionIconPosition
-#include "global.h"
-#include "scene_hud_display.h"
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);

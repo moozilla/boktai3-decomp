@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.7%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define Ratatosk_BeginDirectionalReaction sub_081F5120
-#include "global.h"
 struct Ratatosk {
     u8 pad0[0x51];
     u8 angle;

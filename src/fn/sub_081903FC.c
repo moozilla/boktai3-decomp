@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 94.7%
 // foundry draft (worker best 93.3%); what differs is mostly register allocation and instruction order
-#define Nidhoggr_UpdateDistanceLimitedEffect sub_081903FC
+#define Nidhoggr_UpdateDistanceLimitedEffect Nidhoggr_UpdateDistanceLimitedEffect
 #define gNidhoggrEffectPhaseDurations        gUnk_0824F292
 #define gNidhoggrEffectPhaseFrames           gUnk_0824F28C
 struct NidhoggrDistanceEffect {
@@ -20,7 +20,7 @@ struct NidhoggrDistanceEffect {
 };
 extern const u8 gUnk_0824F292[], gUnk_0824F28C[];
 s32 Callback_InvokeActor(void *, void *);
-void sub_081903FC(struct NidhoggrDistanceEffect *effect)
+void Nidhoggr_UpdateDistanceLimitedEffect(struct NidhoggrDistanceEffect *effect)
 {
     if (effect->x - effect->startX <= 0x1000) {
         if (effect->phase > 5 && effect->speed > 8)
@@ -46,5 +46,5 @@ advance: {
 }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081903FC);
+INCLUDE_ASM("asm/nonmatching", Nidhoggr_UpdateDistanceLimitedEffect);
 #endif

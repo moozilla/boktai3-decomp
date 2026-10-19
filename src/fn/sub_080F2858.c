@@ -1,11 +1,11 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.9%
 // foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
-#define ColorPulse_AlignTargetHeading sub_080F2858
+#define ColorPulse_AlignTargetHeading ColorPulse_AlignTargetHeading
 #define ColorPulse_BeginNearApproach  sub_080F2960
 #define ColorPulse_BeginFarApproach   sub_080F2AAC
-#include "global.h"
 struct ColorPulsePart {
     u32 flags;
     u8 pad4[0x28];
@@ -44,7 +44,7 @@ struct ColorPulse {
 void sub_080F2960(struct ColorPulse *);
 void sub_080F2AAC(struct ColorPulse *);
 void Sound_PlaySong(u32);
-void sub_080F2858(struct ColorPulse *p)
+void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
 {
     s32 i;
     p->rotationTimer += p->speed;
@@ -94,5 +94,5 @@ void sub_080F2858(struct ColorPulse *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F2858);
+INCLUDE_ASM("asm/nonmatching", ColorPulse_AlignTargetHeading);
 #endif

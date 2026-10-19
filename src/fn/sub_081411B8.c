@@ -1,3 +1,6 @@
+#include "global.h"
+#include "player.h"
+#include "directional_force.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.7%
@@ -9,9 +12,6 @@
 #define gForceAngle                  gUnk_0200053C
 #define gForceDirectionMode          gUnk_02000558
 #define gSineTable                   gUnk_086149C4
-#include "global.h"
-#include "player.h"
-#include "directional_force.h"
 extern u16 gUnk_02000558;
 s32 sub_08140F40(struct Player *);
 static inline u8 Player_IsActiveInSceneFive(struct Player *p)

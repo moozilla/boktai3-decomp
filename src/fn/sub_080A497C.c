@@ -1,9 +1,9 @@
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.2%
 // foundry draft (worker best 80.2%); what differs is mostly register allocation and instruction order
 #define SceneActorPlacement_BeginDefaultResponse sub_080A497C
-#include "scene_actor_reset.h"
 s32 sub_080A497C(struct SceneActorRegistryResetView *p)
 {
     u32 offset;

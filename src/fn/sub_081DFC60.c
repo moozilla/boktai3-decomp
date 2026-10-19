@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.5%
 // foundry draft (worker best 97.5%); what differs is mostly register allocation and instruction order
 #define AnimPanel_EraseSelection  sub_081DFC60
 #define gAnimPanelSavedSelections gUnk_020005C0
-#include "global.h"
 extern u8 gUnk_020005C0[];
 struct AnimPanel {
     u8 unk0[0x34c];

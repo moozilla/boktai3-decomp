@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_vec.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.8%
@@ -5,8 +7,6 @@
 #define PlayerOrbitEffect_SpawnParticle sub_0815F934
 #define gParticleRandomIndex            gUnk_03005308
 #define gParticleRandomTable            gUnk_0203B400
-#include "global.h"
-#include "scene_vec.h"
 struct PlayerOrbitParticle {
     u32 flags;
     u8 unknown4[0x14];

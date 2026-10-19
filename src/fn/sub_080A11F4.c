@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.6%
 // foundry draft (worker best 85.2%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateHeightReturn sub_080A11F4
-#include "global.h"
-#include "scene_actor_reset.h"
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);

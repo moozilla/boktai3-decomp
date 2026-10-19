@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
 #define VanargandProjectile_Create     sub_081B70A8
 #define gVanargandProjectileProperties gUnk_08612114
-#include "global.h"
 struct ProjectilePosition {
     s16 x, y, z, pad;
 };

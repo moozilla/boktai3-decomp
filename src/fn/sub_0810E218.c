@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.2%
@@ -5,7 +6,6 @@
 #define SelectionPanel_CommitSelection sub_0810E218
 #define gRandomIndex                   gUnk_03005308
 #define gRandomTable                   gUnk_0203B400
-#include "global.h"
 struct SelectionPanel {
     u8 unknown0[0xD24];
     s8 column;

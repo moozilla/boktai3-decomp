@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 89.8%
 // foundry draft (worker best 87.7%); what differs is mostly register allocation and instruction order
 #define Armor_UpdatePartOrbit sub_0818CB30
-#include "global.h"
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ArmorBody {

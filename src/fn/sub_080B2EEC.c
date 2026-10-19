@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 89.2%
@@ -5,8 +7,6 @@
 #define gRandomTableIndex        gUnk_03005308
 #define gRandomTable             gUnk_0203B400
 #define SceneActor_TrySoloAction sub_080B2EEC
-#include "global.h"
-#include "scene_actor_reset.h"
 extern u32 gUnk_03005308;
 
 s32 SceneActorRegistry_CountLiving(void);

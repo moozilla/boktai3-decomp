@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define PhaseObject_TickEntryReset sub_080F2AAC
 #define PhaseObject_ResetMotion    Ivy_InitBobbing
-#include "global.h"
 struct PhaseEntry {
     u32 flags;
     u8 pad4[2];

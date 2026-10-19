@@ -1,10 +1,10 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.8%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define Player_SelectHistoryDirection sub_0823C368
-#include "global.h"
-#include "player.h"
 s32 sub_0823C368(struct Player *s)
 {
     s32 i, previous, direction, clockwise, counterclockwise;

@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
 #define MessagePanel_ConfigureFromScript sub_08112758
-#include "global.h"
 struct MessagePanel {
     u8 pad0[0x20];
     void *palette;

@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 #define PlayerClone_BeginActiveReactions sub_082012D4
 #define gPlayerCloneManager              gUnk_020005F8
-#include "global.h"
 struct ClonePosition {
     u16 x, y, z, pad;
 };

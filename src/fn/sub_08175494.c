@@ -1,9 +1,9 @@
 #include "global.h"
+#include "game_state.h"
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 94.8%); what differs is mostly register allocation and instruction order
 #define MenuSelection_DrawNumericSummary sub_08175494
-#include "game_state.h"
 u16 *Hud_GetTilemapCell(u32, u32, u32);
 s32 Hud_GetMinimum(s32, s32);
 void SceneHud_DrawDecimalDigits(s32, s32, s32, s32, s32);

@@ -1,3 +1,5 @@
+#include "global.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.7%
@@ -6,8 +8,6 @@
 #define LinkMenu_SetState          Registry1745_SetState
 #define LinkMenu_CheckSelection    Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection    Registry1745_BeginShutdown
-#include "global.h"
-#include "area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void (*)(void));

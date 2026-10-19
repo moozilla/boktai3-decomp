@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 85.5%); what differs is mostly register allocation and instruction order
 #define Armor_TriggerBehavior35 sub_0818BDAC
-#include "global.h"
 struct ArmorActor {
     u8 pad0[0xb32];
     u16 flags;

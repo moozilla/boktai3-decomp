@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.7%
 // foundry draft (worker best 86.2%); what differs is mostly register allocation and instruction order
 #define ModifierStats_ApplyKind11 sub_0811E9B0
-#include "global.h"
 
 struct StatModifier {
     s32 (*apply)(struct StatModifier *, s32);

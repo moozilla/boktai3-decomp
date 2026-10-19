@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 94.0%
 // foundry draft (worker best 94.0%); what differs is mostly register allocation and instruction order
-#define ScreenPalette_UpdateTransition sub_081A681C
+#define ScreenPalette_UpdateTransition ScreenPalette_UpdateTransition
 #define gScreenPaletteBuffer           gUnk_030050E0
 
 struct ScreenPaletteTransition {
@@ -17,7 +17,7 @@ extern u8 gUnk_030050E0[];
 void Blend_SetAlpha(u32, s32, s32);
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
-void sub_081A681C(struct ScreenPaletteTransition *s)
+void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
 {
     u8 *palettes = s->palettes;
     if (s->phase) {
@@ -42,5 +42,5 @@ void sub_081A681C(struct ScreenPaletteTransition *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A681C);
+INCLUDE_ASM("asm/nonmatching", ScreenPalette_UpdateTransition);
 #endif

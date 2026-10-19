@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.3%
@@ -5,7 +6,6 @@
 #define Armor_RetractPartStretch sub_0818CA6C
 #define gRandomTableIndex        gUnk_03005308
 #define gRandomTable             gUnk_0203B400
-#include "global.h"
 
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];

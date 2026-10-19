@@ -1,3 +1,5 @@
+#include "global.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.7%
@@ -5,8 +7,6 @@
 #define LinkSession_UpdatePlayerValueAverage sub_081381CC
 #define PlayerValue_GetBand                  Solar_GetLevelForIntensity
 #define gLinkSession                         gUnk_020004B4
-#include "global.h"
-#include "area_effect_link.h"
 s32 PlayerValue_GetBand(s32);
 s32 Div(s32, s32);
 static inline u32 GetSelection(s32 player)

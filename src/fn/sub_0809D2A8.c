@@ -1,10 +1,10 @@
+#include "scene_actor_reset.h"
+#include "scene_actor_terrain.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.0%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 #define RouteActor_ReflectAtRaisedTerrain sub_0809D2A8
-#include "scene_actor_reset.h"
-#include "scene_actor_terrain.h"
 static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
     mask &= p->flags2CC;

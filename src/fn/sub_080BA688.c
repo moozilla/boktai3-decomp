@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 #define SceneActorReaction_TickForwardBurst sub_080BA688
-#include "global.h"
-#include "scene_actor_reaction.h"
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,

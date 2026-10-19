@@ -1,10 +1,10 @@
+#include "global.h"
+#include "rotation_phase.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_RecoverRotation sub_080F8C40
-#include "global.h"
-#include "rotation_phase.h"
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
 void sub_080FBA38(struct SceneActorRegistryResetView *);

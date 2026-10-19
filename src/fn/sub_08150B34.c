@@ -1,10 +1,10 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
 #define Player_UpdateTimedDirectionAction sub_08150B34
-#include "global.h"
-#include "player.h"
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);

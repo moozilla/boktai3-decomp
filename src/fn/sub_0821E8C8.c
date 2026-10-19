@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_route.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.5%
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
 #define SceneActorRoute_IsOutsidePointBounds sub_0821E8C8
-#include "global.h"
-#include "scene_actor_route.h"
 u32 sub_0821E8C8(struct SceneActorRouteCursor *cursor, const struct ContactPosition *position,
                  u32 xBound, u32 zBound)
 {

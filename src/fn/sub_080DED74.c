@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_registry.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_TickActionCooldown sub_080DED74
-#include "global.h"
-#include "scene_actor_registry.h"
 struct SceneActorActionCooldown {
     u8 unknown0[0x678];
     u32 flags;

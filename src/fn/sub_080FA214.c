@@ -1,10 +1,10 @@
+#include "global.h"
+#include "rotation_phase.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // foundry draft (worker best 84.4%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_ApplyDampedMotion sub_080FA214
-#include "global.h"
-#include "rotation_phase.h"
 s32 Mod(s32, s32);
 struct DampedMotionState {
     u8 unknown0[0xF14];

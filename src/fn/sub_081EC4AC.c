@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.7%
@@ -5,7 +6,6 @@
 #define ActorEffect_SpawnBurstAtAnchor sub_081EC4AC
 #define gEffectRandomIndex             gUnk_03005304
 #define gEffectRandomTable             gUnk_086141BC
-#include "global.h"
 struct BurstActor {
     u8 pad0[0x268];
     s32 height;

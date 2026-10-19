@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.4%
@@ -5,7 +6,6 @@
 #define Armor_UpdateStrafeWithMotion sub_08182B14
 #define gArmorAnimTable3             gUnk_0824EBB4
 #define gSineTable                   gUnk_086149C4
-#include "global.h"
 
 struct ActorAnimationFlags {
     u16 unk0, unk2, unk4;

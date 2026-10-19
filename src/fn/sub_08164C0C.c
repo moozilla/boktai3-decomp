@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.0%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define ResultPanel_ClearFiveTiles sub_08164C0C
-#include "global.h"
 extern u32 gUnk_030053F4;
 u16 *Hud_GetTilemapCell(u32, u32, u32);
 void sub_08164C0C(void)

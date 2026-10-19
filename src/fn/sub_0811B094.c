@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
 #define Collider_ScheduleUpdates sub_0811B094
-#include "global.h"
 struct ScheduledCollider {
     u32 flags;
     u8 unknown4[0x30];

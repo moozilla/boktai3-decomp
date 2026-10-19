@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_input_navigation.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.0%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
-#define Storage_BeginCategoryMode sub_081BF440
-#include "global.h"
-#include "scene_input_navigation.h"
+#define Storage_BeginCategoryMode Storage_BeginCategoryMode
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
     struct SceneInputWidget prompt;
@@ -35,7 +35,7 @@ void SceneInventory_ResetCategoryPalette(struct SceneInventoryCategoryMenu *, u1
 void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
                              void (*)(struct SceneInventoryCategoryMenu *), u32);
 void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
-void sub_081BF440(struct SceneInventoryCategoryMenu *p, u32 mode)
+void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
 {
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
     Storage_RefreshCategoryWidgets(p);
@@ -61,5 +61,5 @@ void sub_081BF440(struct SceneInventoryCategoryMenu *p, u32 mode)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081BF440);
+INCLUDE_ASM("asm/nonmatching", Storage_BeginCategoryMode);
 #endif

@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.0%
 // foundry draft (worker best 97.0%); what differs is mostly register allocation and instruction order
 #define ActorEffect_UpdateRadialTrail sub_081B6AB8
 #define gEffectSineTable              gUnk_086149C4
-#include "global.h"
 struct EffectPosition {
     s16 x, y, z, unused;
 };

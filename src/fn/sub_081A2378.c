@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.6%); what differs is mostly register allocation and instruction order
 #define Hresvelgr_InitializeRadialOffsets sub_081A2378
 #define gRadialSineTable                  gUnk_086149C4
-#include "global.h"
 struct MotionPosition {
     s16 x, y, z, pad;
 };

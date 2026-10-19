@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 #define Hresvelgr_ResetMotionState sub_081A4F78
-#include "global.h"
 struct HresvelgrPosition {
     s16 x, y, z, pad;
 };

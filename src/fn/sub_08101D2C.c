@@ -1,3 +1,6 @@
+#include "global.h"
+#include "engine.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.3%
@@ -9,9 +12,6 @@
 #define gTerrainMap                           gUnk_030052F4
 #define gTerrainWidth                         gUnk_030052F8
 #define gTerrainHeight                        gUnk_030052FC
-#include "global.h"
-#include "engine.h"
-#include "player.h"
 struct NamedObjectTerrainState {
     u8 unknown00[0xB6];
     u16 state;

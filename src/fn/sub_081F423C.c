@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
 #define ActorMotion_UpdateTimedPaletteAnimation sub_081F423C
-#include "global.h"
 struct DirectionalActor {
     u8 pad0[0x51];
     u8 angle;

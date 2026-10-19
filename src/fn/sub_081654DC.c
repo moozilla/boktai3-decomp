@@ -1,11 +1,11 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.9%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
-#define ResultPanel_FillSignedIndicator sub_081654DC
-#include "global.h"
+#define ResultPanel_FillSignedIndicator SceneHud_FillDigitCells
 u16 *Hud_GetTilemapCell(u32, u32, u32);
-void sub_081654DC(s32 count, u32 x, u32 y, s32 sign)
+void SceneHud_FillDigitCells(s32 count, u32 x, u32 y, s32 sign)
 {
     u32 tile = 1;
     u16 *p;
@@ -25,5 +25,5 @@ void sub_081654DC(s32 count, u32 x, u32 y, s32 sign)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081654DC);
+INCLUDE_ASM("asm/nonmatching", SceneHud_FillDigitCells);
 #endif

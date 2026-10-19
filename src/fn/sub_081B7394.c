@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 #define EffectPool_InitSlot sub_081B7394
-#include "global.h"
 struct EffectPoolSprite {
     u8 pad0[7];
     u8 mode;

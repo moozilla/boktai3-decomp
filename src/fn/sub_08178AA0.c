@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_hud_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.0%
@@ -6,8 +8,6 @@
 #define gSceneHud                gUnk_02000214
 #define gSceneHudOwnerSource     gUnk_020004B4
 #define gPartyActors             gUnk_02000580
-#include "global.h"
-#include "scene_hud_display.h"
 struct SceneHudOwnerSource {
     u8 unknown0[0x18];
     s16 index;

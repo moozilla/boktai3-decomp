@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.0%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
 #define SpriteColliderGroup_ActivateParts sub_0818E9B8
-#include "global.h"
 struct SpriteColliderPartState {
     u8 flags, unknown1[4], active, counter;
     u8 unknown7[0x1DD];

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_placement.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.8%
 // foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
 #define SceneActorPlacement_PlayResponseAndResetState sub_08136AF0
-#include "global.h"
-#include "scene_actor_placement.h"
 static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
 {
     s->flags2D4 = mask | s->flags2D4;

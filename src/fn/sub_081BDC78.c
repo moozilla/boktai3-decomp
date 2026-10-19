@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_input_grid.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 #define Storage_RebuildGrid sub_081BDC78
-#include "global.h"
-#include "scene_input_grid.h"
 
 /* Tentative storage navigation: two 4x4 groups and four category cells. */
 void sub_081BDC78(struct SceneInputGrid *p)

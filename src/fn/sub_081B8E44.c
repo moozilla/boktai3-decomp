@@ -1,10 +1,10 @@
+#include "orbit_motion.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.5%
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
 #define OrbitMotion_UpdateCrossedSines sub_081B8E44
 #define gSineTable                     gUnk_086149C4
-#include "orbit_motion.h"
 static inline s32 half(s32 n)
 {
     if (n >= 0)

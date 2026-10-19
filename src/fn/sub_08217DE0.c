@@ -1,3 +1,5 @@
+#include "global.h"
+#include "level_advance_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.9%
@@ -8,8 +10,6 @@
 #define ResourceSlots_Load         Palette_CacheReservedObjectBank
 #define SpriteQueue_Insert         Effect_LinkToList
 #define gSpritePaletteData         gUnk_030042E4
-#include "global.h"
-#include "level_advance_display.h"
 u32 Palette_CacheReservedObjectBank(u32, void *);
 s32 Effect_LinkToList(struct LevelAdvanceParticle *, u32);
 extern u8 *gUnk_030042E4;

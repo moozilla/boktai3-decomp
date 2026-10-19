@@ -1,3 +1,5 @@
+#include "global.h"
+#include "callback_pool.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.7%
@@ -5,8 +7,6 @@
 #define CallbackPool_ApplyDamage          sub_08104F98
 #define CallbackPool_RefreshHitState      sub_081050BC
 #define CallbackPool_RefreshHealthDisplay sub_081056A0
-#include "global.h"
-#include "callback_pool.h"
 void sub_0821FF8C(void *);
 void SceneHud_SetTimedState(void *, s32, s32, u32, s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);

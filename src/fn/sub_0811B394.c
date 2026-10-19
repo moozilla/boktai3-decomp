@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.0%
 // foundry draft (worker best 85.0%); what differs is mostly register allocation and instruction order
 #define SpatialIndex_RemoveEntry sub_0811B394
 #define gSpatialIndex            gUnk_02000200
-#include "global.h"
 struct SpatialEntry {
     u32 flags, mask, category;
     u8 unknownC[3];

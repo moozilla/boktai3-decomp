@@ -1,12 +1,12 @@
+#include "global.h"
+#include "scene_input_compare.h"
+#include "scene_hud_display.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 82.2%
 // foundry draft (worker best 81.5%); what differs is mostly register allocation and instruction order
 #define InventoryGrid_UpdateStatPreview sub_08174C2C
-#include "global.h"
-#include "scene_input_compare.h"
-#include "scene_hud_display.h"
-#include "player.h"
 void sub_081642CC(void *, u32, u32, u32, u32, u32, u32);
 void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
