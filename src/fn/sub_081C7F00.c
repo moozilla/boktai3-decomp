@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_RunEntryAnimSequence sub_081C7F00
 struct S {
     u8 f[1];
     u8 b1;
@@ -16,7 +15,7 @@ struct S {
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
-void sub_081C7F00(u32 a, struct S *p, s32 a2)
+void StateActor_RunEntryAnimSequence(u32 a, struct S *p, s32 a2)
 {
     if (p->b9 != 0) {
         p->b9 = 0;
@@ -26,8 +25,7 @@ void sub_081C7F00(u32 a, struct S *p, s32 a2)
         p->w10 = 0;
     }
     switch (p->b18) {
-        case 0:
-        {
+        case 0: {
             u32 r1;
             if (p->w10 <= 10)
                 break;

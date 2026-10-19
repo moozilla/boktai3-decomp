@@ -1,5 +1,3 @@
-#define DarkLoan_BeginOpening  sub_081BC6AC
-#define DarkLoan_FinishOpening sub_081BC76C
 #include "global.h"
 #include "dark_loan_panel.h"
 void StatGauge_ResetBackground(void *);
@@ -10,10 +8,10 @@ void DarkLoan_HideSprites(void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 MessageWindow_ShowMessage(s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_081BC76C(void *);
+void DarkLoan_FinishOpening(void *);
 void DarkLoan_UpdateOpeningAnimation(void);
 void DarkLoan_SetState(void *, void (*)(void));
-void sub_081BC6AC(struct DarkLoanPanel *p)
+void DarkLoan_BeginOpening(struct DarkLoanPanel *p)
 {
     u32 zero;
     StatGauge_ResetBackground(p);
@@ -30,7 +28,7 @@ void sub_081BC6AC(struct DarkLoanPanel *p)
     MessageWindow_ShowMessage(0);
     ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xe000, zero);
     if (!p->animateOpening)
-        sub_081BC76C(p);
+        DarkLoan_FinishOpening(p);
     else
         DarkLoan_SetState(p, DarkLoan_UpdateOpeningAnimation);
 }

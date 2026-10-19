@@ -1,8 +1,6 @@
 #include "global.h"
 
-#define ActorTrail_RestoreSavedState sub_080A60E0
-
-/* Ported from Bat_RestoreSavedState (sub_08086C1C); this copy resets via ActorTrail_ResetAtSavedPosition.
+/* Ported from Bat_RestoreSavedState (Bat_RestoreSavedState); this copy resets via ActorTrail_ResetAtSavedPosition.
  * Restores the saved snapshot (sibling of Vorn_RestoreSavedState)
  * and plays song 0xEE on one animation frame. Owner +0x48 is an animation record.
  * The snapshot fields below are copied and reset at the listed offsets. */

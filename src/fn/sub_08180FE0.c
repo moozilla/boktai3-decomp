@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneCombatActor_SpawnBouncingParticle sub_08180FE0
-
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
     u32 : 16;
@@ -37,7 +35,7 @@ struct SceneCombatActor {
 
 void SceneCombatActor_InitBouncingParticle(struct SceneCombatActor *p);
 
-void sub_08180FE0(struct SceneCombatActor *p)
+void SceneCombatActor_SpawnBouncingParticle(struct SceneCombatActor *p)
 {
     SceneCombatActor_InitBouncingParticle(p);
     p->particles[1].velocity.z = 0;

@@ -1,15 +1,13 @@
 #include "global.h"
 #include "solar_bank_panel.h"
-#define SolarBank_UpdateSelection  sub_081BB864
-#define SolarBank_BeginAmountEntry sub_081BB658
-#define gSolarBankInput            gUnk_03005260
+#define gSolarBankInput gUnk_03005260
 extern u16 gSolarBankInput[];
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void SolarBank_BeginClosing(void *);
 void SolarBank_BeginAmountEntry(void *);
-void sub_081BB864(struct SolarBankPanel *panel)
+void SolarBank_UpdateSelection(struct SolarBankPanel *panel)
 {
 
     u32 pressed;

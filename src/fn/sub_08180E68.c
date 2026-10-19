@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneCombatActor_SpawnBouncingEffect sub_08180E68
-
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
     u32 : 16;
@@ -37,7 +35,7 @@ struct SceneCombatActor {
 
 void ActorOverlay_InitSprite(struct SceneCombatActor *p);
 
-void sub_08180E68(struct SceneCombatActor *p)
+void SceneCombatActor_SpawnBouncingEffect(struct SceneCombatActor *p)
 {
     ActorOverlay_InitSprite(p);
     p->particles[0].velocity.z = 0;

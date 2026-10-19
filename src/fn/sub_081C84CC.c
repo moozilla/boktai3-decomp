@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_ApproachTargetPose sub_081C84CC
 struct S {
     u8 f[1];
     u8 b1;
@@ -22,7 +21,7 @@ struct S {
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 ScalarApproach_StepSixteenth(s32, s32);
-void sub_081C84CC(u32 a, struct S *p)
+void StateActor_ApproachTargetPose(u32 a, struct S *p)
 {
     {
         u16 mask = 0x400;

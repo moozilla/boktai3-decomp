@@ -1,4 +1,3 @@
-#define Armor_UpdateWalk     sub_081826C8
 #define gArmorWalkAnimations gUnk_0824EB94
 #define gSineTable           gUnk_086149C4
 // Tentative Armor family: on the first frame start the walk animation for the
@@ -25,7 +24,7 @@ struct ArmorWalkController {
     s16 motionY; // 0x52
     s16 motionZ; // 0x54
     u8 pad056[0xC0 - 0x56];
-    u16 stepSoundLock;     // 0xC0, nonzero suppresses the surface sound
+    u16 stepSoundLock; // 0xC0, nonzero suppresses the surface sound
     u8 pad0C2[0xC4 - 0xC2];
     u16 animationDuration; // 0xC4, turnDuration in Armor_UpdatePositiveTurn
     u8 pad0C6[0xC8 - 0xC6];
@@ -62,13 +61,13 @@ static inline void SetMotion(struct ArmorMotionVector *v, s32 angle, s32 speed)
     v->z = RoundMotion(gSineTable[angle] * speed);
 }
 
-void sub_081826C8(struct ArmorWalkController *p, s32 speed, s32 duration)
+void Armor_UpdateWalk(struct ArmorWalkController *p, s32 speed, s32 duration)
 {
     u8 *s = &p->walkState;
     if (*s == 0) {
         u32 four = 4;
         Armor_SetAnimationFromStart((u32)p,
-            (u32)&gArmorWalkAnimations[((p->facing + 0x60) >> 6) & 3]);
+                                    (u32)&gArmorWalkAnimations[((p->facing + 0x60) >> 6) & 3]);
         (*s)++;
         p->walkComplete = 1;
         p->animationDuration = duration;

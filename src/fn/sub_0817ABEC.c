@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
-#define SceneActors_SpawnDestructionParticles_0817ABEC sub_0817ABEC
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

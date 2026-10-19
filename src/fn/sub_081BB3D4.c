@@ -1,10 +1,9 @@
 #include "global.h"
-#define SolarBank_RefreshAmountDigits sub_081BB3D4
 
 #include "solar_bank_panel.h"
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 s32 Div(s32, s32);
-void sub_081BB3D4(struct SolarBankPanel *panel)
+void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
 {
     s32 digits[4];
     s32 value, remaining;

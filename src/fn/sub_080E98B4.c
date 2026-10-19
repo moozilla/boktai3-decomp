@@ -1,6 +1,5 @@
 #include "global.h"
 /* Ivy_UpdateActiveState_080E98B4: same as Ivy_UpdateActiveState without setting the owner's byte +7 (provisional name) */
-#define Ivy_UpdateActiveState_080E98B4 sub_080E98B4
 
 void SceneActorAnimation_SelectDirectionalFlags(void *, u32);
 

@@ -494,9 +494,8 @@ void Actor_RestoreSavedAnimationPlayback(u8 *p)
 extern u8 gUnk_03005430[];
 
 /* Provisional name: Actor_UpdateIdleWait */
-#define Actor_UpdateIdleWait sub_081E42C4
 
-void sub_081E42C4(void *);
+void Actor_UpdateIdleWait(void *);
 
 static inline s32 absolute(s32 x)
 {
@@ -524,7 +523,7 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
 {
     if (p->obj.x == 25 && p->obj.z == 0 && absolute(p->obj.y - 102) <= 9) {
         p->timer = 0;
-        p->fn = sub_081E42C4;
+        p->fn = Actor_UpdateIdleWait;
         if (gUnk_03005430[14] == 5 || gUnk_03005430[14] == 0 || gUnk_03005430[14] == 4)
             p->delay = 1800;
         else
@@ -550,7 +549,7 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 
 // phase<<4 write; not a structural mismatch.
 
-void sub_081E42C4(struct ActorAnimController *p)
+void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gUnk_03005260) {
         p->timer = 0;
@@ -585,7 +584,7 @@ void sub_081E42C4(struct ActorAnimController *p)
 
 #else
 
-INCLUDE_ASM("asm/nonmatching", sub_081E42C4);
+INCLUDE_ASM("asm/nonmatching", Actor_UpdateIdleWait);
 
 #endif
 
@@ -630,7 +629,7 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
         u16 phase;
         p->obj.y = p->savedY2 - 1;
         p->timer = 0;
-        p->fn = sub_081E42C4;
+        p->fn = Actor_UpdateIdleWait;
         phase = p->savedPhase;
         p->oldMode = p->mode;
         {
