@@ -19,7 +19,7 @@ s32 Player_SelectInteractionMode(struct Player *p)
         if ((p->inputKeys[1] & 1) &&
             (u8)Trigger_TryOpenNearby((struct TriggerOpener *)((u8 *)p + 0x24)))
             mode = 0;
-        else if (p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+        else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
             mode = 0;
         else
             mode = 1;

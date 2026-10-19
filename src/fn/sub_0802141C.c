@@ -20,7 +20,7 @@ u8 *SceneActors_FindAvailable(void)
     } while (i < 8);
     do {
         do {
-    return found;
+            return found;
         } while (0);
     } while (0);
 }

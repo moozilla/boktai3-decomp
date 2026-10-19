@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "bouncing_object.h"
 static inline u32 ContactFlags(const u32 *flags, u32 mask)
 {
@@ -7,7 +6,7 @@ static inline u32 ContactFlags(const u32 *flags, u32 mask)
 void BouncingObject_HandleTimerContact(struct BouncingContact *contact, void *unused,
                                        struct BouncingObject *input)
 {
-    register struct BouncingObject *early asm("r3") = input;
+    struct BouncingObject *early = input;
     struct BouncingObject *object = early;
     {
         u16 *timer;
@@ -16,9 +15,10 @@ void BouncingObject_HandleTimerContact(struct BouncingContact *contact, void *un
             timer = &early->timer;
             value = 0;
         } else if (contact->flags & 8) {
-            timer = &object->timer;
-            if (*timer <= 89)
+            timer = &(*(&object))->timer;
+            if ((*timer) <= 89) {
                 return;
+            }
             value = object->initialTimer;
         } else {
             return;

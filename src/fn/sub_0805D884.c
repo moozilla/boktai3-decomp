@@ -1,5 +1,5 @@
 #include "scene_panel_subject_tail.h"
-s32 ScenePanelSubject_Destroy(struct ScenePanelSubjectView *subject)
+s32 ScenePanelSubject_Destroy(struct ScenePanelSubject *subject)
 {
     Sprite_Remove(&subject->drawable);
     Collider_Remove(&subject->collider);

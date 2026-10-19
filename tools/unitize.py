@@ -34,6 +34,7 @@ from split import c_functions  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "unitize")
 WT = os.path.join(os.path.dirname(ROOT), "wt")
+TRANSIENT = ("at capacity", "rate limit", "Rate limit", "overloaded", "Internal server error", "stream disconnected")
 QUOTA_FLOOR = 15        # % of the Codex weekly quota to leave for the user (tools/codex_quota.py)
 
 
@@ -84,6 +85,8 @@ functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
 verification; your sandbox cannot write git metadata); leave the finished work in the tree.
 Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
 every unit worker would collide there. Put findings in notes/{slug}.md instead.
+Run every command in the foreground and wait for it, builds included: you are a one-shot
+headless run, so nothing wakes you after a background command finishes.
 Finish with the brief's short report.
 """
 
@@ -92,14 +95,22 @@ def state_path(s):
     return os.path.join(OUT, s["slug"] + ".json")
 
 
-def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fallback=None):
+def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fallback=None, floor=QUOTA_FLOOR):
     st = {"name": s["name"], "slug": s["slug"]}
     if os.path.exists(state_path(s)):
         st = json.load(open(state_path(s)))
-        if st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
+        transient = st.get("state") == "failed" and os.path.exists(os.path.join(OUT, s["slug"] + ".log")) and \
+            any(e in open(os.path.join(OUT, s["slug"] + ".log"), errors="replace").read()
+                for e in TRANSIENT) and st.get("retries", 0) < 2
+        if transient:          # the worker died on a service error: start it again from a clean tree
+            wt = os.path.join(WT, "unit-" + s["slug"])
+            subprocess.run(["git", "checkout", "--", "."], cwd=wt, capture_output=True)
+            subprocess.run(["git", "clean", "-fdq", "src", "include", "notes", "wip"], cwd=wt, capture_output=True)
+            st = {**st, "state": "retry", "retries": st.get("retries", 0) + 1}
+        elif st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
             return st
     if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
-                                              "--floor", str(QUOTA_FLOOR)]).returncode:
+                                              "--floor", str(floor)]).returncode:
         if not fallback:
             return {**st, "state": "paused (Codex quota below floor)"}
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
@@ -175,7 +186,7 @@ def cmd_run(a):
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
-        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback), todo):
+        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback, a.floor), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
 
@@ -202,6 +213,7 @@ def main():
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
     p.add_argument("--recheck", action="store_true", help="re-verify finished worktrees; run no workers")
+    p.add_argument("--floor", type=float, default=QUOTA_FLOOR, help="stop Codex below this %% of the weekly quota")
     p.add_argument("--range", help="START-END: only subsystems inside this address range")
     p.add_argument("--fallback", help="Claude model (e.g. sonnet) to use once the Codex quota floor is reached")
     sp.add_parser("status")

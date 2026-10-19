@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_tail.h"
 #include "scene_inventory_catalog.h"
 #include "scene_item_values.h"
@@ -61,9 +60,9 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 index = p->grid.savedSelection - 16;
                 u8 *page = &catalog->page;
                 s8 *entries;
-                register s32 offset asm("r0") = *page * 8;
+                s32 offset = *page * 8;
                 s32 value;
-                offset = index + offset;
+                *(&offset) = index + offset;
                 entries = catalog->catalog;
                 value = SceneItemValue_GetItemBaseValue(entries[offset]);
                 ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= value;
@@ -77,9 +76,9 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 index = p->grid.savedSelection - 16;
                 u8 *page = &catalog->page;
                 s8 *entries;
-                register s32 offset asm("r0") = *page * 8;
+                s32 offset = *page * 8;
                 s32 value;
-                offset = index + offset;
+                *(&offset) = index + offset;
                 entries = catalog->catalog;
                 GameState_GetConsumableDescriptor(entries[offset]);
                 offset = *page * 8;

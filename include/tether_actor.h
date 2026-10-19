@@ -1,6 +1,8 @@
 #ifndef GUARD_TETHER_ACTOR_H
 #define GUARD_TETHER_ACTOR_H
 #include "contact_swarm.h"
+#include "engine.h"
+#include "player.h"
 struct TetherSegment {
     u32 flags;
     u8 unknown4[12];
@@ -100,7 +102,12 @@ struct TetherActor {
     struct ContactPosition directedTarget;
     struct ContactPosition origin;
     struct ContactPosition auxiliaryOrigin;
-    u8 unknown43C[0x28];
+    /* State-entry tuning, tentative: initialized together at 0804AA08. */
+    u16 stateOption, stateCounter, unknown440;
+    u16 stateRadius, stateSpeed, stateDuration, stateRepeat, stateDelay;
+    u16 stateRecovery, stateStep, statePhase;
+    u16 stateLimitA, stateLimitB, stateFlagA, stateLimitC, stateFlagB;
+    u16 stateLimitD, stateFlagC, stateLimitE, stateFlagD;
     u16 terrainCheckReady;
     u8 unknown466[4];
     u16 directedTimer, directedHeading;
@@ -111,23 +118,16 @@ struct TetherActor {
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };
-/* Additional player view: heading, side and tetherMode are distinct from facing/actionMode. */
-struct TetherPlayer {
-    u8 unknown0[0x1C];
-    u32 unknown1C;
-    u8 unknown20[0x10];
-    struct ContactPosition position;
-    u8 unknown38[0x36A];
-    u8 heading, side;
-    u8 facing;
-    u8 unknown3A5[0xB2];
-    u8 tetherMode, unknown458, unknown459;
-    u16 unknown45A;
-};
-extern struct TetherPlayer *gUnk_02000580[4];
-extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
+extern struct TetherActor *gUnk_02000488;
 void sub_08217DE0(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Sprite_SetOriginStub(void *, s32, s32);
+
+struct TetherPackedPair {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct TetherColliderVector {
+    struct TetherPackedPair a, b;
+};
 #endif

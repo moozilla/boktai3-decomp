@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 u32 ContactSwarm_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
@@ -11,11 +10,12 @@ static inline s32 truncateShift12(s32 value)
 void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
+    s32 k2 = 255;
     struct ContactPosition *position;
     if (slot->enter) {
         struct ContactCollider *collider;
         struct ContactPosition *velocity;
-        register u32 direction asm("r4");
+        u32 direction;
         u32 speed;
         s32 mask;
         slot->enter = 0;
@@ -27,11 +27,11 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         velocity = &slot->velocity;
         direction = slot->direction;
         speed = slot->speed;
-        velocity->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        velocity->x = truncateShift12(gUnk_086149C4[(direction + 64) & k2] * speed);
         velocity->y = 0;
         {
             const s16 *table = gUnk_086149C4;
-            register u32 offset asm("r0");
+            u32 offset;
             const s16 *entry;
             offset = direction * 2;
             entry = (const void *)(offset + (u32)table);
@@ -51,12 +51,14 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         Collider_SetPosition(resource, position, 0);
         {
             s32 count = resource->unknown3C;
-            if (count > 0)
+            if (count > 0) {
                 Collider_Refresh(resource);
+            }
         }
     }
-    if (slot->stateFrame > 119)
+    if (slot->stateFrame > 119) {
         ContactSwarm_HideSlot(pool, slot, index);
-    else
+    } else {
         slot->stateFrame++;
+    }
 }
