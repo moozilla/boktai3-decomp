@@ -2,7 +2,6 @@
 #include "global.h"
 #include "route_sprite_actor.h"
 /* Drifting sprite: holds hidden for a delay, then drifts along its angle (sine table), rises, and steps its display sequence; result=2 when it ends. */
-#define DriftingSprite_Update sub_08126170
 void Anim_SetDurationScale(struct DisplaySequenceState *, u32);
 struct DriftingSprite {
     struct ContactSwarmSprite sprite;

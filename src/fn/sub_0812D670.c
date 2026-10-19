@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneMovingParticle_AllocateEntry_0812D670: same code as SceneMovingParticle_AllocateEntry at another address (ported by relatives.py; provisional name) */
-#define SceneMovingParticle_AllocateEntry_0812D670 sub_0812D670
 static inline u8 test(volatile u32 *p, s32 one, s32 i)
 {
     s32 mask = one;

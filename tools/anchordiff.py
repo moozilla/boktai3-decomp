@@ -18,6 +18,7 @@ later line reads as different. This script re-pairs the two columns:
 
 The last line is the number of differing instructions. Use it as a score when
 trying C variants: it is stable where check.py's byte count and fuzzy score jump.
+check.py prints both counts on a mismatch, and tools/variants.py ranks C edits by them.
 """
 import difflib
 import glob
@@ -73,6 +74,30 @@ def anchors(rom, you):
     return pairs
 
 
+def hunks(rom, you, mask, rng=None):
+    """Yield (tag, i1, i2, j1, j2) differing hunks of the realigned listings."""
+    if rng:
+        rom = [x for x in rom if rng[0] <= int(x.split()[0], 16) < rng[1]]
+        you = [x for x in you if rng[2] <= int(x.split()[0], 16) < rng[3]]
+    nrom = [normalise(x, mask) for x in rom]
+    nyou = [normalise(x, mask) for x in you]
+    cuts = anchors(rom, you)
+    starts = [(0, 0)] + cuts
+    ends = cuts + [(len(rom), len(you))]
+    for (a0, b0), (a1, b1) in zip(starts, ends):
+        sm = difflib.SequenceMatcher(None, nrom[a0:a1], nyou[b0:b1], autojunk=False)
+        for tag, i1, i2, j1, j2 in sm.get_opcodes():
+            if tag != 'equal':
+                yield rom, you, (tag, i1 + a0, i2 + a0, j1 + b0, j2 + b0)
+
+
+def score(run_dir, rng=None):
+    """(structural, total) differing instructions for a check.py run directory."""
+    rom, you = read_columns(run_dir)
+    return tuple(sum(max(i2 - i1, j2 - j1) for _, _, (_, i1, i2, j1, j2) in hunks(rom, you, mask, rng))
+                 for mask in (True, False))
+
+
 def main(argv):
     mask = '-s' in argv
     rng = None
@@ -87,31 +112,17 @@ def main(argv):
         rest.append(arg)
     run_dir = rest[0] if rest else max(glob.glob('build/check/run-*'), key=os.path.getmtime)
     ctx = int(rest[1]) if len(rest) > 1 else 2
-    rom, you = read_columns(run_dir)
-    if rng:
-        rom = [x for x in rom if rng[0] <= int(x.split()[0], 16) < rng[1]]
-        you = [x for x in you if rng[2] <= int(x.split()[0], 16) < rng[3]]
-    nrom = [normalise(x, mask) for x in rom]
-    nyou = [normalise(x, mask) for x in you]
-    cuts = anchors(rom, you)
-    starts = [(0, 0)] + cuts
-    ends = cuts + [(len(rom), len(you))]
     total = 0
-    for (a0, b0), (a1, b1) in zip(starts, ends):
-        sm = difflib.SequenceMatcher(None, nrom[a0:a1], nyou[b0:b1], autojunk=False)
-        for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if tag == 'equal':
-                continue
-            i1, i2, j1, j2 = i1 + a0, i2 + a0, j1 + b0, j2 + b0
-            total += max(i2 - i1, j2 - j1)
-            where = rom[i1].split()[0] if i1 < len(rom) else 'end'
-            print(f'--- ROM {where}  ({tag} {i2 - i1}/{j2 - j1})')
-            for k in range(max(i1 - ctx, 0), i1):
-                print('   ', rom[k])
-            for k in range(i1, i2):
-                print(' R ', rom[k])
-            for k in range(j1, j2):
-                print(' Y ', you[k])
+    for rom, you, (tag, i1, i2, j1, j2) in hunks(*read_columns(run_dir), mask, rng):
+        total += max(i2 - i1, j2 - j1)
+        where = rom[i1].split()[0] if i1 < len(rom) else 'end'
+        print(f'--- ROM {where}  ({tag} {i2 - i1}/{j2 - j1})')
+        for k in range(max(i1 - ctx, 0), i1):
+            print('   ', rom[k])
+        for k in range(i1, i2):
+            print(' R ', rom[k])
+        for k in range(j1, j2):
+            print(' Y ', you[k])
     print('TOTAL differing insns', total)
 
 
