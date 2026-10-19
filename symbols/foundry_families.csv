@@ -1427,3 +1427,4 @@ addr,function,name,family,note
 081A67A0,sub_081A67A0,PositionedEffect_UpdateOscillatingCoordinates,"PositionedEffect coordinates","updates half-scale coordinates with sine-driven vertical motion"
 081A6920,sub_081A6920,ScreenPalette_UpdateState,"ScreenPaletteTransition","advances palette transition state and screen jitter"
 081A6DCC,sub_081A6DCC,Camera_BlendOffset,"CameraOffset","blends two vectors into an eight-frame camera offset"
+081A6F34,sub_081A6F34,Vanargand_InitPartCollider,"Vanargand part","initializes the part collider and contact callback"
