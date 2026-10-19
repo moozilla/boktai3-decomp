@@ -1,7 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *input)
 {
+    s16 k2 = 0;
+    u8 *field_2;
     struct SceneActorRegistryResetView *actor = input;
     u8 *status = (u8 *)actor + 0xDC;
     u32 statusMask = 8;
@@ -25,17 +26,16 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
             u32 zeroWord;
             flags = &actor->flags2D4;
             old = *flags;
-            zeroByte = 0;
+            zeroByte = k2;
             zeroWord = 0;
-            asm("" : "+r"(zeroByte), "+r"(zeroWord));
             mask |= old;
             *flags = mask;
             {
                 u32 behavior = 3;
                 u32 offset = 0x2A8;
-                register u8 *field asm("r0");
-                field = (u8 *)actor + offset;
-                *field = zeroByte;
+                u8 *field;
+                field_2 = ((u8 *)actor) + offset;
+                *field_2 = zeroByte;
                 offset = 0x2A9;
                 field = (u8 *)actor + offset;
                 *field = zeroByte;
