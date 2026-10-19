@@ -236,6 +236,7 @@ def render_diff(result, context=3, full=False):
 
 
 def main():
+    build.wait_for_cloud_setup()
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("--quiet", action="store_true")

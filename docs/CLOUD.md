@@ -3,9 +3,9 @@
 Tags: #tooling #matching
 
 Claude Code cloud sessions (claude.ai/code) can work on the decomp in parallel with
-local workers. Each one sets up its own machine once (about 35 minutes), then takes
-tasks from a queue coordinated through git branches, so no two workers take the same
-functions.
+local workers. A new session is ready in seconds (the environment caches a built
+base checkout, see below), then takes tasks from a queue coordinated through git
+branches, so no two workers take the same functions.
 
 ## One-time setup (the user)
 
@@ -13,19 +13,42 @@ functions.
    private file host link). **Never commit it** and never put it in the repository.
 2. Create a cloud environment for `moozilla/boktai3-decomp` with:
    * environment variable `BOKTAI3_ROM_URL` = that link;
-   * setup script: `sh tools/cloud_setup.sh`.
+   * setup script:
 
-`tools/cloud_setup.sh` installs packages, builds the tools, downloads and verifies the
-ROM (SHA-1 `2651c5e6…`), and builds once. If the environment has no setup-script
-option, the worker runs it as its first step.
+     ```sh
+     #!/bin/bash
+     mkdir -p /opt/boktai3
+     git clone -q --depth 1 https://github.com/moozilla/boktai3-decomp /opt/boktai3/base \
+       && sh /opt/boktai3/base/tools/cloud_setup.sh --provision \
+       || echo "boktai3 provision failed; sessions fall back to a full setup"
+     ```
+
+How setup works (about 3 minutes once, then seconds per session):
+
+* The setup script (`cloud_setup.sh --provision`) installs packages, builds the tools
+  (agbcc, gbadisasm, permuter), makes the venv, downloads and verifies the ROM (SHA-1
+  `2651c5e6…`) and builds `origin/main` once, all in `/opt/boktai3/base`. It finishes
+  well inside the five minutes after which the environment stops caching, so the
+  filesystem is snapshotted and later sessions skip it. The cache is rebuilt when the
+  setup script or network settings change, or after about seven days.
+* The SessionStart hook (`.claude/settings.json` → `cloud_setup.sh --session`, cloud
+  sessions only) links the base's tools, venv and ROM into the session's checkout and
+  copies its `gen/` and objects (about 5 seconds). If the checkout differs from the
+  base's commit it rebuilds in the background (up to ~2 minutes when the cache is a day
+  or more old); `tools/check.py` and `tools/build.py` wait for that by themselves.
+* Without the setup script (or if it had no ROM), the hook does the full setup in the
+  background instead (about 3 minutes).
+* What used to take 35 minutes was gbadisasm: its label lookups were linear scans,
+  ~7 minutes per pass. `tools/patches/gbadisasm-fast.patch` indexes them (identical
+  output, ~3 seconds per pass).
 
 ## What a worker does (the brief)
 
 Start each session with this prompt (the main session can start them too):
 
 > You are a decomp worker on moozilla/boktai3-decomp. Read CLAUDE.md and docs/CLOUD.md.
-> If `build/boktai3.elf` is missing, run `sh tools/cloud_setup.sh` (about 35 min) and
-> wait for `ready: build/boktai3.gba: OK`. Then loop until your time runs out:
+> The session hook sets the checkout up; if `build/boktai3.elf` is still missing, run
+> `sh tools/cloud_setup.sh` (about 3 min). Then loop until your time runs out:
 > claim a task with `build/venv/bin/python tools/cloud_task.py claim --unassigned`, match its
 > functions, and PR it.
 
