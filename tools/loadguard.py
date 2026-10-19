@@ -93,8 +93,8 @@ START = 90      # seconds: a worker younger than this has not done real work yet
 
 
 def priority(cmd):
-    """Matching (decomp progress) first; unit consolidation (organization) second."""
-    return 0 if "UNIT_WORKER" in cmd else 1
+    """Matching (decomp progress) first; consolidation-only unit workers (the old brief) second."""
+    return 0 if cmd.startswith("claude -p Follow docs/UNIT_WORKER.md") else 1
 
 
 def pace_limit(path):
