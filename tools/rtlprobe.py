@@ -4,6 +4,7 @@
   rtlprobe.py dump FILE.c [--nonmatching] [--flags -da]
   rtlprobe.py loop FILE.c [--nonmatching] [--insn N ...] [--regno R ...]
   rtlprobe.py gcse FILE.c [--nonmatching] [--func NAME] [--scan LO:HI] [--expr I ...]
+  rtlprobe.py try-t FILE.c T [T ...] [--nonmatching]
 
 Each command compiles FILE.c as build.py does (preprocessed the same way),
 with `-dp` and the pass dumps, into build/rtlprobe/<stem>/, in under a second
@@ -38,8 +39,14 @@ gcse  lists PRE's redundant expressions and the reaching registers it makes
       to add or remove; --expr limits the order to some expression indices.
       --need E1 E2 ... lists the T windows (nearest first) that put those
       expressions in exactly that bucket order, e.g. the ROM's stack-slot order.
+
+try-t  checks FILE.c with the instrumented compiler (tools/agbcc-instr.sh, which
+      takes about 40 s to build) forcing the GCSE table size to each T, and
+      prints check.py's counts. This splits a residual diff: whatever is still
+      different at the T that gives the ROM's order has another cause.
 """
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -245,6 +252,21 @@ def loop(a):
     print(f'{n} movables; dump {os.path.relpath(path, ROOT)} (insn numbers: {os.path.relpath(work, ROOT)}/u.s)')
 
 
+def try_t(a):
+    cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
+    if not os.path.exists(cc):
+        sys.exit('build the instrumented compiler first: sh tools/agbcc-instr.sh')
+    for t in [''] + a.t:
+        env = dict(os.environ, AGBCC=cc, AGBCC_GCSE_T=str(t))
+        cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), a.src, '--json', '--quiet']
+        r = subprocess.run(cmd + ['--nonmatching'] * a.nonmatching, cwd=ROOT, env=env, capture_output=True, text=True)
+        res = json.loads([ln for ln in r.stdout.splitlines() if ln.startswith('{')][-1])
+        ad = res.get('anchordiff', {'structural': 0, 'total': 0})
+        print(f"T {t or 'default':>7}: {res['different_byte_count']:>5} differing bytes, "
+              f"realigned {ad['total']} ({ad['structural']} ignoring registers)"
+              f"{'  MATCH' if res['status'] == 'match' else ''}")
+
+
 def dump(a):
     work = compile_dumps(a.src, a.flags.split(), a.nonmatching)
     for f in sorted(os.listdir(work)):
@@ -254,7 +276,7 @@ def dump(a):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('dump', 'loop', 'gcse'):
+    for name in ('dump', 'loop', 'gcse', 'try-t'):
         p = sub.add_parser(name)
         p.add_argument('src')
         p.add_argument('--nonmatching', action='store_true')
@@ -266,9 +288,10 @@ def main():
     sub.choices['gcse'].add_argument('--expr', type=int, nargs='*', help='expression indices to order')
     sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
                                      help='expression indices in the bucket order wanted: print the T windows')
+    sub.choices['try-t'].add_argument('t', type=int, nargs='+')
     a = ap.parse_args()
     a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
-    {'dump': dump, 'loop': loop, 'gcse': gcse}[a.cmd](a)
+    {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t}[a.cmd](a)
 
 
 if __name__ == '__main__':
