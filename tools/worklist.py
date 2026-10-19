@@ -22,11 +22,15 @@ LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
 
 def functions():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
+    from split import function_nonentries
+    interior = function_nonentries()  # reviewed labels inside a function: count them with it
     out = []
     cur = None
+    owner = None
     for ln in code:
         m = re.match(r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start (\S+)", ln)
         if m:
+            owner = cur
             cur = {"name": m.group(1), "addr": None, "insns": 0, "calls": 0, "branches": 0, "jt": False}
             out.append(cur)
             continue
@@ -35,6 +39,9 @@ def functions():
         m = re.match(r"^\w+: @ 0x([0-9A-F]{8})", ln)
         if m and cur["addr"] is None:
             cur["addr"] = int(m.group(1), 16)
+            if cur["addr"] in interior and owner is not None:
+                out.pop()
+                cur = owner
             continue
         s = ln.strip()
         if not s or s.endswith(":") or s.startswith(".") or s.startswith("_0") and ":" in s:
