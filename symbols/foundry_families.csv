@@ -1489,3 +1489,4 @@ addr,function,name,family,note
 081BFA4C,sub_081BFA4C,Storage_UpdateModeSelection,"Storage category menu","dispatches the selected storage interaction mode"
 081BFAE0,sub_081BFAE0,Storage_RefreshCategoryWidgets,"Storage category menu","refreshes slot visibility, action glyphs and category icon"
 081BFC14,sub_081BFC14,Storage_BeginModeSelection,"Storage category menu","initializes mode selection grid and category palette"
+081BFD00,sub_081BFD00,Storage_UpdateBrowse,"Storage 3 (auto, tentative); StorageMenu","updates category browsing, blinking, animations and close input"
