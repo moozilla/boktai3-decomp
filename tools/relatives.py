@@ -89,14 +89,31 @@ def functions():
     global _funcs
     if _funcs is not None:
         return _funcs
+    from split import FUNC_LABEL, extra_function_starts, function_nonentries
     nm = names()
-    out, cur = {}, None
+    nonentries = function_nonentries()
+    extra = extra_function_starts()  # reviewed starts left as plain labels
+    out, cur, prev, fresh = {}, None, None, False
     for ln in open(os.path.join(ROOT, "gen", "code.s")):
+        m = re.match(r"_([0-9A-F]{8}):", ln)
+        if m and int(m.group(1), 16) in extra:
+            prev, cur, fresh = cur, "sub_" + m.group(1), False
+            out[cur] = [int(m.group(1), 16), [], []]
+            continue
         m = re.match(r"\s*(?:non_word_aligned_)?(?:thumb|arm)_func_start (\w+)", ln)
         if m:
-            cur = m.group(1)
+            prev, cur, fresh = cur, m.group(1), True
             out[cur] = [int(cur[4:], 16) if cur.startswith("sub_") else 0, [], []]
             continue
+        if fresh:
+            fresh = False
+            m = FUNC_LABEL.match(ln)
+            if m and prev and int(m.group(2), 16) in nonentries:
+                # Interior label (symbols/function_nonentries.csv): the body
+                # continues the previous function.
+                del out[cur]
+                cur = prev
+                continue
         if cur and ln.startswith("\t") and not ln.startswith("\t."):
             t = token(ln, nm)
             if t:
