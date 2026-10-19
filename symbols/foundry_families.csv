@@ -1486,3 +1486,4 @@ addr,function,name,family,note
 081BEB08,sub_081BEB08,Storage_ShowConsumableDescription,"StoragePanel","shows selected consumable description with numeric text arguments"
 081BEF28,sub_081BEF28,SceneInventory_CompleteCategoryRemoval,"SceneInventory category menu","completes selected category slot removal"
 081BF04C,sub_081BF04C,Storage_UpdateSwapSelection,"Storage category menu","updates source and destination slot selection"
+081BFA4C,sub_081BFA4C,Storage_UpdateModeSelection,"Storage category menu","dispatches the selected storage interaction mode"
