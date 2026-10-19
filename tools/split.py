@@ -25,6 +25,7 @@ FUNC_START = re.compile(r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start (\S
 FUNC_LABEL = re.compile(r"^(\w+): @ 0x([0-9A-F]{8})")
 LABEL = re.compile(r"^(\w+):")
 SET_LABEL = re.compile(r"^\t\.set (\w+),")
+INSN = re.compile(r"^\t(?!\.)(?!\w+_func_start)[a-z]")
 NONENTRIES = os.path.join(ROOT, "symbols", "function_nonentries.csv")
 
 
@@ -187,6 +188,10 @@ def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=(),
                 if any(lo <= address and following <= hi for lo, hi in covered_ranges):
                     continue  # reviewed exact body split around symbolized literals
             if blob and 0x08000000 + int(blob.group(1), 16) in covered_addresses:
+                continue
+            # Data with the function's own instructions after it (a jump table
+            # gbadisasm left as a blob) is interior: the C body emits it too.
+            if blob and any(INSN.match(line) for line in code[k + 1:end]):
                 continue
             # U33J's last instruction ends at 0824DAFA. The next two bytes
             # are zero alignment before data at 0824DAFC, already emitted
