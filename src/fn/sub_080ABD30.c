@@ -1,0 +1,60 @@
+#include "global.h"
+/* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
+void Sprite_Remove(void *);
+void Anim_Remove(void *);
+void Heap_Free(void *);
+void SceneMessages_UnregisterReceiver(void *);
+void Shadow_Destroy(void *);
+void TerrainOverlay_QueueRemoveActor(void *);
+void SceneBody_Unregister(void *);
+void Collider_Remove(void *);
+void SceneActorRegistry_UnlinkActor(void *);
+
+static inline u8 tst(u16 *a, u32 m)
+{
+    if (*a & m)
+        return 1;
+    return 0;
+}
+struct S {
+    u8 f0[4];
+    u8 *p4;
+    u8 b8;
+    u8 f1[0x2b7];
+    u16 h2c0;
+};
+void TentacleBody_RemoveSegmentSprites(struct S *);
+void SpritePool_ConsumeStateFlag(struct S *);
+u32 TentacleBody_Destroy(struct S *s)
+{
+    u8 *p;
+    u8 *q;
+    u32 m;
+    u32 v;
+    TentacleBody_RemoveSegmentSprites(s);
+    SpritePool_ConsumeStateFlag(s);
+    p = s->p4;
+    if (s->b8 == 0)
+        Sprite_Remove(p);
+    else
+        Anim_Remove(p + 0x20);
+    Heap_Free(p);
+    m = 0x100;
+    if (tst((u16 *)((u8 *)s + 0x2c0), m))
+        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+    {
+        u8 *r = (u8 *)s + 0x320;
+        if (*r == 1)
+            Shadow_Destroy(r);
+    }
+    m = 0x2000000;
+    v = *(u32 *)((u8 *)s + 0x2d0) & m;
+    q = (u8 *)s + 0x50;
+    if (v == 0)
+        TerrainOverlay_QueueRemoveActor(q);
+
+    SceneBody_Unregister(q);
+    Collider_Remove((u8 *)s + 0x134);
+    SceneActorRegistry_UnlinkActor(s);
+    return 0;
+}

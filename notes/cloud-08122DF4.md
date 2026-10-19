@@ -12,10 +12,12 @@
   reaches it". Writing `counter = &s->hidden; ... counter = &s->delay; ... counter = (u16 *)&s->riseSteps;`
   (one variable for all three) makes them one pseudo, which then takes r2 from the first use.
   The first use then needed `asm("" ::: "memory")` after the flag store, because the ROM reloads the counter there.
-* `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
+* `08125528` MATCHED (SpreadShot_Step). The fix was removing pointer locals (`position`, `yp`, `zp`, `vz`,
+  `kind`) and writing `s->field` everywhere (see the PRE-copies technique below). Old note, kept for history:
+  `08125528` was a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.7% (13 bytes).
+* `08123194` (8964 bytes with its tails 08124240/08125138) matches exactly (see "Fourth round" below).
   Only the stack slots of four spilled GCSE/PRE reaching registers differ, and they need the GCSE hash
   table size to be 2267..2345 instead of 2597 (see "Third round" below).
   Structural differences went 2875 -> 0 with the changes below.
@@ -102,7 +104,7 @@ triples come from C narrowing `u8` arithmetic (`*p >> 4`, `*p & 15`) and are rem
 so those are the likely place the original's RTL was smaller. I did not find C that removes them
 without changing the code. Variable placement and declaration order only move T by at most ±16.
 
-### Third round on 08123194 (24 -> 19 differing halfwords)
+### Third round on 08123194 (24 -> 13 differing halfwords)
 
 * **Diagnostic compiler.** A copy of agbcc's gcc/ with `GCSE_T` (overrides the expression hash table
   size in gcse.c `alloc_expr_hash_table`) and `CSE_DEBUG`/`CSE_NOCANON` (trace / veto cse.c
@@ -134,3 +136,51 @@ without changing the code. Variable placement and declaration order only move T 
   (loop size 112, and the second 15 hoists once the loop is under 90 insns). The switch form of
   CellHeight (`switch (shape) { case 1: ...; case 2: ...; }`, as in Shadow_UpdateTerrain) is
   byte-identical and leaves T unchanged.
+
+### Fourth round on 08123194: full match
+
+* **The slot condition, exactly.** A `GCSE_T` sweep (2201..3001, every odd T) matches when
+  `bucket(7) < bucket(6) < bucket(4)` (the three `s+const` expressions of the parameters) and
+  `A < C < Bm < Bp`, where `A = (13773+a)%T`, `C = (14419+c)%T`, `Bm = (13771+b)%T`, `Bp = Bm+2`, with
+  `a` = 0x800-path `cell`, `b` = else-path cell, `c` = `preferred`. The model predicts the sweep exactly.
+  Because `C - Bm` is fixed at about 652, `A` has to be small mod T, so T must sit just under
+  `(13773+a)/5` or `(13773+a)/6`. No pseudo shift near T 2597 works.
+* **Knobs that keep the code byte-identical** (measured with a pool- and slot-insensitive score):
+  * `cell` for the 0x800 path declared at function scope moves `a` from 396 to 30, and T is unchanged.
+  * In Seek, `position->y = SlopeSurface(...)`, where `SlopeSurface` returns `u16` through an `s16`
+    local, adds narrowing pairs that combine deletes later. That is +80 T and +112 on `b`/`c`.
+  * CanEnter's `Shape()` gives -24 T and -32 pseudos.
+  * Unused locals add pseudos without insns.
+  * Losing knobs: the `u16`-returning CellHeight (it adds extensions in CanEnter) and the u8
+    CellAttributes in Seek (combine narrows the load to `ldrb`).
+* **Result:** function-scope `cell` + SlopeSurface gives T 2677, a=30, b=2204, c=2208, inside the
+  2653..2759 window. Exact match.
+* **Method, reusable:** sweep the forced T with the instrumented compiler to get the exact acceptable
+  set, fit a bucket-order model to it, then search C edits for ones that leave the code identical
+  and move (T, pseudo numbers) into the model's region. Scratch scripts for this (combo search,
+  model, scorer) were in build/w of the 08123194 thread.
+
+## Technique: late register copies of a field address are PRE's, so delete the pointer local
+
+When the ROM computes `&s->field` into a low register, uses it, and only at the *end of the block*
+copies it (`adds r7, r0, #0`, `mov sb, r1`, `mov sl, r0`), the copy is a GCSE/PRE reaching register.
+The original source wrote `s->field` (or `&s->field`) at each use and had no local pointer. If yours
+declares `u8 *kind = &s->kind;` you get the pointer computed straight into its final register plus an
+extra copy wherever the value is reused. On 08125528, removing `position`, `yp`, `zp`, `vz` and `kind`
+(keeping `vx` and `timer`) went from 85 differing instructions to an exact match. For a value that is
+read before its pointer is spilled (`ldrh r1, [r0]; str r0, [sp]`), write `t = s->timer; timer =
+&s->timer; if (t) ...`. Test locals one at a time: on 08123194 the `position` local is genuinely needed.
+
+## Techniques from the 080C7C1C task (Golem family, agent-found)
+
+* **Inline returning a condition: an `s32` return type, not `u8`.** `static inline s32 CanCharge()` with
+  `if (a && b && call()) return 1; return 0;` gives gcc's store-flag shape (`movs r1, #1; cmp; bne;
+  movs r1, #0; cmp r1, #0`). With `u8` you get a `movs #1 / b / movs #0` diamond plus a copy.
+* **Force a copy of an inline's parameter:** `static inline void F(void *ctx) { u8 *body = ctx; ... }`
+  gives each inline its own pseudo (ROM `adds r3, r4, #0` at each inline start). A plain `u8 *body` parameter
+  reuses the caller's register, and PRE then merges addresses across the inlines.
+* **Mask constants loaded before the value tested are block locals:** `{ u32 mask = 0x80; if (x & mask) }`.
+* **Load in each branch, not an address:** `p = arr[i]` / `p = arr[0]` in the two branches (cross-jumping
+  shares the final `ldr`) rather than `slot = &arr[...]; p = *slot;`.
+* **Early-return inline for a clamped index** (`if (a[8] <= 3) return a[8]; return -1;`) orders the load
+  before the `movs #-1`.

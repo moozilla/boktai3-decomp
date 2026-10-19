@@ -300,8 +300,10 @@ def candidate(name, rel):
     if text.count("INCLUDE_ASM") or "#ifdef NONMATCHING" in text:
         return None
     # the definition's name (a real name, its sub_ label, or a #define alias)
-    text = re.sub(r"^#define\s+" + re.escape(pretty) + r"\s+" + re.escape(rel) + r"\s*$", "", text, flags=re.M)
-    for old in {pretty, rel}:
+    # any `#define Alias rel` (the file's own alias may differ from functions.csv)
+    aliases = set(re.findall(r"^#define\s+(\w+)\s+" + re.escape(rel) + r"\s*$", text, flags=re.M))
+    text = re.sub(r"^#define\s+\w+\s+" + re.escape(rel) + r"\s*$", "", text, flags=re.M)
+    for old in {pretty, rel} | aliases:
         text = re.sub(r"\b" + re.escape(old) + r"\b(?=\s*\()", name, text)
     return text
 
@@ -362,7 +364,7 @@ def port(minimum, keep):
             res = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "check.py"), out], cwd=ROOT,
                                  capture_output=True, text=True)
             text = res.stdout + res.stderr
-            if res.returncode == 0 and "MATCH" in text:
+            if res.returncode == 0 and f"{name}: MATCH" in text:  # the target, not the relative
                 verdict = "MATCH" + (" (constants renamed)" if attempt == "constants" else "")
                 dest = os.path.join(ROOT, "src", "fn", name + ".c")
                 if keep and not os.path.exists(dest):  # never replace existing C

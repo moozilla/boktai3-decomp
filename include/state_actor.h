@@ -54,18 +54,59 @@ struct StateActor {
     u8 angle;                    /* 0x65, initialized from targetAngle by 081D1A44. */
     u8 unk66[2];
     struct StateActorPos position; /* 0x68 */
-    u8 unk70[0x168 - 0x70];
-    u8 receiver[0x2CC - 0x168];  /* 0x168: scene message receiver */
+    u8 unk70[0x20];                /* 0x70-0x8F: still unknown. */
+    /* 0x90-0x167: a second, nested command/recovery pipeline (actor graphics
+     * and basic states, 08021EA8-08024F2C), parallel to the primary state
+     * machine above but with its own offsets. Field names are provisional
+     * (confidence=low); several bytes are only pinned by neighbouring
+     * confirmed fields and are not independently read anywhere yet. */
+    u8 unk90[4];
+    s16 health, maxHealth; /* 0x94: SceneActors_AddHealthCost, _TryStartDeathOrFlaggedAction. */
+    u8 unk98[2];
+    u8 vulnerable; /* 0x9A: set 1 by recovery states; the death/flag check clears it. */
+    u8 unk9B;
+    u32 actionFlags; /* 0x9C: per-frame bits; meaning differs by caller (busy/pending/variant). */
+    u8 unkA0[0xA];
+    u8 actionAnimation; /* 0xAA: requested sub-animation id for the recovery pipeline. */
+    u8 actionState;     /* 0xAB: checked for value 3 by the variant-recovery handlers. */
+    u8 actionMode;      /* 0xAC: index into SceneActorState_UpdateActionController's table. */
+    u8 actionIndex;     /* 0xAD: index into the Active/Secondary/Passive action tables. */
+    u8 actionPhase;     /* 0xAE: index into the phase/primary/secondary action tables. */
+    u8 actionFinished;  /* 0xAF */
+    u8 actionEnter;     /* 0xB0 */
+    u8 actionChanged;   /* 0xB1: unconfirmed, position only. */
+    u8 unkB2;
+    u8 locked; /* 0xB3: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
+    u8 unkB4[0x10];
+    u32 actionTimer; /* 0xC4: reset to 0 on transition, incremented each call otherwise. */
+    u8 unkC8[4];
+    u8 requestedAngle; /* 0xCC */
+    u8 unkCD[0x37];
+    u8 (*actionTryUpdate)(void *); /* 0x104 */
+    void (*actionReset)(void *);   /* 0x108 */
+    u8 unk10C[0xC];
+    u8 receiver2[0x10]; /* 0x118: a second scene message receiver (size tentative). */
+    u8 unk128[0x40];
+    u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
+    u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
+    u8 overlayDrawable[0x260 - 0x1CC]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
+    struct StateActorPos
+        worldPosition; /* 0x260: render/collider position (distinct from `position`). */
+    u8 unk268[0x20];
+    void *palette; /* 0x288: active palette bank, picked by SceneActorGraphics_SelectResource. */
+    u8 unk28C[0x2CC - 0x28C];
     void (*stateCallback)(void); /* 0x2CC */
     u8 unk2D0[0x2E4 - 0x2D0];
     s32 (*animationCallback)(struct StateActor *); /* 0x2E4 */
     u8 unk2E8[0x300 - 0x2E8];
     s32 counter300; /* Advanced by 081CFCA4; meaning tentative. */
-    u8 unk304[0x344 - 0x304];
-    u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown. */
+    u8 unk304[0x343 - 0x304];
+    u8 variant;         /* 0x343: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
+    u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown; see
+                          * include/actor_graphics_and_basic_states.h for what this unit learned. */
 };
 
-void Trigger_ConsumePending(void *receiver, s32 count);
+u32 Trigger_ConsumePending(void *receiver, u32 count);
 
 /* On entry select the next state, then consume a message once done. */
 #define STATE_COMMAND_WAIT(name, next)                                                             \
