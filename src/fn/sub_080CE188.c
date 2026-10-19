@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 66.6% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: 77.9% (agent draft, paused; see notes/cloud-08122DF4.md)
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
@@ -214,22 +214,24 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor)
     }
     if (cell == self->terrainCell || Dazzled(index)) {
         u8 direction;
-        u16 busy = MaskFlags(self, 0x400);
-        u16 blocked;
-        if (busy)
+        u16 blocked = MaskFlags(self, 0x400);
+        u8 zero;
+        if (blocked)
             return 0;
         {
             u16 *flags = (u16 *)(group + 0x40);
             s32 mask = ~4;
             *flags &= mask;
         }
+        zero = 0;
+
         blocked = MaskFlags(self, 0x80);
         if (blocked) {
             SetControl(self, 0x1A, *(void **)(group + 0x48));
-            SetAnimation(self, 0, 0, 12);
+            SetAnimation(self, zero, zero, 12);
         } else {
             SetControl(self, 1, self->entryTarget228);
-            SetAnimation(self, 0, 0, 5);
+            SetAnimation(self, zero, zero, 5);
             LoadRoutePoint(*(struct ContactPosition **)(group + 0x200), group + 0x74);
             (*(struct ContactPosition **)(group + 0x200))->y =
                 CellHeight2(*(struct ContactPosition **)(group + 0x200),

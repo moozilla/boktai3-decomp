@@ -3,7 +3,7 @@
 #include "scene_actor_terrain.h"
 #include "player.h"
 #ifdef NONMATCHING
-// fuzzy: 62.4% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: 79.0% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Golem: chase/charge behaviour (tentative). */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *);
@@ -142,19 +142,23 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group,
         }
     }
 }
+static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                            u8 behavior)
+
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
 /* Give up the charge: drain the stamina and switch to the recover control. */
 static inline void Golem_Recover(struct GolemBody *body)
 {
     body->stamina680 -= 30;
     body->direction691 = body->direction690;
-    {
-        u32 phase = 2, behavior = 7;
-        BODY->state2A8 = 0;
-        BODY->phase2A9 = phase;
-        BODY->behavior2AA = behavior;
-        BODY->counter2AC = 0;
-        BODY->field2B1 = 1;
-    }
+    SetState(BODY, 0, 2, 7);
+
     {
         void *target = sub_080C79A8;
         SetControl(BODY, 0x2B, target);
@@ -168,16 +172,34 @@ static inline s32 Golem_TurnGap(struct GolemBody *body)
     return d;
 }
 /* Turn towards direction690, spending stamina; jumps to the caller's resume/commit labels. */
+static inline void SetControlZ(struct SceneActorRegistryResetView *actor, u32 kind, void *control,
+                               u8 byteZero, u32 zero)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = byteZero;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = zero;
+}
+/* Turn towards direction690, spending stamina; jumps to the caller's resume/commit labels. */
 #define GOLEM_TURN(body)                                                                           \
     {                                                                                              \
         body->direction691 = body->direction690;                                                   \
+        zero = 0;                                                                                  \
         body->direction = body->direction690;                                                      \
         body->stamina680 -= 10;                                                                    \
+        byteZero = 0;                                                                              \
         if (body->stamina680 > 0)                                                                  \
             goto resume;                                                                           \
         {                                                                                          \
             void *target = sub_080C68F0;                                                           \
-            SetControl(BODY, 0x27, target);                                                        \
+            SetControlZ(BODY, 0x27, target, byteZero, zero);                                       \
         }                                                                                          \
         behavior = 3;                                                                              \
         goto commit;                                                                               \
@@ -200,121 +222,171 @@ struct GolemRouteLink {
     u8 unknown0[8];
     s16 *point;
 };
-static inline void Golem_Wander(struct SceneActorRegistryResetView *self, u8 *base)
+struct GolemRoutePoint {
+    s16 x, z;
+};
+struct GolemRouteLink2 {
+    u8 unknown0[8];
+    struct GolemRoutePoint *point;
+};
+struct GolemFlags16 {
+    u16 value;
+};
+struct GolemSavedControl {
+    void *target;
+    u8 state, phase, behavior, kind;
+};
+#define PTR(a, o) (*(void **)((u8 *)(a) + (o)))
+static inline u32 Flag16(void *p, u32 maskInput, u32 off)
 {
-    u8 direction = self->direction;
-    struct SceneActorRegistryResetView *actor = self;
-    u8 *group = base;
-    if (!(actor->flags2D4 & 0x400) && !Test(actor->group.flags414, 4)) {
-        u32 current = actor->direction;
-        s32 i = 0;
-        u32 next;
-        while (1) {
-            u32 offset;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            offset = gUnk_03005308 * 2;
-            next = (*(u16 *)(offset + (u32)gUnk_0203B400) & 3) << 6;
-            if (next == current) {
-                i++;
-                if (i <= 3)
-                    continue;
-                next = current;
-            }
-            group[0x204] = next;
-            {
-                struct {
-                    void *control;
-                    u8 state, phase, behavior, kind;
-                } *saved = (void *)(group + 0x8C);
-                saved->control = actor->target;
-                saved->kind = actor->field2B5;
-                saved->state = actor->state2A8;
-                saved->phase = actor->phase2A9;
-                saved->behavior = actor->behavior2AA;
-            }
-            group[0x205] = direction;
-            {
-                void *target = *(void **)(group + 0x21C);
-                SetControl(actor, 0x1B, target);
-            }
-            SceneActorReaction_ResetAnimation(actor, 1);
-            group[0x206] = 6;
-            break;
-        }
-    }
-    sub_0807E334(actor);
-    actor->field2C2 = 0x20;
+    u32 mask = maskInput;
+    return *(u16 *)((u8 *)p + off) & mask;
 }
-static inline u8 Golem_Pursue(struct SceneActorRegistryResetView *self)
+static inline u32 Flag32(void *p, u32 maskInput, u32 off)
 {
-    struct SceneActorRegistryResetView *actor = self;
-    u8 *group = (u8 *)&actor->group;
-    struct ContactPosition center;
-    struct ContactPosition *dest = actor->state5D4;
-    struct GolemRouteLink *link = (void *)&actor->route;
-    u32 cell;
-    s32 index;
-    dest->x = link->point[0];
-    dest->z = link->point[1];
-    dest->y = CellHeight(dest, CellIndex(dest));
-    if (Test(gUnk_030053F4, 0x4800)) {
-        u8 *partner = (u8 *)actor->fieldDC;
-        if (!partner)
-            goto fail;
-        index = SlotIndex(partner);
-        if (index < 0)
-            goto fail;
-        cell = *(u16 *)(*(u8 **)((u8 *)gUnk_02000580[index] + 0x40) + 6);
-    } else {
-        cell = CellIndex((struct ContactPosition *)((u8 *)actor->fieldDC + 0xC));
-        index = 0;
-    }
-    if (cell == actor->terrainCell || IsDazzled(gUnk_02000580[index])) {
-        if (actor->flags2D4 & 0x400)
-            return 0;
-        *(u16 *)(group + 0x40) &= ~4;
-        if (actor->flags2D4 & 0x80) {
-            void *target = *(void **)(group + 0x48);
-            SetControl(actor, 0x1A, target);
-            {
-                u32 behavior = 12;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
-            }
-        } else {
-            struct ContactPosition *p;
-            void *target = actor->entryTarget228;
-            SetControl(actor, 1, target);
-            {
-                u32 behavior = 5;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
-            }
-            p = *(struct ContactPosition **)(group + 0x200);
-            p->x = ((struct GolemRouteLink *)(group + 0x74))->point[0];
-            p->z = ((struct GolemRouteLink *)(group + 0x74))->point[1];
-            p->y = CellHeight(p, CellIndex(p));
-            (*(struct ContactPosition **)(group + 0x200))->y =
-                CellHeight(*(struct ContactPosition **)(group + 0x200),
-                           CellIndex(*(struct ContactPosition **)(group + 0x200)));
-            (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-        }
-        Golem_Wander(actor, group);
-        return 0;
-    }
-    SceneActorTerrain_GetCenter(cell, &center);
-    if (TryMove(actor, group, &center))
+    u32 mask = maskInput;
+    return *(u32 *)((u8 *)p + off) & mask;
+}
+static inline u8 TestBits16(u16 *p, u32 maskInput)
+{
+    u32 mask = maskInput;
+    if (*p & mask)
         return 1;
-fail:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
     return 0;
 }
+static inline u8 TryMove4(struct SceneActorRegistryResetView *actor, void *route,
+                          struct ContactPosition *position, struct ContactPosition *destination)
+{
+    s32 result;
+    if (!sub_0821F204(route, position, destination)) {
+        u32 mask = ~0x200;
+        actor->flags2D4 = mask & actor->flags2D4;
+        return 0;
+    } else {
+        result = sub_0821F7A8(route, position, destination);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&actor->motion, 8);
+            return 1;
+        } else {
+            u32 mask = ~0x200;
+            actor->flags2D4 = mask & actor->flags2D4;
+            return 0;
+        }
+    }
+}
+static inline u32 RandomDirectionExcept(u32 current)
+{
+    s32 i;
+    for (i = 0; i <= 3; i++) {
+        u32 d;
+        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+        d = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        if (d != current)
+            return d;
+    }
+    return current;
+}
+static inline void Golem_Wander2(struct SceneActorRegistryResetView *input, u8 direction)
+{
+    struct SceneActorRegistryResetView *actor = input;
+    u8 *group = (u8 *)&actor->group;
+    if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
+        group[0x204] = RandomDirectionExcept(actor->direction);
+        ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
+        ((struct GolemSavedControl *)(group + 0x8C))->kind = actor->field2B5;
+        ((struct GolemSavedControl *)(group + 0x8C))->state = actor->state2A8;
+        ((struct GolemSavedControl *)(group + 0x8C))->phase = actor->phase2A9;
+        ((struct GolemSavedControl *)(group + 0x8C))->behavior = actor->behavior2AA;
+        group[0x205] = direction;
+        {
+            void *target = PTR(group, 0x21C);
+            SetControl(actor, 0x1B, target);
+        }
+        SetState(actor, 3, 1, 0);
+        group[0x206] = 6;
+    }
+}
+static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
+{
+    struct SceneActorRegistryResetView *actor;
+    u8 *group;
+    u32 cell;
+    s32 slot;
+    u32 *targetp;
+    actor = input;
+    group = (u8 *)&actor->group;
+    targetp = &actor->fieldDC;
+    {
+        struct ContactPosition *dest = actor->state5D4;
+        struct GolemRouteLink2 *link = (void *)&actor->route;
+        dest->x = link->point->x;
+        dest->z = link->point->z;
+        dest->y = CellHeight(dest, CellIndex(dest));
+    }
+    if (Test(gUnk_030053F4, 0x4800)) {
+        u8 *target = (u8 *)*targetp;
+        if (!target)
+            goto fail;
+        slot = SlotIndex(target);
+        if (slot < 0)
+            goto fail;
+        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+    } else {
+        cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
+        slot = 0;
+    }
+    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+        u16 busy = Flag16(actor, 0x400, 0x2D4);
+        u16 blocked;
+        if (busy)
+            return 0;
+        {
+            struct GolemFlags16 *flags = (void *)(group + 0x40);
+            s32 mask = ~4;
+            flags->value = mask & flags->value;
+        }
+        blocked = Flag16(actor, 0x80, 0x2D4);
+        if (blocked) {
+            void *target = PTR(group, 0x48);
+            SetControl(actor, 0x1A, target);
+            SetState(actor, 0, 0, 12);
+        } else {
+            {
+                void *target = actor->entryTarget228;
+                SetControl(actor, 1, target);
+            }
+            SetState(actor, 0, 0, 5);
+            {
+                struct ContactPosition **home = (struct ContactPosition **)(group + 0x200);
+                {
+                    struct ContactPosition *dest = *home;
+                    struct GolemRouteLink2 *link = (struct GolemRouteLink2 *)(group + 0x74);
+                    dest->x = link->point->x;
+                    dest->z = link->point->z;
+                    dest->y = CellHeight(dest, CellIndex(dest));
+                }
+                (*home)->y = CellHeight(*home, CellIndex(*home));
+                (*home)->pad = 0;
+            }
+        }
+        Golem_Wander2(input, actor->direction);
+        sub_0807E334(input);
+        actor->field2C2 = 0x20;
+        return 0;
+    }
+    {
+        struct ContactPosition center;
+        SceneActorTerrain_GetCenter(cell, &center);
+        if (!TryMove4(input, PTR(group, 0x1FC), &actor->position, &center)) {
+        fail:
+            Callback_InvokeActor(actor, PTR(group, 0x224));
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void sub_080CCD7C(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
@@ -322,6 +394,8 @@ void sub_080CCD7C(struct SceneActorRegistryResetView *actor)
     struct ContactPosition diff;
     void *route;
     u32 behavior;
+    u32 zero;
+    u8 byteZero;
     if (TakeFlag2B1(actor))
         body->flag625 = 1;
     if (Golem_InvokeEnabledBehavior(actor))
@@ -428,12 +502,12 @@ route:
                 body->target69C = *(struct ContactPosition *)(body->route5D0 + 0x1C);
                 {
                     void *target = sub_080C6A68;
-                    SetControl(BODY, 0x26, target);
+                    SetControlZ(BODY, 0x26, target, byteZero, zero);
                 }
                 behavior = 2;
             commit:
                 BODY->behavior2AA = behavior;
-                BODY->counter2AC = 0;
+                BODY->counter2AC = zero;
                 BODY->field2B1 = 1;
                 return;
             }
@@ -442,12 +516,16 @@ route:
     if (body->stamina680 > 0)
         goto advance;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    SceneActorReaction_ResetAnimation(actor, 1);
+    SetState(actor, 3, 1, 0);
     {
         void *target = SceneActorReaction_RestoreAfterDelay;
         SetControl(actor, 0xE, target);
     }
-    actor->flags2D4 &= ~0x100;
+    {
+        u16 *flags = &actor->flags2D4;
+        s32 mask = ~0x100;
+        *flags = mask & *flags;
+    }
     if (actor->flags2D4 & 0x80) {
         {
             struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
@@ -457,7 +535,7 @@ route:
             command->second = 0;
             command->kind = 12;
         }
-        if (!Golem_Pursue(actor))
+        if (!Golem_Chase(actor))
             return;
         actor->field2C2 = 0x20;
         goto advance;
@@ -480,7 +558,8 @@ route:
             dest->y = CellHeight(dest, CellIndex(dest));
         }
         (*(struct ContactPosition **)(group + 0x200))->pad = 1;
-        if (!TryMove(actor, group, *(struct ContactPosition **)(group + 0x200))) {
+        if (!TryMove4(actor, PTR(group, 0x1FC), &actor->position,
+                      *(struct ContactPosition **)(group + 0x200))) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;
         }
