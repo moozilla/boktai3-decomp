@@ -43,7 +43,7 @@ def slug(name):
     return re.sub(r"[^a-z0-9]+", "_", s).strip("_")[:40]
 
 
-def subsystems(min_files):
+def subsystems(min_files, match_first=False):
     rows = list(csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv"))))
     funcs, _ = progress.load_functions()
     addr = {n: a for n, a in funcs}
@@ -53,13 +53,20 @@ def subsystems(min_files):
         a = [addr[f] for f in c_functions(p) if f in addr]
         if a:
             where.append((min(a), max(a), str(p.relative_to(ROOT))))
+    import worklist
+    done = worklist.done_names()
+    unmatched = [f for f in worklist.functions() if f["name"] not in done]
     out = []
     for r in rows:
         lo, hi = int(r["start"], 16), int(r["end"], 16)
         files = [f for a0, a1, f in sorted(where) if lo <= a0 < hi or lo <= a1 < hi]
         nfn = sum(1 for f in files if f.startswith("src/fn/"))
-        if nfn >= min_files:
+        if nfn >= min_files or (match_first and any(lo <= f["addr"] < hi for f in unmatched)):
+            um = [f for f in unmatched if lo <= f["addr"] < hi]
             out.append(dict(name=r["name"], start=r["start"], end=r["end"], slug=slug(r["name"]),
+                            unmatched_insns=sum(f["insns"] for f in um),
+                            unmatched="\n".join(f"  {f['addr']:08X} {f['name']} ({f['insns']})"
+                                                 for f in sorted(um, key=lambda f: -f["insns"])) or "  (none)",
                             files=files, fn=nfn, size=hi - lo))
     return out
 
@@ -70,25 +77,36 @@ def matched_bytes(root):
     return int(m.group(1).replace(",", "")) if m else None
 
 
-BRIEF = """Follow docs/UNIT_WORKER.md (read CLAUDE.md first) for one subsystem:
+BRIEF = """You are a matching worker on the Boktai 3 decomp (read CLAUDE.md first). Your goal is
+decomp progress: byte-identical C for the unmatched functions of one subsystem.
 
   name:  {name}
   range: {start}-{end}  (END exclusive)
   unit:  src/{slug}.c with shared types in include/{slug}.h (reuse an existing header
          in include/ if this is the same object)
 
-`build/venv/bin/python tools/unit_files.py {start} {end}` lists the {n} files to merge.
-Do the whole end state: shared header types, one merged unit in ROM order, every
-function still matching: `tools/check.py src/{slug}.c` exits 0. Do not run tools/build.py or
-make (minutes each, and the full ROM build runs once per batch at integration). Name
-functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
-(integration promotes them). Do not run git commit (the driver commits after its own
-verification; your sandbox cannot write git metadata); leave the finished work in the tree.
-Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
-every unit worker would collide there. Put findings in notes/{slug}.md instead.
-Run every command in the foreground and wait for it, builds included: you are a one-shot
-headless run, so nothing wakes you after a background command finishes.
-Finish with the brief's short report.
+Unmatched functions here, biggest first (address, name, instructions):
+{unmatched}
+
+1. Context first: read the subsystem's matched C (`build/venv/bin/python tools/unit_files.py
+   {start} {end}` lists its files) and recover the shared struct types into the header.
+   Working from the subsystem's real types is what makes the large functions match.
+2. Match the unmatched functions, biggest payoff first, at their ROM position in the unit
+   (merge the subsystem's src/fn/ files into the unit as docs/UNIT_WORKER.md describes).
+   Check each with `tools/check.py src/{slug}.c` (seconds). Helpers: tools/regions.py
+   (structure score ignoring registers: get the structure right first), tools/explain.py,
+   tools/repair.py (wrong constants and callees), tools/relatives.py ADDR (similar matched
+   code), tools/rasolve.py and tools/translate.py (register allocation, last). Spend real
+   effort on big functions: they are most of the remaining code. A close miss (fuzzy at
+   least 80%) stays as a `#ifdef NONMATCHING` draft; otherwise keep the INCLUDE_ASM.
+3. Byte-identical only; no handwritten asm() instructions, no new register pins.
+   Every function in the unit must still match: `tools/check.py src/{slug}.c` exits 0.
+Do not run tools/build.py or make (the full ROM build runs at integration). Name functions
+you understand with a file-local `#define NewName sub_XXXXXXXX` alias. Do not run git commit
+(the driver commits after verifying). Don't edit shared docs (docs/HANDOFF.md, INDEX.md,
+history/, ENGINE.md, GAME_LAYOUT.md); put findings in notes/{slug}.md.
+Run every command in the foreground and wait for it: you are a one-shot headless run.
+Finish with a short report: functions matched, drafts with fuzzy %, what blocked the rest.
 """
 
 
@@ -116,6 +134,14 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
             return {**st, "state": "paused (Codex quota below floor)"}
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
     d = os.path.join(WT, "unit-" + s["slug"])
+    if not recheck and st.get("state") != "retry":
+        claim = state_path(s) + ".claim"
+        try:                             # one runner per subsystem, even with several runners
+            os.close(os.open(claim, os.O_CREAT | os.O_EXCL))
+        except FileExistsError:
+            return {**st, "state": "claimed elsewhere"}
+        if os.path.isdir(d) and not os.path.exists(state_path(s)):
+            return {**st, "state": "in flight elsewhere"}
     if not os.path.isdir(d):
         subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,   # clones, no build
                        env={**os.environ, "BRANCH_PREFIX": "unit"}, capture_output=True)
@@ -179,14 +205,15 @@ def cmd_list(a):
 
 def cmd_run(a):
     os.makedirs(OUT, exist_ok=True)
-    todo = subsystems(a.min)
+    todo = subsystems(a.min, a.order == "unmatched")
     if a.only:
         want = set(a.only.split(","))
         todo = [s for s in todo if s["slug"] in want or s["name"] in want]
     if a.range:
         lo, hi = (int(x, 16) for x in a.range.split("-"))
         todo = [s for s in todo if lo <= int(s["start"], 16) and int(s["end"], 16) <= hi]
-    todo = sorted(todo, key=lambda s: -s["fn"])[:a.limit]
+    key = (lambda s: -s["unmatched_insns"]) if a.order == "unmatched" else (lambda s: -s["fn"])
+    todo = sorted(todo, key=key)[:a.limit]
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
@@ -217,6 +244,8 @@ def main():
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
     p.add_argument("--recheck", action="store_true", help="re-verify finished worktrees; run no workers")
+    p.add_argument("--order", choices=["files", "unmatched"], default="unmatched",
+                   help="unmatched: subsystems with the most unmatched code first (decomp progress)")
     p.add_argument("--floor", type=float, default=QUOTA_FLOOR, help="stop Codex below this %% of the weekly quota")
     p.add_argument("--range", help="START-END: only subsystems inside this address range")
     p.add_argument("--fallback", help="Claude model (e.g. sonnet) to use once the Codex quota floor is reached")
