@@ -14,7 +14,7 @@ import os
 import re
 
 from romlib import ROOT
-from split import c_functions
+from split import c_functions, function_nonentries
 
 LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
            (0x08248590, 0x082485EC, "libagbsyscall")]
@@ -22,15 +22,13 @@ LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
 
 def functions():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
-    from split import function_nonentries
-    interior = function_nonentries()  # reviewed labels inside a function: count them with it
+    nonentries = function_nonentries()
     out = []
-    cur = None
-    owner = None
+    cur = prev = None
     for ln in code:
         m = re.match(r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start (\S+)", ln)
         if m:
-            owner = cur
+            prev = cur
             cur = {"name": m.group(1), "addr": None, "insns": 0, "calls": 0, "branches": 0, "jt": False}
             out.append(cur)
             continue
@@ -38,10 +36,14 @@ def functions():
             continue
         m = re.match(r"^\w+: @ 0x([0-9A-F]{8})", ln)
         if m and cur["addr"] is None:
-            cur["addr"] = int(m.group(1), 16)
-            if cur["addr"] in interior and owner is not None:
+            addr = int(m.group(1), 16)
+            if addr in nonentries and prev is not None:
+                # A reviewed interior label (symbols/function_nonentries.csv): the split keeps
+                # it inside its owner, so count its body there too.
                 out.pop()
-                cur = owner
+                cur = prev
+            else:
+                cur["addr"] = addr
             continue
         s = ln.strip()
         if not s or s.endswith(":") or s.startswith(".") or s.startswith("_0") and ":" in s:
