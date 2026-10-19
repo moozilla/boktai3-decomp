@@ -1,5 +1,5 @@
 #include "scene_panel_subject_tail.h"
-s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
+s32 ScenePanelSubject_Update(struct ScenePanelSubject *subject)
 {
     if (subject->state)
         ScenePanelSubject_KeepPlayerOutside((void *)subject);
@@ -12,7 +12,7 @@ s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
     {
         u16 *hold = &subject->hold;
         if (*hold) {
-            u32 mode = SCENE_PANEL_GLOBAL->mode;
+            u32 mode = SCENE_PANEL_GLOBAL->paletteMode;
             if (mode) {
                 if (subject->state != 4)
                     *hold = 0;

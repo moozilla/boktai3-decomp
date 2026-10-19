@@ -1,10 +1,10 @@
 #include "scene_panel_subject_tail.h"
-struct ScenePanelSubjectView *ScenePanelSubject_Create(const struct ContactPosition *home, u32 row,
-                                                       u32 variant, u32 state, u32 kind,
-                                                       u32 contactLimit, u32 colliderSetting,
-                                                       u32 appearDelay)
+struct ScenePanelSubject *ScenePanelSubject_Create(const struct ContactPosition *home, u32 row,
+                                                   u32 variant, u32 state, u32 kind,
+                                                   u32 contactLimit, u32 colliderSetting,
+                                                   u32 appearDelay)
 {
-    struct ScenePanelSubjectView *subject = Task_Create(8, 0x240);
+    struct ScenePanelSubject *subject = Task_Create(8, 0x240);
     if (subject) {
         Task_SetCallbacks(subject, (void (*)(void *))ScenePanelSubject_Update,
                           (void (*)(void *))ScenePanelSubject_Destroy);

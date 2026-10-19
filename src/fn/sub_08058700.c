@@ -71,7 +71,9 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             {
                 s32 zero = panel->mode & 3;
                 if (zero == 0) {
-                    struct ContactPackedVector position = panel->center, velocity;
+                    struct ContactPackedVector position =
+                                                   (*(struct ContactPackedVector *)&panel->center),
+                                               velocity;
                     position.x += 64;
                     position.z += 64;
                     velocity.x = 300;
@@ -96,7 +98,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 u32 highMask;
                 register union ScenePanelPackedVector *positionWords asm("r9");
                 u32 next;
-                position.packed = panel->center;
+                position.packed = (*(struct ContactPackedVector *)&panel->center);
                 {
                     register const u16 *load asm("r2") = (const u16 *)RANDOM_TABLE_ADDR;
                     asm("" : "+r"(load));

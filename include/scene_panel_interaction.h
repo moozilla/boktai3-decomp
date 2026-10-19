@@ -20,49 +20,6 @@ struct ScenePanelInteractionPackedPosition {
     u32 y : 16;
     u32 z : 16;
 };
-struct ScenePanelInteractionSubject {
-    u8 unknown0[0xD3];
-    u8 state;
-    u8 unknownD4[0x1C];
-    u8 changed;
-};
-struct ScenePanelApproachSprite {
-    u32 flags;
-    u8 unknown4[4];
-    u8 scaleX, scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0x56];
-};
-struct ScenePanelInteractionView {
-    u8 unknown0[0x1A];
-    u16 initialMode;
-    u8 unknown1C[2];
-    u8 subjectCount;
-    u8 activeCount;
-    u8 unknown20[0x230];
-    void (*presentationState)(struct ScenePanel *);
-    u32 mainSpriteFlags;
-    u8 unknown258[0x2A4];
-    u16 state, frame;
-    struct ContactPosition origin, approachPosition, center;
-    struct ScenePanelApproachSprite approachSprite;
-    u8 unknown580[0x668];
-    struct ScenePanelInteractionSubject *subjects[4];
-    u16 resourceScale;
-    u8 unknownBFA[0x15];
-    u8 skipMainSprite;
-    u8 mode, savedMode, gateC12;
-    u8 unknownC13[3];
-    u16 variant;
-    u8 unknownC18[0x54];
-    struct ScenePanelRig rig;
-    u8 unknown1320[0x16];
-    u8 allSubjectsNotified, arrivalRampEnabled;
-    u16 arrivalRampFrame;
-    u8 unknown133A[0x10];
-    u16 transitionSound;
-};
 
 extern struct TetherActor *gUnk_02000488;
 #define SCENE_PANEL_PLAYER ((struct ScenePanelInteractionPlayer *)gUnk_02000580[0])

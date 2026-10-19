@@ -1,5 +1,5 @@
 #include "scene_panel_subject.h"
-void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *subject)
+void ScenePanelSubject_ResetPosition(struct ScenePanelSubject *subject)
 {
     s32 random_2;
     s32 offset;
