@@ -1,0 +1,51 @@
+
+#ifdef NONMATCHING
+// fuzzy: 84.6%
+// foundry draft (worker best 84.6%); what differs is mostly register allocation and instruction order
+#define Hresvelgr_EmitRandomMotionBurst sub_081A0EA4
+#define gMotionRandomIndex gUnk_03005308
+#define gMotionRandomTable gUnk_0203B400
+#include "global.h"
+typedef struct MotionDelta { s32 x:16,y:16,z:16,pad:16; } MotionDelta;
+typedef struct HresvelgrActor {
+ u8 pad0[0x9c]; u32 flags; u8 padA0[3]; u8 phase;
+ u8 padA4[11]; u8 finished; u8 padB0; u8 changed;
+ u8 padB2[0x52]; void *callback;
+ u8 pad108[0x6c]; u8 animationData[0x20]; u8 animation[0x20]; u8 emitter[0x15c]; u16 state;
+} HresvelgrActor;
+extern u32 gUnk_03005308;
+extern u16 gUnk_0203B400[];
+void Hresvelgr_SetAnimation(HresvelgrActor *,void *,void *,u32,u32,u32);
+void *MotionEntry_CreateWithDelta(u32,MotionDelta *,u32,u32);
+void Sound_PlaySong(u32);
+s32 Callback_InvokeActor(void *,void *);
+static inline s32 nextRandom(void) {
+ u32 offset;
+ gUnk_03005308=(gUnk_03005308+1)&1023;
+ offset=gUnk_03005308*2;
+ return *(u16 *)(offset+(u32)gUnk_0203B400);
+}
+static inline void emitBurst(u32 emitter) {
+ int i;
+ 
+ for(i=3;i>=0;--i) {
+ MotionDelta delta={0};
+ delta.x=(nextRandom()&15)-8;
+ delta.y=nextRandom()&7;
+ delta.z=(nextRandom()&15)-8;
+ MotionEntry_CreateWithDelta(emitter,&delta,nextRandom()%4,60);
+ }
+ }
+void sub_081A0EA4(HresvelgrActor *p) {
+ if(p->changed) {
+ p->changed=0; Hresvelgr_SetAnimation(p,p->animation,p->animationData,15,1,4); p->state=8;
+ emitBurst((u32)p->emitter);
+ Sound_PlaySong(0x4d1);
+ }
+ if(!(u8)Callback_InvokeActor(p,p->callback) && p->phase>9) {
+ u32 mask=0x10000000; p->flags |=mask; p->finished=1;
+ }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_081A0EA4);
+#endif
