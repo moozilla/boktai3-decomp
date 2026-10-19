@@ -1,6 +1,5 @@
 #include "global.h"
 /* RadialBurstEffect_BlendSpritePalette_08236E4C: same code as RadialBurstEffect_BlendSpritePalette at another address (ported by relatives.py; provisional name) */
-#define RadialBurstEffect_BlendSpritePalette_08236E4C sub_08236E4C
 struct S {
     u8 p0[0x48];
     u16 *src;

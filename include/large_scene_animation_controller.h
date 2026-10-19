@@ -155,6 +155,6 @@ s32 Nidhoggr_UpdateCutscene(struct Nidhoggr *);
 void Nidhoggr_UpdateHorizontalSway(struct Nidhoggr *);
 void Nidhoggr_UpdateState(struct Nidhoggr *);
 void Nidhoggr_UpdateWideSway(struct Nidhoggr *);
-void sub_081958A8(struct Nidhoggr *);
+void Nidhoggr_ActivateRandomParts2(struct Nidhoggr *);
 
 #endif

@@ -1,12 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
-#define SceneActorControl_UpdateMotionPhase_080EBD0C sub_080EBD0C
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
-
-#define Ivy_TickDrawable sub_080F05E8
 
 struct IvyContext {
     u8 unknown0[0x62C];
