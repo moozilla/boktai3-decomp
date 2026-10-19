@@ -1437,3 +1437,4 @@ addr,function,name,family,note
 081A8408,sub_081A8408,Vanargand_UpdateMode9Transition,"Vanargand action states","updates action state and restarts on flag 0x20000"
 081A85AC,sub_081A85AC,Vanargand_UpdateTargetFlagTransition,"Vanargand action states","selects next action from target flag 0x1000"
 081A8638,sub_081A8638,Vanargand_UpdateProximityTransition,"Vanargand action states","changes action when destination is within 256 units"
+081A8938,sub_081A8938,Vanargand_UpdateQueuedActionTransition,"Vanargand action states","selects queued action when indexed entry is ready"
