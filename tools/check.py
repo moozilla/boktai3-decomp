@@ -20,6 +20,7 @@ import re
 import sys
 import tempfile
 
+import anchordiff
 import build
 from romlib import ROOT, load_rom, off
 
@@ -277,6 +278,12 @@ def main():
         json.dump(result, f, indent=2)
     with open(os.path.join(ROOT, work, "full.diff"), "w") as f:
         f.write(render_diff(result, full=True) + "\n")
+    if not ok:
+        # realigned instruction counts: stable on big functions, where the byte
+        # count and fuzzy score drift after the first inserted instruction
+        result["anchordiff"] = dict(zip(("structural", "total"), anchordiff.score(os.path.join(ROOT, work))))
+        with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
+            json.dump(result, f, indent=2)
     if a.json:
         print(json.dumps(result))
         sys.exit(0 if ok else 1)
@@ -284,6 +291,9 @@ def main():
         print(render_diff(result, context=a.context, full=a.full))
     print(f"{result['different_byte_count']} differing bytes; fuzzy {result['fuzzy_match_percent']:.1f}%; "
           f"extent={result['extent_basis']}; artifacts: {work}")
+    if not ok:
+        print(f"realigned: {result['anchordiff']['total']} differing insns, "
+              f"{result['anchordiff']['structural']} ignoring registers (tools/anchordiff.py {work})")
     names = ", ".join(defined)
     print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
     sys.exit(0 if ok else 1)
