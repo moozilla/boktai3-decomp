@@ -1,7 +1,6 @@
 #define Player_TestTerrainRecoveryEnabled Player_IsFlaggedWithGlobalModifier10
 #include "global.h"
 /* Player_ClampPositionToStoredTerrainCell_0823B938: same code as Player_ClampPositionToStoredTerrainCell at another address (ported by relatives.py; provisional name) */
-#define Player_ClampPositionToStoredTerrainCell_0823B938 sub_0823B938
 #include "player.h"
 #include "engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);

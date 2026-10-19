@@ -11,7 +11,7 @@ struct ArmorPaletteState {
     u8 bank;
     u8 otherBank;
 };
-void sub_08181778(void *);
+void Armor_BindPaletteBanks(void *);
 void ActorPalette_BlendSavedBanksSlow(void *);
 void ActorPalette_RestoreSelectedBanks(void *);
 void Palette_CopyBank(void *, u32);
@@ -22,7 +22,7 @@ void Armor_InitPaletteBanks(struct ArmorPaletteState *s)
     u32 source;
     void (*update)(void *);
     void (*finish)(void *);
-    sub_08181778(s);
+    Armor_BindPaletteBanks(s);
     update = ActorPalette_BlendSavedBanksSlow;
     finish = ActorPalette_RestoreSelectedBanks;
     *(u32 *)controller = (u32)update;

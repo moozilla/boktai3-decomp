@@ -1,6 +1,5 @@
 #include "scene_actor_control_phase.h"
 /* SceneActorControl_CompleteScriptedResponse_0809F368: SceneActorControl_CompleteScriptedResponse with other constants (ported by relatives.py, fixed by hand; provisional name) */
-#define SceneActorControl_CompleteScriptedResponse_0809F368 sub_0809F368
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 void *sub_081D4F20(u32, u32);
