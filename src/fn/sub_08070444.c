@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 /* SceneActorRegistry_CountLivingByCategoryAndField1E6: Counts living actors matching category and halfword 1E6 while excluding status flag 0x20000; field meaning remains tentative */
 #define SceneActorRegistry_CountLivingByCategoryAndField1E6 sub_08070444
@@ -9,17 +8,17 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
  * terminal node and requires an allocated head. */
 s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inputField)
 {
-    register s32 category asm("r5") = inputCategory;
-    register s32 field asm("r4") = inputField;
-    register struct SceneActorRegistryNode *node asm("r2");
+    s32 category = inputCategory;
+    s32 field = inputField;
+    struct SceneActorRegistryNode *node;
     struct SceneActorRegistryActor *actor;
-    register s32 count asm("r3");
+    s32 count;
     SceneActorRegistry_GetManager();
     node = gUnk_020004AC;
     actor = node->actor;
     count = 0;
     if (actor) {
-        register u32 mask asm("r6") = 0x20000;
+        u32 mask = 0x20000;
         do {
             if (actor->health > 0) {
                 u32 offset = 0x2d0;
@@ -28,9 +27,10 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
                 if (!(*flags & mask) && actor->category == category) {
                     offset -= 0xea;
                     {
-                        u16 *criterion = (void *)((u8 *)actor + offset);
-                        if (*criterion == field)
+                        u16 *criterion = (void *)(((u8 *)actor) - (-offset));
+                        if ((*criterion) == field) {
                             count++;
+                        }
                     }
                 }
             }

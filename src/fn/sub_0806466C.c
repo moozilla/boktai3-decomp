@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_slot.h"
 static inline u8 IsRemoving(struct ActorAttachmentSlot *slot)
 {
@@ -14,10 +13,10 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
     if (slot->timer <= 0) {
         if (IsRemoving(slot)) {
             s32 i;
-            register u32 flagsOffset asm("r2");
-            register u8 *flags asm("ip");
+            u32 flagsOffset;
+            u8 *flags;
             u32 idOffset;
-            register s8 *slotId asm("r9");
+            s8 *slotId;
             u8 *active;
             u32 activeOffset;
             u8 *status;
@@ -28,7 +27,6 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
             i = 0;
             /* offsetof-style constants retain the original separate address births. */
             flagsOffset = (u32) & ((struct ActorAttachmentSlot *)0)->flags31;
-            asm("" : "+r"(flagsOffset));
             flags = (u8 *)(flagsOffset + (u32)slot);
             idOffset = (u32) & ((struct ActorAttachmentSlot *)0)->slotId;
             slotId = (s8 *)(idOffset + (u32)slot);
@@ -52,11 +50,11 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                 slot->unknown24 = clear;
                 slot->unknown4C = clear;
                 {
-                    register u8 *low asm("r1") = flags;
+                    u8 *low = flags;
                     *low = clear;
                 }
                 {
-                    register struct ContactSwarmSprite *low asm("r2") = sprite;
+                    struct ContactSwarmSprite *low = sprite;
                     {
                         u32 value = low->flags;
                         bit = 1;
@@ -65,14 +63,13 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                     }
                 }
                 {
-                    register s8 *low asm("r3") = slotId;
+                    s8 *low = slotId;
                     s32 id;
                     id = *low;
                     {
-                        register struct ActorAttachmentOwner *recovered asm("r5") = owner;
-                        register u32 *occupied asm("r2");
+                        struct ActorAttachmentOwner *recovered = owner;
+                        u32 *occupied;
                         u32 offset;
-                        asm("" : "+r"(recovered));
                         offset = 0xA1C;
                         occupied = (u32 *)((u8 *)recovered + offset);
                         bit <<= id;
@@ -81,12 +78,12 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                 }
                 Sprite_Remove(sprite);
                 {
-                    register u8 *low asm("r5") = active;
+                    u8 *low = active;
                     *low = clear;
                 }
                 {
                     u32 invalid = 255;
-                    register u8 *idLow asm("r1");
+                    u8 *idLow;
                     idLow = (u8 *)slotId;
                     *idLow = invalid;
                 }
@@ -100,12 +97,12 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
             gUnk_03005308 = index;
             {
                 u32 offset = index << 1;
-                register const u16 *table asm("r2");
-                table = gUnk_0203B400;
+                const u16 *table;
+                table = (const u16 *)0x0203B400;
                 jitter = Mod(*(const u16 *)(offset + (u32)table), 20);
             }
             {
-                register struct ContactSwarmSprite *low asm("r3") = sprite;
+                struct ContactSwarmSprite *low = sprite;
                 u32 x;
                 x = (u16)low->position.x - 10;
                 low->position.x = x + jitter;

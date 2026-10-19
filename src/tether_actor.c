@@ -3353,10 +3353,12 @@ INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateRoamingState);
 
 void TetherActor_UpdateWanderingState(struct TetherActor *actor)
 {
-    if (actor->state != 4)
+    if (actor->state != 4) {
         TetherActor_SetState(actor, 4);
-    if (gUnk_030053F4 & 512)
+    }
+    if (gUnk_030053F4 & 512) {
         return;
+    }
     if (actor->chargeReady) {
         actor->glowMode = 0;
         actor->roamFrame = 0;
@@ -3384,11 +3386,12 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
             u32 value = (actor->heading + 5) & 7;
             angle = value << 5;
         }
+        do {
         table = gUnk_086149C4;
+        } while (0);
         delta.x = scale(table[(angle + 64) & 255] * 3);
         delta.y = 0;
         delta.z = scale(table[angle] * 3);
-        asm("" : : "r"(angle));
         position = &actor->position;
         if (TetherActor_TestStepDelta((struct ContactPackedVector *)position, &delta, 0x843)) {
             position->x += delta.x;
@@ -3399,10 +3402,11 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
             actor->turnAfterBlock = 1;
         }
     }
-    if (actor->kind == 5 && actor->moving)
+    if ((actor->kind == 5) && actor->moving) {
         TetherActor_SetHeadingEntry(actor, 36);
-    else
+    } else {
         TetherActor_SetEntry(actor, 0);
+    }
     {
         u16 *frame = &actor->roamFrame;
         if (++*frame > 119) {
