@@ -2,7 +2,6 @@
 #include "global.h"
 
 /* tentative: falling shard with gravity that bursts into debris on landing */
-#define SpriteEffect_UpdateFallingShard sub_08122068
 
 #include "engine.h"
 #include "scene_vec.h"
