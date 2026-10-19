@@ -36,6 +36,8 @@ gcse  lists PRE's redundant expressions and the reaching registers it makes
       the range (the hash is reimplemented from gcse.c and checked against
       every entry of the dump), so you can see how many insns you would have
       to add or remove; --expr limits the order to some expression indices.
+      --need E1 E2 ... lists the T windows (nearest first) that put those
+      expressions in exactly that bucket order, e.g. the ROM's stack-slot order.
 """
 import argparse
 import os
@@ -185,10 +187,34 @@ def gcse(a):
         mark = '' if e not in seen else ' (same expr)'
         seen.add(e)
         print(f'{reg:>12}  {e:>4}  {exprs[e][0]:>6}  {insn:>5}  {exprs[e][1][:70]}{mark}')
+    if a.need:
+        a.expr = a.need
+        a.scan = a.scan or f'{max(11, T // 2)}:{T * 2}'
     if not a.scan:
         return
     want = [e for e in dict.fromkeys(e for _, e, _ in sorted(reds, key=lambda r: r[2]))
             if not a.expr or e in a.expr]
+    if a.need:
+        want = [e for e in a.need if e in want]
+        if missing := [e for e in want if e not in raw]:
+            sys.exit(f'cannot recompute the hash of expressions {missing}')
+        lo, hi = (int(v) for v in a.scan.split(':'))
+        hits = [t for t in range(lo | 1, hi + 1, 2)
+                if [raw[e] % t for e in want] == sorted(raw[e] % t for e in want)]
+        windows = []
+        for t in hits:
+            if windows and windows[-1][1] == t - 2:
+                windows[-1][1] = t
+            else:
+                windows.append([t, t])
+        print(f'\nT values in {lo}..{hi} that put expressions {"-".join(map(str, want))} in that bucket order'
+              f' (now T = {T}):')
+        for w0, w1 in sorted(windows, key=lambda w: min(abs(w[0] - T), abs(w[1] - T))):
+            print(f'  T {w0}..{w1}  ({w0 - T:+d}..{w1 - T:+d}, about {2 * (w0 - T):+d}..{2 * (w1 - T):+d} insns at GCSE)')
+        print('raw hashes (bucket = raw % T; a pseudo number inside an expression adds to its raw hash 1:1):')
+        for e in want:
+            print(f'  {e:>5}  raw {raw[e]:>6}  {exprs[e][1][:70]}')
+        return
     missing = [e for e in want if e not in raw]
     if missing:
         sys.exit(f'cannot recompute the hash of expressions {missing}')
@@ -238,6 +264,8 @@ def main():
     sub.choices['gcse'].add_argument('--func')
     sub.choices['gcse'].add_argument('--scan', help='LO:HI, table sizes to try')
     sub.choices['gcse'].add_argument('--expr', type=int, nargs='*', help='expression indices to order')
+    sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
+                                     help='expression indices in the bucket order wanted: print the T windows')
     a = ap.parse_args()
     a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
     {'dump': dump, 'loop': loop, 'gcse': gcse}[a.cmd](a)
