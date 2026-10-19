@@ -22,7 +22,7 @@ struct Unk08231A0CPart {
 };
 
 void EffectPart_UpdateAnimation2(struct Unk08231A0CManager *manager, struct Unk08231A0CGroup *group,
-                                struct Unk08231A0CPart *p)
+                                 struct Unk08231A0CPart *p)
 {
     struct EffectSprite *sprite = &p->sprite, *o;
     struct EffectAnim *a;
