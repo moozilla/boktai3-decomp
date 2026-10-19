@@ -6,7 +6,8 @@
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
 s32 Math_Atan2(s32, s32);
-u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *, struct SceneActorTimedBehaviorContext *, s32);
+u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *,
+                                              struct SceneActorTimedBehaviorContext *, s32);
 u8 sub_080B6618(struct SceneActorRegistryResetView *, struct SceneActorTimedBehaviorContext *, s32);
 u8 sub_080B6884(struct SceneActorRegistryResetView *, struct SceneActorTimedBehaviorContext *, s32);
 void sub_080B7C10(struct SceneActorRegistryResetView *);
@@ -30,44 +31,44 @@ void sub_080B6BA8(struct SceneActorRegistryResetView *s)
     struct SceneActorTargetDelta delta;
     s32 angle;
     if (!(s->flags2D4 & 0x100)) {
-    context = s->context;
-    if (s->distanceF0 < s->rangeF4) {
-        struct SceneActorTargetDelta *difference = &delta;
-        struct ContactPosition *from = &s->position;
-        struct ContactPosition *to = &((struct SceneActorTargetPosition *)s->fieldDC)->position;
-        difference->x = to->x - from->x;
-        difference->y = to->y - from->y;
-        difference->z = to->z - from->z;
-        angle = Math_Atan2(delta.x, difference->z) - s->direction;
-        if (angle > 128)
-            angle -= 256;
-        else if (angle < -128)
-            angle += 256;
-        if (angle < 0)
-            angle = -angle;
-        if (angle < s->fieldE9) {
-            if (s->category == 5) {
-                if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
+        context = s->context;
+        if (s->distanceF0 < s->rangeF4) {
+            struct SceneActorTargetDelta *difference = &delta;
+            struct ContactPosition *from = &s->position;
+            struct ContactPosition *to = &((struct SceneActorTargetPosition *)s->fieldDC)->position;
+            difference->x = to->x - from->x;
+            difference->y = to->y - from->y;
+            difference->z = to->z - from->z;
+            angle = Math_Atan2(delta.x, difference->z) - s->direction;
+            if (angle > 128)
+                angle -= 256;
+            else if (angle < -128)
+                angle += 256;
+            if (angle < 0)
+                angle = -angle;
+            if (angle < s->fieldE9) {
+                if (s->category == 5) {
+                    if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
+                        return;
+                } else if (s->category == 6) {
+                    if (sub_080B6618(s, context, angle))
+                        return;
+                } else if (s->category == 7) {
+                    if (sub_080B6884(s, context, angle))
+                        return;
+                }
+                if (IsFlag512Set(context))
                     return;
-            } else if (s->category == 6) {
-                if (sub_080B6618(s, context, angle))
-                    return;
-            } else if (s->category == 7) {
-                if (sub_080B6884(s, context, angle))
+            } else {
+                if (IsFlag512Set(context))
                     return;
             }
-            if (IsFlag512Set(context))
-                return;
+            sub_080B7C10(s);
         } else {
             if (IsFlag512Set(context))
                 return;
+            sub_080B7C10(s);
         }
-        sub_080B7C10(s);
-    } else {
-        if (IsFlag512Set(context))
-            return;
-        sub_080B7C10(s);
-    }
     }
 }
 #else

@@ -13,8 +13,7 @@ void sub_081BDC78(struct SceneInputGrid *p)
     {
         s32 fill;
         for (i = 0; i <= 3; i++)
-            for (j = 0, fill = 0xFF; j <= 3; j++)
-                {
+            for (j = 0, fill = 0xFF; j <= 3; j++) {
                 u32 value = (u8)p->cells[j + 4][i];
                 value |= fill;
                 p->cells[j + 4][i] = value;
@@ -33,8 +32,7 @@ void sub_081BDC78(struct SceneInputGrid *p)
     {
         s32 fill;
         for (i = 0; i <= 3; i++)
-            for (j = 0, fill = 0xFF; j <= 3; j++)
-                {
+            for (j = 0, fill = 0xFF; j <= 3; j++) {
                 u32 value = (u8)p->cells[j][i];
                 value |= fill;
                 p->cells[j][i] = value;
@@ -54,8 +52,7 @@ void sub_081BDC78(struct SceneInputGrid *p)
     }
     if (SceneInput_TestGridFlags(p, 0x10)) {
         s32 fill;
-        for (i = 0; i <= 3; i++)
-            {
+        for (i = 0; i <= 3; i++) {
             u32 value;
             fill = 0xFF;
             value = (u8)p->cells[8][i];

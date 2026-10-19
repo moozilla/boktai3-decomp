@@ -64,7 +64,8 @@ void sub_08130F60(u8 *s)
         if (!sub_0812F3CC(s)) {
             u8 c = s[0x2B0];
             u32 *f = (u32 *)(s + 0x2D0);
-            if (c) setf(f, 0x20);
+            if (c)
+                setf(f, 0x20);
             if (tst(f, 0x20)) {
                 if (p[3]++ >= Route_GetCurrentPointNodeId(p)) {
                     SceneActorRoute_AdvanceActorPoint(s, p);

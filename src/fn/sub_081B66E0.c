@@ -35,11 +35,11 @@ s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void MotionTrack_Initialize(struct MotionTrack *, const void *, const struct MotionTrackVector *,
-                           const struct MotionTrackVector *, u32);
+                            const struct MotionTrackVector *, u32);
 
 s32 sub_081B66E0(struct VanargandEffect *effect, s32 variant, s32 delay,
-                  const struct MotionTrackVector *position, const struct MotionTrackVector *target,
-                  u32 alternate)
+                 const struct MotionTrackVector *position, const struct MotionTrackVector *target,
+                 u32 alternate)
 {
     u32 palette;
     AnimData_Load(effect->animation, 0x89CB);

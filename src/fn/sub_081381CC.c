@@ -3,8 +3,8 @@
 // fuzzy: 96.7%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define LinkSession_UpdatePlayerValueAverage sub_081381CC
-#define PlayerValue_GetBand Solar_GetLevelForIntensity
-#define gLinkSession gUnk_020004B4
+#define PlayerValue_GetBand                  Solar_GetLevelForIntensity
+#define gLinkSession                         gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 s32 PlayerValue_GetBand(s32);
@@ -21,7 +21,10 @@ static inline u32 GetSelection(s32 player)
     player += index;
     base = (u32)session;
     base += 0x54;
-    { u8 *field = (u8 *)(player + base); return *field; }
+    {
+        u8 *field = (u8 *)(player + base);
+        return *field;
+    }
 }
 
 void sub_081381CC(struct AreaEffectLinkState *session)

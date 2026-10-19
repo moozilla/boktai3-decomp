@@ -16,9 +16,9 @@ struct Vanargand {
     u8 padB0;
     u8 pending;
     u8 animationDone;
-    u8 padB3[0x18c-0xb3];
+    u8 padB3[0x18c - 0xb3];
     u8 animation[0x60];
-    u8 drawable[0x5b0-0x1ec];
+    u8 drawable[0x5b0 - 0x1ec];
     u16 delay;
     u8 pad5B2[6];
     u16 rate1;
@@ -37,25 +37,25 @@ void sub_081AAFC0(struct Vanargand *p, s32 tick)
         p->timer = 0;
     }
     switch (p->phase) {
-    case 0:
-        if (tick == 16)
-            SceneActors_StartUnmirroredAnimation(p, animation, p->drawable, 15, 2, 4);
-        if (tick > 16 && p->animationDone) {
-            p->phase = 1;
-            p->timer = 0;
-            {
-                u16 *rates = &p->rate1;
-                s32 rate = 4;
-                *rates = rate;
-                rates++;
-                *rates = rate;
+        case 0:
+            if (tick == 16)
+                SceneActors_StartUnmirroredAnimation(p, animation, p->drawable, 15, 2, 4);
+            if (tick > 16 && p->animationDone) {
+                p->phase = 1;
+                p->timer = 0;
+                {
+                    u16 *rates = &p->rate1;
+                    s32 rate = 4;
+                    *rates = rate;
+                    rates++;
+                    *rates = rate;
+                }
+                return;
             }
+            break;
+        case 1:
+            p->finished = 1;
             return;
-        }
-        break;
-    case 1:
-        p->finished = 1;
-        return;
     }
     {
         u32 mask = 5;

@@ -25,7 +25,7 @@ s32 Script_GetPc(void);
 s32 Script_GetValueSafe(void);
 s32 Script_GetValue(void);
 void Script_SetPc(s32);
-s32 Script_GetKeywordValue(u32,s32);
+s32 Script_GetKeywordValue(u32, s32);
 u32 Script_GetTextSourcePc(void);
 void Bg_ClearTilemap(s32);
 void StageResults_LoadBackgroundResources(void *);
@@ -33,11 +33,11 @@ void StageResults_InitAnimationIds(void *);
 void MessagePanel_InitSprites(void *);
 void StageResults_InitPortraitDisplay(void *);
 void sub_08111E88(void *);
-void ModifierMenu_InitSelectionSnapshot(void *,void *);
+void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void StageResults_CreateTextWindows(void *);
 void StageResults_ShowSummaryText(void *);
 void sub_08112508(void *);
-void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 sub_08112758(struct MessagePanel *p)
 {
     s32 i, value, found, zero;
@@ -45,11 +45,13 @@ s32 sub_08112758(struct MessagePanel *p)
     u8 *entering, *state;
     if (Script_SeekToKeyword(0x6E)) {
         p->script = Script_GetPc();
-        if (!p->script) return -1;
+        if (!p->script)
+            return -1;
     }
     if (Script_SeekToKeyword(0x72)) {
         p->resource = Script_GetTextSourcePc();
-        if (!p->resource) return -1;
+        if (!p->resource)
+            return -1;
     }
     found = Script_SeekToKeyword(0x62);
     callback = &p->callback;
@@ -62,17 +64,20 @@ s32 sub_08112758(struct MessagePanel *p)
             s32 initial = 6000;
             i = 11;
             q = &p->parameters[11];
-            do { *q-- = initial; } while (--i >= 0);
+            do {
+                *q-- = initial;
+            } while (--i >= 0);
         } else {
             Script_SetPc(value);
             for (i = 0; i <= 10; i++) {
                 value = Script_GetValue();
-                if (value < 0) break;
+                if (value < 0)
+                    break;
                 *(s32 *)((u32)p + 0x11D8 + (i << 2)) = value;
             }
         }
     }
-    p->exitScript = Script_GetKeywordValue(0x65,0);
+    p->exitScript = Script_GetKeywordValue(0x65, 0);
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);
@@ -82,15 +87,15 @@ s32 sub_08112758(struct MessagePanel *p)
     MessagePanel_InitSprites(p);
     StageResults_InitPortraitDisplay(p);
     sub_08111E88(p);
-    ModifierMenu_InitSelectionSnapshot((u8 *)p + 0x944,p->palette);
+    ModifierMenu_InitSelectionSnapshot((u8 *)p + 0x944, p->palette);
     StageResults_CreateTextWindows(p);
     StageResults_ShowSummaryText(p);
     zero = 0;
     *callback = sub_08112508;
     *entering = 1;
     *state = zero;
-    if (Script_GetKeywordValue(0x66,0))
-        ScreenTransition_SendCommand(2,5,4,4,4,0xFFFF,zero);
+    if (Script_GetKeywordValue(0x66, 0))
+        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
     return 1;
 }
 #else

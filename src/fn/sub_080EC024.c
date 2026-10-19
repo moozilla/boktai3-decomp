@@ -3,11 +3,12 @@
 // fuzzy: 91.7%
 // foundry draft (worker best 92.6%); what differs is mostly register allocation and instruction order
 #define SceneActorTarget_FindNearbyPlayer sub_080EC024
-#define gScenePlayers gUnk_02000580
+#define gScenePlayers                     gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
-static inline void SubtractPosition(s16 *delta, const struct SceneVec *a, const struct ContactPosition *b)
+static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
+                                    const struct ContactPosition *b)
 {
     delta[0] = a->x - b->x;
     delta[1] = a->y - b->y;
@@ -29,9 +30,11 @@ void *sub_080EC024(struct SceneActorRegistryResetView *actor)
         struct Player *initial = gScenePlayers[0];
         u32 mask = 0x10000;
         flags = initial->statusFlags;
-        if (flags & mask) limit = 0x24000;
+        if (flags & mask)
+            limit = 0x24000;
     }
-    if (actor->field2B5 == 3 && (flags & 0x40000)) return 0;
+    if (actor->field2B5 == 3 && (flags & 0x40000))
+        return 0;
     excluded = 0x1000;
     difference = delta;
     position = &actor->position;

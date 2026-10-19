@@ -3,8 +3,8 @@
 // fuzzy: 98.1%
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
 #define ClockPanel_CaptureSnapshot sub_08109AEC
-#define gSunClock gUnk_03005430
-#define gGameState gUnk_02000710
+#define gSunClock                  gUnk_03005430
+#define gGameState                 gUnk_02000710
 #include "global.h"
 #include "sun_clock.h"
 #include "game_state.h"
@@ -35,24 +35,45 @@ void sub_08109AEC(struct ClockPanel *p)
     s32 i;
     s32 party;
     record = s->bytes;
-    for (i=0;i<16;i++) s->bytes[i] = src[i];
+    for (i = 0; i < 16; i++)
+        s->bytes[i] = src[i];
     src = (u8 *)gUnk_02000710 + 0x790;
     i = 0;
     values = s->values;
     record += 0xC0;
     dest = s->bytes + 16;
-    for (;i<16;i++) dest[i] = src[i];
-    for (i=0;i<5;i++) *values++ = GameState_GetChallengeBestScore(i+6);
-    if (!p->mode) s->time = gUnk_03005430.extra6*15 + gUnk_03005430.extra7;
-    else s->time = 0;
-    i=0;
-    if (GameState_HasEquippedConsumable(0xA)) {party=2; i=1;}
-    if (GameState_HasEquippedConsumable(0x1A)) {party=3; i++;}
-    if (GameState_HasEquippedConsumable(0x25)) {party=4; i++;}
-    if (GameState_HasEquippedConsumable(0x2F)) {party=5; i++;}
+    for (; i < 16; i++)
+        dest[i] = src[i];
+    for (i = 0; i < 5; i++)
+        *values++ = GameState_GetChallengeBestScore(i + 6);
+    if (!p->mode)
+        s->time = gUnk_03005430.extra6 * 15 + gUnk_03005430.extra7;
+    else
+        s->time = 0;
+    i = 0;
+    if (GameState_HasEquippedConsumable(0xA)) {
+        party = 2;
+        i = 1;
+    }
+    if (GameState_HasEquippedConsumable(0x1A)) {
+        party = 3;
+        i++;
+    }
+    if (GameState_HasEquippedConsumable(0x25)) {
+        party = 4;
+        i++;
+    }
+    if (GameState_HasEquippedConsumable(0x2F)) {
+        party = 5;
+        i++;
+    }
     {
         u32 value = 1;
-        if (i<=3) {value=0; if (i==1) value=party;}
+        if (i <= 3) {
+            value = 0;
+            if (i == 1)
+                value = party;
+        }
         s->party = value;
     }
     SceneActorStyle_InitializeFromGameState(record);

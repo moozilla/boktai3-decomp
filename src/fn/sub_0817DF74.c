@@ -30,7 +30,8 @@ static inline void UpdateSequence(struct TimedEffectActor *p, u32 complete)
     if (complete == 0) {
         if (p->timer == 0) {
             u16 animation = 0x148;
-            SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, animation, 3, 1, 4);
+            SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, animation,
+                                                     3, 1, 4);
         }
         p->timer++;
         if (p->timer > 0xB4) {

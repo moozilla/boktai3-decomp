@@ -3,7 +3,7 @@
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 #define PlayerClone_BeginActiveReactions sub_082012D4
-#define gPlayerCloneManager gUnk_020005F8
+#define gPlayerCloneManager              gUnk_020005F8
 #include "global.h"
 struct ClonePosition {
     u16 x, y, z, pad;
@@ -68,7 +68,10 @@ void sub_082012D4(void)
                 s->position.z = animationFlags->position.z;
                 flags[1] = 5;
                 animationFlags->flags = zero;
-                { u16 one = 1; *flags |= one; }
+                {
+                    u16 one = 1;
+                    *flags |= one;
+                }
                 {
                     struct CloneColliderState *collider = &s->collider;
                     collider->flags |= 4;

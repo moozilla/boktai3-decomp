@@ -3,8 +3,8 @@
 // fuzzy: 95.2%
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
 #define PlayerContact_UpdateThresholdEvent sub_0815EFF8
-#define gRandomTableIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gRandomTableIndex                  gUnk_03005308
+#define gRandomTable                       gUnk_0203B400
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -26,8 +26,10 @@ static inline u16 nextRandom(void)
 void sub_0815EFF8(struct Player *p)
 {
     u32 zero = gUnk_030053F4 & 0x1000;
-    if (zero) return;
-    if (p->actionMode != 1) goto clearReady;
+    if (zero)
+        return;
+    if (p->actionMode != 1)
+        goto clearReady;
     {
         if ((s32)gUnk_02000710->unk600 < gUnk_02000710->contactThreshold) {
             goto clearPending;

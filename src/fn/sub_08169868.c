@@ -3,10 +3,10 @@
 // fuzzy: 87.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 #define SceneHud_CyclePrimarySecondaryOptions sub_08169868
-#define SceneHud_RefreshPrimaryOptions SelectionPanel_RefreshVisibleEntries
-#define SceneHud_RefreshSecondaryOptions sub_0816902C
-#define SceneHud_TickWidgetSlides sub_08168EE8
-#define gSceneHudInput gUnk_03005164
+#define SceneHud_RefreshPrimaryOptions        SelectionPanel_RefreshVisibleEntries
+#define SceneHud_RefreshSecondaryOptions      sub_0816902C
+#define SceneHud_TickWidgetSlides             sub_08168EE8
+#define gSceneHudInput                        gUnk_03005164
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
@@ -29,8 +29,8 @@ void sub_08169868(struct SceneHudState *p)
         if (++p->selection >= p->secondaryCount)
             p->selection = 0;
         {
-        u16 *out = &gUnk_02000710->unk50;
-        *out = ((struct SceneHudState *)(p->selection * 8 + (u32)p))->secondaryFirstValue;
+            u16 *out = &gUnk_02000710->unk50;
+            *out = ((struct SceneHudState *)(p->selection * 8 + (u32)p))->secondaryFirstValue;
         }
         p->secondarySlideTimer = 8;
         sub_0816902C(p);

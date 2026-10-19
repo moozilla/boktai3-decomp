@@ -3,13 +3,16 @@
 // fuzzy: 91.2%
 // foundry draft (worker best 91.2%); what differs is mostly register allocation and instruction order
 #define SceneActor_FindNearbyActivePlayer sub_080E7F54
-#define gPlayerSlots gUnk_02000580
-#define gPlayerSlotFlags gUnk_02000560
+#define gPlayerSlots                      gUnk_02000580
+#define gPlayerSlotFlags                  gUnk_02000560
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
 extern u32 gUnk_02000560[4];
-static inline s32 Square(s32 x) { return x*x; }
+static inline s32 Square(s32 x)
+{
+    return x * x;
+}
 u8 sub_080E7F54(struct SceneActorRegistryResetView *p)
 {
     s32 i = 0;

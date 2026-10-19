@@ -3,8 +3,8 @@
 // fuzzy: 97.3%
 // foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
 #define SceneHud_DrawThreeDigitValue sub_08169A9C
-#define SceneHud_GetTextDestination Hud_GetTilemapCell
-#define SceneHud_MapDigitGlyph Hud_GetStyleTileIndex
+#define SceneHud_GetTextDestination  Hud_GetTilemapCell
+#define SceneHud_MapDigitGlyph       Hud_GetStyleTileIndex
 #include "global.h"
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);

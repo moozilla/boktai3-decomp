@@ -10,13 +10,17 @@ extern struct GameState *gUnk_02000710;
 void sub_0814DF58(struct Player *p, s32 amount)
 {
     s32 value;
-    if (p->statModifierContext.statBOverrideEnabled && p->statModifierContext.statBOverrideMode == 7)
+    if (p->statModifierContext.statBOverrideEnabled &&
+        p->statModifierContext.statBOverrideMode == 7)
         value = gUnk_02000710->unk77C;
     else
         value = p->currentStatB;
-    if (value < amount) value = 0;
-    else value -= amount;
-    if (p->statModifierContext.statBOverrideEnabled && p->statModifierContext.statBOverrideMode == 7)
+    if (value < amount)
+        value = 0;
+    else
+        value -= amount;
+    if (p->statModifierContext.statBOverrideEnabled &&
+        p->statModifierContext.statBOverrideMode == 7)
         gUnk_02000710->unk77C = value;
     else
         p->currentStatB = value;

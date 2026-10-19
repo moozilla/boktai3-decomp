@@ -13,13 +13,13 @@ struct VanargandTransition {
     u8 state;
     u8 padAB[3];
     u8 mode, active, pending;
-    u8 padB1[0xC4-0xB1];
+    u8 padB1[0xC4 - 0xB1];
     u32 counter;
-    u8 padC8[0x10C-0xC8];
+    u8 padC8[0x10C - 0xC8];
     struct VanargandTarget *target;
-    u8 pad110[0x230-0x110];
+    u8 pad110[0x230 - 0x110];
     u8 targetMode;
-    u8 pad231[0x5C2-0x231];
+    u8 pad231[0x5C2 - 0x231];
     s16 condition;
 };
 void Vanargand_StopActionSequence(void *);
@@ -34,12 +34,14 @@ static inline u8 Vanargand_ConsumePending(struct VanargandTransition *p)
 }
 static inline u8 Vanargand_IsTargetMode(u8 mode)
 {
-    if (mode == 0 || mode == 2) return TRUE;
+    if (mode == 0 || mode == 2)
+        return TRUE;
     return FALSE;
 }
 static inline u8 Vanargand_SelectMode(s16 condition)
 {
-    if (condition == 0) return 14;
+    if (condition == 0)
+        return 14;
     return 11;
 }
 void sub_081A84B0(void *object)

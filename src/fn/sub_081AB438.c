@@ -4,26 +4,29 @@
 // foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
 #define Vanargand_UpdateOffsetMotion sub_081AB438
 #include "global.h"
-struct MotionTrackVector { s16 x, y, z, padding; };
+struct MotionTrackVector {
+    s16 x, y, z, padding;
+};
 struct MotionTrack;
 struct Vanargand {
     u8 pad0[0x54];
     s16 x, y, z;
-    u8 pad5A[0x9c-0x5a];
+    u8 pad5A[0x9c - 0x5a];
     u32 flags;
-    u8 padA0[0xaf-0xa0];
+    u8 padA0[0xaf - 0xa0];
     u8 finished;
     u8 padB0;
     u8 pending;
-    u8 padB2[0x18c-0xb2];
+    u8 padB2[0x18c - 0xb2];
     u8 animation[0x60];
-    u8 drawable[0x534-0x1ec];
+    u8 drawable[0x534 - 0x1ec];
     u8 track[0x29];
     u8 trackState;
-    u8 pad55E[0x5b0-0x55e];
+    u8 pad55E[0x5b0 - 0x55e];
     u16 delay;
 };
-void MotionTrack_Initialize(struct MotionTrack *, const void *, const struct MotionTrackVector *, const struct MotionTrackVector *, u32);
+void MotionTrack_Initialize(struct MotionTrack *, const void *, const struct MotionTrackVector *,
+                            const struct MotionTrackVector *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void Vanargand_SetPendingCue(void *, u16);

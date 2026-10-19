@@ -17,15 +17,27 @@ struct HomingProjectile {
     u32 position[2];
     u8 unknown14[0x24 - 0x14];
     u8 secondaryCollider[0x54];
-    struct { u8 unknown00[6]; u16 flags; u8 unknown08[0x54 - 8]; } primaryCollider;
+    struct {
+        u8 unknown00[6];
+        u16 flags;
+        u8 unknown08[0x54 - 8];
+    } primaryCollider;
     u8 resource[0x20];
     struct HomingProjectileParams params;
     u8 sprite[0x44];
     u32 slotIndex;
 };
-struct ColliderHalfwords { s32 lo : 16; s32 hi : 16; };
-struct ColliderVector { struct ColliderHalfwords a, b; };
-struct ProjectileCollider { u8 unknown[6]; u16 flags; };
+struct ColliderHalfwords {
+    s32 lo : 16;
+    s32 hi : 16;
+};
+struct ColliderVector {
+    struct ColliderHalfwords a, b;
+};
+struct ProjectileCollider {
+    u8 unknown[6];
+    u16 flags;
+};
 static inline void ClearPosition(void *position)
 {
     u32 zero = 0;
@@ -74,7 +86,8 @@ void sub_081FF948(void *manager, struct HomingProjectile *p, u32 slotIndex)
     offsetComponents[2] = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(collider, HomingProjectile_OnSecondaryCollision, p);
-    Collider_SetAttackProperties(collider, params->attack, params->element, 0, 0, params->attackFlags);
+    Collider_SetAttackProperties(collider, params->attack, params->element, 0, 0,
+                                 params->attackFlags);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081FF948);

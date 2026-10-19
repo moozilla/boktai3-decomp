@@ -47,10 +47,11 @@ void sub_0816F240(u8 *s)
     SceneHud_GetActionIconPosition(w, s[0x4387]);
     result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = (*kind) + 10;
-    SceneHud_BeginIconMotion(s, 0, result, ((struct SceneHudState *)s)->categoryWidgets[later].paletteBank, v, w, 0x18, 0x10);
+    SceneHud_BeginIconMotion(s, 0, result,
+                             ((struct SceneHudState *)s)->categoryWidgets[later].paletteBank, v, w,
+                             0x18, 0x10);
     Sound_PlaySong(0x38A);
-    if (((struct SceneHudState *)s)->actionOwner->actionMode == 6 ||
-        Panel_RandomPercent() < 20)
+    if (((struct SceneHudState *)s)->actionOwner->actionMode == 6 || Panel_RandomPercent() < 20)
         s[0x4861] = 1;
     else
         s[0x4861] = 0;

@@ -19,7 +19,10 @@ s32 sub_08140748(struct Player *p)
     p->contactSpecial = 0;
     p->terrainRecoveryCounter = 0;
     direction = (((u16)Math_Atan2(p->position.x - p->terrainTarget->x,
-                                  p->position.z - p->terrainTarget->z) + 0x60) >> 6) & 3;
+                                  p->position.z - p->terrainTarget->z) +
+                  0x60) >>
+                 6) &
+                3;
     direction = direction * 2 + 1;
     p->facing = direction;
     if (p->facing > 4) {

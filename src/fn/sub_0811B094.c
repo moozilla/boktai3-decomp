@@ -27,37 +27,47 @@ void sub_0811B094(void *unused, struct ColliderScheduler *scheduler)
     s32 enabled, quota, count, divisor, delay;
     u32 one;
     u32 mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask) return;
+    if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        return;
     count = scheduler->count;
-    if (count <= 0) return;
+    if (count <= 0)
+        return;
     link = scheduler->head;
     enabled = 0;
-    if (count <= 4) quota = 1;
+    if (count <= 4)
+        quota = 1;
     else {
-        if (count <= 9) { quota = 3; count += 2; divisor = 3; }
-        else { quota = 4; count += 3; divisor = 4; }
+        if (count <= 9) {
+            quota = 3;
+            count += 2;
+            divisor = 3;
+        } else {
+            quota = 4;
+            count += 3;
+            divisor = 4;
+        }
         count = Div(count, divisor);
     }
     delay = count - 1;
     if (link) {
-    one = 1;
-    do {
-        struct ScheduledCollider *collider = link->collider;
-        if (collider->flags & one) {
-            collider->flags |= 2;
-            collider->updateDelay = 0;
-        } else if (enabled >= quota) {
-            collider->flags |= 2;
-        } else if (collider->updateDelay > 0) {
-            collider->flags |= 2;
-            collider->updateDelay--;
-        } else {
-            collider->updateDelay = delay;
-            collider->flags &= ~2;
-            enabled++;
-        }
-        link = link->next;
-    } while (link);
+        one = 1;
+        do {
+            struct ScheduledCollider *collider = link->collider;
+            if (collider->flags & one) {
+                collider->flags |= 2;
+                collider->updateDelay = 0;
+            } else if (enabled >= quota) {
+                collider->flags |= 2;
+            } else if (collider->updateDelay > 0) {
+                collider->flags |= 2;
+                collider->updateDelay--;
+            } else {
+                collider->updateDelay = delay;
+                collider->flags &= ~2;
+                enabled++;
+            }
+            link = link->next;
+        } while (link);
     }
 }
 #else

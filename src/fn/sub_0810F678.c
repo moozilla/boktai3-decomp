@@ -4,36 +4,41 @@
 #ifdef NONMATCHING
 // fuzzy: 90.8%
 // foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
-#define RecordMenu_Initialize sub_0810F678
+#define RecordMenu_Initialize        sub_0810F678
 #define RecordMenu_InitializeSprites sub_0810EEFC
-#define RecordMenu_PositionSprites sub_0810F00C
-#define gActiveRecordMenu gUnk_020001D0
+#define RecordMenu_PositionSprites   sub_0810F00C
+#define gActiveRecordMenu            gUnk_020001D0
 extern struct RecordMenu *gUnk_020001D0;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 u32 Script_GetPc(void);
-s32 Script_GetKeywordValue(u32,s32);
+s32 Script_GetKeywordValue(u32, s32);
 void Bg_ClearTilemap(s32);
 void Registry33FF_LoadBackground(struct RecordMenu *);
 void LinkLobbyPanel_InitGlyphFrames(struct RecordMenu *);
 void sub_0810EEFC(struct RecordMenu *);
 void sub_0810F0A0(struct RecordMenu *);
 void sub_0810F00C(struct RecordMenu *);
-void ModifierMenu_InitSelectionSnapshot(void *,void *);
+void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void Registry33FF_CreateTextWindows(struct RecordMenu *);
 void LinkLobbyPanel_RefreshPlayerNames(struct RecordMenu *);
 void RecordMenu_UpdateRecords(struct RecordMenu *);
-void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetChoices(void)
 {
-    struct AreaEffectLinkState *state=gUnk_020004B4;
-    if(state && state->unavailable==1) return state->outgoingChoices;
+    struct AreaEffectLinkState *state = gUnk_020004B4;
+    if (state && state->unavailable == 1)
+        return state->outgoingChoices;
     return 0;
 }
-static inline void SetSelection(struct RecordMenu *menu, s32 value) { menu->selection=value; }
+static inline void SetSelection(struct RecordMenu *menu, s32 value)
+{
+    menu->selection = value;
+}
 static inline s32 LimitSelection(s32 value)
 {
-    if(value>5) value=5;
+    if (value > 5)
+        value = 5;
     return value;
 }
 s32 sub_0810F678(struct RecordMenu *menu)
@@ -41,26 +46,55 @@ s32 sub_0810F678(struct RecordMenu *menu)
     u8 *choices;
     struct AreaEffectLinkState *state;
     s32 selection;
-    if(Script_SeekToKeyword('s')) { menu->titleScript=Script_GetTextSourcePc(); if(!menu->titleScript) return -1; }
-    if(Script_SeekToKeyword('c')) { menu->choiceScript=Script_GetTextSourcePc(); if(!menu->choiceScript) return -1; }
-    if(Script_SeekToKeyword('n')) { menu->recordScript=Script_GetPc(); if(!menu->recordScript) return -1; }
-    menu->exitScript=Script_GetKeywordValue('e',0);
-    choices=GetChoices();
-    if(!choices) return -1;
-    { u8 *field=&menu->selection; *field=choices[0]-5; }
-    selection=LimitSelection(menu->selection);
-    { s32 zero=0;
-    SetSelection(menu,selection);
-    Bg_ClearTilemap(3); Bg_ClearTilemap(2); Bg_ClearTilemap(1); Bg_ClearTilemap(0);
-    Registry33FF_LoadBackground(menu); LinkLobbyPanel_InitGlyphFrames(menu); sub_0810EEFC(menu); sub_0810F0A0(menu); sub_0810F00C(menu);
-    ModifierMenu_InitSelectionSnapshot(menu->textPanel,menu->paletteResource);
-    Registry33FF_CreateTextWindows(menu); LinkLobbyPanel_RefreshPlayerNames(menu);
-    { void (*next)(struct RecordMenu *)=RecordMenu_UpdateRecords; menu->update=next; }
-    menu->redraw=1;
-    menu->leaving=zero;
-    if(Script_GetKeywordValue('f',0)) ScreenTransition_SendCommand(2,5,4,4,4,65535,zero);
+    if (Script_SeekToKeyword('s')) {
+        menu->titleScript = Script_GetTextSourcePc();
+        if (!menu->titleScript)
+            return -1;
     }
-    gUnk_020001D0=menu;
+    if (Script_SeekToKeyword('c')) {
+        menu->choiceScript = Script_GetTextSourcePc();
+        if (!menu->choiceScript)
+            return -1;
+    }
+    if (Script_SeekToKeyword('n')) {
+        menu->recordScript = Script_GetPc();
+        if (!menu->recordScript)
+            return -1;
+    }
+    menu->exitScript = Script_GetKeywordValue('e', 0);
+    choices = GetChoices();
+    if (!choices)
+        return -1;
+    {
+        u8 *field = &menu->selection;
+        *field = choices[0] - 5;
+    }
+    selection = LimitSelection(menu->selection);
+    {
+        s32 zero = 0;
+        SetSelection(menu, selection);
+        Bg_ClearTilemap(3);
+        Bg_ClearTilemap(2);
+        Bg_ClearTilemap(1);
+        Bg_ClearTilemap(0);
+        Registry33FF_LoadBackground(menu);
+        LinkLobbyPanel_InitGlyphFrames(menu);
+        sub_0810EEFC(menu);
+        sub_0810F0A0(menu);
+        sub_0810F00C(menu);
+        ModifierMenu_InitSelectionSnapshot(menu->textPanel, menu->paletteResource);
+        Registry33FF_CreateTextWindows(menu);
+        LinkLobbyPanel_RefreshPlayerNames(menu);
+        {
+            void (*next)(struct RecordMenu *) = RecordMenu_UpdateRecords;
+            menu->update = next;
+        }
+        menu->redraw = 1;
+        menu->leaving = zero;
+        if (Script_GetKeywordValue('f', 0))
+            ScreenTransition_SendCommand(2, 5, 4, 4, 4, 65535, zero);
+    }
+    gUnk_020001D0 = menu;
     return 1;
 }
 #else

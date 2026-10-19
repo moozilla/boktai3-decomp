@@ -3,8 +3,8 @@
 // fuzzy: 95.2%
 // foundry draft (worker best 94.2%); what differs is mostly register allocation and instruction order
 #define Player_UpdateScaleTransition sub_08145400
-#define Player_ConsumePhaseEntry Player_ConsumeStateEntry
-#define Player_SetSequenceCallback Player_SetPendingCallback
+#define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
+#define Player_SetSequenceCallback   Player_SetPendingCallback
 #define Player_ClearAnimationFlagTwo Player_OnFadeMotionExit
 #include "global.h"
 #include "player.h"
@@ -29,36 +29,34 @@ void sub_08145400(struct Player *p)
     p->statusFlags |= 0x1100;
     Player_AddControlFlags(p, 28);
     switch (p->tetherPhase) {
-    case 0:
-        {
-        u16 frame = p->tetherFrame;
-        if (frame <= 63) {
-            s32 scale = 64 - frame;
-            p->movementSpeedScale = scale;
-            p->secondarySpeedScale = scale;
-            p->tetherFrame++;
-        } else
-            Player_SetActionPhase(p, 1);
-        }
-        break;
-    case 1:
-        Player_AddControlFlags(p, 1);
-        break;
-    case 2:
-        animation->flags &= ~1;
-        {
-            s32 scale = p->tetherFrame;
-            p->tetherFrame++;
-            scale++;
-            if (p->tetherFrame <= 63) {
+        case 0: {
+            u16 frame = p->tetherFrame;
+            if (frame <= 63) {
+                s32 scale = 64 - frame;
                 p->movementSpeedScale = scale;
                 p->secondarySpeedScale = scale;
-            } else {
-                animation->flags &= ~2;
-                ActorSequence_Begin(p, 0, 0);
+                p->tetherFrame++;
+            } else
+                Player_SetActionPhase(p, 1);
+        } break;
+        case 1:
+            Player_AddControlFlags(p, 1);
+            break;
+        case 2:
+            animation->flags &= ~1;
+            {
+                s32 scale = p->tetherFrame;
+                p->tetherFrame++;
+                scale++;
+                if (p->tetherFrame <= 63) {
+                    p->movementSpeedScale = scale;
+                    p->secondarySpeedScale = scale;
+                } else {
+                    animation->flags &= ~2;
+                    ActorSequence_Begin(p, 0, 0);
+                }
             }
-        }
-        break;
+            break;
     }
 }
 #else

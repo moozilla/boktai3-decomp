@@ -5,37 +5,54 @@
 #define SceneActorPlacement_PlayResponseAndResetState sub_08136AF0
 #include "global.h"
 #include "scene_actor_placement.h"
-static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask) { s->flags2D4 = mask | s->flags2D4; }
-static inline void ClearFlags32(u32 *p, u32 mask) { *p &= mask; }
-static inline u32 MaskFlags(u16 *p, u32 mask) { mask &= *p; *p = mask; return mask; }
-static inline u16 TestFlags(u32 value, u32 mask) { return mask & value; }
+static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
+{
+    s->flags2D4 = mask | s->flags2D4;
+}
+static inline void ClearFlags32(u32 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline u32 MaskFlags(u16 *p, u32 mask)
+{
+    mask &= *p;
+    *p = mask;
+    return mask;
+}
+static inline u16 TestFlags(u32 value, u32 mask)
+{
+    return mask & value;
+}
 s32 sub_08136AF0(struct SceneActorPlacementView *s)
 {
     u32 flags = MaskFlags(&s->flags2D4, 0xFFFFFEFF);
     switch (s->category) {
-    case 0x12:
-        if (!s->field2E4) goto fallback;
-        Sound_PlaySong(0x108);
-        break;
-    case 0x13:
-        if (!s->field2E4) goto fallback;
-        Sound_PlaySong(0x109);
-        break;
-    case 0x14:
-        if (!s->field2E4) goto fallback;
-        Sound_PlaySong(0x13E);
-        break;
-    case 0x17:
-        if (!s->field2E4) {
-        fallback:
-            Sound_PlaySong(0x211);
-        } else if (TestFlags(flags, 8)) {
+        case 0x12:
+            if (!s->field2E4)
+                goto fallback;
+            Sound_PlaySong(0x108);
+            break;
+        case 0x13:
+            if (!s->field2E4)
+                goto fallback;
+            Sound_PlaySong(0x109);
+            break;
+        case 0x14:
+            if (!s->field2E4)
+                goto fallback;
             Sound_PlaySong(0x13E);
-            Sound_PlaySong(0x12A);
-        } else {
-            Sound_PlaySong(0x13E);
-        }
-        break;
+            break;
+        case 0x17:
+            if (!s->field2E4) {
+            fallback:
+                Sound_PlaySong(0x211);
+            } else if (TestFlags(flags, 8)) {
+                Sound_PlaySong(0x13E);
+                Sound_PlaySong(0x12A);
+            } else {
+                Sound_PlaySong(0x13E);
+            }
+            break;
     }
     {
         const void *control = s->savedControl230;

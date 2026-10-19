@@ -11,7 +11,10 @@ struct Slot7Actor {
     u8 pad5c4[0x2e];
     s16 contactDuration;
 };
-struct Slot7Target { u8 pad0[0x50]; struct Slot7Actor *owner; };
+struct Slot7Target {
+    u8 pad0[0x50];
+    struct Slot7Actor *owner;
+};
 void Sound_PlaySong(u32);
 s32 sub_081F05D0(struct Slot7Target *target, s32 event, s32 amount)
 {
@@ -24,12 +27,10 @@ s32 sub_081F05D0(struct Slot7Target *target, s32 event, s32 amount)
             level = gUnk_02000710->unk876 + 1;
             if (level <= 2)
                 duration = (u16)actor->contactDuration;
-            else if (level <= 5)
-                {
+            else if (level <= 5) {
                 u16 base = actor->contactDuration;
                 duration = base + ((s16)base >> 2);
-            }
-            else
+            } else
                 duration = (u16)actor->contactDuration + (actor->contactDuration >> 1);
             actor->duration = duration;
         }

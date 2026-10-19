@@ -11,7 +11,8 @@ void sub_081654DC(s32 count, u32 x, u32 y, s32 sign)
     u16 *p;
     if (sign >= 0) {
         tile = 0x30;
-        if (sign == 0) tile = 0x20;
+        if (sign == 0)
+            tile = 0x20;
     }
     p = Hud_GetTilemapCell(0, x, y);
     if (count > 0) {
@@ -19,7 +20,8 @@ void sub_081654DC(s32 count, u32 x, u32 y, s32 sign)
         u32 mask = 0xFFFFF000;
         u32 value = tile;
         value |= mask;
-        for (i = count; i != 0; i--) *p++ = value;
+        for (i = count; i != 0; i--)
+            *p++ = value;
     }
 }
 #else

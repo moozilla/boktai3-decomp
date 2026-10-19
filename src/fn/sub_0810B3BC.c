@@ -3,14 +3,23 @@
 // fuzzy: 80.7%
 // foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
 #define SceneMenu_UpdateRecords sub_0810B3BC
-struct SceneMenuRecord { u8 data[0x3E]; u16 checksum; };
-struct SceneMenu {
-    u8 pad0[0x1A]; u16 count;
-    u8 pad1C[0x22]; u16 flags;
-    u16 *input;
-    u8 pad44[0x9C]; struct SceneMenuRecord records[1];
+struct SceneMenuRecord {
+    u8 data[0x3E];
+    u16 checksum;
 };
-struct SceneMenuPeer { u8 pad0[0x18]; s16 state; };
+struct SceneMenu {
+    u8 pad0[0x1A];
+    u16 count;
+    u8 pad1C[0x22];
+    u16 flags;
+    u16 *input;
+    u8 pad44[0x9C];
+    struct SceneMenuRecord records[1];
+};
+struct SceneMenuPeer {
+    u8 pad0[0x18];
+    s16 state;
+};
 extern struct SceneMenuPeer *gUnk_020004B4;
 u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
 void Registry1745_ClearParticipantCounters(struct SceneMenu *);
@@ -27,7 +36,8 @@ u8 LinkSession_ReceiveSelectionByte(struct SceneMenu *, void *, s32, s32);
 static inline u8 HasRecordInput(struct SceneMenu *p)
 {
     u32 value = *p->input;
-    if ((value & 0x3C00) == 0x1800) return 1;
+    if ((value & 0x3C00) == 0x1800)
+        return 1;
     return 0;
 }
 s32 sub_0810B3BC(struct SceneMenu *object)

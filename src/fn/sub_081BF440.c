@@ -32,7 +32,8 @@ void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *);
 void Sound_PlaySong(u32);
 void MenuPanel_ShowDescription(struct SceneInventoryCategoryMenu *, s32, const void *, void *);
 void SceneInventory_ResetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *, void (*)(struct SceneInventoryCategoryMenu *), u32);
+void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+                             void (*)(struct SceneInventoryCategoryMenu *), u32);
 void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
 void sub_081BF440(struct SceneInventoryCategoryMenu *p, u32 mode)
 {
@@ -40,24 +41,24 @@ void sub_081BF440(struct SceneInventoryCategoryMenu *p, u32 mode)
     Storage_RefreshCategoryWidgets(p);
     Storage_RefreshSelectedItemDetails(p);
     {
-    u32 modeIndex = mode - 1;
-    p->mode = mode;
-    if (modeIndex <= 1) {
-        Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
-        Storage_UpdateCursorPosition(&p->grid, p->cursor);
-        SceneInventory_BeginCategoryBrowse(p);
-    } else {
-        Sound_PlaySong(0xDD);
-        {
-            s32 descriptionMode = 4;
-            MenuPanel_ShowDescription(p, descriptionMode, p->description, (void *)-1);
+        u32 modeIndex = mode - 1;
+        p->mode = mode;
+        if (modeIndex <= 1) {
+            Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
+            Storage_UpdateCursorPosition(&p->grid, p->cursor);
+            SceneInventory_BeginCategoryBrowse(p);
+        } else {
+            Sound_PlaySong(0xDD);
+            {
+                s32 descriptionMode = 4;
+                MenuPanel_ShowDescription(p, descriptionMode, p->description, (void *)-1);
+            }
+            SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
+            SceneInventory_ResetCategoryPalette(p, p->colors);
+            SceneInventory_SetState(p, SceneInventory_UpdateSortConfirmation, 0);
+            Storage_RefreshCategoryWidgets(p);
         }
-        SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
-        SceneInventory_ResetCategoryPalette(p, p->colors);
-        SceneInventory_SetState(p, SceneInventory_UpdateSortConfirmation, 0);
-        Storage_RefreshCategoryWidgets(p);
     }
-}
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081BF440);

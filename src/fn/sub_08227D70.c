@@ -2,8 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 91.9%
 // foundry draft (worker best 91.9%); what differs is mostly register allocation and instruction order
-#define System_EnterSleep sub_08227D70
-#define System_WaitFrame InterruptsAndVideo_WaitForVBlank
+#define System_EnterSleep      sub_08227D70
+#define System_WaitFrame       InterruptsAndVideo_WaitForVBlank
 #define gDisplayRefreshPending gUnk_03005404
 
 void System_WaitFrame(void);

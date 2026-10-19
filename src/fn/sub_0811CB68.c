@@ -14,16 +14,17 @@ void sub_0811CB68(void *resource, struct ModifierDisplayObject *parts,
         s32 x = 0;
         s32 y = 0;
         switch (i) {
-        case 3:
-            x = 15;
-            y = -2;
-            break;
-        case 4:
-            x = -19;
-            y = -2;
-            break;
+            case 3:
+                x = 15;
+                y = -2;
+                break;
+            case 4:
+                x = -19;
+                y = -2;
+                break;
         }
-        if (flip) x = -x;
+        if (flip)
+            x = -x;
         parts[i].x = origin->x + x;
         parts[i].y = origin->y + y;
     }

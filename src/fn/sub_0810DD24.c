@@ -3,8 +3,15 @@
 // fuzzy: 84.3%
 // foundry draft (worker best 84.3%); what differs is mostly register allocation and instruction order
 #define SelectionPanel_InitPreview sub_0810DD24
-struct PreviewPosition { u32 x:16, y:16, z:16, pad:16; };
-struct PreviewSource { u8 unk0[0x53]; u8 active; u8 unk54[0x14c]; u8 values[5]; };
+struct PreviewPosition {
+    u32 x : 16, y : 16, z : 16, pad : 16;
+};
+struct PreviewSource {
+    u8 unk0[0x53];
+    u8 active;
+    u8 unk54[0x14c];
+    u8 values[5];
+};
 extern struct PreviewSource *gUnk_020004B4;
 extern u32 gUnk_030053F4, gUnk_030053F0;
 void CharacterModel_InitPalettes(u8 *, s32);
@@ -27,9 +34,11 @@ void sub_0810DD24(u8 *p)
         u8 value;
         u8 zero;
         u8 *dest;
-        if (!source || source->active != 1) return;
+        if (!source || source->active != 1)
+            return;
         values = source->values;
-        if (!values) return;
+        if (!values)
+            return;
         base = p + 0x494;
         value = values[0];
         dest = p + 0x4dc;

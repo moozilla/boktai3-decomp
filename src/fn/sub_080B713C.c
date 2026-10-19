@@ -13,10 +13,8 @@ s32 sub_080B713C(struct SceneActorTerrainView *actor, s32 angle)
     s32 opposite = (direction + 2) & 3;
     s32 i;
 
-    for (i = 0; i <= 3; i++)
-    {
-        if (direction != opposite)
-        {
+    for (i = 0; i <= 3; i++) {
+        if (direction != opposite) {
             if (SceneActorTerrain_GetNeighborCell(actor, direction) >= 0)
                 return direction;
         }

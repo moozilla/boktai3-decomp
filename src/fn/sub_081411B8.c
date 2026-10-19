@@ -3,12 +3,12 @@
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define Player_ApplyDirectionalForce sub_081411B8
-#define Player_GetForceDirection sub_08140F40
-#define gForceMagnitude gUnk_02000550
-#define gForceThreshold gUnk_0200052C
-#define gForceAngle gUnk_0200053C
-#define gForceDirectionMode gUnk_02000558
-#define gSineTable gUnk_086149C4
+#define Player_GetForceDirection     sub_08140F40
+#define gForceMagnitude              gUnk_02000550
+#define gForceThreshold              gUnk_0200052C
+#define gForceAngle                  gUnk_0200053C
+#define gForceDirectionMode          gUnk_02000558
+#define gSineTable                   gUnk_086149C4
 #include "global.h"
 #include "player.h"
 #include "directional_force.h"

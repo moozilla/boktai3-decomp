@@ -81,16 +81,15 @@ void sub_0809C91C(struct Act *a)
         a->posY = a->off + g;
     }
     return;
-cont:
-    {
-        u32 r = 0;
-        if ((*(u16 *)0x02000534) != 0 && (*(u16 *)0x02000500) == 5)
-            r = 1;
-        if (r != 0 || (*(u8 **)0x02000580)[0x418] == 4)
-            cap = 0x3c;
-        else
-            cap = 0x104;
-    }
+cont: {
+    u32 r = 0;
+    if ((*(u16 *)0x02000534) != 0 && (*(u16 *)0x02000500) == 5)
+        r = 1;
+    if (r != 0 || (*(u8 **)0x02000580)[0x418] == 4)
+        cap = 0x3c;
+    else
+        cap = 0x104;
+}
     if ((s16)a->off < cap) {
         a->off += Trunc(gUnk_086149C4[st->phase], 9);
         if (st->phase <= 0x3f)

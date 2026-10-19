@@ -30,7 +30,10 @@ struct ActorAction {
 u8 Modifier_IsFourthSourceReady(struct ActorAction *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
 void CallbackList_SubtractStateTenValue(void *, struct ActorAction *, s32);
-struct SpawnParameters { u32 data; s32 a, b; };
+struct SpawnParameters {
+    u32 data;
+    s32 a, b;
+};
 s8 SpritePairPool_StartEntry(void *, void *, s32, void *, s32, struct SpawnParameters);
 s32 sub_0811F7EC(struct ActorAction *action)
 {
@@ -38,15 +41,18 @@ s32 sub_0811F7EC(struct ActorAction *action)
     void *state;
     s32 cost;
 
-    if (!Modifier_IsFourthSourceReady(action)) goto fail;
+    if (!Modifier_IsFourthSourceReady(action))
+        goto fail;
     owner = action->owner;
     state = owner->actionState;
     cost = CallbackList_RunMatchingState(state, action->id, 10);
-    if (owner->resource < cost) goto fail;
-    action->spawnResult = SpritePairPool_StartEntry(owner->position, owner->direction, 0, action->parameters,
-                                      owner->spawnKind, (struct SpawnParameters){owner->spawnData, 0, 0});
+    if (owner->resource < cost)
+        goto fail;
+    action->spawnResult = SpritePairPool_StartEntry(
+        owner->position, owner->direction, 0, action->parameters, owner->spawnKind,
+        (struct SpawnParameters){owner->spawnData, 0, 0});
     if (action->spawnResult < 0) {
-fail:
+    fail:
         return 0;
     }
     CallbackList_SubtractStateTenValue(state, action, cost);

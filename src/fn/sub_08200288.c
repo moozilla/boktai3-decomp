@@ -3,7 +3,7 @@
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define PlayerClone_SetAnimation sub_08200288
-#define Anim_SetFrame Anim_SetFrameDurationScale
+#define Anim_SetFrame            Anim_SetFrameDurationScale
 #include "global.h"
 
 struct PlayerClone {
@@ -30,7 +30,8 @@ s32 sub_08200288(struct PlayerClone *s, s32 index, u32 frame, u32 mode)
     if (s->animation == index)
         same = 1;
     s->animation = index;
-    Anim_SetKeyframes(&s->anim, s->resource, (u16)((u16)index + s->animationOffset), (u16)mode, same);
+    Anim_SetKeyframes(&s->anim, s->resource, (u16)((u16)index + s->animationOffset), (u16)mode,
+                      same);
     if (s->mirrored)
         s->anim.flags |= 4;
     else

@@ -13,7 +13,8 @@ s32 sub_080A4260(struct SceneActorRegistryResetView *p)
     void *control;
     s32 result;
     s32 offset;
-    if ((s32)p->field304 > 0) goto begin;
+    if ((s32)p->field304 > 0)
+        goto begin;
     result = 0;
     goto done;
 begin:
@@ -84,7 +85,7 @@ begin:
             u16 *flags = &p->flags2D4;
             u32 value = *flags;
             mask |= value;
-        *flags = mask;
+            *flags = mask;
         }
         {
             u32 value = p->group.field416;

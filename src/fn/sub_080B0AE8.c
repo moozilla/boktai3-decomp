@@ -10,16 +10,20 @@ static inline u8 IsUnavailable(void *input)
     struct SceneActorRegistryResetView *p = input;
     if (p) {
         u32 mask = 0x40;
-        if (p->flags2D4 & mask) return 1;
+        if (p->flags2D4 & mask)
+            return 1;
         mask = 0x20000;
-        if (p->flags2D0 & mask) return 1;
-        if (p->health <= 0) return 1;
+        if (p->flags2D0 & mask)
+            return 1;
+        if (p->health <= 0)
+            return 1;
     }
     return 0;
 }
 static inline u8 HasFlags(u16 *flags, u32 mask)
 {
-    if (*flags & mask) return 1;
+    if (*flags & mask)
+        return 1;
     return 0;
 }
 static inline u32 MaskedFlags(struct SceneActorRegistryResetView *p, u32 mask)
@@ -29,7 +33,8 @@ static inline u32 MaskedFlags(struct SceneActorRegistryResetView *p, u32 mask)
 void sub_080B0AE8(struct SceneActorRegistryResetView *p)
 {
     u8 *base = (u8 *)p;
-    if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->field2B5 != 0x29 && !MaskedFlags(p, 0xE3BF)) {
+    if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->field2B5 != 0x29 &&
+        !MaskedFlags(p, 0xE3BF)) {
         u32 mask = 0xC;
         u16 *flags = (u16 *)(base + 0x6D4);
         if (!HasFlags(flags, mask) && HasFlags(flags, 2)) {

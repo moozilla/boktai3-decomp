@@ -3,8 +3,8 @@
 // fuzzy: 90.6%
 // foundry draft (worker best 87.9%); what differs is mostly register allocation and instruction order
 #define ActorAction_RunActiveCallbacks sub_08121110
-#define ActorAction_ResetFlags RegistryA8CB_ResetUpdateState
-#define ActorAction_FinishTick RegistryA8CB_UpdateAnimation
+#define ActorAction_ResetFlags         RegistryA8CB_ResetUpdateState
+#define ActorAction_FinishTick         RegistryA8CB_UpdateAnimation
 #include "global.h"
 struct ActorActionEntry {
     void *callback;

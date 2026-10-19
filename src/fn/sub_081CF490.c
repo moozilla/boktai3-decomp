@@ -26,7 +26,8 @@ void sub_081CF490(void *unused, struct SceneNpc *npc)
     }
     if ((u8)Callback_InvokeActor(npc, npc->callback) != 1) {
         phase = npc->phase;
-        if (phase > 16) npc->phaseComplete = 1;
+        if (phase > 16)
+            npc->phaseComplete = 1;
         else {
             if (phase & 1) {
                 u32 mask = 0x100;

@@ -3,7 +3,7 @@
 // fuzzy: 94.0%
 // foundry draft (worker best 94.0%); what differs is mostly register allocation and instruction order
 #define ScreenPalette_UpdateTransition sub_081A681C
-#define gScreenPaletteBuffer gUnk_030050E0
+#define gScreenPaletteBuffer           gUnk_030050E0
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];
@@ -28,10 +28,12 @@ void sub_081A681C(struct ScreenPaletteTransition *s)
     }
     if (s->phase <= 32) {
         s32 a = s->variant * 3 + 11;
-        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32, palettes + (s->variant * 3 + 10) * 32, s->phase, 5);
+        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+                                 palettes + (s->variant * 3 + 10) * 32, s->phase, 5);
     } else if (s->phase <= 64) {
         s32 a = s->variant * 3 + 10;
-        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32, palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
+        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+                                 palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
     } else {
         u16 index = s->variant * 3;
         u16 bank = index + 9;

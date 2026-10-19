@@ -66,8 +66,10 @@ void sub_0818EE38(struct NidhoggrAnimatedSlot *owner)
             if (flags & 4) {
                 u32 index = state->index;
                 if (index == 0) {
-                    if (flags & 8) state->elapsed = savedDuration;
-                    else state->index = state->frameCount - 1;
+                    if (flags & 8)
+                        state->elapsed = savedDuration;
+                    else
+                        state->index = state->frameCount - 1;
                     ended = 1;
                 } else {
                     state->index = index - 1;
@@ -84,9 +86,11 @@ void sub_0818EE38(struct NidhoggrAnimatedSlot *owner)
                     if (endFlag) {
                         state->elapsed = duration;
                         state->index = frameCount - 1;
-                    } else state->index = 0;
+                    } else
+                        state->index = 0;
                     ended = 1;
-                } else ended = 0;
+                } else
+                    ended = 0;
             }
             command = state->commands + state->index;
             state->frameWeight = *command & 15;
@@ -95,9 +99,11 @@ void sub_0818EE38(struct NidhoggrAnimatedSlot *owner)
                 s32 speed = state->speed;
                 speed = (weight * speed) >> 6;
                 state->duration = speed;
-                if (!(u8)speed) state->duration = 1;
+                if (!(u8)speed)
+                    state->duration = 1;
             }
-        } else ended = 0;
+        } else
+            ended = 0;
     }
     if (ended) {
         owner->update = 0;

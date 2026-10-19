@@ -3,9 +3,12 @@
 // fuzzy: 90.8%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
 #define ChildGroup_WaitForInactiveMembers sub_080F34C8
-#define ChildGroup_BeginInactiveState sub_080F3ABC
+#define ChildGroup_BeginInactiveState     sub_080F3ABC
 
-struct ChildGroupMember { u8 active; u8 pad[0x193]; } __attribute__((packed));
+struct ChildGroupMember {
+    u8 active;
+    u8 pad[0x193];
+} __attribute__((packed));
 struct ChildGroup {
     u8 pad0[0x8D];
     u8 inactive : 1;
@@ -31,12 +34,14 @@ void sub_080F34C8(struct ChildGroup *p)
     struct ChildGroupMember *member;
     if (active < p->count) {
         member = p->members;
-        { u32 stride = sizeof(struct ChildGroupMember);
-        n = p->count;
-        do {
-            if (member->active) active++;
-            member = (struct ChildGroupMember *)((u8 *)member + stride);
-        } while (--n != 0);
+        {
+            u32 stride = sizeof(struct ChildGroupMember);
+            n = p->count;
+            do {
+                if (member->active)
+                    active++;
+                member = (struct ChildGroupMember *)((u8 *)member + stride);
+            } while (--n != 0);
         }
     }
     if (active == 0) {
@@ -46,7 +51,8 @@ void sub_080F34C8(struct ChildGroup *p)
         p->inactive = 1;
         p->callbackCC8 = sub_080F3ABC;
     } else if (active < p->count) {
-        if (++p->timer <= 7) p->callbackCE4 = sub_080F34C8;
+        if (++p->timer <= 7)
+            p->callbackCE4 = sub_080F34C8;
     }
 }
 #else

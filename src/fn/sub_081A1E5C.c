@@ -3,7 +3,7 @@
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define ActorReaction_UpdateCallbackGate sub_081A1E5C
-#define gActorCallbackGateFlags gUnk_02000560
+#define gActorCallbackGateFlags          gUnk_02000560
 extern u32 gUnk_02000560;
 struct ActorReaction {
     u8 unknown0[0x9C];
@@ -17,16 +17,17 @@ void sub_081A1E5C(u32 raw)
 {
     struct ActorReaction *actor = (struct ActorReaction *)raw;
     actor->callbackBlocked = 0;
-    { u32 mask = 4;
-    if (!(gActorCallbackGateFlags & mask)) {
-        u32 one = 1;
-        if (actor->flagsA1 & one) {
-            actor->flags = 0;
-            actor->callbackBlocked = one;
-        } else {
-            SceneActors_RunStateCallback(raw);
+    {
+        u32 mask = 4;
+        if (!(gActorCallbackGateFlags & mask)) {
+            u32 one = 1;
+            if (actor->flagsA1 & one) {
+                actor->flags = 0;
+                actor->callbackBlocked = one;
+            } else {
+                SceneActors_RunStateCallback(raw);
+            }
         }
-    }
     }
 }
 #else

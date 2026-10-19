@@ -10,11 +10,11 @@ u32 sub_08176E20(struct SceneHudState *p)
 {
     struct Player *player;
     if (gUnk_03005260[1] & 8) {
-        player=p->actionOwner;
-        if (player && player->kind==1 && player->actionMode!=6 && !(player->statusFlags & 1)
-            && p->controlMode <= 2) {
-            u32 mask=0x201;
-            if (!((gUnk_030053F4 | gUnk_030053F0) & mask) && player->historyDirectionMode!=1)
+        player = p->actionOwner;
+        if (player && player->kind == 1 && player->actionMode != 6 && !(player->statusFlags & 1) &&
+            p->controlMode <= 2) {
+            u32 mask = 0x201;
+            if (!((gUnk_030053F4 | gUnk_030053F0) & mask) && player->historyDirectionMode != 1)
                 return 1;
         }
     }

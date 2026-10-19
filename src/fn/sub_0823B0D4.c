@@ -65,12 +65,12 @@ u32 sub_0823B0D4(struct Obj *p, u32 arg)
     kind = *cell >> 4;
     h = (*cell & 15) << 8;
     switch (kind) {
-    case 1:
-        h -= *(u8 *)&pos->z;
-        break;
-    case 2:
-        h -= *(u8 *)&pos->x;
-        break;
+        case 1:
+            h -= *(u8 *)&pos->z;
+            break;
+        case 2:
+            h -= *(u8 *)&pos->x;
+            break;
     }
     p->pos.h = h;
     t = 0;

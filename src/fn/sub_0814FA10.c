@@ -4,7 +4,7 @@
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
 #define Player_TurnTowardTargetFacing sub_0814FA10
-#define Player_ResetTriggerAnimation PlayerCue_EnterStandUpdate
+#define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
 #define Player_DispatchPendingTrigger PlayerCue_CompleteAction
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -20,8 +20,10 @@ void sub_0814FA10(struct Player *p)
         shifted -= 8;
         target -= shifted;
         delta = target & 7;
-        if (delta > 4) facing += 7;
-        else facing += 1;
+        if (delta > 4)
+            facing += 7;
+        else
+            facing += 1;
         p->facing = facing & 7;
         {
             u8 *bytes = (u8 *)p;
@@ -35,7 +37,8 @@ void sub_0814FA10(struct Player *p)
             }
         }
         p->tetherFrame = 0;
-    } else p->tetherFrame++;
+    } else
+        p->tetherFrame++;
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40, 1);
     if (p->facing == p->targetFacing) {
         PlayerCue_EnterStandUpdate(p);

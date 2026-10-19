@@ -10,10 +10,16 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
-    if (s->field2B1) { s->field2B1 = 0; return 1; }
+    if (s->field2B1) {
+        s->field2B1 = 0;
+        return 1;
+    }
     return 0;
 }
-static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask) { return s->flags2D4 & mask; }
+static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask)
+{
+    return s->flags2D4 & mask;
+}
 void sub_080A11F4(struct SceneActorRegistryResetView *s)
 {
     s32 delta;
@@ -28,7 +34,11 @@ void sub_080A11F4(struct SceneActorRegistryResetView *s)
         s->field2B5 = one;
         s->target = fn;
         s->field2C8 = zero;
-        { u32 *flags = &s->flags114; s32 mask = -2; *flags &= mask; }
+        {
+            u32 *flags = &s->flags114;
+            s32 mask = -2;
+            *flags &= mask;
+        }
         s->word104 = zero;
         s->direction += 0x80;
     }
@@ -39,12 +49,22 @@ void sub_080A11F4(struct SceneActorRegistryResetView *s)
     } else {
         u16 value = s->field2C2;
         height = &s->field2C2;
-        if (!value) *height = 0x40;
+        if (!value)
+            *height = 0x40;
     }
-    if (!s->drawableKind) Anim_SetDurationScale((u8 *)s->drawable + 0x48, *height);
-    else Anim_SetFrameDurationScale((u8 *)s->drawable + 0x20, *height);
-    { s32 y = s->position.y; s32 offset = -280; y += offset; delta = s->groundHeight2BE; delta -= y; }
-    if (delta < 0) delta = -delta;
+    if (!s->drawableKind)
+        Anim_SetDurationScale((u8 *)s->drawable + 0x48, *height);
+    else
+        Anim_SetFrameDurationScale((u8 *)s->drawable + 0x20, *height);
+    {
+        s32 y = s->position.y;
+        s32 offset = -280;
+        y += offset;
+        delta = s->groundHeight2BE;
+        delta -= y;
+    }
+    if (delta < 0)
+        delta = -delta;
     if (delta <= 16 && (s32)s->counter2AC > 80) {
         u32 one = 1;
         u32 zero = 0;
@@ -54,7 +74,9 @@ void sub_080A11F4(struct SceneActorRegistryResetView *s)
         s->behavior2AA = one;
         s->counter2AC = zero;
         s->field2B1 = one;
-    } else { ++s->counter2AC; }
+    } else {
+        ++s->counter2AC;
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080A11F4);

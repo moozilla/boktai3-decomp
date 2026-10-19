@@ -8,7 +8,10 @@ s32 Callback_InvokeActor(void *, void *);
 void SceneActor_WaitForCategoryAttachment(void);
 static inline u8 TakeEntry(u8 *flag)
 {
-    if (*flag) { *flag = 0; return 1; }
+    if (*flag) {
+        *flag = 0;
+        return 1;
+    }
     return 0;
 }
 void sub_080E6A34(struct SceneActorRegistryResetView *actor)

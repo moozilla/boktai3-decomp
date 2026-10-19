@@ -3,7 +3,7 @@
 // fuzzy: 97.6%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define SceneHud_BeginWidgetMotion sub_08165E78
-#define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
+#define SceneHud_SetWidgetPalette  PauseMenu_SetSpritePalette
 #define gSineTable                 gUnk_086149C4
 #include "global.h"
 #include "scene_hud_display.h"

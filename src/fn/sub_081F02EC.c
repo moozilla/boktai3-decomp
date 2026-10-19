@@ -37,12 +37,10 @@ void sub_081F02EC(void *event, struct Slot7Action *action, struct Slot7Actor *ac
         duration = Div(duration * 10, 6);
         if ((s32)duration <= 2)
             duration = (u16)actor->baseDuration;
-        else if ((s32)duration <= 5)
-            {
+        else if ((s32)duration <= 5) {
             duration = (u16)actor->baseDuration;
             duration += (s16)duration >> 2;
-        }
-        else
+        } else
             duration = (u16)actor->baseDuration + (actor->baseDuration >> 1);
         actor->duration = duration;
         action->cooldown = 30;

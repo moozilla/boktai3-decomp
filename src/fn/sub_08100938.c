@@ -2,8 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 89.5%
 // foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
-#define SpriteSlots_UpdateActive sub_08100938
-#define SpriteSlot_CheckScene FloorSwitch_UpdateRegionVisibility
+#define SpriteSlots_UpdateActive   sub_08100938
+#define SpriteSlot_CheckScene      FloorSwitch_UpdateRegionVisibility
 #define gSpriteSlotUpdateCallbacks gUnk_086064AC
 #include "global.h"
 
@@ -22,7 +22,8 @@ u32 FloorSwitch_UpdateRegionVisibility(struct SpriteSlot *);
 s32 Callback_InvokeActor(void *, void *);
 static inline u8 SpriteSlots_IsActive(u32 *mask, s32 i)
 {
-    if (*mask & (1 << i)) return TRUE;
+    if (*mask & (1 << i))
+        return TRUE;
     return FALSE;
 }
 u32 sub_08100938(struct SpriteSlots *self)

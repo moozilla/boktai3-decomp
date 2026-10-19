@@ -3,9 +3,9 @@
 // fuzzy: 93.5%
 // foundry draft (worker best 92.9%); what differs is mostly register allocation and instruction order
 #define Armor_BeginPartTravelToPlayer sub_0818CC48
-#define gPlayerObject gUnk_02000710
-#define gRandomTableIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gPlayerObject                 gUnk_02000710
+#define gRandomTableIndex             gUnk_03005308
+#define gRandomTable                  gUnk_0203B400
 #include "global.h"
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
@@ -49,7 +49,8 @@ void sub_0818CC48(struct ArmorPart *p)
         p->rotationDelta--;
     p->rotation += p->rotationDelta;
     delta = p->rotationDelta;
-    if (delta < 0) delta = -delta;
+    if (delta < 0)
+        delta = -delta;
     if (delta > 9) {
         s32 dx, dz;
         u32 direction;
@@ -71,9 +72,11 @@ void sub_0818CC48(struct ArmorPart *p)
         direction = (random & 1) ? -1 : 1;
         p->direction = direction;
         dx = p->dx;
-        if (dx < 0) dx = -dx;
+        if (dx < 0)
+            dx = -dx;
         dz = p->dz;
-        if (dz < 0) dz = -dz;
+        if (dz < 0)
+            dz = -dz;
         if (dx < dz)
             p->callback = Armor_UpdatePartTravelXWave;
         else

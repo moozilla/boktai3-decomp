@@ -3,9 +3,11 @@
 // fuzzy: 96.5%
 // foundry draft (worker best 96.5%); what differs is mostly register allocation and instruction order
 #define ActorEffect_InitializeOffset sub_0817D67C
-#define gDirectionSineTable gUnk_086149C4
+#define gDirectionSineTable          gUnk_086149C4
 
-struct EffectPosition { s16 x, y, z, pad; };
+struct EffectPosition {
+    s16 x, y, z, pad;
+};
 struct EffectActor {
     u8 pad0[0x54];
     s16 x, y, z;
@@ -28,7 +30,8 @@ void Projectile_SetTypeAndElement(u8 *, u32, u32);
 s32 Projectile_CreateForOwner(u8 *, s16 *, u32);
 static inline s32 ScaleOffset(s32 value)
 {
-    if (value >= 0) return value >> 12;
+    if (value >= 0)
+        return value >> 12;
     return -(-value >> 12);
 }
 static inline void SetPosition(s16 *pos, s32 x, s32 y, s32 z)

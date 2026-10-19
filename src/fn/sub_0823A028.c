@@ -13,7 +13,8 @@ s32 sub_0823A028(struct FlashingActorEffect *p, s32 value)
     s32 result;
     if (p->flashTicks) {
         u16 ticks = --p->flashTicks;
-        if ((ticks >> 2) & 1) goto flash;
+        if ((ticks >> 2) & 1)
+            goto flash;
     }
     result = value;
     goto done;

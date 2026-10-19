@@ -3,7 +3,7 @@
 // fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define PursuingActors_ReleaseAll sub_0812C020
-#define gPursuingActorManager gUnk_02000184
+#define gPursuingActorManager     gUnk_02000184
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
@@ -11,7 +11,8 @@ void Sprite_Remove(void *);
 extern struct PursuingActorManager *gUnk_02000184;
 static inline u8 IsActive(struct PursuingActorManager *manager, s32 index)
 {
-    if (manager->activeSlots & (1 << index)) return 1;
+    if (manager->activeSlots & (1 << index))
+        return 1;
     return 0;
 }
 u32 sub_0812C020(struct PursuingActorManager *manager)
@@ -25,7 +26,8 @@ u32 sub_0812C020(struct PursuingActorManager *manager)
             Collider_Remove(&actor->secondary);
             Sprite_Remove(actor);
             for (j = 0; j < 2; j++) {
-                if (manager->actors[i].trail[j].active) Sprite_Remove(&actor->trail[j]);
+                if (manager->actors[i].trail[j].active)
+                    Sprite_Remove(&actor->trail[j]);
             }
         }
     }

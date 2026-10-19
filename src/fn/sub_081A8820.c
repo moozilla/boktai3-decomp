@@ -3,7 +3,7 @@
 // fuzzy: 98.0%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
 #define ActorSoundPhase_UpdateConditionalStop sub_081A8820
-#define ActorSoundPhase_StopSong Vanargand_StopActionSequence
+#define ActorSoundPhase_StopSong              Vanargand_StopActionSequence
 #include "global.h"
 struct ActorSoundPhase {
     u8 f0[0xAA];
@@ -31,7 +31,8 @@ static inline u8 chk(struct ActorSoundPhase *p)
 }
 static inline u8 SelectPhase(s16 variant)
 {
-    if (variant == 0) return 16;
+    if (variant == 0)
+        return 16;
     return 13;
 }
 void sub_081A8820(struct ActorSoundPhase *p)

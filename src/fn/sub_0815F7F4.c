@@ -3,7 +3,7 @@
 // fuzzy: 86.6%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define PlayerOrbitEffect_UpdateParticle sub_0815F7F4
-#define gOrbitSineTable gUnk_086149C4
+#define gOrbitSineTable                  gUnk_086149C4
 #include "global.h"
 #include "player.h"
 struct PlayerOrbitParticle {
@@ -42,14 +42,19 @@ void sub_0815F7F4(struct PlayerOrbitEffect *effect, struct PlayerOrbitParticle *
     deltaZ = TruncateOrbitOffset(valueZ);
     p->z = (u16)player->position.z + deltaZ;
     if (effect->frame >= p->expandDelay) {
-        if ((effect->frame & 7) == 0 && p->angularSpeed > 2) p->angularSpeed--;
+        if ((effect->frame & 7) == 0 && p->angularSpeed > 2)
+            p->angularSpeed--;
         p->radius += 6;
         p->y += p->riseSpeed;
-    } else p->radius++;
-    if (p->animationPhase == 0) SpriteDrawable_SelectTileFrame(p, effect->resource, 4);
-    else if (p->animationPhase == 4) SpriteDrawable_SelectTileFrame(p, effect->resource, 5);
+    } else
+        p->radius++;
+    if (p->animationPhase == 0)
+        SpriteDrawable_SelectTileFrame(p, effect->resource, 4);
+    else if (p->animationPhase == 4)
+        SpriteDrawable_SelectTileFrame(p, effect->resource, 5);
     p->animationPhase++;
-    if (p->animationPhase > 7) p->animationPhase = 0;
+    if (p->animationPhase > 7)
+        p->animationPhase = 0;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0815F7F4);

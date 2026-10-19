@@ -3,10 +3,13 @@
 // fuzzy: 96.2%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define SelectionPanel_CommitSelection sub_0810E218
-#define gRandomIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gRandomIndex                   gUnk_03005308
+#define gRandomTable                   gUnk_0203B400
 #include "global.h"
-struct SelectionPanel { u8 unknown0[0xD24]; s8 column; };
+struct SelectionPanel {
+    u8 unknown0[0xD24];
+    s8 column;
+};
 struct SelectionContext {
     u8 unknown0[0x53];
     u8 mode;
@@ -16,7 +19,7 @@ struct SelectionContext {
 extern struct SelectionContext *gUnk_020004B4;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-s32 Mod(s32,s32);
+s32 Mod(s32, s32);
 s32 SelectionPanel_GetSelection(struct SelectionPanel *);
 void sub_0810E218(struct SelectionPanel *p)
 {

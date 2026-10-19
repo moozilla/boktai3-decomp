@@ -3,11 +3,13 @@
 // fuzzy: 99.1%
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define ActorController_UpdateAnimation sub_08184F04
-#define gActorStateCallbacks gUnk_0824EF10
+#define gActorStateCallbacks            gUnk_0824EF10
 #include "global.h"
 #include "engine.h"
 
-struct ActorAnimationStatus { u32 flags : 8; };
+struct ActorAnimationStatus {
+    u32 flags : 8;
+};
 struct ActorControllerAnimation {
     u32 unk0, unk4, flags;
 };

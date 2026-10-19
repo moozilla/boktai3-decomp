@@ -26,39 +26,48 @@ s32 sub_0817B5E4(struct TurningEffectActor *actor, s32 frame, s32 start, s32 per
     s32 elapsed = frame - start;
     s32 step = elapsed / period;
     s32 remainder;
-    if (elapsed < 0) return 0;
+    if (elapsed < 0)
+        return 0;
     remainder = sub_08249350(elapsed, period);
     switch (mode) {
-    case 0:
-        if (remainder != 0) return 0;
-        if (step == 4) return 1;
-        if (step > 4) return 0;
-        if (step == 0 || step == 3) actor->direction += 32;
-        else goto subtract;
-        break;
-    case 1:
-        {
+        case 0:
+            if (remainder != 0)
+                return 0;
+            if (step == 4)
+                return 1;
+            if (step > 4)
+                return 0;
+            if (step == 0 || step == 3)
+                actor->direction += 32;
+            else
+                goto subtract;
+            break;
+        case 1: {
             s32 quarter = period >> 2;
-            if (remainder != 0 && remainder != quarter) return 0;
+            if (remainder != 0 && remainder != quarter)
+                return 0;
         }
-        if (step == 4 && remainder == 0) return 1;
-        if (step > 4) return 0;
-        if (step == 0 || step == 3) actor->direction += 32;
-        else goto subtract;
-        break;
-    default:
-        goto animate;
+            if (step == 4 && remainder == 0)
+                return 1;
+            if (step > 4)
+                return 0;
+            if (step == 0 || step == 3)
+                actor->direction += 32;
+            else
+                goto subtract;
+            break;
+        default:
+            goto animate;
     }
     goto facing;
 subtract:
     actor->direction -= 32;
 facing:
     update_facing(actor);
-animate:
-    {
-        u32 animation = 1;
-        actor->animation = animation;
-    }
+animate: {
+    u32 animation = 1;
+    actor->animation = animation;
+}
     return 0;
 }
 #else

@@ -15,12 +15,12 @@ void sub_0810BB0C(void)
     if (p) {
         struct AreaEffectLinkState *q = p;
         switch (q->unavailable) {
-        case 0:
-            SessionMenu_Call(q);
-            break;
-        case 1:
-            Callback_InvokeActor(p, p->menuCallback);
-            break;
+            case 0:
+                SessionMenu_Call(q);
+                break;
+            case 1:
+                Callback_InvokeActor(p, p->menuCallback);
+                break;
         }
     }
 }

@@ -7,8 +7,15 @@ struct DisplaySequenceState {
     u8 flags, frameCount, frameWeight, duration;
     u16 index, unknownA, speed, elapsed;
 };
-struct Col { u8 pad[6]; u16 flags; };
-struct Spr { u32 flags; u8 pad[12]; u16 frame; };
+struct Col {
+    u8 pad[6];
+    u16 flags;
+};
+struct Spr {
+    u32 flags;
+    u8 pad[12];
+    u16 frame;
+};
 struct S {
     u8 p0[0x18];
     s32 timer;
@@ -106,7 +113,7 @@ u32 sub_08201D38(struct S *p)
                 u32 off2 = 0x19e;
                 DamageNumberDisplay_Show(c, *dp, 0, &p->dmgA, &p->dmgB, 1);
                 SceneHud_SetTimedState(p->w1ac, (s16)*hpp, p->w198, *(s16 *)((u8 *)p + off2),
-                             *((u8 *)p + off2 - 0x9b) == 4, p->w1a2);
+                                       *((u8 *)p + off2 - 0x9b) == 4, p->w1a2);
             }
             if ((s16)p->hp <= 0) {
                 p->dead = 1;

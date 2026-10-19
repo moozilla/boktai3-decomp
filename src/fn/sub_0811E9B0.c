@@ -26,7 +26,7 @@ s32 sub_08249240(void *, s32, s32 (*)(struct StatModifier *, s32));
 s32 sub_0811E9B0(struct ModifierStats *stats, s32 value)
 {
     struct StatModifier *modifier = stats->modifiers;
-    struct StatModifier (*array)[32] = &stats->modifiers;
+    struct StatModifier(*array)[32] = &stats->modifiers;
     s32 i = 0;
     if (i < stats->modifierCount) {
         do {

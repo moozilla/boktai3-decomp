@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 

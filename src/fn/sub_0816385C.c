@@ -25,29 +25,40 @@ void sub_0816385C(struct SpiralParticles *p, struct SpiralParticle *s)
     s32 delta, product, deltaZ;
     s->angle += s->angularSpeed;
     product = s->radius * gUnk_086149C4[(s->angle + 0x40) & 0xff];
-    if (product >= 0) delta = product >> 12;
-    else delta = -(-product >> 12);
+    if (product >= 0)
+        delta = product >> 12;
+    else
+        delta = -(-product >> 12);
     s->x += delta;
     product = s->radius * gUnk_086149C4[s->angle];
-    if (product >= 0) deltaZ = product >> 12;
-    else deltaZ = -(-product >> 12);
+    if (product >= 0)
+        deltaZ = product >> 12;
+    else
+        deltaZ = -(-product >> 12);
     s->z += deltaZ;
     if (p->frame >= s->accelerationFrame) {
-        if (!(p->frame & 7) && s->angularSpeed > 2) s->angularSpeed--;
+        if (!(p->frame & 7) && s->angularSpeed > 2)
+            s->angularSpeed--;
         s->radius += 6;
         s->y += s->rise;
-    } else s->radius++;
+    } else
+        s->radius++;
     switch (s->variant) {
-    case 0:
-        if (s->animationFrame == 0) SpriteDrawable_SelectTileFrame(s, p->resource, 2);
-        else if (s->animationFrame == 4) SpriteDrawable_SelectTileFrame(s, p->resource, 3);
-        break;
-    case 1:
-        if (s->animationFrame == 0) SpriteDrawable_SelectTileFrame(s, p->resource, 4);
-        else if (s->animationFrame == 4) SpriteDrawable_SelectTileFrame(s, p->resource, 5);
-        break;
+        case 0:
+            if (s->animationFrame == 0)
+                SpriteDrawable_SelectTileFrame(s, p->resource, 2);
+            else if (s->animationFrame == 4)
+                SpriteDrawable_SelectTileFrame(s, p->resource, 3);
+            break;
+        case 1:
+            if (s->animationFrame == 0)
+                SpriteDrawable_SelectTileFrame(s, p->resource, 4);
+            else if (s->animationFrame == 4)
+                SpriteDrawable_SelectTileFrame(s, p->resource, 5);
+            break;
     }
-    if (++s->animationFrame > 7) s->animationFrame = 0;
+    if (++s->animationFrame > 7)
+        s->animationFrame = 0;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0816385C);

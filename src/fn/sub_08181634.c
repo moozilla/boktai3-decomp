@@ -4,7 +4,10 @@
 // foundry draft (worker best 81.0%); what differs is mostly register allocation and instruction order
 #define ActorPalette_CopyBanks sub_08181634
 #include "global.h"
-struct PaletteActor { u8 pad0[0x48A]; u8 bank, secondaryBank; };
+struct PaletteActor {
+    u8 pad0[0x48A];
+    u8 bank, secondaryBank;
+};
 void Palette_CopyBank(void *, u32);
 void sub_08181634(struct PaletteActor *p, u8 *source, s32 bank, s32 secondary)
 {

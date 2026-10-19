@@ -4,9 +4,23 @@
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 #define EffectPool_InitSlot sub_081B7394
 #include "global.h"
-struct EffectPoolSprite { u8 pad0[7]; u8 mode; u8 pad8[8]; u16 scale; u8 pad12[0x2c-0x12]; };
-struct EffectPoolAnimation { u8 pad0[6]; u16 tile; u8 pad8[0x14]; };
-struct EffectPoolSlot { s32 active; struct EffectPoolSprite sprite; struct EffectPoolAnimation animation; };
+struct EffectPoolSprite {
+    u8 pad0[7];
+    u8 mode;
+    u8 pad8[8];
+    u16 scale;
+    u8 pad12[0x2c - 0x12];
+};
+struct EffectPoolAnimation {
+    u8 pad0[6];
+    u16 tile;
+    u8 pad8[0x14];
+};
+struct EffectPoolSlot {
+    s32 active;
+    struct EffectPoolSprite sprite;
+    struct EffectPoolAnimation animation;
+};
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);

@@ -3,7 +3,7 @@
 // fuzzy: 93.2%
 // foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
 #define SlotController_RequestReset sub_081FEADC
-#define gSlotController gUnk_020005EC
+#define gSlotController             gUnk_020005EC
 struct ControllerSlot {
     u8 callback[0xE0];
     s16 state;

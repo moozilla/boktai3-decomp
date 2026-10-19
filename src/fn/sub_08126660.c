@@ -15,7 +15,8 @@ struct SmallEffectPool {
 };
 static inline u8 SmallEffectPool_IsAllocated(volatile u32 *allocated, s32 one, s32 index)
 {
-    if (*allocated & (one << index)) return TRUE;
+    if (*allocated & (one << index))
+        return TRUE;
     return FALSE;
 }
 struct SmallEffectSlot *sub_08126660(struct SmallEffectPool *pool)

@@ -12,7 +12,9 @@ void sub_08164C0C(void)
         u16 *tiles = Hud_GetTilemapCell(0, 25, 0);
         s32 tile = 0xD000;
         int i = 4;
-        do { *tiles++ = tile; } while (--i >= 0);
+        do {
+            *tiles++ = tile;
+        } while (--i >= 0);
     }
 }
 #else
