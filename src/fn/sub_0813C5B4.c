@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // Cleanup: remove the angle register hint while retaining exact codegen.
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
 typedef struct Point {
@@ -48,14 +47,16 @@ void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
     if ((++s->ticks & 3) == 0) {
         Effect *e = &s->effects[s->next];
         Effect *draw = e;
-        register s32 angle asm("r12");
+        s32 angle;
         s32 radius;
         draw->flags &= ~1;
         e->kind = 4;
         SpriteDrawable_SelectTileFrame(draw, s->graphics, 4);
         angle = random_first() & 255;
         radius = (random_first() & 127) + 256;
+        do {
         e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+        } while (0);
         e->dy = scale(radius * gUnk_086149C4[angle]);
         draw->pos = *pos;
         draw->pos.x += (u16)e->dx;
@@ -64,7 +65,8 @@ void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
         e->ticks = 0;
         e->active = 1;
         s->active = 1;
-        if (++s->next > 3)
+        if ((++s->next) > 3) {
             s->next = 0;
+        }
     }
 }
