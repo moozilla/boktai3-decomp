@@ -15,9 +15,10 @@
 * `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8876 bytes, 4145 insns with its tails 08124240/08125138) is in progress in a NONMATCHING
-  draft. Structural differences (`tools/anchordiff.py -s`) went 2875 -> 231 with the changes below; what is
-  left is mostly allocation repeated across 16 inlined Seek loops.
+* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6%. Every
+  instruction matches. Only 19 differ, all of them stack-slot numbers of four spilled GCSE/PRE reaching
+  registers plus three reload choices that follow from them (see "PRE register numbering" below).
+  Structural differences went 2875 -> 0 with the changes below.
 
 ## Techniques found on 08123194 (apply to any big function)
 
@@ -60,3 +61,43 @@
   [r2, #0]`) is an inline `Delta(&delta, a, b)` writing `out->x = a->x - b->x`, not field assignments.
 * **A direction computed before an unrelated `if`** (`asrs r4, r0, #6; ands` ahead of the player check)
   is a variable declared and initialised at the top of the block, not the `switch` expression.
+
+### Second round on 08123194 (231 -> 19 differing instructions)
+
+* **Read the byte twice instead of caching it.** `shape = (*p >> 4) & 15; height = (*p & 15) << 8;`
+  produces ROM's `ldrb r1; lsrs r2, r1, #4; movs r0, #0xf; ands r0, r1`, with the `and` tied to the
+  constant. A `flags` local (any type) gives `ands r0, r1` with the output tied to flags. The two loads
+  are merged by CSE, but the RTL keeps the constant as the first `and` operand, so local-alloc/regmove
+  tie it differently. That one inline, used *everywhere* (CanEnter and all 16 loops), took the draft
+  from 231/1194 (structural/total) to 47/201. Inside loops the `& 15` is hoisted and survives; outside
+  loops combine folds it. So one inline explains both shapes, and no separate slope variant is needed.
+* **`x & 0xC3` on a u16 load ties the wrong way because C narrows it.** `*(u16 *)(p + 2) & 0xC3` is
+  shortened to an HImode `and` and the output takes the constant's register (`ldrh r1; movs r0, #0xc3;
+  ands r0, r1`). The ROM has `ldrh r0; movs r1, #0xc3; ands r0, r1`. A small accessor inline
+  `static inline u16 CellAttributes(s32 i) { return *(u16 *)(Properties(i) + 2); }` (its return value is
+  an SImode pseudo) or `*(u32 *)p >> 16 & 0xC3` both give the ROM form.
+* **A value set before a call that only one path needs gets spilled.** `result = 2; if (!Seek(...)) goto
+  stop;` kept `result` live across the inlined Seek loops, so it was spilled (frame +4, every
+  `movs r4, #k` became a store). The ROM sets it after the call: `u8 found = Seek(...); result = 2; if
+  (!found) ...`. Likewise `vx = s->vx; if (vx < 0) vx = -vx; vz = s->vz; ...` (abs before the next load).
+* **`bne far; b other` vs `beq far; b other` for a shared check.** The ROM jumps from the 0x800 path to the
+  shared `if (result < 0) goto stop;` (not to the deflect code after it), with the conditional branch
+  targeting the check. An explicit `if (found) goto check; goto stop;` with a `check:` label before
+  the test reproduces that. `if (found) break;` gets inverted.
+* **A trailing `return 0` placed after the shared exit** comes from
+  `} else if (!CanEnter(...)) { stop: s->state = 2; return 1; } return 0;`.
+
+### PRE register numbering (what is left on 08123194)
+
+GCSE's PRE creates one "reaching register" per partially redundant expression in `pre_delete`. It
+walks the expression hash table bucket by bucket, so the new pseudos are numbered in hash order. When
+several of them are spilled, reload gives stack slots in pseudo-number order (the frame grows up on
+Thumb), and the slot offsets come out permuted. For `(plus (reg R) (const_int k))` the bucket is
+`(13772 + R + k) % T`, and for `(plus fp (reg R))` it is `(14419 + R) % T`. T is the table size,
+`(insns at GCSE / 2) | 1` (see `gcse.c: hash_expr_1`, `alloc_expr_hash_table`). Dump the table and the
+`PRE: redundant insn ... reaching reg is N` lines with `agbcc -dG` (`build/w/gsum.py` in my session was a
+40-line wrapper). With our numbers, the ROM's slot order needs T <= ~2365 (we have 2593, i.e. ~450
+fewer insns at GCSE time) or a quite different pseudo numbering. About 180 QImode truncate+re-extend
+triples come from C narrowing `u8` arithmetic (`*p >> 4`, `*p & 15`) and are removed later by combine,
+so those are the likely place the original's RTL was smaller. I did not find C that removes them
+without changing the code. Variable placement and declaration order only move T by at most ±16.
