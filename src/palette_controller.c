@@ -712,10 +712,10 @@ void Palette_SetBrightnessFromScript(void)
         mode = 3;
 
         do {
-    setMode:
-        t->mode = mode;
-    waiting:
-        t->callback = callback;
+        setMode:
+            t->mode = mode;
+        waiting:
+            t->callback = callback;
         } while (0);
     }
 }

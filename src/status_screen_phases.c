@@ -115,12 +115,13 @@ void StatusScreen_WaitForReveal(struct StatusScreen *p)
     if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= p->times[0]) {
             do {
-            p->noise = StatusScreen_ClearScanlineNoise;
-            {
-                register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_WaitForClose;
-                p->state = state;
-                p->timer = 0;
-            }
+                p->noise = StatusScreen_ClearScanlineNoise;
+                {
+                    register void (*state)(struct StatusScreen *) asm("r1") =
+                        StatusScreen_WaitForClose;
+                    p->state = state;
+                    p->timer = 0;
+                }
             } while (0);
         }
         p->dirty |= 15;
