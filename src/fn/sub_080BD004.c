@@ -1,0 +1,145 @@
+// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_reaction.h"
+/* Sinks the actor into the ground after frame 6, then starts the hidden defeat. */
+#define SceneActorReaction_SinkThenDefeat sub_080BD004
+void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorEffects_AdvanceSteps(void *, u32);
+void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
+static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
+{
+    if (a->object == (void *)1)
+        return 1;
+    return 0;
+}
+static inline u8 ContextFlag(u8 *context)
+{
+    u32 mask = 0x10;
+    if (*(u32 *)(context + 0x6DC) & mask)
+        return 1;
+    return 0;
+}
+static inline void ClearRoute(struct SceneActorRegistryResetView *a,
+                              struct SceneActorRegistryControlGroup *group)
+{
+    struct SceneActorRegistryControl *route = &group->control;
+    u32 *flags = &a->flags2CC;
+    u32 mask = ~0x141C0;
+    *flags &= mask;
+    route->counter = 0;
+    *(u16 *)((u8 *)route + 0x14) = 0;
+    route->timer = 0;
+}
+static inline void Show(struct SceneActorRegistryResetView *a)
+{
+    if (!a->drawableKind) {
+        u32 *flags = a->drawable;
+        u32 mask = ~1;
+        *flags &= mask;
+    } else {
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->drawable + 0x20);
+        u32 mask = ~1;
+        tile->flags &= mask;
+    }
+}
+void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+{
+    struct SceneActorRegistryControlGroup *group = &actor->group;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        ClearRoute(actor, group);
+        if (!ContextFlag(actor->context)) {
+            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
+            sub_0807C72C(actor, 0, 1, actor->category);
+        }
+        {
+            u16 *destination = &actor->colliderA.flags;
+            u32 flags = *destination;
+            u32 mask = 4;
+            mask |= flags;
+            *destination = mask;
+        }
+        Show(actor);
+        {
+            register u32 state asm("r1") = 3;
+            u8 *field = &actor->state2A8;
+            u32 zero = 0;
+            *field = state;
+            {
+                register u32 phaseOffset asm("r3") = 0x2A9;
+                asm("" : : "r"(phaseOffset));
+                field = (u8 *)actor + phaseOffset;
+            }
+            *field = zero;
+            {
+                register u32 behaviorOffset asm("r1") = 0x2AA;
+                asm("" : : "r"(behaviorOffset));
+                field = (u8 *)actor + behaviorOffset;
+            }
+            *field = zero;
+            {
+                u32 *counter = &actor->counter2AC;
+                *counter = zero;
+            }
+            {
+                u32 readyOffset = 0x2B1;
+                u8 *ready;
+                ready = (u8 *)actor + readyOffset;
+                *ready = 1;
+            }
+            {
+                u32 byteZero = 0;
+                actor->fieldAA = zero;
+                actor->field2B3 = byteZero;
+            }
+            *(u16 *)((u8 *)actor + 0x178) = zero;
+            actor->field2B8 = zero;
+        }
+        {
+            u32 mask = 0x20000;
+            u32 *flags = &actor->flags2D0;
+            *flags |= mask;
+        }
+    }
+    if (frame > 6) {
+        actor->position.y -= (u32)(frame - 6) * 30;
+        if (!actor->drawableKind)
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->position;
+        else
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->position;
+        if (frame > 8) {
+            u32 zeroWord = 0;
+            u32 zeroByte = 0;
+            asm("" : "+r"(zeroWord));
+            asm("" : "+r"(zeroByte));
+            actor->health = zeroWord;
+            {
+                register u32 mask asm("r0") = 8;
+                u16 *flags = &actor->flags2D4;
+                *flags = mask | *flags;
+            }
+            {
+                u32 mask = 0x400;
+                u32 *flags = &actor->flags2CC;
+                *flags |= mask;
+            }
+            sub_0807C72C(actor, 0, 127, 0);
+            sub_0807C72C(actor, 1, 127, 0);
+            sub_0807C72C(actor, 3, 127, 0);
+            SceneActorEffects_AdvanceSteps(actor, 4);
+            {
+                void *control = SceneActorReaction_BeginHiddenDefeat;
+                u32 kind = 23;
+                actor->field2B2 = 1;
+                actor->field2B0 = zeroByte;
+                actor->field2B5 = kind;
+                actor->target = control;
+                actor->field2C8 = zeroWord;
+                {
+                    u32 *flags = &actor->flags114;
+                    u32 mask = ~1;
+                    *flags &= mask;
+                }
+                actor->word104 = zeroWord;
+            }
+        }
+    }
+}

@@ -804,8 +804,6 @@ void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag);
 
 INCLUDE_ASM("asm/nonmatching", PlayerAction_RefreshFlagState);
 
-INCLUDE_ASM("asm/nonmatching", sub_0813F702);
-
 void Player_RefreshEquipment(struct Player *p, s32 q)
 {
     Player_RefreshEquipmentWithOptions(p, q, -1);
