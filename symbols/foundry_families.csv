@@ -1452,3 +1452,4 @@ addr,function,name,family,note
 081B019C,sub_081B019C,ActorStatus_Deactivate,"ActorStatus","resets state hides the actor and clears its active bit"
 081B2550,sub_081B2550,SceneBurstActor_UpdateTimedBurst,"SceneBurstActor","emits periodic bursts and finishes after 90 ticks"
 081B5D8C,sub_081B5D8C,PairedSceneActor_UpdateHalves,"PairedSceneActor","updates each active half and dispatches its state callback"
+081B64D4,sub_081B64D4,PairedSceneActor_AreSelectedHalvesFinished,"PairedSceneActor","tests completion of selected active halves"
