@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 /* tentative: per-frame active state: counts down, re-arms the collider and restarts the animation */
