@@ -1395,3 +1395,4 @@ addr,function,name,family,note
 08242F7C,sub_08242F7C,Player_FindMaskedSlot,"Player selection","selects the first player slot in a mask or slot zero"
 082433C8,sub_082433C8,Player_ApplyGatedContact,"Player contact / ContactCollider","gates contact processing with collider response bits"
 0802BF30,sub_0802BF30,GridAttack_Update,"Grid attack actor","runs the grid attack update steps and cycles a frame timer"
+0813D754,sub_0813D754,SceneActor_SelectEffectDisplayMode,"SceneActor effect","selects an effect display mode with timed alternation"
