@@ -48,3 +48,6 @@ uses it.
   plain field accesses first, then assign `prevX = &self->prevX; …` just
   before the block that reuses them (sub_08120618 55% → 96%, sub_081203A8
   577 → 24 bytes).
+* **Dead zero, folding-resistant variant.** When `s16 zero = 0` folds away,
+  `zero = a >> 8;` with `a` a u8 is always 0 but is folded only late, so the
+  `movs rN,#0` survives (sub_08183E4C, passed as a call argument).
