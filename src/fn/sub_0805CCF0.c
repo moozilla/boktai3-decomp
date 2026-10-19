@@ -4,7 +4,7 @@ void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct Cont
 {
     u32 mask = 127;
     if (contact->reactionFlags & mask) {
-        struct ScenePanelSubjectView *subject = owner;
+        struct ScenePanelSubject *subject = owner;
         if (subject->contactCooldown == 0 && subject->state == 2) {
             s32 amount = contact->unknown3C - other->unknown3C;
             if (amount < 0)

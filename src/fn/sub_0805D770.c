@@ -1,5 +1,5 @@
 #include "scene_panel_subject_tail.h"
-void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *subject)
+void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubject *subject)
 {
     if (subject->requested) {
         if (subject->requestLevel <= 11)

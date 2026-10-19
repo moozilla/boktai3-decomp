@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
 void SceneInventory_BeginEquipmentRemoveMove(struct SceneInventoryActionView *panel)
 {
@@ -19,7 +18,7 @@ void SceneInventory_BeginEquipmentRemoveMove(struct SceneInventoryActionView *pa
     target = targets;
     SceneInput_GetGridPosition(target, 24);
     {
-        register u32 *frameOut asm("r6");
+        u32 *frameOut;
         u32 placeholder;
         u32 *attributeOut;
         enabled[1] = 0;
@@ -30,7 +29,7 @@ void SceneInventory_BeginEquipmentRemoveMove(struct SceneInventoryActionView *pa
         attributeOut[1] = savedAttribute;
         {
             struct SceneInputPosition *start = starts;
-            start[1].x = 0;
+            (*(&start))[1].x = 0;
             start[1].y = 0;
             start[1].z = 0;
         }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_effects.h"
 void ScenePanel_InitTimePalette(struct ScenePanel *input)
 {
@@ -28,7 +27,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
             u8 *resource;
             resource = ScriptProc_Start(0x92B3, (u16)*read++);
             {
-                u8 *base = (u8 *)panel + 0x220;
+                u8 *base = ((u8 *)(*(&panel))) + 0x220;
                 base += offset;
                 *(const u16 **)base = (u16 *)(resource + 0x14);
             }
@@ -41,8 +40,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
     panel->paletteBlendFrame = 0;
     colors = panel->paletteSources[panel->targetPalette];
     {
-        register u8 *base asm("r6") = (u8 *)panel;
-        asm("" : "+r"(base));
+        u8 *base = (u8 *)panel;
         destination = (u16 *)(base + 0x20);
     }
     source = colors;

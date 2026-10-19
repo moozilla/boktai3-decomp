@@ -94,6 +94,13 @@ struct PlayerAnimation {
     u32 flags;
 };
 
+struct PlayerVisualObject {
+    u8 unknown0[6];
+    u16 resource;
+    u8 unknown8[4];
+    u32 parameters;
+};
+
 struct Player {
     u8 unk0[0x18];
     s32 slot;                  /* 0x18: compared with local link player index */
@@ -121,15 +128,21 @@ struct Player {
     u8 unkB4[0xC];
     u8 movementSpeedScale;  /* 0xC0: mode-five speed scale, units of 1/64 */
     u8 secondarySpeedScale; /* 0xC1: paired with movementSpeedScale by 08145400 (tentative) */
-    u8 unkC2[0x12];
+    u8 unkC2[4];
+    u16 spriteResource; /* 0xC6 */
+    u8 unkC8[0xC];
     u32 actionVariantResource; /* 0xD4: forwarded to variant display */
     u8 unkD8[0x14];
     struct PlayerAnimation secondaryAnimation; /* 0xEC: alternate keyframe channel */
-    u8 unkF8[0x54];
+    u8 unkF8[0x14];
+    u16 alternatePosition[3]; /* 0x10C */
+    u8 unk112[0x3A];
     u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
     u8 unk150[0x18];
     struct SceneVec colliderPosition; /* 0x168 */
-    u8 unk170[0x60];
+    u8 unk170[8];
+    struct PlayerVisualObject *visualObject; /* 0x178 */
+    u8 unk17C[0x54];
     u8 auxiliarySprite[0x40]; /* 0x1D0: removed by player destructor */
     u8 unk210[0x20];
     struct PlayerCollider collider; /* 0x230: embedded collider, extent bounded by directionFrame */
@@ -157,12 +170,17 @@ struct Player {
     u8 thresholdMode; /* 0x33C: values 6 through 11 qualify for the scene threshold */
     u8 actionEnabled; /* 0x33D: zero bypasses action mode filtering */
     u8 actionSelectionStamp,
-        actionModeValue; /* 0x33E: cached selection and mode value (tentative) */
-    u8 unk340[4];
+        actionModeValue;     /* 0x33E: cached selection and mode value (tentative) */
+    u8 actionRequestBlocked; /* 0x340 */
+    u8 unk341[3];
     const struct PlayerActionConfig *actionConfig; /* 0x344 */
     const u16 *inputKeys;     /* 0x348: directional key bits consumed by Player_GetInputDirection */
-    s16 directionHistory[10]; /* 0x34C: recent direction samples, -1 means absent */
-    u8 unk360[0x40];
+    u16 directionHistory[10]; /* 0x34C: signed samples; 0xFFFF means absent (read through s16) */
+    u8 visualParameters[0xA]; /* 0x360: animation parameter block */
+    u16 visualParameterA, visualParameterB; /* 0x36A */
+    u8 unk36E[0xC];
+    u16 visualParameterC; /* 0x37A */
+    u8 unk37C[0x24];
     u16 animationIndex; /* 0x3A0: selected base keyframe index */
     u8 heading, side;   /* 0x3A2: folded direction and side */
     u8 facing;          /* (guess) direction index */
@@ -242,8 +260,8 @@ struct Player {
     u8 movementRequestAnimated; /* 0x4F2: inverse of immediate movement flag */
     u8 movementAnimationState;  /* 0x4F3: negative byte resets animation (tentative) */
     u8 facingChangeEffects;     /* 0x4F4: bits zero/one enable/select facing cue */
-    u8 unk4F5;
-    u8 movementSpeedReduction; /* 0x4F6 */
+    u8 savedEffectTick;         /* 0x4F5 */
+    u8 movementSpeedReduction;  /* 0x4F6 */
     u8 unk4F7[0x29];
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
@@ -276,14 +294,22 @@ struct Player {
     u8 unk59F[4];
     u8 pendingAnimationTrigger; /* 0x5A3: consumed by 0814F90C */
     u32 cueParameter;           /* 0x5A4: forwarded cue parameter, tentative */
-    u8 unk5A8[0x11];
+    u8 unk5A8[0x10];
+    u8 effectGroup; /* 0x5B8: scene effect group context */
     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
-    u8 unk5BC[0x13C];
+    u8 unk5BC[0x134];
+    u16 effectPosition[3]; /* 0x6F0 */
+    u8 unk6F6[2];
     u16 resetValue6F8, resetValue6FA, resetValue6FC;
     u8 unk6FE[2];
     u8 shadow[0x40];  /* 0x700: actor shadow state */
     u8 resetState740; /* 0x740: set to one by 0813B080 */
-    u8 unk741[0xA80 - 0x741];
+    u8 unk741[7];
+    u8 visualEffects748[0x30], visualEffects778[0x28];
+    u8 visualEffects7A0[0x30], visualEffects7D0[0x2C];
+    u8 directionalEffect[0x68];      /* 0x7FC */
+    void *directionalEffectCallback; /* 0x864 */
+    u8 unk868[0x218];
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
     u8 unkA88[4];
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
@@ -291,10 +317,14 @@ struct Player {
     u8 unkA9E[0x10];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
     u16 menuStatusValues[7]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
-    u8 unkABE[0xA];
+    u8 unkABE[4];
+    u16 baseSpriteResource, savedSpriteResource; /* 0xAC2 */
+    u8 unkAC6[2];
     u8 baseActionVariant; /* 0xAC8: copied to actionVariant */
     u8 actionVariant;     /* 0xAC9: zero or saved action index plus one (tentative) */
-    u8 unkACA[8];
+    u16 savedVisualMode;  /* 0xACA */
+    s16 visualFlashTimer; /* 0xACC */
+    u8 unkACE[4];
     u16 movementRequestParameter, movementRequestScale;  /* 0xAD2: tentative */
     u16 actionEighteenParameter, actionEighteenDuration; /* 0xAD6: tentative */
     u16 actionRequestHold, actionRequestTimer;           /* 0xADA */
@@ -307,7 +337,8 @@ struct Player {
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;
     u16 kindTwoAttachmentCounter; /* 0xB0A */
-    u8 unkB0C[0x34];
+    u8 unkB0C[0x30];
+    s32 eventProcedure;                                   /* 0xB3C */
     void *actionRequestEffect;                            /* 0xB40 */
     struct PlayerStatModifierContext statModifierContext; /* 0xB44: callback context */
     void *actionDisplay;           /* 0xC84: receives descriptor display selection */
