@@ -1480,3 +1480,4 @@ addr,function,name,family,note
 081BD23C,sub_081BD23C,StatGauge_UpdateClosing,"StatGaugePreview / DarkLoan","animates delayed screen transition and exits the preview"
 081BD708,sub_081BD708,DarkLoan_InitializeFromScript,"Dark loan 2 / ScriptPanel (tentative)","reads script options and initializes the loan display"
 081BE7FC,sub_081BE7FC,Storage_BeginItemSpecialMove,"StoragePanel","starts selected storage item's move to special slot"
+081BE8B0,sub_081BE8B0,Storage_BeginEquipmentSpecialMove,"StoragePanel","starts selected storage equipment's move to special slot"
