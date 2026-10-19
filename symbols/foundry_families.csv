@@ -1421,3 +1421,4 @@ addr,function,name,family,note
 081A3DA8,sub_081A3DA8,Hresvelgr_InitHomingShotCollider,"Hresvelgr homing shots","initializes the homing shot collider and attack properties"
 081A4984,sub_081A4984,Hresvelgr_InitializeProjectile,"HresvelgrProjectile","initializes a pooled projectile and optional shadow"
 081A4FE8,sub_081A4FE8,Hresvelgr_UpdateFallingMotion,"HresvelgrMotion","integrates falling velocity and enters state two on ground contact"
+081A522C,sub_081A522C,Hresvelgr_InitializeFallingActor,"HresvelgrMotion","loads falling actor graphics and initializes collider velocity and shadow"
