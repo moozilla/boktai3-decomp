@@ -352,7 +352,7 @@ def white_in(nxt, tmp, src, at, hold=1.0, fade=2.0, lead=1.6):
        "-ss", f"{ms - lead:.3f}", "-i", music, "-map", "0:v",
        "-vf", f"fps={FPS},format=yuv420p,fade=in:st={hold}:d={fade}:color=white",
        "-filter_complex", f"[1:a]aresample=48000,afade=t=out:st={hold + 0.8:.2f}:d={d - hold - 0.8:.2f},apad[g];"
-                         f"[2:a]aresample=48000,volume=0.55,afade=t=in:d={lead},adelay={int((d - lead) * 1000)}:all=1,apad[m];"
+                         f"[2:a]aresample=48000,volume=0.85,afade=t=in:d={lead},adelay={int((d - lead) * 1000)}:all=1,apad[m];"
                          f"[g][m]amix=inputs=2:normalize=0:duration=first[a]",
        "-map", "[a]", "-t", f"{d}", "-c:v", "libx264", "-crf", "16", "-c:a", "aac", "-ac", "2", o)
     return o
@@ -444,37 +444,80 @@ def live_track(tmp, meta, total):
     return o
 
 
-def part2(tmp, chapters, t0):
-    pages = os.path.join(REC, "studio_pages.mp4")
-    live = os.path.join(REC, "studio_live.mp4")
-    cards = os.path.join(REC, "studio_cards.mp4")
-    meta = json.load(open(os.path.join(REC, "studio_live.json")))
-    dl = duration(live)
-    game = live_track(tmp, meta, dl)
-    import tour_stops
-    x, y, w, h = meta.get("game_box") or tour_stops.GAME_BOX
-    live2 = os.path.join(tmp, "studio_live_game.mp4")
-    sh("ffmpeg", "-v", "error", "-y", "-i", live, "-i", game, "-filter_complex",
+def centaur_track(tmp, meta, total):
+    """The game's side of the Centaur stop: live_tour.lua's frames (saved at
+    the GBA's rate, in real time) from when the Studio linked, lined up with
+    the Studio's recording, every second frame (30 fps)."""
+    d = os.path.join(V3, "livetour")
+    fs = sorted(f for f in os.listdir(d) if f.startswith("g_") and f.endswith(".png"))
+    start = meta.get("game_start", 0.0)
+    seq = [(os.path.join(d, fs[0]), max(0.04, start))]
+    t = start
+    for f in fs[::2]:
+        if t >= total:
+            break
+        seq.append((os.path.join(d, f), 2 / 59.7275))
+        t += 2 / 59.7275
+    if t < total:
+        seq.append((seq[-1][0], total - t))
+    lst = os.path.join(tmp, "centaur.txt")
+    with open(lst, "w") as f:
+        for p, dd in seq:
+            f.write(f"file '{p}'\nduration {dd:.4f}\n")
+        f.write(f"file '{seq[-1][0]}'\n")
+    o = os.path.join(tmp, "centaur_game.mp4")
+    sh("ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst,
+       "-vf", f"scale=480:320:flags=neighbor,fps={FPS},format=yuv420p", "-c:v", "libx264", "-crf", "14", o)
+    return o
+
+
+def beside(tmp, studio, game, box, name):
+    """The Studio's recording with the game laid into the box its page leaves for it."""
+    x, y, w, h = box
+    o = os.path.join(tmp, name)
+    sh("ffmpeg", "-v", "error", "-y", "-i", studio, "-i", game, "-filter_complex",
        f"[1:v]pad={w + 8}:{h + 8}:4:4:color=0x3a352e[g];[0:v][g]overlay={x - 4}:{y - 4}:shortest=0,fps={FPS},format=yuv420p",
-       "-t", f"{dl:.3f}", "-c:v", "libx264", "-crf", "16", "-preset", "fast", live2)
-    vids = []
-    for p in (pages, live2, cards):
+       "-t", f"{duration(studio):.3f}", "-c:v", "libx264", "-crf", "16", "-preset", "fast", o)
+    return o
+
+
+def part2(tmp, chapters, t0):
+    """The Studio tour (its pages; Centaur and the live edit, each with the
+    running game beside the Studio), Claude's "how I made this video"
+    (making.py), and the closing cards, under a bed of song 57."""
+    import tour_stops
+    pages = os.path.join(REC, "studio_pages.mp4")
+    cards = os.path.join(REC, "studio_cards.mp4")
+    making = os.path.join(REC, "making.mp4")
+    cen = os.path.join(REC, "studio_centaur.mp4")
+    cmeta = json.load(open(os.path.join(REC, "studio_centaur.json")))
+    cen2 = beside(tmp, cen, centaur_track(tmp, cmeta, duration(cen)), cmeta.get("game_box") or tour_stops.GAME_BOX,
+                  "studio_centaur_game.mp4")
+    live = os.path.join(REC, "studio_live.mp4")
+    meta = json.load(open(os.path.join(REC, "studio_live.json")))
+    live2 = beside(tmp, live, live_track(tmp, meta, duration(live)), meta.get("game_box") or tour_stops.GAME_BOX,
+                   "studio_live_game.mp4")
+    parts = [(pages, "How it was done: the Studio"), (cen2, "Centaur: the Studio, linked to a running game"),
+             (live2, "Live edit: the Studio changes the running game"), (making, "How Claude made this video"),
+             (cards, "The tools, and where to find them")]
+    vids, t = [], t0
+    for p, title in parts:
         o = os.path.join(tmp, os.path.basename(p).replace(".mp4", "_n.mp4"))
         sh("ffmpeg", "-v", "error", "-y", "-i", p, "-vf", f"scale=1920:1080,fps={FPS},format=yuv420p", "-an",
            "-c:v", "libx264", "-crf", "16", "-preset", "fast", o)
         vids.append(o)
+        chapters.append((t, title))
+        t += duration(o)
     v = os.path.join(tmp, "part2_v.mp4")
     concat(vids, v, audio=False)
     dv = duration(v)
     music = os.path.join(REC, "music.mp4")
     ms = scene_start(music)
+    assert duration(music) - ms - 1 > dv, "rec/music.mp4 is shorter than part 2: record a longer bed"
     o = os.path.join(tmp, "part2.mp4")
     sh("ffmpeg", "-v", "error", "-y", "-i", v, "-ss", f"{ms + 1:.3f}", "-i", music, "-map", "0:v", "-map", "1:a",
-       "-af", f"aresample=48000,volume=0.55,afade=t=in:d=0.05,afade=t=out:st={dv - 3:.3f}:d=3,apad", "-t", f"{dv:.3f}",
+       "-af", f"aresample=48000,volume=0.85,afade=t=in:d=0.05,afade=t=out:st={dv - 3:.3f}:d=3,apad", "-t", f"{dv:.3f}",
        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
-    dp = duration(pages)
-    chapters += [(t0, "How it was done: the Studio"), (t0 + dp, "Live edit: the Studio changes the running game"),
-                 (t0 + dp + dl, "The tools, and where to find them")]
     return o
 
 
@@ -494,14 +537,12 @@ def main():
             if name == "part2":
                 if a.part == "1":
                     continue
-                c = part2(tmp, chapters, t)
                 if PART1[k - 1][3].get("white_out"):         # from the last scene's white into part 2
-                    w = white_in(c, tmp, os.path.join(REC, f"{PART1[k - 1][0]}.mp4"), white_from)
+                    w = white_in(os.path.join(REC, "studio_pages.mp4"), tmp, os.path.join(REC, f"{PART1[k - 1][0]}.mp4"),
+                                 white_from)
                     clips.append(w)
                     t += duration(w)
-                    chapters[-3] = (chapters[-3][0] + duration(w), chapters[-3][1])
-                    chapters[-2] = (chapters[-2][0] + duration(w), chapters[-2][1])
-                    chapters[-1] = (chapters[-1][0] + duration(w), chapters[-1][1])
+                c = part2(tmp, chapters, t)
                 clips.append(c)
                 t += duration(c)
                 continue
