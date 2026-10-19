@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.8%
 // foundry draft (worker best 88.8%); what differs is mostly register allocation and instruction order
-#define SceneSelection_WaitForSlotTransition sub_0810AACC
 struct SceneSelection {
     u8 pad0[0x1a];
     u16 slotCount;
@@ -33,7 +32,7 @@ static inline u8 IsTransitionSlot(u32 value)
         return 1;
     return 0;
 }
-s32 sub_0810AACC(struct SceneSelection *p)
+s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
 {
     s32 count, i, length;
     gUnk_03005250 = 1;
@@ -74,5 +73,5 @@ s32 sub_0810AACC(struct SceneSelection *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810AACC);
+INCLUDE_ASM("asm/nonmatching", SceneSelection_WaitForSlotTransition);
 #endif

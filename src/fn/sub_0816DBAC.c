@@ -3,7 +3,7 @@
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, s32);
 s32 SceneHud_FindCategoryAction(u32, u32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void InventoryGrid_BeginNumberPhase(void);
@@ -23,7 +23,8 @@ void SceneHud_BeginSelectedActionTransfer(struct SceneHudState *s)
     to.x = 16;
     to.y = 48;
     to.z = 0;
-    keyframe = sub_0822D604(SceneHud_FindCategoryAction(s->actionCategory, *selection));
+    keyframe =
+        Selection_GetDisplayFrame(SceneHud_FindCategoryAction(s->actionCategory, *selection));
     later = *selection + 10;
     SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
                              16);

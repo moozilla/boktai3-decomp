@@ -1,7 +1,7 @@
 #include "scene_arc.h"
 struct SceneGroundManager *ResourceRegistry_GetResource(u32);
 struct SceneGroundManager *GroundEffect_CreateManager(u32, u32);
-void sub_08217DE0(void *, const void *, u32);
+void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void GroundEffect_IgnoreUpdate(struct SceneGroundEffect *);
 void GroundEffect_UpdateProjection(struct SceneGroundEffect *);
@@ -26,7 +26,7 @@ s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct Scene
     effect->value4 = zero;
     effect->value6 = zero;
     drawable = &effect->flags;
-    sub_08217DE0(drawable, manager->resource, 0x210);
+    ParticleSprite_Initialize(drawable, manager->resource, 0x210);
     Effect_SetOrigin(drawable, -8, -8);
     {
         const u16 *resource = (const u16 *)manager->resource;

@@ -7,7 +7,7 @@ extern struct SceneHudState *gSceneHud;
 extern u16 gSceneHudMode;
 void sub_08169738(struct SceneHudState *);
 void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
-void sub_08167734(struct SceneHudState *);
+void PlayerPanel_RemoveEffects(struct SceneHudState *);
 void Hud_RemoveMenuGraphics(struct SceneHudState *);
 void PauseMenu_RemoveEquipmentSlotAnimations(struct SceneHudState *);
 static inline u32 TestFlags(u32 *flags, u32 mask)
@@ -26,7 +26,7 @@ s32 SceneHud_DestroyOwner(struct SceneHudState *s)
     s32 count;
     sub_08169738(s);
     PauseMenu_RemoveHeaderAnimation(s);
-    sub_08167734(s);
+    PlayerPanel_RemoveEffects(s);
     Hud_RemoveMenuGraphics(s);
     PauseMenu_RemoveEquipmentSlotAnimations(s);
     if (OwnerWidgetsEnabled(0x80) && s->initializationFlag) {

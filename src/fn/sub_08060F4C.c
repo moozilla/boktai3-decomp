@@ -1,5 +1,5 @@
 #include "scene_inventory_actions.h"
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void SceneInventory_BeginItemCatalogMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -19,7 +19,7 @@ void SceneInventory_BeginItemCatalogMove(struct SceneInventoryActionView *panel)
     }
     entry = panel->catalog;
     entry += index;
-    frames[0] = sub_0822D604(*entry);
+    frames[0] = Selection_GetDisplayFrame(*entry);
     {
         u32 attribute = 0x373;
         savedAttribute = attribute;

@@ -13,7 +13,7 @@ struct SpriteBurst {
     struct SpriteBurstParticle particles[4];
 };
 void *AnimData_FindEntry(s32);
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, u32);
@@ -29,7 +29,7 @@ void SpriteBurst_InitParticles(struct SpriteBurst *p)
     active = &p->particles[0].active;
     particle = p->particles;
     for (i = 3; i >= 0; i--) {
-        sub_08217DE0(particle, p->resource, 1);
+        ParticleSprite_Initialize(particle, p->resource, 1);
         Effect_SetOrigin(particle, offset, offset);
         SpriteDrawable_SelectTileFrame(particle, p->resource, 0x11);
         Effect_SetPalette(particle, 1);

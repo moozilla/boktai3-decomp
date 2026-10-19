@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.5%
 // foundry draft (worker best 93.5%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_PlayNearestPointTravel sub_081A0B20
 typedef struct HresvelgrPosition {
     s16 x, y, z, pad;
 } HresvelgrPosition;
@@ -30,7 +29,7 @@ void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 int Hresvelgr_UpdateTravel(HresvelgrActor *);
 int sub_0821EA04(HresvelgrPosition *, HresvelgrPosition *, int);
-void sub_081A0B20(HresvelgrActor *p)
+void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *p)
 {
     HresvelgrPosition target, nearest;
     register HresvelgrActor *actor = p;
@@ -56,5 +55,5 @@ void sub_081A0B20(HresvelgrActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A0B20);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_PlayNearestPointTravel);
 #endif

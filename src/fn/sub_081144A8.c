@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-#define EffectPool_CheckCapacity   sub_081144A8
 #define EffectPool_MarkLinkedSlots SlotRegistry_ClaimMatchingSlot
 struct EffectPoolSlot {
     u8 pad0[0xc];
@@ -18,7 +17,7 @@ struct EffectPool {
 };
 void Memory_Clear(void *, u32);
 void SlotRegistry_ClaimMatchingSlot(struct EffectPool *, s32, u32, u8 *);
-s32 sub_081144A8(struct EffectPool *pool, s32 group, s32 required, s32 allowGroups)
+s32 EffectPool_CheckCapacity(struct EffectPool *pool, s32 group, s32 required, s32 allowGroups)
 {
     u8 visited[16];
     s32 groups = 0;
@@ -42,5 +41,5 @@ s32 sub_081144A8(struct EffectPool *pool, s32 group, s32 required, s32 allowGrou
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081144A8);
+INCLUDE_ASM("asm/nonmatching", EffectPool_CheckCapacity);
 #endif

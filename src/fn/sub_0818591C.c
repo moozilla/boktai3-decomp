@@ -24,7 +24,7 @@ struct S {
     s16 z;
 };
 s32 Armor_TryStartAction(struct S *, s32);
-void sub_0818E9B8(void *, s32);
+void SpriteColliderGroup_ActivateParts(void *, s32);
 void Armor_UpdateDelayedAction12(struct S *p)
 {
     u8 s = p->b3d;
@@ -37,7 +37,7 @@ void Armor_UpdateDelayedAction12(struct S *p)
             break;
         case 1:
             if (p->b40 == 0xff) {
-                sub_0818E9B8((u8 *)p + 0xB58, 0x64);
+                SpriteColliderGroup_ActivateParts((u8 *)p + 0xB58, 0x64);
                 if (p->b3e > 0x13) {
                     if (Armor_TryStartAction(p, 0xc))
                         p->b3d = 3;

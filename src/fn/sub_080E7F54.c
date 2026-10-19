@@ -5,15 +5,14 @@
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // foundry draft (worker best 91.2%); what differs is mostly register allocation and instruction order
-#define SceneActor_FindNearbyActivePlayer sub_080E7F54
-#define gPlayerSlots                      gUnk_02000580
-#define gPlayerSlotFlags                  gUnk_02000560
+#define gPlayerSlots     gUnk_02000580
+#define gPlayerSlotFlags gUnk_02000560
 extern u32 gUnk_02000560[4];
 static inline s32 Square(s32 x)
 {
     return x * x;
 }
-u8 sub_080E7F54(struct SceneActorRegistryResetView *p)
+u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
 {
     s32 i = 0;
     u32 excluded = 8;
@@ -47,5 +46,5 @@ u8 sub_080E7F54(struct SceneActorRegistryResetView *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E7F54);
+INCLUDE_ASM("asm/nonmatching", SceneActor_FindNearbyActivePlayer);
 #endif

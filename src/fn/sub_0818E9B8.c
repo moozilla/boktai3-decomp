@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.0%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
-#define SpriteColliderGroup_ActivateParts sub_0818E9B8
 struct SpriteColliderPartState {
     u8 flags, unknown1[4], active, counter;
     u8 unknown7[0x1DD];
@@ -12,7 +11,7 @@ struct SpriteColliderGroup {
     u8 unknown0[0x5c3];
     u8 count, activeCount;
 };
-void sub_0818E9B8(struct SpriteColliderGroup *p, s32 requested)
+void SpriteColliderGroup_ActivateParts(struct SpriteColliderGroup *p, s32 requested)
 {
     s32 i;
     struct SpriteColliderPartState *part;
@@ -33,5 +32,5 @@ void sub_0818E9B8(struct SpriteColliderGroup *p, s32 requested)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818E9B8);
+INCLUDE_ASM("asm/nonmatching", SpriteColliderGroup_ActivateParts);
 #endif

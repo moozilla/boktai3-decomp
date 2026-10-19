@@ -18,7 +18,7 @@ struct Obj {
     void (*callback)(struct Obj *);
 };
 s32 Div(s32, s32);
-void sub_080F2AAC(struct Obj *);
+void PhaseObject_TickEntryReset(struct Obj *);
 void Ivy_UpdatePositionTransition(struct Obj *p)
 {
     u32 age;
@@ -34,7 +34,7 @@ void Ivy_UpdatePositionTransition(struct Obj *p)
         p->x = p->endX;
         p->y = p->endY;
         p->z = p->endZ;
-        callback = sub_080F2AAC;
+        callback = PhaseObject_TickEntryReset;
         one = 1;
         e = p->elems;
         do {

@@ -1,5 +1,5 @@
 #include "scene_inventory_actions.h"
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void SceneInventory_BeginItemRemoveMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -9,7 +9,7 @@ void SceneInventory_BeginItemRemoveMove(struct SceneInventoryActionView *panel)
     struct SceneInputPosition *target;
     enabled[0] = 1;
     display->widgets[panel->savedSelection + 5].flags |= 1;
-    frames[0] = sub_0822D604(Inventory_GetItemId(panel->savedSelection));
+    frames[0] = Selection_GetDisplayFrame(Inventory_GetItemId(panel->savedSelection));
     {
         u32 attribute = 0x373;
         savedAttribute = attribute;

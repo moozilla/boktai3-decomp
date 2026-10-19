@@ -1,6 +1,5 @@
 #include "global.h"
 /* Golem_UpdateDeath_080D211C: Golem_UpdateDeath variant: entry 9, and resets the facing entry while +0x2B3 is set (provisional name) */
-#define Golem_UpdateDeath_080D211C sub_080D211C
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 static inline u32 orr(u32 k, u16 *a)
 {

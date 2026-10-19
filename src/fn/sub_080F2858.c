@@ -4,8 +4,6 @@
 // fuzzy: 96.9%
 // foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
 #define ColorPulse_AlignTargetHeading ColorPulse_AlignTargetHeading
-#define ColorPulse_BeginNearApproach  sub_080F2960
-#define ColorPulse_BeginFarApproach   sub_080F2AAC
 struct ColorPulsePart {
     u32 flags;
     u8 pad4[0x28];
@@ -41,8 +39,8 @@ struct ColorPulse {
     u8 padD5C[0x24];
     u32 ticks;
 };
-void sub_080F2960(struct ColorPulse *);
-void sub_080F2AAC(struct ColorPulse *);
+void ColorPulse_BeginNearApproach(struct ColorPulse *);
+void PhaseObject_TickEntryReset(struct ColorPulse *);
 void Sound_PlaySong(u32);
 void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
 {
@@ -75,9 +73,9 @@ void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
                 x = *dx * *dx;
                 z = *dz * *dz;
                 if (x + z < 1000000)
-                    *state = sub_080F2960;
+                    *state = ColorPulse_BeginNearApproach;
                 else {
-                    void (*callback)(struct ColorPulse *) = sub_080F2AAC;
+                    void (*callback)(struct ColorPulse *) = PhaseObject_TickEntryReset;
                     u16 one = 1;
                     struct ColorPulsePart *part = parts;
                     struct ColorPulsePart *end = part + 3;

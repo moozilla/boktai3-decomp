@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 85.0%
 // foundry draft (worker best 85.0%); what differs is mostly register allocation and instruction order
-#define SpatialIndex_RemoveEntry sub_0811B394
-#define gSpatialIndex            gUnk_02000200
+#define gSpatialIndex gUnk_02000200
 struct SpatialEntry {
     u32 flags, mask, category;
     u8 unknownC[3];
@@ -30,7 +29,7 @@ struct SpatialIndex {
 extern struct SpatialIndex *gSpatialIndex;
 s32 Div(s32, s32);
 void Heap_Free(void *);
-u8 sub_0811B394(struct SpatialEntry *entry)
+u8 SpatialIndex_RemoveEntry(struct SpatialEntry *entry)
 {
     struct SpatialIndex *index = gSpatialIndex;
     struct SpatialBucket *bucket;
@@ -96,5 +95,5 @@ u8 sub_0811B394(struct SpatialEntry *entry)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811B394);
+INCLUDE_ASM("asm/nonmatching", SpatialIndex_RemoveEntry);
 #endif

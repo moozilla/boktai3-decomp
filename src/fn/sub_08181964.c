@@ -1,6 +1,6 @@
 #include "global.h"
 void Armor_BindPaletteBanks(void);
-void sub_0818171C(void *);
+void ActorPalette_LoadScriptBanks(void *);
 void ActorPalette_RestoreSelectedBanks(void *);
 void Armor_InitPaletteController(u8 *s)
 {
@@ -13,7 +13,7 @@ void Armor_InitPaletteController(u8 *s)
         case 9:
         case 0xd:
         case 0xf:
-            sub_0818171C(s);
+            ActorPalette_LoadScriptBanks(s);
             break;
         default:
             break;

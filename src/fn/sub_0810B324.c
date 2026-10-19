@@ -17,7 +17,7 @@ s32 Registry1745_CheckSessionReady(struct SceneMenu *);
 void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
 void Registry1745_SetState(struct SceneMenu *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
-void sub_0810B3BC(void);
+void SceneMenu_UpdateRecords(void);
 s32 TextWindow_Create(s32, s32, s32, s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
@@ -39,6 +39,6 @@ s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
         return -1;
     }
     if (p->timer <= 59)
-        Registry1745_SetState(p, 0x16, sub_0810B3BC);
+        Registry1745_SetState(p, 0x16, SceneMenu_UpdateRecords);
     return 0;
 }

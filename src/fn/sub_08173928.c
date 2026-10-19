@@ -1,6 +1,6 @@
 #include "global.h"
 void SceneHud_RefreshEquipmentIcons(void *, int);
-void sub_08173C0C(void);
+void SceneHud_TickEquipmentToggle(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
@@ -14,7 +14,7 @@ void PauseInventory_BeginItemUseSelection(u8 *p, int flag)
     int z;
     u8 *a;
     SceneHud_RefreshEquipmentIcons(p, 0);
-    Hud_SetInteractionCallback(p, sub_08173C0C, 1);
+    Hud_SetInteractionCallback(p, SceneHud_TickEquipmentToggle, 1);
     sub_0816CDB8(p + 0x4384, 1, 0);
     z = 0;
     MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, z);

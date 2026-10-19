@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
-#define AnimatedMarker_BeginStateThree sub_081B7954
 struct AnimatedMarkerSprite {
     u8 pad0[6];
     u16 flags;
@@ -28,7 +27,7 @@ struct AnimatedMarker {
     u8 animation[0x10];
     void (*update)(struct AnimatedMarker *);
 };
-void sub_081B7A2C(struct AnimatedMarker *);
+void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *);
 static inline void AnimatedMarker_SetStateThree(struct AnimatedMarker *marker,
                                                 void (*update)(struct AnimatedMarker *), u32 offset)
 {
@@ -36,10 +35,10 @@ static inline void AnimatedMarker_SetStateThree(struct AnimatedMarker *marker,
     marker->phaseTimer = 0;
     *((u8 *)marker + (offset - 0x12)) = 3;
 }
-void sub_081B7954(struct AnimatedMarker *marker)
+void AnimatedMarker_BeginStateThree(struct AnimatedMarker *marker)
 {
-    AnimatedMarker_SetStateThree(marker, sub_081B7A2C, 0x114);
+    AnimatedMarker_SetStateThree(marker, GrowthHazard_RevealWhenCellVacant, 0x114);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B7954);
+INCLUDE_ASM("asm/nonmatching", AnimatedMarker_BeginStateThree);
 #endif

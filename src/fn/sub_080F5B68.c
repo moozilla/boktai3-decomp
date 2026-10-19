@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 86.6%); what differs is mostly register allocation and instruction order
-#define TargetMotion_AdvanceFollowSegment sub_080F5B68
 struct TargetMotion {
     u8 unknown0[6], rotation, unknown7[0x15];
     s16 x, y, z;
@@ -28,7 +27,7 @@ struct TargetMotionCorrection {
 };
 s32 Div(s32, s32);
 void sub_080F60B8(struct TargetMotion *);
-void sub_080F5B68(struct TargetMotion *p)
+void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
 {
     struct TargetMotionCorrection correction;
     correction.x = p->target[0] - p->a;
@@ -52,5 +51,5 @@ void sub_080F5B68(struct TargetMotion *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F5B68);
+INCLUDE_ASM("asm/nonmatching", TargetMotion_AdvanceFollowSegment);
 #endif

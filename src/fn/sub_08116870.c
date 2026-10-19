@@ -20,7 +20,7 @@ struct MotionActor {
 };
 s32 sub_0811CD70(struct MotionActorState *, u32);
 s32 Callback_InvokeActor(void *, void *);
-s32 sub_0811E8F0(struct MotionActorState *, s32);
+s32 ModifierStats_ApplyKind12(struct MotionActorState *, s32);
 u8 LinkParticipant_IsLocallySelected(struct MotionActor *);
 void Character_UpdateLoopingSound(struct MotionActorState *);
 s32 Div(s32, s32);
@@ -37,7 +37,7 @@ void MotionActor_UpdateMovementAudio(struct MotionActor *actor)
         changed = 1;
     }
     if (state->blocked == 0 && status == 0) {
-        state->movement -= sub_0811E8F0(state, 0x20);
+        state->movement -= ModifierStats_ApplyKind12(state, 0x20);
         if (!changed)
             state->requestedSong = 0x87;
     }

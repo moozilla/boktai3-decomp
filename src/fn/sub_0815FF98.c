@@ -5,12 +5,12 @@ struct P {
     u32 w;
 };
 
-void sub_0815FA78(struct P *);
+void PlayerOrbitEffect_UpdateParticles(struct P *);
 void Callback_InvokeActor(struct P *, u32);
 
 s32 PlayerBurst_Update(struct P *p)
 {
-    sub_0815FA78(p);
+    PlayerOrbitEffect_UpdateParticles(p);
     Callback_InvokeActor(p, p->w);
     return 0;
 }

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.9%
 // foundry draft (worker best 80.9%); what differs is mostly register allocation and instruction order
-#define DarkLoan_CreateHiddenDisplay sub_081BD854
 
 struct ScriptPanel {
     u8 pad0[0x8E4];
@@ -28,7 +27,8 @@ void ScriptPanel_InitializeProcedure(struct ScriptPanel *);
 void DarkLoan_BuildDisplay(struct ScriptPanel *, s32);
 void DarkLoan_HideDisplay(void *);
 
-struct ScriptPanel *sub_081BD854(u32 rate, s32 valueD, u32 displayMode, u32 callbackPc)
+struct ScriptPanel *DarkLoan_CreateHiddenDisplay(u32 rate, s32 valueD, u32 displayMode,
+                                                 u32 callbackPc)
 {
     u8 *panel;
     u16 *rateField;
@@ -49,5 +49,5 @@ struct ScriptPanel *sub_081BD854(u32 rate, s32 valueD, u32 displayMode, u32 call
     return (struct ScriptPanel *)panel;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081BD854);
+INCLUDE_ASM("asm/nonmatching", DarkLoan_CreateHiddenDisplay);
 #endif

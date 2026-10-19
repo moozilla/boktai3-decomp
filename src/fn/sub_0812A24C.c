@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.8%
 // foundry draft (worker best 93.9%); what differs is mostly register allocation and instruction order
-#define EffectPool_AllocateSlot sub_0812A24C
 
 struct EffectPoolSlot {
     u8 unknown[0xF3];
@@ -21,7 +20,7 @@ static inline u8 EffectPool_IsUsed(u32 *used, u32 mask)
         return TRUE;
     return FALSE;
 }
-struct EffectPoolSlot *sub_0812A24C(u8 *pool)
+struct EffectPoolSlot *EffectPoolA_AllocateSlot(u8 *pool)
 {
     s32 i = 0;
     u32 one = 1;
@@ -45,5 +44,5 @@ done:
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812A24C);
+INCLUDE_ASM("asm/nonmatching", EffectPoolA_AllocateSlot);
 #endif

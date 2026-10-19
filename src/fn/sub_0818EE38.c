@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 // foundry draft (worker best 85.1%); what differs is mostly register allocation and instruction order
-#define Nidhoggr_StepPoolAnimation sub_0818EE38
 
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
@@ -24,7 +23,7 @@ struct NidhoggrAnimatedSlot {
 };
 s32 Callback_InvokeActor(void *, void *);
 
-void sub_0818EE38(struct NidhoggrAnimatedSlot *owner)
+void Nidhoggr_StepPoolAnimation(struct NidhoggrAnimatedSlot *owner)
 {
     struct NidhoggrPoolSprite *sprite = &owner->sprite;
     struct NidhoggrPoolSequence *state = &owner->sequence;
@@ -114,5 +113,5 @@ void sub_0818EE38(struct NidhoggrAnimatedSlot *owner)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818EE38);
+INCLUDE_ASM("asm/nonmatching", Nidhoggr_StepPoolAnimation);
 #endif

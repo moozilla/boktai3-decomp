@@ -2,8 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
-#define RecordPanel_DrawTime   sub_0810D688
-#define RecordPanel_DrawNumber sub_0810D60C
 struct RecordPanel {
     u8 pad0[0x268];
     u32 spriteFlags;
@@ -14,9 +12,9 @@ s32 GameState_GetChallengeBestScore(u32);
 void Video_DrawBackgroundRowMarkers(u32, u32);
 void Registry3C9F_SetSelectedDisplayResource(struct RecordPanel *);
 s32 Div(s32, s32);
-void sub_0810D60C(s32, s32, s32, s32, s32);
+void PanelText_DrawDecimal(s32, s32, s32, s32, s32);
 u16 *Bg_GetWrappedTilemapEntry(u32, u32, u32);
-void sub_0810D688(struct RecordPanel *p)
+void RecordPanel_DrawTime(struct RecordPanel *p)
 {
     struct RecordPanel *panel = p;
     s32 seconds;
@@ -52,11 +50,11 @@ available:
     }
     {
         int zero = 0;
-        sub_0810D60C(seconds, 100, 2, 12, zero);
-        sub_0810D60C(fraction, 100, 6, 12, zero);
+        PanelText_DrawDecimal(seconds, 100, 2, 12, zero);
+        PanelText_DrawDecimal(fraction, 100, 6, 12, zero);
     }
     *Bg_GetWrappedTilemapEntry(3, 9, 12) = 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810D688);
+INCLUDE_ASM("asm/nonmatching", RecordPanel_DrawTime);
 #endif

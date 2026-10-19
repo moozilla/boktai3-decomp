@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_08184FE8(u8 *p, s32 q);
+void DirectionalActor_TryBeginState(u8 *p, s32 q);
 
 void ActorController_RequestIdleAction(u8 *p)
 {
-    sub_08184FE8(p, 0);
+    DirectionalActor_TryBeginState(p, 0);
 }

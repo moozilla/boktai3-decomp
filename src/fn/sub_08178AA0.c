@@ -4,10 +4,9 @@
 #ifdef NONMATCHING
 // fuzzy: 92.0%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
-#define SceneHud_InitializeOwner sub_08178AA0
-#define gSceneHud                gUnk_02000214
-#define gSceneHudOwnerSource     gUnk_020004B4
-#define gPartyActors             gUnk_02000580
+#define gSceneHud            gUnk_02000214
+#define gSceneHudOwnerSource gUnk_020004B4
+#define gPartyActors         gUnk_02000580
 struct SceneHudOwnerSource {
     u8 unknown0[0x18];
     s16 index;
@@ -25,7 +24,7 @@ static inline s32 OwnerIndex(void)
         return -1;
     return gSceneHudOwnerSource->index;
 }
-s32 sub_08178AA0(struct SceneHudState *s)
+s32 SceneHud_InitializeOwner(struct SceneHudState *s)
 {
     s32 index;
     u32 offset;
@@ -49,5 +48,5 @@ s32 sub_08178AA0(struct SceneHudState *s)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08178AA0);
+INCLUDE_ASM("asm/nonmatching", SceneHud_InitializeOwner);
 #endif

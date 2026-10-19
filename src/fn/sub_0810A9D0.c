@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
-#define gLinkSelectionDisplaySlots      gUnk_03005274
-#define LinkSelection_WaitForEmptySlots sub_0810A9D0
+#define gLinkSelectionDisplaySlots gUnk_03005274
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_SetMenuRequest(u32);
@@ -15,7 +14,7 @@ void ScriptPanel_OpenTextWindow(void);
 void Bg_ClearTilemap(s32);
 void ScriptNotifier_CallWithValue(struct AreaEffectLinkState *);
 void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
-void sub_0810AACC(void);
+void SceneSelection_WaitForSlotTransition(void);
 extern u16 gUnk_03005274[];
 static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 {
@@ -29,7 +28,7 @@ static inline u8 IsItemSlot(u32 value, u32 mask)
         return 1;
     return 0;
 }
-s32 sub_0810A9D0(struct AreaEffectLinkState *p)
+s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
 {
     u8 *extra = (u8 *)p + 0xe0;
     s32 i, count, length;
@@ -69,11 +68,11 @@ s32 sub_0810A9D0(struct AreaEffectLinkState *p)
                 q--;
             } while ((s32)q >= (s32)base);
         }
-        Registry1745_SetState(p, 15, sub_0810AACC);
+        Registry1745_SetState(p, 15, SceneSelection_WaitForSlotTransition);
     } else if (p->menuEvent == 1)
         p->requestedMode = 0x1023;
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810A9D0);
+INCLUDE_ASM("asm/nonmatching", LinkSelection_WaitForEmptySlots);
 #endif

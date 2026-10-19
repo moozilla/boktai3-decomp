@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-#define SceneEffect_InitializeRing sub_08198F3C
 
 struct RingVector {
     u32 x, y;
@@ -51,8 +50,8 @@ static inline u8 Ring_SetMode(struct SceneEffectRing *ring, u32 mode)
     }
 }
 
-void sub_08198F3C(struct RingOwner *owner, struct SceneEffectRing *ring, struct RingVector *pos,
-                  u32 mode)
+void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing *ring,
+                                struct RingVector *pos, u32 mode)
 {
     u8 flags;
     u32 animation = SceneEffect_LoadRingAnimation();
@@ -79,5 +78,5 @@ void sub_08198F3C(struct RingOwner *owner, struct SceneEffectRing *ring, struct 
     ring->destroy = destroy;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08198F3C);
+INCLUDE_ASM("asm/nonmatching", SceneEffect_InitializeRing);
 #endif

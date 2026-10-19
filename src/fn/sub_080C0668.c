@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // foundry draft (worker best 91.2%); what differs is mostly register allocation and instruction order
-#define SceneActorApproach_RunCategoryAction sub_080C0668
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F0];
     u16 timer;
@@ -53,7 +52,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
     }
     actor->word104 = zero;
 }
-void sub_080C0668(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorApproachActionContext *context = actor->context;
     if (TakeReady(actor)) {
@@ -77,5 +76,5 @@ void sub_080C0668(struct SceneActorRegistryResetView *actor)
         actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C0668);
+INCLUDE_ASM("asm/nonmatching", SceneActorApproach_RunCategoryAction);
 #endif

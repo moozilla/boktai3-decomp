@@ -4,12 +4,11 @@
 #ifdef NONMATCHING
 // fuzzy: 83.6%
 // foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
-#define SceneActor_IsFacingNearbyTarget sub_080B335C
 static inline u32 TestFlag(u16 *p, u32 mask)
 {
     return *p & mask;
 }
-s32 sub_080B335C(struct SceneActorRegistryResetView *p)
+s32 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryResetView *q = p->context;
     s32 difference, absolute;
@@ -32,5 +31,5 @@ s32 sub_080B335C(struct SceneActorRegistryResetView *p)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B335C);
+INCLUDE_ASM("asm/nonmatching", SceneActor_IsFacingNearbyTarget);
 #endif

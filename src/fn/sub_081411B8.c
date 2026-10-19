@@ -5,15 +5,13 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-#define Player_ApplyDirectionalForce sub_081411B8
-#define Player_GetForceDirection     sub_08140F40
-#define gForceMagnitude              gUnk_02000550
-#define gForceThreshold              gUnk_0200052C
-#define gForceAngle                  gUnk_0200053C
-#define gForceDirectionMode          gUnk_02000558
-#define gSineTable                   gUnk_086149C4
+#define gForceMagnitude     gUnk_02000550
+#define gForceThreshold     gUnk_0200052C
+#define gForceAngle         gUnk_0200053C
+#define gForceDirectionMode gUnk_02000558
+#define gSineTable          gUnk_086149C4
 extern u16 gUnk_02000558;
-s32 sub_08140F40(struct Player *);
+s32 Player_GetForceDirection(struct Player *);
 static inline u8 Player_IsActiveInSceneFive(struct Player *p)
 {
     u16 active = p->active;
@@ -32,7 +30,7 @@ static inline s32 Player_ScaleForce(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-void sub_081411B8(struct Player *p)
+void Player_ApplyDirectionalForce(struct Player *p)
 {
     s32 x, z, direction;
     if (p->tetherMode == 4)
@@ -59,5 +57,5 @@ void sub_081411B8(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081411B8);
+INCLUDE_ASM("asm/nonmatching", Player_ApplyDirectionalForce);
 #endif

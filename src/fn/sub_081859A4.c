@@ -19,13 +19,13 @@ struct S {
     s16 y;
     s16 z;
 };
-s32 sub_08184FE8(struct S *, s32);
+s32 DirectionalActor_TryBeginState(struct S *, s32);
 void ActorController_SetBehavior(struct S *, s32);
 void Armor_UpdateAction13Transition(struct S *p)
 {
     switch (p->b3d) {
         case 0:
-            if (sub_08184FE8(p, 0xd))
+            if (DirectionalActor_TryBeginState(p, 0xd))
                 p->b3d = 1;
             break;
         case 1:

@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
-#define Player_RecalculateDerivedStats sub_0813B4C8
 s32 Div(s32, s32);
-void sub_0813B4C8(struct Player *p)
+void Player_RecalculateDerivedStats(struct Player *p)
 {
     s32 i;
     u16 *stats;
@@ -54,5 +53,5 @@ void sub_0813B4C8(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813B4C8);
+INCLUDE_ASM("asm/nonmatching", Player_RecalculateDerivedStats);
 #endif

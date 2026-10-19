@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-#define Actor_InitLaunchVelocity sub_080DDD28
 
 s32 Div(s32, s32);
 
@@ -44,5 +43,5 @@ void Actor_InitLaunchVelocity(struct Actor *actor)
     actor->vel.z = Div(pdiff[2], 0x1c);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DDD28);
+INCLUDE_ASM("asm/nonmatching", Actor_InitLaunchVelocity);
 #endif

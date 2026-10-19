@@ -4,9 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // foundry draft (worker best 98.5%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_TiltRotation    sub_080F8B38
-#define SceneActorControl_RecoverRotation sub_080F8C40
-void sub_080F8C40(void);
+void SceneActorControl_RecoverRotation(void);
 static inline s32 FoldAngle(s32 a)
 {
     if (a > 128)
@@ -22,7 +20,7 @@ static inline s32 Magnitude(s32 a)
         result = -result;
     return result;
 }
-void sub_080F8B38(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     u8 *state = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;
@@ -37,7 +35,7 @@ void sub_080F8B38(struct SceneActorRegistryResetView *actor, s32 elapsed)
     magnitude = __builtin_abs(angle);
     if (magnitude > 48) {
         if (elapsed > 42)
-            RotationPhase_Change(actor, sub_080F8C40, 50);
+            RotationPhase_Change(actor, SceneActorControl_RecoverRotation, 50);
     } else {
         angle = FoldAngle(32 - state[0xED3]);
         if (angle < 0)
@@ -47,5 +45,5 @@ void sub_080F8B38(struct SceneActorRegistryResetView *actor, s32 elapsed)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F8B38);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_TiltRotation);
 #endif

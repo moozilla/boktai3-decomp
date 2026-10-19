@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
-#define SingletonSlot7_Update sub_081F1B14
 
 struct SingletonSlot7Actor {
     u8 pad0[0x90];
@@ -61,7 +60,7 @@ static inline u8 PlayerHasFlag(void)
     return 0;
 }
 
-s32 sub_081F1B14(void *arg)
+s32 SingletonSlot7_Update(void *arg)
 {
     struct SingletonSlot7Actor *p = arg;
     struct SingletonSlot7Actor *actor = arg;
@@ -94,5 +93,5 @@ s32 sub_081F1B14(void *arg)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F1B14);
+INCLUDE_ASM("asm/nonmatching", SingletonSlot7_Update);
 #endif

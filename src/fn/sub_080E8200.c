@@ -5,10 +5,9 @@
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
-#define SceneActor_AcquireCollisionTarget sub_080E8200
 extern u32 gUnk_030053F4;
 void *SceneActorContacts_FindObjectById(u16);
-u8 sub_080E7F54(struct SceneActorRegistryResetView *);
+u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *);
 u8 sub_080E8444(struct SceneActorRegistryResetView *);
 static inline u8 motionFlag(struct SceneActorRegistryResetView *actor)
 {
@@ -46,7 +45,7 @@ static inline void setTargetFlags(struct SceneActorRegistryResetView *actor)
         motion[15] = mask;
     }
 }
-s32 sub_080E8200(struct SceneActorRegistryResetView *actor)
+s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     u8 *motion;
@@ -60,7 +59,7 @@ s32 sub_080E8200(struct SceneActorRegistryResetView *actor)
         return 1;
     }
     if (collisionMode()) {
-        if (sub_080E7F54(actor))
+        if (SceneActor_FindNearbyActivePlayer(actor))
             goto yes;
         if (!sub_080E8444(actor))
             goto collision;
@@ -71,7 +70,7 @@ s32 sub_080E8200(struct SceneActorRegistryResetView *actor)
             d = -d;
         if (d > 0x200)
             goto zero;
-        if (!sub_080E7F54(actor))
+        if (!SceneActor_FindNearbyActivePlayer(actor))
             goto collision;
     }
 yes:
@@ -94,5 +93,5 @@ zero:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E8200);
+INCLUDE_ASM("asm/nonmatching", SceneActor_AcquireCollisionTarget);
 #endif

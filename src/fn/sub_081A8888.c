@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.4%
 // foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
-#define Vanargand_UpdateTimedAlternateTransition sub_081A8888
 /* Tentative: action state transition, with restart on flag 0x20000. */
 struct VanargandTransition {
     u8 pad0[0x9C];
@@ -33,7 +32,7 @@ static inline u32 Vanargand_TestFlags(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_081A8888(void *object)
+void Vanargand_UpdateTimedAlternateTransition(void *object)
 {
     struct VanargandTransition *p = object;
     if (Vanargand_ConsumePending(p)) {
@@ -68,5 +67,5 @@ void sub_081A8888(void *object)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A8888);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateTimedAlternateTransition);
 #endif

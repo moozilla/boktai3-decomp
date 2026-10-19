@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 84.6%
 // foundry draft (worker best 84.6%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_EmitRandomMotionBurst sub_081A0EA4
-#define gMotionRandomIndex              gUnk_03005308
-#define gMotionRandomTable              gUnk_0203B400
+#define gMotionRandomIndex gUnk_03005308
+#define gMotionRandomTable gUnk_0203B400
 typedef struct MotionDelta {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } MotionDelta;
@@ -51,7 +50,7 @@ static inline void emitBurst(u32 emitter)
         MotionEntry_CreateWithDelta(emitter, &delta, nextRandom() % 4, 60);
     }
 }
-void sub_081A0EA4(HresvelgrActor *p)
+void Hresvelgr_EmitRandomMotionBurst(HresvelgrActor *p)
 {
     if (p->changed) {
         p->changed = 0;
@@ -67,5 +66,5 @@ void sub_081A0EA4(HresvelgrActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A0EA4);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_EmitRandomMotionBurst);
 #endif

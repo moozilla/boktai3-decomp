@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.0%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
-#define Vanargand_UpdateTimedAnimationAttack sub_081AA650
 struct VanargandAnimation {
     u8 pad0[0x18];
     u16 flags;
@@ -33,7 +32,7 @@ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void Vanargand_SetPendingCue(void *, u16);
-void sub_081AA650(struct Vanargand *p)
+void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
 {
     u32 result;
     struct VanargandAnimation *animation = &p->animation;
@@ -90,5 +89,5 @@ void sub_081AA650(struct Vanargand *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AA650);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateTimedAnimationAttack);
 #endif

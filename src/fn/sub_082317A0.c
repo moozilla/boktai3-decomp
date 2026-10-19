@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* EffectPart_UpdateLoopAnimation: advances a sprite part's frame animation (tile, flips, frame timer) and wraps frame 5 back to 0 and counts down its lifetime (provisional name) */
-#define EffectPart_UpdateLoopAnimation sub_082317A0
 #include "homing_effect.h"
 
 struct Unk08231A0CManager {

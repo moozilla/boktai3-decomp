@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // foundry draft (worker best 90.9%); what differs is mostly register allocation and instruction order
-#define SceneActorTerrain_FindOpenNeighborDirection sub_080B713C
 
-s32 sub_080B713C(struct SceneActorTerrainView *actor, s32 angle)
+s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorTerrainView *actor, s32 angle)
 {
     s32 direction = ((angle + 0x10) & 0xff) >> 6;
     u8 mask = 3;
@@ -23,5 +22,5 @@ s32 sub_080B713C(struct SceneActorTerrainView *actor, s32 angle)
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B713C);
+INCLUDE_ASM("asm/nonmatching", SceneActorTerrain_FindOpenNeighborDirection);
 #endif

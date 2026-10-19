@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
-#define ActorPhase_OrbitParent sub_080F4B94
 struct PhaseParent {
     u8 unknown0[0xB84];
     s16 x;
@@ -34,7 +33,7 @@ s32 Div(s32, s32);
 void Sword_UpdateWaveAttack(void);
 void Sword_UpdateThrustAttack(void);
 void Sword_UpdateSpinningLungeAttack(void);
-void sub_080F4B94(struct PhaseActor *p)
+void ActorPhase_OrbitParent(struct PhaseActor *p)
 {
     struct PhaseParent *parent = p->parent;
     p->angle += p->angleStep;
@@ -64,5 +63,5 @@ void sub_080F4B94(struct PhaseActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F4B94);
+INCLUDE_ASM("asm/nonmatching", ActorPhase_OrbitParent);
 #endif

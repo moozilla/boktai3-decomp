@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_RecoverRotation sub_080F8C40
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
 void sub_080FBA38(struct SceneActorRegistryResetView *);
@@ -28,7 +27,7 @@ static inline s32 FoldRotation(s32 a)
         return a + 256;
     return a;
 }
-void sub_080F8C40(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     struct RotationControlState *state = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;
@@ -61,5 +60,5 @@ void sub_080F8C40(struct SceneActorRegistryResetView *actor, s32 elapsed)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F8C40);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_RecoverRotation);
 #endif

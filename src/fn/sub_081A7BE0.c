@@ -5,7 +5,7 @@ struct A {
     u8 m;
 };
 void ScenePanel_AdvancePairState(void *);
-void sub_081A7AD0(void *);
+void ScenePanel_AdvanceConditionalPairState(void *);
 
 void Vanargand_UpdateModeEffect(struct A *p)
 {
@@ -15,7 +15,7 @@ void Vanargand_UpdateModeEffect(struct A *p)
             break;
         case 2:
         case 3:
-            sub_081A7AD0(p);
+            ScenePanel_AdvanceConditionalPairState(p);
             break;
     }
 }
