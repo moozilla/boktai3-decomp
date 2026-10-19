@@ -1,6 +1,5 @@
 #include "global.h"
 /* Vorn_ParseField624_0808B320: same code as Vorn_ParseField624 at another address (ported by relatives.py; provisional name) */
-#define Vorn_ParseField624_0808B320 sub_0808B320
 #include "scene_actor_registry.h"
 
 struct VornData {
