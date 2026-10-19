@@ -67,7 +67,7 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
                     u32 to;
                     fromRB = k2 & from;
                     do {
-                    fromG = greenMask & from;
+                        fromG = greenMask & from;
                     } while (0);
                     to = *b;
                     {
@@ -461,6 +461,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
+    do {
     gUnk_02000468 = p;
     p->pending = 0;
     t->callback = 0;
@@ -471,35 +472,39 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     gUnk_030051C4 = 0;
     p->flags = Script_GetKeywordValue('f', 0);
     if (Script_SeekToKeyword('p')) {
-        register s32 i asm("r6") = 0;
+        s32 i = 0;
         u16 **out = p->colorSets[PALETTE_SET_SOURCE];
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
-            if (value != 0x30)
+                if (value != 0x30) {
                 *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-            else
+                } else {
                 *out = 0;
+                }
             out++;
             i++;
+            }
         }
-    }
     if (Script_SeekToKeyword('d')) {
         s32 i = 0;
         u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
-            if (value != 0x30)
+                if (value != 0x30) {
                 *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-            else
+                } else {
                 *out = 0;
+                }
             out++;
             i++;
+            }
         }
-    }
-    if (p->flags & 8)
+    } while (0);
+    if (p->flags & 8) {
         Palette_SetVariantsFromPalettes(p);
-    else
+    } else {
         Palette_SetVariantsFromSource(p);
+    }
     p->blend = 0;
     p->selected = Script_GetKeywordValue('c', 0);
     p->current = p->colorSets[PALETTE_SET_SOURCE][p->selected];
@@ -525,14 +530,18 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         w->value = 0;
         w->phase = 0;
     }
-    if (p->flags & 1)
+    if (p->flags & 1) {
         Palette_ResetTransition(p);
-    if (blendEnabled(p) && (p->flags & 2))
+    }
+    if (blendEnabled(p) && (p->flags & 2)) {
         Palette_BlendVariants(p);
-    if (p->flags & 1)
+    }
+    if (p->flags & 1) {
         Palette_BlendTransitionColors(p, t);
-    if (p->current)
+    }
+    if (p->current) {
         CpuSet(p->current, p->hardware, 0x04000068);
+    }
     p->previousState = gUnk_03005430.state;
     t->mode = 0;
     return 0;
