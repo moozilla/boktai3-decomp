@@ -1439,3 +1439,4 @@ addr,function,name,family,note
 081A8638,sub_081A8638,Vanargand_UpdateProximityTransition,"Vanargand action states","changes action when destination is within 256 units"
 081A8938,sub_081A8938,Vanargand_UpdateQueuedActionTransition,"Vanargand action states","selects queued action when indexed entry is ready"
 081A8A74,sub_081A8A74,Vanargand_UpdateMode20,"Vanargand","stops action sequence and returns to mode 11 when finished"
+081A8D2C,sub_081A8D2C,Vanargand_UpdateMotionTrack,"Vanargand","starts animation and motion track then signals completion"
