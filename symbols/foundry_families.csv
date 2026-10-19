@@ -1461,3 +1461,4 @@ addr,function,name,family,note
 081B8CB0,sub_081B8CB0,OrbitMotion_UpdateAngle,"OrbitMotion","interpolates angle and writes orbit position"
 081B9C00,sub_081B9C00,Registry2388_ApplyPalettePhase,"Registry2388 palette controller","applies one of six palette transition phases"
 081B9D54,sub_081B9D54,Registry2388_BlendTimedPalettes,"Registry2388 palette controller","blends palette banks using elapsed time and direction"
+081B9ED0,sub_081B9ED0,Registry2388_InitializeAnimations,"Registry2388 palette controller","loads a resource and initializes thirteen animation entries"
