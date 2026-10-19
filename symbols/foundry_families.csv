@@ -1407,3 +1407,4 @@ addr,function,name,family,note
 0819EFD0,sub_0819EFD0,Hresvelgr_UpdateAdjacentBurstPhase,"Hresvelgr","emits burst at adjacent directional offset"
 0819F954,sub_0819F954,Hresvelgr_UpdateRecoveryPhase,"Hresvelgr","changes animation speed before marking recovery complete"
 0819FB4C,sub_0819FB4C,OffsetActor_PlayTargetSequence,"Hresvelgr actor action sequences (tentative)","moves toward a target for 129 ticks then marks completion"
+081A04B8,sub_081A04B8,OffsetActor_PlayBoundarySequence,"Hresvelgr actor action sequences (tentative)","starts animation and advances when position exceeds boundary"
