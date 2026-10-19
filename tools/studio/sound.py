@@ -43,7 +43,7 @@ for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HE
 import m4a  # noqa: E402
 
 CACHE = os.path.join(ROOT, "build", "cache", "sound.json")
-INPUTS = ["tools/studio/sound.py", "tools/m4a.py", "gen/code_sym.s", "gcl/names/proc.csv",
+INPUTS = ["tools/studio/sound.py", "tools/m4a.py", "gen/code_sym.s", "gcl/names/proc.csv", "tools/assets/gclroles.py",
           "data/labels/scenes.csv", "data/labels/areas.csv"]
 ROM_BASE = 0x08000000
 PLAYER_TABLE = 0x082643EC  # gMPlayTable: {MusicPlayerInfo*, MusicPlayerTrack*, u16 ntracks, u16 unk}
@@ -129,7 +129,7 @@ def script_uses():
     import actors
     import gclview
     img = gclview._image()
-    names = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
+    names = {int(p): r["name"] for p, r in gclview.names().procs.items()}
     bodies = {cid: gclview.procedure(img, cid) or [] for cid in actors.procs()}
     params = {p: {i} for p, (_, i) in BGM_PROCS.items()}  # proc -> argument positions that are a song
     svars = set()                                          # variables passed as a song
@@ -280,7 +280,7 @@ def build():
     pl = players()
     test = sound_test()
     su, cu = script_uses(), code_uses()
-    procnames = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
+    procnames = {int(p): r["name"] for p, r in gclview.names().procs.items()}
     fof = gclfiles.file_of()
     import areas
     scene_area = {int(k): v for k, v in areas.build()["scene_area"].items()}

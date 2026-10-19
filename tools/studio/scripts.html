@@ -97,7 +97,7 @@ function fileRow(f) {
   d.className = 'row' + (f.id === selFile ? ' on' : '') + (f.kind === 'shared' ? ' shared' : '');
   const range = f.procs.length > 1 ? `${f.procs[0]}–${f.procs[f.procs.length - 1]}` : `${f.procs[0]}`;
   const ml = f.entry && scenes[f.entry]?.map ? noteOf('map', scenes[f.entry].map)?.label : '';
-  d.innerHTML = `<b>${esc(f.title)}</b>${ml ? `<span class="lab">${esc(ml)}</span>` : ''}<small>${[`${f.procs.length} procs`, range, f.kind === 'scene' ? '' : f.description].filter(Boolean).map(esc).join(' · ')}</small>`;
+  d.innerHTML = `<b>${esc(fileTitle(f))}</b>${ml ? `<span class="lab">${esc(ml)}</span>` : ''}<small>${[`${f.procs.length} procs`, range, f.kind === 'scene' ? '' : f.description].filter(Boolean).map(esc).join(' · ')}</small>`;
   d.onclick = () => { location.hash = 'file=' + f.id; };
   return d;
 }
@@ -107,7 +107,9 @@ function procRow(id) {
   d.onclick = e => { e.stopPropagation(); location.hash = id; };
   return d;
 }
-const hitFile = (f, q) => [f.id, f.title, f.description, f.category].some(x => (x || '').toUpperCase().includes(q));
+// a scene file by its entry's name (gcl/names/proc.csv, else tools/assets/gclroles.py)
+const fileTitle = f => f.kind === 'scene' && procNames[f.entry] ? `${procNames[f.entry]}` : f.title;
+const hitFile = (f, q) => [f.id, f.title, fileTitle(f), f.description, f.category].some(x => (x || '').toUpperCase().includes(q));
 const hitProc = (c, q) => String(c) === q || (procNames[c] || '').toUpperCase().includes(q) || (label(byId[c] || { id: c }) || '').toUpperCase().includes(q);
 function renderFiles() {
   const q = $('q').value.trim().toUpperCase();
@@ -142,7 +144,7 @@ async function showFile(fid) {
   if (!f) { v.innerHTML = `<div class="empty">No file ${esc(fid)}.</div>`; return; }
   const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}${english ? '/en' : ''}`).then(r => r.json());
   const sc = f.entry ? scenes[f.entry] : null;
-  v.innerHTML = `<h2>${esc(f.title)}</h2>
+  v.innerHTML = `<h2>${esc(fileTitle(f))}</h2>
     <div class="meta">${esc(f.category)} · ${f.procs.length} procedures (${f.procs[0]}–${f.procs[f.procs.length - 1]}) · ${f.kind === 'scene' ? `entry <a href="#${f.entry}">proc ${f.entry}</a>` : `used by ${f.scenes} scenes`}${sc?.map ? ` · map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(f.entry).padStart(4, '0'), 'capture') : ''}${f.kind !== 'scene' && f.description ? ' · ' + esc(f.description) : ''}</div>
     <h3>Source <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="readable"${readable ? ' checked' : ''}> readable</label>
       <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="inline"${inline ? ' checked' : ''}${readable ? '' : ' disabled'}> inline single-use helpers (${d.inlined.length})</label>
@@ -215,6 +217,11 @@ function linkReadable(ln) {
     .replace(/\bproc_(\d+)\(/g, (m, n) => byId[n] ? `<a href="#${n}">proc_${n}</a>(` : m)
     .replace(/\b([A-Za-z_]\w*)\(/g, (m, n) => procOfName[n] ? `<a href="#${procOfName[n]}" title="proc ${procOfName[n]}">${n}</a>(`
       : callees[n] ? `<span title="${esc(actorName(callees[n]))}">${actorLink(callees[n], n)}</span>(` : m)
+    // procedures passed as values: callbacks, door targets, cutscene scripts
+    .replace(/([=\[,] ?)([a-z][a-z0-9_]*)(?=[,\])]|$)/g, (m, a, n) => {
+      const id = procOfName[n] ?? (/^proc_\d+$/.test(n) && byId[n.slice(5)] ? n.slice(5) : null);
+      return id != null ? `${a}<a href="#${id}" title="proc ${id}">${n}</a>` : m;
+    })
     .replace(/\b(text|data)\((\d+)\)/g, (m, k, n) => k + '(' + stringLink(n, n) + ')');
   return c + (note ? `<span class="cmt">${esc(note)}</span>` : '');
 }
