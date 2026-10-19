@@ -117,7 +117,9 @@ def main():
         limit = pace_limit(a.pace)
         if limit is not None:              # usage pacing: at most LIMIT headless Claude workers run
             by = {p: c for p, _, _, c in rows}
-            claude = sorted((age, p) for p, age in roots(rows) if "claude -p" in by.get(p, ""))
+            # every headless Claude worker, whatever started it (runner children included)
+            claude = sorted((age, p) for p, pp, age, c in rows
+                            if is_worker(c) and "claude -p" in c and "claude -p" not in by.get(pp, ""))
             running = [p for _, p in reversed(claude) if p not in paced and p not in paused]  # oldest first
             if len(running) > limit:
                 for p in running[limit:]:
