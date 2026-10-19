@@ -139,9 +139,18 @@ def comparison(orig, mine, addr, *, arm=False, target_size=None):
     }
 
 
+def realigned(result, mask=False):
+    """Differing instructions after tools/anchordiff.py's realignment (listings cut
+    at shared calls, then aligned piecewise; mask=True ignores registers)."""
+    rows = lambda key: [f"{a:08X} {t}" for a, t in result[key]]
+    return sum(max(i2 - i1, j2 - j1) for _, _, (_, i1, i2, j1, j2)
+               in anchordiff.hunks(rows("original"), rows("candidate"), mask))
+
+
 def fuzzy_percent(result):
     """Instruction-text similarity (0-100), with absolute addresses masked so a
-    size difference early in the function does not penalise every branch."""
+    size difference early in the function does not penalise every branch.
+    Big functions: score edits by realigned() instead (docs/BIG_FUNCTIONS.md)."""
     norm = lambda rows: [re.sub(r"0x[0-9a-f]{7,8}", "ADDR", x[1]) for x in rows]
     matcher = difflib.SequenceMatcher(None, norm(result["original"]), norm(result["candidate"]),
                                       autojunk=False)
@@ -274,16 +283,12 @@ def main():
         if a.record:
             record_fuzzy(src, result["draft_fuzzy"])
     ok = result["status"] == "match"
+    if not ok:
+        result["anchordiff"] = {"structural": realigned(result, mask=True), "total": realigned(result)}
     with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
         json.dump(result, f, indent=2)
     with open(os.path.join(ROOT, work, "full.diff"), "w") as f:
         f.write(render_diff(result, full=True) + "\n")
-    if not ok:
-        # realigned instruction counts: stable on big functions, where the byte
-        # count and fuzzy score drift after the first inserted instruction
-        result["anchordiff"] = dict(zip(("structural", "total"), anchordiff.score(os.path.join(ROOT, work))))
-        with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
-            json.dump(result, f, indent=2)
     if a.json:
         print(json.dumps(result))
         sys.exit(0 if ok else 1)

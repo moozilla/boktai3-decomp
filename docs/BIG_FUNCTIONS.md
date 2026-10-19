@@ -24,13 +24,19 @@ explaining every remaining difference from agbcc's pass dumps and source.
 | read twice | 47 / 201 | one `CellHeight` inline reading `*p` twice, used everywhere |
 | liveness | 0 / 19 | `result = 2` after the call, `goto check`, tail shape |
 
-check.py's fuzzy score read 8.8% through all of it, then jumped to 99.6% at the end.
+check.py's match verdict is byte-exact and always right. Its fuzzy score is a coarse
+whole-listing similarity: the first committed draft (1,192 differing instructions)
+already scores 74.8%, and the final one (19) scores 99.6%, so it hardly separates
+a good edit from a bad one. (The session reported it as stuck at 8.8%; that does not
+reproduce with today's check.py.) On 86 current drafts the fuzzy score and the
+realigned count agree to a median of 2 points, so the fuzzy score is fine for
+triage. Use the realigned count to steer edits.
 
 ## 1. Measure with a score that survives insertions
 
-`tools/check.py` pairs the two listings by position, so after the first inserted
-instruction every later row "differs". On a mismatch, check.py prints a
-second line:
+check.py's side-by-side listing pairs rows by position, so after the first
+inserted instruction every later row reads as different, and its byte count
+jumps the same way. On a mismatch, check.py now also prints the realigned counts:
 
     realigned: 201 differing insns, 47 ignoring registers (tools/anchordiff.py build/check/run-...)
 
