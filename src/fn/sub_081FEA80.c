@@ -16,7 +16,7 @@ struct RisingActorManager {
 };
 extern struct RisingActorManager *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
-void sub_081FDAF4(void);
+void RisingActor_AdvanceHeight(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 s32 RisingActorManager_BeginRaise(s32 index)
 {
@@ -28,6 +28,6 @@ s32 RisingActorManager_BeginRaise(s32 index)
     if (!(manager->activeSlots & (1 << index)))
         return -1;
     if (manager->actors[index].lowered)
-        SunOrb_SetUpdateCallback(manager->actors[index].controller, sub_081FDAF4);
+        SunOrb_SetUpdateCallback(manager->actors[index].controller, RisingActor_AdvanceHeight);
     return 0;
 }

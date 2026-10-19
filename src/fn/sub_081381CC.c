@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 96.7%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
-#define LinkSession_UpdatePlayerValueAverage sub_081381CC
-#define PlayerValue_GetBand                  Solar_GetLevelForIntensity
-#define gLinkSession                         gUnk_020004B4
+#define PlayerValue_GetBand Solar_GetLevelForIntensity
+#define gLinkSession        gUnk_020004B4
 s32 PlayerValue_GetBand(s32);
 s32 Div(s32, s32);
 static inline u32 GetSelection(s32 player)
@@ -27,7 +26,7 @@ static inline u32 GetSelection(s32 player)
     }
 }
 
-void sub_081381CC(struct AreaEffectLinkState *session)
+void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *session)
 {
     s32 i;
     session->playerValueSum = 0;
@@ -43,5 +42,5 @@ void sub_081381CC(struct AreaEffectLinkState *session)
         session->value = Div(session->playerValueSum, session->participantCount);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081381CC);
+INCLUDE_ASM("asm/nonmatching", LinkSession_UpdatePlayerValueAverage);
 #endif

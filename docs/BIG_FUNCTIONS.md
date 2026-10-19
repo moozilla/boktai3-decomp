@@ -127,6 +127,19 @@ Inlines:
   copies after the call, so CSE turns them into the ROM's register copies.
 * **A vector difference stored through a stack pointer** is an inline
   `Delta(&out, a, b)`, not field assignments.
+* **A mask loaded before the address and the load** (`movs r1, #0x80; lsls r1, #3;
+  adds r0, rA, #off; ldrh r0, [r0]; ands r0, r1`) is an inline that takes the object
+  and the mask: `static inline u16 MotionFlags(actor, u32 mask) { return
+  actor->flags2D4 & mask; }`. Passing a field pointer puts the address first; a plain
+  `x & 0x400` loads first. `movs r1, #3` before an RNG step is `RandomBits(3)`.
+* **Arguments that are pointer arithmetic get computed before the other copies.**
+  `Delta(&v, &a->pos, &(*(T **)((u8 *)a + 0xDC))->pos)` emits `a + 0xDC` first;
+  a struct field (`&((T *)a->fieldDC)->pos`) keeps the ROM's argument order.
+* **A failure path whose address is computed at each site and that then branches to
+  one shared tail** is two copies of the failure code (`ClearBits(&f, m); return 0;`)
+  that cross-jumping merged. A `goto fail` writes it once and loses the per-site
+  address. Put the success path first where the ROM does (`if (result) { ...;
+  return 1; }`).
 
 Loops and constants:
 * **loop.c hoists a constant only if `threshold * savings * lifetime >= insns in
@@ -137,9 +150,31 @@ Loops and constants:
   `u8` narrowing that creates separate QI and SI copies) raise savings.
 * **`movs rX, #imm` repeated at each use inside a loop** is a hoisted constant
   that lost allocation and was rematerialised by reload.
+* **Keep only the retried code inside a retry loop.** An RNG retry written as
+  `for (;;) { pick; if (same && ++tries <= 3) continue; ...stores...; break; }` keeps
+  the stores in the loop, and loop.c then has too many insns to hoist the RNG's
+  address, mask and table. `do { pick; if (c != prior) goto chosen; } while (++tries
+  <= 3); c = prior; chosen: ...stores...` let it hoist them (sub_080C09F0: 338 to
+  95 structural differences together with the bitfield below).
 * **`adds rX, rH, #0; ands rX, rY`** comes from regmove's backward pass when
   no operand can be tied. A variable set twice (`h = f & 15; h <<= 8;`)
   reproduces the copy.
+
+GCSE:
+* **A register copy just before a block-ending branch** (`mov sl, sb` between the
+  `asrs` and `cmp` of a bounds check), copying a pointer that the code otherwise
+  uses directly, is PRE. It moved a later recomputation of the same expression to
+  the end of an earlier block. Recompute the value where it is used instead of
+  passing a variable: a helper deriving `&actor->group` itself instead of taking
+  `group`, or `*(T **)(group + 0x200)` written out at each use instead of a
+  `state` variable.
+
+Bitfields:
+* **`movs rX, #0` between the `ands` and the store of a halfword
+  read-modify-write**, with later zero stores reusing that register, is the `& 0`
+  of a full-width bitfield insertion: `struct { s16 bits : 16; }` and
+  `f->bits &= ~4`. A signed field gives the `movs #5; rsbs` mask; `u16` gives a
+  pool literal. A narrower bitfield (`u16 bit2 : 1`) becomes a byte access.
 
 Other:
 * Pin registers only as a diagnostic. Pinning one pointer showed which
@@ -188,4 +223,23 @@ Free T reductions that keep the code
 byte-identical: a `u32 Shape(i) { u32 b = *Properties(i); return b >> 4; }`
 accessor in CanEnter (−4 per site). The same accessor in Seek, a u8→s32 return
 from Seek (−56) and a u32 `CellAttributes` (−60) all change loop hoisting or
-jump threading. Declaration order moves T by ±16 at most. This is open.
+jump threading. Declaration order moves T by ±16 at most.
+
+**How it was closed (PR #311, exact match).** Lowering T was a dead end;
+raising it was not, because the order depends on the pseudo numbers inside the
+expressions as well as on T.
+1. Sweep the forced T to get the exact set of T values that match:
+   `rtlprobe.py try-t FILE.c 2201:3001 --nonmatching` prints windows of equal
+   results (25 s for 55 values with `-j`). The sweep is sharper than `--need`:
+   on the 99.6% draft it shows 2267..2303 and 2337..2347, but not 2305..2335.
+2. Fit a bucket-order model that reproduces the sweep exactly (here: the
+   order of expressions 7, 6 and 4, and A < C < Bm < Bp with A = (13773 + a) % T,
+   C = (14419 + c) % T, Bm = (13771 + b) % T for the pseudos a, b and c inside them).
+3. Search C edits that keep the code identical and land (T, a, b, c) in the
+   model's region. Two worked together: a function-scope `cell` variable
+   renumbered its pseudo (396 → 30) without changing T, and a u16-returning
+   wrapper (through an s16 local) at Seek's `position->y =` stores added 80 insns
+   of narrowing that combine removes again, raising T by 80.
+
+Narrowing that combine later deletes is a free knob for the insn count at GCSE;
+a function-scope variable is a free knob for a pseudo's number.

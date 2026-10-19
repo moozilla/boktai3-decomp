@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
-#define SceneActorPlacement_UpdateFlaggedResponse sub_080A8144
 void sub_080A62DC(void);
 void sub_080A8904(struct SceneActorRegistryResetView *);
 static inline u8 TakeQueuedFlag(u8 *flag)
@@ -14,7 +13,7 @@ static inline u8 TakeQueuedFlag(u8 *flag)
     }
     return 0;
 }
-void sub_080A8144(struct SceneActorRegistryResetView *p)
+void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetView *p)
 {
     s32 savedOffset;
     if (TakeQueuedFlag(&p->field2B1)) {
@@ -82,5 +81,5 @@ void sub_080A8144(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A8144);
+INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_UpdateFlaggedResponse);
 #endif

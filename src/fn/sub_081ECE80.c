@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.2%
 // foundry draft (worker best 88.2%); what differs is mostly register allocation and instruction order
-#define SceneMover_StepPastScreenX sub_081ECE80
 struct MoverPosition {
     s32 x, y, z;
 };
@@ -35,7 +34,7 @@ static inline void Project(struct MoverPosition *pos, struct MoverScreen *screen
     screen->y = ((pos->z + y) >> 12) + 96;
     screen->z = pos->z >> 12;
 }
-s32 sub_081ECE80(struct SceneMover *p, s32 target, s32 speed)
+s32 SceneMover_StepPastScreenX(struct SceneMover *p, s32 target, s32 speed)
 {
     s32 delta = target - p->screen.x;
     struct MoverPosition *pos;
@@ -59,5 +58,5 @@ s32 sub_081ECE80(struct SceneMover *p, s32 target, s32 speed)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081ECE80);
+INCLUDE_ASM("asm/nonmatching", SceneMover_StepPastScreenX);
 #endif

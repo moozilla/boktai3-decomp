@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.6%
 // foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
-#define SceneActorReaction_FinishAnimation17 sub_080ED838
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Ivy_UpdateActiveState(void);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
@@ -15,7 +14,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-void sub_080ED838(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_FinishAnimation17(struct SceneActorRegistryResetView *actor)
 {
     u32 offset;
     if (TakePrepared(actor)) {
@@ -71,5 +70,5 @@ void sub_080ED838(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080ED838);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_FinishAnimation17);
 #endif

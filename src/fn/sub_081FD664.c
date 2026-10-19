@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.4%
 // foundry draft (worker best 92.4%); what differs is mostly register allocation and instruction order
-#define OrbitEffect_AdjustHeading sub_081FD664
 struct OrbitEffectPosition {
     s16 x, y, z;
 };
@@ -22,7 +21,7 @@ struct OrbitEffect {
     u32 flags;
 };
 s32 Math_Atan2(s32, s32);
-void sub_081FD664(struct OrbitEffect *p)
+void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
 {
     struct OrbitEffectSteering *params = &p->steering;
     if (params->target) {
@@ -59,5 +58,5 @@ void sub_081FD664(struct OrbitEffect *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FD664);
+INCLUDE_ASM("asm/nonmatching", OrbitEffect_AdjustHeading);
 #endif

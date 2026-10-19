@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.8%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
-#define Vanargand_WaitForActionRelease sub_081ACAC4
 struct Vanargand {
     u8 pad0[0x9c];
     u32 flags;
@@ -25,7 +24,7 @@ struct Vanargand {
 };
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 void Vanargand_SetPendingCue(void *, u16);
-void sub_081ACAC4(struct Vanargand *p)
+void Vanargand_WaitForActionRelease(struct Vanargand *p)
 {
     struct Vanargand *actor = p;
     u32 flag = 4;
@@ -56,5 +55,5 @@ void sub_081ACAC4(struct Vanargand *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081ACAC4);
+INCLUDE_ASM("asm/nonmatching", Vanargand_WaitForActionRelease);
 #endif

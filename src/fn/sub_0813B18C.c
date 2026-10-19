@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.6%
 // foundry draft (worker best 90.7%); what differs is mostly register allocation and instruction order
-#define ActorDirection_ComputeRelativeCardinal sub_0813B18C
 struct DirectionActor {
     u8 pad00[6];
     u16 flags;
@@ -14,7 +13,8 @@ struct DirectionActor {
     u8 direction;
 };
 s32 Math_Atan2(s32, s32);
-s32 sub_0813B18C(struct DirectionActor *actor, struct DirectionActor *target)
+s32 ActorDirection_ComputeRelativeCardinal(struct DirectionActor *actor,
+                                           struct DirectionActor *target)
 {
     s32 angle;
     if (actor->flags & 0x100) {
@@ -31,5 +31,5 @@ s32 sub_0813B18C(struct DirectionActor *actor, struct DirectionActor *target)
     return (angle >> 6) * 2 + 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813B18C);
+INCLUDE_ASM("asm/nonmatching", ActorDirection_ComputeRelativeCardinal);
 #endif

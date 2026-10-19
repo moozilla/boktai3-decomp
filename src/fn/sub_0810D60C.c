@@ -3,11 +3,10 @@
 #ifdef NONMATCHING
 // fuzzy: 81.8%
 // foundry draft (worker best 81.8%); what differs is mostly register allocation and instruction order
-#define PanelText_DrawDecimal sub_0810D60C
-#define PanelText_GetMapCell  Bg_GetWrappedTilemapEntry
+#define PanelText_GetMapCell Bg_GetWrappedTilemapEntry
 s32 Div(s32, s32);
 u8 *Bg_GetWrappedTilemapEntry(u32, u32, u32);
-void sub_0810D60C(s32 value, s32 divisor, u32 x, u32 y, s32 style)
+void PanelText_DrawDecimal(s32 value, s32 divisor, u32 x, u32 y, s32 style)
 {
     s32 base = 0x21;
     u16 *cell;
@@ -23,5 +22,5 @@ void sub_0810D60C(s32 value, s32 divisor, u32 x, u32 y, s32 style)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810D60C);
+INCLUDE_ASM("asm/nonmatching", PanelText_DrawDecimal);
 #endif

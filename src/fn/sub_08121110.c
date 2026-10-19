@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 90.6%
 // foundry draft (worker best 87.9%); what differs is mostly register allocation and instruction order
-#define ActorAction_RunActiveCallbacks sub_08121110
-#define ActorAction_ResetFlags         RegistryA8CB_ResetUpdateState
-#define ActorAction_FinishTick         RegistryA8CB_UpdateAnimation
+#define ActorAction_ResetFlags RegistryA8CB_ResetUpdateState
+#define ActorAction_FinishTick RegistryA8CB_UpdateAnimation
 struct ActorActionEntry {
     void *callback;
     u8 unknown4[0x5c];
@@ -21,7 +20,7 @@ struct ActorActionRunner {
 void RegistryA8CB_ResetUpdateState(void *);
 void RegistryA8CB_UpdateAnimation(void *);
 s32 Callback_InvokeActor(void *, void *);
-s32 sub_08121110(struct ActorActionRunner *actor)
+s32 ActorAction_RunActiveCallbacks(struct ActorActionRunner *actor)
 {
     struct ActorActionEntry *action = &actor->action;
     struct ActorActionRunner *object = (struct ActorActionRunner *)actor->object;
@@ -38,5 +37,5 @@ s32 sub_08121110(struct ActorActionRunner *actor)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08121110);
+INCLUDE_ASM("asm/nonmatching", ActorAction_RunActiveCallbacks);
 #endif

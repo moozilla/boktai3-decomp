@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.6%
 // foundry draft (worker best 85.2%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_UpdateHeightReturn sub_080A11F4
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -20,7 +19,7 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask)
 {
     return s->flags2D4 & mask;
 }
-void sub_080A11F4(struct SceneActorRegistryResetView *s)
+void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
 {
     s32 delta;
     u16 *height;
@@ -79,5 +78,5 @@ void sub_080A11F4(struct SceneActorRegistryResetView *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A11F4);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateHeightReturn);
 #endif

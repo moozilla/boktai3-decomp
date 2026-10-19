@@ -12,7 +12,7 @@ struct SpriteGroup {
     struct SpriteGroupEntry entries[4];
 };
 void *AnimData_FindEntry(s32);
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, u32);
@@ -29,7 +29,7 @@ void SpriteGroup_InitFourSprites(struct SpriteGroup *p, u32 animation)
     entry = p->entries;
     i = 3;
     do {
-        sub_08217DE0(entry, p->resource, 1);
+        ParticleSprite_Initialize(entry, p->resource, 1);
         Effect_SetOrigin(entry, offset, offset);
         SpriteDrawable_SelectTileFrame(entry, p->resource, animation);
         Effect_SetPalette(entry, 1);

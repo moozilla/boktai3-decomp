@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_InitializeShots sub_081A3554
 struct HresvelgrShotSprite {
     u32 flags;
     u8 unknown04[0xC];
@@ -28,7 +27,7 @@ s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
 s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *, s32, s32, s32);
-s32 sub_081A3554(struct HresvelgrShotPool *pool)
+s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
 {
     struct HresvelgrShot *shot;
     s32 i;
@@ -58,5 +57,5 @@ s32 sub_081A3554(struct HresvelgrShotPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A3554);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_InitializeShots);
 #endif

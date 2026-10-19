@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-void sub_08217DE0(void *, const void *, s32);
+void ParticleSprite_Initialize(void *, const void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 struct ActorAttachmentSlotView *
 ActorAttachment_CreateSinglePartSlot(u32 incomingFrame, struct ContactPosition *anchor,
@@ -226,7 +226,7 @@ gotManager:
                 break;
         }
     }
-    sub_08217DE0(renderPart, resource, 0);
+    ParticleSprite_Initialize(renderPart, resource, 0);
     {
         register u8 *lowResource asm("r1") = resourcePointer;
         asm("" : "+r"(lowResource));

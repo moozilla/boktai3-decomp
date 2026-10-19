@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08172638(u8 *);
+void PauseMenu_RefreshFruitAndUnlockIcons(u8 *);
 void Hud_RestoreSecondaryGridSelection(void *);
 void SceneHud_ConfigureActionGrid(void *, u32, u32);
 void PauseMenu_ClearSpriteFlags(u8 *, u32, u32);
@@ -19,7 +19,7 @@ void PauseInventory_ReturnToEquipmentSelection(u8 *s)
 {
     u8 *p, *q;
     u32 zero, result;
-    sub_08172638(s);
+    PauseMenu_RefreshFruitAndUnlockIcons(s);
     p = s + 0x4384;
     Hud_RestoreSecondaryGridSelection(p);
     SceneHud_ConfigureActionGrid(p, 0x61, 0);

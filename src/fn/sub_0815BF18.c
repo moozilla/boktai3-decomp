@@ -33,7 +33,7 @@ void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_Motion7Turn(struct P *, s32);
 void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
-void sub_081507F4(void);
+void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
 void sub_081516C0(void);
 

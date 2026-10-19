@@ -23,7 +23,8 @@ struct Slot7Actor {
 void sub_0821FF8C(void *);
 s32 Div(s32, s32);
 
-void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action, struct Slot7Actor *actor)
+void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
+                                        struct Slot7Actor *actor)
 {
     s16 level;
     s32 duration;

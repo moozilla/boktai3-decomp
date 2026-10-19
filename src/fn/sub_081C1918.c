@@ -4,12 +4,11 @@
 #ifdef NONMATCHING
 // fuzzy: 89.8%
 // foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
-#define ControlPanel_UpdateGaugeIndicator sub_081C1918
 
 s32 Div(s32, s32);
 void Sound_PlaySong(u32 song);
 
-void sub_081C1918(struct Player *p)
+void ControlPanel_UpdateGaugeIndicator(struct Player *p)
 {
     u16 v = gUnk_02000580[0]->indicatorUpdateRate;
     s32 inc;
@@ -41,5 +40,5 @@ void sub_081C1918(struct Player *p)
         p->indicatorTickCounter = 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C1918);
+INCLUDE_ASM("asm/nonmatching", ControlPanel_UpdateGaugeIndicator);
 #endif

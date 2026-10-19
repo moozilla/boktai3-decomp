@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.8%
 // foundry draft (worker best 82.2%); what differs is mostly register allocation and instruction order
-#define ActorImpact_TestForwardPoint sub_08179F60
 extern const s16 gUnk_086149C4[];
 u8 sub_0821D4F0(void *, void *, u32, u32);
 struct ImpactProbeActor {
@@ -19,7 +18,7 @@ static inline s32 trunc12(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-u8 sub_08179F60(struct ImpactProbeActor *p)
+u8 ActorImpact_TestForwardPoint(struct ImpactProbeActor *p)
 {
     struct ContactPosition point;
     u8 *anglePtr = &p->angle;
@@ -59,5 +58,5 @@ u8 sub_08179F60(struct ImpactProbeActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08179F60);
+INCLUDE_ASM("asm/nonmatching", ActorImpact_TestForwardPoint);
 #endif

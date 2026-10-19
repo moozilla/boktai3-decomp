@@ -3,7 +3,7 @@
 void Player_EnterKindTwo(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void sub_081540D4(struct Player *);
-void sub_08150B34(struct Player *);
+void Player_UpdateTimedDirectionAction(struct Player *);
 void PlayerCue_BeginMode28(struct Player *p, s32 facing, s32 variant, u32 parameter)
 {
     if (facing >= 0)
@@ -20,6 +20,6 @@ void PlayerCue_BeginMode28(struct Player *p, s32 facing, s32 variant, u32 parame
             p->actionLatch464 = 1;
             p->actionLatch465 = 1;
         }
-        p->triggerAnimationCallback = sub_08150B34;
+        p->triggerAnimationCallback = Player_UpdateTimedDirectionAction;
     }
 }

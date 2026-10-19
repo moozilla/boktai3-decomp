@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 89.9%
 // foundry draft (worker best 88.4%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_PlayDescent sub_081A09C4
 typedef struct OrbitPosition {
     s16 x, y, z, pad;
 } OrbitPosition;
@@ -30,7 +29,7 @@ void Hresvelgr_SetAnimation(OrbitActor *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void OffsetActor_StepTowardTarget(OrbitActor *);
 void Sound_PlaySong(u32);
-void sub_081A09C4(void *p, int tick)
+void Hresvelgr_PlayDescent(void *p, int tick)
 {
     OrbitActor *actor = p;
     {
@@ -56,5 +55,5 @@ void sub_081A09C4(void *p, int tick)
         Hresvelgr_RefreshTarget(p);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A09C4);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_PlayDescent);
 #endif

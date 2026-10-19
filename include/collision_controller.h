@@ -98,7 +98,7 @@ s32 CollisionController_ScriptGetActiveCount(void);
 void CollisionController_ScriptRemoveAll(void);
 
 /* Engine helpers. */
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Script_ReadReference(void *);

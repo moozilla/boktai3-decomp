@@ -285,8 +285,11 @@ The role comes from how other procedures refer to it first, then from its
 body (the library files of its calls, `names/files.csv`, and the native
 routines it starts); `gclroles.py` lists the rules in order and counts what
 each names, `gclroles.py PROC` gives one name's evidence. Repeats in a scene
-take `_2`, `_3` in id order. Today that is all 492 scene entries and 80% of
-the 3,930 private procedures; the rest keep `proc_N`.
+take `_2`, `_3` in id order. When no role fits, a procedure is named after
+its first call that is not bookkeeping (`_game_state_set_area_flag`,
+`_show_stage_icon`), or `_calc` when it only computes a value. Today that is
+all 492 scene entries and 93% of the 3,930 private procedures; the rest
+(mostly calls to other unnamed procedures) keep `proc_N`.
 
 ```
 def white_forest_3874():  # proc 3874

@@ -6,7 +6,7 @@ struct S {
 };
 s32 Armor_TryStartAction(void *, s32);
 void ActorController_ForceAction(void *, s32);
-void sub_08184FE8(void *, s32);
+void DirectionalActor_TryBeginState(void *, s32);
 void Armor_UpdateAction48Completion(struct S *p)
 {
     u8 *q = &p->st;

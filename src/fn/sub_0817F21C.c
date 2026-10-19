@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
-#define SceneEventActor_UpdateSongStopTransition sub_0817F21C
 struct SceneEventActor {
     u8 unknown0[0x51];
     u8 angle;
@@ -28,7 +27,7 @@ void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, 
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_StopSong(u32);
 void SceneVolume_ResetPendingSequence(void *);
-void sub_0817F21C(struct SceneEventActor *actor)
+void SceneEventActor_UpdateSongStopTransition(struct SceneEventActor *actor)
 {
     if (actor->restart) {
         actor->restart = 0;
@@ -84,5 +83,5 @@ void sub_0817F21C(struct SceneEventActor *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817F21C);
+INCLUDE_ASM("asm/nonmatching", SceneEventActor_UpdateSongStopTransition);
 #endif

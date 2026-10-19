@@ -2,9 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.1%
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
-#define ActorDecision_UpdatePulsePhase   sub_0817BCD4
-#define ActorDecision_SetTransition      SceneVolume_BeginPhase
-#define ActorDecision_AdvancePeriodicCue sub_0817B5E4
+#define ActorDecision_SetTransition SceneVolume_BeginPhase
 struct ActorDecisionPosition {
     u32 a, b;
 };
@@ -27,7 +25,7 @@ s32 SceneVolume_FindNearbyPosition(struct ActorDecisionState *);
 s32 SceneVolume_GetActivityState(struct ActorDecisionState *);
 s32 SceneVolume_ConsumePendingEvent(struct ActorDecisionState *);
 void SceneVolume_BeginPhase(struct ActorDecisionState *, s32);
-s32 sub_0817B5E4(struct ActorDecisionState *, u32, s32, s32, s32);
+s32 ActorEffect_StepTurn(struct ActorDecisionState *, u32, s32, s32, s32);
 static inline u8 consumeReset(struct ActorDecisionState *p)
 {
     if (p->reset) {
@@ -37,7 +35,7 @@ static inline u8 consumeReset(struct ActorDecisionState *p)
     }
     return 0;
 }
-void sub_0817BCD4(struct ActorDecisionState *p)
+void ActorDecision_UpdatePulsePhase(struct ActorDecisionState *p)
 {
     struct ActorDecisionState *s = p;
     s32 result;
@@ -54,9 +52,9 @@ void sub_0817BCD4(struct ActorDecisionState *p)
         p->reason = 0;
     }
     if (s->unknown4EA == 2)
-        result = sub_0817B5E4(p, p->timer, 30, 30, 1);
+        result = ActorEffect_StepTurn(p, p->timer, 30, 30, 1);
     else
-        result = sub_0817B5E4(p, p->timer, 30, 30, 0);
+        result = ActorEffect_StepTurn(p, p->timer, 30, 30, 0);
     if (result) {
         u32 phase = 6;
         p->phase = phase;
@@ -64,5 +62,5 @@ void sub_0817BCD4(struct ActorDecisionState *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817BCD4);
+INCLUDE_ASM("asm/nonmatching", ActorDecision_UpdatePulsePhase);
 #endif

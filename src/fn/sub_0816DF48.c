@@ -16,7 +16,7 @@ struct InventoryGridVector {
 };
 void SceneHud_GetActionIconPosition(void *, int);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -41,7 +41,7 @@ void InventoryGrid_BeginIconTransfer(u8 *s)
     to.x = 16;
     to.y = 48;
     to.z = 0;
-    result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
+    result = Selection_GetDisplayFrame(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = *kind + 10;
     SceneHud_BeginIconMotion(s, 0, result, ((struct InventoryGrid *)s)->elements[later].value32,
                              &from, &to, 24, 16);

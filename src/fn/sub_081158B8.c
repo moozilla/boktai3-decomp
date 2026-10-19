@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 81.8%
 // foundry draft (worker best 81.8%); what differs is mostly register allocation and instruction order
-#define CallbackPool_InvokeActive sub_081158B8
 struct CallbackEntry {
     u8 payload[0xF0];
     u8 active;
@@ -14,7 +13,7 @@ struct CallbackPool {
     struct CallbackEntry entries[48];
 };
 s32 Callback_InvokeActor(void *, void *);
-s32 sub_081158B8(struct CallbackPool *pool)
+s32 CallbackPool_InvokeActive(struct CallbackPool *pool)
 {
     struct CallbackEntry *entry = pool->entries;
     u8 *active = &pool->entries[0].active;
@@ -30,5 +29,5 @@ s32 sub_081158B8(struct CallbackPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081158B8);
+INCLUDE_ASM("asm/nonmatching", CallbackPool_InvokeActive);
 #endif

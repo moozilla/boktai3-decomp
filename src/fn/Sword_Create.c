@@ -2,7 +2,7 @@
 #include "engine.h"
 void Sword_UpdateTask(void *);
 void Sword_DestroyTask(void *);
-s32 sub_080F7458(void *);
+s32 Sword_InitializeFromScript(void *);
 /* Registry routine DB8D (Sword): creates a sword task (0xDA4 bytes) for the
    given id (stored at +0xD7C). */
 void *Sword_Create(u16 id)
@@ -11,7 +11,7 @@ void *Sword_Create(u16 id)
     if (p) {
         *(u16 *)(p + 0xD7C) = id;
         Task_SetCallbacks(p, Sword_UpdateTask, Sword_DestroyTask);
-        if (sub_080F7458(p) < 0) {
+        if (Sword_InitializeFromScript(p) < 0) {
             Task_Kill(p);
             return 0;
         }

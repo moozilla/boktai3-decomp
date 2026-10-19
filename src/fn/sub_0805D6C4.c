@@ -19,7 +19,7 @@ void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
         subject->paletteBank = subject->basePaletteBank;
         subject->countdown--;
         if (subject->countdown < subject->nextThreshold) {
-            sub_082314C4(subject->effects);
+            EffectGroup_FadeFirstActive(subject->effects);
             subject->nextThreshold -= 250;
         }
     }

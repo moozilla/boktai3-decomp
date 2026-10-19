@@ -2,11 +2,9 @@
 #ifdef NONMATCHING
 // fuzzy: 81.6%
 // foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_UpdateRandomVolleyPhase sub_0819F638
-#define gRandomIndex                      gUnk_03005308
-#define gRandomTable                      gUnk_0203B400
-#define gHresvelgrVolleyState             gUnk_02000230
-#define Hresvelgr_EmitVolleyShot          sub_0819F55C
+#define gRandomIndex          gUnk_03005308
+#define gRandomTable          gUnk_0203B400
+#define gHresvelgrVolleyState gUnk_02000230
 struct ReactionVector {
     s16 x, y, z, pad;
 };
@@ -38,7 +36,7 @@ struct ReactionIds {
 };
 extern u32 gRandomIndex, gHresvelgrVolleyState;
 extern const u16 gRandomTable[];
-void sub_0819F55C(const void *, u32, u32, u32, u32, u32);
+void DirectionBurst_EmitOffset(const void *, u32, u32, u32, u32, u32);
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 
@@ -56,7 +54,7 @@ static inline s32 RandomReactionValue(const u16 *table)
     offset = gRandomIndex * 2;
     return *(const u16 *)((u32)table + offset);
 }
-void sub_0819F638(struct ActorReaction *actor, s32 frame)
+void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
 {
     s16 pos[4];
     if (actor->pending) {
@@ -83,7 +81,7 @@ void sub_0819F638(struct ActorReaction *actor, s32 frame)
             table = gRandomTable;
             a = (RandomReactionValue(table) >> 3) % 32 + 64;
             b = (RandomReactionValue(table) >> 3) % 64 + 96;
-            Hresvelgr_EmitVolleyShot(p, frame, actor->variant, a, frame + 12, b);
+            DirectionBurst_EmitOffset(p, frame, actor->variant, a, frame + 12, b);
             if (frame == 4)
                 actor->finished = 1;
         }
@@ -92,5 +90,5 @@ void sub_0819F638(struct ActorReaction *actor, s32 frame)
     Callback_InvokeActor(actor, actor->callback);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819F638);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateRandomVolleyPhase);
 #endif

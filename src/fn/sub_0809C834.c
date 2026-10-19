@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActor_BeginLinkedIdleReaction_0809C834: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
-#define SceneActor_BeginLinkedIdleReaction_0809C834 sub_0809C834
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
 void SceneActorControl_OnIdle(void);

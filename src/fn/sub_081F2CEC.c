@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.6%
 // foundry draft (worker best 98.6%); what differs is mostly register allocation and instruction order
-#define PaletteEffect_RefreshPalette  sub_081F2CEC
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
 #define gEffectPaletteBanks           gUnk_030042E4
 struct PaletteEffect {
@@ -20,7 +19,7 @@ struct PaletteEffect {
 };
 extern u8 *gUnk_030042E4;
 s32 ActorResource_GetFixedId(struct PaletteEffect *);
-void sub_081F2CEC(struct PaletteEffect *p)
+void PaletteEffect_RefreshPalette(struct PaletteEffect *p)
 {
     s32 index, bank;
     if (p->dirty) {
@@ -43,5 +42,5 @@ void sub_081F2CEC(struct PaletteEffect *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F2CEC);
+INCLUDE_ASM("asm/nonmatching", PaletteEffect_RefreshPalette);
 #endif

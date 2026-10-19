@@ -33,7 +33,7 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         struct ProximityEmitterParticle *particle;
         u16 *active;
         particle = (void *)((u8 *)emitter + particleOffset);
-        sub_08217DE0(particle, resourceAt(resource), 0);
+        ParticleSprite_Initialize(particle, resourceAt(resource), 0);
         Effect_SetOrigin(particle, scale, scale);
         SpriteDrawable_SelectTileFrame(particle, resourceAt(resource), 2);
         Effect_SetPalette(particle, 1);

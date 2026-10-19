@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.2%
 // foundry draft (worker best 94.2%); what differs is mostly register allocation and instruction order
-#define Player_UpdateScaleTransition sub_08145400
 #define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
 #define Player_SetSequenceCallback   Player_SetPendingCallback
 #define Player_ClearAnimationFlagTwo Player_OnFadeMotionExit
@@ -18,7 +17,7 @@ static inline void SetStatusFlags(struct Player *p, u32 mask)
 {
     p->statusFlags |= mask;
 }
-void sub_08145400(struct Player *p)
+void Player_UpdateScaleTransition(struct Player *p)
 {
     struct PlayerAnimation *animation;
     if (Player_ConsumeStateEntry(p))
@@ -60,5 +59,5 @@ void sub_08145400(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08145400);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateScaleTransition);
 #endif

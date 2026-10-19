@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-#define SceneActorPhase_TryBeginSpecialMotion sub_080B0AE8
 void sub_080ACE68(struct SceneActorRegistryResetView *);
 static inline u8 IsUnavailable(void *input)
 {
@@ -30,7 +29,7 @@ static inline u32 MaskedFlags(struct SceneActorRegistryResetView *p, u32 mask)
 {
     return p->flags2D4 & mask;
 }
-void sub_080B0AE8(struct SceneActorRegistryResetView *p)
+void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p)
 {
     u8 *base = (u8 *)p;
     if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->field2B5 != 0x29 &&
@@ -75,5 +74,5 @@ void sub_080B0AE8(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B0AE8);
+INCLUDE_ASM("asm/nonmatching", SceneActorPhase_TryBeginSpecialMotion);
 #endif

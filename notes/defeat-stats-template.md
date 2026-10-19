@@ -76,3 +76,12 @@ Measured with `-dg` dumps (`build/w/dump.py`: preprocess like build.py, then `ag
 * sub_0813599C was matched by another worker (PR #281). The pieces that mattered: an inline `Fill(u32 *zero, void *dst)`
   with `zero` declared before the buffer, the HUD arguments loaded into locals in ROM order, and
   `asm("" : "+r"(flags2D0))` after the first clear (it forces the reload after the `flags2D6` store).
+
+**sub_080EE1B0's last pin (`table` in sb), measured with rasolve.** The six spark calls are one
+block, so local-alloc decides. Priorities (`floor_log2(refs) * refs / (death - birth)`): size 760
+(7 refs, 184 insns) takes r8, then pos 721 (`&actor->position`, 7 refs, 194) takes sb ahead of
+table 700 (7 refs, 200). The ROM gives table sb, so its qty must have more refs (a tied copy,
+for example an inline parameter copy at the last call, would add 2) or the same refs over a
+shorter life. Ruled out: `do {} while (0)` around the table read (doubles the refs but
+loop.c then reshapes the whole block, 58 structural differences), and the tie-break (birth
+order applies only to equal priorities).

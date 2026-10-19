@@ -13,7 +13,7 @@ void Player_UpdateColliderRefreshCountdown(void *);
 s32 sub_0815E8A4(void *);
 void Player_EnterKindFour(void *);
 void sub_0815EBB8(void *);
-void sub_0815EFF8(void *);
+void PlayerContact_UpdateThresholdEvent(void *);
 void Player_ClearDirectionHistory(void *);
 void sub_0815ED78(void *);
 void Sound_PlaySong(u32);
@@ -44,7 +44,7 @@ s32 Player_Update(struct Player *p)
             Player_EnterKindFour(p);
         else if (p->tetherMode != 0x26) {
             sub_0815EBB8(p);
-            sub_0815EFF8(p);
+            PlayerContact_UpdateThresholdEvent(p);
         }
     } else if (p->kind == 2) {
         Player_ClearDirectionHistory(p);

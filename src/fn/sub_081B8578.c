@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define SceneScriptObject_ApplyHitFlash sub_081B8578
-#define gSpritePaletteBanks             gUnk_030042E4
+#define gSpritePaletteBanks gUnk_030042E4
 struct SceneScriptHitSource {
     u8 unknown0[0x38];
     u32 flags;
@@ -19,8 +18,8 @@ struct SceneScriptHitObject {
 };
 extern u8 *gUnk_030042E4;
 void Sound_PlaySong(u32);
-void sub_081B8578(struct SceneScriptHitSource *source, void *unused,
-                  struct SceneScriptHitObject *object)
+void SceneScriptObject_ApplyHitFlash(struct SceneScriptHitSource *source, void *unused,
+                                     struct SceneScriptHitObject *object)
 {
     struct {
         struct SceneScriptHitObject *object;
@@ -36,5 +35,5 @@ void sub_081B8578(struct SceneScriptHitSource *source, void *unused,
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B8578);
+INCLUDE_ASM("asm/nonmatching", SceneScriptObject_ApplyHitFlash);
 #endif

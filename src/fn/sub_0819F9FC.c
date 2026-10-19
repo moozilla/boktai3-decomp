@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_UpdateFacingActionPhase sub_0819F9FC
 struct ActorReaction {
     u8 unknown0[0x51];
     u8 direction;
@@ -30,7 +29,7 @@ void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u3
 void Sound_PlaySong(u32);
 void sub_0819BCB8(struct ActorReaction *);
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819F9FC(struct ActorReaction *actor)
+void Hresvelgr_UpdateFacingActionPhase(struct ActorReaction *actor)
 {
     u8 *action = actor->action;
     if (actor->pending) {
@@ -64,5 +63,5 @@ void sub_0819F9FC(struct ActorReaction *actor)
     Callback_InvokeActor(actor, actor->callback);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819F9FC);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateFacingActionPhase);
 #endif

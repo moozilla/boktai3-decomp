@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.7%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
-#define EffectGroup_FadeFirstActive sub_082314C4
 struct EffectGroupEntry {
     u8 state, fadeTimer;
     u16 frame;
@@ -32,12 +31,12 @@ static inline u8 FadeFirst(struct EffectGroup *group)
     }
     return 0;
 }
-s32 sub_082314C4(struct EffectGroup *group)
+s32 EffectGroup_FadeFirstActive(struct EffectGroup *group)
 {
     if (FadeFirst(group))
         group->count--;
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082314C4);
+INCLUDE_ASM("asm/nonmatching", EffectGroup_FadeFirstActive);
 #endif

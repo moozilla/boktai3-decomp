@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.9%
 // foundry draft (worker best 83.8%); what differs is mostly register allocation and instruction order
-#define ActorMarker_InitOffsetPosition sub_08181134
 struct ActorMarker {
     u8 pad0[0xd4];
     u16 position[3];
@@ -17,7 +16,7 @@ struct ActorMarker {
     u8 direction;
 };
 void SceneCombatActor_InitBouncingParticle(struct ActorMarker *);
-void sub_08181134(struct ActorMarker *p)
+void ActorMarker_InitOffsetPosition(struct ActorMarker *p)
 {
     SceneCombatActor_InitBouncingParticle(p);
     p->counters[2] = 0;
@@ -46,5 +45,5 @@ void sub_08181134(struct ActorMarker *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08181134);
+INCLUDE_ASM("asm/nonmatching", ActorMarker_InitOffsetPosition);
 #endif

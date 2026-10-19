@@ -5,7 +5,7 @@
 void SceneHud_GetActionIconPosition(void *, s32);
 u32 SceneItem_SelectRandomSpecialItem(void);
 void SceneItem_SetSlotItem(s32, s32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void SceneHud_FinishRandomActionReturn(void);
@@ -29,7 +29,7 @@ void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
     SceneHud_GetActionIconPosition(&to, s->actionCursor);
     item = SceneItem_SelectRandomSpecialItem();
     SceneItem_SetSlotItem(*selection, SceneItem_SelectRandomSpecialItem());
-    keyframe = sub_0822D604(item);
+    keyframe = Selection_GetDisplayFrame(item);
     later = *selection + 10;
     SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
                              16);

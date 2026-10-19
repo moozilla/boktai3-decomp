@@ -3,14 +3,13 @@
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
-#define Player_TurnTowardTargetFacing sub_0814FA10
 #define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
 #define Player_DispatchPendingTrigger PlayerCue_CompleteAction
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void PlayerCue_EnterStandUpdate(void *);
 void PlayerCue_CompleteAction(void *);
-void sub_0814FA10(struct Player *p)
+void Player_TurnTowardTargetFacing(struct Player *p)
 {
     if (p->tetherFrame > 1) {
         s32 target = p->targetFacing;
@@ -46,5 +45,5 @@ void sub_0814FA10(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814FA10);
+INCLUDE_ASM("asm/nonmatching", Player_TurnTowardTargetFacing);
 #endif

@@ -28,7 +28,7 @@ struct A {
 };
 extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
-void sub_0818CB30(void);
+void Armor_UpdatePartOrbit(void);
 void Armor_InitPartOrbitTimer(struct A *p)
 {
     u32 v;
@@ -36,5 +36,5 @@ void Armor_InitPartOrbitTimer(struct A *p)
     v = *(u16 *)(gUnk_0203B400 + gUnk_03005308 * 2);
     v &= 0x40;
     p->w1d6 = v + 0x1e;
-    p->fn = sub_0818CB30;
+    p->fn = Armor_UpdatePartOrbit;
 }

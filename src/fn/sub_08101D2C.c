@@ -5,13 +5,12 @@
 #ifdef NONMATCHING
 // fuzzy: 98.3%
 // foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
-#define NamedObject_UpdateTerrainRegistration sub_08101D2C
-#define TerrainRegistration_Remove            TerrainModifiers_UnregisterCell
-#define TerrainRegistration_SetCell           TerrainModifiers_RegisterCell
-#define gPlayers                              gUnk_02000580
-#define gTerrainMap                           gUnk_030052F4
-#define gTerrainWidth                         gUnk_030052F8
-#define gTerrainHeight                        gUnk_030052FC
+#define TerrainRegistration_Remove  TerrainModifiers_UnregisterCell
+#define TerrainRegistration_SetCell TerrainModifiers_RegisterCell
+#define gPlayers                    gUnk_02000580
+#define gTerrainMap                 gUnk_030052F4
+#define gTerrainWidth               gUnk_030052F8
+#define gTerrainHeight              gUnk_030052FC
 struct NamedObjectTerrainState {
     u8 unknown00[0xB6];
     u16 state;
@@ -48,7 +47,7 @@ static inline s32 GetCell(struct SceneVec *position, struct EngineMap *map)
         cell = map->rows[z] + x;
     return cell;
 }
-void sub_08101D2C(struct NamedObjectTerrainState *object)
+void NamedObject_UpdateTerrainRegistration(struct NamedObjectTerrainState *object)
 {
     struct EngineMap *map;
     s32 cell;
@@ -72,5 +71,5 @@ void sub_08101D2C(struct NamedObjectTerrainState *object)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08101D2C);
+INCLUDE_ASM("asm/nonmatching", NamedObject_UpdateTerrainRegistration);
 #endif

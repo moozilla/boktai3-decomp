@@ -4,7 +4,6 @@
 // fuzzy: 83.3%
 // foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
 /* The checker ELF predates these names in functions.csv. */
-#define HomingProjectile_InitializeSlot sub_081FF948
 
 struct HomingProjectileParams {
     u8 unknown00[0x10];
@@ -53,7 +52,7 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void HomingProjectile_BeginImpact(void *, void *, struct HomingProjectile *);
 void HomingProjectile_OnSecondaryCollision(void);
 
-void sub_081FF948(void *manager, struct HomingProjectile *p, u32 slotIndex)
+void HomingProjectile_InitializeSlot(void *manager, struct HomingProjectile *p, u32 slotIndex)
 {
     struct HomingProjectileParams *params = &p->params;
     struct ColliderVector size, offset;
@@ -90,5 +89,5 @@ void sub_081FF948(void *manager, struct HomingProjectile *p, u32 slotIndex)
                                  params->attackFlags);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FF948);
+INCLUDE_ASM("asm/nonmatching", HomingProjectile_InitializeSlot);
 #endif

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
-#define Collider_ScheduleUpdates sub_0811B094
 struct ScheduledCollider {
     u32 flags;
     u8 unknown4[0x30];
@@ -21,7 +20,7 @@ struct ColliderScheduler {
 };
 extern u32 gUnk_030053F4, gUnk_030053F0;
 s32 Div(s32, s32);
-void sub_0811B094(void *unused, struct ColliderScheduler *scheduler)
+void Collider_ScheduleUpdates(void *unused, struct ColliderScheduler *scheduler)
 {
     struct ColliderLink *link;
     s32 enabled, quota, count, divisor, delay;
@@ -71,5 +70,5 @@ void sub_0811B094(void *unused, struct ColliderScheduler *scheduler)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811B094);
+INCLUDE_ASM("asm/nonmatching", Collider_ScheduleUpdates);
 #endif

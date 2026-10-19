@@ -1,7 +1,6 @@
 #include "global.h"
 /* The return value is set up as a copy of a zero before the stores (found by tools/permute.py):
  * it puts the halfword zero in r0 and the byte zero in r1, as in the ROM. */
-#define Actor_TickCallbacks sub_081CC64C
 typedef void (*ActorUpdate)(u8 *);
 typedef void (*ActorStateCallback)(u8 *, u8 *, u32);
 /* Per-frame actor tick: clear the display flags, advance the frame counter,

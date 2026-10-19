@@ -1,0 +1,329 @@
+diff --git a/disasm.c b/disasm.c
+index f305799..7ca4013 100755
+--- a/disasm.c
++++ b/disasm.c
+@@ -47,6 +47,121 @@ const int gOptionDataColumnWidth = 16;
+ static struct Label *lookup_label(uint32_t addr);
+ static void renew_or_add_new_func_label(int type, uint32_t word);
+ 
++/* Speed-ups (boktai3-decomp): the original looks labels up with linear scans,
++ * which is quadratic with ~100k labels. An address hash finds a label by
++ * address (addresses are unique), a bitmap of active label addresses answers
++ * next_label_addr, and a cursor skips the processed prefix of gLabels.
++ * Results are identical to the linear versions. */
++static int *sIndex;          /* open addressing: label index + 1, 0 = empty */
++static uint32_t sIndexMask;
++#define ACTIVE_SPAN 0x02000000u
++static uint64_t *sActive;    /* bit per byte address in [ROM_LOAD_ADDR, +ACTIVE_SPAN) */
++static int *sOutside;        /* labels outside that span (rare) */
++static int sOutsideCount, sOutsideCap;
++static int sScanFrom;        /* every label below this is processed or inactive */
++
++static uint32_t hash_addr(uint32_t addr)
++{
++    return (addr * 2654435761u) >> 7;
++}
++
++static void index_insert(uint32_t addr, int i)
++{
++    uint32_t h = hash_addr(addr) & sIndexMask;
++    while (sIndex[h])
++        h = (h + 1) & sIndexMask;
++    sIndex[h] = i + 1;
++}
++
++static void index_rebuild(int capacity, int n)
++{
++    int i;
++    uint32_t size = 1024;
++    while (size < (uint32_t)capacity * 2)
++        size <<= 1;
++    free(sIndex);
++    sIndex = calloc(size, sizeof(*sIndex));
++    if (sIndex == NULL)
++        fatal_error("failed to alloc label index. ");
++    sIndexMask = size - 1;
++    for (i = 0; i < n; i++)
++        index_insert(gLabels[i].addr, i);
++}
++
++static int index_find(uint32_t addr)
++{
++    uint32_t h;
++    if (sIndex == NULL)
++        return -1;
++    h = hash_addr(addr) & sIndexMask;
++    while (sIndex[h])
++    {
++        if (gLabels[sIndex[h] - 1].addr == addr)
++            return sIndex[h] - 1;
++        h = (h + 1) & sIndexMask;
++    }
++    return -1;
++}
++
++static bool in_span(uint32_t addr)
++{
++    return addr >= ROM_LOAD_ADDR && addr - ROM_LOAD_ADDR < ACTIVE_SPAN;
++}
++
++static void set_active_bit(uint32_t addr, bool on)
++{
++    uint32_t o = addr - ROM_LOAD_ADDR;
++    if (sActive == NULL)
++    {
++        sActive = calloc(ACTIVE_SPAN / 64, sizeof(*sActive));
++        if (sActive == NULL)
++            fatal_error("failed to alloc label bitmap. ");
++    }
++    if (on)
++        sActive[o >> 6] |= 1ull << (o & 63);
++    else
++        sActive[o >> 6] &= ~(1ull << (o & 63));
++}
++
++static void set_label_inactive(int i, bool inactive)
++{
++    gLabels[i].inactive = inactive;
++    if (in_span(gLabels[i].addr))
++        set_active_bit(gLabels[i].addr, !inactive);
++    if (!inactive && i < sScanFrom)
++        sScanFrom = i;
++}
++
++static void mark_unprocessed(int i)
++{
++    gLabels[i].processed = false;
++    if (i < sScanFrom)
++        sScanFrom = i;
++}
++
++/* first active label address >= addr inside the span, or 0xFFFFFFFF */
++static uint32_t next_active_in_span(uint32_t addr)
++{
++    uint32_t o, w;
++    uint64_t bits;
++    if (sActive == NULL)
++        return 0xFFFFFFFF;
++    if (addr < ROM_LOAD_ADDR)
++        addr = ROM_LOAD_ADDR;
++    if (!in_span(addr))
++        return 0xFFFFFFFF;
++    o = addr - ROM_LOAD_ADDR;
++    w = o >> 6;
++    bits = sActive[w] & (~0ull << (o & 63));
++    while (!bits)
++    {
++        if (++w >= ACTIVE_SPAN / 64)
++            return 0xFFFFFFFF;
++        bits = sActive[w];
++    }
++    return ROM_LOAD_ADDR + (w << 6) + __builtin_ctzll(bits);
++}
++
+ int disasm_add_label(uint32_t addr, uint8_t type, char *name)
+ {
+     int i, j;
+@@ -54,13 +169,11 @@ int disasm_add_label(uint32_t addr, uint8_t type, char *name)
+     //printf("adding label 0x%08X\n", addr);
+     // Search for label
+     //assert(addr >= ROM_LOAD_ADDR && addr < ROM_LOAD_ADDR + gInputFileBufferSize);
+-    for (i = 0; i < gLabelsCount; i++)
++    i = index_find(addr);
++    if (i >= 0)
+     {
+-        if (gLabels[i].addr == addr)
+-        {
+-            gLabels[i].type = type;
+-            return i;
+-        }
++        gLabels[i].type = type;
++        return i;
+     }
+ 
+     i = gLabelsCount++;
+@@ -86,8 +199,22 @@ int disasm_add_label(uint32_t addr, uint8_t type, char *name)
+     for (j = 0; j < MAX_DEPS; ++j)
+         gLabels[i].deps[j] = NULL;
+     gLabels[i].depCount = 0;
+-    gLabels[i].inactive = false;
+     gLabels[i].isFarJump = false;
++    if ((uint32_t)gLabelsCount * 2 > sIndexMask)
++        index_rebuild(sLabelBufferCount, i);
++    index_insert(addr, i);
++    set_label_inactive(i, false);
++    if (!in_span(addr))
++    {
++        if (sOutsideCount == sOutsideCap)
++        {
++            sOutsideCap = sOutsideCap ? 2 * sOutsideCap : 64;
++            sOutside = realloc(sOutside, sOutsideCap * sizeof(*sOutside));
++            if (sOutside == NULL)
++                fatal_error("failed to alloc space for labels. ");
++        }
++        sOutside[sOutsideCount++] = i;
++    }
+     return i;
+ }
+ 
+@@ -111,11 +238,9 @@ static struct Label *lookup_label(uint32_t addr)
+ {
+     int i;
+ 
+-    for (i = 0; i < gLabelsCount; i++)
+-    {
+-        if (gLabels[i].addr == addr && !gLabels[i].inactive)
+-            return &gLabels[i];
+-    }
++    i = index_find(addr);
++    if (i >= 0 && !gLabels[i].inactive)
++        return &gLabels[i];
+     return NULL;
+ }
+ 
+@@ -142,11 +267,15 @@ static int get_unprocessed_label_index(void)
+ {
+     int i;
+ 
+-    for (i = 0; i < gLabelsCount; i++)
++    for (i = sScanFrom; i < gLabelsCount; i++)
+     {
+         if (!gLabels[i].processed && !gLabels[i].inactive)
++        {
++            sScanFrom = i;
+             return i;
++        }
+     }
++    sScanFrom = gLabelsCount;
+     return -1;
+ }
+ 
+@@ -381,7 +510,7 @@ static void rec_free_dep_nodes(struct DepNode *dn)
+ 
+ static void remove_label(struct Label *label)
+ {
+-    label->inactive = true;
++    set_label_inactive(label - gLabels, true);
+ }
+ 
+ static struct Label *find_prev_label(struct Label *label)
+@@ -433,7 +562,7 @@ static bool set_inactive_labels_and_reprocess_prev_labels(void)
+ 
+                 ret = true;
+                 if (label)
+-                    label->processed = false;
++                    mark_unprocessed(label - gLabels);
+                 remove_label(&gLabels[i]);
+             }
+         }
+@@ -490,7 +619,7 @@ static void renew_or_add_new_func_label(int type, uint32_t word)
+         if (label_p != NULL)
+         {
+             // maybe it has been processed as a non-function label
+-            label_p->processed = false;
++            mark_unprocessed(label_p - gLabels);
+             label_p->branchType = BRANCH_TYPE_BL;
+             label_p->isFunc = true;
+         }
+@@ -516,19 +645,24 @@ static bool IsValidInstruction(cs_insn * insn, int type)
+ 
+ static uint32_t next_label_addr(uint32_t addr)
+ {
+-    uint32_t labelAddr = 0xFFFFFFFF;
++    uint32_t labelAddr;
+     int i;
+ 
+-    for (i = 0; i < gLabelsCount; ++i)
++    labelAddr = next_active_in_span(addr);
++    if (labelAddr == addr)
++    {
++        i = index_find(addr);
++        if (gLabels[i].type == LABEL_ARM_CODE || gLabels[i].type == LABEL_THUMB_CODE)
++            labelAddr = addr == 0xFFFFFFFF ? 0xFFFFFFFF : next_active_in_span(addr + 1);
++    }
++    for (i = 0; i < sOutsideCount; ++i)
+     {
+-        if (gLabels[i].addr == addr
+-         && (gLabels[i].type == LABEL_ARM_CODE || gLabels[i].type == LABEL_THUMB_CODE))
++        struct Label *l = &gLabels[sOutside[i]];
++        if (l->addr == addr
++         && (l->type == LABEL_ARM_CODE || l->type == LABEL_THUMB_CODE))
+             continue;
+-
+-        if (gLabels[i].addr >= addr
+-         && gLabels[i].addr < labelAddr
+-         && !gLabels[i].inactive)
+-            labelAddr = gLabels[i].addr;
++        if (l->addr >= addr && l->addr < labelAddr && !l->inactive)
++            labelAddr = l->addr;
+     }
+     return labelAddr == 0xFFFFFFFF ? 0 : labelAddr;
+ }
+@@ -819,23 +953,19 @@ static void analyze(void)
+ 
+                             // check if anything in PCIC is already proved a far jump
+                             flag = false;
+-                            for (j = 0; j < gLabelsCount; ++j)
++                            for (k = 0; k < pcici; ++k)
+                             {
+-                                for (k = 0; k < pcici; ++k)
++                                j = index_find(processedCallsInChunk[k]);
++                                if (j >= 0 && gLabels[j].isFarJump)
+                                 {
+-                                    if (processedCallsInChunk[k] == gLabels[j].addr
+-                                        && gLabels[j].isFarJump)
+-                                    {
+-                                        flag = true;
+-                                        break;
+-                                    }
++                                    flag = true;
++                                    break;
+                                 }
+-                                if (flag) break;
+                             }
+                             if (flag) continue; // simply ignore this pool
+                             // otherwise we add another dep linked list to the pool label
+                             idx = disasm_add_label(poolAddr, LABEL_POOL, NULL);
+-                            gLabels[idx].inactive = false;
++                            set_label_inactive(idx, false);
+                             if (gLabels[idx].depCount == MAX_DEPS)
+                             {
+                                 // try to replace an invalid pointer
+@@ -1094,23 +1224,27 @@ static void print_disassembly(void)
+ 
+     // remove inactive labels
+ 
+-    for (i = 0; i < gLabelsCount; i++)
+     {
+-        int j;
++        int n = 0;
+ 
+-        if (gLabels[i].inactive)
++        for (i = 0; i < gLabelsCount; i++)
+         {
+-            for (j = 0; j < gLabels[i].depCount && gLabels[i].deps[j]; ++j)
+-                if (gLabels[i].deps[j] != &sInvalidDepNode)
+-                    rec_free_dep_nodes(gLabels[i].deps[j]);
+-            if (i+1 < gLabelsCount)
++            int j;
++
++            if (gLabels[i].inactive)
+             {
+-                memmove(&gLabels[i], &gLabels[i+1], sizeof(struct Label) * (gLabelsCount - i - 1));
+-                --i; // don't increment i
++                for (j = 0; j < gLabels[i].depCount && gLabels[i].deps[j]; ++j)
++                    if (gLabels[i].deps[j] != &sInvalidDepNode)
++                        rec_free_dep_nodes(gLabels[i].deps[j]);
++                continue;
+             }
+-            --gLabelsCount;
++            if (n != i)
++                gLabels[n] = gLabels[i];
++            n++;
+         }
++        gLabelsCount = n;
+     }
++    index_rebuild(gLabelsCount, gLabelsCount);
+ 
+     i = 0;
+     while (addr < ROM_LOAD_ADDR + gInputFileBufferSize)

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.8%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
-#define ScreenLayers_HidePair sub_081EC670
 #define gBackgroundVisibility gUnk_03004BD8
 struct ScreenLayerPair {
     u8 unknown0[0x2C0];
@@ -14,7 +13,7 @@ struct ScreenLayerPair {
     s16 layer;
 };
 extern u16 gUnk_03004BD8;
-void sub_081EC670(struct ScreenLayerPair *screen)
+void ScreenLayers_HidePair(struct ScreenLayerPair *screen)
 {
     s32 mask;
     u16 *control;
@@ -34,5 +33,5 @@ void sub_081EC670(struct ScreenLayerPair *screen)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EC670);
+INCLUDE_ASM("asm/nonmatching", ScreenLayers_HidePair);
 #endif

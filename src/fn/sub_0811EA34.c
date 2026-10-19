@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.5%
 // foundry draft (worker best 87.1%); what differs is mostly register allocation and instruction order
-#define ModifierStats_ApplyKinds2And5 sub_0811EA34
 
 struct StatModifier {
     s32 (*apply)(struct StatModifier *, s32);
@@ -27,7 +26,7 @@ static inline struct StatModifier *ModifierStats_GetModifiers(struct ModifierSta
 {
     return stats->modifiers;
 }
-s32 sub_0811EA34(struct ModifierStats *stats, s32 value)
+s32 ModifierStats_ApplyKinds2And5(struct ModifierStats *stats, s32 value)
 {
     struct StatModifier *entry = ModifierStats_GetModifiers(stats);
     s32 i = 0;
@@ -42,5 +41,5 @@ s32 sub_0811EA34(struct ModifierStats *stats, s32 value)
     return value;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811EA34);
+INCLUDE_ASM("asm/nonmatching", ModifierStats_ApplyKinds2And5);
 #endif

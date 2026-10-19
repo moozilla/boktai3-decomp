@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 95.2%
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
-#define PlayerContact_UpdateThresholdEvent sub_0815EFF8
-#define gRandomTableIndex                  gUnk_03005308
-#define gRandomTable                       gUnk_0203B400
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 extern u32 gUnk_030053F4, gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
@@ -23,7 +22,7 @@ static inline u16 nextRandom(void)
     offset += (u32)table;
     return *(const u16 *)offset;
 }
-void sub_0815EFF8(struct Player *p)
+void PlayerContact_UpdateThresholdEvent(struct Player *p)
 {
     u32 zero = gUnk_030053F4 & 0x1000;
     if (zero)
@@ -53,5 +52,5 @@ clearPending:
     *(u8 *)((u8 *)p + 0x53B) = zero;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815EFF8);
+INCLUDE_ASM("asm/nonmatching", PlayerContact_UpdateThresholdEvent);
 #endif

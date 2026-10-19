@@ -3,9 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 99.4%
 // foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
-#define SceneActors_FireTrackingProjectileSpread sub_081F6748
-#define Projectile_SpawnAtPosition               sub_081FD01C
-#define gSceneAngleSineTable                     gUnk_086149C4
+#define gSceneAngleSineTable gUnk_086149C4
 typedef struct ProjectilePosition {
     s16 x, y, z, pad;
 } ProjectilePosition;
@@ -24,7 +22,7 @@ void Projectile_SetSpriteParameters(u8 *, u32, u32, u32);
 void Projectile_SetTrackingTarget(u8 *, u32);
 void Sound_PlaySong(u32);
 void Projectile_InitParameters(u8 *);
-int sub_081FD01C(u8 *, ProjectilePosition *);
+int Projectile_SpawnAtPosition(u8 *, ProjectilePosition *);
 static inline int trunc12(int n)
 {
     return n >= 0 ? n >> 12 : -(-n >> 12);
@@ -35,7 +33,8 @@ static inline void sum(ProjectilePosition *dst, ProjectilePosition *a, Projectil
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
-void sub_081F6748(SpreadProjectileActor *p, ProjectilePosition *position, u32 parameter)
+void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
+                                              ProjectilePosition *position, u32 parameter)
 {
     u8 projectile[0x58];
     ProjectilePosition delta;
@@ -75,12 +74,12 @@ void sub_081F6748(SpreadProjectileActor *p, ProjectilePosition *position, u32 pa
         Projectile_SetScriptProcedure(projectile, 0x4363, 0);
         Projectile_SetTrackingTarget(projectile, (u32)&p->target);
         Projectile_SetBehaviorMode(projectile, 1);
-        sub_081FD01C(projectile, spawnPtr);
+        Projectile_SpawnAtPosition(projectile, spawnPtr);
         angle = (u8)(angle + step);
         --count;
     } while (count >= 0);
     Sound_PlaySong(1384);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F6748);
+INCLUDE_ASM("asm/nonmatching", SceneActors_FireTrackingProjectileSpread);
 #endif

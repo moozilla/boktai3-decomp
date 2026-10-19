@@ -25,9 +25,11 @@ Recent work, newest first (details in [history](history/README.md)):
 
 * **Every scene's procedures have working names** (2026-10-19):
   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
-  and 80% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
+  and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
   `_after_cutscene_198`, `_on_arrival`, `exit_to_3107`), from how they are
-  referred to and what they call. The readable view and the Studio use them
+  referred to and what they call; the 59 most-referenced library procedures
+  got names by hand in `proc.csv` (`ensure_scene_actor_manager`,
+  `place_scene_npc`, `roll_item_drop`, `arm_defeat_count_event`...). The readable view and the Studio use them
   (confidence `auto`); `gcl/names/proc.csv` still wins
   ([gcl/README.md](../gcl/README.md#generated-names-for-scene-procedures)).
 * **A showcase scene in the game** (2026-10-17): `tools/showcase/` writes new

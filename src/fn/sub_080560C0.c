@@ -1,5 +1,5 @@
 #include "terrain_edge_marker.h"
-void sub_08217DE0(struct TerrainMarkerSprite *, void *, u32);
+void ParticleSprite_Initialize(struct TerrainMarkerSprite *, void *, u32);
 void SpriteDrawable_SelectTileFrame(struct TerrainMarkerSprite *, void *, u32);
 void Effect_SetOrigin(struct TerrainMarkerSprite *, s32, s32);
 void TerrainEdgeMarker_Add(union TerrainMarkerPosition *position, s32 direction, s32 kind,
@@ -9,7 +9,7 @@ void TerrainEdgeMarker_Add(union TerrainMarkerPosition *position, s32 direction,
     if (manager) {
         void *resource = AnimData_FindEntry(0x1C1A);
         struct TerrainMarkerSprite *marker = &manager->markers[manager->count];
-        sub_08217DE0(marker, resource, 0);
+        ParticleSprite_Initialize(marker, resource, 0);
         if (kind == 0)
             SpriteDrawable_SelectTileFrame(marker, resource, 0x33);
         else

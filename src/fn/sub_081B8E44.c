@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 95.5%
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
-#define OrbitMotion_UpdateCrossedSines sub_081B8E44
-#define gSineTable                     gUnk_086149C4
+#define gSineTable gUnk_086149C4
 static inline s32 half(s32 n)
 {
     if (n >= 0)
@@ -26,7 +25,7 @@ static inline void waves(struct OrbitVector *v, struct OrbitWavePair *p)
     v->y = 0;
     v->z = half(((b - a) << 5) / 3);
 }
-s32 sub_081B8E44(struct OrbitMotion *p)
+s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *p)
 {
     struct OrbitWavePair pair;
     pair.x = scale12(p->radius * gSineTable[p->timer & 255]);
@@ -40,5 +39,5 @@ s32 sub_081B8E44(struct OrbitMotion *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B8E44);
+INCLUDE_ASM("asm/nonmatching", OrbitMotion_UpdateCrossedSines);
 #endif

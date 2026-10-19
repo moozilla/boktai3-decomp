@@ -4,7 +4,7 @@ struct CP {
     s16 x, y, z, pad;
 };
 extern u8 *gUnk_02000710;
-void sub_08184FE8(u8 *, s32);
+void DirectionalActor_TryBeginState(u8 *, s32);
 void ActorController_StartTurn(u8 *, u32);
 u32 ActorController_StartModeTwoTurn(u8 *p, u32 v);
 u32 ActorController_StartModeThreeTurn(u8 *p, u32 v);
@@ -33,12 +33,12 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
     }
     q = p + 0xB3D;
     if (*q == 0) {
-        sub_08184FE8(p, 0);
+        DirectionalActor_TryBeginState(p, 0);
     } else if (*q == 1) {
         u32 t = sub_0821FB8C(p + 0x18, p + 0x48, p[0xB39], 0x40);
         if (ActorController_IsNearTarget(p) != 0) {
             *q = 0;
-            sub_08184FE8(p, 0);
+            DirectionalActor_TryBeginState(p, 0);
         } else if (p[0xB41] != 0) {
             if (NavMesh_ConsumeProbeEvent((u16 *)(p + 0x18)) != 0) {
                 switch (a) {
@@ -58,24 +58,24 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
             } else {
                 switch (b) {
                     case 1:
-                        sub_08184FE8(p, 0x1f);
+                        DirectionalActor_TryBeginState(p, 0x1f);
                         break;
                     case 2:
-                        sub_08184FE8(p, 0x2c);
+                        DirectionalActor_TryBeginState(p, 0x2c);
                         break;
                     case 0:
                         switch (a) {
                             case 0:
-                                sub_08184FE8(p, 1);
+                                DirectionalActor_TryBeginState(p, 1);
                                 break;
                             case 1:
-                                sub_08184FE8(p, 0x13);
+                                DirectionalActor_TryBeginState(p, 0x13);
                                 break;
                             case 2:
-                                sub_08184FE8(p, 0x16);
+                                DirectionalActor_TryBeginState(p, 0x16);
                                 break;
                             case 3:
-                                sub_08184FE8(p, 0x26);
+                                DirectionalActor_TryBeginState(p, 0x26);
                                 break;
                         }
                         break;

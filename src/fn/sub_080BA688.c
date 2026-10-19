@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
-#define SceneActorReaction_TickForwardBurst sub_080BA688
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
@@ -24,7 +23,7 @@ static inline void AddHalf(s16 *dst, const s16 *src)
 {
     *dst += *src;
 }
-void sub_080BA688(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p)
 {
     struct {
         u32 zero;
@@ -66,5 +65,5 @@ void sub_080BA688(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080BA688);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_TickForwardBurst);
 #endif

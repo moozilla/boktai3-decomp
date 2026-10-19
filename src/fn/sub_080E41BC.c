@@ -1,11 +1,11 @@
 #include "global.h"
 
-void sub_080DE92C(void *);
-void sub_080DED74(void *);
+void SceneActor_ConfigureSecondaryProfileEntry(void *);
+void SceneActorControl_TickActionCooldown(void *);
 
 s32 Dog_PrepareFrame(void *p)
 {
-    sub_080DE92C(p);
-    sub_080DED74(p);
+    SceneActor_ConfigureSecondaryProfileEntry(p);
+    SceneActorControl_TickActionCooldown(p);
     return 1;
 }

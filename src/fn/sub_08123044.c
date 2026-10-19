@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.7%
 // foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
-#define SpriteNotice_TickManager sub_08123044
 struct SpriteNotice {
     u8 unk0[0x42];
     u8 state;
@@ -22,7 +21,7 @@ static inline u8 Occupied(u32 *mask, s32 i)
         return TRUE;
     return FALSE;
 }
-s32 sub_08123044(struct SpriteNoticeManager *manager)
+s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
 {
     struct SpriteNotice *start = manager->slots;
     s32 i;
@@ -47,5 +46,5 @@ s32 sub_08123044(struct SpriteNoticeManager *manager)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08123044);
+INCLUDE_ASM("asm/nonmatching", SpriteNotice_TickManager);
 #endif
