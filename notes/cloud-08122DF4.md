@@ -17,9 +17,8 @@
   `08125528` was a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8964 bytes with its tails 08124240/08125138) matches exactly (see "Fourth round" below).
-  Only the stack slots of four spilled GCSE/PRE reaching registers differ, and they need the GCSE hash
-  table size to be 2267..2345 instead of 2597 (see "Third round" below).
+* `08123194` (8964 bytes with its tails 08124240/08125138) matches exactly. The last 13 bytes were the stack
+  slots of four spilled GCSE/PRE reaching registers (see "Third round" and "Fourth round" below).
   Structural differences went 2875 -> 0 with the changes below.
 
 ## Techniques found on 08123194 (apply to any big function)
