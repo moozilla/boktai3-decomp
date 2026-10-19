@@ -1,12 +1,11 @@
 #include "global.h"
 #include "scene_grid.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7% (13 differing bytes). Bounce-shot terrain probe: may the shot enter the next cell,
-// else slide it along a wall or up a slope toward the player. Every instruction and register
-// matches except the stack slots of four spilled GCSE/PRE reaching registers: the original's
-// expression hash table had 2267..2345 buckets (insns at GCSE / 2), ours 2597. With that one
-// number forced in a patched agbcc the function matches. See notes/cloud-08122DF4.md.
+/* Bounce-shot terrain probe: may the shot enter the next cell, else slide it along a wall or up
+ * a slope toward the player. The match depends on GCSE's expression hash table size (insns at
+ * GCSE / 2) and on the pseudo numbers of `cell`, `start` and `preferred`: they order four spilled
+ * PRE registers' stack slots. SlopeSurface's u16/s16 round trip and the function-scope `cell`
+ * set both; see notes/cloud-08122DF4.md before restructuring. */
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -61,6 +60,12 @@ slopeX:
 done:
     return height;
 }
+/* Surface height a shot riding a slope cell takes on (its y). */
+static inline u16 SlopeSurface(u8 *properties, struct BouncePosition *position)
+{
+    s16 height = CellHeight(properties, position);
+    return height;
+}
 /* Can the shot enter `next` from `current` moving in quadrant `direction`? */
 static inline u8 CanEnter(struct BouncePosition *position, u32 current, u32 next, s32 angle)
 {
@@ -108,17 +113,6 @@ static inline u8 CanEnter(struct BouncePosition *position, u32 current, u32 next
     }
     return 0;
 }
-/* Set the shot's height to the slope surface under it (shape 1 slopes along z, 2 along x). */
-#define RIDE_SLOPE()                                                                               \
-    do {                                                                                           \
-        u32 shape = (flags >> 4) & 15;                                                             \
-        u32 height = (flags & 15) << 8;                                                            \
-        if (shape == 1)                                                                            \
-            height -= *((u8 *)position + 4);                                                       \
-        else if (shape == 2)                                                                       \
-            height -= *(u8 *)position;                                                             \
-        position->y = height;                                                                      \
-    } while (0)
 /* Walk from `cell` towards `target` along the row, then the column, over cells of the same
  * height; a slope cell ends the walk (the shot rides it). Returns 1 if the walk reaches. */
 static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
@@ -136,7 +130,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
             if (CellAttributes(i) & 0xC3)
                 break;
             if (*Properties(i) >> 4 == 2) {
-                position->y = CellHeight(Properties(i), position);
+                position->y = SlopeSurface(Properties(i), position);
                 return 1;
             }
             if (i == target)
@@ -150,7 +144,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
             if (CellAttributes(i) & 0xC3)
                 break;
             if (*Properties(i) >> 4 == 1) {
-                position->y = CellHeight(Properties(i), position);
+                position->y = SlopeSurface(Properties(i), position);
                 return 1;
             }
             if (i == target)
@@ -166,7 +160,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
             if (CellAttributes(i) & 0xC3)
                 break;
             if (*Properties(i) >> 4 == 2) {
-                position->y = CellHeight(Properties(i), position);
+                position->y = SlopeSurface(Properties(i), position);
                 return 1;
             }
             if (i == target)
@@ -180,7 +174,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
             if (CellAttributes(i) & 0xC3)
                 break;
             if (*Properties(i) >> 4 == 1) {
-                position->y = CellHeight(Properties(i), position);
+                position->y = SlopeSurface(Properties(i), position);
                 return 1;
             }
             if (i == target)
@@ -203,6 +197,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
     s32 quadrant;
     s32 result;
     s32 speed;
+    s32 cell;
     if (s->kind) {
         if (CanEnter(&s->position, s->cell, next, angle))
             return 0;
@@ -210,8 +205,8 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
         position = &s->position;
         quadrant = angle + 0x20;
         if (gUnk_030053F4 & 0x800) {
-            s32 cell = *cellp;
             s32 target;
+            cell = *cellp;
             switch ((quadrant >> 6) & 3) {
                 case 0:
                 case 2:
@@ -245,7 +240,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
         } else {
             u8 found[4];
             struct BouncePosition delta;
-            s32 cell = *cellp;
+            s32 start = *cellp;
             s32 direction = (quadrant >> 6) & 3;
             s32 preferred;
             s32 target;
@@ -260,18 +255,18 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
             switch (direction) {
                 case 0:
                 case 2:
-                    if (Seek(position, cell, cell - SceneGrid_Width()))
+                    if (Seek(position, start, start - SceneGrid_Width()))
                         found[3] = 1;
-                    if (Seek(position, cell, cell + SceneGrid_Width()))
+                    if (Seek(position, start, start + SceneGrid_Width()))
                         found[1] = 1;
                     break;
                 case 1:
                 case 3:
-                    target = cell + 1;
-                    if (Seek(position, cell, target))
+                    target = start + 1;
+                    if (Seek(position, start, target))
                         found[0] = 1;
-                    target = cell - 1;
-                    if (Seek(position, cell, target))
+                    target = start - 1;
+                    if (Seek(position, start, target))
                         found[2] = 1;
                     break;
             }
@@ -330,6 +325,3 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08123194);
-#endif
