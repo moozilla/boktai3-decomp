@@ -9,8 +9,8 @@ worktrees share the gen/ of the checkout unitize.py runs from. --state is that
 checkout's build/unitize/.
 
 A unit's own changes are taken from its worktree commit (unit/unit-SLUG), limited
-to src/SLUG.c, include/SLUG.h, the src/fn/ files it removed, symbols/ and notes/
-(other files in the commit are formatting or shared-doc edits that would collide).
+to src/SLUG.c, include/ (its own header and fields it added to shared ones), the
+src/fn/ files it removed, symbols/ and notes/ (shared docs would collide).
 They are applied on a fresh branch from origin/main; a unit that no longer
 applies is marked "conflict" for a later re-run. If the combined build fails,
 the batch is split in half and each half is tried on its own. State goes in
@@ -60,7 +60,7 @@ def own_patch(st):
     status = [l.split("\t") for l in git("diff", "--name-status", f"{b}~1", b).stdout.splitlines()]
     deleted = [f for k, f, *_ in status if k == "D" and f.startswith("src/fn/")]
     keep = [f for k, f, *_ in status if f not in deleted and
-            (f in (f"src/{s}.c", f"include/{s}.h") or f.startswith(("src/fn/", "symbols/", "notes/")))]
+            (f == f"src/{s}.c" or f.startswith(("include/", "src/fn/", "symbols/", "notes/")))]
     return (git("diff", "--binary", f"{b}~1", b, "--", *keep).stdout if keep else ""), deleted
 
 
