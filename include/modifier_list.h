@@ -39,10 +39,11 @@ struct StatModifier {
     u8 unknownD[3];
     struct StatModifierOwner *owner;
 };
+/* Current/pending stat snapshot, 0x28 bytes. Numeric kind names are tentative. */
 struct ModifierSelection {
-    s16 values0[5];
+    s16 values0[5]; /* +0x00: first source pair, then second source kinds 0/7/6. */
     s16 count, capacity;
-    s16 valuesE[5];
+    s16 valuesE[5]; /* +0x0E: third source triple, then fourth source pair. */
     u32 mask;
     s16 sourceIds[4];
     s16 selectedId, secondaryId;
@@ -100,7 +101,8 @@ struct ModifierMenu {
     u32 stateFrame;
     void *backgroundResource;
     void *tilemap;
-    u8 unknown3C[0x28];
+    u8 unknown3C[0x24];
+    void *backgroundScript; /* 0x60: background setup resource, distinct from the close script. */
     u32 dirtyFlags;
     struct ModifierSelection current, pending;
     void *script;
@@ -138,6 +140,12 @@ struct ModifierPreviewOrigin {
 struct ModifierItemInfo {
     u8 id, kind;
     u16 value2, value4, value6, value8;
+};
+/* Eight-byte second-source lookup result; widths follow FC34 loads. */
+struct ModifierByteSourceInfo {
+    u8 id, kindZero, kindSeven, capacity;
+    u16 kindSix;
+    u8 unknown6[2];
 };
 s32 ScriptRecord_FindModifierRecord(struct ModifierRecord *, s32);
 #endif

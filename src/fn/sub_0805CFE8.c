@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-void ScenePanelSubject_TickActivating(struct ScenePanelSubjectView *owner)
+void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
 {
     if (owner->kind) {
         const volatile u16 *source = &owner->sequence.index;

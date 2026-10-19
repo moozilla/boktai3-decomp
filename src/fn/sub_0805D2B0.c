@@ -1,5 +1,5 @@
 #include "scene_panel_subject_playback.h"
-void ScenePanelSubject_TickDeparting(struct ScenePanelSubjectView *owner)
+void ScenePanelSubject_TickDeparting(struct ScenePanelSubject *owner)
 {
     if (owner->kind) {
         const volatile u16 *source = &owner->sequence.index;

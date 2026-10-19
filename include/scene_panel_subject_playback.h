@@ -3,7 +3,7 @@
 #include "scene_panel_subject.h"
 /* Defined empty-asm operands preserve agbcc copy lifetimes; all callers carry
  * MATCHING_CONCESSION and the shared hints were minimized across their extents. */
-static inline u32 ScenePanelSubject_StepPlayback(struct ScenePanelSubjectView *owner)
+static inline u32 ScenePanelSubject_StepPlayback(struct ScenePanelSubject *owner)
 {
     struct ContactSwarmSprite *sprite = &owner->drawable;
     struct DisplaySequenceState *state = &owner->sequence;

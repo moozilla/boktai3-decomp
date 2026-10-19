@@ -56,7 +56,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         const struct ContactPosition *origin;
         projectedPointer = &projected;
         asm("" : "+r"(projectedPointer));
-        origin = &panel->overlayOrigin;
+        origin = &panel->origin;
         asm("" : "+r"(origin));
         x = origin->x;
         z = origin->z;
@@ -92,7 +92,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     }
     panel->overlayChanged = 0;
     slot = 0;
-    if (slot < panel->overlayCount) {
+    if (slot < panel->subjectCount) {
         entryPointer = &entry;
         do {
             s32 old;
@@ -105,7 +105,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
                 target = 5;
             else {
-                u32 state = panel->subjects[slot]->displayState;
+                u32 state = panel->subjects[slot]->state;
                 target = 5;
                 if (state == 4)
                     target = 0;
@@ -353,7 +353,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             }
         nextSlot:
             slot = next;
-        } while (slot < panel->overlayCount);
+        } while (slot < panel->subjectCount);
     }
     if (playSound)
         Sound_PlaySong(245);
