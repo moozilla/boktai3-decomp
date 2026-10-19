@@ -1456,3 +1456,4 @@ addr,function,name,family,note
 081B6A38,sub_081B6A38,ActorEffect_UpdatePositionTrail,"ActorEffect","updates five trail sprite positions from circular history"
 081B6C1C,sub_081B6C1C,ActorEffect_UpdateHomingFlight,"ActorEffect","steers toward target and updates colliders and position trail"
 081B7568,sub_081B7568,GrowthHazard_FindNearestActiveEntry,"GrowthHazard","finds nearest state-2 entry in X/Z and optionally copies its position"
+081B7744,sub_081B7744,GrowthHazard_ApplyAnimationEvent,"GrowthHazard","updates entry counters and cooldowns from animation event flags"
