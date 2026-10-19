@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
 void SpriteEffectController_RefreshCollider(struct SpriteEffectController *controller,
                                             struct ContactPosition *position)
@@ -7,11 +6,13 @@ void SpriteEffectController_RefreshCollider(struct SpriteEffectController *contr
     u32 enabled = flags & 4;
     if (enabled) {
         u32 refresh = flags & 0x100;
-        asm("" : "+r"(refresh));
+        do {
+        } while (0);
         if (refresh) {
             struct ContactCollider *collider = &controller->collider;
-            if (position)
+            if (position) {
                 Collider_SetPosition(collider, position, 0);
+            }
             Collider_Refresh(collider);
         }
     }
