@@ -36,10 +36,10 @@ static inline void copy32(const void *source, void *dest, s32 size)
     CpuSet(source, dest, (size / 4 & 0x1fffff) | 0x04000000);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {
+    s32 k2 = 0x7C1F;
     s32 count;
     u32 inverse;
     amount >>= 1;
@@ -57,15 +57,17 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
             dest += first;
             out = dest;
             if (count > 0) {
-                register u32 greenMask asm("r10") = 0x03E0;
+                u32 greenMask = 0x03E0;
                 i = count;
                 do {
-                    register u32 from asm("r0") = *a;
+                    u32 from = *a;
                     u32 fromRB;
                     u32 fromG;
                     u32 to;
-                    fromRB = 0x7C1F & from;
-                    fromG = greenMask & from;
+                    fromRB = k2 & from;
+                    do {
+                        fromG = greenMask & from;
+                    } while (0);
                     to = *b;
                     {
                         u32 rb = (((to & 0x7C1F) * amount) + (inverse * fromRB)) & 0xF83E0;
@@ -318,37 +320,41 @@ void Palette_InitBlendSlide(struct PaletteController *p)
     s->duration = 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_BlendVariants(struct PaletteController *p)
 {
+    u16 *out_3;
+    u16 *out_2;
     s32 i;
-    register u16 *out asm("r5");
+    u16 *out;
     if (p->blend == 0) {
         i = 0;
         out = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_SOURCE][i])
+            if (p->colorSets[PALETTE_SET_SOURCE][i]) {
                 CpuSet(p->colorSets[PALETTE_SET_SOURCE][i], out, 0x04000080);
+            }
             out += 256;
             i++;
         } while (i <= 3);
     } else if (p->blend == 64) {
         i = 0;
-        out = p->palettes[0];
+        out_3 = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_DESTINATION][i])
-                CpuSet(p->colorSets[PALETTE_SET_DESTINATION][i], out, 0x04000080);
-            out += 256;
+            if (p->colorSets[PALETTE_SET_DESTINATION][i]) {
+                CpuSet(p->colorSets[PALETTE_SET_DESTINATION][i], out_3, 0x04000080);
+            }
+            out_3 += 256;
             i++;
         } while (i <= 3);
     } else {
         i = 0;
-        out = p->palettes[0];
+        out_2 = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_SOURCE][i] && p->colorSets[PALETTE_SET_DESTINATION][i])
-                Palette_BlendRange(out, p->colorSets[PALETTE_SET_SOURCE][i],
+            if (p->colorSets[PALETTE_SET_SOURCE][i] && p->colorSets[PALETTE_SET_DESTINATION][i]) {
+                Palette_BlendRange(out_2, p->colorSets[PALETTE_SET_SOURCE][i],
                                    p->colorSets[PALETTE_SET_DESTINATION][i], p->blend, 0, 208);
-            out += 256;
+            }
+            out_2 += 256;
             i++;
         } while (i <= 3);
     }
@@ -453,50 +459,54 @@ static inline u16 blendEnabled(struct PaletteController *p)
     return p->flags & 8;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 Palette_InitializeFromScript(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
-    gUnk_02000468 = p;
-    p->pending = 0;
-    t->callback = 0;
-    p->hardware = gUnk_03004FC0;
-    gUnk_03004DA0 = 64;
-    gUnk_03004DA8 = 64;
-    gUnk_03005214 = 0x1084;
-    gUnk_030051C4 = 0;
-    p->flags = Script_GetKeywordValue('f', 0);
-    if (Script_SeekToKeyword('p')) {
-        register s32 i asm("r6") = 0;
-        u16 **out = p->colorSets[PALETTE_SET_SOURCE];
-        while (Script_GetPc() && i <= 3) {
-            s32 value = Script_GetValue();
-            if (value != 0x30)
-                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-            else
-                *out = 0;
-            out++;
-            i++;
+    do {
+        gUnk_02000468 = p;
+        p->pending = 0;
+        t->callback = 0;
+        p->hardware = gUnk_03004FC0;
+        gUnk_03004DA0 = 64;
+        gUnk_03004DA8 = 64;
+        gUnk_03005214 = 0x1084;
+        gUnk_030051C4 = 0;
+        p->flags = Script_GetKeywordValue('f', 0);
+        if (Script_SeekToKeyword('p')) {
+            s32 i = 0;
+            u16 **out = p->colorSets[PALETTE_SET_SOURCE];
+            while (Script_GetPc() && i <= 3) {
+                s32 value = Script_GetValue();
+                if (value != 0x30) {
+                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
+                } else {
+                    *out = 0;
+                }
+                out++;
+                i++;
+            }
         }
-    }
-    if (Script_SeekToKeyword('d')) {
-        s32 i = 0;
-        u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
-        while (Script_GetPc() && i <= 3) {
-            s32 value = Script_GetValue();
-            if (value != 0x30)
-                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-            else
-                *out = 0;
-            out++;
-            i++;
+        if (Script_SeekToKeyword('d')) {
+            s32 i = 0;
+            u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
+            while (Script_GetPc() && i <= 3) {
+                s32 value = Script_GetValue();
+                if (value != 0x30) {
+                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
+                } else {
+                    *out = 0;
+                }
+                out++;
+                i++;
+            }
         }
-    }
-    if (p->flags & 8)
+    } while (0);
+    if (p->flags & 8) {
         Palette_SetVariantsFromPalettes(p);
-    else
+    } else {
         Palette_SetVariantsFromSource(p);
+    }
     p->blend = 0;
     p->selected = Script_GetKeywordValue('c', 0);
     p->current = p->colorSets[PALETTE_SET_SOURCE][p->selected];
@@ -522,14 +532,18 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         w->value = 0;
         w->phase = 0;
     }
-    if (p->flags & 1)
+    if (p->flags & 1) {
         Palette_ResetTransition(p);
-    if (blendEnabled(p) && (p->flags & 2))
+    }
+    if (blendEnabled(p) && (p->flags & 2)) {
         Palette_BlendVariants(p);
-    if (p->flags & 1)
+    }
+    if (p->flags & 1) {
         Palette_BlendTransitionColors(p, t);
-    if (p->current)
+    }
+    if (p->current) {
         CpuSet(p->current, p->hardware, 0x04000068);
+    }
     p->previousState = gUnk_03005430.state;
     t->mode = 0;
     return 0;
@@ -638,14 +652,12 @@ void Palette_StartSlideFromScript(void)
     Palette_StartSlide(a, b, c);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_SetBrightnessFromScript(void)
 {
     struct PaletteController *p = gUnk_02000468;
     if (p) {
         struct PaletteTransition *t = ({
             struct PaletteTransition *hint = &p->transition;
-            asm("" : "+r"(hint));
             hint;
         });
         s32 enabled = Script_GetKeywordValue('n', 0);
@@ -668,18 +680,22 @@ void Palette_SetBrightnessFromScript(void)
                 t->brightness = Palette_GetBrightnessThreshold();
                 goto complete;
             }
-            if (t->mode == 1)
+            if (t->mode == 1) {
                 goto waiting;
-            if (t->mode == 2)
+            }
+            if (t->mode == 2) {
                 goto complete;
+            }
             mode = 1;
             goto setMode;
         } else {
             if (!immediate) {
-                if (t->mode == 0)
+                if (t->mode == 0) {
                     goto complete;
-                if (t->mode != 3)
+                }
+                if (t->mode != 3) {
                     goto fadeOut;
+                }
                 goto waiting;
             }
             t->mode = 0;
@@ -687,15 +703,20 @@ void Palette_SetBrightnessFromScript(void)
             p->flags &= ~16;
         }
     complete:
-        if (callback)
+        if (callback) {
             Script_Call(callback, 0);
+        }
+
         return;
     fadeOut:
         mode = 3;
+
+        do {
     setMode:
         t->mode = mode;
     waiting:
         t->callback = callback;
+        } while (0);
     }
 }
 
