@@ -95,8 +95,8 @@ void Actor_OnConfiguredAnimationUpdate(void);
 void sub_081CC4CC(void);
 void sub_081CC1B4(void);
 void sub_081CC0C8(void);
-void sub_081CA2C8(void);
-void sub_081C879C(void);
+void StateActor_StartKind5Animation9AndAttach(void);
+void StateActor_StartAndMaybeFinishAnim(void);
 static inline void setHandler(void *fn, void **slot)
 {
     *slot = fn;
@@ -401,7 +401,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = sub_081CA2C8;
+                updates[0] = StateActor_StartKind5Animation9AndAttach;
                 npc->state = 0x28;
                 npc->update = updates[0];
                 npc->field10 = 0;
@@ -414,7 +414,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = sub_081C879C;
+                updates[0] = StateActor_StartAndMaybeFinishAnim;
                 npc->state = 0x4A;
                 npc->update = updates[0];
                 npc->field10 = 0;

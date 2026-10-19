@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActorControl_UpdateEntryRecoveryPhase_080E55AC: same code as SceneActorControl_UpdateEntryRecoveryPhase at another address (ported by relatives.py; provisional name) */
-#define SceneActorControl_UpdateEntryRecoveryPhase_080E55AC sub_080E55AC
 #include "scene_actor_control_phase.h"
 u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);

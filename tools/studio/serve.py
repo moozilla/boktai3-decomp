@@ -305,7 +305,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/procs":
             import gclview
             self.send(200, {"procs": actors.proc_list(), "scenes": scene_info(), "callees": gclview.callee_names(),
-                            "procnames": {r["name"]: int(p) for p, r in gclview.Names().procs.items()}})
+                            "procnames": {r["name"]: int(p) for p, r in gclview.names().procs.items()}})
         elif self.path.startswith("/api/proc/"):
             d = actors.proc_detail(int(os.path.basename(self.path)))
             if d:

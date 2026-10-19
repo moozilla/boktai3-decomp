@@ -1,0 +1,360 @@
+#!/usr/bin/env python3
+"""Compile one C file with agbcc's pass dumps and answer questions from them.
+
+  rtlprobe.py dump FILE.c [--nonmatching] [--flags=-da]
+  rtlprobe.py loop FILE.c [--nonmatching] [--insn N ...] [--regno R ...]
+  rtlprobe.py gcse FILE.c [--nonmatching] [--func NAME] [--scan LO:HI] [--expr I ...]
+  rtlprobe.py try-t FILE.c T [T ...] [--nonmatching]
+  rtlprobe.py try-env FILE.c 'VAR=V [VAR=V ...]' ... [--nonmatching]
+  rtlprobe.py perline FILE.c [--nonmatching] [--func NAME] [--top N]
+
+Each command compiles FILE.c as build.py does (preprocessed the same way),
+with `-dp` and the pass dumps, into build/rtlprobe/<stem>/, in under a second
+even for a 4000-instruction function. Use it when the instructions are right
+but a constant, a copy or a register differs and you need to know which pass
+decided it (docs/PERMUTER.md, "Big functions").
+
+dump  writes every pass (-da: .rtl .jump .cse .addressof .gcse .loop .cse2
+      .flow .combine .regmove .lreg .greg .mach) and lists the files. Grep an
+      insn number (the `@ N` after each instruction in u.s, from -dp) through
+      them to see where it changed. --flags=-dX (with "=") picks other dumps: -dL loop,
+      -dG gcse, -dr rtl, -dc combine, -dN regmove, -dl lreg, -dg greg.
+
+loop  summarises loop.c's invariant-motion decisions: each movable with its
+      register, lifetime, savings, and whether it was moved (hoisted out of
+      the loop) or "not desirable". loop.c moves a movable only when
+      threshold * savings * lifetime >= insns in the loop, threshold =
+      (loop has a call ? 1 : 2) * (1 + non-fixed regs) = 13 on Thumb, minus 3
+      per movable already moved. A constant that the ROM keeps in a register
+      across the loop but you rematerialise (or the reverse) is decided here.
+
+gcse  lists PRE's redundant expressions and the reaching registers it makes
+      for them. pre_delete walks the expression hash table bucket by bucket,
+      so reaching registers are numbered (and later allocated, or spilled to
+      stack slots) in bucket order: bucket = hash(expr) % T, with
+      T = (insns at GCSE / 2) | 1. When only those registers or their stack
+      slots differ, the cause is the bucket order, which moves with T (the
+      function's insn count before GCSE) and with the pseudo numbers inside
+      the expressions. --scan LO:HI recomputes the order for every odd T in
+      the range (the hash is reimplemented from gcse.c and checked against
+      every entry of the dump), so you can see how many insns you would have
+      to add or remove; --expr limits the order to some expression indices.
+      --need E1 E2 ... lists the T windows (nearest first) that put those
+      expressions in exactly that bucket order, e.g. the ROM's stack-slot order.
+
+try-t  checks FILE.c with the instrumented compiler (tools/agbcc-instr.sh, which
+      takes about 40 s to build) forcing the GCSE table size to each T, and
+      prints check.py's counts. This splits a residual diff: whatever is still
+      different at the T that gives the ROM's order has another cause.
+
+try-env  the same for any of the instrumented compiler's knobs, one quoted
+      set of assignments per run, e.g. 'CSE_KEEP=2093' 'AGBCC_GCSE_T=2301
+      CSE_KEEP=2093'. CSE_KEEP=r1,r2 never replaces those pseudos as a CSE
+      class's canonical register, CSE_NOCANON=N keeps pseudo N from becoming
+      canonical, CSE_DEBUG=N traces make_regs_eqv (printed as stderr). If
+      keeping the ROM-side pseudo canonical gives 0 diffs, write C that makes
+      that pseudo live longer (sub_08123194: one shared `target` variable for
+      both Seek calls of a path).
+
+perline  insns per source line in the RTL after CSE (what GCSE sees, and so
+      what sets T) against after local-alloc (what survives), largest
+      surplus first. Lines whose RTL shrinks a lot between the two are where
+      to cut insns at GCSE time without changing the final code.
+"""
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+
+import build
+from romlib import ROOT
+
+GCC = os.path.join(build.TOOLS, 'agbcc', 'gcc')
+
+
+def compile_dumps(src, flags, nonmatching, lines=False):
+    if nonmatching and '-DNONMATCHING' not in build.DEFINES:
+        build.DEFINES.append('-DNONMATCHING')
+    work = os.path.join(ROOT, 'build', 'rtlprobe', os.path.basename(src)[:-2])
+    os.makedirs(work, exist_ok=True)
+    for f in os.listdir(work):
+        if f.startswith('u.'):
+            os.remove(os.path.join(work, f))
+    i_path = os.path.join(work, 'u.i')
+    with open(i_path, 'w') as f:
+        if lines:  # keep line markers so -g line notes name the source file and line
+            f.write(build.sh(build.CPP + ['-nostdinc', '-undef'] + build.DEFINES +
+                             ['-I', 'include', '-iquote', '.', src]))
+        else:
+            f.write(build.preprocess(src))
+    r = subprocess.run([build.compiler_for(src)] + build.cflags_for(src) + ['-dp'] + flags + ['u.i', '-o', 'u.s'],
+                       cwd=work, capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(r.stderr)
+    return work
+
+
+# --- gcse.c hash_expr_1, on printed RTL -------------------------------------
+
+def rtl_tables():
+    text = re.sub(r'/\*.*?\*/', '', open(os.path.join(GCC, 'rtl.def')).read(), flags=re.S)
+    codes = {}
+    for k, m in enumerate(re.finditer(r'DEF_RTL_EXPR\s*\(\s*(\w+)\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"', text)):
+        codes[m.group(2)] = (k, m.group(3))
+    text = re.sub(r'/\*.*?\*/', '', open(os.path.join(GCC, 'machmode.def')).read(), flags=re.S)
+    modes = {m.group(1): k for k, m in enumerate(re.finditer(r'DEF_MACHMODE\s*\(\s*\w+\s*,\s*"(\w+)"', text))}
+    return codes, modes
+
+
+def parse_rtl(text):
+    toks = re.findall(r'\(|\)|\[|\]|"[^"]*"|[^\s()\[\]"]+', text)
+    pos = 0
+
+    def node():
+        nonlocal pos
+        tok = toks[pos]
+        pos += 1
+        if tok != '(':
+            return tok
+        out = []
+        while toks[pos] != ')':
+            out.append(node())
+        pos += 1
+        return out
+    return node()
+
+
+class Hasher:
+    def __init__(self):
+        self.codes, self.modes = rtl_tables()
+
+    def head(self, x):
+        name, _, mode = x[0].partition(':')
+        return name.split('/')[0], self.modes.get(mode, 0)
+
+    def __call__(self, x, mode=0):
+        h = 0
+        while True:
+            name, xmode = self.head(x)
+            code, fmt = self.codes[name]
+            if name == 'reg':
+                return h + (code << 7) + int(x[1])
+            if name == 'const_int':
+                return h + (code << 7) + mode + int(x[1], 0)
+            if name == 'symbol_ref':
+                s = x[1][0] if isinstance(x[1], list) else x[1]
+                s, v = s.strip('"'), 0
+                for c in s.encode():
+                    v = (v + (v << 7) + c) & 0xFFFFFFFF
+                return h + (code << 7) + v
+            if name == 'label_ref':
+                return h + (code << 7) + int(x[1])
+            if name == 'mem':
+                h += code
+                x = x[1]
+                continue
+            h += code + xmode
+            ops = x[1:]
+            for i in range(len(fmt) - 1, -1, -1):
+                f, op = fmt[i], ops[i] if i < len(ops) else None
+                if f == 'e':
+                    if i == 0:
+                        x = op
+                        break
+                    h += self(op)
+                elif f == 'E':
+                    h += sum(self(e) for e in op if e not in ('[', ']'))
+                elif f == 's':
+                    h += sum(op.strip('"').encode())
+                elif f == 'i':
+                    h += int(op)
+            else:
+                return h & 0xFFFFFFFF
+
+
+def function_dumps(path, func):
+    text = open(path).read()
+    parts = re.split(r'^;; Function (\w+)\n', text, flags=re.M)
+    funcs = dict(zip(parts[1::2], parts[2::2]))
+    if func:
+        return func, funcs[func]
+    return max(funcs.items(), key=lambda kv: len(kv[1]))
+
+
+def gcse(a):
+    work = compile_dumps(a.src, ['-dG'], a.nonmatching)
+    func, text = function_dumps(os.path.join(work, 'u.i.gcse'), a.func)
+    pre = text.index('PRE GCSE of') if 'PRE GCSE of' in text else len(text)
+    # the expression table that PRE used: the last one printed before its summary
+    starts = [m.start() for m in re.finditer(r'^Expression hash table', text[:pre], flags=re.M)]
+    if not starts:
+        sys.exit(f'{func}: no expression hash table (no PRE ran)')
+    table = text[starts[-1]:pre]
+    T = int(re.match(r'Expression hash table \((\d+) buckets', table).group(1))
+    exprs = {}
+    for m in re.finditer(r'^Index (\d+) \(hash value (\d+)\)\n((?:  .*\n)+)', table, flags=re.M):
+        exprs[int(m.group(1))] = (int(m.group(2)), ' '.join(m.group(3).split()))
+    hasher = Hasher()
+    raw, bad = {}, 0
+    for i, (bucket, rtl) in exprs.items():
+        try:
+            raw[i] = hasher(parse_rtl(rtl))
+            bad += raw[i] % T != bucket
+        except (KeyError, IndexError, ValueError, TypeError, AttributeError):
+            pass
+    reds = [tuple(map(int, m.groups())) for m in re.finditer(
+        r'PRE: redundant insn (\d+) \(expression (\d+)\) in bb \d+, reaching reg is (\d+)', table + text[pre:])]
+    print(f'{func}: T = {T} buckets ({len(exprs)} expressions; hash reproduced for '
+          f'{len(raw) - bad} of {len(exprs)}), {len(reds)} PRE replacements')
+    print('reaching reg  expr  bucket  insn   expression')
+    seen = set()
+    for insn, e, reg in sorted(reds, key=lambda r: r[2]):
+        mark = '' if e not in seen else ' (same expr)'
+        seen.add(e)
+        print(f'{reg:>12}  {e:>4}  {exprs[e][0]:>6}  {insn:>5}  {exprs[e][1][:70]}{mark}')
+    if a.need:
+        a.expr = a.need
+        a.scan = a.scan or f'{max(11, T // 2)}:{T * 2}'
+    if not a.scan:
+        return
+    want = [e for e in dict.fromkeys(e for _, e, _ in sorted(reds, key=lambda r: r[2]))
+            if not a.expr or e in a.expr]
+    if a.need:
+        want = [e for e in a.need if e in want]
+        if missing := [e for e in want if e not in raw]:
+            sys.exit(f'cannot recompute the hash of expressions {missing}')
+        lo, hi = (int(v) for v in a.scan.split(':'))
+        hits = [t for t in range(lo | 1, hi + 1, 2)
+                if [raw[e] % t for e in want] == sorted(raw[e] % t for e in want)]
+        windows = []
+        for t in hits:
+            if windows and windows[-1][1] == t - 2:
+                windows[-1][1] = t
+            else:
+                windows.append([t, t])
+        print(f'\nT values in {lo}..{hi} that put expressions {"-".join(map(str, want))} in that bucket order'
+              f' (now T = {T}):')
+        for w0, w1 in sorted(windows, key=lambda w: min(abs(w[0] - T), abs(w[1] - T))):
+            print(f'  T {w0}..{w1}  ({w0 - T:+d}..{w1 - T:+d}, about {2 * (w0 - T):+d}..{2 * (w1 - T):+d} insns at GCSE)')
+        print('raw hashes (bucket = raw % T; a pseudo number inside an expression adds to its raw hash 1:1):')
+        for e in want:
+            print(f'  {e:>5}  raw {raw[e]:>6}  {exprs[e][1][:70]}')
+        return
+    missing = [e for e in want if e not in raw]
+    if missing:
+        sys.exit(f'cannot recompute the hash of expressions {missing}')
+    lo, hi = (int(v) for v in a.scan.split(':'))
+    print(f'\nreaching-register order by T (expressions {", ".join(map(str, want))}; '
+          f'current order is {"-".join(map(str, want))})')
+    prev, first = None, None
+    for t in list(range(lo | 1, hi + 1, 2)) + [None]:
+        order = None if t is None else tuple(sorted(want, key=lambda e: (raw[e] % t, e)))
+        if order != prev:
+            if prev is not None:
+                print(f'  T {first}..{last}: {"-".join(map(str, prev))}{"  <- now" if first <= T <= last else ""}')
+            prev, first = order, t
+        last = t
+
+
+def loop(a):
+    work = compile_dumps(a.src, ['-dL'], a.nonmatching)
+    path = os.path.join(work, 'u.i.loop')
+    n = 0
+    for ln in open(path):
+        m = re.match(r'Insn (\d+): regno (\d+) \(life (\d+)\)', ln)
+        if m and (not a.insn or int(m.group(1)) in a.insn) and (not a.regno or int(m.group(2)) in a.regno):
+            print(ln.rstrip())
+            n += 1
+        elif re.match(r'Loop from|^;; Function', ln) and not (a.insn or a.regno):
+            print(ln.rstrip())
+    print(f'{n} movables; dump {os.path.relpath(path, ROOT)} (insn numbers: {os.path.relpath(work, ROOT)}/u.s)')
+
+
+def try_t(a):
+    a.envs = [f'AGBCC_GCSE_T={t}' for t in a.t]
+    try_env(a)
+
+
+def try_env(a):
+    cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
+    if not os.path.exists(cc):
+        sys.exit('build the instrumented compiler first: sh tools/agbcc-instr.sh')
+    for spec in [''] + a.envs:
+        env = dict(os.environ, AGBCC=cc, **dict(kv.split('=', 1) for kv in spec.split()))
+        cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), a.src, '--json', '--quiet']
+        r = subprocess.run(cmd + ['--nonmatching'] * a.nonmatching, cwd=ROOT, env=env, capture_output=True, text=True)
+        res = json.loads([ln for ln in r.stdout.splitlines() if ln.startswith('{')][-1])
+        ad = res.get('anchordiff', {'structural': 0, 'total': 0})
+        if 'CSE_DEBUG' in spec:  # check.py drops the compiler's stderr: compile once more for the trace
+            work = compile_dumps(a.src, [], a.nonmatching)
+            tr = subprocess.run([cc] + build.cflags_for(a.src) + ['u.i', '-o', '/dev/null'],
+                                cwd=work, env=env, capture_output=True, text=True)
+            print(tr.stderr.rstrip())
+        print(f"{spec or 'default':>20}: {res['different_byte_count']:>5} differing bytes, "
+              f"realigned {ad['total']} ({ad['structural']} ignoring registers)"
+              f"{'  MATCH' if res['status'] == 'match' else ''}")
+
+
+def perline(a):
+    work = compile_dumps(a.src, ['-g', '-ds', '-dl'], a.nonmatching, lines=True)
+
+    def count(path):
+        func, text = function_dumps(path, a.func)
+        out, where = {}, None
+        for m in re.finditer(r'^\((insn|jump_insn|call_insn|note)(?:/\w+)? \d+ \d+ \d+ (?:\(?"([^"]+)"\)? (\d+))?', text, re.M):
+            if m.group(1) == 'note':
+                if m.group(2):
+                    where = (os.path.basename(m.group(2)), int(m.group(3)))
+            elif where:
+                out[where] = out.get(where, 0) + 1
+        return func, out
+    func, cse = count(os.path.join(work, 'u.i.cse'))
+    _, lreg = count(os.path.join(work, 'u.i.lreg'))
+    rows = sorted(((cse.get(k, 0) - lreg.get(k, 0), k) for k in set(cse) | set(lreg)), reverse=True)
+    print(f'{func}: {sum(cse.values())} insns after CSE, {sum(lreg.values())} after local-alloc')
+    print(' surplus   cse  lreg  line')
+    srcs = {}
+    for d, (f, ln) in rows[:a.top]:
+        if f not in srcs:
+            path = next((p for p in (a.src, os.path.join('include', f), f) if os.path.basename(p) == f
+                         and os.path.exists(os.path.join(ROOT, p))), None)
+            srcs[f] = open(os.path.join(ROOT, path)).read().split('\n') if path else []
+        text = srcs[f][ln - 1].strip() if ln <= len(srcs[f]) else ''
+        print(f'{d:>8} {cse.get((f, ln), 0):>5} {lreg.get((f, ln), 0):>5}  {f}:{ln}  {text[:70]}')
+
+
+def dump(a):
+    work = compile_dumps(a.src, a.flags.split(), a.nonmatching)
+    for f in sorted(os.listdir(work)):
+        print(os.path.relpath(os.path.join(work, f), ROOT))
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest='cmd', required=True)
+    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline'):
+        p = sub.add_parser(name)
+        p.add_argument('src')
+        p.add_argument('--nonmatching', action='store_true')
+    sub.choices['dump'].add_argument('--flags', default='-da')
+    sub.choices['loop'].add_argument('--insn', type=int, nargs='*')
+    sub.choices['loop'].add_argument('--regno', type=int, nargs='*')
+    sub.choices['gcse'].add_argument('--func')
+    sub.choices['gcse'].add_argument('--scan', help='LO:HI, table sizes to try')
+    sub.choices['gcse'].add_argument('--expr', type=int, nargs='*', help='expression indices to order')
+    sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
+                                     help='expression indices in the bucket order wanted: print the T windows')
+    sub.choices['try-t'].add_argument('t', type=int, nargs='+')
+    sub.choices['try-env'].add_argument('envs', nargs='+')
+    sub.choices['perline'].add_argument('--func')
+    sub.choices['perline'].add_argument('--top', type=int, default=25)
+    a = ap.parse_args()
+    a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
+    {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t, 'try-env': try_env,
+     'perline': perline}[a.cmd](a)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,46 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 94.0%
+// foundry draft (worker best 94.0%); what differs is mostly register allocation and instruction order
+#define ScreenPalette_UpdateTransition ScreenPalette_UpdateTransition
+#define gScreenPaletteBuffer           gUnk_030050E0
+
+struct ScreenPaletteTransition {
+    u8 unknown0[4];
+    u8 *palettes;
+    u8 unknown8[12];
+    u8 variant;
+    u8 unknown15;
+    u16 phase;
+};
+extern u8 gUnk_030050E0[];
+void Blend_SetAlpha(u32, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, int, int);
+
+void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
+{
+    u8 *palettes = s->palettes;
+    if (s->phase) {
+        if (s->variant == 1 && s->phase > 64)
+            Blend_SetAlpha(1, (96 - s->phase) / 2, 16);
+        else
+            Blend_SetAlpha(1, 16, 16);
+    }
+    if (s->phase <= 32) {
+        s32 a = s->variant * 3 + 11;
+        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+                                 palettes + (s->variant * 3 + 10) * 32, s->phase, 5);
+    } else if (s->phase <= 64) {
+        s32 a = s->variant * 3 + 10;
+        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+                                 palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
+    } else {
+        u16 index = s->variant * 3;
+        u16 bank = index + 9;
+        u32 offset = bank * 32;
+        CpuSet(s->palettes + offset, gScreenPaletteBuffer, 0x04000008);
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", ScreenPalette_UpdateTransition);
+#endif
