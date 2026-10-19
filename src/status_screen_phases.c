@@ -16,9 +16,10 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
         p->dirty &= ~3;
         {
             register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_Close;
-            asm("" : "+r"(p) : "r"(state));
-            p->state = state;
-            p->timer = 0;
+            do {
+                p->state = state;
+                p->timer = 0;
+            } while (0);
         }
     }
     p->dirty |= 4;
@@ -70,9 +71,10 @@ void StatusScreen_WaitForClose(struct StatusScreen *p)
         if (p->timer++ >= p->times[2]) {
             {
                 register void (*state)(struct StatusScreen *) asm("r1") = sub_0800E974;
-                asm("" : "+r"(p) : "r"(state));
-                p->state = state;
-                p->timer = 0;
+                do {
+                    p->state = state;
+                    p->timer = 0;
+                } while (0);
             }
             p->noise = StatusScreen_ClearScanlineNoise;
         }
@@ -112,13 +114,14 @@ void StatusScreen_WaitForReveal(struct StatusScreen *p)
 {
     if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= p->times[0]) {
+            do {
             p->noise = StatusScreen_ClearScanlineNoise;
             {
                 register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_WaitForClose;
-                asm("" : "+r"(p) : "r"(state));
                 p->state = state;
                 p->timer = 0;
             }
+            } while (0);
         }
         p->dirty |= 15;
     }

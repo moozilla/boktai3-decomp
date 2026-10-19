@@ -107,7 +107,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 46 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
-| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 9 |
+| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 11 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
@@ -119,7 +119,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
 | [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 9 |
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
-| [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 19 |
+| [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 21 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 11 |
@@ -192,7 +192,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 19 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 20 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
@@ -239,6 +239,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/foundry-scene-actor-phases_2026-10-18.md](../notes/foundry-scene-actor-phases_2026-10-18.md) | Foundry scene-actor phase run, 2026-10-18 | #matching #scene-actor #foundry | 2 |
 | [notes/foundry-scene-hud-action-grid_2026-10-18.md](../notes/foundry-scene-hud-action-grid_2026-10-18.md) | Scene HUD action grid foundry candidates | #foundry #matching #scene-hud #input | 3 |
 | [notes/foundry-scene-npc-callbacks_2026-10-18.md](../notes/foundry-scene-npc-callbacks_2026-10-18.md) | Foundry: scene NPC callbacks, 2026-10-18 | #matching #foundry #state-actor | 2 |
+| [notes/grid_attack_actor.md](../notes/grid_attack_actor.md) | Grid attack actor unit consolidation | #grid-attack-actor #unit #matching #080297E8 #0802C678 | 5 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
@@ -251,11 +252,15 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/modifier-display_2026-10-14.md](../notes/modifier-display_2026-10-14.md) | Modifier menu graphics and input (tentative) | *#menu* | 4 |
 | [notes/modifier-menu_2026-10-14.md](../notes/modifier-menu_2026-10-14.md) | Modifier selection and stat previews (tentative) | *#menu #process* | 6 |
 | [notes/modifier-preview_2026-10-14.md](../notes/modifier-preview_2026-10-14.md) | Modifier menu preview and lifecycle (tentative) | *#actors #menu #process* | 6 |
+| [notes/modifier_selection_and_stat_previews.md](../notes/modifier_selection_and_stat_previews.md) | Modifier selection and stat previews (tentative) | #modifiers #menu #matching #unit-consolidation | 4 |
 | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
 | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |
+| [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
+| [notes/palette-level-transitions_2026-10-18.md](../notes/palette-level-transitions_2026-10-18.md) | Palette level transitions unit (2026-10-18) | #palette #mosaic #unit-consolidation | 3 |
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
+| [notes/player_3.md](../notes/player_3.md) | Player 3 unit consolidation | #player #matching #types | 7 |
 | [notes/projected-display_2026-10-14.md](../notes/projected-display_2026-10-14.md) | Five-entry projected display, 08045A20–08045D18 | *#animation #assets* | 4 |
 | [notes/proximity-emitter_2026-10-14.md](../notes/proximity-emitter_2026-10-14.md) | Proximity emitter, 08051A3C–08052130 | *#particles* | 3 |
 | [notes/proximity-icon_2026-10-14.md](../notes/proximity-icon_2026-10-14.md) | Player-proximity keyframe icon |  | 2 |
@@ -297,10 +302,12 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
+| [notes/scene_panel_control_and_lifecycle.md](../notes/scene_panel_control_and_lifecycle.md) | Scene panel control and lifecycle unit | #scene #panel #matching #types | 5 |
 | [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 23 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
+| [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
@@ -316,6 +323,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether-interaction_2026-10-14.md](../notes/tether-interaction_2026-10-14.md) | Tether actor entry, interaction and script controls | *#scripts #actors #tether* | 5 |
 | [notes/tether-roaming-states_2026-10-14.md](../notes/tether-roaming-states_2026-10-14.md) | Tether roaming, recovery and lifecycle states | *#actors #tether* | 6 |
 | [notes/tether-world-states_2026-10-14.md](../notes/tether-world-states_2026-10-14.md) | Tether world position, player boundary and state callbacks | *#actors #tether* | 6 |
+| [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |
 | [notes/w2.md](../notes/w2.md) | w2.md | *#tooling* | 2 |
@@ -327,3 +335,4 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/windows-wireless_2026-10-12.md](../notes/windows-wireless_2026-10-12.md) | Text windows, dialogue transitions and wireless controller | *#wireless #text* | 2 |
 | [notes/wireless-controller_2026-10-12.md](../notes/wireless-controller_2026-10-12.md) | Wireless connection controller | *#inventory #wireless* | 4 |
 | [notes/wireless-tether_2026-10-14.md](../notes/wireless-tether_2026-10-14.md) | Wireless link indicator and tether actor, October 14 | *#actors #wireless #tether #assets* | 7 |
+| [notes/wireless_game_items_and_display.md](../notes/wireless_game_items_and_display.md) | Wireless game items and display (tentative) | #wireless #matching #types | 6 |

@@ -171,6 +171,36 @@ The translations seen so far are small: empty `do { } while (0)` blocks
 around two or three statements (they raise the uses' loop-depth weight), a
 re-read `*(&offset)`, a pointer alias re-declared inside a loop.
 
+### The overnight run (2026-10-18)
+
+All 604 functions still holding pins after depin ran through `autosolve.py
+--fast` with 2 workers (`-j 2` or `-j 3`, `nice -n 10`). It ran about 7
+hours of wall time, including a restart after a machine crash; the workers
+resumed from `results.tsv`. The load average was often 25-40 from other
+sessions.
+
+| Verdict | Functions |
+|---|---:|
+| translated to a match | 83 |
+| partly solved in the compiler; C search fell short | 163 |
+| not allocation; C search fell short | 139 |
+| no compiler solution and too far for the C search | 111 |
+| skipped by triage (more than 64 halfwords off) | 88 |
+| solved in the compiler; C search fell short | 19 |
+| partly solved, too far for the C search | 1 |
+
+`pinfarm.py apply` committed 82 of them, one commit per function, in
+batches #247, #251, #263 and this one. 7 matched in isolation but not once
+spliced back into units that main had since merged or reorganized, so they
+were left pinned. Register-pinned code went from 8.627% to 8.003% of total
+code; other merges during the night also move this number. The yield,
+13.7% of pinned functions, is about twice the sample's 8%. Most of the gain
+is the step budget, which no longer depends on load.
+
+What is left: 163 + 19 partly or fully solved in the compiler, where the C
+search (2 steps, beam 2) did not find the edit. A longer `translate.py`
+run on just those, `--steps 4 --beam 4`, is the next farm pass.
+
 ### Running it
 
 On a 16 GB machine use four workers at most (one crashed at `-j10`), each
