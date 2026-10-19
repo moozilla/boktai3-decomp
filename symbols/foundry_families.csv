@@ -1428,3 +1428,4 @@ addr,function,name,family,note
 081A6920,sub_081A6920,ScreenPalette_UpdateState,"ScreenPaletteTransition","advances palette transition state and screen jitter"
 081A6DCC,sub_081A6DCC,Camera_BlendOffset,"CameraOffset","blends two vectors into an eight-frame camera offset"
 081A6F34,sub_081A6F34,Vanargand_InitPartCollider,"Vanargand part","initializes the part collider and contact callback"
+081A70F8,sub_081A70F8,Vanargand_UpdatePartCollision,"Vanargand part","updates part timers, target flags and collider position"
