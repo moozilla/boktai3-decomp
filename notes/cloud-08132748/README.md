@@ -1,8 +1,8 @@
 # Cloud task 08132748: drafts
 
-`sub_0813599C` and `sub_08134398` are NONMATCHING drafts in `src/fn/` (80.9% and 90%). `sub_08132904` stays a draft here (below 80%).
+`sub_0813599C` was matched exactly by cloud task 08132D2C (PR #281): see its `Fill(&zero, dst)` inline, its HUD arguments computed into locals in ROM order, and its `asm("" : "+r")` barrier on `flags2D0`. `sub_08134398` is a NONMATCHING draft (90%). `sub_08132904` stays a draft here (below 80%).
 
-* `sub_0813599C` (now a NONMATCHING draft in `src/fn/`, 80.9%). This is the category-1 hit reaction: hit history at 0x5B8, damage `1 << *(u8 *)0x47E`, the HUD timed state, the damage number, and the route restart.
+* `sub_0813599C` (matched in PR #281; the notes below are what my draft got wrong). This is the category-1 hit reaction: hit history at 0x5B8, damage `1 << *(u8 *)0x47E`, the HUD timed state, the damage number, and the route restart.
   The control flow and instruction count are right. Remaining differences:
   * In the ROM, `flags2D0` is reloaded after the `flags2D6` store. The draft keeps it in a register.
   * The `field2E4` store is followed by a reload (`strh r4; ldrh r1`) that the draft doesn't produce.
