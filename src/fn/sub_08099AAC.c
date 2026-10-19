@@ -1,6 +1,5 @@
 #include "global.h"
 /* Ghost_Destroy: Ivy_Destroy shape; removes the ghost auxiliary sprites first (ported by relatives.py, fixed by hand; provisional name) */
-#define Ghost_Destroy sub_08099AAC
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Heap_Free(void *);

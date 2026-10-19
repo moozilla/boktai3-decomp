@@ -2,8 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
-#define Skeleton_UpdateDefeat sub_080BD1F0
-
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
  * flag 0x4000 (no reward) sparks and idles; while the context is not finished it switches to
