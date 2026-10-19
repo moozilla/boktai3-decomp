@@ -13,9 +13,11 @@ match either half until they are merged. A candidate here:
     (the owner) and itself.
 Review each one (first lines, how it exits), then add the address to
 symbols/function_nonentries.csv; the split then keeps it inside its owner.
-Reads gen/code.s, so run it after a build.
+Reads gen/code.s, so run it after a build. It also lists INCLUDE_ASM lines in src/ that
+still name a recorded non-entry; delete those lines (the owner's asm now contains the code).
 """
 import csv
+import glob
 import os
 import re
 import sys
@@ -65,5 +67,16 @@ def main():
             print(f"{address:08X} {name:16} owner={owner[0]} callers={len(calls)}  {insn}")
 
 
+def stale_includes():
+    path = os.path.join(ROOT, "symbols", "function_nonentries.csv")
+    names = {"sub_" + r["address"].upper() for r in csv.DictReader(open(path))}
+    for src in sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)):
+        for n, line in enumerate(open(src, errors="replace"), 1):
+            m = re.search(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', line)
+            if m and m.group(1) in names:
+                print(f"stale INCLUDE_ASM {os.path.relpath(src, ROOT)}:{n}: {m.group(1)} is a non-entry")
+
+
 if __name__ == "__main__":
+    stale_includes()
     main()
