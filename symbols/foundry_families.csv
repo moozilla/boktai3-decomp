@@ -1465,3 +1465,4 @@ addr,function,name,family,note
 081B9FD4,sub_081B9FD4,Registry2388_InitializeBackground,"Registry2388 palette controller","configures background layers and loads the base palette"
 081BA2E4,sub_081BA2E4,Registry2388_CreateSelectionCursor,"Registry2388","builds available selection entries and their navigation links"
 081BA3D4,sub_081BA3D4,Registry2388_InitializeFromScript,"Registry2388","reads selection options and initializes the panel"
+081BA644,sub_081BA644,Registry3F74_ApplyPaletteStep,"Registry3F74","applies one of six palette transition steps"
