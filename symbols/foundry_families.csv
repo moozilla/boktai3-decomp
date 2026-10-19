@@ -1471,3 +1471,4 @@ addr,function,name,family,note
 081BA924,sub_081BA924,Registry3F74_InitBackground,"Registry3F74","sets up background layers and phase-dependent palettes"
 081BABB0,sub_081BABB0,Registry3F74_InitFromScript,"Registry3 F 74 (auto, tentative)","reads entry scripts and initial selection, creates cursor and starts opening fade"
 081BAD08,sub_081BAD08,SelectionList_SelectNearestEnabledEntry,"SelectionList","returns the nearest eligible XY entry index"
+081BADFC,sub_081BADFC,SelectionList_ProcessCursorInput,"SelectionList","moves the cursor and navigates linked entries with L/R"
