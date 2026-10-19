@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: travels to the nearest active growth hazard, lands on it and resets its cooldown */
-#define Hresvelgr_UpdateHazardVisit sub_0819E978
 
 typedef struct HresvelgrPosition {
     s16 x, y, z, pad;

@@ -42,7 +42,7 @@ struct SceneInventoryFlagsView {
 };
 s32 Inventory_GetEquipmentId(u32);
 s32 Inventory_CanAssignEquipment(u32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 s32 GameState_IsConsumableSlotEquipped(u32);
 void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
 #endif

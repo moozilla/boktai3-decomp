@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-void *sub_080EC024(struct SceneActorRegistryResetView *);
+void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *);
 s32 sub_080EC0E8(struct SceneActorRegistryResetView *, s32);
 void sub_080E99F8(void *);
 static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
@@ -29,7 +29,7 @@ void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *a
 {
     void *target;
     TakeReset(actor);
-    target = sub_080EC024(actor);
+    target = SceneActorTarget_FindNearbyPlayer(actor);
     if (target) {
         void *callback;
         u8 kind;

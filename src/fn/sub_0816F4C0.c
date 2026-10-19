@@ -5,7 +5,7 @@
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Hud_DrawDefaultEnergyMeter(void *, s32, s32, s32, s32, s32);
 s32 Div(s32, s32);
-void sub_0816F5B0(void);
+void SceneHud_FinishStatBRefill(void);
 void SceneHud_RefillActionStatB(struct SceneHudState *s)
 {
     s32 complete;
@@ -32,6 +32,6 @@ void SceneHud_RefillActionStatB(struct SceneHudState *s)
     if (complete) {
         if (s->actionTransferDelay)
             Sound_StopSong(0x259);
-        Hud_SetInteractionCallback(s, sub_0816F5B0, 1);
+        Hud_SetInteractionCallback(s, SceneHud_FinishStatBRefill, 1);
     }
 }

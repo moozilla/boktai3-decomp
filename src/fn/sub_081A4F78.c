@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_ResetMotionState sub_081A4F78
 struct HresvelgrPosition {
     s16 x, y, z, pad;
 };
@@ -41,7 +40,7 @@ static inline void setState(struct HresvelgrMotion *p, u32 state)
     p->state = state;
     p->stateFrame = 0;
 }
-void sub_081A4F78(struct HresvelgrMotion *p)
+void Hresvelgr_ResetMotionState(struct HresvelgrMotion *p)
 {
     if (!p->stateFrame) {
         setFlags(&p->motion, 4);
@@ -52,5 +51,5 @@ void sub_081A4F78(struct HresvelgrMotion *p)
     setState(p, 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A4F78);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_ResetMotionState);
 #endif

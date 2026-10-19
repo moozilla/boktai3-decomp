@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: spawns a jittered pair of particles moving left and right */
-#define ActorParticles_SpawnSideBurst sub_0811C168
 
 struct ParticleOffset {
     s32 x : 16;

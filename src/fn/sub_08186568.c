@@ -25,7 +25,7 @@ extern struct ArmorTarget *gUnk_02000710;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
-s32 sub_08184FE8(struct ArmorActor *, s32);
+s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
 
 void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
 {
@@ -46,7 +46,7 @@ void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
             a += 0x10;
             a &= 0xe0;
             p->direction = a;
-            if (sub_08184FE8(p, 0x2a)) {
+            if (DirectionalActor_TryBeginState(p, 0x2a)) {
                 p->phase = 1;
             }
             break;

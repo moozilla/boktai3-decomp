@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
-#define StatDisplay_DrawGauge      sub_081647A4
 #define StatDisplay_GetTileAddress Hud_GetTilemapCell
 struct StatDisplay {
     u8 unknown0[0xA40];
@@ -13,7 +12,7 @@ struct StatDisplay {
 };
 u16 *StatDisplay_GetTileAddress(u32, s32, s32);
 s32 Div(s32, s32);
-void sub_081647A4(struct StatDisplay *p, s32 x, s32 y)
+void StatDisplay_DrawGauge(struct StatDisplay *p, s32 x, s32 y)
 {
     s32 filled, i;
     u16 *tiles;
@@ -39,5 +38,5 @@ void sub_081647A4(struct StatDisplay *p, s32 x, s32 y)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081647A4);
+INCLUDE_ASM("asm/nonmatching", StatDisplay_DrawGauge);
 #endif

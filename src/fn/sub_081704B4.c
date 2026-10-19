@@ -10,7 +10,7 @@ u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 void SceneHud_BeginActionIconMotion(void *, int, int, int);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0817061C(void);
+void SceneHud_FinishActionSlide(void);
 void PauseMenu_OnSwapSelectionUpdate(void);
 void Hud_RestoreGridSelection(void *);
 void Hud_SetGridPosition(void *, int, int);
@@ -37,7 +37,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
                 SceneHud_BeginActionIconMotion(p, 1, *cursor, *selection);
             p->categoryWidgets[*selection + 10].flags |= 1;
             p->categoryWidgets[*cursor + 10].flags |= 1;
-            Hud_SetInteractionCallback(p, sub_0817061C, 1);
+            Hud_SetInteractionCallback(p, SceneHud_FinishActionSlide, 1);
         }
     } else if (gUnk_03005260[1] & 2) {
         Hud_SetInteractionCallback(p, PauseMenu_OnSwapSelectionUpdate, 1);

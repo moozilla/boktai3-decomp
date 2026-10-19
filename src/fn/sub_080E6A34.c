@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.6%
 // foundry draft (worker best 87.6%); what differs is mostly register allocation and instruction order
-#define SceneActor_StartFlaggedAnimationPhase sub_080E6A34
 s32 Callback_InvokeActor(void *, void *);
 void SceneActor_WaitForCategoryAttachment(void);
 static inline u8 TakeEntry(u8 *flag)
@@ -14,7 +13,7 @@ static inline u8 TakeEntry(u8 *flag)
     }
     return 0;
 }
-void sub_080E6A34(struct SceneActorRegistryResetView *actor)
+void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *actor)
 {
     if (TakeEntry(&actor->field2B1)) {
         u32 *motion = &actor->fieldDC;
@@ -62,5 +61,5 @@ void sub_080E6A34(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E6A34);
+INCLUDE_ASM("asm/nonmatching", SceneActor_StartFlaggedAnimationPhase);
 #endif

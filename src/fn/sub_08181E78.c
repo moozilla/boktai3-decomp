@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: blends bank palettes toward a colour then back using saved copies */
-#define ActorPalette_PulseBlendSaved sub_08181E78
 
 struct ActorPaletteFade {
     u32 active;

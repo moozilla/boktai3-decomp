@@ -5,7 +5,7 @@ u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SceneTrailEffect_InitPool(u8 *);
 void Task_Kill(u8 *);
-void sub_08123044(void);
+void SpriteNotice_TickManager(void);
 void SceneAnimatedEffect_OnTaskDestroy(void);
 
 u8 *SceneTrailEffect_EnsurePool(void)
@@ -15,7 +15,7 @@ u8 *SceneTrailEffect_EnsurePool(void)
         return gUnk_02000144;
     p = Task_Create(0xa, 0x924);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_08123044, SceneAnimatedEffect_OnTaskDestroy);
+        Task_SetCallbacks(p, SpriteNotice_TickManager, SceneAnimatedEffect_OnTaskDestroy);
         if (SceneTrailEffect_InitPool(p) < 0) {
             Task_Kill(p);
             return 0;

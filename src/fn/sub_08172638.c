@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: redraws the solar-fruit and unlock icons, showing equipped entries */
-#define PauseMenu_RefreshFruitAndUnlockIcons sub_08172638
 
 struct Slot {
     u8 v : 8;

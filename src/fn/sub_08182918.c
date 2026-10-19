@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: directional run motion along facing with edge nudge */
-#define Armor_UpdateRunMotion sub_08182918
 
 /* tentative: picks a directional animation and moves along the facing with a nudge near the cell edge */
 

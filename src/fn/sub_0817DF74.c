@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.9%
 // foundry draft (worker best 97.9%); what differs is mostly register allocation and instruction order
-#define ActorEffect_UpdateTimedSequence sub_0817DF74
 
 struct TimedEffectActor {
     u8 pad0[0x9C];
@@ -44,7 +43,7 @@ static inline void UpdateSequence(struct TimedEffectActor *p, u32 complete)
         }
     }
 }
-void sub_0817DF74(struct TimedEffectActor *p)
+void ActorEffect_UpdateTimedSequence(struct TimedEffectActor *p)
 {
     if (p->restart) {
         p->restart = 0;
@@ -62,5 +61,5 @@ void sub_0817DF74(struct TimedEffectActor *p)
         UpdateSequence(p, p->complete);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817DF74);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateTimedSequence);
 #endif

@@ -9,7 +9,7 @@ struct HudManager {
 };
 extern u32 gUnk_0300523C, gUnk_030051D8;
 extern u16 gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
-s32 sub_08176E20(struct HudManager *);
+s32 SceneHud_CanOpenFromStart(struct HudManager *);
 void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
 void SceneDialog_UpdateEntryFade(void);
 static inline void SetFlags(u32 mask)
@@ -19,7 +19,7 @@ static inline void SetFlags(u32 mask)
 s32 Hud_BeginSavedBlend(struct HudManager *p)
 {
     s32 result;
-    if (!sub_08176E20(p)) {
+    if (!SceneHud_CanOpenFromStart(p)) {
         result = 0;
     } else {
         SetFlags(4);

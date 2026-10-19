@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: plays the action cue sound or positional effect chosen by mode and tether */
-#define Player_PlayActionCueSound sub_0823C548
 
 #include "player.h"
 u32 Player_IsFlaggedWithoutGlobalModifiers(u32);

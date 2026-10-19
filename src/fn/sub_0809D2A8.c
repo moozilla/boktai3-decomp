@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.0%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
-#define RouteActor_ReflectAtRaisedTerrain sub_0809D2A8
 static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
     mask &= p->flags2CC;
@@ -28,7 +27,7 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
     }
     return height;
 }
-void sub_0809D2A8(struct SceneActorRegistryResetView *actor)
+void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition target;
     if (TestFlag(actor, 0x2000)) {
@@ -58,5 +57,5 @@ void sub_0809D2A8(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809D2A8);
+INCLUDE_ASM("asm/nonmatching", RouteActor_ReflectAtRaisedTerrain);
 #endif

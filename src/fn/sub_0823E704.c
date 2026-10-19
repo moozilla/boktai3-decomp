@@ -6,7 +6,7 @@ struct PairE7 {
     u32 a, b;
 };
 u32 Player_GetConfiguredActionPower(u8 *);
-u32 sub_0823D7E0(u8 *);
+u32 Player_CollectCallbackFlags(u8 *);
 void Player_ConsumeActionResource(u8 *);
 void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void sub_0823E704(u8 *p)
@@ -20,7 +20,7 @@ void sub_0823E704(u8 *p)
         p[0xbfc] = v;
     }
     resource = Player_GetConfiguredActionPower(p);
-    flags = sub_0823D7E0(p);
+    flags = Player_CollectCallbackFlags(p);
     if (p[0x418] == 1) {
         *(u16 *)(p + 0xc00) = 29;
         *(u16 *)(p + 0xc08) = 7;

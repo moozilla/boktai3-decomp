@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 94.1%
 // foundry draft (worker best 94.1%); what differs is mostly register allocation and instruction order
-#define CallbackTask_Update sub_08108E5C
-#define gTaskInput          gUnk_03005260
+#define gTaskInput gUnk_03005260
 struct CallbackTask {
     u8 pad0[0x1C];
     u32 cancellable;
@@ -22,7 +21,7 @@ struct CallbackTask {
 };
 extern u16 gUnk_03005260[];
 u8 CallbackTask_Finish(struct CallbackTask *);
-s32 sub_08108E5C(struct CallbackTask *task)
+s32 CallbackTask_Update(struct CallbackTask *task)
 {
     if (CallbackTask_Finish(task))
         return 0;
@@ -40,5 +39,5 @@ s32 sub_08108E5C(struct CallbackTask *task)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08108E5C);
+INCLUDE_ASM("asm/nonmatching", CallbackTask_Update);
 #endif

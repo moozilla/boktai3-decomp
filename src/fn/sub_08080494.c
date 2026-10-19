@@ -6,7 +6,7 @@
 s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32,
                         s32, s32, s32, u32);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void sub_0812E714(void *);
+void ActorParticles_SpawnWideBurst(void *);
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
@@ -184,7 +184,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         Sound_PlaySong(229);
     SceneActorPlacement_PlayCategoryEventSound(actor);
     if (actor->category == 3)
-        sub_0812E714(actor);
+        ActorParticles_SpawnWideBurst(actor);
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
         values[0] = actor->position.x;

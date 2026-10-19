@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 81.2%
 // foundry draft (worker best 81.2%); what differs is mostly register allocation and instruction order
-#define PositionedEffect_InterpolateArcNodes sub_081A6660
-#define gEffectSineTable                     gUnk_086149C4
+#define gEffectSineTable gUnk_086149C4
 struct EffectVector {
     s16 x, y, z, pad;
 };
@@ -33,7 +32,7 @@ static inline void SetVector(struct EffectVector *v, s32 x, s32 y, s32 z)
     v->y = y;
     v->z = z;
 }
-void sub_081A6660(struct PositionedEffect *effect)
+void PositionedEffect_InterpolateArcNodes(struct PositionedEffect *effect)
 {
     struct EffectVector diff;
     s32 i, dx, dy, dz, z, x;
@@ -65,5 +64,5 @@ void sub_081A6660(struct PositionedEffect *effect)
     } while (++i <= 5);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A6660);
+INCLUDE_ASM("asm/nonmatching", PositionedEffect_InterpolateArcNodes);
 #endif

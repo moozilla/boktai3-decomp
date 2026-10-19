@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
-#define ActorMotion_UpdateTimedPaletteAnimation sub_081F423C
 struct DirectionalActor {
     u8 pad0[0x51];
     u8 angle;
@@ -45,8 +44,7 @@ static inline void facing(struct DirectionalActor *p, int angle)
     v &= shifted;
     p->facing8 = v;
 }
-#define ActorPalette_Reset sub_081F2CEC
-void sub_081F2CEC(void *);
+void PaletteEffect_RefreshPalette(void *);
 void Player_ClearFlag740(void);
 static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8 mode)
 {
@@ -59,7 +57,7 @@ static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8
     } else if (p->paletteMode == 1)
         p->paletteValue = 0;
 }
-void sub_081F423C(struct DirectionalActor *p, s32 frame)
+void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 frame)
 {
     struct DirectionalActor *q = p;
     facing(p, p->requestedAngle);
@@ -73,7 +71,7 @@ void sub_081F423C(struct DirectionalActor *p, s32 frame)
     }
     if (frame > 299) {
         p->finished = 1;
-        sub_081F2CEC(q);
+        PaletteEffect_RefreshPalette(q);
     }
     if (p->active == 4) {
         u32 v;
@@ -98,5 +96,5 @@ void sub_081F423C(struct DirectionalActor *p, s32 frame)
     Callback_InvokeActor(p, p->callback);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F423C);
+INCLUDE_ASM("asm/nonmatching", ActorMotion_UpdateTimedPaletteAnimation);
 #endif

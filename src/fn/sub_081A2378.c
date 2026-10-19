@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.6%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_InitializeRadialOffsets sub_081A2378
-#define gRadialSineTable                  gUnk_086149C4
+#define gRadialSineTable gUnk_086149C4
 struct MotionPosition {
     s16 x, y, z, pad;
 };
@@ -26,7 +25,7 @@ static inline s32 TruncateFixed(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-void sub_081A2378(struct Hresvelgr *actor)
+void Hresvelgr_InitializeRadialOffsets(struct Hresvelgr *actor)
 {
     s32 i;
     s32 radius;
@@ -51,5 +50,5 @@ void sub_081A2378(struct Hresvelgr *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A2378);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_InitializeRadialOffsets);
 #endif

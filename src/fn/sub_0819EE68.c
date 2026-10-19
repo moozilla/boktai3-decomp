@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: adjacent-side variant of the recoil burst phase */
-#define Hresvelgr_UpdateAdjacentRecoilBurstPhase sub_0819EE68
 
 struct ReactionVector {
     s16 x, y, z, pad;

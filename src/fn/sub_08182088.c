@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: pulses palette entry 0 of two rows with a 64-frame triangle-wave brightness */
-#define Palette_UpdatePulseFade sub_08182088
 
 struct PalFade {
     u8 pad0[0xA];

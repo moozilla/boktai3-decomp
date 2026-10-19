@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: burst phase that also pushes the body back along its facing while firing */
-#define Hresvelgr_UpdateRecoilBurstPhase sub_0819EC08
 
 struct ReactionVector {
     s16 x, y, z, pad;

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
-#define PreviewActor_UpdateHeading sub_081F7B74
 struct PreviewActor {
     u8 pad0[0x51];
     u8 heading;
@@ -28,7 +27,7 @@ static inline s32 ConsumeActivation(struct PreviewActor *p)
     }
     return 0;
 }
-void sub_081F7B74(struct PreviewActor *p)
+void PreviewActor_UpdateHeading(struct PreviewActor *p)
 {
     struct PreviewActor *q = p;
     p->heading = p->requestedHeading;
@@ -57,5 +56,5 @@ void sub_081F7B74(struct PreviewActor *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F7B74);
+INCLUDE_ASM("asm/nonmatching", PreviewActor_UpdateHeading);
 #endif

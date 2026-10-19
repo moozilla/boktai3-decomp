@@ -14,7 +14,7 @@ void MenuDisplay_UpdateActionPrompt(void *, s32);
 void sub_08166534(void *, s32, s32);
 void MenuDisplay_SetPaletteOverrides(void *, s32, s32, s32, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
-void sub_0816FCD0(void);
+void PauseMenu_UpdateItemActions(void);
 void SceneHud_ReturnToActionGrid(struct SceneHudState *s)
 {
     void *input;
@@ -34,5 +34,5 @@ void SceneHud_ReturnToActionGrid(struct SceneHudState *s)
     MenuDisplay_UpdateActionPrompt(s, 4);
     sub_08166534(s, 10, 6);
     MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
-    Hud_SetInteractionCallback(s, sub_0816FCD0, 0);
+    Hud_SetInteractionCallback(s, PauseMenu_UpdateItemActions, 0);
 }

@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 84.8%
 // foundry draft (worker best 84.4%); what differs is mostly register allocation and instruction order
-#define Navigation_FindContainingRegion sub_0821FCDC
-#define Navigation_IsPointInRegion      NavMesh_IsPointInsideRegion
-#define gTerrainMap                     gUnk_030052F4
+#define Navigation_IsPointInRegion NavMesh_IsPointInsideRegion
+#define gTerrainMap                gUnk_030052F4
 struct NavigationRegion {
     u8 x0, z0, x1, z1;
     u8 unknown4[12];
@@ -21,7 +20,7 @@ struct NavigationResource {
     u32 offsets[1];
 };
 u32 NavMesh_IsPointInsideRegion(struct NavigationRegion *, const struct ContactPosition *, u32);
-u32 sub_0821FCDC(const struct ContactPosition *position)
+u32 Navigation_FindContainingRegion(const struct ContactPosition *position)
 {
     struct NavigationResource *resource = gUnk_030052F4->navigation;
     s32 meshIndex = 0;
@@ -48,5 +47,5 @@ done:
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821FCDC);
+INCLUDE_ASM("asm/nonmatching", Navigation_FindContainingRegion);
 #endif

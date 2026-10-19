@@ -26,7 +26,7 @@ static inline s32 BendSine(s32 angle, s32 bend)
     return ScaleBend(gSineTable[wrapped] * bend);
 }
 void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe, u32 palette,
-                  struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
+                              struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
 {
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
     struct SceneInputWidget *widget;

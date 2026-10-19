@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: loads a sprite resource and sets up five part drawings */
-#define ActorSprite_InitPartDrawings sub_0811C9F8
 
 struct Drawing {
     u8 filler0[0x1A];

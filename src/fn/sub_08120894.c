@@ -1,9 +1,8 @@
 #include "global.h"
 
 /* tentative: knockback fall state installed by the command dispatcher */
-#define SceneActor_UpdateKnockbackFall sub_08120894
 
-/* tentative: knockback/fall state; decays velocity, updates heading, on landing switches to sub_08120B44 */
+/* tentative: knockback/fall state; decays velocity, updates heading, on landing switches to ActorPhysics_UpdateFallMotion */
 
 struct Vec4i {
     s32 x, y, z, w;
@@ -54,11 +53,11 @@ s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Obj *);
-void sub_0811BD30(struct Obj *, u8 *);
+void Actor_UpdateShadowSpriteParts(struct Obj *, u8 *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(u8 *);
 void Trigger_ConsumePending(void *, s32);
-void sub_08120B44(void);
+void ActorPhysics_UpdateFallMotion(void);
 
 static inline void SetState(struct Obj *p, void *fn)
 {
@@ -130,7 +129,7 @@ void SceneActor_UpdateKnockbackFall(struct Obj *p)
         self->hit &= ~1;
     }
     p->unk8AC = h;
-    sub_0811BD30(self, p->model);
+    Actor_UpdateShadowSpriteParts(self, p->model);
     if (self->hit & 4)
         sub_0811BF44(self);
     if (self->hit & 2)
@@ -140,7 +139,7 @@ void SceneActor_UpdateKnockbackFall(struct Obj *p)
     CharacterModel_UpdateAccessoryAnimations(p->model);
     if (done == 1) {
         Trigger_ConsumePending(p->queue, 1);
-        SetState(p, sub_08120B44);
+        SetState(p, ActorPhysics_UpdateFallMotion);
     } else {
         p->timer++;
     }

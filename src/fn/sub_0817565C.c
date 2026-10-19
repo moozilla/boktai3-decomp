@@ -20,7 +20,7 @@ void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestHide(void);
 void TextWindow_Clear(u32);
 void Presentation_InitListValues(u8 *);
-void sub_08175494(u8 *);
+void MenuSelection_DrawNumericSummary(u8 *);
 void Hud_DrawCounter7B0(u32, u32);
 void Hud_DrawCounter50C(u32, u32);
 void Hud_DrawStatusDayNightIndicators(u8 *);
@@ -47,7 +47,7 @@ void Hud_InitStatusMenu(u8 *s)
     Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 9, *(u32 *)(s + 0x2C));
     PlayerPanel_SnapshotValues(s);
     Presentation_InitListValues(s);
-    sub_08175494(s);
+    MenuSelection_DrawNumericSummary(s);
     Hud_DrawDefaultHealthMeter(s, 1, 8, 8);
     p = *(u8 **)(s + 0xA40);
     Hud_DrawDefaultEnergyMeter(s, 1, 8, 10, *(u16 *)(p + 0x428), *(u16 *)(p + 0x42A));

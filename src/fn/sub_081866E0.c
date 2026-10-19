@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: 13-state axis-aligned chase toward a target */
-#define Armor_UpdateAxisChase sub_081866E0
 
 struct ArmorActor {
     u8 unk0[0x48];
@@ -22,7 +21,7 @@ struct ArmorTarget {
     s16 y;
 };
 extern struct ArmorTarget *gUnk_02000710;
-s32 sub_08184FE8(struct ArmorActor *, s32);
+s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
 s32 ActorController_StartModeTwoTurn(struct ArmorActor *, s32);
 
 void Armor_UpdateAxisChase(struct ArmorActor *p, s32 fast)
@@ -59,7 +58,7 @@ loop:
             }
             goto loop;
         case 1:
-            if (sub_08184FE8(p, speed))
+            if (DirectionalActor_TryBeginState(p, speed))
                 p->phase = 2;
             break;
         case 2:
@@ -71,7 +70,7 @@ loop:
             }
             break;
         case 3:
-            if (sub_08184FE8(p, speed))
+            if (DirectionalActor_TryBeginState(p, speed))
                 p->phase = 4;
             break;
         case 4:
@@ -83,7 +82,7 @@ loop:
             }
             break;
         case 5:
-            if (sub_08184FE8(p, speed))
+            if (DirectionalActor_TryBeginState(p, speed))
                 p->phase = 6;
             break;
         case 6:
@@ -95,7 +94,7 @@ loop:
             }
             break;
         case 7:
-            if (sub_08184FE8(p, speed))
+            if (DirectionalActor_TryBeginState(p, speed))
                 p->phase = 8;
             break;
         case 8:

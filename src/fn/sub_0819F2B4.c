@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: adjacent-side variant of the random burst phase; the spread turns the other way */
-#define Hresvelgr_UpdateAdjacentRandomBurstPhase sub_0819F2B4
 
 struct ReactionVector {
     s16 x, y, z, pad;

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 93.3%); what differs is mostly register allocation and instruction order
-#define PairSlotPool_Update     sub_08125A94
 #define gPairSlotStateCallbacks gUnk_08610734
 struct PairSlot {
     u8 unknown[0xDE];
@@ -23,7 +22,7 @@ static inline u8 PairSlotPool_IsAllocated(struct PairSlotPool *pool, s32 index)
         return TRUE;
     return FALSE;
 }
-s32 sub_08125A94(struct PairSlotPool *pool)
+s32 PairSlotPool_Update(struct PairSlotPool *pool)
 {
     s32 index;
     if (((u32 *)pool)[0x78]) {
@@ -37,5 +36,5 @@ s32 sub_08125A94(struct PairSlotPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08125A94);
+INCLUDE_ASM("asm/nonmatching", PairSlotPool_Update);
 #endif

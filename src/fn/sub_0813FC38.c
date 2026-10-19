@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: reads the action mode from the script and installs its callback and input slot */
-#define Player_InitActionMode sub_0813FC38
 
 struct GameStateFC38 {
     u8 unk0[0x10];
@@ -58,7 +57,7 @@ extern void *const gUnk_08610964[];
 
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0813B4C8(struct PlayerFC38 *);
+void Player_RecalculateDerivedStats(struct PlayerFC38 *);
 void sub_08158848(void);
 void ActorSequence_Begin(struct PlayerFC38 *, s32, s32);
 void Player_ClearDirectionHistory(struct PlayerFC38 *);
@@ -80,7 +79,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
         p->timedEventSlot = 1;
     else
         p->timedEventSlot = 0;
-    sub_0813B4C8(p);
+    Player_RecalculateDerivedStats(p);
     if (gUnk_030053F4 & 0x1000) {
         void *cb = sub_08158848;
         u16 *q, *base = gUnk_02000548;

@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: 4-state charge attack with fade, collider arm and camera shake */
-#define ActorController_UpdateChargeAttackTransition sub_081846F4
 
 struct ActorAnimationLayer {
     u16 unknown[3];

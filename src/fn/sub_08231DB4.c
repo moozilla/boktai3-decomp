@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-/* EffectPart_UpdateBlink2: clone of EffectPart_UpdateBlink (sub_08231B3C); advances a sprite part's frame animation, then blinks it (the hide interval shrinks each time) and frees the slot at zero (provisional name) */
-#define EffectPart_UpdateBlink2 sub_08231DB4
+/* EffectPart_UpdateBlink2: clone of EffectPart_UpdateBlink (EffectPart_UpdateBlink); advances a sprite part's frame animation, then blinks it (the hide interval shrinks each time) and frees the slot at zero (provisional name) */
 #include "homing_effect.h"
 
 struct Unk08231A0CManager {

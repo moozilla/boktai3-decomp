@@ -14,7 +14,7 @@ struct Q08239150 {
     struct E08239150 e[6];
 };
 u32 AnimData_FindEntry(u32);
-void sub_08217DE0(void *, u32, u32);
+void ParticleSprite_Initialize(void *, u32, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, u32);
 
@@ -25,7 +25,7 @@ void Player_InitSixParticleEffects(u8 *p)
     q->f0 = AnimData_FindEntry(0x1C1E);
     for (i = 0; i < 6; i++) {
         struct E08239150 *e = &q->e[i];
-        sub_08217DE0(e, q->f0, 1);
+        ParticleSprite_Initialize(e, q->f0, 1);
         Effect_SetOrigin(e, -4, -4);
         Effect_SetPalette(e, 1);
         e->fF = 2;

@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 81.6%
 // foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
-#define Hresvelgr_UpdateRandomAnimation sub_081A117C
-#define gRandomIndex                    gUnk_03005308
-#define gRandomValues                   gUnk_0203B400
+#define gRandomIndex  gUnk_03005308
+#define gRandomValues gUnk_0203B400
 struct ActorReaction {
     u8 unknown0[0x51];
     u8 heading;
@@ -36,7 +35,7 @@ static inline void RestoreHeading(struct ActorReaction *p)
         p->direction8 = 7 & ((p->heading + 0x70) >> 5);
     }
 }
-void sub_081A117C(struct ActorReaction *actor, u32 tick)
+void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
 {
     struct ActorReaction *p = actor;
     RestoreHeading(actor);
@@ -58,5 +57,5 @@ void sub_081A117C(struct ActorReaction *actor, u32 tick)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A117C);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateRandomAnimation);
 #endif

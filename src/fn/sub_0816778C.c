@@ -49,7 +49,7 @@ void InventoryPanel_InitCallbackGroups(struct InventoryPanel *panel)
         entry = group->entries;
         j = 7;
         do {
-            sub_08217DE0(&entry->particle, group->context, frame);
+            ParticleSprite_Initialize(&entry->particle, group->context, frame);
             Effect_SetOrigin(&entry->particle, negative, negative);
             entry->particle.mode = zero;
             metadata->active = zero;

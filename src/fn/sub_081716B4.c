@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: per-frame input callback of the stat comparison screen */
-#define SceneHud_UpdateStatComparison sub_081716B4
 
 #include "scene_hud_display.h"
 #include "game_state.h"

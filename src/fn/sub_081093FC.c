@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
-#define LinkSession_CallPositionScript sub_081093FC
 struct LinkScriptArgs {
     u32 count : 16, unused : 16;
     s32 *values;
@@ -16,7 +15,7 @@ static inline u8 *LinkSession_GetData(struct AreaEffectLinkState *p)
         return NULL;
     return p->sessionData;
 }
-void sub_081093FC(struct AreaEffectPosition *position, s32 value)
+void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 value)
 {
     s32 values[6];
     struct LinkScriptArgs args;
@@ -34,5 +33,5 @@ void sub_081093FC(struct AreaEffectPosition *position, s32 value)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081093FC);
+INCLUDE_ASM("asm/nonmatching", LinkSession_CallPositionScript);
 #endif

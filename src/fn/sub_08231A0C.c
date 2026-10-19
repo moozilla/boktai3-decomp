@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* EffectPart_UpdateAnimation: advances a sprite part's frame animation (tile, flips, frame timer) and counts down its lifetime; sibling of EffectParticle_UpdateFinish (provisional name) */
-#define EffectPart_UpdateAnimation sub_08231A0C
 #include "homing_effect.h"
 
 struct Unk08231A0CManager {

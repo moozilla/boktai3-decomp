@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.0%
 // foundry draft (worker best 85.0%); what differs is mostly register allocation and instruction order
-#define ActorAction_FinishRecoveryAnimation sub_0819E25C
 struct ActorActionSequence {
     u8 unknown0[0x56];
     s16 height;
@@ -33,7 +32,7 @@ static inline u8 ConsumeEntry(u8 *p)
     }
     return 0;
 }
-void sub_0819E25C(struct ActorActionSequence *p)
+void ActorAction_FinishRecoveryAnimation(struct ActorActionSequence *p)
 {
     u32 base = (u32)p;
     u32 *timer;
@@ -58,5 +57,5 @@ void sub_0819E25C(struct ActorActionSequence *p)
     (*timer)++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819E25C);
+INCLUDE_ASM("asm/nonmatching", ActorAction_FinishRecoveryAnimation);
 #endif

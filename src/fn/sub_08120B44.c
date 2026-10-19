@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: damped fall with offset easing, facing and ground step */
-#define ActorPhysics_UpdateFallMotion sub_08120B44
 
 struct Obj {
     u8 pad0[4];
@@ -51,7 +50,7 @@ s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Obj *);
-void sub_0811BD30(struct Obj *, void *);
+void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 
@@ -118,7 +117,7 @@ void ActorPhysics_UpdateFallMotion(struct Obj *p)
             self->flags40 &= ~1;
         }
         p->height = h;
-        sub_0811BD30(self, p->model);
+        Actor_UpdateShadowSpriteParts(self, p->model);
         if (self->flags40 & 4)
             sub_0811BF44(self);
         if (self->flags40 & 2)

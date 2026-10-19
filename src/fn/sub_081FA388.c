@@ -12,7 +12,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void sub_081F9E20(void);
+void PreviewActor_ReplaceProjectileTowardPlayer(void);
 void Ratatosk_InitWideBodyCollider(struct Ratatosk *p)
 {
     struct ColliderVector size, offset;
@@ -25,7 +25,7 @@ void Ratatosk_InitWideBodyCollider(struct Ratatosk *p)
     offset.z = 0;
     Collider_Init(collider, 0, 0x4005, 0, 16, &size, &offset);
     Collider_SetPosition(collider, p->position, 0);
-    Collider_SetCallback(collider, sub_081F9E20, p);
+    Collider_SetCallback(collider, PreviewActor_ReplaceProjectileTowardPlayer, p);
     Collider_SetBodyProperties(collider, 0, 0x804, 8);
     Collider_Refresh(collider);
 }

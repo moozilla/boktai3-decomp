@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: adds or removes an entry in the 8-entry unlock list */
-#define GameState_ToggleUnlockEquipSlot sub_08172270
 
 extern u8 *gUnk_02000710;
 s32 GameState_GetUnlockEntry(s32);

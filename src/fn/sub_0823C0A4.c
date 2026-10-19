@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: link-player variant of entering kind four: resets to idle and updates link counters */
-#define LinkPlayer_ResetToIdleState sub_0823C0A4
 
 struct LP {
     u8 unk0[0x18];
@@ -53,7 +52,7 @@ void sub_0824261C(struct LP *);
 void LinkPlayer_FlushPendingEffects(struct LP *);
 void Player_StopLocalActionSounds(struct LP *);
 void Player_ClearMovementLock(struct LP *);
-void sub_081093FC(void *, s32);
+void LinkSession_CallPositionScript(void *, s32);
 s32 LinkSession_IncrementAlternateCounter(s32);
 s32 LinkSession_IncrementCounter(s32);
 void Player_NotifyFirstSelectedSlot(s32, u32);
@@ -101,7 +100,7 @@ void LinkPlayer_ResetToIdleState(struct LP *p)
     if (p->actionMode != 6) {
         q = &p->unk549;
         if ((s8)*q >= 0)
-            sub_081093FC((u8 *)p + 0x30, (s8)*q);
+            LinkSession_CallPositionScript((u8 *)p + 0x30, (s8)*q);
         *q = 0xff;
     }
     LinkSession_IncrementAlternateCounter(p->slot);

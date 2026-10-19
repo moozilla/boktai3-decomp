@@ -22,7 +22,7 @@ extern struct MotionActor *gUnk_020004F0[];
 void Anim_Remove(void *);
 void Sound_StopSong(u32);
 void SceneMessages_UnregisterReceiver(void *);
-void sub_0811B394(void *);
+void SpatialIndex_RemoveEntry(void *);
 s32 MotionActor_Destroy(struct MotionActor *actor)
 {
     struct MotionActorState *state = &actor->state;
@@ -33,7 +33,7 @@ s32 MotionActor_Destroy(struct MotionActor *actor)
         anim++;
         i--;
     } while (i >= 0);
-    sub_0811B394(&state->resource);
+    SpatialIndex_RemoveEntry(&state->resource);
     {
         u32 mask = 0x800;
         if (!((gUnk_030053F4 | gUnk_030053F0) & mask))

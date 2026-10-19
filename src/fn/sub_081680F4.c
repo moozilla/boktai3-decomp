@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-#define Hud_LoadConditionalPaletteRows sub_081680F4
 struct Hud {
     u8 pad0[0xc70];
     u8 paletteEnabled;
@@ -15,7 +14,7 @@ extern u16 gUnk_03005164[];
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
 void Palette_UpdateHighlightPulse(u16 *);
-void sub_081680F4(struct Hud *input)
+void Hud_LoadConditionalPaletteRows(struct Hud *input)
 {
     register s32 i;
     struct Hud *hud = input;
@@ -44,5 +43,5 @@ void sub_081680F4(struct Hud *input)
     Palette_UpdateHighlightPulse(gUnk_03005164);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081680F4);
+INCLUDE_ASM("asm/nonmatching", Hud_LoadConditionalPaletteRows);
 #endif

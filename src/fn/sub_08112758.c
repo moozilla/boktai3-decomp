@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define MessagePanel_ConfigureFromScript sub_08112758
 struct MessagePanel {
     u8 pad0[0x20];
     void *palette;
@@ -38,7 +37,7 @@ void StageResults_CreateTextWindows(void *);
 void StageResults_ShowSummaryText(void *);
 void sub_08112508(void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-s32 sub_08112758(struct MessagePanel *p)
+s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
 {
     s32 i, value, found, zero;
     void (**callback)(void *);
@@ -99,5 +98,5 @@ s32 sub_08112758(struct MessagePanel *p)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08112758);
+INCLUDE_ASM("asm/nonmatching", MessagePanel_ConfigureFromScript);
 #endif

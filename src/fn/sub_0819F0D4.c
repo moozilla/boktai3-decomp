@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: fires a burst of a random 3-9 shots along its facing, spreading the directions */
-#define Hresvelgr_UpdateRandomBurstPhase sub_0819F0D4
 
 struct ReactionVector {
     s16 x, y, z, pad;

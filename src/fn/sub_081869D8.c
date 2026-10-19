@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_081866E0(u8 *p, s32 q);
+void Armor_UpdateAxisChase(u8 *p, s32 q);
 
 void Armor_UpdatePlayerAlignmentAction25(u8 *p)
 {
-    sub_081866E0(p, 0);
+    Armor_UpdateAxisChase(p, 0);
 }

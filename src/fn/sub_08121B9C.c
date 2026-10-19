@@ -2,7 +2,6 @@
 #include "global.h"
 
 /* tentative: copies owner position into a sprite slot and steps its sequence */
-#define ContactSequenceSlot_StepPlayback sub_08121B9C
 
 #include "display_animation.h"
 #include "contact_swarm.h"

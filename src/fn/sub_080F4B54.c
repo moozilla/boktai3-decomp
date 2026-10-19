@@ -8,7 +8,7 @@ struct P {
     u8 g[0x184 - 0x174];
     u32 a;
 };
-void sub_080F4B94(void);
+void ActorPhase_OrbitParent(void);
 
 void Ivy_BeginChildRandomDelay(struct P *p)
 {
@@ -16,5 +16,5 @@ void Ivy_BeginChildRandomDelay(struct P *p)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     v = *(u16 *)(gUnk_0203B400 + gUnk_03005308 * 2);
     p->a = (v & 0x40) + 0x1e;
-    p->cb = sub_080F4B94;
+    p->cb = ActorPhase_OrbitParent;
 }

@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.8%
 // foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
-#define SceneActorPlacement_PlayResponseAndResetState sub_08136AF0
 static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
 {
     s->flags2D4 = mask | s->flags2D4;
@@ -23,7 +22,7 @@ static inline u16 TestFlags(u32 value, u32 mask)
 {
     return mask & value;
 }
-s32 sub_08136AF0(struct SceneActorPlacementView *s)
+s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView *s)
 {
     u32 flags = MaskFlags(&s->flags2D4, 0xFFFFFEFF);
     switch (s->category) {
@@ -90,5 +89,5 @@ s32 sub_08136AF0(struct SceneActorPlacementView *s)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08136AF0);
+INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_PlayResponseAndResetState);
 #endif

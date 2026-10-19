@@ -32,7 +32,7 @@ void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
 s32 Callback_InvokeActor(void *, void *);
 void RisingActorManager_BeginRaise(s32);
-void sub_081FEADC(s32);
+void SlotController_RequestReset(s32);
 void SlotController_SetSlotFlag2(s32);
 void Ratatosk_UpdatePointEffectAnimation(struct RatatoskActor *p, s32 frame)
 {
@@ -44,7 +44,7 @@ void Ratatosk_UpdatePointEffectAnimation(struct RatatoskActor *p, s32 frame)
         Sound_PlaySong(0x570);
     }
     if (Mod(frame, 300) == 180)
-        sub_081FEADC(Ratatosk_GetSelectedPointIndex());
+        SlotController_RequestReset(Ratatosk_GetSelectedPointIndex());
     {
         u32 mask = 0x100000;
         p->flags = mask | p->flags;

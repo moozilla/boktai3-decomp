@@ -2,7 +2,6 @@
 #include "global.h"
 
 /* tentative: falls under gravity, lands with a sound and switches to the active state */
-#define ParticleBurstEffect_UpdateFalling sub_08139994
 
 #include "actor_attachment_sprite_playback.h"
 
@@ -37,7 +36,7 @@ void Sound_PlaySong(u32);
 void Collider_SetFixedPositionWithYOffset(void *, struct BurstPos *, s32);
 void SpatialIndex_InsertEntry(void *);
 void ParticleBurstEffect_SetStateCallback(struct BurstEntry *, void (*)(struct BurstEntry *));
-void sub_08139798(struct BurstEntry *);
+void ParticleBurstEffect_TickActive(struct BurstEntry *);
 
 void ParticleBurstEffect_UpdateFalling(struct BurstEntry *p)
 {
@@ -54,7 +53,7 @@ void ParticleBurstEffect_UpdateFalling(struct BurstEntry *p)
             p->state = 1;
         }
         p->yOffset = 0;
-        ParticleBurstEffect_SetStateCallback(p, sub_08139798);
+        ParticleBurstEffect_SetStateCallback(p, ParticleBurstEffect_TickActive);
     }
     {
         struct BurstPos *pos = &p->position;

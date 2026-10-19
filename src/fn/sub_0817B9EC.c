@@ -1,6 +1,6 @@
 #include "global.h"
 #include "actor_state.h"
-void sub_0817A034(struct ActorState *, struct ActorAnimationPair *, s32);
+void ActorImpact_FindNearbyPoint(struct ActorState *, struct ActorAnimationPair *, s32);
 s32 SceneVolume_ConsumePendingEvent(struct ActorState *);
 static inline u8 ConsumeTrigger(struct ActorState *p)
 {
@@ -16,7 +16,7 @@ void ActorState_BeginReverseAnimation(struct ActorStateOwner *owner)
     struct ActorState *p = &owner->actor;
     if (ConsumeTrigger(&owner->actor)) {
         p->animationState = 3;
-        sub_0817A034(p, &p->animation, (p->direction + 128) & 255);
+        ActorImpact_FindNearbyPoint(p, &p->animation, (p->direction + 128) & 255);
         {
             u32 state = 4;
             owner->actor.state = state;

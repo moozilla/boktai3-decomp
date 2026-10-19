@@ -14,7 +14,7 @@ void CallbackStatus_ResetSelectorAndTest(void);
 void ActorAbility_SpawnProjectile(void);
 void ActorAbility_ActivatePaletteEffect(void);
 void ActorAbility_SpawnAlternateProjectile(void);
-void sub_0811F7EC(void);
+void ActorAction_TrySpawn(void);
 void ModifierAction_ActivateCost(void);
 void ActorAbility_UpdateRecovery(void);
 void Modifier_InitFourthSourceEffect(u8 *s, u32 v)
@@ -44,7 +44,7 @@ void Modifier_InitFourthSourceEffect(u8 *s, u32 v)
                 f = ActorAbility_SpawnAlternateProjectile;
                 goto set;
             case 3:
-                f = sub_0811F7EC;
+                f = ActorAction_TrySpawn;
                 goto set;
             case 4:
                 f = ModifierAction_ActivateCost;

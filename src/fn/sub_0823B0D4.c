@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: reads the script position and sets up the body, probe and contact node */
-#define KeyframeActor_InitBodyFromScript sub_0823B0D4
 
 #include "engine.h"
 

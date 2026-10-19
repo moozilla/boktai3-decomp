@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 99.1%
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
-#define ActorController_UpdateAnimation sub_08184F04
-#define gActorStateCallbacks            gUnk_0824EF10
+#define gActorStateCallbacks gUnk_0824EF10
 
 struct ActorAnimationStatus {
     u32 flags : 8;
@@ -21,7 +20,7 @@ static inline u8 TestFlag(u8 *p, u32 mask)
     return *p & mask;
 }
 
-void sub_08184F04(u8 *p)
+void ActorController_UpdateAnimation(u8 *p)
 {
     u8 *finished;
     struct ActorControllerAnimation *anim;
@@ -52,5 +51,5 @@ void sub_08184F04(u8 *p)
     p[0xB42]++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08184F04);
+INCLUDE_ASM("asm/nonmatching", ActorController_UpdateAnimation);
 #endif

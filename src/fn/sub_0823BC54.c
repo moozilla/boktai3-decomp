@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: probes tiles beside the facing and picks a diagonal direction */
-#define Actor_ProbeDiagonalTurnDir sub_0823BC54
 
 struct Vec16 {
     s16 x;

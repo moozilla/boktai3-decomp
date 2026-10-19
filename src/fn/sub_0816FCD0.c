@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: action-grid input handler for a pause-menu item screen */
-#define PauseMenu_UpdateItemActions sub_0816FCD0
 
 extern u16 gUnk_03005260[];
 void sub_0816618C(void *, s32, s32);
