@@ -1435,3 +1435,4 @@ addr,function,name,family,note
 081A7EA0,sub_081A7EA0,ScenePanel_RequestPairReaction,"ScenePanel","requests panel reactions from flags and pair conditions"
 081A8214,sub_081A8214,Vanargand_UpdateModeCycle,"Vanargand 3 (auto, tentative)","initializes and cycles active modes 16, 7 and 8"
 081A8408,sub_081A8408,Vanargand_UpdateMode9Transition,"Vanargand action states","updates action state and restarts on flag 0x20000"
+081A85AC,sub_081A85AC,Vanargand_UpdateTargetFlagTransition,"Vanargand action states","selects next action from target flag 0x1000"
