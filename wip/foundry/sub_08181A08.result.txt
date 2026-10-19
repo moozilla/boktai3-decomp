@@ -1,0 +1,4 @@
+RESULT sub_08181A08 notafunction checks=0
+NAME none
+FAMILY ActorPalette
+NOTE Split prologue head: 08181A0E continues by saving r6/r7 and allocating the stack frame.

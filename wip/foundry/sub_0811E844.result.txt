@@ -1,0 +1,4 @@
+RESULT sub_0811E844 fuzzy 56.4% checks=7
+NAME ModifierStats_ResetValue60 low "reset and clamp stat 60 from its base and kind-six modifiers"
+FAMILY ModifierStats
+NOTE Loop count address is hoisted into an extra saved register; the ROM recomputes it each iteration.

@@ -1,0 +1,4 @@
+RESULT sub_0811EAB8 fuzzy 75.9% checks=3
+NAME CallbackList_RunStateThree low "runs state-three callbacks and threads their results"
+FAMILY CallbackList
+NOTE This is the state-three sibling of EA78 and retains the same count-address allocation difference.

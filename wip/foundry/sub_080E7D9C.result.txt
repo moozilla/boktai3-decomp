@@ -1,0 +1,4 @@
+RESULT sub_080E7D9C fuzzy 66.4% checks=6
+NAME SceneActor_BeginGuardedReaction low "resets guarded reaction state and selects behavior 17"
+FAMILY SceneActorAnimation
+NOTE CORE distance is zero with all six regions locked; register allocation and operand choices remain different.

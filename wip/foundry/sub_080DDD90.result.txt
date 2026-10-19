@@ -1,0 +1,4 @@
+RESULT sub_080DDD90 fuzzy 79.1% checks=8
+NAME SceneActorControl_UpdateGateTransition low "updates actor control flags and resets the gate transition state"
+FAMILY SceneActor control gate
+NOTE Five core differences remain in offset calculation and constant reuse, with additional register allocation differences.

@@ -1,0 +1,4 @@
+RESULT sub_08199BD8 fuzzy 61.8% checks=3
+NAME CallbackSlot_AdvancePosition low "advances a selected component for three ticks"
+FAMILY CallbackPool
+NOTE Compiler merges the two component address branches.

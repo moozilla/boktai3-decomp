@@ -1,0 +1,4 @@
+RESULT sub_080CEAC4 fuzzy 55.4% checks=5
+NAME SceneActor_AdvanceTimedPhase low "switches to phase two behavior five after 120 ticks"
+FAMILY scene actor
+NOTE Address CSE retains flag and counter pointers across the function, changing the frame and transition stores.

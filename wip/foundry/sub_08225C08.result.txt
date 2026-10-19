@@ -1,0 +1,4 @@
+RESULT sub_08225C08 fuzzy 52.4% checks=1
+NAME Terrain_UnpackHP low "returns an HP resource directly or decompresses it into WRAM"
+FAMILY Terrain resources
+NOTE The original preserves unusual constant address arithmetic across the decompressor call.

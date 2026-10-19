@@ -1,0 +1,4 @@
+RESULT sub_08135980 notafunction checks=0
+NAME none
+FAMILY unassigned actor state
+NOTE Epilogue fragment reads live r6 and restores r8 and saved registers without a matching prologue.

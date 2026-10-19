@@ -1,0 +1,4 @@
+RESULT sub_080A2A38 fuzzy 35.2% checks=4
+NAME SceneActorControl_FinishDirectionalRecovery low "restore control after directional recovery timer expires"
+FAMILY Scene actor control
+NOTE Control flow recovered; compiler folds the group address and shares zero values differently.

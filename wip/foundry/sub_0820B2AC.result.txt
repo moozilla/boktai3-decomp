@@ -1,0 +1,4 @@
+RESULT sub_0820B2AC fuzzy 35.0% checks=9
+NAME DragonPuppy_UpdateHitRecovery low "jitters the render position before resuming attack timing"
+FAMILY Dragon puppy (auto, tentative)
+NOTE The recovery field at 0x13A also triggers defeat when negative; high-register allocation and address-generation differences remain.

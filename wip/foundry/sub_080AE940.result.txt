@@ -1,0 +1,4 @@
+RESULT sub_080AE940 fuzzy 73.5% checks=8
+NAME SceneActorReaction_CheckRouteApproach low "checks approach distance and route before changing behavior"
+FAMILY SceneActorReaction
+NOTE All calls and branches are recovered with CORE distance one; a duplicate zero load and actor/destination register allocation remain.

@@ -1,0 +1,4 @@
+RESULT sub_08180730 fuzzy 78.5% checks=4
+NAME SceneHazard_AdvanceToTarget low "moves toward target and spawns a proximity hazard on arrival"
+FAMILY MovingSceneHazard
+NOTE CORE distance is zero with all eight regions locked, but the object and position registers remain swapped.

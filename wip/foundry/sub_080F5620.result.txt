@@ -1,0 +1,4 @@
+RESULT sub_080F5620 fuzzy 61.2% checks=6
+NAME ActorPhase_TurnToHalfCircle low "accelerates turning until angle reaches 128"
+FAMILY PhaseActor
+NOTE Loop invariant motion hoists extra state field addresses and spills one pointer.

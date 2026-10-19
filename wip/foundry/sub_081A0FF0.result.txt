@@ -1,0 +1,4 @@
+RESULT sub_081A0FF0 fuzzy 54.5% checks=4
+NAME ActorReaction_EmitMotionBurst low "configures animation and emits four randomized motion entries"
+FAMILY Hresvelgr actor reaction
+NOTE Seven core instruction differences remain in address setup and random-index arithmetic.

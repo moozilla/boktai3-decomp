@@ -1,0 +1,4 @@
+RESULT sub_0818400C fuzzy 70.6% checks=3
+NAME ActorController_UpdateTemporaryAnimationFlag low "sets a flag during directional animation and clears it at completion"
+FAMILY ActorController
+NOTE Best CORE 2 candidate retains the B32 address; shared tail recovered.

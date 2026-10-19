@@ -1,0 +1,4 @@
+RESULT sub_080E04D0 fuzzy 60.2% checks=5
+NAME SceneActorAnimation_TickEntryEleven low "selects entry 11 and updates its drawable with a temporary rate"
+FAMILY SceneActorAnimation
+NOTE Seven of eight core regions match; address reuse and the parameter-default branch still differ.

@@ -1,0 +1,4 @@
+RESULT sub_081CD484 notafunction checks=0
+NAME none
+FAMILY scene actor command dispatch
+NOTE Split prologue head falls through a long-branch BL to 081CDDF4, whose loop body at 081CD4B0 shares its saved registers and epilogue.

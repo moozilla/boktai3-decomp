@@ -1,0 +1,4 @@
+RESULT sub_08243678 fuzzy 70.5% checks=5
+NAME Player_UpdateResetBlink low "counts down a reset value and adds periodic presentation flags"
+FAMILY Player
+NOTE CORE is zero and every structural region is locked; player and timer occupy opposite callee-saved registers.

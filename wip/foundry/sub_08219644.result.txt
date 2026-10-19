@@ -1,0 +1,4 @@
+RESULT sub_08219644 notafunction checks=0
+NAME none
+FAMILY RAM routine interworking trampoline
+NOTE Lone Thumb epilogue restores the return address saved at 08219624.

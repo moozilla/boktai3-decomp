@@ -1,0 +1,4 @@
+RESULT sub_0811EA78 fuzzy 75.9% checks=6
+NAME CallbackList_RunActive low "runs state-one callbacks and threads their results"
+FAMILY CallbackList
+NOTE The callback loop is recovered; agbcc retains the count address instead of recomputing it from the object.

@@ -1,0 +1,4 @@
+RESULT sub_081C2334 fuzzy 65% checks=11
+NAME QuantityDigits_Init low "builds a row of 5 sprites 8px apart from the choice-menu cursor resource (CB05/530D), one shared palette pool index 0x3AC"
+FAMILY choice_menu / menu digit-row widgets (shares ScriptProc_Start(0xCB05,0x530D) resource with ChoiceMenu_Initialize)
+NOTE Structure, calls and all values match (CORE distance 25/86, mostly register-allocation noise); two stubborn diffs remain: the loop over the 4 trailing sprites compiles as a down-counting loop in the ROM (incrementing cmp/ble) but as an up-counting one in every C form tried (for, do-while, i<=3 vs i<4), and the "poolIndex << 5" palette-offset is recomputed via a fresh literal pool load in my version instead of reusing the register that already held 0x3AC as the ROM does; tried caching &gUnk_030042E4 and hoisting the a5=0 constant but both increased the diff, so they were reverted.

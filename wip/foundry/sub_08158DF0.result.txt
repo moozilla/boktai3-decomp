@@ -1,0 +1,4 @@
+RESULT sub_08158DF0 fuzzy 75.4% checks=3
+NAME Player_BeginForcedDirection low "enters action four and sets folded facing direction"
+FAMILY Player
+NOTE Facing-mask allocation changes later constant reuse; context also includes an opaque trailing function beyond 08158E68.

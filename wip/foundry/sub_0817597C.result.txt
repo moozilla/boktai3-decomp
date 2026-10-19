@@ -1,0 +1,4 @@
+RESULT sub_0817597C fuzzy 72.9% checks=5
+NAME MenuSelection_UpdateCursorSprites low "set cursor visibility and row and refresh option animations"
+FAMILY menu selection
+NOTE Five CORE differences remain in offset derivation and constant load order, plus register allocation differences.

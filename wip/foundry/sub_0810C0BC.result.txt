@@ -1,0 +1,4 @@
+RESULT sub_0810C0BC fuzzy 75.6% checks=7
+NAME SceneMenu_PositionDisplay low "sets initial coordinates for seven display elements"
+FAMILY SceneMenuDisplay
+NOTE Extra loop-invariant coordinate addresses extend the register frame; the best candidate is retained after several unproductive layout variants.

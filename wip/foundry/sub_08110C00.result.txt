@@ -1,0 +1,4 @@
+RESULT sub_08110C00 notafunction checks=0
+NAME none
+FAMILY background tilemap
+NOTE Interior split of sub_08110BF8, whose preceding prologue saves the registers restored by this tail.

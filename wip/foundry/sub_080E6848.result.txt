@@ -1,0 +1,4 @@
+RESULT sub_080E6848 fuzzy 66.4% checks=6
+NAME SceneActor_ResetMovementPhase low "reset movement flags and restore saved target"
+FAMILY SceneActor movement phases
+NOTE Entry reset and conditional control clearing are recovered; two offset-generation differences and allocation remain.

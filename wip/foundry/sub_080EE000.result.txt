@@ -1,0 +1,4 @@
+RESULT sub_080EE000 fuzzy 69.7% checks=6
+NAME SceneActorControl_UpdateAnimationTransition low "updates animation flags and returns to directional idle"
+FAMILY SceneActorControl
+NOTE Shared actor fields and control transition recovered; constant scheduling and offset reuse remain different.

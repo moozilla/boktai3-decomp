@@ -1,0 +1,4 @@
+RESULT sub_0811E37C fuzzy 79.2% checks=8
+NAME Modifier_FindSourceRecord low "finds a source ID and copies its modifier fields"
+FAMILY Modifier
+NOTE Success-block placement and induction-pointer allocation differ; the context also includes an unlabelled trailing routine.

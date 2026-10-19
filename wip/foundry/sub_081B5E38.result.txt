@@ -1,0 +1,4 @@
+RESULT sub_081B5E38 fuzzy 52.8% checks=5
+NAME PairedSceneActor_Destroy low "removes animation and both sets of actor components"
+FAMILY PairedSceneActor (tentative)
+NOTE Cleanup calls and offsets are recovered, but stride hoisting changes pointer allocation and the saved-register frame.

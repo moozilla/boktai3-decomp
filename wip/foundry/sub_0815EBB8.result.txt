@@ -1,0 +1,4 @@
+RESULT sub_0815EBB8 fuzzy 70.5% checks=4
+NAME Player_UpdateBlinkTimer low "decrements a mode-gated timer and alternates action flags"
+FAMILY Player
+NOTE CORE is zero but player and timer occupy opposite callee-saved registers; declaration changes did not improve allocation.

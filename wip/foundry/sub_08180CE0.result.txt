@@ -1,0 +1,4 @@
+RESULT sub_08180CE0 fuzzy 72.8% checks=7
+NAME ActorMarker_InitPartSprites low "initializes nine direction-dependent sprite parts"
+FAMILY ActorMarker
+NOTE Nine of eleven regions are structurally locked; embedded sprite address calculations remain different.

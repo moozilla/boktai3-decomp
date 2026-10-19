@@ -1,0 +1,4 @@
+RESULT sub_080AB6F4 fuzzy 53.2% checks=5
+NAME SceneActor_UpdateAlternatingCollider low "toggles collider mode and applies one of two parameter sets"
+FAMILY SceneActor
+NOTE Guards match but agbcc merges parameter addresses and assigns collider pointer differently; CORE distance 4 remains.

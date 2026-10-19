@@ -1,0 +1,4 @@
+RESULT sub_080B03BC fuzzy 66.5% checks=3
+NAME SceneActorPhase_UpdateInitialMotion low "initializes control and advances to movement phase"
+FAMILY Scene actor phase control
+NOTE All calls and branches are present; control-block offset reuse and register lifetimes differ.

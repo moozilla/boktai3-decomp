@@ -1,0 +1,4 @@
+RESULT sub_0810FDDC fuzzy 73.6% checks=5
+NAME LinkMenu_DrawThreeDigitNumber low "draws a three-digit number with hidden leading zeroes"
+FAMILY LinkMenu
+NOTE Index lifetime and loop-invariant address allocation still differ despite matching digit conversion and flag operations.

@@ -1,0 +1,4 @@
+RESULT sub_0819A414 fuzzy 78.6% checks=3
+NAME CallbackEffectPool_Destroy low "clears sixteen primary and eight secondary effects"
+FAMILY CallbackPool
+NOTE Address calculation allocation and one folded store address remain different.

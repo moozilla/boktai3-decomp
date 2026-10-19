@@ -1,0 +1,4 @@
+RESULT sub_081A3828 fuzzy 71.2% checks=4
+NAME EffectPool_ReleaseEntry low "release children and reset an effect pool entry"
+FAMILY EffectPool (tentative)
+NOTE Loop-invariant address hoisting keeps an extra register live despite three source variants.

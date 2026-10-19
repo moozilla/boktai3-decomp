@@ -1,0 +1,4 @@
+RESULT sub_0818ECFC fuzzy 75.2% checks=9
+NAME Nidhoggr_UpdateEffectPool low "runs pool callbacks and updates anchored effect colliders"
+FAMILY Nidhoggr effect pool (tentative)
+NOTE CORE distance is zero; register allocation differs, and the last two checks failed because build/boktai3.elf was empty.

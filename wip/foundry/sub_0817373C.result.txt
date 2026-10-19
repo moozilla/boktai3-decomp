@@ -1,0 +1,4 @@
+RESULT sub_0817373C fuzzy 63.6% checks=5
+NAME SceneHud_RefreshEquipmentIcons low "refresh inventory icons and equipped-slot markers"
+FAMILY SceneHud
+NOTE Separate widget address inductions still differ from the ROM.

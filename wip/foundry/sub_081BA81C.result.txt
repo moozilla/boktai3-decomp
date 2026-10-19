@@ -1,0 +1,4 @@
+RESULT sub_081BA81C fuzzy 57.6% checks=5
+NAME Registry3F74_InitAnimations low "loads animation resource and initializes five slots"
+FAMILY Registry3F74
+NOTE Calls and loop match structurally; constant scheduling and register allocation remain (CORE distance 2).

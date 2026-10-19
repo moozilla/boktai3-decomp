@@ -1,0 +1,4 @@
+RESULT sub_081266B4 fuzzy 77.5% checks=4
+NAME SceneStatusIndicator_UpdateBlink low "updates visibility and a 38-tick blink timer from player status"
+FAMILY SceneStatusIndicator
+NOTE All core regions match; register allocation and branch forwarding remain different.

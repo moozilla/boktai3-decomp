@@ -1,0 +1,4 @@
+RESULT sub_0812C3D0 fuzzy 39.5% checks=4
+NAME CompactEffectPool_AllocateSlot low "reserve one of eight compact slots without clearing"
+FAMILY compact fixed-slot effect pool (tentative)
+NOTE CORE distance is five; shift reuse keeps different pointers live and changes register allocation.

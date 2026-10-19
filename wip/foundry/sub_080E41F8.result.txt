@@ -1,0 +1,4 @@
+RESULT sub_080E41F8 fuzzy 75.2% checks=5
+NAME SceneActor_BeginAnimationWait low "initialize animation and wait for completion"
+FAMILY SceneActor animation phases
+NOTE Entry and completion paths are recovered; offset reuse, instruction ordering and register allocation remain different.

@@ -1,0 +1,4 @@
+RESULT sub_08163020 fuzzy 60.3% checks=4
+NAME TransitionPanel_ApplyScaleAndSpacing low "scales eight sprites and spaces mirrored groups"
+FAMILY TransitionPanel
+NOTE Signed reload selection and pointer register allocation remain different despite correct loop behavior.

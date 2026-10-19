@@ -1,0 +1,4 @@
+RESULT sub_08219624 notafunction checks=0
+NAME none
+FAMILY RAM routine interworking trampoline
+NOTE Thumb prologue head of the mixed-mode wrapper spanning 08219624–08219648, not a standalone C function.

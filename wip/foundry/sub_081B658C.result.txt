@@ -1,0 +1,4 @@
+RESULT sub_081B658C fuzzy 65.6% checks=3
+NAME ActorTimers_CountActive low "counts the two positive signed timer fields"
+FAMILY ActorTimers (tentative)
+NOTE Core distance is zero with a remaining pointer and boolean register swap.

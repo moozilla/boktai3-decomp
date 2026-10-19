@@ -1,0 +1,4 @@
+RESULT sub_080D1644 fuzzy 54.8% checks=5
+NAME SceneActor_BeginRecoveryPhase low "releases attachments and enters a timed recovery control phase"
+FAMILY scene actor animation
+NOTE Six CORE differences remain in constant lifetime and control-field address generation; the semantically corrected candidate is retained.

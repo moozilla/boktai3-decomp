@@ -1,0 +1,2 @@
+RESULT sub_08018E00 fuzzy 60.0% checks=7
+Hard: register assignment (ROM keeps p in r5 and the two array bases in r7/r8, with signed pointer-style loop compares) would not follow from the C shapes tried.

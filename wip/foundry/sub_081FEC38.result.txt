@@ -1,0 +1,4 @@
+RESULT sub_081FEC38 fuzzy 38.7% checks=5
+NAME SlotController_RequestStop low "sets control flag four and changes an active slot callback"
+FAMILY SlotController
+NOTE CORE distance is two because the compiler shares slot arithmetic that the ROM repeats.

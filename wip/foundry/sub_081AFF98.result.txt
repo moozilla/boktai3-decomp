@@ -1,0 +1,4 @@
+RESULT sub_081AFF98 fuzzy 64.5% checks=4
+NAME ActorStatus_ApplyPendingState low "applies a valid state and clears transition timers"
+FAMILY ActorStatus
+NOTE CORE distance is five; retained state-address CSE changes address construction and register pressure.

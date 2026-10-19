@@ -1,0 +1,4 @@
+RESULT sub_08122D58 fuzzy 42.9% checks=6
+NAME ResourceSlotPool_Initialize low "loads resources and initializes four slot flags"
+FAMILY ResourceSlotPool
+NOTE CORE distance is three at the final zero store and return, with register allocation differences in the loop.

@@ -1,0 +1,4 @@
+RESULT sub_08122F78 fuzzy 78.9% checks=4
+NAME SlotPool_Allocate low "allocates a free slot from a 32-entry bitmap pool"
+FAMILY SlotPool
+NOTE The loop and materialized boolean match structurally; pointer induction order still differs.

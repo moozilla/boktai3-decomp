@@ -1,0 +1,4 @@
+RESULT sub_080D5FD8 fuzzy 78.8% checks=6
+NAME SceneActor_UpdateDescriptorApproach low "update palette and approach or turn toward a destination descriptor"
+FAMILY SceneActor behavior
+NOTE Core distance is five; palette-store factoring and state-reset address generation remain different.

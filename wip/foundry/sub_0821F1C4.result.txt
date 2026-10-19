@@ -1,0 +1,4 @@
+RESULT sub_0821F1C4 fuzzy 46.4% checks=4
+NAME Navigation_GetPairValue low "read a symmetric pair value from a packed triangular table"
+FAMILY terrain navigation
+NOTE CORE is zero but allocation and register copies differ.

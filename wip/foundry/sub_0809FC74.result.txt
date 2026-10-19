@@ -1,0 +1,4 @@
+RESULT sub_0809FC74 fuzzy 78.4% checks=6
+NAME SceneActorControl_UpdateRandomDelay low "reset and advance a randomized actor wait"
+FAMILY Scene actor control
+NOTE Main control flow recovered; count-address reuse and register allocation still differ.

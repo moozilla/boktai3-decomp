@@ -1,0 +1,4 @@
+RESULT sub_0812A660 fuzzy 66.9% checks=4
+NAME ActorEffect_InitColliders low "initializes two collision volumes and their callbacks"
+FAMILY ActorEffect (tentative)
+NOTE Packed extent initialization matches; allocation and position-address construction remain.

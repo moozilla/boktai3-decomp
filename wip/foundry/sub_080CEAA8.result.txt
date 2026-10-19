@@ -1,0 +1,4 @@
+RESULT sub_080CEAA8 notafunction checks=0
+NAME none
+FAMILY unassigned
+NOTE Entry has no prologue; it is a mid-function increment of a stack-frame field (r7+0x2AC) that falls straight into the same shared epilogue shape as sub_080CC80C - a split artifact, not a standalone function.

@@ -1,0 +1,4 @@
+RESULT sub_08249308 fuzzy 50.0% checks=3
+NAME Libgcc_ReturnFromDivideByZero low "returns from the no-op divide-by-zero hook"
+FAMILY libgcc integer division runtime
+NOTE Empty C emits bx lr instead of the assembly hook's mov pc,lr; removing interwork and trying the established libgcc old_agbcc selector did not improve the result, so default settings were restored.

@@ -1,0 +1,4 @@
+RESULT sub_0811B500 fuzzy 74.3% checks=4
+NAME Collision_DispatchOverlaps low "dispatches callbacks for overlapping collision-list entries"
+FAMILY Collision
+NOTE Core distance is five; the compiler merges the two list-advance paths and spills the callback mask.

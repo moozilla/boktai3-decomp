@@ -1,0 +1,4 @@
+RESULT sub_081376B4 fuzzy 76.9% checks=3
+NAME SceneActor_AdjustTaggedPosition low "adjusts position when coordinate tag equals B546"
+FAMILY scene actor position search
+NOTE Body differs only by r5/r6 allocation; CORE incorrectly includes the following retained assembly block.

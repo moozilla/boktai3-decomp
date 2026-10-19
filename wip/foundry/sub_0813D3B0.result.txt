@@ -1,0 +1,4 @@
+RESULT sub_0813D3B0 fuzzy 60.0% checks=4
+NAME SceneActor_StartRandomizedEffect low "starts or clears an effect with randomized velocity"
+FAMILY SceneActor effect
+NOTE All calls and branches agree but random-table load order and register allocation remain different (CORE 2).

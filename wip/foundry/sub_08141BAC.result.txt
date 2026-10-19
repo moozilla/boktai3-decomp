@@ -1,0 +1,4 @@
+RESULT sub_08141BAC fuzzy 50.0% checks=10
+NAME Player_GetSmoothedDirection low "prefer a recent adjacent direction when the newest direction is cardinal"
+FAMILY Player
+NOTE The history scan and exits are recovered but register allocation and constant initialization differ.

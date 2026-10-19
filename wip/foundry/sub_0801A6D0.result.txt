@@ -1,0 +1,2 @@
+RESULT sub_0801A6D0 fuzzy 64.2% checks=7
+Hard: stack slot order (the ROM puts the fill-source word below the u16 pair, the reverse of what declaration order gives) and the r8/sb register assignment for the constant 0x3c and the buffer address.

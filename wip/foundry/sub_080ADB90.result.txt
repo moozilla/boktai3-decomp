@@ -1,0 +1,4 @@
+RESULT sub_080ADB90 fuzzy 68.1% checks=5
+NAME SceneActorReaction_WaitForApproach low "waits for a distance threshold or timeout before changing behavior"
+FAMILY SceneActorReaction
+NOTE Control flow and calls are recovered, but context flag pointer lifetime and reset instruction ordering still differ.

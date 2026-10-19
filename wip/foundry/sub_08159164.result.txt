@@ -1,0 +1,4 @@
+RESULT sub_08159164 fuzzy 58.4% checks=7
+NAME PlayerRewards_AddTotal low "adds a player-scaled reward to a capped total"
+FAMILY PlayerRewards
+NOTE Recovered reward scaling and cap, but inlined flag tests retain load-order and branch-layout differences.

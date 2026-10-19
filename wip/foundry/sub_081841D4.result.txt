@@ -1,0 +1,4 @@
+RESULT sub_081841D4 fuzzy 72.1% checks=3
+NAME ActorController_UpdateResetAnimationTransition low "calls actor helper and clears controller bit zero on transition"
+FAMILY ActorController
+NOTE CORE 2: retained B32 address persists across alternate access types.

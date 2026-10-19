@@ -1,0 +1,4 @@
+RESULT sub_0813436E notafunction checks=0
+NAME none
+FAMILY Scene actor reaction
+NOTE This is the success-return basic block of the preceding function, jumping to its shared epilogue at 0813438A.

@@ -1,0 +1,2 @@
+RESULT sub_0808A210 fuzzy 0% checks=0
+This is the epilogue tail of the preceding function (add sp,#0x80; restores r8-sl), not a standalone function, so it can't be written as C.

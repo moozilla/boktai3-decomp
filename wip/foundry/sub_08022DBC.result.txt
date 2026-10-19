@@ -1,0 +1,2 @@
+RESULT sub_08022DBC fuzzy 74.3% checks=10
+agbcc merges the byte compare of the two entry paths and keeps the state value in r2, where the ROM re-loads and carries it in r0.

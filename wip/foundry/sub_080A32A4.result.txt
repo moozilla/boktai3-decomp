@@ -1,0 +1,4 @@
+RESULT sub_080A32A4 fuzzy 43.9% checks=6
+NAME SceneActorControl_UpdateResponseCompletion low "advance completed response and restore actor control"
+FAMILY Scene actor control
+NOTE Remaining differences are reset-tail merging and reused field addresses; no pins used.

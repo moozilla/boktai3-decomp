@@ -1,0 +1,4 @@
+RESULT sub_082196BC notafunction checks=0
+NAME none
+FAMILY ARM interworking wrappers
+NOTE Thumb epilogue restores the return address pushed by 0821969C after the ARM body at 082196A4.

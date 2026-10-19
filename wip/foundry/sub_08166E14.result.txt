@@ -1,0 +1,4 @@
+RESULT sub_08166E14 fuzzy 78.5% checks=7
+NAME InventoryPanel_SetEntryRow low "positions or hides three entry display elements"
+FAMILY InventoryPanel
+NOTE CORE is zero with all regions locked; register allocation and operand order remain.

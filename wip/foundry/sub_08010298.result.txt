@@ -1,0 +1,2 @@
+RESULT sub_08010298 fuzzy 53.6% checks=8
+Structure and values match (core distance small); register allocation differs (p in r6, table pointer reloaded in-loop in r4 and mask/rand ptr in sb/sl) and agbcc kept hoisting the table into a high register.

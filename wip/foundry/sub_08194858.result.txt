@@ -1,0 +1,4 @@
+RESULT sub_08194858 fuzzy 59.5% checks=7
+NAME Nidhoggr_UpdatePairedBounds low "select paired bounds and update visibility flags"
+FAMILY Nidhoggr large scene animation controller
+NOTE CORE distance is zero; owner, bounds-source and part pointers remain allocated to different registers.

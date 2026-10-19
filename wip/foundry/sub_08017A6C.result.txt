@@ -1,0 +1,2 @@
+RESULT sub_08017A6C fuzzy 68.1% checks=9
+Hard: agbcc hoists the 0x630 offset constant into r8 (extra prologue push) where the ROM rematerializes it per use; no C form tried removed it.

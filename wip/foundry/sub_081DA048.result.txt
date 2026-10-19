@@ -1,0 +1,4 @@
+RESULT sub_081DA048 fuzzy 60.4% checks=4
+NAME TimedEffect_ReactToContact low "selects callbacks or marks effect from contact flags"
+FAMILY TimedEffect
+NOTE CORE is zero but register lifetimes and missing copies differ; mask width and early returns did not improve allocation.

@@ -1,0 +1,4 @@
+RESULT sub_0812B27C fuzzy 75.9% checks=3
+NAME LargeEffectPool_Destroy low "remove live slot sprites and colliders and clear pool global"
+FAMILY large fixed-slot effect pool (tentative)
+NOTE The compiler hoists the 0x18C stride into r8 instead of constructing it in the loop.

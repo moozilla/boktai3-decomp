@@ -1,0 +1,4 @@
+RESULT sub_081A4AB4 fuzzy 69.7% checks=8
+NAME Hresvelgr_CreateProjectileExplosions low "creates eight delayed explosions around projectile origin"
+FAMILY HresvelgrProjectile
+NOTE CORE distance two comes from random-table addressing in ip; remaining differences are allocation and copies.

@@ -1,0 +1,4 @@
+RESULT sub_080A97AC fuzzy 48.8% checks=5
+NAME SceneActorSlotGroup_SelectMarkedEntry low "selects first marked entry and copies its position"
+FAMILY SceneActorSlotGroup
+NOTE CORE distance seven remains because the compiler advances a flags pointer instead of recomputing the entry address from a byte offset.

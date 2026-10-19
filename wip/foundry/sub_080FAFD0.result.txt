@@ -1,0 +1,4 @@
+RESULT sub_080FAFD0 fuzzy 75.4% checks=7
+NAME SceneActorControl_ReadHoverParameters low "reads four script parameters and initializes counters and health threshold"
+FAMILY SceneActorControl
+NOTE Remaining differences are index narrowing and statement ordering around the two loops and health calculation.

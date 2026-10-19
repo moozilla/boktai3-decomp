@@ -1,0 +1,4 @@
+RESULT sub_0810BB90 fuzzy 67.6% checks=3
+NAME SessionMenu_IncrementSecondCounter low "increments second counter pair with a cap of twenty"
+FAMILY Session menu counters
+NOTE Ported the first pair with CORE zero; ordinary register hints and a separate pointer local left allocation unchanged.

@@ -1,0 +1,4 @@
+RESULT sub_08163700 fuzzy 63.4% checks=3
+NAME ScriptEffect_Initialize low "initializes script options and publishes task"
+FAMILY ScriptEffect
+NOTE Core distance 6: address derivation and merged parameter store remain; three checks brought no structural improvement.

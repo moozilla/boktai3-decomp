@@ -1,0 +1,4 @@
+RESULT sub_081111E8 fuzzy 76.7% checks=6
+NAME ScanlineScroll_AdvancePhases low "advances split scanline scroll phases unless player flags block updates"
+FAMILY scanline scroll
+NOTE CORE is zero with existing ScenePoolPlayer flags; phase-pointer and temporary register allocation remains different.

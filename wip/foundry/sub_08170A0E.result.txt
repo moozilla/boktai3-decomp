@@ -1,0 +1,4 @@
+RESULT sub_08170A0E notafunction checks=0
+NAME none
+FAMILY SceneHud
+NOTE This is the body of 08170A08 after a six-byte prologue incorrectly split into a separate symbol.

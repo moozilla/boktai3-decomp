@@ -1,0 +1,4 @@
+RESULT sub_0809DBAC fuzzy 41.4% checks=7
+NAME RouteActor_BeginReaction low "plays reaction sound and initializes reaction state"
+FAMILY RouteActor
+NOTE Retained the candidate with CORE distance two; allocation and a derived timer offset remain different.

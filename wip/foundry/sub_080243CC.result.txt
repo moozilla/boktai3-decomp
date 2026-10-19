@@ -1,0 +1,2 @@
+RESULT sub_080243CC fuzzy 71.4% checks=7
+Structure and values match (core distance 5); agbcc hoists the shared zero constant into a callee-saved register and shares p+0xb0, where the ROM rematerializes both and keeps a second param copy in ip.

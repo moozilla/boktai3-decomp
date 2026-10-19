@@ -1,0 +1,4 @@
+RESULT sub_08216E54 fuzzy 73.7% checks=2
+NAME BgGfx_LoadMapResource low "returns map resource and caches decompressed map data"
+FAMILY background graphics
+NOTE Resource validation and cache flow are recovered but the original buffer-address arithmetic remains unresolved.

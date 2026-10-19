@@ -1,0 +1,4 @@
+RESULT sub_0824924C fuzzy 0.0% checks=1
+NAME Libgcc_CallViaR5 low "branches through register r5"
+FAMILY libgcc indirect-call trampolines
+NOTE Genuine assembly runtime thunk with subsequent retained register thunks; C receives its callback on the stack rather than r5 and adds a frame; fuzzy score uses candidate-length extent.

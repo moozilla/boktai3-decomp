@@ -1,0 +1,4 @@
+RESULT sub_081B654C fuzzy 56.2% checks=5
+NAME ActorTimers_GetActiveMask low "returns bits for two positive signed timer fields"
+FAMILY ActorTimers (tentative)
+NOTE Core distance is zero; remaining differences are allocation and zero-initialization placement.

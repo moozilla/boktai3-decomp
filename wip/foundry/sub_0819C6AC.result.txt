@@ -1,0 +1,4 @@
+RESULT sub_0819C6AC fuzzy 67.2% checks=5
+NAME ColliderActor_RandomizeTargetPosition low "choose random radial target position at fixed height"
+FAMILY ColliderActor (tentative)
+NOTE Two CORE differences remain in final height constant materialization, with register allocation also differing.

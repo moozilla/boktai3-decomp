@@ -1,0 +1,4 @@
+RESULT sub_080B197C fuzzy 67.6% checks=4
+NAME SceneActor_BeginContextReaction low "selects context reaction or resets actor state"
+FAMILY SceneActor
+NOTE Calls and branches recovered; mask ordering and pointer/register lifetimes remain different.

@@ -1,0 +1,4 @@
+RESULT sub_08169738 fuzzy 74.1% checks=5
+NAME SelectionPanel_RemoveEntryAnimations low "removes six groups of three panel animations"
+FAMILY SelectionPanel
+NOTE CORE is zero but the third animation pointer and loop counter occupy swapped registers; stopped after several checks without improvement.

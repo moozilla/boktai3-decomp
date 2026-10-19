@@ -1,0 +1,4 @@
+RESULT sub_081C35EC fuzzy 78% checks=12
+NAME SceneActorMotion_Begin low "sets up a timed screen-relative offset tween (dx,dy,dz) toward a target and installs the per-tick update callback"
+FAMILY Registry F 3 E 4 scene actor motion / screen-relative position tween
+NOTE CORE distance reached 0 (structure fully matches: null checks, skip-copy fast path, src-vs-own-position branches, the isometric screen-offset divide-by-3-then-halve idiom borrowed from Camera_SnapTo's `project()`, and the value-first callback store); the remaining ~34 bytes are pure register-allocation noise (r5/r6/r7 numbering swaps) that several reorderings (scope blocks, typed zero temps, statement order) could not budge within the check budget.

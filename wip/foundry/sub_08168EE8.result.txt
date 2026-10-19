@@ -1,0 +1,4 @@
+RESULT sub_08168EE8 fuzzy 68.2% checks=4
+NAME SceneHud_TickWidgetSlides low "decrements slide timers and updates three widget groups' Y positions"
+FAMILY SceneHud
+NOTE Structure is exact with CORE zero; the owner, index and destination pointer occupy different registers.

@@ -1,0 +1,4 @@
+RESULT sub_0811BF44 fuzzy 52.9% checks=4
+NAME ActorParticles_EmitBurst low "plays a sound and emits four randomized particle pairs"
+FAMILY ActorParticles
+NOTE Calls and randomization are recovered; constant hoisting and register allocation leave eight core differences.

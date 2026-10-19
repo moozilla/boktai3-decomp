@@ -1,0 +1,4 @@
+RESULT sub_081B47E8 fuzzy 70.8% checks=4
+NAME ScenePaletteActor_UpdateInterpolation low "copies and interpolates a scene actor palette"
+FAMILY ScenePaletteActor
+NOTE The compiler retains the state address across interpolation, adding a saved register and changing address generation.

@@ -1,0 +1,4 @@
+RESULT sub_0810A304 fuzzy 77.0% checks=4
+NAME ScriptPanel_CompareSnapshots low "exchanges snapshots and advances on participant completion"
+FAMILY ScriptPanel
+NOTE CORE is zero but panel and snapshot pointers receive reversed callee-saved registers.

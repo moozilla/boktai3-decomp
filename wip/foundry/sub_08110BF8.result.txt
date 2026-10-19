@@ -1,0 +1,4 @@
+RESULT sub_08110BF8 notafunction checks=0
+NAME none
+FAMILY Tile row transfer
+NOTE The entire assigned extent is a four-instruction prologue head without a body or return.

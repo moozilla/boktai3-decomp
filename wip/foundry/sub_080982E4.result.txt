@@ -1,0 +1,2 @@
+RESULT sub_080982E4 fuzzy 78.1% checks=8
+Loop shape and the timer decrement match, but gcc hoists the loop-invariant constant 1 out of the loop (extra callee-saved register) where the ROM materializes it in the block; volatile, scoped locals and reassignment did not stop the hoist.

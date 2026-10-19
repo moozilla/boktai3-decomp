@@ -1,0 +1,4 @@
+RESULT sub_080A8EBC fuzzy 71.0% checks=5
+NAME SceneActorSlotGroup_AssignAvailableSlots low "cycles available entry slots through zero to three"
+FAMILY SceneActorSlotGroup
+NOTE CORE distance is zero but allocation differs across the indexed flags scan and advancing slot cursor.

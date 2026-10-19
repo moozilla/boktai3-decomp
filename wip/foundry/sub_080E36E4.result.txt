@@ -1,0 +1,4 @@
+RESULT sub_080E36E4 notafunction checks=0
+NAME none
+FAMILY SceneActorMotion
+NOTE Internal tail of the routine beginning at 080E25FC: inherits r6 and stack locals, falls through from 080E36E0, and releases the parent's 0xA4-byte frame.

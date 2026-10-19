@@ -1,0 +1,4 @@
+RESULT sub_081A6284 fuzzy 73.3% checks=5
+NAME PositionedEffect_InitRadialAttackColliders low "initializes two attack colliders at radial offsets"
+FAMILY PositionedEffect
+NOTE Trigonometric offset calculations and calls agree, but loop register allocation and setup order remain different.

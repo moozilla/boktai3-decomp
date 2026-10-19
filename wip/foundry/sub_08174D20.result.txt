@@ -1,0 +1,4 @@
+RESULT sub_08174D20 fuzzy 24.7% checks=4
+NAME InventoryGrid_UpdateStatMarkers low "positions base bonus and delta stat markers"
+FAMILY InventoryGrid
+NOTE Three loops are recovered; pointer induction merging and constant hoisting still differ, with CORE distance 35.

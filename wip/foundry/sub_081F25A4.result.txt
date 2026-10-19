@@ -1,0 +1,4 @@
+RESULT sub_081F25A4 fuzzy 74.0% checks=3
+NAME SpriteTrail_UpdateFlight low "advances trail flight and selects impact or timeout state"
+FAMILY SpriteTrail
+NOTE All eight core regions match; object/position and collider pointer registers remain swapped, and checks used temporary stale-ELF resolver aliases, removed from delivered C.

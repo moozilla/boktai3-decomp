@@ -1,0 +1,4 @@
+RESULT sub_08095578 fuzzy 77.2% checks=4
+NAME SceneActor_BeginLinkedReaction low "starts actor reaction and linked context phase"
+FAMILY SceneActor linked reactions
+NOTE State setup matches structurally; redundant context flag test and recomputation still differ.

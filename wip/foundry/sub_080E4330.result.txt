@@ -1,0 +1,4 @@
+RESULT sub_080E4330 fuzzy 75.9% checks=4
+NAME SceneActor_BeginAlternateAnimationWait low "initialize alternate animation and wait for completion"
+FAMILY SceneActor animation phases
+NOTE Shared entry and completion structure is recovered; context-offset reuse and argument preparation still differ.

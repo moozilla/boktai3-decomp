@@ -1,0 +1,4 @@
+RESULT sub_08138630 fuzzy 65.4% checks=5
+NAME RecordBuffer_CopyPayloads low "copies 32-byte payloads from 68-byte source records into a packed buffer"
+FAMILY record buffer copy
+NOTE Copy loop structure matches but destination/source/count registers differ; CORE includes unrelated trailing assembly.

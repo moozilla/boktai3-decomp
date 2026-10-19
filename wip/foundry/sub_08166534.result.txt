@@ -1,0 +1,4 @@
+RESULT sub_08166534 fuzzy 43.7% checks=5
+NAME MenuDisplay_UpdateDerivedStats low "refreshes three derived stat rows and positions their digit sprites"
+FAMILY MenuDisplay
+NOTE Calls and loops are recovered, but sprite address factoring and register lifetimes still differ (CORE 22).

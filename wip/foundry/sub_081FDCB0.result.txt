@@ -1,0 +1,4 @@
+RESULT sub_081FDCB0 fuzzy 62.0% checks=6
+NAME OrbitEffect_UpdateHomingTrailSprite low "steers trail toward target with cached planar velocity"
+FAMILY OrbitEffect
+NOTE Coordinate and age reloads are optimized away; the trigonometric velocity helper and expiration behavior are recovered.

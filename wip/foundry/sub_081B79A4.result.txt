@@ -1,0 +1,4 @@
+RESULT sub_081B79A4 fuzzy 74.4% checks=5
+NAME AnimatedMarker_TickActive low "plays activation particles then advances to cooldown after eight frames"
+FAMILY AnimatedMarker
+NOTE CORE is zero with all regions locked; only r4/r5 allocation differs.

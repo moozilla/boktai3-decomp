@@ -1,0 +1,4 @@
+RESULT sub_081B5CCC fuzzy 72.6% checks=3
+NAME ScenePaletteActor_UpdateFadeOut low "interpolates palette then invokes actor completion"
+FAMILY ScenePaletteActor
+NOTE State-address commoning across interpolation causes the same remaining mismatch as 081B47E8.

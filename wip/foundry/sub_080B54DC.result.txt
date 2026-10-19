@@ -1,0 +1,4 @@
+RESULT sub_080B54DC fuzzy 42.3% checks=12
+NAME Vorn_CheckSomething low "returns 1 if bit 0 of field6D4 is set, or if field67C (s16) is >= 0, else returns 0"
+FAMILY Vorn (actor context state predicates, called from Vorn_Init's update path; relative sub_08074A98/SceneActorMovement_UpdateHeight shares the field6D4-style bit test idiom)
+NOTE Logic and the second half's branch shape match exactly (region locked). The first check alone resists matching: ROM materializes (field6D4&1) into an explicit 0/1 value and re-tests it with a second cmp before branching, which agbcc -O2 always collapsed back into a single test for every C shape tried (if/else, ternary, named boolean, volatile, and an asm("":"+r"()) register barrier copied from a documented relative's idiom all produced the same simplified branch). CORE distance is 7; left as fuzzy after exhausting the check budget on this one spot.

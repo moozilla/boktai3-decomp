@@ -1,0 +1,4 @@
+RESULT sub_0809B7FC fuzzy 61.7% checks=5
+NAME ActorBehavior_FinishTimedTransition low "finish delayed transition or restore the fallback behavior"
+FAMILY scene actor behavior
+NOTE All calls and state writes are recovered; five core differences remain in constant lifetime and offset reuse.

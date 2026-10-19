@@ -1,0 +1,4 @@
+RESULT sub_0812A928 fuzzy 64.3% checks=4
+NAME ActorEffect_EmitParticleFan low "emits six particles across a directional fan"
+FAMILY ActorEffect particle emission (tentative)
+NOTE Sine-table lifetime and random-index allocation remain; loop and signed fixed-point rounding are recovered.

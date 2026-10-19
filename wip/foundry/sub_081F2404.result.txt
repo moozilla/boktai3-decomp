@@ -1,0 +1,4 @@
+RESULT sub_081F2404 fuzzy 35.1% checks=3
+NAME SpriteTrail_UpdatePositions low "projects trail history and averages intermediate sprite positions"
+FAMILY SpriteTrail
+NOTE Candidate retains camera-load hoisting, coordinate addressing and allocation differences; check used a temporary resolver alias for the stale baseline ELF, removed from the delivered C.

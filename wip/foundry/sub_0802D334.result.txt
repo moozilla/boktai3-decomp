@@ -1,0 +1,2 @@
+RESULT sub_0802D334 fuzzy 26.3% checks=6
+The ROM keeps p in r3 and spends r4 whereas agbcc emits 'mov ip, r0' for every C shape tried (casts, pointer locals, early return); the store order and constant-offset forms were not reproduced.

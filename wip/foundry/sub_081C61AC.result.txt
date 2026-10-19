@@ -1,0 +1,4 @@
+RESULT sub_081C61AC fuzzy 12.5% checks=4
+NAME SceneObject_ClearEmbeddedFlag low "clears bit zero of the embedded block at offset B8"
+FAMILY scene object embedded flag block
+NOTE CORE is zero but the block pointer, loaded flags and mask use different registers.

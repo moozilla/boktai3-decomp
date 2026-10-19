@@ -1,0 +1,4 @@
+RESULT sub_0810F00C fuzzy 69.0% checks=9
+NAME RecordMenu_PositionSprites low "positions nine menu sprites"
+FAMILY RecordMenu
+NOTE Five core regions are locked; loop-invariant address and constant hoisting remain different.

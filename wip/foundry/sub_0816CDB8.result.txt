@@ -1,0 +1,4 @@
+RESULT sub_0816CDB8 fuzzy 66.3% checks=12
+NAME MenuNavigation_InitializeGrid low "initializes a four-column menu index grid and optional entries"
+FAMILY MenuNavigation
+NOTE CORE distance remains 6: population-loop instruction order and four merged optional-entry stores differ; best candidate retained.

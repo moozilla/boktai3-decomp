@@ -1,0 +1,4 @@
+RESULT sub_080D99D8 notafunction checks=0
+NAME none
+FAMILY scene_actor_registry (actor-iteration dispatcher)
+NOTE No prologue, and the last instruction is `bl sub_08159210` with no following pop/bx - execution falls straight through into sub_080D9A0E's bytes, which also reads the same inherited `sb` (r9, an actor pointer) and `r6`/`r7` without ever establishing them; this is a split of one larger actor-processing function whose real prologue is earlier and whose real epilogue is in sub_080D9A6C, confirmed by relatives sub_08204748.c and sub_080704EC.c which show this exact actor-notify/flag-update idiom inline in bigger matched functions.

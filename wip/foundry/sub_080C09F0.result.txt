@@ -1,0 +1,4 @@
+RESULT sub_080C09F0 notafunction checks=0
+NAME none
+FAMILY none
+NOTE 4-instruction fragment that is only a prologue (push r4-r7,lr; mov r7,sl; mov r6,sb; mov r5,r8) with no body, branch, or return; this is the split-off entry head of a much larger neighboring function, not a real function on its own.

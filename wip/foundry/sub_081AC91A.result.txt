@@ -1,0 +1,4 @@
+RESULT sub_081AC91A notafunction checks=0
+NAME none
+FAMILY ActorSoundPhase
+NOTE Split tail uses the neighbour's stack slots and live r8/sl registers and restores its large frame without a prologue.

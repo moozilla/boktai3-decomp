@@ -1,0 +1,4 @@
+RESULT sub_0817B2DC fuzzy 51.0% checks=4
+NAME ActorEffect_ProcessSceneCommands low "consumes scene commands and resets actor modes"
+FAMILY ActorEffect
+NOTE Retained typed candidate preserves command semantics; loop allocation and shared reset block code generation remain.

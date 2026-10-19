@@ -1,0 +1,4 @@
+RESULT sub_0810E4DC fuzzy 79.9% checks=4
+NAME SelectionPanel_UpdateSelection low "processes confirm and cancel input after the entry delay"
+FAMILY SelectionPanel
+NOTE Seven core differences remain in callback selection and transition-flag stores.

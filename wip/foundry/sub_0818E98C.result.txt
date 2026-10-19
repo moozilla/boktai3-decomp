@@ -1,0 +1,4 @@
+RESULT sub_0818E98C fuzzy 70.0% checks=3
+NAME SpriteColliderGroup_Remove low "removes three sprite and collider pairs"
+FAMILY sprite collider group
+NOTE Compiler hoists the 0x1E4 stride into r7 whereas the ROM rematerializes it after each pair of calls.

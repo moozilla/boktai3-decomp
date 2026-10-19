@@ -1,0 +1,4 @@
+RESULT sub_08113534 fuzzy 77.6% checks=4
+NAME SpriteEffect_CreateAtActor low "creates a sprite effect at an actor-relative position"
+FAMILY SpriteEffect
+NOTE CORE distance is zero but stack-vector address copies and register allocation differ.

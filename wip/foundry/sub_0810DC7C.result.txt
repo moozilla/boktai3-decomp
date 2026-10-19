@@ -1,0 +1,4 @@
+RESULT sub_0810DC7C fuzzy 32.3% checks=5
+NAME SelectionPanel_InitEntryPositions low "initializes position pairs for ten panel entries"
+FAMILY SelectionPanel
+NOTE Fixed-address hoisting and constant lifetimes differ despite equivalent switch behavior.

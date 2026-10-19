@@ -1,0 +1,4 @@
+RESULT sub_0819C5D4 fuzzy 67.6% checks=9
+NAME ColliderActor_ChooseRandomPosition low "choose random radial position at fixed height"
+FAMILY ColliderActor (tentative)
+NOTE CORE distance is zero with all regions locked; register allocation and copies still differ.

@@ -1,0 +1,4 @@
+RESULT sub_081C42B0 fuzzy 71% checks=7
+NAME SpriteEffects_EmitFanParticle low "spawns one SpriteEffectController particle at a point with a random angle/magnitude from a 32-step half-table arc, drawable flags picked by a bit of the flags parameter"
+FAMILY SpriteEffectController / random-table particle emitters (sibling of sub_081C4194 SpriteEffects_EmitFanBurst and sub_0812D064 SpriteEffects_EmitRandomRadialParticle)
+NOTE Structure, branches, constants and even overall byte length (240 bytes, matching ROM) line up; the one defect found along the way was the drawable-flags ternary having its two branch constants (0x200 vs 0x400) swapped relative to ROM's default-then-override structure. Remaining distance (CORE 6/78, all in one region) is pure register allocation/scheduling noise in the prologue, not a structural difference.

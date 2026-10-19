@@ -1,0 +1,4 @@
+RESULT sub_080D534C notafunction checks=0
+NAME none
+FAMILY unassigned
+NOTE Entry has no prologue; it is a mid-function increment (adds r0, #1; str r0, [r1]) falling straight into the same shared epilogue shape as sub_080CC80C/sub_080CEAA8 - a split artifact, not a standalone function.

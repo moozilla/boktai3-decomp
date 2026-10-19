@@ -1,0 +1,4 @@
+RESULT sub_0811FCB4 fuzzy 54.6% checks=6
+NAME ActorMotion_SetKnockback low "sets horizontal knockback velocity and a thirty-frame timer"
+FAMILY ActorMotion
+NOTE Stack vector aliasing and repeated coordinate loads remain structurally different.

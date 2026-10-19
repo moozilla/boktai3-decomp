@@ -1,0 +1,4 @@
+RESULT sub_0810BB4C fuzzy 67.6% checks=6
+NAME SessionMenu_IncrementFirstCounter low "increments first counter pair with a cap of twenty"
+FAMILY Session menu counters
+NOTE CORE is zero with the original signed bounds and repeated address calculation; pointer/index/value registers remain permuted.

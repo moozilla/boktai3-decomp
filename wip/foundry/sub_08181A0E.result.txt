@@ -1,0 +1,4 @@
+RESULT sub_08181A0E notafunction checks=0
+NAME none
+FAMILY actor palette fade
+NOTE Address splits the prologue of sub_08181A08 after its initial register saves.

@@ -1,0 +1,4 @@
+RESULT sub_0819E344 fuzzy 68.5% checks=5
+NAME ActorAction_RestoreSavedBehavior low "restores saved mode animation and callback after animation completion"
+FAMILY ActorActionSequence
+NOTE Pointer allocation changes the entry branch and folds adjacent saved-field offsets differently.

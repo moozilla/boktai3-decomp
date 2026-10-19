@@ -1,0 +1,2 @@
+RESULT sub_0800F6F8 fuzzy 79.8% checks=5
+Core instructions nearly match (distance 5); the remaining gap is register allocation (p in r6 and buffer in sb, which agbcc did not reproduce).

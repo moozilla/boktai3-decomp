@@ -1,0 +1,4 @@
+RESULT sub_0821966C notafunction checks=0
+NAME none
+FAMILY ARM interworking wrappers
+NOTE Thumb epilogue of the wrapper entered at 0821964C, reached from its ARM body at 08219654 after calling RAM code at 03000CE8.

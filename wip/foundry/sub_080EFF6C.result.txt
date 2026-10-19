@@ -1,0 +1,4 @@
+RESULT sub_080EFF6C fuzzy 50% checks=10
+NAME SceneActorReaction_Tick low "clears field2B1 flag, resets state2A8/phase2A9/behavior2AA/counter2AC and sets field2B1 after counter2AC exceeds 30, then increments counter2AC"
+FAMILY SceneActorReaction (scene_actor_reset.h SceneActorRegistryResetView)
+NOTE Structurally identical (CORE distance 4/35, only register-allocation differences remain: ROM recomputes the counter2AC and field2B1 addresses fresh instead of reusing the already-live r3/r4 held from the comparison and the earlier field2B1 check); tried 8 distinct rewrites (pointer-chain continuation, literal vs variable zero, statement reordering, struct-member vs cast-pointer forms, an extra local) and all converged to the same CORE=4 result, suggesting the remaining gap is a genuine agbcc register-allocation quirk not reachable without register pinning (disallowed for this task).

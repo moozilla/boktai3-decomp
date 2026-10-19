@@ -1,0 +1,4 @@
+RESULT sub_081F55B0 fuzzy 79.2% checks=6
+NAME Ratatosk_UpdateOrbitingParticles low "spawns particles on a rotating circle above the actor"
+FAMILY Ratatosk
+NOTE Vector construction and addition are recovered, but pointer lifetimes and register allocation still differ.

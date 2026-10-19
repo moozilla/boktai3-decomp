@@ -1,0 +1,4 @@
+RESULT sub_0822F1B8 fuzzy 40.0% checks=3
+NAME Math_MultiplyUnsignedHigh low "returns the high word of an unsigned 32-by-32 product"
+FAMILY MP2K arithmetic
+NOTE ARM C emits the correct UMULL but retains register moves; the original appears to be a handwritten SDK helper.

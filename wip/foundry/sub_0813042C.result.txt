@@ -1,0 +1,4 @@
+RESULT sub_0813042C fuzzy 41.7% checks=4
+NAME SceneActorMotion_AdvanceIdlePhase low "resets phase unless movement flag is set and advances phase counter"
+FAMILY Scene actor motion
+NOTE CORE distance is two because the compiler retains the reset byte address rather than recomputing it, with additional register differences.

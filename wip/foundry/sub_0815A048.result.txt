@@ -1,0 +1,4 @@
+RESULT sub_0815A048 fuzzy 56.5% checks=4
+NAME Player_RequestPositionReset low "requests a timed player position reset"
+FAMILY Player
+NOTE Body structure is recovered; register allocation, positive-test branch, and an embedded wrapper extent remain different.

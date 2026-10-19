@@ -1,0 +1,4 @@
+RESULT sub_08167FC0 fuzzy 51.2% checks=5
+NAME Hud_InitializePanelResources low "loads panel resources and initializes panel transition and icons"
+FAMILY Hud
+NOTE The compiler hoists the repeated 0x1B4 offset across resource lookups, unlike the ROM; calls and branches agree structurally.

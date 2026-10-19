@@ -1,0 +1,4 @@
+RESULT sub_080EBEE0 fuzzy 61.9% checks=5
+NAME SceneActorReaction_BeginDelayedRestore low "starts a 60-frame restore callback and shows the drawable"
+FAMILY SceneActorReaction
+NOTE All core regions match; the remaining differences are register allocation.

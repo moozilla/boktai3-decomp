@@ -1,0 +1,4 @@
+RESULT sub_08217E40 fuzzy 66.7% checks=4
+NAME SpriteDrawable_QueueIfInactive low "queues an inactive drawable using flags bit 7"
+FAMILY sprite drawable queue
+NOTE Core operations match; pointer and flags temporaries occupy swapped registers.

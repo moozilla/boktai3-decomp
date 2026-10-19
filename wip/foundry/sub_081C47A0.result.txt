@@ -1,0 +1,4 @@
+RESULT sub_081C47A0 fuzzy 74.3% checks=6
+NAME SceneTransition_InitializeFromScript low "initializes coordinates and optional script value"
+FAMILY SceneTransition
+NOTE Zero constants hoist across calls into extra saved registers; the return ABI needs review.

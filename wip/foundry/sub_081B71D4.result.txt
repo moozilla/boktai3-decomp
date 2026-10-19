@@ -1,0 +1,4 @@
+RESULT sub_081B71D4 fuzzy 65.3% checks=4
+NAME VanargandProjectile_CreateWithRetarget low "creates a projectile with an optional subsequent target position"
+FAMILY VanargandProjectile
+NOTE Retained CORE distance six; loop-counter conversions, register allocation and palette constant reuse differ.

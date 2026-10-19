@@ -1,0 +1,4 @@
+RESULT sub_080CBE22 notafunction checks=0
+NAME none
+FAMILY Skeleton
+NOTE Pure epilogue (add sp, #0x150; restore r8/sb/sl; pop r4-r7; pop r1; bx r1), no body instructions and not word-aligned (non_word_aligned_thumb_func_start) -- this is the tail of a large preceding function's frame teardown, not a real function of its own.

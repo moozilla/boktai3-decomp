@@ -1,0 +1,4 @@
+RESULT sub_08171014 fuzzy 30.1% checks=7
+NAME SceneHud_DrawComparisonBars low "draw three capped stat comparison bars"
+FAMILY SceneHud stat comparison and action transfer
+NOTE Typed widget indexing still changes address calculation and register allocation.

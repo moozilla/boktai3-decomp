@@ -1,0 +1,2 @@
+RESULT sub_08022694 fuzzy 71.9% checks=9
+Loop-invariant hoisting differs: ROM hoists &gIdx into a register but reloads the table base per iteration, while agbcc hoists the table instead.

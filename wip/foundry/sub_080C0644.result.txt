@@ -1,0 +1,4 @@
+RESULT sub_080C0644 notafunction checks=0
+NAME none
+FAMILY none
+NOTE 10-instruction fragment with no prologue (push) that falls straight into a large register-restoring epilogue (add sp,#0x9c; pop r3-r5 into r8/sb/sl; pop r4-r7; pop r0; bx r0) belonging to a much larger neighboring function; this is a split tail, not a real function.

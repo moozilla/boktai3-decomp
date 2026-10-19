@@ -1,0 +1,4 @@
+RESULT sub_080D9A6C notafunction checks=0
+NAME none
+FAMILY scene_actor_registry (actor-iteration dispatcher)
+NOTE No prologue (first instruction loads from the caller's stack frame directly); it is the closing segment of the same fragmented function as sub_080D99D8/sub_080D9A0E, ending on the shared epilogue block (`add sp,#0x1c; pop {r3,r4,r5}; mov r8/sb/sl,...`) seen verbatim in the other split-artifact entries in this batch.

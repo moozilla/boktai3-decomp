@@ -1,0 +1,4 @@
+RESULT sub_081C3950 fuzzy 59% checks=10
+NAME SceneActorMotion_ToggleMode low "returns early while a flags bit is set; otherwise counts frames and toggles a 2-state mode field (asymmetric timing: mode 0 waits 2 frames, mode 1 waits 1), saving the pre-toggle mode into a field 0x10 past the flags word"
+FAMILY Registry F 3 E 4 scene actor motion / mode-toggle timer (same object family as sub_081C35EC's flags/mode fields)
+NOTE CORE distance reached 1 of 42 (only one instruction's worth of pure register-allocation difference remains: ROM reuses the long-lived r4 holding the already-known-zero flags&1 result for the final `timer = 0` store, while the candidate materializes a fresh zero); explicitly re-referencing that variable at the tail instead of writing a literal 0 changed allocation elsewhere (lost the `ip`-cached mode-pointer pattern) rather than fixing it, so it was left as is given the check budget.

@@ -1,0 +1,4 @@
+RESULT sub_08249238 fuzzy 0.0% checks=1
+NAME Callback_Invoke low "branches to the callback passed in r0"
+FAMILY Compiler callback trampolines
+NOTE Real bx-r0 trampoline, not a split error; C draft cannot be scored because agbcc emits unresolved _call_via_r0 (0.0% denotes no accepted candidate).

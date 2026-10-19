@@ -1,0 +1,4 @@
+RESULT sub_0815E034 fuzzy 79.3% checks=8
+NAME PlayerCue_ApplyContactPower low "derives contact power and reaction from collider categories"
+FAMILY PlayerCue
+NOTE CORE distance four remains in load order and switch allocation, while all calls and power arithmetic are present.

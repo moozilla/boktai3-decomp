@@ -1,0 +1,4 @@
+RESULT sub_080EFBA0 notafunction checks=0
+NAME none
+FAMILY SceneActorControl
+NOTE Split starts inside a predecessor with live r2/r7 and ends by restoring its 0x78-byte stack frame.

@@ -1,0 +1,4 @@
+RESULT sub_081C3B04 fuzzy 53.7% checks=8
+NAME ContactImpactEffect_UpdateShake low "projects world pos to screen x/y/z vs camera, then adds a random-table-driven shake offset scaled by a growing timer, flagging when the timer passes a threshold"
+FAMILY contact/impact effect (sibling of ContactBurst; projection math matches the sub_08231EF8/damage_number_display camera-relative isometric projection idiom)
+NOTE CORE distance reached 1/97 (only an extra post-call reload of gUnk_03005308 that ROM avoids by keeping the index live in a register across the sub_08249350 call); two attempts to introduce a persistent index local to avoid that reload instead cascaded into a much worse register allocation (CORE 7), so this is left as the best-found near match rather than risking further regression.

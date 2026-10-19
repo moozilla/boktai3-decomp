@@ -1,0 +1,4 @@
+RESULT sub_0817D50E notafunction checks=0
+NAME none
+FAMILY SceneActorState
+NOTE This continuation uses incoming r4 and restores an r8/r4-r7 frame saved by an earlier function head.

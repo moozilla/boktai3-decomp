@@ -1,0 +1,2 @@
+RESULT sub_0800D874 fuzzy 37.7% checks=9
+Hard: the ROM keeps p in r4 with &delta spilled to the stack and per-loop hoisted pointers; agbcc kept choosing ip for p.

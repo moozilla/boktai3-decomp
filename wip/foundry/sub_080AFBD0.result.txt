@@ -1,0 +1,4 @@
+RESULT sub_080AFBD0 notafunction checks=0
+NAME none
+FAMILY n/a
+NOTE No prologue (no push {..}) and the body is just a final "adds r0,#1; str r0,[r1]" followed immediately by a big-frame epilogue (pop r3-r5 into r8/sb/sl, pop r4-r7, pop/bx); this is the tail end of the preceding function in ROM order, not a standalone function, so it was not decompiled separately.

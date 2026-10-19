@@ -1,0 +1,4 @@
+RESULT sub_081FED40 fuzzy 57.1% checks=4
+NAME SlotController_StopSlotAndSong low "requests slot stop and stops song 0x564"
+FAMILY SlotController
+NOTE Retained CORE-distance-one draft; repeated multiplication remains optimized away.

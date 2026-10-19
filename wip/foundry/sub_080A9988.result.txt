@@ -1,0 +1,4 @@
+RESULT sub_080A9988 fuzzy 55.2% checks=7
+NAME ActorTrail_AdvancePositions low "shift saved positions through active trail segments"
+FAMILY ActorTrail
+NOTE Control flow is recovered, but scalar replacement and loop strength reduction still differ from the ROM.

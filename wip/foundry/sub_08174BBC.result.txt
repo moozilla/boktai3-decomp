@@ -1,0 +1,4 @@
+RESULT sub_08174BBC fuzzy 46.2% checks=8
+NAME InventoryGrid_InitAmountRows low "positions three rows of amount glyphs"
+FAMILY InventoryGrid
+NOTE Body stores and loop match structurally except two hoisted coordinate constants; allocation remains different.

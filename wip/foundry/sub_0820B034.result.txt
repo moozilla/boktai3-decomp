@@ -1,0 +1,4 @@
+RESULT sub_0820B034 fuzzy 76.1% checks=9
+NAME DragonPuppy_SpawnAttackProjectile low "spawns a facing-directed attack projectile and plays its sound"
+FAMILY Dragon puppy (auto, tentative)
+NOTE Three of four CORE regions are locked; vector pointer lifetimes and argument-address allocation remain different.

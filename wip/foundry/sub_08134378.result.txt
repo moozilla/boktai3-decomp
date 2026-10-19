@@ -1,0 +1,4 @@
+RESULT sub_08134378 notafunction checks=0
+NAME none
+FAMILY Scene actor reaction
+NOTE This callback-return tail consumes the preceding function's live r7 and restores its r8/r9 and stack frame without a prologue.

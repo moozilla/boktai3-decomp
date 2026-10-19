@@ -1,0 +1,4 @@
+RESULT sub_08141A1C fuzzy 74.0% checks=6
+NAME Player_SelectHistoryDirection low "selects direction from recent samples or facing"
+FAMILY Player
+NOTE Control flow matches but the object pointer and sentinel use different registers.

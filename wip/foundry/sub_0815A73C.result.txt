@@ -1,0 +1,4 @@
+RESULT sub_0815A73C fuzzy 70.9% checks=5
+NAME Player_ApplyScriptRestoration low "applies timed status or percentage stat-A restoration from script"
+FAMILY Player
+NOTE All calls and control flow agree; one constant-address derivation and allocation differences remain (CORE 1).

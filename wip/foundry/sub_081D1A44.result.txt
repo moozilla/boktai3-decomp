@@ -1,0 +1,4 @@
+RESULT sub_081D1A44 fuzzy 68.6% checks=5
+NAME SceneNpc_InitializeFacingAnimation low "initializes four-way and eight-way facing then starts animation"
+FAMILY StateActor
+NOTE CORE is zero; four source variants retained the same register allocation differences.

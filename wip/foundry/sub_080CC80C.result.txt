@@ -1,0 +1,4 @@
+RESULT sub_080CC80C notafunction checks=0
+NAME none
+FAMILY unassigned
+NOTE Entry has no prologue (push); it is a mid-function label (adds r0, #1; str r0, [r1]) falling straight into a shared epilogue block (stack cleanup restoring r8/sb/sl) belonging to the preceding function - a split artifact, not a standalone function.

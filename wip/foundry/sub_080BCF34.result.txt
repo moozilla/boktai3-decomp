@@ -1,0 +1,4 @@
+RESULT sub_080BCF34 fuzzy 77.1% checks=6
+NAME SceneActorApproach_UpdateRetreat low "selects a retreat phase and direction when beyond the distance window"
+FAMILY SceneActor approach callbacks
+NOTE Control flow and angle conversion are recovered; flag-address lifetime and allocation remain different (CORE 3).

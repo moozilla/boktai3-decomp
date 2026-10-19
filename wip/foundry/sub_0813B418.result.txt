@@ -1,0 +1,4 @@
+RESULT sub_0813B418 fuzzy 66.7% checks=8
+NAME Player_ScaleActionValue low "halves or doubles an action value according to player flags"
+FAMILY Player
+NOTE Retained the first draft; subsequent helper and branch rewrites folded redundant null checks or materialized unwanted booleans.

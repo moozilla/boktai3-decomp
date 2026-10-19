@@ -1,0 +1,4 @@
+RESULT sub_0813B7C4 fuzzy 57.6% checks=3
+NAME SceneActor_UpdateCollisionMask low "selects collision mask and mode from actor state"
+FAMILY SceneActor collision
+NOTE An apparently dead signed global calculation and inline predicate layout remain unmatched.

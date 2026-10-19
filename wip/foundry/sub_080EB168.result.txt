@@ -1,0 +1,4 @@
+RESULT sub_080EB168 fuzzy 69.1% checks=3
+NAME SceneActorReaction_WaitHiddenTarget low "hides the actor and waits for a nearby target or timeout"
+FAMILY SceneActorReaction
+NOTE Calls and branches are recovered; constant reuse across the timeout transition and register allocation remain different.

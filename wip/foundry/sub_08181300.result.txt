@@ -1,0 +1,4 @@
+RESULT sub_08181300 fuzzy 65.9% checks=5
+NAME ActorMarker_EmitOffsetEffects low "emits seven effects at facing-dependent position offsets"
+FAMILY ActorMarker
+NOTE Packed halfword writes and all calls are recovered; address setup and register allocation remain different.

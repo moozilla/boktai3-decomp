@@ -1,0 +1,4 @@
+RESULT sub_080D5370 fuzzy 65.0% checks=5
+NAME SceneActor_AdvanceTimedBehavior low "advance timer and request behavior state two at its duration"
+FAMILY SceneActor behavior
+NOTE Timer semantics are recovered, but parameter-base lifetime and repeated field-address calculations still differ.

@@ -1,0 +1,4 @@
+RESULT sub_08121504 notafunction checks=0
+NAME none
+FAMILY ActorAction
+NOTE Split error: only a push and three high-register save moves, with no body or return.

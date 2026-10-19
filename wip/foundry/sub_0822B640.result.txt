@@ -1,0 +1,4 @@
+RESULT sub_0822B640 fuzzy 60.0% checks=6
+NAME ContactSlots_ClearTransient low "clear unmarked slots and consume the transient preservation bit"
+FAMILY ContactSlots
+NOTE CORE is zero; constant copies and register allocation remain different.

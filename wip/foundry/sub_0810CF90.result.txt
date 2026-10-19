@@ -1,0 +1,4 @@
+RESULT sub_0810CF90 fuzzy 54.8% checks=5
+NAME PanelLayout_ResetOffsets low "resets seven coordinate pairs with a special last entry"
+FAMILY PanelLayout
+NOTE Loop and stores recovered; address hoisting and register allocation still differ.

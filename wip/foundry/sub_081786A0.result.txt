@@ -1,0 +1,4 @@
+RESULT sub_081786A0 fuzzy 71.2% checks=8
+NAME Hud_DrawPlayerKindTiles low "writes five player-kind tile IDs to HUD"
+FAMILY Field HUD / AreaEffectLinkState
+NOTE CORE distance is zero; remaining differences are register allocation and two register copies.

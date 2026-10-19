@@ -1,0 +1,4 @@
+RESULT sub_081304C8 fuzzy 58.4% checks=4
+NAME SceneActorControl_EnterHiddenState low "hide actor at high Y and disable its collision"
+FAMILY SceneActorControl
+NOTE CORE distance 5 remains in control reset and counter addressing, with persistent register allocation differences after several checks.

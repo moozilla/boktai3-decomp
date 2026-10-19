@@ -1,0 +1,4 @@
+RESULT sub_0811E8B0 fuzzy 66.7% checks=3
+NAME ModifierStats_ApplyKind0 low "apply kind-zero modifier callbacks to an incoming value"
+FAMILY ModifierStats
+NOTE The compiler caches the modifier count address instead of recomputing it inside the loop.

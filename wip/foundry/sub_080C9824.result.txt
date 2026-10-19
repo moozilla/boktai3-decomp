@@ -1,0 +1,4 @@
+RESULT sub_080C9824 notafunction checks=0
+NAME none
+FAMILY Skeleton
+NOTE This is the tail of sub_080C8774, not a separate function: it has no prologue of its own (the `r7` base pointer it uses is set up by sub_080C8774's prologue, which pushes r4-r7/lr, moves sl/sb/r8 into r5-r7, pushes them, and does `sub sp, #0xa8` -- the exact frame this address's epilogue tears down with `add sp, #0xa8` and the matching pop/mov sequence). The matched relative (SceneActorBehavior_ApplyContactReaction) confirms the pattern: `field |= 0x2000` at offset 0x2CC immediately followed by this same epilogue is how that large function ends.

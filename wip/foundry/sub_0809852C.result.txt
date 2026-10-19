@@ -1,0 +1,4 @@
+RESULT sub_0809852C fuzzy 62.5% checks=3
+NAME ActorVisibility_TickBlink low "blink drawable and shadow, then restore visibility"
+FAMILY scene actor visibility
+NOTE Shared blink structure recovered; unused global masking, branch sharing and register allocation still differ.

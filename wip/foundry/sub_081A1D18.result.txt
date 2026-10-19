@@ -1,0 +1,4 @@
+RESULT sub_081A1D18 fuzzy 56.4% checks=3
+NAME Hresvelgr_EmitMotionBurst low "sets reaction flags and emits four randomized motion entries"
+FAMILY Hresvelgr actor reaction
+NOTE Retains seven core differences in setup and index arithmetic, sharing the first callback's randomized emission pattern.

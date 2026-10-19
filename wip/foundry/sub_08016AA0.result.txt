@@ -1,0 +1,2 @@
+RESULT sub_08016AA0 fuzzy 72.6% checks=11
+Control flow matches; the compiler substitutes the cached mode register (known 3) for the constant 3 mask and reorders the p->a/p->b address computation, which the original did not.

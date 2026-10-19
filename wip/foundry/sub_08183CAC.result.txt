@@ -1,0 +1,4 @@
+RESULT sub_08183CAC fuzzy 67.9% checks=5
+NAME ActorController_UpdateFlaggedAnimationTransition low "starts directional animation and copies controller state"
+FAMILY ActorController
+NOTE CORE 4: retained flag address and derived offset differ; stale ELF requires the old callee alias.

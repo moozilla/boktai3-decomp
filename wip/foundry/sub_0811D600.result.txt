@@ -1,0 +1,4 @@
+RESULT sub_0811D600 fuzzy 78.6% checks=4
+NAME GameRecords_UpdateMinimumRank low "updates one of twelve signed rank records when the new rank is lower"
+FAMILY GameStateRecords
+NOTE The compiler reuses the first signed load while the ROM reloads it; pointer registers also differ.

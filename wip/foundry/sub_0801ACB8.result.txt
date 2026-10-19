@@ -1,0 +1,2 @@
+RESULT sub_0801ACB8 fuzzy 68.8% checks=6
+Hard: control flow is right but register allocation is swapped (ROM keeps the position in r2 and the key word in r3, and holds the key-struct base in ip), and no declaration order or operand order changed it.

@@ -1,0 +1,2 @@
+RESULT sub_08016F24 fuzzy 60.9% checks=7
+Core distance is 7 of 44 instructions; the loop counter and the hoisted constant 1 landed in the wrong registers (the counter was spilled to r8 instead of living in r7).

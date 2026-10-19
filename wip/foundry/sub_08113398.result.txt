@@ -1,0 +1,4 @@
+RESULT sub_08113398 fuzzy 72.8% checks=4
+NAME SpriteEffect_Create low "allocates and initializes a pooled sprite effect"
+FAMILY SpriteEffect
+NOTE Pool traversal matches semantically; address calculation scheduling and argument register allocation remain.

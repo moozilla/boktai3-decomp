@@ -1,0 +1,4 @@
+RESULT sub_081100A0 fuzzy 59.7% checks=4
+NAME LinkMenu_BeginResultReveal low "captures the local result, caps it at 9999 and starts a 90-frame reveal"
+FAMILY LinkMenu
+NOTE Condition layout and cached destination addresses differ; the context also includes trailing neighbour code in its core metric.

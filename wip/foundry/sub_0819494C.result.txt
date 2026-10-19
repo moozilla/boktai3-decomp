@@ -1,0 +1,4 @@
+RESULT sub_0819494C fuzzy 59.5% checks=3
+NAME Nidhoggr_UpdateSecondPairedBounds low "select second paired bounds and update visibility flags"
+FAMILY Nidhoggr large scene animation controller
+NOTE CORE distance is zero; pointer register allocation differs despite local ordering and typed-owner experiments.

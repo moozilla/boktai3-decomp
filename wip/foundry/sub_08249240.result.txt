@@ -1,0 +1,4 @@
+RESULT sub_08249240 fuzzy 0.0% checks=1
+NAME Libgcc_CallViaR2 low "branches through register r2"
+FAMILY libgcc indirect-call trampolines
+NOTE Genuine assembly runtime thunk; C callback forwarding adds a call frame and cannot express its transparent register ABI; fuzzy score uses candidate-length extent.

@@ -1,0 +1,4 @@
+RESULT sub_081840F0 fuzzy 58.5% checks=3
+NAME ActorController_UpdatePaletteRestoreTransition low "starts animation with a delay and requests palette restoration"
+FAMILY ActorController
+NOTE CORE 3: zero scheduling and retained flag address differ; full typed layout worsened component addressing.

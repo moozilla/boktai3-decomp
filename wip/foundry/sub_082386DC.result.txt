@@ -1,0 +1,4 @@
+RESULT sub_082386DC fuzzy 69.4% checks=4
+NAME SpriteEffect_AdvanceBriefAnimation low "advances a short sprite animation and hides it after six ticks"
+FAMILY SpriteEffect
+NOTE Byte-counter truncation is shared differently by the compiler; three equivalent variants made no improvement.

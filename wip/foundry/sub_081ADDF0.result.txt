@@ -1,0 +1,4 @@
+RESULT sub_081ADDF0 fuzzy 71.6% checks=5
+NAME Vanargand_InitScriptedPartSprite low "initializes a scripted part sprite and its scale"
+FAMILY Vanargand
+NOTE Two core ordering differences remain around a hoisted zero constant, with additional register and frame differences.

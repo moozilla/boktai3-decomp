@@ -1,0 +1,4 @@
+RESULT sub_08221548 fuzzy 60.5% checks=4
+NAME Checksum_ComputeCrc16 low "computes complemented CRC16 over a byte range with supplied polynomial"
+FAMILY Checksum
+NOTE CORE distance is zero; register allocation differs and successive local-variable changes did not improve it.

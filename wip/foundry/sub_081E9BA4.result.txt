@@ -1,0 +1,4 @@
+RESULT sub_081E9BA4 fuzzy 58.1% checks=7
+NAME ActorAnim_UpdateChildVisibility low "selects child visibility by matching a game-state value and dispatches active children"
+FAMILY Actor animation controller (tentative)
+NOTE Eight of eleven regions are locked, but pointer-increment scheduling and register allocation remain different; the compared value's semantic meaning is unresolved.

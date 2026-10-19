@@ -1,0 +1,4 @@
+RESULT sub_0821F15C fuzzy 76.5% checks=3
+NAME Terrain_LoadNavigationResource low "load the named navigation resource into the current map"
+FAMILY terrain navigation
+NOTE CORE is zero but the resource result lacks the original register copy.

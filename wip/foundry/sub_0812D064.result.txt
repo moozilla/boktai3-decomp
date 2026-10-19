@@ -1,0 +1,4 @@
+RESULT sub_0812D064 fuzzy 45.7% checks=3
+NAME SpriteEffects_EmitRandomRadialParticle low "spawns sprite effect with random radial velocity and lifetime"
+FAMILY radial sprite effects
+NOTE CORE distance is six; RNG allocation, table reload order and an unused ROM literal remain unresolved.

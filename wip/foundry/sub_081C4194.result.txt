@@ -1,0 +1,4 @@
+RESULT sub_081C4194 fuzzy 72% checks=9
+NAME SpriteEffects_EmitFanBurst low "spawns 16 SpriteEffectController particles at a point in a narrow random-angle fan, grouped into 4 magnitude rings"
+FAMILY SpriteEffectController / random-table particle emitters (sibling of sub_0812D064 SpriteEffects_EmitRandomRadialParticle)
+NOTE Structure, calls and all constants match the ROM; remaining mismatch is register allocation only (CORE distance 9/84): the compiler hoists the random/sine table base into a persistent hi-register where ROM reloads it per iteration from a low register, which also pushes the variant parameter out to a stack spill instead of sl.

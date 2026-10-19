@@ -1,0 +1,4 @@
+RESULT sub_081342D6 notafunction checks=0
+NAME none
+FAMILY Scene actor reaction
+NOTE This label is inside a preceding clamp branch, consumes live r2/r7, and falls through into further split fragments.

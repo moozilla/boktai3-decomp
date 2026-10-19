@@ -1,0 +1,4 @@
+RESULT sub_0813B950 fuzzy 69.4% checks=3
+NAME ActorEffect_UpdateBriefAnimation low "advances a short effect animation and hides it after five ticks"
+FAMILY ActorBriefEffect
+NOTE Compiler retains the shifted frame value whereas the ROM retains the incremented byte before truncation.

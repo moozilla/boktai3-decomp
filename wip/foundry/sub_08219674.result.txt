@@ -1,0 +1,4 @@
+RESULT sub_08219674 notafunction checks=0
+NAME none
+FAMILY ARM interworking wrappers
+NOTE Thumb prologue pushes lr then switches into the adjacent ARM body at 0821967C.

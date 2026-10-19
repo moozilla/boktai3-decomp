@@ -1,0 +1,4 @@
+RESULT sub_08181514 fuzzy 66.9% checks=3
+NAME ActorFragments_Launch low "launches nine direction-selected fragments"
+FAMILY actor fragments
+NOTE Switch matches; loop invariants and register pressure still differ.

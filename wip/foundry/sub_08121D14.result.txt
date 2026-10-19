@@ -1,0 +1,4 @@
+RESULT sub_08121D14 fuzzy 50.0% checks=4
+NAME SpriteGroup_AllocateEntry low "allocates an unused entry from eight slots"
+FAMILY SpriteGroup
+NOTE CORE distance is one because the compiler reuses the tested mask instead of recomputing it.

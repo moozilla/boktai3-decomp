@@ -1,0 +1,4 @@
+RESULT sub_0816D1A4 fuzzy 65.2% checks=6
+NAME SceneHud_SelectUpgradeableStat low "choose a stat with room for an increase below 100"
+FAMILY SceneHud
+NOTE Four of five core regions match; loop entry layout and register allocation remain different.

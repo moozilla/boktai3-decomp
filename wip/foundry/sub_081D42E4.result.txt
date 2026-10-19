@@ -1,0 +1,4 @@
+RESULT sub_081D42E4 fuzzy 61.1% checks=9
+NAME PaletteTransition_BlendAccentColors low "blends six accent colors in two neighboring palette banks"
+FAMILY PaletteTransition
+NOTE CORE distance 2 remains because agbcc shares bank-address additions that the ROM repeats.

@@ -1,0 +1,4 @@
+RESULT sub_08088C24 fuzzy 65.1% checks=13
+NAME SceneActorControl_ResumeOrFaceAway low "clears a per-actor behavior flag, resumes or faces away, and starts a new behavior-0xF phase"
+FAMILY SceneActorControl (shares SceneActorControlState/0x628 flags and SetPhase-style state2A8/phase2A9/behavior2AA/counter2AC/field2B1 tail with sub_08082D80 SceneActorControl_ConvergeSavedMotion)
+NOTE CORE distance got to 1/66 (one redundant "movs r3,#0" that GCC's value-numbering merges with an adjacent zero store in my C but keeps separate in the ROM); could not find a register-pin-free C shape that reproduces the extra move without regressing other regions, so left as a very close fuzzy match.

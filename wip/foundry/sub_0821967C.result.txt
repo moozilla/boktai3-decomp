@@ -1,0 +1,4 @@
+RESULT sub_0821967C notafunction checks=0
+NAME none
+FAMILY ARM interworking wrappers
+NOTE ARM interior of wrapper entered at 08219674 calls RAM code at 03000DD0 and switches to its Thumb epilogue at 08219694.

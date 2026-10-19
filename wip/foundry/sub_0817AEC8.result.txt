@@ -1,0 +1,4 @@
+RESULT sub_0817AEC8 fuzzy 75.5% checks=6
+NAME ActorEffect_SpawnFanParticles low "creates six particles in a randomized angular fan"
+FAMILY ActorEffect
+NOTE Best candidate has CORE distance 6; random-table allocation, address lifetimes and literal reloads remain.

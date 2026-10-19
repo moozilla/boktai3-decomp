@@ -1,0 +1,4 @@
+RESULT sub_08116538 fuzzy 70.8% checks=5
+NAME ActorRecoil_ApplyDirectionalImpulse low "applies an eight-direction impulse and selects recoil state"
+FAMILY ActorRecoil
+NOTE Temporary-vector addressing and signed scaling still differ; the guard, angle quantization, field updates, and state branches are recovered.

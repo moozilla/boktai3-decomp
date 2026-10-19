@@ -1,0 +1,4 @@
+RESULT sub_08170A08 notafunction checks=0
+NAME none
+FAMILY MotionSequence (tentative)
+NOTE Three-instruction prologue fragment continues at the false sub_08170A0E boundary.

@@ -1,0 +1,4 @@
+RESULT sub_080FB07C fuzzy 64.2% checks=5
+NAME SceneActorControl_SelectHoverPhase low "selects a phase using health distance heading and cooldown counters"
+FAMILY SceneActorControl
+NOTE Most decision regions match structurally; transition address generation and final return block layout differ.

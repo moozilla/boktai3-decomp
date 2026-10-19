@@ -1,0 +1,4 @@
+RESULT sub_080F3420 fuzzy 46.7% checks=8
+NAME PhaseObject_ActivateNextChild low "activates the next idle child after a cooldown"
+FAMILY PhaseObject (tentative)
+NOTE Best structural candidate locks five of six regions with CORE distance eight; activation address folding and repeated stride multiplication remain.

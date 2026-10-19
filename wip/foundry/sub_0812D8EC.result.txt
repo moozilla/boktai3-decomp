@@ -1,0 +1,4 @@
+RESULT sub_0812D8EC fuzzy 65.5% checks=4
+NAME SceneParticle_UpdatePool low "dispatches occupied particle slots by state"
+FAMILY SceneParticle
+NOTE Callback dispatch and loop match structurally but pointer setup and register allocation remain different.

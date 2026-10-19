@@ -1,0 +1,4 @@
+RESULT sub_080E7FF4 fuzzy 78.1% checks=7
+NAME SceneActor_CheckRouteCollision low "checks and resolves collision against the actor route target"
+FAMILY SceneActor route collision
+NOTE CORE is zero and all eight regions are locked; only callee-saved register allocation differs.

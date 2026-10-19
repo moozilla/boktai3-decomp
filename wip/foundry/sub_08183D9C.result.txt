@@ -1,0 +1,4 @@
+RESULT sub_08183D9C fuzzy 71.9% checks=3
+NAME ActorController_FinishDirectionalTransition low "selects directional animation and completes transition immediately"
+FAMILY ActorController
+NOTE CORE 2: compiler retains the B32 flag address across component updates.

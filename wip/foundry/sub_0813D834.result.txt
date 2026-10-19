@@ -1,0 +1,4 @@
+RESULT sub_0813D834 fuzzy 72.0% checks=4
+NAME SceneActor_SetEffectSlot low "sets an effect slot and chooses a random variant on activation"
+FAMILY SceneActor effect
+NOTE Compiler constant propagation replaces the original dynamic slot addressing and shifts register lifetimes.

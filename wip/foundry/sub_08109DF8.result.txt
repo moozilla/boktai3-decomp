@@ -1,0 +1,4 @@
+RESULT sub_08109DF8 fuzzy 76.4% checks=4
+NAME ScriptPanel_PollSelection low "polls selection and restarts after timeout"
+FAMILY ScriptPanel
+NOTE CORE is zero but mask and button pointer allocation add a saved register and alter the initialization loop.

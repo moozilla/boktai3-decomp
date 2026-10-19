@@ -1,0 +1,4 @@
+RESULT sub_08219654 notafunction checks=0
+NAME none
+FAMILY RAM routine interworking trampoline
+NOTE ARM middle fragment calls 03000CE8 and switches to the Thumb epilogue at 0821966C; it depends on the preceding Thumb prologue.

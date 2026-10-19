@@ -1,0 +1,4 @@
+RESULT sub_08171F7C fuzzy 77.2% checks=4
+NAME SceneHud_InitializeActionPanel low "initializes action-panel widgets and callback"
+FAMILY SceneHud
+NOTE Main body structure recovered; widget address allocation differs and trailing independent code complicates extent scoring.

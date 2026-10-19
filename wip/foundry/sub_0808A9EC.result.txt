@@ -1,0 +1,2 @@
+RESULT sub_0808A9EC fuzzy 0% checks=0
+Only 3 instructions of a prologue (push, mov r7,sb; mov r6,r8) split off from the following function's body; not a standalone function.

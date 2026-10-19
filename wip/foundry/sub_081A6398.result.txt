@@ -1,0 +1,4 @@
+RESULT sub_081A6398 fuzzy 72.8% checks=5
+NAME PositionedEffect_SpawnScatteredParticles low "emits four particles with randomized horizontal offsets"
+FAMILY PositionedEffect
+NOTE Packed vector calculations are recovered, while stack layout and random-table load ordering remain different.

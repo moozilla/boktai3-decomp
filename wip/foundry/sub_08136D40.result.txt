@@ -1,0 +1,4 @@
+RESULT sub_08136D40 fuzzy 70.1% checks=4
+NAME SceneActorPlacement_ResumeActor low "resumes drawable and shadow and resets actor state"
+FAMILY SceneActorPlacement
+NOTE Retained the typed candidate; store ordering and offset reuse differ in the state reset sequence.

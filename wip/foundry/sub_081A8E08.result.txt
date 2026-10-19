@@ -1,0 +1,4 @@
+RESULT sub_081A8E08 fuzzy 70.3% checks=6
+NAME Vanargand_UpdatePlayerPositionRequest low "selects animation and collision data then requests player position"
+FAMILY Vanargand
+NOTE CORE distance is one with seven of eight regions locked; duplicate zero lifetimes and allocation remain.

@@ -1,0 +1,4 @@
+RESULT sub_0821964C notafunction checks=0
+NAME none
+FAMILY RAM routine interworking trampoline
+NOTE Thumb prologue head of the mixed-mode wrapper spanning 0821964C–08219670.

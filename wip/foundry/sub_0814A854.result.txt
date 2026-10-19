@@ -1,0 +1,4 @@
+RESULT sub_0814A854 fuzzy 65.2% checks=10
+NAME Player_CollectCallbackFlags low "combines three optional callback results with bitwise OR"
+FAMILY Player
+NOTE CORE is zero with all three regions locked; remaining differences are register allocation.

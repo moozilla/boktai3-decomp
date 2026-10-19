@@ -1,0 +1,4 @@
+RESULT sub_0816A0D0 fuzzy 74.2% checks=4
+NAME SceneHud_DrawProjectedValue low "draws four digits of saved value plus quantity times rate"
+FAMILY SceneHud
+NOTE CORE is nine; compiler strength reduction merges the per-widget flag and position addresses, unlike ROM's separate offset accumulator.

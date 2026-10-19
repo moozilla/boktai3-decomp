@@ -1,0 +1,4 @@
+RESULT sub_08169DCC fuzzy 62.1% checks=6
+NAME SceneHud_RestoreOptionControls low "refreshes option widgets, refills player stat B and resumes controls"
+FAMILY SceneHud
+NOTE CORE is two; the compiler reuses the player pointer across the halfword store while ROM reloads it, with allocation differences remaining.
