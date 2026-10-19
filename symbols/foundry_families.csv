@@ -1449,3 +1449,4 @@ addr,function,name,family,note
 081AFA28,sub_081AFA28,ActorStatus_BeginTimedState,"ActorStatus","begins or cancels a timed actor state"
 081AFB94,sub_081AFB94,ActorStatus_InitializeCollider,"ActorStatus","initializes collider bounds callback and attack properties"
 081AFC50,sub_081AFC50,ActorStatus_InitializeBodyCollider,"ActorStatus","initializes body collider and contact callback"
+081B019C,sub_081B019C,ActorStatus_Deactivate,"ActorStatus","resets state hides the actor and clears its active bit"
