@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneInput_BuildActionGrid_08173508: SceneInput_BuildActionGrid with other constants (ported by relatives.py, fixed by hand; provisional name) */
-#define SceneInput_BuildActionGrid_08173508 sub_08173508
 #include "scene_input_navigation.h"
 void SceneInput_BuildActionGrid_08173508(struct SceneInputGridView *grid, u32 flags)
 {

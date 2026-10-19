@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActorControl_RefreshMotionRoute_0808A90C: same code as SceneActorControl_RefreshMotionRoute at another address (ported by relatives.py; provisional name) */
-#define SceneActorControl_RefreshMotionRoute_0808A90C sub_0808A90C
 #include "scene_actor_reset.h"
 void Ghoul_EnterIdleControl(void *);
 void SceneActorControl_OnIdle(void);

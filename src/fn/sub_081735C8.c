@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08173508(void *, int);
+void SceneInput_BuildActionGrid_08173508(void *, int);
 void Hud_SetGridPosition(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
@@ -8,7 +8,7 @@ void Anim_LoadKeyframe(void *, void *, int, int);
 void PauseInventory_InitItemCursors(u8 *p)
 {
     u8 *q = p + 0x4384, *r, *v, *a;
-    sub_08173508(q, 0xe1);
+    SceneInput_BuildActionGrid_08173508(q, 0xe1);
     Hud_SetGridPosition(q, 8, 0);
     a = p + 0x15c0;
     r = p + 0x4387;

@@ -2,9 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
-#define Ivy_UpdateDefeat sub_080EE1B0
-
-/* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (sub_080BD1F0). On entry:
+/* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
  * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
  * (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
  * it revives (restores health, SceneActorReaction_PlayHiddenCue); otherwise the full defeat:
@@ -271,7 +269,7 @@ struct DefeatContext {
     u16 script;
 };
 
-void sub_080EE1B0(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct {
         u32 zero;

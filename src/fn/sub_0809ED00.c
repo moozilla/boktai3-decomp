@@ -1,6 +1,5 @@
 #include "global.h"
 /* Vorn_OnContactEvent_0809ED00: same as Vorn_OnContactEvent but only when the event kind at +0xA is 1 (provisional name) */
-#define Vorn_OnContactEvent_0809ED00 sub_0809ED00
 inline static u8 blocked2048(u8 *c)
 {
     u32 mask;
