@@ -49,7 +49,7 @@ for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HE
 CACHE = os.path.join(ROOT, "build", "cache", "atlas.json")
 INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
-          "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
+          "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "tools/assets/gclroles.py", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
@@ -216,7 +216,7 @@ def build():
 
     # ---- registry entries ----
     A = actors.actors()
-    procnames = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
+    procnames = {int(p): r["name"] for p, r in gclview.names().procs.items()}
     fams = paltrace.families()
     sprite_owner = collections.defaultdict(list)
     names_of = collections.defaultdict(list)  # monster/character string id -> actor keys
