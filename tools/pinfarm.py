@@ -152,7 +152,7 @@ def tidy(unit, name, orig):
 
 
 def find_unit(name):
-    r = subprocess.run(["git", "grep", "-l", "-E", r"\b" + name + r"\s*\(", "--", "src/*.c", "src/**/*.c"],
+    r = subprocess.run(["git", "grep", "-l", "-w", "-F", name, "--", "src/*.c"],
                        cwd=ROOT, capture_output=True, text=True)
     for unit in r.stdout.split():
         if name in dict(definitions(open(os.path.join(ROOT, unit)).read())):
@@ -160,12 +160,54 @@ def find_unit(name):
     return None
 
 
+def current_name(iso_path):
+    """The function's name now in symbols/functions.csv, by its ROM address
+    (tools/check.py on the listed copy says where it is)."""
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools/check.py"), iso_path],
+                       cwd=ROOT, capture_output=True, text=True)
+    m = re.search(r"\(\d+ bytes at 0x([0-9A-Fa-f]{8})\)", r.stdout + r.stderr)
+    addr = m.group(1).upper() if m else old_address(os.path.splitext(os.path.basename(iso_path))[0])
+    if not addr:
+        return None
+    for ln in open(os.path.join(ROOT, "symbols/functions.csv")):
+        if ln.upper().startswith(addr + ","):
+            return ln.split(",")[1]
+    return None
+
+
+def old_address(name):
+    """NAME's address in an earlier symbols/functions.csv (renamed since)."""
+    if re.fullmatch(r"sub_[0-9A-F]{8}", name):
+        return name[4:]
+    revs = subprocess.run(["git", "log", "--format=%H", "-n", "60", "--", "symbols/functions.csv"],
+                          cwd=ROOT, capture_output=True, text=True).stdout.split()
+    for rev in revs:
+        text = subprocess.run(["git", "show", f"{rev}:symbols/functions.csv"], cwd=ROOT,
+                              capture_output=True, text=True).stdout
+        m = re.search(r"^([0-9A-F]{8})," + re.escape(name) + ",", text, re.M)
+        if m:
+            return m.group(1)
+    return None
+
+
+def renamed_copy(src, *names):
+    """SRC with the function's old names (symbol, C name) replaced by the new one."""
+    sym, name, new, results = names
+    text = open(src).read()
+    for old in {sym, name}:
+        text = re.sub(r"\b" + re.escape(old) + r"\b", new, text)
+    dst = os.path.join(os.path.dirname(os.path.abspath(results)), "renamed-" + new + ".c")
+    open(dst, "w").write(text)
+    return dst
+
+
 def cmd_apply(a):
-    units = {}
+    units, iso = {}, {}
     lst = os.path.join(os.path.dirname(a.results), "..", "list.tsv")
     for ln in open(a.list or lst):
         p = ln.rstrip("\n").split("\t")
         units[p[0]] = (p[2], p[4] if len(p) > 4 else p[0])
+        iso[p[0]] = p[1]
     seen = set()
     for ln in open(a.results):
         p = ln.rstrip("\n").split("\t")
@@ -178,7 +220,18 @@ def cmd_apply(a):
             continue
         unit, name = units[func]
         if not os.path.exists(os.path.join(ROOT, unit)) or name not in dict(definitions(open(os.path.join(ROOT, unit)).read())):
-            unit = find_unit(name) or unit  # moved since the list was made
+            # moved (or moved and renamed) since the list was made
+            found = find_unit(name)
+            if not found:
+                new = current_name(iso[func])
+                found = find_unit(new) if new else None
+                if found:
+                    src = renamed_copy(src, func, name, new, a.results)
+                    func, name = new, new
+            if not found:
+                print(f"{name}: no longer found in src/; skipped")
+                continue
+            unit = found
         old = splice(unit, name, src, func)
         if old is None:
             print(f"{func}: could not splice into {unit}")
