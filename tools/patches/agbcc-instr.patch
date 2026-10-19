@@ -855,3 +855,16 @@
  
  /* the declaration found for the last IDENTIFIER token read in.
     yylex must look this up to detect typedefs, which get token type TYPENAME,
+--- a/gcse.c
++++ b/gcse.c
+@@ -2318,6 +2318,10 @@
+      Making it an odd number is simplest for now.
+      ??? Later take some measurements.  */
+   expr_hash_table_size |= 1;
++  /* Instrumentation: AGBCC_GCSE_T=N forces the PRE/hoist table size, so a
++     residual difference can be tested against the bucket order alone.  */
++  if (getenv ("AGBCC_GCSE_T") && atoi (getenv ("AGBCC_GCSE_T")) > 0)
++    expr_hash_table_size = atoi (getenv ("AGBCC_GCSE_T")) | 1;
+   n = expr_hash_table_size * sizeof (struct expr *);
+   expr_hash_table = (struct expr **) gmalloc (n);
+ }
