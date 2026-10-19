@@ -1492,3 +1492,4 @@ addr,function,name,family,note
 081BFD00,sub_081BFD00,Storage_UpdateBrowse,"Storage 3 (auto, tentative); StorageMenu","updates category browsing, blinking, animations and close input"
 081BFFD8,sub_081BFFD8,DirectionMarker_Update,"DirectionMarker (tentative)","picks a facing quadrant from dx/dy, updates the sprite animation if it changed, and steps it"
 081C0390,sub_081C0390,TetherActor_InitRequestIndicator,"Tether actor request indicator (TetherActor_CreateRequestIndicator / UpdateRequestIndicator / DestroyRequestIndicator)","init the tether request-indicator task: load/relocate its anim resource, set up keyframes, grab its scene actor"
+081C06F8,sub_081C06F8,SceneActorSequence_UpdateFadeIn,"ScreenTransition / Scene actor sequence fade-in motion","update callback that eases ScreenTransition.x from 320->192 and .y from 224->32 over 160 frames, then starts the downward motion phase"
