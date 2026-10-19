@@ -1447,3 +1447,4 @@ addr,function,name,family,note
 081AF640,sub_081AF640,Vanargand_InitTransientEffect,"Vanargand transient effects (tentative)","initializes an offset sprite effect and selects its palette"
 081AF76C,sub_081AF76C,Vanargand_ResetState,"Vanargand actor state (tentative)","restores health and resets permitted actor states"
 081AFA28,sub_081AFA28,ActorStatus_BeginTimedState,"ActorStatus","begins or cancels a timed actor state"
+081AFB94,sub_081AFB94,ActorStatus_InitializeCollider,"ActorStatus","initializes collider bounds callback and attack properties"
