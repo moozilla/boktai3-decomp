@@ -1417,3 +1417,4 @@ addr,function,name,family,note
 081A0A88,sub_081A0A88,Hresvelgr_PlayTargetedTravel,"Hresvelgr","starts targeted travel and waits for completion or timeout"
 081A1BE0,sub_081A1BE0,Hresvelgr_UpdateTimedPose,"Hresvelgr actor reaction","plays animation 20 and counts down a timed pose"
 081A33B8,sub_081A33B8,Hresvelgr_TickShot,"Hresvelgr shot pool (tentative)","updates shot motion, collider and expiration"
+081A34B4,sub_081A34B4,Hresvelgr_InitShotCollider,"Hresvelgr shot pool (tentative)","initializes shot collider and attack properties"
