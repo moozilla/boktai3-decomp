@@ -11,7 +11,7 @@ struct ActorEffect {
     struct EffectCollision collision;
 };
 void ActorEffect_RemoveSprites(void *, struct ActorEffect *, s32);
-void sub_081B6A38(struct ActorEffect *);
+void ActorEffect_UpdatePositionTrail(struct ActorEffect *);
 static inline void EffectCollision_Disable(struct EffectCollision *collision)
 {
     collision->flags |= 4;
@@ -22,7 +22,7 @@ void ActorEffect_UpdateExpiry(void *owner, struct ActorEffect *effect, s32 index
         effect->entered = 0;
         EffectCollision_Disable(&effect->collision);
     }
-    sub_081B6A38(effect);
+    ActorEffect_UpdatePositionTrail(effect);
     if (effect->timer > 29)
         ActorEffect_RemoveSprites(owner, effect, index);
     else

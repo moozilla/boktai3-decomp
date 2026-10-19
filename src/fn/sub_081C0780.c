@@ -11,7 +11,7 @@ struct ScreenPoint {
     s16 x, y, z;
 };
 void SceneTarget_BeginMove(void *, struct ScreenPoint *, struct ScreenPoint *, int, int, int, int);
-void sub_081C07C8(void);
+void SceneActorSequence_UpdateFadeInHold(void);
 void ScreenTransition_BeginDownwardMotion(struct ScreenTransition *p)
 {
     struct ScreenPoint start, end;
@@ -28,6 +28,6 @@ void ScreenTransition_BeginDownwardMotion(struct ScreenTransition *p)
         r[2] = zero;
     }
     SceneTarget_BeginMove(p->child, &start, &end, 1, 64, 128, 60);
-    p->update = sub_081C07C8;
+    p->update = SceneActorSequence_UpdateFadeInHold;
     p->timer = zero;
 }

@@ -11,7 +11,8 @@ void Collider_SetAttackProperties(void *, int, int, int, int, int);
 
 void Collider_SetBodyProperties(void *, int, int, int);
 
-void sub_08029870(struct ContactCollider *, struct ContactCollider *, struct GridAttackActor *);
+void GridAttackActor_OnDamageCollision(struct ContactCollider *, struct ContactCollider *,
+                                       struct GridAttackActor *);
 
 void ContactSequencePool_SpawnActor(void *, void *, int);
 
@@ -27,7 +28,8 @@ void ProjectedDisplay_SetHeight(void *, int);
 
 void OrbitContactActor_BeginExpansion(void *);
 
-void sub_08029BF4(struct GridAttackActor *, struct GridAttackPoint *, int);
+void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct GridAttackPoint *,
+                                             int);
 
 void ContactSequencePool_BeginAllDeaths(void *);
 
@@ -45,16 +47,16 @@ int ContactBurst_GetEnabled(void *);
 
 int ContactSequencePool_GetActiveCount(void *);
 
-void sub_0802ADBC(struct GridAttackActor *p);
-void sub_0802B7C8(struct GridAttackActor *p);
+void GridAttack_ProcessMessages(struct GridAttackActor *p);
+void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p);
 
-void sub_0802BAFC(struct GridAttackActor *p);
+void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p);
 
 void SceneActors_Destroy(struct GridAttackActor *);
 
 struct GridAttackActor *SceneActors_GetBySlot(void);
 
-s32 sub_0802BFAC(struct GridAttackActor *, u32);
+s32 GridAttackActor_Initialize(struct GridAttackActor *, u32);
 
 void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed)
 {
@@ -69,7 +71,6 @@ void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int s
                          p->animationSpeed);
 }
 
-#define GridAttackActor_OnDamageCollision sub_08029870
 void sub_0821FF8C(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
@@ -109,7 +110,7 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08029870);
+INCLUDE_ASM("asm/nonmatching", GridAttackActor_OnDamageCollision);
 #endif
 
 void GridAttackActor_OnBodyCollision(void)
@@ -144,7 +145,7 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, p->drawable.position, 0);
-    Collider_SetCallback(collider, sub_08029870, p);
+    Collider_SetCallback(collider, GridAttackActor_OnDamageCollision, p);
     Collider_SetBodyProperties(collider, mode, 0x808, 4);
     Collider_Refresh(collider);
 }
@@ -223,8 +224,7 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
     p->entered = one;
 }
 
-#define GridAttackActor_SpawnTargetedProjectile sub_08029BF4
-INCLUDE_ASM("asm/nonmatching", sub_08029BF4);
+INCLUDE_ASM("asm/nonmatching", GridAttackActor_SpawnTargetedProjectile);
 
 int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
 {
@@ -553,8 +553,8 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        sub_08029BF4(base, (struct GridAttackPoint *)p->targetPosition,
-                     base->targetAttackParameter);
+        GridAttackActor_SpawnTargetedProjectile(base, (struct GridAttackPoint *)p->targetPosition,
+                                                base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
@@ -993,8 +993,7 @@ static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mod
     p->entered = 1;
 }
 
-#define GridAttack_ProcessMessages sub_0802ADBC
-INCLUDE_ASM("asm/nonmatching", sub_0802ADBC);
+INCLUDE_ASM("asm/nonmatching", GridAttack_ProcessMessages);
 
 void GridAttack_UpdateStateNineAction(struct GridAttackActor *p)
 {
@@ -1169,7 +1168,6 @@ int GridAttack_TryStartDamageReaction(struct GridAttackActor *p)
     return 0;
 }
 
-#define GridAttack_UpdateWaitAction sub_0802B3E4
 void GridAttack_UpdateWaitAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
@@ -1359,19 +1357,17 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
     Callback_InvokeActor(p, (void *)gUnk_08605040[p->active]);
 }
 
-#define GridAttack_UpdateAnimationAndTargets sub_0802B7C8
-INCLUDE_ASM("asm/nonmatching", sub_0802B7C8);
+INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateAnimationAndTargets);
 
-#define GridAttack_UpdateCollidersAndPalette sub_0802BAFC
-INCLUDE_ASM("asm/nonmatching", sub_0802BAFC);
+INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateCollidersAndPalette);
 
 int GridAttack_Update(struct GridAttackActor *p)
 {
     u16 *t;
-    sub_0802B7C8(p);
+    GridAttack_UpdateAnimationAndTargets(p);
     GridAttack_UpdateActionController(p);
     GridAttack_RunStateIfUnpaused((u32)p);
-    sub_0802BAFC(p);
+    GridAttack_UpdateCollidersAndPalette(p);
     if (p->phaseTimer <= 0xef)
         GridAttackActor_RequestLinkedActorState(p);
     else
@@ -1391,8 +1387,7 @@ u32 GridAttackActor_Destroy(struct GridAttackActor *p)
     return 0;
 }
 
-#define GridAttackActor_Initialize sub_0802BFAC
-INCLUDE_ASM("asm/nonmatching", sub_0802BFAC);
+INCLUDE_ASM("asm/nonmatching", GridAttackActor_Initialize);
 
 struct GridAttackActor *GridAttackActor_Create(u32 a)
 {
@@ -1405,7 +1400,7 @@ struct GridAttackActor *GridAttackActor_Create(u32 a)
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void *))GridAttack_Update,
                           (void (*)(void *))GridAttackActor_Destroy);
-        if (sub_0802BFAC(p, a) < 0) {
+        if (GridAttackActor_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
         }
