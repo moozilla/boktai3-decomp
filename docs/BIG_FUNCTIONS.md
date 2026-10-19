@@ -159,7 +159,14 @@ at GCSE. Brute-forcing the pseudo numbers inside the expressions near T = 2593
 found no solution, so renumbering alone does not fix it. Either the original RTL
 was much smaller before GCSE, or some of those values were ordinary variables
 (numbered below every PRE register) rather than PRE temporaries: 217 < 1907 <
-1178 < 1075 is exactly that order. Free T reductions that keep the code
+1178 < 1075 is exactly that order. `rtlprobe.py try-t FILE.c 2301 ...` checks the file with the instrumented
+compiler (`sh tools/agbcc-instr.sh`) forcing the table size (`AGBCC_GCSE_T`).
+On 08123194 any T in 2267..2347 fixes all four stack slots and nothing else:
+30 → 17 differing bytes, realigned 19 → 6. So the remaining register
+differences have a separate cause. They come from cse2: `make_regs_eqv` makes
+the PRE reaching register canonical over Seek's `target` parameter because the
+reaching register's last use is later. Use the forced T this way to split any
+residual into independent causes. Free T reductions that keep the code
 byte-identical: a `u32 Shape(i) { u32 b = *Properties(i); return b >> 4; }`
 accessor in CanEnter (−4 per site). The same accessor in Seek, a u8→s32 return
 from Seek (−56) and a u32 `CellAttributes` (−60) all change loop hoisting or
