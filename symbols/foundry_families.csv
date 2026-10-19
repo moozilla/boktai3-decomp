@@ -1400,3 +1400,4 @@ addr,function,name,family,note
 0813E53C,sub_0813E53C,Player_ApplyPeriodicStatChanges,"Player stat modifiers","applies flagged one-percent stat recovery and drain"
 0813EABC,sub_0813EABC,Player_BeginDescriptorAction,"Player descriptor actions","initializes action context from an entry descriptor"
 0813EBE0,sub_0813EBE0,Player_BeginIndexedAction,"Player descriptor actions","clears low flags and starts an indexed action"
+0813ED20,sub_0813ED20,Player_ConsumeActionCharge,"Player descriptor actions","deducts pending action cost from the active entry"
