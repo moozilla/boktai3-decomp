@@ -148,6 +148,10 @@ def prepare(src, func):
     return rel, ast, fn, prefix
 
 
+MAX_CANDIDATES = 400   # per batch: one batch must fit the time budget
+MAX_QUEUE = 4000       # states kept; each holds a parse tree (a run once reached 8.4 GB)
+
+
 def beam_search(pool, prefix, frontier, seen, depth, beam, seeds, ast, func, concessions, deadline, log, tag):
     """Best-first search: expand the best unexpanded state (score, then shorter
     source), BEAM states per batch, until a match, the deadline, or DEPTH*BEAM
@@ -166,18 +170,27 @@ def beam_search(pool, prefix, frontier, seen, depth, beam, seeds, ast, func, con
         if not batch:
             break
         explored += batch
+        if time.time() > deadline:
+            break
         cands = []
         for score, f, hist in batch:
-            if len(hist) >= depth + 3:
+            if len(hist) >= depth + 3 or len(cands) >= MAX_CANDIDATES or time.time() > deadline:
                 continue
             for t, (desc, f2) in neighbours(f, ast, func, seeds, concessions).items():
                 if t in seen:
                     continue
                 seen.add(t)
                 cands.append((t, f2, hist + [desc]))
+                if len(cands) >= MAX_CANDIDATES:
+                    break
         if not cands:
             continue
-        scores = pool.map(evaluate, [prefix + t for t, _, _ in cands], chunksize=4)
+        scores = []                              # compile in chunks so the deadline holds mid-batch
+        for i in range(0, len(cands), 32):
+            scores += pool.map(evaluate, [prefix + t for t, _, _ in cands[i:i + 32]], chunksize=4)
+            if time.time() > deadline:
+                break
+        cands = cands[:len(scores)]
         compiles += len(cands)
         for s_, (t, f2, h) in zip(scores, cands):
             if s_ is None:
@@ -186,6 +199,9 @@ def beam_search(pool, prefix, frontier, seen, depth, beam, seeds, ast, func, con
             counter += 1
             if (s_, len(t)) < (best[0], len(ast_util.to_c(best[1]))):
                 best = (s_, f2, h)
+        if len(heap) > MAX_QUEUE:                # memory: keep only the best states
+            heap = heapq.nsmallest(MAX_QUEUE // 2, heap)
+            heapq.heapify(heap)
         log(f"  {tag} batch {rnd + 1}: {len(cands)} candidates, best {best[0]}, queue {len(heap)}")
         if best[0][0] == 0 and best[0][2] == 0 or time.time() > deadline:
             break
