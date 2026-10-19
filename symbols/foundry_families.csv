@@ -1533,3 +1533,4 @@ addr,function,name,family,note
 081B939C,sub_081B939C,OrbitMotion_BeginDistanceWave,"OrbitMotion","initializes mode six with distance-scaled wave amplitude"
 081B9440,sub_081B9440,OrbitMotion_BeginArc,"OrbitMotion","configures center radius and angles for an arc"
 081BB3D4,sub_081BB3D4,SolarBank_RefreshAmountDigits,"Solar bank panel (tentative)","refreshes the two four-digit amount displays"
+081BB538,sub_081BB538,SolarBank_BeginOpening,"Solar bank panel (tentative)","initializes panel graphics and starts its opening transition"
