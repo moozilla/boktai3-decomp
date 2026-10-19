@@ -27,9 +27,9 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
         }
     }
     do {
-    variantReload = &directionVariant;
-    mirrorValue = *mirrorPointer;
-    entryFlags = entry->flags;
+        variantReload = &directionVariant;
+        mirrorValue = *mirrorPointer;
+        entryFlags = entry->flags;
     } while (0);
     selection = entry->value;
     flags = mirrorValue | entryFlags;

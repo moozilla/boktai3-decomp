@@ -128,7 +128,7 @@ only say which motion plays (low confidence).
 | 20, 21, 22 | motion7_turn, motion7_v7, motion7_v3 | dir | motion 7 |
 | 23–26 | aim, shoot, aim_hold, aim_end | dir / dir, n | motion 3; 24 spawns effect 0x4B 150 ahead and 230 up with sound 0xCD (guess: the gun) |
 | 27 | face_side | on | direction 5 (mirrored) or 3 |
-| 28, 29 | motion11, motion10 | | motion 0xB / 0xA |
+| 28, 29 | transform, motion10 | | motion 0xB / 0xA; 28 is a transformation: a burst of light and a golden form (showcase v3) |
 | 30 | form_motion | | motion 0xA or 0xB by `+0x418` |
 | 31 | state_motion | | motion 0xD–0xF by state |
 | 32 | pose | n (4, 5: n, a, b) | `sub_0815C73C` |

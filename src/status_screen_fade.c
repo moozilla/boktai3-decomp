@@ -9,9 +9,9 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
     int blueMask;
     u16 *buffer;
     bank = 0;
-    buffer = p->buffer;
+    *(&buffer) = p->buffer;
     blueMask = 31744;
-    for (; bank < 2; bank++)
+    for (; bank < 2; bank++) {
         for (i = 0; i < 16; i++) {
             {
                 int index = i;
@@ -19,22 +19,27 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
             }
             {
                 u16 *out = &buffer[bank * 16 + i];
-                register int color asm("r1") = *out;
+                int color = *out;
                 int r = ((color & 31) * factor) & 0x7C0;
                 int g = ((color & 992) * factor) & 0xF800;
                 int blue = color & blueMask;
+                do {
+                } while (0);
                 {
                     int b = (blue * factor) & 0x1F0000;
                     *out = (r | g | b) >> 6;
                 }
             }
         }
+    }
+
     if (++p->timer > 31) {
         Bg_ClearTilemap(0);
         Script_Call(p->script, &p->args);
         Task_Kill(p);
-    } else
+    } else {
         p->dirty |= 15;
+    }
 }
 
 void StatusScreen_WaitForStart(struct StatusScreen *p)
@@ -69,8 +74,9 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
 {
     int factor = p->fade, red, green, blue, base, bank, i;
     int other;
-    if (factor > 256)
+    if (factor > 256) {
         factor = 256;
+    }
     other = 256 - factor;
     red = p->blend & 31;
     green = p->blend & 992;
@@ -83,13 +89,15 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
             int nextBank = bank + 1;
             for (; i < *end; i++) {
                 u16 *source = &p->source[base + i], *dest = &p->buffer[base + i];
-                register int color asm("r1") = *source;
+                int color = *source;
                 int r;
                 int g;
                 int b;
-                r = ((color & 31) * factor + other * red) & 0x1F00;
-                g = ((color & 992) * factor + other * green) & 0x3E000;
-                b = color & 31744;
+                do {
+                    r = ((color & 31) * factor + other * red) & 0x1F00;
+                    g = ((color & 992) * factor + other * green) & 0x3E000;
+                    b = color & 31744;
+                } while (0);
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
             }
