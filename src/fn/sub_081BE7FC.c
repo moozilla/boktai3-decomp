@@ -1,0 +1,65 @@
+#define Storage_BeginItemSpecialMove sub_081BE7FC
+#define Storage_GetSlotPosition      sub_081BD934
+#include "global.h"
+#include "scene_input_grid.h"
+s32 Inventory_GetItemId(u32);
+u32 sub_0822D604(s32);
+void sub_081BD934(struct SceneInputPosition *, u32);
+struct StoragePanel {
+    u8 unknown0[0x1558];
+    struct SceneInputPair pair;
+    u8 unknown164C[0x1766 - 0x164C];
+    u8 selection;
+    u8 unknown1767[0x29];
+    u8 items[1];
+};
+struct StorageWidgetFlags {
+    u32 flags;
+    u8 unknown4[0x5c];
+};
+struct StorageFlagsView {
+    u8 unknown0[0x20];
+    struct StorageWidgetFlags widgets[1];
+};
+void sub_081BE7FC(struct StoragePanel *panel)
+{
+    struct SceneInputPosition starts[2], targets[2];
+    u32 enabled[2], frames[2], attributes[2];
+    struct StorageFlagsView *display = (void *)panel;
+    u32 savedAttribute;
+    struct SceneInputPosition *target;
+    enabled[0] = 1;
+    display->widgets[panel->selection + 8].flags |= 1;
+    frames[0] = sub_0822D604(Inventory_GetItemId(panel->items[panel->selection]));
+    {
+        u32 attribute = 0x373;
+        savedAttribute = attribute;
+        attributes[0] = attribute;
+    }
+    sub_081BD934(starts, panel->selection);
+    target = targets;
+    sub_081BD934(target, 32);
+    {
+        u32 *frameOut;
+        u32 placeholder;
+        u32 *attributeOut;
+        enabled[1] = 0;
+        placeholder = 0x151;
+        frameOut = frames;
+        frameOut[1] = placeholder;
+        attributeOut = attributes;
+        attributeOut[1] = savedAttribute;
+        {
+            struct SceneInputPosition *start = starts;
+            start[1].x = 0;
+            start[1].y = 0;
+            start[1].z = 0;
+        }
+        target[1].x = 0;
+        target[1].y = 0;
+        target[1].z = 0;
+        SceneInput_BeginPairTransition(&panel->pair, enabled, starts, target, frameOut,
+                                       attributeOut, 12);
+    }
+    Sound_PlaySong(0x38A);
+}
