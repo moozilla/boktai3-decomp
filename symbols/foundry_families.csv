@@ -1414,3 +1414,4 @@ addr,function,name,family,note
 081A07AC,sub_081A07AC,Hresvelgr_PlayAscentSequence,"Hresvelgr actor action sequences","raises the actor and changes animation speed at the height threshold"
 081A0888,sub_081A0888,Hresvelgr_UpdateAlternatingOrbit,"Hresvelgr","toggles and applies an orbit offset after a delay"
 081A0954,sub_081A0954,Hresvelgr_PlayDelayedReposition,"Hresvelgr","restores saved position after a delay and sets height"
+081A0A88,sub_081A0A88,Hresvelgr_PlayTargetedTravel,"Hresvelgr","starts targeted travel and waits for completion or timeout"
