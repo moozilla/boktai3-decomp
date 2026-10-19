@@ -64,8 +64,8 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     digits[1] = left - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 11);
     do {
-    row = 0;
-    values = digits;
+        row = 0;
+        values = digits;
     } while (0);
     for (; row < 2; row++) {
         int shift = row << 4;
