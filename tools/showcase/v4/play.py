@@ -45,6 +45,7 @@ STRINGS = 9977                  # the game's string count
 EVENTS = 0x08E8755C
 EVENTS_LITERAL = 0x08224EE0     # the one load of gEventBytecodePtrs (sub_08224EBC)
 END_TALK = 1026                 # closes talk mode: HUD back, player free
+ASKING = Var(0x10000000 | 2 << 24 | 0x100000 | 0x346)   # r700[0x346]: 1 while a choice menu is open (for scripted players)
 
 
 def msg_mode():
@@ -103,10 +104,10 @@ class PlayShow(Show):
         """Statements that show a message and run procedure `then` when it closes."""
         sid = self.message(pages)
         out = [Call(1016, 0, 1)] if start else []
-        return out + [Set(msg_mode(), 1), command(0x1C64, r=Text(sid)), Call(1019, then)]
+        return out + [Set(ASKING, 0), Set(msg_mode(), 1), command(0x1C64, r=Text(sid)), Call(1019, then)]
 
     def ask(self, question, on_choice, name=0x4BB5):
         """Statements that open a choice menu: question is one page whose
         options are in <ALTER> tags; on_choice gets the choice (0, 1, ...) in arg1."""
         sid = self.message([question])
-        return [Set(msg_mode(), 1), Call(1191, name, on_choice, 0, 0, 1), command(0x71E7, r=Text(sid))]
+        return [Set(ASKING, 1), Set(msg_mode(), 1), Call(1191, name, on_choice, 0, 0, 0), command(0x71E7, r=Text(sid))]
