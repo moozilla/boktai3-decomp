@@ -39,3 +39,7 @@ uses it.
   (sub_08182B14, sub_0813A620, sub_0812266C).
 * **Packed bitfield** `struct Slot { u8 v:8; } __attribute__((packed));`
   keeps `ldrb; orrs; strb` for `|= 0xff`.
+* **Raise a variable's allocation priority** with an empty loop around its
+  assignment: `do { h = pos.y - 8; } while (0);` fixed a register-only diff
+  that rasolve attributed to `h` (sub_0811BD30). Copying a value into a
+  narrower local (`u8 animId = anim;`) lowers priority instead (sub_0811C9F8).
