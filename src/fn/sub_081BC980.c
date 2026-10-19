@@ -5,7 +5,7 @@ void DarkLoan_HideSprites(void *);
 void Sound_PlaySong(int);
 void Anim_SetKeyframes(void *, void *, int, int, int);
 void MessageWindow_ShowMessage(int);
-void sub_081BD084(void);
+void StatGauge_WaitBeforeConfirmation(void);
 void DarkLoan_SetState(void *, void (*)(void));
 void DarkLoan_BeginClosing(u8 *p)
 {
@@ -18,5 +18,5 @@ void DarkLoan_BeginClosing(u8 *p)
     *(u32 *)(p + 0x60) &= ~1;
     Anim_SetKeyframes(p + 0x58, p + 0x18, 6, 2, z);
     MessageWindow_ShowMessage(3);
-    DarkLoan_SetState(p, sub_081BD084);
+    DarkLoan_SetState(p, StatGauge_WaitBeforeConfirmation);
 }

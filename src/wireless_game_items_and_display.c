@@ -11,7 +11,7 @@ void WirelessGame_AddItem(void *p, int index)
                 total += counts[i];
             } while (++i <= 3);
             if (total <= 9) {
-                sub_0803A514(p, index, 1);
+                WirelessGameItems_QueueLocalItem(p, index, 1);
                 counts[index]++;
                 WirelessGame_AddWeightedScore(2, 1);
                 Sound_PlaySong(885);
@@ -62,7 +62,7 @@ int WirelessGame_TryAddCyclingItem(void *owner)
                     total += counts[i];
                 } while (++i <= 3);
                 if (total <= 9) {
-                    sub_0803A514(owner, index, 1);
+                    WirelessGameItems_QueueLocalItem(owner, index, 1);
                     counts[index]++;
                     WirelessGame_AddWeightedScore(2, 1);
                     Sound_PlaySong(885);
@@ -914,11 +914,10 @@ ok:
     return p;
 }
 
-#define WirelessGameItems_QueueLocalItem sub_0803A514
 #ifdef NONMATCHING
 // fuzzy: 93.0%
 // Clamping zero temporaries and their register allocation still differ.
-int sub_0803A514(struct WirelessGameVector *position, int index, int amount)
+int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
 {
     struct WirelessGameItems *owner = gUnk_02000100;
     struct WirelessGameItem *target;
@@ -1005,7 +1004,7 @@ int sub_0803A514(struct WirelessGameVector *position, int index, int amount)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803A514);
+INCLUDE_ASM("asm/nonmatching", WirelessGameItems_QueueLocalItem);
 #endif
 
 // MATCHING_CONCESSION: register-pinning
@@ -1424,11 +1423,10 @@ int WirelessGameDisplay_Destroy(struct WirelessGameDisplay *p)
     return 0;
 }
 
-#define WirelessGameDisplay_Init sub_0803AB28
 #ifdef NONMATCHING
 // fuzzy: 85.8%
 // Loop pointer lifetimes and register allocation still differ.
-int sub_0803AB28(struct WirelessGameDisplay *p)
+int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
 {
     struct WirelessGameResource *resource;
     struct WirelessGameDrawing *drawing;
@@ -1477,7 +1475,7 @@ int sub_0803AB28(struct WirelessGameDisplay *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803AB28);
+INCLUDE_ASM("asm/nonmatching", WirelessGameDisplay_Init);
 #endif
 
 void *WirelessGameDisplay_Create(void)
@@ -1485,7 +1483,7 @@ void *WirelessGameDisplay_Create(void)
     void *p = Task_Create(11, 672);
     if (p) {
         Task_SetCallbacks(p, WirelessGameDisplay_Update, WirelessGameDisplay_Destroy);
-        if (sub_0803AB28(p) < 0) {
+        if (WirelessGameDisplay_Init(p) < 0) {
             Task_Kill(p);
             return 0;
         }

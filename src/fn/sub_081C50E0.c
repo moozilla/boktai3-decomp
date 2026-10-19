@@ -11,7 +11,7 @@ struct S {
     u32 fd8;
 };
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
-void sub_081C5190(void);
+void Registry1909_UpdateFalling(void);
 
 void Registry1909_StartFalling(struct S *p)
 {
@@ -20,7 +20,7 @@ void Registry1909_StartFalling(struct S *p)
     p->f20 &= ~1;
     p->fcc = (z = 0);
     Anim_SetKeyframes((u8 *)p + 0x18, (u8 *)p + 0x78, 0x3a, 1, z);
-    f = sub_081C5190;
+    f = Registry1909_UpdateFalling;
     p->fd4 = f;
     p->fd8 = z;
 }

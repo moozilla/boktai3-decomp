@@ -1,19 +1,19 @@
 #include "global.h"
-void sub_081BE960(void *);
-void sub_081BEA4C(void *);
-void sub_081BEB08(void *);
+void Storage_ShowItemDescription(void *);
+void Storage_ShowEquipmentDescription(void *);
+void Storage_ShowConsumableDescription(void *);
 void Storage_RefreshSelectedItemDetails(u8 *p)
 {
     u8 *a = p + 0x1754, *b = p + 0x1758;
     switch (b[*a] >> 1) {
         case 0:
-            sub_081BE960(p);
+            Storage_ShowItemDescription(p);
             break;
         case 1:
-            sub_081BEA4C(p);
+            Storage_ShowEquipmentDescription(p);
             break;
         case 2:
-            sub_081BEB08(p);
+            Storage_ShowConsumableDescription(p);
             break;
     }
 }

@@ -24,6 +24,7 @@ SESSIONS = os.path.expanduser("~/.codex/sessions")
 
 def latest(max_age):
     files = sorted(glob.glob(os.path.join(SESSIONS, "*", "*", "*", "*.jsonl")), key=os.path.getmtime, reverse=True)
+    best = None
     for f in files[:20]:
         if time.time() - os.path.getmtime(f) > max_age * 60:
             break
@@ -35,11 +36,11 @@ def latest(max_age):
                 except ValueError:
                     continue
                 rl = (e.get("payload") or {}).get("rate_limits") or e.get("rate_limits")
-                if rl and rl.get("primary"):
-                    found = rl
-        if found:
-            return found
-    return None
+                if rl and rl.get("primary") and rl["primary"].get("resets_at", 0) > time.time():
+                    found = rl          # a reading whose window has already reset is stale
+        if found and (best is None or found["primary"]["used_percent"] > best["primary"]["used_percent"]):
+            best = found        # the most used of the recent valid readings: never overstate what's left
+    return best
 
 
 def main():

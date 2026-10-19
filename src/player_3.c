@@ -181,7 +181,6 @@ void Player_ClearStateTimer(struct Player *p, s32 idx)
 
 INCLUDE_ASM("asm/nonmatching", sub_0813D924);
 
-#define Player_SelectFlashingVisualMode sub_0813DB60
 #ifdef NONMATCHING
 // fuzzy: 82.1%
 // Register allocation swaps the preserved actor and input mode.
@@ -197,7 +196,7 @@ flash:
     return p->movementRequestParameter;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813DB60);
+INCLUDE_ASM("asm/nonmatching", Player_SelectFlashingVisualMode);
 #endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813DB98);
@@ -221,7 +220,7 @@ s32 sub_0813D924(void *, s32);
 
 s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
-s32 sub_0813DB60(struct Player *, s32);
+s32 Player_SelectFlashingVisualMode(struct Player *, s32);
 
 void sub_0813CE20(void *, s32);
 
@@ -242,7 +241,7 @@ void SceneActor_UpdateVisualEffects(struct Player *p)
     Player_AdvanceEffectTick(p);
     mode = sub_0813D924(p, 0);
     mode = SceneActor_SelectEffectDisplayMode(p, mode);
-    mode = sub_0813DB60(p, mode);
+    mode = Player_SelectFlashingVisualMode(p, mode);
     if (p->kind == 2 && p->tetherMode != 10 && p->tetherMode != 11)
         sub_0813CE20(p, mode);
     else
@@ -939,7 +938,6 @@ static inline void SetModeFlag(struct Player *p)
     }
 }
 
-#define Player_SelectRequestedActionMode sub_0813F8F8
 #ifdef NONMATCHING
 // fuzzy: 85.0%
 // Preserved owner/request registers differ; one exit reloads the mode.
@@ -982,7 +980,7 @@ s32 Player_SelectRequestedActionMode(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813F8F8);
+INCLUDE_ASM("asm/nonmatching", Player_SelectRequestedActionMode);
 #endif
 
 void Player_SetActionRequest(struct Player *p, s32 kind)
@@ -1033,7 +1031,6 @@ s32 Player_GetSelectedAbility(struct Player *p)
     return 5;
 }
 
-#define Player_InitActionRequest sub_0813FB30
 void Player_InitActionRequest(struct Player *p)
 {
     struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
