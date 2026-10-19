@@ -1,6 +1,6 @@
 #include "global.h"
-/* Ivy_Destroy_080ABD30: Ivy_Destroy plus an extra cleanup call first (ported by relatives.py, fixed by hand; provisional name) */
-#define Ivy_Destroy_080ABD30 sub_080ABD30
+/* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
+#define TentacleBody_Destroy sub_080ABD30
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Heap_Free(void *);
@@ -26,7 +26,7 @@ struct S {
 };
 void TentacleBody_RemoveSegmentSprites(struct S *);
 void SpritePool_ConsumeStateFlag(struct S *);
-u32 Ivy_Destroy_080ABD30(struct S *s)
+u32 TentacleBody_Destroy(struct S *s)
 {
     u8 *p;
     u8 *q;
