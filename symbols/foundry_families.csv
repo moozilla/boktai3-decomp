@@ -1475,3 +1475,4 @@ addr,function,name,family,note
 081BAFD4,sub_081BAFD4,MenuCursor_UpdateState,"Menu cursor (auto, tentative)","updates callback requests and selected-entry state"
 081BB1A0,sub_081BB1A0,MenuCursor_Create,"MenuCursor / ResourceSprite","creates a menu cursor with entries and initial selection"
 081BC3B4,sub_081BC3B4,DarkLoan_UpdateBalanceDigits,"DarkLoan display","updates four decimal sprites from balance plus selected amount"
+081BCBCC,sub_081BCBCC,StatGauge_UpdateConfirmation,"StatGaugePreview / DarkLoan","updates confirmation input and cursor animation"
