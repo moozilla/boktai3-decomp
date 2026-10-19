@@ -1,0 +1,45 @@
+
+#ifdef NONMATCHING
+// fuzzy: 95.1%
+// foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
+#define SpriteColliderGroup_ResetActiveParts sub_0818EA3C
+#include "global.h"
+struct SpriteColliderPartState {
+    u8 flags, unknown1[4], active, counter;
+    u8 unknown7[0x1DD];
+};
+struct SpriteColliderGroup {
+    u8 unknown0[0x5c3];
+    u8 count, activeCount;
+};
+void Sound_PlaySongChecked(u32);
+void sub_0818EA3C(struct SpriteColliderGroup *p)
+{
+    s32 i;
+    s32 changed = 0;
+    struct SpriteColliderPartState *part;
+    u8 *count;
+    u32 five, one;
+    u8 total;
+    i = 0;
+    total = p->count;
+    if (i >= total) goto done;
+    one = 1;
+    five = 5;
+    count = &p->count;
+    part = (struct SpriteColliderPartState *)((u8 *)p + 0x119);
+    for (; i < *count; part++, i++) {
+        if (part->active) {
+            part->active = one;
+            part->counter = five;
+            part->flags = one | part->flags;
+            changed = 1;
+        }
+    }
+done:
+    if (changed)
+        Sound_PlaySongChecked(0x13e);
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0818EA3C);
+#endif
