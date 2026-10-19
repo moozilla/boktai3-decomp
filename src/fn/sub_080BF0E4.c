@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 53.3%
+// fuzzy: 52.9%
 // Special-animation start (categories 5/6/7 select sequences 0x63/0x65/0x67 through an inline
 // copy of SceneActorAnimation_SelectDirectionalEntryFlags with an explicit selection), then the
 // shared chase (include/scene_actor_chase.h). First draft: control flow and calls line up.
