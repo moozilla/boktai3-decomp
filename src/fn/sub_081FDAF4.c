@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.1%
 // foundry draft (worker best 81.1%); what differs is mostly register allocation and instruction order
 #define RisingActor_AdvanceHeight sub_081FDAF4
 #define RisingActor_SetCallback   SunOrb_SetUpdateCallback
-#include "global.h"
 struct RisingDrawable {
     u8 pad0[6];
     s16 flags;

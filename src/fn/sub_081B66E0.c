@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.0%
 // foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
 #define VanargandEffect_Initialize sub_081B66E0
-#include "global.h"
 
 /* Tentative Vanargand family; the two vectors are copied as eight-byte records. */
 

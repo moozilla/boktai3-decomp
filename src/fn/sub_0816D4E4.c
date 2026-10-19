@@ -1,3 +1,7 @@
+#include "global.h"
+#include "player.h"
+#include "game_state.h"
+#include "scene_item_values.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.7%
@@ -8,10 +12,6 @@
 #define gActionDefinitions              gUnk_08E61280
 #define gGameState                      gUnk_02000710
 #define gPlayers                        gUnk_02000580
-#include "global.h"
-#include "player.h"
-#include "game_state.h"
-#include "scene_item_values.h"
 extern struct GameState *gUnk_02000710;
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 u32 Inventory_GetUsePermissionFlag(u32);

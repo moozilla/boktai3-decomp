@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
 /* The checker ELF predates these names in functions.csv. */
 #define HomingProjectile_InitializeSlot sub_081FF948
-#include "global.h"
 
 struct HomingProjectileParams {
     u8 unknown00[0x10];

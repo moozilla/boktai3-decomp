@@ -1,14 +1,14 @@
+#include "global.h"
+#include "player.h"
+#include "tether_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.5%
 // foundry draft (worker best 86.3%); what differs is mostly register allocation and instruction order
 #define Player_TestTetherActionInput sub_08156F54
 #define gTetherActor                 gUnk_02000488
-#include "global.h"
-#include "player.h"
 /* The tether header retains a distinct legacy player view. */
 #define gUnk_02000580 gTetherPlayerView
-#include "tether_actor.h"
 #undef gUnk_02000580
 extern struct TetherActor *gUnk_02000488;
 s32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);

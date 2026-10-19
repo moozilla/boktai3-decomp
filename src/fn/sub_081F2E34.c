@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_vec.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
-#define SceneDistance_UpdateSquaredDistances sub_081F2E34
-#include "global.h"
-#include "scene_vec.h"
+#define SceneDistance_UpdateSquaredDistances Ratatosk_UpdatePointDistancesToPlayer
 struct SceneDistanceEntry {
     struct SceneVec position;
     u8 pad8[4];
@@ -16,7 +16,7 @@ struct SceneDistanceSet {
     struct SceneDistanceEntry entries[9];
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
-void sub_081F2E34(struct SceneDistanceSet *set)
+void Ratatosk_UpdatePointDistancesToPlayer(struct SceneDistanceSet *set)
 {
     struct SceneDistanceEntry *entry = set->entries;
     s32 count = 8;
@@ -33,5 +33,5 @@ void sub_081F2E34(struct SceneDistanceSet *set)
     } while (--count >= 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F2E34);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdatePointDistancesToPlayer);
 #endif

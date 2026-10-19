@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // foundry draft (worker best 86.1%); what differs is mostly register allocation and instruction order
-#define SceneActorAttachment_UpdatePosition sub_08180570
+#define SceneActorAttachment_UpdatePosition SpriteComponent_Update
 struct SceneActorAttachmentPosition {
     u32 xy, z;
 };
@@ -22,7 +22,7 @@ struct SceneActorAttachment {
     u8 colliderHeader[0xc];
     struct SceneActorAttachmentPosition colliderPosition;
 };
-void sub_08180570(struct SceneActorAttachment *p)
+void SpriteComponent_Update(struct SceneActorAttachment *p)
 {
     if (p->flags & 1)
         Sound_PlaySong(0x202);
@@ -39,5 +39,5 @@ void sub_08180570(struct SceneActorAttachment *p)
     Collider_Refresh(p->colliderHeader);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08180570);
+INCLUDE_ASM("asm/nonmatching", SpriteComponent_Update);
 #endif

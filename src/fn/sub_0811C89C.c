@@ -1,3 +1,5 @@
+#include "global.h"
+#include "modifier_list.h"
 
 #ifdef NONMATCHING
 // fuzzy: 88.0%
@@ -5,8 +7,6 @@
 #define CharacterPreview_InitializePalette sub_0811C89C
 #define CharacterPreview_SelectResource    CharacterModel_GetPrimaryPaletteIndex
 #define gCharacterPaletteResource          gUnk_030042E4
-#include "global.h"
-#include "modifier_list.h"
 struct CharacterPreviewTileAllocator {
     u8 unknown0[0x38];
     s32 nextTile;

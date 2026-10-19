@@ -1,11 +1,11 @@
+#include "global.h"
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.9%
 // foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
 #define ActorMovement_FindQuarterTurnPoint sub_0817A16C
 #define ActorMovement_TestPoint            ActorPosition_TestPath
-#include "global.h"
-#include "contact_actor.h"
 extern const s16 gUnk_086149C4[];
 s32 ActorMovement_TestPoint(void *, void *);
 struct MovementSearchActor {

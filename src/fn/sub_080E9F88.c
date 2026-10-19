@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.5%
 // foundry draft (worker best 93.4%); what differs is mostly register allocation and instruction order
 #define SceneActorReaction_PlayEntry17 sub_080E9F88
-#include "global.h"
-#include "scene_actor_reaction.h"
 void Ivy_UpdateActiveState_080E98B4(void *);
 void sub_080E9F88(struct SceneActorRegistryResetView *actor)
 {

@@ -1,9 +1,9 @@
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define SceneActorPlacement_UpdateFlaggedResponse sub_080A8144
-#include "scene_actor_reset.h"
 void sub_080A62DC(void);
 void sub_080A8904(struct SceneActorRegistryResetView *);
 static inline u8 TakeQueuedFlag(u8 *flag)

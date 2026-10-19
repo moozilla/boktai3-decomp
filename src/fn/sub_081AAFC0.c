@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.4%
 // foundry draft (worker best 94.4%); what differs is mostly register allocation and instruction order
 #define Vanargand_UpdateAnimationGate sub_081AAFC0
-#include "global.h"
 struct Vanargand {
     u8 pad0[0x9c];
     u32 flags;

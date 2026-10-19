@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 89.5%
@@ -5,7 +6,6 @@
 #define SpriteSlots_UpdateActive   sub_08100938
 #define SpriteSlot_CheckScene      FloorSwitch_UpdateRegionVisibility
 #define gSpriteSlotUpdateCallbacks gUnk_086064AC
-#include "global.h"
 
 struct SpriteSlot {
     u8 pad00[0x86];

@@ -1,12 +1,12 @@
+#include "global.h"
+#include "engine.h"
+#include "pursuing_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define PursuingActors_ReleaseAll sub_0812C020
 #define gPursuingActorManager     gUnk_02000184
-#include "global.h"
-#include "engine.h"
-#include "pursuing_actor.h"
 void Sprite_Remove(void *);
 extern struct PursuingActorManager *gUnk_02000184;
 static inline u8 IsActive(struct PursuingActorManager *manager, s32 index)

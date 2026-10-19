@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.9%
 // foundry draft (worker best 80.9%); what differs is mostly register allocation and instruction order
 #define DarkLoan_CreateHiddenDisplay sub_081BD854
-#include "global.h"
 
 struct ScriptPanel {
     u8 pad0[0x8E4];

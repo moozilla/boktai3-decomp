@@ -1,10 +1,10 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 74.7%
 // foundry draft (worker best 86.7%); what differs is mostly register allocation and instruction order
-#define PlayerStats_AddHundredths sub_0815977C
-#include "global.h"
-#include "player.h"
+#define PlayerStats_AddHundredths PlayerStats_AddHundredths
 s32 Div(s32, s32);
 static inline u32 ReadFlags(u32 *flags, u32 mask)
 {
@@ -23,7 +23,7 @@ static inline s32 HasFlag(struct Player *p, u32 mask)
     return 0;
 }
 
-void sub_0815977C(struct Player *p, s32 amount)
+void PlayerStats_AddHundredths(struct Player *p, s32 amount)
 {
     if (p->kind == 1 && p->actionMode == 0) {
         if (!(HasFlag(p, 0x2000) && HasFlag(p, 0x4000))) {
@@ -38,5 +38,5 @@ void sub_0815977C(struct Player *p, s32 amount)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815977C);
+INCLUDE_ASM("asm/nonmatching", PlayerStats_AddHundredths);
 #endif

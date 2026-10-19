@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.4%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 #define Sword_InitializeFromScript sub_080F7458
-#include "global.h"
 struct SwordTask {
     u8 unknown0[0x86];
     u16 value86;

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.5%
 // foundry draft (worker best 90.5%); what differs is mostly register allocation and instruction order
 #define SceneActorApproach_RunTimedAction sub_080C0750
-#include "global.h"
-#include "scene_actor_reaction.h"
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F2];
     u16 timer;

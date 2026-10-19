@@ -1,3 +1,5 @@
+#include "global.h"
+#include "route_sprite_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.8%
@@ -6,8 +8,6 @@
 #define Route_GetPoints                    Path_GetPointData
 #define gRandomIndex                       gUnk_03005308
 #define gRandomTable                       gUnk_0203B400
-#include "global.h"
-#include "route_sprite_actor.h"
 struct SceneActorRouteSelection {
     u8 unknown0[0x2be];
     u16 groundHeight;

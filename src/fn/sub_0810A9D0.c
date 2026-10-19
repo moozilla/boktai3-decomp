@@ -1,11 +1,11 @@
+#include "global.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 #define gLinkSelectionDisplaySlots      gUnk_03005274
 #define LinkSelection_WaitForEmptySlots sub_0810A9D0
-#include "global.h"
-#include "area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_SetMenuRequest(u32);

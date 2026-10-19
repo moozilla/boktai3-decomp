@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.7%
@@ -6,7 +7,6 @@
 #define ActorEffect_UpdateRadialTrail  sub_081B6AB8
 #define gEffectRandomTable             gUnk_0203B400
 #define gEffectRandomIndex             gUnk_03005308
-#include "global.h"
 struct EffectPosition {
     s16 x, y, z, pad;
 };

@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.5%
 // foundry draft (worker best 94.6%); what differs is mostly register allocation and instruction order
 #define DirectionalActor_TryBeginState sub_08184FE8
-#include "global.h"
 struct DirectionalActor {
     u8 unknown0[0x196];
     u16 flags196;

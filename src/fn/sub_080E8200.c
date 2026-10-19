@@ -1,11 +1,11 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define SceneActor_AcquireCollisionTarget sub_080E8200
-#include "global.h"
-#include "scene_actor_reaction.h"
-#include "player.h"
 extern u32 gUnk_030053F4;
 void *SceneActorContacts_FindObjectById(u16);
 u8 sub_080E7F54(struct SceneActorRegistryResetView *);

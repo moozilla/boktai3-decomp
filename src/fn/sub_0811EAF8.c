@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
-#define CallbackList_RunMatchingState sub_0811EAF8
+#define CallbackList_RunMatchingState CallbackList_RunMatchingState
 struct CallbackEntry {
     void *function;
     u8 unk4;
@@ -16,7 +16,7 @@ struct CallbackList {
     struct CallbackEntry entries[1];
 };
 s32 sub_08249240(void *, void *, void *);
-s32 sub_0811EAF8(struct CallbackList *list, void *value, s32 state)
+s32 CallbackList_RunMatchingState(struct CallbackList *list, void *value, s32 state)
 {
     struct CallbackEntry *base = list->entries;
     s32 i = 0;
@@ -34,5 +34,5 @@ s32 sub_0811EAF8(struct CallbackList *list, void *value, s32 state)
     return (s32)value;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811EAF8);
+INCLUDE_ASM("asm/nonmatching", CallbackList_RunMatchingState);
 #endif

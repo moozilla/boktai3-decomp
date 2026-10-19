@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.5%
@@ -6,7 +7,6 @@
 #define gPlayerObject                 gUnk_02000710
 #define gRandomTableIndex             gUnk_03005308
 #define gRandomTable                  gUnk_0203B400
-#include "global.h"
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
 struct ArmorTravelTarget {

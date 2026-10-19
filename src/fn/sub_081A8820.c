@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.0%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
 #define ActorSoundPhase_UpdateConditionalStop sub_081A8820
 #define ActorSoundPhase_StopSong              Vanargand_StopActionSequence
-#include "global.h"
 struct ActorSoundPhase {
     u8 f0[0xAA];
     u8 st;

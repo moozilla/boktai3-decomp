@@ -1,11 +1,11 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 82.7%
 // foundry draft (worker best 81.1%); what differs is mostly register allocation and instruction order
-#define Armor_SetAnimation       sub_08182454
+#define Armor_SetAnimation       ActorController_SetAnimation
 #define gArmorAnimationVariants  gUnk_0824EB60
 #define gArmorAnimationKeyframes gUnk_0824E920
-#include "global.h"
 struct ArmorActor {
     u8 pad0[0x94];
     u8 animationData[0x20];
@@ -26,7 +26,7 @@ struct ArmorAnimationRequest {
 extern const u8 gUnk_0824EB60[];
 extern const u16 gUnk_0824E920[][2][36];
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void sub_08182454(struct ArmorActor *s, struct ArmorAnimationRequest *request, u32 flags)
+void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationRequest *request, u32 flags)
 {
     u32 index = request->index;
     u16 side;
@@ -64,5 +64,5 @@ void sub_08182454(struct ArmorActor *s, struct ArmorAnimationRequest *request, u
     s->flags &= ~0x20;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08182454);
+INCLUDE_ASM("asm/nonmatching", ActorController_SetAnimation);
 #endif

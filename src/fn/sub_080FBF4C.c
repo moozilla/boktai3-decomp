@@ -1,14 +1,14 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
-#define ActorRoute_SelectDistantPoint sub_080FBF4C
+#define ActorRoute_SelectDistantPoint ActorPhase_SelectDistantWaypoint
 #define ActorRoute_RememberPoint      Axe_RecordRoutePoint
 #define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
 #define gRandomTableIndex             gUnk_03005308
 #define gRandomTable                  gUnk_0203B400
-#include "global.h"
-#include "scene_actor_reset.h"
 struct RoutePointSelection {
     u16 id;
     u8 index, mode;
@@ -32,7 +32,7 @@ static inline u32 Random(void)
     gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
     return *(u16 *)(gRandomTableIndex * 2 + (u32)gRandomTable);
 }
-void sub_080FBF4C(struct SceneActorRegistryResetView *actor, struct ContactPosition *out,
+void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor, struct ContactPosition *out,
                   struct RouteSelectionPosition *origin, s32 limit)
 {
     struct RoutePointSelection route;
@@ -72,5 +72,5 @@ void sub_080FBF4C(struct SceneActorRegistryResetView *actor, struct ContactPosit
     out->z = route.entry[1];
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FBF4C);
+INCLUDE_ASM("asm/nonmatching", ActorPhase_SelectDistantWaypoint);
 #endif

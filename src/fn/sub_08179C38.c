@@ -1,10 +1,10 @@
+#include "global.h"
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define ActorImpact_CopyContact sub_08179C38
-#include "global.h"
-#include "contact_actor.h"
 void sub_0821FF8C(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);

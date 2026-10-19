@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.5%
 // foundry draft (worker best 93.5%); what differs is mostly register allocation and instruction order
 #define Hresvelgr_PlayNearestPointTravel sub_081A0B20
-#include "global.h"
 typedef struct HresvelgrPosition {
     s16 x, y, z, pad;
 } HresvelgrPosition;

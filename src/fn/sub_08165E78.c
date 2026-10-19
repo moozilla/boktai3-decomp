@@ -1,12 +1,12 @@
+#include "global.h"
+#include "scene_hud_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
-#define SceneHud_BeginWidgetMotion sub_08165E78
+#define SceneHud_BeginWidgetMotion SceneHud_BeginIconMotion
 #define SceneHud_SetWidgetPalette  PauseMenu_SetSpritePalette
 #define gSineTable                 gUnk_086149C4
-#include "global.h"
-#include "scene_hud_display.h"
 s32 Math_Atan2(s32, s32);
 void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u32);
 static inline s32 ScaleBend(s32 value)
@@ -25,7 +25,7 @@ static inline s32 BendSine(s32 angle, s32 bend)
     wrapped &= 255;
     return ScaleBend(gSineTable[wrapped] * bend);
 }
-void sub_08165E78(struct SceneHudState *hud, u32 index, u32 keyframe, u32 palette,
+void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe, u32 palette,
                   struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
 {
     struct SceneHudWidgetMotion *motion = &hud->widgetMotions[index];
@@ -50,5 +50,5 @@ void sub_08165E78(struct SceneHudState *hud, u32 index, u32 keyframe, u32 palett
     motion->active = 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08165E78);
+INCLUDE_ASM("asm/nonmatching", SceneHud_BeginIconMotion);
 #endif

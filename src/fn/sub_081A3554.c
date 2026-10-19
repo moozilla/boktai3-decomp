@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define Hresvelgr_InitializeShots sub_081A3554
-#include "global.h"
 struct HresvelgrShotSprite {
     u32 flags;
     u8 unknown04[0xC];

@@ -1,3 +1,6 @@
+#include "global.h"
+#include "engine.h"
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 84.8%
@@ -5,9 +8,6 @@
 #define Navigation_FindContainingRegion sub_0821FCDC
 #define Navigation_IsPointInRegion      NavMesh_IsPointInsideRegion
 #define gTerrainMap                     gUnk_030052F4
-#include "global.h"
-#include "engine.h"
-#include "contact_actor.h"
 struct NavigationRegion {
     u8 x0, z0, x1, z1;
     u8 unknown4[12];

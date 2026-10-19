@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define EffectPool_CheckCapacity   sub_081144A8
 #define EffectPool_MarkLinkedSlots SlotRegistry_ClaimMatchingSlot
-#include "global.h"
 struct EffectPoolSlot {
     u8 pad0[0xc];
     u16 group;

@@ -1,11 +1,11 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.3%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
-#define OrangeSpine_FireProjectile sub_0820F078
+#define OrangeSpine_FireProjectile OrangeSpine_FireProjectile
 #define Projectile_Spawn           Projectile_SpawnFromConfig
 #define gSineTable                 gUnk_086149C4
-#include "global.h"
 struct OrangeSpinePosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -48,7 +48,7 @@ static inline void add(struct OrangeSpinePosition *out, struct OrangeSpinePositi
     out->y = a->y + b->y;
     out->z = b->z + a->z;
 }
-void sub_0820F078(struct OrangeSpine *p)
+void OrangeSpine_FireProjectile(struct OrangeSpine *p)
 {
     u8 config[0x5c];
     struct OrangeSpinePosition delta;
@@ -71,5 +71,5 @@ void sub_0820F078(struct OrangeSpine *p)
     Sound_PlaySong(0x51e);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820F078);
+INCLUDE_ASM("asm/nonmatching", OrangeSpine_FireProjectile);
 #endif

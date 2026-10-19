@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 88.2%); what differs is mostly register allocation and instruction order
 #define Vanargand_UpdateMode3Transition sub_081A84B0
-#include "global.h"
 struct VanargandTarget {
     u8 pad0[0x418];
     u8 mode;

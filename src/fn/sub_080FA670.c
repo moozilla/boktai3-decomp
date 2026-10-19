@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.3%
 // foundry draft (worker best 89.2%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdatePausePhase sub_080FA670
-#include "global.h"
-#include "scene_actor_control_phase.h"
 void sub_080FA670(struct SceneActorRegistryResetView *actor)
 {
     u8 *control = actor->context;

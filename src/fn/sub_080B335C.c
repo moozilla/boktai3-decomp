@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.6%
 // foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
 #define SceneActor_IsFacingNearbyTarget sub_080B335C
-#include "global.h"
-#include "scene_actor_reset.h"
 static inline u32 TestFlag(u16 *p, u32 mask)
 {
     return *p & mask;

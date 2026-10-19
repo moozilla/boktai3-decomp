@@ -1,3 +1,6 @@
+#include "global.h"
+#include "player.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.2%
@@ -5,9 +8,6 @@
 #define PlayerContact_UpdateThresholdEvent sub_0815EFF8
 #define gRandomTableIndex                  gUnk_03005308
 #define gRandomTable                       gUnk_0203B400
-#include "global.h"
-#include "player.h"
-#include "game_state.h"
 extern u32 gUnk_030053F4, gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);

@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 82.1%
 // foundry draft (worker best 82.1%); what differs is mostly register allocation and instruction order
 #define ActorEffect_SelectFlashingValue sub_0823A028
-#include "global.h"
 struct FlashingActorEffect {
     u8 unknown0[0xad2];
     u16 flashValue, flashTicks;

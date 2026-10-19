@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_timed_behavior.h"
 
 #ifdef NONMATCHING
 // fuzzy: 89.5%
 // foundry draft (worker best 89.5%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_SelectBehaviorByTargetAngle sub_080B6BA8
-#include "global.h"
-#include "scene_actor_timed_behavior.h"
 s32 Math_Atan2(s32, s32);
 u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *,
                                               struct SceneActorTimedBehaviorContext *, s32);

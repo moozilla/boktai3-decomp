@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.6%
 // foundry draft (worker best 93.6%); what differs is mostly register allocation and instruction order
 #define SceneNpc_UpdateBlinkPhase sub_081CF490
-#include "global.h"
 struct SceneNpc {
     u8 unknown0[7];
     u8 phaseComplete, unknown8, phaseEntered;

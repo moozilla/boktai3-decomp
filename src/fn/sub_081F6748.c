@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 99.4%
@@ -5,7 +6,6 @@
 #define SceneActors_FireTrackingProjectileSpread sub_081F6748
 #define Projectile_SpawnAtPosition               sub_081FD01C
 #define gSceneAngleSineTable                     gUnk_086149C4
-#include "global.h"
 typedef struct ProjectilePosition {
     s16 x, y, z, pad;
 } ProjectilePosition;

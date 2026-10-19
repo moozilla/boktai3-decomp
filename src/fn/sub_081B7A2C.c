@@ -1,3 +1,7 @@
+#include "global.h"
+#include "engine.h"
+#include "player.h"
+#include "proximity_emitter.h"
 
 #ifdef NONMATCHING
 // fuzzy: 99.1%
@@ -8,10 +12,6 @@
 #define gTerrainMap                       gUnk_030052F4
 #define gTerrainWidth                     gUnk_030052F8
 #define gTerrainHeight                    gUnk_030052FC
-#include "global.h"
-#include "engine.h"
-#include "player.h"
-#include "proximity_emitter.h"
 
 /* Tentative growth-hazard view, consistent with AnimatedMarker_BeginReveal. */
 struct GrowthHazardCollider {

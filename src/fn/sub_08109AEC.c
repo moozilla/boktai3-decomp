@@ -1,3 +1,6 @@
+#include "global.h"
+#include "sun_clock.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.1%
@@ -5,9 +8,6 @@
 #define ClockPanel_CaptureSnapshot sub_08109AEC
 #define gSunClock                  gUnk_03005430
 #define gGameState                 gUnk_02000710
-#include "global.h"
-#include "sun_clock.h"
-#include "game_state.h"
 struct ClockPanelSnapshot {
     u8 bytes[0x20];
     u16 time;

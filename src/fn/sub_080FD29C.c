@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.0%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 #define ActorGroup_ResetActivePhase sub_080FD29C
-#include "global.h"
-#include "scene_actor_reset.h"
 struct ActorGroupPhaseState {
     u8 unknown0[0xe4c];
     u32 flags;

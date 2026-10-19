@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define Hud_LoadConditionalPaletteRows sub_081680F4
-#include "global.h"
 struct Hud {
     u8 pad0[0xc70];
     u8 paletteEnabled;

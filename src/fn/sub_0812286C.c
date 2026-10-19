@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.3%
@@ -6,7 +7,6 @@
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
 #define SceneBody_Release              SceneBody_Unregister
 #define gAnimatedBodyPool              gUnk_02000140
-#include "global.h"
 
 struct AnimatedBodySlot {
     u8 animation[0x60];

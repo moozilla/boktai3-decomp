@@ -1,3 +1,4 @@
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.8%
@@ -5,7 +6,6 @@
 #define ProjectileEmitter_EmitAttackFrame sub_0821025C
 #define gRandomTable                      gUnk_0203B400
 #define gRandomIndex                      gUnk_03005308
-#include "contact_actor.h"
 struct ProximityProjectileEmitter {
     u8 pad0[0x18];
     s32 frame;

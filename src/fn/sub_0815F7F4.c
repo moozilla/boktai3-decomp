@@ -1,11 +1,11 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.6%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define PlayerOrbitEffect_UpdateParticle sub_0815F7F4
 #define gOrbitSineTable                  gUnk_086149C4
-#include "global.h"
-#include "player.h"
 struct PlayerOrbitParticle {
     u8 unknown0[0x18];
     u16 x, y, z, unknown1E;

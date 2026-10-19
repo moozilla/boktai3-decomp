@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 86.6%); what differs is mostly register allocation and instruction order
 #define TargetMotion_AdvanceFollowSegment sub_080F5B68
-#include "global.h"
 struct TargetMotion {
     u8 unknown0[6], rotation, unknown7[0x15];
     s16 x, y, z;

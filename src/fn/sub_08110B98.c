@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
 #define TileRows_CopyPackedRows sub_08110B98
-#include "global.h"
 void sub_08110B98(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 width, s32 height,
                   const u16 *source)
 {

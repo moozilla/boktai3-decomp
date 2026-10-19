@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 67.3%
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
 #define Selection_GetDisplayFrame sub_0822D604
-#include "global.h"
 s32 sub_0822D604(s32 selection)
 {
     if (selection <= 29)

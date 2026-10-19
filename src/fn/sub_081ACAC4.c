@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.8%
 // foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
 #define Vanargand_WaitForActionRelease sub_081ACAC4
-#include "global.h"
 struct Vanargand {
     u8 pad0[0x9c];
     u32 flags;

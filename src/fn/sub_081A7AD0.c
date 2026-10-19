@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 #define ScenePanel_AdvanceConditionalPairState sub_081A7AD0
-#include "global.h"
 struct ScenePanelPairState {
     u8 unknown0[0xE1];
     u8 threshold : 8;

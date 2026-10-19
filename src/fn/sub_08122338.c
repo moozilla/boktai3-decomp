@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.7%
@@ -5,7 +6,6 @@
 #define SpriteEffect_SpawnTowardObject sub_08122338
 #define gEffectRandomIndex             gUnk_03005308
 #define gEffectRandomTable             gUnk_0203B400
-#include "global.h"
 
 struct EffectMotion {
     s32 x : 16;

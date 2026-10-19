@@ -1,17 +1,17 @@
+#include "global.h"
+#include "scene_hud_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.2%
 // foundry draft (worker best 83.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_RefreshActionIcons sub_0816D98C
+#define SceneHud_RefreshActionIcons SceneHud_RefreshActionIcons
 #define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
 #define SceneHud_SetIconPalette     PauseMenu_SetSpritePalette
-#include "global.h"
-#include "scene_hud_display.h"
 s32 SceneHud_FindCategoryAction(u32, u32);
 u32 sub_0822D604(s32);
 s32 sub_0816D4E4(s32);
 void SceneHud_SetIconPalette(struct SceneInputWidget *, u16);
-void sub_0816D98C(u8 *s)
+void SceneHud_RefreshActionIcons(u8 *s)
 {
     struct SceneHudState *owner = (struct SceneHudState *)s;
     s32 i = 0;
@@ -39,5 +39,5 @@ void sub_0816D98C(u8 *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816D98C);
+INCLUDE_ASM("asm/nonmatching", SceneHud_RefreshActionIcons);
 #endif

@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.8%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
 #define ScreenLayers_HidePair sub_081EC670
 #define gBackgroundVisibility gUnk_03004BD8
-#include "global.h"
 struct ScreenLayerPair {
     u8 unknown0[0x2C0];
     u32 firstFlags;

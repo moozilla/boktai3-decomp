@@ -1,10 +1,10 @@
+#include "global.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.1%
 // foundry draft (worker best 97.1%); what differs is mostly register allocation and instruction order
 #define SingletonSlot7_OnTargetContact sub_081F05D0
-#include "global.h"
-#include "game_state.h"
 struct Slot7Actor {
     u8 pad0[0x5c0];
     u16 duration, flashTimer;

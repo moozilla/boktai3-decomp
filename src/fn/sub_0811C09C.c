@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_object.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.1%
@@ -5,8 +7,6 @@
 #define ActorParticles_EmitOffsetBurst sub_0811C09C
 #define gRandomIndex                   gUnk_03005304
 #define gRandomValues                  gUnk_086141BC
-#include "global.h"
-#include "scene_object.h"
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 u32 ActorParticles_CreateAtOffset(void *, struct SceneExtent *, void *, u32, u32, u32, u32, u32,

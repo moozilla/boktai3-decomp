@@ -1,10 +1,10 @@
+#include "global.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 #define PlayerPanel_RemoveEffects sub_08167734
-#include "global.h"
-#include "engine.h"
 struct PanelParticle {
     u8 unknown[0x40];
 };

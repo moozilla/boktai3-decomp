@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.2%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define MenuDisplay_LoadDecimalDigits sub_08166D04
-#include "global.h"
 struct MenuDigit {
     u8 animation[0x60];
 };

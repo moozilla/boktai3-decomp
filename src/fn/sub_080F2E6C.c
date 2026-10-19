@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
-#define PhaseObject_EndApproachPause sub_080F2E6C
-#include "global.h"
+#define PhaseObject_EndApproachPause PhaseObject_EndApproachPause
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];
@@ -37,7 +37,7 @@ struct PhaseObject {
 };
 void sub_080F3B60(struct PhaseObject *);
 void PhaseObject_ApproachTarget(struct PhaseObject *);
-void sub_080F2E6C(struct PhaseObject *p)
+void PhaseObject_EndApproachPause(struct PhaseObject *p)
 {
     s32 i;
     if (!(p->frame & 3)) {
@@ -67,5 +67,5 @@ void sub_080F2E6C(struct PhaseObject *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F2E6C);
+INCLUDE_ASM("asm/nonmatching", PhaseObject_EndApproachPause);
 #endif

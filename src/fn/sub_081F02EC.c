@@ -1,10 +1,10 @@
+#include "global.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.9%
 // foundry draft (worker best 95.9%); what differs is mostly register allocation and instruction order
-#define SingletonSlot7_BeginScaledCooldown sub_081F02EC
-#include "global.h"
-#include "game_state.h"
+#define SingletonSlot7_BeginScaledCooldown SingletonSlot7_BeginScaledCooldown
 
 struct Slot7Action {
     u8 pad0[0x3e];
@@ -23,7 +23,7 @@ struct Slot7Actor {
 void sub_0821FF8C(void *);
 s32 Div(s32, s32);
 
-void sub_081F02EC(void *event, struct Slot7Action *action, struct Slot7Actor *actor)
+void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action, struct Slot7Actor *actor)
 {
     s16 level;
     s32 duration;
@@ -48,5 +48,5 @@ void sub_081F02EC(void *event, struct Slot7Action *action, struct Slot7Actor *ac
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F02EC);
+INCLUDE_ASM("asm/nonmatching", SingletonSlot7_BeginScaledCooldown);
 #endif

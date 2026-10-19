@@ -1,9 +1,9 @@
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 #define SceneActorPlacement_BeginContactRoute sub_080A4260
-#include "scene_actor_reset.h"
 void *SceneActorContacts_FindObjectById(u16);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
 void sub_080A4798(struct SceneActorRegistryResetView *);

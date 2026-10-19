@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.2%
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
 #define ActorPalette_LoadScriptBanks sub_0818171C
-#include "global.h"
 struct ActorPaletteSource {
     u8 unknown0[0x74];
     u16 banks[3][16];

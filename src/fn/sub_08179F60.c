@@ -1,10 +1,10 @@
+#include "global.h"
+#include "contact_actor.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.8%
 // foundry draft (worker best 82.2%); what differs is mostly register allocation and instruction order
 #define ActorImpact_TestForwardPoint sub_08179F60
-#include "global.h"
-#include "contact_actor.h"
 extern const s16 gUnk_086149C4[];
 u8 sub_0821D4F0(void *, void *, u32, u32);
 struct ImpactProbeActor {

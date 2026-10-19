@@ -1,11 +1,11 @@
+#include "global.h"
+#include "display_animation.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 #define PlayerSlotDisplay_Initialize sub_08138924
 #define gPlayerSlotDisplay           gUnk_020004C0
-#include "global.h"
-#include "display_animation.h"
 struct PlayerSlotDisplaySprite {
     u32 flags;
     u8 unknown4[3], priority;

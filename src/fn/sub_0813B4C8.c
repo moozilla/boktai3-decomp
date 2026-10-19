@@ -1,11 +1,11 @@
+#include "global.h"
+#include "player.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
 #define Player_RecalculateDerivedStats sub_0813B4C8
-#include "global.h"
-#include "player.h"
-#include "game_state.h"
 s32 Div(s32, s32);
 void sub_0813B4C8(struct Player *p)
 {

@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.8%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 #define ActorDisplay_UpdateScreenAnchor sub_081EC6BC
 #define gActorDisplayCamera             gUnk_020004B8
-#include "global.h"
 struct WorldPosition {
     s32 x, y, z;
 };

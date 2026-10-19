@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.1%
 // foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
 #define TargetMotion_UpdateFlashingExit sub_080F6220
-#include "global.h"
 struct TargetMotionVector {
     u32 x : 16;
     s32 y : 16;

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_registry.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
 #define SpriteGroup_InitAnimatedSprites sub_080FB984
-#include "global.h"
-#include "scene_actor_registry.h"
 
 struct AnimatedSpriteAnimation {
     u8 unknown0[6];

@@ -1,10 +1,10 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 80.6%
 // foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
 #define SceneActorReaction_FinishAnimation17 sub_080ED838
-#include "global.h"
-#include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Ivy_UpdateActiveState(void);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)

@@ -1,10 +1,10 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define ScriptPanel_ConfirmSelection sub_08109D94
 #define ScriptPanel_SetSelection     Registry1745_SetMenuRequest
-#include "global.h"
 struct ScriptPanel {
     u8 unk0[0x23];
     u8 selection;

@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.2%
@@ -5,7 +6,6 @@
 #define Serial_CheckMultiplayerReady sub_08223128
 #define gSerialConnectionRole        gUnk_0300531C
 #define gSerialTransferStatus        gUnk_03005324
-#include "global.h"
 extern s32 gUnk_0300531C, gUnk_03005324;
 void sub_08223128(void)
 {

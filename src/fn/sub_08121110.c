@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.6%
@@ -5,7 +6,6 @@
 #define ActorAction_RunActiveCallbacks sub_08121110
 #define ActorAction_ResetFlags         RegistryA8CB_ResetUpdateState
 #define ActorAction_FinishTick         RegistryA8CB_UpdateAnimation
-#include "global.h"
 struct ActorActionEntry {
     void *callback;
     u8 unknown4[0x5c];

@@ -1,3 +1,5 @@
+#include "global.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.1%
@@ -7,8 +9,6 @@
 #define MapMenu_GetMarkerVariant  MapScreen_GetMarkerFlipFlags
 #define MapMenu_GetTileAddress    Hud_GetTilemapCell
 #define gGameState                gUnk_02000710
-#include "global.h"
-#include "game_state.h"
 struct MapMenuMarker {
     u8 type, page, x, y;
 };

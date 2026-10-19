@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.6%
@@ -6,7 +7,6 @@
 #define ScreenTransition_SetPhase     TextSequence_SetState
 #define gScreenBlendControl           gUnk_030051DC
 #define gScreenBlendAmount            gUnk_030051D4
-#include "global.h"
 struct ScreenTransition {
     u8 unknown[0x320];
     u16 state;

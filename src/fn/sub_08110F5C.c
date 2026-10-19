@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 88.5%
 // foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
-#define Background_LoadScriptTileList sub_08110F5C
+#define Background_LoadScriptTileList TilemapPanel_LoadScriptTileList
 struct Background {
     u8 pad0[0x2c];
     u8 *tileListScript;
@@ -16,7 +16,7 @@ s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
 s32 Script_SeekToKeyword(u32);
 void Script_SetPc(u8 *);
-void sub_08110F5C(struct Background *bg)
+void TilemapPanel_LoadScriptTileList(struct Background *bg)
 {
     s32 *values;
     if (Script_SeekToKeyword('g')) {
@@ -51,5 +51,5 @@ void sub_08110F5C(struct Background *bg)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08110F5C);
+INCLUDE_ASM("asm/nonmatching", TilemapPanel_LoadScriptTileList);
 #endif

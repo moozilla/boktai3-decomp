@@ -1,3 +1,5 @@
+#include "global.h"
+#include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
 // fuzzy: 98.4%
@@ -5,8 +7,6 @@
 #define SceneActor_TickRandomReaction sub_080B1170
 #define gRandomIndex                  gUnk_03005308
 #define gRandomTable                  gUnk_0203B400
-#include "global.h"
-#include "scene_actor_reset.h"
 struct SceneActorRandomReaction {
     u8 unknown0[0x690];
     u16 timer, period;

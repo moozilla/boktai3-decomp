@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.6%
@@ -5,7 +6,6 @@
 #define Hresvelgr_UpdateRandomAnimation sub_081A117C
 #define gRandomIndex                    gUnk_03005308
 #define gRandomValues                   gUnk_0203B400
-#include "global.h"
 struct ActorReaction {
     u8 unknown0[0x51];
     u8 heading;

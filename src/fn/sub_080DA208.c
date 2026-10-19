@@ -1,3 +1,6 @@
+#include "global.h"
+#include "scene_actor_reset.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.8%
@@ -5,9 +8,6 @@
 #define SceneActor_StartAdjacentCellRoute sub_080DA208
 #define SceneActor_FindDirectionalCell    sub_080D9B20
 #define gCurrentTerrainMap                gUnk_030052F4
-#include "global.h"
-#include "scene_actor_reset.h"
-#include "engine.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);

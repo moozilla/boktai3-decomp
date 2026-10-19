@@ -1,3 +1,4 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 95.3%
@@ -5,7 +6,6 @@
 #define Vanargand_UpdatePairedAttack sub_081A95A8
 #define PairedSceneActor_IsFinished  PairedSceneActor_AreSelectedHalvesFinished
 #define gPlayer                      gUnk_02000580
-#include "global.h"
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;

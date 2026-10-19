@@ -1,12 +1,12 @@
+#include "global.h"
+#include "scene_actor_reset.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // foundry draft (worker best 92.6%); what differs is mostly register allocation and instruction order
 #define SceneActorTarget_FindNearbyPlayer sub_080EC024
 #define gScenePlayers                     gUnk_02000580
-#include "global.h"
-#include "scene_actor_reset.h"
-#include "player.h"
 static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
                                     const struct ContactPosition *b)
 {

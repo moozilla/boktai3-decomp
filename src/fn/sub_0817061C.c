@@ -1,11 +1,11 @@
+#include "global.h"
+#include "scene_hud_display.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // foundry draft (worker best 90.2%); what differs is mostly register allocation and instruction order
 #define SceneHud_FinishActionSlide sub_0817061C
 #define SceneHud_BlendPosition     PauseMenu_SmoothPoint
-#include "global.h"
-#include "scene_hud_display.h"
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
