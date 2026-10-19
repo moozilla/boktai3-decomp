@@ -1424,3 +1424,4 @@ addr,function,name,family,note
 081A522C,sub_081A522C,Hresvelgr_InitializeFallingActor,"HresvelgrMotion","loads falling actor graphics and initializes collider velocity and shadow"
 081A6148,sub_081A6148,PositionedEffect_InitContactCollider,"PositionedEffect","initializes a contact collider with a vertical offset"
 081A61EC,sub_081A61EC,PositionedEffect_InitAttackCollider,"PositionedEffect","initializes an attack collider using the object's attack ID"
+081A67A0,sub_081A67A0,PositionedEffect_UpdateOscillatingCoordinates,"PositionedEffect coordinates","updates half-scale coordinates with sine-driven vertical motion"
