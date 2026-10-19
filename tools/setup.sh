@@ -24,6 +24,13 @@ else
     # An already-applied patch is fine; an incompatible source tree is not.
     git -C gbadisasm apply --reverse --check "$PATCH"
 fi
+# Indexed label lookups: identical output, a pass takes seconds instead of minutes.
+PATCH="$ROOT/tools/patches/gbadisasm-fast.patch"
+if git -C gbadisasm apply --check "$PATCH" 2>/dev/null; then
+    git -C gbadisasm apply "$PATCH"
+else
+    git -C gbadisasm apply --reverse --check "$PATCH"
+fi
 make -s -C gbadisasm
 
 # agbcc: the GCC 2.95-based compiler used by agbcc-era GBA games (matching decomp)
