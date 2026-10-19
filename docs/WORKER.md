@@ -244,6 +244,21 @@ functions left. Do not run a redundant worker build when the integrator will val
 Report: functions matched (count + list), functions skipped and
 why, and any naming insights.
 
+## Big functions and near misses (October 19)
+
+* Score a large function with `tools/anchordiff.py [RUN_DIR] [-s]` (the RUN_DIR is in
+  check.py's `artifacts:` line). It realigns ROM and candidate at their shared calls, so one
+  inserted instruction no longer makes the rest "differ". `-s` counts only structural
+  differences. Get the structure to 0 first, then the registers.
+* `tools/localsweep.py FILE.c` tries deleting `p = &s->field` pointer locals (late
+  `adds rX, rY, #0` / `mov sb, rY` copies are GCSE/PRE reaching registers, so the original
+  wrote the field at each use). It turned the sub_08125528 draft into a match unattended.
+* A draft whose structure is right but whose registers differ: strip the `#else INCLUDE_ASM` branch
+  and run the permuter for 5 minutes. It matched sub_081CC64C, where hand edits had failed.
+* Write-ups of these, with the compiler-source reasoning behind them (loop.c hoisting
+  thresholds, regmove operand ties, inline-argument order, PRE numbering), are in
+  `notes/cloud-08122DF4.md`.
+
 ## Permuter (for "only registers differ" skips)
 
 `build/venv/bin/python tools/permute.py wip/sub_X.c --debug` checks the base score first.
