@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define VanargandProjectile_Create     sub_081B70A8
 #define gVanargandProjectileProperties gUnk_08612114
 struct ProjectilePosition {
     s16 x, y, z, pad;
@@ -52,8 +51,10 @@ void AnimData_SelectPaletteBank(void *, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
-s32 sub_081B70A8(struct VanargandProjectilePool *pool, struct ProjectilePosition *position,
-                 struct ProjectilePosition *target, u32 direction, u32 speed, u32 type)
+s32 VanargandProjectile_Create(struct VanargandProjectilePool *pool,
+                               struct ProjectilePosition *position,
+                               struct ProjectilePosition *target, u32 direction, u32 speed,
+                               u32 type)
 {
     s32 index;
     struct VanargandProjectile *projectile = VanargandProjectilePool_FindFreeSlot(pool, &index);
@@ -106,5 +107,5 @@ s32 sub_081B70A8(struct VanargandProjectilePool *pool, struct ProjectilePosition
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B70A8);
+INCLUDE_ASM("asm/nonmatching", VanargandProjectile_Create);
 #endif

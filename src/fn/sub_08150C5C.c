@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.6%
 // foundry draft (worker best 95.0%); what differs is mostly register allocation and instruction order
-#define Player_UpdateRecoilAction sub_08150C5C
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -20,7 +19,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_08150C5C(struct Player *p)
+void Player_UpdateRecoilAction(struct Player *p)
 {
     s32 value, angle;
     switch (p->tetherPhase) {
@@ -60,5 +59,5 @@ void sub_08150C5C(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08150C5C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateRecoilAction);
 #endif

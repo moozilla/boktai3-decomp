@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 96.8%
 // foundry draft (worker best 96.8%); what differs is mostly register allocation and instruction order
-#define ProjectileEmitter_EmitAttackFrame sub_0821025C
-#define gRandomTable                      gUnk_0203B400
-#define gRandomIndex                      gUnk_03005308
+#define gRandomTable gUnk_0203B400
+#define gRandomIndex gUnk_03005308
 struct ProximityProjectileEmitter {
     u8 pad0[0x18];
     s32 frame;
@@ -37,7 +36,7 @@ static inline void raisePosition(struct ContactPosition *p)
 {
     p->y += 0x80;
 }
-u32 sub_0821025C(struct ProximityProjectileEmitter *p)
+u32 ProjectileEmitter_EmitAttackFrame(struct ProximityProjectileEmitter *p)
 {
     struct ContactPosition position;
     struct ContactPosition offset;
@@ -65,5 +64,5 @@ u32 sub_0821025C(struct ProximityProjectileEmitter *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821025C);
+INCLUDE_ASM("asm/nonmatching", ProjectileEmitter_EmitAttackFrame);
 #endif

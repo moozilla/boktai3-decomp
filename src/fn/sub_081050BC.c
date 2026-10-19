@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 83.8%
 // foundry draft (worker best 82.7%); what differs is mostly register allocation and instruction order
-#define CallbackPool_SpawnHitParticles sub_081050BC
-#define gShakeRandomTable              gUnk_0203B400
-#define gShakeRandomIndex              gUnk_03005308
+#define gShakeRandomTable gUnk_0203B400
+#define gShakeRandomIndex gUnk_03005308
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
@@ -23,7 +22,7 @@ static inline u16 NextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     return table[gUnk_03005308];
 }
-void sub_081050BC(struct CallbackPoolEntry *entry)
+void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
 {
     u32 stack[3];
     struct SceneExtent spread;
@@ -40,5 +39,5 @@ void sub_081050BC(struct CallbackPoolEntry *entry)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081050BC);
+INCLUDE_ASM("asm/nonmatching", CallbackPool_SpawnHitParticles);
 #endif

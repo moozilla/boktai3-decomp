@@ -3,11 +3,10 @@
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
-#define SceneActorPlacement_BeginContactRoute sub_080A4260
 void *SceneActorContacts_FindObjectById(u16);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
 void sub_080A4798(struct SceneActorRegistryResetView *);
-s32 sub_080A4260(struct SceneActorRegistryResetView *p)
+s32 SceneActorPlacement_BeginContactRoute(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryControlGroup *group;
     void *control;
@@ -100,5 +99,5 @@ done:
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A4260);
+INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_BeginContactRoute);
 #endif

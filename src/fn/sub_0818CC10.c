@@ -26,11 +26,11 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-void sub_0818CC48(void);
+void Armor_BeginPartTravelToPlayer(void);
 void Armor_BeginPartSpinup(struct A *p)
 {
     p->b1dd = 0;
-    p->fn = sub_0818CC48;
+    p->fn = Armor_BeginPartTravelToPlayer;
     p->w13c = p->w1c;
     p->w13e = p->w1e;
     p->w140 = p->w20;

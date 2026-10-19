@@ -17,7 +17,7 @@ struct P {
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
-s32 sub_082315A8(void *, s32, s32, struct Vec *);
+s32 EffectGroup_Spawn(void *, s32, s32, struct Vec *);
 void Sound_PlaySong(s32);
 
 static inline int randomWith(const u16 *table)
@@ -48,7 +48,7 @@ void PlayerCue_ShakeEffect(struct P *p, s32 a)
         v.y = -(randomWith(t) & 31);
         v.z = 0;
     }
-    if (sub_082315A8(&p->b5B8, a, 0xE10, &v) >= 0) {
+    if (EffectGroup_Spawn(&p->b5B8, a, 0xE10, &v) >= 0) {
         if (p->b5B9 == 1)
             Sound_PlaySong(0x191);
         else if (p->b5B9 == 2)

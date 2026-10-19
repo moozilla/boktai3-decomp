@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.1%
 // foundry draft (worker best 83.6%); what differs is mostly register allocation and instruction order
-#define SceneMarker_InitSprites     sub_08162A50
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
 struct SceneMarkerVector {
     u32 x : 16, y : 16, z : 16;
@@ -40,7 +39,7 @@ static inline void SetFrame(struct SceneMarkerSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
-s32 sub_08162A50(struct SceneMarker *p, u32 source)
+s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
 {
     u32 zero;
     struct SceneVec position;
@@ -78,5 +77,5 @@ s32 sub_08162A50(struct SceneMarker *p, u32 source)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08162A50);
+INCLUDE_ASM("asm/nonmatching", SceneMarker_InitSprites);
 #endif

@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 86.8%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
-#define ActorEffect_SpawnRandomizedBurst sub_081EC388
-#define gEffectRandomIndex               gUnk_03005304
-#define gEffectRandomTable               gUnk_086141BC
+#define gEffectRandomIndex gUnk_03005304
+#define gEffectRandomTable gUnk_086141BC
 struct BurstActor {
     u8 pad0[0x268];
     s32 height;
@@ -23,7 +22,7 @@ struct EffectVector {
 };
 void sub_08113398(struct EffectVector *, struct EffectVector *, u32, u32, u32, u32, u32, u32, u32,
                   u32, u32, u32, u32, u32);
-void sub_081EC388(struct BurstActor *actor, u32 variant)
+void ActorEffect_SpawnRandomizedBurst(struct BurstActor *actor, u32 variant)
 {
     struct EffectVector position;
     struct EffectVector velocity;
@@ -46,5 +45,5 @@ void sub_081EC388(struct BurstActor *actor, u32 variant)
                      512, 1, 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EC388);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_SpawnRandomizedBurst);
 #endif

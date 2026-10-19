@@ -1,9 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#define Golem_ResumeSavedTarget sub_080C7C1C
-
-/* Sibling of Bat_ResumeSavedTarget (sub_08086E2C): after 60 frames it either resumes group
+/* Sibling of Bat_ResumeSavedTarget (Bat_ResumeSavedTarget): after 60 frames it either resumes group
  * +0x48 (kind 0x1A, flag 0x80 set) or goes idle (kind 0x10) and routes to group +0x58;
  * before that it rewinds a mode-2 animation. */
 

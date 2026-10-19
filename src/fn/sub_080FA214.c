@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // foundry draft (worker best 84.4%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_ApplyDampedMotion sub_080FA214
 s32 Mod(s32, s32);
 struct DampedMotionState {
     u8 unknown0[0xF14];
@@ -12,7 +11,7 @@ struct DampedMotionState {
     u8 unknownF16[2];
     s16 z;
 };
-void sub_080FA214(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *actor)
 {
     struct DampedMotionState *state = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
@@ -40,5 +39,5 @@ void sub_080FA214(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FA214);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_ApplyDampedMotion);
 #endif

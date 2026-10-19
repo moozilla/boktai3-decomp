@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 95.3%
 // foundry draft (worker best 95.3%); what differs is mostly register allocation and instruction order
-#define Vanargand_UpdatePairedAttack sub_081A95A8
-#define PairedSceneActor_IsFinished  PairedSceneActor_AreSelectedHalvesFinished
-#define gPlayer                      gUnk_02000580
+#define PairedSceneActor_IsFinished PairedSceneActor_AreSelectedHalvesFinished
+#define gPlayer                     gUnk_02000580
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;
@@ -31,7 +30,7 @@ s32 ScenePair_CountPositiveCounters(void *);
 void Sound_PlaySong(u32);
 void Vanargand_SetPendingCue(void *, u16);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-void sub_081A95A8(struct Vanargand *p)
+void Vanargand_UpdatePairedAttack(struct Vanargand *p)
 {
     u8 result;
     u32 phase;
@@ -92,5 +91,5 @@ void sub_081A95A8(struct Vanargand *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A95A8);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePairedAttack);
 #endif

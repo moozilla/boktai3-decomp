@@ -5,7 +5,7 @@ struct S {
     u8 p8[0x30 - 8];
     s16 h30, h32, h34;
 };
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
@@ -20,7 +20,7 @@ void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
     s->b = zero;
     p = s->p8;
     a += 0x100;
-    sub_08217DE0(p, *(void **)a, 0x13);
+    ParticleSprite_Initialize(p, *(void **)a, 0x13);
     Effect_SetOrigin(p, -4, -4);
     SpriteDrawable_SelectTileFrame(p, *(void **)a, 0x33);
     ((u8 *)s)[0x17] = one;

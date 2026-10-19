@@ -16,7 +16,7 @@ struct SpriteParticles {
     struct SpriteParticle entries[16];
     u16 timer;
 };
-void sub_0816385C(struct SpriteParticles *, struct SpriteParticle *);
+void SpiralParticles_UpdateParticle(struct SpriteParticles *, struct SpriteParticle *);
 void ParticlePool_UpdateLinearParticle(struct SpriteParticles *, struct SpriteParticle *);
 void SpriteParticles_UpdateEntries(struct SpriteParticles *p)
 {
@@ -29,7 +29,7 @@ void SpriteParticles_UpdateEntries(struct SpriteParticles *p)
                 entry->flags |= 1;
                 control->active = 0;
             } else if (control->variant == 0) {
-                sub_0816385C(p, entry);
+                SpiralParticles_UpdateParticle(p, entry);
             } else {
                 ParticlePool_UpdateLinearParticle(p, entry);
             }

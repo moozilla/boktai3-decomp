@@ -2,8 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.8%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
-#define LinkPanel_UpdateAnimations        sub_0810C238
-#define LinkPanel_SelectActiveAnimation   sub_0810C184
 #define LinkPanel_SelectReadyAnimation    RegistryF246_ShowSlotReadyFrame
 #define LinkPanel_SelectInactiveAnimation RegistryF246_ShowSlotDefaultFrame
 #define gLinkPanelState                   gUnk_020004B4
@@ -29,7 +27,7 @@ struct LinkPanel {
     struct LinkPanelEntry entries[2];
 };
 extern struct LinkPanelPeer *gUnk_020004B4;
-void sub_0810C184(struct LinkPanel *, s32);
+void LinkPanel_SelectActiveAnimation(struct LinkPanel *, s32);
 void RegistryF246_ShowSlotReadyFrame(struct LinkPanel *, s32);
 void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
@@ -42,7 +40,7 @@ static inline u8 valid(s32 i)
         return 0;
     return 1;
 }
-void sub_0810C238(struct LinkPanel *p)
+void LinkPanel_UpdateAnimations(struct LinkPanel *p)
 {
     s32 i = 0;
 
@@ -56,7 +54,7 @@ void sub_0810C238(struct LinkPanel *p)
         if (peer && peer->active == 1 && valid(i) && (u8 *)peer + (0x120 + i * 0x40)) {
             if (entry->timer > 30) {
                 if (entry->state > 1)
-                    sub_0810C184(p, i);
+                    LinkPanel_SelectActiveAnimation(p, i);
                 else if (entry->state == 1)
                     RegistryF246_ShowSlotReadyFrame(p, i);
                 else
@@ -85,5 +83,5 @@ void sub_0810C238(struct LinkPanel *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810C238);
+INCLUDE_ASM("asm/nonmatching", LinkPanel_UpdateAnimations);
 #endif

@@ -12,7 +12,7 @@ struct Armor {
 extern u8 *gUnk_02000710;
 s32 Math_Atan2(s32, s32);
 u32 ActorController_StartAlternateTurn(struct Armor *, u32);
-s32 sub_08184FE8(struct Armor *, s32);
+s32 DirectionalActor_TryBeginState(struct Armor *, s32);
 void Armor_UpdateFacingAction(struct Armor *p, s32 alternate)
 {
     switch (p->state) {
@@ -30,10 +30,10 @@ void Armor_UpdateFacingAction(struct Armor *p, s32 alternate)
         }
         case 1:
             if (alternate) {
-                if (sub_08184FE8(p, 0x20))
+                if (DirectionalActor_TryBeginState(p, 0x20))
                     p->state = 2;
             } else {
-                if (sub_08184FE8(p, 0x19))
+                if (DirectionalActor_TryBeginState(p, 0x19))
                     p->state = 2;
             }
             break;

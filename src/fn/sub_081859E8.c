@@ -5,11 +5,11 @@ struct E {
     u8 f1[7];
     u8 b;
 };
-s32 sub_08184FE8(struct E *, s32);
+s32 DirectionalActor_TryBeginState(struct E *, s32);
 void Armor_StartAction14(struct E *p)
 {
     if (p->a == 0) {
-        if (sub_08184FE8(p, 0xe) != 0)
+        if (DirectionalActor_TryBeginState(p, 0xe) != 0)
             p->a = 0xff;
     }
 }

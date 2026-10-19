@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.2%
 // foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
-#define SceneActorPhase_UpdateCooldown sub_080B09F8
 void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *);
 void sub_080B2858(struct SceneActorRegistryResetView *, u32);
 static inline u8 PhaseComplete(struct SceneActorRegistryResetView *p)
@@ -17,7 +16,7 @@ static inline u16 PrepareFlags(struct SceneActorRegistryResetView *p)
     *flags = mask | *flags;
     return 0;
 }
-void sub_080B09F8(struct SceneActorRegistryResetView *p)
+void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorAnimationLink *link = p->context;
     if (SceneActorControl_TakeFlag(&p->field2B1)) {
@@ -54,5 +53,5 @@ void sub_080B09F8(struct SceneActorRegistryResetView *p)
         ++p->counter2AC;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B09F8);
+INCLUDE_ASM("asm/nonmatching", SceneActorPhase_UpdateCooldown);
 #endif

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020005F4;
-void sub_081FF948(u8 *, u8 *, s32);
+void HomingProjectile_InitializeSlot(u8 *, u8 *, s32);
 u32 HomingProjectile_InitManager(u8 *a)
 {
     u8 *e;
@@ -12,7 +12,7 @@ u32 HomingProjectile_InitManager(u8 *a)
     e = a + 0x1c;
     i = 0;
     do {
-        sub_081FF948(a, e, i);
+        HomingProjectile_InitializeSlot(a, e, i);
         i++;
         e += 0x160;
     } while (i <= 2);

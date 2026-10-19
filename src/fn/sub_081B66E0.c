@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.0%
 // foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
-#define VanargandEffect_Initialize sub_081B66E0
 
 /* Tentative Vanargand family; the two vectors are copied as eight-byte records. */
 
@@ -37,9 +36,9 @@ void Sprite_Init(void *, void *, u32);
 void MotionTrack_Initialize(struct MotionTrack *, const void *, const struct MotionTrackVector *,
                             const struct MotionTrackVector *, u32);
 
-s32 sub_081B66E0(struct VanargandEffect *effect, s32 variant, s32 delay,
-                 const struct MotionTrackVector *position, const struct MotionTrackVector *target,
-                 u32 alternate)
+s32 VanargandEffect_Initialize(struct VanargandEffect *effect, s32 variant, s32 delay,
+                               const struct MotionTrackVector *position,
+                               const struct MotionTrackVector *target, u32 alternate)
 {
     u32 palette;
     AnimData_Load(effect->animation, 0x89CB);
@@ -76,5 +75,5 @@ s32 sub_081B66E0(struct VanargandEffect *effect, s32 variant, s32 delay,
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B66E0);
+INCLUDE_ASM("asm/nonmatching", VanargandEffect_Initialize);
 #endif

@@ -21,7 +21,7 @@ struct Obj {
     u8 byte1DD;
 };
 s32 Div(s32, s32);
-void sub_080F5B68(struct Obj *);
+void TargetMotion_AdvanceFollowSegment(struct Obj *);
 void Sword_UpdateSpinningLunge(struct Obj *p)
 {
     p->rotation += p->byte1DD;
@@ -30,7 +30,7 @@ void Sword_UpdateSpinningLunge(struct Obj *p)
     p->z = p->startZ + Div(p->dz * p->timer, 100);
     p->timer++;
     if (p->timer > 100) {
-        p->callback = sub_080F5B68;
+        p->callback = TargetMotion_AdvanceFollowSegment;
         p->timer = 0;
         p->a = p->target[0] - p->fx - p->startX;
         p->b = p->target[1] - p->fy - p->startY;

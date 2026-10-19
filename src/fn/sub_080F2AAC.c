@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-#define PhaseObject_TickEntryReset sub_080F2AAC
-#define PhaseObject_ResetMotion    Ivy_InitBobbing
+#define PhaseObject_ResetMotion Ivy_InitBobbing
 struct PhaseEntry {
     u32 flags;
     u8 pad4[2];
@@ -34,7 +33,7 @@ struct PhaseObject {
 void Ivy_InitBobbing(struct PhaseObject *);
 void ChildGroup_UpdateTimedOscillation(struct PhaseObject *);
 void Ivy_WaitForPrimaryActionCompletion(struct PhaseObject *);
-void sub_080F2AAC(struct PhaseObject *p)
+void PhaseObject_TickEntryReset(struct PhaseObject *p)
 {
     s32 i;
     if (!(p->frame & 7)) {
@@ -64,5 +63,5 @@ void sub_080F2AAC(struct PhaseObject *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F2AAC);
+INCLUDE_ASM("asm/nonmatching", PhaseObject_TickEntryReset);
 #endif

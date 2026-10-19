@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 /* Spread-shot projectile step: advance, collide, spawn impact notices */
-#define SpreadShot_Step sub_08125528
 // Projectile step: terrain cell/height of the advanced position, collision via sub_08123194,
 // random spread by heading, then notices. Fields are written as s->field throughout: the ROM's
 // late `adds rX, rT, #0` / `mov sb, rT` copies are GCSE/PRE reaching registers, not locals.

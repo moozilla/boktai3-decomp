@@ -2,10 +2,9 @@
 #ifdef NONMATCHING
 // fuzzy: 88.5%
 // foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
-#define ActorEffect_OrientFromPositions sub_0812A558
-#define ActorEffect_SetDirection        LinkedEffect_SetVariant
-#define gRandomIndex                    gUnk_03005308
-#define gRandomTable                    gUnk_0203B400
+#define ActorEffect_SetDirection LinkedEffect_SetVariant
+#define gRandomIndex             gUnk_03005308
+#define gRandomTable             gUnk_0203B400
 struct EffectVector {
     s16 x, y, z;
 };
@@ -52,8 +51,8 @@ static inline u32 randomAngle(u32 *current)
     *current = index;
     return (u8)gUnk_0203B400[index];
 }
-void sub_0812A558(struct ActorEffectPosition *a, struct ActorEffectPosition *b,
-                  struct ActorEffect *effect)
+void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct ActorEffectPosition *b,
+                                     struct ActorEffect *effect)
 {
     struct EffectVector delta;
     s32 angle;
@@ -73,5 +72,5 @@ void sub_0812A558(struct ActorEffectPosition *a, struct ActorEffectPosition *b,
     effect->active = 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812A558);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_OrientFromPositions);
 #endif

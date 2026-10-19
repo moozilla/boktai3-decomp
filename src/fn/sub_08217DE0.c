@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.9%
 // foundry draft (worker best 90.9%); what differs is mostly register allocation and instruction order
-#define ParticleSprite_Initialize  sub_08217DE0
 #define ParticleSprite_SetOffset   Effect_SetOrigin
 #define ParticleSprite_SetResource SpriteDrawable_SelectTileFrame
 #define ResourceSlots_Load         Palette_CacheReservedObjectBank
@@ -17,7 +16,7 @@ static inline u8 selectQueue(u32 flags)
 {
     return (flags & 0x80) != 0;
 }
-void sub_08217DE0(struct LevelAdvanceParticle *sprite, void *resource, u32 flags)
+void ParticleSprite_Initialize(struct LevelAdvanceParticle *sprite, void *resource, u32 flags)
 {
     u32 zero = sprite->queued;
     if (!zero) {
@@ -41,5 +40,5 @@ void sub_08217DE0(struct LevelAdvanceParticle *sprite, void *resource, u32 flags
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08217DE0);
+INCLUDE_ASM("asm/nonmatching", ParticleSprite_Initialize);
 #endif

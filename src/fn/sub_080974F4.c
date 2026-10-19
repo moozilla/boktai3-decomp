@@ -5,8 +5,7 @@
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
-#define SceneActor_EasePlayerHeight sub_080974F4
-#define gSceneActorSineTable        gUnk_086149C4
+#define gSceneActorSineTable gUnk_086149C4
 extern u16 gUnk_02000534, gUnk_02000500;
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
@@ -24,7 +23,7 @@ static inline s32 ScaleWave(s32 wave)
         return wave >> 12;
     return -(-wave >> 12);
 }
-void sub_080974F4(struct SceneActorRegistryResetView *actor)
+void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
 {
     struct ActorHeightOscillation *state = actor->context;
     u32 active = gUnk_02000534;
@@ -50,5 +49,5 @@ void sub_080974F4(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080974F4);
+INCLUDE_ASM("asm/nonmatching", SceneActor_EasePlayerHeight);
 #endif

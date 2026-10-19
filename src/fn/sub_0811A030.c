@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.3%
 // foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
-#define MotionActor_DispatchRequestedState sub_0811A030
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -59,7 +58,7 @@ static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u3
     p->callback = callback;
     p->scriptTimer = zero;
 }
-void sub_0811A030(struct MotionActor *actor)
+void MotionActor_DispatchRequestedState(struct MotionActor *actor)
 {
     struct MotionActorState *state;
     state = &actor->state;
@@ -97,5 +96,5 @@ void sub_0811A030(struct MotionActor *actor)
         ActorStats_ApplyPendingIncrement(state);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811A030);
+INCLUDE_ASM("asm/nonmatching", MotionActor_DispatchRequestedState);
 #endif

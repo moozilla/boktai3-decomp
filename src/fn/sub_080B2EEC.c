@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 89.2%
 // foundry draft (worker best 89.2%); what differs is mostly register allocation and instruction order
-#define gRandomTableIndex        gUnk_03005308
-#define gRandomTable             gUnk_0203B400
-#define SceneActor_TrySoloAction sub_080B2EEC
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 extern u32 gUnk_03005308;
 
 s32 SceneActorRegistry_CountLiving(void);
@@ -45,7 +44,7 @@ static inline void Clear(u32 *p, u32 mask)
 {
     *p &= ~mask;
 }
-void sub_080B2EEC(struct SceneActorRegistryResetView *p)
+void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryResetView *q = p;
     u8 zero;
@@ -96,5 +95,5 @@ void sub_080B2EEC(struct SceneActorRegistryResetView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2EEC);
+INCLUDE_ASM("asm/nonmatching", SceneActor_TrySoloAction);
 #endif

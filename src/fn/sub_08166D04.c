@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.2%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
-#define MenuDisplay_LoadDecimalDigits sub_08166D04
 struct MenuDigit {
     u8 animation[0x60];
 };
@@ -14,7 +13,8 @@ struct MenuDisplay {
 };
 s32 Div(s32, s32);
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
-void sub_08166D04(struct MenuDisplay *p, s32 value, s32 divisor, s32 frameBase, s32 first)
+void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *p, s32 value, s32 divisor, s32 frameBase,
+                                   s32 first)
 {
     struct MenuDigit *digit;
     if (value > 999)
@@ -28,5 +28,5 @@ void sub_08166D04(struct MenuDisplay *p, s32 value, s32 divisor, s32 frameBase, 
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08166D04);
+INCLUDE_ASM("asm/nonmatching", MenuDisplay_LoadDecimalDigits);
 #endif

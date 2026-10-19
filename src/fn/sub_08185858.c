@@ -14,7 +14,7 @@ struct ArmorScriptArgs {
     s32 *values;
 };
 s32 Armor_TryStartAction(struct Armor *, s32);
-s32 sub_08184FE8(struct Armor *, s32);
+s32 DirectionalActor_TryBeginState(struct Armor *, s32);
 void Script_Call(u32, struct ArmorScriptArgs *);
 void Armor_UpdateScriptedAttack(struct Armor *p)
 {
@@ -29,7 +29,7 @@ void Armor_UpdateScriptedAttack(struct Armor *p)
             }
             break;
         case 1:
-            if (sub_08184FE8(p, 12)) {
+            if (DirectionalActor_TryBeginState(p, 12)) {
                 u32 script;
                 p->state = 2;
                 p->timer = 0;

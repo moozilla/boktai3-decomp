@@ -4,9 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 88.5%
 // foundry draft (worker best 87.1%); what differs is mostly register allocation and instruction order
-#define PlayerOrbitEffect_UpdateParticles sub_0815FA78
-#define PlayerOrbitEffect_UpdateParticle  sub_0815F7F4
-#define PlayerOrbitEffect_MoveParticle    PlayerBurst_UpdateParticle
+#define PlayerOrbitEffect_MoveParticle PlayerBurst_UpdateParticle
 struct PlayerOrbitParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -22,9 +20,9 @@ struct PlayerOrbitEffect {
     struct PlayerOrbitParticle particles[16];
     u16 frame;
 };
-void sub_0815F7F4(struct PlayerOrbitEffect *, struct PlayerOrbitParticle *);
+void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *, struct PlayerOrbitParticle *);
 void PlayerBurst_UpdateParticle(struct PlayerOrbitEffect *, struct PlayerOrbitParticle *);
-void sub_0815FA78(struct PlayerOrbitEffect *effect)
+void PlayerOrbitEffect_UpdateParticles(struct PlayerOrbitEffect *effect)
 {
     s32 remaining, i;
     struct PlayerOrbitParticle *p = effect->particles;
@@ -37,7 +35,7 @@ void sub_0815FA78(struct PlayerOrbitEffect *effect)
                 effect->particles[i].flags |= 1;
                 active[0] = 0;
             } else if (active[7] == 0)
-                sub_0815F7F4(effect, p);
+                PlayerOrbitEffect_UpdateParticle(effect, p);
             else
                 PlayerBurst_UpdateParticle(effect, p);
         }
@@ -48,5 +46,5 @@ void sub_0815FA78(struct PlayerOrbitEffect *effect)
     effect->frame++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815FA78);
+INCLUDE_ASM("asm/nonmatching", PlayerOrbitEffect_UpdateParticles);
 #endif

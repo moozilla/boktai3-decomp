@@ -1,6 +1,6 @@
 #include "global.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
-void sub_080BA688(void);
+void SceneActorReaction_TickForwardBurst(void);
 static inline u8 tk(u8 *a)
 {
     if (*a) {
@@ -31,7 +31,7 @@ void Skeleton_UpdateAttackWindup(struct S *p)
     if (tk(&p->b2b2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0x13);
     if (p->b2b3) {
-        void (*f)(void) = sub_080BA688;
+        void (*f)(void) = SceneActorReaction_TickForwardBurst;
         u32 k = 0x28;
         u32 z;
         u8 *a = &p->b2b2;

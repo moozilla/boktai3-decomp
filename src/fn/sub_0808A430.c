@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_RestartOrAdvance sub_0808A430
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void SceneActorControl_RestartOrAdvance(struct SceneActorRegistryResetView *input)
 {
@@ -65,5 +64,5 @@ fieldCheck:
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808A430);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_RestartOrAdvance);
 #endif

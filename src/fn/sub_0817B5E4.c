@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 82.6%
 // foundry draft (worker best 82.6%); what differs is mostly register allocation and instruction order
-#define ActorEffect_StepTurn sub_0817B5E4
 struct TurningEffectActor {
     u8 unknown0[0x51];
     u8 direction;
@@ -21,7 +20,8 @@ static inline void update_facing(struct TurningEffectActor *actor)
     mask &= direction;
     actor->facing8 = mask;
 }
-s32 sub_0817B5E4(struct TurningEffectActor *actor, s32 frame, s32 start, s32 period, s32 mode)
+s32 ActorEffect_StepTurn(struct TurningEffectActor *actor, s32 frame, s32 start, s32 period,
+                         s32 mode)
 {
     s32 elapsed = frame - start;
     s32 step = elapsed / period;
@@ -71,5 +71,5 @@ animate: {
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817B5E4);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_StepTurn);
 #endif

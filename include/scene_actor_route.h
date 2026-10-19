@@ -17,7 +17,8 @@ struct SceneActorRouteCursor {
     struct SceneActorRoutePoint *point;
 };
 u32 Route_AdvancePoint(void *);
-u32 sub_0821E8C8(struct SceneActorRouteCursor *, const struct ContactPosition *, u32, u32);
+u32 SceneActorRoute_IsOutsidePointBounds(struct SceneActorRouteCursor *,
+                                         const struct ContactPosition *, u32, u32);
 /* Tentative destination object referenced by the actor's word at 0xDC. */
 struct SceneActorRouteDestination {
     u8 unknown0[0xC];

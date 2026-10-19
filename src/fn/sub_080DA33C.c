@@ -3,10 +3,9 @@
 #ifdef NONMATCHING
 // fuzzy: 98.1%
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
-#define BouncingObject_RefreshNearbyHeading sub_080DA33C
 
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *);
-void sub_080DA208(struct SceneActorRegistryResetView *);
+void SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *);
 
 s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *actor)
 {
@@ -28,9 +27,9 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *acto
         u16 mask = 0x400;
         *(u16 *)(control + 0x6F2) |= mask;
     }
-    sub_080DA208(actor);
+    SceneActor_StartAdjacentCellRoute(actor);
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DA33C);
+INCLUDE_ASM("asm/nonmatching", BouncingObject_RefreshNearbyHeading);
 #endif

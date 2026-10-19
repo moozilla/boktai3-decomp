@@ -1,11 +1,8 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.9%
-// foundry draft (worker best 93.4%); what differs is mostly register allocation and instruction order
-#define Armor_UpdateRunWithMotion sub_08182918
-#define gArmorAnimTable2          gUnk_0824EBA4
-#define gSineTable                gUnk_086149C4
+/* tentative: directional run motion along facing with edge nudge */
+
+/* tentative: picks a directional animation and moves along the facing with a nudge near the cell edge */
 
 struct ActorAnimationFlags {
     u16 unk0, unk2, unk4;
@@ -20,12 +17,10 @@ struct ActorMotionFlags {
 struct ActorMotionVector {
     s16 x, y, z;
 };
-
-extern u32 gArmorAnimTable2[];
-extern s16 gSineTable[];
-
+extern u32 gUnk_0824EBA4[];
+extern s16 gUnk_086149C4[];
 void Armor_SetAnimationFromStart(u32, u32);
-void Sound_PlaySongChecked(u32 song);
+void Sound_PlaySongChecked(u32);
 
 static inline s32 RoundMotion(s32 x)
 {
@@ -34,65 +29,66 @@ static inline s32 RoundMotion(s32 x)
     return -((-x) >> 12);
 }
 
-void sub_08182918(u8 *p, u32 speed, u32 initial)
+void Armor_UpdateRunMotion(u8 *p, s32 speed, u32 timer)
 {
-    if (p[0xB40] == 0) {
+    u8 *s = p + 0xB40;
+    s16 zero;
+    struct ActorMotionVector *v;
+
+    if (*s == 0) {
         u32 four = 4;
-        Armor_SetAnimationFromStart((u32)p, (u32)&gArmorAnimTable2[((p[0xB39] + 0x60) >> 6) & 3]);
-        p[0xB40]++;
+        Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EBA4[((p[0xB39] + 0x60) >> 6) & 3]);
+        (*s)++;
         p[0xB41] = 1;
-        *(u16 *)(p + 0xC4) = initial;
+        *(u16 *)(p + 0xC4) = timer;
         ((struct ActorAnimationFlags *)(p + 0x238))->flags &= ~four;
         ((struct ActorAnimationFlags *)(p + 0x1E4))->flags &= ~four;
         ((struct ActorAnimationFlags *)(p + 0x28C))->flags &= ~four;
         ((struct ActorAnimationFlags *)(p + 0x190))->flags =
             four | ((struct ActorAnimationFlags *)(p + 0x190))->flags;
         {
-            struct ActorMotionFlags *motion = (void *)(p + 0x180);
-            u32 one = 1;
-            motion->flags &= ~one;
+            struct ActorMotionFlags *m = (void *)(p + 0x180);
+            u32 one = ~1;
+            m->flags &= one;
         }
         ((struct ActorStateFlags *)(p + 0xB32))->flags |= 0x20;
     }
-
     {
-        u8 *s = p + 0xB39;
-        struct ActorMotionVector *v = (void *)(p + 0x50);
-        u8 angle = *s;
-        struct ActorMotionVector *vx = v;
-        v->x = RoundMotion(gSineTable[(angle + 64) & 255] * speed);
-        v->y = 0;
-        v->z = RoundMotion(gSineTable[angle] * speed);
-
-        if (vx->x == 0) {
-            s32 diff = 0x80 - p[0x48];
-            if (diff > 0x10)
-                vx->x = 3;
-            else if (diff < -0x10)
-                vx->x = -3;
-        } else {
-            s16 *z = (s16 *)(p + 0x54);
-            if (*z == 0) {
-                s32 diff = 0x80 - p[0x4C];
-                if (diff > 0x10)
-                    *z = 3;
-                else if (diff < -0x10)
-                    *z = -3;
-            }
+        u8 *ap = p + 0xB39;
+        struct ActorMotionVector *w = v = (void *)(p + 0x50);
+        u8 a = *ap;
+        s32 t;
+        w->x = RoundMotion(gUnk_086149C4[(a + 64) & 255] * speed);
+        w->y = 0;
+        t = RoundMotion(gUnk_086149C4[a] * speed);
+        zero = 0;
+        w->z = t;
+    }
+    if (*(s16 *)(p + 0x50) == 0) {
+        s32 d = 0x80 - p[0x48];
+        if (d > 16)
+            *(s16 *)(p + 0x50) = 3;
+        else if (d < -16) {
+            u32 n = 0xFFFD;
+            *(u16 *)(p + 0x50) = n;
+        }
+    } else if (*(s16 *)(p + 0x54) == 0) {
+        s32 d = 0x80 - p[0x4C];
+        if (d > 16)
+            *(s16 *)(p + 0x54) = 3;
+        else if (d < -16) {
+            u32 n = 0xFFFD;
+            *(u16 *)(p + 0x54) = n;
         }
     }
-
     switch (*(u16 *)(p + 0xC8)) {
         case 2:
-            if (*(u16 *)(p + 0xC0) == 0)
+            if (*(u16 *)(p + 0xC0) == zero)
                 Sound_PlaySongChecked(0xC2);
             break;
         case 5:
-            if (*(u16 *)(p + 0xC0) == 0)
+            if (*(u16 *)(p + 0xC0) == zero)
                 Sound_PlaySongChecked(0xC3);
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08182918);
-#endif

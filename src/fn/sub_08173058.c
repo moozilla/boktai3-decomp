@@ -4,7 +4,7 @@ void PauseMenu_SmoothPoint(void *, void *, s32);
 void PauseMenu_InterpolateActivePairPositions(void *, s32);
 void sub_0822EB14(u32, u32);
 void sub_0822E764(u32, u32);
-void sub_08172638(void *);
+void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 void SceneHud_UpdateActionChoice(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
@@ -32,7 +32,7 @@ void SceneHud_FinishActionTransfer(struct SceneHudState *p)
             sub_0822EB14(p->actionSelection, p->actionCursor);
         else
             sub_0822E764(p->actionSelection - 8, p->actionCursor - 8);
-        sub_08172638(p);
+        PauseMenu_RefreshFruitAndUnlockIcons(p);
         p->categoryWidgets[6].flags |= 1;
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
         MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);

@@ -3,7 +3,7 @@
 #include "scene_panel_subject.h"
 
 void EffectGroup_Reset(void *);
-void sub_082314C4(void *);
+void EffectGroup_FadeFirstActive(void *);
 u32 SceneActorEffects_DestroyGroup(void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *);

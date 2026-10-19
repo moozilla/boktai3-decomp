@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 82.8%
 // foundry draft (worker best 82.8%); what differs is mostly register allocation and instruction order
-#define ActorAction_TrySpawn sub_0811F7EC
 struct ActionOwner {
     u8 unknown0[0x18];
     u8 actionState[0x10];
@@ -35,7 +34,7 @@ struct SpawnParameters {
     s32 a, b;
 };
 s8 SpritePairPool_StartEntry(void *, void *, s32, void *, s32, struct SpawnParameters);
-s32 sub_0811F7EC(struct ActorAction *action)
+s32 ActorAction_TrySpawn(struct ActorAction *action)
 {
     struct ActionOwner *owner;
     void *state;
@@ -60,5 +59,5 @@ s32 sub_0811F7EC(struct ActorAction *action)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811F7EC);
+INCLUDE_ASM("asm/nonmatching", ActorAction_TrySpawn);
 #endif

@@ -30,7 +30,7 @@ void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, 
             }
             random = table[*index];
             offset.y = (s32)(0u - (u32)Mod(random >> 3, spanY) - 6u);
-            sub_082315A8((u8 *)owner + 0x47C, kind, value, &offset);
+            EffectGroup_Spawn((u8 *)owner + 0x47C, kind, value, &offset);
         } while (--left != 0);
     }
 }

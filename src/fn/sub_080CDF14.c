@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
-#define Golem_ChargeOrApproach sub_080CDF14
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void sub_080C6F58(void);

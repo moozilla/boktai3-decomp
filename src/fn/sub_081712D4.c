@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 void sub_08170D78(void *);
-void sub_081716B4(void);
+void SceneHud_UpdateStatComparison(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
 void Hud_SetGridPosition(void *, int, int);
@@ -26,7 +26,7 @@ void SceneHud_OpenStatComparison(struct SceneHudState *p, s32 reset)
         *end-- = zero;
     } while ((s32)end >= (s32)differences);
     sub_08170D78(p);
-    Hud_SetInteractionCallback(p, sub_081716B4, 1);
+    Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
     input = p->actionInput;
     sub_0816CDB8(input, 1, 0);
     if (reset)

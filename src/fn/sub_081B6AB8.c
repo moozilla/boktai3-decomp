@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 97.0%
 // foundry draft (worker best 97.0%); what differs is mostly register allocation and instruction order
-#define ActorEffect_UpdateRadialTrail sub_081B6AB8
-#define gEffectSineTable              gUnk_086149C4
+#define gEffectSineTable gUnk_086149C4
 struct EffectPosition {
     s16 x, y, z, unused;
 };
@@ -43,7 +42,7 @@ static inline void AddOffset(struct EffectPosition *p, struct EffectPosition *v)
     p->y += v->y;
     p->z += v->z;
 }
-void sub_081B6AB8(struct ActorEffect *effect)
+void ActorEffect_UpdateRadialTrail(struct ActorEffect *effect)
 {
     s32 index = effect->trailIndex - 1;
     s32 i;
@@ -71,5 +70,5 @@ void sub_081B6AB8(struct ActorEffect *effect)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B6AB8);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateRadialTrail);
 #endif

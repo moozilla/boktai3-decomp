@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.3%
 // foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
-#define SceneHud_FinishStatBRefill sub_0816F5B0
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
@@ -20,7 +19,7 @@ static inline s32 MaskFrame(s32 mask, u16 frame)
 {
     return mask & frame;
 }
-void sub_0816F5B0(struct SceneHudState *s)
+void SceneHud_FinishStatBRefill(struct SceneHudState *s)
 {
     u16 frame;
     u8 *input;
@@ -46,5 +45,5 @@ void sub_0816F5B0(struct SceneHudState *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816F5B0);
+INCLUDE_ASM("asm/nonmatching", SceneHud_FinishStatBRefill);
 #endif

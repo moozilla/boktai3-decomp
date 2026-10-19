@@ -15,7 +15,7 @@ struct InventoryGrid {
     u8 unknown0A50[0x4CE0 - 0xA50];
     struct InventoryNumberDigit attachments[4];
 };
-s32 sub_08165D10(void *);
+s32 SceneHud_TickPaletteBlend(void *);
 void SceneHud_BeginRandomActionReturn(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void InventoryGrid_UpdateNumberPhase(struct InventoryGrid *s)
@@ -37,7 +37,7 @@ void InventoryGrid_UpdateNumberPhase(struct InventoryGrid *s)
                 p += 0x14;
             } while (--i >= 0);
         }
-    } else if (sub_08165D10(s)) {
+    } else if (SceneHud_TickPaletteBlend(s)) {
         Hud_SetInteractionCallback(s, SceneHud_BeginRandomActionReturn, 1);
     }
 }

@@ -44,7 +44,7 @@ URL is recorded (`rom_url.txt`).
 ## How the cloud work runs
 
 * **Setup per session:**
-  * Each cloud session runs `tools/cloud_setup.sh` (about 35 min) unless the machine is already set up.
+  * The environment's setup script builds a cached base once (~3 min); each session's hook sets up from it in seconds (docs/CLOUD.md).
   * The ROM comes from `BOKTAI3_ROM_URL`. If the environment UI has no place for it, put the download step in the session's starting prompt. Never commit the URL.
   * The URL is on the user's machine in `~/git/b3-logs/rom_url.txt`. The file is a random-named folder under `/var/www/example.com/html/`; delete it when cloud work ends.
 * **Queue:**
