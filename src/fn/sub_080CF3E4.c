@@ -1,4 +1,13 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 80.5%
+// Golem arrive-and-restore: a prologue plus the scene_actor_chase.h Chase_Arrive logic, kept
+// as local copies with the corrections this function shows. The ROM shares one
+// Callback_InvokeActor at the end. Chase_TryRoute and the turn's group, flags2D4 and 0x414 tests
+// take the caller's `obj`, so GCSE shares &flags2D4 with the first 0x80 test. Flag tests load
+// first, then mask. The turn loop is a `for` with a u8 choice. What is left is allocation:
+// the ROM keeps Arrive's group in sb, hoists the random table and 0x3FF out of the turn loop,
+// and spills the reroute target pointer.
 /* Golem_ArriveAndRestore: on entry hands control to the directional-entry reset (kind 0x2C); once that finishes, faces forward, restores after a delay (following up with the chase when flags2D4 & 0x80, else the entry target) and re-targets the chased player, rerouting toward its cell or turning to a new random direction (provisional name) */
 #define Golem_ArriveAndRestore sub_080CF3E4
 #include "scene_actor_chase.h"
@@ -14,19 +23,32 @@ static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
     saved[10] = behavior;
 }
 
+static inline u16 LoadMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    u16 value = actor->flags2D4;
+    return value & mask;
+}
+static inline u8 TestField(u16 *field, u32 mask)
+{
+    if (*field & mask)
+        return 1;
+    return 0;
+}
+
 static inline void Arrive_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
-    if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
+    u8 *group = (u8 *)&((struct SceneActorRegistryResetView *)obj)->group;
+    if (!LoadMotionFlags((struct SceneActorRegistryResetView *)obj, 0x400) &&
+        !TestField((u16 *)((u8 *)obj + 0x414), 4)) {
         s32 prior = actor->direction;
-        s32 tries = 0;
-        s32 choice;
-        do {
+        s32 tries;
+        u8 choice;
+        for (tries = 0; tries <= 3; tries++) {
             choice = Chase_RandomBits(3) << 6;
             if (choice != prior)
                 goto chosen;
-        } while (++tries <= 3);
+        }
         choice = prior;
     chosen:
         group[0x204] = choice;
@@ -102,7 +124,7 @@ reroute: {
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, targetPointer))
         return 1;
 }
 invoke:
@@ -122,7 +144,7 @@ void sub_080CF3E4(struct SceneActorRegistryResetView *actor)
         return;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
-    if (Chase_MotionFlags(actor, 0x80))
+    if (LoadMotionFlags(actor, 0x80))
         SaveDelay(group + 0x8C, *(void **)(group + 0x48), 0xC, 0x78);
     else
         SaveDelay(group + 0x8C, actor->entryTarget228, 7, 0x78);
@@ -134,3 +156,6 @@ void sub_080CF3E4(struct SceneActorRegistryResetView *actor)
     Chase_SetState(actor, 3, 1, 0);
     Arrive(actor);
 }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_080CF3E4);
+#endif
