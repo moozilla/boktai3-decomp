@@ -4,8 +4,12 @@
 
 #ifdef NONMATCHING
 // fuzzy: 81.2%
-/* Skeleton chase step (tentative). Still differs: register allocation (actor r6/r7 swap,
- * BeginTurn's hoisted addresses), the group+0x40 mask order, and the scale-pointer copies. */
+/* Skeleton chase step (tentative): steers toward or away from the target at +0xDC by the
+ * context's near/far distances; when the route flag is set it snaps to the route, re-targets the
+ * player's cell and may start a random turn. Still differs (40 instructions, ignoring
+ * registers): which registers the RNG loop's hoisted constants get (the ROM also hoists the
+ * table address), the exhausted-retry `choice = prior` copy, the mask-before-load order of
+ * the group+0x40 bitfield clear, and the scale-pointer copies that keep the two 0x40 stores apart. */
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
 s32 Mod(s32, s32);
