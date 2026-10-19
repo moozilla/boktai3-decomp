@@ -1530,3 +1530,4 @@ addr,function,name,family,note
 081CDE14,sub_081CDE14,SceneCharacter_UpdatePaletteFade,"SceneCharacter palette fade (siblings: SceneCharacter_UpdatePalettePulse sub_081CBA04, SceneCharacter_UpdateAlternatePalettePulse sub_081CBA80)","drives a 3-mode palette bank crossfade (one-shot A->B, one-shot B->A with swap, or continuous ping-pong) into b+0x1cc, advancing a frame counter at b+0x32"
 081B8F54,sub_081B8F54,OrbitMotion_UpdateAbsoluteSines,"OrbitMotion","writes absolute sine offsets on three axes"
 081B9014,sub_081B9014,OrbitMotion_InterpolatePosition,"OrbitMotion","interpolates three coordinates and snaps to endpoint"
+081B939C,sub_081B939C,OrbitMotion_BeginDistanceWave,"OrbitMotion","initializes mode six with distance-scaled wave amplitude"
