@@ -1,4 +1,3 @@
-#define Registry2388_InitializeAnimations sub_081B9ED0
 #include "global.h"
 #include "engine.h"
 
@@ -20,7 +19,7 @@ struct Registry2388Display {
 extern u8 *gUnk_030042E4;
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 
-void sub_081B9ED0(struct Registry2388Display *p)
+void Registry2388_InitializeAnimations(struct Registry2388Display *p)
 {
     struct Registry2388ResourceHeader *resource = ScriptProc_Start(0xcb05, 0xa2db);
     if (resource) {

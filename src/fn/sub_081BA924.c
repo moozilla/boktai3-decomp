@@ -1,10 +1,12 @@
-#define Registry3F74_InitBackground sub_081BA924
-#define Registry3F74_ApplyPaletteStep sub_081BA644
 #define gRegistry3F74ObjPalette gUnk_03005020
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow   gUnk_03004BD8
 #include "global.h"
 
-struct Registry3F74Object { u8 unknown[0x18]; void *background; u16 *palettes; };
+struct Registry3F74Object {
+    u8 unknown[0x18];
+    void *background;
+    u16 *palettes;
+};
 extern u16 gUnk_03004BD8;
 extern u16 gUnk_03005020[];
 void Bg_SetPriority(u32, s32);
@@ -15,8 +17,8 @@ void *ScriptProc_Start(u16, u16);
 u32 SunClock_GetPhase(void);
 void sub_082157EC(void);
 u8 *sub_08216E54(u16);
-void sub_081BA644(struct Registry3F74Object *, u32);
-void sub_081BA924(struct Registry3F74Object *p)
+void Registry3F74_ApplyPaletteStep(struct Registry3F74Object *, u32);
+void Registry3F74_InitBackground(struct Registry3F74Object *p)
 {
     u8 *resource;
     s32 layers[2];
@@ -43,6 +45,6 @@ void sub_081BA924(struct Registry3F74Object *p)
     Bg_SetPriority(2, 2);
     resource = ScriptProc_Start(0x92B3, 0x771E);
     p->palettes = (u16 *)(resource + 0x14);
-    sub_081BA644(p, SunClock_GetPhase());
+    Registry3F74_ApplyPaletteStep(p, SunClock_GetPhase());
     CpuSet(resource + 0x74, gUnk_03005020, 0x04000008);
 }

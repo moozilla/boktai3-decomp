@@ -1,6 +1,4 @@
-#define StatGauge_UpdateConfirmation sub_081BCBCC
-#define StatGauge_BeginAdjustment    sub_081BC820
-#define gStatGaugeInput              gUnk_03005260
+#define gStatGaugeInput gUnk_03005260
 #include "global.h"
 struct StatGaugePalette {
     u8 unknown0[0x18];
@@ -24,18 +22,18 @@ s32 Anim_Step(void *, void *);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void Sound_PlaySong(u32);
-void sub_081BC820(struct StatGaugePreview *);
+void StatGauge_BeginAdjustment(struct StatGaugePreview *);
 void StatGauge_ConfirmPreview(struct StatGaugePreview *);
 void DarkLoan_BeginClosing(struct StatGaugePreview *);
 extern u16 gUnk_03005260[];
-void sub_081BCBCC(struct StatGaugePreview *p)
+void StatGauge_UpdateConfirmation(struct StatGaugePreview *p)
 {
     Anim_Step(p->backgroundAnim, p->backgroundData);
     Palette_UpdateHighlightPulse(p->palette->colors, &p->highlightPulse);
     if (gUnk_03005260[1] & 1) {
         if (p->selection) {
             Sound_PlaySong(0xdd);
-            sub_081BC820(p);
+            StatGauge_BeginAdjustment(p);
         } else {
             Sound_PlaySong(0xde);
             if (!p->exitScript)

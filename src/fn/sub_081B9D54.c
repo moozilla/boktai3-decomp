@@ -1,4 +1,3 @@
-#define Registry2388_BlendTimedPalettes sub_081B9D54
 #define gBgPaletteShadow gUnk_03004FC0
 #include "global.h"
 
@@ -15,7 +14,7 @@ struct Registry2388PaletteController {
 extern u8 gBgPaletteShadow[];
 void Registry2388_BlendPaletteBanks(u8 *, u8 *, u8 *, int, int, int);
 
-void sub_081B9D54(struct Registry2388PaletteController *p)
+void Registry2388_BlendTimedPalettes(struct Registry2388PaletteController *p)
 {
     u8 *base = p->palettes;
     u8 *extra;
@@ -26,19 +25,23 @@ void sub_081B9D54(struct Registry2388PaletteController *p)
     else
         extra = 0;
     switch (p->mode) {
-    case 0:
-    case 2:
-        if (!extra)
-            extra = base + 0x100;
-        Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0x60, base + 0xc0, p->elapsed, p->shift, 2);
-        Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, base + 0xa0, extra, p->elapsed, p->shift, 1);
-        break;
-    case 1:
-    case 3:
-        if (!extra)
-            extra = base + 0x100;
-        Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0xc0, base, p->elapsed, p->shift, 2);
-        Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, extra, base + 0x40, p->elapsed, p->shift, 1);
-        break;
+        case 0:
+        case 2:
+            if (!extra)
+                extra = base + 0x100;
+            Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0x60, base + 0xc0, p->elapsed,
+                                           p->shift, 2);
+            Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, base + 0xa0, extra, p->elapsed,
+                                           p->shift, 1);
+            break;
+        case 1:
+        case 3:
+            if (!extra)
+                extra = base + 0x100;
+            Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0xc0, base, p->elapsed,
+                                           p->shift, 2);
+            Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, extra, base + 0x40, p->elapsed,
+                                           p->shift, 1);
+            break;
     }
 }

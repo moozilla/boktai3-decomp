@@ -1,5 +1,3 @@
-#define Vanargand_InitBackgroundAttachment sub_081ADEAC
-#define Vanargand_SetProjectedBackgroundPosition sub_081A64C8
 #define gDisplayControlShadow gUnk_03004BD8
 #include "global.h"
 struct VanargandBackgroundAttachment {
@@ -13,14 +11,15 @@ struct VanargandBackgroundAttachment {
 };
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 u8 *sub_08216E54(u16);
-void sub_081A64C8(s32, void *, s32, s32);
+void ScreenPalette_ProjectPosition(s32, void *, s32, s32);
 extern u16 gUnk_03004BD8;
 static inline void Vanargand_ClearBackgroundOffset(void *destination)
 {
     volatile u32 zero = 0;
     CpuSet((const void *)&zero, destination, 0x05000002);
 }
-void sub_081ADEAC(u8 *owner, struct VanargandBackgroundAttachment *part, void *coordinates)
+void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAttachment *part,
+                                        void *coordinates)
 {
     s32 layer;
     void *resource = sub_08216E54(0xa96a);
@@ -38,5 +37,5 @@ void sub_081ADEAC(u8 *owner, struct VanargandBackgroundAttachment *part, void *c
         *control = mask & *control;
     }
     part->position = owner + 0x918;
-    sub_081A64C8(1, part->coordinates, 136, -70);
+    ScreenPalette_ProjectPosition(1, part->coordinates, 136, -70);
 }

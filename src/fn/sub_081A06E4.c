@@ -1,4 +1,3 @@
-#define Hresvelgr_PlaySideTargetSequence sub_081A06E4
 #include "global.h"
 struct HresvelgrActor {
     u8 unknown[0x300];
@@ -12,7 +11,7 @@ void ActionState_Reset(u8 *);
 void ActionState_SetState(u8 *, u32);
 void ActionState_AdvanceState(u8 *);
 void Sound_PlaySong(u32);
-void sub_081A06E4(struct HresvelgrActor *actor)
+void Hresvelgr_PlaySideTargetSequence(struct HresvelgrActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *state = p + 0x2f0;

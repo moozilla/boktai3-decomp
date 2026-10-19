@@ -10,14 +10,14 @@ struct P {
     u8 g[12];
     struct E e[32];
 };
-void sub_081A33B8(void *, void *, u32);
+void Hresvelgr_TickShot(void *, void *, u32);
 s32 Hresvelgr_UpdateShots(struct P *p)
 {
     struct E *e = p->e;
     s32 i = 0;
     do {
         if (e->h != 0)
-            sub_081A33B8(p, e, (p->n + i) & 3);
+            Hresvelgr_TickShot(p, e, (p->n + i) & 3);
         e++;
         i++;
     } while (i <= 0x1f);

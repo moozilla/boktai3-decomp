@@ -2,8 +2,6 @@
 #include "player.h"
 #include "game_state.h"
 
-#define ControlPanel_BeginIdle sub_081C1F20
-
 struct S {
     u8 pad0[0x588];
     u16 v;
@@ -21,7 +19,7 @@ void SegmentDisplay_CallSelectionScript(void);
 void sub_081C1DCC(void);
 void ControlPanel_UpdateIdle(void);
 
-void sub_081C1F20(struct S *p, u32 flag)
+void ControlPanel_BeginIdle(struct S *p, u32 flag)
 {
     gUnk_02000710->menuRewardBalance = 0;
     ControlPanel_ClearPlayerInputHistory();

@@ -1,6 +1,4 @@
-#define Registry2388_CreateSelectionCursor sub_081BA2E4
-#define SelectionCursor_Create             sub_081BB1A0
-#define gRegistry2388SelectionEntries      gUnk_0824F7E8
+#define gRegistry2388SelectionEntries gUnk_0824F7E8
 #include "global.h"
 
 struct Registry2388 {
@@ -16,14 +14,14 @@ struct Registry2388SelectionEntry {
 };
 extern const struct Registry2388SelectionEntry gUnk_0824F7E8[9];
 void *memcpy(void *, const void *, u32);
-u32 sub_081BB1A0(s32, s32, s32, void *);
+u32 MenuCursor_Create(s32, s32, s32, void *);
 
 static inline u32 Entry_TestFlags(struct Registry2388SelectionEntry *entry, u32 mask)
 {
     return entry->flags & mask;
 }
 
-void sub_081BA2E4(struct Registry2388 *object, s32 selection)
+void Registry2388_CreateSelectionCursor(struct Registry2388 *object, s32 selection)
 {
     struct Registry2388SelectionEntry entries[9];
     s32 i;
@@ -61,5 +59,5 @@ void sub_081BA2E4(struct Registry2388 *object, s32 selection)
         else
             entries[2].linkD = 7;
     }
-    object->selectionCursor = sub_081BB1A0(1, selection, 9, entries);
+    object->selectionCursor = MenuCursor_Create(1, selection, 9, entries);
 }

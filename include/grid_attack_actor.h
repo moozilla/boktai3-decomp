@@ -259,7 +259,7 @@ void GridAttack_DispatchSpecialAnimation(struct GridAttackActor *p);
 
 int GridAttack_TryStartDamageReaction(struct GridAttackActor *p);
 
-void sub_0802B3E4(struct GridAttackActor *p);
+void GridAttack_UpdateWaitAction(struct GridAttackActor *p);
 
 void GridAttack_UpdateActionTwo(struct GridAttackActor *p);
 

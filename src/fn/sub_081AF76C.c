@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Vanargand_ResetState sub_081AF76C
-
 /* Tentative actor state layout; health is also decremented by 081AF7F4. */
 struct VanargandActor {
     u8 unknown0[0x160];
@@ -19,7 +17,7 @@ struct VanargandActor {
     u32 stateTimer;
 };
 
-void sub_081AF76C(struct VanargandActor *actor, s32 state)
+void Vanargand_ResetState(struct VanargandActor *actor, s32 state)
 {
     if (state == 1 || state == 0x1b) {
         if (actor->health <= 0)

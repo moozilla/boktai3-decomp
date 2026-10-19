@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Vanargand_UpdateModeCycle sub_081A8214
-
 // Tentative Vanargand ownership; field roles follow the mode transition accesses.
 
 struct VanargandModeActor {
@@ -43,7 +41,7 @@ static inline void ResetTimer(struct VanargandModeActor *p)
     p->timer = 0;
 }
 
-void sub_081A8214(struct VanargandModeActor *p)
+void Vanargand_UpdateModeCycle(struct VanargandModeActor *p)
 {
     struct VanargandModeActor *q = p;
     if (ConsumeEntry(p)) {

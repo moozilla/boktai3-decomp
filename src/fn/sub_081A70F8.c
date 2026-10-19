@@ -1,21 +1,46 @@
-#define Vanargand_UpdatePartCollision sub_081A70F8
 #include "global.h"
-struct VanargandBoss { u8 unk0[0x9c]; u32 flags; u8 unka0[0x522]; s16 state; };
-struct VanargandPartSprite { u8 unk0[6]; u16 animation; u32 unk8; void *animationData; };
-struct VanargandPartCollider { u8 unk0[6]; u16 flags; u8 unk8[0x4c]; };
-struct VanargandPartTarget { u32 unk0; u32 flags; u8 unk8[8]; };
+struct VanargandBoss {
+    u8 unk0[0x9c];
+    u32 flags;
+    u8 unka0[0x522];
+    s16 state;
+};
+struct VanargandPartSprite {
+    u8 unk0[6];
+    u16 animation;
+    u32 unk8;
+    void *animationData;
+};
+struct VanargandPartCollider {
+    u8 unk0[6];
+    u16 flags;
+    u8 unk8[0x4c];
+};
+struct VanargandPartTarget {
+    u32 unk0;
+    u32 flags;
+    u8 unk8[8];
+};
 struct VanargandPart {
-    u8 unk0[0x1c]; s16 position[3]; u8 unk22[10];
+    u8 unk0[0x1c];
+    s16 position[3];
+    u8 unk22[10];
     struct VanargandPartSprite sprite;
-    u8 unk3c[0x6c]; struct VanargandPartCollider collider;
+    u8 unk3c[0x6c];
+    struct VanargandPartCollider collider;
     s16 timerFC, timerFE;
     u32 flags;
-    u8 unk104[0xc]; struct VanargandPartTarget target;
+    u8 unk104[0xc];
+    struct VanargandPartTarget target;
     s16 state;
-    u8 unk122[6]; u16 pendingDamage; u16 unk12a; u16 paletteTimer; u16 disableTimer;
+    u8 unk122[6];
+    u16 pendingDamage;
+    u16 unk12a;
+    u16 paletteTimer;
+    u16 disableTimer;
 };
 void Collider_SetPosition(void *, void *, u32);
-void sub_081A70F8(struct VanargandBoss *boss, struct VanargandPart *part)
+void Vanargand_UpdatePartCollision(struct VanargandBoss *boss, struct VanargandPart *part)
 {
     struct VanargandBoss *owner = boss;
     struct VanargandPartCollider *collider;

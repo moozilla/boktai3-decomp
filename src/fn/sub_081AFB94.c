@@ -1,4 +1,3 @@
-#define ActorStatus_InitializeCollider sub_081AFB94
 #include "global.h"
 #include "engine.h"
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
@@ -13,7 +12,7 @@ struct ActorStatus {
     u8 collider[0xA8];
     u32 mode;
 };
-void sub_081AFB94(struct ActorStatus *status, s32 power, s32 force, s32 value)
+void ActorStatus_InitializeCollider(struct ActorStatus *status, s32 power, s32 force, s32 value)
 {
     void *collider = status->collider;
     struct ActorStatusExtent size, offset;

@@ -6,11 +6,11 @@ struct Q {
     u32 w;
 };
 void memcpy(void *, const void *, s32);
-u32 sub_081BB1A0(s32, s32, s32, void *);
+u32 MenuCursor_Create(s32, s32, s32, void *);
 
 void Registry3F74_CreateSelectionCursor(struct Q *p, s32 a)
 {
     u8 buf[0xb0];
     memcpy(buf, gUnk_0824F878, 0xb0);
-    p->w = sub_081BB1A0(1, a, 0xb, buf);
+    p->w = MenuCursor_Create(1, a, 0xb, buf);
 }

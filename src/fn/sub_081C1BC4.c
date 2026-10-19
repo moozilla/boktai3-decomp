@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ControlPanel_TickMultiplierTimer sub_081C1BC4
-
 struct E {
     u32 fl;
     u8 pad4[0xC];
@@ -20,7 +18,7 @@ struct S {
     u16 mode;
 };
 
-void sub_081C1BC4(struct S *p)
+void ControlPanel_TickMultiplierTimer(struct S *p)
 {
     u16 *a374 = &p->a374;
     u32 copy = *a374;

@@ -1,5 +1,3 @@
-#define Hresvelgr_PlayDelayedReposition sub_081A0954
-#define Hresvelgr_RefreshTarget         sub_0819CA38
 #include "global.h"
 /* Tentative Hresvelgr layout and behavior names, inferred from static consumers. */
 typedef struct HresvelgrPosition {
@@ -21,8 +19,8 @@ typedef struct HresvelgrActor {
 } HresvelgrActor;
 void ActionState_Reset(u8 *);
 void ActionState_AdvanceState(u8 *);
-void sub_0819CA38(HresvelgrActor *);
-void sub_081A0954(HresvelgrActor *p)
+void Hresvelgr_RefreshTarget(HresvelgrActor *);
+void Hresvelgr_PlayDelayedReposition(HresvelgrActor *p)
 {
     u8 *action = p->action;
     {
@@ -36,7 +34,7 @@ void sub_081A0954(HresvelgrActor *p)
     switch (*action) {
         case 0:
             if (++*(u32 *)(action + 4) > 119) {
-                sub_0819CA38(p);
+                Hresvelgr_RefreshTarget(p);
                 p->position = p->savedPosition;
                 p->position.y = 0x2000;
                 ActionState_AdvanceState(action);

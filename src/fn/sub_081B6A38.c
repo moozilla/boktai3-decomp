@@ -1,4 +1,3 @@
-#define ActorEffect_UpdatePositionTrail sub_081B6A38
 #include "global.h"
 struct EffectPosition {
     s32 x, y;
@@ -20,7 +19,7 @@ struct ActorEffect {
     u8 pad134[8];
     struct EffectTrailSprite trails[5];
 };
-void sub_081B6A38(struct ActorEffect *effect)
+void ActorEffect_UpdatePositionTrail(struct ActorEffect *effect)
 {
     s32 index, count;
     struct EffectTrailSprite *sprite;

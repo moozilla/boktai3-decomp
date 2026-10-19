@@ -1,4 +1,3 @@
-#define Hresvelgr_TickShot sub_081A33B8
 #include "global.h"
 struct HresvelgrShot {
     u32 flags;
@@ -17,7 +16,7 @@ struct HresvelgrShot {
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void Hresvelgr_ReleaseShot(struct HresvelgrShot *);
-void sub_081A33B8(void *pool, struct HresvelgrShot *shot, u32 phase)
+void Hresvelgr_TickShot(void *pool, struct HresvelgrShot *shot, u32 phase)
 {
     if (phase == 0) {
         void *collider = shot->collider;

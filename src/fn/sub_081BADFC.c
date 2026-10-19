@@ -1,8 +1,6 @@
 #include "global.h"
 
 // Tentative selection-list interpretation; offsets are shared by neighboring cursor code.
-#define SelectionList_ProcessCursorInput sub_081BADFC
-#define SelectionList_SelectNearestEnabledEntry sub_081BAD08
 #define gCursorKeys gUnk_03005260
 
 struct SelectionEntry {
@@ -22,12 +20,12 @@ struct SelectionList {
 };
 extern u16 gUnk_03005260[2];
 void Sound_PlaySong(u32);
-s32 sub_081BAD08(struct SelectionList *);
+s32 SelectionList_SelectNearestEnabledEntry(struct SelectionList *);
 void MenuCursor_SetPositionFromSelection(struct SelectionList *);
 void SelectionList_TickCursorShake(void);
 void SelectionCursor_SetState(void *, void (*)(void));
 
-s32 sub_081BADFC(struct SelectionList *list)
+s32 SelectionList_ProcessCursorInput(struct SelectionList *list)
 {
     s16 *cursor = &list->savedX;
     s32 step;
@@ -67,13 +65,12 @@ s32 sub_081BADFC(struct SelectionList *list)
         goto nearest;
     }
     goto noInput;
-validate:
-    {
-        struct SelectionEntry *point = (struct SelectionEntry *)((entry << 4) + (u32)list + 0xA4);
-        u16 one = 1;
-        if (point->flags & one)
-            entry = old;
-    }
+validate: {
+    struct SelectionEntry *point = (struct SelectionEntry *)((entry << 4) + (u32)list + 0xA4);
+    u16 one = 1;
+    if (point->flags & one)
+        entry = old;
+}
     goto apply;
 nearest:
     entry = SelectionList_SelectNearestEnabledEntry(list);

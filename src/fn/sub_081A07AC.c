@@ -1,4 +1,3 @@
-#define Hresvelgr_PlayAscentSequence sub_081A07AC
 #include "global.h"
 struct HresvelgrVector {
     s16 x, y, z;
@@ -21,7 +20,7 @@ static inline void SetVector(struct HresvelgrVector *v, s32 x, s32 y, s32 z)
     v->y = y;
     v->z = z;
 }
-void sub_081A07AC(struct HresvelgrActor *actor)
+void Hresvelgr_PlayAscentSequence(struct HresvelgrActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *state = actor->action;

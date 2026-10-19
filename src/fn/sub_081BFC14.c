@@ -1,6 +1,3 @@
-#define Storage_BeginModeSelection sub_081BFC14
-#define Storage_UpdateModeSelection sub_081BFA4C
-#define Storage_RefreshCategoryWidgets sub_081BFAE0
 #include "global.h"
 #include "scene_input_navigation.h"
 struct SceneInventoryCategoryMenu {
@@ -22,30 +19,31 @@ struct SceneInventoryCategoryMenu {
     u16 colors[16];
 };
 void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
-void SceneInventory_SetState(struct SceneInventoryCategoryMenu *, void (*)(struct SceneInventoryCategoryMenu *), u32);
+void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+                             void (*)(struct SceneInventoryCategoryMenu *), u32);
 void Storage_HideItemDetails(struct SceneInventoryCategoryMenu *);
 void Storage_InitSelectionGrid(struct SceneInputGridView *, u32, u32, u32, u32);
 void Storage_InitSlotMapping(struct SceneInventoryCategoryMenu *, s32);
 void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
-void sub_081BFAE0(struct SceneInventoryCategoryMenu *);
-void sub_081BFA4C(struct SceneInventoryCategoryMenu *);
-void sub_081BFC14(struct SceneInventoryCategoryMenu *p, s32 mode)
+void Storage_RefreshCategoryWidgets(struct SceneInventoryCategoryMenu *);
+void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *);
+void Storage_BeginModeSelection(struct SceneInventoryCategoryMenu *p, s32 mode)
 {
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
     Storage_HideItemDetails(p);
     switch (mode) {
-    case 1:
-        Storage_InitSelectionGrid(&p->grid, 0, 8, 1, 3);
-        break;
-    case 3:
-        Storage_InitSelectionGrid(&p->grid, 0, 8, 2, 3);
-        break;
-    case 2:
-        Storage_InitSelectionGrid(&p->grid, 0, 8, 3, 3);
-        break;
+        case 1:
+            Storage_InitSelectionGrid(&p->grid, 0, 8, 1, 3);
+            break;
+        case 3:
+            Storage_InitSelectionGrid(&p->grid, 0, 8, 2, 3);
+            break;
+        case 2:
+            Storage_InitSelectionGrid(&p->grid, 0, 8, 3, 3);
+            break;
     }
     Storage_UpdateCursorPosition(&p->grid, p->cursor);
-    SceneInventory_SetState(p, sub_081BFA4C, 1);
+    SceneInventory_SetState(p, Storage_UpdateModeSelection, 1);
     SceneInventory_SetCategoryPalette(p, p->colors);
-    sub_081BFAE0(p);
+    Storage_RefreshCategoryWidgets(p);
 }

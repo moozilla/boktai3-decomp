@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hresvelgr_UpdateAdjacentBurstPhase sub_0819EFD0
 struct ReactionVector {
     s16 x, y, z, pad;
 };
@@ -39,7 +38,7 @@ static inline s16 *AddReactionVector(s16 *out, struct ReactionVector *b, struct 
     out[2] = b->z + a->z;
     return out;
 }
-void sub_0819EFD0(struct ActorReaction *actor, s32 frame)
+void Hresvelgr_UpdateAdjacentBurstPhase(struct ActorReaction *actor, s32 frame)
 {
     struct {
         u32 ids[2];

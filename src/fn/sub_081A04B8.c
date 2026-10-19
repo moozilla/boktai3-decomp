@@ -1,4 +1,3 @@
-#define OffsetActor_PlayBoundarySequence sub_081A04B8
 #include "global.h"
 struct OffsetActor {
     u8 unknown[0x300];
@@ -15,7 +14,7 @@ static inline u8 OutsideBoundary(struct OffsetActor *actor)
         outside = 1;
     return outside;
 }
-void sub_081A04B8(struct OffsetActor *actor)
+void OffsetActor_PlayBoundarySequence(struct OffsetActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *state = p + 0x2f0;

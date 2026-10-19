@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ControlPanel_ApplyMultiplierMode sub_081C1B20
-
 struct E {
     u32 fl;
     u8 pad4[0xC];
@@ -22,7 +20,7 @@ struct S {
 
 void Sound_PlaySong(u32 song); // include/engine.h
 
-void sub_081C1B20(struct S *p)
+void ControlPanel_ApplyMultiplierMode(struct S *p)
 {
     s32 mode = p->mode;
 

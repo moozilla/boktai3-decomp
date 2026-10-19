@@ -1,5 +1,4 @@
 #include "global.h"
-#define TetherActor_InitRequestIndicator sub_081C0390
 
 struct ResourceHeader8 {
     u32 words[8];

@@ -7,14 +7,14 @@ struct S {
     s32 f68;
 };
 void Registry6A37_UpdateBackgroundScroll(struct S *);
-void sub_081B95E4(u8 *);
+void MotionTrack_Update(u8 *);
 void SceneTransition_BeginVectorTween(struct S *);
 
 void Registry6A37_UpdateFirstScrollTransition(struct S *p)
 {
     s32 r;
     Registry6A37_UpdateBackgroundScroll(p);
-    sub_081B95E4((u8 *)p + 0x24);
+    MotionTrack_Update((u8 *)p + 0x24);
     r = 0;
     if (p->f4d == 2)
         r = 1;

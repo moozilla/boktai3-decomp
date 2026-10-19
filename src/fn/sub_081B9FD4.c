@@ -1,6 +1,5 @@
-#define Registry2388_InitializeBackground sub_081B9FD4
 #define gDisplayControlShadow gUnk_03004BD8
-#define gBgPaletteShadow gUnk_03004FC0
+#define gBgPaletteShadow      gUnk_03004FC0
 #include "global.h"
 #include "engine.h"
 
@@ -16,7 +15,7 @@ u8 *sub_08216E54(u16);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void Bg_SetPriority(u32, s32);
 
-void sub_081B9FD4(struct Registry2388PaletteController *p)
+void Registry2388_InitializeBackground(struct Registry2388PaletteController *p)
 {
     u8 *background;
     s32 config[2];

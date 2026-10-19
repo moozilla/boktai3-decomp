@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hresvelgr_UpdateTargetMotion sub_081A0558
 struct ActorActionSequence {
     u8 unknown0[0x51];
     u8 angle;
@@ -34,7 +33,7 @@ static inline void Clear(void *dest, u32 *zero)
     *zero = 0;
     CpuSet(zero, dest, 0x5000002);
 }
-void sub_081A0558(struct ActorActionSequence *p)
+void Hresvelgr_UpdateTargetMotion(struct ActorActionSequence *p)
 {
     {
         u32 mask = 0x400040;

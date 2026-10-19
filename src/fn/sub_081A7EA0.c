@@ -1,4 +1,3 @@
-#define ScenePanel_RequestPairReaction sub_081A7EA0
 #include "global.h"
 struct ScenePanelPairReaction {
     u8 unknown0[0x9C];
@@ -23,7 +22,7 @@ static inline void ScenePanel_RequestReaction(struct ScenePanelPairReaction *pan
     panel->counter = 0;
     panel->pending = 1;
 }
-s32 sub_081A7EA0(struct ScenePanelPairReaction *panel)
+s32 ScenePanel_RequestPairReaction(struct ScenePanelPairReaction *panel)
 {
     u32 two = 2;
     if (panel->flags & two) {

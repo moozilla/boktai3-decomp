@@ -2,13 +2,12 @@
 #include "directional_interaction.h"
 /* IconRow_Init: loads an animation (key 0xA8E7) and lays out 6 sprites 8px apart
  * using frame ids 3,4,7,8,9,10; low confidence on the exact widget. */
-#define IconRow_Init sub_081C2444
 
 struct Dimensions {
     u32 x : 16, y : 16, z : 16;
 };
 
-void sub_081C2444(u8 *p)
+void IconRow_Init(u8 *p)
 {
     struct Dimensions dimensions;
     u8 *slot;

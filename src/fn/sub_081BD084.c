@@ -1,4 +1,3 @@
-#define StatGauge_WaitBeforeConfirmation sub_081BD084
 #include "global.h"
 struct StatGaugePreview {
     u8 unknown0[0x18];
@@ -19,7 +18,7 @@ void DarkLoan_SetState(void *, void (*)(void));
 void StatGauge_WaitAfterConfirm(void);
 void StatGauge_CloseAfterDelay(void);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_081BD084(struct StatGaugePreview *p)
+void StatGauge_WaitBeforeConfirmation(struct StatGaugePreview *p)
 {
     Anim_Step(p->backgroundAnim, p->backgroundData);
     if (++p->timer > 149) {

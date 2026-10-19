@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define MenuCursor_Create sub_081BB1A0
-
 struct ResourceSpriteEntry {
     s32 values[4];
 };
@@ -20,7 +18,7 @@ struct ResourceSprite {
 
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-void sub_081BAFD4(void);
+void MenuCursor_UpdateState(void);
 void MenuCursor_OnDestroy(void);
 void ResourceSprite_Initialize(struct ResourceSprite *, u32);
 void ResourceSprite_CopyEntries(struct ResourceSprite *, u32, struct ResourceSpriteEntry *);
@@ -34,15 +32,15 @@ static inline void ClearCursorVector(void *dest, u32 *zero, u32 control)
     CpuSet(zero, dest, control);
 }
 
-struct ResourceSprite *sub_081BB1A0(u32 palette, s32 selection, s32 count,
-                                    struct ResourceSpriteEntry *entries)
+struct ResourceSprite *MenuCursor_Create(u32 palette, s32 selection, s32 count,
+                                         struct ResourceSpriteEntry *entries)
 {
     struct ResourceSprite *cursor = Task_Create(8, 0x1B0);
     u32 zero;
 
     if (cursor == NULL)
         return NULL;
-    Task_SetCallbacks(cursor, sub_081BAFD4, MenuCursor_OnDestroy);
+    Task_SetCallbacks(cursor, MenuCursor_UpdateState, MenuCursor_OnDestroy);
     ResourceSprite_Initialize(cursor, palette);
     ResourceSprite_CopyEntries(cursor, count, entries);
     ClearCursorVector(cursor->sprite + 0x20, &zero, 0x05000002);

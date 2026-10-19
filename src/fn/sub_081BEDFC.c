@@ -1,16 +1,16 @@
 #include "global.h"
-void sub_081BE7FC(void *);
-void sub_081BE8B0(void *);
+void Storage_BeginItemSpecialMove(void *);
+void Storage_BeginEquipmentSpecialMove(void *);
 void sub_081BE730(void *);
 void Storage_BeginSelectedItemTransition(u8 *p)
 {
     u8 *a = p + 0x1754, *b = p + 0x1758;
     switch (b[*a] >> 1) {
         case 0:
-            sub_081BE7FC(p);
+            Storage_BeginItemSpecialMove(p);
             break;
         case 1:
-            sub_081BE8B0(p);
+            Storage_BeginEquipmentSpecialMove(p);
             break;
         case 2:
             sub_081BE730(p);

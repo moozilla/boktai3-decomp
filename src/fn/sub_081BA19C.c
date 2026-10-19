@@ -10,12 +10,12 @@ struct Q2 {
     u8 f[0x522];
     u8 sh;
 };
-void sub_081B9D54(void *);
+void Registry2388_BlendTimedPalettes(void *);
 void Registry2388_SetUpdate(void *, void *);
 
 void Registry2388_UpdateTimedEffect(struct Q *p)
 {
-    sub_081B9D54(p);
+    Registry2388_BlendTimedPalettes(p);
     p->h520++;
     if (p->h520 > (1 << ((struct Q2 *)p)->sh))
         Registry2388_SetUpdate(p, 0);

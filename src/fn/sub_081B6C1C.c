@@ -1,6 +1,4 @@
-#define ActorEffect_UpdateHomingFlight  sub_081B6C1C
-#define ActorEffect_UpdatePositionTrail sub_081B6A38
-#define gEffectSineTable                gUnk_086149C4
+#define gEffectSineTable gUnk_086149C4
 #include "global.h"
 struct EffectPosition {
     s16 x, y, z, pad;
@@ -23,14 +21,14 @@ struct ActorEffect {
 };
 extern const s16 gUnk_086149C4[];
 void HomingEffect_TurnTowardTarget(struct ActorEffect *);
-void sub_081B6A38(struct ActorEffect *);
+void ActorEffect_UpdatePositionTrail(struct ActorEffect *);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-void sub_081B6C1C(void *owner, struct ActorEffect *effect, s32 index)
+void ActorEffect_UpdateHomingFlight(void *owner, struct ActorEffect *effect, s32 index)
 {
     struct EffectPosition delta;
     if (effect->entered) {
@@ -73,7 +71,7 @@ void sub_081B6C1C(void *owner, struct ActorEffect *effect, s32 index)
         Collider_SetPosition(&effect->healthCollider, position, 0);
     }
     Collider_Refresh(&effect->collider);
-    sub_081B6A38(effect);
+    ActorEffect_UpdatePositionTrail(effect);
     if (effect->timer > 149) {
         effect->state = 3;
         effect->entered = 1;

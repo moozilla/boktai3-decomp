@@ -1,5 +1,4 @@
 #include "global.h"
-#define Camera_BlendOffset sub_081A6DCC
 
 struct CameraOffsetVector {
     s16 x, y, z;
@@ -15,7 +14,7 @@ static inline int scaleOffset(int n)
     return n >= 0 ? n >> 8 : -((-n) >> 8);
 }
 
-void sub_081A6DCC(struct CameraOffsetVector *a, struct CameraOffsetVector *b, s32 weight)
+void Camera_BlendOffset(struct CameraOffsetVector *a, struct CameraOffsetVector *b, s32 weight)
 {
     struct CameraPackedOffset result;
     if (a && b) {

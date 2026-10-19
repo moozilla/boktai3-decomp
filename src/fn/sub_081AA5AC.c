@@ -1,5 +1,3 @@
-#define Vanargand_UpdateMotionReturn sub_081AA5AC
-#define MotionTrack_Update           sub_081B95E4
 #include "global.h"
 struct Vanargand {
     u8 pad0[0x54];
@@ -17,7 +15,7 @@ s32 Callback_InvokeActor(void *, void *);
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Vanargand_SetPendingCue(void *, u16);
-void sub_081B95E4(void *);
+void MotionTrack_Update(void *);
 static inline s16 *vector(s16 *p, s16 x, s16 y, s16 z)
 {
     s16 *q = p;
@@ -33,7 +31,7 @@ static inline u8 complete(struct Vanargand *p)
         result = 1;
     return result;
 }
-void sub_081AA5AC(struct Vanargand *p)
+void Vanargand_UpdateMotionReturn(struct Vanargand *p)
 {
     void *animation = p->animation;
     u8 result;

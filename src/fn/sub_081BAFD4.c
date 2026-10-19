@@ -1,4 +1,3 @@
-#define MenuCursor_UpdateState sub_081BAFD4
 #include "global.h"
 
 struct MenuCursorEntry {
@@ -26,7 +25,7 @@ static inline void MenuCursor_ClearRequests(struct MenuCursor *cursor)
 }
 
 /* Tentative: callback requests state bits; entry bit 1 cancels state bit 1. */
-void sub_081BAFD4(struct MenuCursor *cursor)
+void MenuCursor_UpdateState(struct MenuCursor *cursor)
 {
     u32 *state;
     MenuCursor_ClearRequests(cursor);

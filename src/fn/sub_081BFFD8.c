@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define DirectionMarker_Update sub_081BFFD8
-
 s32 DirectionMarker_GetAnimation(s32 base, s32 group);
 void Anim_SetKeyframes(void *anim, void *data, u32 index, u32 mode, u32 flags);
 s32 Anim_Step(void *anim, void *data);
@@ -18,7 +16,7 @@ typedef struct {
     s32 category;
 } DirectionMarker;
 
-s32 sub_081BFFD8(DirectionMarker *this)
+s32 DirectionMarker_Update(DirectionMarker *this)
 {
     s32 quadrant;
     s32 newIndex;

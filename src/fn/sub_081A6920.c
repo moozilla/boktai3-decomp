@@ -1,9 +1,6 @@
 #include "global.h"
-#define ScreenPalette_UpdateState sub_081A6920
-#define ScreenPalette_UpdateTransition sub_081A681C
-#define ScreenPalette_ProjectPosition sub_081A64C8
 #define gRandomTableIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gRandomTable      gUnk_0203B400
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];
@@ -20,8 +17,8 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 sub_08249350(s32, s32);
-void sub_081A681C(struct ScreenPaletteTransition *);
-void sub_081A64C8(int, s16 *, int, int);
+void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *);
+void ScreenPalette_ProjectPosition(int, s16 *, int, int);
 
 static inline int nextRandom(void)
 {
@@ -31,48 +28,47 @@ static inline int nextRandom(void)
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 
-void sub_081A6920(struct ScreenPaletteTransition *s)
+void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
 {
     s32 jitter;
     u32 mask = 4;
     if (gUnk_02000560 & mask)
         goto hide;
     switch (s->state) {
-    case 0:
-    hide:
-        {
+        case 0:
+        hide: {
             u16 *control = &gUnk_03004BD8;
             u32 clear = ~0x200;
             *control = clear & *control;
         }
-        return;
-    case 1:
-        if (s->phase == 0)
-            s->phase++;
-        break;
-    case 2:
-        s->phase = ScalarApproach_StepSixteenth(s->phase, 96);
-        if (s->phase > 95)
-            s->state = 3;
-        break;
-    case 4:
-        if (--s->phase == 0) {
-            s->state = 0;
             return;
-        }
-        break;
-    case 3:
-        break;
+        case 1:
+            if (s->phase == 0)
+                s->phase++;
+            break;
+        case 2:
+            s->phase = ScalarApproach_StepSixteenth(s->phase, 96);
+            if (s->phase > 95)
+                s->state = 3;
+            break;
+        case 4:
+            if (--s->phase == 0) {
+                s->state = 0;
+                return;
+            }
+            break;
+        case 3:
+            break;
     }
     {
         u32 visible = 0x200;
         gUnk_03004BD8 = visible | gUnk_03004BD8;
     }
-    sub_081A681C(s);
+    ScreenPalette_UpdateTransition(s);
     if (s->state > 1) {
         jitter = sub_08249350(nextRandom() >> 3, 3) - 1;
     } else {
         jitter = 0;
     }
-    sub_081A64C8(1, s->position, jitter + 136, jitter - 70);
+    ScreenPalette_ProjectPosition(1, s->position, jitter + 136, jitter - 70);
 }

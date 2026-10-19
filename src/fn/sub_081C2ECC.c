@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SparkleEmitter_ReconfigureFromScript sub_081C2ECC
-
 extern void *gUnk_02000264;
 
 void AnimData_SelectPaletteBank(void *, u32);

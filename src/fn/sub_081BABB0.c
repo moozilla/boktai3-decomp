@@ -1,4 +1,3 @@
-#define Registry3F74_InitFromScript sub_081BABB0
 #include "global.h"
 
 struct Registry3F74 {
@@ -14,19 +13,19 @@ void Video_SetRenderCallbacks(int, void *, void *, void *);
 void sub_08217F4C(void);
 void sub_08214B44(void);
 void sub_08219624(void);
-void sub_081BA924(struct Registry3F74 *);
+void Registry3F74_InitBackground(struct Registry3F74 *);
 void sub_081BA81C(struct Registry3F74 *);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void Registry3F74_CreateSelectionCursor(struct Registry3F74 *, s32);
 void Registry3F74_StartOpeningFade(void *);
 
-s32 sub_081BABB0(struct Registry3F74 *p)
+s32 Registry3F74_InitFromScript(struct Registry3F74 *p)
 {
     s32 i;
     s32 *entry;
     Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
-    sub_081BA924(p);
+    Registry3F74_InitBackground(p);
     sub_081BA81C(p);
     if (Script_SeekToKeyword('p')) {
         entry = p->entryScripts;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hresvelgr_UpdateRecoveryPhase sub_0819F954
 struct ActorReaction {
     u8 unknown0[0x9C];
     u32 flags;
@@ -19,7 +18,7 @@ struct ActorReaction {
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819F954(struct ActorReaction *actor)
+void Hresvelgr_UpdateRecoveryPhase(struct ActorReaction *actor)
 {
     if (actor->pending) {
         actor->pending = 0;

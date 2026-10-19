@@ -1,4 +1,3 @@
-#define ActorStatus_Deactivate sub_081B019C
 #include "global.h"
 struct ActorStatus {
     u32 displayFlags;
@@ -16,7 +15,7 @@ struct ActorStatusOwner {
     u8 pad0[0x5B4];
     u32 activeMask;
 };
-void sub_081B019C(struct ActorStatusOwner *owner, struct ActorStatus *status)
+void ActorStatus_Deactivate(struct ActorStatusOwner *owner, struct ActorStatus *status)
 {
     u32 mask = 0x100;
     if (!(status->flags & mask)) {
