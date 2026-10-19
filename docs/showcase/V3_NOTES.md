@@ -18,15 +18,20 @@ chapter list beside it. Everything ROM-derived stays under
 | `proofs.py` | the throwaway scenes that proved each mechanism |
 | `part1.py` | Part 1: one ROM with every set piece as its own scene; `record PIECE` records one |
 | `record.py`, `run.py` | warping in (mGBA headless), then recording in the harness with adaptive dialogue timing |
-| `tour.py`, `tour_stops.py` | Part 2: the Studio at 1280x800 in a 1920x1080 frame with a caption panel, plus the live edit |
-| `live_demo.lua` | the game side of the live edit (Centaur, linked to the Studio) |
+| `tour.py`, `tour_stops.py` | Part 2: the Studio at 1280x800 in a 1920x1080 frame with a caption panel, plus Centaur and the live edit |
+| `live_demo.lua`, `live_tour.lua` | the game sides of the live edit and of the Centaur stop (Centaur, linked to the Studio) |
+| `making.py` | "How I made this video": Claude in the game's message window over the real work behind part 1 |
 | `edit.py` | the cut, the cards, the music beds, the chapters and the loudness |
 
-Rebuild: `part1.py build`, then `record PIECE` for each piece (`cold doors
-night marionettes count ride reveal coffins vride sunback music music13
-music92`, `title 1 1800` and `credits 3 3600`), `tour.py` (with the Studio
-running, in three runs: `--only 0,...,15`, `--only 16`, `--only 17,18` to
-`rec/studio_pages`, `studio_live`, `studio_cards`), then `edit.py`.
+Rebuild: `part1.py build` (it also exports the game's font for the edit's
+cards), then `record PIECE` for each piece (`cold doors night marionettes
+count ride reveal coffins vride sunback music music13 music92`, and
+`credits 3 3600`); `tour.py` with the Studio running and Centaur's data
+generated (`tools/mgba/gen_centaur_data.py`), in four runs, nothing else
+running mGBA meanwhile (a scenario run takes over the Studio's link):
+`--only 0,...,13`, `--only 14`, `--only 15`, `--only 16,17` to
+`rec/studio_pages`, `studio_centaur`, `studio_live`, `studio_cards`; the
+inputs `making.py` lists, then `making.py`; then `edit.py`.
 `part1.py measure ride|vride` (with `MEASURE=1`) films Vanargand's head for
 the riders' curve.
 
@@ -48,7 +53,15 @@ Claude's colors, purified into ones and zeros; Claude riding Vanargand;
 sun is in YOUR hands now."). Then the Studio, and the decomp's credits in
 the end roll's crawl over a parade of Claudes. The end roll's song (92)
 runs under the title, the cards, Claude's ride and the credits as one
-continuous bed.
+continuous bed. Between the scenes, cards drawn by the edit in the game's
+font: the title, "Every scene in this demo is running in the game's actual
+cutscene engine.", and "We hope this work brings:" with three items.
+
+Part 2: a card on what part 1 was, the Studio's pages (each explaining how
+the thing works, one count of the whole game on Browse), GCL shown three
+ways (its bytecode, Konami-style, readable), Centaur (the Live page
+following a running game, a capture, a sprite picked, the map), the live
+edit, Claude's "How I made this video" (making.py), and the tools.
 
 Cut:
 
@@ -148,3 +161,14 @@ Cut:
   and their tempo and key): 13 (fast, minor) under the chase, 22 the Count's
   battle (scene 3247 and the rematch 6401), 3 and 4 the purification and its
   last quarter (`proc_6197`), 92 the true ending's end roll.
+* **Django's motion 28** (player command 28) is a transformation: a burst
+  of light and he takes a golden form (`proofs.kneel`).
+* **The Live page** learns the map, tileset and palette only when a stage
+  loads (Centaur's breakpoints), so `live_tour.lua` warps into the room
+  before filming; its screen inspector's capture is the page's `snap()`.
+* **A scene ending on a message**: the game moves the camera while a
+  message is open, so the edit ends such scenes on the last line (found by
+  the message window's cream color) and fades over it.
+* **Cutscene segments** last until their last timed action: a floating
+  Otenko bobbing on timed glides stretched the Count's opening by 250
+  frames; the bob now runs on the game's repeating timer.
