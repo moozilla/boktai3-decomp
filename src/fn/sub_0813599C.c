@@ -1,6 +1,11 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
+#ifdef NONMATCHING
+// fuzzy: 80.9%
+// Category-1 hit reaction (damage 1 << hits, HUD timed state, damage number, route restart).
+// Control flow right; left: register choice around the flags2D0/2D6 clears and the
+// SceneHud_SetTimedState argument order (ROM derives 0xB2/0x9A from the 0xB0 address).
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, s32, s32, u32);
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
@@ -64,8 +69,8 @@ struct HitHistory {
 u32 sub_0813599C(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
-    u32 category = actor->category;
-    u8 *count;
+    register u32 category asm("r4") = actor->category;
+    register u8 *count asm("r6");
     struct {
         u32 zero;
         u32 size[2];
@@ -75,7 +80,7 @@ u32 sub_0813599C(struct SceneActorRegistryResetView *actor)
         u16 *flags2D4 = &actor->flags2D4;
         u32 flags = *flags2D4;
         if (!(mask & flags)) {
-            u32 *flags2D0;
+            register u32 *flags2D0 asm("r2");
             {
                 u32 value = 0x10;
                 value |= flags;
@@ -83,15 +88,18 @@ u32 sub_0813599C(struct SceneActorRegistryResetView *actor)
                 *flags2D4 = value;
             }
             {
-                u32 offset = 0x2D0;
+                register u32 offset asm("r6") = 0x2D0;
                 u32 clear = ~2;
+                asm("" : "+r"(offset));
                 flags2D0 = (u32 *)((u8 *)actor + offset);
+                asm("" : "+r"(offset));
                 *flags2D0 &= clear;
             }
             {
                 u16 *flags2D6 = &actor->flags2D6;
                 u32 clear = ~0x9CB;
                 *flags2D6 = clear & *flags2D6;
+                asm("" ::: "memory");
             }
             {
                 u32 clear = ~0x4000;
@@ -106,8 +114,14 @@ u32 sub_0813599C(struct SceneActorRegistryResetView *actor)
                 history->count++;
             }
             category <<= *count;
-            actor->reactionSoundVariant = category;
-            actor->health -= actor->reactionSoundVariant;
+            {
+                u16 *damage = &actor->reactionSoundVariant;
+                u32 amount;
+                *damage = category;
+                asm("" ::: "memory");
+                amount = *damage;
+                actor->health -= amount;
+            }
             if (ShowsDamage(actor)) {
                 u32 *buffer;
                 SceneHud_SetTimedState(actor->id, actor->health, *(u16 *)((u8 *)actor + 0xB0),
@@ -140,3 +154,6 @@ u32 sub_0813599C(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0813599C);
+#endif
