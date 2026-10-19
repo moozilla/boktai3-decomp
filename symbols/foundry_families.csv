@@ -1539,3 +1539,4 @@ addr,function,name,family,note
 081BC6AC,sub_081BC6AC,DarkLoan_BeginOpening,"Dark loan panel","sets up the panel and starts its opening transition"
 081BC76C,sub_081BC76C,DarkLoan_FinishOpening,"Dark loan panel","switches the opened panel to its selection state"
 081BCA74,sub_081BCA74,DarkLoan_BeginAlternateOpening,"Dark loan panel","opens the alternate panel display with message thirteen"
+081CB6AC,sub_081CB6AC,StateActor_UpdateFacingAnimation,"State actor kind 086121C4 (tentative)","every call, plays one of two animations (entry 1 vs entry 0, or kind-29's 6/13) depending on a flag field at +0x26; restarts with different playback params and resets the frame counter on first entry (b9), then marks the command done once DisplayAnimation_TestFinished(actor+0xd4) succeeds"
