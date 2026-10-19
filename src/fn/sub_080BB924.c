@@ -1,6 +1,7 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.9% (agent draft, in progress; see notes/cloud-08122DF4.md)
+/* Re-enable the shadow, then restore the actor's live control fields from its saved snapshot (+0x118..) and reset its state; goes idle when flag 0x4000 is set (tentative) */
+#define Actor_RestoreSnapshot sub_080BB924
+
 typedef struct Ctx {
     u8 pad0[0x62A];
     u16 unk62A;
@@ -97,9 +98,10 @@ static inline u8 peek_flag(Obj *s)
     return s->unk2B3;
 }
 
-void sub_080BB924(Obj *s)
+void Actor_RestoreSnapshot(Obj *s)
 {
     Ctx *ctx = s->unk3D0;
+    s32 angle;
     s32 n;
     u8 saved;
     u32 keep;
@@ -119,7 +121,8 @@ void sub_080BB924(Obj *s)
         u32 mask = ~0x800;
         *f &= mask;
     }
-    saved = s->unk59;
+    angle = s->unk59; /* read as an int first: puts the flags pointer in r6 as in the ROM */
+    saved = angle;
     keep = (s->unk2D4 & 0x4000) ? 0x4000 : 0;
     s->unk2CC = s->unk118;
     s->unk2D0 = s->unk11C;
@@ -182,6 +185,3 @@ void sub_080BB924(Obj *s)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080BB924);
-#endif
