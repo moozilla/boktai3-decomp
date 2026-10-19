@@ -1466,3 +1466,4 @@ addr,function,name,family,note
 081BA2E4,sub_081BA2E4,Registry2388_CreateSelectionCursor,"Registry2388","builds available selection entries and their navigation links"
 081BA3D4,sub_081BA3D4,Registry2388_InitializeFromScript,"Registry2388","reads selection options and initializes the panel"
 081BA644,sub_081BA644,Registry3F74_ApplyPaletteStep,"Registry3F74","applies one of six palette transition steps"
+081BA6F8,sub_081BA6F8,Registry3F74_UpdateAnimations,"Registry3F74","updates selection animation and frame offsets"
