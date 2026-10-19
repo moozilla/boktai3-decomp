@@ -66,7 +66,11 @@ address,evidence
 08033AB0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08033AD0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08033C4C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+080347D8,Child connection event dispatcher with own prologue and return; reviewed ROM boundaries in wireless_connection_controller
 080349FC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+080359E4,Parent UNI session initializer with own prologue and return; reviewed ROM boundaries in wireless_connection_controller
+08035B98,Child UNI session initializer with own prologue and return; reviewed ROM boundaries in wireless_connection_controller
+08035CD0,Active-session slot-clearing helper with own prologue and return; reviewed ROM boundaries in wireless_connection_controller
 080369F0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08036BAC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08036C6C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C

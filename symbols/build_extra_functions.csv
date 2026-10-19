@@ -55,7 +55,11 @@ address,isa,evidence,replacement_end
 08033AB0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AD0
 08033AD0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AF0
 08033C4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08033C58
+080347D8,thumb,Child connection event dispatcher with own prologue and return; reviewed ROM boundaries in wireless_connection_controller,080349F0
 080349FC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08034A14
+080359E4,thumb,Parent UNI session initializer with own prologue and return; reviewed ROM boundaries in wireless_connection_controller,08035B98
+08035B98,thumb,Child UNI session initializer with own prologue and return; reviewed ROM boundaries in wireless_connection_controller,08035CD0
+08035CD0,thumb,Active-session slot-clearing helper with own prologue and return; reviewed ROM boundaries in wireless_connection_controller,08035CE8
 080369F0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036A10
 08036BAC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036BD4
 08036C6C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036C88
