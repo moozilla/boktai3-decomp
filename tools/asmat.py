@@ -4,13 +4,15 @@
 Starts at the function containing ADDR. Reviewed interior labels
 (symbols/function_nonentries.csv) are not function starts: the listing backs up
 past them to the real owner and prints them as plain labels, as the split does.
+Reviewed starts that the disassembler left as plain labels
+(symbols/build_extra_functions.csv) are function starts.
 """
 import re
 import signal
 import sys
 
 from romlib import ROOT
-from split import function_nonentries
+from split import extra_function_starts, function_nonentries
 
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # `| head` must not raise BrokenPipeError
 
@@ -21,11 +23,18 @@ addr = int(sys.argv[1], 16)
 n = int(sys.argv[2]) if len(sys.argv) > 2 else 40
 lines = open(ROOT + "/gen/code.s").read().split("\n")
 nonentries = function_nonentries()
+extra = extra_function_starts()
 
 
 def label_addr(i):
     m = LABEL.match(lines[i]) if i < len(lines) else None
     return int(m.group(1) or m.group(2), 16) if m else None
+
+
+def is_extra_start(i):
+    """A plain label that symbols/build_extra_functions.csv makes a function start."""
+    m = LABEL.match(lines[i])
+    return bool(m and m.group(2)) and int(m.group(2), 16) in extra
 
 
 def is_interior_start(i):
@@ -43,12 +52,15 @@ for i, ln in enumerate(lines):
             break
 # back up to the containing function start, skipping interior labels
 i = best
-while i > 0 and not (FUNC_START.match(lines[i]) and not is_interior_start(i)):
+while i > 0 and not (FUNC_START.match(lines[i]) and not is_interior_start(i)) \
+        and not is_extra_start(i):
     i -= 1
 out = []
 for j in range(i, max(best + n, i + n)):
     if j >= len(lines):
         break
+    if is_extra_start(j):
+        out.append(f"\t@ function start (symbols/build_extra_functions.csv)")
     if j > i and is_interior_start(j):
         out.append(f"\t@ interior label (symbols/function_nonentries.csv), not a function start")
         continue

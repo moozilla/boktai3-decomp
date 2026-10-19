@@ -89,11 +89,17 @@ def functions():
     global _funcs
     if _funcs is not None:
         return _funcs
-    from split import FUNC_LABEL, function_nonentries
+    from split import FUNC_LABEL, extra_function_starts, function_nonentries
     nm = names()
     nonentries = function_nonentries()
+    extra = extra_function_starts()  # reviewed starts left as plain labels
     out, cur, prev, fresh = {}, None, None, False
     for ln in open(os.path.join(ROOT, "gen", "code.s")):
+        m = re.match(r"_([0-9A-F]{8}):", ln)
+        if m and int(m.group(1), 16) in extra:
+            prev, cur, fresh = cur, "sub_" + m.group(1), False
+            out[cur] = [int(m.group(1), 16), [], []]
+            continue
         m = re.match(r"\s*(?:non_word_aligned_)?(?:thumb|arm)_func_start (\w+)", ln)
         if m:
             prev, cur, fresh = cur, m.group(1), True
