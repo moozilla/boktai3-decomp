@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Keep overnight runs from hanging the machine: pause workers under memory or CPU pressure.
 
-  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 26] [--resume-load 18] [--pace FILE]
+  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 40] [--resume-load 28] [--pace FILE]
 
 With --pace FILE (default ~/git/b3-logs/pace.txt) it also paces plan usage: at most
 the number in FILE of headless `claude -p` workers run; the youngest beyond that are
@@ -65,10 +65,19 @@ def tree(pid, rows):
     return out
 
 
+SHELLS = {"sh", "zsh", "bash", "-zsh", "-bash", "login", "env", "nohup", "time", "timeout"}
+
+
+def is_worker(cmd):
+    """A real worker process: never a shell whose command line merely mentions one."""
+    exe = os.path.basename(cmd.split()[0]) if cmd.split() else ""
+    return exe not in SHELLS and bool(WORKER.search(cmd))
+
+
 def roots(rows):
     """Worker processes whose parent is not itself a worker (one per job)."""
     by = {p: c for p, _, _, c in rows}
-    return [(p, age) for p, pp, age, c in rows if WORKER.search(c) and not WORKER.search(by.get(pp, ""))
+    return [(p, age) for p, pp, age, c in rows if is_worker(c) and not is_worker(by.get(pp, ""))
             and p != os.getpid()]
 
 
@@ -92,8 +101,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--min-free", type=int, default=15)
     ap.add_argument("--resume-free", type=int, default=30)
-    ap.add_argument("--max-load", type=float, default=26)
-    ap.add_argument("--resume-load", type=float, default=18)
+    ap.add_argument("--max-load", type=float, default=40)
+    ap.add_argument("--resume-load", type=float, default=28)
     ap.add_argument("--interval", type=float, default=5)
     ap.add_argument("--pace", default=os.path.expanduser("~/git/b3-logs/pace.txt"),
                     help="file holding the max number of running `claude -p` workers (usage pacing)")
