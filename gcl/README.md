@@ -264,6 +264,55 @@ stage prefix (`st05_440_`); library procedures used across the game take
 none. A Konami name from a debug print (`@st01_43_ruins_after`) wins over
 ours.
 
+### Generated names for scene procedures
+
+`tools/assets/gclroles.py` fills in names for what `proc.csv` leaves unnamed
+in the scene files, so a scene reads without `proc_N`. A scene file has a
+fixed shape: the entry calls a stage setup, the doors, the enemies, the
+objects, the music, and hands callbacks to cutscenes, message windows and
+entrances. So:
+
+* a scene entry takes its area's prefix (the labeling pass's area labels,
+  `data/labels/areas.csv`) and its id: `white_forest_3880`, `sealed_prison_2744`,
+  `scene_1928` where the area has no label;
+* a procedure private to one scene takes the scene's name and its role:
+  `white_forest_3874_stage`, `_doors`, `_enemies`, `_objects`, `_music`,
+  `_cutscene_198` (starts it), `_after_cutscene_198` (its `onfinish=`),
+  `_on_arrival` (an entrance's callback), `_after_message`, `_on_press`,
+  `_exit_to_3107` (one `door_transition`), `_talk`, `_story_96`.
+
+The role comes from how other procedures refer to it first, then from its
+body (the library files of its calls, `names/files.csv`, and the native
+routines it starts); `gclroles.py` lists the rules in order and counts what
+each names, `gclroles.py PROC` gives one name's evidence. Repeats in a scene
+take `_2`, `_3` in id order. Today that is all 492 scene entries and 80% of
+the 3,930 private procedures; the rest keep `proc_N`.
+
+```
+def white_forest_3874():  # proc 3874
+    scene_start(flags=1)
+    ...
+    if scene_is_set_up() == 0:
+        white_forest_3874_stage()
+        white_forest_3874_doors()
+        scene_apply_reset()
+        white_forest_3874_enemies()
+        white_forest_3874_objects()
+        white_forest_3874_music()
+
+def white_forest_3874_doors():  # proc 3875
+    entrance_at_box_911(box=0xcd22, facing=1, 2, 0, 57, white_forest_3874_on_arrival)
+    door(box=0xcd23, scene=white_forest_3880, entrance=10, back=144)
+```
+
+They are computed from the scripts each time (nothing ROM-derived is
+stored) at confidence `auto`, and `gclview.Names` adds them under the
+`proc.csv` rows, so the readable view, `gclfiles.py` and the Studio's Scripts
+page (file titles, links on callbacks and door targets) show them. A row in
+`proc.csv` always wins: to give a procedure a real name, add it there, and
+the scene's other generated names stay as they are. `gclroles.py --csv`
+prints them all as `proc.csv` rows to start from.
+
 ## Not names
 
 Script procedures are table slots, not hashes: a procedure's number cannot be

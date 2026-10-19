@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActorControl_BeginSoundTransition_080EBC38: SceneActorControl_BeginSoundTransition with other constants (ported by relatives.py + repair.py; provisional name) */
-#define SceneActorControl_BeginSoundTransition_080EBC38 sub_080EBC38
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 void sub_080EAC7C(struct SceneActorRegistryResetView *, s32);

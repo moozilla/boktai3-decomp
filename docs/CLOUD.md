@@ -43,7 +43,9 @@ Per task:
    `tools/explain.py` (per-line mismatch report), `tools/repair.py` (fixes wrong
    constants and callees), `tools/regions.py` (structure score that ignores
    registers), `tools/rasolve.py` / `tools/translate.py` (register allocation),
-   `tools/relatives.py ADDR` (similar matched functions). docs/PERMUTER.md and
+   `tools/relatives.py ADDR` (similar matched functions). For functions of 500+
+   instructions read docs/BIG_FUNCTIONS.md first (`tools/condense.py`,
+   `tools/variants.py`, `tools/rtlprobe.py`; score by check.py's `realigned:` line). docs/PERMUTER.md and
    docs/FOUNDRY.md say when each helps.
    If a function has no prologue (no `push`, or only `push {r5, r6, r7}`), reads a
    stack frame it never set up, or its neighbour has no epilogue, the split is wrong:

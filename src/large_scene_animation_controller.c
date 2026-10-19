@@ -1681,8 +1681,6 @@ found:
 /* Tentative: the second-phase counterpart of Nidhoggr_ActivateRandomPart (activates up to two
  * parts per call instead of one, and uses `timer` instead of `timer2`). confidence=low. */
 
-#define Nidhoggr_ActivateRandomParts2 sub_081958A8
-
 void Nidhoggr_ActivateRandomParts2(struct Nidhoggr *t)
 {
     s32 tries, limit;
@@ -1967,7 +1965,7 @@ void Nidhoggr_UpdateSecondPartPhase(struct Nidhoggr *t)
             t->state++;
             Sound_PlaySongChecked(0x403);
         case 3:
-            sub_081958A8(t);
+            Nidhoggr_ActivateRandomParts2(t);
             t->posOffsetX += t->posOffsetXVelocity;
             if (t->posOffsetX < -0x20000) {
                 t->posOffsetX = -0x20000;

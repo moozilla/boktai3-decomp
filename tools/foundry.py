@@ -598,8 +598,15 @@ def batch(n, bucket_filter=None, lo=0, hi=1 << 32):
         fh.write("\n".join(take) + "\n")
     with open(active_p, "a") as fh:
         fh.write(sub[2] + "\n")
+    # several runners claim at once: take the next free number with an exclusive create
     k = len(glob.glob(os.path.join(SCALE, "batch-*.txt"))) + 1
-    path = os.path.join(SCALE, f"batch-{k:03d}.txt")
+    while True:
+        path = os.path.join(SCALE, f"batch-{k:03d}.txt")
+        try:
+            os.close(os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            break
+        except FileExistsError:
+            k += 1
     rng = f"{sub[0]:08X}-{sub[1]:08X}" if sub[1] else "no recorded range"
     open(path, "w").write(BATCH_BRIEF.format(root=ROOT, funcs="\n".join(take), subsystem=sub[2], range=rng))
     open(path + ".subsystem", "w").write(sub[2])
