@@ -1,7 +1,11 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
-// Sibling of sub_08132D2C (same defeat-stats template, see notes/defeat-stats-template.md).
-// Matched without pins once the counters became an if/else and the macros lost do/while(0).
+#ifdef NONMATCHING
+// fuzzy: 90.0%
+// Sibling of the matched sub_08132D2C (same defeat-stats template, see notes/defeat-stats-template.md).
+// Structure is exact; left: the ROM keeps counter offsets in r5/r7 (ours r1) and two prologue
+// stores (2C8, 2AC) differ by a register copy. Pinning r5 globally moves actor into r7 (unsafe).
 /* Like sub_08132D2C. At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
 void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
@@ -24,10 +28,18 @@ static inline s32 clamp(s32 v)
     return v;
 }
 /* Saturating defeat counters in the game-state block. */
-#define STAT_INC(n) Count(&H(STATS, n))
+#define STAT_INC(n) H(STATS, n) = H(STATS, n) < 9999 ? H(STATS, n) + 1 : 9999
 #define STAT_ADD(n) H(STATS, n) = clamp(H(STATS, n) + 1)
+/* Same counters with the offset held in a given register (register-pinning concession). */
+#define STAT_INC_AT(n, reg)                                                                        \
+    do {                                                                                           \
+        u8 *base = STATS;                                                                          \
+        register u32 offset asm(reg) = (n);                                                        \
+        asm("" : "+r"(offset));                                                                    \
+        H(base, offset) = H(base, offset) < 9999 ? H(base, offset) + 1 : 9999;                     \
+    } while (0)
 #define KILL_KIND(flags)                                                                           \
-    {                                                                                              \
+    do {                                                                                           \
         if ((flags) & 0x80)                                                                        \
             STAT_ADD(0x58A);                                                                       \
         else if ((flags) & 0x100)                                                                  \
@@ -38,20 +50,13 @@ static inline s32 clamp(s32 v)
             STAT_ADD(0x590);                                                                       \
         else if ((flags) &= 0x800)                                                                 \
             STAT_ADD(0x592);                                                                       \
-    }
+    } while (0)
 #define CASE_BODY(n)                                                                               \
-    {                                                                                              \
-        u32 flags = *(u32 *)(hit + 0x38);                                                          \
+    do {                                                                                           \
+        register u32 flags asm("r4") = *(u32 *)(hit + 0x38);                                       \
         STAT_INC(n);                                                                               \
         KILL_KIND(flags);                                                                          \
-    }
-static inline void Count(s16 *p)
-{
-    if (*p < 9999)
-        *p = *p + 1;
-    else
-        *p = 9999;
-}
+    } while (0)
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -103,11 +108,11 @@ u32 sub_08134398(struct SceneActorRegistryResetView *actor)
     u32 flags;
     if (actor->health <= 0) {
         {
-            u32 offset = 0x2D6;
-            u32 controlOffset;
-            u32 zeroByte;
-            u32 zeroWord;
-            u32 one;
+            register u32 offset asm("r5") = 0x2D6;
+            register u32 controlOffset asm("r7");
+            register u32 zeroByte asm("r3");
+            register u32 zeroWord asm("r4");
+            register u32 one asm("r5");
             void *control;
             u32 kind;
             {
@@ -134,9 +139,10 @@ u32 sub_08134398(struct SceneActorRegistryResetView *actor)
             actor->target = control;
             actor->field2C8 = zeroWord;
             {
-                u32 flagsOffset = 0x114;
+                register u32 flagsOffset asm("r7") = 0x114;
                 u32 *flags114;
                 s32 mask;
+                asm("" : "+r"(flagsOffset));
                 flags114 = (u32 *)((u8 *)actor + flagsOffset);
                 mask = ~1;
                 *flags114 &= mask;
@@ -144,10 +150,12 @@ u32 sub_08134398(struct SceneActorRegistryResetView *actor)
             actor->word104 = zeroWord;
             {
                 u32 state = 3;
-                u32 stateOffset = 0x2A8;
+                register u32 stateOffset asm("r2") = 0x2A8;
+                asm("" : "+r"(stateOffset));
                 *((u8 *)actor + stateOffset) = state;
                 {
-                    u32 phaseOffset = 0x2A9;
+                    register u32 phaseOffset asm("r7") = 0x2A9;
+                    asm("" : "+r"(phaseOffset));
                     *((u8 *)actor + phaseOffset) = zeroByte;
                     actor->behavior2AA = zeroByte;
                     stateOffset += 4;
@@ -181,11 +189,12 @@ u32 sub_08134398(struct SceneActorRegistryResetView *actor)
         {
 
             if (kind != 5 && kind != 7 && kind != 6) {
-                STAT_INC(0x87C);
-                STAT_INC(0x538);
+                STAT_INC_AT(0x87C, "r7");
+                STAT_INC_AT(0x538, "r7");
                 {
-                    u32 offset = 0x134;
+                    register u32 offset asm("r7") = 0x134;
                     u8 *pinned;
+                    asm("" : "+r"(offset));
                     pinned = (u8 *)actor + offset;
                     hit = pinned;
                 }
@@ -266,3 +275,6 @@ u32 sub_08134398(struct SceneActorRegistryResetView *actor)
     }
     return (u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x268));
 }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08134398);
+#endif

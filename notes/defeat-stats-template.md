@@ -39,8 +39,10 @@ details caused them. (a) `do { } while (0)` around `KILL_KIND`/`CASE_BODY` is a 
 counter pointer. Use plain braces. (b) The saturating counter is an if/else with two stores
 (`if (*p < 9999) *p = *p + 1; else *p = 9999;`): the second store gives the counter pointer
 the uses it has in the original, and cross-jumping merges the stores back into one `strh`.
-With both changes, sub_08132D2C needs no pins and the 90% draft sub_08134398 matches. The same
-fix removed 18 pins each from sub_080EE1B0 and sub_080BD1F0.
+With both changes sub_08132D2C needs no pins. The same fix removed 18 pins each from
+sub_080EE1B0 and sub_080BD1F0. (sub_08134398 is still a 90% draft: check it with
+`check.py --full` on a copy without the `#else INCLUDE_ASM` branch, or the check compiles
+the fallback asm and reports a false match.)
 
 Only the register pins in 7 and 8 are concessions. `tools/depin.py` kept one of the five.
 
