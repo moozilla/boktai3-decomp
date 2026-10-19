@@ -14,7 +14,7 @@ s32 Armor_TryStartAction(struct Armor *, s32);
 void Armor_StartSlowWhiteFade(struct Armor *);
 void SceneCombatActor_ResetAttackMode(struct Armor *);
 void SceneCombatActor_ResetDefenseMode(struct Armor *);
-void sub_08181778(struct Armor *);
+void Armor_BindPaletteBanks(struct Armor *);
 
 void Armor_UpdateWhiteFadeSequence(struct Armor *armor)
 {
@@ -42,7 +42,7 @@ void Armor_UpdateWhiteFadeSequence(struct Armor *armor)
                         SceneCombatActor_ResetDefenseMode(armor);
                         break;
                 }
-                sub_08181778(armor);
+                Armor_BindPaletteBanks(armor);
                 armor->sequenceState = 3;
             }
             break;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080CC830(void *);
+void Golem_TickFacingQuadrant(void *);
 void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Golem_UpdateEffectsAndContacts(void *);
@@ -19,7 +19,7 @@ struct S {
 s32 Golem_OnUpdate(struct S *s)
 {
     u32 m;
-    sub_080CC830(s);
+    Golem_TickFacingQuadrant(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
         Callback_InvokeActor(s, s->tbl[s->idx]);

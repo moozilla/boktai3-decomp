@@ -1,6 +1,5 @@
 #include "global.h"
 /* Actor_StepTowardTargetAxis: steps toward a target point along one axis (the larger delta, or the current facing on ties); turns first if the axis changes */
-#define Actor_StepTowardTargetAxis sub_080C44E4
 
 struct Unk080C44E4State {
     u8 unk000[0x68E];

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* After 60 frames, return to the group route point and hand control to the entry target. */
-#define SceneActorReaction_ReturnToRouteEntry sub_080BBBC0
 struct SceneActorReactionContext {
     u8 unknown0[0x6DC];
     u32 flags6DC;

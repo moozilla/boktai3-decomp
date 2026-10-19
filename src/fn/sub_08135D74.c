@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (sub_08081C98) and reset hit state. */
-#define SceneActorReaction_TryBeginControl29 sub_08135D74
 void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void sub_08081C98(void);

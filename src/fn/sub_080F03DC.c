@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "scene_vec.h"
 
-#define Ivy_ReleaseCapturedPlayer sub_080F03DC
-
 struct Player;
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -77,7 +75,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
 /* Ivy release (tentative): once per capture (context flag 1), and when context flag 2 says the
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
-void sub_080F03DC(struct SceneActorRegistryResetView *actor)
+void Ivy_ReleaseCapturedPlayer(struct SceneActorRegistryResetView *actor)
 {
     if (TestFlags(actor->context, 1))
         return;

@@ -124,3 +124,4 @@ or scan the table below. Each entry has a `Tags:` line under its heading (vocabu
 | [2026-10-16.md](2026-10-16.md#L82) | October 16 (Claude): script entry points, batch 2 | scripts actors tooling | 2 |
 | [2026-10-16.md](2026-10-16.md#L90) | October 16 (Claude): script entry points, batch 1 | scripts text actors | 16 |
 | [2026-10-17.md](2026-10-17.md#L3) | October 17 (Claude): script entry points, batch 13 | scripts actors | 0 |
+| [2026-10-19.md](2026-10-19.md#L1) | Generated names for scene procedures | scripts tooling | 0 |

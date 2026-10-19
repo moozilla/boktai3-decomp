@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
 /* Steps an animated sprite's display sequence (shared Step inline with SceneParticleBurst_UpdateSlot); sets result=2 when the sequence ends. */
-#define SequencedSprite_StepAnimation sub_08122DF4
 struct SequencedSprite {
     struct SceneParticleEffect sprite;
     struct DisplaySequenceState state;

@@ -4,17 +4,22 @@ proc,name,params,confidence,evidence
 554,scene_reset_state,,low,resets the actor manager mode and script work area (r700[0x28]..)
 557,reset_dungeon_on_entry,dungeon,low,"when entering at appearance points 1-6, clears the floor-switch, candle-stand and other per-dungeon flag arrays and runs the dungeon's own reset (procs 571-580 by gs[0x5ac])"
 558,update_elapsed_days,,low,compares the saved date r708[0xc2..0xc6] with today (r700[0x56..]); prints 日数差を取得 (got the day difference)
+838,is_stage_reentry,,low,1 when current_stage == r708[0x1c6] or r708[0x12c] is 2 or 3
 860,no_callback,,high,empty procedure; passed as the default callback 494 times
 861,scene_start,flags,low,"first call of every scene entry: sets scene flags r700[0x6c] (early story, entrance ranges, stage ranges)"
 862,set_scene_flags,bits,low,r700[0x6c] |= bits
 864,scene_set_mode,mode,low,second call of every scene entry: sets gs[0x868]
 865,set_hud_flags,bits,low,gs[0x868] |= bits; HUD setup procs 867/870 call it before Hud_SetLayout
+867,set_hud_layout_by_dungeon,,low,"HUD flags and page layout, one page off in dungeons 7 and 8 (gs[0x5ac])"
 868,set_hud_layout,,low,sub_081780D4 with element visibility lists
+870,set_sealed_prison_hud_by_story,,medium,while story < 30 enables HUD pages as the Sealed Prison tutorial progresses (story 18 adds a page); called by the 20 prison scenes
 872,scene_is_set_up,,low,scene setup runs inside if (proc_872() == 0) (docs/ASSETS.md)
+874,is_dark_light_phase,refresh,low,"SunClock_GetLightPhase into r700[0x28] when refresh == 1; returns 1 for phases 0, 4 and 5"
 875,advance_story,value,high,"story = max(story, value)"
 876,load_stage_raw,"map,tileset,hp",medium,"the loader 884/885 wrap (docs/ASSETS.md, Stage scripts)"
 878,load_background_layer,"name,tiles,scroll,data",medium,Background_LoadTiles/LoadMaps on layer 2
 879,spawn_background,"name,map,,,",medium,a Background actor (the c_f/c_i/c_d options)
+880,spawn_background_anchored,"name,map,p,i,f,a,b",medium,"spawn Background(name, c_f=131|f, c_i, c_d, p, A=(a, b))"
 881,spawn_background_layer,"name,map,p,i,flags,x,y,scroll_x,scroll_y,clip_w,clip_h",medium,"spawns Background with a layer offset (x/8, y/8), centre (+120, +80) and clip"
 884,load_stage,"map,tileset,hp",high,loads the stage (docs/ASSETS.md); 194 stages follow it with proc_888
 885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
@@ -46,8 +51,11 @@ proc,name,params,confidence,evidence
 923,entrance_at_box_923,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
 924,entrance_at_box_924,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
 925,entrance_at_box_925,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+927,entrance_in_place,appearance,low,"when entering at appearance: HUD setup (proc 933), scene flag 16, and play_entrance_motion mode 6 (wait a frame) with no walk-in"
+928,play_entrance_motion,"r,mode,,,delay,v94,v98",low,"begin_event, then by mode: 6 waits delay frames, 0/2/5 walk in to the entrance point (ScriptActor_MoveTo or Turn), 8 starts an action, 3/4 stand, 7 hide; ends in proc_929"
 931,place_player_at_box,,medium,places the player at the copied door box (docs/ASSETS.md)
 932,set_player_position,,medium,writes GameState+0x30/+0x34 and the facing (docs/ASSETS.md)
+933,entrance_hud_setup,appearance,low,"HUD mode 7 for appearance points 2-6, 57-66 and 125-129, then procs 14108 and 14109"
 934,door,"box,scene,entrance,back",high,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
 935,door_935,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
 936,door_936,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
@@ -67,6 +75,9 @@ proc,name,params,confidence,evidence
 953,set_arrival_entrance,"entrance,back",high,"stores the entrance in r708[0x70] (docs/ENGINE.md, CENTAUR.md)"
 956,set_continue_proc,proc,medium,stores a procedure in r700[0x24]; proc_957 calls it
 957,run_continue_proc,,medium,calls the procedure stored by proc_956
+969,camera_centered_bounds_trap,"area,w1,w2,w3,w4,,ax,az,bx,bz",medium,as camera_bounds_trap with Camera_SetCenteredBounds
+970,camera_bounds_trap,"area,w1,w2,w3,w4,,ax,az,bx,bz",medium,"unless proc_863(16): a player trap on area that sets Camera_SetBounds(a, b)"
+972,export_box_bounds,box,medium,Terrain_ExportBoxBounds(box) into r700[0x6e..0x82]
 1016,begin_event,"mode,flag",low,sets the script control flag (input lock?) before dialogue and cutscenes
 1018,end_event,,low,proc_1017 and sub_0815D590; pairs with begin_event (1016)
 1019,open_message_window,proc,medium,"opens the message window (sub_080311F0, bottom rows; top during story 190-191) continuing with proc"
@@ -77,6 +88,9 @@ proc,name,params,confidence,evidence
 1027,end_event_and_close_message,,medium,"end_event, close_message_window_if_open, HUD mode 7"
 1030,place_directional_controller,"id,x,z,orientation,start_proc",medium,proc_1031 with defaults
 1031,directional_controller,"id,disabled,x,z,orientation,start_proc,end_proc",medium,DirectionalController at the floor height
+1032,release_directional_controller,,medium,DirectionalController_ScriptRelease only
+1033,end_dialogue_release_controller,,medium,"end_dialogue, then proc 1032 (DirectionalController_ScriptRelease); a common message_then/open_message_window callback (130 references)"
+1035,place_scene_npc_by_player,,low,actor_name_of(1) placed on a free side of the player (gs[0x30]/gs[0x34]) by comparing floor heights; the third cutscene script in many scripts=[...] lists
 1036,end_event_restore_hud,,low,"sub_081D105C, end_event, then HUD mode 0 (2 in stages 521-525)"
 1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
 1049,play_bgm_with_fade,"fade,id",medium,"play_bgm_fade(fade, id, 0)"
@@ -84,10 +98,12 @@ proc,name,params,confidence,evidence
 1052,add_display_track,id,low,proc_1053 then a palette track
 1053,display_track_add,"id,resource,frame",medium,DisplayTrack_Add with a position wrapped to the cell
 1055,add_wall_track_7a40,"id,frame,x,y,z",low,display_track_add with resource 7A40; wall types 1 and 3 of wall_track_by_type
+1056,spawn_terrain_modifiers,"a,b,d,x,y,z",medium,"TerrainModifiers(a, b, d, bf=(x, y, z))"
 1059,place_scene_object,"id,type,x,z",medium,proc_1060 with defaults
 1060,scene_object,"id,type,flags,x,z,health,resource,drawmode,script",medium,"SceneObjects at the cell centre (x + 128, z + 128)"
 1071,place_cell_gate,"name,value,x,y,z",medium,only spawns CellGate
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
+1077,spawn_solar_directional_force,"threshold,t1,t2",medium,"DirectionalForce (0x9682) scaled by Solar_GetLevel(), re-thresholded every frame as the sunlight changes"
 1082,floor_switch_tile,"kind,x,z",medium,"compares the floor height at the four corners of a 256x256 tile and returns the plate sprite that fits the slope (families 17C7-17CB, B0A9-B0AD, B0BC/C583)"
 1083,place_floor_switch_at_point,"name,point,switch_no,pressed,tile,on_press,on_release",low,resolves a point (proc 972) and calls place_floor_switch
 1084,place_floor_switch,"name,x,z,switch_no,pressed,tile,on_press,on_release",high,"creates registry AB8E (floor switch) on the floor; on_press/on_release are the S callbacks, e.g. procs 3945/3946 activate and deactivate a door; a debug print labels its pressed argument $f:床スイッチフラグ (floor switch flag); R is (1085, 1086), which set floor_switch_flag[switch_no] and call on_press/on_release"
@@ -99,9 +115,12 @@ proc,name,params,confidence,evidence
 1095,spawn_scene_objects_manager_2,mode,medium,as 1094 with S=7AD2
 1096,box_edge_position,"box,facing",medium,sets r700[0x76]/[0x64]/[0x78] to the point on the box edge for a facing
 1097,place_object_at_box_2,"name,box,facing,",low,proc_1098 with defaults
+1098,place_scene_object_at_box,"id,box,type,facing,value,variant",medium,"box_edge_position, then SceneObjects_ScriptAppend; variant 1 when r708[0x6e.1] and proc_973(box)"
 1100,place_object_at_box,"name,box,facing,",low,copies the box (proc_1096) and creates the object at it (proc_1102)
 1101,place_numbered_object_at_box,"box,facing,variant",low,up to eight objects named 0x6A40+n (r700[0xc5] counts them)
 1102,append_scene_object,"name,x,y,z,,facing,variant",medium,SceneObjects_ScriptAppend
+1108,place_path_object,"name,kind,path,point",low,place_named_object_on_path with defaults and callback proc 1112
+1109,place_named_object_on_path,"name,kind,path,point,,m,follow",low,"Path_GetPoint(path, point), then NamedObject at that point"
 1113,set_actor_route,"name,route,mode",high,only NamedActor_SetRoute
 1118,floor_item,"category,item,x,z,facing,flags,flag",medium,an item on the floor (docs/ASSETS.md)
 1119,place_item,"category,item,x,z,facing,chest,,flags,flag,proc",medium,an item; chest = 1 puts it in a chest (docs/ASSETS.md)
@@ -110,6 +129,11 @@ proc,name,params,confidence,evidence
 1128,place_random_table_item,"table,count,x,z,facing,chest,a,flag,proc",medium,"picks a random (category, item) pair from table and calls place_item"
 1131,place_random_items,"table,count",low,"up to eight items from a text-bank data table (e.g. text#210), via proc_1132"
 1132,place_random_item,"table,index",low,"reads a (kind, item, ...) triplet from the table"
+1133,drop_random_item,,low,"proc 1136 (roll_item_drop), then proc 1138 to place the result; passed as a callback 53 times"
+1136,roll_item_drop,"item_a,item_b,kind,type",medium,"Random(100) against chances raised by ScriptActor flags 21-24 and a pity counter r708[0xe1] (100% after 16 misses); returns item_b|0x1000000, item_a or -1"
+1144,arm_defeat_count_event,"kind,id,count,skip,,,,,,,",low,"unless skip: r700[0x88.4] = 1 and stores the event (r700[0xd2..0xe4]); count goes to r700[0xd4], the target proc 1148 counts up to; kind 0/1 picks 13 or 45 for r700[0xe4]. Sealed Prison 2744 arms one."
+1145,play_defeat_event_reward,,low,"begin_event by r700[0xd2], then jingle (Sound_PlayTrackedSongFromScriptAlternate 11) and proc 1039 0x5B57; passed as a callback 22 times"
+1148,count_defeat_for_event,,low,"while r700[0x88.4]: r700[0xd3] += 1, and at r700[0xd4] runs proc 1149; passed as a callback 24 times"
 1153,direction_to_angle,direction,high,"maps directions 0-7 to angles 160,192,224,0,32,64,96,128"
 1154,actor_name_of,id,low,maps a number to a hash (name) in a 120-line table
 1155,place_character_default,"id,x,z,direction,proc",low,"place_character with w=(256, 512, 1024)"
@@ -120,9 +144,12 @@ proc,name,params,confidence,evidence
 1178,spawn_particles,"count,x,y,z,type,a,speed,spread,life,fade",medium,only spawns AnimatedParticles
 1180,place_collision_controller,"id,type,kind,x,z,attack_a,attack_b,attack_c",low,CollisionController on the floor; type is random 0/1 when r708[0x171] == 2
 1181,scatter_collision_controllers,"type,kind,x,z,spread,count",low,up to 5 place_collision_controller at random offsets; type 3 picks a weighted random type by r700[0x28]
+1184,place_scene_object_at_box_default,"box,facing,,value,,appearance,id",low,append_scene_object_at_box with callback proc 1186
+1185,append_scene_object_at_box,"box,facing,,value,,appearance,id",low,"box_edge_position(box, facing), then SceneObjects_ScriptAppend(id + 1, ...) with variant 1 when entering at appearance"
 1191,open_choice_menu_default,"name,script,stringbase_a,stringbase_b",low,"open_choice_menu with layout (1, 13, 28, 6)"
 1192,open_choice_menu,"name,script,x,y,w,h,stringbase,options_w,options_c,a,b",medium,"HUD mode 3, spawns ChoiceMenu, sets gs[0x86c]"
 1200,enemy_count_slot,,low,"index of the first set flag r708[0x6e.2][0..3], else -1 (enemy-count missions)"
+1201,route_flag_state,,low,"0 when any of r708[0x6e.2][0..2] is set, 1 when [3] is, else -1"
 1204,begin_enemy_count,id,low,finds id in r708[0x215][0..63] and starts counting
 1206,count_enemy,,low,r700[0xef] += 1 while counting
 1207,register_enemy_count,,low,print: 番目の配列に を登録しました (stored the count in the array)
@@ -130,7 +157,9 @@ proc,name,params,confidence,evidence
 1211,enemy_may_spawn,kind,low,returns 1 or 0 for a spawner kind under the current mission
 1212,enemy_slot_taken,,low,r708[0x256.0][...] == 1 while counting
 1219,place_goddess_statue,"x,z",medium,"in an enemy-count mission: items 0x32-0x34, the Fate/Existence/Necessity Goddess Statues, by stage"
+1233,spawn_scene_indicators,"name,value",medium,"SceneIndicators(name, value_t=0x4211, value_p=value)"
 1235,place_spike_floor,"id,x,z,v,d,period",medium,log 'Contact spike floor'; a SceneIndicator on the floor
+1264,clear_talk_flag_and_end,slot,low,"r708[0x8a][slot] = 0, then end_dialogue"
 1265,spawn_scene_managers,,medium,"proc_1266, 1267, 1268; every scene entry calls it"
 1266,spawn_common_managers,,medium,"the Continue? prompt, DemoManager, audio, actor registry, terrain markers..."
 1267,spawn_message_managers,,low,"the message window actors, then closes the window"
@@ -213,6 +242,8 @@ proc,name,params,confidence,evidence
 1586,spawn_ivy_default,"name,path,point,level",low,spawn_ivy with proc 0x633
 1587,place_ivy_remains,"x,y,z",medium,display track with the ivy sprite D638; proc 3278 logs 'placing ivy as destroyed remains'
 1588,spawn_ivy,"name,path,point,a,level,proc",medium,"enemy kind 50, registry 1744 (Ivy_Create); proc 3278 logs 'During mission to eliminate all enemies, placing ivy as destroyed remains!'"
+1594,spawn_enemy_on_path_by_kind,"name,kind,path,point,i",medium,"Path_GetPoint, then proc 1595 (kind 1) or 1596 (kind 0); logs 'Invalid type! Enemy not registered.'"
+1597,spawn_enemy_on_path,"name,path,point,i",low,"Path_GetPoint, then proc 1598"
 1599,place_dragon_puppy,"name,x,z",medium,spawn_dragon_puppy at a cell (data table text-bank 1565)
 1600,spawn_dragon_puppy,"name,path",medium,"enemy spawner: creates key 3D38 (docs/ASSETS.md, 1496-1627)"
 1609,spawn_fan_cannon_manager,"name,path",medium,"enemy spawner: creates key 9CC2 (docs/ASSETS.md, 1496-1627)"
@@ -226,20 +257,43 @@ proc,name,params,confidence,evidence
 1625,spawn_axe_by_kind,"name,kind,path",medium,"picks one of procs [1626, 1627] by kind"
 1626,spawn_axe_1,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
 1627,spawn_axe_2,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
+1640,roll_dungeon_event,kind,low,"Random(100) against proc 1159, then conditions on story, dungeon (gs[0x5ac]) and r708[0x7a]; sets r700[0xff.2] and returns 1 when it fires"
 1666,stop_weather_and_continue,,low,stops the weather (proc_1045) and continues through proc_1674
 1668,restore_hud,,low,"end_event, then HUD mode 0, 1 or 2 by stage"
+1675,ensure_scene_actor_manager,,medium,spawns SceneActorManager (0x286F) unless SceneActorManager_Exists(); the first entry of most cutscene scripts=[...] lists (218 references)
+1676,place_scene_npc,"x,z,direction,i",medium,"actor_name_of(1) (the scene NPC, Otenko in the cutscenes); spawns SceneNpc at the floor height the first time (r700[0xad.0]), else moves it there"
 1677,place_character_2,"id,x,z,direction,i",low,like place_character: actor_name_of(id) and registry 8EA3 on the floor; id 27 only once
+1696,end_actor_script_control,"id,mode",medium,Actor_EndScriptControl(actor_name_of(id)); the pair of begin_actor_script_control
 1771,place_disabled_directional_controller,"id,x,z,orientation,start_proc",low,directional_controller with disabled=1
+1782,get_flag_15d,index,low,return r708[0x15d.0][index]
 1785,run_once,"index,a,proc",medium,calls proc and returns 1 only the first time (sets r708[0x19a][index])
 1786,toggle_switch,"index,kind,on_proc,off_proc",medium,flips a switch flag (r708[0x1a9]/[0x1ab]... by kind) and calls on_proc or off_proc
 1787,story_chapter,,high,"0-6 from story ranges 30, 64, 93, 117, 150, 174, 191"
+1788,show_dialogue_error,code,high,"message 5265 '会話リソースエラー エラーコード:' (conversation resource error, error code) with the number"
+1816,begin_actor_script_control,id,medium,logs 'Town mode'; Actor_BeginScriptControl(actor_name_of(id))
+1817,save_player_facing,,low,r700[0x1c8] = gs[0x36] (gs[0x30..0x34] are the player position)
+1819,player_face,r,medium,ScriptActor_SetFacing(r)
+1820,player_enter_state_four,,low,ScriptActor_EnterStateFour only
 1823,set_script_actor_mode,mode,high,only ScriptActor_SetMode
 2292,show_counter,"slot,value,max",low,sub_08030FFC; called with money (max 999999) and counters
+2591,sealed_prison_tile_animations,,low,TileAnimation_Configure 4C08-4C0A; used by 17 Sealed Prison scenes
+3263,load_ancient_tree_backdrop,,low,load_background_layer 0xE954 and spawn_background_layer 0x535B; used by 42 Ancient Tree scenes
+3264,ancient_tree_backdrop_2,,low,load_background_layer 0x8F62 and spawn_background_layer 0x878D; Ancient Tree scenes
+3266,ancient_tree_tile_animations,,low,TileAnimation_Configure x4; used by Ancient Tree (19) and Dark Castle scenes
+3268,ancient_tree_bgm,,low,play_bgm 101 in either light phase; Ancient Tree scenes
 3269,place_wall,"name,wall_type,x,y,z",medium,display track by wall type ($:P_壁種類 wall type; print: Unknown wall type???)
+3270,place_bridge_by_type,"id,,x,y,z",medium,by bridge_type: display tracks 5D5F/61BF in six orientations
+3742,add_white_forest_track,"id,x,y,z",low,display_track_add resource 0x2D86 at a position; White Forest stages place four of them
+4279,pirate_island_tile_animations,,low,TileAnimation_Configure 0x554; used by 17 Pirate Island scenes
 4932,set_area_story,"area,value",high,sets an area story flag; prints NNNエリアのストーリーフラグを更新 (update area NNN story flag)
 4941,place_pushable_block,"name,,slot,",low,used by the scale quiz for its six blocks (gcl/examples/scale_quiz.md)
 4949,npc_line,"conversation_no,",low,one message per conversation number (the scale floor: Johnny)
+4952,place_wall_by_type_3,"id,,x,y,z",medium,by wall_type: display tracks 77AF/77B0 or add_wall_track_7a40; logs 'Unknown wall type???'
 4953,wall_track_by_type,"id,wall_type,x,y,z",medium,display track per wall_type 0-6; log 'Unknown wall type???'
+4954,place_wall_by_type_2,"id,,x,y,z",medium,by wall_type: display tracks 77AD/77AE/081B; logs 'Unknown wall type???'
+4956,place_wall_by_type,"id,,x,y,z",medium,by wall_type: display tracks 77B1/77B2/77CA/77D1 or add_wall_track_7a40; logs 'Unknown wall type???'
+4958,set_dark_castle_palette_by_story,,medium,"stage palette by story (< 170, >= 174, between) and whether current_stage is 487"
+4959,entrance_at_box_by_flag,"box,facing,entrance,on_arrival",low,"entrance_at_box_911 with on_arrival while r708[0x150.6] == 0, else entrance_at_box_909"
 5010,brothers_reply_none,,medium,scale quiz: answer to John with no blocks
 5011,brothers_reply_some,,medium,scale quiz: answer to John with some blocks
 5012,brothers_reply_all,,medium,scale quiz: answer to John with all blocks
@@ -256,7 +310,13 @@ proc,name,params,confidence,evidence
 5762,wrong_answer_cutscene,"direction,",medium,scale quiz: too light (-1) or too heavy (1)
 5763,correct_answer_cutscene,,medium,scale quiz: correct
 5765,scale_room_doors,,medium,scale room: doors by story stage
+5999,paradise_backdrop,,low,load_background_layer 0x49C0 and spawn_background_layer 0x81AF; Paradise scenes
+6000,paradise_tile_animations,,low,TileAnimation_Configure DB6C-DB6D; Paradise scenes
+6007,paradise_bgm,,medium,"logs 'Setting pre-collapse BGM BGM_st06_01' (38) before story 183, else 'post-collapse BGM_st06_02' (39); Paradise scenes"
 6008,stage_earthquake,,medium,"per-stage earthquake strength after story 183; logs 'No earthquake planned here for now', 'Before collapse, so no earthquake yet'"
 6009,start_earthquake,"period,strength,flag",medium,repeating camera shake at a random period around `period`
 6015,start_tremor,"a,b",low,repeats proc 6016 every 60 frames; used before the collapse
+6320,open_auto_message_window,values,low,"HUD modes 7 and 9, MessageWindow_Open at (1, 1, 28, 6) with auto-advance"
+6365,show_stage_icon,script,medium,"begin_event, then after 16 frames StageIconDisplay with completionscriptid=script"
+6462,call_now_and_after_2_frames,"proc,arg",low,"call(proc), TerrainEdgeMarker_SetMode(1), and call(proc) again 2 frames later"
 8796,place_character,"id,x,z,direction,w_b,w_c,t",low,"actor_name_of(id); id 1 places a SceneNpc once, others registry 8EA3"

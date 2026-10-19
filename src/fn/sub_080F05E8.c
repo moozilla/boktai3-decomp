@@ -4,8 +4,6 @@
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
 
-#define Ivy_TickDrawable sub_080F05E8
-
 struct IvyContext {
     u8 unknown0[0x62C];
     u32 flags;
@@ -132,7 +130,7 @@ static inline void StepSequence(void *obj)
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
  * display sequence (the step is ScenePanelRig_TickSprites's, with the same pins). The drawable
  * pointer passes through r0, as in the ROM. */
-void sub_080F05E8(struct SceneActorRegistryResetView *actor)
+void Ivy_TickDrawable(struct SceneActorRegistryResetView *actor)
 {
     {
         struct IvyContext *context = actor->context;

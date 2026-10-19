@@ -1,0 +1,35 @@
+#include "global.h"
+#include "player.h"
+#ifdef NONMATCHING
+// fuzzy: 84.2%
+// foundry draft (worker best 84.2%); what differs is mostly register allocation and instruction order
+#define PlayerAnimation_SelectSecondaryKeyframes sub_0813AEA0
+#define Animation_SetPlaybackRate                Anim_SetFrameDurationScale
+void Anim_SetKeyframes(void *, void *, u32, u32, u32);
+s32 Anim_Step(void *, void *);
+void Anim_SetFrameDurationScale(void *, u32);
+s32 sub_0813AEA0(struct Player *p, s32 index, s32 rate)
+{
+    struct PlayerAnimation *anim;
+    void *data;
+    u32 flags = 0;
+    if (p->animationIndex == index)
+        flags = 1;
+    p->animationIndex = index;
+    anim = &p->secondaryAnimation;
+    data = p->animationData;
+    {
+        s32 selected = index;
+        selected = selected + p->heading;
+        Anim_SetKeyframes(anim, data, (u16)selected, 1, flags);
+    }
+    if (p->side)
+        anim->flags |= 4;
+    else
+        anim->flags &= ~4;
+    Anim_SetFrameDurationScale(anim, (u16)rate);
+    return Anim_Step(anim, data);
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0813AEA0);
+#endif

@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActorPath_FaceAndCheckStraightPath: faces the actor toward its target and checks that the grid cells along the row/column from its cell to the goal cell are passable (sub_0812E118); restores the facing on failure (provisional) */
-#define SceneActorPath_FaceAndCheckStraightPath sub_080D6DF8
 #include "scene_actor_terrain.h"
 u8 sub_0812E118(s32, s32, s32, u32);
 s32 Math_Atan2(s32, s32);

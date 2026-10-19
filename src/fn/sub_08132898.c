@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 void sub_0813214C(struct SceneActorRegistryResetView *);
 void sub_08132490(struct SceneActorRegistryResetView *);
-void sub_08132748(struct SceneActorRegistryResetView *);
+void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *);
 static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2CC & mask;
@@ -17,7 +17,7 @@ u32 SceneActorBehavior_DispatchFlaggedCategory(struct SceneActorRegistryResetVie
                 sub_08132490(actor);
                 return 1;
             case 9:
-                sub_08132748(actor);
+                SceneActorReaction_EndHitCheckDefeat(actor);
                 break;
             default:
                 sub_0813214C(actor);

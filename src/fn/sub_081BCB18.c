@@ -1,7 +1,7 @@
 #include "global.h"
 void Sound_PlaySong(u32);
 void Anim_Step(u8 *, u8 *);
-void sub_081BC76C(u8 *);
+void DarkLoan_FinishOpening(u8 *);
 void DarkLoan_UpdateOpeningAnimation(u8 *p)
 {
     u16 *c;
@@ -11,5 +11,5 @@ void DarkLoan_UpdateOpeningAnimation(u8 *p)
         Sound_PlaySong(0x2c0);
     (*c)++;
     if (*c > 0x68)
-        sub_081BC76C(p);
+        DarkLoan_FinishOpening(p);
 }
