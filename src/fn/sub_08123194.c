@@ -2,11 +2,11 @@
 #include "scene_grid.h"
 #include "area_effect_link.h"
 #ifdef NONMATCHING
-// fuzzy: 99.6% (30 differing bytes). Bounce-shot terrain probe: may the shot enter the next cell,
-// else slide it along a wall or up a slope toward the player. Every instruction matches; left are the
-// stack slots of four spilled GCSE/PRE reaching registers (0x44..0x50 in another order) and three
-// reload choices that follow from them. PRE creates those registers in expression-hash order, so the
-// original's pseudo numbering / insn count at GCSE time differs. See notes/cloud-08122DF4.md.
+// fuzzy: 99.6% (25 differing bytes). Bounce-shot terrain probe: may the shot enter the next cell,
+// else slide it along a wall or up a slope toward the player. Every instruction matches. Left: the
+// stack slots of four spilled GCSE/PRE reaching registers (the original's expression hash table had
+// 2267..2347 buckets, ours 2593), and six register choices where cse2 makes the reaching register
+// canonical instead of Seek's target (it lives ~58 insns longer). See notes/cloud-08122DF4.md.
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -156,6 +156,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
             if (i == target)
                 return 1;
         }
+        return 0;
     } else {
         i = cell - 1;
         column = Mod(i, width);
@@ -275,7 +276,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
                 for (i = 0; i <= 3; i++) {
                     if (found[i]) {
                         result = i;
-                        goto deflect;
+                        goto check;
                     }
                 }
                 result = -1;
@@ -284,38 +285,38 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
     check:
         if (result < 0)
             goto stop;
-    deflect: {
+        {
 
-        s32 vx, vz;
-        vx = s->vx;
-        if (vx < 0)
-            vx = -vx;
-        vz = s->vz;
-        if (vz < 0)
-            vz = -vz;
-        speed = vz;
-        if (speed < vx)
-            speed = vx;
-        switch (result) {
-            case 0:
-                s->vx = speed;
-                s->vz = 0;
-                break;
-            case 1:
-                s->vx = 0;
-                s->vz = speed;
-                break;
-            case 2:
-                s->vx = -speed;
-                s->vz = 0;
-                break;
-            case 3:
-                s->vx = 0;
-                s->vz = -speed;
-                break;
+            s32 vx, vz;
+            vx = s->vx;
+            if (vx < 0)
+                vx = -vx;
+            vz = s->vz;
+            if (vz < 0)
+                vz = -vz;
+            speed = vz;
+            if (speed < vx)
+                speed = vx;
+            switch (result) {
+                case 0:
+                    s->vx = speed;
+                    s->vz = 0;
+                    break;
+                case 1:
+                    s->vx = 0;
+                    s->vz = speed;
+                    break;
+                case 2:
+                    s->vx = -speed;
+                    s->vz = 0;
+                    break;
+                case 3:
+                    s->vx = 0;
+                    s->vz = -speed;
+                    break;
+            }
+            return 1;
         }
-        return 1;
-    }
     } else if (!CanEnter(&s->position, s->cell, next, angle)) {
     stop:
         s->state = 2;
