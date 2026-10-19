@@ -1,0 +1,53 @@
+
+#ifdef NONMATCHING
+// fuzzy: 93.8%
+// foundry draft (worker best 92.9%); what differs is mostly register allocation and instruction order
+#define CallbackPool_RunSpawnScript sub_081055C0
+#define gShakeRandomTable gUnk_0203B400
+#define gShakeRandomIndex gUnk_03005308
+#include "global.h"
+#include "directional_interaction.h"
+#include "callback_pool.h"
+extern u16 gUnk_0203B400[];
+extern u32 gUnk_03005308;
+static inline u32 NextRandom(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+    return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+}
+void sub_081055C0(struct CallbackPoolEntry *entry, s32 count)
+{
+    s32 values[4];
+    struct DirectionalScriptArgs args;
+    s32 i;
+    if (count > 0 && entry->spawnScript) {
+        args.count = 4;
+        args.values = values;
+        for (i = 0; i < count; i++) {
+            {
+                u32 random = NextRandom();
+                s32 position = entry->position.x - 64;
+                random &= 127;
+                values[0] = position + random;
+            }
+            {
+                u32 random = NextRandom();
+                s32 position = entry->position.y - 64;
+                random &= 127;
+                values[1] = position + random;
+            }
+            {
+                u32 random = NextRandom();
+                s32 position = entry->position.z - 64;
+                random &= 127;
+                values[2] = position + random;
+            }
+            values[3] = entry->spawnIndex;
+            Script_Call(entry->spawnScript, &args);
+            entry->spawnIndex++;
+        }
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_081055C0);
+#endif
