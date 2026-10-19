@@ -40,6 +40,7 @@ static inline void copy32(const void *source, void *dest, s32 size)
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {
+    s32 k2 = 0x7C1F;
     s32 count;
     u32 inverse;
     amount >>= 1;
@@ -57,15 +58,17 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
             dest += first;
             out = dest;
             if (count > 0) {
-                register u32 greenMask asm("r10") = 0x03E0;
+                u32 greenMask = 0x03E0;
                 i = count;
                 do {
-                    register u32 from asm("r0") = *a;
+                    u32 from = *a;
                     u32 fromRB;
                     u32 fromG;
                     u32 to;
-                    fromRB = 0x7C1F & from;
+                    fromRB = k2 & from;
+                    do {
                     fromG = greenMask & from;
+                    } while (0);
                     to = *b;
                     {
                         u32 rb = (((to & 0x7C1F) * amount) + (inverse * fromRB)) & 0xF83E0;
