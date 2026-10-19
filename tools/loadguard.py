@@ -89,6 +89,14 @@ def signal_tree(pid, sig, rows):
             pass
 
 
+START = 90      # seconds: a worker younger than this has not done real work yet
+
+
+def priority(cmd):
+    """Matching (decomp progress) first; unit consolidation (organization) second."""
+    return 0 if "UNIT_WORKER" in cmd else 1
+
+
 def pace_limit(path):
     """The number in the pace file (max concurrent `claude -p` workers), or None for no limit."""
     try:
@@ -115,22 +123,26 @@ def main():
         paused = [p for p in paused if p in alive]
         paced = [p for p in paced if p in alive]
         limit = pace_limit(a.pace)
-        if limit is not None:              # usage pacing: at most LIMIT headless Claude workers run
+        if limit is not None:
+            # Usage pacing that wastes nothing: a worker already working is never paused; only one
+            # that has just started (younger than START seconds) is held, and held workers are
+            # released in priority order (matching before unit consolidation) as others finish.
             by = {p: c for p, _, _, c in rows}
-            # every headless Claude worker, whatever started it (runner children included)
-            claude = sorted((age, p) for p, pp, age, c in rows
-                            if is_worker(c) and "claude -p" in c and "claude -p" not in by.get(pp, ""))
-            running = [p for _, p in reversed(claude) if p not in paced and p not in paused]  # oldest first
+            claude = [(p, age, c) for p, pp, age, c in rows
+                      if is_worker(c) and "claude -p" in c and "claude -p" not in by.get(pp, "")]
+            running = [x for x in claude if x[0] not in paced and x[0] not in paused]
             if len(running) > limit:
-                for p in running[limit:]:
+                fresh = sorted((x for x in running if x[1] < START), key=lambda x: (-priority(x[2]), x[1]))
+                for p, _, _ in fresh[:len(running) - limit]:
                     signal_tree(p, signal.SIGSTOP, rows)
                     paced.append(p)
-                print(f"{time.strftime('%H:%M:%S')} pace {limit}: paused {len(running) - limit} Claude workers", flush=True)
+                    print(f"{time.strftime('%H:%M:%S')} pace {limit}: holding new worker {p}", flush=True)
             elif len(running) < limit and paced:
-                for p in paced[:limit - len(running)]:
+                held = sorted(paced, key=lambda p: priority(by.get(p, "")), reverse=True)
+                for p in held[:limit - len(running)]:
                     signal_tree(p, signal.SIGCONT, rows)
                     paced.remove(p)
-                print(f"{time.strftime('%H:%M:%S')} pace {limit}: resumed, {len(paced)} still paced", flush=True)
+                    print(f"{time.strftime('%H:%M:%S')} pace {limit}: released {p}", flush=True)
         if free < a.min_free or load > a.max_load:
             running = sorted((age, p) for p, age in roots(rows) if p not in paused)
             if running:
