@@ -160,11 +160,9 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
                 STAT_INC(0x87C);
                 STAT_INC(0x538);
                 {
-                    register u32 offset asm("r4") = 0x134;
-                    register u8 *pinned asm("r3");
-                    asm("" : "+r"(offset));
+                    u32 offset = 0x134;
+                    u8 *pinned;
                     pinned = (u8 *)actor + offset;
-                    asm("" : "+r"(pinned));
                     hit = pinned;
                 }
                 {
