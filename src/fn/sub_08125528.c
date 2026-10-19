@@ -1,11 +1,10 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#ifdef NONMATCHING
-// fuzzy: 84.7%
+/* Spread-shot projectile step: advance, collide, spawn impact notices */
+#define SpreadShot_Step sub_08125528
 // Projectile step: terrain cell/height of the advanced position, collision via sub_08123194,
-// random spread by heading, then notices. Structure and instruction count match; left:
-// global allocation (actor r8/r10, kind sl, hits pointer assigned on both branch paths in
-// the ROM = GCSE/PRE), the CellHeight inline parameter copy (ROM adds r5, r7, #0).
+// random spread by heading, then notices. Fields are written as s->field throughout: the ROM's
+// late `adds rX, rT, #0` / `mov sb, rT` copies are GCSE/PRE reaching registers, not locals.
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 u8 sub_08123194(void *, s32, u32);
@@ -71,49 +70,46 @@ static inline u32 Random(void)
     gUnk_03005308 = index;
     return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
-void sub_08125528(u32 unused, struct SpreadShot *s)
+void SpreadShot_Step(u32 unused, struct SpreadShot *s)
 {
     u16 *timer;
-    struct ContactPosition *position;
     s32 angle;
     u32 cell;
     struct ContactPosition spot;
     struct ContactPosition saved;
-    u8 *kind;
-    u16 *hits;
     if (s->reset)
         s->reset = 0;
-    timer = &s->timer;
-    if (*timer) {
-        (*timer)--;
-        return;
+    {
+        u16 t = s->timer;
+        timer = &s->timer;
+        if (t) {
+            *timer = t - 1;
+            return;
+        }
     }
+
     {
         u16 *cellp;
-        s16 *vx, *vz, *zp, *yp;
+        s16 *vx;
         s->cell = CellIndex(&s->position);
-        position = &s->position;
         cellp = &s->cell;
         vx = &s->vx;
-        vz = &s->vz;
-        angle = Math_Atan2(*vx, *vz);
+        angle = Math_Atan2(*vx, s->vz);
         saved = s->position;
-        position->x += *vx;
-        s->position.y = CellHeight(position, *cellp);
-        zp = &s->position.z;
-        *zp += *vz;
-        yp = &s->position.y;
-        cell = CellIndex(position);
-        Collider_SetPosition(s->collider, position, 0);
+        s->position.x += *vx;
+        s->position.y = CellHeight(&s->position, *cellp);
+        s->position.z += s->vz;
+        cell = CellIndex(&s->position);
+        Collider_SetPosition(s->collider, &s->position, 0);
         Collider_Refresh(s->collider);
         if (sub_08123194(s, angle, cell))
             s->position = saved;
         else
-            *yp = CellHeight(position, cell);
+            s->position.y = CellHeight(&s->position, cell);
         s->spritePosition = s->position;
-        spot.x = position->x;
-        spot.y = *yp;
-        spot.z = *zp;
+        spot.x = s->position.x;
+        spot.y = s->position.y;
+        spot.z = s->position.z;
     }
     switch (angle >> 6) {
         case 0:
@@ -125,8 +121,7 @@ void sub_08125528(u32 unused, struct SpreadShot *s)
             spot.x += Mod(Random(), 120) - 60;
             break;
     }
-    kind = &s->kind;
-    if (*kind == 2) {
+    if (s->kind == 2) {
         s32 i;
         for (i = 0; i <= 3; i++)
             sub_08126AD4(&spot, 1, 0, i << 6, 0x54, 1, 0);
@@ -136,21 +131,18 @@ void sub_08125528(u32 unused, struct SpreadShot *s)
         }
         *timer = 8;
     } else {
-        if (SpriteNotice_Create(&spot, 2, *kind) < 0)
+        if (SpriteNotice_Create(&spot, 2, s->kind) < 0)
             goto done;
-        if (!SpriteNotice_CreateBetweenPositions(&saved, &spot, *kind))
+        if (!SpriteNotice_CreateBetweenPositions(&saved, &spot, s->kind))
             goto done;
         *timer = (Random() & 7) + 3;
     }
     if (s->hits) {
         s->hits--;
-        if (*kind != 2)
+        if (s->kind != 2)
             Sound_PlaySong(0x1E2);
         return;
     }
 done:
     s->state = 2;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08125528);
-#endif
