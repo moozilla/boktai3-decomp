@@ -1,6 +1,6 @@
 # Cloud task 08132748: drafts
 
-Two drafts are not matched yet. Both are below the 80% NONMATCHING threshold, so they stay out of `src/`.
+`sub_0813599C` and `sub_08134398` are NONMATCHING drafts in `src/fn/` (80.9% and 90%). `sub_08132904` stays a draft here (below 80%).
 
 * `sub_0813599C` (now a NONMATCHING draft in `src/fn/`, 80.9%). This is the category-1 hit reaction: hit history at 0x5B8, damage `1 << *(u8 *)0x47E`, the HUD timed state, the damage number, and the route restart.
   The control flow and instruction count are right. Remaining differences:
