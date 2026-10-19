@@ -2,8 +2,19 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 89.4% (agent draft, in progress; see notes/cloud-08122DF4.md)
-/* Skeleton: chase the partner / player cell (tentative). */
+// fuzzy: 93.0% (agent draft, 18 structural / 69 total insns off; see header notes below)
+/* Skeleton: approach the target cell (tentative). When actor[0x6C] bit 0 is set: route
+ * to the partner's (co-op: player slot's) cell; on arrival either resume group+0x48 (kind
+ * 0x1A, flag 0x80) or restart entry 0x228 (kind 1) and pick a new random facing (Turn, kind
+ * 0x1B). Otherwise steer toward the partner with min/max distance bands and drive the walk
+ * animation from the callback at +0x260.
+ * Draft status: 18 structural / 69 total differing insns (anchordiff). Remaining:
+ *  - the QI zero for 2B0/2A8/2A9 in the arrival branches: ROM materialises it in that block
+ *    (movs; mov r8); here `zero` is set before the co-op test, so it overlaps partnerp
+ *    (r8 vs sl) and Turn's group copy is spilled instead of living in sl.
+ *  - Turn's hoisted address slots come out in a different order: GCSE PRE reaching regs are
+ *    numbered in hash order ((13772+R+k) % T); no T works with Turn's actor/group copies
+ *    adjacent (R, R+1), so the original's Turn arguments were created elsewhere. */
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
 s32 Callback_InvokeActor(void *, void *);
@@ -50,6 +61,21 @@ static inline void SetControl(void *a, void *control, u32 kind)
     }
     actor->word104 = 0;
 }
+static inline void SetControlZ(void *a, void *control, u32 kind, u8 zero)
+{
+    struct SceneActorRegistryResetView *actor = a;
+    actor->field2B2 = 1;
+    actor->field2B0 = zero;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = 0;
+}
 static inline void SetState(void *a, u8 s, u8 p, u32 b)
 {
     struct SceneActorRegistryResetView *actor = a;
@@ -58,11 +84,6 @@ static inline void SetState(void *a, u8 s, u8 p, u32 b)
     actor->behavior2AA = b;
     actor->counter2AC = 0;
     actor->field2B1 = 1;
-}
-static inline void Restart(void *a, void *control, u32 kind, u8 s, u8 p, u32 b)
-{
-    SetControl(a, control, kind);
-    SetState(a, s, p, b);
 }
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -113,11 +134,9 @@ static inline void ClearFlags16(u16 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group,
-                         struct ContactPosition *destination)
+static inline u8 TryMove2(struct SceneActorRegistryResetView *actor, void *route,
+                          struct ContactPosition *position, struct ContactPosition *destination)
 {
-    void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
     s32 result;
     if (!sub_0821F204(route, position, destination)) {
         ClearFlags16(&actor->flags2D4, ~0x200);
@@ -140,38 +159,6 @@ static inline u16 Masked(void *a, u32 m)
     u32 mask = m;
     return actor->flags2D4 & mask;
 }
-static inline u8 Blocked(void *a)
-{
-    if (Masked(a, 0x400))
-        return 1;
-    return 0;
-}
-static inline u8 Blocked2(void *a)
-{
-    u8 r = 0;
-    if (Masked(a, 0x400))
-        r = 1;
-    return r;
-}
-static inline s32 Blocked3(void *a)
-{
-    if (Masked(a, 0x400))
-        return 1;
-    return 0;
-}
-static inline u8 Blocked4(void *a)
-{
-    u16 v = Masked(a, 0x400);
-    if (v)
-        return 1;
-    return 0;
-}
-static inline u32 Masked32(void *a, u32 m)
-{
-    struct SceneActorRegistryResetView *actor = a;
-    u32 mask = m;
-    return (u16)(actor->flags2D4 & mask);
-}
 static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 16 : -((-n) >> 16);
@@ -183,24 +170,19 @@ static inline u8 Test16(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline int randomWith(const u16 *table)
-{
-    u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
-static inline u16 Random(void)
-{
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
-}
 static inline u32 PickTurn(u32 dir)
 {
     u32 d;
     s32 i;
     for (i = 0; i < 4; i++) {
-        d = (randomWith(gUnk_0203B400) & 3) << 6;
+        {
+            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 v;
+            gUnk_03005308 = index;
+            index *= 2;
+            v = *(const u16 *)(index + (u32)gUnk_0203B400);
+            d = (v & 3) << 6;
+        }
         if (d != dir)
             return d;
     }
@@ -253,8 +235,9 @@ static inline void Approach(void *ctx)
     u8 **partnerp = (u8 **)&CTX->fieldDC;
     u32 cell;
     s32 index;
-    u8 zero = 0;
+    u8 zero;
     ResetDestination(group);
+    zero = 0;
     if (Test(gUnk_030053F4, 0x4800)) {
         u8 *partner = *partnerp;
         if (!partner || (index = PlayerSlot(partner)) < 0) {
@@ -285,10 +268,10 @@ static inline void Approach(void *ctx)
             *flags &= mask;
         }
         if (Masked(actor, 0x80)) {
-            SetControl(actor, *(void **)(group + 0x48), 0x1A);
+            SetControlZ(actor, *(void **)(group + 0x48), 0x1A, zero);
             SetState(actor, zero, zero, 12);
         } else {
-            SetControl(actor, actor->entryTarget228, 1);
+            SetControlZ(actor, actor->entryTarget228, 1, zero);
             SetState(actor, zero, zero, 5);
             ResetDestination(group);
             {
@@ -305,7 +288,7 @@ static inline void Approach(void *ctx)
 move: {
     struct ContactPosition center;
     SceneActorTerrain_GetCenter(cell, &center);
-    if (!TryMove(ctx, group, &center))
+    if (!TryMove2(ctx, *(void **)(group + 0x1FC), &actor->position, &center))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
 }
