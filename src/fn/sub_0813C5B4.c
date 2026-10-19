@@ -55,7 +55,7 @@ void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
         angle = random_first() & 255;
         radius = (random_first() & 127) + 256;
         do {
-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
         } while (0);
         e->dy = scale(radius * gUnk_086149C4[angle]);
         draw->pos = *pos;
