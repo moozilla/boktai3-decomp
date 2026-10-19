@@ -2,9 +2,12 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 90.5% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: 94.4% (agent draft, 19 structural / 63 total insns off: PRE spill-slot order)
 /* Skeleton (tentative): after 60 frames either return to the route point (blocked, flag 0x80)
- * or start a delayed restore and walk back to the route destination. */
+ * or start a delayed restore and walk back to the route destination.
+ * Status: same instruction stream except register allocation / spill-slot order in the
+ * Resume block (hoisted address pseudos from GCSE/PRE; ROM needs a hash table of >= 465
+ * buckets, ours has 447) and the 0x200 mask register in MoveToDestination. */
 u8 sub_0812F3CC(void *);
 void sub_0807C72C(void *, u32, u32, u32);
 void sub_0807E334(void *);
@@ -119,7 +122,7 @@ slopeX:
 done:
     return height;
 }
-static inline u32 MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MaskFlags(struct SceneActorRegistryResetView *actor, u16 mask)
 {
     return actor->flags2D4 & mask;
 }
@@ -129,7 +132,7 @@ static inline u8 IsScenePaused(void)
         return 1;
     return 0;
 }
-static inline u8 TestFlag16(u16 *p, u32 mask)
+static inline u8 TestFlag16(u16 *p, u16 mask)
 {
     if (*p & mask)
         return 1;
@@ -146,7 +149,10 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *route,
 {
     s32 result;
     if (!sub_0821F204(route, position, destination)) {
-        actor->flags2D4 &= ~0x200;
+        {
+            u32 mask = 0x200;
+            actor->flags2D4 &= ~mask;
+        }
         return 0;
     } else {
         result = sub_0821F7A8(route, position, destination);
@@ -155,7 +161,10 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *route,
                 Memory_Clear(&actor->motion, 8);
             return 1;
         } else {
-            actor->flags2D4 &= ~0x200;
+            {
+                u32 mask = 0x200;
+                actor->flags2D4 &= ~mask;
+            }
             return 0;
         }
     }
@@ -190,8 +199,11 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
     u32 direction;
     i = 0;
     for (;;) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        direction = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        {
+            const u16 *table = gUnk_0203B400;
+            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+            direction = (table[gUnk_03005308] & 3) << 6;
+        }
         if (direction != current)
             break;
         if (++i > 3) {
@@ -217,7 +229,10 @@ static inline void Resume(void *ctx, void *groupCtx, u8 direction)
         saved->phase = actor->phase2A9;
         saved->behavior = actor->behavior2AA;
         group->savedDirection = direction;
-        SetControl(actor, 0x1B, group->control);
+        {
+            void *target = group->control;
+            SetControl(actor, 0x1B, target);
+        }
         SetState(actor, 3, 1, 0);
         group->timer = 6;
     }
@@ -243,9 +258,11 @@ static inline void ReturnHome(void *ctx)
     s32 slot;
     u32 mask;
     destination = group->destination;
-    link = &group->link;
-    destination->x = link->point->x;
-    destination->z = link->point->z;
+    {
+        struct SkelRouteLink *home = &group->link;
+        destination->x = home->point->x;
+        destination->z = home->point->z;
+    }
     destination->y = CellHeight(destination, CellIndex(destination));
     if (IsScenePaused()) {
         if (!*target)
