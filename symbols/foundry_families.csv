@@ -1463,3 +1463,4 @@ addr,function,name,family,note
 081B9D54,sub_081B9D54,Registry2388_BlendTimedPalettes,"Registry2388 palette controller","blends palette banks using elapsed time and direction"
 081B9ED0,sub_081B9ED0,Registry2388_InitializeAnimations,"Registry2388 palette controller","loads a resource and initializes thirteen animation entries"
 081B9FD4,sub_081B9FD4,Registry2388_InitializeBackground,"Registry2388 palette controller","configures background layers and loads the base palette"
+081BA2E4,sub_081BA2E4,Registry2388_CreateSelectionCursor,"Registry2388","builds available selection entries and their navigation links"
