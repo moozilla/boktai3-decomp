@@ -1144,8 +1144,9 @@ u32 TetherActor_TestInteractionPath(struct TetherActor *p)
     u8 *a = (u8 *)&p->position;
     u8 *b;
     u32 r;
-    if (sub_0821FCDC(a) == 0xFF || (b = (u8 *)&p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
-                                    sub_0821F2EC(b, a, (u8 *)&p->interactionTarget) == 0))
+    if (sub_0821FCDC(a) == 0xFF ||
+        (b = (u8 *)&p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
+         sub_0821F2EC(b, a, (u8 *)&p->interactionTarget) == 0))
         r = 0;
     else
         r = 1;
@@ -1536,8 +1537,9 @@ void TetherActor_SetInteractionPathFromScript(void)
             p->interactionScriptId = Script_GetValue();
         if (p->state == 3) {
             a = &p->position.x;
-            if (sub_0821FCDC(a) == 0xFF || (b = &p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
-                                            sub_0821F2EC(b, a, &p->interactionTarget.x) == 0))
+            if (sub_0821FCDC(a) == 0xFF ||
+                (b = &p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
+                 sub_0821F2EC(b, a, &p->interactionTarget.x) == 0))
                 TetherActor_SetState(p, 0);
             else
                 TetherActor_SetState(p, 3);
