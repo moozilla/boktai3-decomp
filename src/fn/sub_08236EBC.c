@@ -5,7 +5,7 @@ struct ParticleBurstSprite {
     u8 pad4[0x69];
     u8 frame;
 };
-void sub_08236E4C(struct ParticleBurstSprite *);
+void RadialBurstEffect_BlendSpritePalette_08236E4C(struct ParticleBurstSprite *);
 void ParticleBurst_AdvanceFrame(struct ParticleBurstSprite *p)
 {
     if (p->frame <= 5)
@@ -14,6 +14,6 @@ void ParticleBurst_AdvanceFrame(struct ParticleBurstSprite *p)
         p->flags &= ~0x400;
     if (p->frame <= 15) {
         p->frame++;
-        sub_08236E4C(p);
+        RadialBurstEffect_BlendSpritePalette_08236E4C(p);
     }
 }

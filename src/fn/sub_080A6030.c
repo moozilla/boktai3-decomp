@@ -1,7 +1,7 @@
 #include "global.h"
 extern void ActorShadow_Disable(void *);
 extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-extern void sub_080A60E0(void);
+extern void ActorTrail_RestoreSavedState(void);
 static inline u8 take6030(u8 *s)
 {
     if (s[0x2B2]) {
@@ -40,7 +40,7 @@ void TentacleBody_UpdateHiddenTransition(u8 *s, s32 arg, u32 unused)
         u32 *flags;
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry(s, 9);
-        fn = sub_080A60E0;
+        fn = ActorTrail_RestoreSavedState;
         code = 0xD;
         s[0x2B2] = 1;
         s[0x2B0] = queued;
