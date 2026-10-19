@@ -248,6 +248,13 @@ address,evidence
 0813B3AC,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0813E0F0,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0813E108,Code following a reviewed gap function; retained assembly
+0813E160,Independent player modifier callback with own return; notes/player_3.md
+0813E174,Independent player modifier callback with own return; notes/player_3.md
+0813E184,Independent player modifier callback with own return; notes/player_3.md
+0813E194,Independent player modifier callback with own return; notes/player_3.md
+0813E1B8,Independent player modifier callback with own return; notes/player_3.md
+0813E284,Independent modifier callback following equipment-level function; notes/player_3.md
+0813F828,Independent energy-spend body after affordability test; notes/player_3.md
 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C

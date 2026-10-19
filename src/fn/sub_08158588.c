@@ -22,7 +22,7 @@ s32 Player_SelectAlternateInteractionMode(struct Player *p)
                 mode = 0;
             else
                 mode = 4;
-        } else if (p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+        } else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
             mode = 0;
         else
             mode = 1;
