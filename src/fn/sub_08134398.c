@@ -3,10 +3,10 @@
 #include "scene_actor_reaction.h"
 #ifdef NONMATCHING
 // fuzzy: 90.0%
-// Sibling of the matched sub_08132D2C (same defeat-stats template, see notes/defeat-stats-template.md).
+// Sibling of the matched SceneActorReaction_DefeatRecordStats (same defeat-stats template, see notes/defeat-stats-template.md).
 // Structure is exact; left: the ROM keeps counter offsets in r5/r7 (ours r1) and two prologue
 // stores (2C8, 2AC) differ by a register copy. Pinning r5 globally moves actor into r7 (unsafe).
-/* Like sub_08132D2C. At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
+/* Like SceneActorReaction_DefeatRecordStats. At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
 void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
 void Player_NotifyFirstSelectedSlot(u32, u32);

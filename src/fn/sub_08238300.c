@@ -1,7 +1,6 @@
 #define gDirectionSine gUnk_086149C4
 #include "global.h"
 /* Player_SetDirectionalVelocity_08238300: same code as Player_SetDirectionalVelocity at another address (ported by relatives.py; provisional name) */
-#define Player_SetDirectionalVelocity_08238300 sub_08238300
 #include "player.h"
 extern const s16 gUnk_086149C4[];
 static inline s32 scale12(s32 v)

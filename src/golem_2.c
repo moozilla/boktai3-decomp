@@ -1,7 +1,5 @@
 #include "golem_2.h"
 
-#define Golem_TickFacingQuadrant sub_080CC830
-
 extern const u8 gUnk_08606134[];
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);

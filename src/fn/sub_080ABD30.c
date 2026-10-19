@@ -1,6 +1,5 @@
 #include "global.h"
 /* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
-#define TentacleBody_Destroy sub_080ABD30
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Heap_Free(void *);

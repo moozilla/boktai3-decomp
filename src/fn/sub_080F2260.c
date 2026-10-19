@@ -1,6 +1,5 @@
 #include "global.h"
 /* Armor_UpdatePartColliders_080F2260: same as Armor_UpdatePartColliders but the scene comes from the owner at +0x160 (provisional name) */
-#define Armor_UpdatePartColliders_080F2260 sub_080F2260
 
 struct ArmorVector {
     s32 x : 16;
