@@ -23,6 +23,13 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **Every scene's procedures have working names** (2026-10-19):
+  `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
+  and 80% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
+  `_after_cutscene_198`, `_on_arrival`, `exit_to_3107`), from how they are
+  referred to and what they call. The readable view and the Studio use them
+  (confidence `auto`); `gcl/names/proc.csv` still wins
+  ([gcl/README.md](../gcl/README.md#generated-names-for-scene-procedures)).
 * **A showcase scene in the game** (2026-10-17): `tools/showcase/` writes new
   script procedures (a GCL assembler), dialogue, a cutscene table and stage
   paths into a ROM copy, and `video.sh` records the result with sound. It
@@ -155,7 +162,7 @@ the earlier worktree layout, ranges, merge and clone-seeding procedure are in
 | `tools/docindex.py [ADDR / --tag T]` | docs index; who wrote about an address or topic |
 | `tools/emu/harness`, `tools/mgba/` | headless mGBA scripted runs; desktop Centaur script ([CENTAUR.md](CENTAUR.md)) |
 | `tools/studio/serve.py` | the Studio: text, sprites, maps, actors, scripts, code, live view (port 8642) |
-| `tools/assets/gcx.py`, `gclview.py`, `gclfiles.py`, `gclnames.py`, `gcloptions.py` | scripts: Konami-style and readable views, source files, hash names, option schemas |
+| `tools/assets/gcx.py`, `gclview.py`, `gclfiles.py`, `gclnames.py`, `gcloptions.py`, `gclroles.py` | scripts: Konami-style and readable views, source files, hash names, option schemas, generated scene procedure names |
 | `tools/assets/script_targets.py` | native code reachable from scripts, ranked unmatched targets |
 | `tools/assets/stages.py`, `hp.py`, `sprites.py`, `text.py` | stage scripts, terrain, sprites, text bank |
 | `tools/script_trace.py`, `tools/function_context.py`, `tools/coverage.py` | runtime evidence: script calls, screens a function runs on |
