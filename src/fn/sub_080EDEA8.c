@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "scene_vec.h"
 
-#define Ivy_BeginRelease sub_080EDEA8
-
 struct Player;
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -41,7 +39,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
-void sub_080EDEA8(struct SceneActorRegistryResetView *actor)
+void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
 {
     struct IvyContext *context = actor->context;
     if (SceneActorReaction_TakePrepared(actor)) {

@@ -21,8 +21,8 @@ s32 DarkLoan_GetDefaultRate(void);
 void DarkLoan_StartDisplayScript(struct ScriptPanel *);
 void ScriptPanel_InitializeProcedure(struct ScriptPanel *);
 void DarkLoan_BuildDisplay(struct ScriptPanel *, s32);
-void sub_081BCA74(struct ScriptPanel *);
-void sub_081BC6AC(struct ScriptPanel *);
+void DarkLoan_BeginAlternateOpening(struct ScriptPanel *);
+void DarkLoan_BeginOpening(struct ScriptPanel *);
 
 s32 DarkLoan_InitializeFromScript(struct ScriptPanel *panel)
 {
@@ -57,8 +57,8 @@ s32 DarkLoan_InitializeFromScript(struct ScriptPanel *panel)
     DarkLoan_BuildDisplay(panel, 0);
     panel->callbackPc = callbackPc;
     if (panel->displayMode)
-        sub_081BCA74(panel);
+        DarkLoan_BeginAlternateOpening(panel);
     else
-        sub_081BC6AC(panel);
+        DarkLoan_BeginOpening(panel);
     return 0;
 }
