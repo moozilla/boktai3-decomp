@@ -1535,3 +1535,4 @@ addr,function,name,family,note
 081BB3D4,sub_081BB3D4,SolarBank_RefreshAmountDigits,"Solar bank panel (tentative)","refreshes the two four-digit amount displays"
 081BB538,sub_081BB538,SolarBank_BeginOpening,"Solar bank panel (tentative)","initializes panel graphics and starts its opening transition"
 081BB5CC,sub_081BB5CC,SolarBank_BeginSelection,"Solar bank panel (tentative)","resets selection and displays the selection prompt"
+081BB864,sub_081BB864,SolarBank_UpdateSelection,"Solar bank panel (tentative)","processes confirm cancel and left-right selection input"
