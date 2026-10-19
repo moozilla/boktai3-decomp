@@ -8,6 +8,7 @@ assemble segments + data -> link in ROM order -> objcopy -> SHA-1 check.
 Unchanged inputs are not rebuilt (content hash).
 """
 import argparse
+import concurrent.futures
 import functools
 import hashlib
 import os
@@ -25,6 +26,7 @@ AGBCC_INC = os.path.join(os.path.dirname(AGBCC), "ginclude")
 AS = ["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork", "--no-warn"]
 CFLAGS = ["-O2", "-mthumb-interwork", "-fhex-asm"]
 CPP = shlex.split(os.environ.get("CPP", "cc -E" if sys.platform == "darwin" else "cpp"))
+JOBS = int(os.environ.get("BUILD_JOBS", "4"))   # parallel compiles; 10 cores shared with other workers
 # Extra preprocessor defines; check.py --nonmatching adds -DNONMATCHING.
 DEFINES = []
 
@@ -156,8 +158,8 @@ def main():
     a = ap.parse_args()
     sh([sys.executable, "tools/split.py"])
     units = [ln.split() for ln in open(os.path.join(ROOT, "build", "units.txt"))]
-    objs = []
-    for kind, path in units:
+    def one(unit):
+        kind, path = unit
         if kind == "asm":
             obj = path[:-2] + ".o"
             build_asm(path, obj)
@@ -165,7 +167,11 @@ def main():
             obj = os.path.join("build", path[:-2] + ".o")
             os.makedirs(os.path.join(ROOT, os.path.dirname(obj)), exist_ok=True)
             build_c(path, obj)
-        objs.append(obj)
+        return obj
+    # Compile in parallel (subprocess-bound, so threads); objects keep ROM order for the link.
+    # Unchanged units are skipped by their content-hash stamps.
+    with concurrent.futures.ThreadPoolExecutor(JOBS) as ex:
+        objs = list(ex.map(one, units))
     # data region: all labels global so code can reference them
     data_g = os.path.join(ROOT, "build", "asm", "data_g.s")
     data = open(os.path.join(ROOT, "gen", "data.s")).read()
@@ -181,10 +187,10 @@ def main():
 
     # RAM symbols used by C (gUnk_02XXXXXX / gUnk_03XXXXXX style names)
     syms = set()
-    for kind, path in units:
-        if kind == "c":
-            out = sh(["arm-none-eabi-nm", "-u", os.path.join("build", path[:-2] + ".o")])
-            syms |= set(re.findall(r"\b(\w+_(0[23][0-9A-Fa-f]{6}))\b", out))
+    cobjs = [os.path.join("build", path[:-2] + ".o") for kind, path in units if kind == "c"]
+    for i in range(0, len(cobjs), 400):                # one nm per 400 objects, not per object
+        out = sh(["arm-none-eabi-nm", "-u"] + cobjs[i:i + 400])
+        syms |= set(re.findall(r"\b(\w+_(0[23][0-9A-Fa-f]{6}))\b", out))
     ld = ["SECTIONS {", "  . = 0x08000000;", "  .text : {"]
     ld += [f"    {o}(.text)" for o in objs]
     ld += ["  }", "  /DISCARD/ : { *(.comment) *(.ARM.attributes) }", "}"]

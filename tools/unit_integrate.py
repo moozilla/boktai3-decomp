@@ -162,6 +162,8 @@ def attempt(batch, dry):
         st["integrated"] = url
         save(st)
     print(f"  merged {url}: {len(applied)} units")
+    r = subprocess.run(["sh", "tools/base.sh"], cwd=ROOT, capture_output=True, text=True)   # new worktrees clone it
+    print("  " + (r.stdout.strip() or r.stderr.strip()[-200:]))
     return applied, name
 
 

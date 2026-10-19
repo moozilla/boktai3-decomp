@@ -10,8 +10,8 @@
                                            script's own verification
   unitize.py status                        per subsystem: worker state and verification
 
-Verification after each worker: the worktree's tools/build.py prints
-`build/boktai3.gba: OK`, the unit file exists, and tools/progress.py reports
+Verification after each worker: tools/check.py on the unit exits 0 (fast; the
+combined ROM build runs at integration), the unit file exists, and tools/progress.py reports
 no fewer matched bytes than before. Verified branches are listed for batch
 integration (merge each unit/<slug> branch, combined build, one PR). Logs and
 state live in build/unitize/.
@@ -79,7 +79,8 @@ BRIEF = """Follow docs/UNIT_WORKER.md (read CLAUDE.md first) for one subsystem:
 
 `build/venv/bin/python tools/unit_files.py {start} {end}` lists the {n} files to merge.
 Do the whole end state: shared header types, one merged unit in ROM order, every
-function still matching, `tools/build.py` printing `build/boktai3.gba: OK`. Name
+function still matching: `tools/check.py src/{slug}.c` exits 0. Do not run tools/build.py or
+make (minutes each, and the full ROM build runs once per batch at integration). Name
 functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
 (integration promotes them). Do not run git commit (the driver commits after its own
 verification; your sandbox cannot write git metadata); leave the finished work in the tree.
@@ -116,7 +117,7 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
     d = os.path.join(WT, "unit-" + s["slug"])
     if not os.path.isdir(d):
-        subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,
+        subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,   # clones, no build
                        env={**os.environ, "BRANCH_PREFIX": "unit"}, capture_output=True)
     before = st.get("before") or matched_bytes(ROOT)     # the base this worktree was cut from
     log = os.path.join(OUT, s["slug"] + ".log")
@@ -143,8 +144,11 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
 def verify(s, st, d, before):
     """The driver's own checks on a finished worker's tree, then one commit per subsystem."""
     subprocess.run(["make", "format"], cwd=d, capture_output=True)
-    b = subprocess.run([sys.executable, "tools/build.py"], cwd=d, capture_output=True, text=True)
-    ok = "build/boktai3.gba: OK" in b.stdout + b.stderr
+    # fast check of the unit (seconds): its functions against the ROM. The full ROM build
+    # runs once per batch at integration (tools/unit_integrate.py).
+    b = subprocess.run([sys.executable, "tools/check.py", f"src/{s['slug']}.c", "--quiet"], cwd=d,
+                       capture_output=True, text=True)
+    ok = b.returncode == 0
     after = matched_bytes(d)
     unit = os.path.exists(os.path.join(d, "src", s["slug"] + ".c"))
     good = ok and unit and after is not None and before is not None and after >= before
