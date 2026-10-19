@@ -94,9 +94,9 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
                 int g;
                 int b;
                 do {
-                r = ((color & 31) * factor + other * red) & 0x1F00;
-                g = ((color & 992) * factor + other * green) & 0x3E000;
-                b = color & 31744;
+                    r = ((color & 31) * factor + other * red) & 0x1F00;
+                    g = ((color & 992) * factor + other * green) & 0x3E000;
+                    b = color & 31744;
                 } while (0);
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
