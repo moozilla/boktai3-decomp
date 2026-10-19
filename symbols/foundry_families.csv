@@ -1444,3 +1444,4 @@ addr,function,name,family,note
 081ACB60,sub_081ACB60,Vanargand_UpdateDelayedPartAnimation,"Vanargand","delays a part animation and signals completion"
 081ADEAC,sub_081ADEAC,Vanargand_InitBackgroundAttachment,"Vanargand","loads and positions a background attachment"
 081ADF38,sub_081ADF38,Vanargand_InitSpriteGroup,"Vanargand (tentative), six-sprite animation group","initializes six sprites sharing one animation resource"
+081AF640,sub_081AF640,Vanargand_InitTransientEffect,"Vanargand transient effects (tentative)","initializes an offset sprite effect and selects its palette"
