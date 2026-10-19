@@ -1415,3 +1415,4 @@ addr,function,name,family,note
 081A0888,sub_081A0888,Hresvelgr_UpdateAlternatingOrbit,"Hresvelgr","toggles and applies an orbit offset after a delay"
 081A0954,sub_081A0954,Hresvelgr_PlayDelayedReposition,"Hresvelgr","restores saved position after a delay and sets height"
 081A0A88,sub_081A0A88,Hresvelgr_PlayTargetedTravel,"Hresvelgr","starts targeted travel and waits for completion or timeout"
+081A1BE0,sub_081A1BE0,Hresvelgr_UpdateTimedPose,"Hresvelgr actor reaction","plays animation 20 and counts down a timed pose"
