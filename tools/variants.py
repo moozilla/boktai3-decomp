@@ -50,6 +50,9 @@ DECL = re.compile(r'^\s+(?:(?:const|volatile|register|static|signed|unsigned|str
                   r'[A-Za-z_]\w*(?:\s+\w+)?[\s*]+\w+(?:\[[^\]]*\])?(?:\s*=[^;]*)?;\s*(?://.*)?$')
 
 
+KEYWORD = re.compile(r'^\s*(goto|return|break|continue|case|default|else|do)\b')
+
+
 def parse(text):
     out = []
     for k, block in enumerate(re.split(r'^---[ \t]*$\n?', text, flags=re.M)):
@@ -72,12 +75,21 @@ def parse(text):
 
 
 def decl_swaps(src):
+    """Adjacent local declarations (inside function bodies, not struct members)."""
     lines = src.split('\n')
-    out = []
-    for i in range(len(lines) - 1):
-        a, b = lines[i], lines[i + 1]
-        if DECL.match(a) and DECL.match(b) and not a.lstrip().startswith('return') and '=' not in a + b:
-            out.append((f'swap line {i + 1}/{i + 2}: {b.strip()} first', [(a + '\n' + b, b + '\n' + a)]))
+    out, blocks = [], []
+    for i, ln in enumerate(lines):
+        code = ln.split('//')[0]
+        if i + 1 < len(lines) and blocks and blocks[-1] == 'code':
+            a, b = ln, lines[i + 1]
+            if all(DECL.match(x) and not KEYWORD.match(x) and '=' not in x for x in (a, b)):
+                out.append((f'swap line {i + 1}/{i + 2}: {b.strip()} first', [(a + '\n' + b, b + '\n' + a)]))
+        for ch in code:
+            if ch == '{':
+                blocks.append('data' if re.match(r'\s*(typedef\s+)?(struct|union|enum)\b', code)
+                              or (blocks and blocks[-1] == 'data') else 'code')
+            elif ch == '}' and blocks:
+                blocks.pop()
     return out
 
 
