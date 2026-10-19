@@ -1468,3 +1468,4 @@ addr,function,name,family,note
 081BA644,sub_081BA644,Registry3F74_ApplyPaletteStep,"Registry3F74","applies one of six palette transition steps"
 081BA6F8,sub_081BA6F8,Registry3F74_UpdateAnimations,"Registry3F74","updates selection animation and frame offsets"
 081BA79C,sub_081BA79C,Registry3F74_ConfirmSelection,"Registry3F74","dispatches selection script or starts closing fade"
+081BA924,sub_081BA924,Registry3F74_InitBackground,"Registry3F74","sets up background layers and phase-dependent palettes"
