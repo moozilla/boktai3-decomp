@@ -324,34 +324,39 @@ void Palette_InitBlendSlide(struct PaletteController *p)
 // MATCHING_CONCESSION: register-pinning
 void Palette_BlendVariants(struct PaletteController *p)
 {
+    u16 *out_3;
+    u16 *out_2;
     s32 i;
-    register u16 *out asm("r5");
+    u16 *out;
     if (p->blend == 0) {
         i = 0;
         out = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_SOURCE][i])
+            if (p->colorSets[PALETTE_SET_SOURCE][i]) {
                 CpuSet(p->colorSets[PALETTE_SET_SOURCE][i], out, 0x04000080);
+            }
             out += 256;
             i++;
         } while (i <= 3);
     } else if (p->blend == 64) {
         i = 0;
-        out = p->palettes[0];
+        out_3 = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_DESTINATION][i])
-                CpuSet(p->colorSets[PALETTE_SET_DESTINATION][i], out, 0x04000080);
-            out += 256;
+            if (p->colorSets[PALETTE_SET_DESTINATION][i]) {
+                CpuSet(p->colorSets[PALETTE_SET_DESTINATION][i], out_3, 0x04000080);
+            }
+            out_3 += 256;
             i++;
         } while (i <= 3);
     } else {
         i = 0;
-        out = p->palettes[0];
+        out_2 = p->palettes[0];
         do {
-            if (p->colorSets[PALETTE_SET_SOURCE][i] && p->colorSets[PALETTE_SET_DESTINATION][i])
-                Palette_BlendRange(out, p->colorSets[PALETTE_SET_SOURCE][i],
+            if (p->colorSets[PALETTE_SET_SOURCE][i] && p->colorSets[PALETTE_SET_DESTINATION][i]) {
+                Palette_BlendRange(out_2, p->colorSets[PALETTE_SET_SOURCE][i],
                                    p->colorSets[PALETTE_SET_DESTINATION][i], p->blend, 0, 208);
-            out += 256;
+            }
+            out_2 += 256;
             i++;
         } while (i <= 3);
     }
@@ -462,41 +467,41 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
     do {
-    gUnk_02000468 = p;
-    p->pending = 0;
-    t->callback = 0;
-    p->hardware = gUnk_03004FC0;
-    gUnk_03004DA0 = 64;
-    gUnk_03004DA8 = 64;
-    gUnk_03005214 = 0x1084;
-    gUnk_030051C4 = 0;
-    p->flags = Script_GetKeywordValue('f', 0);
-    if (Script_SeekToKeyword('p')) {
-        s32 i = 0;
-        u16 **out = p->colorSets[PALETTE_SET_SOURCE];
-        while (Script_GetPc() && i <= 3) {
-            s32 value = Script_GetValue();
+        gUnk_02000468 = p;
+        p->pending = 0;
+        t->callback = 0;
+        p->hardware = gUnk_03004FC0;
+        gUnk_03004DA0 = 64;
+        gUnk_03004DA8 = 64;
+        gUnk_03005214 = 0x1084;
+        gUnk_030051C4 = 0;
+        p->flags = Script_GetKeywordValue('f', 0);
+        if (Script_SeekToKeyword('p')) {
+            s32 i = 0;
+            u16 **out = p->colorSets[PALETTE_SET_SOURCE];
+            while (Script_GetPc() && i <= 3) {
+                s32 value = Script_GetValue();
                 if (value != 0x30) {
-                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
+                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
                 } else {
-                *out = 0;
+                    *out = 0;
                 }
-            out++;
-            i++;
+                out++;
+                i++;
             }
         }
-    if (Script_SeekToKeyword('d')) {
-        s32 i = 0;
-        u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
-        while (Script_GetPc() && i <= 3) {
-            s32 value = Script_GetValue();
+        if (Script_SeekToKeyword('d')) {
+            s32 i = 0;
+            u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
+            while (Script_GetPc() && i <= 3) {
+                s32 value = Script_GetValue();
                 if (value != 0x30) {
-                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
+                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
                 } else {
-                *out = 0;
+                    *out = 0;
                 }
-            out++;
-            i++;
+                out++;
+                i++;
             }
         }
     } while (0);
