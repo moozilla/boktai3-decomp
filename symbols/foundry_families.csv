@@ -1418,3 +1418,4 @@ addr,function,name,family,note
 081A1BE0,sub_081A1BE0,Hresvelgr_UpdateTimedPose,"Hresvelgr actor reaction","plays animation 20 and counts down a timed pose"
 081A33B8,sub_081A33B8,Hresvelgr_TickShot,"Hresvelgr shot pool (tentative)","updates shot motion, collider and expiration"
 081A34B4,sub_081A34B4,Hresvelgr_InitShotCollider,"Hresvelgr shot pool (tentative)","initializes shot collider and attack properties"
+081A3DA8,sub_081A3DA8,Hresvelgr_InitHomingShotCollider,"Hresvelgr homing shots","initializes the homing shot collider and attack properties"
