@@ -7,6 +7,8 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
 
 ## Ground rules
 
+* New worktree: `tools/worktree.sh --here` (seconds; clones the built base in
+  `../b3-base`, no build). Workers use `tools/check.py`, never a full build.
 * Fast exact checks suffice for working-branch commits. Run one combined ROM
   build before batch integration into main (`build/boktai3.gba: OK`). Rebuild or
   run relocation/emulator tests again only when changes or failures justify it.
