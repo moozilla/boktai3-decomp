@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Keep overnight runs from hanging the machine: pause workers under memory or CPU pressure.
 
-  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 26] [--resume-load 18]
+  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 26] [--resume-load 18] [--pace FILE]
+
+With --pace FILE (default ~/git/b3-logs/pace.txt) it also paces plan usage: at most
+the number in FILE of headless `claude -p` workers run; the youngest beyond that are
+paused and resumed in turn as the number goes up or workers finish. Edit the file
+to speed up or slow down; delete it for no limit.
 
 Every few seconds this reads the system's free-memory percentage (memory_pressure -Q)
 and the 1-minute load. While free memory is below --min-free or the load is above
@@ -75,6 +80,14 @@ def signal_tree(pid, sig, rows):
             pass
 
 
+def pace_limit(path):
+    """The number in the pace file (max concurrent `claude -p` workers), or None for no limit."""
+    try:
+        return int(open(path).read().split()[0])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--min-free", type=int, default=15)
@@ -82,13 +95,31 @@ def main():
     ap.add_argument("--max-load", type=float, default=26)
     ap.add_argument("--resume-load", type=float, default=18)
     ap.add_argument("--interval", type=float, default=5)
+    ap.add_argument("--pace", default=os.path.expanduser("~/git/b3-logs/pace.txt"),
+                    help="file holding the max number of running `claude -p` workers (usage pacing)")
     a = ap.parse_args()
-    paused = []
+    paused, paced = [], []
     while True:
         free, load = free_percent(), os.getloadavg()[0]
         rows = processes()
         alive = {p for p, _, _, _ in rows}
         paused = [p for p in paused if p in alive]
+        paced = [p for p in paced if p in alive]
+        limit = pace_limit(a.pace)
+        if limit is not None:              # usage pacing: at most LIMIT headless Claude workers run
+            by = {p: c for p, _, _, c in rows}
+            claude = sorted((age, p) for p, age in roots(rows) if "claude -p" in by.get(p, ""))
+            running = [p for _, p in reversed(claude) if p not in paced and p not in paused]  # oldest first
+            if len(running) > limit:
+                for p in running[limit:]:
+                    signal_tree(p, signal.SIGSTOP, rows)
+                    paced.append(p)
+                print(f"{time.strftime('%H:%M:%S')} pace {limit}: paused {len(running) - limit} Claude workers", flush=True)
+            elif len(running) < limit and paced:
+                for p in paced[:limit - len(running)]:
+                    signal_tree(p, signal.SIGCONT, rows)
+                    paced.remove(p)
+                print(f"{time.strftime('%H:%M:%S')} pace {limit}: resumed, {len(paced)} still paced", flush=True)
         if free < a.min_free or load > a.max_load:
             running = sorted((age, p) for p, age in roots(rows) if p not in paused)
             if running:
