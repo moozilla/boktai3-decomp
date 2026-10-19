@@ -58,3 +58,10 @@ Measured with `-dg` dumps (`build/w/dump.py`: preprocess like build.py, then `ag
   (unsafe; seen `adds r0, r7, r7`).
 * Next idea: the ROM's very first reload (0x2D6) already uses r5. Find what makes r0..r4 unavailable
   at that insn. Diff `.greg` "Reloads for insn" between the draft and a hand-built variant.
+* Also tried without effect (spill set stays {r0,r1,r2}): passing both zeros as parameters of an inline
+  `Begin(actor, flags2D6, value, 0, 0)`, with or without typed locals at the call site. In the draft,
+  CSE folds `zeroWord` into the `zeroByte` register and creates a separate HImode zero (`*movhi_insn`) for the `field2C8` store.
+  The ROM stores r4 (SImode) into 0x2C8, 0x104 and 0x2AC, so one zero variable must survive CSE.
+* sub_0813599C was matched by another worker (PR #281). The pieces that mattered: an inline `Fill(u32 *zero, void *dst)`
+  with `zero` declared before the buffer, the HUD arguments loaded into locals in ROM order, and
+  `asm("" : "+r"(flags2D0))` after the first clear (it forces the reload after the `flags2D6` store).
