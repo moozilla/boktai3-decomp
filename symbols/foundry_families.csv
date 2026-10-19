@@ -1482,3 +1482,4 @@ addr,function,name,family,note
 081BE7FC,sub_081BE7FC,Storage_BeginItemSpecialMove,"StoragePanel","starts selected storage item's move to special slot"
 081BE8B0,sub_081BE8B0,Storage_BeginEquipmentSpecialMove,"StoragePanel","starts selected storage equipment's move to special slot"
 081BE960,sub_081BE960,Storage_ShowItemDescription,"StoragePanel","shows the selected stored item's condition and description"
+081BEA4C,sub_081BEA4C,Storage_ShowEquipmentDescription,"StoragePanel","shows selected equipment graphic and descriptor text"
