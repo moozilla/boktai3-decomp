@@ -1432,3 +1432,4 @@ addr,function,name,family,note
 081A74F4,sub_081A74F4,Vanargand_UpdateMode2,"Vanargand boss mode state","updates mode two and requests mode three as pair counters fall"
 081A7828,sub_081A7828,ScenePanel_DispatchTransitionCommands,"ScenePanel","dispatches scene commands into transition requests"
 081A7C10,sub_081A7C10,ScenePanel_SelectPairTransition,"ScenePanel","selects the next nonzero pair transition from a table"
+081A7EA0,sub_081A7EA0,ScenePanel_RequestPairReaction,"ScenePanel","requests panel reactions from flags and pair conditions"
