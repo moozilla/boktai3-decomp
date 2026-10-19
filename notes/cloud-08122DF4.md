@@ -114,3 +114,17 @@ extra copy wherever the value is reused. On 08125528, removing `position`, `yp`,
 (keeping `vx` and `timer`) went from 85 differing instructions to an exact match. For a value that is
 read before its pointer is spilled (`ldrh r1, [r0]; str r0, [sp]`), write `t = s->timer; timer =
 &s->timer; if (t) ...`. Test locals one at a time: on 08123194 the `position` local is genuinely needed.
+
+## Techniques from the 080C7C1C task (Golem family, agent-found)
+
+* **Inline returning a condition: an `s32` return type, not `u8`.** `static inline s32 CanCharge()` with
+  `if (a && b && call()) return 1; return 0;` gives gcc's store-flag shape (`movs r1, #1; cmp; bne;
+  movs r1, #0; cmp r1, #0`). With `u8` you get a `movs #1 / b / movs #0` diamond plus a copy.
+* **Force a copy of an inline's parameter:** `static inline void F(void *ctx) { u8 *body = ctx; ... }`
+  gives each inline its own pseudo (ROM `adds r3, r4, #0` at each inline start). A plain `u8 *body` parameter
+  reuses the caller's register, and PRE then merges addresses across the inlines.
+* **Mask constants loaded before the value tested are block locals:** `{ u32 mask = 0x80; if (x & mask) }`.
+* **Load in each branch, not an address:** `p = arr[i]` / `p = arr[0]` in the two branches (cross-jumping
+  shares the final `ldr`) rather than `slot = &arr[...]; p = *slot;`.
+* **Early-return inline for a clamped index** (`if (a[8] <= 3) return a[8]; return -1;`) orders the load
+  before the `movs #-1`.
