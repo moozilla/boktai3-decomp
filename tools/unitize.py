@@ -14,7 +14,8 @@ Verification after each worker: tools/check.py on the unit exits 0 (fast; the
 combined ROM build runs at integration), the unit file exists, and tools/progress.py reports
 no fewer matched bytes than before. Verified branches are listed for batch
 integration (merge each unit/<slug> branch, combined build, one PR). Logs and
-state live in build/unitize/.
+state live in build/unitize/. A plan limit ("You've hit your session limit") stops
+the runner: no further workers start, and the next run retries that subsystem.
 """
 import argparse
 import csv
@@ -24,8 +25,9 @@ import re
 import shutil
 import subprocess
 import sys
-from pathlib import Path
+import threading
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import progress  # noqa: E402
@@ -34,7 +36,12 @@ from split import c_functions  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "unitize")
 WT = os.path.join(os.path.dirname(ROOT), "wt")
-TRANSIENT = ("at capacity", "rate limit", "Rate limit", "overloaded", "Internal server error", "stream disconnected")
+# plan limits ("You've hit your session limit", "...usage limit"): the worker did nothing and every
+# later worker would fail the same way, so the runner stops and the next run retries the subsystem
+LIMIT = ("You've hit your", "You\u2019ve hit your")
+TRANSIENT = ("at capacity", "rate limit", "Rate limit", "overloaded", "Internal server error",
+             "stream disconnected") + LIMIT
+STOP = threading.Event()        # set on the first plan limit: start no more workers
 QUOTA_FLOOR = 15        # % of the Codex weekly quota to leave for the user (tools/codex_quota.py)
 
 
@@ -120,12 +127,15 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         st = json.load(open(state_path(s)))
         transient = st.get("state") == "failed" and os.path.exists(os.path.join(OUT, s["slug"] + ".log")) and \
             any(e in open(os.path.join(OUT, s["slug"] + ".log"), errors="replace").read()
-                for e in TRANSIENT) and st.get("retries", 0) < 2
+                for e in TRANSIENT) and (st.get("retries", 0) < 2 or st.get("limit"))
+        if STOP.is_set():
+            return {**st, "state": "skipped (usage limit)"}
         if transient:          # the worker died on a service error: start it again from a clean tree
             wt = os.path.join(WT, "unit-" + s["slug"])
             subprocess.run(["git", "checkout", "--", "."], cwd=wt, capture_output=True)
             subprocess.run(["git", "clean", "-fdq", "src", "include", "notes", "wip"], cwd=wt, capture_output=True)
-            st = {**st, "state": "retry", "retries": st.get("retries", 0) + 1}
+            limit = st.pop("limit", None)        # a plan limit doesn't use up one of the two retries
+            st = {**st, "state": "retry", "retries": st.get("retries", 0) + (0 if limit else 1)}
         elif st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
             return st
     if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
@@ -133,6 +143,8 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         if not fallback:
             return {**st, "state": "paused (Codex quota below floor)"}
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
+    if STOP.is_set():                    # before the claim and the worktree: nothing left behind
+        return {**st, "state": "skipped (usage limit)"}
     d = os.path.join(WT, "unit-" + s["slug"])
     if not recheck and st.get("state") != "retry":
         claim = state_path(s) + ".claim"
@@ -164,7 +176,20 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
                                cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600)
         except subprocess.TimeoutExpired:
             fh.write("\n# worker timed out\n")
+    if any(e in open(log, errors="replace").read() for e in LIMIT):
+        STOP.set()                       # a plan limit is not this subsystem's failure: stop, retry next run
+        drop_build(d)
+        st.update(state="failed", limit=True, before=before, branch="unit/unit-" + s["slug"], worktree=d)
+        json.dump(st, open(state_path(s), "w"), indent=1)
+        return {**st, "state": "failed (usage limit; runner stopping)"}
     return verify(s, st, d, before)
+
+
+def drop_build(d):
+    for sub in ("src", "asm", "check"):          # regenerable outputs (tools/clean.py's set): save disk
+        p = os.path.join(d, "build", sub)
+        if os.path.isdir(p) and not os.path.islink(p):
+            shutil.rmtree(p)
 
 
 def verify(s, st, d, before):
@@ -187,10 +212,7 @@ def verify(s, st, d, before):
                        cwd=d, capture_output=True)
     dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "include", "symbols"], cwd=d,
                            capture_output=True, text=True).stdout.strip()
-    for sub in ("src", "asm", "check"):          # regenerable outputs (tools/clean.py's set): save disk
-        p = os.path.join(d, "build", sub)
-        if os.path.isdir(p) and not os.path.islink(p):
-            shutil.rmtree(p)
+    drop_build(d)
     st.update(state="verified" if good and not dirty else "failed",
               build_ok=ok, unit=unit, before=before, after=after, uncommitted=bool(dirty),
               branch="unit/unit-" + s["slug"], worktree=d)
@@ -220,6 +242,8 @@ def cmd_run(a):
         for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback, a.floor), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
+    if STOP.is_set():
+        sys.exit("unitize: stopped at a plan usage limit; run again after it resets to retry the rest")
 
 
 def cmd_status(a):
