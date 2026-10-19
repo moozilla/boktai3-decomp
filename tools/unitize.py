@@ -14,7 +14,8 @@ Verification after each worker: tools/check.py on the unit exits 0 (fast; the
 combined ROM build runs at integration), the unit file exists, and tools/progress.py reports
 no fewer matched bytes than before. Verified branches are listed for batch
 integration (merge each unit/<slug> branch, combined build, one PR). Logs and
-state live in build/unitize/.
+state live in build/unitize/. A plan limit ("You've hit your session limit") stops
+the runner: no further workers start, and the next run retries that subsystem.
 """
 import argparse
 import csv
@@ -24,8 +25,9 @@ import re
 import shutil
 import subprocess
 import sys
-from pathlib import Path
+import threading
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import progress  # noqa: E402
@@ -34,7 +36,12 @@ from split import c_functions  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "unitize")
 WT = os.path.join(os.path.dirname(ROOT), "wt")
-TRANSIENT = ("at capacity", "rate limit", "Rate limit", "overloaded", "Internal server error", "stream disconnected")
+# plan limits ("You've hit your session limit", "...usage limit"): the worker did nothing and every
+# later worker would fail the same way, so the runner stops and the next run retries the subsystem
+LIMIT = ("You've hit your", "You\u2019ve hit your")
+TRANSIENT = ("at capacity", "rate limit", "Rate limit", "overloaded", "Internal server error",
+             "stream disconnected") + LIMIT
+STOP = threading.Event()        # set on the first plan limit: start no more workers
 QUOTA_FLOOR = 15        # % of the Codex weekly quota to leave for the user (tools/codex_quota.py)
 
 
@@ -43,7 +50,7 @@ def slug(name):
     return re.sub(r"[^a-z0-9]+", "_", s).strip("_")[:40]
 
 
-def subsystems(min_files):
+def subsystems(min_files, match_first=False):
     rows = list(csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv"))))
     funcs, _ = progress.load_functions()
     addr = {n: a for n, a in funcs}
@@ -53,13 +60,20 @@ def subsystems(min_files):
         a = [addr[f] for f in c_functions(p) if f in addr]
         if a:
             where.append((min(a), max(a), str(p.relative_to(ROOT))))
+    import worklist
+    done = worklist.done_names()
+    unmatched = [f for f in worklist.functions() if f["name"] not in done]
     out = []
     for r in rows:
         lo, hi = int(r["start"], 16), int(r["end"], 16)
         files = [f for a0, a1, f in sorted(where) if lo <= a0 < hi or lo <= a1 < hi]
         nfn = sum(1 for f in files if f.startswith("src/fn/"))
-        if nfn >= min_files:
+        if nfn >= min_files or (match_first and any(lo <= f["addr"] < hi for f in unmatched)):
+            um = [f for f in unmatched if lo <= f["addr"] < hi]
             out.append(dict(name=r["name"], start=r["start"], end=r["end"], slug=slug(r["name"]),
+                            unmatched_insns=sum(f["insns"] for f in um),
+                            unmatched="\n".join(f"  {f['addr']:08X} {f['name']} ({f['insns']})"
+                                                 for f in sorted(um, key=lambda f: -f["insns"])) or "  (none)",
                             files=files, fn=nfn, size=hi - lo))
     return out
 
@@ -70,25 +84,36 @@ def matched_bytes(root):
     return int(m.group(1).replace(",", "")) if m else None
 
 
-BRIEF = """Follow docs/UNIT_WORKER.md (read CLAUDE.md first) for one subsystem:
+BRIEF = """You are a matching worker on the Boktai 3 decomp (read CLAUDE.md first). Your goal is
+decomp progress: byte-identical C for the unmatched functions of one subsystem.
 
   name:  {name}
   range: {start}-{end}  (END exclusive)
   unit:  src/{slug}.c with shared types in include/{slug}.h (reuse an existing header
          in include/ if this is the same object)
 
-`build/venv/bin/python tools/unit_files.py {start} {end}` lists the {n} files to merge.
-Do the whole end state: shared header types, one merged unit in ROM order, every
-function still matching: `tools/check.py src/{slug}.c` exits 0. Do not run tools/build.py or
-make (minutes each, and the full ROM build runs once per batch at integration). Name
-functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
-(integration promotes them). Do not run git commit (the driver commits after its own
-verification; your sandbox cannot write git metadata); leave the finished work in the tree.
-Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
-every unit worker would collide there. Put findings in notes/{slug}.md instead.
-Run every command in the foreground and wait for it, builds included: you are a one-shot
-headless run, so nothing wakes you after a background command finishes.
-Finish with the brief's short report.
+Unmatched functions here, biggest first (address, name, instructions):
+{unmatched}
+
+1. Context first: read the subsystem's matched C (`build/venv/bin/python tools/unit_files.py
+   {start} {end}` lists its files) and recover the shared struct types into the header.
+   Working from the subsystem's real types is what makes the large functions match.
+2. Match the unmatched functions, biggest payoff first, at their ROM position in the unit
+   (merge the subsystem's src/fn/ files into the unit as docs/UNIT_WORKER.md describes).
+   Check each with `tools/check.py src/{slug}.c` (seconds). Helpers: tools/regions.py
+   (structure score ignoring registers: get the structure right first), tools/explain.py,
+   tools/repair.py (wrong constants and callees), tools/relatives.py ADDR (similar matched
+   code), tools/rasolve.py and tools/translate.py (register allocation, last). Spend real
+   effort on big functions: they are most of the remaining code. A close miss (fuzzy at
+   least 80%) stays as a `#ifdef NONMATCHING` draft; otherwise keep the INCLUDE_ASM.
+3. Byte-identical only; no handwritten asm() instructions, no new register pins.
+   Every function in the unit must still match: `tools/check.py src/{slug}.c` exits 0.
+Do not run tools/build.py or make (the full ROM build runs at integration). Name functions
+you understand with a file-local `#define NewName sub_XXXXXXXX` alias. Do not run git commit
+(the driver commits after verifying). Don't edit shared docs (docs/HANDOFF.md, INDEX.md,
+history/, ENGINE.md, GAME_LAYOUT.md); put findings in notes/{slug}.md.
+Run every command in the foreground and wait for it: you are a one-shot headless run.
+Finish with a short report: functions matched, drafts with fuzzy %, what blocked the rest.
 """
 
 
@@ -102,12 +127,15 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         st = json.load(open(state_path(s)))
         transient = st.get("state") == "failed" and os.path.exists(os.path.join(OUT, s["slug"] + ".log")) and \
             any(e in open(os.path.join(OUT, s["slug"] + ".log"), errors="replace").read()
-                for e in TRANSIENT) and st.get("retries", 0) < 2
+                for e in TRANSIENT) and (st.get("retries", 0) < 2 or st.get("limit"))
+        if STOP.is_set():
+            return {**st, "state": "skipped (usage limit)"}
         if transient:          # the worker died on a service error: start it again from a clean tree
             wt = os.path.join(WT, "unit-" + s["slug"])
             subprocess.run(["git", "checkout", "--", "."], cwd=wt, capture_output=True)
             subprocess.run(["git", "clean", "-fdq", "src", "include", "notes", "wip"], cwd=wt, capture_output=True)
-            st = {**st, "state": "retry", "retries": st.get("retries", 0) + 1}
+            limit = st.pop("limit", None)        # a plan limit doesn't use up one of the two retries
+            st = {**st, "state": "retry", "retries": st.get("retries", 0) + (0 if limit else 1)}
         elif st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
             return st
     if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
@@ -115,7 +143,17 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
         if not fallback:
             return {**st, "state": "paused (Codex quota below floor)"}
         backend, model = "claude", fallback          # Codex budget spent: continue on Claude
+    if STOP.is_set():                    # before the claim and the worktree: nothing left behind
+        return {**st, "state": "skipped (usage limit)"}
     d = os.path.join(WT, "unit-" + s["slug"])
+    if not recheck and st.get("state") != "retry":
+        claim = state_path(s) + ".claim"
+        try:                             # one runner per subsystem, even with several runners
+            os.close(os.open(claim, os.O_CREAT | os.O_EXCL))
+        except FileExistsError:
+            return {**st, "state": "claimed elsewhere"}
+        if os.path.isdir(d) and not os.path.exists(state_path(s)):
+            return {**st, "state": "in flight elsewhere"}
     if not os.path.isdir(d):
         subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,   # clones, no build
                        env={**os.environ, "BRANCH_PREFIX": "unit"}, capture_output=True)
@@ -138,7 +176,20 @@ def run_one(s, model, base, backend="codex", effort="medium", recheck=False, fal
                                cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600)
         except subprocess.TimeoutExpired:
             fh.write("\n# worker timed out\n")
+    if any(e in open(log, errors="replace").read() for e in LIMIT):
+        STOP.set()                       # a plan limit is not this subsystem's failure: stop, retry next run
+        drop_build(d)
+        st.update(state="failed", limit=True, before=before, branch="unit/unit-" + s["slug"], worktree=d)
+        json.dump(st, open(state_path(s), "w"), indent=1)
+        return {**st, "state": "failed (usage limit; runner stopping)"}
     return verify(s, st, d, before)
+
+
+def drop_build(d):
+    for sub in ("src", "asm", "check"):          # regenerable outputs (tools/clean.py's set): save disk
+        p = os.path.join(d, "build", sub)
+        if os.path.isdir(p) and not os.path.islink(p):
+            shutil.rmtree(p)
 
 
 def verify(s, st, d, before):
@@ -161,10 +212,7 @@ def verify(s, st, d, before):
                        cwd=d, capture_output=True)
     dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "include", "symbols"], cwd=d,
                            capture_output=True, text=True).stdout.strip()
-    for sub in ("src", "asm", "check"):          # regenerable outputs (tools/clean.py's set): save disk
-        p = os.path.join(d, "build", sub)
-        if os.path.isdir(p) and not os.path.islink(p):
-            shutil.rmtree(p)
+    drop_build(d)
     st.update(state="verified" if good and not dirty else "failed",
               build_ok=ok, unit=unit, before=before, after=after, uncommitted=bool(dirty),
               branch="unit/unit-" + s["slug"], worktree=d)
@@ -179,20 +227,23 @@ def cmd_list(a):
 
 def cmd_run(a):
     os.makedirs(OUT, exist_ok=True)
-    todo = subsystems(a.min)
+    todo = subsystems(a.min, a.order == "unmatched")
     if a.only:
         want = set(a.only.split(","))
         todo = [s for s in todo if s["slug"] in want or s["name"] in want]
     if a.range:
         lo, hi = (int(x, 16) for x in a.range.split("-"))
         todo = [s for s in todo if lo <= int(s["start"], 16) and int(s["end"], 16) <= hi]
-    todo = sorted(todo, key=lambda s: -s["fn"])[:a.limit]
+    key = (lambda s: -s["unmatched_insns"]) if a.order == "unmatched" else (lambda s: -s["fn"])
+    todo = sorted(todo, key=key)[:a.limit]
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
         for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck, a.fallback, a.floor), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
+    if STOP.is_set():
+        sys.exit("unitize: stopped at a plan usage limit; run again after it resets to retry the rest")
 
 
 def cmd_status(a):
@@ -217,6 +268,8 @@ def main():
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
     p.add_argument("--recheck", action="store_true", help="re-verify finished worktrees; run no workers")
+    p.add_argument("--order", choices=["files", "unmatched"], default="unmatched",
+                   help="unmatched: subsystems with the most unmatched code first (decomp progress)")
     p.add_argument("--floor", type=float, default=QUOTA_FLOOR, help="stop Codex below this %% of the weekly quota")
     p.add_argument("--range", help="START-END: only subsystems inside this address range")
     p.add_argument("--fallback", help="Claude model (e.g. sonnet) to use once the Codex quota floor is reached")

@@ -1020,15 +1020,13 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
             out = (struct SceneVec *)((u8 *)out + 60);
             in = &actor->position;
             x = ({
-                register s32 value asm("r4") = actor->position.x;
-                asm("" : : "r"(value));
+                s32 value = actor->position.x;
                 value;
             });
-            z = in->z;
+            *(&z) = in->z;
             out->x = scale(x - z);
             horizontal = scale(({
-                register s32 sum asm("r1") = x + z;
-                asm("" : : "r"(sum));
+                s32 sum = x + z;
                 sum;
             }));
             height = scaleHeight(in->y);

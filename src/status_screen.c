@@ -1,5 +1,4 @@
 #include "status_screen.h"
-// MATCHING_CONCESSION: register-pinning
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
@@ -14,12 +13,14 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
     int digits[2];
     s16 *dst;
     int row, col;
-    register int *values asm("r12");
+    int *values;
     digits[0] = left > 9;
     digits[1] = left - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 6, 11);
-    row = 0;
-    values = digits;
+    do {
+        row = 0;
+        values = digits;
+    } while (0);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -57,13 +58,15 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     int digits[2];
     s16 *dst;
     int row, col;
-    register int *values asm("r12");
+    int *values;
     int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
     digits[0] = Div(left, 10);
     digits[1] = left - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 11);
-    row = 0;
-    values = digits;
+    do {
+        row = 0;
+        values = digits;
+    } while (0);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;

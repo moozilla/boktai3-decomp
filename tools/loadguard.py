@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Keep overnight runs from hanging the machine: pause workers under memory or CPU pressure.
 
-  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 26] [--resume-load 18]
+  loadguard.py [--min-free 15] [--resume-free 30] [--max-load 40] [--resume-load 28] [--pace FILE]
+
+With --pace FILE (default ~/git/b3-logs/pace.txt) it also paces plan usage: at most
+the number in FILE of headless `claude -p` workers run; the youngest beyond that are
+paused and resumed in turn as the number goes up or workers finish. Edit the file
+to speed up or slow down; delete it for no limit.
 
 Every few seconds this reads the system's free-memory percentage (memory_pressure -Q)
 and the 1-minute load. While free memory is below --min-free or the load is above
@@ -60,10 +65,19 @@ def tree(pid, rows):
     return out
 
 
+SHELLS = {"sh", "zsh", "bash", "-zsh", "-bash", "login", "env", "nohup", "time", "timeout"}
+
+
+def is_worker(cmd):
+    """A real worker process: never a shell whose command line merely mentions one."""
+    exe = os.path.basename(cmd.split()[0]) if cmd.split() else ""
+    return exe not in SHELLS and bool(WORKER.search(cmd))
+
+
 def roots(rows):
     """Worker processes whose parent is not itself a worker (one per job)."""
     by = {p: c for p, _, _, c in rows}
-    return [(p, age) for p, pp, age, c in rows if WORKER.search(c) and not WORKER.search(by.get(pp, ""))
+    return [(p, age) for p, pp, age, c in rows if is_worker(c) and not is_worker(by.get(pp, ""))
             and p != os.getpid()]
 
 
@@ -75,20 +89,60 @@ def signal_tree(pid, sig, rows):
             pass
 
 
+START = 90      # seconds: a worker younger than this has not done real work yet
+
+
+def priority(cmd):
+    """Matching (decomp progress) first; consolidation-only unit workers (the old brief) second."""
+    return 0 if cmd.startswith("claude -p Follow docs/UNIT_WORKER.md") else 1
+
+
+def pace_limit(path):
+    """The number in the pace file (max concurrent `claude -p` workers), or None for no limit."""
+    try:
+        return int(open(path).read().split()[0])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--min-free", type=int, default=15)
     ap.add_argument("--resume-free", type=int, default=30)
-    ap.add_argument("--max-load", type=float, default=26)
-    ap.add_argument("--resume-load", type=float, default=18)
+    ap.add_argument("--max-load", type=float, default=40)
+    ap.add_argument("--resume-load", type=float, default=28)
     ap.add_argument("--interval", type=float, default=5)
+    ap.add_argument("--pace", default=os.path.expanduser("~/git/b3-logs/pace.txt"),
+                    help="file holding the max number of running `claude -p` workers (usage pacing)")
     a = ap.parse_args()
-    paused = []
+    paused, paced = [], []
     while True:
         free, load = free_percent(), os.getloadavg()[0]
         rows = processes()
         alive = {p for p, _, _, _ in rows}
         paused = [p for p in paused if p in alive]
+        paced = [p for p in paced if p in alive]
+        limit = pace_limit(a.pace)
+        if limit is not None:
+            # Usage pacing that wastes nothing: a worker already working is never paused; only one
+            # that has just started (younger than START seconds) is held, and held workers are
+            # released in priority order (matching before unit consolidation) as others finish.
+            by = {p: c for p, _, _, c in rows}
+            claude = [(p, age, c) for p, pp, age, c in rows
+                      if is_worker(c) and "claude -p" in c and "claude -p" not in by.get(pp, "")]
+            running = [x for x in claude if x[0] not in paced and x[0] not in paused]
+            if len(running) > limit:
+                fresh = sorted((x for x in running if x[1] < START), key=lambda x: (-priority(x[2]), x[1]))
+                for p, _, _ in fresh[:len(running) - limit]:
+                    signal_tree(p, signal.SIGSTOP, rows)
+                    paced.append(p)
+                    print(f"{time.strftime('%H:%M:%S')} pace {limit}: holding new worker {p}", flush=True)
+            elif len(running) < limit and paced:
+                held = sorted(paced, key=lambda p: priority(by.get(p, "")), reverse=True)
+                for p in held[:limit - len(running)]:
+                    signal_tree(p, signal.SIGCONT, rows)
+                    paced.remove(p)
+                    print(f"{time.strftime('%H:%M:%S')} pace {limit}: released {p}", flush=True)
         if free < a.min_free or load > a.max_load:
             running = sorted((age, p) for p, age in roots(rows) if p not in paused)
             if running:

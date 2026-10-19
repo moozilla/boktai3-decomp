@@ -30,9 +30,9 @@ s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
             if (!Locked()) {
                 i = 0;
                 do {
-                table = gUnk_08605BB0;
-                state = (u32)&pool->slots[0].state;
-                slot = start;
+                    table = gUnk_08605BB0;
+                    state = (u32)&pool->slots[0].state;
+                    slot = start;
                 } while (0);
                 for (; i < 4;) {
                     if (Occupied(&pool->occupiedMask, i))

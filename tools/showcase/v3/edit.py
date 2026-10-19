@@ -39,22 +39,36 @@ BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 # replaces the clip's sound (otherwise mixed in).
 PART1 = [
     ("cold", "Cold open: something is wrong with that ghoul", None, {}),
-    ("doors", "The doors lie", "cuts", {"bed": 13}),
+    ("doors", "The doors lie", "cuts", {"bed": 13, "fade_on_last_line": True, "lively": True}),
     ("night", "Night falls on cue", None, {}),
     ("marionettes", "The marionettes", None, {}),
-    ("count", "The Count loses control", None, {}),
+    ("count", "The Count loses control", None, {"fade_on_last_line": True}),
     ("ride", "Somebody rides Vanargand", None, {}),
-    ("reveal", "The overload: who the stranger was", None, {}),
-    ("title", "Introducing... Boktai 3, decompiled", ("pages", [0, 1]), {"bed": 92, "only_bed": True}),
-    ("title", None, ("pages", [2]), {"bed": 92, "only_bed": True}),
+    ("reveal", "The overload: who the stranger was", None, {"fade_on_last_line": True}),
+    ("card:title", "Introducing... Boktai 3, decompiled", None, {"bed": 92, "only_bed": True}),
+    ("card:engine", None, None, {"bed": 92, "only_bed": True}),
     ("coffins", "Encore: a purification at the Pile Driver", None, {}),
-    ("title", None, ("pages", [3]), {"bed": 92, "only_bed": True}),
+    ("card:hope", None, None, {"bed": 92, "only_bed": True}),
     ("vride", "Claude rides Vanargand", None, {"bed": 92}),
-    ("title", None, ("pages", [4]), {"bed": 92, "only_bed": True}),
-    ("sunback", "The sun is in your hands", None, {}),
+    ("sunback", "The sun is in your hands", None, {"white_out": True, "fade_on_last_line": True, "fade_color": "white"}),
     ("part2", None, None, {}),
     ("credits", "Credits", ("abs", [(0.9, 58.0, 1.0)]), {"bed": 92, "only_bed": True, "bed_end": True}),
 ]
+
+# The cards between the scenes, drawn in the game's own font (part1.py
+# exports it): screens of text lines, each (text, scale, color, y, fly-in
+# time or None), with a fade in and out.
+CREAM, ACCENT = (236, 230, 218), (224, 116, 90)
+ITEMS = [("Custom ROM hacks", 5, CREAM, 450), ("The game's unused content, rediscovered", 5, CREAM, 570),
+         ("...and maybe even a new edition", 5, CREAM, 700), ("of the 2007 fan translation", 5, CREAM, 790)]
+HOPE = ("We hope this work brings:", 6, ACCENT, 290)
+CARDS = {
+    "title": [(2.6, [("Introducing...", 6, CREAM, 492, None)]),
+              (3.6, [("BOKTAI 3", 10, ACCENT, 380, None), ("DECOMPILED", 10, CREAM, 560, None)])],
+    "engine": [(4.4, [("Every scene in this demo is running", 5, CREAM, 420, None),
+                      ("in the game's actual cutscene engine.", 5, CREAM, 540, None)])],
+    "hope": [(6.4, [HOPE + (None,), ITEMS[0] + (0.8,), ITEMS[1] + (1.7,), ITEMS[2] + (2.8,), ITEMS[3] + (2.8,)])],
+}
 TMP = os.path.join(V3, "edit_tmp")      # reused: every run overwrites it (moving it to the Trash filled the disk)
 
 
@@ -113,12 +127,25 @@ def luma(path, key="YAVG", fps=30):
     return [float(v) for v in re.findall(key + r"=([0-9.]+)", out)]
 
 
-def content_end(path, fps=30, keep=0.4):
+def content_end(path, fps=30, keep=0.1):
     """Seconds into the recording where the closing fade (to black or white)
     is complete, plus `keep`: the recording runs on in black after it."""
     ys = luma(path, fps=fps)
     live = [i for i, y in enumerate(ys) if 24 < y < 228]
     return (live[-1] + 1) / fps + keep if live else len(ys) / fps
+
+
+def last_line_end(path, after=0.0, until=None, fps=30):
+    """Seconds into the recording when the last message window closes before
+    `until`: its cream box fills the bottom of the screen (bright and
+    yellowish; a white fade is neutral)."""
+    out = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{after:.3f}", *(["-t", f"{until - after:.3f}"] if until else []),
+                          "-i", path, "-vf", f"fps={fps},crop=880:150:40:460,signalstats,metadata=print:file=-",
+                          "-f", "null", "-"], capture_output=True, text=True).stdout
+    ys = [float(v) for v in re.findall(r"signalstats.YAVG=([0-9.]+)", out)]
+    us = [float(v) for v in re.findall(r"signalstats.UAVG=([0-9.]+)", out)]
+    up = [i for i, (y, u) in enumerate(zip(ys, us)) if y > 190 and u < 123]
+    return after + (up[-1] + 1) / fps if up else None
 
 
 def pages(path, fps=30, th=60):
@@ -133,6 +160,37 @@ def pages(path, fps=30, th=60):
                 runs.append((a / fps, i / fps))
             a = None
     return runs
+
+
+def motion(path, fps=30):
+    """Per-frame change from the previous frame (mean of the difference)."""
+    out = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf",
+                          f"fps={fps},scale=240:160,tblend=all_mode=difference,signalstats,"
+                          "metadata=print:key=lavfi.signalstats.YAVG:file=-", "-f", "null", "-"],
+                         capture_output=True, text=True).stdout
+    return [float(v) for v in re.findall(r"YAVG=([0-9.]+)", out)]
+
+
+def lively(src, parts, s0, fps=30):
+    """Each part started where its fade-in has finished (85% of the part's
+    median brightness) and the picture has started moving: the chase's
+    rooms open on a slow fade with Django standing still."""
+    import statistics
+    ys, ms = luma(src, fps=fps), motion(src, fps)
+    out = []
+    for a, b, sp in parts:
+        i, j = int((s0 + a) * fps), min(len(ys), int((s0 + b) * fps))
+        if j - i < fps:
+            out.append((a, b, sp))
+            continue
+        med = statistics.median(ys[i:j])
+        k = i
+        while k < j - fps and ys[k] < 0.85 * med:
+            k += 1
+        while k < j - fps and k < len(ms) and ms[k] < 0.3:
+            k += 1
+        out.append((k / fps - s0, b, sp))
+    return out
 
 
 def without_black(src, s0, keep=0.1):
@@ -151,11 +209,65 @@ def without_black(src, s0, keep=0.1):
     return parts
 
 
-def game_clip(name, tmp, trims=None, tag=None):
+def text_layer(text, scale, color, font):
+    """RGBA image of one line in the game's 8x16 font: color 1 is the line's
+    color, 2 and 3 its shading (the font's own), 4 is clear."""
+    import numpy as np
+    w = 8 * len(text)
+    img = np.zeros((16, w, 4), np.float32)
+    shade = {1: 1.0, 2: 0.62, 3: 0.28}
+    for i, ch in enumerate(text):
+        g = font[max(0, min(95, ord(ch) - 0x20))]
+        for v, k in shade.items():
+            m = g == v
+            img[:, 8 * i:8 * i + 8][m] = [color[0] * k, color[1] * k, color[2] * k, 255]
+    return img.repeat(scale, 0).repeat(scale, 1)
+
+
+def card_clip(name, tmp, tag):
+    """A card (CARDS[name]) as a 1920x1080 clip: each screen fades in, its
+    flying lines come in from the right with an ease-out, and it fades out."""
+    import numpy as np
+    font = np.load(os.path.join(V3, "font8x16.npy"))
+    o = os.path.join(tmp, f"{tag}.mp4")
+    p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "1920x1080",
+                          "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-crf", "14", "-preset", "fast",
+                          "-pix_fmt", "yuv420p", o], stdin=subprocess.PIPE)
+    for dur, lines in CARDS[name]:
+        layers = [(text_layer(t, sc, col, font), y, fly) for t, sc, col, y, fly in lines]
+        n = int(dur * FPS)
+        for f in range(n):
+            t = f / FPS
+            frame = np.zeros((1080, 1920, 3), np.float32)
+            for img, y, fly in layers:
+                h, w = img.shape[:2]
+                x = (1920 - w) // 2
+                a = 1.0
+                if fly is not None:
+                    u = min(1.0, max(0.0, (t - fly) / 0.45))
+                    if u <= 0:
+                        continue
+                    x += int((1920 - x) * (1 - u) ** 3)
+                    a = min(1.0, u * 2)
+                x0, x1 = max(0, x), min(1920, x + w)
+                if x1 <= x0:
+                    continue
+                part = img[:, x0 - x:x1 - x]
+                al = part[..., 3:4] / 255 * a
+                frame[y:y + h, x0:x1] = frame[y:y + h, x0:x1] * (1 - al) + part[..., :3] * al
+            k = min(1.0, t / 0.35, (dur - t) / 0.45)
+            p.stdin.write((frame * max(0.0, k)).clip(0, 255).astype(np.uint8).tobytes())
+    p.stdin.close()
+    p.wait()
+    return o
+
+
+def game_clip(name, tmp, trims=None, tag=None, opt=None):
     """A Part 1 recording, cut and scaled; returns the clip's path. trims:
     see PART1 ("cuts": the sound is cut with the picture); sped-up parts
     keep the recording's sound running at its own speed."""
     tag = tag or name
+    opt = opt or {}
     src = os.path.join(REC, f"{name}.mp4")
     s0 = scene_start(src)
     if isinstance(trims, tuple) and trims[0] == "abs":    # times from the recording's start (the crawl scenes)
@@ -168,8 +280,21 @@ def game_clip(name, tmp, trims=None, tag=None):
     end = duration(src)
     if trims is None:
         end = min(end, content_end(src))
+    fade_last = 0.0
+    if trims is None and opt.get("fade_on_last_line"):
+        # the game shifts the camera while a message is open: end on the last line, fading out over it
+        e = last_line_end(src, max(s0, end - 8), end)
+        if e:
+            end, fade_last = e, 0.8
     cut_sound = trims == "cuts"
     parts = without_black(src, s0) if cut_sound else (trims or [(0, end - s0, 1.0)])
+    if cut_sound and opt.get("lively"):
+        parts = lively(src, parts, s0)
+    if cut_sound and opt.get("fade_on_last_line"):
+        e = last_line_end(src, s0 + parts[-1][0], s0 + parts[-1][1])
+        if e:
+            parts[-1] = (parts[-1][0], e - s0, 1.0)
+            fade_last = 0.8
     outs = []
     for k, (a, b, speed) in enumerate(parts):
         a, b = s0 + a, min(end, s0 + b)
@@ -177,8 +302,12 @@ def game_clip(name, tmp, trims=None, tag=None):
         vf = f"setpts=(PTS-STARTPTS)/{speed},{CARD if is_card else GAME}"
         if name == "credits" and k == len(parts) - 1:     # the video's end: fade to black
             vf += f",fade=out:st={(b - a) / speed - 2.5:.3f}:d=2.5"
+        if fade_last and k == len(parts) - 1:
+            vf += f",fade=out:st={(b - a) / speed - fade_last:.3f}:d={fade_last}:color={opt.get('fade_color', 'black')}"
         sh("ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", src, "-vf", vf,
-           *(["-af", "aresample=48000,afade=t=in:d=0.03"] if cut_sound else ["-an"]),
+           *(["-af", "aresample=48000,afade=t=in:d=0.03" + (f",afade=t=out:st={(b - a) - fade_last:.3f}:d={fade_last}"
+                                                             if fade_last and k == len(parts) - 1 else "")]
+             if cut_sound else ["-an"]),
            "-c:v", "libx264", "-crf", "16", "-preset", "fast", *(["-c:a", "aac", "-ac", "2"] if cut_sound else []), o)
         outs.append(o)
     if cut_sound:
@@ -187,7 +316,7 @@ def game_clip(name, tmp, trims=None, tag=None):
         return o
     v = os.path.join(tmp, f"{tag}_v.mp4")
     concat(outs, v, audio=False)
-    fo = 2.5 if name == "credits" else 0.25
+    fo = 2.5 if name == "credits" else (fade_last or 0.25)
     # sound: the recording's own, unsped, from the clip's start, as long as the picture
     dv = duration(v)
     o = os.path.join(tmp, f"{tag}.mp4")
@@ -206,6 +335,27 @@ def song_length(song):
     ms = scene_start(music) + 0.5
     starts = [float(v) for v in re.findall(r"silence_start: ([0-9.]+)", out) if float(v) > ms + 5]
     return (starts[0] if starts else duration(music)) - ms
+
+
+def white_in(nxt, tmp, src, at, hold=1.0, fade=2.0, lead=1.6):
+    """A held white, then a slow fade from white into the first frame of
+    `nxt`, with the sound of `src` (the scene that whited out) from `at`
+    seconds on, fading away, and part 2's music (rec/music.mp4) rising under
+    the last `lead` seconds (part 2 picks it up from there)."""
+    first = os.path.join(tmp, "white_next.png")
+    sh("ffmpeg", "-v", "error", "-y", "-i", nxt, "-frames:v", "1", first)
+    d = hold + fade
+    music = os.path.join(REC, "music.mp4")
+    ms = scene_start(music) + 1
+    o = os.path.join(tmp, "white_in.mp4")
+    sh("ffmpeg", "-v", "error", "-y", "-loop", "1", "-t", f"{d}", "-i", first, "-ss", f"{at:.3f}", "-i", src,
+       "-ss", f"{ms - lead:.3f}", "-i", music, "-map", "0:v",
+       "-vf", f"fps={FPS},format=yuv420p,fade=in:st={hold}:d={fade}:color=white",
+       "-filter_complex", f"[1:a]aresample=48000,afade=t=out:st={hold + 0.8:.2f}:d={d - hold - 0.8:.2f},apad[g];"
+                         f"[2:a]aresample=48000,volume=0.85,afade=t=in:d={lead},adelay={int((d - lead) * 1000)}:all=1,apad[m];"
+                         f"[g][m]amix=inputs=2:normalize=0:duration=first[a]",
+       "-map", "[a]", "-t", f"{d}", "-c:v", "libx264", "-crf", "16", "-c:a", "aac", "-ac", "2", o)
+    return o
 
 
 def with_bed(clip, song, at, tmp, tag, only=False, fade_in=0.3, fade_out=0.5):
@@ -294,37 +444,80 @@ def live_track(tmp, meta, total):
     return o
 
 
-def part2(tmp, chapters, t0):
-    pages = os.path.join(REC, "studio_pages.mp4")
-    live = os.path.join(REC, "studio_live.mp4")
-    cards = os.path.join(REC, "studio_cards.mp4")
-    meta = json.load(open(os.path.join(REC, "studio_live.json")))
-    dl = duration(live)
-    game = live_track(tmp, meta, dl)
-    import tour_stops
-    x, y, w, h = meta.get("game_box") or tour_stops.GAME_BOX
-    live2 = os.path.join(tmp, "studio_live_game.mp4")
-    sh("ffmpeg", "-v", "error", "-y", "-i", live, "-i", game, "-filter_complex",
+def centaur_track(tmp, meta, total):
+    """The game's side of the Centaur stop: live_tour.lua's frames (saved at
+    the GBA's rate, in real time) from when the Studio linked, lined up with
+    the Studio's recording, every second frame (30 fps)."""
+    d = os.path.join(V3, "livetour")
+    fs = sorted(f for f in os.listdir(d) if f.startswith("g_") and f.endswith(".png"))
+    start = meta.get("game_start", 0.0)
+    seq = [(os.path.join(d, fs[0]), max(0.04, start))]
+    t = start
+    for f in fs[::2]:
+        if t >= total:
+            break
+        seq.append((os.path.join(d, f), 2 / 59.7275))
+        t += 2 / 59.7275
+    if t < total:
+        seq.append((seq[-1][0], total - t))
+    lst = os.path.join(tmp, "centaur.txt")
+    with open(lst, "w") as f:
+        for p, dd in seq:
+            f.write(f"file '{p}'\nduration {dd:.4f}\n")
+        f.write(f"file '{seq[-1][0]}'\n")
+    o = os.path.join(tmp, "centaur_game.mp4")
+    sh("ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst,
+       "-vf", f"scale=480:320:flags=neighbor,fps={FPS},format=yuv420p", "-c:v", "libx264", "-crf", "14", o)
+    return o
+
+
+def beside(tmp, studio, game, box, name):
+    """The Studio's recording with the game laid into the box its page leaves for it."""
+    x, y, w, h = box
+    o = os.path.join(tmp, name)
+    sh("ffmpeg", "-v", "error", "-y", "-i", studio, "-i", game, "-filter_complex",
        f"[1:v]pad={w + 8}:{h + 8}:4:4:color=0x3a352e[g];[0:v][g]overlay={x - 4}:{y - 4}:shortest=0,fps={FPS},format=yuv420p",
-       "-t", f"{dl:.3f}", "-c:v", "libx264", "-crf", "16", "-preset", "fast", live2)
-    vids = []
-    for p in (pages, live2, cards):
+       "-t", f"{duration(studio):.3f}", "-c:v", "libx264", "-crf", "16", "-preset", "fast", o)
+    return o
+
+
+def part2(tmp, chapters, t0):
+    """The Studio tour (its pages; Centaur and the live edit, each with the
+    running game beside the Studio), Claude's "how I made this video"
+    (making.py), and the closing cards, under a bed of song 57."""
+    import tour_stops
+    pages = os.path.join(REC, "studio_pages.mp4")
+    cards = os.path.join(REC, "studio_cards.mp4")
+    making = os.path.join(REC, "making.mp4")
+    cen = os.path.join(REC, "studio_centaur.mp4")
+    cmeta = json.load(open(os.path.join(REC, "studio_centaur.json")))
+    cen2 = beside(tmp, cen, centaur_track(tmp, cmeta, duration(cen)), cmeta.get("game_box") or tour_stops.GAME_BOX,
+                  "studio_centaur_game.mp4")
+    live = os.path.join(REC, "studio_live.mp4")
+    meta = json.load(open(os.path.join(REC, "studio_live.json")))
+    live2 = beside(tmp, live, live_track(tmp, meta, duration(live)), meta.get("game_box") or tour_stops.GAME_BOX,
+                   "studio_live_game.mp4")
+    parts = [(pages, "How it was done: the Studio"), (cen2, "Centaur: the Studio, linked to a running game"),
+             (live2, "Live edit: the Studio changes the running game"), (making, "How Claude made this video"),
+             (cards, "The tools, and where to find them")]
+    vids, t = [], t0
+    for p, title in parts:
         o = os.path.join(tmp, os.path.basename(p).replace(".mp4", "_n.mp4"))
         sh("ffmpeg", "-v", "error", "-y", "-i", p, "-vf", f"scale=1920:1080,fps={FPS},format=yuv420p", "-an",
            "-c:v", "libx264", "-crf", "16", "-preset", "fast", o)
         vids.append(o)
+        chapters.append((t, title))
+        t += duration(o)
     v = os.path.join(tmp, "part2_v.mp4")
     concat(vids, v, audio=False)
     dv = duration(v)
     music = os.path.join(REC, "music.mp4")
     ms = scene_start(music)
+    assert duration(music) - ms - 1 > dv, "rec/music.mp4 is shorter than part 2: record a longer bed"
     o = os.path.join(tmp, "part2.mp4")
     sh("ffmpeg", "-v", "error", "-y", "-i", v, "-ss", f"{ms + 1:.3f}", "-i", music, "-map", "0:v", "-map", "1:a",
-       "-af", f"aresample=48000,volume=0.55,afade=t=in:d=2,afade=t=out:st={dv - 3:.3f}:d=3,apad", "-t", f"{dv:.3f}",
+       "-af", f"aresample=48000,volume=0.85,afade=t=in:d=0.05,afade=t=out:st={dv - 3:.3f}:d=3,apad", "-t", f"{dv:.3f}",
        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
-    dp = duration(pages)
-    chapters += [(t0, "How it was done: the Studio"), (t0 + dp, "Live edit: the Studio changes the running game"),
-                 (t0 + dp + dl, "The tools, and where to find them")]
     return o
 
 
@@ -344,12 +537,17 @@ def main():
             if name == "part2":
                 if a.part == "1":
                     continue
+                if PART1[k - 1][3].get("white_out"):         # from the last scene's white into part 2
+                    w = white_in(os.path.join(REC, "studio_pages.mp4"), tmp, os.path.join(REC, f"{PART1[k - 1][0]}.mp4"),
+                                 white_from)
+                    clips.append(w)
+                    t += duration(w)
                 c = part2(tmp, chapters, t)
                 clips.append(c)
                 t += duration(c)
                 continue
-            tag = f"{k:02d}_{name}"
-            c = game_clip(name, tmp, trims, tag)
+            tag = f"{k:02d}_{name.replace(':', '_')}"
+            c = card_clip(name[5:], tmp, tag) if name.startswith("card:") else game_clip(name, tmp, trims, tag, opt)
             if opt.get("bed"):
                 song = opt["bed"]
                 prev, nxt = (PART1[k - 1][3] if k else {}), (PART1[k + 1][3] if k + 1 < len(PART1) else {})
@@ -359,6 +557,9 @@ def main():
                                    fade_in=0 if joined_in else 0.3,
                                    fade_out=2.5 if name == "credits" else (0 if joined_out else 0.5))
                 beds[song] = beds.get(song, 0.0) + used
+            if opt.get("white_out"):     # where its recording goes on after the clip (for the white-in's sound)
+                src = os.path.join(REC, f"{name}.mp4")
+                white_from = scene_start(src) + duration(c)
             if chapter:
                 chapters.append((t, chapter))
             clips.append(c)
