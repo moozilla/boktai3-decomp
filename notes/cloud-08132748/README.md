@@ -2,7 +2,7 @@
 
 Two drafts are not matched yet. Both are below the 80% NONMATCHING threshold, so they stay out of `src/`.
 
-* `sub_0813599C.c` (277 insns; check.py fuzzy about 78%). This is the category-1 hit reaction: hit history at 0x5B8, damage `1 << *(u8 *)0x47E`, the HUD timed state, the damage number, and the route restart.
+* `sub_0813599C` (now a NONMATCHING draft in `src/fn/`, 80.9%). This is the category-1 hit reaction: hit history at 0x5B8, damage `1 << *(u8 *)0x47E`, the HUD timed state, the damage number, and the route restart.
   The control flow and instruction count are right. Remaining differences:
   * In the ROM, `flags2D0` is reloaded after the `flags2D6` store. The draft keeps it in a register.
   * The `field2E4` store is followed by a reload (`strh r4; ldrh r1`) that the draft doesn't produce.
