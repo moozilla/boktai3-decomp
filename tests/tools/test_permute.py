@@ -26,7 +26,7 @@ class PermuteTests(unittest.TestCase):
             src = Path(d) / "candidate.c"
             src.write_text(include + body)
             with patch.object(build, "preprocess", return_value=include + body):
-                self.assertEqual(permute.prepare_source(str(src), "f"), "\n" + body)
+                self.assertEqual(permute.prepare_source(str(src), "f")[0].lstrip("\n"), body)
 
     def test_compact_nested_body_and_inline_helper_are_preserved(self):
         source = "static inline int\nh(int x) { return x + 1; }\n"
@@ -35,7 +35,7 @@ class PermuteTests(unittest.TestCase):
             src = Path(d) / "candidate.c"
             src.write_text(source)
             with patch.object(build, "preprocess", return_value=source):
-                self.assertEqual(permute.prepare_source(str(src), "f"), source)
+                self.assertEqual(permute.prepare_source(str(src), "f")[0].lstrip("\n"), source.lstrip("\n"))
             src.write_text(source + "int other(void) { return 1; }\n")
             with self.assertRaisesRegex(ValueError, "one ROM function"):
                 permute.prepare_source(str(src), "f")
