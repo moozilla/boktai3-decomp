@@ -39,7 +39,7 @@ BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 # replaces the clip's sound (otherwise mixed in).
 PART1 = [
     ("cold", "Cold open: something is wrong with that ghoul", None, {}),
-    ("doors", "The doors lie", "cuts", {"bed": 13, "fade_on_last_line": True}),
+    ("doors", "The doors lie", "cuts", {"bed": 13, "fade_on_last_line": True, "lively": True}),
     ("night", "Night falls on cue", None, {}),
     ("marionettes", "The marionettes", None, {}),
     ("count", "The Count loses control", None, {"fade_on_last_line": True}),
@@ -162,6 +162,37 @@ def pages(path, fps=30, th=60):
     return runs
 
 
+def motion(path, fps=30):
+    """Per-frame change from the previous frame (mean of the difference)."""
+    out = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf",
+                          f"fps={fps},scale=240:160,tblend=all_mode=difference,signalstats,"
+                          "metadata=print:key=lavfi.signalstats.YAVG:file=-", "-f", "null", "-"],
+                         capture_output=True, text=True).stdout
+    return [float(v) for v in re.findall(r"YAVG=([0-9.]+)", out)]
+
+
+def lively(src, parts, s0, fps=30):
+    """Each part started where its fade-in has finished (85% of the part's
+    median brightness) and the picture has started moving: the chase's
+    rooms open on a slow fade with Django standing still."""
+    import statistics
+    ys, ms = luma(src, fps=fps), motion(src, fps)
+    out = []
+    for a, b, sp in parts:
+        i, j = int((s0 + a) * fps), min(len(ys), int((s0 + b) * fps))
+        if j - i < fps:
+            out.append((a, b, sp))
+            continue
+        med = statistics.median(ys[i:j])
+        k = i
+        while k < j - fps and ys[k] < 0.85 * med:
+            k += 1
+        while k < j - fps and k < len(ms) and ms[k] < 0.3:
+            k += 1
+        out.append((k / fps - s0, b, sp))
+    return out
+
+
 def without_black(src, s0, keep=0.1):
     """Trims that skip every dark stretch after s0 (the warps between scenes),
     keeping `keep` seconds of each side of it."""
@@ -257,6 +288,8 @@ def game_clip(name, tmp, trims=None, tag=None, opt=None):
             end, fade_last = e, 0.8
     cut_sound = trims == "cuts"
     parts = without_black(src, s0) if cut_sound else (trims or [(0, end - s0, 1.0)])
+    if cut_sound and opt.get("lively"):
+        parts = lively(src, parts, s0)
     if cut_sound and opt.get("fade_on_last_line"):
         e = last_line_end(src, s0 + parts[-1][0], s0 + parts[-1][1])
         if e:
