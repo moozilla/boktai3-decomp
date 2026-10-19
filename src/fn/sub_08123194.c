@@ -211,6 +211,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
         quadrant = angle + 0x20;
         if (gUnk_030053F4 & 0x800) {
             s32 cell = *cellp;
+            s32 target;
             switch ((quadrant >> 6) & 3) {
                 case 0:
                 case 2:
@@ -224,12 +225,14 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
                     break;
                 case 1:
                 case 3:
-                    if (Seek(position, cell, cell + 1)) {
+                    target = cell + 1;
+                    if (Seek(position, cell, target)) {
                         result = 0;
                         break;
                     }
+                    target = cell - 1;
                     {
-                        u8 found = Seek(position, cell, cell - 1);
+                        u8 found = Seek(position, cell, target);
                         result = 2;
                         if (found)
                             goto check;
@@ -245,6 +248,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
             s32 cell = *cellp;
             s32 direction = (quadrant >> 6) & 3;
             s32 preferred;
+            s32 target;
             struct AreaEffectPlayer *player = gUnk_02000580[0];
             if (!player)
                 preferred = 0;
@@ -263,9 +267,11 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
                     break;
                 case 1:
                 case 3:
-                    if (Seek(position, cell, cell + 1))
+                    target = cell + 1;
+                    if (Seek(position, cell, target))
                         found[0] = 1;
-                    if (Seek(position, cell, cell - 1))
+                    target = cell - 1;
+                    if (Seek(position, cell, target))
                         found[2] = 1;
                     break;
             }
