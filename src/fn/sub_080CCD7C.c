@@ -7,13 +7,13 @@
 /* Golem: chase/charge behaviour (tentative). */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *);
-u8 sub_080C44E4(struct SceneActorRegistryResetView *, void *, u32, u32, s32, u32);
+u8 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *, void *, u32, u32, s32, u32);
 s32 Math_Atan2(s32, s32);
 s32 SceneActorTerrain_CompareNeighborHeight(s32, u32, u32);
 void Skeleton_StepPosition(struct ContactPosition *, u32);
 void sub_080C47DC(void *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
-void sub_080C79A8(void);
+void SceneActorReaction_SlideBack(void);
 void sub_080C68F0(void);
 void sub_080C6A68(void);
 
@@ -160,7 +160,7 @@ static inline void Golem_Recover(struct GolemBody *body)
     SetState(BODY, 0, 2, 7);
 
     {
-        void *target = sub_080C79A8;
+        void *target = SceneActorReaction_SlideBack;
         SetControl(BODY, 0x2B, target);
     }
 }
@@ -434,7 +434,7 @@ route:
     {
         u16 flag = *(u16 *)route & 4;
         if (flag) {
-            if (sub_080C44E4(actor, route, 24, 24, body->charge682, 0)) {
+            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->charge682, 0)) {
                 s32 distance;
                 s32 d;
                 body->target69C = body->home694;
@@ -491,7 +491,7 @@ route:
             if (Golem_TurnGap(body) > 31)
                 GOLEM_TURN(body);
         } else {
-            if (sub_080C44E4(actor, route, 24, 24, body->charge682, 0)) {
+            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->charge682, 0)) {
                 body->target69C = body->home694;
                 sub_080C47DC(body);
             } else

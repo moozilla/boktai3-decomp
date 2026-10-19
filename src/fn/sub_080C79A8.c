@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorReaction_SlideBack: on entry plays sequence 8 facing the context direction (+0x691); slides along the dominant axis of that direction at the context speed (+0x682), decaying it by 0x10 per frame, and flags completion (+0x2B0) 12 frames after it stops (provisional name) */
-#define SceneActorReaction_SlideBack sub_080C79A8
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 
@@ -25,7 +24,7 @@ static inline s32 Scale16(s32 n)
     return n >= 0 ? n >> 16 : -((-n) >> 16);
 }
 
-void sub_080C79A8(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
     struct Unk080C79A8Motion *motion = (struct Unk080C79A8Motion *)((u8 *)actor + 0x50);

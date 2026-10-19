@@ -3242,6 +3242,7 @@ addr,name,mode,confidence,source,notes
 080BB4DC,Skeleton_UpdateDownedState,thumb,low,src-alias,Plays animation eight and emits periodic feedback before entering recovery when the timer expires; downed interpretation tentative
 080BB5AC,Skeleton_UpdateRevivalState,thumb,low,src-alias,Plays animation seven and changes flags at frame 40 before completing after frame 120; revival interpretation tentative
 080BB7BC,SceneActorReaction_TickHiddenTimeout,thumb,low,src-alias,
+080BB924,Actor_RestoreSnapshot,thumb,low,src-alias,
 080BBBC0,SceneActorReaction_ReturnToRouteEntry,thumb,low,src-alias,
 080BCDE4,SceneActorApproach_UpdateRange,thumb,low,src-alias,
 080BD004,SceneActorReaction_SinkThenDefeat,thumb,low,src-alias,
@@ -3264,6 +3265,7 @@ addr,name,mode,confidence,source,notes
 080C4660,SceneActorTerrain_CompareNeighborHeight,thumb,low,src-alias,
 080C4768,Skeleton_StepPosition,thumb,low,src-alias,
 080C49BC,SceneActorControl_RefreshMotionRoute,thumb,low,src-alias,
+080C4A9C,Golem_RestoreRoute,thumb,low,src-alias,
 080C4CFC,SceneActorRoute_CommitReachableDestination,thumb,low,src-alias,
 080C4DBC,SceneActorRoute_SetReachableDestination,thumb,low,src-alias,
 080C4E8C,Skeleton_TryTriggerAction,thumb,low,src-alias,
@@ -3281,6 +3283,7 @@ addr,name,mode,confidence,source,notes
 080C61AC,Golem_UpdateDying,thumb,low,src-alias,Tentative dying callback plays animation six and transitions to the death callback
 080C627C,Golem_UpdateDeath,thumb,low,src-alias,Tentative death callback plays animation seven and signals completion after its timed sequence
 080C62EC,Skeleton_ClearDirectionalEntryFlag,thumb,low,src-alias,
+080C79A8,SceneActorReaction_SlideBack,thumb,low,src-alias,
 080C7C1C,Golem_ResumeSavedTarget,thumb,low,src-alias,
 080C9844,Golem_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Golem_Init
 080CBE40,Golem_UpdateScriptedAction,thumb,low,src-alias,Initializes an action script and advances its timer until completion
@@ -4251,6 +4254,7 @@ addr,name,mode,confidence,source,notes
 08121F80,SceneActor14_OnColliderContact,thumb,low,src-alias,Empty contact callback installed on category 14 actor colliders
 08121F84,SpriteEffect_InitCollider,thumb,low,src-alias,
 08122020,SpriteEffectPool_AllocateSlot,thumb,low,src-alias,
+08122068,SpriteEffect_UpdateFallingShard,thumb,low,src-alias,
 0812224C,SpriteEffect_UpdateBlinkAndExpire,thumb,low,src-alias,
 081222F4,SceneActor14_GetFacingAndFlip,thumb,low,src-alias,Quantizes the actor angle into two facing variants and a mirrored-half flag
 08122338,SpriteEffect_SpawnTowardObject,thumb,low,src-alias,
@@ -6257,11 +6261,14 @@ addr,name,mode,confidence,source,notes
 081A8CC0,ActorSoundPhase_StartFlaggedAnimation,thumb,low,src-alias,
 081A8D2C,Vanargand_UpdateMotionTrack,thumb,low,src-alias,
 081A95A8,Vanargand_UpdatePairedAttack,thumb,low,src-alias,
+081AA438,Vanargand_UpdateDescendTrack,thumb,low,src-alias,
 081AA5AC,Vanargand_UpdateMotionReturn,thumb,low,src-alias,
 081AA650,Vanargand_UpdateTimedAnimationAttack,thumb,low,src-alias,
+081AAE10,Vanargand_UpdateLeapTrack,thumb,low,src-alias,
 081AAFC0,Vanargand_UpdateAnimationGate,thumb,low,src-alias,
 081AB3DC,ActorSoundPhase_StartTimedAnimation,thumb,low,src-alias,
 081AB438,Vanargand_UpdateOffsetMotion,thumb,low,src-alias,
+081AB50C,Vanargand_RunDefeatSequence,thumb,low,src-alias,
 081AC954,Vanargand_OnPrimaryStopState,thumb,low,src-alias,State callback sets control flags and initializes animation 15 with zeroed motion fields
 081AC9A8,ActorSoundPhase_StartAnimation15,thumb,low,src-alias,
 081ACA10,ActorSoundPhase_StartAnimation4,thumb,low,src-alias,
@@ -8787,6 +8794,7 @@ addr,name,mode,confidence,source,notes
 0823B278,Player_InitBodyCollider,thumb,low,src-alias,Initializes the body collider and registers its contact callback and position
 0823B304,Player_InitOptionalComponents,thumb,low,src-alias,Empty initialization hook called during player creation; purpose tentative
 0823B3C4,Player_ClampCameraOffsets_0823B3C4,thumb,low,src-alias,
+0823B47C,ActorMotion_ApplyHeadingDrift,thumb,low,src-alias,
 0823B6A4,Player_ClearMovementLock,thumb,low,src-alias,Resets the local player's camera follow mode and clears field 0x4B6; movement lock interpretation tentative
 0823B6E0,Player_CanUseAction,thumb,low,src-alias,
 0823B854,Player_IsFlaggedWithoutGlobalModifiers,thumb,low,src-alias,Tests input bit 0x80 while global bits 0x18 are both clear
