@@ -36,7 +36,6 @@ static inline void copy32(const void *source, void *dest, s32 size)
     CpuSet(source, dest, (size / 4 & 0x1fffff) | 0x04000000);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {
@@ -321,7 +320,6 @@ void Palette_InitBlendSlide(struct PaletteController *p)
     s->duration = 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_BlendVariants(struct PaletteController *p)
 {
     u16 *out_3;
@@ -461,7 +459,6 @@ static inline u16 blendEnabled(struct PaletteController *p)
     return p->flags & 8;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 Palette_InitializeFromScript(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
@@ -655,14 +652,12 @@ void Palette_StartSlideFromScript(void)
     Palette_StartSlide(a, b, c);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Palette_SetBrightnessFromScript(void)
 {
     struct PaletteController *p = gUnk_02000468;
     if (p) {
         struct PaletteTransition *t = ({
             struct PaletteTransition *hint = &p->transition;
-            asm("" : "+r"(hint));
             hint;
         });
         s32 enabled = Script_GetKeywordValue('n', 0);
@@ -685,18 +680,22 @@ void Palette_SetBrightnessFromScript(void)
                 t->brightness = Palette_GetBrightnessThreshold();
                 goto complete;
             }
-            if (t->mode == 1)
+            if (t->mode == 1) {
                 goto waiting;
-            if (t->mode == 2)
+            }
+            if (t->mode == 2) {
                 goto complete;
+            }
             mode = 1;
             goto setMode;
         } else {
             if (!immediate) {
-                if (t->mode == 0)
+                if (t->mode == 0) {
                     goto complete;
-                if (t->mode != 3)
+                }
+                if (t->mode != 3) {
                     goto fadeOut;
+                }
                 goto waiting;
             }
             t->mode = 0;
@@ -704,15 +703,20 @@ void Palette_SetBrightnessFromScript(void)
             p->flags &= ~16;
         }
     complete:
-        if (callback)
+        if (callback) {
             Script_Call(callback, 0);
+        }
+
         return;
     fadeOut:
         mode = 3;
+
+        do {
     setMode:
         t->mode = mode;
     waiting:
         t->callback = callback;
+        } while (0);
     }
 }
 
