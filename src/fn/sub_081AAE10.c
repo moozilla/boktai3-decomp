@@ -1,6 +1,5 @@
 #include "global.h"
 /* Vanargand_UpdateLeapTrack: plays animation 4 with sound 0x587, rides a motion track (origin 0x280/0x300/0x280) spawning afterimages, then plays animation 0xF and once both halves are ready applies them and finishes (provisional name) */
-#define Vanargand_UpdateLeapTrack sub_081AAE10
 struct VanargandPart {
     u8 pad0[0x10];
     u16 state;
@@ -60,7 +59,7 @@ void Sound_PlaySong(u32);
 void VanargandAfterimagePool_Spawn(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 
-void sub_081AAE10(struct Vanargand *p)
+void Vanargand_UpdateLeapTrack(struct Vanargand *p)
 {
     void *animation = p->animation;
     s16 first[4];
