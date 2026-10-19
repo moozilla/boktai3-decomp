@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-void sub_080E98B4(void);
+void Ivy_UpdateActiveState_080E98B4(void);
 static inline void clearFlag(u32 *flags)
 {
     u32 mask = ~1;
@@ -36,7 +36,7 @@ void SceneActor_BeginReactionAnimation(struct SceneActorRegistryResetView *actor
         Sound_PlaySong(0x2A0);
     }
     if (actor->field2B3) {
-        void (*callback)(void) = sub_080E98B4;
+        void (*callback)(void) = Ivy_UpdateActiveState_080E98B4;
         u32 kind = 0x22;
         u32 zero;
         u8 *prepared = &actor->field2B2;

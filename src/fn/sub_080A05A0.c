@@ -9,7 +9,7 @@ struct Z {
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_0809ED70(void);
-void sub_0809ED00(void);
+void Vorn_OnContactEvent_0809ED00(void);
 void Crow_InitColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
@@ -24,5 +24,5 @@ void Crow_InitColliders(u8 *p)
     s3.b.lo = 0x10;
     *(u32 *)&s4.a = 0;
     *(u32 *)&s4.b &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(p, &s3, &s4, sub_0809ED00, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, Vorn_OnContactEvent_0809ED00, 0, p);
 }

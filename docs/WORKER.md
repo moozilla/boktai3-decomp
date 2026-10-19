@@ -89,6 +89,10 @@ at integration, which is where layout problems are caught.
      yet. The corpus is `build/idioms/corpus.pkl`: build it once with
      `python3 tools/idioms.py --build` (about a minute) and rebuild after large
      batches of matches.
+   * On a function of 500+ instructions, trust check.py's `realigned:` line
+     (tools/anchordiff.py), not its fuzzy score, and work the method in
+     [BIG_FUNCTIONS.md](BIG_FUNCTIONS.md): batches of edits with
+     tools/variants.py, pass dumps with tools/rtlprobe.py.
    * When only registers remain, go to tools/regdiag.py / tools/rasolve.py
      (below). `tools/check.py sub_XXXXXXXX` remains the byte-exact acceptance
      check (raw aligned listing, `--full`); run it once before committing.
