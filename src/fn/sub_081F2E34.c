@@ -1,0 +1,37 @@
+
+#ifdef NONMATCHING
+// fuzzy: 85.4%
+// foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
+#define SceneDistance_UpdateSquaredDistances sub_081F2E34
+#include "global.h"
+#include "scene_vec.h"
+struct SceneDistanceEntry {
+    struct SceneVec position;
+    u8 pad8[4];
+    s32 distanceSquared;
+    u8 pad10[8];
+};
+struct SceneDistanceSet {
+    u8 pad0[0xD1C];
+    struct SceneDistanceEntry entries[9];
+};
+struct SceneVec *Player_GetEffectivePosition(s32);
+void sub_081F2E34(struct SceneDistanceSet *set)
+{
+    struct SceneDistanceEntry *entry = set->entries;
+    s32 count = 8;
+    u32 offset = 0;
+    do {
+        struct SceneVec *target = Player_GetEffectivePosition(0);
+        s32 x = entry->position.x - target->x;
+        s32 z = entry->position.z - target->z;
+        x *= x;
+        x += z * z;
+        set->entries[offset].distanceSquared = x;
+        entry++;
+        offset++;
+    } while (--count >= 0);
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_081F2E34);
+#endif
