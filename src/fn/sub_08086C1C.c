@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Bat_RestoreSavedState sub_08086C1C
-
 /* Bat state callback: restores the saved snapshot (sibling of Vorn_RestoreSavedState)
  * and plays song 0xEE on one animation frame. Owner +0x48 is an animation record.
  * The snapshot fields below are copied and reset at the listed offsets. */

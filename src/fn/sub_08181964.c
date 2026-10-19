@@ -1,11 +1,11 @@
 #include "global.h"
-void sub_08181778(void);
+void Armor_BindPaletteBanks(void);
 void sub_0818171C(void *);
 void ActorPalette_RestoreSelectedBanks(void *);
 void Armor_InitPaletteController(u8 *s)
 {
     u32 *t;
-    sub_08181778();
+    Armor_BindPaletteBanks();
     switch (*(u8 *)(s + 0xb38)) {
         case 3:
         case 5:

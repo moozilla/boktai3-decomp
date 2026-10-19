@@ -2,8 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
-#define Bat_UpdateDefeat sub_08088CD4
-
 /* Bat defeat state (tentative; compare SceneActorReaction_BeginHiddenDefeat): on entry it
  * releases attachments, shows the drawable and clears the route; every 12 frames it emits
  * sparks while flag 8 is set, then a six-spark burst, the defeat script, the event flag and

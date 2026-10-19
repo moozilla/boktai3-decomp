@@ -31,6 +31,11 @@ FILE.c holds one ROM function (`tools/isolate.py UNIT.c FUNC OUT.c
 5. `tools/permute.py FILE.c --run 600 --focus auto` is the blind fallback,
    now fast and crash-free.
 
+Big functions (500+ instructions), or a difference rasolve calls "not
+allocation" (CSE, PRE, loop hoisting, instruction selection): use the
+measure / variant-batch / pass-dump loop in [BIG_FUNCTIONS.md](BIG_FUNCTIONS.md)
+(`tools/anchordiff.py`, `tools/variants.py`, `tools/rtlprobe.py`).
+
 Every result is reviewed like permuter output and confirmed with
 `tools/check.py`; upstream passes do not always keep the program's meaning.
 

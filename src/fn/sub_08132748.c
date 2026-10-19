@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
-#define SceneActorReaction_EndHitCheckDefeat sub_08132748
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
 static inline u8 Test(u32 value, u32 mask)

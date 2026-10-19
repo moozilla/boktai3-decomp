@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 /* Sinks the actor into the ground after frame 6, then starts the hidden defeat. */
-#define SceneActorReaction_SinkThenDefeat sub_080BD004
 void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);

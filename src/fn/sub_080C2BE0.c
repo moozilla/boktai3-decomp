@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
-#define SceneActorControl_UpdateProbeApproach sub_080C2BE0
 #include "scene_actor_control_phase.h"
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);

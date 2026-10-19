@@ -4,7 +4,7 @@
 #include "scene_hud_display.h"
 void SceneHud_RefreshEquipmentIcons(void *, int);
 void Hud_RestoreSecondaryGridSelection(void *);
-void sub_08173508(void *, int);
+void SceneInput_BuildActionGrid_08173508(void *, int);
 void PauseMenu_ClearSpriteFlags(void *, int, int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
 void sub_081672FC(void *);
@@ -24,7 +24,7 @@ void SceneHud_BeginEquipmentSelection(struct SceneHudState *p)
     SceneHud_RefreshEquipmentIcons(p, 0);
     q = p->actionInput;
     Hud_RestoreSecondaryGridSelection(q);
-    sub_08173508(q, 0xe1);
+    SceneInput_BuildActionGrid_08173508(q, 0xe1);
     PauseMenu_ClearSpriteFlags(p, 4, 1);
     PauseMenu_AddSpriteFlags(p, 6, 1);
     PauseMenu_AddSpriteFlags(p, 5, 1);

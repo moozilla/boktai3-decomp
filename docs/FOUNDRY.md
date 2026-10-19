@@ -206,3 +206,32 @@ Most of the gain is the <50 and 50–150 buckets in the barely-matched regions
 284k tokens per match with Sonnet, and the residue there is register choice and
 instruction order, which a bigger model has not fixed.
 
+## Handover: state at the end of the local runs (2026-10-19)
+
+Foundry work moves to cloud sessions. Every function the foundry attempted is
+listed in `docs/foundry_attempts.tsv`: name, instructions, state (matched, draft,
+attempted), the worker's best fuzzy %, and its note.
+
+| bucket | matched | NONMATCHING draft (≥80%) | attempted, below 80% | never attempted (queue) |
+|---|---|---|---|---|
+| <50 | 682 | 95 | 101 | 39 |
+| 50–150 | 872 | 249 | 157 | 61 |
+| 150–400 | 7 | 7 | 7 | 922 |
+| 400+ | 1 | 4 | 7 | — |
+
+* **Drafts.** 339 near-misses are committed as `#ifdef NONMATCHING` drafts in
+  `src/fn/` (`// fuzzy:` recorded). Most of what differs is register choice and
+  instruction order, so start them from the CORE line (`tools/regions.py`).
+* **Below-80% attempts.** Their best C is on branch `foundry-wip-2026-10-19`
+  (`wip/foundry/`).
+* **Opus on 150–400.** It matched 4 of 6 (sub_08180E68, sub_08180FE0,
+  sub_08181778, sub_081826C8) at about $4.7 per match, against about $0.8 for
+  Sonnet on 50–150. That is the best measured rate for that bucket; the
+  remaining 922 are the main open queue.
+* **Rerun.** `tools/foundry.py queue --buckets "<50,50-150,150-400" --max-insns 400`,
+  then `tools/foundry_run.py --backend claude|codex ...`. Then integrate:
+  `foundry.py integrate`, `namefix`/`promote_names`, combined build, PR.
+  * Workers use only `tools/check.py`; the full build runs once per integration PR.
+  * Match placement is by address. Integration skips anything already defined
+    in `src/` and places matches into a unit's `INCLUDE_ASM` slot.
+

@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#define Bat_ResumeSavedTarget sub_08086E2C
-
 /* Bat variant of SceneActorReaction_ResumeSavedTarget (tentative): after 60 frames it
  * resumes either the saved route target (kind 1) or, when flag 0x80 is set, group +0x48
  * (kind 0x1A); before that it rewinds a mode-2 animation. */

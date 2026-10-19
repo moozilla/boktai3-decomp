@@ -2,15 +2,14 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
-#define Ivy_UpdateDefeat sub_080EE1B0
-
-/* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (sub_080BD1F0). On entry:
+/* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
  * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
  * (context flag 0x10) or runs the context's defeat script. After 20 frames, without flag 0x10
  * it revives (restores health, SceneActorReaction_PlayHiddenCue); otherwise the full defeat:
  * cue or six-spark burst, terrain and position scripts, event flag, kill counters per
  * category (saturating at 9999, plus one counter per collider reaction flag) and the reward.
- * Pins: the spark table and the per-case reaction flags. The random table is read through
+ * Pin: the spark table. Kill counters are an if/else (its two stores raise the counter
+ * pointer above the reaction flags; cross-jumping merges them). The random table is read through
  * its literal address (REGALLOC.md, "Reload rotation"); the CpuSet source shares a struct
  * with the script values so that it takes the first stack slot. */
 
@@ -27,9 +26,16 @@ extern u32 gUnk_03005308;
 extern u16 gUnk_030039F0;
 
 #define STAT(n)  (*(s16 *)((u8 *)gUnk_02000710 + (n)))
-#define COUNT(n) STAT(n) = STAT(n) < 9999 ? STAT(n) + 1 : 9999
+#define COUNT(n) Count(&STAT(n))
 #define INC(n)   STAT(n) = Clamp(STAT(n) + 1)
 
+static inline void Count(s16 *p)
+{
+    if (*p < 9999)
+        *p = *p + 1;
+    else
+        *p = 9999;
+}
 static inline s32 Clamp(s32 v)
 {
     if (v > 9999)
@@ -107,7 +113,7 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 #define FLAG_COUNTS()                                                                              \
-    do {                                                                                           \
+    {                                                                                              \
         if (flags & 0x80)                                                                          \
             INC(0x58A);                                                                            \
         else if (flags & 0x100)                                                                    \
@@ -118,49 +124,49 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
             INC(0x590);                                                                            \
         else if (flags &= 0x800)                                                                   \
             INC(0x592);                                                                            \
-    } while (0)
+    }
 static inline void RecordKill(struct SceneActorRegistryResetView *actor, u8 *category)
 {
     struct ContactCollider *collider = &actor->colliderA;
     switch (*category) {
         case 4: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x53A);
             FLAG_COUNTS();
             break;
         }
         case 1: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x53C);
             FLAG_COUNTS();
             break;
         }
         case 2: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x53E);
             FLAG_COUNTS();
             break;
         }
         case 3: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x540);
             FLAG_COUNTS();
             break;
         }
         case 14: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x54C);
             FLAG_COUNTS();
             break;
         }
         case 24: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x55C);
             FLAG_COUNTS();
             break;
         }
         case 10: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x546);
             FLAG_COUNTS();
             break;
@@ -168,68 +174,68 @@ static inline void RecordKill(struct SceneActorRegistryResetView *actor, u8 *cat
         case 5:
         case 6:
         case 7: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x542);
             FLAG_COUNTS();
             break;
         }
         case 21: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x554);
             FLAG_COUNTS();
             break;
         }
         case 18: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x550);
             FLAG_COUNTS();
             break;
         }
         case 19: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x552);
             FLAG_COUNTS();
             break;
         }
         case 17: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x54E);
             FLAG_COUNTS();
             break;
         }
         case 22: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x556);
             FLAG_COUNTS();
             break;
         }
         case 20: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x558);
             FLAG_COUNTS();
             break;
         }
         case 9: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x544);
             FLAG_COUNTS();
             break;
         }
         case 23: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x55A);
             FLAG_COUNTS();
             break;
         }
         case 12:
         case 13: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x54A);
             FLAG_COUNTS();
             break;
         }
         case 25: {
-            register u32 flags asm("r4") = collider->reactionFlags;
+            u32 flags = collider->reactionFlags;
             COUNT(0x560);
             FLAG_COUNTS();
             break;
@@ -263,7 +269,7 @@ struct DefeatContext {
     u16 script;
 };
 
-void sub_080EE1B0(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct {
         u32 zero;

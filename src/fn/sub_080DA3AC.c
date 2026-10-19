@@ -4,7 +4,7 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 extern u16 gUnk_02000508;
-u8 sub_080D6DF8(void *);
+u8 SceneActorPath_FaceAndCheckStraightPath(void *);
 s32 Math_Atan2(s32, s32);
 struct SceneActorTrackingTarget {
     u8 unknown0[12];
@@ -54,7 +54,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
         if (distance >= range)
             goto fail;
     }
-    if (!(u8)sub_080D6DF8(actor))
+    if (!(u8)SceneActorPath_FaceAndCheckStraightPath(actor))
         goto fail;
     {
         u32 *flags = &actor->flags2CC;

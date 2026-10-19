@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorReaction_ApplyEscalatingHit: for category-1 actors flagged 4 at +0x2DC, applies a hit whose damage doubles per stored hit count (+0x47E), shows HUD/damage numbers, restarts the route and flashes the palette; returns 1 when applied (provisional) */
-#define SceneActorReaction_ApplyEscalatingHit sub_0813599C
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, u32, s32, s32);
