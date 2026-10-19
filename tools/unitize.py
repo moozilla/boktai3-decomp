@@ -85,6 +85,8 @@ functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
 verification; your sandbox cannot write git metadata); leave the finished work in the tree.
 Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
 every unit worker would collide there. Put findings in notes/{slug}.md instead.
+Run every command in the foreground and wait for it, builds included: you are a one-shot
+headless run, so nothing wakes you after a background command finishes.
 Finish with the brief's short report.
 """
 
