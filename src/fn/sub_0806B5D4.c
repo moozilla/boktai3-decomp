@@ -25,7 +25,7 @@ struct TileDrawable {
 };
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);
 void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *, s32, u32);
-void sub_08217DE0(void *, void *, s32);
+void ParticleSprite_Initialize(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, s32);
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
@@ -313,7 +313,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
                 resourceContext = context;
                 resource = ScriptProc_Start(key, resourceContext);
             }
-            sub_08217DE0(sprite, ((struct TileDrawable *)slot->drawable)->graphics, 0);
+            ParticleSprite_Initialize(sprite, ((struct TileDrawable *)slot->drawable)->graphics, 0);
             Effect_SetOrigin(sprite, 0U - (u32)biasX, 0U - (u32)biasY);
             {
                 u32 full = sequence;

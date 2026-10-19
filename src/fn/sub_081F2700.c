@@ -1,7 +1,7 @@
 #include "global.h"
 
 void SpriteGroup_RemoveSlot(u8 *, u8 *, s32);
-void sub_0811B394(u8 *);
+void SpatialIndex_RemoveEntry(u8 *);
 
 u32 SingletonSlot7_DestroyEffectPool(u8 *p)
 {
@@ -11,7 +11,7 @@ u32 SingletonSlot7_DestroyEffectPool(u8 *p)
         if (*(u32 *)(p + 0x18) & (1 << i)) {
             SpriteGroup_RemoveSlot(p, q, i);
         }
-        sub_0811B394(q + 0xC8);
+        SpatialIndex_RemoveEntry(q + 0xC8);
         i++;
         q += 0x258;
     } while (i <= 3);

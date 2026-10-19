@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.2%
 // foundry draft (worker best 91.3%); what differs is mostly register allocation and instruction order
-#define RecordMenu_InitializeSprites sub_0810EEFC
 struct RecordMenuSprite {
     u8 unknown[0x3a];
     u16 flags;
@@ -25,7 +24,7 @@ struct RecordMenu {
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_0810EEFC(struct RecordMenu *menu)
+void RecordMenu_InitializeSprites(struct RecordMenu *menu)
 {
     s32 i;
     struct RecordMenuSprite *sprite;
@@ -55,5 +54,5 @@ void sub_0810EEFC(struct RecordMenu *menu)
     menu->sprites[8].tiles = menu->palette;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810EEFC);
+INCLUDE_ASM("asm/nonmatching", RecordMenu_InitializeSprites);
 #endif

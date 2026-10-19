@@ -13,7 +13,7 @@ void AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void Anim_RestartSequence(void *, s32, s32, s32, s32);
-void sub_0818EE38(void);
+void Nidhoggr_StepPoolAnimation(void);
 void Nidhoggr_DestroySpriteEffect(void);
 void Nidhoggr_CreatePalette426Effect(u8 *p, struct V *q)
 {
@@ -27,7 +27,7 @@ void Nidhoggr_CreatePalette426Effect(u8 *p, struct V *q)
         Sprite_Init((u8 *)o + 0x24, r, 0);
         Anim_RestartSequence((u8 *)o + 0x50, *(s32 *)(p + 0x53AC), 5, 0, 0);
         o->v = *q;
-        a = sub_0818EE38;
+        a = Nidhoggr_StepPoolAnimation;
         b = Nidhoggr_DestroySpriteEffect;
         o->f0 = a;
         o->f1 = b;

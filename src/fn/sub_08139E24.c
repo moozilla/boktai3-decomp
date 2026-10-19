@@ -36,7 +36,7 @@ u8 SceneProcParticles_TestCapacity(struct SpritePool *, u32, u32);
 void SceneProcParticles_SubmitBounds(struct SpritePoolEntry *, void (*)(void), u32, u32);
 void ParticleBurstEffect_SetStateCallback(struct SpritePoolEntry *, void (*)(void));
 void ParticleBurstEffect_OnAnimationComplete(void);
-void sub_08139994(void);
+void ParticleBurstEffect_UpdateFalling(void);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 static inline u32 SpritePool_MakeKey(u32 counter, u32 id)
@@ -78,7 +78,8 @@ s32 SpritePool_StartEntry(struct SpritePoolVector *position, void *owner, u32 un
             Anim_SetSequence(pool->entries[i].anim, pool->entries[i].data, 7, 0, 0);
             SceneProcParticles_SubmitBounds(
                 &pool->entries[i], ParticleBurstEffect_OnAnimationComplete, params->value, id + 1);
-            ParticleBurstEffect_SetStateCallback(&pool->entries[i], sub_08139994);
+            ParticleBurstEffect_SetStateCallback(&pool->entries[i],
+                                                 ParticleBurstEffect_UpdateFalling);
             Sound_PlaySong(0x3e5);
             return i;
         }

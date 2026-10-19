@@ -4,7 +4,7 @@
   rtlprobe.py dump FILE.c [--nonmatching] [--flags=-da]
   rtlprobe.py loop FILE.c [--nonmatching] [--insn N ...] [--regno R ...]
   rtlprobe.py gcse FILE.c [--nonmatching] [--func NAME] [--scan LO:HI] [--expr I ...]
-  rtlprobe.py try-t FILE.c T [T ...] [--nonmatching]
+  rtlprobe.py try-t FILE.c T|LO:HI ... [--nonmatching] [-j N]
   rtlprobe.py try-env FILE.c 'VAR=V [VAR=V ...]' ... [--nonmatching]
   rtlprobe.py perline FILE.c [--nonmatching] [--func NAME] [--top N]
 
@@ -46,6 +46,8 @@ try-t  checks FILE.c with the instrumented compiler (tools/agbcc-instr.sh, which
       takes about 40 s to build) forcing the GCSE table size to each T, and
       prints check.py's counts. This splits a residual diff: whatever is still
       different at the T that gives the ROM's order has another cause.
+      LO:HI sweeps every odd T in the range and prints windows of equal
+      results: the exact set of T values that match.
 
 try-env  the same for any of the instrumented compiler's knobs, one quoted
       set of assignments per run, e.g. 'CSE_KEEP=2093' 'AGBCC_GCSE_T=2301
@@ -62,6 +64,7 @@ perline  insns per source line in the RTL after CSE (what GCSE sees, and so
       to cut insns at GCSE time without changing the final code.
 """
 import argparse
+import concurrent.futures
 import json
 import os
 import re
@@ -273,28 +276,55 @@ def loop(a):
 
 
 def try_t(a):
-    a.envs = [f'AGBCC_GCSE_T={t}' for t in a.t]
-    try_env(a)
+    ts, sweep = [], False
+    for arg in a.t:
+        if ':' in arg:
+            lo, hi = (int(v) for v in arg.split(':'))
+            ts += range(lo | 1, hi + 1, 2)
+            sweep = True
+        else:
+            ts.append(int(arg))
+    a.envs = [f'AGBCC_GCSE_T={t}' for t in ts]
+    results = try_env(a, quiet=sweep)
+    if not sweep:
+        return
+    # windows of consecutive T with the same result
+    print(f'{"default":>20}: {results[0][1]}')
+    prev, first, last = None, None, None
+    for (spec, text), t in list(zip(results[1:], ts)) + [((None, None), None)]:
+        if text != prev:
+            if prev is not None:
+                print(f'  T {first}..{last}: {prev}')
+            prev, first = text, t
+        last = t
 
 
-def try_env(a):
+def try_env(a, quiet=False):
     cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
     if not os.path.exists(cc):
         sys.exit('build the instrumented compiler first: sh tools/agbcc-instr.sh')
-    for spec in [''] + a.envs:
+
+    def run(spec):
         env = dict(os.environ, AGBCC=cc, **dict(kv.split('=', 1) for kv in spec.split()))
         cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), a.src, '--json', '--quiet']
         r = subprocess.run(cmd + ['--nonmatching'] * a.nonmatching, cwd=ROOT, env=env, capture_output=True, text=True)
         res = json.loads([ln for ln in r.stdout.splitlines() if ln.startswith('{')][-1])
         ad = res.get('anchordiff', {'structural': 0, 'total': 0})
+        return (f"{res['different_byte_count']:>5} differing bytes, realigned {ad['total']} "
+                f"({ad['structural']} ignoring registers){'  MATCH' if res['status'] == 'match' else ''}")
+    specs = [''] + a.envs
+    with concurrent.futures.ThreadPoolExecutor(a.j) as pool:
+        texts = list(pool.map(run, specs))
+    for spec, text in zip(specs, texts):
         if 'CSE_DEBUG' in spec:  # check.py drops the compiler's stderr: compile once more for the trace
             work = compile_dumps(a.src, [], a.nonmatching)
+            env = dict(os.environ, **dict(kv.split('=', 1) for kv in spec.split()))
             tr = subprocess.run([cc] + build.cflags_for(a.src) + ['u.i', '-o', '/dev/null'],
                                 cwd=work, env=env, capture_output=True, text=True)
             print(tr.stderr.rstrip())
-        print(f"{spec or 'default':>20}: {res['different_byte_count']:>5} differing bytes, "
-              f"realigned {ad['total']} ({ad['structural']} ignoring registers)"
-              f"{'  MATCH' if res['status'] == 'match' else ''}")
+        if not quiet:
+            print(f"{spec or 'default':>20}: {text}")
+    return list(zip(specs, texts))
 
 
 def perline(a):
@@ -346,7 +376,9 @@ def main():
     sub.choices['gcse'].add_argument('--expr', type=int, nargs='*', help='expression indices to order')
     sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
                                      help='expression indices in the bucket order wanted: print the T windows')
-    sub.choices['try-t'].add_argument('t', type=int, nargs='+')
+    sub.choices['try-t'].add_argument('t', nargs='+', help='table sizes, or LO:HI to sweep the odd sizes')
+    for name in ('try-t', 'try-env'):
+        sub.choices[name].add_argument('-j', type=int, default=os.cpu_count() or 4)
     sub.choices['try-env'].add_argument('envs', nargs='+')
     sub.choices['perline'].add_argument('--func')
     sub.choices['perline'].add_argument('--top', type=int, default=25)

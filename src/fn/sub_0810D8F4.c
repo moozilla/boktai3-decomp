@@ -2,9 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 80.5%
 // foundry draft (worker best 80.5%); what differs is mostly register allocation and instruction order
-#define RecordPanel_RefreshEntryLabels sub_0810D8F4
-#define TextWindow_Hide                TextWindow_Clear
-#define TextWindow_Show                TextWindow_StartPlayback
+#define TextWindow_Hide TextWindow_Clear
+#define TextWindow_Show TextWindow_StartPlayback
 struct RecordPanel {
     u8 pad0[0xCEC];
     const u8 *labelScript;
@@ -19,7 +18,7 @@ void TextWindow_StartPlayback(s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 u8 StateFlags_TestIndexedFlag(s32);
-void sub_0810D8F4(struct RecordPanel *p)
+void RecordPanel_RefreshEntryLabels(struct RecordPanel *p)
 {
     s32 skip;
     s32 base;
@@ -55,5 +54,5 @@ void sub_0810D8F4(struct RecordPanel *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810D8F4);
+INCLUDE_ASM("asm/nonmatching", RecordPanel_RefreshEntryLabels);
 #endif

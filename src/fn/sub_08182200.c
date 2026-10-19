@@ -9,7 +9,7 @@ struct S {
     u8 f[0x650];
     struct T t;
 };
-void sub_08182088(void);
+void Palette_UpdatePulseFade(void);
 void Armor_StartAccentPaletteFade(u8 *s)
 {
     struct T *t = (struct T *)(s + 0x650);
@@ -21,7 +21,7 @@ void Armor_StartAccentPaletteFade(u8 *s)
         case 0xd:
         case 0xf:
             if (t->cb == 0) {
-                t->cb = sub_08182088;
+                t->cb = Palette_UpdatePulseFade;
                 t->b = 0;
                 *(u16 *)((u8 *)t + 0x488) = 0;
             }

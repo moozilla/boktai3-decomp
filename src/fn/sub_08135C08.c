@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_placement.h"
 s32 Math_Atan2(s32, s32);
-void sub_0812E5A4(struct SceneActorPlacementView *);
+void ActorParticles_SpawnBurst(struct SceneActorPlacementView *);
 static inline void Difference(struct ContactPosition *out, const struct ContactPosition *b,
                               const struct ContactPosition *a)
 {
@@ -19,7 +19,7 @@ s32 SceneActorPlacement_BeginDestinationJump(struct SceneActorPlacementView *act
         actor->velocity.y = 20;
         actor->velocity.z = Div(delta.z, 36);
         actor->direction = Math_Atan2(delta.x, delta.z);
-        sub_0812E5A4(actor);
+        ActorParticles_SpawnBurst(actor);
         SceneActorPlacement_PlayVariantEventSound(actor, 6);
         return 1;
     }

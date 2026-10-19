@@ -39,7 +39,7 @@ struct Obj {
     s8 delta8;
     s8 delta9;
 };
-void sub_0818CA6C(struct Obj *);
+void Armor_RetractPartStretch(struct Obj *);
 void Armor_UpdatePartStretch(struct Obj *p)
 {
     s32 a = p->byte8, b = p->byte9;
@@ -58,6 +58,6 @@ void Armor_UpdatePartStretch(struct Obj *p)
     if (b == 127) {
         p->byte8 = 64;
         p->delta9 = -16;
-        p->callback = sub_0818CA6C;
+        p->callback = Armor_RetractPartStretch;
     }
 }

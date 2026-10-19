@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.4%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
-#define Sword_InitializeFromScript sub_080F7458
 struct SwordTask {
     u8 unknown0[0x86];
     u16 value86;
@@ -29,7 +28,7 @@ static inline u8 Sword_ClampKind(s32 kind)
         kind = 1;
     return kind;
 }
-s32 sub_080F7458(struct SwordTask *p)
+s32 Sword_InitializeFromScript(struct SwordTask *p)
 {
     s32 i;
     s32 *argument;
@@ -53,5 +52,5 @@ s32 sub_080F7458(struct SwordTask *p)
     return p->ticks = 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F7458);
+INCLUDE_ASM("asm/nonmatching", Sword_InitializeFromScript);
 #endif

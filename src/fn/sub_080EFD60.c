@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 99.4%
 // foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_UpdateTargetApproachPhase sub_080EFD60
-#define SceneActorControl_UpdateDirectionalIdle     Ivy_UpdateActiveState
+#define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 struct SceneActorTargetWaitState {
     u8 unknown0[0x634];
     s16 targetMissFrames;
@@ -50,7 +49,7 @@ static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 beh
     actor->counter2AC = zero;
     actor->field2B1 = 1;
 }
-void sub_080EFD60(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorTargetWaitState *state = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
@@ -80,5 +79,5 @@ void sub_080EFD60(struct SceneActorRegistryResetView *actor)
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EFD60);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateTargetApproachPhase);
 #endif

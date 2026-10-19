@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.3%
 // foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
-#define SceneActorPhase_SelectLinkedAnimation sub_080AEA80
 extern u32 gUnk_03005308;
 
 void sub_080B2858(struct SceneActorAnimationView *, u32);
@@ -36,7 +35,7 @@ static inline s32 RandomByte(void)
     offset += (u32)gUnk_0203B400;
     return *(u8 *)offset;
 }
-void sub_080AEA80(struct SceneActorAnimationView *p)
+void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
 {
     struct SceneActorAnimationLink *link = p->link;
     if (!ConsumeFlag(p)) {
@@ -60,5 +59,5 @@ void sub_080AEA80(struct SceneActorAnimationView *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AEA80);
+INCLUDE_ASM("asm/nonmatching", SceneActorPhase_SelectLinkedAnimation);
 #endif

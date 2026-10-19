@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 89.5%
 // foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
-#define SpriteSlots_UpdateActive   sub_08100938
 #define SpriteSlot_CheckScene      FloorSwitch_UpdateRegionVisibility
 #define gSpriteSlotUpdateCallbacks gUnk_086064AC
 
@@ -26,7 +25,7 @@ static inline u8 SpriteSlots_IsActive(u32 *mask, s32 i)
         return TRUE;
     return FALSE;
 }
-u32 sub_08100938(struct SpriteSlots *self)
+u32 SpriteSlots_UpdateActive(struct SpriteSlots *self)
 {
     struct SpriteSlot *slots = self->slots;
     struct SpriteSlot *slot;
@@ -42,5 +41,5 @@ u32 sub_08100938(struct SpriteSlots *self)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08100938);
+INCLUDE_ASM("asm/nonmatching", SpriteSlots_UpdateActive);
 #endif

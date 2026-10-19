@@ -4,10 +4,10 @@ struct S {
     u8 f[7];
     u8 v;
 };
-void sub_081BDC78(struct S *);
+void Storage_RebuildGrid(struct S *);
 
 void Storage_SetGridFlags(struct S *p, u8 v)
 {
     p->v = v;
-    sub_081BDC78(p);
+    Storage_RebuildGrid(p);
 }

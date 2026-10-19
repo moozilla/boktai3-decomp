@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 93.2%
 // foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
-#define SlotController_RequestReset sub_081FEADC
-#define gSlotController             gUnk_020005EC
+#define gSlotController gUnk_020005EC
 struct ControllerSlot {
     u8 callback[0xE0];
     s16 state;
@@ -19,7 +18,7 @@ extern struct SlotController *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 void RisingActor_LowerHeight(void);
-s32 sub_081FEADC(s32 index)
+s32 SlotController_RequestReset(s32 index)
 {
     struct SlotController *controller = gUnk_020005EC;
     if (!controller) {
@@ -33,5 +32,5 @@ s32 sub_081FEADC(s32 index)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FEADC);
+INCLUDE_ASM("asm/nonmatching", SlotController_RequestReset);
 #endif

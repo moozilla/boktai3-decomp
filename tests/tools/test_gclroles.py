@@ -35,6 +35,12 @@ class ReferenceTests(unittest.TestCase):
         role = gclroles._body_role(['door_transition(scene=proc_3107, entrance=92, 52)'], named, files)
         self.assertEqual(role[0], 'exit_to_proc_3107')
         self.assertIsNone(gclroles._body_role(['proc_77(1, 2)'], named, files))
+        role = gclroles._body_role(['begin_event(mode=0, flag=1)', 'GameState_SetAreaFlag(area=1, bit=2)'], named, files)
+        self.assertEqual(role[0], 'game_state_set_area_flag')
+
+    def test_snake(self):
+        self.assertEqual(gclroles.snake('SceneObjects_ScriptActivate'), 'scene_objects_activate')
+        self.assertEqual(gclroles.snake('show_stage_icon'), 'show_stage_icon')
 
 
 if __name__ == '__main__':

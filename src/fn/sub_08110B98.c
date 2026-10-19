@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
-#define TileRows_CopyPackedRows sub_08110B98
-void sub_08110B98(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 width, s32 height,
-                  const u16 *source)
+void TileRows_CopyPackedRows(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 width, s32 height,
+                             const u16 *source)
 {
     s32 row;
     u32 count;
@@ -24,5 +23,5 @@ void sub_08110B98(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 width, s32 
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08110B98);
+INCLUDE_ASM("asm/nonmatching", TileRows_CopyPackedRows);
 #endif

@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 // foundry draft (worker best 93.9%); what differs is mostly register allocation and instruction order
-#define SceneActor_ConfigureSecondaryProfileEntry sub_080DE92C
 
 void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *actor)
 {
@@ -31,5 +30,5 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *a
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DE92C);
+INCLUDE_ASM("asm/nonmatching", SceneActor_ConfigureSecondaryProfileEntry);
 #endif

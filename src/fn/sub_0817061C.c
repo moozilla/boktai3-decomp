@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // foundry draft (worker best 90.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_FinishActionSlide sub_0817061C
-#define SceneHud_BlendPosition     PauseMenu_SmoothPoint
+#define SceneHud_BlendPosition PauseMenu_SmoothPoint
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
@@ -18,7 +17,7 @@ void SceneHud_ShowActionPreview(void *);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_RefreshActionIcons(void *);
 void PauseMenu_OnSwapSelectionUpdate(void);
-void sub_0817061C(struct SceneHudState *s)
+void SceneHud_FinishActionSlide(struct SceneHudState *s)
 {
     u16 *timer = &s->actionTransferDelay;
     if (!*timer)
@@ -45,5 +44,5 @@ void sub_0817061C(struct SceneHudState *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817061C);
+INCLUDE_ASM("asm/nonmatching", SceneHud_FinishActionSlide);
 #endif

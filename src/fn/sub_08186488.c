@@ -4,14 +4,14 @@ struct S {
     u8 st;
     u8 g[0xB40 - 0xB3E];
 };
-s32 sub_08184FE8(void *, s32);
+s32 DirectionalActor_TryBeginState(void *, s32);
 void ActorController_ForceAction(void *, s32);
 void Armor_UpdateAction36Completion(struct S *p)
 {
     u8 *q = &p->st;
     switch (*q) {
         case 0:
-            if (sub_08184FE8(p, 0x24) != 0)
+            if (DirectionalActor_TryBeginState(p, 0x24) != 0)
                 *q = 1;
             break;
         case 1:

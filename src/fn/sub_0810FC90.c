@@ -12,8 +12,8 @@ struct LinkMenu {
 struct LinkMenuPosition {
     u32 x : 16, y : 16, z : 16, padding : 16;
 };
-void sub_0811C9F8(void *, void *, u32);
-void sub_0811CB68(void *, void *, void *, s32);
+void ActorSprite_InitPartDrawings(void *, void *, u32);
+void CharacterPreview_PositionParts(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
 void CharacterModel_SetComponentRenderMode(void *, s32);
 void CharacterModel_InitPalettes(void *, s32);
@@ -54,8 +54,8 @@ void LinkMenu_LoadSelectionSprite(struct LinkMenu *menu)
             pos.y = 0x50;
             pos.z = 0;
             render = sprite + 0x5F8;
-            sub_0811C9F8(sprite, render, 0x3D99);
-            sub_0811CB68(sprite, render, &pos, 0);
+            ActorSprite_InitPartDrawings(sprite, render, 0x3D99);
+            CharacterPreview_PositionParts(sprite, render, &pos, 0);
             CharacterModel_SetAnimationFlags(render, 0);
             CharacterModel_SetComponentRenderMode(render, 0);
             CharacterModel_InitPalettes(render, payload[3]);

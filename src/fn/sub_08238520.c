@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-#define ContactCollider_GetImpactDirection sub_08238520
 s32 Math_Atan2(s32, s32);
-s32 sub_08238520(struct ContactCollider *a, struct ContactCollider *b)
+s32 ContactCollider_GetImpactDirection(struct ContactCollider *a, struct ContactCollider *b)
 {
     s32 angle;
     s32 result;
@@ -28,5 +27,5 @@ done:
     return ((angle >> 6) << 1) + 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08238520);
+INCLUDE_ASM("asm/nonmatching", ContactCollider_GetImpactDirection);
 #endif

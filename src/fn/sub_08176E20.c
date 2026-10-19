@@ -4,9 +4,8 @@
 #ifdef NONMATCHING
 // fuzzy: 96.8%
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_CanOpenFromStart sub_08176E20
 extern u32 gUnk_030053F4, gUnk_030053F0;
-u32 sub_08176E20(struct SceneHudState *p)
+u32 SceneHud_CanOpenFromStart(struct SceneHudState *p)
 {
     struct Player *player;
     if (gUnk_03005260[1] & 8) {
@@ -21,5 +20,5 @@ u32 sub_08176E20(struct SceneHudState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08176E20);
+INCLUDE_ASM("asm/nonmatching", SceneHud_CanOpenFromStart);
 #endif

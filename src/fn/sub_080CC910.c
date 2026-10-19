@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* Golem: route back to its home cell; near it, settle (sub_080C47DC), else face the cell centre; then go to state 2 (tentative) */
-#define Golem_ReturnHome sub_080CC910
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void sub_080C6338(void);
 void sub_080C66B0(void);

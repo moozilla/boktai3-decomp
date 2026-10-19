@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
-#define ActorImpact_CopyContact sub_08179C38
 void sub_0821FF8C(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
@@ -20,7 +19,8 @@ struct ActorImpact {
     u8 pad473[0x7b];
     u16 value4ee;
 };
-void sub_08179C38(struct ContactCollider *a, struct ContactCollider *b, struct ActorImpact *c)
+void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *b,
+                             struct ActorImpact *c)
 {
     u8 *d = (u8 *)c;
     u32 v;
@@ -50,5 +50,5 @@ void sub_08179C38(struct ContactCollider *a, struct ContactCollider *b, struct A
     PlayerStats_AddContactHundredths(a, b, 12);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08179C38);
+INCLUDE_ASM("asm/nonmatching", ActorImpact_CopyContact);
 #endif

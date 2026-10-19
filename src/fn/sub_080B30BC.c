@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
-#define Vorn_ParseField69A sub_080B30BC
 
 struct VornData {
     u8 unknown0[0x698];
@@ -28,5 +27,5 @@ void Vorn_ParseField69A(struct VornData *ctx)
     ctx->field698 = ctx->field69A;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B30BC);
+INCLUDE_ASM("asm/nonmatching", Vorn_ParseField69A);
 #endif

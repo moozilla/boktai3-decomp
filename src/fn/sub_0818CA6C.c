@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 80.3%
 // foundry draft (worker best 80.3%); what differs is mostly register allocation and instruction order
-#define Armor_RetractPartStretch sub_0818CA6C
-#define gRandomTableIndex        gUnk_03005308
-#define gRandomTable             gUnk_0203B400
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
@@ -26,7 +25,7 @@ static inline void setFlag(u8 *p, u32 mask)
 {
     *p |= mask;
 }
-void sub_0818CA6C(struct ArmorPart *p)
+void Armor_RetractPartStretch(struct ArmorPart *p)
 {
     s32 stretch = p->stretchY;
     if (stretch > 64) {
@@ -56,5 +55,5 @@ void sub_0818CA6C(struct ArmorPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818CA6C);
+INCLUDE_ASM("asm/nonmatching", Armor_RetractPartStretch);
 #endif

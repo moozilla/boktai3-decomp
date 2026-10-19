@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 96.5%
 // foundry draft (worker best 96.5%); what differs is mostly register allocation and instruction order
-#define ActorEffect_InitializeOffset sub_0817D67C
-#define gDirectionSineTable          gUnk_086149C4
+#define gDirectionSineTable gUnk_086149C4
 
 struct EffectPosition {
     s16 x, y, z, pad;
@@ -50,7 +49,7 @@ static inline u8 DirectionAngle(struct EffectActor *actor)
 {
     return ((actor->direction + 5) & 7) << 5;
 }
-void sub_0817D67C(struct EffectActor *p)
+void ActorEffect_InitializeOffset(struct EffectActor *p)
 {
     struct EffectActor *actor = p;
     struct EffectPosition pos;
@@ -77,5 +76,5 @@ void sub_0817D67C(struct EffectActor *p)
     Projectile_CreateForOwner(p->effect, (s16 *)&pos, 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817D67C);
+INCLUDE_ASM("asm/nonmatching", ActorEffect_InitializeOffset);
 #endif

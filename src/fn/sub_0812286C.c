@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 87.3%); what differs is mostly register allocation and instruction order
-#define AnimatedBodyPool_Destroy       sub_0812286C
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
 #define SceneBody_Release              SceneBody_Unregister
 #define gAnimatedBodyPool              gUnk_02000140
@@ -34,7 +33,7 @@ static inline u8 HasSlot(u32 *occupied, u32 bit)
     return 0;
 }
 
-s32 sub_0812286C(struct AnimatedBodyPool *pool)
+s32 AnimatedBodyPool_Destroy(struct AnimatedBodyPool *pool)
 {
     s32 i = 0;
     u32 *occupied = &pool->occupied;
@@ -55,5 +54,5 @@ s32 sub_0812286C(struct AnimatedBodyPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812286C);
+INCLUDE_ASM("asm/nonmatching", AnimatedBodyPool_Destroy);
 #endif

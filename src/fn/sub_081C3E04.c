@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.7%
 // foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
-#define ContactImpactEffect_UpdateContact sub_081C3E04
 
 extern u16 gUnk_03005418[];
 
@@ -47,7 +46,7 @@ struct ContactImpactEffect {
     s32 shakeTimer;
 };
 
-s32 sub_081C3E04(struct ContactImpactEffect *effect)
+s32 ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
 {
     {
         u8 *base = (u8 *)effect + 0x94;
@@ -100,5 +99,5 @@ s32 sub_081C3E04(struct ContactImpactEffect *effect)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C3E04);
+INCLUDE_ASM("asm/nonmatching", ContactImpactEffect_UpdateContact);
 #endif

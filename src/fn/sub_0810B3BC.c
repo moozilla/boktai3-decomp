@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.7%
 // foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
-#define SceneMenu_UpdateRecords sub_0810B3BC
 struct SceneMenuRecord {
     u8 data[0x3E];
     u16 checksum;
@@ -29,7 +28,7 @@ void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
 void Registry1745_SetState(struct SceneMenu *, u32, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_UpdateSelection(void);
-void sub_0810A540(void);
+void LinkMenu_WaitSelectionMode(void);
 u32 Crc_ComputeCcitt16(void *, s32, s32);
 void ByteSequence_AdvanceEncodedValue(struct SceneMenu *, void *, s32);
 u8 LinkSession_ReceiveSelectionByte(struct SceneMenu *, void *, s32, s32);
@@ -40,7 +39,7 @@ static inline u8 HasRecordInput(struct SceneMenu *p)
         return 1;
     return 0;
 }
-s32 sub_0810B3BC(struct SceneMenu *object)
+s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
 {
     u8 *record;
     struct SceneMenu *p = object;
@@ -59,7 +58,7 @@ s32 sub_0810B3BC(struct SceneMenu *object)
         if (gUnk_020004B4 && gUnk_020004B4->state == 0)
             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
         else
-            Registry1745_SetState(p, 8, sub_0810A540);
+            Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
         return 0;
     }
     ByteSequence_AdvanceEncodedValue(p, record, 0x40);
@@ -80,5 +79,5 @@ s32 sub_0810B3BC(struct SceneMenu *object)
         p->flags = 0x1800;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810B3BC);
+INCLUDE_ASM("asm/nonmatching", SceneMenu_UpdateRecords);
 #endif

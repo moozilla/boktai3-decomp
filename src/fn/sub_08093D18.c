@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 88.9%
 // foundry draft (worker best 87.9%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_TickPendingTarget sub_08093D18
 
-void sub_08093D18(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *actor)
 {
     void *context = *(void **)((u8 *)actor + 0x3D0);
 
@@ -48,5 +47,5 @@ void sub_08093D18(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08093D18);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_TickPendingTarget);
 #endif

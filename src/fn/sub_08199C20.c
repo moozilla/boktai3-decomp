@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
-#define CallbackSlot_RestorePosition sub_08199C20
 struct CallbackPosition {
     u32 x, z;
 };
@@ -18,7 +17,7 @@ struct CallbackSlot {
     u8 phase;
     u8 state;
 };
-void sub_08199C20(struct CallbackSlot *slot)
+void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
 {
     u16 *component;
     if (slot->flags & 4)
@@ -34,5 +33,5 @@ void sub_08199C20(struct CallbackSlot *slot)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08199C20);
+INCLUDE_ASM("asm/nonmatching", CallbackSlot_RestorePosition);
 #endif

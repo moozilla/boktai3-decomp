@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void *AnimData_FindEntry(int);
-void sub_08217DE0(void *, void *, int);
+void ParticleSprite_Initialize(void *, void *, int);
 int ResultMenu_CreateGraphics(u8 *arg)
 {
     u8 *p = arg;
@@ -40,7 +40,7 @@ int ResultMenu_CreateGraphics(u8 *arg)
         out = p + 0x6e4;
         i = 3;
         do {
-            sub_08217DE0(out, resource, 0x11);
+            ParticleSprite_Initialize(out, resource, 0x11);
             out += 0x28;
             i--;
         } while (i >= 0);

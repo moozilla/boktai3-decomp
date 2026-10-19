@@ -6,12 +6,11 @@
 #ifdef NONMATCHING
 // fuzzy: 82.2%
 // foundry draft (worker best 81.5%); what differs is mostly register allocation and instruction order
-#define InventoryGrid_UpdateStatPreview sub_08174C2C
 void sub_081642CC(void *, u32, u32, u32, u32, u32, u32);
 void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedEquipment(void *, s32, s32, s32, s32);
-void sub_08174C2C(struct SceneHudState *p)
+void InventoryGrid_UpdateStatPreview(struct SceneHudState *p)
 {
     struct SceneInputItemDescriptor descriptor;
     s32 value;
@@ -31,5 +30,5 @@ void sub_08174C2C(struct SceneHudState *p)
     InventoryPanel_UpdateSelectedEquipment(p, 26, 7, 0, p->comparisonOffsets[2]);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08174C2C);
+INCLUDE_ASM("asm/nonmatching", InventoryGrid_UpdateStatPreview);
 #endif

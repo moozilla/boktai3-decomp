@@ -3,8 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.0%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
-#define ActorSoundPhase_UpdateConditionalStop sub_081A8820
-#define ActorSoundPhase_StopSong              Vanargand_StopActionSequence
+#define ActorSoundPhase_StopSong Vanargand_StopActionSequence
 struct ActorSoundPhase {
     u8 f0[0xAA];
     u8 st;
@@ -35,7 +34,7 @@ static inline u8 SelectPhase(s16 variant)
         return 16;
     return 13;
 }
-void sub_081A8820(struct ActorSoundPhase *p)
+void ActorSoundPhase_UpdateConditionalStop(struct ActorSoundPhase *p)
 {
     struct ActorSoundPhase *q = p;
     if (chk(p)) {
@@ -49,5 +48,5 @@ void sub_081A8820(struct ActorSoundPhase *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A8820);
+INCLUDE_ASM("asm/nonmatching", ActorSoundPhase_UpdateConditionalStop);
 #endif

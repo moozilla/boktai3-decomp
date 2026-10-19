@@ -17,9 +17,8 @@
   `08125528` was a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6%. Every
-  instruction matches. Only 19 differ, all of them stack-slot numbers of four spilled GCSE/PRE reaching
-  registers plus three reload choices that follow from them (see "PRE register numbering" below).
+* `08123194` (8964 bytes with its tails 08124240/08125138) matches exactly. The last 13 bytes were the stack
+  slots of four spilled GCSE/PRE reaching registers (see "Third round" and "Fourth round" below).
   Structural differences went 2875 -> 0 with the changes below.
 
 ## Techniques found on 08123194 (apply to any big function)
@@ -103,6 +102,62 @@ fewer insns at GCSE time) or a quite different pseudo numbering. About 180 QImod
 triples come from C narrowing `u8` arithmetic (`*p >> 4`, `*p & 15`) and are removed later by combine,
 so those are the likely place the original's RTL was smaller. I did not find C that removes them
 without changing the code. Variable placement and declaration order only move T by at most ±16.
+
+### Third round on 08123194 (24 -> 13 differing halfwords)
+
+* **Diagnostic compiler.** A copy of agbcc's gcc/ with `GCSE_T` (overrides the expression hash table
+  size in gcse.c `alloc_expr_hash_table`) and `CSE_DEBUG`/`CSE_NOCANON` (trace / veto cse.c
+  `make_regs_eqv` making a new register canonical) separates the causes. Build: copy
+  `build/tools/agbcc/gcc`, patch, `make`; run with `AGBCC=.../agbcc` (build.py honours it). Never for
+  committed code.
+* **Slots.** ROM order is expr 217 (0x800 path `cell+1`) @0x44, 1907 (`&found[preferred]`) @0x48,
+  1178 (`cell-1`) @0x4c, 1075 (`cell+1`) @0x50. With `GCSE_T` anywhere in 2267..2347 the four slots
+  match, nothing else changes. No pseudo renumbering at T near 2593 gives that order (hash:
+  `(13773+a)%T`, `(14419+c)%T`, `(13771+b)%T` with a=cell(0x800 path), b=cell(else path), c=preferred;
+  brute-forced), so the original had roughly 500..650 fewer insns at GCSE. Cutting only after
+  `preferred` (the else-path Seeks) is pseudo-neutral; uniform cuts would need about 32%. Free cuts that keep the
+  code: the CanEnter shape checks through `u32 b = *Properties(i); b >> 4` (-4 T per site). The same
+  in Seek changes loop.c hoisting of the 15 (loops are 112 insns; the second 15 hoists below 90).
+* **Two C fixes.** Seek needs `return 0;` at the end of the `cell < target` branch (in the
+  `found = Seek(cell, cell - 1)` copy that branch is dead, and its exits then skip `found = 0`), and the
+  found[] scan does `goto check` (ROM re-tests `result < 0`), not `goto deflect`.
+* **The r9 choices (0xaae/ab4/aca, 0x1852/1858/187a).** In ROM, the uses of PRE's register for
+  `cell+1` read Seek's `target` (r9). In ours, cse2's `make_regs_eqv` makes the reaching register
+  canonical, because its last use (the dead `i = cell + 1` in the next Seek copy) is 58 insns after
+  `target`'s last use (cuid 3011 vs 2953; 6052 vs 5995 for the else path). Vetoing that alone does not give the ROM:
+  it makes `i` canonical instead. Keeping `target` canonical (`CSE_KEEP`) matches. **Fixed in C** by a
+  shared `s32 target` variable in each path (`target = cell + 1; Seek(..., target); target = cell - 1;
+  Seek(..., target)`): integrate then uses that pseudo as the parameter, it lives through both copies,
+  and cse2 keeps it.
+* **Where to look for the T drop.** At GCSE, CellHeight accounts for about 840 insns (72 copies) and Properties
+  for 1700 (160 copies), and the narrowed u8/u16 arithmetic leaves about 280 shift pairs that combine removes
+  later. Every way of de-narrowing the Seek sites tried so far also changes loop.c's hoisting of the 15
+  (loop size 112, and the second 15 hoists once the loop is under 90 insns). The switch form of
+  CellHeight (`switch (shape) { case 1: ...; case 2: ...; }`, as in Shadow_UpdateTerrain) is
+  byte-identical and leaves T unchanged.
+
+### Fourth round on 08123194: full match
+
+* **The slot condition, exactly.** A `GCSE_T` sweep (2201..3001, every odd T) matches when
+  `bucket(7) < bucket(6) < bucket(4)` (the three `s+const` expressions of the parameters) and
+  `A < C < Bm < Bp`, where `A = (13773+a)%T`, `C = (14419+c)%T`, `Bm = (13771+b)%T`, `Bp = Bm+2`, with
+  `a` = 0x800-path `cell`, `b` = else-path cell, `c` = `preferred`. The model predicts the sweep exactly.
+  Because `C - Bm` is fixed at about 652, `A` has to be small mod T, so T must sit just under
+  `(13773+a)/5` or `(13773+a)/6`. No pseudo shift near T 2597 works.
+* **Knobs that keep the code byte-identical** (measured with a pool- and slot-insensitive score):
+  * `cell` for the 0x800 path declared at function scope moves `a` from 396 to 30, and T is unchanged.
+  * In Seek, `position->y = SlopeSurface(...)`, where `SlopeSurface` returns `u16` through an `s16`
+    local, adds narrowing pairs that combine deletes later. That is +80 T and +112 on `b`/`c`.
+  * CanEnter's `Shape()` gives -24 T and -32 pseudos.
+  * Unused locals add pseudos without insns.
+  * Losing knobs: the `u16`-returning CellHeight (it adds extensions in CanEnter) and the u8
+    CellAttributes in Seek (combine narrows the load to `ldrb`).
+* **Result:** function-scope `cell` + SlopeSurface gives T 2677, a=30, b=2204, c=2208, inside the
+  2653..2759 window. Exact match.
+* **Method, reusable:** sweep the forced T with the instrumented compiler to get the exact acceptable
+  set, fit a bucket-order model to it, then search C edits for ones that leave the code identical
+  and move (T, pseudo numbers) into the model's region. Scratch scripts for this (combo search,
+  model, scorer) were in build/w of the 08123194 thread.
 
 ## Technique: late register copies of a field address are PRE's, so delete the pointer local
 

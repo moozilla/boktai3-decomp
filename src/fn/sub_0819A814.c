@@ -18,10 +18,10 @@ s32 Mod(s32, s32);
 void Sound_PlaySongChecked(u32);
 u8 *SunOrb_GetPositionFromManager(u8 *, s32);
 void RisingActorManager_BeginRaise(s32);
-void sub_081FEADC(s32);
+void SlotController_RequestReset(s32);
 void SlotController_SetSlotFlag2(s32);
 void Projectile_InitParameters(u8 *);
-void sub_081FD01C(u8 *, struct LinkVector *);
+void Projectile_SpawnAtPosition(u8 *, struct LinkVector *);
 void Projectile_SetBehaviorMode(u8 *, u16);
 void Projectile_SetCollisionParameters(u8 *, u32, u32, u32, u32, u32);
 void Projectile_SetHomingParameters(u8 *, u16, u32, u8);
@@ -56,12 +56,12 @@ void LinkEffect_UpdateProjectileBurst(struct LinkEffect *p)
                     struct LinkVector *v = &position;
                     *v = *p->target;
                     v->y += 128;
-                    sub_081FD01C(projectile, v);
+                    Projectile_SpawnAtPosition(projectile, v);
                 }
                 p->emitted++;
             }
             if (Mod(p->timer, 300) == 180)
-                sub_081FEADC(p->orb);
+                SlotController_RequestReset(p->orb);
             if (p->timer <= 179)
                 SlotController_SetSlotFlag2(p->orb);
             if (p->timer > 240)

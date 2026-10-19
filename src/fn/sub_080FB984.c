@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
-#define SpriteGroup_InitAnimatedSprites sub_080FB984
 
 struct AnimatedSpriteAnimation {
     u8 unknown0[6];
@@ -34,7 +33,7 @@ struct AnimatedSpriteView {
     u16 priority;
     u8 unknown34[0x2c];
 };
-void sub_080FB984(struct SceneActorRegistryActor *owner)
+void SpriteGroup_InitAnimatedSprites(struct SceneActorRegistryActor *owner)
 {
     struct AnimatedSpriteGroup *group = owner->context;
     u16 zero = 0;
@@ -59,5 +58,5 @@ void sub_080FB984(struct SceneActorRegistryActor *owner)
     group->phase = 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FB984);
+INCLUDE_ASM("asm/nonmatching", SpriteGroup_InitAnimatedSprites);
 #endif

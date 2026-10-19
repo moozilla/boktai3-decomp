@@ -10,12 +10,12 @@ struct P {
     u8 j[0x18d - 0x178];
     u8 z;
 };
-void sub_080F4CFC(void);
+void ActorPhase_BeginLunge(void);
 
 void Sword_InitWaveAttack(struct P *p)
 {
     p->z = 0;
-    p->cb = sub_080F4CFC;
+    p->cb = ActorPhase_BeginLunge;
     p->d = p->a;
     p->e = p->b;
     p->h = p->c;

@@ -24,7 +24,7 @@ struct SceneStatusIndicatorManager {
 extern struct SceneStatusIndicatorManager *gUnk_02000158;
 struct SceneStatusIndicatorManager *BlinkingEffect_EnsurePool(void);
 struct SceneStatusIndicator *SceneStatusIndicator_Allocate(struct SceneStatusIndicatorManager *);
-void sub_08217DE0(struct SceneStatusIndicator *, void *, u32);
+void ParticleSprite_Initialize(struct SceneStatusIndicator *, void *, u32);
 void Effect_SetOrigin(struct SceneStatusIndicator *, s32, s32);
 void SpriteDrawable_SelectTileFrame(struct SceneStatusIndicator *, void *, u32);
 struct SceneStatusIndicator *
@@ -48,7 +48,7 @@ SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
     entry->reset = one;
     *(struct SceneStatusIndicatorPosition *)&entry->position = *position;
     entry->position.vector.y += 30;
-    sub_08217DE0(entry, manager->resource, 0);
+    ParticleSprite_Initialize(entry, manager->resource, 0);
     Effect_SetOrigin(entry, -8, -8);
     SpriteDrawable_SelectTileFrame(entry, manager->resource, 52);
     entry->flags |= 1;

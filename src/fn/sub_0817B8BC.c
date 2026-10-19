@@ -6,7 +6,7 @@ s32 SceneVolume_GetActivityState(struct ActorState *);
 s32 SceneVolume_FindNearbyPosition(struct ActorState *);
 s32 ActorPosition_TestPath(struct ActorState *, struct ActorAnimationPair *);
 void SceneVolume_BeginPhase(struct ActorState *, s32);
-s32 sub_0817B5E4(struct ActorState *, u32, s32, s32, s32);
+s32 ActorEffect_StepTurn(struct ActorState *, u32, s32, s32, s32);
 static inline u8 ConsumeTrigger(struct ActorState *p)
 {
     if (p->triggered) {
@@ -42,9 +42,9 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
     else if (owner->actor.timer > 60 && SceneVolume_FindNearbyPosition(p) == 1)
         SceneVolume_BeginPhase(&owner->actor, 3);
     if (p->requestMode == 2)
-        result = sub_0817B5E4(&owner->actor, owner->actor.timer, 30, 10, 1);
+        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 10, 1);
     else
-        result = sub_0817B5E4(&owner->actor, owner->actor.timer, 30, 10, 0);
+        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 10, 0);
     if (result) {
         owner->actor.requestedVariant = owner->actor.variant;
         owner->actor.request = 1;

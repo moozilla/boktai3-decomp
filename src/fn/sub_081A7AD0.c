@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
-#define ScenePanel_AdvanceConditionalPairState sub_081A7AD0
 struct ScenePanelPairState {
     u8 unknown0[0xE1];
     u8 threshold : 8;
@@ -13,7 +12,7 @@ struct ScenePanelPairState {
     u8 state;
 };
 s32 ScenePair_CountPositiveCounters(void *);
-void sub_081A7AD0(struct ScenePanelPairState *panel)
+void ScenePanel_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
 {
     s32 count;
     switch (panel->state) {
@@ -57,5 +56,5 @@ void sub_081A7AD0(struct ScenePanelPairState *panel)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A7AD0);
+INCLUDE_ASM("asm/nonmatching", ScenePanel_AdvanceConditionalPairState);
 #endif

@@ -17,6 +17,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 
 from romlib import BASEROM_SHA1, ROOT
 
@@ -115,17 +116,22 @@ def compiler_identity(path):
     return os.path.realpath(path) + ":" + hashlib.sha1(open(path, "rb").read()).hexdigest()
 
 
+@functools.lru_cache(maxsize=None)
+def headers_hash():
+    # Every unit depends on every header: hash them once per invocation, not per unit.
+    return file_hash(*[os.path.join(d, f) for d in ("include", "include/gba")
+                       for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")], "tools/build.py")
+
+
 def build_c(src, obj):
     lint_c(src)
-    deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
-                    for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
     # INCLUDE_ASM pulls in split.py output, which changes with gen/ and symbols.
-    deps += [os.path.join("build", "asm", "nonmatching", n + ".s")
-             for n in re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', open(os.path.join(ROOT, src)).read())
-             if os.path.exists(os.path.join(ROOT, "build", "asm", "nonmatching", n + ".s"))]
+    deps = [src] + [os.path.join("build", "asm", "nonmatching", n + ".s")
+                    for n in re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', open(os.path.join(ROOT, src)).read())
+                    if os.path.exists(os.path.join(ROOT, "build", "asm", "nonmatching", n + ".s"))]
     cflags = cflags_for(src)
     compiler = compiler_for(src)
-    key = file_hash(*deps, "tools/build.py", extra=compiler_identity(compiler) + " ".join(CPP + DEFINES + cflags))
+    key = file_hash(*deps, extra=headers_hash() + compiler_identity(compiler) + " ".join(CPP + DEFINES + cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = preprocess(src)
@@ -150,7 +156,30 @@ def build_c(src, obj):
     stamp(os.path.join(ROOT, obj), key)
 
 
+def wait_for_cloud_setup():
+    """A cloud session's start hook (tools/cloud_setup.sh --session) may still be
+    rebuilding in the background; wait for it instead of racing it."""
+    pidfile = os.path.join(ROOT, "build", ".cloud-setup.pid")
+    if os.environ.get("B3_SETUP_BG") or not os.path.exists(pidfile):
+        return
+    try:
+        pid = int(open(pidfile).read())
+    except (OSError, ValueError):
+        return
+    said = False
+    while True:
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return
+        if not said:
+            print("waiting for the background cloud setup (build/cloud-setup.log)...", file=sys.stderr)
+            said = True
+        time.sleep(1)
+
+
 def main():
+    wait_for_cloud_setup()
     ap = argparse.ArgumentParser()
     ap.add_argument("--shift", default=None)
     ap.add_argument("--out", default="build/boktai3.gba")

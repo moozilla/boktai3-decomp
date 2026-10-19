@@ -4,9 +4,9 @@
 #ifdef NONMATCHING
 // fuzzy: 95.5%
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
-#define SceneActorRoute_IsOutsidePointBounds sub_0821E8C8
-u32 sub_0821E8C8(struct SceneActorRouteCursor *cursor, const struct ContactPosition *position,
-                 u32 xBound, u32 zBound)
+u32 SceneActorRoute_IsOutsidePointBounds(struct SceneActorRouteCursor *cursor,
+                                         const struct ContactPosition *position, u32 xBound,
+                                         u32 zBound)
 {
     struct ContactPackedVector point;
     s32 distance;
@@ -25,5 +25,5 @@ u32 sub_0821E8C8(struct SceneActorRouteCursor *cursor, const struct ContactPosit
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821E8C8);
+INCLUDE_ASM("asm/nonmatching", SceneActorRoute_IsOutsidePointBounds);
 #endif

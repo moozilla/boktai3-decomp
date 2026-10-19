@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
-#define RegionActorPool_DestroyActors sub_08106C88
-#define gRegionActorPool              gUnk_020001B4
+#define gRegionActorPool gUnk_020001B4
 extern struct RegionActorPool *gUnk_020001B4;
 void Sprite_Remove(void *);
 u32 TerrainOverlay_QueueRemoveActor(u32 *);
@@ -27,7 +26,7 @@ static inline u8 TestFlags(struct RegionActor *actor)
         return 1;
     return 0;
 }
-s32 sub_08106C88(struct RegionActorPool *pool)
+s32 RegionActorPool_DestroyActors(struct RegionActorPool *pool)
 {
     s32 i;
     for (i = 0; i < 32; i++) {
@@ -55,5 +54,5 @@ s32 sub_08106C88(struct RegionActorPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08106C88);
+INCLUDE_ASM("asm/nonmatching", RegionActorPool_DestroyActors);
 #endif

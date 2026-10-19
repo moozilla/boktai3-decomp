@@ -8,7 +8,7 @@ s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
-void sub_0810B238(void);
+void LinkSelection_WaitForParticipantChoices(void);
 void sub_0810BBD4(struct AreaEffectLinkState *);
 void PaletteLevels_Reset(void);
 void Sound_FadeOutChannel10(u32);
@@ -68,7 +68,7 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
         } while (i < length);
     }
     if (count == length) {
-        Registry1745_SetState(p, 20, sub_0810B238);
+        Registry1745_SetState(p, 20, LinkSelection_WaitForParticipantChoices);
         p->readyPhase = 0;
         sub_0810BBD4(session);
         return 0;

@@ -9,7 +9,7 @@ extern const struct StatTransferProfile gUnk_08E60F80[];
 void PauseMenu_SmoothPoint(void *, void *, s32);
 void GameState_EquipConsumableSlot(u32);
 void Player_RefreshEquipmentWithOptions(void *, const void *, s32);
-void sub_081716B4(void);
+void SceneHud_UpdateStatComparison(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_08171258(void *);
 void sub_08170D78(void *);
@@ -35,7 +35,7 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
         GameState_EquipConsumableSlot(p->actionSelection);
         Player_RefreshEquipmentWithOptions(
             p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gUnk_02000710->party[0]]], -1);
-        Hud_SetInteractionCallback(p, sub_081716B4, 1);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
         sub_08171258(p);
         sub_08170D78(p);
         for (i = 0; i < 3; i++) {

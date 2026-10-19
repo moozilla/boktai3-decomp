@@ -4,11 +4,10 @@
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
-#define MapMenu_DrawActiveMarkers sub_0816B958
-#define MapMenu_GetMarkerKind     MapScreen_GetMarkerType
-#define MapMenu_GetMarkerVariant  MapScreen_GetMarkerFlipFlags
-#define MapMenu_GetTileAddress    Hud_GetTilemapCell
-#define gGameState                gUnk_02000710
+#define MapMenu_GetMarkerKind    MapScreen_GetMarkerType
+#define MapMenu_GetMarkerVariant MapScreen_GetMarkerFlipFlags
+#define MapMenu_GetTileAddress   Hud_GetTilemapCell
+#define gGameState               gUnk_02000710
 struct MapMenuMarker {
     u8 type, page, x, y;
 };
@@ -28,7 +27,7 @@ static inline s16 MapMenu_MarkerAttributes(s32 variant)
         return 0xE400;
     return 0xE000;
 }
-void sub_0816B958(struct MapMenu *menu, s32 left, s32 top)
+void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
 {
     s32 i;
     struct MapMenuMarker *marker;
@@ -75,5 +74,5 @@ void sub_0816B958(struct MapMenu *menu, s32 left, s32 top)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816B958);
+INCLUDE_ASM("asm/nonmatching", MapMenu_DrawActiveMarkers);
 #endif

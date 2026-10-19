@@ -7,7 +7,7 @@ extern struct Manager *gUnk_02000054;
 void *ShadowTask_Create(int, int);
 void Shadow_UpdateTerrain(void *);
 void ActorShadow_UpdateNone(void *);
-void sub_08217DE0(void *, void *, int);
+void ParticleSprite_Initialize(void *, void *, int);
 void Effect_SetOrigin(void *, int, int);
 void ShadowList_Insert(void *, void *);
 int Shadow_Initialize(u8 *p, void *source, int mode)
@@ -27,7 +27,7 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
     else
         *(void (**)(void *))(p + 0x34) = ActorShadow_UpdateNone;
     sprite = p + 12;
-    sub_08217DE0(sprite, gUnk_02000054->resource, 512);
+    ParticleSprite_Initialize(sprite, gUnk_02000054->resource, 512);
     Effect_SetOrigin(sprite, -8, -8);
     {
         u8 *resource = gUnk_02000054->resource;
