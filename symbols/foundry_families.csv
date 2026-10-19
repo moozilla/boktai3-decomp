@@ -1478,3 +1478,4 @@ addr,function,name,family,note
 081BCBCC,sub_081BCBCC,StatGauge_UpdateConfirmation,"StatGaugePreview / DarkLoan","updates confirmation input and cursor animation"
 081BD084,sub_081BD084,StatGauge_WaitBeforeConfirmation,"StatGaugePreview / DarkLoan","waits 150 frames before confirming or closing the preview"
 081BD23C,sub_081BD23C,StatGauge_UpdateClosing,"StatGaugePreview / DarkLoan","animates delayed screen transition and exits the preview"
+081BD708,sub_081BD708,DarkLoan_InitializeFromScript,"Dark loan 2 / ScriptPanel (tentative)","reads script options and initializes the loan display"
