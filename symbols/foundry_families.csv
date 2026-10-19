@@ -1442,3 +1442,4 @@ addr,function,name,family,note
 081A8D2C,sub_081A8D2C,Vanargand_UpdateMotionTrack,"Vanargand","starts animation and motion track then signals completion"
 081AA5AC,sub_081AA5AC,Vanargand_UpdateMotionReturn,"Vanargand","starts mode-four motion track and signals completion"
 081ACB60,sub_081ACB60,Vanargand_UpdateDelayedPartAnimation,"Vanargand","delays a part animation and signals completion"
+081ADEAC,sub_081ADEAC,Vanargand_InitBackgroundAttachment,"Vanargand","loads and positions a background attachment"
