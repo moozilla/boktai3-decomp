@@ -12,3 +12,9 @@
   reaches it". Writing `counter = &s->hidden; ... counter = &s->delay; ... counter = (u16 *)&s->riseSteps;`
   (one variable for all three) makes them one pseudo, which then takes r2 from the first use.
   The first use then needed `asm("" ::: "memory")` after the flag store, because the ROM reloads the counter there.
+* `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
+  the original reaches the position through separate field pointers (x through `position`, y and z through their own
+  pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
+* `08123194` (4045 insns with its tails 08124240/08125138) is untouched: a slope/collision probe. Its 152
+  inlined cell lookups collapse well with a script (2720 lines remain), and `SceneGrid_ScanTerrainDirection`
+  (0806E900) holds the matched loop idiom (`location = &gUnk_030052F4; offset += 4`).
