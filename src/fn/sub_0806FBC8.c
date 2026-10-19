@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
@@ -18,21 +17,26 @@ void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
         found: {
             struct SceneActorRegistryNode *after = next->next;
             Heap_Free(next);
-            node->next = after;
+            (*(&node))->next = after;
             manager->cursor = after;
         }
         removed:
             manager->field32--;
             goto done;
+            do {
+            } while (0);
         scan:
-            asm("" : : : "memory");
             next = node->next;
-            if (next->actor == actor)
+
+            if (next->actor == actor) {
                 goto found;
+            }
             node = next;
         test:
-            if (node->next)
+            if (node->next) {
                 goto scan;
+            }
+
         done:;
         }
     }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
 static inline u8 IsUsed(u32 *used, u32 index, u32 one)
 {
@@ -17,7 +16,9 @@ struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParti
             struct SceneParticleBurstSlot *slot = (void *)((u8 *)p->slots + offset);
             slot->index = i;
             {
-                register u32 mask asm("r2") = one;
+                u32 mask = one;
+                do {
+                } while (0);
                 mask <<= i;
                 *used |= mask;
             }

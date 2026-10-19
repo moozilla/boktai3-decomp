@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
 static inline u8 Occupied(u32 *mask, s32 index)
@@ -19,7 +18,7 @@ static inline u32 Locked(void)
 }
 s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
 {
-    register struct RouteSpriteActor *start asm("r3") = pool->slots;
+    struct RouteSpriteActor *start = pool->slots;
     struct RouteSpriteActor *slot;
     /* Keep the post-loop state stride as an integer address; its final value
      * is unused and may extend beyond the complete pool object. */
@@ -30,9 +29,11 @@ s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
         if (!Paused()) {
             if (!Locked()) {
                 i = 0;
+                do {
                 table = gUnk_08605BB0;
                 state = (u32)&pool->slots[0].state;
                 slot = start;
+                } while (0);
                 for (; i < 4;) {
                     if (Occupied(&pool->occupiedMask, i))
                         sub_08249240(pool, slot, (void *)table[*(u8 *)state]);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
 void Effect_Remove(void *);
 static inline u8 Occupied(struct ActorAttachmentManagerView *manager, s32 i)
@@ -18,17 +17,19 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
             struct ActorAttachmentSlotView *slot = &manager->slots[i];
             s32 j = 0;
             struct ActorAttachmentPartSprite *part;
-            part = slot->parts;
+            part = (*(&slot))->parts;
             do {
                 s32 bits = slot->partMask >> j;
-                register s32 bit asm("r1") = 1;
-                if (bits & bit)
+                s32 bit = 1;
+                if (bits & bit) {
                     Effect_Remove(part);
+                }
                 part++;
                 j++;
             } while (j <= 2);
-            if (slot->active48)
+            if (slot->active48) {
                 Sprite_Remove(&slot->sprite);
+            }
         }
     }
     {
