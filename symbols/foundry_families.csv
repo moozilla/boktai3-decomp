@@ -1397,3 +1397,4 @@ addr,function,name,family,note
 0802BF30,sub_0802BF30,GridAttack_Update,"Grid attack actor","runs the grid attack update steps and cycles a frame timer"
 0813D754,sub_0813D754,SceneActor_SelectEffectDisplayMode,"SceneActor effect","selects an effect display mode with timed alternation"
 0813DDAC,sub_0813DDAC,SceneActor_UpdateVisualEffects,"SceneActor effect","updates visual effects, delayed attachment and effect position"
+0813E53C,sub_0813E53C,Player_ApplyPeriodicStatChanges,"Player stat modifiers","applies flagged one-percent stat recovery and drain"
