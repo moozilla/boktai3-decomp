@@ -1410,3 +1410,4 @@ addr,function,name,family,note
 081A04B8,sub_081A04B8,OffsetActor_PlayBoundarySequence,"Hresvelgr actor action sequences (tentative)","starts animation and advances when position exceeds boundary"
 081A0558,sub_081A0558,Hresvelgr_UpdateTargetMotion,"Hresvelgr actor action sequences","updates directional animation and periodically selects a movement target"
 081A063C,sub_081A063C,Hresvelgr_UpdateAlternatingMotion,"Hresvelgr actor action sequences","toggles orientation and completes motion on a condition or timeout"
+081A06E4,sub_081A06E4,Hresvelgr_PlaySideTargetSequence,"Hresvelgr actor action sequences","starts an animation and moves to a side target until nearby"
