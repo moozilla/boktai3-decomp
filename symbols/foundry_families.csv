@@ -1403,3 +1403,4 @@ addr,function,name,family,note
 0813ED20,sub_0813ED20,Player_ConsumeActionCharge,"Player descriptor actions","deducts pending action cost from the active entry"
 0813F784,sub_0813F784,ActorParameter_GetModeValue,"ActorParameter","looks up an actor parameter in one of two mode-dependent tables"
 0813F9EC,sub_0813F9EC,Player_SetActionRequest,"Player action requests","sets action request and resets its latch and timers"
+0819ED6C,sub_0819ED6C,Hresvelgr_UpdateBurstPhase,"Hresvelgr","starts animation and emits four directional effects"
