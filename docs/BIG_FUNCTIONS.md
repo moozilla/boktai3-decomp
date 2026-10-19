@@ -127,6 +127,19 @@ Inlines:
   copies after the call, so CSE turns them into the ROM's register copies.
 * **A vector difference stored through a stack pointer** is an inline
   `Delta(&out, a, b)`, not field assignments.
+* **A mask loaded before the address and the load** (`movs r1, #0x80; lsls r1, #3;
+  adds r0, rA, #off; ldrh r0, [r0]; ands r0, r1`) is an inline that takes the object
+  and the mask: `static inline u16 MotionFlags(actor, u32 mask) { return
+  actor->flags2D4 & mask; }`. Passing a field pointer puts the address first; a plain
+  `x & 0x400` loads first. `movs r1, #3` before an RNG step is `RandomBits(3)`.
+* **Arguments that are pointer arithmetic get computed before the other copies.**
+  `Delta(&v, &a->pos, &(*(T **)((u8 *)a + 0xDC))->pos)` emits `a + 0xDC` first;
+  a struct field (`&((T *)a->fieldDC)->pos`) keeps the ROM's argument order.
+* **A failure path whose address is computed at each site and that then branches to
+  one shared tail** is two copies of the failure code (`ClearBits(&f, m); return 0;`)
+  that cross-jumping merged. A `goto fail` writes it once and loses the per-site
+  address. Put the success path first where the ROM does (`if (result) { ...;
+  return 1; }`).
 
 Loops and constants:
 * **loop.c hoists a constant only if `threshold * savings * lifetime >= insns in
@@ -137,9 +150,31 @@ Loops and constants:
   `u8` narrowing that creates separate QI and SI copies) raise savings.
 * **`movs rX, #imm` repeated at each use inside a loop** is a hoisted constant
   that lost allocation and was rematerialised by reload.
+* **Keep only the retried code inside a retry loop.** An RNG retry written as
+  `for (;;) { pick; if (same && ++tries <= 3) continue; ...stores...; break; }` keeps
+  the stores in the loop, and loop.c then has too many insns to hoist the RNG's
+  address, mask and table. `do { pick; if (c != prior) goto chosen; } while (++tries
+  <= 3); c = prior; chosen: ...stores...` let it hoist them (sub_080C09F0: 338 to
+  95 structural differences together with the bitfield below).
 * **`adds rX, rH, #0; ands rX, rY`** comes from regmove's backward pass when
   no operand can be tied. A variable set twice (`h = f & 15; h <<= 8;`)
   reproduces the copy.
+
+GCSE:
+* **A register copy just before a block-ending branch** (`mov sl, sb` between the
+  `asrs` and `cmp` of a bounds check), copying a pointer that the code otherwise
+  uses directly, is PRE. It moved a later recomputation of the same expression to
+  the end of an earlier block. Recompute the value where it is used instead of
+  passing a variable: a helper deriving `&actor->group` itself instead of taking
+  `group`, or `*(T **)(group + 0x200)` written out at each use instead of a
+  `state` variable.
+
+Bitfields:
+* **`movs rX, #0` between the `ands` and the store of a halfword
+  read-modify-write**, with later zero stores reusing that register, is the `& 0`
+  of a full-width bitfield insertion: `struct { s16 bits : 16; }` and
+  `f->bits &= ~4`. A signed field gives the `movs #5; rsbs` mask; `u16` gives a
+  pool literal. A narrower bitfield (`u16 bit2 : 1`) becomes a byte access.
 
 Other:
 * Pin registers only as a diagnostic. Pinning one pointer showed which
