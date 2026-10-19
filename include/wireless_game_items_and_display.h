@@ -93,8 +93,8 @@ struct WirelessGameExchange {
 };
 struct WirelessGameExchange *WirelessExchange_Get(void);
 extern struct WirelessGameItems *gUnk_02000100;
-int sub_0803A514(struct WirelessGameVector *, int, int);
-int sub_0803AB28(struct WirelessGameDisplay *);
+int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *, int, int);
+int WirelessGameDisplay_Init(struct WirelessGameDisplay *);
 
 void WirelessGame_AddItem(void *p, int index);
 int WirelessGame_TryAddCyclingItem(void *owner);

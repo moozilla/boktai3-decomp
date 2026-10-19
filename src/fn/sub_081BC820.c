@@ -7,14 +7,14 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void DarkLoan_HideSprites(u8 *);
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
-void sub_081BC3B4(u8 *);
+void DarkLoan_UpdateBalanceDigits(u8 *);
 void StatGauge_DrawPreview(u8 *);
 void sub_081BC468(u8 *);
 void AnimData_SelectPaletteBank(u8 *, u32);
 void MessageWindow_ShowMessage(u32);
 void sub_081BCCD4(void);
 void DarkLoan_SetState(u8 *, void (*)(void));
-void sub_081BC820(u8 *s)
+void StatGauge_BeginAdjustment(u8 *s)
 {
     u32 zero, latezero, mask, mask2, mask3, value;
     struct Word8 {
@@ -41,7 +41,7 @@ void sub_081BC820(u8 *s)
         *initial &= mask;
         initial = (u32 *)((u8 *)initial + 0x60);
     } while (--i >= 0);
-    sub_081BC3B4(s);
+    DarkLoan_UpdateBalanceDigits(s);
     StatGauge_DrawPreview(s);
     *(u32 *)(s + 0x5A0) &= (mask2 = ~1);
     q = (u32 *)(resource + 0x5A0);
@@ -71,5 +71,5 @@ void sub_081BC820(u8 *s)
     DarkLoan_SetState(s, sub_081BCCD4);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081BC820);
+INCLUDE_ASM("asm/nonmatching", StatGauge_BeginAdjustment);
 #endif

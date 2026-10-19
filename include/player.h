@@ -115,7 +115,9 @@ struct Player {
     s16 velocityX; /* 0x38: direction-derived velocity */
     u16 unk3A;
     s16 velocityZ;
-    u8 unk3E[0x6C - 0x3E];
+    u8 unk3E[0x68 - 0x3E];
+    u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
+    u8 unk6A[2];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
     struct PlayerAnimation animation; /* 0x8C */
     u16 actionCueCounter;             /* 0x98: zero gates phase-one sound in 08146478 (tentative) */
@@ -260,9 +262,11 @@ struct Player {
     u8 facingChangeEffects;     /* 0x4F4: bits zero/one enable/select facing cue */
     u8 savedEffectTick;         /* 0x4F5 */
     u8 movementSpeedReduction;  /* 0x4F6 */
-    u8 unk4F7[0x2B];
+    u8 unk4F7[0x29];
+    u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
-    u8 unk524[0xA];
+    u16 indicatorUpdateRate; /* 0x524: divisor for 128/x step size of indicatorStep (tentative) */
+    u8 unk526[8];
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
     u16 sceneMode;                /* (guess) */
@@ -274,7 +278,11 @@ struct Player {
     u8 contactCueDuration;     /* 0x53D: threshold cue duration */
     u8 unk53E[0xC];
     u8 catalogSavedOption; /* 0x54A: menu option copied when scriptStatus[1] is zero (tentative) */
-    u8 unk54B[0x41];
+    u8 unk54B[0x2D];
+    u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
+    u8 unk57A[2];
+    u16 indicatorTickCounter; /* 0x57C: wraps 0-9; gates a displaySegmentCount-pitched tick sound (tentative) */
+    u8 unk57E[0xE];
     void (*triggerAnimationCallback)(struct Player *); /* 0x58C */
     u8 unk590[8];
     u16 recoilSpeed;             /* 0x598: decays by three quarters per update */

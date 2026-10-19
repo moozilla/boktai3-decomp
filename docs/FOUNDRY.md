@@ -174,18 +174,35 @@ every file before committing it.
 
 | backend | bucket | functions | matched | named | non-cached tokens per match |
 |---|---|---|---|---|---|
-| Codex gpt-6.1-sol | <50 | 773 | 634 (82%) | 761 | ~39k (both buckets) |
+| Codex gpt-6.1-sol | <50 | 773 | 634 (82%) | 761 | ~24k (both buckets) |
 | Codex gpt-6.1-sol | 50–150 (08080000–08180000) | 799 | 550 (69%) | 799 | |
 | Sonnet, headless `claude -p` | <50 | 31 | 25 (81%) | 31 | ~$0.8 per match |
 | Sonnet subagents | <50 / 50–150 (early ROM) | 24 / 18 | 14 / 1 | | |
 
 Codex matches Sonnet on <50, and on 50–150 in the barely-matched regions it reaches 69%.
 The 1-of-18 Sonnet result came from early-ROM leftovers that past workers had already given
-up on, not from the bucket itself. At about 39k non-cached tokens per match, Codex is the
+up on, not from the bucket itself. At about 24k non-cached tokens per match, Codex is the
 default; Claude coordinates.
 
 Disk filled once overnight. The finisher's solver stage writes per-run work directories,
 and the volume was at 97% from other sessions. The finisher now runs as several locked
 loops (`build/foundry/scale/finisher.sh`), and the stale `build/rasolve-*` directories from
 killed runs are left for the user to clear.
+
+## Return on the overnight run (2026-10-18)
+
+| | |
+|---|---|
+| Codex batches | 314 (`gpt-6.1-sol`, medium reasoning) |
+| Codex tokens | 28.8M non-cached (input minus cached, plus output). An earlier tally of 46M counted each batch twice: the glob also matched Codex's `.last.txt` outputs |
+| Codex weekly quota used | about 74 points (100% to 26%) |
+| Matched functions, all foundry runs | 1,412, every one named (committed through #232, #240, #242, #248) |
+| Matched bytes | 210,620 (8.72% of all code) |
+| Progress | 31.56% before the foundry (after #231) to 40.37% after #248; other sessions' work in the same window is included |
+| Cost per match | about 20k non-cached Codex tokens; Sonnet headless was about $0.8 |
+
+Most of the gain is the <50 and 50–150 buckets in the barely-matched regions
+(08080000–08250000). The 150–400 bucket is held back: its sample cost about
+284k tokens per match with Sonnet, and the residue there is register choice and
+instruction order, which a bigger model has not fixed.
 
