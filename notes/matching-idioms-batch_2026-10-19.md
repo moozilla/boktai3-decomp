@@ -43,3 +43,8 @@ uses it.
   assignment: `do { h = pos.y - 8; } while (0);` fixed a register-only diff
   that rasolve attributed to `h` (sub_0811BD30). Copying a value into a
   narrower local (`u8 animId = anim;`) lowers priority instead (sub_0811C9F8).
+* **Late pointer locals for CSE copies.** When the ROM computes field
+  addresses into low registers and later copies them to high registers, use
+  plain field accesses first, then assign `prevX = &self->prevX; …` just
+  before the block that reuses them (sub_08120618 55% → 96%, sub_081203A8
+  577 → 24 bytes).
