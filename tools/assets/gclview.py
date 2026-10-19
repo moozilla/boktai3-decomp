@@ -171,7 +171,9 @@ SUFFIX = re.compile(r"_?(CreateFromScript|ScriptCreate|FromScript|Create|Script)
 
 
 class Names:
-    def __init__(self):
+    def __init__(self, auto=True):
+        """auto: add tools/assets/gclroles.py's generated names for the scene
+        procedures proc.csv leaves unnamed."""
         import gcloptions
         self.keys = gclnames.best("chara")
         self.cbs = gcx.callback_names()
@@ -188,6 +190,10 @@ class Names:
                 self.procs = {int(r["proc"]): r for r in csv.DictReader(f)}
         except OSError:
             pass
+        if auto:
+            import gclroles
+            for c, r in gclroles.auto_rows().items():
+                self.procs.setdefault(c, r)
         self.data = set()  # text-bank ids that are data records, not text
         try:
             for ln in open(os.path.join(gcx.ROOT, "build", "text", "bank.tsv"), encoding="utf-8"):
