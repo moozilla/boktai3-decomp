@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile one C file with agbcc's pass dumps and answer questions from them.
 
-  rtlprobe.py dump FILE.c [--nonmatching] [--flags -da]
+  rtlprobe.py dump FILE.c [--nonmatching] [--flags=-da]
   rtlprobe.py loop FILE.c [--nonmatching] [--insn N ...] [--regno R ...]
   rtlprobe.py gcse FILE.c [--nonmatching] [--func NAME] [--scan LO:HI] [--expr I ...]
   rtlprobe.py try-t FILE.c T [T ...] [--nonmatching]
@@ -15,7 +15,7 @@ decided it (docs/PERMUTER.md, "Big functions").
 dump  writes every pass (-da: .rtl .jump .cse .addressof .gcse .loop .cse2
       .flow .combine .regmove .lreg .greg .mach) and lists the files. Grep an
       insn number (the `@ N` after each instruction in u.s, from -dp) through
-      them to see where it changed. --flags picks other dumps: -dL loop,
+      them to see where it changed. --flags=-dX (with "=") picks other dumps: -dL loop,
       -dG gcse, -dr rtl, -dc combine, -dN regmove, -dl lreg, -dg greg.
 
 loop  summarises loop.c's invariant-motion decisions: each movable with its
