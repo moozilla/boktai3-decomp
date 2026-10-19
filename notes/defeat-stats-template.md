@@ -34,3 +34,27 @@ Tags: #matching (cloud task 08132748, 2026-10-19)
 8. **Case flags in r4.** Use `register u32 flags asm("r4")`. The last test is destructive: write `else if ((flags) &= 0x800)`.
 
 Only the register pins in 7 and 8 are concessions. `tools/depin.py` kept one of the five.
+
+## sub_08134398 (sibling, 90% draft): the open problem is reload's spill set, not pseudos
+Measured with `-dg` dumps (`build/w/dump.py`: preprocess like build.py, then `agbcc -dp -dg`, and read
+`u.i.greg`). Every remaining difference is a **reload** register, so pins on pseudos can't fix it.
+`rasolve.py` agrees: forcing the ROM's registers on all 96 differing pseudos makes it worse
+(474 bytes).
+
+* `reload1.c` builds one function-wide `spill_regs[]`: the sorted union of every register any instruction
+  had to spill ("Spilling reg N" lines in `.greg`). `allocate_reload_reg` then rotates through it
+  with a persistent `last_spill_reg`. One extra member shifts every later reload.
+* The matched 2D2C spills {r0..r4}. r3 and r4 join only because of the inlined SetControl: `control`,
+  `kind` and an address are live at once while the 0x2B2 and 0x2B0 offsets need reloads (insns 198 and 210).
+* The 4398 ROM's reloads are in r5 and r7. Of 114 constant address offsets, 95 load into r5 and 8 into r7; the
+  r1/r2 ones are probably C-level offset variables, which local-alloc places. So its spill set includes r5/r7. In
+  its prologue, r3/r4 already hold two separate zero values (`movs r3, #0; movs r4, #0` before the
+  `flags2D6` store), so the same SetControl pressure must spill r5 and r7 instead.
+  The 0x2B2 offset is even inherited from the 0x2D6 reload (`subs r5, #0x24`).
+* Still missing: C that gives two zero values that CSE doesn't merge, both born before the
+  `flags2D6` store, without pins. These don't change the spill set (still {r0,r1,r2}):
+  u8/u16/s32 zero types, and `asm("" : "+r"(zero))` barriers.
+  Pins (asm-register variables) do produce r5/r7, but gcc then puts `actor` in r7/r8
+  (unsafe; seen `adds r0, r7, r7`).
+* Next idea: the ROM's very first reload (0x2D6) already uses r5. Find what makes r0..r4 unavailable
+  at that insn. Diff `.greg` "Reloads for insn" between the draft and a hand-built variant.
