@@ -98,7 +98,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/BURST_EMITTER.md](../docs/BURST_EMITTER.md) | Five-slot burst emitter (tentative identity) | *#particles* | 2 |
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
 | [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 20 |
-| [docs/CLOUD.md](../docs/CLOUD.md) | Cloud workers | #tooling #matching | 3 |
+| [docs/CLOUD.md](../docs/CLOUD.md) | Cloud workers | #tooling #matching | 4 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
 | [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 11 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
@@ -108,7 +108,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 46 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
-| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 11 |
+| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
@@ -116,6 +116,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
 | [docs/LIBGCC.md](../docs/LIBGCC.md) | Floating-point runtime identification | *#library* | 4 |
 | [docs/LIBM.md](../docs/LIBM.md) | Math-library source matches | *#library #text* | 5 |
+| [docs/MANAGER_HANDOFF.md](../docs/MANAGER_HANDOFF.md) | Manager handoff (2026-10-19) | #process #tooling | 7 |
 | [docs/MENU_CONTEXT.md](../docs/MENU_CONTEXT.md) | Pause-menu config, sleep, and save context | *#menu* | 3 |
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
 | [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 9 |
@@ -211,6 +212,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 9 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
+| [notes/actor_animation_controller.md](../notes/actor_animation_controller.md) | Actor animation controller (081E34D0-081EAB64) | *#actors #animation #assets #tooling* | 8 |
+| [notes/actor_graphics_and_basic_states.md](../notes/actor_graphics_and_basic_states.md) | Actor graphics and basic states (08021EA8-08024F2C) | #actors #animation | 8 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
@@ -218,16 +221,25 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
 | [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) - not matched | *#sound* | 2 |
+| [notes/cloud-08084F44.md](../notes/cloud-08084F44.md) | Cloud task 08084F44 (Bat, unassigned functions) | #matching #cloud | 1 |
+| [notes/cloud-080BFCC4.md](../notes/cloud-080BFCC4.md) | Cloud task 080BFCC4 | *#actors* | 1 |
+| [notes/cloud-080D2194.md](../notes/cloud-080D2194.md) | Cloud task 080D2194 |  | 1 |
+| [notes/cloud-080D5778.md](../notes/cloud-080D5778.md) | Cloud task 080D5778 |  | 1 |
+| [notes/cloud-08122DF4.md](../notes/cloud-08122DF4.md) | Cloud task 08122DF4 | *#scripts #particles #animation #assets* | 2 |
+| [notes/cloud-08132904.md](../notes/cloud-08132904.md) | Cloud task 08132904 |  | 1 |
+| [notes/cloud-08132D2C.md](../notes/cloud-08132D2C.md) | Cloud task 08132D2C |  | 1 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
 | [notes/contact-sequence-actor_2026-10-14.md](../notes/contact-sequence-actor_2026-10-14.md) | Sequence contact actor pool, October 14 | *#actors* | 6 |
 | [notes/contact-swarm_2026-10-14.md](../notes/contact-swarm_2026-10-14.md) | Contact swarm, 08043F64–08044C80 | *#assets* | 4 |
 | [notes/countdown-timer_2026-10-14.md](../notes/countdown-timer_2026-10-14.md) | Singleton countdown timer |  | 2 |
+| [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 6 |
 | [notes/dialogue-vm_2026-10-12.md](../notes/dialogue-vm_2026-10-12.md) | Dialogue interpreter and scrolling controller |  | 2 |
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
+| [notes/far-branch-tails.md](../notes/far-branch-tails.md) | Far-branch tails: big functions that were split in pieces | #matching #tooling | 2 |
 | [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
 | [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |
 | [notes/foundry-display-resources_2026-10-18.md](../notes/foundry-display-resources_2026-10-18.md) | Foundry display resource functions, 2026-10-18 | #matching #assets | 2 |
@@ -242,6 +254,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/foundry-scene-npc-callbacks_2026-10-18.md](../notes/foundry-scene-npc-callbacks_2026-10-18.md) | Foundry: scene NPC callbacks, 2026-10-18 | #matching #foundry #state-actor | 2 |
 | [notes/grid_attack_actor.md](../notes/grid_attack_actor.md) | Grid attack actor unit consolidation | #grid-attack-actor #unit #matching #080297E8 #0802C678 | 5 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
+| [notes/large_scene_animation_controller.md](../notes/large_scene_animation_controller.md) | Large scene animation controller = Nidhoggr boss (081915E0-0819792C) | *#scene #animation* | 5 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
 | [notes/mgs-gcl-round2.md](../notes/mgs-gcl-round2.md) | MGS/GCL matching round 2 | *#scripts #matching* | 2 |
@@ -308,6 +321,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
+| [notes/script_virtual_machine.md](../notes/script_virtual_machine.md) | Script virtual machine, merged unit | *#scripts* | 8 |
 | [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
