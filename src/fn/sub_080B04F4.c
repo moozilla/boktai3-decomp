@@ -2,7 +2,6 @@
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (sub_080C2BE0) with control sub_080AEA80 and halfword flags at +0x6D4 (provisional name) */
 #define SceneActorControl_UpdateProbeApproach_080B04F4 sub_080B04F4
-/* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 
 #include "scene_actor_control_phase.h"
 u8 sub_080B335C(struct SceneActorRegistryResetView *);
