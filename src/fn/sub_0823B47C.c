@@ -1,7 +1,6 @@
 #include "global.h"
 
 /* tentative: drifts an offset along an 8-way heading and sets facing from it */
-#define ActorMotion_ApplyHeadingDrift sub_0823B47C
 
 #ifdef NONMATCHING
 // fuzzy: 99.4%
@@ -29,7 +28,7 @@ struct Obj {
     u8 enabled;
 };
 
-void sub_0823B3C4(struct Obj *);
+void Player_ClampCameraOffsets_0823B3C4(struct Obj *);
 
 static inline s32 scale(s32 v)
 {
@@ -48,13 +47,13 @@ void ActorMotion_ApplyHeadingDrift(struct Obj *p)
         p->offY = 0;
         p->offZ = 0;
         p->init = 1;
-        sub_0823B3C4(p);
+        Player_ClampCameraOffsets_0823B3C4(p);
     }
     if (p->heading != -1) {
         u32 a = ((p->heading + 1) & 7) * 32;
         p->offX -= scale(gUnk_086149C4[(a + 64) & 255] * 30);
         p->offZ -= scale(gUnk_086149C4[a] * 30);
-        sub_0823B3C4(p);
+        Player_ClampCameraOffsets_0823B3C4(p);
     }
     if ((p->offX != 0 || p->offZ != 0) && p->enabled) {
         s32 a = ((u16)Math_Atan2(p->offX, p->offZ) + 0x70) >> 5;
@@ -72,5 +71,5 @@ void ActorMotion_ApplyHeadingDrift(struct Obj *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823B47C);
+INCLUDE_ASM("asm/nonmatching", ActorMotion_ApplyHeadingDrift);
 #endif

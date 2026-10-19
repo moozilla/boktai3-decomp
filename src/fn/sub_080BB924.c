@@ -1,6 +1,5 @@
 #include "global.h"
 /* Re-enable the shadow, then restore the actor's live control fields from its saved snapshot (+0x118..) and reset its state; goes idle when flag 0x4000 is set (tentative) */
-#define Actor_RestoreSnapshot sub_080BB924
 
 typedef struct Ctx {
     u8 pad0[0x62A];

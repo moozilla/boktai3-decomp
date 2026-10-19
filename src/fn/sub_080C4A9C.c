@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* Golem_RestoreRoute: unless flags2D4 bit 0x100 is set, restores after a delay, records the follow-up control (chase when flags2D4 & 0x80, else the entry target) and routes back toward the chased object via the route point (provisional name) */
-#define Golem_RestoreRoute sub_080C4A9C
 #include "scene_actor_chase.h"
 
 static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
@@ -13,7 +12,7 @@ static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
     saved[10] = behavior;
 }
 
-void sub_080C4A9C(struct SceneActorRegistryResetView *actor)
+void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     u16 *flags;
