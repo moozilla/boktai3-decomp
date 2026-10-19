@@ -1394,3 +1394,4 @@ addr,function,name,family,note
 0823DDE4,sub_0823DDE4,SceneVec_OffsetPolar,"SceneVec","offsets X and Z by a scaled sine/cosine pair"
 08242F7C,sub_08242F7C,Player_FindMaskedSlot,"Player selection","selects the first player slot in a mask or slot zero"
 082433C8,sub_082433C8,Player_ApplyGatedContact,"Player contact / ContactCollider","gates contact processing with collider response bits"
+0802BF30,sub_0802BF30,GridAttack_Update,"Grid attack actor","runs the grid attack update steps and cycles a frame timer"
