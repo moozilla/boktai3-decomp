@@ -16,9 +16,10 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
         p->dirty &= ~3;
         {
             register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_Close;
-            asm("" : "+r"(p) : "r"(state));
+            do {
             p->state = state;
             p->timer = 0;
+            } while (0);
         }
     }
     p->dirty |= 4;
