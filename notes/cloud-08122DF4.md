@@ -15,9 +15,9 @@
 * `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
-* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6%. Every
-  instruction matches. Only 19 differ, all of them stack-slot numbers of four spilled GCSE/PRE reaching
-  registers plus three reload choices that follow from them (see "PRE register numbering" below).
+* `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6% (25 bytes).
+  Every instruction matches. Left: stack slots of four spilled GCSE/PRE reaching registers, and six
+  register choices from cse2 (see "Third round" below; they do *not* follow from the slots).
   Structural differences went 2875 -> 0 with the changes below.
 
 ## Techniques found on 08123194 (apply to any big function)
@@ -101,3 +101,27 @@ fewer insns at GCSE time) or a quite different pseudo numbering. About 180 QImod
 triples come from C narrowing `u8` arithmetic (`*p >> 4`, `*p & 15`) and are removed later by combine,
 so those are the likely place the original's RTL was smaller. I did not find C that removes them
 without changing the code. Variable placement and declaration order only move T by at most ±16.
+
+### Third round on 08123194 (24 -> 19 differing halfwords)
+
+* **Diagnostic compiler.** A copy of agbcc's gcc/ with `GCSE_T` (overrides the expression hash table
+  size in gcse.c `alloc_expr_hash_table`) and `CSE_DEBUG`/`CSE_NOCANON` (trace / veto cse.c
+  `make_regs_eqv` making a new register canonical) separates the causes. Build: copy
+  `build/tools/agbcc/gcc`, patch, `make`; run with `AGBCC=.../agbcc` (build.py honours it). Never for
+  committed code.
+* **Slots.** ROM order is expr 217 (0x800 path `cell+1`) @0x44, 1907 (`&found[preferred]`) @0x48,
+  1178 (`cell-1`) @0x4c, 1075 (`cell+1`) @0x50. With `GCSE_T` anywhere in 2267..2347 the four slots
+  match, nothing else changes. No pseudo renumbering at T near 2593 gives that order (hash:
+  `(13773+a)%T`, `(14419+c)%T`, `(13771+b)%T` with a=cell(0x800 path), b=cell(else path), c=preferred;
+  brute-forced), so the original had roughly 500..650 fewer insns at GCSE. Cutting only after
+  `preferred` (the else-path Seeks) is pseudo-neutral; uniform cuts would need about 32%. Free cuts that keep the
+  code: the CanEnter shape checks through `u32 b = *Properties(i); b >> 4` (-4 T per site). The same
+  in Seek changes loop.c hoisting of the 15 (loops are 112 insns; the second 15 hoists below 90).
+* **Two C fixes.** Seek needs `return 0;` at the end of the `cell < target` branch (in the
+  `found = Seek(cell, cell - 1)` copy that branch is dead, and its exits then skip `found = 0`), and the
+  found[] scan does `goto check` (ROM re-tests `result < 0`), not `goto deflect`.
+* **The r9 choices (0xaae/ab4/aca, 0x1852/1858/187a).** In ROM, the uses of PRE's register for
+  `cell+1` read Seek's `target` (r9). In ours, cse2's `make_regs_eqv` makes the reaching register
+  canonical, because its last use (the dead `i = cell + 1` in the next Seek copy) is 58 insns after
+  `target`'s last use (cuid 3011 vs 2953; 6052 vs 5995 for the else path). Vetoing that alone does not give the ROM:
+  it makes `i` canonical instead, so the full set of equivalences differs. Still open.
