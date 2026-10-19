@@ -1426,3 +1426,4 @@ addr,function,name,family,note
 081A61EC,sub_081A61EC,PositionedEffect_InitAttackCollider,"PositionedEffect","initializes an attack collider using the object's attack ID"
 081A67A0,sub_081A67A0,PositionedEffect_UpdateOscillatingCoordinates,"PositionedEffect coordinates","updates half-scale coordinates with sine-driven vertical motion"
 081A6920,sub_081A6920,ScreenPalette_UpdateState,"ScreenPaletteTransition","advances palette transition state and screen jitter"
+081A6DCC,sub_081A6DCC,Camera_BlendOffset,"CameraOffset","blends two vectors into an eight-frame camera offset"
