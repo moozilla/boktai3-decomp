@@ -12,7 +12,9 @@
   reaches it". Writing `counter = &s->hidden; ... counter = &s->delay; ... counter = (u16 *)&s->riseSteps;`
   (one variable for all three) makes them one pseudo, which then takes r2 from the first use.
   The first use then needed `asm("" ::: "memory")` after the flag store, because the ROM reloads the counter there.
-* `08125528` is a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
+* `08125528` MATCHED (SpreadShot_Step). The fix was removing pointer locals (`position`, `yp`, `zp`, `vz`,
+  `kind`) and writing `s->field` everywhere (see the PRE-copies technique below). Old note, kept for history:
+  `08125528` was a NONMATCHING draft. Instruction count and structure match; only allocation differs. Two hints for whoever resumes it:
   the original reaches the position through separate field pointers (x through `position`, y and z through their own
   pointers kept in r6/sb), and the CellHeight inline's position parameter is a separate copy (`adds r5, r7, #0`).
 * `08123194` (8964 bytes with its tails 08124240/08125138) is a NONMATCHING draft at 99.6%. Every
@@ -101,3 +103,14 @@ fewer insns at GCSE time) or a quite different pseudo numbering. About 180 QImod
 triples come from C narrowing `u8` arithmetic (`*p >> 4`, `*p & 15`) and are removed later by combine,
 so those are the likely place the original's RTL was smaller. I did not find C that removes them
 without changing the code. Variable placement and declaration order only move T by at most ±16.
+
+## Technique: late register copies of a field address are PRE's, so delete the pointer local
+
+When the ROM computes `&s->field` into a low register, uses it, and only at the *end of the block*
+copies it (`adds r7, r0, #0`, `mov sb, r1`, `mov sl, r0`), the copy is a GCSE/PRE reaching register.
+The original source wrote `s->field` (or `&s->field`) at each use and had no local pointer. If yours
+declares `u8 *kind = &s->kind;` you get the pointer computed straight into its final register plus an
+extra copy wherever the value is reused. On 08125528, removing `position`, `yp`, `zp`, `vz` and `kind`
+(keeping `vx` and `timer`) went from 85 differing instructions to an exact match. For a value that is
+read before its pointer is spilled (`ldrh r1, [r0]; str r0, [sp]`), write `t = s->timer; timer =
+&s->timer; if (t) ...`. Test locals one at a time: on 08123194 the `position` local is genuinely needed.
