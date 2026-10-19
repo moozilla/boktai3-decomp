@@ -1491,3 +1491,4 @@ addr,function,name,family,note
 081BFC14,sub_081BFC14,Storage_BeginModeSelection,"Storage category menu","initializes mode selection grid and category palette"
 081BFD00,sub_081BFD00,Storage_UpdateBrowse,"Storage 3 (auto, tentative); StorageMenu","updates category browsing, blinking, animations and close input"
 081BFFD8,sub_081BFFD8,DirectionMarker_Update,"DirectionMarker (tentative)","picks a facing quadrant from dx/dy, updates the sprite animation if it changed, and steps it"
+081C0390,sub_081C0390,TetherActor_InitRequestIndicator,"Tether actor request indicator (TetherActor_CreateRequestIndicator / UpdateRequestIndicator / DestroyRequestIndicator)","init the tether request-indicator task: load/relocate its anim resource, set up keyframes, grab its scene actor"
