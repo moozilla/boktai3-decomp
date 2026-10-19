@@ -17,9 +17,16 @@ longer-term directions.
 
 ## Setup (already done for you)
 
-Your worktree is a full checkout with `baserom.gba`, `gen/` (generated
-asm, shared, **read-only**) and `build/tools` (agbcc) symlinked in. Run
+Your worktree is a full checkout set up by `tools/worktree.sh` (if `gen/` or
+`build/boktai3.elf` is missing, run `tools/worktree.sh --here` first: it takes
+seconds). `baserom.gba`, `build/tools` (agbcc) and `build/venv` are symlinks;
+`gen/`, `build/res/`, `build/text/`, the verified `build/boktai3.elf` and the
+compiled objects are clones of the built base checkout (`../b3-base`). Run
 everything from the worktree root.
+
+Check with `tools/check.py FILE.c` (seconds). **Don't run `tools/build.py` or
+`make`** in a worker: the full ROM build takes minutes and runs once per batch
+at integration, which is where layout problems are caught.
 
 ## Loop
 
