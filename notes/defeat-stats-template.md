@@ -33,6 +33,17 @@ Tags: #matching (cloud task 08132748, 2026-10-19)
 7. **Copy after the switch index.** The collider copy comes after `subs r0, #1`: use `u32 index = *category - 1; collider = hit; switch (index)` with 0-based case labels. The temp gets r3 through a pinned offset: `register u32 offset asm("r4") = 0x134; asm("" : "+r"(offset)); hit = (u8 *)actor + offset;`.
 8. **Case flags in r4.** Use `register u32 flags asm("r4")`. The last test is destructive: write `else if ((flags) &= 0x800)`.
 
+**Update (2026-10-19): no pins are needed for 8 or for the counter offsets.** Two macro
+details caused them. (a) `do { } while (0)` around `KILL_KIND`/`CASE_BODY` is a loop to
+`flow.c`, which adds the loop depth to every use inside, so the case flags outranked the
+counter pointer. Use plain braces. (b) The saturating counter is an if/else with two stores
+(`if (*p < 9999) *p = *p + 1; else *p = 9999;`): the second store gives the counter pointer
+the uses it has in the original, and cross-jumping merges the stores back into one `strh`.
+With both changes sub_08132D2C needs no pins. The same fix removed 18 pins each from
+sub_080EE1B0 and sub_080BD1F0. (sub_08134398 is still a 90% draft: check it with
+`check.py --full` on a copy without the `#else INCLUDE_ASM` branch, or the check compiles
+the fallback asm and reports a false match.)
+
 Only the register pins in 7 and 8 are concessions. `tools/depin.py` kept one of the five.
 
 ## sub_08134398 (sibling, 90% draft): the open problem is reload's spill set, not pseudos
