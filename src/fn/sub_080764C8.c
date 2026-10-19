@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
 void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationView *actor,
                                                      s32 index, u32 variantArgument)
@@ -10,8 +9,8 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
     u8 *mirrorPointer;
     u8 *variantPointer = &directionVariant;
     u32 flags;
-    register u8 mirrorValue asm("r1");
-    register u8 entryFlags asm("r0");
+    u8 mirrorValue;
+    u8 entryFlags;
     u8 *variantReload;
     u32 force;
     u8 *restart;
@@ -27,16 +26,19 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
             *variantPointer = quadrant;
         }
     }
+    do {
     variantReload = &directionVariant;
     mirrorValue = *mirrorPointer;
     entryFlags = entry->flags;
+    } while (0);
     selection = entry->value;
     flags = mirrorValue | entryFlags;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
-    } else
+    } else {
         force = 0;
+    }
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->selection = selection;
@@ -59,27 +61,30 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
         savedSelection = &actor->selection;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
-            if (flags == 1 && (tile->flags & 4))
+            if ((flags == 1) && (tile->flags & 4)) {
                 return;
-            if (flags == 0 && !(tile->flags & 4))
+            }
+            if ((flags == 0) && (!(tile->flags & 4))) {
                 return;
+            }
         }
         *savedSelection = selection;
         {
             u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & mask) {
                 mode = 6;
-            else
+            } else {
                 mode = 4;
+            }
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
-            asm("" : "+r"(flags));
-            if (flags)
+            if (flags) {
                 tile->flags |= mask;
-            else
+            } else {
                 tile->flags &= ~4;
+            }
         }
     }
     *restart = 0;
