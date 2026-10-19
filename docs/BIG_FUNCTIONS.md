@@ -188,4 +188,23 @@ Free T reductions that keep the code
 byte-identical: a `u32 Shape(i) { u32 b = *Properties(i); return b >> 4; }`
 accessor in CanEnter (−4 per site). The same accessor in Seek, a u8→s32 return
 from Seek (−56) and a u32 `CellAttributes` (−60) all change loop hoisting or
-jump threading. Declaration order moves T by ±16 at most. This is open.
+jump threading. Declaration order moves T by ±16 at most.
+
+**How it was closed (PR #311, exact match).** Lowering T was a dead end;
+raising it was not, because the order depends on the pseudo numbers inside the
+expressions as well as on T.
+1. Sweep the forced T to get the exact set of T values that match:
+   `rtlprobe.py try-t FILE.c 2201:3001 --nonmatching` prints windows of equal
+   results (25 s for 55 values with `-j`). The sweep is sharper than `--need`:
+   on the 99.6% draft it shows 2267..2303 and 2337..2347, but not 2305..2335.
+2. Fit a bucket-order model that reproduces the sweep exactly (here: the
+   order of expressions 7, 6 and 4, and A < C < Bm < Bp with A = (13773 + a) % T,
+   C = (14419 + c) % T, Bm = (13771 + b) % T for the pseudos a, b and c inside them).
+3. Search C edits that keep the code identical and land (T, a, b, c) in the
+   model's region. Two worked together: a function-scope `cell` variable
+   renumbered its pseudo (396 → 30) without changing T, and a u16-returning
+   wrapper (through an s16 local) at Seek's `position->y =` stores added 80 insns
+   of narrowing that combine removes again, raising T by 80.
+
+Narrowing that combine later deletes is a free knob for the insn count at GCSE;
+a function-scope variable is a free knob for a pseudo's number.
