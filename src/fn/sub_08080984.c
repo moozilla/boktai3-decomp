@@ -34,13 +34,15 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                     Sound_PlaySong(459);
                     break;
-        }
+            }
             {
                 u16 *timer = (u16 *)(((u8 *)actor) + 0x178);
                 timerZero = 0;
                 *timer = timerZero;
             }
-        } while (0);
+        }
+        while (0)
+            ;
         if (actor->drawableKind == 0) {
             u32 *sequence = actor->drawable;
             u32 mask = timerZero - 2;
