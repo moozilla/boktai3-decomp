@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 65.5% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: 72.5% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Skeleton: on entry play the category's directional rise animation (0x63/0x65/0x67) or hand
  * over to SceneActorReaction_PlayAnimationBUntilComplete; once done, return to the route
  * point, then either resume the route (target cell reached) or walk toward the target cell
@@ -344,9 +344,9 @@ static inline void SetCtlZ(struct SceneActorRegistryResetView *actor, void *cb, 
     }
     actor->word104 = 0;
 }
-static inline void ReturnHome(void *argument)
+static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
 {
-    struct SceneActorRegistryResetView *actor = argument;
+    struct SceneActorRegistryResetView *actor = (void *)outer;
     struct SkeletonGroup *group = (void *)&actor->group;
     struct ContactPosition *destination;
     struct SkeletonRouteLink *link;
@@ -408,14 +408,14 @@ static inline void ReturnHome(void *argument)
                 group->destination->pad = 0;
             }
         }
-        Resume(actor, group, actor->direction);
-        sub_0807E334(actor);
+        Resume(outer, group, actor->direction);
+        sub_0807E334(outer);
         actor->field2C2 = 0x20;
         return;
     } else {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (MoveTo(actor, group, &center))
+        if (MoveTo(outer, group, &center))
             return;
     }
 fail:

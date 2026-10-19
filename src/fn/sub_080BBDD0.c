@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 76.7% (agent draft, in progress; see notes/cloud-08122DF4.md)
+// fuzzy: 79.9% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
  * return to the route point or chase the player target (tentative). */
 void sub_0807E334(void *);
@@ -288,8 +288,12 @@ static inline u8 ReturnHome(void *p)
             }
             SetState(actor, 0, 0, 5);
             destination = group->destination;
-            destination->x = group->link.point->x;
-            destination->z = group->link.point->z;
+            {
+                struct ApproachRouteLink *link = &group->link;
+                destination->x = link->point->x;
+                destination->z = link->point->z;
+            }
+
             destination->y = CellHeight(destination, CellIndex(destination));
             group->destination->y = CellHeight(group->destination, CellIndex(group->destination));
             group->destination->pad = 0;
@@ -343,9 +347,14 @@ static inline u8 IsSettled(s32 dx, s32 dz)
     return 0;
 }
 
-static inline void Approach(struct SceneActorRegistryResetView *actor)
+static inline void ClearSettleFlags(struct SceneActorRegistryResetView *actor)
 {
-    struct ApproachGroup *group = (void *)&actor->group;
+    u16 *f = &actor->flags2D4;
+    s32 m = ~0x120;
+    *f &= m;
+}
+static inline u8 Drift(struct SceneActorRegistryResetView *actor)
+{
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
@@ -371,69 +380,74 @@ static inline void Approach(struct SceneActorRegistryResetView *actor)
     actor->motion.z += dz;
     *(s16 *)((u8 *)actor + 0x318) += dx;
     *(s16 *)((u8 *)actor + 0x31C) += dz;
-    if (IsSettled(dx, dz)) {
-        u8 *context = actor->context;
-        u32 *flags2CC;
-        u32 mask;
-        actor->field2B0 = 1;
+    return IsSettled(dx, dz);
+}
+static inline void Settle(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
+                          u8 *context)
+{
+    u32 *flags2CC;
+    u16 test;
+    u32 mask;
+    ClearSettleFlags(actor);
+    flags2CC = &actor->flags2CC;
+    {
+        s32 m = ~0x80;
+        *flags2CC &= m;
+    }
+    if (actor->field2DC & 0x80000) {
+        u32 mask = 2;
+        u16 *flags = &actor->flags2D6;
+        *flags = mask | *flags;
+        return;
+    }
+    mask = 0x80;
+    test = actor->flags2D4 & mask;
+    if (test) {
+        *flags2CC |= mask;
+
+        group->flags414 |= 4;
+        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        if (!ReturnHome(actor)) {
+            if (!Chase(actor, group)) {
+                Callback_InvokeActor(actor, group->failure);
+                return;
+            }
+        }
         {
-            s32 m = ~0x120;
-            actor->flags2D4 &= m;
+            void *control = group->entryControl41C;
+            SetControl(actor, 0x1A, control);
         }
-        flags2CC = &actor->flags2CC;
+        SetState(actor, 0, 0, 12);
+    } else {
+        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
         {
-            s32 m = ~0x80;
-            *flags2CC &= m;
+            u32 mask = 0x10;
+            actor->flags2CC |= mask;
         }
-        if (actor->field2DC & 0x80000) {
-            u32 mask = 2;
-            u16 *flags = &actor->flags2D6;
-            *flags = mask | *flags;
-            return;
+        group->destination->pad = 0;
+        if (!ReturnHome(actor)) {
+            *(u16 *)(context + 0x6F0) = 0;
+            if (!Chase(actor, group)) {
+                Callback_InvokeActor(actor, group->failure);
+                return;
+            }
         }
-        mask = 0x80;
-        if (actor->flags2D4 & mask) {
-            *flags2CC |= mask;
-            group->flags414 |= 4;
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
-            if (!ReturnHome(actor)) {
-                if (!Chase(actor, group)) {
-                    Callback_InvokeActor(actor, group->failure);
-                    return;
-                }
-            }
-            {
-                void *control = group->entryControl41C;
-                SetControl(actor, 0x1A, control);
-            }
-            SetState(actor, 0, 0, 12);
-        } else {
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
-            {
-                u32 mask = 0x10;
-                actor->flags2CC |= mask;
-            }
-            group->destination->pad = 0;
-            if (!ReturnHome(actor)) {
-                *(u16 *)(context + 0x6F0) = 0;
-                if (!Chase(actor, group)) {
-                    Callback_InvokeActor(actor, group->failure);
-                    return;
-                }
-            }
-            {
-                void *control = actor->entryTarget228;
-                SetControl(actor, 1, control);
-            }
-            SetState(actor, 0, 0, 7);
-            actor->field2C2 = 0x20;
+        {
+            void *control = actor->entryTarget228;
+            SetControl(actor, 1, control);
         }
+        SetState(actor, 0, 0, 7);
+        actor->field2C2 = 0x20;
     }
 }
-
 void sub_080BBDD0(struct SceneActorRegistryResetView *actor)
 {
-    Approach(actor);
+    struct ApproachGroup *group = (void *)&actor->group;
+    if (Drift(actor)) {
+        u8 *context = actor->context;
+        actor->field2B0 = 1;
+        Settle(actor, group, context);
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080BBDD0);
