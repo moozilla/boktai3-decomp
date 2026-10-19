@@ -8,7 +8,7 @@
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 u8 sub_08131D5C(void *);
-void sub_08135F38(void *);
+void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorBehavior_PlayReactionSound(void *);
@@ -240,14 +240,14 @@ u8 sub_08135F70(struct SceneActorRegistryResetView *actor)
         if (sub_08131D5C(actor)) {
             flags2D4 = &actor->flags2D4;
             UpdateHitFlags(actor, flags2D4);
-            sub_08135F38(actor);
+            SceneActor_ClearReactionFlags(actor);
             return 1;
         }
         return 0;
     }
     if (SceneActorBehavior_DispatchFlaggedCategory(actor))
         return 1;
-    sub_08135F38(actor);
+    SceneActor_ClearReactionFlags(actor);
     SceneActorMovement_ProjectProbe(actor, FIELD(actor, 0x174, u16), FIELD(actor, 0x174, u16));
     {
         u32 d = actor->reactionSoundVariant;

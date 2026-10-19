@@ -16,7 +16,7 @@ void SceneMenuPanel_StartPaletteTransition(struct SceneMenuPanel *, u16, u32, s3
 void Sound_PlaySong(u32);
 void SceneMenuPanel_SetCallback(struct SceneMenuPanel *, void (*)(void), s32);
 void MenuTransition_UpdateWidgetFlicker(void);
-void sub_0816EF4C(void);
+void MenuTransition_AnimateMetersToTarget(void);
 void SceneMenuPanel_FinishResultMotion(struct SceneMenuPanel *panel)
 {
     if (SceneMenuPanel_UpdateMotion(panel, 0)) {
@@ -30,7 +30,7 @@ void SceneMenuPanel_FinishResultMotion(struct SceneMenuPanel *panel)
             if (panel->result == 0)
                 SceneMenuPanel_SetCallback(panel, MenuTransition_UpdateWidgetFlicker, 1);
             else
-                SceneMenuPanel_SetCallback(panel, sub_0816EF4C, 1);
+                SceneMenuPanel_SetCallback(panel, MenuTransition_AnimateMetersToTarget, 1);
         }
     }
 }

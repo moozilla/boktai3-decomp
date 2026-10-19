@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.3%
 // foundry draft (worker best 85.5%); what differs is mostly register allocation and instruction order
-#define Armor_TriggerBehavior35 sub_0818BDAC
 struct ArmorActor {
     u8 pad0[0xb32];
     u16 flags;
@@ -14,7 +13,7 @@ struct ArmorActor {
 };
 void ActorController_SetBehavior(struct ArmorActor *, s32);
 
-void sub_0818BDAC(void *unused0, void *unused1, struct ArmorActor *p)
+void Armor_TriggerBehavior35(void *unused0, void *unused1, struct ArmorActor *p)
 {
     if (!(p->flags & 0x80)) {
         if ((u8)(p->type - 4) <= 1) {
@@ -33,5 +32,5 @@ void sub_0818BDAC(void *unused0, void *unused1, struct ArmorActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818BDAC);
+INCLUDE_ASM("asm/nonmatching", Armor_TriggerBehavior35);
 #endif

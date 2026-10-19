@@ -9,7 +9,7 @@
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
  * counter per collider reaction flag) and a six-spark burst.
  * Pins: the spark table and the constant 1 of the two spark bursts. Kill counters are an
- * if/else, as in sub_080EE1B0, which keeps them pin-free. The burst arguments
+ * if/else, as in Ivy_UpdateDefeat, which keeps them pin-free. The burst arguments
  * live in function-scope variables, which the ROM rematerialises at each call. */
 void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);

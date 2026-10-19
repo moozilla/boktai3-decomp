@@ -14,7 +14,7 @@ struct Owner {
     struct Elem elems[8];
 };
 u32 AnimData_FindEntry(u32);
-void sub_08217DE0(struct Elem *, u32, s32);
+void ParticleSprite_Initialize(struct Elem *, u32, s32);
 void Effect_SetOrigin(struct Elem *, s32, s32);
 void SpriteDrawable_SelectTileFrame(struct Elem *, u32, s32);
 void Effect_SetPalette(struct Elem *, s32);
@@ -26,7 +26,7 @@ void HealthRestoreEffect_InitParticlePool(struct Owner *p)
     s32 i;
     for (i = 0; i < 8; e++, i++) {
         p->elems[i].data = resource;
-        sub_08217DE0(e, resource, 17);
+        ParticleSprite_Initialize(e, resource, 17);
         Effect_SetOrigin(e, -4, -4);
         SpriteDrawable_SelectTileFrame(e, p->elems[i].data, 2);
         Effect_SetPalette(e, 1);

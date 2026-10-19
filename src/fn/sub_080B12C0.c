@@ -4,10 +4,9 @@
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
-#define SceneActor_SelectDistantRoutePoint sub_080B12C0
-#define Route_GetPoints                    Path_GetPointData
-#define gRandomIndex                       gUnk_03005308
-#define gRandomTable                       gUnk_0203B400
+#define Route_GetPoints Path_GetPointData
+#define gRandomIndex    gUnk_03005308
+#define gRandomTable    gUnk_0203B400
 struct SceneActorRouteSelection {
     u8 unknown0[0x2be];
     u16 groundHeight;
@@ -31,8 +30,9 @@ static inline s32 randomValue(void)
     table = gUnk_0203B400;
     return *(const u16 *)(offset + (u32)table);
 }
-void sub_080B12C0(struct SceneActorRouteSelection *p, struct ContactPosition *out,
-                  struct ContactPosition *origin, s32 limit)
+void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
+                                        struct ContactPosition *out, struct ContactPosition *origin,
+                                        s32 limit)
 {
     struct SceneActorRouteSelection *actor = p;
     struct RouteSpriteRoute route;
@@ -80,5 +80,5 @@ void sub_080B12C0(struct SceneActorRouteSelection *p, struct ContactPosition *ou
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B12C0);
+INCLUDE_ASM("asm/nonmatching", SceneActor_SelectDistantRoutePoint);
 #endif

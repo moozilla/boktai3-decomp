@@ -8,7 +8,7 @@ struct A {
     s32 n;
     struct E e[8];
 };
-void sub_081B7394(void *, void *, s32);
+void EffectPool_InitSlot(void *, void *, s32);
 
 s32 VanargandAfterimagePool_Init(struct A *p)
 {
@@ -16,7 +16,7 @@ s32 VanargandAfterimagePool_Init(struct A *p)
     struct E *e;
     p->n = 0;
     for (i = 0, e = p->e; i <= 7; i++) {
-        sub_081B7394(p, e, i);
+        EffectPool_InitSlot(p, e, i);
         e++;
     }
     return 0;

@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 90.3%
 // foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
-#define EffectPool_Destroy sub_0813AD08
-#define gEffectPool        gUnk_020001E0
+#define gEffectPool gUnk_020001E0
 struct EffectPoolEntry {
     u8 pad00[0x17];
     s8 effectIndex;
@@ -24,7 +23,7 @@ static inline void ClearEffectPool(void)
 {
     gUnk_020001E0 = 0;
 }
-s32 sub_0813AD08(struct EffectPool *pool)
+s32 EffectPool_Destroy(struct EffectPool *pool)
 {
     struct EffectPoolEntry *entry = pool->entries;
     s32 count = 31;
@@ -38,5 +37,5 @@ s32 sub_0813AD08(struct EffectPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813AD08);
+INCLUDE_ASM("asm/nonmatching", EffectPool_Destroy);
 #endif

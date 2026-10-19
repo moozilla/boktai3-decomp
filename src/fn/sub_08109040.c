@@ -2,8 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 90.0%
 // foundry draft (worker best 90.0%); what differs is mostly register allocation and instruction order
-#define SelectionSlots_ClearValue sub_08109040
-#define gSelectionSlots           gUnk_020004B4
+#define gSelectionSlots gUnk_020004B4
 struct SelectionSlots {
     u8 pad0[0x53];
     u8 busy;
@@ -18,7 +17,7 @@ static inline void *SelectionSlots_GetView(void)
         return 0;
     return gUnk_020004B4->slotView;
 }
-s32 sub_08109040(void *unused, s32 value)
+s32 SelectionSlots_ClearValue(void *unused, s32 value)
 {
     s8 *slot;
     s32 i;
@@ -35,5 +34,5 @@ s32 sub_08109040(void *unused, s32 value)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08109040);
+INCLUDE_ASM("asm/nonmatching", SelectionSlots_ClearValue);
 #endif

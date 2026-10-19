@@ -54,7 +54,7 @@ void Registry1745_SetState(void *, s32, void (*)(void));
 u8 *Script_GetTextSourcePc(void);
 void Hud_SetMode(s32);
 void SessionMenu_Destroy(void *);
-void sub_08109D94(void);
+void ScriptPanel_ConfirmSelection(void);
 void sub_0810B724(void);
 /* Registry routine 1745: creates the singleton at gUnk_020004B4 (0x268
    bytes) from the script options; returns the existing one if there is one,
@@ -108,7 +108,7 @@ struct Registry1745 *Registry1745_Create(void)
     }
     Registry1745_ResetTransferCounters(m);
     Registry1745_InitSessionSettings(m);
-    Registry1745_SetState(p, 1, sub_08109D94);
+    Registry1745_SetState(p, 1, ScriptPanel_ConfirmSelection);
     p->field20 = 3;
     p->fieldD4 = Script_GetKeywordValue('U', 0);
     p->fieldD0 = Script_GetKeywordValue('Y', 0);

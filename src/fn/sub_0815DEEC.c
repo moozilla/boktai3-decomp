@@ -5,7 +5,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.1%
 // foundry draft (worker best 92.5%); what differs is mostly register allocation and instruction order
-#define PlayerCue_ApplyColliderScale sub_0815DEEC
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);
 void Collider_SetContactMode(void *, u32);
@@ -19,7 +18,7 @@ static inline u32 PlayerCue_TestFlags(struct Player *p, u32 mask)
         return 0;
     return ReadMaskedFlags(mask, &p->actionFlags);
 }
-void sub_0815DEEC(struct Player *p, void *collider)
+void PlayerCue_ApplyColliderScale(struct Player *p, void *collider)
 {
     s32 scale = 64;
     if (PlayerCue_TestFlags(p, 0x80000))
@@ -53,5 +52,5 @@ void sub_0815DEEC(struct Player *p, void *collider)
     Collider_SetContactMode(collider, scale);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815DEEC);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_ApplyColliderScale);
 #endif

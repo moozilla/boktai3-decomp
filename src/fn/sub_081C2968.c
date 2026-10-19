@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
-#define ParticlePool_FindFreeEntry sub_081C2968
 /* Tentative particle pool: caller clears bit zero and increments the count. */
 struct ParticleEntry {
     u32 flags;
@@ -14,7 +13,7 @@ struct ParticlePool {
     u8 unknown718[0x60];
     s32 count;
 };
-struct ParticleEntry *sub_081C2968(struct ParticlePool *p)
+struct ParticleEntry *ParticlePool_FindFreeEntry(struct ParticlePool *p)
 {
     s32 i, offset;
     u32 mask;
@@ -38,5 +37,5 @@ fail:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C2968);
+INCLUDE_ASM("asm/nonmatching", ParticlePool_FindFreeEntry);
 #endif

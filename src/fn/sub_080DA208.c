@@ -5,15 +5,13 @@
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // foundry draft (worker best 92.6%); what differs is mostly register allocation and instruction order
-#define SceneActor_StartAdjacentCellRoute sub_080DA208
-#define SceneActor_FindDirectionalCell    sub_080D9B20
-#define gCurrentTerrainMap                gUnk_030052F4
+#define gCurrentTerrainMap gUnk_030052F4
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_080D9B20(void *, s32);
-s32 sub_080DA208(struct SceneActorRegistryResetView *actor)
+s32 SceneActor_FindDirectionalCell(void *, s32);
+s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *parent = actor->context;
@@ -28,7 +26,7 @@ s32 sub_080DA208(struct SceneActorRegistryResetView *actor)
     struct ContactPosition *position;
     s32 result;
     for (; count <= 3; count++) {
-        cell = sub_080D9B20(actor, direction);
+        cell = SceneActor_FindDirectionalCell(actor, direction);
         direction = (direction + 1) & 3;
         if (cell != actor->terrainCell)
             break;
@@ -68,5 +66,5 @@ ready:
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DA208);
+INCLUDE_ASM("asm/nonmatching", SceneActor_StartAdjacentCellRoute);
 #endif

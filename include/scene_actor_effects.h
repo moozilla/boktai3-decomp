@@ -25,5 +25,5 @@ struct SceneActorEffectsView {
     u8 control[0xA8];
     struct SceneActorEffectsContext effect;
 };
-s32 sub_082315A8(void *, u32, u32, struct SceneActorEffectsOffset *);
+s32 EffectGroup_Spawn(void *, u32, u32, struct SceneActorEffectsOffset *);
 #endif

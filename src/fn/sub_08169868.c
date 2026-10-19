@@ -7,13 +7,11 @@
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 #define SceneHud_CyclePrimarySecondaryOptions SceneHud_CyclePrimarySecondaryOptions
 #define SceneHud_RefreshPrimaryOptions        SelectionPanel_RefreshVisibleEntries
-#define SceneHud_RefreshSecondaryOptions      sub_0816902C
-#define SceneHud_TickWidgetSlides             sub_08168EE8
 #define gSceneHudInput                        gUnk_03005164
 extern u16 gUnk_03005164[];
 void SelectionPanel_RefreshVisibleEntries(struct SceneHudState *);
-void sub_0816902C(struct SceneHudState *);
-void sub_08168EE8(struct SceneHudState *);
+void SceneHud_RefreshSecondaryOptions(struct SceneHudState *);
+void SceneHud_TickWidgetSlides(struct SceneHudState *);
 void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
 {
     if ((gUnk_03005260[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible > 1) {
@@ -33,9 +31,9 @@ void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
             *out = ((struct SceneHudState *)(p->selection * 8 + (u32)p))->secondaryFirstValue;
         }
         p->secondarySlideTimer = 8;
-        sub_0816902C(p);
+        SceneHud_RefreshSecondaryOptions(p);
     }
-    sub_08168EE8(p);
+    SceneHud_TickWidgetSlides(p);
     Palette_UpdateHighlightPulse(gUnk_03005164, p->unknown13F0);
 }
 #else

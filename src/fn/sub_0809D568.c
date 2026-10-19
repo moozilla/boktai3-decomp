@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_0809D2A8(void);
+void RouteActor_ReflectAtRaisedTerrain(void);
 u32 Lun_UpdateTerrainBounce(void)
 {
-    sub_0809D2A8();
+    RouteActor_ReflectAtRaisedTerrain();
     return 1;
 }

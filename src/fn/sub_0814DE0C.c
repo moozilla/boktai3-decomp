@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.3%
 // foundry draft (worker best 97.4%); what differs is mostly register allocation and instruction order
-#define Player_ConfigureActionSelectionDisplay sub_0814DE0C
 u8 *Player_GetSpecialAttackDescriptor(s32 idx);
 s32 Player_GetAttackElementType(u32 x);
 void Projectile_InitializeParams(u8 *);
@@ -16,7 +15,7 @@ static inline u32 DisplayFlags(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_0814DE0C(struct Player *p)
+void Player_ConfigureActionSelectionDisplay(struct Player *p)
 {
     u32 selection;
     Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind);
@@ -56,5 +55,5 @@ void sub_0814DE0C(struct Player *p)
     Projectile_SetCollisionSize(p->statModifierContext.actionSelectionDisplay, 16, 100, 16);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814DE0C);
+INCLUDE_ASM("asm/nonmatching", Player_ConfigureActionSelectionDisplay);
 #endif

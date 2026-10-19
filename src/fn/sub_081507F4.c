@@ -3,11 +3,10 @@
 #ifdef NONMATCHING
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
-#define Player_UpdateTimedCueAnimation sub_081507F4
-#define Player_SetAnimationPhase       ActorSequence_Begin
-#define Player_SetAnimationFlags       Player_AddControlFlags
-#define Player_ResetTriggerAnimation   PlayerCue_EnterStandUpdate
-#define Player_DispatchPendingTrigger  PlayerCue_CompleteAction
+#define Player_SetAnimationPhase      ActorSequence_Begin
+#define Player_SetAnimationFlags      Player_AddControlFlags
+#define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
+#define Player_DispatchPendingTrigger PlayerCue_CompleteAction
 void Sound_PlaySong(u32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -15,7 +14,7 @@ void Player_AddControlFlags(struct Player *, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 void PlayerCue_EnterStandUpdate(struct Player *);
 void PlayerCue_CompleteAction(struct Player *);
-void sub_081507F4(struct Player *p)
+void Player_UpdateTimedCueAnimation(struct Player *p)
 {
     switch (p->tetherPhase) {
         case 0:
@@ -65,5 +64,5 @@ void sub_081507F4(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081507F4);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTimedCueAnimation);
 #endif

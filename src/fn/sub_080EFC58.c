@@ -5,7 +5,7 @@ struct SceneActorTargetWaitState {
     u8 unknown0[0x634];
     s16 targetMissFrames;
 };
-s32 sub_080F0910(struct SceneActorRegistryResetView *, s32);
+s32 Ivy_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
 void sub_080ED4E0(void);
 static inline void ClearFlags(u16 *p, u32 mask)
 {
@@ -64,7 +64,7 @@ void SceneActorControl_WaitForTarget(struct SceneActorRegistryResetView *input)
         SetCollider(&actor->colliderA);
         ClearFlags(&actor->flags2C0, ~0x800);
     }
-    if (!sub_080F0910(actor, 1))
+    if (!Ivy_FindAdjacentTarget(actor, 1))
         state->targetMissFrames++;
     else
         state->targetMissFrames = 0;

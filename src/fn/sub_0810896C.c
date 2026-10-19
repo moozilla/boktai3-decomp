@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // foundry draft (worker best 90.2%); what differs is mostly register allocation and instruction order
-#define CallbackSlots_DispatchActive sub_0810896C
 struct CallbackSlot {
     u8 unk0[0x60];
     u16 callbackIndex;
@@ -22,7 +21,7 @@ static inline u8 IsSlotActive(struct CallbackSlot *slots, s32 i)
         return 1;
     return 0;
 }
-s32 sub_0810896C(struct CallbackSlots *obj)
+s32 CallbackSlots_DispatchActive(struct CallbackSlots *obj)
 {
     struct CallbackSlot *slots = obj->slots;
     s32 i;
@@ -38,5 +37,5 @@ s32 sub_0810896C(struct CallbackSlots *obj)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810896C);
+INCLUDE_ASM("asm/nonmatching", CallbackSlots_DispatchActive);
 #endif

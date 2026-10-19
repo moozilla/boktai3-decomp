@@ -12,7 +12,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Disable(void *);
 void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
-void sub_08217DE0(struct TriggerSprite *, struct TriggerGraphics *, u32);
+void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
 s32 sub_0821D6F4(struct SceneVec *, s32);
 s32 Region_FindContaining();
@@ -1098,7 +1098,7 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
         return -1;
     }
     Memory_Clear(p->sprite, 40);
-    sub_08217DE0(p->sprite, manager->graphics, 0);
+    ParticleSprite_Initialize(p->sprite, manager->graphics, 0);
     Effect_SetOrigin(p->sprite, -8, -10);
     if (sub_0821D6F4(position, 128)) {
         {

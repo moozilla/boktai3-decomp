@@ -55,7 +55,7 @@ s32 CollisionController_InitSlot(struct CollisionManager *manager, struct Collis
     Collider_SetCallback(collider, CollisionController_ReceiveHit, slot);
     Collider_Refresh(collider);
     sprite = &slot->sprite;
-    sub_08217DE0(sprite, manager->graphics, 1);
+    ParticleSprite_Initialize(sprite, manager->graphics, 1);
     SpriteDrawable_SelectTileFrame(sprite, manager->graphics, 12);
     Effect_SetOrigin(sprite, -8, -8);
     slot->active = 1;

@@ -16,7 +16,7 @@ void SceneCatalog_SelectDescription(u32);
 void Hud_SetInteractionCallback(struct PauseMenuConfig *, void (*)(void), u32);
 void SceneHud_SetPairedIcons(struct PauseMenuConfig *, u32, s32);
 void MenuSelection_RefreshAllOptionText(struct PauseMenuConfig *);
-s32 sub_08175C40(struct PauseMenuConfig *);
+s32 MenuSelection_ProcessOptionInput(struct PauseMenuConfig *);
 void SelectionPanel_WaitConfirmDelay(void);
 void SelectionPanel_ConfirmSettings(void);
 void PauseMenu_UpdateConfigChoice(struct PauseMenuConfig *s)
@@ -36,7 +36,7 @@ void PauseMenu_UpdateConfigChoice(struct PauseMenuConfig *s)
         MenuSelection_RefreshAllOptionText(s);
         Hud_SetInteractionCallback(s, SelectionPanel_ConfirmSettings, 0);
     } else {
-        if (sub_08175C40(s))
+        if (MenuSelection_ProcessOptionInput(s))
             sub_0817597C(s, 1);
         Anim_Step(s->animation, s->animationData);
     }

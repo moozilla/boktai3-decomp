@@ -44,7 +44,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
             if (kind >= 0) {
                 register u32 frame asm("r2");
                 entry->flags &= ~1;
-                frame = sub_0822D604(kind);
+                frame = Selection_GetDisplayFrame(kind);
                 asm("" : "+r"(frame));
                 frame = (u16)frame;
                 {
@@ -100,7 +100,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
                 s32 currency;
                 entry->flags &= ~1;
                 {
-                    register u32 frame asm("r2") = sub_0822D604(kind);
+                    register u32 frame asm("r2") = Selection_GetDisplayFrame(kind);
                     asm("" : "+r"(frame));
                     frame = (u16)frame;
                     {

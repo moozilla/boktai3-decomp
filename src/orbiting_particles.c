@@ -222,7 +222,7 @@ int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *s
         p->rise = 0;
         p->radius = radius;
         p->timer = i * 4;
-        sub_08217DE0(s, m->resource, 1);
+        ParticleSprite_Initialize(s, m->resource, 1);
         Effect_SetOrigin(s, -4, -4);
         SpriteDrawable_SelectTileFrame(s, m->resource, m->frame);
         Effect_SetPalette(s, 1);

@@ -11,7 +11,7 @@ struct ActorGroupMotionState {
     u8 unknownEBA[6];
     u16 duration;
 };
-void sub_080F8B38(void);
+void SceneActorControl_TiltRotation(void);
 void ActorPhase_UpdateSpriteCollapse(void);
 void SpriteGroup_SetSharedPosition(struct SceneActorRegistryResetView *, void *, u32);
 static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
@@ -51,7 +51,7 @@ void ActorGroup_BeginMotionPhase(struct SceneActorRegistryResetView *actor)
 {
     struct ActorGroupMotionState *group = actor->context;
     if (TakePending(actor)) {
-        BeginControl(actor, sub_080F8B38, 0x31);
+        BeginControl(actor, SceneActorControl_TiltRotation, 0x31);
         {
             u32 flag = 0x100;
             flag |= actor->flags2D4;

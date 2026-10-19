@@ -3,7 +3,7 @@ void SceneMessages_UnregisterReceiver(void *);
 void Shadow_Destroy(void *);
 void SceneActorEffects_DestroyGroup(void *);
 void TerrainOverlay_QueueRemoveActor(void *);
-void sub_0815F738(void *);
+void SceneLink_RemoveNode(void *);
 void SceneBody_Unregister(void *);
 void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *);
 static inline u8 TestFlag(u16 *flags, u32 mask)
@@ -57,7 +57,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
             TerrainOverlay_QueueRemoveActor(identity);
     }
     if (TestFlag(flags, 0x200))
-        sub_0815F738(control + 0x30);
+        SceneLink_RemoveNode(control + 0x30);
     SceneBody_Unregister(identity);
     Collider_Remove((u8 *)actor + 0x134);
     SceneActorRegistry_UnlinkActor((void *)actor);

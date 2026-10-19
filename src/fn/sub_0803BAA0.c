@@ -30,10 +30,10 @@ struct Slot *ScenePool_FindFreeActorSlot(struct P *p)
     }
     return 0;
 }
-void sub_0811BD30(void *, void *);
+void Actor_UpdateShadowSpriteParts(void *, void *);
 void ScenePool_UpdateActorDrawablePosition(u8 *p)
 {
-    sub_0811BD30(p, p + 0x600);
+    Actor_UpdateShadowSpriteParts(p, p + 0x600);
 }
 struct TailData {
     u8 pad[12];

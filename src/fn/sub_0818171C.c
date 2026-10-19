@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.2%
 // foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
-#define ActorPalette_LoadScriptBanks sub_0818171C
 struct ActorPaletteSource {
     u8 unknown0[0x74];
     u16 banks[3][16];
@@ -19,7 +18,7 @@ struct ActorPaletteOwner {
 };
 void *ScriptProc_Start(u16, u16);
 void Palette_CopyBank(void *, const void *);
-void sub_0818171C(struct ActorPaletteOwner *p)
+void ActorPalette_LoadScriptBanks(struct ActorPaletteOwner *p)
 {
     typeof(p->palettes) *palettes = &p->palettes;
     struct ActorPaletteSource *source = ScriptProc_Start(0x92B3, 0xCB8F);
@@ -37,5 +36,5 @@ void sub_0818171C(struct ActorPaletteOwner *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818171C);
+INCLUDE_ASM("asm/nonmatching", ActorPalette_LoadScriptBanks);
 #endif

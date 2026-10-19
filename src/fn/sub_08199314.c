@@ -2,9 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define CallbackPool_Destroy sub_08199314
-#define Callback_Invoke      Callback_InvokeActor
-#define gCallbackPool        gUnk_02000218
+#define Callback_Invoke Callback_InvokeActor
+#define gCallbackPool   gUnk_02000218
 struct CallbackPoolEntry {
     u32 active;
     void *destroy;
@@ -33,7 +32,7 @@ struct CallbackPoolSmallRecord {
 };
 extern struct CallbackPool *gUnk_02000218;
 void Callback_InvokeActor(void *, void *);
-s32 sub_08199314(struct CallbackPool *pool)
+s32 CallbackPool_Destroy(struct CallbackPool *pool)
 {
     s32 i;
     for (i = 0; i <= 0; i++) {
@@ -56,5 +55,5 @@ s32 sub_08199314(struct CallbackPool *pool)
     return (u32)(gUnk_02000218 = 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08199314);
+INCLUDE_ASM("asm/nonmatching", CallbackPool_Destroy);
 #endif

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 89.8%
 // foundry draft (worker best 87.7%); what differs is mostly register allocation and instruction order
-#define Armor_UpdatePartOrbit sub_0818CB30
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ArmorBody {
@@ -32,7 +31,7 @@ struct ArmorPart {
     u8 angle;
     u8 direction;
 };
-void sub_0818CB30(struct ArmorPart *p)
+void Armor_UpdatePartOrbit(struct ArmorPart *p)
 {
     struct ArmorBody *parent = p->parent;
     u8 *angle = &p->angle;
@@ -66,5 +65,5 @@ void sub_0818CB30(struct ArmorPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818CB30);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdatePartOrbit);
 #endif

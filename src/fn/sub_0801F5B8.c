@@ -7,13 +7,13 @@ void SceneObject_UpdateLowered(u8 *s)
     if (timer) {
         Camera_RequestShake(timer);
         do {
-        (*(u16 *)(s + 0x82))--;
+            (*(u16 *)(s + 0x82))--;
         } while (0);
     } else {
         do {
             if (*((int *)(s + 0x64))) {
-        Script_Call(*(int *)(s + 0x64), 0);
-        *(int *)(s + 0x64) = timer;
+                Script_Call(*(int *)(s + 0x64), 0);
+                *(int *)(s + 0x64) = timer;
             }
         } while (0);
     }

@@ -35,7 +35,7 @@ struct OrbitingParticles *OrbitingParticles_CreateFromScript(void);
 void OrbitingParticles_Stop(struct OrbitingParticles *);
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void sub_08217DE0(void *, void *, s32);
+void ParticleSprite_Initialize(void *, void *, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, u32);

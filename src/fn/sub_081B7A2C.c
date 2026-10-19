@@ -6,12 +6,11 @@
 #ifdef NONMATCHING
 // fuzzy: 99.1%
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
-#define GrowthHazard_RevealWhenCellVacant sub_081B7A2C
-#define GrowthHazard_EmitRevealEffects    GrowthHazard_PlayImpactEffect
-#define gPlayers                          gUnk_02000580
-#define gTerrainMap                       gUnk_030052F4
-#define gTerrainWidth                     gUnk_030052F8
-#define gTerrainHeight                    gUnk_030052FC
+#define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect
+#define gPlayers                       gUnk_02000580
+#define gTerrainMap                    gUnk_030052F4
+#define gTerrainWidth                  gUnk_030052F8
+#define gTerrainHeight                 gUnk_030052FC
 
 /* Tentative growth-hazard view, consistent with AnimatedMarker_BeginReveal. */
 struct GrowthHazardCollider {
@@ -47,7 +46,7 @@ static inline s32 GrowthHazard_GetCell(const struct ContactPosition *position)
     return gTerrainMap->rows[z] + x;
 }
 
-void sub_081B7A2C(struct AnimatedMarker *marker)
+void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *marker)
 {
     u32 occupied = 0;
     struct Player *player = gPlayers[0];
@@ -73,5 +72,5 @@ void sub_081B7A2C(struct AnimatedMarker *marker)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B7A2C);
+INCLUDE_ASM("asm/nonmatching", GrowthHazard_RevealWhenCellVacant);
 #endif

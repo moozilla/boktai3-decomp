@@ -3,9 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 92.2%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
-#define ActorPhase_BeginLunge sub_080F4CFC
-#define gRandomIndex          gUnk_03005308
-#define gRandomTable          gUnk_0203B400
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 struct PhaseTarget {
     u8 unknown0[0x30];
     s16 position[3];
@@ -42,7 +41,7 @@ extern u32 gRandomIndex;
 extern const u16 gRandomTable[];
 void Sword_UpdateHorizontalWaveFlight(void);
 void Sword_UpdateDepthWaveFlight(void);
-void sub_080F4CFC(struct PhaseActor *p)
+void ActorPhase_BeginLunge(struct PhaseActor *p)
 {
     struct PhaseParent *parent = p->parent;
     s32 speed, x, z;
@@ -88,5 +87,5 @@ void sub_080F4CFC(struct PhaseActor *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F4CFC);
+INCLUDE_ASM("asm/nonmatching", ActorPhase_BeginLunge);
 #endif

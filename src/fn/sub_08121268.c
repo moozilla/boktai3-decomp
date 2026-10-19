@@ -28,17 +28,17 @@ struct A8CBObject {
 extern void *gUnk_0200020C;
 void *RegistryA8CB_EnsureManager(void);
 struct A8CBObject *RegistryA8CB_FindAvailableEntry(void *manager);
-void sub_081200C8(struct A8CBObject *);
-void sub_0811C9F8(struct A8CBObject *, void *, s32);
-void sub_0811C89C(void *, void *, u8);
+void ActorScript_ParseParams(struct A8CBObject *);
+void ActorSprite_InitPartDrawings(struct A8CBObject *, void *, s32);
+void CharacterPreview_InitializePalette(void *, void *, u8);
 void SceneSlot_RegisterObject(void *);
 void ActorCollision_InitBounds(struct A8CBObject *);
 void RegistryA8CB_RegisterMessageReceiver(struct A8CBObject *);
 void Modifier_InitDrainState(void *, void *, s32, s32);
-void sub_08120B44(void);
+void ActorPhysics_UpdateFallMotion(void);
 /* Registry routine A8CB: takes an object from the manager at 0x0200020C
-   (created on demand), reads its options (sub_081200C8: -n, -p, -s, -P),
-   loads sprite 0x3D99 and starts it with update sub_08120B44 (tentative). */
+   (created on demand), reads its options (ActorScript_ParseParams: -n, -p, -s, -P),
+   loads sprite 0x3D99 and starts it with update ActorPhysics_UpdateFallMotion (tentative). */
 void RegistryA8CB_CreateFromScript(void)
 {
     void *manager = gUnk_0200020C;
@@ -55,14 +55,14 @@ void RegistryA8CB_CreateFromScript(void)
         return;
     Memory_Clear(e->block5BC, 16);
     e->field8AA = 0xFF;
-    sub_081200C8(e);
+    ActorScript_ParseParams(e);
     anim = e->anim;
-    sub_0811C9F8(e, anim, 0x3D99);
-    sub_0811C89C(e->block68, anim, e->field4B);
+    ActorSprite_InitPartDrawings(e, anim, 0x3D99);
+    CharacterPreview_InitializePalette(e->block68, anim, e->field4B);
     SceneSlot_RegisterObject(e->block10);
     ActorCollision_InitBounds(e);
     {
-        void (*update)(void) = sub_08120B44;
+        void (*update)(void) = ActorPhysics_UpdateFallMotion;
         u8 *active = &e->active;
         u32 zero = 0;
         one = 1;

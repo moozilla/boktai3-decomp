@@ -4,10 +4,9 @@
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
-#define Storage_RebuildGrid sub_081BDC78
 
 /* Tentative storage navigation: two 4x4 groups and four category cells. */
-void sub_081BDC78(struct SceneInputGrid *p)
+void Storage_RebuildGrid(struct SceneInputGrid *p)
 {
     s32 i, j;
     {
@@ -67,5 +66,5 @@ void sub_081BDC78(struct SceneInputGrid *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081BDC78);
+INCLUDE_ASM("asm/nonmatching", Storage_RebuildGrid);
 #endif

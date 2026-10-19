@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.9%
 // foundry draft (worker best 94.8%); what differs is mostly register allocation and instruction order
-#define ActorImpact_FindNearbyPoint sub_0817A034
 extern const s16 gUnk_086149C4[];
 u8 sub_0821D4F0(void *, void *, u32, u32);
 struct ImpactMovementBody {
@@ -21,7 +20,8 @@ static inline s32 trunc12(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0817A034(struct ImpactSearchActor *p, struct ContactPosition *out, u32 start)
+void ActorImpact_FindNearbyPoint(struct ImpactSearchActor *p, struct ContactPosition *out,
+                                 u32 start)
 {
     struct ContactPosition point;
     struct ImpactMovementBody *body = &p->body;
@@ -65,5 +65,5 @@ void sub_0817A034(struct ImpactSearchActor *p, struct ContactPosition *out, u32 
     } while (i <= 7);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817A034);
+INCLUDE_ASM("asm/nonmatching", ActorImpact_FindNearbyPoint);
 #endif

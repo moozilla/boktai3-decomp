@@ -6,8 +6,8 @@ struct T {
     u32 hi2 : 16;
 };
 void SceneActorStyle_InitializeFromGameState(void *);
-void sub_0811C9F8(void *, void *, u32);
-void sub_0811CB68(void *, void *, void *, s32);
+void ActorSprite_InitPartDrawings(void *, void *, u32);
+void CharacterPreview_PositionParts(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
 void CharacterModel_SetComponentRenderMode(void *, s32);
 void CharacterModel_InitPalettes(void *, u32);
@@ -23,8 +23,8 @@ void StageResults_InitPortraitDisplay(u8 *s)
     t.lo2 = 0;
     a = s + 0x968;
     b = s + 0xF60;
-    sub_0811C9F8(a, b, 0x3D99);
-    sub_0811CB68(a, b, &t, 0);
+    ActorSprite_InitPartDrawings(a, b, 0x3D99);
+    CharacterPreview_PositionParts(a, b, &t, 0);
     CharacterModel_SetAnimationFlags(b, 0);
     CharacterModel_SetComponentRenderMode(b, 0);
     CharacterModel_InitPalettes(b, s[0x9B3]);

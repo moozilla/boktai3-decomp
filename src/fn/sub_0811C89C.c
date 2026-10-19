@@ -4,16 +4,16 @@
 #ifdef NONMATCHING
 // fuzzy: 88.0%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
-#define CharacterPreview_InitializePalette sub_0811C89C
-#define CharacterPreview_SelectResource    CharacterModel_GetPrimaryPaletteIndex
-#define gCharacterPaletteResource          gUnk_030042E4
+#define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
+#define gCharacterPaletteResource       gUnk_030042E4
 struct CharacterPreviewTileAllocator {
     u8 unknown0[0x38];
     s32 nextTile;
 };
 extern struct CharacterPreviewTileAllocator *gUnk_020004B8;
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
-void sub_0811C89C(struct CharacterPreviewPalette *p, struct CharacterPreviewModel *model, s32 index)
+void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
+                                        struct CharacterPreviewModel *model, s32 index)
 {
     u16 *palette;
     s32 resource;
@@ -65,5 +65,5 @@ void sub_0811C89C(struct CharacterPreviewPalette *p, struct CharacterPreviewMode
         gUnk_020004B8->nextTile = 0xa000;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811C89C);
+INCLUDE_ASM("asm/nonmatching", CharacterPreview_InitializePalette);
 #endif

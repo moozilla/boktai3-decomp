@@ -22,7 +22,7 @@ void Sound_PlaySong(u32);
 void TimedSpriteEffect_RequestStop(u32);
 s8 SpriteSlots_AttachSource(void *);
 u8 LinkParticipant_IsLocallySelected(void *);
-s32 sub_0811ECCC(struct DrainActor *);
+s32 CallbackList_RunStateEight(struct DrainActor *);
 void Modifier_UpdateIdleDrain(void);
 s32 ActorDrain_Update(struct DrainActor *actor)
 {
@@ -38,7 +38,7 @@ s32 ActorDrain_Update(struct DrainActor *actor)
     }
     state->timer--;
     if (Mod(state->timer, 4) == 0) {
-        s32 amount = sub_0811ECCC(actor);
+        s32 amount = CallbackList_RunStateEight(actor);
         s32 health = actor->health - amount;
         if (health < 0)
             health = 0;

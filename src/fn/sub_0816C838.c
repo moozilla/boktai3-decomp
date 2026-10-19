@@ -28,7 +28,7 @@ void MapMenu_ClampScrollAndUpdateArrows(struct MapMenu *);
 void MapMenu_RefreshMarkers(struct MapMenu *);
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
-void sub_0816B958(struct MapMenu *, s32, s32);
+void MapMenu_DrawActiveMarkers(struct MapMenu *, s32, s32);
 void MapScreen_ClearMapLayer(struct MapMenu *);
 void MapMenu_ResetMarkers(struct MapMenu *);
 s32 MessageWindow_SetMessageTable(const void *);
@@ -62,7 +62,7 @@ void MapMenu_InitializeDisplay(struct MapMenu *s)
         tx = dx >> 3;
         ty = (dy >> 3) & ~1;
         BgGfx_LoadTilemapSimple(1, tx, ty, dx, dy);
-        sub_0816B958(s, tx, ty);
+        MapMenu_DrawActiveMarkers(s, tx, ty);
     } else {
         MapScreen_ClearMapLayer(s);
         MapMenu_ResetMarkers(s);

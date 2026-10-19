@@ -31,7 +31,7 @@ s32 Callback_InvokeActor(void *, void *);
 void Armor6_DestroySpriteColliders(void *);
 void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
-void sub_0815F738(void *);
+void SceneLink_RemoveNode(void *);
 void SceneBody_Unregister(void *);
 void Anim_Remove(void *);
 void SceneMessages_UnregisterReceiver(void *);
@@ -61,7 +61,7 @@ s32 Armor6_Destroy(struct Armor6 *actor)
     Collider_Remove(actor->collider238);
     Collider_Remove(actor->collider28C);
     Collider_Remove(actor->collider190);
-    sub_0815F738(actor->component180);
+    SceneLink_RemoveNode(actor->component180);
     SceneBody_Unregister(actor->sceneBody);
     if (actor->animationActive) {
         Anim_Remove(actor->animation);

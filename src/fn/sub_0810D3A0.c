@@ -2,9 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 83.7%
 // foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
-#define PanelSequence_InitializeFromScript sub_0810D3A0
-#define SpriteGroup_Initialize             PanelSequence_InitializeSprites
-#define gPanelSequence                     gUnk_020001C8
+#define SpriteGroup_Initialize PanelSequence_InitializeSprites
+#define gPanelSequence         gUnk_020001C8
 struct PanelSequence {
     u8 pad0[0x1C];
     void *palette;
@@ -52,7 +51,7 @@ static inline u8 *GetSelectionCount(void)
         return 0;
     return &p->count;
 }
-s32 sub_0810D3A0(struct PanelSequence *s)
+s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
 {
     u8 *count;
     int n;
@@ -107,5 +106,5 @@ s32 sub_0810D3A0(struct PanelSequence *s)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810D3A0);
+INCLUDE_ASM("asm/nonmatching", PanelSequence_InitializeFromScript);
 #endif

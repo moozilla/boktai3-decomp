@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 86.6%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-#define PlayerOrbitEffect_UpdateParticle sub_0815F7F4
-#define gOrbitSineTable                  gUnk_086149C4
+#define gOrbitSineTable gUnk_086149C4
 struct PlayerOrbitParticle {
     u8 unknown0[0x18];
     u16 x, y, z, unknown1E;
@@ -28,7 +27,8 @@ static inline s32 TruncateOrbitOffset(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-void sub_0815F7F4(struct PlayerOrbitEffect *effect, struct PlayerOrbitParticle *p)
+void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
+                                      struct PlayerOrbitParticle *p)
 {
     s32 value, delta;
     s32 valueZ, deltaZ;
@@ -57,5 +57,5 @@ void sub_0815F7F4(struct PlayerOrbitEffect *effect, struct PlayerOrbitParticle *
         p->animationPhase = 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815F7F4);
+INCLUDE_ASM("asm/nonmatching", PlayerOrbitEffect_UpdateParticle);
 #endif

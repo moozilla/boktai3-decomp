@@ -5,9 +5,8 @@
 #ifdef NONMATCHING
 // fuzzy: 87.5%
 // foundry draft (worker best 83.9%); what differs is mostly register allocation and instruction order
-#define Player_SubtractStatB sub_0814DF58
 extern struct GameState *gUnk_02000710;
-void sub_0814DF58(struct Player *p, s32 amount)
+void Player_SubtractStatB(struct Player *p, s32 amount)
 {
     s32 value;
     if (p->statModifierContext.statBOverrideEnabled &&
@@ -26,5 +25,5 @@ void sub_0814DF58(struct Player *p, s32 amount)
         p->currentStatB = value;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814DF58);
+INCLUDE_ASM("asm/nonmatching", Player_SubtractStatB);
 #endif

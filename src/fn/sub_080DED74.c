@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
-#define SceneActorControl_TickActionCooldown sub_080DED74
 struct SceneActorActionCooldown {
     u8 unknown0[0x678];
     u32 flags;
@@ -56,7 +55,7 @@ static inline void QueueAction(u8 *actor)
         *flags &= mask;
     }
 }
-void sub_080DED74(struct SceneActorRegistryActor *actor)
+void SceneActorControl_TickActionCooldown(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorActionCooldown *cooldown = actor->context;
     u32 flags;
@@ -90,5 +89,5 @@ void sub_080DED74(struct SceneActorRegistryActor *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DED74);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_TickActionCooldown);
 #endif

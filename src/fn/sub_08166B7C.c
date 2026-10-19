@@ -20,7 +20,7 @@ s32 PauseMenu_GetCategoryEntryValue(u32, s32);
 void Hud_SaveSecondaryGridSelection(void *);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 MenuEntries_CountAvailable(void *, s32);
-s32 sub_0816D4E4(s32);
+s32 SceneHud_CanApplySelectedAction(s32);
 s32 ItemRecord_MeetsLevelRequirement(u32);
 s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
 {
@@ -37,7 +37,8 @@ s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
             if (special == 1 || PauseMenu_IsCategoryEntryEmpty(p, selection->current, group)) {
                 action = 0;
             } else if (group == 4) {
-                if (sub_0816D4E4(Inventory_GetQuantityByStorage(p->page, selection->current)))
+                if (SceneHud_CanApplySelectedAction(
+                        Inventory_GetQuantityByStorage(p->page, selection->current)))
                     action = 1;
             } else if (PauseMenu_GetCategoryEntryValue(selection->current, group)) {
                 if (MenuEntries_CountAvailable(p, group) > 1 || group == 3)

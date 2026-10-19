@@ -5,14 +5,14 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 Pool128_InitManager(u8 *);
 void Task_Kill(u8 *);
 void RegionActorPool_UpdateActors(void);
-void sub_08106C88(void);
+void RegionActorPool_DestroyActors(void);
 
 u8 *Pool1B4_Create(void)
 {
     u8 *p;
     p = Task_Create(10, 0xA8);
     if (p != 0) {
-        Task_SetCallbacks(p, RegionActorPool_UpdateActors, sub_08106C88);
+        Task_SetCallbacks(p, RegionActorPool_UpdateActors, RegionActorPool_DestroyActors);
         if (Pool128_InitManager(p) < 0) {
             Task_Kill(p);
             return 0;

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.5%
 // foundry draft (worker best 97.5%); what differs is mostly register allocation and instruction order
-#define AnimPanel_EraseSelection  sub_081DFC60
 #define gAnimPanelSavedSelections gUnk_020005C0
 extern u8 gUnk_020005C0[];
 struct AnimPanel {
@@ -15,7 +14,7 @@ struct AnimPanel {
 };
 void sub_081DFB18(struct AnimPanel *, s32);
 void sub_081DFA50(struct AnimPanel *);
-s32 sub_081DFC60(struct AnimPanel *p)
+s32 AnimPanel_EraseSelection(struct AnimPanel *p)
 {
     s32 empty = 0;
     s32 index = p->selectionPrimary;
@@ -38,5 +37,5 @@ s32 sub_081DFC60(struct AnimPanel *p)
     return empty;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081DFC60);
+INCLUDE_ASM("asm/nonmatching", AnimPanel_EraseSelection);
 #endif
