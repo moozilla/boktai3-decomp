@@ -5,6 +5,8 @@
   rtlprobe.py loop FILE.c [--nonmatching] [--insn N ...] [--regno R ...]
   rtlprobe.py gcse FILE.c [--nonmatching] [--func NAME] [--scan LO:HI] [--expr I ...]
   rtlprobe.py try-t FILE.c T [T ...] [--nonmatching]
+  rtlprobe.py try-env FILE.c 'VAR=V [VAR=V ...]' ... [--nonmatching]
+  rtlprobe.py perline FILE.c [--nonmatching] [--func NAME] [--top N]
 
 Each command compiles FILE.c as build.py does (preprocessed the same way),
 with `-dp` and the pass dumps, into build/rtlprobe/<stem>/, in under a second
@@ -44,6 +46,20 @@ try-t  checks FILE.c with the instrumented compiler (tools/agbcc-instr.sh, which
       takes about 40 s to build) forcing the GCSE table size to each T, and
       prints check.py's counts. This splits a residual diff: whatever is still
       different at the T that gives the ROM's order has another cause.
+
+try-env  the same for any of the instrumented compiler's knobs, one quoted
+      set of assignments per run, e.g. 'CSE_KEEP=2093' 'AGBCC_GCSE_T=2301
+      CSE_KEEP=2093'. CSE_KEEP=r1,r2 never replaces those pseudos as a CSE
+      class's canonical register, CSE_NOCANON=N keeps pseudo N from becoming
+      canonical, CSE_DEBUG=N traces make_regs_eqv (printed as stderr). If
+      keeping the ROM-side pseudo canonical gives 0 diffs, write C that makes
+      that pseudo live longer (sub_08123194: one shared `target` variable for
+      both Seek calls of a path).
+
+perline  insns per source line in the RTL after CSE (what GCSE sees, and so
+      what sets T) against after local-alloc (what survives), largest
+      surplus first. Lines whose RTL shrinks a lot between the two are where
+      to cut insns at GCSE time without changing the final code.
 """
 import argparse
 import json
@@ -58,7 +74,7 @@ from romlib import ROOT
 GCC = os.path.join(build.TOOLS, 'agbcc', 'gcc')
 
 
-def compile_dumps(src, flags, nonmatching):
+def compile_dumps(src, flags, nonmatching, lines=False):
     if nonmatching and '-DNONMATCHING' not in build.DEFINES:
         build.DEFINES.append('-DNONMATCHING')
     work = os.path.join(ROOT, 'build', 'rtlprobe', os.path.basename(src)[:-2])
@@ -68,7 +84,11 @@ def compile_dumps(src, flags, nonmatching):
             os.remove(os.path.join(work, f))
     i_path = os.path.join(work, 'u.i')
     with open(i_path, 'w') as f:
-        f.write(build.preprocess(src))
+        if lines:  # keep line markers so -g line notes name the source file and line
+            f.write(build.sh(build.CPP + ['-nostdinc', '-undef'] + build.DEFINES +
+                             ['-I', 'include', '-iquote', '.', src]))
+        else:
+            f.write(build.preprocess(src))
     r = subprocess.run([build.compiler_for(src)] + build.cflags_for(src) + ['-dp'] + flags + ['u.i', '-o', 'u.s'],
                        cwd=work, capture_output=True, text=True)
     if r.returncode:
@@ -253,18 +273,56 @@ def loop(a):
 
 
 def try_t(a):
+    a.envs = [f'AGBCC_GCSE_T={t}' for t in a.t]
+    try_env(a)
+
+
+def try_env(a):
     cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
     if not os.path.exists(cc):
         sys.exit('build the instrumented compiler first: sh tools/agbcc-instr.sh')
-    for t in [''] + a.t:
-        env = dict(os.environ, AGBCC=cc, AGBCC_GCSE_T=str(t))
+    for spec in [''] + a.envs:
+        env = dict(os.environ, AGBCC=cc, **dict(kv.split('=', 1) for kv in spec.split()))
         cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), a.src, '--json', '--quiet']
         r = subprocess.run(cmd + ['--nonmatching'] * a.nonmatching, cwd=ROOT, env=env, capture_output=True, text=True)
         res = json.loads([ln for ln in r.stdout.splitlines() if ln.startswith('{')][-1])
         ad = res.get('anchordiff', {'structural': 0, 'total': 0})
-        print(f"T {t or 'default':>7}: {res['different_byte_count']:>5} differing bytes, "
+        if 'CSE_DEBUG' in spec:  # check.py drops the compiler's stderr: compile once more for the trace
+            work = compile_dumps(a.src, [], a.nonmatching)
+            tr = subprocess.run([cc] + build.cflags_for(a.src) + ['u.i', '-o', '/dev/null'],
+                                cwd=work, env=env, capture_output=True, text=True)
+            print(tr.stderr.rstrip())
+        print(f"{spec or 'default':>20}: {res['different_byte_count']:>5} differing bytes, "
               f"realigned {ad['total']} ({ad['structural']} ignoring registers)"
               f"{'  MATCH' if res['status'] == 'match' else ''}")
+
+
+def perline(a):
+    work = compile_dumps(a.src, ['-g', '-ds', '-dl'], a.nonmatching, lines=True)
+
+    def count(path):
+        func, text = function_dumps(path, a.func)
+        out, where = {}, None
+        for m in re.finditer(r'^\((insn|jump_insn|call_insn|note)(?:/\w+)? \d+ \d+ \d+ (?:\(?"([^"]+)"\)? (\d+))?', text, re.M):
+            if m.group(1) == 'note':
+                if m.group(2):
+                    where = (os.path.basename(m.group(2)), int(m.group(3)))
+            elif where:
+                out[where] = out.get(where, 0) + 1
+        return func, out
+    func, cse = count(os.path.join(work, 'u.i.cse'))
+    _, lreg = count(os.path.join(work, 'u.i.lreg'))
+    rows = sorted(((cse.get(k, 0) - lreg.get(k, 0), k) for k in set(cse) | set(lreg)), reverse=True)
+    print(f'{func}: {sum(cse.values())} insns after CSE, {sum(lreg.values())} after local-alloc')
+    print(' surplus   cse  lreg  line')
+    srcs = {}
+    for d, (f, ln) in rows[:a.top]:
+        if f not in srcs:
+            path = next((p for p in (a.src, os.path.join('include', f), f) if os.path.basename(p) == f
+                         and os.path.exists(os.path.join(ROOT, p))), None)
+            srcs[f] = open(os.path.join(ROOT, path)).read().split('\n') if path else []
+        text = srcs[f][ln - 1].strip() if ln <= len(srcs[f]) else ''
+        print(f'{d:>8} {cse.get((f, ln), 0):>5} {lreg.get((f, ln), 0):>5}  {f}:{ln}  {text[:70]}')
 
 
 def dump(a):
@@ -276,7 +334,7 @@ def dump(a):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('dump', 'loop', 'gcse', 'try-t'):
+    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline'):
         p = sub.add_parser(name)
         p.add_argument('src')
         p.add_argument('--nonmatching', action='store_true')
@@ -289,9 +347,13 @@ def main():
     sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
                                      help='expression indices in the bucket order wanted: print the T windows')
     sub.choices['try-t'].add_argument('t', type=int, nargs='+')
+    sub.choices['try-env'].add_argument('envs', nargs='+')
+    sub.choices['perline'].add_argument('--func')
+    sub.choices['perline'].add_argument('--top', type=int, default=25)
     a = ap.parse_args()
     a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
-    {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t}[a.cmd](a)
+    {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t, 'try-env': try_env,
+     'perline': perline}[a.cmd](a)
 
 
 if __name__ == '__main__':
