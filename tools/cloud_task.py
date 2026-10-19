@@ -3,6 +3,8 @@
 
   cloud_task.py list [--min-insns 150]      open tasks, biggest first
   cloud_task.py claim [--min-insns 150]     claim the next open task: prints its brief
+  cloud_task.py claim --task ID             claim that open task (e.g. one with smaller functions)
+  cloud_task.py list --smallest             order by the largest function, smallest first
   cloud_task.py show TASK                   a task's functions
 
 A task is the unmatched functions of at least --min-insns instructions inside one
@@ -70,6 +72,9 @@ def main():
         p.add_argument("--min-insns", type=int, default=150)
         p.add_argument("--unassigned", action="store_true",
                        help="only functions outside subsystem ranges (local workers take the ranges)")
+        p.add_argument("--task", help="claim/list only this task id")
+        p.add_argument("--smallest", action="store_true",
+                       help="order tasks by their largest function, smallest first")
     p = sp.add_parser("show")
     p.add_argument("task")
     a = ap.parse_args()
@@ -80,7 +85,10 @@ def main():
         return
     taken = claimed()
     open_ = [t for t in tasks(a.min_insns) if t["id"] not in taken
-             and (not a.unassigned or t["name"] == "unassigned functions")]
+             and (not a.unassigned or t["name"] == "unassigned functions")
+             and (not a.task or t["id"] == a.task.upper())]
+    if a.smallest:
+        open_.sort(key=lambda t: max(f["insns"] for f in t["functions"]))
     if a.cmd == "list":
         for t in open_:
             print(f"{t['id']}  {len(t['functions']):3d} functions {sum(f['insns'] for f in t['functions']):6d} insns  {t['name']}")
