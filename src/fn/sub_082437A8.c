@@ -5,8 +5,7 @@ void Player_UpdateLinkKind(struct Player *);
 void Player_SetTetherMode(struct Player *, u32, u32);
 s32 Player_GetActionIndex(struct Player *);
 u32 LinkPlayer_IsAbilityIdValid(struct Player *, s32);
-#define F(T, off)                 (*(T *)((u8 *)p + (off)))
-#define Player_InitActionCallback sub_082437A8
+#define F(T, off) (*(T *)((u8 *)p + (off)))
 void Player_InitActionCallback(struct Player *p)
 {
     if (p->actionLatch464 == 0)

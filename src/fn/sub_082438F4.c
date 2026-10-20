@@ -11,8 +11,8 @@ extern u32 gUnk_02000560[];
 void Player_ResetActionState(struct Player *);
 s32 Player_ApplyTerrainDamage(struct Player *);
 void LinkPlayer_ResetToIdleState(struct Player *);
-void sub_08243678(struct Player *);
-void sub_082437A8(struct Player *);
+void Player_TickDamageBlink(struct Player *);
+void Player_InitActionCallback(struct Player *);
 void Player_PlayLocalSong(s32, u32);
 s32 Callback_InvokeActor(void *, void *);
 void sub_0823A2E4(struct Player *);
@@ -23,8 +23,7 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gUnk_020004B4->bit;
 }
-#define F(T, off)             (*(T *)((u8 *)p + (off)))
-#define Player_UpdateLinkCore sub_082438F4
+#define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)
 {
     u16 *clearPtr;
@@ -33,9 +32,9 @@ s32 Player_UpdateLinkCore(struct Player *p)
         if (Player_ApplyTerrainDamage(p))
             LinkPlayer_ResetToIdleState(p);
         else
-            sub_08243678(p);
+            Player_TickDamageBlink(p);
     }
-    sub_082437A8(p);
+    Player_InitActionCallback(p);
     if (p->actionRequestState) {
         Player_PlayLocalSong(p->slot, 0x393);
         p->actionRequestState = 0;

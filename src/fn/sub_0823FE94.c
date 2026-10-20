@@ -5,7 +5,6 @@ void Player_PlayLocalSong(s32, u32);
 u32 LinkPlayer_HasSlotValueAtLeast(struct Player *, s32);
 void *SolarBomb_Create(struct Player *, struct SceneVec *, s32);
 s32 sub_08238280(struct Player *, s32, s32);
-#define Player_UpdateSolarBombCharge sub_0823FE94
 void Player_UpdateSolarBombCharge(struct Player *p)
 {
     if (p->tetherMode != 0x12) {

@@ -23,7 +23,6 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gUnk_020004B4->bit;
 }
-#define Player_OnCreate sub_08243A50
 s32 Player_OnCreate(struct Player *p, void *script)
 {
     LinkPlayer_ReadSlotFromScript();
