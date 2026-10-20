@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateLongTimedPose sub_081F56F0
 #include "global.h"
 struct Ratatosk081F56F0 {
     u8 pad0[0xAF];
