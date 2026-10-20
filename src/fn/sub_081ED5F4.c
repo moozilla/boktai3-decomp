@@ -1,0 +1,160 @@
+#include "global.h"
+// MATCHING_CONCESSION: register-pinning
+struct Frames {
+    u16 *data;
+    u8 flags, count, multiplier, duration;
+    u16 index, pad, rate, timer;
+};
+struct Render {
+    u32 flags;
+    u8 pad[12];
+    u16 tile;
+};
+int Anim_SetSequence(struct Frames *, void *, u32, int, int);
+int Anim_RestartSequence(struct Frames *, void *, u16, int, int);
+void Sound_PlaySong(int);
+void SceneMover_ApproachScreenX(void *, int);
+void sub_081EC6BC(void *);
+void sub_081EC7D8(void *);
+void sub_081EC974(void *);
+void SceneActors_EmitPeriodicParticles(void *, int);
+int sub_081ECE80(void *, int, int);
+int Player_GetHorizontalVelocity(void *);
+void Player_GetWorldPosition(int, void *);
+extern u32 gUnk_03005304;
+extern const u16 gUnk_086141BC[];
+#define W(p, o) (*(s32 *)((u8 *)(p) + (o)))
+#define H(p, o) (*(s16 *)((u8 *)(p) + (o)))
+#define B(p, o) (*((u8 *)(p) + (o)))
+static inline int randomValue(void)
+{
+    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    return gUnk_086141BC[gUnk_03005304];
+}
+static inline void step(struct Frames *f, struct Render *r)
+{
+    u16 *word = f->data + f->index;
+    r->tile = *word >> 6;
+    {
+        int settings = f->flags;
+        register int mask asm("r3") = 1;
+        register int mine asm("r1");
+        int bits;
+        mine = mask & settings;
+        bits = (*word & 48) >> 4;
+        bits &= mask;
+        if (mine != bits)
+            r->flags |= 4;
+        else
+            r->flags &= ~4;
+    }
+    {
+        int settings = f->flags;
+        register int mask asm("r3") = 2;
+        register int mine asm("r1");
+        int bits;
+        mine = mask & settings;
+        mine = (u8)mine;
+        bits = (*word & 48) >> 4;
+        bits &= mask;
+        if (mine != bits)
+            r->flags |= 8;
+        else
+            r->flags &= ~8;
+    }
+    {
+        u32 mask;
+        int duration;
+        register int savedDuration asm("r3");
+        u32 timer = f->timer + 1;
+        f->timer = timer;
+        {
+            register u32 initialMask asm("r1") = 65535;
+            asm("" : "+r"(initialMask));
+            mask = initialMask;
+        }
+        duration = f->duration;
+        timer = (u16)timer;
+        savedDuration = duration;
+        if (timer >= (u32)duration) {
+            register int flags asm("r1");
+            int index;
+            f->timer = 0;
+            flags = f->flags;
+            if (flags & 4) {
+                index = f->index;
+                if (!index) {
+                    if (flags & 8) {
+                        f->timer = savedDuration;
+                        goto update;
+                    }
+                    index = f->count;
+                }
+                index--;
+                goto storeIndex;
+            } else {
+                int count;
+                index = f->index + 1;
+                f->index = index;
+                count = f->count;
+                if ((index & mask) < count)
+                    goto update;
+                index = (u8)(flags & 8);
+                if (index) {
+                    f->timer = duration;
+                    index = count - 1;
+                }
+            }
+        storeIndex:
+            f->index = index;
+        update:
+            word = f->data + f->index;
+            {
+                u32 value = *word;
+                u32 low = 15;
+                low &= value;
+                f->multiplier = low;
+            }
+            f->duration = (f->multiplier * f->rate) >> 6;
+            if (!f->duration)
+                f->duration = 1;
+        }
+    }
+}
+
+void ActorMotion_AdvanceTowardScreenTarget(void *, int);
+// confidence=low: paired render animations and movement are observed statically.
+#define SceneActors_UpdateMovement sub_081ED5F4
+void SceneActors_UpdateMovement(void *arg, int time)
+{
+    void *p = arg;
+    int tick = time;
+    void *base = p;
+    u8 *enter;
+    enter = (u8 *)p + 0xb1;
+    if (*enter) {
+        int zero = 0;
+        struct Render *r;
+        struct Render *r2;
+        struct Frames *f;
+        *enter = zero;
+        r = (void *)((u8 *)p + 0x2c0);
+        r2 = (void *)((u8 *)p + 0x308);
+        W(p, 0x298) = zero;
+        W(p, 0x290) = zero;
+        W((u8 *)r + 0x3c, 0) = zero;
+        f = (void *)((u8 *)p + 0x2ec);
+        Anim_SetSequence(f, (void *)W(p, 0x390), zero, 0, zero);
+        step(f, r);
+        W((u8 *)r2 + 0x3c, 0) = 4;
+        f = (void *)((u8 *)r2 + 0x2c);
+        Anim_SetSequence(f, (void *)W(base, 0x390), 4, 0, 0);
+        step(f, r2);
+    }
+    ActorMotion_AdvanceTowardScreenTarget(p, W(base, 0x294));
+    W(base, 0x288) = (randomValue() & 1);
+    sub_081EC6BC(p);
+    sub_081EC7D8(p);
+    sub_081EC974(p);
+    SceneActors_EmitPeriodicParticles(p, tick);
+}
