@@ -1,4 +1,5 @@
 #include "global.h"
+#define Armor_UpdateAlignedAttackDecision sub_081875EC
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
