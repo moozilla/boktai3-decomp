@@ -35,8 +35,8 @@ void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
 void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
-void sub_08153224(void);
-void sub_08146EAC(void);
+void PlayerCue_UpdateFormChange(void);
+void Player_UpdateAlternateFormCue(void);
 
 s32 PlayerCue_FormMotion(struct P *p, u32 w)
 {
@@ -48,10 +48,10 @@ s32 PlayerCue_FormMotion(struct P *p, u32 w)
         Player_EnterKindTwo(p);
         if (p->d18 == 1) {
             ActorSequence_Begin(p, 0xa, 0);
-            p->fn = sub_08153224;
+            p->fn = PlayerCue_UpdateFormChange;
         } else if (p->d18 == 2) {
             ActorSequence_Begin(p, 0xb, 0);
-            p->fn = sub_08146EAC;
+            p->fn = Player_UpdateAlternateFormCue;
         }
         r = 1;
     }

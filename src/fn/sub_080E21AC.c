@@ -2,15 +2,14 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "script_utility.h"
-/* SceneActorControl_BeginHiddenDefeat: on entry faces forward, releases attachments, plays the category sound and clears the defeat flags; once field2B3 is set either completes the defeat at once (flags2CC & 0x400: scripts, event flag, idle, hide) or hands over to the blink-out (sub_080E2428, kind 0x27) (provisional name) */
-#define SceneActorControl_BeginHiddenDefeat sub_080E21AC
+/* SceneActorControl_BeginHiddenDefeat: on entry faces forward, releases attachments, plays the category sound and clears the defeat flags; once field2B3 is set either completes the defeat at once (flags2CC & 0x400: scripts, event flag, idle, hide) or hands over to the blink-out (SceneActorControl_CompleteBlinkOut, kind 0x27) (provisional name) */
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
-void sub_080E2428(struct SceneActorRegistryResetView *, s32);
+void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *, s32);
 void sub_080747B8(struct SceneActorRegistryResetView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
 void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
@@ -27,7 +26,7 @@ static inline void Hide(u8 *sprite, u32 mask)
 {
     *(u32 *)(sprite + 8) |= mask;
 }
-void sub_080E21AC(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *actor)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -128,7 +127,7 @@ void sub_080E21AC(struct SceneActorRegistryResetView *actor)
                     Hide((u8 *)actor->drawable + 0x20, mask);
             }
         } else {
-            void *callback = (void *)sub_080E2428;
+            void *callback = (void *)SceneActorControl_CompleteBlinkOut;
             u32 kind;
             kind = 0x27;
             actor->field2B2 = 1;

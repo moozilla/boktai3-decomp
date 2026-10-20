@@ -1,0 +1,84 @@
+#include "global.h"
+// MATCHING_CONCESSION: register-pinning
+
+// confidence=low: state advances segment interpolation and oscillation before restoring control.
+
+#ifdef NONMATCHING
+// fuzzy: 85.9%
+void sub_080A69F0(void);
+void sub_080A8904(void *);
+void sub_080A9DB0(void *, s32, s32);
+void TentacleActor_UpdateOscillation(void *, s32, s32);
+#define B(o) (*(u8 *)(p + (o)))
+#define H(o) (*(u16 *)(p + (o)))
+#define W(o) (*(u32 *)(p + (o)))
+
+static inline u8 TakeEntry(u8 *p)
+{
+    if (B(0x2b1)) {
+        B(0x2b1) = 0;
+        return 1;
+    }
+    return 0;
+}
+
+#include "scene_actor_reset.h"
+static inline void SetControl(struct SceneActorRegistryResetView *s, void *control, u32 code)
+{
+    u32 zero;
+    u32 *flags;
+    u8 *field = &s->field2B2;
+    zero = 0;
+    *field = 1;
+    s->field2B0 = zero;
+    s->field2B5 = code;
+    s->target = control;
+    s->field2C8 = zero;
+    flags = &s->flags114;
+    {
+        u32 mask = -2;
+        *flags &= mask;
+    }
+    s->word104 = zero;
+}
+static inline s32 Abs(s32 x)
+{
+    return x < 0 ? -x : x;
+}
+static inline void Advance(void *p, s32 x, s32 z)
+{
+
+    sub_080A9DB0(p, 4, 0x6400);
+}
+void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
+{
+    struct SceneActorRegistryResetView *s = input;
+    if (TakeEntry((u8 *)s)) {
+        SetControl(s, sub_080A69F0, 0x23);
+        *(u16 *)((u8 *)s + 0x2e8) = 8;
+    }
+    Advance(s, Abs(*(s16 *)((u8 *)s + 0x2ec)), Abs(*(s16 *)((u8 *)s + 0x2f0)));
+    TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
+    if (s->field2B0) {
+        u32 zero;
+        sub_080A8904(s);
+        SetControl(s, s->entryTarget228, 1);
+        zero = 0;
+        {
+            register u32 phase asm("r1") = 2;
+            register u32 offset asm("r2") = 0x2a8;
+            *((u8 *)s + offset) = zero;
+            offset++;
+            *((u8 *)s + offset) = zero;
+            offset++;
+            *((u8 *)s + offset) = phase;
+        }
+        s->counter2AC = zero;
+        s->field2B1 = 1;
+    } else
+        s->counter2AC++;
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateRetraction);
+#endif

@@ -16,9 +16,9 @@ struct P {
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void Player_UpdateFacingSide(struct P *);
-void sub_08152174(void);
-void sub_081543F0(void);
-void sub_08155008(void);
+void PlayerCue_UpdateMotionFade(void);
+void PlayerCue_UpdateSideFade(void);
+void PlayerCue_UpdateAlternateFade(void);
 void sub_081503EC(void);
 
 void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
@@ -37,15 +37,15 @@ void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
             p->b3A3 = 0;
         }
         ActorSequence_Begin(p, 7, 3);
-        p->fn = sub_08152174;
+        p->fn = PlayerCue_UpdateMotionFade;
     } else {
         Player_UpdateFacingSide(p);
         if (p->state == 4) {
             ActorSequence_Begin(p, 7, 3);
-            p->fn = sub_081543F0;
+            p->fn = PlayerCue_UpdateSideFade;
         } else if (p->state == 5) {
             ActorSequence_Begin(p, 7, 3);
-            p->fn = sub_08155008;
+            p->fn = PlayerCue_UpdateAlternateFade;
         } else {
             ActorSequence_Begin(p, 7, 4);
             p->fn = sub_081503EC;

@@ -1,0 +1,147 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 94.2%
+// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_animation.h"
+static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor)
+{
+    u8 directionVariant, mirror;
+    u32 selection;
+    register u8 *mirrorPointer asm("r2");
+    u8 *variantPointer = &directionVariant;
+    u32 flags;
+    register u32 mirrorValue asm("r2");
+    u8 variant;
+    register u32 entryFlags asm("r0");
+    u8 *variantReload;
+    u32 force;
+    u8 *restart;
+    {
+        u8 *mirrorAddress = &mirror;
+        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+        asm("" : "+r"(quadrant), "+r"(mirrorAddress));
+        mirrorPointer = mirrorAddress;
+        if (quadrant > 1) {
+            *mirrorPointer = 1;
+            *variantPointer = 3 - quadrant;
+        } else {
+            *mirrorPointer = 0;
+            *variantPointer = quadrant;
+        }
+    }
+    variantReload = &directionVariant;
+    mirrorValue = *mirrorPointer;
+    entryFlags = 4;
+    selection = 8;
+    variant = *variantReload;
+    flags = mirrorValue | entryFlags;
+    if (flags & 0x10) {
+        force = 0x10;
+        flags &= ~0x10;
+    } else
+        force = 0;
+    if (!actor->drawableKind) {
+        struct SceneActorAnimationSequenceDrawable *drawable;
+        actor->selection = selection;
+        drawable = actor->drawable;
+        {
+            void *sequence = drawable->sequence;
+            void *resource = (void *)drawable->resource;
+            u32 selected = (u16)selection;
+            register u32 row asm("r3");
+            row = variant;
+            Anim_SetSequence(sequence, resource, selected, row, flags);
+        }
+        restart = &actor->restart;
+    } else {
+        struct SceneActorAnimationTile *tile =
+            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+        u8 *savedSelection;
+
+        selection += variant;
+        savedSelection = &actor->selection;
+        restart = &actor->restart;
+        if (!force && *savedSelection == selection && !*restart) {
+            if (flags == 1 && (tile->flags & 4))
+                goto selected;
+            if (flags == 0 && !(tile->flags & 4))
+                goto selected;
+        }
+        *savedSelection = selection;
+        {
+            u32 mask = 4;
+            u32 mode;
+            if (flags & mask)
+                mode = 6;
+            else
+                mode = 4;
+            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
+                              actor->drawable, (u16)selection, 2, (u16)mode);
+            flags &= 1;
+            asm("" : "+r"(flags));
+            if (flags)
+                tile->flags |= mask;
+            else
+                tile->flags &= ~4;
+        }
+    }
+    *restart = 0;
+selected:;
+}
+
+#include "scene_actor_reaction.h"
+void Mummy_UpdateRevival(void *);
+static inline u8 TakePrepared(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
+void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+{
+    u32 queued;
+    u8 *prepared;
+    u32 mask = 1;
+    if (!actor->drawableKind) {
+        u32 *flags = actor->drawable;
+        *flags |= mask;
+    } else {
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        tile->flags |= mask;
+    }
+    prepared = &actor->field2B2;
+    if (*prepared) {
+        *prepared = 0;
+        queued = 1;
+    } else
+        queued = 0;
+    if (queued)
+        ActorShadow_Disable((u8 *)actor + 0x320);
+    else if (frame > 0x1A) {
+        void *callback;
+        u32 kind, zero, one;
+        SelectRecoveryAnimation((void *)actor);
+        callback = Mummy_UpdateRevival;
+        kind = 13;
+        zero = 0;
+        one = 1;
+        *prepared = one;
+        actor->field2B0 = zero;
+        actor->field2B5 = kind;
+        actor->target = callback;
+        actor->field2C8 = zero;
+        {
+            u32 *flags = &actor->flags114;
+            s32 mask = ~1;
+            *flags &= mask;
+        }
+        actor->word104 = zero;
+    } else
+        actor->field2B3 = queued;
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
+#endif

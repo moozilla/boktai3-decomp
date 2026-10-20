@@ -2,12 +2,11 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* Golem_ChargeOrReturnHome: builds up charge and cools the charge timer; if the target player is dazzled goes idle (kind 0x27), else charges at the partner when ready (kind 0x28); otherwise walks back to the centre of its home cell, idling there once within reach (tentative) */
-#define Golem_ChargeOrReturnHome sub_080CEDF0
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
-void sub_080C6F58(void);
-void sub_080C66B0(void);
-void sub_080C68F0(void);
+void Golem_UpdateChargeWindup(void);
+void Golem_UpdateRouteMotion(void);
+void Golem_UpdateChargeStop(void);
 void sub_080C47B8(struct ContactPosition *);
 s32 sub_080C47DC(u8 *);
 s32 Math_Atan2(s32, s32);
@@ -110,7 +109,7 @@ static inline s32 CanCharge(void *ctx)
         return 1;
     return 0;
 }
-void sub_080CEDF0(struct SceneActorRegistryResetView *actor)
+void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     u8 *body = actor->context;
@@ -137,7 +136,7 @@ void sub_080CEDF0(struct SceneActorRegistryResetView *actor)
                 if (!(*(u32 *)(player + 0x20) & mask))
                     goto check;
             }
-            SetControl(actor, sub_080C68F0, 0x27);
+            SetControl(actor, Golem_UpdateChargeStop, 0x27);
             SetPhase(actor, 2, 3);
             return;
         } else {
@@ -145,20 +144,20 @@ void sub_080CEDF0(struct SceneActorRegistryResetView *actor)
             u32 mask = 0x20000;
             if (!(*(u32 *)(player + 0x20) & mask))
                 goto check;
-            SetControl(actor, sub_080C68F0, 0x27);
+            SetControl(actor, Golem_UpdateChargeStop, 0x27);
             SetPhase(actor, 2, 3);
             return;
         }
     check:
         if (*(s16 *)(body + 0x680) <= 0) {
             if (!CanCharge(body)) {
-                SetControl(actor, sub_080C68F0, 0x27);
+                SetControl(actor, Golem_UpdateChargeStop, 0x27);
                 SetPhase(actor, 2, 3);
                 return;
             }
         } else if (!CanCharge(body))
             goto approach;
-        SetControl(actor, sub_080C6F58, 0x28);
+        SetControl(actor, Golem_UpdateChargeWindup, 0x28);
         SetPhase(actor, 2, 4);
         return;
     approach: {
@@ -178,7 +177,7 @@ void sub_080CEDF0(struct SceneActorRegistryResetView *actor)
             ((u8 *)actor)[0x59] = direction;
             body[0x68E] = direction;
         }
-        SetControl(actor, sub_080C66B0, 0x23);
+        SetControl(actor, Golem_UpdateRouteMotion, 0x23);
         SetPhase(actor, 2, 1);
     }
     } else

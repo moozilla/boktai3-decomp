@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0808CC48(void *);
+void Ghoul_ResumePendingRoute(void *);
 void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Ghoul_UpdateCooldown(void *);
@@ -19,7 +19,7 @@ struct S {
 s32 Ghoul_Update(struct S *s)
 {
     u32 m;
-    sub_0808CC48(s);
+    Ghoul_ResumePendingRoute(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
         Callback_InvokeActor(s, s->tbl[s->idx]);

@@ -8,7 +8,7 @@ u32 Script_SeekToKeyword(u32);
 u32 Script_GetValue(void);
 void SceneHud_ReadPageVisibility(u8 *);
 void Hud_ReadScriptQOption(u8 *);
-void sub_081779E8(u8 *);
+void Hud_LoadLayoutResources(u8 *);
 void SelectionPanel_RefreshAttachedPanel(u8 *);
 void sub_08176F70(u8 *);
 u32 TextWindow_Create(u32, u32, u32, u32);
@@ -40,7 +40,7 @@ u32 Hud_InitAlternateLayout(u8 *s)
         s[0xA5E] = 8;
     SceneHud_ReadPageVisibility(s);
     Hud_ReadScriptQOption(s);
-    sub_081779E8(s);
+    Hud_LoadLayoutResources(s);
     SelectionPanel_RefreshAttachedPanel(s);
     sub_08176F70(s);
     *(u32 *)(s + 0x48F0) = 0;

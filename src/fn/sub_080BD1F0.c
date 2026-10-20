@@ -21,7 +21,7 @@ void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s3
 void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
-void sub_080B7350(void *);
+void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void SceneActorReaction_TickHiddenTimeout(void);
 void SceneActorRecord_RecordPair(u32, u32);
@@ -424,7 +424,7 @@ notHidden:
             if (Test(*ctxFlags, bit)) {
                 u32 c = 7;
                 actor->category = c;
-                sub_080B7350(actor);
+                Skeleton_InitializeCategoryProfile(actor);
                 Skeleton_InitVariantMotion(actor);
             }
         }

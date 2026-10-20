@@ -24,7 +24,7 @@ struct ActorDisplay {
     s16 alternateLayer;
 };
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
-void sub_081EC7D8(struct ActorDisplay *);
+void ActorDisplay_UpdateForegroundSprite(struct ActorDisplay *);
 void sub_081EC974(struct ActorDisplay *);
 void ActorDisplay_RefreshScreenLayer(struct ActorDisplay *actor)
 {
@@ -45,6 +45,6 @@ void ActorDisplay_RefreshScreenLayer(struct ActorDisplay *actor)
         layerY = origin + 88;
         BgGfx_LoadTilemapAtPosition(3, layerX, layerY - actor->verticalOffset);
     }
-    sub_081EC7D8(actor);
+    ActorDisplay_UpdateForegroundSprite(actor);
     sub_081EC974(actor);
 }

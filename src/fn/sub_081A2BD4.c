@@ -17,7 +17,7 @@ void sub_081A26D8(struct ActorReaction *);
 void Hresvelgr_UpdateBehaviorMode(struct ActorReaction *);
 u32 Hresvelgr_ApplyRequestedAction(struct ActorReaction *);
 void ActorReaction_UpdateCallbackGate(struct ActorReaction *);
-void sub_081A2858(struct ActorReaction *);
+void Hresvelgr_UpdateCollisionPresentation(struct ActorReaction *);
 void Hresvelgr_CopyUpdateTable(struct ActorReaction *);
 u32 ActorReaction_Tick(struct ActorReaction *actor)
 {
@@ -30,7 +30,7 @@ u32 ActorReaction_Tick(struct ActorReaction *actor)
         ActorReaction_ResetFlagsAndDispatch(actor);
         ActorReaction_CommitRequestedState(actor);
         ActorReaction_UpdateCallbackGate(actor);
-        sub_081A2858(actor);
+        Hresvelgr_UpdateCollisionPresentation(actor);
         Hresvelgr_CopyUpdateTable(actor);
         actor->ticks++;
     }

@@ -1,11 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// Same instructions as the ROM; allocation differs (actor in r4 instead of r5, so the polar helper's out/speed registers shift). The ROM's dead 0x0403B714 literal is kept with a pinned r12 and an empty asm.
 #include "scene_actor_reaction.h"
 /* Skeleton_BeginKnockedFlight: on entry makes the body's colliders inert, launches the actor along its facing at a random speed (0x1C-0x2B) with a random upward speed, and shows its shadow; on landing (motion bit 0) stops, and once flags2D0 & 0x10 plays the bone sound (if enabled) and resets the actor (provisional name) */
-#define Skeleton_BeginKnockedFlight sub_080BB61C
 void SceneActorPlacement_ResetActorState(void *, u16 *);
 extern const s16 gUnk_086149C4[];
 
@@ -28,7 +24,10 @@ static inline s32 NextRandom(void)
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    {
+        register const u16 *table asm("r2") = gUnk_0203B400;
+        return *(const u16 *)(offset + (u32)table);
+    }
 }
 static inline s32 NextRandomFirst(void)
 {
@@ -37,8 +36,9 @@ static inline s32 NextRandomFirst(void)
     offset = gUnk_03005308 * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
-static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
+static inline void Polar(struct ContactPosition *out, u8 angle, s32 inputSpeed)
 {
+    register s32 speed asm("r4") = inputSpeed;
     out->x = Scale12(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
     out->y = 0;
     out->z = Scale12(gUnk_086149C4[angle] * speed);
@@ -64,8 +64,9 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-void sub_080BB61C(struct SceneActorRegistryResetView *actor)
+void Skeleton_BeginKnockedFlight(struct SceneActorRegistryResetView *input)
 {
+    struct SceneActorRegistryResetView *actor = input;
     u8 *context = actor->context;
     u8 taken = TakeFlag(&actor->field2B2);
     if (taken) {
@@ -77,7 +78,7 @@ void sub_080BB61C(struct SceneActorRegistryResetView *actor)
         {
             u8 direction = actor->direction;
             register u32 observed asm("r12") = 0x0403B714;
-            s32 random = NextRandomFirst();
+            register s32 random asm("r1") = NextRandomFirst();
             asm volatile("" : : "r"(observed));
             random &= 0xF;
             {
@@ -106,6 +107,3 @@ void sub_080BB61C(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080BB61C);
-#endif

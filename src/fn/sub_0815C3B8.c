@@ -35,13 +35,13 @@ void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
 void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
-void sub_08146EAC(void);
+void Player_UpdateAlternateFormCue(void);
 
 s32 PlayerCue_Motion11(struct P *p, u32 w)
 {
     p->w5a4 = w;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0xb, 0);
-    p->fn = sub_08146EAC;
+    p->fn = Player_UpdateAlternateFormCue;
     return 1;
 }

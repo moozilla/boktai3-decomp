@@ -1,8 +1,10 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: Golem initialization installs this displacement recovery callback.
 #ifdef NONMATCHING
-// fuzzy: agent draft, 145 insns off by tools/anchordiff.py (was 261); see notes/cloud-08122DF4.md
+// fuzzy: 95.8%
+// Remaining mismatch: The two random-direction loops and PRE stack-slot allocation still differ.
 
 /* Golem: converge on the saved motion target; once at rest either hand control to the
  * 0x5DC callback, or (flag 0x80) chase the player / walk the route (tentative). */
@@ -297,7 +299,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
     return 1;
 }
 
-void sub_080C8774(struct SceneActorRegistryResetView *actor)
+void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     s32 x, z;
@@ -400,5 +402,5 @@ moving: {
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C8774);
+INCLUDE_ASM("asm/nonmatching", Golem_ResumeBehaviorAfterDisplacement);
 #endif
