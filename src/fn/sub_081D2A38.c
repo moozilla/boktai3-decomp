@@ -101,7 +101,7 @@ void SceneNpc_TickStateAndPalette(void);
 void TaggedSceneNpc_OnVisibilityUpdate(void);
 void TaggedSceneNpc_DispatchReceiverCallback(void);
 void sub_081D1A44(void);
-void sub_081D1DF8(void);
+void TaggedSceneNpc_UpdateState17AnimationA(void);
 u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 static inline void setHandler(void *fn, void **slot)
 {
@@ -273,7 +273,7 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[0] = sub_081D1DF8;
+            updates[0] = TaggedSceneNpc_UpdateState17AnimationA;
             npc->state = 0x12;
             npc->update = updates[0];
             npc->field10 = 0;

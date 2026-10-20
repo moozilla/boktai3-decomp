@@ -11,14 +11,14 @@ struct PaletteTransition {
     u16 white[16];
     u16 black[16];
 };
-void sub_081D48D8(struct PaletteTransition *, u32);
+void PaletteTransition_StartDisplay(struct PaletteTransition *, u32);
 void sub_081D409C(struct PaletteTransition *, u32);
 void PaletteTransition_ResetBuffers(struct PaletteTransition *p)
 {
     u16 *source;
     s32 i;
     u16 value;
-    sub_081D48D8(p, p->parameter);
+    PaletteTransition_StartDisplay(p, p->parameter);
     if (p->mode == 2) {
         source = p->source;
         sub_081D409C(p, p->parameter);
