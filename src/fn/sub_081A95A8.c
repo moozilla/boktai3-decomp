@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-// foundry draft (worker best 95.3%); what differs is mostly register allocation and instruction order
 #define PairedSceneActor_IsFinished PairedSceneActor_AreSelectedHalvesFinished
 #define gPlayer                     gUnk_02000580
 struct Vanargand {
@@ -33,7 +31,7 @@ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 void Vanargand_UpdatePairedAttack(struct Vanargand *p)
 {
     u8 result;
-    u32 phase;
+    register s32 phase asm("r4");
     u32 *timer;
     void *attachment;
     s32 cue, mode;
@@ -49,7 +47,7 @@ void Vanargand_UpdatePairedAttack(struct Vanargand *p)
         p->phaseTimer = result;
     }
     phase = p->phase;
-    switch ((s32)(u8)phase) {
+    switch (phase) {
         case 0:
             timer = &p->phaseTimer;
             if (*timer == 0) {
@@ -90,6 +88,3 @@ void Vanargand_UpdatePairedAttack(struct Vanargand *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePairedAttack);
-#endif

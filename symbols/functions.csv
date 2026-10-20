@@ -7392,6 +7392,10 @@ addr,name,mode,confidence,source,notes
 081DCF20,TextEntry_CopyInitialName,thumb,low,src-alias,
 081DCF84,TextEntry_DrawName,thumb,low,src-alias,
 081DCFE4,NameEntry_UpdateCursor,thumb,low,src-alias,
+081DD174,NameEntry_MoveCursorUp,thumb,low,src-alias,
+081DD3B8,NameEntry_MoveCursorDown,thumb,low,src-alias,
+081DD590,NameEntry_MoveCursorRight,thumb,low,src-alias,
+081DD80C,NameEntry_MoveCursorLeft,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
