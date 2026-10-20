@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
 #include "contact_swarm.h"
 
 // confidence=low: foreground role inferred from screen-coordinate placement and its refresh caller.
@@ -129,15 +130,15 @@ static inline u32 StepPlayback(struct Drawable *owner)
 }
 void ActorDisplay_UpdateForegroundSprite(u8 *input)
 {
-    register u8 *p asm("r4") = input;
+    u8 *p = input;
     struct Drawable *draw = (struct Drawable *)(p + 0x2C0);
-    register u32 off1 asm("r1");
-    register u32 off2 asm("r2");
-    register u16 *origin asm("r3");
+    u32 off1;
+    u32 off2;
+    u16 *origin;
     register u16 *screen asm("r0");
     register u32 x asm("r1");
-    register u32 y asm("r2");
-    register u32 result asm("r0");
+    u32 y;
+    u32 result;
     draw->ended = 0;
     off1 = 0x278;
     screen = (u16 *)(p + off1);
@@ -146,7 +147,6 @@ void ActorDisplay_UpdateForegroundSprite(u8 *input)
     x = *origin + 42;
     x += *screen;
     off2 += 6;
-    asm("" : "+r"(off2));
     screen = (u16 *)(p + off2);
     result = *screen + x;
     draw->sprite.position.x = result;
@@ -155,7 +155,6 @@ void ActorDisplay_UpdateForegroundSprite(u8 *input)
     off1 += 8;
     screen = (u16 *)(p + off1);
     result = *(s32 *)screen + 74;
-    asm("" : "+r"(result));
     y += result;
     x = *(s32 *)(p + 0x5A0);
     x += y;
