@@ -8,7 +8,6 @@ struct AxeTrailSprite {
 void Axe_EmitMotionTrail(void *);
 void Axe_UpdateReturningTrail(void);
 
-#define Axe_UpdateTrailFadeIn sub_080F85B0
 void Axe_UpdateTrailFadeIn(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {

@@ -1,7 +1,6 @@
 #include "scene_actor_chase.h"
 void Golem_UpdateChargeBuildup(void);
 
-#define Golem_BeginChargeBuildup sub_080C6338
 void Golem_BeginChargeBuildup(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {

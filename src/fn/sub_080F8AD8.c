@@ -15,7 +15,6 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-#define Axe_UpdateFadeOut sub_080F8AD8
 void Axe_UpdateFadeOut(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 entered = TakeEntry(actor);

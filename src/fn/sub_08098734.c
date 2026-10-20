@@ -26,7 +26,6 @@ zero:
     return 0;
 }
 
-#define ActorTick_DecrementCounterAA sub_08098734
 void ActorTick_DecrementCounterAA(u8 *actor)
 {
     if (!Actor_IsInactive(actor)) {

@@ -29,7 +29,6 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->field2B1 = 1;
 }
 
-#define Golem_UpdateHoldTimer sub_080CEAC4
 void Golem_UpdateHoldTimer(struct SceneActorRegistryResetView *actor)
 {
     struct Golem080CEAC4Context *context = actor->context;

@@ -25,7 +25,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
     }
     actor->word104 = 0;
 }
-#define Golem_UpdateChargeSettle sub_080CCC64
 void Golem_UpdateChargeSettle(struct SceneActorRegistryResetView *actor)
 {
     u8 busy;

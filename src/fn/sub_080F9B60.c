@@ -3,7 +3,6 @@
 void Axe_ReleaseAuxiliarySprite(void *);
 void SceneActorControl_OnIdle(void);
 
-#define Axe_ReleaseAndIdle sub_080F9B60
 void Axe_ReleaseAndIdle(struct SceneActorRegistryResetView *actor)
 {
     Axe_ReleaseAuxiliarySprite(actor);
