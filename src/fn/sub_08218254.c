@@ -1,8 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
+#define SpriteOam_QueueCameraRelativeSprites sub_08218254
 #ifdef NONMATCHING
-// fuzzy: 86.7%
-// Remaining differences: projection temporaries, affine allocation, and register lifetimes.
+// fuzzy: 91.0%
+// Remaining differences: camera/offset scheduling, signed comparisons, and register lifetimes.
 struct Vec {
     s16 x, y, z;
 };
@@ -85,13 +86,13 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         register u32 attr asm("r5");
         s32 depth;
         register s32 ox asm("r12"), oy asm("r8");
-        if (p->flags & skip)
+        flags = p->flags;
+        if (flags & skip)
             goto next;
 
         x = divide8(p->pos.x - gUnk_030042A0.x) + 120;
         y = divide8(p->pos.y - gUnk_030042A0.y) + 80;
         z = p->pos.z - gUnk_030042A0.z;
-        flags = p->flags;
         ox = p->offsetX;
         oy = p->offsetY;
         if (!(flags & 64)) {
@@ -125,7 +126,12 @@ void SpriteOam_QueueCameraRelativeSprites(void)
                 gUnk_03004310[*count].angle = angle;
                 gUnk_03004310[*count].scaleX = sx;
                 gUnk_03004310[*count].scaleY = sy;
-                matrix = (*count)++;
+                {
+                    register s32 old asm("r0") = *count;
+                    matrix = old;
+                    ++old;
+                    *count = old;
+                }
             }
             attr |= matrix << 25;
             flags = p->flags;
@@ -173,5 +179,5 @@ void SpriteOam_QueueCameraRelativeSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueCameraRelativeSprites);
+INCLUDE_ASM("asm/nonmatching", sub_08218254);
 #endif
