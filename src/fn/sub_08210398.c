@@ -1,8 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define PinkSpine_UpdateDamageAnimation   sub_08210398
+#define ProjectileEmitter_UpdateAttack    sub_08210180
+#define ProjectileEmitter_EmitAttackFrame sub_0821025C
 #ifdef NONMATCHING
-// fuzzy: 89.6%
-// Remaining differences: pause branch layout, collider addressing, animation pointer lifetimes and explicit callback return.
+// fuzzy: 88.4%
+// Remaining differences: pause branch layout, collider mask allocation, animation pointer lifetimes and explicit callback return.
 #include "pink_spine_playback.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
 extern u32 gUnk_030053F0, gUnk_02000560;
@@ -24,10 +27,15 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;
     if (!p->f134) {
-        p->collider.flags &= ~4;
-        Collider_SetPosition(&p->collider, &p->sprite.position, 0);
-    } else
-        p->collider.flags |= 4;
+        typeof(p->collider) *collider = &p->collider;
+        asm("" : "+r"(collider));
+        collider->flags &= ~4;
+        Collider_SetPosition(collider, &p->sprite.position, 0);
+    } else {
+        typeof(p->collider) *collider = &p->collider;
+        asm("" : "+r"(collider));
+        collider->flags |= 4;
+    }
     if (p->f130 > 0 && !p->f134) {
         p->f136 -= p->f130;
         p->f144 = p->f148;
@@ -64,5 +72,5 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PinkSpine_UpdateDamageAnimation);
+INCLUDE_ASM("asm/nonmatching", sub_08210398);
 #endif
