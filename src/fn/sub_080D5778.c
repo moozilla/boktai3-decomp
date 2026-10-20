@@ -197,5 +197,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D5778);
 #endif
