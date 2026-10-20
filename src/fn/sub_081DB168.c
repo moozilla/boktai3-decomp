@@ -1,6 +1,6 @@
 #include "global.h"
 void Explosion_InitSprite(u8 *, u8 *, u8 *, s32);
-void sub_081DB030(u8 *, u8 *, u32, s32, s32, s32, s32);
+void Explosion_InitCollider(u8 *, u8 *, u32, s32, s32, s32, s32);
 void Collider_SetPosition(u8 *, u8 *, u32);
 static inline void init(u16 *dest, u32 zero, u32 value)
 {
@@ -13,7 +13,7 @@ s32 Explosion_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s
     u8 *emitter;
     Explosion_InitSprite(p + 0x18, p + 0x44, pos, frame);
     emitter = p + 0x60;
-    sub_081DB030(p, emitter, flag, duration, arg4, arg5 | 0x40000, arg6);
+    Explosion_InitCollider(p, emitter, flag, duration, arg4, arg5 | 0x40000, arg6);
     Collider_SetPosition(emitter, pos, 0);
     init((u16 *)(p + 0xb4), 0, arg8);
     return 0;
