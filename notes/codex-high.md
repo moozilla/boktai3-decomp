@@ -889,3 +889,91 @@ full build, network operation, generated-file edit, or direct Git mutation was
 performed. The combined ROM build and name promotion remain integration work.
 The pre-existing change in `tools/cloud_task.py` was left untouched. Shared
 HANDOFF, INDEX and history files were not edited, per cloud-worker scope.
+
+## Task 0823F56C — Player action and recovery states (2026-10-20)
+
+Tags: #matching #player #link #register-pinning
+
+Exact C now covers **53.22% of this task's reviewed extents**, a **+53.22
+percentage-point** task gain (three functions, 2,812 of 5,284 bytes). Two exact
+functions retain register concessions; the third is unhinted. Drafts contribute
+no exact progress. The original task listed 2,174 instructions; 1,127 are in the
+three exact functions. No global progress totals were regenerated.
+
+- **0823F928 matched**, tentative `Player_UpdateChargedSpinAttack`, 1,336
+  bytes, register-pinned. Nine-way phase switch (phase three unused), charge
+  timing, input release, looping spin sounds, particle bursts, an orbiting
+  attack collider, and facing updates. The timer at +0xC0A advances by 16 modulo
+  256; the collider orbits at radius 170 and adds 230 to Y. Existing
+  `Player` fields for +0xAD6/+0xAD8, +0xC0A and facing fixed raw-pointer LHS
+  address evaluation order, improving the first candidate from 94.7% to 99.4%.
+  A scoped pending-action variable for +0xBF6 closed the remaining differences
+  with the authorized concession; `depin.py --write` reduced two hints to one.
+  The final +0xAC9 variant is nine. Naming is tentative: surrounding named
+  routines use the Player prefix, and the charge/orbit behavior supports the
+  working attack name.
+- **0823F56C matched**, tentative `Player_UpdateChargedDashAttack`, 956 bytes,
+  register-pinned. Assigned as the callback for configured action kind 0x30 by
+  `Player_InitializeActionState` (0823AA28). Shares the charge/release/retrigger
+  phases above, but uses animation entries 0x26–0x28 and decaying reverse
+  motion from +0x4D2. A charged phase sets magnitude 30, emits particles when
+  above five, and multiplies magnitude by 3/4 each update. A shared release
+  label reproduced the branch polarity; a distinct second speed local made
+  the second magnitude load precede the sine load. Important callee identity:
+  this uses `SceneParticleBurst_CreateWhilePaused`, unlike 0823F928's
+  `SceneParticleBurst_CreateWithPause`; the names refer to different addresses.
+  The final variant is four. Depinning reduced two hints to one.
+- **08240200 matched**, tentative `Player_UpdateImpactRecoil`, 520 bytes,
+  **no register hints**. Enters mode 0x1D, plays the pending song at +0x4C2,
+  and applies reverse polar recoil or velocity toward +0x47C when +0x479 is
+  set. Target recoil divides signed X/Z differences by eight toward zero,
+  emits alternating impact effects for the first six frames, requests camera
+  shake, and reduces speed by 3/4. A pointer local for the magnitude at +0x270
+  survives the condition and supplies the first polar multiply; the second
+  multiply reloads the field. Explicit signed `scale3` inline branches
+  reproduce arithmetic shifts where direct ternaries emitted logical shifts.
+  `depin.py --write` removed both diagnostic hints and the concession marker.
+- **08240408 drafted 85.8%**, tentative `Player_UpdateAirborneKnockback`,
+  reviewed extent 768 bytes. Enters mode 0x1E, plays +0x4C2, sets height 300,
+  decays reverse speed and height, then selects animations 0x2C/0x2D before
+  returning to idle. Remaining: magnitude-pointer materialization before
+  facing (ROM materializes after sine), scratch registers, and an extra r6
+  save. Retained candidate has 56 realigned differences, 14 ignoring
+  registers. The ordinary typed-field candidate was 83.9%; passing the first
+  magnitude address to the inline reached 85.8%. No hints in the retained
+  draft.
+- **08240708 drafted 92.2%**, tentative `Player_UpdateSlidingRecovery`,
+  reviewed extent 624 bytes. Enters mode 0x1F, computes positive polar motion
+  from `(facing + 1) & 7`, decays speed, probes the predicted terrain cell and
+  cancels blocked motion. Animation 0x2E leads into timed blinking recovery.
+  Remaining: the same magnitude-address lifetime, scratch registers, and r6
+  save (25 realigned differences, eight ignoring registers). A more intrusive
+  pointer/register-barrier diagnostic scored 93.9% but left 20 differences;
+  retained the clearer unhinted 92.2% draft.
+- **08240978 drafted 86.8%**, tentative `Player_UpdateKnockbackRecovery`,
+  reviewed extent 1,080 bytes. Mode 0x20 has two reverse-motion phases with
+  predicted terrain collision, then timed blinking recovery. First phase
+  reduces speed by 3/4 and height by 15; landing triggers song 0x2A8 and
+  sub_08109040. Remaining: cached +0x270 address, scratch registers, and
+  associated literal placement (70 realigned differences, 12 ignoring
+  registers over the reviewed extent). The initial candidate-length score
+  was 86.6%, which appears in the commit subject; the recorded full-extent
+  score is 86.8%. Later pointer, field, accessor and pinning experiments did
+  not beat the retained candidate structurally.
+
+All six sources have descriptive file-local aliases and tentative semantic
+comments. Each exact match passed `tools/check.py` after formatting and
+`depin.py`; candidate lengths equal the reviewed complete function extents.
+All three drafts were scored with `--nonmatching --record`; their default
+INCLUDE_ASM branches separately matched the reviewed full extents. Each source
+was committed separately through `build/commit.sh`. The notes use that driver
+as well. No make/full build, network, direct Git mutation, or generated-file
+edit was performed; batch integration must perform name promotion and the
+combined ROM build. Ghidra output was unavailable in this checkout.
+
+Environment discrepancy: the task prompt named `cloud/0823F56C`, but the
+checked-out branch stayed `cloud/081C29A4`; no checkout was attempted, in
+accordance with the worker restriction. The driver placed the six commits on
+that existing branch. The pre-existing tools/cloud_task.py edit was not
+modified by this worker (it no longer appeared in final status). Shared docs
+were left unchanged under the cloud-worker scope.
