@@ -39,7 +39,7 @@ void sub_0810CFF0(void *);
 void sub_0810CF90(void *);
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void LinkPanel_CreateTextWindows(void *);
-void sub_0810CDD8(void *);
+void LinkPanel_StartDescriptions(void *);
 void PanelSequence_UpdateDelay(struct PanelSequence *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetSelectionCount(void)
@@ -92,7 +92,7 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     sub_0810CF90(s);
     ModifierMenu_InitSelectionSnapshot(s->indicators, s->palette);
     LinkPanel_CreateTextWindows(s);
-    sub_0810CDD8(s);
+    LinkPanel_StartDescriptions(s);
     {
         void (*next)(struct PanelSequence *) = PanelSequence_UpdateDelay;
         s->update = next;
