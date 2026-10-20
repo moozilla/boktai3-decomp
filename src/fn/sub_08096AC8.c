@@ -11,7 +11,7 @@ void SceneActorControl_OnIdle(void *);
 void CpuSet(const void *, void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_08096000(void *);
-u8 sub_08097624(void *);
+u8 Ghost_SelectRandomRouteEntry(void *);
 u8 sub_08097798(void *);
 void Bee_ConsumeFlag80(void *);
 void Bee_ClearActionFlags(void *);
@@ -88,7 +88,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
         Control(actor, SceneActorControl_OnIdle, 16);
         {
             u8 *path = context + 0x60C;
-            sub_08097624(path);
+            Ghost_SelectRandomRouteEntry(path);
             Endpoint(path, &pos);
         }
         Ghost_StartMovementToPosition(actor, &pos);

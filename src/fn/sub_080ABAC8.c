@@ -1,7 +1,7 @@
 #include "global.h"
 
 void TentacleActor_UpdateSegmentColliders(u8 *);
-void sub_080AB6F4(u8 *);
+void Tentacle_FireSecondaryAttack(u8 *);
 void ActorTrail_UpdateTimedScale(u8 *);
 void SpritePool_FlagEntries(u8 *);
 void sub_080A9988(u8 *);
@@ -13,7 +13,7 @@ s32 TentacleActor_UpdateComponents(u8 *p)
 {
     s16 *timer;
     TentacleActor_UpdateSegmentColliders(p);
-    sub_080AB6F4(p);
+    Tentacle_FireSecondaryAttack(p);
     ActorTrail_UpdateTimedScale(p);
     SpritePool_FlagEntries(p);
     sub_080A9988(p);
