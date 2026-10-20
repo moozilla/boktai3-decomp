@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.4%
-// foundry draft (worker best 94.4%); what differs is mostly register allocation and instruction order
 extern const u32 gUnk_08605D68[8];
 static inline s32 Divide128(s32 value)
 {
@@ -34,12 +31,7 @@ u32 sub_08093094(u8 *p)
         u32 mask = 4;
         u32 flags = *(u32 *)(state + 0x3D4);
         if (TestFlags(flags, mask))
-            goto plus6;
+            return Read(gUnk_08605D68, index) + 6;
         return Read(gUnk_08605D68, index);
-    plus6:
-        return Read(gUnk_08605D68, index) + 6;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08093094);
-#endif
