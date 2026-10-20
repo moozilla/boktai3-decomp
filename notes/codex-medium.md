@@ -3528,3 +3528,69 @@ The integrator must perform the complete combined ROM build.
 
 Exact code gain for this task: **+0.0157 percentage points** (380 bytes), all in
 the Register-pinned category. Drafts contribute no exact gain.
+
+## Task 08148318 — 2026-10-20
+
+Tags: #player #matching #register-pinning
+
+Four matches and two guarded drafts. Exact coverage within this task is 56.2%
+(+56.2 percentage points; 1,920 of 3,416 assigned bytes). The batch contributes
++0.0795 percentage points of project code, all Register-pinned. Drafts add no
+exact coverage. Only per-file checks were run; combined ROM validation remains
+with the integrator.
+
+- 08148318: improved the existing Player_UpdateWaveringMovement draft from
+  82.7% to **87.6%**. Writing odd-direction hold durations through the observed
+  Player byte array (`unk466[3]`, offset 0x469) instead of the timer pointer
+  restores the duplicated branch-specific stores. The same change must not be
+  applied indiscriminately to the even-direction path, which retains its timer
+  pointer. Remaining differences include RNG result allocation, even-direction
+  address scheduling, branch/pool layout and an apparently unused original
+  0x0403B714 literal. Barriers around RNG offset/table construction regressed
+  to 82.2% and were reverted. Added the required local descriptive alias; the
+  fallback uses the address symbol so `--nonmatching --record` finds it.
+- 08148B64: new **99.4% draft**, Player_UpdateSpiralDisorientation (tentative).
+  Player dispatch table gUnk_08610CA8 references it. Entry reconstructs facing
+  from heading/side, emits queued effects and a spiral trail, then alternates
+  folded facing using tetherFrame. It sets resource 0x16F, advances the packed
+  animation, grows the effect duration to 32, and returns to action zero after
+  frame 31. Typed spriteResource/actionVariantResource fields reproduce the
+  resource-index shift instead of emitting another literal. Two instructions
+  remain: the duration-field offset is loaded into r0 instead of r3. Explicit
+  duration-pointer/offset pins disrupted shared 0xFFFF masking or earlier
+  scratch-register choices; retained the best compact candidate.
+- 08148914: **matched**, Player_UpdateDecayingRecoil (tentative), 592 bytes.
+  Consumes an optional contactActionTag sound, folds facing, advances animation,
+  applies opposite-facing sine/cosine impulses, and decays magnitude at 0x270
+  by three quarters. At zero it clears contactSpecial and selects action 22
+  only when byte 0x5B9 is three and 0x5BB is nonzero. Multiplying table sample
+  by magnitude, in that source order, fixed most allocation/load-order misses
+  (87.9% to 97.9%). Pins on the magnitude and facing address temporaries closed
+  the remainder. Sign-preserving shifts reproduce the original rounding.
+- 081487B4: **matched**, Player_UpdateTimedMovementRecovery (tentative),
+  352 bytes. Subtracts 60 from byte 0x466 while it exceeds 59; otherwise clears
+  status bit zero and the byte. Advances sequence one and returns to action
+  zero when the movement gate at 0x5BB clears. The shared stepper matched
+  immediately; paired offset/address pins fixed the final two instructions.
+- 08148608: **matched** the previous direction-recovery draft, 428 bytes.
+  Pinning the command pointer to r6 requires separately materializing its
+  offset in r0 and table in r1, avoiding an unwanted in-place pointer shift.
+  A local facing pointer with an input-only barrier schedules its address
+  before the history mask while preserving the typed store and branch merge.
+  The final signed movementAnimationState gate is at 0x4F3, not 0x418.
+- 08148FC0: **matched** the previous walking draft, now named
+  Player_UpdateWalkFootsteps (tentative), 548 bytes. Uses the matched packed
+  stepper, alternates nearby positional effects 0x162/0x163 or sounds 0xC8/0xC7
+  on animation frame two, and emits a secondary effect for GameState flag one
+  at 0x868. Pins retain zero in r5 and position in r4; the saved zero must be
+  u32, because an opaque u16 pin introduces extra truncation. Pinning the frame
+  address then fixes all remaining scratch-register differences.
+
+Every exact candidate passed a reviewed full-extent `tools/check.py` after
+formatting. `tools/depin.py --write` reduced the retained hints to 14, 17, 17,
+and 15 for 081487B4, 08148914, 08148608, and 08148FC0 respectively. Run depin
+on unguarded C candidates: a guarded draft's default INCLUDE_ASM fallback can
+make it strip hints without validating the candidate. The spiral candidate was
+restored and re-recorded after encountering that behavior. Both draft scores
+were recorded with `--nonmatching --record` after formatting. No make, full
+build, network operation or shared documentation edit was performed.
