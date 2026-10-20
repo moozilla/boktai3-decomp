@@ -1,5 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+// confidence=low: motion seven changes sprite scale and visibility over six phases.
+#define PlayerCue_UpdateMotionFade sub_08152174
+#define Player_RestartAnimationFromSetup sub_08151D90
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 81.7%
@@ -211,5 +214,5 @@ void PlayerCue_UpdateMotionFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
+INCLUDE_ASM("asm/nonmatching", sub_08152174);
 #endif
