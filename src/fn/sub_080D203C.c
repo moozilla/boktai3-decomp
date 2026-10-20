@@ -4,7 +4,6 @@ s32 Mod(s32, s32);
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, s32);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, s32, s32, u32);
 void Golem_UpdateDeath_080D211C(void);
-#define Mummy_UpdateDying sub_080D203C
 struct Sub {
     u8 f0[8];
     u16 h8;

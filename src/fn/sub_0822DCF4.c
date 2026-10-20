@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Inventory_AddAssignedSlot sub_0822DCF4
-
 struct Inv0822DCF4 {
     u8 pad0[0x50];
     s16 cursor;

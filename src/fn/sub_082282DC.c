@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define DelayedScript_Update sub_082282DC
-
 struct Msg082282DC {
     u32 a;
     u16 *b;
@@ -57,5 +55,5 @@ void DelayedScript_Update(struct Task082282DC *t)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082282DC);
+INCLUDE_ASM("asm/nonmatching", DelayedScript_Update);
 #endif

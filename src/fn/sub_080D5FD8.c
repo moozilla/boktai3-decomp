@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 // confidence=low: follows a navigation descriptor, switching between acceleration and turning.
-#define Mummy_UpdateDescriptorPursuit sub_080D5FD8
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);

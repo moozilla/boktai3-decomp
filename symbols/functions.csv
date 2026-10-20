@@ -3395,6 +3395,7 @@ addr,name,mode,confidence,source,notes
 080CDF14,Golem_ChargeOrApproach,thumb,low,src-alias,
 080CE188,Golem_ResumeRouteAfterControl,thumb,low,src-alias,
 080CEB48,Golem_BeginSlideState,thumb,low,src-alias,
+080CECA4,Golem_UpdateSettle,thumb,low,src-alias,
 080CEDF0,Golem_ChargeOrReturnHome,thumb,low,src-alias,
 080CF3E4,Golem_ArriveAndRestore,thumb,low,src-alias,
 080CFB98,Golem_InitSpecialActionHandlers,thumb,low,src-alias,Installs the ten-entry callback table at actor offset 0x28C
@@ -3415,6 +3416,7 @@ addr,name,mode,confidence,source,notes
 080D1AFC,Mummy_ResumeSavedTarget,thumb,low,src-alias,
 080D1CD0,Mummy_UpdateHiddenRecovery,thumb,low,src-alias,
 080D1EA0,Mummy_UpdateRevival,thumb,low,src-alias,Tentative revival callback restores saved actor state and health after reenabling the shadow
+080D203C,Mummy_UpdateDying,thumb,low,src-alias,
 080D211C,Golem_UpdateDeath_080D211C,thumb,low,src-alias,
 080D2194,Mummy_ResumeRouteAfterRecovery,thumb,low,src-alias,
 080D3878,Mummy_UpdateDefeat,thumb,low,src-alias,
@@ -3424,10 +3426,12 @@ addr,name,mode,confidence,source,notes
 080D5360,Mummy_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288
 080D53F8,Mummy_UpdateProbeNavigation,thumb,low,src-alias,
 080D5778,Mummy_ResumeDelayedRoute,thumb,low,src-alias,
+080D5FD8,Mummy_UpdateDescriptorPursuit,thumb,low,src-alias,
 080D6114,SceneActor_WaitForControlCompletion,thumb,low,src-alias,
 080D622C,SceneActorControl_UpdatePersistentPhase_080D622C,thumb,low,src-alias,
 080D62BC,Mummy_SetControlPreset,thumb,low,src-alias,Installs the mummy control preset at actor offset 0x284
 080D62CC,Mummy_FireAcceleratingVolley,thumb,low,src-alias,
+080D64E0,Mummy_EnterIdleControl,thumb,low,src-alias,
 080D6608,Mummy_TryDirectPursuit,thumb,low,src-alias,
 080D6DF8,SceneActorPath_FaceAndCheckStraightPath,thumb,low,src-alias,
 080D6FDC,Mummy_RequestStraightRoute,thumb,low,src-alias,
@@ -3764,6 +3768,7 @@ addr,name,mode,confidence,source,notes
 080FFBA4,WoodenCrate_UpdatePaletteTimers,thumb,low,src-alias,
 080FFC24,WoodenCrate_UpdateToggleAnimation,thumb,low,src-alias,
 080FFDD4,WoodenCrate_CheckTrigger,thumb,low,src-alias,
+080FFF78,SlotPool_UpdateActiveSlots,thumb,low,src-alias,
 080FFFE4,WoodenCrate_DestroyManager,thumb,low,src-alias,Manager destruction callback that removes occupied crate sprites and colliders and clears the singleton
 08100038,WoodenCrate_InitManager,thumb,low,src-alias,Starts the manager script procedure and registers the singleton with an empty slot mask
 08100068,WoodenCrate_GetOrCreateManager,thumb,low,src-alias,Returns the existing crate manager or creates and initializes its task
@@ -7421,6 +7426,7 @@ addr,name,mode,confidence,source,notes
 081CF264,SceneNpc_UpdateTransitionFade,thumb,low,src-alias,
 081CF490,SceneNpc_UpdateBlinkPhase,thumb,low,src-alias,
 081CF4F0,SceneNpc_UpdateBlinkOut,thumb,low,src-alias,Applies the sixteen-interval blink sequence then hides the NPC and marks completion
+081CF518,SceneNpc_UpdateBlinkWithCallback,thumb,low,src-alias,
 081CF578,SceneNpc_UpdateDashSlide,thumb,low,src-alias,
 081CF62C,SceneNpc_UpdateDescendingDash,thumb,low,src-alias,
 081CF84C,SceneNpc_PlayAnimation12,thumb,low,src-alias,
@@ -7461,6 +7467,7 @@ addr,name,mode,confidence,source,notes
 081D18FC,TaggedSceneNpc_OnBehaviorUpdate,thumb,low,src-alias,Registered behavior callback that updates the tagged NPC and returns zero
 081D1908,SceneNpc_BlendPalette,thumb,low,src-alias,
 081D1A10,TaggedSceneNpc_PlayTaggedAnimation,thumb,low,src-alias,Offsets animation entries 0 through 9 by ten times the NPC tag before playback
+081D1BA8,SceneNpc_TurnTowardAngle,thumb,low,src-alias,
 081D1D44,TaggedSceneNpc_UpdateState15Animation,thumb,low,src-alias,State 15 handler that starts tagged animation 5 and marks completion when playback finishes
 081D1D80,TaggedSceneNpc_UpdateState16Animation,thumb,low,src-alias,State 16 handler that starts tagged animation 5 and marks completion when playback finishes
 081D1DBC,TaggedSceneNpc_UpdateState17Animation,thumb,low,src-alias,State 17 handler that starts tagged animation 6 and marks completion when playback finishes
@@ -8879,6 +8886,7 @@ addr,name,mode,confidence,source,notes
 08226C44,Camera_SetBoundsFromScript,thumb,low,src-alias,Reads two script vectors and passes them to Camera_SetBounds
 08226CD4,Camera_SetScreenOffsetFromScript,thumb,low,src-alias,Reads two offset values and converts them through the camera isometric offset setter
 08226F20,Camera_UpdatePositionMode,thumb,low,src-alias,
+0822725C,Camera_UpdateShake,thumb,low,src-alias,
 08227378,Camera_Update,thumb,low,src-alias,
 0822744C,Camera_Destroy,thumb,low,src-alias,
 08227478,Camera_Initialize,thumb,low,src-alias,"starts at the saved player position (+150 up), registers as kind 6 receiver, becomes gUnk_03005420"
@@ -8898,6 +8906,7 @@ addr,name,mode,confidence,source,notes
 08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
 08227AD4,Terrain_GetFloorKindFromScript,thumb,low,src-alias,
 08227B80,Terrain_GetCellWordFromScript,thumb,low,src-alias,
+08227C2C,Script_TeleportToCell,thumb,low,src-alias,
 08227D1C,Background_ClearVisibilityFlagFromScript,thumb,low,src-alias,Clears the script-selected bit starting at bit 8 in the shared background visibility flags
 08227D40,Background_SetVisibilityFlagFromScript,thumb,low,src-alias,Sets the script-selected bit starting at bit 8 in the shared background visibility flags
 08227D64,Engine_SoftResetFromScript,thumb,low,src-alias,Wraps the engine shutdown and BIOS soft reset routine for a script command
@@ -8913,11 +8922,13 @@ addr,name,mode,confidence,source,notes
 08228008,Heap_IsEndGuardValid,thumb,low,src-alias,Checks the magic word at the documented end of the heap
 08228028,GameState_UpdateCounterBalanceRank,thumb,low,src-alias,Classifies the relative share of two saved counters and stores the resulting rank
 08228090,GameStats_SelectLeadingCounter,thumb,low,src-alias,
+08228130,Scene_CanOpenMenu,thumb,low,src-alias,
 082281CC,SaveData_IsHeaderValid,thumb,low,src-alias,Checks the header word at offset 0x10 against a magic value; validity interpretation is tentative
 082281FC,SaveData_SetPointsFromScript,thumb,low,src-alias,Sets the saved value from keyword p clamped to 0 through 9999; points interpretation is tentative
 0822824C,Text_SetSilentCharacterFromScript,thumb,low,src-alias,Decodes keyword s into the character code excluded from text playback sounds
 08228288,GameState_SetSavedSceneFromScript,thumb,low,src-alias,Stores a script value in the game state scene number field
 082282A4,ChoiceMenu_GetHighlightColor,thumb,low,src-alias,Maps the cycling menu color index through threshold and palette lookup tables
+082282DC,DelayedScript_Update,thumb,low,src-alias,
 08228364,DelayedScript_OnDestroy,thumb,low,src-alias,Empty destruction callback registered by the delayed script task
 08228368,DelayedScript_Create,thumb,low,src-alias,Creates a delayed script task with copied arguments and selectable scheduling priority
 082283F4,Script_CreateDeferredTaskFromScript,thumb,low,src-alias,Parses delay and script arguments to create an owned task with optional repetition
@@ -9117,6 +9128,8 @@ addr,name,mode,confidence,source,notes
 0822DC24,Inventory_SetEntryFromScript,thumb,low,src-alias,
 0822DC78,GameState_ApplySelectedItem,thumb,low,src-alias,
 0822DCB4,ItemRecord_MeetsLevelRequirement,thumb,low,src-alias,
+0822DCF4,Inventory_AddAssignedSlot,thumb,low,src-alias,
+0822DD80,Inventory_RemoveAssignedSlot,thumb,low,src-alias,
 0822DE14,Inventory_ContainsFromScript,thumb,low,src-alias,
 0822DE64,GameState_ResetEntriesFromScript,thumb,low,src-alias,
 0822DF38,Inventory_IsEquipmentAssigned,thumb,low,src-alias,Tests whether an equipment inventory index appears in the primary assignment slots

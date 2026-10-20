@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Scene_CanOpenMenu sub_08228130
-
 extern u8 *gUnk_02000580;
 extern u32 gUnk_030053F4;
 extern u32 gUnk_02000560;
@@ -25,5 +23,5 @@ u8 Scene_CanOpenMenu(void)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08228130);
+INCLUDE_ASM("asm/nonmatching", Scene_CanOpenMenu);
 #endif

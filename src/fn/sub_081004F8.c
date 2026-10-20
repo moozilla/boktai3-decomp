@@ -22,7 +22,6 @@ struct FloorSwitch {
     u8 field8A, field8B;
     u16 field8C, field8E;
 };
-#define FloorSwitch_Release sub_081004F8
 void FloorSwitch_RunStateScript(struct FloorSwitch *);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
