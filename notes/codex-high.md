@@ -2482,3 +2482,119 @@ credit. This cache requires the existing Ooze_BeginAttack.s fallback spelling,
 while the other five use raw sub_ address fallbacks. For Ooze's score recording,
 the fallback was temporarily given the raw sub_ name and restored afterward.
 No generated assembly, ROM, dumps or diagnostic artifacts were committed.
+
+
+## Task 080CF3E4 — 2026-10-20
+
+Tags: #matching #golem #mummy #animation #route #register-pinning
+
+Worked solo and offline on the supplied `cloud/080CF3E4` branch. Read the
+entry-point, cloud, worker, candidate and big-function guidance. Used only
+per-file checks and local diagnostics; no make, full build, network operation,
+direct Git mutation, shared-header edit, or generated-file edit. Commits were
+queued through `build/commit.sh`. Ghidra's export is absent in this checkout.
+Shared docs/index/history remain for integration, per the cloud worker rules.
+
+New exact progress is **12.42% of the six reviewed task spans, +12.42 percentage
+points** (788 / 6,344 bytes), all in the **Register-pinned** category. Against
+the recorded PROGRESS.md denominator this is approximately **+0.0326 percentage
+points**. Drafts earn no exact credit; no global totals were regenerated.
+
+- **080CF3E4 — drafted 88.3%, Golem_ArriveAndRestore**, improved from the
+  inherited 80.5% record (the address alias made the initial local check 82.8%).
+  Reviewed span 1,972 bytes through 080CFB98; candidate 1,976. Entry installs
+  Skeleton_ClearDirectionalEntryFlag, then selects the directional animation,
+  saves delayed control, snaps to the route, and restores chase or home control
+  according to the player cell and motion flags. Signed 32-bit turn choices,
+  a retained group register, and mask-before-load scheduling reduced the
+  realigned residue from 226 / 40 to **112 / 33** (total / ignoring registers).
+  Explicit RNG constants and a do-loop variant regressed. Remaining differences
+  include group and destination pointer allocation, turn-loop constants, and
+  shared-pointer copies. Used BIG_FUNCTIONS, condense, variants and loop dumps.
+
+- **080D0FE8 — drafted 83.8%, Mummy_TurnTowardRoute**, new reconstruction.
+  Reviewed span **1,628 bytes** through 080D1644; 080D1644 is a separate function,
+  so the next assigned address 080D1784 is not this function's end. Candidate
+  1,640 bytes. Mummy_Init installs this callback. It snaps heading to a quadrant,
+  obtains the route facing unless special motion owns it, selects forward or
+  mirrored turn animation two, rotates by 21 angle units at animation boundaries,
+  then restores normal or turn control. Matched animation sources supplied the
+  explicit-variant selection inline. Testing flags with `if (flags & 1)` rather
+  than mutating flags first, retaining the previous-selection load, and spelling
+  shared forward/backward exits with labels recovered the shared animation tails.
+  Reusing the cached motion-flags pointer and freeing the tile pointer improved
+  78.9% to 83.8%. Moving labels inside the last switch case gave a worse
+  structural alignment and was rejected. Remaining: shared-tail layout,
+  animation argument/copy allocation, flags pointer and control-state lifetimes.
+  Final realigned count **310 / 247**; repeated identical animation calls make
+  the anchor alignment less useful here than the full listing.
+
+- **080D2194 — drafted 88.5%, Mummy_ResumeRouteAfterRecovery**, new reconstruction.
+  Reviewed span and candidate both **1,008 bytes** through 080D2584. Its caller
+  in 080D2584 selects it as recovery control. Consumes the prepared flag, marks
+  reaction flag 0x10, briefly holds the initial animation timer, then resumes
+  retreat (motion bit two), chase (bit 0x80), or a delayed saved route. Failed
+  routing enters SceneActorControl_OnIdle. Moving route/destination derivation
+  into the inline and retaining the 0x200 mask in r8 gives the observed bics
+  operations and high-register address addition. Recomputing the flags address
+  through the actor, rather than keeping an early local, lets PRE cache it.
+  Improved 79.1% to 88.5%; final realigned residue **76 / 15**. Remaining:
+  initial reaction-flag instruction ordering, retained control pointers, spill
+  order and the second mask operand tie. Owner/mask-barrier and signed-bitfield
+  flag variants regressed and were discarded.
+
+- **080D1784 — matched, Mummy_ResumeSavedRouteAfterAnimation**, full **788 bytes**
+  through 080D1A98. The preceding 080D1644 callback installs it after animation
+  six. Entry clears the reaction-route state and plays animation seven; the
+  first 60 frames hold its frame/timer at zero. On animation completion it
+  clears the counter at AA, starts the saved scene-body route, snaps its
+  destination height, and attempts navigation. Failure enters idle control;
+  success arms the destination and saves a 60-frame delayed restore.
+  The decisive type correction was a signed full-width 16-bit bitfield at AA
+  with `value &= 0`: this recovered the two zero lifetimes and moved 73.8% to
+  92.4%. Declaring the body pointer before the group but assigning it afterward
+  gives both the correct stack-slot order and expression evaluation order.
+  Retaining the route mask in r8 recovers the missing high-register pointer
+  addition. A mask-before-load constraint with the reaction and flags pointers
+  closed the entry ordering. An instrumented GCSE T sweep showed the earlier
+  spill differences were order-dependent (T=145 removed that group), but no
+  forced compiler setting is used in the accepted source. Narrow pointer hints
+  made the actual compiler produce an exact result. `depin.py --write` reduced
+  nine hints to four. Removed unused helpers, formatted, and checked the final
+  production source over all 788 bytes: **MATCH**. No handwritten instructions.
+
+- **080D0C30 — stopped below threshold**, tentative scratch name
+  Mummy_ResolveAttackContact. Reviewed span **484 bytes** through 080D0E14.
+  Mummy_InitCollision registers it as the attack callback. Rejects unavailable
+  actors; contact kinds 1..8 check/consume context flag 0x800, remember the
+  source object, latch contact response bit one, and start a special-hit
+  response when owner flag 0x200 is present and the collider cooldown is zero.
+  Other contact kinds still update the remembered source. The unavailable
+  predicate and remembered-source logic have exact shared relatives at
+  080B9030 and 0809ED00. Best complete initial candidate: **67.8%**, 464 bytes,
+  realigned **95 / 31**. Typed collider access recovers the separate cost store,
+  but its subsequent reload, actor/context/contact allocation and offset reuse
+  remain off. Pointer barriers and broad register hints added copies and
+  regressed; the u16 contact view did not change output. Stopped after these
+  hypotheses ceased improving it. Sources remain only in ignored wip/build
+  paths; no below-80% production draft was added.
+
+- **080D1CD0 — drafted 94.3%, Mummy_UpdateHiddenRecovery**, inherited body
+  retained after investigation. Reviewed span and candidate both **464 bytes**
+  through 080D1EA0; final residue **15 / 4**. Sets the drawable hidden bit,
+  consumes field2B2 to disable its shadow, waits past frame 26, selects recovery
+  animation eight, and installs Mummy_UpdateRevival. Entry return materialization,
+  prepared-byte address allocation and zero lifetime are still off. A constrained
+  r0 result reached 94.8% but increased structural differences; an explicitly
+  pinned entry fixed the entry block while swapping actor/animation registers.
+  Expanding that animation inline into the caller also failed to improve the
+  retained candidate. Kept the smaller structural residue and original score.
+  Added the required file-local alias and recorded the full-span check.
+
+All retained drafts have descriptive file-local aliases, confidence comments,
+NONMATCHING guards and recorded fuzzy scores. Their default assembly paths
+passed full-span per-file checks. The two inherited drafts needed their fallback
+spelling changed from the promoted name to raw sub_ addresses because only those
+assembly files exist in this cache; separate corrective driver commits preserve
+one translation unit per change. The exact match also passed after formatting
+and hint minimization. Combined ROM validation remains for batch integration.
