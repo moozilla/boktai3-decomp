@@ -1,8 +1,21 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.5%
-// Remaining differences: register allocation and address-expression lifetimes.
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#define Player_GetHorizontalVelocity        sub_08116C20
+#define Player_GetWorldPosition             sub_08116C4C
+#define SceneActors_EmitPeriodicParticles   sub_081EC5C8
+#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
+#define SceneMover_ApproachScreenX          sub_081ECD44
+#define SceneMover_StepPastScreenX          sub_081ECE80
+#define Anim_SetSequence                    sub_08220C8C
+#define Anim_RestartSequence                sub_08220D20
+#define Sound_PlaySong                      sub_0822B2F8
+// confidence=low: hit callback slows this departure action.
+#define SceneActors_UpdateHitSensitiveDeparture sub_081EE518
+#ifdef NONMATCHING
+// fuzzy: 91.4%
+// Remaining differences: base preservation, second decoder allocation, and phase transitions.
 struct Frames {
     u16 *data;
     u8 flags, count, multiplier, duration;
@@ -131,7 +144,7 @@ static inline void step(struct Frames *f, struct Render *r)
 }
 
 // confidence=low: phase meanings inferred from state entry and motion calls.
-void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
+void SceneActors_UpdateHitSensitiveDeparture(void *arg, int time)
 {
     register void *p asm("r8") = arg;
     register int tick asm("sb") = time;
@@ -142,7 +155,9 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
     if (*enter) {
         struct Frames *f;
         struct Render *r;
-        *enter = 0;
+        register int zero asm("r2") = 0;
+        *enter = zero;
+        asm("" : "+r"(zero));
         r = (void *)((u8 *)p + 0x2c0);
         W(p, 0x298) = 0;
         W(p, 0x290) = 0;
@@ -161,9 +176,9 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
                 struct Render *r;
                 W(base, 0x304) = 1;
                 W(base, 0x2fc) = 3;
-                f = (void *)((u8 *)p + 0x2ec);
-                r = (void *)((u8 *)p + 0x2c0);
+                f = (void *)((u8 *)base + 0x2ec);
                 Anim_SetSequence(f, (void *)W(base, 0x390), 3, 0, 0);
+                r = (void *)((u8 *)base + 0x2c0);
                 step(f, r);
                 W(base, 0x398) = 1;
             }
@@ -245,5 +260,5 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateSequenceTwoAction);
+INCLUDE_ASM("asm/nonmatching", sub_081EE518);
 #endif
