@@ -1,8 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define OrbitEffect_Initialize sub_082368DC
-
 struct OeVec {
     s16 x, y, z, pad;
 };

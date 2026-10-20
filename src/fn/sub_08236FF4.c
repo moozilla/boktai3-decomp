@@ -1,8 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define AttachmentSprite_Setup sub_08236FF4
-
 extern u8 *gUnk_030042E4;
 
 struct AtVector {
