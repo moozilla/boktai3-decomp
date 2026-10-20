@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteTransition_UpdateFade sub_081D4608
 struct PaletteTransition {
     u8 pad0[0x20];
     u32 frame;
@@ -7,7 +6,7 @@ struct PaletteTransition {
     u8 pad25[3];
     u8 anim[1];
 };
-void sub_081D42E4(struct PaletteTransition *, int, int);
+void PaletteTransition_BlendBankColors(struct PaletteTransition *, int, int);
 void PaletteTransition_SetAlternateVariantParameters(struct PaletteTransition *);
 s32 DisplayAnimation_TestFinished(void *);
 void SceneDisplay_SwitchToAlternateDescriptor(struct PaletteTransition *);
@@ -19,14 +18,14 @@ void PaletteTransition_UpdateFade(struct PaletteTransition *p)
         phase = 0x3f - phase;
     switch (p->state) {
         case 0:
-            sub_081D42E4(p, phase, 5);
+            PaletteTransition_BlendBankColors(p, phase, 5);
             if (p->frame > 0x78) {
                 PaletteTransition_SetAlternateVariantParameters(p);
                 p->state++;
             }
             break;
         case 1:
-            sub_081D42E4(p, phase, 5);
+            PaletteTransition_BlendBankColors(p, phase, 5);
             if (DisplayAnimation_TestFinished(p->anim)) {
                 p->state++;
                 p->frame = 0;

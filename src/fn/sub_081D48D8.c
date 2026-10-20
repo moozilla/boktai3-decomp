@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteTransition_StartDisplay sub_081D48D8
 struct PaletteDisplayEntry {
     u16 id;
     u16 frames;

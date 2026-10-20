@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteTransition_UpdateWobble sub_081D39E0
 struct DisplayAnim {
     u8 pad0[0x8c];
     u16 *sprite;

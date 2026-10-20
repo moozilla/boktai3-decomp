@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define PaletteTransition_CopyBanks sub_081D4024
 struct PaletteTransitionBanks {
     u16 source[16][16];
     u16 destination[16][16];
