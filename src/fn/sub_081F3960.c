@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActorAnimation_UpdateSwoopApproach sub_081F3960
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;

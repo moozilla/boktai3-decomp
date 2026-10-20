@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorAnimation_UpdateSwoopMotion sub_081F3720
 typedef struct SwoopActor {
     u8 pad0[0x51];
     u8 angle;
