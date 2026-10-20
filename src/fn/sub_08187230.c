@@ -189,5 +189,5 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateAxisAttackDecision);
+INCLUDE_ASM("asm/nonmatching", sub_08187230);
 #endif
