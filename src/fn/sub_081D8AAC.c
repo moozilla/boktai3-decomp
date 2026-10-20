@@ -1,5 +1,4 @@
 #include "global.h"
-#define Task4E01_UpdateTimedSprite sub_081D8AAC
 struct TimedSpriteConfig {
     u16 flags;
     u16 duration;

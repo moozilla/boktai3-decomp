@@ -1,5 +1,4 @@
 #include "global.h"
-#define PairedSceneActor_InitHalves sub_081B6354
 void ActorStatus_InitializeCollider(void *, s32, s32, s32);
 struct Half {
     u8 pad0[0x98];
@@ -42,5 +41,5 @@ void PairedSceneActor_InitHalves(struct Half *base, s32 k, s32 a2, s32 a3, s32 s
     } while (i <= 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B6354);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_InitHalves);
 #endif

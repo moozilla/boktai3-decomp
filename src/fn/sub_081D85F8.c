@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Task4E01_StartDirectionalAnimation sub_081D85F8
 
 #include "contact_swarm.h"
 
@@ -133,7 +132,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
 
 void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
-void sub_081D873C(void);
+void Task4E01_StepTimedSequence(void);
 s32 Task4E01_StartDirectionalAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
@@ -145,6 +144,6 @@ s32 Task4E01_StartDirectionalAnimation(u8 *p)
     frames = p + 0x180;
     Anim_RestartSequence(frames, resource, 7, direction, 0);
     StepPlayback((void *)(p + 0x8c), (void *)frames);
-    Projectile_SetUpdateCallback(config, sub_081D873C);
+    Projectile_SetUpdateCallback(config, Task4E01_StepTimedSequence);
     return 0;
 }

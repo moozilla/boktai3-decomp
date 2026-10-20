@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Vanargand_UpdatePartFadeOut sub_081B5CCC
 struct VanargandFadePart {
     u8 unknown0[0x38];
     void *palette;
