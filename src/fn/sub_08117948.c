@@ -1,5 +1,7 @@
 #include "global.h"
 
+#define Glove_UpdateStopping sub_08117948
+
 struct Obj {
     u8 pad0[4];
     u32 unk4;
@@ -102,15 +104,14 @@ extern u8 *gUnk_02000710, *gUnk_020004B4;
 void Glove_UpdateStopping(struct Glove *);
 
 #ifdef NONMATCHING
-// fuzzy: 90.0%
+// fuzzy: 86.4%
 // Action-pointer lifetimes, constant reuse and register allocation still differ.
 static inline void ClearDamageFlag(s8 *p, s32 mask)
 {
     *p &= mask;
 }
-static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
+static inline void UpdateSecondaryAction(struct Glove *p, struct Obj *self, u16 *flags)
 {
-    struct Obj *self = &p->motion;
     if (U8(p, 0x33C)) {
         if (U8(p, 0x331) == 5) {
             s32 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
@@ -195,7 +196,7 @@ static inline void UpdateActions(struct Glove *p, u16 *flags)
     }
     if (self->actionCooldown)
         self->actionCooldown--;
-    UpdateSecondaryAction(p, flags);
+    UpdateSecondaryAction(p, self, flags);
     if ((!p || !(*flags & 4)) && (U32(self, 0xC) & 0x800))
         self->damageFlags |= 4;
 }
@@ -205,9 +206,11 @@ void Glove_UpdateStopping(struct Glove *p)
     s32 h, dx, dz;
     u32 a, b;
     if (p->active) {
+        u8 zero = 0;
+        u16 shortZero = 0;
         U16(p, 0x53C) = 0x88;
-        U16(p, 0x53E) = 0;
-        p->active = 0;
+        U16(p, 0x53E) = shortZero;
+        p->active = zero;
     }
     {
         u16 *flags = &p->flags;
@@ -282,5 +285,5 @@ void Glove_UpdateStopping(struct Glove *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Glove_UpdateStopping);
+INCLUDE_ASM("asm/nonmatching", sub_08117948);
 #endif
