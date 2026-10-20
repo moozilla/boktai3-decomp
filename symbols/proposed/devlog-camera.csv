@@ -1,0 +1,2 @@
+addr,name,confidence,evidence
+08225F88,Camera_SetPosition,low,"stores pos into camera +0x60..+0x64, bounds it, sets mode 1 (Camera_SetOffset sets 1 or 2) and recomputes the scroll like Camera_Initialize"
