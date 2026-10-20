@@ -9318,6 +9318,7 @@ addr,name,mode,confidence,source,notes
 08235AB8,HealthBurstEffect_InitParticlePool,thumb,low,src-alias,Initializes eight inactive particles for the tentative health based area attack effect
 08235D68,HealthBurstEffect_Create,thumb,low,src-alias,Creates a task for an area attack whose collider strength can depend on the owner's missing health
 08235EE0,CallbackGroup_EmitAtPosition,thumb,low,src-alias,
+08236024,RadialBurstEffect_UpdateBurstParticle,thumb,low,src-alias,
 0823614C,RadialBurstEffect_EmitOrbitParticle,thumb,low,src-alias,
 08236294,RadialBurstEffect_UpdateParticle,thumb,low,src-alias,Particle callback that integrates velocity and changes animation before expiring after thirteen frames
 08236428,CallbackGroup_UpdateActive,thumb,low,src-alias,
@@ -9330,10 +9331,12 @@ addr,name,mode,confidence,source,notes
 0823674C,TimedSprite_UpdateFrames,thumb,low,src-alias,
 08236878,PlayerEffect_UpdatePhaseCallback,thumb,low,src-alias,
 082368C4,ActorBurst_RemovePrimarySprites,thumb,low,src-alias,Removes both primary sprites owned by the actor burst task
+082368DC,OrbitEffect_Initialize,thumb,low,src-alias,
 082369D8,ParticleEffect_Update,thumb,low,src-alias,
 08236A40,ParticleEffect_Destroy,thumb,low,src-alias,
 08236A8C,ParticleEffect_Initialize,thumb,low,src-alias,
 08236AD0,ActorBurst_Create,thumb,low,src-alias,Creates the actor-linked sprite and particle burst task; effect identity is tentative
+08236B30,ParticleBurst_UpdateOrbitParticle,thumb,low,src-alias,
 08236C04,ParticleBurst_EmitOrbitParticle,thumb,low,src-alias,
 08236D58,ParticleBurst_UpdateSlots,thumb,low,src-alias,
 08236DA8,SpiralTrail_RemoveParticles,thumb,low,src-alias,Removes all eight particles belonging to the spiral trail effect
@@ -9341,6 +9344,7 @@ addr,name,mode,confidence,source,notes
 08236EBC,ParticleBurst_AdvanceFrame,thumb,low,src-alias,
 08236EF8,ParticleBurst_RewindFrame,thumb,low,src-alias,
 08236FE8,SpiralTrail_RemoveSprite,thumb,low,src-alias,Removes the main sprite belonging to the spiral trail task
+08236FF4,AttachmentSprite_Setup,thumb,low,src-alias,
 082370AC,ParticleBurst_Update,thumb,low,src-alias,
 082370E8,ParticleBurst_Destroy,thumb,low,src-alias,
 08237108,ActorAttachment_Initialize,thumb,low,src-alias,

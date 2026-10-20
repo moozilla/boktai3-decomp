@@ -29,7 +29,7 @@ struct Unk0823614CEmitter {
     struct Unk0823614CParticle particles[12];
 };
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void sub_08236024(void);
+void RadialBurstEffect_UpdateBurstParticle(void);
 
 static inline s32 Scale12(s32 n)
 {
@@ -67,7 +67,7 @@ void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *
             p->tile = (r & 1) + 2;
         }
         p->timer = 0;
-        p->update = sub_08236024;
+        p->update = RadialBurstEffect_UpdateBurstParticle;
         p->flags &= ~1;
         SpriteDrawable_SelectTileFrame(p, *(void **)(owner + 0x13C), 4);
         p->x = p->origin->x + Scale12(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);

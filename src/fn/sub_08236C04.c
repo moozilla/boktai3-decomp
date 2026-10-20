@@ -27,7 +27,7 @@ struct Unk08236C04Emitter {
     struct Unk08236C04Particle particles[8];
 };
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void sub_08236B30(void);
+void ParticleBurst_UpdateOrbitParticle(void);
 
 static inline s32 Scale12(s32 n)
 {
@@ -67,7 +67,7 @@ void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *orig
         p->life = 8;
         p->timer = 0;
         p->origin = *origin;
-        p->update = sub_08236B30;
+        p->update = ParticleBurst_UpdateOrbitParticle;
         sprite = p;
         sprite->flags &= ~1;
         SpriteDrawable_SelectTileFrame(sprite, *(void **)(owner + 0xA0), sprite->frame);
