@@ -27,7 +27,7 @@ struct P {
 };
 void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_CompleteAction(struct P *);
-void sub_081538DC(struct P *);
+void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -296,7 +296,7 @@ void PlayerCue_UpdateSideArrival(struct P *p)
             if (StepEnd(&p->sprite, &p->seq, phase)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
-                p->fn = sub_081538DC;
+                p->fn = Player_RestartAnimationFromResource;
                 PlayerCue_CompleteAction(p);
             }
             break;
