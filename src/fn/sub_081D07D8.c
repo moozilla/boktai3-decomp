@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneNpc_EnterProjectedIdle sub_081D07D8
-
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -36,7 +34,7 @@ struct Camera {
 extern struct Camera *gUnk_020004B8;
 void DisplayAnimation_SetFlags(void *, s32);
 void GroundEffect_Initialize(void *, void *, s32);
-void sub_081CFC44(void);
+void SceneNpc_UpdateProjectedVisible(void);
 void SceneNpc_EnterProjectedIdle(void *unused, struct SceneNpc *npc)
 {
     s32 zero, st;
@@ -59,7 +57,7 @@ void SceneNpc_EnterProjectedIdle(void *unused, struct SceneNpc *npc)
     npc->field14 = zero;
     npc->field8 = 1;
     do {
-        update = sub_081CFC44;
+        update = SceneNpc_UpdateProjectedVisible;
         npc->prevState = 0x1f;
         npc->update = update;
         npc->field10 = zero;

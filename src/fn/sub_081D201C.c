@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // differs: tail copy of tag pointer (r2 vs r4) and constant register order
-#define TaggedSceneNpc_UpdateArcMove sub_081D201C
 
 struct ArcTag {
     u8 pad0[4];
@@ -86,5 +85,5 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D201C);
+INCLUDE_ASM("asm/nonmatching", TaggedSceneNpc_UpdateArcMove);
 #endif

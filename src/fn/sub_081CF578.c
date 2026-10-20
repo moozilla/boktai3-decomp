@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneNpc_UpdateDashSlide sub_081CF578
-
 extern const s16 gUnk_086149C4[];
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 static inline s32 trunc12(s32 x)
