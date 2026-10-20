@@ -8,7 +8,7 @@ struct ParticleEffect {
     u8 stopped;
     void *owner;
 };
-void sub_082368DC(struct ParticleEffect *, u32);
+void OrbitEffect_Initialize(struct ParticleEffect *, u32);
 void sub_082366A8(struct ParticleEffect *, u32);
 void sub_082364A4(struct ParticleEffect *);
 void Sound_PlaySong(u32);
@@ -17,7 +17,7 @@ s32 ParticleEffect_Initialize(struct ParticleEffect *p, void *owner, u32 a, u32 
 {
     p->variant = variant;
     p->owner = owner;
-    sub_082368DC(p, b);
+    OrbitEffect_Initialize(p, b);
     sub_082366A8(p, a);
     sub_082364A4(p);
     if (variant == 0)

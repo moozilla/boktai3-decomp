@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define RadialBurstEffect_UpdateParticle sub_08236024
-
 extern const s16 gUnk_086149C4[];
 
 struct RbPos {
@@ -29,7 +27,7 @@ static inline s32 Scale12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void RadialBurstEffect_UpdateParticle(struct RbParticle *p)
+void RadialBurstEffect_UpdateBurstParticle(struct RbParticle *p)
 {
     if (++p->timer > 15) {
         p->flags |= 1;

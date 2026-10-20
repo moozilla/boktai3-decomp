@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ParticleBurst_UpdateOrbitParticle sub_08236B30
-
 extern const s16 gUnk_086149C4[];
 
 struct OrbVec {

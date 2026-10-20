@@ -19,7 +19,7 @@ struct ActorAttachment {
     u8 pad2C[0x284 - 0x2C];
     u8 mode;
 };
-void sub_08236FF4(struct ActorAttachment *, struct AttachmentVector *);
+void AttachmentSprite_Setup(struct ActorAttachment *, struct AttachmentVector *);
 void sub_08236DC4(struct ActorAttachment *);
 
 s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParent *parent, u32 kind,
@@ -38,7 +38,7 @@ s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParen
     p->value28 = a;
     p->value2A = b;
     p->mode = mode;
-    sub_08236FF4(p, &p->parent->position);
+    AttachmentSprite_Setup(p, &p->parent->position);
     if (p->mode == 1)
         sub_08236DC4(p);
     return 0;
