@@ -3632,6 +3632,7 @@ addr,name,mode,confidence,source,notes
 08101D2C,NamedObject_UpdateTerrainRegistration,thumb,low,src-alias,
 08101E20,NamedObject_IsMapCellOccupied,thumb,low,src-alias,Tests whether an entry with flag 1 at B8 records the supplied map cell index
 08101E6C,NamedObject_TryCapturePlayer,thumb,low,src-alias,Offers the object as the pending object of an attached player standing on a flagged terrain cell outside the contact bounds
+08101FF8,NamedObject_UpdateEntryTrigger,thumb,low,src-alias,Calls the entry script once a player on a flagged cell moves outside the object's contact bounds
 081028F8,NamedObject_ClearAttachmentFlag,thumb,low,src-alias,
 08102978,NamedObject_UpdatePlayerFollowFlags,thumb,low,src-alias,Updates player status flags and target name according to the object's state
 081029C0,NamedObject_UpdateTetherFollowFlags,thumb,low,src-alias,Updates tether actor status flags and target name according to the object's state

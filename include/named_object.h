@@ -18,7 +18,7 @@ struct NamedObject {
     u16 unknownBE;
     u16 limit;
     s16 offsetC2;
-    u8 unknownC4[4];
+    u32 enterScript;
     u32 script;
     u32 exitScript;
     u8 unknownD0[0xC];
