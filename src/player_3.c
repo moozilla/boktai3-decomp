@@ -1145,7 +1145,62 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
+void Player_AccumulateContactCost(void);
+// confidence=low: configures the action collider for the active descriptor or alternate mode.
+#define Player_ConfigureActionCollider sub_0813E90C
+void Player_ConfigureActionCollider(struct Player *p)
+{
+    struct SceneVec size, offset;
+    s32 category;
+    void *collider = (u8 *)p + 0xB8C;
+    if (p->actionMode != 6) {
+        switch (p->statModifierContext.statBOverrideEnabled) {
+            case 0:
+                size.x = 90;
+                size.y = 50;
+                size.z = 90;
+                offset.x = 0;
+                offset.y = -25;
+                offset.z = 0;
+                category = 1;
+                p->statModifierContext.actionTimer = 32;
+                p->statModifierContext.contactParameter = 10;
+                break;
+            case 4:
+                size.x = 60;
+                size.y = 50;
+                size.z = 60;
+                offset.x = 0;
+                offset.y = -25;
+                offset.z = 0;
+                category = 16;
+                p->statModifierContext.actionTimer = 32;
+                p->statModifierContext.contactParameter = 20;
+                *((u8 *)p + 0x33E) = 0;
+                break;
+            default:
+                return;
+        }
+        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+                      &offset);
+        Collider_SetAttackProperties(collider, p->statModifierContext.actionPhase,
+                                     p->statModifierContext.actionTimer, category, 0,
+                                     p->statModifierContext.contactParameter);
+        Collider_SetCallback(collider, Player_AccumulateContactCost, p);
+    } else {
+        size.x = 170;
+        size.y = 50;
+        size.z = 170;
+        offset.x = 0;
+        offset.y = -20;
+        offset.z = 0;
+        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+                      &offset);
+        Collider_SetAttackProperties(collider, 20, 50, 16, 2, 20);
+        Collider_SetCallback(collider, 0, p);
+    }
+}
 
 void Player_SetWeaponInstance(struct Player *p, u32 v)
 {
