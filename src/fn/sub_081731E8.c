@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneHud_UpdateSecondaryActionSelection sub_081731E8
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // Remaining: shared grid address is reused rather than recomputed.
@@ -21,7 +20,7 @@ void SceneHud_UpdateActionChoice(void);
 void SceneHud_ConfigureActionGrid(void *, u32, u32);
 void Hud_SetGridPosition(void *, u32, u32);
 void SceneHud_ShowSelectionDescription(void *);
-void sub_08172638(void *);
+void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, u32);
 u32 SceneInput_NavigateGridKeys(void *, u32);
 void SceneHud_UpdateSecondaryActionSelection(u8 *p)
@@ -50,7 +49,7 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
             Hud_SetGridPosition(grid, 0, 0);
             SceneHud_ShowSelectionDescription(p);
         } else if (*selected == 38) {
-            sub_08172638(p);
+            PauseMenu_RefreshFruitAndUnlockIcons(p);
             *(u32 *)(p + 0x1668) |= 1;
             Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
             Hud_SetGridPosition(((struct SceneHudState *)p)->actionInput, 0, 0);
@@ -82,5 +81,5 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081731E8);
+INCLUDE_ASM("asm/nonmatching", SceneHud_UpdateSecondaryActionSelection);
 #endif

@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SceneActor_FindDirectionalCell sub_080D9B20
 #ifdef NONMATCHING
 // fuzzy: 85.3%
 // The compiler merges the repeated passability tests and removes redundant cell comparisons.
@@ -72,5 +71,5 @@ s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s3
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D9B20);
+INCLUDE_ASM("asm/nonmatching", SceneActor_FindDirectionalCell);
 #endif

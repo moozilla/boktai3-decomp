@@ -1,4 +1,3 @@
-#define Dog_ChooseReactionBehavior sub_080E25FC
 #include "global.h"
 // confidence=low: chooses chase or route recovery after an actor reaction.
 
@@ -221,5 +220,5 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E25FC);
+INCLUDE_ASM("asm/nonmatching", Dog_ChooseReactionBehavior);
 #endif

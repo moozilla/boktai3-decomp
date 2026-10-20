@@ -1,4 +1,3 @@
-#define SceneActorReaction_BeginTargetRecovery sub_0812EED8
 #include "global.h"
 #include "scene_actor_chase.h"
 
@@ -109,5 +108,5 @@ u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *ac
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812EED8);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_BeginTargetRecovery);
 #endif

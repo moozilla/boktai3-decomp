@@ -1,4 +1,3 @@
-#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reaction.h"
@@ -341,5 +340,5 @@ void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *ac
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812FA0C);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteReturn);
 #endif

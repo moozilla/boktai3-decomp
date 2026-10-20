@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 // confidence=low: converges saved motion and restores the route after a reaction timer.
-#define Vorn_UpdateKnockbackRecovery sub_080AE1C4
 #ifdef NONMATCHING
 // fuzzy: 82.1%
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling.
@@ -187,5 +186,5 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AE1C4);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateKnockbackRecovery);
 #endif

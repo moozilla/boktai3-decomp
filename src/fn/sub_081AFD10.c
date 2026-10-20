@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define PairedSceneActor_UpdateHalfPresentation sub_081AFD10
 #ifdef NONMATCHING
 // fuzzy: 91.8%
 // Remaining differences: register choices for member offsets and two instruction-order differences.
@@ -220,5 +219,5 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AFD10);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdateHalfPresentation);
 #endif

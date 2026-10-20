@@ -58,7 +58,7 @@ extern void *const gUnk_08610964[];
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Player_RecalculateDerivedStats(struct PlayerFC38 *);
-void sub_08158848(void);
+void Player_UpdateLinkModeMovement(void);
 void ActorSequence_Begin(struct PlayerFC38 *, s32, s32);
 void Player_ClearDirectionHistory(struct PlayerFC38 *);
 
@@ -81,7 +81,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
         p->timedEventSlot = 0;
     Player_RecalculateDerivedStats(p);
     if (gUnk_030053F4 & 0x1000) {
-        void *cb = sub_08158848;
+        void *cb = Player_UpdateLinkModeMovement;
         u16 *q, *base = gUnk_02000548;
         u16 zero = 0;
         q = base + 1;

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#define Player_UpdateChargedDashAttack sub_0823F56C
 // confidence=low: held charge followed by decaying reverse motion suggests a charged dash.
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
@@ -22,7 +21,7 @@ void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
-void sub_08238300(void *, u32);
+void Player_SetDirectionalVelocity_08238300(void *, u32);
 void sub_08238238(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);

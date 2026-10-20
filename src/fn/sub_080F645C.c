@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Sword_UpdateDamage sub_080F645C
 
 #ifdef NONMATCHING
 // fuzzy: 96.5%
@@ -89,5 +88,5 @@ void Sword_UpdateDamage(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F645C);
+INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
 #endif

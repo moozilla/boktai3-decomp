@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hresvelgr_UpdateAnimationAndTargets sub_081A26D8
 // confidence=low: updates render shake and cached bearings/distances to tracked positions.
 struct Vec {
     s16 x, y, z, pad;
@@ -30,7 +29,7 @@ struct Hresvelgr {
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-void sub_081A2430(void *);
+void Hresvelgr_DispatchSceneMessages(void *);
 void sub_08225B74(void *);
 void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_UpdateTargetMetrics(void *);
@@ -46,7 +45,7 @@ void Hresvelgr_UpdateAnimationAndTargets(struct Hresvelgr *p)
     struct Hresvelgr *owner = p;
     struct Sprite *sprite = &p->sprite;
     s32 i;
-    sub_081A2430(actor);
+    Hresvelgr_DispatchSceneMessages(actor);
     sub_08225B74(sprite);
     if (!TestFlags(actor, 0x800000))
         SceneActors_UpdateAnimation(actor, actor->animation, actor->animationState);

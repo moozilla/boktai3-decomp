@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 #include "engine.h"
-#define Player_UpdateImpactRecoil sub_08240200
 // confidence=low: reverse velocity, shake, and target-directed recoil after impact.
 struct RecoveryVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -12,7 +11,7 @@ void Player_PlayLocalSong(u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 void Player_SetSecondaryActionFlags(void *, u32);
 void sub_0823C280(void *);
-void sub_08109040(void *, u32);
+void SelectionSlots_ClearValue(void *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsFlaggedWithGlobalModifier10(u32);
 static inline s32 scale(s32 v)
@@ -37,7 +36,7 @@ static inline s32 scale3(s32 v)
         return v >> 3;
     return -((-v) >> 3);
 }
-void Player_UpdateImpactRecoil(struct Player *p)
+void Player_UpdateTetherRecoil(struct Player *p)
 {
     if (p->tetherMode != 0x1D) {
         Player_SetTetherMode(p, 0x1D, 0);

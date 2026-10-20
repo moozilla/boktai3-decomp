@@ -6,10 +6,10 @@ struct S {
     u8 p[3];
     void (*cb)(void);
 };
-void sub_08117948(void);
+void Glove_UpdateStopping(void);
 void Glove_BeginStopping(struct S *s)
 {
-    void (*f)(void) = sub_08117948;
+    void (*f)(void) = Glove_UpdateStopping;
     u8 *p = &s->on;
     u32 z = 0;
     *p = 1;

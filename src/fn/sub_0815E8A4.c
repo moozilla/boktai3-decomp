@@ -5,12 +5,11 @@
 #include "global.h"
 #include "engine.h"
 #include "player.h"
-#define PlayerContact_ApplyTerrainDamage sub_0815E8A4
 // confidence=low: consumes pending damage and selects terrain/death reactions.
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 s32 Player_BeginTerrainRecovery(struct Player *);
-s32 sub_08140748(struct Player *);
+s32 Player_BeginTerrainFacingAction(struct Player *);
 s32 Player_BeginTerrainRecovery_081408AC(struct Player *);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 s32 Inventory_HasItem(s32);
@@ -64,7 +63,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         if (p && (p->actionFlags & 2))
             skip = 1;
     } else if (p->actionPhase488)
-        p->particleEmissionCount += sub_08140748(p);
+        p->particleEmissionCount += Player_BeginTerrainFacingAction(p);
     else if (p->terrainRecoveryPhase)
         p->particleEmissionCount += Player_BeginTerrainRecovery_081408AC(p);
     if (!p->positionResetValue) {
@@ -111,5 +110,5 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815E8A4);
+INCLUDE_ASM("asm/nonmatching", PlayerContact_ApplyTerrainDamage);
 #endif

@@ -4,13 +4,12 @@
 // Remaining differences: branch sharing, address lifetimes and register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
-#define VulcanCannon_InitializeFromScript sub_08207A00
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *Script_GetValueSafe(void);
 void Sprite_Init(void *, void *, s32);
-void sub_08206C00(void);
-void sub_082071D0(void);
+void VulcanCannon_UpdateTargeting(void);
+void VulcanCannon_UpdateDefeatEffects(void);
 void VulcanCannon_InitCollider(void *);
 void VulcanCannon_ReadScriptValueList(void *, void *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
@@ -124,10 +123,10 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     AnimData_SelectPaletteBank(p->graphics, 0x1be);
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     if (!p->inert) {
-        p->state = sub_08206C00;
+        p->state = VulcanCannon_UpdateTargeting;
         Anim_SetSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
     } else {
-        p->state = sub_082071D0;
+        p->state = VulcanCannon_UpdateDefeatEffects;
         p->dead = 1;
         Anim_SetSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
     }
@@ -157,5 +156,5 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08207A00);
+INCLUDE_ASM("asm/nonmatching", VulcanCannon_InitializeFromScript);
 #endif

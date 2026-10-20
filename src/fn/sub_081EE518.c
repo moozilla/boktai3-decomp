@@ -17,11 +17,11 @@ int Anim_SetSequence(struct Frames *, void *, u16, int, int);
 int Anim_RestartSequence(struct Frames *, void *, u16, int, int);
 void Sound_PlaySong(int);
 void SceneMover_ApproachScreenX(void *, int);
-void sub_081EC6BC(void *);
-void sub_081EC7D8(void *);
-void sub_081EC974(void *);
+void ActorDisplay_UpdateScreenAnchor(void *);
+void ActorDisplay_UpdateForegroundSprite(void *);
+void ActorDisplay_UpdateAccentSprite(void *);
 void SceneActors_EmitPeriodicParticles(void *, int);
-int sub_081ECE80(void *, int, int);
+int SceneMover_StepPastScreenX(void *, int, int);
 int Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(int, void *);
 extern u32 gUnk_03005304;
@@ -131,7 +131,6 @@ static inline void step(struct Frames *f, struct Render *r)
 }
 
 // confidence=low: phase meanings inferred from state entry and motion calls.
-#define SceneActors_UpdateSequenceTwoAction sub_081EE518
 void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
 {
     register void *p asm("r8") = arg;
@@ -179,9 +178,9 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
             W(base, 0x288) = (randomValue() & 3);
         moving:
             SceneMover_ApproachScreenX(p, W(base, 0x294));
-            sub_081EC6BC(p);
-            sub_081EC7D8(p);
-            sub_081EC974(p);
+            ActorDisplay_UpdateScreenAnchor(p);
+            ActorDisplay_UpdateForegroundSprite(p);
+            ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
             break;
         case 2: {
@@ -191,11 +190,11 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
                 velocity = 0x6000;
             if (H(base, 0x5c2) > 0)
                 velocity >>= 1;
-            sub_081ECE80(p, W(base, 0x294), velocity);
+            SceneMover_StepPastScreenX(p, W(base, 0x294), velocity);
             W(base, 0x288) = (randomValue() & 7);
-            sub_081EC6BC(p);
-            sub_081EC7D8(p);
-            sub_081EC974(p);
+            ActorDisplay_UpdateScreenAnchor(p);
+            ActorDisplay_UpdateForegroundSprite(p);
+            ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
             if (W(base, 0x300))
                 W(base, 0x304) = 1;
@@ -217,9 +216,9 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
         case 3:
             SceneMover_ApproachScreenX(p, W(base, 0x294));
             W(base, 0x288) = (randomValue() & 1);
-            sub_081EC6BC(p);
-            sub_081EC7D8(p);
-            sub_081EC974(p);
+            ActorDisplay_UpdateScreenAnchor(p);
+            ActorDisplay_UpdateForegroundSprite(p);
+            ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
             W(base, 0x304) = 0;
             W(base, 0x2fc) = 3;
@@ -233,9 +232,9 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
             SceneMover_ApproachScreenX(p, W(base, 0x294));
             B(base, 0x2f0) |= 4;
             W(base, 0x288) = (randomValue() & 1);
-            sub_081EC6BC(p);
-            sub_081EC7D8(p);
-            sub_081EC974(p);
+            ActorDisplay_UpdateScreenAnchor(p);
+            ActorDisplay_UpdateForegroundSprite(p);
+            ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
             if (W(base, 0x300)) {
                 B(base, 0x2f0) &= ~4;
@@ -246,5 +245,5 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EE518);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateSequenceTwoAction);
 #endif

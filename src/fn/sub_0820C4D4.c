@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Screamer_UpdateScream          sub_0820C4D4
-#define Screamer_WaitForPlayerApproach sub_0820C334
 #ifdef NONMATCHING
 // fuzzy: 94.9%
 // Remaining differences: animation constant copies, switch-case liveness and field-address registers.
@@ -185,5 +183,5 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820C4D4);
+INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
 #endif

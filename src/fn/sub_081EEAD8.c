@@ -19,9 +19,9 @@ extern const u16 gUnk_086141BC[];
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 void sub_08113398(struct PackedVec *, struct PackedVec *, void *, void *, s32, s32, s32, s32, s32,
                   s32, s32, s32, s32, s32);
-void sub_081EC6BC(struct P *);
-void sub_081EC7D8(struct P *);
-void sub_081EC974(struct P *);
+void ActorDisplay_UpdateScreenAnchor(struct P *);
+void ActorDisplay_UpdateForegroundSprite(struct P *);
+void ActorDisplay_UpdateAccentSprite(struct P *);
 #define B(o)   (*(u8 *)((u8 *)p + (o)))
 #define W(o)   (*(s32 *)((u8 *)p + (o)))
 #define PTR(o) (*(void **)((u8 *)p + (o)))
@@ -110,9 +110,9 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
             B(0xaf) = 1;
             break;
     }
-    sub_081EC6BC(input);
-    sub_081EC7D8(input);
-    sub_081EC974(input);
+    ActorDisplay_UpdateScreenAnchor(input);
+    ActorDisplay_UpdateForegroundSprite(input);
+    ActorDisplay_UpdateAccentSprite(input);
 }
 
 #else

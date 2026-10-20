@@ -5,7 +5,6 @@
 // Remaining differences: release-target vector/address lifetimes and RNG register allocation.
 #include "engine.h"
 
-#define Hresvelgr_UpdatePlayerRelease sub_0819FE9C
 // confidence=low: moves a requested player position and eventually restores player control.
 struct Vec {
     s16 x, y, z, pad;
@@ -267,5 +266,5 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819FE9C);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
 #endif

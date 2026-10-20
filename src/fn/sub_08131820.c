@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActorControl_UpdateRouteApproach sub_08131820
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"

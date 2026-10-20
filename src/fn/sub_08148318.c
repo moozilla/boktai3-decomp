@@ -141,7 +141,6 @@ static inline s32 RandomBits(u32 mask)
     gUnk_03005308 = index;
     return gUnk_0203B400[index];
 }
-#define Player_UpdateWaveringMovement sub_08148318
 // confidence=low: selects nearby directions with randomized hold durations.
 void Player_UpdateWaveringMovement(struct Player *p)
 {
@@ -205,5 +204,5 @@ void Player_UpdateWaveringMovement(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08148318);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateWaveringMovement);
 #endif

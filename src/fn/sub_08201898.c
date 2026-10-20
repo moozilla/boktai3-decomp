@@ -1,9 +1,8 @@
 #include "global.h"
 #include "animated_hazard.h"
-#define gTerrainMap                           gUnk_030052F4
-#define gTerrainWidth                         gUnk_030052F8
-#define gTerrainHeight                        gUnk_030052FC
-#define ScriptCombatActor_TryProjectileAttack sub_08201898
+#define gTerrainMap    gUnk_030052F4
+#define gTerrainWidth  gUnk_030052F8
+#define gTerrainHeight gUnk_030052FC
 struct ScriptCombatActor {
     u8 pad0[0x40];
     struct SceneVec position;
@@ -21,7 +20,7 @@ struct ScriptCombatActor {
     u8 pad198[0x1cc - 0x198];
     void *sequence;
 };
-u32 sub_08201A78(void *);
+u32 ScriptCombatActor_UpdateProjectileAttack(void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 struct CannonSample {
@@ -73,7 +72,7 @@ u32 ScriptCombatActor_TryProjectileAttack(struct ScriptCombatActor *p)
                 if (((cell[0] & 15u) << 8) > p->position.y + 128)
                     break;
                 if (i == 4) {
-                    p->update = sub_08201A78;
+                    p->update = ScriptCombatActor_UpdateProjectileAttack;
                     Anim_RestartSequence(p->animation, p->sequence, 1, 0, 0);
                     p->timer = p->duration;
                     p->phase = 0;

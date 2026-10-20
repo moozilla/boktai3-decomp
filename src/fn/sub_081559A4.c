@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 87.3%
-#define Player_UpdateTimedChargeAction sub_081559A4
 // confidence=low: timed held-action phases, animation and completion script.
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -158,5 +157,5 @@ end:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081559A4);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTimedChargeAction);
 #endif

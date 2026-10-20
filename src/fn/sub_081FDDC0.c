@@ -1,5 +1,4 @@
 #include "global.h"
-#define OrbitEffect_SpawnOrbitTrail sub_081FDDC0
 #ifdef NONMATCHING
 // fuzzy: 88.4%
 // Remaining differences: timer mask copy, sine-table pointer lifetime, and registers.
@@ -97,5 +96,5 @@ void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FDDC0);
+INCLUDE_ASM("asm/nonmatching", OrbitEffect_SpawnOrbitTrail);
 #endif

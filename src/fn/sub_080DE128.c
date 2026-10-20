@@ -1,4 +1,3 @@
-#define Dog_SelectTargetAction sub_080DE128
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.

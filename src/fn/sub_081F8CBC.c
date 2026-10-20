@@ -22,10 +22,9 @@ static inline u8 consume(struct Ratatosk *p)
     }
     return 0;
 }
-#define W(o)                           (*(s32 *)(p + (o)))
-#define H(o)                           (*(s16 *)(p + (o)))
-#define V(o)                           (*(struct Vec *)(p + (o)))
-#define Ratatosk_UpdateRetreatSequence sub_081F8CBC
+#define W(o) (*(s32 *)(p + (o)))
+#define H(o) (*(s16 *)(p + (o)))
+#define V(o) (*(struct Vec *)(p + (o)))
 // confidence=low: animation sequence moves away from the player before selecting a distant point.
 void Ratatosk_UpdateRetreatSequence(u8 *p)
 {

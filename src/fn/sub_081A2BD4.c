@@ -13,7 +13,7 @@ struct ActorReaction {
 };
 extern u32 gUnk_0300523C;
 extern u16 gUnk_02000550;
-void sub_081A26D8(struct ActorReaction *);
+void Hresvelgr_UpdateAnimationAndTargets(struct ActorReaction *);
 void Hresvelgr_UpdateBehaviorMode(struct ActorReaction *);
 u32 Hresvelgr_ApplyRequestedAction(struct ActorReaction *);
 void ActorReaction_UpdateCallbackGate(struct ActorReaction *);
@@ -26,7 +26,7 @@ u32 ActorReaction_Tick(struct ActorReaction *actor)
         if (actor->state == 13)
             actor->callbackBlocked = 1;
     } else {
-        sub_081A26D8(actor);
+        Hresvelgr_UpdateAnimationAndTargets(actor);
         ActorReaction_ResetFlagsAndDispatch(actor);
         ActorReaction_CommitRequestedState(actor);
         ActorReaction_UpdateCallbackGate(actor);

@@ -131,7 +131,6 @@ struct ReleaseAnimation {
     struct DisplaySequenceState seq;
     const void *resource;
 };
-#define Player_UpdateDirectionRecovery sub_08148608
 // confidence=low: uses a stored direction sample until recovery animation completes.
 void Player_UpdateDirectionRecovery(struct Player *p)
 {
@@ -155,5 +154,5 @@ void Player_UpdateDirectionRecovery(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08148608);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateDirectionRecovery);
 #endif

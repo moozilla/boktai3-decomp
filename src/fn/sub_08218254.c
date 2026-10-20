@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SpriteOam_QueueCameraRelativeSprites sub_08218254
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // Remaining differences: camera/offset scheduling, signed comparisons, and register lifetimes.
@@ -179,5 +178,5 @@ void SpriteOam_QueueCameraRelativeSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08218254);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueCameraRelativeSprites);
 #endif

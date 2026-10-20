@@ -1,4 +1,3 @@
-#define Dog_ResumeRoute sub_080E4834
 #include "scene_actor_chase.h"
 // confidence=low: resumes group chase or the saved route after arrival.
 #ifdef NONMATCHING
@@ -41,5 +40,5 @@ void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E4834);
+INCLUDE_ASM("asm/nonmatching", Dog_ResumeRoute);
 #endif

@@ -3,8 +3,6 @@
 // fuzzy: 92.5%
 // Remaining differences: PRE stack-slot order and register allocation in route reacquisition.
 // MATCHING_CONCESSION: register-pinning
-#define Mummy_RequestStraightRoute sub_080D6FDC
-#define Mummy_TryDirectPursuit     sub_080D6608
 
 #include "scene_actor_chase.h"
 
@@ -215,5 +213,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D6608);
+INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
 #endif

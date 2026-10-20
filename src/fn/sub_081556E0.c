@@ -1,7 +1,7 @@
 #include "global.h"
 
 #define Player_UpdateStateMotionCue                                                                \
-    sub_081556E0 // confidence=low: tentative cue role from callback phases.
+    Player_UpdateStateMotionCue // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 // Remaining event mask ordering, resource selection stores and playback differ.
@@ -122,5 +122,5 @@ void Player_UpdateStateMotionCue(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081556E0);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateStateMotionCue);
 #endif

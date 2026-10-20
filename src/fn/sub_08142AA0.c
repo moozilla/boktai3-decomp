@@ -1,9 +1,8 @@
 #include "global.h"
 
 // confidence=low: continuation of the neighboring object-push action.
-#define Player_UpdateObjectPushRecovery sub_08142AA0
-#define F8(n)                           (*(u8 *)(p + (n)))
-#define F16(n)                          (*(u16 *)(p + (n)))
+#define F8(n)  (*(u8 *)(p + (n)))
+#define F16(n) (*(u16 *)(p + (n)))
 extern const s16 gUnk_086149C4[];
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);

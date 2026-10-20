@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorDecision_UpdateHazardPath sub_0817BDB0
 
 struct VolumeActor {
     u8 pad0[0x51];

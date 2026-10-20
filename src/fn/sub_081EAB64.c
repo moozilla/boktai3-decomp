@@ -1,5 +1,4 @@
 #include "global.h"
-#define Params3D0_UpdateDisplay sub_081EAB64
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
 #ifdef NONMATCHING
@@ -326,5 +325,5 @@ void Params3D0_UpdateDisplay(struct Display *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EAB64);
+INCLUDE_ASM("asm/nonmatching", Params3D0_UpdateDisplay);
 #endif

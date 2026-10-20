@@ -5,7 +5,6 @@
 // fuzzy: 80.7%
 // Remaining differences: interpolation temporaries, spill placement and argument setup.
 
-#define Vanargand_UpdatePaletteTransition sub_081A5614
 // confidence=low: palette ownership follows adjacent Vanargand transition routines.
 struct PaletteTransition {
     u8 pad0[0x718];
@@ -187,5 +186,5 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A5614);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteTransition);
 #endif

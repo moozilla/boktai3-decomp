@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneHud_FinishPageExit sub_08176BA4
 extern u16 gUnk_03004BD8, gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
 extern u32 gUnk_0300523C;
 void Hud_InitSelectionBounds(u32, u32);

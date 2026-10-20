@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_080F52C0(u8 *);
+void Sword_BeginTargetOrbit(u8 *);
 void Callback_InvokeActor(u8 *, void (*)(u8 *));
 static inline u8 Take(u8 *s)
 {
@@ -22,7 +22,7 @@ void Sword_UpdateThrustAttack(u8 *s)
 {
     if (Take(s)) {
         void (**p)(u8 *) = (void (**)(u8 *))(s + 0x178);
-        void (*fn)(u8 *) = sub_080F52C0;
+        void (*fn)(u8 *) = Sword_BeginTargetOrbit;
         *p = fn;
     }
     {

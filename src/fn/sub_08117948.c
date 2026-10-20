@@ -68,7 +68,7 @@ void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Obj *);
 void sub_0811D91C(struct Obj *);
-void sub_0811BD30(struct Obj *, void *);
+void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct Obj *);
@@ -81,10 +81,10 @@ void Anim_Step(void *, void *);
 void sub_0811D6C8(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 s32 sub_08249240(void *, s32, u32);
-void sub_0811C484(void *, void *, u32);
+void ChargeMarker_TickHold(void *, void *, u32);
 extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
-void sub_08117948(struct Glove *);
+void Glove_UpdateStopping(struct Glove *);
 
 #ifdef NONMATCHING
 // fuzzy: 82.3%
@@ -141,7 +141,7 @@ static inline void UpdateActions(struct Glove *p)
 {
     struct Obj *self = &p->motion;
     if (U8(p, 0x2CD) == 2) {
-        sub_0811C484(self, p->model, (u32)p->input);
+        ChargeMarker_TickHold(self, p->model, (u32)p->input);
     } else if (U8(p, 0x2CD) == 5) {
         if (p->input[0] & 2) {
             if (!sub_08249240((u8 *)p + 0x2C8, 0, U32(p, 0x2C8))) {
@@ -184,7 +184,6 @@ static inline void UpdateActions(struct Glove *p)
     if ((!p || !(p->flags & 4)) && (U32(self, 0xC) & 0x800))
         U8(self, 0x5EE) |= 4;
 }
-#define Glove_UpdateStopping sub_08117948
 void Glove_UpdateStopping(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -251,7 +250,7 @@ void Glove_UpdateStopping(struct Glove *p)
         p->height = h;
         sub_0811D91C(self);
 
-        sub_0811BD30(self, p->model);
+        Actor_UpdateShadowSpriteParts(self, p->model);
         if (self->flags40 & 4)
             sub_0811BF44(self);
         if (self->flags40 & 2)
@@ -265,5 +264,5 @@ void Glove_UpdateStopping(struct Glove *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08117948);
+INCLUDE_ASM("asm/nonmatching", Glove_UpdateStopping);
 #endif

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Vanargand_ApplyPendingDamage sub_081ACC24
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
@@ -165,7 +164,6 @@ static inline void changeState(struct Vanargand *p, s32 state, void *callback)
     }
 }
 
-#define Vanargand_UpdatePaletteLeap sub_081AB078
 static inline void setFlags(struct Vanargand *p, u32 mask)
 {
     p->flags |= mask;

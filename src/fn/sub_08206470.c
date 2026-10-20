@@ -4,13 +4,13 @@ void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void SceneTask_DispatchUnlessPaused(void);
 void Ooze_Destroy(void);
-s32 sub_08206098(void *, void *);
+s32 Ooze_InitializeFromScript(void *, void *);
 void *Ooze_Create(void *p)
 {
     void *r = Task_Create(8, 0x160);
     if (r) {
         Task_SetCallbacks(r, SceneTask_DispatchUnlessPaused, Ooze_Destroy);
-        if (sub_08206098(r, p) < 0) {
+        if (Ooze_InitializeFromScript(r, p) < 0) {
             Task_Kill(r);
             return 0;
         }

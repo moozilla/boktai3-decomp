@@ -4,10 +4,9 @@
 // Remaining differences: branch sharing, address lifetimes and register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
-#define VulcanCannon_UpdateDamageState sub_082074F0
 extern u32 gUnk_030053F0, gUnk_02000560;
-void sub_08206C00(void);
-void sub_082071D0(void);
+void VulcanCannon_UpdateTargeting(void);
+void VulcanCannon_UpdateDefeatEffects(void);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
@@ -69,7 +68,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle,
                                    *(u8 *)((u8 *)p + 0xf7) == 4, p->hudDuration);
         }
-        if (p->state == sub_08206C00)
+        if (p->state == VulcanCannon_UpdateTargeting)
             p->aimTimer = 120;
         if (p->hp <= 0) {
             struct SceneVec center, smoke;
@@ -105,7 +104,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             Anim_RestartSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1be);
             p->flash = 0;
-            p->state = sub_082071D0;
+            p->state = VulcanCannon_UpdateDefeatEffects;
             p->timer = 0;
             Sound_PlaySong(0x52d);
         }
@@ -157,5 +156,5 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082074F0);
+INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateDamageState);
 #endif

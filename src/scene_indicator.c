@@ -278,7 +278,7 @@ int SceneIndicator_CreateFromScript(void)
     }
     p->frame = Script_GetKeywordValue('P', -1);
     if (p->frame < 0) {
-        switch (sub_0821DA14(&p->sprite.position) & 14) {
+        switch (Terrain_GetHigherNeighborMask(&p->sprite.position) & 14) {
             case 2:
                 p->frame = 4;
                 break;

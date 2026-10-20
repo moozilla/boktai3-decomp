@@ -11,12 +11,12 @@ struct P {
 };
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-void sub_081EC6BC(struct P *);
-void sub_081EC7D8(struct P *);
-void sub_081EC974(struct P *);
+void ActorDisplay_UpdateScreenAnchor(struct P *);
+void ActorDisplay_UpdateForegroundSprite(struct P *);
+void ActorDisplay_UpdateAccentSprite(struct P *);
 void SceneActors_EmitPeriodicParticles(struct P *, s32);
 s32 SceneMover_ApproachScreenX(struct P *, s32);
-s32 sub_081ECE80(struct P *, s32, s32);
+s32 SceneMover_StepPastScreenX(struct P *, s32, s32);
 s32 Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(s32, struct SceneVec *);
 void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32, s32);
@@ -32,9 +32,9 @@ static inline u32 RandomBits(u32 mask)
 }
 static inline void Update(struct P *p, s32 time)
 {
-    sub_081EC6BC(p);
-    sub_081EC7D8(p);
-    sub_081EC974(p);
+    ActorDisplay_UpdateScreenAnchor(p);
+    ActorDisplay_UpdateForegroundSprite(p);
+    ActorDisplay_UpdateAccentSprite(p);
     SceneActors_EmitPeriodicParticles(p, time);
 }
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
@@ -298,9 +298,9 @@ void SceneActors_UpdateLeftDeparture(struct P *arg, s32 ticks)
         *((u8 *)input + 0xa2) = 0;
         *(s32 *)((u8 *)input + 0xa4) = 0;
     }
-    sub_081EC6BC(input);
-    sub_081EC7D8(input);
-    sub_081EC974(input);
+    ActorDisplay_UpdateScreenAnchor(input);
+    ActorDisplay_UpdateForegroundSprite(input);
+    ActorDisplay_UpdateAccentSprite(input);
     SceneActors_EmitPeriodicParticles(input, time);
 }
 

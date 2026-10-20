@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define PairedSceneActor_InitializeHalf sub_081B0018
 // confidence=low: initializes a half's sprite, origin, collision, target registration and shadow.
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);

@@ -5,7 +5,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 // MATCHING_CONCESSION: register-pinning
-#define CannonTurret_UpdateCombat sub_08208740
 extern u32 gUnk_030053F0, gUnk_02000560, gUnk_03005308;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -14,7 +13,7 @@ void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
-void sub_08208498(void);
+void CannonTurret_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))
@@ -236,7 +235,8 @@ s32 CannonTurret_UpdateCombat(u8 *p)
         H(0x12e) = 1;
         H(0x12c) = 0;
     }
-    if (Mod(W(0x18), 240) == 0 && H(0x130) == 0 && *(void (**)(void))(p + 0x108) != sub_08208498) {
+    if (Mod(W(0x18), 240) == 0 && H(0x130) == 0 &&
+        *(void (**)(void))(p + 0x108) != CannonTurret_FireAimedVolley) {
         Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 9, 0, 8);
         Anim_SetDurationScale(p + 0x10c, 32);
         H(0x134) = 1;
@@ -266,5 +266,5 @@ s32 CannonTurret_UpdateCombat(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08208740);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
 #endif

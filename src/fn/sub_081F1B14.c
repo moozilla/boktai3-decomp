@@ -46,7 +46,7 @@ void SceneActors_TickStateCallback(struct SingletonSlot7Actor *) __asm__(
 void SceneActors_UpdateTargetMetrics(struct SingletonSlot7Actor *);
 void SceneActors_UpdateEffects(struct SingletonSlot7Actor *);
 void Sound_StopSong(u32);
-void sub_081ECF18(void);
+void SceneActors_UpdateIdleDisplay(void);
 void sub_081F1274(struct SingletonSlot7Actor *);
 
 static inline u8 PlayerHasFlag(void)
@@ -67,8 +67,8 @@ s32 SingletonSlot7_Update(void *arg)
     struct SingletonSlot7Scroll scroll[2];
     if (actor->motionMode == 0) {
         u32 flagged = PlayerHasFlag();
-        if (flagged == 1 && actor->callback != sub_081ECF18) {
-            p->callback = sub_081ECF18;
+        if (flagged == 1 && actor->callback != SceneActors_UpdateIdleDisplay) {
+            p->callback = SceneActors_UpdateIdleDisplay;
             p->callbackTimer = 0;
             p->callbackEntered = flagged;
             p->flagA2 = 0;

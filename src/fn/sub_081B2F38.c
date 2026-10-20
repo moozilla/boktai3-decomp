@@ -2,7 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartOffsetStrike sub_081B2F38
 
 #ifdef NONMATCHING
 // fuzzy: 89.0%
@@ -21,8 +20,8 @@ struct VanargandPart {
     u8 reset, enter, finished;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, s32, u32);
-void sub_081B939C(void *, const void *, const void *, s32, s32);
-void sub_081B95E4(void *);
+void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
+void MotionTrack_Update(void *);
 void Vanargand_EmitPartTrail(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -233,7 +232,7 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 7, (u8)p->variant, 4);
                 StepPlayback(p, &p->sequence, p, 1);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 1);
                 *enter = 1;
@@ -268,7 +267,7 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 *enter = 0;
                 Sound_PlaySong(0x589);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             if (MotionEnded(p)) {
@@ -291,7 +290,7 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 MakeVector(&delta, p->heading, p->distance);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 1);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 4);
                 *enter = 1;
@@ -306,5 +305,5 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B2F38);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartOffsetStrike);
 #endif

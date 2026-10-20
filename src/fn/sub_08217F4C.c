@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SpriteOam_QueueProjectedSprites sub_08217F4C
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // Remaining differences: projection temporaries, signed comparisons, and register lifetimes.
@@ -186,5 +185,5 @@ void SpriteOam_QueueProjectedSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08217F4C);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueProjectedSprites);
 #endif

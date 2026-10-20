@@ -1,5 +1,4 @@
 #include "global.h"
-#define Ratatosk_UpdateSunOrbPlayerTransfer sub_081FA418
 // confidence=low: slot checks gate a two-stage transfer of the player to a sun-orb position.
 struct Target {
     u32 distance;

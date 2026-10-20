@@ -1,4 +1,3 @@
-#define SceneActorReaction_RecordDefeat sub_08134398
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */

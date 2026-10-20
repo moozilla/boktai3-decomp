@@ -169,7 +169,6 @@ static inline u32 CannonEmitter_TestMode(u32 mask)
 {
     return gUnk_02000560 & mask;
 }
-#define CannonEmitter_UpdateAnimation sub_08203204
 s32 CannonEmitter_UpdateAnimation(struct CannonEmitter *input)
 {
     struct CannonEmitter *p = input;

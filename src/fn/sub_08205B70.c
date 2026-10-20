@@ -5,9 +5,9 @@
 #ifdef NONMATCHING
 // fuzzy: 89.1%
 // Remaining differences: state-transition address lifetimes and animation-step register allocation.
-#define Ooze_UpdateAttack sub_08205B70
+#define Ooze_UpdateAttack Ooze_BeginAttack
 // Keep the existing exported name so the draft recorder resolves the fallback.
-#define sub_08205B70 Ooze_BeginAttack
+#define Ooze_BeginAttack Ooze_BeginAttack
 struct Ooze {
     u8 pad0[0x20];
     struct DisplaySequenceSprite sprite;

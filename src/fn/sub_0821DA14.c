@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 // confidence=low: returns higher-cell flags used by SceneIndicator_CreateFromScript.
-#define Terrain_GetHigherNeighborMask sub_0821DA14
 struct Position {
     s16 x, y, z, pad;
 };

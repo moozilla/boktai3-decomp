@@ -5,10 +5,9 @@
 #define VC_DURATION "r3"
 #define VC_WEIGHT   "r1"
 #include "vulcan_cannon_worker.h"
-#define VulcanCannon_UpdateFiringBurst sub_08207010
 s32 Mod(s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-void sub_08206C00(void);
+void VulcanCannon_UpdateTargeting(void);
 void VulcanCannon_FireProjectile(void *);
 s32 VulcanCannon_UpdateFiringBurst(struct VulcanCannon *p)
 {
@@ -23,7 +22,7 @@ s32 VulcanCannon_UpdateFiringBurst(struct VulcanCannon *p)
         p->timer = 0;
         if (p->shotCount >= p->burstCount * 3 && p->burstCount != 0) {
             Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
-            p->state = sub_08206C00;
+            p->state = VulcanCannon_UpdateTargeting;
             p->timer = 0;
         }
     }

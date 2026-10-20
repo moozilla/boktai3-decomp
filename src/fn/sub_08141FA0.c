@@ -1,9 +1,8 @@
 #include "global.h"
 // confidence=low: spends shared resource to enter a timed fast movement phase.
-#define Player_UpdateResourceDash sub_08141FA0
-#define B(n)                      (*(u8 *)(p + (n)))
-#define H(n)                      (*(u16 *)(p + (n)))
-#define S(n)                      (*(s16 *)(p + (n)))
+#define B(n) (*(u8 *)(p + (n)))
+#define H(n) (*(u16 *)(p + (n)))
+#define S(n) (*(s16 *)(p + (n)))
 extern u8 *gUnk_02000710;
 s32 Player_ConsumeStateEntry(void *);
 s32 Player_CanSpendSharedResource(void *, s32);
@@ -13,7 +12,7 @@ void Player_SetActionPhase(void *, u8);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetSmoothedDirection(void *);
 void Player_SetDirectionalVelocity(void *, s32);
-void sub_08141C40(void *, s32);
+void Player_EmitMovementEffects(void *, s32);
 void Player_UpdateFacingSide(void *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -68,7 +67,7 @@ void Player_UpdateResourceDash(u8 *p)
             if (S(0x34c) != -1 && S(0x4b6) == 0)
                 B(0x3a4) = Player_GetSmoothedDirection(p);
             Player_SetDirectionalVelocity(p, B(0x4f0));
-            sub_08141C40(p, 1);
+            Player_EmitMovementEffects(p, 1);
             Player_UpdateFacingSide(p);
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 1), 32, 1);
             break;

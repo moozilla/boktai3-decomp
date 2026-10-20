@@ -653,7 +653,7 @@ void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierConte
 
 void sub_0813E90C(struct Player *);
 
-void sub_0814F328(void);
+void Player_UpdateAttachedAttackCharge(void);
 
 void sub_0814D9C4(void);
 
@@ -681,7 +681,7 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
         Player_GetEquipmentValue((const struct SceneInputItemDescriptor *)&descriptor);
     Player_BuildActionModifiers(p, &p->statModifierContext, &descriptor);
     if (p->statModifierContext.actionKind == 0x30)
-        p->actionCallback = sub_0814F328;
+        p->actionCallback = Player_UpdateAttachedAttackCharge;
     else
         p->actionCallback = sub_0814D9C4;
     p->actionResetCounter = 0;

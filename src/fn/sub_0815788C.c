@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "player.h"
-#define Player_UpdateActionModeMovement sub_0815788C
 // confidence=low: action callback table and nearby interaction routines establish the family.
 void Player_AccumulateAction(struct Player *, s32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
@@ -15,8 +14,8 @@ void Player_UpdateDirectionHistory(struct Player *);
 void sub_08156FE0(struct Player *);
 void Player_UpdateCameraInput(struct Player *, s32);
 void Player_RunPendingCallback(struct Player *);
-void sub_081411B8(struct Player *);
-void sub_0815767C(struct Player *);
+void Player_ApplyDirectionalForce(struct Player *);
+void Player_ApplyControlPresentation(struct Player *);
 void Player_BlendCameraTarget(struct Player *);
 void Player_ClampPositionToStoredTerrainCell(struct Player *);
 void sub_08140CC4(struct Player *);
@@ -114,8 +113,8 @@ void Player_UpdateActionModeMovement(struct Player *p)
             if (p->movementVelocityLocked)
                 *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
             else
-                sub_081411B8(p);
-            sub_0815767C(p);
+                Player_ApplyDirectionalForce(p);
+            Player_ApplyControlPresentation(p);
             if (p->cameraOffsetActive)
                 Player_BlendCameraTarget(p);
             Player_ClampPositionToStoredTerrainCell(p);
@@ -167,7 +166,7 @@ void Player_UpdateActionModeMovement(struct Player *p)
             if (p->unk45C == 1)
                 Player_RunPendingCallback(p);
             Callback_InvokeActor(p, gUnk_08610B70[p->tetherMode]);
-            sub_0815767C(p);
+            Player_ApplyControlPresentation(p);
             break;
         case 2:
             p->statusFlags |= 0x40000;
@@ -175,7 +174,7 @@ void Player_UpdateActionModeMovement(struct Player *p)
             if (p->unk45C == 1)
                 Player_RunPendingCallback(p);
             Callback_InvokeActor(p, p->triggerAnimationCallback);
-            sub_0815767C(p);
+            Player_ApplyControlPresentation(p);
             PlayerCue_UpdatePeriodicParticles(p);
             break;
     }

@@ -9,8 +9,7 @@
 #define VC_DURATION "r4"
 #define VC_WEIGHT   "r2"
 #include "vulcan_cannon_worker.h"
-#define VulcanCannon_UpdateFacingTurn sub_08207350
-void sub_08206C00(void);
+void VulcanCannon_UpdateTargeting(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 static inline u32 TurnAnimation(struct VulcanCannon *source)
 {
@@ -138,7 +137,7 @@ void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
     register struct VulcanCannon *p asm("r12") = owner;
     register u32 token asm("r0");
     if (!p->allowTurn) {
-        p->state = sub_08206C00;
+        p->state = VulcanCannon_UpdateTargeting;
         Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
         token = 0;
         asm("" : "+r"(token));
@@ -156,7 +155,7 @@ void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
             else
                 p->facing = 0;
             asm("" : : "r"(p) : "memory");
-            p->state = sub_08206C00;
+            p->state = VulcanCannon_UpdateTargeting;
             Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
         }
     }
@@ -164,5 +163,5 @@ void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08207350);
+INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateFacingTurn);
 #endif

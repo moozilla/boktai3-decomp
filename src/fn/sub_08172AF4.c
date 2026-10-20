@@ -10,7 +10,7 @@ void PauseMenu_RefreshEquipmentPanel(u8 *);
 void SelectionPanel_ResetSecondarySelection(u8 *);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, u32);
 void Hud_SetInteractionCallback(u8 *, void *, u32);
-void sub_081731E8(void);
+void SceneHud_UpdateSecondaryActionSelection(void);
 void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
 u32 InventoryPanel_UpdateSelectedUnlock(u8 *, u32, u32, u32, u32);
 void InventoryPanel_SetEntryRow(u8 *, u32, u32, u32, u32, u32);
@@ -39,7 +39,7 @@ void PauseInventory_ReturnToEquipmentSelection(u8 *s)
     PauseMenu_RefreshEquipmentPanel(s);
     SelectionPanel_ResetSecondarySelection(s);
     PauseMenu_SetPromptIconPositions(s, 0, 0);
-    Hud_SetInteractionCallback(s, sub_081731E8, 0);
+    Hud_SetInteractionCallback(s, SceneHud_UpdateSecondaryActionSelection, 0);
     {
         struct Flags {
             u32 pad[2], flags;

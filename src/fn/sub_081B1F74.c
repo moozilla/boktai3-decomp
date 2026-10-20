@@ -1,7 +1,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartPairedStrike sub_081B1F74
 
 #ifdef NONMATCHING
 // fuzzy: 92.5%
@@ -22,8 +21,8 @@ struct VanargandPart {
     u8 reset, enter, finished;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, s32, u32);
-void sub_081B939C(void *, const void *, const void *, s32, s32);
-void sub_081B95E4(void *);
+void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
+void MotionTrack_Update(void *);
 void Vanargand_EmitPartTrail(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -110,7 +109,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 AddVector(&delta, &p->origin, &delta);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 2);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 1);
                 *enter = 1;
@@ -131,7 +130,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             }
             break;
         case 2:
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 if (ScenePair_CountPositiveCounters(boss) == 2 &&
                     boss[p->variant == 1 ? 0x205 : 0x421] == 5) {
@@ -181,7 +180,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
         case 4:
             SetFlags(p, 8);
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 5);
                 p->enter = 1;
@@ -202,5 +201,5 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1F74);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartPairedStrike);
 #endif

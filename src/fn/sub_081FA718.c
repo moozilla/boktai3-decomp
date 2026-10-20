@@ -1,5 +1,4 @@
 #include "global.h"
-#define Ratatosk_UpdateCollidersAndPalette sub_081FA718
 struct HalfBits {
     s32 bits : 16;
 };
@@ -60,7 +59,7 @@ void Camera_FollowPlayerWithoutCompletion(s32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 Ratatosk_GetDefaultPaletteIndex(void *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
-void sub_081F2CEC(void *);
+void PaletteEffect_RefreshPalette(void *);
 void CameraTracking_Update(void *);
 static inline s32 scale(s32 v)
 {
@@ -274,7 +273,7 @@ void Ratatosk_UpdateCollidersAndPalette(u8 *p)
                 Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32,
                                          gUnk_030042E4 + bank * 32, S(0x4ac), B(0x4af));
             } else
-                sub_081F2CEC(p);
+                PaletteEffect_RefreshPalette(p);
         } else if (B(0x4ae) == 3) {
             Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32, gUnk_030042E4 + bank * 32,
                                      S(0x4ac), B(0x4af));

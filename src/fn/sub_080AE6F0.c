@@ -1,13 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: resumes the route or runs the recovery script.
-#define Vorn_ResumeReactionRoute sub_080AE6F0
 #ifdef NONMATCHING
 // fuzzy: 83.9%
 // Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation.
 extern const u8 gUnk_0824E20C[];
 u8 sub_080B54DC(void *);
-u8 sub_080B3ADC(void *, u32);
+u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_SendMessage(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -62,7 +61,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
             *f &= mask;
         }
         sub_080B3110(actor, 1, gUnk_0824E20C, 0x39F);
-    } else if (!sub_080B3ADC(context, 1)) {
+    } else if (!SceneActor_DispatchContextAction(context, 1)) {
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
         u32 *actionFlags;
@@ -97,5 +96,5 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     actor->field2C2 = 64;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AE6F0);
+INCLUDE_ASM("asm/nonmatching", Vorn_ResumeReactionRoute);
 #endif

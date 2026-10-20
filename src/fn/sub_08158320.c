@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#define Player_UpdateInteractionHoverDisplay sub_08158320
 // confidence=low: varying height offset suggests hovering during interaction.
 void Player_ClampInteractionVelocity(struct Player *);
 void sub_08225B74(void *);

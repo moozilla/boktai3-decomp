@@ -1,7 +1,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartTracking sub_081B1E24
 
 #ifdef NONMATCHING
 // fuzzy: 90.7%
@@ -22,8 +21,8 @@ struct VanargandPart {
     u8 reset, enter, finished;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, s32, u32);
-void sub_081B939C(void *, const void *, const void *, s32, s32);
-void sub_081B95E4(void *);
+void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
+void MotionTrack_Update(void *);
 void Vanargand_EmitPartTrail(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -69,7 +68,7 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
                     Offset(&delta, -512, 512);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (++p->timer & 64) {
                 SetState(p, 1);
                 p->enter = 1;
@@ -82,5 +81,5 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1E24);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartTracking);
 #endif

@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.6%
 // RNG stores, literal-load order and scratch registers still differ.
-#define SparkleEmitter_EmitParticle sub_081C29A4
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -23,7 +22,7 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern s16 gUnk_03005418[];
-struct Particle *sub_081C2968(struct Emitter *);
+struct Particle *ParticlePool_FindFreeEntry(struct Emitter *);
 static inline s32 random(void)
 {
     return gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
@@ -64,7 +63,7 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
     s32 angle, speed;
     if (emitter->speed <= 1)
         return;
-    particle = sub_081C2968(emitter);
+    particle = ParticlePool_FindFreeEntry(emitter);
     if (!particle)
         return;
     emitter->count++;
@@ -79,5 +78,5 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C29A4);
+INCLUDE_ASM("asm/nonmatching", SparkleEmitter_EmitParticle);
 #endif

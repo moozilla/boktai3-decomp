@@ -1,5 +1,4 @@
 #include "global.h"
-#define FieldHud_UpdateNumberDisplay sub_081796D8
 #ifdef NONMATCHING
 // fuzzy: 97.5%
 struct NumberDisplay {

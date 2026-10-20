@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_AdvanceScriptDestination sub_0814FC80
 // confidence=low: approaches the scripted planar destination and returns to the standing update.
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -112,5 +111,5 @@ void Player_AdvanceScriptDestination(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814FC80);
+INCLUDE_ASM("asm/nonmatching", Player_AdvanceScriptDestination);
 #endif
