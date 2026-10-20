@@ -1,7 +1,5 @@
 #include "global.h"
 /* AnimPanel_HandleClockInput: up/down (with hold repeat) changes the selected year/month/day/hour/minute field with wraparound, then refreshes the digit animations */
-#define AnimPanel_HandleClockInput sub_081DEA60
-#define AnimPanel_UpdateDigits     sub_081DE84C
 
 s32 Mod(s32, s32);
 s32 Clock_DaysInMonth(s32 year, s32 month);

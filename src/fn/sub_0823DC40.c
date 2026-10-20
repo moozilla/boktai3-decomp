@@ -7,10 +7,8 @@ void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_SaveActionIndex(struct Player *);
 s32 Player_UpdateFacingFromInputHistory(struct Player *);
 void sub_0823D8AC(struct Player *);
-s32 sub_0823DAB4(struct Player *);
+s32 Player_UpdateSweepAction(struct Player *);
 void Player_StartDirectionalEffect(struct Player *, u32, void *);
-
-#define Player_UpdateThrowAction sub_0823DC40
 
 void Player_UpdateThrowAction(struct Player *p)
 {
@@ -40,7 +38,7 @@ void Player_UpdateThrowAction(struct Player *p)
                 if (p->actionMode == 1 && p->actionCueFlags == 2 && p->actionCueCounter == 0)
                     Player_StartDirectionalEffect(p, p->facing, &p->position);
             }
-            if (sub_0823DAB4(p))
+            if (Player_UpdateSweepAction(p))
                 Player_SetTetherMode(p, 3, 6);
             break;
         case 6:

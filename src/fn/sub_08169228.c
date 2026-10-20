@@ -3,7 +3,6 @@
 #include "game_state.h"
 #include "player.h"
 
-#define PauseMenu_UpdateEquipmentSelection sub_08169228
 extern u16 gUnk_03005164[];
 void ResultPanel_DrawCappedCounters(struct SceneHudState *, s32, s32, s32);
 void ResultPanel_DrawCappedSmallCounters(struct SceneHudState *, s32, s32, s32);

@@ -1,4 +1,3 @@
-#define NamedObject_ConstrainTether sub_081023CC
 #include "named_object.h"
 #include "player.h"
 extern const struct SceneVec gUnk_086064C4;

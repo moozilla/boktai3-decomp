@@ -5,7 +5,7 @@ struct SelectionPanel {
     void *owner;
 };
 extern u32 gUnk_030053F4;
-void sub_08169504(struct SelectionPanel *);
+void PauseMenu_CreateSelectionWidgets(struct SelectionPanel *);
 void sub_08168850(struct SelectionPanel *);
 void sub_08168A0C(struct SelectionPanel *);
 void SceneHud_RebuildTertiaryOptions(struct SelectionPanel *);
@@ -16,7 +16,7 @@ void Hud_SetElementGroupFlags(struct SelectionPanel *);
 void SceneHud_RefreshWidgetVisibility(struct SelectionPanel *);
 void SelectionPanel_RefreshAttachedPanel(struct SelectionPanel *p)
 {
-    sub_08169504(p);
+    PauseMenu_CreateSelectionWidgets(p);
     if (p->owner) {
         sub_08168850(p);
         sub_08168A0C(p);

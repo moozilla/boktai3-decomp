@@ -1,6 +1,5 @@
 #include "global.h"
 /* NameEntry_UpdateCursor: positions the keyboard cursor sprite for the selected key (80 character cells in two 5x8 blocks, then the page/case/back/end buttons) */
-#define NameEntry_UpdateCursor sub_081DCFE4
 
 struct NameEntryAnim {
     u8 pad0[8];

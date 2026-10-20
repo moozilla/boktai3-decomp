@@ -2,7 +2,6 @@
 #include "scene_hud_display.h"
 #include "player.h"
 
-#define PauseMenu_RefreshStatusPanel sub_08169BE0
 void Hud_DrawHealthMeter(struct SceneHudState *, s32, s32, s32, s32);
 void sub_08164480(struct SceneHudState *, s32, s32, s32, s32, s32, s32);
 void StatDisplay_DrawGauge(struct SceneHudState *, s32, s32);

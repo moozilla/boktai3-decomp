@@ -7,7 +7,6 @@
 // pointer register (sp+0x28 in r6 after the loop, r7 for y/z/w and the call
 // argument, set up before the loop); arrays, structs, pointer locals and an
 // inline setter all failed to reproduce that split.
-#define PauseMenu_CreateSelectionWidgets sub_08169504
 
 void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
 {
@@ -52,5 +51,5 @@ void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
     EXTRA(&p->extraWidgetsC[2], 0x8F, 0xD0)
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08169504);
+INCLUDE_ASM("asm/nonmatching", PauseMenu_CreateSelectionWidgets);
 #endif

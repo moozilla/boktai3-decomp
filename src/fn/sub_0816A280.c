@@ -3,8 +3,6 @@
 #include "game_state.h"
 #include "player.h"
 
-#define PauseMenu_UpdateQuantityInput sub_0816A280
-#define PauseMenu_RefreshPriceDigits  sub_08169F44
 void StatusPanel_UpdateGaugePosition(struct SceneHudState *);
 void sub_0816A0D0(struct SceneHudState *);
 void PauseMenu_RefreshPriceDigits(struct SceneHudState *);

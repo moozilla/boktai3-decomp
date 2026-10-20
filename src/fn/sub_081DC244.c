@@ -1,6 +1,5 @@
 #include "global.h"
 /* ScreenMessage_Update: handles confirm/cancel and the optional yes/no cursor, or waits out the fade, then runs the chosen script and kills the task */
-#define ScreenMessage_Update sub_081DC244
 
 struct ScreenMessage {
     u8 pad0[0x24];

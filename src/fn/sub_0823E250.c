@@ -7,8 +7,6 @@ void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void sub_0823E124(struct Player *, struct SceneVec *, u32, s32);
 
-#define Player_UpdateSpinAction sub_0823E250
-
 struct SpinCtx {
     u8 unk0[0x48];
     u8 collider[0x54];

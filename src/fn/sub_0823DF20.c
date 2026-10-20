@@ -8,8 +8,6 @@ void Player_ConsumeActionResource(struct Player *);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 sub_0823DE6C(void *, u32, u32);
 
-#define Player_BeginSlashAction sub_0823DF20
-
 struct SlashCtx {
     u8 unk0[0x48];
     u8 collider[0x42];

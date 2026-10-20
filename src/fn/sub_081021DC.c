@@ -1,4 +1,3 @@
-#define NamedObject_ConstrainPlayer sub_081021DC
 #include "named_object.h"
 #include "player.h"
 #ifdef NONMATCHING
@@ -69,5 +68,5 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081021DC);
+INCLUDE_ASM("asm/nonmatching", NamedObject_ConstrainPlayer);
 #endif

@@ -37,7 +37,7 @@ s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void sub_0816A0D0(void *);
 void StatusPanel_UpdateGaugePosition(void *);
-void sub_08169F44(void *);
+void PauseMenu_RefreshPriceDigits(void *);
 s32 MessageWindow_ShowMessage(s32);
 void ScenePanel_UpdateDetail(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
@@ -70,7 +70,7 @@ void ScenePanel_BeginDetail(struct ScenePanel *p)
         a += 24;
     }
     zero = 0;
-    sub_08169F44(p);
+    PauseMenu_RefreshPriceDigits(p);
     p->selection = zero;
     p->previousSelection = zero;
     p->state = 0;
