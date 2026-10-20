@@ -2,6 +2,8 @@
 #include "global.h"
 #include "display_animation.h"
 
+#define Ooze_BeginAttack sub_08205B70
+
 #ifdef NONMATCHING
 // fuzzy: 89.1%
 // Remaining differences: state-transition address lifetimes and animation-step register allocation.
