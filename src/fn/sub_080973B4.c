@@ -49,7 +49,6 @@ done:
     return result;
 }
 /* actor must be nonnull: its control context is loaded before the availability gate. */
-#define Ghost_RequestVisibility sub_080973B4
 
 void Ghost_RequestVisibility(struct SceneActorRegistryResetView *input, const u16 *inputRequest)
 {

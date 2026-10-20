@@ -48,7 +48,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     }
     *restart = 0;
 }
-#define Ghost_UpdateDirectionalPose sub_0809599C
 
 void Ghost_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
 {

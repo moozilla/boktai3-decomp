@@ -54,7 +54,6 @@ static inline u16 Flag(struct SceneActorAnimationView *actor, u16 mask)
     return *p = mask | *p;
 }
 // confidence=low: selects Ghost's waiting animation and marks the wait complete after 60 ticks.
-#define Ghost_UpdateWaitingAnimation sub_08095EB4
 
 void Ghost_UpdateWaitingAnimation(struct SceneActorAnimationView *actor, s32 frame)
 {

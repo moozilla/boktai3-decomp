@@ -1,8 +1,7 @@
-#define Ghost_ApproachPlayer sub_08099590
-#define gPlayerSlots         gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
-void sub_08095EB4(void);
+void Ghost_UpdateWaitingAnimation(void);
 void Ghost_StartMovementToPosition(void *, void *);
 extern u8 *gUnk_02000580[4];
 struct RouteActorDestinationState {
@@ -26,7 +25,7 @@ void Ghost_ApproachPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct RouteActorDestinationState *state = actor->context;
     if (TakeFlag(&actor->field2B1)) {
-        void *callback = sub_08095EB4;
+        void *callback = Ghost_UpdateWaitingAnimation;
         u32 kind = 10;
         actor->field2B2 = 1;
         actor->field2B0 = 0;

@@ -21,8 +21,6 @@ struct S08097624 {
     u8 *entry;
 };
 
-#define Ghost_SelectRandomRouteEntry sub_08097624
-
 u32 Ghost_SelectRandomRouteEntry(struct S08097624 *p)
 {
     struct S08097624 *q = p;

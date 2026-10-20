@@ -3021,17 +3021,23 @@ addr,name,mode,confidence,source,notes
 08095540,Bee_Create,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); registry callback
 080956D4,SceneActorBehavior_OnContactForward,thumb,low,src-alias,
 08095740,Ghost_UpdateEnergyDrainAnimation,thumb,low,src-alias,
+0809599C,Ghost_UpdateDirectionalPose,thumb,low,src-alias,
+08095AC0,Ghost_UpdateDirectionalPoseB,thumb,low,src-alias,
 08095C00,Ghost_TurnTowardHeading,thumb,low,src-alias,
+08095EB4,Ghost_UpdateWaitingAnimation,thumb,low,src-alias,
 0809679C,Ghost_DecelerateMovement,thumb,low,src-alias,
 08096AC8,Ghost_RecoilTowardEndpoint,thumb,low,src-alias,
 080972AC,Ghost_InitMotionPreset,thumb,low,src-alias,Installs the Ghost motion preset at actor offset 0x284
 080972BC,SceneActor_BeginLinkedIdleReaction,thumb,low,src-alias,
+080973B4,Ghost_RequestVisibility,thumb,low,src-alias,
 080974F4,SceneActor_EasePlayerHeight,thumb,low,src-alias,
 080975C4,Bee_UpdateSway,thumb,low,src-alias,
+08097624,Ghost_SelectRandomRouteEntry,thumb,low,src-alias,
 08097690,SceneActor_InitLinkedReactionColliders,thumb,low,src-alias,
 08097758,Ghost_GetBehaviorCode,thumb,low,src-alias,Ghost callback returning constant 4; behavior code interpretation is tentative
 0809775C,Ghost_SetMovementEndpoints,thumb,low,src-alias,Copies current and destination positions into the context and resets the movement counter
 0809794C,Ghost_InitActorProfile,thumb,low,src-alias,Finds or adds category 0x17 profile and stores it on the Ghost
+08097968,Ghost_ResetMovementState,thumb,low,src-alias,
 08097B18,SceneActor_EndLinkedReaction,thumb,low,src-alias,
 08097B98,Ghost_GetDirectionalFrame,thumb,low,src-alias,Converts heading into a five-frame direction index and horizontal flip flag
 08097BC0,Ghost_StartMovementToPosition,thumb,low,src-alias,Stores movement endpoints and resets behavior state while setting heading toward the destination
@@ -3050,6 +3056,7 @@ addr,name,mode,confidence,source,notes
 08098CA0,Ghost_FollowPlayerLoop,thumb,low,src-alias,
 08099130,Ghost_PursuePlayerLoop,thumb,low,src-alias,
 08099580,Ghost_InitActionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x28C; action role is tentative
+08099590,Ghost_ApproachPlayer,thumb,low,src-alias,
 080997E8,Ghost_InitReactionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x288; reaction role is tentative
 08099A48,Ghost_InitEffectTable,thumb,low,src-alias,Installs the Ghost table at offset 0x29C; effect role is tentative
 08099A58,Ghost_OnBehaviorUpdate,thumb,low,src-alias,Ghost behavior callback dispatches the current state handler and runs supporting updates
@@ -3204,6 +3211,7 @@ addr,name,mode,confidence,source,notes
 080AB54C,TentacleActor_RecordVisitedRoute,thumb,low,src-alias,Writes an identifier into route history and advances the index modulo four; interpretation is tentative
 080AB57C,SceneActor_ResetQueuedState,thumb,low,src-alias,
 080AB604,SceneActor_TryRequestFacingReaction,thumb,low,src-alias,
+080AB6F4,Tentacle_FireSecondaryAttack,thumb,low,src-alias,
 080AB7BC,TentacleActor_UpdateSegmentColliders,thumb,low,src-alias,
 080AB968,TentacleActor_UpdateRetraction,thumb,low,src-alias,
 080ABAAC,TentacleActor_InitStateHandlers,thumb,low,src-alias,Assigns the actor dispatch table used by its update callback
