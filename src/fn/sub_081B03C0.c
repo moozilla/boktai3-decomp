@@ -4,25 +4,39 @@
 #define PairedSceneActor_UpdatePlayerCapture sub_081B03C0
 #ifdef NONMATCHING
 // fuzzy: 86.2%
+// Remaining differences: animation allocation, argument setup and shared phase-entry tails.
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
-struct PairPosition { s16 x, y, z, pad; };
+struct PairPosition {
+    s16 x, y, z, pad;
+};
 struct PairHalf {
     u32 flags;
-    u8 pad4[0x10-4]; u16 frame;
-    u8 pad12[0x1C-0x12]; struct PairPosition position;
-    u8 pad24[0x48-0x24]; struct DisplaySequenceState sequence;
-    u8 track[0x90-0x58];
+    u8 pad4[0x10 - 4];
+    u16 frame;
+    u8 pad12[0x1C - 0x12];
+    struct PairPosition position;
+    u8 pad24[0x48 - 0x24];
+    struct DisplaySequenceState sequence;
+    u8 track[0x90 - 0x58];
     struct PairPosition *origin;
-    u8 pad94[8]; struct PairPosition offset;
-    u8 padA4[0x15C-0xA4]; u32 mode, controlFlags;
+    u8 pad94[8];
+    struct PairPosition offset;
+    u8 padA4[0x15C - 0xA4];
+    u32 mode, controlFlags;
     u32 phase, timer;
     u8 state, previousState, entered, phaseEntered, finished;
 };
-struct PairOwner { u8 pad0[0x4D0]; void *resource; };
-struct CapturePlayer { u8 pad0[0x20]; u32 flags; };
+struct PairOwner {
+    u8 pad0[0x4D0];
+    void *resource;
+};
+struct CapturePlayer {
+    u8 pad0[0x20];
+    u32 flags;
+};
 extern struct CapturePlayer *gUnk_02000580;
 void MotionTrack_Initialize(void *, void *, void *, s32, s32);
-void sub_081B95E4(void *);
+void MotionTrack_Update(void *);
 void Player_BeginPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32, s32);
 void Player_ApplyPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32);
 static inline void StepSequence(void *obj)
@@ -136,17 +150,20 @@ static inline void StepSequence(void *obj)
     }
 }
 
-
 static inline void initVector(struct PairPosition *v, s32 x, s32 y, s32 z)
 {
     s16 *dst = (s16 *)v;
-    dst[0] = x; dst[1] = y; dst[2] = z;
+    dst[0] = x;
+    dst[1] = y;
+    dst[2] = z;
 }
 static inline void copyPosition(struct PairPosition *dst, struct PairPosition *src)
 {
     s16 *d = (s16 *)dst;
     s16 *s = (s16 *)src;
-    d[0] = s[0]; d[1] = s[1] - 128; d[2] = s[2];
+    d[0] = s[0];
+    d[1] = s[1] - 128;
+    d[2] = s[2];
 }
 static inline u8 trackFinished(struct PairHalf *half)
 {
@@ -163,7 +180,10 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
     struct PairPosition target, position;
     register struct PairOwner *self asm("r8") = owner;
     asm("" : "+r"(self));
-    { u32 mask = 12; half->controlFlags |= mask; }
+    {
+        u32 mask = 12;
+        half->controlFlags |= mask;
+    }
     if (half->entered) {
         half->entered = 0;
         Anim_SetSequence(&half->sequence, self->resource, 12, (u8)half->mode, 0);
@@ -171,47 +191,49 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
         setPhase(half, 0);
     }
     switch (half->phase) {
-    case 0:
-        if (half->phaseEntered) {
-            half->phaseEntered = 0;
-            initVector(&target, 384, 0, 384);
-            MotionTrack_Initialize(half->track, &half->offset, &target, 0, 4);
-        }
-        copyPosition(&position, &half->position);
-        if (half->mode == 0) {
-            if (!(gUnk_02000580->flags & 0x40000))
-                Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 1, 0, 0, 0, 1);
-            else goto abortCapture;
-        } else {
-            if (!(gUnk_02000580->flags & 0x40000))
-                Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 0, 0, 0, 0, 2);
-            else goto abortCapture;
-        }
-        goto advanceTrack;
-    abortCapture:
-        setPhase(half, 3);
-        break;
-    advanceTrack:
-        sub_081B95E4(half->track);
-        if (trackFinished(half))
-            setPhase(half, 1);
-        break;
-    case 1:
-        if (++half->timer > 120) {
+        case 0:
+            if (half->phaseEntered) {
+                half->phaseEntered = 0;
+                initVector(&target, 384, 0, 384);
+                MotionTrack_Initialize(half->track, &half->offset, &target, 0, 4);
+            }
+            copyPosition(&position, &half->position);
+            if (half->mode == 0) {
+                if (!(gUnk_02000580->flags & 0x40000))
+                    Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 1, 0, 0, 0, 1);
+                else
+                    goto abortCapture;
+            } else {
+                if (!(gUnk_02000580->flags & 0x40000))
+                    Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 0, 0, 0, 0, 2);
+                else
+                    goto abortCapture;
+            }
+            goto advanceTrack;
+        abortCapture:
+            setPhase(half, 3);
+            break;
+        advanceTrack:
+            MotionTrack_Update(half->track);
+            if (trackFinished(half))
+                setPhase(half, 1);
+            break;
+        case 1:
+            if (++half->timer > 120) {
+                Anim_SetSequence(&half->sequence, self->resource, 9, (u8)half->mode, 0);
+                StepSequence(half);
+                setPhase(half, 2);
+            }
+            break;
+        case 2:
+            Player_ApplyPositionRequest(gUnk_02000580, &half->position, 80, 32, 128, 0, 0, 0);
             Anim_SetSequence(&half->sequence, self->resource, 9, (u8)half->mode, 0);
             StepSequence(half);
-            setPhase(half, 2);
-        }
-        break;
-    case 2:
-        Player_ApplyPositionRequest(gUnk_02000580, &half->position, 80, 32, 128, 0, 0, 0);
-        Anim_SetSequence(&half->sequence, self->resource, 9, (u8)half->mode, 0);
-        StepSequence(half);
-        setPhase(half, 3);
-        break;
-    case 3:
-        half->finished = 1;
-        break;
+            setPhase(half, 3);
+            break;
+        case 3:
+            half->finished = 1;
+            break;
     }
 }
 #else
