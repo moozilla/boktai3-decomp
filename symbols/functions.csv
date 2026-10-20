@@ -5523,6 +5523,7 @@ addr,name,mode,confidence,source,notes
 0817160C,SceneHud_PrepareActionTransfer,thumb,low,src-alias,
 081716B4,SceneHud_UpdateStatComparison,thumb,low,src-alias,
 08171888,SceneHud_TickStatTransfer,thumb,low,src-alias,
+081719A8,PauseInventory_UpdateConsumableOptionSelection,thumb,low,src-alias,
 08171A5C,SceneHud_PrepareActionTransferToSlot,thumb,low,src-alias,
 08171AF8,SceneHud_UpdateActionSwapSelection,thumb,low,src-alias,
 08171C44,PauseInventory_UpdateConsumableSwapAnimation,thumb,low,src-alias,Animates two consumable cursors together then swaps their inventory slots

@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08170D78(void *);
-void sub_081719A8(void);
+void PauseInventory_UpdateConsumableOptionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
 void Hud_SetGridPosition(void *, int, int);
@@ -12,7 +12,7 @@ void PauseInventory_BeginConsumableSwapSelection(u8 *p, int flag)
 {
     u8 *q;
     sub_08170D78(p);
-    Hud_SetInteractionCallback(p, sub_081719A8, 1);
+    Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableOptionSelection, 1);
     q = p + 0x4384;
     sub_0816CDB8(q, 1, 0);
     if (flag)
