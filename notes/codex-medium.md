@@ -2676,3 +2676,76 @@ Register-pinned category.
 Per-function sources were committed through build/commit.sh. No full build,
 network action, generated assembly, ROM or emulator output was committed.
 Combined ROM verification and name promotion remain for the integrator.
+
+
+## Task 081DB794 — 2026-10-20
+
+Tags: #matching #options #menu #scene-actors #register-pinning
+
+Worked solo and offline on the preclaimed branch. Exact task instruction
+coverage gained **33.0 percentage points** (1030 of the assigned 3122 instructions);
+project totals remain for integration. One new exact function, 2612 bytes,
+in the Register-pinned category. Resumed existing guarded candidates, largest
+first, using BIG_FUNCTIONS, anchored comparisons and hypothesis-driven variant
+batches. No full build, make, network or direct git mutations.
+
+- **081EAB64 — matched, Params3D0_UpdateDisplay**, from inherited 91.0%.
+  Creator 081EB7DC installs this menu callback and TimeDisplay callees establish
+  the display family. Expanding the two palette-helper call sites into their
+  case bodies preserves the shift-field address across interpolation and its
+  following threshold check; 125 / 31 realigned differences became 61 / 19.
+  Constraining palette sources to r2 and temporarily constraining slide Y and
+  reset values recovered the remaining allocation. Two inherited field errors
+  were corrected against assembly: case 6 increments idleTimer at +0x73C, and
+  case 13 compares counter at +0x734 against the fade duration, rather than
+  timer at +0x754. Case 13 still increments counter. depin reduced twelve hints
+  to two source-pointer bindings, removing all empty barriers and the temporary
+  slide/reset pins. Formatted C passes the explicit full **2612-byte** check.
+- **081EE518 — drafted 91.4%, SceneActors_UpdateHitSensitiveDeparture**,
+  from 90.5%. Installer 081EF29C and hit consumer 081F029C establish a departure
+  action whose hit callback halves its speed. Replaced the ordinal name with
+  this tentative behavior name, through a file-local alias only. Computing
+  the second drawable after Anim_SetSequence, using the low context for its
+  state pointer, and sharing entry zero reduce 75 / 20 differences to 66 / 11.
+  Residue includes the pinned r7 base's missing prologue save, second decoder
+  command/mask allocation and phase-transition address derivation. Unpinning
+  the outer locals fixes save structure but drops to 86.1% (99 / 9); retained
+  the stronger guarded candidate. Empty r7 clobber and late base barriers did
+  not fix its save. This draft is not ABI-validated executable C.
+- **081EE130 — drafted 99.4%, SceneActors_UpdatePeriodicEffectAction**,
+  from inherited 90.4%. Moving RNG masking outside the table-reader inline,
+  constructing the initial mask after its destination, and retaining the entry
+  pointer remove scheduling differences. Keeping the first decoder mask in r9
+  avoids an extra copy; simultaneous fixed flip operands recover both reverse
+  flag updates. Remaining **3 realigned differences / 0 ignoring registers**:
+  the +0x598 reset's address constant is in r3 instead of r1. Offset/pointer
+  bindings, a clobber and natural decoder temporaries did not improve it.
+  Candidate matches the reviewed 1000-byte length; assembly stays active.
+- **081EEAD8 — drafted 94.4%, SceneActors_UpdatePaletteDispersal**, from
+  87.0%. Sharing the entry zero in r3 and setting the palette-loop index before
+  its source/destination pointers reduce 63 / 27 differences to 29 / 18.
+  Remaining palette destination setup is too early, and the particle-loop
+  counter/stack-vector setup order differs. Source-pointer barriers and inline
+  argument reordering regress substantially; retained the stronger candidate.
+- **081EDB74 — drafted 96.1%, SceneActors_UpdateLeftDeparture**, from
+  inherited 85.0% in this checkout. Reused the matched 081ED5F4 drawable layout,
+  initialization and playback decoder, removing separate duplicated decoders
+  and the hard r7 base binding. Preparing the destroy callback before its field
+  address improves the departure tail. Remaining **16 / 8** differences include
+  time spilled to the stack, context allocation, decoder literal scheduling and
+  callback setup. A time pin and context constraints did not improve it.
+- **081DB794 — drafted 85.1%, Options_InitScreen**, from 82.4%. Binding the
+  relocated graphics pointer to r4 reduces 53 / 22 differences to 43 / 22.
+  Sprite/resource lifetimes, text-rectangle setup and a redundant palette-source
+  reload remain. Distinct sprite variables, resource-barrier removal, bitfield
+  rectangles and explicit palette-source caching did not improve the retained
+  candidate.
+
+All five drafts retain NONMATCHING guards, raw-address INCLUDE_ASM fallbacks,
+required descriptive aliases and concession markers. Formatted and recorded
+with check.py --nonmatching --record; default assembly alternatives also check
+exact. depin was run on unguarded scratch copies and correctly skipped the
+non-exact candidates, so no draft hint-minimality claim is made. Per-function
+commits and this notes commit use build/commit.sh. Combined ROM validation and
+name promotion remain with the integrator; assembly fallback checks earn no
+exact coverage.
