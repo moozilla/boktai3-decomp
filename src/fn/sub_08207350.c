@@ -3,11 +3,11 @@
 // fuzzy: 88.0%
 // Remaining differences: owner/address allocation, facing update and branch sharing.
 // MATCHING_CONCESSION: register-pinning
-#define VC_FIRST "r2"
-#define VC_TEMP "r2"
-#define VC_MASK "r6"
+#define VC_FIRST    "r2"
+#define VC_TEMP     "r2"
+#define VC_MASK     "r6"
 #define VC_DURATION "r4"
-#define VC_WEIGHT "r2"
+#define VC_WEIGHT   "r2"
 #include "vulcan_cannon_worker.h"
 #define VulcanCannon_UpdateFacingTurn sub_08207350
 void sub_08206C00(void);
@@ -133,7 +133,6 @@ static inline u32 TurnAnimation(struct VulcanCannon *source)
     return ended;
 }
 
-
 void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
 {
     register struct VulcanCannon *p asm("r12") = owner;
@@ -152,12 +151,14 @@ void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
         ended = TurnAnimation(p);
         asm("" : : "r"(token));
         if (ended) {
-        if (!p->facing) p->facing = 1;
-        else p->facing = 0;
-        asm("" : : "r"(p) : "memory");
-        p->state = sub_08206C00;
-        Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
-    }
+            if (!p->facing)
+                p->facing = 1;
+            else
+                p->facing = 0;
+            asm("" : : "r"(p) : "memory");
+            p->state = sub_08206C00;
+            Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
+        }
     }
     return;
 }
