@@ -848,3 +848,66 @@ changes in tools/cloud_task.py were left alone.
 
 Each accepted function/draft was committed separately through build/commit.sh.
 Combined ROM validation is deferred to the integrator as instructed.
+
+## Task 081F8CBC (2026-10-20)
+
+Tags: #matching #ratatosk #animation #script
+
+Five exact matches, checked individually with reviewed target sizes; no full build,
+network operations, or register-pinning concessions. Commits were queued through
+`build/commit.sh`. The pre-existing change to `tools/cloud_task.py` was left alone.
+
+- **081F8CBC matched** — `Ratatosk_UpdateRetreatSequence` (tentative behavioral
+  name). On activation, tests player positions offset by +/-512 on X and Z,
+  keeps the farthest from its collider position, then advances animation states
+  and selects a point farthest from the player. Explicit stack-vector pointers
+  prevent agbcc scalar replacement from turning the vector into packed register
+  operations. A duration pointer declared before the zero local reproduces the
+  reset-store ordering. Reviewed extent: 488 bytes.
+- **081F8EA4 matched** — `Ratatosk_UpdateRepeatedRetreat` (tentative behavioral
+  name). Similar offset search after two completion notifications; a six-stage
+  animation sequence eventually chooses a random movement point. Declaring the
+  candidate pointer before the self-position pointer fixed the last two loop
+  setup instruction reorderings. Reviewed extent: 672 bytes.
+- **081F9F10 matched** — `Ratatosk_ApplyDamageReaction`. Damage callback selected
+  by signed kind 0/1/2; kind 0 displays positive damage, and the cases install
+  directional reaction/recovery callbacks. Packed signed 16-bit vector fields
+  reproduce the damage-display size setup. Be careful that agbcc rounds small
+  byte-only structs to four-byte sizes. Use the existing named symbols
+  `Ratatosk_BeginDirectionalReaction` and `Ratatosk_UpdateDirectionalRecovery`:
+  obsolete sub-address declarations resolved without their Thumb bit in this
+  checkout's checker stubs. Explicit direction/destination/zero locals reproduce
+  the final kind-1 store ordering. Reviewed extent: 352 bytes.
+- **081FA418 matched** — `Ratatosk_UpdateSunOrbPlayerTransfer` (tentative).
+  Checks sun-orb slot state, active target proximity, selected target and player
+  state before starting a two-stage transfer with 90-frame timers. The target
+  distance table has 24-byte entries at +0xE00. A typed array produces the proper
+  base-before-index address calculation; a flag-mask inline puts the mask before
+  the load. A separate local for the second target search fixes register reuse.
+  Reviewed extent: 440 bytes.
+- **081FA718 matched** — `Ratatosk_UpdateCollidersAndPalette`. Updates five
+  colliders, actor/camera/shadow visibility, flash timers, palette transitions,
+  and per-frame counters/force accumulators. Exact sprite flag access comes from
+  small inlines taking the animation object at +0x34C, with flags at +8; camera
+  flags similarly belong to the object at +0x3DC, +0x20. Duplicating the palette
+  oscillation tail in cases 3 and 4 lets cross-jumping reproduce the shared tail;
+  an explicit goto produced different control flow. A signed full-width 16-bit
+  bitfield for the +0x18E flag insertion fixed the final operand-register tie.
+  Reviewed extent: 1532 bytes.
+- **081FAE0C stopped, not drafted** — `Ratatosk_InitializeFromScript` candidate
+  remains only in ignored `wip/sub_081FAE0C.c`. Best latest check: fuzzy 66.2%,
+  realigned 392 differing instructions / 122 ignoring registers, artifact
+  `build/check/run-q_g_0_tt`. Below the 80% retention threshold. Reads script
+  options e/l/p/r/m/A/c/B/S/s/R/G/b/D/d/X/t/i, initializes actor slot 4, movement
+  points, collider parameters, three palette banks and child pools. Explicit
+  actor-member pointer locals before the first option loop reproduce the early
+  address setup and their declaration order controls spilled pointer slots.
+  Remaining differences include constant/address reuse in default option stores,
+  shared branch tails, loop-invariant palette height, source/destination register
+  choices in palette copying, and generic actor setup. A register-pinning trial
+  made the initial candidate worse and was discarded. The first p-option store
+  should access position.x directly; introducing its pointer only for y/z avoids
+  keeping that pointer live across all preceding calls. Original next-state is
+  zero in both mode-dependent initialization paths, even when current state is 2.
+
+The integrator still needs the normal combined full-ROM validation for this batch.
