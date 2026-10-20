@@ -2828,3 +2828,77 @@ alias while the checked function resolved to sub_XXXXXXXX. After changing the
 fallbacks to raw identifiers, reran --nonmatching --record on all six and verified
 the source comments contain the new scores. Score-only follow-up commits retain
 one translation unit each.
+
+## Task 081F7FD0 — 2026-10-20
+
+Tags: #matching #ratatosk #orbit-effect #combat
+
+Two exact matches and two guarded drafts. Worked on the already checked-out
+cloud/081F7FD0 branch; only fast per-file checks, no full build or network.
+Individual source commits and this note use build/commit.sh.
+
+- **081FAE0C stopped, not drafted — Ratatosk_InitializeFromScript.** Inspected
+  the largest function first with asmat, condense, relatives and the caller
+  Ratatosk_Create at 081FB788. The existing medium-worker candidate in
+  wip/sub_081FAE0C.c still scores 66.2%, realigned 392 instructions / 122
+  ignoring registers (build/check/run-0x2knyxo). Script options, collider setup,
+  palette banks and child pools are recovered, but address reuse, stack-pointer
+  lifetimes and branch tails remain below the draft threshold. Ghidra export is
+  absent in this checkout. No production source added for this target.
+- **081F7FD0 stopped, not drafted — Ratatosk_UpdatePlayerCapture (tentative).**
+  New candidate in wip/task081F7FD0/sub_081F7FD0.c: 75.2%, realigned 173 / 30
+  structural differences (build/check/run-dkbci2q1). Captures the player at the
+  midpoint between actor and player, chooses a cardinal-offset destination,
+  watches the player's angular change, emits particles while held, then applies
+  interpolated player movement. Uses animation 9/5/7 and fallback repositioning
+  with animation 4. Explicit stack aggregate, parameter/view register keywords,
+  particle-pointer locals, returning the polar helper's output pointer, and a
+  pinned actor pointer did not improve the baseline. The actor pointer remains
+  r6 instead of r7; vector/config stack slots are displaced by four bytes, and
+  address-constant reuse and PRE pointer copies remain. Best candidate restored.
+- **081F8600 drafted 83.3% — Ratatosk_UpdateSunOrbPlacement.** Chooses a point
+  nearest the player, builds a 32-byte rising-actor config, sets source mode 2
+  and motion parameters 360/4/0/2, creates and raises the orb, and updates both
+  the point occupancy and orb occupancy arrays (24-byte stride). Reuse mode
+  fades all orbs; the final wait has a 600-tick timeout. Small halfword-store
+  inlines and explicit animation locals improved the initial 77.3% candidate.
+  Final reviewed check: realigned 70 / 24 structural differences,
+  build/check/run-yznfzmof. Constant-offset reuse, slot-array address ordering
+  and registers remain. No register pinning in this draft.
+- **081F8988 matched — Ratatosk_UpdateSunOrbRelocation.** Coordinates a selected
+  orb, waits for slot state >60, creates a replacement orb at the farthest
+  player-offset point, releases the old slot through the manager, copies the
+  replacement's position to the actor, then moves toward the nearest player
+  offset. A shared explicit failure label in case 2 reproduces cross-jumping
+  from case 0; computing the scaled occupancy offset before its base eliminates
+  another ordering difference. Two narrowly scoped sequence-store views fixed
+  the final eight register-only instructions. depin.py reduced eight hints to
+  three; formatted source rechecked exact, 740 bytes,
+  build/check/run-0j6vxpxj. Marked register-pinning concession.
+- **081FDDC0 matched — OrbitEffect_SpawnOrbitTrail.** Every fourth update,
+  initializes one of twelve 56-byte trail sprites, chooses radius 768..1279
+  and an 8-bit angle, selects kind-dependent tile frame/palette, and positions
+  it around the actor using signed sine-table products truncated toward zero.
+  The neighbouring OrbitEffect_SpawnHomingTrail provides the object layout;
+  OrbitEffect_UpdateTrailSprite confirms angle/radius and target-vector fields.
+  Preserving the full timer mask's copy, the next-trail field-address/value
+  views, and the sine-table pointer transfer reproduced the remaining register
+  allocation. depin.py reduced sixteen hints to eleven. Formatted source
+  rechecked exact, 356 bytes, build/check/run-34bsumsj. Marked register-pinning
+  concession. No handwritten instruction bodies.
+- **082015D4 drafted 82.4% — ScriptCombatActor_ApplyHitReaction (tentative).**
+  Resumed the existing medium-worker scratch candidate after reviewing assembly
+  and Combat_ApplyHitReaction. Stores damage/type/reaction, drives the HUD and
+  damage display for flag 0x40, and emits three randomized sparks for selected
+  flags. The useful candidate has barriers on pre-narrowing X/Z bases and a
+  pinned RNG table pointer; the unhinted depin scratch was only 70.0% here.
+  Explicitly delaying the first two global RNG cursor stores reduced structural
+  differences but worsened total similarity, so restored the better candidate.
+  Final reviewed check: realigned 49 / 29 structural differences,
+  build/check/run-ffzj4ehe. depin.py correctly skipped the unguarded nonmatch.
+
+Both drafts were checked with --nonmatching --record, remain above 80%, and
+have byte-identical assembly fallbacks checked separately. Fallback matches
+are not C progress. No ROM, generated assembly or emulator output committed.
+Batch integration, name promotion and complete ROM validation remain with the
+integrator.
