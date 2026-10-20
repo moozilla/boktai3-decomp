@@ -1,3 +1,4 @@
+#define Dog_UpdateCollisionBounds sub_080DEA7C
 #include "global.h"
 // confidence=low: places forward collider and selects direction-dependent contact bounds.
 
