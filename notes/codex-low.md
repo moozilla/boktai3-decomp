@@ -1869,3 +1869,60 @@ Each exact function and each draft queued separately with build/commit.sh.
 All four default assembly fallbacks check byte-identical. Combined validation
 is deferred to the integrator as instructed. Names remain tentative where
 marked; no shared documentation or generated outputs were committed.
+
+## Task 0814E3D8 follow-up (2026-10-20)
+
+Tags: #matching #player #cue #charge
+
+Task exact coverage gained 8.7 percentage points (504 of 5,800 reviewed body
+bytes). Normal C: 504 bytes; no register-pinned exact bytes. Used only fast
+per-file checks; no full build or network operation.
+
+- 0814E3D8: improved guarded Player_UpdateSelectedAttackCharge from 90.0% to
+  recorded 90.6%, 71 realigned differences / 34 ignoring registers. Pinning
+  the buffered-input temporary to r0 removes redundant copies (unit marked
+  MATCHING_CONCESSION). Duplicating the charged phase calls regressed after
+  preserving the original early exit, so reverted. Shared tier tail, particle
+  initialization scheduling, descriptor argument and constant lifetimes remain.
+- 0814F328: improved guarded Player_UpdateAttachedAttackCharge from 87.8% to
+  recorded 88.5%, 72 realigned differences / 23 ignoring registers, using the
+  same buffered-input r0 concession. Read the descriptor-action caller and
+  existing charge analysis. Restored required local name alias and raw-address
+  fallback. Local callee alias for Player_SpawnSelectedAttackProjectile is
+  needed because this checkout's ELF still exposes sub_0814DFDC.
+- 0814FC80: retained guarded Player_AdvanceScriptDestination at recorded 89.7%,
+  44 realigned differences / 18 ignoring registers. A shared arrival direction
+  temporary/store regressed to 87.0%; reverted. Restored the local alias and
+  raw-address fallback. Existing movement flags/null tests and register
+  lifetimes remain unresolved.
+- 081503EC: new guarded PlayerCue_UpdateScaleTransition at recorded 84.0%,
+  93 realigned differences / 28 ignoring registers. Motion7Turn,
+  Motion7Variant3 and Motion7Variant7 install it for the ordinary player
+  variants. Nine phases animate departure/arrival, alter scale and control
+  flags, and select hidden/standing callbacks. Reconstructed the entire body
+  through its return and literal pool at 081507F4. Store inlines delaying
+  destination address formation improved the initial 73.6% candidate to
+  82.9% candidate-length / 84.0% reviewed extent. Typed player accesses made
+  no further change. Remaining constant reuse, address allocation, scheduling
+  and shared tails. No register hints in this unit.
+- 0814FFA4: new guarded PlayerCue_UpdateMoveDestination at recorded 80.1%,
+  84 realigned differences / 14 ignoring registers. PlayerCue_MoveTo installs
+  this callback with target position, final facing, movement-effect enable,
+  effect magnitude 150 and completion script. It approaches the target on
+  cadence ticks, decays the effect magnitude, invokes the completion script
+  once and plays animation entries 16/17. Read through return/pool at
+  081502AC. Delayed byte stores reduced structural differences; pinning
+  distance/x/z to r8/sl/sb raised fuzzy score past the draft threshold. Marked
+  register-pinning concession. Remaining facing load/store sharing, constant
+  scheduling and allocation; no handwritten instructions.
+- 0815093C: matched PlayerCue_UpdateDeparture, 504 bytes, first check.
+  PlayerCue_BeginMode27 installs it for non-side player modes. Ported the
+  camera lift / screen transition / descent phases from matched
+  PlayerCue_UpdateSideDeparture, replacing its packed animation stepper with
+  Player_SetAnimation and adding mode-specific sound plus scale resets.
+  Four phases hide the player and acknowledge completion. No register hints.
+
+Each function queued separately through build/commit.sh. All five guarded
+assembly fallbacks check byte-identical; all draft scores recorded with
+--nonmatching --record. Ghidra export is absent. Combined validation remains
+with the integrator. No shared documentation or generated assembly changed.
