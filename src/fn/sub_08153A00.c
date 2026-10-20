@@ -32,7 +32,7 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_UpdateHidden(struct P *);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
-void sub_08151D90(struct P *);
+void Player_RestartAnimationFromSetup(struct P *);
 extern const s16 gUnk_086149C4[];
 void Sound_PlaySong(u32);
 static inline s32 Truncate(s32 v)
@@ -153,7 +153,7 @@ static inline void Step(struct ContactSwarmSprite *sprite, struct DisplaySequenc
 #define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-void sub_081538DC(struct P *);
+void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
@@ -181,7 +181,7 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
         Anim_SetSequence(&p->seq, *(void **)((u8 *)p + 0x410), 0, p->facing, p->flip);
         Step(&p->sprite, &p->seq);
         ActorSequence_Begin(p, 0, 0);
-        p->fn = sub_081538DC;
+        p->fn = Player_RestartAnimationFromResource;
         PlayerCue_CompleteAction(p);
     } else {
         p->vx = Truncate(gUnk_086149C4[(angle + 64) & 255] * 12);

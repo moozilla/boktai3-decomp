@@ -13,8 +13,6 @@ void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 void Sound_PlaySong(u32);
 
-#define StateActor_UpdateAnimation22State sub_081C80D0
-
 void StateActor_UpdateAnimation22State(u32 a, struct S *p, u32 frame)
 {
     u32 r;

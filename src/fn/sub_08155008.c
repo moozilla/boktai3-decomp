@@ -30,7 +30,7 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_UpdateHidden(struct P *);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
-void sub_081538DC(struct P *);
+void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -211,7 +211,7 @@ void PlayerCue_UpdateAlternateFade(struct P *p)
             if (++p->timer > 3) {
                 Player_UpdateFacingSide(p);
                 PlayerCue_EnterStandUpdate(p);
-                p->fn = sub_081538DC;
+                p->fn = Player_RestartAnimationFromResource;
                 PlayerCue_CompleteAction(p);
             }
             break;

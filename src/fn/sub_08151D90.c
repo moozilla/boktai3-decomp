@@ -128,7 +128,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 
-#define Player_RestartAnimationFromSetup sub_08151D90
 void Player_RestartAnimationFromSetup(struct PRecover *p)
 {
     Anim_SetSequence(&p->seq, (const void *)p->unknown40C, 0, p->facing, p->flip);

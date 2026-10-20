@@ -18,8 +18,6 @@ static inline u8 TakeFlag(u8 *p)
     return 0;
 }
 
-#define Vorn_UpdateScriptedAction sub_080AF1E0
-
 void Vorn_UpdateScriptedAction(u8 *obj)
 {
     if (TakeFlag(obj + 0x2B1)) {
@@ -82,5 +80,5 @@ void Vorn_UpdateScriptedAction(u8 *obj)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AF1E0);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateScriptedAction);
 #endif

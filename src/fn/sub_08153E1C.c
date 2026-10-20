@@ -26,7 +26,7 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_UpdateHidden(struct P *);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
-void sub_081538DC(struct P *);
+void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
