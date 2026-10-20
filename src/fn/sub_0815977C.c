@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 74.7%
 // foundry draft (worker best 86.7%); what differs is mostly register allocation and instruction order
-#define PlayerStats_AddHundredths PlayerStats_AddHundredths
+
 s32 Div(s32, s32);
 static inline u32 ReadFlags(u32 *flags, u32 mask)
 {

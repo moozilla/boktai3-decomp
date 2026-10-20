@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 83.2%
 // foundry draft (worker best 83.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_RefreshActionIcons SceneHud_RefreshActionIcons
+
 #define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
 #define SceneHud_SetIconPalette     PauseMenu_SetSpritePalette
 s32 SceneHud_FindCategoryAction(u32, u32);

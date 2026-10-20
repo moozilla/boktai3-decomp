@@ -1,7 +1,6 @@
 #include "global.h"
 
-#define Player_UpdateStateMotionCue                                                                \
-    Player_UpdateStateMotionCue // confidence=low: tentative cue role from callback phases.
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 // Remaining event mask ordering, resource selection stores and playback differ.

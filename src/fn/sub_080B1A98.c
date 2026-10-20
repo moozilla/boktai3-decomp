@@ -86,8 +86,7 @@ static inline u8 Test(u16 *p, u32 mask)
 }
 extern const u8 gUnk_0824E230[];
 
-#define Vorn_BeginTargetPursuit                                                                    \
-    sub_080B1A98 // confidence=low: routes toward the current target after a reaction.
+// confidence=low: routes toward the current target after a reaction.
 u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *p, u32 mask)
@@ -170,5 +169,5 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B1A98);
+INCLUDE_ASM("asm/nonmatching", Vorn_BeginTargetPursuit);
 #endif

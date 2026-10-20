@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define PlayerCue_UpdateSideArrival                                                                \
-    PlayerCue_UpdateSideArrival // confidence=low: tentative cue role from callback phases.
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // Remaining playback completion branch sharing and mask copies differ.

@@ -5,7 +5,7 @@
 // foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
 extern u32 gUnk_03005308;
 
-void sub_080B2858(struct SceneActorAnimationView *, u32);
+void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
 static inline u8 ConsumeFlag(struct SceneActorAnimationView *p)
 {
     if (p->directionalEntryFlag) {
@@ -50,7 +50,7 @@ void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
                 p->nextDirection = (AngleIndex(p->facingAngle) + 3) & 7;
             } else {
                 if (RandomByte() <= 0x1f)
-                    sub_080B2858(p, 1);
+                    Vorn_SelectRetreatRoute(p, 1);
                 else
                     SceneActorAnimation_SelectDirectionalEntry(p, 0);
             }

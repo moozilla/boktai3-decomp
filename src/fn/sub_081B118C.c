@@ -3,8 +3,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
-#define ActorStatus_BeginPlayerRelease                                                             \
-    sub_081B118C // confidence=low: positions player before setting release phase
+// confidence=low: positions player before setting release phase
 struct Status {
     u8 pad[0x160];
     u32 flags, state, timer;

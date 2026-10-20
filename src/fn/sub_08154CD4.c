@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define PlayerCue_UpdateSpiralRecovery                                                             \
-    PlayerCue_UpdateSpiralRecovery // confidence=low: tentative cue role from callback phases.
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // Remaining resource-load order, effect timer constants and address registers differ.

@@ -2,8 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-#define ActorReaction_UpdateCallbackGate ActorReaction_UpdateCallbackGate
-#define gActorCallbackGateFlags          gUnk_02000560
+
+#define gActorCallbackGateFlags gUnk_02000560
 extern u32 gUnk_02000560;
 struct ActorReaction {
     u8 unknown0[0x9C];

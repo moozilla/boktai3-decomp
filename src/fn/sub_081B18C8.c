@@ -170,8 +170,7 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-#define ActorStatus_UpdateRisingStrike                                                             \
-    sub_081B18C8 // confidence=low: rises, waits for a countdown, then returns vertically
+// confidence=low: rises, waits for a countdown, then returns vertically
 void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec rise, target, speed;
@@ -248,5 +247,5 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B18C8);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateRisingStrike);
 #endif

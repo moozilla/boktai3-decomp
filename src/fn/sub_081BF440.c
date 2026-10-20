@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.0%
 // foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
-#define Storage_BeginCategoryMode Storage_BeginCategoryMode
+
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
     struct SceneInputWidget prompt;

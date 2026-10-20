@@ -3191,6 +3191,7 @@ addr,name,mode,confidence,source,notes
 080B12C0,SceneActor_SelectDistantRoutePoint,thumb,low,src-alias,
 080B18AC,Vorn_BeginAction16,thumb,low,src-alias,Queues action 16 and resets its callback and animation counters; specific action meaning is tentative
 080B1938,Vorn_SelectRecoveryAction,thumb,low,src-alias,Selects one of three actions using the recovery mode and eligibility test; recovery interpretation is tentative
+080B1A98,Vorn_BeginTargetPursuit,thumb,low,src-alias,
 080B1D8C,SceneActor_InitContextColliders,thumb,low,src-alias,
 080B1E60,SceneActor_ResetContextAnimation,thumb,low,src-alias,
 080B1EE8,Vorn_OnAnimationCleanup,thumb,low,src-alias,Empty callback installed by Vorn_Init; animation cleanup role is tentative
@@ -3198,6 +3199,8 @@ addr,name,mode,confidence,source,notes
 080B1F10,Vorn_GetAnimationEvent,thumb,low,src-alias,Returns a table value for the current animation frame when its countdown expires and marks an event flag
 080B22D4,Vorn_ParseField624,thumb,low,src-alias,
 080B2558,Vorn_InitMotionLimits,thumb,low,src-alias,Initializes three extended fields to zero and fixed-point limits; motion interpretation is tentative
+080B2580,Vorn_SelectReachableEscapeCell,thumb,low,src-alias,
+080B2858,Vorn_SelectRetreatRoute,thumb,low,src-alias,
 080B2EEC,SceneActor_TrySoloAction,thumb,low,src-alias,
 080B303C,Vorn_ParseField688,thumb,low,src-alias,
 080B309C,Vorn_RunPendingScript,thumb,low,src-alias,Calls the stored script procedure once and clears its identifier
@@ -3206,6 +3209,7 @@ addr,name,mode,confidence,source,notes
 080B33D8,Vorn_UpdateRecoveryCooldown,thumb,low,src-alias,Decrements the extended-state cooldown without underflow; recovery interpretation follows its action eligibility use
 080B33F8,Vorn_ResetRecoveryMode,thumb,low,src-alias,Clears the mode byte used to choose recovery actions; mode meaning is tentative
 080B3404,Vorn_TickSound,thumb,low,src-alias,
+080B3464,Vorn_ResumeRouteAfterReaction,thumb,low,src-alias,
 080B3ADC,SceneActor_DispatchContextAction,thumb,low,src-alias,
 080B401C,Vorn_UpdateBehavior,thumb,low,src-alias,Runs five behavior helpers before the action dispatcher
 080B4044,Vorn_UpdateActionTimers,thumb,low,src-alias,Updates the shared cooldown and three timers and sets an actor flag for selected actions
@@ -3263,6 +3267,7 @@ addr,name,mode,confidence,source,notes
 080BB7BC,SceneActorReaction_TickHiddenTimeout,thumb,low,src-alias,
 080BB924,Actor_RestoreSnapshot,thumb,low,src-alias,
 080BBBC0,SceneActorReaction_ReturnToRouteEntry,thumb,low,src-alias,
+080BBDD0,Skeleton_ConvergeDisplacedPosition,thumb,low,src-alias,
 080BCDE4,SceneActorApproach_UpdateRange,thumb,low,src-alias,
 080BD004,SceneActorReaction_SinkThenDefeat,thumb,low,src-alias,
 080BD1F0,Skeleton_UpdateDefeat,thumb,low,src-alias,
@@ -6459,6 +6464,12 @@ addr,name,mode,confidence,source,notes
 081B0018,PairedSceneActor_InitializeHalf,thumb,low,src-alias,
 081B019C,ActorStatus_Deactivate,thumb,low,src-alias,
 081B03C0,PairedSceneActor_UpdatePlayerCapture,thumb,low,src-alias,
+081B08B8,ActorStatus_UpdatePlayerApproach,thumb,low,src-alias,
+081B0F34,ActorStatus_UpdatePlayerCapture,thumb,low,src-alias,
+081B118C,ActorStatus_BeginPlayerRelease,thumb,low,src-alias,
+081B1334,ActorStatus_UpdateGuardedApproach,thumb,low,src-alias,
+081B18C8,ActorStatus_UpdateRisingStrike,thumb,low,src-alias,
+081B1B90,ActorStatus_UpdateFlankingStrike,thumb,low,src-alias,
 081B1E24,Vanargand_UpdatePartTracking,thumb,low,src-alias,
 081B1F74,Vanargand_UpdatePartPairedStrike,thumb,low,src-alias,
 081B2550,SceneBurstActor_UpdateTimedBurst,thumb,low,src-alias,
@@ -7498,8 +7509,11 @@ addr,name,mode,confidence,source,notes
 081ECF18,SceneActors_UpdateIdleDisplay,thumb,low,src-alias,
 081ED5F4,SceneActors_UpdateMovingDisplay,thumb,low,src-alias,
 081ED8A0,SceneActors_UpdateDelayedMovement,thumb,low,src-alias,
+081EDB74,SceneActors_UpdateLeftDeparture,thumb,low,src-alias,
+081EE130,SceneActors_UpdatePeriodicEffectAction,thumb,low,src-alias,
 081EE518,SceneActors_UpdateSequenceTwoAction,thumb,low,src-alias,
 081EEAC4,SceneActors_DestroyTask,thumb,low,src-alias,Termination callback disables actor displays and clears occupancy before killing the task
+081EEAD8,SceneActors_UpdatePaletteDispersal,thumb,low,src-alias,
 081EEE34,SceneMover_InterpolateScreenX,thumb,low,src-alias,
 081EF140,SceneActors_TickStateCallback,thumb,low,src-alias,Actor update helper forwards execution to SceneActors_RunStateCallback
 081EF14C,SceneActors_EnterIdleState,thumb,low,src-alias,State table callback installs the baseline animation handler and resets transition fields
