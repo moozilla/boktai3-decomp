@@ -1,10 +1,13 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: three motion legs include an approach toward the player.
+#define Vanargand_UpdatePartLunge sub_081B3AAC
+
 #ifdef NONMATCHING
-// fuzzy: 83.6%
-// Remaining differences: register lifetimes, state-transition layout, and literal pools.
+// fuzzy: 88.6%
+// Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -54,6 +57,13 @@ static inline void Difference(struct SceneVec *dst, struct SceneVec *a, struct S
     dst->y = a->y - b->y;
     dst->z = a->z - b->z;
 }
+static inline void SetState(struct VanargandPart *p, u32 state)
+{
+    register u32 next asm("r1") = state;
+    asm("" : "+r"(next));
+    p->state = next;
+    p->timer = 0;
+}
 void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
 {
     u8 *enter;
@@ -77,8 +87,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
             }
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
-                p->state = 1;
-                p->timer = 0;
+                SetState(p, 1);
                 *enter = 1;
             }
             break;
@@ -98,8 +107,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 3);
             }
             if (++p->timer > 16) {
-                p->state = 2;
-                p->timer = 0;
+                SetState(p, 2);
                 *enter = 1;
             }
             break;
@@ -107,15 +115,13 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
         case 2:
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
-                p->state = 3;
-                p->timer = 0;
+                SetState(p, 3);
                 p->enter = 1;
             }
             break;
         case 3:
             if (++p->timer > 30) {
-                p->state = 4;
-                p->timer = 0;
+                SetState(p, 4);
                 p->enter = 1;
             }
             break;
@@ -129,8 +135,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
             }
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
-                p->state = 5;
-                p->timer = 0;
+                SetState(p, 5);
                 *enter = 1;
             }
             break;
@@ -142,5 +147,5 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartLunge);
+INCLUDE_ASM("asm/nonmatching", sub_081B3AAC);
 #endif
