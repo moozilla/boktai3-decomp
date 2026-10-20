@@ -1,22 +1,27 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 95.6%
-// foundry draft (worker best 95.6%); what differs is mostly register allocation and instruction order
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-
-void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 Callback_InvokeActor(void *arg, void *function);
+struct S {
+    u8 f0;
+    u8 b1;
+    u8 f2[5];
+    u8 b7;
+    u8 f8;
+    u8 b9;
+    u8 fa[4];
+    u16 flags;
+    u8 g[0x2e4 - 0x10];
+    void *cb;
+};
+s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
+s32 Callback_InvokeActor(void *, void *);
 s32 sub_081C8FB0(void *, void *, s32);
-
-void sub_081CC0C8(void *a, void *p, u32 unused2)
+void StateActor_StartAnimStep(void *a, struct S *p)
 {
     u32 r;
-    if (B(9) != 0) {
-        B(9) = 0;
-        B(7) = 0;
-        switch (B(1)) {
+    u8 hit;
+    if (p->b9 != 0) {
+        p->b9 = 0;
+        p->b7 = 0;
+        switch (p->b1) {
             case 4:
             case 5:
             case 6:
@@ -57,19 +62,14 @@ void sub_081CC0C8(void *a, void *p, u32 unused2)
     }
     {
         u32 m = 0x1000;
-        H(0xE) = m | H(0xE);
+        p->flags = m | p->flags;
     }
-    {
-        void *callback = *(void **)((u8 *)p + 0x2E4);
-        u8 result = Callback_InvokeActor(p, callback);
-        if (result != 1) {
-            if (sub_081C8FB0(a, p, 0) != 0) {
-                u16 m2 = 0x800;
-                H(0xE) = m2 | H(0xE);
-            }
+    hit = 0;
+    if ((u8)Callback_InvokeActor(p, p->cb) != 1 && sub_081C8FB0(a, p, 0)) {
+        hit = 1;
+        {
+            u32 m = 0x800;
+            p->flags = m | p->flags;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081CC0C8);
-#endif

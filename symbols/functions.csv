@@ -7002,7 +7002,9 @@ addr,name,mode,confidence,source,notes
 081CBCBC,SceneCharacter_StartAnimationEleven,thumb,low,src-alias,State callback starts kind 29 animation 11 and immediately marks the command complete
 081CBD6C,SceneCharacter_UpdateAnimationSeven,thumb,low,src-alias,State callback plays kind 29 animation 7 and waits for completion
 081CC004,SceneCharacter_UpdateAnimationTen,thumb,low,src-alias,State callback plays kind 29 animation 10 and waits for completion
+081CC0C8,StateActor_StartAnimStep,thumb,low,src-alias,
 081CC498,SceneCharacter_StartAnimationThree,thumb,low,src-alias,State callback starts animation 3 and immediately marks the command complete
+081CC4CC,StateActor_SimpleStep,thumb,low,src-alias,
 081CC534,SceneCharacter_FaceSceneTarget,thumb,low,src-alias,Tentative state callback delegates to shared target-facing logic that also initializes idle animation
 081CC540,SceneCharacter_UpdateSlowingBlink,thumb,low,src-alias,State callback blinks with progressively longer phases until the phase duration exceeds 15
 081CC590,SceneCharacter_UpdateAcceleratingBlink,thumb,low,src-alias,State callback uses progressively shorter blink phases then sets display flag 0x100 and completes
