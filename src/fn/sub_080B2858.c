@@ -1,6 +1,10 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: inherited route/reaction interpretation from static callers.
+#define Vorn_SelectRetreatRoute sub_080B2858
+#define Vorn_SelectReachableEscapeCell sub_080B2580
+
 #ifdef NONMATCHING
 // fuzzy: 85.1%
 // Inline actor/group lifetimes, duplicated success-tail layout, and register allocation still differ.
@@ -195,5 +199,5 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_SelectRetreatRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080B2858);
 #endif

@@ -3,8 +3,10 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
+#define Ooze_InitializeFromScript sub_08206098
+
 #ifdef NONMATCHING
-// fuzzy: 85.0%
+// fuzzy: 87.8%
 // Remaining differences: script-option branches, animation-step register allocation, and body setup lifetimes.
 struct OozeInit {
     u8 pad0[0x18];
@@ -153,6 +155,13 @@ static inline u32 Ooze_StepInitialAnimation(struct DisplaySequenceSprite *sprite
     return ended;
 }
 
+static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing)
+{
+    if (!facing)
+        position->x += 128;
+    else
+        position->z += 128;
+}
 s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 {
     struct SceneVec position;
@@ -196,7 +205,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     if (Script_SeekToKeyword('h')) {
         p->facing = Script_GetValue();
         p->facing = (p->facing - 1) / 2;
-        switch ((u16)p->facing) {
+        switch ((u32)(u16)p->facing) {
             case 0:
             case 1:
                 p->facing = 0;
@@ -239,10 +248,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     if (p->solid) {
         position = *(struct SceneVec *)((u8 *)p + 0x3c);
         if (p->variant == 1) {
-            if (!p->facing)
-                position.x += 0x80;
-            else
-                position.z += 0x80;
+            Ooze_OffsetBodyPosition(&position, p->facing);
         }
         SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
         SceneBody_SetSprite(p->body, &p->sprite);
@@ -254,5 +260,5 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08206098);
 #endif

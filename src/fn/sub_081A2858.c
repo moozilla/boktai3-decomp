@@ -1,4 +1,7 @@
 #include "global.h"
+
+// confidence=low: synchronizes colliders, shadow, sound latch and camera flags.
+#define Hresvelgr_UpdateCollisionPresentation sub_081A2858
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: synchronizes colliders, shadow, sound latch and camera flags.
 struct V {
@@ -12,6 +15,10 @@ struct Collider {
     u8 pad1C[0x42 - 0x1C];
     u8 direction;
     u8 pad43[0x54 - 0x43];
+};
+struct Sprite {
+    u8 data[8];
+    u32 flags;
 };
 struct Actor {
     u8 pad0[0x54];
@@ -27,8 +34,7 @@ struct Actor {
     u8 padC4[0xE4 - 0xC4];
     u8 angle;
     u8 padE5[0x194 - 0xE5];
-    u8 sprite[8];
-    u32 spriteFlags;
+    struct Sprite sprite;
     u8 pad1A0[0x1AE - 0x1A0];
     u8 blend;
     u8 pad1AF[0x1B4 - 0x1AF];
@@ -79,9 +85,21 @@ static inline u32 test(u32 *p, u32 mask)
 {
     return *p & mask;
 }
+static inline void SetSpriteVisibility(struct Sprite *sprite, s32 hidden)
+{
+    if (hidden)
+        sprite->flags |= 1;
+    else
+        sprite->flags &= ~1;
+}
+static inline void SetSequence(struct Actor *p, u16 sequence, void *data)
+{
+    p->f1CE = sequence;
+    p->f1DC = data;
+}
 // Remaining differences: branch layout, collider flag insertion, and temporary lifetimes.
 #ifdef NONMATCHING
-// fuzzy: 86.3%
+// fuzzy: 91.3%
 void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
 {
     struct Actor *p2 = p;
@@ -91,19 +109,22 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
     SceneActors_UpdateEffects(p);
     if (p->invulnA) {
         u32 mask = 4;
-        *flags |= mask;
+        p->flags |= mask;
         p->invulnA--;
     }
-    flags = &p->flags;
-    if (p->invulnB) {
-        p->invulnB--;
-        if ((p->invulnB >> 2) & 1) {
-            u32 mask = 16;
-            *flags |= mask;
-        }
-        {
-            u32 mask = 4;
-            *flags |= mask;
+    {
+        u16 invuln = p->invulnB;
+        flags = &p->flags;
+        if (invuln) {
+            p->invulnB--;
+            if ((p->invulnB >> 2) & 1) {
+                u32 mask = 16;
+                *flags |= mask;
+            }
+            {
+                u32 mask = 4;
+                *flags |= mask;
+            }
         }
     }
     c = p->attacks;
@@ -112,7 +133,8 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         p->unused31C = 0;
         i = 1;
         do {
-            c->flags = ((c->flags | 4) | 0) & ~8;
+            c->flags |= 4;
+            c->flags &= ~8;
             c++;
         } while (--i >= 0);
     } else {
@@ -133,20 +155,20 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         Collider_SetPosition(c, p->collisionPosition, 0);
         Collider_Refresh(c);
     }
-    if (*flags & 0x1010000)
+    if (test(flags, 0x1010000))
         p->blend = 3;
     else if (*flags & 0x8000000)
         p->blend = 1;
     else
         p->blend = 2;
     if (test(&*flags, 16)) {
-        p->spriteFlags |= 1;
+        SetSpriteVisibility(&p->sprite, 1);
         {
             u32 mask = 0x10000;
             *flags |= mask;
         }
     } else
-        p->spriteFlags &= ~1;
+        SetSpriteVisibility(&p->sprite, 0);
     if (test(&*flags, 0x10000))
         ScaledShadow_Disable((u8 *)p + 0x3B4);
     else
@@ -161,21 +183,21 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
     if (p->timer312 > 0) {
         p->timer312--;
         if (!p->timer312) {
-            p->f1CE = 0x2F0;
-            p->f1DC = (u8 *)p + 0x424;
+            SetSequence(p, 0x2F0, (u8 *)p + 0x424);
         }
     }
-    if ((*flags & 0x200000) && !(gUnk_02000560 & 4)) {
+    if (test(flags, 0x200000) && !test(&gUnk_02000560, 4)) {
         if (!(p2->cameraFlags & 4)) {
             ColliderActor_UpdateCameraOffset(p);
             goto cameraDone;
         }
-    } else if (!(*flags & 2)) {
+        Camera_SetOffset(8, p2->position);
+    } else if (test(flags, 2)) {
+        Camera_SetOffset(8, p2->position);
+    } else {
         p->cameraState = 0;
         Camera_ResetOffset(8);
-        goto cameraDone;
     }
-    Camera_SetOffset(8, p2->position);
 cameraDone:
     if (test(&*flags, 0x400000)) {
         s32 k = shift(gUnk_086149C4[p2->angle] << 7) + 64;
@@ -192,5 +214,5 @@ cameraDone:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateCollisionPresentation);
+INCLUDE_ASM("asm/nonmatching", sub_081A2858);
 #endif
