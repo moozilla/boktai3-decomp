@@ -4155,6 +4155,7 @@ addr,name,mode,confidence,source,notes
 08113310,SceneDebrisPool_Destroy,thumb,low,src-alias,Task destruction callback releases occupied debris visuals and clears the singleton
 08113340,SceneDebrisPool_Initialize,thumb,low,src-alias,Registers the newly created debris pool as the singleton
 0811334C,SceneDebrisPool_EnsureSingleton,thumb,low,src-alias,Returns the existing 64-slot debris task or creates it with update and destruction callbacks
+081134B0,ActorEffect_SpawnAtActorPos,thumb,low,src-alias,
 08113534,ActorParticles_CreateAtOffset,thumb,low,src-alias,
 081135B8,SpriteEffect_CreateAtPosition,thumb,low,src-alias,
 08113644,SceneGroundEffect_IsBelowGround,thumb,low,src-alias,Compares queried terrain height with the effect position plus a vertical offset; tentative ground-effect identity
@@ -4823,6 +4824,7 @@ addr,name,mode,confidence,source,notes
 0813B4C8,Player_RecalculateDerivedStats,thumb,low,src-alias,
 0813B570,Player_GetMaxLife,thumb,low,src-alias,Computes capped combined life stat times ten or returns the global maximum in override mode
 0813B5B8,Player_GetMaxEnergy,thumb,low,src-alias,Computes capped combined energy stat times five plus 100 with an override mode
+0813B5F8,Player_ClampStatsAndSyncStatus,thumb,low,src-alias,
 0813B67C,Player_InitializeStatsFromScript,thumb,low,src-alias,
 0813B85C,Player_InitVitalsAndCollisionFromScript,thumb,low,src-alias,Loads initial vitals using script options and saved values then configures collision
 0813B870,Player_RefreshVitalsAndCollision,thumb,low,src-alias,Recomputes vital limits and clamps current values then configures collision
