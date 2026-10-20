@@ -1,11 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+#define Ooze_BeginAttack sub_08205B70
 #include "display_animation.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.1%
-// Remaining differences: state-transition address lifetimes and animation-step register allocation.
-// Keep the existing exported name so the draft recorder resolves the fallback.
+// fuzzy: 90.0%
+// Transition constants, mask copies, and register allocation still differ.
 
 struct Ooze {
     u8 pad0[0x20];
@@ -26,7 +27,7 @@ void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void Ooze_UpdateAttackDelay(void);
 static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
-                                           struct DisplaySequenceState *state)
+                                           struct DisplaySequenceState *state, u32 initialMask)
 {
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
@@ -40,7 +41,7 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        u32 maskBit = 1;
+        u32 maskBit = initialMask;
         bit = maskBit;
         asm("" : "+r"(bit));
         first = bit;
@@ -68,7 +69,7 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
+        u32 temp;
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -149,7 +150,7 @@ s32 Ooze_BeginAttack(struct Ooze *p)
     register s32 phase asm("r3") = p->phase;
     switch (phase) {
         case 0:
-            Ooze_StepAttackAnimation(&p->sprite, &p->sequence);
+            Ooze_StepAttackAnimation(&p->sprite, &p->sequence, 1);
             if (p->timer > p->attackDelay) {
                 if (p->repeatAttack)
                     Anim_RestartSequence(&p->sequence, p->resource, p->startSequence, p->facing, 0);
@@ -161,7 +162,7 @@ s32 Ooze_BeginAttack(struct Ooze *p)
             break;
         case 1: {
             void *collider = (u8 *)p + 0x68;
-            if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence)) {
+            if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence, phase)) {
                 if (p->repeatAttack) {
                     if (++p->repeatCount >= p->repeatLimit) {
                         Anim_RestartSequence(&p->sequence, p->resource, p->endSequence, p->facing,
@@ -177,7 +178,7 @@ s32 Ooze_BeginAttack(struct Ooze *p)
             Collider_Refresh(collider);
         } break;
         case 2:
-            if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence)) {
+            if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence, 1)) {
                 Anim_RestartSequence(&p->sequence, p->resource, p->idleSequence, p->facing, 8);
                 p->state = Ooze_UpdateAttackDelay;
                 p->phase = 0;
