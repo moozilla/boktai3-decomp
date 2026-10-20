@@ -1,10 +1,16 @@
+// confidence=low: reaction flags select special control, chase, route recovery or a timed turn.
+#define Dog_ChooseReactionBehavior sub_080E25FC
 #include "global.h"
 // confidence=low: chooses chase or route recovery after an actor reaction.
 
 #ifdef NONMATCHING
-// fuzzy: 83.0%
+// fuzzy: 83.5%
 // Branch layout, flag-address lifetimes and register allocation still differ.
 #include "scene_actor_chase.h"
+static inline void Dog_ClearGroupBits(u8 *group, u32 mask)
+{
+    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~mask;
+}
 static inline u16 Dog_ReadMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     u16 value = actor->flags2D4;
@@ -18,8 +24,11 @@ static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
         s32 prior = actor->direction;
         s32 tries = 0;
         s32 choice;
+        const u16 *table = gUnk_0203B400;
         do {
-            choice = Chase_RandomBits(3) << 6;
+            u32 index = (gUnk_03005308 + 1) & 1023;
+            gUnk_03005308 = index;
+            choice = (table[index] & 3) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);
@@ -64,7 +73,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
         goto reroute;
     if (Dog_ReadMotionFlags(actor, 0x400))
         goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
+    Dog_ClearGroupBits(group, 4);
     if (Dog_ReadMotionFlags(actor, 0x80)) {
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
@@ -220,5 +229,5 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Dog_ChooseReactionBehavior);
+INCLUDE_ASM("asm/nonmatching", sub_080E25FC);
 #endif
