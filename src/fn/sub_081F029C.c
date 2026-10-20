@@ -1,6 +1,6 @@
 /* Tentative family and field names, based on static accesses. */
 #include "global.h"
-void SceneActors_UpdateSequenceTwoAction(void);
+void SceneActors_UpdateHitSensitiveDeparture(void);
 struct ActorReaction {
     u8 unknown0[0x100];
     void (*update)(void);
@@ -18,7 +18,7 @@ struct ActorReactionEvent {
 void ActorReaction_MarkSequenceHit(struct ActorReaction *p, struct ActorReactionEvent *event)
 {
     p->hit = 1;
-    if (p->update == SceneActors_UpdateSequenceTwoAction && event->sequence == p->sequence + 1) {
+    if (p->update == SceneActors_UpdateHitSensitiveDeparture && event->sequence == p->sequence + 1) {
         p->sequenceHit = 1;
         p->speed >>= 1;
     }

@@ -4929,7 +4929,7 @@ addr,name,mode,confidence,source,notes
 081543F0,PlayerCue_UpdateSideFade,thumb,low,src-alias,
 08154AF0,PlayerCue_UpdateSideRecoil,thumb,low,src-alias,
 08154CD4,PlayerCue_UpdateSpiralRecovery,thumb,low,src-alias,
-08154EE4,Player_RestartAnimationFromResource2,thumb,low,src-alias,
+08154EE4,PlayerCue_RestartAlternateAnimation,thumb,low,src-alias,
 08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
 081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
 081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
@@ -7627,7 +7627,7 @@ addr,name,mode,confidence,source,notes
 081ED8A0,SceneActors_UpdateDelayedMovement,thumb,low,src-alias,
 081EDB74,SceneActors_UpdateLeftDeparture,thumb,low,src-alias,
 081EE130,SceneActors_UpdatePeriodicEffectAction,thumb,low,src-alias,
-081EE518,SceneActors_UpdateSequenceTwoAction,thumb,low,src-alias,
+081EE518,SceneActors_UpdateHitSensitiveDeparture,thumb,low,src-alias,
 081EEAC4,SceneActors_DestroyTask,thumb,low,src-alias,Termination callback disables actor displays and clears occupancy before killing the task
 081EEAD8,SceneActors_UpdatePaletteDispersal,thumb,low,src-alias,
 081EEE34,SceneMover_InterpolateScreenX,thumb,low,src-alias,
