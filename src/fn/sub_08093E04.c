@@ -11,7 +11,6 @@ static inline void ResetAnimation(struct SceneActorRegistryResetView *actor, u32
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define Bee_UpdateReactionPhase sub_08093E04
 void Bee_UpdateReactionPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {

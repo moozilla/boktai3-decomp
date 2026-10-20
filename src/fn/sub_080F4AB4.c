@@ -24,7 +24,7 @@ struct PhaseActor {
 extern u32 gRandomIndex;
 extern const u16 gRandomTable[];
 void Ivy_BeginChildPulse(void);
-void sub_080F60B8(void);
+void IvyChild_UpdateAfterBob(void);
 void ActorPhase_ApproachNeutral(struct PhaseActor *p)
 {
     s32 phase = p->phase;
@@ -52,7 +52,7 @@ void ActorPhase_ApproachNeutral(struct PhaseActor *p)
         p->field11E = one;
         p->field11F = one;
         p->flags119 = one | p->flags119;
-        p->update164 = sub_080F60B8;
+        p->update164 = IvyChild_UpdateAfterBob;
     }
 }
 #else
