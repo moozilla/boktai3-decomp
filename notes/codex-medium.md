@@ -1850,3 +1850,83 @@ attempts are only in ignored build/attempts/080B1FA8/ for local follow-up;
 final exploratory scores above use explicit reviewed target sizes. Ghidra's
 gen/ghidra/decomp.c is unavailable. Combined ROM validation is left to the
 integrator as required by the worker instructions.
+
+
+## Task 08207350 — cannon callback follow-up (2026-10-20)
+
+Tags: #matching #vulcan-cannon #cannon-turret #collision #register-pinning
+
+Worked solo and offline. New exact completion is **7.30% of this task's
+reviewed code extent**, a **+7.30 percentage-point gain** (416 / 5700 bytes).
+The batch adds **+0.0172 percentage points** of project code, all in the
+Register-pinned category. One inherited draft became exact, four guarded
+drafts were refined, and the previously missing hit callback now has a
+qualifying guarded draft. No full build, make, network operation, shared
+header change, generated-assembly commit or direct git mutation was used.
+
+- **08207A00 — retained draft 96.1%, VulcanCannon_InitializeFromScript.**
+  Read the largest function, prior notes, BIG_FUNCTIONS and relatives first.
+  A separate facing <= 3 guard with an empty value constraint preserves the
+  ROM's redundant switch bounds check. Retaining the terrain position in r3
+  removes the extra coordinate-pointer copy. Realigned differences improve
+  from 23/6 to 26/2 (total / ignoring registers): fewer structural differences,
+  but the high sprite/position registers exchange roles. The defined return
+  zero also remains an extra instruction; keep it because the factory consumes
+  the initializer result. Candidate and reviewed target are both 1384 bytes.
+  The removed position barrier was tested to have no effect.
+- **082074F0 — improved draft 81.3% to 81.9%,
+  VulcanCannon_UpdateDamageState.** An inline CopyPosition(out, in) materializes
+  each stack destination before its source loads, fixing the center and smoke
+  setup order. Differences fall from 121/30 to 115/26. Separating the dead
+  collider pointer, adding a random-value barrier, or simplifying the final
+  r0 return constraint regressed and was rejected. Effect masks/constants,
+  zero reuse across the smoke calls and allocation remain. Candidate 1296,
+  reviewed target 1284 bytes.
+- **08208740 — retained draft 81.7%, CannonTurret_UpdateCombat.** Initialize
+  the collider separately in the live/dead branches and use the same position
+  copy inline. Realigned differences improve from 119/38 to 115/30 even though
+  the fuzzy score stays unchanged. A combined pause guard gave no improvement.
+  Pause/return layout, animation register copies, effect constants and allocation
+  remain. Candidate 1180, reviewed target 1176 bytes.
+- **08208BE4 — improved draft 93.3% to 95.5%,
+  CannonTurret_InitializeFromScript.** A memory constraint after setting the
+  inert/dead field reproduces the resource reload before the inert animation
+  setup. Differences fall from 37/6 to 23/5. A resource value constraint was
+  weaker; forcing the body pointer lifetime was worse. Return-zero, constant
+  reuse and selected register lifetimes remain. Candidate 1016, reviewed
+  target 1012 bytes.
+- **08207350 — matched, VulcanCannon_UpdateFacingTurn.** Start from the prior
+  88.0% draft. A local signed facing value with a single final store avoids
+  repeated field-address computation and gives the signed halfword-offset
+  byte load. A shared first-flip store with r1 flags and r2 owner views matches
+  the common store tail. Define the return as zero when turning is disabled,
+  the incoming owner token when animation continues, and Anim_RestartSequence's
+  actual u32 result on completion. The callee is a matched return-value wrapper
+  at 08220D20, so this avoids undefined C fall-through. Keeping the turn-enable
+  test in r1 removes the last five differing instructions. depin reduced 18
+  direct hints to 12; the final unguarded source matches the entire reviewed
+  416-byte extent exactly after clang-format. No shared helper was edited.
+- **082081F4 — new draft 82.6%, CannonTurret_ApplyHitReaction (tentative).**
+  Read its collider-registration caller at 082083A0, complete assembly, and
+  matched Combat_ApplyHitReaction (0820FEA8). The callback clears blocked
+  hits, records damage/type/reaction, updates damage display and HUD for flag
+  0x40, otherwise adds contact stats, then emits three sparks when source
+  flags intersect target +13A. Spark velocity is copied from gUnk_0824FE84;
+  position comes from target +40 with random planar offsets [-64,63] and a
+  byte-sized vertical offset. An inline using unsigned halfword views avoids
+  scalarized word read/modify/write operations on the stack vector. Keeping
+  the table in r3 and constraining each computed planar base together improve
+  69.1% to 82.6%. Broad loop/index/mask pins regressed to 51–57% and were
+  discarded. Still 49/29 differences: first RNG store, hoisted loop constants,
+  target-field scheduling and registers. Candidate and target both 428 bytes.
+
+Every retained function has the required file-local semantic alias, and named
+fallbacks were changed back to raw sub_ addresses so the cached ELF resolves
+them. All five draft scores were recorded with check.py --nonmatching --record
+following direct venv clang-format. Their default INCLUDE_ASM branches also
+check byte-identically; these assembly checks earn no exact C credit. depin
+was run on unguarded copies of the drafts to avoid testing their asm fallbacks;
+it correctly skipped nonmatching bodies. Driver commits are separate per
+function, followed by this note. Scratch alternatives and diagnostic outputs
+remain ignored under build/attempts/08207350/. Combined ROM validation and
+name promotion remain the integrator's work.
