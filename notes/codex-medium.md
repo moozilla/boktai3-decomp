@@ -1765,3 +1765,88 @@ the final C scores were verified again. Other drafts were skipped by depin
 because their inherited named fallback files were absent; those fallback
 identifiers are now fixed. Use unguarded scratch candidates for future depin
 experiments on drafts. Combined ROM validation remains the integrator's job.
+
+## Task 080B1FA8 — Vorn route follow-up (2026-10-20)
+
+Tags: #matching #vorn #scene-actor #terrain #route
+
+Worked solo, offline, on the already checked-out `cloud/080B1FA8` branch.
+Exact completion remains **0%**, with **+0.0000 percentage points** of new
+exact code. Improved two inherited guarded drafts and retained a third;
+three new candidates stopped below the 80% threshold. No full build or make,
+network operation, direct git mutation, shared header edit or generated
+assembly commit. Per-file commits and this note use `build/commit.sh`.
+
+- **080B2858 — retained draft 85.1%, Vorn_SelectRetreatRoute.** Read the
+  callers, complete assembly and previous attempt. Baseline remains 134
+  realigned differences / 48 ignoring registers. Giving SelectRoute a
+  distinct opaque actor pointer worsened it to 82.6%, so restored the
+  baseline. Actor/group lifetimes and spills, success-tail state/control
+  addressing and RNG constant scheduling remain. Added the required local
+  alias and an alias for the 080B2580 callee; raw INCLUDE_ASM fallback fixes
+  resolution against the cached ELF. Candidate 1672, target 1684 bytes.
+- **080B3464 — improved draft 84.3% to 87.8%,
+  Vorn_ResumeRouteAfterReaction.** Read BIG_FUNCTIONS and steered with
+  realigned counts: 129/74 to 113/70. Retain the actor flags2D0 pointer
+  across both Resume expansions, pass it to the inline, materialize the
+  group control before its flag condition, and express TryRoute as nested
+  success tests with duplicated failure cleanup. An opaque inline actor
+  pointer regressed to 69.8% and was discarded. Actor copies/spills,
+  control offsets, halfword-mask registers and route argument allocation
+  remain. Candidate 1636, target 1656 bytes. Required local alias added.
+- **080B2580 — improved draft 81.6% to 84.0%,
+  Vorn_SelectReachableEscapeCell.** Move the four scan-result expressions
+  to labels following the cardinal switch. This reproduces the shared
+  east/south/west/north tails and reduces structural differences from 53
+  to 34. Explicit outer-loop found/break and a failure-first final route
+  test improve further to 69/27 differences. Volatile found regresses
+  to 77.7%; retain the ordinary found variable. Remaining differences:
+  loop jump threading moves success and range tests before the retry loop,
+  terrain pointer reloads/pool placement, and allocation. Candidate 724,
+  target 728 bytes. Required local alias added.
+- **080B1FA8 — stopped at 55.2%; no production draft.** Tentative name
+  Vorn_SelectOpposingRoutePoint. Computes target-relative facing, makes a
+  planar direction vector from the sine table scaled by 160, and scans
+  eight-byte route points for a negative dot product excluding the current
+  point. Falls back to a different random route index, snaps destination
+  height and attempts route motion. Failure installs idle control/state;
+  success marks destination pad=1. Packed-vector stores must retain
+  word read/modify/write behavior while the dot product uses signed
+  halfword loads through a ContactPosition view. That alias improves
+  40.4% to 49.5%; extracting the scan and copying its origin, then retaining
+  the group pointer, reaches 55.2%. Still 217/135 differences over the
+  reviewed 812-byte extent; candidate 816. Stack-vector lifetimes,
+  scan return layout and register allocation remain unresolved.
+- **080B23A0 — stopped at 61.5%; no production draft.** Tentative name
+  Vorn_BeginContextPursuit. A context +6AC timer gates entry. Reset=1 or
+  response flag conditions allow a 60-frame pursuit; sets context flag 4,
+  clears flag 2, initializes context +6EC to 60, optionally starts the
+  alternate route, and calls 080B1FA8. Installs behavior 15 and callback
+  080ADCC0/action 0x25, plus actor/group pursuit flags. Explicit unsigned
+  halfword temporaries, signed masks, separate word/byte zeros and
+  temporary register hints improved 50.0% to 61.5%. Still 94/28
+  differences, chiefly constant/address scheduling and control-field
+  allocation; candidate and reviewed target both 440 bytes. These
+  experimental hints are confined to ignored artifacts.
+- **080B3C1C — stopped at 69.9%; no production draft.** Tentative name
+  Vorn_AcquireContactTarget. Checks actor flags and callback26C, requires
+  motion flag 1 and a nonzero range, and selects contact kind 6. Releases
+  an existing contact when flags2D4 bit 0x1000 is set, records the selected
+  object and contact kind, and either refreshes an existing response or
+  installs state/phase 3/1, a 180-frame timer and an animation update.
+  u32 mask temporaries recover bics for 0x1000 and 0x100. Keeping the
+  initial zero mask result on the stack and changing those masks improves
+  66.8% to 69.9%, with 87/18 differences; candidate/target 572 bytes.
+  Most residue is a persistent r6/r7 swap and motion/contact pointer
+  copies. Broad or individual pointer pins and declaration swaps failed
+  to improve it; no retained production source uses those hints.
+
+Final draft scores were recorded with check.py --nonmatching --record after
+venv clang-format. All three default INCLUDE_ASM fallbacks were checked
+byte-identically; these assembly matches do not count as new exact C.
+All retained aliases use the exact required single-space syntax. No retained
+production candidate uses register pinning. The three below-threshold source
+attempts are only in ignored build/attempts/080B1FA8/ for local follow-up;
+final exploratory scores above use explicit reviewed target sizes. Ghidra's
+gen/ghidra/decomp.c is unavailable. Combined ROM validation is left to the
+integrator as required by the worker instructions.
