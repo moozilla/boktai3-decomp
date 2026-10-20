@@ -86,11 +86,10 @@ void Player_UpdateChargeAction(struct Player *p)
             }
             break;
         }
-        case 3:
-            {
-                u32 mask = 0x80;
-                p->statusFlags = mask | p->statusFlags;
-            }
+        case 3: {
+            u32 mask = 0x80;
+            p->statusFlags = mask | p->statusFlags;
+        }
             sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 10), 0x40);
             p->resetValue6FC = 30;
             if (!(p->inputKeys[0] & 1)) {
