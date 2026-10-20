@@ -1,12 +1,12 @@
 #include "global.h"
 #include "modifier_list.h"
-#ifdef NONMATCHING
-// fuzzy: 81.6%
-// foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
-s32 StatModifier_AddForOwnerMode(register struct StatModifier *modifier, s32 value)
+s32 StatModifier_AddForOwnerMode(struct StatModifier *modifier_, s32 value_)
 {
+    register struct StatModifier *modifier asm("r4") = modifier_;
+    register s32 value asm("r3") = value_;
     s32 result;
     if (modifier->enabled == 0)
         result = value;
@@ -22,6 +22,3 @@ s32 StatModifier_AddForOwnerMode(register struct StatModifier *modifier, s32 val
     }
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StatModifier_AddForOwnerMode);
-#endif
