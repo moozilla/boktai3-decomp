@@ -295,7 +295,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
         void *map = Video_GetBackgroundMap(p->layer);
         u32 layerId = p->layer;
         register u32 drawMode asm("r1") = mode;
-        sub_082160B8(layerId, drawMode, resource, 0, offsetX, offsetY, c->mode, map);
+        Bg_SetupLayer(layerId, drawMode, resource, 0, offsetX, offsetY, c->mode, map);
     }
     if (p->limitX && p->limitY) {
         layer->halfWidth = p->limitX / 2;
@@ -829,7 +829,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
         layer->flags = 1;
         Bg_SetPriority(p->layer, c->mode);
     } else
-        sub_082160B8(p->layer, 1, resource, 0, (s16)c->offsetX, (s16)c->offsetY, c->mode, map);
+        Bg_SetupLayer(p->layer, 1, resource, 0, (s16)c->offsetX, (s16)c->offsetY, c->mode, map);
     p->speedScale = scale;
     {
         s32 drawX = p->x >> 4, drawY = p->y >> 4;

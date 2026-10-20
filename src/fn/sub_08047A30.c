@@ -26,7 +26,7 @@ s32 BackgroundFlash_Initialize(struct BackgroundFlashController *controller, voi
         Bg_SetPriority(1, 1);
         Bg_SetupLayers(3, 1, resource, 0, 0, 1, (s32 *)&offset);
     } else {
-        sub_082160B8(1, 1, resource, 0, 0, 0, 1, map);
+        Bg_SetupLayer(1, 1, resource, 0, 0, 0, 1, map);
     }
     BackgroundFlash_LoadPalette();
     table = (const u16 *)RANDOM_TABLE_ADDR;

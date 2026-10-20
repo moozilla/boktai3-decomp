@@ -9,12 +9,12 @@ struct TimedSprite {
     u16 frame, duration;
 };
 void ActorGlyphTrail_SetState(struct TimedSprite *, void (*)(void));
-void sub_08237CDC(void);
+void ActorGlyphTrail_OnPhase(void);
 void TimedSprite_UpdateMotion(struct TimedSprite *p)
 {
     p->x += p->velocityX;
     p->y += p->velocityY;
     p->frame++;
     if (p->frame >= p->duration)
-        ActorGlyphTrail_SetState(p, sub_08237CDC);
+        ActorGlyphTrail_SetState(p, ActorGlyphTrail_OnPhase);
 }
