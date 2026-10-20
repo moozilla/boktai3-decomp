@@ -1,3 +1,9 @@
+#define Player_SetAnimation sub_0813AE18
+#define ActorVariant_GetTableValue sub_081419D4
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateMoveDestination sub_0814FFA4
+#define Script_Call sub_0821AD08
+#define Math_Atan2 sub_082215E4
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: MoveTo callback approaches destination and decelerates its movement effect.
@@ -25,16 +31,17 @@ static inline void putB(u8 *p, u32 o, u32 v)
 }
 static inline void face(u8 *p)
 {
-    if (B(0x3A4) > 4) {
-        putB(p, 0x3A2, 8 - B(0x3A4));
+    u32 dir = B(0x3A4);
+    if (dir > 4) {
+        putB(p, 0x3A2, 8 - dir);
         B(0x3A3) = 1;
     } else {
-        B(0x3A2) = B(0x3A4);
+        B(0x3A2) = dir;
         B(0x3A3) = 0;
     }
 }
 #ifdef NONMATCHING
-// fuzzy: 80.1%
+// fuzzy: 80.0%
 void PlayerCue_UpdateMoveDestination(u8 *p)
 {
     s32 dx = S(0x590) - S(0x30), dz = S(0x594) - S(0x34);
@@ -111,5 +118,5 @@ void PlayerCue_UpdateMoveDestination(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMoveDestination);
+INCLUDE_ASM("asm/nonmatching", sub_0814FFA4);
 #endif
