@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 0%
+// fuzzy: 85.6%
 // Remaining differences: register allocation and instruction/block ordering.
 #include "global.h"
 #include "engine.h"
