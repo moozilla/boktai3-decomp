@@ -19,7 +19,7 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     p->word104 = 0;
 }
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
-void sub_080AE940(struct SceneActorRegistryResetView *);
+void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *);
 static inline u8 PhaseComplete(struct SceneActorRegistryResetView *p)
 {
     return p->field2B0;
@@ -62,7 +62,7 @@ void SceneActorPhase_BeginTimedMotion(struct SceneActorRegistryResetView *p)
             }
             {
                 u16 duration = 40;
-                p->word104 = (u32)sub_080AE940;
+                p->word104 = (u32)Vorn_UpdateApproachRange;
                 p->word108 = zero;
                 p->word10C = zero;
                 p->word110 = duration;
