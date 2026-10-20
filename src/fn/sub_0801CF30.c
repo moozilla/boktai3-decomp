@@ -2,12 +2,12 @@
 int Solar_GetLevel(void);
 void Callback_InvokeActor(void *, void *);
 void sub_0801C24C(void *);
-void sub_08225F88(void *);
+void Camera_SetPosition(void *);
 int ResultMenu_Update(u8 *p)
 {
     *(int *)(p + 0x50) = Solar_GetLevel();
     Callback_InvokeActor(p, *(void **)(p + 0x7a4));
     sub_0801C24C(p);
-    sub_08225F88(p + 0x18);
+    Camera_SetPosition(p + 0x18);
     return 0;
 }
