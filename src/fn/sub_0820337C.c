@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -5,8 +6,8 @@
 #define CannonEmitter_InitializeFromScript sub_0820337C
 
 #ifdef NONMATCHING
-// fuzzy: 56.6%
-// Remaining differences: palette loop uses a descending index instead of a signed pointer bound.
+// fuzzy: 99.0%
+// Remaining differences: palette-loop bound and decrement scheduling.
 struct CannonEmitter {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -30,7 +31,7 @@ void ProximitySequence_TestPlayerDistance(void);
 static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
                                               struct DisplaySequenceState *stateArg, u32 flipMask)
 {
-    struct DisplaySequenceSprite *sprite = &owner->sprite;
+    register struct DisplaySequenceSprite *sprite asm("ip") = &owner->sprite;
     struct DisplaySequenceState *state = stateArg;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
@@ -42,44 +43,50 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     }
     {
         u32 frame = *command >> 6;
+        asm("" : "+r"(sprite) : "r"(frame));
         {
-            struct DisplaySequenceSprite *out = &owner->sprite;
+            register struct DisplaySequenceSprite *out asm("r3") = &owner->sprite;
+            asm("" : "+r"(out));
             out->frame = frame;
         }
     }
     {
         u32 input = state->flags;
-        u32 first;
-        u32 maskBit = 1;
+        register u32 first asm("r2");
+        register u32 maskBit asm("r4") = 1;
         bit = maskBit;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit)) {
             u32 flags = owner->sprite.flags;
-            u32 flip = flipMask;
+            register u32 flip asm("r2") = flipMask;
+            asm("" : : "r"(flip));
             owner->sprite.flags = flags | flip;
         } else
             owner->sprite.flags &= ~4;
     }
     {
         u32 input = state->flags;
-        u32 bit;
-        u32 first;
+        register u32 bit asm("r4");
+        register u32 first asm("r2");
         bit = 2;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
+        asm("" : "+r"(first));
         first = (u8)first;
         {
-            u32 flags;
+            register u32 flags asm("r1");
             if (first != (((*command & 0x30) >> 4) & bit)) {
-                struct DisplaySequenceSprite *read = sprite;
+                register struct DisplaySequenceSprite *read asm("r2") = sprite;
                 flags = read->flags | 8;
             } else {
-                struct DisplaySequenceSprite *read = sprite;
+                register struct DisplaySequenceSprite *read asm("r2") = sprite;
                 flags = read->flags & ~8;
             }
             {
-                struct DisplaySequenceSprite *out = sprite;
+                register struct DisplaySequenceSprite *out asm("r3") = sprite;
                 out->flags = flags;
             }
         }
@@ -87,12 +94,14 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        u32 temp;
-        u32 savedDuration;
+        register u32 temp asm("r2");
+        register u32 savedDuration asm("r4");
         state->elapsed = elapsed;
         temp = 0xFFFF;
+        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
+        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -122,6 +131,7 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -145,7 +155,7 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
             }
             state->frameWeight = *command & 15;
             {
-                s32 weight = state->frameWeight;
+                register s32 weight asm("r2") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -162,7 +172,7 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
 
 s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
 {
-    s32 result;
+    register s32 result asm("r0");
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
         p->initialPosition.y = Script_GetValue();
@@ -204,6 +214,7 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     result = Anim_SetSequence(&p->sequence, p->resource, 6, 0, 0);
     CannonEmitter_StepAnimation(p, &p->sequence, 4);
+    asm("" : "+r"(result));
     if (p->solid) {
         SceneBody_Init(p->body, p->parent, (u8 *)p + 0x3c, 0, 4, p);
         SceneBody_SetSprite(p->body, &p->sprite);
