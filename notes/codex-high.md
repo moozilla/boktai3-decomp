@@ -2270,3 +2270,98 @@ paths compare byte-identical; this is not exact-C progress. All three matches
 were checked over their complete reviewed extents. Shared headers, generated
 files and shared documentation were untouched. An unrelated modification to
 `tools/cloud_task.py` appeared during the session and was left untouched.
+
+# Codex high: task 080DA678 — Mummy movement responses
+
+Tags: #matching #mummy #movement #animation #register-pinning
+
+Branch: `cloud/080DA678`. Worked solo and offline. Exact-C gain is approximately
+**+0.0137 percentage points**, entirely in the Register-pinned category (332
+bytes). Three guarded drafts add no exact credit. Used per-file checks only;
+no make/full build, network operations, generated-file edits, or direct Git
+mutations. All commits went through `build/commit.sh`.
+
+- **080DA678 matched**, tentative alias `Mummy_ResetRevivalMotion`.
+  Reviewed extent **332 bytes**, through 080DA7C4, including both literal pools.
+  Called by Mummy_UpdateRevival (080D1EA0); initializer 080DCC98 also installs
+  it as a motion reset callback. Clears context halfwords 6D0/6D2/6D4/6D6/6F2,
+  actor 5C4, and context 6EE; resets the motion sequence, selects directional
+  animation zero, resolves the route position, then advances the drawable's
+  packed display sequence. The matched 080EBD0C stepper is the same inline
+  body. Its mask-copy temporary must be r1 here rather than the seed's r2.
+  `depin.py --write` reduced 14 hints to 13; final formatted source passed
+  `check.py --target-size 332` with zero differing bytes. Pins and empty
+  allocation barriers are marked; there are no handwritten instruction bodies.
+
+- **080DA97C drafted 85.4%**, tentative alias
+  `Mummy_SelectMovementResponse`. Reviewed extent **6,316 bytes**, through
+  080DC228; candidate **6,272 bytes**. Plays song 0x211 or 0xFD from the
+  reaction-sound variant, clears movement bit four, and selects randomized
+  route control, pursuit, or recovery according to flags2D4 and field2DC.
+  Recovered all three inlined arrival/reroute blocks from the shared chase
+  helpers. The 0x2000 path reverses the saved direction and clears 0x2020;
+  0x80 selects the saved group control after arrival. Other successful
+  pursuit paths install entryTarget228, behavior seven, and Div(64,3).
+  Final realigned residue: **459 instructions / 147 ignoring registers**.
+  Remaining differences include retry-loop allocation/hoisting, PRE stack
+  slots, state-offset reuse, masks before field loads, and far branches.
+  Moving the failure tail ahead of the common pursuit tail reduced a bad
+  repeated-call alignment from about 2,200 structural differences to 202;
+  explicit early `return 0` paths and one temporary r1 RNG-mask pin reduced
+  it further. Local chase helpers preserve the target's late invalid-target
+  callback rather than the shared draft's early callback placement.
+
+- **080DC228 drafted 89.9%**, tentative alias `Mummy_ResumePlayerPursuit`.
+  Reviewed extent **1,960 bytes**, through 080DC9D0; candidate **1,956 bytes**.
+  Entry consumes field2B1, selects animation zero and directional-animation
+  control kind three. Completion clears context bit 0x800 at 6F2, assigns
+  the primary player's +0x24 target, and runs the arrival/reroute block.
+  A successful reroute installs RestoreAfterDelay with control kind 14,
+  a 30-frame delayed packet pointing to group+0x48 with behavior 12, then
+  state/phase/behavior (3,1,0). Final realigned residue: **99 instructions /
+  34 ignoring registers**. Remaining differences are retry-loop invariant
+  allocation, flags-load order, PRE pointer/stack slots and the cell-center
+  temporary. Shares the same late callback/explicit-return improvements and
+  temporary RNG-mask pin as 080DA97C. Wider return types, local group-mask
+  forms and several unpinned RNG-width variants regressed structure or
+  allocation. Depinning was attempted on the unguarded nonexact candidates;
+  the tool correctly skipped them because its acceptance criterion is exact.
+
+- **080DC9D0 drafted 98.9%**, tentative alias
+  `Mummy_ResumeRouteAfterCheckpoint`. Reviewed extent and candidate both
+  **588 bytes**, through 080DCC1C. Entry installs animation-checkpoint control
+  kind 0x26. Completion clears actor motion bit 0x100 and context bit 0x800,
+  selects animation zero, clears group flag bits six and sets context bit
+  0x1000, then restores Mummy_UpdatePlayerRoute with kind 0x27 and behavior
+  16. Tries the route from the actor's position to itself; failure installs
+  idle control/state (3,0,0). **18 bytes / six realigned instructions differ**:
+  three constant/load scheduling pairs, at ROM 080DCA64–080DCA6A,
+  080DCA7A–080DCA7C, and 080DCA8E–080DCA92. Registers and control flow agree.
+  A signed full-width bitfield for the context flag and group flag, plus a
+  local OR mask, removed the surplus copy and matched the control-field
+  spills. Pointer barriers, constant-register pins and explicit mask helpers
+  regressed; no hints retained. Stopped after the remaining ordering ideas
+  failed. A bounded permuter attempt failed before searching because its
+  global split rejects the unrelated promoted symbol Ghoul_ResumePendingRoute
+  in src/fn/sub_0808CC48.c against this checkout's stale symbol map.
+
+- **080DCC98 / Mummy_Init stopped, no draft**. Reviewed assembly and callers;
+  the Ghidra export is absent and matched relatives explain only about 10%
+  of its 1,803 instructions. It sets object context to the actor itself,
+  category one, initializes the profile, and allocates either a 0x5C sprite
+  or 0x80 alternate drawable using asset 0x48DE (sprite sequence 0xA4B2).
+  Its large shared script-parameter parser initializes combat ranges,
+  reaction motion, health, route positions and callback slots, followed by
+  shadow/effect setup and a packed display-sequence step. It installs
+  080DA678 as the motion reset and 080DA97C as the movement response, while
+  the ROM behavior table contains 080DC228 and 080DC9D0. No complete, reviewed
+  candidate was recovered, so the function remains assembly. Future work
+  should recover the common initialization/parser inline before allocation
+  experiments; there is no below-threshold production source to resume.
+
+All three draft scores were recorded with `--nonmatching --record` over the
+reviewed extents. Their default assembly alternatives each passed the same
+full-extent byte check. Names have file-local aliases with confidence comments;
+no symbol/header changes were needed. Used BIG_FUNCTIONS.md, condensed listings,
+matched relatives, anchored comparisons, batched source variants and loop-pass
+inspection. Shared handoff/history/index/progress files remain for integration.
