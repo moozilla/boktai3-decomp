@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 78.9%
-// Floor-offset evaluation, shared depth-clamp stores and register allocation still differ.
+// fuzzy: 86.4%
+// Body has 12 register differences; the recorded score also includes the retained 76-byte tail.
 struct MotionPosition {
     u32 x : 16;
     s32 y : 16;
@@ -25,6 +25,12 @@ static inline s32 Abs(s32 x)
         x = -x;
     return x;
 }
+static inline s32 Query(struct MotionPosition *p)
+{
+    register s32 result asm("r1") = Terrain_GetCellClearance(p);
+    asm("" : "+r"(result));
+    return result;
+}
 static inline s32 Offset(s32 z)
 {
     s32 offset = z + 96;
@@ -38,8 +44,7 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
     struct MotionPosition old, next;
     s32 y, floor, difference;
     u32 bits;
-    register u32 shape asm("r3");
-    register u32 flags asm("r2");
+    u32 shape, flags;
     p->collision = 0;
     p->previousOffset = p->verticalOffset;
     old.x = (p->x << 4) >> 16;
@@ -60,20 +65,30 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
         p->collision = 2;
     }
     Terrain_GetCellClearance(&old);
-    floor = Terrain_GetCellClearance(&next);
+    floor = Query(&next);
     y = (s16)next.y;
     floor -= Offset((s16)next.z);
     if (floor - y < -8) {
         next.z = p->z >> 12;
         p->deltaZ = 0;
         p->collision |= 2;
-        floor = Terrain_GetCellClearance(&next);
+        floor = Query(&next);
         y = (s16)next.y;
         floor -= Offset((s16)next.z);
     }
     bits = Terrain_GetCellHighByte(&next);
-    shape = bits & 0xF00;
-    flags = bits & 0xF000;
+    {
+        register u32 source asm("r2") = bits;
+        register u32 mask asm("r3");
+        asm("" : "+r"(source));
+        flags = source;
+        mask = 0xF00;
+        asm("" : "+r"(mask));
+        mask &= flags;
+        asm("" : "+r"(mask));
+        shape = mask;
+        flags &= 0xF000;
+    }
     difference = floor - y;
     asm("" : "+r"(difference));
     if (y >= floor) {
