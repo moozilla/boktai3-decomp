@@ -466,3 +466,108 @@ against the reviewed extent and rechecked after clang-format. Three sprite
 functions and the background fade have separate draft commits; a follow-up
 single-unit cleanup formats the background fade and removes a stale duplicate
 score comment. No generated assembly or ROM-derived artifact was committed.
+
+## 2026-10-20 — cloud task 08116E44
+
+Tags: #matching #motion #glove #nonmatching
+
+Exact gain: 0.000 percentage points; no matches and no qualifying guarded
+NONMATCHING drafts. Worked solo on the preclaimed cloud/08116E44 branch.
+Only per-file check.py acceptance checks were used; no full build or network
+operation was run. The pre-existing tools/cloud_task.py modification was left
+alone. Below-threshold C is retained only in ignored wip/ files in this worker
+checkout, not in production src/ or this commit.
+
+All six functions share the motion state at actor + 0x18 and the model at
+actor + 0x610. The matched ActorMotion_UpdateFallFrame (081203A8) and
+SceneActor_UpdateFallState (08120618) provide the damping, facing-angle and
+collision-bounce core. These functions additionally hold computed addresses
+across Div and model updates; copying the sibling body alone does not match
+those lifetimes. Tentative names below use the neighbouring MotionActor prefix.
+
+- **08117948 — stopped below threshold; MotionActor_UpdateStopping.**
+  Glove_BeginStopping (08117294), Glove_StopFromScript (08119F44) and
+  Glove_StopWithMessage (08119F9C) install it. Clears initialization byte
+  0x868, sets halfwords 0x53C/0x53E to 0x88/zero, updates movement audio,
+  clamps speeds, integrates damped motion, then handles action callbacks,
+  animation resets and damage recovery. Candidate wip/sub_08117948.c:
+  56.7% fuzzy, 403 realigned differences / 214 ignoring registers.
+  Initial source was 54.9%, 422 / 220. Extracting repeated action-animation
+  resets into inline C improved code slightly; pointer caching, zero-value
+  lifetimes, bit-mask order and extensive allocation differences remain.
+  The apparent sub_08249240 calls are bx-r2 thunks: actual indirect callbacks
+  stored at actor + 0x2C8 and +0x32C, called with the address of their own
+  callback field and zero. The C uses function pointers for those calls.
+- **081182E4 — stopped below threshold; MotionActor_UpdateDefeat.**
+  Installed by MotionActor_DispatchRequestedState when state flag 2 is
+  consumed. Stops locally selected sounds, hides the five model animations,
+  releases marker/action effects and sprite-pair resources, restores model
+  palettes, zeros horizontal motion, and emits bursts every 12 then 6 frames.
+  After timer >120 chooses 08117F6C for link/continuation modes or
+  Glove_OnActionComplete otherwise. Candidate wip/sub_081182E4.c: 60.5%,
+  344 / 180. Best intermediate structure was 333 / 171 at 60.6%; the retained
+  version corrects the palette-data loop to reload the graphics base on every
+  iteration, as the ROM does. Explicit address locals before the animation
+  loop reduced initial structural differences from 219 to 171. Stack-slot
+  order, the outer pointer's low/high register choice and palette-loop
+  addressing still differ substantially.
+- **08116E44 — stopped below threshold; MotionActor_UpdateDeparture.**
+  Installed when MotionActor_DispatchRequestedState consumes state flag 4.
+  Runs script at +0x908 once with a two-value argument record (result index
+  and actor +0x900, or link slot/result data), clears that script, stops local
+  sounds, and saves the 16-byte position at +0x8A4. Sets flags, clears pending
+  damage, runs normal motion while horizontal displacement from that saved
+  position is <=127 units, then switches to MotionActor_RunPendingScript or
+  MotionActor_RunDelayedScript. Candidate wip/sub_08116E44.c: 59.4%,
+  345 / 191. Argument construction and shared movement pointer lifetimes are
+  reconstructed but allocation, mask setup and callback-transition ordering
+  remain far from draft threshold.
+- **08117F6C — stopped below threshold; MotionActor_UpdateRecovery.**
+  Clears model animation flag 1 on entry, sets a three-frame blink countdown,
+  integrates motion and alternates that flag when the countdown expires.
+  Copies the resource/health target fields and raises current health toward
+  its target by 20 when the gap exceeds 100, otherwise by 5. After timer >120,
+  snaps to target, restores the marker/color effect and installs 08117948.
+  Initial candidate: 59.0%, 198 / 75. Retained wip/sub_08117F6C.c uses signed
+  health pointers: 57.1%, 197 / 63. That improves selection of ldrsh versus
+  explicit sign extensions, though register differences worsen the fuzzy
+  score. Duplicate signed/unsigned health loads, callback-address lifetime,
+  flag-pointer caching and the shared motion core remain.
+- **081172C4 — stopped below threshold; MotionActor_UpdateRisingCue.**
+  Entry clears phase +0x918 and speed +0x914, creates StageIconDisplay with
+  Glove_BeginStopping as callback, and sets actor flag 0x10. Phase zero adds
+  0x20 acceleration to the horizontal offset until it exceeds 0x40000;
+  phase three subtracts 0x100 from positive speed and advances to phase four
+  when nonpositive. Runs shared motion and the locally selected looping
+  sound. Best fuzzy candidate wip/sub_081172C4.c: 74.0%, 107 / 34; distinct
+  outer/state struct views recover the required offset reload after setting
+  the animation halfword. An independent 90-second permutation experiment
+  produced a valid candidate with 198 differing bytes and 15 structural
+  differences, but still only 69.8% fuzzy (118 realigned differences), in
+  wip/permuted_081172C4.c. No uninitialized reads were retained. Most residue
+  is self-pointer r5 versus ROM r7 and spill/copy lifetimes across damping.
+- **081175F8 — stopped below threshold; MotionActor_UpdateRisingReturn.**
+  Shares the rise/slowdown phases with 081172C4, omits StageIconDisplay and
+  flag 0x10, and phase four installs 08117948 with active=1 and timer=0.
+  Candidate wip/sub_081175F8.c: 69.3%, 137 / 48, improved from initial 65.7%,
+  152 / 52 by using distinct outer and motion-state views. The same shared
+  motion-core allocation issue remains, plus callback-transition ordering.
+
+Useful techniques and unsuccessful experiments:
+
+- asmat.py's count is a listing-line limit, not an instruction count; dump
+  enough lines to include pools and the epilogue, then stop at the next
+  thumb_func_start. condense.py confirms repeated Div and animation runs.
+- Score large functions using realigned structural/total counts. Candidate
+  byte differences alone were misleading: the permutation reduced 462 to
+  198 differing bytes without approaching the 80% fuzzy draft threshold.
+- A 127-variant pointer-cache sweep on 081172C4 topped out at 74.0% fuzzy.
+  Caching more pointers early can improve structure yet sharply worsen
+  allocation. Adjacent declaration, inline-boundary and alias experiments
+  did not close the shared-core residue.
+- Register-pinning experiments on the outer pointer regressed these sources
+  and were discarded. No retained candidate has a pinning concession.
+- The permuter initially failed to link sub_0811BD30; its promoted symbol is
+  Actor_UpdateShadowSpriteParts. Replacing the obsolete local spelling in
+  the isolated search input fixed that tooling issue. Final acceptance still
+  used check.py; permutation scores were never treated as exact evidence.
