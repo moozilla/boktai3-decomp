@@ -75,7 +75,7 @@ void DisplayAnimation_SetFlags(void *);
 void Actor_DisableShadow(struct SceneNpc *);
 s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
-void sub_081D07D8(void *, struct SceneNpc *);
+void SceneNpc_EnterProjectedIdle(void *, struct SceneNpc *);
 void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
 void SceneNpc_OnModeUpdate(void);
@@ -104,7 +104,7 @@ static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
    Actor_Allocate) named -n, variant -k (default 1), at -p x y z facing -d, with
    behavior -i (0-4: update callback, mode and state), records it in
    gUnk_02000274 and registers it with the scene actor manager; -K also runs
-   sub_081D07D8 on it. The facing computation needs register pins and an empty
+   SceneNpc_EnterProjectedIdle on it. The facing computation needs register pins and an empty
    asm barrier (agbcc otherwise turns the arithmetic shift into a logical one). */
 void SceneNpc_CreateFromScript(void)
 {
@@ -279,6 +279,6 @@ void SceneNpc_CreateFromScript(void)
     rig->handle = ParticlePool_Create();
     if (extra) {
         rig->attached = 1;
-        sub_081D07D8(manager, npc);
+        SceneNpc_EnterProjectedIdle(manager, npc);
     }
 }

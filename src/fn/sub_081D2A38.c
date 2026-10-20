@@ -82,7 +82,7 @@ void DisplayAnimation_SetFlags(void *);
 void Actor_DisableShadow(struct SceneNpc *);
 s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
-void sub_081D07D8(void *, struct SceneNpc *);
+void SceneNpc_EnterProjectedIdle(void *, struct SceneNpc *);
 void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
 void SceneNpc_OnModeUpdate(void);
