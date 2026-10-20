@@ -21,8 +21,8 @@ static inline u32 AboveCell(u16 *a, s32 cell)
     return above;
 }
 // confidence=low: selects a cardinal direction from adjacent terrain heights for diagonal travel.
-#define Projectile_ResolveTerrainDirection sub_081D7F8C
-s32 Projectile_ResolveTerrainDirection(u16 *input, s32 direction)
+#define Task4E01_ResolveTerrainDirection sub_081D7F8C
+s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
 {
     register u16 *a asm("r5") = input;
     s32 cell, width;

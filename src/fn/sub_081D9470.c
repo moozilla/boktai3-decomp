@@ -138,8 +138,8 @@ void sub_081D7934(void *);
 void sub_081D9904(void *);
 void sub_081D95F0(void *);
 // confidence=low: selects the initial impact sequence according to projectile flags.
-#define Projectile_StartImpactAnimation sub_081D9470
-s32 Projectile_StartImpactAnimation(u8 *p)
+#define Task4E01_StartImpactAnimation sub_081D9470
+s32 Task4E01_StartImpactAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
     void *resource = ScriptProc_Start(0x922e, 0x32d7);

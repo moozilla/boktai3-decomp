@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.8%
+// fuzzy: 82.3%
 // Remaining differences: register lifetimes, flag branches and collision-field copies.
 
 #include "contact_swarm.h"
@@ -136,13 +136,13 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
 
 void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
-void Projectile_SetCollisionSize(void *, s32, s32);
+void Projectile_SetCollisionSize(void *, u16, u16, u16);
 u32 sub_08249498(u32, u32);
 void sub_081D7934(void *);
 void sub_081D9904(void *);
 // confidence=low: advances the projectile display and expands collision on every fifteenth tick.
-#define Projectile_UpdateExpandingImpact sub_081D95F0
-s32 Projectile_UpdateExpandingImpact(u8 *p)
+#define Task4E01_UpdateExpandingImpact sub_081D95F0
+s32 Task4E01_UpdateExpandingImpact(u8 *p)
 {
     u8 *config = p + 0x18;
     struct Drawable *sprite;
@@ -166,7 +166,7 @@ s32 Projectile_UpdateExpandingImpact(u8 *p)
         u32 tick = *(u32 *)p;
         if (sub_08249498(tick, 15) == 14 && tick <= 44) {
             s32 size = (*(s32 *)(p + 0x1a0) += 16);
-            Projectile_SetCollisionSize(config, size, 80);
+            Projectile_SetCollisionSize(config, size, 80, size);
             *(u32 *)(p + 0xd4) = *(u32 *)(config + 0x28);
             *(u32 *)(p + 0xd8) = *(u32 *)(config + 0x2c);
         }
