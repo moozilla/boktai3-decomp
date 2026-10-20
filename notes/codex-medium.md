@@ -371,3 +371,89 @@ moved immediately above the #define aliases because trailing comments caused
 clang-format to wrap the alias over two lines, outside promote_names.py's
 recognition pattern. Each alias correction was committed separately by unit.
 No generated assembly or ROM-derived artifact was committed.
+
+# Codex medium worker: task 08216584 (2026-10-20)
+
+Tags: #matching #background #palette #sprite-oam #nonmatching
+
+Worked offline on the preclaimed cloud/08216584 branch, largest function first.
+Exact assignment progress is 0.00% (+0.00 percentage points). Four guarded
+NONMATCHING drafts retain the assembly default; they contribute no exact code
+progress. Used only per-file check.py compilations, including those run by
+variants.py; no make, full build, network, direct git mutations, shared docs or
+progress regeneration. Commits went through build/commit.sh. Left the existing
+tools/cloud_task.py modification untouched. Ghidra's decomp.c export is absent.
+
+- **08216584 — stopped below draft threshold, BgGfx_LoadTilemap.** Reconstructed
+  a complete candidate in ignored wip/sub_08216584.c from assembly and the
+  neighboring Bg_SetLayerMap/LoadTilemapSimple/LoadTilemapAtPosition routines.
+  A layer entry is 0x30 bytes: old tile origins at 0x10/0x12, source width at
+  0x18, metatile dimensions at 0x1C/0x1E, pixel scroll at 0x20/0x22, metatile
+  quadrants at 0x24, source map at 0x28, ring buffer at 0x2C. Source metatiles
+  contain four halfwords. A destination column writes the selected top/bottom
+  pair according to X parity. The bounded path substitutes zero outside the
+  map, or tiles[map[0]] in mode 2; mode 1 wraps source coordinates. Large
+  changes redraw 16 two-row strips; small interior/wrapping changes update
+  exposed rows then columns. Small bounded changes update one column and/or
+  one two-row strip. Read BIG_FUNCTIONS.md and used condense.py, then scored
+  realigned differences. Initial wrapping normalization calls 08249350
+  (signed remainder), whereas inner lookups call BIOS Mod; using Mod for both
+  destroys call anchoring. Plain C % currently fails the isolated link with
+  unresolved __modsi3, so the local candidate declares/calls 08249350 directly.
+  Final candidate: fuzzy 40.9%, 951 realigned differences / 265 ignoring
+  registers. Register hints improved one earlier fuzzy score to 55.0% but
+  worsened structure to 462; that variant was rejected. Row/column inline
+  parameter lifetimes, index-expression grouping and register allocation still
+  differ substantially. No below-threshold source was committed.
+- **08217430 — stopped below draft threshold, proposed
+  Palette_ApplyObjectFade.** Called by InterruptsAndVideo_OnGraphicsUpdateTask
+  after the background fade, unless the grayscale countdown is active. Copies
+  cached object palette banks at full strength; otherwise scales RGB555 or
+  blends toward 030051DC with level 030051D4 >> 1. Flag masks at 03005210
+  exclude specific resource ids, and mode 030051C8 == 1 fills unprotected
+  banks with 03005214. Full strength also requires mode zero and caches the
+  previous level at 03004DAC. The two exclusion sequences intentionally have
+  a repeated 0x3AA test. Best retained candidate in ignored wip is 68.2%,
+  259 realigned differences / 102 ignoring registers. Pinning level to r10
+  improved structure strongly; changing predicate return width, pinning the
+  red/blue term or splitting loop locals did not improve it. Mask hoisting,
+  materialized predicates and distinct register allocation across the three
+  bank loops remain. No below-threshold source was committed.
+- **08218508 — drafted 89.1%, SpriteOam_QueueFlaggedProjectedSprites.** Used as
+  a render callback by 08163398. Same queue construction as 08217F4C, with an
+  additional required drawable flag 0x1000; its semantic meaning is unknown,
+  marked confidence=low. Final reviewed check: 41 realigned differences,
+  19 ignoring registers. Register-pinning concession.
+- **08217F4C — drafted 88.9%, SpriteOam_QueueProjectedSprites.** Common renderer
+  installed by scene/UI setup through Video_SetRenderCallbacks. Traverses
+  030042D0[03004290], rejecting hidden/parity-selected sprites (0x401 or
+  0x201). Projects world coordinates isometrically unless flag 16 supplies
+  screen coordinates; applies drawable offsets and screen bounds. Queues
+  affine matrices, flips, blend/window flags, and either direct OAM entries
+  or clamped depth-sort entries. Final reviewed check: 41 realigned
+  differences, 19 ignoring registers. Projection temporary address caching,
+  matrix-counter increment shape, signed comparison selection and operand
+  scheduling differ. Register-pinning concession.
+- **08218254 — drafted 86.7%, SpriteOam_QueueCameraRelativeSprites.** Alternate
+  renderer paired with 08214D20 by 08225CB8/08225DA0. Shares queue behavior,
+  but uses (position-camera)/8 plus screen center for X/Y and subtracts
+  camera Z directly. Final reviewed check: 45 realigned differences,
+  14 ignoring registers. Camera/offset scheduling and the common matrix/OAM
+  register differences remain. Register-pinning concession.
+
+Useful techniques: preserve Vec's compiler-rounded eight-byte size when
+laying out the 0x24 next pointer (a six-byte conceptual vector plus six bytes
+of explicit padding incorrectly moves it to 0x28). Constrain only observed
+register lifetimes: removing the sprite depth and matrix-count pins improved
+77.9% to 86.8%; freeing projection-value pins improved it further. Computing
+frame parity before declaring the skip mask reproduces the original constant
+load order. variants.py made these isolated hypotheses cheap to compare.
+Background palette level pinning alone reaches draft threshold; pinning source,
+destination and buffer pointers as well regresses it. Pointer-to-pointer bank
+helpers also worsened code generation and were discarded.
+
+All four guarded scores were recorded with check.py --nonmatching --record
+against the reviewed extent and rechecked after clang-format. Three sprite
+functions and the background fade have separate draft commits; a follow-up
+single-unit cleanup formats the background fade and removes a stale duplicate
+score comment. No generated assembly or ROM-derived artifact was committed.
