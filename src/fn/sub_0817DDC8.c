@@ -85,8 +85,8 @@ static inline s32 Scale(int x)
 void sub_0817AEC8(void *, int);
 void SceneVolume_ConfigureAttackCollider(void *, int, int, int);
 void SceneActors_SetParticleControlMode(void *, int);
-#define SceneVolume_UpdateImpactSlide                                                              \
-    sub_0817DDC8 // confidence=low: decays impact speed, then plays a recovery animation
+// confidence=low: decays impact speed, then plays a recovery animation
+#define SceneVolume_UpdateImpactSlide sub_0817DDC8
 void SceneVolume_UpdateImpactSlide(struct VolumeActor *p)
 {
     struct VolumeActor *q = p;
