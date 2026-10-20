@@ -139,3 +139,75 @@ All guarded scores were refreshed with `check.py --nonmatching --record`;
 normal builds retain INCLUDE_ASM for the three drafts. Exact checks used
 explicit reviewed extents for all three matches. Batch ROM validation and
 name promotion are left to the integrator as instructed.
+
+## 2026-10-20 — task 080D3D60, Mummy route and attack callbacks
+
+Tags: #matching #mummy #navigation #nonmatching
+
+No exact matches; exact code progress gain is +0 percentage points. Five
+NONMATCHING drafts retain the original INCLUDE_ASM in default builds. Names
+are provisional file-local aliases using the neighboring Mummy prefix.
+No network operations or full builds were run.
+
+- **080D5778 — drafted 88.3%, Mummy_ResumeDelayedRoute.** Consumes behavior
+  entry, restores saved control, clears route/movement flags and a group
+  timer, then waits for counter2AC > 60. Schedules a delayed restoration;
+  when context+6D2 is set and the target goal cell equals terrainCell,
+  invokes 080D6FDC or chooses a different route entry. Otherwise runs the
+  common route reacquisition logic. Final realigned residue: 134 instructions,
+  39 ignoring registers. Inlined random-turn allocation, flag-load ordering
+  and target-pointer spills remain. No register pins in the authored unit.
+- **080D6608 — drafted 87.0%, Mummy_TryDirectPursuit.** Checks group+64 against
+  gUnk_02000508 and tests the target's goal cell along straight grid rows and
+  columns via 0812E118. On failure, retargets the first player and uses the
+  common route reacquisition logic. The matched 080D6DF8 CanReach/FindPath
+  code supplies the first phase. Final residue: 179 instructions, 28 ignoring
+  registers; allocation after the straight-path search dominates. Pinning
+  the goal/current cell/height/kind did not improve it; retained without pins.
+- **080D3D60 — drafted 82.4%, Mummy_UpdatePlayerRoute.** This is a control
+  callback: entry uses field2B2, selects animation zero and sets flags2D0
+  bit four. 080DA33C selects behavior 16, and behaviors 16/18 select walking
+  or idle animation. When context+6D6 is clear, assigns player zero's target
+  descriptor, clears flags, and reacquires its route; successful rerouting
+  selects group+48 control kind 0x25 and behavior 12. Final residue: 194
+  instructions, 70 ignoring registers. Control-state store ordering and
+  common turn/route pointer allocation remain. No authored register pins.
+- **080D53F8 — drafted 80.0%, Mummy_UpdateProbeNavigation.** Calls the update
+  callback and movement-rate callback (+260), updates drawable duration scale,
+  consumes a navigation probe event, then requests a descriptor turn or
+  acceleration. Probe turns save control/state and use group+206 value two
+  (the common arrival turn uses six); alternate branches select behaviors
+  13/14. Final residue: 95 instructions, 30 ignoring registers. A scoped
+  context+6F2 clear and a wide saved-heading local improved structure.
+  Retains one r6 speed pin, marked as a concession. depin skipped it because
+  it is not exact; broader actor/body/group pins all worsened the candidate.
+- **080D62CC — drafted 94.6%, Mummy_FireAcceleratingVolley.** Called at frame
+  four by SceneActor_UpdateAnimationCheckpoint (080D0E20). Raises the source
+  position by 200; target height selects a divisor for the greater horizontal
+  displacement component. Clamps speed to [10, context+6CC], constrains aim
+  near a cardinal heading, then invokes 080692C8 one to three times based on
+  paletteOffset. Each iteration scales strength by 8/10 and adds speed*4/10;
+  plays song 0x101. A ContactPackedVector source reproduces the packed-word
+  Y update. Retains r6 count/r8 strength pins. Final residue: 17 instructions,
+  10 ignoring registers; quotient copy, argument load order, loop pointer
+  setup and initial height-difference allocation remain.
+- **080D453C — stopped at 76.1%, Mummy_TryStimulusReaction (local candidate
+  only, wip/sub_080D453C.c).** Clears the temporary activity flag, rejects
+  blocked states, finds a stimulus, initializes a 180-tick timer/control kind
+  nine/behavior 11, resolves its tagged position, tries player tracking and
+  a route toward the stimulus, and retargets the nearest player. Named inline
+  flag predicates improved 65.3% to 76.1%; local register pins and declaration
+  swaps stopped improving it. Residue: 121 instructions, 53 ignoring registers,
+  concentrated in entry guards, zero sharing/state stores and route branches.
+  Below the authorized draft threshold, so production source remains assembly.
+
+Useful technique: scene_actor_chase.h already describes almost all of the
+large route bodies. Replacing its random-turn expansion with the semantically
+same PickTurn/Turn form from 080C09F0 improved 080D6608 from 76.0% to 87.0%
+and 080D5778 from 83.3% to 87.9%, before minor signed-shift/route-field cleanup.
+For 080D53F8 the original helper form was better. Compare realigned counts,
+not raw byte differences: large byte deltas here include shifted literals and
+register changes. The Ghidra export was unavailable; reconstruction used asm,
+matched relatives, neighboring callbacks and shared headers. All five draft
+scores were recorded with check.py --nonmatching --record. Full-ROM validation
+and any alias promotion remain integration work.
