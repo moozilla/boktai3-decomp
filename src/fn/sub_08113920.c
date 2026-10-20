@@ -3,7 +3,7 @@
 // confidence=low: profile-driven native effect motion and creation.
 #define NativeEffect_UpdateAcceleratingTrail sub_08113920
 #ifdef NONMATCHING
-// fuzzy: 90.5%
+// fuzzy: 95.4%
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
@@ -224,5 +224,5 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateAcceleratingTrail);
+INCLUDE_ASM("asm/nonmatching", sub_08113920);
 #endif
