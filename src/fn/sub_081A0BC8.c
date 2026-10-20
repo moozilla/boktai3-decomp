@@ -204,5 +204,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
+INCLUDE_ASM("asm/nonmatching", sub_081A0BC8);
 #endif
