@@ -357,7 +357,78 @@ void Player_ClearStateTimer(struct Player *p, s32 idx)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813D924);
+void PaletteLevels_Configure(s32, s32, s32, void *, void *, void *);
+void Player_NotifyActionCategories(struct Player *);
+// confidence=low: chooses visual modes while consuming timed status effects.
+#define Player_SelectTimedVisualMode sub_0813D924
+s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
+{
+    s32 *resource;
+    s32 i;
+    if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000))
+        *(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) = 0;
+    {
+        u32 slot = p->timedEventSlot;
+        void *state = gUnk_02000710;
+        resource = (s32 *)(slot * 4 + (u32)state + 0x628);
+    }
+    if (*resource > 0) {
+        if (p->kind & 1) {
+            if (*resource <= gUnk_02000710->unk876)
+                *resource = 0;
+            else
+                *resource -= gUnk_02000710->unk876;
+        }
+        mode = 6;
+        *(u16 *)((u8 *)p + 0xAD0) = 64;
+    } else {
+        u16 *timer = (u16 *)((u8 *)p + 0xAD0);
+        if (*timer) {
+            if ((*timer >> 2) & 1)
+                mode = 6;
+            --*timer;
+        }
+    }
+    for (i = 0; i <= 1; i++) {
+        switch (i) {
+            case 0:
+                if ((u8)(p->actionMode - 1) <= 1) {
+                    p->scriptStatus[0] = 0;
+                    *(u16 *)((u8 *)p + 0xACE) = 0;
+                } else if (p->scriptStatus[0]) {
+                    if (p->kind & 1) {
+                        p->scriptStatus[0]--;
+                        if ((*p->inputKeys & 0xF0) || *((u8 *)p + 0x457) == 2)
+                            PaletteLevels_Configure(2, 1, 30, (u8 *)p + 0xAF4, (u8 *)p + 0xAF8,
+                                                    (u8 *)p + 0xAFC);
+                    }
+                    mode = 2;
+                    *(u16 *)((u8 *)p + 0xACE) = 64;
+                } else {
+                    u16 *timer = (u16 *)((u8 *)p + 0xACE);
+                    if (*timer) {
+                        if ((*timer >> 2) & 1)
+                            mode = 2;
+                        --*timer;
+                    }
+                }
+                break;
+            case 1:
+                if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000)) {
+                    if (p->scriptStatus[i]) {
+                        Player_NotifyActionCategories(p);
+                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                    }
+                    p->scriptStatus[i] = 0;
+                } else if (p->scriptStatus[i] && (p->kind & 1)) {
+                    if (--p->scriptStatus[i] == 0)
+                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                }
+                break;
+        }
+    }
+    return mode;
+}
 
 #ifdef NONMATCHING
 // fuzzy: 82.1%
@@ -467,7 +538,7 @@ void sub_0813DB98(void *);
 
 void Player_AdvanceEffectTick(struct Player *);
 
-s32 sub_0813D924(void *, s32);
+s32 sub_0813D924(struct Player *, s32);
 
 s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
@@ -564,7 +635,7 @@ s32 Player_GetStateModifierBonus(struct Player *p)
         if (p->scriptStatus[i])
             return 10;
     }
-    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628))
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628))
         return 10;
     if (p->movementModifierActive)
         return 10;
@@ -1285,7 +1356,7 @@ s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
 
 s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
 {
-    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628) <= 0 &&
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) <= 0 &&
         gUnk_02000710->unk876 >= v)
         return 1;
     return 0;
