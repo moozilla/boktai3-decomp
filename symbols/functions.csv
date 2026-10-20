@@ -7120,6 +7120,7 @@ addr,name,mode,confidence,source,notes
 081C46D0,Registry6A37_OnDestroy,thumb,low,src-alias,Empty destruction callback registered by the object's constructor
 081C46D4,SceneTransition_StartSunScript,thumb,low,src-alias,
 081C47EC,Registry6A37_Create,thumb,low,src-alias,Creates and initializes the task registered under actor key 0x6A37
+081C482C,ScenePanelSubject_SlideOpen,thumb,low,src-alias,
 081C49C0,ShipWheel_Update,thumb,low,src-alias,Processes incoming commands and invokes the current state handler for the tentative ship wheel object
 081C49DC,ShipWheel_OnDestroy,thumb,low,src-alias,Removes the object's sprite and clears its singleton pointer
 081C4BA8,ShipWheel_RequestStop,thumb,low,src-alias,Sets flag bit 0 on the active ship wheel object as a provisional stop request
@@ -7404,11 +7405,13 @@ addr,name,mode,confidence,source,notes
 081CEDD4,SceneNpc_ApplyDeceleratingBlink,thumb,low,src-alias,Sets visibility flag 0x100 on alternating shrinking intervals and reports completion
 081CEE18,SceneNpc_UpdateAnimationEight,thumb,low,src-alias,Starts animation entry 8 on state entry then invokes the NPC animation callback
 081CEF3C,SceneNpc_UpdateStopped,thumb,low,src-alias,
+081CF264,SceneNpc_UpdateTransitionFade,thumb,low,src-alias,
 081CF490,SceneNpc_UpdateBlinkPhase,thumb,low,src-alias,
 081CF4F0,SceneNpc_UpdateBlinkOut,thumb,low,src-alias,Applies the sixteen-interval blink sequence then hides the NPC and marks completion
 081CF578,SceneNpc_UpdateDashSlide,thumb,low,src-alias,
 081CF62C,SceneNpc_UpdateDescendingDash,thumb,low,src-alias,
 081CF84C,SceneNpc_PlayAnimation12,thumb,low,src-alias,
+081CF9E8,SceneNpc_UpdateRisingToTerrain,thumb,low,src-alias,
 081CFC44,SceneNpc_UpdateProjectedVisible,thumb,low,src-alias,
 081CFCA4,SceneNpc_UpdateProjectedIdle,thumb,low,src-alias,
 081CFDA4,SceneNpc_UpdateProjectedMove,thumb,low,src-alias,
@@ -7487,6 +7490,7 @@ addr,name,mode,confidence,source,notes
 081D4354,BestiaryDisplay_UpdatePalettePulse,thumb,low,src-alias,Blends two palette colors with a triangular 64-frame cycle; bestiary ownership is tentative
 081D437C,PaletteTransition_SetVariantParameters,thumb,low,src-alias,
 081D43C8,PaletteTransition_SetAlternateVariantParameters,thumb,low,src-alias,
+081D44C0,PaletteTransition_UpdateOutIn,thumb,low,src-alias,
 081D4608,PaletteTransition_UpdateFade,thumb,low,src-alias,
 081D46B4,PaletteTransition_InitDisplays,thumb,low,src-alias,
 081D474C,BestiaryDisplay_CreateEntryAnimations,thumb,low,src-alias,
@@ -7559,9 +7563,11 @@ addr,name,mode,confidence,source,notes
 081D929C,Projectile_UpdateSecondaryExpiry,thumb,low,src-alias,Secondary expiry callback that sets flag 2 and requests removal at the configured lifetime
 081D92B8,Projectile_InitArcFlight,thumb,low,src-alias,Installs a callback that updates vertical motion and saves the starting height; arc interpretation tentative
 081D92F0,TimedEffect_UpdateDeceleration,thumb,low,src-alias,
+081D934C,Boss_FinalExplosions,thumb,low,src-alias,
 081D9470,Task4E01_StartImpactAnimation,thumb,low,src-alias,
 081D95F0,Task4E01_UpdateExpandingImpact,thumb,low,src-alias,
 081D9904,Task4E01_SpawnImpactChildren,thumb,low,src-alias,
+081D9B6C,Projectile_UpdateAnimation,thumb,low,src-alias,
 081D9CB8,Projectile_UpdateAnimationTail,thumb,low,src-alias,Animation-tail callback that marks the sprite active until the signed counter reaches zero
 081D9CDC,Projectile_InitResetDelay,thumb,low,src-alias,Installs the delayed reset callback and conditionally restores frame 25 with both flips cleared
 081D9D14,Projectile_UpdateResetDelay,thumb,low,src-alias,Delay callback that sets flag 2 and restarts projectile state after the lifetime threshold

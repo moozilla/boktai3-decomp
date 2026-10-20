@@ -32,7 +32,6 @@ s32 SceneNpc_IsTransitionEffectFinished(void *);
 void SceneNpc_DestroyTransitionEffect(void *);
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 // confidence=low: animation 7 with a delayed transition effect and palette fade.
-#define SceneNpc_UpdateTransitionFade sub_081CF264
 void SceneNpc_UpdateTransitionFade(void *ctx, struct SceneNpc *npc, s32 tick)
 {
     void **effect = &npc->effect;

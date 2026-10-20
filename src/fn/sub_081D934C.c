@@ -29,7 +29,6 @@ u8 *Explosion_CreateWithCollisionFlags(void *pos, u32 flag, s32 duration, s32 ar
 u8 *Explosion_Create(void *pos, u32 flag, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
 void SceneStimulus_AddTagged(s16, s16, s16, s16, u8, u16);
 
-#define Boss_FinalExplosions sub_081D934C
 s32 Boss_FinalExplosions(struct Boss *self)
 {
     u8 *c = (u8 *)self + 0x8c;

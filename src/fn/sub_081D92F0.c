@@ -15,7 +15,7 @@ struct TimedEffect {
     s16 limit;
 };
 void Projectile_SetUpdateCallback(void *, void *);
-void sub_081D934C(void);
+void Boss_FinalExplosions(void);
 s32 TimedEffect_UpdateDeceleration(struct TimedEffect *effect)
 {
     struct TimedEffectConfig *config = &effect->config;
@@ -23,6 +23,6 @@ s32 TimedEffect_UpdateDeceleration(struct TimedEffect *effect)
     effect->acceleration--;
     if (effect->tick >= config->duration || effect->position < 0 ||
         effect->position < effect->limit)
-        Projectile_SetUpdateCallback(config, sub_081D934C);
+        Projectile_SetUpdateCallback(config, Boss_FinalExplosions);
     return 0;
 }

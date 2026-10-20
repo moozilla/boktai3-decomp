@@ -16,7 +16,6 @@ s32 DisplayAnimation_TestFinished(void *);
 void SceneDisplay_SwitchToAlternateDescriptor(struct PaletteTransition *);
 void PaletteTransition_BlendSelectedBanks(struct PaletteTransition *, int, int);
 
-#define PaletteTransition_UpdateOutIn sub_081D44C0
 void PaletteTransition_UpdateOutIn(struct PaletteTransition *p)
 {
     s32 phase = p->frame & 0x3f;

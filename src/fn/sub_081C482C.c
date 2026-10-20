@@ -139,7 +139,6 @@ struct SlidePanel {
     struct DisplaySequenceState sequence;
     void *resource;
 };
-#define ScenePanelSubject_SlideOpen sub_081C482C
 void ScenePanelSubject_SlideOpen(struct SlidePanel *owner)
 {
     owner->sprite.position.x -= 0xD2;

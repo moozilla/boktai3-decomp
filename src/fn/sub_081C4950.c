@@ -7,7 +7,7 @@ struct SceneObj4950 {
     struct SceneEventReceiver receiver;
 };
 
-void sub_081C482C(void *);
+void ScenePanelSubject_SlideOpen(void *);
 
 void sub_081C4950(struct SceneObj4950 *obj)
 {
@@ -19,7 +19,7 @@ void sub_081C4950(struct SceneObj4950 *obj)
             struct SceneEventCommand *command = receiver->pending[globals->phase][i];
             SceneMessages_SetPendingTrigger(receiver, command);
             if (command->kind == 7)
-                sub_081C482C(obj);
+                ScenePanelSubject_SlideOpen(obj);
             i++;
         } while (i < receiver->count[gSceneEventDispatchState->phase]);
     }
