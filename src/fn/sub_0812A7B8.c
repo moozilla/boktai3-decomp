@@ -1,10 +1,24 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-struct Vec { s16 x, y, z, pad; };
-struct Sprite { u32 flags; u8 visible, unknown5, palette, unknown7; s8 scaleX, scaleY; u8 padA[6]; u16 frame; u8 pad12[10]; struct Vec position; u8 pad24[0x24]; };
-struct Anim { const volatile u16 *commands; u8 flags, frameCount, frameWeight, duration; u16 index, unknownA, speed, elapsed; };
-static inline u32 Step(struct Sprite *sprite,
-                                             struct Anim *state)
+struct Vec {
+    s16 x, y, z, pad;
+};
+struct Sprite {
+    u32 flags;
+    u8 visible, unknown5, palette, unknown7;
+    s8 scaleX, scaleY;
+    u8 padA[6];
+    u16 frame;
+    u8 pad12[10];
+    struct Vec position;
+    u8 pad24[0x24];
+};
+struct Anim {
+    const volatile u16 *commands;
+    u8 flags, frameCount, frameWeight, duration;
+    u16 index, unknownA, speed, elapsed;
+};
+static inline u32 Step(struct Sprite *sprite, struct Anim *state)
 {
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
@@ -122,8 +136,25 @@ static inline u32 Step(struct Sprite *sprite,
     return ended;
 }
 
-struct Effect { struct Sprite sprite; struct Anim anim; u8 pad58[0xA8]; struct Vec *target; u8 pad104[0x68]; struct Vec velocity; u16 unknown174; u8 state; s8 slot; u16 frame; u8 entered, speed, ended, heading; u16 unknown17E, lifetime, riseTimer, delay, turnTimer, maxSpeed; };
-struct Pool { u8 pad[0x18]; void *resource; u32 allocated; };
+struct Effect {
+    struct Sprite sprite;
+    struct Anim anim;
+    u8 pad58[0xA8];
+    struct Vec *target;
+    u8 pad104[0x68];
+    struct Vec velocity;
+    u16 unknown174;
+    u8 state;
+    s8 slot;
+    u16 frame;
+    u8 entered, speed, ended, heading;
+    u16 unknown17E, lifetime, riseTimer, delay, turnTimer, maxSpeed;
+};
+struct Pool {
+    u8 pad[0x18];
+    void *resource;
+    u32 allocated;
+};
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
@@ -132,8 +163,16 @@ s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void LinkedEffect_UpdateColliders(struct Effect *);
-static inline u32 RandomValue(void) { u32 index = (gUnk_03005308 + 1) & 1023; gUnk_03005308 = index; return gUnk_0203B400[index]; }
-static inline s32 Truncate(s32 v) { return v >= 0 ? v >> 12 : -((-v) >> 12); }
+static inline u32 RandomValue(void)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return gUnk_0203B400[index];
+}
+static inline s32 Truncate(s32 v)
+{
+    return v >= 0 ? v >> 12 : -((-v) >> 12);
+}
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 // confidence=low: terminal animation releases the linked effect slot and collider.
@@ -151,7 +190,8 @@ void LinkedEffect_FinishRemoval(struct Pool *pool, struct Effect *p)
         slot = (s8 *)((u8 *)p + offset);
         pool->allocated &= ~(1 << *slot);
         p->state = 0;
-        if (p->sprite.visible) Sprite_Remove(p);
+        if (p->sprite.visible)
+            Sprite_Remove(p);
         Collider_Remove((u8 *)p + 0xac);
         *(u8 *)slot = 255;
         p->unknown174 = 0;
