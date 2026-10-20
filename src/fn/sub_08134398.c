@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #ifdef NONMATCHING
-// fuzzy: 90.0%
+// fuzzy: 91.5%
 // Sibling of the matched SceneActorReaction_DefeatRecordStats (same defeat-stats template, see notes/defeat-stats-template.md).
 // Structure is exact; left: the ROM keeps counter offsets in r5/r7 (ours r1) and two prologue
 // stores (2C8, 2AC) differ by a register copy. Pinning r5 globally moves actor into r7 (unsafe).
@@ -98,7 +98,9 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->word104 = 0;
 }
-u32 sub_08134398(struct SceneActorRegistryResetView *actor)
+#define SceneActorReaction_RecordDefeatTransition sub_08134398
+// confidence=low: distinct from the sibling that also releases contact nodes.
+u32 SceneActorReaction_RecordDefeatTransition(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags2C0;
     u8 *category;
