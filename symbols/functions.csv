@@ -8811,6 +8811,7 @@ addr,name,mode,confidence,source,notes
 082260A4,Camera_RequestShake,thumb,low,src-alias,Raises the pending shake strength when effects are enabled without reducing a stronger request
 08226178,Camera_ClearTargetOffset,thumb,low,src-alias,Zeros the three components of the target-relative offset during camera reset
 0822619C,Camera_SetTargetOffset,thumb,low,src-alias,Copies the packed target-relative offset into the camera state
+082261B8,Camera_SetIsometricOffset,thumb,low,src-alias,
 08226228,Camera_Reset,thumb,low,src-alias,camera cmd 0
 08226268,Camera_SnapTo,thumb,low,src-alias,"camera cmd 1: moves the camera to (x, y, z) at once and recomputes the scroll origin (gUnk_03005418) from the isometric projection"
 0822630C,Camera_SnapToWithoutCompletion,thumb,low,src-alias,Clears completion handling before snapping to the supplied position
@@ -9217,6 +9218,7 @@ addr,name,mode,confidence,source,notes
 082323C0,TimedHazard_UnlinkInstance,thumb,low,src-alias,Removes an instance from the manager's doubly linked list
 082323DC,ColliderSprite_Destroy,thumb,low,src-alias,
 08232740,TimedHazard_UpdateActivationDelay,thumb,low,src-alias,Advances the delay timer and enters active state after its threshold is exceeded
+08232764,ColliderObject_Update,thumb,low,src-alias,
 082327E0,ColliderSpritePool_Update,thumb,low,src-alias,
 0823293C,ScriptSpriteManager_Destroy,thumb,low,src-alias,Task destructor that frees every linked sprite object and clears the singleton
 08232960,ScriptSpriteManager_Init,thumb,low,src-alias,Starts the sprite definition script and initializes the singleton and object list
@@ -9233,6 +9235,7 @@ addr,name,mode,confidence,source,notes
 08233098,TransientSpritePool_Init,thumb,low,src-alias,Loads animation data and initializes the sprite in each of sixteen pool slots
 082330D4,SpritePool_CreateSingleton,thumb,low,src-alias,
 08233120,TransientSpritePool_FindFreeSlot,thumb,low,src-alias,Returns the first inactive slot or null when all sixteen are occupied
+08233140,TransientSprite_Spawn,thumb,low,src-alias,
 082331E4,ExplosionEffect_Update,thumb,low,src-alias,Task callback that waits for a delay then animates the blast and briefly refreshes its damage collider
 08233248,ExplosionEffect_Destroy,thumb,low,src-alias,Task destructor that removes the explosion sprite
 08233258,ExplosionEffect_InitSprite,thumb,low,src-alias,Loads blast graphics and selects a palette variant before setting the sprite position

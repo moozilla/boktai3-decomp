@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: allocate a transient sprite from the pool, copy render state into it and link it into the draw list. */
-#define TransientSprite_Spawn sub_08233140
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // only differs: id halfword load uses r1 instead of r0
@@ -49,5 +48,5 @@ u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *
     return slot;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08233140);
+INCLUDE_ASM("asm/nonmatching", TransientSprite_Spawn);
 #endif
