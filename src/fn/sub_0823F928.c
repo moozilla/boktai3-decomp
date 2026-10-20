@@ -110,7 +110,8 @@ void Player_UpdateTetherChargeC(u8 *p)
                 break;
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x2E9);
             *(u16 *)(p + 0xC0A) = ((8 - *(u8 *)(p + 0x3A4)) & 7) << 5;
-            Collider_SetAttackProperties(p + 0xB8C, Player_GetConfiguredActionPower(p), 0x20, 0x10, 2, 0x1E);
+            Collider_SetAttackProperties(p + 0xB8C, Player_GetConfiguredActionPower(p), 0x20, 0x10,
+                                         2, 0x1E);
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x202);
             Player_SetTetherMode(p, 3, 8);
             break;
