@@ -1059,3 +1059,109 @@ No shared headers, symbols, generated files, history, HANDOFF or INDEX were
 edited. The four drafts have NONMATCHING guards and recorded scores; no draft
 is counted as a match. The integrator still performs name promotion and the
 single combined ROM build for the batch.
+
+# Codex high: task 081B08B8 (2026-10-20)
+
+Tags: #matching #vanargand #actor-status #register-pinning
+
+Branch: `cloud/081B08B8`. Worked solo, offline, with the worktree Python and
+per-file checks only. No make, full build, network action, generated-file edit,
+or direct Git mutation. Each function was queued separately through
+`build/commit.sh`; this note was queued last. Ghidra's export is absent.
+
+Exact task coverage is **7.73% (+7.73 percentage points; 424 of 5,484 reviewed
+body/pool bytes)**, all Register-pinned. This adds approximately **0.018
+percentage points** of repository code coverage. The five drafts add no exact
+coverage. Reviewed extents are the contiguous function bodies and literal pools:
+081B08B8=1,660; 081B0F34=600; 081B118C=424; 081B1334=1,428;
+081B18C8=712; 081B1B90=660 bytes.
+
+The caller `PairedSceneActor_UpdateHalves` (081B5D8C) invokes these through
+`gPairedSceneHalfStateCallbacks` (086120A0), indexed by the part's byte at
+0x16D. The surrounding named functions establish the ActorStatus/Vanargand
+family. MotionTrack_Initialize (081B9334), MotionTrack_Update (081B95E4),
+OrbitMotion_BeginDistanceWave (081B939C), and the player position-request APIs
+explain the motion paths. Names below remain provisional and carry file-local
+aliases with low-confidence comments. The drafts keep a local observed part
+view: position 0x1C, packed sequence 0x48, motion 0x58, anchor pointer 0x90,
+offset 0x9C, variant 0x15C, flags 0x160, substate 0x164, timer 0x168,
+action/previous-action/reset/enter/finished bytes 0x16C..0x170, and countdown
+0x19C. No shared header was changed.
+
+- **081B118C matched**, `ActorStatus_BeginPlayerRelease`, 424 bytes. Improved
+  the existing guarded candidate from 92.9% to byte equality. On reset clears
+  substate/timer and sets enter; state zero requests player positioning with
+  arguments 80/32/128, starts sequence nine from owner resource 0x4D0, steps
+  packed playback, and advances to state one. State one sets finished.
+  The final residue was entirely pointer and zero-value lifetimes. A flags
+  pointer in r1 removes an extra address copy; the reset pointer in r2 plus a
+  mask in r2 and one shared zero in r1 reproduces entry allocation. Explicit
+  destination-pointer constraints preserve the part base at final stores.
+  Using r1 for the elapsed-mask source fixes the animation's last allocation
+  difference. `depin.py --write` reduced 30 hints to 18; formatting followed
+  by `check.py --target-size 424` retained zero differing bytes.
+- **081B08B8 drafted 91.3%**, `ActorStatus_UpdatePlayerApproach`, reviewed
+  1,660 bytes; candidate 1,676. Entry starts sequence eleven. State zero moves
+  the offset by (-256, 0, -256); state one seeks the player relative to the
+  anchor using motion argument three. A nonnegative
+  Vanargand_GetComponentWithFlag10 result completes the approach; squared
+  X/Z distance <= 0x63FF instead selects contact sequence twelve and song
+  0x58A. Motion completion selects a thirty-frame wait with sequence twelve,
+  then sequence nine. Final realigned difference: 92 instructions, 35 ignoring
+  registers. Explicit shared completion/finished labels recovered the ROM's
+  cross-jumped tails. Remaining issues: entry-pointer ordering, vector operands,
+  initial state stores, and register allocation around the shared tails.
+- **081B1334 drafted 83.0%**, `ActorStatus_UpdateGuardedApproach`, reviewed
+  1,428 bytes; candidate 1,412. Related approach starts at (-1024, 0, -1024)
+  and uses motion argument four. In range, it requests action eighteen only
+  when flags 0x100 is clear and previous action is outside 25/26 or finished
+  is set. It writes both action bytes, rearms reset, clears finished and
+  countdown, and clears substate/timer. Otherwise completed motion selects
+  sequence twelve/song 0x58A for 120 frames before sequence nine. Entry also
+  plays 0x58A. Remaining realigned difference: 149 instructions, 55 ignoring
+  registers, chiefly the guarded transition and pointer/animation allocation.
+- **081B18C8 drafted 80.3%**, `ActorStatus_UpdateRisingStrike`, reviewed
+  712 bytes; candidate 696. Starts sequence eight with playback flags four,
+  moves the offset up 512, starts song 0x596 and an externally consumed
+  sixty-frame countdown, then returns toward negative anchor Y with a
+  (0, 64, 0) motion parameter and finishes. Remaining realigned difference:
+  80 instructions, 27 ignoring registers. Reversing the vector-add source
+  operands, materializing the switch state, and using r3 as the duration-mask
+  source improved the score. State-address reuse, entry-pointer lifetimes,
+  vector initialization and constant ordering remain different.
+- **081B1B90 drafted 84.5%**, `ActorStatus_UpdateFlankingStrike`, reviewed
+  660 bytes; candidate 652. Computes player-minus-anchor and offsets X/Z by
+  (+512, -512) for variant one, otherwise (-512, +512). Starts a distance-wave
+  motion at angle `(variant * 128 + 96) & 255`, then plays sequence eight
+  until playback wraps and marks finished. Remaining realigned difference:
+  60 instructions, 20 ignoring registers. A saved state in r7 and an explicit
+  next-state value improve allocation; entry-address lifetime, reuse of the
+  switch's one value in the animation mask, and transition constants remain.
+- **081B0F34 drafted 81.9%**, `ActorStatus_UpdatePlayerCapture`, reviewed
+  600 bytes; candidate 624. Starts sequence twelve, sets status bits 12/16,
+  moves the part offset toward (640, 528, 640), and requests the player at
+  the part position minus 128 Y. Variant zero uses request arguments one/one;
+  the other variant uses zero/two. Player flag 0x40000 or motion completion
+  advances to the finished state. Remaining realigned difference: 121
+  instructions, 66 ignoring registers. Volatile halfword destination writes
+  recover the original three coordinate stores; merging the two request call
+  paths and ordering player-flag masks/pointer lifetimes remain unresolved.
+
+Large functions were read with `condense.py` and matched relatives, including
+ScenePanelSubject's packed playback template. Scored structural hypotheses in
+batches with `variants.py`, using reviewed-extent `check.py`/anchordiff counts
+for decisions. `rtlprobe.py perline` confirmed the release entry test as the
+last source of surplus instructions. A statement-expression macro experiment
+showed that a redundant local owner pointer caused extra copies; retaining a
+normal inline that uses its owner parameter directly produced the same better
+code and kept the source readable. Initializing a u8 result to zero before the
+motion/proximity test reproduces the materialized boolean better than two
+immediate returns. Initializing stack coordinates through a halfword pointer
+avoids agbcc merging partial vector fields into word read/modify/write stores.
+
+Each draft is guarded by NONMATCHING, retains INCLUDE_ASM in its else branch,
+and has its reviewed-extent fuzzy score recorded with `--nonmatching --record`.
+All five default assembly alternatives passed reviewed-extent per-file checks.
+Depinning was attempted on the unguarded draft sources; the exact-only tool
+correctly skipped them. Source review and `git diff --check` passed. No complete
+ROM build was run; combined validation remains with the batch integrator.
