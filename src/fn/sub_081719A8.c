@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define PauseInventory_UpdateConsumableOptionSelection sub_081719A8
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void PauseInventory_RefreshConsumableDescription(void *);
