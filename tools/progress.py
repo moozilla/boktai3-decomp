@@ -20,6 +20,8 @@ EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
 LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
 SUBSYSTEMS = Path(ROOT) / "symbols/progress_subsystems.csv"
 AREAS = Path(ROOT) / "symbols/progress_areas.csv"
+ASM = Path(ROOT) / "symbols/progress_asm.csv"
+ASM_SUFFIX = " (assembly)"
 
 
 def load_libraries(funcs, sizes, path=LIBRARIES):
@@ -80,13 +82,32 @@ def load_areas(path=AREAS):
     return areas
 
 
+def load_asm_ranges(path=ASM):
+    """Reviewed half-open ranges of library code that was hand-written assembly
+    in the original SDK. Unmatched functions in them are reported as intentional
+    assembly rather than as missing decompilation work."""
+    ranges = []
+    with Path(path).open(newline="") as f:
+        for row in csv.DictReader(f):
+            if not row["evidence"]:
+                raise ValueError(f"{row['name']}: missing assembly evidence")
+            start, end = int(row["start"], 16), int(row["end"], 16)
+            if start >= end:
+                raise ValueError(f"{row['name']}: invalid assembly range")
+            ranges.append((start, end))
+    return ranges
+
+
 def unit_areas(areas, unit_name, address):
     base = unit_name.split("/", 1)[-1].replace(" (auto, tentative)", "").replace(" (tentative)", "")
     ids = []
     for aid, (_, rules) in areas.items():
         if any((rng and rng[0] <= address < rng[1]) or (rx and rx.search(base)) for rng, rx in rules):
             ids.append(aid)
-    if unit_name.startswith("libraries/"):
+    if unit_name.endswith(ASM_SUFFIX):
+        if "intentional_asm" not in ids:
+            ids.append("intentional_asm")
+    elif unit_name.startswith("libraries/"):
         ids.append("libraries")
     return ids
 
@@ -218,7 +239,7 @@ def collect_fuzzy(funcs, source_root):
     return fuzzy
 
 
-def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None):
+def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None, asm_ranges=()):
     fuzzy = fuzzy or {}
     areas = areas or {}
     score = lambda n: 100 if n in done else fuzzy.get(n, 0)
@@ -232,6 +253,8 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         library = next((lib for lib in libraries if lib["start"] <= a < lib["end"]), None)
         unit_name = f"{library.get('prefix', 'libraries')}/{library['name']}" if library else f"functions/{a:08X}"
         category = "register_pinned" if n in pinned else "no_register_pinning"
+        if library and n not in done and any(lo <= a < hi for lo, hi in asm_ranges):
+            unit_name += ASM_SUFFIX
         if library and n in pinned:
             unit_name += "/register-pinned"
         if unit_name not in grouped:
@@ -320,7 +343,7 @@ def main():
     if args.json:
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas()), indent=2) + "\n")
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(), load_asm_ranges()), indent=2) + "\n")
 
 
 def bar(frac, width=30):
