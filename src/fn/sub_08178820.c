@@ -7,7 +7,7 @@ void SceneHud_DrawSlotMeter(struct SceneHudState *, s32, u32, u32);
 void sub_08165020(struct SceneHudState *);
 void sub_08164DC0(struct SceneHudState *);
 void SceneHud_RefreshActionKeyframes(struct SceneHudState *);
-void sub_081786A0(struct SceneHudState *);
+void SceneHud_DrawSlotMarkers(struct SceneHudState *);
 void sub_08165254(struct SceneHudState *);
 void SceneHud_RefreshGameplayDisplay(struct SceneHudState *hud)
 {
@@ -24,6 +24,6 @@ void SceneHud_RefreshGameplayDisplay(struct SceneHudState *hud)
     sub_08165020(hud);
     sub_08164DC0(hud);
     SceneHud_RefreshActionKeyframes(hud);
-    sub_081786A0(hud);
+    SceneHud_DrawSlotMarkers(hud);
     sub_08165254(hud);
 }

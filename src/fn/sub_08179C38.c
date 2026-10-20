@@ -2,7 +2,7 @@
 #include "contact_actor.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 95.9%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 void sub_0821FF8C(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
@@ -24,12 +24,11 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
 {
     u8 *d = (u8 *)c;
     u32 v;
+    int mask;
     sub_0821FF8C(a);
     ((struct ActorImpact *)c)->value46a = b->cost;
-    if (({
-            u32 mask = 0x100;
-            mask & a->flags;
-        }))
+    mask = 0x100;
+    if (a->flags & mask)
         ((struct ActorImpact *)c)->direction = a->direction;
     else
         ((struct ActorImpact *)c)->direction = Math_Atan2(b->x - a->x, b->z - a->z);
@@ -38,7 +37,7 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
     *(u32 *)(d + 0xbc) = v;
     v = a->reactionFlags;
     *(u32 *)(d + 0xc0) = v;
-    PlayerStats_AddContactHundredths(a, b, d[0xe2]);
+    PlayerStats_AddContactHundredths(a, b, c->kind);
     {
         u32 one = 1;
         if (a->reactionFlags & one)
