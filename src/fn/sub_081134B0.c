@@ -15,13 +15,14 @@ struct ObjB {
     s32 x, y, z;
 };
 
-#define ActorEffect_Spawn    sub_081134B0
-#define ObjEffect_SpawnAtPos SpriteEffect_CreateAtPosition
+#define ActorEffect_SpawnAtActorPos sub_081134B0
+#define ObjEffect_SpawnAtPos        SpriteEffect_CreateAtPosition
 
 u32 sub_08113398(struct EffPos *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 
-u32 ActorEffect_Spawn(struct ActorA *a, struct EffPos *off, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6,
-                      u32 p7, u32 p8, u32 p9, u32 p10, u32 p11, u32 p12, u32 p13, u32 p14)
+u32 ActorEffect_SpawnAtActorPos(struct ActorA *a, struct EffPos *off, u32 p2, u32 p3, u32 p4,
+                                u32 p5, u32 p6, u32 p7, u32 p8, u32 p9, u32 p10, u32 p11, u32 p12,
+                                u32 p13, u32 p14)
 {
     struct EffPos posBuf;
     struct EffPos *pos = &posBuf;
