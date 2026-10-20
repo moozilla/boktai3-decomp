@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 /* Tentative: per-frame update of a collider-carrying object (restart animation once, move colliders, advance timer). */
-#define ColliderObject_Update sub_08232764
 struct ColliderObjectCtx {
     u8 pad[0x18];
     void *animation;

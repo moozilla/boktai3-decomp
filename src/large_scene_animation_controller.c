@@ -2601,7 +2601,7 @@ void sub_0818ECFC(void *);
 
 void sub_08225F88(void *);
 
-void sub_082261B8(s32, s32);
+void Camera_SetIsometricOffset(s32, s32);
 
 s32 Nidhoggr_Update(struct Nidhoggr *t)
 {
@@ -2623,7 +2623,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
     if (t->targetMode)
         sub_08225F88(&t->cameraPos);
     else
-        sub_082261B8(t->cameraPos.x, t->cameraPos.y);
+        Camera_SetIsometricOffset(t->cameraPos.x, t->cameraPos.y);
     t->timer++;
     return 0;
 }

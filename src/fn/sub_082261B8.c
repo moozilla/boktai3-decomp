@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: converts a 2D grid-style (x, y) pair to an isometric camera offset and applies it. */
-#define Camera_SetIsometricOffset sub_082261B8
 #ifdef NONMATCHING
 // fuzzy: 90.6%
 // differs: load order / register choice of the two halfwords of the packed pair
@@ -34,5 +33,5 @@ void Camera_SetIsometricOffset(u32 x, u32 y)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082261B8);
+INCLUDE_ASM("asm/nonmatching", Camera_SetIsometricOffset);
 #endif
