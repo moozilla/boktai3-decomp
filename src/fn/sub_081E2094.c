@@ -19,7 +19,6 @@ struct Viewer {
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 u32 Sound_IsSongPlaying(s32);
 s32 Anim_Step(void *, void *);
-#define SoundTest_UpdatePlaybackIndicators sub_081E2094
 // Advance each category's indicator animation while its song plays.
 void SoundTest_UpdatePlaybackIndicators(struct Viewer *p)
 {

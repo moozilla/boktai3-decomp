@@ -4443,6 +4443,7 @@ addr,name,mode,confidence,source,notes
 0812B0E8,FragmentProjectilePool_AllocSprite,thumb,low,src-alias,Wraps the projectile slot allocator and returns its leading sprite field
 0812B0F8,ActorEffect_Spawn,thumb,low,src-alias,
 0812B1F4,ActorEffect_UpdatePool,thumb,low,src-alias,
+0812B27C,FragmentProjectilePool_Cleanup,thumb,low,src-alias,
 0812B2CC,FragmentProjectilePool_Init,thumb,low,src-alias,Starts the pool animation script and clears the allocation mask before registering the singleton
 0812B2F8,FragmentProjectilePool_GetOrCreate,thumb,low,src-alias,Returns the existing projectile pool or creates and initializes its task with lifecycle callbacks
 0812B344,FragmentProjectilePool_ResetSingleton,thumb,low,src-alias,Clears the projectile pool singleton during scene subsystem reset
@@ -8625,6 +8626,7 @@ addr,name,mode,confidence,source,notes
 0822DFDC,Inventory_CanAssignEquipment,thumb,low,src-alias,Requires a nonempty entry with a nonzero definition field and no existing primary assignment
 0822E010,Inventory_ResetEquipmentAssignments,thumb,low,src-alias,Clears all eight primary equipment assignments and sets the selected slot to 8
 0822E040,Inventory_GetConsumableObtainedFlag,thumb,low,src-alias,Returns the consumable ID bit from acquisition flags used by the catalog count
+0822E078,Inventory_SetFlag,thumb,low,src-alias,
 0822E0B8,Inventory_GetConsumableCategory,thumb,low,src-alias,Tentatively returns category byte 0xC from the assigned consumable definition
 0822E0DC,Inventory_SetConsumableEntry,thumb,low,src-alias,Marks the consumable ID obtained and stores it in the indexed inventory slot
 0822E104,Inventory_GetConsumableId,thumb,low,src-alias,Returns the signed consumable ID stored in the indexed inventory slot
@@ -8978,6 +8980,7 @@ addr,name,mode,confidence,source,notes
 08242F7C,Player_FindMaskedSlot,thumb,low,src-alias,
 08243090,Player_ApplyContact,thumb,low,src-alias,
 082433C8,Player_ApplyGatedContact,thumb,low,src-alias,
+08243428,Player_ApplyTerrainDamage,thumb,low,src-alias,
 082436D4,Script_GetOptionalIValue,thumb,low,src-alias,Reads keyword 0x69 corresponding to i and returns zero when absent
 082439EC,Player_OnDestroy,thumb,low,src-alias,Destruction callback removes contacts and rendering and collision components before clearing the player slot and count
 08243B54,StatGauge_Draw,thumb,low,src-alias,
