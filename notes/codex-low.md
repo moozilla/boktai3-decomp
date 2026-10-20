@@ -661,3 +661,16 @@ Tags: #matching #player #action #register-pinning
 - 08156FE0: stopped unmatched after revisiting entry, relatives and condensed listing. Best relative explains 11%; two sequence-selection tables, signed status-byte fallback, input/action-mode gates and interaction transitions still need a dedicated reconstruction. No complete candidate retained. Condensed listing is in build/codex-low-08156FE0.txt.
 
 Two exact matches and one new guarded draft committed separately through build/commit.sh. Notes committed last. Ghidra export remains absent. Only check.py per-file compilation used; no make, full build, network operation, shared-doc edit or generated assembly committed. Combined ROM validation remains with integration.
+
+## Task 0821BF5C (2026-10-20, follow-up)
+
+Tags: #matching #terrain #scene-indicator
+
+- 0821C8F8: stopped unmatched after revisiting entry assembly, fresh condensed listing and relatives. Largest relative still explains only 3%; prior analysis of direction-specific paired probes and ten stack temporaries remains applicable. No complete viable candidate; Ghidra export is absent.
+- 0821C254: stopped unmatched after revisiting entry/caller and prior full-assembly analysis. Eight adjacent-cell cases need explicit diagonal orthogonal probes and shared clamping tails; no new close candidate.
+- 0821D178: stopped at retained scratch candidate's 62.1%, 193 realigned differences / 86 ignoring registers. Segment/cell clipping and packed-position layout still need reconstruction. No production draft.
+- 0821D6F4: new guarded Terrain_HasHigherCorner draft, recorded reviewed score 97.7%, 8 realigned differences / 6 ignoring registers over the 800-byte target. Builds center/height values, selects positive-X/Z corner probes by subcell threshold, and returns whether any probed cell has greater base height. Initial candidate 92.3%; grouping cell offset arithmetic before adding the base and reversing the final comparison improved it. Remaining differences are Z halfword-load plus mask versus byte-load selection and pool alignment. LowZ accessor, mask argument and u16-return wrapper did not improve output. No pins. Default assembly fallback checked byte-identical. Driver commit title used the earlier candidate-length 97.2%; source records the authoritative reviewed 97.7%.
+- 0821BF5C: stopped at retained scratch candidate's 70.8%, 167 realigned differences / 125 ignoring registers. Rechecked prior slope-transition reconstruction; no new structural hypothesis. No production draft.
+- 0821DA14: matched Terrain_GetHigherNeighborMask, 936 bytes. SceneIndicator_CreateFromScript consumes its result with mask 14. Samples five offsets around the center of the current cell: (-X,+Z), (0,+Z), (+X,+Z), (+X,0), (+X,-Z), returning bits 1/2/4/8/16 for higher base heights. Unsigned 16-bit packed fields reproduce halfword loads and packed initial stores; later writes naturally simplify to strh. Using addition rather than OR for the Z-center offset reproduced the final separate constant load and yielded byte equality. No register hints. Formatted and checked the production file exactly before its separate driver commit.
+
+One new exact match and one new guarded draft; only fast check.py checks, no full build or network operations. Notes committed last through build/commit.sh. Combined validation remains with integration.
