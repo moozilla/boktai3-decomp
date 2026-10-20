@@ -58,6 +58,9 @@ Per task:
    150+ instructions, with addresses and sizes, and checks out branch `cloud/TASK`.
    It takes the biggest open task. `list --unassigned --smallest` orders tasks by their
    largest function, and `claim --unassigned --task ID` takes a specific one.
+   `--from-end` orders by address from the end of the ROM backwards (Claude workers use it
+   to stay clear of Codex workers going forwards); `--max-insns N` keeps only functions
+   below N instructions (pair with a lower `--min-insns` for small-function tasks).
    The claim commit lists the task's functions; `claim` skips any task that shares a
    function with an unmerged claim (task ids shift as main changes, functions don't).
 2. For each function, biggest payoff first: `tools/asmat.py ADDR 80`, then write C.
