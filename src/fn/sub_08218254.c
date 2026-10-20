@@ -1,0 +1,178 @@
+#include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#ifdef NONMATCHING
+// fuzzy: 86.7%
+// Remaining differences: projection temporaries, affine allocation, and register lifetimes.
+struct Vec {
+    s16 x, y, z;
+};
+struct Drawable {
+    u32 flags;
+    u8 f4, scaleX, scaleY, angle;
+    s16 tile;
+    u8 width, height;
+    s8 offsetX, offsetY;
+    u8 palette, priority;
+    s8 depthOffset;
+    u8 pad11[3];
+    u32 attributes;
+    struct Vec pos;
+    u8 pad1e[4];
+    struct Drawable *next;
+};
+struct Matrix {
+    u8 angle;
+    s8 scaleX, scaleY;
+    u8 pad;
+};
+struct OamEntry {
+    u32 attributes;
+    u16 tile, depth;
+};
+extern u32 gUnk_03003A50, gUnk_03004290, gUnk_03003A04;
+extern struct Drawable *gUnk_030042D0[];
+extern s32 gUnk_03004BA0, gUnk_03004798, gUnk_0300479C, gUnk_0300522C;
+extern struct Matrix gUnk_03004310[];
+extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
+extern u8 gUnk_03005230;
+extern u16 gUnk_03004790[], gUnk_03005418[];
+extern struct Vec gUnk_030042A0;
+static inline s32 project(s32 input)
+{
+    s32 v = input * 3;
+    return v >= 0 ? v >> 5 : -((-v) >> 5);
+}
+static inline s32 divide8(s32 input)
+{
+    return input >= 0 ? input >> 3 : -((-input) >> 3);
+}
+static inline s32 divide2(s32 input)
+{
+    return input >= 0 ? input >> 1 : -((-input) >> 1);
+}
+static inline void screen(struct Vec *dst, struct Vec *src)
+{
+    register struct Vec *out asm("r5") = dst;
+    register struct Vec *in asm("r6") = src;
+    s32 depth, height, y, z;
+    s32 sx = in->x, sz = in->z;
+    out->x = project(sx - sz);
+    depth = project(sx + sz);
+    height = project(in->y);
+    y = depth - height;
+    z = depth + height;
+    out->x = out->x - gUnk_03005418[0] + 120;
+    out->y = y - gUnk_03005418[1] + 80;
+    out->z = z - gUnk_03005418[2];
+}
+#define SpriteOam_QueueCameraRelativeSprites sub_08218254
+void SpriteOam_QueueCameraRelativeSprites(void)
+{
+
+    register struct Drawable *p asm("r4");
+    s32 *matrixCount;
+    u32 parity = gUnk_03003A50 & 1;
+    u32 skip = 0x401;
+    if (parity)
+        skip = 0x201;
+    p = gUnk_030042D0[gUnk_03004290];
+    if (!p)
+        return;
+    matrixCount = &gUnk_03004BA0;
+    do {
+        register s32 x asm("r3"), y asm("r2");
+        register s32 z asm("r9");
+        register u32 flags asm("r6");
+        register u32 attr asm("r5");
+        s32 depth;
+        register s32 ox asm("r12"), oy asm("r8");
+        if (p->flags & skip)
+            goto next;
+
+        x = divide8(p->pos.x - gUnk_030042A0.x) + 120;
+        y = divide8(p->pos.y - gUnk_030042A0.y) + 80;
+        z = p->pos.z - gUnk_030042A0.z;
+        flags = p->flags;
+        ox = p->offsetX;
+        oy = p->offsetY;
+        if (!(flags & 64)) {
+            u32 width = p->width, height = p->height;
+            s32 left = x + ox, top = y + oy;
+            if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
+                goto next;
+        }
+        x += ox;
+        y += oy;
+        depth = z;
+        x &= 511;
+        attr = p->attributes | (x << 16);
+        y &= 255;
+        attr |= y;
+        if (flags & 2) {
+            u32 matrix;
+            u32 angle;
+            s32 sx, sy;
+            if (!(flags & 0x20000) && ((s32)p->scaleX > 60 || (s32)p->scaleY > 60 || p->angle != 0))
+                attr |= 0x300;
+            else
+                attr |= 0x100;
+            angle = p->angle;
+            sx = (s8)p->scaleX;
+            sy = (s8)p->scaleY;
+            if (*matrixCount > 31)
+                matrix = 0;
+            else {
+                s32 *count = matrixCount;
+                gUnk_03004310[*count].angle = angle;
+                gUnk_03004310[*count].scaleX = sx;
+                gUnk_03004310[*count].scaleY = sy;
+                matrix = (*count)++;
+            }
+            attr |= matrix << 25;
+            flags = p->flags;
+        }
+        if (flags & 4)
+            attr |= 0x10000000;
+        if (flags & 8)
+            attr |= 0x20000000;
+        if (gUnk_0300522C && (flags & 0x4000))
+            attr |= 0x400;
+        if (((gUnk_03005230 & 1) && p->priority && !(flags & 0x10000)) || (flags & 0x800))
+            attr |= 0x1000;
+        depth += p->depthOffset;
+        if (flags & 0x20) {
+            s32 tile = p->tile | (p->priority << 10) | (p->palette << 12);
+            s32 n = gUnk_03004798;
+            if (n > 127)
+                goto next;
+            gUnk_03004390[n].attributes = attr;
+            gUnk_03004390[n].tile = tile;
+            gUnk_03004798 = n + 1;
+            gUnk_03003A04 |= 1;
+        } else {
+            s32 tile, n;
+            u32 priority;
+            depth = divide2(depth);
+            if (depth < -128)
+                depth = -128;
+            else if (depth > 127)
+                depth = 127;
+            priority = p->priority;
+            tile = p->tile | (priority << 10) | (p->palette << 12);
+            n = gUnk_0300479C;
+            if (n > 127)
+                goto next;
+            gUnk_030047A0[n].attributes = attr;
+            gUnk_030047A0[n].tile = tile;
+            gUnk_030047A0[n].depth = ((depth + 128) & 255) << 8;
+            gUnk_0300479C = n + 1;
+            gUnk_03004790[priority]++;
+        }
+    next:
+        p = p->next;
+    } while (p);
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08218254);
+#endif
