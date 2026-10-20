@@ -1,9 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+#define Sword_UpdateDamage sub_080F645C
+
 #ifdef NONMATCHING
-// fuzzy: 96.5%
-// Remaining differences: load scheduling, counter register allocation, final mask operand.
+// fuzzy: 97.6%
+// Remaining differences: allocation of the saturated defeat counter at offset 0x538.
 extern u8 *gUnk_02000710;
 void Sword_UpdateBodyPaletteRestore(void *);
 void ChildGroup_ShowDamageNumber(void *, u32, u32);
@@ -32,6 +34,10 @@ static inline void setState(struct SwordState *p, u8 one, u8 id)
     p->state = id;
     p->flags |= one;
 }
+static inline s32 SubtractDamage(u16 *health, u16 *damage)
+{
+    return *health - *damage;
+}
 void Sword_UpdateDamage(u8 *p)
 {
     u32 flags;
@@ -41,7 +47,7 @@ void Sword_UpdateDamage(u8 *p)
     Sword_UpdateBodyPaletteRestore(p);
     if (U(p, 0xd7a)) {
         {
-            s32 health = U(p, 0x7e) - U(p, 0xd78);
+            s32 health = SubtractDamage(&U(p, 0x7e), &U(p, 0xd78));
             zero = 0;
             asm("" : "+r"(zero));
             H(p, 0x7e) = health;
@@ -88,5 +94,5 @@ void Sword_UpdateDamage(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
+INCLUDE_ASM("asm/nonmatching", sub_080F645C);
 #endif
