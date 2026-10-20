@@ -571,3 +571,114 @@ Useful techniques and unsuccessful experiments:
   Actor_UpdateShadowSpriteParts. Replacing the obsolete local spelling in
   the isolated search input fixed that tooling issue. Final acceptance still
   used check.py; permutation scores were never treated as exact evidence.
+
+## Task 080B1A98 — Vorn route/reaction cohort (2026-10-20)
+
+Tags: #matching #vorn #scene-actor #terrain #route
+
+Worked offline on the pre-claimed `cloud/080B1A98` branch. Exact task
+completion is 0%; exact gain is +0.00 percentage points. Four guarded drafts
+qualified; two candidates stopped below the 80% threshold. No full build,
+network operation, direct git mutation, generated assembly commit, or shared
+header change was performed. The pre-existing tools/cloud_task.py edit was
+left alone. All commits were queued through build/commit.sh.
+
+Final production candidates were formatted with the venv's clang-format and
+checked with `build/venv/bin/python tools/check.py FILE --nonmatching --record`.
+The default branch of each file remains INCLUDE_ASM. No retained production
+candidate uses register pinning. Descriptive aliases are tentative, using the
+neighbouring Vorn prefix. Ghidra's gen/ghidra/decomp.c was unavailable.
+
+Per-function results (realigned counts are total / ignoring registers):
+
+- **080B2858 — drafted 85.1%, Vorn_SelectRetreatRoute.** 134 / 48 differences.
+  Context +0x6D0 is a 60-frame gate unless reset is requested; context +0x6C4
+  increments, while +0x6C8 and +0x6CC bound actor distanceF0. The near case
+  faces opposite fieldE9 and calls 080B2580. The other two cases independently
+  jitter fieldE9 by a random value masked with 63, initialize a missing target
+  from player zero +0x24, and attempt a target-cell route. Failure falls back
+  to 080B2580. Success installs idle control 0x10 and behavior 0x15, setting
+  actor flags2D0 bit 4. Context response flags are distinct from actor flags.
+  Explicit promoted u32 halfword-update temporaries improved the candidate
+  from 77.3% to 81.9%; separating the RNG load from its mask improved registers.
+  Residue: inline actor/group copies and spills, success-tail sharing, and
+  constant/address register allocation. Pinning the outer actor worsened it.
+- **080B3464 — drafted 84.3%, Vorn_ResumeRouteAfterReaction.** 129 / 74.
+  Rejects inactive/dead actors, flags2D4 mask 0xE33F, and actors without bit
+  0x80. While group +0x44 is nonzero, action 0x25 with context flag 4 only
+  ticks Vorn sound. Otherwise context flag 4 or 0x10 starts the same route
+  recovery setup, restores animation entry zero and delayed restoration
+  control 14, sets state/phase/behavior 3/1/0, and queues response kind 7
+  for 60 frames with entryTarget228 as payload. It starts the configured
+  group route and requests motion toward its point. The two paths clear
+  context flags by ~6 and ~0x70 respectively, then send a Vorn message.
+  Pointer-based SnapTarget removed aggregate scalarization (spurious word
+  read/modify/write stores) and improved 77.1% to 84.3%. Mask-taking helpers
+  were important for constant-before-load order. Residue: the actor copy
+  and saved flag pointer that the ROM keeps across both duplicated paths,
+  stack-slot lifetimes, and remaining route/control allocation.
+- **080B2580 — drafted 81.6%, Vorn_SelectReachableEscapeCell.** 88 / 53.
+  Tries cardinal sweeps at range 2, then range 1, rotating facing by 64 for
+  up to four attempts. Each sweep calls 0812E118 with original cell, tested
+  cell, original terrain height and original cell shape. Saves the last
+  traversable cell and restores the supplied facing after each range pass.
+  Builds the selected cell centre, tries the two route routines, clears
+  motion when appropriate, and invokes the failure callback if needed.
+  Explicit pre-check plus do/while loops reproduced the ROM's scan order;
+  factoring Sweep with direct returns reproduced its case-tail placement.
+  A signed shift helper retains the original rounding branches. Addressing
+  the failure callback through group +0x224 crossed the draft threshold.
+  Residue: retry-loop hoisting, terrain-pointer caching, switch exit order,
+  and route setup allocation. Pinning the range did not improve it.
+- **080B1A98 — drafted 87.3%, Vorn_BeginTargetPursuit.** 70 / 29.
+  Clears context +0x6D4 bit 8, then requests 080B3110 when response bit 1
+  is set or signed context +0x67C is nonnegative. Otherwise rejects actor
+  flag 0x100, optionally dispatches context response flags (0x1D), and
+  initializes delayed restoration plus target pursuit. Context response
+  flag 4 can extend the capped group +0x44 timer by 300. It snaps the route
+  destination to the configured point, sets destination pad to zero, then
+  requests a route toward actor.fieldDC +12. Signed full-width bitfield
+  access preserves the context-pointer reload after clearing the flag.
+  Group-relative state5D4 access, typed response-command fields and
+  mask-taking context predicates were useful. Residue: saved flags-pointer
+  lifetime, phase/control constant evolution, and target-argument ordering.
+  This selected candidate has slightly more structural differences than
+  the 84.3% alternative (29 versus 28) but fewer total differences (70 vs 80).
+- **080B1FA8 — stopped below threshold.** Retained locally at
+  wip/vorn/sub_080B1FA8.c, 79.5%, 87 / 11. Tentative alias:
+  Vorn_SelectEscapeRoutePoint. Computes a fixed-point direction toward the
+  current target, then prefers route points whose horizontal dot product
+  is negative, excluding the current point's first word. Notably, a negative
+  dot product at the current point does not advance the point pointer;
+  only the nonnegative branch advances it. If none qualifies, chooses a
+  random route index and avoids the previous index where possible.
+  Typed signed vector views kept the packed x/z values on the stack.
+  Separate initialRoute (actor +0x448) and later group-relative route
+  pointers reproduced lifetimes; deriving the destination inside TryRoute
+  restored route-before-target loads. Diagnostic pins on group/initialRoute
+  helped this uncommitted candidate. Remaining differences are mainly
+  scratch-register allocation inside the packed-delta/dot loop, plus a few
+  compare/load and route-mask sequences. Declaration swaps, dot-expression
+  variants, bool widths, actor/zero/mask pins and loop extraction did not
+  cross 80%; a reversed compare measured 79.7% but did not improve structure.
+- **080B23A0 — stopped below threshold.** Retained locally at
+  wip/vorn/sub_080B23A0.c, 42.1%, 174 / 45; experiments reached 45.7% fuzzy.
+  Tentative alias: Vorn_BeginRecoveryRoute. Context +0x6AC gates entry;
+  reset or response flags 4/2 permit it. Sets context +0x6AC and +0x6EC
+  to 60, sets response flag 4 and clears 2. On reset, starts the context's
+  route with its alternative selector. Calls 080B1FA8, selects behavior 15,
+  restores savedTarget control, installs 080ADCC0 in word104 with kind 0x25,
+  enables route/chase flags and copies the reload timer. C recovered these
+  stores, but zero/flag-mask lifetimes, reset in ip, halfword-load reuse and
+  allocation across the phase/control store sequence remain poor. Explicit
+  offset evolution reduced structural differences, while pins and adjacent
+  alternatives failed to produce a qualifying candidate. Nothing promoted.
+
+Useful shared lessons: distinguish context-relative and actor-relative views;
+express the +0x448 route as an aggregate to keep its point at +8; use group
++0x200 when the ROM reuses that offset as its route-flag mask; and take stack
+position addresses before populating fields to avoid aggregate scalarization.
+Positive-success layout and a u8 return in the inlined route helper preserve
+materialized 0/1 checks. Judge large functions by realigned structural/total
+counts: positionally differing byte counts are dominated by shifted branches
+and pools. More structural similarity did not always improve fuzzy scores.
