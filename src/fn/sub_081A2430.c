@@ -1,4 +1,7 @@
 #include "global.h"
+
+#define Hresvelgr_DispatchSceneMessages sub_081A2430
+#define Hresvelgr_UpdateRisingProjectile sub_081A12DC
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
