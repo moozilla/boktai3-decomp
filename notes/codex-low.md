@@ -2594,3 +2594,51 @@ checks see the default INCLUDE_ASM branch and falsely accept pin deletions.
 This pass caught that after queued draft commits, restored all required pins,
 reran --nonmatching --record (95.3% / 82.6%), and committed the corrections.
 The exact 08214B44 check and depin pass were on unguarded C and are unaffected.
+
+
+## Task 081314E8 follow-up — 2026-10-20
+
+Tags: #matching #scene-actor #reaction #position-effects #register-pinning
+
+Exact progress: 0.0 percentage-point gain. Restored required file-local aliases
+in the four existing guarded drafts, using current functions.csv names. Explicit
+address symbols in INCLUDE_ASM preserve the default fallback; local aliases for
+08131D5C and 08134398 also resolve the older ELF names during 08135F70 checks.
+
+- 081363F4: inspected largest first with asmat, relatives and condense, and read
+  BIG_FUNCTIONS plus previous attempts. No complete close candidate retained.
+  Linked-area-damage path resets group+0x4C timers and releases actor+0x45C;
+  pending-hit path calls destination jump and escalating-hit logic, then clears
+  timers and updates collider bit 0x100. The distinct cleanup paths and shared
+  hit decoder still require dedicated reconstruction; prior 64.7% attempt is
+  unsuitable for allocation-only tuning.
+- 08135F70: retained draft 88.2%, 73 realigned differences / 18 ignoring
+  registers. Adjacent declaration swaps did not change output. Health/flags
+  pointer spills and shared hit decoding remain. Restored ResolveDamage name
+  from symbols/functions.csv and address aliases for unresolved local callees.
+- 08132904: retained draft 87.1%, 96 realigned differences / 24 ignoring
+  registers. Collider r8 pin and uncached damage-display pointer regressed;
+  unpinning position/max-health and declaration swaps did nothing. Replacing
+  the halfword damage reload with gain removed one instruction difference but
+  bypasses narrowing, so rejected. No speculative semantic change retained.
+- 08131D5C: retained draft 87.5%, 91 realigned differences / 25 ignoring
+  registers. Tested the same collider, damage and pointer variants; no useful
+  improvement. Existing RNG scheduling, pointer spills and branch layout remain.
+- 081314E8: read full assembly and matched relatives (Dog_ChasePlayer explains
+  51%). Entry clears arrived, restores saved target, clears flags and sets
+  duration 64. A nearby linked target within squared XZ distance 65534 triggers
+  control kind 25; at tick 30 invokes a group callback, after tick 60 attempts
+  the saved nav route and invokes fallback callback on failure. No complete
+  close port produced; stopped without a draft.
+- 08138778: improved draft 90.6% to 96.8%, seven realigned differences / four
+  ignoring registers. variants.py isolated initialization order, base-before-
+  offset increment order, a pinned stop-output address and pinned first flag
+  write address. Remaining sprite-pointer lifetime lets agbcc hoist constant 8
+  into r7, changing first clear and later constant uses. Further pointer-barrier
+  variants did not improve. Best candidate retained and formatted; default
+  assembly fallback is 380 bytes and passes exact check.
+
+Four separate draft commits through build/commit.sh; all scores refreshed with
+check.py --nonmatching --record, and all four default fallbacks checked exact.
+No full build or network operations. Ghidra export is absent. Integration must
+validate the combined ROM; retained drafts contribute no exact progress.
