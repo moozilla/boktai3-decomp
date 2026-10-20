@@ -1,8 +1,10 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 82.3%
+// Remaining differences: duplicated passability checks merge and branch targets differ.
+#define SceneActor_FindDirectionalCell sub_080D9B20
+
 // The compiler merges the repeated passability tests and removes redundant cell comparisons.
-// fuzzy: 85.3%
-#include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 // confidence=low: keeps the current cell unless the requested neighbour passes the height and flag tests.
@@ -13,7 +15,7 @@ static inline u8 Open(s32 cell, s32 level)
         return 0;
     return 1;
 }
-static inline u8 Adjacent(struct SceneActorRegistryResetView *actor, s32 goal)
+static inline u32 Adjacent(struct SceneActorRegistryResetView *actor, s32 goal)
 {
     s32 cell = actor->terrainCell;
     s32 level = actor->position.y >> 8;
@@ -68,6 +70,7 @@ s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s3
     }
     return result;
 }
+
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActor_FindDirectionalCell);
+INCLUDE_ASM("asm/nonmatching", sub_080D9B20);
 #endif

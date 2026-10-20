@@ -1,3 +1,4 @@
+#define Dog_SelectTargetAction sub_080DE128
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
@@ -12,12 +13,11 @@ static inline u8 Flag(u8 *context, u32 mask)
 }
 static inline u8 FarFlag(u8 *context, u32 mask)
 {
-    register u32 bit asm("r1") = mask;
+    u32 bit = mask;
     register u32 offset asm("r3") = 0x678;
     asm("" : "+r"(offset));
     {
         register u32 *field asm("r0") = (u32 *)(context + offset);
-        asm("" : "+r"(field));
         if (*field & bit)
             return 1;
     }
@@ -25,12 +25,10 @@ static inline u8 FarFlag(u8 *context, u32 mask)
 }
 static inline u8 OutsideFlag(u8 *context, u32 mask)
 {
-    register u32 bit asm("r1") = mask;
-    register u32 offset asm("r2") = 0x678;
-    asm("" : "+r"(offset));
+    u32 bit = mask;
+    u32 offset = 0x678;
     {
-        register u32 *field asm("r0") = (u32 *)(context + offset);
-        asm("" : "+r"(field));
+        u32 *field = (u32 *)(context + offset);
         if (*field & bit)
             return 1;
     }
@@ -38,16 +36,15 @@ static inline u8 OutsideFlag(u8 *context, u32 mask)
 }
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    register u32 bit asm("r1") = mask;
+    u32 bit = mask;
     asm("" : "+r"(bit));
     return actor->flags2D4 & bit;
 }
 static inline s32 Absolute(s32 value)
 {
-    register s32 result asm("r0") = value;
+    s32 result = value;
     if (result < 0)
         result = -result;
-    asm("" : "+r"(result));
     return result;
 }
 static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, u32 behavior,
