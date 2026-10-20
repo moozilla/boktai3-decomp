@@ -10,9 +10,9 @@ void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *,
                                             struct ContactCollider *, void *, void *, void *, u32,
                                             void *);
 void SceneActorReaction_TryStartContact(void);
-void sub_080B8FB0(void);
+void SceneActor_TryForward(void);
 void sub_080B8DE0(void);
-void sub_080B8EDC(void);
+void Skeleton_OnContactEvent(void);
 void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *actor)
 {
     u8 *context = actor->context;
@@ -36,7 +36,7 @@ void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *act
     innerSize.packed.z = 0x80;
     *(u32 *)&innerOffset = 0x800000;
     *(u32 *)((u8 *)&innerOffset + 4) &= 0xFFFF0000;
-    SceneActorCollision_InitBody(actor, &innerSize, &innerOffset, sub_080B8FB0, actor);
+    SceneActorCollision_InitBody(actor, &innerSize, &innerOffset, SceneActor_TryForward, actor);
     attackSize.packed.x = 0x40;
     attackSize.packed.y = 0x64;
     attackSize.packed.z = 0x40;
@@ -48,5 +48,5 @@ void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *act
     *(u32 *)&extraOffset = 0x800000;
     *(u32 *)((u8 *)&extraOffset + 4) &= 0xFFFF0000;
     SceneActorCollision_InitExternalAttack(actor, (void *)(context + 0x678), &extraSize,
-                                           &extraOffset, sub_080B8EDC, 1, actor);
+                                           &extraOffset, Skeleton_OnContactEvent, 1, actor);
 }
