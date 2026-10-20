@@ -1,4 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Player_SpawnSelectedAttackProjectile sub_0814DFDC
+// confidence=low: role inferred from callers and callback phases.
+#define Player_UpdateSelectedAttackCharge sub_0814E3D8
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
@@ -162,11 +166,13 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                     Player_SetActionPhase(p, 6);
             }
             break;
-        case 6:
+        case 6: {
+            register u32 pending asm("r0");
             ANIMATE(0x24);
             if (PRESSED)
                 BYTE(0xBF6) = 1;
-            if (BYTE(0xBF6)) {
+            pending = BYTE(0xBF6);
+            if (pending) {
                 BYTE(0xBF6) = 0;
                 BYTE(0x458) = 1;
             } else if (++HALF(0x45A) > 14) {
@@ -174,6 +180,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                 Player_SetActionPhase(p, 7);
             }
             break;
+        }
         case 7:
             ANIMATE(0x23);
             if (++HALF(0x45A) > 4)
@@ -184,5 +191,5 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSelectedAttackCharge);
+INCLUDE_ASM("asm/nonmatching", sub_0814E3D8);
 #endif
