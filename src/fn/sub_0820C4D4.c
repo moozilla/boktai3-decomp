@@ -1,9 +1,9 @@
 #define Screamer_WaitForPlayerApproach sub_0820C334
-#define Screamer_UpdateScream          sub_0820C4D4
+#define Screamer_UpdateScream sub_0820C4D4
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.9%
+// fuzzy: 96.6%
 // Remaining differences: timer/count operand allocation and derived restart-sequence offsets.
 #include "screamer_playback.h"
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -307,5 +307,5 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
+INCLUDE_ASM("asm/nonmatching", sub_0820C4D4);
 #endif
