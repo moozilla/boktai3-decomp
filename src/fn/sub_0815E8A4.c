@@ -34,16 +34,15 @@ static inline u32 playerFlag(struct Player *p, u32 offset, u32 mask)
     if (!p)
         return 0;
     {
-        register u32 *field asm("r0") = (u32 *)((u8 *)p + offset);
-        register u32 bits asm("r1") = mask;
-        asm("" : "+r"(field), "+r"(bits));
+        u32 *field = (u32 *)((u8 *)p + offset);
+        u32 bits = mask;
         return *field & bits;
     }
 }
 s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
 {
     s32 cell, skip;
-    register s32 sequence asm("r1");
+    s32 sequence;
     register struct Player *hazardPlayer asm("r0");
     u8 *properties;
     {
@@ -87,8 +86,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     if (!p->positionResetValue) {
         if (p->movementModifierKind == 1 && p->movementModifierActive) {
             {
-                register u32 bits asm("r1") = 0x200;
-                asm("" : "+r"(bits));
+                u32 bits = 0x200;
                 p->statusFlags |= bits;
             }
             if (++H(0x4C6) >= Div(60, p->movementModifierActive)) {
@@ -97,11 +95,10 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
             }
         }
         if (playerFlag(p, 0x444, 0x08000000)) {
-            register u16 *timer asm("r2") = (u16 *)((u8 *)p + 0x4CE);
+            u16 *timer = (u16 *)((u8 *)p + 0x4CE);
             if (++*timer > 14) {
-                register u16 *pending asm("r0") = &p->particleEmissionCount;
-                register u32 zero asm("r0");
-                asm("" : "+r"(pending));
+                u16 *pending = &p->particleEmissionCount;
+                u32 zero;
                 ++*pending;
                 zero = 0;
                 *timer = zero;
