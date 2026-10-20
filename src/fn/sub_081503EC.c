@@ -1,3 +1,14 @@
+#define Player_UpdateFacingSide sub_0813ADD0
+#define Player_SetAnimation sub_0813AE18
+#define ActorSequence_Begin sub_0813AFEC
+#define Player_AddControlFlags sub_0813B134
+#define ActorVariant_GetTableValue sub_081419D4
+#define PlayerCue_EnterStandUpdate sub_0814F804
+#define PlayerCue_CompleteAction sub_0814F89C
+#define PlayerCue_UpdateHidden sub_0814F8C8
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateScaleTransition sub_081503EC
+#define Sound_PlaySong sub_0822B2F8
 #include "global.h"
 #include "player.h"
 // confidence=low: cue callbacks select departure and arrival phases with scale changes.
@@ -24,7 +35,7 @@ static inline void putB(u8 *p, u32 o, u32 v)
     p[o] = v;
 }
 #ifdef NONMATCHING
-// fuzzy: 84.0%
+// fuzzy: 84.4%
 void PlayerCue_UpdateScaleTransition(u8 *p)
 {
     u16 *t;
@@ -46,7 +57,16 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
             H(0x6FC) = 30;
             W(0x94) |= 2;
             t = (u16 *)(p + 0x45A);
-            goto shrink;
+            putB(p, 0xC0, 64 - (*(u8 *)t << 2));
+            if (*t > 8) {
+                putB(p, 0xC1, *t << 3);
+                putH(p, 0x4E8, (*t - 8) * 20);
+                Player_AddControlFlags(p, 4);
+            }
+            if (++*t > 15)
+                ActorSequence_Begin(p, 7, 3);
+            break;
+
         case 3:
             Player_AddControlFlags(p, 4);
             putH(p, 0x4E8, ((struct Player *)p)->tetherFrame * 200 + 160);
@@ -99,7 +119,6 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
             ANIM(0);
             W(0x94) |= 2;
             t = (u16 *)(p + 0x45A);
-        shrink:
             putB(p, 0xC0, 64 - (*(u8 *)t << 2));
             if (*t > 8) {
                 putB(p, 0xC1, *t << 3);
@@ -124,5 +143,5 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateScaleTransition);
+INCLUDE_ASM("asm/nonmatching", sub_081503EC);
 #endif

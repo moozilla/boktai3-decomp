@@ -1,7 +1,11 @@
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: role inferred from state transitions and callees.
+#define SceneActors_UpdatePaletteDispersal sub_081EEAD8
 #ifdef NONMATCHING
-// fuzzy: 87.0%
+// fuzzy: 89.4%
 // Remaining differences: initialization allocation and palette/loop operand ordering.
 struct P {
     u8 unknown[0x630];
@@ -55,9 +59,9 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
             Palette_InterpolateBanks((u8 *)p + 0x3e8, gUnk_030042E4 + 0x40, gUnk_030042E4 + 0x3ea0,
                                      W(0x5a8), W(0x5ac));
             PTR(0x378) = (u8 *)p + 0x3e8;
-            src = (u8 *)p + 0x408;
-            dest = (u8 *)p + 0x488;
             i = 0;
+            dest = (u8 *)p + 0x488;
+            src = (u8 *)p + 0x408;
             do {
                 Palette_InterpolateBanks(gUnk_03005040[i], src, dest, W(0x5a8), W(0x5ac));
                 dest += 32;
@@ -115,5 +119,5 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePaletteDispersal);
+INCLUDE_ASM("asm/nonmatching", sub_081EEAD8);
 #endif
