@@ -3,6 +3,8 @@
 #include "scene_actor_attachment.h"
 
 // MATCHING_CONCESSION: register-pinning
+#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
+
 #ifdef NONMATCHING
 // fuzzy: 81.1%
 // Remaining differences: PRE stack slots, random-loop allocation, and duration setup order.
