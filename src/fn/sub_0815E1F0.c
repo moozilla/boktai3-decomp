@@ -35,9 +35,8 @@ static inline u32 playerFlag(struct Player *p, u32 mask)
     if (!p)
         return 0;
     {
-        register u32 *flags asm("r0") = &p->statBonusFlags;
-        register u32 bits asm("r1") = mask;
-        asm("" : "+r"(flags), "+r"(bits));
+        u32 *flags = &p->statBonusFlags;
+        u32 bits = mask;
         return *flags & bits;
     }
 }
@@ -94,8 +93,8 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         }
         if ((contactFlag(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
             register u32 power asm("r2") = source->unknown3C;
-            register u32 duration asm("r3") = power + 60;
-            register u32 flags asm("r0");
+            u32 duration = power + 60;
+            u32 flags;
             flags = gUnk_030053F4 & 0x1000;
             // Preserve the original evaluated values without changing the callee's ABI.
             asm volatile("" : "+r"(flags) : "r"(power), "r"(duration));
