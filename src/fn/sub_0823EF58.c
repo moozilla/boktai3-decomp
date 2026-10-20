@@ -1,9 +1,8 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.0%
-// differs: the final BF6 zero store reuses a register instead of a fresh movs
+#define Player_UpdateTetherRecall sub_0823EF58
 
+// MATCHING_CONCESSION: register-pinning
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 sub_08238280(u8 *, s32, s32);
 void Player_UpdateFacingFromInputHistory(u8 *p);
@@ -47,15 +46,19 @@ void Player_UpdateTetherRecall(u8 *p)
             sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x21), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
-            if (*(u8 *)(p + 0xBF6)) {
+            {
+            register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+            if (released) {
                 *(u8 *)(p + 0xBF6) = 0;
                 *(u8 *)(p + 0x458) = 1;
             } else {
                 *(u16 *)(p + 0x45A) += 1;
                 if (*(u16 *)(p + 0x45A) > 9) {
-                    *(u8 *)(p + 0xBF6) = 0;
+                    register u32 zero asm("r0") = 0;
+                    *(u8 *)(p + 0xBF6) = zero;
                     Player_SetTetherMode(p, 3, 6);
                 }
+            }
             }
             break;
         case 6:
@@ -67,6 +70,3 @@ void Player_UpdateTetherRecall(u8 *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherRecall);
-#endif
