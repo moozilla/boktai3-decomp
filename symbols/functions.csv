@@ -8991,6 +8991,7 @@ addr,name,mode,confidence,source,notes
 082387B0,Player_InitPrimaryAuraEffect,thumb,low,src-alias,Initializes the hidden effect at offset 0x748 with resource 0x1C1C animation 4; aura identity is tentative
 08238814,Player_UpdateOrbitingAuraEffect,thumb,low,src-alias,Shows and orbits the effect around the player while its mode and enable conditions hold
 08238974,Player_InitOrbitingAuraEffect,thumb,low,src-alias,Initializes the hidden orbiting effect with resource 0x1C1C animation 16
+082389D8,DirectionalEffect_Update,thumb,low,src-alias,
 08238B28,Player_OnDirectionalEffectAnimationEvent,thumb,low,src-alias,Directional effect callback clears its renewal marker or hides the sprite when no renewal occurred
 08238B48,DirectionalEffect_DecodeAnimationMode,thumb,low,src-alias,
 08238B88,Player_ShowDirectionalEffect,thumb,low,src-alias,Copies owner rendering fields into the directional sprite and marks it visible and active
