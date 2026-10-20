@@ -13,7 +13,7 @@ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081DE630(void *);
-void sub_081DE6C4(void *);
+void Password_LoadDate(void *);
 void AnimPanel_UpdateDigits(void *);
 void Menu_StartFadeIn(u32);
 s32 Time_InitializeDateMenu(u8 *s)
@@ -88,7 +88,7 @@ s32 Time_InitializeDateMenu(u8 *s)
     off1 = 0x1B0;
     sub_0821983C(s + off1, obj, 0x80, 0x10, zero, zero, zero, zero);
     sub_081DE630(s);
-    sub_081DE6C4(s);
+    Password_LoadDate(s);
     AnimPanel_UpdateDigits(s);
     if (gUnk_02000340[4] == 1) {
         off3 = 0x6E0;

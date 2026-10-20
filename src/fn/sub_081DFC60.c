@@ -13,7 +13,7 @@ struct AnimPanel {
     s32 selections[24];
 };
 void sub_081DFB18(struct AnimPanel *, s32);
-void sub_081DFA50(struct AnimPanel *);
+void Password_BuildLabels(struct AnimPanel *);
 s32 AnimPanel_EraseSelection(struct AnimPanel *p)
 {
     s32 empty = 0;
@@ -33,7 +33,7 @@ s32 AnimPanel_EraseSelection(struct AnimPanel *p)
         *entry = 0x41;
     }
     sub_081DFB18(p, p->selectionPrimary);
-    sub_081DFA50(p);
+    Password_BuildLabels(p);
     return empty;
 }
 #else
