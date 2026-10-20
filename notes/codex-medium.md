@@ -3054,3 +3054,68 @@ candidates and skipped them because they are nonmatching; no fallback match
 was mistaken for an exact C result. No generated assembly, ROM, dump or
 scratch candidate is committed. Name promotion and combined ROM validation
 remain integration work.
+
+## Task 080980FC (2026-10-20)
+
+Tags: #matching #ghost #register-pinning
+
+Exact code gain: +0.0941 percentage points of total code (2,272 bytes), in the
+Register-pinned category. Two existing guarded drafts became exact matches;
+two new guarded drafts were retained. No network operations or full builds.
+All commits submitted separately through build/commit.sh.
+
+- 08098CA0: matched as Ghost_FollowPlayerLoop, retaining the existing name.
+  tools/relatives.py found Axe_FollowDeceleratingRoute (080FDA44), explaining
+  86% of the body. Porting its typed route and random/polar helpers, relocating
+  route fields to +0x566/+0x568/+0x5B0/+0x5FC, adding the two route-builder
+  calls, and restoring the mode-dependent speed increment yielded only two
+  register differences. Removing RandomMotion's table pin resolved those.
+  tools/depin.py reduced three hints to two: the inherited r4 observed-address
+  pin and empty input barrier remain necessary. Formatted exact check: 1,168
+  bytes. This callback rebuilds nine waypoints around the player and halves
+  speed when the route renews.
+- 08099130: matched as Ghost_PursuePlayerLoop, retaining the existing name.
+  Ported the newly matched Ghost_FollowPlayerLoop; renewal radius is 256,
+  speed is retained, and acceleration is every sixteen ticks up to eighteen.
+  First check matched, and depin retained the same two hints. Formatted exact
+  check: 1,104 bytes. Both route callbacks call 08098344 and 080980FC.
+- 08098788: drafted 84.4% as Ghost_UpdateVisibility (tentative). Its caller
+  Ghost_OnBehaviorUpdate runs this after state dispatch. Sets collider B bit 4,
+  handles the special 0x4000 mode, and coordinates reveal/conceal transitions
+  using context flags +0x558, timer +0x5B2, player mode and save state. The
+  visibility tests share code with SceneActorControl_RequestVisibility.
+  Retained candidate has 55 realigned differences, 18 ignoring registers:
+  availability/hidden-test expansion, temporary lifetimes, scheduling and
+  allocation. u8 result helpers and mask-before-load accessors improved the
+  initial 75.1% candidate to the retained score. Pinning the context and
+  changing Hidden's return width worsened the result and were discarded.
+  tools/check.py --nonmatching --record measured the full reviewed extent.
+- 080980FC: drafted 88.8% as Ghost_EmitAfterimage (tentative). Called by the
+  matched route callbacks. Every context interval +0x556 ticks, refreshes one
+  of four sprites (stride 0x60 at +0x3D4), selects the actor's directional
+  animation frame, runs the packed animation stepper, copies its position,
+  unhides it and sets lifetime eight. Index +0x554 wraps after three. The
+  middle animation-stepper run is shared with Actor_InitPaletteEffectPose.
+  Retained candidate has 28 realigned differences, six ignoring registers:
+  sprite/animation address reuse, argument scheduling and allocation.
+  Raw separate animation-base addressing improved 81.1% to 88.8%; forcing
+  sprite/animation pointer registers worsened it. Recorded full reviewed
+  extent is 488 bytes.
+- 08098A74: stopped below draft threshold. Best exploratory candidate 61.3%,
+  113 realigned differences / 34 ignoring registers. Tracks the player's
+  position delta into actor motion using context +0x5EC, sets direction and
+  animation scaling, then returns to idle when the player's +0x428 action
+  field clears or control completes. Shared control/state reset expansions,
+  player-pointer aliasing and allocation differ. Typed/raw player views,
+  cached flags pointers and targeted lifetime pins did not improve it.
+  Best candidate retained locally at wip/codex-medium/sub_08098A74.c.
+- 08098344: stopped below draft threshold. Exploratory cubic-route candidate
+  reached 40.4%; 160 realigned differences / 82 ignoring registers. Copies
+  start/target positions with zero Y, samples eight intermediate points at
+  Div(1024,8) intervals and copies the endpoint as point nine. Uses context
+  motion X/Z scaled by 128 in the observed polynomial. Exact interpretation
+  remains tentative: the polynomial includes terms that look unusual, so
+  the scratch version follows observed arithmetic rather than correcting it.
+  An explicit stack-frame struct fixed local layout, but expression grouping,
+  repeated weights, stack-pointer lifetimes and allocation remain unresolved.
+  Candidate retained locally at wip/codex-medium/sub_08098344.c.
