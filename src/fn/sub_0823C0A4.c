@@ -48,7 +48,7 @@ struct LP {
     u8 unkAC6[0xCA4 - 0xAC6];
     void *updateCallback; /* 0xCA4 */
 };
-void sub_0824261C(struct LP *);
+void Player_UpdateLinkKind(struct LP *);
 void LinkPlayer_FlushPendingEffects(struct LP *);
 void Player_StopLocalActionSounds(struct LP *);
 void Player_ClearMovementLock(struct LP *);
@@ -64,7 +64,7 @@ void LinkPlayer_ResetToIdleState(struct LP *p)
     if (p->actionMode == 4) {
         u32 z = 0;
         p->actionMode = 1;
-        p->updateCallback = sub_0824261C;
+        p->updateCallback = Player_UpdateLinkKind;
         p->unk419 = z;
         p->unk54 = (u8 *)p + 0x8c;
         p->unk50 = z;
