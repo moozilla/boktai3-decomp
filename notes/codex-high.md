@@ -2729,3 +2729,92 @@ all default INCLUDE_ASM paths passed separate per-file checks. The two
 scratch-padding corrections have separate one-unit driver commits. No shared
 headers or generated files were edited. Complete combined-ROM validation is
 left to the batch integrator. This notes update is the final driver commit.
+
+## Cloud task 08108750 — 2026-10-20
+
+Tags: #matching #link-session #animated-tile #register-pinning
+
+Worked solo and offline on the preclaimed `cloud/08108750` branch. Read the
+entry, cloud and worker instructions and inspected callers, callees, neighboring
+names and matched relatives before naming each function. Ghidra output is absent.
+Used only fast per-file checks; no make, full build, network operation, generated
+file edits or direct Git mutations. Commits were queued through build/commit.sh.
+
+Exact recovery is **70.86% of this task (+70.86 percentage points; 2,432 of
+3,432 reviewed body/pool bytes)**. Repository code gain is approximately
+**+0.1007 percentage points**. Register-pinned matches contribute 1,660 bytes;
+the unpinned match contributes 772 bytes. The guarded draft adds no exact credit.
+
+- **08109F1C — drafted 89.1%, LinkMenu_WaitForReadyPeers**, reviewed extent
+  1,000 bytes, candidate 988. Called by ScriptPanel_WaitForSelectionData and
+  the matched link-menu callbacks. Reads the latest packet, handles missing
+  participants and connection timeouts, accumulates two readiness counters,
+  checks packed modes 0x400/0x1400, and advances to session snapshot exchange
+  after the countdown. Local observed fields include +0x28 pending request,
+  +0x2D countdown, +0x2E retry timer, +0x48 connection status, +0x64 presence,
+  +0x70 readiness counters and +0x74 missing-packet counters. A local helper
+  returning u8 preserves materialized mode booleans. Moving the shared timeout
+  exit inside the negative-status path improved block order. Remaining:
+  66 realigned differing instructions, 34 ignoring registers; countdown
+  pointer lifetime, zero initialization, mask allocation and block placement.
+  Score recorded with `check.py --nonmatching --record`; default INCLUDE_ASM
+  path passes. The draft commit title says 88.4%; the recorded score is 89.1%.
+- **0810C420 — matched, LinkPanel_UpdateStatusMessage**, 772 bytes, unpinned.
+  Uses LinkPanel_GetConnectionStatus and Registry1745_GetSessionState to choose
+  connection/participant dialogue; delays most changes until the byte timer
+  exceeds thirty. Message three supplies the numeric argument and refreshes
+  immediately when the participant number differs. The matched sibling
+  0810C398 supplies connected/peer-status helpers. A u8 message field cast to
+  s8 produces the original byte-load/sign-extension sequence. A u8 inline
+  delay predicate retains the original materialized boolean. First candidate
+  matched; final formatted check used the complete 772-byte extent.
+- **0810AD50 — matched, LinkSelection_ExchangeParticipantInput**, 608 bytes,
+  Register-pinned. Initializes the six-bit selection exchange, updates the
+  preferred participant marker at actor +0x8F9 from the maximum +0x28 value,
+  reads hardware keys, handles input/leave/cancel packet modes and advances
+  the bit exchange. Stage-icon completion callback 0810ABAC selects this state.
+  An explicit prechecked do/while loop restores the original loop/pool shape.
+  Separate two-argument mode helpers and the widened PackKeys helper prevent
+  early constants and extra copies. A barrier in the cancel-mode helper stops
+  unwanted common-expression reuse; the initial mask needs r1. Depinning
+  reduced ten initial hints to three retained hints. Final reviewed check:
+  zero differing bytes across 608 bytes.
+- **0810BBD4 — matched, LinkSelection_UpdateParticipantScores (tentative)**,
+  352 bytes, Register-pinned. Called by LinkSelection_WaitForReadyParticipants.
+  Reads result elapsed times at session +0x24C/+0x250 and positive/negative
+  counters at +0x234/+0x238. Forms a time-relative adjustment, computes
+  `7 * positive - (13 * negative - 50) + adjustment`, clamps points to 0..100
+  at +0x84, adds them to totals at +0x8C clamped to 0..9999, and marks absent
+  participants with 0xFFFF. Signed arithmetic preserves the original grouping;
+  initializing the negative adjustment before Div preserves its lifetime.
+  The explicit Valid helper preserves signed range branches. Keeping null
+  and invalid-index exits distinct restores the original control flow. A
+  constrained positive value in ip and short-lived pointer/constant hints
+  resolve allocation. An inline read/OR/write keeps absent-slot stores in
+  their original shape. Depinning reduced 21 hints to 15. Final check used
+  the complete 352-byte body/pool extent and found zero differing bytes.
+- **08108750 — matched, AnimatedTile_TickAlternateAnimation**, 332 bytes,
+  Register-pinned. Neighbors AnimatedTile_StartAlternateAnimationFromScript
+  and AnimatedTile_TickFadeOut establish the role: consumes the entry flag,
+  plays song 0x10F, starts sequence five, steps the packed animation and enters
+  fade-out state three on completion. WoodenCrate_UpdateToggleAnimation's
+  exact Step inline explains 126 of 159 instructions and ports unchanged
+  with the observed AnimatedTile layout. First check matched. Depinning
+  retained all four inherited hints; final formatted 332-byte extent check
+  is byte-identical.
+- **0810AFB0 — matched, LinkSelection_WaitForInputCompletion**, 368 bytes,
+  Register-pinned. Entered by 0810AD50 when the local participant requests
+  cancellation/completion. Creates the stage icon, counts leave-mode peers,
+  clears the elapsed counter while peers remain in input/cancel modes, then
+  advances to LinkSelection_WaitForReadyParticipants after sixty frames and
+  all participants report completion. Placing the shutdown label between
+  success and waiting paths restores the original branches/pools. Initializing
+  ready before assigning flags preserves their shared zero. Mode helper
+  constraints first recovered exact instructions; pinning the initial mask
+  path restored allocation. Depinning reduced sixteen hints to one retained
+  hint. Final formatted check used the complete 368-byte extent.
+
+Every exact function has its own driver commit, as does the guarded draft.
+All use descriptive file-local aliases. Sources contain no handwritten
+instruction bodies or raw ROM-data addresses. Full combined-ROM validation is
+left to the batch integrator. This appended note is the final driver commit.
