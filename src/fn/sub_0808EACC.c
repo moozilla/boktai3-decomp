@@ -6,8 +6,6 @@ struct Q {
     u16 timer;
 };
 
-#define Slime_TickWaitTimer sub_0808EACC
-
 void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor)
 {
     struct Q *q = actor->context;

@@ -4,8 +4,6 @@
 void sub_080EE148(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 
-#define Ivy_UpdateIdle sub_080F01E8
-
 void Ivy_UpdateIdle(struct SceneActorRegistryResetView *actor)
 {
     if (Chase_TakeArrived(actor))
