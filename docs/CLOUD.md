@@ -61,6 +61,9 @@ Per task:
    `--from-end` orders by address from the end of the ROM backwards (Claude workers use it
    to stay clear of Codex workers going forwards); `--max-insns N` keeps only functions
    below N instructions (pair with a lower `--min-insns` for small-function tasks).
+   `--fresh` puts tasks with the most functions lacking a NONMATCHING draft first (fresh
+   40–120 insn functions match far more cheaply than old near-miss drafts). Task ids
+   depend on the size filters, so `claim --task ID` needs the same filters as the list.
    The claim commit lists the task's functions; `claim` skips any task that shares a
    function with an unmerged claim (task ids shift as main changes, functions don't).
 2. For each function, biggest payoff first: `tools/asmat.py ADDR 80`, then write C.
