@@ -1,7 +1,11 @@
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: action role inferred from movement and effect calls.
+// confidence=low: role inferred from state transitions and callees.
+#define SceneActors_UpdateLeftDeparture sub_081EDB74
 #ifdef NONMATCHING
 // fuzzy: 85.3%
 // Remaining differences: pointer allocation, constant derivation, and initialization order.
@@ -305,5 +309,5 @@ void SceneActors_UpdateLeftDeparture(struct P *arg, s32 ticks)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateLeftDeparture);
+INCLUDE_ASM("asm/nonmatching", sub_081EDB74);
 #endif

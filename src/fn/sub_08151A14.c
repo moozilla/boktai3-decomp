@@ -1,3 +1,12 @@
+#define Player_UpdateFacingSide sub_0813ADD0
+#define Player_SetAnimation sub_0813AE18
+#define ActorSequence_Begin sub_0813AFEC
+#define ActorVariant_GetTableValue sub_081419D4
+#define PlayerCue_EnterStandUpdate sub_0814F804
+#define PlayerCue_CompleteAction sub_0814F89C
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateTurningPalette sub_08151A14
+#define Sound_PlaySong sub_0822B2F8
 #include "global.h"
 #include "player.h"
 
@@ -12,7 +21,7 @@ extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
 #ifdef NONMATCHING
-// fuzzy: 82.2%
+// fuzzy: 83.1%
 extern u8 *gUnk_02000710;
 extern u16 gUnk_02000518, gUnk_02000528;
 void PlayerCue_UpdateTurningPalette(struct Player *p)
@@ -67,7 +76,9 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
         case 4:
             p->heading = 0;
             p->side = 1;
-            goto animateSide;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x38), 0x40, 1))
+                p->tetherPhase = 7;
+            break;
         case 5:
             p->heading = 0;
             p->side = 1;
@@ -79,7 +90,6 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
         case 6:
             p->heading = 0;
             p->side = 0;
-        animateSide:
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x38), 0x40, 1))
                 p->tetherPhase = 7;
             break;
@@ -118,5 +128,5 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTurningPalette);
+INCLUDE_ASM("asm/nonmatching", sub_08151A14);
 #endif
