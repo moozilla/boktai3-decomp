@@ -1,5 +1,6 @@
 #include "global.h"
-#define ScriptCombatActor_TryProjectileAttack    sub_08201898
+#define ScriptCombatActor_TryProjectileAttack sub_08201898
+
 #define ScriptCombatActor_UpdateProjectileAttack sub_08201A78
 
 #ifdef NONMATCHING
