@@ -2,6 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 94.8%
 // Trail addressing and mask-register allocation still differ.
+// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -33,9 +34,10 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        u32 first;
-        u32 maskBit = 1;
+        register u32 first asm("r1");
+        register u32 maskBit asm("r3") = 1;
         bit = maskBit;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -46,10 +48,12 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     {
         u32 input = state->flags;
         u32 bit;
-        u32 first;
+        register u32 first asm("r1");
         bit = 2;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
+        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
@@ -58,11 +62,12 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        u32 temp;
-        u32 savedDuration;
+        register u32 mask asm("r6");
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
+        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
 
@@ -95,6 +100,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -118,7 +124,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
             }
             state->frameWeight = *command & 15;
             {
-                s32 weight = state->frameWeight;
+                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -161,13 +167,14 @@ void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
 void TwinSpriteEffect_EmitTrail(struct Effect *p)
 {
     if (!Mod(p->frame, p->interval)) {
-        struct Sprite *sprite;
+        register struct Sprite *sprite asm("r5");
         struct Anim *anim;
         Anim_SetSequence(&p->trail[p->next].anim, p->resource, 1, 0, 0);
         {
             u32 index = p->next;
             sprite = (void *)((u8 *)p + index * 0x5c + 0x3c);
             anim = (void *)((u8 *)p + index * 0x5c + 0x84);
+            asm("" : "+r"(sprite), "+r"(anim));
         }
         Step(sprite, anim);
         {
