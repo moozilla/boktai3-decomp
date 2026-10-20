@@ -339,6 +339,7 @@ address,evidence
 081E9BA0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081EC384,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081ED89C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+081EDE4C,Independent callback after 081EDB74 return and pool at 081EDE44-081EDE48; own push r4-r7/lr and saved r8-sl prologue; retained assembly through 081EE130
 081F2084,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081FD46C,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 08200238,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
