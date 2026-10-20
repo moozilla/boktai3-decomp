@@ -2448,3 +2448,87 @@ NONMATCHING option, so running it on a guarded source checks only its assembly
 fallback and can incorrectly discard every hint. Guarded sources were restored
 and their recorded C scores rechecked; unguarded draft candidates correctly
 report that depin cannot minimize a non-exact base.
+# Task 081F3C68 — Ratatosk attack and reaction callbacks (2026-10-20)
+
+Tags: #matching #ratatosk #projectiles #sun-orb #nonmatching #register-pinning
+
+Worked offline on the preclaimed cloud/081F3C68 branch. Exact code gain:
+**+0.0417 percentage points** (1,008 reviewed bytes), comprising +0.0185 pp
+without hints and +0.0232 pp in the Register-pinned category. Only fast
+per-file checks were run; no make, complete build, network or shared-doc edits.
+Commits were queued individually through build/commit.sh. The Ghidra export
+is absent. Neighboring Ratatosk callbacks, the state tables and
+Ratatosk_ApplyDamageReaction establish the family and reaction ownership.
+
+- **081F48AC — matched, Ratatosk_UpdateSunOrbSummon**, reviewed extent 448
+  bytes, no hints. Plays unmirrored animation phases at ticks 6 and 86,
+  selects a point via Ratatosk_FindPointNearestReference, creates a SunOrb
+  and raises its slot. Records point/target occupancy and the selected slot.
+  The decisive edit was modeling the tables at +0xD18 and +0xDF0 as arrays
+  of 24-byte records (active word, position, twelve unknown bytes). Raw
+  pointer arithmetic scored 66.2%; the typed arrays matched immediately.
+  Kept these observed layouts local to the translation unit.
+- **081F467C — matched, Ratatosk_UpdateHomingShot** (tentative), reviewed
+  extent 560 bytes. At tick 28, prepares a player-homing projectile, chooses
+  a launch angle and packed spawn offset from cardinal facing, increments
+  +0xEFA and plays song 0x56A. Finishes after tick 30. Explicit case zero
+  preserves the first switch's range branches; operand order in the vector
+  sum fixes the three component loads. Five final differing instructions
+  were compare/callback-address registers. Minimal r1/r2/r0 bindings and
+  two empty barriers close these; depin reduced eight hints to five.
+  Register-pinning concession is marked. Cardinal facing is initialized
+  by the normal state-entry path before the offset switch is reached.
+- **081F4378 — drafted 91.7%, Ratatosk_UpdateProjectileVolley** (tentative).
+  Sequences directional animations 17–20, clamps aim to a 32-unit cone,
+  and launches three projectiles separated by 16 angle units. A hit event
+  starts the +0xE74 cooldown; tick 120 forces completion. The event consumer
+  returns s32, avoiding an extra byte truncation. Declaring the spawn pointer
+  after the sound call improves allocation; writing the constant-first OR
+  removes one copy. Remaining full-extent residue: 36 realigned differing
+  instructions, 13 ignoring registers. The compiler duplicates the phase
+  increment for the first three cases; explicit shared labels reduced that
+  structure but worsened pointer allocation. Retained without register hints.
+- **081F4CF8 — drafted 86.1%, Ratatosk_UpdateDefeatSequence** (tentative).
+  Runs the first event script and kills a task for the ordinary defeat,
+  clears animation fade, stops sounds/orbs, steers away from flagged terrain,
+  changes animation at tick 140 and emits pairs of particles through tick
+  150. At tick 440, runs the second event script, sets event flag 0x51 and
+  updates four bounded persistent counters. Typed animation flags and
+  separate home/current vector pointers fixed address selection. Declaring
+  the spawn pointer inside the particle iteration and using u16 particle
+  samples (shifted values fit their widths) raised 76.8% to 86.1%.
+  Remaining: 84 differing instructions, 22 ignoring registers, chiefly RNG
+  constant/register lifetimes, angle spill, stack pointer placement and the
+  final flag mask. Pointer register pins were counterproductive and were
+  discarded; no hints remain in the retained draft.
+- **081F3C68 — stopped below draft threshold**, best ordinary candidate
+  69.7%, Ratatosk_UpdateRadialSummonAttack (tentative). Above tick 56,
+  state three creates homing projectiles with randomized angle/variant and
+  one of four angle-step patterns; other states create radial player clones.
+  Both clamp spawn positions to arena bounds and set completion. Candidate
+  preserves the calls, counts and collider parameters, but actor-pointer
+  spills, high-register vector pointers, polar constants and collider-load
+  allocation remain (218 differing instructions, 37 ignoring registers).
+  Tried separate actor aliases, a volatile owner, register constraints,
+  branch-local/global spawn pointers, polar pointers and parameter array
+  widths. No useful improvement; restored the best ordinary candidate to
+  untracked wip/sub_081F3C68.c rather than adding a below-threshold draft.
+- **081F5290 — stopped below draft threshold**, best experiment 67.4%,
+  Ratatosk_UpdateKnockbackRecovery (tentative). Initializes animation 29,
+  decays directional motion for sixteen ticks and scales by 24 per tick,
+  emits alternating-tick particles and chooses defeat or idle after tick
+  29 according to health/locked state. The starting candidate was 59.5%.
+  Sprite-view typing, explicit scale pointers, expansion of the polar math,
+  tick and particle register bindings did not reach the retention threshold.
+  Main differences are the speed/tick register choices, scale-pointer reuse,
+  RNG/table lifetime through particle initialization and callback-state zero
+  sharing. A 64.9% tick-constrained candidate remains untracked at
+  wip/sub_081F5290.c; the broader particle constraints were not retained.
+
+Both guarded drafts were formatted directly with clang-format, then recorded
+using check.py --nonmatching --record against full extents. Both exact matches
+passed explicit --target-size checks after formatting; depin was run on the
+hinted exact source. Each function has a local Ratatosk_VerbNoun alias.
+Original INCLUDE_ASM remains the default for drafts and the two stopped
+functions. Combined ROM validation and name promotion remain with integration.
+The pre-existing local tools/cloud_task.py trial-runner edit was left alone.
