@@ -40,9 +40,6 @@ struct Msg081D010C {
 u32 Math_Atan2(s32, s32);
 void SceneNpc_UpdateProjectedMove(void);
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// only the order of two constant loads (0x24 vs 0) differs
 void sub_081D010C(struct SceneNpc081D010C *npc, struct Msg081D010C *m)
 {
     struct Pt *t;
@@ -76,9 +73,11 @@ void sub_081D010C(struct SceneNpc081D010C *npc, struct Msg081D010C *m)
     k = 0x24;
     zero = 0;
     npc->state = zero;
-    npc->sub = zero;
+    do {
+        npc->sub = zero;
+    } while (0);
     npc->mode = k;
-    npc->timer = zero;
+    npc->timer = zero & 0xFFFFFFFFu;
     npc->changed = 1;
     cb = SceneNpc_UpdateProjectedMove;
     npc->kind = 0x21;
@@ -87,6 +86,3 @@ void sub_081D010C(struct SceneNpc081D010C *npc, struct Msg081D010C *m)
     npc->entered = 1;
     npc->phase = zero;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D010C);
-#endif
