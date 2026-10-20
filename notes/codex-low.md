@@ -1629,3 +1629,42 @@ or network operations. All commits submitted through build/commit.sh.
 All four draft scores recorded by tools/check.py --nonmatching --record; their
 normal build retains INCLUDE_ASM. Ghidra export gen/ghidra/decomp.c was absent.
 Only per-file checks were run. Combined ROM validation belongs to integration.
+
+
+## Task 080D453C (2026-10-20, route/volley follow-up)
+
+Tags: #matching #mummy #navigation
+
+Exact gain: +0.0442 percentage points of total code (1068 bytes), without
+register pinning. No full build or network operations.
+
+- 080D5778: retained guarded Mummy_ResumeDelayedRoute draft, 88.3%, 134 realigned
+  differences / 39 ignoring registers. Passing RNG mask as an inline argument
+  regressed to 87.2%, 147/43; reverted. Added required address/callee aliases.
+- 080D6608: retained guarded Mummy_TryDirectPursuit draft, 92.5%, 103/12.
+  Removing the existing r7 RNG mask pin in favor of an inline argument regressed
+  to 92.1%, 111/14; reverted. Added required address/callee aliases.
+- 080D6FDC: matched Mummy_RequestStraightRoute. A u32-returning Attributes inline
+  around the halfword load prevents HImode narrowing of the mask expression.
+  This resolves all previous 105 realigned differences, including the map-address
+  allocation/spill issue. Formatted and checked exact (1068 bytes). No pins.
+- 080D62CC: improved Mummy_FireAcceleratingVolley from 94.6% to 98.5%, 4 realigned
+  differences / 4 ignoring registers. Explicitly load projectile shot/category
+  before target pointer; use a distinct unpinned heightDifference local rather
+  than sharing difference with facing correction. Remaining differences are the
+  quotient-to-absolute-value register copy, resulting pool padding, and delta
+  pointer scheduling around the loop mask. Pinning heightDifference, speed or
+  quotient (including a quotient barrier) regressed; reverted. Existing count
+  and strength pins retained; no new pins retained.
+- 080D53F8: retained Mummy_UpdateProbeNavigation draft, 80.0%, 95/30. Narrowing
+  saved turn argument to u8 regressed to 77.9%, 126/34; reverted. Added aliases.
+- 080D453C: rechecked retained exploratory Mummy_ReactToNearbyStimulus candidate:
+  60.2% candidate-length, 218/116. Below draft threshold; no production candidate.
+  The previously recorded control-reset and target-position lifetime issues remain.
+
+Draft scores recorded with check.py --nonmatching --record. Explicit sub-address
+INCLUDE_ASM labels are required because descriptive aliases do not expand inside
+its stringified filename. Corrected fallback labels and checked all four default
+assembly paths byte-identical; these checks do not count as C matching progress.
+Commits submitted through build/commit.sh; fallback fixes are separate follow-ups
+because the driver consumed draft commits before those fixes were written.
