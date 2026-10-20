@@ -1739,8 +1739,8 @@ five guarded drafts (four inherited, one newly authored). All scoring used
   38 realigned differences / 19 ignoring registers, initial vector aliases,
   register choices and constant scheduling. Candidate and target 560 bytes.
 - **081A6AEC — stopped below full-extent draft threshold; no production C.**
-  Tentative `Vanargand_GetTargetLateralDistance`. Caller 081ABB70 clamps
-  the result to 512. The visible body projects the actor position at 54 and
+  Tentative `Vanargand_GetTargetLateralDistance`. The call site following
+  081ABB6C clamps the result to 512. The visible body projects the actor position at 54 and
   target position via 110, keeps only projected X separation, unprojects
   with zero Y, and returns planar square-root distance. Independently
   authored candidate, using the matched projection idiom from 081A543C,
