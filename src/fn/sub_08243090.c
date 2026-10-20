@@ -19,8 +19,6 @@ struct Player *Player_FindMaskedSlot(const struct PlayerSelection *);
 void sub_08242FAC(struct Player *, u32);
 void sub_08243020(struct Player *, u32);
 
-#define Player_ApplyContact sub_08243090
-
 static inline u32 Test(u32 m, u32 *pv)
 {
     return *pv & m;

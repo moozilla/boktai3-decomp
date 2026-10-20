@@ -1,6 +1,5 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-#define Inventory_SetFlag sub_0822E078
 // Sets bit i of the 64-bit flag set at gUnk_02000710 + 0x720.
 void Inventory_SetFlag(u32 i)
 {

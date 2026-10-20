@@ -14,7 +14,6 @@ struct Pool {
     u32 active;
     struct Slot slots[8];
 };
-#define FragmentProjectilePool_Cleanup sub_0812B27C
 u32 FragmentProjectilePool_Cleanup(struct Pool *p)
 {
     s32 i;
@@ -28,5 +27,5 @@ u32 FragmentProjectilePool_Cleanup(struct Pool *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812B27C);
+INCLUDE_ASM("asm/nonmatching", FragmentProjectilePool_Cleanup);
 #endif

@@ -57,8 +57,6 @@ s32 Player_BeginTerrainRecovery_0823BA78(struct Player *);
 s32 DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(u32, s32, s32, u32, u32, s32);
 
-#define Player_ApplyTerrainDamage sub_08243428
-
 s32 Player_ApplyTerrainDamage(struct Player *p)
 {
     s32 x = (s16)p->position.x >> 8;
