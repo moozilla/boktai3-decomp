@@ -177,5 +177,5 @@ void PlayerCue_UpdateFormChange(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
+INCLUDE_ASM("asm/nonmatching", sub_08153224);
 #endif
