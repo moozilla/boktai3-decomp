@@ -1561,3 +1561,71 @@ Tags: #matching #scene-actor #reaction
 - 081312F4: exploratory SceneActorReaction_ResumeAfterMotion candidate reached 76.8%, 76 realigned differences / 22 ignoring registers; discarded below threshold. Entry selects +0x224 control kind 2. Completed motion with flag 0x10 chooses behavior 8 and nav+0x214 control kind 0x13; otherwise flags2CC bit 0x10 chooses behavior 7/2 and +0x228 control. Tried offset-based state resets and kind/callback register pins; none improved the baseline. Helpers change constant derivation and require an extra saved register.
 
 All retained drafts checked with `tools/check.py --nonmatching --record`; 08135F70's named body required updating its fuzzy comment explicitly because record did not rewrite it. Default guarded assembly checks are byte-identical, which validates fallback preservation only and does not count as C matching progress. No exact C gain. No full build or network operation performed; commits queued through build/commit.sh.
+
+## Task 08098CA0 (2026-10-20)
+
+Tags: #matching #ghost #lun
+
+Exact code gain: +0.0139 percentage points of total code (336 bytes), entirely
+without register pinning. One exact match and four guarded drafts; no full build
+or network operations. All commits submitted through build/commit.sh.
+
+- 08098CA0: drafted 85.6% as Ghost_FollowPlayerLoop (tentative). Ghost action
+  table gUnk_08605DE8 references this and 08099130. Starts a randomized path around
+  the player's position, follows nine context positions beginning at +0x568,
+  accumulates motion and rebuilds the path after reaching its final point. Speed
+  at context +0x566 starts at one, increases periodically to about twelve, and
+  halves on path renewal. Entry flag +0x2B1 also resets the control callback.
+  Remaining 107 realigned differences / 45 ignoring registers: random-number
+  address scheduling, position-address lifetimes, instruction order and registers.
+  Recomputing waypoint coordinates directly for Math_Atan2 improved fuzzy from
+  78.5% to 85.6%. Read BIG_FUNCTIONS.md; steered by realigned counts and variants.
+- 08099130: drafted 84.9% as Ghost_PursuePlayerLoop (tentative). Same initial
+  path and steering as 08098CA0, but renewal uses radius 256 instead of 512,
+  retains speed and increases it every sixteen ticks while below eighteen.
+  Remaining 103 realigned differences / 42 ignoring registers. Writing the
+  renewal Z store through actor->position instead of the cached position pointer
+  changed allocation and raised the score above threshold. Reviewed full extent
+  gives 84.9%, versus the earlier candidate-length 84.7% in the commit title.
+- 0809B94C: drafted 81.1% as Lun_ApproachMovementTarget (tentative). Installed by
+  the Lun initializer alongside its turning callback. Eases X/Z accumulated
+  motion toward targets at actor +0x310/+0x314, tracks the accumulated amounts at
+  +0x318/+0x31C, divides the remaining displacement by four toward zero and clamps
+  each step to +/-200. Emits particles every twelve ticks with flags2D4 bit 8.
+  Completion selects a special callback, renewed player pursuit, or waiting,
+  according to bit 8 and context delay +0x444. Remaining 110 realigned differences
+  / 32 ignoring registers. Scoped collider pointers recover base+6 flag accesses;
+  signed full-width bitfields reproduce the signed clear masks and raise fuzzy
+  from 79.6% to 81.1%. Extra register pins and an alternate typed movement view
+  worsened results and were discarded.
+- 0809B3F8: drafted 82.8% as Lun_TurnTowardSavedDirection (tentative). Lun's
+  initializer installs this callback. Compares eight-way direction buckets with
+  the saved direction at actor +0x3CD; chooses a turn sense, advances direction by
+  32 at animation events, and restores the saved callback when facing matches.
+  Reuses the animation-selection inline reconstructed for 0809B6AC. Remaining
+  64 realigned differences / 24 ignoring registers include duration-scale pointer
+  lifetimes, mask/address scheduling and control reset constants. Reviewed full
+  extent gives 82.8%, versus candidate-length 81.7% in the commit title.
+- 0809B6AC: matched as Lun_UpdateWaitingAnimation (tentative). Called through
+  control transitions including RouteActor_UpdatePlayerDestinationPhase
+  (0809D948). Selects profile entry eleven and directional frame, updates either
+  sequence or tile animation, sets flags2D6 bit 0x20 for ticks <=29, and marks
+  field2B0 complete after tick 59. Porting the matching selection body from
+  SceneActorAnimation_SelectExplicitVariant (080765F8) as a value-argument inline
+  avoids spilling the address-taken directional outputs: 53.5% ->97.0%. A u16
+  mask parameter in the actor flag setter recovers constant-before-address order
+  and resolves the final six differing instructions. Formatted source checked
+  byte-identical with tools/check.py. No pin/barrier concession required.
+- 0809AE0C: stopped without a qualifying draft. ActorContact_InitializeBodyAndSecondary
+  (0809CBB8) installs this secondary collision callback. Requires contactFlags=1,
+  rejects inactive/dead owners, compares player-relative height to 60 or 260
+  within tolerance 32, changes control/state, disables both colliders, and sets
+  context +0x3D4 bit 2 while applying a player effect based on actor +0x1E6.
+  Best exploratory candidate stayed below 50%; natural allocation keeps actor
+  in ip rather than ROM r6, and dead bit-test computations, context reloads and
+  flags/states differ. Pins and value-returning test helpers did not improve it
+  sufficiently. Local scratch remains in wip/sub_0809AE0C.c, not production src.
+
+All four draft scores recorded by tools/check.py --nonmatching --record; their
+normal build retains INCLUDE_ASM. Ghidra export gen/ghidra/decomp.c was absent.
+Only per-file checks were run. Combined ROM validation belongs to integration.
