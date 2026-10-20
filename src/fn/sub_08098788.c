@@ -1,0 +1,184 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+
+#ifdef NONMATCHING
+// fuzzy: 84.4%
+// Remaining differences: address scheduling, inlined tests and register allocation.
+#include "scene_actor_reset.h"
+extern u32 gUnk_030053F4;
+extern u8 *gUnk_02000580;
+extern s32 gUnk_02000478;
+extern u16 gUnk_02000534, gUnk_02000500;
+void ActorShadow_Disable(void *);
+void sub_0809852C(void *);
+void sub_08098734(void *);
+void ActorVisibility_TickRevealDelay(void *);
+void sub_08097CB4(void *);
+void sub_08097E38(void *);
+void sub_080974F4(void *);
+static inline u8 Flag(u8 *p, u32 mask)
+{
+    if (*(u32 *)(p + 0x558) & mask)
+        return 1;
+    return 0;
+}
+static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+{
+    u32 mask = inputMask;
+    u32 offset = 0x2D4;
+    u16 *flags;
+    flags = (void *)((u8 *)actor + offset);
+    return *flags & mask;
+}
+static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+{
+    u32 mask = inputMask;
+    u32 offset = 0x2D0;
+    u32 *flags;
+    flags = (void *)((u8 *)actor + offset);
+    return *flags & mask;
+}
+static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
+{
+    struct SceneActorRegistryResetView *actor = input;
+    if (actor) {
+        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+            return 1;
+    }
+    return 0;
+}
+static inline u32 Hidden(struct SceneActorRegistryResetView *input)
+{
+    struct SceneActorRegistryResetView *actor = input;
+    u32 mask = 1;
+    register u32 result asm("r0");
+    if (actor->drawableKind == 0) {
+        u32 flags = *(u32 *)actor->drawable & mask;
+        if (flags) {
+            result = 1;
+            goto done;
+        }
+        asm("" ::: "r1");
+    } else {
+        u32 flags = *(u32 *)((u8 *)actor->drawable + 0x28) & mask;
+        if (flags) {
+            result = 1;
+            goto done;
+        }
+    }
+    result = 0;
+done:
+    return result;
+}
+static inline u8 PlayerMode(void)
+{
+    u8 *p = gUnk_02000580;
+    if (p) {
+        u32 result = 0;
+        if (*(u16 *)(p + 0x538) && *(u16 *)(p + 0x534) == 4)
+            result = 1;
+        return result;
+    }
+    return 0;
+}
+static inline u8 GlobalMode(void)
+{
+    u32 result = 0;
+    if (gUnk_02000534 && gUnk_02000500 == 4)
+        result = 1;
+    return result;
+}
+static inline u32 PlayerFlag(u8 *p, u32 mask)
+{
+    return *(u32 *)(p + 0x448) & mask;
+}
+static inline u8 SaveFlag(u32 mask)
+{
+    if (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & mask)
+        return 1;
+    return 0;
+}
+// confidence=low: coordinates Ghost visibility transitions with player reveal state.
+#define Ghost_UpdateVisibility sub_08098788
+u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
+{
+    struct SceneActorRegistryResetView *saved = a;
+    u8 *ctx;
+    {
+        struct ContactCollider *c = &a->colliderB;
+        c->flags |= 4;
+    }
+    if (ReadFlags16(a, 0x4000)) {
+        if (Flag((u8 *)a, 0x200)) {
+            *(u32 *)a->drawable |= 1;
+            ActorShadow_Disable((u8 *)a + 0x320);
+            {
+                u32 mask = ~0x20;
+                u32 *flags = (void *)((u8 *)saved + 0x558);
+                *flags &= mask;
+            }
+        } else
+            sub_0809852C(a);
+        sub_08098734(a);
+        goto finish;
+    }
+    ctx = a->context;
+    if (!Unavailable(a)) {
+        u32 discarded = gUnk_030053F4 & 0x4800;
+        u32 *flags = (u32 *)(ctx + 0x558);
+        s32 reveal;
+        asm("" : : "r"(discarded));
+        if (Flag(ctx, 0x100)) {
+            reveal = SaveFlag(0x20);
+        } else
+            reveal = *(s16 *)((u8 *)gUnk_02000710 + 0x876);
+        if (reveal > 0) {
+            u32 mode;
+            if (gUnk_030053F4 & 0x800)
+                mode = PlayerMode();
+            else {
+                if (gUnk_02000478 > 0)
+                    goto hide;
+                if (gUnk_02000580 && PlayerFlag(gUnk_02000580, 0x10))
+                    goto hide;
+                mode = GlobalMode();
+            }
+            if (mode)
+                goto hide;
+            if (!Flag(ctx, 0x40)) {
+                u32 hidden = Hidden(a);
+                if (!hidden) {
+                    *(u16 *)(ctx + 0x5B2) = hidden;
+                    {
+                        u32 mask = ~0x20;
+                        u32 value = *flags & mask;
+                        *flags = value | 0x40;
+                    }
+                }
+            }
+        } else {
+        hide:
+            if (!Flag(ctx, 0x20)) {
+                if (Hidden(a)) {
+                    *(u16 *)(ctx + 0x5B2) = 0;
+                    {
+                        u32 mask = ~0x40;
+                        u32 value = *flags & mask;
+                        *flags = value | 0x20;
+                    }
+                }
+            }
+        }
+    }
+    sub_0809852C(a);
+    ActorVisibility_TickRevealDelay(a);
+    sub_08097CB4(a);
+    sub_08097E38(a);
+finish:
+    sub_080974F4(a);
+    return 1;
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08098788);
+#endif
