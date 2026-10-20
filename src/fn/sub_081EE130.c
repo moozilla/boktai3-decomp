@@ -1,0 +1,239 @@
+// MATCHING_CONCESSION: register-pinning
+#include "contact_swarm.h"
+#include "scene_vec.h"
+#ifdef NONMATCHING
+// fuzzy: 89.2%
+// Remaining differences: initialization allocation, random-mask order, and timing-expression loads.
+struct P {
+    u8 pad0[0x2c0];
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState seq;
+};
+extern u32 gUnk_03005304;
+extern const u16 gUnk_086141BC[];
+void ActorDisplay_UpdateScreenAnchor(struct P *);
+void ActorDisplay_UpdateForegroundSprite(struct P *);
+void ActorDisplay_UpdateAccentSprite(struct P *);
+void SceneActors_EmitPeriodicParticles(struct P *, s32);
+s32 SceneMover_ApproachScreenX(struct P *, s32);
+s32 SceneMover_StepPastScreenX(struct P *, s32, s32);
+s32 Player_GetHorizontalVelocity(void *);
+void Player_GetWorldPosition(s32, struct SceneVec *);
+void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32, s32);
+#define B(o)   (*(u8 *)((u8 *)p + (o)))
+#define H(o)   (*(u16 *)((u8 *)p + (o)))
+#define S(o)   (*(s16 *)((u8 *)p + (o)))
+#define W(o)   (*(s32 *)((u8 *)p + (o)))
+#define PTR(o) (*(void **)((u8 *)p + (o)))
+static inline u32 RandomBits(u32 mask)
+{
+    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    return gUnk_086141BC[gUnk_03005304] & mask;
+}
+static inline void Update(struct P *p, s32 time)
+{
+    ActorDisplay_UpdateScreenAnchor(p);
+    ActorDisplay_UpdateForegroundSprite(p);
+    ActorDisplay_UpdateAccentSprite(p);
+    SceneActors_EmitPeriodicParticles(p, time);
+}
+static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 bitOne)
+{
+    struct ContactSwarmSprite *sprite = sp;
+    struct DisplaySequenceState *state = st;
+    const volatile u16 *command;
+    u32 duration, flags, bit;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)((u32)table + offset);
+    }
+    sprite->frame = *command >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r1");
+        u32 maskBit = bitOne;
+        bit = maskBit;
+        first = bit;
+        first &= input;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r1");
+        bit = 2;
+        asm volatile("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm volatile("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        register u32 mask asm("r5");
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm volatile("" : "+r"(temp));
+        mask = temp;
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                } else {
+                    state->index = index - 1;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm volatile("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                } else {
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)((u32)table + offset);
+            }
+            state->frameWeight = *command & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        }
+    }
+}
+
+void ActorEffect_SpawnOffsetEffect(struct P *);
+// confidence=low: sequence-one action periodically spawns offset effects.
+void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
+{
+    register struct P *input asm("r8") = arg;
+    register s32 time asm("r10") = ticks;
+    struct P *p = input;
+    register u32 one asm("r9") = 1;
+    W(0x288) = RandomBits(one);
+    if ((*(u8 *)((u8 *)input + 0xb1))) {
+        struct ContactSwarmSprite *sprite;
+        (*(u8 *)((u8 *)input + 0xb1)) = 0;
+        sprite = &input->sprite;
+        (*(s32 *)((u8 *)input + 0x298)) = 0;
+        (*(s32 *)((u8 *)input + 0x290)) = 0;
+        *(s32 *)((u8 *)sprite + 0x3c) = one;
+        {
+            register struct DisplaySequenceState *state asm("r4") = &input->seq;
+            Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 1, 0, 0);
+            Step(sprite, state, one);
+        }
+        W(0x598) = 0;
+        W(0x398) = 0;
+        W(0x2b8) = 4;
+        W(0x2bc) = 120;
+    }
+    SceneMover_ApproachScreenX(input, 40);
+    {
+        register s32 *phase asm("r5") = &W(0x398);
+        switch (*phase) {
+            case 0:
+                if (time > 30) {
+                    W(0x2fc) = 1;
+                    Anim_SetSequence(&p->seq, PTR(0x390), 1, 0, 0);
+                    *phase = 1;
+                    if (W(0x2b4) <= 0x3fff) {
+                        W(0x2b8) += 2;
+                        W(0x2bc) = Div(W(0x2bc), 2);
+                    }
+                }
+                W(0x290) = RandomBits(7);
+                ActorDisplay_UpdateScreenAnchor(input);
+                ActorDisplay_UpdateForegroundSprite(input);
+                ActorDisplay_UpdateAccentSprite(input);
+                SceneActors_EmitPeriodicParticles(input, time);
+                if (W(0x300))
+                    W(0x304) = 1;
+                break;
+            case 1:
+                if (Mod(time, W(0x2bc)) <= 59 && time > 90)
+                    W(0x290) = 0;
+                else if (time < W(0x2b8) * W(0x2bc) + 30)
+                    W(0x290) = RandomBits(7);
+                else
+                    W(0x290) = 0;
+                ActorDisplay_UpdateScreenAnchor(input);
+                ActorDisplay_UpdateForegroundSprite(input);
+                ActorDisplay_UpdateAccentSprite(input);
+                SceneActors_EmitPeriodicParticles(input, time);
+                if (Mod(time, W(0x2bc)) == 0 && time <= W(0x2b8) * W(0x2bc) + 30) {
+                    ActorEffect_SpawnOffsetEffect(input);
+                    W(0x598)++;
+                }
+                if (time >= W(0x2b8) * W(0x2bc) + 90) {
+                    W(0x304) = 0;
+                    W(0x2fc) = 1;
+                    B(0x2f0) |= 4;
+                    Anim_RestartSequence(&p->seq, PTR(0x390), H(0x2fc), 0, 0);
+                    W(0x398) = 2;
+                    W(0x290) = 0;
+                }
+                break;
+            case 2:
+                B(0x2f0) |= 4;
+                ActorDisplay_UpdateScreenAnchor(input);
+                ActorDisplay_UpdateForegroundSprite(input);
+                ActorDisplay_UpdateAccentSprite(input);
+                SceneActors_EmitPeriodicParticles(input, time);
+                if (W(0x300)) {
+                    B(0x2f0) &= ~4;
+                    B(0xaf) = 1;
+                }
+                break;
+        }
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePeriodicEffectAction);
+#endif

@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.1%
-// Remaining differences: script option narrowing, animation pointer lifetimes and defined success return.
+// fuzzy: 88.1%
+// Remaining differences: orientation switch range guard, animation pointer lifetimes and defined success return.
 #include "global.h"
 #define SCREAMER_TEMP     "r2"
 #define SCREAMER_FIRST    "r2"
@@ -21,6 +21,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     struct ActorPosition position;
     void *graphics;
     void *sprite;
+    void *initialSprite;
     void *sequences;
     s32 value;
     if (Script_SeekToKeyword('p')) {
@@ -38,10 +39,10 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1C8 = 30;
     }
     if (Script_SeekToKeyword('l')) {
-        value = (s16)Script_GetValue();
+        value = Script_GetValue();
         p->f1E6 = value;
         p->f1E4 = value;
-        if (value < 0)
+        if ((s16)value < 0)
             p->f1F6 = 1;
     } else {
         p->f1E6 = 120;
@@ -65,7 +66,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     if (Script_SeekToKeyword('h')) {
         p->f1D8 = Script_GetValue();
         p->f1D8 = (p->f1D8 - 1) / 2;
-        switch ((u16)p->f1D8) {
+        switch ((u32)(u16)p->f1D8) {
             case 0:
             case 1:
                 p->f1D8 = 0;
@@ -110,13 +111,15 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     p->f1F8 = resource;
     graphics = p->graphics;
     AnimData_Load(graphics, 0x7E7D);
-    sprite = &p->sprite;
-    Sprite_Init(sprite, graphics, 1);
+    initialSprite = &p->sprite;
+    Sprite_Init(initialSprite, graphics, 1);
     p->sprite.position = p->initialPosition;
     AnimData_SelectPaletteBank(graphics, 0x1C4);
     *((u8 *)&p->sprite + 7) = 3;
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f218 = sequences;
+    asm("" : "+r"(initialSprite));
+    sprite = initialSprite;
     if (!p->f1F6) {
         p->update = Screamer_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0x1A, (u8)p->f1D8, 8);

@@ -87,14 +87,13 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
     actor->field2B1 = 1;
 }
 
-#define Vorn_SelectRetreatRoute                                                                    \
-    sub_080B2858 // confidence=low: distance thresholds select recovery routes.
+// confidence=low: distance thresholds select recovery routes.
 extern const u8 gUnk_0824E230[];
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-u8 sub_080B2580(void *, u32);
+u8 Vorn_SelectReachableEscapeCell(void *, u32);
 u32 SceneActor_DispatchContextAction(void *, u32);
 static inline u32 RandomBits(u32 mask)
 {
@@ -156,7 +155,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     if (actor->distanceF0 < *(u32 *)(body + 0x6c8)) {
         old = actor->direction;
         actor->direction = actor->fieldE9 + 0x80;
-        if (!sub_080B2580(actor, old))
+        if (!Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
@@ -168,7 +167,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
         }
         if (!actor->fieldDC)
             actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
-        if (!SelectRoute(actor) && !sub_080B2580(actor, old))
+        if (!SelectRoute(actor) && !Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
@@ -180,7 +179,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
         }
         if (!actor->fieldDC)
             actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
-        if (!SelectRoute(actor) && !sub_080B2580(actor, old))
+        if (!SelectRoute(actor) && !Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
@@ -196,5 +195,5 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2858);
+INCLUDE_ASM("asm/nonmatching", Vorn_SelectRetreatRoute);
 #endif

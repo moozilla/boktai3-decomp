@@ -1,87 +1,86 @@
 #include "global.h"
+#include "player.h"
+#include "engine.h"
+// confidence=low: reverse velocity, shake, and target-directed recoil after impact.
+struct RecoveryVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
+u32 ActorVariant_GetTableValue(u32, u32);
+u32 sub_08238280(void *, u32, u32);
+void Player_PlayLocalSong(u32, u32);
+void Player_SetTetherMode(void *, u32, u32);
+void Player_SetSecondaryActionFlags(void *, u32);
+void sub_0823C280(void *);
+void SelectionSlots_ClearValue(void *, u32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+u32 Player_IsFlaggedWithGlobalModifier10(u32);
+static inline s32 scale(s32 v)
+{
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
+}
+static inline void reverseMotion(struct Player *p, u16 *magnitude)
+{
+    s32 angle = ((p->facing + 5) & 7) << 5;
+    p->velocityX = -scale(gUnk_086149C4[(angle + 64) & 255] * *magnitude);
+    p->velocityZ = -scale(gUnk_086149C4[angle] * p->directionFrame);
+}
 
-#ifdef NONMATCHING
-// fuzzy: 89.9%
-// differs: register allocation of the facing-byte block at the top
-
-extern const s16 gUnk_086149C4[];
-s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(u8 *, s32, s32);
-void sub_08238238(u8 *);
-void Player_SetTetherMode(u8 *, s32, s32);
-void Player_PlayLocalSong(s32 a, u32 b);
+void RisingSprite_Spawn(void *);
 void Camera_RequestShake(u32);
-void RisingSprite_Spawn(u8 *);
-
-static inline int scale12(int n)
+void sub_08238238(void *);
+static inline s32 scale3(s32 v)
 {
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
+    if (v >= 0)
+        return v >> 3;
+    return -((-v) >> 3);
 }
-
-static inline int scale3(int n)
+void Player_UpdateTetherRecoil(struct Player *p)
 {
-    return n >= 0 ? n >> 3 : -((-n) >> 3);
-}
-
-void Player_UpdateTetherRecoil(u8 *p)
-{
-    u16 *r;
-    u16 *c;
-    u8 *ap;
-    u32 v;
-
-    if (*(u8 *)(p + 0x457) != 0x1D) {
+    if (p->tetherMode != 0x1D) {
         Player_SetTetherMode(p, 0x1D, 0);
-        ap = p + 0x3A4;
-        v = *ap;
-        if ((v & 0xFF) > 4) {
-            *(u8 *)(p + 0x3A2) = (8 - *ap) >> 1;
-            *(u8 *)(p + 0x3A3) = 1;
+        if (p->facing > 4) {
+            p->heading = (8 - p->facing) >> 1;
+            p->side = 1;
         } else {
-            *(u8 *)(p + 0x3A2) = (v & 0xFF) >> 1;
-            *(u8 *)(p + 0x3A3) = 0;
+            p->heading = p->facing >> 1;
+            p->side = 0;
         }
-        sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x29), 0x40);
-        r = (u16 *)(p + 0x4C2);
-        if (*r != 0) {
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), *r);
-            *r = 0;
+        sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
+        if (p->contactActionTag) {
+            Player_PlayLocalSong(p->slot, p->contactActionTag);
+            p->contactActionTag = 0;
         }
     }
-    r = (u16 *)(p + 0x270);
-    if (*r != 0) {
-        if (*(u8 *)(p + 0x479) != 0) {
-            s16 *t = *(s16 **)(p + 0x47C);
-            int dx = t[0] - *(s16 *)(p + 0x30);
-            int dy = t[2] - *(s16 *)(p + 0x34);
-            *(s16 *)(p + 0x38) = scale3(dx);
-            *(s16 *)(p + 0x3C) = scale3(dy);
-            c = (u16 *)(p + 0x45A);
-            if (*c <= 5) {
-                if (!(*c & 1)) {
-                    Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x191);
-                    RisingSprite_Spawn(p + 0x30);
+    {
+        u16 *magnitude = &p->directionFrame;
+        if (*magnitude) {
+            if (*(u8 *)((u8 *)p + 0x479)) {
+                s32 dx = p->terrainTarget->x - p->position.x;
+                s32 dz = p->terrainTarget->z - p->position.z;
+                p->velocityX = scale3(dx);
+                p->velocityZ = scale3(dz);
+                if (p->tetherFrame <= 5) {
+                    if (!(p->tetherFrame & 1)) {
+                        Player_PlayLocalSong(p->slot, 0x191);
+                        RisingSprite_Spawn(&p->position);
+                    }
+                    ++p->tetherFrame;
                 }
-                (*c)++;
-            }
+            } else
+                reverseMotion(p, magnitude);
+            Camera_RequestShake(p->directionFrame);
+            p->directionFrame = (p->directionFrame * 3) >> 2;
         } else {
-            int ang = ((*(u8 *)(p + 0x3A4) + 5) & 7) << 5;
-            *(s16 *)(p + 0x38) = -scale12(gUnk_086149C4[(ang + 0x40) & 0xFF] * *r);
-            *(s16 *)(p + 0x3C) = -scale12(gUnk_086149C4[ang] * *(u16 *)(p + 0x270));
-        }
-        Camera_RequestShake(*(u16 *)(p + 0x270));
-        *(u16 *)(p + 0x270) = (*(u16 *)(p + 0x270) * 3) >> 2;
-    } else {
-        *r = 0;
-        *(u8 *)(p + 0x479) = 0;
-        if (*(u8 *)(p + 0x5B9) == 3 && *(u8 *)(p + 0x5BB) != 0) {
-            Player_SetTetherMode(p, 0x16, 0);
-        } else if (sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x2A), 0x40)) {
-            sub_08238238(p);
-            Player_SetTetherMode(p, 0, 0);
+            *magnitude = 0;
+            *(u8 *)((u8 *)p + 0x479) = 0;
+            if (p->movementModifierKind == 3 && p->movementModifierActive)
+                Player_SetTetherMode(p, 0x16, 0);
+            else if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x2A), 0x40)) {
+                sub_08238238(p);
+                Player_SetTetherMode(p, 0, 0);
+            }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherRecoil);
-#endif

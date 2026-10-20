@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 96.9%
 // foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
-#define ColorPulse_AlignTargetHeading ColorPulse_AlignTargetHeading
+
 struct ColorPulsePart {
     u32 flags;
     u8 pad4[0x28];

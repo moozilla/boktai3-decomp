@@ -2,7 +2,8 @@
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
 #ifdef NONMATCHING
-// fuzzy: 88.5%
+// fuzzy: 90.7%
+// Palette/selection address lifetimes and register allocation still differ.
 struct Display {
     u8 sprites[0x724];
     s32 selection, count;
@@ -47,12 +48,14 @@ void Task_Kill(void *);
 static inline void Interpolate(struct Display *p)
 {
     u8 *source;
+    u8 *input;
     u8 *output;
     if (p->paletteStep <= (1 << p->unused760)) {
         FLAGS(0xA8) &= ~1;
         source = gUnk_030042E4 + 0x6240;
+        input = (u8 *)p + 0x520;
         output = (u8 *)p + 0x700;
-        Palette_InterpolateBanks((u8 *)p + 0x520, output, source, p->paletteStep, p->unused760);
+        Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
         source = gUnk_030042E4 + 0x6260;
         Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep, p->unused760);
         *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
@@ -62,7 +65,7 @@ static inline void Interpolate(struct Display *p)
 void Params3D0_UpdateDisplay(struct Display *p)
 {
     s32 value;
-    u16 position;
+    s16 position;
     struct Message message;
     message.count = 1;
     message.values = &value;
@@ -70,24 +73,36 @@ void Params3D0_UpdateDisplay(struct Display *p)
         switch (TimeDisplay_GetCurrentMonth() - 1) {
             case 2:
             case 3:
-            case 4:
-                Sound_PlaySong((gUnk_08613D80 + 2)[TimeDisplay_GetLightPhaseGroup()]);
-                break;
+            case 4: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                table += 2;
+                Sound_PlaySong(table[phase]);
+            } break;
             case 5:
             case 6:
-            case 7:
-                Sound_PlaySong((gUnk_08613D80 + 4)[TimeDisplay_GetLightPhaseGroup()]);
-                break;
+            case 7: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                table += 4;
+                Sound_PlaySong(table[phase]);
+            } break;
             case 8:
             case 9:
-            case 10:
-                Sound_PlaySong((gUnk_08613D80 + 6)[TimeDisplay_GetLightPhaseGroup()]);
-                break;
+            case 10: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                table += 6;
+                Sound_PlaySong(table[phase]);
+            } break;
             case 0:
             case 1:
-            case 11:
-                Sound_PlaySong((gUnk_08613D80 + 8)[TimeDisplay_GetLightPhaseGroup()]);
-                break;
+            case 11: {
+                const s32 *table = gUnk_08613D80;
+                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                table += 8;
+                Sound_PlaySong(table[phase]);
+            } break;
         }
     }
     if (p->idleTimer > gUnk_020003D0.timeout) {

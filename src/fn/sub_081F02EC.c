@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.9%
 // foundry draft (worker best 95.9%); what differs is mostly register allocation and instruction order
-#define SingletonSlot7_BeginScaledCooldown SingletonSlot7_BeginScaledCooldown
 
 struct Slot7Action {
     u8 pad0[0x3e];

@@ -5,9 +5,9 @@
 #ifdef NONMATCHING
 // fuzzy: 87.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
-#define SceneHud_CyclePrimarySecondaryOptions SceneHud_CyclePrimarySecondaryOptions
-#define SceneHud_RefreshPrimaryOptions        SelectionPanel_RefreshVisibleEntries
-#define gSceneHudInput                        gUnk_03005164
+
+#define SceneHud_RefreshPrimaryOptions SelectionPanel_RefreshVisibleEntries
+#define gSceneHudInput                 gUnk_03005164
 extern u16 gUnk_03005164[];
 void SelectionPanel_RefreshVisibleEntries(struct SceneHudState *);
 void SceneHud_RefreshSecondaryOptions(struct SceneHudState *);

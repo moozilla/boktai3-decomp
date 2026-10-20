@@ -8,7 +8,7 @@ u32 ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestHide(void);
 void Hud_BeginRetryPanel(void *);
 void PauseMenu_RestoreDisplayState(void *);
-void sub_08176BA4(void *);
+void SceneHud_FinishPageExit(void *);
 void Hud_SetUpdateCallback(void *, void (*)(void *));
 void SceneHud_FadeOutPage(struct SceneHudState *p)
 {
@@ -28,7 +28,7 @@ void SceneHud_FadeOutPage(struct SceneHudState *p)
         } else {
             PauseMenu_RestoreDisplayState(p);
             gUnk_030051D8 = p->savedMenuMode;
-            Hud_SetUpdateCallback(p, sub_08176BA4);
+            Hud_SetUpdateCallback(p, SceneHud_FinishPageExit);
         }
     }
 }

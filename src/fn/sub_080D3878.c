@@ -1,4 +1,5 @@
 #include "global.h"
+
 #ifdef NONMATCHING
 // fuzzy: 86.2%
 // MATCHING_CONCESSION: register-pinning
@@ -54,8 +55,9 @@ static inline u32 RandomFrom(const u16 *table)
     v &= 3;
     return v + 1;
 }
-void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
 {
+    register s32 frame asm("r8") = input;
     s32 values[8];
     struct ContactPackedVector rangeA;
     struct ContactPackedVector rangeB;

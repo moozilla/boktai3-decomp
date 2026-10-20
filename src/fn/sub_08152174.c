@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+// confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // Animation registers, scale-store addressing and phase branch layout differ.

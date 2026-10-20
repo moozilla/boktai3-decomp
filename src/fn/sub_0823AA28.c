@@ -4,7 +4,7 @@
 u32 LinkPlayer_GetInitialActionCount(struct Player *, const struct PlayerActionConfig *);
 void sub_0823A5EC(struct Player *, const struct PlayerActionConfig *);
 void sub_0823A830(struct Player *);
-void Player_UpdateTetherChargeB(void);
+void Player_UpdateChargedDashAttack(void);
 extern void (*const gUnk_08E879D8[])(void);
 void Player_InitializeActionState(struct Player *s, const struct PlayerActionConfig *config)
 {
@@ -14,7 +14,7 @@ void Player_InitializeActionState(struct Player *s, const struct PlayerActionCon
     s->statModifierContext.actionTimer = 0;
     sub_0823A5EC(s, config);
     if (s->statModifierContext.actionKind == 0x30)
-        s->actionCallback = Player_UpdateTetherChargeB;
+        s->actionCallback = Player_UpdateChargedDashAttack;
     else
         s->actionCallback = gUnk_08E879D8[s->statModifierContext.statBOverrideEnabled];
     sub_0823A830(s);

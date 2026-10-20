@@ -1,5 +1,7 @@
 #include "global.h"
+
 #ifdef NONMATCHING
+// fuzzy: 85.3%
 // The compiler merges the repeated passability tests and removes redundant cell comparisons.
 // fuzzy: 85.3%
 #include "global.h"

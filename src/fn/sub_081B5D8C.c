@@ -20,7 +20,7 @@ extern void *gPairedSceneHalfStateCallbacks[];
 void Vanargand_ClearPartContact(void *);
 void sub_081AFF98(struct PairedSceneHalf *);
 void sub_081AF7F4(struct PairedSceneHalf *);
-void sub_081AFD10(struct PairedSceneActor *, struct PairedSceneHalf *);
+void PairedSceneActor_UpdateHalfPresentation(struct PairedSceneActor *, struct PairedSceneHalf *);
 void sub_08249244(struct PairedSceneActor *, struct PairedSceneHalf *, s32, void *);
 void PairedSceneActor_UpdateHalves(struct PairedSceneActor *actor)
 {
@@ -50,7 +50,7 @@ void PairedSceneActor_UpdateHalves(struct PairedSceneActor *actor)
                         sub_08249244(actor, half, *timer, *callback);
                     }
                 }
-                sub_081AFD10(actor, half);
+                PairedSceneActor_UpdateHalfPresentation(actor, half);
                 ++*timer;
             }
             timer = (u32 *)((u8 *)timer + 0x21C);

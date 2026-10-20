@@ -4,7 +4,7 @@ extern s32 gUnk_030051E4;
 void Palette_ResetObjectAllocation(void);
 void ObjGfx_ResetAllocationCounters(void);
 void sub_08249238(u32);
-void sub_082154E4(void);
+void SpriteOam_FinalizeQueue(void);
 void sub_08217C7C(void);
 void sub_08217BBC(void);
 void Palette_RefreshObjectBanks(void);
@@ -18,7 +18,7 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
     sub_08249238(gUnk_03004294);
     sub_08249238(gUnk_030042B8);
     sub_08249238(gUnk_030042B4);
-    sub_082154E4();
+    SpriteOam_FinalizeQueue();
     if (gUnk_030051E4) {
         sub_08217C7C();
         sub_08217BBC();

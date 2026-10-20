@@ -1,6 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 86.0%
+// Remaining phase scale addressing and playback register lifetimes differ.
 // fuzzy: 86.0%
 
 struct P {

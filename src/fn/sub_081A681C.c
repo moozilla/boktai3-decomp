@@ -2,8 +2,8 @@
 #ifdef NONMATCHING
 // fuzzy: 94.0%
 // foundry draft (worker best 94.0%); what differs is mostly register allocation and instruction order
-#define ScreenPalette_UpdateTransition ScreenPalette_UpdateTransition
-#define gScreenPaletteBuffer           gUnk_030050E0
+
+#define gScreenPaletteBuffer gUnk_030050E0
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];

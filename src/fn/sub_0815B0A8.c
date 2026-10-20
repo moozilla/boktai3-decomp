@@ -23,7 +23,7 @@ void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_UpdateWalkTarget(void);
 void PlayerCue_UpdateSideWalkTarget(void);
-void sub_0814FC80(void);
+void Player_AdvanceScriptDestination(void);
 
 void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
 {
@@ -39,9 +39,9 @@ void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
     } else if (p->state == 5) {
         p->b464 = 1;
         p->b465 = 1;
-        p->fn = sub_0814FC80;
+        p->fn = Player_AdvanceScriptDestination;
     } else {
-        p->fn = sub_0814FC80;
+        p->fn = Player_AdvanceScriptDestination;
     }
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 1, 0);

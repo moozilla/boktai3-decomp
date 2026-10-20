@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081EEAD8(void);
+void SceneActors_UpdatePaletteDispersal(void);
 struct S {
     u8 f0[0x90];
     u32 a90;
@@ -31,7 +31,7 @@ void SingletonSlot7_UpdateAlternateStateTransition(struct S *p)
     u8 *q;
     u32 r;
     if (chk(p) == 1) {
-        st(sub_081EEAD8, &p->fn);
+        st(SceneActors_UpdatePaletteDispersal, &p->fn);
         p->a90 = 0;
         *((u8 *)p + 0xb1) = 1;
         *((u8 *)p + 0xa2) = 0;

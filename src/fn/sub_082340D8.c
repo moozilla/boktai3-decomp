@@ -4,7 +4,7 @@ struct Pair {
 };
 void AnimData_Load(u8 *, u32);
 void Sprite_Init(u8 *, u8 *, u32);
-s32 sub_0821D6F4(struct Pair *, u32);
+s32 Terrain_HasHigherCorner(struct Pair *, u32);
 void AnimData_SelectPaletteBank(u8 *, u32);
 void SolarBomb_InitSprite(u8 *p)
 {
@@ -14,7 +14,7 @@ void SolarBomb_InitSprite(u8 *p)
     Sprite_Init(sprite, resource, 1);
     *(u16 *)(sprite + 0x10) = 12;
     *(struct Pair *)(p + 0x38) = *(struct Pair *)(p + 0x64);
-    if (sub_0821D6F4((struct Pair *)(p + 0x38), 128)) {
+    if (Terrain_HasHigherCorner((struct Pair *)(p + 0x38), 128)) {
         AnimData_SelectPaletteBank(resource, 402);
         p[0x23] = 1;
     } else

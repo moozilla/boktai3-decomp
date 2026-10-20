@@ -16,7 +16,7 @@ struct ProximitySequence {
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
-void sub_0820302C(struct ProximitySequence *);
+void ProximitySequence_EmitBurst(struct ProximitySequence *);
 
 s32 ProximitySequence_TestPlayerDistance(struct ProximitySequence *s)
 {
@@ -25,7 +25,7 @@ s32 ProximitySequence_TestPlayerDistance(struct ProximitySequence *s)
     s32 dx = player->x - s->position.x;
     s32 dz = player->z - position->z;
     if (dx * dx + dz * dz < s->triggerDistanceSquared) {
-        s->update = sub_0820302C;
+        s->update = ProximitySequence_EmitBurst;
         Anim_RestartSequence(&s->animation, s->resource, 7, 0, 0);
         s->timer = 180;
     }

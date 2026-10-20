@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 87.5%
 // foundry draft (worker best 87.1%); what differs is mostly register allocation and instruction order
-#define ModifierStats_ApplyKinds4And14 ModifierStats_ApplyKinds4And14
 
 struct StatModifier {
     s32 (*apply)(struct StatModifier *, s32);
