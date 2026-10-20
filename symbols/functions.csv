@@ -7522,6 +7522,9 @@ addr,name,mode,confidence,source,notes
 081F34F0,Ratatosk_GetSelectedTargetIndex,thumb,low,src-alias,Returns the signed target index at offset 0xE4E used by target interaction logic
 081F3508,Ratatosk_UpdateDirectionalAnimation,thumb,low,src-alias,
 081F3618,Ratatosk_UpdateEightDirectionAnimation,thumb,low,src-alias,
+081F3720,SceneActorAnimation_UpdateSwoopMotion,thumb,low,src-alias,
+081F3960,SceneActorAnimation_UpdateSwoopApproach,thumb,low,src-alias,
+081F3AE4,SceneActorAnimation_UpdateDiveApproach,thumb,low,src-alias,
 081F4184,Ratatosk_UpdateTimedAttack,thumb,low,src-alias,
 081F423C,ActorMotion_UpdateTimedPaletteAnimation,thumb,low,src-alias,
 081F4A6C,Ratatosk_UpdatePointEffectAnimation,thumb,low,src-alias,
