@@ -2958,6 +2958,8 @@ addr,name,mode,confidence,source,notes
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
+0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
+0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
@@ -7404,12 +7406,15 @@ addr,name,mode,confidence,source,notes
 081CEF3C,SceneNpc_UpdateStopped,thumb,low,src-alias,
 081CF490,SceneNpc_UpdateBlinkPhase,thumb,low,src-alias,
 081CF4F0,SceneNpc_UpdateBlinkOut,thumb,low,src-alias,Applies the sixteen-interval blink sequence then hides the NPC and marks completion
+081CF578,SceneNpc_UpdateDashSlide,thumb,low,src-alias,
 081CF62C,SceneNpc_UpdateDescendingDash,thumb,low,src-alias,
 081CF84C,SceneNpc_PlayAnimation12,thumb,low,src-alias,
+081CFC44,SceneNpc_UpdateProjectedVisible,thumb,low,src-alias,
 081CFCA4,SceneNpc_UpdateProjectedIdle,thumb,low,src-alias,
 081CFDA4,SceneNpc_UpdateProjectedMove,thumb,low,src-alias,
 081CFFAC,SceneNpc_OnStateChange,thumb,low,src-alias,State-change callback installs the requested state handler and resets its execution fields
 081D01C8,SceneNpc_DispatchCommands,thumb,low,src-alias,"kind 5 (NPC) cutscene receiver: commands set state 0 with a sub-state, 4/5/36 walk to a point, 13-16 palette, 64 place"
+081D07D8,SceneNpc_EnterProjectedIdle,thumb,low,src-alias,
 081D0B8C,SceneNpc_OnDestroy,thumb,low,src-alias,Destruction callback releases the message receiver and effects then clears the current NPC
 081D0BC4,SceneNpc_OnModeUpdate,thumb,low,src-alias,Registered NPC callback runs the mode dispatcher and returns zero
 081D0BD0,SceneNpc_OnStateUpdate,thumb,low,src-alias,Registered NPC callback clears frame flags and invokes the state handler with its elapsed frame
@@ -7420,6 +7425,7 @@ addr,name,mode,confidence,source,notes
 081D1150,SceneNpc_RequestRigAction,thumb,low,src-alias,Tentatively requests a rig action by setting the current NPC rig flag at offset 0x2C
 081D116C,SceneNpc_SetBehaviorFourFromScript,thumb,low,src-alias,Selects the named or current NPC and installs the animation behavior used by creation option i=4
 081D15C8,SceneNpc_OnTransitionEffectDestroy,thumb,low,src-alias,Transition effect task destructor removes its sprite and eight effect instances
+081D15EC,SceneEffect_InitParticleRing,thumb,low,src-alias,
 081D1688,SceneNpc_CreateTransitionEffect,thumb,low,src-alias,Creates and initializes the sprite and particle task used during the NPC transition sequence
 081D16CC,SceneNpc_DestroyTransitionEffect,thumb,low,src-alias,Kills the effect task created for the NPC transition sequence
 081D16D8,SceneNpc_IsTransitionEffectFinished,thumb,low,src-alias,Tentatively tests completion of the NPC transition effect by checking status 4
@@ -7444,6 +7450,7 @@ addr,name,mode,confidence,source,notes
 081D1DBC,TaggedSceneNpc_UpdateState17Animation,thumb,low,src-alias,State 17 handler that starts tagged animation 6 and marks completion when playback finishes
 081D1DF8,TaggedSceneNpc_UpdateState17AnimationA,thumb,low,src-alias,
 081D1E78,TaggedSceneNpc_UpdateJumpToTarget,thumb,low,src-alias,
+081D201C,TaggedSceneNpc_UpdateArcMove,thumb,low,src-alias,
 081D2118,SceneNpc_OscillatePaletteBlend,thumb,low,src-alias,
 081D227C,TaggedSceneNpc_UpdateState17AnimationB,thumb,low,src-alias,
 081D2544,SceneNpc_EnterRequestedState,thumb,low,src-alias,
