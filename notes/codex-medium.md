@@ -2532,3 +2532,79 @@ hinted exact source. Each function has a local Ratatosk_VerbNoun alias.
 Original INCLUDE_ASM remains the default for drafts and the two stopped
 functions. Combined ROM validation and name promotion remain with integration.
 The pre-existing local tools/cloud_task.py trial-runner edit was left alone.
+
+## 2026-10-20 — task 0807C72C, scene actor attachment responses
+
+Tags: #matching #scene-actors #attachments #nonmatching
+
+No exact matches; exact code progress gain is 0 percentage points. Three guarded
+NONMATCHING drafts were retained; default builds still use INCLUDE_ASM. No full
+build, network operation, name promotion, or shared-header edit was performed.
+
+- **0807C72C — drafted 86.9%, SceneActorAttachment_ReplaceResponseSlot.**
+  Replaces attachment kinds 0–3, or releases the requested kind for event 127.
+  Kind 0 creates the sprite slot, plays a category sound and may add a tagged
+  stimulus; kind 1 creates the value sprite if the manager/slot query allows it;
+  kind 2 creates a single part; kind 3 creates counted parts. Read constructors,
+  existing callers and SCENE_ACTOR_ATTACHMENT_RESPONSES.md. The final release
+  result is the argument to ActorAttachment_IsUnavailable; its actual s32 return
+  is narrowed to u8 at this call. Corrected that ABI explicitly in a follow-up
+  commit (the instructions and score are unchanged). The remaining reviewed
+  residue is 49 realigned instructions, 21 ignoring registers. A signed r5
+  kind local helps; pinning all arguments or factoring the entire switch hurts.
+  The register-pinning concession is marked. Non-release callers require
+  supported category/kind combinations because SelectOffsets intentionally
+  leaves unsupported outputs untouched; the earlier caller-proof gap documented
+  in the subsystem notes is still open. No invented fallback offsets were added.
+- **0807CA44 — drafted 85.5%, SceneActorAttachment_BeginReturnResponse.**
+  Sets destination5D4 from route450 and terrain height, tests the contact-node
+  object's position, and on failure tries the stored route point before
+  selecting callback228/state0/behavior2. First-target success starts response14
+  and the embedded behavior7 command with duration30. The contact-node position
+  needs two pointer dereferences, not one. A pointer-taking SetCoordinates inline
+  emits halfword stack stores; direct local assignments emitted word merges.
+  ArmCommand and constant-first flag inlines improved the draft. Group pointer
+  pinning to sb is marked as a concession. Remaining reviewed residue: 63
+  realigned instructions, 45 ignoring registers; pointer lifetimes, address and
+  zero-constant sharing still differ. No shared layout changes were needed.
+- **0807CDC4 — drafted 81.3%, SceneActorAttachment_FindReachableNeighbor.**
+  Accepts the input if terrain attributes maskC3 is clear and F204 accepts it.
+  Otherwise ranks right/down/left/up cell centers by signed, halfword-truncated
+  X/Z squared distance, stably sorts them, and returns the first accepted center.
+  Exhaustion writes X/Z=30000 and Y=0 without overwriting the fourth halfword.
+  Reused scene_actor_terrain.h inlines; neighbor centers use the low height
+  nibble without slope adjustment. The sum uses unsigned arithmetic to preserve
+  wrapping. Pinning the delta pointer to r8 helped; pinning the center to sl
+  hurt. Concession marked. Remaining reviewed residue: 104 realigned
+  instructions, 42 ignoring registers, chiefly vector address copies, cell
+  spilling and final loop pointer comparison. Requires a valid map stride and
+  backing storage for the queried neighbor cells.
+- **0807D2E0 — stopped below threshold, 70.4%.** Scratch candidate is
+  wip/codex-medium/sub_0807D2E0.c (untracked). Five consumed arguments, not six:
+  the positive terminal selector is the fifth stack operand. Modes0/1 position
+  the actor and mirror its drawable; mode2 either removes all health or subtracts
+  half, with multiplayer HUD/damage-display gating. Prefix emits three packed
+  effects when flags2D4 bit2000 is set. The candidate uses the exact sibling
+  MayCount/ReportDrain helpers from Ivy_UpdateHold. Remaining: 392 realigned
+  instructions, 222 structural. Attempts at reset factoring, mask inlines,
+  random-value inlines, and actor/group bindings did not improve the best pass.
+  Main issues are the random cursor's deferred stores, duplicated actor pointer,
+  reset-block addresses, and six particle calls' shared constants/table spills.
+  The original callback234 (not savedTarget22C) is used by the terminal path.
+- **0807DB34 — stopped below threshold, 62.0%.** Scratch candidate is
+  wip/codex-medium/sub_0807DB34.c (untracked). Releases an owned contact node,
+  starts response14, then resolves a route/target cell or directly tries the
+  stored destination. The substantial same-cell/reroute sequence is already
+  represented by Chase_Arrive in scene_actor_chase.h; this is a better starting
+  point than reproducing it from raw casts. Reusing it improved the initial
+  45.7% pass. Remaining: 420 realigned instructions, 189 structural. Actor/flags
+  and group bindings regressed. The fallback callback currently lays out early
+  rather than at the ROM's common tail; state constants and nested turn-response
+  pointer lifetimes also differ. Leave its assembly path intact.
+
+All retained drafts passed compilation and full reviewed-extent scoring with
+`build/venv/bin/python tools/check.py FILE --nonmatching --record`. Their local
+SceneActorAttachment_VerbNoun aliases are provisional descriptions of the
+observed effects. Raw candidate-length scores were lower than full-extent scores
+when the candidate was shorter; use the reviewed figures above when resuming.
+`git diff --check` was clean. Commits were queued through build/commit.sh.
