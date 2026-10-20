@@ -1,8 +1,6 @@
 #include "global.h"
+#define SpriteOam_QueueProjectedSprites sub_08217F4C
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 91.0%
-// Remaining differences: projection temporaries, signed comparisons, and register lifetimes.
 struct Vec {
     s16 x, y, z;
 };
@@ -36,34 +34,18 @@ extern struct Matrix gUnk_03004310[];
 extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
 extern u8 gUnk_03005230;
 extern u16 gUnk_03004790[], gUnk_03005418[];
-extern struct Vec gUnk_030042A0;
+static inline s32 UnsignedScale(u8 v)
+{
+    return v;
+}
 static inline s32 project(s32 input)
 {
     s32 v = input * 3;
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-static inline s32 divide8(s32 input)
-{
-    return input >= 0 ? input >> 3 : -((-input) >> 3);
-}
 static inline s32 divide2(s32 input)
 {
     return input >= 0 ? input >> 1 : -((-input) >> 1);
-}
-static inline void screen(struct Vec *dst, struct Vec *src)
-{
-    register struct Vec *out asm("r5") = dst;
-    register struct Vec *in asm("r6") = src;
-    s32 depth, height, y, z;
-    s32 sx = in->x, sz = in->z;
-    out->x = project(sx - sz);
-    depth = project(sx + sz);
-    height = project(in->y);
-    y = depth - height;
-    z = depth + height;
-    out->x = out->x - gUnk_03005418[0] + 120;
-    out->y = y - gUnk_03005418[1] + 80;
-    out->z = z - gUnk_03005418[2];
 }
 void SpriteOam_QueueProjectedSprites(void)
 {
@@ -85,11 +67,25 @@ void SpriteOam_QueueProjectedSprites(void)
         register u32 attr asm("r5");
         s32 depth;
         register s32 ox asm("r12"), oy asm("r8");
-        if (p->flags & skip)
+        u32 initialFlags = p->flags;
+        if (initialFlags & skip)
             goto next;
 
-        if (!(p->flags & 16)) {
-            screen(&pos, &p->pos);
+        if (!(initialFlags & 16)) {
+            {
+                register struct Vec *out asm("r5") = &pos;
+                register struct Vec *in asm("r6") = &p->pos;
+                s32 depth, height, y, z;
+                s32 sx = p->pos.x, sz = in->z;
+                out->x = project(sx - sz);
+                depth = project(sx + sz);
+                height = project(in->y);
+                y = depth - height;
+                z = depth + height;
+                out->x = out->x - gUnk_03005418[0] + 120;
+                out->y = y - gUnk_03005418[1] + 80;
+                out->z = z - gUnk_03005418[2];
+            }
             x = pos.x;
             y = pos.y;
             z = pos.z;
@@ -98,27 +94,35 @@ void SpriteOam_QueueProjectedSprites(void)
             y = p->pos.y;
             z = p->pos.z;
         }
-        flags = p->flags;
-        ox = p->offsetX;
-        oy = p->offsetY;
-        if (!(flags & 64)) {
-            u32 width = p->width, height = p->height;
-            s32 left = x + ox, top = y + oy;
-            if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
-                goto next;
+        {
+            register u32 loaded asm("r1") = p->flags;
+            u32 cull = loaded & 64;
+            flags = loaded;
+            ox = p->offsetX;
+            oy = p->offsetY;
+            if (!cull) {
+                u32 width = p->width, height = p->height;
+                s32 left = x + ox, top = y + oy;
+                if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
+                    goto next;
+            }
         }
         x += ox;
         y += oy;
         depth = z;
         x &= 511;
-        attr = p->attributes | (x << 16);
+        {
+            register u32 shifted asm("r0") = x << 16;
+            attr = p->attributes | shifted;
+        }
         y &= 255;
         attr |= y;
         if (flags & 2) {
             u32 matrix;
             u32 angle;
             s32 sx, sy;
-            if (!(flags & 0x20000) && ((s32)p->scaleX > 60 || (s32)p->scaleY > 60 || p->angle != 0))
+            if (!(flags & 0x20000) &&
+                (UnsignedScale(p->scaleX) > 60 || UnsignedScale(p->scaleY) > 60 || p->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
@@ -168,8 +172,9 @@ void SpriteOam_QueueProjectedSprites(void)
                 depth = -128;
             else if (depth > 127)
                 depth = 127;
+            tile = p->tile;
             priority = p->priority;
-            tile = p->tile | (priority << 10) | (p->palette << 12);
+            tile = tile | (priority << 10) | (p->palette << 12);
             n = gUnk_0300479C;
             if (n > 127)
                 goto next;
@@ -183,7 +188,3 @@ void SpriteOam_QueueProjectedSprites(void)
         p = p->next;
     } while (p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueProjectedSprites);
-#endif
