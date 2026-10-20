@@ -27,10 +27,13 @@ void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
     tertiaryPos[2] = 0;
     tertiaryPos[3] = 0;
     for (i = 0; i <= 2; i++) {
-        sub_0821983C(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60, primaryPos);
-        sub_0821983C(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60, secondaryPos);
+        sub_0821983C(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60,
+                     primaryPos);
+        sub_0821983C(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60,
+                     secondaryPos);
         tertiaryPos[1] = 0x88 - i * 0x18;
-        sub_0821983C(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60, tertiaryPos);
+        sub_0821983C(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60,
+                     tertiaryPos);
     }
 #define EXTRA(widget, frame, X)                                                                    \
     pos[0] = X;                                                                                    \

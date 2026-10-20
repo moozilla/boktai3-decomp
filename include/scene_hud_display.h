@@ -102,10 +102,10 @@ struct SceneHudState {
     u8 actionCueInitialized, actionCueSuppressed; /* 0xB00 */
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
     u8 unknownB04[0x16C];
-    u8 primaryVisible;    /* 0xC70 */
-    u8 primarySlideTimer; /* 0xC71: remaining three-pixel slide steps */
-    s8 primarySelection;  /* 0xC72 */
-    u8 primaryBlinkTimer; /* 0xC73: 60-frame icon blink */
+    u8 primaryVisible;           /* 0xC70 */
+    u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
+    s8 primarySelection;         /* 0xC72 */
+    u8 primaryBlinkTimer;        /* 0xC73: 60-frame icon blink */
     s16 *primarySelectionOutput; /* 0xC74 */
     struct SceneHudPrimaryOption primaryOptions[3];
     u8 unknownC84[4];
