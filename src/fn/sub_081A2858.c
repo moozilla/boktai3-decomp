@@ -1,5 +1,6 @@
 #include "global.h"
 
+// confidence=low: synchronizes colliders, shadow, sound latch and camera flags.
 #define Hresvelgr_UpdateCollisionPresentation sub_081A2858
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: synchronizes colliders, shadow, sound latch and camera flags.
@@ -98,7 +99,7 @@ static inline void SetSequence(struct Actor *p, u16 sequence, void *data)
 }
 // Remaining differences: branch layout, collider flag insertion, and temporary lifetimes.
 #ifdef NONMATCHING
-// fuzzy: 86.3%
+// fuzzy: 91.3%
 void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
 {
     struct Actor *p2 = p;
@@ -112,19 +113,19 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         p->invulnA--;
     }
     {
-    u16 invuln = p->invulnB;
-    flags = &p->flags;
-    if (invuln) {
-        p->invulnB--;
-        if ((p->invulnB >> 2) & 1) {
-            u32 mask = 16;
-            *flags |= mask;
+        u16 invuln = p->invulnB;
+        flags = &p->flags;
+        if (invuln) {
+            p->invulnB--;
+            if ((p->invulnB >> 2) & 1) {
+                u32 mask = 16;
+                *flags |= mask;
+            }
+            {
+                u32 mask = 4;
+                *flags |= mask;
+            }
         }
-        {
-            u32 mask = 4;
-            *flags |= mask;
-        }
-    }
     }
     c = p->attacks;
     if (test(&*flags, 4)) {
@@ -213,5 +214,5 @@ cameraDone:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateCollisionPresentation);
+INCLUDE_ASM("asm/nonmatching", sub_081A2858);
 #endif
