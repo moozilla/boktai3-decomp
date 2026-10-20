@@ -289,3 +289,104 @@ artifacts stay under ignored `wip/` and `build/` paths.
 
 Final caller-label audit confirmed the installer of 080BBDD0 is `Skeleton_Init`;
 corrected the tentative alias's evidence comment accordingly (comment-only).
+
+# Codex high: task 080C6F58 (2026-10-20)
+
+Tags: #matching #golem #terrain #register-pinning
+
+Branch: `cloud/080C6F58`. Worked solo and offline, using the worktree Python
+and fast per-file checks only. No make, full build, network actions, or direct
+Git mutations. All commits used `build/commit.sh`. The existing driver edit in
+`tools/cloud_task.py` was left untouched. Read existing guarded drafts, callers,
+callees, Golem initialization and behavior tables before naming the functions.
+
+The two exact matches cover **12.89% of this task (+12.89 percentage points;
+1,780 of 13,812 reviewed body/pool bytes)**, all in the Register-pinned category.
+The four drafts add no exact coverage. Shared totals were not regenerated.
+
+- **080C6F58 matched**, `Golem_UpdateChargeWindup`, reviewed extent 772 bytes.
+  Installed by Golem_ChargeOrApproach (080CDF14) and Golem_ChargeOrReturnHome
+  (080CEDF0) as control kind 0x28. Resets the animation-completion byte and
+  context halfword at 0x634, selects animation eight, emits randomized dust
+  every fourth frame, and ramps stored speed by sixteen while it is at most
+  383. The original uses the cosine term for both particle X and Z; this
+  unusual behavior is preserved. Starting from the recoil animation expansion
+  gave a complete 90.5% candidate. Integer RAM-table references via the existing
+  RANDOM_TABLE_ADDR macro restored separate literal loads. Keeping the flags
+  pointer in a short-lived low-register local before retaining it across the
+  particle call recovered the original copy order. A low-register flags-load
+  temporary also forces the original duration-scale offset reload. The last
+  six differences disappeared when the original unused 0x0403B714 literal's
+  lifetime extended through the velocity calculation; it is never dereferenced.
+  `depin.py --write` reduced thirteen compiler hints to four. Formatted and
+  accepted by `check.py --target-size 772` with zero differing bytes.
+- **080C75B8 matched**, `Golem_UpdateRecoil`, reviewed extent 1,008 bytes.
+  Installed by the neighboring Golem reaction behavior (080CECA4). Selects
+  animation eight, decays stored recoil speed by a category-dependent amount,
+  converges on the saved position along the selected axis, then waits eight
+  frames and flags completion. Existing candidate checked at 90.1%. Explicit
+  read-before-pointer-copy ordering for the duration-scale fallback recovers
+  a missing pointer copy; an empty actor constraint preserves the ROM's scale
+  reload. A short-lived initial flags pointer, a separate animation zero,
+  and operand order on the flag OR recover the other lifetimes. Temporary
+  pins and constraints reached equality, then `depin.py --write` left only
+  three hints (two register declarations and the empty actor constraint).
+  Formatted and accepted over all 1,008 bytes with zero differing bytes.
+- **080C8774 drafted 95.8%**, `Golem_ResumeBehaviorAfterDisplacement`, reviewed
+  extent 4,304 bytes; candidate 4,296 bytes. Golem initialization installs this
+  displacement-recovery callback. Converges saved X/Z displacement in clamped
+  quarter steps, then resumes a completion callback or chase/route behavior.
+  The retained candidate already had the strongest shared arrival expansion.
+  Added a descriptive alias, current score and mismatch comment. Remaining
+  realigned differences: **73 total / 12 structural**, concentrated in the two
+  random-direction loops and PRE stack slots. Tested RNG argument orders,
+  explicit retry exits, mask widths, integer RAM references and scoped pins;
+  none improved the structural count. `rtlprobe.py loop` confirmed four
+  hoisted constants per loop. A diagnostic forced-GCSE-table sweep over
+  701..901 never improved the twelve structural differences; compiler knobs
+  are diagnostic only and are not part of the retained source.
+- **080CCD7C drafted 80.4%**, `Golem_UpdateChargePursuit`, reviewed extent
+  4,504 bytes; candidate 4,508 bytes. Entry in Golem's behavior table at
+  gUnk_0860613C. Follows/retargets the charge heading, drains stamina when
+  turning or recovering, and falls back to shared chase/route recovery.
+  Existing candidate started at 79.3%, 574 total / 167 structural differences.
+  Keeping separate charge stores in the single-player and multiplayer branches
+  recovers the original branch layout; one outer shared store had deleted
+  important duplicated code. A command helper taking payload, kind, then
+  duration recovers the load order of both delayed-recovery packets. Final
+  differences: **539 total / 141 structural**. Remaining work concerns the
+  repeated turn/control-reset expansions and shared flag/pointer lifetimes.
+  Slot-index, signed bitfield, success-first routing and broader pin variants
+  did not improve the selected candidate. No register hints remain here.
+- **080CE188 drafted 90.3%**, `Golem_ResumeRouteAfterControl`, reviewed extent
+  2,364 bytes; candidate 2,368 bytes. Another gUnk_0860613C behavior entry.
+  After control completion, sets a delayed recovery packet, translates route
+  bounds, then chooses nearest-participant chase or the saved route point.
+  Porting the compatible shared helpers from 080C8774 raised the original
+  78.0% draft to 89.4%; ordering command-helper arguments as payload/kind/
+  duration reached 90.3%. Final differences: **114 total / 34 structural**.
+  Outer group-pointer allocation, the RNG loop and flag-reset lifetimes still
+  differ. Pinning the whole group pointer regressed and was discarded.
+- **080C725C drafted 89.1%**, `Golem_UpdateSlideImpact`, reviewed extent
+  860 bytes; candidate 864 bytes. Golem_BeginSlideState (080CEB48) installs
+  it as kind 0x29 with speed 0x200. Pushes along the stored heading, emits
+  dust every fourth frame, and resolves an impact into completion or defeat.
+  Existing draft started at 68.2%. Independent extent RNG calls, the existing
+  RAM-table macro and the original unused 0x0403B714 literal reached 76.4%.
+  A final **u16 to u32 return-width change in NextRandom** raised that to
+  89.1%, reducing 109 total / 28 structural differences to **54 / 23**.
+  The wider inline result removes narrowing that distorts register allocation
+  around packed extent stores. Attempts to pin the extent table, hold its
+  halfword-preservation mask, or cache all three RNG draws together regressed.
+  Retained the wider-result candidate with the register-pinning concession
+  marker; remaining differences concern motion-pointer copies, RNG allocation
+  and completion/control-reset offsets.
+
+Both matches and all four guarded drafts have file-local descriptive aliases
+with tentative naming evidence. The drafts retain their INCLUDE_ASM alternatives
+and scores recorded by `check.py --nonmatching --record`. Each of the four
+normal assembly paths also passed a full-extent fast check. No handwritten
+instruction bodies or generated assembly were committed. Each function has a
+separate commit; full combined-ROM validation remains with the batch integrator.
+Scratch candidates and diagnostic artifacts remain under ignored `wip/` and
+`build/` directories. This notes update is committed last.
