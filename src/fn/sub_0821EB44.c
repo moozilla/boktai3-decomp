@@ -1,7 +1,5 @@
 #include "terrain_cell_probe.h"
 
-#define Path_SnapToFarthestPoint sub_0821EB44
-
 u8 *Path_GetDefinition(u32 id);
 s32 Path_GetPointData(u8 *def);
 void Path_GetPointPosition(struct Pos16 *out, s32 data, u32 index);

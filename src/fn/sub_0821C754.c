@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Terrain_SampleSurface sub_0821C754
-
 struct Pos16 {
     u16 x, y, z, w;
 };

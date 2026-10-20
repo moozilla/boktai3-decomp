@@ -2,8 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91%
 
-#define Path_SnapToRandomPointInBox sub_0821EF30
-
 extern const u16 gUnk_0203B400[];
 
 u8 *Path_GetDefinition(u32 id);
@@ -65,5 +63,5 @@ s32 Path_SnapToRandomPointInBox(struct Pos16 *out, struct Pos16 *lo, struct Pos1
     return best;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821EF30);
+INCLUDE_ASM("asm/nonmatching", Path_SnapToRandomPointInBox);
 #endif

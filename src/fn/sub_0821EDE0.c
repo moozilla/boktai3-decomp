@@ -1,7 +1,5 @@
 #include "terrain_cell_probe.h"
 
-#define Path_SnapToRandomFarPoint sub_0821EDE0
-
 extern const u16 gUnk_0203B400[];
 
 u8 *Path_GetDefinition(u32 id);
