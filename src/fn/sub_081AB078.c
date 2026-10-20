@@ -1,12 +1,7 @@
 #include "global.h"
+#define Vanargand_UpdatePaletteLeap sub_081AB078
 // confidence=low: palette transition accompanies the leap motion track.
-#ifdef NONMATCHING
-// fuzzy: 93.0%
-// Vanargand palette-fade leap: per variant copies a palette bank and fade table, interpolates two
-// highlight colours by the transition step (t * delta * 256 / 3, rounded >> 8), then rides the
-// leap motion track. Differs only in allocation: the ROM keeps the frame argument in sl and
-// the animation pointer in sb, and reloads the palette address for the second colour (mine
-// keeps it from the first through GCSE; pinning frame/animation makes it spill instead).
+// MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
     u16 state;
@@ -77,6 +72,7 @@ void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
 extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
+#define VANARGAND_PALETTE_ADDR 0x03004FC0 /* gUnk_03004FC0 */
 
 static inline s32 Scale8(s32 n)
 {
@@ -115,9 +111,13 @@ static inline s32 Scale8(s32 n)
 
 void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
 {
+    register s32 savedFrame asm("sl") = frame;
     struct Vanargand *self = p;
-    u8 *animation = p->animation;
+    register u8 *animation asm("sb");
     s16 first[4];
+    asm("" : "+r"(self) : "r"(savedFrame));
+    animation = p->animation;
+    asm("" : : "r"(animation));
     {
         u32 mask = 4;
         p->flags |= mask;
@@ -133,7 +133,7 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
             case 0x6F: {
                 s32 t;
                 s32 r, g, b;
-                u16 color;
+
                 CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x04000020);
                 CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
                 t = p->transition;
@@ -142,8 +142,8 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 LERP(b, t, 0, 0x13, b1)
                 r |= g << 5;
                 r |= b << 10;
-                color = r;
                 {
+                    u16 color = r;
                     u16 *pal = gUnk_03004FC0;
                     pal[0x56 / 2] = color;
                     pal[0x10C / 2] = color;
@@ -153,9 +153,13 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 LERP(b, t, 0, 0x1F, b2)
                 r |= g << 5;
                 r |= b << 10;
-                color = r;
                 {
-                    u16 *pal = gUnk_03004FC0;
+                    register u16 *pal asm("r1");
+                    register u32 color asm("r0") = (u16)r;
+                    asm("" : : "r"(color));
+                    // Keep the second palette address independently rematerializable.
+                    pal = (u16 *)VANARGAND_PALETTE_ADDR;
+                    asm("" : : "r"(pal), "r"(color));
                     pal[0x5A / 2] = color;
                     pal[0x10E / 2] = color;
                 }
@@ -187,7 +191,7 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
         PairedSceneActor_ApplyToSelectedHalves(self->attachment, 3, 0x16);
     }
     MotionTrack_Update(self->track);
-    if (complete(self) && frame > 0x3C) {
+    if (complete(self) && savedFrame > 0x3C) {
         {
             struct VanargandPart *part = &self->part;
             part->state = 7;
@@ -202,6 +206,3 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
         p->flags |= mask;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteLeap);
-#endif
