@@ -2532,3 +2532,1135 @@ hinted exact source. Each function has a local Ratatosk_VerbNoun alias.
 Original INCLUDE_ASM remains the default for drafts and the two stopped
 functions. Combined ROM validation and name promotion remain with integration.
 The pre-existing local tools/cloud_task.py trial-runner edit was left alone.
+
+# Task 081A14FC — Codex medium, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool #nonmatching #register-pinning
+
+Worked solo, offline on the preclaimed cloud/081A14FC branch. Exact code gain:
+**+0.0000 percentage points**. Four inherited guarded drafts retained, two
+improved substantially. Only per-function check.py validation; no make, full
+build, network, shared documentation/index edits or generated-assembly commits.
+
+- **081A5614 — retained draft 80.7%, Vanargand_UpdatePaletteTransition.**
+  Read BIG_FUNCTIONS, condensed assembly and the matched palette-restoration
+  relative 081ACC24. Baseline remains 299 realigned differences / 82 ignoring
+  registers, candidate 2848 versus reviewed 2800-byte target. A shared-result
+  interpolation form with frame-first multiplication regressed to 67.2%
+  (545 / 249); restored the inherited interpolation. Blend argument address
+  scheduling, interpolation register/spill placement and shared tails remain.
+  Added the exact local alias for the already established symbol name.
+- **081A14FC — stopped unmatched after complete static assembly/relative
+  review; no production draft.** Tentative Hresvelgr_UpdateDefeatSequence.
+  Five states gate the first event script on animation phase/player action,
+  accelerate eight movement stages, emit randomized effects, bounce against
+  terrain, set event flags 0/3/0x4E, run the second event script and complete.
+  The matched movement/terrain relative covers only 7% of the body. Repeated
+  precomputation of damage/flag field addresses across switch edges remains
+  the known source-shape obstacle; no new concrete solution emerged. Did not
+  recreate the earlier below-threshold candidate or claim draft credit.
+- **081A1EFC — stopped below draft threshold, best complete candidate 47.0%.**
+  Tentative Hresvelgr_ApplyPendingDamage. Consumes damage and effect requests,
+  selects the active collider hit flags, suppresses optional effects for bit
+  0x40, applies periodic environmental damage from player +0x876 times five,
+  flashes collision presentation and emits damage numbers. Action 16 uses
+  accumulated damage/flags to choose reaction or action 33; action 33 permits
+  three repeated reactions. Other actions test the signed threshold at
+  +0x374, optionally emit sparks/two randomized motion effects, then request
+  reaction or play the hit sound. Candidate 1092 versus reviewed 1148 bytes,
+  388 realigned differences / 178 ignoring registers. Corrected the threshold
+  layout and signed modulo type while drafting. Packed stack-vector writes,
+  owner aliases, shared flag tails and RNG allocation remain. Explicit owner
+  constraints and narrower bitfield variants regressed (46.2–46.3%); restored
+  the ordinary 47.0% candidate at ignored wip/sub_081A1EFC.c. No production C.
+- **081A39E0 — improved draft to 96.2%, EffectPool_UpdateEntry.** Revalidated
+  inherited C at 91.1% despite its older 88.3% comment. Keeping the homing
+  interval's loaded value separate from the r1 store temporary, comparing
+  the loaded value, constraining animation/trail loads, making the collider
+  zero explicit and returning the frame through a u32 accessor reduced
+  37 / 4 realigned differences to **15 / 0**. Candidate and target 800 bytes.
+  Remaining register choices: commutative sine-table address addition, the
+  second animation mask tie, the timer narrowing literal and trail-count/
+  frame/RNG pointer setup. Mask-copy and pointer-constraint variants regressed.
+  A bounded permuter attempt could not start because its split dependency
+  rejects the unrelated Ghoul_ResumePendingRoute start; no search result used.
+- **081A2858 — improved draft 91.3% to 98.3%,
+  Hresvelgr_UpdateCollisionPresentation.** Compute reset-field pointers in
+  each collider branch, derive sequence-data pointers inside the inline from
+  an offset, and type the render-position vector. Crucially corrected both
+  sway writes from the inherited +0x376 field to render-position Y at +0x1B6,
+  as observed in assembly. This is a behavioral correction as well as an
+  addressing improvement. Candidate and reviewed target remain 868 bytes;
+  residue is **10 realigned differences / 8 ignoring registers**, comprising
+  loop-index initialization scheduling and camera flag mask/load allocation.
+  Four additional mask/index/accessor variants regressed; retained best.
+- **081A2430 — retained draft 87.5%, Hresvelgr_DispatchSceneMessages.**
+  Reviewed the pending-trigger loop and action/animation consumers. Reordered
+  pending-array arithmetic reduced structural count from 25 to 24 but worsened
+  total from 51 to 54 and score to 86.6%; restored original. Candidate/target
+  680 bytes, 51 / 25 remaining differences in trigger indexing and shared
+  zero/one action constants. Added local aliases, including the renamed
+  rising-projectile callback needed by the cached ELF.
+
+All four retained units have required file-local aliases and were formatted
+with build/venv/bin/clang-format. Scores recorded after formatting using
+check.py --nonmatching --record against reviewed extents. All four default
+assembly fallbacks checked byte-identically; EffectPool_UpdateEntry retains
+its existing named INCLUDE_ASM because only that generated filename exists.
+The other three use the existing numeric assembly filenames. depin was run
+on unguarded scratch copies and correctly declined to minimize non-exact C;
+concession markers remain. One driver commit queued per draft, with this
+notes commit last. Combined ROM validation and name promotion are deferred
+to integration.
+
+
+## Task 081A9910 — 2026-10-20
+
+Tags: #matching #vanargand #paired-scene-actor #register-pinning
+
+Worked solo and offline on the preclaimed cloud/081A9910 branch. Inspected the
+largest targets first, read BIG_FUNCTIONS.md and prior attempts, and used only
+per-file checks. Exact task instruction coverage gained **13.9 percentage
+points** (465 of the assigned 3335 instructions); project-wide accounting is
+left to batch integration. Exact sources total 1172 bytes, both in the
+Register-pinned category.
+
+- **081ABA64 — stopped unmatched.** Re-read opening assembly, the condensed
+  eleven-phase listing and relatives. The 37% relative coverage is chiefly
+  packed-animation expansion; it does not supply the track/contact phase
+  machine. Existing notes identify the local far-branch labels correctly.
+  No complete close candidate or new structural hypothesis emerged; left
+  assembly in use.
+- **081AA788 — stopped below threshold.** Resumed the scratch sweeping-projectile
+  attack at 75.4% (225 realigned differences, 99 ignoring registers). Pinning
+  the scale helper's second input in r8 and independently forming each
+  auxiliary-animation address from owner+0x444 reduced structural differences
+  to 88, total still 225; latest score 75.6%. Explicit projectile RNG table/mask
+  bindings and a barrier separating angle subtraction regressed, so discarded.
+  Remaining: stack slots, timer-pointer lifetime, randomized-projectile argument
+  allocation and phase-reset tails. Latest full candidate remains only in
+  ignored wip/sub_081AA788.c; no production draft below 80%.
+- **081A9910 — matched, Vanargand_UpdateSynchronizedPairAttack.** New readable
+  C matches the full reviewed 676-byte extent. Commands 3/4/5 run both halves
+  through repeated synchronized attacks, with positive-counter checks selecting
+  motion parameters at +0x588 or +0x586. Two halves in state 5 set +0xF3C to 60;
+  after three repetitions, selected halves receive recovery command 6, and
+  motion parameter +0x584 is restored. Local mask variables reproduce constant
+  load order. Explicit next/zero locals recover shared transition tails. Fixed
+  r4/r5 status locals solve the pair-status register swap. depin removed the
+  unnecessary owner constraint; two bindings remain. Name is tentative.
+- **081A9BB4 — drafted 98.5%, Vanargand_UpdateFacingPairAttack.** New full
+  552-byte candidate starts pair command 7, randomly chooses command 11 (one
+  in four) or 8, and uses facing plus the active-half mask to select a half.
+  Stores its index at +0x5B6; completion restores parameter +0x584. A u8 facing
+  predicate reproduces the materialized boolean. Compute random bits before
+  setting the default command to reproduce the conditional layout. Four
+  differing instructions, zero ignoring registers: RNG table literal uses r1
+  instead of r2; pair-slot offset uses r2 instead of r0. Scoped constraints,
+  address-expression variants and declaration swaps did not improve the clean
+  candidate. Recorded score and verified default INCLUDE_ASM fallback exact.
+- **081A9F88 — matched, Vanargand_UpdateChargedPairAttack.** Improved the
+  retained 92.8% draft to exact across its reviewed 496-byte extent. An owner
+  constraint after the halves-finished call prevents PRE retaining pair-slot
+  address in r4 across that call; scoped r4/r5 status bindings recover both
+  loads and comparisons. A zero constraint gives the separate phase-zero reset.
+  depin reduced four hints to three. Removed guard, formatted and rechecked.
+- **081AA178 — retained draft 99.5%, Vanargand_UpdateRepeatedPairAttack.**
+  Added the required file-local alias and raw-address fallback so the fast
+  checker resolves it against this checkout's ELF. One byte/instruction still
+  differs: phase-zero timer reset uses r7 rather than r5, both zero. Phase
+  output constraints, fixed phase/zero bindings and a fixed timer pointer
+  regressed allocation; restored the best source. Score re-recorded against
+  the full 440-byte extent; default fallback checked exact.
+
+Per-function sources were committed through build/commit.sh. No full build,
+network action, generated assembly, ROM or emulator output was committed.
+Combined ROM verification and name promotion remain for the integrator.
+
+
+## Task 081DB794 — 2026-10-20
+
+Tags: #matching #options #menu #scene-actors #register-pinning
+
+Worked solo and offline on the preclaimed branch. Exact task instruction
+coverage gained **33.0 percentage points** (1030 of the assigned 3122 instructions);
+project totals remain for integration. One new exact function, 2612 bytes,
+in the Register-pinned category. Resumed existing guarded candidates, largest
+first, using BIG_FUNCTIONS, anchored comparisons and hypothesis-driven variant
+batches. No full build, make, network or direct git mutations.
+
+- **081EAB64 — matched, Params3D0_UpdateDisplay**, from inherited 91.0%.
+  Creator 081EB7DC installs this menu callback and TimeDisplay callees establish
+  the display family. Expanding the two palette-helper call sites into their
+  case bodies preserves the shift-field address across interpolation and its
+  following threshold check; 125 / 31 realigned differences became 61 / 19.
+  Constraining palette sources to r2 and temporarily constraining slide Y and
+  reset values recovered the remaining allocation. Two inherited field errors
+  were corrected against assembly: case 6 increments idleTimer at +0x73C, and
+  case 13 compares counter at +0x734 against the fade duration, rather than
+  timer at +0x754. Case 13 still increments counter. depin reduced twelve hints
+  to two source-pointer bindings, removing all empty barriers and the temporary
+  slide/reset pins. Formatted C passes the explicit full **2612-byte** check.
+- **081EE518 — drafted 91.4%, SceneActors_UpdateHitSensitiveDeparture**,
+  from 90.5%. Installer 081EF29C and hit consumer 081F029C establish a departure
+  action whose hit callback halves its speed. Replaced the ordinal name with
+  this tentative behavior name, through a file-local alias only. Computing
+  the second drawable after Anim_SetSequence, using the low context for its
+  state pointer, and sharing entry zero reduce 75 / 20 differences to 66 / 11.
+  Residue includes the pinned r7 base's missing prologue save, second decoder
+  command/mask allocation and phase-transition address derivation. Unpinning
+  the outer locals fixes save structure but drops to 86.1% (99 / 9); retained
+  the stronger guarded candidate. Empty r7 clobber and late base barriers did
+  not fix its save. This draft is not ABI-validated executable C.
+- **081EE130 — drafted 99.4%, SceneActors_UpdatePeriodicEffectAction**,
+  from inherited 90.4%. Moving RNG masking outside the table-reader inline,
+  constructing the initial mask after its destination, and retaining the entry
+  pointer remove scheduling differences. Keeping the first decoder mask in r9
+  avoids an extra copy; simultaneous fixed flip operands recover both reverse
+  flag updates. Remaining **3 realigned differences / 0 ignoring registers**:
+  the +0x598 reset's address constant is in r3 instead of r1. Offset/pointer
+  bindings, a clobber and natural decoder temporaries did not improve it.
+  Candidate matches the reviewed 1000-byte length; assembly stays active.
+- **081EEAD8 — drafted 94.4%, SceneActors_UpdatePaletteDispersal**, from
+  87.0%. Sharing the entry zero in r3 and setting the palette-loop index before
+  its source/destination pointers reduce 63 / 27 differences to 29 / 18.
+  Remaining palette destination setup is too early, and the particle-loop
+  counter/stack-vector setup order differs. Source-pointer barriers and inline
+  argument reordering regress substantially; retained the stronger candidate.
+- **081EDB74 — drafted 96.1%, SceneActors_UpdateLeftDeparture**, from
+  inherited 85.0% in this checkout. Reused the matched 081ED5F4 drawable layout,
+  initialization and playback decoder, removing separate duplicated decoders
+  and the hard r7 base binding. Preparing the destroy callback before its field
+  address improves the departure tail. Remaining **16 / 8** differences include
+  time spilled to the stack, context allocation, decoder literal scheduling and
+  callback setup. A time pin and context constraints did not improve it.
+- **081DB794 — drafted 85.1%, Options_InitScreen**, from 82.4%. Binding the
+  relocated graphics pointer to r4 reduces 53 / 22 differences to 43 / 22.
+  Sprite/resource lifetimes, text-rectangle setup and a redundant palette-source
+  reload remain. Distinct sprite variables, resource-barrier removal, bitfield
+  rectangles and explicit palette-source caching did not improve the retained
+  candidate.
+
+All five drafts retain NONMATCHING guards, raw-address INCLUDE_ASM fallbacks,
+required descriptive aliases and concession markers. Formatted and recorded
+with check.py --nonmatching --record; default assembly alternatives also check
+exact. depin was run on unguarded scratch copies and correctly skipped the
+non-exact candidates, so no draft hint-minimality claim is made. Per-function
+commits and this notes commit use build/commit.sh. Combined ROM validation and
+name promotion remain with the integrator; assembly fallback checks earn no
+exact coverage.
+
+# Codex medium: task 081B03C0 (2026-10-20)
+
+Tags: #matching #actor-status #vanargand #register-pinning
+
+Worked solo on the already checked-out `cloud/081B03C0`, offline. All six
+functions had committed NONMATCHING starting points. Retained their names from
+symbols/functions.csv and added the required file-local aliases. The caller
+PairedSceneActor_UpdateHalves (081B5D8C) dispatches these through the part-state
+callback table at 086120A0. Names remain tentative; these are paired scene-part
+motion states with player-position requests, not evidence of a universal actor
+layout. No shared headers or symbols were changed.
+
+Exact code progress: **0.0% of this task (+0.0 percentage points)**. All six
+results remain guarded drafts. Reviewed extents include each function's body,
+literal pools and alignment: 081B03C0 1272, 081B08B8 1660, 081B0F34 600,
+081B1334 1428, 081B18C8 712, 081B1B90 660 bytes. No new exact or Register-pinned
+exact bytes are claimed.
+
+- **081B08B8 drafted 99.8%**, up from 91.3%. Realigned 2 differing instructions,
+  0 ignoring registers; candidate 1660 bytes, just two bytes differ. ROM uses
+  r1 for the zero-offset scratch of the signed player X load at 081B0B20;
+  candidate uses r3. One function-scope enter pointer recovers the shared
+  completion tail. Set transition values before forming destination pointers;
+  retain the state-one zero for the player-position call. Widen SetVector's
+  scalar arguments to s32 to avoid opaque-zero narrowing. Reversing X/Z add
+  operands matches the inlined vector sum. Explicit resource-before-options
+  and timer-offset constraints recover instruction ordering. Declaration
+  swaps, player/distance pins, opaque indexing and extra zero lifetimes did not
+  solve the final scratch register. The guarded version is retained.
+- **081B1334 drafted 96.1%**, up from 86.0%. Realigned 32 / 3 ignoring registers;
+  candidate 1424 bytes. Ported the related approach's entry/value lifetimes.
+  Forming the switch state address with an opaque offset avoids retaining the
+  state pointer in an extra high register, reducing 60 differences to 32.
+  Remaining differences concern reset/transition pointer registers, guarded
+  action-transition address reuse, and final entry/finished stores. Making
+  only the state value opaque or volatile did not fix the hoisting.
+- **081B03C0 drafted 88.6%**, up from 86.2%. Realigned 97 / 55 ignoring registers;
+  candidate 1308 bytes. Pinning frameWeight's loaded value to r1 improves the
+  existing packed playback without changing behavior. Replacing the playback
+  wholesale with the matched release sibling or pinning its owner base made
+  allocation worse; those attempts were discarded. Request-call setup,
+  phase-entry tails and packed-playback allocation remain unresolved.
+- **081B18C8 drafted 87.0%**, up from 80.3%. Realigned 50 / 17 ignoring registers;
+  candidate 724 bytes. Explicit entry reads before deriving the motion pointer,
+  shared zero values, function-scope entry pointer, and an isolated switch-state
+  address improve the shape. Case one reuses currentState (one) in its entry
+  store. The ROM derives 512 from the live 0x16F offset; our vector initialization
+  still materializes it independently. Entry-pointer allocation, vector-copy
+  ordering and transition constants remain.
+- **081B1B90 drafted 90.4%**, up from 84.5%. Realigned 35 / 11 ignoring registers;
+  candidate 656 bytes. A shared entry pointer in r8 preserves the state in r7;
+  the playback helper must use its dynamic `one` parameter directly rather
+  than first copying it to r3. Share the entry-clear zero with animation
+  options. Remaining differences: flank-offset operands, entry-pointer copies
+  and transition pointer/value allocation.
+- **081B0F34 drafted 92.8%**, up from 81.9%. Realigned 62 / 50 ignoring registers;
+  candidate 612 bytes. An isolated switch state in r4 shares its zero across
+  the request's stack arguments and its one with the finished store. Materialize
+  the entry load before saving its pointer; share transition one. The ROM
+  cross-jumps the two player request calls into one tail, while the retained
+  draft duplicates them. An explicit common call reduced structural differences
+  but worsened the total (68) and fuzzy score (84.0%), so it was discarded.
+
+All sources were clang-formatted and checked using only tools/check.py.
+Scores were refreshed with --nonmatching --record and the reviewed target sizes.
+The initial named INCLUDE_ASM fallbacks could not assemble against this
+checkout's address-named generated files. Changed each fallback to its raw
+sub_XXXXXXXX identifier; all six default assembly paths then checked exactly.
+Those assembly fallback matches grant no C progress. Per-function draft and
+fallback-fix commits, followed by this note, use build/commit.sh. No make,
+full build, generated-file edits, network actions, or direct Git mutation.
+
+Tooling detail: --record initially left the old fuzzy comments unchanged because
+it keys scores by the #else INCLUDE_ASM identifier, which was the descriptive
+alias while the checked function resolved to sub_XXXXXXXX. After changing the
+fallbacks to raw identifiers, reran --nonmatching --record on all six and verified
+the source comments contain the new scores. Score-only follow-up commits retain
+one translation unit each.
+
+## Task 081F7FD0 — 2026-10-20
+
+Tags: #matching #ratatosk #orbit-effect #combat
+
+Two exact matches and two guarded drafts. Worked on the already checked-out
+cloud/081F7FD0 branch; only fast per-file checks, no full build or network.
+Individual source commits and this note use build/commit.sh.
+
+- **081FAE0C stopped, not drafted — Ratatosk_InitializeFromScript.** Inspected
+  the largest function first with asmat, condense, relatives and the caller
+  Ratatosk_Create at 081FB788. The existing medium-worker candidate in
+  wip/sub_081FAE0C.c still scores 66.2%, realigned 392 instructions / 122
+  ignoring registers (build/check/run-0x2knyxo). Script options, collider setup,
+  palette banks and child pools are recovered, but address reuse, stack-pointer
+  lifetimes and branch tails remain below the draft threshold. Ghidra export is
+  absent in this checkout. No production source added for this target.
+- **081F7FD0 stopped, not drafted — Ratatosk_UpdatePlayerCapture (tentative).**
+  New candidate in wip/task081F7FD0/sub_081F7FD0.c: 75.2%, realigned 173 / 30
+  structural differences (build/check/run-dkbci2q1). Captures the player at the
+  midpoint between actor and player, chooses a cardinal-offset destination,
+  watches the player's angular change, emits particles while held, then applies
+  interpolated player movement. Uses animation 9/5/7 and fallback repositioning
+  with animation 4. Explicit stack aggregate, parameter/view register keywords,
+  particle-pointer locals, returning the polar helper's output pointer, and a
+  pinned actor pointer did not improve the baseline. The actor pointer remains
+  r6 instead of r7; vector/config stack slots are displaced by four bytes, and
+  address-constant reuse and PRE pointer copies remain. Best candidate restored.
+- **081F8600 drafted 83.3% — Ratatosk_UpdateSunOrbPlacement.** Chooses a point
+  nearest the player, builds a 32-byte rising-actor config, sets source mode 2
+  and motion parameters 360/4/0/2, creates and raises the orb, and updates both
+  the point occupancy and orb occupancy arrays (24-byte stride). Reuse mode
+  fades all orbs; the final wait has a 600-tick timeout. Small halfword-store
+  inlines and explicit animation locals improved the initial 77.3% candidate.
+  Final reviewed check: realigned 70 / 24 structural differences,
+  build/check/run-yznfzmof. Constant-offset reuse, slot-array address ordering
+  and registers remain. No register pinning in this draft.
+- **081F8988 matched — Ratatosk_UpdateSunOrbRelocation.** Coordinates a selected
+  orb, waits for slot state >60, creates a replacement orb at the farthest
+  player-offset point, releases the old slot through the manager, copies the
+  replacement's position to the actor, then moves toward the nearest player
+  offset. A shared explicit failure label in case 2 reproduces cross-jumping
+  from case 0; computing the scaled occupancy offset before its base eliminates
+  another ordering difference. Two narrowly scoped sequence-store views fixed
+  the final eight register-only instructions. depin.py reduced eight hints to
+  three; formatted source rechecked exact, 740 bytes,
+  build/check/run-0j6vxpxj. Marked register-pinning concession.
+- **081FDDC0 matched — OrbitEffect_SpawnOrbitTrail.** Every fourth update,
+  initializes one of twelve 56-byte trail sprites, chooses radius 768..1279
+  and an 8-bit angle, selects kind-dependent tile frame/palette, and positions
+  it around the actor using signed sine-table products truncated toward zero.
+  The neighbouring OrbitEffect_SpawnHomingTrail provides the object layout;
+  OrbitEffect_UpdateTrailSprite confirms angle/radius and target-vector fields.
+  Preserving the full timer mask's copy, the next-trail field-address/value
+  views, and the sine-table pointer transfer reproduced the remaining register
+  allocation. depin.py reduced sixteen hints to eleven. Formatted source
+  rechecked exact, 356 bytes, build/check/run-34bsumsj. Marked register-pinning
+  concession. No handwritten instruction bodies.
+- **082015D4 drafted 82.4% — ScriptCombatActor_ApplyHitReaction (tentative).**
+  Resumed the existing medium-worker scratch candidate after reviewing assembly
+  and Combat_ApplyHitReaction. Stores damage/type/reaction, drives the HUD and
+  damage display for flag 0x40, and emits three randomized sparks for selected
+  flags. The useful candidate has barriers on pre-narrowing X/Z bases and a
+  pinned RNG table pointer; the unhinted depin scratch was only 70.0% here.
+  Explicitly delaying the first two global RNG cursor stores reduced structural
+  differences but worsened total similarity, so restored the better candidate.
+  Final reviewed check: realigned 49 / 29 structural differences,
+  build/check/run-ffzj4ehe. depin.py correctly skipped the unguarded nonmatch.
+
+Both drafts were checked with --nonmatching --record, remain above 80%, and
+have byte-identical assembly fallbacks checked separately. Fallback matches
+are not C progress. No ROM, generated assembly or emulator output committed.
+Batch integration, name promotion and complete ROM validation remain with the
+integrator.
+
+## Task 080AEB74 — Vorn route callbacks (2026-10-20)
+
+Tags: #matching #vorn #navigation #register-allocation
+
+- **080AFD88 matched — Vorn_UpdateDescriptorPursuit (tentative).** Calls the
+  actor's update270 and movement callback at 0x260, sets animation duration
+  scale, consumes the navigation descriptor's probe event, and either accelerates
+  toward it or requests a turn. Acceleration completion enters state 3 and sets
+  context flag 2 at 0x6D4; turn completion selects behavior 16. Exact extent is
+  360 bytes. A u32-returning motion flag helper avoids narrowing-related register
+  choices. Naming follows neighbouring Vorn callbacks and the named navigation
+  callees. Scoped copies and explicit state/zero locals reproduce the code.
+  depin.py reduced four hints to one empty read/write constraint on the context
+  flag mask; no fixed registers remain. Marked matching concession. Formatted
+  final exact check: build/check/run-gq8z7r9g.
+- **080AFEF0 matched — Vorn_SelectPursuitAfterAction (tentative).** On entry,
+  installs saved entry control 0x224 with kind 2. On action completion, selects
+  behavior 15 and uses context flag 1 at 0x6D4 to choose callback 080ADB90/mode
+  0x23 or Vorn_UpdatePursuitDistance/mode 0x25. Exact extent is 328 bytes, without
+  hints. Initial candidate was 92.0%; declaring callback, zero, and mode locals
+  in that order in the small inlined selector reproduced the two branches'
+  differing zero-register lifetimes. Formatted exact check:
+  build/check/run-ny_rkhv1.
+- **080AEE08 retained draft 83.4% — Vorn_UpdateDefeat.** Reviewed the existing
+  source against the full 984-byte extent. Remaining differences are 84
+  realigned instructions, 9 ignoring registers: flags offset reuse, the first
+  RNG table pointer copy, late control/state constant reloads, and register
+  choices in the script argument and final spark blocks. Moving table scope,
+  changing the first RNG helper, and pinning initial field offsets did not
+  improve it; restored the existing body. Added the required local address alias
+  and a compatibility alias for SceneActor_CallContextScriptB (080B0D28), which
+  is absent under its descriptive name in this worktree's ELF. Re-recorded
+  score: build/check/run-addo587z. Default assembly fallback checked exact.
+- **080AEB74 retained draft 80.2% — Vorn_TryRestorePatrolRoute.** Reviewed the
+  existing source against the 660-byte ROM extent. Remaining differences are
+  67 realigned instructions, 32 ignoring registers: destination pointer spill
+  across terrain lookup, early saved-motion spill, flag pointer reuse, and reset
+  scheduling. Moving the saved-motion assignment into the boolean guard, with
+  and without volatile, worsened the result; restored the original body. Added
+  the required local alias, re-recorded score (build/check/run-lrp2lu9l), and
+  verified the default assembly fallback exactly. INCLUDE_ASM must use the raw
+  sub_ address token here: global.h stringifies it without macro expansion, and
+  this checkout's generated assembly filenames still use raw names.
+- **080AF2BC stopped below draft threshold — tentative delayed route recovery.**
+  Started largest first. Recovered the delayed action queue and the shared
+  Chase_Arrive/Chase_TryRoute paths from checked-in scene_actor_chase.h, confirmed
+  terrain height sampling, player-cell comparison, random facing selection, and
+  patrol fallback against the full assembly. Reviewed extent includes interior
+  label 080AFBD0 and ends at 080AFBE4 (2344 bytes). Best retained scratch check
+  was 66.1%, 472 realigned differences / 167 ignoring registers
+  (build/check/run-sjepbc7p). Main actor/group stack residency, derived address
+  reuse, and RNG loop hoisting differ. Correcting the signed timer comparison,
+  declaring sub_0812F3CC as u8, passing group to the queue inline, and a volatile
+  root-pointer experiment did not bring it to draft quality. Scratch remains
+  uncommitted in wip/sub_080AF2BC.c.
+- **080B0038 stopped below draft threshold — tentative route movement restore.**
+  Recovered context route cleanup, movement resolution, clearing pursuit flags,
+  descriptor clearing, and restoration of default control and callback state.
+  First clean candidate reached 73.9%, 63 realigned differences / 26 ignoring
+  registers (build/check/run-kgozlpt7). Keeping the zero-valued behavior result
+  alive, forcing early group computation, changing state-store addressing, and
+  pinning a flags pointer failed to improve a valid candidate to 80%; discarded
+  the pinning experiments. Best clean source remains uncommitted in
+  wip/sub_080B0038.c. Main residues are group-address lifetime, flag address
+  reuse, and control/state reset constant derivation.
+
+All checks used tools/check.py through build/venv/bin/python. No full build,
+network operations, ROM/generated assembly commits, or integration changes.
+The two refreshed drafts retain their existing C and fuzzy scores; they are
+not newly matched progress. Both exact callbacks and each draft were committed
+through build/commit.sh. Separate cleanup commits minimize the first exact
+callback's hints/formatting and correct draft fallback names for the local
+assembly snapshot. Combined ROM validation remains with the integrator.
+
+## Task 0817FDE0 — 2026-10-20
+
+Tags: #matching #boss-slot-2 #armor #actor-controller #nonmatching
+
+Worked solo on the assigned offline cloud/0817FDE0 branch. Exact C progress:
+0% of this assignment, +0.0 percentage points. Retained four guarded drafts
+(one newly promoted, two improved, one refreshed); the other two targets
+stopped below the draft threshold. Only per-file check.py checks and the
+commit driver were used; no full build, network operation or shared-doc edit.
+Read the entry-point/worker/cloud/large-function instructions, earlier notes,
+assembly, initializer caller, Armor proximity/position callees and matched
+relatives. The Ghidra export is absent.
+
+- **0817FDE0 — stopped below threshold.** BossSlot2_InitializeFromScript
+  (tentative); called by BossSlot2_CreateFromScript. Revisited the retained
+  initializer, separating the early actor fields and writing the player-list
+  initialization as incrementing source/destination pointers. This reduced
+  this session's realigned residue from 388/125 to 336/90 differing instructions
+  (total/ignoring registers), but the candidate-length fuzzy was only 53.2%.
+  It does not supersede the earlier exploratory 57.3% result. Major remaining
+  issues: common actor versus boss pointer lifetimes, palette-copy loop
+  allocation, hoisted component addresses and stack slots. Scratch remains
+  in wip/sub_0817FDE0.c; no source draft was promoted.
+- **081875EC — improved draft 85.8%, Armor_UpdateAlignedAttackDecision.**
+  Previously 83.9%. The flag-selected decision switches have the same
+  instruction shape as 08187230. Keeping the flag-bit result in r6 with an
+  empty register constraint, and reusing its zero value in the normal-path
+  reset stores, reduced total realigned differences from 83 to 69. Structural
+  differences changed from 12 to 14; this is an allocation improvement, not
+  a structural match. Preserved the original descriptive local layout.
+  Remaining: duplicated/merged decision stores, branch polarity/long-branch
+  selection, cooldown-address derivation and scratch registers.
+- **08187230 — improved draft 85.8%, Armor_UpdateAxisAttackDecision.**
+  Same change and 69/14 realigned residue as 081875EC (earlier recorded 83.7%;
+  the unchanged reviewed baseline reproduced as 83.9%). Marked register
+  pinning; the absolute-Z r2 hint remains. A dz r5 pin worsened the result
+  and was discarded. Both decision drafts still use the original assembly
+  by default and earn no exact credit.
+- **08186EB4 — stopped below threshold, Armor_SelectTimedAttack
+  (tentative).** Rechecked the prior candidate and tried absolute-Z, fixed
+  one/mode registers and separated constant initialization. No useful gain;
+  stronger delta pins increased structural differences. Retained the earlier
+  unpinned build/6eb4-base.c candidate in wip/sub_08186EB4.c: 75.9%
+  against the reviewed 892-byte extent, but 195/122 realigned differences,
+  worse structurally than this session's initial 149/53 form preserved in
+  build/6eb4-start-task.c. Branch/store sharing, the mode/one lifetimes and
+  state-pointer reuse remain blockers.
+- **08186CC8 — new draft 80.6%, Armor_SelectAlignedAttack (tentative).**
+  Actor/player X/Z alignment and vertical-distance test select attack or
+  recovery, with Armor_IsNearSavedPosition / Armor_SaveCurrentPosition
+  remembering the attack origin. The prior unpinned baseline is 72.0%.
+  Pinning only absolute X to r5 yields 80.6% against the reviewed 492-byte
+  body/pool extent (candidate 500 bytes); no stack-pointer comparisons were
+  present in this accepted candidate. Remaining differences include an extra
+  saved register, decision-pointer lifetime, merged fallback behavior calls
+  and flags allocation. Repeated fallback calls move across the function,
+  so call-anchored alignment reports a large 184/166 residue despite the
+  higher whole-function fuzzy score. An ax+az pinned candidate scored 89.3%
+  but generated `mov r0, sp` for the Z sign test: rejected, as in the earlier
+  pass. Do not use that candidate as evidence of source correctness.
+- **081835D8 — retained draft 94.0%,
+  ActorController_UpdateHeavyAttackCollider.** Replaced the inherited
+  half-power comment/helper name: the observed scale is 0xAAA / 4096 with
+  sign-aware truncation. Typed layer accesses reduced structural residue
+  from five to two but expanded allocation differences (79.6%); collider and
+  multiply pins, barriers, operand order and inline variants did not close
+  it. Kept the readable unpinned 94.0% candidate (10/5 realigned residue).
+
+Restored required file-local aliases for all three pre-existing drafts and
+used address-named INCLUDE_ASM fallbacks for compatibility with the cached
+ELF. Each guarded source was formatted directly with the venv clang-format,
+then checked with --nonmatching --record; all four default assembly fallbacks
+passed exactly. depin.py was run on unguarded copies of the three hinted
+candidates and skipped them because they are nonmatching; no fallback match
+was mistaken for an exact C result. No generated assembly, ROM, dump or
+scratch candidate is committed. Name promotion and combined ROM validation
+remain integration work.
+
+## Task 080980FC (2026-10-20)
+
+Tags: #matching #ghost #register-pinning
+
+Exact code gain: +0.0941 percentage points of total code (2,272 bytes), in the
+Register-pinned category. Two existing guarded drafts became exact matches;
+two new guarded drafts were retained. No network operations or full builds.
+All commits submitted separately through build/commit.sh.
+
+- 08098CA0: matched as Ghost_FollowPlayerLoop, retaining the existing name.
+  tools/relatives.py found Axe_FollowDeceleratingRoute (080FDA44), explaining
+  86% of the body. Porting its typed route and random/polar helpers, relocating
+  route fields to +0x566/+0x568/+0x5B0/+0x5FC, adding the two route-builder
+  calls, and restoring the mode-dependent speed increment yielded only two
+  register differences. Removing RandomMotion's table pin resolved those.
+  tools/depin.py reduced three hints to two: the inherited r4 observed-address
+  pin and empty input barrier remain necessary. Formatted exact check: 1,168
+  bytes. This callback rebuilds nine waypoints around the player and halves
+  speed when the route renews.
+- 08099130: matched as Ghost_PursuePlayerLoop, retaining the existing name.
+  Ported the newly matched Ghost_FollowPlayerLoop; renewal radius is 256,
+  speed is retained, and acceleration is every sixteen ticks up to eighteen.
+  First check matched, and depin retained the same two hints. Formatted exact
+  check: 1,104 bytes. Both route callbacks call 08098344 and 080980FC.
+- 08098788: drafted 84.4% as Ghost_UpdateVisibility (tentative). Its caller
+  Ghost_OnBehaviorUpdate runs this after state dispatch. Sets collider B bit 4,
+  handles the special 0x4000 mode, and coordinates reveal/conceal transitions
+  using context flags +0x558, timer +0x5B2, player mode and save state. The
+  visibility tests share code with SceneActorControl_RequestVisibility.
+  Retained candidate has 55 realigned differences, 18 ignoring registers:
+  availability/hidden-test expansion, temporary lifetimes, scheduling and
+  allocation. u8 result helpers and mask-before-load accessors improved the
+  initial 75.1% candidate to the retained score. Pinning the context and
+  changing Hidden's return width worsened the result and were discarded.
+  tools/check.py --nonmatching --record measured the full reviewed extent.
+- 080980FC: drafted 88.8% as Ghost_EmitAfterimage (tentative). Called by the
+  matched route callbacks. Every context interval +0x556 ticks, refreshes one
+  of four sprites (stride 0x60 at +0x3D4), selects the actor's directional
+  animation frame, runs the packed animation stepper, copies its position,
+  unhides it and sets lifetime eight. Index +0x554 wraps after three. The
+  middle animation-stepper run is shared with Actor_InitPaletteEffectPose.
+  Retained candidate has 28 realigned differences, six ignoring registers:
+  sprite/animation address reuse, argument scheduling and allocation.
+  Raw separate animation-base addressing improved 81.1% to 88.8%; forcing
+  sprite/animation pointer registers worsened it. Recorded full reviewed
+  extent is 488 bytes.
+- 08098A74: stopped below draft threshold. Best exploratory candidate 61.3%,
+  113 realigned differences / 34 ignoring registers. Tracks the player's
+  position delta into actor motion using context +0x5EC, sets direction and
+  animation scaling, then returns to idle when the player's +0x428 action
+  field clears or control completes. Shared control/state reset expansions,
+  player-pointer aliasing and allocation differ. Typed/raw player views,
+  cached flags pointers and targeted lifetime pins did not improve it.
+  Best candidate retained locally at wip/codex-medium/sub_08098A74.c.
+- 08098344: stopped below draft threshold. Exploratory cubic-route candidate
+  reached 40.4%; 160 realigned differences / 82 ignoring registers. Copies
+  start/target positions with zero Y, samples eight intermediate points at
+  Div(1024,8) intervals and copies the endpoint as point nine. Uses context
+  motion X/Z scaled by 128 in the observed polynomial. Exact interpretation
+  remains tentative: the polynomial includes terms that look unusual, so
+  the scratch version follows observed arithmetic rather than correcting it.
+  An explicit stack-frame struct fixed local layout, but expression grouping,
+  repeated weights, stack-pointer lifetimes and allocation remain unresolved.
+  Candidate retained locally at wip/codex-medium/sub_08098344.c.
+
+## Task 081B48A0 — 2026-10-20
+
+Tags: #matching #vanargand #animation #palette #register-pinning #nonmatching
+
+Worked solo on the preclaimed offline cloud/081B48A0 branch. Read the entry,
+worker, cloud and big-function guidance, existing task notes, callers/callees,
+assembly and matched relatives. The Ghidra export is absent. Exact gain:
++0.0429 percentage points of total code (1,036 bytes), all Register-pinned.
+Two functions matched and one existing guarded draft improved. Three targets
+stopped below the full-extent draft threshold. No network or full build;
+per-file check.py checks and build/commit.sh only. Shared docs were not edited.
+
+- **081B5454 — matched, Vanargand_UpdatePartRadialTravel (tentative).**
+  On reset, computes a planar heading/distance target, starts motion from
+  origin with mode four, selects sequence nine and steps packed playback.
+  Updates motion each tick; completion sets finished, otherwise requests
+  flags 12. Full reviewed extent 472 bytes, ending at 081B562C. Porting the
+  matched Vanargand_UpdatePartBobbing stepper and the existing sidestep vector
+  idiom left five register differences. Moving the stepper's 0xFFFF source
+  to r2 (mask held in r5), plus a short finished-offset/pointer constraint,
+  closed them. Direct clang-format and the final full-extent check pass.
+- **081B5A98 — matched, Vanargand_UpdatePartRevealFade (tentative).**
+  On reset, places origin at the radial heading/distance target, unhides
+  the sprite, copies palette source +194, and selects/steps sequence nine.
+  Interpolates from +194 to +190 with frame and six banks, advances after
+  frame 63, then marks finished. Full reviewed extent 564 bytes, ending at
+  081B5CCC. The same stepper needed its 0xFFFF source in r3. Explicit short
+  offset/address constraints reproduce the reset stores and prevent the
+  switch-state address being held across Palette_InterpolateBanks. Reusing
+  the state offset plus eleven gives the observed enter-address derivation;
+  loading the destination palette before the source-offset constraint closes
+  the last argument-order differences. Direct clang-format and final exact
+  check pass. These hints contain no handwritten instruction bodies.
+- **081B48A0 — improved draft 93.9%, Vanargand_UpdatePartSidestep.**
+  Retained the existing symbols/functions.csv name. Previous draft 87.6%.
+  Moves 128 units along byte +187, preserves origin height, then restores
+  sequence nine and marks finished. Passing the saved state into the second
+  stepper's first flag-mask calculation reproduces its reuse of the value
+  one; the initial stepper gets an explicit first-bit input. A planar-add
+  inline, r6 enter pointer, and transition-value constraints reduce residue
+  from 63/19 to 27/11 realigned differing instructions (total/ignoring
+  registers). Remaining: owner-copy scheduling, entry/motion address reuse,
+  vector load registers, origin-height addressing and pool placement. More
+  explicit planar-pointer constraints reduced structure to eight but worsened
+  total differences to 58; discarded in favor of this 93.9% candidate.
+  Recorded with --nonmatching --record; default INCLUDE_ASM fallback checked
+  exactly. Restored the required local alias and raw-address fallback token
+  for compatibility with the cached assembly/ELF naming.
+- **081B562C — stopped below threshold, tentative part emergence.**
+  Recovered owner display flag selection, sequence nine, palette +190 copy,
+  two owner keyframe phases with song 0x58D, outward radial motion from radius
+  640 to the configured distance, contact initialization and song 0x58E.
+  The final owner display position projects basePosition with sign-aware
+  division by 32 and the screen offset at 03005418. Read condensed listing
+  and relatives; used the shared part/stepper layout. Best retained scratch
+  is 74.5% over the full 1,132-byte extent, 177/56 realigned differences,
+  candidate 1,156 bytes. An output-pointer projection helper fixes the initial
+  word read/modify/write expansion of stack halfwords. State-address lifetime,
+  enter-pointer copies, vector constant/address hoisting, extra saved register,
+  owner flag scheduling and transition ordering remain. Typed owner fields,
+  state-load address constraints, keyframe pointer constraints and a radius
+  hint did not reach draft quality. Scratch remains uncommitted at
+  wip/codex-medium/sub_081B562C.c.
+- **081B5EA4 — stopped below threshold, tentative
+  Vanargand_InitializePartController.** Called by
+  Vanargand_CreatePartController. Initializes owner keyframes and two part
+  records at +98 with stride +21C, assigns palette/tile sources and optional
+  external palette destinations, and initializes visible mode with radial
+  positioning and guarded action two. First source 66.4%, 133/52 realigned
+  differences. Multiple advancing cursors for palette pointers, destination,
+  tile and part improve fuzzy to 70.7% over the full 732-byte extent, but
+  leave 114/75 differences (candidate 720 bytes). The second loop's canonical
+  part/flags addresses, loop-stride hoisting, mode spill, action-store
+  addressing and signed end comparison differ. High-register mode/palette
+  hints and stride barriers did not improve the result. Best retained cursor
+  candidate is uncommitted at wip/codex-medium/sub_081B5EA4.c.
+- **081B4DA4 — stopped; existing boundary blocker confirmed.** Rechecked the
+  earlier wip/sub_081B4DA4.c leap candidate against assembly and both extents.
+  It is 84.2% only over the reviewed first body/pools through 081B512C
+  (0x388 bytes): 82/20 realigned differences, candidate 912 bytes. Inventory
+  extends through 081B52E8, including another apparent function at 081B512C
+  with its own push, stack frame and reset/state dispatch. Full-extent check
+  is 67.7%, 299/237 differences. No production draft was added. Integrator
+  still needs to review/add the missing boundary before a shorter-body score
+  can count. Existing candidate and evidence were preserved.
+
+All accepted callbacks are in the statically observed Vanargand part-action
+family around gUnk_086120A0; no runtime coverage claims were added. Each source
+change was committed separately through the driver. Combined ROM validation
+and name promotion remain with the integrator.
+
+## 2026-10-20 — task 08217960 revisit
+
+Tags: #matching #sprites #palette #terrain
+
+Assigned-function exact coverage rose from 0% to 50% (+50 percentage points,
+three of six functions). Three register-pinned exact matches; two improved
+guarded drafts. Only fast check.py checks were run, with no full build or
+network operations. Separate driver commits preserve each translation unit.
+
+- **08218508 — matched, SpriteOam_QueueFlaggedProjectedSprites.** Reviewed
+  788-byte extent. Read its render-callback caller 08163398 and the common
+  OAM staging code. Kept the existing tentative name: flag 0x1000 selects
+  this pass, but its meaning is still uncertain. Inlining the screen
+  projection body directly into the renderer removes the helper argument
+  copy and the hoisted/spilled stack-vector pointer. Preserve initial flags
+  in a separate unpinned local. A local loaded-flags value pinned to r1
+  before the culling mask recovers the later r6 copy. The shifted X temporary
+  pinned to r0 and the affine counter's old value pinned to r0 recover the
+  remaining copies. Load tile before priority, then combine with a left-
+  associative OR expression: changing the grouping to tile |= (a | b)
+  produces different code. Final formatted production C passes check.py
+  byte-identically, with no handwritten instruction bodies.
+- **0821881C — matched, SpriteOam_QueueOverlayProjectedSprites.** Reviewed
+  788-byte extent. Ported the exact 08218508 body, changing only the required
+  drawable flag from 0x1000 to 0x2000 and preserving the existing tentative
+  name. Exact check passes; separate match commit.
+- **08217F4C — matched, SpriteOam_QueueProjectedSprites.** Reviewed 776-byte
+  extent. Ported the exact flagged renderer and removed its required-flag
+  test. Existing callers install it with Video_SetRenderCallbacks. Exact
+  check passes; separate match commit. These three matches total 2352 bytes.
+- **08218254 — drafted 99.1%, SpriteOam_QueueCameraRelativeSprites.** Improved
+  from the retained 91.0% draft by porting the exact common OAM/affine tail,
+  computing the culling mask before offset loads and pinning the Z difference
+  result to r0. Final reviewed score: four realigned differing instructions,
+  two ignoring registers, over 692 bytes. The entry currently loads flags
+  into r0 and copies to r6 before loading/masking the parity skip value; ROM
+  loads r1, copies to r0, masks, then copies r1 to r6. The missing copy becomes
+  pool padding, so total length already agrees. Explicit masks, an inline
+  mask accessor, late flag assignment, and a small initial/mask/flags pin
+  sweep did not resolve this. Kept the guarded draft and recorded its score.
+- **08217960 — drafted 86.7%, Palette_ApplyBackgroundFade.** Improved from
+  80.1%. Pin the blend color's green component to r10, introduce per-bank
+  green/red-blue contributions, retain the red-blue mask in r9, and express
+  the blended inner loop with separate red/green arithmetic temporaries.
+  Freeing the fetched pixel local improves output more than pinning it.
+  Final reviewed score: 55 realigned differences, 24 ignoring registers,
+  against the 604-byte target. Loop-counter setup, mask hoisting, backdrop
+  blend temporaries and allocation remain. Explicit outer-index increments
+  regress; do/while inner loops produce identical output. Kept the guarded
+  draft and recorded its score after formatting.
+- **0821BF5C — stopped below draft threshold, tentative
+  Terrain_CanCrossSlopeBoundary.** Read the full 760-byte target, its movement
+  caller 0821C254 and height-query callee 0821BE3C. Fresh reconstruction in
+  ignored wip scores 73.6% reviewed, with 121 realigned differences / 73
+  ignoring registers. Tests destination collision bits (mask 1 or 2 by mode),
+  height thresholds 100/128, source/destination slope orientations and the
+  matching flat neighbor's low-nibble height and collision bits. Expanding
+  neighbor override lookups in each direction branch preserves more of the
+  duplicated call/control structure than the inline resolver; caching the
+  selected index causes the compiler to merge those calls again. Signed
+  threshold locals recover BLE. Still below 80%, so no production draft or
+  source commit for this function.
+
+All production functions have file-local descriptive aliases. Both guarded
+sources use address-form INCLUDE_ASM alternatives, so the recorder resolves
+against this checkout's baseline ELF; both default assembly alternatives
+were checked exactly. Three exact sources retain their register-pinning
+concession markers. Notes committed last; shared index/history left unchanged
+under CLOUD.md. Combined ROM validation remains with the integrator.
+
+## Task 08104350 — 2026-10-20
+
+Tags: #matching #actor-group #proximity-actor #register-pinning
+
+Assigned target-byte exact coverage increased from 0% to 31.5% (+31.5 percentage
+points; 1300 of 4124 reviewed bytes including pools/alignment). Two exact
+functions and four NONMATCHING drafts, each in its own driver commit on the
+already-claimed cloud/08104350 branch. No network operations or full builds.
+
+- **08105AB4 — drafted 81.2%, ProximityActor_UpdateDamageAnimation.** Reads the
+  context at 020001B4, health at FC, maximum at FE, damage step at 100 and flags
+  at 108. Starts a terminal animation/state when health reaches zero; otherwise
+  selects a damage frame or mirrored recovery frame, restores health in steps
+  of ten and clears the hit byte EB. The packed-command stepper repeats twice.
+  Started from the matched MessageWindow/SceneActors stepper relatives. Explicit
+  offset-before-table evaluation, scoped flag masks, a distinct duration copy,
+  absolute-value expression and temporary quotient improved the candidate.
+  Pointer lifetimes, instruction ordering and allocation remain: 102 realigned
+  differing instructions, 29 ignoring registers. Recorded against all 952 bytes;
+  the candidate is 940 bytes. Guarded draft retains register hints.
+- **08104350 — drafted 84.0%, ActorGroup_CreateFromScript.** Creates/uses the
+  020001B0 Pool184 manager, allocates a member, loads sprite resource 9385 and
+  reads m/p/r/n/a/b/A/P/I/G options. The A option supplies health, debris count,
+  a byte and three arguments passed to 08105194; default health is 100 and the
+  default count is three. Origin at 118 copies the eight-byte position at 1C;
+  a supplies the squared activation radius at 138. Recovered a local member
+  view, shadow initialization and initial packed-animation stepping. Passing the
+  tested status result to the alternate shadow call keeps its distinct call
+  path. Typed fields and removing forced outer register/pointer lifetimes were
+  more useful than additional pins. Rejected an intermediate with overlapping
+  fixed-register lifetimes; retained the version with ordinary outer locals.
+  Remaining option/default ordering, argument-loop form, pointers and allocation
+  give 120 realigned differences / 70 ignoring registers. Candidate 1008 bytes,
+  reviewed target 1016. Only the guarded stepper retains matching concessions.
+- **0810523C — matched, ActorGroup_EmitRemovalDebris.** Five emissions through
+  08127590 with resource hashes 9385/74C9, radius ten, lifetime 30 and parameter
+  490. The first vertical velocity is 64, the others 34; the last three select
+  (0,1), (1,0), (2,0) variants. Ends by calling 081050BC. Keeping random-angle
+  evaluation before the vector argument in the inline Polar helper fixes load
+  ordering in all five copies. A read-only empty constraint on the first angle
+  and vector settles the first allocation without destroying the angle's known
+  byte range. depin removed both explicit register bindings and retained only
+  that constraint. Exact after formatting with --target-size 900; marked as a
+  register-pinning concession because the empty constraint remains.
+- **0810480C — drafted 94.5%, ActorGroup_UpdateMemberProximity.** On entry clears
+  the frame counter, exposes the sprite and initializes a rotated offset with
+  radii 41/148. On odd frames tests origin range and player eligibility, starts
+  turn step four when the distance changes, and decrements the health/countdown.
+  Expiration selects state three; other activations play song 3C9. Then calls
+  081049F0 and increments the frame. A scoped clear helper restores CpuSet
+  ordering; constraining the first scaled X value and the intermediate Z value
+  improves allocation. Fourteen realigned differences, four ignoring registers:
+  angle/Z register choices, a few address temporaries and flag-test/load order.
+  Candidate and reviewed target both 484 bytes. Guarded draft with hints.
+- **081049F0 — drafted 82.2%, ActorGroup_UpdateMemberSway.** Wraps the byte angle,
+  rotates the two radii around the saved origin and adjusts/damps the turn step.
+  Preserve -(radius * sine), rather than (-radius) * sine: agbcc selects a
+  different negate/multiply order. Signed magnitude shifts reproduce the
+  truncation-toward-zero fixed-point scaling and half-step calculation. A scoped
+  r0 result for two scaled components recovers the original result copies;
+  another attempted table pin regressed and was discarded. Forty-five realigned
+  differences, four ignoring registers: primarily sine-table/scratch allocation,
+  with redundant turn-step reads and two bytes of body length still off.
+  Candidate 368 bytes, reviewed target 372. Guarded draft with hints.
+- **08105808 — matched, ProximityActor_ApplyContactDamage.** Collider callback
+  installed by ProximityActor_InitializeCollider (08105998). Flags at actor 108
+  gate contact response; reaction bit eight emits variant-dependent sparkles and
+  song 15C on a cooldown. Variant one loses 200 health per accepted contact;
+  the other uses incoming collider damage. Both clamp health at zero. Variant
+  one also forwards flag-10 contacts through the callback/data pair at collider
+  4C/50. Use one blocked local across both variant branches to share the
+  materialized status test; an inline mask accessor loads the mask before flags.
+  `health -= damage; health = health < 0 ? 0 : health` reproduces both stores and
+  the signed truncation test. Exact after formatting with --target-size 400,
+  with no register hints.
+
+All names are provisional and carry confidence=low comments above exact alias
+lines. Four draft scores were recorded after formatting using check.py
+--nonmatching --record; their default INCLUDE_ASM branches also pass exact fast
+checks. depin was run on hinted sources (nonmatching candidates are skipped by
+that tool). Some draft commit titles retain their pre-record rounded scores;
+source fuzzy lines and the scores above are authoritative. Shared headers,
+symbol names, generated output, index and history were left unchanged. Combined
+ROM validation remains the integrator's responsibility.
+
+## Task 08129C64 — 2026-10-20
+
+Tags: #matching #effects #register-allocation
+
+- **0812A7B8 matched** as `LinkedEffect_FinishRemoval`. Entry selects sequence 24; animation completion releases the pool bit, removes a visible sprite and the collider at 0xAC, invalidates the signed slot index, and clears the halfword at 0x174. Exact reviewed extent: 368 bytes. `tools/depin.py --write` reduced 14 hints to 12; the formatted source also passed the exact check. Local register pinning concession applies.
+- **0812B424 drafted 94.8%** as tentative `TwinSpriteEffect_EmitTrail`. Periodically initializes sequence 1 on alternating 0x5C-byte trail records, steps it, copies the parent's packed position, sets display flags/palette and a four-tick lifetime, and wraps the two-entry index. Remaining differences: shared address calculation versus duplicate multiplication, animation mask register r6 versus r5, and late position-copy address ordering. Realigned difference: 16 instructions, 9 ignoring registers. Explicit sprite/animation pointers greatly improved the initial 80.3% candidate.
+- **0812AA0C drafted 83.8%** as tentative `LinkedEffect_BeginRisingTravel`. Sets the hidden/transition flag, constructs a random-distance destination along its heading with Y elevated by 512, grows both sprite scales toward 64 over 15 ticks, emits the linked variant every eight frames, then enters state 2 once animation and scaling finish. Remaining differences: entry vector arithmetic, literal load ordering, register allocation, and reused field-offset constants. Realigned difference: 58 instructions, 11 ignoring registers.
+- **08129FF0 drafted 86.5%** as tentative `SunDiscPool_UpdateFallingDisc`. Applies downward acceleration of four units, integrates packed position, samples terrain height and slope, removes slots below zero, and stops at the terrain before state 3 and sound 242. Remaining differences: pointer lifetimes/saved registers, first command load, and terrain-height truncation. Realigned difference: 44 instructions, 13 ignoring registers. Parenthesizing the cell offset and keeping animation and vector pointers explicit improved the candidate substantially.
+- **0812ACB0 stopped below draft threshold**, best retained candidate 79.1% in `wip/sub_0812ACB0.c`. Tentative `LinkedEffect_FollowTarget`: randomized animation selection, delayed turning toward a target, randomized one/two-unit heading changes, acceleration every ten frames, rising Y interpolation, collider updates and expiry. Remaining differences: vector/address lifetimes, extra saved register, block layout, signed truncation arithmetic and allocation. Realigned difference: 148 instructions, 65 ignoring registers. Hard-register pointer experiments regressed and were discarded. Preserve only the ordinary-pointer candidate; no production C added.
+- **08129C64 stopped below draft threshold**, best useful candidate 65.9% in `wip/sub_08129C64.c`. Tentative `SunDiscPool_UpdateTravellingDisc`: advances its animation/position, projects a 32-unit point ahead of velocity, starts gravity within squared XZ distance 0xBD0F of its target, samples terrain ahead, refreshes the collider, then rolls back movement and enters the impact state. Remaining differences: many pointer/register lifetimes, stack vector materialization, duplicate gravity branches and terrain-height handling. Register-pointer experiments regressed and were discarded. No production C added.
+
+Shared observations: the linked-effect record has animation at 0x48, target pointer at 0x100, packed velocity/destination at 0x16C, state/slot at 0x176/0x177, age at 0x178, entry/speed/animation-complete/heading at 0x17A–0x17D, and countdowns at 0x180–0x188. These are local observed layouts, not a promoted universal actor type. The SunDisc record instead has animation at 0x2C, projected position at 0x48 and velocity at 0x8C. Existing matched packed-animation code supplied the volatile command reads and timing/loop semantics. Ghidra export was unavailable. All validation used `tools/check.py`; drafts were recorded with `--nonmatching --record`. No full build or network operations were run. Final notes commit also formats the already-matched 0812A7B8 source without changing its output.
+
+Closeout tooling correction: `tools/depin.py` does not pass `--nonmatching`; on a guarded draft it checks the assembly fallback and can incorrectly remove every hint while retaining a stale fuzzy line. This occurred during closeout. All three reviewed C candidates were restored, formatted, and explicitly rechecked with `--nonmatching --record`, confirming 0812B424 = 94.8%, 0812AA0C = 83.8%, and 08129FF0 = 86.5%. Separate corrective commits restore each draft's hints. For future drafts, run depin on the unguarded scratch candidate, never on the guarded production source. The exact 0812A7B8 depin run used unguarded C and was unaffected.
+
+## Task 08144408 — 2026-10-20
+
+Tags: #matching #player #actions #recoil
+
+All six assigned functions matched with ordinary C and file-local descriptive aliases. Only `tools/check.py` was used for compilation/validation; each formatted source passed with an explicit reviewed full extent. No register pinning, full build, network operation, or shared documentation change was needed. Each match was queued separately through `build/commit.sh`.
+
+- **08145DA0 matched — Player_UpdateDefeatRecoil**, tentative name, 852 bytes. State entry folds facing, plays recoil sounds, notifies wireless defeat under global flag 0x1000, and clears the descriptor attachment. Recoil decays by three quarters; later phases set global flag 0x400, player byte 0xA6 and fading control flags. Matched recoil siblings supplied signed truncation and the existing Player layout; first candidate matched.
+- **081454E0 matched — Player_UpdateTerrainRecoil**, tentative name, 840 bytes. Three terrain/contact conditions steer toward terrainTarget with signed truncation by eight; the first two emit distinct particles. Otherwise applies heading-based recoil. Requests camera shake and decays directionFrame. Completion selects motion 0x16, 0x15 or idle. Initial 98.5% candidate used contactMagnitude incorrectly: the assembly reads positionResetTimer at 0x4D8. Correcting that field produced an exact match.
+- **08145828 matched — Player_UpdateContactKnockdown**, tentative name, 752 bytes. Sets status bit 0x40000, applies recoil and a saturating recovery counter, waits, then clears contactSpecial and returns to idle. Started from PlayerCue_UpdateKnockdownRecovery (08150DB0), replacing cue sequencing and recoilSpeed with this action's phase API and directionFrame. A scoped mask local before the status read fixed the sole instruction-order difference.
+- **08145B18 matched — Player_UpdateDefeatSlide**, tentative name, 648 bytes. Shares defeat notification, attachment clearing and delayed fade with 08145DA0, but slides along facing plus one and advances when the speed decays to zero; animation 0x2E then enters the defeat wait. The shared typed recoil expressions matched without register hints.
+- **08144408 matched — Player_UpdateChargedBurst**, tentative name, 540 bytes. Creates ChargedBurst 150 units along the facing-derived angle, with power shared-resource-level times 60 plus 120 and lifetime 90, then runs success/failure animation phases. Packed 16-bit coordinate bitfields reproduce the two word copies and masked updates. The assembly retains the angle in argument r3 at ChargedBurst_Create: explicitly passing it and computing power before the player-slot mask fixed the initial 87.1% candidate.
+- **08144624 matched — Player_UpdateSpiralBurst**, tentative name, 512 bytes. Requires two shared resource units, projects the same packed burst position and calls SpiralBurst_Create. Uses motion 0x11 with effect parameter 0x173. Derived from the charged-burst state machine and matched on the first check.
+
+Ghidra export was absent. Neighbouring matched functions and assembly were sufficient; all six final checks reported zero differing bytes over the complete body and trailing alignment/pool extent. Combined ROM validation is left to integration as instructed.
+
+## Task 080F9974 — 2026-10-20
+
+Tags: #matching #axe #actor-phase #animation #register-allocation
+
+Two of six assigned functions matched (33.3% of the task); four were retained as guarded drafts. Exact code gain is approximately 0.047 percentage points (1,136 bytes), all without register pinning. Only per-file checks were run; no full build or network operation was performed. Each match and draft was committed separately through the driver. The Ghidra export was unavailable.
+
+- **080F9BE4 drafted 86.9% — Axe_UpdateDefeat.** Entry selects profile 10, disables both colliders, sets actor flag 0x800, resets the spark-pattern index and releases the auxiliary sprite. Every other frame emits a spark at a rotated diagonal offset cycling through -120, -75, -30, 15 and 60. Blink completion calls the terrain/death scripts, records category event flags (including context byte ED7), and returns to idle. The 08082F70 cleanup and other defeat relatives supplied the common tail. A result local in signed fixed-point scaling fixed branch layout and reduced the realigned structural difference substantially. A struct containing the CpuSet zero source followed by eight script values reproduces the stack layout. Remaining: 84 realigned instructions, nine ignoring registers, chiefly register allocation, CpuSet setup order, script-value loads and final control setup. Reviewed target extent: 980 bytes. No pins.
+- **080F9FB8 matched — Axe_UpdatePursuit.** Initializes control from entryTarget228, enables sprite flag 2, and sets context E56 to 512. Within that distance it chooses a tangential heading relative to the player; farther away it turns toward the player with an angle-dependent step. Writes a 32-unit heading velocity and sprite rotation 159 minus heading. The typed local context halfword removed a redundant constant copy. A Polar inline helper prevents local vector stores from being combined into masked word writes. Separate FromPlayer/ToPlayer inline helpers reproduce global-pointer and actor-position address evaluation order; computing the actor position inside FromPlayer was the final fix. Formatted C passed check.py with reviewed --target-size 604, zero differing bytes. No pins.
+- **080FA32C matched — Axe_UpdateHealthPacedMotion**, tentative name. Restores saved control, checks callback completion, then selects speed 8/6/4 and phase duration 400/500/600 from health thresholds at context E48 and EB4. Lower health bands enter sprite-collapse control before animation state 4; the highest band switches only the animation state. Otherwise writes heading E9 to motion and advances the state counter. Explicitly narrowing Callback_InvokeActor's result to u8 recovers the observed byte test. Polar captures the heading once. Changing SetState's arguments from u32 to u8 fixed the final constant-load ordering difference. Formatted C passed check.py with reviewed --target-size 532, zero differing bytes. No pins.
+- **080FBA38 drafted 81.8% — Axe_EmitMotionTrail.** If the parent sprite is visible and actor field 2CA is divisible by the context interval at E46, initializes and advances the next trail sprite, copies actor position/angle/scales, sets lifetime eight and flags, then wraps the four-entry cursor. Context trail records begin at 708, stride 60; sequence at slot+48, resource at +58 and lifetime halfword at +5C. Cursor is E44 and animation variant ED7. Existing packed animation code supplied the flip and frame-timing logic. Remaining: 62 realigned instructions, 31 ignoring registers; sequence argument/address setup, pointer lifetimes, field access order and registers. Reviewed target extent: 588 bytes; candidate is 584. Uses register hints; depin on the unguarded candidate correctly skipped because it is not exact.
+- **080FBC84 drafted 85.2% — ActorPhase_EmitTrailSprite** (existing name retained). Same trail ring and stepper as 080FBA38, but takes explicit position and angle arguments; scales still come from the parent drawable. Remaining: 52 realigned instructions, 22 ignoring registers, including sequence/address setup, stack frame and field order. Reviewed target extent: 600 bytes; candidate is 596. Uses register hints; unguarded depin skipped as nonmatching. The default named INCLUDE_ASM fallback passed the per-file check over 600 bytes.
+
+All fuzzy scores above are the recorded full-target scores from check.py --nonmatching --record. The trail commit titles carry the earlier candidate-length scores (81.4% and 84.8%); the recorded source scores are authoritative. check.py's recording helper keys scores by compiled name and does not follow the existing ActorPhase_EmitTrailSprite alias in the fallback. For 080FBC84, temporarily using sub_080FBC84 in the fallback allowed --record to write 85.2%; the canonical fallback was then restored and checked. The final notes commit includes that score-line correction. No shared headers, symbols, generated output or shared documentation were changed. Combined ROM validation remains for the integrator.
+
+## 2026-10-20 — task 08156FE0
+
+Tags: #matching #player #ui
+
+- **0815FB80 matched**, `PlayerOrbitEffect_UpdateStatTransfer` (tentative). The
+  orbiting transition effect follows five timed arcs around the scene position,
+  returns to its owner and reduces current stat A toward the initialized target.
+  Separate offset statements prevent reassociation of the frame shift and negative
+  constant. Creating the scene-position pointer before those statements fixes
+  literal order; reading the frame before the animation-pointer assignments fixes
+  the final scheduling difference. No register hints needed.
+- **0815F2C8 matched**, `Player_InitializeFromScript`. Initializes display resources,
+  advances the embedded packed sequence, runs script initialization routines,
+  registers the slot and creates barrier/attack effects. Reused the packed decoder
+  from matched ContactSequenceActor code. The sprite pointer must occupy r6;
+  pinning the player base itself caused bad allocation and was discarded. Retained
+  12 register/barrier hints after `tools/depin.py --write`; unit is marked as a
+  register-pinning concession. Exact check passed after formatting.
+- **0816349C matched**, `TransitionPanel_UpdateCostSelection`. Accept/cancel and
+  left/right choice handling for the cost prompt. Confirm invokes the configured
+  script with the selected cost; cancel advances the player sequence and panel
+  close state. Loading the choice into a local before setting the decision to one
+  reproduces the original conditional initialization. No hints needed.
+- **08163FFC matched**, existing name `StatDisplay_DrawRatio`. Converts numerator
+  and denominator into digit arrays and draws both sides plus style-dependent
+  padding. Two arrays with a local dimension of five reproduce the original
+  separate dynamic stack allocations and frame pointer. First candidate exact;
+  no hints needed.
+- **08156FE0 retained existing draft 98.0%**, `Player_SelectActionSequence`.
+  Independently reconstructed candidate reached 93.4% (55 realigned differences,
+  four structural); flag tests need an explicit field pointer before mask/value
+  statements. The scene-five input-field address is otherwise reused across a
+  call. Final review found an existing descriptive-name draft that the initial
+  address-only search missed. Restored that stronger source after an intermediate
+  lower-score draft commit, added the required local alias, and recorded 98.0%
+  again: 16 register-only instructions, zero structural differences. Default build
+  continues to use INCLUDE_ASM.
+- **08160108 stopped unmatched**, tentative `PlayerOrbitEffect_InitializeParticles`.
+  Recovered the sixteen-particle setup, random angle/speed/radius/lifetime fields,
+  trigonometric offsets and tile selection. Best whole-listing similarity was
+  68.6%; a different variant had 16 structural differences but 90 total. Main
+  residue is long-lived RNG/table/resource allocation, stack-slot order and the
+  two sprite/interior-state pointers. Pinning the RNG pointer or interior pointer
+  caused additional reloads after byte stores. No candidate met the 80% draft
+  threshold; exploratory sources remain under ignored wip/ and build/.
+
+Validation used per-file tools/check.py only; no full build or network operations.
+Each exact match was committed separately through build/commit.sh.
+
+## 2026-10-20 — task 080A8750
+
+Tags: #matching #tentacle #scene-actor #animation #terrain
+
+Worked offline on the already-claimed `cloud/080A8750` branch, using per-file
+`tools/check.py` only. No make, complete build, network operation or direct git
+mutation was run. Each match/draft was queued separately through build/commit.sh.
+
+- **080A8750 matched — TentacleActor_UpdateKnockback.** On state entry,
+  installs actor+0x22C control, derives horizontal velocity from facing and the
+  sine table with scale four, clears vertical velocity and sets movement mode
+  two. Advances movement with arguments six and 0x1000; flag 0x10 requests a new
+  wander route and restores entry control/state. A pointer to direction created
+  before the velocity pointer reproduces the original address scheduling.
+  Explicitly retaining the state offset through the final flag store avoids
+  a different address register. The final counter load needs r0 offset and r1
+  pointer hints. Exact 380-byte body including pool/padding; depin reduced nine
+  hints to six, and the formatted production file passed the exact check.
+  Register-pinning concession retained.
+- **080A8904 drafted 87.6% — TentacleActor_SelectWanderRoute.** Reads terrain
+  surface and the context's route-choice count, enumerates adjacent cells while
+  rejecting opposite headings, prefers an unvisited side route, then a random
+  side route, then unvisited forward travel, then reverse travel. Writes the
+  chosen cell center to context+0x904 and arms timer 0x8E4 for 40. Context+0x8E8
+  counts choices; +0x8E9 stores a heading exclusion. If no reverse route exists,
+  rotates that exclusion. Uses existing terrain helpers and visited-route calls
+  at 080AB51C/080AB54C. A signed pointer do/while initializer and a nested terrain
+  surface test improved the initial draft. Remaining: 64 realigned instructions,
+  37 ignoring registers; facing/count/forward lifetimes, first destination
+  pointer lifetime, and store/address order. No register hints retained.
+- **080A8F38 drafted 85.0% — TentacleBody_RefreshDirectionalAnimations.** Iterates
+  0x128-byte segments, skips status bit one, selects tail sequence one for status
+  bit four and reverses its direction, otherwise uses the actor-profile sequence
+  and preserves the current frame/timer around the sequence update. Advances the
+  packed animation and updates sprite frame/flips. Remaining: 41 realigned
+  instructions, eight ignoring registers; stack-slot order, sprite/command
+  pointer lifetimes and register choices. Register/barrier hints retained.
+- **080A915C drafted 87.0% — TentacleBody_ResetDirectionalAnimations.** Same
+  directional animation update, without preserving the frame/timer. A local
+  frame record reproduces the stack layout more closely. Remaining: 36 realigned
+  instructions, ten ignoring registers; first frame/flip accesses, branch/store
+  layout, and loop-tail registers. Register/barrier hints retained.
+- **080A93F4 drafted 87.0% — TentacleBody_RestartSegmentAnimations.** Takes
+  explicit row/flags rather than deriving direction, calls Anim_RestartSequence,
+  applies speed to non-tail segments, then advances the same packed animation.
+  Remaining: 38 realigned instructions, 16 ignoring registers; parameter/frame
+  placement, sprite pointer copies, store layout and loop registers. Hints kept.
+- **080A8D50 stopped unmatched — tentative TentacleBody_InitializeSegments.**
+  Recovered setup of four segments, count/health-share fields 0x8DA/0x8EA/0x8EB,
+  resource and sprite setup, direction mapping and tail status bit four. The
+  other segments begin at staggered frame indices zero through three. Each
+  segment stores its body owner at animation+0x34. Best attempted listing reached
+  68.6% (62 realigned instructions, 19 ignoring registers), below draft threshold.
+  The compiler hoists stack-output pointers and argument transforms out of the
+  loop, merges the two initial constant-four loads, and changes local-counter
+  and register lifetimes. The assembly's stack counter is initialized to zero,
+  tested each iteration and incremented only in its nonzero branch; straightforward
+  scalar C eliminates that branch. A local frame aggregate retains it but still
+  misses allocation/scheduling. Scratch sources remain under ignored wip/build;
+  no subthreshold production source was added.
+
+All four draft scores were recorded after formatting with
+`tools/check.py FILE --nonmatching --record`; each default INCLUDE_ASM fallback
+also passed its per-file exact check. Depin on unguarded animation drafts skipped
+because they are not exact. Their default assembly checks are not C progress.
+The integrator must perform the complete combined ROM build.
+
+Exact code gain for this task: **+0.0157 percentage points** (380 bytes), all in
+the Register-pinned category. Drafts contribute no exact gain.
+
+## Task 08148318 — 2026-10-20
+
+Tags: #player #matching #register-pinning
+
+Four matches and two guarded drafts. Exact coverage within this task is 56.2%
+(+56.2 percentage points; 1,920 of 3,416 assigned bytes). The batch contributes
++0.0795 percentage points of project code, all Register-pinned. Drafts add no
+exact coverage. Only per-file checks were run; combined ROM validation remains
+with the integrator.
+
+- 08148318: improved the existing Player_UpdateWaveringMovement draft from
+  82.7% to **87.6%**. Writing odd-direction hold durations through the observed
+  Player byte array (`unk466[3]`, offset 0x469) instead of the timer pointer
+  restores the duplicated branch-specific stores. The same change must not be
+  applied indiscriminately to the even-direction path, which retains its timer
+  pointer. Remaining differences include RNG result allocation, even-direction
+  address scheduling, branch/pool layout and an apparently unused original
+  0x0403B714 literal. Barriers around RNG offset/table construction regressed
+  to 82.2% and were reverted. Added the required local descriptive alias; the
+  fallback uses the address symbol so `--nonmatching --record` finds it.
+- 08148B64: new **99.4% draft**, Player_UpdateSpiralDisorientation (tentative).
+  Player dispatch table gUnk_08610CA8 references it. Entry reconstructs facing
+  from heading/side, emits queued effects and a spiral trail, then alternates
+  folded facing using tetherFrame. It sets resource 0x16F, advances the packed
+  animation, grows the effect duration to 32, and returns to action zero after
+  frame 31. Typed spriteResource/actionVariantResource fields reproduce the
+  resource-index shift instead of emitting another literal. Two instructions
+  remain: the duration-field offset is loaded into r0 instead of r3. Explicit
+  duration-pointer/offset pins disrupted shared 0xFFFF masking or earlier
+  scratch-register choices; retained the best compact candidate.
+- 08148914: **matched**, Player_UpdateDecayingRecoil (tentative), 592 bytes.
+  Consumes an optional contactActionTag sound, folds facing, advances animation,
+  applies opposite-facing sine/cosine impulses, and decays magnitude at 0x270
+  by three quarters. At zero it clears contactSpecial and selects action 22
+  only when byte 0x5B9 is three and 0x5BB is nonzero. Multiplying table sample
+  by magnitude, in that source order, fixed most allocation/load-order misses
+  (87.9% to 97.9%). Pins on the magnitude and facing address temporaries closed
+  the remainder. Sign-preserving shifts reproduce the original rounding.
+- 081487B4: **matched**, Player_UpdateTimedMovementRecovery (tentative),
+  352 bytes. Subtracts 60 from byte 0x466 while it exceeds 59; otherwise clears
+  status bit zero and the byte. Advances sequence one and returns to action
+  zero when the movement gate at 0x5BB clears. The shared stepper matched
+  immediately; paired offset/address pins fixed the final two instructions.
+- 08148608: **matched** the previous direction-recovery draft, 428 bytes.
+  Pinning the command pointer to r6 requires separately materializing its
+  offset in r0 and table in r1, avoiding an unwanted in-place pointer shift.
+  A local facing pointer with an input-only barrier schedules its address
+  before the history mask while preserving the typed store and branch merge.
+  The final signed movementAnimationState gate is at 0x4F3, not 0x418.
+- 08148FC0: **matched** the previous walking draft, now named
+  Player_UpdateWalkFootsteps (tentative), 548 bytes. Uses the matched packed
+  stepper, alternates nearby positional effects 0x162/0x163 or sounds 0xC8/0xC7
+  on animation frame two, and emits a secondary effect for GameState flag one
+  at 0x868. Pins retain zero in r5 and position in r4; the saved zero must be
+  u32, because an opaque u16 pin introduces extra truncation. Pinning the frame
+  address then fixes all remaining scratch-register differences.
+
+Every exact candidate passed a reviewed full-extent `tools/check.py` after
+formatting. `tools/depin.py --write` reduced the retained hints to 14, 17, 17,
+and 15 for 081487B4, 08148914, 08148608, and 08148FC0 respectively. Run depin
+on unguarded C candidates: a guarded draft's default INCLUDE_ASM fallback can
+make it strip hints without validating the candidate. The spiral candidate was
+restored and re-recorded after encountering that behavior. Both draft scores
+were recorded with `--nonmatching --record` after formatting. No make, full
+build, network operation or shared documentation edit was performed.
+
+## Task 080EB298 — 2026-10-20
+
+Tags: #matching #scene-actor #ivy #worker
+
+- **080EC0E8 matched** as `SceneActorReaction_FindAdjacentTarget`. The matched
+  `Ivy_FindAdjacentTarget` (080F0910) explains all but one call: substitute
+  `sub_080EC024` for `SceneActor_FindNearbyPlayerTarget`. Finds the nearer same-level
+  player/category actor within the squared-distance limit, checks adjacency in
+  terrain cells, optionally turns toward it, and retains its reference at +0xDC.
+  Exact check: 536 bytes. Starting with `relatives.py` made this a first-check match.
+- **080EB298 matched** as tentative
+  `SceneActorReaction_ReacquireAdjacentTarget`. Starts reaction animation control
+  (kind 41), checks for an adjacent target after completion or while control kind
+  34 is active, shows the drawable and switches to `sub_080E9C20` when found.
+  Kind 34 times out after 180 ticks into idle control. A separate no-argument
+  idle-state inline helper, rather than passing constant zero to the generic
+  state setter, puts the zero initialization after the field-address calculation
+  and resolves the last two instruction-order differences. Exact check: 440 bytes.
+- **080EB58C matched** as `SceneActorReaction_WaitForAdjacentTarget`. Context
+  +0x634 is a signed consecutive-miss counter, +0x636 its signed limit. Entry
+  clears the miss counter; exceeding the limit resets the actor state. After
+  30 ticks with a current adjacent target it faces the saved target reference,
+  resets its reaction state and begins `sub_080E9C20`. The target reference is
+  loaded before the search call, as in the ROM. Reusing the combined state/control
+  inline shape from 080EFC58, rather than two independent generic setters,
+  reproduced offset derivation and register lifetimes exactly. Exact: 344 bytes.
+- **080F3230 drafted 83.7%** as tentative `PhaseObject_ConvergeEntries`.
+  Four entries (stride 0x2C, starting +0xA8) interpolate x/z from saved points
+  (+0x468, stride 8) toward a shared target (+0x488), using delay/15. Their signed
+  opacity bytes (+0xB0, stride 0x2C) rise by three and clamp to 64. When unpaused
+  (+0xD80 bit 0 clear) and delay reaches zero, it resets entry coordinates,
+  enables flags, clears collider bits and installs the next callbacks.
+  `--nonmatching --record` recorded the score; default compilation keeps INCLUDE_ASM.
+  Remaining: 32 realigned instructions, only two ignoring registers; principally
+  r3/r4/r6/r7 allocation in the reset loop and constant ordering for mode stores.
+  Keeping separate opacity and flag pointers plus a byte offset reproduced the
+  loop structure. Explicit locals for opacity 64 and flag bit 1 improved ordering.
+  Whole-object shifted views reproduce base-plus-index followed by +0xC4/+0xC8;
+  pointers directly to entries generate different Thumb memory addressing.
+  Use canonical `ChildGroup_UpdateAlternatingCallbacks` for 080F40C8: its old
+  sub_ name resolved without the Thumb bit in this check environment.
+- **080ED4E0 stopped below draft threshold** (best ordinary candidate 68.5%).
+  Tentative `Ivy_UpdateCaptureReach`: selects directional animation 5, plays
+  cue 0x1DD at sequence index 3/elapsed 0, enables capture collision after elapsed
+  6, finds an adjacent target and switches to Ivy hold. Mirrored offset table
+  `gUnk_08606384` positions players or actors; context +0x62C bit 1 marks a held
+  target. Animation completion without capture switches to 080ED838.
+  Best candidate retained at `wip/codex-medium/sub_080ED4E0.c`. Mismatches include
+  extra high-register pressure, state/control constant derivation, packed-vector
+  construction and branch/field-address ordering. Multiple helper/type variants
+  did not get it above the threshold.
+- **080F2F7C stopped below draft threshold** (best ordinary candidate 70.1%).
+  Tentative `PhaseObject_RelocateEntryOrigin`: mirrors x/z offsets over four
+  entries, reduces opacity to a minimum of 1, expands offsets while unpaused,
+  then chooses a random origin around the anchor at radius 200 and y+350.
+  Saves entry positions, marks entry flags/phases, installs
+  `PhaseObject_BeginEntryMotion` and a 30-tick delay. Candidate at
+  `wip/codex-medium/sub_080F2F7C.c`. Remaining: 13 structural differences in the
+  best ordinary candidate, many allocation/stack-slot differences. The ROM
+  keeps the 255 angle mask in a stack slot across Div; the candidate rematerializes
+  it, shifting later spill offsets. Register-pinning experiments did not help
+  enough and were not retained. Neither below-threshold source was added to src.
+
+No network or full builds used. Per-file byte checks accepted the three matches.
+The bounded permuter attempt for 080F3230 failed before searching: export's
+`tools/split.py` rejected unrelated `Ghoul_ResumePendingRoute` in
+`src/fn/sub_0808CC48.c` as not a known function start. The Ghidra export is absent
+(`gen/ghidra/decomp.c`), so these candidates were recovered from assembly and
+matched siblings. No register-pinning concession is present in accepted sources.
