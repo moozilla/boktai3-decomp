@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.3%
-// foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
 #define gEffectPool gUnk_020001E0
 struct EffectPoolEntry {
     u8 pad00[0x17];
@@ -19,10 +16,6 @@ struct EffectPool {
 };
 extern struct EffectPool *gUnk_020001E0;
 void Effect_Remove(void *);
-static inline void ClearEffectPool(void)
-{
-    gUnk_020001E0 = 0;
-}
 s32 EffectPool_Destroy(struct EffectPool *pool)
 {
     struct EffectPoolEntry *entry = pool->entries;
@@ -33,9 +26,9 @@ s32 EffectPool_Destroy(struct EffectPool *pool)
         entry++;
         count--;
     } while (count >= 0);
-    ClearEffectPool();
+    {
+        struct EffectPool *cleared = 0;
+        gUnk_020001E0 = cleared;
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", EffectPool_Destroy);
-#endif
