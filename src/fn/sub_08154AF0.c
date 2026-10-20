@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
+#define PlayerCue_UpdateSideRecoil          sub_08154AF0
+#define Player_RestartAnimationFromResource sub_081538DC
 #ifdef NONMATCHING
-// fuzzy: 97.5%
-// Remaining six differences allocate recoil and direction offsets to other registers.
-// fuzzy: 97.5%
+// fuzzy: 98.7%
+// Remaining three differences allocate the recoil offset to r1 instead of r2.
 
 struct P {
     u8 pad0[0x14C];
@@ -161,7 +162,13 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
     if (H(0x598)) {
-        u32 angle = ((p->dir + 5) & 7) << 5;
+        register u32 directionOffset asm("r5") = 0x3A4;
+        register u8 *direction asm("r0");
+        u32 angle;
+        asm("" : "+r"(directionOffset));
+        direction = (u8 *)p + directionOffset;
+        asm("" : "+r"(direction));
+        angle = ((*direction + 5) & 7) << 5;
         H(0x38) = -Truncate(gUnk_086149C4[(angle + 64) & 255] * H(0x598));
         H(0x3C) = -Truncate(gUnk_086149C4[angle] * H(0x598));
         H(0x598) = (H(0x598) * 3) >> 2;
@@ -174,5 +181,5 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideRecoil);
+INCLUDE_ASM("asm/nonmatching", sub_08154AF0);
 #endif
