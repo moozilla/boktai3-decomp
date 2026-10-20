@@ -3664,3 +3664,75 @@ The bounded permuter attempt for 080F3230 failed before searching: export's
 `src/fn/sub_0808CC48.c` as not a known function start. The Ghidra export is absent
 (`gen/ghidra/decomp.c`), so these candidates were recovered from assembly and
 matched siblings. No register-pinning concession is present in accepted sources.
+
+## Task 081BDE94 — 2026-10-20
+
+Tags: #matching #storage #inventory #worker #register-pinning
+
+Exact code gain: **+0.0729 percentage points** (1,760 bytes). Register-pinned
+category: 1,212 bytes; ordinary C: 548 bytes. Three of the six assigned functions
+matched; no NONMATCHING drafts remain from this task.
+
+- **081BF67C matched**, named `Storage_InitWidgets`. Called by `Storage_Init`
+  (081BFF18), it copies and relocates the 0xCB05/0x5D04 and 0xCB05/0x530D
+  resources into +0x1538/+0x1518, initializes Storage's widgets (including the
+  two sixteen-slot grids and eight equipped markers), then initializes the input
+  marker/glyph pairs at +0x1558/+0x164C. Uses the shared `ContactPackedVector`
+  and `SceneInputResource` types. Taking the clear-fill value's address early
+  (`zeroPtr`) gives the original stack layout; otherwise the position starts
+  four bytes too early and creates extensive allocation differences. Initially
+  committed as a recorded 95.9% draft, then superseded by an exact match.
+  Four hints survive `depin.py`: the first call's r1 zero plus an empty compiler
+  barrier, and r0/r1 pointers for CpuSet. These resolve the final argument-order
+  differences without handwritten instructions. Reviewed extent: 840 bytes.
+- **081BE16C matched**, `Storage_RefreshItemSlots`. Refreshes two sixteen-entry
+  grids at +0x318/+0x918 using mapping bytes +0x1790 and the resource at +0x1538;
+  records the first empty slot in +0x1756/+0x1757, applies palette 0x373 to the
+  carried grid and hides all eight equipped markers at +0x10F8. First empty
+  field is written as unsigned 0xFF but tested through s8; the second starts
+  with signed -1. A distinct row-byte offset and widget-base local reproduce
+  the first grid's address addition order. The second grid needs an explicit
+  advancing slot index, separate column counter and next-row value; otherwise
+  agbcc replaces the counter with a descending loop or recomputes the index.
+  A named mask initialized before the final flags pointer reproduces the hide
+  loop. Two hints remain after depinning: column r9 and second-grid row slot
+  r8. Reviewed extent: 372 bytes.
+- **081BF1AC matched**, `SceneInventory_UpdateCategoryBrowse`. Select+A cycles
+  clock mode; ordinary A saves the grid selection and either starts swap
+  selection (mode 1) or checks whether the selected item can be removed (mode
+  2), opens its confirmation and updates the palette/state. B returns to mode
+  selection; grid navigation updates the cursor and description. A named
+  pointer to the saved cursor gives a +0x14B8 base with flags at +8; a direct
+  field expression instead synthesizes +0x14C0. Positive eligibility branches
+  and a shared `allow` label reproduce the branch order. Set the consumed
+  eligibility flag after the consumable-equipped call to avoid an extra saved
+  register. Use canonical `Storage_UpdateSwapSelection` for callback 081BF04C:
+  the old sub_ name resolved without its Thumb bit. No hints remain after
+  depinning. Reviewed extent: 548 bytes.
+- **081BE504 stopped below draft threshold**, best 49.6% (candidate-length
+  score). Equipment refresher also highlights equipped/unassignable carried
+  slots with palette 0x374, places equipped markers via 081BD934, and hides the
+  unused markers. Ordinary flat/2D typed-widget and raw-pointer variants retain
+  different row-base, flag-pointer and marker-offset inductions and stack
+  allocation. Best source retained in `wip/sub_081BE504.c`; not added to src.
+- **081BE2E0 stopped below draft threshold**, best 70.1% (candidate-length
+  score). Consumable counterpart uses id +0x121, checks equipped slots through
+  `GameState_IsConsumableSlotEquipped`, highlights those entries and positions
+  equipped markers. Explicit row/marker offsets reduced some structural
+  differences, but agbcc turns the inner slot pointer into an induction
+  variable and the counters into descending loops. Volatile counter, aggregate
+  frame and register-placement probes did not improve the retained score.
+  Best source retained in `wip/sub_081BE2E0.c`; not added to src.
+- **081BDE94 stopped below draft threshold**, best 50.2% (candidate-length
+  score). Builds two transition entries for saved/current selections, hides
+  their grid widgets and appropriate equipped markers, determines frames and
+  enabled flags by category, reverses source positions into destinations,
+  begins a twelve-frame pair transition and plays sound 0x38A. Output-array
+  indexing produces different pointer induction/stack spilling; explicit
+  output pointers and flag views worsened the candidate. Best source retained
+  in `wip/sub_081BDE94.c`; not added to src.
+
+All accepted functions were formatted with the venv's clang-format, minimized
+with `depin.py`, and checked byte-identically with explicit reviewed extents
+using `tools/check.py`. No full build or network operations. Ghidra's export
+is absent, so recovery used assembly, callers/callees and matched neighbours.
