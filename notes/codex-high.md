@@ -1266,3 +1266,111 @@ alternatives passed per-file checks; the two smaller alternatives used reviewed
 extents (800 and 596 bytes). Final C scores were recorded with
 `check.py --nonmatching --record`. Formatting and `git diff --check` passed.
 Combined ROM validation remains with the batch integrator.
+
+# Codex high: task 0819F788 (2026-10-20)
+
+Tags: #matching #hresvelgr #terrain #player-positioning #register-pinning
+
+Branch: `cloud/0819F788`. Worked solo and offline, largest functions first.
+Used the worktree Python and fast per-file checks; no make, full build,
+network operations, generated-file edits or direct Git mutations. Function
+commits and this note were queued through `build/commit.sh`.
+
+Exact coverage of the assigned functions' reviewed body/pool extents is
+**28.52% (+28.52 percentage points; 1,620 of 5,680 bytes)**, all in the
+Register-pinned category. The two guarded drafts add no exact coverage.
+Reviewed extents: 0819F788=460, 0819FC34=616, 0819FE9C=1,564,
+081A0BC8=732, 081A12DC=544, 081A14FC=1,764 bytes. Each ends at the
+following independent function's prologue; included literal pools were
+reviewed in the assembly listings.
+
+The neighboring named routines and `Hresvelgr_ApplyRequestedAction`
+(081A1EA4) establish the Hresvelgr action-callback family. The scene-message
+dispatcher at 081A2430 specifically installs 081A12DC for command 26/action
+31. Names below are tentative, with file-local aliases and confidence comments.
+Local observed layouts remain in their own translation units.
+
+- **0819F788 matched**, `Hresvelgr_UpdateAlternatingVolley`, 460 bytes.
+  Entry plays a side-specific sequence from 0824F72C at duration scale eight,
+  clears 02000234 and plays song 0x4D2. Each animation pulse adds the selected
+  offset at 0x338 to the actor position, emits four DirectionBurst shots,
+  alternates the sequence, then finishes after the counter exceeds fifteen.
+  The three random samples must share one local RNG index across the signed
+  remainder call at 08249350; independently reading the global after that
+  call creates a reload. The remainder routine is declared const. Computing
+  the offset inside an inline taking the actor and origin reproduces pointer
+  evaluation order. A separate automatic sample plus an r0 remainder local
+  preserves the ROM's arithmetic shift; pinning the sample itself changes
+  it to a logical shift. Register/barrier hints also retain index, angle,
+  speed and loop-counter lifetimes. `depin.py --write` reduced 26 hints to
+  thirteen; formatted source passed the reviewed-extent exact check.
+- **0819FC34 matched**, `Hresvelgr_UpdateTurningCharge`, 616 bytes.
+  Resets a signed turn at 0x334, faces the target heading, and starts the
+  charge animation. It corrects the transverse coordinate toward target
+  0x110, finishes near the target or beyond the boundary, and enters a brief
+  random +/-16-heading turn on contact flag 0x10. The materialized player
+  availability and boundary booleans preserve the original branches. A mask
+  local in r1 fixes heading quantization's operand tie. An inline flags
+  setter with an opaque temporary actor address prevents an unwanted flags
+  pointer from remaining live across Callback_InvokeActor; its mask is
+  evaluated first. `depin.py --write` reduced seven hints to four; formatted
+  source passed the reviewed-extent exact check.
+- **081A12DC matched**, `Hresvelgr_UpdateRisingProjectile`, 544 bytes.
+  Entry restores target heading, starts animation 25 at duration scale 112,
+  raises the render position by 512 and launches a moving projectile with
+  vertical delta 48. On the next pulse it approaches Y=832 in four-unit
+  steps and finishes at that height. Returning the direction-field pointer
+  from SetHeading gives it the required lifetime without computing it before
+  the entry check. CopyVector followed by a halfword-pointer Y update avoids
+  agbcc's word read/modify/write of the stack vector. The last two reordered
+  instructions disappeared by masking the angle in the PolarVector call
+  argument as well as inside the helper; a barrier or a narrower argument
+  made the code worse. `depin.py --write` reduced four hints to one. Final
+  formatted source passed the full 544-byte check.
+- **0819FE9C drafted 86.1%**, `Hresvelgr_UpdatePlayerRelease`, reviewed
+  1,564 bytes, candidate 1,560. Coordinates a player position request,
+  animation stages, an upward movement toward a free terrain-cell center,
+  landing, camera shake, and the final player position request. Terrain
+  attributes 0x81 reject release cells; it checks four cardinal neighbors
+  before falling back to (0xB54, 0, 0xB54). The landing path intentionally
+  recomputes terrain height before storing it. Returning immediately from
+  each branch of the signed fixed-point shift helper substantially improves
+  its generated branch order. Passing the RNG table into the sample inline
+  improves allocation. Final realigned differences: 123 total / 35 ignoring
+  registers, chiefly release-target address/vector lifetimes and RNG
+  allocation. No register hints were retained in this draft.
+- **081A0BC8 drafted 93.9%**, `Hresvelgr_UpdateBoundaryBarrage`, reviewed
+  732 bytes, candidate 736. Waits 129 frames, positions the actor on the
+  selected boundary, configures collision mask 0xD000 and bounds at 0x704,
+  traverses the arena, and emits falling projectiles over valid terrain
+  every eighth tick. At the far edge it restores mask 0x2F0/bounds 0x424 and
+  finishes. An inline returning the enabled-flags pointer recovers the
+  original cached flag value. Loading raw RNG samples before loading the
+  actor coordinate preserves the interleaved sample/position order. Final
+  realigned differences: 24 total / three ignoring registers. Remaining
+  issues are animation arguments/state-one lifetimes and RNG arithmetic
+  allocation; broader wrap/state hints regressed. Register hints are marked
+  as concessions. Depinning on the unguarded candidate correctly skipped it
+  because the minimizer only accepts exact matches.
+- **081A14FC stopped below draft threshold**, tentative role
+  `Hresvelgr_UpdateDefeatSequence`. Reconstructed all five states: entry
+  animation/event script, eight increasingly fast movement stages with
+  randomized motion effects, landing/bounces with particles, event flags
+  0/3/0x4E and the second event script, then completion. Best complete check
+  reached 53.8% (candidate 1,540 versus reviewed 1,764 bytes), with 465
+  realigned differences / 203 ignoring registers. The main discrepancy is
+  the ROM's repeated precomputation of the four final motion-field addresses
+  around switch edges; the candidate sinks them to the common tail.
+  Scalar fields, inline argument forms, explicit pointer locals, volatile
+  input/opaque-output barriers, pointer pins and pure div/mod declarations
+  did not recover that pattern. Nothing below threshold was promoted;
+  scratch sources and variants remain only under ignored wip/build paths.
+
+Ghidra's export is absent. `relatives.py` fails in its progress-report
+dependency, so used neighboring C and assembly directly. Large functions
+were read with `asmat.py`/`condense.py`; hypothesis batches used variants
+and structural/total anchordiff counts. No tool or shared header was changed.
+Both drafts have NONMATCHING guards, raw sub-address INCLUDE_ASM alternatives,
+recorded reviewed-extent scores, and byte-identical default assembly checks.
+Source review, formatting and `git diff --check` passed. Combined ROM
+validation remains with the batch integrator.
