@@ -49,12 +49,11 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
 }
 #ifdef NONMATCHING
 // fuzzy: 96%
-#define Crow_PlayEntry2 sub_0809EF50
 void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor))
         SelectAnimation((void *)actor, 2, 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809EF50);
+INCLUDE_ASM("asm/nonmatching", Crow_PlayEntry2);
 #endif

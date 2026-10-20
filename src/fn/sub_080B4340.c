@@ -16,7 +16,6 @@ struct S {
     u16 flags;
 };
 
-#define Vorn_OnUpdate sub_080B4340
 s32 Vorn_OnUpdate(struct S *s)
 {
     u32 m;
