@@ -221,3 +221,59 @@ Only the guarded damage draft is production source. Scratch candidates are
 below the 80% draft threshold and are deliberately uncommitted. Resume with
 those candidates and build/sword-*.txt condensed listings if this checkout is
 retained; generated listings are not committed.
+
+## Task 0821881C — 2026-10-20
+
+Tags: #matching #terrain #sprites #scanline
+
+- 082192F0: matched as `ScanlineEffect_StageTransfer` (commit 76695fe00).
+  Stages 160 halfwords from the queued source into ScanlineEffect_GetBuffer:
+  modes 0/1 add the selected BG horizontal/vertical scroll and mask to 511;
+  mode 2 copies mosaic values; mode 3 sets blend registers and masks to 31.
+  Publishes the transfer target/buffer and clears the source. Neighbouring
+  ScanlineEffect functions and caller 082141C0 establish the subsystem.
+  `buffer[i]` rather than `*out++` reproduces the exact loop allocation and
+  initialization order. BackgroundLayer field accesses reproduce the ROM's
+  base-address load and field offsets. Final check.py: 100%, zero differing bytes.
+- 0821C8F8: stopped after assembly/condense/relative analysis, no draft.
+  Largest target first inspected; no matched relative explains more than 3%.
+  Six parameters: context, position, movement vector, two u16 extents, u8 kind.
+  Direction flags use 0x10/0x20 for X and 1/2 for Z. Builds paired offset probes,
+  calls 0821BF5C and 0821C254, and commits through 0821C754. Many duplicated
+  direction-specific branches and ten stack position temporaries must be retained;
+  a generic shared probe loop is unlikely to reproduce this layout.
+- 0821C254: stopped after full assembly and relative analysis, no draft.
+  No relative explains more than 5%. Uses context halfwords +4/+6 as cell indices,
+  classifies an index delta into eight neighbouring directions with terrain width,
+  and dispatches eight cases. Diagonal cases probe both orthogonal cell-edge
+  positions through 0821BF5C before clamping the destination. Edge positions use
+  `(column << 8) + 1` or `((column + 1) << 8) - 1`; keep explicit case bodies.
+- 0821BF5C: stopped, best candidate 70.8% fuzzy, 167 differing instructions / 125
+  ignoring registers; below the draft threshold. Candidate retained locally at
+  wip/codex-low/sub_0821BF5C.c. Resolves terrain overrides (payload +4) or base
+  cells (+12+4*index), rejects blocking flags and excessive 0821BE3C result,
+  then checks adjacent flat/slope transitions. Kind 4 selects mask 2/limit 128;
+  other kinds mask 1/limit 100. Game-state +868 bit 16 with destination flag 128
+  can reject lateral slope movement. Explicit duplicated override lookups improve
+  the score. Shared compare-pointer tails shrink the function incorrectly;
+  register-pinning trials regressed and were discarded.
+- 0821881C: stopped, no qualifying draft. Best fuzzy trial 62.8%; best structural
+  trial 41 differing instructions ignoring registers (203 total), 56.9% fuzzy.
+  Retained the latter locally in wip/codex-low/sub_0821881C.c. Tentative role:
+  stages queued sprites into OAM lists, projects world coordinates with signed
+  3/32 scaling, allocates affine inputs, applies display flags and clamps depth.
+  Scale limit comparisons load unsigned bytes, but affine inputs use signed
+  bytes. Projection inline with pointer parameters reduced structural differences;
+  explicit register pinning worsened structural agreement. Heavy allocation and
+  projection/control-flow differences remain.
+- 0821D178: stopped, candidate 62.1% fuzzy, 193 differing instructions / 86
+  ignoring registers; retained locally in wip/codex-low/sub_0821D178.c.
+  Clips a segment to a 256-unit cell. Checks +Z, -Z, -X, +X intersections and
+  returns 3, 2, 4, 5 respectively; unchanged destination returns 1, failure 0.
+  The packed two-word position preserves unspecified padding halves in the ROM;
+  candidate layout and register allocation differ. Pinning the union and dz
+  regressed and was discarded. Candidate is unreviewed scratch, not an accepted draft.
+
+Only per-file check.py checks were run; no full build or network operations.
+No NONMATCHING drafts met the required 80% threshold. Existing tools/cloud_task.py
+modification was left untouched. No shared docs or generated assembly committed.
