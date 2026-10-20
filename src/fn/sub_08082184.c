@@ -109,13 +109,13 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *input
                 u32 updated;
                 register u32 resultFlag asm("r0");
                 s32 result;
-                if (!sub_0821F204(context, source, (void *)queryWord)) {
+                if (!Nav_IsPositionInMesh(context, source, (void *)queryWord)) {
                     failedFlags = &actor->flags2D4;
                     updated = *failedFlags;
                     updated &= ~clearMask;
                     goto query_failed;
                 }
-                result = sub_0821F7A8(context, source, (void *)queryWord);
+                result = Terrain_ApplyBlocked(context, source, (void *)queryWord);
                 if (result) {
                     if (result != 2)
                         Memory_Clear(&actor->motion, 8);

@@ -129,11 +129,11 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group,
     void *route = *(void **)(group + 0x1FC);
     struct ContactPosition *position = &actor->position;
     s32 result;
-    if (!sub_0821F204(route, position, destination)) {
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
         actor->flags2D4 &= ~0x200;
         return 0;
     } else {
-        result = sub_0821F7A8(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);
@@ -260,12 +260,12 @@ static inline u8 TryMove4(struct SceneActorRegistryResetView *actor, void *route
                           struct ContactPosition *position, struct ContactPosition *destination)
 {
     s32 result;
-    if (!sub_0821F204(route, position, destination)) {
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
         u32 mask = ~0x200;
         actor->flags2D4 = mask & actor->flags2D4;
         return 0;
     } else {
-        result = sub_0821F7A8(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);

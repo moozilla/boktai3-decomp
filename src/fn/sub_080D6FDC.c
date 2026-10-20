@@ -61,13 +61,13 @@ static inline u8 RequestPath(struct SceneActorRegistryResetView *actor, void *ro
 {
     struct ContactPosition *from = &actor->position;
     s32 r;
-    if (!sub_0821F204(route, from, pos)) {
+    if (!Nav_IsPositionInMesh(route, from, pos)) {
         u16 *flags = &actor->flags2D4;
         s32 mask = ~0x200;
         *flags &= mask;
         return 0;
     }
-    r = sub_0821F7A8(route, from, pos);
+    r = Terrain_ApplyBlocked(route, from, pos);
     if (r) {
         if (r != 2)
             Memory_Clear((u8 *)actor + 0x64, 8);
