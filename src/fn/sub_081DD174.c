@@ -1,5 +1,4 @@
 #include "global.h"
-#define NameEntry_MoveCursorUp sub_081DD174
 void NameEntry_UpdateCursor(void *);
 void Sound_PlaySong(s32);
 void NameEntry_MoveCursorUp(u8 *p)

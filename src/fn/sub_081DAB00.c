@@ -17,7 +17,7 @@ struct ProjectileDef {
 void *ResourceRegistry_GetResource(u32);
 void *Task4E01_GetOrCreate(void);
 s32 Mod(s32, s32);
-s32 sub_081DA810(void *, void *, void *);
+s32 TimedEffect_SpawnProjectile(void *, void *, void *);
 s32 Projectile_Spawn(struct ProjectileDef *p, void *arg)
 {
     s32 total = 0;
@@ -67,12 +67,12 @@ s32 Projectile_Spawn(struct ProjectileDef *p, void *arg)
                 p->flags |= 0x100;
             else
                 p->flags |= 0x200;
-            result = sub_081DA810(task, p, arg);
+            result = TimedEffect_SpawnProjectile(task, p, arg);
             p->angle += step;
             if (result == -1)
                 return -1;
         }
         return result;
     }
-    return sub_081DA810(task, p, arg);
+    return TimedEffect_SpawnProjectile(task, p, arg);
 }
