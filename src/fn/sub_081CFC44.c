@@ -1,8 +1,6 @@
 #include "global.h"
 #include "state_actor.h"
 
-#define SceneNpc_UpdateProjectedVisible sub_081CFC44
-
 void GroundEffect_EnableProjection(void *);
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 s32 Player_GetHorizontalVelocity(s32);

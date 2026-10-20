@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 95.8%
 // differs: compiler rematerialises 0 after the loop instead of reusing the loop zero in r0
-#define SceneEffect_InitParticleRing sub_081D15EC
 
 struct Pair {
     u32 a, b;
@@ -46,5 +45,5 @@ s32 SceneEffect_InitParticleRing(u8 *p, struct Pair *src)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D15EC);
+INCLUDE_ASM("asm/nonmatching", SceneEffect_InitParticleRing);
 #endif
