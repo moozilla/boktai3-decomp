@@ -2537,3 +2537,95 @@ address-aliased emitted functions. Changed those three fallbacks to their
 `sub_XXXXXXXX` spellings, formatted them, and reran `--nonmatching --record`.
 All four final fuzzy comments are now written by the checker (including the
 95.4% improvement), rather than merely reported in its global comparison.
+
+## Cloud task 08119B80 — 2026-10-20
+
+Tags: #matching #terrain #glove #particles #animation
+
+Worked solo on the preclaimed `cloud/08119B80` branch, largest functions first.
+Exact code gain: **+0.0364 percentage points** (880 bytes, unpinned). Five guarded
+NONMATCHING drafts earn no exact coverage. No network operations or full builds.
+All six functions have descriptive file-local address aliases.
+
+- **08119B80 — matched, Glove_DispatchCommands.** Reviewed extent 880 bytes;
+  `tools/check.py src/fn/sub_08119B80.c --target-size 880` reports zero differing
+  bytes. Glove command queue +870, recoil-motion parameters +8C8, attachment
+  descriptor +91C, screen position +928 and attachment handle +964. Queue kinds
+  2/6 populate recoil parameters and select 08119378/08119638; kinds 5/0/1 select
+  the named recoil callbacks; kind 3 sets emitter fields. Kind 4 creates or
+  releases attachments and plays sound. Used SceneActor_DispatchCommands
+  (08120DAC) as a structural sibling. The final mismatch was struct padding:
+  agbcc rounds the three-halfword screen position to eight bytes, so padding
+  after it begins at +930. The return type preserves the assembly's zero result
+  on the inactive path and fallthrough result on the active path; known caller
+  MotionActor_DispatchRequestedState ignores the result.
+- **08126D88 — drafted 82.7%, SpriteProjectile_UpdateRebounds (tentative).**
+  Applies gravity, predicts movement, damps and reverses velocity on floor or
+  cell obstruction, plays resource-dependent bounce sounds, updates spin and
+  packed animation, refreshes its collider, and handles lifetime/removal.
+  Final recorded check: 112 realigned instruction differences, 20 ignoring
+  registers, candidate 1248 bytes against the 1260-byte original extent.
+  A switch on terrain shape reproduces the slope branch layout. Reversing
+  Sum's input argument order and writing the horizontal sum in the observed
+  source order improved allocation. An independent sprite pointer lifetime
+  prevents its eviction to a stack slot. Remaining work is sprite/position
+  pointer copies, animation flag-store registers and a few lifetime copies.
+- **08127C24 — drafted 97.0%, TimedSprite_UpdateBallisticFlight (tentative).**
+  Selects frame index by age (3, 6, otherwise), steps animation, advances a
+  packed position and decreases vertical velocity. Checks terrain at the old
+  and new cells, then either refreshes the collider or transitions to blinking.
+  Preserves the observed landing-path subtraction of velocity Y from position
+  X after subtracting velocity X. Final recorded check: 12 differing
+  instructions, 3 ignoring registers; candidate 732 versus 728 bytes.
+  The residue is in the first terrain lookup: an extra position-address
+  recomputation and different coordinate temporary registers. Scoped sequence
+  and sprite views plus a sprite register concession fixed most of the stepper.
+- **08127274 — drafted 87.8%, SpriteProjectile_UpdateExpiry (tentative).**
+  Stationary projectile state updates its cell and animation, refreshes the
+  optional collider and releases its pool slot when animation ends or its
+  lifetime expires. The cleanup clears allocation +860 in the singleton,
+  sprite state +C0, index +C1, halfword +BE and lifetime +CA; marks entry +C8.
+  Final recorded check: 37 differing instructions, 15 ignoring registers;
+  candidate 512 versus 516 bytes. Remaining differences concern the cached
+  sprite pointer, first command lookup and animation allocation. Forcing the
+  sprite to ip reduced structural differences but worsened overall allocation,
+  so that variant was discarded.
+- **0811AE9C — drafted 86.4% recorded, Terrain_ResolveActorMotion (tentative).**
+  The actual 428-byte body is 94.3% fuzzy, with exactly 12 differing bytes /
+  register instructions and zero structural differences under an explicit
+  `--target-size 428` check. The recorder independently includes the retained
+  76-byte tail at 0811B048–0811B094 in its 504-byte denominator, even with the
+  reviewed size option; retain its conservative 86.4% comment. Do not turn
+  those tail bytes into C credit. The routine predicts packed coordinates,
+  clamps depth to 6..60, queries terrain clearance, rejects steep depth motion,
+  resolves vertical contact and updates the prior/current terrain flags.
+  Signed Y bitfields produce direct ldrsh reads; a narrow query-result view
+  and explicit clearance-offset evaluation reproduce the arithmetic. Narrow
+  r2/r3 flag-mask lifetimes avoid cross-jumping the two depth-clamp paths.
+  Last residue swaps floor/Y between r5/r7 and uses a different register for
+  the negative vertical offset. Full-function register pins worsened the
+  initial packing/clamp region; scoped hints worked better.
+- **08127AC0 — drafted 91.5%, TimedSprite_UpdateBlinkAnimation (tentative).**
+  On entry, folds its angle into animation row/mirroring, initializes sequence
+  0x13 and blink age, then advances animation and calls TimedSprite_BlinkAndRemove.
+  Candidate and original extents are both 356 bytes; 15 differing bytes and
+  register instructions, zero structural differences. SelectDirection from
+  MovingSprite_Create (08127F5C) recovers the address-taken stack bytes, whereas
+  scalar locals delete those stores. A short r1 input lifetime avoids an extra
+  angle-address copy; an r1 age pointer avoids a duplicate address computation.
+  Residue is direction-inline allocation and the first command lookup's two
+  registers. rasolve identified the flip-pointer priority but its compiler-space
+  best still left four bytes; bounded translate search found no source change.
+
+Only per-file checks were used. Formatted each retained source directly with
+`build/venv/bin/clang-format -i`. Ran depin on the unguarded candidates; it skips
+mismatches. Its default mode on an already guarded draft checks the assembly
+fallback and can incorrectly remove every hint: this happened once for 08126D88,
+was caught immediately by the NONMATCHING check, and was corrected in the driver
+commit that restores the 82.7% candidate. Always strip the guard before depinning
+an in-progress draft. All final draft scores were written by
+`tools/check.py --nonmatching --record`; default builds retain INCLUDE_ASM.
+
+Driver commits preserve the per-function changes, including corrective/refinement
+commits for 08126D88 and 0811AE9C. This note is the final driver commit. Complete
+combined ROM validation remains for the integrator.
