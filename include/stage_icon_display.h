@@ -28,7 +28,6 @@ s32 StageIconDisplay_Destroy(struct StageIconDisplay *);
 void StageIconDisplay_InitAnimations(struct StageIconDisplay *, s32);
 /* ROM returns its saved Thumb return address; native initializers forward this
  * nonnegative word to their creators. Its bits have no established game meaning. */
-s32 StageIconDisplay_SelectUpdate(struct StageIconDisplay *, s32);
 s32 StageIconDisplay_Initialize(struct StageIconDisplay *, s32, u32,
                                 void (*)(void *, struct StageIconDisplay *), void *);
 s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *);
