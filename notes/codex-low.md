@@ -2375,3 +2375,51 @@ Tags: #matching #player #animation
 - 08154CD4: improved guarded PlayerCue_UpdateSpiralRecovery from 93.8% to 98.1% (+4.3 fuzzy percentage points), five differing bytes / five realigned instructions / zero structural. Compute the resource destination before its literal, load the effect timer mask after the increment store, keep seven and its low-bit copy distinct, and share the sequence pointer through playback. Explicit resource and final byte pointer lifetimes fix remaining extra copies. Sprite offset and effect timer offset still use different registers. Further offset pin variants regressed and were discarded.
 
 Formatted using build/venv/bin/clang-format; recorded all four draft scores with check.py --nonmatching --record. Default assembly fallbacks pass exact checks after spelling INCLUDE_ASM entries with sub addresses, since the cached build lacks the promoted assembly filenames. The documented depin guarded-draft limitation still applies; no fallback-only result was used to remove hints. Four separate draft commits queued through build/commit.sh. No full build or network operations. Exact code progress gain: 0 percentage points.
+
+## Task 081EAB64 — 2026-10-20, resumed display and actor actions
+
+Tags: #matching #scene-actor #display #animation
+
+No exact matches; exact code progress gain 0 percentage points. Five guarded
+production drafts retained. Restored file-local address aliases and raw-address
+assembly fallbacks for the cached ELF; added renamed sprite-callee mappings.
+
+- 081EAB64: retained Params3D0_UpdateDisplay at 91.0%, 125 realigned
+  differences / 31 structural. Reviewed entry, creator relationship, prior notes
+  and relatives. Signed position arithmetic and declaration swaps compile
+  identically; widening position and changing palette pointer lifetimes worsen
+  structure. Palette pointer reuse and selection-animation ordering remain.
+- 081EE518: retained draft at 89.5%, SceneActors_UpdateScreenCrossingAction
+  (replaces the ordinal SequenceTwo name). Computing the second sprite pointer
+  after Anim_SetSequence and through the shared base reduces structural
+  differences from 20 to 13; total differences increase from 75 to 84.
+  Kept the structural improvement per BIG_FUNCTIONS guidance despite lower fuzzy
+  score. Volatile command loads and a second base constraint do not improve it.
+- 081EE130: improved SceneActors_UpdatePeriodicEffectAction to 91.9%, 43
+  realigned differences / 20 structural, from this checkout's effective 90.4%,
+  47 / 25. Reuse the entry-byte pointer, materialize the random destination
+  before the mask, and address completion through the original input.
+  Remaining initialization, packed animation-step and random-mask ordering.
+- 081EEAD8: improved SceneActors_UpdatePaletteDispersal from 87.0% to 89.4%,
+  52 realigned differences / 21 structural (was 63 / 27). Initialize the loop
+  index, destination and source in that order. Explicit palette-source lifetime
+  barriers worsen structure; reversing vector declarations compiles identically.
+- 081EDB74: retained SceneActors_UpdateLeftDeparture at 85.3%, 58 realigned
+  differences / 22 structural. Reused entry byte is identical; deriving the
+  second sequence directly from input or constraining zero-store offsets worsens
+  the result. Two sprite/sequence pointer lifetimes remain the main obstacle.
+- 081EEECC: stopped below acceptance at 66.0%, 111 realigned differences / 59
+  structural. New full candidate remains untracked in wip/sub_081EEECC.c.
+  Hides two sprites, shakes offsets for sixty ticks, emits particles every odd
+  tick after sixty, clamps a departure counter and blinks to completion.
+  Retaining the RNG table across particle setters improves the initial 60.5%
+  candidate; pinning the actor/base worsens it. The checked extent includes a
+  separate-looking entry-byte reset routine at 081EF12C (push/pop and return),
+  currently emitted as raw bytes before SceneActors_TickStateCallback; boundary
+  review is needed before interpreting a whole-extent exact result.
+
+Formatted the five production units directly with build/venv/bin/clang-format,
+recorded scores with check.py --nonmatching --record, and verified all default
+assembly fallbacks. Fallback matches are not C progress. Queued each guarded
+production draft separately through build/commit.sh. No full build, network,
+direct git mutation, shared-doc regeneration or generated ROM artifact commits.
