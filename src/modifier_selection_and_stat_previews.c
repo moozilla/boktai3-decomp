@@ -118,9 +118,9 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
 {
     struct ModifierRecord swap, scratch;
     s32 count = 0;
-#define actor actorArg
+#define actor     actorArg
 #define selection selectionArg
-#define output outputArg
+#define output    outputArg
     s32 i;
     struct ModifierRecord *out;
     i = 0;
