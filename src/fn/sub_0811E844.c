@@ -1,5 +1,4 @@
 #include "global.h"
-#define Actor_RecomputeScriptedValue sub_0811E844
 struct Item {
     void *fn;
     u8 pad4;

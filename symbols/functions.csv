@@ -4412,6 +4412,7 @@ addr,name,mode,confidence,source,notes
 0811E77C,StatModifier_AddForGlobalMode,thumb,low,src-alias,
 0811E7C8,StatModifier_AddForOwnerMode,thumb,low,src-alias,
 0811E814,StatModifier_ScaleAtOwnerThreshold,thumb,low,src-alias,
+0811E844,Actor_RecomputeScriptedValue,thumb,low,src-alias,
 0811E8F0,ModifierStats_ApplyKind12,thumb,low,src-alias,
 0811E930,ModifierStats_ApplyKind15,thumb,low,src-alias,
 0811E970,ModifierStats_ApplyKind7,thumb,low,src-alias,
@@ -5048,6 +5049,7 @@ addr,name,mode,confidence,source,notes
 0814A698,Player_GetSpecialAttackPower,thumb,low,src-alias,Adds the indexed special attack power bonus to the global base stat; attack interpretation is tentative
 0814A6B8,Player_CalculatePreviewActionStat,thumb,low,src-alias,
 0814A76C,Player_CalculateBaseAttackPower,thumb,low,src-alias,Combines player stat modifiers and dispatches to weapon or special attack power calculation
+0814A7D8,Player_CalculateTotalAttackPower,thumb,low,src-alias,
 0814A848,Player_GetAttackPower,thumb,low,src-alias,Returns the fully modified attack power with no additional stat adjustment
 0814A854,ActorFlags_GetResponseBits,thumb,low,src-alias,
 0814A884,Player_AccumulateContactCost,thumb,low,src-alias,
