@@ -1,6 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateSideRecoil                                                                 \
+    sub_08154AF0 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 97.5%
+// Remaining six differences allocate recoil and direction offsets to other registers.
 // fuzzy: 97.5%
 
 struct P {
@@ -171,5 +175,5 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideRecoil);
+INCLUDE_ASM("asm/nonmatching", sub_08154AF0);
 #endif

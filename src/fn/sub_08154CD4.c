@@ -1,6 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateSpiralRecovery                                                             \
+    sub_08154CD4 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 93.8%
+// Remaining resource-load order, effect timer constants and address registers differ.
 // fuzzy: 88.8%
 
 struct P {
@@ -159,8 +163,12 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         }
     }
     Player_SetAnimation(p, 0x9A, 0x40, 1);
-    H(0xC6) = 0x16F;
-    W(0xD4) = (u32)(gUnk_030042E4 + (0x16F << 5));
+    {
+        u32 resource = 0x16F;
+        H(0xC6) = resource;
+        asm("" : "+r"(resource));
+        W(0xD4) = (u32)(gUnk_030042E4 + (resource << 5));
+    }
     Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
     H(0xAD6) = 0x16F;
@@ -173,7 +181,9 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         mask = temp;
         if (H(0xAD8) > 32)
             H(0xAD8) = 32;
-        if (((++p->timer) & mask) > 31) {
+        elapsed = p->timer + 1;
+        p->timer = elapsed;
+        if ((elapsed & mask) > 31) {
             B(0x464) = 1;
             B(0x465) = 1;
             PlayerCue_EnterStandUpdate(p);
@@ -182,5 +192,5 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_08154CD4);
 #endif
