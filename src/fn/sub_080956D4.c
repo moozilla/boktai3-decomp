@@ -1,6 +1,5 @@
 #include "global.h"
 /* SceneActorBehavior_OnContactForward: forwards the contact unless the actor is unavailable or flagged */
-#define SceneActorBehavior_OnContactForward sub_080956D4
 void SceneActorBehavior_ApplyContactReaction(void *, void *);
 static inline u8 Unavailable(u8 *c)
 {

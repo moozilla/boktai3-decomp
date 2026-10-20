@@ -5,7 +5,6 @@
 // register-only: 0x6DC literal is loaded into r2 instead of r6, 0x6D0 offset into r6 instead of r1
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
-#define SceneActor_TryForward sub_080B8FB0
 void sub_0807E9D0(void *, void *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
@@ -42,5 +41,5 @@ void SceneActor_TryForward(void *a, void *b, struct SceneActorRegistryResetView 
     sub_0807E9D0(a, b);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B8FB0);
+INCLUDE_ASM("asm/nonmatching", SceneActor_TryForward);
 #endif

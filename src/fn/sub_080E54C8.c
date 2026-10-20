@@ -17,7 +17,6 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     p->word104 = 0;
 }
 u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-#define Dog_UpdateActionPhase sub_080E54C8
 void Dog_UpdateActionPhase(struct SceneActorRegistryResetView *p)
 {
     if (SceneActorControl_TakeFlag(&p->field2B1)) {

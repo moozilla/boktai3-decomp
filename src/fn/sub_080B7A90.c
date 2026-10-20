@@ -19,7 +19,6 @@ static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
         return 1;
     return 0;
 }
-#define SceneActorTarget_ResolvePendingObjectSkeleton sub_080B7A90
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *owner = actor;
@@ -103,5 +102,5 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B7A90);
+INCLUDE_ASM("asm/nonmatching", SceneActorTarget_ResolvePendingObjectSkeleton);
 #endif
