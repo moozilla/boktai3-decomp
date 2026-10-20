@@ -38,5 +38,5 @@ void CellGate_ClampPlayerEdge(struct CellGate *, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 void Player_BeginTerrainInteraction(struct CellGatePlayer *);
-void sub_08158DF0(struct CellGatePlayer *, u32);
+void Player_BeginDirectionSequence(struct CellGatePlayer *, u32);
 #endif

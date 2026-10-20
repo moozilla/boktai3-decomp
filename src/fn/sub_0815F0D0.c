@@ -12,7 +12,7 @@ void Player_ConsumeActionCharge(void *);
 void Player_UpdateColliderRefreshCountdown(void *);
 s32 PlayerContact_ApplyTerrainDamage(void *);
 void Player_EnterKindFour(void *);
-void sub_0815EBB8(void *);
+void Player_UpdateResetBlink(void *);
 void PlayerContact_UpdateThresholdEvent(void *);
 void Player_ClearDirectionHistory(void *);
 void Player_ApplyLatchedActionMode(void *);
@@ -43,7 +43,7 @@ s32 Player_Update(struct Player *p)
         if (PlayerContact_ApplyTerrainDamage(p))
             Player_EnterKindFour(p);
         else if (p->tetherMode != 0x26) {
-            sub_0815EBB8(p);
+            Player_UpdateResetBlink(p);
             PlayerContact_UpdateThresholdEvent(p);
         }
     } else if (p->kind == 2) {

@@ -14,7 +14,7 @@ struct PlayerPendingNotification {
 extern struct PlayerPendingNotification *gUnk_0200054C;
 extern u16 gUnk_02000594;
 void ActorSequence_Begin(struct Player *, s32, s32);
-void sub_08158DF0(struct Player *, u32);
+void Player_BeginDirectionSequence(struct Player *, u32);
 void Player_StopMovementEffects(struct Player *);
 void Player_SubtractGauge430(struct Player *, s32);
 void sub_08249244(void *, s32, s32, void *);
@@ -79,7 +79,7 @@ s32 Player_SelectActionSequence(struct Player *p)
         ActorSequence_Begin(p, 0x17, 0);
     }
     if (p->tetherMode != 4 && p->unk4E1[2])
-        sub_08158DF0(p, p->coordinateAxis);
+        Player_BeginDirectionSequence(p, p->coordinateAxis);
     mode = p->tetherMode;
     if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
         if (!p->statusValue) {
