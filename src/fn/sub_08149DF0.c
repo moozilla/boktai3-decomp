@@ -17,6 +17,8 @@ static inline void addFlags(u32 *flags, u32 mask)
     *flags |= mask;
 }
 // Two address-selection instructions still use r0 instead of r3.
+// confidence=low: provisional action interpretation from retained C and assembly.
+#define Player_UpdateSpiralTrailAction sub_08149DF0
 #ifdef NONMATCHING
 // fuzzy: 99.3%
 void Player_UpdateSpiralTrailAction(struct Player *p)
@@ -172,5 +174,5 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralTrailAction);
+INCLUDE_ASM("asm/nonmatching", sub_08149DF0);
 #endif
