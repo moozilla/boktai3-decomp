@@ -1,7 +1,10 @@
 #include "global.h"
+
+// confidence=low: selects approach, attack and recovery behaviors along a shared X/Z axis.
+#define Armor_UpdateAxisAttackDecision sub_08187230
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 83.7%
+// fuzzy: 85.8%
 // Remaining differences: branch sharing, decision stores and register allocation.
 // confidence=low: attacks on a shared X/Z axis while choosing approach and recovery states.
 struct ArmorAxisActor {
@@ -29,7 +32,9 @@ void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
 {
-    s32 dx, dy, dz, ax, ay;
+    s32 dx, dy, ax, ay;
+    s32 dz;
+    register u32 mode asm("r6");
     register s32 az asm("r2");
     s16 *timer = &p->attackTimer;
     if (*timer > 0)
@@ -50,7 +55,9 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
         ay = -dy;
     if (dz < 0)
         az = -dz;
-    if (p->flags & 1) {
+    mode = p->flags & 1;
+    asm("" : "+r"(mode));
+    if (mode) {
         u8 *decision = &p->decision;
         switch (*decision) {
             case 0:
@@ -168,17 +175,17 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
             case 1:
                 if (*timer <= 0) {
                     ActorController_SetBehavior(p, 6);
-                    *decision = 0;
-                    p->secondaryTimer = 0;
-                    p->collisionTimer = 0;
+                    *decision = mode;
+                    p->secondaryTimer = mode;
+                    p->collisionTimer = mode;
                 } else
                     ActorController_SetBehaviorIfFinished(p, 5);
                 break;
             case 2:
                 ActorController_SetBehaviorIfFinished(p, 23);
-                *decision = 0;
-                p->secondaryTimer = 0;
-                p->collisionTimer = 0;
+                *decision = mode;
+                p->secondaryTimer = mode;
+                p->collisionTimer = mode;
                 break;
             case 16:
                 ActorController_SetBehavior(p, 40);
@@ -188,5 +195,5 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateAxisAttackDecision);
+INCLUDE_ASM("asm/nonmatching", sub_08187230);
 #endif
