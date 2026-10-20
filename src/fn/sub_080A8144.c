@@ -1,6 +1,5 @@
 #include "scene_actor_reset.h"
 
-// foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 void sub_080A62DC(void);
 void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *);
 static inline u8 TakeQueuedFlag(u8 *flag)
