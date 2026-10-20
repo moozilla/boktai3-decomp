@@ -14,7 +14,7 @@ void SpriteOam_QueueProjectedSprites(void);
 void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void Registry3F74_InitBackground(struct Registry3F74 *);
-void sub_081BA81C(struct Registry3F74 *);
+void Registry3F74_InitAnimations(struct Registry3F74 *);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void Registry3F74_CreateSelectionCursor(struct Registry3F74 *, s32);
@@ -27,7 +27,7 @@ s32 Registry3F74_InitFromScript(struct Registry3F74 *p)
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
     Registry3F74_InitBackground(p);
-    sub_081BA81C(p);
+    Registry3F74_InitAnimations(p);
     if (Script_SeekToKeyword('p')) {
         entry = p->entryScripts;
         i = 10;

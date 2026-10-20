@@ -6518,7 +6518,10 @@ addr,name,mode,confidence,source,notes
 0819E0F4,Hresvelgr_UpdateActionThirtyRequest,thumb,low,src-alias,Requests action thirty and consumes pending triggers on phase entry
 0819E12C,Hresvelgr_UpdateActionThirtyOneRequest,thumb,low,src-alias,Requests action thirty one on entry and consumes pending triggers after phase completion
 0819E170,ActorAction_WaitThenChangeBehavior,thumb,low,src-alias,
+0819E1EC,ActorState_Hold37,thumb,low,src-alias,
 0819E25C,ActorAction_FinishRecoveryAnimation,thumb,low,src-alias,
+0819E2D4,ActorState_Hold35,thumb,low,src-alias,
+0819E344,ActorState_Restart,thumb,low,src-alias,
 0819E408,Hresvelgr_SelectNextBehavior,thumb,low,src-alias,
 0819E5EC,Hresvelgr_UpdatePrimaryBehavior,thumb,low,src-alias,Clears the advance flag and dispatches the primary behavior phase before evaluating behavior transitions
 0819E620,Hresvelgr_UpdateSecondaryBehavior,thumb,low,src-alias,Clears the advance flag and dispatches the secondary behavior phase
@@ -6528,6 +6531,7 @@ addr,name,mode,confidence,source,notes
 0819E6C8,Hresvelgr_UpdateTriggerMode,thumb,low,src-alias,Dispatches the trigger behavior selected by the current mode phase
 0819E6E4,Hresvelgr_UpdateBehaviorMode,thumb,low,src-alias,Clears the per-frame flag and dispatches one of three behavior modes
 0819E708,ActorAnimation_ResetSequence,thumb,low,src-alias,
+0819E754,Actor_SetHeadingVelocity,thumb,low,src-alias,
 0819E7F0,Hresvelgr_UpdateGroundSlam,thumb,low,src-alias,
 0819E978,Hresvelgr_UpdateHazardVisit,thumb,low,src-alias,
 0819EAE4,ActorAction_UpdateDirectionalAnimation,thumb,low,src-alias,
@@ -6860,6 +6864,8 @@ addr,name,mode,confidence,source,notes
 081B8578,SceneScriptObject_ApplyHitFlash,thumb,low,src-alias,
 081B85E0,SceneScriptObject_InitHitCollider,thumb,low,src-alias,
 081B897C,DungeonProp_CreateFromScript,thumb,low,src-alias,Creates a task initialized from script parameters for the dungeon prop sprite family
+081B89C0,SceneMover_SteerXZ,thumb,low,src-alias,
+081B8B38,SceneMover_SteerXY,thumb,low,src-alias,
 081B8CB0,OrbitMotion_UpdateAngle,thumb,low,src-alias,
 081B8E44,OrbitMotion_UpdateCrossedSines,thumb,low,src-alias,
 081B8F54,OrbitMotion_UpdateAbsoluteSines,thumb,low,src-alias,
@@ -6899,6 +6905,7 @@ addr,name,mode,confidence,source,notes
 081BA644,Registry3F74_ApplyPaletteStep,thumb,low,src-alias,
 081BA6F8,Registry3F74_UpdateAnimations,thumb,low,src-alias,
 081BA79C,Registry3F74_ConfirmSelection,thumb,low,src-alias,
+081BA81C,Registry3F74_InitAnimations,thumb,low,src-alias,
 081BA924,Registry3F74_InitBackground,thumb,low,src-alias,
 081BA9D0,Registry3F74_ConfigureDisplay,thumb,low,src-alias,Applies display settings and selects HUD mode seven for this object
 081BA9FC,Registry3F74_UpdateSelection,thumb,low,src-alias,Reads the child selection index and runs the selection handler

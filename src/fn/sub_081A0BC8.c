@@ -48,7 +48,7 @@ void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
-void sub_0819E754(void *, u32);
+void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
@@ -159,7 +159,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                 actor->collisionBounds = actor->boundsHigh;
                 Sound_PlaySong(0x4d0);
             } else {
-                sub_0819E754(actor, 32);
+                Actor_SetHeadingVelocity(actor, 32);
                 state &= tick;
                 asm("" : "+r"(state));
                 if (!state) {
