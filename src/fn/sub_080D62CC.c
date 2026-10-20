@@ -109,5 +109,5 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_FireAcceleratingVolley);
+INCLUDE_ASM("asm/nonmatching", sub_080D62CC);
 #endif
