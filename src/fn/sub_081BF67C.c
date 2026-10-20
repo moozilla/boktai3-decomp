@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input.h"
-void Widget_InitLinked(void *, void *, u16, u32, u8, u8, u8, void *);
 void Storage_GetSlotPosition(void *, s32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_InitWidgets(u8 *p)
