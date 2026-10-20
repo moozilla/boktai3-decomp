@@ -502,3 +502,64 @@ Tags: #matching #hud #numeric-display
 - 08176F70 stopped unmatched after BIG_FUNCTIONS guidance, full/condensed listing and relatives review. Hud_InitAlternateLayout calls it after resource loading and panel refresh. Large widget layout initializer with repeated sub_0821983C calls, a packed animation stepper, and multiple loops. Largest relative covers only 9%; no Ghidra export exists locally. No candidate retained or production changes.
 
 Validation: only tools/check.py per-file checks; both matches rechecked after clang-format. No full builds or network operations. Existing tools/cloud_task.py modification was present at entry and untouched.
+
+## Task 08176F70 (2026-10-20)
+
+Tags: #matching #hud #actor-decision #palette
+
+This assignment overlaps retained work in the checkout. No new C bodies reached
+exact matching; exact progress gain is 0 percentage points. Revalidated the
+existing exact body at 0817BDB0 and retained the two existing qualifying drafts,
+adding the required file-local aliases in separate driver commits. No full
+build, network operations, shared-doc edits, generated files or ROM commits.
+
+- **0817C3F4 — retained draft 83.3%.** BossSlot2_SelectCombatAction selects
+  actions by mode 4EA, previous choice 4E9 and event index 4EB, with vitality
+  thresholds 274/276 and summon pointers C60/C64. Reviewed existing C and the
+  assembly entry under BIG_FUNCTIONS guidance. Final full-extent check records
+  530 realigned differences, 407 ignoring registers. The callback has a shared
+  tail reached through several long-branch islands. Removing the initial event
+  pointer assignment gives 83.5% but leaves paths with an uninitialized pointer;
+  rejected and restored the valid retained source. Added local address alias.
+- **08176F70 — stopped unmatched.** Reviewed prior task notes, relatives and a
+  fresh condensed listing (build/codex-low-6f70.txt). Hud_InitAlternateLayout's
+  large layout initializer repeats widget creation and embeds an animation
+  stepper; its best matched relative explains only 9%. Ghidra export remains
+  unavailable. No new complete C candidate or production body.
+- **081796D8 — retained draft 97.5%.** FieldHud_UpdateNumberDisplay remains nine
+  realigned structural differences: four full 0xFFFFD000 literals narrowed to
+  0xD000 materialization, plus pool effects. Tested a pinned full-width constant
+  through an inline digit store and an empty compiler barrier: structure fell
+  to six but total differences rose to 95 and score fell to 63.8%. Reverted the
+  experiment; no pins/barriers retained. Added local address alias and reran
+  check.py --nonmatching --record.
+- **0817B0B4 — stopped, candidate 59.8%.** Tentative name
+  SceneVolume_UpdateSequencePalette. Mode 506 selects a 24-tick fade from global
+  palette bank 2E80 to 680, fades between 680 and 2DE0, or a repeating pulse.
+  Counter 504 is read signed, shift 507 controls duration. Destination is C00.
+  Fraction clamps to 0..24 and otherwise truncates signed (6144*t/limit)/256.
+  Reset uses SceneVolume_ResetPendingSequence. Typed fields, unsigned storage
+  with signed reads, and a parameterized interpolation fraction slightly
+  improved the first 57.7% candidate. Compiler merges call tails differently;
+  202 realigned differences, 166 ignoring registers. Kept below-threshold C in
+  wip/sub_0817B0B4.c only.
+- **0817AD7C — stopped, best candidate 74.1%.** Tentative name
+  ActorDecision_SpawnBobbingFormation. Starts animation 301, selects initial
+  direction 0 or 32 from RNG, emits four actors at quarter-turn offsets using
+  radius 256 and adds 320 to Y. Each spawn uses target pointer 110 and signed
+  parameter 500; steering direction is initial angle +16 then steps by 64.
+  Typed actor position and a magnitude-taking sine inline improved 70.0% to
+  74.1% (50 realigned differences, 31 structural). Vector-add inlines improved
+  structure but worsened total; explicit pinning of base/mask/loop/position
+  registers also worsened scores. Restored the best unpinned source in
+  wip/sub_0817AD7C.c. Remaining issues include stack spills, sine multiplication
+  register choice and vector temporary lifetime. No production draft.
+- **0817BDB0 — existing exact body verified.** ActorDecision_UpdateHazardPath
+  passed byte-exact check after adding its local alias. Entire 352-byte extent
+  ends at 0817BF10. Consumes queued action, selects path/point with RNG, requests
+  path movement, and emits proximity hazards on consumed path events. This is
+  verification/naming of existing C, not newly recovered exact coverage.
+
+Only per-file check.py acceptance checks were used. Commit messages identify
+addresses and existing draft scores; integration must distinguish alias-only
+changes from new code progress.
