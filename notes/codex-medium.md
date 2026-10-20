@@ -3458,3 +3458,73 @@ Tags: #matching #player #ui
 
 Validation used per-file tools/check.py only; no full build or network operations.
 Each exact match was committed separately through build/commit.sh.
+
+## 2026-10-20 — task 080A8750
+
+Tags: #matching #tentacle #scene-actor #animation #terrain
+
+Worked offline on the already-claimed `cloud/080A8750` branch, using per-file
+`tools/check.py` only. No make, complete build, network operation or direct git
+mutation was run. Each match/draft was queued separately through build/commit.sh.
+
+- **080A8750 matched — TentacleActor_UpdateKnockback.** On state entry,
+  installs actor+0x22C control, derives horizontal velocity from facing and the
+  sine table with scale four, clears vertical velocity and sets movement mode
+  two. Advances movement with arguments six and 0x1000; flag 0x10 requests a new
+  wander route and restores entry control/state. A pointer to direction created
+  before the velocity pointer reproduces the original address scheduling.
+  Explicitly retaining the state offset through the final flag store avoids
+  a different address register. The final counter load needs r0 offset and r1
+  pointer hints. Exact 380-byte body including pool/padding; depin reduced nine
+  hints to six, and the formatted production file passed the exact check.
+  Register-pinning concession retained.
+- **080A8904 drafted 87.6% — TentacleActor_SelectWanderRoute.** Reads terrain
+  surface and the context's route-choice count, enumerates adjacent cells while
+  rejecting opposite headings, prefers an unvisited side route, then a random
+  side route, then unvisited forward travel, then reverse travel. Writes the
+  chosen cell center to context+0x904 and arms timer 0x8E4 for 40. Context+0x8E8
+  counts choices; +0x8E9 stores a heading exclusion. If no reverse route exists,
+  rotates that exclusion. Uses existing terrain helpers and visited-route calls
+  at 080AB51C/080AB54C. A signed pointer do/while initializer and a nested terrain
+  surface test improved the initial draft. Remaining: 64 realigned instructions,
+  37 ignoring registers; facing/count/forward lifetimes, first destination
+  pointer lifetime, and store/address order. No register hints retained.
+- **080A8F38 drafted 85.0% — TentacleBody_RefreshDirectionalAnimations.** Iterates
+  0x128-byte segments, skips status bit one, selects tail sequence one for status
+  bit four and reverses its direction, otherwise uses the actor-profile sequence
+  and preserves the current frame/timer around the sequence update. Advances the
+  packed animation and updates sprite frame/flips. Remaining: 41 realigned
+  instructions, eight ignoring registers; stack-slot order, sprite/command
+  pointer lifetimes and register choices. Register/barrier hints retained.
+- **080A915C drafted 87.0% — TentacleBody_ResetDirectionalAnimations.** Same
+  directional animation update, without preserving the frame/timer. A local
+  frame record reproduces the stack layout more closely. Remaining: 36 realigned
+  instructions, ten ignoring registers; first frame/flip accesses, branch/store
+  layout, and loop-tail registers. Register/barrier hints retained.
+- **080A93F4 drafted 87.0% — TentacleBody_RestartSegmentAnimations.** Takes
+  explicit row/flags rather than deriving direction, calls Anim_RestartSequence,
+  applies speed to non-tail segments, then advances the same packed animation.
+  Remaining: 38 realigned instructions, 16 ignoring registers; parameter/frame
+  placement, sprite pointer copies, store layout and loop registers. Hints kept.
+- **080A8D50 stopped unmatched — tentative TentacleBody_InitializeSegments.**
+  Recovered setup of four segments, count/health-share fields 0x8DA/0x8EA/0x8EB,
+  resource and sprite setup, direction mapping and tail status bit four. The
+  other segments begin at staggered frame indices zero through three. Each
+  segment stores its body owner at animation+0x34. Best attempted listing reached
+  68.6% (62 realigned instructions, 19 ignoring registers), below draft threshold.
+  The compiler hoists stack-output pointers and argument transforms out of the
+  loop, merges the two initial constant-four loads, and changes local-counter
+  and register lifetimes. The assembly's stack counter is initialized to zero,
+  tested each iteration and incremented only in its nonzero branch; straightforward
+  scalar C eliminates that branch. A local frame aggregate retains it but still
+  misses allocation/scheduling. Scratch sources remain under ignored wip/build;
+  no subthreshold production source was added.
+
+All four draft scores were recorded after formatting with
+`tools/check.py FILE --nonmatching --record`; each default INCLUDE_ASM fallback
+also passed its per-file exact check. Depin on unguarded animation drafts skipped
+because they are not exact. Their default assembly checks are not C progress.
+The integrator must perform the complete combined ROM build.
+
+Exact code gain for this task: **+0.0157 percentage points** (380 bytes), all in
+the Register-pinned category. Drafts contribute no exact gain.
