@@ -8973,6 +8973,8 @@ addr,name,mode,confidence,source,notes
 0823E810,Player_EmitScatterEffect,thumb,low,src-alias,
 0823FE60,Player_RunConfiguredActionHandler,thumb,low,src-alias,Enters state three and invokes the configured callback stored at offset 0xC88
 08241310,Player_GetAdjustedMovementInterval,thumb,low,src-alias,Computes a movement interval from a base of twelve or eight and clamps the adjusted result to at least two
+08242DCC,Player_SynchronizeColliderState,thumb,low,src-alias,
+08242EA4,Player_UpdateActionPhase,thumb,low,src-alias,
 08242F7C,Player_FindMaskedSlot,thumb,low,src-alias,
 08243090,Player_ApplyContact,thumb,low,src-alias,
 082433C8,Player_ApplyGatedContact,thumb,low,src-alias,
