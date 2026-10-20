@@ -2,7 +2,7 @@
 void Sound_PlaySong(s32);
 void PauseMenu_SmoothPoint(void *, void *, s32);
 void PauseMenu_InterpolateActivePairPositions(void *, s32);
-void sub_0822D94C(s32, s32);
+void Inventory_SwapEquipmentEntries(s32, s32);
 void PauseInventory_BeginItemSwapSelection(void *, s32);
 void Hud_UpdateInventorySwapAnimation(u8 *p)
 {
@@ -22,7 +22,7 @@ void Hud_UpdateInventorySwapAnimation(u8 *p)
         *(u32 *)(p + 0x2b08) |= m;
         *(u32 *)(p + 0x41e8) |= m;
         *(u32 *)(p + 0x4248) |= m;
-        sub_0822D94C(p[0x438a], p[0x4387]);
+        Inventory_SwapEquipmentEntries(p[0x438a], p[0x4387]);
         PauseInventory_BeginItemSwapSelection(p, 0);
     }
 }
