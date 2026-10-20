@@ -6467,6 +6467,7 @@ addr,name,mode,confidence,source,notes
 0819C028,Hresvelgr_InitializeCollider,thumb,low,src-alias,
 0819C0D0,Hresvelgr_OnBodyContact,thumb,low,src-alias,
 0819C1B8,Hresvelgr_OnSecondaryContact,thumb,low,src-alias,
+0819C29C,Hresvelgr_BeginDamageReaction,thumb,low,src-alias,
 0819C3D0,ColliderActor_InitBodyCollider,thumb,low,src-alias,
 0819C484,ColliderActor_InitLowerBodyCollider,thumb,low,src-alias,
 0819C51C,ColliderActor_UpdateCameraOffset,thumb,low,src-alias,
