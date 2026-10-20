@@ -1,0 +1,101 @@
+#include "global.h"
+#define MotionEffect_InitEntry sub_081F2208
+struct PackedCoordinate {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct ColliderVector {
+    struct PackedCoordinate xy, z;
+};
+struct MotionEntrySprite {
+    u32 flags;
+    u8 pad4[3];
+    u8 enabled;
+    u8 pad8[8];
+    s16 priority;
+    u8 pad12[10];
+    u8 clear[0x10];
+};
+struct MotionEntry {
+    u8 active, delay;
+    u8 pad2[2];
+    s32 position[4];
+    u8 pad14[0x64];
+    u32 collisionArg0, collisionArg1;
+    u8 pad80[8];
+    u8 collider[0x40];
+    u8 renderCollider[0x40];
+    struct MotionEntrySprite sprites[7];
+    u8 pad23c[4];
+};
+void MotionEffectPool_OnRenderComplete(void *);
+void SingletonSlot7_OnEffectMotionComplete(void *);
+void SpatialIndex_InsertEntry(void *);
+void SpatialIndex_InitEntry(void *, struct ColliderVector *, struct ColliderVector *,
+                            struct ColliderVector *, u32, u32, u32, u32, u32, void (*)(void *),
+                            void *);
+void AnimData_Load(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
+void Sprite_InitUnlinked(void *, void *, s32);
+void CpuSet(const void *, void *, u32);
+void Position_GetHeightAdjustedCoordinates(void *, s32, void *);
+s32 MotionEffect_InitEntry(void *unused, struct MotionEntry *e)
+{
+    struct ColliderVector position;
+    struct ColliderVector size;
+    struct ColliderVector offset;
+    s32 i;
+    struct MotionEntrySprite *s;
+    u32 one;
+    u32 zero;
+    u32 fill;
+    void *base;
+    void *render;
+    void *collider;
+    e->delay = 0;
+    e->active = 1;
+    *(u32 *)((u8 *)e + 0x84) = 0;
+    AnimData_Load((u8 *)e + 0x23c, 0x89CB);
+    AnimData_SelectPaletteBank((u8 *)e + 0x23c, 0x1da);
+    s = e->sprites;
+    i = 0;
+    fill = i;
+    for (; i <= 3; i++, s++) {
+        Sprite_InitUnlinked(s, (u8 *)e + 0x23c, 0x11);
+        s->priority = 0x26 - ((4 - i) << 1);
+        s->enabled = 1;
+        zero = fill;
+        CpuSet(&zero, s->clear, 0x05000002);
+    }
+    s = e->sprites + 4;
+    i = 0;
+    render = e->renderCollider;
+    base = e->position;
+    collider = e->collider;
+    for (; i <= 2; i++, s++) {
+        Sprite_InitUnlinked(s, (u8 *)e + 0x23c, 0x11);
+        s->priority = 0x25 - ((3 - i) << 1);
+        one = 1;
+        s->enabled = one;
+        zero = 0;
+        CpuSet(&zero, s->clear, 0x05000002);
+    }
+    Position_GetHeightAdjustedCoordinates(base, 0, &position);
+    size.xy.lo = 4;
+    size.xy.hi = 4;
+    size.z.lo = 4;
+    *(u32 *)&offset.xy = 0;
+    *(u32 *)&offset.z &= 0xFFFF0000;
+    SpatialIndex_InitEntry(render, &position, &size, &offset, 20, 5, one, 0, 0,
+                           MotionEffectPool_OnRenderComplete, e);
+    SpatialIndex_InsertEntry(render);
+    Position_GetHeightAdjustedCoordinates(base, 0, &position);
+    ((s16 *)&size)[0] = 5;
+    ((s16 *)&size)[1] = 5;
+    ((s16 *)&size)[2] = 5;
+    ((s16 *)&offset)[0] = 0;
+    ((s16 *)&offset)[1] = 0;
+    ((s16 *)&offset)[2] = 0;
+    SpatialIndex_InitEntry(collider, &position, &size, &offset, 12, 5, one, e->collisionArg0,
+                           e->collisionArg1, SingletonSlot7_OnEffectMotionComplete, e);
+}
