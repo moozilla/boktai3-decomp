@@ -1,13 +1,17 @@
 #include "global.h"
 #include "player.h"
+// MATCHING_CONCESSION: register-pinning
+
+#define Player_UpdateSweepAction sub_0823DAB4
 
 #ifdef NONMATCHING
 // fuzzy: 97.4%
-// 9 differing insns: the second-branch sum goes through a copy in the ROM, and the 0xFF mask is reloaded
+// Remaining mismatch: second-branch heading sum lacks the ROM register copy.
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
+#define Player_EmitSweepSpark sub_0823D97C
 void Player_EmitSweepSpark(struct Player *, struct SceneVec *, s32, u32, s32);
 
 struct SweepCtx {
@@ -34,8 +38,8 @@ static inline s32 scale(s32 product)
 
 s32 Player_UpdateSweepAction(struct Player *p)
 {
-    struct SweepCtx *q = (struct SweepCtx *)&p->statModifierContext;
     s32 angle;
+    struct SweepCtx *q = (struct SweepCtx *)&p->statModifierContext;
     if (p->statModifierContext.contactTimer == 0) {
         if (p->actionMode == 0)
             Player_PlayLocalSong(p->slot, 0x38C);
@@ -48,10 +52,16 @@ s32 Player_UpdateSweepAction(struct Player *p)
         else {
             u8 *h = &q->heading;
             angle = q->timer * q->extentA + 0x100;
-            angle += *h;
+            {
+            register s32 sum asm("r0") = angle + *h;
+            angle = sum;
+            }
             angle -= 0x20;
         }
-        angle &= 0xFF;
+        {
+        register u32 mask asm("r0") = 0xFF;
+        angle &= mask;
+        }
         q->dest.x = q->origin.x + scale(gUnk_086149C4[(angle + 64) & 255] * 160);
         q->dest.y = q->origin.y;
         q->dest.z = q->origin.z + scale(gUnk_086149C4[angle] * 160);
