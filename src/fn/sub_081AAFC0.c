@@ -1,10 +1,6 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 94.4%
-// foundry draft (worker best 94.4%); what differs is mostly register allocation and instruction order
 struct Vanargand {
-    u8 pad0[0x9c];
+    u8 pad0[0x9C];
     u32 flags;
     u8 padA0[2];
     u8 phase;
@@ -14,46 +10,47 @@ struct Vanargand {
     u8 finished;
     u8 padB0;
     u8 pending;
-    u8 animationDone;
-    u8 padB3[0x18c - 0xb3];
+    u8 ready;
+    u8 padB3[0x18C - 0xB3];
     u8 animation[0x60];
-    u8 drawable[0x5b0 - 0x1ec];
-    u16 delay;
-    u8 pad5B2[6];
-    u16 rate1;
-    u16 rate2;
+    u8 drawable[0x5B0 - 0x1EC];
+    u16 w5B0;
+    u8 pad5B2[0x5B8 - 0x5B2];
+    u16 w5B8;
+    u16 w5BA;
 };
-void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
-void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 tick)
+void Vanargand_SetPendingCue(void *, u16);
+void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 frame)
 {
-    void *animation = p->animation;
+    u8 *anim = p->animation;
+    u8 phase;
     Vanargand_SetPendingCue(p, 3);
     if (p->pending) {
         p->pending = 0;
-        p->delay = 16;
+        p->w5B0 = 16;
         p->phase = 0;
         p->timer = 0;
     }
-    switch (p->phase) {
+    phase = p->phase;
+    switch (phase) {
         case 0:
-            if (tick == 16)
-                SceneActors_StartUnmirroredAnimation(p, animation, p->drawable, 15, 2, 4);
-            if (tick > 16 && p->animationDone) {
+            if (frame == 16)
+                SceneActors_StartUnmirroredAnimation(p, anim, p->drawable, 15, 2, 4);
+            if (frame > 16 && p->ready) {
                 p->phase = 1;
-                p->timer = 0;
+                p->timer = phase;
                 {
-                    u16 *rates = &p->rate1;
-                    s32 rate = 4;
-                    *rates = rate;
-                    rates++;
-                    *rates = rate;
+                    u16 v = 4;
+                    u32 off = 0x5B8;
+                    *(u16 *)((u8 *)p + off) = v;
+                    *(u16 *)((u8 *)p + off + 2) = v;
                 }
                 return;
             }
             break;
         case 1:
-            p->finished = 1;
+            p->finished = phase;
             return;
     }
     {
@@ -61,6 +58,3 @@ void Vanargand_UpdateAnimationGate(struct Vanargand *p, s32 tick)
         p->flags |= mask;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateAnimationGate);
-#endif
