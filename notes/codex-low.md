@@ -2423,3 +2423,18 @@ recorded scores with check.py --nonmatching --record, and verified all default
 assembly fallbacks. Fallback matches are not C progress. Queued each guarded
 production draft separately through build/commit.sh. No full build, network,
 direct git mutation, shared-doc regeneration or generated ROM artifact commits.
+
+## Task 0814FFA4 follow-up (2026-10-20)
+
+Tags: #matching #player #animation #cue
+
+Exact progress: 0.0 percentage-point gain. Six existing guarded drafts retained, with required file-local aliases restored for this cached address-named ELF. Only per-file check.py checks; no network or full build. Named callers and existing symbols establish the PlayerCue prefix; callback interpretations remain tentative.
+
+- 08152174: drafted 81.6%, 218 realigned differences / 37 ignoring registers. Largest first, reviewed asmat and exact relative 08151D90. Sprite-byte setter inline reduced structure to 34 but worsened total to 243 and fuzzy to 79.7%; reverted. Remaining decoder allocation, phase tails and scale addressing.
+- 081503EC: drafted 84.4%, 90 realigned differences / 25 structural. Explicitly duplicate the shrink tail instead of entering a shared C label. Baseline after alias repair was 83.5%, 95 / 28. Phase-two flag stores, scale arithmetic and byte-address lifetimes remain.
+- 08151A14: drafted 83.1%, 87 / 48. Explicit case-four and case-six animation calls improve total from 95 at baseline; structure unchanged. Palette arithmetic, phase branching and field-address allocation remain.
+- 0814FFA4: drafted 80.0%, 82 / 12, versus baseline 80.1%, 84 / 14. Cache the facing direction inside the inline to avoid redundant loads; differing bytes fall from 453 to 335. Direction stores, zero lifetime, multiplication selection and allocation remain.
+- 08151EB8: retained 99.7%, two differing instructions / two structural: movement-direction OR scheduled after field-address calculation. Read/write and input-only barriers on the second direction calculation regress to 96.5% and 96.8%; reverted both.
+- 08152A5C: retained 97.5%, six differing instructions / zero structural. Speed-offset constant wants r2 and direction-offset constant r5. Pinning both constants with input or read/write constraints regressed to 81.9% by losing address reuse; reverted. Reviewed body is 480 bytes through 08152C3C; default fallback still includes the following assembly extent, so default-path matches are never counted as C progress.
+
+All six recorded with check.py --nonmatching --record; all default assembly fallbacks also checked. depin.py --write incorrectly removed hints by checking the guarded assembly path; all such removals were rejected and the original hints restored before final recording. No claim of removable hints. Formatting applied with pinned clang-format, then alias whitespace restored to the exact naming contract. Separate draft commits queued through build/commit.sh, notes last.
