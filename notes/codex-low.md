@@ -2749,3 +2749,47 @@ on guarded NONMATCHING sources incorrectly accepted removals against the default
 INCLUDE_ASM branches; restored all candidates from local checkpoints and reran
 --nonmatching --record. Depin needs an explicit nonmatching mode before use on
 these files. One exact function (336 bytes) is new coverage; drafts earn none.
+
+## 2026-10-20 — task 080F79A8, axe attack phases
+
+Tags: #matching #axe #animation
+
+- 080F79A8: drafted 90.1%, Axe_UpdateOrbitAttack. Existing 87.6% draft
+  improved by making the spin direction signed and reversing the Y-add operand
+  order in the vector inline. Final realigned count 96 / 63 ignoring registers.
+  Orbit initialization, RNG comparison, address reuse, and collider-loop
+  scheduling still differ. Restored required local alias and address fallback.
+- 080F8648: retained drafted 99.2%, Axe_UpdateReturningTrail. Six realigned
+  differences / four ignoring registers remain: player-global scheduling and
+  stack-vector address reuse in the return-distance test. A distance inline
+  regressed to 97.5%; moving both vectors into one function-scope local regressed
+  to 95.8%. Both reverted. Added required local alias and address fallback.
+- 080F8FFC: drafted 84.5%, tentative Axe_UpdateTargetLunge. Entry computes
+  player displacement, divides XZ by 44 or 64 according to health, sets the
+  vertical duration field, configures auxiliary rendering, and starts sound.
+  Rotation accelerates on ten-frame intervals then brakes according to angle.
+  Landing flag selects FinishRotation and clears the context attack flag.
+  72 realigned differences / 34 ignoring registers remain, including stack
+  vector address lifetimes, flag scheduling and callback setup allocation.
+- 080F93E0: drafted 83.0%, tentative Axe_UpdateTurnAnimation. Compares octants,
+  restores the saved callback when aligned, selects turn polarity, maintains
+  duration scale, and rotates one octant on animation event bit four. Shared
+  animation Select inline ported from Lun_UpdateWaitingAnimation. 66 realigned
+  differences / 28 ignoring registers remain: octant arithmetic expression,
+  flag/address scheduling, constant reuse and allocation.
+- 080F9694: matched Axe_UpdateWaitingAnimation. relatives.py found that
+  Lun_UpdateWaitingAnimation covers 150 of 151 instructions. Porting its C and
+  substituting Axe_GetDirectionalFrame gives an exact unpinned match (336 bytes).
+  Wait sets flag 0x20 through frame 29 and marks completion after frame 59.
+- 080F97E4: drafted 81.0%, tentative Axe_ConvergeRecoveryMotion. Reused the
+  quarter-delta/clamp/rest idioms from SceneActorControl_ConvergeSavedMotion.
+  Approaches saved XZ motion with steps clamped to +/-200, then restores flags,
+  copies the movement limit and requests behavior nine. 70 realigned differences
+  / 30 ignoring registers remain. Explicit mask locals reduced structural
+  differences but regressed fuzzy to 74.2%; reverted. Corrected profile-entry
+  callee from the directional-entry routine during review.
+
+All five drafts are guarded and scored with --nonmatching --record; their
+assembly fallbacks pass exact checks. One match and five separate draft commits
+queued through build/commit.sh. No full build or network operations. Exact
+percentage-point gain is deferred to batch integration; drafts earn none.
