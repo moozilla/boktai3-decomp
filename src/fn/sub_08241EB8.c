@@ -146,7 +146,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 // confidence=low: an alternate-form cue that counts up while sliding the pose window
-#define PlayerCue_UpdateSpiralPose sub_08241EB8
 void PlayerCue_UpdateSpiralPose(struct P *p)
 {
     if (B(0x457) != 0xe) {
@@ -190,5 +189,5 @@ void PlayerCue_UpdateSpiralPose(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08241EB8);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralPose);
 #endif
