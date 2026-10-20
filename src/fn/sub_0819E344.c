@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ActorState_Restart sub_0819E344
-
 struct ActorRestart {
     u8 pad[0xA1];
     u8 flags;

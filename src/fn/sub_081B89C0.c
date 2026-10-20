@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97%
 // remaining diffs: load order of the target pointer, Sqrt result zero-extend, one pointer copy
-#define SceneMover_SteerXZ sub_081B89C0
 
 struct MoverVec {
     s16 x, y, z, pad;
@@ -73,5 +72,5 @@ s32 SceneMover_SteerXZ(struct SceneMover *m)
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B89C0);
+INCLUDE_ASM("asm/nonmatching", SceneMover_SteerXZ);
 #endif

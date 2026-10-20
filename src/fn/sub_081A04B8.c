@@ -5,7 +5,7 @@ struct OffsetActor {
 void ActionState_Reset(u8 *);
 void ActionState_SetState(u8 *, u32);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
-void sub_0819E754(struct OffsetActor *, u32);
+void Actor_SetHeadingVelocity(struct OffsetActor *, u32);
 static inline u8 OutsideBoundary(struct OffsetActor *actor)
 {
     u8 *p = (u8 *)actor;
@@ -32,7 +32,7 @@ void OffsetActor_PlayBoundarySequence(struct OffsetActor *actor)
                 Hresvelgr_SetAnimation(p, p + 0x194, p + 0x174, 2, 1, 0);
                 *(u32 *)(state + 4) = 1;
             }
-            sub_0819E754(actor, 0x20);
+            Actor_SetHeadingVelocity(actor, 0x20);
             if (OutsideBoundary(actor))
                 ActionState_SetState(state, 1);
             break;

@@ -8,8 +8,8 @@ s32 ScalarApproach_StepQuarter(s32, s32);
 s32 ScalarApproach_StepEighth(s32, s32);
 s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 Math_StepTowardTarget(s32, s32, s32);
-s32 sub_081B89C0(struct OrbitMotion *);
-s32 sub_081B8B38(struct OrbitMotion *);
+s32 SceneMover_SteerXZ(struct OrbitMotion *);
+s32 SceneMover_SteerXY(struct OrbitMotion *);
 s32 OrbitMotion_UpdateAngle(struct OrbitMotion *);
 s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *);
 s32 OrbitMotion_UpdateAbsoluteSines(struct OrbitMotion *);
@@ -66,9 +66,9 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             break;
         case 6:
             out->y = ScalarApproach_StepEighth(out->y, target->y);
-            return sub_081B89C0(p);
+            return SceneMover_SteerXZ(p);
         case 7:
-            return sub_081B8B38(p);
+            return SceneMover_SteerXY(p);
         case 8:
             return OrbitMotion_UpdateAngle(p);
         case 9:

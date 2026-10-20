@@ -5,8 +5,6 @@
 // fuzzy: 99%
 // only the position of the loop counter init differs (movs r5, #4)
 
-#define Registry3F74_InitAnimations sub_081BA81C
-
 struct Registry3F74ResourceHeader {
     u32 words[8];
 };
@@ -50,5 +48,5 @@ void Registry3F74_InitAnimations(struct Registry3F74Display *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081BA81C);
+INCLUDE_ASM("asm/nonmatching", Registry3F74_InitAnimations);
 #endif

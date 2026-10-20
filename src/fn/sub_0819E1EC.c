@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ActorState_Hold37 sub_0819E1EC
-
 struct ActorHold {
     u8 pad[0xAA];
     u8 st;
