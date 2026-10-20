@@ -1,4 +1,3 @@
-#define Player_SynchronizeColliderState sub_08242DCC
 #include "global.h"
 #include "player.h"
 void sub_08225B74(void *);
