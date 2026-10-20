@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.6%
-// foundry draft (worker best 92.6%); what differs is mostly register allocation and instruction order
 struct SmallCallbackEntry {
     u8 payload[0xB0];
     u8 active;
@@ -15,10 +12,11 @@ struct SmallCallbackPool {
 s32 Callback_InvokeActor(void *, void *);
 s32 CallbackPool_InvokeActiveSmall(struct SmallCallbackPool *pool)
 {
+    void **new_var;
     s32 i;
     for (i = 0; i <= 15; i++) {
         if (pool->entries[i].active) {
-            void **callback = &pool->entries[0].callback + i * (0xB8 / 4);
+            void **callback = (new_var = &pool->entries[0].callback) + i * (0xB8 / 4);
             u32 offset = i * 0xB8 + 0x18;
             struct SmallCallbackEntry *entry = (struct SmallCallbackEntry *)((u32)pool + offset);
             Callback_InvokeActor(entry, *callback);
@@ -26,6 +24,3 @@ s32 CallbackPool_InvokeActiveSmall(struct SmallCallbackPool *pool)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackPool_InvokeActiveSmall);
-#endif

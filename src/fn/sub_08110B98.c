@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
 void TileRows_CopyPackedRows(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 width, s32 height,
                              const u16 *source)
 {
@@ -13,8 +10,9 @@ void TileRows_CopyPackedRows(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 
     for (row = 0; row < height; row++) {
         if (width > 0) {
             s32 index = (row + firstRow) * 4 + (offset + page * 80);
+            count = row * 64 + (u32)dest;
+            dst = (u16 *)count;
             count = width;
-            dst = (u16 *)(row * 64 + (u32)dest);
             src = (const u16 *)(index * 2 + (u32)source);
             do {
                 *dst++ = *src++;
@@ -22,6 +20,3 @@ void TileRows_CopyPackedRows(u16 *dest, s32 page, s32 offset, s32 firstRow, s32 
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TileRows_CopyPackedRows);
-#endif
