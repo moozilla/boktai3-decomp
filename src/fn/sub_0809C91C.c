@@ -1,6 +1,9 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 97.1%
+// confidence=low: applies hovering height and drawable bobbing from the movement phase.
+#define Lun_UpdateHoverHeight sub_0809C91C
 // fuzzy: 96.6%
 // foundry draft (worker best 96.6%); what differs is mostly register allocation and instruction order
 struct Drw {
@@ -58,7 +61,7 @@ static inline s32 Trunc(s32 value, u32 shift)
     return value >= 0 ? value >> shift : -((-value) >> shift);
 }
 
-void sub_0809C91C(struct Act *a)
+void Lun_UpdateHoverHeight(struct Act *a)
 {
     struct St *st = a->st;
     s32 d, ad;
@@ -73,7 +76,7 @@ void sub_0809C91C(struct Act *a)
     }
     if ((u8)(a->kind - 0x23) > 1) {
         u32 m = 0x100000;
-        if (a->flags2D0 & m)
+        if (ActorFlag(a, m, 0x2d0))
             goto cont;
     }
     {
@@ -82,8 +85,10 @@ void sub_0809C91C(struct Act *a)
     }
     return;
 cont: {
-    u32 r = 0;
-    if ((*(u16 *)0x02000534) != 0 && (*(u16 *)0x02000500) == 5)
+    u32 r;
+    u32 mode = *(u16 *)0x02000534;
+    r = 0;
+    if (mode != 0 && (*(u16 *)0x02000500) == 5)
         r = 1;
     if (r != 0 || (*(u8 **)0x02000580)[0x418] == 4)
         cap = 0x3c;
