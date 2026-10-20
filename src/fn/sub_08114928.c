@@ -1,4 +1,9 @@
 #include "global.h"
+// confidence=low: profile-driven native effect motion and creation.
+#define NativeEffect_CreateFromProfile sub_08114928
+#define NativeEffect_UpdateLinearFlight sub_08113738
+#define NativeEffect_UpdateRotatingFlight sub_08113BBC
+#define NativeEffect_UpdateTurningTrail sub_08113F64
 #ifdef NONMATCHING
 // fuzzy: 83.9%
 /* Group-id expression ordering, argument registers and slot initialization still differ. */
