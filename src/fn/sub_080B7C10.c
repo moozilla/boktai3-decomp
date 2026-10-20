@@ -235,7 +235,9 @@ static inline u8 ReturnHome(void *p)
         if (test)
             return 0;
         {
-            struct GroupBits { s16 bits : 16; };
+            struct GroupBits {
+                s16 bits : 16;
+            };
             ((struct GroupBits *)&group->flags414)->bits &= ~4;
         }
         mask = 0x80;
@@ -286,8 +288,9 @@ struct SkeletonSelectionContext {
 };
 extern const u8 gUnk_0824E250[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-u8 sub_080B77D0(struct SceneActorRegistryResetView *, u32);
-#define Skeleton_SelectDistanceReaction sub_080B7C10 // confidence=low: selects retreat or route recovery by context distance thresholds
+u32 sub_080B77D0(struct SceneActorRegistryResetView *, u32);
+// confidence=low: selects retreat or route recovery by context distance thresholds
+#define Skeleton_SelectDistanceReaction sub_080B7C10
 void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonSelectionContext *context = actor->context;
@@ -299,7 +302,7 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
             u8 *direction = &actor->direction;
             s32 prior = *direction;
             *direction = actor->fieldE9 + 0x80;
-            if (!sub_080B77D0(actor, prior))
+            if (!(u8)sub_080B77D0(actor, prior))
                 return;
         }
         {
