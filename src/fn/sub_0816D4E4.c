@@ -1,11 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 #include "scene_item_values.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.7%
-// foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
 #define SceneHud_TestActionFlag      Inventory_GetUsePermissionFlag
 #define SceneHud_GetActionEffectKind Inventory_GetItemUseCondition
 #define gActionDefinitions           gUnk_08E61280
@@ -29,6 +27,7 @@ static inline s32 InventoryPresent(s16 *p)
 }
 static inline struct SceneValueEquipment *GetEquipment(s16 *p)
 {
+    asm("" ::: "memory");
     return Inventory_GetEquipmentEntry(*p);
 }
 u32 SceneHud_CanApplySelectedAction(u32 action)
@@ -87,6 +86,3 @@ u32 SceneHud_CanApplySelectedAction(u32 action)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_CanApplySelectedAction);
-#endif
