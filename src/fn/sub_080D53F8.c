@@ -1,6 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+#define Mummy_UpdateProbeNavigation sub_080D53F8
+#define Mummy_RequestStraightRoute  sub_080D6FDC
+
 #ifdef NONMATCHING
 // fuzzy: 80.0%
 #include "scene_actor_chase.h"
