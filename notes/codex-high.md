@@ -2777,7 +2777,7 @@ the unpinned match contributes 772 bytes. The guarded draft adds no exact credit
   Separate two-argument mode helpers and the widened PackKeys helper prevent
   early constants and extra copies. A barrier in the cancel-mode helper stops
   unwanted common-expression reuse; the initial mask needs r1. Depinning
-  reduced ten initial hints to three retained hints. Final reviewed check:
+  reduced the initial constraints to three retained hints. Final reviewed check:
   zero differing bytes across 608 bytes.
 - **0810BBD4 — matched, LinkSelection_UpdateParticipantScores (tentative)**,
   352 bytes, Register-pinned. Called by LinkSelection_WaitForReadyParticipants.
