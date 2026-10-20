@@ -1,4 +1,5 @@
 #include "global.h"
+#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -112,5 +113,5 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateRepeatedPairAttack);
+INCLUDE_ASM("asm/nonmatching", sub_081AA178);
 #endif
