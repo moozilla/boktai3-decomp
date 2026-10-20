@@ -3119,3 +3119,94 @@ All commits submitted separately through build/commit.sh.
   An explicit stack-frame struct fixed local layout, but expression grouping,
   repeated weights, stack-pointer lifetimes and allocation remain unresolved.
   Candidate retained locally at wip/codex-medium/sub_08098344.c.
+
+## Task 081B48A0 — 2026-10-20
+
+Tags: #matching #vanargand #animation #palette #register-pinning #nonmatching
+
+Worked solo on the preclaimed offline cloud/081B48A0 branch. Read the entry,
+worker, cloud and big-function guidance, existing task notes, callers/callees,
+assembly and matched relatives. The Ghidra export is absent. Exact gain:
++0.0429 percentage points of total code (1,036 bytes), all Register-pinned.
+Two functions matched and one existing guarded draft improved. Three targets
+stopped below the full-extent draft threshold. No network or full build;
+per-file check.py checks and build/commit.sh only. Shared docs were not edited.
+
+- **081B5454 — matched, Vanargand_UpdatePartRadialTravel (tentative).**
+  On reset, computes a planar heading/distance target, starts motion from
+  origin with mode four, selects sequence nine and steps packed playback.
+  Updates motion each tick; completion sets finished, otherwise requests
+  flags 12. Full reviewed extent 472 bytes, ending at 081B562C. Porting the
+  matched Vanargand_UpdatePartBobbing stepper and the existing sidestep vector
+  idiom left five register differences. Moving the stepper's 0xFFFF source
+  to r2 (mask held in r5), plus a short finished-offset/pointer constraint,
+  closed them. Direct clang-format and the final full-extent check pass.
+- **081B5A98 — matched, Vanargand_UpdatePartRevealFade (tentative).**
+  On reset, places origin at the radial heading/distance target, unhides
+  the sprite, copies palette source +194, and selects/steps sequence nine.
+  Interpolates from +194 to +190 with frame and six banks, advances after
+  frame 63, then marks finished. Full reviewed extent 564 bytes, ending at
+  081B5CCC. The same stepper needed its 0xFFFF source in r3. Explicit short
+  offset/address constraints reproduce the reset stores and prevent the
+  switch-state address being held across Palette_InterpolateBanks. Reusing
+  the state offset plus eleven gives the observed enter-address derivation;
+  loading the destination palette before the source-offset constraint closes
+  the last argument-order differences. Direct clang-format and final exact
+  check pass. These hints contain no handwritten instruction bodies.
+- **081B48A0 — improved draft 93.9%, Vanargand_UpdatePartSidestep.**
+  Retained the existing symbols/functions.csv name. Previous draft 87.6%.
+  Moves 128 units along byte +187, preserves origin height, then restores
+  sequence nine and marks finished. Passing the saved state into the second
+  stepper's first flag-mask calculation reproduces its reuse of the value
+  one; the initial stepper gets an explicit first-bit input. A planar-add
+  inline, r6 enter pointer, and transition-value constraints reduce residue
+  from 63/19 to 27/11 realigned differing instructions (total/ignoring
+  registers). Remaining: owner-copy scheduling, entry/motion address reuse,
+  vector load registers, origin-height addressing and pool placement. More
+  explicit planar-pointer constraints reduced structure to eight but worsened
+  total differences to 58; discarded in favor of this 93.9% candidate.
+  Recorded with --nonmatching --record; default INCLUDE_ASM fallback checked
+  exactly. Restored the required local alias and raw-address fallback token
+  for compatibility with the cached assembly/ELF naming.
+- **081B562C — stopped below threshold, tentative part emergence.**
+  Recovered owner display flag selection, sequence nine, palette +190 copy,
+  two owner keyframe phases with song 0x58D, outward radial motion from radius
+  640 to the configured distance, contact initialization and song 0x58E.
+  The final owner display position projects basePosition with sign-aware
+  division by 32 and the screen offset at 03005418. Read condensed listing
+  and relatives; used the shared part/stepper layout. Best retained scratch
+  is 74.5% over the full 1,132-byte extent, 177/56 realigned differences,
+  candidate 1,156 bytes. An output-pointer projection helper fixes the initial
+  word read/modify/write expansion of stack halfwords. State-address lifetime,
+  enter-pointer copies, vector constant/address hoisting, extra saved register,
+  owner flag scheduling and transition ordering remain. Typed owner fields,
+  state-load address constraints, keyframe pointer constraints and a radius
+  hint did not reach draft quality. Scratch remains uncommitted at
+  wip/codex-medium/sub_081B562C.c.
+- **081B5EA4 — stopped below threshold, tentative
+  Vanargand_InitializePartController.** Called by
+  Vanargand_CreatePartController. Initializes owner keyframes and two part
+  records at +98 with stride +21C, assigns palette/tile sources and optional
+  external palette destinations, and initializes visible mode with radial
+  positioning and guarded action two. First source 66.4%, 133/52 realigned
+  differences. Multiple advancing cursors for palette pointers, destination,
+  tile and part improve fuzzy to 70.7% over the full 732-byte extent, but
+  leave 114/75 differences (candidate 720 bytes). The second loop's canonical
+  part/flags addresses, loop-stride hoisting, mode spill, action-store
+  addressing and signed end comparison differ. High-register mode/palette
+  hints and stride barriers did not improve the result. Best retained cursor
+  candidate is uncommitted at wip/codex-medium/sub_081B5EA4.c.
+- **081B4DA4 — stopped; existing boundary blocker confirmed.** Rechecked the
+  earlier wip/sub_081B4DA4.c leap candidate against assembly and both extents.
+  It is 84.2% only over the reviewed first body/pools through 081B512C
+  (0x388 bytes): 82/20 realigned differences, candidate 912 bytes. Inventory
+  extends through 081B52E8, including another apparent function at 081B512C
+  with its own push, stack frame and reset/state dispatch. Full-extent check
+  is 67.7%, 299/237 differences. No production draft was added. Integrator
+  still needs to review/add the missing boundary before a shorter-body score
+  can count. Existing candidate and evidence were preserved.
+
+All accepted callbacks are in the statically observed Vanargand part-action
+family around gUnk_086120A0; no runtime coverage claims were added. Each source
+change was committed separately through the driver. Combined ROM validation
+and name promotion remain with the integrator.
