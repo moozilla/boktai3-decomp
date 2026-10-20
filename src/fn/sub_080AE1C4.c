@@ -188,5 +188,5 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateKnockbackRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080AE1C4);
 #endif
