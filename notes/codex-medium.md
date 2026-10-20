@@ -2448,3 +2448,76 @@ NONMATCHING option, so running it on a guarded source checks only its assembly
 fallback and can incorrectly discard every hint. Guarded sources were restored
 and their recorded C scores rechecked; unguarded draft candidates correctly
 report that depin cannot minimize a non-exact base.
+
+## Task 0821FF8C — collision, digit sprites, serial and RFU (2026-10-20)
+
+Tags: #matching #collision #serial #rfu #animation
+
+Assigned instruction coverage: 15.7% (+15.7 percentage points; 304 of 1935
+instructions). One exact function, five guarded drafts; drafts contribute no
+exact progress. The exact function emits 632 bytes, without register pins.
+All checks used tools/check.py; no full build or network commands were run.
+
+- **0821FF8C — matched, Collision_CalculateDamageResponse.** Reads source attack
+  flags/damage and destination affinity masks; sets response amount and flags,
+  applies the nearby-layer bonus, signed scale factors, and a game-state
+  percentage adjustment when source kind is 16. The response-zero guard prevents
+  recalculation. Useful technique: an inline masked flag accessor puts the mask
+  before the first attack load; caching the full attack flags after the damage
+  clamp removes the extra canonical register copy. Repeated Nearby/ApplyScales
+  inline bodies reproduce the two paths. The diagnostic damage register pin was
+  removed by depin, and the formatted source still checks MATCH.
+- **08223E28 — drafted 80.9%, RfuManager_ApplyRequestResult.** Callback installed
+  by RfuManager_Init through rfu_setREQCallback. Decodes RFU request/result pairs
+  into manager state transitions, notifications and disconnect/recovery work.
+  Guarded draft: 188 realigned differing instructions, 84 ignoring registers.
+  A persistent manager-pointer local initially produced only 62.9%; constant
+  manager accesses improved rematerialization and block layout. Mixing persistent
+  and constant accesses helped some structural regions but lowered overall
+  similarity. Remaining issues include address lifetimes, stack-byte reloads,
+  recovery-slot loop allocation, and literal/jump-table displacement differences.
+- **08222D60 — drafted 83.3%, existing name Serial_ServiceInterrupt.** Reads all
+  four multiplayer words, excludes bit-15 words from the combined readiness mask,
+  updates latest/delivered packet double buffers, and stages packets through the
+  four-entry ring. Error status -2 is selected by SIOCNT conditions; the tail
+  writes the next send word, role and interrupt acknowledgement. Guarded draft:
+  57 realigned differing instructions, seven ignoring registers. Writing array
+  addresses as index + &global[offset] preserves the original separate offset
+  bases; local-array-pointer expressions folded them into immediate offsets.
+  Retains one first-word r8 pin and the concession marker. A volatile count local
+  preserves the temporary halfword while the queue count is decremented/restored.
+  Remaining differences are chiefly allocation and address/pool scheduling.
+  Guarded depin mistakenly checked the assembly fallback and removed the pin;
+  restored the pin in a corrective commit and rechecked the C score. Unguarded
+  depin correctly declines to minimize a non-exact base.
+- **082245A8 — drafted 82.1%, RfuManager_UpdateChildAdmissions.** Identifies newly
+  connected child slots, starts admission timeouts, checks received game-name
+  records against the terminated serial-number list at manager +0x20, accepts
+  compatible slots and disconnects rejected/expired ones. No register hints.
+  Guarded draft: 52 realigned differing instructions, 18 ignoring registers.
+  Separate persistent/present-state pointers and an explicit pending-mask pointer
+  recover the spill/hoisting pattern. A final state-pointer reload before testing
+  pending admissions improved allocation from 79.1% to 82.1%. The XOR/AND
+  expression still becomes BIC; timer addresses and several live ranges differ.
+- **082239E0 — drafted 80.7%, RfuManager_UpdateLinkRecovery.** Wraps watchLink,
+  records loss/reason masks, arms per-slot recovery timeouts, clears recovered
+  slots and disconnects expired ones; returns whether any disconnect occurred.
+  Guarded draft: 49 realigned differing instructions, 23 ignoring registers.
+  Remaining differences involve pointer lifetimes and loop base hoisting.
+  Explicit timeout pointers and an sb hint failed to improve the retained draft.
+- **082213B8 — drafted 94.9%, Anim_DrawDecimalDigits.** Callers in menu panels
+  pass widget arrays, digit resource/base, width, position and spacing. Repeated
+  subtraction emits eight decimal glyph indices, then the requested suffix is
+  drawn with optional leading-zero suppression. Guarded draft: 18 differing
+  bytes, 12 realigned differing instructions, six ignoring registers; same
+  400-byte extent. Explicit cursor plus index reproduces the separate zero-test
+  cursor and glyph lookup, and a prechecked do-loop places the cursor after the
+  width guard. Four register hints remain; unguarded depin skips this non-exact
+  base. Volatile suppression parameter retains both observed stack reads and
+  avoids a pinned intermediate incorrectly coalescing the original flag with its
+  negation. Residue is initial load/negation scheduling and low-register choices.
+
+Scores above are the final reviewed-extent --nonmatching --record results;
+some queue commit subjects used the preceding candidate-length estimate. Every
+source has its required local alias and every draft retains INCLUDE_ASM in the
+#else branch. Draft experiments remain under ignored wip/ and build/ paths.
