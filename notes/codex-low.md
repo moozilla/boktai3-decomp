@@ -1200,3 +1200,67 @@ Tags: #matching #player #movement #resource
 - 08142FC4: matched, `Player_UpdateUnflaggedResourceRecovery`. Sibling uses unflagged eligibility and far particles, plus a triangular pulse duration across a 0..64 timer. Cache the pulse counter once and pass its value to an inline that computes the destination internally. Pinned zero in r5 at the timer increment/store boundary.
 
 All acceptance checks used tools/check.py only; no full build or network operations. Register-pinning concessions are marked in affected units. Each match/draft is submitted separately through build/commit.sh. Drafts remain behind NONMATCHING with assembly defaults.
+
+## Task 080D0FE8 (2026-10-20, retained-candidate follow-up)
+
+Tags: #matching #mummy #scene-actor #register-pinning
+
+Exact progress: 0 percentage-point gain. Both production candidates existed on entry; this pass improves one and repairs their local aliases, not new exact coverage.
+
+- 080D2584: inspected largest first with asmat, relatives and fresh condensed listing (build/codex-low-mummy-motion.txt). Best relative still covers only 30%; four repeated terrain-height regions and paired route probes do not provide a close complete port. Prior far-branch-tail warning remains applicable. Stopped unmatched without a new candidate.
+- 080D0FE8: revisited entry and relatives alongside prior Task 080D0C30 notes. Route-facing octant selection and six animation-selection copies dominate; best relative covers 35%. No new reliable complete candidate; stopped unmatched.
+- 080D3878: retained existing Mummy_UpdateDefeat draft at recorded 86.4%, 86 realigned differences / 34 ignoring registers. Added the required file-local address alias and explicit address INCLUDE_ASM fallback, allowing checks against the local ELF. Remaining control-address materialization, collider lifetime and spills are unchanged; this is verification/alias repair only.
+- 080D2194: re-read entry and prior failed reconstruction. flags2D6 bit 16 and animation completion gate three restoration paths; ordinary terrain/route path needs original field-pointer lifetimes. Prior 60.8% candidate was below threshold. No new useful hypothesis; stopped unmatched.
+- 080D1784: re-read entry/reset and prior failed reconstruction. Clears control timers and selects animation 7; freezes mode/frame through tick 59. Prior 61.4% candidate needs reset ordering and PRE lifetimes reconstructed. No new candidate; stopped unmatched.
+- 080D1CD0: improved existing Mummy_UpdateHiddenRecovery guarded draft 94.2% to 94.3%; realigned differences 22/14 structural to 15/4 structural. A u8-returning take helper materializes the consumed flag but initially swapped actor/flag allocation (76.9%). Pinning queued to r5 and passing its known-zero value into the animation inline through an empty operand barrier retains the mirror-zero lifetime and improves the whole candidate. Removing the queued pin regresses to 74.7%; direct barrier after manual take regresses to 75.9%; actor+queued pins regress to 78.4%. Remaining entry offset/load/store allocation and a few inline temporaries differ. Added required local address alias and explicit address fallback. Candidate remains 464 bytes versus reviewed target extent 464 bytes, but is not byte-identical C.
+
+Formatted both sources directly with the pinned clang-format. Recorded scores with check.py --nonmatching --record and checked both default assembly fallbacks exactly. Separate draft updates queued through build/commit.sh. No full build, make, network operation or shared-doc edits. Existing register concessions remain confined to guarded drafts; integration must perform combined validation.
+
+## Task 080A9DB0 (2026-10-20, retained-candidate follow-up)
+
+Tags: #matching #tentacle #scene-actor #reaction
+
+Exact progress: 0 percentage-point gain. Two existing guarded drafts retained;
+080AB7BC improved from 93.1% to 97.1%. No new exact matches.
+
+- 080ABDCC: reviewed largest first, read BIG_FUNCTIONS and queried relatives.
+  Prior initializer analysis remains applicable: 0x5C/0x80 drawable allocations,
+  D636/C102 resource setup, script parsing, terrain and packed animation code.
+  Best relative covers only 9%; no close complete port. Stopped unmatched.
+- 080AD75C: read complete target assembly and matched reaction/control relatives.
+  Tentative generic stagger-motion recovery, rather than tentacle ownership:
+  entry selects directional animation 3, flag 8 gates sounds 459/298 and periodic
+  sparks (every 12 frames). Quarter differences between +310/+318 and +314/+31C
+  are clamped to +/-200 and added to motion. Once settled and +2B3 is set,
+  clears flags 0x120, checks actor flag 0x80000, body +6D4 mask 0x1D, and routes
+  toward player+24 or restores control. Recovery timers are 64/32. Relatives
+  SceneActorReaction_PlayStaggerBurst and SceneActorControl_ConvergeSavedMotion
+  each explain about 25%; no complete candidate. Stopped unmatched.
+- 080A9DB0: reread complete assembly and prior 52.4% failed reconstruction.
+  Two loops interpolate segment targets and bridge inactive runs, ending in
+  TentacleActor_UpdateSegmentHeadings. Stack-vector lifetimes and loop allocation
+  remain unresolved; no new reliable hypothesis. Stopped unmatched.
+- 080AD530: reread complete assembly and 58.5% prior attempt. Shared control
+  resets, route success/failure layout and offset lifetimes remain unresolved.
+  Stopped unmatched without retaining below-threshold C.
+- 080AB7BC: improved guarded TentacleActor_UpdateSegmentColliders draft to 97.1%,
+  five realigned differing instructions, all structural. Make the mask-taking
+  accessor accept the actor object, deriving its field inside, and pass the
+  existing byte-pointer actor alias cast to the view (passing pp instead adds
+  a spill). An explicit u32 mask for the collider clear now emits bics using
+  the same mask. Remaining: derived 2D0 offset and early stack-vector address
+  scheduling. Explicit vector-pointer barrier reduced structural count to three
+  but swapped the first delta registers, lowering fuzzy to 96.2%; offset pins
+  and barriers regressed. Kept the cleaner unpinned 97.1% version.
+- 080AB968: retained guarded TentacleActor_UpdateRetraction at 85.9%, 29 realigned
+  differences / 12 ignoring registers. Empty argument constraints in Advance
+  did not preserve the unused abs calculations; reverted. Existing reset pins
+  remain. Added required file-local address aliases to both drafts and explicit
+  address-based INCLUDE_ASM fallbacks; checks now resolve against local ELF.
+
+Formatted with build/venv/bin/clang-format; recorded both full-extent draft
+scores with check.py --nonmatching --record, and verified both default assembly
+fallbacks. Default fallback MATCH output does not mean either C draft matched.
+Only per-file checks; no make, full build, network or shared-doc changes. Ghidra
+export is absent. Separate draft updates and these notes submitted through the
+commit driver. Earlier notes under Task 080A9BD8 remain useful context.
