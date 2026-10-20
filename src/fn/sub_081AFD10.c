@@ -2,7 +2,8 @@
 // MATCHING_CONCESSION: register-pinning
 #define PairedSceneActor_UpdateHalfPresentation sub_081AFD10
 #ifdef NONMATCHING
-// fuzzy: 85.8%
+// fuzzy: 91.8%
+// Remaining differences: register choices for member offsets and two instruction-order differences.
 // confidence=low: updates each half's visible position, colliders and completion transition.
 struct PairPosition {
     s16 x, y, z, pad;
@@ -96,7 +97,11 @@ static inline void setReady(struct PairHalf *half)
             *phase = clear;
             half->timer = clear;
             half->reset164 = clear;
-            half->reset168 = clear;
+            {
+                register u32 offset asm("r3") = 0x168;
+                asm("" : "+r"(offset));
+                *(u32 *)((u8 *)half + offset) = clear;
+            }
         }
     }
 }
@@ -110,9 +115,9 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
         register struct PairPosition *base asm("r2") = half->origin;
         offset = &half->offset;
         asm("" : : "r"(offset), "r"(base));
-        dst->x = offset->x + base->x;
-        dst->y = offset->y + base->y;
-        dst->z = offset->z + base->z;
+        dst->x = base->x + offset->x;
+        dst->y = base->y + offset->y;
+        dst->z = base->z + offset->z;
     }
     half->position.y += 256;
     if (half->hiddenTimer) {
@@ -123,10 +128,10 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
         register s32 amplitude asm("r6") = half->shake;
         asm("" : : "r"(amplitude));
         if (amplitude) {
-            register s32 direction asm("r3") = randomSample() >> 4;
+            s32 direction = randomSample() >> 4;
+            u32 mask = 255;
             register struct PairPosition *offset asm("r4") = &jitter;
             register const s16 *sine asm("r2");
-            u32 mask = 255;
             asm("" : : "r"(offset));
             direction &= mask;
             sine = gUnk_086149C4;
@@ -156,7 +161,13 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
                 asm("" : : "r"(coordinate), "r"(deltaZ));
                 dst->z = coordinate + deltaZ;
             }
-            half->shake--;
+            {
+                register u32 offset asm("r0") = 0x19C;
+                s32 *shake;
+                asm("" : "+r"(offset));
+                shake = (s32 *)((u8 *)half + offset);
+                (*shake)--;
+            }
         }
     }
     collider = &half->body;
@@ -181,8 +192,11 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
         asm("" : "+r"(control));
         control->flags &= mask;
     } else {
-        register struct PairShadowControl *control asm("r2") = &half->shadowControl;
+        register u32 offset asm("r3") = 0x20C;
+        register struct PairShadowControl *control asm("r2");
         u32 mask = 1;
+        asm("" : "+r"(offset));
+        control = (struct PairShadowControl *)((u8 *)half + offset);
         asm("" : "+r"(control));
         control->flags |= mask;
     }
