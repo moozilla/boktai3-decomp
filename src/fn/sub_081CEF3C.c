@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define SceneNpc_UpdateStopped sub_081CEF3C
 struct Npc {
     u8 pad0[6];
     u8 state, field7, pad8, field9;

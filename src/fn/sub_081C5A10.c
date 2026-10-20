@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define ChallengeMenu_InitBackgrounds sub_081C5A10
 extern u16 gUnk_03004BD8;
 struct M {
     u8 pad[0x2B8];

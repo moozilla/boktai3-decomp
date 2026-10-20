@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define ChallengeMenu_DrawOptions sub_081C54B8
 struct M {
     u8 pad[0x2E3];
     u8 mask;
