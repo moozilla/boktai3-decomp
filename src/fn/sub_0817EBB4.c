@@ -1,6 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 93.8%
 // Remaining differences: palette constant lifetimes, rotation mask reuse, and registers.
 // confidence=low: summons a formation before rotating through an effect burst
 #define BossSlot2_UpdateSummonSpinSequence sub_0817EBB4
@@ -72,7 +73,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
     }
     switch (p->phase) {
         case 0: {
-            u32 zero = p->timer;
+            register u32 zero asm("r9") = p->timer;
             if (!zero) {
                 SetDirection(p, 32);
                 SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0xF4,
@@ -128,7 +129,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             break;
         case 4:
             if (!p->timer) {
-                u32 one = 1;
+                register u32 one asm("r4") = 1;
                 SetDirection(p, 0);
                 SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0x134,
                                                          one, one, 4);
@@ -160,7 +161,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             break;
         case 7:
             if (!p->timer) {
-                u32 one = 1;
+                register u32 one asm("r4") = 1;
                 SetDirection(p, 0);
                 SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0x134,
                                                          one, one, 4);
@@ -174,7 +175,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             break;
         case 8:
             if (!p->timer) {
-                u32 zero = p->timer;
+                register u32 zero asm("r9") = p->timer;
                 SetDirection(p, 32);
                 SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0xF4,
                                                          1, 1, 1);
