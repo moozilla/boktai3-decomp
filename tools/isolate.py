@@ -54,16 +54,18 @@ def split_decls(text):
 
 def isolate(text, func, out, nonmatching):
     text = select_drafts(text, func, nonmatching)
+    # `#define Name sub_X` aliases: Name defines the same ROM function as sub_X
+    alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M))
     kept = []
     for item in items(text):
         code = strip_comments(item)
         inc = re.match(r"\s*INCLUDE_ASM\([^,]*,\s*(\w+)\)", code)
         if inc:
-            if inc.group(1) == func:
+            if alias.get(inc.group(1), inc.group(1)) == alias.get(func, func):
                 kept.append(item)
             continue
         m = DEF.match(code)
-        if m and not m.group(1) and m.group(3) != func:
+        if m and not m.group(1) and alias.get(m.group(3), m.group(3)) != alias.get(func, func):
             kept.append(m.group(2).strip() + ";")
             continue
         kept.append(item)

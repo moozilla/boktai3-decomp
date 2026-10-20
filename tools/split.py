@@ -307,6 +307,9 @@ def main():
             if n not in index:
                 sys.exit(f"{rel}: function {n} is not a known function start")
             idx.append(index[n])
+        if not idx:
+            sys.exit(f"{rel}: none of {names} is a known function start "
+                     "(a #define alias must map to a sub_XXXXXXXX label)")
         if idx != sorted(idx) or idx != list(range(idx[0], idx[0] + len(idx))):
             sys.exit(f"{rel}: functions must be contiguous and in ROM order "
                      f"(got {[funcs[i][0] for i in idx]})")
