@@ -223,5 +223,5 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateRotatingFlight);
+INCLUDE_ASM("asm/nonmatching", sub_08113BBC);
 #endif
