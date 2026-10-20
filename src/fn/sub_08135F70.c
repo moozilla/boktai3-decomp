@@ -1,12 +1,9 @@
-#include "global.h"
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.9%
-// Pinning the mode-test constant to r4 improves allocation.
-// Control flow and core work line up (regions.py core distance 6/444); allocation and spills
-// differ: the ROM spills the health and +0x2D8 pointers to the stack, keeps mode in sl and a
-// constant 1 in sb across SceneHud_SetTimedState. UpdateHitFlags is inlined twice; the second
-// copy reuses the caller's +0x2CC pointer.
+// fuzzy: 86.8%
+// Remaining differences: health and +0x2D8 pointer spills, mode lifetime,
+// shared hit-flag expansion and temporary-register choices (see worker notes).
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 u8 sub_08131D5C(void *);
@@ -46,7 +43,7 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gUnk_030053F4, 0x4800)) {
         register u32 *owner asm("r1") = &actor->field2E0;
-        register u32 mask asm("r3") = *owner;
+        register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
@@ -73,8 +70,12 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u32 flags)
 {
     if (actor) {
-        if (flags & 0x40)
-            return 1;
+        {
+            register u32 mask asm("r0") = 0x40;
+            asm("" : "+r"(mask));
+            if (mask & flags)
+                return 1;
+        }
         {
             u32 mask = 0x20000;
             if (actor->flags2D0 & mask)
@@ -111,7 +112,9 @@ static inline void UpdateHitFlags(struct SceneActorRegistryResetView *actor, u16
             u32 *flags2CC;
             {
                 s32 mask = ~0x201;
-                *flags2D4 = mask & flags;
+                register u32 value asm("r0") = mask & flags;
+                asm("" : "+r"(value));
+                *flags2D4 = value;
             }
             flags2CC = &actor->flags2CC;
             {
@@ -180,7 +183,9 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
         {
             {
                 s32 mask = ~0x201;
-                *flags2D4 = mask & flags;
+                register u32 value asm("r0") = mask & flags;
+                asm("" : "+r"(value));
+                *flags2D4 = value;
             }
             {
                 u32 mask = ~0x4000;
@@ -227,16 +232,16 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-#define SceneActorReaction_ApplyPendingHit sub_08135F70
-u8 SceneActorReaction_ApplyPendingHit(struct SceneActorRegistryResetView *actor)
+#define SceneActorReaction_ResolveDamage sub_08135F70
+u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags2D4;
     s16 *health;
-    u32 mode;
+    register u32 mode asm("r10");
     u32 *flags2D8;
     u32 *flags2CC;
-    register u32 updated asm("r5");
-    register u32 four asm("r4");
+    u32 updated;
+    u32 four;
     u32 bits;
 
     if (!HasPendingHit(actor)) {
@@ -312,17 +317,20 @@ u8 SceneActorReaction_ApplyPendingHit(struct SceneActorRegistryResetView *actor)
             if (ShouldShowDamage(actor)) {
                 u32 zero;
                 u32 buffer[2];
+                register u32 one asm("r9");
                 {
                     s32 h = *health;
                     s32 maxh = FIELD(actor, 0xB0, u16);
                     s32 kind = FIELD(actor, 0xB2, s16);
                     s32 param = FIELD(actor, 0x9A, s16);
+                    one = 1;
+                    asm("" : "+r"(one));
                     SceneHud_SetTimedState(actor->id, h, maxh, kind, mode >> 2, param);
                 }
                 Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
                     DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                             &actor->position, buffer, 1);
+                                             &actor->position, buffer, one);
             }
         }
     }

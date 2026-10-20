@@ -1,28 +1,24 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-/* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
 
-struct DogActionContext {
-    u8 unknown0[0x678];
-    u32 flags678;
-    u8 unknown67C[0x14];
-    u16 timer690;
-    u8 unknown692[0xE];
-    u16 target6A0;
-    u16 unknown6A2;
-    u16 timer6A4;
-    u8 action6A6, phase6A7;
-    u8 unknown6A8[0x30];
-    u8 saved6D8[8];
+struct IvyContext {
+    u8 unknown0[0x62C];
+    u32 flags;
+    u8 unknown630[4];
+    u16 field634;
+};
+
+struct IvyPlacement {
+    u32 xy, z;
 };
 
 static inline void StepSequence(void *obj)
 {
     struct SceneActorControlMotionDrawable *owner = obj;
-    struct DisplaySequenceState *state;
+    register struct DisplaySequenceState *state asm("r4");
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
@@ -130,24 +126,37 @@ static inline void StepSequence(void *obj)
     }
 }
 
-void SceneActorMovement_ResolveRoutePosition(void *);
 
+struct DogActionContext {
+    u8 unknown0[0x678];
+    u32 flags;
+    u8 unknown67C[0x14];
+    u16 timer690;
+    u8 unknown692[0xE];
+    u16 selection;
+    u8 unknown6A2[2];
+    u16 timer6A4;
+    u8 state6A6, state6A7;
+    u8 unknown6A8[0x30];
+    u8 slots[8];
+};
 #define Dog_ResetActionState sub_080DE57C
-// confidence=low: clears action-related context fields before selecting idle animation.
+// confidence=low: clears action gates before resolving the route and stepping its drawable.
+void SceneActorMovement_ResolveRoutePosition(void *);
 void Dog_ResetActionState(struct SceneActorRegistryResetView *actor)
 {
-    struct DogActionContext *context = actor->context;
-    context->flags678 = 0;
-    context->timer690 = 0;
-    context->target6A0 = 0xFFFF;
-    context->timer6A4 = 0;
-    context->action6A6 = 0;
-    context->phase6A7 = 0;
-    Memory_Clear(context->saved6D8, 8);
+    struct DogActionContext *context=actor->context;
+    context->flags=0;
+    context->timer690=0;
+    context->selection=0xFFFF;
+    context->timer6A4=0;
+    context->state6A6=0;
+    context->state6A7=0;
+    Memory_Clear(context->slots,8);
     SceneActorMovement_ResolveRoutePosition(actor);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry((void *)actor,0);
     {
-        register void *drawable asm("r0") = actor->drawable;
+        register void *drawable asm("r0")=actor->drawable;
         asm("" : "+r"(drawable));
         StepSequence(drawable);
     }
