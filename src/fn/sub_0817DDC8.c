@@ -1,4 +1,5 @@
 #include "global.h"
+#define SceneVolume_UpdateImpactSlide sub_0817DDC8
 
 struct VolumeActor {
     u8 pad0[0x51];
