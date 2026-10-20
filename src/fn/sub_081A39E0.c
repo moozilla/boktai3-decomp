@@ -1,10 +1,13 @@
 #include "global.h"
 
+// confidence=low: updates homing effect entries, animation, trails and lifetime.
+#define EffectPool_UpdateEntry sub_081A39E0
+
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 88.3%
-// Remaining differences: angle masking, animation timer scheduling, and register copies.
+// fuzzy: 96.2%
+// Remaining differences: register choices in angle, animation and trail setup.
 struct Types {
     u32 values[4];
 };
@@ -132,12 +135,20 @@ static inline void Animate(struct Entry *p)
             }
         }
         entry = a->data + a->frame;
-        weight = *entry;
+        {
+            register u32 loaded asm("r1") = *entry;
+            asm("" : "+r"(loaded));
+            weight = loaded;
+        }
         a->duration = weight & 15;
         a->rate = (a->duration * a->scale) >> 6;
         if (!a->rate)
             a->rate = 1;
     }
+}
+static inline u32 Frame(struct Entry *p)
+{
+    return p->frame;
 }
 void EffectPool_UpdateEntry(void *pool, struct Entry *p)
 {
@@ -165,9 +176,13 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     AddVelocity(&p->position, &p->velocity);
     Animate(p);
     Collider_SetPosition(p->collider, &p->position, 0);
-    p->collider[0x42] = 0;
+    {
+        register u32 zero asm("r0") = 0;
+        asm("" : "+r"(zero));
+        p->collider[0x42] = zero;
+    }
     Collider_Refresh(p->collider);
-    if (p->trailCount <= 3 && !(p->frame & 31)) {
+    if (p->trailCount <= 3 && !(Frame(p) & 31)) {
         s32 index;
         u32 types[4];
         s32 angle, sample;
@@ -177,7 +192,11 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
         index = Mod((sample >> 3) & 15, 4);
         *(struct Types *)types = *(const struct Types *)gUnk_0824F760;
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        sample = table[gUnk_03005308];
+        {
+            register s32 loaded asm("r2") = table[gUnk_03005308];
+            asm("" : "+r"(loaded));
+            sample = loaded;
+        }
         angle = ((sample >> 3) & 127) + 64;
         p->trails[p->trailCount] =
             MotionEntry_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
@@ -188,8 +207,10 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (p->lifetime < (p->initialLifetime >> 3))
         p->flags |= 0x200;
     if (!(p->lifetime & 31)) {
-        register s32 interval asm("r1") = p->homingInterval;
-        if (interval > 2)
+        s32 value = p->homingInterval;
+        register s32 interval asm("r1") = value;
+        asm("" : "+r"(value), "+r"(interval));
+        if (value > 2)
             interval--;
         p->homingInterval = interval;
         p->speed++;
