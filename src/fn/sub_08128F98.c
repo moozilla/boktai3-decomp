@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 80.0%
+// fuzzy: 80.1%
 // Vector address lifetimes, RNG allocation and packed coordinate stores still differ.
 struct Vec {
     s16 x, y, z, pad;
@@ -93,7 +93,10 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     s32 cell;
     SetVelocity(&local.center, direction, 512);
     Add(&local.center, &p->position, &local.center);
-    local.cell = CellIndex(&p->position);
+    {
+        s32 sourceCell = CellIndex(&p->position);
+        local.cell = sourceCell;
+    }
     local.zero = 0;
     CpuSet(&local.zero, &local.velocity, 0x05000002);
     if (count > 0) {
@@ -103,9 +106,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
         do {
             s32 height, difference;
             *(u32 *)&local.spot = (u16)((Random(rng) & 255) - 128);
-            local.spot.pad = 0;
-            *(u32 *)&local.spot.z =
-                (*(u32 *)&local.spot.z & 0xFFFF0000) | (u16)((Random(rng) & 255) - 128);
+            *(u32 *)&local.spot.z = (u16)((Random(rng) & 255) - 128);
             Add(&local.spot, &local.center, &local.spot);
             cell = CellIndex(&local.spot);
             if (sub_08128D24(p, &local.spot, local.cell, cell, Divide64(direction)))
@@ -113,7 +114,10 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             if (*CellData(cell) >> 4)
                 goto next;
             height = *CellData(local.cell) & 15;
-            difference = *CellData(cell) & 15;
+            {
+                s32 value = *CellData(cell);
+                difference = value & 15;
+            }
             {
                 s32 delta = height - difference;
                 if (delta < 0)
