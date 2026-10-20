@@ -218,5 +218,5 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralMotion);
+INCLUDE_ASM("asm/nonmatching", sub_08153610);
 #endif
