@@ -502,3 +502,136 @@ Tags: #matching #hud #numeric-display
 - 08176F70 stopped unmatched after BIG_FUNCTIONS guidance, full/condensed listing and relatives review. Hud_InitAlternateLayout calls it after resource loading and panel refresh. Large widget layout initializer with repeated sub_0821983C calls, a packed animation stepper, and multiple loops. Largest relative covers only 9%; no Ghidra export exists locally. No candidate retained or production changes.
 
 Validation: only tools/check.py per-file checks; both matches rechecked after clang-format. No full builds or network operations. Existing tools/cloud_task.py modification was present at entry and untouched.
+
+## Task 08176F70 (2026-10-20)
+
+Tags: #matching #hud #actor-decision #palette
+
+This assignment overlaps retained work in the checkout. No new C bodies reached
+exact matching; exact progress gain is 0 percentage points. Revalidated the
+existing exact body at 0817BDB0 and retained the two existing qualifying drafts,
+adding the required file-local aliases in separate driver commits. No full
+build, network operations, shared-doc edits, generated files or ROM commits.
+
+- **0817C3F4 — retained draft 83.3%.** BossSlot2_SelectCombatAction selects
+  actions by mode 4EA, previous choice 4E9 and event index 4EB, with vitality
+  thresholds 274/276 and summon pointers C60/C64. Reviewed existing C and the
+  assembly entry under BIG_FUNCTIONS guidance. Final full-extent check records
+  530 realigned differences, 407 ignoring registers. The callback has a shared
+  tail reached through several long-branch islands. Removing the initial event
+  pointer assignment gives 83.5% but leaves paths with an uninitialized pointer;
+  rejected and restored the valid retained source. Added local address alias.
+- **08176F70 — stopped unmatched.** Reviewed prior task notes, relatives and a
+  fresh condensed listing (build/codex-low-6f70.txt). Hud_InitAlternateLayout's
+  large layout initializer repeats widget creation and embeds an animation
+  stepper; its best matched relative explains only 9%. Ghidra export remains
+  unavailable. No new complete C candidate or production body.
+- **081796D8 — retained draft 97.5%.** FieldHud_UpdateNumberDisplay remains nine
+  realigned structural differences: four full 0xFFFFD000 literals narrowed to
+  0xD000 materialization, plus pool effects. Tested a pinned full-width constant
+  through an inline digit store and an empty compiler barrier: structure fell
+  to six but total differences rose to 95 and score fell to 63.8%. Reverted the
+  experiment; no pins/barriers retained. Added local address alias and reran
+  check.py --nonmatching --record.
+- **0817B0B4 — stopped, candidate 59.8%.** Tentative name
+  SceneVolume_UpdateSequencePalette. Mode 506 selects a 24-tick fade from global
+  palette bank 2E80 to 680, fades between 680 and 2DE0, or a repeating pulse.
+  Counter 504 is read signed, shift 507 controls duration. Destination is C00.
+  Fraction clamps to 0..24 and otherwise truncates signed (6144*t/limit)/256.
+  Reset uses SceneVolume_ResetPendingSequence. Typed fields, unsigned storage
+  with signed reads, and a parameterized interpolation fraction slightly
+  improved the first 57.7% candidate. Compiler merges call tails differently;
+  202 realigned differences, 166 ignoring registers. Kept below-threshold C in
+  wip/sub_0817B0B4.c only.
+- **0817AD7C — stopped, best candidate 74.1%.** Tentative name
+  ActorDecision_SpawnBobbingFormation. Starts animation 301, selects initial
+  direction 0 or 32 from RNG, emits four actors at quarter-turn offsets using
+  radius 256 and adds 320 to Y. Each spawn uses target pointer 110 and signed
+  parameter 500; steering direction is initial angle +16 then steps by 64.
+  Typed actor position and a magnitude-taking sine inline improved 70.0% to
+  74.1% (50 realigned differences, 31 structural). Vector-add inlines improved
+  structure but worsened total; explicit pinning of base/mask/loop/position
+  registers also worsened scores. Restored the best unpinned source in
+  wip/sub_0817AD7C.c. Remaining issues include stack spills, sine multiplication
+  register choice and vector temporary lifetime. No production draft.
+- **0817BDB0 — existing exact body verified.** ActorDecision_UpdateHazardPath
+  passed byte-exact check after adding its local alias. Entire 352-byte extent
+  ends at 0817BF10. Consumes queued action, selects path/point with RNG, requests
+  path movement, and emits proximity hazards on consumed path events. This is
+  verification/naming of existing C, not newly recovered exact coverage.
+
+Only per-file check.py acceptance checks were used. Commit messages identify
+addresses and existing draft scores; integration must distinguish alias-only
+changes from new code progress.
+
+## Task 080D2584 (2026-10-20, follow-up)
+
+Tags: #matching #mummy #scene-actor #register-pinning
+
+- 080D2584: stopped unmatched after revisiting assembly and condensed runs. Prior attempt already identified four terrain-height copies and paired route probes. No complete candidate or new promising whole-function port; Ghidra export is still absent.
+- 080D5778: retained existing guarded Mummy_ResumeDelayedRoute draft at 88.3%, 134 realigned differences / 39 ignoring registers. Changing PickTurn's for loop to do/while produced identical output; unsigned counter comparison regressed one instruction; pinning actor to r7 regressed substantially. Added required local address alias and local alias for callee Mummy_RequestStraightRoute (080D6FDC), absent under its descriptive name from the local ELF.
+- 080D3D60: retained existing guarded Mummy_UpdatePlayerRoute draft at 82.4%, 194 realigned differences / 70 ignoring registers; added required local address alias. No new recovered C coverage.
+- 080D3878: improved existing guarded Mummy_UpdateDefeat draft from 86.2% to 86.4% by pinning frame argument to r8, matching the entry argument move. Remaining 86 realigned differences / 34 ignoring registers. Pinning animation pointer to r9 regressed, rejected. Existing register-concession marker retained. Added required local address alias.
+- 080D453C: stopped below draft threshold. Exploratory Mummy_ReactToNearbyStimulus candidate in wip/sub_080D453C.c scored 60.2% candidate-length, 218 realigned differences / 116 ignoring registers. Clears flags2D0 bit 24, gates on action/motion flags and cooldowns, finds overlapping stimulus, sets 180-tick timer and behavior 11 on first activation. Resolves tagged position, tries nearby-player tracking, restores saved route and attempts navigation toward stimulus. Success sets motion flag 0x200, context+0x6EA=4 and attachment target; return reports first activation or fallback. No production source retained. Needs field lifetimes and inline contract reconstruction before allocation work.
+- 080D53F8: retained existing guarded Mummy_UpdateProbeNavigation draft at 80.0%, 95 realigned differences / 30 ignoring registers. Removing speed r6 pin worsened to 77.4%; narrowing saved turn packet argument to u8 worsened to 77.9%; widening scale temporary made no difference. Added required local address alias and straight-route callee alias.
+
+Four draft updates queued separately through build/commit.sh. Scores recorded with check.py --nonmatching --record. INCLUDE_ASM fallbacks now use address names explicitly because the macro stringifies its argument; all four default fallbacks passed byte-exact per-file checks. No exact C matches and 0 percentage-point exact coverage gain. No full build, network operation or shared-doc edit; combined validation remains with integration.
+
+## Task 080D62CC (2026-10-20, follow-up)
+
+Tags: #matching #mummy #dog #scene-actor #register-pinning
+
+All source bodies except 080D812C were already retained on entry. This pass adds no new exact coverage (0 percentage-point gain); the exact function below is verification and removal of an unnecessary hint.
+
+- 080D812C: stopped unmatched. Read entry, caller Mummy_UpdateBehavior, fresh condensed assembly and prior codex-medium/low attempts. Timed burn damage includes the three known far-branch tails and extensive saturating defeat counters. Ivy_UpdateDefeat explains 76% of instruction runs, but the prior complete reconstruction scored only 46.5%. No new complete candidate or promising close port; Ghidra export is absent. Leave assembly intact.
+- 080D6608: improved retained Mummy_TryDirectPursuit draft from 87.0% to 89.2%; 144 realigned differences, 26 ignoring registers (previously 179/28). Passing mask 3 into PickTurn makes its constant available before the RNG update and improves allocation. Unsigned/descending/do-while loop forms did not improve further; moving saved-control writes before RNG regressed strongly and was reverted. Added local address aliases for entry and Mummy_RequestStraightRoute. Remaining differences include scratch pointer spill, route vector lifetime, flag-mask load order and register placement.
+- 080D9B20: retained SceneActor_FindDirectionalCell draft at 85.3%, 681 realigned differences / 574 ignoring registers. Raw halfword/word getter forms compile identically; widening boolean returns or changing the else-if chain regresses. The high fuzzy score conceals major missing repeated predicate structure: recover the original adjacency inline contract before allocation work. Added local address alias and explicit address fallback.
+- 080D6FDC: retained Mummy_RequestStraightRoute draft at 80.6%, 105 realigned differences / 17 ignoring registers. Passing a map-global pointer through Width/Height/Cell/IsLevelOpen with r6 binding regressed to 61.6% (240/111), reverted. The original retains the global pointer address across the scan while this candidate spills it. Added local address alias and explicit address fallback.
+- 080DDEC8: existing Dog_RestoreRoute C verified exactly over reviewed 608-byte extent, not a newly recovered match. Added local alias, ran depin --write (four hints to three), and rechecked zero differing bytes. Remaining register concession retained.
+- 080D62CC: retained Mummy_FireAcceleratingVolley draft at 94.6%, 17 realigned differences / 10 ignoring registers. Separate r1 height-difference binding, r4 speed binding and pinned quotient temporary each regressed; reverted. Remaining quotient absolute-value copy, loop setup and projectile argument ordering affect pool placement. Added local address alias and explicit address fallback.
+
+Formatted the four guarded drafts directly with the pinned clang-format, recorded each score with check.py --nonmatching --record, and queued separate commits through build/commit.sh. No make, full build or network operations. Combined ROM validation remains with the integrator.
+
+## Task 080E21AC (2026-10-20, follow-up)
+
+Tags: #matching #dog #scene-actor
+
+All six bodies were already present on entry. This pass adds no new exact coverage (0 percentage-point gain).
+
+- 080E25FC: retained Dog_ChooseReactionBehavior draft at 83.0%, 426 realigned differences / 162 ignoring registers. Direct motion-field test regressed to 82.4% (445/182); swapping context/group declaration order regressed to 82.3% (445/170). A turn-selection wrapper compiled identically. Restored original candidate, added required local address alias and explicit address fallback. Branch layout, motion-flag pointer lifetime and PRE stack slots remain unresolved.
+- 080E4B34: retained Dog_BeginDelayedRouteRecovery draft at 82.1%, 195 realigned differences / 46 ignoring registers. Pinning outer group pointer to r8 regressed to 70.0% (329/136); rejected. Splitting group initialization and adding a turn-selection wrapper produced identical output. Added required local address alias and explicit address fallback. Shared recovery inline allocation and flag update ordering remain.
+- 080E4468: existing Dog_ChasePlayer C verified exactly (972 bytes); added local address alias. Nearby Dog callbacks and chase-control transitions support existing provisional name. No new recovered code.
+- 080E4834: improved Dog_ResumeRoute draft from 82.3% to 84.7% by declaring context before group; 64 realigned differences / 24 ignoring registers, versus 76/23. Candidate now 776 bytes against 768-byte target. Reversing OR operands had no effect; deriving context at use regressed to 78.8%, and pinning group to r8 regressed to 81.4%. Remaining control-reset address materialization, literals and allocation need further reconstruction. Added local alias and explicit address fallback.
+- 080E21AC: existing SceneActorControl_BeginHiddenDefeat C verified exactly (636 bytes); added local entry alias and local CompleteBlinkOut callee alias, required because the descriptive callee symbol is absent from the local ELF. No new recovered code.
+- 080E2428: existing SceneActorControl_CompleteBlinkOut C verified exactly (468 bytes); added local address alias. No new recovered code.
+
+Formatted directly with build/venv/bin/clang-format. Recorded all guarded scores with check.py --nonmatching --record and verified all three default assembly fallbacks exactly. Separate per-function commits queued through build/commit.sh. No make, full build or network operations; combined validation remains with integration.
+
+## Task 0814C3A4 (2026-10-20, follow-up)
+
+Tags: #matching #player #attack #script-control
+
+- 0814C3A4: stopped unmatched. Read entry assembly, regenerated condensed listing and relatives, and reviewed prior attempt. Largest relative covers only 9%, chiefly signed polar-vector calculations. The eight-phase grab/motion routine needs a complete reconstruction; no new viable whole-function candidate. Ghidra export remains absent. Assembly retained.
+- 0814E3D8: retained Player_UpdateSelectedAttackCharge draft at 90.0%, 76 realigned differences / 36 ignoring registers. Replacing the first charged-tail goto with a direct phase-four call compiled identically; reverted. Added required entry alias and local projectile callee alias because descriptive symbols are absent from the local ELF. Explicit address INCLUDE_ASM fallback checked exactly.
+- 0814D264: stopped at existing local candidate's 75.1%, 163 realigned differences / 59 ignoring registers. Adjacent declaration-order variants for sequence/first and radius/first compiled identically. Geometry, sine-table lifetime and context-address allocation remain unresolved. Candidate remains in wip/sub_0814D264.c; no production draft.
+- 0814F328: new guarded draft at 87.8%, 77 realigned differences / 25 ignoring registers. Player_UpdateAttachedAttackCharge is installed by Player_BeginDescriptorAction for action kind 0x30. Runs animation entries 0x26–0x28, creates/updates an attached attack entry, queries its kind-seven value for charge thresholds, releases on input-up, and decays recoil before accepting buffered re-entry. Entry resets the attached handle and installs Player_ReleaseActionEffectOnExit. Started from the adjacent selected-attack charge draft, reconstructed all eight target phases from asm. Mask accessor with caller-side null tests improved initial 84.6% to 87.7% candidate-length. Recorded full extent is 87.8%. Remaining constant reuse, mask/address order, particle initialization and register placement. Callback uses its existing descriptive ELF symbol to retain the Thumb function-pointer bit; raw sub_ alias lost that bit in an early candidate and was removed.
+- 0814DFDC: existing Player_SpawnSelectedAttackProjectile C verified exactly (964 bytes). Added required local alias. This is verification/naming, not newly recovered exact coverage.
+- 0814FC80: new guarded draft at 89.7%, 44 realigned differences / 18 ignoring registers. Player_AdvanceScriptDestination is installed by PlayerCue_WalkTo for ordinary/action-mode-five scripted walking. Calculates planar destination angle and distance, applies movement slowdown and directional axis scaling, chooses facing/side and walking sounds, then snaps to destination and returns to stand when within one step. Initial 84.7% candidate improved through byte-store inlines that calculate destination addresses after their source values, and loading slowdown activation before initializing its boolean. Remaining flag/null-test merging, literal materialization, field lifetimes and allocation. Name remains tentative.
+
+Four per-function changes queued through build/commit.sh. All three guarded drafts recorded with check.py --nonmatching --record; their default assembly fallbacks passed exact checks. Formatted directly with build/venv/bin/clang-format. No register pins, make, full build or network operations. Newly recovered exact coverage gain: 0 percentage points; existing exact progress unchanged. Combined ROM validation remains with the integrator.
+
+
+## Task 0817C3F4 (2026-10-20, follow-up)
+
+Tags: #matching #scene-volume #boss #actor-decision
+
+Four exact C bodies and the guarded combat-decision draft were already present on entry. This pass adds no new exact coverage (0 percentage-point gain). All checks used check.py only; no full build or network operations.
+
+- 0817C3F4: retained BossSlot2_SelectCombatAction draft at 83.3%, 530 realigned differences / 407 ignoring registers. Reviewed BIG_FUNCTIONS guidance, entry and prior notes. Initial event-pointer derivation from q instead of p compiled identically. A parameterized mask accessor regressed to 83.0% (537/409). Eliminating the event pointer in favor of direct q->index accesses retained 83.3% fuzzy but worsened structure to 485 differences; reverted. Keep the original valid initialized pointer and guarded draft unchanged. Long-branch shared tails and repeated decision blocks remain unresolved.
+- 0817DA1C: existing SceneVolume_UpdatePursuitSpin C verified exactly over 940 bytes; added required local address alias. Destination pursuit, periodic particles, rotating effect angle and recovery phases support the tentative existing name. No new recovered code.
+- 0817E6E0: stopped unmatched, exploratory SceneVolume_UpdateLungeApproach candidate retained in wip/sub_0817E6E0.c at 56.6% candidate-length (242 realigned differences / 79 ignoring registers). Entry translates bounds, clears reached and attack bit 2, optionally plays sound 540. Tracks player/path destination; a 16-tick window changes collision flags and palette settings. Computes a quantized destination angle, tests a 32-unit projected floor height against floorHeight at 4F2, then snaps within radius 50 or advances with animation F9. Completion resets the directional callback. Started from the exact knockback sibling's terrain and direction inlines. Pinning actor/angle/deltas worsened structural differences to 110; vector-add and flag/palette inlines worsened overall shape, reverted. Main issues: vector/address lifetimes, entry-reset store ordering, constant reuse and register allocation. Below draft threshold; no production source or register concession retained.
+- 0817E040: existing SceneVolume_UpdateKnockbackLanding C verified exactly over 824 bytes ending at 0817E378; added required local address alias. Height decay, impact velocity and landing animation sequence support existing provisional name.
+- 0817D7AC: existing SceneVolume_UpdateRepeatedShot C verified exactly over 624 bytes ending at 0817DA1C; added required local address alias. Repeats aim/fire phases with impact counter capped at three.
+- 0817DDC8: existing SceneVolume_UpdateImpactSlide C verified exactly over 428 bytes ending at 0817DF74; added required local address alias. Decays impact speed and advances recovery animation.
+
+Formatted the four alias changes with the pinned clang-format and queued one driver commit per verified exact function. Existing 83.3% draft unchanged. Combined ROM validation remains with integration.
