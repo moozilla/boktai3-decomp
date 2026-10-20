@@ -3044,6 +3044,7 @@ addr,name,mode,confidence,source,notes
 08098324,Ghost_RemoveAuxiliarySprites,thumb,low,src-alias,Removes four consecutive sprites embedded in the Ghost actor
 08098660,ActorVisibility_TickRevealDelay,thumb,low,src-alias,
 080986DC,Bee_ConsumeFlag80,thumb,low,src-alias,
+08098734,ActorTick_DecrementCounterAA,thumb,low,src-alias,
 08098788,Ghost_UpdateVisibility,thumb,low,src-alias,
 080989FC,ActorContact_UpdateColliderPositions,thumb,low,src-alias,
 08098CA0,Ghost_FollowPlayerLoop,thumb,low,src-alias,
@@ -3058,6 +3059,7 @@ addr,name,mode,confidence,source,notes
 0809ADD4,Ghost_Create,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); registry callback
 0809B000,Lun_OnBodyContact,thumb,low,src-alias,Lun body collision callback delegates to the common contact reaction
 0809B00C,ActorBehavior_TickParticipantProgress,thumb,low,src-alias,
+0809B178,Lun_UpdateDirectionalPoseNoSelect,thumb,low,src-alias,
 0809B29C,Lun_OnSpecialAnimation,thumb,low,src-alias,Lun state callback consumes the preparation flag and selects animation profile entry 15
 0809B2CC,Lun_UpdateDirectionalPose,thumb,low,src-alias,
 0809B3F8,Lun_TurnTowardSavedDirection,thumb,low,src-alias,
@@ -3106,6 +3108,7 @@ addr,name,mode,confidence,source,notes
 0809F368,SceneActorControl_CompleteScriptedResponse_0809F368,thumb,low,src-alias,
 0809F510,Crow_HopWithinHomeCell,thumb,low,src-alias,
 0809F84C,Crow_SteerAroundPlayer,thumb,low,src-alias,
+0809FC74,Crow_UpdateWanderTimer,thumb,low,src-alias,
 080A0044,Crow_InitActionTable,thumb,low,src-alias,Installs the five-entry Crow action callback table at offset 0x284
 080A0054,Crow_BeginScriptedAction,thumb,low,src-alias,Script-command handler queues action 0x10 and resets action counters and movement flags
 080A05A0,Crow_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their Crow callbacks
@@ -3371,6 +3374,7 @@ addr,name,mode,confidence,source,notes
 080C4CFC,SceneActorRoute_CommitReachableDestination,thumb,low,src-alias,
 080C4DBC,SceneActorRoute_SetReachableDestination,thumb,low,src-alias,
 080C4E8C,Skeleton_TryTriggerAction,thumb,low,src-alias,
+080C4EF0,Golem_ResetIdleControl,thumb,low,src-alias,
 080C4F80,Golem_InitAnimationProfile,thumb,low,src-alias,Finds or adds profile type three and stores its identifier in the animation profile field
 080C515C,Golem_ClearControlFlag,thumb,low,src-alias,Callback that clears bit two of actor flags at 0x2D0; flag purpose unresolved
 080C5170,SceneActor_AccelerateForTerrain,thumb,low,src-alias,
@@ -3385,6 +3389,7 @@ addr,name,mode,confidence,source,notes
 080C61AC,Golem_UpdateDying,thumb,low,src-alias,Tentative dying callback plays animation six and transitions to the death callback
 080C627C,Golem_UpdateDeath,thumb,low,src-alias,Tentative death callback plays animation seven and signals completion after its timed sequence
 080C62EC,Skeleton_ClearDirectionalEntryFlag,thumb,low,src-alias,
+080C6338,Golem_BeginChargeBuildup,thumb,low,src-alias,
 080C63D0,Golem_UpdateChargeBuildup,thumb,low,src-alias,
 080C66B0,Golem_UpdateRouteMotion,thumb,low,src-alias,
 080C68F0,Golem_UpdateChargeStop,thumb,low,src-alias,
@@ -3402,9 +3407,11 @@ addr,name,mode,confidence,source,notes
 080CC830,Golem_TickFacingQuadrant,thumb,low,src-alias,
 080CC8B8,Golem_UpdateEffectsAndContacts,thumb,low,src-alias,Processes a timed effect and runs three shared actor update helpers
 080CC910,Golem_ReturnHome,thumb,low,src-alias,
+080CCC64,Golem_UpdateChargeSettle,thumb,low,src-alias,
 080CCD7C,Golem_UpdateChargePursuit,thumb,low,src-alias,
 080CDF14,Golem_ChargeOrApproach,thumb,low,src-alias,
 080CE188,Golem_ResumeRouteAfterControl,thumb,low,src-alias,
+080CEAC4,Golem_UpdateHoldTimer,thumb,low,src-alias,
 080CEB48,Golem_BeginSlideState,thumb,low,src-alias,
 080CECA4,Golem_UpdateSettle,thumb,low,src-alias,
 080CEDF0,Golem_ChargeOrReturnHome,thumb,low,src-alias,
@@ -3703,8 +3710,10 @@ addr,name,mode,confidence,source,notes
 080F82E8,ActorPhase_UpdateSpriteCollapse,thumb,low,src-alias,
 080F83FC,ActorPhase_WaitBeforeRelocation,thumb,low,src-alias,
 080F84D4,ActorPhase_UpdateSpriteRestore,thumb,low,src-alias,
+080F85B0,Axe_UpdateTrailFadeIn,thumb,low,src-alias,
 080F8648,Axe_UpdateReturningTrail,thumb,low,src-alias,
 080F8A14,SceneActorControl_SettleRotation,thumb,low,src-alias,
+080F8AD8,Axe_UpdateFadeOut,thumb,low,src-alias,
 080F8B38,SceneActorControl_TiltRotation,thumb,low,src-alias,
 080F8C40,SceneActorControl_RecoverRotation,thumb,low,src-alias,
 080F8D9C,SceneActorControl_FinishRotation,thumb,low,src-alias,
@@ -3716,6 +3725,7 @@ addr,name,mode,confidence,source,notes
 080F9694,Axe_UpdateWaitingAnimation,thumb,low,src-alias,
 080F97E4,Axe_ConvergeRecoveryMotion,thumb,low,src-alias,
 080F9974,Axe_UpdateDamageSpin,thumb,low,src-alias,
+080F9B60,Axe_ReleaseAndIdle,thumb,low,src-alias,
 080F9BE4,Axe_UpdateDefeat,thumb,low,src-alias,
 080F9FB8,Axe_UpdatePursuit,thumb,low,src-alias,
 080FA214,SceneActorControl_ApplyDampedMotion,thumb,low,src-alias,
@@ -3759,7 +3769,9 @@ addr,name,mode,confidence,source,notes
 080FD128,Axe_UpdateEffects,thumb,low,src-alias,Runs six effect and timer helpers after the axe state callback; grouping is provisional
 080FD29C,ActorGroup_ResetActivePhase,thumb,low,src-alias,
 080FD334,ActorGroup_BeginMotionPhase,thumb,low,src-alias,
+080FD48C,Axe_UpdateRecoverTimer,thumb,low,src-alias,
 080FD500,SceneActorControl_UpdateControl35Phase,thumb,low,src-alias,
+080FD65C,Axe_UpdateRecoverTimer2,thumb,low,src-alias,
 080FD6D0,ActorGroup_BeginExtendedMotion,thumb,low,src-alias,
 080FD840,SceneActorControl_EndExtendedPhase,thumb,low,src-alias,
 080FD8FC,SceneActorControl_UpdateControl2APhase,thumb,low,src-alias,
@@ -8728,6 +8740,7 @@ addr,name,mode,confidence,source,notes
 0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
+0821FB04,Actor_MoveAlongAngle,thumb,low,src-alias,
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,
 0821FD3C,ProximityVolume_TranslateBounds,thumb,low,src-alias,
 0821FDC8,Collider_Register,thumb,low,src-alias,Appends a collider to the manager's list unless already registered
@@ -9170,8 +9183,11 @@ addr,name,mode,confidence,source,notes
 0822D808,Inventory_GetEquippedDescriptor,thumb,low,src-alias,Resolves a primary equipment assignment and outputs its descriptor or an empty descriptor
 0822D83C,Inventory_SetEquipmentEntry,thumb,low,src-alias,Initializes an inventory entry from a descriptor and marks its equipment ID obtained
 0822D858,Inventory_ClearEquipmentEntry,thumb,low,src-alias,Initializes the indexed equipment entry from an empty descriptor
+0822D87C,Inventory_AddEquipmentFromRecord,thumb,low,src-alias,
 0822D904,Inventory_TryAddEquipmentEntry,thumb,low,src-alias,Wraps the equipment insertion helper and returns whether its result is positive
 0822D918,Inventory_RemoveEquipmentEntry,thumb,low,src-alias,Clears an equipment entry and removes all eight primary assignments referencing it
+0822D94C,Inventory_SwapEquipmentEntries,thumb,low,src-alias,
+0822DA94,Inventory_SortEquipment,thumb,low,src-alias,
 0822DB54,RecordEntry_AddFromScript,thumb,low,src-alias,
 0822DC24,Inventory_SetEntryFromScript,thumb,low,src-alias,
 0822DC78,GameState_ApplySelectedItem,thumb,low,src-alias,
@@ -9228,6 +9244,7 @@ addr,name,mode,confidence,source,notes
 0822EDF8,Save_ResumeRuntimeAfterTransfer,thumb,low,src-alias,Restores saved runtime callbacks and sound VSync after a save transfer
 0822EE68,Save_WriteBlock,thumb,low,src-alias,
 0822EF44,Save_ReadBlock,thumb,low,src-alias,
+0822EFFC,Save_VerifyBlock,thumb,low,src-alias,
 0822F0A4,Save_WriteBlockWithRetries,thumb,low,src-alias,
 0822F10C,Save_ReadBlockWithRetries,thumb,low,src-alias,
 0822F1B4,umul3232H32,thumb,low,src-alias,
@@ -9298,6 +9315,7 @@ addr,name,mode,confidence,source,notes
 08231448,ActiveList_PrependNode,thumb,low,src-alias,
 08231480,EffectGroup_Unlink,thumb,low,src-alias,
 082314C4,EffectGroup_FadeFirstActive,thumb,low,src-alias,
+08231500,EffectGroup_SpawnPart,thumb,low,src-alias,
 08231568,EffectGroup_Reset,thumb,low,src-alias,
 082315A8,EffectGroup_Spawn,thumb,low,src-alias,
 08231788,SceneActorEffects_FinishSlot,thumb,low,src-alias,Resets slot state and timer while marking its drawable inactive
