@@ -1190,3 +1190,63 @@ all draft sources before final checks, so it gives no draft minimality evidence.
 relatives.py failed while generating its progress cache; no network or full build
 was attempted. Per-function commits completed through build/commit.sh. Combined
 ROM validation and name promotion remain for integration.
+
+## Task 080B77D0 — 2026-10-20
+
+Tags: #matching #skeleton #nonmatching
+
+Exact code gain: 0 percentage points. Improved two inherited guarded drafts and
+restored required local aliases/fallback spellings on a third. Worked solo;
+no network, make, full build, or direct git mutations. All commits use the driver.
+Read entry-point/worker/cloud guidance and BIG_FUNCTIONS; inspected assigned
+assembly, condensed large bodies and prior committed notes before changes.
+
+- 080BBDD0: drafted **88.9%**, Skeleton_ConvergeDisplacedPosition, up from
+  87.1%. Narrowing PickDirection's selected direction to u8 reduces realigned
+  differences from 316 total / 44 structural to 256 / 46 and makes candidate
+  length equal the reviewed 4116-byte extent. It represents a byte direction
+  throughout. Mask-first short/settle updates, a signed group flag helper,
+  deriving saved state directly from actor, narrowing prior direction and
+  pinning the outer actor to r8 did not improve the result. Remaining recovery
+  pointer/flag lifetimes and RNG allocation require further work. No pins.
+- 080B7C10: retained inherited **92.8%** draft, Skeleton_SelectDistanceReaction.
+  Restored file-local own-name and retreat-callee aliases plus raw-address
+  INCLUDE_ASM spelling for this checkout's generated assembly. Adjacent local
+  declaration swaps, byte direction result, removing current-direction r5 pin
+  and direct RNG table access did not improve 146 total / 22 structural
+  differences. Existing concession marker retained. depin on the actual
+  unguarded scratch candidate skips because the base is not exact.
+- 080B9158: stopped unmatched. Inspected entry, condensed repeated terrain
+  recovery and installer 080B5D84 (timed behavior 56, category-dependent timer).
+  Entry samples RNG, probes direction through 080B713C, then uses animation 15
+  and route/chase recovery on failed direction or landing. No complete improved
+  candidate recovered beyond prior notes' below-threshold attempt. relatives.py
+  fails generating its progress cache (progress.py subprocess failure); no
+  tooling change made to work around that failure.
+- 080BF0E4: stopped below threshold; existing production draft unchanged.
+  Scratch PlayerSlot index-first loading changes reviewed realigned residue
+  from 473 / 164 to 476 / 162, scoring 72.4% over 3040 bytes. Narrowing the
+  random-direction helper's return did not improve structure. Directional
+  rise animation expansion and recovery allocation remain the blockers.
+- 080BA268: new scratch candidate, tentative Skeleton_ReleaseBoneProjectiles,
+  stopped at **64.5%** over reviewed 784 bytes (candidate 772), 148 total / 50
+  structural differences. Caller 080BA13C installs it following queued contact;
+  animation 22 releases two randomized D45E/1DC3 bone effects at heights +260
+  then +220 with upward velocity 30, reinitializes category 5 and collider.
+  Signed shift helper preserves the quantization branch; packed position copy
+  and typed addition recover much of the launch sequence. Remaining polar
+  argument scheduling, redundant angle masks, effect literal scheduling and
+  register allocation prevent a qualifying draft. Scratch only, no src body.
+- 080B77D0: drafted **94.3%**, Skeleton_TrySelectRetreatCell, up from 87.8%.
+  Deriving group at its late callback use instead of retaining a function-wide
+  group pointer removes its extra prologue setup; 52 / 30 differences become
+  27 / 27. A byte retry counter regresses. Moving north/south tail computations
+  to shared goto labels reduces structure to 25 but increases total to 43 and
+  lowers fuzzy to 93.1%; restored the stronger 94.3% candidate. Remaining
+  residue is north/south map reload tail layout and pool placement. No pins.
+
+Three changed guarded files formatted directly with build/venv/bin/clang-format;
+reviewed scores recorded with check.py --nonmatching --record, and all three
+assembly fallback checks pass. Below-threshold candidates remain in ignored
+wip/codex-low. No exact coverage claimed for assembly fallbacks. Combined ROM
+validation remains for integration. Shared docs and totals were not regenerated.
