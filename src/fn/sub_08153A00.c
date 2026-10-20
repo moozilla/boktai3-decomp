@@ -222,5 +222,5 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideWalkTarget);
+INCLUDE_ASM("asm/nonmatching", sub_08153A00);
 #endif
