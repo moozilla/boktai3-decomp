@@ -21,7 +21,6 @@ static inline u8 Vanargand_ConsumePending(struct VanargandEntry *p)
     return FALSE;
 }
 
-#define Vanargand_UpdateEntryTransition sub_081A8550
 void Vanargand_UpdateEntryTransition(struct VanargandEntry *p)
 {
     if (Vanargand_ConsumePending(p)) {
