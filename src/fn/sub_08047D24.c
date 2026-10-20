@@ -2,7 +2,7 @@
 #include "temporary_animation_pool.h"
 struct TemporaryAnimationPool *TemporaryAnimationPool_Create(void);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_FindInactive(struct TemporaryAnimationPool *);
-void sub_082199C8(void *, u32, u32);
+void Widget_CopyMasked(void *, u32, u32);
 void Anim_LinkToList(void *, u32);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, u32 lifetime,
                                                                   u32 flags, s32 paletteIndex,
@@ -20,7 +20,7 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
     if (!slot)
         return NULL;
     animation = &slot->animation;
-    sub_082199C8(animation, sequence, 27);
+    Widget_CopyMasked(animation, sequence, 27);
     animation->flags |= flags;
     if (paletteIndex > 0) {
         const void *palette;

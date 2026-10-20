@@ -25,15 +25,15 @@ void sub_081C1434(u8 *p)
 
     for (i = 0, obj = p + 0x90; i <= 7; i++) {
         dims.x = data[i];
-        sub_0821983C(obj, p + 0x18, 0, 0x30, 0, 0, 0x3c, &dims);
+        Widget_InitLinked(obj, p + 0x18, 0, 0x30, 0, 0, 0x3c, &dims);
         *(u32 *)(obj + 8) |= 1;
         obj += 0x60;
     }
 
-    sub_0821983C(p + 0x390, p + 0x18, 0x3c, 0x30, 0, 0, 0x3c, NULL);
+    Widget_InitLinked(p + 0x390, p + 0x18, 0x3c, 0x30, 0, 0, 0x3c, NULL);
 
     obj = p + 0x3f0;
-    sub_0821983C(obj, p + 0x38, 0x80, 0x30, 0, 0, 0x3c, NULL);
+    Widget_InitLinked(obj, p + 0x38, 0x80, 0x30, 0, 0, 0x3c, NULL);
     *(u32 *)(obj + 8) |= 1;
 }
 #else

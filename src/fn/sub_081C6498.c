@@ -1,7 +1,7 @@
 #include "global.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, void *, u32, u32, u32, u32, u32, u32);
 void TimeResult_InitCategoryDisplay(u8 *);
 void sub_081C62B4(u8 *);
 void TimeResult_InitAnimations(u8 *s)
@@ -19,13 +19,13 @@ void TimeResult_InitAnimations(u8 *s)
     p = ScriptProc_Start(bank, 0xE2AB);
     *(struct Blob *)(s + 0x38) = *p;
     ResourceHeader_Relocate(s + 0x38, p);
-    sub_0821983C(s + 0x58, first, 0, 0x10, 1, zero = 0, sixty = 0x3C, 0);
-    sub_0821983C(s + 0xB8, first, 0, 0x10, 2, zero, sixty, zero);
+    Widget_InitLinked(s + 0x58, first, 0, 0x10, 1, zero = 0, sixty = 0x3C, 0);
+    Widget_InitLinked(s + 0xB8, first, 0, 0x10, 2, zero, sixty, zero);
     {
         u32 loopzero = 0;
         obj = s + (sixty + 0xDC);
         for (i = 5; i >= 0; i--) {
-            sub_0821983C(obj, s + 0x38, 0, 0x31, 2, loopzero, 0x3C, loopzero);
+            Widget_InitLinked(obj, s + 0x38, 0, 0x31, 2, loopzero, 0x3C, loopzero);
             obj += 0x60;
         }
     }

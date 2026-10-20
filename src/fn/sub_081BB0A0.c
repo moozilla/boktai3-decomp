@@ -16,14 +16,14 @@ struct ResourceSprite {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void ResourceSprite_Initialize(struct ResourceSprite *object, u32 palette)
 {
     struct ResourceSpriteHeader *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     if (resource) {
         object->resource = *resource;
         ResourceHeader_Relocate(&object->resource, resource);
-        sub_0821983C(object->sprite, &object->resource, 2, 0x30, (u8)palette, 0, 0x3C, 0);
+        Widget_InitLinked(object->sprite, &object->resource, 2, 0x30, (u8)palette, 0, 0x3C, 0);
         object->entryCount = 0;
         object->selection = 0xFFFF;
     }

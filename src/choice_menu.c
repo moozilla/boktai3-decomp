@@ -410,7 +410,8 @@ struct Dimensions {
     u32 z : 16;
 };
 
-void sub_0821983C(void *, struct ChoiceResource *, s32, s32, s32, s32, s32, struct Dimensions *);
+void Widget_InitLinked(void *, struct ChoiceResource *, s32, s32, s32, s32, s32,
+                       struct Dimensions *);
 
 s32 MessageWindow_GetSoundMode(void);
 
@@ -450,8 +451,8 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     dimensions.x = 1;
     dimensions.y = 0;
     dimensions.z = 0;
-    sub_0821983C(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &dimensions);
-    sub_0821983C(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &dimensions);
+    Widget_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &dimensions);
+    Widget_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &dimensions);
     palette = p->palette;
     Memory_Copy(palette, p->leftCursor.palette, 32);
     p->leftCursor.palette = palette;

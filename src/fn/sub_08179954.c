@@ -18,7 +18,7 @@ struct MeterDisplay {
     void *script;
     s32 scale;
 };
-s32 sub_0821983C(void *, void *, u16, u32, u32, u32, u32, void *);
+s32 Widget_InitLinked(void *, void *, u16, u32, u32, u32, u32, void *);
 s32 Div(s32, s32);
 void MeterDisplay_InitializeWidgets(struct MeterDisplay *s)
 {
@@ -36,7 +36,8 @@ void MeterDisplay_InitializeWidgets(struct MeterDisplay *s)
     widget = s->widgets;
 
     do {
-        result = sub_0821983C(widget, s->resource, i + 0x49, 0x10, zero, zero, zero, (void *)zero);
+        result =
+            Widget_InitLinked(widget, s->resource, i + 0x49, 0x10, zero, zero, zero, (void *)zero);
         if (result)
             return;
         widget->x = result;

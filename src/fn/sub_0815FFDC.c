@@ -13,7 +13,7 @@ struct PlayerTransition {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void PlayerTransition_LoadAnimation(struct PlayerTransition *p)
 {
@@ -21,7 +21,7 @@ void PlayerTransition_LoadAnimation(struct PlayerTransition *p)
     if (resource) {
         p->resource = *resource;
         ResourceHeader_Relocate(&p->resource, resource);
-        sub_0821983C(p->animation, &p->resource, 0, 0x9000, 2, 0, 0x3c, p->owner + 0x30);
+        Widget_InitLinked(p->animation, &p->resource, 0, 0x9000, 2, 0, 0x3c, p->owner + 0x30);
         Anim_SetKeyframes(p->animation, &p->resource, 0xe4, 1, 0);
         p->animationFlags = 0x33;
         p->attachment = *(u32 *)(p->owner + 0xd4);

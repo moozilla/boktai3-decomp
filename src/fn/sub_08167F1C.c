@@ -21,7 +21,7 @@ struct HudIconOffset {
     u32 pad : 16;
 };
 extern u8 *gUnk_030042E4;
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Hud_InitializeThreeIcons(struct Hud *hud)
 {
     struct HudIconOffset offset;
@@ -37,7 +37,7 @@ void Hud_InitializeThreeIcons(struct Hud *hud)
     j = 0;
     for (; i < 3; icon++, j++, i++) {
         offset.x = (i + 14) * 8;
-        sub_0821983C(icon, hud->resource, 0x29, 0x10031, zero, zero, 60, &offset);
+        Widget_InitLinked(icon, hud->resource, 0x29, 0x10031, zero, zero, 60, &offset);
         icon->tile = zero;
         hud->icons[j].tiles = gUnk_030042E4 + (icon->tile << 5);
     }

@@ -48,7 +48,7 @@ void Anim_Remove(void *);
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, int);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, int);
 void *Script_GetKeywordValue(int, int);
 int WirelessStatusMenu_InitFromScript(struct LinkMenu *p)
 {
@@ -73,7 +73,7 @@ int WirelessStatusMenu_InitFromScript(struct LinkMenu *p)
         int flags;
         flags = 0x2011;
         zero = 0;
-        sub_0821983C(drawable, blob, 3, flags, zero, zero, 60, zero);
+        Widget_InitLinked(drawable, blob, 3, flags, zero, zero, 60, zero);
     }
     p->resource = Script_GetKeywordValue(114, 0);
     p->window = -1;

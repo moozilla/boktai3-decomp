@@ -283,7 +283,7 @@ u32 sub_0821F2EC(void *, void *, void *);
 
 void SceneActorContacts_RemoveNode(void *);
 
-void sub_0821BC68(void *, void *);
+void CellObject_Init(void *, void *);
 
 s32 Inventory_AddItem(u32, u32);
 
@@ -1235,7 +1235,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
     if (!actor->movementProbe) {
         u32 offset = 0x120;
         void *probe = &actor->movementProbeStorage;
-        sub_0821BC68(probe, &actor->position);
+        CellObject_Init(probe, &actor->position);
         actor->movementProbe = probe;
     }
     {
@@ -2203,7 +2203,7 @@ displayDone:
         actor->auxiliaryRegistered = 1;
     }
     if (actor->kind == 9) {
-        sub_0821BC68(&actor->movementProbeStorage, &actor->position);
+        CellObject_Init(&actor->movementProbeStorage, &actor->position);
         actor->movementProbe = &actor->movementProbeStorage;
     }
     TerrainOverlay_QueueAddActor(config);
@@ -2607,7 +2607,7 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     oldAttributes = actor->movementProbeStorage.attributes;
     if (actor->kind == 9) {
         if (!actor->movementProbe) {
-            sub_0821BC68(&actor->movementProbeStorage, position);
+            CellObject_Init(&actor->movementProbeStorage, position);
             actor->movementProbe = &actor->movementProbeStorage;
         }
         sub_08225B74(&actor->bodyConfig);
@@ -4014,7 +4014,7 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
     if (actor->state != 11) {
         TetherActor_SetState(actor, 11);
         if (!actor->movementProbe) {
-            sub_0821BC68(&actor->movementProbeStorage, &actor->position);
+            CellObject_Init(&actor->movementProbeStorage, &actor->position);
             actor->movementProbe = &actor->movementProbeStorage;
         }
         Sound_PlaySong(0x3F3);
