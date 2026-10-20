@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-void sub_0813214C(struct SceneActorRegistryResetView *);
-void sub_08132490(struct SceneActorRegistryResetView *);
+void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *);
+void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *);
 void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *);
 static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
@@ -14,13 +14,13 @@ u32 SceneActorBehavior_DispatchFlaggedCategory(struct SceneActorRegistryResetVie
             case 11:
             case 12:
             case 13:
-                sub_08132490(actor);
+                SceneActorReaction_ApplyCategoryDamage(actor);
                 return 1;
             case 9:
                 SceneActorReaction_EndHitCheckDefeat(actor);
                 break;
             default:
-                sub_0813214C(actor);
+                SceneActorReaction_ApplyStaggerDamage(actor);
                 return 1;
         }
     }

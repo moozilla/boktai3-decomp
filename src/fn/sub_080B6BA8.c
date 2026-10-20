@@ -7,9 +7,11 @@
 s32 Math_Atan2(s32, s32);
 u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *,
                                               struct SceneActorTimedBehaviorContext *, s32);
-u8 sub_080B6618(struct SceneActorRegistryResetView *, struct SceneActorTimedBehaviorContext *, s32);
-u8 sub_080B6884(struct SceneActorRegistryResetView *, struct SceneActorTimedBehaviorContext *, s32);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+u8 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *,
+                                  struct SceneActorTimedBehaviorContext *, s32);
+u8 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *,
+                                struct SceneActorTimedBehaviorContext *, s32);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 struct SceneActorTargetDelta {
     s16 x, y, z;
 };
@@ -50,10 +52,10 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
                     if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
                         return;
                 } else if (s->category == 6) {
-                    if (sub_080B6618(s, context, angle))
+                    if (Skeleton_TryBeginGuardedAttack(s, context, angle))
                         return;
                 } else if (s->category == 7) {
-                    if (sub_080B6884(s, context, angle))
+                    if (Skeleton_TryBeginArmedAttack(s, context, angle))
                         return;
                 }
                 if (IsFlag512Set(context))
@@ -62,11 +64,11 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
                 if (IsFlag512Set(context))
                     return;
             }
-            sub_080B7C10(s);
+            Skeleton_SelectDistanceReaction(s);
         } else {
             if (IsFlag512Set(context))
                 return;
-            sub_080B7C10(s);
+            Skeleton_SelectDistanceReaction(s);
         }
     }
 }

@@ -8,7 +8,7 @@ void sub_082154E4(void);
 void sub_08217C7C(void);
 void sub_08217BBC(void);
 void Palette_RefreshObjectBanks(void);
-void sub_08217960(void);
+void Palette_ApplyBackgroundFade(void);
 void sub_08217430(void);
 void SpriteOam_ResetQueue(u32);
 u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
@@ -27,7 +27,7 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
         if (!gUnk_030051E4)
             Palette_RefreshObjectBanks();
     } else {
-        sub_08217960();
+        Palette_ApplyBackgroundFade();
         sub_08217430();
     }
     SpriteOam_ResetQueue(0);

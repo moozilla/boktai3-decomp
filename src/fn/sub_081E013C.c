@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.8%
-// 21 differing instruction runs; size -4 bytes; first diff at +0x18 (movs r1, #0xd2 vs movs r2, #0xd2)
 extern u32 gUnk_02000358[];
 extern u8 gUnk_03004FC0[];
 void AnimPanel_LoadSelections(u8 *);
@@ -14,30 +12,37 @@ void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void sub_081DF1D8(u8 *);
 void sub_081DFA50(u8 *);
-u32 sub_081E013C(u8 *s)
+u32 Password_InitializeEntryMenu(u8 *s)
 {
     u32 *flags = (u32 *)(s + 0x34C);
     u32 zero;
-    u32 size;
+    register u32 size asm("r4");
     u32 one;
     u32 value;
     void *p, *a;
     void *q;
-    u8 *obj, *first;
+    register u8 *obj asm("r4");
+    register u8 *first asm("r5");
     u32 bank;
-    s32 offA, offB;
-    u32 *oneptr;
+    register s32 offA asm("r1");
+    register s32 offB asm("r2");
+    register u32 *oneptr asm("r1");
     u32 *ptr;
-    u32 *initial;
-    u16 *halfA, *halfB;
-    u16 bitsA, bitsB;
+    register u32 *initial asm("r0");
+    register u16 *halfA asm("r1");
+    u16 *halfB;
+    u16 bitsA;
+    u16 bitsB;
+    register u8 *temp asm("r0");
     *flags = (zero = 0);
     offA = 0x348;
     *(u32 *)(s + offA) = zero;
     offB = 0x350;
     *(u32 *)(s + offB) = zero;
     offA += 0x10;
-    *(u16 *)(s + offA) = zero;
+    asm("" : "+r"(offA));
+    temp = s + offA;
+    *(u16 *)temp = zero;
     offB += 0xA;
     *(u16 *)(s + offB) = zero;
     oneptr = (u32 *)(s + 0x35C);
@@ -76,26 +81,33 @@ u32 sub_081E013C(u8 *s)
     obj = s + 0x210;
     ResourceHeader_Relocate(obj, p);
     sub_0821983C(s + 0x1B0, obj, 0x32, 0x10, zero, zero, zero, zero);
-    ptr = (u32 *)(first + 0x70);
     {
         u32 *save = (u32 *)(s + 0x7D0);
-        u32 old = *ptr;
+        u32 old;
+        ptr = (u32 *)(first + 0x70);
+        old = *ptr;
         *save = old;
         obj = s + 0x7D8;
         CpuSet((void *)old, obj, 0x10);
         *ptr = (u32)obj;
     }
     *(void **)(s + 0x170) = obj;
+    halfA = (u16 *)(s + 0xDA);
     bitsA = 0xE000;
-    *(u16 *)(s + 0xDA) = bitsA;
-    halfA = (u16 *)(s + 0x162);
-    bitsA += 2;
     *halfA = bitsA;
+    halfA = (u16 *)(s + 0x162);
+    {
+        register u32 palette asm("r0") = 0xE002;
+        *halfA = palette;
+    }
     p = ScriptProc_Start(bank, 0x530D);
-    obj = s + 0x298;
+    offA = 0x298;
+    obj = s + offA;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0x238, obj, 0x8C, 0x10, one, zero, zero, zero);
-    obj = s + 0x320;
+    offB = 0x238;
+    sub_0821983C(s + offB, obj, 0x8C, 0x10, one, zero, zero, zero);
+    offB = 0x320;
+    obj = s + offB;
     ResourceHeader_Relocate(obj, p);
     sub_0821983C(s + 0x2C0, obj, 0x8D, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0x240) &= ~1;
@@ -119,6 +131,3 @@ u32 sub_081E013C(u8 *s)
     sub_081DFA50(s);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081E013C);
-#endif

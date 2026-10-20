@@ -81,7 +81,8 @@ static inline u8 RequestPath(struct SceneActorRegistryResetView *actor, void *ro
     return 0;
 }
 
-u8 sub_080D6FDC(struct SceneActorRegistryResetView *actor)
+// confidence=low: scans to the last open cell in the current facing and starts a route.
+u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;
     u8 *nav = (u8 *)actor + 0x3D4;
@@ -151,5 +152,5 @@ found:
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D6FDC);
+INCLUDE_ASM("asm/nonmatching", Mummy_RequestStraightRoute);
 #endif

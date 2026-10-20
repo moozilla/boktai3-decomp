@@ -3,8 +3,8 @@
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
-void sub_080C6F58(void);
-void sub_080C66B0(void);
+void Golem_UpdateChargeWindup(void);
+void Golem_UpdateRouteMotion(void);
 extern u8 *gUnk_02000580[4];
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -106,7 +106,7 @@ void Golem_ChargeOrApproach(struct SceneActorRegistryResetView *actor)
     if (actor->field2B0) {
         Golem_Charge(body);
         if (CanCharge(body)) {
-            void *target = sub_080C6F58;
+            void *target = Golem_UpdateChargeWindup;
             SetControl(actor, 0x28, target);
             {
                 u32 phase = 2, behavior = 4;
@@ -119,7 +119,7 @@ void Golem_ChargeOrApproach(struct SceneActorRegistryResetView *actor)
             return;
         }
         {
-            void *target = sub_080C66B0;
+            void *target = Golem_UpdateRouteMotion;
             SetControl(actor, 0x23, target);
         }
         {

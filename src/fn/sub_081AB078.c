@@ -1,6 +1,7 @@
 #include "global.h"
+// confidence=low: palette transition accompanies the leap motion track.
 #ifdef NONMATCHING
-// fuzzy: 88.0%
+// fuzzy: 93.0%
 // Vanargand palette-fade leap: per variant copies a palette bank and fade table, interpolates two
 // highlight colours by the transition step (t * delta * 256 / 3, rounded >> 8), then rides the
 // leap motion track. Differs only in allocation: the ROM keeps the frame argument in sl and
@@ -112,7 +113,7 @@ static inline s32 Scale8(s32 n)
         tag##Store :;                                                                              \
     }
 
-void sub_081AB078(struct Vanargand *p, s32 frame)
+void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
 {
     struct Vanargand *self = p;
     u8 *animation = p->animation;
@@ -202,5 +203,5 @@ void sub_081AB078(struct Vanargand *p, s32 frame)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AB078);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteLeap);
 #endif

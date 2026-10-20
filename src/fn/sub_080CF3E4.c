@@ -9,7 +9,6 @@
 // the ROM keeps Arrive's group in sb, hoists the random table and 0x3FF out of the turn loop,
 // and spills the reroute target pointer.
 /* Golem_ArriveAndRestore: on entry hands control to the directional-entry reset (kind 0x2C); once that finishes, faces forward, restores after a delay (following up with the chase when flags2D4 & 0x80, else the entry target) and re-targets the chased player, rerouting toward its cell or turning to a new random direction (provisional name) */
-#define Golem_ArriveAndRestore sub_080CF3E4
 #include "scene_actor_chase.h"
 
 void Skeleton_ClearDirectionalEntryFlag(void);
@@ -133,7 +132,7 @@ done:
     return 0;
 }
 
-void sub_080CF3E4(struct SceneActorRegistryResetView *actor)
+void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     if (Chase_TakeArrived(actor)) {
@@ -157,5 +156,5 @@ void sub_080CF3E4(struct SceneActorRegistryResetView *actor)
     Arrive(actor);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CF3E4);
+INCLUDE_ASM("asm/nonmatching", Golem_ArriveAndRestore);
 #endif

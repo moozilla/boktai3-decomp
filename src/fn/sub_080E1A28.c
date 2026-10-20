@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* Dog_LeapTowardTarget: on entry turns the leap velocity toward the context's target position (snapping to it within 16, else turning 16 at a time) and plays sound 0x3A4; halves the velocity while the motion's bit 0 is set, and hands over to the landing reaction (kind 0x24) when flags2D0 & 0x10 (provisional name) */
-#define Dog_LeapTowardTarget sub_080E1A28
 void Dog_UpdateAnimationSixteenReaction(void);
 s32 Math_Atan2(s32, s32);
 extern const s16 gUnk_086149C4[];
@@ -41,7 +40,7 @@ static inline u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void sub_080E1A28(struct SceneActorRegistryResetView *actor)
+void Dog_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
     struct ContactPosition velocity;

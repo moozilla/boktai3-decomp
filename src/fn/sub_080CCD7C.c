@@ -2,8 +2,10 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "player.h"
+// confidence=low: Golem behavior table dispatches charge pursuit using stored heading, speed and stamina.
 #ifdef NONMATCHING
-// fuzzy: 79.0% (agent draft, paused; see notes/cloud-08122DF4.md)
+// fuzzy: 80.4%
+// Remaining mismatch: Charge/turn control resets and shared route-recovery pointer lifetimes still differ.
 /* Golem: chase/charge behaviour (tentative). */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *);
@@ -14,8 +16,8 @@ void Skeleton_StepPosition(struct ContactPosition *, u32);
 void sub_080C47DC(void *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
 void SceneActorReaction_SlideBack(void);
-void sub_080C68F0(void);
-void sub_080C6A68(void);
+void Golem_UpdateChargeStop(void);
+void Golem_UpdateChargeRecovery(void);
 
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
@@ -198,7 +200,7 @@ static inline void SetControlZ(struct SceneActorRegistryResetView *actor, u32 ki
         if (body->stamina680 > 0)                                                                  \
             goto resume;                                                                           \
         {                                                                                          \
-            void *target = sub_080C68F0;                                                           \
+            void *target = Golem_UpdateChargeStop;                                                 \
             SetControlZ(BODY, 0x27, target, byteZero, zero);                                       \
         }                                                                                          \
         behavior = 3;                                                                              \
@@ -387,7 +389,16 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
     return 1;
 }
 
-void sub_080CCD7C(struct SceneActorRegistryResetView *actor)
+static inline void SetCommand(struct SceneActorReactionCommand *command, void *payload, u32 kind,
+                              u32 duration)
+{
+    command->duration = duration;
+    command->payload = payload;
+    command->first = 0;
+    command->second = 0;
+    command->kind = kind;
+}
+void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     struct GolemBody *body = actor->context;
@@ -479,9 +490,12 @@ route:
                             goto recover;
                         if (IsDazzled(gUnk_02000580[index]))
                             goto recover;
-                    } else if (IsDazzled(gUnk_02000580[0]))
-                        goto recover;
-                    body->charge688 = 400;
+                        body->charge688 = 400;
+                    } else {
+                        if (IsDazzled(gUnk_02000580[0]))
+                            goto recover;
+                        body->charge688 = 400;
+                    }
                 }
             recover:
                 Golem_Recover(body);
@@ -501,7 +515,7 @@ route:
             resume:
                 body->target69C = *(struct ContactPosition *)(body->route5D0 + 0x1C);
                 {
-                    void *target = sub_080C6A68;
+                    void *target = Golem_UpdateChargeRecovery;
                     SetControlZ(BODY, 0x26, target, byteZero, zero);
                 }
                 behavior = 2;
@@ -527,14 +541,7 @@ route:
         *flags = mask & *flags;
     }
     if (actor->flags2D4 & 0x80) {
-        {
-            struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-            command->duration = 30;
-            command->payload = *(void **)(group + 0x48);
-            command->first = 0;
-            command->second = 0;
-            command->kind = 12;
-        }
+        SetCommand((void *)(group + 0x8C), *(void **)(group + 0x48), 12, 30);
         if (!Golem_Chase(actor))
             return;
         actor->field2C2 = 0x20;
@@ -542,14 +549,7 @@ route:
     } else {
         actor->flags2CC |= 0x10;
         actor->field2C2 = 0x40;
-        {
-            struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-            command->duration = 60;
-            command->payload = actor->entryTarget228;
-            command->first = 0;
-            command->second = 0;
-            command->kind = 7;
-        }
+        SetCommand((void *)(group + 0x8C), actor->entryTarget228, 7, 60);
         {
             struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
             struct GolemRouteLink *link = (void *)(group + 0x74);
@@ -569,5 +569,5 @@ advance:
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CCD7C);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargePursuit);
 #endif

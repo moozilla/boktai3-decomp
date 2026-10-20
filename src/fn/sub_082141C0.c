@@ -7,7 +7,7 @@ extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004390[];
 void Bg_UpdateScrollShadow(void);
 void InterruptsAndVideo_WaitForVBlank(void);
-void sub_082192F0(void);
+void ScanlineEffect_StageTransfer(void);
 void Palette_UploadBuffers(void);
 void sub_0821537C(void);
 void Text_FlushTileUploads(void);
@@ -20,7 +20,7 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
     vu16 *disp;
     Bg_UpdateScrollShadow();
     InterruptsAndVideo_WaitForVBlank();
-    sub_082192F0();
+    ScanlineEffect_StageTransfer();
     flags = &gUnk_03003A04;
     if (*flags & 1) {
         struct Dma *dma = (struct Dma *)0x040000d4;

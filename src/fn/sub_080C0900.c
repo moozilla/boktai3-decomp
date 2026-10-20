@@ -14,7 +14,7 @@ struct SceneActorApproachActionContext {
 };
 void sub_080BAAF4(void);
 void Vorn_SpawnHazard(struct SceneActorRegistryResetView *, s32);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 static inline u16 ClearedCounter(void)
 {
     return 0;
@@ -75,7 +75,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryReset
     }
     if (actor->field2B0) {
         ClearFlags(&actor->flags2D4, ~0x100);
-        sub_080B7C10(actor);
+        Skeleton_SelectDistanceReaction(actor);
     } else
         actor->counter2AC++;
 }

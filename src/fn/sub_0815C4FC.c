@@ -14,9 +14,9 @@ struct P {
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void Player_UpdateFacingSide(struct P *);
-void sub_08153610(void);
-void sub_08154CD4(void);
-void sub_081556E0(void);
+void PlayerCue_UpdateSpiralMotion(void);
+void PlayerCue_UpdateSpiralRecovery(void);
+void Player_UpdateStateMotionCue(void);
 
 u32 PlayerCue_StateMotion(struct P *p, u32 c)
 {
@@ -26,17 +26,17 @@ u32 PlayerCue_StateMotion(struct P *p, u32 c)
     if (p->state == 3) {
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xD, 0);
-        p->fn = sub_08153610;
+        p->fn = PlayerCue_UpdateSpiralMotion;
     } else if (p->state == 4) {
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xE, 0);
-        p->fn = sub_08154CD4;
+        p->fn = PlayerCue_UpdateSpiralRecovery;
     } else if (p->state == 5) {
         p->dir = 4;
         Player_UpdateFacingSide(p);
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xF, 0);
-        p->fn = sub_081556E0;
+        p->fn = Player_UpdateStateMotionCue;
     } else {
         return 0;
     }

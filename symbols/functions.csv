@@ -2943,6 +2943,7 @@ addr,name,mode,confidence,source,notes
 0808AEB8,Ghoul_TickCooldown,thumb,low,src-alias,Decrements the owner context countdown at offset 0x63C without underflow; cooldown purpose is tentative
 0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
+0808CC48,Ghoul_ResumePendingRoute,thumb,low,src-alias,
 0808CE44,Ghoul_UpdateCooldown,thumb,low,src-alias,Per-update helper ticks the ghoul countdown and returns success
 0808CE50,Ghoul_UpdateSpecialActionControl,thumb,low,src-alias,Starts the ghoul animation-five action and restores the saved controller after completion
 0808CF54,Ghoul_UpdateAnimationElevenControl,thumb,low,src-alias,Starts the shared animation-eleven action and restores the saved controller after completion
@@ -2952,7 +2953,10 @@ addr,name,mode,confidence,source,notes
 0808D1C0,Ghoul_OnMessage,thumb,low,src-alias,Callback forwarding to a shared actor handler; message role is tentative
 0808D1CC,Ghoul_Destroy,thumb,low,src-alias,Destruction callback releasing scene actor effect resources
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
+0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
+0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
+0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
@@ -3135,6 +3139,8 @@ addr,name,mode,confidence,source,notes
 080AB54C,TentacleActor_RecordVisitedRoute,thumb,low,src-alias,Writes an identifier into route history and advances the index modulo four; interpretation is tentative
 080AB57C,SceneActor_ResetQueuedState,thumb,low,src-alias,
 080AB604,SceneActor_TryRequestFacingReaction,thumb,low,src-alias,
+080AB7BC,TentacleActor_UpdateSegmentColliders,thumb,low,src-alias,
+080AB968,TentacleActor_UpdateRetraction,thumb,low,src-alias,
 080ABAAC,TentacleActor_InitStateHandlers,thumb,low,src-alias,Assigns the actor dispatch table used by its update callback
 080ABABC,TentacleActor_UpdatePendingVelocity,thumb,low,src-alias,Applies the pending radial velocity update and returns success
 080ABAC8,TentacleActor_UpdateComponents,thumb,low,src-alias,Runs the actor component updates and decrements a positive reaction timer
@@ -3155,9 +3161,11 @@ addr,name,mode,confidence,source,notes
 080AD1C0,Vorn_UpdateHiddenRecovery,thumb,low,src-alias,Hides the sprite and shadow on entry then starts recovery after the timer threshold; interpretation tentative
 080AD270,Vorn_RestoreSavedState,thumb,low,src-alias,Restores visibility and saved behavior fields then resets transient reaction state
 080AD40C,SceneActorReaction_ResumeSavedTarget,thumb,low,src-alias,
+080ADCC0,Vorn_UpdatePursuitDistance,thumb,low,src-alias,
 080AE120,SceneActorReaction_BeginSideStep,thumb,low,src-alias,
 080AE5E4,SceneActorReaction_ResumeOrRunScript,thumb,low,src-alias,
 080AEA80,SceneActorPhase_SelectLinkedAnimation,thumb,low,src-alias,
+080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,
 080AFBE4,Vorn_InitSpecialActionTable,thumb,low,src-alias,Installs the action table at actor offset 0x288; special action role is tentative
 080B04F4,SceneActorControl_UpdateProbeApproach_080B04F4,thumb,low,src-alias,
 080B0728,SceneActorPhase_UpdateConditionalMotion,thumb,low,src-alias,
@@ -3213,17 +3221,24 @@ addr,name,mode,confidence,source,notes
 080B61C4,Vorn_SpawnHazard,thumb,low,src-alias,
 080B6430,SceneActor_UpdateProfileForCategory,thumb,low,src-alias,
 080B6538,SceneActorControl_TryBeginNearbyBehavior16,thumb,low,src-alias,
+080B6618,Skeleton_TryBeginGuardedAttack,thumb,low,src-alias,
+080B6884,Skeleton_TryBeginArmedAttack,thumb,low,src-alias,
 080B6BA8,SceneActorControl_SelectBehaviorByTargetAngle,thumb,low,src-alias,
 080B6CE4,SceneActorReaction_UpdateGate,thumb,low,src-alias,
+080B6E04,Skeleton_RestorePursuitRoute,thumb,low,src-alias,
 080B70CC,SceneActorReaction_SelectTileParameter,thumb,low,src-alias,
 080B713C,SceneActorTerrain_FindOpenNeighborDirection,thumb,low,src-alias,
 080B7184,SceneActorReaction_ParseOptions,thumb,low,src-alias,
 080B7280,Skeleton_InitVariantMotion,thumb,low,src-alias,Initializes fixed-point motion parameters according to Skeleton variants 5 through 7; motion interpretation is tentative
+080B7350,Skeleton_InitializeCategoryProfile,thumb,low,src-alias,
 080B7580,SceneActorReaction_SetProfileEntries,thumb,low,src-alias,
 080B7688,SceneActorReaction_IsRangeReady,thumb,low,src-alias,
+080B77D0,Skeleton_TrySelectRetreatCell,thumb,low,src-alias,
 080B7BB4,SceneActorScript_ReadPParameters,thumb,low,src-alias,
+080B7C10,Skeleton_SelectDistanceReaction,thumb,low,src-alias,
 080B8AB8,SceneActorScript_ReadCallScriptConfig,thumb,low,src-alias,
 080B8B38,SceneActorScript_TriggerCallOnCount,thumb,low,src-alias,
+080B8B84,SceneActorReaction_TrySink,thumb,low,src-alias,
 080B8D14,SceneActorReaction_TickHiddenResponse,thumb,low,src-alias,
 080B8DA4,Skeleton_UpdateActionFlags,thumb,low,src-alias,Updates action state and cooldown then clears extended flag 0x2000 when actor flag 0x200 is absent
 080B9030,SceneActorReaction_TryStartContact,thumb,low,src-alias,
@@ -3241,6 +3256,7 @@ addr,name,mode,confidence,source,notes
 080BAD7C,Skeleton_UpdateHeavyAttackRecovery,thumb,low,src-alias,Plays animation 21 then returns to the timed idle callback; heavy attack interpretation tentative
 080BB4DC,Skeleton_UpdateDownedState,thumb,low,src-alias,Plays animation eight and emits periodic feedback before entering recovery when the timer expires; downed interpretation tentative
 080BB5AC,Skeleton_UpdateRevivalState,thumb,low,src-alias,Plays animation seven and changes flags at frame 40 before completing after frame 120; revival interpretation tentative
+080BB61C,Skeleton_BeginKnockedFlight,thumb,low,src-alias,
 080BB7BC,SceneActorReaction_TickHiddenTimeout,thumb,low,src-alias,
 080BB924,Actor_RestoreSnapshot,thumb,low,src-alias,
 080BBBC0,SceneActorReaction_ReturnToRouteEntry,thumb,low,src-alias,
@@ -3253,6 +3269,7 @@ addr,name,mode,confidence,source,notes
 080C0828,SceneActorApproach_RunAlternateTimedAction,thumb,low,src-alias,
 080C0900,SceneActorApproach_CaptureTargetAndRunAction,thumb,low,src-alias,
 080C12EC,Skeleton_SetReactionControlTable,thumb,low,src-alias,Installs the table at actor offset 0x28C during initialization; reaction role tentative
+080C12FC,Golem_ReactToContact,thumb,low,src-alias,
 080C2BE0,SceneActorControl_UpdateProbeApproach,thumb,low,src-alias,
 080C2E14,SceneActorControl_UpdateEntryPhase,thumb,low,src-alias,
 080C2F3C,SceneActorControl_UpdateEntryRecoveryPhase,thumb,low,src-alias,
@@ -3283,15 +3300,28 @@ addr,name,mode,confidence,source,notes
 080C61AC,Golem_UpdateDying,thumb,low,src-alias,Tentative dying callback plays animation six and transitions to the death callback
 080C627C,Golem_UpdateDeath,thumb,low,src-alias,Tentative death callback plays animation seven and signals completion after its timed sequence
 080C62EC,Skeleton_ClearDirectionalEntryFlag,thumb,low,src-alias,
+080C63D0,Golem_UpdateChargeBuildup,thumb,low,src-alias,
+080C66B0,Golem_UpdateRouteMotion,thumb,low,src-alias,
+080C68F0,Golem_UpdateChargeStop,thumb,low,src-alias,
+080C6A68,Golem_UpdateChargeRecovery,thumb,low,src-alias,
+080C6F58,Golem_UpdateChargeWindup,thumb,low,src-alias,
+080C725C,Golem_UpdateSlideImpact,thumb,low,src-alias,
+080C75B8,Golem_UpdateRecoil,thumb,low,src-alias,
 080C79A8,SceneActorReaction_SlideBack,thumb,low,src-alias,
 080C7C1C,Golem_ResumeSavedTarget,thumb,low,src-alias,
+080C8774,Golem_ResumeBehaviorAfterDisplacement,thumb,low,src-alias,
 080C9844,Golem_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Golem_Init
 080CBE40,Golem_UpdateScriptedAction,thumb,low,src-alias,Initializes an action script and advances its timer until completion
 080CC820,Golem_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288
 080CC830,Golem_TickFacingQuadrant,thumb,low,src-alias,
 080CC8B8,Golem_UpdateEffectsAndContacts,thumb,low,src-alias,Processes a timed effect and runs three shared actor update helpers
 080CC910,Golem_ReturnHome,thumb,low,src-alias,
+080CCD7C,Golem_UpdateChargePursuit,thumb,low,src-alias,
 080CDF14,Golem_ChargeOrApproach,thumb,low,src-alias,
+080CE188,Golem_ResumeRouteAfterControl,thumb,low,src-alias,
+080CEB48,Golem_BeginSlideState,thumb,low,src-alias,
+080CEDF0,Golem_ChargeOrReturnHome,thumb,low,src-alias,
+080CF3E4,Golem_ArriveAndRestore,thumb,low,src-alias,
 080CFB98,Golem_InitSpecialActionHandlers,thumb,low,src-alias,Installs the ten-entry callback table at actor offset 0x28C
 080CFBA8,Golem_OnUpdate,thumb,low,src-alias,Main update callback dispatches the current behavior and updates effects and contacts
 080CFBFC,Golem_OnSharedActorUpdate,thumb,low,src-alias,Registered callback delegates to the shared actor motion and contact updater
@@ -3305,15 +3335,24 @@ addr,name,mode,confidence,source,notes
 080D0F88,Mummy_UpdateWalking,thumb,low,src-alias,Tentative walking callback selects animation one and initializes movement parameters on entry
 080D0FC4,Mummy_UpdateIdle,thumb,low,src-alias,Idle callback clears the entry flag and selects directional animation zero
 080D1A98,SceneActorAnimation_UpdateDirectionalEntry,thumb,low,src-alias,
+080D1AFC,Mummy_ResumeSavedTarget,thumb,low,src-alias,
+080D1CD0,Mummy_UpdateHiddenRecovery,thumb,low,src-alias,
 080D1EA0,Mummy_UpdateRevival,thumb,low,src-alias,Tentative revival callback restores saved actor state and health after reenabling the shadow
 080D211C,Golem_UpdateDeath_080D211C,thumb,low,src-alias,
+080D3878,Mummy_UpdateDefeat,thumb,low,src-alias,
+080D3D60,Mummy_UpdatePlayerRoute,thumb,low,src-alias,
 080D48C0,Mummy_UpdateBehavior,thumb,low,src-alias,Runs five mummy behavior helpers before the current state callback is dispatched
 080D48E8,Mummy_UpdateSpecialFlags,thumb,low,src-alias,Post-behavior helper clears special flags unless the current action is 0x27
 080D5360,Mummy_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288
+080D53F8,Mummy_UpdateProbeNavigation,thumb,low,src-alias,
+080D5778,Mummy_ResumeDelayedRoute,thumb,low,src-alias,
 080D6114,SceneActor_WaitForControlCompletion,thumb,low,src-alias,
 080D622C,SceneActorControl_UpdatePersistentPhase_080D622C,thumb,low,src-alias,
 080D62BC,Mummy_SetControlPreset,thumb,low,src-alias,Installs the mummy control preset at actor offset 0x284
+080D62CC,Mummy_FireAcceleratingVolley,thumb,low,src-alias,
+080D6608,Mummy_TryDirectPursuit,thumb,low,src-alias,
 080D6DF8,SceneActorPath_FaceAndCheckStraightPath,thumb,low,src-alias,
+080D6FDC,Mummy_RequestStraightRoute,thumb,low,src-alias,
 080D7408,Mummy_CanPassMovementThreshold,thumb,low,src-alias,Tentatively permits movement unless the active timer and stored threshold block it
 080D7438,SceneActor_EnterMotionPhase,thumb,low,src-alias,
 080D7548,Mummy_OnMovementUpdate,thumb,low,src-alias,Movement callback that runs movement logic unless flag 0x100 suppresses it
@@ -3339,10 +3378,14 @@ addr,name,mode,confidence,source,notes
 080DCC98,Mummy_Init,thumb,high,gcl-name,name from GCL key 6913 マミー (Mummy); loader called by Mummy_Create
 080DDCF4,Mummy_Create,thumb,high,gcl-name,name from GCL key 6913 マミー (Mummy); registry callback
 080DDD28,Actor_InitLaunchVelocity,thumb,low,src-alias,
+080DDEC8,Dog_RestoreRoute,thumb,low,src-alias,
+080DE128,Dog_SelectTargetAction,thumb,low,src-alias,
 080DE550,SceneActor_RefreshLivingCountAndProfile,thumb,low,src-alias,
+080DE57C,Dog_ResetActionState,thumb,low,src-alias,
 080DE6CC,Dog_OnClearActivityFlag,thumb,low,src-alias,Dog initialization registers this callback to clear actor flag 2
 080DE92C,SceneActor_ConfigureSecondaryProfileEntry,thumb,low,src-alias,
 080DE990,SceneActorCollision_InitGateColliders,thumb,low,src-alias,
+080DEA7C,Dog_UpdateCollisionBounds,thumb,low,src-alias,
 080DED24,Dog_UpdateActionTimers,thumb,low,src-alias,Decrements the paired timers used to gate dog actions
 080DED54,Dog_UpdateActionCooldown,thumb,low,src-alias,Decrements the separate dog cooldown at state offset 0x696
 080DED74,SceneActorControl_TickActionCooldown,thumb,low,src-alias,
@@ -3357,19 +3400,28 @@ addr,name,mode,confidence,source,notes
 080E038C,Dog_OnReactionCleanup,thumb,low,src-alias,Empty reaction callback installed during initialization; cleanup role is tentative
 080E0390,Dog_UpdateDefeatDelay,thumb,low,src-alias,Plays animation 6 and periodically emits an effect before entering the final defeat phase; interpretation is tentative
 080E0460,Dog_UpdateDefeatFinish,thumb,low,src-alias,Plays animation 7 and sets timed completion flags before ending the reaction; defeat interpretation is tentative
+080E059C,Dog_ResumeAfterReaction,thumb,low,src-alias,
 080E17D8,SceneActorAnimation_EmitDirectionalTrail,thumb,low,src-alias,
 080E18F4,SceneActorAnimation_RefreshTimedAttackCollider,thumb,low,src-alias,
+080E1A28,Dog_LeapTowardTarget,thumb,low,src-alias,
 080E1CB8,Dog_UpdateAnimationSixteenReaction,thumb,low,src-alias,Reaction callback selects animation 16 on entry and completes when animation playback finishes
 080E1D00,Dog_UpdateAnimationFourteenReaction,thumb,low,src-alias,Reaction callback selects animation 14 on entry and completes when animation playback finishes
 080E1D48,Dog_UpdateTurnSequence,thumb,low,src-alias,Runs a counted sequence of direction changes and then restores the saved behavior packet
 080E1F4C,Dog_OnSecondaryReactionCleanup,thumb,low,src-alias,Empty secondary reaction callback installed during initialization; cleanup role is tentative
 080E1F50,SceneActorMotion_TestTargetTransition,thumb,low,src-alias,
 080E2064,SceneActorMotion_UpdateTargetTransition,thumb,low,src-alias,
+080E21AC,SceneActorControl_BeginHiddenDefeat,thumb,low,src-alias,
+080E2428,SceneActorControl_CompleteBlinkOut,thumb,low,src-alias,
+080E25FC,Dog_ChooseReactionBehavior,thumb,low,src-alias,
 080E3790,Dog_UpdateScriptedAction,thumb,low,src-alias,Starts action callback 10 and calls the action script before advancing or finishing the behavior
 080E41AC,Dog_SetPrimaryBehaviorPreset,thumb,low,src-alias,Assigns the fixed table at 0x08606204 to field 0x288; preset role is tentative
 080E41BC,Dog_PrepareFrame,thumb,low,src-alias,Runs two shared preparation helpers before state dispatch in the update callback
 080E41D4,Dog_FinishFrame,thumb,low,src-alias,Runs shared update helpers and decrements timers after state dispatch
 080E4458,Dog_SetSecondaryBehaviorPreset,thumb,low,src-alias,Assigns the fixed table at 0x0860620C to field 0x28C; preset role is tentative
+080E4468,Dog_ChasePlayer,thumb,low,src-alias,
+080E4834,Dog_ResumeRoute,thumb,low,src-alias,
+080E4B34,Dog_BeginDelayedRouteRecovery,thumb,low,src-alias,
+080E52EC,Dog_UpdateProbeApproach,thumb,low,src-alias,
 080E55AC,SceneActorControl_UpdateEntryRecoveryPhase_080E55AC,thumb,low,src-alias,
 080E56D8,Dog_SetControlPreset,thumb,low,src-alias,Assigns the fixed table at 0x08606214 to the established control preset field at 0x284
 080E56E8,Dog_Update,thumb,low,src-alias,Prepares the frame and dispatches the current state when enabled before finishing frame maintenance
@@ -3378,6 +3430,7 @@ addr,name,mode,confidence,source,notes
 080E6814,Dog_Create,thumb,low,src-alias,Allocates and initializes the dog actor registered under GCL key F836
 080E696C,SceneActor_UpdateAlternateEntryPhase,thumb,low,src-alias,
 080E6A34,SceneActor_StartFlaggedAnimationPhase,thumb,low,src-alias,
+080E6BE4,Dog_UpdateShadowlessApproach,thumb,low,src-alias,
 080E70B0,Mimic_InitBehaviorTable,thumb,low,src-alias,Installs the behavior callback table at actor offset 0x284
 080E70C0,Mimic_UpdateReactionState,thumb,low,src-alias,Runs the reaction state helper and returns success
 080E74C4,SceneActor_EnterShadowlessPhase,thumb,low,src-alias,
@@ -3518,6 +3571,7 @@ addr,name,mode,confidence,source,notes
 080F6220,TargetMotion_UpdateFlashingExit,thumb,low,src-alias,
 080F63C4,Sword_UpdateComponents,thumb,low,src-alias,Iterates the active sword components and invokes the handler selected by each component state
 080F6414,Sword_UpdateBodyPaletteRestore,thumb,low,src-alias,Timed body callback restores the saved palette bank and local palette pointer then clears the effect state
+080F645C,Sword_UpdateDamage,thumb,low,src-alias,
 080F669C,Sword_UpdateTask,thumb,low,src-alias,
 080F6718,Sword_DestroyTask,thumb,low,src-alias,
 080F7458,Sword_InitializeFromScript,thumb,low,src-alias,
@@ -4440,11 +4494,15 @@ addr,name,mode,confidence,source,notes
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
 0812EED4,SceneActorReaction_OnEnemyDefault,thumb,low,src-alias,Shared callback installed by enemy initializers that returns zero; specific callback role is tentative
+0812EED8,SceneActorReaction_BeginTargetRecovery,thumb,low,src-alias,
 0812F12C,SceneActor_UpdateActiveCallbacks,thumb,low,src-alias,
 0812F270,SceneActor_UpdateBehaviorCallbacks,thumb,low,src-alias,
 0812F520,SceneActor_SetContactReactionDirection,thumb,low,src-alias,
 0812F5D0,SceneActorTarget_OnBindingChanged,thumb,low,src-alias,Empty hook called by shared actor target binding paths; notification role is tentative
+0812F5D4,SceneActorReaction_UpdateContactRoute,thumb,low,src-alias,
 0812F8F4,SceneActorControl_UpdateEntryTransition,thumb,low,src-alias,
+0812FA0C,SceneActorReaction_UpdateRouteReturn,thumb,low,src-alias,
+081301C4,SceneActorReaction_UpdateRouteRecovery,thumb,low,src-alias,
 08130490,SceneActorControl_AdvancePhaseIfFlagged,thumb,low,src-alias,Clears the phase entry byte and increments the phase counter when flag 2 at offset 2D4 is set
 081305D0,SceneActorControl_AdvancePhase,thumb,low,src-alias,Clears the phase entry byte and unconditionally increments the counter at offset 2AC
 0813067C,SceneActorControl_UpdateSavedControlPhase,thumb,low,src-alias,
@@ -4460,13 +4518,19 @@ addr,name,mode,confidence,source,notes
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
 08131CCC,SceneActorBehavior_InstallCallbackTables,thumb,low,src-alias,
+08131D5C,SceneActorReaction_ApplyAreaDamage,thumb,low,src-alias,
+0813214C,SceneActorReaction_ApplyStaggerDamage,thumb,low,src-alias,
+08132490,SceneActorReaction_ApplyCategoryDamage,thumb,low,src-alias,
 08132748,SceneActorReaction_EndHitCheckDefeat,thumb,low,src-alias,
 08132898,SceneActorBehavior_DispatchFlaggedCategory,thumb,low,src-alias,
+08132904,SceneActorReaction_ApplyLinkedAreaDamage,thumb,low,src-alias,
 08132D2C,SceneActorReaction_DefeatRecordStats,thumb,low,src-alias,
+08134398,SceneActorReaction_RecordDefeat,thumb,low,src-alias,
 0813599C,SceneActorReaction_ApplyEscalatingHit,thumb,low,src-alias,
 08135C08,SceneActorPlacement_BeginDestinationJump,thumb,low,src-alias,
 08135D74,SceneActorReaction_TryBeginControl29,thumb,low,src-alias,
 08135F38,SceneActor_ClearReactionFlags,thumb,low,src-alias,
+08135F70,SceneActorReaction_ResolveDamage,thumb,low,src-alias,
 081369C8,SceneActorPlacement_ResetStateThree,thumb,low,src-alias,
 08136AF0,SceneActorPlacement_PlayResponseAndResetState,thumb,low,src-alias,
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive
@@ -4490,6 +4554,7 @@ addr,name,mode,confidence,source,notes
 08138380,Registry1745_BeginShutdown,thumb,low,src-alias,Clears participant count and saves the previous state before entering state zero and closing related displays
 081383A4,Registry1745_InitParticipantOrder,thumb,low,src-alias,Fills participant order entries with consecutive indices and pads the remaining entries with sentinel four
 081386F0,ScriptNotifier_CallWithValue,thumb,low,src-alias,
+08138778,PositionEffectDisplay_UpdateSources,thumb,low,src-alias,
 081388F4,PositionEffectDisplay_Destroy,thumb,low,src-alias,Task destructor removes four sprites and clears the singleton; position effect ownership is tentative
 08138924,PlayerSlotDisplay_Initialize,thumb,low,src-alias,
 081389E0,PositionEffectDisplay_Create,thumb,low,src-alias,Returns or creates the singleton task with four animated sprites and update and destruction callbacks
@@ -4497,6 +4562,8 @@ addr,name,mode,confidence,source,notes
 08138A8C,TimedSpriteEffect_RequestStop,thumb,low,src-alias,Requests termination of an active slot among four effects; effect identity is tentative
 08138AC8,HeightProbe_IsBelowLimit,thumb,low,src-alias,
 08138AF8,ParticleEmitter_OnStop,thumb,low,src-alias,Clears the emitter callback and activity flags when entering its stop state; emitter identity is tentative
+08138B18,ParticleEmitter_UpdateScatterTrail,thumb,low,src-alias,
+08138CDC,ParticleEmitter_UpdateFlight,thumb,low,src-alias,
 08138FE0,SoundDelay_Update,thumb,low,src-alias,
 08139298,BallisticSpriteEffect_UpdateManager,thumb,low,src-alias,Invokes each active effect slot callback in the four-slot manager; ballistic identity is tentative
 081392DC,BallisticSpriteEffect_DestroyManager,thumb,low,src-alias,Removes all four slot sprites and clears the manager pointer
@@ -4707,11 +4774,19 @@ addr,name,mode,confidence,source,notes
 08145400,Player_UpdateScaleTransition,thumb,low,src-alias,
 081460F4,Player_UpdateDeathSequence,thumb,low,src-alias,Sequences animation sounds screen transition and health clearing before setting completion; death interpretation is tentative
 08146478,Player_UpdateTimedCuePhase,thumb,low,src-alias,
+08146574,Player_UpdateInputCadenceCue,thumb,low,src-alias,
 08146870,Player_UpdateBriefAction,thumb,low,src-alias,
+0814692C,Player_UpdateEnergyBurst,thumb,low,src-alias,
+08146C64,Player_UpdateAttachmentCue,thumb,low,src-alias,
 08146E5C,Player_OnMotion11Exit,thumb,low,src-alias,Resets motion offsets and refreshes form equipment when motion 11 exits
+08146EAC,Player_UpdateAlternateFormCue,thumb,low,src-alias,
 08147738,Player_OnMotion10Exit,thumb,low,src-alias,Refreshes form equipment outside the restricted mode and invalidates the cached selection when motion 10 exits
+08147768,Player_UpdateFormChangeCue,thumb,low,src-alias,
+08147CF0,Player_UpdateSpiralRelease,thumb,low,src-alias,
 08148F80,Player_GetWalkSpeed,thumb,low,src-alias,Calculates the walking speed from status and slowdown fields with a minimum of two
+08149DF0,Player_UpdateSpiralTrailAction,thumb,low,src-alias,
 0814A01C,Player_UpdateStatBAction,thumb,low,src-alias,
+0814A128,Player_UpdateStatARestoreAction,thumb,low,src-alias,
 0814A360,Player_UpdateStatBEffectAction,thumb,low,src-alias,
 0814A4B0,Player_UpdateAttackFacing,thumb,low,src-alias,Updates facing from available directional input when permitted and refreshes sprite direction
 0814A530,Player_CalculateActionStat,thumb,low,src-alias,
@@ -4738,7 +4813,9 @@ addr,name,mode,confidence,source,notes
 0814DE0C,Player_ConfigureActionSelectionDisplay,thumb,low,src-alias,
 0814DF0C,Player_IsStatBBelow,thumb,low,src-alias,
 0814DF58,Player_SubtractStatB,thumb,low,src-alias,
+0814DFDC,Player_SpawnSelectedAttackProjectile,thumb,low,src-alias,
 0814E3A0,Player_UpdateAttachedEntryPosition,thumb,low,src-alias,
+0814E3D8,Player_UpdateSelectedAttackCharge,thumb,low,src-alias,
 0814E978,Player_OnChargedAttackExit,thumb,low,src-alias,Releases the active managed attack handle when the charging attack motion exits
 0814EED4,Player_StopActionSongOnExit,thumb,low,src-alias,Action exit callback that stops song 0xCC
 0814F310,Player_ReleaseActionEffectOnExit,thumb,low,src-alias,Action exit callback that releases the effect handle at 0xC74 when valid; effect ownership is tentative
@@ -4765,6 +4842,18 @@ addr,name,mode,confidence,source,notes
 08151310,Player_UpdateSixPhaseAction,thumb,low,src-alias,
 0815196C,PlayerCue_UpdateRunOverlay,thumb,low,src-alias,Run cue callback that sets overlay animation 0x174 and its associated value to 0x18
 08151988,Player_UpdateThreePhaseBaseAnimationAction,thumb,low,src-alias,
+08151EB8,PlayerCue_UpdateWalkTarget,thumb,low,src-alias,
+08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,
+08153224,PlayerCue_UpdateFormChange,thumb,low,src-alias,
+08153610,PlayerCue_UpdateSpiralMotion,thumb,low,src-alias,
+08153A00,PlayerCue_UpdateSideWalkTarget,thumb,low,src-alias,
+08153E1C,PlayerCue_UpdateSideDeparture,thumb,low,src-alias,
+081540D4,PlayerCue_UpdateSideArrival,thumb,low,src-alias,
+081543F0,PlayerCue_UpdateSideFade,thumb,low,src-alias,
+08154AF0,PlayerCue_UpdateSideRecoil,thumb,low,src-alias,
+08154CD4,PlayerCue_UpdateSpiralRecovery,thumb,low,src-alias,
+08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
+081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
 081561A8,PlayerCue_UpdateStandDiagonalB,thumb,low,src-alias,Alternate diagonal standing callback that completes the cue after two animation completion checks
 08156BBC,Player_GetInputDirection,thumb,low,src-alias,
 08156C1C,Player_UpdateDirectionHistory,thumb,low,src-alias,Shifts ten direction samples and records the current input direction adjusted by the actor direction offset
@@ -4772,6 +4861,7 @@ addr,name,mode,confidence,source,notes
 08156CAC,Player_EmitPeriodicParticles,thumb,low,src-alias,
 08156F54,Player_TestTetherActionInput,thumb,low,src-alias,
 08156FC0,Player_TestNearbyInteraction,thumb,low,src-alias,Tests nearby interaction using the player position and stored interaction parameters
+0815767C,Player_ApplyControlPresentation,thumb,low,src-alias,
 081580EC,Player_SelectInteractionMode,thumb,low,src-alias,
 081581AC,Player_TestMovementPosition,thumb,low,src-alias,
 08158234,Player_ClampInteractionVelocity,thumb,low,src-alias,
@@ -5445,6 +5535,7 @@ addr,name,mode,confidence,source,notes
 08176E20,SceneHud_CanOpenFromStart,thumb,low,src-alias,
 08176EA0,Hud_BeginSavedBlend,thumb,low,src-alias,
 08176F20,Hud_RemoveMenuGraphics,thumb,low,src-alias,
+081779E8,Hud_LoadLayoutResources,thumb,low,src-alias,
 08177C00,SceneHud_ReadScriptOptions,thumb,low,src-alias,
 08177C9C,SceneHud_ReadPageVisibility,thumb,low,src-alias,
 08177D24,Hud_ReadScriptQOption,thumb,low,src-alias,
@@ -5493,8 +5584,10 @@ addr,name,mode,confidence,source,notes
 08179300,Background_GetWrappedTileEntry,thumb,low,src-alias,Returns a background tilemap entry with both coordinates wrapped to 32 tiles
 08179320,FieldHud_UpdateGaugePalette,thumb,low,src-alias,
 081793D0,FieldHud_RefreshGaugeIndex,thumb,low,src-alias,
+081793EC,FieldHud_UpdateTimeDigits,thumb,low,src-alias,
 08179550,NumericDisplay_InitializeWidgets,thumb,low,src-alias,
 08179650,Palette_InitColorTransition,thumb,low,src-alias,Packs starting and ending RGB555 colors and computes fixed-point channel increments
+081796D8,FieldHud_UpdateNumberDisplay,thumb,low,src-alias,
 081798FC,ViewportGauge_ComputeFill,thumb,low,src-alias,
 08179954,MeterDisplay_InitializeWidgets,thumb,low,src-alias,
 081799F8,FieldHud_InitializeNumber,thumb,low,src-alias,
@@ -5551,6 +5644,7 @@ addr,name,mode,confidence,source,notes
 0817BB54,ActorDecision_UpdateTimedPhase,thumb,low,src-alias,
 0817BC64,ActorDecision_UpdateDelayPhase,thumb,low,src-alias,
 0817BCD4,ActorDecision_UpdatePulsePhase,thumb,low,src-alias,
+0817BDB0,ActorDecision_UpdateHazardPath,thumb,low,src-alias,
 0817BF10,ActorDecision_UpdateFlagPhase,thumb,low,src-alias,
 0817BFA4,SceneActorState_UpdateAnimationRequest,thumb,low,src-alias,
 0817C00C,ActorDecision_UpdatePendingPhase,thumb,low,src-alias,
@@ -5559,6 +5653,7 @@ addr,name,mode,confidence,source,notes
 0817C29C,ActorState_UpdateConditionalTrigger,thumb,low,src-alias,
 0817C358,BossSlot2_UpdateFlaggedRecovery,thumb,low,src-alias,Consumes a pending flag to enter state 11 and increments the state timer; recovery identity is tentative
 0817C390,SceneActorState_WaitForFlagClear,thumb,low,src-alias,
+0817C3F4,BossSlot2_SelectCombatAction,thumb,low,src-alias,
 0817D530,BossSlot2_RunVariantCallback,thumb,low,src-alias,Invokes the callback selected by the byte at offset AE
 0817D54C,BossSlot2_RunGuardedPhaseCallback,thumb,low,src-alias,Dispatches by phase when unpaused and the actor status check permits it
 0817D588,BossSlot2_RunPhaseEntryCallback,thumb,low,src-alias,Dispatches through a phase-indexed callback table; entry role is tentative
@@ -5566,7 +5661,11 @@ addr,name,mode,confidence,source,notes
 0817D5C0,BossSlot2_ResetAndRunPhaseCallback,thumb,low,src-alias,Clears a control field before invoking the phase-selected callback
 0817D5E4,ActorAnimation_UpdateDirectional,thumb,low,src-alias,
 0817D67C,ActorEffect_InitializeOffset,thumb,low,src-alias,
+0817D7AC,SceneVolume_UpdateRepeatedShot,thumb,low,src-alias,
+0817DA1C,SceneVolume_UpdatePursuitSpin,thumb,low,src-alias,
+0817DDC8,SceneVolume_UpdateImpactSlide,thumb,low,src-alias,
 0817DF74,ActorEffect_UpdateTimedSequence,thumb,low,src-alias,
+0817E040,SceneVolume_UpdateKnockbackLanding,thumb,low,src-alias,
 0817E5B0,SceneEventActor_UpdateRemovalSequence,thumb,low,src-alias,
 0817EA70,SceneEventActor_UpdateTimedAnimation,thumb,low,src-alias,
 0817EB34,SceneEventActor_UpdateTimedResponse,thumb,low,src-alias,
@@ -5752,6 +5851,7 @@ addr,name,mode,confidence,source,notes
 08186BF8,Armor_DispatchBehaviorUpdate,thumb,low,src-alias,Calls the current behavior table entry then clears its timer for most behaviors and increments its frame counter
 08186C50,Armor_IsNearSavedPosition,thumb,low,src-alias,Tests whether current X and Z are each within 0xBF units of the saved position
 08186C98,Armor_SaveCurrentPosition,thumb,low,src-alias,Copies the current three-coordinate position into the saved position fields
+081875EC,Armor_UpdateAlignedAttackDecision,thumb,low,src-alias,
 08189C54,Armor_UpdatePrimaryBehaviorByFlag,thumb,low,src-alias,Selects the primary behavior updater using flag 0x200; its gameplay meaning remains tentative
 08189C80,Armor_UpdateSecondaryBehaviorByFlag,thumb,low,src-alias,Selects the secondary behavior updater using flag 0x200; its gameplay meaning remains tentative
 08189CAC,Armor_UpdatePrimaryBehaviorByInverseFlag,thumb,low,src-alias,Selects the same primary behavior pair with the flag 0x200 mapping reversed
@@ -6125,6 +6225,7 @@ addr,name,mode,confidence,source,notes
 081A1E5C,ActorReaction_UpdateCallbackGate,thumb,low,src-alias,
 081A1EA4,Hresvelgr_ApplyRequestedAction,thumb,low,src-alias,Installs the requested action callback for valid action IDs and resets action execution fields
 081A2378,Hresvelgr_InitializeRadialOffsets,thumb,low,src-alias,
+081A2858,Hresvelgr_UpdateCollisionPresentation,thumb,low,src-alias,
 081A2BBC,Hresvelgr_CopyUpdateTable,thumb,low,src-alias,Copies a twelve-byte ROM table to a temporary; update helper has no observable effect
 081A2BD4,ActorReaction_Tick,thumb,low,src-alias,
 081A2C3C,Hresvelgr_Destroy,thumb,low,src-alias,Destruction callback removes actor resources and colliders and clears the singleton
@@ -6261,11 +6362,15 @@ addr,name,mode,confidence,source,notes
 081A8CC0,ActorSoundPhase_StartFlaggedAnimation,thumb,low,src-alias,
 081A8D2C,Vanargand_UpdateMotionTrack,thumb,low,src-alias,
 081A95A8,Vanargand_UpdatePairedAttack,thumb,low,src-alias,
+081A9DDC,Vanargand_UpdateAlternatingPairAttack,thumb,low,src-alias,
+081A9F88,Vanargand_UpdateChargedPairAttack,thumb,low,src-alias,
+081AA178,Vanargand_UpdateRepeatedPairAttack,thumb,low,src-alias,
 081AA438,Vanargand_UpdateDescendTrack,thumb,low,src-alias,
 081AA5AC,Vanargand_UpdateMotionReturn,thumb,low,src-alias,
 081AA650,Vanargand_UpdateTimedAnimationAttack,thumb,low,src-alias,
 081AAE10,Vanargand_UpdateLeapTrack,thumb,low,src-alias,
 081AAFC0,Vanargand_UpdateAnimationGate,thumb,low,src-alias,
+081AB078,Vanargand_UpdatePaletteLeap,thumb,low,src-alias,
 081AB3DC,ActorSoundPhase_StartTimedAnimation,thumb,low,src-alias,
 081AB438,Vanargand_UpdateOffsetMotion,thumb,low,src-alias,
 081AB50C,Vanargand_RunDefeatSequence,thumb,low,src-alias,
@@ -6301,6 +6406,8 @@ addr,name,mode,confidence,source,notes
 081AFD04,Vanargand_ClearPartContact,thumb,low,src-alias,Clears the per-frame part contact word beside its collider
 081B019C,ActorStatus_Deactivate,thumb,low,src-alias,
 081B2550,SceneBurstActor_UpdateTimedBurst,thumb,low,src-alias,
+081B2608,Vanargand_UpdatePartRetreat,thumb,low,src-alias,
+081B3AAC,Vanargand_UpdatePartLunge,thumb,low,src-alias,
 081B4784,SceneParticleEmitter_EmitPeriodically,thumb,low,src-alias,
 081B5D8C,PairedSceneActor_UpdateHalves,thumb,low,src-alias,
 081B6180,Vanargand_CreatePartController,thumb,low,src-alias,Creates and registers a controller task that manages two animated boss parts
@@ -7137,7 +7244,9 @@ addr,name,mode,confidence,source,notes
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
 081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
+081DEC2C,Time_UpdateDateMenu,thumb,low,src-alias,
 081DEDF4,AnimPanel_RemoveAnimations,thumb,low,src-alias,
+081DEE38,Time_InitializeDateMenu,thumb,low,src-alias,
 081DF06C,Time_SetDateMenuFromScript,thumb,low,src-alias,Reads three script options into the date menu configuration block
 081DF0AC,Time_CreateDateMenu,thumb,low,src-alias,Creates the date and time editing task whose confirmation updates the clock
 081DF0EC,AnimPanel_SaveSelections,thumb,low,src-alias,
@@ -7148,7 +7257,9 @@ addr,name,mode,confidence,source,notes
 081DF694,Password_MoveCursorLeft,thumb,low,src-alias,Moves the password keyboard selection left with special edge wrapping
 081DFC1C,AnimPanel_AppendSelection,thumb,low,src-alias,
 081DFC60,AnimPanel_EraseSelection,thumb,low,src-alias,
+081DFCB4,Password_UpdateEntryMenu,thumb,low,src-alias,
 081E00E8,Password_DestroyEntryMenu,thumb,low,src-alias,Destruction callback clears display flags and removes six password entry animations
+081E013C,Password_InitializeEntryMenu,thumb,low,src-alias,
 081E03F4,ScreenParams358_SetFromScript,thumb,low,src-alias,
 081E0474,Password_CreateEntryMenu,thumb,low,src-alias,Creates the password keyboard task and installs its lifecycle callbacks
 081E04B4,StartPrompt_Update,thumb,low,src-alias,
@@ -7286,6 +7397,7 @@ addr,name,mode,confidence,source,notes
 081EAA80,TimeDisplay_SetSelectionKeyframe,thumb,low,src-alias,Loads a keyframe offset by twelve from the stored selection value into the display object
 081EAAAC,Actor_HideAuxiliarySprites,thumb,low,src-alias,Clears visibility bit 0 on four embedded sprite records starting at offset 0x238.
 081EAAE4,Actor_UpdatePairedSpriteAnimation,thumb,low,src-alias,Advances a four-step paired keyframe sequence every ten ticks for the sprites at offsets 0x238 and 0x2C0.
+081EAB64,Params3D0_UpdateDisplay,thumb,low,src-alias,
 081EB598,Params3D0_DestroyDisplay,thumb,low,src-alias,Task destructor releases nine animations and clears background layer 2
 081EB724,Params3D0_SetFromScript,thumb,low,src-alias,
 081EB7DC,Params3D0_CreateDisplay,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
@@ -7305,6 +7417,7 @@ addr,name,mode,confidence,source,notes
 081EC5C8,SceneActors_EmitPeriodicParticles,thumb,low,src-alias,Emits particle variants at phases zero and thirteen of a sixteen tick cycle
 081EC670,ScreenLayers_HidePair,thumb,low,src-alias,
 081EC6BC,ActorDisplay_UpdateScreenAnchor,thumb,low,src-alias,
+081EC7D8,ActorDisplay_UpdateForegroundSprite,thumb,low,src-alias,
 081ECADC,ActorDisplay_RefreshScreenLayer,thumb,low,src-alias,
 081ECB60,ScreenLayers_SelectRandomVariant,thumb,low,src-alias,
 081ECBC0,ActorEffect_SpawnOffsetEffect,thumb,low,src-alias,
@@ -7657,6 +7770,7 @@ addr,name,mode,confidence,source,notes
 08208BD8,CannonTurret_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the turret sprite; identity is tentative
 08208FD8,CannonTurret_Create,thumb,low,src-alias,Allocates and initializes the actor registered as key 4CD8; turret name is tentative
 0820901C,CombatActor_RecordDefeat,thumb,low,src-alias,
+08209254,FanCannon_ApplyHitReaction,thumb,low,src-alias,
 082094D0,FanCannonManager_InitSlot,thumb,low,src-alias,Empty initialization hook called for each of the eight manager slots
 082094D4,FanCannonManager_DestroySlot,thumb,low,src-alias,Removes a slot sprite and clears its occupied bit
 082094F8,FanCannon_ReadToggleSchedule,thumb,low,src-alias,Reads up to eight script timing values used to toggle cannon activity
@@ -7685,8 +7799,13 @@ addr,name,mode,confidence,source,notes
 0820BCE0,DragonPuppy_Create,thumb,medium,gcl-name,name from GCL key 3D38 ドラゴンパピー (Dragon Puppy); registry callback
 0820BD24,Screamer_HandleDefeat,thumb,low,src-alias,Calls the defeat script and updates Screamer event flags and kill statistics
 0820BF6C,Screamer_OnColliderContact,thumb,low,src-alias,Empty callback installed during Screamer collider initialization
+0820BF70,Screamer_ApplyHitReaction,thumb,low,src-alias,
+0820C334,Screamer_WaitForPlayerApproach,thumb,low,src-alias,
+0820C4D4,Screamer_UpdateScream,thumb,low,src-alias,
 0820C984,SceneDrawablePair_SetFlags,thumb,low,src-alias,
+0820C9AC,Screamer_UpdateDamageParticles,thumb,low,src-alias,
 0820CCF4,Screamer_Destroy,thumb,low,src-alias,Destruction callback that removes the Screamer sprite
+0820CD00,Screamer_InitFromScript,thumb,low,src-alias,
 0820D1F8,Screamer_Create,thumb,medium,gcl-name,name from GCL key 84CF スクリーマー (Screamer); registry callback
 0820D23C,EnemyParticle_UpdateLifetime,thumb,low,src-alias,Marks the particle for motion refresh and reports expiration past its configured lifetime
 0820D258,SceneOverlayEntry_Init,thumb,low,src-alias,
@@ -7721,7 +7840,9 @@ addr,name,mode,confidence,source,notes
 08210100,ProjectileEmitter_WaitForPlayerApproach,thumb,low,src-alias,
 08210180,ProjectileEmitter_UpdateAttack,thumb,low,src-alias,
 0821025C,ProjectileEmitter_EmitAttackFrame,thumb,low,src-alias,
+08210398,PinkSpine_UpdateDamageAnimation,thumb,low,src-alias,
 08210648,PinkSpine_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the actor sprite
+08210654,PinkSpine_InitFromScript,thumb,low,src-alias,
 082109D8,PinkSpine_Create,thumb,low,src-alias,Creates and initializes the actor task; tentative prefix from its pink and pale-blue sprite palette
 08210A1C,Collection_GetPageEntryCount,thumb,low,src-alias,Returns the table value used to mask unused slots on a collection page
 08210A48,Collection_IsEntryUnlocked,thumb,low,src-alias,Tests the indexed bit in the persistent collection unlock mask
@@ -7854,6 +7975,7 @@ addr,name,mode,confidence,source,notes
 082172E0,Palette_CacheReservedObjectBank,thumb,low,src-alias,Finds or copies a keyed object palette into one of two reserved banks
 08217344,Palette_CacheObjectBank,thumb,low,src-alias,Finds or copies a keyed object palette into the sixteen-bank object palette buffer
 082173A8,Palette_UploadBuffers,thumb,low,src-alias,Uploads background and object palette buffers and applies the backdrop color override
+08217960,Palette_ApplyBackgroundFade,thumb,low,src-alias,
 08217D50,Palette_RefreshObjectBanks,thumb,low,src-alias,Refreshes cached object palette banks from their source indices and selects the background palette buffer
 08217DB4,Palette_CopyBank,thumb,low,src-alias,Copies sixteen colors comprising one palette bank
 08217DCC,Palette_SetBackdropColor,thumb,low,src-alias,Queues a backdrop color override for the next palette upload
@@ -7863,6 +7985,9 @@ addr,name,mode,confidence,source,notes
 08217EC4,Effect_SetOrigin,thumb,low,src-alias,Sets the two byte-sized sprite offsets used to position an effect relative to its anchor
 08217ECC,Effect_SetPalette,thumb,low,src-alias,Resolves a source palette index to a cached object palette bank and assigns it
 08217EEC,SpriteDrawable_SelectTileFrame,thumb,low,src-alias,
+08217F4C,SpriteOam_QueueProjectedSprites,thumb,low,src-alias,
+08218254,SpriteOam_QueueCameraRelativeSprites,thumb,low,src-alias,
+08218508,SpriteOam_QueueFlaggedProjectedSprites,thumb,low,src-alias,
 08218B30,Video_OnFrameNoOp,thumb,low,src-alias,Empty callback installed in the video frame processing callback slot
 08218B34,Text_FlushTileUploads,thumb,low,src-alias,Uploads queued glyph tiles to background VRAM using DMA and clears the queue
 08218B8C,Text_QueueTileUpload,thumb,low,src-alias,Stages one glyph tile and records its destination tile index
@@ -7888,6 +8013,7 @@ addr,name,mode,confidence,source,notes
 08219270,ScanlineEffect_GetBuffer,thumb,low,src-alias,Returns the fixed RAM buffer used to stage scanline transfers
 08219278,ScanlineEffect_GetHorizontalScrollRegister,thumb,low,src-alias,Returns the selected background horizontal scroll register
 082192B4,ScanlineEffect_GetVerticalScrollRegister,thumb,low,src-alias,Returns the selected background vertical scroll register
+082192F0,ScanlineEffect_StageTransfer,thumb,low,src-alias,
 08219574,Blend_SetAlpha,thumb,low,src-alias,Selects blend targets and enables alpha blending with the supplied coefficients
 082195D0,Anim_ResetDefaultFlags,thumb,low,src-alias,Clears the global halfword copied into newly loaded animations; tentative flags interpretation
 082195E0,Anim_Remove,thumb,low,src-alias,

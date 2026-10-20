@@ -18,7 +18,7 @@ struct P {
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void sub_08152A5C(void);
-void sub_08154AF0(void);
+void PlayerCue_UpdateSideRecoil(void);
 void Player_UpdateRecoilAction(void);
 
 void PlayerCue_Motion29(struct P *p, s32 dir, u32 h, u32 c)
@@ -40,7 +40,7 @@ void PlayerCue_Motion29(struct P *p, s32 dir, u32 h, u32 c)
     if (p->state == 3)
         p->fn = sub_08152A5C;
     else if (p->state == 4)
-        p->fn = sub_08154AF0;
+        p->fn = PlayerCue_UpdateSideRecoil;
     else
         p->fn = Player_UpdateRecoilAction;
 }

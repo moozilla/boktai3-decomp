@@ -703,7 +703,7 @@ void sub_0814EEE0(void);
 
 void sub_0814E990(void);
 
-void sub_0814E3D8(void);
+void Player_UpdateSelectedAttackCharge(void);
 
 static inline void ClearFlag(struct Player *p, u32 index)
 {
@@ -741,7 +741,7 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
     else if (p->statModifierContext.actionKind == 8)
         p->actionCallback = sub_0814E990;
     else
-        p->actionCallback = sub_0814E3D8;
+        p->actionCallback = Player_UpdateSelectedAttackCharge;
     sub_0813E90C(p);
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);

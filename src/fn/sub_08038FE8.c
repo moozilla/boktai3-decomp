@@ -7,7 +7,7 @@ void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 void Hud_SetMode(u32);
 void Video_SetRenderCallbacks(u32, void *, void *, void *);
 void Script_Call(u32, u32);
-void sub_08217F4C(void);
+void SpriteOam_QueueProjectedSprites(void);
 void sub_08214B44(void);
 void sub_08219624(void);
 void WirelessTradeMenu_UpdateExit(u8 *p)
@@ -20,7 +20,7 @@ void WirelessTradeMenu_UpdateExit(u8 *p)
     }
     if (*(u32 *)(p + 0x24) == 10) {
         Hud_SetMode(7);
-        Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
+        Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
         if (*(u32 *)(p + 0xd4) != 0)
             Script_Call(*(u32 *)(p + 0xd4), 0);
     }

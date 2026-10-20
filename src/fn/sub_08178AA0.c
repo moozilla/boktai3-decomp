@@ -15,7 +15,7 @@ extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
 extern struct Player *gPartyActors[];
 extern struct SceneHudState *gSceneHud;
 
-void sub_081779E8(struct SceneHudState *);
+void Hud_LoadLayoutResources(struct SceneHudState *);
 void SceneHud_InitGameplayResources(struct SceneHudState *);
 void SceneHud_RefreshGameplayDisplay(struct SceneHudState *);
 static inline s32 OwnerIndex(void)
@@ -37,7 +37,7 @@ s32 SceneHud_InitializeOwner(struct SceneHudState *s)
     *(u16 *)((u8 *)s + offset) = 0;
     owner = gPartyActors[s->actionOwnerIndex];
     s->actionOwner = owner;
-    sub_081779E8(s);
+    Hud_LoadLayoutResources(s);
     SceneHud_InitGameplayResources(s);
     SceneHud_RefreshGameplayDisplay(s);
     s->previousCueGroup = 255;
