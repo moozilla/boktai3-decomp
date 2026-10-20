@@ -1,7 +1,8 @@
 #include "global.h"
+#define Mummy_UpdateDefeat sub_080D3878
 
 #ifdef NONMATCHING
-// fuzzy: 86.2%
+// fuzzy: 86.4%
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -213,5 +214,5 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateDefeat);
+INCLUDE_ASM("asm/nonmatching", sub_080D3878);
 #endif
