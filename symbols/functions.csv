@@ -2961,13 +2961,17 @@ addr,name,mode,confidence,source,notes
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
+0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
+0808EF58,Slime_UpdateShake,thumb,low,src-alias,
+0808F1C4,Slime_UpdateStill,thumb,low,src-alias,
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
+0808FD9C,Slime_FollowPlayer,thumb,low,src-alias,
 0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise
@@ -3592,6 +3596,7 @@ addr,name,mode,confidence,source,notes
 080EFD60,SceneActorControl_UpdateTargetApproachPhase,thumb,low,src-alias,
 080EFF54,Ivy_ClearAnimationRestartFlag,thumb,low,src-alias,Clears the pending animation restart byte at offset 0x2B1
 080F0164,SceneActorControl_HideAndDisableCollision,thumb,low,src-alias,
+080F01E8,Ivy_UpdateIdle,thumb,low,src-alias,
 080F02F4,Ivy_InitControlPresets,thumb,low,src-alias,Installs three control preset pointers during Ivy initialization
 080F0324,SceneActorControl_BeginSoundTransition,thumb,low,src-alias,
 080F03DC,Ivy_ReleaseCapturedPlayer,thumb,low,src-alias,
@@ -3719,6 +3724,7 @@ addr,name,mode,confidence,source,notes
 080FAD64,Axe_BeginMoveToPosition,thumb,low,src-alias,Stores movement endpoints and resets movement state while facing the destination
 080FAE08,Axe_ClearForcedMovement,thumb,low,src-alias,Clears actor and movement flags plus a timer; forced movement interpretation is tentative
 080FB050,Axe_TickCooldowns,thumb,low,src-alias,Decrements each of four nonzero cooldown counters
+080FB07C,Axe_PickAttack,thumb,low,src-alias,
 080FB1DC,Axe_InitRoutePointHistory,thumb,low,src-alias,Marks three recent route point slots unused and resets the insertion index
 080FB214,Axe_RecordRoutePoint,thumb,low,src-alias,Appends a route point index to the three-entry circular history
 080FB248,Axe_IsRoutePointRecent,thumb,low,src-alias,Tests whether a route point index appears in the three-entry history
@@ -6663,6 +6669,7 @@ addr,name,mode,confidence,source,notes
 081A7C94,ScenePanel_UpdatePairConditions,thumb,low,src-alias,
 081A7D80,ScenePanel_ApplyPairTransition,thumb,low,src-alias,
 081A7EA0,ScenePanel_RequestPairReaction,thumb,low,src-alias,
+081A7FC0,Vanargand_UpdatePairEntry,thumb,low,src-alias,
 081A8044,ScenePanel_UpdateDelayedPairState,thumb,low,src-alias,
 081A809C,ScenePanel_UpdateActiveTransition,thumb,low,src-alias,
 081A8100,Vanargand_UpdateTimedMode4,thumb,low,src-alias,Sets mode 4 on entry runs two active update helpers and increments the state timer
@@ -6671,8 +6678,10 @@ addr,name,mode,confidence,source,notes
 081A8214,Vanargand_UpdateModeCycle,thumb,low,src-alias,
 081A82C4,Vanargand_UpdateTimedMode10,thumb,low,src-alias,Sets mode 10 on entry runs two active update helpers and increments the state timer
 081A8320,ScenePanel_UpdateActivePairState,thumb,low,src-alias,
+081A8378,Vanargand_UpdateVariantEntry,thumb,low,src-alias,
 081A8408,Vanargand_UpdateMode9Transition,thumb,low,src-alias,
 081A84B0,Vanargand_UpdateMode3Transition,thumb,low,src-alias,
+081A8550,Vanargand_UpdateEntryTransition,thumb,low,src-alias,
 081A85AC,Vanargand_UpdateTargetFlagTransition,thumb,low,src-alias,
 081A8638,Vanargand_UpdateProximityTransition,thumb,low,src-alias,
 081A8718,Vanargand_UpdateTimedMode13,thumb,low,src-alias,Sets mode 13 on entry runs two active update helpers and increments the state timer
