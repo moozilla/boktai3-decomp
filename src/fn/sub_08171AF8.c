@@ -16,7 +16,7 @@ s32 Inventory_GetConsumableId(u32);
 void sub_0816676C(void *, s32);
 void SceneHud_PrepareActionTransferToSlot(void *, s32, s32, s32);
 void PauseInventory_UpdateConsumableSwapAnimation(void);
-void sub_081719A8(void);
+void PauseInventory_UpdateConsumableOptionSelection(void);
 void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
 {
     u8 *input = p->actionInput;
@@ -54,7 +54,7 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
         two &= keys;
         if (!two)
             return;
-        Hud_SetInteractionCallback(p, sub_081719A8, 1);
+        Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableOptionSelection, 1);
         p->categoryWidgets[6].flags |= one;
         Hud_RestoreGridSelection(input);
         Hud_SetGridPosition(input, p->actionInput[1], p->actionInput[2]);
