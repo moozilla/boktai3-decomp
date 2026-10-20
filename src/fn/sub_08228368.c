@@ -6,7 +6,7 @@ struct Args08228368 {
 void *Task_CreateFromHeapEnd(u32 list,
                              u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
 void Task_SetCallbacks(void *, void *, void *);
-void sub_082282DC(u8 *);
+void DelayedScript_Update(u8 *);
 void DelayedScript_OnDestroy(u8 *);
 /* Start a task that runs `script` after `delay` frames (a negative delay
  * sets flag 0x2C), with up to `args->count` copied argument words. */
@@ -34,7 +34,7 @@ u8 *DelayedScript_Create(u32 script, struct Args08228368 *args, s32 delay, s32 u
             *(u16 *)(t + 0x2c) = 0;
         *(s32 *)(t + 0x28) = delay;
         *(u32 *)(t + 0x24) = script;
-        Task_SetCallbacks(t, sub_082282DC, DelayedScript_OnDestroy);
+        Task_SetCallbacks(t, DelayedScript_Update, DelayedScript_OnDestroy);
     }
     return t;
 }

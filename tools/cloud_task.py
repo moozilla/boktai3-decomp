@@ -25,6 +25,7 @@ import argparse
 import csv
 import os
 import re
+import signal
 import subprocess
 import sys
 import uuid
@@ -99,6 +100,7 @@ def brief(t):
 
 
 def main():
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # `list | head` exits quietly
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     for c in ("list", "claim"):
