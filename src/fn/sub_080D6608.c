@@ -1,4 +1,8 @@
 #include "global.h"
+
+#define Mummy_TryDirectPursuit     sub_080D6608
+#define Mummy_RequestStraightRoute sub_080D6FDC
+
 #ifdef NONMATCHING
 // fuzzy: 92.5%
 // Remaining differences: PRE stack-slot order and register allocation in route reacquisition.
