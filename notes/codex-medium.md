@@ -2291,3 +2291,70 @@ was checked with tools/check.py; draft scores were recorded on formatted C.
 Only the commit driver was used. No make, full build, generated-file edits,
 network operations, pushes or PRs. Batch validation and name promotion remain
 with the integrator. Notes remain local to this worker; shared docs untouched.
+
+## Task 080FDA44 — 2026-10-20
+
+Tags: #matching #axe #wooden-crate #named-object #register-pinning
+
+All six assigned functions matched: task completion 100% (+100 percentage
+points), with no NONMATCHING drafts. Exact checks used reviewed full extents;
+no make, tools/build.py, network, generated-file edits or direct git writes.
+One source per matching commit, submitted through build/commit.sh. Names are
+file-local aliases and tentative semantic interpretations, pending integration.
+
+- 080FDA44: matched, `Axe_FollowDeceleratingRoute`, 1108 bytes. Consumes the
+  pending-entry flag, follows nine context points at +E5C, then wraps to the
+  last point and halves speed at +E5A. Speed ramps every 16 ticks up to 12.
+  Computes random offsets around the player, using radius 512 on retarget.
+  Calls 080FBA38 during movement. The actor motion is +64, distinct from the
+  secondary motion at +2EC. Register-pinned: retains the observed unused
+  0x0403B714 load in r4 through the first polar calculation, and pins the
+  middle random-table base to r3. Empty operand barriers only; no handwritten
+  instructions. depin.py retained all three necessary hints.
+- 080FDE98: matched, `Axe_FollowAcceleratingRoute`, 1092 bytes. Same route
+  skeleton as 080FDA44, but uses radius 256 on retarget, leaves speed intact
+  at route wrap, and ramps to 18. Porting the matched sibling required only
+  those changes. Same three register hints, verified with depin.py.
+- 08100C18: matched, `NamedObject_EmitMovementTrail`, 784 bytes. Emits at
+  alternating direction-dependent offsets from +10C, toggling +D2 and
+  resetting +BC to four ticks. Kind +F3 selects default particles (0) or
+  explicit resource/variant particles (3, resources F422/121B). Using a
+  switch for kind and spelling additions as object coordinate plus offset
+  reproduced the original addressing and branch order without hints.
+- 080FF87C: matched, `WoodenCrate_CreateFromScript`, 636 bytes. Acquires the
+  manager and a slot, loads BB68, initializes the sprite and parses p/R/r/n/
+  C/D/s/k/t. Records initial flags at +CE, selects palette 1A1 or 1A0, chooses
+  idle sequence 0 or 2, advances its packed command stream and creates the
+  collider. Related named manager, flag and collider routines establish the
+  WoodenCrate prefix. Register-pinned: separate sprite and animation views
+  reproduce the saved sprite pointer and repeated flag accesses; explicit
+  saved duration locals avoid alias-induced reloads. depin.py reduced 24
+  hints to 16. Full extent ends at WoodenCrate_BeginToggleAnimation.
+- 080FFC24: matched, `WoodenCrate_UpdateToggleAnimation`, 428 bytes. Updates
+  palette timers, advances the packed animation and, on completion, selects
+  idle sequence 0/2, sets crate flag 1/2, marks +D4, and calls script +B8 with
+  the name and crate flags. The command reads are volatile halfwords, as in
+  matched display-animation relatives. Register-pinned: first flag-test
+  operand barriers and second flag mask/result pins preserve compiler operand
+  ties. depin.py reduced five hints to four. Reviewed extent ends before the
+  separate 080FFDD0 entry retained as bytes by the existing assembly inventory.
+- 081010E0: matched, `NamedObject_UpdateVerticalTravel`, 524 bytes. Clears
+  motion, consumes the sound-entry byte +BA, respects pause flag 4, and moves
+  toward upper/lower limits at +D8/+D4 according to flag 2. On arrival, snaps
+  an attached player, sets flag 100, state 4 and the entry byte, stops movement
+  sounds and plays 159 unless sound flag 4 suppresses it. An inline delta
+  helper preserves the otherwise-unused initial player-relative vector.
+  Passing the player-global address first to that helper delays dereferencing
+  it until the other argument addresses are materialized; this resolved the
+  last load-order mismatch without pinning. A normal position-view cast on
+  the copied player position preserves the observed halfword height store.
+
+Useful technique across the task: model observed local layouts first, then
+steer inline argument and commutative operand order. Literal-bearing RAM
+random-table expressions must remain distinct on the first sample to avoid
+GCSE keeping an extra table pointer live. On the Axe callbacks, returning a
+masked u32 from the first random helper places the 255 mask before the byte
+load and reproduces the original polar setup. All four hinted units were
+run through depin.py; all six sources were clang-formatted and passed their
+final tools/check.py checks. Combined ROM validation and name promotion are
+left to the integrator, as required by the worker assignment.
