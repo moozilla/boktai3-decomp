@@ -1,8 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+#define Mummy_FireAcceleratingVolley sub_080D62CC
+
 #ifdef NONMATCHING
-// fuzzy: 94.6%
+// fuzzy: 98.5%
+// Remaining differences: quotient copy, pool padding and loop delta-address scheduling.
 #include "scene_actor_reset.h"
 #include "engine.h"
 
@@ -34,19 +37,20 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->position;
     struct ContactPosition delta;
     s32 divisor, facing, difference;
+    s32 heightDifference;
     s32 speed;
     register s32 count asm("r6");
     s32 direction;
     register s32 strength asm("r8");
     source.y += 200;
-    difference = source.y - ((struct ContactPosition *)(actor->fieldDC + 0xc))->y;
-    if (difference <= 255)
+    heightDifference = source.y - ((struct ContactPosition *)(actor->fieldDC + 0xc))->y;
+    if (heightDifference <= 255)
         divisor = 15;
-    else if (difference <= 511)
+    else if (heightDifference <= 511)
         divisor = 20;
-    else if (difference <= 767)
+    else if (heightDifference <= 767)
         divisor = 23;
-    else if (difference <= 1023)
+    else if (heightDifference <= 1023)
         divisor = 27;
     else
         divisor = 34;
@@ -92,8 +96,12 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         delta.x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
         delta.y = 0;
         delta.z = Scale(gUnk_086149C4[direction & 255] * speed);
-        sub_080692C8(&source, &delta, (void *)(actor->fieldDC + 0xc), actor->fieldB8,
-                     actor->fieldC0, strength, actor->id);
+        {
+            u32 shot = actor->fieldB8;
+            u32 category = actor->fieldC0;
+            void *target = (void *)(actor->fieldDC + 0xc);
+            sub_080692C8(&source, &delta, target, shot, category, strength, actor->id);
+        }
         strength = Div(strength << 3, 10);
         speed += Div(speed << 2, 10);
     }
@@ -101,5 +109,5 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_FireAcceleratingVolley);
+INCLUDE_ASM("asm/nonmatching", sub_080D62CC);
 #endif

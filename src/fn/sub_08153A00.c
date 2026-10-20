@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative player cue role; see callback body.
+#define PlayerCue_UpdateSideWalkTarget      sub_08153A00
+#define Player_RestartAnimationFromResource sub_081538DC
 #ifdef NONMATCHING
-// fuzzy: 94.2%
+// fuzzy: 96.9%
 // Signed scaling sign tests and direction-store layout still differ.
 struct P {
     u8 pad0[0x30];
@@ -221,5 +223,5 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideWalkTarget);
+INCLUDE_ASM("asm/nonmatching", sub_08153A00);
 #endif
