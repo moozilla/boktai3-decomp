@@ -584,3 +584,110 @@ or direct git add/commit/checkout/stash occurred. The unrelated pre-existing
 change to tools/cloud_task.py remains untouched. Combined-ROM validation and
 name promotion belong to the batch integrator. Scratch candidates and diagnostic
 artifacts remain ignored under wip/ and build/. The local Ghidra export is absent.
+
+## 2026-10-20 — Task 080ADCC0, Vorn reaction and routing callbacks
+
+Tags: #matching #vorn #scene-actor #terrain #register-pinning #nonmatching
+
+No byte-identical matches; two guarded drafts accepted for retention. Exact code
+progress gain is 0.000 percentage points. The four other candidates remain below
+the 80% draft threshold in ignored `wip/` files. No shared headers or generated
+files were changed.
+
+Family evidence: neighbouring named callbacks use Vorn, and the creation code
+around 080B4E18 installs 080AEE08, 080AEB74, 080AE1C4 and 080AE6F0. The special
+control table gUnk_08605F94 contains 080AF1E0 and 080AF2BC; its initializer is
+Vorn_InitSpecialActionTable. Vorn_SendMessage (080B4134) consumes context6C1 and
+sends message seven plus the actor id to category 0x19. Function names below
+remain tentative where the precise gameplay role is uncertain.
+
+- **080AF2BC stopped, 72.0%** on the reviewed extent; tentative
+  `Vorn_UpdateDelayedRouteRecovery`, candidate in `wip/sub_080AF2BC.c`.
+  After callback/update guards and counter2AC > 60, releases an attachment,
+  installs RestoreAfterDelay (kind 14), saves a 30-frame command, then either
+  runs pursuit arrival/rerouting, restores the saved route for flags2CC bit
+  0x10, or saves behavior two and waits 64. Existing scene_actor_chase.h supplies
+  almost the entire pursuit path, including the deliberate repeated destination
+  height probe and RNG retry turn. Retained candidate: 386 total / 101 structural
+  differences; body 2364 versus reviewed 2344 bytes. The counter comparison must
+  be signed. Read BIG_FUNCTIONS.md; used condensed assembly, relatives, variants
+  and rtlprobe. Seven inline-shape/lifetime variants did not improve the default
+  396 / 111 candidate-length result. A diagnostic GCSE T sweep 401..501 changed
+  registers/spills (best 358 total) but left 111 structural differences; no
+  instrumented-compiler setting was retained. Main-latch rewriting to a direct
+  if greatly worsened address lifetimes. Needs more work on cached outer state
+  addresses, RNG constant hoisting and local stack-vector lifetimes.
+- **080ADCC0 drafted 85.7%**, `Vorn_UpdatePursuitDistance`, in
+  `src/fn/sub_080ADCC0.c`. Prepared entry returns immediately. Subsequent calls
+  broadcast position and use distanceF0 thresholds 0x19000, 0x38400 and 0x90000,
+  context flag 0x2 at 0x6D4, nearTimer6A8 and farTimer6AA. They choose animation,
+  delayed behavior 15 or cell-centre routing toward fieldDC. The route context
+  here is **actor->context + 0x3D4**, as the original assembly establishes; it
+  is not actor->group. The two route tests clear motion flag 0x200 on failure
+  and invoke that context group's failure callback. An explicit unsigned flags
+  pointer and a full-width signed mask store raised the candidate above the
+  threshold. Pins retain context in r7 and the temporary centre pointer in sl.
+  Reviewed result: 95 total / 69 structural differences, candidate 1160 versus
+  reviewed 1120 bytes. Remaining: centre-building temporaries, branch layout,
+  saved registers and address allocation. The commit subject accidentally says
+  84.6%; the authoritative recorded source/check score is **85.7%**.
+- **080AE1C4 stopped, 67.2%** reviewed; tentative
+  `Vorn_UpdateKnockbackRecovery`, `wip/sub_080AE1C4.c`. Entry rounds direction,
+  selects animation six, requests category-25 attachment behavior and song
+  0x1CC once, resets route/reaction flags, then broadcasts its message. Each
+  frame applies quarter-distance X/Z corrections clamped to +/-200 to motion64
+  and saved positions318/31C. Once motion settles and the signed timerAA is
+  nonpositive, restores route/control kind eight and collider flags. Relatives
+  08082D80 and 080E8490 provided motion-convergence and collision-reset C.
+  Retained candidate: 205 total / 79 structural differences, 1072 versus 1056
+  bytes. Explicit cached field pointers reduced code size but worsened score;
+  that candidate was discarded. Adjacent declaration swaps did nothing. A
+  diagnostic T sweep 201..321 did not change the result. Needs initial reset
+  mask/control-address lifetimes and the late repeated animation reset aligned.
+- **080AE6F0 stopped, 70.0%** retained reviewed candidate; tentative
+  `Vorn_ResumeReactionRoute`, `wip/sub_080AE6F0.c`. On prepared entry turns back
+  and selects animation zero. When flags2D0 bit 0x10 is present, clears bit four,
+  sends a message, resumes SceneBody_StartRoute, clears context flags, then
+  either runs script gUnk_0824E20C/0x39F or resets route and installs group+0x210
+  control kind 15. Retained candidate: 98 total / 42 structural differences,
+  596 versus 592 bytes. Context/group/flags pinning transiently reached 71.0%
+  candidate-length score (94 / 44); no exact match. Signed mask temporaries
+  preserve the negative immediate for byte flag clearing. Moving motion access
+  into a byte-pointer helper instead materialized actor+0xEB, losing the
+  original actor+0xDC with a +15 load. A full-width s16 bitfield experiment did
+  not improve the retained source. Needs saved zero and flags-address lifetimes.
+- **080AEB74 stopped, 71.8%** reviewed; tentative
+  `Vorn_TryRestorePatrolRoute`, `wip/sub_080AEB74.c`. Requires flags2CC bits
+  0x400000 and 0x200000 plus motion flag one, saves a 30-frame command for
+  savedTarget/kind nine, samples the route terrain height, marks the destination
+  ready, resets reaction flags and context timers6D4/69E/6AC, sends a message,
+  then returns one. Retained candidate: 142 total / 47 structural differences,
+  668 versus 660 bytes. Mask-parameter helpers improved instruction ordering,
+  but explicit flags/motion pointer caching and group/context pins did not
+  improve the score. Needs the original spilled motion pointer, transient r3
+  destination and flags2CC lifetime around the terrain call.
+- **080AEE08 drafted 83.4%**, `Vorn_UpdateDefeat`, in
+  `src/fn/sub_080AEE08.c`. Reused Bat_UpdateDefeat's verified spark/script/event
+  pattern; Vorn adds Vorn_SendMessage, calls 080B0D28 before the burst, and
+  always transitions to idle control/state 1/behavior 2 after its completion
+  latch. Entry releases attachments, advances effects, clears route counters,
+  and marks the collider. Completion spawns six sparks unless flags2CC bit
+  0x400 suppresses them, runs the eight-argument defeat script, conditionally
+  sets the category event flag, hides the drawable and shadow. Pins cover
+  burst pointers/constants and the first RNG result/cursor. The first RNG uses
+  a distinct helper; assigning the position pointer in the first call prevents
+  an early address computation. A small drawable-tail type preserves the
+  original +0x20 base and +8 flags access. Reviewed result: 84 total / nine
+  structural differences; candidate and target both 984 bytes. Remaining:
+  low-register choices, address derivation and late constant reloads.
+
+Both retained drafts have bare file-local semantic aliases, register-pinning
+markers and `#ifdef NONMATCHING` / original INCLUDE_ASM alternatives. Scores
+were written by `tools/check.py --nonmatching --record`. All acceptance and
+comparison work used per-file check.py; no make, full build, network access,
+push/PR, direct git add/commit/checkout/stash, generated assembly modification
+or shared-doc edit occurred. The local Ghidra export is absent. The unrelated
+pre-existing modification to tools/cloud_task.py remains untouched. Commit
+requests go through build/commit.sh; combined ROM validation is left to the
+batch integrator. Scratch candidates and diagnostic artifacts remain in ignored
+wip/ and build/ directories.
