@@ -1,8 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
+#define SpriteOam_QueueProjectedSprites sub_08217F4C
 #ifdef NONMATCHING
-// fuzzy: 88.9%
-// Remaining differences: projection temporaries, affine allocation, and register lifetimes.
+// fuzzy: 91.0%
+// Remaining differences: projection temporaries, signed comparisons, and register lifetimes.
 struct Vec {
     s16 x, y, z;
 };
@@ -132,7 +133,12 @@ void SpriteOam_QueueProjectedSprites(void)
                 gUnk_03004310[*count].angle = angle;
                 gUnk_03004310[*count].scaleX = sx;
                 gUnk_03004310[*count].scaleY = sy;
-                matrix = (*count)++;
+                {
+                    register s32 old asm("r0") = *count;
+                    matrix = old;
+                    ++old;
+                    *count = old;
+                }
             }
             attr |= matrix << 25;
             flags = p->flags;
@@ -180,5 +186,5 @@ void SpriteOam_QueueProjectedSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueProjectedSprites);
+INCLUDE_ASM("asm/nonmatching", sub_08217F4C);
 #endif
