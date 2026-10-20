@@ -69,5 +69,5 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", NamedObject_ConstrainPlayer);
+INCLUDE_ASM("asm/nonmatching", sub_081021DC);
 #endif
