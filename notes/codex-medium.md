@@ -63,3 +63,79 @@ Commits were queued through `build/commit.sh`.
 The three exact functions are all in the Register-pinned category. Guarded
 scores were recorded with `tools/check.py --nonmatching --record`; their
 normal build paths retain INCLUDE_ASM. No shared documentation was changed.
+
+# Task 08131D5C — scene actor damage and defeat
+
+Tags: #matching #scene-actor #damage #defeat-stats
+
+Worked offline on the preclaimed cloud/08131D5C branch. Used only fast
+`tools/check.py` compilations for validation; no make, full build or network.
+Each function was committed separately through `build/commit.sh`.
+
+- **08134398 — matched, SceneActorReaction_RecordDefeat.** Started with the
+  existing guarded draft and read its matched sibling 08132D2C plus
+  `notes/defeat-stats-template.md`. Rebuilding the opening from the sibling,
+  dropping the contact-node release/group-link flag work and keeping the
+  target's own reset fields gave the right behavior. The decisive change was
+  the full-width signed bitfield for flags2D6: it creates separate SI/HI zero
+  values before the halfword store, which makes the spill/reload register set
+  match throughout the repeated statistics blocks. Passing the clear mask to
+  a small inline puts the literal load before the halfword load. Counter
+  increments retain two explicit stores and macros use plain braces rather
+  than do/while wrappers. Exact reviewed extent: 5636 bytes. **No register
+  pins remain** in this unit.
+- **08132490 — matched, SceneActorReaction_ApplyCategoryDamage.** Called for
+  actor categories 11/12/13 by SceneActorBehavior_DispatchFlaggedCategory
+  (08132898). Applies reactionSoundVariant damage, palette/HUD/damage-number
+  feedback, clears collision timers, and hides/redirects a defeated actor;
+  surviving actors play song 0x13E. Started from the matched 08132748 defeat
+  setup and 08135F70's damage-display predicate. Loading the damage into a
+  local before subtracting fixed initial load order; changing the predicate's
+  mask register from r3 to r2 closed the remaining allocation differences.
+  Exact reviewed extent: 696 bytes. Register-pinning concession.
+- **0813214C — matched, SceneActorReaction_ApplyStaggerDamage.** Sibling of
+  08132490 for the dispatcher's default category path. Surviving actors enter
+  control kind 0x21 with SceneActorReaction_PlayStaggerBurst; the final
+  flags2CC bit 0x2000 is set on either health path. A signed full-width
+  flags2D4 bitfield plus an inline mask parameter reproduced the early byte
+  zero and halfword zero. A short r0 bit-mask constraint fixes the stagger
+  flag OR order. Broader zero/collider pins caused unsafe-looking register
+  overlap and were discarded. Exact reviewed extent: 836 bytes.
+  Register-pinning concession.
+- **08131D5C — drafted 85.4%, SceneActorReaction_ApplyAreaDamage.** Called by
+  08135F70 when no pending hit exists. Requires enabled, clear flags2D0 bit 8,
+  clear flags2CC bit 2 and zero collider responseValue. Gets damage from
+  AreaEffect_ScaleGainAtPosition using the position and unsigned max health,
+  applies it, generates two random knockback components, displays feedback,
+  sets a 38-tick response timer and control kind 0x12 (or defeat kind 17).
+  Candidate has 96 realigned differing instructions, 42 ignoring registers.
+  Pointer spill placement, RNG expansion and load/store scheduling remain;
+  the candidate is 12 bytes shorter than the 1008-byte original extent.
+  Tried shared failure labels, call/output-pointer helpers, high-register
+  hints, typed collider access, paired RNG expansion and bitfield OR forms.
+  The typed collider/shared-failure candidate was retained; other experiments
+  remain untracked under wip/med. Register-pinning concession in the common
+  display predicate and short flag-mask lifetime.
+- **08132904 — drafted 81.1%, SceneActorReaction_ApplyLinkedAreaDamage.**
+  Shares the preceding area's damage flow, selecting
+  AreaEffect_ScaleLinkGainAtPosition in link mode, and additionally clears
+  flags2D4 bit 0x2000 after starting knockback. Candidate has 126 realigned
+  differing instructions, 58 ignoring registers, and is 16 bytes shorter
+  than the 1064-byte original extent. The same pointer/RNG issues remain.
+  Register-pinning concession.
+- **08135F70 — improved draft 86.8%, SceneActorReaction_ResolveDamage.**
+  Resolves pending hit damage and flags, or falls back to 08131D5C for area
+  damage. Added the required name and concession marker. Keeping mode in sl,
+  preserving the constant one in sb across the HUD call, and constraining
+  short-lived hit masks improved the existing 84.4% draft. Removing its old
+  updated-value r5 pin reduces structural differences further: retained
+  candidate has 79 realigned differing instructions, 18 ignoring registers.
+  Health/flags2D8 pointer spills and the two inlined hit-flag expansions still
+  differ; candidate is 1152 bytes versus the original 1156-byte extent.
+  Forced stack barriers and output-pointer helpers worsened the structure
+  and were discarded. Register-pinning concession.
+
+All guarded scores were refreshed with `check.py --nonmatching --record`;
+normal builds retain INCLUDE_ASM for the three drafts. Exact checks used
+explicit reviewed extents for all three matches. Batch ROM validation and
+name promotion are left to the integrator as instructed.
