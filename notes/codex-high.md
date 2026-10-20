@@ -1165,3 +1165,104 @@ All five default assembly alternatives passed reviewed-extent per-file checks.
 Depinning was attempted on the unguarded draft sources; the exact-only tool
 correctly skipped them. Source review and `git diff --check` passed. No complete
 ROM build was run; combined validation remains with the batch integrator.
+
+## Task 0812E118 — 2026-10-20
+
+Tags: #matching #scene-actors #nonmatching #register-pinning #boundaries
+
+Branch: `cloud/0812E118`. Worked solo and offline. Exact code gain: **0.00
+percentage points (0% of the six assigned functions matched)**. Improved three
+existing guarded drafts; no new exact coverage is claimed. Used the worktree's
+Python and fast per-file checks, never make, a full build, network operations,
+or direct Git mutations. Commits were queued through `build/commit.sh`.
+
+- **0812FA0C — drafted 83.2%**, up from 80.6%. Local alias
+  `SceneActorReaction_UpdateRouteReturn` (tentative existing interpretation).
+  Reviewed function span: 1,976 bytes through 081301C4; C emits 1,968 bytes.
+  Final realigned differences: **191 total / 50 ignoring registers**, versus
+  228 / 44 initially. Explicit RNG table/index/wrap/mask locals and pinning
+  the prior direction to r5 reduced allocation differences and improved the
+  full-function fuzzy score, despite a small structural-count regression.
+  Packet constants, narrower setter parameters, target/group pointer removal,
+  bitfield masks, and other RNG pins did not improve the retained candidate.
+  Remaining differences include PRE stack slots, RNG constant placement,
+  delayed-control/state setup and the reroute target's stack-pointer lifetime.
+  The file carries the register-pinning concession. The checker could not
+  record the score while INCLUDE_ASM used the promoted descriptive name;
+  using sub_0812FA0C in the assembly alternative fixed the local build and
+  allowed `--nonmatching --record` to record 83.2%.
+- **0812E7EC — stopped below threshold**, retained locally at
+  `wip/high/sub_0812E7EC.c`. Tentative alias
+  `SceneActorReaction_DispatchPendingCommands`. The earlier worker's local
+  candidate was absent, so reconstructed the receiver loop, behavior/movement
+  cases and attachment sub-dispatch from assembly. The receiver is actor+0xC;
+  the event bank is gUnk_0200047C+0x24. Category 18 writes destination XYZ at
+  actor+0x2FC; other categories use the route at group+0x1FC. Commands 5–7
+  forward small halfword packets. Attachment kind 5 calls the parts creator
+  with part count from command+0xE; kinds 6/7 update a descriptor; kind 8
+  releases resources in order 0,1,2,4,5,3. Reviewed span is **1,764 bytes**,
+  ending at 0812EED0, before the two tiny neighboring functions. Final check:
+  **76.6%, 292 total / 179 structural differences**, C 1,564 bytes.
+  Candidate-length scoring misleadingly reports 71.0%; use the reviewed span.
+  The main remaining problem is cross-jumping: agbcc merges state-setting
+  sequences the ROM duplicates. State/control parameter-width variants,
+  explicit initial count, actor-relative count and local attachment-offset
+  scopes did not resolve the missing sequences. Nothing promoted.
+- **0812F5D4 — drafted 81.1%**, up from 80.8%, alias
+  `SceneActorReaction_UpdateContactRoute`. Final realigned differences:
+  **80 total / 23 structural**, down from 92 / 35. Additional pins on RNG
+  wrap (r7) and mask (r6), an inline behavior setter, and passing the +0x414
+  flag mask as an inline argument improved the structure. The last change
+  reproduces mask-before-load ordering. The original r5 prior-direction and
+  r1 retry-count pins remain. A higher-fuzzy intermediate scored 83.9%, but
+  the retained candidate has fewer structural and total differences.
+  Remaining differences are PRE stack-slot ordering, constant placement in
+  the RNG preheader/loop, and control/state allocation. Reviewed span 800
+  bytes; C 804 bytes. Ran depin on an unguarded temporary copy: it correctly
+  skipped the nonmatching C. Do not depin a guarded draft through its matching
+  assembly fallback; that does not measure the hints in the candidate.
+- **0812EED8 — drafted 86.1%**, up from 81.3%, alias
+  `SceneActorReaction_BeginTargetRecovery`. Spelling the 0x400 motion-flag
+  clear as a scoped pointer/mask operation instead of the Chase helper reduces
+  realigned differences from **58 to 43 total**, with **22 structural** left.
+  Remaining differences include early flags-pointer PRE, motion-pointer
+  copies, mask/load order, and recomputing the final motion-flags address.
+  Actor/motion/flags pins, altered pointer scopes, and actor-based accessors
+  did not improve the candidate. Reviewed span 596 bytes; C 600 bytes.
+- **0812F3CC — stopped below threshold**, retained locally at
+  `wip/high/sub_0812F3CC.c`. Tentative alias
+  `SceneActorReaction_BeginContactResponse`. Selects a contact, clears route
+  counters, stores the selected node at group+0x88, installs idle control and
+  state (3,1,0), clears flags2CC bit 0x10, sets flags2D6 bit 0x800.
+  An explicit failure label before the success body restores the short
+  conditional branches. Clearing the group-relative control via a typed
+  pointer restores its +0x18/+0x14/+8 stores. Group pinning helps allocation.
+  Reviewed-span score **72.3%, 52 total / 17 structural differences**, C 332
+  versus 340 bytes. Zero-value reuse across the contact-selection call differs
+  from the ROM's distinct word/byte zeros (including ip). Setter-width,
+  selected-contact/actor pins, explicit zero parameters and separate pinned
+  zeros did not reach the draft threshold. Nothing promoted.
+- **0812E118 — stopped after assembly/caller and extent review.** Its callers
+  in the SceneActorPath family use it to test a neighboring terrain cell
+  against current height/shape. It rejects attributes 0x43, permits specific
+  slope/flat transitions only along the matching axis, and compares heights
+  exactly or within one height unit for those transitions. However, at
+  0812E188/0812E18C it reads bytes at sp+4/sp before initializing the stack
+  position at 0812E1BC and following stores. This is a real independent
+  prologue, not an interior split. Reproducing it directly would introduce
+  uninitialized C reads, so no candidate was promoted. Its actual return ends
+  at 0812E2B2 (padding through 0812E2BC); the generated assembly then retains
+  **0x120 bytes of separate raw Thumb code** through 0812E3DC. Any future
+  exact-credit claim must review that boundary and must not absorb the raw
+  body into a candidate-length check.
+
+Read the large functions with asmat/condense and used hypothesis batches with
+variants, scoring structural/total realigned differences before positional byte
+counts. `relatives.py` was unavailable because its progress-report dependency
+exited nonzero; the Ghidra export is absent in this checkout. No tooling or
+shared documentation was changed. All three retained drafts have file-local
+aliases and explicit sub-address INCLUDE_ASM alternatives. Their assembly
+alternatives passed per-file checks; the two smaller alternatives used reviewed
+extents (800 and 596 bytes). Final C scores were recorded with
+`check.py --nonmatching --record`. Formatting and `git diff --check` passed.
+Combined ROM validation remains with the batch integrator.

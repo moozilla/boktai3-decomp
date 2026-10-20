@@ -5,7 +5,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 80.6%
+// fuzzy: 83.2%
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
