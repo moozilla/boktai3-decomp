@@ -917,3 +917,63 @@ No exact matches: exact code gain is 0.0 percentage points. Five guarded drafts 
 Boundary evidence: `081EDB74`'s prior reporting extent incorrectly absorbed the independent callback at 081EDE4C (own saved r8-sl prologue after the departure return/pool). Added 081EDE4C to progress extra boundaries and inventory; full draft score is 85.3%, versus the misleading 51.2% against both callbacks. Likewise 081EEAD8 ends at 081EEDDC, where another callback starts with its own push r4/lr and return before 081EEE30; added that reporting boundary. These additions split only reporting extents and leave the independent bodies in assembly. A further independent short callback starts at 081EF12C after 081EEECC's pool; it was observed but not added because no draft was accepted for 081EEECC.
 
 The common packed stepper came from matched PlayerCue_UpdateSideDeparture; empty compiler operand constraints contain no instruction bodies. All retained units carry the register-pinning concession marker and provisional file-local naming aliases. Ghidra export is absent. Only per-file check.py compilation was used; no make, full build, network, push, PR, or direct git mutation. Commit requests used build/commit.sh. Combined ROM validation remains the integrator's responsibility.
+
+## Task 081731E8 — 2026-10-20
+
+Tags: #matching #hud #menu-input #nonmatching
+
+Exact gain: approximately 0.026 percentage points of total code (636 bytes),
+without register pinning. Two new guarded drafts; two assigned functions were
+already exact. Aggregate totals remain in PROGRESS.md and are not regenerated
+by this worker.
+
+- 08176BA4 matched as SceneHud_FinishPageExit. SceneHud_FadeOutPage installs
+  this callback after restoring display state. Advances bounds for 17 ticks,
+  restores display globals and persistent songs, then handles queued health
+  burst, script calls and three particle emissions. The particle position and
+  extent are signed 16-bit full-width bitfields packed into two words: position
+  offset (-512,-256,-512), extent (1024,512,1024). Script arguments have a u16
+  count at zero and value pointer at four. Explicit zero initialization between
+  calculating the incremented timer and storing it resolves the last two
+  instruction differences. An inline mask helper reproduces mask-before-load.
+  Exact again after formatting; no pins.
+- 08175008 drafted 94.1% as Presentation_UpdateAllocationSelection. Resumed
+  retained 64.8% scratch candidate. Three pending signed counts gate preview;
+  up/down select a stat, left/right refund or allocate points, A confirms and B
+  resets. Typed allocation arrays, an inline description setter taking the
+  already-computed description, and loading the owner's stat before forming
+  the pending-count pointer greatly improve address scheduling. Retains r4
+  scan/mask, r1 input and r6 selection pins with the required concession marker.
+  Remaining 26 realigned instructions / nine ignoring registers concern
+  constant ordering and array address reuse/allocation. Typed owner fields and
+  reversed mask operands reduce structural differences to seven but lower
+  fuzzy similarity; restored the 94.1% candidate. depin was run on the actual
+  unguarded candidate; it skipped because this is not an exact match.
+- 081731E8 drafted 97.3% as SceneHud_UpdateSecondaryActionSelection. Called by
+  the equipment selection page's interaction callback. A saves the secondary
+  grid selection and handles reset (39), main action grid (32), or action
+  choice (38); navigation uses mask C0 and updates prompt/cursor. Evaluating
+  selected-pointer assignment in the second cursor argument preserves address
+  order. Loading the selected byte before initializing the prompt bool fixes
+  its constant scheduling. Four realigned instructions / two ignoring registers
+  remain: compiler reuses the grid address in r6 instead of recomputing it into
+  r4 for choice 38, plus pool effects. No pins. Full reviewed score is higher
+  than candidate-length score (96.7%) because the candidate omits four bytes.
+- 081779E8 already matched as Hud_LoadLayoutResources; verified 536 exact bytes
+  using a scratch file-local alias for the cached ELF's original name. No
+  production changes or new exact credit.
+- 081793EC already matched as FieldHud_UpdateTimeDigits; verified 356 exact
+  bytes using the same scratch alias technique. No production changes or new
+  exact credit.
+- 08176F70 stopped unmatched. Read BIG_FUNCTIONS, regenerated the condensed
+  assembly and reviewed relatives plus prior attempts. Hud_InitAlternateLayout
+  calls this widget-layout initializer after resource loading. Repeated widget
+  creation loops and an embedded packed animation stepper dominate it; the
+  strongest matched relative covers only 9%. No Ghidra export is available.
+  No new complete candidate or production body; prior detailed notes apply.
+
+Only check.py per-file compilations were used, including --nonmatching --record
+for both drafts and exact default INCLUDE_ASM checks. Formatted directly with
+build/venv/bin/clang-format. No make, full build, network, generated-file edits,
+ROM commits or direct git mutations. Per-function commits queued through
+build/commit.sh; combined ROM validation remains for batch integration.
