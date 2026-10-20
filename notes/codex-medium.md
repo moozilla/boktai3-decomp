@@ -1677,3 +1677,91 @@ recorded each draft with check.py --nonmatching --record and checked each
 default assembly fallback exactly. Commits used build/commit.sh. No make,
 full build, network operation, shared documentation/index edit, ROM or generated
 assembly commit. Combined validation and name promotion remain with integration.
+
+# Task 081A2430 — Codex medium, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool #register-pinning
+
+Worked solo on the already claimed `cloud/081A2430` branch, offline. Exact
+code gain: **+0.0000 percentage points**; no new exact C matches. Retained
+five guarded drafts (four inherited, one newly authored). All scoring used
+`build/venv/bin/python tools/check.py`; no make or full build was run.
+
+- **081A5614 — retained draft 80.7%**,
+  `Vanargand_UpdatePaletteTransition`. Read BIG_FUNCTIONS, the condensed
+  listing and the matched restore/interpolation relative in 081ACC24.
+  Baseline: 299 realigned differences / 82 ignoring registers, candidate
+  2848 bytes against the 2800-byte symbol extent. A blend wrapper taking
+  the owner and computing the output address inside reduced structural
+  differences to 60, but worsened allocation and fuzzy score to 76.8%.
+  Removing the selector pin, pinning RGB/frame temporaries, and changing
+  interpolation to a shared result did not improve the retained draft.
+  Restored baseline; added the required local alias and raw assembly
+  fallback so it resolves against the cached ELF/generated assembly.
+- **081A2858 — improved draft 86.3% to 91.3%**,
+  `Hresvelgr_UpdateCollisionPresentation`. Fixed a real source defect:
+  the first invulnerability path dereferenced `flags` before initialization.
+  It now accesses the owner's flags directly. Preserve the second timer
+  load before materializing the shared flags pointer. Split the disabled
+  collider flag operations into two full-width signed bitfield updates;
+  this reproduces the otherwise surprising zero OR. Reordered the camera
+  branches to put the set-offset path before reset. Sprite/sequence inline
+  accessors improve address and argument setup. Remaining: 49 realigned
+  differences / 39 ignoring registers, including reset-pointer allocation,
+  sprite field addressing and constant scheduling; candidate/target 868 bytes.
+- **081A39E0 — improved draft 88.3% to 91.1%**,
+  `EffectPool_UpdateEntry`. Caller 081A3D00 iterates entries; the target-angle
+  helper and the body establish homing, animation/collider updates, trail
+  emission and lifetime-dependent acceleration. Keeping the angle mask
+  opaque in r3 preserves the final AND before the byte store. Pinning the
+  animation timer to r0 improves its scheduling. Separate vector component
+  temporaries and an input-liveness barrier reproduce more of the animation
+  flag operations. Remaining: 37 realigned differences / 4 ignoring
+  registers, mainly temporary registers, RNG/trail setup and timer mask
+  scheduling. Candidate and target 800 bytes.
+- **081A2430 — retained/revalidated draft 87.5%**,
+  `Hresvelgr_DispatchSceneMessages`. Explicitly alias the renamed callback
+  `Hresvelgr_UpdateRisingProjectile` to 081A12DC for the cached ELF.
+  Ordinary multidimensional pending-message indexing regressed; alternative
+  pointer arithmetic and sharing zero/one action parameters also regressed.
+  Retained the original structure: 51 realigned differences / 25 ignoring
+  registers, candidate and target 680 bytes. Remaining differences are
+  pending-buffer indexing and mode/action constant lifetimes.
+- **081A8F48 — new draft 88.7%**, tentative
+  `Vanargand_UpdatePlayerDrain`. Positions player zero at the boss position
+  plus (128, 0, 128); chooses animations 12–14 and copies player collision
+  data according to player mode at 418. Later adds the position-request
+  result to boss health and shows the change. Preserve the second position
+  construction before testing the player flag. A mask-taking inline and a
+  retained initial `one` recover the initial failure block and argument
+  setup. Keep the signed start-frame bias explicit; otherwise CSE rewrites
+  it onto the current frame and loses the original load order. Remaining:
+  38 realigned differences / 19 ignoring registers, initial vector aliases,
+  register choices and constant scheduling. Candidate and target 560 bytes.
+- **081A6AEC — stopped below full-extent draft threshold; no production C.**
+  Tentative `Vanargand_GetTargetLateralDistance`. Caller 081ABB70 clamps
+  the result to 512. The visible body projects the actor position at 54 and
+  target position via 110, keeps only projected X separation, unprojects
+  with zero Y, and returns planar square-root distance. Independently
+  authored candidate, using the matched projection idiom from 081A543C,
+  improved from 65.8% to 85.6% against the visible 312-byte body. A local
+  owner pin to ip and a shared-result signed-shift helper produced that
+  gain. It remains only **51.0% against the 736-byte symbol span**: the
+  existing symbol includes undecoded executable bytes beginning at 081A6C24
+  through the next function at 081A6DCC. No shortened-extent match or draft
+  credit is claimed. Boundary recovery is needed before resuming.
+
+All five production drafts retain NONMATCHING guards and useful local names.
+Formatted directly with `build/venv/bin/clang-format` (restoring the exact
+single-space alias syntax afterward), recorded final draft scores, and checked
+all default assembly fallbacks byte-identically. Follow-up per-unit commits
+repair the inherited fallback names and retain formatting. Commits use only
+`build/commit.sh`; no ROM/generated assembly is committed.
+
+Tool caveat: `depin.py --write` does not enable NONMATCHING, so for drafts with
+working assembly fallbacks it can report success and strip hints without
+checking the C. Its removals in 081A39E0/081A8F48 were immediately restored;
+the final C scores were verified again. Other drafts were skipped by depin
+because their inherited named fallback files were absent; those fallback
+identifiers are now fixed. Use unguarded scratch candidates for future depin
+experiments on drafts. Combined ROM validation remains the integrator's job.
