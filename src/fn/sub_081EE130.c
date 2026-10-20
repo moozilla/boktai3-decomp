@@ -1,9 +1,13 @@
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: action role inferred from movement and effect calls.
+// confidence=low: role inferred from state transitions and callees.
+#define SceneActors_UpdatePeriodicEffectAction sub_081EE130
 #ifdef NONMATCHING
-// fuzzy: 89.2%
+// fuzzy: 91.9%
 // Remaining differences: initialization allocation, random-mask order, and timing-expression loads.
 struct P {
     u8 pad0[0x2c0];
@@ -156,23 +160,31 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
     register s32 time asm("r10") = ticks;
     struct P *p = input;
     register u32 one asm("r9") = 1;
-    W(0x288) = RandomBits(one);
-    if ((*(u8 *)((u8 *)input + 0xb1))) {
-        struct ContactSwarmSprite *sprite;
-        (*(u8 *)((u8 *)input + 0xb1)) = 0;
-        sprite = &input->sprite;
-        (*(s32 *)((u8 *)input + 0x298)) = 0;
-        (*(s32 *)((u8 *)input + 0x290)) = 0;
-        *(s32 *)((u8 *)sprite + 0x3c) = one;
-        {
-            register struct DisplaySequenceState *state asm("r4") = &input->seq;
-            Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 1, 0, 0);
-            Step(sprite, state, one);
+    {
+        u32 sample = RandomBits(0xffff);
+        register s32 *dest asm("r1") = &W(0x288);
+        asm("" : "+r"(dest));
+        W(0x288) = sample & one;
+    }
+    {
+        u8 *entered = (u8 *)input + 0xb1;
+        if (*entered) {
+            struct ContactSwarmSprite *sprite;
+            *entered = 0;
+            sprite = &input->sprite;
+            (*(s32 *)((u8 *)input + 0x298)) = 0;
+            (*(s32 *)((u8 *)input + 0x290)) = 0;
+            *(s32 *)((u8 *)sprite + 0x3c) = one;
+            {
+                register struct DisplaySequenceState *state asm("r4") = &input->seq;
+                Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 1, 0, 0);
+                Step(sprite, state, one);
+            }
+            W(0x598) = 0;
+            W(0x398) = 0;
+            W(0x2b8) = 4;
+            W(0x2bc) = 120;
         }
-        W(0x598) = 0;
-        W(0x398) = 0;
-        W(0x2b8) = 4;
-        W(0x2bc) = 120;
     }
     SceneMover_ApproachScreenX(input, 40);
     {
@@ -228,7 +240,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                 SceneActors_EmitPeriodicParticles(input, time);
                 if (W(0x300)) {
                     B(0x2f0) &= ~4;
-                    B(0xaf) = 1;
+                    *((u8 *)input + 0xaf) = 1;
                 }
                 break;
         }
@@ -236,5 +248,5 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePeriodicEffectAction);
+INCLUDE_ASM("asm/nonmatching", sub_081EE130);
 #endif
