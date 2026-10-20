@@ -22,7 +22,7 @@ int GameState_IsConsumableSlotEquipped(int);
 void MessageWindow_SetDisplayMode(int);
 void MessageWindow_SetPalette(int);
 void Widget_CopyMasked(void *, void *, int);
-void sub_082216F8(void *, void *, void *, u32, int);
+void Vec16_Lerp(void *, void *, void *, u32, int);
 int Inventory_HasItem(int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 void ScrollingDialogue_RequestHide(void);
@@ -868,7 +868,7 @@ void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
             p->choiceTarget.x = 64;
         p->choiceTarget.y = 40;
     }
-    sub_082216F8(&dest->position, &source->position, &p->choiceTarget, p->frame, 3);
+    Vec16_Lerp(&dest->position, &source->position, &p->choiceTarget, p->frame, 3);
     if (p->frame > 7)
         SelectionMenu_AdvanceChoice(p);
     else

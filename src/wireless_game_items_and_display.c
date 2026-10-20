@@ -405,7 +405,7 @@ void WirelessGameItems_UpdateBlinkingItem(struct WirelessGameItems *p, struct Wi
 
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 
-void sub_082216F8(void *, void *, void *, int, int);
+void Vec16_Lerp(void *, void *, void *, int, int);
 
 // MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct WirelessGameItem *p,
@@ -441,7 +441,7 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
         }
         WirelessGameItem_SetRandomArcVelocity(p, 32, 15);
     }
-    sub_082216F8(&drawing->position.words.x, &p->start, &p->end, p->timer, 5);
+    Vec16_Lerp(&drawing->position.words.x, &p->start, &p->end, p->timer, 5);
     WirelessGameItems_ApplyMotionWave(&drawing->position.words.x, p->timer, p->arcVelocity);
     *(struct WirelessGamePair *)&sprite->x = *(struct WirelessGamePair *)&drawing->position.words.x;
     if (p->timer > 31) {
@@ -544,7 +544,7 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     p->drawing.flags &= ~1;
     {
         void *position = &drawing->position.words.x;
-        sub_082216F8(position, &p->start, &p->end, p->timer, 5);
+        Vec16_Lerp(position, &p->start, &p->end, p->timer, 5);
         WirelessGameItems_ApplyMotionWave(position, p->timer, p->arcVelocity);
     }
     {
@@ -633,7 +633,7 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
         }
         WirelessGameItem_SetRandomNegativeArcVelocity(p, 32, 15);
     }
-    sub_082216F8(&drawing->position.words.x, &p->start, &p->end, p->timer, 5);
+    Vec16_Lerp(&drawing->position.words.x, &p->start, &p->end, p->timer, 5);
     WirelessGameItems_ApplyMotionWave(&drawing->position.words.x, p->timer, p->arcVelocity);
     {
         u32 x = drawing->position.words.x;

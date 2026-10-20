@@ -16,7 +16,7 @@ extern Actor *gUnk_02000580;
 int ResultMenu_IsPhaseStart(void *);
 void sub_0801B700(void *);
 void PlayerCue_Stand(void *, int);
-void sub_082216F8(void *, void *, void *, u32, int);
+void Vec16_Lerp(void *, void *, void *, u32, int);
 void OrbitingParticles_Create(void *, int, int, int, int);
 void Sound_PlaySong(int);
 void sub_08017044(int, int, int, int, void *, void *, int, void *);
@@ -39,7 +39,7 @@ void Transformation_Reveal(u8 *p)
         PlayerCue_Stand(actor, 4);
     }
     if (*(u32 *)(p + 0x3c) <= 32)
-        sub_082216F8(p + 0x18, p + 0x28, p + 0x30, *(u32 *)(p + 0x3c), 5);
+        Vec16_Lerp(p + 0x18, p + 0x28, p + 0x30, *(u32 *)(p + 0x3c), 5);
     if (*(u32 *)(p + 0x3c) == 30) {
         orbit = actor->position;
         OrbitingParticles_Create(&orbit, 64, 60, 8, 0);
