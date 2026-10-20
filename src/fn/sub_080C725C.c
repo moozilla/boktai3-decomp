@@ -5,7 +5,7 @@
 // confidence=low: neighboring Golem controls establish the state role.
 // confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
-// fuzzy: 89.1%
+// fuzzy: 91.3%
 // Push along the stored heading, emit dust, and resolve an impact into completion or defeat.
 // Remaining mismatch: motion-pointer copies, RNG allocation and completion/control-reset offsets.
 #include "scene_object.h"
@@ -137,5 +137,5 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateSlideImpact);
+INCLUDE_ASM("asm/nonmatching", sub_080C725C);
 #endif
