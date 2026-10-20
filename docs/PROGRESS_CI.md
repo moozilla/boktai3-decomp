@@ -151,8 +151,12 @@ of functions or of the whole ROM. Data/asset reconstruction is not measured.
 ### Area categories
 
 `symbols/progress_areas.csv` adds unit-level objdiff categories on top of the
-two register categories: **Intentional assembly (boot)** (`intentional_asm`,
-`08000000-0800145C`: header, reset vector and IWRAM helpers that stay assembly),
+two register categories: **Intentional assembly** (`intentional_asm`,
+`08000000-0800145C`: header, reset vector and IWRAM helpers that stay assembly, plus the
+library ranges in `symbols/progress_asm.csv`: SDK/GCC handwritten assembly such as the
+m4a_1.s mixer block, RFU callback trampolines, BIOS wrappers and libgcc division, whose
+unmatched functions move to `libraries/<name> (assembly)` units and leave the Libraries
+category),
 **Monsters and bosses** (`monsters`: the Ghoul through Wooden crate block by
 address range plus boss/enemy families by unit-name regex), **Libraries**, and
 **Decompilable code** (everything except the intentional assembly). Rows give an

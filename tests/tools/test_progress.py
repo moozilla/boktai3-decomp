@@ -159,9 +159,6 @@ class ProgressTests(unittest.TestCase):
             self.assertEqual(progress.inventory_addresses(assembly, extras), [0x08000100, 0x08000104])
 
 
-if __name__ == '__main__':
-    unittest.main()
-
 
 class AreaCategoryTest(unittest.TestCase):
     def test_areas_add_categories_without_changing_totals(self):
@@ -173,3 +170,24 @@ class AreaCategoryTest(unittest.TestCase):
         self.assertEqual(cats["monsters"]["matched_code"], "4")
         self.assertEqual(cats["decompilable"]["total_code"], "4")
         self.assertEqual(report["measures"]["total_code"], "8")
+
+    def test_library_assembly_ranges_leave_libraries_category(self):
+        funcs = [("a", 0x08100104), ("b", 0x08100108), ("c", 0x0810010C)]
+        sizes = {"a": 4, "b": 4, "c": 4}
+        libs = [{"name": "SDK", "start": 0x08100104, "end": 0x08100110, "names": {}, "prefix": "libraries"}]
+        areas = progress.load_areas()
+        report = progress.make_report(funcs, sizes, {"a"}, libs, areas=areas,
+                                      asm_ranges=[(0x08100108, 0x08100110)])
+        cats = {c["id"]: c["measures"] for c in report["categories"]}
+        self.assertEqual(cats["libraries"]["total_code"], "4")
+        self.assertEqual(cats["intentional_asm"]["total_code"], "8")
+        self.assertEqual(cats["decompilable"]["total_code"], "4")
+        self.assertEqual(report["measures"]["total_code"], "12")
+        self.assertIn("libraries/SDK (assembly)", [u["name"] for u in report["units"]])
+
+    def test_asm_ranges_load(self):
+        self.assertTrue(progress.load_asm_ranges())
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,4 +1,4 @@
 id,name,start,end,name_regex,evidence
-intentional_asm,Intentional assembly (boot),08000000,0800145C,,GBA header/reset vector and IWRAM ARM helpers stay assembly; see docs/PROGRESS_CI.md
+intentional_asm,Intentional assembly,08000000,0800145C,,GBA header/reset vector and IWRAM ARM helpers stay assembly; library assembly ranges are in symbols/progress_asm.csv; see docs/PROGRESS_CI.md
 monsters,Monsters and bosses,08085D58,0810067C,,Contiguous enemy block Ghoul through Wooden crate (units by ROM order)
 monsters,Monsters and bosses,,,^(Nidhoggr|Boss slot2|Hresvelgr|Vanargand|Ratatosk|Enemy |Dragon puppy|Poison hand|Orange spine|Vulcan cannon|Fan cannon|Cannon battery|Growth hazard|Sun orb)\b,Boss and enemy families named by tools/families.py
