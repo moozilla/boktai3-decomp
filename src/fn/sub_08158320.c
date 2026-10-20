@@ -3,7 +3,7 @@
 #include "player.h"
 // confidence=low: varying height offset suggests hovering during interaction.
 void Player_ClampInteractionVelocity(struct Player *);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void sub_0802E04C(void *);
 u32 Player_GetControlFlags(struct Player *, u16);
 void Collider_SetPosition(void *, void *, u32);
@@ -28,7 +28,7 @@ static inline s32 hoverTarget(void)
 void Player_UpdateInteractionHoverDisplay(struct Player *p)
 {
     Player_ClampInteractionVelocity(p);
-    sub_08225B74(&p->positionalEffectGroup);
+    Obj_StepPosition(&p->positionalEffectGroup);
     sub_0802E04C(&p->positionalEffectGroup);
     if (p->tetherMode <= 1) {
         u8 *timer = (u8 *)p + 0x468;

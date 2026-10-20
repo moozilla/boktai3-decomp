@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08224524(void);
+void Rfu_ReqCallback(void);
 void RfuManager_ApplyRequestResult(void);
 void rfu_setMSCCallback(void *);
 void rfu_setREQCallback(void *);
@@ -18,7 +18,7 @@ u32 RfuManager_Init(u32 a, u32 b)
         p[6] = 0xff;
         *(u32 *)(p + 0x40) = a;
         *(u32 *)(p + 0x44) = b;
-        rfu_setMSCCallback(sub_08224524);
+        rfu_setMSCCallback(Rfu_ReqCallback);
         rfu_setREQCallback(RfuManager_ApplyRequestResult);
         r = 0;
     } else {

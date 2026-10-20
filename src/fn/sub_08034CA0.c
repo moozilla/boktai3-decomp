@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_082236C8(int, int, int, const u8 *);
+int RfuManager_StartConnect(int, int, int, const u8 *);
 extern const u8 gUnk_0824DE60[];
 int Wireless_StartParentSearch(struct Engine *p)
 {
@@ -51,7 +51,7 @@ int Wireless_StartParentSearch(struct Engine *p)
         p->pending = 0;
         p->allowed = 0;
     }
-    raw = sub_082236C8(0, 0, 600, gUnk_0824DE60);
+    raw = RfuManager_StartConnect(0, 0, 600, gUnk_0824DE60);
     {
         int narrowed = raw;
         status = (u8)narrowed;
