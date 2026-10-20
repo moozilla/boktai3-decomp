@@ -4,7 +4,7 @@
 struct ActorPosition {
     s16 x, y, z, pad;
 };
-struct ActorSprite {
+struct ScreamerSprite {
     u32 flags;
     u8 unknown4[0xc];
     u16 frame;
@@ -16,7 +16,7 @@ struct ScreamerState {
     u8 unknown0[24];
     u32 age;
     struct ActorPosition initialPosition;
-    struct ActorSprite sprite;
+    struct ScreamerSprite sprite;
     u8 graphics[0x1c];
     u8 attackCollider[0x54];
     u8 bodyCollider[6];
@@ -70,9 +70,12 @@ struct ScreamerState {
 #define SCREAMER_DURATION "r3"
 #define SCREAMER_WEIGHT   "r1"
 #endif
+#ifndef SCREAMER_TEMP
+#define SCREAMER_TEMP "r1"
+#endif
 static inline u32 Screamer_StepAnimation(struct ScreamerState *owner)
 {
-    struct ActorSprite *sprite = &owner->sprite;
+    struct ScreamerSprite *sprite = &owner->sprite;
     struct DisplaySequenceState *state = &owner->sequence;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
@@ -114,7 +117,7 @@ static inline u32 Screamer_StepAnimation(struct ScreamerState *owner)
     {
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm(SCREAMER_MASK);
-        register u32 temp asm("r1");
+        register u32 temp asm(SCREAMER_TEMP);
         register u32 savedDuration asm(SCREAMER_DURATION);
         state->elapsed = elapsed;
         temp = 0xFFFF;
