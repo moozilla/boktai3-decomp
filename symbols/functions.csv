@@ -9155,11 +9155,16 @@ addr,name,mode,confidence,source,notes
 0823D714,Player_SaveActionIndex,thumb,low,src-alias,
 0823D7D4,Player_GetConfiguredActionPower,thumb,low,src-alias,Forwards to the action-type-dependent calculation using fields 0x420 and 0xBF8; power interpretation tentative
 0823D7E0,Player_CollectCallbackFlags,thumb,low,src-alias,
+0823D810,Player_ApplyContactCosts,thumb,low,src-alias,
+0823D8AC,Player_StartContactAttack,thumb,low,src-alias,
+0823D97C,Player_EmitSweepSpark,thumb,low,src-alias,
 0823DAB4,Player_UpdateSweepAction,thumb,low,src-alias,
 0823DC40,Player_UpdateThrowAction,thumb,low,src-alias,
 0823DDE4,SceneVec_OffsetPolar,thumb,low,src-alias,
 0823DE44,Player_GetTerrainHeightAtPosition,thumb,low,src-alias,Decodes a terrain height nibble and subtracts the local X or Z component for slopes
+0823DE6C,Terrain_ClassifyOffsetHeight,thumb,low,src-alias,
 0823DF20,Player_BeginSlashAction,thumb,low,src-alias,
+0823E124,Player_EmitRandomSpark,thumb,low,src-alias,
 0823E250,Player_UpdateSpinAction,thumb,low,src-alias,
 0823E494,Player_UpdateSlashAction,thumb,low,src-alias,
 0823E810,Player_EmitScatterEffect,thumb,low,src-alias,
