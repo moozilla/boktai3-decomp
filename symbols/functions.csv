@@ -5878,6 +5878,8 @@ addr,name,mode,confidence,source,notes
 08183A88,ActorController_UpdatePaletteAnimationTransition,thumb,low,src-alias,
 08183B54,ActorController_UpdateLayeredAnimationTransition,thumb,low,src-alias,
 08183C3C,DirectionalActor_UpdateSequence,thumb,low,src-alias,
+08183CAC,ActorController_UpdateLayeredMid,thumb,low,src-alias,
+08183D9C,ActorController_UpdateLayeredEnd,thumb,low,src-alias,
 08183E4C,ArmorActor_UpdateFixedSpeedMotion,thumb,low,src-alias,
 081842B0,Armor_UpdateDefeatSequence,thumb,low,src-alias,
 08184430,ActorController_UpdateBreakApartTransition,thumb,low,src-alias,
@@ -6613,6 +6615,7 @@ addr,name,mode,confidence,source,notes
 081B8518,SceneScriptTask_Update,thumb,low,src-alias,
 081B854C,DungeonProp_Destroy,thumb,low,src-alias,Task destruction callback removes the sprite and collider plus type-12 auxiliary resources
 081B8578,SceneScriptObject_ApplyHitFlash,thumb,low,src-alias,
+081B85E0,SceneScriptObject_InitHitCollider,thumb,low,src-alias,
 081B897C,DungeonProp_CreateFromScript,thumb,low,src-alias,Creates a task initialized from script parameters for the dungeon prop sprite family
 081B8CB0,OrbitMotion_UpdateAngle,thumb,low,src-alias,
 081B8E44,OrbitMotion_UpdateCrossedSines,thumb,low,src-alias,
@@ -8380,6 +8383,7 @@ addr,name,mode,confidence,source,notes
 0821E8C8,SceneActorRoute_IsOutsidePointBounds,thumb,low,src-alias,
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
+0821F1C4,PairTable_Lookup,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,

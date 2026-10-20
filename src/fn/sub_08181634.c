@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.4% (only the order of the initial register moves differs)
 // MATCHING_CONCESSION: register-pinning
-#define ArmorPalette_CopyKindBanks sub_08181634
 void Palette_CopyBank(void *, void *);
 void ArmorPalette_CopyKindBanks(u8 *s0, u8 *dst, u32 i, u32 j)
 {
@@ -20,5 +19,5 @@ void ArmorPalette_CopyKindBanks(u8 *s0, u8 *dst, u32 i, u32 j)
     Palette_CopyBank(s + (s[0x48B] * 32 + 8), d);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08181634);
+INCLUDE_ASM("asm/nonmatching", ArmorPalette_CopyKindBanks);
 #endif
