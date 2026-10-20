@@ -1,4 +1,3 @@
-#define ScreenPalette_ProjectPosition sub_081A64C8
 #include "global.h"
 struct Vec3s {
     s16 x, y, z;

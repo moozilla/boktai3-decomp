@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#define gActorLayeredMidRestoreAnimations                gUnk_0824EE20
-#define ActorController_UpdateLayeredMidWithRestoreDelay sub_081840F0
+#define gActorLayeredMidRestoreAnimations gUnk_0824EE20
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 94.7% (movs r2,#0 is scheduled after the p+0xc4 address; orrs operand order on the 0x190 flag)
@@ -49,5 +48,5 @@ void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081840F0);
+INCLUDE_ASM("asm/nonmatching", ActorController_UpdateLayeredMidWithRestoreDelay);
 #endif

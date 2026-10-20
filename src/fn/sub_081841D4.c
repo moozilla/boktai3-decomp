@@ -1,6 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
-#define gActorBounceAnimations               gUnk_0824EE30
-#define ActorController_UpdateBounceParticle sub_081841D4
+#define gActorBounceAnimations gUnk_0824EE30
 #include "global.h"
 struct ActorAnimationLayer {
     u16 unknown[3];
