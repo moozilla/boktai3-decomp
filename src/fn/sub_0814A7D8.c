@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_CalculateTotalAttackPower sub_0814A7D8
 
 struct P0814A7D8 {
     u8 f0[0x424];
