@@ -1,168 +1,205 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.8%
-// Remaining differences: pointer allocation, polar-vector temporaries and instruction order.
-#define Ratatosk_UpdateProjectileVolley sub_081F4378
-struct Actor {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x56];
-    u8 facing, facing8;
-    u8 padAA[5];
-    u8 finished, padB0, changed;
-    u8 padB2[0x1a];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    void *callback;
-    u8 pad108[0x74];
-    u32 volleyState;
-    u8 pad180[0x1ac];
-    u8 animation[0x20];
-    u8 animationData[0x20];
-    s16 x, y, z, pad372;
-    u8 pad374[0xb00];
-    s16 cooldown;
-};
+// fuzzy: 91.7%
+// Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
 };
+struct PackedVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
+struct Actor {
+    u8 pad0[0x51];
+    u8 angle;
+    u8 pad52[2];
+    struct Vec position, velocity;
+    u8 pad64[0x2c];
+    u32 timer;
+    s16 health;
+    u8 pad96[6];
+    u32 flags;
+    u8 padA0[2];
+    u8 mode, padA3;
+    u32 modeTime;
+    u8 facing, facing8, padAA, animationId, state, nextState, active, finished, padB0, changed,
+        padB2, locked;
+    u8 padB4[0x18];
+    u8 requestedAngle;
+    u8 padCD[0x33];
+    void (*update)(void);
+    void *callback;
+    u8 pad108[0xc];
+    s8 savedAngle;
+    u8 pad115[0x67];
+    u32 phase;
+    u8 pad180[0x1ac];
+    u8 animation[0x20];
+    u8 animationData[0x20];
+    struct Vec anchor;
+    u8 pad374[0x58];
+    struct Vec home;
+    u8 pad3D4[0xa78];
+    s16 selectedPoint, selectedTarget;
+    u16 padE50;
+    u16 scaleX, scaleZ, padE56, scaleStep;
+    u8 padE5A[0x14];
+    u16 motion;
+    u8 motionFlag, padE71, targetAngle, phaseTimer;
+    s16 hitTimer, terrainTimer;
+};
+#define H(o) (*(s16 *)((u8 *)p2 + (o)))
+#define U(o) (*(u16 *)((u8 *)p2 + (o)))
+#define B(o) (*(u8 *)((u8 *)p2 + (o)))
+#define W(o) (*(u32 *)((u8 *)p2 + (o)))
+extern u32 gUnk_03005304;
+extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
+void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
+void SceneActors_StartAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-struct Vec *Player_GetEffectivePosition(int);
+void Sound_StopSong(u32);
+u8 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
-void Projectile_InitParameters(void *);
-void Projectile_SetLaunchParameters(void *, int, int, int, int);
-void Projectile_SetSpriteParameters(void *, int, int, int);
-void Projectile_SetScriptProcedure(void *, int, int);
-void Projectile_SetCollisionParameters(void *, int, int, int, int, int);
-void Projectile_SetBehaviorMode(void *, int);
-void sub_081FD01C(void *, void *);
-s32 SceneProjectile_ConsumeHitEvent(void);
-void Callback_InvokeActor(void *, void *);
-static inline void facing(struct Actor *p, int angle)
+static inline u32 randomA(void)
+{
+    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    return gUnk_086141BC[gUnk_03005304];
+}
+static inline void facing(struct Actor *p, s32 angle)
 {
     u32 v;
-    int shifted;
+    s32 shift;
     p->angle = angle;
-    shifted = (p->angle + 0x60) >> 6;
+    shift = (p->angle + 0x60) >> 6;
     v = 3;
-    v &= shifted;
+    v &= shift;
     p->facing = v;
-    shifted = (p->angle + 0x70) >> 5;
+    shift = (p->angle + 0x70) >> 5;
     v = 7;
-    v &= shifted;
+    v &= shift;
     p->facing8 = v;
 }
-static inline int trunc12(int v)
+static inline s32 trunc12(s32 v)
 {
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
+    return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, u32 angle, int speed)
+static inline void polar(struct Vec *v, s32 angle, s32 radius)
 {
-    v->x = trunc12(speed * gUnk_086149C4[(angle + 64) & 255]);
-    v->y = 0;
-    v->z = trunc12(speed * gUnk_086149C4[angle]);
+    s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    s32 zero = 0;
+    v->x = x;
+    v->y = zero;
+    v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-// MATCHING_CONCESSION: register-pinning
-static inline void sum(struct Vec *a, struct Vec *b, struct Vec *c)
+static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
-    a->x = b->x + c->x;
-    a->y = b->y + c->y;
-    a->z = b->z + c->z;
+    d->x = a->x + b->x;
+    d->y = a->y + b->y;
+    d->z = a->z + b->z;
 }
-void Ratatosk_UpdateProjectileVolley(struct Actor *input, s32 frame)
+void Ratatosk_InitAnimatedParticleParams(void *);
+void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
+void sub_081FC26C(void *, struct Vec *);
+// confidence=low: staged attack animation culminates in a three-projectile volley.
+struct Vec *Player_GetEffectivePosition(s32);
+void Projectile_InitParameters(void *);
+void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
+void Projectile_SetSpriteParameters(void *, u32, u32, u32);
+void Projectile_SetScriptProcedure(void *, u32, u16);
+void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
+void Projectile_SetBehaviorMode(void *, u16);
+void Projectile_SpawnAtPosition(void *, struct Vec *);
+s32 SceneProjectile_ConsumeHitEvent(void);
+void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
-    struct Actor *p = input;
-    struct Actor *q = p;
-    u32 params[22];
-    struct Vec offset, position;
+    u8 params[0x58];
+    struct Vec delta, spawn;
+    struct Actor *p2 = p;
     if (p->changed) {
-        p->changed = 0;
+        u32 zero = 0;
+        p->changed = zero;
         facing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 17, 1, 4, 4);
-        p->volleyState = 0;
+        p->phase = zero;
     }
-    switch (p->volleyState) {
+    switch (p->phase) {
         case 0:
-            if (frame > 9) {
-                SceneActors_StartDirectionalAnimation(p, q->animationData, q->animation, 18, 1, 4,
+            if (tick > 9) {
+                SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 18, 1, 4,
                                                       4);
-                goto advance;
+                p2->phase++;
             }
             break;
         case 1:
-            if (frame > 33) {
-                SceneActors_StartDirectionalAnimation(p, q->animationData, q->animation, 19, 1, 4,
+            if (tick > 33) {
+                SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 19, 1, 4,
                                                       4);
-                goto advance;
+                p2->phase++;
             }
             break;
         case 2:
-            if (frame > 36) {
-                SceneActors_StartDirectionalAnimation(p, q->animationData, q->animation, 20, 1, 4,
+            if (tick > 36) {
+                SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 20, 1, 4,
                                                       4);
-                goto advance;
+                p2->phase++;
             }
             break;
         case 3:
-            if (frame > 42) {
+            if (tick > 42) {
                 struct Vec *target = Player_GetEffectivePosition(0);
-                struct Vec *origin = (struct Vec *)&q->x;
-                u32 angle = (u8)Math_Atan2(target->x - origin->x, target->z - origin->z);
-                u32 base = (u8)((p->facing << 6) - 64);
-                s32 delta = base - angle;
-                int i;
-                if (delta > 128)
-                    delta = 255 - delta;
-                else if (delta < -128)
-                    delta += 255;
-                if (delta > 32)
-                    angle = (u8)(base - 32);
-                else if (delta < -32)
-                    angle = base | 32;
-                polar(&offset, (u8)((p->facing << 6) - 64), 180);
-                sum(&position, &offset, (struct Vec *)&q->x);
-                {
-                    struct Vec *v = &position;
-                    v->y += 200;
+                struct Vec *anchor = &p2->anchor;
+                u8 angle = Math_Atan2(target->x - anchor->x, target->z - anchor->z);
+                u8 facingAngle = (p->facing << 6) - 64;
+                s32 difference = facingAngle - angle;
+                s32 i;
+                if (difference > 128)
+                    difference = 255 - difference;
+                else if (difference < -128)
+                    difference += 255;
+                if (difference > 32)
+                    angle = facingAngle - 32;
+                else if (difference < -32) {
+                    angle = 32;
+                    angle |= facingAngle;
                 }
-                angle = (u8)(angle - 16);
+                polar(&delta, (u8)((p->facing << 6) - 64), 180);
+                sum(&spawn, &delta, &p2->anchor);
+                spawn.y += 200;
+                angle -= 16;
                 Sound_PlaySong(0x568);
                 {
-                    register struct Vec *spawn asm("r8") = &position;
-                    for (i = 2; i >= 0; i--) {
+                    struct Vec *spawnPtr = &spawn;
+                    i = 2;
+                    do {
                         Projectile_InitParameters(params);
                         Projectile_SetLaunchParameters(params, 0, 150, angle, 24);
                         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 498);
                         Projectile_SetScriptProcedure(params, 0x4363, 0);
                         Projectile_SetCollisionParameters(params, 0, 0, 30, 15, 30);
                         Projectile_SetBehaviorMode(params, 1);
-                        sub_081FD01C(params, spawn);
-                        angle = (u8)(angle + 16);
-                    }
+                        Projectile_SpawnAtPosition(params, spawnPtr);
+                        angle += 16;
+                    } while (--i >= 0);
                 }
-            advance:
-                q->volleyState++;
+                p2->phase++;
             }
             break;
         case 4:
-            if (SceneProjectile_ConsumeHitEvent() && q->cooldown == 0) {
-                q->cooldown = 120;
+            if (SceneProjectile_ConsumeHitEvent() && p2->hitTimer == 0) {
+                p2->hitTimer = 120;
                 p->finished = 1;
             }
             break;
     }
-    if (frame > 119) {
-        q->volleyState = 0;
+    if (tick > 119) {
+        p2->phase = 0;
         p->finished = 1;
     }
     Callback_InvokeActor(p, p->callback);
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F4378);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateProjectileVolley);
 #endif

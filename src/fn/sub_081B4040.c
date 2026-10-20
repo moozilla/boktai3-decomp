@@ -3,11 +3,8 @@
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "scene_vec.h"
-// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
-#define Vanargand_EmitRadialPartEffects sub_081B4040
-
 #ifdef NONMATCHING
-// fuzzy: 80.1%
+// fuzzy: 81.0%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -185,7 +182,7 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
         u32 fill;
         u32 *state, *timer;
         u8 *enter;
-        s32 i, phase;
+        s32 i;
         p->reset = 0;
         Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 10, (u8)p->variant, 0);
         fill = 0;
@@ -193,12 +190,10 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
         state = &p->state;
         timer = &p->timer;
         enter = &p->enter;
-        phase = 0;
         for (i = 0; i < 6; i++) {
-            Vector(&point, phase / 6);
+            Vector(&point, i * 255 / 6);
             Add(&point, (struct SceneVec *)((u8 *)p + 0x1c), &point);
             VanargandEffect_Create(3, i * 2, &point, &zero, p->variant);
-            phase += 255;
         }
         *state = 0;
         *timer = 0;
@@ -233,5 +228,5 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B4040);
+INCLUDE_ASM("asm/nonmatching", Vanargand_EmitRadialPartEffects);
 #endif
