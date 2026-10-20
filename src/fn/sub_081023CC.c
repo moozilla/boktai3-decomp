@@ -8,7 +8,8 @@ s32 TetherActor_TestStatusFlags(u32);
 void TetherActor_CopyPosition(struct SceneVec *);
 void TetherActor_SetPosition(struct SceneVec *);
 u8 NamedObject_IsMapCellOccupied(s32);
-static inline void Difference(struct SceneVec *d, const struct SceneVec *b, const struct SceneVec *a)
+static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
+                              const struct SceneVec *a)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;

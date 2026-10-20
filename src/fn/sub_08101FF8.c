@@ -8,7 +8,8 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 s32 Player_TestAttachmentFlags(struct Player *, u32);
 u8 NamedObject_IsMapCellOccupied(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline void Difference(struct SceneVec *d, const struct SceneVec *b, const struct SceneVec *a)
+static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
+                              const struct SceneVec *a)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;
