@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneNpc_TurnTowardAngle sub_081D1BA8
-
 struct Npc081D1BA8 {
     u8 pad0[7];
     u8 done, changed, entered;

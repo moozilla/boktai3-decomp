@@ -2,8 +2,6 @@
 #include "engine.h"
 #include "script_reference.h"
 
-#define Script_TeleportToCell sub_08227C2C
-
 struct Pos08227C2C {
     u32 x : 16;
     u32 y : 16;

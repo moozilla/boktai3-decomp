@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 92.5%
 // Open: the original reloads the 0xA3C slot-mask offset into a fresh register for the loop pointer.
-#define SlotPool_UpdateActiveSlots sub_080FFF78
 extern void *gUnk_0860649C[];
 struct PoolSlot {
     u8 unknown0[0xC4];
@@ -43,5 +42,5 @@ s32 SlotPool_UpdateActiveSlots(struct SlotPool *pool)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FFF78);
+INCLUDE_ASM("asm/nonmatching", SlotPool_UpdateActiveSlots);
 #endif

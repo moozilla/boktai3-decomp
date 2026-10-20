@@ -4,7 +4,7 @@ struct SceneActorMotionParent {
     u8 unknown0[0x6F2];
     u16 flags;
 };
-void sub_080D64E0(void *);
+void Mummy_EnterIdleControl(void *);
 void SceneActorControl_OnIdle(void);
 static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
 {
@@ -51,7 +51,7 @@ void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
             if (*motionFlags & mask)
                 return;
         }
-        sub_080D64E0(actor);
+        Mummy_EnterIdleControl(actor);
     } else {
         u32 one = 1;
         actor->state2A8 = 0;

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Inventory_RemoveAssignedSlot sub_0822DD80
-
 struct Inv0822DD80 {
     u8 pad0[0x50];
     s16 cursor;

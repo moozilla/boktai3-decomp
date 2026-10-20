@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define Mummy_EnterIdleControl sub_080D64E0
 void SceneActorControl_OnIdle(void);
 struct MummyContext {
     u8 unknown0[0x6D8];

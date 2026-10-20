@@ -15,7 +15,7 @@ extern s16 gUnk_03005418[];
 void Camera_DispatchCommands(struct Camera *);
 void sub_08226CF8(struct Camera *);
 void Camera_UpdatePositionMode(struct Camera *);
-void sub_0822725C(struct Camera *);
+void Camera_UpdateShake(struct Camera *);
 void Camera_ApplyPositionBounds(struct Camera *, s16 *);
 
 static inline s32 Scale(s32 v)
@@ -45,7 +45,7 @@ u32 Camera_Update(struct Camera *c)
         } else {
             Camera_UpdatePositionMode(c);
         }
-        sub_0822725C(c);
+        Camera_UpdateShake(c);
         Camera_ApplyPositionBounds(c, gUnk_030042A0);
     }
     out = gUnk_03005418;

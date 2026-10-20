@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Camera_UpdateShake sub_0822725C
-
 struct Camera0822725C {
     u8 pad0[0x7e];
     u16 amp;

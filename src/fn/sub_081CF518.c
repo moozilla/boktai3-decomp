@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneNpc_UpdateBlinkWithCallback sub_081CF518
-
 struct Npc081CF518 {
     u8 pad0[7];
     u8 done, changed, entered;

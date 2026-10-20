@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-#define Golem_UpdateSettle sub_080CECA4
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void Golem_UpdateRouteMotion(void);
 void Golem_UpdateRecoil(void);
