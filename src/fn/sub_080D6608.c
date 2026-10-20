@@ -217,5 +217,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
+INCLUDE_ASM("asm/nonmatching", sub_080D6608);
 #endif
