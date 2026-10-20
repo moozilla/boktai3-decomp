@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 0%
+// fuzzy: 85.2%
 // Remaining differences: sequence setup, field-access order, and register allocation.
 #include "global.h"
 #include "scene_actor_reset.h"
