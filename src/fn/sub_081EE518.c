@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 90.5%
 // Remaining differences: register allocation and address-expression lifetimes.
-// fuzzy: 0%
+// MATCHING_CONCESSION: register-pinning
 struct Frames {
     u16 *data;
     u8 flags, count, multiplier, duration;
@@ -40,9 +40,10 @@ static inline void step(struct Frames *f, struct Render *r)
     r->tile = *word >> 6;
     {
         int settings = f->flags;
-        int mask = 1;
-        int mine;
+        register int mask asm("r3") = 1;
+        register int mine asm("r1");
         int bits;
+        asm("" : "+r"(mask));
         mine = mask & settings;
         bits = (*word & 48) >> 4;
         bits &= mask;
@@ -53,10 +54,12 @@ static inline void step(struct Frames *f, struct Render *r)
     }
     {
         int settings = f->flags;
-        int mask = 2;
-        int mine;
+        register int mask asm("r3") = 2;
+        register int mine asm("r1");
         int bits;
+        asm("" : "+r"(mask));
         mine = mask & settings;
+        asm("" : "+r"(mine));
         mine = (u8)mine;
         bits = (*word & 48) >> 4;
         bits &= mask;
@@ -66,18 +69,20 @@ static inline void step(struct Frames *f, struct Render *r)
             r->flags &= ~8;
     }
     {
-        u32 mask;
+        register u32 mask asm("r5");
         int duration;
-        int savedDuration;
+        register int savedDuration asm("r3");
         u32 timer = f->timer + 1;
         f->timer = timer;
         {
-            u32 initialMask = 65535;
+            register u32 initialMask asm("r1") = 65535;
+            asm("" : "+r"(initialMask));
             mask = initialMask;
         }
         duration = f->duration;
         timer = (u16)timer;
         savedDuration = duration;
+        asm("" : "+r"(savedDuration));
         if (timer >= (u32)duration) {
             int flags;
             int index;
@@ -102,6 +107,7 @@ static inline void step(struct Frames *f, struct Render *r)
                 if ((index & mask) < count)
                     goto update;
                 index = (u8)(flags & 8);
+                asm("" : "+r"(flags));
                 if (index) {
                     f->timer = duration;
                     index = count - 1;
@@ -128,10 +134,11 @@ static inline void step(struct Frames *f, struct Render *r)
 #define SceneActors_UpdateSequenceTwoAction sub_081EE518
 void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
 {
-    void *p = arg;
-    int tick = time;
-    void *base = p;
+    register void *p asm("r8") = arg;
+    register int tick asm("sb") = time;
+    register void *base asm("r7") = p;
     u8 *enter;
+    asm("" : "+r"(p), "+r"(tick), "+r"(base));
     enter = (u8 *)p + 0xb1;
     if (*enter) {
         struct Frames *f;
