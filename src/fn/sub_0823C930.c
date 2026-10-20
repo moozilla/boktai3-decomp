@@ -8,7 +8,7 @@
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Player_SetTetherMode(void *, s32, s32);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(void *, s32, s32);
+s32 Player_SetAnimationIndex(void *, s32, s32);
 void Player_PlayLocalSong(s32, u32);
 s32 Player_IsFlaggedWithGlobalModifier08(u32);
 void Player_EmitPositionEffect(void *, void *, u32, u32, void *, u32, u32);
@@ -92,7 +92,7 @@ void Player_UpdateTerrainSidestep(u8 *p)
                     B(0x3A3) = 0;
                 }
             }
-            if (sub_08238280(p, anim, 0x40))
+            if (Player_SetAnimationIndex(p, anim, 0x40))
                 Player_SetTetherMode(p, 4, 1);
             break;
         case 1:
@@ -125,13 +125,13 @@ void Player_UpdateTerrainSidestep(u8 *p)
                     }
                 }
             }
-            sub_08238280(p, anim, 0x40);
+            Player_SetAnimationIndex(p, anim, 0x40);
             if (H(0x3A0) == 24 && H(0xA0) == 0 && H(0x98) == 1)
                 Player_PlayLocalSong(W(0x18), 0xDB);
             break;
         case 2:
             W(0x20) |= 8;
-            if (sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 5), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 5), 0x40)) {
                 effect = *(struct PackedVec *)(p + 0x30);
                 if (B(0x4A5) == 1) {
                     effect.x += 28;

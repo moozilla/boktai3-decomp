@@ -2,7 +2,7 @@
 #include "player.h"
 
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_SaveActionIndex(struct Player *);
 s32 Player_UpdateFacingFromInputHistory(struct Player *);
@@ -16,13 +16,13 @@ void Player_UpdateSlashAction(struct Player *p)
     switch (p->tetherPhase) {
         case 0:
             Player_SaveActionIndex(p);
-            if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x18), speed))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x18), speed))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
             Player_SaveActionIndex(p);
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x19), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x19), 0x40);
             if (p->tetherFrame > 6 && !(p->inputKeys[0] & 2)) {
                 Player_BeginSlashAction(p);
                 Player_SetTetherMode(p, 3, 4);
@@ -34,8 +34,8 @@ void Player_UpdateSlashAction(struct Player *p)
             u16 *kind;
             p->cameraInputProcessed = 0;
             mode = &p->actionMode;
-            sub_08238280(p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))),
-                         speed);
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))), speed);
             if (*mode == 1) {
                 if (*kind == 0x1C) {
                     if (p->actionCueFlags == 1 && p->actionCueCounter == 0)
@@ -56,7 +56,7 @@ void Player_UpdateSlashAction(struct Player *p)
             p->cameraInputProcessed = 0;
             if (p->inputKeys[1] & 2)
                 *((u8 *)p + 0xBF6) = 1;
-            if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x18), speed))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x18), speed))
                 Player_SetTetherMode(p, 3, 6);
             break;
         case 6: {
@@ -70,7 +70,8 @@ void Player_UpdateSlashAction(struct Player *p)
             if (zero) {
                 *flag = 0;
                 p->tetherPhase = 0;
-            } else if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x19), speed)) {
+            } else if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x19),
+                                                speed)) {
                 *flag = zero;
                 Player_SetTetherMode(p, 0, 0);
             }

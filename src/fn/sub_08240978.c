@@ -20,7 +20,7 @@ static inline s32 Truncate12(s32 v)
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsFlaggedWithGlobalModifier10(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
@@ -55,7 +55,7 @@ void Player_UpdateFlinch(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0:
-            sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x29), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x29), 0x40);
             if (++p->tetherFrame > 3) {
                 Player_SetTetherMode(p, 0x20, 1);
                 p->terrainRecoveryCounter = 300;
@@ -66,7 +66,7 @@ void Player_UpdateFlinch(struct Player *p)
             struct StackPoint pos;
             s32 x, z;
             u32 cell;
-            sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2B), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2B), 0x40);
             a = ((p->facing + 5) & 7) << 5;
             p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
             p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
@@ -116,7 +116,8 @@ void Player_UpdateFlinch(struct Player *p)
                 p->velocityX = 0;
                 p->velocityZ = 0;
             }
-            if (sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2C), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2C),
+                                         0x40)) {
                 p->directionFrame = 0;
                 Player_SetTetherMode(p, 0x20, 3);
             }
