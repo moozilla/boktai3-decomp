@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.5%
-// foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
+// fuzzy: 98.3%
+// 98.3%: only the order of the `count` copy (adds r2, r0, #0) and the dst load differ
 #define Background_LoadScriptTileList TilemapPanel_LoadScriptTileList
 struct Background {
     u8 pad0[0x2c];
@@ -38,8 +38,8 @@ void TilemapPanel_LoadScriptTileList(struct Background *bg)
             u16 *dst;
             if (bg->tileCount > 0) {
                 src = values;
-                dst = bg->tiles;
                 count = bg->tileCount;
+                dst = bg->tiles;
                 do {
                     *dst = *src++;
                     dst++;
