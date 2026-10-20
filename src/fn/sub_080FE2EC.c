@@ -1,4 +1,3 @@
-#define Axe_UpdatePlayerDestinationPhase sub_080FE2EC
 #include "global.h"
 #include "scene_actor_reset.h"
 void Axe_UpdateWaitingAnimation(void);

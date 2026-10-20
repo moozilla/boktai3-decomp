@@ -1,4 +1,3 @@
-#define Axe_UpdateCollapsePhase sub_080FA540
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -79,5 +78,5 @@ void Axe_UpdateCollapsePhase(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FA540);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateCollapsePhase);
 #endif

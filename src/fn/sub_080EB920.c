@@ -1,4 +1,3 @@
-#define Octopus_EnterThrowPhase sub_080EB920
 #include "global.h"
 #include "scene_actor_reset.h"
 

@@ -1,4 +1,3 @@
-#define Dog_UpdateLeapWindup sub_080E1984
 #include "global.h"
 #include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
