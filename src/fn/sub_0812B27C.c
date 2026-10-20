@@ -1,5 +1,4 @@
 #include "global.h"
-#define FragmentProjectilePool_Cleanup sub_0812B27C
 extern u8 *gUnk_02000180;
 void Sprite_Remove(u8 *);
 void Collider_Remove(u8 *);
