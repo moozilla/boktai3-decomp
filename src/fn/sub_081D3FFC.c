@@ -9,7 +9,7 @@ struct S {
 };
 u32 SceneDisplay_GetAlternateDescriptor(struct S *);
 void BestiaryDisplay_SetEntry(struct S *, u32);
-void sub_081D4A34(struct S *);
+void PaletteTransition_Restart(struct S *);
 
 void SceneDisplay_SwitchToAlternateDescriptor(struct S *p)
 {
@@ -19,5 +19,5 @@ void SceneDisplay_SwitchToAlternateDescriptor(struct S *p)
     p->f18 = z;
     p->f20 = z;
     p->b24 = z;
-    sub_081D4A34(p);
+    PaletteTransition_Restart(p);
 }

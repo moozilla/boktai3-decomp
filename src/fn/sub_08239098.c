@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define DirectionalEffect_AddParticle sub_08239098
-
 struct Pos {
     u32 a, b;
 };

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ScrollingDialogue_Step sub_081D581C
-
 void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_HideImmediately(void);
 void ScrollingDialogue_RequestShow(void);

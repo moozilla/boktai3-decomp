@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define SceneActor_UpdateAnimationDTimer sub_081F612C
-
 typedef struct TimedSceneActor2 {
     u8 pad0[0x51];
     u8 angle;

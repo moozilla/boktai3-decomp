@@ -6,7 +6,7 @@ s32 sub_08238280(u8 *, s32, s32);
 void Player_UpdateFacingFromInputHistory(u8 *p);
 void sub_0823E704(u8 *p);
 s32 Player_UpdateThrowArc(u8 *p);
-void sub_08238E0C(u8 *p, u32 a, u8 *b);
+void DirectionalEffect_Spawn(u8 *p, u32 a, u8 *b);
 void Player_SetTetherMode(u8 *, s32, s32);
 
 void Player_UpdateTetherThrow(u8 *p)
@@ -39,7 +39,7 @@ void Player_UpdateTetherThrow(u8 *p)
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             if (*(u8 *)(p + 0x418) == 1 && *(u16 *)(p + 0xA0) == 5 && *(u16 *)(p + 0x98) == 0)
-                sub_08238E0C(p, *(u8 *)(p + 0x3A4), p + 0x30);
+                DirectionalEffect_Spawn(p, *(u8 *)(p + 0x3A4), p + 0x30);
             if (sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x1F), 0x40)) {
                 if (*(u8 *)(p + 0xBF6)) {
                     *(u8 *)(p + 0xBF6) = 0;

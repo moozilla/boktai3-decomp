@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define DisplayEntry_SetAnim sub_081D4990
-
 struct DispInfo {
     u8 pad[0x1C];
     s8 f1C;

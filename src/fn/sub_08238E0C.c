@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define DirectionalEffect_Spawn sub_08238E0C
-
 struct Pos {
     u32 a, b;
 };
@@ -48,5 +46,5 @@ void DirectionalEffect_Spawn(struct EffectState *p, s32 unused, struct Pos *pos)
     Player_ShowDirectionalEffect(p);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08238E0C);
+INCLUDE_ASM("asm/nonmatching", DirectionalEffect_Spawn);
 #endif
