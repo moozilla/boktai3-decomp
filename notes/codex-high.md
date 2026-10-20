@@ -3150,3 +3150,110 @@ spelling changed from the promoted name to raw sub_ addresses because only those
 assembly files exist in this cache; separate corrective driver commits preserve
 one translation unit per change. The exact match also passed after formatting
 and hint minimization. Combined ROM validation remains for batch integration.
+
+
+## 2026-10-20 — task 080D3878: Mummy route, defeat and volley controls
+
+Tags: #matching #mummy #navigation #nonmatching #register-pinning
+
+Exact code gain: **+0.0220 percentage points** (532 bytes), entirely in the
+Register-pinned category. One exact match, four improved guarded drafts, and
+one stopped candidate below the retention threshold. Worked solo on the supplied
+cloud/080D3878 branch; no network operations, full builds, shared-header edits,
+or generated-file edits. All commits went through build/commit.sh.
+
+- **080D62CC — matched, Mummy_FireAcceleratingVolley**, all **532 bytes**
+  through 080D64E0. Existing name retained. SceneActor_UpdateAnimationCheckpoint
+  (080D0E20) invokes it at animation frame four, timer zero. The callee 080692C8
+  allocates from the BouncingObject pool and receives the source, velocity and
+  target positions. The volley raises the source Y by 200, derives and clamps
+  horizontal speed, limits the aim near the actor's cardinal facing, emits
+  one to three objects, scales strength by 8/10, and increases speed by 4/10.
+  Started from the retained 98.5% draft. Binding a separate quotient to r4 and
+  retaining a separate absolute-value result recovered the apparently redundant
+  r4-to-r0 copy while keeping the comparison and negation on r4. A temporary
+  delta pointer declared inside the loop and used only for its first X store
+  moved the hoisted stack address before the angle mask. Together these closed
+  all four realigned differences. depin.py reduced six hints to four: count r6,
+  strength r8, quotient r4 and its empty constraint barrier. Formatted and then
+  checked byte-identical over the reviewed 532-byte extent. No handwritten
+  instruction bodies or forced compiler settings.
+
+- **080D5778 — drafted 92.1%, Mummy_ResumeDelayedRoute**, improved from 88.3%.
+  Reviewed span **2,144 bytes** through 080D5FD8; candidate **2,140 bytes**.
+  Final residue **82 realigned / 21 ignoring registers**. Recomputing the group
+  from the actor inside Turn, instead of accepting the cached group parameter,
+  fixed the PRE pointer-copy placement. Writing the signed full-width group
+  flag masks in mask-first order, retaining the route table base before its
+  definition offset load, and a narrow r1 target-pointer hint also helped.
+  Passing the original obj plus &target into Chase_TryRoute recovered the
+  parent actor identity and stack-target lifetime. Remaining: entry flag-load
+  ordering, route-choice registers, and the random-turn table/mask hoisting.
+  Explicit RNG mask/table pins and forced stack table lifetimes regressed;
+  the scoped OR-mask hint reduced structural differences but increased total
+  differences, so it was discarded. Retains one target-pointer pin.
+
+- **080D3D60 — drafted 92.9%, Mummy_UpdatePlayerRoute**, improved from 82.4%.
+  Reviewed span **2,012 bytes** through 080D453C; candidate **2,004 bytes**.
+  Final residue **71 / 26**. Uses the same group and route-owner corrections as
+  080D5778, but passing the RNG mask as an inline argument helps this caller
+  only. Moving the initial flag constant after the animation call recovers its
+  lifetime. A shared moved-success label at the end of Arrive and one explicit
+  fallback callback block remove duplicated return/callback code. A mask-argument
+  word-clear helper and scoped r0 halfword-OR constraint recover two flag-store
+  orders. Remaining: entry flag-load ordering, random-turn hoisting/registers,
+  and return/literal-pool placement. Widening Arrive's return and binding RNG
+  values directly to registers regressed. Retains the scoped OR pin/barrier.
+
+- **080D3878 — drafted 91.3%, Mummy_UpdateDefeat**, improved from 86.4%.
+  Reviewed span **1,256 bytes** through 080D3D60; candidate **1,252 bytes**.
+  Final residue **47 / 12**. Keeping the collider address in a scoped r5 local
+  before the height-reset store recovers the original early address formation.
+  Small HideTile/ShowTile inlines preserve the drawable+0x20 base with flags at
+  +8, rather than folding everything into +0x28. A constrained script argument
+  offset recovers its independent +0x204 calculation. Reading the already-held
+  motion-flags pointer reduces total differences, although pool alignment makes
+  the fuzzy score slightly lower than the alternate 91.8% form. Remaining:
+  flag-address materialization, late script/effect argument registers and zero
+  lifetimes. Pinning the animation pointer and adding broad mask/offset pins
+  regressed. Existing frame/table pins remain, with the collider/offset hints.
+
+- **080D53F8 — drafted 83.1%, Mummy_UpdateProbeNavigation**, improved from 80.0%.
+  Reviewed span **896 bytes** through 080D5778; candidate **892 bytes**.
+  Final residue **77 / 19**. Pointer-based boolean halfword predicates place the
+  mask before the field load. A u32-returning motion predicate prevents the
+  narrow result lifetime, and a word-flag inline fixes the player-flag ordering.
+  Remaining: retaining the motion-flags pointer across the probe callbacks,
+  PRE spill-slot order, and random-turn allocation. Passing the cached flags
+  pointer into the turn inline and widening/narrowing its other values did not
+  help. Existing r6 speed pin retained.
+
+- **080D453C — stopped below threshold**, tentative scratch name
+  Mummy_ReactToStimulus, **79.8%** over the reviewed **900-byte** span through
+  080D48C0; candidate **892 bytes**, residue **90 / 27**. Complete reconstruction
+  remains untracked at wip/sub_080D453C.c. Clears temporary activity, rejects
+  blocked flags/cooldowns, finds an overlapping stimulus, arms a 180-tick timer,
+  installs group+68 control kind nine and behavior eleven, resolves the tagged
+  position, tries player tracking, and attempts a route toward the stimulus.
+  A successful route sets motion bit 0x200, temporary activity, context+6EA=4,
+  and the nearest-player attachment. Returns whether this was the initial
+  activation, a successful direct tracking attempt, or a fallback callback.
+  Moving the activity clear into the blocked-state inline lets CSE retain the
+  just-written word. Computing the target pointer after the tracking call and
+  placing the shared success label inside the route-failure branch substantially
+  improved layout. Remaining: entry owner-copy/flag materialization, control-state
+  zero sharing, saved stimulus index, motion-pointer lifetime and return timing.
+  Guard-owner hints, register bindings, signed counter-bitfield stores, alternate
+  time-limit expressions and explicit state-store variants did not improve the
+  retained candidate. No below-80% production draft was added.
+
+All four retained drafts have descriptive local address aliases, NONMATCHING
+fallbacks using raw sub-address labels, concession markers where applicable,
+remaining-difference comments, and scores recorded with check.py --nonmatching
+--record. The fallback spelling matters: INCLUDE_ASM stringifies its filename
+without expanding the descriptive alias. Each default assembly path passed a
+full-span exact check. Those fallback checks grant no C progress. Hint
+minimization was also attempted on standalone copies of draft C; depin correctly
+skipped them because they are not exact (checking a guarded fallback would
+otherwise misleadingly accept hint removal). The integrator still owns the
+single combined ROM build and shared documentation/index regeneration.

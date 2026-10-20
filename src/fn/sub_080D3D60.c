@@ -1,8 +1,24 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+// confidence=low: control reacquires a player route once the context delay clears.
+#define Mummy_UpdatePlayerRoute sub_080D3D60
+
 #ifdef NONMATCHING
-// fuzzy: 82.4%
+// fuzzy: 92.9%
+// Remaining differences: random-turn hoisting, flag-load order and return/pool placement.
 #include "scene_actor_chase.h"
+static inline void SetHalf(u16 *field, u32 bits)
+{
+    register u32 mask asm("r0") = bits;
+    asm("" : "+r"(mask));
+    mask |= *field;
+    *field = mask;
+}
+static inline u32 ClearWordValue(u32 *field, u32 bits)
+{
+    return *field & ~bits;
+}
 #include "scene_actor_animation.h"
 
 static inline u8 Test16(u16 *p, u32 mask)
@@ -11,7 +27,7 @@ static inline u8 Test16(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 PickTurn(u32 dir)
+static inline u32 PickTurn(u32 dir, u32 mask)
 {
     u32 d;
     s32 i;
@@ -22,7 +38,7 @@ static inline u32 PickTurn(u32 dir)
             gUnk_03005308 = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
-            d = (v & 3) << 6;
+            d = (v & mask) << 6;
         }
         if (d != dir)
             return d;
@@ -36,7 +52,7 @@ struct MummySavedControl {
 static inline void Turn(u8 saved, void *ctx, void *g)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    u8 *group = g;
+    u8 *group = (u8 *)&actor->group;
     {
         u32 mask = 0x400;
         if (((struct SceneActorRegistryResetView *)ctx)->flags2D4 & mask)
@@ -44,7 +60,7 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    group[0x204] = PickTurn(actor->direction);
+    group[0x204] = PickTurn(actor->direction, 3);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -78,9 +94,7 @@ static inline u8 Arrive(void *obj)
                 player = index;
         }
         if (player < 0) {
-        invoke:
-            Callback_InvokeActor(actor, *(void **)(group + 0x224));
-            goto done;
+            goto invoke;
         }
         cell = gUnk_02000580[player]->cell[3];
     } else {
@@ -92,7 +106,11 @@ static inline u8 Arrive(void *obj)
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
+    {
+        struct ChaseFlags40 *flags = (void *)(group + 0x40);
+        s32 mask = ~4;
+        flags->bits = mask & flags->bits;
+    }
     if (Chase_MotionFlags(actor, 0x80)) {
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
@@ -125,12 +143,16 @@ reroute: {
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
-        return 1;
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, &target))
+        goto moved;
+    goto invoke;
 }
+invoke:
+    Callback_InvokeActor(actor, *(void **)(group + 0x224));
 done:
     return 0;
+moved:
+    return 1;
 }
 
 // confidence=low: control callback reacquires the player and resumes a route.
@@ -148,8 +170,9 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     u8 *group = (u8 *)&actor->group;
     if (TakeControlEntry(actor)) {
-        u32 mask = 4;
+        u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        mask = 4;
         actor->flags2D0 |= mask;
     }
     if (BouncingObject_RefreshNearbyHeading(actor))
@@ -163,9 +186,9 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
         actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
         {
             u32 mask = 4;
-            *(u16 *)(group + 0x40) |= mask;
+            SetHalf((u16 *)(group + 0x40), mask);
         }
-        actor->flags2D0 &= ~4;
+        actor->flags2D0 = ClearWordValue(&actor->flags2D0, 4);
         *(u16 *)(body + 0x6f2) &= ~0x1400;
         if (Arrive(actor)) {
             Chase_SetCtl(actor, *(void **)(group + 0x48), 0x25);
@@ -176,5 +199,5 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D3D60);
 #endif
