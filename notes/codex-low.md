@@ -2309,3 +2309,56 @@ both assembly fallbacks verified; those fallback checks are not C matches.
 Separate driver commits for the exact match and each guarded draft. No full
 build, network access, direct git mutation or shared-doc regeneration. Combined
 ROM validation and global percentage-point accounting remain with integration.
+
+## Task 080D9B20 (2026-10-20, directional-cell and dog reactions)
+
+Tags: #matching #scene-actor #dog #terrain
+
+No exact matches; exact code gain 0.0 percentage points. Retained four guarded
+production drafts and their existing descriptive names. Added required local
+address aliases and raw sub-address INCLUDE_ASM fallbacks so the checker resolves
+them against this worktree's ELF. Used per-file checks only, no full build.
+
+- 080E25FC: retained Dog_ChooseReactionBehavior at **83.5%**. Largest-first
+  assembly/relative review; 386 realigned differences, 148 ignoring registers.
+  Widening the motion accessor, reading flags directly and replacing the signed
+  group bitfield with a u16 store all worsened structure; widening the saved
+  direction parameter was identical. No candidate changes retained.
+- 080E0750: stopped unmatched after entry assembly, condensed listing and
+  relatives review. Entry consumes +0x2B2, quarters signed motion components,
+  selects animation 3 and updates motion flags. Shared chase terrain lookups
+  explain 32%; saved-motion convergence explains a separate entry region.
+  Complete reaction/control-flow reconstruction remains necessary. Ghidra
+  export gen/ghidra/decomp.c is unavailable.
+- 080E4B34: retained Dog_BeginDelayedRouteRecovery at **87.7%**; 131 realigned
+  differences, 40 ignoring registers. The same motion-width/direct-load and
+  group-bitfield variants worsened structure; saved-direction widening was
+  identical. Twenty-update delay and saved group control packet remain visible.
+- 080D9B20: retained SceneActor_FindDirectionalCell at **82.3%**. Changing the
+  Adjacent inline return from u8 to s32 reduces realigned differences from
+  681/574 structural to 269/250 structural, despite fuzzy dropping from 85.3%.
+  Widening Open instead worsened structure to 668. Kept the realigned improvement
+  as BIG_FUNCTIONS recommends. Repeated passability branch merging still differs;
+  removed duplicate fuzzy annotation and recorded current score.
+- 080DEA7C: retained Dog_UpdateCollisionBounds at **99.4%**, three structural
+  instructions differ: compiler rematerializes 0x2D0 rather than subtracting four
+  from the earlier 0x2D4 offset. Explicit offset lifetime constraints reproduce
+  that subtraction, reaching zero structural differences, but introduce nine
+  register differences downstream (table signed-load zero index, heading store,
+  collider address). Declaration swaps do not improve them. A pinned pointer
+  resolves two more register instructions in another variant; a forced zero
+  table index adds instructions. Rejected these experiments and kept unpinned
+  99.4% source. No new register concession committed.
+- 080DE6E0: stopped unmatched. Built a complete initial candidate in
+  wip/sub_080DE6E0.c (not production or committed): animation tick zero gates
+  effect spawning at frames 1/5/7 for kinds 1/3, random position jitter and
+  rearward 80-unit offset; returns gUnk_086061E4 frame/chase entry. Candidate
+  scores only 40.7% over reviewed 588-byte extent, with 246 realigned differences
+  (177 structural) and oversized output. Moving CpuSet's zero initialization
+  to the use improves the first draft but is far below draft acceptance.
+
+Formatted the four production units directly with the pinned clang-format and
+recorded scores with check.py --nonmatching --record. Queued each guarded draft
+separately through build/commit.sh. No network, direct git mutation, shared docs,
+ROM-derived artifacts or full-build commands. Combined validation remains with
+the integrator.
