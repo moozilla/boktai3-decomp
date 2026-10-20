@@ -1,0 +1,96 @@
+#include "global.h"
+
+struct Pair32 {
+    u32 a, b;
+};
+
+struct ChargeParticle {
+    u32 flags;
+    u8 unknown4[0x14];
+    union Word { u32 w; struct { u16 lo, hi; } h; } x, y; /* 0x18 */
+    u8 unknown20[8];
+    u8 mode; /* 0x28 */
+    u8 unknown29;
+    u8 delay2A;
+    u8 flag2B;
+    s16 dx;      /* 0x2C */
+    u8 unk2E[2];
+    s16 dy;      /* 0x30 */
+    u8 unknown32[2];
+};
+
+struct ChargePlayer {
+    u8 unk0[0x18];
+    s32 slot;
+    u8 unk1C[0x98C];
+    void *particleGraphics; /* 0x9A8 */
+    u8 active;               /* 0x9AC */
+    u8 head;                 /* 0x9AD */
+    u8 budget;               /* 0x9AE */
+    u8 unk9AF;
+    struct ChargeParticle particles[4]; /* 0x9B0 */
+};
+
+struct LinkState {
+    u8 unk0[0x5C];
+    u8 bonus[1];
+};
+extern struct LinkState *gUnk_020004B4;
+extern u32 gUnk_03005308;
+extern const s16 gUnk_086149C4[];
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+
+static inline s32 TruncateScale(s32 x)
+{
+    return x >= 0 ? x >> 12 : -((-x) >> 12);
+}
+
+#define ChargePlayer_EmitParticle sub_082392E8
+
+void ChargePlayer_EmitParticle(struct ChargePlayer *p, struct Pair32 *origin_)
+{
+    register struct Pair32 *origin asm("r9") = origin_;
+    struct ChargeParticle *e;
+    register struct ChargeParticle *f asm("r8");
+    u32 angle, speed, i;
+    u8 *table = (u8 *)RANDOM_TABLE_ADDR;
+    u32 *ip = &gUnk_03005308;
+    u32 m = 255;
+    s32 slot = p->slot;
+    u32 bonus;
+    if (!gUnk_020004B4 || slot < 0)
+        bonus = 0;
+    else
+        bonus = gUnk_020004B4->bonus[slot];
+    p->budget = p->budget + 2 + bonus;
+    if (p->budget > 0x27) {
+        e = &p->particles[p->head];
+        f = e;
+        e->flags &= ~1;
+        e->flag2B = 2;
+        SpriteDrawable_SelectTileFrame(e, p->particleGraphics, 2);
+        i = (*ip + 1) & 1023;
+        angle = table[i * 2];
+        i = (i + 1) & 1023;
+        *ip = i;
+        speed = (*(u16 *)(table + i * 2) & 0x3F) + 0x80;
+        e->dx = TruncateScale(gUnk_086149C4[(angle + 64) & m] * speed);
+        e->dy = TruncateScale(gUnk_086149C4[angle] * speed);
+        f->x.w = origin->a;
+        f->y.w = origin->b;
+        f->x.h.lo += e->dx;
+        f->y.h.lo += e->dy;
+        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        {
+            u32 v = *(volatile u16 *)((u8 *)RANDOM_TABLE_ADDR + gUnk_03005308 * 2);
+            e->delay2A = (v & 3) + 14;
+        }
+        e->unknown29 = 0;
+        e->mode = 1;
+        p->head++;
+        if (p->head > 3)
+            p->head = 0;
+        p->budget -= 0x28;
+        p->active = 1;
+    }
+}
