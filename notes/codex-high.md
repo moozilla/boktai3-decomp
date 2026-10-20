@@ -2062,3 +2062,110 @@ start with the already matched recoil sibling, then model the extra pointers
 that survive across calls explicitly. On the larger callback, realigned
 structural counts were used to distinguish those lifetime changes from
 register-only changes.
+
+## Task 0812EED8 — 2026-10-20
+
+Tags: #matching #scene-actors #nonmatching #register-pinning
+
+Branch: `cloud/0812EED8`. Worked solo, offline, using the worktree Python,
+fast `check.py` checks, and the commit driver. Exact gain: **+0.0399 percentage
+points** of code (964 reviewed bytes), all **Without register pinning**.
+Matched **33.3% of the six assigned functions**, covering **20.53% of their
+reviewed spans**. Three existing guarded drafts were improved; one function
+remains below the draft threshold. No full build, make, network operation,
+branch change, direct Git mutation, or generated-file edit was performed.
+Combined ROM validation remains with the integrator.
+
+- **0812FA0C — drafted 84.8%**, up from 83.2%, existing tentative name
+  `SceneActorReaction_UpdateRouteReturn`. Reviewed extent **1,976 bytes**;
+  candidate **1,972 bytes**. Final realigned differences: **165 total / 40
+  ignoring registers**, versus 191 / 50 initially. Passing the +0x414 test's
+  mask as an inline argument fixes mask-before-load order. Replacing explicit
+  RNG table/index/wrap locals with `Chase_RandomBits(3)` substantially improves
+  the random-turn preheader and allocation. Prior-direction r5 pin remains.
+  Mask and table pins, retry-count pin, full-width bitfield clear, target
+  pointer pin, and delayed-packet pointer variants regressed. Remaining:
+  PRE stack slots, delayed-control/state setup, and reroute target-pointer
+  lifetime. Guarded fallback passes the full reviewed-extent exact check.
+- **0812F5D4 — drafted 80.4%**, existing tentative name
+  `SceneActorReaction_UpdateContactRoute`. Reviewed extent **800 bytes**;
+  candidate **804 bytes**. Final realigned differences: **90 total / 13
+  ignoring registers**, versus 80 / 23 initially. Retained the structurally
+  better candidate even though fuzzy declined from 81.1%. An inlined RNG
+  call with a pinned r6 mask recovers the ROM's preheader constant loads;
+  redundant wrap/table locals and the wrap pin are gone. Prior r5 and retry
+  r1 hints remain. The duration setup still recomputes 0x2D4 instead of
+  deriving it from 0x270; PRE stack ordering and byte-zero placement differ.
+  A diagnostic forced-GCSE-table sweep over 121–161 separates PRE allocation
+  from structural issues but produces no match; no compiler overrides were
+  retained. Guarded fallback passes the full reviewed-extent exact check.
+- **081301C4 — drafted 88.6%**, up from 81.6%, existing tentative name
+  `SceneActorReaction_UpdateRouteRecovery`. Reviewed extent and candidate
+  both **616 bytes**. Final realigned differences: **36 total / 14 ignoring
+  registers**, versus 61 / 24 initially. Declaring the stack position pointer
+  before reading the route reproduces its setup order. A normal saved flags
+  pointer, with an empty allocation barrier before the height lookup, keeps
+  the flags address across terrain/path calls. Cast the proximity result to
+  u8, matching the caller's observed byte consumption without changing the
+  shared callee's u32 contract. Fixed-register pointer and phase-offset
+  experiments were discarded; the final pointer is an ordinary local.
+  Marked the retained allocation barrier as a concession. Remaining:
+  state/control offset reuse, vector-store registers, and packet zero values.
+  Guarded fallback passes the full reviewed-extent exact check.
+- **0812EED8 — matched**, `SceneActorReaction_BeginTargetRecovery`, tentative
+  existing interpretation. Reviewed extent **596 bytes**, through 0812F12C;
+  C matches all bytes including the literal pool. Requires flags2CC bits
+  0x400000 and 0x200000 plus the motion block's target flag. Sets recovery
+  bit 0x100, selects directional animation zero, installs delayed restoration
+  with saved behavior nine and duration 30, snaps the stored destination to
+  the route, and clears motion/reaction flags and timers. The key changes:
+  both actor-flag updates use the same actor/mask inline; the target-flag
+  helper captures its motion pointer through an output parameter after
+  computing the test; final motion clears use typed pointer/mask operations.
+  This removes duplicate addresses and places the high-register transfers
+  correctly. `depin.py --write` removed both the temporary r2 pointer pin
+  and its barrier, retaining exact equality. Final source has **no register
+  hints or matching concession**.
+- **08130714 — matched**, tentative alias
+  `SceneActorControl_UpdateTriggerApproach`. Reviewed extent **368 bytes**,
+  through 08130884. Its callback occurs in the same behavior-control tables
+  as the neighboring SceneActorControl functions. Entry consumes field2B1
+  and installs entryTarget228 with kind one. Normal updates select directional
+  animation one, evaluate callback260 for speed, update duration scaling,
+  and accelerate toward the group+0x1FC descriptor. On arrival it consumes
+  the pending trigger, selects state/phase/behavior (2,0,2), and restores
+  savedTarget with kind zero; otherwise it increments the counter. Started
+  from the matched route-approach/control relatives' typed helper patterns;
+  matched on the **first check**, with no hints.
+- **0812F3CC — stopped below threshold, best 75.4%**, scratch only at
+  `wip/codex-high/sub_0812F3CC-zero.c`. Tentative scratch alias
+  `SceneActorReaction_BeginContactResponse`. Reviewed extent **340 bytes**;
+  candidate **336 bytes**, **44 total / 13 structural differences**. Starts
+  from the prior retained 72.3% attempt. Rejects incompatible motion flags,
+  missing target/contact eligibility and disabled routes; selects a contact,
+  clears route counters, stores the selected contact at group+0x88, installs
+  idle control/state (3,1,0), clears flags2CC bit 0x10, and sets flags2D6 bit
+  0x800. A distinct byte-zero temporary in ip and an actor/mask inline for
+  the final halfword flag set improve the draft. Still differs in word-zero
+  reuse from the earlier flags test, flags-pointer lifetime, byte-zero copies,
+  state/control offsets, and contact/group allocation. Explicit fresh word
+  zeros, actor/contact/group pins, flag-pointer capture, boolean-test forms,
+  setter widths and direct contact-store addressing failed to reach 80%.
+  No below-threshold production C was added.
+
+All retained sources have file-local descriptive aliases; existing promoted
+names were preserved. Restoring explicit sub-address aliases also allows the
+fast checker to link against this worktree's older ELF symbol names. The big
+function was reviewed with `asmat.py` and `condense.py`; scored hypothesis
+batches with `variants.py` and inspected `rtlprobe.py` loop/PRE diagnostics.
+The Ghidra export is absent. Only byte-identical C was promoted as a match.
+
+Both matches passed checks with explicit reviewed extents after final edits.
+All three draft scores were recorded with `--nonmatching --record`, and their
+assembly alternatives passed exact reviewed-extent checks. Depinning the two
+remaining hinted drafts was attempted on unguarded scratch copies; it
+correctly skipped their nonexact C, rather than testing their assembly
+fallbacks. Formatting with the pinned venv clang-format and `git diff --check`
+passed. A final refinement commit removes the now-unneeded hints from EED8;
+small single-unit follow-ups format FA0C and label the recovery draft's
+allocation barrier. Shared handoff/history/index files were left to integration.
