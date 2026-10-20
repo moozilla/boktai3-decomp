@@ -1,7 +1,10 @@
 #include "global.h"
+// confidence=low: command 9 alternates the selected pair halves for six timed attacks.
+#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 96.2%
-// confidence=low: command 9 alternates selected halves for six timed attacks.
+// fuzzy: 99.5%
+// Remaining difference: phase-zero timer reset uses r7 instead of r5.
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;
@@ -30,6 +33,7 @@ void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+#define PairedSceneActor_AreSelectedHalvesFinished sub_081B64D4
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
@@ -41,7 +45,7 @@ static inline s32 RandomValue(void)
 void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 {
     u8 result;
-    u8 phase;
+    s32 phase;
     if (p->mode == 1) {
         u32 mask = 0x40000;
         p->flags |= mask;
@@ -70,6 +74,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 p->selected = (RandomValue() >> 4) & 1;
                 p->phase = 1;
+                asm("" : : "r"(phase));
                 p->timer = phase;
             }
             break;
@@ -81,7 +86,11 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
                     {
                         u8 next = 2;
                         p->phase = next;
-                        p->timer = 0;
+                        {
+                            register u32 zero asm("r0") = 0;
+                            asm("" : "+r"(zero));
+                            p->timer = zero;
+                        }
                     }
                 } else {
                     p->selected = (p->selected + 1) & 1;
@@ -105,5 +114,5 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateRepeatedPairAttack);
+INCLUDE_ASM("asm/nonmatching", sub_081AA178);
 #endif
