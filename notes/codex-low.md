@@ -2154,3 +2154,18 @@ reviewed scores recorded with check.py --nonmatching --record, and all three
 assembly fallback checks pass. Below-threshold candidates remain in ignored
 wip/codex-low. No exact coverage claimed for assembly fallbacks. Combined ROM
 validation remains for integration. Shared docs and totals were not regenerated.
+
+## Task 080C68F0 (2026-10-20)
+
+Tags: #matching #golem #register-pinning
+
+All six assigned functions already contained guarded drafts. Retained existing names from symbols/functions.csv and added the required file-local aliases. Exact C progress: 0 percentage-point gain; all remain drafts.
+
+- 080CCD7C: drafted 80.4%, Golem_UpdateChargePursuit. Inspected largest first with asmat, condense and relatives. Reviewed-extent check: 539 realigned differing instructions, 141 ignoring registers. Best matched relative covers only 29%; charge/turn resets and route pointer lifetimes remain substantial. Added local aliases for charge-stop/recovery callback references because the cached ELF still uses address names. No body changes retained.
+- 080C8774: drafted 95.8%, Golem_ResumeBehaviorAfterDisplacement. Baseline 73 realigned differences / 12 ignoring registers. RNG wrap-mask r8 pin regressed to 77.7% (524/174); retry-loop goto form regressed to 91.9% (165/16). Restored baseline. RNG table/wrap allocation and PRE stack slots remain.
+- 080CE188: drafted 90.3%, Golem_ResumeRouteAfterControl. Baseline 114/34 realigned differences. Narrowing RandomDirectionExcept's return to u8 regressed to 89.3% (128/41); reverted. Shared RNG loop and outer group/control-reset lifetimes remain.
+- 080C6A68: drafted 86.5%, Golem_UpdateChargeRecovery. Baseline 93/20 realigned differences. Swapping the step/candidate stack declarations left output identical; reverted. Packed halfword scheduling and stack sample placement remain.
+- 080C725C: improved draft from 89.1% to 91.3%, Golem_UpdateSlideImpact. Binding the RNG table to r6 with an empty value barrier reduced realigned differences from 54/23 to 40/19. Removing the barrier restores the baseline. Replaced collider offset cast with its existing typed flags field (same generated code). Candidate is 12 bytes longer than the 860-byte target extent. Remaining seed allocation, repeated table reloads and collider/reset scheduling prevent exactness.
+- 080C68F0: improved draft from 81.6% to 91.9%, Golem_UpdateChargeStop. Ported mirror-pointer/value bindings and quadrant/address barrier from the matched SceneActorAnimation_SelectDirectionalEntry sibling; removed the unnecessary u8 flags cast at Anim_SetSequence. Realigned differences fell from 37/9 to 18/9. Explicit flags/selection pins regressed to 79.0%; a mirror-load barrier regressed to 84.3%. Remaining pointer copies, flag load order and selector scheduling prevent exactness.
+
+Formatted all six files directly with the project's clang-format (no make). Ran check.py --nonmatching --record for every draft. The score recorder does not resolve INCLUDE_ASM aliases; changed the two improved drafts' fallback operands to sub_ names and reran recording so their fuzzy lines contain the measured scores. This required separate corrective driver commits after the initial draft commits. Both improved default assembly fallbacks checked byte-identical. depin --write skips nonmatching candidates; attempted it on all three hinted units. No full build or network operations performed. Commits queued through build/commit.sh only.
