@@ -1,6 +1,6 @@
 #include "global.h"
 
-#define FrostEmitter_Update sub_081D2FE8
+#define FrostEmitter_Step sub_081D2FE8
 
 struct FrostParticle {
     u8 pad0[0x44];
@@ -19,7 +19,7 @@ struct FrostEmitter {
 void sub_081D2EA4(struct FrostParticle *);
 void sub_081D2D78(struct FrostEmitter *);
 
-void FrostEmitter_Update(struct FrostEmitter *p)
+void FrostEmitter_Step(struct FrostEmitter *p)
 {
     s32 idle = 0;
     s32 i;
