@@ -1,3 +1,4 @@
+#define SceneHud_UpdateSecondaryActionSelection sub_081731E8
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 97.3%
