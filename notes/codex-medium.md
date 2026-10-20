@@ -3603,3 +3603,139 @@ The integrator must perform the complete combined ROM build.
 
 Exact code gain for this task: **+0.0157 percentage points** (380 bytes), all in
 the Register-pinned category. Drafts contribute no exact gain.
+
+## Task 08148318 — 2026-10-20
+
+Tags: #player #matching #register-pinning
+
+Four matches and two guarded drafts. Exact coverage within this task is 56.2%
+(+56.2 percentage points; 1,920 of 3,416 assigned bytes). The batch contributes
++0.0795 percentage points of project code, all Register-pinned. Drafts add no
+exact coverage. Only per-file checks were run; combined ROM validation remains
+with the integrator.
+
+- 08148318: improved the existing Player_UpdateWaveringMovement draft from
+  82.7% to **87.6%**. Writing odd-direction hold durations through the observed
+  Player byte array (`unk466[3]`, offset 0x469) instead of the timer pointer
+  restores the duplicated branch-specific stores. The same change must not be
+  applied indiscriminately to the even-direction path, which retains its timer
+  pointer. Remaining differences include RNG result allocation, even-direction
+  address scheduling, branch/pool layout and an apparently unused original
+  0x0403B714 literal. Barriers around RNG offset/table construction regressed
+  to 82.2% and were reverted. Added the required local descriptive alias; the
+  fallback uses the address symbol so `--nonmatching --record` finds it.
+- 08148B64: new **99.4% draft**, Player_UpdateSpiralDisorientation (tentative).
+  Player dispatch table gUnk_08610CA8 references it. Entry reconstructs facing
+  from heading/side, emits queued effects and a spiral trail, then alternates
+  folded facing using tetherFrame. It sets resource 0x16F, advances the packed
+  animation, grows the effect duration to 32, and returns to action zero after
+  frame 31. Typed spriteResource/actionVariantResource fields reproduce the
+  resource-index shift instead of emitting another literal. Two instructions
+  remain: the duration-field offset is loaded into r0 instead of r3. Explicit
+  duration-pointer/offset pins disrupted shared 0xFFFF masking or earlier
+  scratch-register choices; retained the best compact candidate.
+- 08148914: **matched**, Player_UpdateDecayingRecoil (tentative), 592 bytes.
+  Consumes an optional contactActionTag sound, folds facing, advances animation,
+  applies opposite-facing sine/cosine impulses, and decays magnitude at 0x270
+  by three quarters. At zero it clears contactSpecial and selects action 22
+  only when byte 0x5B9 is three and 0x5BB is nonzero. Multiplying table sample
+  by magnitude, in that source order, fixed most allocation/load-order misses
+  (87.9% to 97.9%). Pins on the magnitude and facing address temporaries closed
+  the remainder. Sign-preserving shifts reproduce the original rounding.
+- 081487B4: **matched**, Player_UpdateTimedMovementRecovery (tentative),
+  352 bytes. Subtracts 60 from byte 0x466 while it exceeds 59; otherwise clears
+  status bit zero and the byte. Advances sequence one and returns to action
+  zero when the movement gate at 0x5BB clears. The shared stepper matched
+  immediately; paired offset/address pins fixed the final two instructions.
+- 08148608: **matched** the previous direction-recovery draft, 428 bytes.
+  Pinning the command pointer to r6 requires separately materializing its
+  offset in r0 and table in r1, avoiding an unwanted in-place pointer shift.
+  A local facing pointer with an input-only barrier schedules its address
+  before the history mask while preserving the typed store and branch merge.
+  The final signed movementAnimationState gate is at 0x4F3, not 0x418.
+- 08148FC0: **matched** the previous walking draft, now named
+  Player_UpdateWalkFootsteps (tentative), 548 bytes. Uses the matched packed
+  stepper, alternates nearby positional effects 0x162/0x163 or sounds 0xC8/0xC7
+  on animation frame two, and emits a secondary effect for GameState flag one
+  at 0x868. Pins retain zero in r5 and position in r4; the saved zero must be
+  u32, because an opaque u16 pin introduces extra truncation. Pinning the frame
+  address then fixes all remaining scratch-register differences.
+
+Every exact candidate passed a reviewed full-extent `tools/check.py` after
+formatting. `tools/depin.py --write` reduced the retained hints to 14, 17, 17,
+and 15 for 081487B4, 08148914, 08148608, and 08148FC0 respectively. Run depin
+on unguarded C candidates: a guarded draft's default INCLUDE_ASM fallback can
+make it strip hints without validating the candidate. The spiral candidate was
+restored and re-recorded after encountering that behavior. Both draft scores
+were recorded with `--nonmatching --record` after formatting. No make, full
+build, network operation or shared documentation edit was performed.
+
+## Task 080EB298 — 2026-10-20
+
+Tags: #matching #scene-actor #ivy #worker
+
+- **080EC0E8 matched** as `SceneActorReaction_FindAdjacentTarget`. The matched
+  `Ivy_FindAdjacentTarget` (080F0910) explains all but one call: substitute
+  `sub_080EC024` for `SceneActor_FindNearbyPlayerTarget`. Finds the nearer same-level
+  player/category actor within the squared-distance limit, checks adjacency in
+  terrain cells, optionally turns toward it, and retains its reference at +0xDC.
+  Exact check: 536 bytes. Starting with `relatives.py` made this a first-check match.
+- **080EB298 matched** as tentative
+  `SceneActorReaction_ReacquireAdjacentTarget`. Starts reaction animation control
+  (kind 41), checks for an adjacent target after completion or while control kind
+  34 is active, shows the drawable and switches to `sub_080E9C20` when found.
+  Kind 34 times out after 180 ticks into idle control. A separate no-argument
+  idle-state inline helper, rather than passing constant zero to the generic
+  state setter, puts the zero initialization after the field-address calculation
+  and resolves the last two instruction-order differences. Exact check: 440 bytes.
+- **080EB58C matched** as `SceneActorReaction_WaitForAdjacentTarget`. Context
+  +0x634 is a signed consecutive-miss counter, +0x636 its signed limit. Entry
+  clears the miss counter; exceeding the limit resets the actor state. After
+  30 ticks with a current adjacent target it faces the saved target reference,
+  resets its reaction state and begins `sub_080E9C20`. The target reference is
+  loaded before the search call, as in the ROM. Reusing the combined state/control
+  inline shape from 080EFC58, rather than two independent generic setters,
+  reproduced offset derivation and register lifetimes exactly. Exact: 344 bytes.
+- **080F3230 drafted 83.7%** as tentative `PhaseObject_ConvergeEntries`.
+  Four entries (stride 0x2C, starting +0xA8) interpolate x/z from saved points
+  (+0x468, stride 8) toward a shared target (+0x488), using delay/15. Their signed
+  opacity bytes (+0xB0, stride 0x2C) rise by three and clamp to 64. When unpaused
+  (+0xD80 bit 0 clear) and delay reaches zero, it resets entry coordinates,
+  enables flags, clears collider bits and installs the next callbacks.
+  `--nonmatching --record` recorded the score; default compilation keeps INCLUDE_ASM.
+  Remaining: 32 realigned instructions, only two ignoring registers; principally
+  r3/r4/r6/r7 allocation in the reset loop and constant ordering for mode stores.
+  Keeping separate opacity and flag pointers plus a byte offset reproduced the
+  loop structure. Explicit locals for opacity 64 and flag bit 1 improved ordering.
+  Whole-object shifted views reproduce base-plus-index followed by +0xC4/+0xC8;
+  pointers directly to entries generate different Thumb memory addressing.
+  Use canonical `ChildGroup_UpdateAlternatingCallbacks` for 080F40C8: its old
+  sub_ name resolved without the Thumb bit in this check environment.
+- **080ED4E0 stopped below draft threshold** (best ordinary candidate 68.5%).
+  Tentative `Ivy_UpdateCaptureReach`: selects directional animation 5, plays
+  cue 0x1DD at sequence index 3/elapsed 0, enables capture collision after elapsed
+  6, finds an adjacent target and switches to Ivy hold. Mirrored offset table
+  `gUnk_08606384` positions players or actors; context +0x62C bit 1 marks a held
+  target. Animation completion without capture switches to 080ED838.
+  Best candidate retained at `wip/codex-medium/sub_080ED4E0.c`. Mismatches include
+  extra high-register pressure, state/control constant derivation, packed-vector
+  construction and branch/field-address ordering. Multiple helper/type variants
+  did not get it above the threshold.
+- **080F2F7C stopped below draft threshold** (best ordinary candidate 70.1%).
+  Tentative `PhaseObject_RelocateEntryOrigin`: mirrors x/z offsets over four
+  entries, reduces opacity to a minimum of 1, expands offsets while unpaused,
+  then chooses a random origin around the anchor at radius 200 and y+350.
+  Saves entry positions, marks entry flags/phases, installs
+  `PhaseObject_BeginEntryMotion` and a 30-tick delay. Candidate at
+  `wip/codex-medium/sub_080F2F7C.c`. Remaining: 13 structural differences in the
+  best ordinary candidate, many allocation/stack-slot differences. The ROM
+  keeps the 255 angle mask in a stack slot across Div; the candidate rematerializes
+  it, shifting later spill offsets. Register-pinning experiments did not help
+  enough and were not retained. Neither below-threshold source was added to src.
+
+No network or full builds used. Per-file byte checks accepted the three matches.
+The bounded permuter attempt for 080F3230 failed before searching: export's
+`tools/split.py` rejected unrelated `Ghoul_ResumePendingRoute` in
+`src/fn/sub_0808CC48.c` as not a known function start. The Ghidra export is absent
+(`gen/ghidra/decomp.c`), so these candidates were recovered from assembly and
+matched siblings. No register-pinning concession is present in accepted sources.
