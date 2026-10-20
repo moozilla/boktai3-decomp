@@ -159,10 +159,9 @@ static inline u32 VulcanCannon_StepIdleAnimation(struct DisplaySequenceSprite *s
 
 static inline s32 TargetDistance(struct SceneVec *player, struct SceneVec *position)
 {
-    register struct SceneVec *a asm("r0") = player;
-    register struct SceneVec *b asm("r3") = position;
+    struct SceneVec *a = player;
+    struct SceneVec *b = position;
     s32 dx, dz;
-    asm("" : "+r"(a), "+r"(b));
     dx = a->x - b->x;
     dz = a->z - b->z;
     return dx * dx + dz * dz;
@@ -171,7 +170,6 @@ static inline s32 TargetAngle(struct SceneVec *player, struct SceneVec *position
 {
     register struct SceneVec *a asm("r2") = player;
     register struct SceneVec *b asm("r3") = position;
-    asm("" : "+r"(a), "+r"(b));
     return Math_Atan2(a->x - b->x, a->z - b->z);
 }
 
@@ -243,7 +241,6 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         p->timer = 0;
         p->shotCount = 0;
         facing = p->facing;
-        asm("" : "+r"(facing));
         if (!facing) {
             if ((u8)(angle - 0x21) <= 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
@@ -261,4 +258,3 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     VulcanCannon_StepIdleAnimation(&p->display.sprite, &p->sequence);
     return 0;
 }
-
