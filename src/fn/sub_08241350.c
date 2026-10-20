@@ -138,7 +138,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 #ifdef NONMATCHING
-// fuzzy: 98.1%
+// fuzzy: 98.2%
 void Player_BeginWalk(struct PRecover *p)
 {
     if (p->tetherActive != 1) {

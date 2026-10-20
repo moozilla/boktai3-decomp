@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 92.7%
+// fuzzy: 92.9%
 // Remaining differences: register allocation (r1/r3 swaps) in the head and tail.
 
 struct P {
