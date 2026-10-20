@@ -3045,3 +3045,58 @@ Two of six assigned functions matched (33.3% by function count, +33.3 percentage
 - 0809AE0C stopped below draft threshold. Rechecked retained contact candidate: 46.9%, 154 realigned differing instructions / 71 ignoring registers. Original contains discarded context-bit calculations, while C removes them; ownership-pointer lifetime and state-store allocation also differ. Existing capture/contact interpretation remains tentative; candidate stays in wip/sub_0809AE0C.c.
 
 Ghidra export gen/ghidra/decomp.c is unavailable. Commits queued through build/commit.sh; combined ROM validation remains with the integrator. No shared documentation/index edits under cloud-worker instructions.
+
+## Task 081C01D8 — 2026-10-20
+
+Tags: #matching #scene-npc #tether #particles
+
+- **081C01D8 matched**, `TetherActor_PositionRequestIndicator` (364 bytes;
+  register-pinned category). Projects TetherActor_GetPosition into the marker's
+  0x98 screen vector, selects an offset quadrant with DirectionMarker_Update,
+  clamps the drawable position to x=16..208/y=16..128, and toggles visibility.
+  On first visibility it plays song 0x4D9. The caller
+  TetherActor_UpdateRequestIndicator supplies request mode at 0xA4.
+  Explicit projection and mask inline helpers fixed instruction selection/order.
+  A temporary r0 pin for the returned position fixed the final move ordering;
+  depin reduced five hints to that single pin. Formatted source checked exact
+  with reviewed target extent 364 before queueing the per-function commit.
+- **081D1E78 drafted 97.0%**, `TaggedSceneNpc_UpdateJumpToTarget`.
+  Initializes animations 7/8/9, computes rounded flight duration with Sqrt,
+  Div and Mod, interpolates x/z and a parabolic y coordinate, then lands and
+  waits for the last animation. Typed fields eliminate a duplicate angle load;
+  an inline signed-truncating half helper fixes the parabola instructions.
+  Remaining airborne-phase entry flag/pointer lifetime adds a copy and changes
+  load/store registers (9 realigned differences, 6 ignoring registers).
+  NONMATCHING score recorded; the default branch retains INCLUDE_ASM.
+- **081D2610 stopped below draft threshold**. Tagged NPC scene-message
+  dispatcher, called by TaggedSceneNpc_OnFrameUpdate. Receiver at 0x168,
+  message counts at receiver+6, two four-entry message banks at +8 indexed by
+  gUnk_0200047C[0x24]. Commands change mode, targets, facing, attachment effects
+  or position. Initial candidate 28.9%; high-register pin experiment 29.6%
+  with worse aligned structure. Large jump-table address differences inflate
+  the diagnostic, but many field address/zero-store ordering differences remain.
+- **081CEFCC stopped below draft threshold**. NPC follow-target behavior:
+  context+0x438 target, squared x/z thresholds 0x90000 and 0xFFFF, teleport
+  to a -768 polar offset when far away, otherwise move at speed 24 or test
+  conversation angles. Callback_InvokeActor returning 1 suppresses updates.
+  Candidate 40.9%; explicit observed register roles improved to 58.3%, but
+  77 register-independent realigned differences remain. Needs motion/position
+  pointer lifetimes and stack-vector treatment aligned with original.
+- **081D2318 stopped below draft threshold**. Gradually faces a conversation
+  target (signed delta limited to +/-8), controls optional attachment effect,
+  and sets flags from distance/angle tests. Initial 69.8%; register pinning
+  worsened to 62.8%; explicit target-position and heading locals gave 68.9%.
+  Repeated pointer loads, heading-store/truncation order, and near-test control
+  flow remain. No production source added.
+- **081C29A4 stopped below draft threshold**. Existing symbol name
+  SparkleEmitter_EmitParticle retained in candidate. Allocates an available
+  particle, generates a random screen-ring point and inverse-projects it to
+  world position, then chooses randomized polar velocity. Initial 41.7%;
+  observed emitter/particle register pins 42.1%, without structural improvement.
+  Random sample scheduling and vector/register lifetimes remain unresolved.
+
+All six targets were inspected with asmat and relatives. Ghidra pseudo-C is
+unavailable (gen/ghidra/decomp.c absent). Below-threshold candidates remain only
+in ignored wip/; none is counted as a draft or exact progress. Only per-file
+check.py checks were run; no full build or network operation. Integration must
+perform the combined ROM validation.
