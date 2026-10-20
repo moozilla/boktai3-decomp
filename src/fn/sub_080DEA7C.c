@@ -108,5 +108,5 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
         ((struct ContactCollider *)(context + 0x624))->bounds = *(struct ContactPosition *)&narrow;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Dog_UpdateCollisionBounds);
+INCLUDE_ASM("asm/nonmatching", sub_080DEA7C);
 #endif
