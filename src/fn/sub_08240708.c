@@ -20,7 +20,7 @@ static inline s32 Truncate12(s32 v)
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsFlaggedWithGlobalModifier10(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
@@ -31,7 +31,7 @@ void Player_UpdateRecoil(struct Player *p)
 {
     if (p->tetherMode != 0x1F) {
         u8 *variant = (u8 *)p + 0x418;
-        sub_08238280(p, ActorVariant_GetTableValue(*variant, 0x29), 0x40);
+        Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*variant, 0x29), 0x40);
         p->interactionResetCounter = 0;
         if (*variant == 6)
             Player_PlayLocalSong(p->slot, 0x2EB);
@@ -77,7 +77,8 @@ void Player_UpdateRecoil(struct Player *p)
                 Player_PlayLocalSong(p->slot, 0xD1);
                 SelectionSlots_ClearValue(&p->position, p->slot);
             }
-            if (sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2E), 0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2E),
+                                         0x40))
                 Player_SetTetherMode(p, 0x1F, 2);
             break;
         case 2:

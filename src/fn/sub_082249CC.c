@@ -3,7 +3,6 @@
 #define gRfuSlotStatusUNI gUnk_03006A60
 #define gRfuLinkStatus    gUnk_03006A80
 #include "rfu_compat.h"
-#define RfuManager_RemoveSendTargets sub_082249CC
 
 void RfuManager_RemoveSendTargets(u8 bm)
 {

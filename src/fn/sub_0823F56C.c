@@ -11,7 +11,7 @@ struct AttackVec {
 extern const s16 gUnk_086149C4[];
 void Player_SetTetherMode(void *, u32, u32);
 u32 ActorVariant_GetTableValue(u32, u32);
-u32 sub_08238280(void *, u32, u32);
+u32 Player_SetAnimationIndex(void *, u32, u32);
 u32 Player_UpdateFacingFromInputHistory(void *);
 
 void Player_PlayLocalSong(u32, u32);
@@ -35,12 +35,12 @@ void Player_UpdateChargedDashAttack(u8 *p)
 {
     switch (B(0x458)) {
         case 0:
-            if (sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if (++H(0x45A) > 6) {
                 B(0xC0F) = 0;
                 H(0x4D2) = 0;
@@ -55,7 +55,7 @@ void Player_UpdateChargedDashAttack(u8 *p)
             break;
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if (H(0x45A) == 6)
                 Player_PlayLocalSong(W(0x18), 0x1F4);
             if (!(**(u16 **)(p + 0x348) & 2)) {
@@ -72,7 +72,7 @@ void Player_UpdateChargedDashAttack(u8 *p)
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if (!(**(u16 **)(p + 0x348) & 2)) {
             release:
                 Player_PlayLocalSong(W(0x18), 0x1F6);
@@ -80,7 +80,7 @@ void Player_UpdateChargedDashAttack(u8 *p)
             }
             break;
         case 5:
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x28), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x28), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 B(0xBF6) = 1;
             if (H(0x4D2)) {
@@ -108,7 +108,7 @@ void Player_UpdateChargedDashAttack(u8 *p)
             break;
         case 6: {
             register u32 pending asm("r0");
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 B(0xBF6) = 1;
             pending = B(0xBF6);
@@ -122,7 +122,7 @@ void Player_UpdateChargedDashAttack(u8 *p)
             break;
         }
         case 7:
-            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40);
             if (++H(0x45A) > 4)
                 Player_SetTetherMode(p, 0, 0);
             break;

@@ -5,7 +5,7 @@ void Player_SetTetherMode(struct Player *, u32, u32);
 void Player_PlayLocalSong(s32, u32);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
-void sub_08238280(struct Player *, s32, s32);
+void Player_SetAnimationIndex(struct Player *, s32, s32);
 void SelectionSlots_ClearValue(void *, u32);
 void sub_0823C280(struct Player *);
 #define F(T, off) (*(T *)((u8 *)p + (off)))
@@ -16,7 +16,7 @@ void Player_UpdateDefeatSequence(struct Player *p)
     phase = p->tetherPhase;
     switch (phase) {
         case 0:
-            sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
             F(u16, 0x4E8) = phase;
             F(u32, 0x40) = phase;
             SelectionSlots_ClearValue((u8 *)p + 0x30, p->slot);
@@ -34,7 +34,7 @@ void Player_UpdateDefeatSequence(struct Player *p)
         case 2: {
             u16 *counter;
             s32 zero;
-            sub_08238280(p, 0x2C, 0x40);
+            Player_SetAnimationIndex(p, 0x2C, 0x40);
             counter = &F(u16, 0x4E8);
             {
                 u16 t = *counter - 0x1E;

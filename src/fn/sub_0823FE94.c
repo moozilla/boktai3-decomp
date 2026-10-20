@@ -4,7 +4,7 @@ void Player_SetTetherMode(struct Player *, u32, u32);
 void Player_PlayLocalSong(s32, u32);
 u32 LinkPlayer_HasSlotValueAtLeast(struct Player *, s32);
 void *SolarBomb_Create(struct Player *, struct SceneVec *, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_UpdateSolarBombCharge(struct Player *p)
 {
     if (p->tetherMode != 0x12) {
@@ -28,7 +28,7 @@ void Player_UpdateSolarBombCharge(struct Player *p)
                 p->actionEighteenParameter = 0x170;
                 p->actionEighteenDuration = 0x20;
             }
-            if (sub_08238280(p, 0x8B, 0x40) != 0) {
+            if (Player_SetAnimationIndex(p, 0x8B, 0x40) != 0) {
                 if (*enabled != 0)
                     Player_SetTetherMode(p, 0x12, 1);
                 else
@@ -49,14 +49,14 @@ void Player_UpdateSolarBombCharge(struct Player *p)
             u16 *frame = &p->tetherFrame;
             if (*frame == 0)
                 Player_PlayLocalSong(p->slot, 0x192);
-            sub_08238280(p, 0x95, 0x40);
+            Player_SetAnimationIndex(p, 0x95, 0x40);
             (*frame)++;
             if (*frame > 0xB)
                 Player_SetTetherMode(p, 0x12, 3);
             break;
         }
         case 3:
-            if (sub_08238280(p, 0x90, 0x40) != 0)
+            if (Player_SetAnimationIndex(p, 0x90, 0x40) != 0)
                 Player_SetTetherMode(p, 0, 1);
             break;
     }

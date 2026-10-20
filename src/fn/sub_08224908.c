@@ -7,7 +7,6 @@ struct Manager {
     const u16 *allowed;
 };
 extern struct Manager gUnk_03005390;
-#define RfuManager_FindAllowedParents sub_08224908
 
 u8 RfuManager_FindAllowedParents(void)
 {

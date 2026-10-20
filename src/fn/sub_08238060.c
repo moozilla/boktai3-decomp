@@ -17,7 +17,6 @@ void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 void Collider_Refresh(u8 *);
 void SpritePulseEffect_OnAnimationEvent(void);
-#define SpritePulseEffect_InitCollider sub_08238060
 void SpritePulseEffect_InitCollider(u8 *p, u32 type, u32 a, u32 b, u32 c, u32 d)
 {
     struct Z s1, s2;

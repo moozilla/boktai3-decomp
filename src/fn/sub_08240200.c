@@ -6,7 +6,7 @@ struct RecoveryVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 u32 ActorVariant_GetTableValue(u32, u32);
-u32 sub_08238280(void *, u32, u32);
+u32 Player_SetAnimationIndex(void *, u32, u32);
 void Player_PlayLocalSong(u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 void Player_SetSecondaryActionFlags(void *, u32);
@@ -47,7 +47,7 @@ void Player_UpdateTetherRecoil(struct Player *p)
             p->heading = p->facing >> 1;
             p->side = 0;
         }
-        sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
+        Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40);
         if (p->contactActionTag) {
             Player_PlayLocalSong(p->slot, p->contactActionTag);
             p->contactActionTag = 0;
@@ -77,7 +77,8 @@ void Player_UpdateTetherRecoil(struct Player *p)
             *(u8 *)((u8 *)p + 0x479) = 0;
             if (p->movementModifierKind == 3 && p->movementModifierActive)
                 Player_SetTetherMode(p, 0x16, 0);
-            else if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x2A), 0x40)) {
+            else if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2A),
+                                              0x40)) {
                 sub_08238238(p);
                 Player_SetTetherMode(p, 0, 0);
             }

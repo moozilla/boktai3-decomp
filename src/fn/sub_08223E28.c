@@ -18,8 +18,8 @@ void RfuManager_DisconnectAndWait(u8);
 void RfuManager_CompletePendingMscCycle(void);
 void RfuManager_ClearState(void);
 void RfuManager_FinishSlotReception(void);
-u8 sub_08224908(void);
-void sub_082249CC(void);
+u8 RfuManager_FindAllowedParents(void);
+void RfuManager_RemoveSendTargets(void);
 void RfuManager_UpdateLinkRecovery(u16);
 #ifdef NONMATCHING
 // fuzzy: 80.9%
@@ -80,7 +80,7 @@ void RfuManager_ApplyRequestResult(u16 command, u16 result)
                 break;
             case 0x1d:
                 if (!result) {
-                    status = sub_08224908();
+                    status = RfuManager_FindAllowedParents();
                     G->f14 = status;
                     if (status)
                         RfuManager_NotifyEvent(0x20, 1);
@@ -230,7 +230,7 @@ void RfuManager_ApplyRequestResult(u16 command, u16 result)
         case 0x30:
             if (!result) {
                 G->f14 = rfu_getSTWIRecvBuffer()[8];
-                sub_082249CC();
+                RfuManager_RemoveSendTargets();
                 if (G->f30) {
                     G->f30 &= ~(u8)G->f14;
                     for (i = 0; i < 4; i++)
