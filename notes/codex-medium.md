@@ -1077,3 +1077,71 @@ exact. Draft scores were recorded with check.py --nonmatching --record against
 reviewed extents. All commits use build/commit.sh. No full builds, network
 operations, ROM, generated assembly or emulator dumps. Project percentage and
 percentage-point accounting remain for batch integration.
+
+## Task 080DE128 — 2026-10-20
+
+Tags: #matching #dog #register-allocation
+
+Worked solo on the preclaimed cloud/080DE128 branch; no network or full build.
+Three of six assigned entries (50%) pass reviewed-extent exact checks; one is
+retained as a 99.4% guarded draft and two remain below the draft threshold.
+The three exact C bodies already existed in the starting checkout under
+promoted descriptive names: these commits repair their missing local aliases
+and reduce unnecessary hints, rather than claiming newly recovered body bytes.
+Project percentage and percentage-point accounting belong to batch integration.
+
+- **080DE128 — matched, Dog_SelectTargetAction.** Added the local alias required
+  by the worker checkout's ELF, then checked all 772 body/pool bytes through
+  080DE42C. The subsequent byte block is retained trailing assembly, not part
+  of the accepted C body. Chooses target-range/heading responses 0x75, 0x82 or
+  0x87, otherwise invokes the movement selection. depin.py reduced 14 hints
+  to four; the register-pinning concession remains marked. Exact after format.
+- **080DE57C — matched, Dog_ResetActionState.** Added local alias and validated
+  the complete 336-byte extent ending at 080DE6CC. Clears context action gates,
+  timers and slots, resolves movement and steps the drawable sequence. depin.py
+  reduced 14 hints to 13. Exact after format; concession remains marked.
+- **080DEA7C — drafted 99.4%, Dog_UpdateCollisionBounds.** Retained the existing
+  guarded C with its required alias and recorded the score. Remaining difference:
+  the availability test separately loads offset 0x2D0 instead of deriving it by
+  subtracting four from 0x2D4 (three realigned differences including alignment).
+  A constrained offset removed the structural difference but introduced nine
+  to eleven register differences elsewhere; further signed-load and offset pins
+  did not improve it. Those experiments were discarded. A follow-up fixes the
+  fallback to spell sub_080DEA7C literally: INCLUDE_ASM stringifies its argument
+  without expanding the alias. Default assembly path is exact; draft score
+  recorded with --nonmatching --record against its 680-byte extent.
+- **080E059C — matched, Dog_ResumeAfterReaction.** Added local alias; complete
+  436-byte extent ending at 080E0750 matches after format. Waits for animation
+  completion, then resumes chase control with route flags or restores idle
+  movement. Both existing register hints remain necessary under depin.py.
+- **080E0750 — stopped below threshold.** Tentative name
+  Dog_ResumeRouteAfterKnockback. Read BIG_FUNCTIONS.md, the condensed listing,
+  callers and matched relatives. Reconstructed the entry's velocity quartering,
+  bounded offset smoothing (+/-200), animation-completion gates, chase versus
+  route restoration, and repeated terrain/route/turn logic from scene_actor_chase.h.
+  First candidate: 74.5%, 655 realigned differences / 234 ignoring registers.
+  Moving the invalid-target callback to a common tail and retaining smoothing
+  field pointers did not help: 73.8%, 656 / 238, 4184 candidate bytes. Current
+  valid candidate remains in ignored wip/sub_080E0750.c; no production draft.
+  Ghidra export is absent. Most remaining differences concern inlined control
+  tails, RNG retry allocation, stack slots and shared callback placement.
+- **080DE6E0 — stopped below threshold.** Tentative name Dog_EmitFootstepEffect.
+  Frames 1, 5 and 7 at elapsed zero emit palette-mode 1/3 effects behind the
+  actor, with two randomized X/Z offsets; returns a chase-dependent frame-table
+  value from gUnk_086061E4. Effect mode 3 uses randomized lifetime 20..83 and
+  mode 1 uses the fixed alternate effect parameters. Typed inline vector Add
+  and Offset helpers improved the initial 42.2% trial to 56.0% against the
+  reviewed 588-byte target (161 realigned / 57 structural; 616 candidate bytes).
+  Some pinning experiments scored up to 76.1%, but inspection showed incorrect
+  stack-address rematerialization around explicitly pinned inline pointers,
+  plus a missing r7 save in another trial. Rejected those candidates rather
+  than treating their scores as progress. Retained the unpinned, defined-value
+  candidate in ignored wip/sub_080DE6E0.c. It explicitly initializes the Y
+  component before the vector addition; the assembly's transient Y is overwritten
+  before the effect call, so reproducing that otherwise dead stack read is not
+  an acceptable way to improve a candidate. Remaining issues are register
+  lifetimes, initial flag address sharing, vector addressing and temporary layout.
+
+All commits were queued through build/commit.sh. No ROM, generated assembly,
+emulator dumps, shared docs or symbol tables were changed. Only check.py was
+used for acceptance; the integrator still needs the combined full-ROM build.
