@@ -3,7 +3,7 @@
 #include "scene_actor_terrain.h"
 /* Golem: route back to its home cell; near it, settle (sub_080C47DC), else face the cell centre; then go to state 2 (tentative) */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
-void sub_080C6338(void);
+void Golem_BeginChargeBuildup(void);
 void Golem_UpdateRouteMotion(void);
 void sub_080C47B8(struct ContactPosition *);
 void sub_080C47DC(void *);
@@ -77,7 +77,7 @@ void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
     struct ContactPosition center;
     struct ContactPosition diff;
     if (TakeFlag2B1(actor)) {
-        void *target = sub_080C6338;
+        void *target = Golem_BeginChargeBuildup;
         SetControl(actor, 0x25, target);
         actor->direction = actor->fieldE9;
         actor->field2B0 = 0;

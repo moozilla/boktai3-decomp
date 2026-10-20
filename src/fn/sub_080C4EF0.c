@@ -4,7 +4,6 @@
 
 extern const u8 gUnk_0824E274[];
 
-#define Golem_ResetIdleControl sub_080C4EF0
 void Golem_ResetIdleControl(struct SceneActorRegistryResetView *actor)
 {
     SceneActorReaction_ResetResponseState(&actor->word460, gUnk_0824E274, 0x22F);

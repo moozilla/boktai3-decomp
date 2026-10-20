@@ -15,7 +15,6 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->field2B1 = 1;
 }
 
-#define Axe_UpdateRecoverTimer2 sub_080FD65C
 void Axe_UpdateRecoverTimer2(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B1)
@@ -28,5 +27,5 @@ void Axe_UpdateRecoverTimer2(struct SceneActorRegistryResetView *actor)
         actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FD65C);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateRecoverTimer2);
 #endif

@@ -51,7 +51,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-#define Lun_UpdateDirectionalPoseNoSelect sub_0809B178
 void Lun_UpdateDirectionalPoseNoSelect(struct SceneActorAnimationView *actor)
 {
     struct SceneActorProfileEntry *entry =

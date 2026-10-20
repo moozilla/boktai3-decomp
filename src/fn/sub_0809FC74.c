@@ -27,7 +27,6 @@ inline static u8 Test2(int a1, u32 a0)
     return Chase_Test(a0, a1);
 }
 
-#define Crow_UpdateWanderTimer sub_0809FC74
 void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
 {
     struct CrowWanderContext *context = actor->context;
@@ -52,5 +51,5 @@ void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809FC74);
+INCLUDE_ASM("asm/nonmatching", Crow_UpdateWanderTimer);
 #endif
