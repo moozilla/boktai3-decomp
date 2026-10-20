@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define PhaseObject_ResetMotion Ivy_InitBobbing
 struct PhaseEntry {
     u32 flags;
@@ -54,7 +51,7 @@ void PhaseObject_TickEntryReset(struct PhaseObject *p)
                 p->step = zero;
             }
             {
-                u32 one = 1;
+                u8 one = 1;
                 p->flags8D = one | p->flags8D;
             }
             p->update = ChildGroup_UpdateTimedOscillation;
@@ -62,6 +59,3 @@ void PhaseObject_TickEntryReset(struct PhaseObject *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PhaseObject_TickEntryReset);
-#endif
