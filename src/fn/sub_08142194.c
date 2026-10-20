@@ -1,7 +1,9 @@
+#define Player_UpdatePushAction                                                                    \
+    sub_08142194 // confidence=low: neighbor push and contact effects identify the action
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.6%
+// fuzzy: 91.5%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -116,7 +118,7 @@ static inline int isTwo(struct P *p)
     return r;
 }
 
-void sub_08142194(struct P *p)
+void Player_UpdatePushAction(struct P *p)
 {
     s32 sb;
     u8 state;
@@ -170,7 +172,9 @@ void sub_08142194(struct P *p)
             } else {
                 int s, idx, d;
                 d = p->dir;
-                t = (d + ((t - d) * 2 + 8)) & 7;
+                t = (t - d) * 2;
+                t += 8;
+                t = (d + t) & 7;
                 t = (t + 1) & 7;
                 v = p->pos;
                 v.x -= scale(gUnk_086149C4[((t << 5) + 0x40) & 0xff] * 50);
