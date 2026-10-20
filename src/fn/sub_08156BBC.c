@@ -1,9 +1,7 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.8%
-// foundry draft (worker best 95.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gPlayerDirectionByKeys gUnk_08610B50
 extern const s16 gUnk_08610B50[];
 static inline u16 MaskKeys(u16 keys, u16 mask)
@@ -20,8 +18,6 @@ s32 Player_GetInputDirection(struct Player *p)
         direction |= 4;
     if (0x10 & keys)
         direction |= 8;
+    asm("" ::"r"(keys));
     return gUnk_08610B50[direction];
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_GetInputDirection);
-#endif
