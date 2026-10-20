@@ -1,8 +1,11 @@
 #include "global.h"
 
+// confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
+#define Glove_UpdateDefeatEffects sub_081182E4
+
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 80.7%
+// fuzzy: 81.3%
 // Reset-action pointer lifetimes, motion temporaries and register allocation still differ.
 
 struct Obj {
@@ -118,7 +121,6 @@ static inline u8 IsRecoveryEnabled(u32 mask)
         return 1;
     return 0;
 }
-// confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
 void Glove_UpdateDefeatEffects(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -129,12 +131,12 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         s32 count;
         u8 *animation;
         u32 offset;
-        struct Obj *actionSelf = self;
+        struct Obj *actionSelf;
         u8 *actionKind, *spriteSlot, *releasePending, *actionPending;
         u16 *actionTimer, *cooldown, *flags;
         u8 **sprites;
-        u8 *style;
         u32 *motionBias;
+        u8 *style;
         ActorParticles_SpawnSideBurst(self);
         if (LinkParticipant_IsLocallySelected(p)) {
             Sound_StopSong(0x87);
@@ -144,6 +146,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             Sound_StopSong(0x8B);
             Sound_StopSong(0x93);
         }
+        actionSelf = self;
         actionKind = (u8 *)p + 0x2CD;
         spriteSlot = (u8 *)p + 0x33D;
         releasePending = (u8 *)p + 0x343;
@@ -194,7 +197,9 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         count = 4;
         do {
             u8 *base = *sprites;
-            *(u32 *)(base + 0x48 + offset) = (u32)(base + 0x210);
+            u8 *destination = base + 0x48;
+            destination += offset;
+            *(u32 *)destination = (u32)(base + 0x210);
             offset += 0x60;
             count--;
         } while (count >= 0);
@@ -316,5 +321,5 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Glove_UpdateDefeatEffects);
+INCLUDE_ASM("asm/nonmatching", sub_081182E4);
 #endif
