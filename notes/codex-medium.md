@@ -3739,3 +3739,200 @@ The bounded permuter attempt for 080F3230 failed before searching: export's
 `src/fn/sub_0808CC48.c` as not a known function start. The Ghidra export is absent
 (`gen/ghidra/decomp.c`), so these candidates were recovered from assembly and
 matched siblings. No register-pinning concession is present in accepted sources.
+
+## Task 081BDE94 — 2026-10-20
+
+Tags: #matching #storage #inventory #worker #register-pinning
+
+Exact code gain: **+0.0729 percentage points** (1,760 bytes). Register-pinned
+category: 1,212 bytes; ordinary C: 548 bytes. Three of the six assigned functions
+matched; no NONMATCHING drafts remain from this task.
+
+- **081BF67C matched**, named `Storage_InitWidgets`. Called by `Storage_Init`
+  (081BFF18), it copies and relocates the 0xCB05/0x5D04 and 0xCB05/0x530D
+  resources into +0x1538/+0x1518, initializes Storage's widgets (including the
+  two sixteen-slot grids and eight equipped markers), then initializes the input
+  marker/glyph pairs at +0x1558/+0x164C. Uses the shared `ContactPackedVector`
+  and `SceneInputResource` types. Taking the clear-fill value's address early
+  (`zeroPtr`) gives the original stack layout; otherwise the position starts
+  four bytes too early and creates extensive allocation differences. Initially
+  committed as a recorded 95.9% draft, then superseded by an exact match.
+  Four hints survive `depin.py`: the first call's r1 zero plus an empty compiler
+  barrier, and r0/r1 pointers for CpuSet. These resolve the final argument-order
+  differences without handwritten instructions. Reviewed extent: 840 bytes.
+- **081BE16C matched**, `Storage_RefreshItemSlots`. Refreshes two sixteen-entry
+  grids at +0x318/+0x918 using mapping bytes +0x1790 and the resource at +0x1538;
+  records the first empty slot in +0x1756/+0x1757, applies palette 0x373 to the
+  carried grid and hides all eight equipped markers at +0x10F8. First empty
+  field is written as unsigned 0xFF but tested through s8; the second starts
+  with signed -1. A distinct row-byte offset and widget-base local reproduce
+  the first grid's address addition order. The second grid needs an explicit
+  advancing slot index, separate column counter and next-row value; otherwise
+  agbcc replaces the counter with a descending loop or recomputes the index.
+  A named mask initialized before the final flags pointer reproduces the hide
+  loop. Two hints remain after depinning: column r9 and second-grid row slot
+  r8. Reviewed extent: 372 bytes.
+- **081BF1AC matched**, `SceneInventory_UpdateCategoryBrowse`. Select+A cycles
+  clock mode; ordinary A saves the grid selection and either starts swap
+  selection (mode 1) or checks whether the selected item can be removed (mode
+  2), opens its confirmation and updates the palette/state. B returns to mode
+  selection; grid navigation updates the cursor and description. A named
+  pointer to the saved cursor gives a +0x14B8 base with flags at +8; a direct
+  field expression instead synthesizes +0x14C0. Positive eligibility branches
+  and a shared `allow` label reproduce the branch order. Set the consumed
+  eligibility flag after the consumable-equipped call to avoid an extra saved
+  register. Use canonical `Storage_UpdateSwapSelection` for callback 081BF04C:
+  the old sub_ name resolved without its Thumb bit. No hints remain after
+  depinning. Reviewed extent: 548 bytes.
+- **081BE504 stopped below draft threshold**, best 49.6% (candidate-length
+  score). Equipment refresher also highlights equipped/unassignable carried
+  slots with palette 0x374, places equipped markers via 081BD934, and hides the
+  unused markers. Ordinary flat/2D typed-widget and raw-pointer variants retain
+  different row-base, flag-pointer and marker-offset inductions and stack
+  allocation. Best source retained in `wip/sub_081BE504.c`; not added to src.
+- **081BE2E0 stopped below draft threshold**, best 70.1% (candidate-length
+  score). Consumable counterpart uses id +0x121, checks equipped slots through
+  `GameState_IsConsumableSlotEquipped`, highlights those entries and positions
+  equipped markers. Explicit row/marker offsets reduced some structural
+  differences, but agbcc turns the inner slot pointer into an induction
+  variable and the counters into descending loops. Volatile counter, aggregate
+  frame and register-placement probes did not improve the retained score.
+  Best source retained in `wip/sub_081BE2E0.c`; not added to src.
+- **081BDE94 stopped below draft threshold**, best 50.2% (candidate-length
+  score). Builds two transition entries for saved/current selections, hides
+  their grid widgets and appropriate equipped markers, determines frames and
+  enabled flags by category, reverses source positions into destinations,
+  begins a twelve-frame pair transition and plays sound 0x38A. Output-array
+  indexing produces different pointer induction/stack spilling; explicit
+  output pointers and flag views worsened the candidate. Best source retained
+  in `wip/sub_081BDE94.c`; not added to src.
+
+All accepted functions were formatted with the venv's clang-format, minimized
+with `depin.py`, and checked byte-identically with explicit reviewed extents
+using `tools/check.py`. No full build or network operations. Ghidra's export
+is absent, so recovery used assembly, callers/callees and matched neighbours.
+
+
+## Task 0813FFE4 — 2026-10-20
+
+Tags: #matching #player #movement #camera #nonmatching
+
+Five of six assigned functions matched (83.3% by count), adding approximately
+0.109 percentage points of total code (2632 bytes). Of that gain, approximately
+0.043 percentage points (1044 bytes) belongs to Register-pinned; approximately
+0.066 percentage points (1588 bytes) needs no matching concessions. One inherited
+99.9% guarded draft retained with the required file-local alias and raw fallback.
+Aggregate totals remain in PROGRESS.md. Worked solo on the preclaimed branch;
+no network, make, full build or direct git mutations. Each function was committed
+separately through build/commit.sh.
+
+- **08140CC4 matched**, Player_UpdateLockedMovement (636 bytes). Relative
+  Player_UpdateModifier08Drift at 0823BE50 provides most of the body and its
+  local typed layout. Adapted the status predicate and sound call; added the
+  mode-three/phase-five/contactMagnitude path, which starts movement opposite
+  facing. Bytes 48C-48F hold active/played/timer/direction; signed halfwords
+  490/494 hold ten-unit directional components. Three inline signed scaling
+  expansions share the sine table; preserving its pointer/result lifetime
+  reproduces the register allocation. No hints needed.
+- **08140F40 matched**, Player_GetForceDirection (632 bytes), improving the
+  inherited 99.7% draft. An empty compiler barrier on the masked signed angle
+  retains the original arithmetic shift; assigning offset zero after that shift
+  restores instruction order. depin retains angle r0, direction r4 and the empty
+  barrier (3 of 3 hints). Compares terrain heights in a direction-dependent
+  neighbor, with additional within-cell X/Z corner selection for even directions.
+- **08140AC8 matched**, Player_SelectLockedTurnDirection (508 bytes).
+  Actor_ProbeDiagonalTurnDir at 0823BC54 ports exactly after replacing its
+  probe callee with 081409BC. Called by the locked-movement updater. Probes
+  three offset positions for cardinal direction values 0/2/4/6 and selects
+  the adjacent odd direction; unsupported input returns -1. No hints needed.
+- **0813FFE4 matched**, Player_InitBodyFromScript (444 bytes). Uses packed
+  signed sixteen-bit vector fields, reads script keyword p or saved player
+  position, samples terrain height including slope adjustment, initializes
+  SceneBody, display, movement probe, offset and contact registration. Combines
+  the position sampler from 08064338 with the setup sequence of 0823B0D4.
+  A switch on modes 0/1/2/6 reproduces the apparently redundant signed lower
+  bound check; an ordinary range predicate folds it into an unsigned test.
+  Separate early/late body locals reproduce the r4-to-r5 copy once that switch
+  is present. Explicitly returns the defined contact-registration result while
+  recording body IDs. Correcting the SceneBody_Init entry argument from u16
+  to full width removes two unwanted truncation instructions. depin removes
+  both temporary body pins, leaving no concessions.
+- **0814159C matched**, Player_UpdateCameraOffset (412 bytes), improving the
+  inherited 83.7% draft. Split input history from its quantized direction;
+  use a signed full-width local for the narrowed atan2 result, separate the
+  facing mask from direction computation, and preserve action-mode lifetime.
+  depin reduces ten exploratory hints to three: history pointer r2, an empty
+  barrier between input copying and adding one, and action-mode r0. These
+  retain the original copy/add pair, load allocation, mask scheduling and
+  derived field-address literals. Both angle sums remain readable signed C.
+- **08141C40 drafted 99.9%**, Player_EmitMovementEffects (576 bytes).
+  One resolved branch byte differs at 08141C64: ROM null-player branch skips
+  directly to 08141CFC, while C branches to the redundant null test at
+  08141C90. Realigned instruction comparison reports zero differences but
+  byte comparison correctly rejects the candidate. Explicit goto/nested
+  guards, combined suppression inline, and pointer barriers either preserve
+  this difference or worsen register allocation and pool placement. Retained
+  the strongest original body and existing position r4 pin. depin on the
+  unguarded scratch source skips because its base is not exact; it provides
+  no hint-minimality claim. Recorded with --nonmatching --record and verified
+  the default assembly fallback separately. The comment identifies the residue.
+
+All five exact functions were formatted with build/venv/bin/clang-format and
+passed check.py with explicit reviewed body/pool extents (444, 508, 636, 632,
+412 bytes respectively in address order). No handwritten instruction bodies.
+Combined ROM validation and alias promotion remain for batch integration.
+Shared docs/index and progress totals were not regenerated by this worker.
+
+## Task 080FD6D0 — named object terrain constraints and actor-group motion
+
+Tags: #matching #named-object #terrain #actor-group
+
+- 08103F44 matched: NamedObject_PlayAdjacentExitSound. The caller is
+  081012EC, after NamedObject_StepTowardTarget reports arrival and the object
+  changes to state 3.
+  Checks attachment ownership/flags, then four adjacent cells for equal height
+  and absence of terrain attributes 0xC3; plays song 0x151 on the first exit.
+  Reused the matched SceneActorTerrain cell accessor. Two nested u8 inline
+  predicates preserve materialized booleans. Reading x/z through one u16
+  position pointer and loading attributes through a u32-returning inline
+  removed the final selection/register differences. No pinning.
+- 0810271C matched: NamedObject_ClampTetherToPlatform. Ported the matched
+  NamedObject_ConstrainTether (081023CC): sample tether cell instead of object
+  cell, accept same terrain height unless attribute 0x40 is set, and use bounds
+  at 086064B4. Installed for kind 1 by NamedObject_CreateFromScript. No pinning.
+- 08102570 matched: NamedObject_ClampTetherAtBarrier. Same family, but its guard
+  is terrain attribute 0x80. Installed for kinds 0/3. The rest of the clamp and
+  attachment flag 0x200 update is shared with 0810271C. No pinning.
+- 080FD6D0 matched: ActorGroup_BeginExtendedMotion. Based on matched
+  ActorGroup_BeginMotionPhase (080FD334); changes control to 080F85B0/type 0x27,
+  sets group flag 0x1000, copies duration EC4 to timer EBC, sets auxiliary
+  sprite position from context+8A8 with mode 0x13D, marks ED0 active, and plays
+  song 0x16F. Completion selects behavior 7. Correct context padding was the
+  last mismatch. Name follows neighboring ActorGroup routines. No pinning.
+- 081021DC retained inherited draft at 86.5%: NamedObject_ConstrainPlayer.
+  Independent sibling port converged on the same 33 register-only differences:
+  delta pointer r5/r6 and y-difference/reload allocation. Signed state access
+  is required. Pointer pin experiments worsened structure and were discarded.
+  Kept the inherited readable source, added the required local alias, and
+  corrected its default INCLUDE_ASM label to sub_081021DC (the named assembly
+  filename is absent in this checkout). Default fallback passes exact check.
+- 08101340 drafted 84.5%: NamedObject_UpdateMovementSound, called by
+  NamedObject_UpdatePool. Selects songs 0x28A/0x288/0x289 by object kind, using
+  manager byte 1378 as the playing latch. A switch rather than if/else prevents
+  constant-delta folding and recovers the instruction structure. The 448-byte
+  executable body has 17 register-only differences (91.9% candidate-length
+  score). Reviewed extent is 528 bytes and includes an additional apparent
+  function at 08101500, so the recorded whole-extent score is 84.5%; do not
+  mistake the body score for full coverage. Default assembly fallback passes.
+
+Useful layout warning: sizeof(struct NamedObject) from named_object.h is
+0x198 in this checkout, while pool stride is 0x19C. Explicit integer stride
+arithmetic, as in matched NamedObject_UpdatePool, prevents incorrect indexing
+and loop strength reduction. No shared header was changed.
+
+Bounded permuter attempts for the two remaining drafts stopped before search:
+tools/split.py rejects unrelated Ghoul_ResumePendingRoute in sub_0808CC48.c as
+an unknown function start. Declaration swaps and pinning did not improve the
+retained candidates. All four matches were clang-formatted and rechecked with
+check.py; both drafts were checked with --nonmatching --record and their
+assembly fallbacks checked separately. No full build or network operations.

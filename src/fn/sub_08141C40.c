@@ -1,6 +1,9 @@
 #include "global.h"
+#define Player_EmitMovementEffects sub_08141C40
+
 #ifdef NONMATCHING
 // fuzzy: 99.9%
+// The first null-player branch targets the next null check rather than the shared effect path.
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 extern u8 *gUnk_02000710;
@@ -107,5 +110,5 @@ void Player_EmitMovementEffects(u8 *p, s32 quiet)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_EmitMovementEffects);
+INCLUDE_ASM("asm/nonmatching", sub_08141C40);
 #endif

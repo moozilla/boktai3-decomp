@@ -2,6 +2,7 @@
 #include "player.h"
 #ifdef NONMATCHING
 // fuzzy: 86.5%
+#define NamedObject_ConstrainPlayer sub_081021DC
 // Open: only a register swap (the delta pointer should be r6 and the y-difference temporary r5).
 extern const struct SceneVec gUnk_086064C4;
 extern struct EngineMap *gUnk_030052F4;
@@ -68,5 +69,5 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", NamedObject_ConstrainPlayer);
+INCLUDE_ASM("asm/nonmatching", sub_081021DC);
 #endif
