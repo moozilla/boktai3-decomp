@@ -1991,3 +1991,166 @@ assembly commit; combined ROM validation belongs to the integrator.
 Each match and qualifying draft was committed separately through build/commit.sh.
 Draft scores were recorded with check.py --nonmatching --record; all three
 normal assembly fallbacks check byte-identical. Ghidra export is absent.
+
+## Task 08140CC4 — 2026-10-20
+
+Tags: #matching #player #movement #camera #nonmatching
+
+Exact gain: approximately 0.018 percentage points of total code (448 bytes),
+without register pinning. One exact match, three new guarded drafts and one
+updated existing draft. Aggregate totals remain in PROGRESS.md. Worked solo;
+no network, full build, or direct git mutation. All commits use build/commit.sh.
+
+- 08142194: updated existing guarded draft to 91.5%, named
+  Player_UpdatePushAction (tentative: neighbor pushes and contact effects).
+  Read BIG_FUNCTIONS and inspected assembly, callers/callees and relatives.
+  Explicitly sequencing the direction difference, doubled offset, addition of
+  eight and facing addition reduces structural realigned differences from 47
+  to 35; total differences are 105 versus the original 104. The slight fuzzy
+  decrease from 91.6% accompanies this structural improvement. Remaining
+  differences include extra saved high register, terrain helper mask/narrowing
+  and address/register allocation. Existing body preserved under NONMATCHING.
+- 08140CC4: stopped unmatched, no qualifying draft. Static caller
+  Player update 0815788C invokes it to maintain locked movement. Byte 284 bit
+  one gates direction refresh; bytes 48D/48E delay release, byte48F stores
+  direction, halfwords490/494 store ten-unit direction-derived components.
+  Modes 1/2 or mode6 with valid direction history start locking; mode3 phase5
+  with contactMagnitude starts opposite facing. Typed local layout improved
+  initial 62.2% candidate to 74.4% (106 realigned differences, 12 structural).
+  Owner r5 pin regressed to 72.0%; no productive next hypothesis remained.
+  Scratch candidates remain under ignored wip/codex-low and build/.
+- 08140F40: drafted 99.7% as Player_GetForceDirection. Quantizes global angle
+  0200053C, compares terrain heights in the directional neighbor; diagonal
+  movement checks the corner and the adjacent cell selected by within-cell X/Z.
+  Pinned angle/result to r0 and direction to r4 recover register allocation
+  and tail. One differing instruction remains: ROM arithmetic shift versus
+  compiler logical shift in the nonnegative masked-angle quantization.
+  Recorded reviewed extent is 632 bytes. depin on the unguarded candidate
+  skips because the base is nonmatching. Required concession marker retained.
+- 08141C40: drafted 99.3% as Player_EmitMovementStepEffects. Called by
+  Player_UpdateMovement and the resource dash. Animation cue counter/flags
+  gate emission; action flags, repeated-effect presence, terrain/action status
+  and mode5 select effects/songs. A global bit at GameState+868 enables an
+  additional position effect. Passing that mask to an inline recovers its
+  mask-before-global-load order. Four realigned instruction differences remain:
+  initial null-path destination and flag load/mask scheduling. No pins.
+- 08141FA0: matched as Player_UpdateResourceDash (tentative dash identity).
+  Entry tests shared resource availability or actionFlags bit20, sets speed
+  from GameState+876 (or 26 for free dash), caps at32 and uses 512/speed ticks.
+  Phase0 sets directional velocity, movement effects and animation; failed
+  entry uses phase1 for eight ticks. Using the existing Player padding bytes
+  at4F0/4F1 avoids a second aliased owner pointer. The direction store is
+  facing at3A4, not coordinateAxis at4A5. Exact after formatting: 448 bytes.
+- 0814159C: drafted 83.7% as existing Player_UpdateCameraOffset. Starts from
+  global camera position minus player position (Y minus150), steps horizontal
+  offsets by thirty units from directionHistory, clamps, then derives facing
+  and side from the offset angle when camera input is processed. Remaining
+  28 realigned differences / 11 structural concern input-direction allocation,
+  angle/mask scheduling and derived field constants. No pins. The default
+  INCLUDE_ASM must use existing promoted Player_UpdateCameraOffset filename,
+  while the draft retains a local alias to sub_0814159C; corrected after the
+  draft commit when the default check exposed the unavailable old filename.
+
+All four drafts were formatted and recorded with check.py --nonmatching
+--record using reviewed extents. All default assembly fallback checks pass,
+including the camera fallback correction. The dash passed the exact C check.
+Ghidra export is absent. Combined ROM validation remains for the integrator.
+
+## Task 080C66B0 — 2026-10-20
+
+Tags: #matching #golem #nonmatching #register-pinning
+
+Exact code gain this pass: 0 percentage points. The checkout already held three
+exact C implementations and three guarded drafts under promoted names. Restored
+file-local aliases required by this worker task and raw sub-address assembly
+fallback names required by this checkout's generated assembly. Existing Golem
+callers 080CC910, 080CDF14 and 080CEDF0 install route/windup callbacks; adjacent
+Golem controls establish the provisional state names. No new exact coverage is
+claimed for the inherited implementations.
+
+- 080C6A68: drafted 86.5%, up from 85.9%. Read BIG_FUNCTIONS before work.
+  Explicit packed X/Z word updates preserve the neighboring halfword; pinning
+  variantPointer to r5 and mirrorPointer to r2 recovers selector allocation.
+  Realigned differences improved from 96 total / 32 structural to 93 / 20.
+  Remaining residue is stack-slot placement, packed-store scheduling and late
+  context direction address scheduling. An explicit sum temporary reached
+  17 structural differences but worsened total to 102 and fuzzy to 84.3%; rejected.
+- 080C75B8: inherited match verified, Golem_UpdateRecoil, 1008 bytes.
+  Decelerates recoil, approaches the saved position, signals completion.
+- 080C725C: inherited guarded draft retained at 89.1%, Golem_UpdateSlideImpact.
+  54 total / 23 structural differences: motion pointer copies, RNG allocation,
+  control-reset offsets. Pinning body to r10 regressed to 83.9%; rejected.
+- 080C6F58: inherited match verified, Golem_UpdateChargeWindup, 772 bytes.
+- 080C66B0: inherited match verified, Golem_UpdateRouteMotion, 576 bytes.
+- 080C68F0: inherited guarded draft retained at 81.6%, Golem_UpdateChargeStop.
+  37 total / 9 structural differences. Pinning quadrant/selection to r3,
+  mirror to r2 and keyframe mode to r7 regressed to 78.1%; rejected.
+
+All six formatted using build/venv/bin/clang-format. Exact C checks and all three
+assembly fallback checks pass. Draft scores recorded by check.py --nonmatching
+--record. depin retains 3/4/3 hints on route/windup/recoil. On guarded drafts,
+depin tested the assembly alternative and incorrectly removed hints; restored
+all draft sources before final checks, so it gives no draft minimality evidence.
+relatives.py failed while generating its progress cache; no network or full build
+was attempted. Per-function commits completed through build/commit.sh. Combined
+ROM validation and name promotion remain for integration.
+
+## Task 080B77D0 — 2026-10-20
+
+Tags: #matching #skeleton #nonmatching
+
+Exact code gain: 0 percentage points. Improved two inherited guarded drafts and
+restored required local aliases/fallback spellings on a third. Worked solo;
+no network, make, full build, or direct git mutations. All commits use the driver.
+Read entry-point/worker/cloud guidance and BIG_FUNCTIONS; inspected assigned
+assembly, condensed large bodies and prior committed notes before changes.
+
+- 080BBDD0: drafted **88.9%**, Skeleton_ConvergeDisplacedPosition, up from
+  87.1%. Narrowing PickDirection's selected direction to u8 reduces realigned
+  differences from 316 total / 44 structural to 256 / 46 and makes candidate
+  length equal the reviewed 4116-byte extent. It represents a byte direction
+  throughout. Mask-first short/settle updates, a signed group flag helper,
+  deriving saved state directly from actor, narrowing prior direction and
+  pinning the outer actor to r8 did not improve the result. Remaining recovery
+  pointer/flag lifetimes and RNG allocation require further work. No pins.
+- 080B7C10: retained inherited **92.8%** draft, Skeleton_SelectDistanceReaction.
+  Restored file-local own-name and retreat-callee aliases plus raw-address
+  INCLUDE_ASM spelling for this checkout's generated assembly. Adjacent local
+  declaration swaps, byte direction result, removing current-direction r5 pin
+  and direct RNG table access did not improve 146 total / 22 structural
+  differences. Existing concession marker retained. depin on the actual
+  unguarded scratch candidate skips because the base is not exact.
+- 080B9158: stopped unmatched. Inspected entry, condensed repeated terrain
+  recovery and installer 080B5D84 (timed behavior 56, category-dependent timer).
+  Entry samples RNG, probes direction through 080B713C, then uses animation 15
+  and route/chase recovery on failed direction or landing. No complete improved
+  candidate recovered beyond prior notes' below-threshold attempt. relatives.py
+  fails generating its progress cache (progress.py subprocess failure); no
+  tooling change made to work around that failure.
+- 080BF0E4: stopped below threshold; existing production draft unchanged.
+  Scratch PlayerSlot index-first loading changes reviewed realigned residue
+  from 473 / 164 to 476 / 162, scoring 72.4% over 3040 bytes. Narrowing the
+  random-direction helper's return did not improve structure. Directional
+  rise animation expansion and recovery allocation remain the blockers.
+- 080BA268: new scratch candidate, tentative Skeleton_ReleaseBoneProjectiles,
+  stopped at **64.5%** over reviewed 784 bytes (candidate 772), 148 total / 50
+  structural differences. Caller 080BA13C installs it following queued contact;
+  animation 22 releases two randomized D45E/1DC3 bone effects at heights +260
+  then +220 with upward velocity 30, reinitializes category 5 and collider.
+  Signed shift helper preserves the quantization branch; packed position copy
+  and typed addition recover much of the launch sequence. Remaining polar
+  argument scheduling, redundant angle masks, effect literal scheduling and
+  register allocation prevent a qualifying draft. Scratch only, no src body.
+- 080B77D0: drafted **94.3%**, Skeleton_TrySelectRetreatCell, up from 87.8%.
+  Deriving group at its late callback use instead of retaining a function-wide
+  group pointer removes its extra prologue setup; 52 / 30 differences become
+  27 / 27. A byte retry counter regresses. Moving north/south tail computations
+  to shared goto labels reduces structure to 25 but increases total to 43 and
+  lowers fuzzy to 93.1%; restored the stronger 94.3% candidate. Remaining
+  residue is north/south map reload tail layout and pool placement. No pins.
+
+Three changed guarded files formatted directly with build/venv/bin/clang-format;
+reviewed scores recorded with check.py --nonmatching --record, and all three
+assembly fallback checks pass. Below-threshold candidates remain in ignored
+wip/codex-low. No exact coverage claimed for assembly fallbacks. Combined ROM
+validation remains for integration. Shared docs and totals were not regenerated.
