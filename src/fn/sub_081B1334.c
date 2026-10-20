@@ -1,10 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: provisional role inferred from state transitions and player-motion calls
+#define ActorStatus_UpdateGuardedApproach sub_081B1334
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
 #ifdef NONMATCHING
 // fuzzy: 86.0%
-// Remaining differences: Guarded contact transition, entry-pointer lifetimes, and packed-animation allocation differ.
+// Remaining differences: Entry/reset pointer allocation, guarded-transition address reuse, and final stores differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -150,11 +152,21 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
 static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32 options)
 {
     void *data = *(void **)(boss + 0x4d0);
-    register struct DisplaySequenceState *seq asm("r4") = &p->sequence;
+    register struct DisplaySequenceState *seq asm("r4");
+    if (id == 9) {
+        register void *resource asm("r1") = data;
+        register u32 zero asm("r2");
+        asm("" : "+r"(resource));
+        zero = 0;
+        asm("" : "+r"(zero));
+        data = resource;
+        options = zero;
+    }
+    seq = &p->sequence;
     Anim_SetSequence(seq, data, id, (u8)p->variant, options);
     StepPlayback(p, seq, p, 1);
 }
-static inline void SetVector(struct SceneVec *p, s16 x, s16 y, s16 z)
+static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
     ((volatile s16 *)p)[0] = x;
     p->y = y;
@@ -162,9 +174,9 @@ static inline void SetVector(struct SceneVec *p, s16 x, s16 y, s16 z)
 }
 static inline void AddOffset(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
-    out->x = (u16)a->x + (u16)b->x;
+    out->x = (u16)b->x + (u16)a->x;
     out->y = (u16)b->y + (u16)a->y;
-    out->z = (u16)a->z + (u16)b->z;
+    out->z = (u16)b->z + (u16)a->z;
 }
 static inline void Difference(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
@@ -179,13 +191,16 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-static inline u8 PlayerNear(struct ActorStatusPart *p)
+static inline u32 PlayerNear(struct ActorStatusPart *p)
 {
     struct SceneVec *player = Player_GetEffectivePosition(0);
     s32 dx = player->x - p->position.x;
     s32 dz = player->z - p->position.z;
-    u8 result = 0;
-    if (dx * dx + dz * dz <= 0x63ff)
+    register u32 result asm("r2");
+    s32 distance = dx * dx + dz * dz;
+    asm("" : "+r"(distance));
+    result = 0;
+    if (distance <= 0x63ff)
         result = 1;
     return result;
 }
@@ -210,76 +225,125 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
     register u8 *owner asm("r9") = boss;
     struct ActorStatusPart *p = part;
     struct SceneVec target, delta;
+    u8 *enter;
     u32 mask = 0x28;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
         SetAnimation(p, owner, 11, 0);
-        p->state = 0;
-        p->timer = 0;
+        {
+            register u32 zero asm("r1") = 0;
+            asm("" : "+r"(zero));
+            p->state = zero;
+            p->timer = zero;
+        }
         p->enter = 1;
         Sound_PlaySong(0x58a);
     }
-    switch (p->state) {
-        case 0: {
-            u8 *enter = &p->enter;
-            void *motion = p->motion;
-            if (*enter) {
-                *enter = 0;
-                SetVector(&target, -1024, 0, -1024);
+    {
+        register u32 offset asm("r1") = 0x164;
+        register u32 *state asm("r0");
+        asm("" : "+r"(offset));
+        state = (u32 *)((u8 *)p + offset);
+        switch (*state) {
+            case 0: {
+                register u32 entered asm("r1");
+                register void *motion asm("r6");
                 {
-                    struct SceneVec *origin = &p->offset;
-                    AddOffset(&target, origin, &target);
-                    MotionTrack_Initialize(motion, origin, &target, 0, 4);
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
                 }
+                motion = p->motion;
+                if (entered) {
+                    register u32 zero asm("r2") = 0;
+                    asm("" : "+r"(zero));
+                    *enter = zero;
+                    SetVector(&target, -1024, zero, -1024);
+                    {
+                        struct SceneVec *origin = &p->offset;
+                        AddOffset(&target, origin, &target);
+                        MotionTrack_Initialize(motion, origin, &target, 0, 4);
+                    }
+                }
+                MotionTrack_Update(motion);
+                if (MotionEnded(p)) {
+                    register u32 next asm("r2") = 1;
+                    asm("" : "+r"(next));
+                    p->state = next;
+                    p->timer = 0;
+                    *enter = next;
+                }
+                break;
             }
-            MotionTrack_Update(motion);
-            if (MotionEnded(p)) {
-                p->state = 1;
-                p->timer = 0;
-                *enter = 1;
+            case 1: {
+                register u32 entered asm("r1");
+                register void *motion asm("r6");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                motion = p->motion;
+                if (entered) {
+                    register u32 zero asm("r0") = 0;
+                    asm("" : "+r"(zero));
+                    *enter = zero;
+                    Difference(&delta, Player_GetEffectivePosition(zero), p->anchor);
+                    MotionTrack_Initialize(motion, &p->offset, &delta, 0, 4);
+                }
+                MotionTrack_Update(motion);
+                if (PlayerNear(p)) {
+                    RequestBehavior(p, 18);
+                } else if (MotionEnded(p)) {
+                    {
+                        register u32 next asm("r1") = 2;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
+                    p->timer = 0;
+                    *enter = 1;
+                }
+                break;
             }
-            break;
+            case 2: {
+                register u32 entered asm("r1");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                if (entered) {
+                    register u32 zero asm("r2") = 0;
+                    asm("" : "+r"(zero));
+                    *enter = zero;
+                    SetAnimation(p, owner, 12, zero);
+                    Sound_PlaySong(0x58a);
+                }
+                if (++p->timer > 120) {
+                    SetAnimation(p, owner, 9, 0);
+                    {
+                        register u32 next asm("r1") = 3;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
+                    p->timer = 0;
+                    *enter = 1;
+                }
+                break;
+            }
+            case 3:
+                p->finished = 1;
+                break;
         }
-        case 1: {
-            u8 *enter = &p->enter;
-            void *motion = p->motion;
-            if (*enter) {
-                *enter = 0;
-                Difference(&delta, Player_GetEffectivePosition(0), p->anchor);
-                MotionTrack_Initialize(motion, &p->offset, &delta, 0, 4);
-            }
-            MotionTrack_Update(motion);
-            if (PlayerNear(p)) {
-                RequestBehavior(p, 18);
-            } else if (MotionEnded(p)) {
-                p->state = 2;
-                p->timer = 0;
-                *enter = 1;
-            }
-            break;
-        }
-        case 2: {
-            u8 *enter = &p->enter;
-            if (*enter) {
-                *enter = 0;
-                SetAnimation(p, owner, 12, 0);
-                Sound_PlaySong(0x58a);
-            }
-            if (++p->timer > 120) {
-                SetAnimation(p, owner, 9, 0);
-                p->state = 3;
-                p->timer = 0;
-                *enter = 1;
-            }
-            break;
-        }
-        case 3:
-            p->finished = 1;
-            break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
 #endif
