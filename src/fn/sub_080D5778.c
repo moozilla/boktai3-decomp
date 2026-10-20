@@ -1,5 +1,8 @@
 #include "global.h"
 
+#define Mummy_ResumeDelayedRoute   sub_080D5778
+#define Mummy_RequestStraightRoute sub_080D6FDC
+
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 #include "scene_actor_chase.h"
@@ -194,5 +197,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D5778);
 #endif
