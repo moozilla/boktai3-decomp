@@ -5,7 +5,7 @@
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void sub_080BCF34(void);
+void Skeleton_UpdateTargetTransition(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u32 NavMesh_ConsumeProbeEvent(void *);
@@ -59,7 +59,7 @@ void SceneActorControl_UpdateProbeApproach(struct SceneActorRegistryResetView *a
     u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetControl(actor, sub_080BCF34, 0x3B);
+        SetControl(actor, Skeleton_UpdateTargetTransition, 0x3B);
         {
             u32 bit = 0x200;
             u32 *flags = (u32 *)(control + 0x6DC);

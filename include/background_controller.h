@@ -187,7 +187,7 @@ u8 *sub_08216E54(u16);
 struct ResourceRef *ResourceRegistry_GetResource(u16);
 void Blend_SetAlpha(u32, s32, s32);
 void Bg_SetPriority(u32, s32);
-void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
+void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void Bg_SetupLayers(s32, s32, void *, s16, s16, s32, s32 *);
 void Bg_SetLayerMap(u32, void *, u16);
 void sub_08215D40(u16, void *, s32, u16 *, u16);

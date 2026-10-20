@@ -47,7 +47,7 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(int, int);
 extern const s16 gUnk_086149C4[];
 int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
-void sub_0802DD6C(struct Actor *, int);
+void Actor_PlayFootstepSound(struct Actor *, int);
 void DisplayAnimation_SetFlags(void *, int);
 void DisplayAnimation_ClearFlags(void *, int);
 void DisplayAnimation_SetPalette(void *, int, int, int);
@@ -108,7 +108,7 @@ void sub_0802EA90(void *unused, struct Actor *p)
             }
             Actor_PlayAnimationEntry(p, 1, 1, 0, 1);
         }
-        sub_0802DD6C(p, 1);
+        Actor_PlayFootstepSound(p, 1);
     }
 }
 #else
