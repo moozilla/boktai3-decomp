@@ -83,8 +83,8 @@ collision:
         goto zero;
     if (actor->distanceF0 >= actor->distanceLimitF8)
         goto zero;
-    if (!sub_0821F204(*(void **)(group + 0x1FC), &actor->position,
-                      (struct ContactPosition *)((u8 *)target + 12)))
+    if (!Nav_IsPositionInMesh(*(void **)(group + 0x1FC), &actor->position,
+                              (struct ContactPosition *)((u8 *)target + 12)))
         goto zero;
     if (!nearFlag(actor))
         goto zero;

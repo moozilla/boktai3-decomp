@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Terrain_ApplyBlocked sub_0821F7A8
-
 struct Pos {
     u16 x, pad2, z;
 };

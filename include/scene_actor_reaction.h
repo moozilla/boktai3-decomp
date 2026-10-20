@@ -25,8 +25,8 @@ struct SceneActorReactionTail {
     struct ContactPosition *destination;
 };
 void SceneActorControl_OnIdle(void);
-s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B2) {

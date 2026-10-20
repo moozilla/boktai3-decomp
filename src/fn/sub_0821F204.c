@@ -3,7 +3,6 @@
 
 #ifdef NONMATCHING
 // fuzzy: 97.4%
-#define Nav_IsPositionInMesh sub_0821F204
 
 struct Pos {
     u16 x, pad2, z;
@@ -69,5 +68,5 @@ u32 Nav_IsPositionInMesh(struct NavQuery *q, void *unused, struct Pos *pos)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821F204);
+INCLUDE_ASM("asm/nonmatching", Nav_IsPositionInMesh);
 #endif

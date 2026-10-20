@@ -2,8 +2,8 @@
 #include "scene_actor_registry.h"
 #include "player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
-s32 sub_0821F7A8(void *, const struct ContactPosition *, const struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, const struct ContactPosition *, const struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, const struct ContactPosition *, const struct ContactPosition *);
 u8 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryActor *,
                                            const struct ContactPosition *, u32, u32);
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryActor *, u32);
@@ -120,7 +120,7 @@ slopeDone:;
     {
         struct ContactPosition *position = &actor->position;
         register u16 *flagsToClear asm("r0");
-        result = sub_0821F204(routeObject, position, &target);
+        result = Nav_IsPositionInMesh(routeObject, position, &target);
         if (!result) {
             register u32 offset asm("r2") = 0x2d4;
             u16 *flags;
@@ -129,7 +129,7 @@ slopeDone:;
             flagsToClear = flags;
             goto clearRoute;
         }
-        result = sub_0821F7A8(routeObject, position, &target);
+        result = Terrain_ApplyBlocked(routeObject, position, &target);
         if (!result) {
             register u32 offset asm("r6") = 0x2d4;
             u16 *flags;
@@ -334,10 +334,10 @@ modeOne: {
             target = (const struct ContactPosition *)&current->position;
         }
     }
-    result = sub_0821F204(routeObject, position, target);
+    result = Nav_IsPositionInMesh(routeObject, position, target);
     if (!result)
         goto clearPlayerRoute;
-    result = sub_0821F7A8(routeObject, position, target);
+    result = Terrain_ApplyBlocked(routeObject, position, target);
     if (!result)
         goto clearPlayerRoute;
     if (result == 2)

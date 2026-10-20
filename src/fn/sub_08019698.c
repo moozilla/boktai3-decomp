@@ -15,7 +15,7 @@ int Script_GetKeywordValue(int, int);
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void *ScriptProc_Start(int, int);
-int sub_08215CB8(void *, int, void *, int, int);
+int Bg_CopyTiles(void *, int, void *, int, int);
 int TileAnimation_Initialize(Manager *p)
 {
     int i, resource, mode;
@@ -42,7 +42,7 @@ int TileAnimation_Initialize(Manager *p)
         resource = Script_GetKeywordValue('p', 0);
         mode = Script_GetKeywordValue('m', 0);
         data = ScriptProc_Start(0xceef, (u16)resource);
-        if (data && sub_08215CB8(data, mode, p->tiles, 0, p->count) >= 0)
+        if (data && Bg_CopyTiles(data, mode, p->tiles, 0, p->count) >= 0)
             return 0;
     }
     return -1;

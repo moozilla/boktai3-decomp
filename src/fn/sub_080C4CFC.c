@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"
-s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_080C47B8(struct ContactPosition *);
 void SceneActorRoute_CommitReachableDestination(struct SceneActorRegistryResetView *actor)
 {
@@ -13,8 +13,9 @@ void SceneActorRoute_CommitReachableDestination(struct SceneActorRegistryResetVi
     u32 flags = *(u16 *)(SceneActorTerrain_GetCell(cell) + 2);
     u32 mask = 0x43;
     if (!(flags & mask)) {
-        if (sub_0821F204(*(void **)(group + 0x1FC), &actor->position,
-                         &((struct SceneActorRouteDestination *)actor->fieldDC)->position)) {
+        if (Nav_IsPositionInMesh(
+                *(void **)(group + 0x1FC), &actor->position,
+                &((struct SceneActorRouteDestination *)actor->fieldDC)->position)) {
             context->destination = ((struct SceneActorRouteDestination *)actor->fieldDC)->position;
             sub_080C47B8(&context->destination);
         }

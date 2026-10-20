@@ -76,12 +76,12 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
             void *route = *(void **)(group + 0x1FC);
             struct ContactPosition *position = &actor->position;
             struct ContactPosition *target = (void *)(context + 0x62C);
-            s32 result = sub_0821F204(route, position, target);
+            s32 result = Nav_IsPositionInMesh(route, position, target);
             if (!result) {
                 u32 mask = ~0x200;
                 *flags = mask & *flags;
             } else {
-                result = sub_0821F7A8(route, position, target);
+                result = Terrain_ApplyBlocked(route, position, target);
                 if (result) {
                     if (result != 2)
                         Memory_Clear(&actor->motion, 8);
