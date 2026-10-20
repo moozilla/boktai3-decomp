@@ -286,3 +286,6 @@ coverage.
 The two matches and improved guarded draft have separate commits. Full combined
 ROM validation remains with the integrator. Scratch candidates and diagnostic
 artifacts stay under ignored `wip/` and `build/` paths.
+
+Final caller-label audit confirmed the installer of 080BBDD0 is `Skeleton_Init`;
+corrected the tentative alias's evidence comment accordingly (comment-only).
