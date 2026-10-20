@@ -2682,3 +2682,16 @@ Tags: #matching #terrain #path
 
 Only check.py per-file checks; no full build or network operations. Exact match
 and existing draft update committed separately through driver; notes last.
+
+## Task 081493E4 follow-up (2026-10-20)
+
+Tags: #matching #player #animation
+
+- 081493E4: matched Player_UpdateMovementPose, 408 bytes, register-pinned category. Consumes entry, derives heading/side, clears status bit one, steps auxiliary pose sequence two, then returns to standing when byte 0x5BB clears. Ported Step from 0814957C; removing the command r7 pin eliminated five pointer copies and a missing saved-register problem. Explicit r2 offset/r0 latch address pins closed the final two instructions. depin removed one unnecessary hint (15 to 14); formatted source passes exact check.
+- 0814957C: improved existing draft 93.7% to 97.6%. Pinned index offset r0 and table r1 before forming command r6, at both decoder sites. Eight realigned differing instructions / six ignoring registers remain: facing destination calculation order and final movement-state address. Explicit facing destination pins caused reloads and regressed; reverted. Restored required local alias and address-form assembly fallback.
+- 08149720: retained drafted 92.5%, 35 realigned differences / 14 ignoring registers. Existing phase recovery/decoder candidate still has selection/control and allocation differences. Restored required alias and address-form fallback; no new complete hypothesis.
+- 08149A14: retained drafted 97.3%, 13 realigned differences / zero ignoring registers. Residue is strength/approach address and register allocation. Pinning strength offset r2 and pointer r3 changed earlier allocation and introduced reloads (90.1%); reverted. Restored alias/fallback.
+- 08149DF0: retained drafted 99.3%, two realigned differences / zero ignoring registers. Duration offset needs r3 instead of r0. Explicit offset r3 pin regressed to 93.2% by disturbing earlier allocation and constant reuse; reverted. Restored alias/fallback.
+- 0814C3A4: stopped unmatched after largest-first assembly/relatives/condense inspection and prior-note review. Eight-phase grab-motion routine; strongest relative covers only 9%, mostly trigonometry. Condense leaves 973 instructions unfolded. No Ghidra export available. No complete candidate produced; assembly intact.
+
+All four guarded drafts were formatted, rescored with --nonmatching --record and their default assembly fallbacks checked exact. One exact match; percentage-point gain deferred to integration report (408 exact bytes). No full build, make, network or generated-file commits. Function commits and this note use build/commit.sh.
