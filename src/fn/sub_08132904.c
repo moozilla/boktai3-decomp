@@ -1,67 +1,23 @@
-#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 81.1%
+// Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 83.5%
-// Remaining differences: pointer spills, RNG temporaries and control-reset allocation.
-extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
-s32 Math_Atan2(s32, s32);
-// fuzzy: 0%
+/* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
-extern u8 *gUnk_030042E4;
-void AnimData_SelectPaletteBank(void *, s32);
-void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
-void CpuSet(const void *, void *, u32);
-void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
-void SceneActorMovement_ProjectProbe(void *, u32, u32);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
+static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
 {
-    if (actor->field2E6 == 0)
-        return 0;
-    return 1;
-}
-static inline s32 LocalPlayer(void)
-{
-    if (!gUnk_020004B4)
-        return -1;
-    return gUnk_020004B4->localPlayer;
-}
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
-{
-    if (Test(gUnk_030053F4, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
-        if (!(mask & 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
+    u32 mask = maskInput;
+    return actor->flags2D0 & mask;
 }
 static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
                                        void *control)
@@ -91,129 +47,148 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
     }
 }
 
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 mask)
+void AnimData_SelectPaletteBank(void *, s32);
+void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
+void CpuSet(const void *, void *, u32);
+void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
+void SceneActorMovement_ProjectProbe(void *, u32, u32);
+void SceneActorReaction_PlayStaggerBurst(void);
+extern u8 *gUnk_030042E4;
+static inline s32 LocalPlayer(void)
+{
+    if (!gUnk_020004B4)
+        return -1;
+    return gUnk_020004B4->localPlayer;
+}
+static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+{
+    if (Test(gUnk_030053F4, 0x4800)) {
+        register u32 *owner asm("r1") = &actor->field2E0;
+        register u32 mask asm("r2") = *owner;
+        if (!(mask & 0x20) && mask) {
+            switch (LocalPlayer()) {
+                case 0:
+                    if (*owner != 1)
+                        goto fail;
+                    break;
+                case 1:
+                    if (*owner != 2)
+                        goto fail;
+                    break;
+                case 2:
+                    if (*owner != 4)
+                        goto fail;
+                    break;
+                case 3:
+                    if (*owner != 8)
+                        goto fail;
+                    break;
+            }
+        }
+    }
+    return 1;
+fail:
+    return 0;
+}
+
+struct FlagHalfword { s16 bits : 16; };
+static inline void ClearHit(struct FlagHalfword *flags, u32 mask) { flags->bits = mask & flags->bits; }
+static inline void SetHit(u16 *p, u32 bit) { *p = bit | *p; }
+static inline void Fill(u32 *zero, void *dst)
+{
+    *zero = 0;
+    CpuSet(zero, dst, 0x05000002);
+}
+s32 AreaEffect_ScaleGainAtPosition(void *, u32);
+s32 AreaEffect_ScaleLinkGainAtPosition(void *, u32);
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+static inline u32 RandomBits(u32 mask)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    return gUnk_0203B400[gUnk_03005308] & mask;
+}
+static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D0 & mask;
 }
-static inline void Fill(u32 *zero, void *display)
+static inline u32 GetFlags(u32 **out, struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    *zero = 0;
-    CpuSet(zero, display, 0x05000002);
+    u32 *p = &actor->flags2CC;
+    u32 result = *p & mask;
+    *out = p;
+    return result;
 }
-#define SceneActorReaction_ApplyAreaDamage sub_08132904
-// Pending damage selects defeat control or the stagger reaction.
-void SceneActorReaction_PlayStaggerBurst(void *);
-u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *input)
+// Area-effect damage with a random knockback heading.
+#define SceneActorReaction_ApplyLinkedAreaDamage sub_08132904
+u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
-    s32 dx, dz;
     u32 *flags2CC;
-    u32 *flags2D8;
-    s16 *healthp;
+    struct ContactCollider *collider;
     u16 *timer;
-    u16 *maxp;
-    void *position;
-    s32 damage;
-    u32 zero;
-    u32 display[2];
-    register u8 *collider asm("r8");
-    if (Flag2D0(actor, 8))
+    struct ContactPosition *position;
+    u16 *maxHealth;
+    s16 *health;
+    u32 *flags2D8;
+    s32 gain, dx, dz;
+    if (ActorFlags(actor, 8) || actor->enabled != 1 || GetFlags(&flags2CC, actor, 2))
         goto fail;
-    if (*((u8 *)actor + 0x2B4) != 1)
-        goto fail;
-    {
-        u32 mask = 2;
-        u32 *p = &actor->flags2CC;
-        u32 v = *p & mask;
-        flags2CC = p;
-        if (v)
-            goto fail;
-    }
-    collider = (u8 *)&actor->colliderA;
+    collider = &actor->colliderA;
     timer = (u16 *)((u8 *)actor + 0x178);
     if (*timer)
         goto fail;
-    if (Test(gUnk_030053F4, 0x4800)) {
-        void *pos = &actor->position;
-        u16 *maximum = (u16 *)((u8 *)actor + 0xB0);
-        damage = AreaEffect_ScaleLinkGainAtPosition(pos, *maximum);
-        position = pos;
-        maxp = maximum;
-    } else {
-        void *pos = &actor->position;
-        u16 *maximum = (u16 *)((u8 *)actor + 0xB0);
-        damage = AreaEffect_ScaleGainAtPosition(pos, *maximum);
-        position = pos;
-        maxp = maximum;
-    }
-    if (!damage)
+    position = &actor->position;
+    maxHealth = (u16 *)&actor->defaultHealth;
+    if (Test(gUnk_030053F4, 0x4800))
+        gain = AreaEffect_ScaleLinkGainAtPosition(position, *maxHealth);
+    else
+        gain = AreaEffect_ScaleGainAtPosition(position, *maxHealth);
+    if (!gain)
         goto fail;
+    dx = RandomBits(0x3F) - 16;
+    dz = RandomBits(0x3F) - 16;
+    collider->cost = gain;
+    actor->reactionSoundVariant = gain;
     {
-        const u16 *table = gUnk_0203B400;
-        u32 *seed = &gUnk_03005308;
-        u32 index = *seed + 1;
-        u32 mask = 1023;
-        u32 bits = 63;
-        index &= mask;
-        dx = (table[index] & bits) - 16;
-        index = (index + 1) & mask;
-        *seed = index;
-        dz = (table[index] & bits) - 16;
+        u32 damage = collider->cost;
+        health = &actor->health;
+        *health -= damage;
     }
-    *(u16 *)(collider + 0x3E) = damage;
-    actor->reactionSoundVariant = damage;
-    healthp = &actor->health;
-    *healthp -= *(u16 *)(collider + 0x3E);
     flags2D8 = &actor->field2D8;
     if (!(*flags2D8 & 0x20000)) {
         u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
-        if (!actor->drawableKind)
+        if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
-            *(void **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
-        {
-            u32 timer = 8;
-            *(u16 *)((u8 *)actor + 0x1E8) = timer;
-        }
-        {
-            u32 mask = 0x8000;
-            *flags2CC = mask | *flags2CC;
-        }
+            *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+        { u32 eight = 8; actor->field1E8 = eight; }
+        { u32 bit = 0x8000; *flags2CC |= bit; }
         if (ShouldShowDamage(actor)) {
-            s32 health = *healthp;
-            u32 maximum = *(u16 *)((u8 *)actor + 0xB0);
-            s32 value = *(s16 *)((u8 *)actor + 0xB2);
-            s32 previous = *(s16 *)((u8 *)actor + 0x9A);
-            SceneHud_SetTimedState(actor->id, health, maximum, value, 0, previous);
-            Fill(&zero, display);
+            u32 zero;
+            u32 buffer[2];
+            s32 h = *health;
+            u32 max = *maxHealth;
+            s32 kind = *(s16 *)((u8 *)actor + 0xB2);
+            s32 param = *(s16 *)((u8 *)actor + 0x9A);
+            SceneHud_SetTimedState(actor->id, h, max, kind, 0, param);
+            Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
-                DamageNumberDisplay_Show(collider, actor->reactionSoundVariant, 0, position,
-                                         display, 1);
+                DamageNumberDisplay_Show(collider, actor->reactionSoundVariant, 0, position, buffer, 1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, dx, dz);
     {
-        u32 bit = 8;
-        actor->flags2D4 = bit | actor->flags2D4;
+        struct FlagHalfword *flags = (void *)&actor->flags2D4;
+        flags->bits |= 8;
     }
-    *((u8 *)actor + 0x59) = Math_Atan2(dx, dz);
+    actor->direction = Math_Atan2(dx, dz);
     *timer = 38;
     actor->field2DC = 0x40000;
-    *flags2D8 = 0;
-    {
-        u16 *f = &actor->flags2D4;
-        u32 mask = ~0x2000;
-        register u32 v asm("r1");
-        u32 z;
-        asm("" : "+r"(mask));
-        v = mask & *f;
-        z = 0;
-        *f = v;
-        actor->field2B8 = z;
-    }
-
-    if (*healthp <= 0) {
-        *(u16 *)(collider + 0x44) = 0;
+    actor->field2D8 = 0;
+    ClearHit((void *)&actor->flags2D4, ~0x2000);
+    actor->field2B8 = 0;
+    if (*health <= 0) {
+        collider->responseValue = 0;
         Hide(actor);
         {
             void *control = *(void **)((u8 *)actor + 0x234);
@@ -222,42 +197,33 @@ u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *input)
         {
             u32 state = 3;
             actor->state2A8 = state;
+            actor->phase2A9 = 0;
+            actor->behavior2AA = 0;
+            actor->counter2AC = 0;
+            actor->field2B1 = 1;
         }
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
         actor->field2E0 = 32;
         if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
-        {
-            u32 bit = 0x20;
-            asm("" : "+r"(bit));
-            actor->flags2D4 = bit | actor->flags2D4;
-        }
-        {
-            void *control = *(void **)((u8 *)actor + 0x230);
-            Reaction_SetControl(actor, 18, control);
-        }
+        { register u32 bit asm("r0") = 0x20; asm("" : "+r"(bit)); actor->flags2D4 = bit | actor->flags2D4; }
+        { void *control = actor->reactionTarget230; Reaction_SetControl(actor, 0x12, control); }
         {
             u32 state = 3;
             actor->state2A8 = state;
+            actor->phase2A9 = 0;
+            actor->behavior2AA = 0;
+            actor->counter2AC = 0;
+            actor->field2B1 = 1;
         }
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
     }
-    {
-        u32 bit = 0x2000;
-        *flags2CC = bit | *flags2CC;
-    }
+    { u32 mask = 0x2000; *flags2CC |= mask; }
     return 1;
 fail:
     return 0;
 }
 
 #else
+#include "global.h"
 INCLUDE_ASM("asm/nonmatching", sub_08132904);
 #endif
