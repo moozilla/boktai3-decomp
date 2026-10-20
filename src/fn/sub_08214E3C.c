@@ -1,8 +1,8 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
+#define Sprite_RenderFlipAwareList sub_08214E3C
 #ifdef NONMATCHING
-// fuzzy: 89.1%
-// Projection-source allocation and flipped-bounds operand scheduling still differ.
+// fuzzy: 56.0%
+// Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
     s16 x, y, z;
 };
@@ -55,7 +55,7 @@ void Sprite_RenderFlipAwareList(void)
     if (!p)
         return;
     do {
-        register s32 x asm("r3"), y asm("r7"), z asm("r8");
+        s32 x, y asm("r7"), z asm("r8");
         struct SpriteResource *resource;
         if (p->flags & skip)
             goto next;
@@ -65,7 +65,7 @@ void Sprite_RenderFlipAwareList(void)
         if (!(p->flags & 16)) {
             screen(&pos, &p->pos);
             {
-                register struct Vec *out asm("r0") = &pos;
+                struct Vec *out = &pos;
                 x = out->x;
                 y = out->y;
                 z = out->z;
@@ -76,11 +76,13 @@ void Sprite_RenderFlipAwareList(void)
             z = p->pos.z;
         }
         if (!(p->flags & 64)) {
-            s32 left, top;
-            register u32 width asm("r12");
+            s32 left;
+            s32 top;
+            u32 width;
             u32 height;
             if (p->flags & 4) {
-                left = x + resource->offsetX - resource->width;
+                s32 edge = x + resource->offsetX;
+                left = edge - resource->width;
             } else {
                 left = x - resource->offsetX;
             }
@@ -102,5 +104,5 @@ void Sprite_RenderFlipAwareList(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Sprite_RenderFlipAwareList);
+INCLUDE_ASM("asm/nonmatching", sub_08214E3C);
 #endif
