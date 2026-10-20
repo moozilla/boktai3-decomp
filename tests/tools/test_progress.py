@@ -161,3 +161,15 @@ class ProgressTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class AreaCategoryTest(unittest.TestCase):
+    def test_areas_add_categories_without_changing_totals(self):
+        areas = progress.load_areas()
+        report = progress.make_report([("a", 0x08000000), ("b", 0x08086000)],
+                                      {"a": 4, "b": 4}, {"b"}, areas=areas)
+        cats = {c["id"]: c["measures"] for c in report["categories"]}
+        self.assertEqual(cats["intentional_asm"]["total_code"], "4")
+        self.assertEqual(cats["monsters"]["matched_code"], "4")
+        self.assertEqual(cats["decompilable"]["total_code"], "4")
+        self.assertEqual(report["measures"]["total_code"], "8")
