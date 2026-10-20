@@ -1,3 +1,7 @@
+#define Golem_UpdateChargeRecovery sub_080C6A68
+#define Golem_UpdateChargeStop     sub_080C68F0
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_UpdateChargePursuit sub_080CCD7C
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"

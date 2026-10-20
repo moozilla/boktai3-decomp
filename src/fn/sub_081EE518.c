@@ -1,6 +1,10 @@
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
 #include "global.h"
+// confidence=low: role inferred from state transitions and callees.
+#define SceneActors_UpdateScreenCrossingAction sub_081EE518
 #ifdef NONMATCHING
-// fuzzy: 90.5%
+// fuzzy: 89.5%
 // Remaining differences: register allocation and address-expression lifetimes.
 // MATCHING_CONCESSION: register-pinning
 struct Frames {
@@ -131,7 +135,7 @@ static inline void step(struct Frames *f, struct Render *r)
 }
 
 // confidence=low: phase meanings inferred from state entry and motion calls.
-void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
+void SceneActors_UpdateScreenCrossingAction(void *arg, int time)
 {
     register void *p asm("r8") = arg;
     register int tick asm("sb") = time;
@@ -151,7 +155,7 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
         f = (void *)((u8 *)p + 0x2ec);
         Anim_SetSequence(f, (void *)W(p, 0x390), 2, 0, 0);
         step(f, r);
-        W(p, 0x398) = 0;
+        W(base, 0x398) = 0;
         Sound_PlaySong(0x586);
     }
     switch ((u32)W(base, 0x398)) {
@@ -162,8 +166,8 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
                 W(base, 0x304) = 1;
                 W(base, 0x2fc) = 3;
                 f = (void *)((u8 *)p + 0x2ec);
-                r = (void *)((u8 *)p + 0x2c0);
                 Anim_SetSequence(f, (void *)W(base, 0x390), 3, 0, 0);
+                r = (void *)((u8 *)base + 0x2c0);
                 step(f, r);
                 W(base, 0x398) = 1;
             }
@@ -245,5 +249,5 @@ void SceneActors_UpdateSequenceTwoAction(void *arg, int time)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateSequenceTwoAction);
+INCLUDE_ASM("asm/nonmatching", sub_081EE518);
 #endif
