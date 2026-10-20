@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Task4E01_StepTimedSequence sub_081D873C
 struct Render {
     u32 flags;
     u8 pad[12];

@@ -6771,15 +6771,18 @@ addr,name,mode,confidence,source,notes
 081B4040,Vanargand_EmitRadialPartEffects,thumb,low,src-alias,
 081B431C,Vanargand_UpdatePartImpact,thumb,low,src-alias,
 081B4784,SceneParticleEmitter_EmitPeriodically,thumb,low,src-alias,
+081B47E8,Vanargand_UpdatePartFlashFade,thumb,low,src-alias,
 081B48A0,Vanargand_UpdatePartSidestep,thumb,low,src-alias,
 081B4C04,Vanargand_UpdatePartRecovery,thumb,low,src-alias,
 081B52E8,Vanargand_UpdatePartBobbing,thumb,low,src-alias,
 081B5454,Vanargand_UpdatePartRadialTravel,thumb,low,src-alias,
 081B5A98,Vanargand_UpdatePartRevealFade,thumb,low,src-alias,
+081B5CCC,Vanargand_UpdatePartFadeOut,thumb,low,src-alias,
 081B5D8C,PairedSceneActor_UpdateHalves,thumb,low,src-alias,
 081B6180,Vanargand_CreatePartController,thumb,low,src-alias,Creates and registers a controller task that manages two animated boss parts
 081B6244,PairedSceneActor_ApplyToSelectedHalves,thumb,low,src-alias,
 081B6310,PairedSceneActor_SetResetValues,thumb,low,src-alias,
+081B6354,PairedSceneActor_InitHalves,thumb,low,src-alias,
 081B63F4,Vanargand_SetPartAnimationParameter,thumb,low,src-alias,Sets the same animation halfword on both controller parts when the controller exists
 081B6410,Vanargand_SetPairedMotionParameter,thumb,low,src-alias,Sets the same halfword in both paired components; motion parameter interpretation is tentative
 081B6424,Vanargand_SetPairedEffectParameter,thumb,low,src-alias,Sets matching trailing halfwords in both components; effect parameter interpretation is tentative
@@ -7588,8 +7591,11 @@ addr,name,mode,confidence,source,notes
 081D85A0,Task4E01_OnDefaultTimedAnimation,thumb,low,src-alias,Sets flag two and completes when the default animation counter reaches its duration
 081D85BC,Task4E01_StartAlternateTimedAnimation,thumb,low,src-alias,Installs a separate identical timed callback and selects frame 25; alternate role tentative
 081D85DC,Task4E01_OnAlternateTimedAnimation,thumb,low,src-alias,Sets flag two and completes at the duration threshold for the alternate callback
+081D85F8,Task4E01_StartDirectionalAnimation,thumb,low,src-alias,
+081D873C,Task4E01_StepTimedSequence,thumb,low,src-alias,
 081D8854,Task4E01_OnType8DirectionalAnimation,thumb,low,src-alias,Handles type eight directional frames and flips before completing after tick five
 081D88D8,SpriteSequence_BeginStageAnimation,thumb,low,src-alias,
+081D8AAC,Task4E01_UpdateTimedSprite,thumb,low,src-alias,
 081D8B14,Task4E01_OnType7DirectionalAnimation,thumb,low,src-alias,Handles type seven directional frames and flips before completing after tick five
 081D8F88,Task4E01_OnType4Animation,thumb,low,src-alias,Immediately returns completion for the callback installed for type four
 081D8F8C,Task4E01_StartType4TimedAnimation,thumb,low,src-alias,Selects frame 25 and installs the timed completion callback in the type four handler group; role tentative
