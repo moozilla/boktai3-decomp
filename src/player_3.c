@@ -1,5 +1,8 @@
 #include "player_3.h"
 
+#define Player_UpdateAttachedAttackCharge sub_0814F328
+#define Player_UpdateSelectedAttackCharge sub_0814E3D8
+
 /* Tentative role: select an effect flag from actor and global state. */
 
 static inline u8 global_mode(void)
@@ -628,7 +631,141 @@ void Player_ApplyPeriodicStatChanges(struct Player *p)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", Player_BuildActionModifiers);
+static inline void ClearFlag(struct Player *p, u32 index)
+{
+    if (!p)
+        return;
+    if (index > 63)
+        p->actionStateFlags &= ~(1 << (index - 64));
+    else if (index > 31)
+        p->actionFlags &= ~(1 << (index - 32));
+    else
+        p->statBonusFlags &= ~(1 << index);
+}
+
+#ifdef NONMATCHING
+// fuzzy: 88.1%
+// Flag-clear loop allocation and flag-set operand ordering still differ.
+static inline void SetBonusFlag(struct Player *p, u32 mask)
+{
+    if (p) {
+        u32 *flags = &p->statBonusFlags;
+        *flags |= mask;
+    }
+}
+void Player_SubtractResistance(struct Player *, s32, s32);
+
+#define Player_BuildActionModifiers sub_0813E608
+void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierContext *context,
+                                 const void *descriptor)
+{
+    s32 i;
+    for (i = 2; i >= 0; i--) {
+        context->statModifierCallbacks[2 - i] = 0;
+        if (p) {
+            p->flagCallbacks[2 - i] = 0;
+            p->contactCostCallbacks[2 - i] = 0;
+        }
+    }
+    if (p) {
+        for (i = 0; i <= 6; i++)
+            ClearFlag(p, i);
+    }
+    context->savedActionIndex = 0;
+    for (i = 0; i <= 1; i++) {
+        switch (*((const u8 *)((u32)descriptor + i * 4) + 12)) {
+            case 1:
+                *((u8 *)context + 0xD1) = 0;
+                context->savedActionIndex = 17;
+                break;
+            case 2:
+                if (p)
+                    context->statModifierCallbacks[i] = Player_ModifyValueByMissingLife;
+                break;
+            case 3:
+                if (p)
+                    context->statModifierCallbacks[i] = Player_ModifyValueByRemainingLife;
+                break;
+            case 4:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplySol;
+                break;
+            case 5:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyFlame;
+                break;
+            case 6:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyFrost;
+                break;
+            case 7:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyCloud;
+                break;
+            case 8:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyEarth;
+                break;
+            case 9:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000Low;
+                context->savedActionIndex = 12;
+                break;
+            case 10:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000High;
+                context->savedActionIndex = 12;
+                break;
+            case 11:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000Low;
+                context->savedActionIndex = 11;
+                break;
+            case 12:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000High;
+                context->savedActionIndex = 11;
+                break;
+            case 13:
+                SetBonusFlag(p, 4);
+                context->savedActionIndex = 13;
+                break;
+            case 14:
+                SetBonusFlag(p, 8);
+                context->savedActionIndex = 15;
+                break;
+            case 15:
+                SetBonusFlag(p, 16);
+                context->savedActionIndex = 14;
+                break;
+            case 16:
+                SetBonusFlag(p, 32);
+                break;
+            case 17:
+                context->statModifierCallbacks[i] = Player_ModifyValueByEquipmentLevel;
+                break;
+            case 18:
+                Player_SubtractResistance(p, 1, 1);
+                break;
+            case 19:
+                Player_SubtractResistance(p, 2, 1);
+                break;
+            case 20:
+                Player_SubtractResistance(p, 3, 1);
+                break;
+            case 21:
+                Player_SubtractResistance(p, 4, 1);
+                break;
+            case 22:
+                Player_SubtractResistance(p, 5, 1);
+                break;
+        }
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0813E608);
+#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
 
@@ -704,18 +841,6 @@ void sub_0814EEE0(void);
 void sub_0814E990(void);
 
 void Player_UpdateSelectedAttackCharge(void);
-
-static inline void ClearFlag(struct Player *p, u32 index)
-{
-    if (!p)
-        return;
-    if (index > 63)
-        p->actionStateFlags &= ~(1 << (index - 64));
-    else if (index > 31)
-        p->actionFlags &= ~(1 << (index - 32));
-    else
-        p->statBonusFlags &= ~(1 << index);
-}
 
 void Player_BeginIndexedAction(struct Player *p, s32 action)
 {
