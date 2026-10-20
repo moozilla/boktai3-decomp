@@ -2361,3 +2361,88 @@ fallbacks. Ghidra's export was unavailable. Shared headers, symbols, generated
 files and shared docs were not edited. `depin.py` checks a draft's default asm
 branch rather than its NONMATCHING body, so the final hint removal was assessed
 with an explicit NONMATCHING check. No full build was run.
+
+## Task 0818B2A0 — 2026-10-20
+
+Tags: #matching #armor #motion #register-pinning #worker
+
+All six assigned functions matched: 100% of the task, +100 percentage points
+from its initial exact coverage. Batch code gain is **+0.1835 percentage
+points** (4,432 bytes including reviewed literal pools and jump tables).
+Register-pinned category: +0.0954 points (2,304 bytes); without hints:
++0.0881 points (2,128 bytes). No drafts remain for this assignment.
+
+- **0818B2A0 — matched, Armor_UpdateBehaviorAfterContact**, 1,292 bytes.
+  Started from the inherited 99.5% guarded draft and preserved its existing
+  symbol name. The remaining mode-2/3 forced transition needs the zero value
+  materialized after the state and timer stores. A scoped zero plus an empty
+  read/write compiler barrier reproduces that order. `depin.py` removed the
+  explicit r0 pin, retaining the necessary barrier; the unit carries the
+  concession marker. The existing ContactBoost callee needed its old-address
+  alias for this checkout's checker ELF. The target alias is file-local.
+- **0818B7AC — matched, Armor_ReceiveColliderContact**, 1,288 bytes.
+  Recovered the collider callback installed by 0818BE30, taking attacker,
+  contacted collider and armor owner. Rejects dead/cooling-down owners,
+  subtracts guard health or selects ordinary reactions, adjusts damage and
+  knockback by armor type and attacker properties, clamps health, updates the
+  behavior/HUD, displays damage or healing, chooses impact sounds and calls
+  the contact script. The owner layout agrees with Armor_ReceiveTargetEvent
+  at 0818BCB4 and Armor_InitFromScript at 0818C0BC. First draft was 87.1%.
+  Inline mask-taking property accessors recover constant-before-load order.
+  Separate named locals in originalDamage/critical/direction/broken order
+  recover the spill slots, and assigning the owner after `broken = 0` recovers
+  the entry copies. Case 11 needs its negative category test written first
+  to share the ROM's tails. A scoped full-width facing temporary preserves
+  `+0xA0` instead of narrowing it to `-0x60`. Depinning removed its barrier;
+  final source has no register hints.
+- **0818BE30 — matched, Armor_InitCombatColliders**, 652 bytes.
+  Called by Armor_InitFromScript. Initializes secondary attack (+0x1E4),
+  contact (+0x238), trigger (+0x28C) and main attack (+0x190) colliders.
+  Quarter/half attack strength uses explicit signed fixed-point rounding.
+  The type switch sets complementary category/property bits for the combat
+  colliders. A retained collider pointer in r4 reproduces both post-call
+  flag accesses and the otherwise overmerged switch tails. Load defense
+  into its own local before deriving the position pointer; reusing the
+  attack-power temporary gives extra register copies. A mask-taking flags
+  inline recovers the 0x100C literal/load order. Removing an id pin fixed
+  all seven remaining high-register differences; depinning also removed the
+  position pin, leaving only the collider pin. Use the existing named
+  Armor_TriggerBehavior35 declaration for the callback: its raw sub-address
+  alias resolves as an even data symbol in this checker ELF, losing Thumb
+  bit 0. The named declaration gives the correct callback literal.
+- **0818D0C8 — matched, Armor_DampPartWaveReturn**, 340 bytes.
+  Ports the exact Armor_DampPartMovement at 0818D640. Applies planar velocity
+  and rotation, halves velocity when the owner's low three timing bits are
+  clear, then selects the 0818CF10 or 0818CFEC return wave based on absolute
+  segment deltas. Those callbacks put the sinusoidal offset on X or Z,
+  respectively. On stopping, sets both interpolation scales to 16, flips the
+  turn direction and sets spin to -10. Crucial source order: load/absolute X
+  first, then load/absolute Z. Loading both before taking either absolute
+  value leaves 28 realigned differences; sequential loads match without pins.
+- **0818D21C — matched, Armor_InitPartLunge**, 360 bytes.
+  Installed by Armor_StartPartReturnMotion at 0818E200. Computes the player
+  bearing, sets target rotation to 0xA0 minus that bearing, chooses a random
+  signed turn direction, captures the segment origin and calculates the
+  800-unit endpoint at player Y+220. Installs Armor_AcceleratePartTurn.
+  Reused the shared motion layout and exact SpinningApproach_InitMotion
+  geometry. Explicit RNG byte-offset arithmetic fixes the table-load order;
+  caching the player's pointer for the bearing keeps its two coordinate
+  reads together. Depinning reduced nine hints to four: turn in r1, table
+  and negative temporary in r3, and the negative temporary's empty barrier.
+  Remaining hints preserve the copied -1 and the surrounding allocation.
+- **0818DC50 — matched, SpinningApproach_DampReturnMovement**, 500 bytes.
+  Reused SpinningApproach_UpdateApproach's owner-relative segment setup and
+  Armor_DampPartWaveReturn's velocity rounding. Every fifth +0x126 tick,
+  halves planar velocity; once stopped, builds the return segment, snapshots
+  the owner's current position, reverses turn direction, sets spin to -15
+  and installs SpinningApproach_UpdateOwnerRelativeSegment. First complete
+  typed candidate matched exactly, with no register hints. The +0x126 counter
+  uses a local view; the established shared motion header was not changed.
+
+All six functions were formatted directly with the worktree's clang-format,
+then accepted by `tools/check.py` with reviewed full-function extents. The
+three hinted units were minimized with `tools/depin.py --write` before their
+final checks. Each match has its own commit through `build/commit.sh`; this
+note is a separate final driver commit. Worked solo and offline. No full
+build, make invocation, generated-file edit, shared documentation/index edit,
+or network action. Combined ROM validation remains the integrator's task.
