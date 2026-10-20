@@ -3,8 +3,6 @@
 #include "player.h"
 #include "contact_actor.h"
 
-#define Player_ApplyContactResponse sub_0813B1EC
-
 static inline u32 flagBits(u32 *flags, u32 mask)
 {
     u32 bits = mask;
