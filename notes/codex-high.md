@@ -1715,3 +1715,82 @@ nonexact candidates. No handwritten instruction bodies were introduced.
 
 Each draft was queued separately through build/commit.sh; these notes are
 committed last. Complete combined-ROM validation remains with the integrator.
+
+## 2026-10-20 — task 08155D58: player action selection and contact responses
+
+Tags: #matching #player #collision #register-pinning
+
+Worked solo on the preclaimed branch `cloud/08155D58`, largest functions first.
+No network operations, full builds, generated-file edits or symbol-table changes.
+
+- **081561EC stopped below draft threshold.** Tentative name
+  `Player_UpdateTargetMotion`. Reconstructed the five phases of secondary-image
+  movement to the supplied target and back, particle-pool entry setup, target
+  proximity tests, animation selection, vertical motion and input latches.
+  The first whole-function check was 59.3%, with 251 structural differences;
+  typed fields, animation flags and addressable vector temporaries reduced the
+  structural count to 165, but the retained unpinned source is only 64.7%.
+  Animation argument setup, particle RNG/vector lifetimes, repeated addresses
+  and allocation still need a dedicated pass. Scratch source remains at
+  `wip/sub_081561EC.c`; nothing below threshold was added to production src/.
+  Ghidra output is unavailable in this checkout. A trial pinning r7 generated
+  suspicious frame-relative addresses and was discarded; do not resume from
+  that intermediate candidate.
+- **08156FE0 drafted 98.0%**, `Player_SelectActionSequence` (tentative).
+  Recovered both sequence dispatch tables, gauge depletion and forced modes,
+  pending-notification cleanup, special scene-five interaction input, barrier
+  selection, event-flag action cancellation, and normal/alternate action input.
+  Full reviewed extent: 1692 bytes. The retained candidate differs by 17 bytes,
+  with 16 realigned instruction differences and zero ignoring registers.
+  Remaining allocation differences are concentrated around scene-five direction
+  sampling and the barrier-selection input path. Put null guards inside the
+  inline flag accessor to preserve repeated checks; taking an active-state
+  snapshot before initializing the boolean reproduces the original test order.
+  Separate constrained offset lifetimes avoid PRE sharing the two input-field
+  addresses. The guarded source retains its address-based INCLUDE_ASM fallback.
+  Initially committed at 93.1%, then updated separately after the final pass.
+- **0815E1F0 matched**, existing name `PlayerContact_ApplyResponse`, full extent
+  1100 bytes. Applies contact power/reactions, status immunities, timed reset,
+  particle response and shifted pending damage. The previous 85.6% draft reached
+  exact equality by moving null checks into the flag/state helpers, reading the
+  first reaction mask directly, and sharing the damage return tail. The timed
+  reset setup evaluates source power, power-plus-sixty and global flags even
+  though the callee consumes only player and duration: preserve their evaluated
+  register lifetimes with an empty barrier, keeping the actual two-argument ABI.
+  No hidden-argument contract or instruction body was invented. Hint minimization
+  reduced seven hints to two: the r2 power pin and its empty liveness barrier.
+- **08155D58 stopped at 79.6%**, tentative name
+  `Player_UpdatePulsingChargeAction`. The matched unflagged-resource-recovery
+  relative 08142FC4 supplied the pulse structure; the timed-charge draft supplied
+  completion-script argument layout. Reconstructed all six phases, songs
+  0x2E4/0x239, far particles, the 0..64 pulse, four-unit charge increments,
+  direct phase-five transition and success/timeout script argument. Best retained
+  source has 123 realigned differences, 25 ignoring registers. Shared zero/one
+  lifetimes, merged phase-one/phase-three setup, pulse-address reuse and mask
+  lifetimes still differ. Subsequent hand variants did not improve the retained
+  result. Scratch source is `wip/sub_08155D58.c`; no production draft below 80%.
+- **0815E8A4 matched**, existing name `PlayerContact_ApplyTerrainDamage`, full
+  extent 788 bytes. Selects hazardous-terrain/death reactions, accumulates and
+  applies pending damage, clears its response vector and consumes inventory
+  item 0x26 for the restoration effect. The prior 89.4% draft reached equality
+  with shared early dispatch, a 32-bit attribute accessor, explicit flag and
+  counter temporaries, and the lifetime of the hazard player argument. Hand
+  variants reduced the residue to seven instructions before the final exact
+  change. Hint minimization reduced eleven hints to one: hazardPlayer in r0.
+- **0815ED78 matched**, `Player_ApplyLatchedActionMode` (tentative), full extent
+  500 bytes. Consumes actionLatch465 when actionLatch464 is set, restores mode
+  0/1/2 (falling back to 1), chooses the single/multiplayer update callback,
+  resets animation/position pointers and refreshes resource/enchantment state.
+  Preserve the duplicated mode branches: each repeats the global callback test.
+  Initial C had only nine register-only differences. An address-offset lifetime
+  barrier reproduced all four mode-field address constructions. Minimization
+  removed the offset register pin; the empty offset barrier remains necessary.
+
+All three exact matches belong to the Register-pinned category. Each was
+formatted directly with the pinned clang-format and rechecked after hint
+minimization with `check.py --target-size` over the full reviewed extent:
+zero differing bytes in every case. The 98.0% draft was recorded with
+`check.py --nonmatching --record`; depin was checked against an unguarded
+scratch copy so it could not accidentally accept the assembly fallback.
+Per-function matching commits and subsequent per-function hint reductions were
+queued through build/commit.sh. Combined-ROM validation is deferred to integration.
