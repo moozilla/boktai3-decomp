@@ -1,9 +1,6 @@
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
-// Movement-direction OR is scheduled after the direction-field address.
 struct P {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;
@@ -178,7 +175,11 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
     } else {
         p->vx = Truncate(gUnk_086149C4[(angle + 64) & 255] * 9);
         p->vy = Truncate(gUnk_086149C4[angle & 255] * 9);
-        p->dir = ((((angle + 16) & 255) >> 5) + 3) & 7 | 1;
+        {
+            u8 d = ((((angle + 16) & 255) >> 5) + 3) & 7;
+            d |= 1;
+            p->dir = d;
+        }
         if (p->dir > 4) {
             p->facing = (8 - p->dir) >> 1;
             p->flip = 1;
@@ -190,7 +191,3 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
     Anim_SetSequence(&p->seq, (void *)p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateWalkTarget);
-#endif
