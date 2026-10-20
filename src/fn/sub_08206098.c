@@ -1,11 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+#define Ooze_InitializeFromScript sub_08206098
 #include "display_animation.h"
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.8%
-// Remaining differences: script-option branches, animation-step register allocation, and body setup lifetimes.
+// fuzzy: 93.7%
+// Sequence-ID constants, delay-script loads, and the defined return token still differ.
 struct OozeInit {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -153,6 +155,10 @@ static inline u32 Ooze_StepInitialAnimation(struct DisplaySequenceSprite *sprite
     return ended;
 }
 
+static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
+{
+    *out = *in;
+}
 static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing)
 {
     if (!facing)
@@ -202,19 +208,26 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     }
     if (Script_SeekToKeyword('h')) {
         p->facing = Script_GetValue();
-        p->facing = (p->facing - 1) / 2;
-        switch ((u32)(u16)p->facing) {
-            case 0:
-            case 1:
-                p->facing = 0;
-                break;
-            case 2:
-            case 3:
+        {
+            u32 facing = (u16)(p->facing = (p->facing - 1) / 2);
+            asm("" : "+r"(facing));
+            if (facing <= 3) {
+                asm("" : "+r"(facing));
+                switch (facing) {
+                    case 0:
+                    case 1:
+                        p->facing = 0;
+                        break;
+                    case 2:
+                    case 3:
+                        p->facing = 1;
+                        break;
+                    default:
+                        p->facing = 1;
+                        break;
+                }
+            } else
                 p->facing = 1;
-                break;
-            default:
-                p->facing = 1;
-                break;
         }
     } else
         p->facing = 0;
@@ -244,7 +257,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
         Ooze_ReadScriptValueList(p);
     result = (s32)&p->solid;
     if (p->solid) {
-        position = *(struct SceneVec *)((u8 *)p + 0x3c);
+        CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
         if (p->variant == 1) {
             Ooze_OffsetBodyPosition(&position, p->facing);
         }
@@ -258,5 +271,5 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08206098);
 #endif
