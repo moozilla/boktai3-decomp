@@ -17,7 +17,7 @@ struct Registry2388Display {
     struct Registry2388ResourceHeader resource;
 };
 extern u8 *gUnk_030042E4;
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 
 void Registry2388_InitializeAnimations(struct Registry2388Display *p)
 {
@@ -34,7 +34,7 @@ void Registry2388_InitializeAnimations(struct Registry2388Display *p)
         zero = 0;
         count = 12;
         do {
-            sub_0821983C(anim, &p->resource, 0, 0x10, 2, zero, 0x3c, (void *)zero);
+            Widget_InitLinked(anim, &p->resource, 0, 0x10, 2, zero, 0x3c, (void *)zero);
             anim->palette = palette;
             anim->layer = 3;
             anim++;

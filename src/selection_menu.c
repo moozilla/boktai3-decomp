@@ -21,7 +21,7 @@ int Player_GetCurrentAttribute(int);
 int GameState_IsConsumableSlotEquipped(int);
 void MessageWindow_SetDisplayMode(int);
 void MessageWindow_SetPalette(int);
-void sub_082199C8(void *, void *, int);
+void Widget_CopyMasked(void *, void *, int);
 void sub_082216F8(void *, void *, void *, u32, int);
 int Inventory_HasItem(int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
@@ -293,7 +293,7 @@ void SelectionMenu_InitCursors(struct SelectionMenu *p)
     g = p->cursors;
     i = 2;
     do {
-        sub_0821983C(g, &p->panelResource, 0x4e, 0x10, clear, clear, 0x3c, saved);
+        Widget_InitLinked(g, &p->panelResource, 0x4e, 0x10, clear, clear, 0x3c, saved);
         g++;
         i--;
     } while (i >= 0);
@@ -317,7 +317,7 @@ void SelectionMenu_InitMarkers(struct SelectionMenu *p)
     g = p->markers;
     i = 7;
     do {
-        sub_0821983C(g, &p->panelResource, 0x50, 0x31, clear, clear, 0x3c, saved);
+        Widget_InitLinked(g, &p->panelResource, 0x50, 0x31, clear, clear, 0x3c, saved);
         g++;
         i--;
     } while (i >= 0);
@@ -329,7 +329,7 @@ void SelectionMenu_InitHighlight(struct SelectionMenu *p)
     u32 m = 0xFFFF0000;
     *(u32 *)&z = 0x800000;
     *((u32 *)&z + 1) &= m;
-    sub_0821983C(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &z);
+    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &z);
 }
 
 void SelectionMenu_PositionCursors(struct SelectionMenu *p)
@@ -856,7 +856,7 @@ void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
     struct SceneInputWidget *source = &p->icons[p->selectedSlot];
     struct SceneInputWidget *dest = &p->icons[16 + p->choiceCount];
     if (SelectionMenu_ConsumeCallbackFlag(p)) {
-        sub_082199C8(dest, source, 13);
+        Widget_CopyMasked(dest, source, 13);
         dest->flags &= ~1;
         source->paletteBank = 0x374;
         source->palette = SelectionMenu_GetIconPalette(1);

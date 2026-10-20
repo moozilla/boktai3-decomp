@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define FrostEmitter_Step sub_081D2FE8
-
 struct FrostParticle {
     u8 pad0[0x44];
     u16 active;

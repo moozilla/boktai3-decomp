@@ -17,7 +17,7 @@ struct MessagePanel {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void MessagePanel_InitSprites(struct MessagePanel *p)
 {
     s32 i;
@@ -29,7 +29,7 @@ void MessagePanel_InitSprites(struct MessagePanel *p)
     zero = 0;
     sprite = (u8 *)p->sprites;
     for (; i < 23; i++) {
-        sub_0821983C(sprite, p->resources, p->spriteIds[i], 0x10, 1, zero, zero, (void *)zero);
+        Widget_InitLinked(sprite, p->resources, p->spriteIds[i], 0x10, 1, zero, zero, (void *)zero);
         p->selections[i] = 0xFFFF;
         if (i == 5)
             p->sprites[5].visible = zero;

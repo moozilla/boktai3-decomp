@@ -1,7 +1,7 @@
 #include "global.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, void *);
+void Widget_InitLinked(u8 *, void *, u32, u32, u32, u32, u32, void *);
 void Presentation_InitializeSprites(u8 *s)
 {
     struct Blob {
@@ -19,9 +19,9 @@ void Presentation_InitializeSprites(u8 *s)
     coords.a = 0;
     coords.b = 0;
     coords.c = 0;
-    sub_0821983C(s + 0x38, obj, 15, 0x30, zero = 0, 0, sixty = 0x3C, &coords);
-    sub_0821983C(s + 0x98, obj, 11, 0x30, zero, zero, sixty, &coords);
-    sub_0821983C(s + 0xF8, obj, 2, 0x30, zero, zero, sixty, &coords);
-    sub_0821983C(s + 0x1B8, obj, 5, 0x30, zero, zero, sixty, &coords);
-    sub_0821983C(s + 0x158, obj, 0, 0x30, zero, zero, sixty, &coords);
+    Widget_InitLinked(s + 0x38, obj, 15, 0x30, zero = 0, 0, sixty = 0x3C, &coords);
+    Widget_InitLinked(s + 0x98, obj, 11, 0x30, zero, zero, sixty, &coords);
+    Widget_InitLinked(s + 0xF8, obj, 2, 0x30, zero, zero, sixty, &coords);
+    Widget_InitLinked(s + 0x1B8, obj, 5, 0x30, zero, zero, sixty, &coords);
+    Widget_InitLinked(s + 0x158, obj, 0, 0x30, zero, zero, sixty, &coords);
 }

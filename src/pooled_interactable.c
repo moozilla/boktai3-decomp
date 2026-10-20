@@ -73,7 +73,7 @@ s32 Breakable_InitSlot(struct PooledInteractableManager *manager, struct PooledI
         }
     }
     drawable = &slot->drawable;
-    sub_08219918(drawable, resource, 0, 1, 2, 0, 60, d);
+    Widget_InitCleared(drawable, resource, 0, 1, 2, 0, 60, d);
     Anim_SetKeyframes(drawable, slot->resource, 0, 1, 0);
     collider = &slot->collider;
     scale.x = 128;

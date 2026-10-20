@@ -2,7 +2,7 @@
 struct DisplayResourceHeader {
     u32 words[8];
 };
-s32 sub_0821983C(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
+s32 Widget_InitLinked(void *, void *, u32, s32, u32, u32, u32, const struct DisplayPosition *);
 s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *display, u32 resourceId,
                                          s32 flags, const struct DisplayPosition *position)
 {
@@ -24,7 +24,7 @@ setup:
     ResourceHeader_Relocate(resource, (void *)source);
     {
         s32 result =
-            sub_0821983C((u8 *)display + 0x2C, resource, 0, flags, 1, inactive, 60, position);
+            Widget_InitLinked((u8 *)display + 0x2C, resource, 0, flags, 1, inactive, 60, position);
         display->position = (struct DisplayPosition *)((u8 *)display + 0x4C);
         display->displayFlags = (u32 *)((u8 *)display + 0x34);
         return result;

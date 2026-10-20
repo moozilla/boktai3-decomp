@@ -14,7 +14,7 @@ struct RecordList {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 static inline void SetSpriteProc(void *proc, struct RecordList *list)
 {
     list->spriteProc = proc;
@@ -30,8 +30,8 @@ void RecordList_InitializeSprites(struct RecordList *list)
         s32 zero = 0;
         sprite = list->sprites;
         for (; i < 18; i++) {
-            sub_0821983C(sprite, list->resource, list->spriteIds[i], 16, zero, zero, zero,
-                         (void *)zero);
+            Widget_InitLinked(sprite, list->resource, list->spriteIds[i], 16, zero, zero, zero,
+                              (void *)zero);
             list->states[i] = -1;
             sprite++;
         }

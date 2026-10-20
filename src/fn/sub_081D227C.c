@@ -1,14 +1,12 @@
 #include "global.h"
 
-#define TaggedSceneNpc_UpdateState17Animation sub_081D227C
-
 void TaggedSceneNpc_PlayTaggedAnimation(void *, int, int, int, int);
 int DisplayAnimation_TestFinished(void *);
 int Anim_Step(void *, void *);
 s32 Mod(s32, s32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
 
-void TaggedSceneNpc_UpdateState17Animation(void *unused, u8 *p, s32 tick)
+void TaggedSceneNpc_UpdateState17AnimationB(void *unused, u8 *p, s32 tick)
 {
     u8 *tag = p + 0x20;
     if (p[9]) {

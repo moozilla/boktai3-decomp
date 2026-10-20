@@ -17,7 +17,7 @@ struct NumericDisplay {
     void *script;
     u32 parameter;
 };
-s32 sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 NumericDisplay_InitializeWidgets(struct NumericDisplay *s, u32 parameter)
 {
     s32 i;
@@ -52,7 +52,7 @@ s32 NumericDisplay_InitializeWidgets(struct NumericDisplay *s, u32 parameter)
                 x = 0;
                 break;
         }
-        result = sub_0821983C(&s->widgets[i], s->resource, 0x29, 0x10, 0, 0, 0, 0);
+        result = Widget_InitLinked(&s->widgets[i], s->resource, 0x29, 0x10, 0, 0, 0, 0);
         if (result != 0) {
             ret = -1;
             goto end;

@@ -3,7 +3,7 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, void *);
+void Widget_InitLinked(u8 *, void *, u32, u32, u32, u32, u32, void *);
 extern u8 gUnk_0824F6F8[];
 u32 PaletteCycleBackground_Init(u8 *s)
 {
@@ -24,7 +24,7 @@ u32 PaletteCycleBackground_Init(u8 *s)
     p = ScriptProc_Start(0xCB05, 0x7C8B);
     resource = *(struct Blob *)p;
     ResourceHeader_Relocate(&resource, p);
-    sub_0821983C(s + 0x18, &resource, 1, 0x10, zero, zero, 0x3C, gUnk_0824F6F8);
+    Widget_InitLinked(s + 0x18, &resource, 1, 0x10, zero, zero, 0x3C, gUnk_0824F6F8);
     s[0x78] = 1;
     s[0x79] = zero;
     return 0;

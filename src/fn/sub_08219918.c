@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Widget_InitCleared sub_08219918
-
 extern u16 gUnk_03005238;
 
 struct ClearedWidget {

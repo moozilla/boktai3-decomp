@@ -8,7 +8,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void sub_081DF1D8(u8 *);
 void Password_BuildLabels(u8 *);
@@ -70,16 +70,16 @@ u32 Password_InitializeEntryMenu(u8 *s)
     p = ScriptProc_Start(bank, 0xE2AB);
     first = s + 0x78;
     ResourceHeader_Relocate(first, p);
-    sub_0821983C(s + 0x18, first, 0x39, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x18, first, 0x39, 0x10, zero, zero, zero, zero);
     obj = s + size;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0xA0, obj, 0x16, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0xA0, obj, 0x16, 0x10, zero, zero, zero, zero);
     obj = s + 0x188;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0x128, obj, 0x18, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x128, obj, 0x18, 0x10, zero, zero, zero, zero);
     obj = s + 0x210;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0x1B0, obj, 0x32, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x1B0, obj, 0x32, 0x10, zero, zero, zero, zero);
     {
         u32 *save = (u32 *)(s + 0x7D0);
         u32 old;
@@ -104,11 +104,11 @@ u32 Password_InitializeEntryMenu(u8 *s)
     obj = s + offA;
     ResourceHeader_Relocate(obj, p);
     offB = 0x238;
-    sub_0821983C(s + offB, obj, 0x8C, 0x10, one, zero, zero, zero);
+    Widget_InitLinked(s + offB, obj, 0x8C, 0x10, one, zero, zero, zero);
     offB = 0x320;
     obj = s + offB;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0x2C0, obj, 0x8D, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x2C0, obj, 0x8D, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0x240) &= ~1;
     *(u32 *)(s + 0x2C8) |= one;
     {
