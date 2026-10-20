@@ -1,5 +1,8 @@
 #include "global.h"
 
+// confidence=low: coordinates player positioning and release.
+#define Hresvelgr_UpdatePlayerRelease sub_0819FE9C
+
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // Remaining differences: release-target vector/address lifetimes and RNG register allocation.
