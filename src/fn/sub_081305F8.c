@@ -27,8 +27,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
     actor->word104 = 0;
 }
 
-#define SceneActorControl_BeginIdleControl sub_081305F8
-
 void SceneActorControl_BeginIdleControl(struct SceneActorRegistryResetView *actor)
 {
     if (TakeFlag2B1(actor)) {

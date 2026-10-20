@@ -4,8 +4,6 @@
 s32 Inventory_GetItemId(u32);
 s32 Inventory_GetItemPackedState(u32);
 
-#define InventorySlot_PickRandom sub_0812E3DC
-
 u8 InventorySlot_PickRandom(s16 *slot, s16 *kind, s16 *param)
 {
     u16 start;

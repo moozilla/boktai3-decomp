@@ -27,8 +27,6 @@ static inline void Enter(struct SceneActorRegistryResetView *actor, u32 zero)
     actor->field2B1 = 1;
 }
 
-#define SceneActorControl_EnterTimedState sub_0813042C
-
 void SceneActorControl_EnterTimedState(struct SceneActorRegistryResetView *actor)
 {
     register u32 bit asm("r1");
