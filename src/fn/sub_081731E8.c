@@ -1,3 +1,4 @@
+#define SceneHud_UpdateSecondaryActionSelection sub_081731E8
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 97.3%
@@ -81,5 +82,5 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneHud_UpdateSecondaryActionSelection);
+INCLUDE_ASM("asm/nonmatching", sub_081731E8);
 #endif
