@@ -2227,3 +2227,45 @@ All accepted C and guarded draft files were formatted directly with the pinned
 clang-format. Per-file exact checks and --nonmatching --record only; no make,
 tools/build.py, full ROM check, shared-doc regeneration, direct git mutation,
 or network operation. Integration must perform combined ROM validation.
+
+## Task 081879A8 (2026-10-20, follow-up)
+
+Tags: #matching #armor #decision
+
+Exact C gain: **0.0 percentage points**. Worked solo on the assigned branch,
+without network or full builds. Existing scratch candidates from the previous
+Armor task supplied the starting points. Ghidra export remains unavailable.
+
+- 08187F44: stopped below threshold, baseline 65.9%, 308 realigned differences /
+  146 ignoring registers. Read largest first, BIG_FUNCTIONS, matched relatives
+  (best covers only 9%) and assembly entry. Halfword coordinate locals raised
+  fuzzy to 66.5% but worsened structural residue to 164; rejected. Shared lateral
+  attack tails and coordinate lifetimes remain. No production draft added.
+- 081879A8: stopped below threshold, baseline 63.2%, 289/131 realigned residue.
+  Halfword coordinate locals scored 64.6% but worsened structure to 154; rejected.
+  Same shared-tail and coordinate-lifetime blockers as the close-combat sibling.
+- 081885BC: stopped below threshold at 73.0%, 234/167 realigned residue. Reviewed
+  primary flag dispatcher and assembly's shared timer/reset tails. Unsigned
+  absolute coordinates regressed to 72.7%; explicit inverse axis tests and
+  absolute-coordinate pins compiled identically. No production source added.
+- 08188B7C: stopped below threshold at 71.9%, 239/168 baseline residue. Absolute
+  coordinate pins slightly improved scratch output to 72.4%, 235/165, still below
+  threshold. Unsigned absolutes regressed; inverse axis tests were identical.
+  Experimental pins remain only in generated variant artifacts, not source.
+- 0818911C: stopped below threshold at 69.9%, 173/50 realigned residue. Existing
+  aggressive-decision scratch uses halfword coordinates; changing them to words
+  regressed to 68.4%, 305/60. Signed flag type compiled identically. Remaining
+  shared tails, coordinate spills and registers block a qualifying draft.
+- 081896D0: retained **81.5% guarded draft**, Armor_UpdateFacingDecision. Added
+  required file-local address alias and changed stringified INCLUDE_ASM operand
+  to raw sub_081896D0. Recorded score: 158 realigned differences / 48 ignoring
+  registers. Halfword coordinates, unsigned absolutes and volatile/byte flag
+  types regressed. Full coordinate-register bindings reduced structural residue
+  to 24 but increased total differences to 199 and dropped fuzzy to 72.4%; partial
+  bindings also failed to improve a qualifying candidate. No pins retained.
+  Default assembly fallback checked byte-identical; this is not an exact C match.
+
+Only check.py and variant checks were used. Existing accepted source remains
+unpinned and its body unchanged. Queued the guarded alias/fallback correction
+and these notes through build/commit.sh; combined ROM validation stays with the
+integrator. No shared documentation or totals regenerated.
