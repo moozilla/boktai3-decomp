@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 51.1%
+// fuzzy: 80.2%
 // Golem/skeleton reaction dispatcher (returns 1 when it changed control): hit (0x2000) turns
 // round and chases, 0xC0000 hands over to reactionTarget230, otherwise roar-and-chase through
 // three copies of Chase_Arrive (include/scene_actor_chase.h); 080C23FC is its far tail.
@@ -25,7 +25,9 @@ static inline void ChasePlayer(struct SceneActorRegistryResetView *actor)
     actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
 }
 
-u8 sub_080C12FC(struct SceneActorRegistryResetView *actor)
+#define Golem_ReactToContact sub_080C12FC
+// confidence=low: contact flags select chase, roar, or a reaction control.
+u8 Golem_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
     u8 *group = (u8 *)&actor->group;

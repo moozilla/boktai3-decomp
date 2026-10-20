@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.5%
-// One instruction differs: the ROM derives the flags2D0 offset as `subs r2, #4` from the flags2D4 offset register; agbcc rematerializes 0x2D0. Explicit offset arithmetic (as in sub_080704EC) and a 15-minute permuter run did not reproduce it.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* SceneActorReaction_TrySink: when a live, unblocked actor stands on a sinking cell (cell flag 0x40) at or below the ground height, hands control to its sink callback (default SceneActorReaction_SinkAndRemove, kind 0x16) in state 3 and marks it sinking (flags2D0 |= 0x20000); returns whether it did (provisional name) */
@@ -11,11 +9,16 @@ void SceneActorReaction_SinkAndRemove(void);
 static inline u8 Blocked(struct SceneActorRegistryResetView *actor)
 {
     u32 mask = 0x40;
-    if (actor->flags2D4 & mask)
+    register u32 offset asm("r2") = 0x2D4;
+    if (*(u16 *)((u8 *)actor + offset) & mask)
         return 1;
     mask = 0x20000;
-    if (actor->flags2D0 & mask)
-        return 1;
+    offset -= 4;
+    {
+        register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
+        if (*field & mask)
+            return 1;
+    }
     if (actor->health <= 0)
         return 1;
     return 0;
@@ -45,7 +48,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->field2B1 = 1;
 }
 
-u8 sub_080B8B84(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_TrySink(struct SceneActorRegistryResetView *actor)
 {
     if (actor && !Blocked(actor) && actor->enabled == 1) {
         u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->terrainCell) + 2);
@@ -66,6 +69,3 @@ u8 sub_080B8B84(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080B8B84);
-#endif
