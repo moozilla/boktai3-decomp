@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-void sub_080C4EF0(void *);
+void Golem_ResetIdleControl(void *);
 void SceneActorControl_OnIdle(void);
 static inline u32 TestFlags(u16 *flags, u32 mask)
 {
@@ -58,7 +58,7 @@ void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *ac
         actor->group.field418 = actor->group.field416;
         if (TestFlags(&actor->flags2D4, 256))
             return;
-        sub_080C4EF0(actor);
+        Golem_ResetIdleControl(actor);
     } else {
         SetState(actor, active);
         SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
