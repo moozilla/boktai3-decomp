@@ -11,8 +11,11 @@ A task is the unmatched functions of at least --min-insns instructions inside on
 subsystem range (symbols/progress_subsystems.csv), or a run of up to 6 such
 functions where no range is recorded. Its id is its first address. Claiming pushes
 a commit unique to this worker to refs/heads/cloud/TASK; a second worker's push to
-the same name is rejected (not a fast-forward), so each task has one owner. A task
-whose functions are all matched on origin/main drops out of the list. Work happens
+the same name is rejected (not a fast-forward), so each task has one owner. The
+claim commit lists the task's functions, and a task overlapping any function of an
+open (unmerged) claim is skipped: the loose runs of 6 shift as origin/main changes,
+so task ids alone would let two workers take the same function. A task whose
+functions are all matched on origin/main drops out of the list. Work happens
 on that branch; finish with a PR (docs/CLOUD.md).
 """
 import argparse
@@ -57,6 +60,13 @@ def claimed():
     return {l.split("refs/heads/cloud/")[1] for l in r.stdout.splitlines() if "refs/heads/cloud/" in l}
 
 
+def claimed_functions():
+    """Function addresses listed in claim commits of cloud/* branches not yet merged into main."""
+    git("fetch", "-q", "origin", "+refs/heads/cloud/*:refs/remotes/origin/cloud/*")
+    r = git("log", "--format=%B", "--grep=^Claim cloud task", "--remotes=origin/cloud/*", "--not", "origin/main")
+    return {a for l in r.stdout.splitlines() if l.startswith("Functions:") for a in l.split()[1:]}
+
+
 def brief(t):
     lines = [f"Task {t['id']}: {t['name']}, {len(t['functions'])} unmatched functions "
              f"({sum(f['insns'] for f in t['functions'])} instructions). Branch: cloud/{t['id']}.", ""]
@@ -84,7 +94,9 @@ def main():
         print(brief(t) if t else "no such open task")
         return
     taken = claimed()
+    busy = claimed_functions()
     open_ = [t for t in tasks(a.min_insns) if t["id"] not in taken
+             and not busy & {f"{f['addr']:08X}" for f in t["functions"]}
              and (not a.unassigned or t["name"] == "unassigned functions")
              and (not a.task or t["id"] == a.task.upper())]
     if a.smallest:
@@ -96,7 +108,8 @@ def main():
         return
     for t in open_:
         git("checkout", "-q", "-B", f"cloud/{t['id']}", "origin/main")
-        git("commit", "-q", "--allow-empty", "-m", f"Claim cloud task {t['id']} ({uuid.uuid4().hex[:8]})")
+        git("commit", "-q", "--allow-empty", "-m", f"Claim cloud task {t['id']} ({uuid.uuid4().hex[:8]})",
+            "-m", "Functions: " + " ".join(f"{f['addr']:08X}" for f in t["functions"]))
         if git("push", "-q", "origin", f"HEAD:refs/heads/cloud/{t['id']}").returncode == 0:
             print(brief(t))
             return

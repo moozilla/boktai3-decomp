@@ -58,6 +58,8 @@ Per task:
    150+ instructions, with addresses and sizes, and checks out branch `cloud/TASK`.
    It takes the biggest open task. `list --unassigned --smallest` orders tasks by their
    largest function, and `claim --unassigned --task ID` takes a specific one.
+   The claim commit lists the task's functions; `claim` skips any task that shares a
+   function with an unmerged claim (task ids shift as main changes, functions don't).
 2. For each function, biggest payoff first: `tools/asmat.py ADDR 80`, then write C.
    If the subsystem has a unit (`src/<subsystem>.c` holding the function's
    `INCLUDE_ASM`), write it there; otherwise in `src/fn/sub_ADDR.c` (copy the shape of
