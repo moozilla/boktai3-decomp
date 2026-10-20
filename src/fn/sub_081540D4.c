@@ -1,6 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateSideArrival                                                                \
+    sub_081540D4 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 98.5%
+// Remaining playback completion branch sharing and mask copies differ.
 // fuzzy: 91.5%
 
 struct P {
@@ -138,23 +142,23 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 #include "scene_vec.h"
-static inline void Face(struct P *p)
+static inline void Face(struct P *p, u32 phase)
 {
     if (p->dir > 4) {
         p->facing = (8 - p->dir) >> 1;
         p->flip = 1;
     } else {
         p->facing = p->dir >> 1;
-        p->flip = 0;
+        p->flip = phase;
     }
 }
-static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
+static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 phase)
 {
     struct ContactSwarmSprite *sprite = sp;
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
-    u32 ended = 0;
+    u32 ended;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -165,9 +169,8 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        u32 maskBit = 1;
+        u32 maskBit = phase;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -209,12 +212,13 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                 u32 index = state->index;
                 if (index == 0) {
                     u32 hold = 8;
-                    ended = 1;
                     hold &= flags;
                     if (hold) {
                         state->elapsed = savedDuration;
+                        goto ended_animation;
                     } else {
                         state->index = state->frameCount - 1;
+                        goto ended_animation;
                     }
                 } else {
                     state->index = index - 1;
@@ -226,7 +230,6 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    ended = 1;
                     endFlag = flags & 8;
                     asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
@@ -239,15 +242,20 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                     } else {
                         state->index = 0;
                     }
+                    goto ended_animation;
                 } else {
                 }
             }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
+            ended = 0;
+            goto update_frame;
+        ended_animation:
+            ended = 1;
+        update_frame: {
+            u32 offset = state->index << 1;
+            const volatile u16 *table;
+            table = state->commands;
+            command = (const volatile u16 *)((u32)table + offset);
+        }
             state->frameWeight = *command & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
@@ -258,6 +266,8 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                 if (!(u8)speed)
                     state->duration = 1;
             }
+        } else {
+            ended = 0;
         }
     }
     return ended;
@@ -265,10 +275,11 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
 // confidence=low: reduces departure scale and returns to standing after animation.
 void PlayerCue_UpdateSideArrival(struct P *p)
 {
-    switch (p->phase) {
+    u32 phase = p->phase;
+    switch (phase) {
         case 0:
             if (!p->timer) {
-                Face(p);
+                Face(p, phase);
                 ++p->timer;
             }
             Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
@@ -283,7 +294,7 @@ void PlayerCue_UpdateSideArrival(struct P *p)
             break;
         case 1:
             Anim_SetSequence(&p->seq, p->resource, 3, p->facing, p->flip);
-            if (StepEnd(&p->sprite, &p->seq)) {
+            if (StepEnd(&p->sprite, &p->seq, phase)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
                 p->fn = sub_081538DC;
@@ -293,5 +304,5 @@ void PlayerCue_UpdateSideArrival(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideArrival);
+INCLUDE_ASM("asm/nonmatching", sub_081540D4);
 #endif
