@@ -2616,7 +2616,7 @@ or generated-file edits. All commits went through build/commit.sh.
   allocates from the BouncingObject pool and receives the source, velocity and
   target positions. The volley raises the source Y by 200, derives and clamps
   horizontal speed, limits the aim near the actor's cardinal facing, emits
-  one to three objects, reduces strength by 8/10, and increases speed by 4/10.
+  one to three objects, scales strength by 8/10, and increases speed by 4/10.
   Started from the retained 98.5% draft. Binding a separate quotient to r4 and
   retaining a separate absolute-value result recovered the apparently redundant
   r4-to-r0 copy while keeping the comparison and negation on r4. A temporary
