@@ -1487,7 +1487,7 @@ queued through build/commit.sh and observed in git log.
   Signed s16 position and preparing the palette input pointer before the output
   pointer improve the selection slides and palette calls. Final checker-recorded
   draft: 133 realigned differing instructions, 39 ignoring registers; candidate
-  2,620 bytes, reviewed original extent 2,608 bytes. Palette field/address reuse,
+  2,620 bytes, checker-reviewed original extent 2,612 bytes. Palette field/address reuse,
   selection-position arithmetic and allocation remain. Used BIG_FUNCTIONS,
   variants batches and rtlprobe perline; rejected full-width position and
   explicit keyframe-zero variants. Default retains INCLUDE_ASM.
