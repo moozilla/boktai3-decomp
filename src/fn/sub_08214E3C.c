@@ -1,7 +1,8 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #define Sprite_RenderFlipAwareList sub_08214E3C
 #ifdef NONMATCHING
-// fuzzy: 56.0%
+// fuzzy: 95.3%
 // Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
     s16 x, y, z;
@@ -55,7 +56,7 @@ void Sprite_RenderFlipAwareList(void)
     if (!p)
         return;
     do {
-        s32 x, y asm("r7"), z asm("r8");
+        register s32 x asm("r3"), y asm("r7"), z asm("r8");
         struct SpriteResource *resource;
         if (p->flags & skip)
             goto next;
@@ -65,7 +66,7 @@ void Sprite_RenderFlipAwareList(void)
         if (!(p->flags & 16)) {
             screen(&pos, &p->pos);
             {
-                struct Vec *out = &pos;
+                register struct Vec *out asm("r0") = &pos;
                 x = out->x;
                 y = out->y;
                 z = out->z;
@@ -77,11 +78,11 @@ void Sprite_RenderFlipAwareList(void)
         }
         if (!(p->flags & 64)) {
             s32 left;
-            s32 top;
-            u32 width;
-            u32 height;
+            register s32 top asm("r4");
+            register u32 width asm("r12");
+            register u32 height asm("r1");
             if (p->flags & 4) {
-                s32 edge = x + resource->offsetX;
+                register s32 edge asm("r0") = x + resource->offsetX;
                 left = edge - resource->width;
             } else {
                 left = x - resource->offsetX;
