@@ -3409,3 +3409,52 @@ Two of six assigned functions matched (33.3% of the task); four were retained as
 - **080FBC84 drafted 85.2% — ActorPhase_EmitTrailSprite** (existing name retained). Same trail ring and stepper as 080FBA38, but takes explicit position and angle arguments; scales still come from the parent drawable. Remaining: 52 realigned instructions, 22 ignoring registers, including sequence/address setup, stack frame and field order. Reviewed target extent: 600 bytes; candidate is 596. Uses register hints; unguarded depin skipped as nonmatching. The default named INCLUDE_ASM fallback passed the per-file check over 600 bytes.
 
 All fuzzy scores above are the recorded full-target scores from check.py --nonmatching --record. The trail commit titles carry the earlier candidate-length scores (81.4% and 84.8%); the recorded source scores are authoritative. check.py's recording helper keys scores by compiled name and does not follow the existing ActorPhase_EmitTrailSprite alias in the fallback. For 080FBC84, temporarily using sub_080FBC84 in the fallback allowed --record to write 85.2%; the canonical fallback was then restored and checked. The final notes commit includes that score-line correction. No shared headers, symbols, generated output or shared documentation were changed. Combined ROM validation remains for the integrator.
+
+## 2026-10-20 — task 08156FE0
+
+Tags: #matching #player #ui
+
+- **0815FB80 matched**, `PlayerOrbitEffect_UpdateStatTransfer` (tentative). The
+  orbiting transition effect follows five timed arcs around the scene position,
+  returns to its owner and reduces current stat A toward the initialized target.
+  Separate offset statements prevent reassociation of the frame shift and negative
+  constant. Creating the scene-position pointer before those statements fixes
+  literal order; reading the frame before the animation-pointer assignments fixes
+  the final scheduling difference. No register hints needed.
+- **0815F2C8 matched**, `Player_InitializeFromScript`. Initializes display resources,
+  advances the embedded packed sequence, runs script initialization routines,
+  registers the slot and creates barrier/attack effects. Reused the packed decoder
+  from matched ContactSequenceActor code. The sprite pointer must occupy r6;
+  pinning the player base itself caused bad allocation and was discarded. Retained
+  12 register/barrier hints after `tools/depin.py --write`; unit is marked as a
+  register-pinning concession. Exact check passed after formatting.
+- **0816349C matched**, `TransitionPanel_UpdateCostSelection`. Accept/cancel and
+  left/right choice handling for the cost prompt. Confirm invokes the configured
+  script with the selected cost; cancel advances the player sequence and panel
+  close state. Loading the choice into a local before setting the decision to one
+  reproduces the original conditional initialization. No hints needed.
+- **08163FFC matched**, existing name `StatDisplay_DrawRatio`. Converts numerator
+  and denominator into digit arrays and draws both sides plus style-dependent
+  padding. Two arrays with a local dimension of five reproduce the original
+  separate dynamic stack allocations and frame pointer. First candidate exact;
+  no hints needed.
+- **08156FE0 retained existing draft 98.0%**, `Player_SelectActionSequence`.
+  Independently reconstructed candidate reached 93.4% (55 realigned differences,
+  four structural); flag tests need an explicit field pointer before mask/value
+  statements. The scene-five input-field address is otherwise reused across a
+  call. Final review found an existing descriptive-name draft that the initial
+  address-only search missed. Restored that stronger source after an intermediate
+  lower-score draft commit, added the required local alias, and recorded 98.0%
+  again: 16 register-only instructions, zero structural differences. Default build
+  continues to use INCLUDE_ASM.
+- **08160108 stopped unmatched**, tentative `PlayerOrbitEffect_InitializeParticles`.
+  Recovered the sixteen-particle setup, random angle/speed/radius/lifetime fields,
+  trigonometric offsets and tile selection. Best whole-listing similarity was
+  68.6%; a different variant had 16 structural differences but 90 total. Main
+  residue is long-lived RNG/table/resource allocation, stack-slot order and the
+  two sprite/interior-state pointers. Pinning the RNG pointer or interior pointer
+  caused additional reloads after byte stores. No candidate met the 80% draft
+  threshold; exploratory sources remain under ignored wip/ and build/.
+
+Validation used per-file tools/check.py only; no full build or network operations.
+Each exact match was committed separately through build/commit.sh.
