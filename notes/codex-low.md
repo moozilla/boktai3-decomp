@@ -1264,3 +1264,76 @@ fallbacks. Default fallback MATCH output does not mean either C draft matched.
 Only per-file checks; no make, full build, network or shared-doc changes. Ghidra
 export is absent. Separate draft updates and these notes submitted through the
 commit driver. Earlier notes under Task 080A9BD8 remain useful context.
+
+## Task 0819DD44 — 2026-10-20
+
+Tags: #matching #hresvelgr #behavior #contact-damage
+
+Exact coverage of the six assigned reviewed body/pool extents: **19.03%
+(+19.03 percentage points; 1,224 of 6,432 bytes)**. Both new exact matches
+are unpinned. Guarded drafts add no exact coverage. Repository-wide totals
+remain for batch integration. Worked solo and offline on the supplied
+cloud/0819DD44 branch; no make, full build, network or direct Git mutations.
+
+- **0819DD44 matched**, `Hresvelgr_UpdateAttackCycle`, 740 bytes. Fifteen-state
+  behavior callback requests attacks through byte AA, waits on completion AF,
+  counts repeated attacks in 02000220 and eventually sets readiness byte 383.
+  Flags 04000000/20000000/40000000/80000000 select interruptions and branches.
+  State 2 checks the interruption flag only while waiting, not after its entry
+  request or completed-action transition. Inline request setters preserve the
+  constant-before-address ordering. Splitting byte A1 bit updates into named
+  temporaries recovered operand ties. Temporary pins closed the last four
+  instructions; depin removed all five hints and the formatted source still
+  passed the complete 740-byte exact check.
+- **0819E408 matched**, `Hresvelgr_SelectNextBehavior`, 484 bytes. Consumes
+  readiness 383, advances index 32E within behavior tables 08611D44/5C/7C/8C,
+  selects phase 32C based on health below half or contact 318, resets behavior
+  timer C4 and requests the selected behavior through AE/B0. Accumulation at
+  324 resets when index is zero. A shared next-index local with one store
+  after the range branch was essential; writing stores in both arms changes
+  cross-jumping. Keeping both object pointers typed produced 97.1%, whereas
+  byte-pointer casts reached only 79.9%. A scoped phase-zero next-index local
+  recovered the final allocation; depin removed its two hints, retaining an
+  exact unpinned match after formatting.
+- **0819FE9C retained draft 86.1%**, `Hresvelgr_UpdatePlayerRelease`, 1,564
+  reviewed bytes. Confirmed the existing guarded draft's score: 123 realigned
+  differing instructions / 35 ignoring registers. No improvement claimed.
+  Added the required local alias and adjacent confidence comment; changed its
+  assembly alternative to the address symbol so the stale baseline ELF can
+  check it. Default assembly alternative passes exactly.
+- **081A0BC8 improved draft 93.9% -> 96.1%**,
+  `Hresvelgr_UpdateBoundaryBarrage`, 732 reviewed bytes. Passing the live state
+  value as animation duration argument, then consuming it with `state &= tick`,
+  recovers the shared constant-one lifetime and eliminates all structural
+  differences. Final residue: 14 register-only instructions / 15 bytes,
+  principally RNG mask lifetime (ip versus sl), signed remainder temporaries,
+  and terrain-height constant allocation. Explicit mask/scatter helper pins
+  regressed and were discarded. Retains its register-pinning concession.
+  Recorded the score, required local alias and confidence comment; default
+  assembly alternative passes exactly.
+- **081A14FC stopped unmatched** after largest-first assembly, condensed-run
+  and relative review. Five-state defeat/event sequence: animation 15 and
+  player-action gate; eight 30-tick movement stages toward 0B54; animation
+  21/22 landing and particle bursts; event flags 0/3/4E and second script.
+  The condensed listing exposes seven copies of the four contact-field
+  address precomputations, not just duplicated RNG/terrain helpers. The best
+  matched relative covers only 7%; no new useful hypothesis for recovering
+  that repeated switch-edge address setup, so no new source was promoted.
+- **081A1EFC stopped below draft threshold**, tentative
+  `Hresvelgr_ApplyContactDamage`. New complete scratch reconstruction in
+  ignored `wip/codex-low-0819DD44/sub_081A1EFC.c`; initial reviewed check was
+  49.1% (369 realigned differences / 208 structural), subsequent pointer pins
+  regressed. Correct body/pool extent is 1,148 bytes through 081A2378;
+  the first exploratory check used 1,140 and should not be cited as acceptance.
+  Consumes pending spark/reaction/motion at 328/329/326, selects contact pair
+  31C/320 or 31E/322, applies environmental damage of five times the signed
+  player field 876 with a 60-tick cooldown, subtracts health, then selects
+  flags/reaction callback or emits effects. Packed bitfield vector operations,
+  shared reaction tails and pointer lifetimes remain structurally different.
+  No below-threshold candidate was put in production source.
+
+Validation: per-file tools/check.py only, with reviewed extents for exact
+matches and drafts. Both draft scores recorded with --nonmatching --record;
+formatted with the pinned clang-format. All production changes queued as one
+function per driver commit. Shared docs/index were left alone per CLOUD.md.
+Combined ROM verification remains with the integrator.
