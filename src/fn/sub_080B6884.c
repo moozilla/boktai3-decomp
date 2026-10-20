@@ -51,8 +51,8 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define Skeleton_TryBeginArmedAttack                                                               \
-    sub_080B6884 // confidence=low: category-seven angle/range gate chooses close or ranged behavior
+// confidence=low: category-seven angle/range gate chooses close or ranged behavior
+#define Skeleton_TryBeginArmedAttack sub_080B6884
 u32 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *actor,
                                  struct SkeletonAttackContext *context, s32 angle)
 {
