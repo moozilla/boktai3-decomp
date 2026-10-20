@@ -2642,3 +2642,43 @@ Four separate draft commits through build/commit.sh; all scores refreshed with
 check.py --nonmatching --record, and all four default fallbacks checked exact.
 No full build or network operations. Ghidra export is absent. Integration must
 validate the combined ROM; retained drafts contribute no exact progress.
+
+## Task 0821C8F8 follow-up — 2026-10-20
+
+Tags: #matching #terrain #path
+
+- 0821C8F8: stopped unmatched after largest-first entry, relatives and condensed
+  listing review. Best relative covers 7%; direction-specific paired probes and
+  ten stack positions remain unreconstructed. No new complete candidate.
+- 0821F2EC: stopped unmatched after entry, relatives and condensed listing review.
+  Caches destination X/Z at context+0xC/+0x10 and source X/Z at +0x14/+0x18;
+  identical endpoints return 2. Scans navmesh groups/regions with
+  NavMesh_IsPointInsideRegion, rejects group changes, and handles region transitions.
+  Best matched relative covers only 1%; no close complete candidate.
+- 0821D178: retained scratch candidate, 62.8% over reviewed 888-byte extent
+  (0821D178–0821D4F0), 189 realigned differences / 82 ignoring registers.
+  Packed clipping intermediates and intersection/control flow remain unresolved.
+- 0821D6F4: retained 97.7% guarded Terrain_HasHigherCorner draft, restored required
+  file-local address alias and explicit-address assembly fallback. Eight realigned
+  differences / six ignoring registers. Bitfield source, wider load, pinned mask
+  and shift extraction all failed to recover ldrh plus mask for low Z.
+- 0821EC84: matched Path_FindNearestDistantPoint, reviewed 348 bytes. Selects the
+  nearest point whose squared XZ distance is at least the supplied minimum,
+  defaulting output XZ to point zero; obtains output Y from terrain slope data.
+  Assign best=chosen after initial point lookup to recover lifetime/spills;
+  separate ordered zero stores recover failure paths. Read terrain byte twice
+  through one data pointer to recover mask operand allocation. A temporary sl
+  pin led to equality, then depin removed it; final formatted C matches without
+  register concessions. Separate driver commit confirmed.
+- 0821EF30: stopped with scratch candidate at wip/sub_0821EF30.c. Reviewed
+  404-byte body scores 91.8%, 16 realigned differences / zero ignoring registers.
+  Scans path points from a random starting index and retains the LAST point
+  inside XZ bounds, then computes terrain Y. Positive bounds predicate and
+  explicit random-table address arithmetic fix structure; pointer pins regress.
+  Recorder includes the unrecognized dispatch routine at 0821F0C4–0821F15C,
+  yielding 78.5%. A queued production draft was committed before this discrepancy
+  was caught; a subsequent withdrawal removes it to honor the >=80% requirement.
+  Do not count this as a retained draft or exact progress.
+
+Only check.py per-file checks; no full build or network operations. Exact match
+and existing draft update committed separately through driver; notes last.
