@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: motion 0x1D applies decaying recoil until standing resumes.
-#define PlayerCue_UpdateRecoilSlide sub_08152A5C
-#define Player_RestartAnimationFromSetup sub_08151D90
 #ifdef NONMATCHING
 // fuzzy: 97.5%
 // Two address constants use different registers; reviewed body ends at 08152C3C.
@@ -177,5 +175,5 @@ void PlayerCue_UpdateRecoilSlide(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08152A5C);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateRecoilSlide);
 #endif

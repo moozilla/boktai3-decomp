@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: palette transitions and stage colors follow adjacent Vanargand routines.
-#define Vanargand_UpdatePaletteTransition sub_081A5614
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -189,5 +188,5 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A5614);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteTransition);
 #endif

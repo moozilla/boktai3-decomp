@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define PlayerCue_UpdateWalkTarget sub_08151EB8
-#define Player_RestartAnimationFromSetup sub_08151D90
 #ifdef NONMATCHING
 // fuzzy: 99.7%
 // Movement-direction OR is scheduled after the direction-field address.
@@ -193,5 +191,5 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08151EB8);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateWalkTarget);
 #endif

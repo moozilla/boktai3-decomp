@@ -166,7 +166,6 @@ static inline u32 Step(struct WoodenCrate *spriteInput, struct DisplaySequenceSt
     return done;
 }
 // confidence=low: allocates a crate slot and reads sprite, trigger and callback options from the script.
-#define WoodenCrate_CreateFromScript sub_080FF87C
 void WoodenCrate_CreateFromScript(void)
 {
     struct WoodenCrateManager *manager = gUnk_020001A4;

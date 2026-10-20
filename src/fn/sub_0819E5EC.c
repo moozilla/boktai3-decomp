@@ -7,10 +7,10 @@ struct P {
 };
 extern const u32 gUnk_08611DAC[];
 void Callback_InvokeActor(void *, u32);
-void sub_0819E408(void *);
+void Hresvelgr_SelectNextBehavior(void *);
 void Hresvelgr_UpdatePrimaryBehavior(struct P *p)
 {
     p->b = 0;
     Callback_InvokeActor(p, gUnk_08611DAC[p->i]);
-    sub_0819E408(p);
+    Hresvelgr_SelectNextBehavior(p);
 }

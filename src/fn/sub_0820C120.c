@@ -1,9 +1,12 @@
 #include "global.h"
 #include "screamer_playback.h"
-#define Screamer_InitColliders sub_0820C120
-#define Screamer_ApplyHitReaction sub_0820BF70
-struct ColliderFlags { u8 pad[6]; u32 flags:16; };
-struct ScreamerColliderVector { s32 x:16, y:16, z:16, pad:16; };
+struct ColliderFlags {
+    u8 pad[6];
+    u32 flags : 16;
+};
+struct ScreamerColliderVector {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
@@ -17,11 +20,19 @@ void Screamer_InitColliders(struct ScreamerState *p)
     struct ScreamerColliderVector size, offset;
     void *collider = p->attackCollider;
     if (!p->f1D8) {
-        size.x = 160; size.y = 128; size.z = 128;
-        offset.x = 128; offset.y = 0; offset.z = 0;
+        size.x = 160;
+        size.y = 128;
+        size.z = 128;
+        offset.x = 128;
+        offset.y = 0;
+        offset.z = 0;
     } else {
-        size.x = 128; size.y = 128; size.z = 160;
-        offset.x = 0; offset.y = 0; offset.z = 128;
+        size.x = 128;
+        size.y = 128;
+        size.z = 160;
+        offset.x = 0;
+        offset.y = 0;
+        offset.z = 128;
     }
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(collider, Screamer_OnColliderContact, p);

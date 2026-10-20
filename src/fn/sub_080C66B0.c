@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Golem_UpdateRouteMotion                                                                    \
-    sub_080C66B0 // confidence=low: neighboring Golem controls establish the state role.
+// confidence=low: neighboring Golem controls establish the state role.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 #include "scene_object.h"

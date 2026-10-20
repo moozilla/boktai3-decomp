@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: plays a charge animation sequence and starts a converging particle pulse
-#define BossSlot2_UpdateChargePaletteSequence sub_0817F0AC
 struct BossActor {
     u8 pad0[0x51];
     u8 direction;

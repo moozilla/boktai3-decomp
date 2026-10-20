@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: periodically retargets the part beside the player for 64 ticks.
-#define Vanargand_UpdatePartTracking sub_081B1E24
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
@@ -97,5 +96,5 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1E24);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartTracking);
 #endif

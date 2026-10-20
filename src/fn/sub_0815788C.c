@@ -11,7 +11,7 @@ void Player_EmitPeriodicParticles(struct Player *);
 s32 Player_CanUseSceneFeature(struct Player *);
 void Player_UpdateTimedScriptEvent(struct Player *);
 void Player_UpdateDirectionHistory(struct Player *);
-void sub_08156FE0(struct Player *);
+void Player_SelectActionSequence(struct Player *);
 void Player_UpdateCameraInput(struct Player *, s32);
 void Player_RunPendingCallback(struct Player *);
 void Player_ApplyDirectionalForce(struct Player *);
@@ -105,7 +105,7 @@ void Player_UpdateActionModeMovement(struct Player *p)
                 }
             }
             Player_UpdateDirectionHistory(p);
-            sub_08156FE0(p);
+            Player_SelectActionSequence(p);
             Player_UpdateCameraInput(p, p->tetherMode);
             if (p->unk45C == 1)
                 Player_RunPendingCallback(p);

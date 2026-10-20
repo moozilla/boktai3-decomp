@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: retained provisional behavior name from caller and state-transition evidence.
-#define Dog_ResumeRoute sub_080E4834
 #include "scene_actor_chase.h"
 // confidence=low: resumes group chase or the saved route after arrival.
 static inline u32 Dog_SetMotionBits(struct SceneActorRegistryResetView *actor, u32 mask)

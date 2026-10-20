@@ -33,7 +33,6 @@ static inline void setPartFlags(struct ArmorPart *p, u32 mask)
     p->flags |= mask;
 }
 // confidence=low: accumulated contacts drive a temporary attack and defense increase.
-#define Armor_UpdateContactBoost sub_0818AFEC
 void Armor_UpdateContactBoost(struct ArmorActor *p, s32 amount, u32 flags)
 {
     p->contactAccumulated += amount;

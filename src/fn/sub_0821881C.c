@@ -65,7 +65,6 @@ static inline void screen(struct Vec *dst, struct Drawable *src)
     out->z = z - gUnk_03005418[2];
 }
 // confidence=low: flag 0x2000 selects this sprite staging pass.
-#define SpriteOam_QueueOverlayProjectedSprites sub_0821881C
 void SpriteOam_QueueOverlayProjectedSprites(void)
 {
     struct Vec pos;
@@ -187,5 +186,5 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821881C);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueOverlayProjectedSprites);
 #endif

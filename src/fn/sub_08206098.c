@@ -3,8 +3,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#define Ooze_InitializeFromScript sub_08206098
-
 #ifdef NONMATCHING
 // fuzzy: 87.8%
 // Remaining differences: script-option branches, animation-step register allocation, and body setup lifetimes.
@@ -260,5 +258,5 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08206098);
+INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
 #endif

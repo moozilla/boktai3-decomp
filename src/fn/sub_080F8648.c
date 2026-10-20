@@ -4,7 +4,6 @@
 // fuzzy: 99.2%
 // Six instructions differ: player-address scheduling and stack-vector address reuse.
 // confidence=low: sends the axe trail toward the player, then returns it to the actor.
-#define Axe_UpdateReturningTrail sub_080F8648
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -152,5 +151,5 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F8648);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateReturningTrail);
 #endif

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define PlayerContact_ApplyResponse sub_0815E1F0
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"

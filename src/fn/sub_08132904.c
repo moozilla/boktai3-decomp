@@ -1,4 +1,3 @@
-#define SceneActorReaction_ApplyLinkedAreaDamage sub_08132904
 #ifdef NONMATCHING
 // fuzzy: 87.1%
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
@@ -258,5 +257,5 @@ fail:
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08132904);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyLinkedAreaDamage);
 #endif

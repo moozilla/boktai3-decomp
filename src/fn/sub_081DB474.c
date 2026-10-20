@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Options_UpdateScreen sub_081DB474
 struct Rect {
     u32 xy;
     u16 width, height;

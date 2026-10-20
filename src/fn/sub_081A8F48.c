@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
-#define Vanargand_UpdatePlayerDrain sub_081A8F48
 
 #ifdef NONMATCHING
 // fuzzy: 88.7%
@@ -153,5 +152,5 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A8F48);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePlayerDrain);
 #endif

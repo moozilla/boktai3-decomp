@@ -1,4 +1,3 @@
-#define Player_UpdateCameraOffset sub_0814159C
 #include "global.h"
 #include "player.h"
 

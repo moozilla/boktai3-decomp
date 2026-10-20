@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: consumes pending damage and selects terrain/death reactions.
-#define PlayerContact_ApplyTerrainDamage sub_0815E8A4
 #include "engine.h"
 #include "player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);

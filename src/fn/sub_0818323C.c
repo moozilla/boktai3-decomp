@@ -20,7 +20,6 @@ struct AttackCollider {
     u32 flags;
 };
 
-#define ActorController_UpdateMovingAttackCollider sub_0818323C
 struct Vec {
     s16 x, y, z, pad;
 };

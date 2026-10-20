@@ -3,8 +3,7 @@
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
 // fuzzy: 88.9%
-#define Skeleton_ConvergeDisplacedPosition                                                         \
-    sub_080BBDD0 // confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
+// confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
 // Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
  * return to the route point or chase the player target (tentative). */
@@ -419,5 +418,5 @@ void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *acto
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080BBDD0);
+INCLUDE_ASM("asm/nonmatching", Skeleton_ConvergeDisplacedPosition);
 #endif

@@ -111,7 +111,6 @@ static inline u32 Step(struct WoodenCrate *crate)
     return done;
 }
 // confidence=low: finishes the opening/closing animation and invokes its script with crate name and flags.
-#define WoodenCrate_UpdateToggleAnimation sub_080FFC24
 void WoodenCrate_UpdateToggleAnimation(struct WoodenCrateManager *manager,
                                        struct WoodenCrate *crate)
 {

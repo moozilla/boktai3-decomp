@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: controls the actor palette fade and repeating pulse sequence
-#define BossSlot2_UpdateSequencePalette sub_0817B0B4
 struct PaletteActor {
     u8 pad0[0x504];
     u8 timer, pad505, mode, shift;

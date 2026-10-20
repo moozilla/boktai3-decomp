@@ -2,7 +2,7 @@
 #define gPlayerSlots              gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
-void sub_0809B6AC(void);
+void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
 extern u8 *gUnk_02000580[4];
 struct RouteActorDestinationState {
@@ -26,7 +26,7 @@ void RouteActor_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView 
 {
     if (TakeFlag(&actor->field2B1)) {
         struct RouteActorDestinationState *state = actor->context;
-        void *callback = sub_0809B6AC;
+        void *callback = Lun_UpdateWaitingAnimation;
         u32 kind = 10;
         actor->field2B2 = 1;
         actor->field2B0 = 0;

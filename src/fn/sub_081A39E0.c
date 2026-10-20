@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define EffectPool_UpdateEntry sub_081A39E0
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING

@@ -115,7 +115,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 
-
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -124,19 +123,30 @@ void RisingSprite_Spawn(void *);
 void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32, s32, s32);
 void Camera_RequestShake(u32);
 extern const s16 gUnk_086149C4[];
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
+#define B(o)  (*(u8 *)((u8 *)p + (o)))
+#define H(o)  (*(u16 *)((u8 *)p + (o)))
 #define SH(o) (*(s16 *)((u8 *)p + (o)))
-static inline void Approach(struct Player *p) {
+static inline void Approach(struct Player *p)
+{
     s16 *target = *(s16 **)((u8 *)p + 0x47C);
     s32 x = target[0] - SH(0x30);
     s32 z = target[2] - SH(0x34);
-    if (x >= 0) SH(0x38) = x >> 3; else SH(0x38) = -(-x >> 3);
-    if (z >= 0) SH(0x3C) = z >> 3; else SH(0x3C) = -(-z >> 3);
+    if (x >= 0)
+        SH(0x38) = x >> 3;
+    else
+        SH(0x38) = -(-x >> 3);
+    if (z >= 0)
+        SH(0x3C) = z >> 3;
+    else
+        SH(0x3C) = -(-z >> 3);
 }
-static inline s32 Scale(s32 x) { if (x >= 0) return x >> 12; return -(-x >> 12); }
+static inline s32 Scale(s32 x)
+{
+    if (x >= 0)
+        return x >> 12;
+    return -(-x >> 12);
+}
 // confidence=low: moves toward a saved effect position or recoils while shake decays.
-#define Player_UpdateRecoilMotion sub_08149A14
 void Player_UpdateRecoilMotion(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -152,7 +162,8 @@ void Player_UpdateRecoilMotion(struct Player *p)
             H(0x4C2) = 0;
         }
     }
-    Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading, p->side);
+    Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
+                     p->side);
     Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
     if (H(0x270)) {
         if (B(0x479)) {
@@ -198,5 +209,5 @@ void Player_UpdateRecoilMotion(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08149A14);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateRecoilMotion);
 #endif

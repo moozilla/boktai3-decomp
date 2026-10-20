@@ -102,7 +102,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 void Ratatosk_InitAnimatedParticleParams(void *);
 void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
 void sub_081FC26C(void *, struct Vec *);
-#define Ratatosk_UpdateProjectileVolley sub_081F4378
 // confidence=low: staged attack animation culminates in a three-projectile volley.
 struct Vec *Player_GetEffectivePosition(s32);
 void Projectile_InitParameters(void *);
@@ -111,7 +110,7 @@ void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetScriptProcedure(void *, u32, u16);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
-void sub_081FD01C(void *, struct Vec *);
+void Projectile_SpawnAtPosition(void *, struct Vec *);
 s32 SceneProjectile_ConsumeHitEvent(void);
 void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
@@ -180,7 +179,7 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                         Projectile_SetScriptProcedure(params, 0x4363, 0);
                         Projectile_SetCollisionParameters(params, 0, 0, 30, 15, 30);
                         Projectile_SetBehaviorMode(params, 1);
-                        sub_081FD01C(params, spawnPtr);
+                        Projectile_SpawnAtPosition(params, spawnPtr);
                         angle += 16;
                     } while (--i >= 0);
                 }
@@ -202,5 +201,5 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F4378);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateProjectileVolley);
 #endif

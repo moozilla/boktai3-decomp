@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: action role inferred from local animation, motion and effects.
-#define Vanargand_EmitRadialPartEffects sub_081B4040
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
@@ -229,5 +228,5 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B4040);
+INCLUDE_ASM("asm/nonmatching", Vanargand_EmitRadialPartEffects);
 #endif

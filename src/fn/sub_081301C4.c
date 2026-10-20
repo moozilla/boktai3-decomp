@@ -4,7 +4,6 @@
 #include "scene_actor_attachment.h"
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
-#define SceneActorReaction_UpdateRouteRecovery sub_081301C4
 
 #ifdef NONMATCHING
 // fuzzy: 88.6%
@@ -100,5 +99,5 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081301C4);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteRecovery);
 #endif

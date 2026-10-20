@@ -174,7 +174,6 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
     out->z = pos->z >> 12;
 }
 // confidence=low: type zero and threshold sprites travel at fixed velocity.
-#define NativeEffect_UpdateLinearFlight sub_08113738
 void NativeEffect_UpdateLinearFlight(struct Effect *p)
 {
     struct Packed projected;

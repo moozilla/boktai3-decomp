@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
-#define ScriptCombatActor_ApplyHitReaction sub_082015D4
 
 #ifdef NONMATCHING
 // fuzzy: 82.4%
@@ -91,5 +90,5 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082015D4);
+INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_ApplyHitReaction);
 #endif

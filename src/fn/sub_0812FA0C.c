@@ -3,7 +3,6 @@
 #include "scene_actor_reaction.h"
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
-#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -343,5 +342,5 @@ void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *ac
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812FA0C);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteReturn);
 #endif

@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: carries a player position request along a motion track
-#define ActorStatus_UpdatePlayerCapture sub_081B0F34
 #ifdef NONMATCHING
 // fuzzy: 81.9%
 // Remaining differences: Player-request branch merging, pointer lifetimes, and some vector/constant ordering differ.
@@ -222,5 +221,5 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B0F34);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
 #endif

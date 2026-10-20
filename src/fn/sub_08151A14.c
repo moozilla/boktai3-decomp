@@ -11,7 +11,6 @@ void Player_UpdateFacingSide(void *);
 extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
-#define PlayerCue_UpdateTurningPalette sub_08151A14
 #ifdef NONMATCHING
 // fuzzy: 82.2%
 extern u8 *gUnk_02000710;
@@ -119,5 +118,5 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08151A14);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTurningPalette);
 #endif

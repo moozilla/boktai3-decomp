@@ -4,7 +4,7 @@
 void Player_EnterKindTwo(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
-void sub_08151078(struct Player *);
+void PlayerCue_UpdateRecoilRecovery(struct Player *);
 void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
 {
     if (direction >= 0)
@@ -26,5 +26,5 @@ void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
     else
         p->animation.flags &= ~4;
     ActorSequence_Begin(p, 0x1d, 2);
-    p->triggerAnimationCallback = sub_08151078;
+    p->triggerAnimationCallback = PlayerCue_UpdateRecoilRecovery;
 }

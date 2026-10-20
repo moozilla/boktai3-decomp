@@ -1,7 +1,4 @@
 #include "global.h"
-#define VulcanCannon_UpdateTargeting     sub_08206C00
-#define VulcanCannon_UpdateDefeatEffects sub_082071D0
-#define VulcanCannon_UpdateDamageState   sub_082074F0
 #ifdef NONMATCHING
 // fuzzy: 81.9%
 // Remaining differences: branch sharing, address lifetimes and register allocation.
@@ -163,5 +160,5 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082074F0);
+INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateDamageState);
 #endif

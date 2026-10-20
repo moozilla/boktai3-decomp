@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SpriteOam_FinalizeQueue sub_082154E4
 #ifdef NONMATCHING
 // fuzzy: 82.6%
 // Remaining differences: priority-loop allocation and invariant address hoisting.
@@ -111,5 +110,5 @@ void SpriteOam_FinalizeQueue(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082154E4);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_FinalizeQueue);
 #endif

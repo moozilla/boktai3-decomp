@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
-#define PlayerCue_UpdateSideArrival         sub_081540D4
-#define Player_RestartAnimationFromResource sub_081538DC
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // Remaining playback completion branch sharing and mask copies differ.
@@ -304,5 +302,5 @@ void PlayerCue_UpdateSideArrival(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081540D4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideArrival);
 #endif

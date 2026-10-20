@@ -43,7 +43,6 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     dst->z = z - gUnk_03005418[2];
 }
 // confidence=low: resource flag selects this list; name describes observed bounds handling.
-#define Sprite_RenderFlipAwareList sub_08214E3C
 void Sprite_RenderFlipAwareList(void)
 {
     struct Vec pos;
@@ -103,5 +102,5 @@ void Sprite_RenderFlipAwareList(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08214E3C);
+INCLUDE_ASM("asm/nonmatching", Sprite_RenderFlipAwareList);
 #endif

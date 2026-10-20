@@ -80,7 +80,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     a->word104 = 0;
 }
 // confidence=low: turns Lun in 32-angle increments until its saved direction is reached.
-#define Lun_TurnTowardSavedDirection sub_0809B3F8
 void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *a)
 {
     u8 *identity = (u8 *)a + 0x50;
@@ -132,5 +131,5 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809B3F8);
+INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
 #endif

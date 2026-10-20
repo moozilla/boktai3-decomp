@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: coordinates a part strike with its opposite part.
-#define Vanargand_UpdatePartPairedStrike sub_081B1F74
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
@@ -204,5 +203,5 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1F74);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartPairedStrike);
 #endif

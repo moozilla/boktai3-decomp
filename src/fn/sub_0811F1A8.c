@@ -42,7 +42,8 @@ struct ActorEmitter {
 };
 u8 Modifier_IsFirstSourceReady(struct ActorEmitter *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
-s32 sub_08114928(struct EmitterVector *, s32, struct EmitterVector *, void *, s32, s32, s32, s32);
+s32 NativeEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
+                                   s32, s32, s32);
 void CallbackList_SubtractClampedValue(void *, struct ActorEmitter *, s32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 ActorEmitter_TryEmitAnimatedPair(struct ActorEmitter *emitter)
@@ -62,13 +63,14 @@ s32 ActorEmitter_TryEmitAnimatedPair(struct ActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x8000;
-    if (sub_08114928(&owner->position, height, &velocity, owner->profile, owner->kind + 1, 1, 2,
-                     0) >= 0)
+    if (NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+                                       owner->kind + 1, 1, 2, 0) >= 0)
         goto success;
 fail:
     return 0;
 success:
-    sub_08114928(&owner->position, height, &velocity, owner->profile, owner->kind + 1, 0, 1, 1);
+    NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+                                   owner->kind + 1, 0, 1, 1);
     Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 2, 0);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;

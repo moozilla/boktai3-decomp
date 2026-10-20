@@ -1,6 +1,4 @@
 #include "global.h"
-#define VulcanCannon_UpdateTargeting  sub_08206C00
-#define VulcanCannon_UpdateFacingTurn sub_08207350
 // MATCHING_CONCESSION: register-pinning
 #define VC_FIRST    "r2"
 #define VC_TEMP     "r2"

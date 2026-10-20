@@ -89,7 +89,6 @@ struct SavedMotion {
 
 void Bee_UpdateRecoveryAnimation(void);
 // confidence=low: approaches a saved player position during the recovery animation.
-#define Bee_ApproachSavedPlayerPosition sub_08093EE4
 void Bee_ApproachSavedPlayerPosition(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;

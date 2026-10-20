@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: rises, waits for a countdown, then returns vertically
-#define ActorStatus_UpdateRisingStrike sub_081B18C8
 #ifdef NONMATCHING
 // fuzzy: 80.3%
 // Remaining differences: State-address reuse, entry-pointer lifetimes, and vector/constant ordering differ.
@@ -249,5 +248,5 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B18C8);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateRisingStrike);
 #endif

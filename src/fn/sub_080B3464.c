@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: inherited route/reaction interpretation from static callers.
-#define Vorn_ResumeRouteAfterReaction sub_080B3464
 
 #ifdef NONMATCHING
 // fuzzy: 87.8%
@@ -237,5 +236,5 @@ void Vorn_ResumeRouteAfterReaction(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B3464);
+INCLUDE_ASM("asm/nonmatching", Vorn_ResumeRouteAfterReaction);
 #endif

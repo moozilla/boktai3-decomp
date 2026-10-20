@@ -2,9 +2,6 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: action role inferred from movement and effect calls.
-#define SceneActors_UpdatePeriodicEffectAction sub_081EE130
-#define ActorDisplay_UpdateForegroundSprite    sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite        sub_081EC974
 #ifdef NONMATCHING
 // fuzzy: 89.2%
 // Remaining differences: initialization allocation, random-mask order, and timing-expression loads.

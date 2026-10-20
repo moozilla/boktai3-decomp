@@ -177,7 +177,6 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
     out->z = pos->z >> 12;
 }
 // confidence=low: type one follows a widening rotating trajectory.
-#define NativeEffect_UpdateRotatingFlight sub_08113BBC
 void NativeEffect_UpdateRotatingFlight(struct Effect *p)
 {
     struct Packed velocity, projected;
@@ -222,5 +221,5 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08113BBC);
+INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateRotatingFlight);
 #endif

@@ -118,7 +118,6 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
     actor->collisionMask = mask;
 }
 // confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
-#define Hresvelgr_UpdateBoundaryBarrage sub_081A0BC8
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
     struct Action *action = &actor->action;
@@ -202,5 +201,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A0BC8);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
 #endif

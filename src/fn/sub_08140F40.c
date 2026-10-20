@@ -1,4 +1,3 @@
-#define Player_GetForceDirection sub_08140F40
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
@@ -89,5 +88,5 @@ fail:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08140F40);
+INCLUDE_ASM("asm/nonmatching", Player_GetForceDirection);
 #endif

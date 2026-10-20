@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Options_InitScreen sub_081DB794
 #ifdef NONMATCHING
 // fuzzy: 82.4%
 struct Rect {
@@ -99,5 +98,5 @@ s32 Options_InitScreen(u8 *arg)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081DB794);
+INCLUDE_ASM("asm/nonmatching", Options_InitScreen);
 #endif

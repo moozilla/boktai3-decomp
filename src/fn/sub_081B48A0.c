@@ -3,7 +3,6 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: action role inferred from local animation, motion and effects.
-#define Vanargand_UpdatePartSidestep sub_081B48A0
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // Remaining differences: register lifetimes, instruction order and literal pools.
@@ -212,5 +211,5 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B48A0);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSidestep);
 #endif

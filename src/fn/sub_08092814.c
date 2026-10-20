@@ -73,7 +73,6 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 phase, u32 b
 void Bee_DisableMovement(void *);
 void Bee_BeginMoveToPosition(void *, void *);
 // confidence=low: initializes a small random movement and returns to the player when it stops.
-#define Bee_ReturnToPlayerWhenStopped sub_08092814
 void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
 {
     u32 zero;
@@ -100,5 +99,5 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08092814);
+INCLUDE_ASM("asm/nonmatching", Bee_ReturnToPlayerWhenStopped);
 #endif

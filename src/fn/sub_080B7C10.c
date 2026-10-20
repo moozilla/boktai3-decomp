@@ -2,8 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-#define Skeleton_SelectDistanceReaction                                                            \
-    sub_080B7C10 // confidence=low: neighboring Skeleton controls establish provisional role
+// confidence=low: neighboring Skeleton controls establish provisional role
 #ifdef NONMATCHING
 // fuzzy: 92.8%
 // Remaining differences: recovery stack slots, turn-state address lifetimes, and flag-update ordering.
@@ -290,7 +289,6 @@ struct SkeletonSelectionContext {
 };
 extern const u8 gUnk_0824E250[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-#define Skeleton_TrySelectRetreatCell sub_080B77D0
 u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *, u32);
 // confidence=low: selects retreat or route recovery by context distance thresholds
 void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
@@ -328,5 +326,5 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B7C10);
+INCLUDE_ASM("asm/nonmatching", Skeleton_SelectDistanceReaction);
 #endif

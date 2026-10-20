@@ -54,7 +54,6 @@ static inline u16 Flag(struct SceneActorAnimationView *actor, u16 mask)
     return *p = mask | *p;
 }
 // confidence=low: selects Lun's waiting animation and marks the wait complete after 60 ticks.
-#define Lun_UpdateWaitingAnimation sub_0809B6AC
 void Lun_UpdateWaitingAnimation(struct SceneActorAnimationView *actor, s32 frame)
 {
     struct SceneActorProfileEntry *entry =

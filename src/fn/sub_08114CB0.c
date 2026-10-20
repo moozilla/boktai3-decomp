@@ -131,7 +131,6 @@ struct Manager {
     struct ActorAttachmentPartSprite sprites[32];
     struct DisplaySequenceState sequences[32];
 };
-#define NativeParticle_UpdateAnimatedMotion sub_08114CB0
 void NativeParticle_UpdateAnimatedMotion(struct Manager *m, struct Particle *p)
 {
     struct ActorAttachmentPartSprite *sprite = &m->sprites[p->index];

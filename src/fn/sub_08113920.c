@@ -177,7 +177,6 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
     out->z = pos->z >> 12;
 }
 // confidence=low: horizontal motion accelerates and leaves a short particle trail.
-#define NativeEffect_UpdateAcceleratingTrail sub_08113920
 void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 {
     struct Packed projected;
@@ -214,5 +213,5 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08113920);
+INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateAcceleratingTrail);
 #endif

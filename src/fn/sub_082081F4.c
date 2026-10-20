@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
-#define CannonTurret_ApplyHitReaction sub_082081F4
 
 #ifdef NONMATCHING
 // fuzzy: 82.6%
@@ -91,5 +90,5 @@ void CannonTurret_ApplyHitReaction(struct HitSource *source, struct HitResult *h
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082081F4);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_ApplyHitReaction);
 #endif

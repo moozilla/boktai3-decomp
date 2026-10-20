@@ -45,7 +45,6 @@ static inline void Delta(struct ContactPosition *o, struct ContactPosition *a,
     o->z = a->z - b->z;
 }
 // confidence=low: Ghost action table movement callback follows a randomized loop around the player.
-#define Ghost_PursuePlayerLoop sub_08099130
 void Ghost_PursuePlayerLoop(struct SceneActorRegistryResetView *a)
 {
     u8 *ctx = a->context;
@@ -108,5 +107,5 @@ void Ghost_PursuePlayerLoop(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08099130);
+INCLUDE_ASM("asm/nonmatching", Ghost_PursuePlayerLoop);
 #endif
