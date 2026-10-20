@@ -122,33 +122,33 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         }
     }
     {
-    s32 start = self->startFrame;
-    s32 current = p->player->frame;
-    s32 bias = -256;
-    asm("" : "+r"(bias));
-    start += bias;
-    if (((current - start) & 255) <= 19) {
-        if (p->ready) {
-            s32 amount, health;
-            OffsetPosition(position, p->position);
-            if (!TestFlags(&p->player->flags, 0x40000)) {
-                amount = Player_BeginPositionRequest(p->player, position, 0, 0, 0, 0, 1,
-                                                    self->damage, 2);
-                health = self->health;
-                SceneActors_SetHealth(self, health + amount);
-                if (health != self->health)
-                    DamageNumberDisplay_ShowWithDefaultScale((u8 *)self + 0x6C4, amount, 1,
-                                                            self->position, 1);
-                sub_081A6398(self);
-                Sound_PlaySongChecked(0x225);
-                if (!TestFlags(&gUnk_02000560, 4) && p->action <= 4)
-                    return;
+        s32 start = self->startFrame;
+        s32 current = p->player->frame;
+        s32 bias = -256;
+        asm("" : "+r"(bias));
+        start += bias;
+        if (((current - start) & 255) <= 19) {
+            if (p->ready) {
+                s32 amount, health;
+                OffsetPosition(position, p->position);
+                if (!TestFlags(&p->player->flags, 0x40000)) {
+                    amount = Player_BeginPositionRequest(p->player, position, 0, 0, 0, 0, 1,
+                                                         self->damage, 2);
+                    health = self->health;
+                    SceneActors_SetHealth(self, health + amount);
+                    if (health != self->health)
+                        DamageNumberDisplay_ShowWithDefaultScale((u8 *)self + 0x6C4, amount, 1,
+                                                                 self->position, 1);
+                    sub_081A6398(self);
+                    Sound_PlaySongChecked(0x225);
+                    if (!TestFlags(&gUnk_02000560, 4) && p->action <= 4)
+                        return;
+                }
+                p->finished = 1;
             }
+        } else {
             p->finished = 1;
         }
-    } else {
-        p->finished = 1;
-    }
     }
 }
 
