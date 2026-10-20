@@ -2,8 +2,9 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 77.4%
+// fuzzy: 80.8%
 // Remaining differences: PRE stack slots, random-loop allocation, and duration setup order.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
@@ -43,8 +44,8 @@ static inline void BeginContactTurn(void *obj, u32 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!FullFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
-        s32 tries = 0;
+        register s32 prior asm("r5") = actor->direction;
+        register s32 tries asm("r1") = 0;
         s32 choice;
         const u16 *table = gUnk_0203B400;
         u32 *randomIndex = &gUnk_03005308;
