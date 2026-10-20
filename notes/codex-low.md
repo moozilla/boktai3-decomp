@@ -591,3 +591,18 @@ All source bodies except 080D812C were already retained on entry. This pass adds
 - 080D62CC: retained Mummy_FireAcceleratingVolley draft at 94.6%, 17 realigned differences / 10 ignoring registers. Separate r1 height-difference binding, r4 speed binding and pinned quotient temporary each regressed; reverted. Remaining quotient absolute-value copy, loop setup and projectile argument ordering affect pool placement. Added local address alias and explicit address fallback.
 
 Formatted the four guarded drafts directly with the pinned clang-format, recorded each score with check.py --nonmatching --record, and queued separate commits through build/commit.sh. No make, full build or network operations. Combined ROM validation remains with the integrator.
+
+## Task 080E21AC (2026-10-20, follow-up)
+
+Tags: #matching #dog #scene-actor
+
+All six bodies were already present on entry. This pass adds no new exact coverage (0 percentage-point gain).
+
+- 080E25FC: retained Dog_ChooseReactionBehavior draft at 83.0%, 426 realigned differences / 162 ignoring registers. Direct motion-field test regressed to 82.4% (445/182); swapping context/group declaration order regressed to 82.3% (445/170). A turn-selection wrapper compiled identically. Restored original candidate, added required local address alias and explicit address fallback. Branch layout, motion-flag pointer lifetime and PRE stack slots remain unresolved.
+- 080E4B34: retained Dog_BeginDelayedRouteRecovery draft at 82.1%, 195 realigned differences / 46 ignoring registers. Pinning outer group pointer to r8 regressed to 70.0% (329/136); rejected. Splitting group initialization and adding a turn-selection wrapper produced identical output. Added required local address alias and explicit address fallback. Shared recovery inline allocation and flag update ordering remain.
+- 080E4468: existing Dog_ChasePlayer C verified exactly (972 bytes); added local address alias. Nearby Dog callbacks and chase-control transitions support existing provisional name. No new recovered code.
+- 080E4834: improved Dog_ResumeRoute draft from 82.3% to 84.7% by declaring context before group; 64 realigned differences / 24 ignoring registers, versus 76/23. Candidate now 776 bytes against 768-byte target. Reversing OR operands had no effect; deriving context at use regressed to 78.8%, and pinning group to r8 regressed to 81.4%. Remaining control-reset address materialization, literals and allocation need further reconstruction. Added local alias and explicit address fallback.
+- 080E21AC: existing SceneActorControl_BeginHiddenDefeat C verified exactly (636 bytes); added local entry alias and local CompleteBlinkOut callee alias, required because the descriptive callee symbol is absent from the local ELF. No new recovered code.
+- 080E2428: existing SceneActorControl_CompleteBlinkOut C verified exactly (468 bytes); added local address alias. No new recovered code.
+
+Formatted directly with build/venv/bin/clang-format. Recorded all guarded scores with check.py --nonmatching --record and verified all three default assembly fallbacks exactly. Separate per-function commits queued through build/commit.sh. No make, full build or network operations; combined validation remains with integration.
