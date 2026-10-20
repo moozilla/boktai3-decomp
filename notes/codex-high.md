@@ -487,3 +487,100 @@ or direct Git mutation was performed. The unrelated pre-existing change to
 `tools/cloud_task.py` was left untouched. Full combined-ROM validation remains
 with the batch integrator. Diagnostic artifacts are ignored under build/ and
 wip/; the Ghidra export was unavailable.
+
+
+# Task 080B6618 — Skeleton attack and route selection (2026-10-20)
+
+Tags: #matching #skeleton #scene-actor #terrain #register-pinning
+
+Branch `cloud/080B6618`, assigned six-function cohort. Worked solo and offline.
+The four matches cover **38.21% of the task (+38.21 percentage points; 2,696 of
+7,056 reviewed bytes)**. Register-pinned: **10.09% of the task** (712 bytes);
+without register pinning: **28.12%** (1,984 bytes). Repository code-coverage gain
+is approximately **0.112 percentage points**. The two guarded drafts add no exact
+coverage. Each function was committed separately through `build/commit.sh`.
+
+- **080B7C10 drafted 92.8%**, tentative `Skeleton_SelectDistanceReaction`, reviewed
+  extent 3,656 bytes; candidate also 3,656 bytes. Resets response state at actor
+  +0x460 using gUnk_0824E250/0x4F5, increments context attempts703, and compares
+  distanceF0 against context +0x708/+0x70C. The near path temporarily reverses
+  the heading and invokes 080B77D0 with the prior heading as its second argument.
+  The remaining paths expand route-point recovery, player/target cell selection,
+  terrain slope height, retry-turn setup and chase routing. Started from the
+  retained 080B9158 recovery candidate, itself related to the 080BBDD0 draft.
+  Initial 87.7%, 243 total / 73 structural differences, became **146 / 22**.
+  Useful changes: inline mask arguments, narrow motion-mask accessor, loading
+  player index before the -1 sentinel, mask-first route-flag clearing, retaining
+  an RNG table local, and pinning the previous random heading to r5. The TU is
+  marked with the register-pinning concession. Remaining differences are recovery
+  stack slots, turn-state address lifetimes and group-flag instruction order.
+  The duplicate distance paths mirror the ROM's two inline expansions. RTL loop
+  dumps and batched variants were used; no handwritten instructions.
+- **080B6884 matched**, tentative `Skeleton_TryBeginArmedAttack`, all 804 bytes,
+  without register hints. Its caller 080B6BA8 selects this gate for category seven.
+  Near targets use health718 or context flag 0x80, angle <=24, ranges6E0/6E4,
+  signed timers6F0/6F2 and attempts703 to choose phase-two behavior zero or three.
+  Far targets require angle <=20. The near ranged selection also clears context
+  flag 0x80. First C was 98.2%; passing context and mask into the byte-bool test,
+  and a pointer/mask into the clear-flags inline, recovered mask/load order and
+  the original derived 0x6DC offset. A follow-up source-only correction moved the
+  confidence comment above the one-line alias: split.py's inventory regex requires
+  a bare `#define Name sub_XXXXXXXX`, without a trailing comment/continuation.
+- **080B6E04 matched**, tentative `Skeleton_RestorePursuitRoute`, all 712 bytes,
+  register-pinned. Installed as a callback by the nearby creation code. Unless
+  flags2D4 bit 0x100 or context active6D0 blocks it, selects chase control for bit
+  0x80, extends group timer418 by 300 with a field416 ceiling, or installs delayed
+  restoration control (kind 14, 60 frames, command kind seven). Copies the route
+  point to the group destination, computes slope-adjusted terrain height, clears
+  its pad and routes toward fieldDC's position; invokes the failure callback if
+  routing fails. Started at 59.4%, 151 / 39 differences. Evaluating command
+  arguments before stores, reading target before route, and using a route-link
+  local reached 83.6%. A single r8 route-mask/offset local with an empty constraint
+  reproduces the shared 0x200 address and BIC lifetimes. Finally, a **u16 local**
+  inside the u16-returning mask accessor eliminated a reload and all remaining
+  differences. Marker retained; no instruction text appears in the empty asm.
+- **080B7350 matched**, tentative `Skeleton_InitializeCategoryProfile`, all 560
+  bytes, without register hints. Its Skeleton defeat consumers call it when
+  switching category to seven. Looks up profile entry zero, then initializes
+  the category-five/six/seven action/animation entry values and flags in a sparse
+  order. The existing matched 080B7580 SetEntry idiom supplied the byte-pair form.
+  The correct flagged slot is entry 11 (offset 0x2C), not entry nine. Passing low
+  value, flags and destination as **three separate inline arguments** recovered
+  constant evaluation order and walking-pointer reuse. Combining the two bytes
+  into one argument was 94.0%, hoisting the high byte reached 98.2%, separate
+  arguments matched exactly. Other entry state bytes remain untouched.
+- **080B6618 matched**, tentative `Skeleton_TryBeginGuardedAttack`, all 620 bytes,
+  without register hints. Its caller 080B6BA8 selects it for category six. Fails
+  over to 080B7C10 when range readiness is false unless context flag 0x200 blocks
+  selection. Guard range6E8/timer6F4, angle <=12 and health <=health718 choose
+  phase-two behavior two; nearby/ranged ranges and timers choose behavior zero
+  or one, with angle limits 24/12 respectively. Every accepted attack resets
+  attempts703. Reused the independently verified 080B6884 context and helpers;
+  the first candidate matched exactly, including shared close-attack tails.
+- **080B77D0 drafted 87.8%**, tentative `Skeleton_TrySelectRetreatCell`, reviewed
+  extent 704 bytes; candidate 696 bytes, **52 total / 30 structural** differences.
+  Probes one neighboring cell in the facing quadrant via 0812E118; rotates the
+  temporary heading by 64 up to four attempts when blocked, restores the supplied
+  prior heading, builds the selected cell center, and tries route setup/update.
+  Failure clears motion flag 0x200 and invokes the group failure callback.
+  Initial candidate was 70.6%. A center-building inline avoids agbcc's word-sized
+  read/modify/write of direct stack halfword assignments. Putting the step count
+  in an inline formal retains `cmp #1; blt` rather than canonicalizing to zero.
+  Restoring a real outer do/while loop hoists cell/position addresses and raised
+  the candidate to the retained threshold. Group-local placement also mattered.
+  Remaining differences: north/south scan tails, cached group/route addresses,
+  terrain-load allocation and padding. Register experiments did not help and
+  were not retained. The commit subject says provisional 87.1%; the recorded
+  full-extent score in the source is **87.8%**.
+
+Validation: formatted all six TUs with build/venv/bin/clang-format and checked
+its dry-run/Werror mode. The four C matches passed check.py with explicit reviewed
+sizes 620/804/712/560; the two guarded assembly alternatives passed over all
+704/3,656 bytes. Draft scores were recorded with --nonmatching --record. All
+names use file-local aliases and tentative interpretation comments. Follow-up
+formatting/declaration cleanup of 080B7C10 retains its 92.8% score. No make,
+full build, generated assembly edit, network access, push/PR, shared-doc edit,
+or direct git add/commit/checkout/stash occurred. The unrelated pre-existing
+change to tools/cloud_task.py remains untouched. Combined-ROM validation and
+name promotion belong to the batch integrator. Scratch candidates and diagnostic
+artifacts remain ignored under wip/ and build/. The local Ghidra export is absent.
