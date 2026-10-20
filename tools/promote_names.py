@@ -9,7 +9,8 @@ this tool moves every alias into symbols/functions.csv (confidence=low,
 source=src-alias), rewrites each `sub_XXXXXXXX` reference in src/ and include/
 and symbols/ram.ld to the name, and deletes the alias lines. `make` then regenerates gen/ with the
 new labels. Aliases of hidden boundaries without a sub_ label are left
-as they are. Refuses to run if an address has two names or a name two addresses.
+as they are. Refuses to run if an address has two names or a name two addresses,
+or if an alias disagrees with the name functions.csv already has for its address.
 """
 import argparse
 import csv
@@ -19,7 +20,8 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ALIAS = re.compile(r"^#define[ \t]+(\w+)[ \t]+(sub_[0-9A-F]{8})[ \t]*\n", re.M)
+# a trailing `// comment` (or clang-format's wrapped form of a long line) is kept on its own line
+ALIAS = re.compile(r"^#define[ \t]+(\w+)(?:[ \t]+|[ \t]*\\\n[ \t]*)(sub_[0-9A-F]{8})[ \t]*(//[^\n]*)?\n", re.M)
 CSV = os.path.join(ROOT, "symbols", "functions.csv")
 
 
@@ -50,8 +52,13 @@ def main():
     labels = func_labels()
     alias = {}  # sub_X -> Name
     for path in sources():
-        for name, label in ALIAS.findall(open(path).read()):
+        for name, label, _ in ALIAS.findall(open(path).read()):
             if label not in labels:
+                # already named (gen/ labels it by name) or a hidden boundary: never rewrite
+                # the alias to `#define Alias ExistingName`, report the disagreement instead
+                if by_addr.get(label[4:], name) != name:
+                    sys.exit(f"{label} is already {by_addr[label[4:]]} in functions.csv, alias says {name}"
+                             f" ({os.path.relpath(path, ROOT)}): rename one of them")
                 continue
             if alias.setdefault(label, name) != name:
                 sys.exit(f"{label} has two names: {alias[label]}, {name}")
@@ -81,7 +88,8 @@ def main():
     changed = 0
     for path in sources():
         text = open(path).read()
-        out = ALIAS.sub(lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), text)
+        out = ALIAS.sub(lambda m: ((m.group(3) or "").strip() + "\n").lstrip("\n")
+                        if renames.get(m.group(2)) == m.group(1) else m.group(0), text)
         out = ref.sub(lambda m: renames.get(m.group(0), m.group(0)), out)
         if out != text:
             open(path, "w").write(out)
