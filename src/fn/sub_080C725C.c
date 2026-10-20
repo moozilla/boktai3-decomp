@@ -1,10 +1,11 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Golem_UpdateSlideImpact sub_080C725C
+// confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
-// fuzzy: 67.2%
-// Slide-and-shed state: pushes along the context heading, bursts dust every 4 frames and, when
-// the actor's +0x40 bit 0 is set, sprays particles and then either finishes or hands control to
-// group+0x208 (kind 7). About 30 differing instructions ignoring registers: the ROM reloads the
-// random table for the extent draws (mine reuses the velocity draw's), and allocation.
+// fuzzy: 89.1%
+// Push along the stored heading, emit dust, and resolve an impact into completion or defeat.
+// Remaining mismatch: motion-pointer copies, RNG allocation and completion/control-reset offsets.
 #include "scene_object.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -15,7 +16,7 @@ u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
-struct Unk080C725CBody {
+struct GolemSlideBody {
     u8 unknown0[9];
     u8 direction;
     u8 unknownA[2];
@@ -31,9 +32,9 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return FALSE;
 }
-static inline u16 NextRandom(void)
+static inline u32 NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308];
 }
@@ -44,11 +45,11 @@ static inline s32 Quarter(s16 n)
     return -((-n) >> 2);
 }
 
-void sub_080C725C(struct SceneActorRegistryResetView *actor, u32 frame)
+void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 frame)
 {
     u8 *context = actor->context;
     u8 *group = (u8 *)&actor->group;
-    struct Unk080C725CBody *body = (struct Unk080C725CBody *)((u8 *)actor + 0x50);
+    struct GolemSlideBody *body = (struct GolemSlideBody *)((u8 *)actor + 0x50);
 
     if (TakeFlag(&actor->field2B2))
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
@@ -87,18 +88,16 @@ void sub_080C725C(struct SceneActorRegistryResetView *actor, u32 frame)
         *(u16 *)(context + 0x6AC) = 0x1E;
         *(u16 *)(context + 0x6AE) = 0x14;
         velocity.x = Quarter(body->motionZ);
-        velocity.y = NextRandom() & 7;
+        {
+            register u32 unused asm("r4") = 0x0403B714;
+            asm("" : : "r"(unused));
+            velocity.y = NextRandom() & 7;
+        }
         velocity.z = Quarter(body->motionX);
         {
-            const u16 *table = gUnk_0203B400;
-            u32 i = gUnk_03005308;
-            i = (i + 1) & 1023;
-            extent.x = (table[i] & 3) + 15;
-            i = (i + 1) & 1023;
-            extent.y = (table[i] & 7) + 15;
-            i = (i + 1) & 1023;
-            gUnk_03005308 = i;
-            extent.z = (table[i] & 3) + 15;
+            extent.x = (NextRandom() & 3) + 15;
+            extent.y = (NextRandom() & 7) + 15;
+            extent.z = (NextRandom() & 3) + 15;
         }
         count = (NextRandom() & 3) + 4;
         sub_08014634(count, ActorMode_SelectOddStateVariant(actor), (void *)&body->position,
@@ -109,9 +108,11 @@ void sub_080C725C(struct SceneActorRegistryResetView *actor, u32 frame)
         } else {
             {
                 u16 delay = 0xB4;
-                u32 mask = 1;
                 actor->fieldAA = delay;
-                actor->flags2D0 |= mask;
+                {
+                    u32 mask = 1;
+                    actor->flags2D0 |= mask;
+                }
             }
             actor->state2A8 = 3;
             actor->phase2A9 = 0;
