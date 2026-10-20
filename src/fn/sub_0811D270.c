@@ -1,14 +1,12 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.8%
-// foundry draft (worker best 81.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define SceneHud_DrawStyledDecimal PanelText_DrawDigits
 #define SceneHud_GetLayerMapCell   Video_GetWrappedBackgroundMapEntry
 s32 Div(s32, s32);
 u16 *Video_GetWrappedBackgroundMapEntry(s32, u8 *, u32);
 void PanelText_DrawDigits(register s32 value, s32 divisor, u8 *x, u32 y, s32 style)
 {
-    u16 *cell;
+    register u16 *cell asm("r6");
     s32 base = 0x21;
     if (!style)
         base = 0x11;
@@ -22,6 +20,3 @@ void PanelText_DrawDigits(register s32 value, s32 divisor, u8 *x, u32 y, s32 sty
         } while (divisor > 0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PanelText_DrawDigits);
-#endif
