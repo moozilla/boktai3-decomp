@@ -779,3 +779,72 @@ as structural changes. Inspect realigned counts first. Inline argument widths
 and whether a stack position is filled through a pointer materially change
 front-end narrowing, CSE and PRE. A guarded draft must always be scored with
 --nonmatching; testing its default assembly fallback proves nothing about its C.
+
+## Task 081DEC2C — 2026-10-20
+
+Tags: #matching #menu #animation #time #password
+
+Worked solo on the already-checked-out cloud/081DEC2C branch, largest target
+first. Used only per-file check.py acceptance checks; no full build or network.
+All new matches/drafts have file-local descriptive aliases. Existing unrelated
+changes in tools/cloud_task.py were left alone.
+
+- **081EAB64 — drafted 88.5%, Params3D0_UpdateDisplay.** The creator at
+  081EB7DC installs this as the display task callback. It selects seasonal
+  music using month/light phase, handles the title/menu reveal and palette
+  interpolation, animates option changes, and calls the configured script on
+  confirmation or timeout. Ownership/name is tentative, following neighbouring
+  Params3D0 names. State occupies +0x72C, selection +0x724, fade shift +0x738,
+  idle timer +0x73C, state timer +0x748, palette step +0x75C, and palette shift
+  +0x760. The distinct +0x734 counter increments only in two states; it is not
+  the common state timer. Guarded C recorded with --nonmatching --record;
+  final realigned differences: 157 total, 53 ignoring registers. Remaining
+  differences include palette argument ordering, cached field addresses and
+  selection-position arithmetic/narrowing. No exact credit. Condense exposed
+  the repeated keyframe/palette blocks; asmat supplied the full switch tables.
+- **081DFCB4 — matched, Password_UpdateEntryMenu (1,076 bytes).** Keyboard
+  navigation repeats every five held frames after a sixteen-frame history;
+  A appends/accepts, B erases/cancels, Start selects/accepts the end entry,
+  shoulders move the text position. It joins text rows, decodes the password,
+  pads the player name, fades and dispatches the configured result script.
+  Capturing the loaded character before testing/storing it, and loading the
+  player value before the destination pointer, reproduce original ordering.
+  A do/while name loop avoids the extra entry guard produced with pinned
+  induction registers. Register-pinned category; exact explicit-size check.
+- **081E013C — matched, Password_InitializeEntryMenu (696 bytes).** Improved
+  the existing 85.8% draft to exact. Initializes selection/repeat state,
+  backgrounds, relocated resource headers and six animation instances; copies
+  palettes into task-local storage and assigns their bank attributes. Retaining
+  the first header pointer through its palette-member access fixes a lost
+  pointer increment. Palette attribute 0xE002 must be a separate constant;
+  deriving it from a live 0xE000 value changes instruction selection. Scoped
+  register hints and one empty operand barrier preserve offset lifetimes.
+  Register-pinned category; exact explicit-size check.
+- **081DEE38 — matched, Time_InitializeDateMenu (564 bytes).** Initializes
+  date menu backgrounds and animation resources, copies a 32-byte relocated
+  header at +0x6B8, saves/copies a palette, builds date digits, and chooses the
+  fade based on the script parameter. Assignment of the one-valued setup
+  argument inside Bg_SetupLayers gives the original stack-store ordering.
+  Cache the palette source before storing its saved pointer to avoid an extra
+  reload through potentially aliasing raw pointers. Register-pinned category;
+  exact explicit-size check.
+- **081EC7D8 — matched, ActorDisplay_UpdateForegroundSprite (412 bytes).**
+  Tentative foreground role follows ActorDisplay_RefreshScreenLayer's call and
+  coordinate placement. Sets the drawable at +0x2C0 from screen/origin offsets,
+  conditionally hides it, then advances packed-command animation unless its
+  mode is one. The sequence begins at drawable +0x2C; +0x3C is an unknown word,
+  animation-ended is +0x40, and mode is +0x44. Reused the known packed-command
+  playback idiom from route_sprite_playback.h locally without changing shared
+  types or consumers. Explicit coordinate temporaries and scoped pointer
+  hints reproduce the address/load ordering. Register-pinned category; exact
+  explicit-size check.
+- **081DEC2C — matched, Time_UpdateDateMenu (456 bytes).** Saves prior date
+  fields, wraps the selected field, delegates edits, applies date/time on
+  Start, recalculates sunrise/sunset, then fades and dispatches the exit script.
+  Typed consecutive s32 fields reproduce all address-increment patterns.
+  Explicit empty case 2 is necessary for the original switch decision tree;
+  the two visible nonempty cases alone compile differently. No register
+  pinning. Exact explicit-size check.
+
+Each accepted function/draft was committed separately through build/commit.sh.
+Combined ROM validation is deferred to the integrator as instructed.
