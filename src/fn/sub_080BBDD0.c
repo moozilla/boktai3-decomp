@@ -2,6 +2,10 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
+// fuzzy: 87.1%
+#define Skeleton_ConvergeDisplacedPosition                                                         \
+    sub_080BBDD0 // confidence=low: installed by Skeleton_Create; converges saved displacement before route/chase recovery
+// Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
 // fuzzy: 79.9% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
  * return to the route point or chase the player target (tentative). */
@@ -119,37 +123,11 @@ static inline u8 TestFlag16(u16 *p, u32 mask)
 }
 static inline s32 PlayerSlot(u8 *target)
 {
+    u32 index = target[8];
     s32 slot = -1;
-    if (target[8] <= 3)
-        slot = target[8];
+    if (index <= 3)
+        slot = index;
     return slot;
-}
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
-                        struct ContactPosition *destination)
-{
-    void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
-    s32 result;
-    if (!sub_0821F204(route, position, destination)) {
-        {
-            s32 m = ~0x200;
-            actor->flags2D4 &= m;
-        }
-        return 0;
-    } else {
-        result = sub_0821F7A8(route, position, destination);
-        if (result) {
-            if (result != 2)
-                Memory_Clear(&actor->motion, 8);
-            return 1;
-        } else {
-            {
-                s32 m = ~0x200;
-                actor->flags2D4 &= m;
-            }
-            return 0;
-        }
-    }
 }
 static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
                          struct ContactPosition *position, struct ContactPosition *destination)
@@ -207,14 +185,17 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
 {
     u32 current = actor->direction;
     s32 i;
-    for (i = 0; i <= 3; i++) {
-        u32 direction;
+    u32 direction;
+    i = 0;
+    do {
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
         direction = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
         if (direction != current)
-            return direction;
-    }
-    return current;
+            goto chosen;
+    } while (++i <= 3);
+    direction = current;
+chosen:
+    return direction;
 }
 static inline void Resume(struct SceneActorRegistryResetView *raw, u8 direction)
 {
@@ -237,6 +218,11 @@ static inline void Resume(struct SceneActorRegistryResetView *raw, u8 direction)
         group->timer = 6;
     }
     sub_0807E334(raw);
+}
+static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    u16 value = actor->flags2D4 & mask;
+    return value;
 }
 static inline u8 ReturnHome(void *p)
 {
@@ -265,16 +251,17 @@ static inline u8 ReturnHome(void *p)
     }
     if (cell == actor->terrainCell || (gUnk_02000580[slot]->flags & (mask = 0x20000))) {
         mask = 0x400;
-        test = actor->flags2D4 & mask;
+        test = MotionFlags(actor, mask);
         if (test)
             return 0;
         {
-            u16 *f = &group->flags414;
-            s32 m = ~4;
-            *f &= m;
+            struct GroupBits {
+                s16 bits : 16;
+            };
+            ((struct GroupBits *)&group->flags414)->bits &= ~4;
         }
         mask = 0x80;
-        test = actor->flags2D4 & mask;
+        test = MotionFlags(actor, mask);
         if (test) {
             {
                 void *control = group->entryControl41C;
@@ -314,31 +301,12 @@ static inline u8 ReturnHome(void *p)
 }
 static inline s32 Quarter(s32 d)
 {
+    s32 result;
     if (d >= 0)
-        return d >> 2;
-    return -(-d >> 2);
-}
-static inline s32 Quarter2(s32 value, s16 *anchor)
-{
-    s32 d = value - *anchor;
-    if (d >= 0)
-        return d >> 2;
-    return -(-d >> 2);
-}
-static inline s32 Quarter3(s16 *value, s16 *anchor)
-{
-    s32 d = *value - *anchor;
-    if (d >= 0)
-        return d >> 2;
-    return -(-d >> 2);
-}
-static inline s32 Clamp(s32 d)
-{
-    if (d > 200)
-        return 200;
-    if (d < -200)
-        return -200;
-    return d;
+        result = d >> 2;
+    else
+        result = -(-d >> 2);
+    return result;
 }
 static inline u8 IsSettled(s32 dx, s32 dz)
 {
@@ -349,9 +317,10 @@ static inline u8 IsSettled(s32 dx, s32 dz)
 
 static inline void ClearSettleFlags(struct SceneActorRegistryResetView *actor)
 {
-    u16 *f = &actor->flags2D4;
-    s32 m = ~0x120;
-    *f &= m;
+    struct SettleBits {
+        s16 bits : 16;
+    };
+    ((struct SettleBits *)&actor->flags2D4)->bits &= ~0x120;
 }
 static inline u8 Drift(struct SceneActorRegistryResetView *actor)
 {
@@ -395,9 +364,10 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         *flags2CC &= m;
     }
     if (actor->field2DC & 0x80000) {
-        u32 mask = 2;
-        u16 *flags = &actor->flags2D6;
-        *flags = mask | *flags;
+        struct ShortFlags {
+            s16 bits : 16;
+        };
+        ((struct ShortFlags *)&actor->flags2D6)->bits |= 2;
         return;
     }
     mask = 0x80;
@@ -440,7 +410,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         actor->field2C2 = 0x20;
     }
 }
-void sub_080BBDD0(struct SceneActorRegistryResetView *actor)
+void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *actor)
 {
     struct ApproachGroup *group = (void *)&actor->group;
     if (Drift(actor)) {
