@@ -11,8 +11,6 @@ void Player_StopLocalSong(s32, u32);
 s32 Player_IsUnflaggedBelowResourceLimit(struct Player *);
 void Player_EmitConvergingParticle(struct Player *, void *);
 
-#define Player_UpdateConvergingChargeAction sub_0823D3A0
-
 void Player_UpdateConvergingChargeAction(struct Player *p)
 {
     if (p->tetherMode != 7) {
