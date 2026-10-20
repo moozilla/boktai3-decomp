@@ -1,8 +1,5 @@
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 98.7%
-// foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define Player_SetAnimationPhase      ActorSequence_Begin
 #define Player_SetAnimationFlags      Player_AddControlFlags
 #define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
@@ -45,16 +42,9 @@ void Player_UpdateTimedCueAnimation(struct Player *p)
         dispatch:
             PlayerCue_CompleteAction(p);
             break;
-        case 4: {
-            u16 frame = p->tetherFrame;
-            s32 mask = 7;
-            s32 low = mask;
-            low &= frame;
-            frame >>= 3;
-            mask -= frame;
-            if (low >= mask)
+        case 4:
+            if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 3))
                 Player_AddControlFlags(p, 5);
-        }
             if (++p->tetherFrame > 55)
                 ActorSequence_Begin(p, 21, 5);
             break;
@@ -63,6 +53,3 @@ void Player_UpdateTimedCueAnimation(struct Player *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTimedCueAnimation);
-#endif

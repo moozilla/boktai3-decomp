@@ -9078,10 +9078,13 @@ addr,name,mode,confidence,source,notes
 0823F56C,Player_UpdateChargedDashAttack,thumb,low,src-alias,
 0823F928,Player_UpdateChargedSpinAttack,thumb,low,src-alias,
 0823FE60,Player_RunConfiguredActionHandler,thumb,low,src-alias,Enters state three and invokes the configured callback stored at offset 0xC88
+0823FE94,Player_UpdateSolarBombCharge,thumb,low,src-alias,
 08240200,Player_UpdateTetherRecoil,thumb,low,src-alias,
 08240408,Player_UpdateKnockback,thumb,low,src-alias,
 08240708,Player_UpdateRecoil,thumb,low,src-alias,
 08240978,Player_UpdateFlinch,thumb,low,src-alias,
+08240DB0,Player_UpdateDefeatSequence,thumb,low,src-alias,
+08240ED4,Player_UpdateStumble,thumb,low,src-alias,
 08240F9C,Player_UpdateChargeSpin,thumb,low,src-alias,
 082411CC,Player_RestartAnimation,thumb,low,src-alias,
 08241310,Player_GetAdjustedMovementInterval,thumb,low,src-alias,Computes a movement interval from a base of twelve or eight and clamps the adjusted result to at least two
@@ -9098,8 +9101,12 @@ addr,name,mode,confidence,source,notes
 08243090,Player_ApplyContact,thumb,low,src-alias,
 082433C8,Player_ApplyGatedContact,thumb,low,src-alias,
 08243428,Player_ApplyTerrainDamage,thumb,low,src-alias,
+08243678,Player_TickDamageBlink,thumb,low,src-alias,
 082436D4,Script_GetOptionalIValue,thumb,low,src-alias,Reads keyword 0x69 corresponding to i and returns zero when absent
+082437A8,Player_InitActionCallback,thumb,low,src-alias,
+082438F4,Player_UpdateLinkCore,thumb,low,src-alias,
 082439EC,Player_OnDestroy,thumb,low,src-alias,Destruction callback removes contacts and rendering and collision components before clearing the player slot and count
+08243A50,Player_OnCreate,thumb,low,src-alias,
 08243B54,StatGauge_Draw,thumb,low,src-alias,
 08243C10,Solar_InitTimer,thumb,low,src-alias,Configures cartridge GPIO and timer 3 and installs the solar sensor interrupt handler
 08243CDC,Solar_ShutdownTimer,thumb,low,src-alias,Stops timer 3 and disables its interrupt and cartridge GPIO access
