@@ -502,3 +502,18 @@ Tags: #matching #hud #numeric-display
 - 08176F70 stopped unmatched after BIG_FUNCTIONS guidance, full/condensed listing and relatives review. Hud_InitAlternateLayout calls it after resource loading and panel refresh. Large widget layout initializer with repeated sub_0821983C calls, a packed animation stepper, and multiple loops. Largest relative covers only 9%; no Ghidra export exists locally. No candidate retained or production changes.
 
 Validation: only tools/check.py per-file checks; both matches rechecked after clang-format. No full builds or network operations. Existing tools/cloud_task.py modification was present at entry and untouched.
+
+## Task 081ED5F4 — 2026-10-20
+
+Tags: #matching #scene-actors #tooling
+
+- 081ED5F4 matched as `SceneActors_UpdateMovement`: paired render animations (sequences zero and four), target movement and periodic particles. Exact fast check: 680 bytes. Register-pinning concession; depin reduced 20 hints to eight. Keeping the initialization zero through the sequence call, a full-width local sequence declaration, and the flags operand in r1 closed the match.
+- 081ED8A0 matched as `SceneActors_UpdateDelayedMovement`: same animation setup, motion starts after tick 120; successful motion sets transition byte AF and field 284 to 16. Exact fast check: 724 bytes. Declaration order plus two scoped register temporaries closed the six-instruction residue. Depin reduced twelve hints to nine.
+- 081EE518 drafted 90.5% as `SceneActors_UpdateSequenceTwoAction` (tentative phase semantics). Full-extent NONMATCHING check: 75 differing instructions, 20 ignoring registers. Five phases initialize sequence two, advance to sequence three, follow player-derived velocity, then reverse the sequence and request transition. Returning the raw random table value from the inline, and applying the mask at its caller, prevented GCC from merging the two random paths and raised the candidate from 60.6% to 90.5%. Kept guarded in src with default INCLUDE_ASM.
+- 081EDB74 stopped: candidate for `SceneActors_UpdateDeparture` matches the visible body to 97.5% (ten differing instructions, two structural); full-extent draft check is only 65.2%, so not committed. Inventory includes the following raw assembly blob starting 081EDE4C through 081EE130. Investigate that separate prologue/boundary before resuming; do not treat body-only similarity as full-function acceptance. Candidate in wip/sub_081EDB74.c.
+- 081EE130 stopped below draft threshold: randomized timed action; latest full reviewed 1000-byte extent scored 78.1%. Remaining pointer lifetimes, repeated arithmetic load order, and first animation's shared constant-one allocation. Candidate in wip/sub_081EE130.c.
+- 081EEAD8 stopped below draft threshold: palette interpolation/flashing followed by five particle spawns per tick and eventual transition. Plain vector fields reached 70.1%; bitfields and base pins regressed to 65.9%. Candidate in wip/sub_081EEAD8.c, earlier version in build/ead8.old.c. No production C retained.
+
+Tool caveat: `tools/depin.py` does not enable NONMATCHING. On a guarded draft its default assembly branch passes, so it removes all C hints without validating the draft. Restored 081EE518's hints immediately and reran `check.py --nonmatching --record` to confirm 90.5%; corrective driver commit preserves the validated result. Use depin on an extracted unguarded candidate for future drafts.
+
+No full build, network operation or shared documentation edits. Existing tools/cloud_task.py modification left untouched. Exact code gain is the two matches only; draft earns no exact progress. Integration should validate the combined ROM and calculate percentage-point gain centrally.
