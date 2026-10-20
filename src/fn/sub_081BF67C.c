@@ -1,10 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input.h"
-
-#ifdef NONMATCHING
-// fuzzy: 95.9%
-// The first zero argument reload and CpuSet argument order still differ.
-// Initializes both resource headers, Storage widgets, and the input marker/glyph pairs.
 #define Storage_InitWidgets sub_081BF67C
 void sub_0821983C(void *, void *, u16, u32, u8, u8, u8, void *);
 void sub_081BD934(void *, s32);
@@ -25,12 +21,20 @@ void Storage_InitWidgets(u8 *p)
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
-    sub_0821983C(p + 0x18, p + 0x1518, 0xD2, 0x30, 0, 0, 60, &pos);
+    {
+        register u32 blank asm("r1") = 0;
+        asm("" ::"r"(blank));
+        sub_0821983C(p + 0x18, p + 0x1518, 0xD2, 0x30, blank, blank, 60, &pos);
+    }
     sub_0821983C(p + 0x78, p + 0x1518, 0x41, 0x30, 0, 0, 60, &pos);
     pos.x += 8;
     sub_0821983C(p + 0xD8, p + 0x1518, 0x42, 0x30, 0, 0, 60, &pos);
     zero = 0;
-    CpuSet(zeroPtr, &pos, 0x05000002);
+    {
+        register u32 *source asm("r0") = zeroPtr;
+        register void *target asm("r1") = &pos;
+        CpuSet(source, target, 0x05000002);
+    }
     sub_0821983C(p + 0x138, p + 0x1518, 0x40, 0x30, 0, 0, 60, &pos);
     sub_0821983C(p + 0x198, p + 0x1518, 0xD3, 0x30, 0, 0, 60, &pos);
     sub_0821983C(p + 0x1F8, p + 0x1518, 0x63, 0x30, 0, 0, 60, &pos);
@@ -70,7 +74,3 @@ void Storage_InitWidgets(u8 *p)
     SceneInput_InitMarkerPair((void *)(p + 0x1558));
     SceneInput_InitGlyphPair((void *)(p + 0x164C));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081BF67C);
-#endif
