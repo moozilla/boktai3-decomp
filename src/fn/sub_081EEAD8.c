@@ -1,12 +1,15 @@
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite     sub_081EC974
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// confidence=low: role inferred from state transitions and callees.
+#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
+#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+#define ActorDisplay_UpdateAccentSprite     sub_081EC974
+#define Palette_InterpolateBanks            sub_08221110
+#define Mod                                 sub_0824859C
+// confidence=low: fades sprite palettes before emitting dispersal particles.
 #define SceneActors_UpdatePaletteDispersal sub_081EEAD8
 #ifdef NONMATCHING
-// fuzzy: 89.4%
-// Remaining differences: initialization allocation and palette/loop operand ordering.
+// fuzzy: 94.4%
+// Remaining differences: palette destination setup and particle-loop initialization order.
 struct P {
     u8 unknown[0x630];
 };
@@ -40,12 +43,14 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
     struct P *input = arg;
     struct P *p = input;
     if ((*(u8 *)((u8 *)input + 0xb1))) {
-        (*(u8 *)((u8 *)input + 0xb1)) = 0;
+        register s32 zero asm("r3") = 0;
+        (*(u8 *)((u8 *)input + 0xb1)) = zero;
+        asm("" : "+r"(zero));
         (*(s32 *)((u8 *)input + 0x394)) |= 0x20000;
-        (*(s32 *)((u8 *)input + 0x5a8)) = 0;
+        (*(s32 *)((u8 *)input + 0x5a8)) = zero;
         (*(s32 *)((u8 *)input + 0x5ac)) = 6;
-        (*(s32 *)((u8 *)input + 0x398)) = 0;
-        (*(s32 *)((u8 *)input + 0x5a0)) = 0;
+        (*(s32 *)((u8 *)input + 0x398)) = zero;
+        (*(s32 *)((u8 *)input + 0x5a0)) = zero;
     }
     switch (W(0x398)) {
         case 0: {
@@ -60,6 +65,7 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
                                      W(0x5a8), W(0x5ac));
             PTR(0x378) = (u8 *)p + 0x3e8;
             i = 0;
+            asm("" : "+r"(i));
             dest = (u8 *)p + 0x488;
             src = (u8 *)p + 0x408;
             do {
