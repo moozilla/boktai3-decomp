@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
 #define ActorDecision_SetTransition SceneVolume_BeginPhase
 struct ActorDecisionPosition {
     u32 a, b;
@@ -37,14 +35,15 @@ static inline u8 consumeReset(struct ActorDecisionState *p)
 }
 void ActorDecision_UpdatePulsePhase(struct ActorDecisionState *p)
 {
-    struct ActorDecisionState *s = p;
     s32 result;
+    struct ActorDecisionState *s = p;
+    asm("" : "+r"(s));
     consumeReset(p);
-    if (ActorMovement_CanReachTarget((void *)s))
+    if (ActorMovement_CanReachTarget(s))
         SceneVolume_BeginPhase(p, 1);
     else if (SceneVolume_GetActivityState(p))
         SceneVolume_BeginPhase(p, 2);
-    else if (p->timer > 60 && SceneVolume_FindNearbyPosition((void *)s) == 1)
+    else if (p->timer > 60 && SceneVolume_FindNearbyPosition(s) == 1)
         SceneVolume_BeginPhase(p, 3);
     else if (p->timer > 210) {
         p->savedSelection = p->selection;
@@ -61,6 +60,3 @@ void ActorDecision_UpdatePulsePhase(struct ActorDecisionState *p)
     }
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorDecision_UpdatePulsePhase);
-#endif
