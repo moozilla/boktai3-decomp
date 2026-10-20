@@ -5,7 +5,7 @@
 
 // confidence=low: carries a player position request along a motion track
 #ifdef NONMATCHING
-// fuzzy: 81.9%
+// fuzzy: 92.8%
 // Remaining differences: Player-request calls remain duplicated; entry and flag-mask allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
