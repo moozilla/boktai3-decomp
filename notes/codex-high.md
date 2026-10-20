@@ -2530,3 +2530,10 @@ All retained functions have file-local `Subsystem_VerbNoun` address aliases.
 Commits were queued through `build/commit.sh`, including separate one-file
 register-hint minimization commits for the two accepted matches and the
 source-validity correction for 08113104. This note is the final driver commit.
+
+Final metadata check also caught a checker naming trap: the older drafts'
+named INCLUDE_ASM fallbacks prevented `--record` from finding the newly
+address-aliased emitted functions. Changed those three fallbacks to their
+`sub_XXXXXXXX` spellings, formatted them, and reran `--nonmatching --record`.
+All four final fuzzy comments are now written by the checker (including the
+95.4% improvement), rather than merely reported in its global comparison.
