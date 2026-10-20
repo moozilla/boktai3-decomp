@@ -1469,3 +1469,67 @@ Validation used only per-function check.py; all draft scores were recorded with
 --nonmatching --record. Two exact matches and four guarded drafts retained.
 No full build, network operation or shared documentation/index change. Commits
 queued through build/commit.sh; combined ROM verification belongs to integration.
+
+## Task 0818911C — 2026-10-20
+
+Tags: #matching #armor #worker
+
+- **0818AFEC — matched, Armor_UpdateContactBoost.** Increments contact counters,
+  moves through modes 0/1/3, temporarily scales the saved attack and defense to
+  125%, and applies 0x200004 to the two attack colliders. The contact-power field
+  is at 0x274. Naming is tentative because the exact gameplay meaning of the
+  contact counters is not confirmed. Started from Armor_UpdateAccumulatedBehavior's
+  observed layout and scaling idiom. An inline scaling helper left eight register
+  differences; writing the two signed scaling blocks at their use sites matched
+  exactly. No register pins. Formatted and checked twice before driver commit.
+- **0818B2A0 — drafted 99.5%, Armor_UpdateBehaviorAfterContact**, improved from
+  the inherited 97.8% draft. Clear-flags inline calls recovered the intended mask
+  and collider registers. Explicit three-argument prototypes and forwarding the
+  incoming flags to 0818AFEC and Armor_UpdateAccumulatedBehavior removed another
+  register mismatch and made the call contracts defined. Three realigned
+  differences remain (two ignoring registers): zero materialization precedes the
+  mode/timer stores instead of following them in the modes 2/3 forced-transition
+  path. Declaration swaps and a signed full-width bitfield store did not help;
+  retained the simpler ordinary store. Required alias added; score recorded.
+- **0818911C — stopped below threshold, Armor_UpdateAggressiveDecision.**
+  Candidate remains locally in wip/sub_0818911C.c. Recovered timer expiry,
+  boost removal, target Manhattan distance, facing quantization, and both flag-1
+  decision switches. First draft 61.8%; separating coordinate differences from
+  rounding reached 71.4% (242 realigned / 73 structural). Variant trials lowered
+  structural differences to 50 and total to 173, but fuzzy fell to 69.9%.
+  Remaining issues include cached target coordinates versus reloads, stack
+  lifetimes and shared tail placement. Tried generic global pointer, narrow flag,
+  signed flag, inline direction conversion, coordinate widths/declaration order,
+  and separated rounding. No source committed below threshold.
+- **081896D0 — drafted 81.5%, Armor_UpdateFacingDecision.** Ported the recovered
+  decision routine after reading its full assembly. Unlike 0818911C, mode 1 first
+  checks quantized facing, then retreats with behavior 9 when distance exceeds 5;
+  its special type is 15 rather than 14. Explicit rounding steps produce the
+  retained draft. Final recorded full-function check: 158 realigned differences,
+  48 ignoring registers. Target-coordinate lifetimes/spills, branch tails and
+  register allocation remain. The alternate local wip candidate has fewer
+  realigned differences (152 / 44) but scores 77.4% fuzzy. No register pins.
+- **0818B7AC — stopped after assembly/relative analysis; no qualifying draft.**
+  Collision callback takes attacking collider, contacted collider and owner.
+  Owner flags 0x80 and the signed 0xB2C cooldown reject contacts; collider +0x44
+  supplies the new cooldown. It tests owner flag 2 to choose defense-health
+  handling at 0xB20 versus regular reactions, temporarily changes contacted
+  collider categories/properties by armor type, applies health changes at 0xB1C,
+  forwards original damage plus attacker properties to 0818B2A0, updates the HUD,
+  shows damage numbers and chooses impact sounds. Death sets flag 0x80; the
+  reaction script uses 0xB50 and flag 0x100. Best matched relative covers only
+  19/543 instructions. No sufficiently concrete compiler-shape hypothesis for
+  a worthwhile candidate after this analysis; left assembly unchanged.
+- **0818BE30 — stopped below threshold, Armor_InitCombatColliders.** Local
+  candidate wip/sub_0818BE30.c initializes colliders at 0x190/0x1E4/0x238/0x28C,
+  with contact callbacks 0818B7AC and Armor_TriggerBehavior35, quarter/half attack
+  strength, and category masks selected by type. First candidate 50.9%; replacing
+  inaccurate u16 callee argument declarations with u32 removes extra narrowing.
+  Main unresolved shape is overmerged switch tails and pointer allocation.
+  Named fields, scoped collider locals and diagnostic register pins failed to
+  improve it sufficiently; all pins removed. Nothing below threshold committed.
+
+Validation: only tools/check.py per file; draft scores recorded with
+--nonmatching --record. One matching commit and two draft commits queued via
+build/commit.sh, with no make, full build or network operation. Shared docs and
+index were not edited. Integration must run the combined ROM verification.
