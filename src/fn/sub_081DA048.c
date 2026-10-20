@@ -16,7 +16,7 @@ struct TEntry {
 
 void Projectile_SetUpdateCallback(void *, void *);
 void Task4E01_SpawnImpactChildren(void);
-void sub_081D934C(void);
+void Boss_FinalExplosions(void);
 void Task4E01_StartTerminalAnimation(void *);
 
 void sub_081DA048(struct TCollider *self, struct TCollider *other, struct TEntry *entry)
@@ -30,7 +30,7 @@ void sub_081DA048(struct TCollider *self, struct TCollider *other, struct TEntry
         Projectile_SetUpdateCallback(config, Task4E01_SpawnImpactChildren);
     } else if (config->type != 8) {
         if (config->type == 9) {
-            Projectile_SetUpdateCallback(config, sub_081D934C);
+            Projectile_SetUpdateCallback(config, Boss_FinalExplosions);
         } else {
             e = entry;
             if ((self->flags & 1) || (other->flags & 1)) {

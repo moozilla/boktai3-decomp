@@ -13,7 +13,6 @@ struct Npc {
     u8 pad78[0x2E4 - 0x78];
     u8 (*callback)(struct Npc *);
 };
-#define SceneNpc_UpdateRisingToTerrain sub_081CF9E8
 void SceneNpc_UpdateRisingToTerrain(void *ctx, struct Npc *npc, s32 tick)
 {
     if (npc->entered) {

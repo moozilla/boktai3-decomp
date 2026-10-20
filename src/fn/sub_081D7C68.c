@@ -262,7 +262,7 @@ void Task4E01_UpdateExpandingImpact(void *);
 void Task4E01_OnDefaultDirectionalAnimation(void *);
 void Task4E01_OnType7DirectionalAnimation(void *);
 void Task4E01_OnType4Animation(void *);
-void sub_081D9B6C(void *);
+void Projectile_UpdateAnimation(void *);
 void sub_081D9D3C(void *);
 // confidence=low: resets projectile time and chooses the terminal animation by projectile kind.
 s32 Task4E01_StartTerminalAnimation(u8 *input)
@@ -300,7 +300,7 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
                 Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 6, 0, 0);
                 StepSecond((void *)(p + 0x8c), (void *)(p + 0x180));
             }
-            Projectile_SetUpdateCallback(config, sub_081D9B6C);
+            Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;
         case 11:
             if (!(*(u16 *)config & 0x2000))

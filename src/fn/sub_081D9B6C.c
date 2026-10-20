@@ -135,7 +135,6 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_UpdateAnimationTail(void *);
 
-#define Projectile_UpdateAnimation sub_081D9B6C
 s32 Projectile_UpdateAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
@@ -152,5 +151,5 @@ s32 Projectile_UpdateAnimation(u8 *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D9B6C);
+INCLUDE_ASM("asm/nonmatching", Projectile_UpdateAnimation);
 #endif
