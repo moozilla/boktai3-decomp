@@ -682,3 +682,100 @@ Positive-success layout and a u8 return in the inlined route helper preserve
 materialized 0/1 checks. Judge large functions by realigned structural/total
 counts: positionally differing byte counts are dominated by shifted branches
 and pools. More structural similarity did not always improve fuzzy scores.
+
+## Task 0812E7EC — 2026-10-20
+
+Tags: #matching #scene-actors #nonmatching #register-pinning
+
+No exact matches; exact code gain is 0.00 percentage points. Four guarded drafts
+were retained on the assigned cloud/0812E7EC branch. All scores below are the
+final `check.py --nonmatching --record` scores, against reviewed extents. Default
+builds retain INCLUDE_ASM. No full build, network operation, or shared-doc update
+was performed. The pre-existing tools/cloud_task.py modification was left alone.
+
+- **0812FA0C — drafted 80.6%.** Tentative alias:
+  SceneActorReaction_UpdateRouteReturn. On entry installs savedTarget (+0x22C),
+  clears route/chase flags; after counter >60, starts RestoreAfterDelay, saves
+  the group's reload time and entry control, then performs the common arrival
+  decision. `Chase_Arrive` from scene_actor_chase.h supplies almost the entire
+  large inline: route snapping, linked target/player-cell lookup, direct route
+  rebuilding, and random turn packet setup. Retained local copies allow future
+  tuning without changing consumers. Final realigned differences: 228 total,
+  44 ignoring registers. A signed halfword mask at group +0x40, ordering the
+  saved time load before the packet address, and retaining the callback's zero
+  return at the phase-counter store improved the draft. Pinning actor/group
+  worsened it. Remaining issues: PRE stack slots, random-loop constants, and
+  control/phase setup allocation. Initial commit title says 80.4%, but the
+  recorded full-function score is 80.6%.
+- **0812E7EC — stopped below threshold.** Local candidate:
+  wip/sub_0812E7EC.c, 58.8%. Tentative alias:
+  SceneActorReaction_DispatchPendingCommands. Called by
+  SceneActor_DispatchActivePhase, gated by flags2C0 &0x100. Reads the receiver
+  at actor +0xC using scene-event double-buffer phase +0x24. Commands 0/1/2
+  set movement/turn destinations; 4,8,9,10,11 select behaviors; 5/6/7 forward
+  actor messages; command 3 dispatches attachment creation/update/release.
+  Category 18 uses actor +0x2FC coordinates; others use route-object +0x1C.
+  A typed command union avoids materializing a separate argument pointer;
+  an explicit precheck plus do/while restores the loop entrance. A u8 phase
+  parameter preserves distinct byte/word zeros. Still, the compiler merges
+  large state/control tails that the ROM duplicates, leaving the candidate
+  substantially shorter. Parameter-width variants and nested setter inlines
+  did not resolve this. Nothing promoted.
+- **0812F5D4 — drafted 80.8%.** Tentative alias:
+  SceneActorReaction_UpdateContactRoute. Invokes callbacks +0x270 and +0x260,
+  applies actor field2C2 as duration scale, consumes the route probe event,
+  then requests a descriptor turn or acceleration. An enabled group contact
+  can start a random turn with retry limit three, saving control/state in the
+  group packet and setting group +0x206 to two. Final realigned differences:
+  92 total, 35 ignoring registers. Using a u32 saved-direction argument avoids
+  early byte narrowing; explicit RNG table/index/mask locals expose the loop;
+  loading the existing duration through a temporary before the conditional
+  store improved allocation substantially. Two scoped register hints remain
+  on RNG prior direction and retry count, with the concession marker.
+  Remaining issues: duration/control setup, PRE stack slots and RNG allocation.
+  Correction commit restores these hints after depin.py mistakenly tested the
+  guarded assembly fallback and removed them (77.4%). Running depin.py on the
+  unguarded candidate correctly skips it as nonmatching. The final C itself
+  was rechecked at 80.8%; depin.py needs NONMATCHING support before use on drafts.
+- **0812EED8 — drafted 81.3%.** Tentative alias:
+  SceneActorReaction_BeginTargetRecovery. Requires flags2CC bits 0x400000 and
+  0x200000 plus motion +0xEB bit 1; installs delayed recovery, snaps the route
+  position, resets response flags/timers and marks field5DA as 0xFF. Final
+  realigned differences: 58 total, 22 ignoring registers. Pointer-based flag
+  tests avoid combining the two tests into one, delaying the motion pointer
+  assignment improves its lifetime, and reusing the flags pointer for the
+  late test removes recomputation. Explicit signed masks reproduce the byte
+  flag clear. Register assignment and PRE copies remain. Initial commit title
+  says 80.8%; the recorded full-function score is 81.3%.
+- **081301C4 — drafted 81.6%.** Tentative alias:
+  SceneActorReaction_UpdateRouteRecovery. After the delay clears recovery bit
+  0x100, requests category reaction 2, starts delayed restoration and probes a
+  route to its saved point using the actor's current Y. The near-position test
+  chooses a saved control with behavior seven or zero. Increments the counter
+  after the recovery work as well as before the delay expires. Final realigned
+  differences: 61 total, 24 ignoring registers. Reading the route-point pointer
+  once and filling a ContactPosition through its address fixed many structural
+  differences. Remaining issues: zero/flag lifetimes and route/packet register
+  allocation. Initial commit title says 81.1%; final recorded score is 81.6%.
+- **0812F3CC — stopped below threshold.** Local candidate:
+  wip/sub_0812F3CC.c, 73.5%, realigned 49 total / 10 structural differences.
+  Tentative alias: SceneActorReaction_BeginContactResponse. Numerous actor
+  callers test its u8 result; it selects a contact, clears the response-control
+  counters, records the selected contact at group +0x88, starts idle control
+  and state (3,1,0), clears flags2CC bit 0x10, and sets flags2D6 bit 0x800.
+  The failure block must precede the success block, using gotos to reproduce
+  that layout. A u32-returning motion-flags inline gives the initial mask's
+  operand order; a diagnostic r5 group pin reduces structural differences.
+  The main obstacle is allocation and CSE retaining the zero result of the
+  0x80 guard across the contact call, rather than materializing fresh zeros.
+  Narrowing the *high-bit* flags getter to u16 is invalid (it erases the
+  0x1000000 gate); that experimental variant was rejected immediately.
+  Separate narrow/boolean low-bit getters, contact/actor/flags pins and mask
+  order variants did not reach 80%. Nothing promoted.
+
+Useful techniques: shared Chase helpers are strong structural seeds for this
+range, but raw whole-listing fuzzy scores move with register allocation as well
+as structural changes. Inspect realigned counts first. Inline argument widths
+and whether a stack position is filled through a pointer materially change
+front-end narrowing, CSE and PRE. A guarded draft must always be scored with
+--nonmatching; testing its default assembly fallback proves nothing about its C.
