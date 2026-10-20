@@ -1377,3 +1377,44 @@ bytes differing. All three guarded assembly alternatives also pass exactly;
 this is fallback validation, not C matching credit. One driver commit per
 match/draft; no full build or network operations. Combined ROM validation is
 left to integration.
+
+## Task 08218508 revisit (2026-10-20)
+
+Tags: #matching #sprites #terrain
+
+- 0821C8F8: stopped unmatched after largest-first entry assembly, fresh full
+  condensed listing and relative review. The best current relative covers 7%,
+  chiefly terrain lookup fragments. Direction-specific paired probes and ten
+  separate stack position temporaries remain the obstacle; no new viable C.
+- 0821C254: stopped unmatched after entry assembly and relative review. Best
+  relative covers 5%; the eight adjacent-cell branches and duplicated orthogonal
+  probes still require reconstruction. Earlier full-assembly notes apply.
+- 0821D178: stopped below draft threshold. Rechecked retained segment-clipping
+  scratch candidate: approximately 62% fuzzy, with packed-position stores and
+  intersection/control-flow differences unresolved. No production draft.
+- 08218508: improved guarded SpriteOam_QueueFlaggedProjectedSprites draft from
+  89.1% to 90.9%. Added required local address alias and address-based assembly
+  alternative for the stale baseline ELF. Full reviewed extent is 788 bytes.
+- 0821881C: new guarded SpriteOam_QueueOverlayProjectedSprites draft, 90.9%.
+  Tentative name: the observable distinction from 08218508 is selection flag
+  0x2000 rather than 0x1000. Porting the existing sibling draft is much stronger
+  than the previous independent scratch candidate. Both routines stage the same
+  projected/absolute sprite positions, affine inputs and depth-sorted OAM lists.
+  Both now have 33 realigned differences, 14 ignoring registers. Computing the
+  culling mask before offset loads and passing the whole drawable to projection
+  improve structure. Returning the unsigned scale byte through an s32 accessor
+  recovers signed branch instructions. Destination scope, explicit affine-count
+  increment and signed affine-index trials did not improve the result. Remaining
+  differences include projection pointer hoisting/spill, affine result copies,
+  priority load order and register lifetimes. Register-pinning concessions retained.
+- 0821BF5C: stopped below draft threshold after full assembly and retained scratch
+  candidate review. Reviewed 760-byte extent scores 73.7%, 175 realigned / 134
+  ignoring registers; this is not directly comparable to the earlier
+  candidate-length score. Override lookup branch merging and slope-transition
+  tails remain structurally different. No production draft.
+
+Validation: formatted both production drafts with build/venv/bin/clang-format;
+recorded both scores using check.py --nonmatching --record (full 788-byte extents).
+Both default assembly alternatives pass exactly; this earns no C matching credit.
+One driver commit queued per draft. No full build or network operations. Shared
+index/history left unchanged per CLOUD.md; combined build belongs to integration.
