@@ -1,5 +1,5 @@
 #define ActorGroup_BeginExtendedMotion sub_080FD6D0
-#define SpriteGroup_SetSharedPosition Axe_SetAuxiliarySpriteRenderState
+#define SpriteGroup_SetSharedPosition  Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_reset.h"
 struct ActorGroupMotionState {
