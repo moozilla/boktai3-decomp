@@ -1,7 +1,5 @@
 #include "global.h"
 #define Vanargand_ApplyPendingDamage sub_081ACC24
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
@@ -237,7 +235,6 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
                 if (count == 0) {
                     {
                         register u32 mask asm("r2") = 1;
-                        asm("" : : "r"(mask));
                         setFlags(p, mask);
                     }
                     self->accumulatedDamage = count;
@@ -270,6 +267,3 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
     return 0;
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081ACC24);
-#endif
