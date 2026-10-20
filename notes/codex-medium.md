@@ -2902,3 +2902,77 @@ have byte-identical assembly fallbacks checked separately. Fallback matches
 are not C progress. No ROM, generated assembly or emulator output committed.
 Batch integration, name promotion and complete ROM validation remain with the
 integrator.
+
+## Task 080AEB74 — Vorn route callbacks (2026-10-20)
+
+Tags: #matching #vorn #navigation #register-allocation
+
+- **080AFD88 matched — Vorn_UpdateDescriptorPursuit (tentative).** Calls the
+  actor's update270 and movement callback at 0x260, sets animation duration
+  scale, consumes the navigation descriptor's probe event, and either accelerates
+  toward it or requests a turn. Acceleration completion enters state 3 and sets
+  context flag 2 at 0x6D4; turn completion selects behavior 16. Exact extent is
+  360 bytes. A u32-returning motion flag helper avoids narrowing-related register
+  choices. Naming follows neighbouring Vorn callbacks and the named navigation
+  callees. Scoped copies and explicit state/zero locals reproduce the code.
+  depin.py reduced four hints to one empty read/write constraint on the context
+  flag mask; no fixed registers remain. Marked matching concession. Formatted
+  final exact check: build/check/run-gq8z7r9g.
+- **080AFEF0 matched — Vorn_SelectPursuitAfterAction (tentative).** On entry,
+  installs saved entry control 0x224 with kind 2. On action completion, selects
+  behavior 15 and uses context flag 1 at 0x6D4 to choose callback 080ADB90/mode
+  0x23 or Vorn_UpdatePursuitDistance/mode 0x25. Exact extent is 328 bytes, without
+  hints. Initial candidate was 92.0%; declaring callback, zero, and mode locals
+  in that order in the small inlined selector reproduced the two branches'
+  differing zero-register lifetimes. Formatted exact check:
+  build/check/run-ny_rkhv1.
+- **080AEE08 retained draft 83.4% — Vorn_UpdateDefeat.** Reviewed the existing
+  source against the full 984-byte extent. Remaining differences are 84
+  realigned instructions, 9 ignoring registers: flags offset reuse, the first
+  RNG table pointer copy, late control/state constant reloads, and register
+  choices in the script argument and final spark blocks. Moving table scope,
+  changing the first RNG helper, and pinning initial field offsets did not
+  improve it; restored the existing body. Added the required local address alias
+  and a compatibility alias for SceneActor_CallContextScriptB (080B0D28), which
+  is absent under its descriptive name in this worktree's ELF. Re-recorded
+  score: build/check/run-addo587z. Default assembly fallback checked exact.
+- **080AEB74 retained draft 80.2% — Vorn_TryRestorePatrolRoute.** Reviewed the
+  existing source against the 660-byte ROM extent. Remaining differences are
+  67 realigned instructions, 32 ignoring registers: destination pointer spill
+  across terrain lookup, early saved-motion spill, flag pointer reuse, and reset
+  scheduling. Moving the saved-motion assignment into the boolean guard, with
+  and without volatile, worsened the result; restored the original body. Added
+  the required local alias, re-recorded score (build/check/run-lrp2lu9l), and
+  verified the default assembly fallback exactly. INCLUDE_ASM must use the raw
+  sub_ address token here: global.h stringifies it without macro expansion, and
+  this checkout's generated assembly filenames still use raw names.
+- **080AF2BC stopped below draft threshold — tentative delayed route recovery.**
+  Started largest first. Recovered the delayed action queue and the shared
+  Chase_Arrive/Chase_TryRoute paths from checked-in scene_actor_chase.h, confirmed
+  terrain height sampling, player-cell comparison, random facing selection, and
+  patrol fallback against the full assembly. Reviewed extent includes interior
+  label 080AFBD0 and ends at 080AFBE4 (2344 bytes). Best retained scratch check
+  was 66.1%, 472 realigned differences / 167 ignoring registers
+  (build/check/run-sjepbc7p). Main actor/group stack residency, derived address
+  reuse, and RNG loop hoisting differ. Correcting the signed timer comparison,
+  declaring sub_0812F3CC as u8, passing group to the queue inline, and a volatile
+  root-pointer experiment did not bring it to draft quality. Scratch remains
+  uncommitted in wip/sub_080AF2BC.c.
+- **080B0038 stopped below draft threshold — tentative route movement restore.**
+  Recovered context route cleanup, movement resolution, clearing pursuit flags,
+  descriptor clearing, and restoration of default control and callback state.
+  First clean candidate reached 73.9%, 63 realigned differences / 26 ignoring
+  registers (build/check/run-kgozlpt7). Keeping the zero-valued behavior result
+  alive, forcing early group computation, changing state-store addressing, and
+  pinning a flags pointer failed to improve a valid candidate to 80%; discarded
+  the pinning experiments. Best clean source remains uncommitted in
+  wip/sub_080B0038.c. Main residues are group-address lifetime, flag address
+  reuse, and control/state reset constant derivation.
+
+All checks used tools/check.py through build/venv/bin/python. No full build,
+network operations, ROM/generated assembly commits, or integration changes.
+The two refreshed drafts retain their existing C and fuzzy scores; they are
+not newly matched progress. Both exact callbacks and each draft were committed
+through build/commit.sh. Separate cleanup commits minimize the first exact
+callback's hints/formatting and correct draft fallback names for the local
+assembly snapshot. Combined ROM validation remains with the integrator.
