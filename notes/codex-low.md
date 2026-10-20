@@ -1337,3 +1337,43 @@ matches and drafts. Both draft scores recorded with --nonmatching --record;
 formatted with the pinned clang-format. All production changes queued as one
 function per driver commit. Shared docs/index were left alone per CLOUD.md.
 Combined ROM verification remains with the integrator.
+
+## Task 08209AC4 revisit (2026-10-20)
+
+Tags: #matching #fan-cannon #screamer
+
+- 0820C120: matched unpinned as Screamer_InitColliders (532 bytes).
+  Creates directional attack collider 6C (2001), body collider C0 (5009),
+  and directional secondary body collider 114 (4009). Attack properties use
+  signed fields 1C4/1C6/1C8; body properties use unsigned 1E8/1EA.
+  Ooze_InitAttackCollider supplied the packed signed 16-bit vector bitfields
+  required for the first setup; subsequent assignments use halfword views.
+  A full-width unsigned 16-bit flags bitfield reproduced the final two OR
+  operations exactly, eliminating four register-only differences without pins.
+- 0820BF70: improved guarded Screamer_ApplyHitReaction draft 94.3% -> 95.2%.
+  Declaration order source/hit/target fixes argument-copy ordering; passing
+  &frame.position rather than the pinned position pointer fixes stack address
+  materialization. Remaining 11 realigned instructions / 2 structural concern
+  RNG index/mask/sample allocation. Recorded with --nonmatching --record.
+- 0820C4D4: retained guarded Screamer_UpdateScream draft 94.9%, 34 realigned
+  differing instructions / 7 ignoring registers. Added required address alias
+  and callback alias so the stale-symbol baseline ELF can check the draft.
+  Animation constant copies and switch-case field-address lifetimes remain.
+- 0820C9AC: retained guarded Screamer_UpdateDamageParticles draft 81.3%,
+  93 realigned differences / 60 ignoring registers. Added required alias.
+  Pause branch shape, particle stack frame, RNG lifetimes and callback return
+  remain unresolved. Recorded both retained draft scores again.
+- 08209AC4: stopped unmatched after largest-first asmat/condense review.
+  Condense exposes only short timer-check and effect-call runs, insufficient
+  to port the mixed activation, contact, fan-force and animation update.
+  The earlier reconstruction notes above remain applicable; no new candidate.
+- 0820A5CC: stopped unmatched after asmat/relatives review. Best matched
+  relative explains 19%, chiefly animation playback; script option setup,
+  terrain/collider and manager slot layout need full reconstruction. No new
+  source promoted. Ghidra export is absent in this checkout.
+
+Validation used tools/check.py only. Exact initializer acceptance printed zero
+bytes differing. All three guarded assembly alternatives also pass exactly;
+this is fallback validation, not C matching credit. One driver commit per
+match/draft; no full build or network operations. Combined ROM validation is
+left to integration.
