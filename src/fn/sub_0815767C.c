@@ -1,7 +1,8 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 88.2%
+#define Player_ApplyControlPresentation sub_0815767C
+
+// MATCHING_CONCESSION: register-pinning
 
 struct Drawable {
     u32 a, b, flags;
@@ -22,6 +23,23 @@ void PlayerEffect_SetPaletteSource(void *, u32, u32);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
+static inline u8 *offsetR1(u8 *p, u32 off)
+{
+    register u32 offset asm("r1") = off;
+    return p + offset;
+}
+static inline u8 *offsetR2(u8 *p, u32 off)
+{
+    register u32 offset asm("r2") = off;
+    return p + offset;
+}
+static inline void setCollider(u8 *p)
+{
+    register u16 *ptr asm("r2") = (u16 *)(p + 0x236);
+    register u32 value asm("r1") = *ptr;
+    register u32 mask asm("r0") = 4;
+    *ptr = mask | value;
+}
 void Player_ApplyControlPresentation(u8 *p)
 {
     u32 value = H(0x474);
@@ -37,7 +55,7 @@ void Player_ApplyControlPresentation(u8 *p)
     sub_08225B74(p + 0x24);
     sub_0802E04C(p + 0x24);
     if (Player_GetControlFlags(p, 8))
-        H(0x236) = 4 | H(0x236);
+        setCollider(p);
     else {
         H(0x236) &= ~4;
         Collider_SetPosition(p + 0x230, p + 0x30, 0);
@@ -51,13 +69,13 @@ void Player_ApplyControlPresentation(u8 *p)
     else
         W(0x94) &= ~0x200;
     if (Player_GetControlFlags(p, 64))
-        W(0x14C) &= ~1;
+        *(u32 *)offsetR1(p, 0x14C) &= ~1;
     else
-        W(0x14C) |= 1;
-    if (Player_GetControlFlags(p, 4) || !B(0x740))
-        ActorShadow_Disable(p + 0x700);
+        *(u32 *)offsetR2(p, 0x14C) |= 1;
+    if (Player_GetControlFlags(p, 4) || !*offsetR1(p, 0x740))
+        ActorShadow_Disable(offsetR2(p, 0x700));
     else
-        ActorShadow_Enable(p + 0x700);
+        ActorShadow_Enable(offsetR1(p, 0x700));
     if (Player_GetControlFlags(p, 256) && !Player_GetControlFlags(p, 1)) {
         ActorDebris_Show((void *)W(0xC84));
         PlayerEffect_SetPaletteSource((void *)W(0xC84), H(0xC6), W(0xD4));
@@ -69,15 +87,15 @@ void Player_ApplyControlPresentation(u8 *p)
     H(0xAE) += H(0x4E8);
     H(0xB0) += H(0x4EA);
     if (B(0x53D)) {
-        s32 jitter;
+        register s32 jitter asm("r1");
+        u32 random;
+        register u32 mask asm("r0");
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        jitter = (*(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400) & 15) - 7;
+        random = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+        mask = 15;
+        jitter = (random & mask) - 7;
         H(0xAC) += jitter;
         H(0xB0) -= jitter;
         B(0x53D)--;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_ApplyControlPresentation);
-#endif
