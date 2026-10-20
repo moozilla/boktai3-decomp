@@ -1,4 +1,5 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 84.4%
 // Control flow and core work line up (regions.py core distance 6/444); allocation and spills
@@ -225,7 +226,8 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-u8 sub_08135F70(struct SceneActorRegistryResetView *actor)
+#define SceneActorReaction_ApplyPendingHit sub_08135F70
+u8 SceneActorReaction_ApplyPendingHit(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags2D4;
     s16 *health;
