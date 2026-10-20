@@ -2,6 +2,8 @@
 #include "global.h"
 // confidence=low: chooses chase or route recovery after an actor reaction.
 
+#define Dog_ChooseReactionBehavior sub_080E25FC
+
 #ifdef NONMATCHING
 // fuzzy: 83.5%
 // Branch layout, flag-address lifetimes and register allocation still differ.
@@ -228,5 +230,5 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Dog_ChooseReactionBehavior);
+INCLUDE_ASM("asm/nonmatching", sub_080E25FC);
 #endif

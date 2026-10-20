@@ -1,9 +1,11 @@
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_UpdateSlideImpact sub_080C725C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
 // confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
-// fuzzy: 89.1%
+// fuzzy: 91.3%
 // Push along the stored heading, emit dust, and resolve an impact into completion or defeat.
 // Remaining mismatch: motion-pointer copies, RNG allocation and completion/control-reset offsets.
 #include "scene_object.h"
@@ -34,7 +36,8 @@ static inline u8 TakeFlag(u8 *flag)
 }
 static inline u32 NextRandom(void)
 {
-    const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+    register const u16 *table asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
+    asm("" : "+r"(table));
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308];
 }
@@ -129,10 +132,10 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
             actor->field2C8 = 0;
             actor->flags114 &= ~1;
             actor->word104 = 0;
-            *(u16 *)((u8 *)&actor->colliderA + 6) &= ~0x100;
+            actor->colliderA.flags &= ~0x100;
         }
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateSlideImpact);
+INCLUDE_ASM("asm/nonmatching", sub_080C725C);
 #endif
