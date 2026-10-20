@@ -11,7 +11,7 @@ void Player_SetDirectionalVelocity_08238300(u8 *, s32);
 void Player_PlayActionCueSound(u8 *, u32);
 void sub_08238238(u8 *);
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(u8 *, s32, s32);
+s32 Player_SetAnimationIndex(u8 *, s32, s32);
 
 void sub_0823C760(u8 *p)
 {
@@ -61,12 +61,12 @@ void sub_0823C760(u8 *p)
             Player_SetDirectionalVelocity_08238300(p, p[0x4F0]);
             Player_PlayActionCueSound(p, 1);
             sub_08238238(p);
-            sub_08238280(p, ActorVariant_GetTableValue(p[0x418], 1), 0x20);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p[0x418], 1), 0x20);
             break;
         }
         case 1: {
             u16 *t;
-            sub_08238280(p, ActorVariant_GetTableValue(p[0x418], 0), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p[0x418], 0), 0x40);
             t = (u16 *)(p + 0x45A);
             (*t)++;
             if (*t > 7)
