@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_SimpleStep sub_081CC4CC
 struct S {
     u8 f0;
     u8 b1;
