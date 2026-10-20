@@ -1,7 +1,5 @@
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 void sub_080A62DC(void);
 void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *);
@@ -49,7 +47,8 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetVie
         }
         Sound_PlaySong(0x19B);
     }
-    if (p->field2B5 == 39 && (u8)Callback_InvokeActor(p, p->update270)) {
+    savedOffset = 39;
+    if (p->field2B5 == savedOffset && (u8)Callback_InvokeActor(p, p->update270)) {
         u32 two = 2;
         u8 *field = &p->state2A8;
         u32 zero = 0;
@@ -80,6 +79,3 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetVie
         p->counter2AC++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_UpdateFlaggedResponse);
-#endif
