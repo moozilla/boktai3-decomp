@@ -36,7 +36,8 @@ void Player_UpdateSlashAction(struct Player *p)
             u16 *kind;
             p->cameraInputProcessed = 0;
             mode = &p->actionMode;
-            sub_08238280(p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))), speed);
+            sub_08238280(p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))),
+                         speed);
             if (*mode == 1) {
                 if (*kind == 0x1C) {
                     if (p->actionCueFlags == 1 && p->actionCueCounter == 0)

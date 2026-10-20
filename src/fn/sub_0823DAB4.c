@@ -24,7 +24,7 @@ struct SweepCtx {
     u16 extentB; /* 0xC0 */
     u16 pad2;
     u16 pad3;
-    u16 timer; /* 0xC6 */
+    u16 timer;  /* 0xC6 */
     u8 heading; /* 0xC8 */
     s8 index;   /* 0xC9 */
 };
@@ -60,7 +60,10 @@ s32 Player_UpdateSweepAction(struct Player *p)
         Collider_SetPosition(q->collider, &q->dest, 0);
         Collider_Refresh(q->collider);
         if (q->index >= 0) {
-            { u32 m = 0x80000; p->statusFlags |= m; }
+            {
+                u32 m = 0x80000;
+                p->statusFlags |= m;
+            }
             if (q->timer & 1)
                 sub_0823D97C(p, &q->origin, angle, p->side, q->index);
         }

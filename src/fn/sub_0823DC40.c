@@ -14,7 +14,7 @@ void Player_StartDirectionalEffect(struct Player *, u32, void *);
 
 void Player_UpdateThrowAction(struct Player *p)
 {
-    
+
     switch (p->tetherPhase) {
         case 0:
             Player_SaveActionIndex(p);
