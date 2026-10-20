@@ -115,3 +115,43 @@ Tags: #matching #player #attack
 - 0814C3A4: inspected largest first with asmat, relatives and condense after BIG_FUNCTIONS.md. Eight-phase apparent grab/motion routine snapshots previous position/resource fields, installs Player_OnGrabMotionExit, allocates a particle pool, and manipulates the object in gUnk_0200054C. Condense found only modest repetition (1209 instructions to 1165 listing lines); strongest relative covers 8%, mostly signed polar-vector math. Late phases calculate distance with Sqrt/Div and heading with Math_Atan2. No viable complete C candidate produced; stopped with assembly intact. The local `bl _0814CF20` targets the common epilogue, not an external call.
 
 Only fast per-file check.py checks ran; no make, full build, network or generated-assembly commits. Ghidra pseudo-C was unavailable (gen/ghidra/decomp.c absent). Exact percentage and percentage-point gain are left to batch integration's report regeneration. Unrelated tools/cloud_task.py changes were left untouched. Each match/draft was committed separately through build/commit.sh.
+# Task 081556E0 — 2026-10-20
+
+Tags: #matching #player #animation
+
+- 081556E0: drafted 87.8% (recorded NONMATCHING check); tentative name
+  Player_UpdateStateMotionCue. PlayerCue_StateMotion installs it for state five.
+  Chooses palette source by status flags on entry, plays song 490, runs animation
+  154, steps the auxiliary sequence for the first ten ticks, and returns to stand
+  after tick 39. Inline accessors returning masked flags preserve the repeated
+  null checks; direct `p && flags` expressions merged those checks and scored
+  only 71.9%. Remaining: animation-step selection/control flow, temporary
+  liveness, and registers (57 realigned differences, 34 ignoring registers).
+  The commit title retains the earlier 86.9% whole-candidate score; the source's
+  recorded reviewed-extent score is 87.8%.
+- 0815767C: drafted 88.2%; Player_ApplyControlPresentation synchronizes control
+  flags to collider/drawable flags, shadow visibility and debris palette source;
+  copies the render position with offsets and optional random jitter. A drawable
+  struct preserves the base+8 flags access; explicit integer-addressed RNG table
+  lookup preserves load order. Remaining 30 instructions differ only in registers
+  (zero differences ignoring registers). No register pinning used.
+- 081561EC: inspected assembly, condensed listing and relatives; left unmatched.
+  PlayerCue_Motion38To installs it for state two / sequence 0x26 and writes the
+  target coordinates at 0x590. Entry initializes a particle pool at 0xA88 and
+  installs Player_OnTargetMotionExit. Five phase paths mix secondary animation,
+  movement interpolation and particle emission. Relatives explain short trig/RNG
+  fragments, not the complete state logic. No compilable candidate retained.
+- 08156FE0: inspected assembly, condensed listing and relatives; left unmatched.
+  Large sequence selector with two jump tables, gauge drain, barrier/interaction
+  tests, status flags and animation event tests. Returns the current sequence in
+  some early exits and zero after normal transitions. No close matched seed or
+  compilable candidate retained.
+- 081559A4 and 08155D58: inspected assembly and relatives; left unmatched. Related
+  six-phase player action sequences, adding control flag 8 and dispatching on
+  byte 0x458. Phase zero selects variant animation zero and advances to sequence
+  7/phase 1 on action-config flag 1. Phase one initializes facing 4, heading 1,
+  side zero and action origin. Existing relatives cover only short fragments;
+  no compilable candidates retained.
+
+Ghidra export `gen/ghidra/decomp.c` is absent. Only tools/check.py was used for
+compilation; no full build, network operations or generated assets committed.
