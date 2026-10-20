@@ -10,8 +10,6 @@ void Player_PlayLocalSong(s32, u32);
 void Player_StopLocalSong(s32, u32);
 void sub_082392E8(struct Player *, void *);
 
-#define Player_UpdateChargeAction sub_0823D080
-
 void Player_UpdateChargeAction(struct Player *p)
 {
     if (p->tetherMode != 7) {
