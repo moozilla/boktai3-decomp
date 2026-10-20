@@ -1,9 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.9%
-// foundry draft (worker best 94.8%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
 u8 sub_0821D4F0(void *, void *, u32, u32);
 struct ImpactMovementBody {
@@ -27,6 +24,7 @@ void ActorImpact_FindNearbyPoint(struct ImpactSearchActor *p, struct ContactPosi
     struct ImpactMovementBody *body = &p->body;
     s32 i = 0;
     u32 mask = 255;
+    u32 speed = 256;
     s16 *v = (s16 *)&point;
     struct ContactPosition *center = &p->body.position;
     do {
@@ -39,7 +37,6 @@ void ActorImpact_FindNearbyPoint(struct ImpactSearchActor *p, struct ContactPosi
         }
         {
             s32 sample = gUnk_086149C4[angle & mask];
-            u16 speed = 256;
             s32 value = sample * speed;
             s32 z;
             if (value >= 0)
@@ -49,13 +46,14 @@ void ActorImpact_FindNearbyPoint(struct ImpactSearchActor *p, struct ContactPosi
                 value >>= 12;
                 z = -value;
             }
+            v[2] = z;
             {
                 u32 x = (u16)body->position.x;
                 u32 dx = (u16)v[0];
                 v[0] = x + dx;
             }
             v[1] = (u16)v[1] + (u16)center->y;
-            v[2] = (u16)center->z + z;
+            v[2] += center->z;
         }
         if (sub_0821D4F0(center, &point, 3, 256)) {
             *out = point;
@@ -64,6 +62,3 @@ void ActorImpact_FindNearbyPoint(struct ImpactSearchActor *p, struct ContactPosi
         i++;
     } while (i <= 7);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorImpact_FindNearbyPoint);
-#endif
