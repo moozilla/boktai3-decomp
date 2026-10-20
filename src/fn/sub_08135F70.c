@@ -1,7 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 84.4%
+// fuzzy: 86.9%
+// Pinning the mode-test constant to r4 improves allocation.
 // Control flow and core work line up (regions.py core distance 6/444); allocation and spills
 // differ: the ROM spills the health and +0x2D8 pointers to the stack, keeps mode in sl and a
 // constant 1 in sb across SceneHud_SetTimedState. UpdateHitFlags is inlined twice; the second
@@ -235,7 +236,7 @@ u8 SceneActorReaction_ApplyPendingHit(struct SceneActorRegistryResetView *actor)
     u32 *flags2D8;
     u32 *flags2CC;
     register u32 updated asm("r5");
-    u32 four;
+    register u32 four asm("r4");
     u32 bits;
 
     if (!HasPendingHit(actor)) {
