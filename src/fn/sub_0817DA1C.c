@@ -82,8 +82,8 @@ static inline s32 Scale(int x)
     return -(-x >> 12);
 }
 
-#define SceneVolume_UpdatePursuitSpin                                                              \
-    sub_0817DA1C // confidence=low: pursues a destination while spawning a rotating effect
+// confidence=low: pursues a destination while spawning a rotating effect
+#define SceneVolume_UpdatePursuitSpin sub_0817DA1C
 void SceneVolume_UpdatePursuitSpin(struct VolumeActor *p, s32 elapsed)
 {
     struct VolumeActor *q = p;
