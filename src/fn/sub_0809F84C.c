@@ -2,9 +2,8 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.0%
-// Remaining differences: inline clamps, argument evaluation order and register allocation.
-// fuzzy: 91.6%
+// fuzzy: 91.5%
+// Remaining differences: defined vector padding, inline clamps, argument order and registers.
 
 extern u8 *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
@@ -50,6 +49,8 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * speed, 12);
+    // The original copies this scratch halfword without initializing it.
+    out->pad = 0;
 }
 static inline s32 Minimum(s32 n, s32 min)
 {
