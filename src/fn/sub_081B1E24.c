@@ -1,10 +1,14 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// confidence=low: periodically retargets the part beside the player for 64 ticks.
+#define Vanargand_UpdatePartTracking sub_081B1E24
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.7%
-// Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
+// fuzzy: 98.1%
+// Remaining difference: timer-address offset uses r1 instead of r2 (three instructions).
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -42,10 +46,22 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 }
 static inline void Offset(struct SceneVec *v, s32 x, s32 z)
 {
-    v->x = x + (u16)v->x;
-    v->z = z + (u16)v->z;
+    register s16 *component asm("r1") = &v->x;
+    register s32 first asm("r2");
+    register s32 second asm("r3");
+    register s32 value asm("r0");
+    asm("" : "+r"(component));
+    first = x;
+    asm("" : "+r"(first));
+    value = first;
+    asm("" : "+r"(value));
+    v->x = value + (u16)*component;
+    second = z;
+    asm("" : "+r"(second));
+    value = second;
+    asm("" : "+r"(value));
+    v->z = value + (u16)v->z;
 }
-// confidence=low: periodically retargets the part beside the player for 64 ticks.
 void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
 {
     struct SceneVec delta;
@@ -81,5 +97,5 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartTracking);
+INCLUDE_ASM("asm/nonmatching", sub_081B1E24);
 #endif
