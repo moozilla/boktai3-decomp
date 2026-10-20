@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 89.1%
+// fuzzy: 90.9%
 // Remaining differences: projection temporaries, affine allocation, and register lifetimes.
 struct Vec {
     s16 x, y, z;
@@ -36,26 +36,25 @@ extern struct Matrix gUnk_03004310[];
 extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
 extern u8 gUnk_03005230;
 extern u16 gUnk_03004790[], gUnk_03005418[];
-extern struct Vec gUnk_030042A0;
+static inline s32 UnsignedScale(u8 v)
+{
+    return v;
+}
 static inline s32 project(s32 input)
 {
     s32 v = input * 3;
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-static inline s32 divide8(s32 input)
-{
-    return input >= 0 ? input >> 3 : -((-input) >> 3);
-}
 static inline s32 divide2(s32 input)
 {
     return input >= 0 ? input >> 1 : -((-input) >> 1);
 }
-static inline void screen(struct Vec *dst, struct Vec *src)
+static inline void screen(struct Vec *dst, struct Drawable *src)
 {
     register struct Vec *out asm("r5") = dst;
-    register struct Vec *in asm("r6") = src;
+    register struct Vec *in asm("r6") = &src->pos;
     s32 depth, height, y, z;
-    s32 sx = in->x, sz = in->z;
+    s32 sx = src->pos.x, sz = in->z;
     out->x = project(sx - sz);
     depth = project(sx + sz);
     height = project(in->y);
@@ -65,7 +64,8 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     out->y = y - gUnk_03005418[1] + 80;
     out->z = z - gUnk_03005418[2];
 }
-// confidence=low: selects drawables with flag 0x1000; its higher-level meaning is unknown.
+// confidence=low: flag 0x1000 selects this sprite staging pass.
+#define SpriteOam_QueueFlaggedProjectedSprites sub_08218508
 void SpriteOam_QueueFlaggedProjectedSprites(void)
 {
     struct Vec pos;
@@ -92,7 +92,7 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             goto next;
 
         if (!(p->flags & 16)) {
-            screen(&pos, &p->pos);
+            screen(&pos, p);
             x = pos.x;
             y = pos.y;
             z = pos.z;
@@ -102,13 +102,16 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             z = p->pos.z;
         }
         flags = p->flags;
-        ox = p->offsetX;
-        oy = p->offsetY;
-        if (!(flags & 64)) {
-            u32 width = p->width, height = p->height;
-            s32 left = x + ox, top = y + oy;
-            if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
-                goto next;
+        {
+            u32 cull = flags & 64;
+            ox = p->offsetX;
+            oy = p->offsetY;
+            if (!cull) {
+                u32 width = p->width, height = p->height;
+                s32 left = x + ox, top = y + oy;
+                if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
+                    goto next;
+            }
         }
         x += ox;
         y += oy;
@@ -121,7 +124,8 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             u32 matrix;
             u32 angle;
             s32 sx, sy;
-            if (!(flags & 0x20000) && ((s32)p->scaleX > 60 || (s32)p->scaleY > 60 || p->angle != 0))
+            if (!(flags & 0x20000) &&
+                (UnsignedScale(p->scaleX) > 60 || UnsignedScale(p->scaleY) > 60 || p->angle != 0))
                 attr |= 0x300;
             else
                 attr |= 0x100;
@@ -183,5 +187,5 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueFlaggedProjectedSprites);
+INCLUDE_ASM("asm/nonmatching", sub_08218508);
 #endif
