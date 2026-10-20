@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.7%
-// 13 differing instruction runs; size +4 bytes; first diff at +0x2 (sub sp, #8 vs mov r7, r8)
+// fuzzy: 82.2%
+// remaining: agbcc CSEs the constant 7 into a callee-saved reg (orig reloads it), shifting resource/flags registers
 struct PairE7 {
     u32 a, b;
 };
@@ -17,7 +17,7 @@ void sub_0823E704(u8 *p)
     *(u16 *)(p + 0xbea) += 230;
     {
         u32 v = ((p[0x3a4] + 5) & 7) << 5;
-        p[0xbfc] = v;
+        p[0xc0c] = v;
     }
     resource = Player_GetConfiguredActionPower(p);
     flags = Player_CollectCallbackFlags(p);
@@ -42,8 +42,12 @@ void sub_0823E704(u8 *p)
     }
     Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags,
                                  *(u16 *)(q + 0xba));
-    q[0x8a] = q[0xc8];
-    *(u16 *)(q + 0xc6) = 0;
+    {
+        u8 h = q[0xc8];
+        u32 z = 0;
+        q[0x8a] = h;
+        *(u16 *)(q + 0xc6) = z;
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0823E704);
