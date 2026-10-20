@@ -1151,3 +1151,42 @@ All four drafts were formatted and recorded with check.py --nonmatching
 --record using reviewed extents. All default assembly fallback checks pass,
 including the camera fallback correction. The dash passed the exact C check.
 Ghidra export is absent. Combined ROM validation remains for the integrator.
+
+## Task 080C66B0 — 2026-10-20
+
+Tags: #matching #golem #nonmatching #register-pinning
+
+Exact code gain this pass: 0 percentage points. The checkout already held three
+exact C implementations and three guarded drafts under promoted names. Restored
+file-local aliases required by this worker task and raw sub-address assembly
+fallback names required by this checkout's generated assembly. Existing Golem
+callers 080CC910, 080CDF14 and 080CEDF0 install route/windup callbacks; adjacent
+Golem controls establish the provisional state names. No new exact coverage is
+claimed for the inherited implementations.
+
+- 080C6A68: drafted 86.5%, up from 85.9%. Read BIG_FUNCTIONS before work.
+  Explicit packed X/Z word updates preserve the neighboring halfword; pinning
+  variantPointer to r5 and mirrorPointer to r2 recovers selector allocation.
+  Realigned differences improved from 96 total / 32 structural to 93 / 20.
+  Remaining residue is stack-slot placement, packed-store scheduling and late
+  context direction address scheduling. An explicit sum temporary reached
+  17 structural differences but worsened total to 102 and fuzzy to 84.3%; rejected.
+- 080C75B8: inherited match verified, Golem_UpdateRecoil, 1008 bytes.
+  Decelerates recoil, approaches the saved position, signals completion.
+- 080C725C: inherited guarded draft retained at 89.1%, Golem_UpdateSlideImpact.
+  54 total / 23 structural differences: motion pointer copies, RNG allocation,
+  control-reset offsets. Pinning body to r10 regressed to 83.9%; rejected.
+- 080C6F58: inherited match verified, Golem_UpdateChargeWindup, 772 bytes.
+- 080C66B0: inherited match verified, Golem_UpdateRouteMotion, 576 bytes.
+- 080C68F0: inherited guarded draft retained at 81.6%, Golem_UpdateChargeStop.
+  37 total / 9 structural differences. Pinning quadrant/selection to r3,
+  mirror to r2 and keyframe mode to r7 regressed to 78.1%; rejected.
+
+All six formatted using build/venv/bin/clang-format. Exact C checks and all three
+assembly fallback checks pass. Draft scores recorded by check.py --nonmatching
+--record. depin retains 3/4/3 hints on route/windup/recoil. On guarded drafts,
+depin tested the assembly alternative and incorrectly removed hints; restored
+all draft sources before final checks, so it gives no draft minimality evidence.
+relatives.py failed while generating its progress cache; no network or full build
+was attempted. Per-function commits completed through build/commit.sh. Combined
+ROM validation and name promotion remain for integration.
