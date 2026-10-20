@@ -1,4 +1,3 @@
-#define Player_ClampStatsAndSyncStatus sub_0813B5F8
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
