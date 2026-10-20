@@ -17,7 +17,9 @@ from romlib import ROOT
 from split import c_functions, extra_function_starts, function_nonentries
 
 LIBRARY = [(0x0822F248, 0x08231440, "m4a (pokeemerald m4a.c)"),
-           (0x08248590, 0x082485EC, "libagbsyscall")]
+           (0x08248590, 0x082485EC, "libagbsyscall"),
+           # Hand-written/linked libgcc (lib1thumb divide etc.); not matchable as C.
+           (0x08249238, 0x0824ACFC, "libgcc runtime")]
 
 
 def functions():
