@@ -61,8 +61,8 @@ static inline void FaceTarget(struct DecisionActor *p)
         p->direction8 = mask;
     }
 }
-#define BossSlot2_SelectCombatAction                                                               \
-    sub_0817C3F4 // confidence=low: selects phase-dependent attacks from the preceding choice and event index
+// confidence=low: selects phase-dependent attacks from the preceding choice and event index
+#define BossSlot2_SelectCombatAction sub_0817C3F4
 void BossSlot2_SelectCombatAction(struct DecisionActor *p)
 {
     struct DecisionActor *q = p;
