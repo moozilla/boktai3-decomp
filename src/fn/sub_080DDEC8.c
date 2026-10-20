@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+#define Dog_RestoreRoute sub_080DDEC8
 /* Dog_RestoreRoute: unless flags2D4 bit 0x100 is set, restores after a delay, records the follow-up control (chase when flags2D4 & 0x80, else the entry target) and routes back toward the chased object via the route point (provisional name) */
 #include "scene_actor_chase.h"
 
@@ -38,7 +40,7 @@ void Dog_RestoreRoute(struct SceneActorRegistryResetView *actor)
                 *time = *(u16 *)((u8 *)actor + 0x416);
         }
         {
-            register u16 *field asm("r0") = (u16 *)(group + 0x40);
+            u16 *field = (u16 *)(group + 0x40);
             register u32 mask asm("r1") = 4;
             register u32 value asm("r2") = *field;
             mask |= value;

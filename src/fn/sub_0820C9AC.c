@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Screamer_UpdateDamageParticles sub_0820C9AC
+#define Screamer_HandleDefeat          sub_0820BD24
 #ifdef NONMATCHING
 // fuzzy: 81.3%
 // Remaining differences: pause branch layout, random-table lifetimes, stack slots and explicit callback return.
@@ -126,5 +128,5 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Screamer_UpdateDamageParticles);
+INCLUDE_ASM("asm/nonmatching", sub_0820C9AC);
 #endif

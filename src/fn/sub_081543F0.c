@@ -1,6 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateSideFade                                                                   \
+    sub_081543F0 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 86.4%
+// Remaining phase scale addressing and playback register lifetimes differ.
 // fuzzy: 86.4%
 
 struct P {
@@ -220,5 +224,5 @@ void PlayerCue_UpdateSideFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideFade);
+INCLUDE_ASM("asm/nonmatching", sub_081543F0);
 #endif
