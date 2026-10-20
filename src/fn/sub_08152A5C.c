@@ -1,3 +1,13 @@
+#define ActorSequence_Begin sub_0813AFEC
+#define Player_AddControlFlags sub_0813B134
+#define PlayerCue_EnterStandUpdate sub_0814F804
+#define PlayerCue_CompleteAction sub_0814F89C
+#define PlayerCue_UpdateHidden sub_0814F8C8
+#define Player_RestartAnimationFromSetup sub_08151D90
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateRecoilSlide sub_08152A5C
+#define Anim_SetSequence sub_08220C8C
+#define Sound_PlaySong sub_0822B2F8
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: motion 0x1D applies decaying recoil until standing resumes.
@@ -175,5 +185,5 @@ void PlayerCue_UpdateRecoilSlide(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateRecoilSlide);
+INCLUDE_ASM("asm/nonmatching", sub_08152A5C);
 #endif
