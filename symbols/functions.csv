@@ -8020,6 +8020,7 @@ addr,name,mode,confidence,source,notes
 081F4CF8,Ratatosk_UpdateDefeatSequence,thumb,low,src-alias,
 081F5120,Ratatosk_BeginDirectionalReaction,thumb,low,src-alias,
 081F51D8,Ratatosk_UpdateDirectionalRecovery,thumb,low,src-alias,
+081F56F0,Ratatosk_UpdateLongTimedPose,thumb,low,src-alias,
 081F5748,Ratatosk_UpdateTimedPose,thumb,low,src-alias,
 081F57DC,Ratatosk_UpdateTimedPoseVariant,thumb,low,src-alias,
 081F5870,SceneActor_BeginTimedAnimation,thumb,low,src-alias,
