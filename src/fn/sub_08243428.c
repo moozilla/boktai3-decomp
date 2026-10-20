@@ -50,7 +50,6 @@ static inline u32 FlagTest(u32 m, u32 *pv)
     return r;
 }
 
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
@@ -116,7 +115,8 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     }
     p->particleEmissionCount = 0;
     if (flash)
-        SceneHud_SetTimedState(*(u32 *)((u8 *)p + 0x24), p->currentStatA, p->maximumStatA, 10, 0, -1);
+        SceneHud_SetTimedState(*(u32 *)((u8 *)p + 0x24), p->currentStatA, p->maximumStatA, 10, 0,
+                               -1);
     if (p->currentStatA != 0)
         return 0;
 one:
