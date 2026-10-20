@@ -1418,3 +1418,54 @@ recorded both scores using check.py --nonmatching --record (full 788-byte extent
 Both default assembly alternatives pass exactly; this earns no C matching credit.
 One driver commit queued per draft. No full build or network operations. Shared
 index/history left unchanged per CLOUD.md; combined build belongs to integration.
+
+## 2026-10-20 — task 081DA810
+
+Tags: #matching #projectiles #menus #scene-actors
+
+- **081DA810 — matched, TimedEffect_SpawnProjectile.** Reads the projectile
+  type's update callback, allocates a TimedEffect entry, initializes velocity,
+  collision, graphics and category counters. Type 9 installs a manager-owned
+  collision callback with special bounds. Config offsets follow the neighbouring
+  motion-pool layout but add type/collision options. A separate saved collider
+  pointer recovered the original lifetime. Temporaries for the collision flag,
+  signed heading and priority value fixed the remaining load/copy order.
+  `depin.py --write` removed all five hints; the final C has no concessions.
+  Exact check: full 752-byte body.
+- **081DB474 — matched, Options_UpdateScreen.** Handles three menu selections,
+  a nine-value sub-selection, highlight rectangles, fade-out and script results.
+  An explicit empty case 2 reproduces the switch tree. The text rectangle has
+  a packed first word and two halfwords; expressing that first word as a field
+  rather than a cast recovered the original allocation. One empty input barrier
+  retains the early mask load; marked register-pinning concession. Depinning
+  removed the explicit r2 pin. Exact check: full 744-byte body.
+- **081DB794 — drafted 82.4%, Options_InitScreen.** Initializes the option-screen
+  backgrounds, five animations, palette scratch, labels and initial selection.
+  Separate background/palette resource locals avoid unnecessarily extending the
+  sprite-resource lifetime. Constants use temporary register pins. A preliminary
+  83.4% checkpoint was superseded: the final draft removes a fixed input-pointer
+  pin that overlapped another pointer's allocation. Remaining 53 realigned
+  differences, 22 ignoring registers, include sprite-pointer lifetimes, initial
+  argument order and a redundant palette-source reload. Default retains asm.
+- **081EAB64 — drafted 91.0%, Params3D0_UpdateDisplay**, up from 90.7%.
+  Multiplying the light-phase index before advancing the seasonal song table
+  recovers the original shift order. Remaining 125 realigned differences,
+  31 ignoring registers: palette pointers, selection-animation temporaries and
+  address lifetimes. Default retains asm; existing descriptive name retained.
+- **081EE130 — drafted 90.4%, SceneActors_UpdatePeriodicEffectAction**, up from
+  89.2%. Reversing the timing-product operands matches load order. Remaining
+  47 realigned differences, 25 ignoring registers: initialization, random-mask
+  placement and packed sequence-step allocation. Removing existing pins/barriers
+  worsened the candidate and was reverted. Default retains asm.
+- **081EDB74 — retained draft 85.3%, SceneActors_UpdateLeftDeparture.** Two
+  animation sequences depart to the left before the task switches to destruction.
+  Added the required file-local alias and checker mappings for renamed callees.
+  Removing hints, changing the second sequence's command-pointer derivation and
+  constraining the initial input did not improve the retained candidate.
+  Remaining 58 realigned differences, 22 ignoring registers: frame saves,
+  second-sprite addressing and initialization constant/order choices.
+
+Validation used only per-function check.py; all draft scores were recorded with
+--nonmatching --record. Two exact matches and four guarded drafts retained.
+No full build, network operation or shared documentation/index change. Commits
+queued through build/commit.sh; combined ROM verification belongs to integration.
