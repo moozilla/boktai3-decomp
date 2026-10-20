@@ -1,3 +1,4 @@
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
 #include "global.h"
 #include "player.h"
 // confidence=low: cue callbacks select departure and arrival phases with scale changes.
@@ -24,7 +25,7 @@ static inline void putB(u8 *p, u32 o, u32 v)
     p[o] = v;
 }
 #ifdef NONMATCHING
-// fuzzy: 84.0%
+// fuzzy: 84.4%
 void PlayerCue_UpdateScaleTransition(u8 *p)
 {
     u16 *t;
@@ -46,7 +47,16 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
             H(0x6FC) = 30;
             W(0x94) |= 2;
             t = (u16 *)(p + 0x45A);
-            goto shrink;
+            putB(p, 0xC0, 64 - (*(u8 *)t << 2));
+            if (*t > 8) {
+                putB(p, 0xC1, *t << 3);
+                putH(p, 0x4E8, (*t - 8) * 20);
+                Player_AddControlFlags(p, 4);
+            }
+            if (++*t > 15)
+                ActorSequence_Begin(p, 7, 3);
+            break;
+
         case 3:
             Player_AddControlFlags(p, 4);
             putH(p, 0x4E8, ((struct Player *)p)->tetherFrame * 200 + 160);
@@ -99,7 +109,6 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
             ANIM(0);
             W(0x94) |= 2;
             t = (u16 *)(p + 0x45A);
-        shrink:
             putB(p, 0xC0, 64 - (*(u8 *)t << 2));
             if (*t > 8) {
                 putB(p, 0xC1, *t << 3);

@@ -1,3 +1,4 @@
+// confidence=low: existing Golem state interpretation retained.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.

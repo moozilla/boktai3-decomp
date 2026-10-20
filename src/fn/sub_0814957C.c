@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+// confidence=low: provisional action interpretation from retained C and assembly.
 #ifdef NONMATCHING
-// fuzzy: 93.7%
+// fuzzy: 97.6%
 // Remaining differences: instruction selection and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -11,9 +12,11 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     register const volatile u16 *command asm("r6");
     u32 duration, flags, bit;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
+        register u32 offset asm("r0") = state->index << 1;
+        register const volatile u16 *table asm("r1");
+        asm("" : "+r"(offset));
         table = state->commands;
+        asm("" : "+r"(table));
         command = (const volatile u16 *)((u32)table + offset);
     }
     sprite->frame = *command >> 6;
@@ -96,9 +99,11 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
                 }
             }
             {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
+                register u32 offset asm("r0") = state->index << 1;
+                register const volatile u16 *table asm("r1");
+                asm("" : "+r"(offset));
                 table = state->commands;
+                asm("" : "+r"(table));
                 command = (const volatile u16 *)((u32)table + offset);
             }
             state->frameWeight = *command & 15;

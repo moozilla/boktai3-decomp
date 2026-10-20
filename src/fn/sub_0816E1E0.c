@@ -24,7 +24,7 @@ s32 SceneHud_TickPaletteBlend(void *);
 void SceneHud_UpdateActionSelection(void);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void sub_081672FC(void *);
 void Hud_SaveGridSelection(void *);
 void sub_0816CDB8(void *, int, int);
@@ -62,7 +62,7 @@ void InventoryGrid_FinishNumberPhase(struct InventoryGrid *s)
         Hud_SaveGridSelection(selection);
         sub_081672FC(s);
         MenuDisplay_UpdateActionPrompt(s, 4);
-        sub_0816701C(s, 0, 0, 0, 1, 0);
+        InventoryPanel_DrawStatComparison(s, 0, 0, 0, 1, 0);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
 }

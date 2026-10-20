@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 94.1%
+// fuzzy: 95.4%
 // Remaining: input/array address allocation and constant scheduling.
 struct AllocHud {
     u8 pad[0x48a8];
@@ -10,6 +10,10 @@ struct AllocHud {
     u8 values[3];
     u8 pad2;
     s16 deltas[3], offsets[3];
+};
+struct AllocOwner {
+    u8 pad[0x41c];
+    u16 stats[3];
 };
 struct AllocSprite {
     u32 pad[2];
@@ -55,8 +59,9 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         counts++;
     }
     if (!any && (gUnk_03005260[0] & 4)) {
+        u8 *modifier = p + 0xa58;
         any = 1;
-        p[0xa58] = any;
+        *modifier = any;
         ResultPanel_DrawCappedCounters(p, 1, 7, 8);
         ResultPanel_DrawCappedSmallCounters(p, 1, 7, 10);
         *(u32 *)(p + 0x3348) |= any;
@@ -100,7 +105,7 @@ void Presentation_UpdateAllocationSelection(u8 *p)
             goto display;
         owner = *(u8 **)(p + 0xa40);
         index = p[0x48aa];
-        stat = *(u16 *)((u16 *)(owner + 0x41c) + index);
+        stat = ((struct AllocOwner *)owner)->stats[index];
         n = ((struct AllocHud *)p)->offsets + index;
         if (stat + *n > 99)
             goto display;

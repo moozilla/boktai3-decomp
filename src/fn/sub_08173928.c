@@ -7,7 +7,7 @@ void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void PauseMenu_ResetItemCursor(void *);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_BeginItemUseSelection(u8 *p, int flag)
 {
@@ -23,6 +23,6 @@ void PauseInventory_BeginItemUseSelection(u8 *p, int flag)
     a = p + 0x1620;
     SceneHud_GetActionIconPosition(a, p[0x4387]);
     SceneHud_ShowEquipmentDetails(p);
-    sub_0816701C(p, 0, 1, 0, z, z);
+    InventoryPanel_DrawStatComparison(p, 0, 1, 0, z, z);
     MenuDisplay_UpdateActionPrompt(p, 2);
 }

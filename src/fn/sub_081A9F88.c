@@ -1,7 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.8%
 // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
+// MATCHING_CONCESSION: register-pinning
 struct Pair {
     u8 pad0[0x205];
     u8 first;
@@ -83,6 +82,7 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
                 p->phase = 1;
                 {
                     u32 zero = 0;
+                    asm("" : "+r"(zero));
                     p->timer = zero;
                 }
             }
@@ -105,9 +105,13 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
                 p->timer++;
             }
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                struct Pair *pair = self->pair;
-                u8 a = pair->first;
-                u8 b = pair->second;
+                struct Pair *pair;
+                register u32 a asm("r4");
+                u32 b;
+                asm("" : "+r"(self));
+                pair = self->pair;
+                a = pair->first;
+                b = pair->second;
                 if (ScenePair_CountPositiveCounters(pair) == 2 && a == 0xC && b == 0xC)
                     *(u16 *)((u8 *)self + 0xF3C) = 60;
                 {
@@ -133,6 +137,3 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateChargedPairAttack);
-#endif

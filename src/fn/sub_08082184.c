@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 98.3%
 #include "scene_actor_reaction.h"
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 struct RouteResponseGroup {
     u8 unknown0[0x74];
     struct {
@@ -85,7 +85,7 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *input
             prepared = (u8 *)actor + offset;
             *prepared = 1;
         }
-        sub_0807C72C(actor, 0, 2, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         destination = group->destination;
         {
             register __typeof__(&group->route) route asm("r2") = &group->route;

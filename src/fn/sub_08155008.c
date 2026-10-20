@@ -1,10 +1,11 @@
+// confidence=low: replays the alternate cue resource after fade completion.
+// confidence=low: inferred from player cue phases and animation consumers.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 86.0%
 // Remaining phase scale addressing and playback register lifetimes differ.
-// fuzzy: 86.0%
 
 struct P {
     u8 pad0[0x14C];
@@ -30,7 +31,7 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_UpdateHidden(struct P *);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
-void Player_RestartAnimationFromResource(struct P *);
+void PlayerCue_RestartAlternateAnimation(struct P *);
 void Player_UpdateFacingSide(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -211,7 +212,7 @@ void PlayerCue_UpdateAlternateFade(struct P *p)
             if (++p->timer > 3) {
                 Player_UpdateFacingSide(p);
                 PlayerCue_EnterStandUpdate(p);
-                p->fn = Player_RestartAnimationFromResource;
+                p->fn = PlayerCue_RestartAlternateAnimation;
                 PlayerCue_CompleteAction(p);
             }
             break;

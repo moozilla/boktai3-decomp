@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 94.3%
-// Remaining differences: stack-address materialization and register allocation.
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -49,7 +46,7 @@ struct Target {
 extern const struct Vec gUnk_0824FE9C;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -64,7 +61,7 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
@@ -96,38 +93,46 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     sparks:
         if (source->flags & target->sparkMask) {
             register s32 i asm("r6");
-            register struct Vec *vel asm("r10") = &frame.velocity;
-            register struct Vec *pos asm("r4") = &frame.position;
+            struct Vec *vel = &frame.velocity;
+            struct Vec *pos = &frame.position;
             register u32 *index asm("r9") = &gUnk_03005308;
-            register u32 mask asm("r8") = 0x7f;
+            u32 mask = 0x7f;
             i = 2;
             do {
                 register u32 random asm("r1");
                 register const u16 *table asm("r3");
-                u32 sample, x;
+                u32 sample;
+                u32 x;
                 frame.velocity = gUnk_0824FE9C;
                 frame.position = target->position;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
-                random = (*index + 1) & 0x3ff;
+                {
+                    register u32 *cursor asm("r2") = index;
+                    random = (*cursor + 1) & 0x3ff;
+                    asm("" : : "r"(cursor));
+                }
                 sample = table[random];
                 x = pos->x - 0x40;
                 sample &= mask;
-                pos->x = x + sample;
+                x += sample;
+                pos->x = x;
                 random = (random + 1) & 0x3ff;
                 pos->y += (u8)table[random];
                 random = (random + 1) & 0x3ff;
-                *index = random;
-                sample = table[random];
-                x = pos->z - 0x40;
-                sample &= mask;
-                pos->z = x + sample;
+                {
+                    register u32 *cursor asm("r7") = index;
+                    *cursor = random;
+                }
+                {
+                    u32 last = table[random];
+                    x = pos->z - 0x40;
+                    last &= mask;
+                    x += last;
+                    pos->z = x;
+                }
                 SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Screamer_ApplyHitReaction);
-#endif

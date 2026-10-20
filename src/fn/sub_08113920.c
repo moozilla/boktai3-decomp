@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
-// fuzzy: 90.5%
-/* Particle-offset emission and pointer spill allocation still differ. */
+// fuzzy: 95.4%
+/* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
@@ -176,6 +177,15 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
     out->y = ((s32)(pos->z + (pos->y + h)) >> 12) + 0x60;
     out->z = pos->z >> 12;
 }
+static inline u32 TrailRandom(void)
+{
+    register u32 value asm("r0");
+    value = gUnk_086141BC[gUnk_03005304];
+    asm("" : "+r"(value));
+    value &= 7;
+    asm("" : "+r"(value));
+    return value;
+}
 // confidence=low: horizontal motion accelerates and leaves a short particle trail.
 void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 {
@@ -199,9 +209,9 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
             u32 x : 16, y : 16, z : 16, pad : 16;
         } offset;
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.x = (gUnk_086141BC[gUnk_03005304] & 7) - 3;
+        offset.x = (TrailRandom())-3;
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.y = (gUnk_086141BC[gUnk_03005304] & 7) - 3;
+        offset.y = (TrailRandom())-3;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }
     p->timer++;

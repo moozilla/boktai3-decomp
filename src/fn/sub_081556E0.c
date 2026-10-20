@@ -1,10 +1,10 @@
+// confidence=low: inferred from player cue phases and animation consumers.
 #include "global.h"
 
 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 // Remaining event mask ordering, resource selection stores and playback differ.
-// fuzzy: 87.8%
 // confidence=low: caller selects this update for player state five.
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))

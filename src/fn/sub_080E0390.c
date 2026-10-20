@@ -1,7 +1,7 @@
 #include "global.h"
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, s32);
-void sub_0807C72C(u8 *, s32, s32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(u8 *, s32, s32, u32);
 void Dog_UpdateDefeatFinish(void);
 inline static u8 TakeFlag(u8 *flag)
 {
@@ -34,7 +34,7 @@ void Dog_UpdateDefeatDelay(u8 *s, s32 arg)
         }
     }
     if (Mod(arg, 60) == 0) {
-        sub_0807C72C(s, 2, 0, s[0x98]);
+        SceneActorAttachment_ReplaceResponseSlot(s, 2, 0, s[0x98]);
     }
     off = 0xF9;
     off <<= 1;

@@ -8,7 +8,7 @@
  * point, then either resume the route (target cell reached) or walk toward the target cell
  * (tentative). */
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(void *);
 void sub_0807E334(void *);
 
@@ -463,7 +463,7 @@ void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
                     SetCtlZ(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10, zero);
             }
         }
-        sub_0807C72C(actor, 0, 0, *category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, *category);
         SceneActorBehavior_CallActionScript(actor);
         Or16(&actor->group.flags414, 4);
         Or16(flags, 0x80);

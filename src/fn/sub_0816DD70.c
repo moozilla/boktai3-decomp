@@ -13,7 +13,7 @@ void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
-void sub_0816701C(void *, s32, s32, s32, s32, s32);
+void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 void MenuDisplay_SetPaletteOverrides(void *, s32, s32, s32, s32);
 void SceneHud_FinishRandomActionReturn(struct SceneHudState *s)
 {
@@ -31,7 +31,7 @@ void SceneHud_FinishRandomActionReturn(struct SceneHudState *s)
         Hud_SaveGridSelection(input);
         sub_081672FC(s);
         MenuDisplay_UpdateActionPrompt(s, 4);
-        sub_0816701C(s, 0, 0, 0, 1, 0);
+        InventoryPanel_DrawStatComparison(s, 0, 0, 0, 1, 0);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
 }

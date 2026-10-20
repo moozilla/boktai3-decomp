@@ -30,7 +30,7 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Hresvelgr_DispatchSceneMessages(void *);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_UpdateTargetMetrics(void *);
 s32 Math_Atan2(s32, s32);
@@ -46,7 +46,7 @@ void Hresvelgr_UpdateAnimationAndTargets(struct Hresvelgr *p)
     struct Sprite *sprite = &p->sprite;
     s32 i;
     Hresvelgr_DispatchSceneMessages(actor);
-    sub_08225B74(sprite);
+    Obj_StepPosition(sprite);
     if (!TestFlags(actor, 0x800000))
         SceneActors_UpdateAnimation(actor, actor->animation, actor->animationState);
     actor->renderPosition.x = sprite->position.x;

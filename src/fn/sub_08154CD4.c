@@ -1,10 +1,10 @@
+// confidence=low: inferred from player cue phases and animation consumers.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 93.8%
-// Remaining resource-load order, effect timer constants and address registers differ.
-// fuzzy: 88.8%
+// Remaining sprite offset and effect timer address registers differ.
 
 struct P {
     u8 pad0[0x14C];
@@ -155,7 +155,11 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     }
     {
         u32 timer = p->timer;
-        if ((s32)(timer & 7) >= (s32)(7 - (timer >> 2))) {
+        register u32 seven asm("r1") = 7;
+        register u32 low asm("r2") = seven;
+        asm("" : "+r"(low));
+        low &= timer;
+        if ((s32)low >= (s32)(seven - (timer >> 2))) {
             Player_AddControlFlags(p, 0x41);
             *(struct DisplayPosition *)((u8 *)p + 0xAC) =
                 *(struct DisplayPosition *)((u8 *)p + 0x30);
@@ -163,19 +167,36 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     }
     Player_SetAnimation(p, 0x9A, 0x40, 1);
     {
-        u32 resource = 0x16F;
-        H(0xC6) = resource;
+        u16 *target = (u16 *)((u8 *)p + 0xC6);
+        u32 resource;
+        asm("" : "+r"(target));
+        resource = 0x16F;
+        *target = resource;
         asm("" : "+r"(resource));
         W(0xD4) = (u32)(gUnk_030042E4 + (resource << 5));
     }
-    Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-    Step(&p->sprite, &p->seq);
-    H(0xAD6) = 0x16F;
+    {
+        register u32 offset asm("r3") = 0x3FC;
+        struct DisplaySequenceState *seq;
+        asm("" : "+r"(offset));
+        seq = (struct DisplaySequenceState *)((u8 *)p + offset);
+        Anim_SetSequence(seq, p->resource, 0, p->facing, p->flip);
+        Step(&p->sprite, seq);
+    }
+    {
+        u16 *target = (u16 *)((u8 *)p + 0xAD6);
+        register u32 resource asm("r0");
+        asm("" : "+r"(target));
+        resource = 0x16F;
+        asm("" : "+r"(resource));
+        *target = resource;
+    }
     {
         u32 elapsed = H(0xAD8) + 3;
         register u32 mask asm("r2");
-        register u32 temp asm("r3") = 0xFFFF;
+        register u32 temp asm("r3");
         H(0xAD8) = elapsed;
+        temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
         if (H(0xAD8) > 32)
@@ -186,7 +207,14 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
             B(0x464) = 1;
             B(0x465) = 1;
             PlayerCue_EnterStandUpdate(p);
-            B(0x5A3) = 1;
+            {
+                register u32 off asm("r3") = 0x5A3;
+                register u8 *target asm("r0");
+                asm("" : "+r"(off));
+                target = (u8 *)p + off;
+                asm("" : "+r"(target), "+r"(off));
+                *target = 1;
+            }
         }
     }
 }

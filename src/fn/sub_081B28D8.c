@@ -5,9 +5,11 @@
 
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
+// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
+
 #ifdef NONMATCHING
-// fuzzy: 98.2%
-// Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
+// fuzzy: 99.9%
+// Remaining differences: two register copies are scheduled in the opposite order in state four.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -298,9 +300,9 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 Vanargand_EmitPartTrail(p);
             break;
         case 4: {
+            u32 entering;
             SetFlags(p, 8);
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
 
             if (entering) {

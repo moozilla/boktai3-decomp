@@ -1,11 +1,11 @@
 #include "global.h"
 #include "player.h"
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 u32 Player_GetSecondaryActionFlags(struct Player *, u16);
 void Collider_SetPosition(void *, void *, u32);
 void Player_SynchronizeColliderState(struct Player *p)
 {
-    sub_08225B74(&p->positionalEffectGroup);
+    Obj_StepPosition(&p->positionalEffectGroup);
     if (Player_GetSecondaryActionFlags(p, 8)) {
         p->collider.flags |= 4;
     } else {

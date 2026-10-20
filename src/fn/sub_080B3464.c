@@ -93,7 +93,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
 // confidence=low: restores route after context response flags.
 void Vorn_TickSound(void *);
 void Vorn_SendMessage(void *);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 static inline u32 Mask16(struct SceneActorRegistryResetView *p, u32 mask)
 {
@@ -165,7 +165,7 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, 
     }
     ClearRouteBits(&actor->flags2D4, 0x400);
     actor->field5DA = 255;
-    sub_0807C72C(actor, 0, 2, 0x19);
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     actor->state2A8 = 3;

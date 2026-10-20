@@ -5,6 +5,7 @@
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
 // MATCHING_CONCESSION: register-pinning
+
 #ifdef NONMATCHING
 // fuzzy: 84.8%
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.

@@ -7,7 +7,7 @@ struct PlayerContactSource {
     struct Player *owner;
 };
 
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 s32 Player_IsActionBlocked(struct Player *);
 s32 sub_08249244(void *, void *, void *, void *);
 void Sound_PlaySong(u32);
@@ -26,7 +26,7 @@ void Player_AccumulateContactCost(struct PlayerContactSource *source,
     s32 i;
     if (Test16(&contact->contactFlags, 0x10)) {
         p = source->owner;
-        sub_0821FF8C(source, contact);
+        Collision_CalculateDamageResponse(source, contact);
         if (p->actionMode == 1) {
             if (p->statModifierContext.savedActionIndex == 1 && Player_IsActionBlocked(p) &&
                 !(contact->costFlags & 8)) {

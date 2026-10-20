@@ -12,7 +12,7 @@ extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 int Mod(int, int);
 void Sound_PlaySong(int);
-void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
+void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 
 static inline int randomValue(u16 *table, int limit)
 {
@@ -69,13 +69,13 @@ void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
     {
         u8 *drawing = (u8 *)p + 0x178;
         base = (u8 *)p + 0x30;
-        sub_082213B8(drawing, base, a, 2, 51, 168, 32, 8, 0);
+        Anim_DrawDecimalDigits(drawing, base, a, 2, 51, 168, 32, 8, 0);
     }
-    sub_082213B8((u8 *)p + 0x238, base, b, 2, 51, 192, 32, 8, 0);
-    sub_082213B8((u8 *)p + 0x2F8, base, c, 2, 51, 216, 32, 8, 0);
-    sub_082213B8((u8 *)p + 0x3B8, base, d, 2, 51, 168, 56, 8, 0);
-    sub_082213B8((u8 *)p + 0x478, base, e, 2, 51, 192, 56, 8, 0);
-    sub_082213B8((u8 *)p + 0x538, base, f, 2, 51, 216, 56, 8, 0);
+    Anim_DrawDecimalDigits((u8 *)p + 0x238, base, b, 2, 51, 192, 32, 8, 0);
+    Anim_DrawDecimalDigits((u8 *)p + 0x2F8, base, c, 2, 51, 216, 32, 8, 0);
+    Anim_DrawDecimalDigits((u8 *)p + 0x3B8, base, d, 2, 51, 168, 56, 8, 0);
+    Anim_DrawDecimalDigits((u8 *)p + 0x478, base, e, 2, 51, 192, 56, 8, 0);
+    Anim_DrawDecimalDigits((u8 *)p + 0x538, base, f, 2, 51, 216, 56, 8, 0);
     if (p->timer > 99) {
         p->state = 2;
         p->entered = 1;

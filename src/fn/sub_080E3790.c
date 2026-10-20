@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_080E04D0(void);
-void sub_0807C72C(u8 *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
 void Dog_SelectTargetAction(u8 *);
 inline static u8 TakeFlag(u8 *p)
@@ -76,7 +76,7 @@ void Dog_UpdateScriptedAction(struct S *obj)
             u32 byte = obj->atE9;
             obj->at59 = byte;
         }
-        sub_0807C72C((u8 *)obj, 0, 0, obj->at98);
+        SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->at98);
         SceneActorBehavior_CallActionScript((u8 *)obj);
         h = (u16 *)(((u8 *)obj) + 0x414);
         {

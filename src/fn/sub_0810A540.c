@@ -15,7 +15,7 @@ void Script_Call(u32, void *);
 void Sound_FadeOutChannel10(u32);
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_ExchangeChoices(void);
-void sub_08109F1C(void);
+void LinkMenu_WaitForReadyPeers(void);
 static inline u8 IsMode9(u16 value)
 {
     value &= 0x3c00;
@@ -45,7 +45,7 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
         return 0;
     }
     if (IsMode4(*p->selection))
-        Registry1745_SetState(p, 4, sub_08109F1C);
+        Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
     return 0;
 }
 #else

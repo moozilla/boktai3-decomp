@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: follows the existing Lun movement callback interpretation.
+
 #ifdef NONMATCHING
 // fuzzy: 82.8%
 // Remaining differences: instruction ordering and register allocation.

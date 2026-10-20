@@ -22,7 +22,7 @@ struct PhaseObject {
     s32 motionTimer;
 };
 void Ivy_InitBobbing(struct PhaseObject *);
-void sub_080F3230(struct PhaseObject *);
+void PhaseObject_ConvergeEntries(struct PhaseObject *);
 void Sound_PlaySong(u32);
 void PhaseObject_BeginEntryMotion(struct PhaseObject *p)
 {
@@ -41,7 +41,7 @@ void PhaseObject_BeginEntryMotion(struct PhaseObject *p)
         Ivy_InitBobbing(p);
         p->delay = 15;
         p->motionTimer = 20;
-        p->callback = sub_080F3230;
+        p->callback = PhaseObject_ConvergeEntries;
         p->phase = 0x80;
         Sound_PlaySong(0x16c);
     }

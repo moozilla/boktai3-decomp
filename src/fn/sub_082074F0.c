@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.9%
-// Remaining differences: branch sharing, address lifetimes and register allocation.
-// MATCHING_CONCESSION: register-pinning
+// fuzzy: 90.6%
+// Collider and sequence-argument allocation and the defined zero return still differ.
 #include "vulcan_cannon_worker.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
 void VulcanCannon_UpdateTargeting(void);
@@ -33,10 +33,10 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 {
     return *p & mask;
 }
-static inline s32 CannonRandom(const u16 *table, s32 mask)
+static inline s32 CannonRandom(const u16 *table)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308] & mask;
+    return table[gUnk_03005308];
 }
 static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
 {
@@ -85,26 +85,46 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             CannonEffectOffset(&center);
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
-            velocity.a.hi = CannonRandom(table, 7);
+            velocity.a.hi = (CannonRandom(table) & 7);
             velocity.b.lo = -4;
             spread.a.lo = 24;
-            spread.a.hi = CannonRandom(table, 7) + 3;
+            spread.a.hi = (CannonRandom(table) & 7) + 3;
             spread.b.lo = 24;
-            sub_08014634(CannonRandom(table, 3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             CopyPosition(&smoke, &p->display.spatial.position);
             CannonEffectOffset(&smoke);
-            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 0);
+            {
+                register s32 zero asm("r3") = 0;
+                asm("" : "+r"(zero));
+                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, zero);
+            }
             smoke.x += 128;
-            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 2);
+            {
+                register s32 zero asm("r0") = 0;
+                asm("" : "+r"(zero));
+                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
+            }
             smoke.x -= 128;
             smoke.z += 128;
-            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 2);
+            {
+                register s32 zero asm("r1") = 0;
+                asm("" : "+r"(zero));
+                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
+            }
             smoke.z -= 128;
             smoke.x -= 128;
-            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 5);
+            {
+                register s32 zero asm("r2") = 0;
+                asm("" : "+r"(zero));
+                Explosion_CreateAt(&smoke, 16, zero, 0, zero, 60, zero, 5);
+            }
             smoke.x += 128;
             smoke.z -= 128;
-            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, 0, 5);
+            {
+                register s32 zero asm("r3") = 0;
+                asm("" : "+r"(zero));
+                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
+            }
             Anim_RestartSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1be);
             p->flash = 0;
