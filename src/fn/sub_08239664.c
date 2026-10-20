@@ -1,61 +1,89 @@
+#define PaletteFade_ApplySelectiveBrightness sub_08239664
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 65.1%
-// The shared 0x1F constant lands in ip and is rematerialized as in the ROM. Differences: the
-// ROM re-zero-extends the colour with lsls #16 before the >>5 and >>10 shifts (a u32 colour
-// with (u16) casts gets that but costs allocation elsewhere), and the +0xAC6 pointer stays in r1
-// until the brightening loops copy it to r8.
+
+/* tentative: copies a palette bank, optionally brightening each channel capped at 31 */
+
+struct PalFadeObj {
+    u8 pad0[0x360];
+    u16 palette[16];
+    u8 pad380[0x418 - 0x380];
+    u8 mode;
+    u8 copyAll;
+    u8 pad41A[0xAB0 - 0x41A];
+    u16 paletteBanks[10];
+    s16 bankIndex;
+    u8 brighten;
+};
+
 extern u8 *gUnk_030042E4;
 
-static inline u32 Brighten(u16 color, u8 *level)
+void PaletteFade_ApplySelectiveBrightness(struct PalFadeObj *p)
 {
-    s32 r, g, b;
-    r = (color & 0x1F) + *level;
-    if (r > 0x1F)
-        r = 0x1F;
-    g = ((color >> 5) & 0x1F) + *level;
-    if (g > 0x1F)
-        g = 0x1F;
-    b = ((color >> 10) & 0x1F) + *level;
-    if (b > 0x1F)
-        b = 0x1F;
-    return (b << 10) | (g << 5) | r;
-}
-
-void sub_08239664(u8 *p)
-{
-    u8 **base = &gUnk_030042E4;
-    u16 *src = (u16 *)(*base + ((u16 *)(p + 0xAB0))[*(s16 *)(p + 0xAC4)] * 32);
-    u8 *amount = p + 0xAC6;
-    u16 *dst;
+    u16 *src;
     s32 i;
 
-    if (*amount == 0) {
-        if (p[0x419] == 0) {
+    src = (u16 *)(gUnk_030042E4 + p->paletteBanks[p->bankIndex] * 32);
+    if (p->brighten == 0) {
+        if (p->copyAll == 0) {
+            u16 *dst;
             i = 0;
-            dst = (u16 *)(p + 0x360);
-            for (; i <= 15; src++, dst++, i++) {
-                if ((u32)(i - 5) > 1 && i != 13)
+            dst = p->palette;
+            for (; i < 16; i++) {
+                if (!((u32)(i - 5) <= 1 || i == 13))
                     *dst = *src;
+                src++;
+                dst++;
             }
         } else {
-            dst = (u16 *)(p + 0x360);
+            u16 *dst = p->palette;
             for (i = 15; i >= 0; i--)
                 *dst++ = *src++;
         }
-    } else if (p[0x419] == 0) {
-        i = 0;
-        dst = (u16 *)(p + 0x360);
-        for (; i <= 15; src++, dst++, i++) {
-            if ((u32)(i - 5) > 1 && i != 13)
-                *dst = Brighten(*src, amount);
-        }
     } else {
-        dst = (u16 *)(p + 0x360);
-        for (i = 15; i >= 0; i--)
-            *dst++ = Brighten(*src++, amount);
+        if (p->copyAll == 0) {
+            u8 *add;
+            u16 *dst;
+            i = 0;
+            add = &p->brighten;
+            dst = p->palette;
+            for (; i < 16; i++) {
+                if (!((u32)(i - 5) <= 1 || i == 13)) {
+                    u16 c = *src;
+                    s32 r, g, b;
+                    r = (c & 0x1F) + *add;
+                    if (r > 0x1F)
+                        r = 0x1F;
+                    g = (s16)(((u32)(c << 16) >> 21) & 0x1F) + *add;
+                    if (g > 0x1F)
+                        g = 0x1F;
+                    b = (s16)(((u32)(c << 16) >> 26) & 0x1F) + *add;
+                    if (b > 0x1F)
+                        b = 0x1F;
+                    *dst = (b << 10) | (g << 5) | r;
+                }
+                src++;
+                dst++;
+            }
+        } else {
+            s32 mask = 0x1F;
+            u8 *add = &p->brighten;
+            u16 *dst = p->palette;
+            for (i = 15; i >= 0; i--) {
+                u16 c = *src;
+                s32 r, g, b;
+                r = (c & 0x1F) + *add;
+                if (r > 0x1F)
+                    r = 0x1F;
+                g = (((u32)(c << 16) >> 21) & mask) + *add;
+                if (g > 0x1F)
+                    g = 0x1F;
+                b = (((u32)(c << 16) >> 26) & mask) + *add;
+                if (b > 0x1F)
+                    b = 0x1F;
+                *dst = (b << 10) | (g << 5) | r;
+                src++;
+                dst++;
+            }
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08239664);
-#endif
