@@ -1248,10 +1248,10 @@ or direct Git mutations. Commits were queued through `build/commit.sh`.
   slope/flat transitions only along the matching axis, and compares heights
   exactly or within one height unit for those transitions. However, at
   0812E188/0812E18C it reads bytes at sp+4/sp before initializing the stack
-  position at 0812E1BC and following stores. This is a real independent
+  position after the subsequent Mod/Div calls. This is a real independent
   prologue, not an interior split. Reproducing it directly would introduce
-  uninitialized C reads, so no candidate was promoted. Its actual return ends
-  at 0812E2B2 (padding through 0812E2BC); the generated assembly then retains
+  uninitialized C reads, so no candidate was promoted. Its actual return is
+  at 0812E2BA (the body ends at 0812E2BC); the generated assembly then retains
   **0x120 bytes of separate raw Thumb code** through 0812E3DC. Any future
   exact-credit claim must review that boundary and must not absorb the raw
   body into a candidate-length check.
