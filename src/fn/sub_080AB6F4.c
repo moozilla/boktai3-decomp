@@ -18,8 +18,6 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor)
     return 0;
 }
 
-#define Tentacle_FireSecondaryAttack sub_080AB6F4
-
 void Tentacle_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
 {
     if (IsUnavailable(actor))

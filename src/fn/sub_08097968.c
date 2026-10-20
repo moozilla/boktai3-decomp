@@ -138,7 +138,6 @@ struct GhostMovement {
     u32 fill[6];
     struct IvyPlacement placement;
 };
-#define Ghost_ResetMovementState sub_08097968
 
 void Ghost_ResetMovementState(struct SceneActorRegistryResetView *actor)
 {
