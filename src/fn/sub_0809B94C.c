@@ -1,5 +1,8 @@
 #include "global.h"
 
+// confidence=low: follows the existing Lun movement callback interpretation.
+#define Lun_ApproachMovementTarget sub_0809B94C
+
 #ifdef NONMATCHING
 // fuzzy: 81.1%
 // Remaining differences: instruction ordering, address lifetimes, and registers.
@@ -10,6 +13,7 @@ extern u8 *gUnk_02000580[];
 s32 Mod(s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 void sub_0809B7FC(void);
+#define Lun_UpdateWaitingAnimation sub_0809B6AC
 void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
 void SceneActorControl_ResetCollisionFlags(void *);
@@ -148,5 +152,5 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Lun_ApproachMovementTarget);
+INCLUDE_ASM("asm/nonmatching", sub_0809B94C);
 #endif

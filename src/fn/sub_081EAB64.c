@@ -1,8 +1,10 @@
 #include "global.h"
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
+// confidence=low: role inferred from state transitions and callees.
+#define Params3D0_UpdateDisplay sub_081EAB64
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fuzzy: 91.0%
 // Palette/selection address lifetimes and register allocation still differ.
 struct Display {
     u8 sprites[0x724];
@@ -325,5 +327,5 @@ void Params3D0_UpdateDisplay(struct Display *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Params3D0_UpdateDisplay);
+INCLUDE_ASM("asm/nonmatching", sub_081EAB64);
 #endif
