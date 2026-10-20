@@ -266,4 +266,3 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
     }
     return 0;
 }
-

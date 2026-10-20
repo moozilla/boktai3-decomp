@@ -43,30 +43,31 @@ void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
     else
         FIELD(u16, half, 0xAC) = zero;
     {
-    u16 *size = (u16 *)(half + 0xAE);
-    byteZero = 0;
-    zero = 0;
-    scale = 1024;
-    asm("" : : "r"(byteZero), "r"(zero), "r"(scale));
-    *size = scale;
+        u16 *size = (u16 *)(half + 0xAE);
+        byteZero = 0;
+        zero = 0;
+        scale = 1024;
+        asm("" : : "r"(byteZero), "r"(zero), "r"(scale));
+        *size = scale;
     }
     FIELD(u16, half, 0xB0) = 3;
     {
-    u16 *active = (u16 *)(half + 0x172);
-    one = 1;
-    asm("" : : "r"(one));
-    *active = one;
+        u16 *active = (u16 *)(half + 0x172);
+        one = 1;
+        asm("" : : "r"(one));
+        *active = one;
     }
     ActorStatus_InitializeCollider(half, 30, 128, 60);
     ActorStatus_InitializeBodyCollider(half);
     FIELD(u16, half, 0x188) = zero;
     half[0x16C] = byteZero;
     half[0x16D] = byteZero;
-    { u8 *track = half + 0x58;
-    FIELD(u32, track, 0) = zero;
-    half[0x81] = byteZero;
-    half[0x80] = byteZero;
-    FIELD(u32, track, 0x34) = zero;
+    {
+        u8 *track = half + 0x58;
+        FIELD(u32, track, 0) = zero;
+        half[0x81] = byteZero;
+        half[0x80] = byteZero;
+        FIELD(u32, track, 0x34) = zero;
     }
     TargetRegistry_RegisterSceneActor(half + 0x20C, half + 0x108, ActorStatus_BeginTimedState);
     shadow = half + 0x1A0;
@@ -82,9 +83,9 @@ void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
     FIELD(u32, half, 0x19C) = zero;
     FIELD(u16, half, 0xB2) = one;
     {
-    u32 offset = 0x176;
-    u16 *duration = (u16 *)(half + offset);
-    *duration = offset - 0x4A;
+        u32 offset = 0x176;
+        u16 *duration = (u16 *)(half + offset);
+        *duration = offset - 0x4A;
     }
     FIELD(u16, half, 0x174) = zero;
 }
