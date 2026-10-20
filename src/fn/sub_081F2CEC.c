@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.6%
-// foundry draft (worker best 98.6%); what differs is mostly register allocation and instruction order
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
 #define gEffectPaletteBanks           gUnk_030042E4
 struct PaletteEffect {
@@ -19,6 +16,10 @@ struct PaletteEffect {
 };
 extern u8 *gUnk_030042E4;
 s32 ActorResource_GetFixedId(struct PaletteEffect *);
+static inline void CpuSetArgs(int control, u8 *dest, void *source)
+{
+    CpuSet(source, dest, control);
+}
 void PaletteEffect_RefreshPalette(struct PaletteEffect *p)
 {
     s32 index, bank;
@@ -36,11 +37,8 @@ void PaletteEffect_RefreshPalette(struct PaletteEffect *p)
             void *dest;
             void *source = gUnk_030042E4 + (bank << 5);
             dest = p->paletteCopy;
-            CpuSet(source, p->paletteCopy, 0x04000008);
+            CpuSetArgs(0x04000008, p->paletteCopy, source);
             p->palette = dest;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PaletteEffect_RefreshPalette);
-#endif

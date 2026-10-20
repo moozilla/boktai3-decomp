@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.4%
-// foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define MenuPanel_CyclePage Storage_TickCategorySelection
 #define gMenuKeys           gUnk_03005260
 struct MenuPanel {
@@ -29,8 +27,6 @@ s32 Storage_TickCategorySelection(struct MenuPanel *panel)
             panel->page = left;
         return 1;
     }
+    asm("" ::"r"(keys));
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Storage_TickCategorySelection);
-#endif
