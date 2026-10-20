@@ -1,6 +1,10 @@
 #include "global.h"
 
+#define Player_UpdateStateMotionCue                                                                \
+    sub_081556E0 // confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 88.3%
+// Remaining event mask ordering, resource selection stores and playback differ.
 // fuzzy: 87.8%
 // confidence=low: caller selects this update for player state five.
 #define H(o) (*(u16 *)(p + (o)))
@@ -44,7 +48,7 @@ void Player_UpdateStateMotionCue(u8 *p)
             H(0xC6) = 46;
         else if (Event(p, 0x10000000))
             H(0xC6) = 0x179;
-        else if (Event(p, 0x80000000))
+        else if (p && *(s32 *)(p + 0x444) < 0)
             H(0xC6) = 0x175;
         else if (Extra(p, 1))
             H(0xC6) = 0x177;
@@ -118,5 +122,5 @@ void Player_UpdateStateMotionCue(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateStateMotionCue);
+INCLUDE_ASM("asm/nonmatching", sub_081556E0);
 #endif
