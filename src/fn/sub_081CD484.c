@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// Three initial-facing stores use r0 rather than r2 for the field address.
 #define SceneNpc_DispatchCutsceneCommands sub_081CD484
 typedef struct {
     u16 id;
@@ -83,40 +81,48 @@ static inline void setFacing(struct SceneNpc *npc, u32 a)
     npc->motion.angle = a;
     {
         s32 t = (s32)(a + 0x70) >> 5;
-        register u32 m asm("r0") = 7;
+        u32 m = 7;
         m &= t;
-        asm("" : "+r"(m));
         npc->facing8 = m;
     }
     {
         s32 t = (s32)(a + 0x60) >> 6;
-        register u32 m asm("r0") = 3;
+        u32 m = 3;
         m &= t;
-        asm("" : "+r"(m));
         npc->facing4 = m;
     }
 }
 
-static inline void setInitialFacing(struct SceneNpc *npc, u32 input)
+static inline u32 setInitialFacing(struct SceneNpc *npc, u32 input)
 {
-    register u32 angle asm("r1") = input;
+    u32 angle = input;
+    register u8 *dest asm("r2");
+    register u32 zero asm("r3");
     asm("" : "+r"(angle));
-    npc->motion.angle = angle;
+    dest = &npc->motion.angle;
+    zero = 0;
+    asm("" : : "r"(zero));
+    *dest = angle;
     {
-        register s32 t asm("r2") = (s32)(angle + 0x70) >> 5;
-        register u32 m asm("r0") = 7;
-        asm("" : "+r"(t));
+        s32 t = (s32)(angle + 0x70) >> 5;
+        u32 m = 7;
         m &= t;
-        asm("" : "+r"(m));
         npc->facing8 = m;
     }
     {
         s32 t = (s32)(angle + 0x60) >> 6;
-        register u32 m asm("r0") = 3;
+        u32 m = 3;
         m &= t;
-        asm("" : "+r"(m));
         npc->facing4 = m;
     }
+    return zero;
+}
+static inline void setInitialState(struct SceneNpc *npc, u32 state, u32 zero)
+{
+    npc->state = zero;
+    npc->entered = zero;
+    npc->sub = state;
+    npc->timer = zero;
 }
 
 static inline void aim(struct SceneNpc *npc, s16 *m)
@@ -170,17 +176,17 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->changed = 1;
                 } break;
                 case 1: {
-                    setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
                     if (npc->kind == 29) {
                         if (npc->sub20.tag == 1) {
-                            setState(npc, 93);
+                            setInitialState(npc, 93, zero);
                             npc->changed = 1;
                         } else {
-                            setState(npc, 1);
+                            setInitialState(npc, 1, zero);
                             npc->changed = 1;
                         }
                     } else {
-                        setState(npc, 1);
+                        setInitialState(npc, 1, zero);
                         npc->changed = 1;
                     }
                 } break;
@@ -434,8 +440,8 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->changed = 1;
                 } break;
                 case 93: {
-                    setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
-                    setState(npc, 83);
+                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    setInitialState(npc, 83, zero);
                     npc->changed = 1;
                 } break;
                 case 94: {
@@ -447,8 +453,8 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     npc->changed = 1;
                 } break;
                 case 96: {
-                    setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
-                    setState(npc, 86);
+                    u32 zero = setInitialFacing(npc, (u8)((((u8 *)m)[8] + 5) << 5));
+                    setInitialState(npc, 86, zero);
                     npc->changed = 1;
                 } break;
                 case 97: {
@@ -632,7 +638,3 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
             i++;
         } while (i < entry->count[gUnk_0200047C[0x24]]);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_DispatchCommands_081CD484);
-#endif
