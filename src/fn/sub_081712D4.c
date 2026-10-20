@@ -12,7 +12,7 @@ s32 Inventory_GetConsumableId(u32);
 s32 Player_GetCandidateAttribute(s32, s32);
 s32 Player_GetCurrentAttribute(s32);
 void SceneHud_DrawComparisonBars(void *, s32, s32, s16 *);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void SceneHud_OpenStatComparison(struct SceneHudState *p, s32 reset)
 {
@@ -40,6 +40,6 @@ void SceneHud_OpenStatComparison(struct SceneHudState *p, s32 reset)
         differences[i] = value - Player_GetCurrentAttribute(i);
     }
     SceneHud_DrawComparisonBars(p, 10, 6, differences);
-    sub_0816701C(p, 0, 0, 1, 0, differences[2]);
+    InventoryPanel_DrawStatComparison(p, 0, 0, 1, 0, differences[2]);
     MenuDisplay_UpdateActionPrompt(p, 3);
 }

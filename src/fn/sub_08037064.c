@@ -13,7 +13,7 @@ void Wireless_RequestResetConnection(void);
 void Video_SetRenderCallbacks(u32, void *, void *, void *);
 void Script_Call(u32, u32);
 void SpriteOam_QueueProjectedSprites(void);
-void sub_08214B44(void);
+void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void WirelessStatusMenu_UpdateExitState(struct P *p)
 {
@@ -25,7 +25,8 @@ void WirelessStatusMenu_UpdateExitState(struct P *p)
         Wireless_RequestResetConnection();
     }
     if (p->w1c == 0x14) {
-        Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
+        Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
+                                 sub_08219624);
         if (p->w2c != 0)
             Script_Call(p->w2c, 0);
     }

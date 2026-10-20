@@ -1,8 +1,6 @@
 #include "global.h"
+// confidence=low: flag 0x2000 selects this sprite staging pass.
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 90.9%
-// Remaining differences: projection temporaries, affine allocation, and register lifetimes.
 struct Vec {
     s16 x, y, z;
 };
@@ -49,22 +47,6 @@ static inline s32 divide2(s32 input)
 {
     return input >= 0 ? input >> 1 : -((-input) >> 1);
 }
-static inline void screen(struct Vec *dst, struct Drawable *src)
-{
-    register struct Vec *out asm("r5") = dst;
-    register struct Vec *in asm("r6") = &src->pos;
-    s32 depth, height, y, z;
-    s32 sx = src->pos.x, sz = in->z;
-    out->x = project(sx - sz);
-    depth = project(sx + sz);
-    height = project(in->y);
-    y = depth - height;
-    z = depth + height;
-    out->x = out->x - gUnk_03005418[0] + 120;
-    out->y = y - gUnk_03005418[1] + 80;
-    out->z = z - gUnk_03005418[2];
-}
-// confidence=low: flag 0x2000 selects this sprite staging pass.
 void SpriteOam_QueueOverlayProjectedSprites(void)
 {
     struct Vec pos;
@@ -85,13 +67,27 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         register u32 attr asm("r5");
         s32 depth;
         register s32 ox asm("r12"), oy asm("r8");
-        if (p->flags & skip)
+        u32 initialFlags = p->flags;
+        if (initialFlags & skip)
             goto next;
-        if (!(p->flags & 0x2000))
+        if (!(initialFlags & 0x2000))
             goto next;
 
-        if (!(p->flags & 16)) {
-            screen(&pos, p);
+        if (!(initialFlags & 16)) {
+            {
+                register struct Vec *out asm("r5") = &pos;
+                register struct Vec *in asm("r6") = &p->pos;
+                s32 depth, height, y, z;
+                s32 sx = p->pos.x, sz = in->z;
+                out->x = project(sx - sz);
+                depth = project(sx + sz);
+                height = project(in->y);
+                y = depth - height;
+                z = depth + height;
+                out->x = out->x - gUnk_03005418[0] + 120;
+                out->y = y - gUnk_03005418[1] + 80;
+                out->z = z - gUnk_03005418[2];
+            }
             x = pos.x;
             y = pos.y;
             z = pos.z;
@@ -100,9 +96,10 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
             y = p->pos.y;
             z = p->pos.z;
         }
-        flags = p->flags;
         {
-            u32 cull = flags & 64;
+            register u32 loaded asm("r1") = p->flags;
+            u32 cull = loaded & 64;
+            flags = loaded;
             ox = p->offsetX;
             oy = p->offsetY;
             if (!cull) {
@@ -116,7 +113,10 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         y += oy;
         depth = z;
         x &= 511;
-        attr = p->attributes | (x << 16);
+        {
+            register u32 shifted asm("r0") = x << 16;
+            attr = p->attributes | shifted;
+        }
         y &= 255;
         attr |= y;
         if (flags & 2) {
@@ -138,7 +138,12 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
                 gUnk_03004310[*count].angle = angle;
                 gUnk_03004310[*count].scaleX = sx;
                 gUnk_03004310[*count].scaleY = sy;
-                matrix = (*count)++;
+                {
+                    register s32 old asm("r0") = *count;
+                    matrix = old;
+                    ++old;
+                    *count = old;
+                }
             }
             attr |= matrix << 25;
             flags = p->flags;
@@ -169,8 +174,9 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
                 depth = -128;
             else if (depth > 127)
                 depth = 127;
+            tile = p->tile;
             priority = p->priority;
-            tile = p->tile | (priority << 10) | (p->palette << 12);
+            tile = tile | (priority << 10) | (p->palette << 12);
             n = gUnk_0300479C;
             if (n > 127)
                 goto next;
@@ -184,7 +190,3 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
         p = p->next;
     } while (p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueOverlayProjectedSprites);
-#endif

@@ -1,8 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 89.1%
-// Projection-source allocation and flipped-bounds operand scheduling still differ.
+// fuzzy: 95.3%
+// Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
     s16 x, y, z;
 };
@@ -76,11 +76,13 @@ void Sprite_RenderFlipAwareList(void)
             z = p->pos.z;
         }
         if (!(p->flags & 64)) {
-            s32 left, top;
+            s32 left;
+            register s32 top asm("r4");
             register u32 width asm("r12");
-            u32 height;
+            register u32 height asm("r1");
             if (p->flags & 4) {
-                left = x + resource->offsetX - resource->width;
+                register s32 edge asm("r0") = x + resource->offsetX;
+                left = edge - resource->width;
             } else {
                 left = x - resource->offsetX;
             }

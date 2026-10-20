@@ -1,3 +1,4 @@
+// confidence=low: existing Golem state interpretation retained.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"

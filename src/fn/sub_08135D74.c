@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (sub_08081C98) and reset hit state. */
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void sub_08081C98(void);
 static inline u8 Test(u32 value)
@@ -83,9 +83,9 @@ u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *act
                 u32 clear = ~0x9CB;
                 *flags2D6 = clear & *flags2D6;
             }
-            sub_0807C72C(actor, 0, 127, 0);
-            sub_0807C72C(actor, 1, 127, 0);
-            sub_0807C72C(actor, 3, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
             SceneActorEffects_AdvanceSteps(actor, 4);
             actor->field5C4 = blocked;
             actor->field5C0 = blocked;

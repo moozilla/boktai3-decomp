@@ -14,7 +14,7 @@ void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void sub_0816D634(void *, u32);
 void Hud_DrawDefaultHealthMeter(void *, u32, u32, u32);
@@ -86,7 +86,7 @@ void MenuTransition_AnimateMetersToTarget(u8 *p)
         Hud_SaveGridSelection(q);
         sub_081672FC(p);
         MenuDisplay_UpdateActionPrompt(p, 4);
-        sub_0816701C(p, 0, 0, 0, 1, 0);
+        InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, 0);
         MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
     }
 }

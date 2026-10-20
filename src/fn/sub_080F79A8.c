@@ -1,7 +1,9 @@
 #include "global.h"
 
+// confidence=low: axe attack behavior inferred from orbit and trail state updates.
+
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fuzzy: 90.1%
 // Branch layout, address reuse and register allocation still differ.
 // confidence=low: the axe and its auxiliary sprite orbit a shared moving center.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
@@ -35,7 +37,7 @@ struct AxeContext {
     s16 radius;
     u8 padCA2[0x2];
     u8 speed;
-    u8 direction;
+    s8 direction;
     u8 heading;
     u8 padCA7[0x2];
     u8 angle;
@@ -101,7 +103,7 @@ static inline void Difference(struct Vec *v, struct Vec *a, struct Vec *b)
 static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
 {
     out->x = a->x + b->x;
-    out->y = a->y + b->y;
+    out->y = b->y + a->y;
     out->z = a->z + b->z;
 }
 static inline s32 Scale(s32 value, s32 bits)

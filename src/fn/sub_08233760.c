@@ -1,9 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 64.3%
-// Control flow and instruction selection match (regions.py core distance 2); allocation
-// differs. rasolve's best (51 bytes) wants the velocity.y temporary at lower priority and the
-// object pointer at higher priority (it should get r6).
 #include "engine.h"
 #include "contact_actor.h"
 
@@ -40,7 +36,11 @@ static inline u32 TerrainHeight(struct ContactPosition *position)
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     flags = *data;
     shape = flags >> 4;
-    height = (flags & 15) << 8;
+    {
+        u32 mask = 15;
+        mask &= flags;
+        height = mask << 8;
+    }
     switch (shape) {
         case 1:
             height -= *(u8 *)&position->z;
@@ -52,7 +52,7 @@ static inline u32 TerrainHeight(struct ContactPosition *position)
     return height;
 }
 
-void sub_08233760(struct Unk08233760Object *object)
+void ChargedBurst_EmitTerminalDebris(struct Unk08233760Object *object)
 {
     sub_0823350C(object);
     Collider_Refresh((u8 *)object + 0x20);
@@ -62,13 +62,22 @@ void sub_08233760(struct Unk08233760Object *object)
             struct Unk08233760PackedVec velocity, extent;
             const u16 *table = gUnk_0203B400;
             u32 *seed = &gUnk_03005308;
-            u32 i = *seed + 1;
+            register u32 i asm("r2") = *seed + 1;
             u32 mask = 1023;
-            u32 low = 15;
+            register u32 low asm("r9");
             i &= mask;
-            velocity.x = (table[i] & low) - 7;
+            {
+                u32 sample = table[i];
+                low = 15;
+                asm("" : "+r"(low));
+                velocity.x = (sample & low) - 7;
+            }
             i = (i + 1) & mask;
-            velocity.y = (table[i] & 31) - 16;
+            {
+                u32 sample = table[i];
+                u32 mask31 = 31;
+                velocity.y = (sample & mask31) - 16;
+            }
             i = (i + 1) & mask;
             *seed = i;
             velocity.z = (table[i] & low) - 7;
@@ -80,6 +89,3 @@ void sub_08233760(struct Unk08233760Object *object)
         Task_Kill(object);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08233760);
-#endif

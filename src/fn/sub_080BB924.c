@@ -80,7 +80,7 @@ void ActorShadow_Enable(void *);
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 void Sound_PlaySong(u32);
 void SceneActorPalette_ClearCompletedTransitions(void);
-void sub_080B5F38(Obj *);
+void Skeleton_ResetRouteReaction(Obj *);
 void SceneActorControl_OnIdle(void);
 void Trigger_ConsumePending(void *, s32);
 static inline u8 take_flag(Obj *s)
@@ -155,7 +155,7 @@ void Actor_RestoreSnapshot(Obj *s)
     SceneActorPalette_ClearCompletedTransitions();
     s->unk2D4 |= keep;
     s->unk59 = saved;
-    sub_080B5F38(s);
+    Skeleton_ResetRouteReaction(s);
     {
         u32 mask = 0x4000;
         if (s->unk2D4 & mask) {

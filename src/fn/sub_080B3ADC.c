@@ -6,7 +6,7 @@
 // foundry draft (worker best 90.4%); what differs is mostly register allocation and instruction order
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
-void sub_080B23A0(void *, u32);
+void Vorn_BeginPursuitRoute(void *, u32);
 void Vorn_SelectRetreatRoute(void *, u32);
 void Vorn_SelectRecoveryAction(void *, const u8 *, u32);
 u8 SceneActor_IsFacingNearbyTarget(void *);
@@ -51,7 +51,7 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p, u32 
     if (first) {
         if (reset == 1)
             p->field6AC = 0;
-        sub_080B23A0(p, reset);
+        Vorn_BeginPursuitRoute(p, reset);
         return 1;
     }
     if (Test(flags, 0x10)) {

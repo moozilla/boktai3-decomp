@@ -172,7 +172,7 @@ void Player_UpdateObjectPush(struct P *p)
             } else {
                 int s, idx, d;
                 d = p->dir;
-                t = (d + ((t - d) * 2 + 8)) & 7;
+                t = (((t - d) * 2 + 8) + d) & 7;
                 t = (t + 1) & 7;
                 v = p->pos;
                 v.x -= scale(gUnk_086149C4[((t << 5) + 0x40) & 0xff] * 50);

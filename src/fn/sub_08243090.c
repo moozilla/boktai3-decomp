@@ -9,7 +9,7 @@ void sub_08220204(struct ContactCollider *, struct ContactCollider *);
 void sub_08238580(struct Player *, struct ContactCollider *, struct ContactCollider *);
 s32 LinkSession_ClearFirstPlayerKind(void *, s32);
 void LinkPlayer_FlushPendingEffects(struct Player *);
-void sub_0813D548(struct Player *, s32);
+void Player_QueueStatusEffect(struct Player *, s32);
 void sub_0813D834(struct Player *, s32, s32);
 s32 SceneParticle_CreateDefaultPriority(const struct ContactPosition *,
                                         const struct ContactPosition *,
@@ -96,13 +96,13 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
         if (!(target->costFlags & 2)) {
             if (p->contactSpecial == 0)
                 p->contactActionTag = 0x191;
-            sub_0813D548(p, 1);
+            Player_QueueStatusEffect(p, 1);
         }
     } else if (Test(8, &source->reactionFlags)) {
         if (!(target->costFlags & 2)) {
             if (p->contactSpecial == 0)
                 p->contactActionTag = 0x133;
-            sub_0813D548(p, 2);
+            Player_QueueStatusEffect(p, 2);
         }
     } else if (Test(0x40000, &source->reactionFlags))
         LinkPlayer_FlushPendingEffects(p);

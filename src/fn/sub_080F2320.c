@@ -43,7 +43,7 @@ struct ColorPulse {
 };
 void sub_080F421C(void);
 void Sword_UpdateBodyPaletteRestore(void);
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
@@ -58,7 +58,7 @@ void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseConta
             b->effect = 0;
         }
     } else {
-        sub_0821FF8C(a, b);
+        Collision_CalculateDamageResponse(a, b);
         b->value = a->value;
         if (!p->hitCallback) {
             u32 damage = b->damage;

@@ -1,9 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: menu ownership follows Params3D0_CreateDisplay.
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
-#ifdef NONMATCHING
-// fuzzy: 90.7%
-// Palette/selection address lifetimes and register allocation still differ.
 struct Display {
     u8 sprites[0x724];
     s32 selection, count;
@@ -45,23 +44,6 @@ void TimeDisplay_HideAnimatedObjects(void *);
 void Script_Call(void *, void *);
 void Task_Kill(void *);
 #define FLAGS(off) (*(u32 *)((u8 *)p + (off)))
-static inline void Interpolate(struct Display *p)
-{
-    u8 *source;
-    u8 *input;
-    u8 *output;
-    if (p->paletteStep <= (1 << p->unused760)) {
-        FLAGS(0xA8) &= ~1;
-        source = gUnk_030042E4 + 0x6240;
-        input = (u8 *)p + 0x520;
-        output = (u8 *)p + 0x700;
-        Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
-        source = gUnk_030042E4 + 0x6260;
-        Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep, p->unused760);
-        *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
-        p->paletteStep++;
-    }
-}
 void Params3D0_UpdateDisplay(struct Display *p)
 {
     s32 value;
@@ -166,7 +148,23 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     p->paletteStep = 1 << p->unused760;
                 }
             }
-            Interpolate(p);
+            {
+                register u8 *source asm("r2");
+                u8 *input;
+                u8 *output;
+                if (p->paletteStep <= (1 << p->unused760)) {
+                    FLAGS(0xA8) &= ~1;
+                    source = gUnk_030042E4 + 0x6240;
+                    input = (u8 *)p + 0x520;
+                    output = (u8 *)p + 0x700;
+                    Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
+                    source = gUnk_030042E4 + 0x6260;
+                    Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
+                                             p->unused760);
+                    *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
+                    p->paletteStep++;
+                }
+            }
             if (p->paletteStep > (1 << (p->unused760 - 1)) + 20 || p->skipped == 1)
                 p->state = 6;
             break;
@@ -180,14 +178,30 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     p->paletteStep = 1 << p->unused760;
                 }
             }
-            Interpolate(p);
+            {
+                register u8 *source asm("r2");
+                u8 *input;
+                u8 *output;
+                if (p->paletteStep <= (1 << p->unused760)) {
+                    FLAGS(0xA8) &= ~1;
+                    source = gUnk_030042E4 + 0x6240;
+                    input = (u8 *)p + 0x520;
+                    output = (u8 *)p + 0x700;
+                    Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
+                    source = gUnk_030042E4 + 0x6260;
+                    Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
+                                             p->unused760);
+                    *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
+                    p->paletteStep++;
+                }
+            }
             if (Mod(p->stateTimer, 30) == 0) {
                 if (FLAGS(0x130) & 1)
                     FLAGS(0x130) &= ~1;
                 else
                     FLAGS(0x130) |= 1;
             }
-            p->counter++;
+            p->idleTimer++;
             break;
         case 7:
             if (p->stateTimer > 124) {
@@ -248,8 +262,12 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 9:
             Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
-            *(s16 *)((u8 *)p + 0x1D0) = 144;
-            p->velocity = 0;
+            {
+                s16 *destination = (s16 *)((u8 *)p + 0x1D0);
+                s32 zero = 0;
+                *destination = 144;
+                p->velocity = zero;
+            }
             p->state = 10;
             break;
         case 10:
@@ -259,7 +277,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
             p->velocity -= 2;
             position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
             *(u16 *)((u8 *)p + 0x1D0) = position;
-            *(s16 *)((u8 *)p + 0x148) = (s16)position - 144;
+            {
+                s32 y = (s16)position - 144;
+                *(s16 *)((u8 *)p + 0x148) = y;
+            }
             if ((s16)position <= 0) {
                 Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
                 *(s16 *)((u8 *)p + 0x148) = 0;
@@ -270,8 +291,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 11:
             Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
-            *(u16 *)((u8 *)p + 0x1D0) = 0xFF70;
-            p->velocity = 0;
+            {
+                u16 *destination = (u16 *)((u8 *)p + 0x1D0);
+                s32 zero = 0;
+                {
+                    s32 initialY = 0xFF70;
+                    *destination = initialY;
+                }
+                p->velocity = zero;
+            }
             p->state = 12;
             break;
         case 12:
@@ -281,7 +309,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
             p->velocity += 2;
             position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
             *(u16 *)((u8 *)p + 0x1D0) = position;
-            *(s16 *)((u8 *)p + 0x148) = (s16)position + 144;
+            {
+                s32 y = (s16)position + 144;
+                *(s16 *)((u8 *)p + 0x148) = y;
+            }
             if ((s16)position >= 0) {
                 Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
                 *(s16 *)((u8 *)p + 0x148) = 0;
@@ -298,7 +329,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 else
                     FLAGS(0x130) |= 1;
             }
-            if (p->timer > (1 << p->fadeShift) || p->fadeShift == 0) {
+            if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
                 TimeDisplay_HideAnimatedObjects(p);
                 if (p->result == 0)
                     Script_Call(gUnk_020003D0.c, 0);
@@ -324,6 +355,3 @@ void Params3D0_UpdateDisplay(struct Display *p)
     p->stateTimer++;
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Params3D0_UpdateDisplay);
-#endif

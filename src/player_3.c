@@ -1,4 +1,5 @@
 #include "player_3.h"
+// MATCHING_CONCESSION: register-pinning
 
 /* Tentative role: select an effect flag from actor and global state. */
 
@@ -45,7 +46,110 @@ void Player_LoadVisualParameters(struct Player *p)
 
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
 
-INCLUDE_ASM("asm/nonmatching", sub_0813CB8C);
+void PaletteFade_ApplyBrightenedPalette(struct Player *);
+void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
+s32 WirelessGame_GetSelectedEquipmentEffect(s32);
+s32 Player_GetUsableEnchantment(struct Player *);
+#ifdef NONMATCHING
+// fuzzy: 87.9%
+// Owner/mode register allocation and shared tail stores differ.
+// confidence=low: applies timed palette overlays and the current enchantment pulse.
+void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
+{
+    register u32 mode asm("r4") = requestedMode;
+    s32 intensity;
+    s32 effect;
+    s32 weight;
+    const u16 *source;
+    s32 i;
+    u16 *base;
+    u16 *destination;
+    if (p->actionVariant != p->baseActionVariant) {
+        p->baseActionVariant = p->actionVariant;
+        Player_LoadVisualParameters(p);
+    }
+    intensity = Player_GetVisualEffectFlags(p);
+    if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
+        p->savedSpriteResource = mode;
+        p->unkAC6[0] = intensity;
+        PaletteFade_ApplyBrightenedPalette(p);
+    }
+    if (!p->actionEighteenDuration) {
+        if (gUnk_030053F4 & 0x1000)
+            effect = WirelessGame_GetSelectedEquipmentEffect((s8)p->thresholdMode) - 1;
+        else
+            effect = Player_GetUsableEnchantment(p);
+        if (effect >= 0) {
+            p->actionRequestHold = effect + 0x16E;
+            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            if (p->actionRequestTimer <= 31)
+                weight = p->actionRequestTimer;
+            else if (p->actionRequestTimer <= 47)
+                weight = 32;
+            else if (p->actionRequestTimer <= 79)
+                weight = 80 - p->actionRequestTimer;
+            else
+                weight = 0;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+            if (++p->actionRequestTimer > 95)
+                p->actionRequestTimer = 0;
+        } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
+            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            if ((u16)(p->actionRequestTimer - 33) <= 14)
+                p->actionRequestTimer = 48;
+            if (p->actionRequestTimer <= 32) {
+                weight = p->actionRequestTimer;
+                p->actionRequestTimer = weight - 1;
+            } else {
+                weight = 80 - p->actionRequestTimer;
+                if (++p->actionRequestTimer > 79)
+                    p->actionRequestTimer = 0;
+            }
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        } else {
+            p->actionRequestHold = 0;
+            p->actionRequestTimer = 0;
+            if (!p->unk419)
+                p->actionVariantResource = (u32)p->visualParameters;
+            else
+                p->visualObject->parameters = (u32)p->visualParameters;
+        }
+    } else {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            if (!p->unk419) {
+                destination = (u16 *)((u8 *)p + 0x380);
+                base = (u16 *)p->visualParameters;
+                for (i = 0; i < 16; i++) {
+                    if ((u32)(i - 5) <= 1 || i == 13)
+                        *destination = *base;
+                    else
+                        *destination = *source;
+                    source++;
+                    destination++;
+                    base++;
+                }
+                p->actionVariantResource = (u32)((u8 *)p + 0x380);
+            } else {
+                destination = (u16 *)((u8 *)p + 0x380);
+                for (i = 15; i >= 0; i--) {
+                    *destination++ = *source++;
+                }
+                p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+            }
+        } else {
+            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        }
+        p->actionEighteenDuration--;
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", Player_UpdateVisualPalette);
+#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
 
@@ -58,23 +162,92 @@ void Player_SelectSpriteResource(struct Player *p)
     }
 }
 
-void sub_0813D178(void *);
+void Player_InitVisualResources(void *);
 
-void sub_0813CB8C(void *, u32);
+void Player_UpdateVisualPalette(struct Player *, u32);
 
-INCLUDE_ASM("asm/nonmatching", sub_0813D178);
+static inline u32 ReadVisualFlag(u32 *flags, u32 mask)
+{
+    u32 m = mask;
+    return *flags & m;
+}
+static inline u32 VisualBonusFlag(struct Player *p, u32 mask)
+{
+    if (!p)
+        return 0;
+    return ReadVisualFlag(&p->statBonusFlags, mask);
+}
+static inline u32 VisualActionFlag(struct Player *p, u32 mask)
+{
+    if (!p)
+        return 0;
+    return ReadVisualFlag(&p->actionFlags, mask);
+}
+// confidence=low: initializes visual resource selectors from mode and bonus flags.
+void Player_InitVisualResources(void *actor)
+{
+    struct Player *p = actor;
+    s32 single;
+    s32 count;
+    switch (p->actionMode) {
+        case 0:
+            single = 1;
+            count = 0;
+            if (VisualBonusFlag(p, 0x40000000))
+                count = 1;
+            if (VisualActionFlag(p, 1))
+                count++;
+            if (VisualBonusFlag(p, 0x20000000))
+                count++;
+            if ((p && (s32)p->statBonusFlags < 0))
+                count++;
+            if (count > 1)
+                single = 0;
+            if (VisualBonusFlag(p, 0x10000000))
+                p->menuStatusValues[0] = 0x179;
+            else if (VisualBonusFlag(p, 0x40000000) && single == 1)
+                p->menuStatusValues[0] = 0x178;
+            else if (VisualActionFlag(p, 1) && single == 1)
+                p->menuStatusValues[0] = 0x177;
+            else if (VisualBonusFlag(p, 0x20000000) && single == 1)
+                p->menuStatusValues[0] = 0x176;
+            else if ((p && (s32)p->statBonusFlags < 0) && single == 1)
+                p->menuStatusValues[0] = 0x175;
+            else
+                p->menuStatusValues[0] = 0x2A;
+            break;
+        case 1:
+            p->menuStatusValues[0] = 0x33;
+            break;
+        case 2:
+            p->menuStatusValues[0] = 0x39;
+            break;
+        case 6:
+            p->menuStatusValues[0] = 0x34;
+            break;
+        default:
+            return;
+    }
+    p->menuStatusValues[1] = 0x16E;
+    p->menuStatusValues[2] = 0x2D;
+    p->menuStatusValues[3] = 0x170;
+    p->menuStatusValues[4] = 0x171;
+    p->menuStatusValues[5] = 0x2C;
+    p->menuStatusValues[6] = 0x2E;
+    *(u16 *)((u8 *)p + 0xABE) = 0x2B;
+}
 
 void Player_InitVisualState(struct Player *p)
 {
     Player_SelectSpriteResource(p);
-    sub_0813D178(p);
+    Player_InitVisualResources(p);
     p->savedSpriteResource = 0xFFFF;
     p->baseActionVariant = 0xFF;
     p->spriteResource = p->baseSpriteResource;
     p->actionVariantResource = (u32)p->visualParameters;
     p->visualObject->resource = p->baseSpriteResource;
     p->visualObject->parameters = (u32)p->visualParameters;
-    sub_0813CB8C(p, 0);
+    Player_UpdateVisualPalette(p, 0);
 }
 
 void SceneActor_StartRandomizedEffect(struct Player *);
@@ -114,7 +287,59 @@ void Player_FlushQueuedEffects(struct Player *p)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813D548);
+s32 EffectGroup_Spawn(void *, s32, s32, struct SceneVec *);
+
+static inline int EffectRandomWith(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+
+// confidence=low: queues a randomized status particle and its sound cue.
+void Player_QueueStatusEffect(struct Player *p, s32 a)
+{
+    struct SceneVec v;
+    if (p->movementModifierActive) {
+        if (p->movementModifierKind != a) {
+            if (p->movementModifierKind == 3)
+                return;
+            Player_FlushQueuedEffects(p);
+        }
+    }
+    if (!p->movementModifierActive) {
+        p->savedEffectTick = p->facingChangeEffects;
+        *(u16 *)((u8 *)p + 0x4C6) = 0;
+    }
+
+    if (p->actionMode == 3) {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 7) - 3;
+        v.y = (EffectRandomWith(t) & 7) - 5;
+        v.z = 0;
+    } else if (p->actionMode == 4) {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 7) - 3;
+        v.y = (EffectRandomWith(t) & 7) - 3;
+        v.z = 0;
+    } else {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 15) - 7;
+        v.y = -(EffectRandomWith(t) & 31);
+        v.z = 0;
+    }
+    if (EffectGroup_Spawn(&p->effectGroup, a, 0xE10, &v) >= 0) {
+        if (p->movementModifierKind == 1)
+            Sound_PlaySong(0x191);
+        else if (p->movementModifierKind == 2) {
+            p->particleEmissionCount += 10;
+            Sound_PlaySong(0x133);
+        } else if (p->movementModifierKind == 3)
+            Sound_PlaySong(0x133);
+    }
+    p->scriptStatus[0] = 0;
+}
 
 s32 Player_GetEffectTickDelta(struct Player *p)
 {
@@ -179,7 +404,77 @@ void Player_ClearStateTimer(struct Player *p, s32 idx)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813D924);
+void PaletteLevels_Configure(s32, s32, s32, void *, void *, void *);
+void Player_NotifyActionCategories(struct Player *);
+// confidence=low: chooses visual modes while consuming timed status effects.
+s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
+{
+    s32 *resource;
+    s32 i;
+    if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000))
+        *(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) = 0;
+    {
+        u32 slot = p->timedEventSlot;
+        void *state = gUnk_02000710;
+        resource = (s32 *)(slot * 4 + (u32)state + 0x628);
+    }
+    if (*resource > 0) {
+        if (p->kind & 1) {
+            if (*resource <= gUnk_02000710->unk876)
+                *resource = 0;
+            else
+                *resource -= gUnk_02000710->unk876;
+        }
+        mode = 6;
+        *(u16 *)((u8 *)p + 0xAD0) = 64;
+    } else {
+        u16 *timer = (u16 *)((u8 *)p + 0xAD0);
+        if (*timer) {
+            if ((*timer >> 2) & 1)
+                mode = 6;
+            --*timer;
+        }
+    }
+    for (i = 0; i <= 1; i++) {
+        switch (i) {
+            case 0:
+                if ((u8)(p->actionMode - 1) <= 1) {
+                    p->scriptStatus[0] = 0;
+                    *(u16 *)((u8 *)p + 0xACE) = 0;
+                } else if (p->scriptStatus[0]) {
+                    if (p->kind & 1) {
+                        p->scriptStatus[0]--;
+                        if ((*p->inputKeys & 0xF0) || *((u8 *)p + 0x457) == 2)
+                            PaletteLevels_Configure(2, 1, 30, (u8 *)p + 0xAF4, (u8 *)p + 0xAF8,
+                                                    (u8 *)p + 0xAFC);
+                    }
+                    mode = 2;
+                    *(u16 *)((u8 *)p + 0xACE) = 64;
+                } else {
+                    u16 *timer = (u16 *)((u8 *)p + 0xACE);
+                    if (*timer) {
+                        if ((*timer >> 2) & 1)
+                            mode = 2;
+                        --*timer;
+                    }
+                }
+                break;
+            case 1:
+                if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000)) {
+                    if (p->scriptStatus[i]) {
+                        Player_NotifyActionCategories(p);
+                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                    }
+                    p->scriptStatus[i] = 0;
+                } else if (p->scriptStatus[i] && (p->kind & 1)) {
+                    if (--p->scriptStatus[i] == 0)
+                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                }
+                break;
+        }
+    }
+    return mode;
+}
 
 #ifdef NONMATCHING
 // fuzzy: 82.1%
@@ -199,7 +494,79 @@ flash:
 INCLUDE_ASM("asm/nonmatching", Player_SelectFlashingVisualMode);
 #endif
 
-INCLUDE_ASM("asm/nonmatching", sub_0813DB98);
+static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
+{
+    u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+    if (*timer) {
+        u8 *sound = (u8 *)p + 0x4E1;
+        if (*sound) {
+            Sound_PlaySong(0x336);
+            *sound = zero;
+        }
+        if (--*timer == 0) {
+            p->animation.flags &= ~2;
+            p->movementSpeedScale = 64;
+            p->secondarySpeedScale = 64;
+        } else {
+            p->animation.flags |= 2;
+            {
+                s32 speed = 64 - (*timer >> 1);
+                p->movementSpeedScale = speed;
+                p->secondarySpeedScale = speed;
+            }
+        }
+    }
+}
+#ifdef NONMATCHING
+// fuzzy: 82.2%
+// Inlined slowdown allocation, flag mask ordering and pointer reuse differ.
+// confidence=low: applies visual status flags and ramps the paired speed scales.
+void Player_UpdateStatusVisuals(void *actor)
+{
+    struct Player *p = actor;
+    u32 remaining = *(u16 *)((u8 *)p + 0x538);
+    if (remaining) {
+        if (*(u16 *)((u8 *)p + 0x534) == 5) {
+            u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+            if (*timer < 64) {
+                if (*timer == 0) {
+                    Sound_PlaySong(0x1EE);
+                    *((u8 *)p + 0x4E1) = 1;
+                }
+                ++*timer;
+            }
+            p->animation.flags |= 2;
+            {
+                s32 speed = 64 - (*timer >> 1);
+                p->movementSpeedScale = speed;
+                p->secondarySpeedScale = speed;
+            }
+            p->statusFlags |= 0x50000;
+        } else {
+            DecayVisualSlowdown(p, 0);
+        }
+        if (*(u16 *)((u8 *)p + 0x534) == 6 || VisualActionFlag(p, 8)) {
+            p->animation.flags |= 0x200;
+            p->statusFlags |= 0x20000;
+        } else {
+            p->animation.flags &= ~0x200;
+        }
+        if (p->kind & 1)
+            --*(u16 *)((u8 *)p + 0x538);
+    } else {
+        DecayVisualSlowdown(p, remaining);
+        if (VisualActionFlag(p, 8)) {
+            p->animation.flags |= 0x200;
+            p->statusFlags |= 0x20000;
+        } else {
+            p->animation.flags &= ~0x200;
+        }
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", Player_UpdateStatusVisuals);
+#endif
 
 void Player_AdvanceEffectTick(struct Player *p)
 {
@@ -212,11 +579,11 @@ void Player_AdvanceEffectTick(struct Player *p)
 
 #define SceneActor_AdvanceEffectTick Player_AdvanceEffectTick
 
-void sub_0813DB98(void *);
+void Player_UpdateStatusVisuals(void *);
 
 void Player_AdvanceEffectTick(struct Player *);
 
-s32 sub_0813D924(void *, s32);
+s32 Player_SelectTimedVisualMode(struct Player *, s32);
 
 s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
@@ -237,15 +604,15 @@ void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int
 void SceneActor_UpdateVisualEffects(struct Player *p)
 {
     s32 mode;
-    sub_0813DB98(p);
+    Player_UpdateStatusVisuals(p);
     Player_AdvanceEffectTick(p);
-    mode = sub_0813D924(p, 0);
+    mode = Player_SelectTimedVisualMode(p, 0);
     mode = SceneActor_SelectEffectDisplayMode(p, mode);
     mode = Player_SelectFlashingVisualMode(p, mode);
     if (p->kind == 2 && p->tetherMode != 10 && p->tetherMode != 11)
         sub_0813CE20(p, mode);
     else
-        sub_0813CB8C(p, mode);
+        Player_UpdateVisualPalette(p, mode);
     sub_0813B950(p);
     Player_UpdateOrbitingEffect(p);
     sub_0813BAD8(p);
@@ -313,7 +680,7 @@ s32 Player_GetStateModifierBonus(struct Player *p)
         if (p->scriptStatus[i])
             return 10;
     }
-    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628))
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628))
         return 10;
     if (p->movementModifierActive)
         return 10;
@@ -628,9 +995,202 @@ void Player_ApplyPeriodicStatChanges(struct Player *p)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", Player_BuildActionModifiers);
+static inline void ClearFlag(struct Player *p, u32 index)
+{
+    if (!p)
+        return;
+    if (index > 63)
+        p->actionStateFlags &= ~(1 << (index - 64));
+    else if (index > 31)
+        p->actionFlags &= ~(1 << (index - 32));
+    else
+        p->statBonusFlags &= ~(1 << index);
+}
 
-INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
+static inline void SetBonusFlag(struct Player *p, u32 mask)
+{
+    if (p) {
+        u32 *flags = &p->statBonusFlags;
+        u32 m = mask;
+        *flags |= m;
+    }
+}
+struct ActionModifierDescriptor {
+    u8 unknown[12];
+    struct {
+        u8 kind, unknown[3];
+    } modifiers[2];
+};
+void Player_SubtractResistance(struct Player *, s32, s32);
+
+void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierContext *context,
+                                 const void *descriptor)
+{
+    s32 i;
+    u32 zero = 0;
+    void **flags = p->flagCallbacks;
+    void **callbacks = context->statModifierCallbacks;
+    for (i = 2; i >= 0; i--) {
+        *callbacks = (void *)zero;
+        if (p) {
+            *flags = (void *)zero;
+            flags[3] = (void *)zero;
+        }
+        flags++;
+        callbacks++;
+    }
+    if (p) {
+        s32 bit;
+        for (bit = 0; bit <= 6; bit++)
+            ClearFlag(p, bit);
+    }
+    context->savedActionIndex = 0;
+    for (i = 0; i <= 1; i++) {
+        switch (((const struct ActionModifierDescriptor *)descriptor)->modifiers[i].kind) {
+            case 1:
+                *((u8 *)context + 0xD1) = 0;
+                context->savedActionIndex = 17;
+                break;
+            case 2:
+                if (p)
+                    context->statModifierCallbacks[i] = Player_ModifyValueByMissingLife;
+                break;
+            case 3:
+                if (p)
+                    context->statModifierCallbacks[i] = Player_ModifyValueByRemainingLife;
+                break;
+            case 4:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplySol;
+                break;
+            case 5:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyFlame;
+                break;
+            case 6:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyFrost;
+                break;
+            case 7:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyCloud;
+                break;
+            case 8:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitApplyEarth;
+                break;
+            case 9:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000Low;
+                context->savedActionIndex = 12;
+                break;
+            case 10:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect40000High;
+                context->savedActionIndex = 12;
+                break;
+            case 11:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000Low;
+                context->savedActionIndex = 11;
+                break;
+            case 12:
+                if (p)
+                    p->flagCallbacks[i] = Player_OnWeaponHitRollEffect80000High;
+                context->savedActionIndex = 11;
+                break;
+            case 13:
+                SetBonusFlag(p, 4);
+                context->savedActionIndex = 13;
+                break;
+            case 14:
+                SetBonusFlag(p, 8);
+                context->savedActionIndex = 15;
+                break;
+            case 15:
+                SetBonusFlag(p, 16);
+                context->savedActionIndex = 14;
+                break;
+            case 16:
+                SetBonusFlag(p, 32);
+                break;
+            case 17:
+                context->statModifierCallbacks[i] = Player_ModifyValueByEquipmentLevel;
+                break;
+            case 18:
+                Player_SubtractResistance(p, 1, 1);
+                break;
+            case 19:
+                Player_SubtractResistance(p, 2, 1);
+                break;
+            case 20:
+                Player_SubtractResistance(p, 3, 1);
+                break;
+            case 21:
+                Player_SubtractResistance(p, 4, 1);
+                break;
+            case 22:
+                Player_SubtractResistance(p, 5, 1);
+                break;
+        }
+    }
+}
+
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
+void Player_AccumulateContactCost(void);
+// confidence=low: configures the action collider for the active descriptor or alternate mode.
+void Player_ConfigureActionCollider(struct Player *p)
+{
+    struct SceneVec size, offset;
+    s32 category;
+    void *collider = (u8 *)p + 0xB8C;
+    if (p->actionMode != 6) {
+        switch (p->statModifierContext.statBOverrideEnabled) {
+            case 0:
+                size.x = 90;
+                size.y = 50;
+                size.z = 90;
+                offset.x = 0;
+                offset.y = -25;
+                offset.z = 0;
+                category = 1;
+                p->statModifierContext.actionTimer = 32;
+                p->statModifierContext.contactParameter = 10;
+                break;
+            case 4:
+                size.x = 60;
+                size.y = 50;
+                size.z = 60;
+                offset.x = 0;
+                offset.y = -25;
+                offset.z = 0;
+                category = 16;
+                p->statModifierContext.actionTimer = 32;
+                p->statModifierContext.contactParameter = 20;
+                *((u8 *)p + 0x33E) = 0;
+                break;
+            default:
+                return;
+        }
+        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+                      &offset);
+        Collider_SetAttackProperties(collider, p->statModifierContext.actionPhase,
+                                     p->statModifierContext.actionTimer, category, 0,
+                                     p->statModifierContext.contactParameter);
+        Collider_SetCallback(collider, Player_AccumulateContactCost, p);
+    } else {
+        size.x = 170;
+        size.y = 50;
+        size.z = 170;
+        offset.x = 0;
+        offset.y = -20;
+        offset.z = 0;
+        Collider_Init(collider, 0, 0x2101, 0, (0x10000U << p->movementRequestBlocked) >> 16, &size,
+                      &offset);
+        Collider_SetAttackProperties(collider, 20, 50, 16, 2, 20);
+        Collider_SetCallback(collider, 0, p);
+    }
+}
 
 void Player_SetWeaponInstance(struct Player *p, u32 v)
 {
@@ -651,7 +1211,7 @@ void ActionRecord_CopyFromEntry(void *, void *);
 
 void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
 
-void sub_0813E90C(struct Player *);
+void Player_ConfigureActionCollider(struct Player *);
 
 void Player_UpdateAttachedAttackCharge(void);
 
@@ -685,7 +1245,7 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
     else
         p->actionCallback = sub_0814D9C4;
     p->actionResetCounter = 0;
-    sub_0813E90C(p);
+    Player_ConfigureActionCollider(p);
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);
     if (p->statModifierContext.actionKind != 0x30)
@@ -704,18 +1264,6 @@ void sub_0814EEE0(void);
 void sub_0814E990(void);
 
 void Player_UpdateSelectedAttackCharge(void);
-
-static inline void ClearFlag(struct Player *p, u32 index)
-{
-    if (!p)
-        return;
-    if (index > 63)
-        p->actionStateFlags &= ~(1 << (index - 64));
-    else if (index > 31)
-        p->actionFlags &= ~(1 << (index - 32));
-    else
-        p->statBonusFlags &= ~(1 << index);
-}
 
 void Player_BeginIndexedAction(struct Player *p, s32 action)
 {
@@ -742,7 +1290,7 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
         p->actionCallback = sub_0814E990;
     else
         p->actionCallback = Player_UpdateSelectedAttackCharge;
-    sub_0813E90C(p);
+    Player_ConfigureActionCollider(p);
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);
 }
@@ -906,7 +1454,7 @@ s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
 
 s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
 {
-    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628) <= 0 &&
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) <= 0 &&
         gUnk_02000710->unk876 >= v)
         return 1;
     return 0;
@@ -932,7 +1480,8 @@ static inline void SetModeFlag(struct Player *p)
     if (p) {
         u32 *flags = &p->actionStateFlags;
         u32 mask = 16;
-        *flags |= mask;
+        u32 m = mask;
+        *flags |= m;
     }
 }
 

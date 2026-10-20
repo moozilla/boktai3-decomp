@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+// confidence=low: provisional action interpretation from retained C and assembly.
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // Remaining differences: instruction selection and register allocation.

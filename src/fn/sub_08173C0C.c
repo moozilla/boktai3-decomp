@@ -10,7 +10,7 @@ void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);
 void Hud_SaveGridSelection(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 s32 Inventory_GetEquipmentId(u32);
 u32 Inventory_IsEquipmentAssigned(s32);
 s32 sub_0822DD80(u32);
@@ -31,7 +31,7 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *p)
         SceneHud_ShowEquipmentDetails(p);
         Hud_SaveGridSelection(q);
         MenuDisplay_UpdateActionPrompt(p, 2);
-        sub_0816701C(p, 0, 1, 0, 0, 0);
+        InventoryPanel_DrawStatComparison(p, 0, 1, 0, 0, 0);
     } else if (gUnk_03005260[1] & 1) {
         slot = p->actionCursor;
         if (Inventory_GetEquipmentId(slot) == 0xff)

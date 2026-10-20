@@ -2,7 +2,7 @@
 void Storage_InitEntries(u8 *);
 void Storage_InitBackground(u8 *);
 void Storage_LoadDisplayResources(u8 *);
-void sub_081BF67C(u8 *);
+void Storage_InitWidgets(u8 *);
 void Storage_InitTextOptions(u8 *);
 void SceneInventory_InitWidgetPalette(u8 *, u8 *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
@@ -17,7 +17,7 @@ u32 Storage_Init(u8 *p)
     Storage_InitEntries(p);
     Storage_InitBackground(p);
     Storage_LoadDisplayResources(p);
-    sub_081BF67C(p);
+    Storage_InitWidgets(p);
     Storage_InitTextOptions(p);
     SceneInventory_InitWidgetPalette(p, p + 0x17C8);
     ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, 0);

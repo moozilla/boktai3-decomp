@@ -1,8 +1,11 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+
+// confidence=low: holding input charges recoil and release advances the tether attack.
 
 #ifdef NONMATCHING
 // fuzzy: 96.0%
-// foundry draft (worker best 96.0%); what differs is mostly register allocation and instruction order
+// Remaining differences: charge-duration store and particle bitfield setup instruction order.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -29,7 +32,7 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void sub_0823F148(u8 *p)
+void Player_UpdateChargedTetherStrike(u8 *p)
 {
     struct BurstA ba;
     struct BurstB bb;
@@ -79,7 +82,10 @@ void sub_0823F148(u8 *p)
                 break;
             *(u8 *)(p + 0xC0F) = 1;
             *(u16 *)(p + 0x4D2) = 0x1E;
-            *(u16 *)(p + 0xAD6) = 0x16E;
+            {
+                register u32 duration asm("r0") = 0x16E;
+                *(u16 *)(p + 0xAD6) = duration;
+            }
             *(u16 *)(p + 0xAD8) = 0x24;
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
             Player_SetTetherMode(p, 3, 4);
@@ -128,15 +134,19 @@ void sub_0823F148(u8 *p)
             sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
-            if (*(u8 *)(p + 0xBF6)) {
-                *(u8 *)(p + 0xBF6) = 0;
-                *(u8 *)(p + 0x458) = 1;
-                break;
-            }
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 0xE) {
-                *(u8 *)(p + 0xBF6) = 0;
-                Player_SetTetherMode(p, 3, 7);
+            {
+                register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+                if (released) {
+                    *(u8 *)(p + 0xBF6) = 0;
+                    *(u8 *)(p + 0x458) = 1;
+                    break;
+                }
+                (*(u16 *)(p + 0x45A))++;
+                if (*(u16 *)(p + 0x45A) > 0xE) {
+                    register u32 zero asm("r0") = 0;
+                    *(u8 *)(p + 0xBF6) = zero;
+                    Player_SetTetherMode(p, 3, 7);
+                }
             }
             break;
         case 7:
@@ -157,5 +167,5 @@ void sub_0823F148(u8 *p)
     *(u8 *)(p + 0xAC9) = 8;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823F148);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateChargedTetherStrike);
 #endif

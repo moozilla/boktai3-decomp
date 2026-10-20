@@ -15,7 +15,7 @@ struct RecoilCollisionActor {
     u8 unknown634[0x8f8 - 0x634];
     s8 group;
 };
-void sub_081162D8();
+void ActorRecoil_ReceiveBodyContact();
 void ActorRecoil_ApplyDirectionalImpulse();
 void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(),
                             void *);
@@ -38,8 +38,8 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     offset.x = 0;
     offset.y = -size.y;
     offset.z = 2;
-    SpatialIndex_InitEntry(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12, sub_081162D8,
-                           owner);
+    SpatialIndex_InitEntry(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12,
+                           ActorRecoil_ReceiveBodyContact, owner);
     ((s16 *)&pos)[0] = p->width;
     ((s16 *)&pos)[1] = p->height - 96;
     ((s16 *)&pos)[2] = p->height - 96;

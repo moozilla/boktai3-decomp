@@ -6,7 +6,7 @@ struct RotatingDrawable {
     u8 unknown4[2];
     u8 angle;
 };
-void sub_080FBA38(struct SceneActorAnimationView *);
+void Axe_EmitMotionTrail(struct SceneActorAnimationView *);
 void Sound_PlaySong(u32);
 
 static inline s32 NormalizeAngle(s32 angle)
@@ -31,7 +31,7 @@ void SceneActorControl_SettleRotation(struct SceneActorAnimationView *actor, s32
         state[0xEAF] = 30;
     }
     angle = NormalizeAngle(drawable->angle);
-    sub_080FBA38(actor);
+    Axe_EmitMotionTrail(actor);
     previous = drawable->angle;
     drawable->angle = previous - state[0xA36];
     if ((s32)previous < ((struct RotatingDrawable *)actor->drawable)->angle)

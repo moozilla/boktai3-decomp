@@ -1,4 +1,5 @@
 #include "global.h"
+// confidence=low: hidden recovery disables the shadow and waits to enter revival.
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // Entry take-flag allocation and zero-value lifetime still differ.

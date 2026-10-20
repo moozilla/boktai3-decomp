@@ -29,7 +29,7 @@ extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
 struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
-void sub_0818FC00(void *);
+void Nidhoggr_UpdateDetachedAttackEffect(void *);
 void Nidhoggr_DestroyCollidableEffect(void *);
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -59,7 +59,7 @@ void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector 
         return;
     SceneEffect_ResetState(effect);
     {
-        void (*update)(void *) = sub_0818FC00;
+        void (*update)(void *) = Nidhoggr_UpdateDetachedAttackEffect;
         void (*destroy)(void *) = Nidhoggr_DestroyCollidableEffect;
         effect->update = update;
         effect->destroy = destroy;

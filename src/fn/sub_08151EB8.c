@@ -1,3 +1,4 @@
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING

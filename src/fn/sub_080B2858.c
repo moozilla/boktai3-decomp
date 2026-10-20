@@ -3,9 +3,11 @@
 #include "scene_actor_terrain.h"
 // confidence=low: inherited route/reaction interpretation from static callers.
 
+// confidence=low: route role inferred from callers and terrain/path tests.
+
 #ifdef NONMATCHING
-// fuzzy: 85.1%
-// Inline actor/group lifetimes, duplicated success-tail layout, and register allocation still differ.
+// fuzzy: 90.7%
+// Inline actor/group lifetimes, random-mask ordering, and register allocation still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -95,14 +97,19 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
+
 u8 Vorn_SelectReachableEscapeCell(void *, u32);
 u32 SceneActor_DispatchContextAction(void *, u32);
 static inline u32 RandomBits(u32 mask)
 {
     u32 value;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    value = gUnk_0203B400[gUnk_03005308];
+    value = *(const u16 *)((gUnk_03005308 * 2) + (u32)gUnk_0203B400);
     return value & mask;
+}
+static inline u32 PlayerFlags(u8 *player, u32 mask)
+{
+    return *(u32 *)(player + 0x20) & mask;
 }
 static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 {
@@ -115,11 +122,12 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
     struct RouteLink *point = (struct RouteLink *)(group + 0x74);
     u32 cell;
     struct ContactPosition target;
+    struct ContactPosition **slot = (void *)((u8 *)actor + 0xdc);
     dest->x = point->point[0];
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
-    cell = CellIndex((struct ContactPosition *)((u8 *)actor->fieldDC + 12));
-    if (cell == actor->terrainCell || (*(u32 *)(gUnk_02000580[0] + 0x20) & 0x20000)) {
+    cell = CellIndex((struct ContactPosition *)((u8 *)*slot + 12));
+    if (cell == actor->terrainCell || PlayerFlags(gUnk_02000580[0], 0x20000)) {
         SceneActor_DispatchContextAction(actor->context, 0);
         return 0;
     }
@@ -145,12 +153,12 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     }
     {
         u32 bit = 0x10;
-        u16 *flags = (void *)(body + 0x6d4);
-        u32 value = *flags;
-        s32 mask = ~0x40;
-        value |= bit;
-        value &= mask;
-        *flags = value;
+        struct Flags {
+            s16 bits : 16;
+        };
+        struct Flags *flags = (void *)(body + 0x6d4);
+        flags->bits |= bit;
+        flags->bits &= ~0x40;
     }
     SceneActorReaction_ResetResponseState(group + 0x8c, gUnk_0824E230, 0x486);
     (*(u32 *)(body + 0x6c4))++;

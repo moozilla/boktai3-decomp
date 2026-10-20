@@ -13,7 +13,7 @@ extern u8 *gUnk_02000580;
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectProfileEntry(void *, s32);
 void PlayerContact_ApplySyntheticContact(void *, u32, u32, u32, u32, u32);
-void sub_0813D548(void *, u32);
+void Player_QueueStatusEffect(void *, u32);
 static inline s32 WrapCounter(s32 n)
 {
     return n - 256;
@@ -52,9 +52,9 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
             }
             if (s->accumulated > 100) {
                 if (*mode == 1)
-                    sub_0813D548(gUnk_02000580, 1);
+                    Player_QueueStatusEffect(gUnk_02000580, 1);
                 else
-                    sub_0813D548(gUnk_02000580, 2);
+                    Player_QueueStatusEffect(gUnk_02000580, 2);
                 s->accumulated = 0;
             }
         }

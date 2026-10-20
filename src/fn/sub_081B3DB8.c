@@ -4,6 +4,8 @@
 #include "scene_vec.h"
 // confidence=low: emits six radial effects, waits for animation 10, then deactivates the part.
 
+// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
+
 #ifdef NONMATCHING
 // fuzzy: 87.4%
 // Remaining differences: radial-loop allocation and animation-step register lifetimes.

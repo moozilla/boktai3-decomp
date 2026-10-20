@@ -1,8 +1,10 @@
 #include "global.h"
 
+// confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
+
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 80.7%
+// fuzzy: 81.3%
 // Reset-action pointer lifetimes, motion temporaries and register allocation still differ.
 
 struct Obj {
@@ -71,7 +73,7 @@ struct Glove {
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void sub_0811AE9C(struct Obj *);
+void Terrain_ResolveActorMotion(struct Obj *);
 void sub_0811D91C(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
@@ -118,7 +120,6 @@ static inline u8 IsRecoveryEnabled(u32 mask)
         return 1;
     return 0;
 }
-// confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
 void Glove_UpdateDefeatEffects(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -129,12 +130,12 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         s32 count;
         u8 *animation;
         u32 offset;
-        struct Obj *actionSelf = self;
+        struct Obj *actionSelf;
         u8 *actionKind, *spriteSlot, *releasePending, *actionPending;
         u16 *actionTimer, *cooldown, *flags;
         u8 **sprites;
-        u8 *style;
         u32 *motionBias;
+        u8 *style;
         ActorParticles_SpawnSideBurst(self);
         if (LinkParticipant_IsLocallySelected(p)) {
             Sound_StopSong(0x87);
@@ -144,6 +145,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             Sound_StopSong(0x8B);
             Sound_StopSong(0x93);
         }
+        actionSelf = self;
         actionKind = (u8 *)p + 0x2CD;
         spriteSlot = (u8 *)p + 0x33D;
         releasePending = (u8 *)p + 0x343;
@@ -194,7 +196,9 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         count = 4;
         do {
             u8 *base = *sprites;
-            *(u32 *)(base + 0x48 + offset) = (u32)(base + 0x210);
+            u8 *destination = base + 0x48;
+            destination += offset;
+            *(u32 *)destination = (u32)(base + 0x210);
             offset += 0x60;
             count--;
         } while (count >= 0);
@@ -275,7 +279,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
                 self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
             *pprevX = *px;
             *pprevZ = self->z;
-            sub_0811AE9C(self);
+            Terrain_ResolveActorMotion(self);
             a = (u32) ~(self->unk3C >> 12) >> 31;
             b = (u32) ~(self->unk38 >> 12) >> 31;
             if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&

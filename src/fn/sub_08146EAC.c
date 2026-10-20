@@ -132,7 +132,7 @@ s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorAttachment_Create(struct Player *, s32, struct SceneVec *, s32, s32, s32);
 void Player_EmitQueuedEffects(struct Player *);
 void Player_NotifyActionCategories(struct Player *);
-void sub_0813D178(struct Player *);
+void Player_InitVisualResources(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void PlayerCue_EnterStandUpdate(struct Player *);
@@ -284,7 +284,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                     p->statHundredths = 0;
                 } else
                     p->actionMode = 0;
-                sub_0813D178(p);
+                Player_InitVisualResources(p);
                 p->savedSpriteResource = 0xFFFF;
                 if (p->unk536 != 0x15 && p->unk536 != 0x31)
                     p->active = 0;
@@ -328,7 +328,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                 }
             }
             gUnk_02000590 = 0;
-            sub_0813D178(p);
+            Player_InitVisualResources(p);
             p->savedSpriteResource = 0xFFFF;
             p->actionEighteenDuration = 0;
             if (++p->tetherFrame > 29) {

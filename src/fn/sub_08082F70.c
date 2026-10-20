@@ -1,7 +1,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
@@ -50,7 +50,8 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
     {
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     }
     {
         u32 mask = 0x400;
