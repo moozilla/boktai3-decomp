@@ -111,7 +111,7 @@ int GroupObjects_Destroy(struct GroupObjects *);
 int GroupObjects_Initialize(struct GroupObjects *, int);
 void *GroupObjects_CreateTask(void *);
 
-void sub_082216F8(void *, void *, void *, int, int);
+void Vec16_Lerp(void *, void *, void *, int, int);
 void BoardPiece_SetFacingAnim(struct GroupObjects *, struct GroupPiece *, int);
 int sub_0800FC28(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);

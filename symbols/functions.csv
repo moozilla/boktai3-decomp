@@ -8420,6 +8420,7 @@ addr,name,mode,confidence,source,notes
 08217060,Video_SetBlendControl,thumb,low,src-alias,Sets blend mode and the first and second target layer masks
 08217074,Video_SetBlendAlpha,thumb,low,src-alias,Sets the two alpha blending coefficients
 08217084,Video_SetBlendBrightness,thumb,low,src-alias,Sets the brightness increase or decrease coefficient
+08217120,ObjShape_InitTables,thumb,low,src-alias,
 082171B8,Palette_GetBackgroundBuffer,thumb,low,src-alias,Returns the background palette buffer later uploaded to palette RAM
 08217298,ResourceSlots_Reset,thumb,low,src-alias,
 082172C8,Palette_ResetObjectAllocation,thumb,low,src-alias,Resets object palette allocation after two reserved banks and PaletteSet banks
@@ -8666,6 +8667,8 @@ addr,name,mode,confidence,source,notes
 08220AAC,Collider_ResetManagerLists,thumb,low,src-alias,Resets both manager list sentinels and tails and clears their counters
 08220B18,Collider_GetManager,thumb,low,src-alias,Returns the singleton collider manager pointer
 08220B24,Collision_AccumulateNearbyResponse,thumb,low,src-alias,
+08220B78,Anim_ApplyDurationScales,thumb,low,src-alias,
+08220BF8,Box_Overlaps,thumb,low,src-alias,
 08220C8C,Anim_SetSequence,thumb,low,src-alias,
 08220D20,Anim_RestartSequence,thumb,low,src-alias,Clears the frame count to force Anim_SetSequence to restart playback
 08220D44,Anim_SetDurationScale,thumb,low,src-alias,Scales the current frame duration by a factor with 64 representing normal duration
@@ -8682,12 +8685,14 @@ addr,name,mode,confidence,source,notes
 08221594,Crc_ComputeCcitt16,thumb,low,src-alias,Calls the checksum routine with the CRC-16 polynomial 0x1021
 082215A4,Crc_ComputeIbm16,thumb,low,src-alias,Calls the checksum routine with the CRC-16 polynomial 0x8005
 082215E4,Math_Atan2,thumb,low,src-alias,
+082216F8,Vec16_Lerp,thumb,low,src-alias,
 08221774,ScalarApproach_StepHalf,thumb,low,src-alias,
 08221798,ScalarApproach_StepQuarter,thumb,low,src-alias,
 082217CC,ScalarApproach_StepEighth,thumb,low,src-alias,
 08221800,ScalarApproach_StepSixteenth,thumb,low,src-alias,
 082221E8,Math_SetMotionPosition,thumb,low,src-alias,Tentatively sets a motion record position by copying two coordinate words into offsets 0x20 and 0x24
 082221F4,Math_GetTargetAngleAndDistance,thumb,low,src-alias,Computes the angle and Euclidean distance from the stored position to a target point with zero outputs for coincident points
+0822223C,Orbit_OffsetFromAngle,thumb,low,src-alias,
 08222330,PolarInterpolation_SetCurrentFromPoint,thumb,low,src-alias,Computes angle and distance from the stored origin to a point and stores both in fixed point
 08222358,Interp_Step,thumb,low,src-alias,
 082223CC,HashTable_Init,thumb,low,src-alias,Allocates and clears buckets and stores the bucket count and hash callback
