@@ -1,13 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// Remaining differences: quotient copy, pool padding and loop delta-address scheduling.
+// confidence=low: animation checkpoint emits aimed shots with rising speed and falling strength.
+#define Mummy_FireAcceleratingVolley sub_080D62CC
+
 #include "scene_actor_reset.h"
 #include "engine.h"
 
-// confidence=low: animation checkpoint emits repeated aimed shots; projectile kind is unknown.
 s32 Div(s32, s32);
 void sub_080692C8(struct ContactPackedVector *, struct ContactPosition *, struct ContactPosition *,
                   u32, u32, u32, u32);
@@ -61,7 +60,15 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         if (ax > az)
             z = x;
         speed = Div(z, divisor);
-        speed = Abs(speed);
+        {
+            register s32 quotient asm("r4") = speed;
+            s32 absolute;
+            asm("" : "+r"(quotient));
+            absolute = quotient;
+            if (quotient < 0)
+                absolute = -quotient;
+            speed = absolute;
+        }
     }
     if (speed <= 10)
         speed = 10;
@@ -91,7 +98,8 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         direction = actor->fieldE9;
     strength = *(u16 *)(body + 0x6ce);
     for (; count != 0; count--) {
-        delta.x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
+        struct ContactPosition *deltaPointer = &delta;
+        deltaPointer->x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
         delta.y = 0;
         delta.z = Scale(gUnk_086149C4[direction & 255] * speed);
         {
@@ -105,7 +113,3 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     }
     Sound_PlaySong(0x101);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_FireAcceleratingVolley);
-#endif
