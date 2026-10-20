@@ -1,7 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.9%
-// Remaining differences: damage-field addressing, shared temporaries and register allocation.
+// fuzzy: 98.3%
+// Remaining differences: mask materialization, collider/flags copies and register allocation.
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
 #define Mummy_UpdateBurnDamage sub_080D812C
@@ -141,8 +142,8 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gUnk_030053F4, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        u32 mask = *owner;
+        register u32 *owner asm("r1") = &actor->field2E0;
+        register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
@@ -167,6 +168,11 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
+static inline void Fill(u32 *zero, void *dst)
+{
+    *zero = 0;
+    CpuSet(zero, dst, 0x05000002);
+}
 void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 {
     struct BurnState *burn = (void *)&actor->group;
@@ -177,7 +183,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
     u32 kind;
     s32 i;
     struct ContactCollider *damageCollider;
-    u32 *damageFlags;
+    register u32 *damageFlags asm("r6");
     if (Blocked(actor))
         return;
     if (!burn->timer)
@@ -197,7 +203,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         return;
     }
     {
-        u32 status;
+        register u32 status asm("r0");
         if (burn->intensity > 2) {
             if (Mod(burn->timer, 16) == 0) {
                 Sound_PlaySong(0x121);
@@ -230,10 +236,11 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
     }
     burn->timer--;
     if (Mod(burn->timer, 40) == 0) {
-        actor->colliderA.cost = 1 << burn->intensity;
-        actor->reactionSoundVariant = actor->colliderA.cost;
+        damageCollider = &actor->colliderA;
+        damageCollider->cost = 1 << burn->intensity;
+        actor->reactionSoundVariant = damageCollider->cost;
         {
-            u32 damage = actor->colliderA.cost;
+            u32 damage = damageCollider->cost;
             actor->health -= damage;
         }
         damageCollider = &actor->colliderA;
@@ -260,11 +267,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                 s32 type = *(s16 *)((u8 *)actor + 0xB2);
                 s32 param = *(s16 *)((u8 *)actor + 0x9A);
                 SceneHud_SetTimedState(actor->id, health, max, type, 0, param);
-                {
-                    u32 *dest = buffer;
-                    zero = 0;
-                    CpuSet(&zero, dest, 0x05000002);
-                }
+                Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || !(*damageFlags & 0x20000))
                     DamageNumberDisplay_Show(damageCollider, actor->reactionSoundVariant, 0,
                                              &actor->position, buffer, 1);
