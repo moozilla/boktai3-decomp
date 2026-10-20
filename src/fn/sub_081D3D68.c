@@ -3,8 +3,8 @@ struct S {
     u8 f[0x1C];
     u32 a;
 };
-void sub_081D48D8(void *, u32);
+void PaletteTransition_StartDisplay(void *, u32);
 void SceneDisplay_InitCurrentAnimation(struct S *p)
 {
-    sub_081D48D8(p, p->a);
+    PaletteTransition_StartDisplay(p, p->a);
 }

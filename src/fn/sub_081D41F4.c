@@ -1,6 +1,5 @@
 #include "global.h"
 // Blend two RGB555 colors: (a * ((1 << shift) - weight) + b * weight) >> shift per channel.
-#define Palette_BlendColor sub_081D41F4
 void Palette_BlendColor(u16 *dst, u16 *a, u16 *b, int weight, int shift)
 {
     int inv = (1 << shift) - weight;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteTransition_UpdateBlink sub_081D3A98
 struct PaletteTransitionTarget {
     u8 pad0[0xe];
     u8 direction;

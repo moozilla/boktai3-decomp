@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteTransition_InitDisplays sub_081D46B4
 #ifdef NONMATCHING
 // fuzzy: 90.9%
 struct PaletteDisplayEntry {
@@ -55,5 +54,5 @@ void PaletteTransition_InitDisplays(struct PaletteTransition *p)
     Dir_Decompose(e->directionIndex, (u8 *)p + 0x9fe, (u8 *)p + 0x9ff, *dir);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D46B4);
+INCLUDE_ASM("asm/nonmatching", PaletteTransition_InitDisplays);
 #endif

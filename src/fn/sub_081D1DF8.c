@@ -1,5 +1,4 @@
 #include "global.h"
-#define TaggedSceneNpc_UpdateState17AnimationA sub_081D1DF8
 
 void TaggedSceneNpc_PlayTaggedAnimation(void *, int, int, int, int);
 int Anim_Step(void *, void *);
