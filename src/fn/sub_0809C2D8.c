@@ -3,8 +3,8 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.6%
-// Remaining difference: compiler reuses the destination pointer instead of rebuilding its stack address.
+// fuzzy: 94.4%
+// Remaining differences: defined destination padding and destination-pointer address reuse.
 
 struct LunRouteEntry {
     u8 unknown0[4];
@@ -43,6 +43,8 @@ static inline void RoutePosition(struct ContactPosition *p, struct LunRouteEntry
     p->x = route->point[0];
     p->z = route->point[1];
     p->y = Chase_Height(p);
+    // The endpoint setter copies all eight bytes; define the scratch padding.
+    p->pad = 0;
 }
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
