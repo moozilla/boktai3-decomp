@@ -96,5 +96,5 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_TryRestorePatrolRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080AEB74);
 #endif
