@@ -2793,3 +2793,54 @@ All five drafts are guarded and scored with --nonmatching --record; their
 assembly fallbacks pass exact checks. One match and five separate draft commits
 queued through build/commit.sh. No full build or network operations. Exact
 percentage-point gain is deferred to batch integration; drafts earn none.
+
+## 2026-10-20 — task 08142194, player interactions and tether movement
+
+Tags: #matching #player #tether #terrain
+
+- 08142194: retained guarded Player_UpdateObjectPush draft at 92.9%.
+  Added the required local alias and address-named assembly fallback, allowing
+  checks against this worktree's ELF. Reassociated the direction reflection as
+  ((target - direction) * 2 + 8) + direction: structural differences fell from
+  33 to 29; total remains 84 realigned differences. Sine-table pointer lifetimes,
+  cell-address reuse, prologue allocation and flag narrowing remain off. Existing
+  one-argument ActorVariant_GetTableValue call corresponds to a ROM call with no
+  explicit r1 setup; its ABI interpretation still needs investigation.
+- 08143ED0: drafted 93.9%, tentative Player_UpdateTetherMovement. Selects idle
+  or moving tether animation, applies signed-truncated directional velocity and
+  axis scaling, emits terrain/action-dependent step cues, then constrains the
+  tether target. Reused velocity idioms from Player_SetDirectionalVelocity and
+  cue interpretation from Player_PlayActionCueSound. 38 realigned differences,
+  27 ignoring registers: repeated action-flag address/load materialization,
+  boolean conversion of global bit zero, effect-call zero scheduling, allocation.
+- 08143B54: drafted 89.0%, tentative Player_ConstrainTetherTarget. Limits target
+  radius around a 70-unit directional offset, blends target 3:1 toward the
+  constrained point, tests terrain, clips to cell edges, then sets target facing.
+  Pins actor/offsets to r6/r7/r8 (marked concession) improved initial 86.5% to
+  89.0%; still 47 realigned differences, 12 ignoring registers. Field-address
+  materialization, offset lifetimes and allocation remain. Duplicated height
+  paths preserve the ROM's shared tail shape.
+- 081432DC: drafted 88.6%, tentative Player_UpdateHeldInteraction. Approaches
+  saved position and facing, then starts/holds/releases an action while checking
+  capacity and the global resource at 0x77C. An initial 79.1% candidate improved
+  by assigning the shared zero after the arrival-distance comparison and using
+  explicit cue/holding labels. 57 realigned differences, 33 ignoring registers:
+  facing-address scheduling, shared cue block layout and allocation remain.
+- 08143604: drafted 92.1%, tentative Player_UpdateEnergyBurst. Entry tests
+  energy 100 and the global burst latch, prepares one of two effect origins,
+  grows an effect parameter to 32, and advances the held/recovery animations.
+  32 realigned differences, six ignoring registers remain, primarily constant
+  copies for the effect fields and register scheduling. No pins.
+- 081439D8: matched Player_TestTetherTarget, unpinned. Terrain properties are
+  read through the override lookup twice; rejects blocked attributes and height
+  differences above 255. Flag 0x800 snaps the candidate to the tether actor and
+  cancels the sequence when actor separation exceeds 255 on either horizontal
+  axis. Adapted the terrain lookup idiom from TetherActor_TestStepPosition.
+  First candidate differed by one subtraction operand order; height minus actor
+  Y matches exactly (380 bytes).
+
+All five drafts are guarded, recorded with --nonmatching --record, and have
+exact assembly fallbacks checked separately. One exact match and five drafts
+queued individually through build/commit.sh. No full build or network used.
+Drafts contribute no exact progress; percentage-point gain is deferred to batch
+integration. Ghidra export is absent in this checkout.
