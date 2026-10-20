@@ -3210,3 +3210,73 @@ All accepted callbacks are in the statically observed Vanargand part-action
 family around gUnk_086120A0; no runtime coverage claims were added. Each source
 change was committed separately through the driver. Combined ROM validation
 and name promotion remain with the integrator.
+
+## 2026-10-20 — task 08217960 revisit
+
+Tags: #matching #sprites #palette #terrain
+
+Assigned-function exact coverage rose from 0% to 50% (+50 percentage points,
+three of six functions). Three register-pinned exact matches; two improved
+guarded drafts. Only fast check.py checks were run, with no full build or
+network operations. Separate driver commits preserve each translation unit.
+
+- **08218508 — matched, SpriteOam_QueueFlaggedProjectedSprites.** Reviewed
+  788-byte extent. Read its render-callback caller 08163398 and the common
+  OAM staging code. Kept the existing tentative name: flag 0x1000 selects
+  this pass, but its meaning is still uncertain. Inlining the screen
+  projection body directly into the renderer removes the helper argument
+  copy and the hoisted/spilled stack-vector pointer. Preserve initial flags
+  in a separate unpinned local. A local loaded-flags value pinned to r1
+  before the culling mask recovers the later r6 copy. The shifted X temporary
+  pinned to r0 and the affine counter's old value pinned to r0 recover the
+  remaining copies. Load tile before priority, then combine with a left-
+  associative OR expression: changing the grouping to tile |= (a | b)
+  produces different code. Final formatted production C passes check.py
+  byte-identically, with no handwritten instruction bodies.
+- **0821881C — matched, SpriteOam_QueueOverlayProjectedSprites.** Reviewed
+  788-byte extent. Ported the exact 08218508 body, changing only the required
+  drawable flag from 0x1000 to 0x2000 and preserving the existing tentative
+  name. Exact check passes; separate match commit.
+- **08217F4C — matched, SpriteOam_QueueProjectedSprites.** Reviewed 776-byte
+  extent. Ported the exact flagged renderer and removed its required-flag
+  test. Existing callers install it with Video_SetRenderCallbacks. Exact
+  check passes; separate match commit. These three matches total 2352 bytes.
+- **08218254 — drafted 99.1%, SpriteOam_QueueCameraRelativeSprites.** Improved
+  from the retained 91.0% draft by porting the exact common OAM/affine tail,
+  computing the culling mask before offset loads and pinning the Z difference
+  result to r0. Final reviewed score: four realigned differing instructions,
+  two ignoring registers, over 692 bytes. The entry currently loads flags
+  into r0 and copies to r6 before loading/masking the parity skip value; ROM
+  loads r1, copies to r0, masks, then copies r1 to r6. The missing copy becomes
+  pool padding, so total length already agrees. Explicit masks, an inline
+  mask accessor, late flag assignment, and a small initial/mask/flags pin
+  sweep did not resolve this. Kept the guarded draft and recorded its score.
+- **08217960 — drafted 86.7%, Palette_ApplyBackgroundFade.** Improved from
+  80.1%. Pin the blend color's green component to r10, introduce per-bank
+  green/red-blue contributions, retain the red-blue mask in r9, and express
+  the blended inner loop with separate red/green arithmetic temporaries.
+  Freeing the fetched pixel local improves output more than pinning it.
+  Final reviewed score: 55 realigned differences, 24 ignoring registers,
+  against the 604-byte target. Loop-counter setup, mask hoisting, backdrop
+  blend temporaries and allocation remain. Explicit outer-index increments
+  regress; do/while inner loops produce identical output. Kept the guarded
+  draft and recorded its score after formatting.
+- **0821BF5C — stopped below draft threshold, tentative
+  Terrain_CanCrossSlopeBoundary.** Read the full 760-byte target, its movement
+  caller 0821C254 and height-query callee 0821BE3C. Fresh reconstruction in
+  ignored wip scores 73.6% reviewed, with 121 realigned differences / 73
+  ignoring registers. Tests destination collision bits (mask 1 or 2 by mode),
+  height thresholds 100/128, source/destination slope orientations and the
+  matching flat neighbor's low-nibble height and collision bits. Expanding
+  neighbor override lookups in each direction branch preserves more of the
+  duplicated call/control structure than the inline resolver; caching the
+  selected index causes the compiler to merge those calls again. Signed
+  threshold locals recover BLE. Still below 80%, so no production draft or
+  source commit for this function.
+
+All production functions have file-local descriptive aliases. Both guarded
+sources use address-form INCLUDE_ASM alternatives, so the recorder resolves
+against this checkout's baseline ELF; both default assembly alternatives
+were checked exactly. Three exact sources retain their register-pinning
+concession markers. Notes committed last; shared index/history left unchanged
+under CLOUD.md. Combined ROM validation remains with the integrator.
