@@ -212,5 +212,5 @@ void PlayerCue_UpdateMotionFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
+INCLUDE_ASM("asm/nonmatching", sub_08152174);
 #endif
