@@ -2695,3 +2695,57 @@ Tags: #matching #player #animation
 - 0814C3A4: stopped unmatched after largest-first assembly/relatives/condense inspection and prior-note review. Eight-phase grab-motion routine; strongest relative covers only 9%, mostly trigonometry. Condense leaves 973 instructions unfolded. No Ghidra export available. No complete candidate produced; assembly intact.
 
 All four guarded drafts were formatted, rescored with --nonmatching --record and their default assembly fallbacks checked exact. One exact match; percentage-point gain deferred to integration report (408 exact bytes). No full build, make, network or generated-file commits. Function commits and this note use build/commit.sh.
+
+## 2026-10-20 — task 080F421C, sword return and initialization
+
+Tags: #matching #sword #register-allocation
+
+- **080F5170 matched — Sword_DecelerateReturn.** Reads the owner at component
+  offset 0x160, advances rotation and horizontal position, and waits for the
+  owner's 0xD80 low bits to clear before decelerating. When stopped, records
+  the return displacement and chooses 080F4FA8 or 080F508C by the larger absolute
+  horizontal delta. A typed local component layout plus a small signed-halving
+  inline produced the exact 336-byte function. Direct assignments to the s16
+  fields selected ldrh/shift sequences; the s32-returning inline produced the
+  original ldrsh/branch shape. No register pins are needed.
+- **080F645C drafted 97.6% — Sword_UpdateDamage.** Retained and improved the
+  existing draft. Passing both health and pending-damage addresses into an
+  inline subtraction fixes load scheduling. Seven realigned instruction
+  differences remain, zero ignoring registers, all around the saturated
+  defeat counter at global offset 0x538. Explicit counter pointer/value and
+  offset pins changed selection or worsened allocation; restored the best
+  candidate. Added the required local alias for the existing symbol name.
+- **080F52C0 drafted 95.5% — Sword_BeginTargetOrbit.** Retained the existing
+  draft and added its local alias. Writing RNG lookup address arithmetic with
+  the shifted index first reduces structural differences from four to two:
+  six realigned instruction differences remain. A forced negative-direction
+  temporary and direction register did not improve it. Remaining differences
+  concern RNG table register choice and the -1 temporary/copy.
+- **080F6F90 drafted 84.8% — Sword_InitAttackComponents.** Retained and improved
+  the existing initializer draft, adding its local alias and tentative name
+  evidence. An index-first command address and a volatile empty mask barrier
+  reduce structural differences from 26 to 15 (115 total realigned differences).
+  The remaining problems include animation mask/copy lifetime, two hoisted
+  collider offset-vector addresses, and register allocation. Changing the
+  command base back to the passed pointer slightly worsened structure.
+- **080F421C stopped at 70.4%, no production draft.** New candidate retained
+  in wip/sub_080F421C.c. Tentative Sword_UpdateDefeat: disables child colliders,
+  alternates display visibility, emits rotating five-position death particles,
+  disables the shadow, and invokes an optional defeat script with eight
+  arguments. Typed child fields and an inline script-argument writer improved
+  the first 69.9% candidate only slightly. Still differs in loop strength
+  reduction, field-address lifetimes, stack layout, and allocation; below the
+  80% production-draft threshold.
+- **080F67AC stopped, no candidate.** Inspected entry, condensed listing and
+  matched relatives before the smaller functions. The 846-instruction sword
+  initializer combines repeated packed animation playback with script-option
+  parsing and multiple collider setups. Closest relatives explain only about
+  24%, primarily animation playback, without a coherent whole-function port.
+  Ghidra export is absent (gen/ghidra/decomp.c), so no pseudo-C starting point.
+
+Validation used only tools/check.py; no full build, network or shared generated
+file writes. Existing guarded drafts remain guarded. tools/depin.py --write
+on guarded NONMATCHING sources incorrectly accepted removals against the default
+INCLUDE_ASM branches; restored all candidates from local checkpoints and reran
+--nonmatching --record. Depin needs an explicit nonmatching mode before use on
+these files. One exact function (336 bytes) is new coverage; drafts earn none.
