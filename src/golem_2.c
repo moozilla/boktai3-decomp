@@ -7,7 +7,7 @@ extern const u8 gUnk_08606134[];
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
-void sub_080C4EF0(u8 *);
+void Golem_ResetIdleControl(u8 *);
 void Camera_RequestShake(u32);
 void Skeleton_TryTriggerAction(void *);
 void Skeleton_ClearPendingFlag(void *);
@@ -261,7 +261,7 @@ void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
         *((u16 *)(((u8 *)obj) - (-off))) = value;
     }
     if (obj->field2B0) {
-        sub_080C4EF0((u8 *)obj);
+        Golem_ResetIdleControl((u8 *)obj);
     } else {
         ++(*((u32 *)(((u8 *)obj) + 0x2AC)));
     }

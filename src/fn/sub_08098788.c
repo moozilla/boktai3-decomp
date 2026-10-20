@@ -11,7 +11,7 @@ extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 void ActorShadow_Disable(void *);
 void sub_0809852C(void *);
-void sub_08098734(void *);
+void ActorTick_DecrementCounterAA(void *);
 void ActorVisibility_TickRevealDelay(void *);
 void sub_08097CB4(void *);
 void sub_08097E38(void *);
@@ -118,7 +118,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             }
         } else
             sub_0809852C(a);
-        sub_08098734(a);
+        ActorTick_DecrementCounterAA(a);
         goto finish;
     }
     ctx = a->context;
