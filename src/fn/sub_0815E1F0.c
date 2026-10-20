@@ -7,7 +7,8 @@ void sub_0815E034(struct Player *, struct ContactCollider *);
 void SceneActorControl_RequestDeparture(s32);
 s32 Player_RequestTimedReset(struct Player *, u32);
 void Player_EmitQueuedEffects(struct Player *);
-void sub_0813B1EC(struct Player *, struct ContactCollider *, struct ContactCollider *);
+void Player_ApplyContactResponse(struct Player *, struct ContactCollider *,
+                                 struct ContactCollider *);
 void Player_QueueStatusEffect(struct Player *, s32);
 void sub_0813D834(struct Player *, s32, s32);
 s32 SceneParticle_CreateDefaultPriority(void *, void *, s32, s32, s32);
@@ -106,7 +107,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             Player_EmitQueuedEffects(p);
             shift++;
         }
-        sub_0813B1EC(p, source, target);
+        Player_ApplyContactResponse(p, source, target);
         if (p->actionMode == 1)
             p->contactThresholdPending = 1;
     }
