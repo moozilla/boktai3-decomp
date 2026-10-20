@@ -1,8 +1,10 @@
 #include "global.h"
-// confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
-
 #ifdef NONMATCHING
 // fuzzy: 82.4%
+// Remaining differences: RNG store timing, loop hoisting and recipient-field register allocation.
+// confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
+#define ScriptCombatActor_ApplyHitReaction sub_082015D4
+
 // Remaining differences: RNG stores, loop constants, target-field scheduling and allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
@@ -90,5 +92,5 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_ApplyHitReaction);
+INCLUDE_ASM("asm/nonmatching", sub_082015D4);
 #endif
