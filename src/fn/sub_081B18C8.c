@@ -5,7 +5,7 @@
 
 // confidence=low: rises, waits for a countdown, then returns vertically
 #ifdef NONMATCHING
-// fuzzy: 80.3%
+// fuzzy: 87.0%
 // Remaining differences: Entry-pointer lifetimes, derived vector constants, and state-transition allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
