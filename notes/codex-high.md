@@ -3528,3 +3528,88 @@ reviewed extents; those fallback checks do not credit the draft C as matching.
 Ran depin on all four unguarded nonmatching candidates; it correctly skipped
 mismatches. No handwritten instruction bodies or ROM-derived dumps were
 committed. This note is the final driver commit for the task.
+## Task 0816ECF0 — 2026-10-20
+
+Tags: #matching #hud #menu-input #nonmatching #register-pinning
+
+Exact gain: approximately **0.020 percentage points** of total code (488
+bytes), all in the Register-pinned category. One new match, one new guarded
+draft, one improved guarded draft, and two retained guarded drafts with the
+required local address aliases. Aggregate totals remain in PROGRESS.md.
+
+- **08172E70 — matched**, `SceneHud_UpdateActionTransferSelection` (tentative).
+  Navigates the action grid, confirms fruit/unlock transfers, hides both
+  affected widgets and installs SceneHud_FinishActionTransfer; B restores the
+  previous grid selection. The test is actionInput[1] at 4385, not the group
+  field at 4388. Loading the current selection before assigning the source
+  pointer reproduces both call argument orders. A pinned r7 value with an
+  output-only allocation barrier, immediately overwritten by the defined
+  constant 1 and then negated, reproduces the original fresh -1 sentinel
+  materialization instead of subtracting two from a retained 1. No undefined
+  value is read. depin removed one unnecessary barrier (three hints to two).
+  Formatted C passed exact check.py with reviewed extent 488 bytes.
+- **0816ECF0 — drafted 90.2%**, `PauseMenu_BeginVitalRatioExchange`
+  (confidence low). Item action kind 10 starts icon motion and stages vital
+  values for SceneMenuPanel_FinishResultMotion. Mode zero exchanges their
+  proportions: maximum A times current B / maximum B and maximum B times
+  current A / maximum A, each minimum one if the corresponding prior value
+  was nonzero. Other modes stage zero A and maximum B. A local RatioHud view
+  establishes owner at A40 and previous/next halfword pairs at 4868–486E.
+  Typed destination fields and assigning the previous-A pointer within the
+  multiplication improved the raw-pointer candidate from 64.7% to 90.2%.
+  Twelve realigned differences, seven ignoring registers, remain in previous-B
+  destination reuse, zero scheduling and pools. Volatile owner and u32 owner
+  experiments were reverted; retained C has no pins or volatile accesses.
+- **08175008 — improved draft 94.1% to 95.4%**,
+  `Presentation_UpdateAllocationSelection` (existing promoted name). Giving
+  the owner's three stats an array view preserves owner-base calculation
+  before indexing. Forming the comparison-modifier pointer before setting
+  the Boolean fixes constant scheduling. Remaining: 21 realigned differences,
+  five ignoring registers, principally pending-count address association,
+  duplicated index shifts and the 0x10 input mask's operand tie. Explicit byte
+  indices, mask-order variants and an inline mask accessor did not help.
+  Retains the prior r4/r1/r6 pins and concession marker. depin was run on an
+  unguarded scratch copy and correctly skipped the nonexact candidate.
+- **081731E8 — retained draft 97.3%**,
+  `SceneHud_UpdateSecondaryActionSelection` (existing promoted name).
+  Four realigned differences, two ignoring registers: choice 38 reuses grid
+  address r6 instead of recomputing it into r4, with pool consequences.
+  Offset barriers hoisted another constant into a saved register; mutable
+  base-pointer barriers and pinning the owner worsened allocation. Reverted
+  all experiments; production draft remains unpinned.
+- **081796D8 — retained readable draft 97.5%**,
+  `FieldHud_UpdateNumberDisplay` (existing promoted name). The remaining
+  full-width FFFFD000 tile-attribute literals become D000 under direct u16
+  stores. Inline s32 encoders retain the full constant; pinning the literal
+  and copy operands reached a locally retained 548-byte candidate with zero
+  structural and six register differences (97.7%). Those are three signed
+  field-load offset registers in the palette update, chosen by reload's
+  rotation. Pinning field offsets added address calculations; direct-field
+  barriers duplicated constant loads; additional owner/value/tile pins did
+  not improve it. rasolve's bounded 51-compile diagnostic reached four bytes
+  in compiler space by changing reload rotation, but this is not a C match.
+  The more complex hinted candidate was not promoted over the readable draft.
+  The permuter could not start: its split step rejected unrelated
+  Ghoul_ResumePendingRoute at 0808CC48 as an unknown function start. The
+  assembly body/pools end at 081798FC: reviewed fallback extent is 548 bytes.
+- **08176F70 — stopped unmatched**, tentative `Hud_InitAlternateWidgets`.
+  Read BIG_FUNCTIONS, full and condensed assembly, Hud_InitAlternateLayout,
+  Hud_LoadLayoutResources and matched animation-stepper relatives. Authored
+  a complete scratch reconstruction of repeated widget initialization,
+  layout loops, the embedded stepper and final resource copy. The strongest
+  relative covers only 9%, and no Ghidra export is available. Final reviewed
+  check: 49.4%, 769 realigned differences / 269 ignoring registers, 2596-byte
+  candidate versus 2680-byte target. Pointer/constant lifetimes and allocation
+  across widget loops remain far off. Broad iterator/register pins worsened
+  structure; scoped position-pointer pinning helped only slightly. Below the
+  draft threshold, so no production C was added. Scratch sources and useful
+  closer alternatives remain under wip/codex-high-task0816ECF0/ and build/.
+
+All four guarded draft scores were recorded with check.py --nonmatching
+--record. Their assembly alternatives passed exact reviewed-extent checks
+(468, 424, 832 and 548 bytes). The existing promoted-name drafts needed their
+#else INCLUDE_ASM spelled with sub_ADDR so the recorder finds the emitted
+symbol after applying the local alias; 081731E8 has a small follow-up commit
+for that correction. Only per-file checks were used; no make, full build,
+network, push or PR. Used pinned venv clang-format directly, and left shared
+handoff/history/index files to integration.
