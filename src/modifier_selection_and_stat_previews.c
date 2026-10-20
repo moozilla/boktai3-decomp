@@ -108,21 +108,19 @@ s32 Modifier_ApplyAmount(s32 a, s32 b, s32 c)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 94.5%
+// fuzzy: 95.3%
 
-// fuzzy: 88.1%
-
-// Register allocation and a hoisted sort pointer differ; reviewed ROM extent is 256 bytes.
+// Register allocation and a hoisted sort pointer (output + 1) differ; params used directly via macros; reviewed ROM extent is 256 bytes.
 
 s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
                             struct ModifierSelection *selectionArg,
                             struct ModifierRecord *outputArg, u32 includeSelected)
 {
-    struct ModifierSelection *actor = actorArg;
-    struct ModifierSelection *selection = selectionArg;
-    struct ModifierRecord *output = outputArg;
     struct ModifierRecord swap, scratch;
     s32 count = 0;
+#define actor     actorArg
+#define selection selectionArg
+#define output    outputArg
     s32 i;
     struct ModifierRecord *out;
     i = 0;
@@ -186,6 +184,9 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
 done:
     return count;
 }
+#undef actor
+#undef selection
+#undef output
 
 #else
 

@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.5%
-// draft: operand order of the id add and the loop reload of *v differ
 s32 Script_ParseStringRef(const void *);
 u8 *Text_LookupString(s32);
 #define Text_CopyStringPair sub_0803200C
@@ -9,12 +6,12 @@ u8 *Text_LookupString(s32);
 s32 Text_CopyStringPair(u8 *dst, const void *a, const void *b, s32 c, s32 d)
 {
     s32 v;
+    u8 ch;
     v = Script_ParseStringRef(a);
-    c = v + c;
-    v = (s32)Text_LookupString(c);
+    v = (s32)Text_LookupString(v + c);
     if (v == 0)
         goto fail;
-    while (*(u8 *)v != 0) {
+    while ((ch = *(u8 *)v) != 0) {
         *dst = *(u8 *)v;
         v++;
         dst++;
@@ -26,14 +23,11 @@ s32 Text_CopyStringPair(u8 *dst, const void *a, const void *b, s32 c, s32 d)
         *dst = v;
         return -1;
     }
-    while (*(u8 *)v != 0) {
+    while ((ch = *(u8 *)v) != 0) {
         *dst = *(u8 *)v;
         v++;
         dst++;
     }
-    *dst = *(u8 *)v;
+    *dst = ch;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0803200C);
-#endif
