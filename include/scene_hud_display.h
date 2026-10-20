@@ -36,7 +36,8 @@ struct SceneHudTertiaryOption {
 };
 struct SceneHudPrimaryOption {
     s8 value;
-    u8 unknown1[3];
+    s8 icon; /* above five: drawn as an attribute icon directly */
+    u8 unknown2[2];
 };
 struct SceneHudSecondaryOption {
     s8 value;
@@ -101,10 +102,10 @@ struct SceneHudState {
     u8 actionCueInitialized, actionCueSuppressed; /* 0xB00 */
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
     u8 unknownB04[0x16C];
-    u8 primaryVisible;    /* 0xC70 */
-    u8 primarySlideTimer; /* 0xC71: remaining three-pixel slide steps */
-    s8 primarySelection;  /* 0xC72 */
-    u8 unknownC73;
+    u8 primaryVisible;           /* 0xC70 */
+    u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
+    s8 primarySelection;         /* 0xC72 */
+    u8 primaryBlinkTimer;        /* 0xC73: 60-frame icon blink */
     s16 *primarySelectionOutput; /* 0xC74 */
     struct SceneHudPrimaryOption primaryOptions[3];
     u8 unknownC84[4];
@@ -189,9 +190,13 @@ struct SceneHudState {
     u8 unknown48CC[0x19];
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
-    u8 unknown48E7[3];
-    u16 valueRate; /* 0x48EA */
-    u8 unknown48EC[0x4988 - 0x48EC];
+    u8 unknown48E7;
+    u8 quantityArrowFrame; /* 0x48E8: arrow keyframe base, 0x13 up and 0x16 down */
+    u8 quantityArrowTimer; /* 0x48E9: arrow animation, wraps at sixteen */
+    u16 valueRate;         /* 0x48EA */
+    u16 balanceLimitTimer; /* 0x48EC: frames left of the over-limit warning */
+    u16 balanceLimitShown; /* 0x48EE: over-limit message already shown */
+    u8 unknown48F0[0x4988 - 0x48F0];
     struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
     u8 unknown4A48[0x28];
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
