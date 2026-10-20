@@ -1,0 +1,218 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#include "actor_attachment_state.h"
+struct Visual {
+    u8 unknown0[0x1c];
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState sequence;
+};
+struct VisualAnim {
+    u8 unknown0[0x40];
+    struct ContactPosition position;
+};
+struct Debris {
+    struct Visual *visual;
+    struct ContactPosition position, velocity;
+    u32 timer;
+    u8 restitution, active, entered, visualType;
+    void (*update)(struct Debris *);
+};
+struct Camera {
+    u8 unknown0[0x44];
+    s32 x, y;
+};
+struct Packed {
+    u32 x : 16, y : 16, z : 16, pad : 16;
+};
+extern struct Camera *gUnk_020004B8;
+s32 Div(s32, s32);
+s32 Terrain_GetCellClearance(void *);
+void SceneDebris_OnMotionEnd(struct Debris *);
+static inline u32 StepDebrisSprite(struct Visual *visual)
+{
+    register struct Visual *v asm("r12") = visual;
+    struct ContactSwarmSprite *sprite = &v->sprite;
+    struct DisplaySequenceState *state = &v->sequence;
+    register const volatile u16 *command asm("r6"); /* preserve observed packed-command reads */
+    u32 ended, duration, flags, bit;
+    {
+        register u32 offset asm("r0") = state->index << 1;
+        register const volatile u16 *table asm("r1");
+        register struct Visual *read asm("r2") = v;
+        asm("" : : "r"(read), "r"(offset));
+        table = read->sequence.commands;
+        asm("" : "+r"(table));
+        command = (const volatile u16 *)((u32)table + offset);
+    }
+    asm("" : "+r"(command));
+    sprite->frame = *command >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r1");
+        register u32 maskBit asm("r3") = 1;
+        bit = maskBit;
+        first = bit;
+        first &= input;
+        {
+            register u32 value asm("r0");
+            if (first != (((*command & 0x30) >> 4) & bit)) {
+                register struct Visual *read asm("r1") = v;
+                asm("" : "+r"(read));
+                value = read->sprite.flags | 4;
+            } else {
+                register struct Visual *read asm("r1") = v;
+                asm("" : "+r"(read));
+                value = read->sprite.flags & ~4;
+            }
+            asm("" : "+r"(value));
+            {
+                register struct Visual *out asm("r2") = v;
+                asm("" : "+r"(out));
+                out->sprite.flags = value;
+            }
+        }
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r1");
+        bit = 2;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        register u32 mask asm("r6");
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        /* Keep the live mask distinct from its source without binding r7. */
+        asm("" : "+&r"(mask) : "r"(temp));
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                    ended = 1;
+                } else {
+                    state->index = index - 1;
+                    ended = 0;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    ended = 1;
+                } else {
+                    ended = 0;
+                }
+            }
+            {
+                register u32 offset asm("r0") = state->index << 1;
+                register const volatile u16 *table asm("r1");
+                table = state->commands;
+                asm("" : "+r"(table));
+                command = (const volatile u16 *)((u32)table + offset);
+            }
+            state->frameWeight = *command & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
+// confidence=low: planar debris lifetime follows completion of its visual animation.
+#define SceneDebris_UpdateAnimatedMotion sub_08113104
+void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
+{
+    /* The original writes only X/Y, then also copies the untouched depth halfword. */
+    struct Packed projected;
+    s32 ended;
+    register struct ContactPosition *output asm("r3");
+    if (p->entered) {
+        u32 *flags;
+        if (!p->visualType)
+            flags = &p->visual->sprite.flags;
+        else
+            flags = (u32 *)((u8 *)p->visual + 0x28);
+        {
+            u32 mask = ~1;
+            asm("" : "+r"(mask));
+            *flags &= mask;
+        }
+        p->entered = 0;
+    }
+    p->position.x = p->position.x + p->velocity.x;
+    p->position.y = p->position.y + p->velocity.y;
+    projected.x = p->position.x - gUnk_020004B8->x;
+    projected.y = p->position.y - gUnk_020004B8->y;
+    output = (void *)&projected;
+    asm("" : "+r"(output));
+    if (!p->visualType) {
+        struct Visual *visual = p->visual;
+        visual->sprite.position.x = ((struct ContactPosition *)&projected)->x;
+        visual->sprite.position.y = output->y;
+        visual->sprite.position.z = output->z;
+    } else {
+        struct VisualAnim *visual = (void *)p->visual;
+        visual->position.x = ((struct ContactPosition *)&projected)->x;
+        visual->position.y = output->y;
+        visual->position.z = output->z;
+    }
+    if (!p->visualType) {
+        register struct Visual *input asm("r2") = p->visual;
+        asm("" : "+r"(input));
+        ended = StepDebrisSprite(input);
+    } else
+        ended = Anim_Step((u8 *)p->visual + 0x20, p->visual);
+    if (ended) {
+        p->update = SceneDebris_OnMotionEnd;
+        p->entered = 1;
+    }
+}
