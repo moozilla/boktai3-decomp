@@ -19,6 +19,7 @@ INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
 EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
 LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
 SUBSYSTEMS = Path(ROOT) / "symbols/progress_subsystems.csv"
+AREAS = Path(ROOT) / "symbols/progress_areas.csv"
 
 
 def load_libraries(funcs, sizes, path=LIBRARIES):
@@ -63,6 +64,31 @@ def load_groups(funcs, sizes, path, prefix):
             libraries.append({"name": row["name"], "start": start, "end": end,
                               "names": names, "prefix": prefix})
     return libraries
+
+
+def load_areas(path=AREAS):
+    """Reviewed report areas as {id: (label, [(start, end, regex)])}. A unit
+    belongs to an area when its first address is in a range or its name matches."""
+    areas = {}
+    with Path(path).open(newline="") as f:
+        for row in csv.DictReader(f):
+            if not row["evidence"]:
+                raise ValueError(f"{row['id']}: missing area evidence")
+            rng = (int(row["start"], 16), int(row["end"], 16)) if row["start"] else None
+            rx = re.compile(row["name_regex"]) if row["name_regex"] else None
+            areas.setdefault(row["id"], (row["name"], []))[1].append((rng, rx))
+    return areas
+
+
+def unit_areas(areas, unit_name, address):
+    base = unit_name.split("/", 1)[-1].replace(" (auto, tentative)", "").replace(" (tentative)", "")
+    ids = []
+    for aid, (_, rules) in areas.items():
+        if any((rng and rng[0] <= address < rng[1]) or (rx and rx.search(base)) for rng, rx in rules):
+            ids.append(aid)
+    if unit_name.startswith("libraries/"):
+        ids.append("libraries")
+    return ids
 
 
 def assembly_addresses(path):
@@ -192,8 +218,9 @@ def collect_fuzzy(funcs, source_root):
     return fuzzy
 
 
-def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None):
+def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None):
     fuzzy = fuzzy or {}
+    areas = areas or {}
     score = lambda n: 100 if n in done else fuzzy.get(n, 0)
     libraries = sorted([*libraries, *subsystems], key=lambda group: group["start"])
     for left, right in zip(libraries, libraries[1:]):
@@ -208,7 +235,8 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         if library and n in pinned:
             unit_name += "/register-pinned"
         if unit_name not in grouped:
-            unit = {"name": unit_name, "functions": [], "metadata": {"progress_categories": [category]}}
+            unit = {"name": unit_name, "functions": [], "metadata": {"progress_categories": [category]},
+                    "_first": a}
             units.append(unit)
             grouped[unit_name] = unit
         matched = n in done
@@ -218,6 +246,9 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
             "address": str(a - (library["start"] if library else a)),
             "metadata": {"virtual_address": str(a)}})
     for unit in units:
+        unit["metadata"]["progress_categories"] += unit_areas(areas, unit["name"], unit.pop("_first"))
+        if "intentional_asm" in areas and "intentional_asm" not in unit["metadata"]["progress_categories"]:
+            unit["metadata"]["progress_categories"].append("decompilable")
         items = unit["functions"]
         total_b = sum(int(item["size"]) for item in items)
         matched_items = [item for item in items if item["fuzzy_match_percent"] == 100]
@@ -239,6 +270,19 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
             len(members), len(matched), units=len(selected),
             complete_units=sum(u["metadata"]["complete"] for u in selected),
             fuzzy_b=sum(sizes[n] * score(n) / 100 for n in members))})
+    labels = {**{a: l for a, (l, _) in areas.items()}, "libraries": "Libraries",
+              "decompilable": "Decompilable code (excludes intentional assembly)"}
+    for cid, label in labels.items():
+        selected = [u for u in units if cid in u["metadata"]["progress_categories"]]
+        if not selected:
+            continue
+        total_b = sum(int(u["measures"]["total_code"]) for u in selected)
+        done_b = sum(int(u["measures"]["matched_code"]) for u in selected)
+        count = sum(u["measures"]["total_functions"] for u in selected)
+        categories.append({"id": cid, "name": label, "measures": measures(
+            total_b, done_b, count, sum(u["measures"]["matched_functions"] for u in selected),
+            units=len(selected), complete_units=sum(u["metadata"]["complete"] for u in selected),
+            fuzzy_b=sum(u["measures"]["fuzzy_match_percent"] * int(u["measures"]["total_code"]) / 100 for u in selected))})
     return {"version": 2, "categories": categories, "measures": measures(sum(sizes.values()),
             sum(sizes[n] for n in done), len(funcs), len(done), units=len(units),
             complete_units=sum(u["metadata"]["complete"] for u in units),
@@ -276,7 +320,7 @@ def main():
     if args.json:
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy), indent=2) + "\n")
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas()), indent=2) + "\n")
 
 
 def bar(frac, width=30):

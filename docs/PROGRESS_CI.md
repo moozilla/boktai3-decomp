@@ -148,6 +148,18 @@ in the final ROM, so fuzzy, exact and linked code percentages coincide here.
 These are byte-weighted measures of the tracked code region, not percentages
 of functions or of the whole ROM. Data/asset reconstruction is not measured.
 
+### Area categories
+
+`symbols/progress_areas.csv` adds unit-level objdiff categories on top of the
+two register categories: **Intentional assembly (boot)** (`intentional_asm`,
+`08000000-0800145C`: header, reset vector and IWRAM helpers that stay assembly),
+**Monsters and bosses** (`monsters`: the Ghoul through Wooden crate block by
+address range plus boss/enemy families by unit-name regex), **Libraries**, and
+**Decompilable code** (everything except the intentional assembly). Rows give an
+address range and/or a regex on the unit name; a unit joins a category when its
+first address is in range or its name matches. Overall totals are unchanged;
+category percentages use their own denominators. Edit the CSV to regroup.
+
 ## Integration references
 
 - [Decompedia integration guide](https://decomp.wiki/tools/decomp-dev).
