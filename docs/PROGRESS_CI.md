@@ -33,10 +33,10 @@ entries used by the splitter are separately reviewed in
 The same `split.c_functions` scanner used by the build identifies non-static C
 definitions and address aliases. `INCLUDE_ASM` placeholders and static helpers
 do not count. Counts include only known boundaries, deduplicate names, and fail
-on an unknown definition instead of silently inflating progress. Game functions
-remain individual report units where original translation-unit boundaries are
-unknown. The eight identified libraries are contiguous report units, each with
-its functions nested underneath, in ROM order.
+on an unknown definition instead of silently inflating progress. Every game
+function belongs to a subsystem unit and every unit to a category (see
+*Categories and hierarchy*). The eight identified libraries are contiguous report
+units in the Libraries category, each with its functions nested underneath.
 
 `symbols/progress_libraries.csv` records reviewed, nonoverlapping address spans
 and the evidence/name maps used for MP2K, RFU, libagbsyscall, EEPROM, SIIRTC,
@@ -141,28 +141,29 @@ denominator; the Markdown summary also shows each matched share of total code.
 Fuzzy matching can include partial similarity; exact matching counts completed
 matches, and linked/completed measures count source units incorporated into
 the rebuilt game. Our reporter gives unfinished candidates no partial credit
-and groups identified libraries and contiguous game subsystems. Unknown areas
-remain individual function units.
+and groups identified libraries and contiguous game subsystems under
+top-level categories.
 Every accepted exact C match is used
 in the final ROM, so fuzzy, exact and linked code percentages coincide here.
 These are byte-weighted measures of the tracked code region, not percentages
 of functions or of the whole ROM. Data/asset reconstruction is not measured.
 
-### Area categories
+### Categories and hierarchy
 
-`symbols/progress_areas.csv` adds unit-level objdiff categories on top of the
-two register categories: **Intentional assembly** (`intentional_asm`,
+Every unit belongs to one top-level category from `symbols/progress_categories.csv`
+(Monsters, Bosses, Player, Menus, …) and is named `Category/Unit`; units are listed
+category by category. See [REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md) for the
+hierarchy and the rules for placing new code. Register-pinned and unpinned
+functions share their unit; the unit carries both register categories when it has
+both, and the two register categories' totals are still computed per function.
+
+`symbols/progress_areas.csv` adds **Intentional assembly** (`intentional_asm`,
 `08000000-0800145C`: header, reset vector and IWRAM helpers that stay assembly, plus the
 library ranges in `symbols/progress_asm.csv`: SDK/GCC handwritten assembly such as the
 m4a_1.s mixer block, RFU callback trampolines, BIOS wrappers and libgcc division, whose
-unmatched functions move to `libraries/<name> (assembly)` units and leave the Libraries
-category),
-**Monsters and bosses** (`monsters`: the Ghoul through Wooden crate block by
-address range plus boss/enemy families by unit-name regex), **Libraries**, and
-**Decompilable code** (everything except the intentional assembly). Rows give an
-address range and/or a regex on the unit name; a unit joins a category when its
-first address is in range or its name matches. Overall totals are unchanged;
-category percentages use their own denominators. Edit the CSV to regroup.
+unmatched functions move to `Libraries/<name> (assembly)` units and leave the Libraries
+category) and **Decompilable code** (everything except the intentional assembly).
+Overall totals are unchanged; category percentages use their own denominators.
 
 ## Integration references
 
@@ -178,15 +179,11 @@ contract: `jp_report` containing `report.json`.
 
 ## Contiguous game groups
 
-`symbols/progress_subsystems.csv` defines the named `game/` report units, using
-half-open inventory ranges and source/document evidence. This changes report
-presentation only: function identities, byte denominators and matching credit
-are preserved. Register-pinned members appear in a nested unit so the native
-category remains accurate. Provisional labels are explicitly marked tentative.
-
-The task scheduler (`08219F50–0821A184`) already has matching C throughout.
-Neighboring groups expose its heap, input, resource registry and message queue.
-The entry-point group contains the matching `AgbMain` and reset-word helper.
+`symbols/progress_subsystems.csv` defines the game units, using half-open
+inventory ranges and source/document evidence; `tools/subsystems.py --regroup`
+fills the code between reviewed rows (see [REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)).
+This changes report presentation only: function identities, byte denominators and
+matching credit are preserved. Provisional labels are explicitly marked tentative.
 
 The beginning of the address-ordered report is **not AgbMain**. Its first span
 includes the GBA header/reset vector; the `IntrMain` span also includes the ARM
@@ -194,12 +191,3 @@ helpers copied to IWRAM. These remain assembly. We retain the old denominator
 and do not turn header data or handwritten startup assembly into C credit.
 Treemap positions can change as groups and layout change; use unit labels and
 virtual addresses to identify a tile rather than its screen corner.
-
-
-The October 15 cleanup adds documented groups for the recent actor, inventory,
-input, effect and panel work, plus identified middle-ROM controllers and math
-helpers. See [the subsystem index](REPORT_SUBSYSTEMS.md) for range evidence and
-scope. Grouping preserves each function's address, size and fuzzy/exact status,
-all overall byte/function measures, and both register categories. The associated
-retained-tail audit corrects an independent legacy counting error at08221800;
-that correction changes exact credit, while grouping alone does not.
