@@ -1,4 +1,5 @@
 #include "global.h"
+#define SceneVolume_UpdateRepeatedShot sub_0817D7AC
 
 struct VolumeActor {
     u8 pad0[0x51];

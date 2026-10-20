@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateMotionFade                                                                 \
+    sub_08152174 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // Animation registers, scale-store addressing and phase branch layout differ.
@@ -210,5 +212,5 @@ void PlayerCue_UpdateMotionFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
+INCLUDE_ASM("asm/nonmatching", sub_08152174);
 #endif
