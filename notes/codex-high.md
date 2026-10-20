@@ -2446,3 +2446,87 @@ final checks. Each match has its own commit through `build/commit.sh`; this
 note is a separate final driver commit. Worked solo and offline. No full
 build, make invocation, generated-file edit, shared documentation/index edit,
 or network action. Combined ROM validation remains the integrator's task.
+
+## Task 081128F8 — 2026-10-20
+
+Tags: #matching #native-effect #scene-debris #actor-marker #register-pinning
+
+Worked solo and offline on the already-claimed `cloud/081128F8` branch.
+Final result: two exact functions, four guarded drafts. The matches cover
+26.3% of the assigned instruction count (+26.3 percentage points; 980 exact
+bytes), all in the Register-pinned category. Existing draft sources were
+resumed rather than recreated. No make, full build, network operation,
+generated-file edit, or shared documentation/index edit. Combined ROM
+validation and name promotion remain the integrator's work.
+
+- **08113BBC — drafted 99.6%, NativeEffect_UpdateRotatingFlight.**
+  Retained the prior best draft and restored its required local address alias
+  so it checks against this worktree's older ELF names. Two realigned
+  register-only differences remain: the final height-address reload uses r3
+  instead of r0. Scoped height pointers/values, input/output constraints and
+  scratch-register clobbers did not improve it; several changed earlier PRE
+  decisions and animation allocation. No functional change claimed.
+- **08114928 — drafted 83.9%, NativeEffect_CreateFromProfile.**
+  Retained the prior best draft, adding local aliases for its entry and the
+  three motion-state callbacks whose names are absent from the base ELF.
+  Still 53 realigned differing instructions, 23 with registers ignored.
+  Main obstacles: the manager-counter address is hoisted and kept alive;
+  position/velocity arguments spill; the second group-id expression and
+  type-two damage setup choose different registers/order. Counter-pointer
+  constraints, volatile counter reads, scalar-result constraints and pinned
+  input copies did not improve the candidate. Stronger input pinning also
+  changed the struct-copy instruction selection, so those edits were rejected.
+- **08113920 — drafted 95.4%, NativeEffect_UpdateAcceleratingTrail.**
+  Improved from 90.5% by factoring the random-table sample into an inline
+  helper with a constrained scalar result. Keeping the seven-bit-range mask
+  inside that helper fixes the particle-offset operand order. Thirteen
+  realigned differing instructions remain (five ignoring registers): an
+  extra live constant changes the ring mask, timer-pointer spill and frame
+  size. Hiding the odd-tick mask avoids that constant hoist but leaves a
+  different mask allocation and the extra spill; retained the smaller
+  realigned-difference candidate. The emission callee reads only the two
+  initialized offset halfwords, not the unused depth/padding fields.
+- **08112EA8 — matched, SceneDebris_UpdateBouncingMotion (tentative name).**
+  Full reviewed extent 604 bytes. Clears the selected visual's entry flag,
+  integrates signed halfword XYZ motion, increments vertical velocity, and
+  reflects depth velocity at 0/63 using restitution/10. Terrain clearance
+  clamps Y and derives reflected Y/X velocities. Projects against camera
+  X/Y; steps packed sprite commands for visual type zero, otherwise calls
+  Anim_Step with both animation and resource arguments. Timer expiry selects
+  SceneDebris_OnMotionEnd. Typed views establish the 32-byte debris slot:
+  visual pointer +0, position +4, velocity +C, timer +14, restitution +18,
+  active +19, entry +1A, visual type +1B, callback +1C. First visual sprite
+  begins +1C, its sequence +48; the alternate visual's position begins +40.
+  Explicit comparison values and scoped field/table views fixed the shared
+  animation stepper. Depinning reduced 37 hints to 19; formatted final source
+  passed `tools/check.py --target-size 604` with zero differing bytes.
+- **08113104 — drafted 96.2%, SceneDebris_UpdateAnimatedMotion (tentative).**
+  Planar sibling: moves X/Y, projects against the camera, advances the chosen
+  visual, and schedules cleanup when animation completes. A 476-byte exact
+  candidate was initially queued, then rejected during source-validity review:
+  the ROM writes only the projected X/Y word but copies a third scratch
+  halfword to visual depth. No instruction initializes that halfword. The
+  final correction commit supersedes the earlier matching commit and keeps
+  this function NONMATCHING; the defined draft explicitly initializes depth
+  to zero. Its final recorded score is 96.2%, nine realigned differing
+  instructions (four ignoring registers). Do not count the earlier exact
+  byte result as accepted C or restore its uninitialized depth read.
+- **081128F8 — matched, ActorMarkerPool_UpdateMarkers.**
+  Full reviewed extent 376 bytes. Walks eight 0x60-byte marker slots; for
+  active entries projects their anchored fixed-point X and Y+Z into screen
+  coordinates, then advances their packed sprite animation. Confirms task
+  header +18, resource prefix +1C within each slot, first sprite at manager
+  +34, first sequence +60, anchor +70 and activity word +74. Separate cursor,
+  sprite and sequence views reproduce the compiler's parallel loop pointers.
+  Widening the second flip mask through an empty constrained operand avoids
+  unwanted halfword normalization. Do not bind a dereferenced pointer to r7:
+  this agbcc can reinterpret its address as frame-relative storage. Pinning
+  temporary command/table lifetimes instead and letting the long-lived sprite
+  pointer allocate naturally resolved that issue. Depinning reduced 47 hints
+  to 13; formatted final source passed `tools/check.py --target-size 376`
+  with zero differing bytes.
+
+All retained functions have file-local `Subsystem_VerbNoun` address aliases.
+Commits were queued through `build/commit.sh`, including separate one-file
+register-hint minimization commits for the two accepted matches and the
+source-validity correction for 08113104. This note is the final driver commit.
