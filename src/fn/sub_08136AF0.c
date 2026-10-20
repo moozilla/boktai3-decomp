@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_actor_placement.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
 static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
 {
     s->flags2D4 = mask | s->flags2D4;
@@ -24,6 +21,7 @@ static inline u16 TestFlags(u32 value, u32 mask)
 }
 s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView *s)
 {
+    u8 new_var;
     u32 flags = MaskFlags(&s->flags2D4, 0xFFFFFEFF);
     switch (s->category) {
         case 0x12:
@@ -45,7 +43,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView
             if (!s->field2E4) {
             fallback:
                 Sound_PlaySong(0x211);
-            } else if (TestFlags(flags, 8)) {
+            } else if ((new_var = TestFlags(flags, 8))) {
                 Sound_PlaySong(0x13E);
                 Sound_PlaySong(0x12A);
             } else {
@@ -88,6 +86,3 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_PlayResponseAndResetState);
-#endif
