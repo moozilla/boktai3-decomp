@@ -1,9 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.6%
-// foundry draft (worker best 95.0%); what differs is mostly register allocation and instruction order
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -26,12 +23,11 @@ void Player_UpdateRecoilAction(struct Player *p)
         case 0: {
             u16 frame = p->tetherFrame;
             if (!frame) {
-                s8 direction = p->facing;
-                if ((u8)direction > 4) {
+                if ((u8)(s8)p->facing > 4) {
                     p->heading = (8 - p->facing) >> 1;
                     p->side = 1;
                 } else {
-                    p->heading = (u8)direction >> 1;
+                    p->heading = (u8)(s8)p->facing >> 1;
                     p->side = frame;
                 }
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40, 1);
@@ -58,6 +54,3 @@ void Player_UpdateRecoilAction(struct Player *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateRecoilAction);
-#endif

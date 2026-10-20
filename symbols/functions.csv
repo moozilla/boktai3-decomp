@@ -3169,6 +3169,7 @@ addr,name,mode,confidence,source,notes
 080AEA80,SceneActorPhase_SelectLinkedAnimation,thumb,low,src-alias,
 080AEB74,Vorn_TryRestorePatrolRoute,thumb,low,src-alias,
 080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,
+080AF1E0,Vorn_UpdateScriptedAction,thumb,low,src-alias,
 080AFBE4,Vorn_InitSpecialActionTable,thumb,low,src-alias,Installs the action table at actor offset 0x288; special action role is tentative
 080B04F4,SceneActorControl_UpdateProbeApproach_080B04F4,thumb,low,src-alias,
 080B0728,SceneActorPhase_UpdateConditionalMotion,thumb,low,src-alias,
@@ -3180,6 +3181,7 @@ addr,name,mode,confidence,source,notes
 080B0AE8,SceneActorPhase_TryBeginSpecialMotion,thumb,low,src-alias,
 080B0C38,Vorn_InitScriptCallback,thumb,low,src-alias,Resets callback argument fields and reads the script procedure from keyword d
 080B0C80,SceneActor_RunPositionScript,thumb,low,src-alias,
+080B0D28,SceneActor_CallContextScriptB,thumb,low,src-alias,
 080B0E04,SceneInventory_FindSlotByValue,thumb,low,src-alias,
 080B0E5C,SceneActor_TryLaunchItem13,thumb,low,src-alias,
 080B0F4C,SceneActor_TryLaunchSelectedItem,thumb,low,src-alias,
@@ -4873,16 +4875,19 @@ addr,name,mode,confidence,source,notes
 08151310,Player_UpdateSixPhaseAction,thumb,low,src-alias,
 0815196C,PlayerCue_UpdateRunOverlay,thumb,low,src-alias,Run cue callback that sets overlay animation 0x174 and its associated value to 0x18
 08151988,Player_UpdateThreePhaseBaseAnimationAction,thumb,low,src-alias,
+08151D90,Player_RestartAnimationFromSetup,thumb,low,src-alias,
 08151EB8,PlayerCue_UpdateWalkTarget,thumb,low,src-alias,
 08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,
 08153224,PlayerCue_UpdateFormChange,thumb,low,src-alias,
 08153610,PlayerCue_UpdateSpiralMotion,thumb,low,src-alias,
+081538DC,Player_RestartAnimationFromResource,thumb,low,src-alias,
 08153A00,PlayerCue_UpdateSideWalkTarget,thumb,low,src-alias,
 08153E1C,PlayerCue_UpdateSideDeparture,thumb,low,src-alias,
 081540D4,PlayerCue_UpdateSideArrival,thumb,low,src-alias,
 081543F0,PlayerCue_UpdateSideFade,thumb,low,src-alias,
 08154AF0,PlayerCue_UpdateSideRecoil,thumb,low,src-alias,
 08154CD4,PlayerCue_UpdateSpiralRecovery,thumb,low,src-alias,
+08154EE4,Player_RestartAnimationFromResource2,thumb,low,src-alias,
 08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
 081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
 081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
@@ -6944,6 +6949,7 @@ addr,name,mode,confidence,source,notes
 081C7E30,StateActor_UpdateAnimation20State,thumb,low,src-alias,Plays animation entry 20 for kind 27 then restores entry zero when playback finishes
 081C7F00,StateActor_RunEntryAnimSequence,thumb,low,src-alias,
 081C8018,StateActor_UpdateAnimation21State,thumb,low,src-alias,Starts animation entry 21 for kind 27 and completes after frame ten
+081C80D0,StateActor_UpdateAnimation22State,thumb,low,src-alias,
 081C81A4,StateActor_StartAnimation23State,thumb,low,src-alias,Starts animation entry 23 for kind 27 and immediately marks the state complete
 081C8254,StateActor_UpdateAnimation24State,thumb,low,src-alias,Plays animation entry 24 for kind 27 with playback mode three and waits for completion
 081C8310,StateActor_StartAnimation25State,thumb,low,src-alias,Starts animation entry 25 for kind 27 and immediately marks the state complete
@@ -6968,6 +6974,7 @@ addr,name,mode,confidence,source,notes
 081C996C,Actor_UpdateKindFourEntryFive,thumb,low,src-alias,Animation state callback selecting entry 5 for kind 4 and marking completion
 081C9A28,Actor_UpdateKindFourEntryFiveFlagsSix,thumb,low,src-alias,Animation state callback selecting entry 5 for kind 4 with keyframe flags 6 and marking completion
 081C9AE4,Actor_UpdateKindFourEntrySeven,thumb,low,src-alias,Animation state callback selecting entry 7 for kind 4 and marking completion
+081C9BA0,StateActor_UpdateTwoStageAnimation,thumb,low,src-alias,
 081C9D00,Actor_UpdateKindFourEntryTen,thumb,low,src-alias,Animation state callback selecting entry 10 for kind 4 and resetting phase before awaiting completion
 081C9DC0,Actor_BeginKindFourEntrySix,thumb,low,src-alias,Animation state callback starting entry 6 for kind 4 on state entry without testing completion
 081C9E6C,Actor_UpdateKindFiveEntryFour,thumb,low,src-alias,Animation state callback selecting entry 4 for kind 5 and marking completion
@@ -6979,6 +6986,7 @@ addr,name,mode,confidence,source,notes
 081CA3D4,Actor_UpdateKindFiveEntryTen,thumb,low,src-alias,Animation state callback selecting entry 10 for kind 5 and marking completion
 081CA854,Actor_BeginKindFifteenEntryNine,thumb,low,src-alias,Animation state callback starting entry 9 for kind 15 on state entry without testing completion
 081CA900,Actor_UpdateKindFifteenEntryTenTimed,thumb,low,src-alias,Animation state callback starting entry 10 for kind 15 and marking completion when the frame argument exceeds 15
+081CA9B8,StateActor_UpdateTwoStageAnimationB,thumb,low,src-alias,
 081CAB20,SceneCharacter_UpdateAnimationFiveSixFive,thumb,low,src-alias,State callback plays kind 15 animations 5 then 6 then 5 and marks completion
 081CAD28,SceneCharacter_StartSlowAnimationSeven,thumb,low,src-alias,State callback starts kind 15 animation 7 with playback parameter 1
 081CADD8,SceneCharacter_StartAnimationSeven,thumb,low,src-alias,State callback starts kind 15 animation 7 with playback parameter 4

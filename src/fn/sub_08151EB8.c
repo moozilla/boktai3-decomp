@@ -31,7 +31,7 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_UpdateHidden(struct P *);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
-void sub_08151D90(struct P *);
+void Player_RestartAnimationFromSetup(struct P *);
 extern const s16 gUnk_086149C4[];
 void Sound_PlaySong(u32);
 static inline s32 Truncate(s32 v)
@@ -169,7 +169,7 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
             p->flip = 0;
         }
         ActorSequence_Begin(p, 0, 0);
-        p->fn = sub_08151D90;
+        p->fn = Player_RestartAnimationFromSetup;
         PlayerCue_CompleteAction(p);
     } else {
         p->vx = Truncate(gUnk_086149C4[(angle + 64) & 255] * 9);

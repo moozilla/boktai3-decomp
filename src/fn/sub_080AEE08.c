@@ -10,7 +10,7 @@ void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
-void sub_080B0D28(void *);
+void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
@@ -79,7 +79,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     actor->field2B0 = 1;
     if (!Flag(actor, 0x400, 0x2CC)) {
         u8 category;
-        sub_080B0D28(actor);
+        SceneActor_CallContextScriptB(actor);
         rangeB.x = 80;
         rangeB.y = 60;
         rangeB.z = 60;
