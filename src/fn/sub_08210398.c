@@ -1,0 +1,69 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#define PinkSpine_UpdateDamageAnimation sub_08210398
+#ifdef NONMATCHING
+// fuzzy: 89.6%
+// Remaining differences: pause branch layout, collider addressing, animation pointer lifetimes and explicit callback return.
+#include "pink_spine_playback.h"
+// confidence=low: prefix follows the neighboring creator; species identity remains tentative.
+extern u32 gUnk_030053F0, gUnk_02000560;
+void Anim_RestartSequence(void *, void *, u32, u32, u32);
+void sub_0821025C(void);
+void ProjectileEmitter_UpdateAttack(void);
+static inline u32 PauseFlags(u32 mask)
+{
+    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+}
+static inline u32 TestFlags(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
+{
+    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, 4))
+        return 0;
+    Callback_InvokeActor(p, p->update);
+    p->sprite.flags &= ~1;
+    if (!p->f134) {
+        p->collider.flags &= ~4;
+        Collider_SetPosition(&p->collider, &p->sprite.position, 0);
+    } else
+        p->collider.flags |= 4;
+    if (p->f130 > 0 && !p->f134) {
+        p->f136 -= p->f130;
+        p->f144 = p->f148;
+        Sound_PlaySong(0x13E);
+        if (p->f136 <= 0) {
+            p->f134 = 1;
+            Anim_RestartSequence(&p->sequence, p->f15C, 0xD, 0, 0);
+            AnimData_SelectPaletteBank(p->graphics, 0x1BD);
+            p->f12C = 0;
+            p->update = sub_0821025C;
+            Sound_PlaySong(0x522);
+            p->age = 0;
+        }
+        p->f12C = 4;
+        p->f132 = 1;
+        p->f130 = 0;
+    }
+    if (p->f12C > 0) {
+        AnimData_SelectPaletteBank(p->graphics, 0x192);
+        p->f12C--;
+    } else
+        AnimData_SelectPaletteBank(p->graphics, 0x1BD);
+    {
+        register u32 allocationToken asm("r0");
+        u32 ended;
+        asm("" : "=r"(allocationToken));
+        ended = PinkSpine_StepAnimation(p);
+        asm("" : : "r"(allocationToken));
+        if (ended && p->update == ProjectileEmitter_UpdateAttack)
+            Sound_PlaySong(0x521);
+    }
+    p->age++;
+    // Callback callers discard the ROM's incidental result.
+    return 0;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08210398);
+#endif
