@@ -3280,3 +3280,88 @@ against this checkout's baseline ELF; both default assembly alternatives
 were checked exactly. Three exact sources retain their register-pinning
 concession markers. Notes committed last; shared index/history left unchanged
 under CLOUD.md. Combined ROM validation remains with the integrator.
+
+## Task 08104350 — 2026-10-20
+
+Tags: #matching #actor-group #proximity-actor #register-pinning
+
+Assigned target-byte exact coverage increased from 0% to 31.5% (+31.5 percentage
+points; 1300 of 4124 reviewed bytes including pools/alignment). Two exact
+functions and four NONMATCHING drafts, each in its own driver commit on the
+already-claimed cloud/08104350 branch. No network operations or full builds.
+
+- **08105AB4 — drafted 81.2%, ProximityActor_UpdateDamageAnimation.** Reads the
+  context at 020001B4, health at FC, maximum at FE, damage step at 100 and flags
+  at 108. Starts a terminal animation/state when health reaches zero; otherwise
+  selects a damage frame or mirrored recovery frame, restores health in steps
+  of ten and clears the hit byte EB. The packed-command stepper repeats twice.
+  Started from the matched MessageWindow/SceneActors stepper relatives. Explicit
+  offset-before-table evaluation, scoped flag masks, a distinct duration copy,
+  absolute-value expression and temporary quotient improved the candidate.
+  Pointer lifetimes, instruction ordering and allocation remain: 102 realigned
+  differing instructions, 29 ignoring registers. Recorded against all 952 bytes;
+  the candidate is 940 bytes. Guarded draft retains register hints.
+- **08104350 — drafted 84.0%, ActorGroup_CreateFromScript.** Creates/uses the
+  020001B0 Pool184 manager, allocates a member, loads sprite resource 9385 and
+  reads m/p/r/n/a/b/A/P/I/G options. The A option supplies health, debris count,
+  a byte and three arguments passed to 08105194; default health is 100 and the
+  default count is three. Origin at 118 copies the eight-byte position at 1C;
+  a supplies the squared activation radius at 138. Recovered a local member
+  view, shadow initialization and initial packed-animation stepping. Passing the
+  tested status result to the alternate shadow call keeps its distinct call
+  path. Typed fields and removing forced outer register/pointer lifetimes were
+  more useful than additional pins. Rejected an intermediate with overlapping
+  fixed-register lifetimes; retained the version with ordinary outer locals.
+  Remaining option/default ordering, argument-loop form, pointers and allocation
+  give 120 realigned differences / 70 ignoring registers. Candidate 1008 bytes,
+  reviewed target 1016. Only the guarded stepper retains matching concessions.
+- **0810523C — matched, ActorGroup_EmitRemovalDebris.** Five emissions through
+  08127590 with resource hashes 9385/74C9, radius ten, lifetime 30 and parameter
+  490. The first vertical velocity is 64, the others 34; the last three select
+  (0,1), (1,0), (2,0) variants. Ends by calling 081050BC. Keeping random-angle
+  evaluation before the vector argument in the inline Polar helper fixes load
+  ordering in all five copies. A read-only empty constraint on the first angle
+  and vector settles the first allocation without destroying the angle's known
+  byte range. depin removed both explicit register bindings and retained only
+  that constraint. Exact after formatting with --target-size 900; marked as a
+  register-pinning concession because the empty constraint remains.
+- **0810480C — drafted 94.5%, ActorGroup_UpdateMemberProximity.** On entry clears
+  the frame counter, exposes the sprite and initializes a rotated offset with
+  radii 41/148. On odd frames tests origin range and player eligibility, starts
+  turn step four when the distance changes, and decrements the health/countdown.
+  Expiration selects state three; other activations play song 3C9. Then calls
+  081049F0 and increments the frame. A scoped clear helper restores CpuSet
+  ordering; constraining the first scaled X value and the intermediate Z value
+  improves allocation. Fourteen realigned differences, four ignoring registers:
+  angle/Z register choices, a few address temporaries and flag-test/load order.
+  Candidate and reviewed target both 484 bytes. Guarded draft with hints.
+- **081049F0 — drafted 82.2%, ActorGroup_UpdateMemberSway.** Wraps the byte angle,
+  rotates the two radii around the saved origin and adjusts/damps the turn step.
+  Preserve -(radius * sine), rather than (-radius) * sine: agbcc selects a
+  different negate/multiply order. Signed magnitude shifts reproduce the
+  truncation-toward-zero fixed-point scaling and half-step calculation. A scoped
+  r0 result for two scaled components recovers the original result copies;
+  another attempted table pin regressed and was discarded. Forty-five realigned
+  differences, four ignoring registers: primarily sine-table/scratch allocation,
+  with redundant turn-step reads and two bytes of body length still off.
+  Candidate 368 bytes, reviewed target 372. Guarded draft with hints.
+- **08105808 — matched, ProximityActor_ApplyContactDamage.** Collider callback
+  installed by ProximityActor_InitializeCollider (08105998). Flags at actor 108
+  gate contact response; reaction bit eight emits variant-dependent sparkles and
+  song 15C on a cooldown. Variant one loses 200 health per accepted contact;
+  the other uses incoming collider damage. Both clamp health at zero. Variant
+  one also forwards flag-10 contacts through the callback/data pair at collider
+  4C/50. Use one blocked local across both variant branches to share the
+  materialized status test; an inline mask accessor loads the mask before flags.
+  `health -= damage; health = health < 0 ? 0 : health` reproduces both stores and
+  the signed truncation test. Exact after formatting with --target-size 400,
+  with no register hints.
+
+All names are provisional and carry confidence=low comments above exact alias
+lines. Four draft scores were recorded after formatting using check.py
+--nonmatching --record; their default INCLUDE_ASM branches also pass exact fast
+checks. depin was run on hinted sources (nonmatching candidates are skipped by
+that tool). Some draft commit titles retain their pre-record rounded scores;
+source fuzzy lines and the scores above are authoritative. Shared headers,
+symbol names, generated output, index and history were left unchanged. Combined
+ROM validation remains the integrator's responsibility.
