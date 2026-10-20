@@ -150,6 +150,8 @@ static inline void FindReleaseTarget(struct Hresvelgr *actor, struct Vec *out)
         }
     }
 }
+// confidence=low: coordinates player positioning, landing, and release.
+#define Hresvelgr_UpdatePlayerRelease sub_0819FE9C
 void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 {
     struct Hresvelgr *saved = actor;
@@ -266,5 +268,5 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
+INCLUDE_ASM("asm/nonmatching", sub_0819FE9C);
 #endif
