@@ -8,8 +8,8 @@ void ChallengeMenu_LoadPalette(u8 *p);
 void ChallengeMenu_SetStoredRank(s32 a, s32 b, u32 c);
 void ChallengeMenu_StartFadeIn(u8 *p);
 void SceneTextSelector_UpdatePanel(struct SceneTextSelector *p);
-void sub_081C54B8(u8 *s);
-void sub_081C5A10(u8 *s);
+void ChallengeMenu_DrawOptions(u8 *s);
+void ChallengeMenu_InitBackgrounds(u8 *s);
 s32 Script_GetKeywordValue(u32, s32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetValue(void);
@@ -63,11 +63,11 @@ s32 ChallengeMenu_ScriptOpen(struct ChallengeMenu *s)
     }
     s->unk30c = 0;
     s->unk310 = 0;
-    sub_081C5A10((u8 *)s);
+    ChallengeMenu_InitBackgrounds((u8 *)s);
     ChallengeMenu_LoadPalette((u8 *)s);
     ChallengeMenu_InitAnimations((u8 *)s);
     SceneTextSelector_UpdatePanel((struct SceneTextSelector *)s);
-    sub_081C54B8((u8 *)s);
+    ChallengeMenu_DrawOptions((u8 *)s);
     ChallengeMenu_StartFadeIn((u8 *)s);
     s->choice = 0;
     return 0;

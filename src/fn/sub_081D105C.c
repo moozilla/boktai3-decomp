@@ -19,9 +19,9 @@ extern struct SceneNpc *gUnk_02000274;
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 void DisplayAnimation_SetFlags(void *, s32);
 void Actor_DisableShadow(struct SceneNpc *);
-void sub_081CEF3C(void);
+void SceneNpc_UpdateStopped(void);
 /* Registry routine 6CBE: puts scene NPC -n (default: the last created) into
-   mode 0x11, state 15 (update sub_081CEF3C) and resets its animation
+   mode 0x11, state 15 (update SceneNpc_UpdateStopped) and resets its animation
    (tentative: stop and stand). */
 void SceneNpc_StopFromScript(void)
 {
@@ -45,7 +45,7 @@ void SceneNpc_StopFromScript(void)
     npc->mode = mode;
     npc->field14 = 0;
     npc->field8 = 1;
-    update = sub_081CEF3C;
+    update = SceneNpc_UpdateStopped;
     npc->state = 15;
     npc->update = update;
     npc->field10 = 0;
