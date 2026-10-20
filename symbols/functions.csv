@@ -4020,6 +4020,7 @@ addr,name,mode,confidence,source,notes
 0810CC28,LinkPanel_DrawTime,thumb,low,src-alias,
 0810CCC8,LinkPanel_DrawPeerTimes,thumb,low,src-alias,
 0810CD4C,LinkPanel_CreateTextWindows,thumb,low,src-alias,
+0810CDD8,LinkPanel_StartDescriptions,thumb,low,src-alias,
 0810CEBC,SlotMenu_InitializeAlternateEntryValues,thumb,low,src-alias,
 0810CF08,PanelSequence_InitializeSprites,thumb,low,src-alias,
 0810D14C,Registry30AC_HideDisplay,thumb,low,src-alias,Sets hidden flags on seven animations and hides both embedded display panels
@@ -5537,6 +5538,7 @@ addr,name,mode,confidence,source,notes
 08169BB0,StatusPanel_ClearLowerRows,thumb,low,src-alias,
 08169BE0,PauseMenu_RefreshStatusPanel,thumb,low,src-alias,
 08169DAC,Hud_OnUnpausedRefresh,thumb,low,src-alias,Refreshes the HUD through its display updater when global flag bit zero is clear
+08169DCC,SceneHud_EnterOptionControls,thumb,low,src-alias,
 08169E94,StatusPanel_BeginRefresh,thumb,low,src-alias,
 08169EDC,StatusPanel_ResetSelectionAnimations,thumb,low,src-alias,
 08169F44,PauseMenu_RefreshPriceDigits,thumb,low,src-alias,
@@ -6586,6 +6588,7 @@ addr,name,mode,confidence,source,notes
 081A4064,MotionEntry_UpdatePosition,thumb,low,src-alias,
 081A4100,MotionEntry_Create,thumb,low,src-alias,
 081A427C,Hresvelgr_ReleaseEffect,thumb,low,src-alias,Decrements the active effect count and marks the entry inactive
+081A4594,Hresvelgr_UpdateMotionEntry,thumb,low,src-alias,
 081A46B0,Hresvelgr_UpdateEffects,thumb,low,src-alias,Task update callback dispatches each active effect by type and increments its age
 081A46EC,Hresvelgr_DestroyEffectPool,thumb,low,src-alias,Task destruction callback removes effect sprites and clears the pool singleton
 081A4718,EffectSpritePool_InitializeEntries,thumb,low,src-alias,
@@ -7517,6 +7520,8 @@ addr,name,mode,confidence,source,notes
 081D474C,BestiaryDisplay_CreateEntryAnimations,thumb,low,src-alias,
 081D48B0,BestiaryDisplay_UpdateAnimations,thumb,low,src-alias,Advances playback for the display's six animation objects
 081D48D8,PaletteTransition_StartDisplay,thumb,low,src-alias,
+081D4990,DisplayEntry_SetAnim,thumb,low,src-alias,
+081D4A34,PaletteTransition_Restart,thumb,low,src-alias,
 081D4AC0,BestiaryDisplay_UpdateEntry,thumb,low,src-alias,
 081D4CA4,BestiaryDisplay_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that destroys six animations and removes the auxiliary sprite
 081D4D9C,BestiaryDisplay_Create,thumb,low,src-alias,Creates and initializes the display task with update and destruction callbacks
@@ -7542,8 +7547,10 @@ addr,name,mode,confidence,source,notes
 081D5324,Bestiary_CountUnlockedGroupEntries,thumb,low,src-alias,Counts set entry flags within the selected completion group
 081D5358,GameState_AreAllEventFlagsSet,thumb,low,src-alias,Checks that all 83 event flags are set while ignoring unused upper bits
 081D53A0,Script_ConsumeOptionalKeywordValue,thumb,low,src-alias,Consumes one value when keyword k is present; its intended command role remains uncertain
+081D53B4,BestiaryFlags_Update,thumb,low,src-alias,
 081D5444,BackgroundPanel_ReleaseHandles,thumb,low,src-alias,
 081D5478,BestiaryDisplay_DrawEntryDetails,thumb,low,src-alias,
+081D581C,ScrollingDialogue_Step,thumb,low,src-alias,
 081D58B4,MonsterBook_UpdateHighlightPulse,thumb,low,src-alias,Advances a looping 50-tick sequence and writes the highlight intensity; visual role tentative
 081D5C08,MonsterBook_SetupPageBackgrounds,thumb,low,src-alias,Loads page graphics and palettes and configures background layers
 081D6194,MonsterBook_SetPage,thumb,low,src-alias,Stores the page index and resets its state before rebuilding page graphics
@@ -7557,6 +7564,7 @@ addr,name,mode,confidence,source,notes
 081D72A4,ScreenTransition_DispatchPhase,thumb,low,src-alias,
 081D72FC,ScreenTransition_ReturnZero,thumb,low,src-alias,
 081D73F0,TextSequence_CreateFromScript,thumb,low,src-alias,Creates a task that reads timed text and color records from script options; identity tentative
+081D7434,OptionMenu_Update,thumb,low,src-alias,
 081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
 081D75AC,ScreenParams2A0_CreateSelector,thumb,low,src-alias,Creates an input task that selects among eight script callbacks configured through ScreenParams2A0
 081D7874,Task4E01_ClearTrailSprites,thumb,low,src-alias,Clears four active bytes and hides their corresponding sprites; trail identity tentative
@@ -7973,8 +7981,10 @@ addr,name,mode,confidence,source,notes
 081F5B74,SceneActor_BeginConditionalAnimation8,thumb,low,src-alias,
 081F5CAC,SceneActor_UpdateAnimation15Cycle,thumb,low,src-alias,
 081F5D6C,SceneActor_UpdateAnimation0Timer,thumb,low,src-alias,
+081F5F28,SceneActors_UpdateSpawnShake,thumb,low,src-alias,
 081F5FEC,SceneActors_UpdateTimedDirectionalAnimation,thumb,low,src-alias,
 081F6078,SceneActors_UpdateTimedAnimationReset,thumb,low,src-alias,
+081F612C,SceneActor_UpdateAnimationDTimer,thumb,low,src-alias,
 081F61A0,SceneActors_UpdateOrbitingParticleAnimation,thumb,low,src-alias,
 081F63C4,Ratatosk_RunStateCallback,thumb,low,src-alias,Delegates Ratatosk state execution to SceneActors_RunStateCallback
 081F63D0,Ratatosk_InitRequestedState,thumb,low,src-alias,Validates the requested state and installs its table callback while resetting state entry fields
@@ -9420,8 +9430,11 @@ addr,name,mode,confidence,source,notes
 08238B48,DirectionalEffect_DecodeAnimationMode,thumb,low,src-alias,
 08238B88,Player_ShowDirectionalEffect,thumb,low,src-alias,Copies owner rendering fields into the directional sprite and marks it visible and active
 08238BC8,Player_StartDirectionalEffect,thumb,low,src-alias,Positions and animates the directional effect using the player facing and sets its movement vector
+08238E0C,DirectionalEffect_Spawn,thumb,low,src-alias,
 08238EBC,DirectionalEffect_PlaceSprite,thumb,low,src-alias,
 08238F10,Player_DestroyDirectionalEffect,thumb,low,src-alias,Removes the directional effect sprite embedded at offset 0x7FC
+08238F24,DirectionalEffect_Init,thumb,low,src-alias,
+08239098,DirectionalEffect_AddParticle,thumb,low,src-alias,
 08239130,Player_DestroySixParticleEffects,thumb,low,src-alias,Removes all six effect records beginning at offset 0x870
 08239150,Player_InitSixParticleEffects,thumb,low,src-alias,Initializes six effect records from resource 0x1C1E and resets their controller
 082391A8,Player_UpdateConvergingParticles,thumb,low,src-alias,Moves four active particles toward their shared center and hides particles that arrive
