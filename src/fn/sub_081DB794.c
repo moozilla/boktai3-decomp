@@ -1,7 +1,20 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Menu_EraseRect          sub_081DC02C
+#define Menu_DrawStringRef      sub_081DC154
+#define Menu_SetTextRect        sub_081DC178
+#define Menu_StartFadeIn        sub_081DC1B4
+#define Bg_ClearTilemap         sub_082156B8
+#define Bg_SetupLayers          sub_082161B4
+#define BgGfx_LoadTilemapSimple sub_0821656C
+#define ResourceHeader_Relocate sub_082196C4
+#define ScriptProc_Start        sub_0821A520
+#define CpuSet                  sub_08248594
+// confidence=low: background, labels, animations and menu selection initialization.
+#define Options_InitScreen sub_081DB794
 #ifdef NONMATCHING
-// fuzzy: 82.4%
+// fuzzy: 85.1%
+// Remaining differences: sprite/resource lifetimes, text-rectangle setup, palette reload.
 struct Rect {
     u16 x, y, width, height;
 };
@@ -27,7 +40,7 @@ s32 Options_InitScreen(u8 *arg)
     void *resource;
     void *background;
     void *palette;
-    void *graphics;
+    register void *graphics asm("r4");
     void *sprite;
     s32 layer;
     struct Rect rect;
@@ -98,5 +111,5 @@ s32 Options_InitScreen(u8 *arg)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Options_InitScreen);
+INCLUDE_ASM("asm/nonmatching", sub_081DB794);
 #endif

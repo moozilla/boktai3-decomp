@@ -1,5 +1,7 @@
 #include "scene_actor_chase.h"
 // confidence=low: restores a saved patrol destination and delayed command.
+// confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
+#define Vorn_TryRestorePatrolRoute sub_080AEB74
 #ifdef NONMATCHING
 // fuzzy: 80.2%
 // Remaining differences: terrain destination spill, flag-address reuse, and reset scheduling; savedMotion need not be volatile.
@@ -95,5 +97,5 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_TryRestorePatrolRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080AEB74);
 #endif
