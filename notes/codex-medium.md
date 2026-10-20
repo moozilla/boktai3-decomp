@@ -911,3 +911,79 @@ network operations, or register-pinning concessions. Commits were queued through
   zero in both mode-dependent initialization paths, even when current state is 2.
 
 The integrator still needs the normal combined full-ROM validation for this batch.
+
+## Task 0820302C — 2026-10-20
+
+Tags: #matching #animation #script #ooze #cannon
+
+Two exact matches and four guarded drafts. Used only fast per-file checks; no
+full build or network operations. Separate function commits went through the
+commit driver. The pre-existing `tools/cloud_task.py` change remains untouched.
+
+- **0820302C matched — ProximitySequence_EmitBurst.** Emits alternating-speed
+  sprite effects every ten countdown ticks below 90, plays a variant-dependent
+  sound at tick 80, and returns to proximity testing at expiry. The neighbouring
+  `ProximitySequence_TestPlayerDistance` installs this callback with timer 180.
+  Position is copied as two words and raised on Y; effect velocity uses signed
+  sixteen-bit bitfields. Fetch the first random value, then compute one shared
+  `base = spread - 8`, then use that base for both X and Z: duplicating the base
+  inside expressions/inline helpers makes agbcc narrow the subtraction, introduce
+  a literal, and allocate different registers. Small copy/raise inlines prevent
+  packed stack-vector scalar replacement. Exact check after formatting: 468 bytes.
+  No register-pinning concession required.
+- **08203204 matched — CannonEmitter_UpdateAnimation.** Pause-gated callback
+  dispatch, sprite visibility-bit clearing, temporary palette assignment while
+  +0xF2 counts down, then packed sequence playback. Preserves the callback's
+  return value in r0; treating it as a void callback changes the entire stepper's
+  register assignment. The same object shape is constructed at 0820337C and used
+  by 0820302C: sprite +0x20, flash palette +0xB0, callback +0xD0, sequence +0xD4.
+  A shared `paused:` return reproduces the original branch layout while allowing
+  the flip-mask constant to be initialized after the first pause test. Explicit
+  flag-result and read/store pointer locals reproduce the second flip update.
+  Register-pinning concession; `depin.py --write` reduced 29 hints to 21. Exact
+  check after formatting: 364 bytes.
+- **0820337C drafted 87.6% — CannonEmitter_InitializeFromScript.** Reads script
+  options p/r/a/t/s/S, squares the trigger range (default 0x40000), loads sprite
+  resource 0x7E7D, selects palette `variant + 0x1BA`, fills sixteen flash colours
+  with 0x7FFF, starts sequence 6 and optionally registers a scene body. Installs
+  `ProximitySequence_TestPlayerDistance`. Reused the recovered animation stepper
+  and explicitly preserved the `Anim_SetSequence` / terrain-queue return value.
+  Remaining: saved member-pointer lifetimes, palette-loop branch layout and
+  animation allocation (43 realigned instructions, 16 ignoring registers).
+- **08205B70 drafted 89.1% — Ooze_UpdateAttack (existing Ooze_BeginAttack).**
+  Three animation phases: wait until +0x11E exceeds +0x13E; start the attack and
+  play sound 0x523; repeat/hold until +0x13C reaches +0x13A; finish and restore
+  `Ooze_UpdateAttackDelay`, resetting phase/timer/repeat counters. Collider +0x68
+  is refreshed during phase 1. The stepper shares long runs with
+  `ContactSequenceActor_UpdateAppearing` and the roaming-object playback helper.
+  Passing sprite and sequence separately fixes their address-materialization
+  order. Remaining: 77 realigned instructions, 17 ignoring registers, mainly
+  transition-field address reuse and allocation. The draft's address alias also
+  maps back to existing exported `Ooze_BeginAttack`, allowing `--record` to find
+  the named assembly fallback; the initial zero score was corrected in a followup.
+- **08206098 drafted 85.0% — Ooze_InitializeFromScript.** Reads p/a/i/t/r/w/h/S;
+  defaults collider extents to 30/10/30, interval 60, attack delay 30 and repeat
+  limit 3. The h option maps pairs of headings to two facings. Initializes sprite,
+  variant-dependent sequence IDs, attack collider, optional delay list and optional
+  scene body. For variant 1 the body's origin shifts +128 along X or Z according
+  to facing. Installs `Ooze_UpdateAttackDelay`. Explicit return preserves the
+  observed +0x14E member address on the no-body path and terrain-queue result on
+  the body path, rather than falling off a non-void function. Remaining: option
+  branch shape, animation allocation and body-setup pointer lifetimes (103
+  realigned instructions, 47 ignoring registers).
+- **08206C00 drafted 83.6% — VulcanCannon_UpdateTargeting.** Compares player
+  distance with squared range; optional delay-table/fixed timer starts turning.
+  Facing 0 tests a narrow Z band with player to the right; the alternate facing
+  tests a narrow X band with player in front along Z. A clear shot resets attack
+  counters and installs 08207010. At aim timer 119, atan2 can select turning
+  callback 08207350. Final animation playback belongs to sprite +0x6C and sequence
+  +0x10C. A stack-address lifetime hint retains the copied player position in
+  memory; repeated member expressions avoid keeping a position pointer in a high
+  register throughout the function. Remaining: facing-change branch sharing and
+  address/allocation differences (103 realigned instructions, 20 structural).
+
+All four drafts compile, retain INCLUDE_ASM fallbacks, carry register-pinning
+markers, and have scores recorded with `check.py --nonmatching --record` against
+reviewed function extents. Declaration-swap trials did not improve them;
+`depin.py` skips non-exact candidates. No handwritten instruction bodies.
+Combined full-ROM validation remains for the integrator.
