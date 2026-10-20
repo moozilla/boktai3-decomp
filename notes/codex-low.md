@@ -1926,3 +1926,68 @@ Each function queued separately through build/commit.sh. All five guarded
 assembly fallbacks check byte-identical; all draft scores recorded with
 --nonmatching --record. Ghidra export is absent. Combined validation remains
 with the integrator. No shared documentation or generated assembly changed.
+
+## Task 08092814 (2026-10-20)
+
+Tags: #matching #bee #ghost #actor-animation
+
+Task exact coverage gained 23.1 percentage points, reaching 23.1% of these
+4,540 reviewed function bytes (1,048 exact bytes). All exact C is unpinned.
+No full build, network operation, shared documentation edit or generated
+assembly commit; combined ROM validation belongs to the integrator.
+
+- 08093810: drafted 82.1% as Bee_FollowWanderRoute (tentative). Consumes entry,
+  installs entryTarget228, chooses a random heading near actor+0xE9 (or a
+  reverse heading when context+0x3D4 bit 8 is set), builds nine route points,
+  follows them, then chooses behavior from context+0x3DC after its cooldown.
+  Context+0x428 is waypoint index; +0x43A is remaining interpolation budget;
+  +0x480 holds two movement words. Full-extent check: 130 realigned differing
+  instructions, 71 ignoring registers. Stack-vector addresses, PRE address
+  reuse and register allocation remain. Typed context/node experiments and
+  actor/context pins regressed and were reverted. Explicit Control offsets,
+  delayed CpuSet initialization and shift-before-table RNG addressing helped.
+- 080941F4: stopped without a qualifying draft. Complete exploratory C in
+  untracked wip/sub_080941F4.c. Follows the same route shape but aims at the
+  object at context+0x440, uses radius +0x43E, starts budget at 1280, and
+  restarts with +0x42C << 5. Its target delta is recomputed at entry, each
+  update and route restart. Best tested structural count was 91 (body pinned
+  r4; fuzzy 61.9%); the unpinned final exploration was 53.3%, 298/140 realigned
+  differences. Actor/context pins, pointer locals, declaration changes,
+  typed waypoint context and helper rewrites did not yield a close candidate.
+- 08095740: matched Ghost_UpdateEnergyDrainAnimation, 604 bytes. Directional
+  profile entry 1 is selected using Ghost_GetDirectionalFrame; modes 0/1
+  periodically subtract player energy, mode 1 also calls 0813D834. Tracks
+  player+0x4F4 wrapping progress relative to context+0x5BE; elapsed +0x5BD,
+  limit +0x561 and interval +0x560. Matched Select inline from Lun animation
+  code supplied the shared sprite/tile animation branches. WrapCounter inline
+  preserves the subtraction order. A typed u16 flag-setting inline and
+  initializing zero after taking the destination pointer fixed final ordering.
+- 08095C00: drafted 89.1% as Ghost_TurnTowardHeading (tentative). Turns in
+  32-angle increments on field2CA bit 4, choosing direction with flags2CC
+  bit 0x10000; resumes savedTarget when the octant matches actor+0x3CD.
+  Refreshes duration scale and profile entry 1 animation. Full-extent check:
+  39 realigned differences, 4 ignoring registers. Main residue is motion /
+  sequence pointer register allocation, mask lifetime and Control zero timing.
+  Explicit flag-mask locals and a mask-taking read inline helped. Pointer
+  pins and wholesale replacement of Control regressed and were reverted.
+- 08093EE4: matched Bee_ApproachSavedPlayerPosition, 444 bytes. On entry saves
+  the player's two position words at context+0x450, selects recovery animation,
+  copies context+0x429 to +0x3DC, sets flag 0x100 and plays song 0x3C8. Approaches
+  the saved X/Z at speed 24 when farther than 32 on either axis; animation
+  completion selects behavior 4. Expressing the saved position as a field of
+  a motion view at context+0x444 reproduced the original addressing and all
+  registers. Delaying the context byte destination until after loading its
+  value and a local mask in Control fixed the other structural differences.
+- 08092814: drafted 93.1% as Bee_ReturnToPlayerWhenStopped (tentative).
+  Initializes random movement components at actor+0x2EC/+0x2F0 using the sine
+  table scaled by 1/64; when stationary, disables movement and begins moving
+  toward player+0x30, then selects phase 2 behavior 0. Full-extent check:
+  13 differing instructions, zero ignoring registers (15 differing bytes).
+  Explicit Control offset lifetimes and an inline CpuSet zero initialization
+  reduced the structural residue to zero; RNG pointer arithmetic puts its
+  shift before the table literal as in ROM. Remaining setup register choices
+  resisted small local/type/store-inline variants; retained without pins.
+
+Each match and qualifying draft was committed separately through build/commit.sh.
+Draft scores were recorded with check.py --nonmatching --record; all three
+normal assembly fallbacks check byte-identical. Ghidra export is absent.
