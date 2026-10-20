@@ -3,9 +3,12 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
+// confidence=low: player-directed sweeping strike followed by a timed retreat.
+#define Vanargand_UpdatePartSweepingStrike sub_081B3410
+
 #ifdef NONMATCHING
-// fuzzy: 94.0%
-// Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
+// fuzzy: 94.5%
+// Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -260,7 +263,7 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             enter = &p->enter;
 
             if (entering) {
-                *enter = 0;
+                p->enter = 0;
                 Difference(&p->target, Player_GetEffectivePosition(0), p->base);
                 p->target.y = Player_GetEffectivePosition(0)->y - (p->base)->y;
                 OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &p->target,
@@ -336,5 +339,5 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSweepingStrike);
+INCLUDE_ASM("asm/nonmatching", sub_081B3410);
 #endif
