@@ -255,6 +255,7 @@ address,evidence
 0813E1B8,Independent player modifier callback with own return; notes/player_3.md
 0813E284,Independent modifier callback following equipment-level function; notes/player_3.md
 0813F828,Independent energy-spend body after affordability test; notes/player_3.md
+08152C3C,Independent push r4-r7-lr and stack allocation after 08152A5C pop-bx return and literal pool; ROM bytes F0 B5 83 B0 at 08152C3C
 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
