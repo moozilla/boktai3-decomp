@@ -32,7 +32,6 @@ static inline void RequestState(struct VanargandVariant *p, u32 state)
     p->state = state;
 }
 
-#define Vanargand_UpdateVariantEntry sub_081A8378
 void Vanargand_UpdateVariantEntry(struct VanargandVariant *p)
 {
     struct VanargandVariant *q = p;

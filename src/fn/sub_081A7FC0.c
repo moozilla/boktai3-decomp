@@ -33,7 +33,6 @@ static inline void RequestState(struct VanargandPair *p, u32 state)
     p->state = state;
 }
 
-#define Vanargand_UpdatePairEntry sub_081A7FC0
 void Vanargand_UpdatePairEntry(struct VanargandPair *p)
 {
     struct VanargandPair *q = p;
