@@ -2,6 +2,8 @@
 #include "global.h"
 // confidence=low: waits twenty updates before saving chase behavior and rerouting.
 
+#define Dog_BeginDelayedRouteRecovery sub_080E4B34
+
 #ifdef NONMATCHING
 // fuzzy: 87.7%
 // Recovery inline register allocation and several flag updates still differ.
@@ -153,5 +155,5 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
         a->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Dog_BeginDelayedRouteRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080E4B34);
 #endif
