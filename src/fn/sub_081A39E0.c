@@ -190,5 +190,5 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A39E0);
+INCLUDE_ASM("asm/nonmatching", EffectPool_UpdateEntry);
 #endif
