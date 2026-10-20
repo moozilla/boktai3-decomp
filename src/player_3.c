@@ -292,7 +292,60 @@ void Player_FlushQueuedEffects(struct Player *p)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813D548);
+s32 sub_082315A8(void *, s32, s32, struct SceneVec *);
+
+static inline int EffectRandomWith(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+
+// confidence=low: queues a randomized status particle and its sound cue.
+#define Player_QueueStatusEffect sub_0813D548
+void Player_QueueStatusEffect(struct Player *p, s32 a)
+{
+    struct SceneVec v;
+    if (p->movementModifierActive) {
+        if (p->movementModifierKind != a) {
+            if (p->movementModifierKind == 3)
+                return;
+            Player_FlushQueuedEffects(p);
+        }
+    }
+    if (!p->movementModifierActive) {
+        p->savedEffectTick = p->facingChangeEffects;
+        *(u16 *)((u8 *)p + 0x4C6) = 0;
+    }
+
+    if (p->actionMode == 3) {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 7) - 3;
+        v.y = (EffectRandomWith(t) & 7) - 5;
+        v.z = 0;
+    } else if (p->actionMode == 4) {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 7) - 3;
+        v.y = (EffectRandomWith(t) & 7) - 3;
+        v.z = 0;
+    } else {
+        const u16 *t = gUnk_0203B400;
+        v.x = (EffectRandomWith(t) & 15) - 7;
+        v.y = -(EffectRandomWith(t) & 31);
+        v.z = 0;
+    }
+    if (sub_082315A8(&p->effectGroup, a, 0xE10, &v) >= 0) {
+        if (p->movementModifierKind == 1)
+            Sound_PlaySong(0x191);
+        else if (p->movementModifierKind == 2) {
+            p->particleEmissionCount += 10;
+            Sound_PlaySong(0x133);
+        } else if (p->movementModifierKind == 3)
+            Sound_PlaySong(0x133);
+    }
+    p->scriptStatus[0] = 0;
+}
 
 s32 Player_GetEffectTickDelta(struct Player *p)
 {
