@@ -1758,3 +1758,51 @@ Tags: #player #matching #drafts
 All retained C remains guarded by NONMATCHING, scored with --record.
 Per-file default assembly fallback checks pass after the 08149DF0 filename fix;
 these checks do not count as C matches. No full build or network operations.
+
+
+## Task 08153224 follow-up (2026-10-20)
+
+Tags: #matching #player #animation #cue
+
+Exact progress: 0.0 percentage-point gain. All six targets were existing guarded
+C drafts; restored file-local aliases using their current symbols/functions.csv
+names and address-form INCLUDE_ASM fallbacks. No network or full build used.
+Formatted all six files and recorded full-extent scores with check.py
+--nonmatching --record; each default assembly fallback checks byte-identically.
+
+- 081543F0: improved PlayerCue_UpdateSideFade from 86.4% to drafted 91.3%.
+  Typed sprite.unknown8[0/1] accesses instead of byte-pointer casts reduce
+  realigned differences from 131/29 structural to 77/7. A scale setter inline
+  reached 89.7%; value barriers 89.0%; specializing final playback with swapped
+  state/sprite pins regressed to 85.6%. Retained typed accesses. Remaining
+  differences concern scale offsets, phase tails and playback allocation.
+- 08153A00: retained PlayerCue_UpdateSideWalkTarget, drafted 96.9%, 17 realigned
+  differences / eight structural. Unsigned final-direction reset and unsigned
+  scaling products did not change code. Volatile reset worsened to 94.8%;
+  product barriers did not improve it. Direction-reset store and signed scaling
+  branch layout remain; reverted experiments.
+- 08153224: retained PlayerCue_UpdateFormChange, drafted 84.4%, 84 realigned
+  differences / 26 structural. Explicit widened timer and opaque mask worsened
+  to 82.3%; splitting effect-timer addition did not change code. Remaining
+  constant lifetimes, phase layout and particle configuration. Preserved fully
+  initialized particle words rather than introducing an uninitialized read.
+- 081540D4: retained PlayerCue_UpdateSideArrival, drafted 98.5%, nine realigned
+  differences / seven structural. Shared last-frame index store did not improve
+  the instruction count; phase-mask barrier increased structural differences.
+  Reverted both. Completion-store sharing and first-mask materialization remain.
+- 08153610: retained PlayerCue_UpdateSpiralMotion, drafted 89.9%, 42 realigned
+  differences / 15 structural. Widened timer plus mask reduced structural count
+  to 13 but raised total to 56 and lowered fuzzy to 88.3%; rejected. Effect
+  timer temporary alone made no change. Constants and field-address lifetimes
+  remain.
+- 08154AF0: improved PlayerCue_UpdateSideRecoil from 97.5% to drafted 98.7%,
+  three realigned differences / zero structural (three bytes). Pin the direction
+  offset to r5 and its derived pointer to r0 with empty operand barriers.
+  Remaining recoil-offset constant uses r1 instead of ROM r2. Pinning that
+  offset, with input/output/no barrier and local pointer variants, disrupts
+  earlier allocation and worsens the candidate. Retained only direction hints.
+
+Tool caution: depin.py tests the default fallback of guarded drafts, so its
+reported hint removal does not validate NONMATCHING code. Its changes were
+reverted and the guarded candidate rechecked explicitly; use it on extracted
+unguarded C for draft minimization.
