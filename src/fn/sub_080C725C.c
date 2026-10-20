@@ -1,3 +1,5 @@
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_UpdateSlideImpact sub_080C725C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
@@ -34,7 +36,8 @@ static inline u8 TakeFlag(u8 *flag)
 }
 static inline u32 NextRandom(void)
 {
-    const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+    register const u16 *table asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
+    asm("" : "+r"(table));
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308];
 }
@@ -129,7 +132,7 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
             actor->field2C8 = 0;
             actor->flags114 &= ~1;
             actor->word104 = 0;
-            *(u16 *)((u8 *)&actor->colliderA + 6) &= ~0x100;
+            actor->colliderA.flags &= ~0x100;
         }
     }
 }
