@@ -1467,3 +1467,70 @@ instruction bodies or instrumented-compiler settings were introduced. The
 worker leaves combined ROM validation and any integration/name promotion to
 the integrator. Helpers passing existing field pointers often preserve the
 original address lifetimes better than helpers recomputing them from the actor.
+
+## Task 081E013C — 2026-10-20
+
+Tags: #matching #animation #menu #scene-actors #register-pinning
+
+Worked solo and offline on the preclaimed task. Five of six targets finish
+exact (83.3% by function count); three are new matches, while two already had
+exact C from the earlier 081DEC2C task. New exact code gain is approximately
+0.070 percentage points (1,692 bytes), all in the Register-pinned category.
+The remaining target is a guarded draft. Only check.py was used for acceptance;
+no full build, make, network, or direct git mutation. Separate commits were
+queued through build/commit.sh and observed in git log.
+
+- **081EAB64 — drafted 90.7%, Params3D0_UpdateDisplay**, improved from
+  88.5%. Existing creator 081EB7DC and TimeDisplay callees establish the menu
+  family. Seasonal table bases must be captured before the light-phase call,
+  then offset afterwards; this preserves the unadjusted ROM label in the pool.
+  Signed s16 position and preparing the palette input pointer before the output
+  pointer improve the selection slides and palette calls. Final checker-recorded
+  draft: 133 realigned differing instructions, 39 ignoring registers; candidate
+  2,620 bytes, reviewed original extent 2,608 bytes. Palette field/address reuse,
+  selection-position arithmetic and allocation remain. Used BIG_FUNCTIONS,
+  variants batches and rtlprobe perline; rejected full-width position and
+  explicit keyframe-zero variants. Default retains INCLUDE_ASM.
+- **081E013C — matched/revalidated, Password_InitializeEntryMenu**, 696-byte
+  reviewed extent. This was already exact on arrival. Added its required local
+  alias to resolve against the local ELF's address spelling, then depin removed
+  ten of eleven hints. Only the first relocated header pointer's r5 pin remains.
+  No new exact credit for this function.
+- **081EC7D8 — matched/revalidated, ActorDisplay_UpdateForegroundSprite**,
+  412-byte reviewed extent. Also already exact on arrival. Added the local alias,
+  and depin reduced 21 hints to 13 while preserving exact bytes. No new credit.
+- **081EC974 — matched, ActorDisplay_UpdateAccentSprite**, 360-byte reviewed
+  extent. Called immediately after the foreground updater by
+  ActorDisplay_RefreshScreenLayer at 081ECADC. Drawable +0x308 uses screen X,
+  origin +0x5E0, a signed three-step offset at drawable +0x40, and a +149 Y
+  position. +0x5EC controls visibility. Reused the foreground's packed sequence
+  decoder. The +0x40 field doubles as a short positional cycle here and is
+  reset on playback completion; do not generalize its name to animation-ended
+  for every consumer. Explicit coordinate temporaries and a short r0 binding
+  reproduce load/subtract order. Depin leaves 12 playback/coordinate hints.
+- **081ECF18 — matched, SceneActors_UpdateIdleDisplay**, 652-byte reviewed
+  extent ending 081ED1A4 (before the trailing undecoded next body). Known
+  SceneActors_EnterIdleState installs it. Entry byte +0xB1 gates initialization:
+  clears +0x298/+0x290, starts foreground sequence zero and accent sequence four,
+  and steps both. Each frame advances the shared 1,024-entry random-table index,
+  sets +0x288 to its low bit, then refreshes the three display pieces. Passing
+  the already-established sequence pointer to the playback inline avoids extra
+  pointer calculations; scoped flip masks stop constants being kept across
+  the second initialization call. Loading the RNG sample before preparing its
+  destination fixes final store ordering. Depin leaves ten short playback hints;
+  entry zero/context/actor pins all proved unnecessary and were removed.
+- **081ED5F4 — matched, SceneActors_UpdateMovingDisplay**, 680-byte reviewed
+  extent ending 081ED89C (the separate return stub follows). Installed by
+  SceneActors_EnterMovementState. Shares the idle initialization, then calls
+  ActorMotion_AdvanceTowardScreenTarget with +0x294, refreshes display and emits
+  periodic particles with its second argument. A temporary actor barrier and
+  second-argument pin initially fixed prologue move ordering; depin removed
+  both once the common decoder hints were minimized. Ten playback hints remain.
+
+All five exact sources passed explicit reviewed-size checks after direct
+clang-format. tools/depin.py --write was run on every exact hinted unit. Naming
+is provisional where marked confidence=low. Existing shared types were reused;
+no shared headers, symbols, generated files or shared docs changed. The local
+ELF predates promoted target names, so file-local aliases also permit checker
+symbol resolution. Combined ROM validation and name promotion remain with the
+integrator.
