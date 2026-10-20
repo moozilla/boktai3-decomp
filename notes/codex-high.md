@@ -691,3 +691,107 @@ pre-existing modification to tools/cloud_task.py remains untouched. Commit
 requests go through build/commit.sh; combined ROM validation is left to the
 batch integrator. Scratch candidates and diagnostic artifacts remain in ignored
 wip/ and build/ directories.
+
+## 2026-10-20 — Task 0820C334, Screamer and PinkSpine actor callbacks
+
+Tags: #matching #screamer #pink-spine #scene-actor #register-pinning #nonmatching
+
+Exact coverage of this task's 5,316 reviewed body/pool bytes is **7.83%
+(+7.83 percentage points; 416 bytes)**, entirely Register-pinned. Five guarded
+C drafts recover the remaining functions and count as zero exact progress.
+Worked solo on the already-claimed `cloud/0820C334` branch. Read the worker,
+cloud and large-function guidance; inspected callers, neighbouring named
+functions, full assembly and matched relatives. The Ghidra export is absent.
+No make, full build, network action or direct Git mutation was performed.
+Each function was committed separately through `build/commit.sh`.
+
+- **0820C334 matched**, `Screamer_WaitForPlayerApproach`, full 416 bytes.
+  Clears the sprite hide bit, obtains player position zero, compares squared
+  X/Z distance to actor+1FC, then starts sequence 0x1D and installs 0820C4D4
+  when close. Resets the task-age word and phase1D6, updates the body collider,
+  disables the other collider and advances packed animation. Caller 0820CD00
+  installs this state, and Screamer_Create (0820D1F8) establishes the family.
+  The first candidate was three instructions away. Pinning the 0xFFFF source
+  to r1, separately from the live r5 mask, reproduces the missing register copy
+  and pool alignment. Final formatted check reports zero differing bytes.
+  `depin.py --write` found no hints in the consumer itself; allocation hints
+  used by its packed-animation inline remain in screamer_playback.h.
+- **0820C4D4 drafted 94.4%**, `Screamer_UpdateScream`, reviewed 1,200 bytes.
+  Three signed phases: wait for timer1CA > delay1D4, start 0x1B at duration
+  scale 0x20 and play 0x51A; count completed animations against limit1D0;
+  start 0x1D, then restore approach state/sequence0x1A after recovery1CC.
+  Phase one refreshes the attack collider at +6C; other phases position the
+  body collider at +C0. The same packed animation expansion occurs three
+  times. Shared matched playback C from ContactSequenceActor and
+  RoamingObject supplied the template. Initial 80.7% improved by constraining
+  the explicit flag copies and the duration/weight/mask registers. Final
+  realigned residue is **38 instructions / nine ignoring registers**.
+  Remaining issues are constant source registers across the three expansions,
+  reuse of phase one as the flip mask, offset allocation and switch liveness.
+- **0820CD00 drafted 81.1%**, `Screamer_InitFromScript`, reviewed 1,272 bytes;
+  candidate 1,268. Parses p/a/l/i/r/w/h/S/z/g/D/G/X/V, stores the creator's
+  resource at +1F8, loads graphics0x7E7D and palette0x1C4, and obtains the
+  0x922E/0x5184 sequence resource. Negative l marks the initially inactive
+  state; h maps directional pairs to horizontal/vertical orientation. Starts
+  approach state or SceneDrawablePair_SetFlags, offsets sprite X or Z by -16,
+  optionally builds a terrain body at +168, and squares positive radius1DA.
+  Remaining **137 instructions / 27 ignoring registers**: keyword narrowing,
+  field-address registers, sequence/sprite pointer lifetimes and defined
+  success return. A signed local for the l value avoids alias-driven reloads.
+  Making the temporary position pointer escape through an empty constraint
+  prevents agbcc from turning halfword coordinate stores into word masks.
+- **0820C9AC drafted 81.3%**, `Screamer_UpdateDamageParticles`, reviewed
+  840 bytes; candidate 816. Checks the global pause flags, invokes the active
+  state, subtracts damage1DC from health1E4, copies contact flags204 to200,
+  displays damage and updates the HUD. Defeat spawns eight randomly directed
+  particles (graphics0x7E7C, frames0x18..0x1B, palette0x1C4), selects the
+  inactive callback, invokes Screamer_HandleDefeat and plays0x52E. Otherwise
+  flashes palette0x192 for eight frames, consumes damage and manages the
+  collider's blink countdown104. Remaining **93 instructions / 60 ignoring
+  registers**: pause-return layout, random-table base reconstruction and
+  cursor lifetimes, stack slots and palette-address caching. Passing an
+  explicitly retained r10 random-table pointer to the first three RNG
+  expansions raised similarity substantially; the final two draws retain
+  their independent low-register address path. Widening the local graphics
+  API declaration avoids an extra, unsupported frame truncation.
+- **08210654 drafted 92.8%**, `PinkSpine_InitFromScript`, reviewed 900 bytes;
+  candidate 904. Prefix follows neighbouring PinkSpine_Create (082109D8) and
+  PinkSpine_OnTaskDestroy (08210648); identity remains tentative because
+  neighbouring behavior states use ProjectileEmitter names. Parses position,
+  two squared radii, l/a/S/D/G/X, initializes graphics0x7E7D/palette0x1BD,
+  selects approach sequence0xB or inactive sequence0xD, optionally builds
+  the body at +C0, then stores one to field136. Remaining **31 instructions /
+  six ignoring registers**: option/animation allocation and explicit success
+  return. Preserves the original surprising final health-field overwrite.
+- **08210398 drafted 89.6%**, `PinkSpine_UpdateDamageAnimation`, reviewed
+  688 bytes; candidate 692. Checks pause, invokes the current behavior,
+  positions or disables the collider according to134, subtracts damage130
+  from136 and copies148 to144. Defeat selects sequence0xD and0821025C,
+  resets age and plays0x522; all damage arms a four-frame palette flash.
+  Advances animation and plays0x521 when a cycle ends during
+  ProjectileEmitter_UpdateAttack. Remaining **44 instructions / 29 ignoring
+  registers**: pause layout, collider base addressing, animation pointer
+  lifetimes and an explicit callback return.
+
+The common sprite position/sequence layout is observed in both actor families;
+unknown scalar fields retain their offset-based names. Sprite types are scoped
+as ScreamerSprite to avoid a collision with the unrelated ActorSprite type.
+The two family headers keep the playback source readable and independent of
+handwritten instruction bodies. All affected consumers carry the authorized
+register-pinning concession marker. The draft helpers use allocation-only r0
+outputs solely between empty-asm operands; those tokens never participate in
+C arithmetic, stores, branches or returned values. This preserves the ROM's
+reserved-register lifetime while giving the C drafts explicit zero results.
+The initializers' creators consume a result sign, while the original bodies
+leave incidental R0 words intact; those ABI details remain nonmatching and
+must not be promoted as exact from fuzzy scores.
+
+All five final scores were recorded with `check.py --nonmatching --record`
+against complete function extents. Their default INCLUDE_ASM branches also
+passed separate per-file exact checks. Formatting used the venv clang-format
+directly. Depinning was invoked on every hinted candidate; the minimizer skips
+nonmatching candidates, so their residual hints were retained. No combined ROM
+build was run; it belongs to batch integration. The pre-existing modification
+to tools/cloud_task.py was left untouched. Scratch candidates and diagnostics
+remain ignored under wip/codex-high/ and build/. Shared HANDOFF, INDEX and
+history files were not edited, per the cloud-worker scope.
