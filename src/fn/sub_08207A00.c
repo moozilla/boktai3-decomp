@@ -1,7 +1,10 @@
 #include "global.h"
+#define VulcanCannon_UpdateTargeting      sub_08206C00
+#define VulcanCannon_UpdateDefeatEffects  sub_082071D0
+#define VulcanCannon_InitializeFromScript sub_08207A00
 #ifdef NONMATCHING
-// fuzzy: 96.4%
-// Remaining differences: branch sharing, address lifetimes and register allocation.
+// fuzzy: 96.1%
+// Remaining differences: register allocation and explicit success-return epilogue.
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 s32 Script_SeekToKeyword(s32);
@@ -61,17 +64,21 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         {
             u32 facing = (u8)(p->facing = (p->facing - 1) / 2);
             asm("" : "+r"(facing));
-            switch (facing) {
-                case 0:
-                case 1:
-                    p->facing = 0;
-                    break;
-                case 2:
-                case 3:
-                default:
-                    p->facing = 1;
-                    break;
-            }
+            if (facing <= 3) {
+                asm("" : "+r"(facing));
+                switch (facing) {
+                    case 0:
+                    case 1:
+                        p->facing = 0;
+                        break;
+                    case 2:
+                    case 3:
+                    default:
+                        p->facing = 1;
+                        break;
+                }
+            } else
+                p->facing = 1;
         }
     } else {
         p->facing = 1;
@@ -134,10 +141,10 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     if (!p->inert)
         VulcanCannon_InitCollider(p);
     if (p->terrainEnabled && !p->inert) {
-        struct SceneVec *position = &p->display.spatial.position;
-        s32 x = position->x >> 8;
-        s32 z = position->z >> 8;
-        s32 index;
+        register struct SceneVec *position asm("r3") = &p->display.spatial.position;
+        s32 x, z, index;
+        x = position->x >> 8;
+        z = position->z >> 8;
         if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
             index = 0;
         else
@@ -156,5 +163,5 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", VulcanCannon_InitializeFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08207A00);
 #endif

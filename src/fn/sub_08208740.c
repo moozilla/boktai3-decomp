@@ -1,4 +1,6 @@
 #include "global.h"
+#define CannonTurret_FireAimedVolley sub_08208498
+#define CannonTurret_UpdateCombat    sub_08208740
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // Remaining differences: pause layout, vector setup, register allocation and explicit callback result.
@@ -18,6 +20,10 @@ void Anim_SetDurationScale(void *, u16);
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
+static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
+{
+    *out = *in;
+}
 static inline u32 RandomFrom(const u16 *table)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
@@ -177,7 +183,7 @@ s32 CannonTurret_UpdateCombat(u8 *p)
 {
     struct SceneVec position;
     struct EffectVector velocity, size;
-    struct ColliderView *collider = (void *)(p + 0x6c);
+    struct ColliderView *collider;
     u32 ended;
     register u32 token asm("r0");
     if (Paused(0x400))
@@ -192,10 +198,13 @@ s32 CannonTurret_UpdateCombat(u8 *p)
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;
     if (H(0x130) == 0) {
+        collider = (void *)(p + 0x6c);
         collider->flags &= ~4;
         Collider_SetPosition(collider, p + 0x40, 0);
-    } else
+    } else {
+        collider = (void *)(p + 0x6c);
         collider->flags |= 4;
+    }
     if (H(0x12c) > 0 && H(0x130) == 0) {
         H(0x132) -= H(0x12c);
         W(0x14c) = W(0x150);
@@ -210,7 +219,7 @@ s32 CannonTurret_UpdateCombat(u8 *p)
             s32 count;
             H(0x130) = 1;
             H(0xb0) = 0;
-            position = *(struct SceneVec *)(p + 0x40);
+            CopyPosition(&position, (struct SceneVec *)(p + 0x40));
             {
                 struct SceneVec *v = &position;
                 v->y += 200;
@@ -266,5 +275,5 @@ s32 CannonTurret_UpdateCombat(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
+INCLUDE_ASM("asm/nonmatching", sub_08208740);
 #endif
