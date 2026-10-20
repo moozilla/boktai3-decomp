@@ -15,7 +15,6 @@ struct GlyphTrail {
     u16 timer;
 };
 void Task_Kill(void *);
-#define ActorGlyphTrail_OnPhase sub_08237CDC
 void ActorGlyphTrail_OnPhase(struct GlyphTrail *p)
 {
     p->timer++;
