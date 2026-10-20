@@ -1,5 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// confidence=low: carries a player position request along a motion track
+#define ActorStatus_UpdatePlayerCapture sub_081B0F34
 #ifdef NONMATCHING
 // fuzzy: 81.9%
 // Remaining differences: Player-request branch merging, pointer lifetimes, and some vector/constant ordering differ.
@@ -165,7 +168,6 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-// confidence=low: carries a player position request along a motion track
 void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target, playerTarget;
@@ -220,5 +222,5 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
+INCLUDE_ASM("asm/nonmatching", sub_081B0F34);
 #endif
