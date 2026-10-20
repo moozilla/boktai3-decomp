@@ -2,10 +2,13 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 
+// confidence=low: preserves the existing tentative reaction-state interpretation.
+#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
+
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 81.1%
-// Remaining differences: PRE stack slots, random-loop allocation, and duration setup order.
+// fuzzy: 80.4%
+// Remaining differences: PRE stack slots, mask placement, and duration/control setup order.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -52,14 +55,9 @@ static inline void BeginContactTurn(void *obj, u32 saved)
         register s32 prior asm("r5") = actor->direction;
         register s32 tries asm("r1") = 0;
         s32 choice;
-        const u16 *table = gUnk_0203B400;
-        u32 *randomIndex = &gUnk_03005308;
-        register u32 wrap asm("r7") = 1023;
         register u32 mask asm("r6") = 3;
         do {
-            u32 index = (*randomIndex + 1) & wrap;
-            *randomIndex = index;
-            choice = (table[index] & mask) << 6;
+            choice = Chase_RandomBits(mask) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);
@@ -132,5 +130,5 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
+INCLUDE_ASM("asm/nonmatching", sub_0812F5D4);
 #endif
