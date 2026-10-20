@@ -2,8 +2,6 @@
 #include "global.h"
 #include "display_animation.h"
 
-#define SunDiscSprite_Update sub_081299F8
-
 struct SunDiscSprite {
     u32 flags;
     u8 unk4[0xc];

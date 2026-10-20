@@ -3,8 +3,6 @@
 #include "display_animation.h"
 #include "contact_actor.h"
 
-#define SunDiscEffect_Update sub_08129B04
-
 struct SunDiscEffectPool {
     u8 unk0[0x34];
     void *sequenceResource;
