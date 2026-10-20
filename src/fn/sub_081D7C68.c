@@ -265,8 +265,8 @@ void Task4E01_OnType4Animation(void *);
 void sub_081D9B6C(void *);
 void sub_081D9D3C(void *);
 // confidence=low: resets projectile time and chooses the terminal animation by projectile kind.
-#define Projectile_StartTerminalAnimation sub_081D7C68
-s32 Projectile_StartTerminalAnimation(u8 *input)
+#define Task4E01_StartTerminalAnimation sub_081D7C68
+s32 Task4E01_StartTerminalAnimation(u8 *input)
 {
     register u8 *p asm("r8") = input;
     register u8 *config asm("r9") = p + 0x18;

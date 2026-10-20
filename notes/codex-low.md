@@ -2873,3 +2873,20 @@ Worked offline on the preclaimed branch. Only per-file `tools/check.py` checks w
 - **081F5290 — stopped below draft threshold**, left assembly. Hit recoil sets animation 29, decays motion halfwords by 24, emits particles on odd frames, and selects defeat or directional idle after frame 29 according to health and lock state. Initial reconstruction 45.5%; preserving the signed saved-angle addition until polar lookup and expressing the sprite-relative velocity improved it to 58.4%, 208 realigned / 72 structural differences. Remaining issues include merged polar tails, persistent sprite pointer, state-transition store order and particle register allocation. Scratch in `wip/sub_081F5290.c`; not committed.
 
 Accepted exact gain: two functions, 700 bytes; 360 Register-pinned and 340 unpinned. Aggregate progress regeneration and complete ROM validation remain with batch integration. No other worker's candidate sources were read.
+
+## Task 081D7C68 — 2026-10-20
+
+Tags: #matching #projectiles #terrain #register-pinning
+
+- 081D9470 matched: Task4E01_StartImpactAnimation. Looks up resource 0x922E/0x32D7, selects sequence 0 or 5 from flag 0x10, advances playback, sets size state to 8 and installs 081D95F0. Exact checker accepted 384 bytes. Register-pinned category.
+- 081D95F0 drafted 82.3%: Task4E01_UpdateExpandingImpact. Clamps a decremented timer to 4, updates visibility flags, advances animation, selects sequence 4 once, expands collision every fifteenth tick through tick 44, then switches callback or removes the projectile. Registers, flag branch arrangement and collision-field copies remain different. The collision-size setter consumes four arguments; both horizontal dimensions use the expanding size.
+- 081D7C68 drafted 82.2%: Task4E01_StartTerminalAnimation. Sets flag 0x1000, clears timers and selects terminal callbacks by projectile type; type 3 selects sequence 1 or 6 and advances playback. Switch layout and register allocation remain different.
+- 081D7F8C drafted 84.8%: Task4E01_ResolveTerrainDirection. Tests adjacent terrain heights to resolve even direction values 0/2/4/6. Height comparisons are unsigned despite signed halfword loads. Cell-index register reuse, boolean placement and branch layout remain different.
+- 081D8244 drafted 85.5%: Task4E01_SelectTerrainTurn. Odd directions reverse directly. Even directions use angle from the current cell center, adjacency to the other point, and prospective terrain height to choose a turn. Center-vector stack packing, branch sharing and register choices remain different.
+- 081D9904 drafted 89.0%: Task4E01_SpawnImpactChildren. Unless flag 0x10 is set, creates three child projectiles with randomized directions and speed offsets, propagates damage/type/sprite settings, then advances animation and removes the owner. Parameter flag operations and saved-pointer lifetimes remain different. Child parameter storage is 0x58 bytes; owner-config pointer is at offset 0x54.
+
+All descriptive interpretations are provisional. Neighbouring Task4E01 callback names establish the subsystem prefix; Projectile_* callees establish the parameter API. No shared layout/header changes were made.
+
+Technique: reuse the packed-animation stepper from 081ED5F4. Pinning duration to r2, flags to r1 and the 0xFFFF mask to r5, with an empty constraint preserving the mask copy, made 081D9470 exact. Separate stepper variants prevent the compiler merging branches in 081D7C68. Volatile halfword random-table reads preserve the loads in 081D9904; explicit signed divide-by-two branches match its truncation idiom better than C division. Ghidra export is absent. Retained drafts have useful structure but further manual changes lacked a clear exact-match hypothesis.
+
+Validation used only tools/check.py; all five guarded draft scores were recorded with --nonmatching --record. No full build or network operation was run. One exact function and five drafts; drafts receive no exact credit.

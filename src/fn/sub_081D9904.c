@@ -162,8 +162,8 @@ struct SpawnConfig {
     u16 count;
 };
 // confidence=low: emits three randomized child projectiles before removing the source.
-#define Projectile_SpawnImpactChildren sub_081D9904
-s32 Projectile_SpawnImpactChildren(u8 *input)
+#define Task4E01_SpawnImpactChildren sub_081D9904
+s32 Task4E01_SpawnImpactChildren(u8 *input)
 {
     register u8 *p asm("r10") = input;
     u8 storage[0x58];
