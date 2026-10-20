@@ -29,11 +29,13 @@ def strip_comments(item):
 
 def select_drafts(text, func, nonmatching):
     """Resolve #ifdef NONMATCHING blocks: FUNC's draft or fallback, others' fallback."""
+    al = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M))
     block = re.compile(r"#\s*ifdef\s+NONMATCHING[^\n]*\n(.*?)#\s*else\s*\n(.*?)#\s*endif[^\n]*\n", re.S)
 
     def pick(m):
         draft, fallback = m.group(1), m.group(2)
-        mine = re.search(r"\b" + re.escape(func) + r"\b", fallback)
+        names = {func} | {n for n, a in al.items() if a == func or n == func} | {a for n, a in al.items() if n == func}
+        mine = any(re.search(r"\b" + re.escape(n) + r"\b", fallback) for n in names)
         if mine and nonmatching:
             return draft
         if not mine:
@@ -54,16 +56,18 @@ def split_decls(text):
 
 def isolate(text, func, out, nonmatching):
     text = select_drafts(text, func, nonmatching)
+    # `#define Name sub_X` aliases: Name defines the same ROM function as sub_X
+    alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M))
     kept = []
     for item in items(text):
         code = strip_comments(item)
         inc = re.match(r"\s*INCLUDE_ASM\([^,]*,\s*(\w+)\)", code)
         if inc:
-            if inc.group(1) == func:
+            if alias.get(inc.group(1), inc.group(1)) == alias.get(func, func):
                 kept.append(item)
             continue
         m = DEF.match(code)
-        if m and not m.group(1) and m.group(3) != func:
+        if m and not m.group(1) and alias.get(m.group(3), m.group(3)) != alias.get(func, func):
             kept.append(m.group(2).strip() + ";")
             continue
         kept.append(item)
@@ -77,7 +81,10 @@ def ensure(src, func):
     path = src if os.path.isabs(src) else os.path.join(ROOT, src)
     text = open(path).read()
     names = split.c_functions(path)
-    if len(names) <= 1:
+    # a `#ifdef NONMATCHING` draft of FUNC (or of its alias): tools want the draft, not the INCLUDE_ASM
+    aliases = [n for n, a in re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M) if a == func]
+    has_draft = any(f in dict(split.nonmatching_functions(path)) for f in [func] + aliases)
+    if len(names) <= 1 and not has_draft:
         return os.path.relpath(path, ROOT)
     # `#define Name sub_XXXXXXXX` aliases: the source may spell FUNC either way
     spell = [func] + [n for n, a in re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M) if a == func]
