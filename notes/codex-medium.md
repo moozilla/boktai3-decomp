@@ -1145,3 +1145,70 @@ Project percentage and percentage-point accounting belong to batch integration.
 All commits were queued through build/commit.sh. No ROM, generated assembly,
 emulator dumps, shared docs or symbol tables were changed. Only check.py was
 used for acceptance; the integrator still needs the combined full-ROM build.
+
+## Task 081B1E24 — Vanargand part callbacks (2026-10-20)
+
+Tags: #matching #vanargand #animation #register-allocation
+
+Worked solo on the preclaimed `cloud/081B1E24` branch. Exact code gain: 0.0
+percentage points. All six functions are guarded drafts, with assembly retained
+as the default path; 081B2608 was an existing 83.8% draft in the starting tree.
+No full build or network operations were run. Each draft was formatted, checked
+with `tools/check.py --nonmatching --record` against its full function extent,
+and committed separately through `build/commit.sh`.
+
+- **081B3410 — drafted 94.0%, Vanargand_UpdatePartSweepingStrike.** Seven-state
+  callback: aim/clamp the player-facing angle, approach with distance-wave motion,
+  wind back, prepare the player-relative target, strike, halve residual velocity,
+  and return to the saved heading/distance. Remaining realigned differences:
+  58 total / 28 ignoring registers. Most concern the packed animation setup,
+  high-register enter pointer lifetimes, literal pools and copied counters.
+- **081B28D8 — drafted 93.1%, Vanargand_UpdatePartGroundStrike.** Related
+  seven-state attack using ordinary motion tracks rather than the distance-wave
+  helper. The impact plays song 0x1BA; the linger phase emits bursts every 16
+  ticks through tick 44, sets flag 0x80, and exits after tick 89. Remaining:
+  66 total / 27 structural, chiefly animation register lifetimes, enter pointers,
+  saved counter addressing and pool placement.
+- **081B1F74 — drafted 92.5%, Vanargand_UpdatePartPairedStrike.** Reset computes
+  player-relative targets with +/-112 offsets when both counters are positive,
+  otherwise +/-256. Completion consults the opposite part's byte at boss+0x205
+  or boss+0x421 before selecting the alternate motion/burst path. Cases 3–5 are
+  retained even though the visible completion paths select state 6 directly.
+  Remaining: 65 total / 9 structural. Mostly register allocation, enter-pointer
+  copies, zero reuse and literal padding. This unit has no register pins.
+- **081B2F38 — drafted 89.0%, Vanargand_UpdatePartOffsetStrike.** Five-state
+  callback: wind away from the player, prepare a player target offset by +128
+  on X or Z according to the variant, strike with trails, and return to rest.
+  Remaining: 76 total / 38 structural. Stack frame/spills, retained motion/one
+  registers, animation setup and enter-pointer allocation remain different.
+- **081B2608 — improved draft to 88.0%, Vanargand_UpdatePartRetreat.** Preserved
+  both identical-looking variant branches in the retreat-vector calculation.
+  Typed inline state/flag writes and removal of the enter register pin improved
+  the baseline. Added the required local alias so the current worker ELF can
+  locate the address, and spelled sub_081B2608 literally in INCLUDE_ASM because
+  that macro stringifies its argument. Remaining: 48 total / 11 structural,
+  mostly saved-boss/enter allocation, zero and constant reuse, animation inlines.
+- **081B1E24 — drafted 90.7%, Vanargand_UpdatePartTracking.** Retargets every
+  16 ticks with opposite +/-512 X/Z offsets according to variant, ends after
+  64 ticks, then marks completion. Remaining: 18 total / 13 structural, localized
+  to constant-load/copy order and shared-tail placement in the offset addition.
+  Scalar widths, inline scalar additions, unsigned parameters and constrained
+  constants did not improve this residue. This unit has no register pins.
+
+Names are tentative static interpretations, following the neighbouring
+Vanargand family. No runtime coverage claims were made. Common observed layout:
+sequence at +0x48, motion at +0x58, motion's base-position pointer at +0x90,
+origin at +0x9C, target at +0xA4, heading/distance at +0xAC/+0xAE, variant at
++0x15C, flags/state/timer at +0x160/+0x164/+0x168, and reset/enter/finished bytes
+at +0x16E/+0x16F/+0x170. Unknown fields remain explicit and local to each unit.
+
+Useful techniques: BIG_FUNCTIONS.md's realigned counts and small hypothesis
+batches with variants.py; typed base pointers fixed vector argument ordering;
+address-taking inline vector operations prevented agbcc from turning direct
+stack halfword updates into word read/modify/write sequences; explicitly
+preloading the enter byte into r1 before deriving its pointer greatly improved
+the three larger attack callbacks. Separate inline state/flag writes restored
+constant-before-address order. depin.py --write was run on the hinted units;
+it skips nonmatching candidates, so no claim is made that retained draft hints
+are minimal. Ghidra export was unavailable. Further work should start from these
+recorded candidates and focus on the remaining allocation/setup differences.
