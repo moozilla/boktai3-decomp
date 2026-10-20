@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 82.7%
@@ -118,9 +119,10 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        u32 first;
+        register u32 first asm("r1");
         u32 maskBit = 1;
         bit = maskBit;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -131,10 +133,12 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     {
         u32 input = state->flags;
         u32 bit;
-        u32 first;
+        register u32 first asm("r1");
         bit = 2;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
+        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
@@ -144,12 +148,14 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        u32 temp;
-        u32 savedDuration;
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
+        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
+        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -179,6 +185,7 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -202,7 +209,7 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
             }
             state->frameWeight = *command & 15;
             {
-                s32 weight = state->frameWeight;
+                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -228,6 +235,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
     s32 floor, nextFloor;
     u8 *delay;
     u16 *lifetime;
+    asm("" : "+r"(sprite));
     if (p->enter) {
         p->flags &= ~1;
         p->enter = 0;
@@ -248,6 +256,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
         if (p->flags & 2) {
             s8 *spin = &p->spin;
             s32 value = *spin;
+            asm("" : "+r"(value));
             *spin = -value;
         }
         delay = &p->soundDelay;
