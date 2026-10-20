@@ -26,7 +26,22 @@ static inline u8 IsPlayerScrollBlocked(void)
     return 0;
 }
 
-void ScanlineScroll_AdvancePhases(struct ScanlineScroll *);
+void ScanlineScroll_AdvancePhases(struct ScanlineScroll *p)
+{
+    s32 i;
+    if (!IsPlayerScrollBlocked()) {
+        for (i = 0; i < p->split; i++) {
+            p->phases[i] = (p->phases[i] + p->speedTop) & 0xFFF;
+            p->offsets[i] = p->phases[i] >> 7;
+        }
+        while (i <= 159) {
+            p->phases[i] = (p->phases[i] + p->speedBottom) & 0xFFF;
+            p->offsets[i] = p->phases[i] >> 7;
+            i++;
+        }
+    }
+}
+
 void ScanlineEffect_SetSource(s32, s32, void *);
 void ScanlineScroll_Update(struct ScanlineScroll *p)
 {
