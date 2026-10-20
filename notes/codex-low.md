@@ -3195,3 +3195,18 @@ Tags: #matching #spider #crow
 - 0809FE78: stopped below draft threshold, candidate-length 40.4%. Crow forward travel: entry clears drawable flag 2 and restores saved control; after delay 24/40 tests travel limit and facing error against player, returns to behavior 1 on failure, otherwise derives motion from sine table and context speed. Vector layout/copies, early-stop branch sharing and state reset remain different. Exploratory source in ignored wip/sub_0809FE78.c.
 
 Exact task progress: 0/6 functions (0%), +0 percentage points. Two guarded drafts; four original assembly placeholders retained. Ghidra export absent. Only per-file check.py checks used; no full build or network operations. Function and notes commits submitted through build/commit.sh.
+
+## Task 08226F20 — 2026-10-20
+
+Tags: #matching #camera #particles #palette
+
+All six assigned functions matched (100% of this task; +100 percentage points of task completion). Fast per-file checks only; batch ROM validation remains with the integrator. Three units use the authorized register-pinning concession, minimized with `tools/depin.py --write`.
+
+- 08226F20 matched as `Camera_UpdatePositionMode`. Eight modes snap/interpolate toward a fixed position, scene body, player-relative position, saved position or external vector. Packed signed 16-bit bitfields reproduce the register-resident player target. Multiplication operand order controls timer versus position load order. Sharing one body-pointer local between cases 3 and 4 removed all remaining register differences without pins. The movement flag at 0x1C is a halfword.
+- 08227624 matched as `CameraTracking_UpdatePosition` (existing name retained). Uses horizontal distance to approach a clamped scale, applies a 128-frame blend and interpolates the endpoints. Flag 1 fixes height to first endpoint plus 150. A small inline mask helper reproduces mask-before-load ordering; scale-before-blend multiplication reproduces operand load order. No pins.
+- 08239664 matched as `PaletteFade_ApplySelectiveBrightness`. The matched 0813C798 relative supplies the exact palette/channel idiom; removing its mode-2 exception matches this function. Preserves indices 5, 6 and 13 unless copyAll is set. No pins.
+- 0823614C matched as `RadialBurstEffect_EmitOrbitParticle`. Emits from a twelve-slot pool after three ticks; randomized radius, angle and tile place the particle about a retained origin pointer. Pinning the random cursor to r1 resolves the retained draft's allocation differences; depinning removed the empty barrier, leaving one pin.
+- 08236C04 matched as `ParticleBurst_EmitOrbitParticle`. Emits from an eight-slot pool after two ticks; snapshots the origin, randomizes speed/radius/angle and initializes an eight-tick lifetime. Cursor pin r1 plus table-before-seed assignment order matched. Depinning removed the barrier, leaving one pin.
+- 08233760 matched as `ChargedBurst_EmitTerminalDebris`. After sixteen ticks, compares signed object height (converted to unsigned for comparison) against terrain height and emits randomized debris if above it, then kills the task. Existing caller 08233714 selects this state after the charged-burst intro. Splitting the terrain mask into a local and reading the random sample before initializing the low mask fixes instruction selection/order. Depinning reduced nine hints to three: cursor r2, low mask r9 and an empty low-mask constraint. No handwritten instruction bodies.
+
+Ghidra export is unavailable here (`gen/ghidra/decomp.c` absent); assembly and matched relatives were sufficient. All accepted functions have file-local descriptive aliases. No drafts remain for this task.
