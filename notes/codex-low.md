@@ -2534,3 +2534,63 @@ copies to avoid testing fallback assembly: all six correctly skipped because
 they are not exact. No claim that remaining hints are minimal. Only fast local
 checks; no make, full build, network or generated-artifact commits. Queued one
 commit per draft through build/commit.sh, notes last.
+
+# Task 08214600 (2026-10-20)
+
+Tags: #matching #sprites #video #palette
+
+Offline worker pass on the preclaimed branch. Exact gain: +0.0197 percentage
+points of code (476 bytes), in the Register-pinned category. No full build or
+network operations; acceptance used tools/check.py only.
+
+- **08214B44 — matched, Sprite_RenderScaledList.** Started from the checked-in
+  Sprite_RenderUnflippedList sibling (08214FBC), removed its resource-list flag
+  guard, and added signed scale-byte multiplication and flip-aware bounds.
+  The resource width/height are unsigned bytes; origin offsets and the sprite's
+  scale bytes are signed. Scaling uses arithmetic >> 6, while projection uses
+  sign-symmetric truncation. Pinning only the resource pointer to r6 resolved
+  the pointer allocation swap. Moving z to function scope before the skip-mask
+  initialization fixed the final six differences (z/skip stack slots exchanged).
+  depin.py confirmed the single pin is required. clang-format followed by
+  check.py reported MATCH, 0 differing bytes.
+- **08214E3C — improved existing draft, 95.3% (was 89.1%).** Added the required
+  local Sprite_RenderFlipAwareList alias. Pinning height to r1 removed the extra
+  move; pinning top to r4 and an intermediate horizontal edge to r0 improved
+  operand selection. Final check: 9 differing instructions, 0 ignoring registers,
+  10 differing bytes. Remaining differences are projection source r8 versus ip,
+  vertical-bound operands and the last bounds-sum result register. Pointer pinning,
+  local ordering, explicit flags, and vertical edge temporaries did not improve
+  the retained candidate. Kept the existing guarded draft with recorded score.
+- **082154E4 — retained existing draft, 82.6%.** Added the required local
+  SpriteOam_FinalizeQueue alias. Read its depth-bucket chaining, per-priority
+  output offsets, unused-entry clearing and affine matrix emission. Tried a
+  descending four-element priority-pointer loop, pinning the outer index/buffer,
+  and declaration swaps. None improved structural alignment; retained the original
+  candidate: 41 differing instructions, 12 ignoring registers, 88 differing bytes.
+- **08217430 — stopped below draft threshold, 21.0%.** Scratch candidate is
+  wip/sub_08217430.c (not production or committed). Reconstructed palette-ID skip
+  groups, full-brightness bank copies, black fades, colored fades and mode-1
+  solid-color replacement. The RGB555 arithmetic separates 0x7c1f and 0x3e0,
+  weights by level >> 1 and 32 minus that level, masks products then shifts 5.
+  The helper-based reconstruction differs substantially in branch layout and
+  allocation: 858 differing instructions, 753 ignoring registers. Needs direct
+  per-path skip tests matching the ROM's repeated loads before allocation work.
+- **08216584 — inspected, no completed candidate.** BgGfx_LoadTilemap uses
+  0x30-byte layer records, stores current tile/scroll coordinates, and returns
+  early on unchanged coordinates. It has separate map formats plus full-window
+  and small-delta paths; metatile expansion writes paired rows into a 32-column
+  wrapping destination. The blocked-source lookup and incremental edge paths
+  remain to be reconstructed. Ghidra export is absent and relatives.py did not
+  resolve the address by numeric name; no source was promoted.
+- **08214600 — inspected, no completed candidate.** The renderer called by
+  08214B44 clamps half-depth to [-128,127], prepares OAM flags, allocates affine
+  matrix records, transforms/culls resource pieces into two 32-word stack arrays,
+  then allocates tiles/palette and emits either immediate or depth-bucketed OAM.
+  Mixed flip/scale/rotation paths and their stack lifetimes remain unresolved.
+  condense.py found no repeated runs to fold. No incomplete C was promoted.
+
+Tool caveat: do not run depin.py directly on guarded NONMATCHING source: its
+checks see the default INCLUDE_ASM branch and falsely accept pin deletions.
+This pass caught that after queued draft commits, restored all required pins,
+reran --nonmatching --record (95.3% / 82.6%), and committed the corrections.
+The exact 08214B44 check and depin pass were on unguarded C and are unaffected.
