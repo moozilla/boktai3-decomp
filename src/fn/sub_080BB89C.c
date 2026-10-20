@@ -1,6 +1,5 @@
 #include "global.h"
 /* TentacleBody_UpdateReactionTransition: plays the hurt entry or, after a long wait, restores the saved snapshot */
-#define TentacleBody_UpdateReactionTransition sub_080BB89C
 extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 extern void Actor_RestoreSnapshot(void);
 static inline u8 take(u8 *s)

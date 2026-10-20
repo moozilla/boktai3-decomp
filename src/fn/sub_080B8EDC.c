@@ -1,6 +1,5 @@
 #include "global.h"
 /* Skeleton_OnContactEvent: records the hit and flags the state unless the actor is unavailable */
-#define Skeleton_OnContactEvent sub_080B8EDC
 inline static u8 blocked2048(u8 *c)
 {
     u32 mask;

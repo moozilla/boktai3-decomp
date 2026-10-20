@@ -3,7 +3,6 @@
 // fuzzy: 98.4%
 // only difference: "adds r0, #2" on the table base is placed before the sound-index load instead of after it
 /* Actor_PlayFootstepSound: plays a step sound when the animation hits one of two marked frames */
-#define Actor_PlayFootstepSound sub_0802DD6C
 
 struct StepInfo {
     u8 pad0[3];
@@ -52,5 +51,5 @@ void Actor_PlayFootstepSound(struct StepActor *actor, u32 mode)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0802DD6C);
+INCLUDE_ASM("asm/nonmatching", Actor_PlayFootstepSound);
 #endif

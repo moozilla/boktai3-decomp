@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 /* Skeleton_UpdateTargetTransition: skeleton variant of the target-motion transition */
-#define Skeleton_UpdateTargetTransition sub_080BCF34
 struct SkeletonTargetContext {
     u8 unknown0[0x6DC];
     u32 flags;

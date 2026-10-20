@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_animation.h"
 /* SceneActor_EnterFlaggedEntryPhase: plays directional entry 16 once, clears the 0x4 bit, and forwards the restart flag */
-#define SceneActor_EnterFlaggedEntryPhase sub_080E70CC
 u32 SceneActor_GetDirectionFlags(u32);
 static inline u8 TakeFlag(u8 *flag)
 {
