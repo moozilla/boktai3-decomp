@@ -1,4 +1,5 @@
 #include "global.h"
+#define Armor_UpdateAlignedAttackDecision sub_081875EC
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -200,5 +201,5 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedAttackDecision);
+INCLUDE_ASM("asm/nonmatching", sub_081875EC);
 #endif
