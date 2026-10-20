@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.6%
-// foundry draft (worker best 90.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct DirectionActor {
     u8 pad00[6];
     u16 flags;
@@ -18,7 +16,8 @@ s32 ActorDirection_ComputeRelativeCardinal(struct DirectionActor *actor,
 {
     s32 angle;
     if (actor->flags & 0x100) {
-        angle = (u32)actor->direction + 0xe0U;
+        angle = actor->direction + 0xe0;
+        asm("" ::: "memory");
     } else {
         s32 dx = actor->x - target->x;
         s32 dy = actor->y - target->y;
@@ -30,6 +29,3 @@ s32 ActorDirection_ComputeRelativeCardinal(struct DirectionActor *actor,
     angle &= 0xff;
     return (angle >> 6) * 2 + 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorDirection_ComputeRelativeCardinal);
-#endif

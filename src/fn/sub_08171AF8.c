@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#ifdef NONMATCHING
-// fuzzy: 98.6%
-// foundry draft (worker best 98.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
 void MenuDisplay_UpdateActionPrompt(void *, int);
@@ -30,8 +28,9 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
     }
     keys = gUnk_03005260[1];
     one = 1;
-    confirm = keys;
-    confirm &= one;
+    confirm = one;
+    asm("" : "+r"(confirm));
+    confirm &= keys;
     if (confirm) {
         u8 *cursor = &p->actionCursor;
         u32 current = *cursor;
@@ -62,6 +61,3 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
         Sound_PlaySong(0xDE);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_UpdateActionSwapSelection);
-#endif
