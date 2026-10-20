@@ -1,7 +1,9 @@
+#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reaction.h"
 
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 80.6%
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.
@@ -188,11 +190,17 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        register s32 prior asm("r5") = actor->direction;
         s32 tries = 0;
         s32 choice;
+        const u16 *table = gUnk_0203B400;
+        u32 *randomIndex = &gUnk_03005308;
+        u32 wrap = 1023;
+        u32 mask = 3;
         do {
-            choice = Chase_RandomBits(3) << 6;
+            u32 index = (*randomIndex + 1) & wrap;
+            *randomIndex = index;
+            choice = (table[index] & mask) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);
