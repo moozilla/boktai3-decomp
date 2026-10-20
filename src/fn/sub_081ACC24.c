@@ -1,7 +1,7 @@
 #include "global.h"
 #define Vanargand_ApplyPendingDamage sub_081ACC24
 #ifdef NONMATCHING
-// fuzzy: 99.0%
+// fuzzy: 99.1%
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
