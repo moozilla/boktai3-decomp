@@ -139,7 +139,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 
 #ifdef NONMATCHING
 // fuzzy: 98.1%
-#define Player_BeginWalk sub_08241350
 void Player_BeginWalk(struct PRecover *p)
 {
     if (p->tetherActive != 1) {
@@ -163,5 +162,5 @@ void Player_BeginWalk(struct PRecover *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08241350);
+INCLUDE_ASM("asm/nonmatching", Player_BeginWalk);
 #endif

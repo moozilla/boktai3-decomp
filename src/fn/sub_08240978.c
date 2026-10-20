@@ -36,7 +36,6 @@ static inline u8 *CellData(u32 cell)
     return gUnk_030052F4->cells + (cell * 4 + 12);
 }
 
-#define Player_UpdateFlinch sub_08240978
 void Player_UpdateFlinch(struct Player *p)
 {
     if (p->tetherMode != 0x20) {

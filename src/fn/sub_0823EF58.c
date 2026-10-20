@@ -11,8 +11,6 @@ void sub_0823EDDC(u8 *p);
 s32 sub_0823EE80(u8 *p);
 void Player_SetTetherMode(u8 *, s32, s32);
 
-#define Player_UpdateTetherRecall sub_0823EF58
-
 void Player_UpdateTetherRecall(u8 *p)
 {
     switch (*(u8 *)(p + 0x458)) {
@@ -70,5 +68,5 @@ void Player_UpdateTetherRecall(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823EF58);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherRecall);
 #endif

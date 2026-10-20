@@ -9,8 +9,6 @@ s32 sub_0823E998(u8 *p);
 void sub_08238E0C(u8 *p, u32 a, u8 *b);
 void Player_SetTetherMode(u8 *, s32, s32);
 
-#define Player_UpdateTetherThrow sub_0823EC58
-
 void Player_UpdateTetherThrow(u8 *p)
 {
     switch (*(u8 *)(p + 0x458)) {
