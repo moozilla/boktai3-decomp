@@ -1087,3 +1087,67 @@ recommitted as new progress. No network, full build, or direct git mutation.
 
 Validation used only tools/check.py (including variants' per-file checks).
 Combined ROM validation remains for integration. Notes queued with build/commit.sh.
+
+## Task 08140CC4 — 2026-10-20
+
+Tags: #matching #player #movement #camera #nonmatching
+
+Exact gain: approximately 0.018 percentage points of total code (448 bytes),
+without register pinning. One exact match, three new guarded drafts and one
+updated existing draft. Aggregate totals remain in PROGRESS.md. Worked solo;
+no network, full build, or direct git mutation. All commits use build/commit.sh.
+
+- 08142194: updated existing guarded draft to 91.5%, named
+  Player_UpdatePushAction (tentative: neighbor pushes and contact effects).
+  Read BIG_FUNCTIONS and inspected assembly, callers/callees and relatives.
+  Explicitly sequencing the direction difference, doubled offset, addition of
+  eight and facing addition reduces structural realigned differences from 47
+  to 35; total differences are 105 versus the original 104. The slight fuzzy
+  decrease from 91.6% accompanies this structural improvement. Remaining
+  differences include extra saved high register, terrain helper mask/narrowing
+  and address/register allocation. Existing body preserved under NONMATCHING.
+- 08140CC4: stopped unmatched, no qualifying draft. Static caller
+  Player update 0815788C invokes it to maintain locked movement. Byte 284 bit
+  one gates direction refresh; bytes 48D/48E delay release, byte48F stores
+  direction, halfwords490/494 store ten-unit direction-derived components.
+  Modes 1/2 or mode6 with valid direction history start locking; mode3 phase5
+  with contactMagnitude starts opposite facing. Typed local layout improved
+  initial 62.2% candidate to 74.4% (106 realigned differences, 12 structural).
+  Owner r5 pin regressed to 72.0%; no productive next hypothesis remained.
+  Scratch candidates remain under ignored wip/codex-low and build/.
+- 08140F40: drafted 99.7% as Player_GetForceDirection. Quantizes global angle
+  0200053C, compares terrain heights in the directional neighbor; diagonal
+  movement checks the corner and the adjacent cell selected by within-cell X/Z.
+  Pinned angle/result to r0 and direction to r4 recover register allocation
+  and tail. One differing instruction remains: ROM arithmetic shift versus
+  compiler logical shift in the nonnegative masked-angle quantization.
+  Recorded reviewed extent is 632 bytes. depin on the unguarded candidate
+  skips because the base is nonmatching. Required concession marker retained.
+- 08141C40: drafted 99.3% as Player_EmitMovementStepEffects. Called by
+  Player_UpdateMovement and the resource dash. Animation cue counter/flags
+  gate emission; action flags, repeated-effect presence, terrain/action status
+  and mode5 select effects/songs. A global bit at GameState+868 enables an
+  additional position effect. Passing that mask to an inline recovers its
+  mask-before-global-load order. Four realigned instruction differences remain:
+  initial null-path destination and flag load/mask scheduling. No pins.
+- 08141FA0: matched as Player_UpdateResourceDash (tentative dash identity).
+  Entry tests shared resource availability or actionFlags bit20, sets speed
+  from GameState+876 (or 26 for free dash), caps at32 and uses 512/speed ticks.
+  Phase0 sets directional velocity, movement effects and animation; failed
+  entry uses phase1 for eight ticks. Using the existing Player padding bytes
+  at4F0/4F1 avoids a second aliased owner pointer. The direction store is
+  facing at3A4, not coordinateAxis at4A5. Exact after formatting: 448 bytes.
+- 0814159C: drafted 83.7% as existing Player_UpdateCameraOffset. Starts from
+  global camera position minus player position (Y minus150), steps horizontal
+  offsets by thirty units from directionHistory, clamps, then derives facing
+  and side from the offset angle when camera input is processed. Remaining
+  28 realigned differences / 11 structural concern input-direction allocation,
+  angle/mask scheduling and derived field constants. No pins. The default
+  INCLUDE_ASM must use existing promoted Player_UpdateCameraOffset filename,
+  while the draft retains a local alias to sub_0814159C; corrected after the
+  draft commit when the default check exposed the unavailable old filename.
+
+All four drafts were formatted and recorded with check.py --nonmatching
+--record using reviewed extents. All default assembly fallback checks pass,
+including the camera fallback correction. The dash passed the exact C check.
+Ghidra export is absent. Combined ROM validation remains for the integrator.
