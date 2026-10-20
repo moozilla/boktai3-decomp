@@ -1,6 +1,4 @@
 #include "global.h"
-#define CannonTurret_FireAimedVolley sub_08208498
-#define CannonTurret_UpdateCombat    sub_08208740
 #ifdef NONMATCHING
 // fuzzy: 81.7%
 // Remaining differences: pause layout, vector setup, register allocation and explicit callback result.
@@ -275,5 +273,5 @@ s32 CannonTurret_UpdateCombat(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08208740);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
 #endif

@@ -52,7 +52,6 @@ static inline void StopMovementSound(struct NamedObjectLift *object)
     }
 }
 // confidence=low: moves vertically to the selected height limit and snaps an attached player on arrival.
-#define NamedObject_UpdateVerticalTravel sub_081010E0
 void NamedObject_UpdateVerticalTravel(struct NamedObjectLift *object)
 {
     struct ContactPosition delta;

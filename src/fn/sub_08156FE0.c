@@ -5,7 +5,6 @@
 // Remaining differences: 16 register-only instructions in the scene-five direction/input path and barrier-selection path.
 #include "player.h"
 // confidence=low: action-mode gates and input select the player's next sequence.
-#define Player_SelectActionSequence sub_08156FE0
 extern u32 gUnk_030053F4;
 struct PlayerPendingNotification {
     void *receiver;
@@ -24,7 +23,7 @@ void Sound_PlaySong(u32);
 s32 Trigger_TryOpenNearby(void *);
 s32 PlayerBarrier_IsActive(void *);
 void PlayerBarrier_Hide(void *);
-s32 sub_0813F8F8(struct Player *);
+s32 Player_SelectRequestedActionMode(struct Player *);
 s32 Player_GetEventFlags(struct Player *, u32);
 void sub_0813B3CC(struct Player *);
 s32 Player_TestNearbyInteraction(struct Player *);
@@ -185,7 +184,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                     PlayerBarrier_Hide(p->actionRequestEffect);
                     goto end;
                 }
-                mode = sub_0813F8F8(p);
+                mode = Player_SelectRequestedActionMode(p);
                 ActorSequence_Begin(p, mode, 0);
                 goto end;
             }
@@ -288,5 +287,5 @@ end:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08156FE0);
+INCLUDE_ASM("asm/nonmatching", Player_SelectActionSequence);
 #endif

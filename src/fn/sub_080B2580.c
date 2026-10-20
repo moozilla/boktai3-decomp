@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: inherited route/reaction interpretation from static callers.
-#define Vorn_SelectReachableEscapeCell sub_080B2580
 
 #ifdef NONMATCHING
 // fuzzy: 84.0%
@@ -184,5 +183,5 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2580);
+INCLUDE_ASM("asm/nonmatching", Vorn_SelectReachableEscapeCell);
 #endif

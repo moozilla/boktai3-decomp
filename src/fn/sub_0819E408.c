@@ -16,7 +16,6 @@ struct Hresvelgr {
 };
 extern const u32 gUnk_08611D44[], gUnk_08611D5C[], gUnk_08611D7C[], gUnk_08611D8C[];
 // confidence=low: advances behavior tables on completed actions, with health and contact transitions.
-#define Hresvelgr_SelectNextBehavior sub_0819E408
 void Hresvelgr_SelectNextBehavior(struct Hresvelgr *p)
 {
     struct Hresvelgr *q = p;

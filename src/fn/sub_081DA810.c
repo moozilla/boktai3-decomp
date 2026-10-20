@@ -1,6 +1,5 @@
 #include "contact_swarm.h"
 // confidence=low: allocates a timed-effect entry for the projectile configuration.
-#define TimedEffect_SpawnProjectile sub_081DA810
 struct Config {
     u16 flags, strength, tracking;
     s8 direction;

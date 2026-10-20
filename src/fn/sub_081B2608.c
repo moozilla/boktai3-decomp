@@ -4,7 +4,6 @@
 #include "scene_vec.h"
 // confidence=low: moves a Vanargand part along its heading, then plays sequence 7.
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
-#define Vanargand_UpdatePartRetreat sub_081B2608
 
 #ifdef NONMATCHING
 // fuzzy: 91.6%
@@ -226,5 +225,5 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B2608);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRetreat);
 #endif

@@ -3,7 +3,7 @@
 void Player_UpdateFacingSide(struct Player *);
 void Player_EnterKindTwo(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
-void sub_08151A14(struct Player *);
+void PlayerCue_UpdateTurningPalette(struct Player *);
 void PlayerCue_BeginModeSeven(struct Player *p, s32 mode)
 {
     if (mode == 0) {
@@ -28,5 +28,5 @@ void PlayerCue_BeginModeSeven(struct Player *p, s32 mode)
         return;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 7, p->tetherPhase);
-    p->triggerAnimationCallback = sub_08151A14;
+    p->triggerAnimationCallback = PlayerCue_UpdateTurningPalette;
 }

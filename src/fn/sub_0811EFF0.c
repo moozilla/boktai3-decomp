@@ -39,7 +39,8 @@ struct ActorEmitter {
 };
 u8 Modifier_IsFirstSourceReady(struct ActorEmitter *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
-s32 sub_08114928(struct EmitterVector *, s32, struct EmitterVector *, void *, s32, s32, s32, s32);
+s32 NativeEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
+                                   s32, s32, s32);
 void CallbackList_SubtractClampedValue(void *, struct ActorEmitter *, s32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);

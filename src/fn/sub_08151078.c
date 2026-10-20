@@ -17,7 +17,6 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-#define PlayerCue_UpdateRecoilRecovery sub_08151078
 void PlayerCue_UpdateRecoilRecovery(struct Player *p)
 {
     s32 value, angle;

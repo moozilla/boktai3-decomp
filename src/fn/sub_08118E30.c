@@ -81,7 +81,6 @@ extern u8 *gUnk_02000710, *gUnk_020004B4;
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);
 // confidence=low: message command one selects this recoil animation; stagger role is tentative.
-#define Glove_UpdateStaggerRecoil sub_08118E30
 void Glove_UpdateStaggerRecoil(struct Glove *p)
 {
     struct Obj *self = &p->motion;

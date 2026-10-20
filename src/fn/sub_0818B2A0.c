@@ -33,10 +33,9 @@ struct Obj {
 
 extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
-extern void sub_0818AFEC(struct Obj *, s32, u32);
+extern void Armor_UpdateContactBoost(struct Obj *, s32, u32);
 extern void Armor_UpdateAccumulatedBehavior(struct Obj *, s32, u32);
 
-#define Armor_UpdateBehaviorAfterContact sub_0818B2A0
 static inline void clearFlags(struct Sub *p, u32 mask)
 {
     p->flags &= ~mask;
@@ -188,7 +187,7 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
             Armor_UpdateAccumulatedBehavior(p, delta, flags);
             break;
         afec:
-            sub_0818AFEC(p, delta, flags);
+            Armor_UpdateContactBoost(p, delta, flags);
             break;
         case 10:
             p->acc += delta;
@@ -236,5 +235,5 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818B2A0);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateBehaviorAfterContact);
 #endif

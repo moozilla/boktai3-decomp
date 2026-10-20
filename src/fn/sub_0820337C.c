@@ -3,8 +3,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#define CannonEmitter_InitializeFromScript sub_0820337C
-
 #ifdef NONMATCHING
 // fuzzy: 99.0%
 // Remaining differences: palette-loop bound and decrement scheduling.
@@ -225,5 +223,5 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820337C);
+INCLUDE_ASM("asm/nonmatching", CannonEmitter_InitializeFromScript);
 #endif

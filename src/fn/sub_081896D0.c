@@ -36,7 +36,6 @@ static inline void clear(struct Part *c, u32 bits)
     c->flags &= ~bits;
 }
 // confidence=low: close-range pursuit and boosted attack choices, gated by actor flags.
-#define Armor_UpdateFacingDecision sub_081896D0
 void Armor_UpdateFacingDecision(struct Armor *p)
 {
     s32 tx, tz, x, z, dx, dz, ax, az, dist, dir;
@@ -232,5 +231,5 @@ void Armor_UpdateFacingDecision(struct Armor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081896D0);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateFacingDecision);
 #endif

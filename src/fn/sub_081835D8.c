@@ -21,7 +21,6 @@ struct AttackCollider {
 };
 
 // confidence=low: animation transition arms a stronger attack and updates per-frame collider bounds.
-#define ActorController_UpdateHeavyAttackCollider sub_081835D8
 extern const u32 gUnk_0824ECC4[], gUnk_0824ECC8[];
 extern const struct HitBox gUnk_0824ED0C[], gUnk_0824ECCC[];
 extern const u8 gUnk_0824ED4C[];
@@ -112,5 +111,5 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081835D8);
+INCLUDE_ASM("asm/nonmatching", ActorController_UpdateHeavyAttackCollider);
 #endif

@@ -40,7 +40,7 @@ struct Profile {
 };
 extern struct Manager *gUnk_020004C8;
 struct Manager *NativeEffect_EnsureManager(void);
-u8 sub_081144A8(struct Manager *, s32, s32, s32);
+u8 EffectPool_CheckCapacity(struct Manager *, s32, s32, s32);
 void NativeEffect_InitTypeZeroSprite(struct Effect *);
 void NativeEffect_InitDirectionalSprite(struct Effect *, s32);
 void NativeEffect_InitThresholdSprite(struct Effect *, s32);
@@ -51,9 +51,9 @@ void NativeEffect_InitColliderWithDepth(struct Effect *, void (*)(void), s32, s3
 void NativeEffect_OnColliderExpire(void);
 void NativeEffect_OnColliderImpact(void);
 void sub_0811455C(void);
-void sub_08113738(struct Effect *);
-void sub_08113BBC(struct Effect *);
-void sub_08113F64(struct Effect *);
+void NativeEffect_UpdateLinearFlight(struct Effect *);
+void NativeEffect_UpdateRotatingFlight(struct Effect *);
+void NativeEffect_UpdateTurningTrail(struct Effect *);
 void NativeEffect_SetState(struct Effect *, void (*)(struct Effect *));
 void EffectActor_BeginHorizontalMotion(struct Effect *, struct Profile *, s32);
 void Sound_PlaySong(u32);
@@ -64,7 +64,6 @@ static inline u32 GroupId(struct Manager *m, s32 group)
     return (group & mask) | ((frame & mask) << 8);
 }
 // confidence=low: selects a sprite and motion state from an emission profile.
-#define NativeEffect_CreateFromProfile sub_08114928
 s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec *velocity,
                                    struct Profile *profile, s32 group, s32 reverse, s32 required,
                                    s32 allowGroups)
@@ -77,7 +76,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
             return -1;
     } else
         m = gUnk_020004C8;
-    if (sub_081144A8(m, GroupId(m, group), required, allowGroups))
+    if (EffectPool_CheckCapacity(m, GroupId(m, group), required, allowGroups))
         return -1;
     for (i = 0; i < 16; i++) {
         if (!m->effects[i].active) {
@@ -114,7 +113,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     m->effects[i].speed = m->effects[i].velocity.x >> 12;
                     NativeEffect_InitDefaultCollider(&m->effects[i], NativeEffect_OnColliderExpire,
                                                      profile->damage);
-                    NativeEffect_SetState(&m->effects[i], sub_08113738);
+                    NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateLinearFlight);
                     Sound_PlaySong(0xcd);
                     break;
                 case 2:
@@ -129,7 +128,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                         NativeEffect_InitDefaultCollider(&m->effects[i],
                                                          NativeEffect_OnColliderExpire, damage);
                     }
-                    NativeEffect_SetState(&m->effects[i], sub_08113738);
+                    NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateLinearFlight);
                     Sound_PlaySong(0xcd);
                     break;
                 case 1:
@@ -138,7 +137,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     m->effects[i].speed = m->effects[i].velocity.x;
                     NativeEffect_InitDefaultCollider(&m->effects[i], NativeEffect_OnColliderExpire,
                                                      profile->damage);
-                    NativeEffect_SetState(&m->effects[i], sub_08113BBC);
+                    NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateRotatingFlight);
                     Sound_PlaySong(0xcd);
                     break;
                 case 3:
@@ -147,7 +146,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     m->effects[i].speed = m->effects[i].velocity.x;
                     NativeEffect_InitColliderWithDepth(
                         &m->effects[i], NativeEffect_OnColliderImpact, profile->damage, 10);
-                    NativeEffect_SetState(&m->effects[i], sub_08113F64);
+                    NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateTurningTrail);
                     Sound_PlaySong(0x164);
                     break;
                 case 4:
@@ -162,5 +161,5 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08114928);
+INCLUDE_ASM("asm/nonmatching", NativeEffect_CreateFromProfile);
 #endif

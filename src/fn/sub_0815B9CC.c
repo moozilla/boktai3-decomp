@@ -19,7 +19,7 @@ void Player_UpdateFacingSide(struct P *);
 void PlayerCue_UpdateMotionFade(void);
 void PlayerCue_UpdateSideFade(void);
 void PlayerCue_UpdateAlternateFade(void);
-void sub_081503EC(void);
+void PlayerCue_UpdateScaleTransition(void);
 
 void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
 {
@@ -48,7 +48,7 @@ void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
             p->fn = PlayerCue_UpdateAlternateFade;
         } else {
             ActorSequence_Begin(p, 7, 4);
-            p->fn = sub_081503EC;
+            p->fn = PlayerCue_UpdateScaleTransition;
         }
     }
 }

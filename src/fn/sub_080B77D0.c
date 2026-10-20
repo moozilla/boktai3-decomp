@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-#define Skeleton_TrySelectRetreatCell                                                              \
-    sub_080B77D0 // confidence=low: neighboring Skeleton controls establish provisional role
+// confidence=low: neighboring Skeleton controls establish provisional role
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // Remaining differences: cached group/route addresses, north/south scan tails, and terrain-load registers.
@@ -165,5 +164,5 @@ u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *actor, u32
     return SelectRetreat(actor, priorDirection, 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B77D0);
+INCLUDE_ASM("asm/nonmatching", Skeleton_TrySelectRetreatCell);
 #endif

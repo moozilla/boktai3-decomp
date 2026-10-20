@@ -98,7 +98,6 @@ struct MotionPair {
 };
 
 // confidence=low: follows a randomized route and returns to the Bee behavior selector.
-#define Bee_FollowWanderRoute sub_08093810
 void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
 {
     struct {
@@ -174,5 +173,5 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08093810);
+INCLUDE_ASM("asm/nonmatching", Bee_FollowWanderRoute);
 #endif

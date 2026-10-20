@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: inferred from segment state and collider updates.
-#define TentacleActor_UpdateSegmentColliders sub_080AB7BC
 
 #ifdef NONMATCHING
 // fuzzy: 97.1%
@@ -134,5 +133,5 @@ void TentacleActor_UpdateSegmentColliders(struct P *pp)
     } while (i < *(s16 *)(base + 0x8da));
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AB7BC);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateSegmentColliders);
 #endif

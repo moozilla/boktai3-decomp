@@ -2,7 +2,6 @@
 #include "scene_actor_chase.h"
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
-#define SceneActorReaction_BeginTargetRecovery sub_0812EED8
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {

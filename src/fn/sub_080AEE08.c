@@ -3,7 +3,6 @@
 #include "script_utility.h"
 
 // confidence=low: tentative Vorn behavior role.
-#define Vorn_UpdateDefeat sub_080AEE08
 #ifdef NONMATCHING
 // fuzzy: 83.4%
 // Remaining differences: register choices, address derivation, and two late constant reloads.
@@ -11,7 +10,6 @@ void sub_0807C72C(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
-#define SceneActor_CallContextScriptB sub_080B0D28
 void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -167,5 +165,5 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AEE08);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
 #endif

@@ -10,7 +10,7 @@ extern u8 *gUnk_02000580[];
 s32 Mod(s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 void sub_0809B7FC(void);
-void sub_0809B6AC(void);
+void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
 void SceneActorControl_ResetCollisionFlags(void *);
 struct Flags {
@@ -83,7 +83,6 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
-#define Lun_ApproachMovementTarget sub_0809B94C
 void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *ctx = a->context;
@@ -139,7 +138,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
             SceneActorControl_ResetCollisionFlags(a);
         } else {
             a->direction = a->fieldE9;
-            SetControl(a, sub_0809B6AC, 10);
+            SetControl(a, Lun_UpdateWaitingAnimation, 10);
             SetState(a, 0, 1, 1);
             a->direction = a->fieldE9;
             a->field2C2 = 64;
@@ -149,5 +148,5 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809B94C);
+INCLUDE_ASM("asm/nonmatching", Lun_ApproachMovementTarget);
 #endif

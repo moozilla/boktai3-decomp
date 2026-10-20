@@ -3,7 +3,6 @@
 // fuzzy: 81.1%
 // Remaining differences: stack-vector lifetime and low-register allocation.
 // confidence=low: emits four bobbing actors in a circular formation around this boss
-#define BossSlot2_SpawnBobbingFormation sub_0817AD7C
 struct FormationActor {
     u8 pad0[0x54];
     s16 position[4];
@@ -69,5 +68,5 @@ void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817AD7C);
+INCLUDE_ASM("asm/nonmatching", BossSlot2_SpawnBobbingFormation);
 #endif

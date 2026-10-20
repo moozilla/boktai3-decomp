@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ControlPanel_InitializeFromScript sub_081C2570
 struct VecWords {
     u32 a, b;
 };

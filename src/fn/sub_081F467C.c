@@ -70,7 +70,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->y = a->y + b->y;
     d->z = b->z + a->z;
 }
-#define Ratatosk_UpdateHomingShot sub_081F467C
 // confidence=low: fires a player-homing projectile at a facing-dependent offset.
 extern u8 *gUnk_02000580;
 void Projectile_InitParameters(void *);
@@ -80,7 +79,7 @@ void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetScriptProcedure(void *, u32, u16);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
-void sub_081FD01C(void *, struct Vec *);
+void Projectile_SpawnAtPosition(void *, struct Vec *);
 void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
 {
     u8 params[0x58];
@@ -136,7 +135,7 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         }
         sum(&spawn, (struct Vec *)&offset, &p2->anchor);
         spawn.y += 150;
-        sub_081FD01C(params, &spawn);
+        Projectile_SpawnAtPosition(params, &spawn);
         Sound_PlaySong(0x56a);
     }
     {

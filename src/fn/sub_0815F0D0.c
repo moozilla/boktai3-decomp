@@ -15,7 +15,7 @@ void Player_EnterKindFour(void *);
 void sub_0815EBB8(void *);
 void PlayerContact_UpdateThresholdEvent(void *);
 void Player_ClearDirectionHistory(void *);
-void sub_0815ED78(void *);
+void Player_ApplyLatchedActionMode(void *);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 void SceneActor_UpdateVisualEffects(void *);
@@ -58,7 +58,7 @@ s32 Player_Update(struct Player *p)
                 p->positionResetValue = 0;
         }
     }
-    sub_0815ED78(p);
+    Player_ApplyLatchedActionMode(p);
     if (p->actionRequestState) {
         Sound_PlaySong(0x393);
         p->actionRequestState = 0;

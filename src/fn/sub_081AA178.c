@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
-#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 99.5%
@@ -33,7 +32,6 @@ void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-#define PairedSceneActor_AreSelectedHalvesFinished sub_081B64D4
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
@@ -114,5 +112,5 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AA178);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateRepeatedPairAttack);
 #endif

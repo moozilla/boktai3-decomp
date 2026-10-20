@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Golem_UpdateChargeRecovery                                                                 \
-    sub_080C6A68 // confidence=low: neighboring Golem controls establish the state role.
+// confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 // Remaining differences: stack-slot placement, packed-store scheduling and animation pointer copies.
@@ -268,5 +267,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C6A68);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeRecovery);
 #endif

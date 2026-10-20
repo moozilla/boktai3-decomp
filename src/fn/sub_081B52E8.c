@@ -2,7 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartBobbing sub_081B52E8
 
 struct VanargandPart {
     struct ContactSwarmSprite sprite;

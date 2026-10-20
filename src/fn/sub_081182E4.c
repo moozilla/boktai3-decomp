@@ -89,8 +89,8 @@ void CharacterModel_ClearAnimationFlags(void *, u32);
 void CharacterModel_SetAnimationFlags(void *, u32);
 void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
-void sub_08117948(struct Glove *);
-void sub_0811C168(struct Obj *);
+void Glove_UpdateStopping(struct Glove *);
+void ActorParticles_SpawnSideBurst(struct Obj *);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
@@ -105,7 +105,7 @@ void CharacterModel_LoadSecondaryPalette(void *, s32);
 void sub_0810BB4C(void *, s32);
 void sub_0810BB90(void *, s32);
 s32 Mod(s32, s32);
-void sub_0811C09C(struct Obj *);
+void ActorParticles_EmitOffsetBurst(struct Obj *);
 void sub_08117F6C(struct Glove *);
 void Glove_OnActionComplete(struct Glove *);
 static inline void ClearFlags(u16 *p, s32 mask)
@@ -119,7 +119,6 @@ static inline u8 IsRecoveryEnabled(u32 mask)
     return 0;
 }
 // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
-#define Glove_UpdateDefeatEffects sub_081182E4
 void Glove_UpdateDefeatEffects(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -136,7 +135,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         u8 **sprites;
         u8 *style;
         u32 *motionBias;
-        sub_0811C168(self);
+        ActorParticles_SpawnSideBurst(self);
         if (LinkParticipant_IsLocallySelected(p)) {
             Sound_StopSong(0x87);
             Sound_StopSong(0x88);
@@ -227,12 +226,12 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
     }
     if (p->timer <= 29) {
         if (Mod(p->timer, 12) == 0) {
-            sub_0811C09C(self);
+            ActorParticles_EmitOffsetBurst(self);
             Sound_PlaySong(0x16E);
         }
     } else if (p->timer <= 59) {
         if (Mod(p->timer, 6) == 0) {
-            sub_0811C09C(self);
+            ActorParticles_EmitOffsetBurst(self);
             Sound_PlaySong(0x16E);
         }
     }
@@ -317,5 +316,5 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081182E4);
+INCLUDE_ASM("asm/nonmatching", Glove_UpdateDefeatEffects);
 #endif

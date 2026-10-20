@@ -55,12 +55,11 @@ static inline u32 NextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return *(const u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
 }
-void sub_082012D4(void);
+void PlayerClone_BeginActiveReactions(void);
 u32 PlayerClone_GetActiveCount(void);
 void Player_SetFlag740(void);
 void Player_ClearFlag740(void);
 // confidence=low: repeated relocations followed by clone-pool activation; attack label tentative.
-#define Ratatosk_UpdateCloneAttack sub_081F7DAC
 void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 {
     struct Ratatosk *q = p;
@@ -138,7 +137,7 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
             case 3:
                 if (p->cloneReady > 0) {
                     p->spawnClone = 1;
-                    sub_082012D4();
+                    PlayerClone_BeginActiveReactions();
                 }
                 if (PlayerClone_GetActiveCount() == 0) {
                     p->animationFlag = 1;
@@ -154,5 +153,5 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F7DAC);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateCloneAttack);
 #endif

@@ -9,7 +9,6 @@ void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);
 // confidence=low: selects attacks until the arena departure sequence completes.
-#define Hresvelgr_UpdateAttackCycle sub_0819DD44
 static inline u8 Start(u8 *p)
 {
     u8 *flag = p + 0x9a;

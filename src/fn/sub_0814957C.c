@@ -132,7 +132,6 @@ struct ReleaseAnimation {
     const void *resource;
 };
 // confidence=low: holds the odd-direction pose until movement animation ends.
-#define Player_UpdateOddDirectionPose sub_0814957C
 void Player_UpdateFacingSide(struct Player *);
 void Player_UpdateOddDirectionPose(struct Player *p)
 {
@@ -157,5 +156,5 @@ void Player_UpdateOddDirectionPose(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814957C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateOddDirectionPose);
 #endif

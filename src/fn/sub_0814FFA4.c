@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: MoveTo callback approaches destination and decelerates its movement effect.
-#define PlayerCue_UpdateMoveDestination sub_0814FFA4
 extern const s16 gUnk_086149C4[];
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -112,5 +111,5 @@ void PlayerCue_UpdateMoveDestination(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814FFA4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMoveDestination);
 #endif

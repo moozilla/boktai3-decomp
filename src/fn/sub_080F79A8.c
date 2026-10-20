@@ -4,12 +4,11 @@
 // fuzzy: 87.6%
 // Branch layout, address reuse and register allocation still differ.
 // confidence=low: the axe and its auxiliary sprite orbit a shared moving center.
-#define Axe_UpdateOrbitAttack sub_080F79A8
-#define H(p, off)             (*(u16 *)((u8 *)(p) + (off)))
-#define S(p, off)             (*(s16 *)((u8 *)(p) + (off)))
-#define B(p, off)             (*((u8 *)(p) + (off)))
-#define W(p, off)             (*(u32 *)((u8 *)(p) + (off)))
-#define P(p, off)             ((u8 *)(p) + (off))
+#define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
+#define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
+#define B(p, off) (*((u8 *)(p) + (off)))
+#define W(p, off) (*(u32 *)((u8 *)(p) + (off)))
+#define P(p, off) ((u8 *)(p) + (off))
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -239,5 +238,5 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F79A8);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateOrbitAttack);
 #endif

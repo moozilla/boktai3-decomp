@@ -39,7 +39,6 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     dst->z = z - gUnk_03005418[2];
 }
 // confidence=low: resource flag selects this list; name describes observed bounds handling.
-#define Sprite_RenderUnflippedList sub_08214FBC
 void Sprite_RenderUnflippedList(void)
 {
     struct Vec pos;

@@ -17,7 +17,6 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 // confidence=low: cue motion 0x1E recoils, waits, then recovers unless requested to stay down.
-#define PlayerCue_UpdateKnockdownRecovery sub_08150DB0
 void PlayerCue_UpdateKnockdownRecovery(struct Player *p)
 {
     s32 value, angle;

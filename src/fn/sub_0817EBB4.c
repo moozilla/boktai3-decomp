@@ -4,7 +4,6 @@
 // fuzzy: 93.8%
 // Remaining differences: palette constant lifetimes, rotation mask reuse, and registers.
 // confidence=low: summons a formation before rotating through an effect burst
-#define BossSlot2_UpdateSummonSpinSequence sub_0817EBB4
 struct BossActor {
     u8 pad0[0x51];
     u8 direction;
@@ -38,7 +37,7 @@ struct BossActor {
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, s32, s32, s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void sub_0817AD7C(void *);
+void BossSlot2_SpawnBobbingFormation(void *);
 void ActorEffect_SpawnAtAngle(void *, void *, u32);
 void sub_0806CCC8(void *, s32, s32);
 u8 Callback_InvokeActor(void *, void *);
@@ -108,7 +107,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             if (!p->timer) {
                 SceneActors_StartUnmirroredAnimation(p, &q->animation, q->animationState, 0x12D, 2,
                                                      4);
-                sub_0817AD7C(p);
+                BossSlot2_SpawnBobbingFormation(p);
             }
             if (p->timer > 30) {
                 u32 phase = 3, zero = 0;
@@ -191,5 +190,5 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817EBB4);
+INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdateSummonSpinSequence);
 #endif

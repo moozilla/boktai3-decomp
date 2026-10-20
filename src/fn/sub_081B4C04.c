@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Vanargand_UpdatePartRecovery sub_081B4C04
 #include "contact_swarm.h"
 #include "scene_vec.h"
 

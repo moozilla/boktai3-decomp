@@ -1,7 +1,6 @@
 #include "global.h"
 #include "rotation_phase.h"
 // confidence=low: saves the player position and turns the axe before the attack callback.
-#define Axe_UpdateTargetWindup sub_080F8E68
 struct WindupContext {
     u8 unknown0[0xE3E];
     u8 delay, turnStep;

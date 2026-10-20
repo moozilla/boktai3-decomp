@@ -2,7 +2,6 @@
 #include "scene_actor_control_phase.h"
 
 // confidence=low: approaches the active route descriptor and consumes its trigger on arrival.
-#define SceneActorControl_UpdateTriggerApproach sub_08130714
 
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);

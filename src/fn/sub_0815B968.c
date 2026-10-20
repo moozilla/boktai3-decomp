@@ -29,7 +29,7 @@ void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
 void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
-void sub_081503EC(void);
+void PlayerCue_UpdateScaleTransition(void);
 
 void PlayerCue_Motion7Variant7(struct P *p, s32 v, u32 w)
 {
@@ -41,5 +41,5 @@ void PlayerCue_Motion7Variant7(struct P *p, s32 v, u32 w)
     p->w5a4 = w;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 7, 7);
-    p->fn = sub_081503EC;
+    p->fn = PlayerCue_UpdateScaleTransition;
 }

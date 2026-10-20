@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
-#define ActorStatus_UpdateGuardedApproach sub_081B1334
 #ifdef NONMATCHING
 // fuzzy: 86.0%
 // Remaining differences: Guarded contact transition, entry-pointer lifetimes, and packed-animation allocation differ.
@@ -282,5 +281,5 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1334);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
 #endif

@@ -179,7 +179,6 @@ static inline u32 RandomValue(void)
     return gUnk_086141BC[gUnk_03005304];
 }
 // confidence=low: type three moves along a changing heading and emits trail particles.
-#define NativeEffect_UpdateTurningTrail sub_08113F64
 void NativeEffect_UpdateTurningTrail(struct Effect *p)
 {
     struct Packed velocity, projected;

@@ -12,7 +12,7 @@ typedef struct ActorControllerMotion {
     u8 padB3A[8];
     u8 decay;
 } ActorControllerMotion;
-void sub_0818323C(ActorControllerMotion *);
+void ActorController_UpdateMovingAttackCollider(ActorControllerMotion *);
 extern const s16 gSineTable[];
 static inline int trunc12(int x)
 {
@@ -20,7 +20,7 @@ static inline int trunc12(int x)
 }
 void ActorController_UpdateDecayingVelocity(ActorControllerMotion *p)
 {
-    sub_0818323C(p);
+    ActorController_UpdateMovingAttackCollider(p);
     {
         u8 *a = &p->angle;
         int shift = p->decay >> 1;

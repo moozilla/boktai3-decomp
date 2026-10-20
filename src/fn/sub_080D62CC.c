@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Mummy_FireAcceleratingVolley sub_080D62CC
-
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // Remaining differences: quotient copy, pool padding and loop delta-address scheduling.
@@ -109,5 +107,5 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D62CC);
+INCLUDE_ASM("asm/nonmatching", Mummy_FireAcceleratingVolley);
 #endif

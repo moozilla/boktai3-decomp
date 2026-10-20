@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: repeats delayed animations before dispatching a context script.
-#define Vorn_UpdateAnimationRetries sub_080AFBF4
 extern const u8 gUnk_0824E224[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void SceneActor_UpdateDelayedAnimation(void);

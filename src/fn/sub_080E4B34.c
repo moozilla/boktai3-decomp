@@ -1,5 +1,4 @@
 // confidence=low: waits twenty updates, saves the group behavior and attempts route recovery.
-#define Dog_BeginDelayedRouteRecovery sub_080E4B34
 #include "global.h"
 // confidence=low: waits twenty updates before saving chase behavior and rerouting.
 
@@ -154,5 +153,5 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
         a->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E4B34);
+INCLUDE_ASM("asm/nonmatching", Dog_BeginDelayedRouteRecovery);
 #endif

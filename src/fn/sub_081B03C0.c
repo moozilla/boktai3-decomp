@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: moves a paired half and holds/releases player position requests.
-#define PairedSceneActor_UpdatePlayerCapture sub_081B03C0
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 #ifdef NONMATCHING
@@ -238,5 +237,5 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B03C0);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdatePlayerCapture);
 #endif

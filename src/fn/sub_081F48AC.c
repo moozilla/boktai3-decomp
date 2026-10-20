@@ -54,7 +54,6 @@ struct Actor {
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 u8 Callback_InvokeActor(void *, void *);
-#define Ratatosk_UpdateSunOrbSummon sub_081F48AC
 s32 Ratatosk_FindPointNearestReference(void *, s32);
 void RisingActorConfig_Initialize(void *);
 void SunOrb_SetTargetSource(void *, s32);

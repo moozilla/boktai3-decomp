@@ -17,7 +17,6 @@ void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s3
 void SpriteParticle_ForwardCreate(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                   s32, s32, s32, s32, s32, s32);
 // confidence=low: emits alternating particles at direction-dependent offsets while moving.
-#define NamedObject_EmitMovementTrail sub_08100C18
 void NamedObject_EmitMovementTrail(struct NamedObjectTrail *object)
 {
     struct ContactPosition offsets[2], position;

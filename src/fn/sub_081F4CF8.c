@@ -102,7 +102,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 void Ratatosk_InitAnimatedParticleParams(void *);
 void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
 void sub_081FC26C(void *, struct Vec *);
-#define Ratatosk_UpdateDefeatSequence sub_081F4CF8
 // confidence=low: defeat role inferred from event flag 0x51 and persistent counters.
 struct Map {
     u32 pad;
@@ -117,7 +116,7 @@ void *TerrainModifiers_FindCellOverride(s32, s32);
 void Task_Kill(void *);
 void SceneActors_RunFirstEventScript(void *, void *);
 void SceneActors_RunSecondEventScript(void *, void *);
-void sub_082012D4(void);
+void PlayerClone_BeginActiveReactions(void);
 void SunOrb_FadeOutAll(void *);
 void sub_08159164(u16);
 void GameState_SetEventFlag(s32);
@@ -178,7 +177,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         p2->scaleX = 0;
         p2->scaleZ = 0;
         p2->scaleStep = 0;
-        sub_082012D4();
+        PlayerClone_BeginActiveReactions();
         SunOrb_FadeOutAll(*(void **)((u8 *)p2 + 0xf2c));
         Sound_StopSong(0x56b);
         Sound_StopSong(0x569);
@@ -244,5 +243,5 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F4CF8);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDefeatSequence);
 #endif

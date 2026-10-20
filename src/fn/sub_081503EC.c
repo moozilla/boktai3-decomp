@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 // confidence=low: cue callbacks select departure and arrival phases with scale changes.
-#define PlayerCue_UpdateScaleTransition sub_081503EC
 void Player_AddControlFlags(void *, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -125,5 +124,5 @@ void PlayerCue_UpdateScaleTransition(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081503EC);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateScaleTransition);
 #endif

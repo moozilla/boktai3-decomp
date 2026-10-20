@@ -1,7 +1,4 @@
 #include "global.h"
-#define ScriptCombatActor_TryProjectileAttack sub_08201898
-
-#define ScriptCombatActor_UpdateProjectileAttack sub_08201A78
 
 #ifdef NONMATCHING
 // fuzzy: 80.2%
@@ -86,5 +83,5 @@ u32 ScriptCombatActor_UpdateProjectileAttack(u8 *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08201A78);
+INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_UpdateProjectileAttack);
 #endif

@@ -16,7 +16,7 @@ struct P {
 
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
-void sub_08150DB0(void);
+void PlayerCue_UpdateKnockdownRecovery(void);
 
 void PlayerCue_Motion30(struct P *p, s32 dir, u32 h, u32 b, u32 c)
 {
@@ -35,5 +35,5 @@ void PlayerCue_Motion30(struct P *p, s32 dir, u32 h, u32 b, u32 c)
     p->c = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0x1E, 0);
-    p->fn = sub_08150DB0;
+    p->fn = PlayerCue_UpdateKnockdownRecovery;
 }

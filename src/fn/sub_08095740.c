@@ -139,7 +139,6 @@ static inline s32 WrapCounter(s32 n)
     return n - 256;
 }
 // confidence=low: drains player energy while tracking the player's wrapping progress counter.
-#define Ghost_UpdateEnergyDrainAnimation sub_08095740
 void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
 {
     u8 *body = *(u8 **)((u8 *)actor + 0x3D0);

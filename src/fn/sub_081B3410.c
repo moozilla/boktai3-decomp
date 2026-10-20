@@ -4,7 +4,6 @@
 #include "scene_vec.h"
 
 // confidence=low: player-directed sweeping strike followed by a timed retreat.
-#define Vanargand_UpdatePartSweepingStrike sub_081B3410
 
 #ifdef NONMATCHING
 // fuzzy: 94.5%
@@ -339,5 +338,5 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B3410);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSweepingStrike);
 #endif

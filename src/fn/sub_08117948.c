@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Glove_UpdateStopping sub_08117948
-
 struct Obj {
     u8 pad0[4];
     u32 unk4;
@@ -284,5 +282,5 @@ void Glove_UpdateStopping(struct Glove *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08117948);
+INCLUDE_ASM("asm/nonmatching", Glove_UpdateStopping);
 #endif

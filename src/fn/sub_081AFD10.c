@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: maintains paired-half presentation, colliders and completion flags.
-#define PairedSceneActor_UpdateHalfPresentation sub_081AFD10
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 95.3%
@@ -241,5 +240,5 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AFD10);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdateHalfPresentation);
 #endif

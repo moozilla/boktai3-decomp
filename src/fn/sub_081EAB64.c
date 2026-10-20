@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
-#define Params3D0_UpdateDisplay sub_081EAB64
 #ifdef NONMATCHING
 // fuzzy: 90.7%
 // Palette/selection address lifetimes and register allocation still differ.

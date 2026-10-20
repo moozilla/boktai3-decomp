@@ -131,7 +131,6 @@ struct SwordComponent {
     u8 pad188[0xC];
 };
 // confidence=low: the four children are the active sword components updated at 080F63C4.
-#define Sword_InitAttackComponents sub_080F6F90
 void Ivy_OnChildDestroy(void);
 void sub_080F4708(void);
 void Sword_InitAttackComponents(u8 *input)
@@ -219,5 +218,5 @@ void Sword_InitAttackComponents(u8 *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F6F90);
+INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
 #endif

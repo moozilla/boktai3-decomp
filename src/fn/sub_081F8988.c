@@ -65,7 +65,6 @@ static inline u8 ConsumeActivation(struct Ratatosk *p)
     return 0;
 }
 // confidence=low: coordinates orb selection, raising and relocation; exact attack role tentative.
-#define Ratatosk_UpdateSunOrbRelocation sub_081F8988
 void Ratatosk_UpdateSunOrbRelocation(struct Ratatosk *p)
 {
     struct OrbConfig config;
@@ -184,5 +183,5 @@ void Ratatosk_UpdateSunOrbRelocation(struct Ratatosk *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F8988);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateSunOrbRelocation);
 #endif

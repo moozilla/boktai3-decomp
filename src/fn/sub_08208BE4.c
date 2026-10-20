@@ -1,5 +1,4 @@
 #include "global.h"
-#define CannonTurret_InitializeFromScript sub_08208BE4
 #ifdef NONMATCHING
 // fuzzy: 95.5%
 // Remaining differences: resource reload, selected register lifetimes, and explicit success result.
@@ -251,5 +250,5 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08208BE4);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_InitializeFromScript);
 #endif

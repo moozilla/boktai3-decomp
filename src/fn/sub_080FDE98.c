@@ -66,7 +66,6 @@ static inline u32 Facing(u32 value, u8 *direction)
     return (value & 63) + *direction;
 }
 // confidence=low: follows nine stored route points and retargets around the player; action role tentative.
-#define Axe_FollowAcceleratingRoute sub_080FDE98
 void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
 {
     struct AxeRoute *route = actor->context;

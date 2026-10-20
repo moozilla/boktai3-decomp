@@ -73,7 +73,6 @@ void SunOrb_SetMotionParams(void *, s32, s32, s32, s32);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 // confidence=low: raises a sun orb at a player-near point; precise attack name tentative.
-#define Ratatosk_UpdateSunOrbPlacement sub_081F8600
 void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
 {
     struct OrbConfig config;
@@ -177,5 +176,5 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F8600);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateSunOrbPlacement);
 #endif

@@ -4,7 +4,6 @@
 // confidence=low: state advances segment interpolation and oscillation before restoring control.
 
 // confidence=low: inferred from segment state and collider updates.
-#define TentacleActor_UpdateRetraction sub_080AB968
 
 #ifdef NONMATCHING
 // fuzzy: 85.9%
@@ -83,5 +82,5 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AB968);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateRetraction);
 #endif

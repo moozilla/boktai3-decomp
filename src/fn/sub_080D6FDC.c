@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Mummy_RequestStraightRoute sub_080D6FDC
-
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 

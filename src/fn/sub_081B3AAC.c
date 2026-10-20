@@ -3,7 +3,6 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: three motion legs include an approach toward the player.
-#define Vanargand_UpdatePartLunge sub_081B3AAC
 
 #ifdef NONMATCHING
 // fuzzy: 88.6%
@@ -147,5 +146,5 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B3AAC);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartLunge);
 #endif

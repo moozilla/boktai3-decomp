@@ -1,8 +1,6 @@
 #include "global.h"
 
 // confidence=low: dispatches scene messages into action and animation state.
-#define Hresvelgr_DispatchSceneMessages sub_081A2430
-#define Hresvelgr_UpdateRisingProjectile sub_081A12DC
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -151,5 +149,5 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A2430);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
 #endif

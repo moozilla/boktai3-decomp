@@ -81,7 +81,6 @@ extern u8 *gUnk_02000710, *gUnk_020004B4;
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);
 // confidence=low: message command three configures the particle emitter before this recoil.
-#define Glove_UpdateEmitterRecoil sub_081190D4
 void Glove_UpdateEmitterRecoil(struct Glove *p)
 {
     struct Obj *self = &p->motion;
