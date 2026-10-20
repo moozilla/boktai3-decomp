@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Remaining differences: two commutative add operand orders in animation-presence checks.
 struct BestiaryConfig {
     u8 pad[14];
     u8 animation, flags;
@@ -34,21 +31,26 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
 {
     s32 i;
     u8 *animations;
+    s32 off;
     const struct BestiaryConfig *config;
     if (p[0x25]) {
         i = 0;
         animations = p + 0x28;
-        for (; i <= 5; i++)
-            if (*(u32 *)(i * 0x94 + (u32)animations))
-                DisplayAnimation_SetFlags(p + 0x28 + i * 0x94, 1);
+        for (; i <= 5; i++) {
+            off = i * 0x94;
+            if (*(u32 *)(animations + off))
+                DisplayAnimation_SetFlags(p + 0x28 + off, 1);
+        }
         *(u32 *)(p + 0x9a4) |= 1;
         return 0;
     }
     i = 0;
     animations = p + 0x28;
-    for (; i <= 5; i++)
-        if (*(u32 *)(i * 0x94 + (u32)animations))
-            DisplayAnimation_ClearFlags(p + 0x28 + i * 0x94, 1);
+    for (; i <= 5; i++) {
+        s32 o2 = i * 0x94;
+        if (*(u32 *)(animations + o2))
+            DisplayAnimation_ClearFlags(p + 0x28 + o2, 1);
+    }
     *(u32 *)(p + 0x9a4) &= ~1;
     {
         u8 *blocked = p + 0xa02;
@@ -89,7 +91,3 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
     }
     p[0xa03] = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", BestiaryDisplay_UpdateEntry);
-#endif

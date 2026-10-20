@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
 #define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
 #define gChildGroupRandomIndex               gUnk_03005308
 #define gChildGroupRandomTable               gUnk_0203B400
@@ -51,7 +49,7 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
         {
             u32 random = (gUnk_03005308 + 1) & 0x3FF;
             u32 value;
-            const u16 *table;
+            register const u16 *table asm("r2");
             gUnk_03005308 = random;
             random <<= 1;
             table = gUnk_0203B400;
@@ -88,6 +86,3 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ChildGroup_UpdateAlternatingCallbacks);
-#endif
