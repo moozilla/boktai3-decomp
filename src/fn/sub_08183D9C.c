@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #define gActorLayeredEndAnimations gUnk_0824EDE8
 #include "global.h"
-#define ActorController_UpdateLayeredEnd sub_08183D9C
 struct ActorAnimationLayer {
     u16 unknown[3];
     u16 flags;

@@ -5,7 +5,6 @@
 // Open: the final subtract writes r0 (idx in r0); ROM keeps the index in r1
 // (subs r1, r1, r0) and loads through it. Triangular-index lookup of a
 // symmetric pair table (a != b), stride-major.
-#define PairTable_Lookup sub_0821F1C4
 
 u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b)
 {
@@ -20,5 +19,5 @@ u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b)
     return table[idx];
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821F1C4);
+INCLUDE_ASM("asm/nonmatching", PairTable_Lookup);
 #endif

@@ -1,5 +1,4 @@
 #include "global.h"
-#define AnimatedMarker_RegisterOccupiedCell sub_081B769C
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 static inline int trunc8(int x)
 {

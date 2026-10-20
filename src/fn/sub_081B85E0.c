@@ -1,5 +1,4 @@
 #include "contact_actor.h"
-#define SceneScriptObject_InitHitCollider sub_081B85E0
 void SceneScriptObject_ApplyHitFlash(void);
 void SceneScriptObject_InitHitCollider(u8 *p)
 {
