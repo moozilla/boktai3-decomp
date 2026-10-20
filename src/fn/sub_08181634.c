@@ -1,27 +1,24 @@
 #include "global.h"
-
 #ifdef NONMATCHING
-// fuzzy: 81.0%
-// foundry draft (worker best 81.0%); what differs is mostly register allocation and instruction order
-#define ActorPalette_CopyBanks ArmorPalette_CopyKindBanks
-struct PaletteActor {
-    u8 pad0[0x48A];
-    u8 bank, secondaryBank;
-};
-void Palette_CopyBank(void *, u32);
-void ArmorPalette_CopyKindBanks(struct PaletteActor *p, u8 *source, s32 bank, s32 secondary)
+// fuzzy: 98.4% (only the order of the initial register moves differs)
+// MATCHING_CONCESSION: register-pinning
+#define ArmorPalette_CopyKindBanks sub_08181634
+void Palette_CopyBank(void *, void *);
+void ArmorPalette_CopyKindBanks(u8 *s0, u8 *dst, u32 i, u32 j)
 {
-    u8 *src;
-    src = source + (bank << 5);
-    Palette_CopyBank((u8 *)p + ((p->bank << 5) + 8), (u32)src);
-    src = source + ((bank + 1) << 5);
-    Palette_CopyBank((u8 *)p + ((p->bank << 5) + 0x28), (u32)src);
-    bank += 2;
-    src = source + (bank << 5);
-    Palette_CopyBank((u8 *)p + ((p->bank << 5) + 0x48), (u32)src);
-    src = source + (secondary << 5);
-    Palette_CopyBank((u8 *)p + ((p->secondaryBank << 5) + 8), (u32)src);
+    register u8 *s asm("r6") = s0;
+    u8 *d;
+    u8 *bank;
+    d = dst + i * 32;
+    bank = s + 0x48A;
+    Palette_CopyBank(s + (*bank * 32 + 8), d);
+    d = dst + (i + 1) * 32;
+    Palette_CopyBank(s + (*bank * 32 + 0x28), d);
+    d = dst + (i + 2) * 32;
+    Palette_CopyBank(s + (*bank * 32 + 0x48), d);
+    d = dst + j * 32;
+    Palette_CopyBank(s + (s[0x48B] * 32 + 8), d);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", ArmorPalette_CopyKindBanks);
+INCLUDE_ASM("asm/nonmatching", sub_08181634);
 #endif
