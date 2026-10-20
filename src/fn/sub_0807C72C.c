@@ -5,7 +5,7 @@
 #ifdef NONMATCHING
 // fuzzy: 86.9%
 /* Remaining differences are register lifetimes and inline mask/address selection. */
-u8 ActorAttachment_IsUnavailable(void);
+s32 ActorAttachment_IsUnavailable(struct ActorAttachmentSlotView *);
 void *ActorAttachment_CreatePartsSlotWithCount(u32, void *, u32, s32, u32, s16 *, s32, u32, void *, void *);
 void SceneStimulus_AddTagged(s32, s32, s32, u32, u32, u16);
 #define SceneActorAttachment_ReplaceResponseSlot sub_0807C72C
@@ -53,7 +53,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
             actor->attachment = ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
             actor->attachment = ActorAttachment_ReleaseResource(actor->attachment, 1, (void *)actor->id);
             actor->attachment = ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
-            if (ActorAttachment_IsUnavailable()) {
+            if ((u8)ActorAttachment_IsUnavailable(actor->attachment)) {
                 s16 *value;
                 s32 initial;
                 u32 flag;
