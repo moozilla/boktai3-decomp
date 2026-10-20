@@ -2629,3 +2629,103 @@ an in-progress draft. All final draft scores were written by
 Driver commits preserve the per-function changes, including corrective/refinement
 commits for 08126D88 and 0811AE9C. This note is the final driver commit. Complete
 combined ROM validation remains for the integrator.
+
+## Cloud task 0809C2D8 — 2026-10-20
+
+Tags: #matching #lun #crow #terrain #animation
+
+Worked solo, offline, on the preclaimed `cloud/0809C2D8` branch. Read the entry
+and worker instructions, then inspected assembly, callback tables, named
+neighbors/callees and matched relatives. Ghidra output is absent in this
+checkout. Used only fast per-file `check.py` checks and the worktree Python;
+no make, full build, network operations or direct Git mutations. Formatted
+sources with the worktree's clang-format and queued commits with build/commit.sh.
+
+Exact recovery is **9.18% of this task (+9.18 percentage points; 344 of 3,748
+reviewed bytes)**, unpinned. Repository code gain is approximately **+0.0142
+percentage points**. Five guarded drafts add no exact coverage. All six have
+descriptive file-local address aliases; no register hints remain.
+
+- **0809F84C — drafted 91.5%, Crow_SteerAroundPlayer (tentative).** Reviewed
+  extent 1,064 bytes; candidate 1,060 bytes. Action-table member 1 at 08605E94.
+  Sets drawable flag two and entryTarget224 control on entry. Chooses approach
+  versus orbit from counter/time, distance 0x7D00 and context range +3E0;
+  computes the player angle, normalizes signed turns, derives bounded turn
+  steps and motion from the sine table, and updates drawable direction with
+  a two/four-frame cooldown. Context +3DA is the approach timer, +3DC speed,
+  +3DD turn cooldown and +3E4 approach-turn count. Final alignment: 50 differing
+  instructions, 14 ignoring registers. Residue concerns inline clamp copies,
+  argument evaluation order, padding initialization and r4/r6/r8/r9 allocation.
+  Narrow SetState formals prevent over-merging its early exits; explicit
+  absolute-value assignments avoid redundant inline-result copies. The original
+  copies an uninitialized scratch halfword alongside the velocity. The final
+  draft defines `velocity.pad = 0`; do not restore that uninitialized read to
+  chase equality. Earlier committed score 92.0% is superseded by 91.5%.
+- **0809F510 — drafted 95.6%, Crow_HopWithinHomeCell (tentative).** Reviewed
+  extent 828 bytes; candidate 824 bytes. Action-table member 2 at 08605E94.
+  Context +3E8 is the home cell and +42C is its velocity. Initializes a random
+  heading/speed and upward velocity 14, predicts the next terrain cell,
+  cancels horizontal velocity outside the home cell, applies gravity two,
+  and resets the behavior on landing. The computed home-cell center is stored
+  in scratch but unused afterwards in the original. Final alignment: 21 differing
+  instructions, 13 ignoring registers. An inline Add with reversed operand
+  order prevents scalarized packed stack writes. A single local aggregate
+  containing fill zero/home/next reproduces the stack offsets. Computing
+  the next cell before loading the home cell fixes another load-order issue.
+  Remaining residue is the arrived-flag spill, control/reset constants and
+  CpuSet setup order. The commit title's 95.8% is a typo; recorded score is 95.6%.
+- **0809F174 — drafted 98.8%, Crow_RecoverFromDisplacement (tentative).**
+  Reviewed/candidate extent 500 bytes. Installed by the Crow initializer's
+  callback setup near 080A1D38. Selects animation three; converges saved X/Z
+  displacement (+318/+31C) toward +310/+314 by signed quarter steps bounded
+  to +/-200, then restores idle after settling and elapsed time exceeds 30.
+  Clears context +3EC and attack collision, restores facing and sets +2C2 to
+  64. Final alignment: six differing instructions, all structural ordering:
+  the two zero constants and halfword-mask load occur at different points.
+  A single-result Quarter helper and direct clamp branches fixed the extra
+  moves/high-register save. Explicit widened mask/value temporaries reproduce
+  the intended negative mask; narrowing the operation to u16 introduces a
+  different literal and disrupts allocation. Zero pinning regressed and was
+  discarded. No concession marker remains.
+- **0809C2D8 — drafted 94.4%, Lun_ChooseMovementDestination.** Reviewed extent
+  512 bytes; candidate 516 bytes. Motion-table member 0 at 08605E34. Restores
+  saved control and clears context +3E2; once height >239 and counter >60,
+  clamps height to 240, chooses a new route entry (+42C), snaps its terrain
+  height, saves movement endpoints, calls 0809CCF4, selects behavior one,
+  computes heading at actor +3CD and clears context vector +424. Final
+  alignment: 14 differing instructions, four ignoring registers. Wrapping
+  subtraction and Atan2 together preserves the target pointer for signed
+  coordinate reads. The earlier unpinned 97.6% attempt lacked an independent
+  stack-address recomputation; a discarded r3 constraint reached 99.6%, one
+  mov-versus-add instruction short. The endpoint callee copies all eight
+  bytes, while the original initializes only three halfwords. Final draft
+  explicitly defines target.pad to zero, superseding the earlier score.
+- **0809C630 — drafted 95.5%, Lun_UpdateLaunchedReaction (tentative).**
+  Reviewed/candidate extent 500 bytes. Motion-table member 3 at 08605E34.
+  Selects Lun_OnSpecialAnimation/kind 0x24, consumes the lift penalty, clears
+  context vector +424, chooses a random launch angle, sets secondary motion
+  to sin(angle)*12 / 4096, 10, cos(angle)*12 / 4096, and clears flag 0x100000.
+  Motion flag 0x10 ends the launch and installs idle control/behavior four.
+  Final alignment: 14 register-only differing instructions (11 bytes), zero
+  structural differences. A shared fill-zero slot fixes the stack frame.
+  Reassigning the flags pointer inside the entry branch avoids keeping it
+  alive across calls; returning it from inline ClearFlags reproduces the
+  final pointer copy and the initial hoisted flags address. RNG width/source
+  spelling variants did not fix the remaining scratch-register allocation.
+- **0809C4D8 — matched, Lun_UpdateTimedRecovery (tentative).** Complete
+  reviewed extent 344 bytes, unpinned. Motion-table member 4 at 08605E34.
+  Installs idle control/profile animation 16, sets context flag one and
+  disables collider flag four and actor flag 0x800. Flashes every eight frames
+  before frame 40, then every three frames; after frame 60 restores the
+  height adjustment, resets collision flags and selects behavior zero.
+  First candidate had only two mask/load-order differences. Declaring the
+  u16 field pointer before a widened u32 mask, then assigning the masked
+  value through that pointer, gives the original address/mask/load order.
+  Formatted final source passed `check.py --target-size 344` with zero bytes
+  differing. Committed separately as a match.
+
+All five draft scores were recorded by `check.py --nonmatching --record`;
+all default INCLUDE_ASM paths passed separate per-file checks. The two
+scratch-padding corrections have separate one-unit driver commits. No shared
+headers or generated files were edited. Complete combined-ROM validation is
+left to the batch integrator. This notes update is the final driver commit.
