@@ -1,9 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 
+// confidence=low: initializes the four active sword attack components.
+#define Sword_InitAttackComponents sub_080F6F90
+
 #ifdef NONMATCHING
-// fuzzy: 84.3%
-// Animation temporaries, field-address reuse and register allocation still differ.
+// fuzzy: 84.8%
+// Animation mask lifetime, collider argument addresses and register allocation still differ.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
 #define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
 #define B(p, off) (*((u8 *)(p) + (off)))
@@ -26,7 +29,7 @@ static inline void Step(struct DisplaySequenceSprite *sprite, struct DisplaySequ
 {
     const volatile u16 *command;
     u32 duration, flags;
-    command = commands + state->index;
+    command = (void *)((state->index << 1) + (u32)state->commands);
     sprite->frame = *command >> 6;
     {
         u32 first = state->flags & 1;
@@ -51,7 +54,7 @@ static inline void Step(struct DisplaySequenceSprite *sprite, struct DisplaySequ
         u32 temporary = 0xFFFF;
         u32 mask;
         state->elapsed = elapsed;
-        asm("" : "+r"(temporary));
+        asm volatile("" : "+r"(temporary));
         mask = temporary;
         duration = state->duration;
         if ((u16)elapsed >= duration) {
@@ -218,5 +221,5 @@ void Sword_InitAttackComponents(u8 *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
+INCLUDE_ASM("asm/nonmatching", sub_080F6F90);
 #endif
