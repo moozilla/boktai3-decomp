@@ -3144,13 +3144,16 @@ addr,name,mode,confidence,source,notes
 080A21C8,Spider_SelectIdleAnimation,thumb,low,src-alias,Animation callback clears the entry flag and selects directional animation entry zero
 080A28A0,Spider_OnSecondaryColliderContact,thumb,low,src-alias,Empty callback tentatively associated with the secondary collider initialized by Spider_Init
 080A28A4,Spider_OnActionEvent,thumb,low,src-alias,Empty action-event callback installed by Spider_Init
+080A2A38,SceneActorReaction_ResumeEntryTarget,thumb,low,src-alias,
 080A2CEC,Spider_UpdateDefeat,thumb,low,src-alias,
 080A2F04,Spider_UpdatePreAction,thumb,low,src-alias,Runs three Spider update helpers and emits timed particles before action dispatch
 080A2F2C,Spider_ApproachRouteProbe,thumb,low,src-alias,
+080A32A4,SceneActorControl_UpdateEntryWait,thumb,low,src-alias,
 080A33A4,SceneActorControl_UpdateRouteResponse,thumb,low,src-alias,
 080A37C8,Spider_TickActionUntilComplete,thumb,low,src-alias,Clears the queued flag and increments the action timer while the action callback reports incomplete
 080A382C,Spider_SetBehaviorTables,thumb,low,src-alias,Installs two Spider-specific behavior tables at offsets 0x284 and 0x294
 080A384C,Spider_InitColliders,thumb,low,src-alias,Initializes the spider body and attack colliders with their collision callbacks
+080A38E8,SceneActorRoute_ResetStep,thumb,low,src-alias,
 080A3A14,Spider_InitProfile,thumb,low,src-alias,Stores the shared type 2 actor profile during spider initialization
 080A3C00,Spider_ClearGroupFlag,thumb,low,src-alias,Conditionally clears group flag 2 when the spider is eligible and the global state is negative
 080A3C78,SceneActor_IsWithinTetherRange,thumb,low,src-alias,
@@ -3243,6 +3246,7 @@ addr,name,mode,confidence,source,notes
 080AE1C4,Vorn_UpdateKnockbackRecovery,thumb,low,src-alias,
 080AE5E4,SceneActorReaction_ResumeOrRunScript,thumb,low,src-alias,
 080AE6F0,Vorn_ResumeReactionRoute,thumb,low,src-alias,
+080AE940,Vorn_UpdateApproachRange,thumb,low,src-alias,
 080AEA80,SceneActorPhase_SelectLinkedAnimation,thumb,low,src-alias,
 080AEB74,Vorn_TryRestorePatrolRoute,thumb,low,src-alias,
 080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,

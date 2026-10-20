@@ -5,7 +5,6 @@
 #include "scene_actor_animation.h"
 
 /* SceneActorRoute_ResetStep: tentative */
-#define SceneActorRoute_ResetStep sub_080A38E8
 
 struct SpiderResetContext {
     u8 unknown0[0x628];
