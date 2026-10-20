@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: profile-driven native effect motion and creation.
+#define NativeEffect_UpdateRotatingFlight sub_08113BBC
 #ifdef NONMATCHING
 // fuzzy: 99.6%
 /* Only the scratch register used to reload height at the collider call differs. */
