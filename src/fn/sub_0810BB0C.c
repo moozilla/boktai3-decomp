@@ -1,21 +1,15 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 83.3%
-// foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
 s32 Callback_InvokeActor(void *, void (*)(void));
-static inline void SessionMenu_Call(struct AreaEffectLinkState *p)
-{
-    Callback_InvokeActor(p, p->menuCallback);
-}
 void SessionMenu_InvokeCallback(void)
 {
-    struct AreaEffectLinkState *p = gUnk_020004B4;
+    register struct AreaEffectLinkState *p asm("r3") = gUnk_020004B4;
     if (p) {
-        struct AreaEffectLinkState *q = p;
+        register struct AreaEffectLinkState *q asm("r2") = p;
         switch (q->unavailable) {
             case 0:
-                SessionMenu_Call(q);
+                Callback_InvokeActor(q, q->menuCallback);
                 break;
             case 1:
                 Callback_InvokeActor(p, p->menuCallback);
@@ -23,6 +17,3 @@ void SessionMenu_InvokeCallback(void)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SessionMenu_InvokeCallback);
-#endif
