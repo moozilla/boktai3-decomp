@@ -1,9 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.9%
-// foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
 #define ActorMovement_TestPoint ActorPosition_TestPath
 extern const s16 gUnk_086149C4[];
 s32 ActorMovement_TestPoint(void *, void *);
@@ -26,6 +23,7 @@ void ActorMovement_FindQuarterTurnPoint(struct MovementSearchActor *p, struct Co
     u32 start = p->angle;
     s32 i = 0;
     u32 mask = 255;
+    u32 speed = 128;
     s16 *v = (s16 *)&point;
     const s16 *sine = gUnk_086149C4;
     do {
@@ -38,7 +36,6 @@ void ActorMovement_FindQuarterTurnPoint(struct MovementSearchActor *p, struct Co
         }
         {
             s32 sample = sine[angle & mask];
-            u32 speed = 128;
             s32 z = trunc12((s32)(speed * sample));
             v[2] = z;
             {
@@ -47,7 +44,7 @@ void ActorMovement_FindQuarterTurnPoint(struct MovementSearchActor *p, struct Co
                 v[0] = x + dx;
             }
             v[1] = (u16)v[1] + (u16)center->y;
-            v[2] = z + (u16)center->z;
+            v[2] += center->z;
         }
         if (ActorMovement_TestPoint(p, &point)) {
             *out = point;
@@ -57,6 +54,3 @@ void ActorMovement_FindQuarterTurnPoint(struct MovementSearchActor *p, struct Co
     } while (i <= 3);
     *out = *center;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMovement_FindQuarterTurnPoint);
-#endif
