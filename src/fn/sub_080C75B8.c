@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 87.8%
-// Recoil state: plays sequence 8 (same animation inline as SceneActorReaction_SlideBack),
-// decays the context speed by the category step, slides back toward the saved position along
-// the facing axis, then waits 8 frames. 13 differing instructions ignoring registers: where
-// the zero constants are materialised, and the ROM reloads field2C2 before testing it.
+/* Decelerate recoil, converge on the saved position, then signal completion. */
+#define Golem_UpdateRecoil sub_080C75B8
+// confidence=low: inferred from the three movement phases and neighboring Golem controls.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 
@@ -36,18 +34,22 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-void sub_080C75B8(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateRecoil(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
     struct Unk080C75B8Motion *motion = (struct Unk080C75B8Motion *)((u8 *)actor + 0x50);
     s16 *speed;
     u16 *flags2D4;
+    u16 *initialFlags;
+    register u32 animationZero asm("r5");
 
     if (TakeFlag(&actor->field2B2)) {
         actor->field2B3 = 0;
         body[0x68D] = 0;
         {
-            u32 quadrant = ((body[0x68E] + 0x60) >> 6) & 3;
+            u32 angle = (body[0x68E] + 0x60) >> 6;
+            u32 quadrant = 3;
+            quadrant &= angle;
             body[0x68C] = quadrant;
         }
         *(struct ContactPosition *)(body + 0x69C) = motion->position;
@@ -55,8 +57,11 @@ void sub_080C75B8(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 mask = 0x100;
-        flags2D4 = &actor->flags2D4;
-        *flags2D4 |= mask;
+        u16 *flags = &actor->flags2D4;
+        register u32 value asm("r1") = *flags;
+        initialFlags = flags;
+        animationZero = 0;
+        *flags = mask | value;
     }
     {
         u32 mask = 0x2000;
@@ -76,11 +81,12 @@ void sub_080C75B8(struct SceneActorRegistryResetView *actor)
             u8 *mirrorAddress = &mirror;
             s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
             mirrorPointer = mirrorAddress;
+            flags2D4 = initialFlags;
             if (quadrant > 1) {
                 *mirrorPointer = 1;
                 *variantPointer = 3 - quadrant;
             } else {
-                *mirrorPointer = 0;
+                *mirrorPointer = animationZero;
                 *variantPointer = quadrant;
             }
         }
@@ -162,8 +168,10 @@ done:
         }
         speed = (s16 *)(body + 0x682);
         if (*speed < 0) {
-            body[0x68D] = 1;
-            *speed = 0;
+            u8 *phase = body + 0x68D;
+            u32 zero = 0;
+            *phase = 1;
+            *speed = zero;
             return;
         }
         actor->motion.x += (*speed * gUnk_086149C4[(body[0x68E] + 0x40) & 0xFF]) >> 16;
@@ -199,14 +207,19 @@ done:
             return;
         }
     } else {
-        if (++body[0x68F] > 7) {
+        u8 *counter = body + 0x68F;
+        u32 value = *counter + 1;
+        u32 zero = 0;
+        *counter = value;
+        if ((u8)value > 7) {
             actor->field2B0 = 1;
-            body[0x68F] = 0;
-            *(u16 *)(body + 0x682) = 0;
+            *counter = zero;
+            *(u16 *)(body + 0x682) = zero;
             return;
         }
     }
     actor->field2C2 = 0x40 >> (*(u16 *)(body + 0x684) >> 7);
+    asm("" : "+r"(actor));
     {
         u32 mask = 0xA02F;
         u16 *scale;
@@ -214,8 +227,10 @@ done:
             actor->field2C2 = 0x40;
             scale = &actor->field2C2;
         } else {
-            scale = &actor->field2C2;
-            if (*scale == 0)
+            u16 *p = &actor->field2C2;
+            u16 value = *p;
+            scale = p;
+            if (value == 0)
                 *scale = 0x40;
         }
         if (actor->drawableKind == 0)
@@ -224,6 +239,3 @@ done:
             Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080C75B8);
-#endif
