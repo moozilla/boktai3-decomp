@@ -2976,3 +2976,81 @@ not newly matched progress. Both exact callbacks and each draft were committed
 through build/commit.sh. Separate cleanup commits minimize the first exact
 callback's hints/formatting and correct draft fallback names for the local
 assembly snapshot. Combined ROM validation remains with the integrator.
+
+## Task 0817FDE0 — 2026-10-20
+
+Tags: #matching #boss-slot-2 #armor #actor-controller #nonmatching
+
+Worked solo on the assigned offline cloud/0817FDE0 branch. Exact C progress:
+0% of this assignment, +0.0 percentage points. Retained four guarded drafts
+(one newly promoted, two improved, one refreshed); the other two targets
+stopped below the draft threshold. Only per-file check.py checks and the
+commit driver were used; no full build, network operation or shared-doc edit.
+Read the entry-point/worker/cloud/large-function instructions, earlier notes,
+assembly, initializer caller, Armor proximity/position callees and matched
+relatives. The Ghidra export is absent.
+
+- **0817FDE0 — stopped below threshold.** BossSlot2_InitializeFromScript
+  (tentative); called by BossSlot2_CreateFromScript. Revisited the retained
+  initializer, separating the early actor fields and writing the player-list
+  initialization as incrementing source/destination pointers. This reduced
+  this session's realigned residue from 388/125 to 336/90 differing instructions
+  (total/ignoring registers), but the candidate-length fuzzy was only 53.2%.
+  It does not supersede the earlier exploratory 57.3% result. Major remaining
+  issues: common actor versus boss pointer lifetimes, palette-copy loop
+  allocation, hoisted component addresses and stack slots. Scratch remains
+  in wip/sub_0817FDE0.c; no source draft was promoted.
+- **081875EC — improved draft 85.8%, Armor_UpdateAlignedAttackDecision.**
+  Previously 83.9%. The flag-selected decision switches have the same
+  instruction shape as 08187230. Keeping the flag-bit result in r6 with an
+  empty register constraint, and reusing its zero value in the normal-path
+  reset stores, reduced total realigned differences from 83 to 69. Structural
+  differences changed from 12 to 14; this is an allocation improvement, not
+  a structural match. Preserved the original descriptive local layout.
+  Remaining: duplicated/merged decision stores, branch polarity/long-branch
+  selection, cooldown-address derivation and scratch registers.
+- **08187230 — improved draft 85.8%, Armor_UpdateAxisAttackDecision.**
+  Same change and 69/14 realigned residue as 081875EC (earlier recorded 83.7%;
+  the unchanged reviewed baseline reproduced as 83.9%). Marked register
+  pinning; the absolute-Z r2 hint remains. A dz r5 pin worsened the result
+  and was discarded. Both decision drafts still use the original assembly
+  by default and earn no exact credit.
+- **08186EB4 — stopped below threshold, Armor_SelectTimedAttack
+  (tentative).** Rechecked the prior candidate and tried absolute-Z, fixed
+  one/mode registers and separated constant initialization. No useful gain;
+  stronger delta pins increased structural differences. Retained the earlier
+  unpinned build/6eb4-base.c candidate in wip/sub_08186EB4.c: 75.9%
+  against the reviewed 892-byte extent, but 195/122 realigned differences,
+  worse structurally than this session's initial 149/53 form preserved in
+  build/6eb4-start-task.c. Branch/store sharing, the mode/one lifetimes and
+  state-pointer reuse remain blockers.
+- **08186CC8 — new draft 80.6%, Armor_SelectAlignedAttack (tentative).**
+  Actor/player X/Z alignment and vertical-distance test select attack or
+  recovery, with Armor_IsNearSavedPosition / Armor_SaveCurrentPosition
+  remembering the attack origin. The prior unpinned baseline is 72.0%.
+  Pinning only absolute X to r5 yields 80.6% against the reviewed 492-byte
+  body/pool extent (candidate 500 bytes); no stack-pointer comparisons were
+  present in this accepted candidate. Remaining differences include an extra
+  saved register, decision-pointer lifetime, merged fallback behavior calls
+  and flags allocation. Repeated fallback calls move across the function,
+  so call-anchored alignment reports a large 184/166 residue despite the
+  higher whole-function fuzzy score. An ax+az pinned candidate scored 89.3%
+  but generated `mov r0, sp` for the Z sign test: rejected, as in the earlier
+  pass. Do not use that candidate as evidence of source correctness.
+- **081835D8 — retained draft 94.0%,
+  ActorController_UpdateHeavyAttackCollider.** Replaced the inherited
+  half-power comment/helper name: the observed scale is 0xAAA / 4096 with
+  sign-aware truncation. Typed layer accesses reduced structural residue
+  from five to two but expanded allocation differences (79.6%); collider and
+  multiply pins, barriers, operand order and inline variants did not close
+  it. Kept the readable unpinned 94.0% candidate (10/5 realigned residue).
+
+Restored required file-local aliases for all three pre-existing drafts and
+used address-named INCLUDE_ASM fallbacks for compatibility with the cached
+ELF. Each guarded source was formatted directly with the venv clang-format,
+then checked with --nonmatching --record; all four default assembly fallbacks
+passed exactly. depin.py was run on unguarded copies of the three hinted
+candidates and skipped them because they are nonmatching; no fallback match
+was mistaken for an exact C result. No generated assembly, ROM, dump or
+scratch candidate is committed. Name promotion and combined ROM validation
+remain integration work.
