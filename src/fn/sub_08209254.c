@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 83.7%
+// fuzzy: 80.7%
 // Remaining differences: stack-address materialization and register allocation.
 #define FanCannon_ApplyHitReaction sub_08209254
 struct Vec {
@@ -74,8 +74,8 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
             register void *hud asm("r8");
-            register s32 health asm("r7");
-            s32 a, b, direction, time;
+            register s32 health asm("r10");
+            s32 a, b, direction;
             target->reaction = 0x26;
             target->flash = 8;
             Sound_PlaySong(0x211);
@@ -88,9 +88,7 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             direction = 0;
             if (target->direction == 4)
                 direction = 1;
-            time = target->hudTime;
-            asm("" : "+r"(health));
-            SceneHud_SetTimedState(hud, health, a, b, direction, time);
+            SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
             if (source->flags & 0x40)
                 goto sparks;
         }
