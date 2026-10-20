@@ -689,3 +689,44 @@ Exact code gain: 0.0 percentage points. Five existing guarded drafts revised or 
 - 08210398: revised PinkSpine_UpdateDamageAnimation draft, recorded 88.4%; 46 realigned differences / 21 ignoring registers, down from 29 structural differences in the fresh baseline check (89.3% fuzzy). Explicit typed collider pointers keep the base at +0x6C and flags at +6 rather than selecting a separate +0x72 pointer. This cuts differing bytes from 627 to 125 despite the lower fuzzy metric. Pause-goto experiment had no effect and was reverted. Remaining mask-register choice, pause block/pool layout, animation lifetimes and defined callback return.
 
 All five drafts retain NONMATCHING guards and INCLUDE_ASM in the default path. Every draft now has its own file-local descriptive-name alias, with local aliases for renamed callees absent from the baseline ELF. The fallback must use sub_XXXXXXXX: check.py --nonmatching --record otherwise compiles correctly but silently fails to update a fuzzy comment whose named fallback differs from the emitted sub_ symbol. Scores above were recorded after correcting that form and formatting with the pinned clang-format. depin.py --write was invoked and skipped the nonexact candidates; it did not establish any removable hint. Five separate draft commits queued through build/commit.sh; notes queued last. Combined ROM validation remains with integration.
+
+## Task 08152174 follow-up (2026-10-20)
+
+Tags: #matching #player #animation #cue
+
+Exact progress: 0.0 percentage-point gain; 08153E1C was already exact C.
+The checked-out sources use promoted names but the cached ELF and assembly files
+use address names. Restored the required file-local aliases and address-named
+INCLUDE_ASM fallbacks; no full build or network operation was used.
+
+- 08152174: retained guarded draft at 81.7%, 217 realigned differences, 37
+  ignoring registers. Read largest first with asmat and relatives. Pinning the
+  player to r6 worsened to 49.0%; removing decoder pins worsened to 80.1%.
+  Both reverted. Remaining scale addressing, phase tails and decoder registers.
+- 08153A00: improved guarded draft from 94.2% to 96.9%, 17 realigned
+  differences, eight structural. Separate explicit negative/nonnegative velocity
+  multiplier branches reproduce more of the ROM than a ternary multiplier.
+  Unsigned multiplication and value barrier did not improve; memory barrier and
+  volatile reload regressed. Retained plain C branch improvement. Sign-test
+  folding and direction-store sharing remain.
+- 08153224: retained guarded draft 84.4%, 84 realigned differences, 26
+  structural. No safe new hypothesis for the partly initialized ROM particle
+  word; retained fully initialized words. Constant and phase layout residue.
+- 08153610: improved guarded draft from 87.1% to 89.9%, 42 realigned
+  differences, 15 structural. Resource ID 0x16F is stored then shifted to derive
+  its resource pointer; an empty value barrier retains that dependency instead
+  of loading a separately folded offset. Existing register-pinning concession
+  marker retained. Timer-mask, field addressing and register lifetimes remain.
+- 08153E1C: existing exact PlayerCue_UpdateSideDeparture confirmed at 696
+  bytes after local alias restoration. depin --write retained all 11 hints;
+  final formatted per-file check reports zero differing bytes. No new exact
+  coverage claimed.
+- 08152A5C: stopped at existing scratch (38.6% full-extent score), not
+  committed as a draft. asmat confirms recoil callback context. Recorded extent
+  continues to 08153224 despite an additional prologue at 08152C3C. Boundary
+  investigation is needed before the 480-byte candidate can be accepted.
+
+All four guarded candidates were formatted, checked with --nonmatching --record,
+and their default assembly fallbacks checked byte-identical. One-function
+commits were queued through build/commit.sh; follow-up fallback fixes retain the
+address name because INCLUDE_ASM stringifies its argument without macro expansion.
