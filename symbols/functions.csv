@@ -6550,6 +6550,7 @@ addr,name,mode,confidence,source,notes
 081A376C,DirectionBurst_Emit,thumb,low,src-alias,
 081A37BC,Hresvelgr_GetHomingShotTargetAngle,thumb,low,src-alias,Computes the horizontal angle from a homing projectile to a target position
 081A37E0,EffectPool_FindIdleActiveEntry,thumb,low,src-alias,
+081A3828,EffectEntry_Release,thumb,low,src-alias,
 081A388C,EffectPool_AllocateEntry,thumb,low,src-alias,
 081A39E0,EffectPool_UpdateEntry,thumb,low,src-alias,
 081A3D00,EffectPool_UpdateActiveEntries,thumb,low,src-alias,
@@ -6695,6 +6696,7 @@ addr,name,mode,confidence,source,notes
 081ADD5C,Vanargand_DestroyAnimatedPart,thumb,low,src-alias,Removes a part animation and its sprite when present
 081ADD7C,Vanargand_DestroyPartSprites,thumb,low,src-alias,Removes active sprites from six consecutive part entries
 081ADD9C,SceneComposite_Destroy,thumb,low,src-alias,
+081ADDF0,HresvelgrChild_Init,thumb,low,src-alias,
 081ADEAC,Vanargand_InitBackgroundAttachment,thumb,low,src-alias,
 081ADF38,Vanargand_InitSpriteGroup,thumb,low,src-alias,
 081ADFB8,SceneBackdrop_Initialize,thumb,low,src-alias,

@@ -48,7 +48,7 @@ void Collider_SetPosition(void *, void *, s32);
 void Collider_Refresh(void *);
 s32 Mod(s32, s32);
 void *MotionEntry_CreateConfigured(void *, s32, s32, s32, u32, s32);
-void sub_081A3828(void *);
+void EffectEntry_Release(void *);
 
 static inline void SetVelocity(struct Vec *out, u8 angle, u8 speed)
 {
@@ -217,7 +217,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             p->turnShift >>= 1;
     }
     if (!p->lifetime)
-        sub_081A3828(p);
+        EffectEntry_Release(p);
 }
 
 #else
