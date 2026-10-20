@@ -270,5 +270,5 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
+INCLUDE_ASM("asm/nonmatching", sub_0819FE9C);
 #endif
