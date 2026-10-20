@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 86.9%
 // Remaining differences: trigger indexing and shared mode/action constant lifetimes.
-#define Hresvelgr_DispatchSceneMessages sub_081A2430
 // confidence=low: dispatches pending cutscene messages into action and animation state.
 struct Vec {
     s16 x, y, z, pad;
@@ -64,9 +63,9 @@ extern struct Director *gUnk_0200047C;
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
 void Hresvelgr_OnActionTwentyEight(void *);
-void sub_081A1244(void *);
-void sub_081A117C(void *);
-void sub_081A12DC(void *);
+void Hresvelgr_BeginRestAnimation(void *);
+void Hresvelgr_UpdateRandomAnimation(void *);
+void Hresvelgr_UpdateRisingProjectile(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 
@@ -106,12 +105,12 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
                 goto setAction;
             case 1:
                 SetMode(p, 2, 0, 1, 1);
-                callback = sub_081A1244;
+                callback = Hresvelgr_BeginRestAnimation;
                 action = 0x1d;
                 goto setAction;
             case 19:
                 SetMode(p, 2, 0, 2, 1);
-                callback = sub_081A117C;
+                callback = Hresvelgr_UpdateRandomAnimation;
                 action = 0x1e;
             setAction:
                 SetAction(p, action, callback);
@@ -119,7 +118,7 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
             case 26:
                 actor->colliderDirection = 1;
                 SetMode(p, 2, 0, 3, 1);
-                SetAction(p, 0x1f, sub_081A12DC);
+                SetAction(p, 0x1f, Hresvelgr_UpdateRisingProjectile);
                 break;
             case 9:
                 SceneActors_ConfigureEffect(p, message->args[0], 180, 180);
@@ -148,5 +147,5 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A2430);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
 #endif

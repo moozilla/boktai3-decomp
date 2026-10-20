@@ -164,7 +164,6 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     return ended;
 }
 
-#define CannonEmitter_InitializeFromScript sub_0820337C
 s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
 {
     s16 *palette;
@@ -220,5 +219,5 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820337C);
+INCLUDE_ASM("asm/nonmatching", CannonEmitter_InitializeFromScript);
 #endif

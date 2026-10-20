@@ -1,4 +1,3 @@
-#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
@@ -133,5 +132,5 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812F5D4);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
 #endif

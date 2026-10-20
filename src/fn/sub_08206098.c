@@ -6,7 +6,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.0%
 // Remaining differences: script-option branches, animation-step register allocation, and body setup lifetimes.
-#define Ooze_InitializeFromScript sub_08206098
 struct OozeInit {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -255,5 +254,5 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08206098);
+INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
 #endif

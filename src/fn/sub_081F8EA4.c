@@ -22,10 +22,9 @@ static inline u8 consume(struct Ratatosk *p)
     }
     return 0;
 }
-#define W(o)                           (*(s32 *)(p + (o)))
-#define H(o)                           (*(s16 *)(p + (o)))
-#define V(o)                           (*(struct Vec *)(p + (o)))
-#define Ratatosk_UpdateRepeatedRetreat sub_081F8EA4
+#define W(o) (*(s32 *)(p + (o)))
+#define H(o) (*(s16 *)(p + (o)))
+#define V(o) (*(struct Vec *)(p + (o)))
 // confidence=low: repeats a retreat animation before returning to a random movement point.
 void Ratatosk_UpdateRepeatedRetreat(u8 *p)
 {

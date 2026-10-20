@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
-#define VulcanCannon_UpdateDefeatEffects sub_082071D0
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void VulcanCannon_RecordDefeat(void *);

@@ -131,7 +131,6 @@ struct ReleaseAnimation {
     struct DisplaySequenceState seq;
     const void *resource;
 };
-#define Player_UpdateSpiralAfterglow sub_08147FB8
 // confidence=low: timed palette cue follows the spiral release.
 void Player_UpdateSpiralAfterglow(struct Player *p)
 {
@@ -174,5 +173,5 @@ void Player_UpdateSpiralAfterglow(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08147FB8);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralAfterglow);
 #endif

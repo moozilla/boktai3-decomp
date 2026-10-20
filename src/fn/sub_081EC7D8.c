@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
 #include "contact_swarm.h"
 
 // confidence=low: foreground role inferred from screen-coordinate placement and its refresh caller.

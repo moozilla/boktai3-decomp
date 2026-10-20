@@ -11,7 +11,7 @@ void SceneHud_LayoutActionGrid_08172950(void *);
 void SceneHud_RefreshEquippedActionIcons(void *);
 void PauseMenu_SetPromptIconPositions(void *, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_081731E8(void);
+void SceneHud_UpdateSecondaryActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void ScrollingDialogue_HideImmediately(void);
@@ -39,7 +39,7 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
             b = 0;
         MenuDisplay_UpdateActionPrompt(p, b);
     }
-    Hud_SetInteractionCallback(p, sub_081731E8, 0);
+    Hud_SetInteractionCallback(p, SceneHud_UpdateSecondaryActionSelection, 0);
     z = 0;
     MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
     ScrollingDialogue_HideImmediately();

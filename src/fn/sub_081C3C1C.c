@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ContactImpactEffect_UpdateInterpolatedPosition sub_081C3C1C
 extern u16 gUnk_03005418[];
 
 s32 __divsi3(s32, s32);

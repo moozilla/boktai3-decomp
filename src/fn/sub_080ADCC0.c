@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
-#define Vorn_UpdatePursuitDistance sub_080ADCC0 // confidence=low: tentative Vorn behavior role.
+#define Vorn_UpdatePursuitDistance                                                                 \
+    Vorn_UpdatePursuitDistance // confidence=low: tentative Vorn behavior role.
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // Remaining differences: six low-register choices in the middle-distance path.
@@ -149,5 +150,5 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080ADCC0);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdatePursuitDistance);
 #endif

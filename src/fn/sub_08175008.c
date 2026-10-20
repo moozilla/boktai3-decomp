@@ -1,5 +1,4 @@
 #include "global.h"
-#define Presentation_UpdateAllocationSelection sub_08175008
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 94.1%
@@ -33,7 +32,7 @@ void Presentation_InitListValues(void *);
 void PauseMenu_SetPromptIconPositions(void *, u32, u32);
 void SceneHud_SetPairedIcons(void *, u32, s32);
 void Anim_Step(void *, void *);
-void sub_08174C2C(void *);
+void InventoryGrid_UpdateStatPreview(void *);
 void SceneCatalog_SetDescription(void *, s32);
 static inline void setDescription(u8 *p, u32 n)
 {
@@ -144,7 +143,7 @@ display:
     *(u32 *)(p + 0x1608) &= ~1;
     Anim_Step(p + 0x1600, p + 0x64);
 finish:
-    sub_08174C2C(p);
+    InventoryGrid_UpdateStatPreview(p);
     if (*(s8 *)(p + 0x48ab) >= 0) {
         SceneCatalog_SetDescription(p, *(s8 *)(p + 0x48ab));
         p[0x48ab] = 255;
@@ -152,5 +151,5 @@ finish:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08175008);
+INCLUDE_ASM("asm/nonmatching", Presentation_UpdateAllocationSelection);
 #endif

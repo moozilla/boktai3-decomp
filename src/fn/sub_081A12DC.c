@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_UpdateRisingProjectile sub_081A12DC
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
 struct Vec {
     s16 x, y, z, pad;

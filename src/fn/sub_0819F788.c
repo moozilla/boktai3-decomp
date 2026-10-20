@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_UpdateAlternatingVolley sub_0819F788
 // confidence=low: alternates side-specific sequences and emits four directional shots per pulse.
 struct Vec {
     s16 x, y, z, pad;

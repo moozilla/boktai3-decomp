@@ -1,4 +1,3 @@
-#define SceneActorReaction_ApplyStaggerDamage sub_0813214C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"

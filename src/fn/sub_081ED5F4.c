@@ -127,16 +127,13 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     return ended;
 }
 
-void sub_081EC6BC(void *);
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
+void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
-#define ActorDisplay_UpdateAccentSprite sub_081EC974
 void ActorDisplay_UpdateAccentSprite(void *);
 void ActorMotion_AdvanceTowardScreenTarget(void *, s32);
 void SceneActors_EmitPeriodicParticles(void *, void *);
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-#define SceneActors_UpdateMovingDisplay sub_081ED5F4
 // confidence=low: called by SceneActors_EnterMovementState.
 void SceneActors_UpdateMovingDisplay(u8 *input, void *particles)
 {
@@ -174,7 +171,7 @@ void SceneActors_UpdateMovingDisplay(u8 *input, void *particles)
         u32 *offset = (u32 *)(context + 0x288);
         *offset = value & 1;
     }
-    sub_081EC6BC(p);
+    ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
     ActorDisplay_UpdateAccentSprite(p);
     SceneActors_EmitPeriodicParticles(p, savedParticles);

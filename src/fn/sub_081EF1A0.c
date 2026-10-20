@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081ED5F4(void);
+void SceneActors_UpdateMovingDisplay(void);
 struct S {
     u8 f0[0x90];
     u32 a90;
@@ -31,7 +31,7 @@ void SceneActors_EnterMovementState(struct S *p)
     u8 *q;
     u32 r;
     if (chk(p) == 1) {
-        st(sub_081ED5F4, &p->fn);
+        st(SceneActors_UpdateMovingDisplay, &p->fn);
         p->a90 = 0;
         *((u8 *)p + 0xb1) = 1;
         *((u8 *)p + 0xa2) = 0;

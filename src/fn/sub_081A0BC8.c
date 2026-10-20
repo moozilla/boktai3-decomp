@@ -5,7 +5,6 @@
 // Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "engine.h"
-#define Hresvelgr_UpdateBoundaryBarrage sub_081A0BC8
 // confidence=low: traverses a boundary, spawning falling projectiles over valid terrain.
 struct Vec {
     s16 x, y, z, pad;
@@ -199,5 +198,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A0BC8);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
 #endif

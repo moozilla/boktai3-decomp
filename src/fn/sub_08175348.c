@@ -5,7 +5,7 @@ void SceneCatalog_SetDescription(u8 *, s32);
 void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
-void sub_08175008(void);
+void Presentation_UpdateAllocationSelection(void);
 void InventoryGrid_UpdateModifierPreview(void);
 void Presentation_CommitListValues(u8 *);
 void Player_RefreshStatsAndVitals(void *);
@@ -20,7 +20,7 @@ void MenuSelection_ProcessConfirmation(u8 *s)
         Sound_PlaySong(0xDE);
         SceneCatalog_SetDescription(s, s[0x48AA] + 20);
         SceneHud_SetPairedIcons(s, 1, -1);
-        Hud_SetInteractionCallback(s, sub_08175008, 1);
+        Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 1);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     } else if (state == 1) {
         u8 **p;
@@ -45,7 +45,7 @@ void MenuSelection_ProcessConfirmation(u8 *s)
         } else {
             SceneCatalog_SetDescription(s, s[0x48AA] + 20);
             MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
-            Hud_SetInteractionCallback(s, sub_08175008, 0);
+            Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
         }
     }
 }

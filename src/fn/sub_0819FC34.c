@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_UpdateTurningCharge sub_0819FC34
 // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
 struct Vec {
     s16 x, y, z, pad;

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Palette_ApplyBackgroundFade sub_08217960
 #ifdef NONMATCHING
 // fuzzy: 80.1%
 // Blended bank loops still differ in constant hoisting and register allocation.
@@ -96,5 +95,5 @@ void Palette_ApplyBackgroundFade(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08217960);
+INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
 #endif

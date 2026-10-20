@@ -6,7 +6,6 @@
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
-#define PlayerContact_ApplyResponse sub_0815E1F0
 void sub_0815E034(struct Player *, struct ContactCollider *);
 void SceneActorControl_RequestDeparture(s32);
 s32 Player_RequestTimedReset(struct Player *, u32);

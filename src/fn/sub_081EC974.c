@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorDisplay_UpdateAccentSprite sub_081EC974
 // confidence=low: accent role inferred from cycling offset and paired foreground refresh.
 #include "contact_swarm.h"
 

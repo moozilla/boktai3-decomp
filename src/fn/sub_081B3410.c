@@ -2,7 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartSweepingStrike sub_081B3410
 
 #ifdef NONMATCHING
 // fuzzy: 94.0%
@@ -23,8 +22,8 @@ struct VanargandPart {
     u8 reset, enter, finished;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, s32, u32);
-void sub_081B939C(void *, const void *, const void *, s32, s32);
-void sub_081B95E4(void *);
+void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
+void MotionTrack_Update(void *);
 void Vanargand_EmitPartTrail(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -223,11 +222,12 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 *enter = 0;
                 MakeVector(&delta, AimAngle(p), 256);
                 AddVector(&delta, &p->origin, &delta);
-                sub_081B939C(p->motion, &p->origin, &delta, ((p->variant << 7) + 96) & 255, 16);
+                OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &delta,
+                                              ((p->variant << 7) + 96) & 255, 16);
                 Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 8, (u8)p->variant, 4);
                 StepPlayback(p, &p->sequence, p, 1);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 1);
                 *enter = 1;
@@ -247,7 +247,7 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 3);
                 Sound_PlaySong(0x588);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 2);
                 *enter = 1;
@@ -263,7 +263,8 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 *enter = 0;
                 Difference(&p->target, Player_GetEffectivePosition(0), p->base);
                 p->target.y = Player_GetEffectivePosition(0)->y - (p->base)->y;
-                sub_081B939C(p->motion, &p->origin, &p->target, ((p->variant << 7) + 96) & 255, 16);
+                OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &p->target,
+                                              ((p->variant << 7) + 96) & 255, 16);
                 *(u32 *)((u8 *)p + 0x19c) = 0;
             }
             if (++p->timer > 23) {
@@ -273,7 +274,7 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             }
             break;
         case 3:
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 Sound_PlaySong(0x3d9);
                 AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4,
@@ -320,7 +321,7 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 MakeVector(&delta, p->heading, p->distance);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 SetState(p, 6);
                 *enter = 1;
@@ -335,5 +336,5 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B3410);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSweepingStrike);
 #endif

@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
-#define CannonTurret_FireAimedVolley sub_08208498
 struct CannonTurret {
     u8 pad00[0x40];
     struct SceneVec position;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 // confidence=low: tests higher adjacent cells across the selected subcell corner.
-#define Terrain_HasHigherCorner sub_0821D6F4
 struct Position {
     s16 x, y, z, pad;
 };
@@ -79,5 +78,5 @@ s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821D6F4);
+INCLUDE_ASM("asm/nonmatching", Terrain_HasHigherCorner);
 #endif

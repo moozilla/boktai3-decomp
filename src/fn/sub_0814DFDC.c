@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_SpawnSelectedAttackProjectile sub_0814DFDC
 #include "player.h"
 // confidence=low: descriptor meanings remain tentative; creates the selected attack display projectile.
 extern u32 gUnk_030053F4;

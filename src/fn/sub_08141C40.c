@@ -1,9 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 99.9%
-#define Player_EmitMovementEffects sub_08141C40
-#define B(n)                       (*(u8 *)(p + (n)))
-#define H(n)                       (*(u16 *)(p + (n)))
+#define B(n) (*(u8 *)(p + (n)))
+#define H(n) (*(u16 *)(p + (n)))
 extern u8 *gUnk_02000710;
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 s32 RepeatedEffect_RequestNearby(void *);
@@ -108,5 +107,5 @@ void Player_EmitMovementEffects(u8 *p, s32 quiet)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08141C40);
+INCLUDE_ASM("asm/nonmatching", Player_EmitMovementEffects);
 #endif

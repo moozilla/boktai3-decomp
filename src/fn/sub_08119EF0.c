@@ -14,16 +14,16 @@ struct Glove {
     struct GloveDraw draw;
 };
 extern struct Glove *gUnk_020004F0[];
-void sub_081188F4(void);
+void Glove_UpdateRecoil(void);
 /* Registry routine E3EE (Glove): starts glove -i (default 0): active, update
-   sub_081188F4, timer 0, draw flag 1. */
+   Glove_UpdateRecoil, timer 0, draw flag 1. */
 void Glove_StartFromScript(void)
 {
     struct Glove *glove;
     s32 i = Script_GetKeywordValue('i', 0);
     glove = gUnk_020004F0[i];
     if (glove) {
-        void (*update)(void) = sub_081188F4;
+        void (*update)(void) = Glove_UpdateRecoil;
         u8 *active = &glove->active;
         u32 zero = 0;
         u16 one = 1;

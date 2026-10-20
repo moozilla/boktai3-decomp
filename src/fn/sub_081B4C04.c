@@ -138,7 +138,6 @@ static inline void StepSequence(void *obj)
     }
 }
 
-#define Vanargand_UpdatePartRecovery sub_081B4C04
 // confidence=low: holds sequence 11 for 180 frames before restoring action 22.
 static inline void ChangeAction(struct VanargandPart *p, u8 action)
 {
@@ -178,5 +177,5 @@ void Vanargand_UpdatePartRecovery(u8 *boss, struct VanargandPart *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B4C04);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRecovery);
 #endif

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Player_ApplyControlPresentation sub_0815767C
-
 // MATCHING_CONCESSION: register-pinning
 
 struct Drawable {

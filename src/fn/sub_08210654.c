@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define PinkSpine_InitFromScript                sub_08210654
-#define ProjectileEmitter_WaitForPlayerApproach sub_08210100
-#define ProjectileEmitter_EmitAttackFrame       sub_0821025C
 #ifdef NONMATCHING
 // fuzzy: 93.5%
 // Remaining differences: option/animation register allocation and defined success return.
@@ -100,5 +97,5 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08210654);
+INCLUDE_ASM("asm/nonmatching", PinkSpine_InitFromScript);
 #endif

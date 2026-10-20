@@ -68,7 +68,7 @@ void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Obj *);
 void sub_0811D91C(struct Obj *);
-void sub_0811BD30(struct Obj *, void *);
+void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct Obj *);
@@ -79,7 +79,6 @@ extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
-#define Glove_UpdateRecoil sub_081188F4
 void Glove_UpdateRecoil(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -149,7 +148,7 @@ void Glove_UpdateRecoil(struct Glove *p)
         p->height = h;
         sub_0811D91C(self);
 
-        sub_0811BD30(self, p->model);
+        Actor_UpdateShadowSpriteParts(self, p->model);
         if (self->flags40 & 4)
             sub_0811BF44(self);
         if (self->flags40 & 2)

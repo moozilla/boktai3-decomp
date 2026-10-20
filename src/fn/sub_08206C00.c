@@ -3,7 +3,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#define VulcanCannon_UpdateTargeting sub_08206C00
 struct VulcanCannon {
     u8 pad0[0x18];
     s32 timer;
@@ -36,8 +35,8 @@ struct SceneVec *Player_GetEffectivePosition(s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 VulcanCannon_HasClearShot(struct VulcanCannon *);
 s32 Math_Atan2(s32, s32);
-void sub_08207350(void);
-void sub_08207010(void);
+void VulcanCannon_UpdateFacingTurn(void);
+void VulcanCannon_UpdateFiringBurst(void);
 static inline u32 VulcanCannon_StepIdleAnimation(struct DisplaySequenceSprite *sprite,
                                                  struct DisplaySequenceState *state)
 {
@@ -185,7 +184,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
-            p->state = sub_08207350;
+            p->state = VulcanCannon_UpdateFacingTurn;
             p->timer = 0;
             p->delayIndex++;
             if (p->delayIndex > p->delayCount - 1)
@@ -198,7 +197,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
             p->timer = 0;
-            p->state = sub_08207350;
+            p->state = VulcanCannon_UpdateFacingTurn;
         }
     }
     if (distance < p->range * p->range) {
@@ -211,7 +210,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
                     p->targetVisible = 1;
                     p->timer = 0;
                     p->shotCount = 0;
-                    p->state = sub_08207010;
+                    p->state = VulcanCannon_UpdateFiringBurst;
                 } else
                     p->targetVisible = 0;
             } else
@@ -225,7 +224,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
                     p->targetVisible = 1;
                     p->timer = 0;
                     p->shotCount = 0;
-                    p->state = sub_08207010;
+                    p->state = VulcanCannon_UpdateFiringBurst;
                 } else
                     p->targetVisible = 0;
             } else
@@ -245,13 +244,13 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
             if ((u8)(angle - 0x21) <= 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
                 p->timer = facing;
-                p->state = sub_08207350;
+                p->state = VulcanCannon_UpdateFacingTurn;
             }
         } else {
             if ((u8)(angle - 0x21) > 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
                 p->timer = 0;
-                p->state = sub_08207350;
+                p->state = VulcanCannon_UpdateFacingTurn;
             }
         }
     }

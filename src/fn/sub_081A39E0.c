@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 // Remaining differences: angle masking, animation timer scheduling, and register copies.
-#define EffectPool_UpdateEntry sub_081A39E0
 struct Types {
     u32 values[4];
 };

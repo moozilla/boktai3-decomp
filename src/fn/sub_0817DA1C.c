@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneVolume_UpdatePursuitSpin sub_0817DA1C
 
 struct VolumeActor {
     u8 pad0[0x51];

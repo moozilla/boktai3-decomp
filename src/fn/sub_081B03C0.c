@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
-#define PairedSceneActor_UpdatePlayerCapture sub_081B03C0
 #ifdef NONMATCHING
 // fuzzy: 86.2%
 // Remaining differences: animation allocation, argument setup and shared phase-entry tails.
@@ -237,5 +236,5 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B03C0);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdatePlayerCapture);
 #endif

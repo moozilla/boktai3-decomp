@@ -5,7 +5,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
-#define Mummy_UpdateBurnDamage sub_080D812C
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
 void SceneActorRecord_RecordPair(u16, u16);
 void Player_NotifyFirstSelectedSlot(u32, u32);
@@ -397,5 +396,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D812C);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateBurnDamage);
 #endif

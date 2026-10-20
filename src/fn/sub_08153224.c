@@ -1,6 +1,6 @@
 #include "contact_swarm.h"
 #define PlayerCue_UpdateFormChange                                                                 \
-    sub_08153224 // confidence=low: tentative player cue role; see callback body.
+    PlayerCue_UpdateFormChange // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 84.4%
 // Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.
@@ -177,5 +177,5 @@ void PlayerCue_UpdateFormChange(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08153224);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
 #endif

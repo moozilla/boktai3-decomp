@@ -1,8 +1,6 @@
-#define Dog_RestoreRoute sub_080DDEC8
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Dog_RestoreRoute sub_080DDEC8
 /* Dog_RestoreRoute: unless flags2D4 bit 0x100 is set, restores after a delay, records the follow-up control (chase when flags2D4 & 0x80, else the entry target) and routes back toward the chased object via the route point (provisional name) */
 #include "scene_actor_chase.h"
 

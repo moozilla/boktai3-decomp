@@ -8,7 +8,7 @@ s32 Player_GetSmoothedDirection(struct Player *);
 s32 Player_GetMovementSpeed(struct Player *);
 s32 Player_GetMovementRateScale(s32);
 void Player_SetDirectionalVelocity(struct Player *, s32);
-void sub_08141C40(struct Player *, s32);
+void Player_EmitMovementEffects(struct Player *, s32);
 void Player_UpdateFacingSide(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
@@ -56,7 +56,7 @@ void Player_UpdateMovement(struct Player *p)
             speed = (p->movementSpeedScale * speed) >> 6;
         Player_SetDirectionalVelocity(p, speed);
     }
-    sub_08141C40(p, 0);
+    Player_EmitMovementEffects(p, 0);
     Player_UpdateFacingSide(p);
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 1), 64, 1);
     if (++p->movementStatTimer > 60) {

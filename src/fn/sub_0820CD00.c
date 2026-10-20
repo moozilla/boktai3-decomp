@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Screamer_InitFromScript        sub_0820CD00
-#define Screamer_WaitForPlayerApproach sub_0820C334
 #ifdef NONMATCHING
 // fuzzy: 88.1%
 // Remaining differences: orientation switch range guard, animation pointer lifetimes and defined success return.
@@ -163,5 +161,5 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820CD00);
+INCLUDE_ASM("asm/nonmatching", Screamer_InitFromScript);
 #endif

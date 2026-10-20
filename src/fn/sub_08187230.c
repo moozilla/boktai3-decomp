@@ -1,5 +1,4 @@
 #include "global.h"
-#define Armor_UpdateAxisAttackDecision sub_08187230
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 83.7%
@@ -189,5 +188,5 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08187230);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateAxisAttackDecision);
 #endif

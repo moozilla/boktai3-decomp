@@ -14,11 +14,11 @@ int Anim_SetSequence(struct Frames *, void *, u32, int, int);
 int Anim_RestartSequence(struct Frames *, void *, u16, int, int);
 void Sound_PlaySong(int);
 void SceneMover_ApproachScreenX(void *, int);
-void sub_081EC6BC(void *);
-void sub_081EC7D8(void *);
-void sub_081EC974(void *);
+void ActorDisplay_UpdateScreenAnchor(void *);
+void ActorDisplay_UpdateForegroundSprite(void *);
+void ActorDisplay_UpdateAccentSprite(void *);
 void SceneActors_EmitPeriodicParticles(void *, int);
-int sub_081ECE80(void *, int, int);
+int SceneMover_StepPastScreenX(void *, int, int);
 int Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(int, void *);
 extern u32 gUnk_03005304;
@@ -124,7 +124,6 @@ static inline void step(struct Frames *f, struct Render *r)
 
 void ActorMotion_AdvanceTowardScreenTarget(void *, int);
 // confidence=low: paired render animations and movement are observed statically.
-#define SceneActors_UpdateDelayedMovement sub_081ED8A0
 void SceneActors_UpdateDelayedMovement(void *arg, int time)
 {
     void *p = arg;
@@ -156,12 +155,12 @@ void SceneActors_UpdateDelayedMovement(void *arg, int time)
         int t = tick;
         asm("" : "+r"(t));
         if (t > 120)
-            result = sub_081ECE80(p, W(base, 0x294), 0x6000);
+            result = SceneMover_StepPastScreenX(p, W(base, 0x294), 0x6000);
     }
     W(base, 0x288) = (randomValue() & 1);
-    sub_081EC6BC(p);
-    sub_081EC7D8(p);
-    sub_081EC974(p);
+    ActorDisplay_UpdateScreenAnchor(p);
+    ActorDisplay_UpdateForegroundSprite(p);
+    ActorDisplay_UpdateAccentSprite(p);
     SceneActors_EmitPeriodicParticles(p, tick);
     {
         int test = result;

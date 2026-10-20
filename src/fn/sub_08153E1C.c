@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #define PlayerCue_UpdateSideDeparture                                                              \
-    sub_08153E1C // confidence=low: tentative player cue role; see callback body.
+    PlayerCue_UpdateSideDeparture // confidence=low: tentative player cue role; see callback body.
 
 struct P {
     u8 pad0[0x14C];

@@ -1,4 +1,3 @@
-#define Dog_ResetActionState sub_080DE57C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"

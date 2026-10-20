@@ -1,5 +1,4 @@
 #include "global.h"
-#define Ratatosk_ApplyDamageReaction sub_081F9F10
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

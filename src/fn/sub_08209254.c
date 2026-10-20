@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-#define FanCannon_ApplyHitReaction sub_08209254
 // fuzzy: 80.7%
 // Remaining differences: stack-address materialization and register allocation.
 struct Vec {

@@ -15,20 +15,20 @@ struct Glove {
     struct GloveDraw draw;
 };
 extern struct Glove *gUnk_020004F0[];
-void sub_08117948(void);
+void Glove_UpdateStopping(void);
 static inline void clearDrawFlags(struct GloveDraw *d, s32 mask)
 {
     d->flags &= mask;
 }
 /* Registry routine (Glove): glove -i (default 0) switches to update
-   sub_08117948 and clears draw flag 1 (counterpart of Glove_StartFromScript). */
+   Glove_UpdateStopping and clears draw flag 1 (counterpart of Glove_StartFromScript). */
 void Glove_StopFromScript(void)
 {
     struct Glove *glove;
     s32 i = Script_GetKeywordValue('i', 0);
     glove = gUnk_020004F0[i];
     if (glove) {
-        void (*update)(void) = sub_08117948;
+        void (*update)(void) = Glove_UpdateStopping;
         u8 *active = &glove->active;
         u32 zero = 0;
         u16 one = 1;

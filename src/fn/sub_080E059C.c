@@ -1,4 +1,3 @@
-#define Dog_ResumeAfterReaction sub_080E059C
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: animation completion resumes group movement or idle.

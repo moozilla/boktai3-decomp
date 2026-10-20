@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#define Player_UpdateChargedSpinAttack sub_0823F928
 // confidence=low: charge phases and orbiting attack collider identify a spinning attack.
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
@@ -22,7 +21,7 @@ void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
-void sub_08238300(void *, u32);
+void Player_SetDirectionalVelocity_08238300(void *, u32);
 void sub_08238238(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
 void SceneParticleBurst_CreateWithPause(void *, void *, void *, u32, u32, u32);
@@ -119,7 +118,7 @@ void Player_UpdateChargedSpinAttack(u8 *p)
             s32 angle;
             B(0x4B9) = 0;
             if (Player_UpdateFacingFromInputHistory(p))
-                sub_08238300(p, 6);
+                Player_SetDirectionalVelocity_08238300(p, 6);
             if (!(H(0x45A) & 3)) {
                 offset.x = 0;
                 offset.y = 0;

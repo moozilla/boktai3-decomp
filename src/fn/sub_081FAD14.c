@@ -19,7 +19,7 @@ void Ratatosk_UpdateAnimatedPosition(void *);
 void Ratatosk_UpdateBehavior(void *);
 u32 Ratatosk_InitRequestedState(void *);
 void Ratatosk_RunStateCallback(void *);
-void sub_081FA718(void *);
+void Ratatosk_UpdateCollidersAndPalette(void *);
 s32 SceneDistance_UpdateActor(struct SceneDistanceActor *p)
 {
     u8 previous = p->nearTarget;
@@ -33,6 +33,6 @@ s32 SceneDistance_UpdateActor(struct SceneDistanceActor *p)
     Ratatosk_InitRequestedState(p);
     Ratatosk_RunStateCallback(p);
     SceneActors_UpdateEffects(p);
-    sub_081FA718(p);
+    Ratatosk_UpdateCollidersAndPalette(p);
     return 0;
 }

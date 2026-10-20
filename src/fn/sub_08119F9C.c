@@ -11,7 +11,7 @@ struct Packet {
 extern struct Packet gUnk_020001F0;
 void SceneMessages_Send(struct Packet *);
 void Sound_PlayTrackedSong(int);
-void sub_08117948(void);
+void Glove_UpdateStopping(void);
 static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 {
     d->flags = mask & d->flags;
@@ -35,7 +35,7 @@ void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
     }
     Sound_PlayTrackedSong(0x29);
     {
-        void (*update)(void) = sub_08117948;
+        void (*update)(void) = Glove_UpdateStopping;
         u8 *active = &glove->gloveActive;
         *active = one;
         glove->gloveUpdate = update;

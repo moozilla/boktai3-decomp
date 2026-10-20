@@ -1,5 +1,4 @@
 #include "global.h"
-#define Vanargand_UpdatePaletteLeap sub_081AB078
 // confidence=low: palette transition accompanies the leap motion track.
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {

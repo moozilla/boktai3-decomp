@@ -1,5 +1,4 @@
 #include "scene_actor_terrain.h"
-#define SceneNpc_UpdateDescendingDash sub_081CF62C
 // confidence=low: animation 9-12 dash with decreasing speed and height above terrain.
 struct NpcTag {
     u8 pad[10];

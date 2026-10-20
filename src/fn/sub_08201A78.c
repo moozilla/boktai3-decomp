@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScriptCombatActor_UpdateProjectileAttack sub_08201A78
 #ifdef NONMATCHING
 // fuzzy: 80.2%
 struct Vec {
@@ -18,7 +17,7 @@ void ProjectileConfig_SetVerticalMotion(void *, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
 void Projectile_SpawnFromConfig(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-u32 sub_08201898(void *);
+u32 ScriptCombatActor_TryProjectileAttack(void *);
 #define H(off) (*(s16 *)(p + (off)))
 #define U(off) (*(u16 *)(p + (off)))
 #define W(off) (*(u32 *)(p + (off)))
@@ -78,10 +77,10 @@ u32 ScriptCombatActor_UpdateProjectileAttack(u8 *p)
         U(0x184)--;
     else {
         Anim_RestartSequence(p + 0x160, *(void **)(p + 0x1cc), 0, 0, 0);
-        *(u32(**)(void *))(p + 0x15c) = sub_08201898;
+        *(u32(**)(void *))(p + 0x15c) = ScriptCombatActor_TryProjectileAttack;
     }
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08201A78);
+INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_UpdateProjectileAttack);
 #endif

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "display_animation.h"
-#define ProximitySequence_EmitBurst sub_0820302C
 struct ProximitySequence {
     u8 pad0[0x3c];
     struct SceneVec position;

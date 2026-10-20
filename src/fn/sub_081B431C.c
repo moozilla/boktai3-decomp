@@ -144,9 +144,8 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     return ended;
 }
-#define Vanargand_UpdatePartImpact sub_081B431C
 // confidence=low: paired part travels to an impact point and emits a burst.
-void sub_081B95E4(void *);
+void MotionTrack_Update(void *);
 s32 ScenePair_CountPositiveCounters(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -225,7 +224,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                 Add(&delta, &p->origin, &delta);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (Ended(p)) {
                 p->state = 2;
                 p->timer = 0;
@@ -245,7 +244,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                 Diff(&p->target, &p->target, p->basePosition);
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 2);
             }
-            sub_081B95E4(p->motion);
+            MotionTrack_Update(p->motion);
             if (Ended(p)) {
                 if (ScenePair_CountPositiveCounters(savedBoss) == 2 &&
                     savedBoss[p->variant == 1 ? 0x205 : 0x421] == 12) {
@@ -275,5 +274,5 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B431C);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartImpact);
 #endif

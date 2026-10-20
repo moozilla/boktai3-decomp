@@ -5,7 +5,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 #include "scene_vec.h"
-#define CannonTurret_InitializeFromScript sub_08208BE4
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_0820843C(void);
@@ -250,5 +249,5 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08208BE4);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_InitializeFromScript);
 #endif

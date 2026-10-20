@@ -1,4 +1,3 @@
-#define Dog_ChasePlayer sub_080E4468
 #include "global.h"
 /* Dog_ChasePlayer: on entry starts the chase animation (kind 0x28); bites when a bite frame of the run cycle ends with player 0 in range (records the player's position, extends the chase timer), otherwise once the control finishes either follows the group's chase (flags2D4 & 0x80) or routes back to its route point (provisional name) */
 #include "scene_actor_chase.h"

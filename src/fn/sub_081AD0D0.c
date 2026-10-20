@@ -152,7 +152,6 @@ static inline void changeState(struct Vanargand *p, s32 state, void *callback)
     }
 }
 
-#define Vanargand_ApplyRequestedMode sub_081AD0D0
 // confidence=low: consumes byte AA and installs its callback from the mode table.
 extern void *gUnk_08612020[];
 void Vanargand_SetPairedMotionParameter(void *, u16);

@@ -1,8 +1,7 @@
 #include "global.h"
-#define Player_UpdateUnflaggedResourceRecovery sub_08142FC4
-#define B(n)                                   (*(u8 *)(p + (n)))
-#define H(n)                                   (*(u16 *)(p + (n)))
-#define W(n)                                   (*(u32 *)(p + (n)))
+#define B(n) (*(u8 *)(p + (n)))
+#define H(n) (*(u16 *)(p + (n)))
+#define W(n) (*(u32 *)(p + (n)))
 s32 Player_ConsumeStateEntry(void *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
