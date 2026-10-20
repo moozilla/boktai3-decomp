@@ -8,7 +8,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 void sub_08238280(struct Player *, s32, s32);
 void SelectionSlots_ClearValue(void *, u32);
 void sub_0823C280(struct Player *);
-#define F(T, off) (*(T *)((u8 *)p + (off)))
+#define F(T, off)                   (*(T *)((u8 *)p + (off)))
 #define Player_UpdateDefeatSequence sub_08240DB0
 void Player_UpdateDefeatSequence(struct Player *p)
 {
