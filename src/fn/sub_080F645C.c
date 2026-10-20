@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Sword_UpdateDamage sub_080F645C
 
 #ifdef NONMATCHING
 // fuzzy: 96.5%
@@ -75,13 +76,18 @@ void Sword_UpdateDamage(u8 *p)
                 INC(0x58E);
             } else if (flags & 0x400) {
                 INC(0x590);
-            } else if (flags & 0x800) {
-                INC(0x592);
+            } else {
+                register u32 last asm("r2") = flags;
+                last &= 0x800;
+                asm("" : "+r"(last));
+                if (last) {
+                    INC(0x592);
+                }
             }
         }
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
+INCLUDE_ASM("asm/nonmatching", sub_080F645C);
 #endif

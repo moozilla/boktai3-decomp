@@ -1,4 +1,5 @@
 #include "global.h"
+#define SceneVolume_UpdateKnockbackLanding sub_0817E040
 
 struct VolumeActor {
     u8 pad0[0x51];

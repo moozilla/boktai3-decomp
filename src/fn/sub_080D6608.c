@@ -1,7 +1,10 @@
 #include "global.h"
 
+#define Mummy_TryDirectPursuit     sub_080D6608
+#define Mummy_RequestStraightRoute sub_080D6FDC
+
 #ifdef NONMATCHING
-// fuzzy: 87.0%
+// fuzzy: 89.2%
 #include "scene_actor_chase.h"
 
 static inline u8 Test16(u16 *p, u32 mask)
@@ -10,7 +13,7 @@ static inline u8 Test16(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 PickTurn(u32 dir)
+static inline u32 PickTurn(u32 dir, u32 mask)
 {
     u32 d;
     s32 i;
@@ -21,7 +24,7 @@ static inline u32 PickTurn(u32 dir)
             gUnk_03005308 = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
-            d = (v & 3) << 6;
+            d = (v & mask) << 6;
         }
         if (d != dir)
             return d;
@@ -43,7 +46,7 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    group[0x204] = PickTurn(actor->direction);
+    group[0x204] = PickTurn(actor->direction, 3);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -202,5 +205,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
+INCLUDE_ASM("asm/nonmatching", sub_080D6608);
 #endif
