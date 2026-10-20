@@ -42,7 +42,8 @@ struct ChaseContext {
 
 static inline u8 MotionTest(u16 *field, u32 mask)
 {
-    if (*field & mask) return 1;
+    if (*field & mask)
+        return 1;
     return 0;
 }
 static inline u8 Chase_TakeArrived(struct SceneActorRegistryResetView *actor)
