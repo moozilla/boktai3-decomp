@@ -3,7 +3,7 @@
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 #define ActorStatus_UpdatePlayerApproach sub_081B08B8
 #ifdef NONMATCHING
-// fuzzy: 91.3%
+// fuzzy: 99.8%
 // Remaining differences: Only the zero-offset scratch register in the player X-distance load differs (two bytes).
 #include "display_animation.h"
 #include "scene_vec.h"
