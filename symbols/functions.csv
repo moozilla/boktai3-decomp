@@ -8602,6 +8602,7 @@ addr,name,mode,confidence,source,notes
 0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
 0821BC68,CellObject_Init,thumb,low,src-alias,
 0821BD48,Terrain_GetHeightAt,thumb,low,src-alias,
+0821C754,Terrain_SampleSurface,thumb,low,src-alias,
 0821D630,TerrainModifiers_InitCell,thumb,low,src-alias,Initializes a cell override with packed tile and height data plus flags
 0821D64C,TerrainModifiers_FindCellOverride,thumb,low,src-alias,Finds the highest override for a cell while excluding masked flags
 0821D698,TerrainModifiers_RegisterCell,thumb,low,src-alias,Initializes a cell override and inserts it at the terrain override list head
@@ -8634,7 +8635,11 @@ addr,name,mode,confidence,source,notes
 0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821E8C8,SceneActorRoute_IsOutsidePointBounds,thumb,low,src-alias,
 0821E920,Path_PickRandomPoint,thumb,low,src-alias,
+0821EA04,Path_SnapToNearestPoint,thumb,low,src-alias,
+0821EB44,Path_SnapToFarthestPoint,thumb,low,src-alias,
 0821EC84,Path_FindNearestDistantPoint,thumb,low,src-alias,
+0821EDE0,Path_SnapToRandomFarPoint,thumb,low,src-alias,
+0821EF30,Path_SnapToRandomPointInBox,thumb,low,src-alias,
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
