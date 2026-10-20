@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: action role inferred from local animation, motion and effects.
-#define Vanargand_UpdatePartRetreat sub_081B48A0
+#define Vanargand_UpdatePartSidestep sub_081B48A0
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // Remaining differences: register lifetimes, instruction order and literal pools.
@@ -160,7 +160,7 @@ static inline u8 Ended(struct VanargandPart *p)
 }
 
 // confidence=low: action role inferred from local motion and animation.
-void Vanargand_UpdatePartRetreat(u8 *bossArg, struct VanargandPart *p)
+void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
 {
     register u8 *boss asm("r8") = bossArg;
     u32 mask = 12;
