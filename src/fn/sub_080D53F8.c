@@ -100,5 +100,5 @@ increment:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
+INCLUDE_ASM("asm/nonmatching", sub_080D53F8);
 #endif
