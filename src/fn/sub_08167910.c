@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
-// One commutative adds operand order remains different.
 #include "scene_hud_display.h"
 #include "player.h"
 void PauseMenu_LoadAttributeIconFrame(void *, void *, s32);
@@ -51,7 +48,7 @@ void PauseMenu_UpdateSelectedEquipmentIcons(struct SceneHudState *p)
         } else if (owner[0x33E]) {
             if ((u16)++p->actionTransferDelay & 1)
                 PauseMenu_LoadAttributeIconFrame(
-                    p, p->primaryWidgets, *(s8 *)((u8 *)p + p->primarySelection * 4 + 0xC79));
+                    p, p->primaryWidgets, *(s8 *)((u8 *)p + (p->primarySelection << 2) + 0xC79));
             else
                 PauseMenu_LoadEmptySlotFrame(p, p->primaryWidgets);
         } else
@@ -82,7 +79,3 @@ void PauseMenu_UpdateSelectedEquipmentIcons(struct SceneHudState *p)
         hide((u8 *)p->tertiaryWidgets);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PauseMenu_UpdateSelectedEquipmentIcons);
-#endif
