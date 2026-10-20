@@ -244,5 +244,5 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateFlankingStrike);
+INCLUDE_ASM("asm/nonmatching", sub_081B1B90);
 #endif
