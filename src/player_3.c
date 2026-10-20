@@ -713,16 +713,20 @@ static inline void ClearFlag(struct Player *p, u32 index)
         p->statBonusFlags &= ~(1 << index);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 88.1%
-// Flag-clear loop allocation and flag-set operand ordering still differ.
 static inline void SetBonusFlag(struct Player *p, u32 mask)
 {
     if (p) {
         u32 *flags = &p->statBonusFlags;
-        *flags |= mask;
+        u32 m = mask;
+        *flags |= m;
     }
 }
+struct ActionModifierDescriptor {
+    u8 unknown[12];
+    struct {
+        u8 kind, unknown[3];
+    } modifiers[2];
+};
 void Player_SubtractResistance(struct Player *, s32, s32);
 
 #define Player_BuildActionModifiers sub_0813E608
@@ -730,20 +734,26 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
                                  const void *descriptor)
 {
     s32 i;
+    u32 zero = 0;
+    void **flags = p->flagCallbacks;
+    void **callbacks = context->statModifierCallbacks;
     for (i = 2; i >= 0; i--) {
-        context->statModifierCallbacks[2 - i] = 0;
+        *callbacks = (void *)zero;
         if (p) {
-            p->flagCallbacks[2 - i] = 0;
-            p->contactCostCallbacks[2 - i] = 0;
+            *flags = (void *)zero;
+            flags[3] = (void *)zero;
         }
+        flags++;
+        callbacks++;
     }
     if (p) {
-        for (i = 0; i <= 6; i++)
-            ClearFlag(p, i);
+        s32 bit;
+        for (bit = 0; bit <= 6; bit++)
+            ClearFlag(p, bit);
     }
     context->savedActionIndex = 0;
     for (i = 0; i <= 1; i++) {
-        switch (*((const u8 *)((u32)descriptor + i * 4) + 12)) {
+        switch (((const struct ActionModifierDescriptor *)descriptor)->modifiers[i].kind) {
             case 1:
                 *((u8 *)context + 0xD1) = 0;
                 context->savedActionIndex = 17;
@@ -832,10 +842,6 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_BuildActionModifiers);
-#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
 
@@ -1127,7 +1133,8 @@ static inline void SetModeFlag(struct Player *p)
     if (p) {
         u32 *flags = &p->actionStateFlags;
         u32 mask = 16;
-        *flags |= mask;
+        u32 m = mask;
+        *flags |= m;
     }
 }
 
