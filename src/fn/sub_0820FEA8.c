@@ -32,12 +32,12 @@ struct HitRecipient {
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 
 void Combat_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
                              struct HitRecipient *target)
 {
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;

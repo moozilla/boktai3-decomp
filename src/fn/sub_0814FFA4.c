@@ -6,7 +6,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 s32 Math_Atan2(s32, s32);
 void Script_Call(u32, u32);
-void sub_08143B54(void *, s32, s32, u32);
+void Player_ConstrainTetherTarget(void *, s32, s32, u32);
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
 #define S(o) (*(s16 *)(p + (o)))
@@ -107,7 +107,7 @@ void PlayerCue_UpdateMoveDestination(u8 *p)
     }
     Player_SetAnimation(p, anim, 64, 1);
     if (moving)
-        sub_08143B54(p, x, z, B(0x59B));
+        Player_ConstrainTetherTarget(p, x, z, B(0x59B));
 }
 
 #else

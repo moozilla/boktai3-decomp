@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
+
 #ifdef NONMATCHING
-// fuzzy: 94.9%
+// fuzzy: 95.5%
 struct Orbit {
     u8 pad[0x134];
     u16 endX, endY, endZ;
@@ -33,7 +34,7 @@ void Sword_BeginTargetOrbit(u8 *p)
     }
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
-        s32 bits = gUnk_0203B400[gUnk_03005308];
+        s32 bits = *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
         register s32 mask asm("r2") = 1;
         asm("" : "+r"(mask));
         bits &= mask;

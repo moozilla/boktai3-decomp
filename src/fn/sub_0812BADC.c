@@ -1,0 +1,189 @@
+// MATCHING_CONCESSION: register-pinning
+#include "contact_swarm.h"
+#ifdef NONMATCHING
+// fuzzy: 83.3%
+// Remaining: sine/RNG load order, position and terrain register allocation, and collider temporaries.
+struct SlashCollider {
+    u8 pad[6];
+    u16 flags;
+    u8 unknown8[0x4C];
+};
+struct Slash {
+    u32 flags;
+    u8 active, unknown5, phase, priority;
+    s8 scaleX, scaleY;
+    u8 unknownA[2];
+    void *graphics;
+    u16 frame;
+    u8 unknown12[10];
+    struct ContactPosition position;
+    u8 unknown24[8];
+    struct DisplaySequenceState sequence;
+    u8 trails[0xB8];
+    struct SlashCollider primary, secondary;
+    struct ContactPosition velocity;
+    u8 initialHeading, heading, turnTimer, turnSpeed;
+    u16 speed;
+    u8 trailIndex, trailPeriod;
+    const void *sequenceResource;
+    s32 lifetime;
+    u16 effectFlags;
+    u8 state;
+    s8 slot;
+    u16 timer;
+    u8 entered, turnDelay;
+};
+struct Pool {
+    u8 task[0x18];
+    u8 graphics[0x20];
+    u32 used;
+};
+extern struct Pool *gUnk_02000184;
+extern const s16 gUnk_086149C4[];
+extern const u16 gUnk_0203B400[];
+extern u32 gUnk_03005308;
+struct Pool *SlashEffect_GetOrCreateManager(void);
+struct Slash *SlashEffect_AllocateSlot(struct Pool *);
+void TwinSpriteEffect_InitGraphics(struct Slash *);
+void PursuingActor_InitColliders(struct Slash *, s32, s32, s32, s32, s32, s32, s32);
+void TimedEffect_UpdateVisibility(struct Slash *);
+void TwinSpriteEffect_EmitTrail(struct Slash *);
+void PursuingActor_TurnTowardPlayer(struct Slash *);
+void SlashEffect_UpdateColliders(struct Slash *);
+void SwooshProjectile_RemoveTrailSprites(struct Slash *);
+u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
+s32 Mod(s32, s32);
+s32 Math_Atan2(s32, s32);
+static inline s32 Truncate(s32 v)
+{
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
+}
+
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+static inline s32 CellIndex(struct ContactPosition *p)
+{
+    register s32 x asm("r3") = p->x >> 8;
+    s32 z = p->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+static inline u8 *CellData(s32 index)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(index, 1);
+    if (p)
+        return p + 4;
+    else {
+        struct EngineMap *map = gUnk_030052F4;
+        u32 offset = index * 4 + 12;
+        return map->cells + offset;
+    }
+}
+static inline void Disable(struct SlashCollider *c)
+{
+    c->flags |= 4;
+}
+static inline void AddPosition(struct ContactPosition *out, struct ContactPosition *a,
+                               struct ContactPosition *b)
+{
+    {
+        register u32 v asm("r0") = (u16)a->x;
+        asm("" : "+r"(v));
+        out->x = v + (u16)b->x;
+    }
+    {
+        register u32 v asm("r0") = (u16)a->y;
+        asm("" : "+r"(v));
+        out->y = v + (u16)b->y;
+    }
+    {
+        register u32 v asm("r0") = (u16)a->z;
+        asm("" : "+r"(v));
+        out->z = v + (u16)b->z;
+    }
+}
+// confidence=low: contact reaction reverses horizontal velocity, adds upward motion and retires the slash
+void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
+{
+    struct ContactPosition *position, *velocity;
+    s32 angle;
+    s32 magnitude;
+    s32 height;
+    if (p->entered) {
+        p->timer = 0;
+        {
+            register u32 mask asm("r1") = 255;
+            angle = (Math_Atan2(p->velocity.x, p->velocity.z) + 128);
+            mask = 255;
+            asm("" : "+r"(mask));
+            angle &= mask;
+            asm("" : "+r"(angle));
+        }
+        velocity = &p->velocity;
+        magnitude = 12;
+        asm("" : "+r"(magnitude));
+        {
+            register const s16 *sine asm("r2") = gUnk_086149C4;
+            velocity->x = Truncate(sine[(angle + 64) & 255] * magnitude);
+        }
+        velocity->y = 0;
+        {
+            register u32 masked asm("r0") = 255;
+            masked &= angle;
+            asm("" : "+r"(masked));
+            velocity->z = Truncate(gUnk_086149C4[masked] * magnitude);
+        }
+        {
+            u32 index = (gUnk_03005308 + 1) & 1023;
+            gUnk_03005308 = index;
+            {
+                register u32 offset asm("r0") = index * 2;
+                register const u16 *source asm("r3");
+                asm("" : "+r"(offset));
+                source = gUnk_0203B400;
+                {
+                    register u32 sample asm("r0") = *(const u16 *)((u32)source + offset);
+                    asm("" : "+r"(sample));
+                    p->velocity.y = (sample & 15) + 8;
+                }
+            }
+        }
+        Disable(&p->primary);
+        Disable(&p->secondary);
+        Sound_PlaySong(0x1E4);
+        p->entered = 0;
+    }
+    TimedEffect_UpdateVisibility(p);
+    {
+        register struct ContactPosition *current asm("r2") = &p->position;
+        register struct ContactPosition *velocity asm("r1") = &p->velocity;
+        asm("" : "+r"(current), "+r"(velocity));
+        p->position.x = (u16)p->position.x + (u16)velocity->x;
+        current->y = (u16)current->y + (u16)velocity->y;
+        current->z = (u16)current->z + (u16)velocity->z;
+    }
+    position = &p->position;
+    p->velocity.y -= 2;
+    height = (*CellData(CellIndex(position)) & 15) << 8;
+    if (p->position.y < height) {
+        p->velocity.x = 0;
+        p->velocity.y = 0;
+        p->velocity.z = 0;
+        p->position.y = height;
+    }
+    if (Sprite_BlinkUntilExpired(p, p->timer, 10, 30)) {
+        Collider_Remove(&p->secondary);
+        SwooshProjectile_RemoveTrailSprites(p);
+        Sprite_Remove(p);
+        pool->used &= ~(1 << p->slot);
+        p->slot = -1;
+        p->state = 0;
+    } else
+        p->timer++;
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", PursuingActor_UpdateRecoil);
+#endif

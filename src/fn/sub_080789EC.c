@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-void sub_0807C72C(struct SceneActorBehaviorView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
     u8 slot;
@@ -57,7 +57,7 @@ void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
         *field = mask;
     }
     actor = early;
-    sub_0807C72C(actor, 0, 0, actor->category);
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
     if (Test(gUnk_030053F4, 0x4800))
         return;
     {

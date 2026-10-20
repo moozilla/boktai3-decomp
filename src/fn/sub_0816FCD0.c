@@ -21,7 +21,7 @@ void PauseMenu_ResetItemCursor(void *);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
-void sub_0816701C(void *, s32, s32, s32, s32, s32);
+void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 void PauseMenu_ClearSpriteFlags(void *, s32, s32);
 s32 SceneInput_NavigateGridKeys(void *, s32);
 void PauseMenu_OnSortConfirmationUpdate(void);
@@ -41,7 +41,7 @@ static inline void PauseMenu_BeginActionSelection(u8 *p)
     Hud_SaveGridSelection(g);
     sub_081672FC(p);
     MenuDisplay_UpdateActionPrompt(p, 4);
-    sub_0816701C(p, 0, 0, 0, 1, 0);
+    InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, 0);
     MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
 }
 static inline void PauseMenu_BeginSwapSelection(u8 *p)

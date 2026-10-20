@@ -3,7 +3,7 @@
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void InventoryPanel_SetEntryRow(void *, u32, u32, u32, u32, u32);
 u32 InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 int SceneInput_NavigateGridKeys(void *, int);
 void Hud_SaveGridSelection(void *);
 void SceneHud_RefreshEquippedActionIcons(void *);
@@ -37,7 +37,7 @@ void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
             MenuDisplay_UpdateActionPrompt(p, group);
         }
         if (*cursor > 7)
-            sub_0816701C(p, 1, 0, 0, 0, 0);
+            InventoryPanel_DrawStatComparison(p, 1, 0, 0, 0, 0);
         else
             InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, 0);
     } else if (gUnk_03005260[1] & 1) {

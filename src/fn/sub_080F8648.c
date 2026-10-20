@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: axe attack behavior inferred from orbit and trail state updates.
+
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // Six instructions differ: player-address scheduling and stack-vector address reuse.

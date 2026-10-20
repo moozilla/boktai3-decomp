@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: blends the boss palette banks and stage colors.
+
 // confidence=low: palette transitions and stage colors follow adjacent Vanargand routines.
 // MATCHING_CONCESSION: register-pinning
 

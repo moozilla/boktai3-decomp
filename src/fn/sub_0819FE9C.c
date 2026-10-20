@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: coordinates player positioning and release.
+
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // Remaining differences: release-target vector/address lifetimes and RNG register allocation.

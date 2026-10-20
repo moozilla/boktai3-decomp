@@ -13,7 +13,7 @@ struct WindupContext {
 };
 extern u8 *gUnk_02000580;
 void Sound_PlaySong(u32);
-void sub_080F8FFC(void);
+void Axe_UpdateTargetLunge(void);
 void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     struct WindupContext *state = actor->context;
@@ -37,7 +37,7 @@ void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elaps
         else
             delay = state->delay;
         if (elapsed > delay) {
-            void *callback = sub_080F8FFC;
+            void *callback = Axe_UpdateTargetLunge;
             u32 phase = 0x36;
             actor->field2B2 = 1;
             actor->field2B0 = 0;

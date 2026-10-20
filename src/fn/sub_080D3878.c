@@ -1,8 +1,11 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+// confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
+
 #ifdef NONMATCHING
-// fuzzy: 86.4%
-// MATCHING_CONCESSION: register-pinning
+// fuzzy: 91.3%
+// Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 void sub_080747B8(void *);
@@ -11,9 +14,9 @@ void SceneEffect_EmitPositionPattern(void *);
 void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 
 /* Mummy defeat: hides the drawable, emits defeat effects, runs the script and returns to idle. */
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -33,6 +36,15 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
+}
+static inline void ShowTile(struct SceneActorAnimationTile *tile, u32 mask)
+{
+    tile->flags |= mask;
+}
+static inline void HideTile(struct SceneActorAnimationTile *tile)
+{
+    u32 mask = ~1;
+    tile->flags = mask & tile->flags;
 }
 static inline u32 Random4(void)
 {
@@ -66,13 +78,16 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
     u8 *anim = drawable->anim;
     u16 script;
     u16 *motionFlags;
+    register struct ContactCollider *collider asm("r5");
     if (SceneActorReaction_TakePrepared(actor)) {
         u8 *group = (u8 *)&actor->group;
         if (!Flag(actor, 0x20000, 0x2D0)) {
-            if (!*((u8 *)actor + 8))
-                *(u32 *)actor->drawable &= ~1;
-            else
-                ((struct SceneActorAnimationTile *)((u8 *)actor->drawable + 0x20))->flags &= ~1;
+            if (!*((u8 *)actor + 8)) {
+                u32 *flags = actor->drawable;
+                s32 mask = ~1;
+                *flags = mask & *flags;
+            } else
+                HideTile((void *)((u8 *)actor->drawable + 0x20));
         }
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
@@ -85,16 +100,18 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
         *(u16 *)((u8 *)actor + 0x1EA) = 0x20;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
+        collider = &actor->colliderA;
+        asm("" : "+r"(collider));
         *(u16 *)((u8 *)actor + 0x178) = 0;
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Flag(actor, 8, 0x2D4))
             Sound_PlaySong(0x12A);
         {
-            struct ContactCollider *collider = &actor->colliderA;
+            /* reuse the observed collider */
             collider->flags |= 4;
         }
     }
@@ -117,7 +134,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         motionFlags = &actor->flags2D4;
         if (!test) {
             u8 category;
-            if (!Flag(actor, 0xA007, 0x2D4)) {
+            if (!(*motionFlags & 0xA007)) {
                 SceneEffect_EmitPositionPattern(actor);
                 SceneStimulus_AddUntagged(actor->position.x, actor->position.z, 0x400, 0, 1);
             } else {
@@ -156,7 +173,11 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         values[2] = actor->position.z;
         values[3] = *(s32 *)((u8 *)actor + 0x1FC);
         values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
+        {
+            register u32 offset asm("r5") = 0x204;
+            asm("" : "+r"(offset));
+            values[5] = *(s32 *)((u8 *)actor + offset);
+        }
         values[6] = *(s32 *)((u8 *)actor + 0x2E0);
         values[7] = actor->id;
         arguments.count = 8;
@@ -172,7 +193,8 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         u32 test = *motionFlags & mask;
         flags = &actor->flags2D4;
         if (!test && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
         zero = 0;
         one = 1;
@@ -208,7 +230,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
     if (!*((u8 *)actor + 8))
         *(u32 *)actor->drawable |= 1;
     else
-        ((struct SceneActorAnimationTile *)((u8 *)actor->drawable + 0x20))->flags |= 1;
+        ShowTile((void *)((u8 *)actor->drawable + 0x20), 1);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }
 

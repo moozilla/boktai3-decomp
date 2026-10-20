@@ -6,14 +6,14 @@ struct S {
     u16 c;
     u16 d;
 };
-void sub_081D7934(struct S *);
+void Task4E01_BeginImpactAnimation(struct S *);
 s32 Projectile_UpdateResetDelay(struct S *p)
 {
     u32 two = 2;
     p->b |= two;
     if (p->a >= p->d) {
         p->c |= 0x40;
-        sub_081D7934(p);
+        Task4E01_BeginImpactAnimation(p);
     }
     return 0;
 }

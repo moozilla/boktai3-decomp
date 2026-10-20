@@ -5,6 +5,8 @@
 
 // confidence=low: player-directed sweeping strike followed by a timed retreat.
 
+// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
+
 #ifdef NONMATCHING
 // fuzzy: 94.5%
 // Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.

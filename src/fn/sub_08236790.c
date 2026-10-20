@@ -23,7 +23,7 @@ struct GlowTask {
     void (*callback)(void);
     struct GlowOwner *owner;
 };
-void sub_0823614C(struct GlowOwner *, void *);
+void RadialBurstEffect_EmitOrbitParticle(struct GlowOwner *, void *);
 void sub_08235DB0(struct GlowOwner *);
 void sub_082362EC(struct GlowOwner *, void *);
 void TimedSprite_UpdateFrames(void);
@@ -36,7 +36,7 @@ void sub_08236790(struct GlowTask *p)
         p->y += p->f95;
         p->f95--;
         if (p->owner->flag1A != 0 && p->f95 > 0)
-            sub_0823614C(p->owner, &p->x);
+            RadialBurstEffect_EmitOrbitParticle(p->owner, &p->x);
     } else if (p->owner->flag1A != 0) {
         p->flags |= 1;
         p->f90 = 0;

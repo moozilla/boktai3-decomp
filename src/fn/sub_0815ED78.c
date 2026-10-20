@@ -6,7 +6,7 @@
 extern u32 gUnk_030053F4;
 void Player_UpdateLinkModeMovement(struct Player *);
 void Player_UpdateActionModeMovement(struct Player *);
-void sub_0813D178(struct Player *);
+void Player_InitVisualResources(struct Player *);
 s32 Player_GetUsableEnchantment(struct Player *);
 s32 Player_IsEnchantmentAvailable(struct Player *, s32);
 static inline void ApplyActionMode(struct Player *p, u32 mode, u32 resource)
@@ -43,7 +43,7 @@ void Player_ApplyLatchedActionMode(struct Player *p)
         *(void **)((u8 *)p + 0x54) = &p->animation;
         *(u32 *)((u8 *)p + 0x50) = 0;
         *(void **)((u8 *)p + 0x5C0) = &p->previousPosition;
-        sub_0813D178(p);
+        Player_InitVisualResources(p);
         p->savedSpriteResource = 0xFFFF;
         enchantment = Player_GetUsableEnchantment(p) + 1;
         p->actionVariant = enchantment;

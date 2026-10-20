@@ -1,4 +1,5 @@
 #include "global.h"
+// confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
 // fuzzy: 83.9%
 /* Group-id expression ordering, argument registers and slot initialization still differ. */

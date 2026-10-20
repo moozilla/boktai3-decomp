@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-void sub_0821FF8C(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *);
+void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
+                                       struct SceneActorBehaviorContactView *);
 void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *,
                                             struct SceneActorBehaviorContactView *,
                                             struct SceneActorBehaviorContactView *);
@@ -71,7 +72,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         if (!(source->flags & mask))
             return;
     }
-    sub_0821FF8C(source, destination);
+    Collision_CalculateDamageResponse(source, destination);
     destination->parameter44 = source->parameter44;
     {
         u32 mode = destination->mode;

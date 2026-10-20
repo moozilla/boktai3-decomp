@@ -3,9 +3,11 @@
 #include "scene_actor_terrain.h"
 // confidence=low: inherited route/reaction interpretation from static callers.
 
+// confidence=low: route role inferred from callers and terrain/path tests.
+
 #ifdef NONMATCHING
-// fuzzy: 84.0%
-// Retry-loop layout, terrain-pointer lifetime, and route argument allocation still differ.
+// fuzzy: 94.5%
+// Width-load rematerialization, stack-slot order, and literal-pool placement still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -50,12 +52,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
     void *route = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->position;
     s32 result = Nav_IsPositionInMesh(route, position, target);
-    if (!result) {
-        ClearRouteBits(&actor->flags2D4, 0x200);
-        return 0;
-    }
-    result = Terrain_ApplyBlocked(route, position, target);
-    if (result) {
+    if (result && (result = Terrain_ApplyBlocked(route, position, target))) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
         return 1;
@@ -150,6 +147,19 @@ north:
 home:
     return actor->terrainCell;
 }
+static inline u32 CenterHeight(s32 cell)
+{
+    u32 attr = *SceneActorTerrain_GetCell(cell);
+    return (attr & 15) << 8;
+}
+static inline void GetCenter(s32 cell, struct ContactPosition *p)
+{
+    s32 x = Mod(cell, SceneActorTerrain_Width());
+    s32 z = Div(cell, SceneActorTerrain_Width());
+    p->x = (x << 8) + 128;
+    p->y = CenterHeight(cell);
+    p->z = (z << 8) + 128;
+}
 u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32 savedDirection)
 {
     struct ContactPosition target;
@@ -170,10 +180,11 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
     nextRange:
         range--;
         actor->direction = savedDirection;
-        if (found)
-            break;
-    } while (range > 0);
-    SceneActorTerrain_GetCenter(dest, &target);
+        if (found || range <= 0)
+            goto done;
+    } while (1);
+done:
+    GetCenter(dest, &target);
     group = (u8 *)&actor->group;
     if (!TryRoute(actor, group, &target)) {
         Callback_InvokeActor(actor, *(void **)(group + 0x224));

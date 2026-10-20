@@ -8,5 +8,5 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *t
     u32 tag = SceneStimulus_GetTaggedPosition((u16 *)position, (s8)index);
     target->tag = tag;
     if (tag == 0xB546)
-        sub_0807CDC4(source, context, position, position);
+        SceneActorAttachment_FindReachableNeighbor(source, context, position, position);
 }

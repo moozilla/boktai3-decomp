@@ -1,8 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// Remaining difference: zero materialization order in modes 2 and 3.
 struct Sub {
     u8 pad[0x38];
     u32 flags;
@@ -101,7 +99,11 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
             if (flag) {
                 p->state = 1;
                 p->timer = 0x5A;
-                *q = 0;
+                {
+                    u32 zero = 0;
+                    asm("" : "+r"(zero));
+                    *q = zero;
+                }
             } else if (p->keys & 1) {
                 if ((s16)sum > 400) {
                     p->state = 2;
@@ -234,6 +236,3 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateBehaviorAfterContact);
-#endif

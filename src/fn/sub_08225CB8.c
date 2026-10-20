@@ -21,7 +21,7 @@ void sub_0821F15C(u16);
 struct TerrainTask *ResourceRegistry_GetResource(u32);
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void SpriteOam_QueueProjectedSprites(void);
-void sub_08214B44(void);
+void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void SpriteOam_QueueCameraRelativeSprites(void);
 void sub_08214D20(void);
@@ -56,7 +56,7 @@ void Terrain_LoadFromScript(void)
     if (Script_SeekToKeyword('v')) {
         s32 mode = Script_GetValue();
         if (mode == 0) {
-            Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44,
+            Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                                      sub_08219624);
             gUnk_030042A0.x = g->originX >> 4;
             gUnk_030042A0.y = g->originY >> 4;

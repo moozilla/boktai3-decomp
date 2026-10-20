@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 82.1%
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
 u8 sub_080B54DC(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -61,7 +61,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         maskTwo = 2;
         flags = &actor->flags2D0;
         if (!(*flags & maskTwo)) {
-            sub_0807C72C(actor, 3, 0, 25);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0, 25);
             {
                 *flags |= maskTwo;
             }

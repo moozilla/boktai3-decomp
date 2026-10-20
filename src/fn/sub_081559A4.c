@@ -1,3 +1,4 @@
+// confidence=low: inferred from player cue phases and animation consumers.
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -20,7 +21,8 @@ void Hud_ClearTimer(void);
 void Script_Call(u32, void *);
 extern u8 *gUnk_02000710;
 struct Call {
-    u16 count, pad;
+    u32 count : 16;
+    u32 pad : 16;
     s32 *values;
 };
 static inline u32 held(u8 *p, u32 mask)

@@ -5,7 +5,7 @@ struct ContactModeActor {
     u8 unknown0[0x358];
     u32 mode;
 };
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 struct ContactModeActor *SceneActors_GetBySlot(s32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
@@ -36,7 +36,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
         owner->retargetTimer = 250;
         owner->targetIndex = mode;
     }
-    sub_0821FF8C(source, other);
+    Collision_CalculateDamageResponse(source, other);
     PlayerStats_AddContactHundredths(source, other, 2);
     actor = SceneActors_GetBySlot(0);
     if (actor) {
