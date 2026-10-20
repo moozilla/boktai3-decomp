@@ -155,3 +155,69 @@ Tags: #matching #player #animation
 
 Ghidra export `gen/ghidra/decomp.c` is absent. Only tools/check.py was used for
 compilation; no full build, network operations or generated assets committed.
+
+## Task 080F645C (2026-10-20)
+
+Tags: #matching #sword #nonmatching
+
+No exact matches: exact code gain 0.0 percentage points. One guarded draft was
+committed; no full build, network operation, or direct git mutation was run.
+The pre-existing tools/cloud_task.py modification was left alone.
+
+- 080F645C: drafted 96.5%, Sword_UpdateDamage. Caller Sword_UpdateTask confirms
+  the damage/death role: CB4 cooldown, palette restore, D78 pending damage,
+  D7A damage-effect parameter, signed health at 7E. Death sets state 1/6 and
+  callback sub_080F421C; increments total and Sword defeat counters (87C, 538,
+  548), plus the first applicable category counter 58A–592 selected by CA8.
+  CannonTurret_HandleDefeat (08207FAC) supplies most of the exact counter code.
+  Final check: 15 differing bytes, 11 realigned instructions, 2 structural.
+  Residue: the health load occurs before forming the damage pointer, one
+  counter's register assignment, and the last mask's destination. Uses r8
+  zero and a scoped r2 read concession; depin skipped because the candidate
+  is nonmatching. Default INCLUDE_ASM path checked exactly. Draft fuzzy score
+  recorded with check.py --nonmatching --record. Typed SetState helper from
+  080F3848 reproduced state stores better than raw byte assignments.
+- 080F67AC: inspected full condensed initializer and relatives; no candidate
+  retained. Sword owner setup (02000580), main sprite at B68, animation at B58,
+  graphics at B94, CC8/CF0 callbacks, copied palette at D30, optional A/T/p/K/V
+  script parameters, several colliders, shadow and another sprite. Nearest
+  matched relatives explain only the packed animation stepper (~23%). A
+  direct sibling seed is absent, and the 846-instruction mixed initializer
+  needs a local layout and shared stepper before useful allocation work.
+- 080F79A8: inspected condensed phase body and relatives; no candidate retained.
+  Entry initializes CAB flags, CA0 radius, CA4 angular step, CA5 sign and C98
+  center. Trigonometric orbit/trail positions, timed RNG sign changes, player
+  heading and expansion lead to later state transitions. Closest matched
+  relative explains ~21%; several distinct timed phases need separate C
+  recovery. A single generic steering helper would lose the branch layout.
+- 080F6F90: inspected condensed body and relatives; no candidate retained.
+  Parses c/C collision parameters and n (default 4), creates four child records
+  at 4BC + i*194, graphics 5291, animation resource 922E/3F72 sequence 2,
+  palette D56, owner pointer at child+1D0; attack/body colliders use 2001/5009.
+  Stack vector initialization uses packed halfword insertion (not arbitrary
+  uninitialized scalar reads). The inlined animation stepper is the only
+  substantial relative (~20%); no reliable full-body seed was available.
+- 080F8648: tentative Sword_UpdatePursuitReturn candidate in untracked
+  wip/sub_080F8648.c, 67.0% (187 realigned, 47 structural differences). Entry
+  initializes a trail at A24 with polar velocity A2C (speed 12); shrinks
+  drawable byte 6, follows the player through tick 119, then returns to the
+  actor at speed 8. Settles into state 29 within squared distance 1023 or
+  after tick 600. Reused Polar/Delta/Scale12 from 080E1A28 and the existing
+  SceneActorRegistryResetView. Explicit register hints improved 63.3% to
+  67.0%, but source load/address order and lifetime differences remain broad;
+  below the commit threshold, so stopped rather than retaining in src.
+- 080F75C0: tentative Sword_ApplyContactRetreat candidate in untracked
+  wip/sub_080F75C0.c, best 73.1% (53 realigned, 22 structural differences).
+  Rejects statusFlags 40/status 20000/dead health, delegates common contact
+  reaction, records hit fields, and if owner CAB bit 2 and EB0 > 2 disables
+  three pairs of colliders (A96/B92, stride 54), selects reverse flicker phase
+  2F, and clears EB0. A u8 inline predicate reproduces the materialized bool.
+  Inline state pointer arguments hoist addresses across the collider loop;
+  an input-only loop-index barrier prevents reverse countdown. Register-pinned
+  loop indexes instead inhibit strength reduction and were worse. Experiments
+  with pinning all state pointers regressed; best source retained separately.
+
+Only the guarded damage draft is production source. Scratch candidates are
+below the 80% draft threshold and are deliberately uncommitted. Resume with
+those candidates and build/sword-*.txt condensed listings if this checkout is
+retained; generated listings are not committed.
