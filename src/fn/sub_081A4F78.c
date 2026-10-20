@@ -1,55 +1,43 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 96.4%
-// foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
-struct HresvelgrPosition {
+struct MotionPosition {
     s16 x, y, z, pad;
 };
-struct HresvelgrMotionFlags {
-    u8 unknown0[6];
+struct HresvelgrCollider {
+    u8 pad0[6];
     u16 flags;
 };
 struct HresvelgrMotion {
-    u8 unknown0[0x18];
-    u32 flags;
-    u8 unknown1C[0x18];
-    struct HresvelgrPosition position;
-    u8 unknown3C[0x24];
-    struct HresvelgrMotionFlags motion;
-    u8 unknown68[0x4c];
-    struct HresvelgrPosition offset;
-    u8 unknownBC[8];
-    struct HresvelgrPosition origin;
-    u8 unknownCC[0x6c];
-    u16 state, stateFrame;
+    u8 pad0[0x18];
+    u32 flags18;
+    u8 pad1C[0x34 - 0x1C];
+    struct MotionPosition position;
+    u8 pad3C[0x60 - 0x3C];
+    struct HresvelgrCollider collider;
+    u8 pad68[0xB4 - 0x68];
+    struct MotionPosition base;
+    u8 padBC[0xC4 - 0xBC];
+    struct MotionPosition offset;
+    u8 padCC[0x138 - 0xCC];
+    u16 resetState[2];
 };
-static inline void add(struct HresvelgrPosition *d, struct HresvelgrPosition *b,
-                       struct HresvelgrPosition *a)
+static inline void Sum(struct MotionPosition *out, struct MotionPosition *a,
+                       struct MotionPosition *b)
 {
-    d->x = b->x + a->x;
-    d->y = b->y + a->y;
-    d->z = b->z + a->z;
-}
-static inline void setFlags(struct HresvelgrMotionFlags *p, u32 mask)
-{
-    p->flags = mask | p->flags;
-}
-static inline void setState(struct HresvelgrMotion *p, u32 state)
-{
-    p->state = state;
-    p->stateFrame = 0;
+    out->x = a->x + b->x;
+    out->y = a->y + b->y;
+    out->z = a->z + b->z;
 }
 void Hresvelgr_ResetMotionState(struct HresvelgrMotion *p)
 {
-    if (!p->stateFrame) {
-        setFlags(&p->motion, 4);
-        p->flags &= ~1;
-        ++p->stateFrame;
+    int one;
+    if (p->resetState[1] == 0) {
+        struct HresvelgrCollider *c = &p->collider;
+        c->flags |= 4;
+        p->flags18 &= ~1;
+        p->resetState[1]++;
     }
-    add(&p->position, &p->origin, &p->offset);
-    setState(p, 1);
+    Sum(&p->position, &p->base, &p->offset);
+    one = 1;
+    p->resetState[0] = 1;
+    p->resetState[one] = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_ResetMotionState);
-#endif

@@ -9,7 +9,7 @@ struct BitVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-void sub_08239098(void *, struct BitVec *, struct BitVec *, u32);
+void DirectionalEffect_AddParticle(void *, struct BitVec *, struct BitVec *, u32);
 
 static inline s32 scale(s32 product)
 {
@@ -30,5 +30,5 @@ void Player_EmitRandomSpark(void *p, struct SceneVec *in, u32 angle, u32 extra)
     b.x = -scale(gUnk_086149C4[(angle + 64) & 255] * k);
     b.y = 0;
     b.z = -scale(gUnk_086149C4[angle & 255] * k);
-    sub_08239098(p, &a, &b, extra);
+    DirectionalEffect_AddParticle(p, &a, &b, extra);
 }
