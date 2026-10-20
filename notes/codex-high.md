@@ -2383,3 +2383,102 @@ family evidence. Used BIG_FUNCTIONS guidance, anchored structural counts,
 variants batches and an RTL GCSE dump for the large reconstruction. Only
 byte-exact C was promoted as matching. Shared docs/index/history were left for
 integration, per the cloud-worker instructions.
+
+## Task 08205B70 — 2026-10-20 refinement
+
+Tags: #matching #nonmatching #ooze #vulcan-cannon #cannon-turret #register-pinning
+
+Worked solo on the supplied cloud/08205B70 branch, offline. All six assigned
+functions already had guarded drafts. Exact C progress is **0% of this task,
++0 percentage points**; the refinements below remain NONMATCHING and earn no
+exact credit. Used only per-file checks and compiler diagnostics, with separate
+driver commits for each draft. No make, full build, network operation, direct
+git mutation, shared-header edit, or shared documentation/index regeneration.
+
+- **08207A00 — drafted 96.1%, VulcanCannon_InitializeFromScript.** Worked the
+  largest function first, reading BIG_FUNCTIONS, previous notes, complete
+  assembly, its factory and relevant callees. An explicit unsigned <= 3 guard
+  and value constraint retain the redundant facing-switch bounds check. A
+  terrain-position r3 view avoids the second high-register coordinate copy.
+  Realigned residue improves from 23/6 to **26/2** (total / ignoring registers),
+  despite the fuzzy score decreasing from 96.4%. Remaining: sprite/position
+  high-register roles and a few low-register choices, plus the explicit zero
+  return. Keep that defined return: the factory consumes the initializer's
+  result, whereas the ROM falls through with a callee-dependent register value.
+  The candidate and reviewed target are both 1384 bytes. Forcing the position
+  into r8 early worsened allocation and was rejected.
+
+- **082074F0 — drafted 90.6%, VulcanCannon_UpdateDamageState**, up from 81.9%.
+  Move random masks from the RNG helper's arguments to its callers; this places
+  mask materialization after the sample load and matches the debris setup.
+  Separate constrained zero values around the five smoke calls prevent a zero
+  from being hoisted across the whole defeat path. Residue improves from
+  115/26 to **57/5**; candidate and target are both 1284 bytes. Remaining:
+  collider operand allocation, sequence-argument constant reuse, and the
+  defined zero return/palette-tail registers. A separately pinned dead collider
+  and early RNG-state/mask pins regressed. The pause gate already matches.
+
+- **08205B70 — drafted 90.0%, Ooze_BeginAttack**, up from 89.1%. Free the
+  animation duration-mask source from its r1 pin; the active phases need a
+  different source register. Pass the known phase-1 value as the first flip
+  mask there, retaining literal 1 in the other phases. Residue improves from
+  77/17 to **70/7**; candidate 1216 versus reviewed target 1212 bytes. Remaining:
+  mask copies, transition constant/address reuse, and allocation. Duplicating
+  the animation helper with different pins worsened structure. A small forced
+  GCSE-table-size diagnostic (551, 601, 651, 701, 751) on the initial draft had
+  no effect, so that is not a supported explanation for its residue. The
+  actual function ends at 0820602C, before two separate nearby callbacks;
+  0820608C is not its end.
+
+- **08208740 — drafted 84.5%, CannonTurret_UpdateCombat**, up from 81.7%.
+  Constrain the final zero return, which restores the ROM's shared pause-return
+  block and early literal-pool placement. Give the animation frame store a
+  separate r3 sprite view and constrain its flag-store view. Residue improves
+  from 115/30 to **95/11**; candidate and target are both 1176 bytes. Remaining:
+  collider and sprite copies, constant reuse, and explicit return-zero
+  instructions. Removing the pre-animation token improved a structural count
+  but substantially worsened allocation; it was rejected. Splitting the second
+  flip stores likewise did not improve the retained result.
+
+- **08206098 — drafted 93.7%, Ooze_InitializeFromScript**, up from 87.8%.
+  Preserve the narrowed heading assignment's value in a local and explicitly
+  retain the <= 3 switch guard. Copy the optional scene-body position through
+  a small inline that materializes the stack destination before the loads;
+  this also fixes the facing-dependent position-offset scheduling. Residue
+  improves from 79/21 to **35/11**; candidate 988 versus reviewed target 984
+  bytes. Remaining: sequence-ID constant reuse, delay-script load registers,
+  and the inherited defined return token. Getter/field-view changes did not
+  affect the sequence stores; freeing its animation-mask source regressed.
+
+- **082081F4 — drafted 99.0%, CannonTurret_ApplyHitReaction**, up from 82.6%.
+  Initially improved the inherited draft to 86.5% with typed damage storage,
+  reaction-value lifetime, and per-iteration random-table setup. The exact
+  Screamer_ApplyHitReaction at 0820BF70 then supplied a much stronger seed.
+  Port its observed target layout to collider +6C, displayed positions +78/+80,
+  direction +AF, reaction +B0, flash +128, damage +12C, health +132, HUD +148,
+  and damage type +150, with velocity data gUnk_0824FE84. Preserve health in r7
+  through an explicit value constraint before the HUD call; merely declaring
+  a fixed local register allowed the HUD-time address temporary to overwrite
+  it in a rejected candidate. A separate r0 wrap-mask constraint keeps the
+  first RNG cursor alive through wrapping without pinning the cursor itself.
+  The final **two bytes / two instructions** differ only in the first RNG
+  cursor copy/load: ROM uses r7, candidate r2. Structural residue is **0**;
+  candidate and target are both 428 bytes. Hard-pinning that first cursor to
+  r7 introduced loop-constant pressure and a stack spill; extending wrap pins
+  or clobbers also regressed. Declaration swaps, integer/typed cursor views,
+  and redundant output constraints did not close the last register choice.
+  This callback clears blocked hits, records damage/type/reaction, updates the
+  special-hit HUD, and emits three jittered sparks when source flags overlap
+  the target spark mask. The subsystem name remains tentative.
+
+Final sources were formatted directly with the venv clang-format, semantic
+alias lines restored to the requested exact spacing, and fuzzy scores recorded
+with check.py --nonmatching --record using the reviewed extents above. Each
+unit carries the register-pinning concession. Unguarded depin probes correctly
+skip nonmatching C; never run depin against a guarded source's exact assembly
+fallback, since it can incorrectly remove the draft's hints. All six default
+assembly fallbacks pass their per-file checks; those checks earn no exact C
+credit. This cache requires the existing Ooze_BeginAttack.s fallback spelling,
+while the other five use raw sub_ address fallbacks. For Ooze's score recording,
+the fallback was temporarily given the raw sub_ name and restored afterward.
+No generated assembly, ROM, dumps or diagnostic artifacts were committed.
