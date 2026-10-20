@@ -85,8 +85,8 @@ static inline s32 Scale(int x)
 s32 ActorMovement_CanReachTarget(void *);
 s32 sub_08179F60(void *);
 void sub_0817D67C(void *);
-#define SceneVolume_UpdateRepeatedShot                                                             \
-    sub_0817D7AC // confidence=low: alternates aim and projectile states, capped at three impacts
+// confidence=low: alternates aim and projectile states, capped at three impacts
+#define SceneVolume_UpdateRepeatedShot sub_0817D7AC
 void SceneVolume_UpdateRepeatedShot(struct VolumeActor *p)
 {
     struct VolumeActor *q = p;
