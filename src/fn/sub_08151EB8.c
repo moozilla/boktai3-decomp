@@ -1,3 +1,14 @@
+#define ActorSequence_Begin sub_0813AFEC
+#define Player_AddControlFlags sub_0813B134
+#define PlayerCue_EnterStandUpdate sub_0814F804
+#define PlayerCue_CompleteAction sub_0814F89C
+#define PlayerCue_UpdateHidden sub_0814F8C8
+#define Player_RestartAnimationFromSetup sub_08151D90
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateWalkTarget sub_08151EB8
+#define Anim_SetSequence sub_08220C8C
+#define Math_Atan2 sub_082215E4
+#define Sound_PlaySong sub_0822B2F8
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
@@ -191,5 +202,5 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateWalkTarget);
+INCLUDE_ASM("asm/nonmatching", sub_08151EB8);
 #endif

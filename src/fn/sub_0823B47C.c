@@ -2,6 +2,8 @@
 
 /* tentative: drifts an offset along an 8-way heading and sets facing from it */
 
+#define ActorMotion_ApplyHeadingDrift sub_0823B47C
+
 #ifdef NONMATCHING
 // fuzzy: 99.4%
 // 4 bytes off: ROM places the `adds r2, r1, #0` copy before the facing strb;
