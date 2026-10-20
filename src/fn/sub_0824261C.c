@@ -2,7 +2,6 @@
 #include "engine.h"
 #include "player.h"
 /* Per-update handler for the player in link-play kinds one, two and eight (tentative). */
-#define Player_UpdateLinkKind sub_0824261C
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 struct LinkRefs {
     u8 unk0[0x5c];
@@ -13,7 +12,7 @@ extern u32 gUnk_08E87A10[];
 extern const s16 gUnk_086149C4[];
 void Player_AccumulateActionCharge(struct Player *, u32);
 void sub_082420D4(struct Player *);
-s32 sub_082422D8(struct Player *);
+s32 Player_SelectInputMode(struct Player *);
 void sub_0823B728(struct Player *, s32);
 void sub_082424D0(struct Player *);
 void sub_0823B7A4(struct Player *);
@@ -92,7 +91,7 @@ void Player_UpdateLinkKind(struct Player *p)
                 Player_AccumulateActionCharge(p, charge);
             }
             sub_082420D4(p);
-            idx = sub_082422D8(p);
+            idx = Player_SelectInputMode(p);
             sub_0823B728(p, idx);
             Callback_InvokeActor(p, (void *)gUnk_08E87A10[idx]);
             if (p->movementVelocityLocked)
