@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Golem_UpdateChargeWindup                                                                   \
+    sub_080C6F58 // confidence=low: neighboring Golem controls establish the state role.
 #include "scene_object.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
