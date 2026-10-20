@@ -1,10 +1,9 @@
+// confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
+#define Vorn_UpdatePursuitDistance sub_080ADCC0
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
 // confidence=low: tentative Vorn behavior role.
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// Remaining differences: six low-register choices in the middle-distance path.
 // confidence=low: target distance controls approach, idle animation, and a delayed action.
 void Vorn_BroadcastPosition(void *);
 void sub_080B1FA8(void *);
@@ -18,6 +17,23 @@ static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask, u16 **out
 {
     u16 *field = (u16 *)&p->flags;
     u32 value = *field & mask;
+    *out = field;
+    if (value)
+        return 1;
+    return 0;
+}
+static inline u8 Vorn_TestMiddle(struct VornPursuitContext *p, u32 mask, u16 **out)
+{
+    register u32 offset asm("r3");
+    register u16 *field asm("r1");
+    register u32 bits asm("r2") = mask;
+    u32 value;
+    asm("" : "+r"(bits));
+    offset = 0x6D4;
+    asm("" : "+r"(offset));
+    field = (u16 *)((u8 *)p + offset);
+    asm("" : "+r"(field), "+r"(bits));
+    value = *field & bits;
     *out = field;
     if (value)
         return 1;
@@ -104,7 +120,7 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
             }
         }
     } else {
-        near = Vorn_TestNear(context, 2, &flags);
+        near = Vorn_TestMiddle(context, 2, &flags);
         if (near) {
             actor->direction = actor->fieldE9;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -148,6 +164,3 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
     }
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdatePursuitDistance);
-#endif
