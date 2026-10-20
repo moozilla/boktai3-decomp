@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.7%
-// foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define EffectPool_MarkLinkedSlots SlotRegistry_ClaimMatchingSlot
 struct EffectPoolSlot {
     u8 pad0[0xc];
@@ -23,12 +20,12 @@ s32 EffectPool_CheckCapacity(struct EffectPool *pool, s32 group, s32 required, s
     s32 groups = 0;
     s32 freeSlots = 0;
     s32 i;
-    group &= 0xff;
+    u32 g = group & 0xff;
     Memory_Clear(visited, 16);
     for (i = 0; i < 16; i++) {
         if (!pool->slots[i].active)
             freeSlots++;
-        else if ((u8)pool->slots[i].group == group && !visited[i]) {
+        else if ((u8)pool->slots[i].group == g && !visited[i]) {
             visited[i] = 1;
             SlotRegistry_ClaimMatchingSlot(pool, i + 1, pool->slots[i].group, visited);
             groups++;
@@ -40,6 +37,3 @@ s32 EffectPool_CheckCapacity(struct EffectPool *pool, s32 group, s32 required, s
         return 1;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", EffectPool_CheckCapacity);
-#endif
