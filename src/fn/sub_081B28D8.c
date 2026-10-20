@@ -3,9 +3,12 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
+// confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
+#define Vanargand_UpdatePartGroundStrike sub_081B28D8
+
 #ifdef NONMATCHING
-// fuzzy: 93.1%
-// Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
+// fuzzy: 98.2%
+// Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -81,7 +84,7 @@ static inline u8 MotionEnded(struct VanargandPart *p)
     return p->motion[0x29] == 2;
 }
 static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequenceState *state,
-                               struct VanargandPart *base, u32 one)
+                               struct VanargandPart *base, u32 one, u32 flip)
 {
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command; /* preserve observed packed-command reads */
@@ -102,7 +105,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 4;
+            owner->sprite.flags |= flip;
         else
             owner->sprite.flags &= ~4;
     }
@@ -123,13 +126,14 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r1");
+        register u32 mask asm("r6");
+        register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
+        asm("" : "+r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -222,8 +226,15 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 *enter = 0;
                 MakeVector(&delta, AimAngle(p), 256);
                 AddVector(&delta, &p->origin, &delta);
-                Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 8, (u8)p->variant, 4);
-                StepPlayback(p, &p->sequence, p, 1);
+                {
+                    void *data = *(void **)(boss + 0x4d0);
+                    register u32 flip asm("r9") = 4;
+                    struct DisplaySequenceState *seq;
+                    asm("" : "+r"(flip));
+                    seq = &p->sequence;
+                    Anim_SetSequence(seq, data, 7, (u8)p->variant, flip);
+                    StepPlayback(p, &p->sequence, p, 1, flip);
+                }
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 2);
                 Sound_PlaySong(0x588);
             }
@@ -259,9 +270,14 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             enter = &p->enter;
 
             if (entering) {
-                *enter = 0;
+                p->enter = 0;
                 Difference(&p->target, Player_GetEffectivePosition(0), p->base);
-                p->target.y = Player_GetEffectivePosition(0)->y - (p->base)->y;
+                {
+                    struct SceneVec *player = Player_GetEffectivePosition(0);
+                    u32 baseY = (u16)p->base->y;
+                    u32 playerY = (u16)player->y;
+                    p->target.y = playerY - baseY;
+                }
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 1);
                 *(u32 *)((u8 *)p + 0x19c) = 0;
             }
@@ -290,7 +306,10 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
 
             if (entering) {
                 *enter = 0;
-                *(u16 *)((u8 *)p + 0xf0) = *(u16 *)((u8 *)p + 0x172);
+                {
+                    u16 saved = *(u16 *)((u8 *)p + 0x172);
+                    *(u16 *)((u8 *)p + 0xf0) = saved;
+                }
                 *(u32 *)((u8 *)p + 0x19c) = 8;
             }
             if (!(p->timer & 15) && p->timer <= 44)
@@ -330,5 +349,5 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartGroundStrike);
+INCLUDE_ASM("asm/nonmatching", sub_081B28D8);
 #endif
