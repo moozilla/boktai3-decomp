@@ -3736,3 +3736,74 @@ All accepted functions were formatted with the venv's clang-format, minimized
 with `depin.py`, and checked byte-identically with explicit reviewed extents
 using `tools/check.py`. No full build or network operations. Ghidra's export
 is absent, so recovery used assembly, callers/callees and matched neighbours.
+
+
+## Task 0813FFE4 — 2026-10-20
+
+Tags: #matching #player #movement #camera #nonmatching
+
+Five of six assigned functions matched (83.3% by count), adding approximately
+0.109 percentage points of total code (2632 bytes). Of that gain, approximately
+0.043 percentage points (1044 bytes) belongs to Register-pinned; approximately
+0.066 percentage points (1588 bytes) needs no matching concessions. One inherited
+99.9% guarded draft retained with the required file-local alias and raw fallback.
+Aggregate totals remain in PROGRESS.md. Worked solo on the preclaimed branch;
+no network, make, full build or direct git mutations. Each function was committed
+separately through build/commit.sh.
+
+- **08140CC4 matched**, Player_UpdateLockedMovement (636 bytes). Relative
+  Player_UpdateModifier08Drift at 0823BE50 provides most of the body and its
+  local typed layout. Adapted the status predicate and sound call; added the
+  mode-three/phase-five/contactMagnitude path, which starts movement opposite
+  facing. Bytes 48C-48F hold active/played/timer/direction; signed halfwords
+  490/494 hold ten-unit directional components. Three inline signed scaling
+  expansions share the sine table; preserving its pointer/result lifetime
+  reproduces the register allocation. No hints needed.
+- **08140F40 matched**, Player_GetForceDirection (632 bytes), improving the
+  inherited 99.7% draft. An empty compiler barrier on the masked signed angle
+  retains the original arithmetic shift; assigning offset zero after that shift
+  restores instruction order. depin retains angle r0, direction r4 and the empty
+  barrier (3 of 3 hints). Compares terrain heights in a direction-dependent
+  neighbor, with additional within-cell X/Z corner selection for even directions.
+- **08140AC8 matched**, Player_SelectLockedTurnDirection (508 bytes).
+  Actor_ProbeDiagonalTurnDir at 0823BC54 ports exactly after replacing its
+  probe callee with 081409BC. Called by the locked-movement updater. Probes
+  three offset positions for cardinal direction values 0/2/4/6 and selects
+  the adjacent odd direction; unsupported input returns -1. No hints needed.
+- **0813FFE4 matched**, Player_InitBodyFromScript (444 bytes). Uses packed
+  signed sixteen-bit vector fields, reads script keyword p or saved player
+  position, samples terrain height including slope adjustment, initializes
+  SceneBody, display, movement probe, offset and contact registration. Combines
+  the position sampler from 08064338 with the setup sequence of 0823B0D4.
+  A switch on modes 0/1/2/6 reproduces the apparently redundant signed lower
+  bound check; an ordinary range predicate folds it into an unsigned test.
+  Separate early/late body locals reproduce the r4-to-r5 copy once that switch
+  is present. Explicitly returns the defined contact-registration result while
+  recording body IDs. Correcting the SceneBody_Init entry argument from u16
+  to full width removes two unwanted truncation instructions. depin removes
+  both temporary body pins, leaving no concessions.
+- **0814159C matched**, Player_UpdateCameraOffset (412 bytes), improving the
+  inherited 83.7% draft. Split input history from its quantized direction;
+  use a signed full-width local for the narrowed atan2 result, separate the
+  facing mask from direction computation, and preserve action-mode lifetime.
+  depin reduces ten exploratory hints to three: history pointer r2, an empty
+  barrier between input copying and adding one, and action-mode r0. These
+  retain the original copy/add pair, load allocation, mask scheduling and
+  derived field-address literals. Both angle sums remain readable signed C.
+- **08141C40 drafted 99.9%**, Player_EmitMovementEffects (576 bytes).
+  One resolved branch byte differs at 08141C64: ROM null-player branch skips
+  directly to 08141CFC, while C branches to the redundant null test at
+  08141C90. Realigned instruction comparison reports zero differences but
+  byte comparison correctly rejects the candidate. Explicit goto/nested
+  guards, combined suppression inline, and pointer barriers either preserve
+  this difference or worsen register allocation and pool placement. Retained
+  the strongest original body and existing position r4 pin. depin on the
+  unguarded scratch source skips because its base is not exact; it provides
+  no hint-minimality claim. Recorded with --nonmatching --record and verified
+  the default assembly fallback separately. The comment identifies the residue.
+
+All five exact functions were formatted with build/venv/bin/clang-format and
+passed check.py with explicit reviewed body/pool extents (444, 508, 636, 632,
+412 bytes respectively in address order). No handwritten instruction bodies.
+Combined ROM validation and alias promotion remain for batch integration.
+Shared docs/index and progress totals were not regenerated by this worker.
