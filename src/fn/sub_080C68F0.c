@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Golem_UpdateChargeStop                                                                     \
+    sub_080C68F0 // confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
 // fuzzy: 81.6%
 // Remaining differences: animation selector register allocation and flag-clear order.
@@ -123,5 +125,5 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeStop);
+INCLUDE_ASM("asm/nonmatching", sub_080C68F0);
 #endif
