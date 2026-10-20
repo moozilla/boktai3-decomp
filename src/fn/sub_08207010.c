@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#define VC_FIRST "r1"
-#define VC_TEMP "r2"
-#define VC_MASK "r4"
+#define VC_FIRST    "r1"
+#define VC_TEMP     "r2"
+#define VC_MASK     "r4"
 #define VC_DURATION "r3"
-#define VC_WEIGHT "r1"
+#define VC_WEIGHT   "r1"
 #include "vulcan_cannon_worker.h"
 #define VulcanCannon_UpdateFiringBurst sub_08207010
 s32 Mod(s32, s32);
@@ -14,7 +14,8 @@ s32 VulcanCannon_UpdateFiringBurst(struct VulcanCannon *p)
 {
     if (Mod(p->timer, 10) == 0 && p->timer <= 30) {
         Anim_RestartSequence(&p->sequence, p->resource, 0x12, (u8)p->facing, 8);
-        if (Mod(p->shotCount, 3) == 0) Sound_PlaySong(0x51d);
+        if (Mod(p->shotCount, 3) == 0)
+            Sound_PlaySong(0x51d);
         VulcanCannon_FireProjectile(p);
         p->shotCount++;
     }
