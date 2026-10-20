@@ -1,0 +1,100 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#include "scene_actor_reaction.h"
+struct VornApproachContext {
+    u8 unknown0[0x6C8];
+    u32 minimumDistance, maximumDistance;
+    u8 unknown6D0[4];
+    u16 flags;
+};
+/* Vorn_UpdateApproachRange: tentative */
+u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
+s32 Callback_InvokeActor(void *, void *);
+static inline void ClearFlags(u32 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline void ClearFlags16(u16 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+{
+    register u32 offset asm("r0") = 0x2B2;
+    u8 *field;
+    asm("" : "+r"(offset));
+    field = (u8 *)actor + offset;
+    if (*field) {
+        *field = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
+{
+    void *route = *(void **)(group + 0x1FC);
+    struct ContactPosition *position = &actor->position;
+    s32 result;
+    register struct ContactPosition *destination asm("r4");
+    u32 base = actor->fieldDC;
+    asm("" : "+r"(base));
+    destination = (void *)(base + 12);
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
+        ClearFlags16(&actor->flags2D4, ~0x200);
+        return 0;
+    } else {
+        result = Terrain_ApplyBlocked(route, position, destination);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&actor->motion, 8);
+            return 1;
+        } else {
+            ClearFlags16(&actor->flags2D4, ~0x200);
+            return 0;
+        }
+    }
+}
+#ifdef NONMATCHING
+// fuzzy: 91.9%
+void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
+{
+    struct VornApproachContext *context = actor->context;
+    u8 *group = (void *)&actor->group;
+    if (SceneActorReaction_TakePrepared(actor))
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+    else if (actor->distanceF0 > context->maximumDistance ||
+             actor->distanceF0 < context->minimumDistance) {
+        Vorn_SelectRetreatRoute((void *)actor, 1);
+    } else if (SceneActor_IsFacingNearbyTarget(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        if (!TryMove(actor, group))
+            Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        else {
+            register u32 next asm("r1");
+            register u8 zero asm("r3");
+            register u32 zero2 asm("r4");
+            u16 *flags = &context->flags;
+            u32 mask = ~0x40;
+            mask &= *flags;
+            zero = 0;
+            zero2 = 0;
+            *flags = mask;
+            next = 21;
+            {
+                register u32 offset asm("r2") = 0x2A8;
+                *((u8 *)actor + offset) = zero;
+                offset += 1;
+                *((u8 *)actor + offset) = zero;
+                offset += 1;
+                *((u8 *)actor + offset) = next;
+                actor->counter2AC = zero2;
+                offset += 7;
+                *((u8 *)actor + offset) = 1;
+            }
+        }
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateApproachRange);
+#endif
