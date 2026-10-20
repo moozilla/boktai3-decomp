@@ -1,3 +1,5 @@
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_UpdateChargeStop sub_080C68F0
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
@@ -26,7 +28,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
         {
             u8 directionVariant;
             u8 mirror;
-            u8 *mirrorPointer;
+            register u8 *mirrorPointer asm("r2");
             register u8 *variantPointer asm("r4");
             u32 flags;
             u32 variant;
@@ -39,6 +41,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             {
                 u8 *mirrorAddress = &mirror;
                 s32 quadrant = ((((s32)actor->direction) + 0x60) >> 6) & 3;
+                asm("" : "+r"(quadrant), "+r"(mirrorAddress));
                 mirrorPointer = mirrorAddress;
                 if (quadrant > 1) {
                     *mirrorPointer = 1;
@@ -50,7 +53,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             }
             variantReload = &directionVariant;
             {
-                u32 mirrorValue = *mirrorPointer;
+                register u32 mirrorValue asm("r2") = *mirrorPointer;
                 u32 flagMask = 4;
                 selection = 7;
                 variant = *variantReload;
@@ -69,7 +72,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
                 animation->selection = selection;
                 drawable = animation->drawable;
                 Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
-                                 (u8)variant, (u8)flags);
+                                 (u8)variant, flags);
                 restart = &animation->restart;
             } else {
                 struct SceneActorAnimationTile *tile =
