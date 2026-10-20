@@ -2358,3 +2358,93 @@ load and reproduces the original polar setup. All four hinted units were
 run through depin.py; all six sources were clang-formatted and passed their
 final tools/check.py checks. Combined ROM validation and name promotion are
 left to the integrator, as required by the worker assignment.
+
+## Task 08113738 — 2026-10-20
+
+Tags: #matching #native-effect #particles #register-pinning
+
+Worked offline on the already-claimed `cloud/08113738` branch. Each function
+was checked using `build/venv/bin/python tools/check.py` and queued in its own
+commit through `build/commit.sh`. No full builds, network operations or shared
+generated-file changes. All six assigned functions now have C: three exact
+matches and three guarded NONMATCHING drafts. Combined ROM validation and
+name promotion remain the integrator's work.
+
+- **08113F64 — matched, NativeEffect_UpdateTurningTrail (tentative).**
+  Type-three profile update. Clears the entry flag, integrates fixed-point
+  position and changes polar velocity over timer ranges 0–5, 6–19 and 20+.
+  During the middle range the angle changes by twice the signed direction,
+  and resets at tick 19; after tick 19 horizontal speed increases every four
+  ticks. Emits randomized particles on odd ticks through tick 19. Projects
+  the sprite, steps animation, updates the embedded collider, and switches
+  to SpriteEffect_RemoveWithBurst on ground contact or lifetime expiry.
+  Exact extent: 1036 bytes. Register-pinned category; depin retained 11 hints.
+  The final six differences were position/height spill slots. A u16 angle
+  parameter plus an explicit s16 angle local inside the inline polar helper
+  fixed PRE ordering without adding instructions; actual callers supply the
+  byte angle at +CA.
+- **08113BBC — drafted 99.6%, NativeEffect_UpdateRotatingFlight (tentative).**
+  Type-one update shares the same motion/animation/collider layout. Uses polar
+  speed three before tick 20, then four; rotates every fourth tick initially,
+  every second tick through tick 19, and every tick through tick 41. Ground
+  test uses margin eight and schedules NativeEffect_DestroyEntry. Full-size
+  checker leaves two register-only instruction differences: the final height
+  address reload uses r3 instead of r0. Ten focused argument/pointer hint
+  variants failed to improve it; preserving the simpler draft. The animation
+  mask temporary must be r3 here, unlike the other family members.
+- **08114928 — drafted 83.9%, NativeEffect_CreateFromProfile (tentative).**
+  Confirms the 16-slot native-effect manager layout: entries begin at +18,
+  stride D8, and the manager frame counter is +D98. Input profile byte +1
+  selects five sprite initializers and corresponding motion states. Profile
+  +2 supplies lifetime, +6 collider damage and +A the threshold selection.
+  Copies two four-word vectors, sets height and sprite/activity fields,
+  combines group with the low manager-frame byte, and returns the chosen
+  index or -1. Types zero/two select 08113738; one selects 08113BBC; three
+  selects 08113F64; four calls EffectActor_BeginHorizontalMotion, which selects
+  08113920. Remaining 53 realigned differing instructions (23 with registers
+  ignored): argument/spill allocation, group-id expression ordering, and
+  initialization/call order. Narrowing the stored group id directly causes
+  agbcc to select an undesired byte load; the retained explicit helper keeps
+  the original word load but hoists an extra manager-counter address.
+- **08113920 — drafted 90.5%, NativeEffect_UpdateAcceleratingTrail (tentative).**
+  Called by EffectActor_BeginHorizontalMotion. Integrates position, projects
+  and animates the sprite, updates the collider, then accelerates X velocity
+  by direction * 512. Emits odd-tick particles through tick nine with each
+  offset `(random & 7) - 3`. Ground test margin zero or lifetime expiry selects
+  SpriteEffect_RemoveWithBurst. Remaining 32 realigned differing instructions,
+  two with registers ignored: particle-offset operand order plus position and
+  sprite-position spill order. Factoring the random load into a helper helped
+  08113F64 but worsened this function; restored the best direct-load form.
+- **08113738 — matched, NativeEffect_UpdateLinearFlight (tentative).**
+  Shared type-zero/type-two fixed-velocity flight update; entry clears sprite
+  bit zero, then integrates, projects, animates, places and inserts its collider.
+  Ground margin eight or lifetime expiry selects NativeEffect_DestroyEntry.
+  Exact extent: 488 bytes. Register-pinned category; depin retained 11 hints.
+  The first packed flip comparison needs its result in r2 rather than the
+  shared ActorAttachment_StepSprite helper's r1.
+- **08114CB0 — matched, NativeParticle_UpdateAnimatedMotion.**
+  Updates the small particle position using signed halfword velocities, copies
+  its packed coordinates into a 40-byte sprite selected by signed index +13,
+  and advances the parallel sequence at manager +520. Computes sprite tile
+  from frame, width/height in tile units and resource tile base. Animation end
+  sets state +12 to two; increments timer +14. Unlike the larger sprite
+  stepper, it neither stores frameWeight nor clamps zero duration to one.
+  Exact extent: 340 bytes. Register-pinned category; depin reduced 16 hints to
+  13. Keeping the tile dimensions' product separate from the frame product
+  fixed multiplication order; tail operand hints fixed pointer scratch regs.
+
+Useful family technique: project through an inline output-pointer helper,
+then copy the eight-byte packed result into sprite.position. Directly writing
+fields of a local packed struct caused substantially different allocation;
+the output-pointer form immediately brought the large updates to within a few
+register differences. Existing actor_attachment_sprite_playback.h provided
+the observed volatile packed-command decoder, specialized locally for each
+function's register ties. No instruction bodies were handwritten.
+
+All committed C was clang-formatted. Exact files passed final byte checks;
+draft scores were recorded with `--nonmatching --record` against full extents.
+Run depin on the unguarded candidate when inspecting a draft: depin has no
+NONMATCHING option, so running it on a guarded source checks only its assembly
+fallback and can incorrectly discard every hint. Guarded sources were restored
+and their recorded C scores rechecked; unguarded draft candidates correctly
+report that depin cannot minimize a non-exact base.
