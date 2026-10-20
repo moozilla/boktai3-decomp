@@ -36,17 +36,26 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         p->power = 30;
         p->speed = 24;
     }
-    if (Script_SeekToKeyword('R')) p->range = Script_GetValue();
-    else p->range = 1024;
+    if (Script_SeekToKeyword('R'))
+        p->range = Script_GetValue();
+    else
+        p->range = 1024;
     if (Script_SeekToKeyword('l')) {
         s32 hp = Script_GetValue();
         p->maxHp = hp;
         p->hp = hp;
-        if ((s16)hp < 0) p->inert = 1;
-    } else { p->maxHp = 120; p->hp = 120; }
-    if (Script_SeekToKeyword('d')) p->terrainEnabled = Script_GetValue();
-    if (Script_SeekToKeyword('i')) p->turnDelay = Script_GetValue();
-    else p->turnDelay = 60;
+        if ((s16)hp < 0)
+            p->inert = 1;
+    } else {
+        p->maxHp = 120;
+        p->hp = 120;
+    }
+    if (Script_SeekToKeyword('d'))
+        p->terrainEnabled = Script_GetValue();
+    if (Script_SeekToKeyword('i'))
+        p->turnDelay = Script_GetValue();
+    else
+        p->turnDelay = 60;
     if (Script_SeekToKeyword('h')) {
         p->facing = Script_GetValue();
         p->allowTurn = Script_GetValue();
@@ -54,24 +63,43 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
             u32 facing = (u8)(p->facing = (p->facing - 1) / 2);
             asm("" : "+r"(facing));
             switch (facing) {
-            case 0: case 1: p->facing = 0; break;
-            case 2: case 3: default: p->facing = 1; break;
+                case 0:
+                case 1:
+                    p->facing = 0;
+                    break;
+                case 2:
+                case 3:
+                default:
+                    p->facing = 1;
+                    break;
             }
         }
-    } else { p->facing = 1; p->allowTurn = 1; }
-    if (Script_SeekToKeyword('r')) p->delayScript = Script_GetValueSafe();
-    if (Script_SeekToKeyword('I')) p->burstDelay = Script_GetValue();
-    else p->burstDelay = 120;
-    if (Script_SeekToKeyword('n')) p->burstCount = Script_GetValue();
-    else p->burstCount = 3;
-    if (Script_SeekToKeyword('S')) p->unknown14c = Script_GetValue();
+    } else {
+        p->facing = 1;
+        p->allowTurn = 1;
+    }
+    if (Script_SeekToKeyword('r'))
+        p->delayScript = Script_GetValueSafe();
+    if (Script_SeekToKeyword('I'))
+        p->burstDelay = Script_GetValue();
+    else
+        p->burstDelay = 120;
+    if (Script_SeekToKeyword('n'))
+        p->burstCount = Script_GetValue();
+    else
+        p->burstCount = 3;
+    if (Script_SeekToKeyword('S'))
+        p->unknown14c = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
         p->bodyFlags = Script_GetValue();
         p->bodyPower = Script_GetValue();
     }
-    if (Script_SeekToKeyword('g')) p->hudStyle = Script_GetValue();
-    else p->hudStyle = 2;
-    if (Script_SeekToKeyword('D')) p->deathScript = Script_GetValue();
+    if (Script_SeekToKeyword('g'))
+        p->hudStyle = Script_GetValue();
+    else
+        p->hudStyle = 2;
+    if (Script_SeekToKeyword('D'))
+        p->deathScript = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
         p->args[0] = Script_GetValue();
         p->args[1] = Script_GetValue();
@@ -83,9 +111,12 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     }
     if (Script_SeekToKeyword('V')) {
         p->hudDuration = Script_GetValue();
-        if (p->hudDuration > 99) p->hudDuration = 99;
-        if (p->hudDuration <= 0) p->hudDuration = 1;
-    } else p->hudDuration = 0;
+        if (p->hudDuration > 99)
+            p->hudDuration = 99;
+        if (p->hudDuration <= 0)
+            p->hudDuration = 1;
+    } else
+        p->hudDuration = 0;
     p->owner = owner;
     AnimData_Load(p->graphics, 0x7e7d);
     Sprite_Init(&p->display.sprite, p->graphics, 1);
@@ -101,22 +132,27 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         Anim_SetSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
     }
     VulcanCannon_StepAnimation(p);
-    if (!p->inert) VulcanCannon_InitCollider(p);
+    if (!p->inert)
+        VulcanCannon_InitCollider(p);
     if (p->terrainEnabled && !p->inert) {
         struct SceneVec *position = &p->display.spatial.position;
         s32 x = position->x >> 8;
         s32 z = position->z >> 8;
         s32 index;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC) index = 0;
-        else index = gUnk_030052F4->rows[z] + x;
-        TerrainModifiers_RegisterCell(p->terrain, index, 0, p->display.spatial.position.y >> 8, 0, 1);
+        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            index = 0;
+        else
+            index = gUnk_030052F4->rows[z] + x;
+        TerrainModifiers_RegisterCell(p->terrain, index, 0, p->display.spatial.position.y >> 8, 0,
+                                      1);
     }
     SceneBody_Init(p->body, p->owner, &p->display.spatial.position, 0, 4, p);
     if (p->unknown14c) {
         SceneBody_SetSprite(p->body, &p->display.sprite);
         TerrainOverlay_QueueAddActor(p->body);
     }
-    if (p->delayScript) VulcanCannon_ReadScriptValueList(p, p->delayScript);
+    if (p->delayScript)
+        VulcanCannon_ReadScriptValueList(p, p->delayScript);
     return 0;
 }
 
