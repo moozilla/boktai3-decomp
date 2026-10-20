@@ -1,4 +1,3 @@
-#define NamedObject_UpdateContactTrigger sub_081015EC
 #include "named_object.h"
 extern u8 *gUnk_02000580[];
 static inline u8 HasFlag(u32 mask, s16 *flags)

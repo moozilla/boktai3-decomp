@@ -6,11 +6,9 @@ s32 sub_08238280(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_SaveActionIndex(struct Player *);
 s32 Player_UpdateFacingFromInputHistory(struct Player *);
-void sub_0823DF20(struct Player *);
-s32 sub_0823E250(struct Player *);
+void Player_BeginSlashAction(struct Player *);
+s32 Player_UpdateSpinAction(struct Player *);
 void sub_08238CE0(struct Player *, u32, void *, u32);
-
-#define Player_UpdateSlashAction sub_0823E494
 
 void Player_UpdateSlashAction(struct Player *p)
 {
@@ -26,7 +24,7 @@ void Player_UpdateSlashAction(struct Player *p)
             Player_UpdateFacingFromInputHistory(p);
             sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0x19), 0x40);
             if (p->tetherFrame > 6 && !(p->inputKeys[0] & 2)) {
-                sub_0823DF20(p);
+                Player_BeginSlashAction(p);
                 Player_SetTetherMode(p, 3, 4);
             } else
                 p->tetherFrame++;
@@ -50,7 +48,7 @@ void Player_UpdateSlashAction(struct Player *p)
                         sub_08238CE0(p, p->facing, &p->position, 2);
                 }
             }
-            if (sub_0823E250(p))
+            if (Player_UpdateSpinAction(p))
                 Player_SetTetherMode(p, 3, 5);
             break;
         }

@@ -1,4 +1,3 @@
-#define NamedObject_UpdateRouteFollower sub_081018DC
 #include "named_object.h"
 static inline u8 HasFlag(u32 mask, s16 *flags)
 {

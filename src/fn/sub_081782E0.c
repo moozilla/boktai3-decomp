@@ -8,7 +8,7 @@ void sub_08168A0C(struct SceneHudState *);
 void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
 void sub_08168850(struct SceneHudState *);
 void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *);
-void sub_08169BE0(struct SceneHudState *);
+void PauseMenu_RefreshStatusPanel(struct SceneHudState *);
 void Hud_SetElementGroupFlags(struct SceneHudState *);
 void SceneHud_RefreshWidgetVisibility(struct SceneHudState *);
 void Hud_RefreshActivePanel(struct SceneHudState *);
@@ -24,7 +24,7 @@ void SceneHud_RefreshControls(void)
             SceneHud_UpdateSecondaryWidgets(gSceneHud);
             if (gUnk_030053F4 & 0x1000) {
                 if (!gSceneHud->controlMode)
-                    sub_08169BE0(gSceneHud);
+                    PauseMenu_RefreshStatusPanel(gSceneHud);
                 Hud_SetElementGroupFlags(gSceneHud);
             } else if (!gSceneHud->controlMode) {
                 SceneHud_RefreshWidgetVisibility(gSceneHud);

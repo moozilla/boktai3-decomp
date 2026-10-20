@@ -6,8 +6,6 @@ extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_08239098(void *, void *, void *, void *);
 
-#define Player_EmitScatterEffect sub_0823E810
-
 struct Vec16 {
     u32 x : 16, y : 16, z : 16;
 };

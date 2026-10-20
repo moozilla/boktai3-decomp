@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
 
-#define PauseMenu_RefreshPriceDigits sub_08169F44
 s32 Div(s32, s32);
 
 /* SceneHudState viewed as one widget array from 0x1420 (indices 75 and 76 are valueWidgets). */

@@ -1,4 +1,3 @@
-#define NamedObject_TryCapturePlayer sub_08101E6C
 #include "named_object.h"
 #include "player.h"
 extern const struct SceneVec gUnk_086064B4;

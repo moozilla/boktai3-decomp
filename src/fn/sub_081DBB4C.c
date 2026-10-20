@@ -1,6 +1,5 @@
 #include "global.h"
 /* ScreenParams2E8_UpdateScreen: per-frame state machine (blinking prompt, solar baseline capture and save header write, result message, fade out, return to script) */
-#define ScreenParams2E8_UpdateScreen sub_081DBB4C
 
 struct SaveScreenAnim {
     u32 unk0;

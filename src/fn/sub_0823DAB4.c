@@ -10,8 +10,6 @@ void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void sub_0823D97C(struct Player *, struct SceneVec *, s32, u32, s32);
 
-#define Player_UpdateSweepAction sub_0823DAB4
-
 struct SweepCtx {
     u8 unk0[0x48];
     u8 collider[0x54];
@@ -72,5 +70,5 @@ s32 Player_UpdateSweepAction(struct Player *p)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823DAB4);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSweepAction);
 #endif

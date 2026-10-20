@@ -10,7 +10,7 @@ extern u16 gUnk_03005260[];
 extern u32 gUnk_02000340[];
 extern u8 gUnk_03005430[];
 void Sound_PlaySong(s32);
-void sub_081DEA60(void *);
+void AnimPanel_HandleClockInput(void *);
 void SunClock_SetDateTime(s32, s32, s32, s32, s32, s32, s32);
 void Time_CalculateSunriseSunset(s32, s32, s32);
 void Menu_StartFadeOut(s32);
@@ -43,7 +43,7 @@ void Time_UpdateDateMenu(struct DateMenu *p)
                     p->selection++;
                 Sound_PlaySong(0xDC);
             }
-            sub_081DEA60(p);
+            AnimPanel_HandleClockInput(p);
             if (gUnk_03005260[1] & 8) {
                 Sound_PlaySong(0xDD);
                 SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);

@@ -1,4 +1,3 @@
-#define NamedObject_UpdateEntryTrigger sub_08101FF8
 #include "named_object.h"
 #include "player.h"
 extern const struct SceneVec gUnk_086064B4;

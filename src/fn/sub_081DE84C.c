@@ -1,6 +1,5 @@
 #include "global.h"
 /* AnimPanel_UpdateDigits: redraws the year/month/day/hour/minute digit animations whose value changed and clamps the day to the month length */
-#define AnimPanel_UpdateDigits sub_081DE84C
 
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
