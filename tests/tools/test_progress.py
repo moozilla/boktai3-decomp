@@ -164,12 +164,41 @@ class AreaCategoryTest(unittest.TestCase):
     def test_areas_add_categories_without_changing_totals(self):
         areas = progress.load_areas()
         report = progress.make_report([("a", 0x08000000), ("b", 0x08086000)],
-                                      {"a": 4, "b": 4}, {"b"}, areas=areas)
+                                      {"a": 4, "b": 4}, {"b"}, areas=areas,
+                                      categories=progress.load_categories())
         cats = {c["id"]: c["measures"] for c in report["categories"]}
         self.assertEqual(cats["intentional_asm"]["total_code"], "4")
         self.assertEqual(cats["monsters"]["matched_code"], "4")
         self.assertEqual(cats["decompilable"]["total_code"], "4")
         self.assertEqual(report["measures"]["total_code"], "8")
+        self.assertIn("Monsters/08086000", [u["name"] for u in report["units"]])
+
+    def test_every_game_function_has_a_unit_and_category(self):
+        funcs, sizes = progress.load_functions()
+        done = progress.collect_done(funcs, Path(progress.ROOT) / "src")
+        pinned = progress.collect_pinned(funcs, Path(progress.ROOT) / "src") & done
+        categories = progress.load_categories()
+        report = progress.make_report(
+            funcs, sizes, done, progress.load_libraries(funcs, sizes), pinned,
+            progress.load_groups(funcs, sizes, progress.SUBSYSTEMS, "game"),
+            areas=progress.load_areas(), asm_ranges=progress.load_asm_ranges(), categories=categories)
+        labels = [label for label, _ in categories.values()]
+        for unit in report["units"]:
+            self.assertIn(unit["name"].split("/", 1)[0], labels)
+            if not unit["name"].endswith(progress.ASM_SUFFIX):
+                self.assertGreater(len(unit["functions"]), 1, unit["name"])
+            top = [c for c in unit["metadata"]["progress_categories"] if c in categories]
+            self.assertLessEqual(len(top), 1, unit["name"])
+        self.assertNotIn("other", {c["id"] for c in report["categories"]},
+                         "unclassified units: add a rule to symbols/progress_categories.csv")
+        # Units are listed category by category, so each category is one region of the treemap.
+        seen = []
+        for unit in report["units"]:
+            label = unit["name"].split("/", 1)[0]
+            if not seen or seen[-1] != label:
+                self.assertNotIn(label, seen)
+                seen.append(label)
+        self.assertEqual(sum(int(u["measures"]["total_code"]) for u in report["units"]), sum(sizes.values()))
 
     def test_library_assembly_ranges_leave_libraries_category(self):
         funcs = [("a", 0x08100104), ("b", 0x08100108), ("c", 0x0810010C)]

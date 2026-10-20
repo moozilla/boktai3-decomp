@@ -19,7 +19,7 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 |---|---|
 | Build | `make` rebuilds the ROM byte-identical (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`, `build/boktai3.gba: OK`) |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data |
-| Report | grouped into 197 subsystem ranges ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
+| Report | every function in one of ~490 subsystem units under 11 game categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent work, newest first (details in [history](history/README.md)):
 
