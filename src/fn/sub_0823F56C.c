@@ -1,147 +1,132 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 97.0%
-// draft adapted from sub_0823F148
+#include "player.h"
+#define Player_UpdateChargedDashAttack sub_0823F56C
+// confidence=low: held charge followed by decaying reverse motion suggests a charged dash.
+#define B(o) (*(u8 *)(p + (o)))
+#define H(o) (*(u16 *)(p + (o)))
+#define W(o) (*(u32 *)(p + (o)))
+struct AttackVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
 extern const s16 gUnk_086149C4[];
+void Player_SetTetherMode(void *, u32, u32);
+u32 ActorVariant_GetTableValue(u32, u32);
+u32 sub_08238280(void *, u32, u32);
+u32 Player_UpdateFacingFromInputHistory(void *);
+
+void Player_PlayLocalSong(u32, u32);
+void Player_StopLocalSong(u32, u32);
+u32 Player_GetConfiguredActionPower(void *);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
+
+void sub_08238300(void *, u32);
+void sub_08238238(void *);
+void DirectionalEffect_PlaceSprite(void *, u32, void *);
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
-s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(u8 *, s32, s32);
-void Player_SetTetherMode(u8 *, s32, s32);
-void Player_PlayLocalSong(s32 a, u32 b);
-s32 Player_UpdateFacingFromInputHistory(u8 *p);
-
-struct BurstA {
-    s32 a;
-    u32 b : 16;
-    u32 c : 16;
-};
-struct BurstB {
-    u32 a : 16;
-    u32 b : 16;
-    u32 c : 16;
-    u32 d : 16;
-};
-
-static inline int scale(int n)
+static inline s32 scale(s32 v)
 {
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
 }
-
-void Player_UpdateTetherChargeB(u8 *p)
+void Player_UpdateChargedDashAttack(u8 *p)
 {
-    struct BurstA ba;
-    struct BurstB bb;
-    u16 *t;
-    u16 *r;
-    s32 a, id;
-
-    switch (*(u8 *)(p + 0x458)) {
+    switch (B(0x458)) {
         case 0:
-            if (sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x26), 0x40))
+            if (sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x27), 0x40);
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) <= 6)
-                break;
-            *(u8 *)(p + 0xC0F) = 0;
-            *(u16 *)(p + 0x4D2) = 0;
-            if (*(u16 *)(p + 0x428) <= 2) {
-                a = *(s32 *)(p + 0x18);
-                id = 0xD5;
-                goto fin;
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            if (++H(0x45A) > 6) {
+                B(0xC0F) = 0;
+                H(0x4D2) = 0;
+                if (H(0x428) <= 2) {
+                    Player_PlayLocalSong(W(0x18), 0xD5);
+                    Player_SetTetherMode(p, 3, 5);
+                } else if (**(u16 **)(p + 0x348) & 2)
+                    Player_SetTetherMode(p, 3, 4);
+                else
+                    goto release;
             }
-            if (**(u16 **)(p + 0x348) & 2) {
-                Player_SetTetherMode(p, 3, 4);
-                break;
-            }
-            goto l340;
+            break;
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x27), 0x40);
-            t = (u16 *)(p + 0x45A);
-            if (*t == 6)
-                Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F4);
-            if (!(**(u16 **)(p + 0x348) & 2))
-                goto l340;
-            (*t)++;
-            if (*t <= 0x3B)
-                break;
-            *(u8 *)(p + 0xC0F) = 1;
-            *(u16 *)(p + 0x4D2) = 0x1E;
-            *(u16 *)(p + 0xAD6) = 0x16E;
-            *(u16 *)(p + 0xAD8) = 0x24;
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F5);
-            Player_SetTetherMode(p, 3, 4);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            if (H(0x45A) == 6)
+                Player_PlayLocalSong(W(0x18), 0x1F4);
+            if (!(**(u16 **)(p + 0x348) & 2)) {
+                Player_PlayLocalSong(W(0x18), 0x1F6);
+                Player_SetTetherMode(p, 3, 5);
+            } else if (++H(0x45A) > 59) {
+                B(0xC0F) = 1;
+                H(0x4D2) = 30;
+                ((struct Player *)p)->actionEighteenParameter = 0x16E;
+                ((struct Player *)p)->actionEighteenDuration = 0x24;
+                Player_PlayLocalSong(W(0x18), 0x1F5);
+                Player_SetTetherMode(p, 3, 4);
+            }
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x27), 0x40);
-            if (**(u16 **)(p + 0x348) & 2)
-                break;
-        l340:
-            a = *(s32 *)(p + 0x18);
-            id = 0x1F6;
-        fin:
-            Player_PlayLocalSong(a, id);
-            Player_SetTetherMode(p, 3, 5);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
+            if (!(**(u16 **)(p + 0x348) & 2)) {
+            release:
+                Player_PlayLocalSong(W(0x18), 0x1F6);
+                Player_SetTetherMode(p, 3, 5);
+            }
             break;
-        case 5: {
-            s32 ang, n;
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x28), 0x40);
+        case 5:
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x28), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            r = (u16 *)(p + 0x4D2);
-            if (*r != 0) {
-                if (*r > 5) {
-                    ba.a = 0;
-                    ba.b = 0;
-                    bb.a = 0x20;
-                    bb.b = 0x20;
-                    bb.c = 0x20;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &ba, &bb, 1, 3, 4);
+                B(0xBF6) = 1;
+            if (H(0x4D2)) {
+                s32 angle, speed;
+                if (H(0x4D2) > 5) {
+                    struct AttackVec offset, size;
+                    offset.x = 0;
+                    offset.y = 0;
+                    offset.z = 0;
+                    size.x = 32;
+                    size.y = 32;
+                    size.z = 32;
+                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &offset, &size, 1, 3, 4);
                 }
-                ang = ((*(u8 *)(p + 0x3A4) + 5) & 7) << 5;
-                n = *r;
-                *(s16 *)(p + 0x38) = -scale(gUnk_086149C4[(ang + 0x40) & 0xFF] * n);
-                *(s16 *)(p + 0x3C) = -scale(*(u16 *)(p + 0x4D2) * gUnk_086149C4[ang]);
-                *(u16 *)(p + 0x4D2) = (*(u16 *)(p + 0x4D2) * 3) >> 2;
-            } else {
-                (*(u16 *)(p + 0x45A))++;
-                if (*(u16 *)(p + 0x45A) > 4)
-                    Player_SetTetherMode(p, 3, 6);
-            }
+                angle = ((B(0x3A4) + 5) & 7) << 5;
+                speed = H(0x4D2);
+                H(0x38) = -scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+                {
+                    s32 zSpeed = H(0x4D2);
+                    H(0x3C) = -scale(gUnk_086149C4[angle] * zSpeed);
+                }
+                H(0x4D2) = (H(0x4D2) * 3) >> 2;
+            } else if (++H(0x45A) > 4)
+                Player_SetTetherMode(p, 3, 6);
             break;
-        }
-        case 6:
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x27), 0x40);
+        case 6: {
+            register u32 pending asm("r0");
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            if (*(u8 *)(p + 0xBF6)) {
-                *(u8 *)(p + 0xBF6) = 0;
-                *(u8 *)(p + 0x458) = 1;
-                break;
-            }
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 0xE) {
-                *(u8 *)(p + 0xBF6) = 0;
+                B(0xBF6) = 1;
+            pending = B(0xBF6);
+            if (pending) {
+                B(0xBF6) = 0;
+                B(0x458) = 1;
+            } else if (++H(0x45A) > 14) {
+                B(0xBF6) = 0;
                 Player_SetTetherMode(p, 3, 7);
             }
             break;
+        }
         case 7:
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x26), 0x40);
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 4)
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40);
+            if (++H(0x45A) > 4)
                 Player_SetTetherMode(p, 0, 0);
             break;
-        default:
-            break;
     }
-    *(u8 *)(p + 0xAC9) = 4;
+    B(0xAC9) = 4;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherChargeB);
-#endif

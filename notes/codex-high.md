@@ -1374,3 +1374,184 @@ Both drafts have NONMATCHING guards, raw sub-address INCLUDE_ASM alternatives,
 recorded reviewed-extent scores, and byte-identical default assembly checks.
 Source review, formatting and `git diff --check` passed. Combined ROM
 validation remains with the batch integrator.
+## Task 081C29A4 (2026-10-20)
+
+Tags: #matching #scene-npc #sparkle-emitter #register-pinning
+
+Branch `cloud/081C29A4`, solo and offline. Exact recovery is 76.98% of this
+assignment's reviewed function extent: **+0.166 percentage points of project
+code** (4,000 bytes). The register-pinned portion contributes +0.122 points
+(2,936 bytes); the other two matches contribute +0.044 points (1,064 bytes).
+The draft is excluded from exact progress. Project totals were not regenerated.
+
+- **081CD484 matched**, `SceneNpc_DispatchCutsceneCommands`, 2,448 bytes.
+  The caller `SceneNpc_UpdateCommands` runs movement/animation/effects first,
+  then this dispatcher. It traverses receiver +0x168's messages for the current
+  scene-message phase, sets pending triggers, and handles command kinds through
+  108. Most cases reset the command state and timer; larger cases set a target
+  and speed, spawn a trigger/drop or SunOrb target, or configure palette fading.
+  Struct fields and repeated inline helpers brought structural differences to
+  zero. `(npc->angle + 128) & 255`, rather than an explicit u8 cast, preserved
+  the observed reload and mask sequence in the reverse-facing cases. Motion
+  must be addressed through its +0x5C descriptor for the +0x34/+0x36/+0x38 stores.
+  Initial facing needed a constrained destination and live zero. Depinning
+  reduced 14 hints to four. The earlier 99.3% draft commit is superseded by
+  the exact match commit. The existing symbols entry is named
+  `SceneNpc_DispatchCommands_081CD484`; the new file-local alias intentionally
+  supplies the address-free name for integration's name-promotion pass.
+- **081CF62C matched**, `SceneNpc_UpdateDescendingDash`, 544 bytes.
+  Name is tentative, as marked in the source. On entry it selects animation 9,
+  raises Y by 160, and initializes a height offset of 300. Phases select
+  animations 10, 11 and 12, compute polar velocity, quarter off horizontal
+  speed each update, converge height toward terrain, play song 680 on landing,
+  and mark completion after the final phase. Reusing the terrain cell-index
+  and slope-height helpers made the first successfully compiled candidate
+  exact. A separate diagnostic replacing the shared height helper's register
+  declaration with ordinary C also matched all 544 bytes; no register hint is
+  required for this function.
+- **081C3C1C matched**, `ContactImpactEffect_UpdateInterpolatedPosition`,
+  488 bytes, register-pinned. It shares its +0x94 scale ramp and projection
+  formulas with the adjacent `ContactImpactEffect_UpdateContact` draft. This
+  variant interpolates all three coordinates from +0xDC to +0xE4, projects
+  them with the 3/32 formulas and camera offsets, increments +0xF8, and sets
+  +0xD8 when duration +0x9A is exceeded. Sweeping inline interpolation argument
+  order found `(start, end, duration, time)`, improving 80.9% to 88.1% while
+  making the interpolation section exact. A typed vector pointer, a separate
+  projected-sum local, and temporary register hints closed the projection.
+  Depinning reduced 15 hints to two pointer declarations (ip and r2), with
+  no empty barriers retained.
+- **081CFDA4 matched**, `SceneNpc_UpdateProjectedMove`, 520 bytes, no hints.
+  Enables the ground projection, plays animation 3, and interpolates saved
+  position +0x23C toward target +0x54 over tag duration +0x12. It writes fixed
+  point projection coordinates from +0x2F0, including camera X, then advances
+  projection X by `Player_GetHorizontalVelocity(0)` and marks completion.
+  The same `(start, end, duration, time)` interpolation order discovered on
+  081C3C1C changed this candidate directly from 89.5% to an exact match.
+  Computing the target pointer inside a dedicated inline preserves the
+  original projection-address/target-address ordering.
+- **081C29A4 drafted 91.6%**, `SparkleEmitter_EmitParticle`, 532-byte extent.
+  Caller `SparkleEmitter_UpdateEmitting` invokes it every other update.
+  `sub_081C2968` finds the free entry; this routine increments live count,
+  clears the free bit, chooses a randomized point on a radius-150 circle,
+  converts screen coordinates into world position, and chooses randomized
+  angle/speed for the particle velocity. It then clears age +0x34.
+  Keeping both velocity random samples inside the polar inline's arguments
+  improved the original 69% candidate to 91%; evaluating angle and speed as
+  prior statements shortens the wrong lifetimes. Giving the circle helper
+  `(angle, output, radius)` order and expressing random-table indexing as
+  one assignment expression reached 91.6%. Remaining: one extra RNG-index
+  store in the two-sample sequence, literal-load order, and scratch registers
+  (27 realigned differences, eight ignoring registers). No register hints
+  remain. The guarded draft was formatted, scored with
+  `check.py --nonmatching --record --target-size 532`, and its default
+  INCLUDE_ASM branch separately matched all 532 bytes.
+- **081CEFCC unresolved**, tentative `SceneNpc_UpdateFollowSubject`.
+  Reviewed body/pool extent is 664 bytes, ending at 081CF264. The best retained
+  scratch is 69.2% over that extent, 684 candidate bytes, with 122 realigned
+  differences / 48 ignoring registers. It plays idle animation, sets flags
+  0x402, follows the context subject at +0x438, and uses squared-distance
+  thresholds 0x90000 and 0xFFFF. Far away it snaps to an offset of -768 along
+  its facing; at intermediate range it sets speed 24. At close range it tests
+  vertical and facing alignment against context +0x434 and may set flag 0x800.
+  Remaining differences include the distance inline's temporary lifetimes,
+  source/position pointer allocation, speed rematerialization in the polar
+  inline, and signed-angle narrowing in the alignment test. Scalar-distance
+  helper and pointer/register experiments stopped improving it. Assembly
+  remains unchanged; the candidate stays ignored at `wip/sub_081CEFCC.c` and
+  is not committed as a sub-threshold draft.
+
+Every exact function was formatted with the venv clang-format and accepted by
+`tools/check.py --target-size` over the reviewed full extent. Each match and
+retained draft was committed separately through `build/commit.sh`. No make,
+full build, network operation, generated-file edit, or direct Git mutation was
+performed. The combined ROM build and name promotion remain integration work.
+The pre-existing change in `tools/cloud_task.py` was left untouched. Shared
+HANDOFF, INDEX and history files were not edited, per cloud-worker scope.
+
+## Task 0823F56C — Player action and recovery states (2026-10-20)
+
+Tags: #matching #player #link #register-pinning
+
+Exact C now covers **53.22% of this task's reviewed extents**, a **+53.22
+percentage-point** task gain (three functions, 2,812 of 5,284 bytes). Two exact
+functions retain register concessions; the third is unhinted. Drafts contribute
+no exact progress. The original task listed 2,174 instructions; 1,127 are in the
+three exact functions. No global progress totals were regenerated.
+
+- **0823F928 matched**, tentative `Player_UpdateChargedSpinAttack`, 1,336
+  bytes, register-pinned. Nine-way phase switch (phase three unused), charge
+  timing, input release, looping spin sounds, particle bursts, an orbiting
+  attack collider, and facing updates. The timer at +0xC0A advances by 16 modulo
+  256; the collider orbits at radius 170 and adds 230 to Y. Existing
+  `Player` fields for +0xAD6/+0xAD8, +0xC0A and facing fixed raw-pointer LHS
+  address evaluation order, improving the first candidate from 94.7% to 99.4%.
+  A scoped pending-action variable for +0xBF6 closed the remaining differences
+  with the authorized concession; `depin.py --write` reduced two hints to one.
+  The final +0xAC9 variant is nine. Naming is tentative: surrounding named
+  routines use the Player prefix, and the charge/orbit behavior supports the
+  working attack name.
+- **0823F56C matched**, tentative `Player_UpdateChargedDashAttack`, 956 bytes,
+  register-pinned. Assigned as the callback for configured action kind 0x30 by
+  `Player_InitializeActionState` (0823AA28). Shares the charge/release/retrigger
+  phases above, but uses animation entries 0x26–0x28 and decaying reverse
+  motion from +0x4D2. A charged phase sets magnitude 30, emits particles when
+  above five, and multiplies magnitude by 3/4 each update. A shared release
+  label reproduced the branch polarity; a distinct second speed local made
+  the second magnitude load precede the sine load. Important callee identity:
+  this uses `SceneParticleBurst_CreateWhilePaused`, unlike 0823F928's
+  `SceneParticleBurst_CreateWithPause`; the names refer to different addresses.
+  The final variant is four. Depinning reduced two hints to one.
+- **08240200 matched**, tentative `Player_UpdateImpactRecoil`, 520 bytes,
+  **no register hints**. Enters mode 0x1D, plays the pending song at +0x4C2,
+  and applies reverse polar recoil or velocity toward +0x47C when +0x479 is
+  set. Target recoil divides signed X/Z differences by eight toward zero,
+  emits alternating impact effects for the first six frames, requests camera
+  shake, and reduces speed by 3/4. A pointer local for the magnitude at +0x270
+  survives the condition and supplies the first polar multiply; the second
+  multiply reloads the field. Explicit signed `scale3` inline branches
+  reproduce arithmetic shifts where direct ternaries emitted logical shifts.
+  `depin.py --write` removed both diagnostic hints and the concession marker.
+- **08240408 drafted 85.8%**, tentative `Player_UpdateAirborneKnockback`,
+  reviewed extent 768 bytes. Enters mode 0x1E, plays +0x4C2, sets height 300,
+  decays reverse speed and height, then selects animations 0x2C/0x2D before
+  returning to idle. Remaining: magnitude-pointer materialization before
+  facing (ROM materializes after sine), scratch registers, and an extra r6
+  save. Retained candidate has 56 realigned differences, 14 ignoring
+  registers. The ordinary typed-field candidate was 83.9%; passing the first
+  magnitude address to the inline reached 85.8%. No hints in the retained
+  draft.
+- **08240708 drafted 92.2%**, tentative `Player_UpdateSlidingRecovery`,
+  reviewed extent 624 bytes. Enters mode 0x1F, computes positive polar motion
+  from `(facing + 1) & 7`, decays speed, probes the predicted terrain cell and
+  cancels blocked motion. Animation 0x2E leads into timed blinking recovery.
+  Remaining: the same magnitude-address lifetime, scratch registers, and r6
+  save (25 realigned differences, eight ignoring registers). A more intrusive
+  pointer/register-barrier diagnostic scored 93.9% but left 20 differences;
+  retained the clearer unhinted 92.2% draft.
+- **08240978 drafted 86.8%**, tentative `Player_UpdateKnockbackRecovery`,
+  reviewed extent 1,080 bytes. Mode 0x20 has two reverse-motion phases with
+  predicted terrain collision, then timed blinking recovery. First phase
+  reduces speed by 3/4 and height by 15; landing triggers song 0x2A8 and
+  sub_08109040. Remaining: cached +0x270 address, scratch registers, and
+  associated literal placement (70 realigned differences, 12 ignoring
+  registers over the reviewed extent). The initial candidate-length score
+  was 86.6%, which appears in the commit subject; the recorded full-extent
+  score is 86.8%. Later pointer, field, accessor and pinning experiments did
+  not beat the retained candidate structurally.
+
+All six sources have descriptive file-local aliases and tentative semantic
+comments. Each exact match passed `tools/check.py` after formatting and
+`depin.py`; candidate lengths equal the reviewed complete function extents.
+All three drafts were scored with `--nonmatching --record`; their default
+INCLUDE_ASM branches separately matched the reviewed full extents. Each source
+was committed separately through `build/commit.sh`. The notes use that driver
+as well. No make/full build, network, direct Git mutation, or generated-file
+edit was performed; batch integration must perform name promotion and the
+combined ROM build. Ghidra output was unavailable in this checkout.
+
+Environment discrepancy: the task prompt named `cloud/0823F56C`, but the
+checked-out branch stayed `cloud/081C29A4`; no checkout was attempted, in
+accordance with the worker restriction. The driver placed the six commits on
+that existing branch. The pre-existing tools/cloud_task.py edit was not
+modified by this worker (it no longer appeared in final status). Shared docs
+were left unchanged under the cloud-worker scope.
