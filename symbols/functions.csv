@@ -8684,6 +8684,7 @@ addr,name,mode,confidence,source,notes
 082221E8,Math_SetMotionPosition,thumb,low,src-alias,Tentatively sets a motion record position by copying two coordinate words into offsets 0x20 and 0x24
 082221F4,Math_GetTargetAngleAndDistance,thumb,low,src-alias,Computes the angle and Euclidean distance from the stored position to a target point with zero outputs for coincident points
 08222330,PolarInterpolation_SetCurrentFromPoint,thumb,low,src-alias,Computes angle and distance from the stored origin to a point and stores both in fixed point
+08222358,Interp_Step,thumb,low,src-alias,
 082223CC,HashTable_Init,thumb,low,src-alias,Allocates and clears buckets and stores the bucket count and hash callback
 082223F8,HashTable_Destroy,thumb,low,src-alias,Frees the bucket array and clears its pointer
 08222410,HashNode_Init,thumb,low,src-alias,Stores the node key and value and clears its chain pointer
@@ -8721,9 +8722,12 @@ addr,name,mode,confidence,source,notes
 08223640,RfuManager_StartConfiguration,thumb,low,src-alias,Stores configuration parameters and schedules adapter reset followed by configuration
 08223674,RfuManager_ResetConnectionState,thumb,low,src-alias,Clears connection tracking and operation state while retaining configuration and callbacks
 082236BC,RfuManager_RequestStopMode,thumb,low,src-alias,Schedules state 0x15 which issues the RFU stop mode request
+082236C8,RfuManager_StartConnect,thumb,low,src-alias,
+082237A0,RfuManager_StartChildConnect,thumb,low,src-alias,
 082239E0,RfuManager_UpdateLinkRecovery,thumb,low,src-alias,
 08223BA4,RfuManager_CheckVBlankSync,thumb,low,src-alias,Checks RFU synchronization and reports an error plus pending cycle completion on failure
 08223E28,RfuManager_ApplyRequestResult,thumb,low,src-alias,
+08224524,Rfu_ReqCallback,thumb,low,src-alias,
 082245A8,RfuManager_UpdateChildAdmissions,thumb,low,src-alias,
 08224880,RfuManager_FinishSlotReception,thumb,low,src-alias,Clears a successfully received NI slot and reports completion while awaiting connection data
 082248DC,RfuManager_StartPendingRecovery,thumb,low,src-alias,Saves the current operation and enters child connection recovery when recovery is pending
@@ -8791,6 +8795,7 @@ addr,name,mode,confidence,source,notes
 08225B30,SceneBody_SetKeyframeDisplay,thumb,low,src-alias,Attaches the alternate display record used by keyframe animation callers
 08225B38,SceneBody_SetPositionOffset,thumb,low,src-alias,Copies a packed position offset and sets the flag enabling it; offset interpretation is tentative
 08225B4C,SceneBody_StartRoute,thumb,low,src-alias,Attaches a route and starts it with the supplied route parameters
+08225B74,Obj_StepPosition,thumb,low,src-alias,
 08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
 08225CB8,Terrain_LoadFromScript,thumb,low,src-alias,
 08225DA0,Terrain_SetRenderModeFromScript,thumb,low,src-alias,Selects map rendering callbacks from the script v option and aligns background offsets to the grid origin
@@ -8832,6 +8837,7 @@ addr,name,mode,confidence,source,notes
 08226C44,Camera_SetBoundsFromScript,thumb,low,src-alias,Reads two script vectors and passes them to Camera_SetBounds
 08226CD4,Camera_SetScreenOffsetFromScript,thumb,low,src-alias,Reads two offset values and converts them through the camera isometric offset setter
 08226F20,Camera_UpdatePositionMode,thumb,low,src-alias,
+08227378,Camera_Update,thumb,low,src-alias,
 0822744C,Camera_Destroy,thumb,low,src-alias,
 08227478,Camera_Initialize,thumb,low,src-alias,"starts at the saved player position (+150 up), registers as kind 6 receiver, becomes gUnk_03005420"
 082275D8,Camera_Create,thumb,low,src-alias,Returns the existing camera or creates and initializes its task with update and cleanup callbacks
@@ -8848,6 +8854,8 @@ addr,name,mode,confidence,source,notes
 08227950,Palette_GetStateBlendIndices,thumb,low,src-alias,
 082279A8,ScreenTransition_SendCommand,thumb,low,src-alias,Maps the transition kind to a receiver and sends command 3 with six transition parameters
 08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
+08227AD4,Terrain_GetFloorKindFromScript,thumb,low,src-alias,
+08227B80,Terrain_GetCellWordFromScript,thumb,low,src-alias,
 08227D1C,Background_ClearVisibilityFlagFromScript,thumb,low,src-alias,Clears the script-selected bit starting at bit 8 in the shared background visibility flags
 08227D40,Background_SetVisibilityFlagFromScript,thumb,low,src-alias,Sets the script-selected bit starting at bit 8 in the shared background visibility flags
 08227D64,Engine_SoftResetFromScript,thumb,low,src-alias,Wraps the engine shutdown and BIOS soft reset routine for a script command

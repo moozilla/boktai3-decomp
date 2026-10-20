@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define RfuManager_StartChildConnect sub_082237A0
-
 struct RfuMgr {
     u8 pad0[4];
     u8 f4;

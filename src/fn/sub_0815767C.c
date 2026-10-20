@@ -10,7 +10,7 @@ struct Drawable {
 #define B(o) (*(u8 *)(p + (o)))
 s32 Player_GetControlFlags(void *, u32);
 void CellObject_Init(void *, void *);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void sub_0802E04C(void *);
 void Collider_SetPosition(void *, void *, s32);
 void ActorShadow_Disable(void *);
@@ -50,7 +50,7 @@ void Player_ApplyControlPresentation(u8 *p)
             W(0x40) = (u32)position;
         }
     }
-    sub_08225B74(p + 0x24);
+    Obj_StepPosition(p + 0x24);
     sub_0802E04C(p + 0x24);
     if (Player_GetControlFlags(p, 8))
         setCollider(p);

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Rfu_ReqCallback sub_08224524
-
 struct RfuStatic {
     u8 pad0[2];
     u8 f2;
@@ -14,7 +12,7 @@ struct RfuStatic {
 };
 extern struct RfuStatic gUnk_03005390;
 extern u8 *gUnk_03006A80;
-void sub_082239E0(u16);
+void RfuManager_UpdateLinkRecovery(u16);
 void RfuManager_CompletePendingMscCycle(void);
 u16 rfu_UNI_PARENT_getDRAC_ACK(u8 *);
 void Callback_InvokeActor(u16, u32);
@@ -29,7 +27,7 @@ void Rfu_ReqCallback(u16 a)
     gUnk_03005390.fF = 1;
     zero = *gUnk_03006A80;
     if (zero == 0) {
-        sub_082239E0(a);
+        RfuManager_UpdateLinkRecovery(a);
         if (gUnk_03005390.f2 != 1) {
             RfuManager_CompletePendingMscCycle();
             gUnk_03005390.fF = zero;
