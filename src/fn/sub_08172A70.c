@@ -1,5 +1,4 @@
 #include "global.h"
-#define PauseInventory_EnterEquipmentSelection sub_08172A70
 void SceneHud_ConfigureActionGrid(u8 *, u32, u32);
 void Hud_SetGridPosition(u8 *, u32, u32);
 void SceneHud_SetActionCursorPosition(u8 *, u32);

@@ -7,7 +7,6 @@ struct SlotOwner {
     u8 slots[5];
 };
 extern struct SlotOwner *gUnk_020004B4;
-#define SceneHud_DrawSlotMarkers sub_081786A0
 void SceneHud_DrawSlotMarkers(void)
 {
     u8 *src;
