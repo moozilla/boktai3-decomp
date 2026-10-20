@@ -20,8 +20,6 @@ struct DirectionalEffect {
     u8 active;
 };
 
-#define DirectionalEffect_Update sub_082389D8
-
 static inline u32 StepPlayback(struct DirectionalEffect *owner, struct DisplaySequenceState *state,
                                struct DirectionalEffect *base, u32 one)
 {
