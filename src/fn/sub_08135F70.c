@@ -1,3 +1,6 @@
+#define SceneActorReaction_ApplyAreaDamage sub_08131D5C
+#define SceneActorReaction_RecordDefeat    sub_08134398
+#define SceneActorReaction_ResolveDamage   sub_08135F70
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
@@ -345,5 +348,5 @@ done: {
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ResolveDamage);
+INCLUDE_ASM("asm/nonmatching", sub_08135F70);
 #endif
