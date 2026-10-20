@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 73.1%
-// 11 differing instruction runs; size -4 bytes; first diff at +0xA (ldr r0, [pc, #0x80] vs ldr r0, [pc, #0x7c])
 struct PairED {
     u32 a, b;
 };
@@ -11,7 +8,8 @@ void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void sub_0823EDDC(u8 *p)
 {
     u32 resource, zero;
-    u8 *angle;
+    u8 *angle, *tmp;
+    u32 saved;
     *(struct PairED *)(p + 0xbe8) = *(struct PairED *)(p + 0x30);
     {
         u32 y = *(u16 *)(p + 0xbea) + 230;
@@ -20,16 +18,14 @@ void sub_0823EDDC(u8 *p)
     }
     {
         u32 direction = ((p[0x3a4] + 5) & 7) << 5;
-        angle = p + 0xbfc;
-        *angle = direction;
+        angle = p + 0xc0c;
+        *(tmp = angle) = direction;
     }
     resource = Player_GetConfiguredActionPower(p);
     AnimData_SelectPaletteBank(p + 0xb70, 76);
     Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero,
                                  *(u16 *)(p + 0xbfe));
-    p[0xbce] = *angle;
+    saved = *tmp;
+    p[0xbce] = saved;
     *(u16 *)(p + 0xc0a) = zero;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823EDDC);
-#endif
