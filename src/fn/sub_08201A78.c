@@ -1,4 +1,5 @@
 #include "global.h"
+
 #ifdef NONMATCHING
 // fuzzy: 80.2%
 struct Vec {

@@ -12,9 +12,22 @@ struct Obj {
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    u8 pad44[0xC0 - 0x44];
+    u8 pad44[0x68 - 0x44];
+    u32 pendingDamage;
+    u8 pad6C[0x7E - 0x6C];
+    u16 recoveryValue;
+    u8 pad80[0xC0 - 0x80];
     s32 unkC0;
-    u8 padC4[0x5AC - 0xC4];
+    u8 padC4[0x307 - 0xC4];
+    u8 actionActive;
+    u16 actionCooldown;
+    u8 pad30A[0x319 - 0x30A];
+    u8 actionKind;
+    u8 pad31A[0x326 - 0x31A];
+    u16 recoveryTimer, cooldown;
+    u8 pad32A[0x57A - 0x32A];
+    u8 damageTimer;
+    u8 pad57B[0x5AC - 0x57B];
     s32 vy; /* 0x5AC */
     s32 y;  /* 0x5B0 */
     s32 vz; /* 0x5B4 */
@@ -30,7 +43,9 @@ struct Obj {
     s32 x; /* 0x5DC */
     u8 pad5E0[0x5EC - 0x5E0];
     s8 steps; /* 0x5EC */
-    u8 pad5ED[3];
+    u8 pad5ED;
+    s8 damageFlags;
+    u8 pad5EF;
     u16 angle; /* 0x5F0 */
     u8 pad5F2[6];
 };
@@ -87,13 +102,13 @@ extern u8 *gUnk_02000710, *gUnk_020004B4;
 void Glove_UpdateStopping(struct Glove *);
 
 #ifdef NONMATCHING
-// fuzzy: 82.3%
-// Action flags and pointer lifetimes still differ from the original.
+// fuzzy: 90.0%
+// Action-pointer lifetimes, constant reuse and register allocation still differ.
 static inline void ClearDamageFlag(s8 *p, s32 mask)
 {
     *p &= mask;
 }
-static inline void UpdateSecondaryAction(struct Glove *p)
+static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
 {
     struct Obj *self = &p->motion;
     if (U8(p, 0x33C)) {
@@ -117,27 +132,27 @@ static inline void UpdateSecondaryAction(struct Glove *p)
             if (p->input[1] & 1)
                 sub_08249240((u8 *)p + 0x32C, 0, U32(p, 0x32C));
         }
-        if (U8(self, 0x319) == 4) {
-            if (U16(self, 0x326)) {
+        if (self->actionKind == 4) {
+            if (self->recoveryTimer) {
                 u16 bit = 2;
-                p->flags |= bit;
-                U16(self, 0x326)--;
+                *flags |= bit;
+                self->recoveryTimer--;
             }
-        } else if (U8(self, 0x319) == 1 && U16(self, 0x326)) {
-            U16(self, 0x326)--;
-            ClearDamageFlag((s8 *)self + 0x5EE, ~1);
-            U8(self, 0x57A) = 0;
-            U32(self, 0x68) = 0;
-            if (!U16(self, 0x326)) {
+        } else if (self->actionKind == 1 && self->recoveryTimer) {
+            self->recoveryTimer--;
+            ClearDamageFlag(&self->damageFlags, ~1);
+            self->damageTimer = 0;
+            self->pendingDamage = 0;
+            if (!self->recoveryTimer) {
                 s32 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
-                sub_0811D6C8(self, palette, U16(self, 0x7E), 0, 0, 16, 1, 1);
+                sub_0811D6C8(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
             }
         }
-        if (U16(self, 0x328))
-            U16(self, 0x328)--;
+        if (self->cooldown)
+            self->cooldown--;
     }
 }
-static inline void UpdateActions(struct Glove *p)
+static inline void UpdateActions(struct Glove *p, u16 *flags)
 {
     struct Obj *self = &p->motion;
     if (U8(p, 0x2CD) == 2) {
@@ -153,7 +168,7 @@ static inline void UpdateActions(struct Glove *p)
                     if (LinkParticipant_IsLocallySelected(p))
                         Sound_StopSong(0x93);
                 }
-                U8(self, 0x307) = 1;
+                self->actionActive = 1;
             } else {
                 U8(p, 0x31E) = 1;
             }
@@ -166,7 +181,7 @@ static inline void UpdateActions(struct Glove *p)
                 if (LinkParticipant_IsLocallySelected(p))
                     Sound_StopSong(0x93);
             }
-            U8(self, 0x307) = 0;
+            self->actionActive = 0;
         }
     } else if (U8(p, 0x2CD) == 3) {
         if (p->input[1] & 2)
@@ -178,11 +193,11 @@ static inline void UpdateActions(struct Glove *p)
         if (p->input[1] & 2)
             sub_08249240((u8 *)p + 0x2C8, 0, U32(p, 0x2C8));
     }
-    if (U16(self, 0x308))
-        U16(self, 0x308)--;
-    UpdateSecondaryAction(p);
-    if ((!p || !(p->flags & 4)) && (U32(self, 0xC) & 0x800))
-        U8(self, 0x5EE) |= 4;
+    if (self->actionCooldown)
+        self->actionCooldown--;
+    UpdateSecondaryAction(p, flags);
+    if ((!p || !(*flags & 4)) && (U32(self, 0xC) & 0x800))
+        self->damageFlags |= 4;
 }
 void Glove_UpdateStopping(struct Glove *p)
 {
@@ -194,72 +209,75 @@ void Glove_UpdateStopping(struct Glove *p)
         U16(p, 0x53E) = 0;
         p->active = 0;
     }
-    MotionActor_UpdateMovementAudio(p);
-    ScenePool_ClampMotionSpeeds(self);
-    h = self->vy + self->unkC0;
-    if (h > 0xF000)
-        h = 0xF000;
-
-    self->y += 0x200;
-    if (self->steps > 0) {
-        self->x += self->dx;
-        self->dx += Div(-self->dx, self->steps);
-        self->dy += Div(-self->dy, self->steps);
-        self->dz += Div(-self->dz, self->steps);
-        self->steps--;
-    } else {
-        Memory_Clear(&self->dx, 0x10);
-    }
-    Actor_ClampMovementSpeed(self);
-
     {
-        s32 *pprevZ, *pprevX, *pvz, *px, *py;
-        s32 lim;
-        self->outX = h + self->x - self->prevX;
-        self->outY = self->y + self->dy;
-        self->outZ = self->vz + self->dz;
-        dx = (self->x - self->prevX) >> 12;
-        dz = (self->z - self->prevZ) >> 12;
-        lim = 0x3000;
-        px = &self->x;
-        pprevX = &self->prevX;
-        py = &self->y;
-        pprevZ = &self->prevZ;
-        pvz = &self->vz;
-        if (h > lim)
-            dx = 0x80;
-        if (dx == 0 && dz == 0)
-            self->angle = 0xFFFF;
-        else
-            self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
-        *pprevX = *px;
-        *pprevZ = self->z;
-        sub_0811AE9C(self);
-        a = (u32) ~(self->unk3C >> 12) >> 31;
-        b = (u32) ~(self->unk38 >> 12) >> 31;
-        if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
-            a == 1) {
-            s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
-            if (v < 4)
-                v = 4;
-            if (v > 18)
-                v = 18;
-            *py -= v << 9;
-            self->flags40 &= ~1;
+        u16 *flags = &p->flags;
+        MotionActor_UpdateMovementAudio(p);
+        ScenePool_ClampMotionSpeeds(self);
+        h = self->vy + self->unkC0;
+        if (h > 0xF000)
+            h = 0xF000;
+
+        self->y += 0x200;
+        if (self->steps > 0) {
+            self->x += self->dx;
+            self->dx += Div(-self->dx, self->steps);
+            self->dy += Div(-self->dy, self->steps);
+            self->dz += Div(-self->dz, self->steps);
+            self->steps--;
+        } else {
+            Memory_Clear(&self->dx, 0x10);
         }
-        p->height = h;
-        sub_0811D91C(self);
+        Actor_ClampMovementSpeed(self);
 
-        Actor_UpdateShadowSpriteParts(self, p->model);
-        if (self->flags40 & 4)
-            sub_0811BF44(self);
-        if (self->flags40 & 2)
-            *pvz = 0;
-        if (self->flags40 & 1)
-            *py = 0;
+        {
+            s32 *pprevZ, *pprevX, *pvz, *px, *py;
+            s32 lim;
+            self->outX = h + self->x - self->prevX;
+            self->outY = self->y + self->dy;
+            self->outZ = self->vz + self->dz;
+            dx = (self->x - self->prevX) >> 12;
+            dz = (self->z - self->prevZ) >> 12;
+            lim = 0x3000;
+            px = &self->x;
+            pprevX = &self->prevX;
+            py = &self->y;
+            pprevZ = &self->prevZ;
+            pvz = &self->vz;
+            if (h > lim)
+                dx = 0x80;
+            if (dx == 0 && dz == 0)
+                self->angle = 0xFFFF;
+            else
+                self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
+            *pprevX = *px;
+            *pprevZ = self->z;
+            sub_0811AE9C(self);
+            a = (u32) ~(self->unk3C >> 12) >> 31;
+            b = (u32) ~(self->unk38 >> 12) >> 31;
+            if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&
+                b <= 1 && a == 1) {
+                s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
+                if (v < 4)
+                    v = 4;
+                if (v > 18)
+                    v = 18;
+                *py -= v << 9;
+                self->flags40 &= ~1;
+            }
+            p->height = h;
+            sub_0811D91C(self);
+
+            Actor_UpdateShadowSpriteParts(self, p->model);
+            if (self->flags40 & 4)
+                sub_0811BF44(self);
+            if (self->flags40 & 2)
+                *pvz = 0;
+            if (self->flags40 & 1)
+                *py = 0;
+        }
+
+        UpdateActions(p, flags);
     }
-
-    UpdateActions(p);
     CharacterModel_UpdateAccessoryAnimations(p->model);
     p->timer++;
 }

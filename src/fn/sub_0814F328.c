@@ -1,4 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: role inferred from callers and callback phases.
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
@@ -156,11 +158,13 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
             } else if (++HALF(0x45A) > 4)
                 Player_SetActionPhase(p, 6);
             break;
-        case 6:
+        case 6: {
+            register u32 pending asm("r0");
             ANIMATE(0x27);
             if (PRESSED)
                 BYTE(0xBF6) = 1;
-            if (BYTE(0xBF6)) {
+            pending = BYTE(0xBF6);
+            if (pending) {
                 *(s32 *)(p + 0xC74) = -1;
                 BYTE(0xBF6) = 0;
                 BYTE(0x458) = 1;
@@ -169,6 +173,7 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
                 Player_SetActionPhase(p, 7);
             }
             break;
+        }
         case 7:
             ANIMATE(0x26);
             if (++HALF(0x45A) > 4)

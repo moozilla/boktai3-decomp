@@ -1,4 +1,5 @@
 #include "global.h"
+// confidence=low: phase-dependent combat selection inferred from state and distance tests
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 struct DecisionActor {

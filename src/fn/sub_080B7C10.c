@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: neighboring Skeleton controls establish provisional role
 #ifdef NONMATCHING
 // fuzzy: 92.8%
 // Remaining differences: recovery stack slots, turn-state address lifetimes, and flag-update ordering.

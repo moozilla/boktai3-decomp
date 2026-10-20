@@ -1,4 +1,5 @@
 #include "global.h"
+// confidence=low: moves a paired half and holds/releases player position requests.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 #ifdef NONMATCHING

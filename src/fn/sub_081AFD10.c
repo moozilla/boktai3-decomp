@@ -1,8 +1,9 @@
 #include "global.h"
+// confidence=low: maintains paired-half presentation, colliders and completion flags.
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 91.8%
-// Remaining differences: register choices for member offsets and two instruction-order differences.
+// fuzzy: 95.3%
+// Remaining differences: member-offset and address register allocation.
 // confidence=low: updates each half's visible position, colliders and completion transition.
 struct PairPosition {
     s16 x, y, z, pad;
@@ -99,7 +100,11 @@ static inline void setReady(struct PairHalf *half)
             {
                 register u32 offset asm("r3") = 0x168;
                 asm("" : "+r"(offset));
-                *(u32 *)((u8 *)half + offset) = clear;
+                {
+                    register u32 *dst asm("r0") = (u32 *)((u8 *)half + offset);
+                    asm("" : "+r"(dst));
+                    *dst = clear;
+                }
             }
         }
     }
@@ -162,9 +167,10 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
             }
             {
                 register u32 offset asm("r0") = 0x19C;
-                s32 *shake;
+                register s32 *shake asm("r1");
                 asm("" : "+r"(offset));
                 shake = (s32 *)((u8 *)half + offset);
+                asm("" : "+r"(shake));
                 (*shake)--;
             }
         }
@@ -197,17 +203,32 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
         asm("" : "+r"(offset));
         control = (struct PairShadowControl *)((u8 *)half + offset);
         asm("" : "+r"(control));
+        asm("" : "+r"(mask));
         control->flags |= mask;
     }
-    if (half->flashTimer) {
-        half->flashTimer--;
-        if (!half->flashTimer)
-            CpuSet(half->savedPalette, half->palette, 0x04000008);
+    {
+        register u32 offset asm("r4") = 0x184;
+        u16 *timer;
+        asm("" : "+r"(offset));
+        timer = (u16 *)((u8 *)half + offset);
+        if (*timer) {
+            (*timer)--;
+            if (!*timer) {
+                register u32 paletteOffset asm("r1") = 0x190;
+                asm("" : "+r"(paletteOffset));
+                CpuSet(*(void **)((u8 *)half + paletteOffset), half->palette, 0x04000008);
+            }
+        }
     }
-    if (testFlags(half, 0x80) || (half->displayFlags & 1))
-        ScaledShadow_Disable(half->shadow);
-    else
-        ScaledShadow_Enable(half->shadow);
+    if (testFlags(half, 0x80) || (half->displayFlags & 1)) {
+        register u32 offset asm("r2") = 0x1A0;
+        asm("" : "+r"(offset));
+        ScaledShadow_Disable((u8 *)half + offset);
+    } else {
+        register u32 offset asm("r3") = 0x1A0;
+        asm("" : "+r"(offset));
+        ScaledShadow_Enable((u8 *)half + offset);
+    }
     if (half->previousState == 0x16 && half->phase) {
         if (half->mode == 0)
             owner->activeMask &= ~1;

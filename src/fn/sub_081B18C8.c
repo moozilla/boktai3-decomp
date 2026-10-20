@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// confidence=low: rises, waits for a countdown, then returns vertically
 #ifdef NONMATCHING
 // fuzzy: 80.3%
 // Remaining differences: State-address reuse, entry-pointer lifetimes, and vector/constant ordering differ.
@@ -170,7 +172,6 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-// confidence=low: rises, waits for a countdown, then returns vertically
 void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec rise, target, speed;

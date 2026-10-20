@@ -1,6 +1,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: inherited route/reaction interpretation from static callers.
+
 #ifdef NONMATCHING
 // fuzzy: 85.1%
 // Inline actor/group lifetimes, duplicated success-tail layout, and register allocation still differ.

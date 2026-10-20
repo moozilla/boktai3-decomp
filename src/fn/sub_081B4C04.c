@@ -2,9 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -30,7 +27,7 @@ extern const s16 gUnk_086149C4[];
 static inline void StepSequence(void *obj)
 {
     struct VanargandPart *owner = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
@@ -64,9 +61,9 @@ static inline void StepSequence(void *obj)
         asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 8;
+            ((struct VanargandPart *)obj)->sprite.flags |= 8;
         else
-            owner->sprite.flags &= ~8;
+            ((struct VanargandPart *)obj)->sprite.flags &= ~8;
     }
     {
         u32 elapsed = state->elapsed + 1;
@@ -161,21 +158,20 @@ void Vanargand_UpdatePartRecovery(u8 *boss, struct VanargandPart *p, s32 frame)
         p->reset = 0;
         {
             void *resource = *(void **)(boss + 0x4d0);
-            asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 11, (u8)p->variant, 0);
         }
         StepSequence(p);
     }
     if (frame > 180) {
         {
-            u32 mask = ~0x100;
-            asm("" : "+r"(mask));
-            p->flags &= mask;
+            register u32 offset asm("r3") = 0x160;
+            register u32 *flags asm("r2");
+            u32 mask;
+            asm("" : "+r"(offset));
+            flags = (u32 *)((u8 *)p + offset);
+            mask = ~0x100;
+            *flags &= mask;
         }
         ChangeAction(p, 22);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRecovery);
-#endif

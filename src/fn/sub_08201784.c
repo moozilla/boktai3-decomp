@@ -20,7 +20,7 @@ void Collider_SetPosition(u8 *, u8 *, u32);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 s32 Collider_Refresh(u8 *);
 void ScriptCombatActor_OnPassiveColliderContact(void);
-void sub_082015D4(void);
+void ScriptCombatActor_ApplyHitReaction(void);
 void sub_08201784(u8 *p)
 {
     struct Z a, b;
@@ -46,7 +46,7 @@ void sub_08201784(u8 *p)
     r[2] = 0;
     Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
     Collider_SetPosition(q, p + 0x40, 0);
-    Collider_SetCallback(q, sub_082015D4, p);
+    Collider_SetCallback(q, ScriptCombatActor_ApplyHitReaction, p);
     Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x19a), *(u16 *)(p + 0x19c));
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
 // fuzzy: 81.6%
 // Remaining differences: animation selector register allocation and flag-clear order.

@@ -4,8 +4,8 @@ void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058B4[];
 s32 Player_GetHorizontalVelocity(s32);
-void sub_08114928(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *, s32, s32, s32,
-                  s32);
+void NativeEffect_CreateFromProfile(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *,
+                                    s32, s32, s32, s32);
 static inline void Or(u32 mask, u32 *flags)
 {
     *flags |= mask;
@@ -99,8 +99,8 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                     register s32 height asm("r0") = actor->restrictionMetric;
                     level = height - 0x16000;
                 }
-                sub_08114928(&actor->position, level, &velocity, actor->emissionProfile, 5, zero, 3,
-                             zero);
+                NativeEffect_CreateFromProfile(&actor->position, level, &velocity,
+                                               actor->emissionProfile, 5, zero, 3, zero);
                 break;
             }
             case 3: {
@@ -118,11 +118,11 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 }
                 position = &actor->position;
                 profile = actor->emissionProfile;
-                sub_08114928(position, level, &velocity, profile, 5, 1, 4, zero);
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, zero);
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 velocity.y = zero;
                 velocity.z = zero;
-                sub_08114928(position, level, &velocity, profile, 5, zero, 4, 1);
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, zero, 4, 1);
                 Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, zero);
                 actor->unknown308 = 60;
                 break;

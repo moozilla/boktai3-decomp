@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // Remaining playback completion branch sharing and mask copies differ.
-// fuzzy: 91.5%
 
 struct P {
     u8 pad0[0x14C];

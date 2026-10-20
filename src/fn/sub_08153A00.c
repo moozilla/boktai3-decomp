@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 94.2%
+// fuzzy: 96.9%
 // Signed scaling sign tests and direction-store layout still differ.
 struct P {
     u8 pad0[0x30];

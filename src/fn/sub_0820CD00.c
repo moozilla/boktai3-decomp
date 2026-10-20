@@ -12,7 +12,7 @@
 #include "screamer_playback.h"
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
 void SceneDrawablePair_SetFlags(void);
-s32 sub_0820C120(struct ScreamerState *);
+s32 Screamer_InitColliders(struct ScreamerState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
@@ -135,7 +135,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         asm("" : : "r"(allocationToken));
     }
     if (!p->f1F6)
-        sub_0820C120(p);
+        Screamer_InitColliders(p);
     if (!p->f1D8)
         p->sprite.position.x -= 16;
     else

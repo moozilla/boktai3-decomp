@@ -34,7 +34,8 @@ struct ActorEmitter {
 };
 u8 Modifier_IsFirstSourceReady(struct ActorEmitter *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
-s32 sub_08114928(struct EmitterVector *, s32, struct EmitterVector *, void *, s32, s32, s32, s32);
+s32 NativeEffect_CreateFromProfile(struct EmitterVector *, s32, struct EmitterVector *, void *, s32,
+                                   s32, s32, s32);
 void CallbackList_SubtractClampedValue(void *, struct ActorEmitter *, s32);
 s32 ActorEmitter_TryEmit(struct ActorEmitter *emitter)
 {
@@ -54,8 +55,8 @@ s32 ActorEmitter_TryEmit(struct ActorEmitter *emitter)
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x16000;
-    if (sub_08114928(&owner->position, height, &velocity, owner->profile, owner->kind + 1, 0, 1,
-                     0) >= 0)
+    if (NativeEffect_CreateFromProfile(&owner->position, height, &velocity, owner->profile,
+                                       owner->kind + 1, 0, 1, 0) >= 0)
         goto success;
 fail:
     return 0;

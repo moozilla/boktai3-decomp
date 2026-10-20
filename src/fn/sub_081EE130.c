@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+// confidence=low: action role inferred from movement and effect calls.
 #ifdef NONMATCHING
 // fuzzy: 89.2%
 // Remaining differences: initialization allocation, random-mask order, and timing-expression loads.
@@ -198,7 +199,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
             case 1:
                 if (Mod(time, W(0x2bc)) <= 59 && time > 90)
                     W(0x290) = 0;
-                else if (time < W(0x2b8) * W(0x2bc) + 30)
+                else if (time < W(0x2bc) * W(0x2b8) + 30)
                     W(0x290) = RandomBits(7);
                 else
                     W(0x290) = 0;
@@ -206,11 +207,11 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                 ActorDisplay_UpdateForegroundSprite(input);
                 ActorDisplay_UpdateAccentSprite(input);
                 SceneActors_EmitPeriodicParticles(input, time);
-                if (Mod(time, W(0x2bc)) == 0 && time <= W(0x2b8) * W(0x2bc) + 30) {
+                if (Mod(time, W(0x2bc)) == 0 && time <= W(0x2bc) * W(0x2b8) + 30) {
                     ActorEffect_SpawnOffsetEffect(input);
                     W(0x598)++;
                 }
-                if (time >= W(0x2b8) * W(0x2bc) + 90) {
+                if (time >= W(0x2bc) * W(0x2b8) + 90) {
                     W(0x304) = 0;
                     W(0x2fc) = 1;
                     B(0x2f0) |= 4;

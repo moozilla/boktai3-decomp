@@ -3,9 +3,11 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
+// confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
+
 #ifdef NONMATCHING
-// fuzzy: 89.0%
-// Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
+// fuzzy: 93.2%
+// Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -96,7 +98,6 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         register u32 first asm("r1");
         u32 maskBit = one;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -121,13 +122,14 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r1");
+        register u32 mask asm("r6");
+        register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
+        asm("" : "+r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -206,7 +208,7 @@ static inline void OffsetTarget(struct SceneVec *v, u32 variant)
 // confidence=low: attacks a position offset from the player before returning.
 void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
-    u8 *enter;
+    register u8 *enter asm("r9");
     register u32 entering asm("r1");
     u32 mask = 0x20;
     p->flags |= mask;
@@ -219,6 +221,8 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
     switch (p->state) {
         case 0: {
             struct SceneVec delta;
+            register u32 one asm("r8");
+            register void *motion asm("r10");
             SetFlags(p, 8);
             entering = p->enter;
             asm("" : "+r"(entering));
@@ -228,9 +232,17 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 *enter = 0;
                 MakeVector(&delta, (AimAngle(p) + 128) & 255, 128);
                 AddVector(&delta, &p->origin, &delta);
-                MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 1);
-                Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 7, (u8)p->variant, 4);
-                StepPlayback(p, &p->sequence, p, 1);
+                motion = p->motion;
+                asm("" : "+r"(motion));
+                one = 1;
+                asm("" : "+r"(one));
+                MotionTrack_Initialize(motion, &p->origin, &delta, 0, one);
+                {
+                    void *data = *(void **)(boss + 0x4d0);
+                    struct DisplaySequenceState *seq = &p->sequence;
+                    Anim_SetSequence(seq, data, 7, (u8)p->variant, 4);
+                    StepPlayback(p, &p->sequence, p, one);
+                }
             }
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {

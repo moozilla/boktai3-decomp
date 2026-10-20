@@ -1,12 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.6%
-// Remaining differences: the map-address PRE register spills across Mod and changes frame/register allocation.
-
-// Structure lines up (regions.py core distance 2/418). Allocation differs: the ROM keeps the
-// GCSE copy of &gUnk_030052F4 in r6 for the whole scan (frame 0x10); here it is spilled
-// (frame 0x14). rasolve: forcing the ROM registers does not help (14 structural diffs).
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 
@@ -27,9 +20,13 @@ static inline u8 *Cell(s32 cell)
         return override + 4;
     return gUnk_030052F4->cells + (cell * 4 + 12);
 }
+static inline u32 Attributes(s32 cell)
+{
+    return *(u16 *)(Cell(cell) + 2);
+}
 static inline u8 IsLevelOpen(s32 cell, u32 level)
 {
-    if ((*Cell(cell) & 15) != level || (*(u16 *)(Cell(cell) + 2) & 0x43))
+    if ((*Cell(cell) & 15) != level || (Attributes(cell) & 0x43))
         return 0;
     return 1;
 }
@@ -154,7 +151,3 @@ found:
     FIELD(state, 0x6D2, u16) = 0xF0;
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_RequestStraightRoute);
-#endif

@@ -1,8 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.8%
-// foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
+// fuzzy: 99.5%
+// Remaining difference: zero materialization order in modes 2 and 3.
 struct Sub {
     u8 pad[0x38];
     u32 flags;
@@ -33,15 +33,18 @@ struct Obj {
 
 extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
-extern void sub_0818AFEC();
-extern void Armor_UpdateAccumulatedBehavior();
+extern void Armor_UpdateContactBoost(struct Obj *, s32, u32);
+extern void Armor_UpdateAccumulatedBehavior(struct Obj *, s32, u32);
 
-void sub_0818B2A0(struct Obj *p, s32 delta, s32 unused, s32 flag)
+static inline void clearFlags(struct Sub *p, u32 mask)
+{
+    p->flags &= ~mask;
+}
+
+void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 flag)
 {
     s32 v;
     u16 *q;
-    u32 m;
-    struct Sub *sp;
     s32 sum;
     switch (p->mode) {
         case 0:
@@ -165,11 +168,8 @@ void sub_0818B2A0(struct Obj *p, s32 delta, s32 unused, s32 flag)
                 p->acc = 420;
                 p->h112A = 0;
                 p->hB26 = p->h112C;
-                sp = &p->sub[1];
-                m = ~0x00400008;
-                sp->flags &= m;
-                sp = &p->sub[0];
-                sp->flags &= m;
+                clearFlags(&p->sub[1], 0x400008);
+                clearFlags(&p->sub[0], 0x400008);
             } else {
                 goto b178;
             }
@@ -184,10 +184,10 @@ void sub_0818B2A0(struct Obj *p, s32 delta, s32 unused, s32 flag)
             if (p->keys & 0x200)
                 goto afec;
         b178:
-            Armor_UpdateAccumulatedBehavior(p, delta);
+            Armor_UpdateAccumulatedBehavior(p, delta, flags);
             break;
         afec:
-            sub_0818AFEC(p, delta);
+            Armor_UpdateContactBoost(p, delta, flags);
             break;
         case 10:
             p->acc += delta;
@@ -235,5 +235,5 @@ void sub_0818B2A0(struct Obj *p, s32 delta, s32 unused, s32 flag)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818B2A0);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateBehaviorAfterContact);
 #endif

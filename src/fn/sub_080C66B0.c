@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: neighboring Golem controls establish the state role.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 #include "scene_object.h"

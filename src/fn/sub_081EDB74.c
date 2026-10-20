@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+// confidence=low: action role inferred from movement and effect calls.
 #ifdef NONMATCHING
 // fuzzy: 85.3%
 // Remaining differences: pointer allocation, constant derivation, and initialization order.

@@ -27,7 +27,7 @@ extern u32 gUnk_030053F0, gUnk_030053F4;
 void Hud_SetMode(s32);
 void Script_Call(u32, void *);
 void sub_08116E44(void);
-void sub_081182E4(void);
+void Glove_UpdateDefeatEffects(void);
 void sub_08119B80(struct MotionActor *);
 void ActorStats_ApplyPendingIncrement(struct MotionActorState *);
 void StageIconDisplay_Create(u32, u32, void (*)(void), void *);
@@ -87,7 +87,7 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
             mask &= *flags;
             zero = 0;
             *flags = mask;
-            SetCallback(actor, sub_081182E4, zero);
+            SetCallback(actor, Glove_UpdateDefeatEffects, zero);
             return;
         }
     }

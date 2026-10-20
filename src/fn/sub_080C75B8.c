@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: neighboring Golem controls establish the state role.
 /* Decelerate recoil, converge on the saved position, then signal completion. */
 // confidence=low: inferred from the three movement phases and neighboring Golem controls.
 #include "scene_actor_reset.h"

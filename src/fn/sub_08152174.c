@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+// confidence=low: motion seven changes sprite scale and visibility over six phases.
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 81.7%

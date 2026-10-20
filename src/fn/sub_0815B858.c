@@ -19,7 +19,7 @@ void Player_UpdateFacingSide(struct P *);
 void PlayerCue_UpdateMotionFade(void);
 void PlayerCue_UpdateSideFade(void);
 void PlayerCue_UpdateAlternateFade(void);
-void sub_081503EC(void);
+void PlayerCue_UpdateScaleTransition(void);
 
 static inline u8 sideDir(u8 d)
 {
@@ -56,7 +56,7 @@ void PlayerCue_Motion7Turn(struct P *p, s32 dir, u32 c)
         } else {
             p->b3A2 >>= 2;
             p->b3A3 = 0;
-            p->fn = sub_081503EC;
+            p->fn = PlayerCue_UpdateScaleTransition;
         }
     }
 }

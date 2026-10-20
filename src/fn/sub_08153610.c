@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 89.9%
 // Constant derivation, resource pointer setup and timer mask lifetimes differ.
 struct P {
     u8 pad0[0x30];

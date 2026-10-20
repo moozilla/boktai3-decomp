@@ -1,10 +1,13 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 
+// confidence=low: preserves the existing tentative reaction-state interpretation.
+
 #ifdef NONMATCHING
-// fuzzy: 81.6%
-// Remaining differences: register allocation, cached pointers, and inline instruction order.
+// fuzzy: 88.6%
+// Remaining differences: state/control offset reuse, vector-store allocation, and packet zeros.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -42,6 +45,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
 {
     u8 *group = (u8 *)&actor->group;
     u8 result;
+    u32 *savedFlags;
     Chase_TakeArrived(actor);
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
@@ -64,25 +68,27 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
             *flags |= mask;
         }
         {
-            u16 *route = *(u16 **)(group + 0x7c);
             struct ContactPosition *p = &target;
+            u16 *route = *(u16 **)(group + 0x7c);
             p->x = route[0];
             p->z = route[1];
+            savedFlags = &actor->flags2CC;
+            asm("" : "+r"(savedFlags));
             p->y = Chase_Height(p);
         }
         target.y = actor->position.y;
         Chase_TryRoute(actor, *(void **)(group + 0x1fc), &actor->position, &target);
         (*(struct ContactPosition **)(group + 0x200))->pad = 1;
-        if (!SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
+        if (!(u8)SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
             {
-                u32 *flags = &actor->flags2CC;
+                u32 *flags = savedFlags;
                 u32 mask = ~0xc0;
                 *flags &= mask;
             }
             SaveControl(group + 0x8c, actor->entryTarget228, 7);
         } else {
             {
-                u32 *flags = &actor->flags2CC;
+                u32 *flags = savedFlags;
                 u32 mask = ~0xd0;
                 *flags &= mask;
             }

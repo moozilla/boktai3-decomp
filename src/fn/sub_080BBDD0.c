@@ -2,10 +2,9 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 88.9%
 // confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
 // Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
-// fuzzy: 79.9% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
  * return to the route point or chase the player target (tentative). */
 void sub_0807E334(void *);
@@ -184,7 +183,7 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
 {
     u32 current = actor->direction;
     s32 i;
-    u32 direction;
+    u8 direction;
     i = 0;
     do {
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;

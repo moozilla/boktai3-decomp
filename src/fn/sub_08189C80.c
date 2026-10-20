@@ -6,11 +6,11 @@ struct S {
 void sub_081885BC(void *);
 void sub_0818911C(void *);
 void sub_08188B7C(void *);
-void sub_081896D0(void *);
+void Armor_UpdateFacingDecision(void *);
 void Armor_UpdateSecondaryBehaviorByFlag(struct S *p)
 {
     if ((p->fl & 0x200) == 0)
         sub_08188B7C(p);
     else
-        sub_081896D0(p);
+        Armor_UpdateFacingDecision(p);
 }
