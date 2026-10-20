@@ -1794,3 +1794,91 @@ zero differing bytes in every case. The 98.0% draft was recorded with
 scratch copy so it could not accidentally accept the assembly fallback.
 Per-function matching commits and subsequent per-function hint reductions were
 queued through build/commit.sh. Combined-ROM validation is deferred to integration.
+
+## Task 0817AD7C (2026-10-20)
+
+Tags: #matching #boss #palette #scene-volume #register-pinning
+
+Two new exact matches: approximately +0.038 percentage points of code against
+PROGRESS.md's recorded denominator (920 reviewed bytes). Of those, 552 bytes
+are Register-pinned and 368 bytes need no hints. Two new guarded drafts were
+added; the existing combat-decision draft was retained with a local alias and
+correct assembly fallback. Drafts contribute no exact progress. All commits
+were queued through build/commit.sh on the assigned cloud/0817AD7C branch.
+No network, full build, generated-file edits, or shared-doc changes.
+
+- **0817C3F4 — retained draft 83.3%, BossSlot2_SelectCombatAction.** Read
+  BIG_FUNCTIONS.md, the existing source, assembly, condensed listing and
+  matched relatives. Best retained source remains 530 realigned differences,
+  407 ignoring registers. Moving event initialization after the initial
+  callback guard, repeating mode-local initialization, and replacing the final
+  event store with a direct index store did not improve the result. Kept the
+  initialized pointer; no uninitialized-read variant was accepted. Added the
+  required exact local alias and changed the stringified INCLUDE_ASM argument
+  to sub_0817C3F4. Default fallback verified exactly over 4412 bytes. No new
+  recovered body for this address.
+- **0817EBB4 — new draft 93.8%, BossSlot2_UpdateSummonSpinSequence
+  (tentative).** Nine-state animation sequence: sets facing, starts palette
+  fade mode 3, invokes the four-actor formation spawner, rotates effects over
+  a 512-unit timer, then restores the callback. Initial reconstruction was
+  86.5%. Preserving the phase-zero timer before its zero test and reusing it
+  for the palette counter, plus two call-argument constants pinned to r4,
+  improved it to 32 realigned differences, 15 ignoring registers; full
+  reviewed extent is 952 bytes. Remaining differences concern palette
+  constant lifetimes, rotation mask reuse, register choices and pool effects.
+  Three hints are retained and the unit is marked register-pinning. A spin
+  mask helper, explicit palette mode pin, and palette initializer inline
+  regressed and were discarded. depin.py initially tested the guarded
+  assembly fallback and removed candidate hints; restored them in a corrective
+  commit. An unguarded scratch run correctly skipped the nonexact candidate.
+  Use an unguarded scratch copy when depinning drafts. Both --nonmatching
+  --record and the default assembly fallback were checked.
+- **0817E6E0 — stopped below threshold, best exploratory 73.5%, tentative
+  BossSlot2_UpdateLungeApproach.** Tracks the player/path destination during
+  a sixteen-tick collision window; tests a 32-unit projected terrain height,
+  snaps within radius 50 or at an invalid floor, otherwise advances using
+  animation F9. The bounds argument is actor+288 (A2 << 2), not actor+428.
+  Observed floor height is 4F2. Reused the matched knockback sibling's terrain
+  and direction inlines. Correcting the bounds argument, the vector base
+  layout at +48, materialized floor boolean, and snap-before-advance block
+  order improved 56.0% to 73.5% (139 realigned differences, 59 ignoring
+  registers). Palette initialization as an inline helped. Angle/delta pins,
+  combined projection/vector helpers and direct horizontal-velocity inline
+  regressed. Remaining issues: address and vector lifetimes, cosine-index
+  reuse, constant ordering and allocation. Best valid source is retained in
+  wip/sub_0817E6E0.c only; no production draft below 80%.
+- **0817B0B4 — matched, BossSlot2_UpdateSequencePalette (tentative), 552
+  bytes.** Mode 1 fades global palette +2E80 to +680 for 24 ticks; modes 2/3
+  fade between +680 and +2DE0 for 1 << shift ticks; mode 4 repeatedly pulses
+  between them over two half periods. Counter storage is unsigned, reads are
+  signed. Fraction clamps to 0..24 and otherwise truncates signed division
+  toward zero before an eight-bit magnitude shift. First candidate was
+  88.4%; changing inline argument order to evaluate the signed tick first,
+  pinning source/destination pointer allocation and the phase-one palette
+  base produced equality. Hint minimization removed four of eight hints,
+  including the fraction scale pin. Four remain: the phase-one base in r0,
+  its second bank in r6, and the second banks for modes 2/3 in r7. Marked
+  register-pinning, formatted and checked with --target-size 552.
+- **0817F0AC — matched, BossSlot2_UpdateChargePaletteSequence (tentative),
+  368 bytes, no hints.** Sets direction 32 and offset point, plays animations
+  F4/12B/12D, waits for completion and 30 ticks, then starts palette pulse
+  mode 4, song 239 and converging particles at +5F8. First candidate was
+  83.9%. A SetPalette inline taking mode, shift and the zero timer changed
+  allocation across the entire routine and reproduced every offset register
+  and instruction. Offset-specific register helpers regressed and were
+  discarded. Formatted and checked over the complete reviewed 368 bytes.
+- **0817AD7C — new draft 81.1%, BossSlot2_SpawnBobbingFormation
+  (tentative), no hints.** Starts animation 12D, chooses initial angle 0 or
+  32 from RNG bit 8, then spawns four bobbing actors at quarter turns with
+  radius 256 and vertical offset 320. Spawn steering starts at base+16 and
+  steps by 64; target is +110 and signed parameter is +500. Hoisting the
+  origin vector pointer and passing the mask into the trigonometric inline
+  improved 64.6% to 81.1% (33 realigned differences, four ignoring registers).
+  A hardcoded mask incorrectly lets agbcc remove repeated ANDs. Inline
+  parameter-order variants, explicit loop/register pins, an output-pointer
+  pin and vector-add inlines did not improve the retained version. Remaining
+  differences are stack-vector lifetime and low-register allocation. Recorded
+  score and default fallback checked over the full 332-byte extent.
+
+The Ghidra export is absent locally. Fast check.py checks supplied acceptance;
+no full build was run. Combined ROM validation remains with integration.
