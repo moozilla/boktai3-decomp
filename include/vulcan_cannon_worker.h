@@ -11,7 +11,10 @@ struct VulcanCannon {
     struct SceneVec initialPosition;
     union {
         struct DisplaySequenceSprite sprite;
-        struct { u8 pad[0x1c]; struct SceneVec position; } spatial;
+        struct {
+            u8 pad[0x1c];
+            struct SceneVec position;
+        } spatial;
     } display;
     u8 graphics[0x1c];
     u8 collider[0x54];
@@ -34,11 +37,11 @@ struct VulcanCannon {
     s16 delayCount, delayIndex, delays[8];
 };
 #ifndef VC_FIRST
-#define VC_FIRST "r1"
-#define VC_TEMP "r1"
-#define VC_MASK "r5"
+#define VC_FIRST    "r1"
+#define VC_TEMP     "r1"
+#define VC_MASK     "r5"
 #define VC_DURATION "r3"
-#define VC_WEIGHT "r1"
+#define VC_WEIGHT   "r1"
 #endif
 static inline u32 VulcanCannon_StepAnimation(struct VulcanCannon *owner)
 {
