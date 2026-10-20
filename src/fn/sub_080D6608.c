@@ -1,7 +1,11 @@
 #include "global.h"
-
 #ifdef NONMATCHING
-// fuzzy: 87.0%
+// fuzzy: 92.5%
+// Remaining differences: PRE stack-slot order and register allocation in route reacquisition.
+// MATCHING_CONCESSION: register-pinning
+#define Mummy_RequestStraightRoute sub_080D6FDC
+#define Mummy_TryDirectPursuit     sub_080D6608
+
 #include "scene_actor_chase.h"
 
 static inline u8 Test16(u16 *p, u32 mask)
@@ -21,7 +25,10 @@ static inline u32 PickTurn(u32 dir)
             gUnk_03005308 = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
-            d = (v & 3) << 6;
+            {
+                register u32 mask asm("r7") = 3;
+                d = (v & mask) << 6;
+            }
         }
         if (d != dir)
             return d;
@@ -67,7 +74,7 @@ static inline u8 Arrive(void *obj)
     s32 player;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
     if (Chase_Test(gUnk_030053F4, 0x4800)) {
-        struct ChaseTarget *t = *slot;
+        register struct ChaseTarget *t asm("r1") = *slot;
         if (!t)
             goto invoke;
         {
@@ -91,7 +98,11 @@ static inline u8 Arrive(void *obj)
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
+    {
+        struct ChaseFlags40 *flags = (void *)(group + 0x40);
+        s32 mask = ~4;
+        flags->bits = mask & flags->bits;
+    }
     if (Chase_MotionFlags(actor, 0x80)) {
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
@@ -124,7 +135,7 @@ reroute: {
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &target))
         return 1;
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
@@ -190,7 +201,9 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     s32 goal = *(u16 *)(*(u8 **)(actor->fieldDC + 0x1c) + 6);
     if (*(u32 *)(group + 0x64) != gUnk_02000508)
         return 0;
-    if (goal == actor->terrainCell || FindPath(actor, goal))
+    if (goal == actor->terrainCell)
+        return 1;
+    if (FindPath(actor, goal))
         return 1;
     if (!*(u16 *)(body + 0x6d2) && actor->terrainCell == goal) {
         Mummy_RequestStraightRoute(actor);
@@ -202,5 +215,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
+INCLUDE_ASM("asm/nonmatching", sub_080D6608);
 #endif
