@@ -1,0 +1,110 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 96.2%
+#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
+// confidence=low: command 9 alternates selected halves for six timed attacks.
+struct Vanargand {
+    u8 pad0[0x9C];
+    u32 flags;
+    u8 padA0[2];
+    u8 phase;
+    u8 padA3;
+    u32 timer;
+    u8 padA8[7];
+    u8 finished;
+    u8 entered;
+    u8 pending;
+    u8 padB2[0x104 - 0xB2];
+    void *callback;
+    u8 pad108[0x56C - 0x108];
+    void *pair;
+    u8 pad570[0x580 - 0x570];
+    u32 selected;
+    u16 pad584;
+    u16 parameter;
+    u8 pad588[0x5B4 - 0x588];
+    s16 repeats;
+    u8 pad5B6[0x5C2 - 0x5B6];
+    s16 mode;
+};
+void Vanargand_SetPendingCue(void *, u16);
+u8 Callback_InvokeActor(void *, void *);
+void Vanargand_SetPairedMotionParameter(void *, u16);
+void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+s32 sub_081B64D4(void *);
+extern u32 gUnk_03005308;
+extern u16 gUnk_0203B400[];
+static inline s32 RandomValue(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+    return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+}
+void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
+{
+    u8 result;
+    u8 phase;
+    if (p->mode == 1) {
+        u32 mask = 0x40000;
+        p->flags |= mask;
+    }
+    {
+        u32 mask = 0x40;
+        p->flags |= mask;
+    }
+    Vanargand_SetPendingCue(p, 0);
+    result = Callback_InvokeActor(p, p->callback);
+    if (result)
+        return;
+    if (p->pending) {
+        p->pending = result;
+        p->phase = result;
+        p->timer = result;
+        p->repeats = result;
+        Vanargand_SetPairedMotionParameter(p->pair, p->parameter);
+    }
+    phase = p->phase;
+    switch (phase) {
+        case 0:
+            if (p->timer == 0) {
+                PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 7);
+                p->timer++;
+            } else if (sub_081B64D4(p->pair)) {
+                p->selected = (RandomValue() >> 4) & 1;
+                p->phase = 1;
+                p->timer = phase;
+            }
+            break;
+        case 1:
+            if (p->timer == 0)
+                PairedSceneActor_ApplyToSelectedHalves(p->pair, p->selected + 1, 9);
+            if (++p->timer > 50) {
+                if (++p->repeats > 5) {
+                    {
+                        u8 next = 2;
+                        p->phase = next;
+                        p->timer = 0;
+                    }
+                } else {
+                    p->selected = (p->selected + 1) & 1;
+                    p->phase = 1;
+                    p->timer = result;
+                }
+            }
+            break;
+        case 2:
+            if (sub_081B64D4(p->pair)) {
+                if (++p->timer > 15) {
+                    p->phase = 3;
+                    p->timer = result;
+                }
+            }
+            break;
+        case 3:
+            p->finished = 1;
+            break;
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", sub_081AA178);
+#endif

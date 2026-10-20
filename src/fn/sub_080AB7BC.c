@@ -1,8 +1,10 @@
 #include "global.h"
 
+#define TentacleActor_UpdateSegmentColliders sub_080AB7BC
+
 #ifdef NONMATCHING
-// fuzzy: 85.5%
-// foundry draft (worker best 84.3%); what differs is mostly register allocation and instruction order
+// fuzzy: 93.1%
+// Remaining differences include stack-vector scheduling, flag access, and register allocation.
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetPosition(void *, void *, s32);
 void Collider_Refresh(void *);
@@ -54,7 +56,23 @@ static inline u8 chk(struct P *p)
     return FALSE;
 }
 
-void sub_080AB7BC(struct P *pp)
+static inline void SetAttack(void *collider, u8 *p, s32 variant)
+{
+    u8 *q = p + 0xb4 + variant;
+    u32 a = *(u16 *)q;
+    u32 b;
+    u32 c;
+    u32 d;
+    q += 8;
+    b = *(u16 *)q;
+    q += variant ? 0x12 : 0x10;
+    c = *(u32 *)q;
+    q -= variant ? 0xa : 8;
+    d = *(u16 *)q;
+    Collider_SetAttackProperties(collider, a, b, 0, c, d);
+}
+
+void TentacleActor_UpdateSegmentColliders(struct P *pp)
 {
     u8 *p = (u8 *)pp;
     u8 *base = pp->f3d0;
@@ -87,14 +105,16 @@ void sub_080AB7BC(struct P *pp)
             if (d[0] * d[0] + d[2] * d[2] <= 0xFFFF) {
                 Collider_SetPosition(b, a, 0);
                 Collider_Refresh(b);
-                if (H(p, 0x2d4) & 0x100) {
+                if (tsth((u16 *)(p + 0x2d4), 0x100)) {
                     H(a, 0x32) &= ~0x100;
-                    Collider_SetAttackProperties(b, H(p, 0xb6), H(p, 0xbe), 0, W(p, 0xd0),
-                                                 H(p, 0x12));
+                    SetAttack(b, p, 2);
                 } else {
-                    H(base + off + 0x41c, 6) |= 0x100;
-                    Collider_SetAttackProperties(b, H(p, 0xb4), H(p, 0xbc), 0, W(p, 0xcc),
-                                                 H(p, 0x1));
+                    {
+                        struct AttackFlags { u8 pad[6]; u16 flags; };
+                        struct AttackFlags *f = (void *)(base + off + 0x41c);
+                        f->flags |= 0x100;
+                    }
+                    SetAttack(b, p, 0);
                 }
             }
         }
