@@ -27,7 +27,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = 0;
 }
-#define SceneActorReaction_UpdateRouteRecovery sub_081301C4
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void sub_0807C72C(void *, u32, u32, u32);
@@ -94,5 +93,5 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081301C4);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteRecovery);
 #endif

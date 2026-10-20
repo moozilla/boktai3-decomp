@@ -51,7 +51,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define Dog_UpdateProbeApproach sub_080E52EC
 // confidence=low: approaches the navigation probe and selects the next dog state.
 void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
 {
@@ -95,7 +94,6 @@ void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 0x20, 0x20,
                                                      speed)) {
             SetState(actor);
-
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
                                                              0x20, speed)) {

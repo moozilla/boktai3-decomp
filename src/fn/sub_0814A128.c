@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define Player_UpdateStatARestoreAction sub_0814A128
 // confidence=low: restores the tentative health-like stat A using two stat B units.
 u32 Player_ConsumeStateEntry(struct Player *);
 void *SpiralBurst_Create(struct Player *, struct SceneVec *);

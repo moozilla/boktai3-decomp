@@ -119,7 +119,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
     return done;
 }
 
-#define Player_UpdateAlternateFormCue sub_08146EAC
 // confidence=low: motion eleven toggles actionMode two with a secondary sprite animation.
 extern u32 gUnk_030053F4;
 extern u16 gUnk_02000528, gUnk_02000518, gUnk_02000590;

@@ -7,7 +7,7 @@ struct SceneActorApproachContext {
     u32 minimumDistance, maximumDistance;
 };
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 static inline void ClearFlags(u32 *p, u32 mask)
 {
@@ -47,7 +47,7 @@ void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
     else if (actor->distanceF0 > context->maximumDistance ||
              actor->distanceF0 < context->minimumDistance) {
         ClearFlags(&context->flags, ~0x100);
-        sub_080B7C10(actor);
+        Skeleton_SelectDistanceReaction(actor);
     } else if (SceneActorReaction_IsRangeReady(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         if (!TryMove(actor, group))

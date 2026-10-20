@@ -2,7 +2,6 @@
 #include "global.h"
 #include "player.h"
 #include "contact_swarm.h"
-#define Player_UpdateSpiralTrailAction sub_08149DF0
 // confidence=low: action creates the spiral trail and advances its auxiliary sprite.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -173,5 +172,5 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08149DF0);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralTrailAction);
 #endif

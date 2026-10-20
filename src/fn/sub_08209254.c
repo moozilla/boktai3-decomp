@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.7%
 // Remaining differences: stack-address materialization and register allocation.
-#define FanCannon_ApplyHitReaction sub_08209254
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -129,5 +128,5 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08209254);
+INCLUDE_ASM("asm/nonmatching", FanCannon_ApplyHitReaction);
 #endif

@@ -13,7 +13,7 @@ struct SceneActorCheckpointSequence {
     u8 unknownA[4];
     u16 timer;
 };
-void sub_080D62CC(struct SceneActorRegistryResetView *);
+void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *);
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -34,7 +34,7 @@ void SceneActor_UpdateAnimationCheckpoint(struct SceneActorRegistryResetView *ac
     }
     if (sequence->frame > 2) {
         if (sequence->frame == 4 && sequence->timer == 0)
-            sub_080D62CC(actor);
+            Mummy_FireAcceleratingVolley(actor);
     }
     if (actor->field2B3) {
         state->savedTick = state->currentTick;

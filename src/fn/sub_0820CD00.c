@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Screamer_InitFromScript sub_0820CD00
 #ifdef NONMATCHING
 // fuzzy: 81.1%
 // Remaining differences: script option narrowing, animation pointer lifetimes and defined success return.
@@ -11,7 +10,7 @@
 #define SCREAMER_DURATION "r4"
 #define SCREAMER_WEIGHT   "r2"
 #include "screamer_playback.h"
-s32 sub_0820C334(struct ScreamerState *);
+s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
 void SceneDrawablePair_SetFlags(void);
 s32 sub_0820C120(struct ScreamerState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
@@ -119,7 +118,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f218 = sequences;
     if (!p->f1F6) {
-        p->update = sub_0820C334;
+        p->update = Screamer_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0x1A, (u8)p->f1D8, 8);
     } else {
         p->update = SceneDrawablePair_SetFlags;
@@ -159,5 +158,5 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820CD00);
+INCLUDE_ASM("asm/nonmatching", Screamer_InitFromScript);
 #endif

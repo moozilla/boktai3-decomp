@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define Player_UpdateInputCadenceCue sub_08146574
 // confidence=low: shifts input history and adjusts animation rate from occupied samples.
 u32 Player_ConsumeStateEntry(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);

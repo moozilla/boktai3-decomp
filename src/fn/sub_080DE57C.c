@@ -126,7 +126,6 @@ static inline void StepSequence(void *obj)
     }
 }
 
-
 struct DogActionContext {
     u8 unknown0[0x678];
     u32 flags;
@@ -140,23 +139,22 @@ struct DogActionContext {
     u8 unknown6A8[0x30];
     u8 slots[8];
 };
-#define Dog_ResetActionState sub_080DE57C
 // confidence=low: clears action gates before resolving the route and stepping its drawable.
 void SceneActorMovement_ResolveRoutePosition(void *);
 void Dog_ResetActionState(struct SceneActorRegistryResetView *actor)
 {
-    struct DogActionContext *context=actor->context;
-    context->flags=0;
-    context->timer690=0;
-    context->selection=0xFFFF;
-    context->timer6A4=0;
-    context->state6A6=0;
-    context->state6A7=0;
-    Memory_Clear(context->slots,8);
+    struct DogActionContext *context = actor->context;
+    context->flags = 0;
+    context->timer690 = 0;
+    context->selection = 0xFFFF;
+    context->timer6A4 = 0;
+    context->state6A6 = 0;
+    context->state6A7 = 0;
+    Memory_Clear(context->slots, 8);
     SceneActorMovement_ResolveRoutePosition(actor);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor,0);
+    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        register void *drawable asm("r0")=actor->drawable;
+        register void *drawable asm("r0") = actor->drawable;
         asm("" : "+r"(drawable));
         StepSequence(drawable);
     }

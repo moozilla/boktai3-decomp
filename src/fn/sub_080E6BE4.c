@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#define Dog_UpdateShadowlessApproach sub_080E6BE4
 // confidence=low: resolves the shadowless approach against the saved context position.
 #ifdef NONMATCHING
 // fuzzy: 84.0%
@@ -42,5 +41,5 @@ void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E6BE4);
+INCLUDE_ASM("asm/nonmatching", Dog_UpdateShadowlessApproach);
 #endif

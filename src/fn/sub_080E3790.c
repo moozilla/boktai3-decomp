@@ -2,7 +2,7 @@
 void sub_080E04D0(void);
 void sub_0807C72C(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
-void sub_080DE128(u8 *);
+void Dog_SelectTargetAction(u8 *);
 inline static u8 TakeFlag(u8 *p)
 {
     if (*p) {
@@ -96,7 +96,7 @@ void Dog_UpdateScriptedAction(struct S *obj)
         *((u16 *)(((u8 *)obj) - (-off))) = value;
     }
     if (obj->done) {
-        sub_080DE128((u8 *)obj);
+        Dog_SelectTargetAction((u8 *)obj);
     } else {
         ++(*((u32 *)(((u8 *)obj) + 0x2AC)));
     }

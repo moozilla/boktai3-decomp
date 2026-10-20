@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#define Dog_ResumeAfterReaction sub_080E059C
 // confidence=low: animation completion resumes group movement or idle.
 void SceneActorControl_OnIdle(void);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)

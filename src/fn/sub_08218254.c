@@ -65,7 +65,6 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     out->y = y - gUnk_03005418[1] + 80;
     out->z = z - gUnk_03005418[2];
 }
-#define SpriteOam_QueueCameraRelativeSprites sub_08218254
 void SpriteOam_QueueCameraRelativeSprites(void)
 {
 
@@ -174,5 +173,5 @@ void SpriteOam_QueueCameraRelativeSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08218254);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueCameraRelativeSprites);
 #endif

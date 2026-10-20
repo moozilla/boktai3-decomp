@@ -17,10 +17,10 @@ extern struct G gUnk_030042A0;
 s32 Script_GetKeywordValue(u32, u32);
 struct Q *ResourceRegistry_GetResource(u32);
 void Video_SetRenderCallbacks(u32, void (*)(void), void (*)(void), void (*)(void));
-void sub_08217F4C(void);
+void SpriteOam_QueueProjectedSprites(void);
 void sub_08214B44(void);
 void sub_08219624(void);
-void sub_08218254(void);
+void SpriteOam_QueueCameraRelativeSprites(void);
 void sub_08214D20(void);
 void sub_0821964C(void);
 void Terrain_SetRenderModeFromScript(void)
@@ -29,14 +29,15 @@ void Terrain_SetRenderModeFromScript(void)
     struct Q *p;
     if (r == 0) {
         p = ResourceRegistry_GetResource(0x56C2);
-        Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
+        Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
         if (p && p->f4) {
             gUnk_030042A0.f8 = p->f4->f8 >> 4;
             gUnk_030042A0.fa = p->f4->fa >> 4;
             return;
         }
     } else {
-        Video_SetRenderCallbacks(r, sub_08218254, sub_08214D20, sub_0821964C);
+        Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
+                                 sub_0821964C);
     }
     gUnk_030042A0.f8 = 0;
     gUnk_030042A0.fa = 0;

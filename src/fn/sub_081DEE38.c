@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Time_InitializeDateMenu sub_081DEE38
-struct ResourceHeader { u32 words[8]; };
+struct ResourceHeader {
+    u32 words[8];
+};
 extern u8 gUnk_03004FC0[];
 extern u32 gUnk_02000340[];
 void Bg_ClearTilemap(u32);

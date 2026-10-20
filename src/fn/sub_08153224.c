@@ -63,7 +63,6 @@ s32 Player_ConsumeStateEntry(struct P *);
 s32 ActorVariant_GetTableValue(s32, s32);
 void Player_SetActionPhase(struct P *, s32);
 void sub_0813D178(struct P *);
-#define PlayerCue_UpdateFormChange sub_08153224
 // confidence=low: toggles actor variant between zero and one through four motion phases.
 void PlayerCue_UpdateFormChange(struct P *p)
 {
@@ -176,5 +175,5 @@ void PlayerCue_UpdateFormChange(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08153224);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
 #endif

@@ -11,14 +11,14 @@ struct SceneTransition {
     u8 pad341[5];
     u16 timer;
 };
-void sub_08218508(void);
+void SpriteOam_QueueFlaggedProjectedSprites(void);
 void sub_08214E3C(void);
 void sub_08219674(void);
 void Video_SetRenderCallbacks(int, void *, void *, void *);
 void SceneTransition_FinishDelay(struct SceneTransition *p)
 {
     if (++p->timer > 31) {
-        void *a = sub_08218508;
+        void *a = SpriteOam_QueueFlaggedProjectedSprites;
         void *b = sub_08214E3C;
         void *c = sub_08219674;
         u32 mask = ~1;

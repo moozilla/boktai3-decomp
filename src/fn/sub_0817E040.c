@@ -135,7 +135,6 @@ static inline void SetVelocity(s16 *velocity, u32 angle, s32 speed)
     velocity[2] = Scale(gUnk_086149C4[angle] * speed);
 }
 // confidence=low: decays impact velocity and height before landing animations
-#define SceneVolume_UpdateKnockbackLanding sub_0817E040
 void SceneVolume_UpdateKnockbackLanding(struct VolumeActor *p, s32 elapsed)
 {
     struct VolumeActor *q = p;

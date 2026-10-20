@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-#define Golem_ResumeRouteAfterControl sub_080CE188
 // confidence=low: Golem behavior table dispatches completion into chase or saved-route recovery.
 #ifdef NONMATCHING
 // fuzzy: 90.3%
@@ -375,5 +374,5 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
         actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CE188);
+INCLUDE_ASM("asm/nonmatching", Golem_ResumeRouteAfterControl);
 #endif

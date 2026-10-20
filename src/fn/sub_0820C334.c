@@ -4,8 +4,7 @@
 #define SCREAMER_DURATION "r3"
 #define SCREAMER_WEIGHT   "r1"
 #include "screamer_playback.h"
-#define Screamer_WaitForPlayerApproach sub_0820C334
-s32 sub_0820C4D4(struct ScreamerState *);
+s32 Screamer_UpdateScream(struct ScreamerState *);
 struct ActorPosition *Player_GetEffectivePosition(u32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *p)
@@ -20,7 +19,7 @@ s32 Screamer_WaitForPlayerApproach(struct ScreamerState *p)
     dz = player->z - position->z;
     if (dx * dx + dz * dz < (s32)p->f1FC) {
         Anim_RestartSequence(&p->sequence, p->f218, 0x1D, (u8)p->f1D8, 0);
-        p->update = sub_0820C4D4;
+        p->update = Screamer_UpdateScream;
         p->age = 0;
         p->f1D6 = 0;
     }

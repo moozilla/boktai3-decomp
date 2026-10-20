@@ -1,6 +1,5 @@
 #include "global.h"
 /* Dog_ChasePlayer: on entry starts the chase animation (kind 0x28); bites when a bite frame of the run cycle ends with player 0 in range (records the player's position, extends the chase timer), otherwise once the control finishes either follows the group's chase (flags2D4 & 0x80) or routes back to its route point (provisional name) */
-#define Dog_ChasePlayer sub_080E4468
 #include "scene_actor_chase.h"
 
 void Dog_UpdateAnimationFourteenReaction(void);
@@ -28,7 +27,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-void sub_080E4468(struct SceneActorRegistryResetView *actor)
+void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
     u8 *group = (u8 *)&actor->group;

@@ -282,7 +282,6 @@ done:
     return 0;
 }
 
-#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 // confidence=low: waits before restoring control and choosing a route back toward the target.
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *actor)
@@ -334,5 +333,5 @@ void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *ac
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812FA0C);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteReturn);
 #endif

@@ -21,8 +21,8 @@ struct P {
 
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
-void sub_08151EB8(void);
-void sub_08153A00(void);
+void PlayerCue_UpdateWalkTarget(void);
+void PlayerCue_UpdateSideWalkTarget(void);
 void sub_0814FC80(void);
 
 void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
@@ -33,9 +33,9 @@ void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
     if (p->state == 3) {
         if ((s8)a >= 0)
             p->b59D = ((s8)a >> 1) * 2 + 1;
-        p->fn = sub_08151EB8;
+        p->fn = PlayerCue_UpdateWalkTarget;
     } else if (p->state == 4) {
-        p->fn = sub_08153A00;
+        p->fn = PlayerCue_UpdateSideWalkTarget;
     } else if (p->state == 5) {
         p->b464 = 1;
         p->b465 = 1;

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 80.1%
 // Blended bank loops still differ in constant hoisting and register allocation.
-#define Palette_ApplyBackgroundFade sub_08217960
 extern s32 gUnk_03004DA0, gUnk_030051D8, gUnk_03004DA8;
 extern u16 *gUnk_030051E0;
 extern u16 gUnk_03004FC0[], gUnk_030051C4, gUnk_03005214;
@@ -96,5 +95,5 @@ void Palette_ApplyBackgroundFade(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08217960);
+INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
 #endif

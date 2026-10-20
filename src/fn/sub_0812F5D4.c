@@ -28,7 +28,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = 0;
 }
-#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
 // confidence=low: advances a route probe and requests the contact-facing turn.
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 s32 NavMesh_ConsumeProbeEvent(void *);
@@ -131,5 +130,5 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812F5D4);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
 #endif

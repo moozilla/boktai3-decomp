@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
 {
@@ -17,7 +17,7 @@ u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetVie
     if (!SceneActorReaction_IsRangeReady(s)) {
         if (IsFlag512Set(context))
             return 1;
-        sub_080B7C10(s);
+        Skeleton_SelectDistanceReaction(s);
         return 1;
     }
     if (angle <= 24 && s->distanceF0 < context->nearRange6E0) {

@@ -3,7 +3,6 @@
 #include "scene_actor_terrain.h"
 #include "script_utility.h"
 /* SceneActorControl_CompleteBlinkOut: keeps terrain timers and height updated while the drawable blinks (shadow follows visibility); when the blink expires runs the context and defeat scripts, sets the defeat event flag, goes idle unless flags2D4 & 0x4000, and hides the drawable and shadow (provisional name) */
-#define SceneActorControl_CompleteBlinkOut sub_080E2428
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
@@ -37,7 +36,7 @@ static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
 hidden:
     return 0;
 }
-void sub_080E2428(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;

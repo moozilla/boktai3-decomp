@@ -1,6 +1,5 @@
 #include "global.h"
-/* Golem_BeginSlideState: on entry hands control to the slide state (sub_080C725C, kind 0x29), faces the stored heading and sets the context push speed to 0x200; after 30 frames or once the control finishes, reports the pending context event and returns to the idle control (sub_080C68F0, kind 0x27) in phase 2/3 (provisional name) */
-#define Golem_BeginSlideState sub_080CEB48
+/* Golem_BeginSlideState: on entry hands control to the slide state (Golem_UpdateSlideImpact, kind 0x29), faces the stored heading and sets the context push speed to 0x200; after 30 frames or once the control finishes, reports the pending context event and returns to the idle control (Golem_UpdateChargeStop, kind 0x27) in phase 2/3 (provisional name) */
 #include "scene_actor_reset.h"
 
 struct Unk080CEB48Context {
@@ -14,8 +13,8 @@ struct Unk080CEB48Body {
     u8 direction;
 };
 
-void sub_080C725C(void);
-void sub_080C68F0(void);
+void Golem_UpdateSlideImpact(void);
+void Golem_UpdateChargeStop(void);
 
 static inline u8 TakeFlag(u8 *flag)
 {
@@ -51,12 +50,12 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->field2B1 = 1;
 }
 
-void sub_080CEB48(struct SceneActorRegistryResetView *actor)
+void Golem_BeginSlideState(struct SceneActorRegistryResetView *actor)
 {
     struct Unk080CEB48Context *context = actor->context;
     struct Unk080CEB48Body *body = (struct Unk080CEB48Body *)((u8 *)actor + 0x50);
     if (TakeFlag(&actor->field2B1)) {
-        BeginControl(actor, sub_080C725C, 0x29);
+        BeginControl(actor, Golem_UpdateSlideImpact, 0x29);
         actor->field2B0 = 0;
         body->direction = actor->fieldE9;
         context->pushSpeed = 0x200;
@@ -66,7 +65,7 @@ void sub_080CEB48(struct SceneActorRegistryResetView *actor)
             actor->field304 = context->pendingEvent;
             Callback_InvokeActor(actor, actor->update26C);
         }
-        BeginControl(actor, sub_080C68F0, 0x27);
+        BeginControl(actor, Golem_UpdateChargeStop, 0x27);
         SetPhase(actor, 0, 2, 3);
     } else {
         actor->counter2AC++;

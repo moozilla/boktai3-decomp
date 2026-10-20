@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define TentacleActor_UpdateRetraction sub_080AB968
 // confidence=low: state advances segment interpolation and oscillation before restoring control.
 
 #ifdef NONMATCHING
@@ -36,10 +35,16 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
     s->target = control;
     s->field2C8 = zero;
     flags = &s->flags114;
-    { u32 mask = -2; *flags &= mask; }
+    {
+        u32 mask = -2;
+        *flags &= mask;
+    }
     s->word104 = zero;
 }
-static inline s32 Abs(s32 x) { return x < 0 ? -x : x; }
+static inline s32 Abs(s32 x)
+{
+    return x < 0 ? -x : x;
+}
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
@@ -70,9 +75,10 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
         }
         s->counter2AC = zero;
         s->field2B1 = 1;
-    } else s->counter2AC++;
+    } else
+        s->counter2AC++;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AB968);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateRetraction);
 #endif

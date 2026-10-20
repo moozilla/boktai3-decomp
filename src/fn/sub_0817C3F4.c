@@ -24,7 +24,7 @@ s32 SceneActors_ConsumePendingSignal(void *);
 void SceneVolume_BeginPhase(void *, int);
 void ProximityVolume_ClearLatch(void *);
 void AnimatedHazardManager_RetractAll(void);
-s32 sub_0817AFF4(void *);
+s32 SceneVolume_CanActivate(void *);
 void SceneSteeringActor_RequestRemovalAll(void);
 u8 Callback_InvokeActor(void *, void *);
 extern void *gUnk_08611C6C[];
@@ -62,7 +62,6 @@ static inline void FaceTarget(struct DecisionActor *p)
     }
 }
 // confidence=low: selects phase-dependent attacks from the preceding choice and event index
-#define BossSlot2_SelectCombatAction sub_0817C3F4
 void BossSlot2_SelectCombatAction(struct DecisionActor *p)
 {
     struct DecisionActor *q = p;
@@ -118,7 +117,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 2: {
-                        s32 result = sub_0817AFF4(q);
+                        s32 result = SceneVolume_CanActivate(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -257,7 +256,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         SelectAction(p, 0, 8);
                         break;
                     case 2: {
-                        s32 result = sub_0817AFF4(q);
+                        s32 result = SceneVolume_CanActivate(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
@@ -354,7 +353,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 2: {
-                    s32 result = sub_0817AFF4(q);
+                    s32 result = SceneVolume_CanActivate(q);
                     if (result) {
                         SelectAction(p, 0, 12);
                     } else {
@@ -447,7 +446,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 10: {
-                    if (sub_0817AFF4(q)) {
+                    if (SceneVolume_CanActivate(q)) {
                         SceneSteeringActor_RequestRemovalAll();
                         SelectAction(p, 0, 12);
                     } else {
@@ -502,5 +501,5 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817C3F4);
+INCLUDE_ASM("asm/nonmatching", BossSlot2_SelectCombatAction);
 #endif

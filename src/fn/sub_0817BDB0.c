@@ -108,7 +108,6 @@ static inline s32 RandomValue(void)
     return *(u16 *)(offset + (u32)values);
 }
 // confidence=low: follows path points while creating proximity hazards
-#define ActorDecision_UpdateHazardPath sub_0817BDB0
 void ActorDecision_UpdateHazardPath(struct VolumeActor *p)
 {
     struct VolumeActor *q = p;

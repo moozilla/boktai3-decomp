@@ -2,7 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#define Vanargand_UpdatePartRetreat sub_081B2608
 // confidence=low: moves a Vanargand part along its heading, then plays sequence 7.
 #ifdef NONMATCHING
 // fuzzy: 83.8%
@@ -210,5 +209,5 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B2608);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRetreat);
 #endif

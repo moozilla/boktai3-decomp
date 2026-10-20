@@ -3,7 +3,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_script.h"
-u8 sub_080B8B84(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_TrySink(struct SceneActorRegistryResetView *);
 void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
 s32 Mod(s32, s32);
 static inline u8 Test(u32 value, u32 mask)
@@ -34,7 +34,7 @@ void SceneActorReaction_TickHiddenTimeout(struct SceneActorRegistryResetView *p,
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x11);
         ActorShadow_Disable((u8 *)p + 0x320);
     } else {
-        if (Mod(elapsed, 10) == 0 && sub_080B8B84(p))
+        if (Mod(elapsed, 10) == 0 && SceneActorReaction_TrySink(p))
             return;
         if (Test(StateFlag(state, 2), ~0))
             return;

@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // Remaining differences: stack-address materialization and register allocation.
-#define Screamer_ApplyHitReaction sub_0820BF70
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -130,5 +129,5 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820BF70);
+INCLUDE_ASM("asm/nonmatching", Screamer_ApplyHitReaction);
 #endif

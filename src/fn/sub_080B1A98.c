@@ -88,7 +88,7 @@ extern const u8 gUnk_0824E230[];
 
 #define Vorn_BeginTargetPursuit                                                                    \
     sub_080B1A98 // confidence=low: routes toward the current target after a reaction.
-u8 sub_080B3ADC(void *, u32);
+u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *p, u32 mask)
 {
@@ -136,7 +136,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
             if (actor->group.field418 > actor->group.field416)
                 actor->group.field418 = actor->group.field416;
         }
-        if (sub_080B3ADC(actor->context, 1))
+        if (SceneActor_DispatchContextAction(actor->context, 1))
             return;
     }
     SceneActorReaction_ResetAnimation(actor, 1);

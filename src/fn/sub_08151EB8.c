@@ -148,7 +148,6 @@ static inline void Step(struct ContactSwarmSprite *sprite, struct DisplaySequenc
         }
     }
 }
-#define PlayerCue_UpdateWalkTarget sub_08151EB8
 void PlayerCue_UpdateWalkTarget(struct P *p)
 {
     s32 dx = p->tx - p->x;
@@ -189,5 +188,5 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08151EB8);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateWalkTarget);
 #endif

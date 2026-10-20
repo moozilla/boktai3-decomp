@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Screamer_UpdateScream sub_0820C4D4
 #ifdef NONMATCHING
 // fuzzy: 94.4%
 // Remaining differences: animation constant copies, switch-case liveness and field-address registers.
@@ -12,7 +11,7 @@ void Anim_SetDurationScale(void *, u32);
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-s32 sub_0820C334(struct ScreamerState *);
+s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
 s32 Screamer_UpdateScream(struct ScreamerState *p)
 {
     register s32 phase asm("r3");
@@ -49,7 +48,7 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
             Screamer_StepAnimation(p);
             if (p->f1CA > p->f1CC) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 0);
-                p->update = sub_0820C334;
+                p->update = Screamer_WaitForPlayerApproach;
                 p->f1D6 = 0;
                 p->f1CA = 0;
                 p->f1D2 = 0;
@@ -64,5 +63,5 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820C4D4);
+INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
 #endif

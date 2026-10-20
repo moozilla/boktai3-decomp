@@ -262,7 +262,6 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
     }
     return ended;
 }
-#define PlayerCue_UpdateSideArrival sub_081540D4
 // confidence=low: reduces departure scale and returns to standing after animation.
 void PlayerCue_UpdateSideArrival(struct P *p)
 {
@@ -294,5 +293,5 @@ void PlayerCue_UpdateSideArrival(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081540D4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideArrival);
 #endif

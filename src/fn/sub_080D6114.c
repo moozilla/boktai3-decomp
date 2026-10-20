@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 s32 Callback_InvokeActor(void *, void *);
-void sub_080D3D60(void);
+void Mummy_UpdatePlayerRoute(void);
 static inline u8 TakePrepared(u8 *field)
 {
     if (*field) {
@@ -46,7 +46,7 @@ void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *act
                 actor->counter2AC = 0;
                 actor->field2B1 = 1;
             }
-            SetControl(actor, sub_080D3D60, 0x27);
+            SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         } else
             actor->counter2AC++;
     }

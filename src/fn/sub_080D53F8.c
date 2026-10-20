@@ -6,12 +6,11 @@
 #include "scene_actor_chase.h"
 
 // confidence=low: consumes navigation probe events and schedules descriptor turns.
-#define Mummy_UpdateProbeNavigation sub_080D53F8
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 sub_0807AF94(void *);
-u8 sub_080D6FDC(void *);
+u8 Mummy_RequestStraightRoute(void *);
 static inline void BeginProbeTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
@@ -86,7 +85,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
                                                           speed)) {
             if ((gUnk_02000580[0]->flags & 8) && !*(u16 *)(body + 0x6d2)) {
-                if (sub_080D6FDC(actor))
+                if (Mummy_RequestStraightRoute(actor))
                     return;
             }
             Chase_SetBehavior(actor, 14);
@@ -98,5 +97,5 @@ increment:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D53F8);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
 #endif

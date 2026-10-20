@@ -38,7 +38,6 @@ void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
-#define Armor_UpdateAlignedAttackDecision sub_081875EC
 // confidence=low: selects attacks when player and armor share a horizontal grid axis.
 void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
 {
@@ -201,5 +200,5 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081875EC);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedAttackDecision);
 #endif

@@ -26,7 +26,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = 0;
 }
-#define SceneActorReaction_BeginTargetRecovery sub_0812EED8
 // confidence=low: target contact flags enable a delayed return to route behavior.
 static inline u8 HasTargetFlag(struct SceneActorReactionMotion *motion, u32 mask)
 {
@@ -105,5 +104,5 @@ u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *ac
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812EED8);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_BeginTargetRecovery);
 #endif

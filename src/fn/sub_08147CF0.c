@@ -115,7 +115,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 
-#define Player_UpdateSpiralRelease sub_08147CF0
 // confidence=low: spiral particles accompany a timed release and palette cue.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -185,5 +184,5 @@ void Player_UpdateSpiralRelease(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08147CF0);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralRelease);
 #endif

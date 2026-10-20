@@ -2,8 +2,9 @@
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 90.6%
-#define PositionEffectDisplay_UpdateSources sub_08138778
-struct Vec { s16 x,y,z,w; };
+struct Vec {
+    s16 x, y, z, w;
+};
 struct Obj {
     u32 flags;
     u8 pad4[12];
@@ -24,27 +25,48 @@ struct Slot {
     u16 stopOnEnd, active;
     u8 pad44[0x1c];
 };
-struct Manager { u8 pad[0x34]; struct Slot slots[4]; };
-static inline u32 frame_factor(u16 v) { register u32 value asm("r1") = v; u32 mask=15; return mask & value; }
+struct Manager {
+    u8 pad[0x34];
+    struct Slot slots[4];
+};
+static inline u32 frame_factor(u16 v)
+{
+    register u32 value asm("r1") = v;
+    u32 mask = 15;
+    return mask & value;
+}
 int PositionEffectDisplay_UpdateSources(struct Manager *m)
 {
-    struct Cursor { u16 frame; u8 pad2[10]; struct Vec position; u8 tail[8]; struct Anim anim; const struct Vec *source; u16 stopOnEnd, active; u8 pad34[0x2c]; };
+    struct Cursor {
+        u16 frame;
+        u8 pad2[10];
+        struct Vec position;
+        u8 tail[8];
+        struct Anim anim;
+        const struct Vec *source;
+        u16 stopOnEnd, active;
+        u8 pad34[0x2c];
+    };
     register struct Manager *owner asm("r8") = m;
     register struct Manager *base asm("r12") = owner;
     register struct Cursor *cursor asm("r6") = (void *)((u8 *)owner + 0x44);
     register struct Anim *sequence asm("r9") = (void *)((u8 *)owner + 0x60);
     register struct Obj *sprites asm("r7") = (void *)((u8 *)owner + 0x34);
-    register s32 offset asm("r10")=0;
+    register s32 offset asm("r10") = 0;
     do {
         if (cursor->active) {
-            struct Manager *p=base;
+            struct Manager *p = base;
             struct Obj *o;
             struct Anim *a;
             const volatile u16 *entry;
             register u16 n asm("r0");
             int done;
-            { u8 *address = (u8 *)owner + 0x70; asm("" : "+r"(address)); cursor->position = **(const struct Vec **)(address + offset); }
-            o=sprites;
+            {
+                u8 *address = (u8 *)owner + 0x70;
+                asm("" : "+r"(address));
+                cursor->position = **(const struct Vec **)(address + offset);
+            }
+            o = sprites;
             a = sequence;
             entry = cursor->anim.data + cursor->anim.frame;
             cursor->frame = *entry >> 6;
@@ -103,21 +125,25 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 done = 0;
 
             if (done && cursor->stopOnEnd) {
-                { u8 *address = (u8 *)owner + 0x34; asm("" : "+r"(address)); ((struct Obj *)(address + offset))->flags |= 1; }
-                cursor->stopOnEnd=0;
-                cursor->active=0;
+                {
+                    u8 *address = (u8 *)owner + 0x34;
+                    asm("" : "+r"(address));
+                    ((struct Obj *)(address + offset))->flags |= 1;
+                }
+                cursor->stopOnEnd = 0;
+                cursor->active = 0;
             }
         }
         offset += 0x60;
         cursor++;
-        base=(void *)((u8 *)base+0x60);
+        base = (void *)((u8 *)base + 0x60);
         sequence++;
-        sequence=(void *)((u8 *)sequence+0x50);
-        sprites=(void *)((u8 *)sprites+0x60);
+        sequence = (void *)((u8 *)sequence + 0x50);
+        sprites = (void *)((u8 *)sprites + 0x60);
     } while ((s32)base <= (s32)((u8 *)owner + 0x120));
     return 0;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08138778);
+INCLUDE_ASM("asm/nonmatching", PositionEffectDisplay_UpdateSources);
 #endif

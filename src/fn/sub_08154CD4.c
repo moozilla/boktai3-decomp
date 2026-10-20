@@ -142,7 +142,6 @@ void Player_SetAnimation(struct P *, s32, s32, s32);
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 #define W(o) (*(u32 *)((u8 *)p + (o)))
 
-#define PlayerCue_UpdateSpiralRecovery sub_08154CD4
 // confidence=low: inferred from the side-facing cue callbacks and effects.
 void PlayerCue_UpdateSpiralRecovery(struct P *p)
 {
@@ -183,5 +182,5 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08154CD4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralRecovery);
 #endif

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* Decelerate recoil, converge on the saved position, then signal completion. */
-#define Golem_UpdateRecoil sub_080C75B8
 // confidence=low: inferred from the three movement phases and neighboring Golem controls.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"

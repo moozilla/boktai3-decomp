@@ -4,7 +4,7 @@
 /* Golem: route back to its home cell; near it, settle (sub_080C47DC), else face the cell centre; then go to state 2 (tentative) */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void sub_080C6338(void);
-void sub_080C66B0(void);
+void Golem_UpdateRouteMotion(void);
 void sub_080C47B8(struct ContactPosition *);
 void sub_080C47DC(void *);
 s32 Math_Atan2(s32, s32);
@@ -112,7 +112,7 @@ void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
             body[0x68E] = angle;
         }
         {
-            void *target = sub_080C66B0;
+            void *target = Golem_UpdateRouteMotion;
             SetControl(actor, 0x23, target);
         }
         {

@@ -7,7 +7,7 @@ struct SoundDelay {
     u16 timer;
 };
 void Sound_PlaySong(u32);
-void sub_08138CDC(struct SoundDelay *);
+void ParticleEmitter_UpdateFlight(struct SoundDelay *);
 void SoundDelay_Update(struct SoundDelay *p)
 {
     if (p->entered) {
@@ -16,7 +16,7 @@ void SoundDelay_Update(struct SoundDelay *p)
         p->entered = 0;
     }
     if (p->timer > 30) {
-        p->update = sub_08138CDC;
+        p->update = ParticleEmitter_UpdateFlight;
         p->entered = 1;
     } else {
         p->timer++;

@@ -148,7 +148,6 @@ static inline s32 Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-#define PlayerCue_UpdateSideRecoil sub_08154AF0
 // confidence=low: inferred from the side-facing cue callbacks and effects.
 void PlayerCue_UpdateSideRecoil(struct P *p)
 {
@@ -172,5 +171,5 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08154AF0);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideRecoil);
 #endif

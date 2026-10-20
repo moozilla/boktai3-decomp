@@ -134,8 +134,7 @@ done:
 }
 
 // confidence=low: control callback reacquires the player and resumes a route.
-#define Mummy_UpdatePlayerRoute sub_080D3D60
-u8 sub_080DA33C(struct SceneActorRegistryResetView *);
+u8 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *);
 static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B2) {
@@ -153,7 +152,7 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         actor->flags2D0 |= mask;
     }
-    if (sub_080DA33C(actor))
+    if (BouncingObject_RefreshNearbyHeading(actor))
         Chase_SetBehavior(actor, 16);
     if (actor->behavior2AA == 16)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
@@ -177,5 +176,5 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D3D60);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
 #endif
