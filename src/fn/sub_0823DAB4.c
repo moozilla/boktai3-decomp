@@ -2,7 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.3%
+// fuzzy: 97.4%
 // 9 differing insns: the second-branch sum goes through a copy in the ROM, and the 0xFF mask is reloaded
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
@@ -60,7 +60,7 @@ s32 Player_UpdateSweepAction(struct Player *p)
         Collider_SetPosition(q->collider, &q->dest, 0);
         Collider_Refresh(q->collider);
         if (q->index >= 0) {
-            p->statusFlags |= 0x80000;
+            { u32 m = 0x80000; p->statusFlags |= m; }
             if (q->timer & 1)
                 sub_0823D97C(p, &q->origin, angle, p->side, q->index);
         }
