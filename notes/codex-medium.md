@@ -2212,3 +2212,82 @@ checked using check.py --nonmatching --record. Every default assembly fallback
 also passed check.py; those fallback matches earn no C credit. Six separate
 draft commits and this note were submitted through build/commit.sh. Full batch
 validation and name promotion remain with the integrator.
+
+## Task 081B4040 — 2026-10-20
+
+Tags: #matching #vanargand #animation #motion #tooling
+
+- 081B52E8: matched, `Vanargand_UpdatePartBobbing`. On reset, selects
+  sequence 9 and performs one packed animation step; every tick sets origin Y
+  from the signed sine table at frame & 255, scaled by 128, and sets finished.
+  Complete 364-byte extent ends at 081B5454. Register-pinning concession.
+- 081B4C04: matched, `Vanargand_UpdatePartRecovery` (existing draft 91.8%).
+  Sets flags 12 and 0x120, selects sequence 11 on reset, and after 180 ticks
+  clears flag 0x100 and requests action 22, respecting the unfinished 25/26
+  action guard. Complete 416-byte extent ends at 081B4DA4. Register-pinning
+  concession. Setting the flag-offset register to r3, the flag pointer to r2,
+  and assigning the r1 mask after pointer materialization recovered the last
+  six-byte difference. depin.py reduced 18 hints to 14 before final acceptance.
+- 081B431C: drafted 84.9%, `Vanargand_UpdatePartImpact`, improved from 80.6%.
+  Sequence 8 precedes a short sideways motion and a travel to the impact
+  coordinates. Paired counter/state checks select the strong burst and flash
+  versus the ordinary burst; travel emits trails on even frames. Remaining:
+  100 realigned differing instructions, 30 ignoring registers. Enter-value
+  temporaries avoid premature address canonicalization; transition constants,
+  vector argument order, pool placement and saved pointer registers remain.
+- 081B48A0: drafted 87.6%, tentative `Vanargand_UpdatePartRetreat`. Starts
+  sequence 11, moves 128 units along the angle byte at +187 while preserving
+  origin height, then selects sequence 9 and sets finished. Remaining:
+  63 realigned differences, 19 ignoring registers; vector pointer copies,
+  transition ordering, saved owner/state and animation mask reuse differ.
+- 081B4040: drafted 81.0%, tentative `Vanargand_EmitRadialPartEffects`.
+  Selects sequence 10, emits six type-3 effects around the display position
+  at radius 128 with delays i*2, waits for the externally updated flash timer,
+  steps the animation, plays sound 0x58C, then deactivates the part. Remaining:
+  92 realigned differences, 27 ignoring registers. Declaring reset-field
+  pointer assignments after CpuSet reproduces more loop-hoisted addresses;
+  stack spills, loop registers and transition instruction ordering remain.
+- 081B4DA4: stopped; scratch candidate `wip/sub_081B4DA4.c` only. Tentative
+  `Vanargand_UpdatePartLeap`: sequence 9, a variant-dependent planar leap with
+  Y=768, then movement to terrain height and completion flag 0x80. The actual
+  apparent body is 0x388 bytes, ending at 081B512C, including final padding.
+  081B512C begins a separate apparent function (push {r4,r5,r6,lr}, own stack
+  frame, reset and state dispatch) currently emitted as bytes under the same
+  assembly block. The candidate scores 84.2% over the reviewed body, with
+  82 realigned differences / 20 ignoring registers, but --record independently
+  uses the inventory extent through 081B52E8 and records only 67.7%. A briefly
+  queued draft was removed in a follow-up commit once this distinction was
+  confirmed. No below-threshold production draft remains. Integrator should
+  review the missing 081B512C entry/boundary before resuming. Vector stores,
+  owner/enter lifetimes, terrain-height store width and transition ordering
+  remain even over the shorter body. An unused vector initialization is
+  observed in the assembly and retained through an inline vector setter.
+
+All six callbacks occur in the part-action table at gUnk_086120A0, with named
+Vanargand neighbors. Existing shared local layouts describe the sprite at +0,
+sequence +48, motion +58, base position pointer +90, origin +9C, target +A4,
+variant +15C, flags +160, state +164, timer +168 and enter +16F.
+These are static observations; no runtime coverage claims were added.
+
+Useful compiler details: the packed stepper's second sprite flag update must
+use a distinct source expression (`((struct VanargandPart *)obj)->sprite`)
+from the first update. This removes an unnecessary ip pointer alias and its
+copies. Materializing the animation resource before the sequence address via
+an empty operand barrier reproduces argument ordering. Final exact sources
+were depinned, formatted and checked again. No instruction bodies were added.
+
+Tool caveats: depin.py treats a raw-symbol NONMATCHING assembly fallback as
+an exact default source and may strip every draft hint without checking the
+NONMATCHING candidate. This happened on three drafts; their reviewed snapshots
+were restored and their candidate scores rechecked. With a named fallback,
+check.py --record can fail to update the fuzzy line when the defined symbol
+uses a raw-address alias; changing the fallback to sub_081B431C fixed recording.
+For 081B4DA4, --target-size changes the comparison but not draft_scores()'s
+recorded score. Do not substitute the shorter score for the recorded one.
+
+Final disposition: two exact matches (both register-pinned), three guarded
+NONMATCHING drafts and one stopped scratch candidate. Each retained source
+was checked with tools/check.py; draft scores were recorded on formatted C.
+Only the commit driver was used. No make, full build, generated-file edits,
+network operations, pushes or PRs. Batch validation and name promotion remain
+with the integrator. Notes remain local to this worker; shared docs untouched.
