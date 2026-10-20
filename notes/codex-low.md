@@ -1200,3 +1200,18 @@ Tags: #matching #player #movement #resource
 - 08142FC4: matched, `Player_UpdateUnflaggedResourceRecovery`. Sibling uses unflagged eligibility and far particles, plus a triangular pulse duration across a 0..64 timer. Cache the pulse counter once and pass its value to an inline that computes the destination internally. Pinned zero in r5 at the timer increment/store boundary.
 
 All acceptance checks used tools/check.py only; no full build or network operations. Register-pinning concessions are marked in affected units. Each match/draft is submitted separately through build/commit.sh. Drafts remain behind NONMATCHING with assembly defaults.
+
+## Task 080D0FE8 (2026-10-20, retained-candidate follow-up)
+
+Tags: #matching #mummy #scene-actor #register-pinning
+
+Exact progress: 0 percentage-point gain. Both production candidates existed on entry; this pass improves one and repairs their local aliases, not new exact coverage.
+
+- 080D2584: inspected largest first with asmat, relatives and fresh condensed listing (build/codex-low-mummy-motion.txt). Best relative still covers only 30%; four repeated terrain-height regions and paired route probes do not provide a close complete port. Prior far-branch-tail warning remains applicable. Stopped unmatched without a new candidate.
+- 080D0FE8: revisited entry and relatives alongside prior Task 080D0C30 notes. Route-facing octant selection and six animation-selection copies dominate; best relative covers 35%. No new reliable complete candidate; stopped unmatched.
+- 080D3878: retained existing Mummy_UpdateDefeat draft at recorded 86.4%, 86 realigned differences / 34 ignoring registers. Added the required file-local address alias and explicit address INCLUDE_ASM fallback, allowing checks against the local ELF. Remaining control-address materialization, collider lifetime and spills are unchanged; this is verification/alias repair only.
+- 080D2194: re-read entry and prior failed reconstruction. flags2D6 bit 16 and animation completion gate three restoration paths; ordinary terrain/route path needs original field-pointer lifetimes. Prior 60.8% candidate was below threshold. No new useful hypothesis; stopped unmatched.
+- 080D1784: re-read entry/reset and prior failed reconstruction. Clears control timers and selects animation 7; freezes mode/frame through tick 59. Prior 61.4% candidate needs reset ordering and PRE lifetimes reconstructed. No new candidate; stopped unmatched.
+- 080D1CD0: improved existing Mummy_UpdateHiddenRecovery guarded draft 94.2% to 94.3%; realigned differences 22/14 structural to 15/4 structural. A u8-returning take helper materializes the consumed flag but initially swapped actor/flag allocation (76.9%). Pinning queued to r5 and passing its known-zero value into the animation inline through an empty operand barrier retains the mirror-zero lifetime and improves the whole candidate. Removing the queued pin regresses to 74.7%; direct barrier after manual take regresses to 75.9%; actor+queued pins regress to 78.4%. Remaining entry offset/load/store allocation and a few inline temporaries differ. Added required local address alias and explicit address fallback. Candidate remains 464 bytes versus reviewed target extent 464 bytes, but is not byte-identical C.
+
+Formatted both sources directly with the pinned clang-format. Recorded scores with check.py --nonmatching --record and checked both default assembly fallbacks exactly. Separate draft updates queued through build/commit.sh. No full build, make, network operation or shared-doc edits. Existing register concessions remain confined to guarded drafts; integration must perform combined validation.
