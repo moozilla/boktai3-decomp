@@ -5132,6 +5132,7 @@ addr,name,mode,confidence,source,notes
 08158650,Player_SynchronizeInteractionDisplay,thumb,low,src-alias,
 08158848,Player_UpdateLinkModeMovement,thumb,low,src-alias,
 08158CD8,Player_BeginTerrainInteraction,thumb,low,src-alias,
+08158DF0,Player_BeginDirectionSequence,thumb,low,src-alias,
 08158EC8,SceneActorControl_OnJitterPosition,thumb,low,src-alias,Empty hook called with the active slot position after jitter starts; intended position effect is unknown
 08158ECC,Player_BeginResourceStationInteraction,thumb,low,src-alias,Enters action 8 and stores the station trigger position and interaction variant
 08158F04,Player_BeginDirectionalCue,thumb,low,src-alias,
@@ -5319,6 +5320,7 @@ addr,name,mode,confidence,source,notes
 0815E710,PlayerContact_ApplySyntheticContact,thumb,low,src-alias,
 0815E790,Player_EnterKindFour,thumb,low,src-alias,
 0815E8A4,PlayerContact_ApplyTerrainDamage,thumb,low,src-alias,
+0815EBB8,Player_UpdateResetBlink,thumb,low,src-alias,
 0815EC14,Player_SaveStateSnapshot,thumb,low,src-alias,
 0815ED78,Player_ApplyLatchedActionMode,thumb,low,src-alias,
 0815EF6C,Player_RecordInputTicks,thumb,low,src-alias,
@@ -5532,6 +5534,7 @@ addr,name,mode,confidence,source,notes
 081691C0,SelectionPanel_RefreshSecondaryEntries,thumb,low,src-alias,
 08169228,PauseMenu_UpdateEquipmentSelection,thumb,low,src-alias,
 08169504,PauseMenu_CreateSelectionWidgets,thumb,low,src-alias,
+08169738,SceneHud_RemoveAnimations,thumb,low,src-alias,
 081697B8,SelectionPanel_RefreshAttachedPanel,thumb,low,src-alias,
 08169818,PauseMenu_RefreshEquipmentPanel,thumb,low,src-alias,Runs four shared equipment display refresh helpers in sequence; panel identity is tentative
 08169838,SelectionPanel_ResetSecondarySelection,thumb,low,src-alias,

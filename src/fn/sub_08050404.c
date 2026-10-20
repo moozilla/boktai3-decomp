@@ -35,9 +35,9 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
                     goto done;
                 {
                     if (gate->flags & 8)
-                        sub_08158DF0(player, 7);
+                        Player_BeginDirectionSequence(player, 7);
                     else
-                        sub_08158DF0(player, 1);
+                        Player_BeginDirectionSequence(player, 1);
                 }
             }
         } else {
