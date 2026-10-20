@@ -2070,3 +2070,80 @@ sources. Running depin on unguarded scratch copies correctly says the C does not
 match and skips it. Future workers should strip the fallback before depinning
 any draft. Batch integration/name promotion/full ROM validation remain with
 the integrator.
+
+## Task 0817F9C0 — 2026-10-20
+
+Tags: #matching #boss-slot-2 #armor #actor-controller
+
+Offline worker on the preselected cloud/0817F9C0 branch. Used per-file
+`build/venv/bin/python tools/check.py` checks only, with driver commits;
+no full build, network operation, shared-doc edit or generated-file commit.
+Ghidra's `gen/ghidra/decomp.c` is absent, so reconstruction used assembly,
+callers, named neighbors and matched relatives.
+
+- **0818323C — matched, ActorController_UpdateMovingAttackCollider.**
+  Called by ActorController_UpdateMovementVelocity and
+  ActorController_UpdateDecayingVelocity. Starts the directional animation
+  from 0824EC84, arms the attack collider on frame 9, emits the particle burst
+  at the collider offset plus actor position, changes attack power on frame 11,
+  disables the collider on frame 14, and ticks camera shake. The 08183078
+  matched relative supplied most collider and layer idioms. Exact without
+  register pinning, 580 bytes. The copied opening comment about half power
+  belongs to the relative: this function uses full power on frame 9 and half
+  power on frame 11. Important technique: write the stack-vector sum through
+  s16 pointers, rather than local struct-field assignments (which generated
+  word read/modify/write sequences). A zero local initialized after computing
+  the destination of the facing store gives the final exact allocation and
+  instruction ordering. Formatted source passed the exact checker.
+- **081835D8 — drafted 94.0%, ActorController_UpdateHeavyAttackCollider
+  (tentative).** Uses fixed animation records 0824ECC4/0824ECC8, transitions
+  through three phases, and loads per-frame collider size, offset and facing
+  from 0824ED0C/0824ECCC/0824ED4C. Attack scaling is 0xAAA in fixed point,
+  followed by sign-aware truncation and force 80. The source's inherited
+  half-power header/helper name is a seed artifact, not the recovered scale.
+  Final guarded source uses no register hints. The default build retains
+  INCLUDE_ASM; --nonmatching --record measured 10 realigned instructions,
+  5 ignoring registers, against the reviewed extent. The commit subject's
+  93.6% was the earlier candidate-length score; the recorded reviewed score
+  is 94.0%. Remaining differences are the layer/collider base calculation,
+  reuse of the 0x190 offset, and the multiply-result register. A pinning
+  experiment reached 96.1%, but added an address copy and retained less useful
+  constraints; kept the readable unpinned draft.
+- **0817FDE0 — stopped below draft threshold (best exploratory 57.3%).**
+  BossSlot2_CreateFromScript calls this initializer. Recovered script options
+  t/B/i/P/p/s/a/e/c/A, actor registration, resource 0xCB05:0xDE23, packed
+  position, health and collider configuration, frost emitter, shadow,
+  proximity volume, camera, and palette buffer initialization. Needs the
+  boss/common-actor pointer views recovered more accurately: current raw
+  accesses and hard-register experiments alter address lifetimes, loop shape,
+  spills and allocation. Initial structure score was 137 differing instructions
+  ignoring registers; hints reduced that to 90 but did not produce a viable
+  retained draft. Scratch: wip/sub_0817FDE0.c and build/fde0-*.c.
+- **0817F9C0 — stopped below threshold (best 72.3%).** Tentative role:
+  BossSlot2_UpdatePresentation. Called after the state callbacks by
+  SceneActor_UpdateUnlessPaused. Updates effects and particles, collision
+  visibility, frost emission, shadow visibility, palette countdown, shake and
+  camera tracking; clears per-frame flags and increments the frame counter.
+  A HasFlag inline reproduces constant-before-load ordering. Signed full-width
+  collider flags and a duplicate pinned boss pointer did not solve the remaining
+  address, halfword-update and register differences; rejected the latter.
+  Scratch: wip/sub_0817F9C0.c; build/f9c0-current.c is the better unpinned form.
+- **08186CC8 — stopped below threshold (unpinned 72.0%).** Tentative role:
+  Armor_SelectAlignedAttack. Recovers player-relative rounded x/z displacement,
+  absolute vertical separation, behavior/state gates, attack-origin proximity
+  test and remembered-position update. An exploratory three-register pinning
+  attempt scored 84.4%, but produced a suspicious stack-pointer comparison in
+  place of the z test; rejected rather than committing misleading progress.
+  Typed fields and declaration swaps did not improve the unpinned candidate.
+  The compiler merges/reorders fallback SetBehaviorIfFinished calls and keeps
+  a different phase-address lifetime. Scratch: wip/sub_08186CC8.c.
+- **08186EB4 — stopped below threshold (best 75.7%).** Tentative role:
+  Armor_SelectTimedAttack. Related alignment selector with timed follow-ups,
+  directional facing checks and behavior 24. Explicit near/far branch labels
+  reduced structural differences, but mode/one/phase-pointer allocation and
+  shared zero-state exits remain unlike the ROM. Register hints did not help.
+  Scratch: wip/sub_08186EB4.c; build/6eb4-base.c retains the 75.7% attempt.
+
+Only the exact function and the >=80% guarded draft were promoted to src.
+The four lower-scoring sources remain local scratch and earn no progress.
+Full batch validation and name promotion remain with the integrator.
