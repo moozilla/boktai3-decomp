@@ -5,9 +5,9 @@
 // fuzzy: 85.3%
 // Remaining differences: pointer allocation, constant derivation, and initialization order.
 struct P {
- u8 pad0[0x2c0];
- struct ContactSwarmSprite sprite;
- struct DisplaySequenceState seq;
+    u8 pad0[0x2c0];
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState seq;
 };
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
@@ -20,18 +20,22 @@ s32 sub_081ECE80(struct P *, s32, s32);
 s32 Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(s32, struct SceneVec *);
 void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32, s32);
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-#define S(o) (*(s16 *)((u8 *)p + (o)))
-#define W(o) (*(s32 *)((u8 *)p + (o)))
+#define B(o)   (*(u8 *)((u8 *)p + (o)))
+#define H(o)   (*(u16 *)((u8 *)p + (o)))
+#define S(o)   (*(s16 *)((u8 *)p + (o)))
+#define W(o)   (*(s32 *)((u8 *)p + (o)))
 #define PTR(o) (*(void **)((u8 *)p + (o)))
-static inline u32 RandomBits(u32 mask) {
- gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
- return gUnk_086141BC[gUnk_03005304] & mask;
+static inline u32 RandomBits(u32 mask)
+{
+    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    return gUnk_086141BC[gUnk_03005304] & mask;
 }
-static inline void Update(struct P *p, s32 time) {
- sub_081EC6BC(p); sub_081EC7D8(p); sub_081EC974(p);
- SceneActors_EmitPeriodicParticles(p,time);
+static inline void Update(struct P *p, s32 time)
+{
+    sub_081EC6BC(p);
+    sub_081EC7D8(p);
+    sub_081EC974(p);
+    SceneActors_EmitPeriodicParticles(p, time);
 }
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -256,36 +260,48 @@ static inline void StepSecond(struct ContactSwarmSprite *sp, struct DisplaySeque
 }
 
 void SceneActors_DestroyTask(struct P *);
-#define SceneActors_UpdateLeftDeparture sub_081EDB74 // confidence=low: two sprite sequences move left until task destruction.
-void SceneActors_UpdateLeftDeparture(struct P *arg,s32 ticks)
+#define SceneActors_UpdateLeftDeparture                                                            \
+    sub_081EDB74 // confidence=low: two sprite sequences move left until task destruction.
+void SceneActors_UpdateLeftDeparture(struct P *arg, s32 ticks)
 {
- register struct P *input asm("r7")=arg;
- register s32 time asm("r10")=ticks;
- register struct P *p asm("r9")=input;
- if(*((u8 *)input+0xb1)) {
-  struct ContactSwarmSprite *sprite;
-  register struct ContactSwarmSprite *second asm("r8");
-  *((u8 *)input+0xb1)=0;
-  sprite=&input->sprite;
-  second=(void *)((u8 *)input+0x308);
-  (*(s32 *)((u8 *)input+0x298))=0; (*(s32 *)((u8 *)input+0x290))=0;
-  *(s32 *)((u8 *)sprite+0x3c)=0;
-  { register struct DisplaySequenceState *state asm("r4")=&input->seq;
-  Anim_SetSequence(state,(*(void **)((u8 *)input+0x390)),0,0,0);
-  Step(sprite,state); }
-  *(s32 *)((u8 *)second+0x3c)=4;
-  { register struct DisplaySequenceState *state asm("r4")=(void *)((u8 *)second+0x2c);
-  Anim_SetSequence(state,PTR(0x390),4,0,0);
-  StepSecond(second,state); }
- }
- W(0x280)=-0x5000; W(0x284)=0; W(0x268)+=W(0x280);
- if(S(0x278)<0) {
-  *(void (**)(struct P *))((u8 *)input+0x100)=SceneActors_DestroyTask;
-  *(s32 *)((u8 *)input+0x90)=0;
-  *((u8 *)input+0xb1)=1; *((u8 *)input+0xa2)=0;
-  *(s32 *)((u8 *)input+0xa4)=0;
- }
- sub_081EC6BC(input); sub_081EC7D8(input); sub_081EC974(input); SceneActors_EmitPeriodicParticles(input,time);
+    register struct P *input asm("r7") = arg;
+    register s32 time asm("r10") = ticks;
+    register struct P *p asm("r9") = input;
+    if (*((u8 *)input + 0xb1)) {
+        struct ContactSwarmSprite *sprite;
+        register struct ContactSwarmSprite *second asm("r8");
+        *((u8 *)input + 0xb1) = 0;
+        sprite = &input->sprite;
+        second = (void *)((u8 *)input + 0x308);
+        (*(s32 *)((u8 *)input + 0x298)) = 0;
+        (*(s32 *)((u8 *)input + 0x290)) = 0;
+        *(s32 *)((u8 *)sprite + 0x3c) = 0;
+        {
+            register struct DisplaySequenceState *state asm("r4") = &input->seq;
+            Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 0, 0, 0);
+            Step(sprite, state);
+        }
+        *(s32 *)((u8 *)second + 0x3c) = 4;
+        {
+            register struct DisplaySequenceState *state asm("r4") = (void *)((u8 *)second + 0x2c);
+            Anim_SetSequence(state, PTR(0x390), 4, 0, 0);
+            StepSecond(second, state);
+        }
+    }
+    W(0x280) = -0x5000;
+    W(0x284) = 0;
+    W(0x268) += W(0x280);
+    if (S(0x278) < 0) {
+        *(void (**)(struct P *))((u8 *)input + 0x100) = SceneActors_DestroyTask;
+        *(s32 *)((u8 *)input + 0x90) = 0;
+        *((u8 *)input + 0xb1) = 1;
+        *((u8 *)input + 0xa2) = 0;
+        *(s32 *)((u8 *)input + 0xa4) = 0;
+    }
+    sub_081EC6BC(input);
+    sub_081EC7D8(input);
+    sub_081EC974(input);
+    SceneActors_EmitPeriodicParticles(input, time);
 }
 
 #else
