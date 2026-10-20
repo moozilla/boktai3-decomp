@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#define PlayerCue_UpdateSideWalkTarget                                                             \
+    sub_08153A00 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 94.2%
-// Signed axis scaling and direction-store layout differ.
+// Signed scaling sign tests and direction-store layout still differ.
 struct P {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;
@@ -186,13 +188,21 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
         p->vx = Truncate(gUnk_086149C4[(angle + 64) & 255] * 12);
         p->vy = Truncate(gUnk_086149C4[angle & 255] * 12);
         if (U8(p, 0x28F) == 1) {
-            s32 v = p->vy * (p->vy < 0 ? 40 : 52);
+            s32 v;
+            if (p->vy < 0)
+                v = p->vy * 40;
+            else
+                v = p->vy * 52;
             if (v >= 0)
                 p->vy = v >> 6;
             else
                 p->vy = -((-v) >> 6);
         } else if (U8(p, 0x28F) == 2) {
-            s32 v = p->vx * (p->vx < 0 ? 40 : 52);
+            s32 v;
+            if (p->vx < 0)
+                v = p->vx * 40;
+            else
+                v = p->vx * 52;
             if (v >= 0)
                 p->vx = v >> 6;
             else
@@ -212,5 +222,5 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideWalkTarget);
+INCLUDE_ASM("asm/nonmatching", sub_08153A00);
 #endif
