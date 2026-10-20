@@ -100,5 +100,5 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     actor->field2C2 = 64;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_ResumeReactionRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080AE6F0);
 #endif
