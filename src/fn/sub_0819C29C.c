@@ -3,7 +3,6 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void ActorReaction_BeginCollisionPhase(void *);
 void sub_081A1D18(void *);
 void sub_081A14FC(void *);
-#define Hresvelgr_BeginDamageReaction sub_0819C29C
 static inline void SetState(struct GridAttackActor *p, void (*fn)(void *), int id)
 {
     int zero;
