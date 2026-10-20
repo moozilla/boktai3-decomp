@@ -1,8 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.6%
-// Remaining differences: register allocation and instruction/block ordering.
-#include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#define PlayerContact_ApplyResponse sub_0815E1F0
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
@@ -17,8 +15,11 @@ s32 SceneParticle_CreateDefaultPriority(void *, void *, s32, s32, s32);
 extern const s16 gUnk_086149C4[];
 static inline u32 specialState(struct Player *p, u32 mode)
 {
-    u32 active = p->active;
-    u32 result = 0;
+    u32 active, result;
+    if (!p)
+        return 0;
+    active = p->active;
+    result = 0;
     if (active && p->sceneMode == mode)
         result = 1;
     return result;
@@ -31,7 +32,14 @@ static inline s32 scale(s32 v)
 }
 static inline u32 playerFlag(struct Player *p, u32 mask)
 {
-    return p->statBonusFlags & mask;
+    if (!p)
+        return 0;
+    {
+        register u32 *flags asm("r0") = &p->statBonusFlags;
+        register u32 bits asm("r1") = mask;
+        asm("" : "+r"(flags), "+r"(bits));
+        return *flags & bits;
+    }
 }
 union ResponsePosition {
     struct SceneVec point;
@@ -51,7 +59,8 @@ static inline u32 contactFlag(struct ContactCollider *c, u32 mask)
 s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source,
                                 struct ContactCollider *target)
 {
-    s32 shift, damage;
+    s32 shift;
+    s32 damage;
     union ResponsePosition velocity;
     target->cost = 0;
     if (contactPower(source) > 0)
@@ -64,11 +73,11 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             value = 3;
         target->responseValue = value;
     }
-    if (p && playerFlag(p, 0x40000000))
+    if (playerFlag(p, 0x40000000))
         shift = -1;
     else
         shift = 0;
-    if ((contactFlag(source, 0x80010)) && !(gUnk_030053F4 & 0x1000))
+    if (((source->reactionFlags & 0x80010)) && !(gUnk_030053F4 & 0x1000))
         p->positionResetState = 1;
     else
         p->positionResetState = 0;
@@ -78,15 +87,19 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         p->contactActionTag = 230;
         if (*(s8 *)&p->movementAnimationState >= 0)
             SceneActorControl_RequestDeparture(*(s8 *)&p->movementAnimationState);
-        if (p && specialState(p, 6)) {
+        if (specialState(p, 6)) {
             p->sceneMode = 0;
             p->active = 0;
             p->secondaryDrawFlags &= ~0x400;
         }
-        if ((contactFlag(source, 0x80000)) && !(p && playerFlag(p, 0x20000000))) {
-            s32 duration = source->unknown3C + 60;
-            u32 flags = gUnk_030053F4 & 0x1000;
-            Player_RequestTimedReset(p, duration);
+        if ((contactFlag(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
+            register u32 power asm("r2") = source->unknown3C;
+            register u32 duration asm("r3") = power + 60;
+            register u32 flags asm("r0");
+            flags = gUnk_030053F4 & 0x1000;
+            // Preserve the original evaluated values without changing the callee's ABI.
+            asm volatile("" : "+r"(flags) : "r"(power), "r"(duration));
+            Player_RequestTimedReset(p, power + 60);
             *(u16 *)((u8 *)p + 0x4DA) = 1;
         }
         if (!p->positionResetRequested && p->positionResetTimer)
@@ -99,14 +112,14 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         if (p->actionMode == 1)
             p->contactThresholdPending = 1;
     }
-    if (p && specialState(p, 3)) {
+    if (specialState(p, 3)) {
         target->cost = 0;
         damage = 0;
         if (contactFlag(source, 0x40000))
             Player_EmitQueuedEffects(p);
-        return damage;
+        goto done;
     }
-    if ((p && specialState(p, 5)) || p->tetherMode == 2 || p->actionMode == 3 || p->actionMode == 4)
+    if ((specialState(p, 5)) || p->tetherMode == 2 || p->actionMode == 3 || p->actionMode == 4)
         shift++;
     if (contactFlag(source, 0x200000)) {
         if (!(target->costFlags & 2)) {
@@ -126,10 +139,9 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         p->contactSpecial = 0;
     } else if (contactFlag(source, 0x40000))
         Player_EmitQueuedEffects(p);
-    if ((contactFlag(source, 0x8000)) && !(p && playerFlag(p, 0x100)) &&
-        !(p && playerFlag(p, 0x20000000)))
+    if ((contactFlag(source, 0x8000)) && !(playerFlag(p, 0x100)) && !(playerFlag(p, 0x20000000)))
         sub_0813D834(p, 0, 1800);
-    if ((contactFlag(source, 0x100000)) && !(p && playerFlag(p, 0x20000000)))
+    if ((contactFlag(source, 0x100000)) && !(playerFlag(p, 0x20000000)))
         sub_0813D834(p, 1, 900);
     if (contactFlag(source, 0x20000)) {
         s32 angle = ((p->facing + 5) & 7) << 5;
@@ -148,9 +160,6 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
     }
     if (p->particleEmissionCount < damage)
         p->particleEmissionCount = damage;
+done:
     return damage;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerContact_ApplyResponse);
-#endif
