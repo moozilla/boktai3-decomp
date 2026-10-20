@@ -1,4 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "golem_2.h"
+#include "script_utility.h"
 
 extern const u8 gUnk_08606134[];
 
@@ -41,11 +43,162 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
     return 0;
 }
 
+
+void SceneActorEffects_AdvanceSteps(void *, u32);
+void SceneActorTerrain_ClearCollisionTimers(void *);
+void SceneActorBehavior_CallTerrainScript(void *);
+void SceneActorPlacement_PlayCategoryEventSound(void *);
+void *sub_081D4F20(u32, u32);
+void GameState_SetEventFlag(void *);
+void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
+void ActorShadow_Disable(void *);
+void sub_0812E714(void *);
+void SceneActorControl_OnIdle(void);
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
 void Golem_OnUnusedState(void)
 {
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_080C9848);
+static inline u32 Flags32At(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    return *(u32 *)((u8 *)a + 0x2CC) & mask;
+}
+static inline u32 RandomFrom(const u16 *table)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 v;
+    gUnk_03005308 = index;
+    index *= 2;
+    v = *(const u16 *)((u32)table + index);
+    v &= 3;
+    return v + 1;
+}
+
+/* Releases the defeated golem, runs its script, and emits the defeat burst. */
+#define Golem_UpdateDefeat sub_080C9848
+void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+{
+    s32 values[8];
+    struct ContactPackedVector rangeB;
+    struct ScriptUtilityArguments arguments;
+    u8 *group = (u8 *)&actor->group;
+    u16 script;
+    if (TakeFlag(&actor->field2B2)) {
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
+        actor->field2B3 = 0;
+        sub_0807C72C(actor, 0, 127, 0);
+        sub_0807C72C(actor, 1, 127, 0);
+        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorEffects_AdvanceSteps(actor, 4);
+        {
+            struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
+            u32 *field = &actor->flags2CC;
+            u32 mask = ~0x141C0;
+            *field &= mask;
+            control->counter = 0;
+            *(u16 *)((u8 *)control + 0x14) = 0;
+            control->timer = 0;
+        }
+        Sound_PlaySong(0x13E);
+        {
+            u16 *flags = (u16 *)((u8 *)actor + 0x13A);
+            register u32 value asm("r1") = *flags;
+            register u32 mask asm("r0") = 4;
+            asm("" : "+r"(value), "+r"(mask));
+            *flags = mask | value;
+        }
+    }
+    SceneActorTerrain_ClearCollisionTimers((void *)actor);
+    if (!actor->field2B3)
+        return;
+    actor->field2B0 = 1;
+    SceneActorBehavior_CallTerrainScript(actor);
+    script = *(u16 *)((u8 *)actor + 0x1F8);
+    if (script) {
+        values[0] = actor->position.x;
+        values[1] = actor->position.y;
+        values[2] = actor->position.z;
+        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
+        values[4] = *(s32 *)((u8 *)actor + 0x200);
+        values[5] = *(s32 *)((u8 *)actor + 0x204);
+        values[6] = *(s32 *)((u8 *)actor + 0x2E0);
+        values[7] = actor->id;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
+    }
+    if (!Flags16(actor, 0x4000) && (u32)(actor->category - 11) > 2)
+        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+    if (!Flags32At(actor, 0x400)) {
+        u8 category;
+        rangeB.x = 80;
+        rangeB.y = 60;
+        rangeB.z = 60;
+        {
+            register const u16 *table asm("sl") = gUnk_0203B400;
+            s32 duration;
+            s32 scale;
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
+                                duration = 20, scale = 2, 1);
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x40, 4, duration,
+                                scale, 1);
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x5E, 4, duration,
+                                scale, 1);
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x80, 4, duration,
+                                scale, 1);
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xC4, 4, duration,
+                                scale, 1);
+            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xF0, 4, duration,
+                                scale, 1);
+        }
+        category = actor->category;
+        if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
+            category == 0x18 || category == 0x19)
+            Sound_PlaySong(0xE5);
+    }
+    {
+        void *callback = (void *)SceneActorControl_OnIdle;
+        u32 kind = 16;
+        u32 zero;
+        u32 one;
+        u8 *ready = &actor->field2B2;
+        zero = 0;
+        one = 1;
+        *ready = one;
+        actor->field2B0 = zero;
+        actor->field2B5 = kind;
+        actor->target = callback;
+        actor->field2C8 = zero;
+        {
+            u32 *field = &actor->flags114;
+            s32 clear = ~1;
+            *field &= clear;
+        }
+        actor->word104 = zero;
+        {
+            u32 behavior = 2;
+            actor->state2A8 = one;
+            actor->phase2A9 = zero;
+            actor->behavior2AA = behavior;
+            actor->counter2AC = zero;
+            actor->field2B1 = one;
+        }
+    }
+    ActorShadow_Disable((u8 *)actor + 0x320);
+    if (!*((u8 *)actor + 8))
+        **(u32 **)((u8 *)actor + 4) |= 1;
+    else {
+        struct DefeatOwnerGroup { u32 unknown[2]; u32 flags; };
+        struct DefeatOwner { u8 unknown[0x20]; struct DefeatOwnerGroup group; };
+        struct DefeatOwner *owner = *(void **)((u8 *)actor + 4);
+        struct DefeatOwnerGroup *ownerGroup = &owner->group;
+        ownerGroup->flags |= 1;
+    }
+    sub_0812E714(actor);
+    SceneActorPlacement_PlayCategoryEventSound(actor);
+}
+
 
 INCLUDE_ASM("asm/nonmatching", sub_080C9C04);
 
