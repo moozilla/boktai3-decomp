@@ -294,3 +294,80 @@ increase: several pinning variants increased fuzzy while worsening alignment.
 Ghidra export gen/ghidra/decomp.c is absent. All five below-threshold candidates
 remain local in ignored wip/, outside production source. Commits are queued
 through build/commit.sh; no shared documentation/index was edited.
+
+# Codex medium worker: task 0817BDB0 (2026-10-20)
+
+Tags: #matching #scene-volume #actor-decision #boss-slot #nonmatching
+
+Worked offline on the claimed cloud/0817BDB0 branch. Five exact matches recover
+41.79% of this assignment's code extent (+41.79 percentage points from its
+unmatched baseline; 3,168 bytes), equivalent to +0.1312 percentage points of
+project code using the PROGRESS.md denominator. The sixth function is a guarded
+draft and contributes no exact progress. No register pinning was retained.
+Only check.py per-file compilation checks were used; no full build, network,
+direct git mutation, shared documentation or progress regeneration. Commits
+went through build/commit.sh. The pre-existing tools/cloud_task.py edit was
+left alone.
+
+Read the neighboring ActorDecision, BossSlot2 and ActorEffect implementations,
+the task assembly and callback tables gUnk_08611C6C / gUnk_08611CB8 /
+gUnk_08611CD0. The first table drives the decision choices; the second selects
+the large decision routine; the third includes the movement/effect callbacks.
+0817F444 also installs 0817E040 as an actor callback after an impact response.
+Names are explicitly tentative: the actor's species is not established.
+
+- **0817DA1C — matched, SceneVolume_UpdatePursuitSpin.** Starts animation 0x134,
+  tests the path/player movement mode, pursues destination halfwords at
+  0x2A4/0x2A8 with speed five, and rotates an effect by 16 angle units each tick.
+  Collision status at the 0x32C effect gates sound 0x2E7. After elapsed time 96
+  it requests phase two and restores the requested facing. Exact 940-byte check.
+  Local masks declared before flag accesses reproduce the original instruction
+  order; incrementing the initially zero impact flag avoids reusing phase one.
+- **0817E040 — matched, SceneVolume_UpdateKnockbackLanding.** Reverses facing
+  relative to impact angle 0x471, decays speed 0x472 by three quarters, adds
+  height 0x468 to the terrain floor, and plays landing/recovery animations.
+  The terrain lookup handles cell overrides and sloped shapes one/two.
+  Exact 824-byte check. A temporary X result followed by a zero local before
+  the velocity stores reproduces the zero load before the first store. A
+  local mask for the terrain nibble fixes its operand tie; ordered phase/zero
+  locals fix the phase-two transition stores.
+- **0817D7AC — matched, SceneVolume_UpdateRepeatedShot.** Alternates aiming,
+  conditional projectile creation through 0817D67C, and impact-count states;
+  the byte at 0x473 is capped at three. Exact 624-byte check. The explicit
+  timer-zero jump to the increment path retains the original separate zero
+  and >10 tests; the equivalent combined expression was optimized differently.
+- **0817DDC8 — matched, SceneVolume_UpdateImpactSlide.** Initializes effects
+  through 0817AEC8 and the attack collider, then decays impact velocity by
+  three quarters or three eighths according to byte 0x470. Once stopped,
+  animation 0x116 completes before requesting the next phase. Exact 428-byte
+  check on the first candidate.
+- **0817BDB0 — matched, ActorDecision_UpdateHazardPath.** Chooses a random path
+  and point, advances after pending events, spawns proximity hazards on the
+  first three advances and requests a transition afterward. Exact 352-byte
+  check. Materializing the RNG table pointer before advancing its index fixes
+  the table literal's lifetime; duplicated movement/state stores in the two
+  event branches reproduce the compiler's shared tail and literal-pool layout.
+- **0817C3F4 — drafted 83.3%, BossSlot2_SelectCombatAction.** Complete three-mode
+  selector with vitality thresholds at 0x274/0x276, summon tests at 0xC60/0xC64,
+  prior choice 0x4E9, event index 0x4EB and distance threshold 0x23FFF. Chooses
+  attacks in each explicit switch case, clears the latch at 0x428/retracts
+  hazards at phase boundaries, and dispatches choices through gUnk_08611C6C.
+  Early transition-byte absence jumps directly to callback dispatch. Read
+  BIG_FUNCTIONS.md and inspected condense.py / relatives.py output first.
+  Final --nonmatching --record check: 530 realigned differing instructions,
+  407 ignoring registers, reviewed extent; candidate 4,520 bytes versus the
+  4,412-byte target extent. The initial candidate was 63.3%; putting the zero
+  argument before the choice in the inline selector and retaining an explicit
+  event pointer raised it above draft threshold. Moving that pointer into
+  individual branches or returning it from the inline changed cross-jumping
+  and regressed alignment substantially, so those variants were rejected.
+  Remaining: shared transition tails, repeated event-pointer materialization,
+  block/literal-pool layout and register choices. No Ghidra export is installed.
+  The initial draft commit title says 82.3% (candidate-length score); recording
+  against the reviewed extent gives 83.3%, which is the score in the source.
+
+All files were clang-formatted and checked again. Confidence comments were
+moved immediately above the #define aliases because trailing comments caused
+clang-format to wrap the alias over two lines, outside promote_names.py's
+recognition pattern. Each alias correction was committed separately by unit.
+No generated assembly or ROM-derived artifact was committed.
