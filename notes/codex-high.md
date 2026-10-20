@@ -2910,3 +2910,93 @@ drafts. Ran depin on unguarded candidates: the exact match retained its hints;
 it correctly skipped mismatching candidates. No shared headers or generated
 files were committed. Complete combined-ROM validation is left to the batch
 integrator. This appended note is the final driver commit.
+
+## 2026-10-20 — task 0812B91C: pursuing slash and fragment effect states
+
+Tags: #matching #effects #register-allocation #function-boundaries
+
+This worker batch adds **0.046 percentage points** of exact code coverage
+(1,112 bytes), all in the Register-pinned category. Two exact functions and
+three guarded drafts were checked separately and queued through build/commit.sh.
+No full build, network operation, shared-header change or generated-file edit
+was performed. Combined-ROM validation remains with the integrator.
+
+- **0812C69C — matched, FragmentEffect_UpdateOrbit (tentative)**, reviewed
+  extent 580 bytes. State two in callback table 086107E8. The F422 fragment
+  slot is 0xC0 bytes; sprite position +1C, sequence +2C, collider +3C, center
+  +90, displacement +98, unsigned fixed-point angle +A0, angular step +A4,
+  signed direction +A8, signed radius +AC, scale timer +AE, lifetime +B4,
+  state +BA, signed index +BB, timer +BC and entry flag +BE. Adds/subtracts
+  angle by direction, wraps the positive direction at FF000, computes sine
+  displacement using radius shifted by seven and truncation toward zero,
+  adds the saved center, occasionally emits a particle every 30 ticks,
+  refreshes collision and animation, then advances to retirement at expiry.
+  Relatives 08241504 and 0806C204 supplied the animation/trigonometry shapes.
+  A single-owner Step helper avoids the extra ip sprite alias. Signed sine
+  scaling needed distinct product/result lifetimes; unsigned halfword locals
+  establish the center-first addition order. depin reduced 41 hints to 16,
+  followed by formatting and an exact reviewed-extent check.
+- **0812BDA8 — matched, PursuingActor_CreateHomingSlash (tentative)**,
+  reviewed extent 532 bytes. Ensures singleton 02000184, allocates from the
+  eight-slot slash pool, sets the chase state and 120-tick lifetime, records
+  heading/turn duration/turn speed/turn delay and movement speed, copies the
+  spawn position, loads resource 922E/8DC7, starts sequence one, selects
+  palette 2E2, steps animation, enables the main sprite and initializes its
+  two trail sprites and paired colliders. Neighbours PursuingActor_TurnTowardPlayer,
+  TwinSpriteEffect_InitGraphics and PursuingActor_InitColliders anchor the
+  provisional name. Relative 0806C7B0 supplied the exact animation shape.
+  Named even/odd field offsets preserve the original paired offset-register
+  lifetimes during initialization; a late sprite alias preserves the final
+  flag stores. depin reduced 45 hints to 31. Formatted source checked exact
+  across all 532 bytes before the separate driver commit.
+- **0812B91C — drafted 83.0%, PursuingActor_AdvanceChase (tentative)**,
+  reviewed/candidate extent 448 bytes. Resets entry timer, advances trail
+  sprites through 0812B424 and their visibility, derives velocity from heading
+  and speed, probes the prospective terrain cell and enters recoil when its
+  height exceeds the slash's Y. Otherwise moves, homes toward the player,
+  refreshes both colliders, increments phase/timer, accelerates every four
+  ticks and retires at lifetime expiry. Remaining: 44 realigned differing
+  instructions, ten ignoring registers; heading/sine temporaries, prospective
+  position lifetime and shared state-entry tail. Explicit pointer lifetimes
+  and halfword-add temporaries improved the initial candidate substantially.
+- **0812BADC — drafted 83.3%, PursuingActor_UpdateRecoil (tentative)**,
+  reviewed extent 516 bytes, candidate 524. On contact, reverses the existing
+  horizontal heading, scales the sine vector by twelve, chooses upward
+  velocity from RNG, disables both colliders and plays sound 1E4. Applies
+  gravity, clamps to the terrain's base height and stops velocity, then blinks
+  until removing the secondary collider, trail/main sprites and manager slot.
+  Remaining: 39 realigned differing instructions, eleven ignoring registers;
+  sine/RNG literal ordering, position/terrain registers and short collider
+  temporaries. A scoped magnitude prevents multiplication by twelve from
+  turning into shifts; an inline collider operation retains base+6 addressing.
+- **0812C4E8 — drafted 99.1%, FragmentEffect_GrowToFullSize (tentative)**,
+  reviewed/candidate extent 436 bytes. Entry enables affine scaling, starts
+  a 30-tick interpolation from scale one to 64, emits particles every twelve
+  ticks and advances animation; interpolation completion enters orbit and
+  clears affine flag two. Only two bytes differ: the final signed scale-timer
+  load uses zero index r1 rather than r2. All instruction shapes agree.
+  Narrow/wide signed temporaries, pointer aliases, direct-field/volatile
+  reloads and branch rearrangements did not resolve this reload allocation.
+- **0812C8E0 — stopped, no production draft**. Authored state-body candidate
+  is 99.1% across the reviewed 460-byte C8E0–CAAC extent, with the same two-byte
+  signed-load index difference as growth. It scales from 64 toward one over
+  twenty ticks, emits particles every six ticks and removes the sprite and
+  manager slot. Pinning the saved timer to r8 corrected the pool/timer high
+  register swap. However, the current full function extent also owns a
+  612-byte retained raw tail at **0812CAAC–0812CD10**, beginning with another
+  push/callee-save prologue. check.py --nonmatching --record therefore scores
+  the full 1,072-byte extent at **59.5%**, below the authorized 80% threshold.
+  Removed the untracked production draft and left the existing assembly path
+  untouched. The state-body candidate remains only in ignored
+  wip/sub_0812C8E0.c; do not grant it exact/draft coverage without auditing the
+  0812CAAC boundary. Growth provides a durable starting point: change entry
+  duration 30 to 20, starting scale one to 64, interpolation target 64 to one,
+  particle period twelve to six, then replace transition-to-orbit with sprite
+  removal, allocation-mask clearing and index/state/entry reset.
+
+The three retained fuzzy comments were recorded by check.py --nonmatching
+--record. Their default INCLUDE_ASM paths also passed exact checks at the
+reviewed extents; those fallback checks do not credit the draft C as matching.
+Ran depin on all four unguarded nonmatching candidates; it correctly skipped
+mismatches. No handwritten instruction bodies or ROM-derived dumps were
+committed. This note is the final driver commit for the task.
