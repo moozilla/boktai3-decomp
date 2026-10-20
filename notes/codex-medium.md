@@ -2532,3 +2532,147 @@ hinted exact source. Each function has a local Ratatosk_VerbNoun alias.
 Original INCLUDE_ASM remains the default for drafts and the two stopped
 functions. Combined ROM validation and name promotion remain with integration.
 The pre-existing local tools/cloud_task.py trial-runner edit was left alone.
+
+# Task 081A14FC — Codex medium, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool #nonmatching #register-pinning
+
+Worked solo, offline on the preclaimed cloud/081A14FC branch. Exact code gain:
+**+0.0000 percentage points**. Four inherited guarded drafts retained, two
+improved substantially. Only per-function check.py validation; no make, full
+build, network, shared documentation/index edits or generated-assembly commits.
+
+- **081A5614 — retained draft 80.7%, Vanargand_UpdatePaletteTransition.**
+  Read BIG_FUNCTIONS, condensed assembly and the matched palette-restoration
+  relative 081ACC24. Baseline remains 299 realigned differences / 82 ignoring
+  registers, candidate 2848 versus reviewed 2800-byte target. A shared-result
+  interpolation form with frame-first multiplication regressed to 67.2%
+  (545 / 249); restored the inherited interpolation. Blend argument address
+  scheduling, interpolation register/spill placement and shared tails remain.
+  Added the exact local alias for the already established symbol name.
+- **081A14FC — stopped unmatched after complete static assembly/relative
+  review; no production draft.** Tentative Hresvelgr_UpdateDefeatSequence.
+  Five states gate the first event script on animation phase/player action,
+  accelerate eight movement stages, emit randomized effects, bounce against
+  terrain, set event flags 0/3/0x4E, run the second event script and complete.
+  The matched movement/terrain relative covers only 7% of the body. Repeated
+  precomputation of damage/flag field addresses across switch edges remains
+  the known source-shape obstacle; no new concrete solution emerged. Did not
+  recreate the earlier below-threshold candidate or claim draft credit.
+- **081A1EFC — stopped below draft threshold, best complete candidate 47.0%.**
+  Tentative Hresvelgr_ApplyPendingDamage. Consumes damage and effect requests,
+  selects the active collider hit flags, suppresses optional effects for bit
+  0x40, applies periodic environmental damage from player +0x876 times five,
+  flashes collision presentation and emits damage numbers. Action 16 uses
+  accumulated damage/flags to choose reaction or action 33; action 33 permits
+  three repeated reactions. Other actions test the signed threshold at
+  +0x374, optionally emit sparks/two randomized motion effects, then request
+  reaction or play the hit sound. Candidate 1092 versus reviewed 1148 bytes,
+  388 realigned differences / 178 ignoring registers. Corrected the threshold
+  layout and signed modulo type while drafting. Packed stack-vector writes,
+  owner aliases, shared flag tails and RNG allocation remain. Explicit owner
+  constraints and narrower bitfield variants regressed (46.2–46.3%); restored
+  the ordinary 47.0% candidate at ignored wip/sub_081A1EFC.c. No production C.
+- **081A39E0 — improved draft to 96.2%, EffectPool_UpdateEntry.** Revalidated
+  inherited C at 91.1% despite its older 88.3% comment. Keeping the homing
+  interval's loaded value separate from the r1 store temporary, comparing
+  the loaded value, constraining animation/trail loads, making the collider
+  zero explicit and returning the frame through a u32 accessor reduced
+  37 / 4 realigned differences to **15 / 0**. Candidate and target 800 bytes.
+  Remaining register choices: commutative sine-table address addition, the
+  second animation mask tie, the timer narrowing literal and trail-count/
+  frame/RNG pointer setup. Mask-copy and pointer-constraint variants regressed.
+  A bounded permuter attempt could not start because its split dependency
+  rejects the unrelated Ghoul_ResumePendingRoute start; no search result used.
+- **081A2858 — improved draft 91.3% to 98.3%,
+  Hresvelgr_UpdateCollisionPresentation.** Compute reset-field pointers in
+  each collider branch, derive sequence-data pointers inside the inline from
+  an offset, and type the render-position vector. Crucially corrected both
+  sway writes from the inherited +0x376 field to render-position Y at +0x1B6,
+  as observed in assembly. This is a behavioral correction as well as an
+  addressing improvement. Candidate and reviewed target remain 868 bytes;
+  residue is **10 realigned differences / 8 ignoring registers**, comprising
+  loop-index initialization scheduling and camera flag mask/load allocation.
+  Four additional mask/index/accessor variants regressed; retained best.
+- **081A2430 — retained draft 87.5%, Hresvelgr_DispatchSceneMessages.**
+  Reviewed the pending-trigger loop and action/animation consumers. Reordered
+  pending-array arithmetic reduced structural count from 25 to 24 but worsened
+  total from 51 to 54 and score to 86.6%; restored original. Candidate/target
+  680 bytes, 51 / 25 remaining differences in trigger indexing and shared
+  zero/one action constants. Added local aliases, including the renamed
+  rising-projectile callback needed by the cached ELF.
+
+All four retained units have required file-local aliases and were formatted
+with build/venv/bin/clang-format. Scores recorded after formatting using
+check.py --nonmatching --record against reviewed extents. All four default
+assembly fallbacks checked byte-identically; EffectPool_UpdateEntry retains
+its existing named INCLUDE_ASM because only that generated filename exists.
+The other three use the existing numeric assembly filenames. depin was run
+on unguarded scratch copies and correctly declined to minimize non-exact C;
+concession markers remain. One driver commit queued per draft, with this
+notes commit last. Combined ROM validation and name promotion are deferred
+to integration.
+
+
+## Task 081A9910 — 2026-10-20
+
+Tags: #matching #vanargand #paired-scene-actor #register-pinning
+
+Worked solo and offline on the preclaimed cloud/081A9910 branch. Inspected the
+largest targets first, read BIG_FUNCTIONS.md and prior attempts, and used only
+per-file checks. Exact task instruction coverage gained **13.9 percentage
+points** (465 of the assigned 3335 instructions); project-wide accounting is
+left to batch integration. Exact sources total 1172 bytes, both in the
+Register-pinned category.
+
+- **081ABA64 — stopped unmatched.** Re-read opening assembly, the condensed
+  eleven-phase listing and relatives. The 37% relative coverage is chiefly
+  packed-animation expansion; it does not supply the track/contact phase
+  machine. Existing notes identify the local far-branch labels correctly.
+  No complete close candidate or new structural hypothesis emerged; left
+  assembly in use.
+- **081AA788 — stopped below threshold.** Resumed the scratch sweeping-projectile
+  attack at 75.4% (225 realigned differences, 99 ignoring registers). Pinning
+  the scale helper's second input in r8 and independently forming each
+  auxiliary-animation address from owner+0x444 reduced structural differences
+  to 88, total still 225; latest score 75.6%. Explicit projectile RNG table/mask
+  bindings and a barrier separating angle subtraction regressed, so discarded.
+  Remaining: stack slots, timer-pointer lifetime, randomized-projectile argument
+  allocation and phase-reset tails. Latest full candidate remains only in
+  ignored wip/sub_081AA788.c; no production draft below 80%.
+- **081A9910 — matched, Vanargand_UpdateSynchronizedPairAttack.** New readable
+  C matches the full reviewed 676-byte extent. Commands 3/4/5 run both halves
+  through repeated synchronized attacks, with positive-counter checks selecting
+  motion parameters at +0x588 or +0x586. Two halves in state 5 set +0xF3C to 60;
+  after three repetitions, selected halves receive recovery command 6, and
+  motion parameter +0x584 is restored. Local mask variables reproduce constant
+  load order. Explicit next/zero locals recover shared transition tails. Fixed
+  r4/r5 status locals solve the pair-status register swap. depin removed the
+  unnecessary owner constraint; two bindings remain. Name is tentative.
+- **081A9BB4 — drafted 98.5%, Vanargand_UpdateFacingPairAttack.** New full
+  552-byte candidate starts pair command 7, randomly chooses command 11 (one
+  in four) or 8, and uses facing plus the active-half mask to select a half.
+  Stores its index at +0x5B6; completion restores parameter +0x584. A u8 facing
+  predicate reproduces the materialized boolean. Compute random bits before
+  setting the default command to reproduce the conditional layout. Four
+  differing instructions, zero ignoring registers: RNG table literal uses r1
+  instead of r2; pair-slot offset uses r2 instead of r0. Scoped constraints,
+  address-expression variants and declaration swaps did not improve the clean
+  candidate. Recorded score and verified default INCLUDE_ASM fallback exact.
+- **081A9F88 — matched, Vanargand_UpdateChargedPairAttack.** Improved the
+  retained 92.8% draft to exact across its reviewed 496-byte extent. An owner
+  constraint after the halves-finished call prevents PRE retaining pair-slot
+  address in r4 across that call; scoped r4/r5 status bindings recover both
+  loads and comparisons. A zero constraint gives the separate phase-zero reset.
+  depin reduced four hints to three. Removed guard, formatted and rechecked.
+- **081AA178 — retained draft 99.5%, Vanargand_UpdateRepeatedPairAttack.**
+  Added the required file-local alias and raw-address fallback so the fast
+  checker resolves it against this checkout's ELF. One byte/instruction still
+  differs: phase-zero timer reset uses r7 rather than r5, both zero. Phase
+  output constraints, fixed phase/zero bindings and a fixed timer pointer
+  regressed allocation; restored the best source. Score re-recorded against
+  the full 440-byte extent; default fallback checked exact.
+
+Per-function sources were committed through build/commit.sh. No full build,
+network action, generated assembly, ROM or emulator output was committed.
+Combined ROM verification and name promotion remain for the integrator.
