@@ -1,9 +1,12 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: inherited route/reaction interpretation from static callers.
+#define Vorn_SelectReachableEscapeCell sub_080B2580
+
 #ifdef NONMATCHING
-// fuzzy: 81.6%
-// Cardinal scan tail layout, retry-loop hoisting, and route argument allocation still differ.
+// fuzzy: 84.0%
+// Retry-loop layout, terrain-pointer lifetime, and route argument allocation still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -103,7 +106,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
                         break;
                     next++;
                 } while (++i < range);
-            return next - 1;
+            goto east;
         case 1:
             next = cell + SceneActorTerrain_Width();
             i = 0;
@@ -113,7 +116,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
                         break;
                     next += SceneActorTerrain_Width();
                 } while (++i < range);
-            return next - SceneActorTerrain_Width();
+            goto south;
         case 2:
             next = cell - 1;
             i = 0;
@@ -123,7 +126,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
                         break;
                     next--;
                 } while (++i < range);
-            return next + 1;
+            goto west;
         case 3:
             next = cell - SceneActorTerrain_Width();
             i = 0;
@@ -133,10 +136,20 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
                         break;
                     next -= SceneActorTerrain_Width();
                 } while (++i < range);
-            return next + SceneActorTerrain_Width();
+            goto north;
         default:
-            return actor->terrainCell;
+            goto home;
     }
+east:
+    return next - 1;
+south:
+    return next - SceneActorTerrain_Width();
+west:
+    return next + 1;
+north:
+    return next + SceneActorTerrain_Width();
+home:
+    return actor->terrainCell;
 }
 u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32 savedDirection)
 {
@@ -158,15 +171,18 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
     nextRange:
         range--;
         actor->direction = savedDirection;
-    } while (!found && range > 0);
+        if (found)
+            break;
+    } while (range > 0);
     SceneActorTerrain_GetCenter(dest, &target);
     group = (u8 *)&actor->group;
-    if (TryRoute(actor, group, &target))
-        return 1;
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
-    return 0;
+    if (!TryRoute(actor, group, &target)) {
+        Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        return 0;
+    }
+    return 1;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_SelectReachableEscapeCell);
+INCLUDE_ASM("asm/nonmatching", sub_080B2580);
 #endif
