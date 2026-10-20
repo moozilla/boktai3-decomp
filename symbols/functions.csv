@@ -3014,6 +3014,7 @@ addr,name,mode,confidence,source,notes
 080937F4,Bee_UpdateTimersAndContacts,thumb,low,src-alias,Updates both cooldowns and the intervening contact-related state
 08093810,Bee_FollowWanderRoute,thumb,low,src-alias,
 08093D18,SceneActorControl_TickPendingTarget,thumb,low,src-alias,
+08093E04,Bee_UpdateReactionPhase,thumb,low,src-alias,
 08093EE4,Bee_ApproachSavedPlayerPosition,thumb,low,src-alias,
 0809465C,Bee_InitBehaviorHandlers,thumb,low,src-alias,Installs the Bee behavior state handler table at actor offset 0x28C
 0809466C,Bee_InitReactionHandlers,thumb,low,src-alias,Tentatively installs the shared reaction handler table with a Bee-specific final handler
@@ -3710,6 +3711,7 @@ addr,name,mode,confidence,source,notes
 080F5B68,TargetMotion_AdvanceFollowSegment,thumb,low,src-alias,
 080F5E74,Sword_UpdateComponentPaletteRestore,thumb,low,src-alias,Timed component callback restores the parent palette bank and palette data pointer
 080F5EBC,Sword_SetTrajectoryFromCurrentPosition,thumb,low,src-alias,Uses the current position as the trajectory endpoint and recomputes displacement from the saved start
+080F60B8,IvyChild_UpdateAfterBob,thumb,low,src-alias,
 080F6118,Sword_UpdateWaveAttack,thumb,low,src-alias,Attack callback initializes the wave state on a consumed trigger then dispatches its active state handler
 080F6170,Sword_UpdateThrustAttack,thumb,low,src-alias,Attack callback initializes the thrust state on a consumed trigger then dispatches its active state handler
 080F61C8,Sword_UpdateSpinningLungeAttack,thumb,low,src-alias,Attack callback initializes the spinning lunge on a consumed trigger then dispatches its active state handler
