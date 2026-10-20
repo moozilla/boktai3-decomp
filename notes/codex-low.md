@@ -827,3 +827,50 @@ workers' candidate sources. Fast checks verified the exact match again after
 formatting. Final notes commit also formats that already-matched unit and removes
 unused local prototypes without changing its bytes. The guarded stopping draft
 uses INCLUDE_ASM in the default build. All other attempts remain outside src/.
+
+## Task 080F52C0 — 2026-10-20
+
+Tags: #matching #sword #nonmatching
+
+Exact code gain: 0.0 percentage points. No full build or network operations.
+
+- 080F52C0: drafted **95.5%**, tentative Sword_BeginTargetOrbit. Caller
+  080F6170 installs this callback. Reads owner +160 and owner's target +60,
+  computes heading to target, chooses random turn sign, saves start position,
+  constructs an 800-unit trigonometric endpoint with target height +220,
+  stores deltas, and installs ActorPhase_AccelerateTurn. A local typed endpoint
+  layout improved initial 51.4% to 79.0%. Keeping the rotation subtraction
+  full-width with an empty constraint and using a constrained r2 RNG mask,
+  stored after direction, reached 95.5% (7 realigned, 4 structural differences).
+  Remaining differences are RNG table load order/register, negative-one setup,
+  and resulting alignment. More pointer/negative-value pins regressed. The
+  translation unit is marked register-pinning; no instruction bodies used.
+- 080F645C: improved existing Sword_UpdateDamage draft **96.5% to 97.2%**.
+  A scoped r2 result for the final category mask fixes its operand destination.
+  Remaining: health load scheduled before forming damage pointer, and +538
+  counter registers (9 realigned instructions, 2 structural). Explicit counter
+  pointer/value pins worsened allocation, so reverted those experiments.
+  Added the required local alias. Both drafts have recorded fuzzy scores and
+  raw sub-address INCLUDE_ASM fallbacks, which pass default exact checks.
+- 080F75C0: stopped below threshold. New raw-pointer contact response candidate
+  reached only 29.1%; removed it from src. Existing wip/sub_080F75C0.c and the
+  earlier 73.1% notes remain the better starting point. Typed fields, the u8
+  inline availability predicate, and pre-loop inline state-pointer arguments
+  are needed to retain the ROM's address scheduling; a direct scalar loop
+  does not reproduce it. No draft committed.
+- 080F67AC: stopped after assembly/condensed listing and relatives inspection.
+  Existing notes already describe the full initializer. Nearest matched seed
+  covers 23%, chiefly the animation stepper. The mixed sprite, palette,
+  script-option, and collider initialization still needs full typed recovery;
+  no new candidate or progress beyond the prior attempt.
+- 080F6F90: stopped after condensed listing and relatives inspection. Script
+  collision options and four-child creation share only ~20% with matched code;
+  the packed stack vectors and inline animation state need joint recovery.
+  Prior detailed notes remain applicable; no candidate retained.
+- 080F79A8: stopped after assembly/condensed phase and relatives inspection.
+  Timed orbital movement has several distinct phases, repeated vector/trig
+  operations, sounds, RNG and attack collider updates. No close full-body seed
+  was found; prior notes apply. No candidate retained.
+
+Ghidra export is absent. Used local assembly and fast check.py only. No generated
+assembly, ROM, or emulator output is included in these commits.
