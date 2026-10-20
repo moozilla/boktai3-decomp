@@ -16,7 +16,7 @@ void sub_082156D8(u32);
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
 void Video_SetWindowLayerMasks(u32, u32, u32, u32);
 void Sprite_InitSystem(void);
-void sub_08217120(void);
+void ObjShape_InitTables(void);
 void Anim_ResetDefaultFlags(void);
 void ScanlineEffect_Initialize(void);
 void Text_LoadFontResource(void);
@@ -79,7 +79,7 @@ void InterruptsAndVideo_InitRuntime(void)
     gUnk_030042F0 = zero;
     gUnk_03003A08 = zero;
     Sprite_InitSystem();
-    sub_08217120();
+    ObjShape_InitTables();
     Anim_ResetDefaultFlags();
     ScanlineEffect_Initialize();
     Text_LoadFontResource();

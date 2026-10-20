@@ -573,7 +573,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
         zero = 0;
         CpuSet(&zero, offset, 0x05000002);
     }
-    sub_082216F8(&p->anchor, &p->anchor, &p->target, index + 8, 5);
+    Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
         const u16 *table;
         p->direction = Math_Atan2(-p->offset.x, -p->offset.z);
