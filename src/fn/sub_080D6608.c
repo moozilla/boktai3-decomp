@@ -1,4 +1,8 @@
 #include "global.h"
+
+#define Mummy_TryDirectPursuit     sub_080D6608
+#define Mummy_RequestStraightRoute sub_080D6FDC
+
 #ifdef NONMATCHING
 // fuzzy: 92.5%
 // Remaining differences: PRE stack-slot order and register allocation in route reacquisition.
@@ -213,5 +217,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
+INCLUDE_ASM("asm/nonmatching", sub_080D6608);
 #endif
