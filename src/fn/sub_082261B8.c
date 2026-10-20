@@ -1,8 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 /* Tentative: converts a 2D grid-style (x, y) pair to an isometric camera offset and applies it. */
-#ifdef NONMATCHING
-// fuzzy: 90.6%
-// differs: load order / register choice of the two halfwords of the packed pair
 struct PackedXY {
     s16 x, y;
     u32 pad;
@@ -17,10 +15,14 @@ void Camera_SetIsometricOffset(u32 x, u32 y)
     s16 out[4];
     struct PackedXY in;
     if (gUnk_03005420 != 0) {
-        s32 b, a;
+        register s32 a asm("r5");
+        register s32 b asm("r6");
         s32 t;
+        u32 lo, hi;
         s16 *o;
-        *(u32 *)&in = (u16)x | (y << 16);
+        lo = x << 16;
+        hi = y << 16;
+        *(u32 *)&in = (lo >> 16) | hi;
         o = out;
         a = in.x;
         b = in.y;
@@ -32,6 +34,3 @@ void Camera_SetIsometricOffset(u32 x, u32 y)
         Camera_SetTargetOffset(out);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Camera_SetIsometricOffset);
-#endif
