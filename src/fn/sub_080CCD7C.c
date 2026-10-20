@@ -2,8 +2,11 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "player.h"
+#define Golem_UpdateChargePursuit sub_080CCD7C
+// confidence=low: Golem behavior table dispatches charge pursuit using stored heading, speed and stamina.
 #ifdef NONMATCHING
-// fuzzy: 79.0% (agent draft, paused; see notes/cloud-08122DF4.md)
+// fuzzy: 80.4%
+// Remaining mismatch: Charge/turn control resets and shared route-recovery pointer lifetimes still differ.
 /* Golem: chase/charge behaviour (tentative). */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *);
@@ -387,7 +390,16 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
     return 1;
 }
 
-void sub_080CCD7C(struct SceneActorRegistryResetView *actor)
+static inline void SetCommand(struct SceneActorReactionCommand *command, void *payload, u32 kind,
+                              u32 duration)
+{
+    command->duration = duration;
+    command->payload = payload;
+    command->first = 0;
+    command->second = 0;
+    command->kind = kind;
+}
+void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     struct GolemBody *body = actor->context;
@@ -479,9 +491,12 @@ route:
                             goto recover;
                         if (IsDazzled(gUnk_02000580[index]))
                             goto recover;
-                    } else if (IsDazzled(gUnk_02000580[0]))
-                        goto recover;
-                    body->charge688 = 400;
+                        body->charge688 = 400;
+                    } else {
+                        if (IsDazzled(gUnk_02000580[0]))
+                            goto recover;
+                        body->charge688 = 400;
+                    }
                 }
             recover:
                 Golem_Recover(body);
@@ -527,14 +542,7 @@ route:
         *flags = mask & *flags;
     }
     if (actor->flags2D4 & 0x80) {
-        {
-            struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-            command->duration = 30;
-            command->payload = *(void **)(group + 0x48);
-            command->first = 0;
-            command->second = 0;
-            command->kind = 12;
-        }
+        SetCommand((void *)(group + 0x8C), *(void **)(group + 0x48), 12, 30);
         if (!Golem_Chase(actor))
             return;
         actor->field2C2 = 0x20;
@@ -542,14 +550,7 @@ route:
     } else {
         actor->flags2CC |= 0x10;
         actor->field2C2 = 0x40;
-        {
-            struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-            command->duration = 60;
-            command->payload = actor->entryTarget228;
-            command->first = 0;
-            command->second = 0;
-            command->kind = 7;
-        }
+        SetCommand((void *)(group + 0x8C), actor->entryTarget228, 7, 60);
         {
             struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
             struct GolemRouteLink *link = (void *)(group + 0x74);
