@@ -1,6 +1,9 @@
 #include "global.h"
+#define VulcanCannon_UpdateTargeting     sub_08206C00
+#define VulcanCannon_UpdateDefeatEffects sub_082071D0
+#define VulcanCannon_UpdateDamageState   sub_082074F0
 #ifdef NONMATCHING
-// fuzzy: 81.3%
+// fuzzy: 81.9%
 // Remaining differences: branch sharing, address lifetimes and register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
@@ -37,6 +40,10 @@ static inline s32 CannonRandom(const u16 *table, s32 mask)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308] & mask;
+}
+static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
+{
+    *out = *in;
 }
 static inline void CannonEffectOffset(struct SceneVec *v)
 {
@@ -77,7 +84,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             p->dead = 1;
             if (p->terrainEnabled)
                 TerrainModifiers_UnregisterCell(p->terrain);
-            center = p->display.spatial.position;
+            CopyPosition(&center, &p->display.spatial.position);
             CannonEffectOffset(&center);
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -87,7 +94,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.a.hi = CannonRandom(table, 7) + 3;
             spread.b.lo = 24;
             sub_08014634(CannonRandom(table, 3) + 4, 13, &center, &velocity, &spread, 15, 15);
-            smoke = p->display.spatial.position;
+            CopyPosition(&smoke, &p->display.spatial.position);
             CannonEffectOffset(&smoke);
             sub_081DB390(&smoke, 16, 0, 0, 0, 60, 0, 0);
             smoke.x += 128;
@@ -156,5 +163,5 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateDamageState);
+INCLUDE_ASM("asm/nonmatching", sub_082074F0);
 #endif
