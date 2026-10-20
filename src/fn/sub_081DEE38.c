@@ -11,7 +11,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081DE630(void *);
 void Password_LoadDate(void *);
 void AnimPanel_UpdateDigits(void *);
@@ -53,13 +53,13 @@ s32 Time_InitializeDateMenu(u8 *s)
     first = s + 0x78;
     ResourceHeader_Relocate(first, resource);
     *(struct ResourceHeader *)(s + 0x6B8) = *(struct ResourceHeader *)first;
-    sub_0821983C(s + 0x18, first, 0x34, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x18, first, 0x34, 0x10, zero, zero, zero, zero);
     second = s + 0x100;
     ResourceHeader_Relocate(second, resource);
-    sub_0821983C(s + 0xA0, second, 0x26, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0xA0, second, 0x26, 0x10, zero, zero, zero, zero);
     first = s + 0x188;
     ResourceHeader_Relocate(first, resource);
-    sub_0821983C(s + 0x128, first, 0x27, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x128, first, 0x27, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0xA8) |= one;
     *(u32 *)(s + 0x130) |= one;
     {
@@ -86,7 +86,7 @@ s32 Time_InitializeDateMenu(u8 *s)
     obj = s + off5;
     ResourceHeader_Relocate(obj, resource);
     off1 = 0x1B0;
-    sub_0821983C(s + off1, obj, 0x80, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + off1, obj, 0x80, 0x10, zero, zero, zero, zero);
     sub_081DE630(s);
     Password_LoadDate(s);
     AnimPanel_UpdateDigits(s);

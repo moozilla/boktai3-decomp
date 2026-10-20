@@ -6,7 +6,7 @@ u32 TerrainOverlay_QueueAddActor(void *p);
 u32 ScaledShadow_InitializeDefaultLarge(void *a, void *b);
 s32 TargetRegistry_RegisterActor(void *n, void *v, void *w);
 void Armor_InitPaletteController(void *s);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void ProximityVolume_TranslateBounds(void *, void *);
 void SceneBody_Init(void *, u32, void *, s32, s32, void *);
 void SceneBody_SetKeyframeDisplay(void *, void *);
@@ -163,7 +163,7 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     q = ScriptProc_Start(0xCB05, 0x761E);
     p->f94 = *(struct W *)q;
     ResourceHeader_Relocate(&p->f94, q);
-    sub_0821983C(p->fb4, &p->f94, 0, 0, 2, 0, 0x3c, &t);
+    Widget_InitLinked(p->fb4, &p->f94, 0, 0, 2, 0, 0x3c, &t);
     Anim_SetKeyframes(p->fb4, &p->f94, 0, 1, 0);
     clr(&p->e[0]);
     clr(&p->e[1]);

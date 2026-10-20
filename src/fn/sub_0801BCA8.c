@@ -1,6 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void *AnimData_FindEntry(int);
 void ParticleSprite_Initialize(void *, void *, int);
 int ResultMenu_CreateGraphics(u8 *arg)
@@ -29,7 +29,7 @@ int ResultMenu_CreateGraphics(u8 *arg)
     out = p + 0x144;
     i = 14;
     do {
-        sub_0821983C(out, p + 0x104, 0xb9, 0x11, clear, clear, 60, saved);
+        Widget_InitLinked(out, p + 0x104, 0xb9, 0x11, clear, clear, 60, saved);
         out += 0x60;
         i--;
     } while (i >= 0);

@@ -23,7 +23,7 @@ struct RecordMenu {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void RecordMenu_InitializeSprites(struct RecordMenu *menu)
 {
     s32 i;
@@ -35,8 +35,8 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
         s32 zero = 0;
         sprite = menu->sprites;
         for (; i < 8; i++) {
-            sub_0821983C(sprite, menu->rowResource, menu->spriteIds[i], 16, zero, zero, zero,
-                         (void *)zero);
+            Widget_InitLinked(sprite, menu->rowResource, menu->spriteIds[i], 16, zero, zero, zero,
+                              (void *)zero);
             menu->states[i] = -1;
             sprite++;
         }
@@ -45,8 +45,8 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
         s32 zero = 0;
         *(void **)((u8 *)menu + 0x3ec) = ScriptProc_Start(0xcb05, 0x530d);
         ResourceHeader_Relocate(menu->resource);
-        sub_0821983C(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, zero, zero, zero,
-                     (void *)zero);
+        Widget_InitLinked(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, zero, zero,
+                          zero, (void *)zero);
     }
     menu->states[i] |= -1;
     CpuSet(menu->sprites[8].tiles, menu->palette, 0x4000008);

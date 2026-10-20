@@ -4,7 +4,7 @@ struct ProjectedDisplayFrame {
     u16 frame, unknown2;
 };
 extern const struct ProjectedDisplayFrame gUnk_08605960[];
-s32 sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
 {
     struct ProjectedDisplayEntry *entry = display->entries;
@@ -12,7 +12,7 @@ s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *display)
     struct ProjectedDisplayResource *resource = &display->resource;
     s32 result;
     do {
-        if (sub_0821983C(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0)
+        if (Widget_InitLinked(entry, resource, 0, 16, 2, 0, 60, &display->screen) >= 0)
             goto initialized;
         result = -1;
         goto done;

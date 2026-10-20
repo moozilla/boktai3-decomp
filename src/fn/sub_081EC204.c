@@ -5,7 +5,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 u32 Menu_StartFadeIn(u32);
 void ScriptPrompt_ResetDisplay(u8 *);
 u32 Results_Initialize(u8 *s)
@@ -40,11 +40,11 @@ u32 Results_Initialize(u8 *s)
     q = ScriptProc_Start(bank, 0xE2AB);
     obj = s + 0x78;
     ResourceHeader_Relocate(obj, q);
-    sub_0821983C(s + 0x18, obj, 0x3C, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x18, obj, 0x3C, 0x10, zero, zero, zero, zero);
     q = ScriptProc_Start(bank, 0x530D);
     obj2 = s + size;
     ResourceHeader_Relocate(obj2, q);
-    sub_0821983C(s + 0xA0, obj2, 0x80, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0xA0, obj2, 0x80, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0x134) = 3;
     return Menu_StartFadeIn(3);
 }

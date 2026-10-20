@@ -19,7 +19,7 @@ void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
     widget = pair->widgets;
     remaining = 1;
     do {
-        sub_0821983C(widget, pair, 0, 0x31, zero, zero, 60, &position);
+        Widget_InitLinked(widget, pair, 0, 0x31, zero, zero, 60, &position);
         widget++;
         remaining--;
     } while (remaining >= 0);

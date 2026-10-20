@@ -28,7 +28,7 @@ void TextWindow_SetString(int, int, void *);
 void TextWindow_StartPlayback(int);
 void TextWindow_Destroy(int);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *Script_GetTextSourcePc(void);

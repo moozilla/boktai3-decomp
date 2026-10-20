@@ -21,7 +21,7 @@ struct Vec00A {
 void PlayerClone_InitConfig(u8 *);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, void *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 u32 ActorDebris_Create(u8 *, u8 *, u8 *);
 void PlayerEffect_SetPaletteSource(u32, u32, u32);
 void ScaledShadow_InitializeDefault(u8 *, u8 *);
@@ -58,7 +58,7 @@ void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
         ResourceHeader_Relocate(obj, res);
         {
             u8 *p = s + 0x1b8;
-            sub_0821983C(p, obj, 0, 0, 2, 1, zero, zero);
+            Widget_InitLinked(p, obj, 0, 0, 2, 1, zero, zero);
             *(u32 *)(s + 0x1c0) |= 1;
             value = ActorDebris_Create(p, s + 0x320, s + 0x322);
             *(u32 *)(s + 0x33c) = value;
