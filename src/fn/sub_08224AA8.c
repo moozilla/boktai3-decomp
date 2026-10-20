@@ -7,7 +7,6 @@ struct Manager {
     u16 f18;
 };
 extern struct Manager gUnk_03005390;
-#define RfuManager_DropFailingTargets sub_08224AA8
 
 void RfuManager_DropFailingTargets(void)
 {

@@ -3,7 +3,7 @@ void Player_SetTetherMode(u8 *, s32, s32);
 s32 Player_SelectHistoryDirectionB(u8 *);
 void sub_08238238(u8 *);
 s32 ActorVariant_GetTableValue(u32, s32);
-void sub_08238280(u8 *, s32, s32);
+void Player_SetAnimationIndex(u8 *, s32, s32);
 void Player_EnterIdleAnimation(u8 *p)
 {
     s32 value;
@@ -14,5 +14,5 @@ void Player_EnterIdleAnimation(u8 *p)
     }
     *(u32 *)(p + 0x20) &= ~1;
     value = ActorVariant_GetTableValue(p[0x418], 0);
-    sub_08238280(p, value, 0x40);
+    Player_SetAnimationIndex(p, value, 0x40);
 }

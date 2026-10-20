@@ -2,7 +2,6 @@
 #include "player.h"
 #include "engine.h"
 void Anim_SetFrameDurationScale(void *, u32);
-#define Player_SetAnimationIndex sub_08238280
 
 s32 Player_SetAnimationIndex(struct Player *p, s32 index, u32 scale)
 {

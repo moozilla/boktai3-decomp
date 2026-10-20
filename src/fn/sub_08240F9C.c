@@ -41,7 +41,7 @@ void LinkPlayer_FlushPendingEffects(struct PRecover *);
 void SpiralTrail_CreateWithParticles(struct PRecover *, s32, s32, s32, s32);
 void Player_SetSecondaryActionFlags(struct PRecover *, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
-void sub_08238280(struct PRecover *, s32, s32);
+void Player_SetAnimationIndex(struct PRecover *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 sub_0823C4B4(struct PRecover *);
 s32 Player_GetAdjustedMovementInterval(struct PRecover *);
@@ -179,7 +179,7 @@ void Player_UpdateChargeSpin(struct PRecover *p)
         Player_SetSecondaryActionFlags(p, 0x41);
         p->sprite.savedPos = *(struct V8 *)((u8 *)p + 0x30);
     }
-    sub_08238280(p, ActorVariant_GetTableValue(p->variant, 0), 0x40);
+    Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->variant, 0), 0x40);
     p->f_ad6 = 0x16F;
     p->f_ad8 += 3;
     if (p->f_ad8 > 0x20)

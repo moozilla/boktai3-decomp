@@ -2,7 +2,7 @@
 #include "player.h"
 
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
 s32 Player_IsFlaggedBelowResourceLimit(struct Player *);
 void Player_SetActionOrigin_0823D00C(struct Player *);
@@ -18,7 +18,7 @@ void Player_UpdateChargeAction(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0:
-            sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40);
             Player_SetTetherMode(p, 7, 1);
             break;
         case 1:
@@ -36,7 +36,7 @@ void Player_UpdateChargeAction(struct Player *p)
                 p->tetherFrame++;
             }
             p->resetValue6FC = 15;
-            if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 8), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 8), 0x40)) {
                 s32 r;
                 Player_PlayLocalSong(p->slot, 0xCB);
                 if (!(p->inputKeys[0] & 1)) {
@@ -68,7 +68,7 @@ void Player_UpdateChargeAction(struct Player *p)
                         Player_PlayLocalSong(p->slot, 0x128);
                 }
             }
-            sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 9), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 9), 0x40);
             z = 0;
             p->resetValue6FC = 30;
             Player_SetActionOrigin_0823D00C(p);
@@ -88,7 +88,7 @@ void Player_UpdateChargeAction(struct Player *p)
             u32 mask = 0x80;
             p->statusFlags = mask | p->statusFlags;
         }
-            sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 10), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 10), 0x40);
             p->resetValue6FC = 30;
             if (!(p->inputKeys[0] & 1)) {
                 Player_SetTetherMode(p, 7, 4);
@@ -101,7 +101,7 @@ void Player_UpdateChargeAction(struct Player *p)
             break;
         case 4:
             p->resetValue6FC = 15;
-            if (sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 11), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 11), 0x40)) {
                 p->heading = p->facing;
                 p->side = 0;
                 Player_SetTetherMode(p, 0, 0);

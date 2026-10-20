@@ -12,7 +12,6 @@ struct RfuMgr {
 };
 extern struct RfuMgr gUnk_03005390;
 u32 sub_08249498(u32, u32);
-#define RfuManager_StepSlotTimer sub_08223DB8
 
 void RfuManager_StepSlotTimer(u32 a)
 {
