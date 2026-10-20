@@ -977,3 +977,68 @@ for both drafts and exact default INCLUDE_ASM checks. Formatted directly with
 build/venv/bin/clang-format. No make, full build, network, generated-file edits,
 ROM commits or direct git mutations. Per-function commits queued through
 build/commit.sh; combined ROM validation remains for batch integration.
+
+## Task 081B3DB8 — Vanargand part behaviors (2026-10-20)
+
+Tags: #matching #vanargand #animation #nonmatching
+
+Exact gain: 0.000 percentage points. Two guarded drafts; no exact matches.
+Read the entry-point and worker docs, BIG_FUNCTIONS, callers/callees and matched
+relatives. No Ghidra export exists in this worktree. Worked solo, without network
+or full builds. Per-function checks used build/venv/bin/python tools/check.py.
+
+Observed part layout follows Vanargand_UpdatePartRetreat / UpdatePartLunge:
+sequence at 0x48, motion at 0x58, base-position pointer at 0x90, origin at 0x9C,
+target at 0xA4, variant at 0x15C, behavior flags at 0x160, state/timer at
+0x164/0x168, previous/current action bytes at 0x16D/0x16C, reset/enter/finished
+at 0x16E/0x16F/0x170. Names below are tentative interpretations from static code.
+
+- 081B431C drafted **80.6%**, Vanargand_UpdatePartImpact. Selects sequence 8,
+  moves by a short directional offset, then moves toward one of two fixed impact
+  points relative to basePosition. Emits a burst (and possibly a flash timer)
+  when the motion completes; emits trails on alternate frames while moving.
+  Reviewed-extent check: 140 realigned differing instructions, 38 ignoring
+  registers. A typed Set/Difference inline recovered the three-halfword stores
+  and eliminated repeated pointer reloads. Remaining differences include pointer
+  lifetimes, transition constant scheduling, instruction order and pool layout.
+  Saved boss/enter/frame register hints improved the initial candidate.
+- 081B4DA4 stopped unmatched. Candidate raises the part toward y=0x300 along
+  heading 48 or 16, then returns it to terrain height, setting flag 0x80 when done.
+  Candidate-length check reached 79.0%; this is **not** a qualifying draft score.
+  Reviewed extent also includes code-like bytes at unlabeled 081B512C through
+  roughly 081B52E8: reviewed score only 64.1%. Review this boundary before a
+  future complete attempt; do not count candidate-length equality as acceptance.
+  Terrain lookup uses map rows, TerrainModifiers_FindCellOverride(cell,1), the
+  high-nibble slope and low-nibble height. Retained scratch candidate under wip/.
+- 081B48A0 stopped unmatched. Candidate sidesteps 128 units along byte 0x187,
+  preserving origin y, then selects sequence 9 and marks finished. Initial reset
+  selects sequence 11 and steps it once. Best reviewed score 76.4%, below the
+  draft threshold; 113 realigned differences, 41 ignoring registers. Natural
+  allocation and helper-owner/command pin experiments did not produce a useful
+  next improvement. Retained scratch candidate under wip/.
+- 081B4040 stopped unmatched. Creates six radial type-3 Vanargand effects,
+  selects sequence 10, waits for flashTimer to reach zero, then advances the
+  sequence, plays song 0x58C and calls sub_081B019C after completion. Candidate
+  reached 67.2% candidate-length similarity; pointer-hoisting and owner-register
+  experiments stalled. Retained scratch candidate under wip/.
+- 081B3DB8 stopped unmatched. Creates six type-1 radial effects spaced by
+  (i*255)/6, plays song 0x58C, advances sequence 10 and calls sub_081B019C after
+  completion. Candidate reached 73.9% candidate-length similarity. Explicit
+  state/timer/enter pointer lifetimes recovered some loop hoisting, but register
+  allocation, loop constant scheduling and stack shape remain. Retained under wip/.
+- 081B4C04 drafted **91.8%**, Vanargand_UpdatePartRecovery. Sets flags 0x12C,
+  selects and steps sequence 11 on reset; after frame 180 clears flag 0x100 and
+  requests action 22 unless action 25/26 is unfinished. Resets the action timer,
+  state and state timer when that transition is accepted. Reviewed check leaves
+  19 realigned differences, nine ignoring registers: an extra ip owner copy in
+  the animation stepper and register/constant derivation in the action change.
+
+The Ivy_TickDrawable void stepper was a useful source for the reset-only steps;
+Vanargand_UpdatePartRetreat supplied the completion-returning stepper. Format
+was run directly through build/venv/bin/clang-format, then draft scores recorded
+again. tools/depin.py only supports exact sources: on a NONMATCHING wrapper it
+checks the default INCLUDE_ASM and incorrectly strips all hints. Restored both
+candidates and reran depin on their unguarded scratch files; it correctly skipped
+nonmatching bases. Final recorded scores above were verified after restoration.
+Each draft has a file-local naming alias and register-concession marker. Draft
+commits queued separately through build/commit.sh. No shared docs regenerated.
