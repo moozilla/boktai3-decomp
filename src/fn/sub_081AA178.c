@@ -1,6 +1,6 @@
 #include "global.h"
-#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
+#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 99.5%
