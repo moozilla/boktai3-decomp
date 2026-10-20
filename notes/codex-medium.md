@@ -1930,3 +1930,67 @@ it correctly skipped nonmatching bodies. Driver commits are separate per
 function, followed by this note. Scratch alternatives and diagnostic outputs
 remain ignored under build/attempts/08207350/. Combined ROM validation and
 name promotion remain the integrator's work.
+
+## 2026-10-20 — cloud task 08214E3C
+
+Tags: #matching #sprite #sprite-oam #background #palette #nonmatching
+
+Worked solo, offline, on the preclaimed branch. Only per-file check.py checks
+were used, including those beneath variants.py; no make, full build, network,
+or direct git mutations. Commits went through build/commit.sh. Assignment
+instruction coverage is 6.46% (+6.46 percentage points; 157 of 2431 instructions).
+Global progress was not regenerated. Ghidra's decomp.c export is unavailable.
+
+- **08216584 — stopped below draft threshold, BgGfx_LoadTilemap.** Read the
+  full condensed listing, BIG_FUNCTIONS.md, callers and existing family notes.
+  Reused the ignored candidate in this checkout. Replacing signed truncating
+  division with arithmetic shifts only on coordinates already checked as
+  nonnegative, and adding the metatile row offset after the column offset,
+  reduced realigned differences from 951/265 structural to 594/228. Computing
+  viewport bounds earlier improved structure further to 599/220 (50.6%).
+  Widening the blank color to u32 regressed severely. Still below threshold:
+  inline row/column lifetimes, outer-loop increment placement, expression
+  ordering, spills and allocation differ. Updated ignored wip candidate only.
+- **08217430 — stopped below draft threshold, Palette_ApplyObjectFade.** Read
+  full assembly, graphics-update caller and existing reconstruction. Baseline
+  remains 67.4%, 256 realigned differences / 100 ignoring registers. Tested
+  explicit predicate result locals, unsigned level and volatile mask reads;
+  none improved the baseline. The mask tests and three distinct bank loops
+  still need their original constant hoisting and allocation. Kept in wip.
+- **08214FBC — matched, Sprite_RenderUnflippedList (344 bytes, unpinned).**
+  Reconstructed from assembly using the matched screen-projection inline in
+  actor_animation_controller.c. Traverses the current 030042C0 sprite list,
+  skips hidden/frame-parity-selected entries, requires flag 0x2000, projects
+  world coordinates unless flag 16 supplies screen coordinates, rejects
+  offscreen resource bounds unless flag 64 bypasses clipping, then submits
+  through 08214600. Resource dimensions/offsets are at +8..+B; sprite resource
+  at +C, position +1C, next +28. This rendering path ignores flip flags when
+  computing bounds; the semantic meaning of its required flag is tentative.
+  First candidate matched exactly; formatted final source also matches.
+- **08214E3C — drafted 89.1%, Sprite_RenderFlipAwareList.** The sibling requires
+  flag 0x1000 and adjusts resource bounds for flip flags 4 and 8. Pinning output
+  coordinate lifetimes brought 55.8% to 85.3%; a width register, an explicit
+  r0 pointer for reading the projected stack vector, and sharing the width
+  load after the horizontal branch reduced structure further. Final reviewed
+  check: 22 realigned differences / 2 ignoring registers, extent 388 bytes.
+  Projection-source r8 versus ip and flipped-bounds register ties/scheduling
+  remain. Guarded assembly-default draft, register-pinning concession marked.
+  Its commit title's 88.5% was stale; the recorded reviewed score is 89.1%.
+- **082154E4 — retained 82.6% draft, SpriteOam_FinalizeQueue.** Read the complete
+  assembly and checked the existing draft. Tested output-buffer/counter pins,
+  countdown priority loop, scoped disable pointer and matrix-count pointer;
+  none improved the 41 realigned / 12 structural baseline. Priority-loop
+  allocation and premature invariant-address hoisting remain. Added the
+  required file-local alias, made the fallback use the raw assembly symbol,
+  formatted, and rerecorded the reviewed 436-byte draft.
+- **08217960 — retained 80.1% draft, Palette_ApplyBackgroundFade.** Verified the
+  existing 604-byte draft: 82 realigned differences / 39 structural. A green
+  term r10 pin reduced structure to 33 but added a concession with no useful
+  fuzzy gain, so it was discarded. Explicit source-color caching and counter
+  pinning also failed to improve it. Constant hoisting, loop-counter setup and
+  packed-color operand allocation remain. Added the required local alias and
+  raw-symbol fallback; formatted and rerecorded the existing draft.
+
+Final checks: byte-exact acceptance for 08214FBC; --nonmatching --record for
+all three guarded drafts. The follow-up style commit formats the exact sprite
+source without changing its instructions. No ROM or generated artifacts added.
