@@ -290,6 +290,9 @@ def main():
     index = {f[0]: n for n, f in enumerate(funcs)}
 
     write_nonmatching(code, funcs)
+    with open(os.path.join(ROOT, "symbols", "functions.csv"), newline="") as source:
+        csv_addr = {r[1]: r[0].upper() for r in csv.reader(source)
+                    if len(r) > 1 and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
     units = []  # (first_func_idx, last_func_idx, path)
     for path in sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)):
         rel = os.path.relpath(path, ROOT)
@@ -298,6 +301,8 @@ def main():
             sys.exit(f"{rel}: no function definitions found (a file the build would silently ignore)")
         idx = []
         for n in names:
+            if n not in index and f"sub_{csv_addr.get(n, '')}" in index:
+                n = f"sub_{csv_addr[n]}"  # name promoted on main after gen/code_sym.s was built
             if n not in index and re.fullmatch(r"sub_[0-9A-F]{8}", n):
                 # "hidden" function: code the disassembler did not split off
                 # (e.g. inside the previous function's trailing data). It is
