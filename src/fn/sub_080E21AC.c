@@ -1,3 +1,5 @@
+#define SceneActorControl_CompleteBlinkOut  sub_080E2428
+#define SceneActorControl_BeginHiddenDefeat sub_080E21AC
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
