@@ -1,7 +1,9 @@
+// confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
+#define Vorn_UpdateKnockbackRecovery sub_080AE1C4
 #include "scene_actor_chase.h"
 // confidence=low: converges saved motion and restores the route after a reaction timer.
 #ifdef NONMATCHING
-// fuzzy: 82.1%
+// fuzzy: 81.2%
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
 void sub_0807C72C(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
@@ -187,5 +189,5 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateKnockbackRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080AE1C4);
 #endif
