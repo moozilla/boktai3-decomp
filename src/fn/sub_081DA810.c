@@ -45,7 +45,7 @@ extern void (*const gUnk_086136A8[])(void);
 extern const s16 gUnk_086149C4[];
 struct Entry *TimedEffect_FindFreeEntry(struct Manager *, s32 *);
 void Projectile_SetUpdateCallback(void *, void (*)(void));
-void sub_081D9F18(void *);
+void Projectile_InitFromType(void *);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(void *, void *, void *);
 void sub_081DA048(void);
@@ -73,7 +73,7 @@ s32 TimedEffect_SpawnProjectile(struct Manager *manager, struct Config *config,
     if (!entry)
         return -1;
     Projectile_SetUpdateCallback(config, gUnk_086136A8[config->type]);
-    sub_081D9F18(config);
+    Projectile_InitFromType(config);
     entry->lifetime = 6;
     entry->elapsed = 0;
     if (config->type == 9)

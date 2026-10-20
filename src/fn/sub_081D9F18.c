@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Projectile_InitFromType sub_081D9F18
-
 struct PConfig {
     u16 flags;
     u8 pad2[0x38 - 2];

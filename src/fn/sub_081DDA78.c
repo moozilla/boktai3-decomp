@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define NameEntry_AppendChar sub_081DDA78
-
 struct NameEntry {
     u8 pad0[0x348];
     s32 which;
