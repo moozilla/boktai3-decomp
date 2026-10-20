@@ -65,7 +65,83 @@ void sub_0813D178(void *);
 
 void sub_0813CB8C(void *, u32);
 
+static inline u32 ReadVisualFlag(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+static inline u32 VisualBonusFlag(struct Player *p, u32 mask)
+{
+    if (!p)
+        return 0;
+    return ReadVisualFlag(&p->statBonusFlags, mask);
+}
+static inline u32 VisualActionFlag(struct Player *p, u32 mask)
+{
+    if (!p)
+        return 0;
+    return ReadVisualFlag(&p->actionFlags, mask);
+}
+#ifdef NONMATCHING
+// fuzzy: 97.0%
+// Constant masks are loaded after flags rather than before them.
+// confidence=low: initializes visual resource selectors from mode and bonus flags.
+#define Player_InitVisualResources sub_0813D178
+void Player_InitVisualResources(void *actor)
+{
+    struct Player *p = actor;
+    s32 single;
+    s32 count;
+    switch (p->actionMode) {
+        case 0:
+            single = 1;
+            count = 0;
+            if (VisualBonusFlag(p, 0x40000000))
+                count = 1;
+            if (VisualActionFlag(p, 1))
+                count++;
+            if (VisualBonusFlag(p, 0x20000000))
+                count++;
+            if ((p && (s32)p->statBonusFlags < 0))
+                count++;
+            if (count > 1)
+                single = 0;
+            if (VisualBonusFlag(p, 0x10000000))
+                p->menuStatusValues[0] = 0x179;
+            else if (VisualBonusFlag(p, 0x40000000) && single == 1)
+                p->menuStatusValues[0] = 0x178;
+            else if (VisualActionFlag(p, 1) && single == 1)
+                p->menuStatusValues[0] = 0x177;
+            else if (VisualBonusFlag(p, 0x20000000) && single == 1)
+                p->menuStatusValues[0] = 0x176;
+            else if ((p && (s32)p->statBonusFlags < 0) && single == 1)
+                p->menuStatusValues[0] = 0x175;
+            else
+                p->menuStatusValues[0] = 0x2A;
+            break;
+        case 1:
+            p->menuStatusValues[0] = 0x33;
+            break;
+        case 2:
+            p->menuStatusValues[0] = 0x39;
+            break;
+        case 6:
+            p->menuStatusValues[0] = 0x34;
+            break;
+        default:
+            return;
+    }
+    p->menuStatusValues[1] = 0x16E;
+    p->menuStatusValues[2] = 0x2D;
+    p->menuStatusValues[3] = 0x170;
+    p->menuStatusValues[4] = 0x171;
+    p->menuStatusValues[5] = 0x2C;
+    p->menuStatusValues[6] = 0x2E;
+    *(u16 *)((u8 *)p + 0xABE) = 0x2B;
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813D178);
+#endif
 
 void Player_InitVisualState(struct Player *p)
 {
@@ -764,7 +840,7 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813E608);
+INCLUDE_ASM("asm/nonmatching", Player_BuildActionModifiers);
 #endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
