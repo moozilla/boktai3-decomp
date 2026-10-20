@@ -1212,3 +1212,87 @@ constant-before-address order. depin.py --write was run on the hinted units;
 it skips nonmatching candidates, so no claim is made that retained draft hints
 are minimal. Ghidra export was unavailable. Further work should start from these
 recorded candidates and focus on the remaining allocation/setup differences.
+
+## Task 08208498 (2026-10-20)
+
+Tags: #matching #cannon-turret #fan-cannon #codex-medium
+
+Worked solo on the already checked-out cloud/08208498 branch. No network or
+full builds. Exact checks used build/venv/bin/python tools/check.py; commits
+went through build/commit.sh. New exact gain: **+0.0225 percentage points** of
+code (544 bytes), in the Register-pinned category because its one empty
+register barrier is necessary. No total progress report was regenerated.
+
+- **08208498 matched**, CannonTurret_FireAimedVolley. Fires every ten ticks
+  while the countdown exceeds 45, aims toward the effective player position,
+  adds random angular spread, selects speed between half and full configured
+  speed, and alternates effect variants on the twenty-tick cadence. Returns
+  to sub_0820843C after the countdown. Static evidence: neighbouring
+  CannonTurret_InitCollider/Create, the update callback comparison at
+  08208740, Math_Atan2 and SpriteEffectController_Create calls. Exact check:
+  544 bytes, fuzzy 100%, after formatting and depin.py. The sole retained
+  concession is an empty barrier on the random-table pointer; no fixed
+  register variables remain. An inline CopyPosition with separately assigned
+  destination/source pointers restored argument order. RandomFrom(table)
+  with a preloaded pointer restored the RNG register lifetime. Calling Polar
+  with &velocity and assigning the caller's velocity pointer afterwards
+  removed the final three differing instructions. A low r7 table pin was
+  rejected: agbcc reused r7 and turned table accesses into stack accesses.
+- **08208740 drafted 81.7%**, CannonTurret_UpdateCombat. New complete candidate
+  handles pause flags, callback dispatch, collider visibility, damage/HUD,
+  defeat debris and animation, periodic animation selection, palette flash,
+  blink and packed sequence playback. Last full-size nonmatching check:
+  119 realigned differing instructions, 38 ignoring registers. Remaining
+  differences include pause layout, collider/vector setup and allocation.
+  The callback's incidental ROM result is replaced with defined zero; a
+  defined r0 allocation token keeps playback from freely using r0. Uses a
+  local Subsystem_VerbNoun alias and the required concession marker.
+- **08208BE4 drafted 93.3%**, CannonTurret_InitializeFromScript. New complete
+  candidate parses p/r/a/l/s/S/z/g/D/G/X/V, loads graphics resource 7E7D,
+  uses palette 1BC, looks up animation resource (922E,5184), starts live/dead
+  animation, steps packed playback, and initializes collider/terrain overlay.
+  Last full-size check: 37 realigned differing instructions, 6 ignoring
+  registers. Remaining differences: resource-slot reload and register
+  lifetimes, plus an explicit zero success result rather than incidental
+  r0. Keeping Anim_SetSequence's defined return live in r0 through playback
+  reduced the register differences substantially (72.0% to 93.3%). Health
+  option writes must remain in ROM order: +136 then +132; test the narrowed
+  local value to avoid an extra reload. Position +1C, sprite +24, display
+  position +40, graphics +50, sequence +10C, resource pointer +164.
+- **08209254 retained draft 80.7%**, FanCannon_ApplyHitReaction. Added the
+  required file-local descriptive alias and re-recorded its unchanged score.
+  Reviewed source/callees/assembly and tested removal of HUD/health pins and
+  an explicit critical-hit mask lifetime. All worsened the existing draft
+  (about 70.8%); restored its safe r10 health binding. Final check: 37
+  realigned differing instructions, 7 ignoring registers. Stack-address
+  selection and allocation remain. Do not restore the earlier unsafe r7
+  health binding mentioned in notes/codex-low.md.
+- **08209704 stopped below draft threshold**. Built a complete exploratory
+  FanCannon_RampPowerAndEmitParticles candidate under wip/sub_08209704.c.
+  Reviewed the full body and neighbouring inactive/toggle routines. Emits
+  every 30 ticks, chooses axis/direction, computes signed sine products with
+  magnitude truncation toward zero, samples a distance interval, randomizes
+  graphics/flip flags, and increments power capped at +10C. Power at +120,
+  distance +108, signed axis +11A and direction +11B. Candidate experiments
+  stayed around 50–52%; random-table/address lifetimes, stack materialization,
+  duplicated direction paths and allocation remain too far away. No src
+  draft committed. Ghidra export gen/ghidra/decomp.c was unavailable.
+- **08209AC4 stopped below draft threshold**. Read full asm and BIG_FUNCTIONS,
+  ran condense and relatives, then built a complete exploratory
+  FanCannon_UpdateCombatAndForce candidate under wip/sub_08209AC4.c. It covers
+  scheduled toggling, callback dispatch, damage/defeat effects and terrain
+  overrides, aligned-player range/path tests, global force outputs, palette
+  flash/blink, sequence choice and speed scaling, and packed playback.
+  Reviewed extent: 2052 bytes through 0820A2C8. Safe unpinned main-pointer
+  candidate: fuzzy 58.7%, realigned 444 differing instructions / 169 ignoring
+  registers. A diagnostic r7 pointer pin scored 63.8% but was not retained
+  because of low-register lifetime concerns. Largest issues: main pointer
+  selected into sl instead of r7, field-address PRE, vector/debris setup,
+  and stack/register lifetimes. Source remains outside src; no draft credit.
+
+Tool caveat: depin.py on a guarded draft can check the default INCLUDE_ASM
+and incorrectly remove every NONMATCHING hint without checking its C. This
+happened for the new 08208740/08208BE4 drafts; restored their committed sources
+immediately using git show. Only use the tool on an extracted candidate for
+such drafts, or teach it --nonmatching before applying it. The exact
+08208498 depin run was on unguarded C and is valid.
