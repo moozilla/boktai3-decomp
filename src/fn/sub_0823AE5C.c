@@ -7,7 +7,7 @@ struct BlobAE {
 };
 struct BlobAE *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(struct BlobAE *, struct BlobAE *);
-void sub_0821983C(u8 *, struct BlobAE *, u32, u32, u32, u32, u32, void *);
+void Widget_InitLinked(u8 *, struct BlobAE *, u32, u32, u32, u32, u32, void *);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void sub_08238238(u8 *);
@@ -24,7 +24,7 @@ void sub_0823AE5C(u8 *p)
         copy = (struct BlobAE *)(p + 0x6c);
         ResourceHeader_Relocate(copy, data);
         object = p + 0x8c;
-        sub_0821983C(object, copy, 0, 0x9000, 2, 0, 60, p + 0x30);
+        Widget_InitLinked(object, copy, 0, 0x9000, 2, 0, 60, p + 0x30);
         found = Script_SeekToKeyword(0x64);
         if (found)
             p[0x548] = Script_GetValue();

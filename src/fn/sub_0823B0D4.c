@@ -13,7 +13,7 @@ u32 SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void sub_0823AE5C(u8 *);
 void sub_0823AF44(u8 *);
 u32 SceneBody_SetKeyframeDisplay(void *, void *);
-void sub_0821BC68(void *, void *);
+void CellObject_Init(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 u32 SceneBody_SetPositionOffset(void *, struct Vec16 *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
@@ -78,7 +78,7 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     sub_0823AF44(p);
     p[0x419] = zero;
     SceneBody_SetKeyframeDisplay(body, p + 0x8c);
-    sub_0821BC68(p + 0x284, p + 0x540);
+    CellObject_Init(p + 0x284, p + 0x540);
     SceneBody_SetMovementProbe(body, p + 0x284, 0x1e, 0x1e);
     off.x = 0;
     off.y = 0x12c;

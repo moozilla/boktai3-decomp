@@ -33,7 +33,7 @@ void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
 void Anim_RestartSequence(void *, void *, int, int, int);
-void sub_0821983C(void *, void *, int, int, int, int, int, int);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, int);
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Memory_Copy(void *, const void *, int);

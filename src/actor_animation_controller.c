@@ -4411,7 +4411,7 @@ void TimeDisplay_InitBackgrounds(u8 *p)
 
 void ResourceHeader_Relocate(u8 *, void *);
 
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 
 void TimeDisplay_HideAnimatedObjects(u8 *);
 
@@ -4423,15 +4423,15 @@ void TimeDisplay_InitAnimatedObjects(u8 *s)
     u32 two;
     u32 one;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(s + 0x18, obj, 1, 0x10, zero = 0, 0, 0, 0);
-    sub_0821983C(s + 0xA0, obj, 2, 0x10, zero, zero, zero, zero);
-    sub_0821983C(s + 0x128, obj, 11, 0x10, two = 2, zero, zero, zero);
-    sub_0821983C(s + 0x1B0, obj, 11, 0x10, two, zero, zero, zero);
-    sub_0821983C(s + 0x458, obj, 0, 0x10, zero, zero, zero, zero);
-    sub_0821983C(s + 0x238, obj, 7, 0x10, zero, zero, zero, zero);
-    sub_0821983C(s + 0x2C0, obj, 3, 0x10, zero, zero, zero, zero);
-    sub_0821983C(s + 0x348, obj, 7, 0x30, one = 1, zero, zero, zero);
-    sub_0821983C(s + 0x3D0, obj, 3, 0x30, one, zero, zero, zero);
+    Widget_InitLinked(s + 0x18, obj, 1, 0x10, zero = 0, 0, 0, 0);
+    Widget_InitLinked(s + 0xA0, obj, 2, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x128, obj, 11, 0x10, two = 2, zero, zero, zero);
+    Widget_InitLinked(s + 0x1B0, obj, 11, 0x10, two, zero, zero, zero);
+    Widget_InitLinked(s + 0x458, obj, 0, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x238, obj, 7, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x2C0, obj, 3, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(s + 0x348, obj, 7, 0x30, one = 1, zero, zero, zero);
+    Widget_InitLinked(s + 0x3D0, obj, 3, 0x30, one, zero, zero, zero);
     TimeDisplay_HideAnimatedObjects(s);
 }
 

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Dir_Decompose sub_081D396C
-
 void Dir_Decompose(u8 n, u8 *a, u8 *b, u32 scale)
 {
     u8 m;

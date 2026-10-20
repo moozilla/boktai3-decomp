@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_0821BD48(void *);
+u32 Terrain_GetHeightAt(void *);
 
 struct S {
     u8 filler[0xb84];
@@ -13,5 +13,5 @@ struct S {
 void Ivy_UpdateGroundHeight(struct S *s)
 {
     if (s->n > 7)
-        s->v = (u16)sub_0821BD48(s->a);
+        s->v = (u16)Terrain_GetHeightAt(s->a);
 }

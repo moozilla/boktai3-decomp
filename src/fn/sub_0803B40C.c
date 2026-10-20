@@ -36,7 +36,7 @@ int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
 void *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
@@ -93,9 +93,9 @@ initialize:
     {
         struct Drawing *draw = p->draws;
         u32 drawFlags = 0x2011;
-        sub_0821983C(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
+        Widget_InitLinked(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 1;
-        sub_0821983C(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
+        Widget_InitLinked(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 2;
         glyph = p->glyph;
         savedSprite = &p->sprite;
@@ -107,7 +107,7 @@ initialize:
             register int zero asm("r5") = 0;
             int count = 19;
             do {
-                sub_0821983C(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
+                Widget_InitLinked(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
                 count--;
                 draw++;
             } while (count >= 0);

@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Terrain_GetHeightAt sub_0821BD48
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 u16 Terrain_GetHeightAt(u16 *point)

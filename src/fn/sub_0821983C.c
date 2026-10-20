@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Widget_InitLinked sub_0821983C
-
 struct ContactPosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));

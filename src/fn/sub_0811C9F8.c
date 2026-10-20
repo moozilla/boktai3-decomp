@@ -41,7 +41,7 @@ extern struct Camera *gUnk_020004B8;
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void ScenePalette_RefreshOnFlags(struct Actor *, struct Owner *);
-s32 sub_0821983C(void *, void *, s32, s32, s32, s32, s32, s32);
+s32 Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 s32 Anim_Step(void *, void *);
 void Actor_SetSpriteDepthOffsets(struct Owner *, s32);
@@ -99,7 +99,7 @@ void ActorSprite_InitPartDrawings(struct Actor *actor, struct Owner *owner, u32 
         d = &owner->drawings[i];
         res = owner->resource;
         animId = anim;
-        if (sub_0821983C(d, res, animId, frames, 0, 1, 0, 0) != 0)
+        if (Widget_InitLinked(d, res, animId, frames, 0, 1, 0, 0) != 0)
             return;
         Anim_SetKeyframes(d, res, animId, 1, 0);
         Anim_Step(d, res);

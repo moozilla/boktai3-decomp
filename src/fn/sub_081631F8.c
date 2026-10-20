@@ -22,7 +22,7 @@ struct TransitionPanelPosition {
 };
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void sub_08219918(void *, void *, s32, s32, s32, s32, s32, void *);
+void Widget_InitCleared(void *, void *, s32, s32, s32, s32, s32, void *);
 void TransitionPanel_InitOverlay(struct TransitionPanel *p)
 {
     struct TransitionPanelResource *resource = ScriptProc_Start(0xCB05, 0x530D);
@@ -33,7 +33,7 @@ void TransitionPanel_InitOverlay(struct TransitionPanel *p)
         position.x = -8;
         position.y = -8;
         position.z = 0;
-        sub_08219918(&p->overlay, &p->resource, 0x4B, 0x1091, 0, 0, 60, &position);
+        Widget_InitCleared(&p->overlay, &p->resource, 0x4B, 0x1091, 0, 0, 60, &position);
         CpuSet(p->overlay.tiles, p->tileCopy, 0x04000008);
         p->overlay.frame = 0x3AA;
         p->overlay.tiles = p->tileCopy;

@@ -45,7 +45,7 @@ void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void *ScriptProc_Start(s32, s32);
 void Bg_SetupLayers(s32, s32, void *, s32, s32, s32, void *);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, s32, s32, s32, s32, s32, void *);
+void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void Menu_StartFadeIn(s32);
 void SoundTest_CountEntries(void *);
 void SoundTest_ShowCategory(void *);
@@ -84,33 +84,33 @@ s32 SoundTest_Initialize(struct Viewer *p)
     asset = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate(&p->backgroundResource, asset);
     p->digitsResource = p->backgroundResource;
-    sub_0821983C(&p->background, &p->backgroundResource, 59, 16, 0, 0, 0, 0);
+    Widget_InitLinked(&p->background, &p->backgroundResource, 59, 16, 0, 0, 0, 0);
     ResourceHeader_Relocate(&p->labelResource, asset);
-    sub_0821983C(&p->label, &p->labelResource, 47, 16, 0, 0, 0, 0);
+    Widget_InitLinked(&p->label, &p->labelResource, 47, 16, 0, 0, 0, 0);
     for (i = 0; i < 3; i++) {
-        sub_0821983C(&p->labels[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
+        Widget_InitLinked(&p->labels[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
         p->labels[i].flags |= 1;
         pos.y += 32;
     }
     pos.x = 184;
     pos.y = 64;
     for (i = 0; i < 3; i++) {
-        sub_0821983C(&p->digitsA[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        Widget_InitLinked(&p->digitsA[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
         p->digitsA[i].flags |= 1;
         pos.x += 8;
     }
     pos.x = 184;
     pos.y = 96;
     for (i = 0; i < 3; i++) {
-        sub_0821983C(&p->digitsB[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
+        Widget_InitLinked(&p->digitsB[i], &p->digitsResource, 0, 48, 0, 0, 60, &pos);
         p->digitsB[i].flags |= 1;
         pos.x += 8;
     }
     asset = ScriptProc_Start(0xcb05, 0x530d);
     ResourceHeader_Relocate(&p->panelResource, asset);
-    sub_0821983C(&p->panel, &p->panelResource, 139, 16, 0, 0, 0, 0);
+    Widget_InitLinked(&p->panel, &p->panelResource, 139, 16, 0, 0, 0, 0);
     ResourceHeader_Relocate(&p->cursorResource, asset);
-    sub_0821983C(&p->cursor, &p->cursorResource, 71, 16, 0, 0, 0, 0);
+    Widget_InitLinked(&p->cursor, &p->cursorResource, 71, 16, 0, 0, 0, 0);
     p->savedPalette = *(u16 **)((u8 *)p + 0x178);
     CpuSet(p->savedPalette, p->palette, 16);
     *(u16 **)((u8 *)p + 0x178) = p->palette;

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Widget_CopyMasked sub_082199C8
-
 struct CopyWidget {
     u16 f0;
     u8 pad2[4];

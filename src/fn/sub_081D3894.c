@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Particle_UpdateHoming sub_081D3894
-
 struct HomingSprite {
     u8 pad0[0x18];
     s16 x, y, z;

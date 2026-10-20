@@ -26,20 +26,20 @@ void PauseMenu_CreateSelectionWidgets(struct SceneHudState *p)
     tertiaryPos[2] = 0;
     tertiaryPos[3] = 0;
     for (i = 0; i <= 2; i++) {
-        sub_0821983C(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60,
-                     primaryPos);
-        sub_0821983C(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60,
-                     secondaryPos);
+        Widget_InitLinked(&p->primaryWidgets[i], p->motionResource, 0x184, 0x10011, 0, 0, 60,
+                          primaryPos);
+        Widget_InitLinked(&p->secondaryWidgets[i], p->motionResource, 0xF0, 0x10011, 0, 0, 60,
+                          secondaryPos);
         tertiaryPos[1] = 0x88 - i * 0x18;
-        sub_0821983C(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60,
-                     tertiaryPos);
+        Widget_InitLinked(&p->tertiaryWidgets[i], p->motionResource, 0xE7, 0x10011, 0, 0, 60,
+                          tertiaryPos);
     }
 #define EXTRA(widget, frame, X)                                                                    \
     pos[0] = X;                                                                                    \
     pos[1] = 0;                                                                                    \
     pos[2] = 0;                                                                                    \
     pos[3] = 0;                                                                                    \
-    sub_0821983C(widget, p->widgetResource, frame, 0x10011, 0, 0, 60, pos);
+    Widget_InitLinked(widget, p->widgetResource, frame, 0x10011, 0, 0, 60, pos);
     EXTRA(&p->extraWidgetsA[0], 0x90, 0)
     EXTRA(&p->extraWidgetsA[1], 0x90, 0xB0)
     EXTRA(&p->extraWidgetsA[2], 0x90, 0xD0)

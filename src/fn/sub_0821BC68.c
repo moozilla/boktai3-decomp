@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define CellObject_Init sub_0821BC68
-
 struct CellObject {
     u8 pad0[4];
     u16 cell4;

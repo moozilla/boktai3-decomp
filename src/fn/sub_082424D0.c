@@ -5,7 +5,7 @@
 #define W(o) (*(u32 *)(p + (o)))
 #define B(o) (*(u8 *)(p + (o)))
 s32 Player_GetSecondaryActionFlags(void *, u32);
-void sub_0821BC68(void *, void *);
+void CellObject_Init(void *, void *);
 void sub_08225B74(void *);
 void Collider_SetPosition(void *, void *, s32);
 void ActorShadow_Disable(void *);
@@ -36,7 +36,7 @@ void sub_082424D0(u8 *p)
             W(0x40) = value;
         else if (!W(0x40)) {
             void *position = p + 0x284;
-            sub_0821BC68(position, p + 0x30);
+            CellObject_Init(position, p + 0x30);
             W(0x40) = (u32)position;
         }
     }
