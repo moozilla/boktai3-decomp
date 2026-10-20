@@ -409,3 +409,83 @@ Tags: #matching #player #animation
 - 08147CF0: guarded draft as Player_UpdateSpiralRelease (tentative), recorded full-extent fuzzy 97.1%. Creates spiral particles, alternates folded facing/collider updates, advances the secondary animation and selects palette 0x2DD. Reused the packed-command stepper from 08153E1C. Removing an early duplicate overlay pointer eliminated an extra saved-register copy. Remaining realigned differences: 11 instructions, three ignoring registers, primarily tail address temporaries/constant derivation and pool extent. Explicit offset pins regressed to 95.9% and were reverted. The commit title's preliminary candidate-length 97.4% is superseded by the recorded reviewed-extent 97.1%.
 
 Five exact functions and one guarded draft; exact functions cover 88.9% of this assignment's function extents (5696 bytes), with the remainder a draft. Register-pinned exact category: 08146C64 and 08146EAC; unpinned exact category: 08146574, 0814692C, 08147768. No project totals regenerated in this worker. Only per-file check.py checks used; no make, full build, network, or shared-doc edits. Ghidra export is absent. Pre-existing tools/cloud_task.py changes were left untouched. Separate function commits queued through build/commit.sh; formatting-only followups cover the first two accepted units.
+# Task 081A2858 — Codex low, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool
+
+Exact progress: 0 percentage points; no exact matches. One guarded draft,
+081A2858, recorded at 86.3%. No full build or network commands were run.
+The existing tools/cloud_task.py modification was left untouched.
+
+- **081A5614 — stopped after structural analysis, no C draft.** Inspected first
+  as the largest target. It selects a palette bank (0x6F versus 0x7F according
+  to pointer F24), dispatches six states through F20, and performs repeated
+  clamped fixed-point color interpolation. State 1 blends palette buffers at
+  actor offsets 718/918/B18 with the F18 counter and F22 exponent. The condensed
+  listing identifies three copies of a 120-item color transition run and 22
+  signed division/shift runs. `relatives.py` supplies the interpolation idiom
+  from SpriteController_AnimateGrowing but covers only small individual runs;
+  no Ghidra export exists in this checkout. Stopped without a complete,
+  independently checkable C implementation. Condensed scratch listing:
+  build/codex-low-5614.txt. A future attempt should factor the clamped
+  interpolation before reproducing all six palette states.
+- **081A2858 — drafted 86.3%.** Tentative name
+  Hresvelgr_UpdateCollisionPresentation; called by ActorReaction_Tick after
+  behavior dispatch. Synchronizes attack/body colliders, sprite visibility,
+  shadow enablement, sound latch, camera offset and oscillation scale.
+  Invulnerability halfwords are at 314 and 318 (316 is the oscillation scale).
+  Full-width signed collider flag bitfields and mask-taking accessors improved
+  instruction selection. Pinning the descending collider-loop counter to r5
+  improved 78.6% to 85.7%; a scoped clear mask and explicit flags pointer brought
+  the recorded full-extent result to 86.3%. Unit has the register-pinning
+  concession marker. `depin.py --write` was invoked; it skips a nonexact base.
+  Remaining realigned differences: 83 total, 61 ignoring registers, chiefly
+  flag insertion, branch layout and address/zero lifetimes. Default build uses
+  INCLUDE_ASM. Final command: tools/check.py src/fn/sub_081A2858.c
+  --nonmatching --record. Candidate emits 860 bytes against an 868-byte extent;
+  this is a guarded draft only, not exact progress.
+- **081A39E0 — stopped, candidate 65.2%.** Existing canonical name is
+  EffectPool_UpdateEntry; local tentative candidate name is
+  EffectPool_UpdateHomingEntry. Its active-entry caller advances byte 158.
+  Turns angle 163 toward the player with turn shift 162 and signed interval
+  164; speed 159 produces the velocity at E4. Includes the packed animation
+  stepper at 2C and periodic MotionEntry spawns into pointers at 168.
+  Remaining differences are animation-step control flow, inline vector
+  addressing and registers (65 structural/156 total). Register pin trials did
+  not improve the structure. Candidate retained in wip/sub_081A39E0.c;
+  below the committed-draft threshold.
+- **081A6AEC — stopped: full-extent score 54.1%.** The 312-byte visible body
+  projects actor position 54 and target pointer 110, isolates projected X
+  separation, unprojects it with Y=0 and computes a planar square-root distance.
+  Tentative name Vanargand_GetTargetLateralDistance. Debug_NudgeWorldPositionWithB
+  supplies an exact projection idiom. Arrays plus inline projection/set/inverse
+  routines improved the visible-body comparison from 55.4% to 90.8%, with only
+  6 structural and 17 total realigned differences. However the symbol extends
+  through undecoded executable bytes starting at 081A6C24, up to 081A6DCC.
+  The required --nonmatching --record check correctly scores the full extent
+  at 54.1%. An early queued draft commit was followed by a removal commit;
+  no below-threshold production draft remains. Retained in wip/sub_081A6AEC.c.
+  Do not treat the candidate-length 90.8% as a full-function score. Boundary
+  recovery is required before this candidate can qualify.
+- **081A8F48 — stopped, best candidate 65.8%.** Tentative name
+  Vanargand_UpdatePlayerDrain: positions the player at actor position +
+  (128,0,128), selects animations 12–14 and copies player collision data into
+  palettes 7B8/7D8/7F8 by player mode 418, then adds a position-request result
+  to boss health and displays the change. Array-based stack vectors eliminate
+  unwanted merged word stores; three-argument vector addition improves the
+  structure. Latest helper experiment is 65.7% (68 structural/125 total),
+  retained in wip/sub_081A8F48.c; initial candidate also in build/8f48-base.c.
+  Important control-flow detail: global flag 4 branches to finished, rather
+  than returning without setting it. Remaining differences include shared
+  animation/drawable addresses across switch arms and stack-vector temporaries.
+- **081A9178 — stopped, candidate 54.7%.** Tentative name
+  Vanargand_UpdateTargetDash. Callback at 104 can interrupt; state A2 starts
+  animation 4, waits past frame 10, initializes a mode-3 motion track toward
+  target 110 (or a point 1024 units from center 640,768,640), then spawns
+  afterimages until track state 55D becomes 2. Candidate retained in
+  wip/sub_081A9178.c. Remaining differences include stack vector construction,
+  motion-track pointer spills, state-switch block shape and register lifetimes.
+
+Only the qualifying draft and these notes are committed. Other scratch C is
+kept outside production src/. No symbols, generated assembly, ROM or emulator
+outputs were committed.
