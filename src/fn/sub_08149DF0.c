@@ -173,5 +173,5 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralTrailAction);
+INCLUDE_ASM("asm/nonmatching", sub_08149DF0);
 #endif
