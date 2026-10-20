@@ -1,6 +1,9 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 80.6%
+// Remaining differences: the map-address PRE register spills across Mod and changes frame/register allocation.
+#define Mummy_RequestStraightRoute sub_080D6FDC
+
 // Structure lines up (regions.py core distance 2/418). Allocation differs: the ROM keeps the
 // GCSE copy of &gUnk_030052F4 in r6 for the whole scan (frame 0x10); here it is spilled
 // (frame 0x14). rasolve: forcing the ROM registers does not help (14 structural diffs).
@@ -151,6 +154,7 @@ found:
     FIELD(state, 0x6D2, u16) = 0xF0;
     return 1;
 }
+
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_RequestStraightRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D6FDC);
 #endif
