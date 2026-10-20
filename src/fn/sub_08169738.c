@@ -3,8 +3,6 @@
 
 void Anim_Remove(void *);
 
-#define SceneHud_RemoveAnimations sub_08169738
-
 void SceneHud_RemoveAnimations(u8 *hud)
 {
     u8 *c = hud + 0xF70;

@@ -4,8 +4,6 @@
 
 void Player_AddControlFlags(struct Player *, u32);
 
-#define Player_UpdateResetBlink sub_0815EBB8
-
 void Player_UpdateResetBlink(struct Player *p)
 {
     register s32 value asm("r5");

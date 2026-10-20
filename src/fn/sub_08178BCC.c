@@ -5,7 +5,7 @@
 #include "game_state.h"
 extern struct SceneHudState *gSceneHud;
 extern u16 gSceneHudMode;
-void sub_08169738(struct SceneHudState *);
+void SceneHud_RemoveAnimations(struct SceneHudState *);
 void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
 void PlayerPanel_RemoveEffects(struct SceneHudState *);
 void Hud_RemoveMenuGraphics(struct SceneHudState *);
@@ -24,7 +24,7 @@ s32 SceneHud_DestroyOwner(struct SceneHudState *s)
 {
     struct SceneInputWidget *widget;
     s32 count;
-    sub_08169738(s);
+    SceneHud_RemoveAnimations(s);
     PauseMenu_RemoveHeaderAnimation(s);
     PlayerPanel_RemoveEffects(s);
     Hud_RemoveMenuGraphics(s);

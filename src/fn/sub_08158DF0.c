@@ -3,8 +3,6 @@
 
 void ActorSequence_Begin(struct Player *, s32, s32);
 
-#define Player_BeginDirectionSequence sub_08158DF0
-
 void Player_BeginDirectionSequence(struct Player *p, u32 axis)
 {
     ActorSequence_Begin(p, 4, 1);
