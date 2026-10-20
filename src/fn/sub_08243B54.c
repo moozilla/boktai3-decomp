@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.9%
-// 9 differing instruction runs; size -4 bytes; first diff at +0x54 (ldr r1, [pc, #0x5c] vs ldr r1, [pc, #0x58])
+// fuzzy: 88.9%
+// Remaining: the 0xFFFFD000 tile attribute mask is copied from the literal pool through a second register in the original.
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 extern u16 gUnk_03005178;
@@ -31,11 +31,11 @@ void StatGauge_Draw(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
     if (gUnk_03005178 != attr)
         gUnk_03005178 = attr;
     for (i = 0; i < whole; i++) {
-        s16 mask = -12288;
+        s32 mask = -12288;
         *out++ = filled | mask;
     }
     if (partial) {
-        s16 mask = -12288;
+        s32 mask = -12288;
         s32 diff = partial;
         diff -= 8;
         diff = filled - diff;
@@ -43,7 +43,7 @@ void StatGauge_Draw(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
         i++;
     }
     while (i <= 9) {
-        s16 mask = -12288;
+        s32 mask = -12288;
         *out++ = empty | mask;
         i++;
     }
