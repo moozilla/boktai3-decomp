@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: action role inferred from local animation, motion and effects.
+#define Vanargand_UpdatePartImpact sub_081B431C
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
@@ -171,9 +173,10 @@ static inline void Vector(struct SceneVec *v, s32 angle)
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * 64);
     v->y = 0;
     {
+        s32 sample = gUnk_086149C4[angle & 255];
         s32 scale = 64;
-        asm("" : "+r"(scale));
-        v->z = Scale(gUnk_086149C4[angle & 255] * scale);
+        asm("" : "+r"(sample));
+        v->z = Scale(sample * scale);
     }
 }
 static inline void Add(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
@@ -188,7 +191,8 @@ static inline u8 Ended(struct VanargandPart *p)
 }
 void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 {
-    register u8 *enter asm("r7");
+    u8 *enter;
+    register u32 entering asm("r1");
     register u8 *savedBoss asm("r6") = boss;
     register u32 savedFrame asm("r8") = frame;
     u32 mask = 0x20;
@@ -201,21 +205,29 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
     }
     switch (p->state) {
         case 0:
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 *enter = 0;
                 Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 8, (u8)p->variant, 0);
             }
             if (StepPlayback(p, &p->sequence, p, 1)) {
-                p->state = 1;
+                {
+                    u32 next = 1;
+                    asm("" : "+r"(next));
+                    p->state = next;
+                }
                 p->timer = 0;
                 *enter = 1;
             }
             break;
         case 1: {
             struct SceneVec delta;
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 *enter = 0;
                 if (p->variant == 1)
                     Vector(&delta, 224);
@@ -226,15 +238,21 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             }
             MotionTrack_Update(p->motion);
             if (Ended(p)) {
-                p->state = 2;
+                {
+                    u32 next = 2;
+                    asm("" : "+r"(next));
+                    p->state = next;
+                }
                 p->timer = 0;
                 *enter = 1;
             }
             break;
         }
         case 2:
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 *enter = 0;
                 if (p->variant == 1) {
                     Set(&p->target, 0x3ab, 0x100, 0x2cb);
@@ -253,13 +271,21 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     Add(&point, p->basePosition, &p->target);
                     AnimatedParticles_EmitBurst(&point, p->particleAngle, 0, 64, 4, 4, 4, 4);
                     p->flashTimer = 15;
-                    p->state = 3;
+                    {
+                        u32 next = 3;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
                     p->timer = 0;
                 } else {
                     Sound_PlaySong(0x3d9);
                     AnimatedParticles_EmitBurst((u8 *)p + 0x1c, p->particleAngle, 0, 64, 4, 4, 4,
                                                 4);
-                    p->state = 3;
+                    {
+                        u32 next = 3;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
                     p->timer = 0;
                 }
                 *enter = 1;
