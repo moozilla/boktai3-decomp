@@ -25,8 +25,8 @@ static inline u8 Hidden(struct SceneActorRegistryResetView *a) {
  no:
  return 0;
 }
-#define Bat_UpdateDefeat sub_0808F2A0
-void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor,
+#define Bat_RunDefeatScript sub_0808F2A0
+void Bat_RunDefeatScript(struct SceneActorRegistryResetView *actor,
                                                          s32 frame)
 {
     s32 values[8];

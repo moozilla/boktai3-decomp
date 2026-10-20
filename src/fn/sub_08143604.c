@@ -1,7 +1,7 @@
 #include "global.h"
 
 // confidence=low: energy-gated burst sequence with a held middle animation.
-#define Player_UpdateEnergyBurst sub_08143604
+#define Player_UpdateHeldEnergyBurst sub_08143604
 #ifdef NONMATCHING
 // fuzzy: 92.1%
 #define B(n) (*(u8 *)(p + (n)))
@@ -24,7 +24,7 @@ static inline void grow(u8 *p)
     if ((H(0xAD8) += 3) > 32)
         H(0xAD8) = 32;
 }
-void Player_UpdateEnergyBurst(u8 *p)
+void Player_UpdateHeldEnergyBurst(u8 *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         B(0xAC9) = 0;
