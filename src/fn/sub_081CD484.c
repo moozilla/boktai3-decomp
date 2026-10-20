@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneNpc_DispatchCutsceneCommands SceneNpc_DispatchCommands_081CD484
 typedef struct {
     u16 id;
     u8 unk[4];
