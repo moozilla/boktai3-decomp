@@ -262,7 +262,11 @@ struct Player {
     u8 facingChangeEffects;     /* 0x4F4: bits zero/one enable/select facing cue */
     u8 savedEffectTick;         /* 0x4F5 */
     u8 movementSpeedReduction;  /* 0x4F6 */
-    u8 unk4F7[0x29];
+    u8 unk4F7;
+    u16 chargeCounter; /* 0x4F8 (tentative) */
+    u8 unk4FA[3];
+    u8 chargeSoundActive; /* 0x4FD (tentative) */
+    u8 unk4FE[0x22];
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
     u16 indicatorUpdateRate; /* 0x524: divisor for 128/x step size of indicatorStep (tentative) */
