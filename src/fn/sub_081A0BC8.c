@@ -1,5 +1,8 @@
 #include "global.h"
 
+// confidence=low: spawns projectiles while traversing the arena boundary.
+#define Hresvelgr_UpdateBoundaryBarrage sub_081A0BC8
+
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.
