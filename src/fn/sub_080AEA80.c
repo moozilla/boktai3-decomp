@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_animation.h"
-#ifdef NONMATCHING
-// fuzzy: 98.3%
-// foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
 extern u32 gUnk_03005308;
 
 void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
@@ -30,10 +28,11 @@ static inline s32 AngleIndex(s32 angle)
 static inline s32 RandomByte(void)
 {
     u32 offset;
+    register u16 *table asm("r4");
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     offset = gUnk_03005308 * 2;
-    offset += (u32)gUnk_0203B400;
-    return *(u8 *)offset;
+    table = gUnk_0203B400;
+    return *(u8 *)(offset + (u32)table);
 }
 void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
 {
@@ -58,6 +57,3 @@ void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
             SceneActorAnimation_SelectDirectionalEntry(p, 1);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPhase_SelectLinkedAnimation);
-#endif

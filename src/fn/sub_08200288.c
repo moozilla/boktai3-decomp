@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.7%
-// foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 #define Anim_SetFrame Anim_SetFrameDurationScale
 
 struct PlayerClone {
@@ -29,8 +26,8 @@ s32 PlayerClone_SetAnimation(struct PlayerClone *s, s32 index, u32 frame, u32 mo
     if (s->animation == index)
         same = 1;
     s->animation = index;
-    Anim_SetKeyframes(&s->anim, s->resource, (u16)((u16)index + s->animationOffset), (u16)mode,
-                      same);
+    Anim_SetKeyframes(&s->anim, s->resource, (u16)((u16)(*(&index)) + s->animationOffset),
+                      (u16)mode, same);
     if (s->mirrored)
         s->anim.flags |= 4;
     else
@@ -38,6 +35,3 @@ s32 PlayerClone_SetAnimation(struct PlayerClone *s, s32 index, u32 frame, u32 mo
     Anim_SetFrameDurationScale(&s->anim, (u16)frame);
     return Anim_Step(&s->anim, s->resource);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerClone_SetAnimation);
-#endif
