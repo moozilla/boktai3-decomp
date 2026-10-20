@@ -1,0 +1,56 @@
+#include "global.h"
+
+#ifdef NONMATCHING
+// fuzzy: 87.3%
+// Open: ROM keeps limit in a second register (copy of the loaded halfword) and
+// compares (timer << 16) with (limit << 16); mine truncates with lsr instead.
+struct BurstVector {
+    s16 x, y, z, pad;
+};
+struct BurstParent {
+    u8 pad0[0x30];
+    struct BurstVector position;
+    u8 pad38[0x457 - 0x38];
+    u8 variant;
+};
+struct Burst {
+    u8 pad0[0x18];
+    struct BurstParent *parent;
+    struct BurstVector offset;
+    u8 kind, variant;
+    u16 timer;
+    u16 limit28, limit2A;
+    u8 sprite[0x1C];
+    struct BurstVector position;
+    u8 pad50[0x98 - 0x50];
+    u8 active;
+    u8 pad99[0x284 - 0x99];
+    u8 mode;
+};
+void ParticleBurst_AdvanceFrame(void *);
+void ParticleBurst_RewindFrame(void *);
+void sub_08236C04(struct Burst *, struct BurstVector *);
+
+void sub_08236F48(struct Burst *p)
+{
+    if (p->active) {
+        u16 limit = p->limit2A;
+        if (p->timer < limit && p->variant != p->parent->variant)
+            p->timer = limit;
+        p->timer++;
+        if ((u32)(p->timer << 16) < (u32)(limit << 16)) {
+            ParticleBurst_AdvanceFrame(p->sprite);
+            p->position = p->parent->position;
+            p->position.x += p->offset.x;
+            p->position.y += p->offset.y;
+            p->position.z += p->offset.z;
+            if (p->mode == 1 && p->timer < p->limit28)
+                sub_08236C04(p, &p->position);
+        } else {
+            ParticleBurst_RewindFrame(p->sprite);
+        }
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08236F48);
+#endif
