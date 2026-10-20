@@ -5,7 +5,7 @@
 
 // confidence=low: approaches a side of the player before playing sequence eight
 #ifdef NONMATCHING
-// fuzzy: 84.5%
+// fuzzy: 90.4%
 // Remaining differences: Entry-pointer copies, flank-offset operands, and transition allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
