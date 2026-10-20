@@ -125,7 +125,6 @@ static inline void Step(struct SceneSteeringActor *input)
     }
     return;
 }
-#define Hresvelgr_UpdateMotionEntry sub_081A4594
 void Hresvelgr_UpdateMotionEntry(struct SceneSteeringActor *input)
 {
     register struct SceneSteeringActor *p asm("r5") = input;
