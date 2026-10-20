@@ -5,7 +5,7 @@ extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-void sub_0823E810(struct Player *, struct SceneVec *, u32, u32, s32);
+void Player_EmitScatterEffect(struct Player *, struct SceneVec *, u32, u32, s32);
 
 struct ThrowCtx {
     u8 unk0[0x48];
@@ -32,7 +32,6 @@ static inline s32 scale(s32 product)
     return product >= 0 ? product >> 12 : -((-product) >> 12);
 }
 
-#define Player_UpdateThrowArc sub_0823E998
 s32 Player_UpdateThrowArc(struct Player *p)
 {
     struct ThrowCtx *q = (struct ThrowCtx *)&p->statModifierContext;
@@ -53,7 +52,7 @@ s32 Player_UpdateThrowArc(struct Player *p)
         q->dest.x = q->origin.x + scale(gUnk_086149C4[(q->heading + 64) & 255] * t);
         q->dest.z = q->origin.z + scale(gUnk_086149C4[q->heading] * t);
         if (q->timer > q->phase3 + 2 && q->index >= 0)
-            sub_0823E810(p, &q->dest, angle, q->heading, q->index);
+            Player_EmitScatterEffect(p, &q->dest, angle, q->heading, q->index);
         if (q->timer > q->phase3 + q->phase1 - 2) {
             struct Vec16 pos;
             s32 radius = 0xAA;

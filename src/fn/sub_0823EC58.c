@@ -5,7 +5,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 s32 sub_08238280(u8 *, s32, s32);
 void Player_UpdateFacingFromInputHistory(u8 *p);
 void sub_0823E704(u8 *p);
-s32 sub_0823E998(u8 *p);
+s32 Player_UpdateThrowArc(u8 *p);
 void sub_08238E0C(u8 *p, u32 a, u8 *b);
 void Player_SetTetherMode(u8 *, s32, s32);
 
@@ -31,7 +31,7 @@ void Player_UpdateTetherThrow(u8 *p)
         case 4:
             *(u8 *)(p + 0x4B9) = 0;
             sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x1F), 0x40);
-            if (sub_0823E998(p))
+            if (Player_UpdateThrowArc(p))
                 Player_SetTetherMode(p, 3, 5);
             break;
         case 5:

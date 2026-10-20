@@ -8973,6 +8973,7 @@ addr,name,mode,confidence,source,notes
 0823E250,Player_UpdateSpinAction,thumb,low,src-alias,
 0823E494,Player_UpdateSlashAction,thumb,low,src-alias,
 0823E810,Player_EmitScatterEffect,thumb,low,src-alias,
+0823E998,Player_UpdateThrowArc,thumb,low,src-alias,
 0823EC58,Player_UpdateTetherThrow,thumb,low,src-alias,
 0823EF58,Player_UpdateTetherRecall,thumb,low,src-alias,
 0823F56C,Player_UpdateTetherChargeB,thumb,low,src-alias,
