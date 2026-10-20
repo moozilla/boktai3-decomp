@@ -1042,3 +1042,48 @@ candidates and reran depin on their unguarded scratch files; it correctly skippe
 nonmatching bases. Final recorded scores above were verified after restoration.
 Each draft has a file-local naming alias and register-concession marker. Draft
 commits queued separately through build/commit.sh. No shared docs regenerated.
+
+## Task 080D0C30 — 2026-10-20
+
+Tags: #matching #mummy #collision #nonmatching
+
+Exact gain: 0.000 percentage points. No new matches or qualifying drafts.
+The assignment overlaps the earlier Task 080D1784; retained sources were not
+recommitted as new progress. No network, full build, or direct git mutation.
+
+- 080D0FE8: inspected largest first with BIG_FUNCTIONS, asmat, relatives and
+  condense. Turns toward route-facing byte 0x3CD, chooses transition animation
+  by current cardinal quadrant and desired octant, adjusts direction by 21 per
+  tick, applies duration scale, and resumes group control kind 27 or saved
+  control kind 2. Six animation-selection copies account for much of the body.
+  Strongest relative covers 35%, mainly small animation/reset runs; no complete
+  reliable candidate recovered. Stopped unmatched.
+- 080D2194: reviewed full assembly and relatives against previous 60.8% attempt.
+  Prior notes remain applicable: ordinary path retains many state-field pointers
+  across terrain and route calls, unlike simple chase helper expansion. No new
+  candidate or qualifying draft; stopped unmatched.
+- 080D1784: re-read entry and prior attempt. Clears group+0x4C timers, selects
+  animation 7, freezes animation mode/frame through tick 59. Prior 61.4% attempt
+  needs reset-pointer lifetimes reconstructed; no improved candidate retained.
+- 080D0C30: new scratch candidate, tentatively Mummy_OnAttackCollision, using
+  Ghoul_OnAttackCollision's unavailable predicate and contact recorder. Context
+  at actor+0x3D0 has flag 0x800 at +0x6F2; contact kinds 1..8 clear that flag,
+  resolve the contacted object and can queue a timed response with cooldown 30.
+  Other kinds only record contact. Initial score 54.1%; explicit boolean helper,
+  volatile contact-halfword reload and r3/r6 bindings reduced realigned
+  differences from 138/61 structural to 127/53 but lowered fuzzy to 35.0%.
+  No production draft: source stays under ignored wip/codex-low. Future work
+  should recover the separate saved-owner and input-context pointer lifetimes,
+  plus original contact record layout, before adding allocation hints.
+- 080D1AFC: existing Mummy_ResumeSavedTarget verified exact over 468 bytes.
+  Scratch file-local alias reconciles promoted source name with cached ELF's
+  original sub_ name; production source unchanged, no new exact credit.
+- 080D1CD0: existing Mummy_UpdateHiddenRecovery draft verified at 94.2%,
+  22 realigned differences / 14 ignoring registers, reviewed extent 464 bytes.
+  Adjacent declaration swaps, narrowing queued to u8 and narrowing mask to u16
+  changed nothing. TakePrepared helper again reduces structural differences to
+  two but regresses total to 54 and fuzzy to 76.9%. Retained existing draft
+  unchanged; same cached-ELF alias workaround used only in scratch.
+
+Validation used only tools/check.py (including variants' per-file checks).
+Combined ROM validation remains for integration. Notes queued with build/commit.sh.
