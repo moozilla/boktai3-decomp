@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Serial_ServiceInterrupt sub_08222D60
 extern s32 gUnk_03005324, gUnk_0300531C;
 extern u32 gUnk_0300172C, gUnk_03001730, gUnk_03001734;
 extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;

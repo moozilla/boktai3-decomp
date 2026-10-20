@@ -152,7 +152,6 @@ static inline void Step(struct Fragment *sprite)
     }
 }
 // confidence=low: circular fragment motion around the saved center, using F422 graphics
-#define FragmentEffect_UpdateOrbit sub_0812C69C
 void FragmentEffect_UpdateOrbit(struct Pool *unused, struct Fragment *p)
 {
     struct ContactPosition *offset;

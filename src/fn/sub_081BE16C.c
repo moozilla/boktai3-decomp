@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Storage_RefreshItemSlots sub_081BE16C
 struct StorageWidget {
     u8 unknown0[8];
     u32 flags;
@@ -18,7 +17,7 @@ struct StorageItems {
     u8 slots[32];
 };
 s32 Inventory_GetItemId(u32);
-u32 sub_0822D604(s32);
+u32 Selection_GetDisplayFrame(s32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_RefreshItemSlots(struct StorageItems *p)
@@ -44,7 +43,7 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
             s32 id = Inventory_GetItemId(p->slots[index]);
             if (id >= 0) {
                 widget->flags &= ~1;
-                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, sub_0822D604(id), 1);
+                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, Selection_GetDisplayFrame(id), 1);
             } else {
                 if ((s8)p->emptyCarried < 0)
                     p->emptyCarried = index;
@@ -74,7 +73,7 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
             s32 id = Inventory_GetItemId(p->slots[index]);
             if (id >= 0) {
                 widget->flags &= ~1;
-                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, sub_0822D604(id), 1);
+                Anim_LoadKeyframe(widget, (u8 *)p + 0x1538, Selection_GetDisplayFrame(id), 1);
             } else {
                 if (p->emptyStored < 0)
                     p->emptyStored = index;

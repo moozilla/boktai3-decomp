@@ -4,7 +4,6 @@
 // confidence=low: inherited route/reaction interpretation from static callers.
 
 // confidence=low: route role inferred from callers and terrain/path tests.
-#define Vorn_SelectRetreatRoute sub_080B2858
 
 #ifdef NONMATCHING
 // fuzzy: 90.7%
@@ -99,8 +98,6 @@ extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
-#define Vorn_SelectReachableEscapeCell sub_080B2580
-#define SceneActor_DispatchContextAction sub_080B3ADC
 u8 Vorn_SelectReachableEscapeCell(void *, u32);
 u32 SceneActor_DispatchContextAction(void *, u32);
 static inline u32 RandomBits(u32 mask)
@@ -208,5 +205,5 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2858);
+INCLUDE_ASM("asm/nonmatching", Vorn_SelectRetreatRoute);
 #endif

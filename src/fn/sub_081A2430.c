@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: dispatches pending scene messages into action and animation state.
-#define Hresvelgr_DispatchSceneMessages sub_081A2430
 
 // confidence=low: dispatches scene messages into action and animation state.
 // MATCHING_CONCESSION: register-pinning
@@ -70,7 +69,6 @@ void Trigger_ConsumePending(void *, s32);
 void Hresvelgr_OnActionTwentyEight(void *);
 void Hresvelgr_BeginRestAnimation(void *);
 void Hresvelgr_UpdateRandomAnimation(void *);
-#define Hresvelgr_UpdateRisingProjectile sub_081A12DC
 void Hresvelgr_UpdateRisingProjectile(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
@@ -153,5 +151,5 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A2430);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
 #endif

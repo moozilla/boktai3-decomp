@@ -129,7 +129,6 @@ static inline void StepSequence(void *obj)
 }
 
 // confidence=low: resets Mimic pursuit state and advances its idle drawable.
-#define Mimic_ResetPursuitDrawable sub_080E7B68
 void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;

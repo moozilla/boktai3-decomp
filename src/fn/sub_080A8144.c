@@ -4,7 +4,7 @@
 // fuzzy: 98.7%
 // foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 void sub_080A62DC(void);
-void sub_080A8904(struct SceneActorRegistryResetView *);
+void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *);
 static inline u8 TakeQueuedFlag(u8 *flag)
 {
     if (*flag) {
@@ -62,7 +62,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetVie
         u32 two;
         u32 zero;
         u8 *field;
-        sub_080A8904(p);
+        TentacleActor_SelectWanderRoute(p);
         two = 2;
         field = &p->state2A8;
         zero = 0;

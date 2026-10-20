@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Ooze_InitializeFromScript sub_08206098
 #include "display_animation.h"
 #include "scene_vec.h"
 
@@ -271,5 +270,5 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08206098);
+INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
 #endif

@@ -47,7 +47,7 @@ struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
 void PursuingActor_InitColliders(struct Slash *, s32, s32, s32, s32, s32, s32, s32);
 void TimedEffect_UpdateVisibility(struct Slash *);
-void sub_0812B424(struct Slash *);
+void TwinSpriteEffect_EmitTrail(struct Slash *);
 void PursuingActor_TurnTowardPlayer(struct Slash *);
 void SlashEffect_UpdateColliders(struct Slash *);
 void SwooshProjectile_RemoveTrailSprites(struct Slash *);
@@ -105,7 +105,6 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
     }
 }
 // confidence=low: contact reaction reverses horizontal velocity, adds upward motion and retires the slash
-#define PursuingActor_UpdateRecoil sub_0812BADC
 void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
 {
     struct ContactPosition *position, *velocity;
@@ -186,5 +185,5 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812BADC);
+INCLUDE_ASM("asm/nonmatching", PursuingActor_UpdateRecoil);
 #endif

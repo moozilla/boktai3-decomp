@@ -2,7 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: action pulses a spiral effect while alternating the folded facing.
-#define Player_UpdateSpiralDisorientation sub_08148B64
 #ifdef NONMATCHING
 // fuzzy: 99.4%
 // Remaining mismatch: duration-field address uses r0 where the ROM uses r3.
@@ -203,5 +202,5 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08148B64);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralDisorientation);
 #endif

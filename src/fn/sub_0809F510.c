@@ -83,7 +83,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 // confidence=low: random horizontal motion and gravity keep the hop inside its home cell.
-#define Crow_HopWithinHomeCell sub_0809F510
 void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
 {
     struct CrowHopState *state = actor->context;
@@ -132,5 +131,5 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809F510);
+INCLUDE_ASM("asm/nonmatching", Crow_HopWithinHomeCell);
 #endif

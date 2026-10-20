@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Sprite_RenderFlipAwareList sub_08214E3C
 #ifdef NONMATCHING
 // fuzzy: 95.3%
 // Remaining differences: projection source register and vertical-bound operand allocation.
@@ -105,5 +104,5 @@ void Sprite_RenderFlipAwareList(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08214E3C);
+INCLUDE_ASM("asm/nonmatching", Sprite_RenderFlipAwareList);
 #endif

@@ -39,7 +39,6 @@ static inline void DisableCollider(struct ContactCollider *collider)
     collider->flags &= mask;
 }
 // confidence=low: flashes at increasing frequency, then resets collision and movement state.
-#define Lun_UpdateTimedRecovery sub_0809C4D8
 void Lun_UpdateTimedRecovery(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;

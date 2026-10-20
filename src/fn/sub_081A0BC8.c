@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: spawns projectiles while traversing the arena boundary.
-#define Hresvelgr_UpdateBoundaryBarrage sub_081A0BC8
 
 #ifdef NONMATCHING
 // fuzzy: 96.1%
@@ -204,5 +203,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A0BC8);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
 #endif

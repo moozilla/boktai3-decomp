@@ -1,6 +1,5 @@
 #include "motion_0818.h"
 // MATCHING_CONCESSION: register-pinning
-#define Armor_InitPartLunge sub_0818D21C
 extern u8 *gUnk_02000710;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];

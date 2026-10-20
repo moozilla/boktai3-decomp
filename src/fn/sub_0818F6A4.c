@@ -177,7 +177,6 @@ static inline u8 *cell(int index)
     return gUnk_030052F4->cells + 12 + index * 4;
 }
 // confidence=low: rising effect retargets the player before descending and emitting an impact.
-#define Nidhoggr_UpdateFallingAttackEffect sub_0818F6A4
 void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
 {
     u8 *age = &p->age;
@@ -279,5 +278,5 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818F6A4);
+INCLUDE_ASM("asm/nonmatching", Nidhoggr_UpdateFallingAttackEffect);
 #endif

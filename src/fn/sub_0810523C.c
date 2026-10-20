@@ -11,7 +11,7 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
-void sub_081050BC(void *);
+void CallbackPool_SpawnHitParticles(void *);
 static inline s32 Scale(s32 x)
 {
     if (x >= 0)
@@ -32,7 +32,6 @@ static inline void Polar(s32 angle, struct Position *v, s32 radius)
     v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 // confidence=low: removal caller emits five directional debris particles.
-#define ActorGroup_EmitRemovalDebris sub_0810523C
 void ActorGroup_EmitRemovalDebris(struct Actor *p)
 {
     struct Position v;
@@ -56,5 +55,5 @@ void ActorGroup_EmitRemovalDebris(struct Actor *p)
     Polar(Rand() & 255, &v, 10);
     v.y = 34;
     sub_08127590(&p->position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 2, 0, 0, 0, 0, 0);
-    sub_081050BC(p);
+    CallbackPool_SpawnHitParticles(p);
 }

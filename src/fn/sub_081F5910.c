@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: selects a reaction animation from the boss reaction mode.
-#define Ratatosk_UpdateReactionAnimation sub_081F5910
 struct Actor {
     u8 pad0[0x51];
     u8 angle;

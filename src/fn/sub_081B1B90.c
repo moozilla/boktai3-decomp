@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
-#define ActorStatus_UpdateFlankingStrike sub_081B1B90
 
 // confidence=low: approaches a side of the player before playing sequence eight
 #ifdef NONMATCHING
@@ -244,5 +243,5 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1B90);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateFlankingStrike);
 #endif

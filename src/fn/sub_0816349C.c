@@ -6,7 +6,6 @@ struct ScriptCallArgs {
     s32 *values;
 };
 void Script_Call(s32, struct ScriptCallArgs *);
-#define TransitionPanel_UpdateCostSelection sub_0816349C
 struct TransitionPanelSprite {
     u32 flags;
     u8 unknown4[0x4C];

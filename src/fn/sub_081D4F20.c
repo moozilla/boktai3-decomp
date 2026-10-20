@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define BestiaryDisplay_GetEntryForActor sub_081D4F20
 s32 BestiaryDisplay_GetEntryForActor(u32 kind, s32 variant)
 {
     s32 result;

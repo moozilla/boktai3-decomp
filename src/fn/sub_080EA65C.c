@@ -162,7 +162,6 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
         *(u8 **)((u8 *)a->drawable + 0x68) = gUnk_030042E4 + bank * 32;
 }
 
-#define Octopus_ReleaseCapturedTarget sub_080EA65C
 void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 *drawable = actor->drawable;
@@ -258,5 +257,5 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EA65C);
+INCLUDE_ASM("asm/nonmatching", Octopus_ReleaseCapturedTarget);
 #endif

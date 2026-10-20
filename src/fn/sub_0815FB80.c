@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 // confidence=low: orbit animation drains current stat A to a target during the player transition.
-#define PlayerOrbitEffect_UpdateStatTransfer sub_0815FB80
 struct PlayerOrbitEffect {
     u8 unknown0[0x18];
     struct Player *owner;
@@ -17,7 +16,7 @@ extern struct SceneVec gUnk_030042A0;
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-void sub_0815F934(void *, void *, s32);
+void PlayerOrbitEffect_SpawnParticle(void *, void *, s32);
 s32 Anim_Step(void *, void *);
 void PlayerTransition_StepReveal(void *);
 void PlayerBurst_SetStateCallback(void *, void (*)(void *));
@@ -41,7 +40,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
         }
         p->position.x = p->owner->position.x - (*frame << 7);
         p->position.z = p->owner->position.z;
-        sub_0815F934(p, &p->position, 0x80);
+        PlayerOrbitEffect_SpawnParticle(p, &p->position, 0x80);
     } else if (*frame <= 23) {
         animation = p->animation;
         data = p->animationData;
@@ -56,7 +55,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             p->position.x = origin->x + offset;
         }
         p->position.z = gUnk_030042A0.z - ((*frame - 16) << 7);
-        sub_0815F934(p, &p->position, 0x48);
+        PlayerOrbitEffect_SpawnParticle(p, &p->position, 0x48);
     } else if (*frame <= 39) {
         animation = p->animation;
         data = p->animationData;
@@ -71,7 +70,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             p->position.x = origin->x - offset;
         }
         p->position.z = gUnk_030042A0.z + ((*frame - 32) << 7);
-        sub_0815F934(p, &p->position, 0xC8);
+        PlayerOrbitEffect_SpawnParticle(p, &p->position, 0xC8);
     } else if (*frame <= 55) {
         animation = p->animation;
         data = p->animationData;
@@ -86,7 +85,7 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             offset -= 1280;
             p->position.z = origin->z + offset;
         }
-        sub_0815F934(p, &p->position, 9);
+        PlayerOrbitEffect_SpawnParticle(p, &p->position, 9);
     } else if (*frame <= 71) {
         animation = p->animation;
         data = p->animationData;
@@ -101,13 +100,13 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             offset -= 2304;
             p->position.z = origin->z + offset;
         }
-        sub_0815F934(p, &p->position, 0x89);
+        PlayerOrbitEffect_SpawnParticle(p, &p->position, 0x89);
     } else {
         struct SceneVec *pos;
         u32 bits = *frame & 3;
         pos = &p->position;
         if (!bits)
-            sub_0815F934(p, &p->position, 0xC0);
+            PlayerOrbitEffect_SpawnParticle(p, &p->position, 0xC0);
         {
             u32 current = *frame;
             animation = p->animation;

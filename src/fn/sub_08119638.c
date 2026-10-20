@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: animation 0x21 completes into Glove_UpdateStaggerRecoil.
-#define Glove_UpdateStaggerReturn sub_08119638
 
 struct Obj {
     u8 pad0[4];
@@ -69,7 +68,7 @@ struct Glove {
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void sub_0811AE9C(struct Obj *);
+void Terrain_ResolveActorMotion(struct Obj *);
 void sub_0811D91C(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
@@ -78,8 +77,8 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
-void sub_0811BD30(struct Obj *, void *);
-void sub_08118E30(void *);
+void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+void Glove_UpdateStaggerRecoil(void *);
 extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
 
@@ -136,7 +135,7 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
         *pprevX = *px;
         *pprevZ = self->z;
-        sub_0811AE9C(self);
+        Terrain_ResolveActorMotion(self);
         a = (u32) ~(self->unk3C >> 12) >> 31;
         b = (u32) ~(self->unk38 >> 12) >> 31;
         if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
@@ -151,7 +150,7 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
         }
         p->height = h;
 
-        sub_0811BD30(self, p->model);
+        Actor_UpdateShadowSpriteParts(self, p->model);
         if (self->flags40 & 4)
             sub_0811BF44(self);
         if (self->flags40 & 2)
@@ -165,7 +164,7 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
     if (complete == 1) {
         Trigger_ConsumePending((u8 *)p + 0x870, 1);
         {
-            void (*callback)(void *) = sub_08118E30;
+            void (*callback)(void *) = Glove_UpdateStaggerRecoil;
             u8 *active = &p->active;
             u32 zero = 0;
             *active = complete;

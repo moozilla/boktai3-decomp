@@ -1,11 +1,10 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 // confidence=low: starts the target-pursuit route and resets pursuit timers and callbacks.
-#define Vorn_BeginPursuitRoute sub_080B23A0
-#define FIELD(p, off, T)       (*(T *)((u8 *)(p) + (off)))
+#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void sub_080B1FA8(void *);
-void sub_080ADCC0(void);
+void Vorn_UpdatePursuitDistance(void);
 #ifdef NONMATCHING
 // fuzzy: 83.4%
 // Flag reloads, route-index addressing, constant lifetimes, and register allocation still differ.
@@ -88,7 +87,7 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
     }
     SetState(actor, 15);
     SetControl(actor, actor->savedTarget, 0);
-    SetMotion(actor, sub_080ADCC0, 37);
+    SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
     {
         u32 bit = 4;
         u16 *field = (void *)((u8 *)actor + 0x414);
@@ -116,5 +115,5 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B23A0);
+INCLUDE_ASM("asm/nonmatching", Vorn_BeginPursuitRoute);
 #endif

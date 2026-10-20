@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
@@ -43,7 +43,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         if (category != 2 && category != 22) {
             register u32 forwarded asm("r3") = category;
-            sub_0807C72C(actor, 0, 1, forwarded);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, forwarded);
         }
         {
             register u32 value asm("r0") = collider->flags;
@@ -114,9 +114,9 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
                 u32 *flags = &actor->flags2CC;
                 *flags |= mask;
             }
-            sub_0807C72C(actor, 0, 127, 0);
-            sub_0807C72C(actor, 1, 127, 0);
-            sub_0807C72C(actor, 3, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
             SceneActorEffects_AdvanceSteps(actor, 4);
             {
                 void *control = SceneActorReaction_BeginHiddenDefeat;

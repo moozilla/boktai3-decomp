@@ -57,7 +57,6 @@ static inline u16 PackKeys(u32 value, u32 mode)
     value &= 0x3fff;
     return value;
 }
-#define LinkSelection_WaitForInputCompletion sub_0810AFB0
 s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
 {
     struct ExchangeCounters *c = (void *)p->sessionData;

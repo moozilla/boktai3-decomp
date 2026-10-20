@@ -19,7 +19,6 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 // confidence=low: creates a charged burst ahead of the player using the shared resource level.
-#define Player_UpdateChargedBurst sub_08144408
 void Player_UpdateChargedBurst(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {

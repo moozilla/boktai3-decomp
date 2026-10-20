@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 // Updates a dropped sprite only when its manager requests an animation tick.
-#define SpriteDrop_UpdateEntry sub_08115E00
 struct Render {
     u32 flags;
     u8 pad4[12];

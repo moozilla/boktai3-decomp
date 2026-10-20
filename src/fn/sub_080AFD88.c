@@ -1,7 +1,6 @@
 #include "scene_actor_chase.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: follows a navigation descriptor, switching between acceleration and turning.
-#define Vorn_UpdateDescriptorPursuit sub_080AFD88
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);

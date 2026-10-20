@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
-#define ActorStatus_UpdateGuardedApproach sub_081B1334
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
 #ifdef NONMATCHING
@@ -345,5 +344,5 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1334);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
 #endif

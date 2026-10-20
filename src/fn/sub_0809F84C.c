@@ -81,7 +81,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->word104 = 0;
 }
 // confidence=low: distance and angle gates suggest approach and orbit flight steering.
-#define Crow_SteerAroundPlayer sub_0809F84C
 void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct CrowSteeringState *state = actor->context;
@@ -168,5 +167,5 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809F84C);
+INCLUDE_ASM("asm/nonmatching", Crow_SteerAroundPlayer);
 #endif

@@ -1,5 +1,4 @@
 // confidence=low: inferred from player cue phases and animation consumers.
-#define Player_UpdateTimedChargeAction sub_081559A4
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -160,5 +159,5 @@ end:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081559A4);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTimedChargeAction);
 #endif

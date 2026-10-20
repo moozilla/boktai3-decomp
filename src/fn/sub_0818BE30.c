@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Armor_InitCombatColliders sub_0818BE30
 struct ArmorCollider {
     u8 pad0[6];
     u16 flags;
@@ -23,7 +22,7 @@ void Armor_InitCollider(void *, u32, void *, const void *, const void *, void *,
 void Armor_InitExtendedCollider(void *, u32, s32, void *, const void *, const void *, void *,
                                 void *);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
-void sub_0818B7AC(void);
+void Armor_ReceiveColliderContact(void);
 void Armor_TriggerBehavior35(void);
 static inline void addFlags(struct ArmorCollider *p, u32 mask)
 {
@@ -58,8 +57,8 @@ void Armor_InitCombatColliders(struct ArmorColliderOwner *input, u32 inputId)
     c = &p->contact;
     defense = p->defensePower;
     position = p->position;
-    Armor_InitExtendedCollider(c, id, defense, position, gUnk_0824F10C, gUnk_0824F114, sub_0818B7AC,
-                               p);
+    Armor_InitExtendedCollider(c, id, defense, position, gUnk_0824F10C, gUnk_0824F114,
+                               Armor_ReceiveColliderContact, p);
     addFlags(c, 0x100C);
     c = &p->trigger;
     Armor_InitExtendedCollider(c, id, 0, position, gUnk_0824F10C, gUnk_0824F11C,

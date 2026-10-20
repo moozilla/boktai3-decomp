@@ -45,7 +45,6 @@ static inline s32 WrapAngle(s32 x)
     return x;
 }
 // confidence=low: rotates the member's offset about its origin and damps its turn step.
-#define ActorGroup_UpdateMemberSway sub_081049F0
 void ActorGroup_UpdateMemberSway(struct ActorGroupMember *p)
 {
     s32 angle = WrapAngle(p->angle);
@@ -83,5 +82,5 @@ void ActorGroup_UpdateMemberSway(struct ActorGroupMember *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081049F0);
+INCLUDE_ASM("asm/nonmatching", ActorGroup_UpdateMemberSway);
 #endif

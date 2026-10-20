@@ -76,7 +76,6 @@ static inline u8 Slow(void)
     return 0;
 }
 // confidence=low: global flag applies a temporary movement slowdown
-#define SceneActorPlacement_UpdateMovementSlowdown sub_080A3EBC
 void SceneActorPlacement_UpdateMovementSlowdown(struct SceneActorRegistryResetView *a)
 {
     register u8 *c asm("r3") = (void *)SceneActorControl_GetState(a);

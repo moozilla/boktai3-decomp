@@ -21,7 +21,7 @@ struct ActorTrail {
 };
 void TentacleActor_ResetRouteHistory(void *);
 void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
 {
     struct ActorTrail *trail = actor->context;
@@ -48,7 +48,7 @@ void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
     actor->position = trail->savedPosition;
     TentacleActor_ResetRouteHistory(actor);
     TentacleActor_ResetSegmentPositions(trail, &actor->position);
-    sub_080A8904(actor);
+    TentacleActor_SelectWanderRoute(actor);
     {
         u32 state = 2;
         actor->state2A8 = 0;

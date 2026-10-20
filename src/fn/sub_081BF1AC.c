@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_input_navigation.h"
-#define SceneInventory_UpdateCategoryBrowse sub_081BF1AC
 struct StorageBrowse {
     u8 unknown0[0x258];
     struct SceneInputWidget prompt;
@@ -27,8 +26,8 @@ void Sound_PlaySong(u32);
 void Storage_SetGridFlags(void *, u32);
 void SceneInventory_SetState(void *, void (*)(void *), u32);
 void Storage_UpdateSwapSelection(void *);
-void sub_081BFAE0(void *);
-void sub_081BFC14(void *, u32);
+void Storage_RefreshCategoryWidgets(void *);
+void Storage_BeginModeSelection(void *, u32);
 s32 Inventory_GetItemId(u32);
 s32 Inventory_GetEquipmentId(u32);
 s32 Inventory_CanAssignEquipment(u32);
@@ -57,7 +56,7 @@ void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
             Storage_SetGridFlags(&p->grid, 0x10);
             Sound_PlaySong(0xDD);
             SceneInventory_SetState(p, Storage_UpdateSwapSelection, 0);
-            sub_081BFAE0(p);
+            Storage_RefreshCategoryWidgets(p);
         } else if (p->mode == 2) {
             s32 slot = p->slots[p->grid.savedSelection];
             u32 allowed;
@@ -99,7 +98,7 @@ void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
         }
     } else if (gUnk_03005260[1] & 2) {
         Sound_PlaySong(0xDE);
-        sub_081BFC14(p, p->mode);
+        Storage_BeginModeSelection(p, p->mode);
     } else if (SceneInput_NavigateGrid(&p->grid)) {
         Storage_UpdateCursorPosition(&p->grid, &p->cursor);
         Storage_RefreshSelectedItemDetails(p);

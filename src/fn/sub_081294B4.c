@@ -174,7 +174,6 @@ extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 struct FeatherPool *FeatherEffectPool_GetOrCreate(void);
 struct Feather *FeatherEffectPool_AllocEntry(struct FeatherPool *);
 // confidence=low: creates a directional feather effect with palette and scatter variants.
-#define FeatherEffectPool_CreateDirectional sub_081294B4
 struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 angle, u32 flags,
                                                     u32 variant)
 {
@@ -226,5 +225,5 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081294B4);
+INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_CreateDirectional);
 #endif

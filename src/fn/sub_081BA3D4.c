@@ -13,7 +13,7 @@ struct Registry2388 {
 };
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void SpriteOam_QueueProjectedSprites(void);
-void sub_08214B44(void);
+void Sprite_RenderScaledList(void);
 void sub_08219624(void);
 void Registry2388_InitializeBackground(struct Registry2388 *);
 void Registry2388_InitializeAnimations(struct Registry2388 *);
@@ -29,7 +29,8 @@ s32 Registry2388_InitializeFromScript(struct Registry2388 *object, void *arg)
 {
     s32 i;
     s32 *value;
-    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
+    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
+                             sub_08219624);
     Registry2388_InitializeBackground(object);
     Registry2388_InitializeAnimations(object);
     if (Script_SeekToKeyword(0x70)) {

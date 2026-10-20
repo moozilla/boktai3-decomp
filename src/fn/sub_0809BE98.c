@@ -94,7 +94,7 @@ void TentacleActor_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -136,60 +136,72 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
 }
 
-#define Lun_UpdateSway sub_0809CAF8
-#define Lun_SelectRandomRouteEntry sub_0809CB58
-#define Lun_BeginMoveToPosition sub_0809D0C8
 void Lun_UpdateSway(void *);
 void Lun_SelectRandomRouteEntry(struct SceneActorRouteCursor *);
-void Lun_BeginMoveToPosition(void *,void *);
+void Lun_BeginMoveToPosition(void *, void *);
 u8 sub_0809CCF4(void *);
-static inline void Fill(void *dst,u32 *tmp,u32 value)
-{*tmp=value;CpuSet(tmp,dst,0x05000002);}
+static inline void Fill(void *dst, u32 *tmp, u32 value)
+{
+    *tmp = value;
+    CpuSet(tmp, dst, 0x05000002);
+}
 static inline s32 CellIndex(const struct ContactPosition *position, struct ContactPosition **saved)
 {
- s32 x=position->x>>8;
- s32 z=position->z>>8;
- *saved=(void *)position;
- if(x<0||z<0||(u32)x>=gUnk_030052F8||(u32)z>=gUnk_030052FC)return 0;
- return gUnk_030052F4->rows[z]+x;
+    s32 x = position->x >> 8;
+    s32 z = position->z >> 8;
+    *saved = (void *)position;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
 }
 // confidence=low: follows saved route points and renews a destination after arrival.
-#define Lun_FollowRoute sub_0809BE98
 void Lun_FollowRoute(struct SceneActorRegistryResetView *actor)
 {
- u8 *body=actor->context;
- s32 speed;
- u32 zero[1];
- struct ContactPosition target;
- if(Take(&actor->field2B1)){
-  Control(actor,actor->entryTarget228,1);
-  Fill(body+0x424,zero,0);
-  body[0x3E3]=1;
- }
- if((u8)Callback_InvokeActor(actor,*(void **)((u8 *)actor+0x270)))return;
- speed=Callback_InvokeActor(actor,*(void **)((u8 *)actor+0x260));
- Scale(actor);
- Lun_UpdateSway(actor);
- if(Approach(actor,(void *)(body+0x3E8),speed) && sub_0809CCF4(actor)){
-  struct SceneActorRouteCursor *route;
-  struct ContactPosition *p;
-  struct ContactPosition *saved;
-  s32 cell,height;
-  u32 kind;
-  u16 attr;
-  Polar((void *)(body+0x424),actor->direction,speed);
-  route=(void *)(body+0x42C);
-  Lun_SelectRandomRouteEntry(route);
-  p=&target;
-  p->x=route->point->x;
-  p->z=route->point->z;
-  cell=CellIndex(p,&saved);
-  attr=*SceneActorTerrain_GetCell(cell);
-  kind=attr>>4;
-  {u32 mask=15;mask &=attr;height=mask<<8;}
-  switch(kind){case 1:height-=((u8 *)p)[4];break;case 2:height-=((u8 *)p)[0];break;}
-  p->y=height;
-  Lun_BeginMoveToPosition(actor,saved);
- }
- actor->counter2AC++;
+    u8 *body = actor->context;
+    s32 speed;
+    u32 zero[1];
+    struct ContactPosition target;
+    if (Take(&actor->field2B1)) {
+        Control(actor, actor->entryTarget228, 1);
+        Fill(body + 0x424, zero, 0);
+        body[0x3E3] = 1;
+    }
+    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)))
+        return;
+    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    Scale(actor);
+    Lun_UpdateSway(actor);
+    if (Approach(actor, (void *)(body + 0x3E8), speed) && sub_0809CCF4(actor)) {
+        struct SceneActorRouteCursor *route;
+        struct ContactPosition *p;
+        struct ContactPosition *saved;
+        s32 cell, height;
+        u32 kind;
+        u16 attr;
+        Polar((void *)(body + 0x424), actor->direction, speed);
+        route = (void *)(body + 0x42C);
+        Lun_SelectRandomRouteEntry(route);
+        p = &target;
+        p->x = route->point->x;
+        p->z = route->point->z;
+        cell = CellIndex(p, &saved);
+        attr = *SceneActorTerrain_GetCell(cell);
+        kind = attr >> 4;
+        {
+            u32 mask = 15;
+            mask &= attr;
+            height = mask << 8;
+        }
+        switch (kind) {
+            case 1:
+                height -= ((u8 *)p)[4];
+                break;
+            case 2:
+                height -= ((u8 *)p)[0];
+                break;
+        }
+        p->y = height;
+        Lun_BeginMoveToPosition(actor, saved);
+    }
+    actor->counter2AC++;
 }

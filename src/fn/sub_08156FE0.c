@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_SelectActionSequence sub_08156FE0
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 98.0%

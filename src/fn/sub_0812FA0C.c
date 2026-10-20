@@ -5,7 +5,6 @@
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
 // MATCHING_CONCESSION: register-pinning
-#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 
 #ifdef NONMATCHING
 // fuzzy: 84.8%

@@ -2,8 +2,7 @@
 #define gRfuSlotStatusNI gUnk_03006A70
 #define gRfuLinkStatus   gUnk_03006A80
 #include "rfu_compat.h"
-#define RfuManager_UpdateChildAdmissions sub_082245A8
-#define G                                ((struct Manager *)0x03005390)
+#define G ((struct Manager *)0x03005390)
 struct Manager {
     u8 f0, f1;
     volatile u8 f2;
@@ -23,7 +22,7 @@ void RfuManager_ClearState(void);
 void RfuManager_FinishSlotReception(void);
 u8 sub_08224908(void);
 void sub_082249CC(void);
-void sub_082239E0(u16);
+void RfuManager_UpdateLinkRecovery(u16);
 #ifdef NONMATCHING
 // fuzzy: 82.1%
 void RfuManager_UpdateChildAdmissions(void)
@@ -123,5 +122,5 @@ void RfuManager_UpdateChildAdmissions(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082245A8);
+INCLUDE_ASM("asm/nonmatching", RfuManager_UpdateChildAdmissions);
 #endif

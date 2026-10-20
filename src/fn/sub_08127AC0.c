@@ -179,7 +179,6 @@ static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
     }
 }
 // confidence=low: initializes direction-dependent playback before the blinking removal state.
-#define TimedSprite_UpdateBlinkAnimation sub_08127AC0
 void TimedSprite_UpdateBlinkAnimation(struct TimedSpritePool *pool, struct Projectile *input)
 {
     register struct Projectile *p asm("r5") = input;
@@ -202,5 +201,5 @@ void TimedSprite_UpdateBlinkAnimation(struct TimedSpritePool *pool, struct Proje
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08127AC0);
+INCLUDE_ASM("asm/nonmatching", TimedSprite_UpdateBlinkAnimation);
 #endif

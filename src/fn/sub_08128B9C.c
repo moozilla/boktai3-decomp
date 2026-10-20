@@ -171,7 +171,6 @@ static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, str
 }
 
 // confidence=low: completes the initial directional sequence before the scatter state.
-#define FeatherEffectPool_UpdateOpeningAnimation sub_08128B9C
 void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct Feather *p)
 {
     struct Feather *sprite = p;
@@ -189,5 +188,5 @@ void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct F
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08128B9C);
+INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_UpdateOpeningAnimation);
 #endif

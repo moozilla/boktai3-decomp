@@ -36,7 +36,6 @@ static inline s32 Height(struct Position *p)
     return h;
 }
 // confidence=low: selects the nearest path point outside the minimum squared distance.
-#define Path_FindNearestDistantPoint sub_0821EC84
 s32 Path_FindNearestDistantPoint(struct Position *out, struct Position *from, u32 id, u32 minArg)
 {
     u32 minimum = minArg;

@@ -195,7 +195,6 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
     }
 }
 
-#define Octopus_UpdateHold sub_080EA064
 void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct OctopusContext *context = actor->context;

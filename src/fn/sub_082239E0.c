@@ -2,8 +2,7 @@
 #define gRfuSlotStatusNI gUnk_03006A70
 #define gRfuLinkStatus   gUnk_03006A80
 #include "rfu_compat.h"
-#define RfuManager_UpdateLinkRecovery sub_082239E0
-#define G                             ((struct Manager *)0x03005390)
+#define G ((struct Manager *)0x03005390)
 struct Manager {
     u8 f0, f1;
     volatile u8 f2;
@@ -98,5 +97,5 @@ u32 RfuManager_UpdateLinkRecovery(u16 command)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082239E0);
+INCLUDE_ASM("asm/nonmatching", RfuManager_UpdateLinkRecovery);
 #endif

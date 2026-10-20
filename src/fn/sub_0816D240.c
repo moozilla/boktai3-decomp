@@ -9,7 +9,7 @@ s32 SceneHud_SelectUpgradeableStat(s32);
 void Player_RefreshStatsAndVitals(struct Player *);
 void Hud_DrawStatusMetersAndCounts(struct SceneHudState *, s32, s32);
 void sub_08166534(void *, s32, s32);
-void sub_0816701C(void *, s32, s32, s32, s32, s32);
+void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 static inline s32 ClampIncrease(s32 index, s32 amount)
 {
     struct GameState *state = gUnk_02000710;
@@ -42,6 +42,6 @@ void SceneHud_IncreaseStatBonus(struct SceneHudState *s, s32 index, s32 amount)
         Player_RefreshStatsAndVitals(p);
         Hud_DrawStatusMetersAndCounts(s, 2, 12);
         sub_08166534(s, 10, 6);
-        sub_0816701C(s, 0, 0, 0, 1, 0);
+        InventoryPanel_DrawStatComparison(s, 0, 0, 0, 1, 0);
     }
 }

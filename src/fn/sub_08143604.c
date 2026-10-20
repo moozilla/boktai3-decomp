@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: energy-gated burst sequence with a held middle animation.
-#define Player_UpdateHeldEnergyBurst sub_08143604
 #ifdef NONMATCHING
 // fuzzy: 92.1%
 #define B(n) (*(u8 *)(p + (n)))
@@ -98,5 +97,5 @@ void Player_UpdateHeldEnergyBurst(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08143604);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateHeldEnergyBurst);
 #endif

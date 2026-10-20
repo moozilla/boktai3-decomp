@@ -65,7 +65,6 @@ static inline void Clear(void *dest, u32 *zero)
     CpuSet(zero, dest, 0x05000002);
 }
 // confidence=low: starts a random recoil then returns to the stored terrain endpoint.
-#define Ghost_RecoilTowardEndpoint sub_08096AC8
 void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -98,5 +97,5 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08096AC8);
+INCLUDE_ASM("asm/nonmatching", Ghost_RecoilTowardEndpoint);
 #endif

@@ -1,7 +1,5 @@
-#define Vorn_UpdatePursuitDistance sub_080ADCC0
 #include "scene_actor_chase.h"
 // confidence=low: completed action chooses a pursuit callback from context flag one.
-#define Vorn_SelectPursuitAfterAction sub_080AFEF0
 void sub_080ADB90(void);
 void Vorn_UpdatePursuitDistance(void);
 static inline void SelectPursuit(struct SceneActorRegistryResetView *a, void *cb, u32 mode)

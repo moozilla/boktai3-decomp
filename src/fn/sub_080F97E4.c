@@ -1,6 +1,5 @@
 #include "scene_actor_control_phase.h"
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
-#define Axe_ConvergeRecoveryMotion sub_080F97E4
 
 #ifdef NONMATCHING
 // fuzzy: 81.0%
@@ -74,5 +73,5 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F97E4);
+INCLUDE_ASM("asm/nonmatching", Axe_ConvergeRecoveryMotion);
 #endif

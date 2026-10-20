@@ -27,12 +27,12 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
     struct ContactPosition *target;
     s32 result;
     target = *(struct ContactPosition **)(group + mask);
-    result = sub_0821F204(route, position, target);
+    result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         ClearFlags(&actor->flags2D4, mask);
         return 0;
     }
-    result = sub_0821F7A8(route, position, target);
+    result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
@@ -46,7 +46,6 @@ struct RecoveryCounter {
 };
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 // confidence=low: restarts the saved route after a timed animation and waits before restoring control.
-#define Mummy_ResumeSavedRouteAfterAnimation sub_080D1784
 void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     void *body;

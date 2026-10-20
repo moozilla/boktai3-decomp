@@ -11,7 +11,7 @@ void ScriptPanel_OpenTextWindow(void);
 void LinkSelection_RecordSlotState(void *, u32, s32, u32 *, s32);
 void LinkSelection_AdvanceBitExchange(void *, u32, u16 *);
 void Registry1745_SetState(void *, u32, void *);
-void sub_0810AFB0(void);
+void LinkSelection_WaitForInputCompletion(void);
 struct ExchangeCounters {
     u8 pad0[0x180];
     u32 elapsed;
@@ -60,7 +60,6 @@ static inline s32 SessionState(void)
         return -1;
     return gUnk_020004B4->unknown1C;
 }
-#define LinkSelection_ExchangeParticipantInput sub_0810AD50
 s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
 {
     struct ExchangeCounters *c = (void *)p->sessionData;
@@ -119,7 +118,7 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
             } else {
                 LinkSelection_RecordSlotState(p, value, i, &flags, 0);
                 if (i == p->localPlayer)
-                    Registry1745_SetState(p, 18, sub_0810AFB0);
+                    Registry1745_SetState(p, 18, LinkSelection_WaitForInputCompletion);
             }
         } while (++i < p->participantCount);
     }

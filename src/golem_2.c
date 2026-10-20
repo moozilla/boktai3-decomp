@@ -5,7 +5,7 @@
 extern const u8 gUnk_08606134[];
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
-void sub_0807C72C(u8 *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
 void sub_080C4EF0(u8 *);
 void Camera_RequestShake(u32);
@@ -43,16 +43,15 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
     return 0;
 }
 
-
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorTerrain_ClearCollisionTimers(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 void ActorShadow_Disable(void *);
-void sub_0812E714(void *);
+void ActorParticles_SpawnWideBurst(void *);
 void SceneActorControl_OnIdle(void);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -76,7 +75,6 @@ static inline u32 RandomFrom(const u16 *table)
 }
 
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
-#define Golem_UpdateDefeat sub_080C9848
 void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     s32 values[8];
@@ -87,9 +85,9 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     if (TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
@@ -129,7 +127,8 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Script_Call(script, &arguments);
     }
     if (!Flags16(actor, 0x4000) && (u32)(actor->category - 11) > 2)
-        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+        GameState_SetEventFlag(
+            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     if (!Flags32At(actor, 0x400)) {
         u8 category;
         rangeB.x = 80;
@@ -189,16 +188,21 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     if (!*((u8 *)actor + 8))
         **(u32 **)((u8 *)actor + 4) |= 1;
     else {
-        struct DefeatOwnerGroup { u32 unknown[2]; u32 flags; };
-        struct DefeatOwner { u8 unknown[0x20]; struct DefeatOwnerGroup group; };
+        struct DefeatOwnerGroup {
+            u32 unknown[2];
+            u32 flags;
+        };
+        struct DefeatOwner {
+            u8 unknown[0x20];
+            struct DefeatOwnerGroup group;
+        };
         struct DefeatOwner *owner = *(void **)((u8 *)actor + 4);
         struct DefeatOwnerGroup *ownerGroup = &owner->group;
         ownerGroup->flags |= 1;
     }
-    sub_0812E714(actor);
+    ActorParticles_SpawnWideBurst(actor);
     SceneActorPlacement_PlayCategoryEventSound(actor);
 }
-
 
 INCLUDE_ASM("asm/nonmatching", sub_080C9C04);
 
@@ -237,7 +241,7 @@ void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
             u32 byte = obj->fieldE9;
             obj->direction = byte;
         }
-        sub_0807C72C((u8 *)obj, 0, 0, obj->category);
+        SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->category);
         SceneActorBehavior_CallActionScript((u8 *)obj);
         h = (u16 *)(((u8 *)obj) + 0x414);
         {

@@ -41,7 +41,6 @@ static inline s32 half(s32 value)
 #ifdef NONMATCHING
 // fuzzy: 97.0%
 // Remaining difference: entry-flag pointer lifetime in the airborne phase.
-#define TaggedSceneNpc_UpdateJumpToTarget sub_081D1E78
 void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
 {
     struct Tagged *t = &p->tagged;
@@ -112,5 +111,5 @@ void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D1E78);
+INCLUDE_ASM("asm/nonmatching", TaggedSceneNpc_UpdateJumpToTarget);
 #endif

@@ -18,7 +18,6 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 // confidence=low: creates a spiral burst ahead of the player when two shared resource units are available.
-#define Player_UpdateSpiralBurst sub_08144624
 void Player_UpdateSpiralBurst(struct Player *p)
 {
     if (p->tetherMode != 0x11) {

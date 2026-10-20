@@ -56,7 +56,6 @@ static inline u16 Negative(struct LinkResults *p, s32 i)
     return p->negative[i];
 }
 // confidence=low: the formula combines two result counters and relative elapsed time into bounded points.
-#define LinkSelection_UpdateParticipantScores sub_0810BBD4
 void LinkSelection_UpdateParticipantScores(struct LinkScores *p)
 {
     struct LinkResults *results = (void *)((u8 *)p + 0xe0);

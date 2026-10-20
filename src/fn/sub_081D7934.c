@@ -259,8 +259,8 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 u32 sub_08249498(u32, u32);
-void sub_081D9904(void *);
-void sub_081D95F0(void *);
+void Task4E01_SpawnImpactChildren(void *);
+void Task4E01_UpdateExpandingImpact(void *);
 void Task4E01_OnDefaultDirectionalAnimation(void *);
 void Task4E01_OnType7DirectionalAnimation(void *);
 void Task4E01_OnType8DirectionalAnimation(void *);
@@ -268,7 +268,6 @@ void Task4E01_OnType4Animation(void *);
 void sub_081D9B6C(void *);
 void sub_081D9D3C(void *);
 // confidence=low: resets projectile time, chooses impact animation, and sets the impact flag.
-#define Task4E01_BeginImpactAnimation sub_081D7934
 struct ImpactConfig {
     u16 flags;
     u8 pad[6];
@@ -336,5 +335,5 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D7934);
+INCLUDE_ASM("asm/nonmatching", Task4E01_BeginImpactAnimation);
 #endif

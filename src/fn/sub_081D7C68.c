@@ -64,7 +64,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
-        
+
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -183,7 +183,7 @@ static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
-        
+
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -256,16 +256,15 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 u32 sub_08249498(u32, u32);
-void sub_081D7934(void *);
-void sub_081D9904(void *);
-void sub_081D95F0(void *);
+void Task4E01_BeginImpactAnimation(void *);
+void Task4E01_SpawnImpactChildren(void *);
+void Task4E01_UpdateExpandingImpact(void *);
 void Task4E01_OnDefaultDirectionalAnimation(void *);
 void Task4E01_OnType7DirectionalAnimation(void *);
 void Task4E01_OnType4Animation(void *);
 void sub_081D9B6C(void *);
 void sub_081D9D3C(void *);
 // confidence=low: resets projectile time and chooses the terminal animation by projectile kind.
-#define Task4E01_StartTerminalAnimation sub_081D7C68
 s32 Task4E01_StartTerminalAnimation(u8 *input)
 {
     register u8 *p asm("r8") = input;
@@ -274,39 +273,48 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
     *(u32 *)p = 0;
     *(u32 *)(config + 8) = 0;
     switch (*(u32 *)(config + 0x48)) {
-    case 0: case 1: case 2: case 5: case 6: case 10:
-        ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
-        Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
-        *(u32 *)p = 0;
-        break;
-    case 7:
-        ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
-        Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
-        break;
-    case 4:
-        Projectile_SetUpdateCallback(config, Task4E01_OnType4Animation);
-        break;
-    case 3:
-        if (*(u16 *)config & 0x10) {
-            *(u32 *)(p + 0x194) = 1;
-            Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 1, 0, 0);
-            StepFirst((void *)(p + 0x8c), (void *)(p + 0x180));
-        } else {
-            *(u32 *)(p + 0x194) = 6;
-            Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 6, 0, 0);
-            StepSecond((void *)(p + 0x8c), (void *)(p + 0x180));
-        }
-        Projectile_SetUpdateCallback(config, sub_081D9B6C);
-        break;
-    case 11:
-        if (!(*(u16 *)config & 0x2000)) ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
-        Projectile_SetUpdateCallback(config, sub_081D9D3C);
-        break;
-    case 8: case 9: default: break;
+        case 0:
+        case 1:
+        case 2:
+        case 5:
+        case 6:
+        case 10:
+            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
+            *(u32 *)p = 0;
+            break;
+        case 7:
+            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
+            break;
+        case 4:
+            Projectile_SetUpdateCallback(config, Task4E01_OnType4Animation);
+            break;
+        case 3:
+            if (*(u16 *)config & 0x10) {
+                *(u32 *)(p + 0x194) = 1;
+                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 1, 0, 0);
+                StepFirst((void *)(p + 0x8c), (void *)(p + 0x180));
+            } else {
+                *(u32 *)(p + 0x194) = 6;
+                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 6, 0, 0);
+                StepSecond((void *)(p + 0x8c), (void *)(p + 0x180));
+            }
+            Projectile_SetUpdateCallback(config, sub_081D9B6C);
+            break;
+        case 11:
+            if (!(*(u16 *)config & 0x2000))
+                ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            Projectile_SetUpdateCallback(config, sub_081D9D3C);
+            break;
+        case 8:
+        case 9:
+        default:
+            break;
     }
     return 0;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D7C68);
+INCLUDE_ASM("asm/nonmatching", Task4E01_StartTerminalAnimation);
 #endif

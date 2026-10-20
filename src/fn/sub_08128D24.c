@@ -62,7 +62,6 @@ void SpriteEffectController_Create(struct Vec *, struct Vec *, s32, u32, u32, u3
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 // confidence=low: scans intervening cells and clips the scatter position at rising terrain.
-#define FeatherEffectPool_ClipScatterPath sub_08128D24
 u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 current, s32 target,
                                      s32 inputDirection)
 {
@@ -154,5 +153,5 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08128D24);
+INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_ClipScatterPath);
 #endif

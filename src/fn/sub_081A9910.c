@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: paired commands 3/4/5 repeat a synchronized attack before selected halves recover.
-#define Vanargand_UpdateSynchronizedPairAttack sub_081A9910
 struct Pair {
     u8 pad0[0x205];
     u8 first;

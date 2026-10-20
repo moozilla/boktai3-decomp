@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: planar debris lifetime follows completion of its visual animation.
-#define SceneDebris_UpdateAnimatedMotion sub_08113104
 #ifdef NONMATCHING
 // fuzzy: 96.2%
 /* ROM has an uninitialized projected depth; this draft explicitly uses zero. */
@@ -222,5 +221,5 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08113104);
+INCLUDE_ASM("asm/nonmatching", SceneDebris_UpdateAnimatedMotion);
 #endif

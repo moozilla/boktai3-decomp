@@ -25,7 +25,7 @@ int Wireless_GetPeerHandshakeData(void);
 void TextWindow_Refresh(int, int);
 void Memory_Clear(void *, int);
 void WirelessText_DecodeString(const void *, void *, int);
-void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
+void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 void TextWindow_SetString(int, int, void *);
 void Sound_PlaySong(int);
 void Wireless_RequestAdvanceConnection(void);
@@ -73,7 +73,7 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                 {
                     u8 *packet = gUnk_03006A80->partner[i].gname;
                     int value = packet[11] | (packet[12] << 8);
-                    sub_082213B8(draw, p->draw, value, 5, 0, 136, 70, 8, 0);
+                    Anim_DrawDecimalDigits(draw, p->draw, value, 5, 0, 136, 70, 8, 0);
                 }
                 {
                     u32 mask = ~1;

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
-#define EffectPool_UpdateEntry sub_081A39E0
 
 // MATCHING_CONCESSION: register-pinning
 

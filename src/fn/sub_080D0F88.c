@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 u32 SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 
 static inline u8 TakeFlag(u8 *flag)
@@ -15,6 +15,6 @@ static inline u8 TakeFlag(u8 *flag)
 void Mummy_UpdateWalking(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
-        sub_0807C72C(p, 0, 0x7F, 0);
+        SceneActorAttachment_ReplaceResponseSlot(p, 0, 0x7F, 0);
     SceneActorAnimation_SelectDirectionalEntry(p, 1);
 }

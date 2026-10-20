@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: requests movement around adjacent terrain overrides.
-#define Hresvelgr_UpdateTerrainManeuver sub_0819D4D8
 
 struct Action {
     u8 state, pad[3];

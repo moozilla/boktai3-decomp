@@ -138,7 +138,6 @@ static inline void Step(struct Render *owner, struct Frames *state)
     }
 }
 // confidence=low: health-derived animation and recovery; actor identity remains tentative.
-#define ProximityActor_UpdateDamageAnimation sub_08105AB4
 void ProximityActor_UpdateDamageAnimation(u8 *input)
 {
     register u8 *p asm("r5") = input;
@@ -208,5 +207,5 @@ void ProximityActor_UpdateDamageAnimation(u8 *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08105AB4);
+INCLUDE_ASM("asm/nonmatching", ProximityActor_UpdateDamageAnimation);
 #endif

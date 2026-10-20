@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
-#define ActorStatus_UpdatePlayerApproach sub_081B08B8
 #ifdef NONMATCHING
 // fuzzy: 99.8%
 // Remaining differences: Only the zero-offset scratch register in the player X-distance load differs (two bytes).
@@ -354,5 +353,5 @@ void ActorStatus_UpdatePlayerApproach(u8 *boss, struct ActorStatusPart *part)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B08B8);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerApproach);
 #endif

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
-#define Player_UpdateTetherMovement sub_08143ED0
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 #define B(n) (*(u8 *)(p + (n)))
@@ -21,7 +20,7 @@ u32 Player_IsNormalActionAllowed(u32);
 void Player_PlayPositionEffect(void *, void *, s32, u32, void *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
-void sub_08143B54(void *, s32, s32, s32);
+void Player_ConstrainTetherTarget(void *, s32, s32, s32);
 static inline s32 scale12(s32 v)
 {
     if (v >= 0)
@@ -138,9 +137,9 @@ void Player_UpdateTetherMovement(u8 *p)
 animate:
     Player_SetAnimation(p, animation, rate, 1);
     if (moving || B(0x48C))
-        sub_08143B54(p, cosine, sine, 150);
+        Player_ConstrainTetherTarget(p, cosine, sine, 150);
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08143ED0);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherMovement);
 #endif

@@ -27,7 +27,6 @@ static inline s32 scaled(s32 x)
 }
 
 // confidence=low: updates Skeleton body and facing attack bounds while its control is active
-#define Skeleton_UpdateFacingColliders sub_080B6210
 struct SkeletonColliderContext {
     u8 unknown0[0x624];
     struct ContactCollider body;

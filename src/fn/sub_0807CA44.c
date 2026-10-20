@@ -8,7 +8,7 @@
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 static inline u32 CellAt(struct ContactPosition *position)
 {
     s32 x = position->x >> 8;
@@ -30,8 +30,12 @@ static inline s32 HeightAt(struct ContactPosition *position)
     s32 shape = *data >> 4;
     s32 height = (*data & 15) << 8;
     switch (shape) {
-    case 1: height -= (u8)position->z; break;
-    case 2: height -= (u8)position->x; break;
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
     }
     return height;
 }
@@ -42,10 +46,15 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->field2B5 = kind;
     actor->target = callback;
     actor->field2C8 = 0;
-    { u32 *field = &actor->flags114; u32 mask = ~1; *field &= mask; }
+    {
+        u32 *field = &actor->flags114;
+        u32 mask = ~1;
+        *field &= mask;
+    }
     actor->word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase, u32 behavior)
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
+                            u32 behavior)
 {
     actor->state2A8 = state;
     actor->phase2A9 = phase;
@@ -53,11 +62,12 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *group, struct ContactPosition *destination)
+static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *group,
+                        struct ContactPosition *destination)
 {
     void *shape = *(void **)((u8 *)group + 0x1FC);
-    if (sub_0821F204(shape, &actor->position, destination)) {
-        s32 result = sub_0821F7A8(shape, &actor->position, destination);
+    if (Nav_IsPositionInMesh(shape, &actor->position, destination)) {
+        s32 result = Terrain_ApplyBlocked(shape, &actor->position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);
@@ -74,7 +84,8 @@ static inline void SetCoordinates(struct ContactPosition *out, s16 *coordinates)
     out->z = coordinates[1];
     out->y = HeightAt(out);
 }
-static inline void ArmCommand(struct SceneActorReactionCommand *command, void *payload, u32 kind, u32 duration)
+static inline void ArmCommand(struct SceneActorReactionCommand *command, void *payload, u32 kind,
+                              u32 duration)
 {
     command->duration = duration;
     command->payload = payload;
@@ -82,9 +93,14 @@ static inline void ArmCommand(struct SceneActorReactionCommand *command, void *p
     command->second = 0;
     command->kind = kind;
 }
-static inline void SetWordFlag(u32 *flags, u32 mask) { *flags = mask | *flags; }
-static inline void SetHalfFlag(u16 *flags, u32 mask) { *flags = mask | *flags; }
-#define SceneActorAttachment_BeginReturnResponse sub_0807CA44
+static inline void SetWordFlag(u32 *flags, u32 mask)
+{
+    *flags = mask | *flags;
+}
+static inline void SetHalfFlag(u16 *flags, u32 mask)
+{
+    *flags = mask | *flags;
+}
 void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView *actor)
 {
     register void *group asm("sb") = &actor->group;
@@ -97,7 +113,8 @@ void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView
     destination->x = (*(s16 **)((u8 *)source + 8))[0];
     destination->z = (*(s16 **)((u8 *)source + 8))[1];
     destination->y = HeightAt(destination);
-    if (!MoveTo(actor, group, &(**(struct SceneActorPositionSource ***)((u8 *)group + 0x88))->position)) {
+    if (!MoveTo(actor, group,
+                &(**(struct SceneActorPositionSource ***)((u8 *)group + 0x88))->position)) {
         s16 *coordinates = *(s16 **)((u8 *)group + 0x7C);
         SetCoordinates(&position, coordinates);
         MoveTo(actor, group, &position);
@@ -105,7 +122,7 @@ void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView
         SetState(actor, 0, 0, 2);
     } else {
         struct SceneActorReactionCommand *command;
-        sub_0807C72C(actor, 0, 1, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
         SetState(actor, 3, 1, 0);
         SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
         command = (void *)((u8 *)group + 0x8C);
@@ -117,5 +134,5 @@ void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0807CA44);
+INCLUDE_ASM("asm/nonmatching", SceneActorAttachment_BeginReturnResponse);
 #endif

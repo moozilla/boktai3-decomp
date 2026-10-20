@@ -16,7 +16,6 @@ struct Actor {
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-#define Hresvelgr_UpdateTravel sub_0819CB7C
 static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);

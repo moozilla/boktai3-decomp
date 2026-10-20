@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
-#define Vanargand_UpdateChargedPairAttack sub_081A9F88
 // MATCHING_CONCESSION: register-pinning
 struct Pair {
     u8 pad0[0x205];

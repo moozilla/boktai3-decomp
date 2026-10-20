@@ -9,7 +9,7 @@
  * Resume block (hoisted address pseudos from GCSE/PRE; ROM needs a hash table of >= 465
  * buckets, ours has 447) and the 0x200 mask register in MoveToDestination. */
 u8 sub_0812F3CC(void *);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_0807E334(void *);
 void SceneActorControl_OnIdle(void);
 
@@ -346,7 +346,7 @@ void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
                 void *target = SceneActorReaction_RestoreAfterDelay;
                 SetControl(actor, 0xE, target);
             }
-            sub_0807C72C(actor, 0, 2, actor->category);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
             {
                 struct SkelSaved *saved = &group->saved;
                 void *target = actor->entryTarget228;

@@ -20,7 +20,7 @@ struct OffsetEffectActor {
     u32 effectId;
 };
 extern struct EffectSourceActor *gUnk_020004F0[];
-void sub_081F2A08(u32, struct EffectPosition *, s32 *, u32, s32, s32);
+void SpriteTrail_CreateMotionEffect(u32, struct EffectPosition *, s32 *, u32, s32, s32);
 void Sound_PlaySong(u32);
 static inline void GetSourcePosition(s32 index, s32 *sourcePosition)
 {
@@ -51,8 +51,8 @@ u32 ActorEffect_SpawnOffsetEffect(struct OffsetEffectActor *actor)
     position.y = actor->y - 0x40000;
     position.z = 0x1C000;
     GetSourcePosition(actor->sourceIndex, source);
-    sub_081F2A08(actor->effectId, &position, source, actor->style, actor->parameterA,
-                 actor->parameterB);
+    SpriteTrail_CreateMotionEffect(actor->effectId, &position, source, actor->style,
+                                   actor->parameterA, actor->parameterB);
     Sound_PlaySong(0x58F);
     /* The original epilogue preserves r0; no explicit result is established. */
 }

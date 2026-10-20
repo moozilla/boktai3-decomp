@@ -15,12 +15,12 @@ void Hud_DrawHealthMeter(struct Hud *, s32, s32, s32, s32);
 void sub_08164480(struct Hud *, s32, s32, s32, s32, s32, s32);
 void StatDisplay_DrawGauge(struct Hud *, s32, s32);
 void sub_08164864(struct Hud *, s32, s32, s32);
-void sub_08165020(struct Hud *);
-void sub_08164DC0(struct Hud *);
-void sub_08164C40(struct Hud *, s32);
+void Hud_UpdateTimedStatusIcon(struct Hud *);
+void Hud_UpdateTransientStatGauge(struct Hud *);
+void Hud_DrawStoredEnergyGauge(struct Hud *, s32);
 void SelectionPanel_UpdateBlink(struct Hud *);
-void sub_08167910(struct Hud *);
-void sub_08165254(struct Hud *);
+void PauseMenu_UpdateSelectedEquipmentIcons(struct Hud *);
+void Hud_UpdateCountdownDigits(struct Hud *);
 void Hud_RefreshActivePanel(struct Hud *hud)
 {
     if (hud->panel && hud->mode != 7 && hud->mode <= 2) {
@@ -29,13 +29,13 @@ void Hud_RefreshActivePanel(struct Hud *hud)
         sub_08164480(hud, 0, 4, 2, hud->panel->a, hud->panel->b, one);
         StatDisplay_DrawGauge(hud, 3, 3);
         sub_08164864(hud, 0, 9, 0x12);
-        sub_08165020(hud);
+        Hud_UpdateTimedStatusIcon(hud);
         if (hud->mode == 0)
-            sub_08164DC0(hud);
+            Hud_UpdateTransientStatGauge(hud);
         else
-            sub_08164C40(hud, hud->mode);
+            Hud_DrawStoredEnergyGauge(hud, hud->mode);
         SelectionPanel_UpdateBlink(hud);
-        sub_08167910(hud);
-        sub_08165254(hud);
+        PauseMenu_UpdateSelectedEquipmentIcons(hud);
+        Hud_UpdateCountdownDigits(hud);
     }
 }

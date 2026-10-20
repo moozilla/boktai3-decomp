@@ -1,6 +1,5 @@
 #include "scene_actor_animation.h"
 // confidence=low: turns one octant toward the requested direction on animation ticks.
-#define Axe_UpdateTurnAnimation sub_080F93E0
 
 #ifdef NONMATCHING
 // fuzzy: 83.0%
@@ -133,5 +132,5 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F93E0);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateTurnAnimation);
 #endif

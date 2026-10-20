@@ -21,71 +21,88 @@ void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
 {
-    u32 off=0x2A8;
-    register u32 phase asm("r5")=0x2A9;
-    u32 zero=0;
-    FIELD(a,off,u8)=zero;
-    FIELD(a,phase,u8)=zero;
-    off+=2;
+    u32 off = 0x2A8;
+    register u32 phase asm("r5") = 0x2A9;
+    u32 zero = 0;
+    FIELD(a, off, u8) = zero;
+    FIELD(a, phase, u8) = zero;
+    off += 2;
     asm("" : "+r"(off));
-    FIELD(a,off,u8)=behavior;
-    phase+=3;
-    FIELD(a,phase,u32)=zero;
-    {u32 b=0x2B1; FIELD(a,b,u8)=1;}
-
+    FIELD(a, off, u8) = behavior;
+    phase += 3;
+    FIELD(a, phase, u32) = zero;
+    {
+        u32 b = 0x2B1;
+        FIELD(a, b, u8) = 1;
+    }
 }
 static inline void Control(struct SceneActorRegistryResetView *a, void *target)
 {
-    u32 off=0x2B2;
-    FIELD(a,off,u8)=1;
-    off-=2;
-    FIELD(a,off,u8)=0;
-    off+=5;
-    FIELD(a,off,u8)=1;
-    a->target=target;
-    a->field2C8=0;
-    {u32 *p=&a->flags114; s32 m=~1; *p &= m;}
-    a->word104=0;
+    u32 off = 0x2B2;
+    FIELD(a, off, u8) = 1;
+    off -= 2;
+    FIELD(a, off, u8) = 0;
+    off += 5;
+    FIELD(a, off, u8) = 1;
+    a->target = target;
+    a->field2C8 = 0;
+    {
+        u32 *p = &a->flags114;
+        s32 m = ~1;
+        *p &= m;
+    }
+    a->word104 = 0;
 }
 // confidence=low: advances Spider toward its route probe and resumes route control on arrival
-#define Spider_ApproachRouteProbe sub_080A2F2C
 void Spider_ApproachRouteProbe(struct SceneActorRegistryResetView *actor)
 {
-    u8 *nav=(u8 *)actor+0x3D4;
+    u8 *nav = (u8 *)actor + 0x3D4;
     s32 speed;
     u16 *scale;
-    if(actor->field2B1) actor->field2B1=0;
-    speed=Callback_InvokeActor(actor,FIELD(actor,0x260,void *));
+    if (actor->field2B1)
+        actor->field2B1 = 0;
+    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
-        u32 mask=0xA02F;
-        if(actor->flags2D4 & mask) {
-            u16 *p=&actor->field2C2; *p=64; scale=p;
+        u32 mask = 0xA02F;
+        if (actor->flags2D4 & mask) {
+            u16 *p = &actor->field2C2;
+            *p = 64;
+            scale = p;
         } else {
-            u16 *p=&actor->field2C2; u32 v=*p; scale=p;
-            if(!v) *p=64;
+            u16 *p = &actor->field2C2;
+            u32 v = *p;
+            scale = p;
+            if (!v)
+                *p = 64;
         }
     }
-    if(!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable+0x48,*scale);
+    if (!actor->drawableKind)
+        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable+0x20,*scale);
-    if(NavMesh_ConsumeProbeEvent(FIELD(nav,0x1FC,void *))) {
-        if(SceneActorBehavior_RequestDescriptorTurn(actor,FIELD(nav,0x1FC,void *),32,32,speed)) {
-            State(actor,13);
+        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+    if (NavMesh_ConsumeProbeEvent(FIELD(nav, 0x1FC, void *))) {
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 32, 32,
+                                                     speed)) {
+            State(actor, 13);
             return;
         }
     }
-    if(SceneActorBehavior_AccelerateTowardDescriptor(actor,FIELD(nav,0x1FC,void *),32,32,speed)) {
-        State(actor,12);
-        Control(actor,FIELD(nav,0x48,void *));
+    if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 32, 32,
+                                                      speed)) {
+        State(actor, 12);
+        Control(actor, FIELD(nav, 0x48, void *));
         sub_080A4798(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
     } else {
         actor->counter2AC++;
-        {u32 mask=0x2000; u32 *p=&actor->flags2CC; *p |= mask;}
+        {
+            u32 mask = 0x2000;
+            u32 *p = &actor->flags2CC;
+            *p |= mask;
+        }
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A2F2C);
+INCLUDE_ASM("asm/nonmatching", Spider_ApproachRouteProbe);
 #endif

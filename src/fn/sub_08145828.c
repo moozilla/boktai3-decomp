@@ -19,7 +19,6 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 // confidence=low: recoil phases end by clearing the special contact state and returning to idle.
-#define Player_UpdateContactKnockdown sub_08145828
 void Player_UpdateContactKnockdown(struct Player *p)
 {
     s32 value, angle;

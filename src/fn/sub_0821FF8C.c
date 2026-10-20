@@ -1,6 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#define Collision_CalculateDamageResponse sub_0821FF8C
 struct CollisionEntry {
     u8 pad0[6];
     u16 flags;

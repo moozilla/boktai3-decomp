@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: synchronizes collision, shadow and camera presentation.
-#define Hresvelgr_UpdateCollisionPresentation sub_081A2858
 
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -222,5 +221,5 @@ cameraDone:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A2858);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateCollisionPresentation);
 #endif

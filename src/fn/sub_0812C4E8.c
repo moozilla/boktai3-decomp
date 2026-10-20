@@ -155,7 +155,6 @@ static inline void Step(struct Fragment *sprite)
     }
 }
 // confidence=low: F422 fragment state interpolates sprite scale on appearance
-#define FragmentEffect_GrowToFullSize sub_0812C4E8
 void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
 {
     s16 *scaleTimer;
@@ -204,5 +203,5 @@ void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812C4E8);
+INCLUDE_ASM("asm/nonmatching", FragmentEffect_GrowToFullSize);
 #endif

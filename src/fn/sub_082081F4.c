@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: collision callback records damage and emits sparks for selected source flags.
-#define CannonTurret_ApplyHitReaction sub_082081F4
 #ifdef NONMATCHING
 // fuzzy: 99.0%
 // Only the first RNG-index read uses a different pointer register.
@@ -52,7 +51,7 @@ struct Target {
 };
 extern const struct Vec gUnk_0824FE84;
 extern u32 gUnk_03005308;
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -67,7 +66,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
     struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
@@ -148,5 +147,5 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082081F4);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_ApplyHitReaction);
 #endif

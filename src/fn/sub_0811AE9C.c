@@ -38,7 +38,6 @@ static inline s32 Offset(s32 z)
     return offset;
 }
 // confidence=low: resolves glove and actor motion against terrain clearance and depth limits.
-#define Terrain_ResolveActorMotion sub_0811AE9C
 void Terrain_ResolveActorMotion(struct TerrainMotion *p)
 {
     struct MotionPosition old, next;
@@ -119,5 +118,5 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811AE9C);
+INCLUDE_ASM("asm/nonmatching", Terrain_ResolveActorMotion);
 #endif

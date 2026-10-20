@@ -1,7 +1,7 @@
 #include "scene_actor_control_phase.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void sub_080FBA38(void *);
+void Axe_EmitMotionTrail(void *);
 extern u8 *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 static inline s32 Normalize(s32 a)
@@ -65,7 +65,6 @@ struct PursuitContext {
     u8 unknown0[0xE56];
     u16 distance;
 };
-#define Axe_UpdatePursuit sub_080F9FB8
 void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition delta;
@@ -89,7 +88,7 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
         *(u32 *)actor->drawable |= 2;
         context->distance = 512;
     }
-    sub_080FBA38(actor);
+    Axe_EmitMotionTrail(actor);
     if (context->distance > actor->distanceF0) {
         s32 difference;
         FromPlayer(&gUnk_02000580, &delta, actor);

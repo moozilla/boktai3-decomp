@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: flag 0x1000 selects this sprite staging pass.
-#define SpriteOam_QueueFlaggedProjectedSprites sub_08218508
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;

@@ -10,7 +10,7 @@ void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void ProximityVolume_TranslateBounds(void *, void *);
 void SceneBody_Init(void *, u32, void *, s32, s32, void *);
 void SceneBody_SetKeyframeDisplay(void *, void *);
-void sub_0818BE30(void *, u32);
+void Armor_InitCombatColliders(void *, u32);
 void AnimData_Load(void *, u32);
 void ResourceHeader_Relocate(void *, void *);
 void *ScriptProc_Start(u32, u32);
@@ -196,7 +196,7 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     n[1] |= one;
     ScaledShadow_InitializeDefaultLarge(p->f114, y);
     ProximityVolume_TranslateBounds(a, &t);
-    sub_0818BE30(p, arg);
+    Armor_InitCombatColliders(p, arg);
     p->hB2E = 0;
     r = 0;
     switch (p->bB38) {

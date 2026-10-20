@@ -106,8 +106,9 @@ static inline void step(struct Frames *f, struct Render *r)
 }
 
 // confidence=low: script body initialization installs this auxiliary sprite and animation.
-#define KeyframeActor_InitAuxiliarySprite sub_0823AF44
-struct Vec { s16 x, y, z; };
+struct Vec {
+    s16 x, y, z;
+};
 void KeyframeActor_InitAuxiliarySprite(u8 *arg)
 {
     u8 *p = arg;
@@ -127,8 +128,8 @@ void KeyframeActor_InitAuxiliarySprite(u8 *arg)
         u32 value = *(u16 *)(p + 0x30);
         *(s16 *)(p + 0x168) = value;
         {
-        register u32 y asm("r0") = *(u16 *)(p + 0x32);
-        *(s16 *)(p + 0x16A) = y;
+            register u32 y asm("r0") = *(u16 *)(p + 0x32);
+            *(s16 *)(p + 0x16A) = y;
         }
         value = *(u16 *)(p + 0x34);
         *(s16 *)(p + 0x16C) = value;

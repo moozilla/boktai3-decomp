@@ -38,7 +38,7 @@ static inline u32 Test32(u32 *p, u32 m)
 }
 
 extern u8 *gUnk_02000580[];
-u8 sub_080A4260(void *);
+u8 SceneActorPlacement_BeginContactRoute(void *);
 s32 Math_Atan2(s32, s32);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void sub_080A4798(void *);
@@ -68,7 +68,6 @@ static inline u32 SaveFlags(struct SceneActorRegistryResetView *a, u16 **out, u3
     return r;
 }
 // confidence=low: starts close player contact when within the actor's stored distance limit
-#define SceneActorPlacement_BeginNearbyPlayerContact sub_080A45C8
 u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetView *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
@@ -80,7 +79,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
     s32 angle;
     if (HasFlag(c, 4))
         return 0;
-    if (sub_080A4260(a))
+    if (SceneActorPlacement_BeginContactRoute(a))
         return 1;
     player = gUnk_02000580[0];
     if (Test32((void *)(player + 0x20), 0x20000))

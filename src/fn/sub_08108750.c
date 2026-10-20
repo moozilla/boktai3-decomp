@@ -85,7 +85,6 @@ static inline u32 Step(struct AnimatedTile *crate)
     return done;
 }
 
-#define AnimatedTile_TickAlternateAnimation sub_08108750
 void AnimatedTile_TickAlternateAnimation(struct AnimatedTileManager *manager,
                                          struct AnimatedTile *tile)
 {

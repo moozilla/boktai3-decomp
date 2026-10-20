@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: selects approach, attack and recovery behaviors along a shared X/Z axis.
-#define Armor_UpdateAxisAttackDecision sub_08187230
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 85.8%
@@ -195,5 +194,5 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08187230);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateAxisAttackDecision);
 #endif

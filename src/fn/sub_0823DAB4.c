@@ -2,8 +2,6 @@
 #include "player.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define Player_UpdateSweepAction sub_0823DAB4
-
 #ifdef NONMATCHING
 // fuzzy: 97.4%
 // Remaining mismatch: second-branch heading sum lacks the ROM register copy.
@@ -11,7 +9,6 @@ extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-#define Player_EmitSweepSpark sub_0823D97C
 void Player_EmitSweepSpark(struct Player *, struct SceneVec *, s32, u32, s32);
 
 struct SweepCtx {
@@ -53,14 +50,14 @@ s32 Player_UpdateSweepAction(struct Player *p)
             u8 *h = &q->heading;
             angle = q->timer * q->extentA + 0x100;
             {
-            register s32 sum asm("r0") = angle + *h;
-            angle = sum;
+                register s32 sum asm("r0") = angle + *h;
+                angle = sum;
             }
             angle -= 0x20;
         }
         {
-        register u32 mask asm("r0") = 0xFF;
-        angle &= mask;
+            register u32 mask asm("r0") = 0xFF;
+            angle &= mask;
         }
         q->dest.x = q->origin.x + scale(gUnk_086149C4[(angle + 64) & 255] * 160);
         q->dest.y = q->origin.y;

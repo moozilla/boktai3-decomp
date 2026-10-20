@@ -5,10 +5,9 @@
 #ifdef NONMATCHING
 // fuzzy: 81.3%
 /* Candidate keys match the search order; vector pointer allocation still differs. */
-s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, const struct ContactPosition *, const struct ContactPosition *);
 static inline s32 DistanceSquared(struct ContactPosition *difference,
-                                   const struct ContactPosition *a,
-                                   const struct ContactPosition *b)
+                                  const struct ContactPosition *a, const struct ContactPosition *b)
 {
     s32 x, z, xSquare, zSquare;
     SceneActorTerrain_Subtract(difference, a, b);
@@ -16,11 +15,14 @@ static inline s32 DistanceSquared(struct ContactPosition *difference,
     xSquare = x * x;
     z = difference->z;
     zSquare = z * z;
-    { s32 copy = zSquare; return (u32)xSquare + (u32)copy; }
+    {
+        s32 copy = zSquare;
+        return (u32)xSquare + (u32)copy;
+    }
 }
-#define SceneActorAttachment_FindReachableNeighbor sub_0807CDC4
 void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionSource *source,
-    void *context, struct ContactPosition *output, const struct ContactPosition *input)
+                                                void *context, struct ContactPosition *output,
+                                                const struct ContactPosition *input)
 {
     struct SceneActorEffectCandidate candidates[4];
     struct ContactPosition center, difference;
@@ -29,7 +31,7 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
     s32 adjacent;
     struct SceneActorEffectCandidate *candidate;
     if (!(*(u16 *)(SceneActorTerrain_GetCell(cell) + 2) & 0xC3) &&
-        sub_0821F204(context, &source->position, input)) {
+        Nav_IsPositionInMesh(context, &source->position, input)) {
         *output = *input;
         return;
     }
@@ -54,7 +56,7 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
     do {
         if (!(*(u16 *)(SceneActorTerrain_GetCell(candidate->value) + 2) & 0xC3)) {
             SceneActorTerrain_GetCenter(candidate->value, &center);
-            if (sub_0821F204(context, &source->position, &center)) {
+            if (Nav_IsPositionInMesh(context, &source->position, &center)) {
                 *output = center;
                 return;
             }
@@ -67,5 +69,5 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0807CDC4);
+INCLUDE_ASM("asm/nonmatching", SceneActorAttachment_FindReachableNeighbor);
 #endif

@@ -5,7 +5,6 @@
 // confidence=low: emits six radial effects, waits for animation 10, then deactivates the part.
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
-#define Vanargand_ReleaseRadialEffects sub_081B3DB8
 
 #ifdef NONMATCHING
 // fuzzy: 87.4%
@@ -212,5 +211,5 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B3DB8);
+INCLUDE_ASM("asm/nonmatching", Vanargand_ReleaseRadialEffects);
 #endif

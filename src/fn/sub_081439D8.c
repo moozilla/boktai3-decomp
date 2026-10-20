@@ -1,11 +1,20 @@
 #include "global.h"
 
 // confidence=low: validates terrain for a tether target and snaps to the tether actor on flagged cells.
-#define Player_TestTetherTarget sub_081439D8
 
-struct Position { s16 x, y, z, pad; };
-struct Actor { u8 pad[0x30]; struct Position position; };
-struct Map { u32 pad; u8 *cells; u8 pad8[28]; u16 rows[1]; };
+struct Position {
+    s16 x, y, z, pad;
+};
+struct Actor {
+    u8 pad[0x30];
+    struct Position position;
+};
+struct Map {
+    u32 pad;
+    u8 *cells;
+    u8 pad8[28];
+    u16 rows[1];
+};
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -24,7 +33,8 @@ static inline u8 *properties(struct Position *position)
     else
         cell = gUnk_030052F4->rows[z] + x;
     p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p) p += 4;
+    if (p)
+        p += 4;
     else {
         struct Map *map = gUnk_030052F4;
         u32 offset = cell * 4 + 12;
@@ -32,26 +42,39 @@ static inline u8 *properties(struct Position *position)
     }
     return p;
 }
-static inline s32 absolute(s32 v) { if (v < 0) v = -v; return v; }
+static inline s32 absolute(s32 v)
+{
+    if (v < 0)
+        v = -v;
+    return v;
+}
 u32 Player_TestTetherTarget(struct Actor *actor, struct Position *candidate)
 {
     u8 *p = properties(candidate);
     u32 flags = *(u16 *)(p + 2);
     s32 height, surface;
     struct Position *target;
-    if (flags & 1) return 0;
+    if (flags & 1)
+        return 0;
     if (!TetherActor_GetStatusFlags()) {
-        if (Player_IsStatusBit4ActionActive(flags)) return 0;
-        if (flags & 0x40) return 0;
+        if (Player_IsStatusBit4ActionActive(flags))
+            return 0;
+        if (flags & 0x40)
+            return 0;
     }
     p = properties(candidate);
     surface = *p >> 4;
     height = (*p & 15) << 8;
     switch (surface) {
-    case 1: height -= (u8)candidate->z; break;
-    case 2: height -= (u8)candidate->x; break;
+        case 1:
+            height -= (u8)candidate->z;
+            break;
+        case 2:
+            height -= (u8)candidate->x;
+            break;
     }
-    if (absolute(height - actor->position.y) > 255) return 0;
+    if (absolute(height - actor->position.y) > 255)
+        return 0;
     if (flags & 0x800) {
         target = TetherActor_GetPosition();
         if (absolute(target->x - actor->position.x) > 255 ||

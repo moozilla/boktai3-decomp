@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
-#define Sword_BeginTargetOrbit sub_080F52C0
 
 #ifdef NONMATCHING
 // fuzzy: 95.5%
@@ -59,5 +58,5 @@ void Sword_BeginTargetOrbit(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F52C0);
+INCLUDE_ASM("asm/nonmatching", Sword_BeginTargetOrbit);
 #endif

@@ -20,7 +20,6 @@ struct RatioHud {
 };
 #define OWNER(p) (((struct RatioHud *)(p))->owner)
 // confidence=low: mode zero exchanges the proportions of two current vitals.
-#define PauseMenu_BeginVitalRatioExchange sub_0816ECF0
 void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
 {
     u32 from[2];
@@ -72,5 +71,5 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816ECF0);
+INCLUDE_ASM("asm/nonmatching", PauseMenu_BeginVitalRatioExchange);
 #endif

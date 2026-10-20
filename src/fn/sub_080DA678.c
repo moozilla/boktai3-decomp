@@ -5,7 +5,6 @@
 #include "scene_actor_animation.h"
 
 // confidence=low: clears mummy motion counters and restarts the directional animation.
-#define Mummy_ResetRevivalMotion sub_080DA678
 void Mummy_ResetMotionState(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 

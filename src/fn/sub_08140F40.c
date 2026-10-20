@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#define Player_GetForceDirection sub_08140F40
 
 struct Terrain {
     u8 pad[4];

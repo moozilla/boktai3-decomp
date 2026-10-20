@@ -47,7 +47,7 @@ struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
 void PursuingActor_InitColliders(struct Slash *, s32, s32, s32, s32, s32, s32, s32);
 void TimedEffect_UpdateVisibility(struct Slash *);
-void sub_0812B424(struct Slash *);
+void TwinSpriteEffect_EmitTrail(struct Slash *);
 void PursuingActor_TurnTowardPlayer(struct Slash *);
 void SlashEffect_UpdateColliders(struct Slash *);
 void SwooshProjectile_RemoveTrailSprites(struct Slash *);
@@ -100,7 +100,6 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
     }
 }
 // confidence=low: homing slash travels until a higher terrain cell or its lifetime ends
-#define PursuingActor_AdvanceChase sub_0812B91C
 void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
 {
     struct ContactPosition next;
@@ -114,7 +113,7 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
             *entered = 0;
         }
     }
-    sub_0812B424(p);
+    TwinSpriteEffect_EmitTrail(p);
     TimedEffect_UpdateVisibility(p);
     {
         register u32 offset asm("r2") = 0x1A5;
@@ -205,5 +204,5 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812B91C);
+INCLUDE_ASM("asm/nonmatching", PursuingActor_AdvanceChase);
 #endif

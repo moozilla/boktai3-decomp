@@ -154,7 +154,6 @@ static inline u8 Ended(struct VanargandPart *p)
 }
 
 // confidence=low: moves the part to its heading/distance target before releasing render flags.
-#define Vanargand_UpdatePartRadialTravel sub_081B5454
 void Vanargand_UpdatePartRadialTravel(u8 *boss, struct VanargandPart *p)
 {
     if (p->reset) {

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: blends the boss palette banks and stage colors.
-#define Vanargand_UpdatePaletteTransition sub_081A5614
 
 // confidence=low: palette transitions and stage colors follow adjacent Vanargand routines.
 // MATCHING_CONCESSION: register-pinning
@@ -191,5 +190,5 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A5614);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteTransition);
 #endif

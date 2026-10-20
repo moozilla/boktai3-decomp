@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: uses heavy-attack animation records and per-frame collider tables.
-#define ActorController_UpdateHeavyAttackCollider sub_081835D8
 
 /* Arms the heavy-attack collider from animation-frame tables. */
 
@@ -114,5 +113,5 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081835D8);
+INCLUDE_ASM("asm/nonmatching", ActorController_UpdateHeavyAttackCollider);
 #endif

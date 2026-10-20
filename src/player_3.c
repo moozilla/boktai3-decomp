@@ -1,9 +1,6 @@
 #include "player_3.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define Player_UpdateAttachedAttackCharge sub_0814F328
-#define Player_UpdateSelectedAttackCharge sub_0814E3D8
-
 /* Tentative role: select an effect flag from actor and global state. */
 
 static inline u8 global_mode(void)
@@ -49,7 +46,7 @@ void Player_LoadVisualParameters(struct Player *p)
 
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
 
-void sub_0813C798(struct Player *);
+void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
 s32 WirelessGame_GetSelectedEquipmentEffect(s32);
 s32 Player_GetUsableEnchantment(struct Player *);
@@ -57,7 +54,6 @@ s32 Player_GetUsableEnchantment(struct Player *);
 // fuzzy: 87.9%
 // Owner/mode register allocation and shared tail stores differ.
 // confidence=low: applies timed palette overlays and the current enchantment pulse.
-#define Player_UpdateVisualPalette sub_0813CB8C
 void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 {
     register u32 mode asm("r4") = requestedMode;
@@ -76,7 +72,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
     if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
         p->savedSpriteResource = mode;
         p->unkAC6[0] = intensity;
-        sub_0813C798(p);
+        PaletteFade_ApplyBrightenedPalette(p);
     }
     if (!p->actionEighteenDuration) {
         if (gUnk_030053F4 & 0x1000)
@@ -152,7 +148,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813CB8C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateVisualPalette);
 #endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
@@ -166,9 +162,9 @@ void Player_SelectSpriteResource(struct Player *p)
     }
 }
 
-void sub_0813D178(void *);
+void Player_InitVisualResources(void *);
 
-void sub_0813CB8C(struct Player *, u32);
+void Player_UpdateVisualPalette(struct Player *, u32);
 
 static inline u32 ReadVisualFlag(u32 *flags, u32 mask)
 {
@@ -188,7 +184,6 @@ static inline u32 VisualActionFlag(struct Player *p, u32 mask)
     return ReadVisualFlag(&p->actionFlags, mask);
 }
 // confidence=low: initializes visual resource selectors from mode and bonus flags.
-#define Player_InitVisualResources sub_0813D178
 void Player_InitVisualResources(void *actor)
 {
     struct Player *p = actor;
@@ -245,14 +240,14 @@ void Player_InitVisualResources(void *actor)
 void Player_InitVisualState(struct Player *p)
 {
     Player_SelectSpriteResource(p);
-    sub_0813D178(p);
+    Player_InitVisualResources(p);
     p->savedSpriteResource = 0xFFFF;
     p->baseActionVariant = 0xFF;
     p->spriteResource = p->baseSpriteResource;
     p->actionVariantResource = (u32)p->visualParameters;
     p->visualObject->resource = p->baseSpriteResource;
     p->visualObject->parameters = (u32)p->visualParameters;
-    sub_0813CB8C(p, 0);
+    Player_UpdateVisualPalette(p, 0);
 }
 
 void SceneActor_StartRandomizedEffect(struct Player *);
@@ -292,7 +287,7 @@ void Player_FlushQueuedEffects(struct Player *p)
     }
 }
 
-s32 sub_082315A8(void *, s32, s32, struct SceneVec *);
+s32 EffectGroup_Spawn(void *, s32, s32, struct SceneVec *);
 
 static inline int EffectRandomWith(const u16 *table)
 {
@@ -303,7 +298,6 @@ static inline int EffectRandomWith(const u16 *table)
 }
 
 // confidence=low: queues a randomized status particle and its sound cue.
-#define Player_QueueStatusEffect sub_0813D548
 void Player_QueueStatusEffect(struct Player *p, s32 a)
 {
     struct SceneVec v;
@@ -335,7 +329,7 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
         v.y = -(EffectRandomWith(t) & 31);
         v.z = 0;
     }
-    if (sub_082315A8(&p->effectGroup, a, 0xE10, &v) >= 0) {
+    if (EffectGroup_Spawn(&p->effectGroup, a, 0xE10, &v) >= 0) {
         if (p->movementModifierKind == 1)
             Sound_PlaySong(0x191);
         else if (p->movementModifierKind == 2) {
@@ -413,7 +407,6 @@ void Player_ClearStateTimer(struct Player *p, s32 idx)
 void PaletteLevels_Configure(s32, s32, s32, void *, void *, void *);
 void Player_NotifyActionCategories(struct Player *);
 // confidence=low: chooses visual modes while consuming timed status effects.
-#define Player_SelectTimedVisualMode sub_0813D924
 s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
 {
     s32 *resource;
@@ -528,7 +521,6 @@ static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
 // fuzzy: 82.2%
 // Inlined slowdown allocation, flag mask ordering and pointer reuse differ.
 // confidence=low: applies visual status flags and ramps the paired speed scales.
-#define Player_UpdateStatusVisuals sub_0813DB98
 void Player_UpdateStatusVisuals(void *actor)
 {
     struct Player *p = actor;
@@ -573,7 +565,7 @@ void Player_UpdateStatusVisuals(void *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0813DB98);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateStatusVisuals);
 #endif
 
 void Player_AdvanceEffectTick(struct Player *p)
@@ -587,11 +579,11 @@ void Player_AdvanceEffectTick(struct Player *p)
 
 #define SceneActor_AdvanceEffectTick Player_AdvanceEffectTick
 
-void sub_0813DB98(void *);
+void Player_UpdateStatusVisuals(void *);
 
 void Player_AdvanceEffectTick(struct Player *);
 
-s32 sub_0813D924(struct Player *, s32);
+s32 Player_SelectTimedVisualMode(struct Player *, s32);
 
 s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
@@ -612,15 +604,15 @@ void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int
 void SceneActor_UpdateVisualEffects(struct Player *p)
 {
     s32 mode;
-    sub_0813DB98(p);
+    Player_UpdateStatusVisuals(p);
     Player_AdvanceEffectTick(p);
-    mode = sub_0813D924(p, 0);
+    mode = Player_SelectTimedVisualMode(p, 0);
     mode = SceneActor_SelectEffectDisplayMode(p, mode);
     mode = Player_SelectFlashingVisualMode(p, mode);
     if (p->kind == 2 && p->tetherMode != 10 && p->tetherMode != 11)
         sub_0813CE20(p, mode);
     else
-        sub_0813CB8C(p, mode);
+        Player_UpdateVisualPalette(p, mode);
     sub_0813B950(p);
     Player_UpdateOrbitingEffect(p);
     sub_0813BAD8(p);
@@ -1031,7 +1023,6 @@ struct ActionModifierDescriptor {
 };
 void Player_SubtractResistance(struct Player *, s32, s32);
 
-#define Player_BuildActionModifiers sub_0813E608
 void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierContext *context,
                                  const void *descriptor)
 {
@@ -1148,7 +1139,6 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Player_AccumulateContactCost(void);
 // confidence=low: configures the action collider for the active descriptor or alternate mode.
-#define Player_ConfigureActionCollider sub_0813E90C
 void Player_ConfigureActionCollider(struct Player *p)
 {
     struct SceneVec size, offset;
@@ -1221,7 +1211,7 @@ void ActionRecord_CopyFromEntry(void *, void *);
 
 void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
 
-void sub_0813E90C(struct Player *);
+void Player_ConfigureActionCollider(struct Player *);
 
 void Player_UpdateAttachedAttackCharge(void);
 
@@ -1255,7 +1245,7 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
     else
         p->actionCallback = sub_0814D9C4;
     p->actionResetCounter = 0;
-    sub_0813E90C(p);
+    Player_ConfigureActionCollider(p);
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);
     if (p->statModifierContext.actionKind != 0x30)
@@ -1300,7 +1290,7 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
         p->actionCallback = sub_0814E990;
     else
         p->actionCallback = Player_UpdateSelectedAttackCharge;
-    sub_0813E90C(p);
+    Player_ConfigureActionCollider(p);
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);
 }

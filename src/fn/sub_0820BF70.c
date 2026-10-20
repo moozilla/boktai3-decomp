@@ -1,4 +1,3 @@
-#define Screamer_ApplyHitReaction sub_0820BF70
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -47,7 +46,7 @@ struct Target {
 extern const struct Vec gUnk_0824FE9C;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -62,7 +61,7 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;

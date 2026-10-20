@@ -1,13 +1,23 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-struct AdjacentWaitContext { u8 pad[0x634]; s16 missed, limit; };
-struct AdjacentWaitTarget { u8 pad[0xC]; struct ContactPosition position; };
-s32 sub_080EC0E8(struct SceneActorRegistryResetView *, s32);
-s32 Math_Atan2(s32,s32);
+struct AdjacentWaitContext {
+    u8 pad[0x634];
+    s16 missed, limit;
+};
+struct AdjacentWaitTarget {
+    u8 pad[0xC];
+    struct ContactPosition position;
+};
+s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+s32 Math_Atan2(s32, s32);
 void sub_080E9C20(void);
 static inline void ResetState(struct SceneActorRegistryResetView *a, u32 zero)
 {
-    a->state2A8=zero; a->phase2A9=zero; a->behavior2AA=zero; a->counter2AC=zero; a->field2B1=1;
+    a->state2A8 = zero;
+    a->phase2A9 = zero;
+    a->behavior2AA = zero;
+    a->counter2AC = zero;
+    a->field2B1 = 1;
 }
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 zero)
 {
@@ -45,23 +55,27 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 z
         actor->word104 = zero;
     }
 }
-#define SceneActorReaction_WaitForAdjacentTarget sub_080EB58C
 void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView *a)
 {
-    struct AdjacentWaitContext *ctx=a->context;
-    struct AdjacentWaitTarget *target=(void *)a->fieldDC;
+    struct AdjacentWaitContext *ctx = a->context;
+    struct AdjacentWaitTarget *target = (void *)a->fieldDC;
     s32 found;
     s32 zero;
-    if (SceneActorControl_TakeFlag(&a->field2B1)) ctx->missed=0;
-    found=sub_080EC0E8(a,1);
+    if (SceneActorControl_TakeFlag(&a->field2B1))
+        ctx->missed = 0;
+    found = SceneActorReaction_FindAdjacentTarget(a, 1);
     if (!found) {
-        if (ctx->missed>ctx->limit) ResetState(a,found);
-        else ctx->missed++;
-    } else ctx->missed=0;
-    if ((s32)a->counter2AC>30 && (zero=ctx->missed)==0) {
-        struct ContactPosition *position=&a->position;
-        a->direction=Math_Atan2(target->position.x-position->x,target->position.z-position->z);
-        BeginControl(a,zero);
+        if (ctx->missed > ctx->limit)
+            ResetState(a, found);
+        else
+            ctx->missed++;
+    } else
+        ctx->missed = 0;
+    if ((s32)a->counter2AC > 30 && (zero = ctx->missed) == 0) {
+        struct ContactPosition *position = &a->position;
+        a->direction =
+            Math_Atan2(target->position.x - position->x, target->position.z - position->z);
+        BeginControl(a, zero);
     }
     a->counter2AC++;
 }

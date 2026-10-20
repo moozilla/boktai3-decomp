@@ -56,7 +56,7 @@ static inline s32 WrapAngle(s32 x)
 extern u8 *gUnk_02000580[];
 extern u16 gUnk_02000534, gUnk_02000500;
 u8 ProximityActor_IsPlayerInsideOriginRange(void *);
-void sub_081049F0(struct ActorGroupMember *);
+void ActorGroup_UpdateMemberSway(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
 static inline void Clear(void *p)
 {
@@ -64,7 +64,6 @@ static inline void Clear(void *p)
     CpuSet(&zero, p, 0x05000002);
 }
 // confidence=low: starts a sway and advances the group member when the nearby player moves.
-#define ActorGroup_UpdateMemberProximity sub_0810480C
 void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
 {
     if (p->started) {
@@ -107,10 +106,10 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
             }
         }
     }
-    sub_081049F0(p);
+    ActorGroup_UpdateMemberSway(p);
     p->frame++;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810480C);
+INCLUDE_ASM("asm/nonmatching", ActorGroup_UpdateMemberProximity);
 #endif

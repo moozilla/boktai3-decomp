@@ -1,5 +1,4 @@
 // confidence=low: existing Golem state interpretation retained.
-#define Golem_UpdateSlideImpact sub_080C725C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
@@ -137,5 +136,5 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C725C);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateSlideImpact);
 #endif

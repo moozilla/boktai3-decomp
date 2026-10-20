@@ -6,7 +6,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
@@ -34,7 +34,6 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *a, u8 s, u8 
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-#define Axe_UpdateDefeat sub_080F9BE4
 void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct {
@@ -134,9 +133,10 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     {
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     }
-    GameState_SetEventFlag(sub_081D4F20(actor->category, context[0xED7]));
+    GameState_SetEventFlag(BestiaryDisplay_GetEntryForActor(actor->category, context[0xED7]));
     actor->fieldAA = 0;
     {
         void *callback = (void *)SceneActorControl_OnIdle;
@@ -158,5 +158,5 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F9BE4);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateDefeat);
 #endif

@@ -152,7 +152,6 @@ struct EffectCollider {
     u8 pad[6];
     u16 flags;
 };
-#define Nidhoggr_UpdateDetachedAttackEffect sub_0818FC00
 void Nidhoggr_UpdateDetachedAttackEffect(struct NidhoggrEffect *p)
 {
     u32 ended = Nidhoggr_StepAnimation(p);

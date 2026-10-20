@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: approaches the saved interaction position, then holds an energy-consuming action.
-#define Player_UpdateHeldInteraction sub_081432DC
 #ifdef NONMATCHING
 // fuzzy: 88.6%
 #define B(n) (*(u8 *)(p + (n)))
@@ -122,5 +121,5 @@ void Player_UpdateHeldInteraction(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081432DC);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateHeldInteraction);
 #endif

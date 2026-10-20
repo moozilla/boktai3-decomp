@@ -5,7 +5,6 @@
 // Control-pointer allocation, spill ordering, and initial flag operations still differ.
 #include "scene_actor_chase.h"
 // confidence=low: recovery animation restores retreat, chase, or the saved route.
-#define Mummy_ResumeRouteAfterRecovery sub_080D2194
 struct RecoverySequence {
     u8 pad[7];
     u8 mode;
@@ -41,12 +40,12 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
     struct ContactPosition *position = &actor->position;
     register u32 mask asm("r8") = 0x200;
     struct ContactPosition *target = *(struct ContactPosition **)(group + mask);
-    s32 result = sub_0821F204(route, position, target);
+    s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         ClearFlags(&actor->flags2D4, mask);
         return 0;
     }
-    result = sub_0821F7A8(route, position, target);
+    result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
@@ -99,5 +98,5 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D2194);
+INCLUDE_ASM("asm/nonmatching", Mummy_ResumeRouteAfterRecovery);
 #endif

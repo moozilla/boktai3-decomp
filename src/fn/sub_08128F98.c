@@ -59,9 +59,8 @@ static inline s32 Scale(s32 x)
 }
 void SpriteEffectController_Create(struct Vec *, struct Vec *, s32, u32, u32, u32, u32, u32, u32,
                                    u32, u32, u32, s32, s32, s32, s32, s32, s32);
-u8 sub_08128D24(struct Feather *, struct Vec *, s32, s32, s32);
+u8 FeatherEffectPool_ClipScatterPath(struct Feather *, struct Vec *, s32, s32, s32);
 // confidence=low: scatters terrain-constrained sprite effects ahead of the feather animation.
-#define FeatherEffectPool_SpawnGroundScatter sub_08128F98
 static inline void SetVelocity(struct Vec *v, s32 angle, s32 speed)
 {
     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
@@ -109,7 +108,8 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             *(u32 *)&local.spot.z = (u16)((Random(rng) & 255) - 128);
             Add(&local.spot, &local.center, &local.spot);
             cell = CellIndex(&local.spot);
-            if (sub_08128D24(p, &local.spot, local.cell, cell, Divide64(direction)))
+            if (FeatherEffectPool_ClipScatterPath(p, &local.spot, local.cell, cell,
+                                                  Divide64(direction)))
                 goto next;
             if (*CellData(cell) >> 4)
                 goto next;
@@ -147,5 +147,5 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08128F98);
+INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_SpawnGroundScatter);
 #endif

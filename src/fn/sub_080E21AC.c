@@ -3,10 +3,10 @@
 #include "scene_actor_terrain.h"
 #include "script_utility.h"
 /* SceneActorControl_BeginHiddenDefeat: on entry faces forward, releases attachments, plays the category sound and clears the defeat flags; once field2B3 is set either completes the defeat at once (flags2CC & 0x400: scripts, event flag, idle, hide) or hands over to the blink-out (SceneActorControl_CompleteBlinkOut, kind 0x27) (provisional name) */
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *, s32);
@@ -35,9 +35,9 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
@@ -94,7 +94,8 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
                 u16 test = value & mask;
                 flags = &actor->flags2D4;
                 if (!test && (u32)(actor->category - 11) > 2)
-                    GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+                    GameState_SetEventFlag(
+                        BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
             }
             {
                 u32 mask = 0x4000;

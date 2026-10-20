@@ -6,7 +6,6 @@
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
-#define Vanargand_UpdatePartOffsetStrike sub_081B2F38
 
 #ifdef NONMATCHING
 // fuzzy: 93.2%
@@ -320,5 +319,5 @@ void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tic
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B2F38);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartOffsetStrike);
 #endif

@@ -30,7 +30,6 @@ static inline u8 Test(struct Actor *p, u32 mask)
     return 0;
 }
 // confidence=low: collider callback applies damage and emits contact sparkles for both variants.
-#define ProximityActor_ApplyContactDamage sub_08105808
 void ProximityActor_ApplyContactDamage(struct Collider *a, struct Collider *b, struct Actor *p)
 {
     u32 blocked;

@@ -2,12 +2,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 // confidence=low: restores the common Skeleton route and reaction state after snapshot recovery
-#define Skeleton_ResetRouteReaction sub_080B5F38
 extern const u8 gUnk_0824E250[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
-u8 sub_0821E8C8(void *, void *, u32, u32);
+u8 SceneActorRoute_IsOutsidePointBounds(void *, void *, u32, u32);
 struct SkeletonResetContext {
     u8 unknown0[0x6D0];
     u8 timer;
@@ -65,7 +64,7 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
     actor->field5DA = 255;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (sub_0821E8C8(&actor->route, &actor->position, 32, 32)) {
+    if (SceneActorRoute_IsOutsidePointBounds(&actor->route, &actor->position, 32, 32)) {
         u32 behavior = 2;
         register u32 offset asm("r2") = 0x2A8;
         *((u8 *)actor + offset) = 0;

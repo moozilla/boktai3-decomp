@@ -1,7 +1,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
@@ -64,59 +64,99 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-s32 Mod(s32,s32);
-void TentacleBody_GetDirectionFrame(u8,u32 *,u32 *);
-void sub_080A915C(void *,s32);
-void TentacleBody_UpdateSegmentMotion(void *,s32);
+s32 Mod(s32, s32);
+void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
+void TentacleBody_ResetDirectionalAnimations(void *, s32);
+void TentacleBody_UpdateSegmentMotion(void *, s32);
 void ActorTrail_RemoveAllSegments(void *);
 void sub_080AB294(void *);
-void SparkParticle_Spawn(void *,s32,void *,s32,s32,s32,s32,s32);
-static inline u32 Random4(void) {
- gUnk_03005308=(gUnk_03005308+1)&1023;
- { u32 value = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400); u32 mask=3; return (mask & value)+1; }
-}
-#define TentacleBody_UpdateDefeat sub_080A73B4
-void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor,s32 frame)
+void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
+static inline u32 Random4(void)
 {
- s32 values[8];
- u32 variant, flags;
- struct ContactPackedVector range;
- struct ScriptUtilityArguments arguments;
- u16 script;
- if (SceneActorControl_TakeFlag(&actor->field2B2)) {
-  u8 *entry=(void *)SceneActorProfiles_GetEntryAddress(((struct SceneActorAnimationView *)actor)->profileId, ((struct SceneActorAnimationView *)actor)->profileMode,0);
-  TentacleBody_GetDirectionFrame(actor->direction,&variant,&flags);
-  Select((void *)actor,entry[0x44],variant,flags);
-  sub_080A915C(actor->context,18);
-  actor->field2B3=0;
-  SceneActorPlacement_PlayCategoryEventSound((void *)actor);
-  { struct ContactCollider *c=(void *)((u8 *)actor+0x134); c->flags |=4; }
- }
- if (Mod(frame,10)==0) {
-  range.x=60; range.y=60; range.z=40;
-  SparkParticle_Spawn(&actor->position,Random4(),&range,actor->direction+128,10,8,2,2);
- }
- TentacleBody_UpdateSegmentMotion(actor,frame);
- if (!Sprite_BlinkUntilExpired(actor->drawable,frame,10,30)) return;
- actor->field2B0=1;
- ActorTrail_RemoveAllSegments(actor);
- sub_080AB294(&actor->position);
- {u32 mask=0x400; if (!(actor->flags2CC & mask)) SceneActorBehavior_CallTerrainScript((void *)actor);}
- script=*(u16 *)((u8 *)actor+0x1F8);
- if (script) {
- values[0]=actor->position.x; values[1]=actor->position.y; values[2]=actor->position.z;
- values[3]=*(s32 *)((u8 *)actor+0x1FC); values[4]=*(s32 *)((u8 *)actor+0x200); values[5]=*(s32 *)((u8 *)actor+0x204);
- values[6]=actor->field2E0; values[7]=actor->id;
- arguments.count=8; arguments.values=values; Script_Call(script,&arguments);
- }
- {u32 mask=0x4000; if (!(actor->flags2D4 & mask) && (u32)(actor->category-11)>2) GameState_SetEventFlag(sub_081D4F20(actor->category,actor->paletteOffset));}
- actor->fieldAA=0;
- {void *callback=(void *)SceneActorControl_OnIdle; u32 kind=16;
- actor->field2B2=1; actor->field2B0=0; actor->field2B5=kind; actor->target=callback; actor->field2C8=0;
- {u32 *p=&actor->flags114; u32 mask=~1; *p &=mask;} actor->word104=0;}
- SetAnimation(actor,1,0,2);
- ActorShadow_Disable((u8 *)actor+0x320);
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    {
+        u32 value = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+        u32 mask = 3;
+        return (mask & value) + 1;
+    }
+}
+void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+{
+    s32 values[8];
+    u32 variant, flags;
+    struct ContactPackedVector range;
+    struct ScriptUtilityArguments arguments;
+    u16 script;
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+        u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
+            ((struct SceneActorAnimationView *)actor)->profileId,
+            ((struct SceneActorAnimationView *)actor)->profileMode, 0);
+        TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+        Select((void *)actor, entry[0x44], variant, flags);
+        TentacleBody_ResetDirectionalAnimations(actor->context, 18);
+        actor->field2B3 = 0;
+        SceneActorPlacement_PlayCategoryEventSound((void *)actor);
+        {
+            struct ContactCollider *c = (void *)((u8 *)actor + 0x134);
+            c->flags |= 4;
+        }
+    }
+    if (Mod(frame, 10) == 0) {
+        range.x = 60;
+        range.y = 60;
+        range.z = 40;
+        SparkParticle_Spawn(&actor->position, Random4(), &range, actor->direction + 128, 10, 8, 2,
+                            2);
+    }
+    TentacleBody_UpdateSegmentMotion(actor, frame);
+    if (!Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30))
+        return;
+    actor->field2B0 = 1;
+    ActorTrail_RemoveAllSegments(actor);
+    sub_080AB294(&actor->position);
+    {
+        u32 mask = 0x400;
+        if (!(actor->flags2CC & mask))
+            SceneActorBehavior_CallTerrainScript((void *)actor);
+    }
+    script = *(u16 *)((u8 *)actor + 0x1F8);
+    if (script) {
+        values[0] = actor->position.x;
+        values[1] = actor->position.y;
+        values[2] = actor->position.z;
+        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
+        values[4] = *(s32 *)((u8 *)actor + 0x200);
+        values[5] = *(s32 *)((u8 *)actor + 0x204);
+        values[6] = actor->field2E0;
+        values[7] = actor->id;
+        arguments.count = 8;
+        arguments.values = values;
+        Script_Call(script, &arguments);
+    }
+    {
+        u32 mask = 0x4000;
+        if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+    }
+    actor->fieldAA = 0;
+    {
+        void *callback = (void *)SceneActorControl_OnIdle;
+        u32 kind = 16;
+        actor->field2B2 = 1;
+        actor->field2B0 = 0;
+        actor->field2B5 = kind;
+        actor->target = callback;
+        actor->field2C8 = 0;
+        {
+            u32 *p = &actor->flags114;
+            u32 mask = ~1;
+            *p &= mask;
+        }
+        actor->word104 = 0;
+    }
+    SetAnimation(actor, 1, 0, 2);
+    ActorShadow_Disable((u8 *)actor + 0x320);
 }

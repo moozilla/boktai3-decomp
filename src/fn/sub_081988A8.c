@@ -30,7 +30,6 @@ struct Actor {
 extern const struct Pair gUnk_0824F65C, gUnk_0824F63C, gUnk_0824F664, gUnk_0824F644, gUnk_0824F66C,
     gUnk_0824F64C, gUnk_0824F674, gUnk_0824F654;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-#define SceneEffect_UpdateRecoil sub_081988A8
 void SceneEffect_UpdateRecoil(struct Actor *a)
 {
     s32 state = a->entered;
@@ -129,5 +128,5 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081988A8);
+INCLUDE_ASM("asm/nonmatching", SceneEffect_UpdateRecoil);
 #endif

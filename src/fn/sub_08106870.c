@@ -27,7 +27,7 @@ struct RegionSpriteManager {
     const void *sequenceResource, *alternateResource;
 };
 extern struct RegionSpriteManager *gUnk_020001B4;
-void sub_08105AB4(struct RegionSprite *);
+void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
 {
@@ -163,7 +163,6 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 extern u32 gUnk_030052F8, gUnk_030052FC;
 // confidence=low: script-created region actor selects one of two sprite resources and registers its terrain cell.
-#define RegionActor_CreateFromScript sub_08106870
 void RegionActor_CreateFromScript(void)
 {
     struct RegionSpriteManager *manager = gUnk_020001B4;
@@ -233,5 +232,5 @@ void RegionActor_CreateFromScript(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08106870);
+INCLUDE_ASM("asm/nonmatching", RegionActor_CreateFromScript);
 #endif

@@ -38,13 +38,12 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state,
 }
 void Bee_DisableMovement(void *);
 // confidence=low: eases saved motion before returning to idle; register allocation still differs.
-#define Bee_UpdateMovementStop sub_080924EC
 #ifdef NONMATCHING
 // fuzzy: 86.5%
 void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
-    register u8 *body asm("r8")=actor->context;
+    register u8 *body asm("r8") = actor->context;
     s32 x;
     s32 z;
     s16 *priorX;
@@ -58,8 +57,8 @@ void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         {
-            u32 mask=~0x100;
-            actor->flags2D4=mask & actor->flags2D4;
+            u32 mask = ~0x100;
+            actor->flags2D4 = mask & actor->flags2D4;
         }
     }
     {
@@ -98,26 +97,52 @@ void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
     actor->motion.z += z;
     *priorX += x;
     *priorZ += z;
-    if (AtRest(x,z)) {
-      register u32 zeroWord asm("r6")=0;
-      register u32 zeroByte asm("r4");
-      asm("" : "+r"(zeroWord));
-      actor->field2B0=1;
-      {u16 *p=&actor->flags2D4; u32 mask=~0x20; *p=mask & *p; zeroByte=0; asm("" : "+r"(zeroByte));}
-      {u32 *p=&actor->flags2CC; u32 mask=~0x80; *p &=mask;}
-      Bee_DisableMovement(actor);
-      {u32 phase=2; register u32 offset asm("r2")=0x2A8;
-       register u32 phaseOffset asm("r3");
-       *((u8 *)actor+offset)=zeroByte; phaseOffset=0x2A9; *((u8 *)actor+phaseOffset)=phase;
-       actor->behavior2AA=zeroByte; offset+=4; asm("" : "+r"(offset));
-       {register u32 *p asm("r0")=(void *)((u8 *)actor+offset); *p=zeroWord;}
-       phaseOffset+=8; {register u8 *p asm("r0")=(u8 *)actor+phaseOffset; *p=1;}
-      }
-      {u32 mask=8; *(u32 *)(body+0x3D4) |=mask;}
-      body[0x42A]=60;
+    if (AtRest(x, z)) {
+        register u32 zeroWord asm("r6") = 0;
+        register u32 zeroByte asm("r4");
+        asm("" : "+r"(zeroWord));
+        actor->field2B0 = 1;
+        {
+            u16 *p = &actor->flags2D4;
+            u32 mask = ~0x20;
+            *p = mask & *p;
+            zeroByte = 0;
+            asm("" : "+r"(zeroByte));
+        }
+        {
+            u32 *p = &actor->flags2CC;
+            u32 mask = ~0x80;
+            *p &= mask;
+        }
+        Bee_DisableMovement(actor);
+        {
+            u32 phase = 2;
+            register u32 offset asm("r2") = 0x2A8;
+            register u32 phaseOffset asm("r3");
+            *((u8 *)actor + offset) = zeroByte;
+            phaseOffset = 0x2A9;
+            *((u8 *)actor + phaseOffset) = phase;
+            actor->behavior2AA = zeroByte;
+            offset += 4;
+            asm("" : "+r"(offset));
+            {
+                register u32 *p asm("r0") = (void *)((u8 *)actor + offset);
+                *p = zeroWord;
+            }
+            phaseOffset += 8;
+            {
+                register u8 *p asm("r0") = (u8 *)actor + phaseOffset;
+                *p = 1;
+            }
+        }
+        {
+            u32 mask = 8;
+            *(u32 *)(body + 0x3D4) |= mask;
+        }
+        body[0x42A] = 60;
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080924EC);
+INCLUDE_ASM("asm/nonmatching", Bee_UpdateMovementStop);
 #endif

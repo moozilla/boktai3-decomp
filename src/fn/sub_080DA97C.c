@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: chooses a route, pursuit, or recovery response from the movement flags.
-#define Mummy_SelectMovementResponse sub_080DA97C
 
 #ifdef NONMATCHING
 // fuzzy: 85.4%
@@ -242,5 +241,5 @@ pursue:
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DA97C);
+INCLUDE_ASM("asm/nonmatching", Mummy_SelectMovementResponse);
 #endif

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: checkpoint completion restores player-route control and retries the route.
-#define Mummy_ResumeRouteAfterCheckpoint sub_080DC9D0
 
 #ifdef NONMATCHING
 // fuzzy: 98.9%
@@ -9,7 +8,7 @@
 #include "scene_actor_chase.h"
 
 void SceneActor_UpdateAnimationCheckpoint(void);
-void sub_080D3D60(void);
+void Mummy_UpdatePlayerRoute(void);
 void SceneActorControl_OnIdle(void);
 
 struct MummyCheckpointContext {
@@ -34,7 +33,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
             u32 mask = 0x1000;
             body->flags6F2 = mask | body->flags6F2;
         }
-        Chase_SetCtl(actor, sub_080D3D60, 0x27);
+        Chase_SetCtl(actor, Mummy_UpdatePlayerRoute, 0x27);
         Chase_SetBehavior(actor, 0x10);
         if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &actor->position)) {
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
@@ -43,5 +42,5 @@ void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DC9D0);
+INCLUDE_ASM("asm/nonmatching", Mummy_ResumeRouteAfterCheckpoint);
 #endif

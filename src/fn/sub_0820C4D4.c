@@ -1,5 +1,3 @@
-#define Screamer_WaitForPlayerApproach sub_0820C334
-#define Screamer_UpdateScream sub_0820C4D4
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
@@ -307,5 +305,5 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820C4D4);
+INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
 #endif

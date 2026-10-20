@@ -24,7 +24,7 @@ struct RegionSpriteManager {
     const void *sequenceResource, *alternateResource;
 };
 extern struct RegionSpriteManager *gUnk_020001B4;
-void sub_08105AB4(struct RegionSprite *);
+void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
 {
@@ -151,7 +151,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
     return done;
 }
 // confidence=low: region pool actor with behavior-controlled animation transitions.
-#define RegionActor_UpdateBehaviorAnimation sub_08105E6C
 void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
 {
     struct RegionSprite *p = input;
@@ -169,7 +168,7 @@ void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
             if (p->sequence.index == 3)
                 p->behaviorFlags = 0x24;
         } else {
-            sub_08105AB4(p);
+            ProximityActor_UpdateDamageAnimation(p);
             if (Test(&p->behaviorFlags, 1))
                 Step(&p->sprite, &p->sequence);
         }
@@ -177,5 +176,5 @@ void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08105E6C);
+INCLUDE_ASM("asm/nonmatching", RegionActor_UpdateBehaviorAnimation);
 #endif

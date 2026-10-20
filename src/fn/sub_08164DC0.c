@@ -4,12 +4,11 @@
 // fuzzy: 95.3%
 // Remaining differences: instruction selection, load placement, and literal-mask materialization.
 // confidence=low: transient gauges use two independent countdowns.
-#define Hud_UpdateTransientStatGauge sub_08164DC0
 extern u16 gUnk_0300517C;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 void StatDisplay_DrawTwoDigitCounter(s32);
-void sub_08164C0C(void);
+void ResultPanel_ClearFiveTiles(void);
 void Hud_UpdateTransientStatGauge(u8 *p)
 {
     s32 draw = 0, full = 0, partial = 0, width = 0, foreground = 0, background = 0, tile = 0, n;
@@ -90,11 +89,11 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         do {
             *cell-- = 0xd000;
         } while (--n >= 0);
-        sub_08164C0C();
+        ResultPanel_ClearFiveTiles();
         p[0xa7f] = 0;
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08164DC0);
+INCLUDE_ASM("asm/nonmatching", Hud_UpdateTransientStatGauge);
 #endif

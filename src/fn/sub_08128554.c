@@ -178,7 +178,6 @@ static inline u32 Step(struct FragmentSprite *owner, struct FragmentSequence *st
 }
 
 // confidence=low: animates three projected burst sprites and enables their short-lived impact collider.
-#define FragmentBurst_UpdateImpactAnimation sub_08128554
 static inline void ProjectShift(struct Vec *out, struct Vec *in, struct Vec *camera)
 {
     Project(out, in);
@@ -217,5 +216,5 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08128554);
+INCLUDE_ASM("asm/nonmatching", FragmentBurst_UpdateImpactAnimation);
 #endif

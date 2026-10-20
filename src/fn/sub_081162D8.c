@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: body-volume callback applies knockback and records special contacts.
-#define ActorRecoil_ReceiveBodyContact sub_081162D8
 
 struct Vec3s {
     s16 x, y, z, w;
@@ -88,7 +87,7 @@ static inline void polar(struct Vec3s *v, s32 angle, s32 speed)
 }
 u8 ScenePool_CanAcceptControl(struct Obj *);
 void SceneMotion_PlayKindSound(struct Msg *);
-u16 sub_0811E930(struct Obj *, u16);
+u16 ModifierStats_ApplyKind15(struct Obj *, u16);
 void ActorRecoil_ReceiveBodyContact(struct Obj *objArg, struct Msg *msgArg)
 {
     struct Msg *msg = msgArg;
@@ -150,7 +149,7 @@ void ActorRecoil_ReceiveBodyContact(struct Obj *objArg, struct Msg *msgArg)
 sound:
     SceneMotion_PlayKindSound(msg);
     if (isKind(msg->kind, 4) || isKind(msg->kind, 3)) {
-        obj->contactValue = sub_0811E930(obj, msg->value);
+        obj->contactValue = ModifierStats_ApplyKind15(obj, msg->value);
         obj->contactKind = msg->kind;
         obj->contactPending = 1;
     }

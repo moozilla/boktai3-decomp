@@ -54,7 +54,6 @@ static inline u8 Mode(u32 value, u32 mask, u32 expected)
         return 1;
     return 0;
 }
-#define LinkMenu_WaitForReadyPeers sub_08109F1C
 s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
 {
     u16 packets[4];
@@ -213,5 +212,5 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08109F1C);
+INCLUDE_ASM("asm/nonmatching", LinkMenu_WaitForReadyPeers);
 #endif

@@ -15,7 +15,7 @@ void sub_08166534(void *, s32, s32);
 void SceneHud_InitializeActionInput(void *);
 void SceneHud_LayoutActionGrid(void *);
 void sub_081672FC(void *);
-void sub_0816701C(void *, s32, s32, s32, s32, s32);
+void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 void ScrollingDialogue_RequestShow(void);
 void SceneHud_ShowActionPreview(void *);
 void PauseMenu_SetPromptIconPositions(void *, s32, s32);
@@ -51,7 +51,7 @@ void PauseInventory_InitEquipmentPage(u8 *p)
     SceneHud_InitializeActionInput(p);
     SceneHud_LayoutActionGrid(p);
     sub_081672FC(p);
-    sub_0816701C(p, 0, 0, 0, 1, z);
+    InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, z);
     ScrollingDialogue_RequestShow();
     SceneHud_ShowActionPreview(p);
     PauseMenu_SetPromptIconPositions(p, 0, 0);

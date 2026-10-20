@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-#define Player_UpdateDirectionRecovery sub_08148608
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct DisplaySequenceState *state = st;

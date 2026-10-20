@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: prioritizes defeat, recovery, and interrupted charge reactions.
-#define Hresvelgr_TryStartReaction sub_0819CFEC
 struct Sprite {
     u8 pad[9];
     u8 direction;

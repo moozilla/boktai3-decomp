@@ -1,12 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite     sub_081EC974
-#define Palette_InterpolateBanks            sub_08221110
-#define Mod                                 sub_0824859C
 // confidence=low: fades sprite palettes before emitting dispersal particles.
-#define SceneActors_UpdatePaletteDispersal sub_081EEAD8
 #ifdef NONMATCHING
 // fuzzy: 94.4%
 // Remaining differences: palette destination setup and particle-loop initialization order.
@@ -125,5 +119,5 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EEAD8);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePaletteDispersal);
 #endif

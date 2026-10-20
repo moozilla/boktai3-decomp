@@ -1,12 +1,12 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
-s32 Div(s32,s32);
-s32 Mod(s32,s32);
-u8 *TerrainModifiers_FindCellOverride(s32,s32);
+s32 Div(s32, s32);
+s32 Mod(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u8 sub_080E7FF4(void *);
 u8 sub_080E80BC(void *);
-s32 Math_Atan2(s32,s32);
+s32 Math_Atan2(s32, s32);
 void ActorShadow_Enable(void *);
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_03005308;
@@ -60,13 +60,17 @@ static inline u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-
-static inline u8 HasMode(u8 *p) { u32 mask=1; if (*(u16 *)(p+0x65C)&mask) return 1; return 0; }
+static inline u8 HasMode(u8 *p)
+{
+    u32 mask = 1;
+    if (*(u16 *)(p + 0x65C) & mask)
+        return 1;
+    return 0;
+}
 #ifdef NONMATCHING
 // fuzzy: 93.4%
 // Remaining differences: instruction ordering and register allocation.
 // confidence=low: generic scene actor leap; species ownership is not established.
-#define SceneActor_LeapTowardTarget sub_080E7134
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -76,44 +80,60 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
         s32 correcting;
         s32 speed;
         if (!HasMode(context)) {
-            if (!sub_080E7FF4(actor->context)) { SceneActor_ResetCollisionReaction(actor); return; }
-        } else if (!sub_080E80BC(actor->context)) return;
+            if (!sub_080E7FF4(actor->context)) {
+                SceneActor_ResetCollisionReaction(actor);
+                return;
+            }
+        } else if (!sub_080E80BC(actor->context))
+            return;
         CellCenter(&point, actor->terrainCell);
         Delta(&point, &actor->position, &point);
         correcting = 0;
-        switch (((actor->direction + 0x20)&0xFF)>>6) {
-        case 0: case 2:
-            if ((point.z < 0 ? -point.z : point.z)>0x40) {
-                CellCenter(&point, actor->terrainCell);
-                point.x = actor->position.x;
-                correcting = 1;
-            }
-            break;
-        case 1: case 3:
-            if ((point.x < 0 ? -point.x : point.x)>0x40) {
-                CellCenter(&point, actor->terrainCell);
-                point.z = actor->position.z;
-                correcting = 1;
-            }
-            break;
+        switch (((actor->direction + 0x20) & 0xFF) >> 6) {
+            case 0:
+            case 2:
+                if ((point.z < 0 ? -point.z : point.z) > 0x40) {
+                    CellCenter(&point, actor->terrainCell);
+                    point.x = actor->position.x;
+                    correcting = 1;
+                }
+                break;
+            case 1:
+            case 3:
+                if ((point.x < 0 ? -point.x : point.x) > 0x40) {
+                    CellCenter(&point, actor->terrainCell);
+                    point.z = actor->position.z;
+                    correcting = 1;
+                }
+                break;
         }
         if (correcting) {
             Delta(&delta, &actor->position, &point);
             speed = 4;
         } else {
-            Delta(&delta, &actor->position, (struct ContactPosition *)(*(u8 **)(group+0x1FC)+0x1C));
-            gUnk_03005308 = (gUnk_03005308+1)&1023;
-            { u32 random = gUnk_0203B400[gUnk_03005308]; s32 base = context[0x65E]-2; speed = base + (random&3); }
+            Delta(&delta, &actor->position,
+                  (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            {
+                u32 random = gUnk_0203B400[gUnk_03005308];
+                s32 base = context[0x65E] - 2;
+                speed = base + (random & 3);
+            }
         }
-        actor->direction = Math_Atan2(delta.x,delta.z);
-        Polar(&actor->secondaryMotion,actor->direction,speed);
-        *(u16 *)((u8 *)actor+0x2EE)=24;
-        SceneActorAnimation_SelectEntryFlags((void *)actor,14,SceneActor_GetDirectionFlags(actor->direction));
+        actor->direction = Math_Atan2(delta.x, delta.z);
+        Polar(&actor->secondaryMotion, actor->direction, speed);
+        *(u16 *)((u8 *)actor + 0x2EE) = 24;
+        SceneActorAnimation_SelectEntryFlags((void *)actor, 14,
+                                             SceneActor_GetDirectionFlags(actor->direction));
         Sound_PlaySong(0x1B2);
-        ActorShadow_Enable((u8 *)actor+0x320);
-    } else { u32 mask=16; if (actor->flags2D0&mask) actor->field2B0=1; }
+        ActorShadow_Enable((u8 *)actor + 0x320);
+    } else {
+        u32 mask = 16;
+        if (actor->flags2D0 & mask)
+            actor->field2B0 = 1;
+    }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E7134);
+INCLUDE_ASM("asm/nonmatching", SceneActor_LeapTowardTarget);
 #endif

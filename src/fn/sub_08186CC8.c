@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: behavior selection aligns the actor with the player and remembers attack origins.
-#define Armor_SelectAlignedAttack sub_08186CC8
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 80.6%
@@ -128,5 +127,5 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08186CC8);
+INCLUDE_ASM("asm/nonmatching", Armor_SelectAlignedAttack);
 #endif

@@ -1,5 +1,4 @@
 #include "motion_0818.h"
-#define SpinningApproach_DampReturnMovement sub_0818DC50
 struct ReturnDampingCounter {
     u8 pad[0x126];
     u16 ticks;

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
-#define ActorStatus_UpdatePlayerCapture sub_081B0F34
 
 // confidence=low: carries a player position request along a motion track
 #ifdef NONMATCHING
@@ -250,5 +249,5 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B0F34);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
 #endif

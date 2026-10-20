@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 95.9%
 // foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
 struct ActorImpact {
@@ -25,7 +25,7 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
     u8 *d = (u8 *)c;
     u32 v;
     int mask;
-    sub_0821FF8C(a);
+    Collision_CalculateDamageResponse(a);
     ((struct ActorImpact *)c)->value46a = b->cost;
     mask = 0x100;
     if (a->flags & mask)

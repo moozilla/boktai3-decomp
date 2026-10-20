@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hud_UpdateCountdownDigits sub_08165254
 extern u32 gUnk_02000560, gUnk_030053F4;
 extern u8 *gUnk_02000710;
 s32 Div(s32, s32);

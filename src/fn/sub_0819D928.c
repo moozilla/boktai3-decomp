@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: repeats charges until terrain or the attempt limit ends them.
-#define Hresvelgr_UpdateRepeatedCharge sub_0819D928
 
 struct Action {
     u8 state, pad[3];

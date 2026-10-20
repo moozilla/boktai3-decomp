@@ -84,7 +84,7 @@ void TentacleActor_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -126,7 +126,6 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
 }
 // confidence=low: pursues saved waypoints with an 800-frame transition.
-#define TentacleBody_UpdatePursuit sub_080A7C84
 void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -140,7 +139,7 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
-        sub_080A8904(actor);
+        TentacleActor_SelectWanderRoute(actor);
     }
     if ((u8)Callback_InvokeActor(actor, actor->update270)) {
         State0(actor);
@@ -151,7 +150,7 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
-        sub_080A8904(actor);
+        TentacleActor_SelectWanderRoute(actor);
         Delta(&delta, &actor->position, (void *)(body + 0x904));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
@@ -166,12 +165,12 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     }
     TentacleActor_UpdateOscillation(actor, 120, 10);
     if ((s32)actor->counter2AC > 800) {
-        sub_080A8904(actor);
+        TentacleActor_SelectWanderRoute(actor);
         State2(actor);
     } else
         actor->counter2AC++;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A7C84);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdatePursuit);
 #endif

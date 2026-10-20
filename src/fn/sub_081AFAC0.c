@@ -7,7 +7,7 @@
 s32 Math_Atan2(s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 extern u8 *gUnk_02000580;
 struct ContactActor {
     u8 pad0[6];
@@ -45,7 +45,7 @@ void ActorStatus_InitializeContact(struct ContactActor *actor, struct ContactAct
     s32 strength, shift, scaled;
     u32 value;
     u32 direction;
-    sub_0821FF8C(actor);
+    Collision_CalculateDamageResponse(actor);
     strength = other->strength;
     shift = status->strengthShift;
     if (strength >= 0)

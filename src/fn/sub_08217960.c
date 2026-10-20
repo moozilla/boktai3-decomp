@@ -1,5 +1,4 @@
 #include "global.h"
-#define Palette_ApplyBackgroundFade sub_08217960
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 86.7%
@@ -102,5 +101,5 @@ void Palette_ApplyBackgroundFade(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08217960);
+INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
 #endif

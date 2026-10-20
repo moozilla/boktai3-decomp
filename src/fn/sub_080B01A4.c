@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: accelerates along the route and chooses side-step or turn transitions.
-#define Vorn_UpdateRouteApproach sub_080B01A4
 
 #include "scene_actor_control_phase.h"
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);

@@ -172,7 +172,6 @@ static inline void Fan_Step(struct FanCannon *p, void *sprite, struct FanSeq *s)
     }
 }
 // confidence=low: script options initialize an eight-slot fan cannon and publish its occupied bit.
-#define FanCannon_CreateFromScript sub_0820A5CC
 s32 FanCannon_CreateFromScript(void)
 {
     struct FanManager *manager = gUnk_02000600;

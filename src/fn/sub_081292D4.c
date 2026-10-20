@@ -167,9 +167,8 @@ static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, str
     return ended;
 }
 
-void sub_08128F98(struct Feather *, s32);
+void FeatherEffectPool_SpawnGroundScatter(struct Feather *, s32);
 // confidence=low: emits ground scatter on frame three, then releases the completed feather effect.
-#define FeatherEffectPool_UpdateScatterAnimation sub_081292D4
 void FeatherEffectPool_UpdateScatterAnimation(void *unused, struct Feather *p)
 {
     struct Feather *sprite = p;
@@ -178,7 +177,7 @@ void FeatherEffectPool_UpdateScatterAnimation(void *unused, struct Feather *p)
         p->enter = 0;
     }
     if (p->sequence.index == 3 && !p->sequence.elapsed)
-        sub_08128F98(p, 4);
+        FeatherEffectPool_SpawnGroundScatter(p, 4);
     if (Step(sprite, &p->sequence, p)) {
         struct FeatherPool *pool = gUnk_02000174;
         pool->used &= ~(1 << p->slot);

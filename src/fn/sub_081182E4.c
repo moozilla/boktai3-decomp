@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
-#define Glove_UpdateDefeatEffects sub_081182E4
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -74,7 +73,7 @@ struct Glove {
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void sub_0811AE9C(struct Obj *);
+void Terrain_ResolveActorMotion(struct Obj *);
 void sub_0811D91C(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
@@ -280,7 +279,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
                 self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
             *pprevX = *px;
             *pprevZ = self->z;
-            sub_0811AE9C(self);
+            Terrain_ResolveActorMotion(self);
             a = (u32) ~(self->unk3C >> 12) >> 31;
             b = (u32) ~(self->unk38 >> 12) >> 31;
             if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&
@@ -321,5 +320,5 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081182E4);
+INCLUDE_ASM("asm/nonmatching", Glove_UpdateDefeatEffects);
 #endif

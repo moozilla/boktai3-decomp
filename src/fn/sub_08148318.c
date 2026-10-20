@@ -2,7 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: random neighboring directions with short hold durations.
-#define Player_UpdateWaveringMovement sub_08148318
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // Remaining differences: RNG allocation, even-direction address scheduling and literal pools.
@@ -206,5 +205,5 @@ void Player_UpdateWaveringMovement(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08148318);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateWaveringMovement);
 #endif

@@ -5,7 +5,6 @@
 // Shared animation tails, branch layout, and flag-pointer allocation still differ.
 #include "scene_actor_chase.h"
 // confidence=low: chooses turn animations and rotates toward the route's facing.
-#define Mummy_TurnTowardRoute sub_080D0FE8
 u32 Route_GetCurrentPointFacing(void *);
 struct TurnSequence {
     u8 pad[8];
@@ -188,5 +187,5 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D0FE8);
+INCLUDE_ASM("asm/nonmatching", Mummy_TurnTowardRoute);
 #endif

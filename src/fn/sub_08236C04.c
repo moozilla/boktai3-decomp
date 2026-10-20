@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ParticleBurst_EmitOrbitParticle sub_08236C04
 #include "engine.h"
 
 struct Unk08236C04Position {

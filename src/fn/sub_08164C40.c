@@ -4,7 +4,6 @@
 // fuzzy: 86.6%
 // Remaining differences: instruction selection, load placement, and literal-mask materialization.
 // confidence=low: gauge source is the save-state counter at 0x618.
-#define Hud_DrawStoredEnergyGauge sub_08164C40
 extern u8 *gUnk_02000710;
 extern u16 gUnk_0300517C;
 extern u16 gUnk_0300517A;
@@ -73,5 +72,5 @@ void Hud_DrawStoredEnergyGauge(u8 *p, s32 mode)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08164C40);
+INCLUDE_ASM("asm/nonmatching", Hud_DrawStoredEnergyGauge);
 #endif

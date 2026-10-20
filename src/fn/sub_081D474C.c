@@ -13,13 +13,12 @@ struct BestiaryConfig {
     u8 rest[10];
 };
 extern const struct BestiaryConfig gUnk_086126E0[];
-void sub_081D396C(s32, u8 *, u8 *, u32);
+void Dir_Decompose(s32, u8 *, u8 *, u32);
 s32 DisplayAnimation_InitializeKeyframes(void *, u32, u32, void *);
 s32 DisplayAnimation_InitializeSequence(void *, u32, u32, u32, void *);
 void DisplayAnimation_SetEntry(void *, u32, u32, u32, u32, u32, u32);
 void DisplayAnimation_UpdatePlayback(void *);
 void DisplayAnimation_SetPriority(void *, s32);
-#define BestiaryDisplay_CreateEntryAnimations sub_081D474C
 void BestiaryDisplay_CreateEntryAnimations(u8 *p)
 {
     struct EntryIds ids = gUnk_0824FC6C;
@@ -44,7 +43,7 @@ void BestiaryDisplay_CreateEntryAnimations(u8 *p)
         u32 sequence = config->sequence;
         *(u16 *)(p + 0xa00) = sequence;
     }
-    sub_081D396C(config->animation, p + 0x9fe, p + 0x9ff, *(u16 *)(p + 0xa00));
+    Dir_Decompose(config->animation, p + 0x9fe, p + 0x9ff, *(u16 *)(p + 0xa00));
     i = 4;
     id = &ids.id[4];
     for (; i >= 0; i--) {

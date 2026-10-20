@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: resumes pursuit from the route point, with a delayed control transition.
-#define Mummy_ResumePlayerPursuit sub_080DC228
 
 #ifdef NONMATCHING
 // fuzzy: 89.9%
@@ -159,5 +158,5 @@ void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DC228);
+INCLUDE_ASM("asm/nonmatching", Mummy_ResumePlayerPursuit);
 #endif

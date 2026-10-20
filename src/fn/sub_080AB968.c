@@ -8,7 +8,7 @@
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 void sub_080A69F0(void);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
 #define B(o) (*(u8 *)(p + (o)))
@@ -63,7 +63,7 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
     if (s->field2B0) {
         u32 zero;
-        sub_080A8904(s);
+        TentacleActor_SelectWanderRoute(s);
         SetControl(s, s->entryTarget228, 1);
         zero = 0;
         {

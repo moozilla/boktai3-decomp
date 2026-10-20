@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: animation checkpoint emits aimed shots with rising speed and falling strength.
-#define Mummy_FireAcceleratingVolley sub_080D62CC
 
 #include "scene_actor_reset.h"
 #include "engine.h"

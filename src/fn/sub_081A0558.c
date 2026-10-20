@@ -26,7 +26,7 @@ void Hresvelgr_SetAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 void sub_0819C6AC(struct ActorActionSequence *);
-void sub_0819CD60(struct ActorActionSequence *);
+void Hresvelgr_SteerTowardTarget(struct ActorActionSequence *);
 s32 SceneMover_IsNearTarget(void *, s32);
 static inline void Clear(void *dest, u32 *zero)
 {
@@ -64,7 +64,7 @@ void Hresvelgr_UpdateTargetMotion(struct ActorActionSequence *p)
     if (p->repeat)
         Sound_PlaySong(0x3d9);
     if (!SceneMover_IsNearTarget(p, 4)) {
-        sub_0819CD60(p);
+        Hresvelgr_SteerTowardTarget(p);
         if (++p->timer > 0x40) {
             p->timer = 1;
             sub_0819C6AC(p);

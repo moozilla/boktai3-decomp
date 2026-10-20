@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: initial attack sequence before arena departure.
-#define Hresvelgr_UpdateOpeningAttackCycle sub_0819DAB4
 
 struct Action {
     u8 state, pad[3];

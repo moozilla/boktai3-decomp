@@ -4,7 +4,6 @@
 // confidence=low: inherited route/reaction interpretation from static callers.
 
 // confidence=low: route role inferred from callers and terrain/path tests.
-#define Vorn_SelectReachableEscapeCell sub_080B2580
 
 #ifdef NONMATCHING
 // fuzzy: 94.5%
@@ -52,8 +51,8 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
 {
     void *route = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->position;
-    s32 result = sub_0821F204(route, position, target);
-    if (result && (result = sub_0821F7A8(route, position, target))) {
+    s32 result = Nav_IsPositionInMesh(route, position, target);
+    if (result && (result = Terrain_ApplyBlocked(route, position, target))) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
         return 1;
@@ -195,5 +194,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2580);
+INCLUDE_ASM("asm/nonmatching", Vorn_SelectReachableEscapeCell);
 #endif

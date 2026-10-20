@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define TentacleBody_RefreshDirectionalAnimations sub_080A8F38
 
 #ifdef NONMATCHING
 // fuzzy: 85.0%
@@ -158,5 +157,5 @@ void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 kind)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A8F38);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_RefreshDirectionalAnimations);
 #endif

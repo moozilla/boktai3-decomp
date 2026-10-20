@@ -9,7 +9,7 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_ReturnToEquipmentSelection(void *);
 void Hud_SaveGridSelection(void *);
 void SceneHud_ConfigureActionGrid(void *, u32, u32);
-void sub_08172E70(void);
+void SceneHud_UpdateActionTransferSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void SceneHud_UpdateActionChoice(struct SceneHudState *p)
 {
@@ -39,6 +39,6 @@ void SceneHud_UpdateActionChoice(struct SceneHudState *p)
             SceneHud_ConfigureActionGrid(q, 0, 1);
         else
             SceneHud_ConfigureActionGrid(q, 0, 2);
-        Hud_SetInteractionCallback(p, sub_08172E70, 1);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionTransferSelection, 1);
     }
 }

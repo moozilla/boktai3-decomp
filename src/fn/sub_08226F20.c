@@ -1,5 +1,4 @@
 #include "global.h"
-#define Camera_UpdatePositionMode sub_08226F20
 struct Vec {
     s16 x, y, z, pad;
 };

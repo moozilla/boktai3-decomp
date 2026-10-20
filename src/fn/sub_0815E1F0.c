@@ -8,7 +8,7 @@ void SceneActorControl_RequestDeparture(s32);
 s32 Player_RequestTimedReset(struct Player *, u32);
 void Player_EmitQueuedEffects(struct Player *);
 void sub_0813B1EC(struct Player *, struct ContactCollider *, struct ContactCollider *);
-void sub_0813D548(struct Player *, s32);
+void Player_QueueStatusEffect(struct Player *, s32);
 void sub_0813D834(struct Player *, s32, s32);
 s32 SceneParticle_CreateDefaultPriority(void *, void *, s32, s32, s32);
 extern const s16 gUnk_086149C4[];
@@ -123,17 +123,17 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x191;
-            sub_0813D548(p, 1);
+            Player_QueueStatusEffect(p, 1);
         }
     } else if (contactFlag(source, 0x400000)) {
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x133;
-            sub_0813D548(p, 2);
+            Player_QueueStatusEffect(p, 2);
         }
     } else if (contactFlag(source, 0x4000)) {
         p->contactActionTag = 0x133;
-        sub_0813D548(p, 3);
+        Player_QueueStatusEffect(p, 3);
         p->contactSpecial = 0;
     } else if (contactFlag(source, 0x40000))
         Player_EmitQueuedEffects(p);

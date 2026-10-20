@@ -37,7 +37,6 @@ static inline s32 RandomValue(const u16 *table)
     return *(const u16 *)(offset + (u32)table);
 }
 extern const s16 gUnk_086149C4[];
-#define OrbitEffect_SpawnOrbitTrail sub_081FDDC0
 void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
 {
     register u32 timer asm("r0") = p->trailTimer + 1;

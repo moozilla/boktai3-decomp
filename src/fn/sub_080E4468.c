@@ -5,7 +5,7 @@
 
 void Dog_UpdateAnimationFourteenReaction(void);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 struct DogAnim {
     u8 unknown0[7];
@@ -48,7 +48,7 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
         if ((anim->frame == 6 || anim->frame == 0xC || anim->frame == 0x13 ||
              anim->frame == 0x19) &&
             anim->timer == anim->rate - 1 && (u32)distance < *(u32 *)(context + 0x684)) {
-            sub_0807C72C(actor, 0, 1, actor->category);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
             Chase_SetBehavior(actor, 0x10);
             *(struct ContactPosition *)(context + 0x6D8) =
                 *(struct ContactPosition *)((u8 *)gUnk_02000580[0] + 0x30);
