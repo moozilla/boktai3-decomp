@@ -7,7 +7,14 @@ INCLUDE_ASM line is dropped, so tools/check.py, tools/regdiag.py and
 tools/permute.py see a file with one ROM function. With --nonmatching, FUNC's
 `#ifdef NONMATCHING` draft is selected (other drafts are dropped).
 Multi-name declarations (`int a, b;`) are split, which decomp-permuter needs.
+
+Library use: `ensure(src, func)` returns SRC unchanged when it holds one ROM
+function, else writes the isolated copy (draft selected) to
+build/isolated/UNIT__FUNC.c and returns that repo-relative path. permute.py,
+rasolve.py and translate.py call it, so they accept a function inside a
+multi-function unit directly (line numbers then refer to the isolated copy).
 """
+import os
 import re
 import sys
 
@@ -45,11 +52,8 @@ def split_decls(text):
                   r"(\w+(?:\s*,\s*\w+)+);\n", split, text, flags=re.M)
 
 
-def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    nonmatching = "--nonmatching" in sys.argv
-    unit, func, out = args
-    text = select_drafts(open(unit).read(), func, nonmatching)
+def isolate(text, func, out, nonmatching):
+    text = select_drafts(text, func, nonmatching)
     kept = []
     for item in items(text):
         code = strip_comments(item)
@@ -64,6 +68,31 @@ def main():
             continue
         kept.append(item)
     open(out, "w").write(split_decls("\n".join(kept) + "\n"))
+
+
+def ensure(src, func):
+    """Repo-relative path of a file holding only FUNC (a name or its sub_ address)."""
+    import split
+    from romlib import ROOT
+    path = src if os.path.isabs(src) else os.path.join(ROOT, src)
+    text = open(path).read()
+    names = split.c_functions(path)
+    if len(names) <= 1:
+        return os.path.relpath(path, ROOT)
+    # `#define Name sub_XXXXXXXX` aliases: the source may spell FUNC either way
+    spell = [func] + [n for n, a in re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M) if a == func]
+    name = next((n for n in spell if re.search(r"\b" + n + r"\b", text)), func)
+    out = os.path.join(ROOT, "build", "isolated", f"{os.path.basename(path)[:-2]}__{func}.c")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    isolate(text, name, out, True)
+    return os.path.relpath(out, ROOT)
+
+
+def main():
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    nonmatching = "--nonmatching" in sys.argv
+    unit, func, out = args
+    isolate(open(unit).read(), func, out, nonmatching)
 
 
 if __name__ == "__main__":
