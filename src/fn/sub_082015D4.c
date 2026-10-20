@@ -3,8 +3,9 @@
 #define ScriptCombatActor_ApplyHitReaction sub_082015D4
 
 #ifdef NONMATCHING
-// fuzzy: 70.0%
+// fuzzy: 82.4%
 // Remaining differences: RNG stores, loop constants, target-field scheduling and allocation.
+// MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
 
 /* Names and field interpretations are tentative. */
@@ -45,10 +46,12 @@ static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
     u16 *x = (u16 *)&v->x, *y = (u16 *)&v->y, *z = (u16 *)&v->z;
     u32 sample = RandomSample(table);
     u32 base = *x - 64;
+    asm("" : "+r"(base));
     *x = base + (sample & 127);
     *y = *y + (u8)RandomSample(table);
     sample = RandomSample(table);
     base = *z - 64;
+    asm("" : "+r"(base));
     *z = base + (sample & 127);
 }
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit, u8 *p)
@@ -75,7 +78,7 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
     sparks:
         if (U(0x19c) & source->flags) {
             struct SceneVec velocity, position;
-            const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+            register const u16 *table asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
             s32 i = 2;
             do {
                 velocity = gUnk_0824FE44;
