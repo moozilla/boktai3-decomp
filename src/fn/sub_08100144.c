@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 84.5%
 // foundry draft (worker best 84.5%); what differs is mostly register allocation and instruction order
-#define WoodenCrate_ReactToHit    WoodenCrate_ReactToHit
+
 #define WoodenCrate_TestFlag      WoodenCrate_HasFlags
 #define WoodenCrate_SetFlag       WoodenCrate_SetFlags
 #define WoodenCrate_StartSequence WoodenCrate_BeginToggleAnimation

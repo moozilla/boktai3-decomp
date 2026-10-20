@@ -1,4 +1,5 @@
 #include "contact_swarm.h"
+// confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 84.4%
 // Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.

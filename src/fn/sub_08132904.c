@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 81.1%
+// fuzzy: 87.1%
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -69,26 +69,24 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
             switch (LocalPlayer()) {
                 case 0:
                     if (*owner != 1)
-                        goto fail;
+                        return 0;
                     break;
                 case 1:
                     if (*owner != 2)
-                        goto fail;
+                        return 0;
                     break;
                 case 2:
                     if (*owner != 4)
-                        goto fail;
+                        return 0;
                     break;
                 case 3:
                     if (*owner != 8)
-                        goto fail;
+                        return 0;
                     break;
             }
         }
     }
     return 1;
-fail:
-    return 0;
 }
 
 struct FlagHalfword {
@@ -144,12 +142,22 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     timer = (u16 *)((u8 *)actor + 0x178);
     if (*timer)
         goto fail;
-    position = &actor->position;
-    maxHealth = (u16 *)&actor->defaultHealth;
-    if (Test(gUnk_030053F4, 0x4800))
-        gain = AreaEffect_ScaleLinkGainAtPosition(position, *maxHealth);
-    else
-        gain = AreaEffect_ScaleGainAtPosition(position, *maxHealth);
+    {
+        register struct ContactPosition *pos asm("r4");
+        register u16 *max asm("r5");
+        if (Test(gUnk_030053F4, 0x4800)) {
+            pos = &actor->position;
+            max = (u16 *)&actor->defaultHealth;
+            gain = AreaEffect_ScaleLinkGainAtPosition(pos, *max);
+        } else {
+            pos = &actor->position;
+            max = (u16 *)&actor->defaultHealth;
+            gain = AreaEffect_ScaleGainAtPosition(pos, *max);
+        }
+        asm("" : "+r"(pos), "+r"(max));
+        position = pos;
+        maxHealth = max;
+    }
     if (!gain)
         goto fail;
     dx = RandomBits(0x3F) - 16;

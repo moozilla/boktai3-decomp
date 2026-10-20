@@ -10,7 +10,7 @@ void Player_ResetStatus(void *);
 void Player_RecordInputTicks(void *);
 void Player_ConsumeActionCharge(void *);
 void Player_UpdateColliderRefreshCountdown(void *);
-s32 sub_0815E8A4(void *);
+s32 PlayerContact_ApplyTerrainDamage(void *);
 void Player_EnterKindFour(void *);
 void sub_0815EBB8(void *);
 void PlayerContact_UpdateThresholdEvent(void *);
@@ -40,7 +40,7 @@ s32 Player_Update(struct Player *p)
             else
                 gUnk_02000528 = 0;
         }
-        if (sub_0815E8A4(p))
+        if (PlayerContact_ApplyTerrainDamage(p))
             Player_EnterKindFour(p);
         else if (p->tetherMode != 0x26) {
             sub_0815EBB8(p);

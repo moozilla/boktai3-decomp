@@ -14,7 +14,7 @@ void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32,
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
-s32 sub_0821D6F4(struct SceneVec *, s32);
+s32 Terrain_HasHigherCorner(struct SceneVec *, s32);
 s32 Region_FindContaining();
 void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
@@ -1100,7 +1100,7 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     Memory_Clear(p->sprite, 40);
     ParticleSprite_Initialize(p->sprite, manager->graphics, 0);
     Effect_SetOrigin(p->sprite, -8, -10);
-    if (sub_0821D6F4(position, 128)) {
+    if (Terrain_HasHigherCorner(position, 128)) {
         {
             struct TriggerSprite *sprite = p->sprite;
             struct TriggerGraphics *graphics = manager->graphics;

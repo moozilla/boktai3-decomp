@@ -2,7 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.3%
+// fuzzy: 86.1%
 // Remaining differences: register allocation, cached pointers, and inline instruction order.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
@@ -98,7 +98,11 @@ u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *ac
             *(u16 *)(control + 8) = 0;
         }
     }
-    Chase_ClearMotionFlags(actor, 0x400);
+    {
+        u16 *field = &actor->flags2D4;
+        u32 mask = ~0x400;
+        *field &= mask;
+    }
     actor->field5DA = 0xff;
     Chase_ClearMotionFlags(actor, 0x1000);
     return 1;

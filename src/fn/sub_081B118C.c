@@ -3,11 +3,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
-#ifdef NONMATCHING
-// fuzzy: 92.9%
-// Remaining differences: entry pointer copies, owner resource addressing and state-store order.
-#define ActorStatus_BeginPlayerRelease                                                             \
-    sub_081B118C // confidence=low: positions player before setting release phase
+// confidence=low: positions player before setting release phase
 struct Status {
     u8 pad[0x160];
     u32 flags, state, timer;
@@ -18,7 +14,7 @@ void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
 static inline void StepSequence(void *obj)
 {
     register struct SceneActorControlMotionDrawable *owner asm("r6") = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
@@ -59,7 +55,7 @@ static inline void StepSequence(void *obj)
     {
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r5");
-        register u32 temp asm("r2");
+        register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -129,36 +125,45 @@ static inline void StepSequence(void *obj)
 void ActorStatus_BeginPlayerRelease(u8 *ownerArg, struct Status *status)
 {
     register struct Status *s asm("r6") = status;
-    register u8 *owner asm("r4") = ownerArg;
-    u32 mask = 12;
-    s->flags |= mask;
-    if (s->entered) {
-        s->entered = 0;
-        s->state = 0;
-        s->timer = 0;
-        s->phase = 1;
+    u8 *owner = ownerArg;
+    register u32 mask asm("r2") = 12;
+    {
+        register u32 *flags asm("r1") = &s->flags;
+        *flags |= mask;
+    }
+    {
+        u8 *reset = &s->entered;
+        if (*reset) {
+            u32 zero = 0;
+            *reset = zero;
+            s->state = zero;
+            s->timer = zero;
+            s->phase = 1;
+        }
     }
     switch (s->state) {
         case 0:
             Player_ApplyPositionRequest(gUnk_02000580, (u8 *)s + 0x1c, 80, 32, 128, 0, 0, 0);
             {
-                register void *data asm("r1") = *(void **)(owner + 0x4d0);
+                void *data = *(void **)(owner + 0x4d0);
                 register void *seq asm("r4");
-                asm("" : "+r"(data));
                 seq = (u8 *)s + 0x48;
                 Anim_SetSequence(seq, data, 9, *(u8 *)((u8 *)s + 0x15c), 0);
             }
             StepSequence(s);
-            s->state = 1;
-            s->timer = 0;
-            s->phase = 1;
+            {
+                u32 next = 1;
+                s->state = next;
+                s->timer = 0;
+                {
+                    register u8 *phase asm("r0") = &s->phase;
+                    *phase = next;
+                }
+            }
             break;
-        case 1:
-            s->done = 1;
-            break;
+        case 1: {
+            register u8 *done asm("r0") = &s->done;
+            *done = 1;
+        } break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081B118C);
-#endif

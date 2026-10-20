@@ -31,7 +31,7 @@ void SceneCatalog_ResetTextWindow(u8 *);
 void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void SceneCatalog_SetDescription(u8 *, s32);
 void InventoryGrid_UpdateModifierPreview(void);
-void sub_08175008(void);
+void Presentation_UpdateAllocationSelection(void);
 extern u16 gUnk_03004BD8;
 void Hud_InitStatusMenu(u8 *s)
 {
@@ -86,7 +86,7 @@ void Hud_InitStatusMenu(u8 *s)
         n = s[0x48AA] + 20;
         s[0x48AB] = n;
         SceneCatalog_SetDescription(s, (s8)s[0x48AB]);
-        Hud_SetInteractionCallback(s, sub_08175008, 0);
+        Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, zero);
     }
     {

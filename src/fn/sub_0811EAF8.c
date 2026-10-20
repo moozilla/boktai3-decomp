@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
-#define CallbackList_RunMatchingState CallbackList_RunMatchingState
+
 struct CallbackEntry {
     void *function;
     u8 unk4;

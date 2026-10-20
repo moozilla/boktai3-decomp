@@ -2,9 +2,9 @@
 #ifdef NONMATCHING
 // fuzzy: 94.7%
 // foundry draft (worker best 93.3%); what differs is mostly register allocation and instruction order
-#define Nidhoggr_UpdateDistanceLimitedEffect Nidhoggr_UpdateDistanceLimitedEffect
-#define gNidhoggrEffectPhaseDurations        gUnk_0824F292
-#define gNidhoggrEffectPhaseFrames           gUnk_0824F28C
+
+#define gNidhoggrEffectPhaseDurations gUnk_0824F292
+#define gNidhoggrEffectPhaseFrames    gUnk_0824F28C
 struct NidhoggrDistanceEffect {
     void *update;
     void *destroy;

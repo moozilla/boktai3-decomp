@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 81.4%
 // foundry draft (worker best 81.4%); what differs is mostly register allocation and instruction order
-#define ActorStatus_InitializeContact ActorStatus_InitializeContact
+
 s32 Math_Atan2(s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);

@@ -76,7 +76,7 @@ int SceneIndicator_Pause(void);
 int SceneIndicator_Resume(void);
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
-int sub_0821DA14(void *);
+int Terrain_GetHigherNeighborMask(void *);
 void Sprite_ApplyAnimation(void *, void *);
 void Collider_SetAttackPowerAndForce(void *, int, int);
 void Collider_SetAttackProperties(void *, int, int, int, int, int);

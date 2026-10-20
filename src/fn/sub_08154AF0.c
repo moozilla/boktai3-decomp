@@ -1,6 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
+// fuzzy: 97.5%
+// Remaining six differences allocate recoil and direction offsets to other registers.
 // fuzzy: 97.5%
 
 struct P {

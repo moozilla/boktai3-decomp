@@ -36,7 +36,7 @@ struct PackedAnchor {
     s16 x, y, z;
 };
 extern struct DisplayCamera *gUnk_020004B8;
-void sub_081ED8A0(void);
+void SceneActors_UpdateDelayedMovement(void);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
 void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
 {
@@ -46,7 +46,7 @@ void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
         s32 threshold = 0;
         s32 limit = (actor->limit - 180) << 12;
         if (limit != 0)
-            threshold = actor->callback != sub_081ED8A0;
+            threshold = actor->callback != SceneActors_UpdateDelayedMovement;
         if (position->x < threshold)
             position->x = limit;
         screen = &actor->screen;

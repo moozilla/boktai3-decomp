@@ -84,8 +84,7 @@ static inline s32 RoundDirection(s32 n)
         return n >> 6;
     return -((-n) >> 6);
 }
-#define Vorn_SelectReachableEscapeCell                                                             \
-    sub_080B2580 // confidence=low: tests cardinal cells at decreasing ranges.
+// confidence=low: tests cardinal cells at decreasing ranges.
 u8 sub_0812E118(u32, u32, u32, u32);
 static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
 {
@@ -169,5 +168,5 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B2580);
+INCLUDE_ASM("asm/nonmatching", Vorn_SelectReachableEscapeCell);
 #endif

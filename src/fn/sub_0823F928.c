@@ -1,191 +1,157 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 87.8%
-// draft; cases 0-7 follow Player_UpdateTetherChargeB, case 8 is the orbiting hit effect
+#include "player.h"
+// confidence=low: charge phases and orbiting attack collider identify a spinning attack.
+#define B(o) (*(u8 *)(p + (o)))
+#define H(o) (*(u16 *)(p + (o)))
+#define W(o) (*(u32 *)(p + (o)))
+struct AttackVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
 extern const s16 gUnk_086149C4[];
-void SceneParticleBurst_CreateWithPause(void *, void *, void *, u32, u32, u32);
-s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(u8 *, s32, s32);
-void Player_SetTetherMode(u8 *, s32, s32);
-void Player_PlayLocalSong(s32 a, u32 b);
-void Player_StopLocalSong(s32 a, u32 b);
-s32 Player_UpdateFacingFromInputHistory(u8 *p);
-void Player_SetDirectionalVelocity_08238300(u8 *, s32);
-void DirectionalEffect_PlaceSprite(u8 *, u32, u8 *);
+void Player_SetTetherMode(void *, u32, u32);
+u32 ActorVariant_GetTableValue(u32, u32);
+u32 sub_08238280(void *, u32, u32);
+u32 Player_UpdateFacingFromInputHistory(void *);
+
+void Player_PlayLocalSong(u32, u32);
+void Player_StopLocalSong(u32, u32);
+u32 Player_GetConfiguredActionPower(void *);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
-void sub_08238238(u8 *);
-u32 Player_GetConfiguredActionPower(u8 *);
-void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 
-struct BurstA {
-    s32 a;
-    u32 b : 16;
-    u32 c : 16;
-};
-struct BurstB {
-    u32 a : 16;
-    u32 b : 16;
-    u32 c : 16;
-    u32 d : 16;
-};
-struct Pos {
-    u32 x : 16;
-    s32 y : 16;
-    u32 z : 16;
-    u32 pad : 16;
-};
-
-static inline int scale(int n)
+void Player_SetDirectionalVelocity_08238300(void *, u32);
+void sub_08238238(void *);
+void DirectionalEffect_PlaceSprite(void *, u32, void *);
+void SceneParticleBurst_CreateWithPause(void *, void *, void *, u32, u32, u32);
+static inline s32 scale(s32 v)
 {
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
 }
-
-void Player_UpdateTetherChargeC(u8 *p)
+void Player_UpdateChargedSpinAttack(u8 *p)
 {
-    struct BurstA ba;
-    struct BurstB bb;
-    struct Pos pos;
-    u16 *t;
-    u16 *c;
-    u8 *q, *pp;
-    u32 cnt;
-    s32 a, id, ang;
-
-    if (*(u8 *)(p + 0x457) != 3)
+    if (B(0x457) != 3)
         Player_SetTetherMode(p, 3, 0);
-    switch (*(u8 *)(p + 0x458)) {
+    switch (B(0x458)) {
         case 0:
-            if (sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x23), 0x40))
+            if (sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x23), 0x40))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) <= 6)
-                break;
-            *(u8 *)(p + 0xC0F) = 0;
-            if (*(u16 *)(p + 0x428) <= 9) {
-                a = *(s32 *)(p + 0x18);
-                id = 0xD5;
-                goto fin;
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40);
+            if (++H(0x45A) > 6) {
+                B(0xC0F) = 0;
+                if (H(0x428) <= 9) {
+                    Player_PlayLocalSong(W(0x18), 0xD5);
+                    Player_SetTetherMode(p, 3, 5);
+                } else if ((**(u16 **)(p + 0x348)) & 2)
+                    Player_SetTetherMode(p, 3, 2);
+                else {
+                    Player_PlayLocalSong(W(0x18), 0x203);
+                    Player_SetTetherMode(p, 3, 5);
+                }
             }
-            if (**(u16 **)(p + 0x348) & 2) {
-                Player_SetTetherMode(p, 3, 2);
-                break;
-            }
-            goto l203;
+            break;
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
-            t = (u16 *)(p + 0x45A);
-            if (*t == 6)
-                Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F8);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40);
+            if (H(0x45A) == 6)
+                Player_PlayLocalSong(W(0x18), 0x1F8);
             if (!(**(u16 **)(p + 0x348) & 2)) {
-            l203:
-                a = *(s32 *)(p + 0x18);
-                id = 0x203;
-            fin:
-                Player_PlayLocalSong(a, id);
+                Player_PlayLocalSong(W(0x18), 0x203);
                 Player_SetTetherMode(p, 3, 5);
-                break;
+            } else if (++H(0x45A) > 29) {
+                B(0xC0F) = 1;
+                ((struct Player *)p)->actionEighteenParameter = 0x16F;
+                ((struct Player *)p)->actionEighteenDuration = 0x24;
+                Player_PlayLocalSong(W(0x18), 0x1F9);
+                Player_SetTetherMode(p, 3, 4);
             }
-            (*t)++;
-            if (*t <= 0x1D)
-                break;
-            *(u8 *)(p + 0xC0F) = 1;
-            *(u16 *)(p + 0xAD6) = 0x16F;
-            *(u16 *)(p + 0xAD8) = 0x24;
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
-            Player_SetTetherMode(p, 3, 4);
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
-            if (**(u16 **)(p + 0x348) & 2)
-                break;
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x2E9);
-            *(u16 *)(p + 0xC0A) = ((8 - *(u8 *)(p + 0x3A4)) & 7) << 5;
-            Collider_SetAttackProperties(p + 0xB8C, Player_GetConfiguredActionPower(p), 0x20, 0x10,
-                                         2, 0x1E);
-            Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x202);
-            Player_SetTetherMode(p, 3, 8);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40);
+            if (!(**(u16 **)(p + 0x348) & 2)) {
+                u32 power;
+                Player_PlayLocalSong(W(0x18), 0x2E9);
+                ((struct Player *)p)->statModifierContext.contactTimer =
+                    ((8 - ((struct Player *)p)->facing) & 7) << 5;
+                power = Player_GetConfiguredActionPower(p);
+                Collider_SetAttackProperties(p + 0xB8C, power, 0x20, 0x10, 2, 30);
+                Player_PlayLocalSong(W(0x18), 0x202);
+                Player_SetTetherMode(p, 3, 8);
+            }
             break;
         case 5:
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x25), 0x40);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x25), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 4)
+                B(0xBF6) = 1;
+            if (++H(0x45A) > 4)
                 Player_SetTetherMode(p, 3, 6);
             break;
-        case 6:
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
+        case 6: {
+            register u32 pending asm("r0");
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
-                *(u8 *)(p + 0xBF6) = 1;
-            if (*(u8 *)(p + 0xBF6)) {
-                *(u8 *)(p + 0xBF6) = 0;
-                *(u8 *)(p + 0x458) = 1;
-                break;
-            }
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 0xE) {
-                *(u8 *)(p + 0xBF6) = 0;
+                B(0xBF6) = 1;
+            pending = B(0xBF6);
+            if (pending) {
+                B(0xBF6) = 0;
+                B(0x458) = 1;
+            } else if (++H(0x45A) > 14) {
+                B(0xBF6) = 0;
                 Player_SetTetherMode(p, 3, 7);
             }
             break;
+        }
         case 7:
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x23), 0x40);
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 4)
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x23), 0x40);
+            if (++H(0x45A) > 4)
                 Player_SetTetherMode(p, 0, 0);
             break;
         case 8: {
-            *(u8 *)(p + 0x4B9) = 0;
+            struct AttackVec offset, size, pos;
+            s32 angle;
+            B(0x4B9) = 0;
             if (Player_UpdateFacingFromInputHistory(p))
                 Player_SetDirectionalVelocity_08238300(p, 6);
-            cnt = *(u16 *)(p + 0x45A) & 3;
-            pp = p + 0x30;
-            if (cnt == 0) {
-                ba.a = 0;
-                ba.b = 0;
-                bb.a = 0x20;
-                bb.b = 0;
-                bb.c = 0x20;
-                SceneParticleBurst_CreateWithPause(pp, &ba, &bb, 1, 2, 4);
+            if (!(H(0x45A) & 3)) {
+                offset.x = 0;
+                offset.y = 0;
+                offset.z = 0;
+                size.x = 32;
+                size.y = 0;
+                size.z = 32;
+                SceneParticleBurst_CreateWithPause(p + 0x30, &offset, &size, 1, 2, 4);
             }
-            c = (u16 *)(p + 0xC0A);
-            *c = (*c + 0x10) & 0xFF;
-            DirectionalEffect_PlaceSprite(p, *c, pp);
-            *(long long *)&pos = *(long long *)(p + 0x30);
-            ang = (0x1A0 - *c) & 0xFF;
-            pos.x += scale(gUnk_086149C4[(ang + 0x40) & 0xFF] * 0xAA);
-            pos.y += 0xE6;
-            pos.z += scale(gUnk_086149C4[ang] * 0xAA);
-            q = p + 0xB8C;
-            Collider_SetPosition(q, &pos, 0);
-            *(u8 *)(p + 0xBCE) = ang;
-            Collider_Refresh(q);
-            *(u8 *)(p + 0x3A4) = ((0x10F - *(u16 *)(p + 0xC0A)) & 0xFF) >> 5;
+            ((struct Player *)p)->statModifierContext.contactTimer =
+                (((struct Player *)p)->statModifierContext.contactTimer + 16) & 255;
+            DirectionalEffect_PlaceSprite(p, ((struct Player *)p)->statModifierContext.contactTimer,
+                                          p + 0x30);
+            pos = *(struct AttackVec *)(p + 0x30);
+            angle = (0x1A0 - ((struct Player *)p)->statModifierContext.contactTimer) & 255;
+            pos.x += scale(170 * gUnk_086149C4[(angle + 64) & 255]);
+            pos.y += 230;
+            pos.z += scale(170 * gUnk_086149C4[angle]);
+            Collider_SetPosition(p + 0xB8C, &pos, 0);
+            B(0xBCE) = angle;
+            Collider_Refresh(p + 0xB8C);
+            ((struct Player *)p)->facing =
+                ((0x10F - ((struct Player *)p)->statModifierContext.contactTimer) & 255) >> 5;
             sub_08238238(p);
-            sub_08238280(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x25), 0x40);
-            t = (u16 *)(p + 0x45A);
-            if ((*t & 0xF) == 0)
-                Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x204);
-            (*t)++;
-            if (*t >= (*(u8 *)(p + 0xC0F) << 5)) {
-                Player_StopLocalSong(*(s32 *)(p + 0x18), 0x202);
+            sub_08238280(p, ActorVariant_GetTableValue(B(0x418), 0x25), 0x40);
+            if (!(H(0x45A) & 15))
+                Player_PlayLocalSong(W(0x18), 0x204);
+            if (++H(0x45A) >= (B(0xC0F) << 5)) {
+                Player_StopLocalSong(W(0x18), 0x202);
                 Player_SetTetherMode(p, 3, 6);
             }
             break;
         }
-        default:
-            break;
     }
-    *(u8 *)(p + 0xAC9) = 9;
+    B(0xAC9) = 9;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherChargeC);
-#endif

@@ -1,7 +1,9 @@
 #include "global.h"
 
+// confidence=low: action phases push neighboring scene objects and emit position effects.
+
 #ifdef NONMATCHING
-// fuzzy: 91.6%
+// fuzzy: 92.9%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -116,7 +118,7 @@ static inline int isTwo(struct P *p)
     return r;
 }
 
-void sub_08142194(struct P *p)
+void Player_UpdateObjectPush(struct P *p)
 {
     s32 sb;
     u8 state;
@@ -224,6 +226,8 @@ void sub_08142194(struct P *p)
                 b.z -= 0x80;
             } else if (d == 3) {
                 a.x -= 0x34;
+                a.y += 0;
+                a.z += 0;
                 b.x += 0x80;
                 b.z += 0x40;
             } else if (d == 5) {
@@ -254,5 +258,5 @@ void sub_08142194(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08142194);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateObjectPush);
 #endif

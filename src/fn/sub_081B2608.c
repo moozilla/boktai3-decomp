@@ -4,7 +4,7 @@
 #include "scene_vec.h"
 // confidence=low: moves a Vanargand part along its heading, then plays sequence 7.
 #ifdef NONMATCHING
-// fuzzy: 83.8%
+// fuzzy: 88.0%
 // Remaining differences: register lifetimes, state-transition layout, and literal pools.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -155,10 +155,19 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     return ended;
 }
+static inline void SetState(struct VanargandPart *p, u32 state)
+{
+    p->state = state;
+    p->timer = 0;
+}
+static inline void SetFlags(struct VanargandPart *p, u32 mask)
+{
+    p->flags |= mask;
+}
 void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
 {
     register u8 *savedBoss asm("r9") = boss;
-    register u8 *enter asm("r8");
+    u8 *enter;
     u32 state;
     struct SceneVec delta;
     u32 mask = 0x20;
@@ -177,15 +186,13 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
     state = p->state;
     switch (state) {
         case 0:
-            mask = 8;
-            p->flags |= mask;
+            SetFlags(p, 8);
             MotionTrack_Update(p->motion);
             {
                 u32 finished = p->motion[0x29] == 2;
                 asm("" : "+r"(finished));
                 if (finished) {
-                    p->state = 1;
-                    p->timer = 0;
+                    SetState(p, 1);
                     p->enter = 1;
                 }
             }
@@ -197,8 +204,7 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
                 Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 7, (u8)p->variant, 0);
             }
             if (StepPlayback(p, &p->sequence, p, state)) {
-                p->state = 2;
-                p->timer = 0;
+                SetState(p, 2);
                 *enter = 1;
             }
             break;

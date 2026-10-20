@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
+// confidence=low: tentative Vorn behavior role.
 #ifdef NONMATCHING
 // fuzzy: 83.4%
 // Remaining differences: register choices, address derivation, and two late constant reloads.

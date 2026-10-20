@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
-#define PhaseObject_EndApproachPause PhaseObject_EndApproachPause
+
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];

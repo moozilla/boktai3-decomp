@@ -36,7 +36,7 @@ void Ratatosk_UpdatePointDistancesToPlayer(struct Ratatosk *);
 void SceneDistance_UpdateLinkedDistances(struct Ratatosk *);
 void SceneDistance_UpdateLinkedTargetDistances(struct Ratatosk *);
 void sub_081F6B90(struct Ratatosk *);
-void sub_081FA418(struct Ratatosk *);
+void Ratatosk_UpdateSunOrbPlayerTransfer(struct Ratatosk *);
 void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
 {
     struct Ratatosk *actor = p;
@@ -52,7 +52,7 @@ void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
         Ratatosk_UpdatePointDistancesToPlayer(p);
         SceneDistance_UpdateLinkedTargetDistances(p);
     }
-    sub_081FA418(actor);
+    Ratatosk_UpdateSunOrbPlayerTransfer(actor);
     SceneActors_UpdateAnimation(actor, actor->animation, (s32)&actor->animationDelta);
     Ratatosk_OscillateScale(actor);
     actor->colliderPosition.x = sprite->position.x;
