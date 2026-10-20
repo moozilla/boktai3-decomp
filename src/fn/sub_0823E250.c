@@ -5,7 +5,7 @@ extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-void sub_0823E124(struct Player *, struct SceneVec *, u32, s32);
+void Player_EmitRandomSpark(struct Player *, struct SceneVec *, u32, s32);
 
 struct SpinCtx {
     u8 unk0[0x48];
@@ -52,7 +52,7 @@ s32 Player_UpdateSpinAction(struct Player *p)
                 u32 m = 0x80000;
                 p->statusFlags |= m;
             }
-            sub_0823E124(p, &q->dest, q->heading, q->index);
+            Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
         }
     } else if (q->timer < q->phase1 + q->phase2) {
         s32 radius = q->speed * q->phase1 + 0xCC;
@@ -63,7 +63,7 @@ s32 Player_UpdateSpinAction(struct Player *p)
                 p->statusFlags |= m;
             }
             if (!(q->timer & 1))
-                sub_0823E124(p, &q->dest, q->heading, q->index);
+                Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
         }
     }
     if (++q->timer >= q->phase1 + q->phase2 + q->phase3) {

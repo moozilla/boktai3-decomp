@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
 
-#define Terrain_ClassifyOffsetHeight sub_0823DE6C
-
 struct TerrainMap {
     u32 pad;
     u8 *cells;

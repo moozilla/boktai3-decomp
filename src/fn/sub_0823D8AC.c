@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#define Player_StartContactAttack sub_0823D8AC
-
 u32 Player_GetConfiguredActionPower(struct Player *);
 u32 Player_CollectCallbackFlags(struct Player *);
 void Player_ConsumeActionResource(struct Player *);

@@ -8,7 +8,7 @@ extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-void sub_0823D97C(struct Player *, struct SceneVec *, s32, u32, s32);
+void Player_EmitSweepSpark(struct Player *, struct SceneVec *, s32, u32, s32);
 
 struct SweepCtx {
     u8 unk0[0x48];
@@ -63,7 +63,7 @@ s32 Player_UpdateSweepAction(struct Player *p)
                 p->statusFlags |= m;
             }
             if (q->timer & 1)
-                sub_0823D97C(p, &q->origin, angle, p->side, q->index);
+                Player_EmitSweepSpark(p, &q->origin, angle, p->side, q->index);
         }
         return 0;
     }

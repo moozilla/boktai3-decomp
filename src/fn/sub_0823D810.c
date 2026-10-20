@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#define Player_ApplyContactCosts sub_0823D810
-
 u32 sub_08220204(struct Player *, void *);
 s32 sub_08249244(void *, struct Player *, void *, void *);
 s32 PlayerLink_IsActionModeAllowed(void *);
