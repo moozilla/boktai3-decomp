@@ -3623,16 +3623,12 @@ addr,name,mode,confidence,source,notes
 08100F28,NamedObject_IsWithinSpriteBounds,thumb,low,src-alias,Tests whether a position lies within supplied horizontal and vertical distances of sprite coordinates
 08100F60,NamedObject_StepTowardTarget,thumb,low,src-alias,
 08101550,NamedObject_IsPlayerWithinContactBounds,thumb,low,src-alias,
-081015EC,NamedObject_UpdateContactTrigger,thumb,low,src-alias,Per-frame update for a scripted object that toggles state on player contact and fires its scripts
 08101810,NamedObject_ApplyVerticalImpulseAndJitter,thumb,low,src-alias,
-081018DC,NamedObject_UpdateRouteFollower,thumb,low,src-alias,Per-frame update for a scripted object that steps along its route and fires scripts at route ends
 08101A3C,NamedObject_FindByName,thumb,low,src-alias,Searches twelve object entries for a matching name key
 08101A74,NamedObject_GetFollowTarget,thumb,low,src-alias,Finds the object matching the manager follow target key used by release-from-script
 08101AB4,ActorGroup_ReleaseMember,thumb,low,src-alias,
 08101D2C,NamedObject_UpdateTerrainRegistration,thumb,low,src-alias,
 08101E20,NamedObject_IsMapCellOccupied,thumb,low,src-alias,Tests whether an entry with flag 1 at B8 records the supplied map cell index
-08101E6C,NamedObject_TryCapturePlayer,thumb,low,src-alias,Offers the object as the pending object of an attached player standing on a flagged terrain cell outside the contact bounds
-08101FF8,NamedObject_UpdateEntryTrigger,thumb,low,src-alias,Calls the entry script once a player on a flagged cell moves outside the object's contact bounds
 081028F8,NamedObject_ClearAttachmentFlag,thumb,low,src-alias,
 08102978,NamedObject_UpdatePlayerFollowFlags,thumb,low,src-alias,Updates player status flags and target name according to the object's state
 081029C0,NamedObject_UpdateTetherFollowFlags,thumb,low,src-alias,Updates tether actor status flags and target name according to the object's state
