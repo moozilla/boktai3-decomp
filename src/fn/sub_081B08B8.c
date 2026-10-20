@@ -354,5 +354,5 @@ void ActorStatus_UpdatePlayerApproach(u8 *boss, struct ActorStatusPart *part)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerApproach);
+INCLUDE_ASM("asm/nonmatching", sub_081B08B8);
 #endif
