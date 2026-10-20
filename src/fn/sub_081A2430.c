@@ -1,8 +1,12 @@
 #include "global.h"
+
+// confidence=low: dispatches scene messages into action and animation state.
+#define Hresvelgr_DispatchSceneMessages sub_081A2430
+#define Hresvelgr_UpdateRisingProjectile sub_081A12DC
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fuzzy: 87.5%
 // Remaining differences: trigger indexing and shared mode/action constant lifetimes.
 // confidence=low: dispatches pending cutscene messages into action and animation state.
 struct Vec {
@@ -147,5 +151,5 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
+INCLUDE_ASM("asm/nonmatching", sub_081A2430);
 #endif
