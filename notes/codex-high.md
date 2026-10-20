@@ -795,3 +795,94 @@ build was run; it belongs to batch integration. The pre-existing modification
 to tools/cloud_task.py was left untouched. Scratch candidates and diagnostics
 remain ignored under wip/codex-high/ and build/. Shared HANDOFF, INDEX and
 history files were not edited, per the cloud-worker scope.
+
+## Task 080D6608 — 2026-10-20
+
+Tags: #matching #mummy #dog #scene-actor #register-pinning
+
+Worked solo on the already-claimed cloud/080D6608 branch. No network operations,
+full build, generated-file edits or shared documentation edits. Final outcomes:
+two checked exact retained bodies and four guarded drafts. The dog C bodies
+were already present and byte-identical before this pass; their commits add the
+required file-local aliases (and remove one unnecessary hint for 080DDEC8).
+Do not count those pre-existing bodies as newly recovered exact-code percentage
+or percentage-point gain from this session. Draft improvements earn no exact
+progress credit.
+
+- **080D812C drafted 98.3%**, `Mummy_UpdateBurnDamage` (tentative).
+  Reviewed extent 6504 bytes, candidate also 6504; final realigned difference
+  **59 instructions, seven ignoring registers**. The large statistics tail is
+  the saturating category/weapon defeat-counter code shared with
+  SceneActorReaction_DefeatRecordStats (08132D2C) and Ivy_UpdateDefeat
+  (080EE1B0). Reused those matched C idioms rather than reproducing each switch
+  arm independently. Actor +3D4 owns four halfword effect durations at relative
+  +1E4, count +1EC, active mask +1EE and damage timer +1F0; relative +AA supplies
+  the damage exponent. Every 40 ticks it subtracts 1 << exponent, flashes the
+  palette and can display damage. At zero health it changes control, records
+  defeat statistics and clears both timers. Action 0x15 clears the effect.
+  The status interpretation as burn remains tentative. Important correction:
+  the action-0x15 flags clear is **~0x10**, because the ROM derives -17 by
+  subtracting 0x31 from 0x20. Keeping a typed collider pointer for cost +3E,
+  spelling the duration indexing at each use and using an inline CpuSet fill
+  reduced structural differences substantially. A shared status-store label
+  also matters. Remaining differences are the signed mask materialization,
+  collider/flag pointer copies, category-pointer move order and registers.
+  Pointer-output damage-helper variants regressed; signed/bitfield mask forms
+  improved the local clear but worsened allocation elsewhere. Final diagnostic
+  pins retain the damage flag pointer, HUD ownership operands and status value.
+  An initial 96.9% checkpoint was committed before the later improvement.
+- **080D6608 drafted 92.5%**, `Mummy_TryDirectPursuit` (tentative).
+  Reviewed extent 2032 bytes, candidate 2028; final realigned difference
+  **103 instructions, 12 ignoring registers**. Starts with a same-row/column
+  reachability scan using sub_0812E118, then falls back to the player route
+  reacquisition path. The retained draft began at 87.0%. Separate success
+  checks, a signed group flag update, passing &target directly to TryRoute,
+  an r7 random-mask local and the target-index pointer in r1 improved it.
+  Remaining PRE stack-slot ordering dominates the register differences in
+  the turn/save-control block; some caller pointer reloads also differ.
+  Rewriting the retry loop with a chosen label and forcing the whole arrival
+  group to sb did not improve the retained candidate.
+- **080D9B20 drafted 82.3%**, `SceneActor_FindDirectionalCell` (tentative).
+  Reviewed extent 1768 bytes, candidate 1764; final realigned difference
+  **269 instructions, 250 ignoring registers**. Checks the requested neighbour
+  against height and blocking bits 0x43, otherwise returns the actor's cell.
+  The retained u8 Adjacent candidate scored 85.3% but generated only 1444 bytes
+  and had 574 structural differences with call-based realignment. Widening
+  Adjacent's result to u32 recovers the duplicated body structure and nearly
+  the complete length, despite the lower coarse fuzzy score. Open result
+  widths, narrowed index types, nested returns, independent conditions and
+  explicit result variables did not recover the ROM's particular cross-jumps.
+  The older shorter form remains available in the parent commit.
+- **080D6FDC drafted 80.6%**, `Mummy_RequestStraightRoute` (tentative).
+  Reviewed and candidate extents 1068 bytes; final realigned difference
+  **105 instructions, 17 ignoring registers**. Retained the existing candidate
+  and supplied its required alias. Scans in the facing direction to the last
+  open cell, starts a route, and arms a 240-tick cooldown on success. Its map
+  address spills across Mod instead of staying in r6, giving a 0x14 frame
+  rather than 0x10. Tested accessor temporaries, animation argument widths,
+  signed masks, map pointer outputs, success polarity and instrumented GCSE
+  table sizes 401..801. None improved the retained source; table size alone
+  does not explain this register choice.
+- **080DDEC8 matched**, `Dog_RestoreRoute`, reviewed extent **608 bytes**.
+  Existing body matched after adding its local alias. Compared its delayed
+  follow-up control and route restoration with Golem_RestoreRoute (080C4A9C):
+  dog uses a 20-frame chase delay and sets flag 4 after the timer extension.
+  Depinning reduced four recognized hints to three; exact check still passes.
+- **080DE128 matched**, `Dog_SelectTargetAction`, reviewed body **772 bytes**
+  through 080DE42C; the following retained byte blob is not part of this C body.
+  Existing body matched after adding its local alias. Selects responses 0x75,
+  0x82 and 0x87 from target distance, heading error and cooldowns, or asks
+  sub_080DF400 to move. Depinning retained all four recognized hints.
+
+All task functions have local Subsystem_VerbNoun aliases. Both exact bodies
+passed check.py with explicit reviewed extents. All four drafts were formatted
+with the venv clang-format, scored using --nonmatching --record, and their
+INCLUDE_ASM default branches passed separate checks. Concession markers remain
+on hinted units. The integrator still owns the one combined ROM build.
+
+Tool caveat discovered here: depin.py on a guarded draft checks the default
+INCLUDE_ASM branch and consequently treats every hint as removable. Those
+results were discarded. Run depinning on the unguarded candidate instead;
+it correctly reports that these nonmatching candidates cannot be minimized
+as exact matches. The final guarded drafts preserve their tested hints.
+Scratch hypotheses and checks are ignored under wip/ and build/.
