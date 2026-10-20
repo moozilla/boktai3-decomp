@@ -250,5 +250,5 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
+INCLUDE_ASM("asm/nonmatching", sub_081B0F34);
 #endif
