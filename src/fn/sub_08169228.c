@@ -49,8 +49,8 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
     ResultPanel_DrawCappedCounters(p, 0, 3, 1);
     ResultPanel_DrawCappedSmallCounters(p, 0, 3, 2);
     StatDisplay_DrawPlayerValue(p, 0, 3, 3);
-    if (!(gUnk_03005260[0] & 4) && !p->primarySlideTimer && !p->secondarySlideTimer
-        && !p->tertiarySlideTimer) {
+    if (!(gUnk_03005260[0] & 4) && !p->primarySlideTimer && !p->secondarySlideTimer &&
+        !p->tertiarySlideTimer) {
         PauseMenu_FinishEquipmentSelection(p);
     } else {
         if ((gUnk_03005260[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible) {
