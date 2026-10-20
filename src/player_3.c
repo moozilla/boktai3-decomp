@@ -1,4 +1,5 @@
 #include "player_3.h"
+// MATCHING_CONCESSION: register-pinning
 
 #define Player_UpdateAttachedAttackCharge sub_0814F328
 #define Player_UpdateSelectedAttackCharge sub_0814E3D8
@@ -48,7 +49,111 @@ void Player_LoadVisualParameters(struct Player *p)
 
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
 
+void sub_0813C798(struct Player *);
+void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
+s32 WirelessGame_GetSelectedEquipmentEffect(s32);
+s32 Player_GetUsableEnchantment(struct Player *);
+#ifdef NONMATCHING
+// fuzzy: 87.9%
+// Owner/mode register allocation and shared tail stores differ.
+// confidence=low: applies timed palette overlays and the current enchantment pulse.
+#define Player_UpdateVisualPalette sub_0813CB8C
+void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
+{
+    register u32 mode asm("r4") = requestedMode;
+    s32 intensity;
+    s32 effect;
+    s32 weight;
+    const u16 *source;
+    s32 i;
+    u16 *base;
+    u16 *destination;
+    if (p->actionVariant != p->baseActionVariant) {
+        p->baseActionVariant = p->actionVariant;
+        Player_LoadVisualParameters(p);
+    }
+    intensity = Player_GetVisualEffectFlags(p);
+    if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
+        p->savedSpriteResource = mode;
+        p->unkAC6[0] = intensity;
+        sub_0813C798(p);
+    }
+    if (!p->actionEighteenDuration) {
+        if (gUnk_030053F4 & 0x1000)
+            effect = WirelessGame_GetSelectedEquipmentEffect((s8)p->thresholdMode) - 1;
+        else
+            effect = Player_GetUsableEnchantment(p);
+        if (effect >= 0) {
+            p->actionRequestHold = effect + 0x16E;
+            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            if (p->actionRequestTimer <= 31)
+                weight = p->actionRequestTimer;
+            else if (p->actionRequestTimer <= 47)
+                weight = 32;
+            else if (p->actionRequestTimer <= 79)
+                weight = 80 - p->actionRequestTimer;
+            else
+                weight = 0;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+            if (++p->actionRequestTimer > 95)
+                p->actionRequestTimer = 0;
+        } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
+            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            if ((u16)(p->actionRequestTimer - 33) <= 14)
+                p->actionRequestTimer = 48;
+            if (p->actionRequestTimer <= 32) {
+                weight = p->actionRequestTimer;
+                p->actionRequestTimer = weight - 1;
+            } else {
+                weight = 80 - p->actionRequestTimer;
+                if (++p->actionRequestTimer > 79)
+                    p->actionRequestTimer = 0;
+            }
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        } else {
+            p->actionRequestHold = 0;
+            p->actionRequestTimer = 0;
+            if (!p->unk419)
+                p->actionVariantResource = (u32)p->visualParameters;
+            else
+                p->visualObject->parameters = (u32)p->visualParameters;
+        }
+    } else {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            if (!p->unk419) {
+                destination = (u16 *)((u8 *)p + 0x380);
+                base = (u16 *)p->visualParameters;
+                for (i = 0; i < 16; i++) {
+                    if ((u32)(i - 5) <= 1 || i == 13)
+                        *destination = *base;
+                    else
+                        *destination = *source;
+                    source++;
+                    destination++;
+                    base++;
+                }
+                p->actionVariantResource = (u32)((u8 *)p + 0x380);
+            } else {
+                destination = (u16 *)((u8 *)p + 0x380);
+                for (i = 15; i >= 0; i--) {
+                    *destination++ = *source++;
+                }
+                p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+            }
+        } else {
+            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        }
+        p->actionEighteenDuration--;
+    }
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813CB8C);
+#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
 
@@ -63,7 +168,7 @@ void Player_SelectSpriteResource(struct Player *p)
 
 void sub_0813D178(void *);
 
-void sub_0813CB8C(void *, u32);
+void sub_0813CB8C(struct Player *, u32);
 
 static inline u32 ReadVisualFlag(u32 *flags, u32 mask)
 {
