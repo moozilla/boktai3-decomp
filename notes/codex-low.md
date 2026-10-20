@@ -2438,3 +2438,52 @@ Exact progress: 0.0 percentage-point gain. Six existing guarded drafts retained,
 - 08152A5C: retained 97.5%, six differing instructions / zero structural. Speed-offset constant wants r2 and direction-offset constant r5. Pinning both constants with input or read/write constraints regressed to 81.9% by losing address reuse; reverted. Reviewed body is 480 bytes through 08152C3C; default fallback still includes the following assembly extent, so default-path matches are never counted as C progress.
 
 All six recorded with check.py --nonmatching --record; all default assembly fallbacks also checked. depin.py --write incorrectly removed hints by checking the guarded assembly path; all such removals were rejected and the original hints restored before final recording. No claim of removable hints. Formatting applied with pinned clang-format, then alias whitespace restored to the exact naming contract. Separate draft commits queued through build/commit.sh, notes last.
+
+
+## Task 081175F8 follow-up — 2026-10-20
+
+Tags: #matching #glove #motion #recoil
+
+Two new unpinned exact matches: 0.0583 percentage-point code gain (1,408 bytes).
+All six task functions reviewed; only per-file check.py checks, no full build or
+network. Restored required file-local aliases for the cached address-named ELF.
+
+- 08117948: retained guarded Glove_UpdateStopping at 86.4%, 99 realigned
+  differing instructions / 39 ignoring registers. Baseline was 90.0%, 85 / 42.
+  Passing the motion object into the secondary action inline reduces structural
+  differences, though allocation and the fuzzy score worsen; retained the
+  structural improvement per BIG_FUNCTIONS guidance. Separate byte and halfword
+  initialization zeros remove four further differences. Constant-first damage
+  flag and declaration swaps do not improve it. Action pointer lifetimes remain.
+- 081182E4: improved guarded Glove_UpdateDefeatEffects from 80.7% to 81.3%,
+  138 / 63 (baseline 140 / 66). Delay actionSelf initialization until after
+  sound calls; calculate the palette destination before indexing; swap style
+  and motionBias declarations. Cleanup pointer setup/spills and motion
+  allocation remain. Existing scalar-height register concession retained.
+- 08117F6C: stopped below acceptance, best new scratch 74.9%, 120 / 49,
+  Glove_UpdateRecovery. Reusing an explicit flags pointer, delaying the vertical
+  position pointer until after the height clamp, and placing the link mask
+  before global loads improve structure. Transplanting the exact recoil motion
+  block regresses to 63.8%; unpinning height regresses too. Pointer spills and
+  lifetimes remain. Source stays in untracked wip/sub_08117F6C.c.
+- 081175F8: stopped below acceptance; retained previous 70.0% launch scratch.
+  Inlining the physics body directly regresses to 66.2%; explicit motion
+  pointers reach 37 structural differences but only 63.6% overall. No new
+  declaration-swap improvement. Useful alternate in ignored
+  build/launch-explicit-pointers.c, original in wip/sub_081175F8.c.
+- 08119378: matched Glove_UpdateRecoilReturn, reviewed extent 704 bytes.
+  Script command case 2 configures recoil and selects this callback; animation
+  zero runs until ActorRecoil_UpdateMotion returns nonzero, then consumes the
+  trigger and selects 081198F8. Adapted exact Glove_UpdateImpactRecoil motion,
+  removing speed clamps. Declaring completion before height establishes stack
+  order; callback/activation pointer/zero locals establish the final stores.
+- 08119638: matched Glove_UpdateStaggerReturn, reviewed extent 704 bytes.
+  Script command case 6 selects this counterpart; animation 0x21 completes
+  into Glove_UpdateStaggerRecoil (08118E30). Same exact body as 08119378 except
+  the animation and completion callback.
+
+Formatted production units with pinned clang-format. Both matches pass explicit
+704-byte check.py acceptance. Draft scores recorded with --nonmatching --record;
+assembly fallbacks also pass and are not counted as C progress. Queued one
+commit per match/draft through build/commit.sh, notes last. Batch integration
+validation remains with the orchestrator.
