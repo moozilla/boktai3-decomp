@@ -2967,3 +2967,5 @@ Offline solo worker pass: four unpinned exact matches and two retained guarded d
 - **081A0BC8 — retained draft 96.1%**, `Hresvelgr_UpdateBoundaryBarrage`, 732 reviewed bytes. Restored the required local alias and recorded score. Still 14 realigned register-only differences, chiefly RNG mask and signed remainder temporaries and terrain constant allocation. Existing register-pinning concession retained. No improvement or exact credit claimed.
 
 No Ghidra export is available. Largest-first review identified existing drafts; relatives then supplied the exact shared state-machine scaffolding for the remaining functions. Combined ROM validation remains with the integrator.
+
+Final default-path verification found the cached assembly files still use address names. Both retained drafts now use address-named INCLUDE_ASM fallbacks; each default path passed the exact check. These fallback fixes were queued separately after the draft commits.
