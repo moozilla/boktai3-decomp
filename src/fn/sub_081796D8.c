@@ -1,3 +1,4 @@
+#define FieldHud_UpdateNumberDisplay sub_081796D8
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 97.5%
@@ -108,5 +109,5 @@ void FieldHud_UpdateNumberDisplay(struct NumberDisplay *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", FieldHud_UpdateNumberDisplay);
+INCLUDE_ASM("asm/nonmatching", sub_081796D8);
 #endif
