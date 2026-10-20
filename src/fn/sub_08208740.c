@@ -1,10 +1,12 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define CannonTurret_FireAimedVolley sub_08208498
+#define CannonTurret_UpdateCombat sub_08208740
 #ifdef NONMATCHING
-// fuzzy: 81.7%
-// Remaining differences: pause layout, vector setup, register allocation and explicit callback result.
+// fuzzy: 84.5%
+// Collider and sprite views, constant reuse, and the defined zero return still differ.
 #include "display_animation.h"
 #include "scene_vec.h"
-// MATCHING_CONCESSION: register-pinning
 extern u32 gUnk_030053F0, gUnk_02000560, gUnk_03005308;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -55,8 +57,9 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
     }
     {
         u32 frame = *command >> 6;
-        asm("" : "+r"(sprite) : "r"(frame));
-        sprite->frame = frame;
+        register struct DisplaySequenceSprite *out asm("r3") = sprite;
+        asm("" : "+r"(out) : "r"(frame));
+        out->frame = frame;
     }
     {
         u32 input = state->flags;
@@ -95,6 +98,7 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
             }
             {
                 register struct DisplaySequenceSprite *out asm("r3") = sprite;
+                asm("" : "+r"(out));
                 out->flags = flags;
             }
         }
@@ -269,9 +273,13 @@ s32 CannonTurret_UpdateCombat(u8 *p)
         H(0x134) = 0;
     }
     W(0x18)++;
-    return 0;
+    {
+        register s32 result asm("r0") = 0;
+        asm("" : "+r"(result));
+        return result;
+    }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
+INCLUDE_ASM("asm/nonmatching", sub_08208740);
 #endif
