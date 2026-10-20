@@ -2612,3 +2612,67 @@ on unguarded scratch copies and correctly declined to minimize non-exact C;
 concession markers remain. One driver commit queued per draft, with this
 notes commit last. Combined ROM validation and name promotion are deferred
 to integration.
+
+
+## Task 081A9910 — 2026-10-20
+
+Tags: #matching #vanargand #paired-scene-actor #register-pinning
+
+Worked solo and offline on the preclaimed cloud/081A9910 branch. Inspected the
+largest targets first, read BIG_FUNCTIONS.md and prior attempts, and used only
+per-file checks. Exact task instruction coverage gained **13.9 percentage
+points** (465 of the assigned 3335 instructions); project-wide accounting is
+left to batch integration. Exact sources total 1172 bytes, both in the
+Register-pinned category.
+
+- **081ABA64 — stopped unmatched.** Re-read opening assembly, the condensed
+  eleven-phase listing and relatives. The 37% relative coverage is chiefly
+  packed-animation expansion; it does not supply the track/contact phase
+  machine. Existing notes identify the local far-branch labels correctly.
+  No complete close candidate or new structural hypothesis emerged; left
+  assembly in use.
+- **081AA788 — stopped below threshold.** Resumed the scratch sweeping-projectile
+  attack at 75.4% (225 realigned differences, 99 ignoring registers). Pinning
+  the scale helper's second input in r8 and independently forming each
+  auxiliary-animation address from owner+0x444 reduced structural differences
+  to 88, total still 225; latest score 75.6%. Explicit projectile RNG table/mask
+  bindings and a barrier separating angle subtraction regressed, so discarded.
+  Remaining: stack slots, timer-pointer lifetime, randomized-projectile argument
+  allocation and phase-reset tails. Latest full candidate remains only in
+  ignored wip/sub_081AA788.c; no production draft below 80%.
+- **081A9910 — matched, Vanargand_UpdateSynchronizedPairAttack.** New readable
+  C matches the full reviewed 676-byte extent. Commands 3/4/5 run both halves
+  through repeated synchronized attacks, with positive-counter checks selecting
+  motion parameters at +0x588 or +0x586. Two halves in state 5 set +0xF3C to 60;
+  after three repetitions, selected halves receive recovery command 6, and
+  motion parameter +0x584 is restored. Local mask variables reproduce constant
+  load order. Explicit next/zero locals recover shared transition tails. Fixed
+  r4/r5 status locals solve the pair-status register swap. depin removed the
+  unnecessary owner constraint; two bindings remain. Name is tentative.
+- **081A9BB4 — drafted 98.5%, Vanargand_UpdateFacingPairAttack.** New full
+  552-byte candidate starts pair command 7, randomly chooses command 11 (one
+  in four) or 8, and uses facing plus the active-half mask to select a half.
+  Stores its index at +0x5B6; completion restores parameter +0x584. A u8 facing
+  predicate reproduces the materialized boolean. Compute random bits before
+  setting the default command to reproduce the conditional layout. Four
+  differing instructions, zero ignoring registers: RNG table literal uses r1
+  instead of r2; pair-slot offset uses r2 instead of r0. Scoped constraints,
+  address-expression variants and declaration swaps did not improve the clean
+  candidate. Recorded score and verified default INCLUDE_ASM fallback exact.
+- **081A9F88 — matched, Vanargand_UpdateChargedPairAttack.** Improved the
+  retained 92.8% draft to exact across its reviewed 496-byte extent. An owner
+  constraint after the halves-finished call prevents PRE retaining pair-slot
+  address in r4 across that call; scoped r4/r5 status bindings recover both
+  loads and comparisons. A zero constraint gives the separate phase-zero reset.
+  depin reduced four hints to three. Removed guard, formatted and rechecked.
+- **081AA178 — retained draft 99.5%, Vanargand_UpdateRepeatedPairAttack.**
+  Added the required file-local alias and raw-address fallback so the fast
+  checker resolves it against this checkout's ELF. One byte/instruction still
+  differs: phase-zero timer reset uses r7 rather than r5, both zero. Phase
+  output constraints, fixed phase/zero bindings and a fixed timer pointer
+  regressed allocation; restored the best source. Score re-recorded against
+  the full 440-byte extent; default fallback checked exact.
+
+Per-function sources were committed through build/commit.sh. No full build,
+network action, generated assembly, ROM or emulator output was committed.
+Combined ROM verification and name promotion remain for the integrator.
