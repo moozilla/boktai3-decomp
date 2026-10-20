@@ -42,7 +42,7 @@ s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void StatusPanel_BeginAnimatedTransition(void *);
 void ScenePanel_BeginSelection(void *);
-void sub_0816A280(void *);
+void PauseMenu_UpdateQuantityInput(void *);
 void ScenePanel_UpdateDetail(struct ScenePanel *p)
 {
     Anim_Step(&p->mainSprite, p->keyframes);
@@ -66,5 +66,5 @@ void ScenePanel_UpdateDetail(struct ScenePanel *p)
         Sound_PlaySong(0xDE);
         ScenePanel_BeginSelection(p);
     } else
-        sub_0816A280(p);
+        PauseMenu_UpdateQuantityInput(p);
 }

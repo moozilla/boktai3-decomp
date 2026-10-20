@@ -68,13 +68,13 @@ void TetherActor_SetPosition(void *);
 void TetherActor_AddStatusFlags(s32, u32);
 void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *, struct NamedObject *);
 u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32);
-void sub_08101E6C(void);
+void NamedObject_TryCapturePlayer(void);
 void sub_08102570(void);
 void NamedObject_UpdateTerrainRegistration(void);
-void sub_08101FF8(void);
+void NamedObject_UpdateEntryTrigger(void);
 void sub_0810271C(void);
-void sub_081021DC(void);
-void sub_081023CC(void);
+void NamedObject_ConstrainPlayer(void);
+void NamedObject_ConstrainTether(void);
 static inline s32 optionalValue(void)
 {
     if (Script_GetPc())
@@ -145,7 +145,7 @@ void NamedObject_CreateFromScript(void)
             s32 m;
             sprite->y = e->heightLow;
             e->state = 1;
-            e->handlers[0] = sub_08101E6C;
+            e->handlers[0] = NamedObject_TryCapturePlayer;
             e->handlers[1] = sub_08102570;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
@@ -160,7 +160,7 @@ void NamedObject_CreateFromScript(void)
             s32 m;
             sprite->y = e->heightLow;
             e->state = 1;
-            e->handlers[0] = sub_08101E6C;
+            e->handlers[0] = NamedObject_TryCapturePlayer;
             e->handlers[1] = sub_08102570;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
@@ -175,7 +175,7 @@ void NamedObject_CreateFromScript(void)
             s32 m;
             sprite->y = e->heightLow;
             e->state = 1;
-            e->handlers[0] = sub_08101FF8;
+            e->handlers[0] = NamedObject_UpdateEntryTrigger;
             e->handlers[1] = sub_0810271C;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 2;
@@ -199,8 +199,8 @@ void NamedObject_CreateFromScript(void)
         }
         case 2:
             e->state = 4;
-            e->handlers[0] = sub_081021DC;
-            e->handlers[1] = sub_081023CC;
+            e->handlers[0] = NamedObject_ConstrainPlayer;
+            e->handlers[1] = NamedObject_ConstrainTether;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 0;
             switch (e->row) {

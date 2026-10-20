@@ -9,7 +9,7 @@ struct S {
 };
 
 void Menu_SetBackgroundMap(u32 p, u32 b);
-void sub_081DCFE4(struct S *s);
+void NameEntry_UpdateCursor(struct S *s);
 
 void NameEntry_ToggleCharacterPage(struct S *s)
 {
@@ -23,5 +23,5 @@ void NameEntry_ToggleCharacterPage(struct S *s)
         s->a = 0;
         Menu_SetBackgroundMap(s->d, 0);
     }
-    sub_081DCFE4(s);
+    NameEntry_UpdateCursor(s);
 }

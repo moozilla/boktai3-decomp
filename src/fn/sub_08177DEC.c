@@ -13,7 +13,7 @@ void Bg_ClearTilemap(s32);
 void Hud_SetupBackgroundLayer(u8 *, void *, s32, s32, s32);
 void SceneHud_RefreshWidgetVisibility(u8 *);
 void MessageWindow_SetPalette(s32);
-void sub_08169BE0(u8 *);
+void PauseMenu_RefreshStatusPanel(u8 *);
 /* The HUD block is large and mostly unmapped; offsets are read raw. */
 #define HUD_U8(o)  (*(u8 *)(hud + (o)))
 #define HUD_U16(o) (*(u16 *)(hud + (o)))
@@ -94,7 +94,7 @@ void Hud_SetMode(u32 mode)
         if (shown)
             MessageWindow_SetPalette(0xEFDA);
         if (gUnk_030053F4 & 0x1000)
-            sub_08169BE0(hud);
+            PauseMenu_RefreshStatusPanel(hud);
     }
     HUD_U8(0xA8E) = 0;
 }

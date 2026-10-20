@@ -3677,12 +3677,18 @@ addr,name,mode,confidence,source,notes
 08100F28,NamedObject_IsWithinSpriteBounds,thumb,low,src-alias,Tests whether a position lies within supplied horizontal and vertical distances of sprite coordinates
 08100F60,NamedObject_StepTowardTarget,thumb,low,src-alias,
 08101550,NamedObject_IsPlayerWithinContactBounds,thumb,low,src-alias,
+081015EC,NamedObject_UpdateContactTrigger,thumb,low,src-alias,
 08101810,NamedObject_ApplyVerticalImpulseAndJitter,thumb,low,src-alias,
+081018DC,NamedObject_UpdateRouteFollower,thumb,low,src-alias,
 08101A3C,NamedObject_FindByName,thumb,low,src-alias,Searches twelve object entries for a matching name key
 08101A74,NamedObject_GetFollowTarget,thumb,low,src-alias,Finds the object matching the manager follow target key used by release-from-script
 08101AB4,ActorGroup_ReleaseMember,thumb,low,src-alias,
 08101D2C,NamedObject_UpdateTerrainRegistration,thumb,low,src-alias,
 08101E20,NamedObject_IsMapCellOccupied,thumb,low,src-alias,Tests whether an entry with flag 1 at B8 records the supplied map cell index
+08101E6C,NamedObject_TryCapturePlayer,thumb,low,src-alias,
+08101FF8,NamedObject_UpdateEntryTrigger,thumb,low,src-alias,
+081021DC,NamedObject_ConstrainPlayer,thumb,low,src-alias,
+081023CC,NamedObject_ConstrainTether,thumb,low,src-alias,
 081028F8,NamedObject_ClearAttachmentFlag,thumb,low,src-alias,
 08102978,NamedObject_UpdatePlayerFollowFlags,thumb,low,src-alias,Updates player status flags and target name according to the object's state
 081029C0,NamedObject_UpdateTetherFollowFlags,thumb,low,src-alias,Updates tether actor status flags and target name according to the object's state
@@ -5255,6 +5261,8 @@ addr,name,mode,confidence,source,notes
 08168FC4,SelectionPanel_RefreshVisibleEntries,thumb,low,src-alias,
 0816902C,SceneHud_RefreshSecondaryOptions,thumb,low,src-alias,
 081691C0,SelectionPanel_RefreshSecondaryEntries,thumb,low,src-alias,
+08169228,PauseMenu_UpdateEquipmentSelection,thumb,low,src-alias,
+08169504,PauseMenu_CreateSelectionWidgets,thumb,low,src-alias,
 081697B8,SelectionPanel_RefreshAttachedPanel,thumb,low,src-alias,
 08169818,PauseMenu_RefreshEquipmentPanel,thumb,low,src-alias,Runs four shared equipment display refresh helpers in sequence; panel identity is tentative
 08169838,SelectionPanel_ResetSecondarySelection,thumb,low,src-alias,
@@ -5265,11 +5273,14 @@ addr,name,mode,confidence,source,notes
 08169B38,StatusPanel_DrawFirstValue,thumb,low,src-alias,
 08169B74,StatusPanel_DrawSecondValue,thumb,low,src-alias,
 08169BB0,StatusPanel_ClearLowerRows,thumb,low,src-alias,
+08169BE0,PauseMenu_RefreshStatusPanel,thumb,low,src-alias,
 08169DAC,Hud_OnUnpausedRefresh,thumb,low,src-alias,Refreshes the HUD through its display updater when global flag bit zero is clear
 08169E94,StatusPanel_BeginRefresh,thumb,low,src-alias,
 08169EDC,StatusPanel_ResetSelectionAnimations,thumb,low,src-alias,
+08169F44,PauseMenu_RefreshPriceDigits,thumb,low,src-alias,
 0816A1E0,StatusPanel_UpdateGaugePosition,thumb,low,src-alias,
 0816A25C,StatusPanel_GetDirectionAxis,thumb,low,src-alias,
+0816A280,PauseMenu_UpdateQuantityInput,thumb,low,src-alias,
 0816A4EC,ScenePanel_BeginSelection,thumb,low,src-alias,
 0816A5A8,ScenePanel_BeginDetail,thumb,low,src-alias,
 0816A700,StatusPanel_BeginAnimatedTransition,thumb,low,src-alias,
@@ -7213,6 +7224,7 @@ addr,name,mode,confidence,source,notes
 081DB75C,Options_Destroy,thumb,low,src-alias,Options task destruction callback removes its five animation objects
 081DBA54,ScreenParams2C0_SetFromScript,thumb,low,src-alias,
 081DBB0C,Options_Create,thumb,medium,gcl-name,name from GCL key 96CD オプション (Options); registry callback
+081DBB4C,ScreenParams2E8_UpdateScreen,thumb,low,src-alias,
 081DBDC8,ScreenParams2E8_DestroyScreen,thumb,low,src-alias,Screen destruction callback clears display flags and removes its three animation objects
 081DBE04,ScreenParams2E8_InitScreen,thumb,low,src-alias,Initializes backgrounds and three animations using the scripted screen parameters
 081DBF98,ScreenParams2E8_SetFromScript,thumb,low,src-alias,
@@ -7225,6 +7237,7 @@ addr,name,mode,confidence,source,notes
 081DC1B4,Menu_StartFadeIn,thumb,low,src-alias,Starts a mode-zero screen fade with the requested speed when nonzero; fade direction tentative
 081DC1DC,Menu_StartFadeOut,thumb,low,src-alias,Starts a mode-one screen fade when the supplied duration is nonzero
 081DC208,PairedFlags_SelectActive,thumb,low,src-alias,
+081DC244,ScreenMessage_Update,thumb,low,src-alias,
 081DC448,ScreenMessage_Destroy,thumb,low,src-alias,Destruction callback removes the message indicator animations when enabled
 081DC470,ScreenMessage_Initialize,thumb,low,src-alias,Loads backgrounds and optional indicators then creates the scripted text window
 081DC618,ScreenParams_SetFromScript,thumb,low,src-alias,
@@ -7239,11 +7252,14 @@ addr,name,mode,confidence,source,notes
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
 081DCF20,TextEntry_CopyInitialName,thumb,low,src-alias,
 081DCF84,TextEntry_DrawName,thumb,low,src-alias,
+081DCFE4,NameEntry_UpdateCursor,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
 081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
+081DE84C,AnimPanel_UpdateDigits,thumb,low,src-alias,
+081DEA60,AnimPanel_HandleClockInput,thumb,low,src-alias,
 081DEC2C,Time_UpdateDateMenu,thumb,low,src-alias,
 081DEDF4,AnimPanel_RemoveAnimations,thumb,low,src-alias,
 081DEE38,Time_InitializeDateMenu,thumb,low,src-alias,
@@ -8944,8 +8960,14 @@ addr,name,mode,confidence,source,notes
 0823D714,Player_SaveActionIndex,thumb,low,src-alias,
 0823D7D4,Player_GetConfiguredActionPower,thumb,low,src-alias,Forwards to the action-type-dependent calculation using fields 0x420 and 0xBF8; power interpretation tentative
 0823D7E0,Player_CollectCallbackFlags,thumb,low,src-alias,
+0823DAB4,Player_UpdateSweepAction,thumb,low,src-alias,
+0823DC40,Player_UpdateThrowAction,thumb,low,src-alias,
 0823DDE4,SceneVec_OffsetPolar,thumb,low,src-alias,
 0823DE44,Player_GetTerrainHeightAtPosition,thumb,low,src-alias,Decodes a terrain height nibble and subtracts the local X or Z component for slopes
+0823DF20,Player_BeginSlashAction,thumb,low,src-alias,
+0823E250,Player_UpdateSpinAction,thumb,low,src-alias,
+0823E494,Player_UpdateSlashAction,thumb,low,src-alias,
+0823E810,Player_EmitScatterEffect,thumb,low,src-alias,
 0823FE60,Player_RunConfiguredActionHandler,thumb,low,src-alias,Enters state three and invokes the configured callback stored at offset 0xC88
 08241310,Player_GetAdjustedMovementInterval,thumb,low,src-alias,Computes a movement interval from a base of twelve or eight and clamps the adjusted result to at least two
 08242F7C,Player_FindMaskedSlot,thumb,low,src-alias,
