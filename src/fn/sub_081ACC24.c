@@ -271,5 +271,5 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_ApplyPendingDamage);
+INCLUDE_ASM("asm/nonmatching", sub_081ACC24);
 #endif
