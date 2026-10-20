@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define Hresvelgr_InitializeMotionCollider sub_081A51B8
 struct MotionPackedVector {
     s32 x : 16, y : 16, z : 16;
 };
