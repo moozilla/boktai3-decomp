@@ -143,5 +143,5 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080D1CD0);
 #endif
