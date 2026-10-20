@@ -1,4 +1,4 @@
-#define NamedObject_UpdateKindA sub_081018DC
+#define NamedObject_UpdateRouteFollower sub_081018DC
 #include "named_object.h"
 static inline u8 HasFlag(u32 mask, s16 *flags)
 {
@@ -10,12 +10,12 @@ static inline s32 Load(s16 *p)
 {
     return *p;
 }
-void NamedObject_UpdateKindA(struct NamedObject *o)
+void NamedObject_UpdateRouteFollower(struct NamedObject *o)
 {
     struct NamedObjectManager **managerPtr;
     u8 *route;
     u8 step;
-    u32 name;
+    u32 *np;
     struct NamedObjectManager *m;
     if (o->stage) {
         struct NamedObjectManager *manager = gUnk_020001AC;
@@ -49,10 +49,11 @@ void NamedObject_UpdateKindA(struct NamedObject *o)
             if (SceneActorRoute_IsOutsidePointBounds(route, &o->x, 16, 16)) {
                 o->state = 1;
                 m = *managerPtr;
-                if ((name = o->name) == m->followName && o->exitScript) {
+                np = &o->name;
+                if (*np == m->followName && o->exitScript) {
                     struct NamedObjectArgs args;
                     u32 values[1];
-                    values[0] = name;
+                    values[0] = *np;
                     args.count = 1;
                     args.values = values;
                     Script_Call(o->exitScript, &args);

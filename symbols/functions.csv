@@ -3625,6 +3625,7 @@ addr,name,mode,confidence,source,notes
 08101550,NamedObject_IsPlayerWithinContactBounds,thumb,low,src-alias,
 081015EC,NamedObject_UpdateContactTrigger,thumb,low,src-alias,Per-frame update for a scripted object that toggles state on player contact and fires its scripts
 08101810,NamedObject_ApplyVerticalImpulseAndJitter,thumb,low,src-alias,
+081018DC,NamedObject_UpdateRouteFollower,thumb,low,src-alias,Per-frame update for a scripted object that steps along its route and fires scripts at route ends
 08101A3C,NamedObject_FindByName,thumb,low,src-alias,Searches twelve object entries for a matching name key
 08101A74,NamedObject_GetFollowTarget,thumb,low,src-alias,Finds the object matching the manager follow target key used by release-from-script
 08101AB4,ActorGroup_ReleaseMember,thumb,low,src-alias,
