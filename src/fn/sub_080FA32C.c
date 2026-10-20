@@ -1,5 +1,5 @@
 #include "scene_actor_control_phase.h"
-u8 sub_080FB07C(void *);
+u8 Axe_PickAttack(void *);
 void ActorPhase_UpdateSpriteCollapse(void);
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 x)
@@ -47,7 +47,7 @@ void Axe_UpdateHealthPacedMotion(struct SceneActorRegistryResetView *actor)
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         SetControl(actor, actor->savedTarget, 0);
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)) && sub_080FB07C(actor))
+    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)) && Axe_PickAttack(actor))
         return;
     if (actor->health <= *(s32 *)(context + 0xE48)) {
         speed = 8;
