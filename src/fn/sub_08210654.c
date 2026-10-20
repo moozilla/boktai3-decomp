@@ -1,7 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define PinkSpine_InitFromScript                sub_08210654
+#define ProjectileEmitter_WaitForPlayerApproach sub_08210100
+#define ProjectileEmitter_EmitAttackFrame       sub_0821025C
 #ifdef NONMATCHING
-// fuzzy: 92.8%
+// fuzzy: 93.5%
 // Remaining differences: option/animation register allocation and defined success return.
 #include "pink_spine_playback.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
@@ -15,6 +18,7 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
 {
     void *graphics;
     void *sprite;
+    void *initialSprite;
     void *sequences;
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
@@ -62,12 +66,14 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     p->f140 = resource;
     graphics = p->graphics;
     AnimData_Load(graphics, 0x7E7D);
-    sprite = &p->sprite;
-    Sprite_Init(sprite, graphics, 1);
+    initialSprite = &p->sprite;
+    Sprite_Init(initialSprite, graphics, 1);
     p->sprite.position = p->initialPosition;
     AnimData_SelectPaletteBank(graphics, 0x1BD);
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f15C = sequences;
+    asm("" : "+r"(initialSprite));
+    sprite = initialSprite;
     if (!p->f13A) {
         p->update = ProjectileEmitter_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0xB, 0, 0);
@@ -94,5 +100,5 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PinkSpine_InitFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08210654);
 #endif
