@@ -1,4 +1,6 @@
 #include "global.h"
+
+#define Mummy_RequestStraightRoute sub_080D6FDC
 #ifdef NONMATCHING
 // fuzzy: 80.6%
 // Structure lines up (regions.py core distance 2/418). Allocation differs: the ROM keeps the
@@ -152,5 +154,5 @@ found:
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_RequestStraightRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D6FDC);
 #endif
