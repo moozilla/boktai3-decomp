@@ -78,8 +78,8 @@ void StateActor_UpdateTwoStageAnimation(u32 a, struct S *p)
                 case 14:
                 case 15:
                     r = 0;
-                break;
-            case 16:
+                    break;
+                case 16:
                 case 17:
                 case 18:
                 case 19:
