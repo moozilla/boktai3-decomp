@@ -1,12 +1,17 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 93.1%
-// Remaining differences: flag-load order, input-address lifetime and register allocation.
+// fuzzy: 98.0%
+// Remaining differences: 16 register-only instructions in the scene-five direction/input path and barrier-selection path.
 #include "player.h"
 // confidence=low: action-mode gates and input select the player's next sequence.
 #define Player_SelectActionSequence sub_08156FE0
 extern u32 gUnk_030053F4;
-struct PlayerPendingNotification { void *receiver; u32 flags; void *payload; };
+struct PlayerPendingNotification {
+    void *receiver;
+    u32 flags;
+    void *payload;
+};
 extern struct PlayerPendingNotification *gUnk_0200054C;
 extern u16 gUnk_02000594;
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -25,16 +30,41 @@ void sub_0813B3CC(struct Player *);
 s32 Player_TestNearbyInteraction(struct Player *);
 static inline u32 HasActionFlag(struct Player *p, u32 mask)
 {
-    u32 *flags;
-    if (!p) return 0;
-    flags = &p->actionFlags;
-    return *flags & mask;
+    if (!p)
+        return 0;
+    {
+        register u32 *flags asm("r0") = &p->actionFlags;
+        register u32 bits asm("r1") = mask;
+        asm("" : "+r"(flags), "+r"(bits));
+        return *flags & bits;
+    }
+}
+/* Keep the two input-field address lifetimes separate, as in the ROM. */
+static inline const u16 *InitialInput(struct Player *p)
+{
+    register u32 offset asm("r1") = 0x348;
+    register const u16 **field asm("r0");
+    asm("" : "+r"(offset));
+    field = (const u16 **)((u8 *)p + offset);
+    asm("" : "+r"(field));
+    return *field;
+}
+static inline const u16 *ReloadInput(struct Player *p)
+{
+    register u32 offset asm("r5") = 0x348;
+    asm("" : "+r"(offset));
+    {
+        register const u16 **field asm("r0") = (const u16 **)((u8 *)p + offset);
+        asm("" : "+r"(field));
+        return *field;
+    }
 }
 static inline u32 IsSceneFive(struct Player *p)
 {
     u32 active = p->active;
     u32 result = 0;
-    if (active && p->sceneMode == 5) result = 1;
+    if (active && p->sceneMode == 5)
+        result = 1;
     return result;
 }
 s32 Player_SelectActionSequence(struct Player *p)
@@ -49,21 +79,32 @@ s32 Player_SelectActionSequence(struct Player *p)
         p->terrainRecoveryCounter = 0;
         ActorSequence_Begin(p, 0x17, 0);
     }
-    if (p->tetherMode != 4 && p->unk4E1[2]) sub_08158DF0(p, p->coordinateAxis);
+    if (p->tetherMode != 4 && p->unk4E1[2])
+        sub_08158DF0(p, p->coordinateAxis);
     mode = p->tetherMode;
     if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
         if (!p->statusValue) {
-            if (p->contactSpecial && mode != 0x1E) ActorSequence_Begin(p, 0x1E, 0);
+            if (p->contactSpecial && mode != 0x1E)
+                ActorSequence_Begin(p, 0x1E, 0);
             Player_StopMovementEffects(p);
             switch (p->tetherMode) {
-            default:
-                if (p->actionMode == 2) {
-                    if (p->tetherMode != 11) ActorSequence_Begin(p, 11, 0);
-                } else if (p->actionMode == 1) {
-                    if (p->tetherMode != 10) ActorSequence_Begin(p, 10, 0);
-                }
-            case 4: case 12: case 21: case 24: case 25: case 26: case 28: case 38:
-                break;
+                default:
+                    if (p->actionMode == 2) {
+                        if (p->tetherMode != 11)
+                            ActorSequence_Begin(p, 11, 0);
+                    } else if (p->actionMode == 1) {
+                        if (p->tetherMode != 10)
+                            ActorSequence_Begin(p, 10, 0);
+                    }
+                case 4:
+                case 12:
+                case 21:
+                case 24:
+                case 25:
+                case 26:
+                case 28:
+                case 38:
+                    break;
             }
             p->statusValue = 0;
             p->unk432[0] = 0;
@@ -73,12 +114,16 @@ s32 Player_SelectActionSequence(struct Player *p)
         if ((HasActionFlag(p, 0x8000) && p->actionMode == 1) ||
             (HasActionFlag(p, 0x10000) && p->actionMode == 2))
             Player_SubtractGauge430(p, 3);
-        else Player_SubtractGauge430(p, 4);
+        else
+            Player_SubtractGauge430(p, 4);
     } else {
-        if (p->statGaugeFull == 1) p->statusValue = 4000;
-        else p->statusValue = 0;
+        if (p->statGaugeFull == 1)
+            p->statusValue = 4000;
+        else
+            p->statusValue = 0;
     }
-    if (p->tetherMode == 0x26) goto end;
+    if (p->tetherMode == 0x26)
+        goto end;
     if (p->directionFrame) {
         if (p->unk432[1]) {
             p->actionLatch464 = 1;
@@ -86,13 +131,16 @@ s32 Player_SelectActionSequence(struct Player *p)
             p->unk432[1] = 0;
         }
         if (p->contactSpecial) {
-            if (p->tetherMode != 0x1E) ActorSequence_Begin(p, 0x1E, 0);
-        } else ActorSequence_Begin(p, 0x1D, 0);
+            if (p->tetherMode != 0x1E)
+                ActorSequence_Begin(p, 0x1E, 0);
+        } else
+            ActorSequence_Begin(p, 0x1D, 0);
         if (gUnk_0200054C && gUnk_02000594) {
             if (!(gUnk_0200054C->flags & 1)) {
                 if (gUnk_0200054C->flags & 0x10)
                     sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
-                else sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
+                else
+                    sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
             }
             gUnk_0200054C = 0;
             gUnk_02000594 = 0;
@@ -106,84 +154,135 @@ s32 Player_SelectActionSequence(struct Player *p)
         goto end;
     }
     switch (mode) {
-    case 6:
-        if (Player_TestTetherActionInput(p)) goto end;
-        Sound_PlaySong(218);
-        goto idle;
-    default:
-        if (p && IsSceneFive(p)) {
-            if ((p->inputKeys[1] & 1) && (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup)) goto idle;
-            if ((s16)p->directionHistory[0] == -1) goto idle;
-            if (p->inputKeys[0] & 0x100) goto idle;
-            ActorSequence_Begin(p, 1, 0);
-            goto end;
-        }
-        keys = p->inputKeys;
-        if (keys[1] & 0x200) {
-            if (p->actionMode == 6) { ActorSequence_Begin(p, 2, 0); goto end; }
-            if (p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
-                Sound_PlaySong(402);
+        case 6:
+            if (Player_TestTetherActionInput(p))
+                goto end;
+            Sound_PlaySong(218);
+            goto idle;
+        default:
+            if (p && IsSceneFive(p)) {
+                if ((InitialInput(p)[1] & 1) &&
+                    (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
+                    goto idle;
+                if ((s16)p->directionHistory[0] == -1)
+                    goto idle;
+                if (ReloadInput(p)[0] & 0x100)
+                    goto idle;
+                ActorSequence_Begin(p, 1, 0);
                 goto end;
             }
-            if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
-                PlayerBarrier_Hide(p->actionRequestEffect);
+            keys = p->inputKeys;
+            if (keys[1] & 0x200) {
+                if (p->actionMode == 6) {
+                    ActorSequence_Begin(p, 2, 0);
+                    goto end;
+                }
+                if (p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
+                    Sound_PlaySong(402);
+                    goto end;
+                }
+                if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
+                    PlayerBarrier_Hide(p->actionRequestEffect);
+                    goto end;
+                }
+                mode = sub_0813F8F8(p);
+                ActorSequence_Begin(p, mode, 0);
                 goto end;
             }
-            mode = sub_0813F8F8(p);
-            ActorSequence_Begin(p, mode, 0);
-            goto end;
-        }
-        if (keys[1] & 2) {
-            if (p->actionMode == 2) { ActorSequence_Begin(p, 38, 0); goto end; }
-            if (p->actionMode == 1) { ActorSequence_Begin(p, 12, 0); goto end; }
-            if (Player_GetEventFlags(p, 0x4000)) goto cancel;
-            if (Player_GetEventFlags(p, 1)) {
-                if (p->statModifierContext.statBOverrideEnabled == 3) goto primary;
-            cancel:
+            if (keys[1] & 2) {
+                if (p->actionMode == 2) {
+                    ActorSequence_Begin(p, 38, 0);
+                    goto end;
+                }
+                if (p->actionMode == 1) {
+                    ActorSequence_Begin(p, 12, 0);
+                    goto end;
+                }
+                if (Player_GetEventFlags(p, 0x4000))
+                    goto cancel;
+                if (Player_GetEventFlags(p, 1)) {
+                    if (p->statModifierContext.statBOverrideEnabled == 3)
+                        goto primary;
+                cancel:
+                    ActorSequence_Begin(p, 0, 0);
+                    sub_0813B3CC(p);
+                    goto end;
+                }
+                goto normalAttack;
+            primary:
+                ActorSequence_Begin(p, 3, 0);
+                goto end;
+            normalAttack:
+                ActorSequence_Begin(p, 3, 0);
+                goto end;
+            }
+            if (keys[1] & 1) {
+                if (p->actionMode == 2) {
+                    if (p->historyDirectionMode == 1)
+                        ActorSequence_Begin(p, 38, 0);
+                    else
+                        ActorSequence_Begin(p, 38, 3);
+                    goto end;
+                }
+                if (p->actionMode == 1) {
+                    if (p->historyDirectionMode == 1)
+                        ActorSequence_Begin(p, 12, 0);
+                    else
+                        ActorSequence_Begin(p, 12, 3);
+                    goto end;
+                }
+                if (p->actionMode == 0 && Player_TestNearbyInteraction(p)) {
+                    Sound_PlaySong(218);
+                    ActorSequence_Begin(p, 6, 0);
+                    goto end;
+                }
+                if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
+                    goto idle;
+                if (!p->actionMode && PlayerBarrier_IsActive(p->actionRequestEffect)) {
+                    ActorSequence_Begin(p, 20, 0);
+                    goto end;
+                }
+                ActorSequence_Begin(p, 7, 0);
+                goto end;
+            }
+            if ((s16)p->directionHistory[0] == -1 || (keys[0] & 0x100) ||
+                p->historyDirectionMode == 1) {
+            idle:
                 ActorSequence_Begin(p, 0, 0);
-                sub_0813B3CC(p);
-                goto end;
-            }
-            ActorSequence_Begin(p, 3, 0);
-            goto end;
-        primary:
-            ActorSequence_Begin(p, 3, 0);
-            goto end;
-        }
-        if (keys[1] & 1) {
-            if (p->actionMode == 2) {
-                if (p->historyDirectionMode == 1) ActorSequence_Begin(p, 38, 0);
-                else ActorSequence_Begin(p, 38, 3);
-                goto end;
-            }
-            if (p->actionMode == 1) {
-                if (p->historyDirectionMode == 1) ActorSequence_Begin(p, 12, 0);
-                else ActorSequence_Begin(p, 12, 3);
-                goto end;
-            }
-            if (p->actionMode == 0 && Player_TestNearbyInteraction(p)) {
-                Sound_PlaySong(218);
-                ActorSequence_Begin(p, 6, 0);
-                goto end;
-            }
-            if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup)) goto idle;
-            if (!p->actionMode && PlayerBarrier_IsActive(p->actionRequestEffect)) {
-                ActorSequence_Begin(p, 20, 0);
-                goto end;
-            }
-            ActorSequence_Begin(p, 7, 0);
-            goto end;
-        }
-        if ((s16)p->directionHistory[0] == -1 || (keys[0] & 0x100) || p->historyDirectionMode == 1) {
-        idle:
-            ActorSequence_Begin(p, 0, 0);
-        } else ActorSequence_Begin(p, 1, 0);
-        break;
-    case 2: case 3: case 4: case 5: case 7: case 8: case 9: case 10: case 11: case 12:
-    case 13: case 14: case 15: case 16: case 17: case 18: case 19: case 20: case 21:
-    case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: case 30:
-    case 37: case 38:
-        break;
+            } else
+                ActorSequence_Begin(p, 1, 0);
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 37:
+        case 38:
+            break;
     }
 end:
     return 0;
