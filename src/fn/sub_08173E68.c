@@ -1,9 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-// foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
 #define SceneHud_GetEquipmentSlotPosition SceneHud_GetActionIconPosition
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -24,6 +22,8 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
     void *q = p->actionInput;
     u16 one;
     u16 keys;
+    u32 c;
+    u32 two;
     if (SceneInput_NavigateGridKeys(q, 0xf0)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowEquipmentDetails(p);
@@ -31,7 +31,9 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
     }
     keys = gUnk_03005260[1];
     one = 1;
-    if (one & keys) {
+    c = one;
+    asm("" : "+r"(c));
+    if (c & keys) {
         u8 *cursor = &p->actionCursor;
         u32 source = *cursor;
         u8 *selection = &p->actionSelection;
@@ -48,15 +50,16 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
             sub_0816676C(p, 2);
             Hud_SetInteractionCallback(p, Hud_UpdateInventorySwapAnimation, 1);
         }
-    } else if (2 & keys) {
-        Hud_SetInteractionCallback(p, sub_08173D2C, 1);
-        p->categoryWidgets[6].flags |= one;
-        Hud_RestoreGridSelection(q);
-        Hud_SetGridPosition(q, p->actionInput[1], p->actionInput[2]);
-        PauseInventory_GetItemCursorPosition(&p->categoryWidgets[5].position, q);
-        Sound_PlaySong(0xde);
+    } else {
+        two = 2;
+        asm("" : "+r"(two));
+        if (two & keys) {
+            Hud_SetInteractionCallback(p, sub_08173D2C, 1);
+            p->categoryWidgets[6].flags |= one;
+            Hud_RestoreGridSelection(q);
+            Hud_SetGridPosition(q, p->actionInput[1], p->actionInput[2]);
+            PauseInventory_GetItemCursorPosition(&p->categoryWidgets[5].position, q);
+            Sound_PlaySong(0xde);
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_TickEquipmentSwap);
-#endif

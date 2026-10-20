@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.8%
-// foundry draft (worker best 95.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void MenuSelection_RefreshOptionText(u8 *);
@@ -9,6 +7,7 @@ s32 MenuSelection_ProcessOptionInput(u8 *s)
 {
     u32 keys = gUnk_03005260[1];
     u16 up;
+    u32 m;
     u8 *row;
     if (keys & 0x10) {
         row = s + 0x48C0;
@@ -48,27 +47,28 @@ changed:
     MenuSelection_RefreshOptionText(s);
     return 1;
 vertical:
-    up = 0x40;
-    up &= keys;
+    m = 0x40;
+    up = keys & m;
     if (up) {
         row = s + 0x48C0;
         if (*row == 0)
             *row = 2;
         else
             *row -= 1;
-    } else if (0x80 & keys) {
-        row = s + 0x48C0;
-        if (*row == 2)
-            *row = up;
-        else
-            *row += 1;
-    } else
-        goto none;
+    } else {
+        m = 0x80;
+        asm("" : "+r"(m));
+        if (m & keys) {
+            row = s + 0x48C0;
+            if (*row == 2)
+                *row = up;
+            else
+                *row += 1;
+        } else
+            goto none;
+    }
     Sound_PlaySong(0xDC);
     return 1;
 none:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", MenuSelection_ProcessOptionInput);
-#endif

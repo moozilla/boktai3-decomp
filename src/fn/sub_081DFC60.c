@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// foundry draft (worker best 97.5%); what differs is mostly register allocation and instruction order
 #define gAnimPanelSavedSelections gUnk_020005C0
 extern u8 gUnk_020005C0[];
 struct AnimPanel {
@@ -27,7 +24,7 @@ s32 AnimPanel_EraseSelection(struct AnimPanel *p)
             empty = 1;
         } else {
             p->selectionPrimary = index - 1;
-            entries[p->selectionPrimary] = value;
+            *(u32 *)((u32)entries + (p->selectionPrimary << 2)) = value;
         }
     } else {
         *entry = 0x41;
@@ -36,6 +33,3 @@ s32 AnimPanel_EraseSelection(struct AnimPanel *p)
     Password_BuildLabels(p);
     return empty;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", AnimPanel_EraseSelection);
-#endif
