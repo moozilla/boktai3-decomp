@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-void sub_080ACE68(struct SceneActorRegistryResetView *);
+void Vorn_UpdateScriptedAnimation(struct SceneActorRegistryResetView *);
 static inline u8 IsUnavailable(void *input)
 {
     struct SceneActorRegistryResetView *p = input;
@@ -63,7 +63,7 @@ void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p
                 }
                 {
                     u32 duration = 0x29;
-                    p->word104 = (u32)sub_080ACE68;
+                    p->word104 = (u32)Vorn_UpdateScriptedAnimation;
                     p->word108 = zero;
                     p->word10C = zero;
                     p->word110 = duration;
