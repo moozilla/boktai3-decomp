@@ -1,12 +1,11 @@
 #include "global.h"
 #include "player.h"
 /* Chooses the player's input-driven action mode for this update (tentative). */
-#define Player_SelectInputMode sub_082422D8
 u32 Player_GetTetherMode(struct Player *);
 s32 Trigger_TryOpenNearby(void *);
 void Player_StopLocalActionSounds(struct Player *);
 void Player_ClearMovementLock(struct Player *);
-s32 sub_08242120(struct Player *);
+s32 Player_TryStepForward(struct Player *);
 
 static inline s32 IsScene5(struct Player *p)
 {
@@ -48,7 +47,7 @@ u32 Player_SelectInputMode(struct Player *p)
         case 30:
             break;
         case 4:
-            if (sub_08242120(p) != 0)
+            if (Player_TryStepForward(p) != 0)
                 break;
         case 5:
         case 6:

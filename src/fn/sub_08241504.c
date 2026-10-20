@@ -149,7 +149,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 // confidence=low: a cue that emits a displaced positional effect, then advances its pose
-#define PlayerCue_UpdateOffsetBurst sub_08241504
 void PlayerCue_UpdateOffsetBurst(struct P *p)
 {
     if (B(0x457) != 4) {

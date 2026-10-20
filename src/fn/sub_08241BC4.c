@@ -155,7 +155,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 // confidence=low: a landing cue that slides toward a terrain target, then returns to idle
-#define PlayerCue_UpdateTerrainSlide sub_08241BC4
 static inline s32 Scale3(s32 v)
 {
     if (v >= 0)
@@ -220,5 +219,5 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08241BC4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTerrainSlide);
 #endif

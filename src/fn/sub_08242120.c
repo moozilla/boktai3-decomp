@@ -2,7 +2,6 @@
 #include "engine.h"
 #include "player.h"
 /* Tests whether the terrain cell just ahead of the player is low enough to step onto (tentative). */
-#define Player_TryStepForward sub_08242120
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void sub_08238238(struct Player *);
 extern const s16 gUnk_086149C4[];
