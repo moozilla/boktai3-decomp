@@ -1668,3 +1668,50 @@ its stringified filename. Corrected fallback labels and checked all four default
 assembly paths byte-identical; these checks do not count as C matching progress.
 Commits submitted through build/commit.sh; fallback fixes are separate follow-ups
 because the driver consumed draft commits before those fixes were written.
+
+## 2026-10-20 task 080AE1C4: Vorn recovery and delayed routes
+
+Tags: #matching #vorn #navigation
+
+Exact gain: +0.0167 percentage points of total code (404 bytes), register-pinned.
+Only per-file check.py validation; no full build or network operations.
+
+- 080AF2BC: stopped at 72.9%, 347 realigned differences / 84 ignoring registers.
+  Read the complete condensed body, callers/control context and matched chase
+  relatives. A candidate using Chase_Arrive, delayed command storage, route snap
+  and route planning started at 65.6%, 475/167. A volatile group pointer improved
+  stack allocation to 72.9%, 349/87; passing the command pointer directly to the
+  delay inline reduced it to 347/84. Spilling actor or flags regressed. Below
+  the 80% draft threshold; removed the candidate, retained assembly.
+- 080AE1C4: retained guarded Vorn_UpdateKnockbackRecovery draft at 81.2%,
+  113/36 (previously 82.1%, 118/40). Delaying maskTwo initialization until after
+  directional animation and spilling group improved realigned structure while
+  lowering coarse fuzzy score. Control-pointer recomputation regressed.
+- 080AEE08: retained guarded Vorn_UpdateDefeat draft at 83.4%, 84/9.
+  Unpinning burst locals or RNG cursor regressed. Declaration swaps had no
+  effect. Added a local address alias for SceneActor_CallContextScriptB because
+  the base ELF retains sub_080B0D28. Remaining issues are address derivation,
+  register allocation and constant reloads.
+- 080AEB74: retained guarded Vorn_TryRestorePatrolRoute draft at 80.2%, 67/32
+  (previously 68/34). Removing volatile from savedMotion improved structure;
+  pinning destination, spilling group and deriving control from group regressed.
+  Terrain destination spills, flag-address reuse and reset scheduling remain.
+- 080AE6F0: retained guarded Vorn_ResumeReactionRoute draft at 82.8%, 57/21
+  (previously 83.9%, 55/23). Explicit motion flag load/OR/store improves structure;
+  caching flags2D0 before testing/clearing removes two register differences.
+  Explicit sl zero pin, removing r8 pin and spilling group regressed.
+- 080AFBF4: matched Vorn_UpdateAnimationRetries, 404 bytes. On entry it selects
+  delayed animation, clears context retry count 0x696 and elapsed count 0x694,
+  and chooses duration 10..41 at 0x697. Completion repeats while retries remain,
+  otherwise clears context bits 0..1 at 0x6D4 and dispatches gUnk_0824E224.
+  Specializing the RNG inline to return the duration, rather than passing a
+  mask argument, improved 94.0% to 99.0%. A register-pinned r2 table pointer in
+  the second RNG expansion resolves the final two register differences.
+  Marked MATCHING_CONCESSION: register-pinning; no instruction bodies.
+
+All four existing drafts now have required file-local naming aliases, and their
+scores were recorded with check.py --nonmatching --record. Default fallback
+INCLUDE_ASM arguments must use literal sub-address names because the macro
+stringifies the filename. Corrected those and checked all four fallback paths
+exactly; assembly fallback checks are not C progress. Function/draft commits and
+fallback follow-ups submitted separately through build/commit.sh.
