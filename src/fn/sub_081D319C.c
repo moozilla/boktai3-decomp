@@ -8,7 +8,7 @@ struct S {
     void (*f3a0)(void);
     u32 f3a4;
 };
-void sub_081D2FE8(void);
+void FrostEmitter_Step(void);
 
 void FrostEmitter_StartEmission(struct S *p, u32 v)
 {
@@ -16,7 +16,7 @@ void FrostEmitter_StartEmission(struct S *p, u32 v)
         void (*f)(void);
         p->f38 = v;
         p->f3c = 1;
-        f = sub_081D2FE8;
+        f = FrostEmitter_Step;
         p->f3a0 = f;
         p->f3a4 = 0;
     }

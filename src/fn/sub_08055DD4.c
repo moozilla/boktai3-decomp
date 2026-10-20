@@ -25,19 +25,20 @@ void StageIconDisplay_InitAnimations(struct StageIconDisplay *argument, s32 vari
             u32 scratch;
             register struct SceneExtent *point asm("r4");
             scratch = (u32)&position;
-            sub_0821983C(&display->icon, header, 48, 48, variant, variant, 60, (void *)scratch);
+            Widget_InitLinked(&display->icon, header, 48, 48, variant, variant, 60,
+                              (void *)scratch);
             scratch = 0;
             point = &position;
             indicator = (void *)((u8 *)header + 0x80);
             i = 2;
             do {
-                sub_0821983C(indicator, savedHeader, 49, 49, scratch, scratch, 60, point);
+                Widget_InitLinked(indicator, savedHeader, 49, 49, scratch, scratch, 60, point);
                 point->x += 8;
                 indicator++;
             } while (--i >= 0);
         } else if (variant == 1)
-            sub_0821983C(&display->icon, header, 51, 48, 0, 0, 60, &position);
+            Widget_InitLinked(&display->icon, header, 51, 48, 0, 0, 60, &position);
         else
-            sub_0821983C(&display->icon, header, 48, 48, 0, 0, 60, &position);
+            Widget_InitLinked(&display->icon, header, 48, 48, 0, 0, 60, &position);
     }
 }

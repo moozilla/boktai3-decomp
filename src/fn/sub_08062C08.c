@@ -28,7 +28,7 @@ void SceneInventory_InitPanel(struct SceneInventoryTail *input, s32 mode)
     zero = 0;
     i = 2;
     do {
-        sub_0821983C(widget, &p->display.widgetResource, 0, 0x30, zero, zero, 60, location);
+        Widget_InitLinked(widget, &p->display.widgetResource, 0, 0x30, zero, zero, 60, location);
         location->x += 8;
         widget++;
     } while (--i >= 0);
@@ -40,7 +40,7 @@ void SceneInventory_InitPanel(struct SceneInventoryTail *input, s32 mode)
     asm("" : "+l"(zero));
     i = 2;
     do {
-        sub_0821983C(widget, resource, 0, 0x30, zero, zero, 60, location);
+        Widget_InitLinked(widget, resource, 0, 0x30, zero, zero, 60, location);
         location->x += 8;
         widget++;
     } while (--i >= 0);
@@ -51,7 +51,7 @@ void SceneInventory_InitPanel(struct SceneInventoryTail *input, s32 mode)
     zero = 0;
     i = 2;
     do {
-        sub_0821983C(widget, resource, 0, 0x30, zero, zero, 60, location);
+        Widget_InitLinked(widget, resource, 0, 0x30, zero, zero, 60, location);
         location->x += 8;
         widget++;
     } while (--i >= 0);
@@ -62,7 +62,7 @@ void SceneInventory_InitPanel(struct SceneInventoryTail *input, s32 mode)
     zero = 0;
     i = 2;
     do {
-        sub_0821983C(widget, resource, 0, 0x30, zero, zero, 60, location);
+        Widget_InitLinked(widget, resource, 0, 0x30, zero, zero, 60, location);
         location->x += 8;
         widget++;
     } while (--i >= 0);
@@ -73,7 +73,7 @@ void SceneInventory_InitPanel(struct SceneInventoryTail *input, s32 mode)
     zero = 0;
     i = 2;
     do {
-        sub_0821983C(widget, resource, 0, 0x30, zero, zero, 60, location);
+        Widget_InitLinked(widget, resource, 0, 0x30, zero, zero, 60, location);
         location->x += 8;
         widget++;
     } while (--i >= 0);

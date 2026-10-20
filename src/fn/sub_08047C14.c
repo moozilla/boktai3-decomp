@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "temporary_animation_pool.h"
-s32 sub_08219918(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 Widget_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
 static inline s32 initializeAnimation(struct ProjectedDisplayEntry *animation,
                                       struct ProjectedDisplayResource *resource,
                                       struct ContactPosition *position, u32 zero)
 {
-    s32 value = sub_08219918(animation, resource, 0, 0, 2, zero, 60, position);
+    s32 value = Widget_InitCleared(animation, resource, 0, 0, 2, zero, 60, position);
     s32 result = 0;
     if (value < 0)
         result = -1;

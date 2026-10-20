@@ -14,5 +14,5 @@ void ShakeIconDisplay_TickShake(struct ShakeIconDisplay *);
 s32 ShakeIconDisplay_Tick(struct ShakeIconDisplay *);
 u32 ShakeIconDisplay_Destroy(struct ShakeIconDisplay *);
 s32 ShakeIconDisplay_Initialize(struct ShakeIconDisplay *);
-void sub_0821983C(void *, void *, u32, u32, u32, u32, s32, const void *);
+void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 #endif

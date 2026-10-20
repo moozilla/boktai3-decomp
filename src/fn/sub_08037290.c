@@ -45,7 +45,7 @@ void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
 void Anim_RestartSequence(void *, void *, int, int, int);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 
 int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kind)
 {
@@ -238,7 +238,7 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
         drawing = p->drawings[0];
         count = 4;
         do {
-            sub_0821983C(drawing, owner->descriptor, 0, 17, 1, zero, 60, (void *)zero);
+            Widget_InitLinked(drawing, owner->descriptor, 0, 17, 1, zero, 60, (void *)zero);
             drawing += 0x60;
         } while (--count >= 0);
     }

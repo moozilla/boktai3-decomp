@@ -1,7 +1,7 @@
 #include "global.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, void *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u8 *);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u8 *);
 void Anim_SetKeyframes(u8 *, u32, u32, u32, u32);
 void Vanargand_InitBackgroundAttachment(u8 *, u8 *, u8 *);
 void sub_081ADDF0(u8 *, u8 *, u8 *);
@@ -20,7 +20,7 @@ void Vanargand_InitAnimatedAttachment(u8 *s, u8 *t)
     p = ScriptProc_Start(0xCB05, 0xB3DE);
     obj = t + 0x60;
     ResourceHeader_Relocate(obj, p);
-    sub_0821983C(t, obj, 0, 0, 2, 2, 0x3C, coords);
+    Widget_InitLinked(t, obj, 0, 0, 2, 2, 0x3C, coords);
     Anim_SetKeyframes(t, obj, 11, 1, zero);
     *(u16 *)(t + 0x3A) = 0x6F;
     *(u8 **)(t + 0x48) = s + 0x718;

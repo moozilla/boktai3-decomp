@@ -1,7 +1,7 @@
 #include "global.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(u8 *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081C5AF0(u8 *);
 void sub_081C5B6C(u8 *);
 void ChallengeMenu_InitAnimations(u8 *s)
@@ -27,16 +27,16 @@ void ChallengeMenu_InitAnimations(u8 *s)
     *(struct Blob *)(s + 0x18) = *p;
     last = (struct Blob *)(s + 0x18);
     ResourceHeader_Relocate(last, p);
-    sub_0821983C(s + 0x258, last, 0x8A, 0x10, zero = 0, 0, sixty = 0x3C, 0);
+    Widget_InitLinked(s + 0x258, last, 0x8A, 0x10, zero = 0, 0, sixty = 0x3C, 0);
     dst = (u16 *)(s + 0x27A);
     bits = 0xFFE8;
     *dst = bits;
-    sub_0821983C(s + 0x1F8, first, 0, 0x10, 3, zero, sixty, zero);
+    Widget_InitLinked(s + 0x1F8, first, 0, 0x10, 3, zero, sixty, zero);
     loopzero = 0;
     entry = s + 0x78;
     i = 3;
     do {
-        sub_0821983C(entry, s + 0x38, 0, 0x10, loopzero, loopzero, 0x3C, loopzero);
+        Widget_InitLinked(entry, s + 0x38, 0, 0x10, loopzero, loopzero, 0x3C, loopzero);
         entry += 0x60;
     } while (--i >= 0);
     sub_081C5AF0(s);

@@ -5,7 +5,7 @@ struct Data {
 struct Data *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(struct Data *, struct Data *);
 u16 Selection_GetDisplayFrame(u32);
-void sub_0821983C(u8 *, struct Data *, u32, u32, u32, u32, u32, void *);
+void Widget_InitLinked(u8 *, struct Data *, u32, u32, u32, u32, u32, void *);
 void HealthRestoreEffect_InitAnimation(u8 *p)
 {
     struct Data data;
@@ -19,5 +19,6 @@ void HealthRestoreEffect_InitAnimation(u8 *p)
     coords[0] = 8;
     *(u16 *)(p + 0x7e) = 32;
     *(u16 *)(p + 0x80) = zero;
-    sub_0821983C(p + 0x1c, &data, Selection_GetDisplayFrame(0x26), 0x33, zero, zero, 0x3c, coords);
+    Widget_InitLinked(p + 0x1c, &data, Selection_GetDisplayFrame(0x26), 0x33, zero, zero, 0x3c,
+                      coords);
 }

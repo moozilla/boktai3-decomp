@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 #include "scene_vec.h"
-void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
+void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void Palette_CopyBank(void *, void *);
 s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
@@ -31,7 +31,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     object = menu->displays;
     remaining = 17;
     do {
-        sub_0821983C(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
+        Widget_InitLinked(object, &menu->graphicsB, 0, 0x11, 2, 0, 0x3c, originPointer);
         remaining--;
         object++;
     } while (remaining >= 0);
