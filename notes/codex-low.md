@@ -277,3 +277,66 @@ Tags: #matching #terrain #sprites #scanline
 Only per-file check.py checks were run; no full build or network operations.
 No NONMATCHING drafts met the required 80% threshold. Existing tools/cloud_task.py
 modification was left untouched. No shared docs or generated assembly committed.
+
+## Task 08151EB8 (2026-10-20)
+
+Tags: #matching #player #animation #cue
+
+Exact progress: 0.0 percentage-point gain; five guarded drafts, no C matches.
+All six callbacks belong to PlayerCue, as established by the named callers
+0815B0A8 (WalkTo), 0815B9CC (Motion7Variant3), 0815B52C,
+0815C428 (FormMotion), and 0815C4FC (StateMotion).
+
+- 08152174: drafted 81.7% as PlayerCue_UpdateMotionFade (tentative).
+  Largest target inspected first with asmat, relatives and condense. Six phases
+  play motion 7 while changing sprite bytes 154/155, control flags and scale 4E8.
+  ContactSequenceActor_UpdateActive supplies the repeated packed-command decoder.
+  Final reviewed check: 217 realigned differences, 37 ignoring registers.
+  Pinning the player pointer or command pointer worsened code sharing/allocation;
+  reverted. Scale-store addressing and phase tails remain, plus decoder registers.
+- 08153A00: drafted 94.2% as PlayerCue_UpdateSideWalkTarget (tentative).
+  State-four walk snaps within squared distance 144, uses twelve-unit velocity,
+  maps the atan2 angle to eight directions, and scales one velocity axis by
+  40/64 or 52/64 depending on field28F and sign. Completion installs 081538DC.
+  Reviewed check: 39 realigned differences, 18 ignoring registers. Conditional
+  multiplication folds sign checks differently; direction-store sharing differs.
+- 08153224: drafted 84.4% as PlayerCue_UpdateFormChange (tentative).
+  Four phases toggle variant418 between zero and one, choose variant animation
+  table entries 0/8/10/11, update spiral parameters AD6/AD8 and resume standing.
+  Real observed typed fields raised the initial 73.5% candidate above threshold;
+  reviewed check: 84 realigned differences, 26 ignoring registers. ROM preserves
+  the high half of a stack particle word; candidate fully initializes both words
+  instead of introducing an uninitialized C read. Other residue: constant copies,
+  timer masks and phase branch/register layout. No pinning in this unit.
+- 08151EB8: drafted 98.6% as PlayerCue_UpdateWalkTarget.
+  WalkTo's state-three callback: nine-unit velocity, squared arrival radius 81,
+  odd-facing animation directions, optional final direction at 59D. Completion
+  installs 08151D90. Reviewed check: eight differing instructions, six structural.
+  Main residue is the common byte-store tail for finalDir versus dir, and OR
+  ordering before the direction store. Explicit shared output-pointer and inline
+  facing-value variants regressed and were discarded.
+- 08153610: drafted 87.1% as PlayerCue_UpdateSpiralMotion (tentative).
+  State-three motion 13 grows AD8 by three up to 32, alternates facing according
+  to timer bits, sets resource16F and eventually resumes standing. Struct-copy
+  syntax reproduces the paired position copy at AC; the animation mask must use
+  r6 instead of the sibling decoder's r5. Reviewed check: 52 realigned differences,
+  20 ignoring registers. Resource offset derivation and constant/timer lifetimes
+  remain different.
+- 08152A5C: stopped with uncommitted scratch at
+  wip/codex-low/sub_08152A5C.c, tentative PlayerCue_UpdateRecoil.
+  Plays song E6 once; speed598 decays by 3/4 and drives opposite-facing velocity.
+  The 480-byte body candidate differs in six register-selection instructions
+  (97.5% candidate-length similarity), but the inventory extent reaches 08153224.
+  There is another push/prologue at 08152C3C in the retained byte tail. The required
+  full-extent recorded score is only 38.6%; do not count or commit it as a qualifying
+  draft and do not mistake the body-only score for acceptance. Boundary repair is
+  required before resuming. No shared generated files or split metadata changed.
+
+Each retained draft has a file-local descriptive alias and guarded INCLUDE_ASM
+fallback; nonmatching checks used --nonmatching --record. Formatting used the
+venv clang-format directly. depin was attempted on unguarded candidates and
+correctly skipped their mismatches; its default-mode handling of a guarded draft
+would test the assembly fallback, so do not use that to minimize draft hints.
+All five default assembly fallbacks passed check.py. Ghidra export was absent.
+No full build or network operation performed. Existing tools/cloud_task.py edit
+was left untouched. Five separate draft commits were made through build/commit.sh.
