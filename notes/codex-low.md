@@ -1715,3 +1715,46 @@ INCLUDE_ASM arguments must use literal sub-address names because the macro
 stringifies the filename. Corrected those and checked all four fallback paths
 exactly; assembly fallback checks are not C progress. Function/draft commits and
 fallback follow-ups submitted separately through build/commit.sh.
+
+
+## Task 0814957C — 2026-10-20
+
+Tags: #player #matching #drafts
+
+- 0814957C: drafted 93.7%, tentative Player_UpdateOddDirectionPose.
+  Ported the nearby direction-recovery pose and shared packed-command stepper.
+  Pinning the command pointer to r6 improved 88.3% to 93.7%; 16 realigned
+  differences, six ignoring registers. Explicit facing-address barriers worsened
+  selection; pinning the whole player to r7 also worsened code generation.
+- 08149720: drafted 92.5%, tentative Player_UpdatePoseRecovery. First phase
+  forces an odd facing and decays halfword 0x4EC by 30, then plays sequence 3
+  until playback ends. Stepper returns whether it wrapped or held at an end.
+  35 realigned differences, 14 ignoring registers; return/control layout remains.
+- 08149A14: drafted 97.3%, tentative Player_UpdateRecoilMotion. Uses three
+  effect flags (0x479, 0x47B, 0x489) to approach saved position 0x47C, otherwise
+  recoils along facing. Shake and speed halfword 0x270 decay by 3/4.
+  Explicit abs/shift/negate truncation instead of C signed division by eight
+  improved 76.4% to 97.3%. All 13 realigned differences are register-only.
+- 08149DF0: retained existing 99.3% Player_UpdateSpiralTrailAction draft and
+  added required local alias. Exactly two instructions differ: final duration
+  address 0xAD8 uses r0 instead of r3. Tried duration-pointer/offset pins,
+  scalar temporary forms, clobber barriers and declaration permutations;
+  none improved the original. Restored best source. Fixed fallback's literal
+  INCLUDE_ASM name after the alias exposed its stringified filename.
+- 0814D264: stopped below retention threshold; full exploratory C reached
+  73.9% (171 realigned differences, 69 ignoring registers). Removed candidate
+  from src. Action 0x54 sweeps a horizontal radius-160 arc; 0x81 sweeps a
+  radius-250 vertical arc projected along stored yaw; 0x72 uses a timed radial
+  reach. Configures collider at player+0xB8C. A local typed arc layout improved
+  70.9% to 73.9%; swapping sum operands did not help. Address evaluation and
+  table-pointer liveness remain substantial differences.
+- 0814C3A4: inspected first, with BIG_FUNCTIONS guidance, relatives and condensed
+  listing. No retained candidate. Apparent grab-motion state machine uses
+  Player_OnGrabMotionExit, saved auxiliary sprite state, particle creation and
+  trigonometric movement. Only 9% covered by closest matched relative;
+  condense leaves 973 instructions unfolded (1165 lines). Needs a dedicated
+  state-by-state reconstruction; no Ghidra export is present in this checkout.
+
+All retained C remains guarded by NONMATCHING, scored with --record.
+Per-file default assembly fallback checks pass after the 08149DF0 filename fix;
+these checks do not count as C matches. No full build or network operations.
