@@ -1296,3 +1296,69 @@ happened for the new 08208740/08208BE4 drafts; restored their committed sources
 immediately using git show. Only use the tool on an extracted candidate for
 such drafts, or teach it --nonmatching before applying it. The exact
 08208498 depin run was on unguarded C and is valid.
+
+## 2026-10-20 — cloud task 082154E4
+
+Tags: #matching #background #palette #sprite-oam #nonmatching
+
+Worked solo and offline on the preclaimed cloud/082154E4 branch. Exact gain:
+0.000 percentage points (0% of this assignment matched). Reused this checkout's
+previous family notes and candidates. All retained changes are guarded drafts;
+the assembly remains the default. Used per-file check.py only, including the
+checks beneath variants.py; no make, full build, network or direct git mutations.
+Each changed unit was queued separately through build/commit.sh.
+
+- **08216584 — stopped below draft threshold, BgGfx_LoadTilemap.** Rechecked
+  the complete ignored candidate and read the condensed listing and big-function
+  guidance. Baseline remains 40.9%, 951 realigned differences / 265 ignoring
+  registers. The previously documented bounded/interior/wrapping paths and
+  metatile quadrant expansion remain the useful reconstruction. No qualifying
+  source was added. Ghidra export is still unavailable.
+- **08217430 — stopped below draft threshold, Palette_ApplyObjectFade.**
+  Baseline was 68.2%, 259 realigned differences / 102 ignoring registers.
+  Tested scoped loop variables, per-path source/destination/counter pins,
+  explicit full-strength copy arguments, declaration order and predicate
+  materialization. Explicit copy arguments reduced structural differences to
+  100 but scored only 67.4%; scoped pins and unpinned scoped variables regressed.
+  No qualifying source was added. Mask/predicate code is substantially recovered,
+  but distinct bank-loop allocation remains unresolved.
+- **08217F4C — improved existing draft from 88.9% to 91.0%,
+  SpriteOam_QueueProjectedSprites.** Final extent 776 bytes; 37 realigned
+  differences / 16 ignoring registers. A local old matrix index pinned to r0,
+  copied to the result before increment/store, reproduces the affine allocator's
+  load/copy/increment sequence. Removing projection pins and changing the inline
+  to accept the drawable did not improve structure. Projection-pointer caching,
+  the scale comparisons' signed branch selection, and scheduling remain.
+- **08218254 — improved existing draft from 86.7% to 91.0%,
+  SpriteOam_QueueCameraRelativeSprites.** Final extent 692 bytes; 34 realigned
+  differences / 12 ignoring registers. Retaining drawable flags from the initial
+  skip test and applying the same matrix-counter update improved the candidate.
+  Camera/offset scheduling, signed branch selection and allocation remain.
+- **08217960 — retained existing 80.1% draft,
+  Palette_ApplyBackgroundFade.** Rechecked 604-byte extent, 82 realigned
+  differences / 39 ignoring registers. Added the required local alias and made
+  the fallback spell the raw assembly symbol. Packed-color constant hoisting,
+  loop-counter setup and allocation remain unchanged.
+- **082154E4 — new 82.6% draft, SpriteOam_FinalizeQueue.** Final extent
+  436 bytes; 41 realigned differences / 12 ignoring registers. The graphics
+  update task calls it after render callbacks and before palette updates. It
+  links queued sprites into 256 depth buckets through the low byte of OAM's
+  fourth halfword, computes hardware-priority output offsets, emits descending
+  depth buckets within the 128-entry limit, and disables unused OAM entries.
+  It then writes up to 32 affine matrices from the queued angle and signed
+  scales, using the sine table at 086149C4 and Div, and marks OAM dirty.
+  A stack struct containing the 256-byte bucket array and fill word, followed by
+  a separate priority array, reproduces the observed stack layout. Reusing the
+  tested zero scale as the zero result avoids redundant movs. Scoped first-loop
+  and affine-loop pins improved allocation. Keeping a separate priority sum
+  from the emitted-entry count and retaining a shared OAM base improved the
+  structure. Further count/base/index pin changes regressed; invariant-address
+  hoisting and priority-loop allocation remain. Register-pinning concession.
+
+All four changed units have file-local Subsystem_VerbNoun aliases. The fallback
+INCLUDE_ASM uses sub_XXXXXXXX literally: the checker parses that spelling before
+preprocessing when recording per-draft scores; using the descriptive macro there
+left the old fuzzy comment unchanged. Re-recorded all scores successfully with
+--nonmatching --record after formatting. depin.py --write was invoked on all four
+units; it skips guarded drafts because their default build is not an exact C
+match. No handwritten instruction bodies were introduced.
