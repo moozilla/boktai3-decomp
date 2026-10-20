@@ -1,9 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+// confidence=low: random neighboring directions with short hold durations.
+#define Player_UpdateWaveringMovement sub_08148318
 #ifdef NONMATCHING
-// fuzzy: 82.7%
-// Remaining differences: address calculations, branch layout and register allocation.
+// fuzzy: 87.6%
+// Remaining differences: RNG allocation, even-direction address scheduling and literal pools.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -163,13 +165,13 @@ void Player_UpdateWaveringMovement(struct Player *p)
             choice = (RandomBits(7) & 7);
             if (choice <= 5) {
                 p->facing = direction;
-                *timer = 9;
+                p->unk466[3] = 9;
             } else if (choice <= 6) {
                 p->facing = (direction + 7) & 7;
-                *timer = 3;
+                p->unk466[3] = 3;
             } else {
                 p->facing = (direction + 9) & 7;
-                *timer = 3;
+                p->unk466[3] = 3;
             }
         } else {
             choice = (RandomBits(7) & 7);
@@ -204,5 +206,5 @@ void Player_UpdateWaveringMovement(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateWaveringMovement);
+INCLUDE_ASM("asm/nonmatching", sub_08148318);
 #endif
