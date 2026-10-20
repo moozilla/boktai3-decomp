@@ -1,4 +1,3 @@
-#define Dog_ResolvePendingObject sub_080DF2E0
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_behavior.h"
@@ -101,5 +100,5 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DF2E0);
+INCLUDE_ASM("asm/nonmatching", Dog_ResolvePendingObject);
 #endif

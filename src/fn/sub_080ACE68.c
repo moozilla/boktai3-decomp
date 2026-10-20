@@ -1,4 +1,3 @@
-#define Vorn_UpdateScriptedAnimation sub_080ACE68
 #include "global.h"
 
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);

@@ -1,5 +1,4 @@
 #define SpriteGroup_SetSharedPosition Axe_SetAuxiliarySpriteRenderState
-#define Axe_UpdateFadeOutPhase        sub_080FD158
 #include "global.h"
 #include "scene_actor_reset.h"
 struct ActorGroupMotionState {

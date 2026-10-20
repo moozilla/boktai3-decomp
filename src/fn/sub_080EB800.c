@@ -1,4 +1,3 @@
-#define Octopus_StartHoldControl sub_080EB800
 #include "global.h"
 #include "scene_actor_reset.h"
 

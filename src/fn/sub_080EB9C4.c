@@ -1,4 +1,3 @@
-#define Octopus_EnterReleasePhase sub_080EB9C4
 #include "global.h"
 #include "scene_actor_reset.h"
 

@@ -1,4 +1,3 @@
-#define Octopus_BeginIdleAnimation sub_080EBF8C
 #include "global.h"
 #include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalFlags(void *, u32);
