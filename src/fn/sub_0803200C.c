@@ -22,7 +22,7 @@ s32 Text_CopyStringPair(u8 *dst, const void *a, const void *b, s32 c, s32 d)
     v = Script_ParseStringRef(b);
     v = (s32)Text_LookupString(v + d);
     if (v == 0) {
-fail:
+    fail:
         *dst = v;
         return -1;
     }
