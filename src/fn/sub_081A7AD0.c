@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.2%
-// foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 struct ScenePanelPairState {
     u8 unknown0[0xE1];
     u8 threshold : 8;
@@ -26,10 +23,13 @@ void ScenePanel_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
         case 4:
             if (ScenePair_CountPositiveCounters(panel->pair) != 2)
                 goto reset;
-            if (panel->threshold <= 42)
-                panel->state = 8;
-            else
-                panel->state = 7;
+            {
+                s32 t = panel->threshold;
+                if (t <= 42)
+                    panel->state = 8;
+                else
+                    panel->state = 7;
+            }
             break;
         case 6:
             if (ScenePair_CountPositiveCounters(panel->pair) != 0)
@@ -55,6 +55,3 @@ void ScenePanel_AdvanceConditionalPairState(struct ScenePanelPairState *panel)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScenePanel_AdvanceConditionalPairState);
-#endif
