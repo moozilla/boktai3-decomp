@@ -194,5 +194,5 @@ s32 Ooze_BeginAttack(struct Ooze *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08205B70);
+INCLUDE_ASM("asm/nonmatching", Ooze_BeginAttack);
 #endif
