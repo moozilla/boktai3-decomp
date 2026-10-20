@@ -20,8 +20,8 @@ void RfuManager_DisconnectAndWait(u8);
 void RfuManager_CompletePendingMscCycle(void);
 void RfuManager_ClearState(void);
 void RfuManager_FinishSlotReception(void);
-u8 sub_08224908(void);
-void sub_082249CC(void);
+u8 RfuManager_FindAllowedParents(void);
+void RfuManager_RemoveSendTargets(void);
 void RfuManager_UpdateLinkRecovery(u16);
 #ifdef NONMATCHING
 // fuzzy: 82.1%

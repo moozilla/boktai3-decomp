@@ -8836,13 +8836,17 @@ addr,name,mode,confidence,source,notes
 082237A0,RfuManager_StartChildConnect,thumb,low,src-alias,
 082239E0,RfuManager_UpdateLinkRecovery,thumb,low,src-alias,
 08223BA4,RfuManager_CheckVBlankSync,thumb,low,src-alias,Checks RFU synchronization and reports an error plus pending cycle completion on failure
+08223DB8,RfuManager_StepSlotTimer,thumb,low,src-alias,
 08223E28,RfuManager_ApplyRequestResult,thumb,low,src-alias,
 08224524,Rfu_ReqCallback,thumb,low,src-alias,
 082245A8,RfuManager_UpdateChildAdmissions,thumb,low,src-alias,
 08224880,RfuManager_FinishSlotReception,thumb,low,src-alias,Clears a successfully received NI slot and reports completion while awaiting connection data
 082248DC,RfuManager_StartPendingRecovery,thumb,low,src-alias,Saves the current operation and enters child connection recovery when recovery is pending
+08224908,RfuManager_FindAllowedParents,thumb,low,src-alias,
 08224980,RfuManager_NotifyEvent,thumb,low,src-alias,Invokes the registered event handler and clears its transient event parameters
 082249A8,RfuManager_DisconnectAndWait,thumb,low,src-alias,Disconnects the selected slots synchronously while temporarily setting the request guard
+082249CC,RfuManager_RemoveSendTargets,thumb,low,src-alias,
+08224AA8,RfuManager_DropFailingTargets,thumb,low,src-alias,
 08224BA0,RfuManager_SetMscCallback,thumb,low,src-alias,Stores the caller MSC handler and reinstalls the manager MSC callback
 08224BB8,RfuManager_SetEventCallback,thumb,low,src-alias,Replaces the handler used to report manager events
 08224C84,RfuManager_CompletePendingMscCycle,thumb,low,src-alias,Clears an active MSC cycle flag and reports event 0x45
@@ -9468,7 +9472,9 @@ addr,name,mode,confidence,source,notes
 08237EC8,SpritePulseEffect_OnAnimationEvent,thumb,low,src-alias,Callback sets the effect state to 1 and clears its counter; pulse identity is tentative
 08237FFC,TimedSpriteEffect_Destroy,thumb,low,src-alias,Task destruction callback removes the embedded sprite
 0823800C,PositionedSprite_Init,thumb,low,src-alias,
+08238060,SpritePulseEffect_InitCollider,thumb,low,src-alias,
 082381C8,TimedSpriteEffect_Create,thumb,low,src-alias,Creates a sprite task with duration parameters and destroys it if initialization fails
+08238280,Player_SetAnimationIndex,thumb,low,src-alias,
 08238300,Player_SetDirectionalVelocity_08238300,thumb,low,src-alias,
 082383D4,Player_SetTetherMode,thumb,low,src-alias,
 082383FC,Player_ResetActionState,thumb,low,src-alias,
