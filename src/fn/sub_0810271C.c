@@ -9,12 +9,17 @@ void TetherActor_CopyPosition(struct SceneVec *);
 void TetherActor_SetPosition(struct SceneVec *);
 u8 NamedObject_IsMapCellOccupied(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline u8 *CellData(s32 cell) {
+static inline u8 *CellData(s32 cell)
+{
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p) return p + 4;
+    if (p)
+        return p + 4;
     return gUnk_030052F4->cells + (cell * 4 + 12);
 }
-static inline u32 Attributes(s32 cell) { return *(u16 *)(CellData(cell) + 2); }
+static inline u32 Attributes(s32 cell)
+{
+    return *(u16 *)(CellData(cell) + 2);
+}
 static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
                               const struct SceneVec *a)
 {
