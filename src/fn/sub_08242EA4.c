@@ -1,4 +1,3 @@
-#define Player_UpdateActionPhase sub_08242EA4
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 91.6%
@@ -14,7 +13,7 @@ void sub_0823B7A4(struct Player *);
 void Player_ClampPositionToStoredTerrainCell_0823B938(struct Player *);
 void Player_UpdateModifier08Drift(struct Player *);
 void Player_SetSecondaryActionFlags(struct Player *, u32);
-void sub_08242DCC(struct Player *);
+void Player_SynchronizeColliderState(struct Player *);
 s32 Callback_InvokeActor(void *, void *);
 void Player_UpdateActionPhase(struct Player *p)
 {
@@ -45,7 +44,7 @@ void Player_UpdateActionPhase(struct Player *p)
                 *(u32 *)((u8 *)p + 0x38) = src[0];
                 *(u32 *)((u8 *)p + 0x3C) = hi;
             }
-            sub_08242DCC(p);
+            Player_SynchronizeColliderState(p);
             if (p->cameraOffsetActive != 0) {
                 sub_0823B7A4(p);
             }
@@ -55,12 +54,12 @@ void Player_UpdateActionPhase(struct Player *p)
         case 2:
             Player_SetSecondaryActionFlags(p, 8);
             Callback_InvokeActor(p, (void *)p->triggerAnimationCallback);
-            sub_08242DCC(p);
+            Player_SynchronizeColliderState(p);
             break;
         default:
             break;
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08242EA4);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateActionPhase);
 #endif
