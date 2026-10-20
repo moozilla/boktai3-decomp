@@ -2,9 +2,10 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-// confidence=low: action role inferred from local animation, motion and effects.
+// confidence=low: moves the part along its stored retreat angle, then returns to idle.
+#define Vanargand_UpdatePartSidestep sub_081B48A0
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fuzzy: 93.9%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -28,7 +29,7 @@ struct VanargandPart {
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
-static inline void StepSequence(void *obj)
+static inline void StepSequence(void *obj, u32 firstMask)
 {
     struct VanargandPart *owner = obj;
     register struct DisplaySequenceState *state asm("r4");
@@ -45,8 +46,7 @@ static inline void StepSequence(void *obj)
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
+        bit = firstMask;
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -158,6 +158,12 @@ static inline u8 Ended(struct VanargandPart *p)
     return p->motion[0x29] == 2;
 }
 
+static inline void AddPlanar(struct SceneVec *v, struct SceneVec *origin)
+{
+    v->x = origin->x + v->x;
+    v->z = origin->z + v->z;
+    v->y = origin->y;
+}
 // confidence=low: action role inferred from local motion and animation.
 void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
 {
@@ -171,45 +177,60 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
             asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 11, (u8)p->variant, 0);
         }
-        StepSequence(p);
-        p->state = 0;
-        p->timer = 0;
+        {
+            register u32 firstBit asm("r3") = 1;
+            asm("" : "+r"(firstBit));
+            StepSequence(p, firstBit);
+        }
+        {
+            register u32 zero asm("r1") = 0;
+            asm("" : "+r"(zero));
+            p->state = zero;
+            p->timer = zero;
+        }
         p->enter = 1;
     }
-    switch (p->state) {
-        case 0: {
-            struct SceneVec target;
-            u8 *enter = &p->enter;
-            if (*enter) {
-                *enter = 0;
-                Vector(&target, *((u8 *)p + 0x187), 128);
-                target.x = p->origin.x + target.x;
-                target.z = p->origin.z + target.z;
-                target.y = p->origin.y;
-                MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
-            }
-            MotionTrack_Update(p->motion);
-            if (Ended(p)) {
-                p->state = 1;
-                p->timer = 0;
-                *enter = 1;
-            }
-            break;
-        }
-        case 1:
-            if (p->enter) {
-                p->enter = 0;
-                {
-                    void *resource = *(void **)(boss + 0x4d0);
-                    asm("" : "+r"(resource));
-                    Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
+    {
+        u32 state = p->state;
+        asm("" : "+r"(state));
+        switch (state) {
+            case 0: {
+                struct SceneVec target;
+                register u8 *enter asm("r6") = &p->enter;
+                if (*enter) {
+                    *enter = 0;
+                    Vector(&target, *((u8 *)p + 0x187), 128);
+                    AddPlanar(&target, &p->origin);
+                    MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
                 }
-                StepSequence(p);
+                MotionTrack_Update(p->motion);
+                if (Ended(p)) {
+                    {
+                        register u32 next asm("r2") = 1;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
+                    p->timer = 0;
+                    *enter = 1;
+                }
+                break;
             }
-            p->finished = 1;
-            break;
+            case 1:
+                if (p->enter) {
+                    p->enter = 0;
+                    {
+                        void *resource = *(void **)(boss + 0x4d0);
+                        asm("" : "+r"(resource));
+                        Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
+                    }
+                    asm("" : "+r"(state));
+                    StepSequence(p, state);
+                }
+                p->finished = 1;
+                break;
+        }
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSidestep);
+INCLUDE_ASM("asm/nonmatching", sub_081B48A0);
 #endif
