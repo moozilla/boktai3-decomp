@@ -1,4 +1,5 @@
 #include "global.h"
+#define BossSlot2_SelectCombatAction sub_0817C3F4
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 struct DecisionActor {
