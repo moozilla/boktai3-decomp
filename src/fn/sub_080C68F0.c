@@ -4,7 +4,7 @@
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
-// fuzzy: 81.6%
+// fuzzy: 91.9%
 // Remaining differences: animation selector register allocation and flag-clear order.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -127,5 +127,5 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeStop);
+INCLUDE_ASM("asm/nonmatching", sub_080C68F0);
 #endif
