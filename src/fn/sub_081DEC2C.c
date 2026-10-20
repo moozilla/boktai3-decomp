@@ -47,50 +47,50 @@ void Task_Kill(void *);
 void AnimPanel_UpdateClockSetup(struct AnimPanelClock *p)
 {
     switch (p->state) {
-    case 0:
-        p->prevYear = p->year;
-        p->prevMonth = p->month;
-        p->prevDay = p->day;
-        p->prevHour = p->hour;
-        p->prevMinute = p->minute;
-        if (gUnk_03005260.pressed & 0x20) {
-            if (p->cursor <= 0)
-                p->cursor = 4;
-            else
-                p->cursor--;
-            Sound_PlaySong(0xDC);
-        } else if (gUnk_03005260.pressed & 0x10) {
-            if (p->cursor > 3)
-                p->cursor = 0;
-            else
-                p->cursor++;
-            Sound_PlaySong(0xDC);
-        }
-        AnimPanel_HandleClockInput(p);
-        if (gUnk_03005260.pressed & 8) {
-            Sound_PlaySong(0xDD);
-            SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);
-            Time_CalculateSunriseSunset(0x23A666, 0x8BC000, 0);
-            gUnk_03005430[9] = 0;
-            Menu_StartFadeOut(p->fadeSpeed);
-            p->state = 1;
-            p->confirmed = 1;
-        }
-        sub_081DE780(p);
-        Palette_UpdateHighlightPulse(p->pulse, p->pulseState);
-        break;
-    case 1:
-        if (p->fadeTimer > (1 << p->fadeSpeed)) {
-            MenuSprites_SetFlagBits(p);
-            if (p->confirmed == 0)
-                Script_Call(gUnk_02000340[3], 0);
-            else
-                Script_Call(gUnk_02000340[2], 0);
-            Task_Kill(p);
-        }
-        p->fadeTimer++;
-        break;
-    case 2:
-        break;
+        case 0:
+            p->prevYear = p->year;
+            p->prevMonth = p->month;
+            p->prevDay = p->day;
+            p->prevHour = p->hour;
+            p->prevMinute = p->minute;
+            if (gUnk_03005260.pressed & 0x20) {
+                if (p->cursor <= 0)
+                    p->cursor = 4;
+                else
+                    p->cursor--;
+                Sound_PlaySong(0xDC);
+            } else if (gUnk_03005260.pressed & 0x10) {
+                if (p->cursor > 3)
+                    p->cursor = 0;
+                else
+                    p->cursor++;
+                Sound_PlaySong(0xDC);
+            }
+            AnimPanel_HandleClockInput(p);
+            if (gUnk_03005260.pressed & 8) {
+                Sound_PlaySong(0xDD);
+                SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);
+                Time_CalculateSunriseSunset(0x23A666, 0x8BC000, 0);
+                gUnk_03005430[9] = 0;
+                Menu_StartFadeOut(p->fadeSpeed);
+                p->state = 1;
+                p->confirmed = 1;
+            }
+            sub_081DE780(p);
+            Palette_UpdateHighlightPulse(p->pulse, p->pulseState);
+            break;
+        case 1:
+            if (p->fadeTimer > (1 << p->fadeSpeed)) {
+                MenuSprites_SetFlagBits(p);
+                if (p->confirmed == 0)
+                    Script_Call(gUnk_02000340[3], 0);
+                else
+                    Script_Call(gUnk_02000340[2], 0);
+                Task_Kill(p);
+            }
+            p->fadeTimer++;
+            break;
+        case 2:
+            break;
     }
 }

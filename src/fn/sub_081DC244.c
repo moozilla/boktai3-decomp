@@ -34,72 +34,72 @@ void ScreenMessage_Update(struct ScreenMessage *s)
     u32 *g;
 
     switch (s->state) {
-    case 0:
-        if (gUnk_03005260[1] & 1) {
-            if (s->selection == 0 || gUnk_020002F8[2] == 0) {
-                Sound_PlaySong(0xDD);
+        case 0:
+            if (gUnk_03005260[1] & 1) {
+                if (s->selection == 0 || gUnk_020002F8[2] == 0) {
+                    Sound_PlaySong(0xDD);
+                    TextWindow_Destroy(s->textWindow);
+                    if (gUnk_020002F8[2] != 0) {
+                        s->firstFlags |= 1;
+                        s->secondFlags |= 1;
+                    }
+                    Script_Call(gUnk_020002F8[3], 0);
+                    Task_Kill(s);
+                } else {
+                    Sound_PlaySong(0xDE);
+                    TextWindow_Destroy(s->textWindow);
+                    if (gUnk_020002F8[2] != 0) {
+                        s->firstFlags |= 1;
+                        s->secondFlags |= 1;
+                    }
+                    Script_Call(gUnk_020002F8[4], 0);
+                    Task_Kill(s);
+                }
+            } else if (gUnk_03005260[1] & 2) {
+                if (gUnk_020002F8[2] == 0) {
+                    Sound_PlaySong(0xDD);
+                    TextWindow_Destroy(s->textWindow);
+                    Script_Call(gUnk_020002F8[3], 0);
+                    Task_Kill(s);
+                } else {
+                    Sound_PlaySong(0xDE);
+                    TextWindow_Destroy(s->textWindow);
+                    s->firstFlags |= 1;
+                    s->secondFlags |= 1;
+                    Script_Call(gUnk_020002F8[5], 0);
+                    Task_Kill(s);
+                }
+            }
+            if (gUnk_020002F8[2] == 1) {
+                if (((gUnk_03005260[1] & 0x20) && s->selection == 1) ||
+                    ((gUnk_03005260[1] & 0x10) && s->selection == 0)) {
+                    s->selection = 1 - s->selection;
+                    Sound_PlaySong(0x37C);
+                }
+                PairedFlags_SelectActive(s);
+                Palette_UpdateHighlightPulse(s->pulse, s->pulseState);
+            }
+            Palette_SetBackdropColor(0x73FF);
+            break;
+        case 1:
+            if (s->fadeTimer > (1 << s->fadeSpeed) || s->fadeSpeed == 0) {
                 TextWindow_Destroy(s->textWindow);
-                if (gUnk_020002F8[2] != 0) {
+                g = gUnk_020002F8;
+                if (g[2] != 0) {
                     s->firstFlags |= 1;
                     s->secondFlags |= 1;
                 }
-                Script_Call(gUnk_020002F8[3], 0);
-                Task_Kill(s);
-            } else {
-                Sound_PlaySong(0xDE);
-                TextWindow_Destroy(s->textWindow);
-                if (gUnk_020002F8[2] != 0) {
-                    s->firstFlags |= 1;
-                    s->secondFlags |= 1;
-                }
-                Script_Call(gUnk_020002F8[4], 0);
+                if (s->result == 0)
+                    Script_Call(g[5], 0);
+                else if (s->result == 1)
+                    Script_Call(g[3], 0);
+                else
+                    Script_Call(g[4], 0);
                 Task_Kill(s);
             }
-        } else if (gUnk_03005260[1] & 2) {
-            if (gUnk_020002F8[2] == 0) {
-                Sound_PlaySong(0xDD);
-                TextWindow_Destroy(s->textWindow);
-                Script_Call(gUnk_020002F8[3], 0);
-                Task_Kill(s);
-            } else {
-                Sound_PlaySong(0xDE);
-                TextWindow_Destroy(s->textWindow);
-                s->firstFlags |= 1;
-                s->secondFlags |= 1;
-                Script_Call(gUnk_020002F8[5], 0);
-                Task_Kill(s);
-            }
-        }
-        if (gUnk_020002F8[2] == 1) {
-            if (((gUnk_03005260[1] & 0x20) && s->selection == 1)
-                || ((gUnk_03005260[1] & 0x10) && s->selection == 0)) {
-                s->selection = 1 - s->selection;
-                Sound_PlaySong(0x37C);
-            }
-            PairedFlags_SelectActive(s);
-            Palette_UpdateHighlightPulse(s->pulse, s->pulseState);
-        }
-        Palette_SetBackdropColor(0x73FF);
-        break;
-    case 1:
-        if (s->fadeTimer > (1 << s->fadeSpeed) || s->fadeSpeed == 0) {
-            TextWindow_Destroy(s->textWindow);
-            g = gUnk_020002F8;
-            if (g[2] != 0) {
-                s->firstFlags |= 1;
-                s->secondFlags |= 1;
-            }
-            if (s->result == 0)
-                Script_Call(g[5], 0);
-            else if (s->result == 1)
-                Script_Call(g[3], 0);
-            else
-                Script_Call(g[4], 0);
-            Task_Kill(s);
-        }
-        s->fadeTimer++;
-        break;
-    case 2:
-        break;
+            s->fadeTimer++;
+            break;
+        case 2:
+            break;
     }
 }

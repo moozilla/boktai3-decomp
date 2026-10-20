@@ -48,40 +48,40 @@ void NameEntry_UpdateCursor(struct NameEntry *p)
         }
     } else {
         switch (p->cursor - 80) {
-        case 0:
-            p->anims[1].x = 0xB0;
-            p->anims[1].y = 0;
-            break;
-        case 1:
-            p->anims[1].x = 0xC0;
-            p->anims[1].y = 0;
-            break;
-        case 2:
-            p->anims[1].x = 0xB0;
-            p->anims[1].y = 0x10;
-            break;
-        case 3:
-            p->anims[1].x = 0xC0;
-            p->anims[1].y = 0x10;
-            break;
-        case 4:
-            p->anims[2].x = 0;
-            p->anims[2].y = -16;
-            p->anims[2].flags &= ~1;
-            p->anims[1].flags |= 1;
-            break;
-        case 5:
-            p->anims[2].x = 0;
-            p->anims[2].y = 0;
-            p->anims[1].flags |= 1;
-            p->anims[2].flags &= ~1;
-            break;
-        case 6:
-            p->anims[5].x = 0;
-            p->anims[5].y = 0;
-            p->anims[1].flags |= 1;
-            p->anims[5].flags &= ~1;
-            break;
+            case 0:
+                p->anims[1].x = 0xB0;
+                p->anims[1].y = 0;
+                break;
+            case 1:
+                p->anims[1].x = 0xC0;
+                p->anims[1].y = 0;
+                break;
+            case 2:
+                p->anims[1].x = 0xB0;
+                p->anims[1].y = 0x10;
+                break;
+            case 3:
+                p->anims[1].x = 0xC0;
+                p->anims[1].y = 0x10;
+                break;
+            case 4:
+                p->anims[2].x = 0;
+                p->anims[2].y = -16;
+                p->anims[2].flags &= ~1;
+                p->anims[1].flags |= 1;
+                break;
+            case 5:
+                p->anims[2].x = 0;
+                p->anims[2].y = 0;
+                p->anims[1].flags |= 1;
+                p->anims[2].flags &= ~1;
+                break;
+            case 6:
+                p->anims[5].x = 0;
+                p->anims[5].y = 0;
+                p->anims[1].flags |= 1;
+                p->anims[5].flags &= ~1;
+                break;
         }
     }
 }

@@ -1,7 +1,7 @@
 #include "global.h"
 /* AnimPanel_HandleClockInput: up/down (with hold repeat) changes the selected year/month/day/hour/minute field with wraparound, then refreshes the digit animations */
 #define AnimPanel_HandleClockInput sub_081DEA60
-#define AnimPanel_UpdateDigits sub_081DE84C
+#define AnimPanel_UpdateDigits     sub_081DE84C
 
 s32 Mod(s32, s32);
 s32 Clock_DaysInMonth(s32 year, s32 month);
@@ -52,79 +52,80 @@ void AnimPanel_HandleClockInput(struct AnimPanelClock *p)
     }
 
     switch (p->cursor) {
-    case 0:
-        if (dir == CLOCK_DIR_UP) {
-            if (p->year <= 2098) {
-                p->year++;
+        case 0:
+            if (dir == CLOCK_DIR_UP) {
+                if (p->year <= 2098) {
+                    p->year++;
+                    Sound_PlaySong(0x19A);
+                }
+            } else if (dir == CLOCK_DIR_DOWN) {
+                if (p->year > 2000) {
+                    p->year--;
+                    Sound_PlaySong(0x19A);
+                }
+            }
+            break;
+        case 1:
+            if (dir == CLOCK_DIR_UP) {
+                if (p->month > 11)
+                    p->month = 1;
+                else
+                    p->month++;
+                Sound_PlaySong(0x19A);
+            } else if (dir == CLOCK_DIR_DOWN) {
+                if (p->month <= 1)
+                    p->month = 12;
+                else
+                    p->month--;
                 Sound_PlaySong(0x19A);
             }
-        } else if (dir == CLOCK_DIR_DOWN) {
-            if (p->year > 2000) {
-                p->year--;
+            break;
+        case 2:
+            days = Clock_DaysInMonth(p->year, p->month);
+            if (dir == CLOCK_DIR_UP) {
+                if (p->day >= days)
+                    p->day = 1;
+                else
+                    p->day++;
+                Sound_PlaySong(0x19A);
+            } else if (dir == CLOCK_DIR_DOWN) {
+                if (p->day <= 1)
+                    p->day = days;
+                else
+                    p->day--;
                 Sound_PlaySong(0x19A);
             }
-        }
-        break;
-    case 1:
-        if (dir == CLOCK_DIR_UP) {
-            if (p->month > 11)
-                p->month = 1;
-            else
-                p->month++;
-            Sound_PlaySong(0x19A);
-        } else if (dir == CLOCK_DIR_DOWN) {
-            if (p->month <= 1)
-                p->month = 12;
-            else
-                p->month--;
-            Sound_PlaySong(0x19A);
-        }
-        break;
-    case 2:
-        days = Clock_DaysInMonth(p->year, p->month);
-        if (dir == CLOCK_DIR_UP) {
-            if (p->day >= days)
-                p->day = 1;
-            else
-                p->day++;
-            Sound_PlaySong(0x19A);
-        } else if (dir == CLOCK_DIR_DOWN) {
-            if (p->day <= 1)
-                p->day = days;
-            else
-                p->day--;
-            Sound_PlaySong(0x19A);
-        }
-        break;
-    case 3:
-        if (dir == CLOCK_DIR_UP) {
-            if (p->hour > 22)
-                p->hour = 0;
-            else
-                p->hour++;
-            Sound_PlaySong(0x19A);
-        } else if (dir == CLOCK_DIR_DOWN) {
-            if (p->hour <= 0)
-                p->hour = 23;
-            else
-                p->hour--;
-            Sound_PlaySong(0x19A);
-        }
-        break;
-    case 4:
-        if (dir == CLOCK_DIR_UP) {
-            if (p->minute > 58)
-                p->minute = 0;
-            else
-                p->minute++;
-            Sound_PlaySong(0x19A);
-        } else if (dir == CLOCK_DIR_DOWN) {
-            if (p->minute <= 0)
-                p->minute = 59;
-            else
-                p->minute--;
-            Sound_PlaySong(0x19A);
-        }
-        break;
-    }    AnimPanel_UpdateDigits(p);
+            break;
+        case 3:
+            if (dir == CLOCK_DIR_UP) {
+                if (p->hour > 22)
+                    p->hour = 0;
+                else
+                    p->hour++;
+                Sound_PlaySong(0x19A);
+            } else if (dir == CLOCK_DIR_DOWN) {
+                if (p->hour <= 0)
+                    p->hour = 23;
+                else
+                    p->hour--;
+                Sound_PlaySong(0x19A);
+            }
+            break;
+        case 4:
+            if (dir == CLOCK_DIR_UP) {
+                if (p->minute > 58)
+                    p->minute = 0;
+                else
+                    p->minute++;
+                Sound_PlaySong(0x19A);
+            } else if (dir == CLOCK_DIR_DOWN) {
+                if (p->minute <= 0)
+                    p->minute = 59;
+                else
+                    p->minute--;
+                Sound_PlaySong(0x19A);
+            }
+            break;
+    }
+    AnimPanel_UpdateDigits(p);
 }
