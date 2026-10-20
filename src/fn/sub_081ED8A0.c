@@ -1,192 +1,173 @@
+#include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#include "contact_swarm.h"
-#include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 91.6%
-// Remaining differences: entry/reset allocation and the second sprite stepper.
-struct P {
-    u8 pad0[0x2c0];
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState seq;
+struct Frames {
+    u16 *data;
+    u8 flags, count, multiplier, duration;
+    u16 index, pad, rate, timer;
 };
+struct Render {
+    u32 flags;
+    u8 pad[12];
+    u16 tile;
+};
+int Anim_SetSequence(struct Frames *, void *, u32, int, int);
+int Anim_RestartSequence(struct Frames *, void *, u16, int, int);
+void Sound_PlaySong(int);
+void SceneMover_ApproachScreenX(void *, int);
+void sub_081EC6BC(void *);
+void sub_081EC7D8(void *);
+void sub_081EC974(void *);
+void SceneActors_EmitPeriodicParticles(void *, int);
+int sub_081ECE80(void *, int, int);
+int Player_GetHorizontalVelocity(void *);
+void Player_GetWorldPosition(int, void *);
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-void sub_081EC6BC(struct P *);
-void sub_081EC7D8(struct P *);
-void sub_081EC974(struct P *);
-void SceneActors_EmitPeriodicParticles(struct P *, s32);
-s32 SceneMover_ApproachScreenX(struct P *, s32);
-s32 sub_081ECE80(struct P *, s32, s32);
-s32 Player_GetHorizontalVelocity(void *);
-void Player_GetWorldPosition(s32, struct SceneVec *);
-void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32, s32);
-#define B(o)   (*(u8 *)((u8 *)p + (o)))
-#define H(o)   (*(u16 *)((u8 *)p + (o)))
-#define S(o)   (*(s16 *)((u8 *)p + (o)))
-#define W(o)   (*(s32 *)((u8 *)p + (o)))
-#define PTR(o) (*(void **)((u8 *)p + (o)))
-static inline u32 RandomBits(u32 mask)
+#define W(p, o) (*(s32 *)((u8 *)(p) + (o)))
+#define H(p, o) (*(s16 *)((u8 *)(p) + (o)))
+#define B(p, o) (*((u8 *)(p) + (o)))
+static inline int randomValue(void)
 {
     gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304] & mask;
+    return gUnk_086141BC[gUnk_03005304];
 }
-static inline void Update(struct P *p, s32 time)
+static inline void step(struct Frames *f, struct Render *r)
 {
-    sub_081EC6BC(p);
-    sub_081EC7D8(p);
-    sub_081EC974(p);
-    SceneActors_EmitPeriodicParticles(p, time);
-}
-static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
-{
-    struct ContactSwarmSprite *sprite = sp;
-    struct DisplaySequenceState *state = st;
-    const volatile u16 *command;
-    u32 duration, flags, bit;
+    u16 *word = f->data + f->index;
+    r->tile = *word >> 6;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm volatile("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+        int settings = f->flags;
+        register int mask asm("r3") = 1;
+        register int mine asm("r1");
+        int bits;
+        mine = mask & settings;
+        bits = (*word & 48) >> 4;
+        bits &= mask;
+        if (mine != bits)
+            r->flags |= 4;
         else
-            sprite->flags &= ~4;
+            r->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
-        bit = 2;
-        asm volatile("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm volatile("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+        int settings = f->flags;
+        register int mask asm("r3") = 2;
+        register int mine asm("r1");
+        int bits;
+        mine = mask & settings;
+        mine = (u8)mine;
+        bits = (*word & 48) >> 4;
+        bits &= mask;
+        if (mine != bits)
+            r->flags |= 8;
         else
-            sprite->flags &= ~8;
+            r->flags &= ~8;
     }
     {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm volatile("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
+        u32 mask;
+        int duration;
+        register int savedDuration asm("r3");
+        u32 timer = f->timer + 1;
+        f->timer = timer;
+        {
+            register u32 initialMask asm("r1") = 65535;
+            asm("" : "+r"(initialMask));
+            mask = initialMask;
+        }
+        duration = f->duration;
+        timer = (u16)timer;
         savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
+        if (timer >= (u32)duration) {
+            register int flags asm("r1");
+            int index;
+            f->timer = 0;
+            flags = f->flags;
             if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
+                index = f->index;
+                if (!index) {
+                    if (flags & 8) {
+                        f->timer = savedDuration;
+                        goto update;
                     }
-                } else {
-                    state->index = index - 1;
+                    index = f->count;
                 }
+                index--;
+                goto storeIndex;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm volatile("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                } else {
+                int count;
+                index = f->index + 1;
+                f->index = index;
+                count = f->count;
+                if ((index & mask) < count)
+                    goto update;
+                index = (u8)(flags & 8);
+                if (index) {
+                    f->timer = duration;
+                    index = count - 1;
                 }
             }
+        storeIndex:
+            f->index = index;
+        update:
+            word = f->data + f->index;
             {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                u32 value = *word;
+                u32 low = 15;
+                low &= value;
+                f->multiplier = low;
             }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
+            f->duration = (f->multiplier * f->rate) >> 6;
+            if (!f->duration)
+                f->duration = 1;
         }
     }
 }
 
-#define SceneActors_UpdateTimedApproach                                                            \
-    sub_081ED8A0 // confidence=low: two sequences precede a timed screen-X approach.
-void SceneActors_UpdateTimedApproach(struct P *arg, s32 ticks)
+void ActorMotion_AdvanceTowardScreenTarget(void *, int);
+// confidence=low: paired render animations and movement are observed statically.
+#define SceneActors_UpdateDelayedMovement sub_081ED8A0
+void SceneActors_UpdateDelayedMovement(void *arg, int time)
 {
-    volatile s32 time = ticks;
-    register struct P *input asm("r9") = arg;
-    register s32 done asm("r10") = 0;
-    register struct P *p asm("r8") = input;
-    if (B(0xb1)) {
-        struct ContactSwarmSprite *sprite;
-        struct ContactSwarmSprite *second;
-        register struct DisplaySequenceState *state asm("r4");
-        B(0xb1) = done;
-        sprite = &p->sprite;
-        second = (void *)((u8 *)p + 0x308);
-        W(0x298) = done;
-        W(0x290) = done;
-        *(s32 *)((u8 *)sprite + 0x3c) = done;
-        state = &p->seq;
-        Anim_SetSequence(state, PTR(0x390), 0, 0, done);
-        Step(sprite, state);
-        *(s32 *)((u8 *)second + 0x3c) = 4;
-        state = (void *)((u8 *)second + 0x2c);
-        Anim_SetSequence(state, PTR(0x390), 4, 0, 0);
-        Step(second, state);
+    void *p = arg;
+    int tick = time;
+    int result = 0;
+    void *base = p;
+    u8 *enter;
+    enter = (u8 *)p + 0xb1;
+    if (*enter) {
+        int zero = 0;
+        struct Render *r;
+        struct Render *r2;
+        struct Frames *f;
+        *enter = zero;
+        r = (void *)((u8 *)p + 0x2c0);
+        r2 = (void *)((u8 *)p + 0x308);
+        W(p, 0x298) = zero;
+        W(p, 0x290) = zero;
+        W((u8 *)r + 0x3c, 0) = zero;
+        f = (void *)((u8 *)p + 0x2ec);
+        Anim_SetSequence(f, (void *)W(p, 0x390), zero, 0, zero);
+        step(f, r);
+        W((u8 *)r2 + 0x3c, 0) = 4;
+        f = (void *)((u8 *)r2 + 0x2c);
+        Anim_SetSequence(f, (void *)W(base, 0x390), 4, 0, 0);
+        step(f, r2);
     }
-    if (time > 120)
-        done = sub_081ECE80(input, W(0x294), 0x6000);
-    W(0x288) = RandomBits(1);
-    sub_081EC6BC(input);
-    sub_081EC7D8(input);
-    sub_081EC974(input);
-    SceneActors_EmitPeriodicParticles(input, time);
-    if (done) {
-        *((u8 *)input + 0xaf) = 1;
-        W(0x284) = 16;
+    {
+        int t = tick;
+        asm("" : "+r"(t));
+        if (t > 120)
+            result = sub_081ECE80(p, W(base, 0x294), 0x6000);
+    }
+    W(base, 0x288) = (randomValue() & 1);
+    sub_081EC6BC(p);
+    sub_081EC7D8(p);
+    sub_081EC974(p);
+    SceneActors_EmitPeriodicParticles(p, tick);
+    {
+        int test = result;
+        if (test) {
+            B(p, 0xaf) = 1;
+            W(base, 0x284) = 16;
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081ED8A0);
-#endif

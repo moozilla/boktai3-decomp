@@ -1087,3 +1087,116 @@ recommitted as new progress. No network, full build, or direct git mutation.
 
 Validation used only tools/check.py (including variants' per-file checks).
 Combined ROM validation remains for integration. Notes queued with build/commit.sh.
+## Task 081ED5F4 — 2026-10-20
+
+Tags: #matching #scene-actors #tooling
+
+- 081ED5F4 matched as `SceneActors_UpdateMovement`: paired render animations (sequences zero and four), target movement and periodic particles. Exact fast check: 680 bytes. Register-pinning concession; depin reduced 20 hints to eight. Keeping the initialization zero through the sequence call, a full-width local sequence declaration, and the flags operand in r1 closed the match.
+- 081ED8A0 matched as `SceneActors_UpdateDelayedMovement`: same animation setup, motion starts after tick 120; successful motion sets transition byte AF and field 284 to 16. Exact fast check: 724 bytes. Declaration order plus two scoped register temporaries closed the six-instruction residue. Depin reduced twelve hints to nine.
+- 081EE518 drafted 90.5% as `SceneActors_UpdateSequenceTwoAction` (tentative phase semantics). Full-extent NONMATCHING check: 75 differing instructions, 20 ignoring registers. Five phases initialize sequence two, advance to sequence three, follow player-derived velocity, then reverse the sequence and request transition. Returning the raw random table value from the inline, and applying the mask at its caller, prevented GCC from merging the two random paths and raised the candidate from 60.6% to 90.5%. Kept guarded in src with default INCLUDE_ASM.
+- 081EDB74 stopped: candidate for `SceneActors_UpdateDeparture` matches the visible body to 97.5% (ten differing instructions, two structural); full-extent draft check is only 65.2%, so not committed. Inventory includes the following raw assembly blob starting 081EDE4C through 081EE130. Investigate that separate prologue/boundary before resuming; do not treat body-only similarity as full-function acceptance. Candidate in wip/sub_081EDB74.c.
+- 081EE130 stopped below draft threshold: randomized timed action; latest full reviewed 1000-byte extent scored 78.1%. Remaining pointer lifetimes, repeated arithmetic load order, and first animation's shared constant-one allocation. Candidate in wip/sub_081EE130.c.
+- 081EEAD8 stopped below draft threshold: palette interpolation/flashing followed by five particle spawns per tick and eventual transition. Plain vector fields reached 70.1%; bitfields and base pins regressed to 65.9%. Candidate in wip/sub_081EEAD8.c, earlier version in build/ead8.old.c. No production C retained.
+
+Tool caveat: `tools/depin.py` does not enable NONMATCHING. On a guarded draft its default assembly branch passes, so it removes all C hints without validating the draft. Restored 081EE518's hints immediately and reran `check.py --nonmatching --record` to confirm 90.5%; corrective driver commit preserves the validated result. Use depin on an extracted unguarded candidate for future drafts.
+
+No full build, network operation or shared documentation edits. Existing tools/cloud_task.py modification left untouched. Exact code gain is the two matches only; draft earns no exact progress. Integration should validate the combined ROM and calculate percentage-point gain centrally.
+# Task 0815788C — 2026-10-20
+
+Tags: #matching #player #contact #register-allocation
+
+- 0815788C matched: `Player_UpdateActionModeMovement` (tentative). Player callback using table 08610B70; action modes 0/2 run timed events, mode 1 also accumulates action and ticks mode particles. The mode-1 path requests nearby effect targets and clamps alternate terrain positions.
+- 08157CFC matched: `Player_UpdateInteractionMovement` (tentative). Uses callback table 08610C0C. This supplied the common implementation for 0815788C and 08158848. Five qualifying updates probe 50 units behind facing; a floor at least 200 units above the current Y and no cell flag 4 starts action 4. The eligibility flag lives at player +0x284, not +0x464.
+- 08158320 matched: `Player_UpdateInteractionHoverDisplay` (tentative). Clamps interaction velocity, refreshes positional effects, and updates hover height toward a random byte target every 16 ticks. Current hover height is +0x466, target +0x467, timer +0x468; collider Y includes terrain recovery height. Register-pinned concession; depin removed two of six initial hints, and the retained four hints passed exact check after formatting.
+- 08158848 matched: `Player_UpdateLinkModeMovement` (tentative). Installed by Player_InitActionMode under global flag 0x1000; uses table 08610D88. Shares terrain/action-four logic with 08157CFC, omits periodic scene-feature events, and has distinct kind-two and kind-four handling.
+- 0815E1F0 drafted 85.6%: `PlayerContact_ApplyResponse`. Applies contact power and reaction flags, scales the applied cost by player status/mode, and raises pending damage to the larger response. Full guarded draft recorded by check.py. Remaining differences include flag/load ordering, shift/damage register allocation, repeated special-state checks, and timed-reset call setup (ROM retains source power/duration in r2/r3 and reads global flags). No invented hidden-argument contract was added. The movement animation byte must be read signed despite the shared header's u8 field.
+- 0815E8A4 drafted 89.4%: `PlayerContact_ApplyTerrainDamage` (tentative). Selects hazardous-terrain reactions, accumulates terrain/status damage, displays and subtracts damage, clears the pending vector, and consumes inventory item 0x26 to restore health. Remaining differences include early reaction call merging, boolean materialization, address lifetimes and register allocation. The commit subject used the pre-format 88.5% score; the recorded full-extent score is 89.4%.
+
+Useful technique: typed SceneVec/bitfield union probes reproduce packed halfword updates and the inlined terrain tests. A local mask before the status load fixes ordering. Initializing special-state results after loading `active` fixes another load-order difference. The unsigned nonzero expression `(-value | value) >> 31` preserves the original rsbs/orrs/lsrs idiom; operand order selects the original registers. Inline helpers around the random result and hover-target subtraction preserve arithmetic shift and store ordering.
+
+Validation: only tools/check.py per-file checks; no make, full build, network, push or PR. Exact sources were formatted with the pinned clang-format. Four exact functions out of six assigned (66.7% of assigned functions); drafts receive no exact credit. Shared docs/index and the pre-existing tools/cloud_task.py modification were left untouched, per cloud-worker instructions.
+
+Score recording caveat: check.py --record keys scores by the compiled sub_ alias, but the already-named 0815E1F0 fallback uses PlayerContact_ApplyResponse. Recorded with the address token temporarily, then restored the correct named INCLUDE_ASM fallback. No generated assembly was edited.
+
+## Task 081A0BC8 — 2026-10-20
+
+Tags: #matching #hresvelgr #scene-commands #register-allocation
+
+Exact progress: 0.0 percentage-point gain. Two guarded drafts, no exact matches.
+The supplied branch was cloud/081A0BC8; the actual checkout reports
+cloud/0815788C (with the task-claim commit in its history). No branch changes
+were made; driver commits are on that existing branch. The pre-existing
+modification to tools/cloud_task.py was left untouched.
+
+- 081A14FC stopped unmatched after full assembly and relative review, following
+  BIG_FUNCTIONS guidance. Five-state sequence tentatively handles defeat:
+  starts animation 15, waits for frame >8 and the player action gate, runs the
+  first event script, then animation 20; later falls to terrain, emits bursts,
+  sets event flags 0/3/0x4E and runs the second script. State 1 derives movement
+  in 30-tick sections, adjusts animation rate and emits randomized motion
+  entries. No useful large relative: best covers only 7%. No qualifying C
+  candidate; repeated terrain, RNG and stack-vector expansion remain work.
+- 081A1EFC stopped unmatched after full condensed assembly and relative review.
+  Tentatively applies received/environmental damage: consumes pending bytes
+  +328/+329 and halfword +326, chooses the active contact pair at +31C/+320
+  or +31E/+322, clears all four, and considers contact bit 0x40. Environmental
+  damage is five times the signed global player field +876 and has a 60-tick
+  cooldown at +31A. Subtracts actor health +94, displays damage, requests
+  reactions through callback +100, and emits spark/motion effects. Packed
+  stack vectors and many reaction branches prevented a useful close draft;
+  relatives cover only short pieces (best 11%).
+- 081A0BC8 stopped unmatched, scratch candidate 62.2% (166 realigned differing
+  instructions, 98 ignoring registers). Tentative sweep attack: waits past
+  128 ticks, positions beside target, moves toward arena edge, periodically
+  spawns projectiles at randomized nearby terrain cells. Uses action state
+  +2F0, facing +A8 and mirror +32B; stops beyond coordinate 5120. Shared terrain
+  code from Actor_UpdateMovementAnimationAndEffects helped recover semantics,
+  but RNG lifetime, control shape and actor offsets still differ. Scratch:
+  wip/sub_081A0BC8.c; below retention threshold.
+- 081A2430 stopped unmatched, valid scratch candidate 61.9% before allocation
+  experiments. Hresvelgr scene-command dispatcher, based on the receiver at
+  +118 and shared SceneEventReceiver layout. Kinds 0/1/19/26 request actions
+  28/29/30/31; 26 also sets mirror +32B. Kind 9 configures an effect, 5 changes
+  heading and restarts animation, 2 updates body/display positions. Inline
+  function arguments hoisted action/callback constants before stores; a macro
+  improved ordering. Correct prepared flag is +B1; transition-pending is +B0.
+  Register pins worsened the candidate. Scratch wip/sub_081A2430.c only.
+- 081A26D8 drafted 85.3% as Hresvelgr_UpdateMovementAndTargets. Runs command
+  dispatch, body motion and animation; copies body position to display +1B4;
+  applies a decaying sine/cosine shake from +310; updates target metrics and
+  per-target angles/squared distances from pointers +110. Typed views fixed
+  load/store order and avoided raw-pointer loop strength reduction. A pinned
+  r9 actor alias plus empty identity barrier improved the draft. Remaining:
+  shake pointer/angle registers, literal-load order, target-loop shape and
+  pointer copies (32 realigned differences, 17 ignoring registers). Metrics
+  use an overlapping union to avoid a one-element distance array indexed by
+  the runtime count. Guarded fallback uses original assembly. Final full-extent
+  recorded score differs from commit subject's initial 85.1%.
+- 081A12DC drafted 81.7% as Hresvelgr_FireProjectileAndDescend. Faces target,
+  starts animation 25, raises projectile origin by 512, launches with a
+  four-unit planar vector and vertical speed 48, then descends toward Y=832
+  in steps of four after the animation event. Inline vector construction and
+  position-copy/raise helpers fixed stack halfword access patterns. Pinned
+  state pointer r8 improves allocation. Remaining: heading-mask operand ties,
+  actor aliases, vector pointer and counter registers (58 realigned differences,
+  17 ignoring registers). Guarded fallback uses original assembly.
+
+Validation: only check.py per-file comparisons, including --nonmatching --record
+on both formatted retained sources. depin.py was invoked on both candidates;
+its exact-match prerequisite means it skipped these nonmatching drafts. No
+make/full build, network, push, PR, generated assembly or ROM changes. Ghidra
+export gen/ghidra/decomp.c is absent. Only qualifying drafts and these notes
+are committed; lower-scoring scratch sources stay outside production src/.
+
+## Task 08141C40 — 2026-10-20
+
+Tags: #matching #player #movement #resource
+
+- 08141C40: drafted 99.9%, `Player_EmitMovementEffects`. One differing byte: the initial null-player branch targets 08141C90 rather than ROM 08141CFC. Remaining instructions are identical. Pinned the position pointer to r4; pinning the player pointer instead made code worse. Boolean global-flag accessor must return u8 and take its mask through an inline to preserve explicit boolean materialization and constant ordering. Called by normal movement and the timed resource dash.
+- 08141FA0: matched, tentative `Player_UpdateResourceDash`. State entry spends shared resource or accepts actionFlags bit 0x20, derives capped movement speed and inverse duration, then updates directional movement. Tiny mask/store inlines recover load ordering and address/value evaluation order without pinning.
+- 08142194: existing draft improved from 91.6% to 92.9%, tentative `Player_UpdateObjectPush`. Direction-three effect-position adjustment needs explicit `a.y += 0` and `a.z += 0`: packed-vector bitfields retain the ROM's word writes even though values do not change. Remaining realigned differences: 84 instructions, 33 ignoring registers. Extra high register, status-test ordering, terrain flag narrowing, and stack-vector register choices remain. Ghidra export unavailable locally.
+- 08142AA0: matched, tentative `Player_UpdateObjectPushRecovery`. Three phases set diagonal retreat velocity, retry neighboring-object pushing, and return to the parent action. No register pinning.
+- 08142CC0: matched, `Player_UpdateFlaggedResourceRecovery`. Five phases animate entry, sustain recovery, pause while ineligible, and exit when input is released. Calls flagged resource eligibility and near-particle emission. A pinned zero in r5 must be assigned after materializing the duration-field pointer and before writing 30.
+- 08142FC4: matched, `Player_UpdateUnflaggedResourceRecovery`. Sibling uses unflagged eligibility and far particles, plus a triangular pulse duration across a 0..64 timer. Cache the pulse counter once and pass its value to an inline that computes the destination internally. Pinned zero in r5 at the timer increment/store boundary.
+
+All acceptance checks used tools/check.py only; no full build or network operations. Register-pinning concessions are marked in affected units. Each match/draft is submitted separately through build/commit.sh. Drafts remain behind NONMATCHING with assembly defaults.
