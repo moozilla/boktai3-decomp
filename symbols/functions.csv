@@ -7330,6 +7330,8 @@ addr,name,mode,confidence,source,notes
 081D9CB8,Projectile_UpdateAnimationTail,thumb,low,src-alias,Animation-tail callback that marks the sprite active until the signed counter reaches zero
 081D9CDC,Projectile_InitResetDelay,thumb,low,src-alias,Installs the delayed reset callback and conditionally restores frame 25 with both flips cleared
 081D9D14,Projectile_UpdateResetDelay,thumb,low,src-alias,Delay callback that sets flag 2 and restarts projectile state after the lifetime threshold
+081D9F18,Projectile_InitFromType,thumb,low,src-alias,
+081DA0B4,TimedEffect_InitEntry,thumb,low,src-alias,
 081DA178,TimedEffect_RemoveFromManager,thumb,low,src-alias,
 081DA61C,TimedEffect_DestroyManager,thumb,low,src-alias,
 081DA684,TimedEffect_InitManager,thumb,low,src-alias,
@@ -7402,6 +7404,7 @@ addr,name,mode,confidence,source,notes
 081DD3B8,NameEntry_MoveCursorDown,thumb,low,src-alias,
 081DD590,NameEntry_MoveCursorRight,thumb,low,src-alias,
 081DD80C,NameEntry_MoveCursorLeft,thumb,low,src-alias,
+081DDA78,NameEntry_AppendChar,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
