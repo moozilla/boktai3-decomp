@@ -1,3 +1,5 @@
+// confidence=low: approaches the navigation probe and selects the next dog behavior.
+#define Dog_UpdateProbeApproach sub_080E52EC
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
