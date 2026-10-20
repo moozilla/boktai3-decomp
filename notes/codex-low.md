@@ -2154,3 +2154,41 @@ reviewed scores recorded with check.py --nonmatching --record, and all three
 assembly fallback checks pass. Below-threshold candidates remain in ignored
 wip/codex-low. No exact coverage claimed for assembly fallbacks. Combined ROM
 validation remains for integration. Shared docs and totals were not regenerated.
+
+## Task 080C9848 — Golem defeat and reactions (2026-10-20)
+
+Tags: #matching #golem #register-pinning
+
+- **080C9848 matched**, named `Golem_UpdateDefeat`, in `src/golem_2.c`.
+  The Golem initializer references this callback alongside the default reaction
+  callback. It consumes field2B2, selects animation 10, releases attachment slots
+  0/1/3, clears group control and collision timers, plays song 0x13E, and marks
+  collider flags at 0x13A. Once field2B3 is set, it invokes terrain and optional
+  defeat scripts, records the category event, emits six sparks unless flags2CC
+  has 0x400, installs idle control, disables the shadow and marks its owner.
+  `Bat_UpdateDefeat` (08088CD4) provided the script arguments and particle burst.
+  A local group pointer preserved the group+0x4C addressing. Initializing zero
+  after taking the field2B2 address reduced realigned differences from 102 to 6;
+  a nested owner-group view fixed the final owner addressing. Register pinning
+  retains the burst table in sl and the collider mask/value in r0/r1, using an
+  empty compiler constraint only (no instruction body). Both the isolated
+  candidate (956 bytes) and complete unit passed `tools/check.py` byte-exactly.
+- **080C9C04 remains unmatched**, no draft retained. Reviewed first as the largest
+  target with asmat, condense and relatives. Entry sets context+0x628 bit 0x800,
+  clears actor flags2D0 bit 0x1000000, plays variant event sound, and branches on
+  flags2D4 bit 0x2000. The flagged path reverses saved facing, clears 0x2020,
+  sets movement bit 0x10 and resets route-motion state. Repeated terrain height,
+  route validation and charge transitions dominate the body. Golem_ReturnHome
+  (080CC910) explains 34%; Golem_ChargeOrReturnHome (080CEDF0) is another useful
+  source. No Ghidra export exists in this checkout. Stopped at structural
+  investigation without a complete candidate or score.
+- **080CBF24 remains unmatched**, no draft retained. Inspected asmat, condensed
+  listing and relatives. Entry consumes field2B1, invokes update270 and
+  sub_0812F3CC, waits until counter2AC > 60, releases attachment slot 0 with mode
+  2, and installs SceneActorReaction_RestoreAfterDelay with state/phase 3/1.
+  flags2D4 bit 0x80 selects further route/target handling; global 0x4800 selects
+  partner-player lookup. Golem_ReturnHome explains 34% of the body, including
+  route point copying and terrain height. Its complete branch structure still
+  needs reconstruction; stopped without a complete candidate or score.
+
+Only fast check.py validation was run; no full build or network operations.
