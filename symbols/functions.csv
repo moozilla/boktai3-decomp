@@ -4650,6 +4650,8 @@ addr,name,mode,confidence,source,notes
 08129834,SpriteActor_AdvanceContactState,thumb,low,src-alias,
 081298F4,SparkParticleSource_Emit,thumb,low,src-alias,
 0812993C,BlinkingSprite_UpdateExpiry,thumb,low,src-alias,
+081299F8,SunDiscSprite_Update,thumb,low,src-alias,
+08129B04,SunDiscEffect_Update,thumb,low,src-alias,
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
@@ -4878,6 +4880,7 @@ addr,name,mode,confidence,source,notes
 0813B144,Player_GetControlFlags,thumb,low,src-alias,returns the requested bits from the control flag field
 0813B154,Player_StopActionSounds,thumb,low,src-alias,stops action sounds with a separate sound set for form six
 0813B18C,ActorDirection_ComputeRelativeCardinal,thumb,low,src-alias,
+0813B1EC,Player_ApplyContactResponse,thumb,low,src-alias,
 0813B318,Player_IsActionBlocked,thumb,low,src-alias,tests a per-player counter and flag plus global modes; blocking interpretation is tentative
 0813B374,Player_CallEventScript,thumb,low,src-alias,calls the optional script at offset 0xB3C with one event argument
 0813B3BC,Player_GetEventFlags,thumb,low,src-alias,Returns the masked bits of the flag word at offset B34
