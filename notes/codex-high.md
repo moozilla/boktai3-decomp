@@ -3346,3 +3346,95 @@ Every exact function has its own driver commit, as does the guarded draft.
 All use descriptive file-local aliases. Sources contain no handwritten
 instruction bodies or raw ROM-data addresses. Full combined-ROM validation is
 left to the batch integrator. This appended note is the final driver commit.
+
+## Cloud task 08128554 — 2026-10-20
+
+Tags: #matching #feather-effects #fragment-burst #terrain #animation #register-pinning
+
+Worked solo and offline on the preclaimed `cloud/08128554` branch. Read the entry,
+cloud and worker instructions, callers/callees, adjacent names and matched relatives.
+Used the worktree Python and fast per-file checks only; no make, full build,
+network operations or direct Git mutations. Formatted retained sources directly
+with the worktree clang-format and queued commits through build/commit.sh.
+
+Exact recovery is **11.18% of this task (+11.18 percentage points; 368 of 3,292
+reviewed body/pool bytes)**. Repository code gain is approximately **+0.0152
+percentage points**, entirely Register-pinned. The five guarded drafts add no
+exact coverage. All six functions have descriptive file-local address aliases.
+
+- **081292D4 — matched, FeatherEffectPool_UpdateScatterAnimation (tentative)**,
+  complete reviewed extent 368 bytes. Callback table 086107A0, state two. On entry
+  clears drawable flag one; when sequence index +34 is three and elapsed +3A is
+  zero, calls 08128F98 with four scatter samples. Steps packed animation, then
+  releases the pool mask at singleton 02000174 +38, clears state +92, removes
+  the sprite, writes slot +93 to -1, clears age +90 and marks entry +96. Porting
+  the Step inline from 08127274 with the observed feather layout matched on its
+  first check. depin retained all eleven hints. Final formatted check with
+  `--target-size 368` reports zero differing bytes.
+- **08128F98 — drafted 80.1%, FeatherEffectPool_SpawnGroundScatter (tentative)**,
+  reviewed/candidate extent 828 bytes. Rounds angle +97 to a cardinal direction,
+  offsets a center by 512 using the sine table, samples random X/Z offsets,
+  calls 08128D24 to clip the path and rejects slopes or height differences over
+  one. Creates SpriteEffectController effects using 1C1A/D1B8: sequence three
+  and randomized lifetime for variant zero, sequence 12 otherwise; effect flags
+  come from +98. Final alignment: 91 differing instructions, 46 ignoring
+  registers. Explicit signed divide-by-64/4096 helpers preserve the ROM's
+  negative branches; a SetVelocity inline recovers halfword writes; aggregate
+  scratch layout recovers zero/center/velocity/spot/cell stack order. Remaining
+  issues are address lifetimes, RNG allocation, argument constants and stores.
+  Source review caught a masked word read spanning an uninitialized Z halfword
+  in the initial 80.0% draft. A separate corrective driver commit replaces it
+  with a complete packed-word assignment, defining Z and padding; the final
+  80.1% draft supersedes that candidate and has no such read.
+- **08128D24 — drafted 82.2%, FeatherEffectPool_ClipScatterPath (tentative)**,
+  reviewed extent 628 bytes, candidate 620. Walks from source to target cell by
+  direction; rejects slopes, compares adjacent heights, computes an uphill
+  cell's center and clips X/Z at its boundary. Directions two/three additionally
+  choose random Y within the preceding cell height and create the same effect
+  variants. Final alignment: 64 differing instructions, 20 ignoring registers.
+  Scoped center, direction and RNG hints improve allocation. The unobstructed
+  ROM exit has no explicit zero assignment; the draft deliberately returns a
+  defined zero instead of using an undefined C fallthrough result. This and
+  terrain/center register allocation remain nonmatching.
+- **08128554 — drafted 93.2%, FragmentBurst_UpdateImpactAnimation (tentative)**,
+  reviewed/candidate extent 536 bytes. Callback table 08610790, state one. Plays
+  sound 3B1 on entry, steps three sprites and their sequences, projects origin
+  +F0 isometrically against camera 03005418, and adds 32 pixels per sprite to Y.
+  Refreshes collider +100 through timer +15C equal to four, then enters state
+  two at +156 and marks entry +15E. Final alignment: 22 differing instructions,
+  eight ignoring registers; 28 differing bytes. Combining projection and camera
+  subtraction in one inline preserves the forwarded Y/Z arithmetic. Removing
+  the extra Step sprite alias and keeping separate first-flip mask expressions
+  avoids a redundant pointer copy and constant-one hoisting. Residue: loop
+  setup order, mask allocation and short-lived register copies.
+- **081294B4 — drafted 92.0%, FeatherEffectPool_CreateDirectional (tentative)**,
+  reviewed/candidate extent 540 bytes. Called by
+  SceneActorAnimation_RefreshTimedAttackCollider (080E18F4). Ensures the pool,
+  checks suspension flags, allocates an entry, initializes direction/state and
+  position, selects row/mirroring and sequence one, then selects palette 278
+  with effect flags 200004 or palette 277 with flags 400008. Steps animation,
+  enables the sprite, sets priority one and returns the slot. Final alignment:
+  23 differing instructions, four ignoring registers; 74 differing bytes.
+  A signed scalar SelectDirection argument avoids an unnecessary angle memory
+  reload, and a read-only sprite constraint preserves its early lifetime.
+  Residue swaps pool/angle between r5/r7, moves the narrowing shift, duplicates
+  a sprite alias and uses a different final flags register. Broad permanent
+  register bindings regressed allocation and were discarded.
+- **08128B9C — drafted 99.5%, FeatherEffectPool_UpdateOpeningAnimation
+  (tentative)**, reviewed/candidate extent 392 bytes. Callback table 086107A0,
+  state one. Clears drawable flag one on entry, steps the current sequence and,
+  on completion, folds angle into animation row/mirroring, selects sequence one
+  and enters state two. Final alignment: two differing instructions, both the
+  placement of `mov ip, r6`: candidate after entry reset, ROM before it. The
+  other instructions and extent agree. Empty-constraint and scoped-register
+  experiments disturbed allocation rather than fixing this placement. A
+  permuter preparation attempt produced only base.c and no search results or
+  candidates; none are credited or retained in production.
+
+All five fuzzy comments were written by `check.py --nonmatching --record`.
+Their default INCLUDE_ASM paths passed separate per-file checks at the complete
+536/392/628/828/540-byte extents; those checks validate the fallbacks, not the C
+drafts. Ran depin on unguarded candidates: the exact match retained its hints;
+it correctly skipped mismatching candidates. No shared headers or generated
+files were committed. Complete combined-ROM validation is left to the batch
+integrator. This appended note is the final driver commit.
