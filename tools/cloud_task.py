@@ -7,6 +7,7 @@
   cloud_task.py list --smallest             order by the largest function, smallest first
   cloud_task.py list --from-end             order by address, end of the ROM first
   cloud_task.py list --max-insns 150        only functions below 150 instructions
+  cloud_task.py list --fresh                most functions without a NONMATCHING draft first
   cloud_task.py show TASK                   a task's functions
 
 A task is the unmatched functions of at least --min-insns instructions inside one
@@ -35,6 +36,21 @@ import worklist  # noqa: E402
 
 def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
+
+
+def drafted():
+    """Names (sub_ or csv) of functions that already have a NONMATCHING draft in src/."""
+    out = set()
+    for d, _, files in os.walk(os.path.join(ROOT, "src")):
+        for fn in files:
+            if not fn.endswith(".c"):
+                continue
+            s = open(os.path.join(d, fn), errors="ignore").read()
+            if "NONMATCHING" in s:
+                out.update(re.findall(r'INCLUDE_ASM\("asm/nonmatching",\s*(\w+)\)', s))
+    names = {r[1]: r[0].upper() for r in csv.reader(open(os.path.join(ROOT, "symbols", "functions.csv")))
+             if len(r) > 1 and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
+    return out | {f"sub_{names[n]}" for n in out if n in names}
 
 
 def tasks(min_insns, max_insns=None):
@@ -94,6 +110,8 @@ def main():
         p.add_argument("--smallest", action="store_true",
                        help="order tasks by their largest function, smallest first")
         p.add_argument("--max-insns", type=int, help="only functions below this size")
+        p.add_argument("--fresh", action="store_true",
+                       help="order by functions without an existing NONMATCHING draft, most first")
         p.add_argument("--from-end", action="store_true",
                        help="order tasks by address, highest first (stays clear of workers going forwards)")
     p = sp.add_parser("show")
@@ -114,9 +132,15 @@ def main():
         open_.sort(key=lambda t: max(f["insns"] for f in t["functions"]))
     if a.from_end:
         open_.sort(key=lambda t: -int(t["id"], 16))
+    if a.fresh:
+        dr = drafted()
+        for t in open_:
+            t["fresh"] = sum(f["name"] not in dr and f"sub_{f['addr']:08X}" not in dr for f in t["functions"])
+        open_.sort(key=lambda t: -t["fresh"])  # stable: keeps --from-end order within a count
     if a.cmd == "list":
         for t in open_:
-            print(f"{t['id']}  {len(t['functions']):3d} functions {sum(f['insns'] for f in t['functions']):6d} insns  {t['name']}")
+            fresh = f"  {t['fresh']} fresh" if "fresh" in t else ""
+            print(f"{t['id']}  {len(t['functions']):3d} functions {sum(f['insns'] for f in t['functions']):6d} insns  {t['name']}{fresh}")
         print(f"{len(open_)} open, {len(taken)} claimed")
         return
     for t in open_:
