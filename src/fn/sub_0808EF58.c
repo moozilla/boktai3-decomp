@@ -12,8 +12,6 @@ struct AnimState {
     u16 b;
 };
 
-#define Slime_UpdateShake sub_0808EF58
-
 void Slime_UpdateShake(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     struct Q *q = actor->context;

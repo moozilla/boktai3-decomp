@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 99%
 // Open: one `movs r5, #0` is scheduled before the flags `orrs` in the original.
-void sub_0808EF58(void);
+void Slime_UpdateShake(void);
 
 struct T {
     u32 w[2];
@@ -26,8 +26,6 @@ static inline void SetBit(struct SceneActorReactionMotion *m, u32 bit)
     m->flags = v;
 }
 
-#define Slime_FollowPlayer sub_0808FD9C
-
 void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct Q *q = actor->context;
@@ -44,7 +42,7 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
         actor->field2B2 = 1;
         actor->field2B0 = zero;
         actor->field2B5 = 0x2A;
-        actor->target = sub_0808EF58;
+        actor->target = Slime_UpdateShake;
         actor->field2C8 = zero;
         {
             u32 *field = &actor->flags114;
@@ -56,5 +54,5 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808FD9C);
+INCLUDE_ASM("asm/nonmatching", Slime_FollowPlayer);
 #endif

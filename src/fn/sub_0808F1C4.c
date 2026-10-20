@@ -8,8 +8,6 @@ struct D {
     u8 b;
 };
 
-#define Slime_UpdateStill sub_0808F1C4
-
 void Slime_UpdateStill(struct SceneActorRegistryResetView *actor)
 {
     struct D *d = actor->drawable;

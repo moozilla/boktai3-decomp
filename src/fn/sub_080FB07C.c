@@ -19,8 +19,6 @@ static inline void Go(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 
     actor->field2B1 = 1;
 }
 
-#define Axe_PickAttack sub_080FB07C
-
 u32 Axe_PickAttack(struct SceneActorRegistryResetView *actor)
 {
     struct Q *q = actor->context;
