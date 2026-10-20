@@ -2749,3 +2749,75 @@ non-exact candidates, so no draft hint-minimality claim is made. Per-function
 commits and this notes commit use build/commit.sh. Combined ROM validation and
 name promotion remain with the integrator; assembly fallback checks earn no
 exact coverage.
+
+# Codex medium: task 081B03C0 (2026-10-20)
+
+Tags: #matching #actor-status #vanargand #register-pinning
+
+Worked solo on the already checked-out `cloud/081B03C0`, offline. All six
+functions had committed NONMATCHING starting points. Retained their names from
+symbols/functions.csv and added the required file-local aliases. The caller
+PairedSceneActor_UpdateHalves (081B5D8C) dispatches these through the part-state
+callback table at 086120A0. Names remain tentative; these are paired scene-part
+motion states with player-position requests, not evidence of a universal actor
+layout. No shared headers or symbols were changed.
+
+Exact code progress: **0.0% of this task (+0.0 percentage points)**. All six
+results remain guarded drafts. Reviewed extents include each function's body,
+literal pools and alignment: 081B03C0 1272, 081B08B8 1660, 081B0F34 600,
+081B1334 1428, 081B18C8 712, 081B1B90 660 bytes. No new exact or Register-pinned
+exact bytes are claimed.
+
+- **081B08B8 drafted 99.8%**, up from 91.3%. Realigned 2 differing instructions,
+  0 ignoring registers; candidate 1660 bytes, just two bytes differ. ROM uses
+  r1 for the zero-offset scratch of the signed player X load at 081B0B20;
+  candidate uses r3. One function-scope enter pointer recovers the shared
+  completion tail. Set transition values before forming destination pointers;
+  retain the state-one zero for the player-position call. Widen SetVector's
+  scalar arguments to s32 to avoid opaque-zero narrowing. Reversing X/Z add
+  operands matches the inlined vector sum. Explicit resource-before-options
+  and timer-offset constraints recover instruction ordering. Declaration
+  swaps, player/distance pins, opaque indexing and extra zero lifetimes did not
+  solve the final scratch register. The guarded version is retained.
+- **081B1334 drafted 96.1%**, up from 86.0%. Realigned 32 / 3 ignoring registers;
+  candidate 1424 bytes. Ported the related approach's entry/value lifetimes.
+  Forming the switch state address with an opaque offset avoids retaining the
+  state pointer in an extra high register, reducing 60 differences to 32.
+  Remaining differences concern reset/transition pointer registers, guarded
+  action-transition address reuse, and final entry/finished stores. Making
+  only the state value opaque or volatile did not fix the hoisting.
+- **081B03C0 drafted 88.6%**, up from 86.2%. Realigned 97 / 55 ignoring registers;
+  candidate 1308 bytes. Pinning frameWeight's loaded value to r1 improves the
+  existing packed playback without changing behavior. Replacing the playback
+  wholesale with the matched release sibling or pinning its owner base made
+  allocation worse; those attempts were discarded. Request-call setup,
+  phase-entry tails and packed-playback allocation remain unresolved.
+- **081B18C8 drafted 87.0%**, up from 80.3%. Realigned 50 / 17 ignoring registers;
+  candidate 724 bytes. Explicit entry reads before deriving the motion pointer,
+  shared zero values, function-scope entry pointer, and an isolated switch-state
+  address improve the shape. Case one reuses currentState (one) in its entry
+  store. The ROM derives 512 from the live 0x16F offset; our vector initialization
+  still materializes it independently. Entry-pointer allocation, vector-copy
+  ordering and transition constants remain.
+- **081B1B90 drafted 90.4%**, up from 84.5%. Realigned 35 / 11 ignoring registers;
+  candidate 656 bytes. A shared entry pointer in r8 preserves the state in r7;
+  the playback helper must use its dynamic `one` parameter directly rather
+  than first copying it to r3. Share the entry-clear zero with animation
+  options. Remaining differences: flank-offset operands, entry-pointer copies
+  and transition pointer/value allocation.
+- **081B0F34 drafted 92.8%**, up from 81.9%. Realigned 62 / 50 ignoring registers;
+  candidate 612 bytes. An isolated switch state in r4 shares its zero across
+  the request's stack arguments and its one with the finished store. Materialize
+  the entry load before saving its pointer; share transition one. The ROM
+  cross-jumps the two player request calls into one tail, while the retained
+  draft duplicates them. An explicit common call reduced structural differences
+  but worsened the total (68) and fuzzy score (84.0%), so it was discarded.
+
+All sources were clang-formatted and checked using only tools/check.py.
+Scores were refreshed with --nonmatching --record and the reviewed target sizes.
+The initial named INCLUDE_ASM fallbacks could not assemble against this
+checkout's address-named generated files. Changed each fallback to its raw
+sub_XXXXXXXX identifier; all six default assembly paths then checked exactly.
+Those assembly fallback matches grant no C progress. Per-function draft and
+fallback-fix commits, followed by this note, use build/commit.sh. No make,
+full build, generated-file edits, network actions, or direct Git mutation.
