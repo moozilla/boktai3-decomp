@@ -42,7 +42,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void WirelessController_RebuildAvailablePeerList(struct Engine *);
-int sub_082237A0(int, int);
+int RfuManager_StartChildConnect(int, int);
 extern u16 gUnk_03005260[];
 int Wireless_SelectParentFromInput(struct Engine *p)
 {
@@ -84,7 +84,7 @@ int Wireless_SelectParentFromInput(struct Engine *p)
                 struct RfuLinkStatus *link;
                 int status;
                 link = gUnk_03006A80;
-                status = (u8)sub_082237A0(link->partner[parentIndex].id, 0);
+                status = (u8)RfuManager_StartChildConnect(link->partner[parentIndex].id, 0);
                 if (!status) {
                     setOperation(p, 10, status);
                     return 0;

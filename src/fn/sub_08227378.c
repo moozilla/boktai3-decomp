@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Camera_Update sub_08227378
-
 struct Camera {
     u8 pad0[0x1c];
     u16 f1C;
@@ -16,7 +14,7 @@ extern s16 gUnk_030042A0[];
 extern s16 gUnk_03005418[];
 void Camera_DispatchCommands(struct Camera *);
 void sub_08226CF8(struct Camera *);
-void sub_08226F20(struct Camera *);
+void Camera_UpdatePositionMode(struct Camera *);
 void sub_0822725C(struct Camera *);
 void Camera_ApplyPositionBounds(struct Camera *, s16 *);
 
@@ -45,7 +43,7 @@ u32 Camera_Update(struct Camera *c)
             gUnk_030042A0[1] = c->f5A;
             gUnk_030042A0[2] = c->f5C;
         } else {
-            sub_08226F20(c);
+            Camera_UpdatePositionMode(c);
         }
         sub_0822725C(c);
         Camera_ApplyPositionBounds(c, gUnk_030042A0);

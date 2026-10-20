@@ -45,7 +45,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);
 void sub_082222BC(void *, void *, int);
-int sub_08222358(void *, void *);
+int Interp_Step(void *, void *);
 void Sound_PlaySongChecked(int);
 int SceneActorGraphics_GetResourceId(void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
@@ -100,7 +100,7 @@ void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
                     TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
                 }
             }
-            if (sub_08222358((u8 *)p2 + 0x30c, position + 12))
+            if (Interp_Step((u8 *)p2 + 0x30c, position + 12))
                 p->finished = 1;
         }
     }

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define RfuManager_StartConnect sub_082236C8
-
 struct RfuMgr {
     u8 pad0[4];
     u8 f4;

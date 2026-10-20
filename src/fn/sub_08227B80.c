@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Terrain_GetCellWordFromScript sub_08227B80
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Script_ReadReference(void *);
 void Script_WriteReferenceValue(void *, u32, s32);

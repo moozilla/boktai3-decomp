@@ -3,8 +3,6 @@
 // fuzzy: 89.3%
 // Open: the original reloads o->len (ldrh) after the t <= len test instead of reusing the register.
 
-#define Interp_Step sub_08222358
-
 struct Interp {
     u8 pad0[4];
     s32 x;
@@ -37,5 +35,5 @@ u32 Interp_Step(struct Interp *o, void *p)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08222358);
+INCLUDE_ASM("asm/nonmatching", Interp_Step);
 #endif

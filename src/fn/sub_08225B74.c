@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Obj_StepPosition sub_08225B74
-
 struct Obj {
     u8 pad0[8];
     u8 f8;
