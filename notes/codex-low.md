@@ -563,3 +563,16 @@ build, network operations, shared-doc edits, generated files or ROM commits.
 Only per-file check.py acceptance checks were used. Commit messages identify
 addresses and existing draft scores; integration must distinguish alias-only
 changes from new code progress.
+
+## Task 080D2584 (2026-10-20, follow-up)
+
+Tags: #matching #mummy #scene-actor #register-pinning
+
+- 080D2584: stopped unmatched after revisiting assembly and condensed runs. Prior attempt already identified four terrain-height copies and paired route probes. No complete candidate or new promising whole-function port; Ghidra export is still absent.
+- 080D5778: retained existing guarded Mummy_ResumeDelayedRoute draft at 88.3%, 134 realigned differences / 39 ignoring registers. Changing PickTurn's for loop to do/while produced identical output; unsigned counter comparison regressed one instruction; pinning actor to r7 regressed substantially. Added required local address alias and local alias for callee Mummy_RequestStraightRoute (080D6FDC), absent under its descriptive name from the local ELF.
+- 080D3D60: retained existing guarded Mummy_UpdatePlayerRoute draft at 82.4%, 194 realigned differences / 70 ignoring registers; added required local address alias. No new recovered C coverage.
+- 080D3878: improved existing guarded Mummy_UpdateDefeat draft from 86.2% to 86.4% by pinning frame argument to r8, matching the entry argument move. Remaining 86 realigned differences / 34 ignoring registers. Pinning animation pointer to r9 regressed, rejected. Existing register-concession marker retained. Added required local address alias.
+- 080D453C: stopped below draft threshold. Exploratory Mummy_ReactToNearbyStimulus candidate in wip/sub_080D453C.c scored 60.2% candidate-length, 218 realigned differences / 116 ignoring registers. Clears flags2D0 bit 24, gates on action/motion flags and cooldowns, finds overlapping stimulus, sets 180-tick timer and behavior 11 on first activation. Resolves tagged position, tries nearby-player tracking, restores saved route and attempts navigation toward stimulus. Success sets motion flag 0x200, context+0x6EA=4 and attachment target; return reports first activation or fallback. No production source retained. Needs field lifetimes and inline contract reconstruction before allocation work.
+- 080D53F8: retained existing guarded Mummy_UpdateProbeNavigation draft at 80.0%, 95 realigned differences / 30 ignoring registers. Removing speed r6 pin worsened to 77.4%; narrowing saved turn packet argument to u8 worsened to 77.9%; widening scale temporary made no difference. Added required local address alias and straight-route callee alias.
+
+Four draft updates queued separately through build/commit.sh. Scores recorded with check.py --nonmatching --record. INCLUDE_ASM fallbacks now use address names explicitly because the macro stringifies its argument; all four default fallbacks passed byte-exact per-file checks. No exact C matches and 0 percentage-point exact coverage gain. No full build, network operation or shared-doc edit; combined validation remains with integration.
