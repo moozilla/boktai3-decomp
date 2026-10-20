@@ -1534,3 +1534,77 @@ no shared headers, symbols, generated files or shared docs changed. The local
 ELF predates promoted target names, so file-local aliases also permit checker
 symbol resolution. Combined ROM validation and name promotion remain with the
 integrator.
+
+# Task 08206C00 — Vulcan cannon states (2026-10-20)
+
+Tags: #matching #vulcan-cannon #animation #register-pinning
+
+Worked offline on the preclaimed cloud/08206C00 branch. Only fast checker
+compilations were used, with reviewed extents for exact acceptance; no full
+build, network operation or shared documentation edit. Commits went through
+build/commit.sh. Ghidra's export is absent. Existing VulcanCannon_Create,
+VulcanCannon_FireProjectile, VulcanCannon_InitCollider and the callback literals
+establish this family's ownership and provisional field meanings.
+
+- **08206C00 — matched, VulcanCannon_UpdateTargeting**, reviewed extent 1,040
+  bytes. Improved the existing 83.6% draft. Tests squared player distance,
+  directional firing alignment and clear-shot visibility; changes to firing
+  or facing-turn states. A timed heading check also requests a turn. Inline
+  distance and angle helpers taking whole position pointers reproduce the
+  paired signed-coordinate accesses. Keeping the effective player pointer
+  in r0, and using short r0/r3 and r2/r3 bindings inside those helpers, fixed
+  the last dead copy and swapped pointers. A memory operand on the target
+  vector preserves its stack copy without materializing its address. A short
+  r5 facing binding keeps the zero-facing value live through the turn call,
+  preventing the compiler from merging the two turn-call bodies. depin removed
+  five unnecessary hints (21 to 16); exact checked again after formatting.
+- **08207010 — matched, VulcanCannon_UpdateFiringBurst**, reviewed extent 448
+  bytes. Fires at ten-tick intervals through tick 30, restarts the firing
+  animation, and plays its shot sound every third projectile. After the burst
+  delay, resets the timer and returns to targeting once the configured burst
+  count is satisfied. The shared packed-command playback helper matches with
+  its mask in r4 and mask source in r2.
+- **082071D0 — matched, VulcanCannon_UpdateDefeatEffects**, reviewed extent
+  384 bytes. Steps the defeated animation; non-inert cannons create particles
+  at ticks 13 through 23 and record defeat at tick 1. Explicit inline position
+  copy and raise helpers materialize the stack destination before the source
+  loads, fixing the only four differing instructions in the first candidate.
+- **08207350 — drafted 88.0%, VulcanCannon_UpdateFacingTurn**. Disallowed
+  turning returns to targeting immediately. Otherwise animation completion
+  toggles facing and restores the targeting animation. The local playback
+  variant and owner/token constraints recover most of the original ip-owner
+  layout, but address allocation, facing-store/reload ordering and return-path
+  sharing remain: 32 differing instructions, 16 ignoring registers. This
+  callback is declared void, consistent with its discarded result in the main
+  update. No undefined fall-through C result is retained.
+- **082074F0 — drafted 81.3%, VulcanCannon_UpdateDamageState**. Pause gates,
+  invokes the current state, maintains collider activity, applies damage and
+  HUD feedback, emits defeat debris/smoke, changes target attachments and
+  palettes, blinks the sprite, and advances timers. Passing the project's
+  RANDOM_TABLE_ADDR through the RNG inline lets agbcc defer intermediate
+  random-index stores, unlike direct extern-array indexing. Initializing the
+  collider pointer separately in the live/dead branches matches the original
+  lifetimes better. Remaining: 121 differing instructions, 30 ignoring
+  registers, mainly effect/vector setup, constant reuse and allocation. The
+  draft defines its discarded result as zero through a short r0 constraint.
+  An initial commit's message used the candidate-length score; the subsequent
+  refinement and recorded source score are authoritative and clear the full
+  80% retention threshold.
+- **08207A00 — drafted 96.4%, VulcanCannon_InitializeFromScript**. Recovers
+  options p/a/R/l/d/i/h/r/I/n/S/z/g/D/G/X/V, graphics 0x7E7D, resource
+  0x922E/0x5184, initial active/inert states, optional terrain registration,
+  scene-body setup and the delay list. Defaults and signed/narrow fields are
+  represented in include/vulcan_cannon_worker.h, shared by this batch's new
+  sources only. Uncertain fields retain offset names. Remaining: 23 differing
+  instructions, six ignoring registers; switch bounds, position-pointer
+  lifetime and explicit return-zero epilogue are the structural residue.
+  A no-result candidate reached 97.3%; the retained draft returns zero so the
+  factory's negative-result check consumes a defined C value. The initial
+  commit message predates the final full-extent score; source records 96.4%.
+
+All three exact matches retain the Register-pinned concession, including
+constraints in the shared animation helper. depin was run on each exact unit;
+it sees direct hints in the targeting source, but does not expand the shared
+helper for the other two. Each draft keeps INCLUDE_ASM in its default branch;
+all scores were recorded again after direct clang-format. Batch integration
+must still perform the combined ROM validation and name promotion.
