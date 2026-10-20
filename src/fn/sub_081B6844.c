@@ -15,12 +15,12 @@ struct ContactReaction {
 };
 void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void ActorReaction_BeginOnContact(struct ContactActor *actor, void *context,
                                   struct ContactReaction *reaction)
 {
     reaction->direction = actor->direction;
-    sub_0821FF8C(actor);
+    Collision_CalculateDamageResponse(actor);
     {
         u32 one = 1;
         if (actor->flags & one) {

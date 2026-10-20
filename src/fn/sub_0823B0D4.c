@@ -11,7 +11,7 @@ struct Vec16 {
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void sub_0823AE5C(u8 *);
-void sub_0823AF44(u8 *);
+void KeyframeActor_InitAuxiliarySprite(u8 *);
 u32 SceneBody_SetKeyframeDisplay(void *, void *);
 void CellObject_Init(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
@@ -75,7 +75,7 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     body = p + 0x24;
     SceneBody_Init(body, entry, p + 0x540, 0, p[0x18], p);
     sub_0823AE5C(p);
-    sub_0823AF44(p);
+    KeyframeActor_InitAuxiliarySprite(p);
     p[0x419] = zero;
     SceneBody_SetKeyframeDisplay(body, p + 0x8c);
     CellObject_Init(p + 0x284, p + 0x540);

@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.4%
-// Remaining differences: timer mask copy, sine-table pointer lifetime, and registers.
+// MATCHING_CONCESSION: register-pinning
 #define gOrbitEffectRandomTable gUnk_0203B400
 #define gOrbitEffectRandomIndex gUnk_03005308
 struct OrbitEffectPosition {
@@ -41,16 +39,34 @@ static inline s32 RandomValue(const u16 *table)
 extern const s16 gUnk_086149C4[];
 void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
 {
-    u32 timer = p->trailTimer + 1;
+    register u32 timer asm("r0") = p->trailTimer + 1;
     p->trailTimer = timer;
     {
-        u16 mask = 0xffff;
-        timer &= mask;
+        register u32 mask asm("r2") = 0xffff;
+        register u32 work asm("r1");
+        asm("" : "+r"(mask));
+        work = mask;
+        asm("" : "+r"(work));
+        timer &= work;
     }
-    if (!(timer & 3)) {
-        struct OrbitTrailSprite *trail = &p->trails[p->nextTrail];
+    timer &= 3;
+    if (!timer) {
+        register u32 fieldOffset asm("r3") = 0x3a0;
+        struct OrbitTrailSprite *trail;
+
         const u16 *table;
+        s32 v, delta;
+        const s16 *sine;
+        struct OrbitEffectPosition *position;
         u32 zero;
+        asm("" : "+r"(fieldOffset));
+        {
+            register u16 *index asm("r0") = (u16 *)((u8 *)p + fieldOffset);
+            {
+                register u32 entry asm("r1") = *index;
+                trail = &p->trails[entry];
+            }
+        }
         if (!p->hidden)
             trail->flags &= ~1;
         trail->flags &= ~0x200;
@@ -65,36 +81,33 @@ void OrbitEffect_SpawnOrbitTrail(struct OrbitEffect *p)
             Effect_SetPalette(trail, 1);
         }
         {
-            struct OrbitEffectPosition *position;
-            const s16 *sine = gUnk_086149C4;
-            s32 v, delta;
-            v = sine[(trail->angle + 64) & 255] * trail->radius;
-            if (v >= 0)
-                delta = v >> 12;
-            else
-                delta = -((-v) >> 12);
-            position = trail->target;
-            trail->position.x = (u16)position->x + delta;
-            trail->position.y = position->y;
-            v = sine[trail->angle & 255] * trail->radius;
-            if (v >= 0)
-                delta = v >> 12;
-            else
-                delta = -((-v) >> 12);
-            {
-                u16 z = (u16)position->z + delta;
-                zero = 0;
-                trail->position.z = z;
-            }
-            trail->active = 1;
-            trail->age = zero;
-            p->nextTrail++;
-            if (p->nextTrail > 11)
-                p->nextTrail = zero;
+            const s16 *first = gUnk_086149C4;
+            asm("" : "+r"(first));
+            v = first[(trail->angle + 64) & 255] * trail->radius;
+            sine = first;
         }
+        asm("" : "+r"(sine));
+        if (v >= 0)
+            delta = v >> 12;
+        else
+            delta = -((-v) >> 12);
+        position = trail->target;
+        trail->position.x = position->x + delta;
+        trail->position.y = position->y;
+        v = sine[trail->angle & 255] * trail->radius;
+        if (v >= 0)
+            delta = v >> 12;
+        else
+            delta = -((-v) >> 12);
+        {
+            u16 z = position->z + delta;
+            zero = 0;
+            trail->position.z = z;
+        }
+        trail->active = 1;
+        trail->age = zero;
+        ++p->nextTrail;
+        if (p->nextTrail > 11)
+            p->nextTrail = zero;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", OrbitEffect_SpawnOrbitTrail);
-#endif

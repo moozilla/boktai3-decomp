@@ -4,8 +4,10 @@
 #include "scene_vec.h"
 // confidence=low: three motion legs include an approach toward the player.
 
+// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
+
 #ifdef NONMATCHING
-// fuzzy: 88.6%
+// fuzzy: 90.3%
 // Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -58,8 +60,7 @@ static inline void Difference(struct SceneVec *dst, struct SceneVec *a, struct S
 }
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
-    register u32 next asm("r1") = state;
-    asm("" : "+r"(next));
+    u32 next = state;
     p->state = next;
     p->timer = 0;
 }

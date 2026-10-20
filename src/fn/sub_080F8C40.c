@@ -6,7 +6,7 @@
 // foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
-void sub_080FBA38(struct SceneActorRegistryResetView *);
+void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
 void sub_080FC094(struct SceneActorRegistryResetView *, s32);
 void SceneActorControl_FinishRotation(void);
 struct RotationControlState {
@@ -46,7 +46,7 @@ void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor
     if (Mod(elapsed, 4) == 0)
         state->acceleration += 4;
     angle = NormalizeAngle(drawable->angle);
-    sub_080FBA38(actor);
+    Axe_EmitMotionTrail(actor);
     {
         s32 magnitude = angle;
         if (magnitude < 0)

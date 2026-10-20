@@ -71,7 +71,7 @@ void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int s
                          p->animationSpeed);
 }
 
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
 #ifdef NONMATCHING
@@ -82,7 +82,7 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
 {
     struct GridAttackActor *base = p;
     int angle;
-    sub_0821FF8C(source, other);
+    Collision_CalculateDamageResponse(source, other);
     PlayerStats_AddContactHundredths(source, other, p->contactReward);
     p->damage = other->cost;
     {

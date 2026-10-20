@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-// Remaining differences: address calculations, branch layout and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct DisplaySequenceState *state = st;
@@ -11,7 +8,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     const volatile u16 *command;
     u32 duration, flags, bit;
     {
-        u32 offset = state->index << 1;
+        register u32 offset asm("r0") = state->index << 1;
         const volatile u16 *table;
         table = state->commands;
         command = (const volatile u16 *)((u32)table + offset);
@@ -96,7 +93,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
                 }
             }
             {
-                u32 offset = state->index << 1;
+                register u32 offset asm("r0") = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
                 command = (const volatile u16 *)((u32)table + offset);
@@ -137,6 +134,8 @@ void Player_UpdateDirectionRecovery(struct Player *p)
     if (Player_ConsumeStateEntry(p))
         ActorSequence_Begin(p, 23, 0);
     if ((s16)p->directionHistory[0] >= 0) {
+        u8 *facing = &p->facing;
+        asm("" : : "r"(facing));
         p->facing = (p->directionHistory[0] & 254) + 1;
         if (p->facing > 4) {
             p->heading = (8 - p->facing) >> 1;
@@ -149,10 +148,12 @@ void Player_UpdateDirectionRecovery(struct Player *p)
     Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x40C), 1,
                      p->heading, p->side);
     Step(&((struct ReleaseAnimation *)p)->sprite, &((struct ReleaseAnimation *)p)->seq);
-    if ((s8)p->movementAnimationState < 0)
-        ActorSequence_Begin(p, 0, 0);
+    {
+        register u32 offset asm("r2") = 0x4F3;
+        register s8 *gate asm("r0");
+        asm("" : "+r"(offset));
+        gate = (s8 *)p + offset;
+        if (*gate < 0)
+            ActorSequence_Begin(p, 0, 0);
+    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateDirectionRecovery);
-#endif

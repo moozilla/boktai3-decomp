@@ -27,7 +27,7 @@ struct Map {
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_030053F4;
 u8 *TerrainModifiers_FindCellOverride(int, int);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 int DisplayAnimation_SetPosition(void *, void *);
 int DisplayAnimation_UpdatePlayback(void *);
 void Actor_SetAttachmentEffect(struct Actor *, unsigned, int, int);
@@ -43,7 +43,7 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct Actor *p)
     s16 k2 = 0;
     struct Body *body = &p->body;
     void *drawable = &p->drawable;
-    sub_08225B74(body);
+    Obj_StepPosition(body);
     {
         u32 mask = 0x400;
         if (!(p->flags & mask)) {

@@ -11,9 +11,9 @@
  * Pins: the spark table and the constant 1 of the two spark bursts. Kill counters are an
  * if/else, as in Ivy_UpdateDefeat, which keeps them pin-free. The burst arguments
  * live in function-scope variables, which the ROM rematerialises at each call. */
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -284,9 +284,9 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
@@ -341,7 +341,8 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u32 t = *flags2D4 & mask;
             categoryp = &actor->category;
             if (!t && (u32)(*categoryp - 11) > 2)
-                GameState_SetEventFlag(sub_081D4F20(*categoryp, actor->paletteOffset));
+                GameState_SetEventFlag(
+                    BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
         }
         {
             struct ContactPackedVector range;
@@ -445,7 +446,8 @@ notHidden:
                 Script_Call(script, &arguments);
             }
             if (!Masked16(flags2D4, 0x4000) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+                GameState_SetEventFlag(
+                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
             sub_08159164(context->rewardHigh);
             Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
         } else {
@@ -485,7 +487,8 @@ notHidden:
             }
         }
         if (!Masked16(flags2D4, 0x4000) && (u32)(*categoryp - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(*categoryp, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
         sub_08159164(context->rewardHigh);
         Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
         COUNT(0x87C);

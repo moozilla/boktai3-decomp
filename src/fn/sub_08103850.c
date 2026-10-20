@@ -28,7 +28,7 @@ void sub_08101B1C(struct NamedObject *);
 void NamedObject_UpdateFollowers(struct NamedObject *);
 void sub_0810103C(struct NamedObject *);
 void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObject *);
-void sub_08101340(struct NamedObjectManager *);
+void NamedObject_UpdateMovementSound(struct NamedObjectManager *);
 static inline u8 isActive(u32 mask, u32 bit)
 {
     if (mask & bit)
@@ -77,7 +77,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
                 }
             }
         }
-        sub_08101340(manager);
+        NamedObject_UpdateMovementSound(manager);
     }
     return 0;
 }

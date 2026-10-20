@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: spawns projectiles while traversing the arena boundary.
+
 #ifdef NONMATCHING
 // fuzzy: 96.1%
 // Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.

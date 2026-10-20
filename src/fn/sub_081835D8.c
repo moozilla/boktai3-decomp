@@ -1,6 +1,8 @@
 #include "global.h"
 
-/* tentative: arms the attack collider from facing tables with half power */
+// confidence=low: uses heavy-attack animation records and per-frame collider tables.
+
+/* Arms the heavy-attack collider from animation-frame tables. */
 
 struct ActorAnimationLayer {
     u16 unknown[3];
@@ -32,7 +34,7 @@ void Armor_SetAnimationFromStart(u32 a, u32 b);
 void Collider_SetAttackPowerAndForce(void *, s32, s32);
 void Sound_PlaySongChecked(u32 a);
 
-static inline s32 Half(s32 n)
+static inline s32 ScaleHeavyAttack(s32 n)
 {
     n = 0xaaa * n;
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -86,7 +88,7 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
                     t->flags |= mask;
                     c = t;
                 }
-                Collider_SetAttackPowerAndForce(c, (u16)Half(*(s16 *)(p + 0xb26)), 80);
+                Collider_SetAttackPowerAndForce(c, (u16)ScaleHeavyAttack(*(s16 *)(p + 0xb26)), 80);
             }
             break;
         case 2:

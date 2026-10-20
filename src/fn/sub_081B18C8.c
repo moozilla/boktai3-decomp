@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: rises, waits for a countdown, then returns vertically
 #ifdef NONMATCHING
-// fuzzy: 80.3%
-// Remaining differences: State-address reuse, entry-pointer lifetimes, and vector/constant ordering differ.
+// fuzzy: 87.0%
+// Remaining differences: Entry-pointer lifetimes, derived vector constants, and state-transition allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -149,11 +150,16 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
 static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32 options)
 {
     void *data = *(void **)(boss + 0x4d0);
-    register struct DisplaySequenceState *seq asm("r4") = &p->sequence;
-    Anim_SetSequence(seq, data, id, (u8)p->variant, options);
+    register struct DisplaySequenceState *seq asm("r4");
+    register u32 playbackOptions asm("r7");
+    asm("" : "+r"(data));
+    playbackOptions = options;
+    asm("" : "+r"(playbackOptions));
+    seq = &p->sequence;
+    Anim_SetSequence(seq, data, id, (u8)p->variant, playbackOptions);
     StepPlayback(p, seq, p, 1);
 }
-static inline void SetVector(struct SceneVec *p, s16 x, s16 y, s16 z)
+static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
     ((volatile s16 *)p)[0] = x;
     p->y = y;
@@ -175,25 +181,47 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
 void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec rise, target, speed;
+    u8 *enter;
     u32 mask = 0x20;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
         SetAnimation(p, boss, 8, 4);
-        p->state = 0;
-        p->timer = 0;
+        {
+            register u32 zero asm("r1") = 0;
+            asm("" : "+r"(zero));
+            p->state = zero;
+            p->timer = zero;
+        }
         p->enter = 1;
     }
     {
-        register u32 currentState asm("r4") = p->state;
+        register u32 offset asm("r1") = 0x164;
+        register u32 currentState asm("r4");
+        asm("" : "+r"(offset));
+        {
+            register u32 *stateAddress asm("r0") = (u32 *)((u8 *)p + offset);
+            asm("" : "+r"(stateAddress));
+            currentState = *stateAddress;
+        }
         asm("" : "+r"(currentState));
         switch (currentState) {
             case 0: {
-                u8 *enter = &p->enter;
-                register void *motion asm("r8") = p->motion;
-                if (*enter) {
-                    *enter = 0;
-                    SetVector(&rise, 0, 512, 0);
+                register u32 entered asm("r1");
+                register void *motion asm("r8");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                motion = p->motion;
+                if (entered) {
+                    register u32 zero asm("r1") = 0;
+                    asm("" : "+r"(zero));
+                    *enter = zero;
+                    SetVector(&rise, zero, 512, zero);
                     {
                         struct SceneVec *origin = &p->offset;
                         AddOffset(&rise, origin, &rise);
@@ -202,15 +230,24 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    p->state = 1;
+                    register u32 next asm("r2") = 1;
+                    asm("" : "+r"(next));
+                    p->state = next;
                     p->timer = 0;
-                    *enter = 1;
+                    *enter = next;
                 }
                 break;
             }
             case 1: {
-                u8 *enter = &p->enter;
-                if (*enter) {
+                register u32 entered asm("r1");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                if (entered) {
                     *enter = 0;
                     Sound_PlaySong(0x596);
                     p->countdown = 60;
@@ -218,23 +255,37 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
                 if (!p->countdown) {
                     p->state = 2;
                     p->timer = 0;
-                    *enter = 1;
+                    *enter = currentState;
                 }
                 break;
             }
             case 2: {
-                u8 *enter = &p->enter;
-                register void *motion asm("r8") = p->motion;
-                if (*enter) {
-                    *enter = 0;
+                register u32 entered asm("r1");
+                register void *motion asm("r8");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                motion = p->motion;
+                if (entered) {
+                    register u32 zero asm("r5") = 0;
+                    asm("" : "+r"(zero));
+                    *enter = zero;
                     target = p->offset;
                     ((volatile s16 *)&target)[1] = -(u16)p->anchor->y;
-                    SetVector(&speed, 0, 64, 0);
+                    SetVector(&speed, zero, 64, zero);
                     MotionTrack_Initialize(motion, &p->offset, &target, &speed, 1);
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    p->state = 3;
+                    {
+                        register u32 next asm("r1") = 3;
+                        asm("" : "+r"(next));
+                        p->state = next;
+                    }
                     p->timer = 0;
                     *enter = 1;
                 }

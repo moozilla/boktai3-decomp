@@ -18,7 +18,7 @@ void Player_ApplyDirectionalForce(struct Player *);
 void Player_ApplyControlPresentation(struct Player *);
 void Player_BlendCameraTarget(struct Player *);
 void Player_ClampPositionToStoredTerrainCell(struct Player *);
-void sub_08140CC4(struct Player *);
+void Player_UpdateLockedMovement(struct Player *);
 s32 Player_IsStatusBit3ActionActive(u16);
 void Player_AddControlFlags(struct Player *, u16);
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -121,7 +121,7 @@ void Player_UpdateActionModeMovement(struct Player *p)
             if (p->actionMode == 1)
                 Player_RequestNearbyEffectTarget(p);
             Player_ClampAlternateTerrainPosition(p);
-            sub_08140CC4(p);
+            Player_UpdateLockedMovement(p);
             if (p && specialState(p))
                 break;
             if (p->actionMode == 2)

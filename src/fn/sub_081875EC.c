@@ -1,8 +1,10 @@
 #include "global.h"
 
+// confidence=low: selects approach, attack and recovery behaviors along a shared X/Z axis.
+
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 83.9%
+// fuzzy: 85.8%
 // Remaining differences: branch layout, merged decision stores and register allocation.
 
 struct ArmorDecisionActor {
@@ -41,6 +43,7 @@ s32 Math_Atan2(s32, s32);
 // confidence=low: selects attacks when player and armor share a horizontal grid axis.
 void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
 {
+    register u32 mode asm("r6");
     s32 dx;
     s32 dy;
     s32 dz;
@@ -66,7 +69,9 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
         ay = -dy;
     if (dz < 0)
         az = -dz;
-    if (p->flags & 1) {
+    mode = p->flags & 1;
+    asm("" : "+r"(mode));
+    if (mode) {
         u8 *decision = &p->decision;
         switch (*decision) {
             case 0:
@@ -180,17 +185,17 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
             case 1:
                 if (*cooldown <= 0) {
                     ActorController_SetBehavior(p, 6);
-                    *decision = 0;
-                    p->secondaryCooldown = 0;
-                    p->collisionCooldown = 0;
+                    *decision = mode;
+                    p->secondaryCooldown = mode;
+                    p->collisionCooldown = mode;
                 } else
                     ActorController_SetBehaviorIfFinished(p, 5);
                 break;
             case 2:
                 ActorController_SetBehaviorIfFinished(p, 23);
-                *decision = 0;
-                p->secondaryCooldown = 0;
-                p->collisionCooldown = 0;
+                *decision = mode;
+                p->secondaryCooldown = mode;
+                p->collisionCooldown = mode;
                 break;
             case 16:
                 ActorController_SetBehavior(p, 40);

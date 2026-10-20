@@ -1,3 +1,4 @@
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
 #include "global.h"
 #include "player.h"
 
@@ -12,7 +13,7 @@ extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
 #ifdef NONMATCHING
-// fuzzy: 82.2%
+// fuzzy: 83.1%
 extern u8 *gUnk_02000710;
 extern u16 gUnk_02000518, gUnk_02000528;
 void PlayerCue_UpdateTurningPalette(struct Player *p)
@@ -67,7 +68,9 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
         case 4:
             p->heading = 0;
             p->side = 1;
-            goto animateSide;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x38), 0x40, 1))
+                p->tetherPhase = 7;
+            break;
         case 5:
             p->heading = 0;
             p->side = 1;
@@ -79,7 +82,6 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
         case 6:
             p->heading = 0;
             p->side = 0;
-        animateSide:
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x38), 0x40, 1))
                 p->tetherPhase = 7;
             break;

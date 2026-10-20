@@ -9,7 +9,7 @@ void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
 void ScriptPanel_OpenTextWindow(void);
 void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void LinkSelection_WaitForParticipantChoices(void);
-void sub_0810BBD4(struct AreaEffectLinkState *);
+void LinkSelection_UpdateParticipantScores(struct AreaEffectLinkState *);
 void PaletteLevels_Reset(void);
 void Sound_FadeOutChannel10(u32);
 extern u32 gUnk_0300523C, gUnk_03005250;
@@ -70,7 +70,7 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
     if (count == length) {
         Registry1745_SetState(p, 20, LinkSelection_WaitForParticipantChoices);
         p->readyPhase = 0;
-        sub_0810BBD4(session);
+        LinkSelection_UpdateParticipantScores(session);
         return 0;
     }
     if (p->menuElapsed > 89)

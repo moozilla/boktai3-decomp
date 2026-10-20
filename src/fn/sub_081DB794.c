@@ -1,7 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: background, labels, animations and menu selection initialization.
 #ifdef NONMATCHING
-// fuzzy: 82.4%
+// fuzzy: 85.1%
+// Remaining differences: sprite/resource lifetimes, text-rectangle setup, palette reload.
 struct Rect {
     u16 x, y, width, height;
 };
@@ -27,7 +29,7 @@ s32 Options_InitScreen(u8 *arg)
     void *resource;
     void *background;
     void *palette;
-    void *graphics;
+    register void *graphics asm("r4");
     void *sprite;
     s32 layer;
     struct Rect rect;

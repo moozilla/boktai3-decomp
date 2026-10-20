@@ -19,7 +19,7 @@ struct Slot7Actor {
     u8 pad5c4[0x2c];
     s16 baseDuration;
 };
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 s32 Div(s32, s32);
 
 void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
@@ -27,7 +27,7 @@ void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
 {
     s16 level;
     s32 duration;
-    sub_0821FF8C(event);
+    Collision_CalculateDamageResponse(event);
     if (action->cooldown) {
         action->phase = 0;
         action->state = 0;

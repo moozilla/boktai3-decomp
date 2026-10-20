@@ -9,10 +9,10 @@ void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void DarkLoan_UpdateBalanceDigits(u8 *);
 void StatGauge_DrawPreview(u8 *);
-void sub_081BC468(u8 *);
+void DarkLoan_UpdateAdjustmentDigits(u8 *);
 void AnimData_SelectPaletteBank(u8 *, u32);
 void MessageWindow_ShowMessage(u32);
-void sub_081BCCD4(void);
+void DarkLoan_UpdateAdjustment(void);
 void DarkLoan_SetState(u8 *, void (*)(void));
 void StatGauge_BeginAdjustment(u8 *s)
 {
@@ -54,7 +54,7 @@ void StatGauge_BeginAdjustment(u8 *s)
         p = (u32 *)((u8 *)p + 0x60);
     } while (--j >= 0);
     latezero = 0;
-    sub_081BC468(s);
+    DarkLoan_UpdateAdjustmentDigits(s);
     *(u16 *)(s + 0x908) = latezero;
     *(u16 *)(s + 0x90A) = latezero;
     ((struct Word8 *)(s + 0x778))->flags &= (mask3 = ~1);
@@ -68,7 +68,7 @@ void StatGauge_BeginAdjustment(u8 *s)
     *(u16 *)(s + 0x8FE) = latezero;
     *(u16 *)(s + 0x900) = latezero;
     *(u16 *)(s + 0x8F8) = latezero;
-    DarkLoan_SetState(s, sub_081BCCD4);
+    DarkLoan_SetState(s, DarkLoan_UpdateAdjustment);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", StatGauge_BeginAdjustment);

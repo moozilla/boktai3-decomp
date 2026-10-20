@@ -9,7 +9,7 @@ void sub_080747B8(struct SceneActorMotionView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *);
 struct SceneActorRegistryResetView;
 void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void NavMesh_UpdateProbe(u16 *, u32);
 void sub_0821DE30(struct SceneActorRegistryControlGroup *);
 static inline u32 ReadMotionFlags(struct SceneActorMotionView *actor, u32 mask)
@@ -323,7 +323,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
         u16 *motionFlags;
         motionFlags = cache.motionFlags;
         if (SceneActorPlacement_TestFlags(motionFlags, mask))
-            sub_08225B74(&actor->id);
+            Obj_StepPosition(&actor->id);
     }
     {
         u32 offset = (u8 *)&actor->terrainCell - (u8 *)actor;

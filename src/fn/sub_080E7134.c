@@ -1,0 +1,139 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
+#include "engine.h"
+s32 Div(s32, s32);
+s32 Mod(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+u8 sub_080E7FF4(void *);
+u8 sub_080E80BC(void *);
+s32 Math_Atan2(s32, s32);
+void ActorShadow_Enable(void *);
+extern const s16 gUnk_086149C4[];
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+static inline void CellCenter(struct ContactPosition *out, u32 cell)
+{
+    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    u8 *data;
+    out->x = (x << 8) + 0x80;
+    data = TerrainModifiers_FindCellOverride(cell, 1);
+    if (data)
+        data += 4;
+    else
+        data = gUnk_030052F4->cells + (cell * 4 + 12);
+    out->y = (*data & 15) << 8;
+    out->z = (z << 8) + 0x80;
+}
+
+static inline s32 Scale12(s32 n)
+{
+    if (n >= 0)
+        return n >> 12;
+    return -((-n) >> 12);
+}
+static inline s32 Half(s32 n)
+{
+    if (n >= 0)
+        return n >> 1;
+    return -((-n) >> 1);
+}
+static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
+{
+    out->x = Scale12(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
+    out->y = 0;
+    out->z = Scale12(gUnk_086149C4[angle & 0xFF] * speed);
+}
+static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
+                         const struct ContactPosition *to)
+{
+    out->x = to->x - from->x;
+    out->y = to->y - from->y;
+    out->z = to->z - from->z;
+}
+static inline u8 TakeFlag(u8 *flag)
+{
+    if (*flag) {
+        *flag = 0;
+        return 1;
+    }
+    return 0;
+}
+
+static inline u8 HasMode(u8 *p)
+{
+    u32 mask = 1;
+    if (*(u16 *)(p + 0x65C) & mask)
+        return 1;
+    return 0;
+}
+#ifdef NONMATCHING
+// fuzzy: 93.4%
+// Remaining differences: instruction ordering and register allocation.
+// confidence=low: generic scene actor leap; species ownership is not established.
+void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
+{
+    u8 *context = actor->context;
+    u8 *group = (u8 *)&actor->group;
+    struct ContactPosition point, delta;
+    if (TakeFlag(&actor->field2B2)) {
+        s32 correcting;
+        s32 speed;
+        if (!HasMode(context)) {
+            if (!sub_080E7FF4(actor->context)) {
+                SceneActor_ResetCollisionReaction(actor);
+                return;
+            }
+        } else if (!sub_080E80BC(actor->context))
+            return;
+        CellCenter(&point, actor->terrainCell);
+        Delta(&point, &actor->position, &point);
+        correcting = 0;
+        switch (((actor->direction + 0x20) & 0xFF) >> 6) {
+            case 0:
+            case 2:
+                if ((point.z < 0 ? -point.z : point.z) > 0x40) {
+                    CellCenter(&point, actor->terrainCell);
+                    point.x = actor->position.x;
+                    correcting = 1;
+                }
+                break;
+            case 1:
+            case 3:
+                if ((point.x < 0 ? -point.x : point.x) > 0x40) {
+                    CellCenter(&point, actor->terrainCell);
+                    point.z = actor->position.z;
+                    correcting = 1;
+                }
+                break;
+        }
+        if (correcting) {
+            Delta(&delta, &actor->position, &point);
+            speed = 4;
+        } else {
+            Delta(&delta, &actor->position,
+                  (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            {
+                u32 random = gUnk_0203B400[gUnk_03005308];
+                s32 base = context[0x65E] - 2;
+                speed = base + (random & 3);
+            }
+        }
+        actor->direction = Math_Atan2(delta.x, delta.z);
+        Polar(&actor->secondaryMotion, actor->direction, speed);
+        *(u16 *)((u8 *)actor + 0x2EE) = 24;
+        SceneActorAnimation_SelectEntryFlags((void *)actor, 14,
+                                             SceneActor_GetDirectionFlags(actor->direction));
+        Sound_PlaySong(0x1B2);
+        ActorShadow_Enable((u8 *)actor + 0x320);
+    } else {
+        u32 mask = 16;
+        if (actor->flags2D0 & mask)
+            actor->field2B0 = 1;
+    }
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", SceneActor_LeapTowardTarget);
+#endif

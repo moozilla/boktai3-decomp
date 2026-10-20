@@ -1,8 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 80.1%
-// Blended bank loops still differ in constant hoisting and register allocation.
+// fuzzy: 86.7%
+// Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
 extern s32 gUnk_03004DA0, gUnk_030051D8, gUnk_03004DA8;
 extern u16 *gUnk_030051E0;
 extern u16 gUnk_03004FC0[], gUnk_030051C4, gUnk_03005214;
@@ -17,7 +17,8 @@ void Palette_ApplyBackgroundFade(void)
     u16 *src, *dst;
     register s32 level asm("r12");
     s32 other;
-    u32 rb, g;
+    u32 rb;
+    register u32 g asm("r10");
     if (value == 64) {
         gUnk_030051E0 = gUnk_03004FC0;
         return;
@@ -68,11 +69,16 @@ void Palette_ApplyBackgroundFade(void)
         dst = buffer;
         for (i = 0; i < 16; i++) {
             if ((gUnk_030051C4 >> i) & 1) {
+                register u32 green asm("r8") = g * other;
+                register u32 mask asm("r9") = 0x7c1f;
+                register u32 redblue asm("r7") = rb * other;
                 for (j = 15; j >= 0; j--) {
                     u32 c = *src;
-                    *dst = (((level * (c & 0x7c1f) + rb * other) & 0xf83e0) |
-                            ((level * (c & 0x3e0) + g * other) & 0x7c00)) >>
-                           5;
+                    register u32 redTerm asm("r2") = level * (c & mask) + redblue;
+                    register u32 greenTerm asm("r0");
+                    redTerm &= 0xf83e0;
+                    greenTerm = (level * (c & 0x3e0) + green) & 0x7c00;
+                    *dst = (redTerm | greenTerm) >> 5;
                     src++;
                     dst++;
                 }

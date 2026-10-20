@@ -1158,7 +1158,7 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
 
 extern void (*const gUnk_086049B4[])(struct SceneObject *);
 
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 
 void sub_0821DE30(void *);
 
@@ -1208,7 +1208,7 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
             SceneObjects_DestroyObject(p);
             continue;
         }
-        sub_08225B74(&p->body);
+        Obj_StepPosition(&p->body);
         if (p->update)
             p->update(p);
         if (p->flags & 0x20) {

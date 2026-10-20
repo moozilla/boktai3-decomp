@@ -15,7 +15,7 @@ struct PlayerOrbitEffect {
 extern u32 gUnk_0300523C;
 void Sound_PlaySong(u32);
 s32 Anim_Step(void *, void *);
-void sub_0815FB80(void);
+void PlayerOrbitEffect_UpdateStatTransfer(void);
 void PlayerBurst_SetStateCallback(void *, void (*)(void));
 void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 {
@@ -33,6 +33,6 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
     effect->frame++;
     if (effect->frame > 59) {
         effect->animationState = 1;
-        PlayerBurst_SetStateCallback(effect, sub_0815FB80);
+        PlayerBurst_SetStateCallback(effect, PlayerOrbitEffect_UpdateStatTransfer);
     }
 }

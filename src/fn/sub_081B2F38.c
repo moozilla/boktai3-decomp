@@ -5,6 +5,8 @@
 
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
+// confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
+
 #ifdef NONMATCHING
 // fuzzy: 93.2%
 // Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.

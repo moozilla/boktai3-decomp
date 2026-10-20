@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_update.h"
-void sub_0807CA44(struct SceneActorRegistryActor *);
+void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryActor *);
 static inline u8 TestFlag(u16 *flags, u32 mask)
 {
     if (*flags & mask)
@@ -121,7 +121,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *acto
         }
         mask = ~0x983;
     } else if (TestFlag(flags, 0x800)) {
-        sub_0807CA44(updateActor);
+        SceneActorAttachment_BeginReturnResponse(updateActor);
         mask = ~0x981;
     } else if (TestFlag(flags, 1))
         mask = ~0x181;

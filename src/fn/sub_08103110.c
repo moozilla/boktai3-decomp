@@ -69,10 +69,10 @@ void TetherActor_AddStatusFlags(s32, u32);
 void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *, struct NamedObject *);
 u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32);
 void NamedObject_TryCapturePlayer(void);
-void sub_08102570(void);
+void NamedObject_ClampTetherAtBarrier(void);
 void NamedObject_UpdateTerrainRegistration(void);
 void NamedObject_UpdateEntryTrigger(void);
-void sub_0810271C(void);
+void NamedObject_ClampTetherToPlatform(void);
 void NamedObject_ConstrainPlayer(void);
 void NamedObject_ConstrainTether(void);
 static inline s32 optionalValue(void)
@@ -146,7 +146,7 @@ void NamedObject_CreateFromScript(void)
             sprite->y = e->heightLow;
             e->state = 1;
             e->handlers[0] = NamedObject_TryCapturePlayer;
-            e->handlers[1] = sub_08102570;
+            e->handlers[1] = NamedObject_ClampTetherAtBarrier;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
             AnimData_SelectPaletteBank(e->anim, 0x240);
@@ -161,7 +161,7 @@ void NamedObject_CreateFromScript(void)
             sprite->y = e->heightLow;
             e->state = 1;
             e->handlers[0] = NamedObject_TryCapturePlayer;
-            e->handlers[1] = sub_08102570;
+            e->handlers[1] = NamedObject_ClampTetherAtBarrier;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 1;
             AnimData_SelectPaletteBank(e->anim, 0x246);
@@ -176,7 +176,7 @@ void NamedObject_CreateFromScript(void)
             sprite->y = e->heightLow;
             e->state = 1;
             e->handlers[0] = NamedObject_UpdateEntryTrigger;
-            e->handlers[1] = sub_0810271C;
+            e->handlers[1] = NamedObject_ClampTetherToPlatform;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 2;
             switch (e->row) {

@@ -28,7 +28,7 @@ void Hud_SetMode(s32);
 void Script_Call(u32, void *);
 void sub_08116E44(void);
 void Glove_UpdateDefeatEffects(void);
-void sub_08119B80(struct MotionActor *);
+void Glove_DispatchCommands(struct MotionActor *);
 void ActorStats_ApplyPendingIncrement(struct MotionActorState *);
 void StageIconDisplay_Create(u32, u32, void (*)(void), void *);
 static inline u8 TestActorFlags(struct MotionActor *p, u32 mask)
@@ -91,7 +91,7 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
             return;
         }
     }
-    sub_08119B80(actor);
+    Glove_DispatchCommands(actor);
     if (!IsUpdated(actor))
         ActorStats_ApplyPendingIncrement(state);
 }

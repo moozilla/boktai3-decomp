@@ -13,7 +13,7 @@
  * its literal address (REGALLOC.md, "Reload rotation"); the CpuSet source shares a struct
  * with the script values so that it takes the first stack slot. */
 
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -412,7 +412,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         }
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*categoryp - 11) > 2)
-        GameState_SetEventFlag(sub_081D4F20(*categoryp, actor->paletteOffset));
+        GameState_SetEventFlag(BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
     SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
     SetState(actor, 1, 0, 2);
     COUNT(0x87C);

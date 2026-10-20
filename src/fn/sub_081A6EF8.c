@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 struct Dest {
     u8 pad[0x124];
@@ -11,7 +11,7 @@ struct Dest {
 void Vanargand_OnPartContact(u8 *a, u8 *b, struct Dest *c)
 {
     u32 v;
-    sub_0821FF8C(a);
+    Collision_CalculateDamageResponse(a);
     c->b = *(u16 *)(b + 0x3e);
     v = *(u32 *)(a + 0x38);
     c->a = v;

@@ -9,7 +9,7 @@ struct AxePlayer {
     struct ContactPosition position;
 };
 extern struct AxePlayer *gUnk_02000580;
-void sub_080FBA38(struct SceneActorRegistryResetView *);
+void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 struct AxeRoute {
@@ -99,7 +99,7 @@ void Axe_FollowDeceleratingRoute(struct SceneActorRegistryResetView *actor)
         route->speed = 1;
     }
     Delta(&delta, &actor->position, &route->points[route->index]);
-    sub_080FBA38(actor);
+    Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->direction = Math_Atan2(route->points[route->index].x - actor->position.x,
                                       route->points[route->index].z - actor->position.z);

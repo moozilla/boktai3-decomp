@@ -1,5 +1,7 @@
 #include "global.h"
 
+// confidence=low: dispatches pending scene messages into action and animation state.
+
 // confidence=low: dispatches scene messages into action and animation state.
 // MATCHING_CONCESSION: register-pinning
 

@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: carries a player position request along a motion track
 #ifdef NONMATCHING
-// fuzzy: 81.9%
-// Remaining differences: Player-request branch merging, pointer lifetimes, and some vector/constant ordering differ.
+// fuzzy: 92.8%
+// Remaining differences: Player-request calls remain duplicated; entry and flag-mask allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -154,7 +155,7 @@ static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32
     Anim_SetSequence(seq, data, id, (u8)p->variant, options);
     StepPlayback(p, seq, p, 1);
 }
-static inline void SetVector(struct SceneVec *p, s16 x, s16 y, s16 z)
+static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
     ((volatile s16 *)p)[0] = x;
     p->y = y;
@@ -175,48 +176,75 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
     if (p->reset) {
         p->reset = 0;
         SetAnimation(p, boss, 12, 0);
-        p->state = 0;
-        p->timer = 0;
+        {
+            register u32 zero asm("r1") = 0;
+            asm("" : "+r"(zero));
+            p->state = zero;
+            p->timer = zero;
+        }
         p->enter = 1;
     }
     mask = 16;
     p->flags |= mask;
-    switch (p->state) {
-        case 0: {
-            register u8 *enter asm("r7") = &p->enter;
-            if (*enter) {
-                *enter = 0;
-                SetVector(&target, 640, 528, 640);
-                MotionTrack_Initialize(p->motion, &p->offset, &target, 0, 4);
+    {
+        register u32 currentState asm("r4");
+        register u32 offset asm("r1") = 0x164;
+        register u32 *stateAddress asm("r0");
+        asm("" : "+r"(offset));
+        stateAddress = (u32 *)((u8 *)p + offset);
+        asm("" : "+r"(stateAddress));
+        currentState = *stateAddress;
+        asm("" : "+r"(currentState));
+        switch (currentState) {
+            case 0: {
+                u8 *enter;
+                register u32 entered asm("r1");
+                {
+                    register u8 *address asm("r0") = &p->enter;
+                    entered = *address;
+                    asm("" : "+r"(address), "+r"(entered));
+                    enter = address;
+                    asm("" : "+r"(enter));
+                }
+                if (entered) {
+                    *enter = currentState;
+                    SetVector(&target, 640, 528, 640);
+                    MotionTrack_Initialize(p->motion, &p->offset, &target, 0, 4);
+                }
+                {
+                    volatile s16 *out = (void *)&playerTarget;
+                    struct SceneVec *position = &p->position;
+                    out[0] = position->x;
+                    out[1] = position->y - 128;
+                    out[2] = position->z;
+                }
+                if (!p->variant) {
+                    if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
+                        goto complete;
+                    Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, 1, currentState,
+                                                currentState, currentState, 1);
+                } else {
+                    if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
+                        goto complete;
+                    Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, currentState,
+                                                currentState, currentState, currentState, 2);
+                }
+                MotionTrack_Update(p->motion);
+                if (MotionEnded(p)) {
+                complete: {
+                    register u32 next asm("r2") = 1;
+                    asm("" : "+r"(next));
+                    p->state = next;
+                    p->timer = 0;
+                    *enter = next;
+                }
+                }
+                break;
             }
-            {
-                volatile s16 *out = (void *)&playerTarget;
-                struct SceneVec *position = &p->position;
-                out[0] = position->x;
-                out[1] = position->y - 128;
-                out[2] = position->z;
-            }
-            if (!p->variant) {
-                if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
-                    goto complete;
-                Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, 1, 0, 0, 0, 1);
-            } else {
-                if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
-                    goto complete;
-                Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, 0, 0, 0, 0, 2);
-            }
-            MotionTrack_Update(p->motion);
-            if (MotionEnded(p)) {
-            complete:
-                p->state = 1;
-                p->timer = 0;
-                *enter = 1;
-            }
-            break;
+            case 1:
+                p->finished = currentState;
+                break;
         }
-        case 1:
-            p->finished = 1;
-            break;
     }
 }
 

@@ -63,7 +63,7 @@ extern u8 *gUnk_030042E4;
 s32 Player_ConsumeStateEntry(struct P *);
 s32 ActorVariant_GetTableValue(s32, s32);
 void Player_SetActionPhase(struct P *, s32);
-void sub_0813D178(struct P *);
+void Player_InitVisualResources(struct P *);
 // confidence=low: toggles actor variant between zero and one through four motion phases.
 void PlayerCue_UpdateFormChange(struct P *p)
 {
@@ -136,7 +136,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
                     p->variant = 1;
                 else
                     p->variant = 0;
-                sub_0813D178(p);
+                Player_InitVisualResources(p);
                 p->fAC4 = 65535;
                 if (p->f536 != 21 && p->f536 != 49)
                     p->f538 = 0;

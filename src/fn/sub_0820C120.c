@@ -1,3 +1,4 @@
+
 #include "global.h"
 #include "screamer_playback.h"
 struct ColliderFlags {

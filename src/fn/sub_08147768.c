@@ -15,7 +15,7 @@ void Player_EmitQueuedEffects(struct Player *);
 void Player_NotifyActionCategories(struct Player *);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Anim_Step(void *, void *);
-void sub_0813D178(struct Player *);
+void Player_InitVisualResources(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void PlayerCue_EnterStandUpdate(struct Player *);
@@ -119,7 +119,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
                     p->statHundredths = 0;
                 } else
                     p->actionMode = 0;
-                sub_0813D178(p);
+                Player_InitVisualResources(p);
                 p->savedSpriteResource = 0xFFFF;
                 if (p->unk536 != 0x15 && p->unk536 != 0x31)
                     p->active = 0;

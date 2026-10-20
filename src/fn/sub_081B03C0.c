@@ -1,10 +1,11 @@
 #include "global.h"
+// confidence=low: provisional role inferred from state transitions and player-motion calls
 // confidence=low: moves a paired half and holds/releases player position requests.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 #ifdef NONMATCHING
-// fuzzy: 86.2%
-// Remaining differences: animation allocation, argument setup and shared phase-entry tails.
+// fuzzy: 88.6%
+// Remaining differences: Packed-animation allocation, request-call setup, and shared phase-entry tails differ.
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
 struct PairPosition {
     s16 x, y, z, pad;
@@ -138,7 +139,7 @@ static inline void StepSequence(void *obj)
             }
             state->frameWeight = *command & 15;
             {
-                s32 weight = state->frameWeight;
+                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;

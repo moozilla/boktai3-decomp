@@ -42,7 +42,7 @@ void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);
 void sub_082222BC(void *, void *, int);
-int sub_08222358(void *, void *);
+int Interp_Step(void *, void *);
 void Sound_PlaySong(int);
 int ActorResource_GetFixedId(void *);
 int Callback_InvokeActor(void *, void *);
@@ -113,7 +113,7 @@ void SceneActorAnimation_UpdateSwoopApproach(ActorAnimation *p, int tick)
             u32 mask = 0x40;
             p->flags = p->flags | mask;
         }
-        if (sub_08222358(p2->polar, position + 12))
+        if (Interp_Step(p2->polar, position + 12))
             p->finished = 1;
     }
 }
