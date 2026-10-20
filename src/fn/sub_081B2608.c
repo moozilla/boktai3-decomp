@@ -3,9 +3,12 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: moves a Vanargand part along its heading, then plays sequence 7.
+// confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
+#define Vanargand_UpdatePartRetreat sub_081B2608
+
 #ifdef NONMATCHING
-// fuzzy: 88.0%
-// Remaining differences: register lifetimes, state-transition layout, and literal pools.
+// fuzzy: 91.6%
+// Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -56,7 +59,6 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         register u32 first asm("r1");
         u32 maskBit = one;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -81,13 +83,14 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        u32 mask;
+        register u32 mask asm("r6");
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
+        asm("" : "+r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -171,6 +174,7 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
     u32 state;
     struct SceneVec delta;
     u32 mask = 0x20;
+    asm("" : "+r"(savedBoss));
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -179,9 +183,16 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
         else
             RetreatVector(&delta, p->heading);
         MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
-        p->state = 0;
-        p->timer = 0;
-        p->enter = 1;
+        {
+            register u32 zero asm("r1") = 0;
+            register u32 offset asm("r3") = 0x164;
+            asm("" : "+r"(zero));
+            *(u32 *)((u8 *)p + offset) = zero;
+            p->timer = zero;
+            offset += 11;
+            asm("" : "+r"(offset));
+            *(u8 *)((u8 *)p + offset) = 1;
+        }
     }
     state = p->state;
     switch (state) {
@@ -215,5 +226,5 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRetreat);
+INCLUDE_ASM("asm/nonmatching", sub_081B2608);
 #endif

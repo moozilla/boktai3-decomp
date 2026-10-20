@@ -1,4 +1,6 @@
 #include "global.h"
+// confidence=low: phase-dependent combat selection inferred from state and distance tests
+#define BossSlot2_SelectCombatAction sub_0817C3F4
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 struct DecisionActor {
@@ -501,5 +503,5 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_SelectCombatAction);
+INCLUDE_ASM("asm/nonmatching", sub_0817C3F4);
 #endif
