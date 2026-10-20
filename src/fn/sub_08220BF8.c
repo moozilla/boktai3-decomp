@@ -1,6 +1,5 @@
 #include "global.h"
 /* Box_Overlaps: Tests whether two boxes overlap on all three axes (sum of half extents against center distance) */
-#define Box_Overlaps sub_08220BF8
 
 struct Box {
     u8 pad0[0x1c];
@@ -21,7 +20,7 @@ static inline s32 axis(struct Box *a, struct Box *b, s32 i)
     return hit;
 }
 
-s32 sub_08220BF8(struct Box *a, struct Box *b)
+s32 Box_Overlaps(struct Box *a, struct Box *b)
 {
     s32 result = 0;
     if (axis(a, b, 0) && axis(a, b, 1) && axis(a, b, 2))

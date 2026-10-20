@@ -15,7 +15,7 @@ struct Interp {
     u16 len;
 };
 s32 Div(s32, s32);
-void sub_0822223C(struct Interp *, void *, u32, u32);
+void Orbit_OffsetFromAngle(struct Interp *, void *, u32, u32);
 
 u32 Interp_Step(struct Interp *o, void *p)
 {
@@ -28,7 +28,7 @@ u32 Interp_Step(struct Interp *o, void *p)
             if (o->x < 0)
                 o->x += 0x10000;
             o->x = *(u16 *)&o->x;
-            sub_0822223C(o, p, (u32)o->x >> 8, (u32)(o->y << 8) >> 16);
+            Orbit_OffsetFromAngle(o, p, (u32)o->x >> 8, (u32)(o->y << 8) >> 16);
             return 0;
         }
     }
