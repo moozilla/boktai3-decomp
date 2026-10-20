@@ -2,7 +2,7 @@
 #include "global.h"
 #define Options_InitScreen sub_081DB794
 #ifdef NONMATCHING
-// fuzzy: 83.4%
+// fuzzy: 82.4%
 struct Rect {
     u16 x, y, width, height;
 };
@@ -22,7 +22,7 @@ void Menu_StartFadeIn(s32);
 #define W(o) (*(u32 *)(p + (o)))
 s32 Options_InitScreen(u8 *arg)
 {
-    register u8 *p asm("r7") = arg;
+    u8 *p = arg;
     register u32 zero asm("r9");
     register u32 one asm("r8");
     void *resource;
@@ -46,10 +46,12 @@ s32 Options_InitScreen(u8 *arg)
     palette = ScriptProc_Start(0x92B3, 0x204);
     CpuSet((u8 *)palette + 0x14, gUnk_03004FC0, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
+    asm volatile("" : "+r"(resource) : "r"(p));
     graphics = p + 0x84;
     ResourceHeader_Relocate(graphics, resource);
     sub_0821983C(p + 0x24, graphics, 0x3A, 0x10, zero, zero, zero, zero);
     resource = ScriptProc_Start(0xCB05, 0x530D);
+    asm volatile("" : "+r"(resource) : "r"(p));
     graphics = p + 0x10C;
     ResourceHeader_Relocate(graphics, resource);
     sub_0821983C(p + 0xAC, graphics, 0x8A, 0x10, zero, zero, zero, zero);
