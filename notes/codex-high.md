@@ -795,3 +795,97 @@ build was run; it belongs to batch integration. The pre-existing modification
 to tools/cloud_task.py was left untouched. Scratch candidates and diagnostics
 remain ignored under wip/codex-high/ and build/. Shared HANDOFF, INDEX and
 history files were not edited, per the cloud-worker scope.
+
+## Task 081C29A4 (2026-10-20)
+
+Tags: #matching #scene-npc #sparkle-emitter #register-pinning
+
+Branch `cloud/081C29A4`, solo and offline. Exact recovery is 76.98% of this
+assignment's reviewed function extent: **+0.166 percentage points of project
+code** (4,000 bytes). The register-pinned portion contributes +0.122 points
+(2,936 bytes); the other two matches contribute +0.044 points (1,064 bytes).
+The draft is excluded from exact progress. Project totals were not regenerated.
+
+- **081CD484 matched**, `SceneNpc_DispatchCutsceneCommands`, 2,448 bytes.
+  The caller `SceneNpc_UpdateCommands` runs movement/animation/effects first,
+  then this dispatcher. It traverses receiver +0x168's messages for the current
+  scene-message phase, sets pending triggers, and handles command kinds through
+  108. Most cases reset the command state and timer; larger cases set a target
+  and speed, spawn a trigger/drop or SunOrb target, or configure palette fading.
+  Struct fields and repeated inline helpers brought structural differences to
+  zero. `(npc->angle + 128) & 255`, rather than an explicit u8 cast, preserved
+  the observed reload and mask sequence in the reverse-facing cases. Motion
+  must be addressed through its +0x5C descriptor for the +0x34/+0x36/+0x38 stores.
+  Initial facing needed a constrained destination and live zero. Depinning
+  reduced 14 hints to four. The earlier 99.3% draft commit is superseded by
+  the exact match commit. The existing symbols entry is named
+  `SceneNpc_DispatchCommands_081CD484`; the new file-local alias intentionally
+  supplies the address-free name for integration's name-promotion pass.
+- **081CF62C matched**, `SceneNpc_UpdateDescendingDash`, 544 bytes.
+  Name is tentative, as marked in the source. On entry it selects animation 9,
+  raises Y by 160, and initializes a height offset of 300. Phases select
+  animations 10, 11 and 12, compute polar velocity, quarter off horizontal
+  speed each update, converge height toward terrain, play song 680 on landing,
+  and mark completion after the final phase. Reusing the terrain cell-index
+  and slope-height helpers made the first successfully compiled candidate
+  exact. A separate diagnostic replacing the shared height helper's register
+  declaration with ordinary C also matched all 544 bytes; no register hint is
+  required for this function.
+- **081C3C1C matched**, `ContactImpactEffect_UpdateInterpolatedPosition`,
+  488 bytes, register-pinned. It shares its +0x94 scale ramp and projection
+  formulas with the adjacent `ContactImpactEffect_UpdateContact` draft. This
+  variant interpolates all three coordinates from +0xDC to +0xE4, projects
+  them with the 3/32 formulas and camera offsets, increments +0xF8, and sets
+  +0xD8 when duration +0x9A is exceeded. Sweeping inline interpolation argument
+  order found `(start, end, duration, time)`, improving 80.9% to 88.1% while
+  making the interpolation section exact. A typed vector pointer, a separate
+  projected-sum local, and temporary register hints closed the projection.
+  Depinning reduced 15 hints to two pointer declarations (ip and r2), with
+  no empty barriers retained.
+- **081CFDA4 matched**, `SceneNpc_UpdateProjectedMove`, 520 bytes, no hints.
+  Enables the ground projection, plays animation 3, and interpolates saved
+  position +0x23C toward target +0x54 over tag duration +0x12. It writes fixed
+  point projection coordinates from +0x2F0, including camera X, then advances
+  projection X by `Player_GetHorizontalVelocity(0)` and marks completion.
+  The same `(start, end, duration, time)` interpolation order discovered on
+  081C3C1C changed this candidate directly from 89.5% to an exact match.
+  Computing the target pointer inside a dedicated inline preserves the
+  original projection-address/target-address ordering.
+- **081C29A4 drafted 91.6%**, `SparkleEmitter_EmitParticle`, 532-byte extent.
+  Caller `SparkleEmitter_UpdateEmitting` invokes it every other update.
+  `sub_081C2968` finds the free entry; this routine increments live count,
+  clears the free bit, chooses a randomized point on a radius-150 circle,
+  converts screen coordinates into world position, and chooses randomized
+  angle/speed for the particle velocity. It then clears age +0x34.
+  Keeping both velocity random samples inside the polar inline's arguments
+  improved the original 69% candidate to 91%; evaluating angle and speed as
+  prior statements shortens the wrong lifetimes. Giving the circle helper
+  `(angle, output, radius)` order and expressing random-table indexing as
+  one assignment expression reached 91.6%. Remaining: one extra RNG-index
+  store in the two-sample sequence, literal-load order, and scratch registers
+  (27 realigned differences, eight ignoring registers). No register hints
+  remain. The guarded draft was formatted, scored with
+  `check.py --nonmatching --record --target-size 532`, and its default
+  INCLUDE_ASM branch separately matched all 532 bytes.
+- **081CEFCC unresolved**, tentative `SceneNpc_UpdateFollowSubject`.
+  Reviewed body/pool extent is 664 bytes, ending at 081CF264. The best retained
+  scratch is 69.2% over that extent, 684 candidate bytes, with 122 realigned
+  differences / 48 ignoring registers. It plays idle animation, sets flags
+  0x402, follows the context subject at +0x438, and uses squared-distance
+  thresholds 0x90000 and 0xFFFF. Far away it snaps to an offset of -768 along
+  its facing; at intermediate range it sets speed 24. At close range it tests
+  vertical and facing alignment against context +0x434 and may set flag 0x800.
+  Remaining differences include the distance inline's temporary lifetimes,
+  source/position pointer allocation, speed rematerialization in the polar
+  inline, and signed-angle narrowing in the alignment test. Scalar-distance
+  helper and pointer/register experiments stopped improving it. Assembly
+  remains unchanged; the candidate stays ignored at `wip/sub_081CEFCC.c` and
+  is not committed as a sub-threshold draft.
+
+Every exact function was formatted with the venv clang-format and accepted by
+`tools/check.py --target-size` over the reviewed full extent. Each match and
+retained draft was committed separately through `build/commit.sh`. No make,
+full build, network operation, generated-file edit, or direct Git mutation was
+performed. The combined ROM build and name promotion remain integration work.
+The pre-existing change in `tools/cloud_task.py` was left untouched. Shared
+HANDOFF, INDEX and history files were not edited, per cloud-worker scope.
