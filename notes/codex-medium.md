@@ -1994,3 +1994,79 @@ Global progress was not regenerated. Ghidra's decomp.c export is unavailable.
 Final checks: byte-exact acceptance for 08214FBC; --nonmatching --record for
 all three guarded drafts. The follow-up style commit formats the exact sprite
 source without changing its instructions. No ROM or generated artifacts added.
+
+## 2026-10-20 — cloud task 082015D4
+
+Tags: #matching #nonmatching #combat #projectile #ooze #tooling
+
+Worked solo on the preclaimed branch, offline. Per-file checks and diagnostic
+variant batches only; no make, full build, network or direct git mutations.
+Exact assignment progress: 0% (+0 percentage points). Five guarded drafts are
+retained; these earn no exact progress. Existing exported names were preserved
+and all retained functions have file-local semantic aliases.
+
+- **08205B70 — retained draft 89.1%, Ooze_BeginAttack.** Read BIG_FUNCTIONS,
+  existing notes, the attack-state body and complete assembly. Baseline remains
+  77 realigned differences / 17 ignoring registers. Timer-register variants and
+  cached pointers to transition fields all regressed. The remaining differences
+  are constant/address reuse across transitions and stepper allocation. The
+  assembly file in this cache is named Ooze_BeginAttack.s, so its fallback must
+  retain that exported spelling even though the C alias uses sub_08205B70.
+- **08206098 — improved draft 85.0% to 87.8%, Ooze_InitializeFromScript.** Widen
+  the heading-switch operand from u16 to u32 after the u16 narrowing: this keeps
+  the two unsigned upper-bound checks instead of the old compiler's additional
+  signed comparisons/reloads. Move the variant-1 body-origin adjustment into
+  a small inline taking the stack SceneVec pointer; this avoids scalarizing
+  coordinate stores into word masks. Final 79 realigned / 21 structural
+  differences. Option-field pointer variants regressed. Sequence-ID address
+  reuse, body setup and animation registers remain.
+- **08202B30 — stopped below threshold, Projectile_SpawnFromConfig.** Read pool
+  creation/free-slot routines, config setters and callers. Reconstructed config
+  copy, trigonometric planar velocity, collider/resource/sprite setup, optional
+  direction-dependent animation, homing target lookup, vertical-origin cache,
+  sprite flag and occupied-slot bit. Initial 68.1%; exploratory hints reached
+  76.3%, below the 80% draft threshold. Not added to src. Scratch is under
+  wip/sub_08202B30.c and build/projectile-*.c. The C still differs in the velocity
+  setup, saved config/slot/member pointer lifetimes, sequence argument ordering
+  and sprite read/write views in the packed-command stepper. Fixed pointer
+  pins introduced additional spills, so that experiment is not a trusted ABI
+  reconstruction. No exact claim or durable draft for this address.
+- **0820337C — improved draft 87.6% to 99.0%,
+  CannonEmitter_InitializeFromScript.** Separate r4 pins for the two animation
+  flip masks prevent their premature hoisting. Explicit frame-store r3 and
+  first-flip-mask r2 views resolve the remaining stepper allocation differences.
+  A descending signed palette index reproduces all code after the palette loop
+  exactly. Only five realigned instructions differ (24 bytes): the ROM compares
+  the descending palette pointer against its start, while this draft decrements
+  an index. Direct signed-pointer, callback-end-pointer and inline-fill variants
+  worsened address materialization/order; retain the 99.0% index candidate.
+- **08201A78 — retained draft 80.2%,
+  ScriptCombatActor_UpdateProjectileAttack.** Added semantic alias and a local
+  address alias for the projectile-attack callback, which the cached ELF still
+  calls sub_08201898. Explicit signed-angle liveness, a later position pointer
+  and a volatile RNG-table parameter failed to improve 71 realigned / 33
+  structural differences. RNG table load placement, stack-vector lifetime and
+  allocation remain.
+- **082015D4 — new draft 82.4%, ScriptCombatActor_ApplyHitReaction
+  (tentative).** Ported the closely related CannonTurret_ApplyHitReaction after
+  reading its registration at 08201784 and the target assembly. Records damage
+  +180, type +1B8 and reaction +104; flag 0x40 starts the display/HUD response;
+  selected flags emit three sparks using gUnk_0824FE44. Target-specific member
+  offsets include +17C/+198/+19E/+1A2 and HUD pointer +1AC. RNG-counter, mask,
+  position-pointer and countdown-register variants did not improve the retained
+  score. Final 49 realigned / 29 structural differences, mostly RNG store
+  timing, loop invariant hoisting and member-address allocation.
+
+Final C checks used --nonmatching --record; all five assembly fallbacks also
+passed per-file byte checks (these assembly matches earn no C credit).
+clang-format was invoked directly from the venv. Driver commits contain the
+individual sources and this note; no ROM or generated assembly was added.
+
+Tool pitfall: depin.py on a guarded draft tests its default assembly fallback,
+then incorrectly considers every hint removable. This briefly produced lower
+scores in queued commits for 0820337C and 082015D4. Explicit nonmatching C checks
+caught it immediately; follow-up commits restore the reviewed 99.0% and 82.4%
+sources. Running depin on unguarded scratch copies correctly says the C does not
+match and skips it. Future workers should strip the fallback before depinning
+any draft. Batch integration/name promotion/full ROM validation remain with
+the integrator.
