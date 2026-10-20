@@ -2599,7 +2599,7 @@ void sub_0819321C(void *);
 
 void sub_0818ECFC(void *);
 
-void sub_08225F88(void *);
+void Camera_SetPosition(void *);
 
 void Camera_SetIsometricOffset(s32, s32);
 
@@ -2621,7 +2621,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
     sub_0818ECFC(t->effectPool);
     Nidhoggr_ApproachCameraTarget(t);
     if (t->targetMode)
-        sub_08225F88(&t->cameraPos);
+        Camera_SetPosition(&t->cameraPos);
     else
         Camera_SetIsometricOffset(t->cameraPos.x, t->cameraPos.y);
     t->timer++;

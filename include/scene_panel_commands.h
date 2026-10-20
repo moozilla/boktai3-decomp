@@ -10,7 +10,7 @@ extern struct ScenePanelCommandGlobals *gUnk_0200047C;
 u32 SceneMessages_SetPendingTrigger(void *, void *);
 void SceneMessages_UnregisterReceiver(void *);
 s32 SceneMessages_RegisterReceiver(void *, u32, u32);
-void sub_08225F88(const void *);
+void Camera_SetPosition(const void *);
 
 void ScenePanel_DispatchCommands(struct ScenePanel *);
 void ScenePanel_UnregisterReceiver(struct ScenePanel *);

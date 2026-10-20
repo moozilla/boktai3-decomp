@@ -8946,6 +8946,7 @@ addr,name,mode,confidence,source,notes
 08225E84,Camera_ClampDiagonalPosition,thumb,low,src-alias,
 08225F1C,Camera_ApplyPositionBounds,thumb,low,src-alias,
 08225F5C,Camera_ResetOffset,thumb,low,src-alias,Resets the offset immediately or selects a timed reset mode; offset interpretation tentative
+08225F88,Camera_SetPosition,thumb,low,src-alias,
 08226058,Camera_SetOffset,thumb,low,src-alias,Stores a three-component offset and selects immediate or timed application; interpretation tentative
 082260A4,Camera_RequestShake,thumb,low,src-alias,Raises the pending shake strength when effects are enabled without reducing a stronger request
 08226178,Camera_ClearTargetOffset,thumb,low,src-alias,Zeros the three components of the target-relative offset during camera reset

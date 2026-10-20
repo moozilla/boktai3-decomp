@@ -14,7 +14,7 @@ struct CameraTracking {
 };
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-void sub_08225F88(struct CameraPackedPosition *);
+void Camera_SetPosition(struct CameraPackedPosition *);
 static inline u32 Test(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -53,5 +53,5 @@ void CameraTracking_UpdatePosition(struct CameraTracking *tracking)
     else
         position.y = first->y + Scale((second->y - first->y) * factor, 8);
     position.z = first->z + Scale((second->z - first->z) * factor, 8);
-    sub_08225F88(&position);
+    Camera_SetPosition(&position);
 }

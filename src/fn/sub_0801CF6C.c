@@ -5,7 +5,7 @@ typedef struct {
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_08225F88(void *);
+void Camera_SetPosition(void *);
 int ResultMenu_ReadScript(u8 *p)
 {
     int found, result;
@@ -24,7 +24,7 @@ int ResultMenu_ReadScript(u8 *p)
     {
         Vec *position = (Vec *)(p + 0x18);
         *(Vec *)(p + 0x20) = *(Vec *)(p + 0x18);
-        sub_08225F88(position);
+        Camera_SetPosition(position);
     }
     *(u16 *)(p + 0x7a0) = Script_GetKeywordValue(0x65, 0);
     p[0xae] = Script_GetKeywordValue(0x6c, 0);
