@@ -13,7 +13,7 @@ static inline s32 Truncate12(s32 v)
 }
 
 s32 ActorVariant_GetTableValue(u32, s32);
-s32 sub_08238280(struct Player *, s32, s32);
+s32 Player_SetAnimationIndex(struct Player *, s32, s32);
 void sub_08238238(struct Player *);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
@@ -36,7 +36,7 @@ void Player_UpdateKnockback(struct Player *p)
     }
     switch (p->tetherPhase) {
         case 0:
-            sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x29), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x29), 0x40);
             if (++p->tetherFrame > 2)
                 Player_SetTetherMode(p, 0x1E, 1);
             break;
@@ -44,7 +44,7 @@ void Player_UpdateKnockback(struct Player *p)
             u32 a;
             if (p->tetherFrame == 0)
                 p->terrainRecoveryCounter = 300;
-            sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2B), 0x40);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2B), 0x40);
             a = ((p->facing + 5) & 7) << 5;
             p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
             p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
@@ -68,7 +68,8 @@ void Player_UpdateKnockback(struct Player *p)
             u32 a = ((p->facing + 5) & 7) << 5;
             p->velocityX = -Truncate12(gUnk_086149C4[(a + 0x40) & 0xFF] * p->directionFrame);
             p->velocityZ = -Truncate12(gUnk_086149C4[a] * p->directionFrame);
-            if (sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2C), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2C),
+                                         0x40)) {
                 p->directionFrame = 0;
                 Player_SetTetherMode(p, 0x1E, 3);
             }
@@ -79,7 +80,8 @@ void Player_UpdateKnockback(struct Player *p)
                 Player_SetTetherMode(p, 0x1E, 4);
             break;
         case 4:
-            if (sub_08238280(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2D), 0x40)) {
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)p + 0x418), 0x2D),
+                                         0x40)) {
                 p->contactSpecial = 0;
                 sub_08238238(p);
                 Player_SetTetherMode(p, 0, 0);

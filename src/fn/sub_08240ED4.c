@@ -6,7 +6,7 @@ void Player_SetSecondaryActionFlags(struct Player *, u32);
 void Player_SetDirectionalVelocity_08238300(struct Player *, s32);
 void sub_08238238(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
-void sub_08238280(struct Player *, s32, s32);
+void Player_SetAnimationIndex(struct Player *, s32, s32);
 void Player_UpdateStumble(struct Player *p)
 {
     u16 *frame;
@@ -30,5 +30,5 @@ void Player_UpdateStumble(struct Player *p)
     if (p->movementVelocityLocked == 0)
         Player_SetDirectionalVelocity_08238300(p, 0x20);
     sub_08238238(p);
-    sub_08238280(p, ActorVariant_GetTableValue(p->actionMode, 1), 0x40);
+    Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 1), 0x40);
 }

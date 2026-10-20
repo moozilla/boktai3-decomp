@@ -28,7 +28,7 @@ void Player_SetTetherMode(struct P *, s32, s32);
 void LinkPlayer_FlushPendingEffects(struct P *);
 void Player_PlayLocalSong(s32, u32);
 s32 Player_SetSecondaryActionFlags(struct P *, u32);
-s32 sub_08238280(struct P *, s32, s32);
+s32 Player_SetAnimationIndex(struct P *, s32, s32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, s32, s32, s32);
 extern u8 *gUnk_030042E4;
 #define B(o) (*(u8 *)((u8 *)p + (o)))
@@ -163,7 +163,7 @@ void PlayerCue_UpdateSpiralPose(struct P *p)
             *(struct SceneVec *)((u8 *)p + 0xAC) = *(struct SceneVec *)((u8 *)p + 0x30);
         }
     }
-    sub_08238280(p, 0x9a, 0x40);
+    Player_SetAnimationIndex(p, 0x9a, 0x40);
     W(0xD4) = (u32)gUnk_030042E4 + 0x2DE0;
     Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
