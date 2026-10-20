@@ -8,7 +8,6 @@ static inline int trunc1(int x)
 {
     return x >= 0 ? x >> 1 : -(-x >> 1);
 }
-#define HresvelgrChild_Init sub_081ADDF0
 void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
 {
     u8 *anim = obj + 0x2c;
@@ -43,5 +42,5 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
     out[2] = trunc1(t);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081ADDF0);
+INCLUDE_ASM("asm/nonmatching", HresvelgrChild_Init);
 #endif
