@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
-// One arithmetic-versus-logical shift instruction remains in direction quantization.
+#define Player_GetForceDirection sub_08140F40
+
 struct Terrain {
     u8 pad[4];
     u8 *cells;
@@ -25,9 +24,13 @@ static inline s32 Width(void)
 s32 Player_GetForceDirection(struct Player *p)
 {
     register s32 angle asm("r0") = ((gUnk_0200053C + 0x70) & 255);
-    register s32 d asm("r4") = angle >> 5;
-    s32 offset = 0;
+    register s32 d asm("r4");
+    s32 offset;
     u32 h;
+    /* Keep the signed quantization used by the original compiler. */
+    asm("" : "+r"(angle));
+    d = angle >> 5;
+    offset = 0;
     if (d & 1) {
         if (d == 1)
             offset = Width();
@@ -86,7 +89,3 @@ s32 Player_GetForceDirection(struct Player *p)
 fail:
     return -1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_GetForceDirection);
-#endif
