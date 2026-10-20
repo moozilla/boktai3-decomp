@@ -175,7 +175,6 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             break;
         case 8:
             if (!p->timer) {
-                register u32 zero asm("r9") = p->timer;
                 SetDirection(p, 32);
                 SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0xF4,
                                                          1, 1, 1);
