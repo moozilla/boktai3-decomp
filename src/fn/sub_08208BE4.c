@@ -1,6 +1,7 @@
 #include "global.h"
+#define CannonTurret_InitializeFromScript sub_08208BE4
 #ifdef NONMATCHING
-// fuzzy: 93.3%
+// fuzzy: 95.5%
 // Remaining differences: resource reload, selected register lifetimes, and explicit success result.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
@@ -234,6 +235,7 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     } else {
         *(void (**)(void))(p + 0x108) = sub_082086B8;
         H(0x130) = 1;
+        asm("" : : : "memory");
         sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, 0);
     }
     StepAnimation(p, (void *)(p + 0x10c), 4);
@@ -249,5 +251,5 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_InitializeFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08208BE4);
 #endif

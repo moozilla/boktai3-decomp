@@ -1,5 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// confidence=low: approaches a side of the player before playing sequence eight
+#define ActorStatus_UpdateFlankingStrike sub_081B1B90
 #ifdef NONMATCHING
 // fuzzy: 84.5%
 // Remaining differences: Entry/state register lifetimes, animation mask allocation, and transition constants differ.
@@ -157,7 +160,6 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-// confidence=low: approaches a side of the player before playing sequence eight
 void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target;
@@ -219,5 +221,5 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateFlankingStrike);
+INCLUDE_ASM("asm/nonmatching", sub_081B1B90);
 #endif
