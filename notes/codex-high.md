@@ -2270,3 +2270,94 @@ paths compare byte-identical; this is not exact-C progress. All three matches
 were checked over their complete reviewed extents. Shared headers, generated
 files and shared documentation were untouched. An unrelated modification to
 `tools/cloud_task.py` appeared during the session and was left untouched.
+
+
+## Task 080B01A4: Vorn route and pursuit callbacks (2026-10-20)
+
+Tags: #matching #vorn #routing #nonmatching
+
+Branch: `cloud/080B01A4`. Worked solo and offline. Used per-file checks only;
+commits queued through `build/commit.sh`. Reviewed complete extents are 536,
+756, 812, 440, 728 and 1684 bytes for the six assigned addresses in address order.
+Assigned-range exact coverage is **26.07% (+26.07 percentage points)**, or 1292
+of 4956 bytes. Global progress is left for batch integration.
+
+- **080B01A4 matched**, `Vorn_UpdateRouteApproach` (536 bytes, no pins).
+  Referenced by Vorn's behavior table; shared shape with 080B04F4 and
+  08131820. Clears the entry latch, runs the enabled callback and reaction
+  check, selects directional animation one, and obtains movement speed from
+  callback 0x260. Applies animation duration scale, then consumes the route
+  probe event. Acceleration completion selects behavior 18, restores the
+  saved control callback, and starts the side-step motion callback with kind
+  38; a turn selects behavior 20. Exact on the first authored check, retained
+  after formatting and an explicit `--target-size 536` check.
+- **080B1A98 matched**, existing name `Vorn_BeginTargetPursuit` (756 bytes,
+  no pins). Improved the retained 87.3% draft to an exact match. It clears
+  context flag eight, gates on response/context state and motion flag 0x100,
+  refreshes a pursuit timer, and either delegates to the action dispatcher
+  or installs the restore-after-delay control, route response command, and
+  path toward the current target. Passing route and position explicitly to
+  the route inline removed ten structural differences. Reusing the same
+  motion-mask inline at both tests preserved the flag-address lifetime.
+  Spelling out state three/phase one reset with explicit local constants,
+  clearing the initial flag through an unsigned mask helper, and testing
+  context flag one through the object accessor removed the rest. Complete
+  `--target-size 756` acceptance check passed after formatting.
+- **080B1FA8 stopped below the draft threshold**, tentative
+  `Vorn_SelectTargetEscapePoint` (reviewed extent 812 bytes). Callers
+  080ADCC0 and 080B23A0 use it when refreshing pursuit movement. It builds a
+  target-facing vector from Math_Atan2 and the sine table, seeks an eight-byte
+  route entry with a negative planar dot product that differs from the
+  current entry, and otherwise picks a random different entry. It snaps the
+  destination to terrain height and attempts the path; failure selects state
+  three and idle control, success marks destination offset six as one.
+  Important quirk retained in the C: the point cursor advances only on a
+  nonnegative dot product, while the iteration counter advances every time.
+  Packed halfword vector writes followed by signed halfword reads through a
+  different view force stack storage in the ROM. Authored scalar, packed,
+  array-snapshot, helper/direct-loop, unsigned-field and diagnostic pinning
+  variants did not converge: best complete checked fuzzy result was 66.0%,
+  159 total / 78 structural differences (852 candidate bytes). No source
+  below 80% was promoted. Scratch variants remain under ignored `wip/` and
+  `build/vorn-1FA8-*.c`; they are not committed drafts.
+- **080B23A0 drafted 83.4%**, `Vorn_BeginPursuitRoute` (440-byte reviewed
+  extent; 436-byte C candidate), 40 total / 19 structural differences. Called
+  by recovery selection 080B1938, behavior 080AD114 and context dispatch
+  080B3ADC. Checks context cooldown 0x6AC and flags four/two, writes two
+  60-frame timers, optionally starts a route, calls 080B1FA8, then installs
+  behavior 15, the saved control callback and 080ADCC0 motion kind 37.
+  Sets actor pursuit flags and reloads the route timer. Signed full-width
+  halfword bitfield compound updates reproduce the distinct byte/word zero
+  lifetimes better than a merged ordinary halfword expression. Remaining:
+  the second flag reload, route-index address ordering, mask lifetimes and
+  allocation. Diagnostic explicit pins were discarded; the retained draft
+  has no hints and is guarded with the original INCLUDE_ASM fallback.
+- **080B2580 drafted 94.5%**, existing name
+  `Vorn_SelectReachableEscapeCell` (728-byte reviewed extent; 716-byte C
+  candidate), 23 total / eight structural differences. Improved the retained
+  84.0% draft. Tries four headings at range two, then range one, restoring
+  the supplied heading after each range; requests a path to the chosen cell
+  and invokes the failure callback if necessary. A shared `if (found ||
+  range <= 0) goto done` after the retry loop fixed its rotated exit layout.
+  Combining the two path-failure tests matches this function's shared tail.
+  A local center-height accessor improves the final cell-height allocation.
+  Remaining: map-width address rematerialization/literal pools and stack-slot
+  order. Removed the diagnostic attribute pin; final draft has no hints.
+- **080B2858 drafted 90.7%**, existing name `Vorn_SelectRetreatRoute`
+  (1684-byte reviewed extent; 1676-byte C candidate), 90 total / 33 structural
+  differences. Improved the retained 85.1% draft. Starts the cooldown and
+  response record, then chooses escape movement according to near/far
+  distance thresholds. The middle and far paths deliberately duplicate the
+  same target-cell routing logic, as the ROM does. Signed halfword bitfield
+  compound updates improve zero/constant lifetimes; explicit RNG byte-offset
+  arithmetic, a target-slot pointer and mask-taking player-flags accessor
+  also improve instruction order. Remaining differences involve inline
+  actor/group copies and stack lifetimes, random-mask order and registers.
+  No register hints retained.
+
+All retained drafts were formatted, rescored with
+`tools/check.py FILE --nonmatching --record`, and keep their default assembly
+fallbacks. Ghidra's export was unavailable. Shared headers, symbols, generated
+files and shared docs were not edited. `depin.py` checks a draft's default asm
+branch rather than its NONMATCHING body, so the final hint removal was assessed
+with an explicit NONMATCHING check. No full build was run.
