@@ -10,6 +10,9 @@ With --run, runs the permuter for that long (all cores by default) and stops
 early at an exact match; the best candidates land in that run's output-*/
 directories, and progress.tsv records when each better score appeared.
 
+A FILE that holds several ROM functions is isolated automatically (tools/isolate.py
+ensure, written to build/isolated/); --focus lines then refer to that copy.
+
 --focus restricts every mutation to some source lines of SRC: `auto` takes the
 lines tools/regdiag.py blames for the differing instructions and registers;
 otherwise give lines like `120-135,140`. --context widens each line by N.
@@ -242,6 +245,8 @@ def main():
         ap.error("--run must be nonnegative and -j must be positive")
     src = a.src if a.src.endswith(".c") else os.path.join("src", "fn", a.src + ".c")
     func = a.func or os.path.basename(src)[:-2]
+    import isolate
+    src = isolate.ensure(src, func)  # multi-function unit: work on an isolated copy
     alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", open(os.path.join(ROOT, src)).read(), re.M))
     label = func = alias.get(func, func)  # cpp expands "#define Name sub_X"
     parent = os.path.join(ROOT, "build", "permute", func)
