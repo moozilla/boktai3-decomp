@@ -777,3 +777,53 @@ fallbacks and incorrectly removed every hint from guarded drafts; restored the
 candidate hints and rechecked the recorded scores. Do not use its default path
 as evidence that a NONMATCHING candidate can lose its pins. Six one-function
 draft commits queued through build/commit.sh, followed by these notes.
+
+## Task 081172C4 — 2026-10-20
+
+Tags: #matching #glove #actor-motion
+
+- **081188F4 — matched, Glove_UpdateRecoil.** Exact 664-byte match, with no
+  register concessions. Initializes animation zero, updates recoil and clamped
+  movement, eases the three offset velocities, updates facing/collision and
+  accessory animation, and advances the particle emitter. The matched
+  ActorPhysics_UpdateFallMotion (08120B44) supplies the shared movement layout.
+  This actor embeds that movement object at +0x18; its model starts at +0x610.
+- **08117948 — drafted 82.3%, Glove_UpdateStopping.** Full-size recorded
+  NONMATCHING check: 144 realigned differing instructions, 55 ignoring registers.
+  Splitting the action/status work into inline routines improved the first
+  57.4% attempt substantially. Remaining differences include action flag masks,
+  zero-store scheduling, pointer lifetime/spills, and register allocation. No
+  register pins retained. Reads the actor's +0x8C4 input pointer and handles the
+  action kind at +0x2CD, then recovery/cooldown fields relative to the motion
+  object. The name follows Glove_BeginStopping and the script stop callback.
+- **081182E4 — stopped below threshold (best 76.1%).** Tentative
+  Glove_UpdateDefeat: clears action/sprite state, hides markers, restores model
+  palettes and emits timed flashes before selecting a recovery callback after
+  120 ticks. Explicit cleanup field pointers and an ascending model-part offset
+  improved structure. Still differs in pointer setup/spill scheduling, loop
+  addressing and the common motion block. Best scratch source remains in
+  wip/sub_081182E4.c; its scalar height pin is experimental, not exact credit.
+- **08117F6C — stopped below threshold (best 74.1%).** Tentative
+  Glove_UpdateRecovery: blinks model flags, eases the motion object's +0x58
+  halfword toward +0x5A, then restores its marker/color effect and switches to
+  08117948 after 120 ticks. Explicit motion pointers plus a height register pin
+  improved the attempt, but pointer spills, mask order and tail lifetimes remain.
+  Scratch source: wip/sub_08117F6C.c.
+- **081175F8 — stopped below threshold (best 70.0%).** Tentative
+  Glove_UpdateLaunch: accelerates +0x914 by 0x20 until position exceeds 0x40000,
+  decelerates by 0x100, then installs 08117948 in phase four. The common motion
+  block retains allocation and pointer-lifetime differences. Inline damp/physics
+  boundaries and explicit pointer experiments did not establish an exact path.
+  Scratch source: wip/sub_081175F8.c.
+- **081172C4 — stopped below threshold (best 71.3%).** Tentative
+  Glove_UpdateLaunchDisplay: related launch phases, but creates the stage icon
+  display with Glove_BeginStopping and sets flag 0x10. Same motion residue as
+  081175F8; declaration swaps and register/pointer variants did not improve it
+  enough to retain as a production draft. Scratch: wip/sub_081172C4.c.
+
+Ghidra export gen/ghidra/decomp.c is absent. Used assembly, named callers and
+matched relatives only; no network, full build, generated-file edits or other
+workers' candidate sources. Fast checks verified the exact match again after
+formatting. Final notes commit also formats that already-matched unit and removes
+unused local prototypes without changing its bytes. The guarded stopping draft
+uses INCLUDE_ASM in the default build. All other attempts remain outside src/.

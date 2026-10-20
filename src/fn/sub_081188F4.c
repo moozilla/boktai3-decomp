@@ -38,33 +38,32 @@ struct Obj {
 struct Glove {
     u8 pad0[0x18];
     struct Obj motion;
-    u8 model[0x860-0x610];
+    u8 model[0x860 - 0x610];
     s8 marker, markerSlot;
     u8 pad862[2];
     u32 timer;
     u8 active;
     u8 pad869[3];
     void (*update)(void *);
-    u8 pad870[0x8C4-0x870];
+    u8 pad870[0x8C4 - 0x870];
     u16 *input;
-    u8 pad8C8[0x8E4-0x8C8];
+    u8 pad8C8[0x8E4 - 0x8C8];
     u32 previousInput;
     s32 height;
     u8 pad8EC[8];
     u16 flags, blinkTimer;
     s8 participant;
-    u8 pad8F9[0x914-0x8F9];
+    u8 pad8F9[0x914 - 0x8F9];
     s32 launchSpeed;
     u8 launchPhase;
 };
-#define U8(p,o) (*(u8 *)((u8 *)(p)+(o)))
-#define S8(p,o) (*(s8 *)((u8 *)(p)+(o)))
-#define U16(p,o) (*(u16 *)((u8 *)(p)+(o)))
-#define S16(p,o) (*(s16 *)((u8 *)(p)+(o)))
-#define U32(p,o) (*(u32 *)((u8 *)(p)+(o)))
-#define S32(p,o) (*(s32 *)((u8 *)(p)+(o)))
+#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
+#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
+#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
+#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
+#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
+#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
-s32 Mod(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void sub_0811AE9C(struct Obj *);
@@ -76,29 +75,8 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
-void MotionActor_UpdateMovementAudio(struct Glove *);
-u8 LinkParticipant_IsLocallySelected(struct Glove *);
-void Sound_StopSong(s32);
-void Sound_PlaySong(s32);
-void Anim_SetKeyframes(void *, void *, u16, s32, s32);
-void Anim_Step(void *, void *);
-void sub_0811D6C8(void *, s32, u16, s32, s32, s32, s32, s32);
-s32 CharacterModel_GetPrimaryPaletteIndex(void *);
-s32 sub_08249240(void *, s32, u32);
-void sub_0811C484(void *, void *, u32);
-void CharacterModel_ClearAnimationFlags(void *, s32);
-void CharacterModel_SetAnimationFlags(void *, s32);
-void CharacterModel_LoadPrimaryPalette(void *);
-void CharacterModel_LoadSecondaryPalette(void *, u8);
-void ActorMarkerPool_ShowMarker(s8);
-void ActorMarkerPool_HideMarker(s8);
-void ActorMarker_HideSlot(s8);
-void Character_SetLowResourceColorEffect(void *, void *);
 extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
-void sub_08117948(void *);
-void sub_08117F6C(void *);
-void Glove_OnActionComplete(void *);
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 #define Glove_UpdateRecoil sub_081188F4
@@ -111,11 +89,15 @@ void Glove_UpdateRecoil(struct Glove *p)
         Glove_SetAnimationKeyframes(p, 0);
         p->active = 0;
     }
-    { u16 bit = 0x10; p->flags |= bit; }
+    {
+        u16 bit = 0x10;
+        p->flags |= bit;
+    }
     ActorRecoil_UpdateMotion(p);
     ScenePool_ClampMotionSpeeds(self);
     h = self->vy + self->unkC0;
-    if (h > 0xF000) h = 0xF000;
+    if (h > 0xF000)
+        h = 0xF000;
 
     self->y += 0x200;
     if (self->steps > 0) {
@@ -130,47 +112,50 @@ void Glove_UpdateRecoil(struct Glove *p)
     Actor_ClampMovementSpeed(self);
 
     {
-    s32 *pprevZ, *pprevX, *pvz, *px, *py;
-    s32 lim;
-    self->outX = h + self->x - self->prevX;
-    self->outY = self->y + self->dy;
-    self->outZ = self->vz + self->dz;
-    dx = (self->x - self->prevX) >> 12;
-    dz = (self->z - self->prevZ) >> 12;
-    lim = 0x3000;
-    px = &self->x;
-    pprevX = &self->prevX;
-    py = &self->y;
-    pprevZ = &self->prevZ;
-    pvz = &self->vz;
-    if (h > lim)
-        dx = 0x80;
-    if (dx == 0 && dz == 0)
-        self->angle = 0xFFFF;
-    else
-        self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
-    *pprevX = *px;
-    *pprevZ = self->z;
-    sub_0811AE9C(self);
-    a = (u32) ~(self->unk3C >> 12) >> 31;
-    b = (u32) ~(self->unk38 >> 12) >> 31;
-    if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
-        a == 1) {
-        s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
-        if (v < 4)
-        v = 4;
-        if (v > 18)
-        v = 18;
-        *py -= v << 9;
-        self->flags40 &= ~1;
-    }
-    p->height = h;
-    sub_0811D91C(self);
+        s32 *pprevZ, *pprevX, *pvz, *px, *py;
+        s32 lim;
+        self->outX = h + self->x - self->prevX;
+        self->outY = self->y + self->dy;
+        self->outZ = self->vz + self->dz;
+        dx = (self->x - self->prevX) >> 12;
+        dz = (self->z - self->prevZ) >> 12;
+        lim = 0x3000;
+        px = &self->x;
+        pprevX = &self->prevX;
+        py = &self->y;
+        pprevZ = &self->prevZ;
+        pvz = &self->vz;
+        if (h > lim)
+            dx = 0x80;
+        if (dx == 0 && dz == 0)
+            self->angle = 0xFFFF;
+        else
+            self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
+        *pprevX = *px;
+        *pprevZ = self->z;
+        sub_0811AE9C(self);
+        a = (u32) ~(self->unk3C >> 12) >> 31;
+        b = (u32) ~(self->unk38 >> 12) >> 31;
+        if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
+            a == 1) {
+            s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
+            if (v < 4)
+                v = 4;
+            if (v > 18)
+                v = 18;
+            *py -= v << 9;
+            self->flags40 &= ~1;
+        }
+        p->height = h;
+        sub_0811D91C(self);
 
-    sub_0811BD30(self, p->model);
-    if (self->flags40 & 4) sub_0811BF44(self);
-    if (self->flags40 & 2) *pvz = 0;
-    if (self->flags40 & 1) *py = 0;
+        sub_0811BD30(self, p->model);
+        if (self->flags40 & 4)
+            sub_0811BF44(self);
+        if (self->flags40 & 2)
+            *pvz = 0;
+        if (self->flags40 & 1)
+            *py = 0;
     }
 
     CharacterModel_UpdateAccessoryAnimations(p->model);
