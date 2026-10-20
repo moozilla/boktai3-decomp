@@ -49,7 +49,7 @@ void ActionState_SetState(void *, u32);
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819E754(void *, u32);
+void Actor_SetHeadingVelocity(void *, u32);
 s32 Math_StepTowardTarget(s32, s32, s32);
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
@@ -119,7 +119,7 @@ void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
                     Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 2, 1, 0);
                     action->frame = 1;
                 } else {
-                    sub_0819E754(actor, 32);
+                    Actor_SetHeadingVelocity(actor, 32);
                     if (!actor->turn) {
                         u32 side = actor->side;
                         struct Vec *target = actor->target;
