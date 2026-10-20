@@ -2938,7 +2938,9 @@ addr,name,mode,confidence,source,notes
 08086E2C,Bat_ResumeSavedTarget,thumb,low,src-alias,
 08088CD4,Bat_UpdateDefeat,thumb,low,src-alias,
 0808A224,Ghoul_SetBehaviorHandlers,thumb,low,src-alias,Installs the two ghoul behavior callbacks at actor offset 0x288
+0808A234,Ghoul_UpdateProbeApproach,thumb,low,src-alias,
 0808A430,SceneActorControl_RestartOrAdvance,thumb,low,src-alias,
+0808A538,Ghoul_WaitForRouteResult,thumb,low,src-alias,
 0808A654,Ghoul_SetActionHandlers,thumb,low,src-alias,Installs the shared and ghoul-specific action callback table at actor offset 0x284
 0808A870,Ghoul_SetSpecialHandlers,thumb,low,src-alias,Installs the single special behavior callback table at actor offset 0x28C
 0808A880,Ghoul_EnterIdleControl,thumb,low,src-alias,Installs the shared idle callback and resets action state and queued control fields
@@ -3120,6 +3122,7 @@ addr,name,mode,confidence,source,notes
 0809F510,Crow_HopWithinHomeCell,thumb,low,src-alias,
 0809F84C,Crow_SteerAroundPlayer,thumb,low,src-alias,
 0809FC74,Crow_UpdateWanderTimer,thumb,low,src-alias,
+0809FDAC,Crow_UpdateReturnAnimation,thumb,low,src-alias,
 080A0044,Crow_InitActionTable,thumb,low,src-alias,Installs the five-entry Crow action callback table at offset 0x284
 080A0054,Crow_BeginScriptedAction,thumb,low,src-alias,Script-command handler queues action 0x10 and resets action counters and movement flags
 080A05A0,Crow_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their Crow callbacks
@@ -3130,6 +3133,7 @@ addr,name,mode,confidence,source,notes
 080A0874,Crow_PlayAnimationCue,thumb,low,src-alias,Plays sound 0xF6 at the start of animation frame five
 080A0894,Crow_TryActivatePlayerProximityResponse,thumb,low,src-alias,Tentatively activates response flags when near the player and the tracked value is below its threshold
 080A090C,Crow_BeginReaction,thumb,low,src-alias,Reaction callback resets action state and queues action 0x10 unless already active or disabled
+080A09DC,Crow_ReadSpawnScript,thumb,low,src-alias,
 080A0C04,Crow_UpdatePreAction,thumb,low,src-alias,Wraps the pre-dispatch update helper and reports success
 080A0C10,Crow_UpdatePostAction,thumb,low,src-alias,Wraps the post-dispatch update helper and reports success
 080A11F4,SceneActorControl_UpdateHeightReturn,thumb,low,src-alias,
@@ -3184,6 +3188,7 @@ addr,name,mode,confidence,source,notes
 080A7C84,TentacleBody_UpdatePursuit,thumb,low,src-alias,
 080A7F60,TentacleBody_UpdateSpiral,thumb,low,src-alias,
 080A8144,SceneActorPlacement_UpdateFlaggedResponse,thumb,low,src-alias,
+080A85BC,TentacleActor_UpdateKnockbackSlide,thumb,low,src-alias,
 080A8750,TentacleActor_UpdateKnockback,thumb,low,src-alias,
 080A88CC,TentacleBody_InitBehaviorTable,thumb,low,src-alias,Assigns the actor behavior table during initialization
 080A88DC,TentacleBody_GetDirectionFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and a mirror flag
@@ -3209,6 +3214,7 @@ addr,name,mode,confidence,source,notes
 080AA724,TentacleActor_AdvanceMotionPhase,thumb,low,src-alias,Adds four to the motion phase when the supplied condition is true
 080AABEC,TentacleActor_EnterHitReaction,thumb,low,src-alias,Consumes a pending reaction flag and resets actor state with a 180-frame timer; interpretation is tentative
 080AAC8C,TentacleActor_OnSegmentAttackCollision,thumb,low,src-alias,Empty callback installed during segment attack collider initialization
+080AAC90,TentacleActor_ReactToContact,thumb,low,src-alias,
 080AADE4,TentacleActor_ApplyPendingRadialVelocity,thumb,low,src-alias,Consumes a pending state and computes a horizontal velocity vector from angle and magnitude
 080AAFF4,TentacleActor_InitProfile,thumb,low,src-alias,Finds or adds the actor profile using its type byte and stores the result
 080AB010,TentacleActor_OnResolveVariantValue,thumb,low,src-alias,Actor callback that returns a four-entry variant lookup when the resource condition permits

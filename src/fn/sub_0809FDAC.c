@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define Crow_UpdateReturnAnimation sub_0809FDAC
 s32 Callback_InvokeActor(void *, void *);
 void RouteActor_UpdateAnimationSequence(void);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)

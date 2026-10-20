@@ -5,7 +5,6 @@ u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void sub_08088C24(void);
-#define Ghoul_UpdateProbeApproach sub_0808A234
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u32 NavMesh_ConsumeProbeEvent(void *);

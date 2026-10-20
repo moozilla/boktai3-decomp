@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(void *);
-#define Ghoul_WaitForRouteResult sub_0808A538
 static inline u8 TakePrepared(u8 *field)
 {
     if (*field) {

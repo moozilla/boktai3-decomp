@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define TentacleActor_ReactToContact sub_080AAC90
-#define FIELD(p, o, T)               (*(T *)((u8 *)(p) + (o)))
+#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
 void TentacleActor_EnterHitReaction(void *);
