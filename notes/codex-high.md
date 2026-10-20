@@ -961,3 +961,101 @@ scores despite the semantic-name aliases. Ran depin on both: it only minimizes
 exact matches, so it skipped these drafts. Formatting and `git diff --check`
 passed. No new layout/global data claims or shared header changes. Batch ROM
 validation remains for the integrator.
+
+# Task 081A1EFC — Codex high, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool #register-pinning
+
+Branch: `cloud/081A1EFC`. Worked solo and offline. Used the worktree Python,
+`asmat.py`, `relatives.py`, `condense.py`, `anchordiff.py`, and per-file
+`check.py`; no make, full build, network operation, or direct Git mutation.
+All commits went through `build/commit.sh`. Exact project code gain is
+**+0.0159 percentage points**, all without register pinning (384 bytes).
+Drafts contribute no exact progress.
+
+- **081A5614 — drafted 80.7%**, tentative
+  `Vanargand_UpdatePaletteTransition`. The adjacent reset/blend functions
+  and the Vanargand update caller establish the family. Modes 1–5 blend
+  palette banks or restore their source buffers; mode 6 interpolates two
+  paired RGB entries between stages. Repeated clamped, signed fixed-point
+  interpolation is expressed with inline helpers. The restoration paths in
+  modes 4/5 intentionally call the reset routine twice, as the ROM does.
+  Reviewed target 2800 bytes; candidate 2848 bytes; 299 realigned differing
+  instructions / 82 ignoring registers. The main remaining differences are
+  argument setup, interpolation temporary allocation and spills. Pinning
+  the selector to r8 is marked as a concession. Broad pinning of the nested
+  RGB temporaries regressed. The discarded alternative with a Blend wrapper
+  also had 81 structural differences, but changed the owner allocation and
+  scored below the draft threshold. This unit was formatted after its draft
+  commit; formatting preserved its recorded score.
+- **081A1EFC — stopped below the draft threshold**, tentative working name
+  `Hresvelgr_ApplyContactDamage`; no source committed. The candidate preserves
+  contact accumulator consumption, environmental damage, health/display
+  updates, special action-16/action-33 reactions, sparks and debris, but the
+  initial check is only 49.4% (119 structural / 346 total realigned differences).
+  Original stack frame 0x54 versus candidate 0x50; the original retains the
+  owner in sl and a low-register copy in r7, while the candidate gives both
+  copies high registers. Number-display vector stores become packed word
+  updates; particle RNG temporaries and reaction/flag shared tails also
+  differ. Eight targeted alignment/owner-pinning variants gave no useful
+  improvement. `wip/sub_081A1EFC.c` retains the original candidate locally;
+  the ROM assembly remains the build implementation. Future work should
+  recover the original vector/store helper and shared reaction/flag setters
+  before trying allocation again.
+- **081A2858 — drafted 83.3%**, existing semantic name
+  `Hresvelgr_UpdateCollisionPresentation`. `ActorReaction_Tick` calls it after
+  its behavior/callback updates. It gates the two contact colliders, updates
+  the body collider, presentation flags, shadow, sound latch, camera offset
+  and vertical display ramp, then clears transient flags at BC/C0. The second
+  contact collider overlaps the palette field at 2CE; a named union preserves
+  the observed offsets. Full-width signed halfword bitfields reproduce the
+  disabled-collider flag operations. Mask-taking inline accessors recover
+  the mask-before-load order; animation-specific helpers retain the 194+8
+  addressing. Reviewed target 864 bytes; candidate 872 bytes; 77 realigned
+  differences / 19 ignoring registers. Remaining differences are pointer
+  lifetimes, palette constant setup and allocation. C0's transient pointer
+  is pinned to r10, with the required concession marker.
+- **081A39E0 — drafted 88.3%**, `EffectPool_UpdateEntry`. Its caller is
+  `EffectPool_UpdateActiveEntries` (081A3D00); its target-angle helper is
+  `Hresvelgr_GetHomingShotTargetAngle` (081A37BC). The entry homes toward
+  player zero, advances its animation/collider, emits up to four motion
+  trails, and increases speed/turning frequency as its lifetime expires.
+  Reviewed target and candidate both 800 bytes; 50 realigned differences /
+  12 ignoring registers. Explicit vector-load temporaries and masks tied to
+  their constant registers improve matching. Signed local RNG samples keep
+  the ROM's arithmetic shifts. Remaining differences include redundant angle
+  masking, animation timer scheduling and register copies. Register hints
+  in the animation flags blocks are marked as concessions.
+  The score was recorded with the raw sub_081A39E0 fallback identifier, then
+  the fallback was restored to the existing canonical `EffectPool_UpdateEntry`
+  name, whose assembly file exists in this checkout. Both the 88.3% C check
+  and byte-identical default assembly check passed afterward. Current
+  `check.py` cannot rediscover the per-draft score when a canonical fallback
+  name differs from the compiled file-local alias; the recorded score is
+  unchanged and the C is still guarded, not exact progress.
+- **081A2430 — drafted 86.9%**, tentative
+  `Hresvelgr_DispatchSceneMessages`. Called by 081A26D8. It reads the active
+  scene-message buffer, sets the pending trigger, handles action/mode changes
+  for commands 0/1/19/26, effect configuration for 9, facing/animation for 5,
+  and position for 2. An explicit shared action block for cases 0/1/19
+  recovers the ROM's cross-jumping; case 26 remains separate. Passing mode
+  constants through the inline setter improves their lifetimes. Reviewed
+  target and candidate both 680 bytes; 53 realigned differences / 25 ignoring
+  registers. Remaining differences are trigger indexing and mode/action
+  constants. Action and callback register hints are marked as concessions.
+- **081A26D8 — matched**, tentative
+  `Hresvelgr_UpdateAnimationAndTargets`, 384 bytes, **without register pinning**.
+  `ActorReaction_Tick` (081A2BD4) calls this before behavior dispatch. It calls
+  the pending-message dispatcher, advances animation, copies the render
+  position, adds decaying random shake, updates target metrics, then computes
+  bearings and squared horizontal distances for tracked positions. A sprite
+  pointer scoped inside the prechecked target loop prevents unwanted output
+  pointer induction. Typed bearing/distance arrays recover base-before-index
+  addressing. `RANDOM_TABLE_ADDR` reproduces the late table-literal load.
+  The last 20 differing bytes were a pure r6/r7 swap; removing the provisional
+  owner/r9 hint produced exact output. Final formatted source checked MATCH.
+
+No shared headers, symbols, generated files, history, HANDOFF or INDEX were
+edited. The four drafts have NONMATCHING guards and recorded scores; no draft
+is counted as a match. The integrator still performs name promotion and the
+single combined ROM build for the batch.
