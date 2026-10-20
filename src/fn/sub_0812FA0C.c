@@ -2,9 +2,11 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reaction.h"
 
+// confidence=low: preserves the existing tentative reaction-state interpretation.
+
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 83.2%
+// fuzzy: 84.8%
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
@@ -37,6 +39,12 @@ struct ChaseContext {
     u32 farDistance;
 };
 
+static inline u8 MotionTest(u16 *field, u32 mask)
+{
+    if (*field & mask)
+        return 1;
+    return 0;
+}
 static inline u8 Chase_TakeArrived(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B1) {
@@ -188,18 +196,12 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
-    if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
+    if (!Chase_MotionFlags(actor, 0x400) && !MotionTest((u16 *)((u8 *)actor + 0x414), 4)) {
         register s32 prior asm("r5") = actor->direction;
         s32 tries = 0;
         s32 choice;
-        const u16 *table = gUnk_0203B400;
-        u32 *randomIndex = &gUnk_03005308;
-        u32 wrap = 1023;
-        u32 mask = 3;
         do {
-            u32 index = (*randomIndex + 1) & wrap;
-            *randomIndex = index;
-            choice = (table[index] & mask) << 6;
+            choice = Chase_RandomBits(3) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);

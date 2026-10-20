@@ -1,4 +1,6 @@
 #include "global.h"
+
+// confidence=low: palette transitions and stage colors follow adjacent Vanargand routines.
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING

@@ -24,7 +24,7 @@ void ActorShadow_Enable(void *);
 void Sound_PlaySong(u32);
 u8 ActorPhase_UpdateFlicker(u32 *, s32, s32, s32);
 void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
-void sub_080F79A8(void);
+void Axe_UpdateOrbitAttack(void);
 static inline u8 consumeEntry(struct PhaseActor *s)
 {
     if (s->entered) {
@@ -51,7 +51,7 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
         Sound_PlaySong(0x16f);
     }
     if (ActorPhase_UpdateFlicker(&flags, frame, 10, 30)) {
-        void (*next)(void) = sub_080F79A8;
+        void (*next)(void) = Axe_UpdateOrbitAttack;
         u32 id = 0x2c;
         s->entered = 1;
         s->phaseState = 0;

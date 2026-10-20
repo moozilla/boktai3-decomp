@@ -1,11 +1,8 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.4%
-// Remaining differences: register allocation and instruction/block ordering.
-#include "global.h"
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: consumes pending damage and selects terrain/death reactions.
 #include "engine.h"
 #include "player.h"
-// confidence=low: consumes pending damage and selects terrain/death reactions.
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 s32 Player_BeginTerrainRecovery(struct Player *);
@@ -25,14 +22,27 @@ static inline u8 sceneFlag(void)
 }
 static inline u32 specialState(struct Player *p)
 {
+    u32 active = p->active;
     u32 result = 0;
-    if (p->active && p->sceneMode == 3)
+    if (active && p->sceneMode == 3)
         result = 1;
     return result;
+}
+static inline u32 playerFlag(struct Player *p, u32 offset, u32 mask)
+{
+    if (!p)
+        return 0;
+    {
+        u32 *field = (u32 *)((u8 *)p + offset);
+        u32 bits = mask;
+        return *field & bits;
+    }
 }
 s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
 {
     s32 cell, skip;
+    s32 sequence;
+    register struct Player *hazardPlayer asm("r0");
     u8 *properties;
     {
         s32 x = p->position.x >> 8, z = p->position.z >> 8;
@@ -46,21 +56,27 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         properties += 4;
     else
         properties = gUnk_030052F4->cells + 12 + cell * 4;
-    if ((*(u16 *)(properties + 2) & 0x40) && !p->tetherStatusFlags) {
-        if (sceneFlag())
-            ActorSequence_Begin(p, 0x22, 0);
-        else
-            ActorSequence_Begin(p, 0x21, 0);
-        return 1;
+    if ((*(u32 *)properties >> 16 & 0x40) && !p->tetherStatusFlags) {
+        if (sceneFlag()) {
+            hazardPlayer = p;
+            sequence = 0x22;
+        } else {
+            hazardPlayer = p;
+            sequence = 0x21;
+        }
+        goto hazard;
     }
     if (gUnk_02000710->playerParticleRate > 4999) {
-        ActorSequence_Begin(p, 0x23, 0);
+        hazardPlayer = p;
+        sequence = 0x23;
+    hazard:
+        ActorSequence_Begin(hazardPlayer, sequence, 0);
         return 1;
     }
     skip = 0;
     if (p->terrainClampApplied) {
         p->particleEmissionCount += Player_BeginTerrainRecovery(p);
-        if (p && (p->actionFlags & 2))
+        if (playerFlag(p, 0x448, 2))
             skip = 1;
     } else if (p->actionPhase488)
         p->particleEmissionCount += Player_BeginTerrainFacingAction(p);
@@ -68,16 +84,23 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         p->particleEmissionCount += Player_BeginTerrainRecovery_081408AC(p);
     if (!p->positionResetValue) {
         if (p->movementModifierKind == 1 && p->movementModifierActive) {
-            p->statusFlags |= 0x200;
+            {
+                u32 bits = 0x200;
+                p->statusFlags |= bits;
+            }
             if (++H(0x4C6) >= Div(60, p->movementModifierActive)) {
                 p->particleEmissionCount += 10;
                 H(0x4C6) = 0;
             }
         }
-        if (p && (p->statBonusFlags & 0x08000000)) {
-            if (++H(0x4CE) > 14) {
-                p->particleEmissionCount++;
-                H(0x4CE) = 0;
+        if (playerFlag(p, 0x444, 0x08000000)) {
+            u16 *timer = (u16 *)((u8 *)p + 0x4CE);
+            if (++*timer > 14) {
+                u16 *pending = &p->particleEmissionCount;
+                u32 zero;
+                ++*pending;
+                zero = 0;
+                *timer = zero;
             }
         }
     }
@@ -108,7 +131,3 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     }
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerContact_ApplyTerrainDamage);
-#endif

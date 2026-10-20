@@ -2,7 +2,7 @@
 // confidence=low: converges saved motion and restores the route after a reaction timer.
 #ifdef NONMATCHING
 // fuzzy: 82.1%
-// Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling.
+// Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
 void sub_0807C72C(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
 u8 sub_080B54DC(void *);
@@ -45,12 +45,12 @@ static inline u8 Test(u16 *p, u32 mask)
 }
 void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *volatile group = (u8 *)&actor->group;
     s32 timer;
     s32 x, z;
     s16 *priorX, *priorZ;
     if (SceneActorReaction_TakePrepared(actor)) {
-        u32 maskTwo = 2;
+        u32 maskTwo;
         u32 *flags;
         u16 *motionFlags;
         struct SceneActorReactionMotion *motion;
@@ -58,6 +58,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         u32 *actionFlags;
         actor->direction = (((actor->direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
+        maskTwo = 2;
         flags = &actor->flags2D0;
         if (!(*flags & maskTwo)) {
             sub_0807C72C(actor, 3, 0, 25);

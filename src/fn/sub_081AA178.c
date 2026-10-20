@@ -1,7 +1,9 @@
 #include "global.h"
+// confidence=low: command 9 alternates the selected pair halves for six timed attacks.
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 96.2%
-// confidence=low: command 9 alternates selected halves for six timed attacks.
+// fuzzy: 99.5%
+// Remaining difference: phase-zero timer reset uses r7 instead of r5.
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;
@@ -41,7 +43,7 @@ static inline s32 RandomValue(void)
 void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 {
     u8 result;
-    u8 phase;
+    s32 phase;
     if (p->mode == 1) {
         u32 mask = 0x40000;
         p->flags |= mask;
@@ -70,6 +72,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 p->selected = (RandomValue() >> 4) & 1;
                 p->phase = 1;
+                asm("" : : "r"(phase));
                 p->timer = phase;
             }
             break;
@@ -81,7 +84,11 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
                     {
                         u8 next = 2;
                         p->phase = next;
-                        p->timer = 0;
+                        {
+                            register u32 zero asm("r0") = 0;
+                            asm("" : "+r"(zero));
+                            p->timer = zero;
+                        }
                     }
                 } else {
                     p->selected = (p->selected + 1) & 1;

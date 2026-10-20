@@ -1,9 +1,11 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+// confidence=low: inherited route/reaction interpretation from static callers.
+
 #ifdef NONMATCHING
-// fuzzy: 84.3%
-// Saved actor/flag-pointer lifetimes and duplicated route-reset register allocation still differ.
+// fuzzy: 87.8%
+// Saved actor lifetimes, control offsets, and duplicated route-reset allocation still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -48,19 +50,20 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
     void *route = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->position;
     s32 result = sub_0821F204(route, position, target);
-    if (!result) {
+    if (result) {
+        result = sub_0821F7A8(route, position, target);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&actor->motion, 8);
+            return 1;
+        }
         ClearRouteBits(&actor->flags2D4, 0x200);
         return 0;
-    }
-    result = sub_0821F7A8(route, position, target);
-    if (result) {
-        if (result != 2)
-            Memory_Clear(&actor->motion, 8);
-        return 1;
     }
     ClearRouteBits(&actor->flags2D4, 0x200);
     return 0;
 }
+
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
 {
     void *callback = cb;
@@ -128,7 +131,7 @@ static inline void SnapTarget(struct ContactPosition *out, u16 *point)
     out->z = point[1];
     out->y = CellHeight(out, CellIndex(out));
 }
-static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group)
+static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, u32 *flags)
 {
     struct SceneActorRegistryResetView *actor = input;
     struct ContactPosition target;
@@ -148,14 +151,16 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group)
         value &= mask;
         motion->flags = value;
     }
-    if (MaskLow(actor, 0x200000)) {
-        actor->flags2D0 &= 0xfeffffff;
-        ClearRouteBits(&actor->flags2D4, 0x200);
-        {
-            struct SceneActorRegistryControl *control = (void *)(group + 0x4c);
-            control->mode = 0;
-            control->counter = 0;
-            control->timer = 0;
+    {
+        struct SceneActorRegistryControl *control = (void *)(group + 0x4c);
+        if (MaskLow(actor, 0x200000)) {
+            *flags &= 0xfeffffff;
+            ClearRouteBits(&actor->flags2D4, 0x200);
+            {
+                control->mode = 0;
+                control->counter = 0;
+                control->timer = 0;
+            }
         }
     }
     ClearRouteBits(&actor->flags2D4, 0x400);
@@ -197,6 +202,7 @@ void Vorn_ResumeRouteAfterReaction(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     u8 *body;
+    u32 *flags = &actor->flags2D0;
     if (IsInactive(actor))
         return;
     if (Mask16(actor, 0xe33f))
@@ -217,14 +223,14 @@ void Vorn_ResumeRouteAfterReaction(struct SceneActorRegistryResetView *actor)
         return;
     }
     if (TestBody(body, 4)) {
-        Resume(actor, group);
+        Resume(actor, group, flags);
         ClearRouteBits((u16 *)((u8 *)actor->context + 0x6d4), 6);
-        actor->flags2D0 &= ~4;
+        *flags &= ~4;
         Vorn_SendMessage(actor);
     } else if (TestBody(body, 16)) {
-        Resume(actor, group);
+        Resume(actor, group, flags);
         ClearRouteBits((u16 *)((u8 *)actor->context + 0x6d4), 0x70);
-        actor->flags2D0 &= ~4;
+        *flags &= ~4;
         Vorn_SendMessage(actor);
     }
 }

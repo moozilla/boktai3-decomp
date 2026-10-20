@@ -1,7 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// confidence=low: part approaches the player and chooses contact or timeout animation
 #ifdef NONMATCHING
-// fuzzy: 83.0%
+// fuzzy: 86.0%
 // Remaining differences: Guarded contact transition, entry-pointer lifetimes, and packed-animation allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -188,7 +190,21 @@ static inline u8 PlayerNear(struct ActorStatusPart *p)
     return result;
 }
 
-// confidence=low: part approaches the player and chooses contact or timeout animation
+static inline void RequestBehavior(struct ActorStatusPart *p, u32 action)
+{
+    u32 mask = 0x100;
+    if (!(p->flags & mask)) {
+        if ((u8)(p->previousAction - 25) > 1 || p->finished) {
+            p->previousAction = action;
+            p->action = action;
+            p->reset = 1;
+            p->finished = 0;
+            p->countdown = 0;
+            p->state = 0;
+            p->timer = 0;
+        }
+    }
+}
 void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 {
     register u8 *owner asm("r9") = boss;
@@ -235,17 +251,7 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
             }
             MotionTrack_Update(motion);
             if (PlayerNear(p)) {
-                if (!(p->flags & 0x100)) {
-                    if ((u8)(p->previousAction - 25) > 1 || p->finished) {
-                        p->previousAction = 18;
-                        p->action = 18;
-                        p->reset = 1;
-                        p->finished = 0;
-                        p->countdown = 0;
-                        p->state = 0;
-                        p->timer = 0;
-                    }
-                }
+                RequestBehavior(p, 18);
             } else if (MotionEnded(p)) {
                 p->state = 2;
                 p->timer = 0;

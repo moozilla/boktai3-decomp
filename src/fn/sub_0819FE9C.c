@@ -150,6 +150,7 @@ static inline void FindReleaseTarget(struct Hresvelgr *actor, struct Vec *out)
         }
     }
 }
+// confidence=low: coordinates player positioning, landing, and release.
 void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 {
     struct Hresvelgr *saved = actor;

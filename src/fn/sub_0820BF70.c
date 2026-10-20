@@ -62,8 +62,8 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         struct Vec position, velocity;
     } frame;
     struct Source *source = sourceInput;
-    struct Target *target = targetInput;
     struct Hit *hit = input;
+    struct Target *target = targetInput;
     sub_0821FF8C(source);
     if (hit->blocked) {
         hit->damage = 0;
@@ -121,7 +121,7 @@ void Screamer_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 x = pos->z - 0x40;
                 sample &= mask;
                 pos->z = x + sample;
-                SparkParticle_Spawn(pos, 1, vel, 0, 3, 8, 2, 2);
+                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }

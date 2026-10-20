@@ -3,7 +3,7 @@
 // confidence=low: resumes the route or runs the recovery script.
 #ifdef NONMATCHING
 // fuzzy: 83.9%
-// Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation.
+// Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation; caching flags reduces register differences.
 extern const u8 gUnk_0824E20C[];
 u8 sub_080B54DC(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
@@ -30,11 +30,12 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     flags = &actor->flags2D0;
-    if (!(*flags & 16))
-        return;
     {
-        s32 mask = ~4;
-        *flags &= mask;
+        u32 value = *flags;
+        if (!(value & 16))
+            return;
+        value &= ~4;
+        *flags = value;
     }
     Vorn_SendMessage(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -52,7 +53,9 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     if (sub_080B54DC(context)) {
         struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
         u32 mask = 8;
-        motion->flags |= mask;
+        u32 value = motion->flags;
+        value |= mask;
+        motion->flags = value;
         mask = 0x80;
         actor->flags2CC |= mask;
         {

@@ -75,33 +75,33 @@ void Params3D0_UpdateDisplay(struct Display *p)
             case 3:
             case 4: {
                 const s32 *table = gUnk_08613D80;
-                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
                 table += 2;
-                Sound_PlaySong(table[phase]);
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
             } break;
             case 5:
             case 6:
             case 7: {
                 const s32 *table = gUnk_08613D80;
-                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
                 table += 4;
-                Sound_PlaySong(table[phase]);
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
             } break;
             case 8:
             case 9:
             case 10: {
                 const s32 *table = gUnk_08613D80;
-                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
                 table += 6;
-                Sound_PlaySong(table[phase]);
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
             } break;
             case 0:
             case 1:
             case 11: {
                 const s32 *table = gUnk_08613D80;
-                s32 phase = TimeDisplay_GetLightPhaseGroup();
+                s32 phase = TimeDisplay_GetLightPhaseGroup() * 4;
                 table += 8;
-                Sound_PlaySong(table[phase]);
+                Sound_PlaySong(*(const s32 *)((const u8 *)table + phase));
             } break;
         }
     }

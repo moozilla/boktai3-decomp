@@ -1,8 +1,10 @@
 #include "global.h"
+
+// confidence=low: dispatches scene messages into action and animation state.
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fuzzy: 87.5%
 // Remaining differences: trigger indexing and shared mode/action constant lifetimes.
 // confidence=low: dispatches pending cutscene messages into action and animation state.
 struct Vec {

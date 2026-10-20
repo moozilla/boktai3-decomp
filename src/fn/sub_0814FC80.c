@@ -1,4 +1,5 @@
 #include "global.h"
+// confidence=low: role inferred from callers and callback phases.
 // confidence=low: approaches the scripted planar destination and returns to the standing update.
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);

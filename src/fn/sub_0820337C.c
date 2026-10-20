@@ -4,8 +4,8 @@
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.6%
-// Remaining differences: palette-loop layout, saved pointers, and animation-step register allocation.
+// fuzzy: 99.0%
+// Remaining differences: palette-loop bound and decrement scheduling.
 struct CannonEmitter {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -42,19 +42,23 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     {
         u32 frame = *command >> 6;
         asm("" : "+r"(sprite) : "r"(frame));
-        sprite->frame = frame;
+        {
+            register struct DisplaySequenceSprite *out asm("r3") = &owner->sprite;
+            asm("" : "+r"(out));
+            out->frame = frame;
+        }
     }
     {
         u32 input = state->flags;
         register u32 first asm("r2");
-        u32 maskBit = 1;
+        register u32 maskBit asm("r4") = 1;
         bit = maskBit;
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit)) {
             u32 flags = owner->sprite.flags;
-            register u32 flip asm("r3") = flipMask;
+            register u32 flip asm("r2") = flipMask;
             asm("" : : "r"(flip));
             owner->sprite.flags = flags | flip;
         } else
@@ -62,7 +66,7 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     }
     {
         u32 input = state->flags;
-        u32 bit;
+        register u32 bit asm("r4");
         register u32 first asm("r2");
         bit = 2;
         asm("" : "+r"(bit));
@@ -166,7 +170,6 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
 
 s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
 {
-    s16 *palette;
     register s32 result asm("r0");
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
@@ -200,11 +203,12 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
     Sprite_Init(&p->sprite, p->animationData, 1);
     *(struct SceneVec *)((u8 *)p + 0x3c) = p->initialPosition;
     AnimData_SelectPaletteBank(p->animationData, p->variant + 0x1ba);
-    palette = &p->flashPalette[15];
-    do {
-        *palette = 0x7fff;
-        palette--;
-    } while (palette >= p->flashPalette);
+    {
+        s32 i = 15;
+        do {
+            p->flashPalette[i] = 0x7fff;
+        } while (--i >= 0);
+    }
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     result = Anim_SetSequence(&p->sequence, p->resource, 6, 0, 0);
     CannonEmitter_StepAnimation(p, &p->sequence, 4);

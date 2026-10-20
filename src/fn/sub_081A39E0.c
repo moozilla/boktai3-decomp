@@ -1,4 +1,5 @@
 #include "global.h"
+
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -67,20 +68,24 @@ static inline void SetVelocity(struct Vec *out, u8 angle, u8 speed)
 static inline void AddVelocity(struct Vec *out, struct Vec *velocity)
 {
     u16 value = velocity->x;
-    u16 position = out->x;
+    register u16 position asm("r5") = out->x;
     out->x = value + position;
     value = velocity->y;
-    position = out->y;
-    out->y = value + position;
+    {
+        register u16 y asm("r6") = out->y;
+        out->y = value + y;
+    }
     value = velocity->z;
-    position = out->z;
-    out->z = value + position;
+    {
+        u16 z = out->z;
+        out->z = value + z;
+    }
 }
 static inline void Animate(struct Entry *p)
 {
     struct Animation *a = &p->animation;
     const u16 *entry = a->data + a->frame;
-    u16 timer;
+    register u16 timer asm("r0");
     u32 mask;
     u32 flags;
     u32 weight;
@@ -97,7 +102,10 @@ static inline void Animate(struct Entry *p)
     {
         register u32 input asm("r0") = a->flags;
         register u32 mask asm("r3") = 2;
-        register u32 left asm("r1") = (u8)(mask & input);
+        register u32 left asm("r1");
+        asm("" : "+r"(input));
+        left = (u8)(mask & input);
+        asm("" : "+r"(left) : "r"(input));
         if (left != (((*entry & 0x30) >> 4) & mask))
             p->flags |= 8;
         else
@@ -137,9 +145,13 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (sub_08249350(p->frame, p->homingInterval) == 0) {
         s32 diff = Hresvelgr_GetHomingShotTargetAngle(p, Player_GetEffectivePosition(0));
         s32 heading = p->heading;
-        diff = (diff - heading) & 255;
+        register u32 angleMask asm("r3");
+        diff -= heading;
+        angleMask = 255;
+        asm("" : "+r"(angleMask), "+r"(diff));
+        diff &= angleMask;
         if (diff > 128) {
-            diff = 255 - diff;
+            diff = angleMask - diff;
             reverse = 1;
         }
         diff >>= p->turnShift;
@@ -147,7 +159,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             diff = heading - diff;
         else
             diff = heading + diff;
-        p->heading = diff & 255;
+        p->heading = diff & angleMask;
     }
     SetVelocity(&p->velocity, p->heading, p->speed);
     AddVelocity(&p->position, &p->velocity);
@@ -176,7 +188,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (p->lifetime < (p->initialLifetime >> 3))
         p->flags |= 0x200;
     if (!(p->lifetime & 31)) {
-        s32 interval = p->homingInterval;
+        register s32 interval asm("r1") = p->homingInterval;
         if (interval > 2)
             interval--;
         p->homingInterval = interval;

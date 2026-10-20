@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: neighboring Golem controls establish the state role.
 // confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
 // fuzzy: 89.1%

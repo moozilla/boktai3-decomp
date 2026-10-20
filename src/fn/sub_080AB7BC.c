@@ -1,7 +1,9 @@
 #include "global.h"
 
+// confidence=low: inferred from segment state and collider updates.
+
 #ifdef NONMATCHING
-// fuzzy: 93.1%
+// fuzzy: 97.1%
 // Remaining differences include stack-vector scheduling, flag access, and register allocation.
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetPosition(void *, void *, s32);
@@ -21,9 +23,9 @@ struct P {
     u8 *f3d0;
 };
 
-static inline u32 tsth(u16 *a, u32 m)
+static inline u32 tsth(struct P *a, u32 m)
 {
-    return *a & m;
+    return a->f2d4 & m;
 }
 static inline u32 tstw(u32 m, u32 *a)
 {
@@ -103,8 +105,11 @@ void TentacleActor_UpdateSegmentColliders(struct P *pp)
             if (d[0] * d[0] + d[2] * d[2] <= 0xFFFF) {
                 Collider_SetPosition(b, a, 0);
                 Collider_Refresh(b);
-                if (tsth((u16 *)(p + 0x2d4), 0x100)) {
-                    H(a, 0x32) &= ~0x100;
+                if (tsth((struct P *)p, 0x100)) {
+                    {
+                        u32 mask = 0x100;
+                        H(a, 0x32) &= ~mask;
+                    }
                     SetAttack(b, p, 2);
                 } else {
                     {

@@ -1,3 +1,4 @@
+// confidence=low: finishes the blink, runs defeat scripts and hides the drawable and shadow.
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"

@@ -3,6 +3,8 @@
 
 // confidence=low: state advances segment interpolation and oscillation before restoring control.
 
+// confidence=low: inferred from segment state and collider updates.
+
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 void sub_080A69F0(void);

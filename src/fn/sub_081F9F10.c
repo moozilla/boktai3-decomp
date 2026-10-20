@@ -29,7 +29,7 @@ struct Ratatosk {
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void Ratatosk_BeginDirectionalReaction(void);
 void Ratatosk_UpdateDirectionalRecovery(void);
-void sub_081F4CF8(void);
+void Ratatosk_UpdateDefeatSequence(void);
 static inline void setState(struct Ratatosk *p, u32 state, u32 next, u32 changed)
 {
     p->state = state;
@@ -80,7 +80,7 @@ s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
                 p->flags |= flags;
             }
             setState(p, 1, zero, 1);
-            setCallback(p, sub_081F4CF8, 15);
+            setCallback(p, Ratatosk_UpdateDefeatSequence, 15);
         } break;
     }
     return 1;

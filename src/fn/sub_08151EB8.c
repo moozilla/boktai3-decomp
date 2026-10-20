@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
-// fuzzy: 98.6%
-// Final-direction store sharing and facing-expression instruction order differ.
+// fuzzy: 99.7%
+// Movement-direction OR is scheduled after the direction-field address.
 struct P {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;
@@ -159,8 +159,11 @@ void PlayerCue_UpdateWalkTarget(struct P *p)
         if (p->finalDir >= 0) {
             p->dir = p->finalDir;
             p->finalDir = -1;
-        } else
-            p->dir = ((((angle + 16) & 255) >> 5) + 3) & 7 | 1;
+        } else {
+            s32 direction = (((((angle + 16) & 255) >> 5) + 3) & 7) | 1;
+            asm("" : "+r"(direction));
+            p->dir = direction;
+        }
         if (p->dir > 4) {
             p->facing = (8 - p->dir) >> 1;
             p->flip = 1;

@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.2%
+// fuzzy: 86.4%
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"

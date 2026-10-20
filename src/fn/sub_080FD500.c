@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-void sub_080F8E68(void);
+void Axe_UpdateTargetWindup(void);
 void ActorPhase_UpdateSpriteCollapse(void);
 struct SceneActorControl35Context {
     u8 unknown0[0xE4C];
@@ -54,7 +54,7 @@ void SceneActorControl_UpdateControl35Phase(struct SceneActorRegistryResetView *
 {
     struct SceneActorControl35Context *context = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *callback = (void *)sub_080F8E68;
+        void *callback = (void *)Axe_UpdateTargetWindup;
         u32 kind = 0x35;
         actor->field2B2 = 1;
         actor->field2B0 = 0;

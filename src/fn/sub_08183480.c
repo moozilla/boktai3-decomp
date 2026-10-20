@@ -10,7 +10,7 @@ typedef struct ActorControllerMotion {
     u8 padB34[5];
     u8 angle;
 } ActorControllerMotion;
-void sub_0818323C(ActorControllerMotion *);
+void ActorController_UpdateMovingAttackCollider(ActorControllerMotion *);
 extern const s16 gSineTable[];
 static inline int trunc12(int x)
 {
@@ -18,7 +18,7 @@ static inline int trunc12(int x)
 }
 void ActorController_UpdateMovementVelocity(ActorControllerMotion *p)
 {
-    sub_0818323C(p);
+    ActorController_UpdateMovingAttackCollider(p);
     if ((u16)(p->animation - 7) <= 4) {
         s16 *v;
         u8 *a;

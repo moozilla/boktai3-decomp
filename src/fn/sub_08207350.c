@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.0%
-// Remaining differences: owner/address allocation, facing update and branch sharing.
 // MATCHING_CONCESSION: register-pinning
 #define VC_FIRST    "r2"
 #define VC_TEMP     "r2"
@@ -10,7 +7,7 @@
 #define VC_WEIGHT   "r2"
 #include "vulcan_cannon_worker.h"
 void VulcanCannon_UpdateTargeting(void);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
+s32 Anim_RestartSequence(void *, void *, u32, u32, u32);
 static inline u32 TurnAnimation(struct VulcanCannon *source)
 {
     register struct VulcanCannon *owner asm("r12") = source;
@@ -33,10 +30,20 @@ static inline u32 TurnAnimation(struct VulcanCannon *source)
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->display.sprite.flags |= 4;
-        else
-            owner->display.sprite.flags &= ~4;
+        {
+            register u32 spriteFlags asm("r1");
+            if (first != (((*command & 0x30) >> 4) & bit)) {
+                register struct VulcanCannon *read asm("r2") = owner;
+                spriteFlags = read->display.sprite.flags | 4;
+            } else {
+                register struct VulcanCannon *read asm("r2") = owner;
+                spriteFlags = read->display.sprite.flags & ~4;
+            }
+            {
+                struct VulcanCannon *out = owner;
+                out->display.sprite.flags = spriteFlags;
+            }
+        }
     }
     {
         u32 input = state->flags;
@@ -132,36 +139,32 @@ static inline u32 TurnAnimation(struct VulcanCannon *source)
     return ended;
 }
 
-void VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
+s32 VulcanCannon_UpdateFacingTurn(struct VulcanCannon *owner)
 {
     register struct VulcanCannon *p asm("r12") = owner;
     register u32 token asm("r0");
-    if (!p->allowTurn) {
+    register u32 allowed asm("r1") = p->allowTurn;
+    if (!allowed) {
         p->state = VulcanCannon_UpdateTargeting;
         Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
         token = 0;
-        asm("" : "+r"(token));
-        return;
+        return 0;
     }
     {
         u32 ended;
         token = (u32)owner;
-        asm("" : "+r"(token));
         ended = TurnAnimation(p);
-        asm("" : : "r"(token));
         if (ended) {
-            if (!p->facing)
-                p->facing = 1;
+            s8 *facing = &p->facing;
+            s32 value = *facing;
+            if (!value)
+                value = 1;
             else
-                p->facing = 0;
-            asm("" : : "r"(p) : "memory");
+                value = 0;
+            *facing = value;
             p->state = VulcanCannon_UpdateTargeting;
-            Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
+            token = Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, 0);
         }
     }
-    return;
+    return token;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateFacingTurn);
-#endif

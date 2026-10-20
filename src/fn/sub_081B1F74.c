@@ -1,9 +1,11 @@
 #include "global.h"
+
+// confidence=low: coordinates a part strike with its opposite part.
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.5%
+// fuzzy: 94.5%
 // Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -41,9 +43,9 @@ static inline void MakeVector(struct SceneVec *out, s32 angle, s32 scale)
 }
 static inline void AddVector(struct SceneVec *dst, struct SceneVec *a, struct SceneVec *b)
 {
-    dst->x = b->x + a->x;
-    dst->y = b->y + a->y;
-    dst->z = b->z + a->z;
+    dst->x = a->x + b->x;
+    dst->y = a->y + b->y;
+    dst->z = a->z + b->z;
 }
 static inline void Difference(struct SceneVec *dst, struct SceneVec *a, struct SceneVec *b)
 {
@@ -65,7 +67,6 @@ static inline u8 MotionEnded(struct VanargandPart *p)
     return p->motion[0x29] == 2;
 }
 u32 ScenePair_CountPositiveCounters(void *);
-// confidence=low: coordinates a part strike with its opposite part.
 void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
     u8 *enter;
@@ -100,7 +101,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
         case 0: {
             struct SceneVec delta;
             enter = &p->enter;
-            if (*enter) {
+            if (p->enter) {
                 *enter = 0;
                 if (p->variant == 1)
                     MakeVector(&delta, 224, 256);
@@ -118,10 +119,11 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
         }
         case 1:
             enter = &p->enter;
-            if (*enter) {
-                *enter = 0;
+            if (p->enter) {
+                u32 zero = 0;
+                *enter = zero;
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 1);
-                *(u32 *)((u8 *)p + 0x19c) = 0;
+                *(u32 *)((u8 *)p + 0x19c) = zero;
             }
             if (++p->timer > 0) {
                 Sound_PlaySong(0x588);
@@ -159,7 +161,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
         case 3:
             enter = &p->enter;
-            if (*enter) {
+            if (p->enter) {
                 *enter = 0;
                 SetFlags(p, 8);
                 {

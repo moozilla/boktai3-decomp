@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.8%
+// fuzzy: 88.2%
 // Remaining differences: health and +0x2D8 pointer spills, mode lifetime,
 // shared hit-flag expansion and temporary-register choices (see worker notes).
 #include "scene_actor_reset.h"
@@ -240,7 +240,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 *flags2D8;
     u32 *flags2CC;
     u32 updated;
-    u32 four;
+    register u32 four asm("r4");
     u32 bits;
 
     if (!HasPendingHit(actor)) {
