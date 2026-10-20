@@ -5,7 +5,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 80.6%
+// fuzzy: 84.9%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -300,5 +300,5 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartImpact);
+INCLUDE_ASM("asm/nonmatching", sub_081B431C);
 #endif
