@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// Context flag reloads, saved flag-pointer lifetime, and route argument register allocation still differ.
+// confidence=low: route role inferred from callers and terrain/path tests.
+#define Vorn_BeginTargetPursuit sub_080B1A98
+
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -42,17 +42,15 @@ static inline void ClearRouteBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
-                          struct ContactPosition *target)
+static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
+                          struct ContactPosition *position, struct ContactPosition *target)
 {
-    void *route = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->position;
-    s32 result = Nav_IsPositionInMesh(route, position, target);
+    s32 result = sub_0821F204(route, position, target);
     if (!result) {
         ClearRouteBits(&actor->flags2D4, 0x200);
         return 0;
     }
-    result = Terrain_ApplyBlocked(route, position, target);
+    result = sub_0821F7A8(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
@@ -87,6 +85,8 @@ static inline u8 Test(u16 *p, u32 mask)
 extern const u8 gUnk_0824E230[];
 
 // confidence=low: routes toward the current target after a reaction.
+
+#define SceneActor_DispatchContextAction sub_080B3ADC
 u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *p, u32 mask)
@@ -101,7 +101,7 @@ static inline u8 TestContext(struct SceneActorRegistryResetView *p, u32 mask)
 }
 static inline u8 NeedsResponse(struct SceneActorRegistryResetView *p)
 {
-    if (Test(&p->flags6D4, 1) || p->field67C >= 0)
+    if (TestContext(p, 1) || p->field67C >= 0)
         return 1;
     return 0;
 }
@@ -114,13 +114,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
         u16 *point;
     };
     struct RouteLink *point;
-    {
-        struct Flags {
-            s16 bits : 16;
-        };
-        struct Flags *p = (void *)((u8 *)actor->context + 0x6d4);
-        p->bits &= ~8;
-    }
+    ClearRouteBits((void *)((u8 *)actor->context + 0x6d4), 8);
     if (NeedsResponse(actor->context)) {
         sub_080B3110(actor, 1, gUnk_0824E230, 0x29a);
         return;
@@ -130,7 +124,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     group = (u8 *)&actor->group;
     if (TestContext(actor->context, 0x1d)) {
         actor->field2C2 = 32;
-        if (TestContext(actor->context, 4) && (actor->flags2D4 & 0x80)) {
+        if (TestContext(actor->context, 4) && MotionFlags(actor, 0x80)) {
             actor->group.field418 += 300;
             if (actor->group.field418 > actor->group.field416)
                 actor->group.field418 = actor->group.field416;
@@ -138,7 +132,14 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
         if (SceneActor_DispatchContextAction(actor->context, 1))
             return;
     }
-    SceneActorReaction_ResetAnimation(actor, 1);
+    {
+        u32 state = 3, phase = 1;
+        actor->state2A8 = state;
+        actor->phase2A9 = phase;
+        actor->behavior2AA = 0;
+        actor->counter2AC = 0;
+        actor->field2B1 = 1;
+    }
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 mask = 16;
@@ -164,10 +165,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!TryRoute(actor, group, (struct ContactPosition *)((u8 *)actor->fieldDC + 12)))
+    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->position,
+                  (struct ContactPosition *)((u8 *)actor->fieldDC + 12)))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_BeginTargetPursuit);
-#endif
