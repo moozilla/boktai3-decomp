@@ -2,7 +2,7 @@
 
 #ifdef NONMATCHING
 // fuzzy: 87.8%
-// draft; cases 0-7 follow sub_0823F56C, case 8 is the orbiting hit effect
+// draft; cases 0-7 follow Player_UpdateTetherChargeB, case 8 is the orbiting hit effect
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWithPause(void *, void *, void *, u32, u32, u32);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -41,8 +41,6 @@ static inline int scale(int n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-
-#define Player_UpdateTetherChargeC sub_0823F928
 
 void Player_UpdateTetherChargeC(u8 *p)
 {
@@ -189,5 +187,5 @@ void Player_UpdateTetherChargeC(u8 *p)
     *(u8 *)(p + 0xAC9) = 9;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823F928);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherChargeC);
 #endif

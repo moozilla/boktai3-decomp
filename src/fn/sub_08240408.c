@@ -18,7 +18,6 @@ void sub_08238238(struct Player *);
 void Player_SetTetherMode(struct Player *, s32, s32);
 void Player_PlayLocalSong(s32, s32);
 
-#define Player_UpdateKnockback sub_08240408
 void Player_UpdateKnockback(struct Player *p)
 {
     if (p->tetherMode != 0x1E) {

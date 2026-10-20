@@ -164,7 +164,6 @@ static inline void Step(struct SprBig *sp, struct DisplaySequenceState *st)
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 #ifdef NONMATCHING
 // fuzzy: 99.6%
-#define Player_UpdateChargeSpin sub_08240F9C
 void Player_UpdateChargeSpin(struct PRecover *p)
 {
     if (p->tetherActive != 0xE) {
@@ -199,5 +198,5 @@ void Player_UpdateChargeSpin(struct PRecover *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08240F9C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateChargeSpin);
 #endif

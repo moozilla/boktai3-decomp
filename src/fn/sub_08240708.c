@@ -27,7 +27,6 @@ void Player_SetSecondaryActionFlags(struct Player *, u32);
 void SelectionSlots_ClearValue(void *, s32);
 void sub_0823C280(struct Player *);
 
-#define Player_UpdateRecoil sub_08240708
 void Player_UpdateRecoil(struct Player *p)
 {
     if (p->tetherMode != 0x1F) {

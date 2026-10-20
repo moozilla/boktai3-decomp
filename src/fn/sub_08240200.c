@@ -23,8 +23,6 @@ static inline int scale3(int n)
     return n >= 0 ? n >> 3 : -((-n) >> 3);
 }
 
-#define Player_UpdateTetherRecoil sub_08240200
-
 void Player_UpdateTetherRecoil(u8 *p)
 {
     u16 *r;
@@ -85,5 +83,5 @@ void Player_UpdateTetherRecoil(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08240200);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherRecoil);
 #endif

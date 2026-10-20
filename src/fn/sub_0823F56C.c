@@ -28,8 +28,6 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-#define Player_UpdateTetherChargeB sub_0823F56C
-
 void Player_UpdateTetherChargeB(u8 *p)
 {
     struct BurstA ba;
@@ -145,5 +143,5 @@ void Player_UpdateTetherChargeB(u8 *p)
     *(u8 *)(p + 0xAC9) = 4;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0823F56C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherChargeB);
 #endif
