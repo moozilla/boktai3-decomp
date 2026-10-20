@@ -1,3 +1,5 @@
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_UpdateChargeRecovery sub_080C6A68
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
