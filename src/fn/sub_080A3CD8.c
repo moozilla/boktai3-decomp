@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 0%
+// fuzzy: 81.0%
 // Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 
