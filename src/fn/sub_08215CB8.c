@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Bg_CopyTiles sub_08215CB8
-
 struct BgResource {
     u8 pad[0xC];
     u32 maps;

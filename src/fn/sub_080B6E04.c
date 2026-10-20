@@ -98,13 +98,13 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
     struct ContactPosition *position = &actor->position;
     struct ContactPosition *destination = (void *)(target + 12);
     s32 result;
-    if (!sub_0821F204(route, position, destination)) {
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
             actor->flags2D4 &= ~bits;
         }
         return 0;
     } else {
-        result = sub_0821F7A8(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);

@@ -148,12 +148,12 @@ static inline void Chase_ClearBits(u16 *field, u32 bits)
 static inline u8 Chase_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
                                 struct ContactPosition *position, struct ContactPosition *target)
 {
-    s32 result = sub_0821F204(route, position, target);
+    s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         Chase_ClearBits(&actor->flags2D4, 0x200);
         return 0;
     }
-    result = sub_0821F7A8(route, position, target);
+    result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);

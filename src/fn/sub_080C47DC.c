@@ -24,7 +24,7 @@ struct Unk080C47DCLink {
     struct Unk080C47DCObject *target;
 };
 
-s32 sub_0821F7A8(void *, void *, void *);
+s32 Terrain_ApplyBlocked(void *, void *, void *);
 
 static inline u32 Cell(s32 x, s32 z)
 {
@@ -39,7 +39,7 @@ s32 sub_080C47DC(u8 *actor)
     struct Unk080C47DCLink *link = (struct Unk080C47DCLink *)(actor + 0x3D4);
     struct Unk080C47DCBody *body = (struct Unk080C47DCBody *)(actor + 0x50);
     struct Unk080C47DCObject **target = (struct Unk080C47DCObject **)(actor + 0x5D0);
-    s32 found = sub_0821F7A8(*target, actor + 0x5C, actor + 0x69C);
+    s32 found = Terrain_ApplyBlocked(*target, actor + 0x5C, actor + 0x69C);
 
     if (found != 0) {
         s32 dx = (*target)->position.x - body->position.x;

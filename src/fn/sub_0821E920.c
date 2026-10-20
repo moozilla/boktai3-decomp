@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define Path_PickRandomPoint sub_0821E920
-
 struct PathPos {
     u16 x, y, z;
 };

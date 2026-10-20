@@ -7,8 +7,8 @@ struct SceneActorTargetMotionContext {
     u32 flags;
 };
 s32 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {
@@ -22,13 +22,13 @@ static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
     void *collider = a->routeObject;
     struct ContactPosition *position = &a->position;
     struct ContactPosition *destination = (void *)(a->fieldDC + 12);
-    if (!sub_0821F204(collider, position, destination)) {
+    if (!Nav_IsPositionInMesh(collider, position, destination)) {
         u16 *flags = &a->flags2D4;
         u32 mask = ~0x200;
         *flags &= mask;
         return 0;
     } else {
-        s32 result = sub_0821F7A8(collider, position, destination);
+        s32 result = Terrain_ApplyBlocked(collider, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&a->motion, 8);

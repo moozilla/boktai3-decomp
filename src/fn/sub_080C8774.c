@@ -10,8 +10,8 @@
  * 0x5DC callback, or (flag 0x80) chase the player / walk the route (tentative). */
 
 s32 Callback_InvokeActor(void *, void *);
-s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
 void Sound_PlaySong(u32);
 extern u8 *gUnk_02000580[4];
@@ -165,12 +165,12 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
                          struct ContactPosition *position, struct ContactPosition *destination)
 {
     s32 result;
-    if (!sub_0821F204(route, position, destination)) {
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
         u32 mask = ~0x200;
         actor->flags2D4 = mask & actor->flags2D4;
         return 0;
     } else {
-        result = sub_0821F7A8(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);
