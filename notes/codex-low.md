@@ -1806,3 +1806,66 @@ Tool caution: depin.py tests the default fallback of guarded drafts, so its
 reported hint removal does not validate NONMATCHING code. Its changes were
 reverted and the guarded candidate rechecked explicitly; use it on extracted
 unguarded C for draft minimization.
+
+## Task 08150DB0 (2026-10-20)
+
+Tags: #matching #player #cue #animation
+
+Task exact coverage: 19.8% (+19.8 percentage points; 1,072 of 5,424 reviewed
+body bytes). Normal C: 712 bytes; Register-pinned: 360 bytes. Drafts do not
+count toward exact progress. Used per-file check.py only, with no full build,
+network operation, or generated assembly changes.
+
+- 08150DB0: matched PlayerCue_UpdateKnockdownRecovery, 712 bytes. Caller
+  PlayerCue_Motion30 selects motion 0x1E; callback applies decaying recoil,
+  reduces terrainRecoveryCounter, waits, and either stays down or plays the
+  recovery animation. Porting velocity and scaling expressions from exact
+  Player_UpdateRecoilAction matched on the first check. Reviewed extent ends
+  at 08151078. No register hints.
+- 08151078: matched PlayerCue_UpdateRecoilRecovery, 360 bytes. Caller
+  PlayerCue_Motion29B selects motion 0x1D; callback decays recoil then plays
+  recovery, advancing to phase two and acknowledging completion. An explicit
+  empty case two preserves the original switch dispatch tree. Pinning the
+  initial frame value to r3 removes a redundant copy and its padding. Marked
+  MATCHING_CONCESSION: register-pinning. Final formatted check exact through
+  081511E0.
+- 08151A14: new guarded draft PlayerCue_UpdateTurningPalette, recorded 82.2%,
+  95 realigned differences / 48 ignoring registers. Caller
+  PlayerCue_BeginModeSeven sets facing and phase. Callback turns toward the
+  requested direction, selects side-specific animations, and interpolates
+  palette entries at 36A, 36C and 37A over a sixteen-tick triangle wave. Read
+  the full body through its return/pool at 08151D90. Calculating red before
+  green improved the first candidate from 65.6% to 82.2%. Pinning the player
+  and weight registers regressed; a color inline and value barriers did not
+  help. Remaining direction-branch, field-address, color temporary and global
+  fade-counter allocation differences. Ghidra export is absent.
+- 08151EB8: improved existing PlayerCue_UpdateWalkTarget draft from 98.6% to
+  recorded 99.7%, two realigned differences / two ignoring registers. A
+  separate arrival direction value with an empty output constraint lets the
+  final-direction and computed-direction stores share their tail. Only the
+  moving path's OR versus direction-address scheduling remains. Input-only
+  constraints and register clobbers caused constant reuse and worsened
+  allocation; reverted. Restored required local aliases and address fallback.
+- 08152174: retained PlayerCue_UpdateMotionFade draft, recorded 81.7%, 217
+  realigned differences / 37 ignoring registers. Read largest first and used
+  relatives plus BIG_FUNCTIONS workflow. Existing packed animation stepper
+  covers most of the six phases. Full-width timer arithmetic emitted identical
+  code; removing the weight pin worsened total differences to 244. Remaining
+  scale-store addressing, phase tails and decoder register allocation. Restored
+  local aliases and address fallback; no exact coverage claimed.
+- 08152A5C: new guarded PlayerCue_UpdateRecoilSlide draft, recorded 97.5%, six
+  realigned differences / zero ignoring registers. Caller Motion29 selects
+  this callback for actionMode three. One-time sound, packed animation playback,
+  decaying slide, then standing callback and completion. Two address constants
+  use different registers. Pinning address constants changed earlier sequence
+  setup and worsened the result; reverted. Verified separate function prologue
+  bytes F0 B5 83 B0 at 08152C3C after the callback's own return and literal
+  pool. Added this evidence-backed boundary to progress_extra_functions.csv
+  and progress_functions.csv: the previous 38.6% score erroneously included
+  the independent following function/data. Actual callback extent is 480 bytes;
+  default INCLUDE_ASM still retains the entire original 1,992-byte span.
+
+Each exact function and each draft queued separately with build/commit.sh.
+All four default assembly fallbacks check byte-identical. Combined validation
+is deferred to the integrator as instructed. Names remain tentative where
+marked; no shared documentation or generated outputs were committed.
