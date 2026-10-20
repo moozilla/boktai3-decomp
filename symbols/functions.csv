@@ -7152,6 +7152,7 @@ addr,name,mode,confidence,source,notes
 081C53EC,SceneMessageSprite_Create,thumb,low,src-alias,Creates an animated task registered as scene-message receiver type 10; provisional object name
 081C542C,GameState_GetPackedTripletValue,thumb,low,src-alias,
 081C5470,ChallengeMenu_SetStoredRank,thumb,low,src-alias,Stores a four-bit value indexed by group and option; rank interpretation is tentative
+081C54B8,ChallengeMenu_DrawOptions,thumb,low,src-alias,
 081C554C,SceneTextSelector_UpdatePanel,thumb,low,src-alias,
 081C55B8,ChallengeMenu_ConsumeStateEntry,thumb,low,src-alias,Returns and clears the flag marking first execution of a new menu state
 081C55D8,ChallengeMenu_SetState,thumb,low,src-alias,Installs the state callback and resets its timer while marking state entry
@@ -7164,6 +7165,7 @@ addr,name,mode,confidence,source,notes
 081C5984,ChallengeMenu_EnableBackground,thumb,low,src-alias,Enables BG0 in the display shadow and resets BG1 scroll for menu rendering
 081C59A4,ChallengeMenu_Update,thumb,low,src-alias,Task update callback that refreshes selection graphics and invokes the current state
 081C59C4,ChallengeMenu_Destroy,thumb,low,src-alias,Task cleanup callback that removes six animations and clears all background tilemaps
+081C5A10,ChallengeMenu_InitBackgrounds,thumb,low,src-alias,
 081C5ABC,ChallengeMenu_LoadPalette,thumb,low,src-alias,Loads the menu palette resource and copies 40 words into palette staging memory
 081C5C2C,ChallengeMenu_InitAnimations,thumb,low,src-alias,Relocates three graphics resources and initializes six menu animation objects
 081C5D40,ChallengeMenu_ScriptOpen,thumb,low,src-alias,
@@ -7397,6 +7399,7 @@ addr,name,mode,confidence,source,notes
 081CEDC8,SceneNpc_UpdateMode,thumb,low,src-alias,Forwards NPC processing to the mode handler dispatcher
 081CEDD4,SceneNpc_ApplyDeceleratingBlink,thumb,low,src-alias,Sets visibility flag 0x100 on alternating shrinking intervals and reports completion
 081CEE18,SceneNpc_UpdateAnimationEight,thumb,low,src-alias,Starts animation entry 8 on state entry then invokes the NPC animation callback
+081CEF3C,SceneNpc_UpdateStopped,thumb,low,src-alias,
 081CF490,SceneNpc_UpdateBlinkPhase,thumb,low,src-alias,
 081CF4F0,SceneNpc_UpdateBlinkOut,thumb,low,src-alias,Applies the sixteen-interval blink sequence then hides the NPC and marks completion
 081CF62C,SceneNpc_UpdateDescendingDash,thumb,low,src-alias,
