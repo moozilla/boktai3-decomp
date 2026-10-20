@@ -1,65 +1,66 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.6%
-// draft: charge table read and copy order differ (register choice, instruction order)
-#include "player.h"
-extern u8 *gUnk_020004B4;
-extern const u8 gUnk_08E87B0C[];
-void Player_AccumulateActionCharge(struct Player *, u32);
-void sub_082420D4(struct Player *);
-s32 sub_08242D30(struct Player *);
-void sub_0823B728(struct Player *, s32);
-void sub_0823B7A4(struct Player *);
-void Player_ClampPositionToStoredTerrainCell_0823B938(struct Player *);
-void Player_UpdateModifier08Drift(struct Player *);
-void Player_SetSecondaryActionFlags(struct Player *, u32);
-void Player_SynchronizeColliderState(struct Player *);
-s32 Callback_InvokeActor(void *, void *);
-void Player_UpdateActionPhase(struct Player *p)
+
+struct P2 {
+    u32 a, b;
+};
+struct Link {
+    u8 pad[0x5c];
+    u8 arr[1];
+};
+extern struct Link *gUnk_020004B4;
+extern void *gUnk_08E87B0C[];
+void Player_AccumulateActionCharge(u8 *, s32);
+void sub_082420D4(u8 *);
+s32 sub_08242D30(u8 *);
+void sub_0823B728(u8 *, s32);
+void Callback_InvokeActor(u8 *, void *);
+void Player_SynchronizeColliderState(u8 *);
+void sub_0823B7A4(u8 *);
+void Player_ClampPositionToStoredTerrainCell_0823B938(u8 *);
+void Player_UpdateModifier08Drift(u8 *);
+void Player_SetSecondaryActionFlags(u8 *, s32);
+
+static inline long long LinkGet(s32 i)
 {
-    u32 *src;
-    s32 charge;
-    s32 idx;
-    *(u32 *)((u8 *)p + 0x20) |= 0xA8 << 11;
-    switch (p->kind) {
-        case 1:
-            if (*(u32 *)((u8 *)p + 0x20) & 0x10) {
-                s32 slot = p->slot;
-                u8 *stored = gUnk_020004B4;
-                if (stored == NULL || slot < 0) {
-                    charge = 0;
-                } else {
-                    charge = stored[0x5c + slot];
-                }
-                Player_AccumulateActionCharge(p, charge);
+    u8 v;
+    if (gUnk_020004B4 == 0 || i < 0)
+        v = 0;
+    else
+        v = gUnk_020004B4->arr[i];
+    return v;
+}
+
+void Player_UpdateActionPhase(u8 *p)
+{
+    u32 *new_var;
+    u32 m = 0x54000;
+    u32 f = *(u32 *)(p + 0x20) | m;
+    new_var = (u32 *)(p + 0x20);
+    *new_var = f;
+    switch (*(s32 *)(p + 0x1c)) {
+        case 1: {
+            s32 r;
+            if (f & 0x10) {
+                Player_AccumulateActionCharge(p, LinkGet(*(s32 *)(p + 0x18)));
             }
             sub_082420D4(p);
-            idx = sub_08242D30(p);
-            sub_0823B728(p, idx);
-            Callback_InvokeActor(p, ((void **)gUnk_08E87B0C)[idx]);
-            if (p->movementVelocityLocked) {
-                u32 hi;
-                src = (u32 *)((u8 *)p + 0x490);
-                hi = src[1];
-                *(u32 *)((u8 *)p + 0x38) = src[0];
-                *(u32 *)((u8 *)p + 0x3C) = hi;
+            r = sub_08242D30(p);
+            sub_0823B728(p, r);
+            Callback_InvokeActor(p, gUnk_08E87B0C[r]);
+            if (p[0x48c] != 0) {
+                *(struct P2 *)(p + 0x38) = *(struct P2 *)(p + 0x490);
             }
             Player_SynchronizeColliderState(p);
-            if (p->cameraOffsetActive != 0) {
+            if (*(s16 *)(p + 0x4b6) != 0)
                 sub_0823B7A4(p);
-            }
             Player_ClampPositionToStoredTerrainCell_0823B938(p);
             Player_UpdateModifier08Drift(p);
             break;
+        }
         case 2:
             Player_SetSecondaryActionFlags(p, 8);
-            Callback_InvokeActor(p, (void *)p->triggerAnimationCallback);
+            Callback_InvokeActor(p, *(void **)(p + 0x58c));
             Player_SynchronizeColliderState(p);
-            break;
-        default:
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateActionPhase);
-#endif
