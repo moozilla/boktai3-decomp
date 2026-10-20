@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 void sub_0808E660(void);
-#define Slime_StartWalkChoice sub_0808E570
 void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
