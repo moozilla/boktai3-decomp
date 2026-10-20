@@ -419,6 +419,15 @@ tools/cloud_task.py modification untouched. Ghidra's decomp.c export is absent.
   red/blue term or splitting loop locals did not improve it. Mask hoisting,
   materialized predicates and distinct register allocation across the three
   bank loops remain. No below-threshold source was committed.
+- **08217960 — drafted 80.1%, Palette_ApplyBackgroundFade.** Gets the next
+  background palette buffer and combines 03004DA0/030051D8 into a 0..64
+  fade level. At full strength selects the original 03004FC0 buffer;
+  at zero fills masked banks with 03005214 and copies unmasked banks.
+  Intermediate values scale or blend selected banks in packed RGB555,
+  optionally blending the backdrop override at 030051D0 as well. Final
+  reviewed check: 82 realigned differences, 39 ignoring registers.
+  Blended-bank constant hoisting, loop-counter setup and allocation remain;
+  only the level r12 pin is retained as a register-pinning concession.
 - **08218508 — drafted 89.1%, SpriteOam_QueueFlaggedProjectedSprites.** Used as
   a render callback by 08163398. Same queue construction as 08217F4C, with an
   additional required drawable flag 0x1000; its semantic meaning is unknown,
