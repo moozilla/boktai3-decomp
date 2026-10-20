@@ -31,7 +31,6 @@ void Text_ClearGlyphCache(void);
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // Differs only in register choice for the display-flag mask (r0 vs r2).
-#define Bg_SetupLayer sub_082160B8
 void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 priority, u32 map)
 {
     struct BgHeader hdr;
@@ -89,5 +88,5 @@ skip:
         Text_ClearGlyphCache();
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082160B8);
+INCLUDE_ASM("asm/nonmatching", Bg_SetupLayer);
 #endif

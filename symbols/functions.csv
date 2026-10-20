@@ -8471,6 +8471,7 @@ addr,name,mode,confidence,source,notes
 08215CB8,Bg_CopyTiles,thumb,low,src-alias,
 08215DF0,Bg_SetTilemapEntry,thumb,low,src-alias,Writes a tile index with flip flags and palette bank into a background map cell
 08215F38,Text_DrawNumber,thumb,low,src-alias,
+082160B8,Bg_SetupLayer,thumb,low,src-alias,
 082161B4,Bg_SetupLayers,thumb,low,src-alias,
 08216494,Bg_ResetScale,thumb,low,src-alias,Resets both background scale factors to fixed-point unity
 082164AC,Bg_SetLayerMap,thumb,low,src-alias,
@@ -9418,7 +9419,9 @@ addr,name,mode,confidence,source,notes
 082375FC,MovingSprite_Create_082375FC,thumb,low,src-alias,
 082377A8,ActorGlyphTrail_SetState,thumb,low,src-alias,Stores the actor-linked effect state callback and resets its timer
 08237BAC,ActorGlyphTrail_HideParticles,thumb,low,src-alias,Clears active markers and sets the hidden flag on all four trail particles
+08237BD4,ActorGlyphTrail_Update,thumb,low,src-alias,
 08237C9C,TimedSprite_UpdateMotion,thumb,low,src-alias,
+08237CDC,ActorGlyphTrail_OnPhase,thumb,low,src-alias,
 08237D68,ActorGlyphTrail_UpdateTask,thumb,low,src-alias,Task update callback dispatches the actor-linked glyph trail state
 08237D7C,ActorGlyphTrail_DestroyTask,thumb,low,src-alias,Task destruction callback removes the main sprite and four trail particles
 08237DA0,ActorGlyphTrail_InitSprite,thumb,low,src-alias,Initializes the main sprite using animation resource 0x210E and palette bank 0x4D

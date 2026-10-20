@@ -238,7 +238,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
         Bg_SetPriority(p->bg, 0);
     else {
         void *dst = Video_GetBackgroundMap(0);
-        sub_082160B8(p->bg, 0, map, 0, 0, 0, 0, dst);
+        Bg_SetupLayer(p->bg, 0, map, 0, 0, 0, 0, dst);
     }
     p->source = (u16 *)(palette + 0x1B4);
     {

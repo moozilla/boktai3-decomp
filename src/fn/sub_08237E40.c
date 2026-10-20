@@ -13,7 +13,7 @@ struct SpriteBurst {
 void ActorGlyphTrail_InitSprite(struct SpriteBurst *);
 void sub_082377B8(struct SpriteBurst *);
 void SpriteBurst_InitParticles(struct SpriteBurst *);
-void sub_08237BD4(void);
+void ActorGlyphTrail_Update(void);
 void ActorGlyphTrail_SetState(struct SpriteBurst *, void (*)(void));
 s32 SpriteBurst_Init(struct SpriteBurst *p, u32 parameter, u32 value, u32 variant)
 {
@@ -24,6 +24,6 @@ s32 SpriteBurst_Init(struct SpriteBurst *p, u32 parameter, u32 value, u32 varian
     ActorGlyphTrail_InitSprite(p);
     sub_082377B8(p);
     SpriteBurst_InitParticles(p);
-    ActorGlyphTrail_SetState(p, sub_08237BD4);
+    ActorGlyphTrail_SetState(p, ActorGlyphTrail_Update);
     return 0;
 }

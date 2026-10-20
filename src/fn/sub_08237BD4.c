@@ -17,7 +17,6 @@ void sub_08237A28(void *);
 void ActorGlyphTrail_HideParticles(void *);
 void ActorGlyphTrail_SetState(void *, void (*)(void));
 void TimedSprite_UpdateMotion(void);
-#define ActorGlyphTrail_Update sub_08237BD4
 void ActorGlyphTrail_Update(struct GlyphTrail *p)
 {
     u32 state = p->owner[0x457];
