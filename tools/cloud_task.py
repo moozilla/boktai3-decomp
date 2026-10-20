@@ -90,7 +90,7 @@ def main():
         p.add_argument("--min-insns", type=int, default=150)
         p.add_argument("--unassigned", action="store_true",
                        help="only functions outside subsystem ranges (local workers take the ranges)")
-        p.add_argument("--task", help="claim/list only this task id")
+        p.add_argument("--task", help="claim/list only this task id (ids depend on --min-insns/--max-insns: pass the same filters as the list that showed it)")
         p.add_argument("--smallest", action="store_true",
                        help="order tasks by their largest function, smallest first")
         p.add_argument("--max-insns", type=int, help="only functions below this size")
@@ -127,7 +127,7 @@ def main():
             print(brief(t))
             return
         git("checkout", "-q", "--detach", "origin/main")      # someone else got it first
-    sys.exit("no open tasks")
+    sys.exit("no open tasks" + (" (task ids depend on --min-insns/--max-insns; pass the filters used with list)" if a.task else ""))
 
 
 if __name__ == "__main__":
