@@ -2487,3 +2487,50 @@ Formatted production units with pinned clang-format. Both matches pass explicit
 assembly fallbacks also pass and are not counted as C progress. Queued one
 commit per match/draft through build/commit.sh, notes last. Batch integration
 validation remains with the orchestrator.
+
+
+## Task 081B28D8 follow-up — 2026-10-20
+
+Tags: #matching #vanargand #motion #animation
+
+Exact progress: 0.0 percentage-point gain. Reviewed all six existing guarded
+Vanargand drafts, largest first. Restored required file-local address aliases;
+assembly fallbacks use address symbols because INCLUDE_ASM stringifies its
+argument. Existing functions.csv names and neighbouring named callbacks retain
+the Vanargand prefix; interpretations remain tentative.
+
+- 081B3410: retained drafted 94.5%, 52 realigned differences / 18 ignoring
+  registers. Read BIG_FUNCTIONS, asmat, relatives and condensed listing. Byte
+  variant reads, duration barrier, declaration swaps and per-case local entry
+  variables do not change output. Initial animation setup order, variant
+  address reuse and packed playback allocation remain.
+- 081B28D8: improved drafted 98.2% to 99.9%, 15 / 4 differences reduced to
+  2 / 2. State four needs an ordinary local entry value rather than the
+  function-scope r1-pinned value. Only the order of two register copies at
+  081B2DB6 and 081B2DB8 remains. Explicit flags pointers, entry-register pins,
+  entry-input barriers, swapped entry setup and a scoped entry pointer regress
+  or leave the two copies unchanged; stopped after focused scheduling trials.
+- 081B2F38: retained drafted 93.2%, 53 / 28. Inspected assembly; declaration
+  swaps and ordinary local entry values in cases zero, one and three do not
+  improve it. Motion/state setup and packed playback lifetimes remain.
+- 081B3AAC: improved drafted 88.6% to 90.3%, 49 / 23 reduced to 38 / 13.
+  Removing SetState's r1 pin and value barrier improves state transitions.
+  Byte-returning motion completion and typed base-position field produce the
+  same baseline. Remaining entry/state pointer lifetimes and allocation.
+- 081B3DB8: retained drafted 87.4%, 56 / 14. Removing the r10 state pointer
+  pin or swapping vector-add operands improves fuzzy similarity but worsens
+  structural differences, so both reverted. Radial-loop and decoder lifetimes
+  remain.
+- 081B4040: drafted 80.1%, 93 / 26, versus baseline 81.0%, 92 / 27.
+  Explicit phase accumulator incremented by 255 improves structure by one
+  instruction; retained per BIG_FUNCTIONS structural-first guidance. Combining
+  flags worsens both scores; reverted. Radial-loop and decoder allocation remain.
+
+Formatted using pinned clang-format, restored exact alias spacing, and recorded
+all six scores with check.py --nonmatching --record (explicit reviewed extents
+1632, 1240, 1692, 780, 648 and 732 bytes respectively). Default assembly paths
+also pass; those are not C matches. Ran depin.py --write on unguarded scratch
+copies to avoid testing fallback assembly: all six correctly skipped because
+they are not exact. No claim that remaining hints are minimal. Only fast local
+checks; no make, full build, network or generated-artifact commits. Queued one
+commit per draft through build/commit.sh, notes last.
