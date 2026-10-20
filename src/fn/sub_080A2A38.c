@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 /* SceneActorReaction_ResumeEntryTarget: tentative */
-#define SceneActorReaction_ResumeEntryTarget sub_080A2A38
 
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 {

@@ -8,7 +8,6 @@ struct VornApproachContext {
     u16 flags;
 };
 /* Vorn_UpdateApproachRange: tentative */
-#define Vorn_UpdateApproachRange sub_080AE940
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
 void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
 s32 Callback_InvokeActor(void *, void *);
@@ -97,5 +96,5 @@ void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AE940);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateApproachRange);
 #endif

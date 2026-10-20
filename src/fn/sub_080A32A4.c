@@ -1,7 +1,6 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 /* SceneActorControl_UpdateEntryWait: tentative */
-#define SceneActorControl_UpdateEntryWait sub_080A32A4
 
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
@@ -46,5 +45,5 @@ void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A32A4);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateEntryWait);
 #endif
