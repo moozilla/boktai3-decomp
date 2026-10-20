@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 void Slime_UpdateRandomWait(void);
-#define Slime_StartRandomWait sub_0808E6E4
 void Slime_StartRandomWait(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {

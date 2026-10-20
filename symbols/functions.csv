@@ -2958,6 +2958,8 @@ addr,name,mode,confidence,source,notes
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
+0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
+0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
