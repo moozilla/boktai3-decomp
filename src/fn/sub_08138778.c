@@ -1,7 +1,8 @@
+#define PositionEffectDisplay_UpdateSources sub_08138778
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 90.6%
+// fuzzy: 96.8%
 struct Vec {
     s16 x, y, z, w;
 };
@@ -49,14 +50,14 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
     };
     register struct Manager *owner asm("r8") = m;
     register struct Manager *base asm("r12") = owner;
+    register s32 offset asm("r10") = 0;
     register struct Cursor *cursor asm("r6") = (void *)((u8 *)owner + 0x44);
     register struct Anim *sequence asm("r9") = (void *)((u8 *)owner + 0x60);
     register struct Obj *sprites asm("r7") = (void *)((u8 *)owner + 0x34);
-    register s32 offset asm("r10") = 0;
     do {
         if (cursor->active) {
             struct Manager *p = base;
-            struct Obj *o;
+            register struct Obj *o asm("r5");
             struct Anim *a;
             const volatile u16 *entry;
             register u16 n asm("r0");
@@ -75,9 +76,11 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 register u32 left asm("r2") = 1;
                 u32 mask = 1;
                 left &= input;
-                if (left != (((*entry & 0x30) >> 4) & mask))
-                    base->slots[0].sprite.flags |= 4;
-                else
+                if (left != (((*entry & 0x30) >> 4) & mask)) {
+                    register struct Manager *write asm("r2") = base;
+                    asm("" : "+r"(write));
+                    write->slots[0].sprite.flags |= 4;
+                } else
                     o->flags &= ~4;
             }
             {
@@ -119,8 +122,11 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 entry = a->data + a->frame;
                 a->factor = frame_factor(*entry);
                 a->rate = (a->factor * a->scale) >> 6;
-                if (!a->rate)
-                    a->rate = 1;
+                if (!a->rate) {
+                    u32 one = 1;
+                    asm("" : "+r"(one));
+                    a->rate = one;
+                }
             } else
                 done = 0;
 
@@ -128,15 +134,18 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 {
                     u8 *address = (u8 *)owner + 0x34;
                     asm("" : "+r"(address));
-                    ((struct Obj *)(address + offset))->flags |= 1;
+                    {
+                        register struct Obj *dst asm("r0") = (void *)(address + offset);
+                        dst->flags |= 1;
+                    }
                 }
                 cursor->stopOnEnd = 0;
                 cursor->active = 0;
             }
         }
+        base = (void *)((u8 *)base + 0x60);
         offset += 0x60;
         cursor++;
-        base = (void *)((u8 *)base + 0x60);
         sequence++;
         sequence = (void *)((u8 *)sequence + 0x50);
         sprites = (void *)((u8 *)sprites + 0x60);
@@ -145,5 +154,5 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PositionEffectDisplay_UpdateSources);
+INCLUDE_ASM("asm/nonmatching", sub_08138778);
 #endif

@@ -1,9 +1,18 @@
+#define ActorSequence_Begin sub_0813AFEC
+#define Player_AddControlFlags sub_0813B134
+#define PlayerCue_EnterStandUpdate sub_0814F804
+#define PlayerCue_CompleteAction sub_0814F89C
+#define PlayerCue_UpdateHidden sub_0814F8C8
+#define Player_RestartAnimationFromSetup sub_08151D90
+// confidence=low: tentative cue role inferred from named callers and callback behavior.
+#define PlayerCue_UpdateMotionFade sub_08152174
+#define Anim_SetSequence sub_08220C8C
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: motion seven changes sprite scale and visibility over six phases.
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 81.7%
+// fuzzy: 81.6%
 // Animation registers, scale-store addressing and phase branch layout differ.
 struct P {
     u8 pad0[0x14C];
@@ -212,5 +221,5 @@ void PlayerCue_UpdateMotionFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
+INCLUDE_ASM("asm/nonmatching", sub_08152174);
 #endif

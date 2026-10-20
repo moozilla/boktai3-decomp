@@ -1,6 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+// confidence=low: provisional action interpretation from retained C and assembly.
+#define Player_UpdateRecoilMotion sub_08149A14
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // Remaining differences: instruction selection and register allocation.
@@ -209,5 +211,5 @@ void Player_UpdateRecoilMotion(struct Player *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateRecoilMotion);
+INCLUDE_ASM("asm/nonmatching", sub_08149A14);
 #endif
