@@ -7,7 +7,7 @@
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void sub_080B23A0(void *, u32);
-void sub_080B2858(void *, u32);
+void Vorn_SelectRetreatRoute(void *, u32);
 void Vorn_SelectRecoveryAction(void *, const u8 *, u32);
 u8 SceneActor_IsFacingNearbyTarget(void *);
 static inline u8 Test(u16 *p, u32 mask)
@@ -61,7 +61,7 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p, u32 
             Vorn_SelectRecoveryAction(p, gUnk_0824E230, 0x61F);
             return 1;
         }
-        sub_080B2858(p, reset);
+        Vorn_SelectRetreatRoute(p, reset);
         return 1;
     }
     return 0;

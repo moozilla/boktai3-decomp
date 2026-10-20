@@ -1,6 +1,5 @@
 #include "contact_swarm.h"
-#define PlayerCue_UpdateFormChange                                                                 \
-    PlayerCue_UpdateFormChange // confidence=low: tentative player cue role; see callback body.
+// confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
 // fuzzy: 84.4%
 // Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.

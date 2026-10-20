@@ -7,7 +7,7 @@
 // Remaining differences: state-transition address lifetimes and animation-step register allocation.
 #define Ooze_UpdateAttack Ooze_BeginAttack
 // Keep the existing exported name so the draft recorder resolves the fallback.
-#define Ooze_BeginAttack Ooze_BeginAttack
+
 struct Ooze {
     u8 pad0[0x20];
     struct DisplaySequenceSprite sprite;

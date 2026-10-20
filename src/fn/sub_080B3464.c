@@ -87,8 +87,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
     actor->field2B1 = 1;
 }
 
-#define Vorn_ResumeRouteAfterReaction                                                              \
-    sub_080B3464 // confidence=low: restores route after context response flags.
+// confidence=low: restores route after context response flags.
 void Vorn_TickSound(void *);
 void Vorn_SendMessage(void *);
 void sub_0807C72C(void *, u32, u32, u32);
@@ -231,5 +230,5 @@ void Vorn_ResumeRouteAfterReaction(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B3464);
+INCLUDE_ASM("asm/nonmatching", Vorn_ResumeRouteAfterReaction);
 #endif

@@ -148,8 +148,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 void ActorEffect_SpawnOffsetEffect(struct P *);
-#define SceneActors_UpdatePeriodicEffectAction                                                     \
-    sub_081EE130 // confidence=low: sequence-one action periodically spawns offset effects.
+// confidence=low: sequence-one action periodically spawns offset effects.
 void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
 {
     register struct P *input asm("r8") = arg;
@@ -236,5 +235,5 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EE130);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePeriodicEffectAction);
 #endif

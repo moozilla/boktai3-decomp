@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define PlayerCue_UpdateSideRecoil                                                                 \
-    PlayerCue_UpdateSideRecoil // confidence=low: tentative cue role from callback phases.
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 97.5%
 // Remaining six differences allocate recoil and direction offsets to other registers.

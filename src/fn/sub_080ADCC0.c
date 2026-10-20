@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
-#define Vorn_UpdatePursuitDistance                                                                 \
-    Vorn_UpdatePursuitDistance // confidence=low: tentative Vorn behavior role.
+// confidence=low: tentative Vorn behavior role.
 #ifdef NONMATCHING
 // fuzzy: 98.9%
 // Remaining differences: six low-register choices in the middle-distance path.

@@ -188,8 +188,7 @@ static inline u8 PlayerNear(struct ActorStatusPart *p)
     return result;
 }
 
-#define ActorStatus_UpdateGuardedApproach                                                          \
-    sub_081B1334 // confidence=low: part approaches the player and chooses contact or timeout animation
+// confidence=low: part approaches the player and chooses contact or timeout animation
 void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 {
     register u8 *owner asm("r9") = boss;
@@ -276,5 +275,5 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B1334);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
 #endif

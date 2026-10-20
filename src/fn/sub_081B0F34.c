@@ -165,8 +165,7 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
         result = 1;
     return result;
 }
-#define ActorStatus_UpdatePlayerCapture                                                            \
-    sub_081B0F34 // confidence=low: carries a player position request along a motion track
+// confidence=low: carries a player position request along a motion track
 void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target, playerTarget;
@@ -221,5 +220,5 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B0F34);
+INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
 #endif

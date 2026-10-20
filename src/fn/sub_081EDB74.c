@@ -260,8 +260,7 @@ static inline void StepSecond(struct ContactSwarmSprite *sp, struct DisplaySeque
 }
 
 void SceneActors_DestroyTask(struct P *);
-#define SceneActors_UpdateLeftDeparture                                                            \
-    sub_081EDB74 // confidence=low: two sprite sequences move left until task destruction.
+// confidence=low: two sprite sequences move left until task destruction.
 void SceneActors_UpdateLeftDeparture(struct P *arg, s32 ticks)
 {
     register struct P *input asm("r7") = arg;
@@ -305,5 +304,5 @@ void SceneActors_UpdateLeftDeparture(struct P *arg, s32 ticks)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EDB74);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateLeftDeparture);
 #endif

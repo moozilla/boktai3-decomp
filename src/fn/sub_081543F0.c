@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define PlayerCue_UpdateSideFade                                                                   \
-    PlayerCue_UpdateSideFade // confidence=low: tentative cue role from callback phases.
+// confidence=low: tentative cue role from callback phases.
 #ifdef NONMATCHING
 // fuzzy: 86.4%
 // Remaining phase scale addressing and playback register lifetimes differ.

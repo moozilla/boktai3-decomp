@@ -3,8 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 // foundry draft (worker best 93.9%); what differs is mostly register allocation and instruction order
-#define SpatialIndex_SetPosition SpatialIndex_SetPosition
-#define gSpatialIndex            gUnk_02000200
+
+#define gSpatialIndex gUnk_02000200
 struct SpatialEntry {
     u32 flags;
     u8 unknown4[12];

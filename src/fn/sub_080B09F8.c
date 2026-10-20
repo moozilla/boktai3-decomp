@@ -4,7 +4,7 @@
 // fuzzy: 98.2%
 // foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
 void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *);
-void sub_080B2858(struct SceneActorRegistryResetView *, u32);
+void Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *, u32);
 static inline u8 PhaseComplete(struct SceneActorRegistryResetView *p)
 {
     return p->field2B0;
@@ -48,7 +48,7 @@ void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
         u32 mask = ~0x100;
         *flags = mask & *flags;
         SceneActorAnimation_SelectDirectionalEntry((void *)p, 0);
-        sub_080B2858(p, 1);
+        Vorn_SelectRetreatRoute(p, 1);
     } else
         ++p->counter2AC;
 }

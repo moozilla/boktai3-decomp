@@ -3,9 +3,9 @@
 #ifdef NONMATCHING
 // fuzzy: 85.3%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
-#define OrangeSpine_FireProjectile OrangeSpine_FireProjectile
-#define Projectile_Spawn           Projectile_SpawnFromConfig
-#define gSineTable                 gUnk_086149C4
+
+#define Projectile_Spawn Projectile_SpawnFromConfig
+#define gSineTable       gUnk_086149C4
 struct OrangeSpinePosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));

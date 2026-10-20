@@ -30,8 +30,7 @@ static inline u32 Random(void)
     gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
     return gUnk_086141BC[gUnk_03005304];
 }
-#define SceneActors_UpdatePaletteDispersal                                                         \
-    sub_081EEAD8 // confidence=low: fades two palettes then emits dispersal particles.
+// confidence=low: fades two palettes then emits dispersal particles.
 void SceneActors_UpdatePaletteDispersal(struct P *arg)
 {
     struct P *input = arg;
@@ -116,5 +115,5 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EEAD8);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePaletteDispersal);
 #endif
