@@ -1,10 +1,11 @@
+#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 80.8%
+// fuzzy: 81.1%
 // Remaining differences: PRE stack slots, random-loop allocation, and duration setup order.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
@@ -38,18 +39,24 @@ static inline u32 FullFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
 }
+static inline u8 TestField(u16 *field, u32 mask)
+{
+    if (*field & mask)
+        return 1;
+    return 0;
+}
 static inline void BeginContactTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
-    if (!FullFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
+    if (!FullFlags(actor, 0x400) && !TestField((u16 *)((u8 *)actor + 0x414), 4)) {
         register s32 prior asm("r5") = actor->direction;
         register s32 tries asm("r1") = 0;
         s32 choice;
         const u16 *table = gUnk_0203B400;
         u32 *randomIndex = &gUnk_03005308;
-        u32 wrap = 1023;
-        u32 mask = 3;
+        register u32 wrap asm("r7") = 1023;
+        register u32 mask asm("r6") = 3;
         do {
             u32 index = (*randomIndex + 1) & wrap;
             *randomIndex = index;
@@ -68,11 +75,11 @@ static inline void BeginContactTurn(void *obj, u32 saved)
     }
 }
 
-static inline u8 TestField(u16 *field, u32 mask)
+static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior, u32 counter)
 {
-    if (*field & mask)
-        return 1;
-    return 0;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = counter;
+    actor->field2B1 = 1;
 }
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
@@ -114,21 +121,17 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
                     return;
                 }
             }
-            actor->behavior2AA = 13;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            SetBehavior(actor, 13, 0);
         }
     } else {
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
                                                           result)) {
-            actor->behavior2AA = 14;
-            actor->counter2AC = event;
-            actor->field2B1 = 1;
+            SetBehavior(actor, 14, event);
             return;
         }
     }
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
+INCLUDE_ASM("asm/nonmatching", sub_0812F5D4);
 #endif
