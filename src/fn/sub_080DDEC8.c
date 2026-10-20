@@ -1,3 +1,4 @@
+#define Dog_RestoreRoute sub_080DDEC8
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
