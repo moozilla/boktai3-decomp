@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Golem_UpdateSlideImpact                                                                    \
+    sub_080C725C // confidence=low: neighboring Golem controls establish the state role.
 // confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
 // fuzzy: 89.1%
@@ -133,5 +135,5 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateSlideImpact);
+INCLUDE_ASM("asm/nonmatching", sub_080C725C);
 #endif

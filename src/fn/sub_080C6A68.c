@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Golem_UpdateChargeRecovery                                                                 \
+    sub_080C6A68 // confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
-// fuzzy: 85.9%
-// Remaining differences: packed position stores, stack-slot placement and animation pointer copies.
+// fuzzy: 86.5%
+// Remaining differences: stack-slot placement, packed-store scheduling and animation pointer copies.
 /* Decelerate the charge, return to the current cell center, then restore the saved route. */
 // confidence=low: installed when charge movement completes; the three phases slow, center, and settle it.
 #include "scene_actor_reset.h"
@@ -74,8 +76,8 @@ void Golem_UpdateChargeRecovery(struct SceneActorRegistryResetView *actor)
     }
     {
         u8 directionVariant, mirror;
-        u8 *mirrorPointer;
-        u8 *variantPointer;
+        register u8 *mirrorPointer asm("r2");
+        register u8 *variantPointer asm("r5");
         u32 flags, variant, selection;
         u8 *variantReload;
         u32 force;
@@ -169,17 +171,18 @@ done:
         }
         {
             struct RecoverySample step;
-            struct ContactPosition candidate;
+            struct RecoverySample candidate;
             struct RecoverySample *out;
             struct ContactPosition *p;
             s32 x, z, cell;
             step.x = (*speed * gUnk_086149C4[(body[0x691] + 0x40) & 0xFF]) >> 16;
             step.z = (*speed * gUnk_086149C4[body[0x691]]) >> 16;
-            candidate = actor->position;
+            candidate = *(struct RecoverySample *)&actor->position;
             out = (struct RecoverySample *)&candidate;
-            out->x = (u16)candidate.x + (u16)step.x;
-            out->z = (u16)candidate.z + (u16)step.z;
-            p = &candidate;
+            *(u32 *)out = (*(u32 *)out & 0xFFFF0000) | (u16)((u16)candidate.x + (u16)step.x);
+            ((u32 *)out)[1] =
+                (((u32 *)out)[1] & 0xFFFF0000) | (u16)((u16)candidate.z + (u16)step.z);
+            p = (struct ContactPosition *)&candidate;
             x = p->x >> 8;
             z = p->z >> 8;
             if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -265,5 +268,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080C6A68);
 #endif
