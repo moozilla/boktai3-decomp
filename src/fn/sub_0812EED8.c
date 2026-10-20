@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
 
@@ -28,7 +27,8 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->word104 = 0;
 }
 // confidence=low: target contact flags enable a delayed return to route behavior.
-static inline u8 HasTargetFlag(struct SceneActorReactionMotion **out, struct SceneActorReactionMotion *motion, u32 mask)
+static inline u8 HasTargetFlag(struct SceneActorReactionMotion **out,
+                               struct SceneActorReactionMotion *motion, u32 mask)
 {
     u32 value = motion->flags & mask;
     *out = motion;
@@ -58,8 +58,7 @@ static inline void SetActorFlags(struct SceneActorRegistryResetView *actor, u32 
 }
 static inline struct SceneActorReactionMotion *MakeMotionPointer(void *actor)
 {
-    register u8 *bytes asm("r2") = actor;
-    asm("" : "+r"(bytes));
+    u8 *bytes = actor;
     return (void *)(bytes + 0xdc);
 }
 u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *actor)
