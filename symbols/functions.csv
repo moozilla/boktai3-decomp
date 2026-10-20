@@ -9056,7 +9056,9 @@ addr,name,mode,confidence,source,notes
 0823C548,Player_PlayActionCueSound,thumb,low,src-alias,
 0823CFDC,Player_IsFlaggedBelowResourceLimit,thumb,low,src-alias,Returns whether flag 0x10 is set and field 0x428 is below field 0x42A; resource interpretation tentative
 0823D00C,Player_SetActionOrigin_0823D00C,thumb,low,src-alias,
+0823D080,Player_UpdateChargeAction,thumb,low,src-alias,
 0823D370,Player_IsUnflaggedBelowResourceLimit,thumb,low,src-alias,Returns whether flag 0x10 is clear and field 0x428 is below field 0x42A; resource interpretation tentative
+0823D3A0,Player_UpdateConvergingChargeAction,thumb,low,src-alias,
 0823D6CC,Player_UpdateFacingFromInputHistory,thumb,low,src-alias,Selects facing from direction history when movement is unlocked and refreshes directional presentation
 0823D714,Player_SaveActionIndex,thumb,low,src-alias,
 0823D7D4,Player_GetConfiguredActionPower,thumb,low,src-alias,Forwards to the action-type-dependent calculation using fields 0x420 and 0xBF8; power interpretation tentative
