@@ -155,3 +155,78 @@ Notes for the next run:
   25 minutes with other sessions running.
 - Several ported sources carry inherited `register ... asm("rN")` pins and
   `MATCHING_CONCESSION: register-pinning`. None was added here.
+
+## Codex reasoning effort trial (2026-10-20)
+
+Three Codex workers ran `gpt-6.1-sol` at `model_reasoning_effort` low, medium
+and high. Each worker had its own worktree and claimed unassigned
+`tools/cloud_task.py` tasks one after another (6 functions of 150+
+instructions each). The run started at 08:34Z with the weekly allowance at
+100% and was stopped at 20% (18:24:53Z, about 9.85 h). All three workers had
+the same prompt: the docs to read, the toolchain (check.py `realigned:`,
+BIG_FUNCTIONS.md, rtlprobe/variants/condense with the instrumented agbcc),
+drafts at 80% fuzzy or more, and strict `Subsystem_VerbNoun` naming. The
+results went into main through #330, #341, #352 and #371: 265 new exact
+matches. The runner and the logs are kept outside the repo
+(`b3-logs/codex_trial/`).
+
+A match counts as verified if it is exact on main after #371. Each function
+is counted once, for the level that matched it first; the number in brackets
+is what the worker claimed in its commits. Tokens are summed per task (input
+not served from cache, cached input, output, and the reasoning part of
+output). The allowance is shared, so each level's share of the 80-point drain
+is an estimate, weighting uncached input + output + cached/10.
+
+| Effort | Tasks | Verified (claimed) | Drafts | Uncached in | Cached in | Output (reasoning) | Drain share | Per task | Per hour | Per 100k output | Per point |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| low | 108 | 111 (122) | 193 | 11.3M | 301M | 1.19M (183k) | ~25.6 | 1.03 | 11.3 | 9.3 | ~4.3 |
+| medium | 57 | 99 (101) | 118 | 9.0M | 350M | 1.25M (347k) | ~27.3 | 1.74 | 10.1 | 7.9 | ~3.6 |
+| high | 39 | 64 (75) | 113 | 8.2M | 356M | 1.26M (435k) | ~27.1 | 1.64 | 6.5 | 5.1 | ~2.4 |
+
+Reading:
+
+- The allowance drained at about 8 points an hour with all three workers
+  running, at a similar rate for each level. Wall time, not effort, decides
+  what a level costs, so the cheapest level is the one that matches most per
+  hour.
+- Low matched the most per point of allowance and per hour. It skims: about
+  one match per 6-function task, short sessions of 4–6 minutes, and many
+  80–90% drafts. Its claims were the least reliable (11 claimed matches did
+  not survive integration; some of those were duplicates of other levels).
+- Medium had the best yield per task and its claims were almost all real
+  (99 of 101).
+- High cost about 1.7 times as much allowance per match as low. It used more
+  than twice the reasoning tokens without finding more matches per task, but
+  it left the closest near misses (99.x%).
+- For draining Codex allowance into matches, use low or medium. Save high
+  for targeted near misses.
+
+Operational notes:
+
+- `codex exec --json` stdout carries no `rate_limits`. The live allowance
+  reading is in the session rollout file (`~/.codex/sessions/.../rollout-*.jsonl`,
+  in every `token_count` event). The runner tailed those files and stopped
+  every worker on the first reading of 20% or less. The last 21% reading was at
+  18:24:52.98Z and the first 20% reading at 18:24:53.70Z; all workers were
+  interrupted in the same second and had exited by 18:24:55Z. Readings are whole
+  percents, so the stop landed at exactly 20%.
+- Codex's macOS sandbox refuses writes to a worktree's `.git`, even with
+  `--add-dir`. Workers queued commits through a small script and the runner,
+  outside the sandbox, made them, still one commit per match.
+- Loose unassigned tasks shifted as main moved, so two levels could claim the
+  same functions. `cloud_task.py` now claims per function (#330). The
+  unassigned queue ran out at 18:01Z, and the last 20 minutes used
+  subsystem-range tasks.
+- Integration gotchas fixed along the way:
+  - `promote_names.py` now accepts trailing comments on alias lines and
+    reports alias/name collisions (#352).
+  - After promoting names, run `make`, not `tools/build.py`, so that
+    `gen/code_sym.s` is regenerated.
+  - Renaming a function whose old name is baked into `gen/code.s` needs
+    `gen/code.s` regenerated or patched.
+
+Rename candidates for a later pass: these prefixes are opaque, and some
+were inherited by the trial's names: `Task4E01_`, `Registry2388_`,
+`BossSlot2_`, `Params3D0_`. The ordinal names
+`Player_RestartAnimationFromResource2` and
+`SceneActors_UpdateSequenceTwoAction` were replaced in #371.
