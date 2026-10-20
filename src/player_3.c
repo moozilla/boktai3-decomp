@@ -67,7 +67,8 @@ void sub_0813CB8C(void *, u32);
 
 static inline u32 ReadVisualFlag(u32 *flags, u32 mask)
 {
-    return *flags & mask;
+    u32 m = mask;
+    return *flags & m;
 }
 static inline u32 VisualBonusFlag(struct Player *p, u32 mask)
 {
@@ -81,9 +82,6 @@ static inline u32 VisualActionFlag(struct Player *p, u32 mask)
         return 0;
     return ReadVisualFlag(&p->actionFlags, mask);
 }
-#ifdef NONMATCHING
-// fuzzy: 97.0%
-// Constant masks are loaded after flags rather than before them.
 // confidence=low: initializes visual resource selectors from mode and bonus flags.
 #define Player_InitVisualResources sub_0813D178
 void Player_InitVisualResources(void *actor)
@@ -138,10 +136,6 @@ void Player_InitVisualResources(void *actor)
     p->menuStatusValues[6] = 0x2E;
     *(u16 *)((u8 *)p + 0xABE) = 0x2B;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0813D178);
-#endif
 
 void Player_InitVisualState(struct Player *p)
 {
