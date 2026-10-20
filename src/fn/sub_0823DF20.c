@@ -6,7 +6,7 @@ u32 Player_GetConfiguredActionPower(struct Player *);
 u32 Player_CollectCallbackFlags(struct Player *);
 void Player_ConsumeActionResource(struct Player *);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
-s32 sub_0823DE6C(void *, u32, u32);
+s32 Terrain_ClassifyOffsetHeight(void *, u32, u32);
 
 struct SlashCtx {
     u8 unk0[0x48];
@@ -46,7 +46,7 @@ void Player_BeginSlashAction(struct Player *p)
     if (p->actionMode == 1)
         flags |= 0x40000;
     attackA = q->attackA;
-    kind = sub_0823DE6C(&q->origin, q->heading, 0xE0);
+    kind = Terrain_ClassifyOffsetHeight(&q->origin, q->heading, 0xE0);
     if (kind != 0) {
         if ((q->index == 2 || q->index == 4) && kind == 2) {
             q->w[1] = 0x1B;
@@ -61,7 +61,7 @@ void Player_BeginSlashAction(struct Player *p)
             q->w[3] = 3;
             q->w[4] = 0;
         }
-    } else if (sub_0823DE6C(&q->origin, q->heading, 0x150) != 0) {
+    } else if (Terrain_ClassifyOffsetHeight(&q->origin, q->heading, 0x150) != 0) {
         q->w[1] = 0x1B;
         q->w[0] = 0x38;
         q->w[2] = 2;
