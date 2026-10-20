@@ -2362,3 +2362,16 @@ recorded scores with check.py --nonmatching --record. Queued each guarded draft
 separately through build/commit.sh. No network, direct git mutation, shared docs,
 ROM-derived artifacts or full-build commands. Combined validation remains with
 the integrator.
+
+## Task 08154CD4 — 2026-10-20, resumed worker pass
+
+Tags: #matching #player #animation
+
+- 081561EC: stopped unmatched after largest-first assembly and relatives review. Best relative still covers only 17%; no whole-function hypothesis beyond the prior particle-pool, target-motion and inline animation observations. No new source retained.
+- 08155008: retained guarded PlayerCue_UpdateAlternateFade draft, recorded 86.1%, 130 realigned differences / 27 structural. Corrected the completion callback to sub_08154EE4 (alternate resource replay), as proven by the ROM literal, rather than the similarly named sub_081538DC. Restored local aliases for the cached ELF. Phase scale addressing and playback allocation remain.
+- 08155D58: stopped below draft threshold at 74.9%, 153 realigned differences / 55 structural, versus the previous 72.9% candidate. Changed the script parameter count to a 16-bit bitfield and removed the cached frame pointer from pulse stores/increments. Pulse source remains in untracked wip/sub_08155D58.c; not promoted. Shared zero/one lifetimes, script pointer addresses and pulse field addressing remain.
+- 081559A4: retained guarded Player_UpdateTimedChargeAction draft at 87.3%, 65 realigned differences / 30 structural. Script count bitfield expresses the observed word mask/store but gives the same score. Restored the required local alias. Pointer lifetimes and shared constants remain.
+- 081556E0: retained guarded Player_UpdateStateMotionCue draft at 88.3%, 54 realigned differences / 31 structural. Signed Event helper regressed to 56 differences; early event mask barrier regressed to 62. Reverted both and restored local alias.
+- 08154CD4: improved guarded PlayerCue_UpdateSpiralRecovery from 93.8% to 98.1% (+4.3 fuzzy percentage points), five differing bytes / five realigned instructions / zero structural. Compute the resource destination before its literal, load the effect timer mask after the increment store, keep seven and its low-bit copy distinct, and share the sequence pointer through playback. Explicit resource and final byte pointer lifetimes fix remaining extra copies. Sprite offset and effect timer offset still use different registers. Further offset pin variants regressed and were discarded.
+
+Formatted using build/venv/bin/clang-format; recorded all four draft scores with check.py --nonmatching --record. Default assembly fallbacks pass exact checks after spelling INCLUDE_ASM entries with sub addresses, since the cached build lacks the promoted assembly filenames. The documented depin guarded-draft limitation still applies; no fallback-only result was used to remove hints. Four separate draft commits queued through build/commit.sh. No full build or network operations. Exact code progress gain: 0 percentage points.
