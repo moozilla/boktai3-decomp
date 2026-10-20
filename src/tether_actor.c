@@ -319,7 +319,7 @@ s32 Mod(s32, s32);
 
 s32 Div(s32, s32);
 
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 
 u32 NamedObject_FindNearPosition(struct ContactPosition *);
 
@@ -2610,7 +2610,7 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
             CellObject_Init(&actor->movementProbeStorage, position);
             actor->movementProbe = &actor->movementProbeStorage;
         }
-        sub_08225B74(&actor->bodyConfig);
+        Obj_StepPosition(&actor->bodyConfig);
     } else {
         u8 *properties;
         u32 currentCell;

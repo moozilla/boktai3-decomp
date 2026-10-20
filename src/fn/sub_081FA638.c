@@ -30,7 +30,7 @@ s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 void Ratatosk_OscillateScale(struct Ratatosk *);
 s32 SceneActors_UpdateAnimation(void *, void *, s32);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void ActorProximity_UpdateSquaredDistances(struct Ratatosk *);
 void Ratatosk_UpdatePointDistancesToPlayer(struct Ratatosk *);
 void SceneDistance_UpdateLinkedDistances(struct Ratatosk *);
@@ -43,7 +43,7 @@ void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
     struct RatatoskSprite *sprite = &p->sprite;
     p->flagAA = 0;
     sub_081F6B90(p);
-    sub_08225B74(sprite);
+    Obj_StepPosition(sprite);
     if (Mod(p->timer, 30) == 0) {
         ActorProximity_UpdateSquaredDistances(p);
         SceneDistance_UpdateLinkedDistances(p);

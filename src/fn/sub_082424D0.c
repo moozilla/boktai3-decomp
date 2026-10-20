@@ -6,7 +6,7 @@
 #define B(o) (*(u8 *)(p + (o)))
 s32 Player_GetSecondaryActionFlags(void *, u32);
 void CellObject_Init(void *, void *);
-void sub_08225B74(void *);
+void Obj_StepPosition(void *);
 void Collider_SetPosition(void *, void *, s32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
@@ -40,7 +40,7 @@ void sub_082424D0(u8 *p)
             W(0x40) = (u32)position;
         }
     }
-    sub_08225B74(p + 0x24);
+    Obj_StepPosition(p + 0x24);
     if (Player_GetSecondaryActionFlags(p, 8))
         setCollider(p);
     else {
