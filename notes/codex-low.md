@@ -533,3 +533,73 @@ Useful technique: typed SceneVec/bitfield union probes reproduce packed halfword
 Validation: only tools/check.py per-file checks; no make, full build, network, push or PR. Exact sources were formatted with the pinned clang-format. Four exact functions out of six assigned (66.7% of assigned functions); drafts receive no exact credit. Shared docs/index and the pre-existing tools/cloud_task.py modification were left untouched, per cloud-worker instructions.
 
 Score recording caveat: check.py --record keys scores by the compiled sub_ alias, but the already-named 0815E1F0 fallback uses PlayerContact_ApplyResponse. Recorded with the address token temporarily, then restored the correct named INCLUDE_ASM fallback. No generated assembly was edited.
+
+## Task 081A0BC8 — 2026-10-20
+
+Tags: #matching #hresvelgr #scene-commands #register-allocation
+
+Exact progress: 0.0 percentage-point gain. Two guarded drafts, no exact matches.
+The supplied branch was cloud/081A0BC8; the actual checkout reports
+cloud/0815788C (with the task-claim commit in its history). No branch changes
+were made; driver commits are on that existing branch. The pre-existing
+modification to tools/cloud_task.py was left untouched.
+
+- 081A14FC stopped unmatched after full assembly and relative review, following
+  BIG_FUNCTIONS guidance. Five-state sequence tentatively handles defeat:
+  starts animation 15, waits for frame >8 and the player action gate, runs the
+  first event script, then animation 20; later falls to terrain, emits bursts,
+  sets event flags 0/3/0x4E and runs the second script. State 1 derives movement
+  in 30-tick sections, adjusts animation rate and emits randomized motion
+  entries. No useful large relative: best covers only 7%. No qualifying C
+  candidate; repeated terrain, RNG and stack-vector expansion remain work.
+- 081A1EFC stopped unmatched after full condensed assembly and relative review.
+  Tentatively applies received/environmental damage: consumes pending bytes
+  +328/+329 and halfword +326, chooses the active contact pair at +31C/+320
+  or +31E/+322, clears all four, and considers contact bit 0x40. Environmental
+  damage is five times the signed global player field +876 and has a 60-tick
+  cooldown at +31A. Subtracts actor health +94, displays damage, requests
+  reactions through callback +100, and emits spark/motion effects. Packed
+  stack vectors and many reaction branches prevented a useful close draft;
+  relatives cover only short pieces (best 11%).
+- 081A0BC8 stopped unmatched, scratch candidate 62.2% (166 realigned differing
+  instructions, 98 ignoring registers). Tentative sweep attack: waits past
+  128 ticks, positions beside target, moves toward arena edge, periodically
+  spawns projectiles at randomized nearby terrain cells. Uses action state
+  +2F0, facing +A8 and mirror +32B; stops beyond coordinate 5120. Shared terrain
+  code from Actor_UpdateMovementAnimationAndEffects helped recover semantics,
+  but RNG lifetime, control shape and actor offsets still differ. Scratch:
+  wip/sub_081A0BC8.c; below retention threshold.
+- 081A2430 stopped unmatched, valid scratch candidate 61.9% before allocation
+  experiments. Hresvelgr scene-command dispatcher, based on the receiver at
+  +118 and shared SceneEventReceiver layout. Kinds 0/1/19/26 request actions
+  28/29/30/31; 26 also sets mirror +32B. Kind 9 configures an effect, 5 changes
+  heading and restarts animation, 2 updates body/display positions. Inline
+  function arguments hoisted action/callback constants before stores; a macro
+  improved ordering. Correct prepared flag is +B1; transition-pending is +B0.
+  Register pins worsened the candidate. Scratch wip/sub_081A2430.c only.
+- 081A26D8 drafted 85.3% as Hresvelgr_UpdateMovementAndTargets. Runs command
+  dispatch, body motion and animation; copies body position to display +1B4;
+  applies a decaying sine/cosine shake from +310; updates target metrics and
+  per-target angles/squared distances from pointers +110. Typed views fixed
+  load/store order and avoided raw-pointer loop strength reduction. A pinned
+  r9 actor alias plus empty identity barrier improved the draft. Remaining:
+  shake pointer/angle registers, literal-load order, target-loop shape and
+  pointer copies (32 realigned differences, 17 ignoring registers). Metrics
+  use an overlapping union to avoid a one-element distance array indexed by
+  the runtime count. Guarded fallback uses original assembly. Final full-extent
+  recorded score differs from commit subject's initial 85.1%.
+- 081A12DC drafted 81.7% as Hresvelgr_FireProjectileAndDescend. Faces target,
+  starts animation 25, raises projectile origin by 512, launches with a
+  four-unit planar vector and vertical speed 48, then descends toward Y=832
+  in steps of four after the animation event. Inline vector construction and
+  position-copy/raise helpers fixed stack halfword access patterns. Pinned
+  state pointer r8 improves allocation. Remaining: heading-mask operand ties,
+  actor aliases, vector pointer and counter registers (58 realigned differences,
+  17 ignoring registers). Guarded fallback uses original assembly.
+
+Validation: only check.py per-file comparisons, including --nonmatching --record
+on both formatted retained sources. depin.py was invoked on both candidates;
+its exact-match prerequisite means it skipped these nonmatching drafts. No
+make/full build, network, push, PR, generated assembly or ROM changes. Ghidra
+export gen/ghidra/decomp.c is absent. Only qualifying drafts and these notes
+are committed; lower-scoring scratch sources stay outside production src/.
