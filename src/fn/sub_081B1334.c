@@ -345,5 +345,5 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
+INCLUDE_ASM("asm/nonmatching", sub_081B1334);
 #endif
