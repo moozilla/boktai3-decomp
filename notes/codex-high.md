@@ -1555,3 +1555,65 @@ accordance with the worker restriction. The driver placed the six commits on
 that existing branch. The pre-existing tools/cloud_task.py edit was not
 modified by this worker (it no longer appeared in final status). Shared docs
 were left unchanged under the cloud-worker scope.
+
+
+## Task 080E2428 follow-up (2026-10-20)
+
+Tags: #matching #dog #scene-actor #register-pinning
+
+The claimed six-function task already contained three exact C implementations
+and three guarded drafts. Task code is now 29.30% exact, a gain of 8.38
+percentage points across the 9,160-byte reviewed task extent. Newly recovered
+code is 768 bytes (0.0318 percentage points of total code), all in the
+Register-pinned category. Reverified existing C does not earn new coverage.
+
+- **080E25FC drafted 83.5%**, `Dog_ChooseReactionBehavior`, reviewed extent
+  4,500 bytes, candidate 4,472 bytes. Improved the retained 83.0% draft by
+  keeping the RNG table in a local pointer inside the recovery-turn inline
+  and passing the group flag-clear mask through an inline. Realigned
+  differences fell from 426 / 162 ignoring registers to 386 / 148.
+  Motion-mask signedness, width, operand order and outer declaration-order
+  variants did not improve it. Explicitly passing a shared motion-flags
+  pointer reduced some structural differences but regressed the retained
+  similarity and allocation; rejected. Remaining issues include the common
+  motion-flag address lifetime, repeated recovery/turn allocation, and reset
+  address reuse. Default INCLUDE_ASM retained.
+- **080E4B34 drafted 87.7%**, `Dog_BeginDelayedRouteRecovery`, reviewed extent
+  1,976 bytes, candidate 1,960 bytes. The same local random-table pointer and
+  group flag-clear inline improved 82.1% to 87.7%, with 131 realigned
+  differences / 40 ignoring registers (formerly 195 / 46). Outer pointer
+  barriers and a group register pin regressed; rejected. Signed group
+  bitfields and an extra recovery-mask accessor also did not help. Remaining
+  differences include the outer/inner group lifetimes, recovery-packet
+  save/reset ordering, RNG allocation and stack target-pointer retention.
+  Default INCLUDE_ASM retained.
+- **080E4834 matched**, `Dog_ResumeRoute`, all 768 bytes. Improved the 84.7%
+  draft by returning the updated motion flags as a 32-bit value from a local
+  inline, testing its chase bit, declaring group before context, and loading
+  group/movement masks through explicit locals or an inline. This reached
+  98.7% with six differing instructions. The final insertion and chase test
+  needed the two zero-reset values live before the OR: two local register
+  pins (r4/r5) and an empty input-only value barrier close the match. A u8
+  zero local added a redundant reset; u16/u32 reset locals match. depin.py
+  removed the unnecessary r1 pin and two barriers, leaving three necessary
+  hints. Unit is marked MATCHING_CONCESSION: register-pinning. No handwritten
+  instructions. Full-extent exact check passed after formatting and depinning.
+- **080E4468 already matched**, `Dog_ChasePlayer`; verified all 972 bytes,
+  added the required local address alias. Its player-zero range test, bite
+  animation frames and chase/route transition support the existing name.
+- **080E2428 already matched**, `SceneActorControl_CompleteBlinkOut`;
+  verified all 468 bytes, added the required local address alias. Blink
+  completion invokes scripts/event updates and hides drawable/shadow.
+- **080E52EC already matched**, `Dog_UpdateProbeApproach`; verified all
+  476 bytes, added the required local address alias. Existing actor value
+  barrier remains necessary under depin.py and the unit retains its
+  register-pinning concession marker. Probe events gate turn/acceleration
+  transitions and the context flags at +0x678.
+
+All six keep the existing provisional names from symbols/functions.csv with
+file-local sub-address aliases. Draft scores were recorded with
+check.py --nonmatching --record over reviewed full extents. Sources were
+formatted with the pinned clang-format directly because the task forbids make.
+Each source was committed separately through build/commit.sh. No full build,
+network access, shared documentation edits or direct Git mutation was used;
+combined ROM validation remains the integrator's responsibility.
