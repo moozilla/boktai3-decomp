@@ -603,3 +603,16 @@ its exact-match prerequisite means it skipped these nonmatching drafts. No
 make/full build, network, push, PR, generated assembly or ROM changes. Ghidra
 export gen/ghidra/decomp.c is absent. Only qualifying drafts and these notes
 are committed; lower-scoring scratch sources stay outside production src/.
+
+## Task 08141C40 — 2026-10-20
+
+Tags: #matching #player #movement #resource
+
+- 08141C40: drafted 99.9%, `Player_EmitMovementEffects`. One differing byte: the initial null-player branch targets 08141C90 rather than ROM 08141CFC. Remaining instructions are identical. Pinned the position pointer to r4; pinning the player pointer instead made code worse. Boolean global-flag accessor must return u8 and take its mask through an inline to preserve explicit boolean materialization and constant ordering. Called by normal movement and the timed resource dash.
+- 08141FA0: matched, tentative `Player_UpdateResourceDash`. State entry spends shared resource or accepts actionFlags bit 0x20, derives capped movement speed and inverse duration, then updates directional movement. Tiny mask/store inlines recover load ordering and address/value evaluation order without pinning.
+- 08142194: existing draft improved from 91.6% to 92.9%, tentative `Player_UpdateObjectPush`. Direction-three effect-position adjustment needs explicit `a.y += 0` and `a.z += 0`: packed-vector bitfields retain the ROM's word writes even though values do not change. Remaining realigned differences: 84 instructions, 33 ignoring registers. Extra high register, status-test ordering, terrain flag narrowing, and stack-vector register choices remain. Ghidra export unavailable locally.
+- 08142AA0: matched, tentative `Player_UpdateObjectPushRecovery`. Three phases set diagonal retreat velocity, retry neighboring-object pushing, and return to the parent action. No register pinning.
+- 08142CC0: matched, `Player_UpdateFlaggedResourceRecovery`. Five phases animate entry, sustain recovery, pause while ineligible, and exit when input is released. Calls flagged resource eligibility and near-particle emission. A pinned zero in r5 must be assigned after materializing the duration-field pointer and before writing 30.
+- 08142FC4: matched, `Player_UpdateUnflaggedResourceRecovery`. Sibling uses unflagged eligibility and far particles, plus a triangular pulse duration across a 0..64 timer. Cache the pulse counter once and pass its value to an inline that computes the destination internally. Pinned zero in r5 at the timer increment/store boundary.
+
+All acceptance checks used tools/check.py only; no full build or network operations. Register-pinning concessions are marked in affected units. Each match/draft is submitted separately through build/commit.sh. Drafts remain behind NONMATCHING with assembly defaults.
