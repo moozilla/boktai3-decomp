@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Password_InitializeEntryMenu sub_081E013C
 extern u32 gUnk_02000358[];
 extern u8 gUnk_03004FC0[];
 void AnimPanel_LoadSelections(u8 *);
@@ -16,31 +17,30 @@ u32 Password_InitializeEntryMenu(u8 *s)
 {
     u32 *flags = (u32 *)(s + 0x34C);
     u32 zero;
-    register u32 size asm("r4");
+    u32 size;
     u32 one;
     u32 value;
     void *p, *a;
     void *q;
-    register u8 *obj asm("r4");
+    u8 *obj;
     register u8 *first asm("r5");
     u32 bank;
-    register s32 offA asm("r1");
-    register s32 offB asm("r2");
-    register u32 *oneptr asm("r1");
+    s32 offA;
+    s32 offB;
+    u32 *oneptr;
     u32 *ptr;
-    register u32 *initial asm("r0");
-    register u16 *halfA asm("r1");
+    u32 *initial;
+    u16 *halfA;
     u16 *halfB;
     u16 bitsA;
     u16 bitsB;
-    register u8 *temp asm("r0");
+    u8 *temp;
     *flags = (zero = 0);
     offA = 0x348;
     *(u32 *)(s + offA) = zero;
     offB = 0x350;
     *(u32 *)(s + offB) = zero;
     offA += 0x10;
-    asm("" : "+r"(offA));
     temp = s + offA;
     *(u16 *)temp = zero;
     offB += 0xA;
@@ -97,7 +97,7 @@ u32 Password_InitializeEntryMenu(u8 *s)
     *halfA = bitsA;
     halfA = (u16 *)(s + 0x162);
     {
-        register u32 palette asm("r0") = 0xE002;
+        u32 palette = 0xE002;
         *halfA = palette;
     }
     p = ScriptProc_Start(bank, 0x530D);
