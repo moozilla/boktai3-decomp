@@ -53,5 +53,5 @@ void Player_UpdateCameraOffset(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814159C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateCameraOffset);
 #endif
