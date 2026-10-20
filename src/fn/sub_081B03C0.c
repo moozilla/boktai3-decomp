@@ -239,5 +239,5 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdatePlayerCapture);
+INCLUDE_ASM("asm/nonmatching", sub_081B03C0);
 #endif
