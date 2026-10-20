@@ -13,7 +13,6 @@ struct ActorMarkerEffectPosition {
 extern const u16 gUnk_0824E6F8[][4];
 extern u8 gUnk_0824E768[];
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-#define ActorMarker_EmitRingEffects sub_08181300
 void ActorMarker_EmitRingEffects(struct ActorMarker *p)
 {
     s32 row = 0;
@@ -44,5 +43,5 @@ void ActorMarker_EmitRingEffects(struct ActorMarker *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08181300);
+INCLUDE_ASM("asm/nonmatching", ActorMarker_EmitRingEffects);
 #endif

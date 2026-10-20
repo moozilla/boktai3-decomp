@@ -4,7 +4,6 @@ s32 Script_ParseStringRef(u32);
 const u8 *Text_LookupString(s32);
 void Menu_EraseRect(s32, s32, s32, s32);
 void Menu_DrawText(s32, s32, u8 *);
-#define Password_BuildLabels sub_081DFA50
 struct PwLabels {
     u8 pad[0x370];
     u8 b0[0x100], b1[0x100], b2[0x100], b3[0x100];

@@ -14,7 +14,7 @@ void AnimPanel_HandleClockInput(void *);
 void SunClock_SetDateTime(s32, s32, s32, s32, s32, s32, s32);
 void Time_CalculateSunriseSunset(s32, s32, s32);
 void Menu_StartFadeOut(s32);
-void sub_081DE780(void *);
+void Password_UpdateCursorPanel(void *);
 void Palette_UpdateHighlightPulse(void *, void *);
 void MenuSprites_SetFlagBits(void *);
 void Script_Call(u32, void *);
@@ -53,7 +53,7 @@ void Time_UpdateDateMenu(struct DateMenu *p)
                 p->state = 1;
                 p->result = 1;
             }
-            sub_081DE780(p);
+            Password_UpdateCursorPanel(p);
             Palette_UpdateHighlightPulse((u8 *)p + 0x734, (u8 *)p + 0x73C);
             break;
         case 1:

@@ -9,7 +9,7 @@ struct AnimPanel {
     s32 selections[24];
 };
 void sub_081DFB18(struct AnimPanel *, s32);
-void sub_081DFA50(struct AnimPanel *);
+void Password_BuildLabels(struct AnimPanel *);
 s32 AnimPanel_AppendSelection(struct AnimPanel *p)
 {
     s32 full;
@@ -24,6 +24,6 @@ s32 AnimPanel_AppendSelection(struct AnimPanel *p)
         full = 1;
     }
     sub_081DFB18(p, index);
-    sub_081DFA50(p);
+    Password_BuildLabels(p);
     return full;
 }

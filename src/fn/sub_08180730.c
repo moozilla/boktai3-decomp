@@ -27,7 +27,6 @@ static inline s32 scaleOffset(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
-#define ProximityVolume_Update sub_08180730
 void ProximityVolume_Update(struct ProximityVolume *p0)
 {
     register struct ProximityVolume *p asm("r5") = p0;
