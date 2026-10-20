@@ -5806,6 +5806,7 @@ addr,name,mode,confidence,source,notes
 08180FE0,SceneCombatActor_SpawnBouncingParticle,thumb,low,src-alias,
 08181134,ActorMarker_InitOffsetPosition,thumb,low,src-alias,
 081811F0,ActorMarker_InitMovingSprite,thumb,low,src-alias,
+08181300,ActorMarker_EmitRingEffects,thumb,low,src-alias,
 081813F8,ActorMarker_EmitIndexedEffect,thumb,low,src-alias,
 081814C0,Armor_SpawnRandomDirectionalParticle,thumb,low,src-alias,Selects one of ten directional particle offsets using the shared random sequence
 081814F8,Armor_SpawnDirectionalParticleFan,thumb,low,src-alias,Spawns particles at directional offsets zero through eight
@@ -5881,6 +5882,7 @@ addr,name,mode,confidence,source,notes
 08183CAC,ActorController_UpdateLayeredMid,thumb,low,src-alias,
 08183D9C,ActorController_UpdateLayeredEnd,thumb,low,src-alias,
 08183E4C,ArmorActor_UpdateFixedSpeedMotion,thumb,low,src-alias,
+0818400C,ActorController_UpdateLayeredMidNoSound,thumb,low,src-alias,
 081842B0,Armor_UpdateDefeatSequence,thumb,low,src-alias,
 08184430,ActorController_UpdateBreakApartTransition,thumb,low,src-alias,
 081846F4,ActorController_UpdateChargeAttackTransition,thumb,low,src-alias,
@@ -7410,6 +7412,8 @@ addr,name,mode,confidence,source,notes
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
 081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
+081DE6C4,Password_LoadDate,thumb,low,src-alias,
+081DE780,Password_UpdateCursorPanel,thumb,low,src-alias,
 081DE84C,AnimPanel_UpdateDigits,thumb,low,src-alias,
 081DEA60,AnimPanel_HandleClockInput,thumb,low,src-alias,
 081DEC2C,Time_UpdateDateMenu,thumb,low,src-alias,
@@ -7422,7 +7426,10 @@ addr,name,mode,confidence,source,notes
 081DF160,AnimPanel_ResetSelections,thumb,low,src-alias,
 081DF1A0,AnimPanel_JoinTextRows,thumb,low,src-alias,
 081DF32C,Password_MoveCursorUp,thumb,low,src-alias,Moves the password keyboard selection upward with wrapping and cursor feedback
+081DF510,Password_MoveCursorDown,thumb,low,src-alias,
 081DF694,Password_MoveCursorLeft,thumb,low,src-alias,Moves the password keyboard selection left with special edge wrapping
+081DF878,Password_MoveCursorRight,thumb,low,src-alias,
+081DFA50,Password_BuildLabels,thumb,low,src-alias,
 081DFC1C,AnimPanel_AppendSelection,thumb,low,src-alias,
 081DFC60,AnimPanel_EraseSelection,thumb,low,src-alias,
 081DFCB4,Password_UpdateEntryMenu,thumb,low,src-alias,

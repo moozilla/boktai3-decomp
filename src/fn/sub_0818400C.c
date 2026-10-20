@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#define gActorLayeredMidAnimations              gUnk_0824EE10
-#define ActorController_UpdateLayeredMidNoSound sub_0818400C
+#define gActorLayeredMidAnimations gUnk_0824EE10
 #include "global.h"
 struct ActorAnimationLayer {
     u16 unknown[3];

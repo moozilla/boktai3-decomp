@@ -11,7 +11,7 @@ void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void sub_081DF1D8(u8 *);
-void sub_081DFA50(u8 *);
+void Password_BuildLabels(u8 *);
 u32 Password_InitializeEntryMenu(u8 *s)
 {
     u32 *flags = (u32 *)(s + 0x34C);
@@ -127,6 +127,6 @@ u32 Password_InitializeEntryMenu(u8 *s)
     *(u32 *)(s + 0x36C) = zero;
     Menu_StartFadeIn(0);
     sub_081DF1D8(s);
-    sub_081DFA50(s);
+    Password_BuildLabels(s);
     return 0;
 }

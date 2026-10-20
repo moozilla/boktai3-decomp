@@ -14,14 +14,14 @@ extern u16 gUnk_03005260[];
 extern u32 gUnk_02000358[];
 extern u8 *gUnk_02000710, *gUnk_030053F8;
 void Password_MoveCursorUp(void *);
-void sub_081DF510(void *);
-void sub_081DF878(void *);
+void Password_MoveCursorDown(void *);
+void Password_MoveCursorRight(void *);
 void Password_MoveCursorLeft(void *);
 void Sound_PlaySong(s32);
 s32 AnimPanel_AppendSelection(void *);
 s32 AnimPanel_EraseSelection(void *);
 void sub_081DF1D8(void *);
-void sub_081DFA50(void *);
+void Password_BuildLabels(void *);
 void sub_081DFB9C(void *);
 void Menu_StartFadeOut(s32);
 void Palette_UpdateHighlightPulse(void *, void *);
@@ -61,10 +61,10 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
                 Password_MoveCursorUp(p);
             if ((gUnk_03005260[1] & 0x80) ||
                 (Mod(p->verticalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x80)))
-                sub_081DF510(p);
+                Password_MoveCursorDown(p);
             if ((gUnk_03005260[1] & 0x10) ||
                 (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x10)))
-                sub_081DF878(p);
+                Password_MoveCursorRight(p);
             if ((gUnk_03005260[1] & 0x20) ||
                 (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x20)))
                 Password_MoveCursorLeft(p);
@@ -108,7 +108,7 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
             Palette_UpdateHighlightPulse((u8 *)p + 0x810, (u8 *)p + 0x819);
             break;
         case 1:
-            sub_081DFA50(p);
+            Password_BuildLabels(p);
             AnimPanel_JoinTextRows((u8 *)p + 0x370, text);
             a = gUnk_02000358[1];
             b = gUnk_02000358[2];

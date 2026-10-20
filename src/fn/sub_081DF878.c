@@ -1,7 +1,6 @@
 #include "global.h"
 void sub_081DF1D8(void *);
 void Sound_PlaySong(s32);
-#define Password_MoveCursorRight sub_081DF878
 void Password_MoveCursorRight(u8 *p)
 {
     switch (*(u32 *)(p + 0x34c)) {

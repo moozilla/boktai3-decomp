@@ -3,7 +3,6 @@ struct Rect16 {
     s16 x, y, z, w;
 };
 void Menu_SetTextRect(void *, void *);
-#define Password_UpdateCursorPanel sub_081DE780
 void Password_UpdateCursorPanel(u8 *p)
 {
     struct Rect16 r;

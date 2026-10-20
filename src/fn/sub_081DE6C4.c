@@ -2,7 +2,6 @@
 s32 SunClock_GetPackedDate(void);
 s32 SunClock_GetBaseHour(void);
 s32 SunClock_GetBaseMinute(void);
-#define Password_LoadDate sub_081DE6C4
 void Password_LoadDate(u8 *p)
 {
     s32 v, t;
