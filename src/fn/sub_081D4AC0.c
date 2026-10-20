@@ -18,12 +18,12 @@ extern const struct BestiaryConfig gUnk_086126E0[];
 extern const s16 gUnk_086149C4[];
 void DisplayAnimation_SetFlags(void *, u32);
 void DisplayAnimation_ClearFlags(void *, u32);
-void sub_081D4A34(void *);
+void PaletteTransition_Restart(void *);
 void Callback_InvokeActor(void *, void *);
 void Dir_Decompose(s32, u8 *, u8 *, u32);
 void DisplayAnimation_SetEntry(void *, u32, u32, u32, u32, u32, u32);
 void DisplayAnimation_UpdatePlayback(void *);
-void sub_081D4990(void *, s32);
+void DisplayEntry_SetAnim(void *, s32);
 static inline s32 Scale(s32 n, s32 bits)
 {
     if (n >= 0)
@@ -60,7 +60,7 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
             *(u32 *)(p + 0x18) = zero;
             *(u32 *)(p + 0x20) = zero;
             p[0x24] = zero;
-            sub_081D4A34(p);
+            PaletteTransition_Restart(p);
         }
     }
     if (config->callback)
@@ -85,7 +85,7 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
         *(u32 *)(p + 0x9a4) |= 1;
     else {
         *(u32 *)(p + 0x9a4) &= ~1;
-        sub_081D4990(p, config->overlay);
+        DisplayEntry_SetAnim(p, config->overlay);
     }
     p[0xa03] = 0;
 }
