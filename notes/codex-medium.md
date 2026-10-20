@@ -1362,3 +1362,108 @@ left the old fuzzy comment unchanged. Re-recorded all scores successfully with
 --nonmatching --record after formatting. depin.py --write was invoked on all four
 units; it skips guarded drafts because their default build is not an exact C
 match. No handwritten instruction bodies were introduced.
+
+
+## 2026-10-20 — cloud task 080AD75C, Vorn reaction and route callbacks
+
+Tags: #matching #vorn #scene-actor #terrain #nonmatching #register-pinning
+
+Worked solo and offline on preclaimed cloud/080AD75C. No exact matches:
+exact code progress gain is 0.000 percentage points (0% of the assignment).
+Improved one existing draft, added three new guarded drafts, and retained the
+existing defeat draft with its required file-local alias. Each unit was queued
+separately through build/commit.sh. Used check.py for acceptance, never make or
+a full ROM build, and made no network or direct git mutations. No shared headers,
+generated assembly, ROM, shared documentation, or symbol tables were edited.
+
+Family evidence: neighbours are named Vorn; the initializer near 080B4E18
+installs 080AD75C, 080AE1C4, 080AE6F0, 080AEB74 and 080AEE08. Read their assembly,
+the earlier codex-high task notes, and the relevant callees and exact relatives.
+The Ghidra export is unavailable. Names remain tentative, with confidence=low.
+
+- **080ADCC0 — drafted 98.9%, Vorn_UpdatePursuitDistance**, improved from
+  85.7%. Full reviewed extent 1120 bytes, candidate 1120; six differing
+  instructions/bytes and zero structural differences in anchordiff. Removing
+  the context r7 pin, expanding centre construction at its two call sites,
+  and removing the centre-pointer pin fixed the extra address materializations.
+  A predicate returning the tested flags pointer through an output parameter
+  reproduces the original load/and/high-register-copy ordering. Pinning the
+  Div result z to sb swaps z and the saved flags pointer into their original
+  high registers. Only this pin remains in the unit. The remaining six
+  differences are three pairs of low-register choices in the middle-distance
+  path: context flags offset at 080ADF56/58, timer offset at 080ADF88/8A,
+  and map-global address at 080ADFE4/E6. Scoped offset/map pins, near/value
+  widths, adjacent declaration swaps, and delayed centre pointer variants
+  did not improve it. Function-scope variable variants need C89 declaration
+  placement fixed before they can be usefully tested; those syntax failures
+  were discarded. The permuter setup failed before a search because split.py
+  cannot resolve unrelated Ghoul_ResumePendingRoute (0808CC48) against the
+  checkout's generated function starts; no rebuild was attempted.
+- **080AD75C — stopped below threshold, 77.2%**, tentative
+  Vorn_UpdateStaggerRecovery in ignored wip/sub_080AD75C.c. Reviewed extent is
+  1076 bytes, through the final literal at 080ADB8C, ending at 080ADB90;
+  candidate 1080. Final comparison: 143 differing instructions / 38 ignoring
+  registers. Entry selects animation three, plays 0x1CB and 0x12A for motion
+  flag eight, clears the completion latch; subsequent frames mark flags,
+  emit a spark every twelve frames, and converge saved X/Z motion by signed
+  quarter differences clamped to +/-200. At rest and completion, it chooses
+  a delayed stagger control, context recovery, or player pursuit and saved
+  route control. Exact 08082D80 and 0808148C supplied the convergence and spark
+  idioms. Explicit action-flags and motion-flags pointers improved the baseline
+  from 65.0%; high-register pins and predicate/lifetime variants regressed or
+  stalled. Remaining work is flags/route address reuse, stack-vector lifetimes,
+  register choices, and late state/control scheduling. No src draft committed.
+- **080AE1C4 — drafted 82.1%, Vorn_UpdateKnockbackRecovery**. Reviewed
+  extent 1056, candidate 1052; 118 differing instructions / 40 structural.
+  Entry rounds direction, selects animation six, requests attachment category
+  25 once, resets reaction/collision flags and broadcasts a message. Each frame
+  writes 65 at actor+0x1EA (not +0x2EA), uses a signed timer at +0xAA for blink
+  scheduling, then applies the same quarter-step convergence. At rest with a
+  nonpositive timer it installs group+0x20C control kind eight, restarts the
+  route, adjusts collider flag 0x100, and optionally enables motion flag eight.
+  Correcting the +0x1EA store and 0x02000000 flag constant, expressing heading
+  division with the signed conditional idiom, caching the initial mask two,
+  and passing the existing motion-flags pointer through ClearMotion brought
+  this above threshold. Actor/prior-pointer pins and alternate control-address
+  forms regressed; none retained. Reset-address lifetimes, collision scheduling,
+  and saved registers remain unresolved. This new unit has no register pins.
+- **080AE6F0 — drafted 83.9%, Vorn_ResumeReactionRoute**. Reviewed extent
+  592, candidate 600; 55 differing instructions / 23 structural. On entry
+  turns back and selects animation zero. Flags2D0 bit 0x10 gates route resume;
+  it clears bit four, sends a message, clears context flags, then runs script
+  0824E20C/0x39F or restores group+0x210 control kind 15 and state 3/phase 1.
+  Computing flags2D0 after the prepared-entry animation, using full-width signed
+  masks for halfword clears, passing the retained motion-flags pointer into
+  reset helpers, and pinning the long-lived flags2D0 pointer to r8 improved
+  the first 64.0% candidate. The r8 pin is safe across the external calls.
+  Saved-zero, result-local and explicit control-store variants regressed.
+  Context flag scheduling, saved zero and address lifetimes still differ.
+- **080AEB74 — drafted 80.2%, Vorn_TryRestorePatrolRoute**. Reviewed
+  extent 660, candidate 664; 68 differing instructions / 34 structural.
+  Requires flags2CC bits 0x400000 and 0x200000 and motion flag one. Saves a
+  30-frame command for savedTarget/kind nine, samples the saved patrol point's
+  terrain height, marks the destination ready, resets collision/context timers,
+  sends a message, and returns one. A narrow local route view with a points
+  pointer at +8 reproduces the original +0x74/+8 accesses. Chase_Height's
+  repeated terrain-byte expression matches better than a cached-byte helper.
+  A volatile local savedMotion pointer retains the observed stack slot across
+  calls; it is initialized on the successful guard path before every use.
+  It is currently stored after that guard, whereas the original spills during
+  the predicate. Low-register pointer pins across terrain calls were rejected
+  as unsuitable; no pins remain in this unit. Destination spill, flags-address
+  reuse and reset scheduling remain unresolved.
+- **080AEE08 — retained 83.4%, Vorn_UpdateDefeat**. Reviewed extent and
+  candidate both 984; 84 differing instructions / nine structural. Added the
+  required file-local alias and raw sub_080AEE08 fallback spelling, then recorded
+  the score again. Tested RNG table/index forms, removal of RNG-result/table
+  pins, and a separately evaluated last spark count. None improved the best
+  structural comparison, so retained the previous body unchanged. The remaining
+  differences include low-register allocation, a copied first RNG table base,
+  and late state/control constant reuse. The existing pinning marker remains.
+
+All five retained units compile as NONMATCHING, keep INCLUDE_ASM as their default,
+and have checker-recorded scores after direct clang-format. No handwritten
+instruction bodies or instrumented-compiler settings were introduced. The
+worker leaves combined ROM validation and any integration/name promotion to
+the integrator. Helpers passing existing field pointers often preserve the
+original address lifetimes better than helpers recomputing them from the actor.
