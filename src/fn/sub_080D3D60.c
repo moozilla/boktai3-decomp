@@ -1,5 +1,7 @@
 #include "global.h"
 
+#define Mummy_UpdatePlayerRoute sub_080D3D60
+
 #ifdef NONMATCHING
 // fuzzy: 82.4%
 #include "scene_actor_chase.h"
@@ -176,5 +178,5 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D3D60);
 #endif

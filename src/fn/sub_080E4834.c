@@ -1,14 +1,15 @@
+#define Dog_ResumeRoute sub_080E4834
 #include "scene_actor_chase.h"
 // confidence=low: resumes group chase or the saved route after arrival.
 #ifdef NONMATCHING
-// fuzzy: 82.3%
+// fuzzy: 84.7%
 // Remaining differences: helper expansion, register allocation and literal placement.
 void sub_080E04D0(void);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
     u8 *context = a->context;
+    u8 *group = (u8 *)&a->group;
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, sub_080E04D0, 10);
     if ((u8)Callback_InvokeActor(a, a->update270))
@@ -40,5 +41,5 @@ void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Dog_ResumeRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080E4834);
 #endif
