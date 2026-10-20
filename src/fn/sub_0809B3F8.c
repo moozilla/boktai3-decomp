@@ -1,5 +1,8 @@
 #include "global.h"
 
+// confidence=low: follows the existing Lun movement callback interpretation.
+#define Lun_TurnTowardSavedDirection sub_0809B3F8
+
 #ifdef NONMATCHING
 // fuzzy: 82.8%
 // Remaining differences: instruction ordering and register allocation.
@@ -131,5 +134,5 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
+INCLUDE_ASM("asm/nonmatching", sub_0809B3F8);
 #endif
