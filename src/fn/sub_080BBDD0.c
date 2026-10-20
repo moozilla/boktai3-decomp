@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 87.1%
 #define Skeleton_ConvergeDisplacedPosition                                                         \
-    sub_080BBDD0 // confidence=low: installed by Skeleton_Create; converges saved displacement before route/chase recovery
+    sub_080BBDD0 // confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
 // Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
 // fuzzy: 79.9% (agent draft, paused; see notes/cloud-08122DF4.md)
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
