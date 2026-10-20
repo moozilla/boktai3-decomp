@@ -20,6 +20,7 @@ EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
 LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
 SUBSYSTEMS = Path(ROOT) / "symbols/progress_subsystems.csv"
 AREAS = Path(ROOT) / "symbols/progress_areas.csv"
+CATEGORIES = Path(ROOT) / "symbols/progress_categories.csv"
 ASM = Path(ROOT) / "symbols/progress_asm.csv"
 ASM_SUFFIX = " (assembly)"
 
@@ -64,7 +65,7 @@ def load_groups(funcs, sizes, path, prefix):
             if not row["evidence"]:
                 raise ValueError(f"{row['name']}: missing group evidence")
             libraries.append({"name": row["name"], "start": start, "end": end,
-                              "names": names, "prefix": prefix})
+                              "names": names, "prefix": prefix, "category": row.get("category") or ""})
     return libraries
 
 
@@ -80,6 +81,36 @@ def load_areas(path=AREAS):
             rx = re.compile(row["name_regex"]) if row["name_regex"] else None
             areas.setdefault(row["id"], (row["name"], []))[1].append((rng, rx))
     return areas
+
+
+def load_categories(path=CATEGORIES):
+    """Top-level subsystems, in display order, as {id: (label, [(start, end, regex)])}.
+    A game unit takes the category of its progress_subsystems.csv row, else the
+    first rule (in file order) whose name regex matches, within the rule's address
+    range if it has one, else the first address-only rule containing its start."""
+    with Path(path).open(newline="") as f:
+        rows = list(csv.DictReader(f))
+    categories = {}
+    for row in rows:
+        rng = (int(row["start"], 16), int(row["end"], 16)) if row["start"] else None
+        rx = re.compile(row["name_regex"]) if row["name_regex"] else None
+        categories.setdefault(row["id"], (row["name"], []))[1].append((rng, rx))
+    return categories
+
+
+def category_of(categories, group):
+    if group.get("category"):
+        if group["category"] not in categories:
+            raise ValueError(f"{group['name']}: unknown category {group['category']}")
+        return group["category"]
+    # Name rules first, in file order, then address-only rules.
+    for named in (True, False):
+        for cid, (_, rules) in categories.items():
+            for rng, rx in rules:
+                if bool(rx) == named and (not rx or rx.search(group["name"])) and (
+                        not rng or rng[0] <= group["start"] < rng[1]):
+                    return cid
+    raise ValueError(f"{group['name']}: no category rule matches")
 
 
 def load_asm_ranges(path=ASM):
@@ -107,7 +138,7 @@ def unit_areas(areas, unit_name, address):
     if unit_name.endswith(ASM_SUFFIX):
         if "intentional_asm" not in ids:
             ids.append("intentional_asm")
-    elif unit_name.startswith("libraries/"):
+    elif unit_name.lower().startswith("libraries/"):
         ids.append("libraries")
     return ids
 
@@ -239,7 +270,11 @@ def collect_fuzzy(funcs, source_root):
     return fuzzy
 
 
-def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None, asm_ranges=()):
+def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None,
+                asm_ranges=(), categories=None):
+    """objdiff v2 report. With categories, every unit is named Category/Unit, belongs
+    to one top-level category, and units are listed category by category, so
+    decomp.dev's treemap shows each category as one region."""
     fuzzy = fuzzy or {}
     areas = areas or {}
     score = lambda n: 100 if n in done else fuzzy.get(n, 0)
@@ -247,31 +282,43 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
     for left, right in zip(libraries, libraries[1:]):
         if left["end"] > right["start"]:
             raise ValueError("report groups overlap")
+    order = {cid: k for k, cid in enumerate(categories or ())}
     units = []
     grouped = {}
     for n, a in funcs:
         library = next((lib for lib in libraries if lib["start"] <= a < lib["end"]), None)
-        unit_name = f"{library.get('prefix', 'libraries')}/{library['name']}" if library else f"functions/{a:08X}"
-        category = "register_pinned" if n in pinned else "no_register_pinning"
+        top = None
+        if categories:
+            prefix = library.get("prefix", "libraries") if library else None
+            top = "libraries" if prefix == "libraries" else category_of(
+                categories, library or {"name": f"{a:08X}", "start": a})
+            unit_name = f"{categories[top][0]}/{library['name'] if library else f'{a:08X}'}"
+        else:
+            unit_name = f"{library.get('prefix', 'libraries')}/{library['name']}" if library else f"functions/{a:08X}"
         if library and n not in done and any(lo <= a < hi for lo, hi in asm_ranges):
             unit_name += ASM_SUFFIX
-        if library and n in pinned:
-            unit_name += "/register-pinned"
         if unit_name not in grouped:
-            unit = {"name": unit_name, "functions": [], "metadata": {"progress_categories": [category]},
-                    "_first": a}
+            unit = {"name": unit_name, "functions": [], "metadata": {"progress_categories": []},
+                    "_first": a, "_top": top}
             units.append(unit)
             grouped[unit_name] = unit
-        matched = n in done
-        grouped[unit_name]["functions"].append({
+        unit = grouped[unit_name]
+        category = "register_pinned" if n in pinned else "no_register_pinning"
+        if category not in unit["metadata"]["progress_categories"]:
+            unit["metadata"]["progress_categories"].append(category)
+        unit["functions"].append({
             "name": library["names"].get(a, n) if library else n,
             "size": str(sizes[n]), "fuzzy_match_percent": score(n),
             "address": str(a - (library["start"] if library else a)),
             "metadata": {"virtual_address": str(a)}})
     for unit in units:
-        unit["metadata"]["progress_categories"] += unit_areas(areas, unit["name"], unit.pop("_first"))
-        if "intentional_asm" in areas and "intentional_asm" not in unit["metadata"]["progress_categories"]:
-            unit["metadata"]["progress_categories"].append("decompilable")
+        cats = unit["metadata"]["progress_categories"]
+        top = unit.pop("_top")
+        if top and not unit["name"].endswith(ASM_SUFFIX):
+            cats.append(top)
+        cats += [c for c in unit_areas(areas, unit["name"], unit["_first"]) if c not in cats]
+        if "intentional_asm" in areas and "intentional_asm" not in cats:
+            cats.append("decompilable")
         items = unit["functions"]
         total_b = sum(int(item["size"]) for item in items)
         matched_items = [item for item in items if item["fuzzy_match_percent"] == 100]
@@ -281,20 +328,27 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         unit["measures"] = measures(total_b, done_b, len(items), len(matched_items),
                                    units=1, complete_units=int(complete), fuzzy_b=fuzzy_b)
         unit["metadata"]["complete"] = complete
-    categories = []
+    if categories:
+        units.sort(key=lambda u: (min((order[c] for c in u["metadata"]["progress_categories"] if c in order),
+                                      default=len(order)), u["_first"]))
+    for unit in units:
+        unit.pop("_first")
+    categories_out = []
     for cid, label in [("no_register_pinning", "No register pinning"), ("register_pinned", "Register-pinned")]:
         members = [n for n, _ in funcs if (n in pinned) == (cid == "register_pinned")]
         if not members:
             continue
         matched = [n for n in members if n in done]
         selected = [u for u in units if cid in u["metadata"]["progress_categories"]]
-        categories.append({"id": cid, "name": label, "measures": measures(
+        categories_out.append({"id": cid, "name": label, "measures": measures(
             sum(sizes[n] for n in members), sum(sizes[n] for n in matched),
             len(members), len(matched), units=len(selected),
             complete_units=sum(u["metadata"]["complete"] for u in selected),
             fuzzy_b=sum(sizes[n] * score(n) / 100 for n in members))})
-    labels = {**{a: l for a, (l, _) in areas.items()}, "libraries": "Libraries",
-              "decompilable": "Decompilable code (excludes intentional assembly)"}
+    labels = {**{c: l for c, (l, _) in (categories or {}).items()},
+              **{a: l for a, (l, _) in areas.items() if a not in (categories or {})}}
+    labels.setdefault("libraries", "Libraries")
+    labels["decompilable"] = "Decompilable code (excludes intentional assembly)"
     for cid, label in labels.items():
         selected = [u for u in units if cid in u["metadata"]["progress_categories"]]
         if not selected:
@@ -302,11 +356,11 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         total_b = sum(int(u["measures"]["total_code"]) for u in selected)
         done_b = sum(int(u["measures"]["matched_code"]) for u in selected)
         count = sum(u["measures"]["total_functions"] for u in selected)
-        categories.append({"id": cid, "name": label, "measures": measures(
+        categories_out.append({"id": cid, "name": label, "measures": measures(
             total_b, done_b, count, sum(u["measures"]["matched_functions"] for u in selected),
             units=len(selected), complete_units=sum(u["metadata"]["complete"] for u in selected),
             fuzzy_b=sum(u["measures"]["fuzzy_match_percent"] * int(u["measures"]["total_code"]) / 100 for u in selected))})
-    return {"version": 2, "categories": categories, "measures": measures(sum(sizes.values()),
+    return {"version": 2, "categories": categories_out, "measures": measures(sum(sizes.values()),
             sum(sizes[n] for n in done), len(funcs), len(done), units=len(units),
             complete_units=sum(u["metadata"]["complete"] for u in units),
             fuzzy_b=sum(sizes[n] * score(n) / 100 for n, _ in funcs)), "units": units}
@@ -343,7 +397,9 @@ def main():
     if args.json:
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(), load_asm_ranges()), indent=2) + "\n")
+        report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
+                             load_asm_ranges(), load_categories())
+        Path(args.json).write_text(json.dumps(report, indent=2) + "\n")
 
 
 def bar(frac, width=30):

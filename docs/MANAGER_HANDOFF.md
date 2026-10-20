@@ -89,7 +89,7 @@ URL is recorded (`rom_url.txt`).
   * `tools/regions.py`, `tools/repair.py`, `tools/explain.py`, `tools/relatives.py`
   * `tools/rasolve.py` and `tools/translate.py` (docs/PERMUTER.md)
   * `tools/fixsearch.py` (bounded)
-* **Organization:** `tools/namer.py` (Codex naming), `tools/families.py` (ranges from name prefixes), `tools/promote_names.py`.
+* **Organization:** `tools/namer.py` (Codex naming), `tools/subsystems.py` (report units and categories from name prefixes), `tools/promote_names.py`.
 * **Infrastructure:**
   * `tools/worktree.sh`, `tools/base.sh`, `tools/clean.py`
   * `tools/loadguard.py`, `tools/codex_quota.py`

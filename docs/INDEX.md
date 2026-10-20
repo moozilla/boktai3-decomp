@@ -125,10 +125,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
-| [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 12 |
+| [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 11 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
 | [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 9 |
-| [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#progress* | 6 |
+| [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#tooling #progress* | 10 |
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
 | [docs/RFU.md](../docs/RFU.md) | RFU wireless SDK source matches | *#wireless #library* | 6 |
