@@ -1000,3 +1000,80 @@ Tags: #matching #vanargand #boss #paired-scene-actor
 - **081AFD10 — drafted 85.8% as PairedSceneActor_UpdateHalfPresentation.** Adds origin+offset+256Y, applies random radial shake, updates body/attack colliders, restores flashed palette, toggles shadow and clears completed pair bits before returning the half to state 2. Layout: position 0x1C, origin pointer 0x90, offset 0x9C, colliders 0xB4/0x108, mode 0x15C, flags 0x160, state/previousState 0x16C/0x16D, flash 0x184, shake 0x19C. agbcc rounds the three-halfword vector struct to eight bytes, so explicit padding is needed when embedding it. Mask-taking flag accessors avoid a duplicate retained flags pointer (which otherwise spills the owner into r8); full-width signed collider bitfields preserve negative masks. Marked register pins steer RNG and vector temporaries. Final reviewed-extent check: 46 realigned differences / 5 structural, candidate 644 bytes versus ROM extent 648; remaining vector operand order, reset-constant reuse, offsets and register allocation. Source's recorded 85.8% supersedes the preliminary 85.5% commit title. Default fallback checked exact.
 
 Two exact matches and two guarded drafts retained; both larger phase machines stopped as described. Each source was committed through build/commit.sh, with this notes update last. Exact sources were formatted and checked with explicit reviewed extents; draft scores were recorded with tools/check.py --nonmatching --record and fallbacks checked. No full builds, network operations, generated assembly, ROM or emulator outputs committed. Combined ROM validation and project percentage / percentage-point accounting remain for batch integration.
+
+## Task 081ABA64 (2026-10-20)
+
+Tags: #matching #vanargand #paired-scene-actor
+
+- **081ABA64 — stopped unmatched.** Inspected the largest target first with
+  asmat, condense, relatives and the prior task notes after reading
+  BIG_FUNCTIONS.md. Existing evidence still points to an eleven-phase attack
+  machine containing six packed-animation playback expansions, tracks and
+  synthetic player contact. Matched relatives cover only about 37% of its
+  instructions, chiefly playback. No sufficiently close full-function port or
+  complete candidate emerged. The local far-branch labels must stay inside the
+  parent function; they are not external callees. Left the assembly fallback.
+- **081ACC24 — matched as Vanargand_ApplyPendingDamage.** Raised the existing
+  99.1% draft to 100% exact (1196 bytes). The sole cause of its long branch and
+  extra pool alignment was a redundant empty-asm input constraint on the
+  constant-one mask immediately before setFlags. Removing that constraint
+  preserves the same allocation while allowing the short branch. Removed the
+  NONMATCHING guard and rechecked the entire previously reviewed extent before
+  committing. The unit retains its register-pinning concession marker.
+- **081B03C0 — drafted 86.2% as PairedSceneActor_UpdatePlayerCapture.** Entry
+  selects animation 12 and starts phase 0. A track moves the half offset to
+  (384,0,384); player requests use the displayed position minus 128 Y and
+  side-specific request flags. Player flag 0x40000 aborts capture into phase 3.
+  Track completion enters phase 1; after timer 120 it selects animation 9,
+  enters phase 2, applies a position request and transitions to phase 3, which
+  sets the completion byte. Phase and timer are +0x164/+0x168, with the entry
+  byte at +0x16F. Reused the playback shape from Dog_ResetActionState. Vector
+  stores through an inline s16 pointer prevent agbcc from packing local
+  halfwords into word read/modify/writes; an inline u8 predicate reproduces the
+  materialized track-completion boolean. Shared abort code and owner pinning
+  improved the draft from 70.2%. Remaining: animation allocation, call argument
+  setup, retained phase-entry pointer and transition tails (112 realigned
+  differences, 55 ignoring registers). Guarded fallback checked exact. A small
+  follow-up source commit formats the draft and uses MotionTrack_Update's
+  canonical callee name; the recorded score is unchanged.
+- **081AFD10 — improved draft to 91.8%, PairedSceneActor_UpdateHalfPresentation.**
+  Swapping the source order of the origin/offset additions matches the ROM's
+  load order (agbcc otherwise commutes them). A variants batch identified a
+  removable direction-register pin and a separately materialized +0x168 reset
+  offset; explicit +0x19C shake and +0x20C shadow-control offsets improved
+  remaining temporary choices. Final candidate has the complete 648-byte
+  extent, with 27 realigned differences / 2 ignoring registers. Remaining
+  differences are mostly scratch-register choices for member offsets, plus
+  mask/address setup order. Declaration swapping did not help further.
+  rasolve could not directly compile the guarded alias-named function, so no
+  solver result was adopted. Score recorded, fallback checked exact.
+- **081B0018 — matched as PairedSceneActor_InitializeHalf.** Complete 100% exact
+  match (388 bytes), with marked register pinning. Initializes sprite 0x89CA,
+  side/mode and origin, offsets and extents, attack/body colliders, target
+  registration and scaled shadow 0x1C1B; clears track/state/flash/shake fields.
+  Typed zero temporaries distinguish byte-zero r6 from word-zero r4; scale
+  1024 and active value 1 stay in sb/r8. Scoped member pointers reproduce
+  address-before-constant setup and let 300 reuse offset 0x176 minus 0x4A.
+  A source-pointer constraint reproduces the final CpuSet argument order.
+  Use the canonical ActorStatus_BeginTimedState callback symbol: an undeclared
+  raw-address alias resolves as an even address in the checker stub, whereas
+  the canonical Thumb callback has bit 0 set. The collider callees are
+  ActorStatus_InitializeCollider and ActorStatus_InitializeBodyCollider.
+- **081B0248 — stopped below draft threshold.** Wrote several complete tentative
+  PairedSceneActor_SpawnRadialEffects candidates. Four emissions use angle
+  48+8*i for mode zero, otherwise 255-8*i, radius 640 about the origin plus
+  256 Y, randomized angle increment 0..31 and speed 12..19, then call
+  VanargandEffect_Create with side 1-mode. The RNG samples are shifted by 3
+  before their low-bit remainder calculations. Best trial reached only 63.1%
+  (91 realigned differences / 27 structural); register-pinning trials exposed
+  stack-vector placement, inline polar allocation and RNG load/store ordering
+  differences rather than producing a draft-quality result. Latest candidate
+  remains only in ignored wip/sub_081B0248.c; no production C file committed.
+
+Two new exact matches; one new guarded draft and one improved guarded draft.
+All retained sources use descriptive file-local aliases. Both exact matches
+were checked again, and both guarded sources' default assembly paths checked
+exact. Draft scores were recorded with check.py --nonmatching --record against
+reviewed extents. All commits use build/commit.sh. No full builds, network
+operations, ROM, generated assembly or emulator dumps. Project percentage and
+percentage-point accounting remain for batch integration.
