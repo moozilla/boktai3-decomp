@@ -35,11 +35,11 @@ extern struct Camera *gUnk_020004B8;
 #define ActorMarkerPool_UpdateMarkers sub_081128F8
 s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
 {
-    register struct MarkerPool *base asm("r12") = pool;
-    register struct MarkerCursor *cursor asm("r6") = (void *)&base->slots[0].sprite;
-    register struct DisplaySequenceState *sequence asm("r9") = &base->slots[0].sequence;
+    struct MarkerPool *base = pool;
+    struct MarkerCursor *cursor = (void *)&base->slots[0].sprite;
+    struct DisplaySequenceState *sequence = &base->slots[0].sequence;
     struct ContactSwarmSprite *sprites = &cursor->sprite;
-    register struct MarkerTail *tail asm("r8") = (void *)&base->slots[0].sprite.position.y;
+    struct MarkerTail *tail = (void *)&base->slots[0].sprite.position.y;
     register s32 index asm("r10");
     s32 remaining;
     {
@@ -49,20 +49,17 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
     }
     remaining = 7;
     do {
-        register u8 *active asm("r0") = (u8 *)&base->slots[0].active;
-        asm volatile("" : "+r"(active));
+        u8 *active = (u8 *)&base->slots[0].active;
         if (*(u32 *)(active + index)) {
-            register const struct FixedPosition **anchorSlot asm("r2") = &base->slots[0].anchor;
+            const struct FixedPosition **anchorSlot = &base->slots[0].anchor;
             const struct FixedPosition *anchor;
-            register struct ContactSwarmSprite *sprite asm("r5");
-            register struct DisplaySequenceState *state asm("r3");
-            register const volatile u16 *command asm("r4");
+            struct ContactSwarmSprite *sprite;
+            struct DisplaySequenceState *state;
+            const volatile u16 *command;
             u32 duration, flags;
-            asm("" : "+r"(anchorSlot));
             anchorSlot = (void *)((u8 *)anchorSlot + index);
             {
-                register const struct FixedPosition *read asm("r0") = *anchorSlot;
-                asm("" : "+r"(read));
+                const struct FixedPosition *read = *anchorSlot;
                 anchor = read;
             }
             cursor->sprite.position.x = (anchor->x >> 12) - gUnk_020004B8->x;
@@ -70,20 +67,16 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
             cursor->sprite.position.y = ((anchor->z + anchor->y) >> 12) + 0x5c;
             sprite = sprites;
             state = sequence;
-            asm("" : "+r"(sprite), "+r"(state));
             {
-                register u32 offset asm("r0") = cursor->sequence.index << 1;
-                register const volatile u16 *table asm("r1") = cursor->sequence.commands;
-                asm("" : "+r"(offset), "+r"(table));
+                u32 offset = cursor->sequence.index << 1;
+                const volatile u16 *table = cursor->sequence.commands;
                 command = (void *)((u32)table + offset);
-                asm("" : "+r"(command));
             }
             cursor->sprite.frame = *command >> 6;
             {
-                register struct MarkerTail *read asm("r1") = tail;
-                register u32 input asm("r0") = read->flags;
+                struct MarkerTail *read = tail;
+                u32 input = read->flags;
                 u32 first = 1;
-                asm("" : "+r"(input));
                 first &= input;
                 if (first != (((*command & 0x30) >> 4) & 1))
                     cursor->sprite.flags |= 4;
@@ -94,11 +87,10 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
                 register u32 input asm("r0") = state->flags;
                 register u32 first asm("r1");
                 first = 2 & input;
-                asm("" : "+r"(first));
                 first = (u8)first;
                 {
-                    register u32 encoded asm("r0") = (*command & 0x30) >> 4;
-                    register u32 bit asm("r2") = 2;
+                    u32 encoded = (*command & 0x30) >> 4;
+                    u32 bit = 2;
                     asm volatile("" : "+r"(bit) : "r"(encoded));
                     encoded &= bit;
                     if (first != encoded)
@@ -109,7 +101,7 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
             }
             {
                 u32 elapsed = state->elapsed + 1;
-                register u32 mask asm("r5");
+                u32 mask;
                 register u32 temp asm("r2");
                 register u32 savedDuration asm("r2");
                 state->elapsed = elapsed;
@@ -119,14 +111,13 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
                 duration = state->duration;
                 elapsed = (u16)elapsed;
                 savedDuration = duration;
-                asm("" : "+r"(savedDuration));
                 if (elapsed >= duration) {
                     state->elapsed = 0;
                     flags = state->flags;
                     if (flags & 4) {
                         u32 frame = state->index;
                         if (!frame) {
-                            register u32 hold asm("r0") = flags & 8;
+                            u32 hold = flags & 8;
                             asm("" : "+r"(hold));
                             if (hold)
                                 state->elapsed = savedDuration;
@@ -139,7 +130,6 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
                         u32 count;
                         state->index = frame;
                         count = state->frameCount;
-                        asm("" : "+r"(count));
                         if ((frame & mask) >= count) {
                             u32 endFlag = flags & 8;
                             asm("" : "+r"(endFlag));
@@ -152,11 +142,9 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
                         }
                     }
                     {
-                        register u32 offset asm("r0") = state->index << 1;
-                        register const volatile u16 *table asm("r1") = state->commands;
-                        asm("" : "+r"(offset), "+r"(table));
+                        u32 offset = state->index << 1;
+                        const volatile u16 *table = state->commands;
                         command = (void *)((u32)table + offset);
-                        asm("" : "+r"(command));
                     }
                     state->frameWeight = *command & 15;
                     {
@@ -171,7 +159,6 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
         cursor++;
         {
             register u32 step asm("r1") = 0x60;
-            asm("" : "+r"(step));
             sequence = (void *)((u8 *)sequence + step);
             sprites = (void *)((u8 *)sprites + 0x60);
             tail = (void *)((u8 *)tail + step);
@@ -179,7 +166,6 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
         }
         {
             register s32 next asm("r2") = remaining - 1;
-            asm("" : "+r"(next));
             remaining = next;
             if (next < 0)
                 break;
