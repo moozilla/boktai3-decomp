@@ -5,6 +5,8 @@
   cloud_task.py claim [--min-insns 150]     claim the next open task: prints its brief
   cloud_task.py claim --task ID             claim that open task (e.g. one with smaller functions)
   cloud_task.py list --smallest             order by the largest function, smallest first
+  cloud_task.py list --from-end             order by address, end of the ROM first
+  cloud_task.py list --max-insns 150        only functions below 150 instructions
   cloud_task.py show TASK                   a task's functions
 
 A task is the unmatched functions of at least --min-insns instructions inside one
@@ -34,9 +36,10 @@ def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
 
 
-def tasks(min_insns):
+def tasks(min_insns, max_insns=None):
     done = worklist.done_names()
     fs = [f for f in worklist.functions() if f["name"] not in done and f["insns"] >= min_insns
+          and (max_insns is None or f["insns"] < max_insns)
           and not worklist.in_library(f["addr"]) and f["addr"] >= 0x0800145C]
     subs = [(int(r["start"], 16), int(r["end"], 16), r["name"])
             for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv")))]
@@ -85,6 +88,9 @@ def main():
         p.add_argument("--task", help="claim/list only this task id")
         p.add_argument("--smallest", action="store_true",
                        help="order tasks by their largest function, smallest first")
+        p.add_argument("--max-insns", type=int, help="only functions below this size")
+        p.add_argument("--from-end", action="store_true",
+                       help="order tasks by address, highest first (stays clear of workers going forwards)")
     p = sp.add_parser("show")
     p.add_argument("task")
     a = ap.parse_args()
@@ -95,12 +101,14 @@ def main():
         return
     taken = claimed()
     busy = claimed_functions()
-    open_ = [t for t in tasks(a.min_insns) if t["id"] not in taken
+    open_ = [t for t in tasks(a.min_insns, a.max_insns) if t["id"] not in taken
              and not busy & {f"{f['addr']:08X}" for f in t["functions"]}
              and (not a.unassigned or t["name"] == "unassigned functions")
              and (not a.task or t["id"] == a.task.upper())]
     if a.smallest:
         open_.sort(key=lambda t: max(f["insns"] for f in t["functions"]))
+    if a.from_end:
+        open_.sort(key=lambda t: -int(t["id"], 16))
     if a.cmd == "list":
         for t in open_:
             print(f"{t['id']}  {len(t['functions']):3d} functions {sum(f['insns'] for f in t['functions']):6d} insns  {t['name']}")
