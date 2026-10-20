@@ -2169,3 +2169,104 @@ fallbacks. Formatting with the pinned venv clang-format and `git diff --check`
 passed. A final refinement commit removes the now-unneeded hints from EED8;
 small single-unit follow-ups format FA0C and label the recovery draft's
 allocation barrier. Shared handoff/history/index files were left to integration.
+
+# Codex high: task 081C2570
+
+Tags: #matching #control-panel #sparkle-emitter #sprite-controller #scene-npc #register-pinning
+
+Branch: `cloud/081C2570`. Worked solo and offline. Used only per-file checks;
+no make/full build, network operations, or direct Git mutations. Each source
+was committed separately through `build/commit.sh`. Combined ROM validation
+remains with the batch integrator.
+
+- **081CD484 drafted 93.8%**, `SceneNpc_DispatchCutsceneCommands`.
+  Reviewed extent 2,448 bytes; candidate 2,444. Reconstructed the 109-entry
+  NPC cutscene command switch, including kind-dependent states, target
+  movement, attachment effects, drops, palette changes and trigger consumption.
+  Commands 0 and the common state-change tail set the changed byte at 0x08;
+  command 103 changes the kind-29 variant and motion vector. Command 69
+  copies the context position and adds 200 to signed Y before spawning its
+  effect. Final realigned differences: 79 total / 13 ignoring registers.
+  Remaining issues are facing-mask registers, motion setup in command 103,
+  and copies/narrowing in the kind dispatch. Typed packed vectors and keeping
+  argument loads before the stack position copy improved the first 89.5%
+  candidate substantially. Read `docs/BIG_FUNCTIONS.md`, used condense and
+  anchored comparisons, and stopped after register hints and branch-motion
+  variants regressed. No hints retained. Its default INCLUDE_ASM uses the
+  existing named symbol `SceneNpc_DispatchCommands_081CD484`; the new local
+  alias targets `sub_081CD484` for integrator naming promotion.
+
+- **081CF62C matched**, `SceneNpc_UpdateDescendingArrival`, 544 bytes.
+  Tentative arrival-state interpretation: entry animation 9, raise Y by 160,
+  initialize height offset 300, animation 10 after frame three, then lower
+  toward terrain while damping unsigned horizontal speed to three quarters.
+  At rest plays song 680 and animations 11/12, then sets done. The callback
+  is present in the NPC state table; neighboring SceneNpc_PlayAnimation12
+  uses the same flags, animation callback and tag height field. Scalar
+  terrain-height lookup and a polar-vector inline matched on the first check.
+  Final formatted source passed `check.py --target-size 544`. No register
+  hints or handwritten instructions.
+
+- **081C2570 matched**, `ControlPanel_InitializeFromScript`, 636 bytes.
+  Called by ControlPanel_CreateFromScript (081C27EC). Initializes three
+  C046 sprite/animation pairs, the icon rows and reward balance display,
+  installs ControlPanel_UpdateIdle and reads options p/N/r/t/b/e/a. Option t
+  defaults to 180/300/600; r defaults to 300. Starts song 0x23E and publishes
+  the singleton. Explicit panel halfword fields removed redundant constant
+  copies; signed halfword arithmetic preserved the -0x300 coordinate delta.
+  Separate early/late zero lifetimes and computing the 0x590 field address
+  before initializing the late zero recovered instruction order. Depinning
+  reduced three hints to two (animation r5 and sprite r4). The unit carries
+  MATCHING_CONCESSION: register-pinning. Final formatted source passed the
+  reviewed 636-byte check.
+
+- **081C29A4 drafted 91.6%**, `SparkleEmitter_EmitParticle`, 532 bytes.
+  Called every other update by SparkleEmitter_UpdateEmitting (081C2BBC).
+  Allocates a free pool entry when speed is greater than one, activates it,
+  chooses a randomized screen-edge position of radius 150, converts it into
+  world coordinates, then sets jittered angle/speed and clears particle age.
+  Three RNG samples use angle masks 63/15 and speed mask three. Final
+  realigned differences: 32 total / 14 ignoring registers, chiefly RNG table
+  load/index-store order and allocation. Loading samples and base fields into
+  separate locals, and separating angle subtraction from speed addition in
+  the polar inline, recovered the original shape. A raw-address RNG variant
+  regressed and was discarded. No hints retained. Reviewed score recorded;
+  default assembly path checked byte-identical.
+
+- **081C3C1C matched**, `SpriteController_UpdateInterpolatedPosition`,
+  488 bytes. Installed by the F3E4 move/scale setup at 081C371C. Interpolates
+  scale from 0x94/0x96 and X/Y/Z from 0xDC/0xE4, using signed timer 0xF8 and
+  unsigned duration 0x9A; projects the result relative to camera 03005418,
+  advances the timer, and sets result 0xD8 after the duration. Packed 16-bit
+  vector fields reproduce stack word insertions. Projection needs a distinct
+  pointer view, component/sum temporaries, and multiplication before the
+  signed divide-by-32 inline. Register hints diagnosed the final 13 bytes;
+  `depin.py --write` removed all seven after the source temporaries were
+  established. Final formatted source passed the reviewed 488-byte check.
+  No concession marker remains.
+
+- **081CEFCC stopped below draft threshold**, tentative
+  `SceneNpc_FollowSceneTarget`. Script behavior two (081D10D8) and the NPC
+  creation paths select this update. Context 0x438 supplies a target with
+  position at 0x30 and heading at 0x2D; context 0x434 supplies the comparison
+  position. Squared distance above 0x90000 snaps the NPC 0x300 behind the
+  target; distance above 0xFFFF sets speed-24 motion toward it. In the near
+  band, vertical separation <=255 and two heading tests set display flag
+  0x800. Entry/normal animation mode arguments are four/one. Best complete
+  unhinted candidate: 64.0%, 656 versus reviewed 664 bytes, realigned 147 / 31
+  ignoring registers. A later hinted candidate reached 68.3% but retained
+  more structural differences and was discarded. Remaining difficulties are
+  distinct motion/position aliases, the X-difference spill, PRE pointer
+  copies before the distance branches, facing allocation, and the shared
+  final vector store. Stopped after scalar-distance, inline-argument,
+  pointer-lifetime and pinning variants stalled. Retained only the unhinted
+  scratch source under ignored `wip/codex-high/sub_081CEFCC.c`; no below-80%
+  source was promoted or committed.
+
+Ghidra's export was absent. `relatives.py` failed in its progress-report
+subprocess, so assembly, neighboring C, symbol names and data-table references
+provided the evidence. Both guarded drafts compile and their default assembly
+paths compare byte-identical; this is not exact-C progress. All three matches
+were checked over their complete reviewed extents. Shared headers, generated
+files and shared documentation were untouched. An unrelated modification to
+`tools/cloud_task.py` appeared during the session and was left untouched.
