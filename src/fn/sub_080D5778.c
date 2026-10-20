@@ -1,7 +1,12 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+// confidence=low: control waits sixty frames before restoring or choosing a route.
+#define Mummy_ResumeDelayedRoute sub_080D5778
+
 #ifdef NONMATCHING
-// fuzzy: 88.3%
+// fuzzy: 92.1%
+// Remaining differences: entry flag-load order, route selection registers and random-turn hoisting.
 #include "scene_actor_chase.h"
 
 static inline u8 Test16(u16 *p, u32 mask)
@@ -35,7 +40,7 @@ struct MummySavedControl {
 static inline void Turn(u8 saved, void *ctx, void *g)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    u8 *group = g;
+    u8 *group = (u8 *)&actor->group;
     {
         u32 mask = 0x400;
         if (((struct SceneActorRegistryResetView *)ctx)->flags2D4 & mask)
@@ -67,7 +72,7 @@ static inline u8 Arrive(void *obj)
     s32 player;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
     if (Chase_Test(gUnk_030053F4, 0x4800)) {
-        struct ChaseTarget *t = *slot;
+        register struct ChaseTarget *t asm("r1") = *slot;
         if (!t)
             goto invoke;
         {
@@ -91,7 +96,11 @@ static inline u8 Arrive(void *obj)
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
+    {
+        struct ChaseFlags40 *flags = (void *)(group + 0x40);
+        s32 mask = ~4;
+        flags->bits = mask & flags->bits;
+    }
     if (Chase_MotionFlags(actor, 0x80)) {
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
@@ -124,7 +133,7 @@ reroute: {
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, &target))
         return 1;
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
@@ -133,6 +142,7 @@ done:
 }
 
 // confidence=low: delayed return to route with a target-cell special action.
+#define Mummy_RequestStraightRoute sub_080D6FDC
 u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryResetView *);
 static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
@@ -157,8 +167,10 @@ static inline void PickRoute(struct SceneActorRegistryResetView *actor)
         pick = Mod(pick + 1, route->definition[0]);
     route->choice = pick;
     route->step = 0;
-    route->point =
-        (u8 *)gUnk_030052F4->routes + *(u16 *)(route->definition + 2) + route->choice * 8;
+    {
+        u8 *base = gUnk_030052F4->routes;
+        route->point = base + *(u16 *)(route->definition + 2) + route->choice * 8;
+    }
 }
 void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
@@ -173,7 +185,11 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
     if ((s32)actor->counter2AC > 60) {
-        ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~6;
+        {
+            struct ChaseFlags40 *flags = (void *)(group + 0x40);
+            s32 mask = ~6;
+            flags->bits = mask & flags->bits;
+        }
         Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
         SaveDelay(group + 0x8c, *(void **)(group + 0x48), 12, 30);
         Chase_SetState(actor, 3, 1, 0);
@@ -194,5 +210,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080D5778);
 #endif
