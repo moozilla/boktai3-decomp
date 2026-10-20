@@ -886,3 +886,78 @@ results were discarded. Run depinning on the unguarded candidate instead;
 it correctly reports that these nonmatching candidates cannot be minimized
 as exact matches. The final guarded drafts preserve their tested hints.
 Scratch hypotheses and checks are ignored under wip/ and build/.
+
+## Task 08131820 — route approach and area damage (2026-10-20)
+
+Tags: #matching #scene-actor #route #damage #register-pinning
+
+Worked solo on the preclaimed `cloud/08131820` branch, offline. Used the
+worktree Python and per-file checker; no make, full build, generated assembly
+edits or network. Each source commit was queued through `build/commit.sh`.
+
+New exact code gain: **+0.0217 percentage points**, all register-pinned (524
+bytes, using PROGRESS.md's code denominator). Three assigned functions already
+had matching C in the starting checkout; their revalidation adds no new code
+credit. The two guarded drafts remain excluded from exact progress.
+
+- **08134398 — matched, existing C reverified.**
+  `SceneActorReaction_RecordDefeat`, reviewed extent 5636 bytes. The largest
+  assigned function was already implemented and named by the preceding medium
+  worker. Added the required local alias because the supplied ELF still names
+  the target `sub_08134398`; its full resolved-byte check passed unchanged.
+  Saturating category/weapon defeat statistics and kind-17 control setup are
+  documented in notes/codex-medium.md. No register hints in this unit.
+- **0813214C — matched, existing C reverified.**
+  `SceneActorReaction_ApplyStaggerDamage`, reviewed extent 836 bytes. Retained
+  the existing damage/display/defeat logic and surviving actor's kind-33 stagger
+  callback. Added the local alias. `depin.py --write` reduced four hints to two;
+  formatted full-extent check remained exact. Register-pinning concession.
+- **08132490 — matched, existing C reverified.**
+  `SceneActorReaction_ApplyCategoryDamage`, reviewed extent 696 bytes. Retained
+  category damage, defeat control setup and surviving actor's song 0x13E.
+  Added the local alias. Depinning reduced two hints to one; formatted
+  full-extent check remained exact. Register-pinning concession.
+- **08131820 — newly matched.** Tentative alias
+  `SceneActorControl_UpdateRouteApproach`, reviewed extent 524 bytes. Present
+  in the repeated route callback tables (including gUnk_08605C9C); its closest
+  matched relative is 080B04F4, explaining 60% of the instructions. Consumes
+  field2B1, invokes callback +0x260 for movement speed, updates drawable duration
+  scale, then consumes the navigation probe event. A successful descriptor turn
+  sets behavior 6. A successful acceleration sets behavior 8 and control kind
+  0x13 from actor+0x5E8. Outside mode mask 0x4800, it chooses a route point using
+  RNG/Mod, avoids the previous index by advancing once modulo the point count,
+  resets its phase, updates its data pointer and resolves the route position.
+  Other paths increment counter2AC. Reused the relative's duration-scale and
+  descriptor-call shapes. Explicit byte-index RNG expansion (multiply the index
+  before adding the table base) recovered the arithmetic-shift/load order.
+  Local offset/pointer bindings recovered the two reset sequences and final
+  counter allocation. Depinning reduced 35 hints to 14; the final formatted
+  checker reports zero differing bytes over the complete 524-byte extent.
+- **08131D5C — drafted 87.5%**, improved from 85.4%.
+  `SceneActorReaction_ApplyAreaDamage`. Full target extent 1008 bytes;
+  candidate 1004 bytes, 91 realigned differing instructions / 25 ignoring
+  registers (previously 96 / 42). Direct failure returns inside the inline
+  owner/display predicate recover its materialized boolean branch shape.
+  Scoped r4/r5 position/max-health values retained after the gain call move
+  their spills to the correct side of that call. A dz/sl binding improves its
+  later uses. Remaining: collision-flags/collider/health pointer allocation,
+  stack slots, RNG first-index store and constant scheduling, hit-flag load
+  order. Forcing the collision flags to sb or collider to r8, combining RNG
+  index updates, and a SetHit wrapper regressed structure; discarded. The best
+  structural candidate is retained, rather than the 87.9% candidate with 30
+  structural differences.
+- **08132904 — drafted 87.1%**, improved from 81.1%.
+  `SceneActorReaction_ApplyLinkedAreaDamage`. Full target extent 1064 bytes;
+  candidate 1060 bytes, 96 realigned differing instructions / 24 ignoring
+  registers (previously 126 / 58). Same predicate improvement. Branch-local
+  position/max-health setup and scoped r4/r5 values reproduce the duplicated
+  gain-call setup and improve the spills. A maximum-health/sl pin and explicit
+  paired RNG expansion regressed and were discarded. Remaining pointer/stack
+  allocation, RNG scheduling and hit-flag ordering overlap the preceding draft.
+
+Both drafts retain NONMATCHING guards and raw-address-name INCLUDE_ASM fallback
+identifiers, so `check.py --nonmatching --record` can locate and update their
+scores despite the semantic-name aliases. Ran depin on both: it only minimizes
+exact matches, so it skipped these drafts. Formatting and `git diff --check`
+passed. No new layout/global data claims or shared header changes. Batch ROM
+validation remains for the integrator.
