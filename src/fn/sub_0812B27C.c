@@ -1,0 +1,31 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 88.9%
+// draft: original materializes the active test as a 0/1 value (extra movs/cmp per slot)
+extern u8 *gUnk_02000180;
+void Sprite_Remove(u8 *);
+void Collider_Remove(u8 *);
+struct Slot {
+    u8 sprite[0xac];
+    u8 collider[0x18c - 0xac];
+};
+struct Pool {
+    u8 pad0[0x1c];
+    u32 active;
+    struct Slot slots[8];
+};
+u32 FragmentProjectilePool_Cleanup(struct Pool *p)
+{
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        if (p->active & (1 << i)) {
+            Sprite_Remove(p->slots[i].sprite);
+            Collider_Remove(p->slots[i].collider);
+        }
+    }
+    gUnk_02000180 = 0;
+    return 0;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", FragmentProjectilePool_Cleanup);
+#endif
