@@ -1,12 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#include "global.h"
 #include "scene_actor_chase.h"
-#include "scene_actor_animation.h"
-#define Dog_ResumeBehaviorAfterAnimation sub_080E059C
-// confidence=low: resumes chase or idle behavior after animation 11 signals completion.
+#define Dog_ResumeAfterReaction sub_080E059C
+// confidence=low: animation completion resumes group movement or idle.
 void SceneActorControl_OnIdle(void);
-void SceneActor_SetPositionXZ(void *, s32, s32);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {
         a->field2B2 = 0;
@@ -14,39 +11,38 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
 {
-    u16 value = a->flags2D4;
-    return value & mask;
-}
-static inline void OrFlags(u16 *flags, u32 mask)
-{
-    register u32 bits asm("r0") = mask;
-    *flags = bits | *flags;
-}
-void Dog_ResumeBehaviorAfterAnimation(struct SceneActorRegistryResetView *a)
-{
-    if (TakePrepared(a)) {
-        SceneActorAnimation_SelectDirectionalEntry((void *)a, 11);
+    u8 *group;
+    u16 flags;
+    if (TakeEntry(a)) {
+        SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->field2B3 = 0;
     }
-    if (a->field2B3) {
-        u8 *group = (u8 *)&a->group;
-        a->field2B0 = 1;
-        if (MotionFlags(a, 0x80)) {
-            SceneActor_SetPositionXZ((u8 *)a + 0x50,
-                                     ((struct ContactCollider *)a->routeObject)->bounds.x,
-                                     ((struct ContactCollider *)a->routeObject)->bounds.z);
-            SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-            Chase_SetCtl(a, *(void **)(group + 0x48), 26);
-            Chase_SetBehavior(a, 12);
-            OrFlags((u16 *)(group + 0x40), 4);
-            a->field2C2 = 32;
-        } else {
-            SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-            Chase_SetCtl(a, SceneActorControl_OnIdle, 16);
-            Chase_SetBehavior(a, 7);
-            a->flags2CC |= 16;
+    if (!a->field2B3)
+        return;
+    group = (u8 *)&a->group;
+    a->field2B0 = 1;
+    {
+        register u32 mask asm("r1") = 0x80;
+        flags = a->flags2D4 & mask;
+    }
+    if (flags) {
+        SceneActor_SetPositionXZ((u8 *)a + 0x50, *(s16 *)(*(u8 **)((u8 *)a + 0x5D0) + 0x1C),
+                                 *(s16 *)(*(u8 **)((u8 *)a + 0x5D0) + 0x20));
+        SceneActorAnimation_SelectDirectionalEntry(a, 0);
+        Chase_SetCtl(a, *(void **)(group + 0x48), 0x1A);
+        Chase_SetBehavior(a, 12);
+        {
+            u16 *field = (u16 *)((u8 *)a + 0x414);
+            register u32 mask asm("r0") = 4;
+            *field = mask | *field;
         }
+        a->field2C2 = 0x20;
+    } else {
+        SceneActorAnimation_SelectDirectionalEntry(a, 0);
+        Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
+        Chase_SetBehavior(a, 7);
+        a->flags2CC |= 0x10;
     }
 }
