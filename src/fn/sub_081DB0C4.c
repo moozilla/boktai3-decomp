@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Explosion_InitColliderWithFlags sub_081DB0C4
-
 struct ExplosionSize {
     u32 x : 16, y : 16, z : 16;
 };

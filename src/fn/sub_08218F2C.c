@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define TextWindow_DrawNarrowGlyph sub_08218F2C
-
 u32 Text_GetFontResource(void);
 s32 Text_LoadFontResource(void);
 u8 *Text_GetNarrowGlyphData(void);

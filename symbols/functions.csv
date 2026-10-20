@@ -7357,9 +7357,12 @@ addr,name,mode,confidence,source,notes
 081DAF50,Explosion_Update,thumb,low,src-alias,Task callback advances the delayed six-frame effect and briefly refreshes its collider; explosion interpretation tentative
 081DAFCC,Explosion_Destroy,thumb,low,src-alias,Destruction callback removes the explosion task's sprite
 081DAFDC,Explosion_InitSprite,thumb,low,src-alias,Loads the shared effect resource and selects the explosion variant at animation index 0x116 plus the argument
+081DB030,Explosion_InitCollider,thumb,low,src-alias,
+081DB0C4,Explosion_InitColliderWithFlags,thumb,low,src-alias,
 081DB168,Explosion_Init,thumb,low,src-alias,Initializes the effect sprite and standard collider with position and activation delay
 081DB1D8,Explosion_InitWithCollisionFlags,thumb,low,src-alias,Initializes the same effect with an additional configurable collider flag argument
 081DB324,Explosion_Create,thumb,low,src-alias,Allocates an explosion with caller-supplied collision parameters and activation delay
+081DB390,Explosion_CreateAt,thumb,low,src-alias,
 081DB404,Explosion_CreateWithCollisionFlags,thumb,low,src-alias,Allocates an explosion using the initializer that accepts additional collider flags
 081DB474,Options_UpdateScreen,thumb,low,src-alias,
 081DB75C,Options_Destroy,thumb,low,src-alias,Options task destruction callback removes its five animation objects
@@ -8211,6 +8214,8 @@ addr,name,mode,confidence,source,notes
 08218E0C,Text_ReleaseCachedGlyph,thumb,low,src-alias,Decrements a cached tile reference count and clears the entry when its last reference is removed
 08218E5C,TextWindow_BlankRect,thumb,low,src-alias,
 08218ED8,BackgroundMap_ClearTextRect,thumb,low,src-alias,
+08218F2C,TextWindow_DrawNarrowGlyph,thumb,low,src-alias,
+08218FB4,TextWindow_DrawWideGlyph,thumb,low,src-alias,
 08219054,TextWindow_InitializeGraphics,thumb,low,src-alias,Empty initialization hook called before text window tile graphics are filled; provisional role
 08219058,TextWindow_FillTileGraphics,thumb,low,src-alias,Fills 8 KiB of background VRAM with palette index 4 during text window setup
 082190BC,Mosaic_Initialize,thumb,low,src-alias,Clears the pending update flag and cached mosaic parameters

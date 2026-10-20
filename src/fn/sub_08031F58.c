@@ -13,7 +13,7 @@ struct TextState {
 void TextState_PlayGlyphSound(struct TextState *, int);
 void TextState_AdvanceLine(struct TextState *);
 int TextState_AdvanceCursor(struct TextState *, int);
-void sub_08218F2C(int, int, int, int);
+void TextWindow_DrawNarrowGlyph(int, int, int, int);
 int TextState_DrawNarrowGlyph(struct TextState *p, u16 c)
 {
     TextState_PlayGlyphSound(p, c);
@@ -21,7 +21,7 @@ int TextState_DrawNarrowGlyph(struct TextState *p, u16 c)
         TextState_AdvanceLine(p);
         p->wrap = 1;
     }
-    sub_08218F2C(c, p->x, p->y, p->palette);
+    TextWindow_DrawNarrowGlyph(c, p->x, p->y, p->palette);
     TextState_AdvanceCursor(p, 0);
     p->lastWidth = 0;
 }

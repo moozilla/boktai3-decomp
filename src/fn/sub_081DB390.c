@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Explosion_CreateAt sub_081DB390
-
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void Explosion_Update(u8 *);
