@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative player cue role; see callback body.
+#define PlayerCue_UpdateSpiralMotion        sub_08153610
+#define Player_RestartAnimationFromResource sub_081538DC
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 89.9%
 // Constant derivation, resource pointer setup and timer mask lifetimes differ.
 struct P {
     u8 pad0[0x30];
@@ -217,5 +219,5 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralMotion);
+INCLUDE_ASM("asm/nonmatching", sub_08153610);
 #endif
