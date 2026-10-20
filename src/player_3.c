@@ -377,7 +377,80 @@ flash:
 INCLUDE_ASM("asm/nonmatching", Player_SelectFlashingVisualMode);
 #endif
 
+static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
+{
+    u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+    if (*timer) {
+        u8 *sound = (u8 *)p + 0x4E1;
+        if (*sound) {
+            Sound_PlaySong(0x336);
+            *sound = zero;
+        }
+        if (--*timer == 0) {
+            p->animation.flags &= ~2;
+            p->movementSpeedScale = 64;
+            p->secondarySpeedScale = 64;
+        } else {
+            p->animation.flags |= 2;
+            {
+                s32 speed = 64 - (*timer >> 1);
+                p->movementSpeedScale = speed;
+                p->secondarySpeedScale = speed;
+            }
+        }
+    }
+}
+#ifdef NONMATCHING
+// fuzzy: 82.2%
+// Inlined slowdown allocation, flag mask ordering and pointer reuse differ.
+// confidence=low: applies visual status flags and ramps the paired speed scales.
+#define Player_UpdateStatusVisuals sub_0813DB98
+void Player_UpdateStatusVisuals(void *actor)
+{
+    struct Player *p = actor;
+    u32 remaining = *(u16 *)((u8 *)p + 0x538);
+    if (remaining) {
+        if (*(u16 *)((u8 *)p + 0x534) == 5) {
+            u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+            if (*timer < 64) {
+                if (*timer == 0) {
+                    Sound_PlaySong(0x1EE);
+                    *((u8 *)p + 0x4E1) = 1;
+                }
+                ++*timer;
+            }
+            p->animation.flags |= 2;
+            {
+                s32 speed = 64 - (*timer >> 1);
+                p->movementSpeedScale = speed;
+                p->secondarySpeedScale = speed;
+            }
+            p->statusFlags |= 0x50000;
+        } else {
+            DecayVisualSlowdown(p, 0);
+        }
+        if (*(u16 *)((u8 *)p + 0x534) == 6 || VisualActionFlag(p, 8)) {
+            p->animation.flags |= 0x200;
+            p->statusFlags |= 0x20000;
+        } else {
+            p->animation.flags &= ~0x200;
+        }
+        if (p->kind & 1)
+            --*(u16 *)((u8 *)p + 0x538);
+    } else {
+        DecayVisualSlowdown(p, remaining);
+        if (VisualActionFlag(p, 8)) {
+            p->animation.flags |= 0x200;
+            p->statusFlags |= 0x20000;
+        } else {
+            p->animation.flags &= ~0x200;
+        }
+    }
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813DB98);
+#endif
 
 void Player_AdvanceEffectTick(struct Player *p)
 {
