@@ -190,9 +190,13 @@ struct SceneHudState {
     u8 unknown48CC[0x19];
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
-    u8 unknown48E7[3];
-    u16 valueRate; /* 0x48EA */
-    u8 unknown48EC[0x4988 - 0x48EC];
+    u8 unknown48E7;
+    u8 quantityArrowFrame; /* 0x48E8: arrow keyframe base, 0x13 up and 0x16 down */
+    u8 quantityArrowTimer; /* 0x48E9: arrow animation, wraps at sixteen */
+    u16 valueRate;         /* 0x48EA */
+    u16 balanceLimitTimer; /* 0x48EC: frames left of the over-limit warning */
+    u16 balanceLimitShown; /* 0x48EE: over-limit message already shown */
+    u8 unknown48F0[0x4988 - 0x48F0];
     struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
     u8 unknown4A48[0x28];
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
