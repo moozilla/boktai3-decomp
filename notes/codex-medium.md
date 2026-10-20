@@ -2821,3 +2821,10 @@ sub_XXXXXXXX identifier; all six default assembly paths then checked exactly.
 Those assembly fallback matches grant no C progress. Per-function draft and
 fallback-fix commits, followed by this note, use build/commit.sh. No make,
 full build, generated-file edits, network actions, or direct Git mutation.
+
+Tooling detail: --record initially left the old fuzzy comments unchanged because
+it keys scores by the #else INCLUDE_ASM identifier, which was the descriptive
+alias while the checked function resolved to sub_XXXXXXXX. After changing the
+fallbacks to raw identifiers, reran --nonmatching --record on all six and verified
+the source comments contain the new scores. Score-only follow-up commits retain
+one translation unit each.
