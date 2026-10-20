@@ -2,6 +2,8 @@
 #include "global.h"
 #include "display_animation.h"
 
+#define Ooze_BeginAttack sub_08205B70
+
 #ifdef NONMATCHING
 // fuzzy: 89.1%
 // Remaining differences: state-transition address lifetimes and animation-step register allocation.
@@ -192,5 +194,5 @@ s32 Ooze_BeginAttack(struct Ooze *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Ooze_BeginAttack);
+INCLUDE_ASM("asm/nonmatching", sub_08205B70);
 #endif
