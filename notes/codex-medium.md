@@ -1608,3 +1608,160 @@ it sees direct hints in the targeting source, but does not expand the shared
 helper for the other two. Each draft keeps INCLUDE_ASM in its default branch;
 all scores were recorded again after direct clang-format. Batch integration
 must still perform the combined ROM validation and name promotion.
+
+## Task 081AA178 — 2026-10-20 follow-up
+
+Tags: #matching #vanargand #paired-scene-actor #register-pinning
+
+Worked solo and offline on the preclaimed cloud/081AA178 branch. Read the
+worker/cloud guidance and BIG_FUNCTIONS.md, looked up the existing attempts,
+and inspected the largest target and its relatives before refining retained
+candidates. Exact code gain in this pass: +0 percentage points; no new exact
+matches. Three existing guarded drafts were retained in separate driver commits.
+
+- **081ABA64 — stopped unmatched.** Re-inspected its opening assembly,
+  condensed listing and matched relatives. The best relative covers 37%, mostly
+  the six animation playback expansions, rather than the eleven-phase attack
+  machine. The prior notes already identify local far-branch tails and the
+  track/synthetic-contact behavior. No new complete candidate or productive
+  structural hypothesis emerged; assembly remains in use.
+- **081AA788 — stopped below threshold.** Resumed the complete scratch
+  Vanargand_UpdateSweepingProjectileAttack candidate. The original check was
+  70.3%, 265 realigned differences / 87 ignoring registers. Keeping the owner
+  in sb, the spread in sl, and a separate auxiliary-part pointer across
+  Anim_SetSequence improved the preliminary score to 75.4% (225 / 99), with
+  candidate length equal to the 1672-byte body ending at 081AAE10. This is
+  still below the retention threshold. The part pointer recovers resource
+  +0x58/reset +0x5C accesses; randomized projectile setup, stack lifetimes,
+  phase transitions and argument ordering remain. Latest source stays only
+  in ignored wip/sub_081AA788.c.
+- **081AA178 — improved guarded draft, 99.5%,
+  Vanargand_UpdateRepeatedPairAttack.** Full reviewed extent is 440 bytes.
+  A phase input constraint keeps the phase live through the phase-zero RNG
+  path, giving the original timer-pointer allocation. A scoped r0 zero
+  constraint gives the separate reset after the sixth repetition. Only one
+  byte / one instruction differs: phase-zero timer reset uses r7 rather than
+  r5 (both contain zero); structural differences are zero. Narrow/wide phase
+  trials, fixed phase bindings and separate dispatch/result lifetimes did
+  not close it. Retained readable C and marked the register-pinning concession.
+- **081AFD10 — improved guarded draft, 95.3%,
+  PairedSceneActor_UpdateHalfPresentation.** Full reviewed extent is 648
+  bytes; 15 realigned differences, zero ignoring registers. Scoped shake/reset
+  destination pointers, palette-timer offset and shadow offsets recover most
+  remaining allocation. A mask constraint after shadow-control address setup
+  recovers its instruction order. Explicit flag/owner-offset bindings broke
+  useful CSE and made the code worse, so were discarded. Remaining offsets
+  and pointer registers are listed by the checker; no behavioral omissions
+  were found. Register-pinning concession remains marked.
+- **081B0248 — stopped below threshold.** Resumed the radial-effects scratch
+  candidate. Reversing stack-vector declaration order, consistently raising
+  the same position-pointer view and preserving signed RNG samples before
+  shifting improved the preliminary result from 63.1% to 65.2% (74 realigned
+  differences / 27 ignoring registers, full 376-byte extent). Position/velocity
+  stack placement, polar helper allocation, RNG update order and loop scratch
+  registers remain. No production draft; latest source stays only in ignored
+  wip/sub_081B0248.c.
+- **081B03C0 — retained guarded draft, 86.2%,
+  PairedSceneActor_UpdatePlayerCapture.** Full reviewed extent is 1272 bytes;
+  candidate is 1308, with 112 realigned differences / 55 ignoring registers.
+  Binding the playback owner to r6, with either input or input/output
+  constraints, increased differences and was discarded. Remaining work is
+  playback allocation, request arguments and shared phase-entry tails. Added
+  the required file-local alias for its already established symbol name.
+
+All three retained units now have exact file-local aliases, confidence comments
+above those aliases, and raw sub-address INCLUDE_ASM fallbacks (the macro
+stringifies its argument). This also lets the checker resolve names against
+the older local ELF. Formatted directly with build/venv/bin/clang-format;
+recorded each draft with check.py --nonmatching --record and checked each
+default assembly fallback exactly. Commits used build/commit.sh. No make,
+full build, network operation, shared documentation/index edit, ROM or generated
+assembly commit. Combined validation and name promotion remain with integration.
+
+# Task 081A2430 — Codex medium, 2026-10-20
+
+Tags: #matching #hresvelgr #vanargand #effect-pool #register-pinning
+
+Worked solo on the already claimed `cloud/081A2430` branch, offline. Exact
+code gain: **+0.0000 percentage points**; no new exact C matches. Retained
+five guarded drafts (four inherited, one newly authored). All scoring used
+`build/venv/bin/python tools/check.py`; no make or full build was run.
+
+- **081A5614 — retained draft 80.7%**,
+  `Vanargand_UpdatePaletteTransition`. Read BIG_FUNCTIONS, the condensed
+  listing and the matched restore/interpolation relative in 081ACC24.
+  Baseline: 299 realigned differences / 82 ignoring registers, candidate
+  2848 bytes against the 2800-byte symbol extent. A blend wrapper taking
+  the owner and computing the output address inside reduced structural
+  differences to 60, but worsened allocation and fuzzy score to 76.8%.
+  Removing the selector pin, pinning RGB/frame temporaries, and changing
+  interpolation to a shared result did not improve the retained draft.
+  Restored baseline; added the required local alias and raw assembly
+  fallback so it resolves against the cached ELF/generated assembly.
+- **081A2858 — improved draft 86.3% to 91.3%**,
+  `Hresvelgr_UpdateCollisionPresentation`. Fixed a real source defect:
+  the first invulnerability path dereferenced `flags` before initialization.
+  It now accesses the owner's flags directly. Preserve the second timer
+  load before materializing the shared flags pointer. Split the disabled
+  collider flag operations into two full-width signed bitfield updates;
+  this reproduces the otherwise surprising zero OR. Reordered the camera
+  branches to put the set-offset path before reset. Sprite/sequence inline
+  accessors improve address and argument setup. Remaining: 49 realigned
+  differences / 39 ignoring registers, including reset-pointer allocation,
+  sprite field addressing and constant scheduling; candidate/target 868 bytes.
+- **081A39E0 — improved draft 88.3% to 91.1%**,
+  `EffectPool_UpdateEntry`. Caller 081A3D00 iterates entries; the target-angle
+  helper and the body establish homing, animation/collider updates, trail
+  emission and lifetime-dependent acceleration. Keeping the angle mask
+  opaque in r3 preserves the final AND before the byte store. Pinning the
+  animation timer to r0 improves its scheduling. Separate vector component
+  temporaries and an input-liveness barrier reproduce more of the animation
+  flag operations. Remaining: 37 realigned differences / 4 ignoring
+  registers, mainly temporary registers, RNG/trail setup and timer mask
+  scheduling. Candidate and target 800 bytes.
+- **081A2430 — retained/revalidated draft 87.5%**,
+  `Hresvelgr_DispatchSceneMessages`. Explicitly alias the renamed callback
+  `Hresvelgr_UpdateRisingProjectile` to 081A12DC for the cached ELF.
+  Ordinary multidimensional pending-message indexing regressed; alternative
+  pointer arithmetic and sharing zero/one action parameters also regressed.
+  Retained the original structure: 51 realigned differences / 25 ignoring
+  registers, candidate and target 680 bytes. Remaining differences are
+  pending-buffer indexing and mode/action constant lifetimes.
+- **081A8F48 — new draft 88.7%**, tentative
+  `Vanargand_UpdatePlayerDrain`. Positions player zero at the boss position
+  plus (128, 0, 128); chooses animations 12–14 and copies player collision
+  data according to player mode at 418. Later adds the position-request
+  result to boss health and shows the change. Preserve the second position
+  construction before testing the player flag. A mask-taking inline and a
+  retained initial `one` recover the initial failure block and argument
+  setup. Keep the signed start-frame bias explicit; otherwise CSE rewrites
+  it onto the current frame and loses the original load order. Remaining:
+  38 realigned differences / 19 ignoring registers, initial vector aliases,
+  register choices and constant scheduling. Candidate and target 560 bytes.
+- **081A6AEC — stopped below full-extent draft threshold; no production C.**
+  Tentative `Vanargand_GetTargetLateralDistance`. The call site following
+  081ABB6C clamps the result to 512. The visible body projects the actor position at 54 and
+  target position via 110, keeps only projected X separation, unprojects
+  with zero Y, and returns planar square-root distance. Independently
+  authored candidate, using the matched projection idiom from 081A543C,
+  improved from 65.8% to 85.6% against the visible 312-byte body. A local
+  owner pin to ip and a shared-result signed-shift helper produced that
+  gain. It remains only **51.0% against the 736-byte symbol span**: the
+  existing symbol includes undecoded executable bytes beginning at 081A6C24
+  through the next function at 081A6DCC. No shortened-extent match or draft
+  credit is claimed. Boundary recovery is needed before resuming.
+
+All five production drafts retain NONMATCHING guards and useful local names.
+Formatted directly with `build/venv/bin/clang-format` (restoring the exact
+single-space alias syntax afterward), recorded final draft scores, and checked
+all default assembly fallbacks byte-identically. Follow-up per-unit commits
+repair the inherited fallback names and retain formatting. Commits use only
+`build/commit.sh`; no ROM/generated assembly is committed.
+
+Tool caveat: `depin.py --write` does not enable NONMATCHING, so for drafts with
+working assembly fallbacks it can report success and strip hints without
+checking the C. Its removals in 081A39E0/081A8F48 were immediately restored;
+the final C scores were verified again. Other drafts were skipped by depin
+because their inherited named fallback files were absent; those fallback
+identifiers are now fixed. Use unguarded scratch candidates for future depin
+experiments on drafts. Combined ROM validation remains the integrator's job.
