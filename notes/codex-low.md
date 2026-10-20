@@ -2269,3 +2269,43 @@ Only check.py and variant checks were used. Existing accepted source remains
 unpinned and its body unchanged. Queued the guarded alias/fallback correction
 and these notes through build/commit.sh; combined ROM validation stays with the
 integrator. No shared documentation or totals regenerated.
+
+## Task 080ABDCC (2026-10-20, pursuit register closure)
+
+Tags: #matching #vorn #tentacle #reaction
+
+- 080ABDCC: stopped unmatched after largest-first review of BIG_FUNCTIONS,
+  initializer entry, condensed listing and relatives. Best relative explains
+  only 9%; mixed drawable setup, script options, terrain placement and playback
+  still lack a complete close C candidate. Ghidra export is unavailable.
+- 080ADCC0: **matched**, Vorn_UpdatePursuitDistance, 1120 bytes in the
+  Register-pinned category. Prior 98.9% candidate had six register-only
+  differences. A separate middle-distance flag accessor with offset bound to
+  r3 first changed downstream allocation, resolving the other two pairs.
+  Binding its field to r1 and mask to r2 left only instruction order; consuming
+  the mask before assigning the offset reproduced movs-before-ldr exactly.
+  Empty operand constraints contain no instructions. Removed NONMATCHING guard
+  and verified default C with check.py: zero differing bytes.
+- 080AD75C: stopped unmatched. Revisited full assembly and relatives; stagger
+  burst and saved-motion convergence each explain about 25%, while route and
+  control-reset tails require additional reconstruction. Prior notes on sound,
+  clamped quarter-motion and recovery timers remain applicable.
+- 080AD530: stopped unmatched. Revisited complete assembly, caller/control
+  context and prior 58.5% attempt. Completion after event 18, context mask
+  0x1D dispatch and route-failure/control-reset layout remain the main blockers.
+- 080AE1C4: retained guarded **81.2% draft**, Vorn_UpdateKnockbackRecovery.
+  Recorded current score: 113 realigned differences, 36 ignoring registers.
+  Adjacent declarations and reversed OR operands compiled identically. Removing
+  volatile group raised fuzzy to 82.3% but worsened structure to 38; rejected.
+  Added required local address alias and explicit raw-address assembly fallback.
+- 080AE6F0: retained guarded **82.8% draft**, Vorn_ResumeReactionRoute.
+  Recorded current score: 57 realigned differences, 21 ignoring registers.
+  Declaration swaps were identical; volatile group and removing the flags pin
+  worsened structure to 35 and 30 respectively. Added local address alias and
+  explicit raw-address assembly fallback. Existing register concession retained.
+
+Solo work, per-file check.py and variants only. Draft scores were recorded and
+both assembly fallbacks verified; those fallback checks are not C matches.
+Separate driver commits for the exact match and each guarded draft. No full
+build, network access, direct git mutation or shared-doc regeneration. Combined
+ROM validation and global percentage-point accounting remain with integration.
