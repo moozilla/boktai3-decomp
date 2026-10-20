@@ -3,7 +3,6 @@
 // fuzzy: 99%
 // Open: the second (pair copy) loop counter 'movs #1' is scheduled before the
 // pointer setup instead of after.
-#define SceneInventory_BeginEquipmentSwapPair sub_0806055C
 void SceneInventory_BeginEquipmentSwapPair(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -53,5 +52,5 @@ void SceneInventory_BeginEquipmentSwapPair(struct SceneInventoryActionView *pane
     Sound_PlaySong(0x38A);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0806055C);
+INCLUDE_ASM("asm/nonmatching", SceneInventory_BeginEquipmentSwapPair);
 #endif

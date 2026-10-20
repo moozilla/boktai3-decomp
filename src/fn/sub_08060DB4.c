@@ -4,7 +4,6 @@
 // Open: the second (pair copy) loop counter 'movs #1' is scheduled before the
 // pointer setup instead of after.
 u32 Selection_GetDisplayFrame(s32);
-#define SceneInventory_BeginItemSwapPair sub_08060DB4
 void SceneInventory_BeginItemSwapPair(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -44,5 +43,5 @@ void SceneInventory_BeginItemSwapPair(struct SceneInventoryActionView *panel)
     Sound_PlaySong(0x38A);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08060DB4);
+INCLUDE_ASM("asm/nonmatching", SceneInventory_BeginItemSwapPair);
 #endif

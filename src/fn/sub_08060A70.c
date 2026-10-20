@@ -2,14 +2,13 @@
 #ifdef NONMATCHING
 // fuzzy: 93%
 // Open: the slot index lands in r5 and the widget base in r4 (swapped in the
-// original); pair-copy loop counter ordering as in sub_08060DB4.
+// original); pair-copy loop counter ordering as in SceneInventory_BeginItemSwapPair.
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
 extern struct GameState *gUnk_02000710;
 s32 SceneInventory_FindConsumableAssignment(u32);
-#define SceneInventory_BeginConsumableSwapPair sub_08060A70
 void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -65,5 +64,5 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
     Sound_PlaySong(0x38A);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08060A70);
+INCLUDE_ASM("asm/nonmatching", SceneInventory_BeginConsumableSwapPair);
 #endif
