@@ -5,7 +5,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 #ifdef NONMATCHING
-// fuzzy: 86.2%
+// fuzzy: 88.6%
 // Remaining differences: Packed-animation allocation, request-call setup, and shared phase-entry tails differ.
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
 struct PairPosition {
