@@ -16,7 +16,6 @@ struct EffectEntry {
 extern struct EffectManager *gUnk_0200023C;
 void MotionEntry_SetEnabled(void *, u32);
 void ScaledShadow_Disable(void *);
-#define EffectEntry_Release sub_081A3828
 void EffectEntry_Release(struct EffectEntry *e)
 {
     struct EffectManager *m = gUnk_0200023C;
