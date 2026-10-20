@@ -1,8 +1,11 @@
+#define SceneActor_CallContextScriptB sub_080B0D28
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
 // confidence=low: tentative Vorn behavior role.
+// confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
+#define Vorn_UpdateDefeat sub_080AEE08
 #ifdef NONMATCHING
 // fuzzy: 83.4%
 // Remaining differences: register choices, address derivation, and two late constant reloads.
