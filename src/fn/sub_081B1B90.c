@@ -1,10 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: provisional role inferred from state transitions and player-motion calls
+#define ActorStatus_UpdateFlankingStrike sub_081B1B90
 
 // confidence=low: approaches a side of the player before playing sequence eight
 #ifdef NONMATCHING
 // fuzzy: 84.5%
-// Remaining differences: Entry/state register lifetimes, animation mask allocation, and transition constants differ.
+// Remaining differences: Entry-pointer copies, flank-offset operands, and transition allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -44,9 +46,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        register u32 maskBit asm("r3") = one;
-        bit = maskBit;
-        asm("" : "+r"(bit));
+        bit = one;
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -162,6 +162,7 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
 void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target;
+    register u8 *enter asm("r8");
     register u32 state asm("r7");
     u32 mask = 8;
     p->flags |= mask;
@@ -175,10 +176,19 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
     asm("" : "+r"(state));
     switch (state) {
         case 0: {
-            u8 *enter = &p->enter;
-            if (*enter) {
-                *enter = 0;
-                Difference(&target, Player_GetEffectivePosition(0), p->anchor);
+            register u32 entered asm("r1");
+            {
+                register u8 *address asm("r0") = &p->enter;
+                entered = *address;
+                asm("" : "+r"(address), "+r"(entered));
+                enter = address;
+                asm("" : "+r"(enter));
+            }
+            if (entered) {
+                register u32 zero asm("r0") = 0;
+                asm("" : "+r"(zero));
+                *enter = zero;
+                Difference(&target, Player_GetEffectivePosition(zero), p->anchor);
                 if (p->variant == 1) {
                     target.x += 512;
                     target.z -= 512;
@@ -200,14 +210,28 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
             break;
         }
         case 1: {
-            u8 *enter = &p->enter;
-            register struct DisplaySequenceState *seq asm("r4") = &p->sequence;
-            if (*enter) {
-                *enter = 0;
-                Anim_SetSequence(seq, *(void **)(boss + 0x4d0), 8, (u8)p->variant, 0);
+            register struct DisplaySequenceState *seq asm("r4");
+            register u32 entered asm("r1");
+            {
+                register u8 *address asm("r0") = &p->enter;
+                entered = *address;
+                asm("" : "+r"(address), "+r"(entered));
+                enter = address;
+                asm("" : "+r"(enter));
+            }
+            seq = &p->sequence;
+            if (entered) {
+                register u32 zero asm("r2") = 0;
+                asm("" : "+r"(zero));
+                *enter = zero;
+                Anim_SetSequence(seq, *(void **)(boss + 0x4d0), 8, (u8)p->variant, zero);
             }
             if (StepPlayback(p, seq, p, state)) {
-                p->state = 2;
+                {
+                    register u32 next asm("r1") = 2;
+                    asm("" : "+r"(next));
+                    p->state = next;
+                }
                 p->timer = 0;
                 *enter = 1;
             }
