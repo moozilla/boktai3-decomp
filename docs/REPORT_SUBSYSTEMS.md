@@ -1,10 +1,80 @@
 # Subsystem report organization
 
-The objdiff v2 report groups documented contiguous code families in
-`symbols/progress_subsystems.csv`. These are presentation ranges, with functions
-nested beneath named `game/` units. They describe observed ownership and APIs;
-they do not assert recovered original object-file boundaries or specific in-game
-identities. Tentative names remain marked as such.
+The progress report (`tools/progress.py --json`, published to
+[decomp.dev](https://decomp.dev/moozilla/boktai3-decomp)) is a three-level
+hierarchy:
+
+1. **Category**: a top-level subsystem such as *Monsters*, *Bosses*, *Player*
+   or *Menus, HUD and dialogue* (`symbols/progress_categories.csv`). decomp.dev
+   lists the categories in its category menu; choosing one shows only its units.
+2. **Unit**: one object or subsystem inside a category, named
+   `Category/Unit`, for example `Monsters/Ghoul` or `Bosses/Vanargand 2`
+   (`symbols/progress_subsystems.csv`). Each tile of decomp.dev's treemap is a
+   unit; clicking it opens the next level.
+3. **Function**: the unit's functions, each a tile of the unit's treemap.
+
+decomp.dev draws one flat treemap per view and does not nest tiles, so the
+category level is the category menu, not a border inside the treemap. Units are
+listed category by category, so each category occupies one area of the full
+treemap. Source file locations (`src/fn/`, `src/*.c`) do not affect the report.
+
+Grouping never changes credit: every function keeps its address, size and
+exact or fuzzy status, and the totals are unchanged (`tests/tools/test_progress.py`).
+Ranges describe observed ownership and APIs; they do not assert recovered
+original object-file boundaries or in-game identities. Names are provisional.
+
+## How rows are made
+
+* **Reviewed rows** of `progress_subsystems.csv` (evidence not starting with
+  `auto:`) are written by people or workers from source and notes. Their
+  `category` column may name a category directly.
+* **Generated rows** (evidence `auto: ...`) cover all the code between reviewed
+  rows. `python3 tools/subsystems.py --regroup` (after `make disasm`) cuts that
+  code into contiguous objects by function-name prefix (`Ghoul_*`), smoothing
+  over stray prefixes, and pulls unnamed functions into the object they call,
+  are called by, or share a pointer table or data label with. Objects under
+  1 KB fold into their closest neighbour. Repeated prefixes are numbered in ROM
+  order (`Player 1`, `Player 2`).
+* A unit's category is its row's `category` if set, else the first
+  `progress_categories.csv` rule whose name regex matches (within the rule's
+  range if it has one), else the first address-only rule containing it.
+* `python3 tools/subsystems.py` prints the whole tree; `--tree` with
+  `--regroup` prints it after regrouping.
+
+## Keeping the structure tidy
+
+* **Name functions `Prefix_Action`**, with one prefix per object (`Ghoul_UpdateChase`).
+  The prefix is what puts a function in the right unit. A generic prefix
+  (`SceneActor_`, `Actor_`) in the middle of an enemy is fine; it is outvoted.
+* **After a naming batch**, run `make disasm && python3 tools/subsystems.py --regroup`
+  and commit the CSV with the names. Only generated rows change.
+* **When you identify an object or subsystem**, add a reviewed row with real
+  evidence and, if no rule places it right, a `category`. Reviewed rows are
+  never rewritten by `--regroup`; they absorb adjacent unnamed code only.
+* **New enemy, boss or menu family**: add its prefix to the matching rule in
+  `progress_categories.csv` if the address ranges there do not already cover it.
+* **Never leave code unclassified**: `test_every_game_function_has_a_unit_and_category`
+  fails if a unit falls through to *Not yet classified*, is a lone function, or
+  if units of one category are not listed together.
+* **Source layout** is independent: put a consolidated subsystem in
+  `src/<subsystem>.c` named after its row (docs/UNIT_WORKER.md, `tools/unitize.py`).
+
+## Current categories
+
+| Category | What it holds |
+|---|---|
+| Engine core | Boot, AgbMain, task scheduler, heap, script VM, video/sprite/BG/text services, terrain navigation, camera |
+| Minigames | Transformation and result game, its tutorial |
+| Link and wireless | Wireless controller and menus, link lobby and session panels, serial and RFU manager |
+| Hardware, time and save | Clock and sun schedule, solar sensor, save data, game state flags |
+| Bosses | Nidhoggr, Hresvelgr, Vanargand, Ratatosk, the slot-2 boss |
+| Field objects and hazards | Scene objects, containers, switches, crates, traps, hazards, terrain effects |
+| Monsters | One unit per enemy: the `08084F44–0810033C` enemy block (Bat, Ghoul, Slime, Bee, Ghost, …, Axe) and later enemy families (Armor, Glove, cannons, spines, …) |
+| Player | Player control, cues, attacks, barrier and clone |
+| Menus, HUD and dialogue | Dialogue, text windows, pause menu, HUD, inventory, shops, books, name entry, password |
+| Scene actors and NPCs | The shared scene-actor framework, pooled and contact actors, NPCs |
+| Effects and presentation | Particles, palette and scanline effects, projectiles, presentation controllers |
+| Libraries | MP2K, RFU, syscalls, EEPROM, SIIRTC, libgcc, libm, libc |
 
 ## Recent contiguous work
 

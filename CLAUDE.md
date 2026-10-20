@@ -25,6 +25,10 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
 * Don't edit generated files (`build/asm/*`). Names go in
   `symbols/functions.csv` / `symbols/data.csv`; pointer facts go in
   `symbols/pointers.txt` / `symbols/nonpointer_*.txt`.
+* Report hierarchy (decomp.dev): category -> unit -> function. Name functions
+  `Prefix_Action` with one prefix per object; after a naming batch run
+  `make disasm && python3 tools/subsystems.py --regroup`. Placement rules are in
+  `docs/REPORT_SUBSYSTEMS.md`.
 * Use useful provisional names without a separate proof exercise. Mark guesses
   `confidence=low` and record the current interpretation; revise later.
 
