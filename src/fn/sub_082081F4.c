@@ -1,101 +1,148 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-// confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
+// confidence=low: collision callback records damage and emits sparks for selected source flags.
 #define CannonTurret_ApplyHitReaction sub_082081F4
-
 #ifdef NONMATCHING
-// fuzzy: 86.5%
-// RNG stores, loop constants, and register allocation still differ.
-#include "scene_vec.h"
-
-/* Names and field interpretations are tentative. */
-
-struct HitSource {
-    u8 pad0[0xA];
-    u16 damageType;
-    u8 padC[0x2C];
+// fuzzy: 99.0%
+// Only the first RNG-index read uses a different pointer register.
+struct Vec {
+    u16 x, y, z, pad;
+};
+struct Source {
+    u8 p0[0xa];
+    u16 type;
+    u8 pc[0x38 - 0xc];
     u32 flags;
-    u8 pad3C[8];
+    u8 p3c[8];
     u16 reaction;
 };
-struct HitResult {
-    u8 pad0[0x3E];
+struct Hit {
+    u8 p0[0x3e];
     u16 damage;
-    u8 pad40[3];
+    u8 p40[3];
     u8 state;
     u16 blocked;
 };
+struct Target {
+    u8 p0[0x40];
+    struct Vec position;
+    u8 p48[0x6c - 0x48];
+    u8 collider[0xc];
+    struct Vec displayPosition;
+    u8 p80[0xaf - 0x80];
+    u8 direction;
+    u16 reaction;
+    u8 pb2[0x128 - 0xb2];
+    u16 flash;
+    u16 pad12a;
+    s16 damage;
+    u8 p12e[4];
+    s16 health;
+    u16 pad134;
+    s16 hudA;
+    u16 pad138;
+    u16 sparkMask;
+    s16 hudB;
+    u8 p13e[6];
+    s16 hudTime;
+    u16 pad146;
+    void *hud;
+    u8 p14c[4];
+    u32 damageType;
+};
+extern const struct Vec gUnk_0824FE84;
 extern u32 gUnk_03005308;
-extern const struct SceneVec gUnk_0824FE84;
 void sub_0821FF8C(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
-void PlayerStats_AddContactHundredths(void *, void *, u32);
+void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-#define H(o) (*(s16 *)(p + (o)))
-#define U(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-static inline u32 RandomSample(const u16 *table)
+void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
+                                   struct Target *targetInput)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
-}
-static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
-{
-    u16 *x = (u16 *)&v->x, *y = (u16 *)&v->y, *z = (u16 *)&v->z;
-    u32 sample = RandomSample(table);
-    u32 base = *x - 64;
-    asm("" : "+r"(base));
-    *x = base + (sample & 127);
-    *y = *y + (u8)RandomSample(table);
-    sample = RandomSample(table);
-    base = *z - 64;
-    asm("" : "+r"(base));
-    *z = base + (sample & 127);
-}
-void CannonTurret_ApplyHitReaction(struct HitSource *source, struct HitResult *hit, u8 *p)
-{
+    struct {
+        struct Vec position, velocity;
+    } frame;
+    struct Source *source = sourceInput;
+    struct Hit *hit = input;
+    struct Target *target = targetInput;
     sub_0821FF8C(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
     } else {
-        ((struct {
-            u8 pad[0x12c];
-            s16 damage;
-        } *)p)
-            ->damage = hit->damage;
-        W(0x150) = source->damageType;
-        {
-            u32 reaction = source->reaction;
-            asm("" : "+r"(reaction));
-            U(0xb0) = reaction;
-        }
+        target->damage = hit->damage;
+        target->damageType = source->type;
+        target->reaction = source->reaction;
         if (source->flags & 0x40) {
-            U(0xb0) = 0x26;
-            H(0x128) = 8;
+            register void *hud asm("r8");
+            register s32 health asm("r7");
+            s32 a, b, direction;
+            target->reaction = 0x26;
+            target->flash = 8;
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(p + 0x6c, H(0x12c), 0, p + 0x78, p + 0x80, 1);
-            SceneHud_SetTimedState(*(void **)(p + 0x148), H(0x132), H(0x136), H(0x13c),
-                                   p[0xaf] == 4, H(0x144));
+            DamageNumberDisplay_Show(target->collider, target->damage, 0, &target->displayPosition,
+                                     (u8 *)target + 0x80, 1);
+            hud = target->hud;
+            health = target->health;
+            a = target->hudA;
+            b = target->hudB;
+            direction = 0;
+            if (target->direction == 4)
+                direction = 1;
+            asm("" : "+r"(health));
+            SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
             if (source->flags & 0x40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
-        if (source->flags & U(0x13a)) {
-            struct SceneVec velocity, position;
-            s32 i = 2;
+        if (source->flags & target->sparkMask) {
+            s32 i;
+            struct Vec *vel = &frame.velocity;
+            struct Vec *pos = &frame.position;
+            register u32 *index asm("r9") = &gUnk_03005308;
+            u32 mask = 0x7f;
+            i = 2;
             do {
+                register u32 random asm("r1");
                 register const u16 *table asm("r3");
-                velocity = gUnk_0824FE84;
-                position = *(struct SceneVec *)(p + 0x40);
+                u32 sample;
+                u32 x;
+                frame.velocity = gUnk_0824FE84;
+                frame.position = target->position;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
-                RandomizePosition(&position, table);
-                SparkParticle_Spawn(&position, 1, &velocity, 0, 3, 8, 2, 2);
-            } while (--i >= 0);
+                {
+                    u32 *cursor = index;
+                    register u32 wrap asm("r0");
+                    random = *cursor + 1;
+                    wrap = 0x3ff;
+                    asm("" : "+r"(wrap) : "r"(cursor));
+                    random &= wrap;
+                }
+                sample = table[random];
+                x = pos->x - 0x40;
+                sample &= mask;
+                x += sample;
+                pos->x = x;
+                random = (random + 1) & 0x3ff;
+                pos->y += (u8)table[random];
+                random = (random + 1) & 0x3ff;
+                {
+                    register u32 *cursor asm("r7") = index;
+                    *cursor = random;
+                }
+                {
+                    u32 last = table[random];
+                    x = pos->z - 0x40;
+                    last &= mask;
+                    x += last;
+                    pos->z = x;
+                }
+                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
+                i--;
+            } while (i >= 0);
         }
     }
 }
