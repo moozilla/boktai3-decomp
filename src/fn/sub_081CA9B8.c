@@ -14,8 +14,6 @@ struct S {
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
-#define StateActor_UpdateTwoStageAnimationB sub_081CA9B8
-
 void StateActor_UpdateTwoStageAnimationB(u32 a, struct S *p)
 {
     u32 r;

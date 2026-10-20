@@ -6,7 +6,6 @@ struct SceneActorScriptContext {
     u8 unknown0[0x67C];
     s16 mode, firstParameter, secondParameter;
 };
-#define SceneActor_CallContextScriptB sub_080B0D28
 void SceneActor_CallContextScriptB(struct SceneActorBehaviorView *actor)
 {
     s32 values[12];
