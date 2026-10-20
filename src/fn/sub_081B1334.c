@@ -5,7 +5,7 @@
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
 #ifdef NONMATCHING
-// fuzzy: 86.0%
+// fuzzy: 96.1%
 // Remaining differences: Entry/reset pointer allocation, guarded-transition address reuse, and final stores differ.
 #include "display_animation.h"
 #include "scene_vec.h"
