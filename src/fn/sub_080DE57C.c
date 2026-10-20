@@ -1,3 +1,4 @@
+#define Dog_ResetActionState sub_080DE57C
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -18,7 +19,7 @@ struct IvyPlacement {
 static inline void StepSequence(void *obj)
 {
     struct SceneActorControlMotionDrawable *owner = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
