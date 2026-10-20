@@ -8198,6 +8198,7 @@ addr,name,mode,confidence,source,notes
 08215A48,Bg_SetTileUpload,thumb,low,src-alias,Stores a background tile source with destination offset and size for later upload; upload role is tentative.
 08215A74,Bg_SetPriority,thumb,low,src-alias,Sets the priority bits in the selected background control register
 08215C8C,BgGfx_FindEntryById,thumb,low,src-alias,Finds a resource entry by ID for background tile loading
+08215CB8,Bg_CopyTiles,thumb,low,src-alias,
 08215DF0,Bg_SetTilemapEntry,thumb,low,src-alias,Writes a tile index with flip flags and palette bank into a background map cell
 08215F38,Text_DrawNumber,thumb,low,src-alias,
 082161B4,Bg_SetupLayers,thumb,low,src-alias,
@@ -8423,9 +8424,12 @@ addr,name,mode,confidence,source,notes
 0821E7EC,Path_GetPointPositionById,thumb,low,src-alias,Resolves a path ID and point index into XYZ or clears XYZ on failure
 0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821E8C8,SceneActorRoute_IsOutsidePointBounds,thumb,low,src-alias,
+0821E920,Path_PickRandomPoint,thumb,low,src-alias,
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
+0821F204,Nav_IsPositionInMesh,thumb,low,src-alias,
+0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,

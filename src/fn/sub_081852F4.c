@@ -9,7 +9,7 @@ void ActorController_StartTurn(u8 *, u32);
 u32 ActorController_StartModeTwoTurn(u8 *p, u32 v);
 u32 ActorController_StartModeThreeTurn(u8 *p, u32 v);
 u32 ActorController_StartModeOneTurn(u8 *p, u32 v);
-s32 sub_0821F7A8(void *, void *, struct CP *);
+s32 Terrain_ApplyBlocked(void *, void *, struct CP *);
 u32 NavMesh_ConsumeProbeEvent(u16 *p);
 s32 ActorController_IsNearTarget(u8 *);
 u32 sub_0821FB8C(void *, void *, u32, u32);
@@ -24,7 +24,7 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
         pos.x = *(u16 *)(g + 0x30);
         pos.y = *(u16 *)(g + 0x32);
         pos.z = *(u16 *)(g + 0x34);
-        r = sub_0821F7A8(p + 0x18, p + 0x48, &pos);
+        r = Terrain_ApplyBlocked(p + 0x18, p + 0x48, &pos);
         if (r == 1) {
             p[0xB3D] = r;
         } else if (ActorController_IsNearTarget(p) == 0) {

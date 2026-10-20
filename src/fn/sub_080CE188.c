@@ -156,12 +156,12 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
                          struct ContactPosition *position, struct ContactPosition *destination)
 {
     s32 result;
-    if (!sub_0821F204(route, position, destination)) {
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
         u32 mask = ~0x200;
         actor->flags2D4 = mask & actor->flags2D4;
         return 0;
     } else {
-        result = sub_0821F7A8(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);
@@ -301,11 +301,11 @@ static inline u8 RouteToBit(struct SceneActorRegistryResetView *actor, void *rou
                             struct ContactPosition *position, struct ContactPosition *target,
                             u32 bit)
 {
-    if (!sub_0821F204(routeObject, position, target)) {
+    if (!Nav_IsPositionInMesh(routeObject, position, target)) {
         actor->flags2D4 &= ~bit;
         return 0;
     } else {
-        s32 result = sub_0821F7A8(routeObject, position, target);
+        s32 result = Terrain_ApplyBlocked(routeObject, position, target);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);

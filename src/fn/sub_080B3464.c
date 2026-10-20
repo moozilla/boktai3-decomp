@@ -49,9 +49,9 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
 {
     void *route = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->position;
-    s32 result = sub_0821F204(route, position, target);
+    s32 result = Nav_IsPositionInMesh(route, position, target);
     if (result) {
-        result = sub_0821F7A8(route, position, target);
+        result = Terrain_ApplyBlocked(route, position, target);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);

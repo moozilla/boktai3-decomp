@@ -8,8 +8,8 @@
 #define gCurrentTerrainMap gUnk_030052F4
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
-s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 s32 SceneActor_FindDirectionalCell(void *, s32);
 s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
 {
@@ -45,10 +45,10 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
     target.y = actor->position.y;
     route = *(void **)(group + 0x1FC);
     position = &actor->position;
-    result = sub_0821F204(route, position, &target);
+    result = Nav_IsPositionInMesh(route, position, &target);
     if (!result)
         goto clearRoute;
-    result = sub_0821F7A8(route, position, &target);
+    result = Terrain_ApplyBlocked(route, position, &target);
     if (!result)
         goto clearRoute;
     if (result != 2)

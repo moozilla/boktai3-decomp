@@ -9,7 +9,7 @@ s32 SceneVolume_GetActivityState(struct ActorState *);
 s32 SceneVolume_FindNearbyPosition(struct ActorState *);
 void SceneVolume_BeginPhase(struct ActorState *, s32);
 s32 ActorEffect_StepTurn(struct ActorState *, u32, s32, s32, s32);
-s32 sub_0821E920(void *, u32);
+s32 Path_PickRandomPoint(void *, u32);
 static inline u8 ConsumeTrigger(struct ActorState *p)
 {
     if (p->triggered) {
@@ -33,7 +33,7 @@ void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
     s32 result;
     if (ConsumeTrigger(p)) {
         p->animationIndex = (RandomValue() >> 8) & 3;
-        if (sub_0821E920(&p->animation, p->animationIndex) >= 0)
+        if (Path_PickRandomPoint(&p->animation, p->animationIndex) >= 0)
             p->animationState = 3;
         {
             u32 state = 4;

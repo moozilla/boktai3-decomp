@@ -4,8 +4,10 @@
 struct SceneActorRouteTargetPosition {
     s16 x, y, z, pad;
 };
-u32 sub_0821F204(void *, const struct ContactPosition *, struct SceneActorRouteTargetPosition *);
-u32 sub_0821F7A8(void *, const struct ContactPosition *, struct SceneActorRouteTargetPosition *);
+u32 Nav_IsPositionInMesh(void *, const struct ContactPosition *,
+                         struct SceneActorRouteTargetPosition *);
+u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *,
+                         struct SceneActorRouteTargetPosition *);
 static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -50,10 +52,10 @@ void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *act
     }
     target.y = base->position.y;
     context = *(void **)(control + 0x1FC);
-    if (!sub_0821F204(context, &base->position, &target))
+    if (!Nav_IsPositionInMesh(context, &base->position, &target))
         goto failed;
     {
-        u32 result = sub_0821F7A8(context, &base->position, &target);
+        u32 result = Terrain_ApplyBlocked(context, &base->position, &target);
         if (!result)
             goto failed;
         if (result != 2)
