@@ -6586,6 +6586,7 @@ addr,name,mode,confidence,source,notes
 081A4064,MotionEntry_UpdatePosition,thumb,low,src-alias,
 081A4100,MotionEntry_Create,thumb,low,src-alias,
 081A427C,Hresvelgr_ReleaseEffect,thumb,low,src-alias,Decrements the active effect count and marks the entry inactive
+081A4594,Hresvelgr_UpdateMotionEntry,thumb,low,src-alias,
 081A46B0,Hresvelgr_UpdateEffects,thumb,low,src-alias,Task update callback dispatches each active effect by type and increments its age
 081A46EC,Hresvelgr_DestroyEffectPool,thumb,low,src-alias,Task destruction callback removes effect sprites and clears the pool singleton
 081A4718,EffectSpritePool_InitializeEntries,thumb,low,src-alias,
