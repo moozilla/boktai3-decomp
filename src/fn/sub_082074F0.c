@@ -1,7 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 76.5%
+// fuzzy: 81.3%
 // Remaining differences: branch sharing, address lifetimes and register allocation.
+// MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 #define VulcanCannon_UpdateDamageState sub_082074F0
 extern u32 gUnk_030053F0, gUnk_02000560;
@@ -19,23 +20,27 @@ struct CannonEffectVector { struct CannonEffectPair a, b; };
 struct CannonCollider { u8 pad[6]; u16 flags; };
 static inline u32 TestPair(u32 mask, u32 *a, u32 *b) { return (*a | *b) & mask; }
 static inline u32 TestFlag(u32 mask, u32 *p) { return *p & mask; }
-static inline s32 CannonRandom(s32 mask)
+static inline s32 CannonRandom(const u16 *table, s32 mask)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308] & mask;
+    return table[gUnk_03005308] & mask;
 }
 static inline void CannonEffectOffset(struct SceneVec *v) { v->y += 128; }
 s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 {
-    struct CannonCollider *collider = (void *)p->collider;
+    struct CannonCollider *collider;
     if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560)) return 0;
     p->previousVisible = p->targetVisible;
     Callback_InvokeActor(p, p->state);
     p->display.sprite.flags &= ~1;
     if (!p->dead) {
+        collider = (void *)p->collider;
         collider->flags &= ~4;
         Collider_SetPosition(collider, &p->display.spatial.position, 0);
-    } else collider->flags |= 4;
+    } else {
+        collider = (void *)p->collider;
+        collider->flags |= 4;
+    }
     if (p->damage > 0 && !p->dead) {
         p->hp -= p->damage;
         p->hitFlags = p->colliderHitFlags;
@@ -48,17 +53,19 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         if (p->hp <= 0) {
             struct SceneVec center, smoke;
             struct CannonEffectVector velocity, spread;
+            const u16 *table;
             p->dead = 1;
             if (p->terrainEnabled) TerrainModifiers_UnregisterCell(p->terrain);
             center = p->display.spatial.position;
             CannonEffectOffset(&center);
             velocity.a.lo = -4;
-            velocity.a.hi = CannonRandom(7);
+            table = (const u16 *)RANDOM_TABLE_ADDR;
+            velocity.a.hi = CannonRandom(table, 7);
             velocity.b.lo = -4;
             spread.a.lo = 24;
-            spread.a.hi = CannonRandom(7) + 3;
+            spread.a.hi = CannonRandom(table, 7) + 3;
             spread.b.lo = 24;
-            sub_08014634(CannonRandom(3) + 4, 13, &center, &velocity, &spread, 15, 15);
+            sub_08014634(CannonRandom(table, 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             smoke = p->display.spatial.position;
             CannonEffectOffset(&smoke);
             sub_081DB390(&smoke, 16, 0, 0, 0, 60, 0, 0);
@@ -109,7 +116,11 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
     }
     p->timer++;
     if (p->aimTimer > 0) p->aimTimer--;
-    return 0;
+    {
+        register s32 result asm("r0") = 0;
+        asm("" : "+r"(result));
+        return result;
+    }
 }
 
 #else
