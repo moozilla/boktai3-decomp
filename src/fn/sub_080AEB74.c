@@ -1,8 +1,9 @@
 #include "scene_actor_chase.h"
 // confidence=low: restores a saved patrol destination and delayed command.
+#define Vorn_TryRestorePatrolRoute sub_080AEB74
 #ifdef NONMATCHING
 // fuzzy: 80.2%
-// Remaining differences: terrain destination spill, flag-address reuse, and reset scheduling.
+// Remaining differences: terrain destination spill, flag-address reuse, and reset scheduling; savedMotion need not be volatile.
 void Vorn_SendMessage(void *);
 struct VornPatrolRoute {
     u8 unknown0[8];
@@ -31,7 +32,7 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     u8 *group = (u8 *)&actor->group;
     u8 *context = actor->context;
     struct SceneActorReactionMotion *motion;
-    struct SceneActorReactionMotion *volatile savedMotion;
+    struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
     if (!Bits(actor, 0x400000) || !Bits(actor, 0x200000) ||
         !CanRestore(motion = (void *)&actor->fieldDC, 1))
@@ -95,5 +96,5 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_TryRestorePatrolRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080AEB74);
 #endif
