@@ -15,8 +15,8 @@ struct Actor {
 };
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-u32 sub_081134B0(struct Actor *, struct ParticleOffset *, struct ParticleOffset *, u32, u32, u32,
-                 u32, u32, u32, u32, u32, u32, u32, u32, u32);
+u32 ActorEffect_SpawnAtActorPos(struct Actor *, struct ParticleOffset *, struct ParticleOffset *,
+                                u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 ParticleRandom(void)
 {
     gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
@@ -36,13 +36,13 @@ void ActorParticles_SpawnSideBurst(struct Actor *p)
     b.z = (ParticleRandom() & 7) - 3;
     {
         u8 layer = p->field4A;
-        sub_081134B0(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
+        ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
     }
     b.x = (ParticleRandom() & 3) + 2;
     b.y = -(ParticleRandom() & 7) - 2;
     b.z = (ParticleRandom() & 7) - 3;
     {
         u8 layer = p->field4A;
-        sub_081134B0(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
+        ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
     }
 }
