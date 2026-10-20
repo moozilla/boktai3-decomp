@@ -12,7 +12,7 @@ void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
 static inline void ClearPosition(void *src, void *dst)
@@ -44,7 +44,7 @@ s32 PanelKeyframeSprite_Create(struct PanelKeyframeOwner *owner, u32 key, u32 in
     spriteFlags = flags | 0x11;
     anim = p->anim;
     frame = (u16)index;
-    sub_0821983C(anim, p, frame, spriteFlags, (u8)mode, 2, 0x3C, pos);
+    Widget_InitLinked(anim, p, frame, spriteFlags, (u8)mode, 2, 0x3C, pos);
     Anim_SetKeyframes(anim, p, frame, 2, 0);
     Anim_Step(anim, p);
     return 1;

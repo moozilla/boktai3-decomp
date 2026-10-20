@@ -10,11 +10,11 @@ struct O {
     u16 b;
     u16 c;
 };
-u16 sub_0821BD48(struct O *);
+u16 Terrain_GetHeightAt(struct O *);
 void Path_GetPointPosition(struct O *o, struct E *t, u32 i)
 {
     struct E *e = &t[i];
     o->a = e->a;
     o->c = e->b;
-    o->b = sub_0821BD48(o);
+    o->b = Terrain_GetHeightAt(o);
 }

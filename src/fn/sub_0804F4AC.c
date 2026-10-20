@@ -7,7 +7,7 @@ struct C {
 };
 struct C *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, struct C *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
+void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
 void ResourceStation_InitializeDigits(u8 *p)
 {
     struct Z z;
@@ -27,7 +27,7 @@ void ResourceStation_InitializeDigits(u8 *p)
         a += 0x20;
         j = 3;
         do {
-            sub_0821983C(a, b, 0x1e, 0x31, 1, 0, 0x3c, &z);
+            Widget_InitLinked(a, b, 0x1e, 0x31, 1, 0, 0x3c, &z);
             a += 0x60;
             j--;
         } while (j >= 0);

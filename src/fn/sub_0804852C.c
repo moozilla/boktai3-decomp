@@ -1,5 +1,5 @@
 #include "wireless_link_indicator.h"
-s32 sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
 {
     const struct ProjectedDisplayResource *resource;
@@ -11,7 +11,7 @@ s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
         indicator->resource = *resource;
         relocated = &indicator->resource;
         ResourceHeader_Relocate(relocated, (void *)resource);
-        sub_0821983C(&indicator->animation, relocated, 34, 17, 0, 0, 60, NULL);
+        Widget_InitLinked(&indicator->animation, relocated, 34, 17, 0, 0, 60, NULL);
         result = 0;
     } else
         result = -1;

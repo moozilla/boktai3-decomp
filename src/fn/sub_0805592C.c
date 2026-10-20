@@ -1,5 +1,5 @@
 #include "script_keyframe_pool.h"
-void sub_0821983C(void *, void *, u32, u32, u32, u32, s32, const void *);
+void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 void ScriptKeyframe_AddFromScript(void)
 {
     struct ScriptKeyframeManager *manager = gUnk_02000498;
@@ -57,8 +57,8 @@ void ScriptKeyframe_AddFromScript(void)
             position = &entry->position;
         }
     }
-    sub_0821983C(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0, 60,
-                 position);
+    Widget_InitLinked(&entry->animation, &entry->resource, (u16)frame, mode, (u8)priority, 0, 60,
+                      position);
     value = Script_SeekToKeyword('A');
     if (value)
         entry->conditionalVisibility = Script_GetValue();

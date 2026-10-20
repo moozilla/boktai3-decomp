@@ -19,7 +19,7 @@ struct TetherRequestIndicator {
 
 void *ScriptProc_Start(u16 key, u16 context);
 s32 ResourceHeader_Relocate(void *dst, void *src);
-void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 s32 DirectionMarker_GetAnimation(s32 base, s32 group);
 void Anim_SetKeyframes(void *anim, void *data, u32 index, u32 mode, u32 flags);
 void *SceneActors_GetBySlot(u32);
@@ -31,7 +31,7 @@ s32 TetherActor_InitRequestIndicator(struct TetherRequestIndicator *p)
     resource = ScriptProc_Start(0xCB05, 0xF771);
     p->resource = *resource;
     ResourceHeader_Relocate(&p->resource, resource);
-    sub_0821983C(p->anim, &p->resource, 0, 0x10, 0, 1, 0x3c, 0);
+    Widget_InitLinked(p->anim, &p->resource, 0, 0x10, 0, 1, 0x3c, 0);
     Anim_SetKeyframes(p->anim, &p->resource, (u16)DirectionMarker_GetAnimation(0, 0), 0, 0);
     p->flags |= 1;
     p->actor = SceneActors_GetBySlot(1);
