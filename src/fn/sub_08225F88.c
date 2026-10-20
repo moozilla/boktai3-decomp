@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Camera_SetPosition sub_08225F88
-
 struct Vec {
     s16 x, y, z;
 };
