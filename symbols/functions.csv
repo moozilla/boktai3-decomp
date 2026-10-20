@@ -4655,6 +4655,7 @@ addr,name,mode,confidence,source,notes
 0812CF50,SceneSlot_Allocate,thumb,low,src-alias,
 0812CF9C,SceneSlot_EmitPulse,thumb,low,src-alias,
 0812D180,SceneSlot_UpdateTimedPulse,thumb,low,src-alias,
+0812D1D8,LargeFragmentEffect_UpdateAnimation,thumb,low,src-alias,
 0812D34C,SceneSlot_Remove,thumb,low,src-alias,
 0812D390,ScriptedColliderActor_Create,thumb,low,src-alias,
 0812D46C,FragmentSpritePool_UpdateTask,thumb,low,src-alias,Task callback dispatches handlers for eight active sprite slots; fragment identity is tentative from resource F422
@@ -4667,6 +4668,7 @@ addr,name,mode,confidence,source,notes
 0812D704,SceneParticle_UpdateMotion,thumb,low,src-alias,
 0812D758,SceneParticle_Remove,thumb,low,src-alias,
 0812D7D0,SceneParticle_Create,thumb,low,src-alias,
+0812D8EC,ParticleEffectPool_Update,thumb,low,src-alias,
 0812D960,ParticleEffectPool_DestroyTask,thumb,low,src-alias,Task cleanup callback removes active effects from 26 slots and clears the singleton
 0812D9A8,ParticleEffectPool_Init,thumb,low,src-alias,Finds animation resource 1C1E and clears the pool mask; particle identity is tentative
 0812D9D4,ParticleEffectPool_GetOrCreate,thumb,low,src-alias,Returns the existing effect pool or creates its task and installs callbacks
@@ -4678,6 +4680,7 @@ addr,name,mode,confidence,source,notes
 0812DF40,Math_GetVectorLength,thumb,low,src-alias,
 0812E058,SceneActor_SetPositionXZ,thumb,low,src-alias,
 0812E084,SceneActorReaction_ResetResponseState,thumb,low,src-alias,Clears embedded response state bytes and control words used by actor restoration callers
+0812E3DC,InventorySlot_PickRandom,thumb,low,src-alias,
 0812E5A4,ActorParticles_SpawnBurst,thumb,low,src-alias,
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
@@ -4691,10 +4694,13 @@ addr,name,mode,confidence,source,notes
 0812F8F4,SceneActorControl_UpdateEntryTransition,thumb,low,src-alias,
 0812FA0C,SceneActorReaction_UpdateRouteReturn,thumb,low,src-alias,
 081301C4,SceneActorReaction_UpdateRouteRecovery,thumb,low,src-alias,
+0813042C,SceneActorControl_EnterTimedState,thumb,low,src-alias,
 08130490,SceneActorControl_AdvancePhaseIfFlagged,thumb,low,src-alias,Clears the phase entry byte and increments the phase counter when flag 2 at offset 2D4 is set
 081305D0,SceneActorControl_AdvancePhase,thumb,low,src-alias,Clears the phase entry byte and unconditionally increments the counter at offset 2AC
+081305F8,SceneActorControl_BeginIdleControl,thumb,low,src-alias,
 0813067C,SceneActorControl_UpdateSavedControlPhase,thumb,low,src-alias,
 08130714,SceneActorControl_UpdateTriggerApproach,thumb,low,src-alias,
+08130884,SceneActorControl_UpdateTriggerPhase,thumb,low,src-alias,
 08130AB4,SceneActorState_DispatchTable294State,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x294; table role remains tentative
 08130AD8,SceneActorState_DispatchTable29CState,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x29C; table role remains tentative
 08130AFC,SceneActorState_DispatchTable2A0State,thumb,low,src-alias,Invokes the callback selected by byte 0x2A9 from table 0x2A0; table role remains tentative

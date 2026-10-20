@@ -174,7 +174,6 @@ void LargeFragmentEffect_UpdateCollider(u8 *);
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
 void sub_0812D064(struct Vec *);
-#define LargeFragmentEffect_UpdateAnimation sub_0812D1D8
 void LargeFragmentEffect_UpdateAnimation(void *unused, struct Feather *p)
 {
     if (p->enter) {

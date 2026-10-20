@@ -24,8 +24,6 @@ struct S {
     u32 mask;
 };
 
-#define ParticleEffectPool_Update sub_0812D8EC
-
 u32 ParticleEffectPool_Update(struct S *b)
 {
     s32 i;
@@ -44,5 +42,5 @@ u32 ParticleEffectPool_Update(struct S *b)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812D8EC);
+INCLUDE_ASM("asm/nonmatching", ParticleEffectPool_Update);
 #endif

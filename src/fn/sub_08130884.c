@@ -23,7 +23,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define SceneActorControl_UpdateTriggerPhase sub_08130884
 
 void SceneActorControl_UpdateTriggerPhase(struct SceneActorRegistryResetView *actor)
 {

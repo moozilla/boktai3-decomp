@@ -17,7 +17,7 @@ struct SceneActorItemLaunch {
     u16 flags;
 };
 extern struct ItemLaunchPlayer *gUnk_02000580[4];
-u8 sub_0812E3DC(s16 *, s16 *, s16 *);
+u8 InventorySlot_PickRandom(s16 *, s16 *, s16 *);
 s32 sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
 void Sound_PlaySong(u32);
@@ -41,7 +41,7 @@ s32 SceneActor_TryLaunchSelectedItem(struct SceneActorItemLaunch *p)
     pos.y += 200;
     if (occupied(p))
         return -1;
-    if (!sub_0812E3DC(&p->slot, &p->kind, &p->parameter))
+    if (!InventorySlot_PickRandom(&p->slot, &p->kind, &p->parameter))
         return -1;
     if (sub_08017044(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
         p->slot = 0xffff;
