@@ -8728,6 +8728,7 @@ addr,name,mode,confidence,source,notes
 0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
+0821FB04,Actor_MoveAlongAngle,thumb,low,src-alias,
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,
 0821FD3C,ProximityVolume_TranslateBounds,thumb,low,src-alias,
 0821FDC8,Collider_Register,thumb,low,src-alias,Appends a collider to the manager's list unless already registered
@@ -9170,8 +9171,11 @@ addr,name,mode,confidence,source,notes
 0822D808,Inventory_GetEquippedDescriptor,thumb,low,src-alias,Resolves a primary equipment assignment and outputs its descriptor or an empty descriptor
 0822D83C,Inventory_SetEquipmentEntry,thumb,low,src-alias,Initializes an inventory entry from a descriptor and marks its equipment ID obtained
 0822D858,Inventory_ClearEquipmentEntry,thumb,low,src-alias,Initializes the indexed equipment entry from an empty descriptor
+0822D87C,Inventory_AddEquipmentFromRecord,thumb,low,src-alias,
 0822D904,Inventory_TryAddEquipmentEntry,thumb,low,src-alias,Wraps the equipment insertion helper and returns whether its result is positive
 0822D918,Inventory_RemoveEquipmentEntry,thumb,low,src-alias,Clears an equipment entry and removes all eight primary assignments referencing it
+0822D94C,Inventory_SwapEquipmentEntries,thumb,low,src-alias,
+0822DA94,Inventory_SortEquipment,thumb,low,src-alias,
 0822DB54,RecordEntry_AddFromScript,thumb,low,src-alias,
 0822DC24,Inventory_SetEntryFromScript,thumb,low,src-alias,
 0822DC78,GameState_ApplySelectedItem,thumb,low,src-alias,
@@ -9228,6 +9232,7 @@ addr,name,mode,confidence,source,notes
 0822EDF8,Save_ResumeRuntimeAfterTransfer,thumb,low,src-alias,Restores saved runtime callbacks and sound VSync after a save transfer
 0822EE68,Save_WriteBlock,thumb,low,src-alias,
 0822EF44,Save_ReadBlock,thumb,low,src-alias,
+0822EFFC,Save_VerifyBlock,thumb,low,src-alias,
 0822F0A4,Save_WriteBlockWithRetries,thumb,low,src-alias,
 0822F10C,Save_ReadBlockWithRetries,thumb,low,src-alias,
 0822F1B4,umul3232H32,thumb,low,src-alias,
@@ -9298,6 +9303,7 @@ addr,name,mode,confidence,source,notes
 08231448,ActiveList_PrependNode,thumb,low,src-alias,
 08231480,EffectGroup_Unlink,thumb,low,src-alias,
 082314C4,EffectGroup_FadeFirstActive,thumb,low,src-alias,
+08231500,EffectGroup_SpawnPart,thumb,low,src-alias,
 08231568,EffectGroup_Reset,thumb,low,src-alias,
 082315A8,EffectGroup_Spawn,thumb,low,src-alias,
 08231788,SceneActorEffects_FinishSlot,thumb,low,src-alias,Resets slot state and timer while marking its drawable inactive

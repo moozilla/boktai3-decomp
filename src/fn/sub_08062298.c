@@ -1,5 +1,5 @@
 #include "scene_inventory_tail.h"
-void sub_0822DA94(u32);
+void Inventory_SortEquipment(u32);
 void Inventory_SortConsumables(u32);
 void GameState_SortConsumableSlots(u32);
 s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
@@ -12,7 +12,7 @@ s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
         Sound_PlaySong(0xDD);
         switch (p->category) {
             case 0:
-                sub_0822DA94(0);
+                Inventory_SortEquipment(0);
                 break;
             case 1:
                 Inventory_SortConsumables(0);
