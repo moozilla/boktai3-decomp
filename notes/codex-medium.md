@@ -211,3 +211,86 @@ register changes. The Ghidra export was unavailable; reconstruction used asm,
 matched relatives, neighboring callbacks and shared headers. All five draft
 scores were recorded with check.py --nonmatching --record. Full-ROM validation
 and any alias promotion remain integration work.
+
+
+# Task 081875EC — Armor attack decisions
+
+Tags: #matching #armor #actor-controller #nonmatching
+
+Worked offline on the already checked-out cloud/081875EC assignment. Read
+CLAUDE.md, AGENTS.md, CLOUD.md, WORKER.md, HANDOFF.md and BIG_FUNCTIONS.md.
+No network, full builds or direct git mutations were used. The existing
+unrelated tools/cloud_task.py modification was left alone. No exact progress
+was added: percentage-point gain is 0. This task retains one guarded draft.
+
+Read the Armor-named neighboring callbacks (including 08186618), callers
+08189C54/08189C80/08189CAC/08189CD8, and the behavior-setting callees in the
+assembly. The six routines are actor decision state machines. They compare
+player coordinates at 0x30/0x32/0x34 to actor coordinates at 0x48/0x4A/0x4C,
+round horizontal deltas with (delta + 128) >> 8, and dispatch through the
+byte at actor+0x1120. Actor+0xB32 bit one selects alternate decision paths;
+0xB39 is facing, 0xB3C behavior and 0xB3D sequence phase. Names remain tentative.
+
+- **081875EC — drafted 83.9%, Armor_UpdateAlignedAttackDecision.** Selects
+  attacks on a shared horizontal grid axis; checks vertical separation <=127
+  and horizontal range <=1/3, with a separate flag-dependent path. The normal
+  idle path increments 0x1126 and can select behavior 31 after 300 ticks when
+  Armor_IsSequenceIncomplete succeeds. Decision 1 waits for cooldown 0x1122;
+  decision 2 requests behavior 23 and clears two timers. Retained an r2 pin
+  for the absolute Z delta, marked MATCHING_CONCESSION. It removed an extra
+  saved high register and reduced realigned structural residue from 31 to 14
+  on the scratch check. Final reviewed-extent check: **83 differing insns,
+  12 ignoring registers**. Remaining: branch polarity/far branches, merged
+  decision stores, address derivation and scratch register choices. Pinning
+  more deltas or the cooldown pointer did not close these differences. The
+  default INCLUDE_ASM path passed check.py exactly (956 bytes); this is not
+  an exact C match. Score recorded with --nonmatching --record.
+- **08187F44 — stopped below threshold; best fuzzy 75.9%.** Proposed
+  Armor_UpdateCloseRangeDecision. Decrements attack and collision cooldowns
+  twice in fast mode, gates collider flag four, and toggles fast mode every
+  300 ticks outside the alternate flag path. The two decision switches share
+  approach/recovery logic; side attacks randomly choose behavior 36 or 24.
+  Full candidate stays in wip/sub_08187F44.c. The retained structural best
+  has 213 realigned differences, 99 ignoring registers (69.5% fuzzy); the
+  higher fuzzy variants had worse total alignment. agbcc merges repeated
+  facing loads and cooldown-address formation that the ROM repeats. Pinning
+  decisions, angle and coordinate values, pointer forms and inline expansion
+  did not produce an eligible draft.
+- **081879A8 — stopped at 75.3%, Armor_UpdateMeleeDecision.** Near sibling
+  of 08187F44 without its four random side-attack choices; each chooses
+  behavior 24 directly. Retained scratch candidate has 211 realigned
+  differences, 93 ignoring registers. The same facing-load caching and
+  cooldown-tail/address sharing remain. A narrower Math_Atan2 declaration
+  improved two instructions but did not resolve the body. No source draft.
+- **081885BC — stopped at 68.7%, Armor_UpdateDefensiveDecision.** Six-case
+  defensive decision switches, attack/secondary/collision countdowns,
+  sequence-dependent recovery, and restoration of saved fields 0x112C/0x112E
+  to 0xB26/0xB28/0x274. Clears mask 0x00200004 in two control flags on
+  restoration. Normal decision 1 can select behavior 31 from timer 0x1130.
+  Scratch candidate: 248 realigned differences, 113 ignoring registers.
+  Pinning deltas and absolute values improved the first pass from 55.8%,
+  but shared jump-table tails, pointer lifetimes and flag access shapes remain.
+- **08188B7C — stopped at 66.2%, Armor_UpdateRetreatDecision.** Close sibling
+  of 081885BC: special type 13 instead of 12, direct behavior-29 requests,
+  and normal decision 1 chooses behavior nine when facing the player at a
+  Manhattan distance over four (instead of the timer/sequence check).
+  Scratch candidate: 277 realigned differences, 106 ignoring registers.
+  Same jump-table and shared-tail problems as the defensive variant.
+- **0818911C — stopped below threshold, Armor_UpdateAggressiveDecision.**
+  Its expiring 0x112A countdown resets decision/mode, restores 0xB26,
+  clears 0x1128 and control bits 0x00400008. Selects behaviors 37/39 or
+  38/2 from fast mode and secondary cooldown, with 360-tick attack cooldowns.
+  Scratch baseline: 52.9%, 395 realigned differences, 223 ignoring registers.
+  Delta/absolute-value pins raised coarse fuzzy to 65.2% while worsening
+  realigned structure (344), so retained the baseline. Shared flag-dependent
+  cases and restore/control accesses need structural work before allocation.
+
+Useful techniques: condense.py exposed the four repeated RNG/side-attack
+blocks; matched relatives supplied Armor subsystem naming and facing-angle
+rounding. Keep raw and absolute deltas separate: an r2 absolute-Z pin was
+useful only in 081875EC. Expanding repeated inline attack choices improved
+large-function structure. Compare realigned counts before accepting a fuzzy
+increase: several pinning variants increased fuzzy while worsening alignment.
+Ghidra export gen/ghidra/decomp.c is absent. All five below-threshold candidates
+remain local in ignored wip/, outside production source. Commits are queued
+through build/commit.sh; no shared documentation/index was edited.
