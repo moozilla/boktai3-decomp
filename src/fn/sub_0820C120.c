@@ -1,5 +1,6 @@
 #define Screamer_ApplyHitReaction sub_0820BF70
-#define Screamer_InitColliders    sub_0820C120
+
+#define Screamer_InitColliders sub_0820C120
 #include "global.h"
 #include "screamer_playback.h"
 struct ColliderFlags {
