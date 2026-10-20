@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Actor_SetHeadingVelocity sub_0819E754
-
 struct HeadingVec {
     s16 x, y, z, pad;
 };
