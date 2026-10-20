@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define PaletteTransition_Restart sub_081D4A34
-
 struct PaletteDisplayEntry {
     u16 id;
     u16 frames;

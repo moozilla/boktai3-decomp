@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define OptionMenu_Update sub_081D7434
-
 extern u16 gUnk_03005260[];
 extern u32 gUnk_020002A0[];
 

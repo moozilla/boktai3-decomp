@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SceneActors_UpdateSpawnShake sub_081F5F28
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;

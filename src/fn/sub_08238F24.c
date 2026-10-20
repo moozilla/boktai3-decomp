@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define DirectionalEffect_Init sub_08238F24
-
 typedef struct Point {
     u32 a, b;
 } Point;

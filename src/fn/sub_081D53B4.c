@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define BestiaryFlags_Update sub_081D53B4
-
 u32 GameState_AreAllEventFlagsSet(void);
 void ThresholdTrack_ClassifyPosition(u8);
 u32 Bestiary_IsGroupComplete(void);

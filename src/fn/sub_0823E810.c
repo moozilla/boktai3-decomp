@@ -4,7 +4,7 @@
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-void sub_08239098(void *, void *, void *, void *);
+void DirectionalEffect_AddParticle(void *, void *, void *, void *);
 
 struct Vec16 {
     u32 x : 16, y : 16, z : 16;
@@ -35,5 +35,5 @@ void Player_EmitScatterEffect(void *task, struct SceneVec *center, u32 yaw, u32 
     v = -scale(gUnk_086149C4[yaw & 255] * r);
     vel.x = scale(gUnk_086149C4[(pitch + 64) & 255] * v);
     vel.z = scale(gUnk_086149C4[pitch & 255] * v);
-    sub_08239098(task, &pos, &vel, arg);
+    DirectionalEffect_AddParticle(task, &pos, &vel, arg);
 }
