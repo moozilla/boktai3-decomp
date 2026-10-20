@@ -1,5 +1,6 @@
+#define SceneActorReaction_ApplyAreaDamage sub_08131D5C
 #ifdef NONMATCHING
-// fuzzy: 85.4%
+// fuzzy: 87.5%
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -69,26 +70,24 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
             switch (LocalPlayer()) {
                 case 0:
                     if (*owner != 1)
-                        goto fail;
+                        return 0;
                     break;
                 case 1:
                     if (*owner != 2)
-                        goto fail;
+                        return 0;
                     break;
                 case 2:
                     if (*owner != 4)
-                        goto fail;
+                        return 0;
                     break;
                 case 3:
                     if (*owner != 8)
-                        goto fail;
+                        return 0;
                     break;
             }
         }
     }
     return 1;
-fail:
-    return 0;
 }
 
 struct FlagHalfword {
@@ -137,16 +136,22 @@ u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *actor)
     u16 *maxHealth;
     s16 *health;
     u32 *flags2D8;
-    s32 gain, dx, dz;
+    s32 gain, dx;
+    register s32 dz asm("sl");
     if (ActorFlags(actor, 8) || actor->enabled != 1 || GetFlags(&flags2CC, actor, 2))
         goto fail;
     collider = &actor->colliderA;
     timer = (u16 *)((u8 *)actor + 0x178);
     if (*timer)
         goto fail;
-    position = &actor->position;
-    maxHealth = (u16 *)&actor->defaultHealth;
-    gain = AreaEffect_ScaleGainAtPosition(position, *maxHealth);
+    {
+        register struct ContactPosition *pos asm("r4") = &actor->position;
+        register u16 *max asm("r5") = (u16 *)&actor->defaultHealth;
+        gain = AreaEffect_ScaleGainAtPosition(pos, *max);
+        asm("" : "+r"(pos), "+r"(max));
+        position = pos;
+        maxHealth = max;
+    }
     if (!gain)
         goto fail;
     dx = RandomBits(0x3F) - 16;
@@ -245,5 +250,5 @@ fail:
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyAreaDamage);
+INCLUDE_ASM("asm/nonmatching", sub_08131D5C);
 #endif
