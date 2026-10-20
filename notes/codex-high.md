@@ -390,3 +390,100 @@ instruction bodies or generated assembly were committed. Each function has a
 separate commit; full combined-ROM validation remains with the batch integrator.
 Scratch candidates and diagnostic artifacts remain under ignored `wip/` and
 `build/` directories. This notes update is committed last.
+
+# Codex high: task 080C12FC (2026-10-20)
+
+Tags: #matching #golem #register-pinning #nonmatching
+
+Branch: `cloud/080C12FC`. Worked solo and offline. Exact recovery is **13.39% of
+this task's reviewed code, +13.39 percentage points** (1,312 exact bytes), all
+in the Register-pinned category. Against the checked-in project denominator,
+this batch contributes **+0.0543 percentage points**. Drafts receive no exact
+credit. Each accepted function has its own driver-created commit; this notes
+update is queued last.
+
+- **080C12FC drafted 80.2%**, `Golem_ReactToContact`, tentative name based on
+  contact flags selecting chase, roar, or the reaction control. This was an
+  existing guarded candidate, recorded at 51.1%; today's checker measures it
+  at 80.2% without changing its body. Added its required descriptive alias,
+  formatted it, and recorded the current score. Final realigned difference:
+  **739 total / 315 structural**. Read BIG_FUNCTIONS, the condensed listing,
+  matched relatives and the shared chase header. Most residue is in the three
+  Chase_Arrive expansions: callback branch layout, retry-loop allocation and
+  saved pointer/flag lifetimes. The far tail 080C23FC is already included in
+  the reviewed function extent; no boundary changes were needed. Shared
+  headers were left untouched.
+- **080C6A68 drafted 85.9%**, `Golem_UpdateChargeRecovery`. Ported the matched
+  Golem_UpdateRecoil (080C75B8) animation and three-phase recovery structure.
+  Entry clears completion/restart, saves the motion position, and captures the
+  heading quadrant. Phase zero reduces speed by 40 and checks whether the
+  projected X/Z step stays in the current terrain cell. Phase one approaches
+  the current cell center along the stored heading axis, clamped to +/-8.
+  Phase two waits 16 ticks, restores the saved route destination, settles it
+  through 080C47DC, restores facing and signals completion. Final realigned
+  difference: **96 total / 32 structural**. The main mismatch is packed-vector
+  position updates: the ROM preserves the adjacent halfword with word
+  read/modify/write operations while this candidate emits halfword stores.
+  Stack placement and animation pointer copies also remain. Changing bitfield
+  signedness/width or aliasing the candidate through a short-vector pointer
+  did not close it. Three temporary hints remain; depin declines an unguarded
+  nonmatching base, so no exact-minimal hint claim is made for this draft.
+- **080C63D0 matched**, `Golem_UpdateChargeBuildup`, **736 bytes**. Callers and
+  neighboring Golem controls identify it as speed buildup with a randomized
+  windup. Species 1/3/5 wait 30 + 4*(RNG&3), species zero waits 50 +
+  16*(RNG&3), and other species wait zero. Context flag 0x800 at +0x628 is
+  consumed to skip the wait. Speed ramps by 16 through 0x17F; animation scale
+  uses speed>>7, and exceeding the selected duration marks completion and
+  plays variant event sound four. A WaitTime inline containing both the flag
+  check/clear and RNG selection recovers the original shared branch tail.
+  Moving a temporary pointer copy before the materialized byte boolean was
+  essential. Depin reduced six hints to **two**: a value in r1 at the motion
+  flag insertion and an empty actor constraint before animation-scale reloads.
+  Formatted and accepted by the byte-exact per-file checker.
+- **080C66B0 matched**, `Golem_UpdateRouteMotion`, **576 bytes**. Return-home
+  behaviors 080CC910, 080CDF14 and 080CEDF0 install this control for travel
+  toward a cell center. It consumes entry/restart, inserts motion flag 0x100,
+  selects the directional animation, derives duration scale from signed
+  context speed, and emits opposing-motion dust every fourth frame. Porting
+  the common animation from 080C75B8 and using a typed motion view recovered
+  the addressing. An initial scratch candidate had an unassigned flags
+  pointer; that was corrected before retention or acceptance. The final
+  19 differences were register-only; fixing the initial flag-load allocation
+  closed them. Depin reduced five hints to **three** (zero in r6, flag value
+  in r1, empty actor constraint before scale handling). Formatted and checked
+  byte-identical after cleanup.
+- **080C68F0 drafted 81.6%**, `Golem_UpdateChargeStop`. Charge/slide callers
+  install this completion control. Entry selects directional animation seven
+  with flag four, clears restart, and later animation completion clears
+  motion flag 0x100 and sets control completion. Final realigned difference:
+  **37 total / 9 structural**. Distinct typed animation view, operand order
+  for mirror flags and an explicit flag-clear temporary recovered the best
+  valid layout. Remaining differences concern selector allocation, pointer
+  copies and call argument ordering. The bounded permuter search produced
+  candidates, but its 80.1% output was rejected: an actor alias was assigned
+  only in the tile branch and then read on the sequence path. A different,
+  initialized typed-view candidate was retained and improved to 81.6%.
+  Register hints and one empty pointer constraint are marked as concessions;
+  depin skips the unguarded base because it is nonmatching.
+- **080C47DC stopped; existing draft left unchanged**. Today's check measures
+  the inherited settle-route draft at **75.5%, 54 total / 13 structural**.
+  It routes toward the destination, projects the lesser X/Z displacement onto
+  the body's cell center, quantizes the resulting heading, and clears motion
+  if the new quadrant disagrees with the destination delta. Allocation keeps
+  dz in r7 instead of the ROM's r2 and the link pointer in r8 instead of r5.
+  Splitting delta lifetimes, declaration/assignment order, scoped pins and a
+  100-second two-process permuter search did not yield a valid >=80% draft.
+  The search's 90.6% candidate was explicitly rejected for reading delta.x
+  before it was initialized. Correcting that read dropped it to 73.6%.
+  The best valid scratch baseline remains in wip/codex-high; no new production
+  source or draft commit was made for this function.
+
+Validation used only `build/venv/bin/python tools/check.py FILE.c`; guarded
+scores were recorded with `--nonmatching --record`. All three retained draft
+assembly alternatives also pass their default per-file check. Both exact
+matches were formatted and checked after depinning. No make/full build,
+network action, shared generated-output edit, handwritten instruction body,
+or direct Git mutation was performed. The unrelated pre-existing change to
+`tools/cloud_task.py` was left untouched. Full combined-ROM validation remains
+with the batch integrator. Diagnostic artifacts are ignored under build/ and
+wip/; the Ghidra export was unavailable.
