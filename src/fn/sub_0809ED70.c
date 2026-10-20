@@ -29,7 +29,6 @@ one:
 zero:
     return 0;
 }
-#define Crow_OnBodyContact sub_0809ED70
 void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
                         struct SceneActorBehaviorContactView *destination,
                         struct SceneActorRegistryResetView *actor)

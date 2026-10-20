@@ -3053,6 +3053,7 @@ addr,name,mode,confidence,source,notes
 0809B000,Lun_OnBodyContact,thumb,low,src-alias,Lun body collision callback delegates to the common contact reaction
 0809B00C,ActorBehavior_TickParticipantProgress,thumb,low,src-alias,
 0809B29C,Lun_OnSpecialAnimation,thumb,low,src-alias,Lun state callback consumes the preparation flag and selects animation profile entry 15
+0809B2CC,Lun_UpdateDirectionalPose,thumb,low,src-alias,
 0809B3F8,Lun_TurnTowardSavedDirection,thumb,low,src-alias,
 0809B6AC,Lun_UpdateWaitingAnimation,thumb,low,src-alias,
 0809B94C,Lun_ApproachMovementTarget,thumb,low,src-alias,
@@ -3088,9 +3089,12 @@ addr,name,mode,confidence,source,notes
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry
 0809ECC8,Lun_Create,thumb,low,gcl-behavior,"registry 680E spawner for enemy kinds 26-28; its sprite D28E is a small flame in three variants, matching the -lun spirits クロロホルルン/モエルルン/ヒエルルン (KLOROFOLUN/BURRNUN/CHILLUN)"
 0809ED00,Vorn_OnContactEvent_0809ED00,thumb,low,src-alias,
+0809ED70,Crow_OnBodyContact,thumb,low,src-alias,
 0809EE00,Crow_OnIdleAnimation,thumb,low,src-alias,Animation callback selects directional entry 1 and checks the frame-triggered crow sound
 0809EE2C,RouteActor_UpdatePeriodicAnimation,thumb,low,src-alias,
 0809EEBC,RouteActor_UpdateAnimationSequence,thumb,low,src-alias,
+0809EF50,Crow_PlayEntry2,thumb,low,src-alias,
+0809F024,Crow_UpdateDirectionalPose,thumb,low,src-alias,
 0809F150,Crow_OnSpecialAnimation,thumb,low,src-alias,Special-state animation callback clears the entry flag and selects directional entry 14
 0809F174,Crow_RecoverFromDisplacement,thumb,low,src-alias,
 0809F368,SceneActorControl_CompleteScriptedResponse_0809F368,thumb,low,src-alias,
@@ -3275,6 +3279,7 @@ addr,name,mode,confidence,source,notes
 080B4134,Vorn_SendMessage,thumb,low,src-alias,
 080B416C,Vorn_BroadcastPosition,thumb,low,src-alias,Sends message 6 with the actor position to category 25 and records that it was sent
 080B4330,Vorn_InitActionTable,thumb,low,src-alias,Installs the ROM table at actor offset 0x29C; action table interpretation is tentative
+080B4340,Vorn_OnUpdate,thumb,low,src-alias,
 080B43A4,Vorn_OnRender,thumb,low,src-alias,Callback delegates to the shared actor rendering helper and returns zero; rendering role is tentative
 080B43B0,Vorn_OnDestroy,thumb,low,src-alias,Destruction callback releases scene actor effect resources and returns zero
 080B43BC,Vorn_Init,thumb,medium,gcl-name,name from GCL key DFDC ヴォーン (Vorn); loader called by Vorn_Create

@@ -51,7 +51,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-#define Crow_UpdateDirectionalPose sub_0809F024
 void Crow_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
 {
     struct SceneActorProfileEntry *entry;
