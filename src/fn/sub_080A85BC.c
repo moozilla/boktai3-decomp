@@ -1,5 +1,4 @@
 #include "scene_actor_reset.h"
-#define TentacleActor_UpdateKnockbackSlide sub_080A85BC
 // MATCHING_CONCESSION: register-pinning
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];

@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 92.9%
 // Remaining differences: register allocation around the ground-height lookup.
-#define Crow_ReadSpawnScript sub_080A09DC
-#define FIELD(p, o, T)       (*(T *)((u8 *)(p) + (o)))
+#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 struct Pair8 {
     u32 a, b;
 };
@@ -127,5 +126,5 @@ void Crow_ReadSpawnScript(void *input)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A09DC);
+INCLUDE_ASM("asm/nonmatching", Crow_ReadSpawnScript);
 #endif
