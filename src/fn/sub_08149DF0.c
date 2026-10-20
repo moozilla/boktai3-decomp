@@ -17,6 +17,7 @@ static inline void addFlags(u32 *flags, u32 mask)
     *flags |= mask;
 }
 // Two address-selection instructions still use r0 instead of r3.
+#define Player_UpdateSpiralTrailAction sub_08149DF0
 #ifdef NONMATCHING
 // fuzzy: 99.3%
 void Player_UpdateSpiralTrailAction(struct Player *p)
