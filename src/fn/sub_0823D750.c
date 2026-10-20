@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.0% (2 bytes: final accumulate lands in r1 instead of r0 in case 4)
 
 s32 Div(s32, s32);
 
@@ -23,10 +21,8 @@ s32 sub_0823D750(u8 *p)
         case 3:
             return ((*(u16 *)(p + 0x420) >> 1) + 0x63) >> 1;
         case 4:
-            r = (*(u16 *)(p + 0xBF8) + (Div(40, 10) - 8) * 5) << 1;
+            r = *(u16 *)(p + 0xBF8) + (Div(40, 10) - 8) * 5;
+            r = r << 1;
             return r;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823D750);
-#endif
