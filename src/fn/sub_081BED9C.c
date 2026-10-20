@@ -1,6 +1,6 @@
 #include "global.h"
 void Inventory_SortConsumables(u32);
-void sub_0822DA94(u32);
+void Inventory_SortEquipment(u32);
 void GameState_SortConsumableSlots(u32);
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x1754];
@@ -16,7 +16,7 @@ void SceneInventory_SortSelectedCategory(struct SceneInventoryCategoryMenu *p)
             Inventory_SortConsumables(p->sortMode);
             break;
         case 1:
-            sub_0822DA94(p->sortMode);
+            Inventory_SortEquipment(p->sortMode);
             break;
         case 2:
             GameState_SortConsumableSlots(p->sortMode);

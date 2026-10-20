@@ -11,7 +11,6 @@ static inline s32 Mul12(s32 a, s32 b)
         return t >> 12;
     return -(-t >> 12);
 }
-#define Actor_MoveAlongAngle sub_0821FB04
 s32 Actor_MoveAlongAngle(struct Vec3 *pos, u32 angle, s32 dist)
 {
     struct Vec3 d;

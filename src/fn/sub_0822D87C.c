@@ -9,7 +9,6 @@ void *Inventory_GetEquipmentEntry(s32);
 void Player_BeginDescriptorAction(void *, void *);
 #ifdef NONMATCHING
 // fuzzy: 91.9%
-#define Inventory_AddEquipmentFromRecord sub_0822D87C
 // differs: register/instruction order of the slot-count loop setup (global address kept in r6).
 s32 Inventory_AddEquipmentFromRecord(const void *record)
 {
@@ -48,5 +47,5 @@ s32 Inventory_AddEquipmentFromRecord(const void *record)
     return idx;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0822D87C);
+INCLUDE_ASM("asm/nonmatching", Inventory_AddEquipmentFromRecord);
 #endif

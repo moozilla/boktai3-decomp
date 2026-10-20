@@ -12,7 +12,6 @@ struct EffectGroup {
     struct EffectGroupEntry entries[4];
 };
 void sub_08014634(u32, u32, u32, u32, u32, u32, u32);
-#define EffectGroup_SpawnPart sub_08231500
 s32 EffectGroup_SpawnPart(struct EffectGroup *group, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f)
 {
     struct EffectGroupEntry *entry;

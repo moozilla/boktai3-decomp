@@ -1,7 +1,6 @@
 #include "global.h"
 s32 Inventory_GetEquipmentId(s32);
-void sub_0822D94C(s32, s32);
-#define Inventory_SortEquipment sub_0822DA94
+void Inventory_SwapEquipmentEntries(s32, s32);
 void Inventory_SortEquipment(s32 base)
 {
     s32 n = 0;
@@ -16,7 +15,7 @@ void Inventory_SortEquipment(s32 base)
         } else {
             n++;
             if (gaps > 0)
-                sub_0822D94C(idx, idx - gaps);
+                Inventory_SwapEquipmentEntries(idx, idx - gaps);
         }
     }
     if (n > 1) {
@@ -27,7 +26,7 @@ void Inventory_SortEquipment(s32 base)
             for (j = i; j < n; j++) {
                 a = Inventory_GetEquipmentId(base + i);
                 if (a > Inventory_GetEquipmentId(base + j))
-                    sub_0822D94C(base + i, base + j);
+                    Inventory_SwapEquipmentEntries(base + i, base + j);
             }
         }
     }

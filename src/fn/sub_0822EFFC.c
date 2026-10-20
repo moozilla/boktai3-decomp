@@ -1,6 +1,5 @@
 #include "global.h"
 u16 Eeprom_ReadBlock(u16, void *);
-#define Save_VerifyBlock sub_0822EFFC
 s32 Save_VerifyBlock(u16 start, s32 length)
 {
     u16 address = start;

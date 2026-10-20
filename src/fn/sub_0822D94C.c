@@ -7,7 +7,6 @@ struct EquipEntry {
 struct EquipEntry *Inventory_GetEquipmentEntry(s32);
 s32 Inventory_IsEquipmentAssigned(s32);
 void Player_SetWeaponInstance(void *, void *);
-#define Inventory_SwapEquipmentEntries sub_0822D94C
 void Inventory_SwapEquipmentEntries(s32 a, s32 b)
 {
     struct EquipEntry *ea;
