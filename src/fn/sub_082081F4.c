@@ -1,10 +1,12 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
 // confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
+#define CannonTurret_ApplyHitReaction sub_082081F4
 
 #ifdef NONMATCHING
-// fuzzy: 82.6%
-// Remaining differences: RNG stores, loop constants, target-field scheduling and allocation.
-// MATCHING_CONCESSION: register-pinning
+// fuzzy: 86.5%
+// RNG stores, loop constants, and register allocation still differ.
 #include "scene_vec.h"
 
 /* Names and field interpretations are tentative. */
@@ -60,9 +62,17 @@ void CannonTurret_ApplyHitReaction(struct HitSource *source, struct HitResult *h
         hit->damage = 0;
         hit->state = 0;
     } else {
-        H(0x12c) = hit->damage;
+        ((struct {
+            u8 pad[0x12c];
+            s16 damage;
+        } *)p)
+            ->damage = hit->damage;
         W(0x150) = source->damageType;
-        U(0xb0) = source->reaction;
+        {
+            u32 reaction = source->reaction;
+            asm("" : "+r"(reaction));
+            U(0xb0) = reaction;
+        }
         if (source->flags & 0x40) {
             U(0xb0) = 0x26;
             H(0x128) = 8;
@@ -75,13 +85,14 @@ void CannonTurret_ApplyHitReaction(struct HitSource *source, struct HitResult *h
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
-        if (U(0x13a) & source->flags) {
+        if (source->flags & U(0x13a)) {
             struct SceneVec velocity, position;
-            register const u16 *table asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
             s32 i = 2;
             do {
+                register const u16 *table asm("r3");
                 velocity = gUnk_0824FE84;
                 position = *(struct SceneVec *)(p + 0x40);
+                table = (const u16 *)RANDOM_TABLE_ADDR;
                 RandomizePosition(&position, table);
                 SparkParticle_Spawn(&position, 1, &velocity, 0, 3, 8, 2, 2);
             } while (--i >= 0);
@@ -90,5 +101,5 @@ void CannonTurret_ApplyHitReaction(struct HitSource *source, struct HitResult *h
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_ApplyHitReaction);
+INCLUDE_ASM("asm/nonmatching", sub_082081F4);
 #endif
