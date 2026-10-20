@@ -1,4 +1,6 @@
 #include "stage_icon_display.h"
+/* The ROM returns the word its void callee leaves in r0 (saved lr); callers only test its sign. */
+s32 StageIconDisplay_SelectUpdate(struct StageIconDisplay *, s32);
 s32 StageIconDisplay_Initialize(struct StageIconDisplay *display, s32 variant, u32 option,
                                 void (*completion)(void *, struct StageIconDisplay *),
                                 void *argument)
