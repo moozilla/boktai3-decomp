@@ -1,0 +1,156 @@
+#include "global.h"
+#include "engine.h"
+#include "player.h"
+#define Player_UpdateLinkModeMovement sub_08158848
+// confidence=low: action callback table and nearby interaction routines establish the family.
+void Player_EmitPeriodicParticles(struct Player *);
+s32 Player_CanUseSceneFeature(struct Player *);
+void Player_UpdateTimedScriptEvent(struct Player *);
+void Player_UpdateDirectionHistory(struct Player *);
+void sub_08156FE0(struct Player *);
+void Player_UpdateCameraInput(struct Player *, s32);
+void Player_RunPendingCallback(struct Player *);
+void sub_081411B8(struct Player *);
+void sub_0815767C(struct Player *);
+void Player_BlendCameraTarget(struct Player *);
+void Player_ClampPositionToStoredTerrainCell(struct Player *);
+void sub_08140CC4(struct Player *);
+s32 Player_IsStatusBit3ActionActive(u16);
+void Player_AddControlFlags(struct Player *, u16);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void PlayerCue_UpdatePeriodicParticles(struct Player *);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+extern void *const gUnk_08610D88[];
+extern const s16 gUnk_086149C4[];
+union ProbePosition {
+    struct SceneVec point;
+    struct {
+        u32 x : 16, y : 16, z : 16;
+    } words;
+};
+static inline s32 cellIndex(struct SceneVec *pos)
+{
+    s32 x = pos->x >> 8, z = pos->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+static inline u8 *cellProperties(s32 index)
+{
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+    if (cell)
+        return cell + 4;
+    return gUnk_030052F4->cells + 12 + index * 4;
+}
+static inline s32 groundHeight(struct SceneVec *position)
+{
+    s32 index = cellIndex(position), height;
+    u8 *cell = cellProperties(index);
+    u32 kind = *cell >> 4;
+    height = (*cell & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
+    }
+    return height;
+}
+static inline s32 scale(s32 v)
+{
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
+}
+static inline u32 specialState(struct Player *p)
+{
+    u32 active = p->active;
+    u32 result = 0;
+    if (active && p->sceneMode == 5)
+        result = 1;
+    return result;
+}
+static inline u32 nonzero(u32 value)
+{
+    return (-value | value) >> 31;
+}
+static inline u32 terrainFlag(struct SceneVec *pos)
+{
+    u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
+    return flags & 4;
+}
+void Player_UpdateLinkModeMovement(struct Player *p)
+{
+    union ProbePosition pos;
+    u32 mask = 0x4000;
+    p->statusFlags |= mask;
+    switch (p->kind) {
+        case 1:
+            Player_UpdateDirectionHistory(p);
+            sub_08156FE0(p);
+            Player_UpdateCameraInput(p, p->tetherMode);
+            if (p->unk45C == 1)
+                Player_RunPendingCallback(p);
+            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
+            if (p->movementVelocityLocked)
+                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+            else
+                sub_081411B8(p);
+            sub_0815767C(p);
+            if (p->cameraOffsetActive)
+                Player_BlendCameraTarget(p);
+            Player_ClampPositionToStoredTerrainCell(p);
+            sub_08140CC4(p);
+            if (p && specialState(p))
+                break;
+            {
+                u32 enabled = 0;
+                if (!Player_IsStatusBit3ActionActive(*(u16 *)((u8 *)p + 0x292)) &&
+                    p->tetherMode == 1 && (*(u8 *)((u8 *)p + 0x284) & 1))
+                    enabled = nonzero(p->facing & 1);
+                if (enabled) {
+                    if (++*(u16 *)p->unk4A6 == 5) {
+                        s32 angle;
+                        u32 flags;
+                        pos.point = p->position;
+                        angle = ((p->facing + 5) & 7) << 5;
+                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
+                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
+                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
+                            break;
+                        flags = terrainFlag(&pos.point);
+                        if (flags)
+                            break;
+                        p->coordinateAxis = p->facing;
+                        p->actionFourEnabled = flags;
+                        ActorSequence_Begin(p, 4, 0);
+                    }
+                } else
+                    *(u16 *)p->unk4A6 = enabled;
+            }
+            break;
+        case 4:
+            p->statusFlags |= 0x40000;
+            Player_AddControlFlags(p, 8);
+            if ((u8)(p->tetherMode - 0x1F) > 4) {
+                if (p->contactSpecial)
+                    ActorSequence_Begin(p, 0x20, 0);
+                else
+                    ActorSequence_Begin(p, 0x1F, 0);
+            }
+            if (p->unk45C == 1)
+                Player_RunPendingCallback(p);
+            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
+            sub_0815767C(p);
+            break;
+        case 2:
+            Player_AddControlFlags(p, 8);
+            if (p->unk45C == 1)
+                Player_RunPendingCallback(p);
+            Callback_InvokeActor(p, p->triggerAnimationCallback);
+            sub_0815767C(p);
+            break;
+    }
+}
