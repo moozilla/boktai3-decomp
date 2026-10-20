@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneHud_EnterOptionControls sub_08169DCC
 struct AnimBox {
     u8 pad0[8];
     u32 flags;

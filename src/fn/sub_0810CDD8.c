@@ -1,5 +1,4 @@
 #include "global.h"
-#define LinkPanel_StartDescriptions sub_0810CDD8
 struct PanelSelection {
     u8 pad0[0x53];
     volatile u8 type;

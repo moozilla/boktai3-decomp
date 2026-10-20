@@ -4020,6 +4020,7 @@ addr,name,mode,confidence,source,notes
 0810CC28,LinkPanel_DrawTime,thumb,low,src-alias,
 0810CCC8,LinkPanel_DrawPeerTimes,thumb,low,src-alias,
 0810CD4C,LinkPanel_CreateTextWindows,thumb,low,src-alias,
+0810CDD8,LinkPanel_StartDescriptions,thumb,low,src-alias,
 0810CEBC,SlotMenu_InitializeAlternateEntryValues,thumb,low,src-alias,
 0810CF08,PanelSequence_InitializeSprites,thumb,low,src-alias,
 0810D14C,Registry30AC_HideDisplay,thumb,low,src-alias,Sets hidden flags on seven animations and hides both embedded display panels
@@ -5537,6 +5538,7 @@ addr,name,mode,confidence,source,notes
 08169BB0,StatusPanel_ClearLowerRows,thumb,low,src-alias,
 08169BE0,PauseMenu_RefreshStatusPanel,thumb,low,src-alias,
 08169DAC,Hud_OnUnpausedRefresh,thumb,low,src-alias,Refreshes the HUD through its display updater when global flag bit zero is clear
+08169DCC,SceneHud_EnterOptionControls,thumb,low,src-alias,
 08169E94,StatusPanel_BeginRefresh,thumb,low,src-alias,
 08169EDC,StatusPanel_ResetSelectionAnimations,thumb,low,src-alias,
 08169F44,PauseMenu_RefreshPriceDigits,thumb,low,src-alias,

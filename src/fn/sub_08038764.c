@@ -15,7 +15,7 @@ struct P {
 extern u16 gUnk_03005260[];
 void WirelessGameMenu_InitItemChoices(struct P *);
 void WirelessGameMenu_InitEquipmentChoices(struct P *);
-void sub_08169DCC(void);
+void SceneHud_EnterOptionControls(void);
 void StatusPanel_BeginRefresh(void);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void WirelessGameMenu_SignalStatusPanel(struct P *);
@@ -32,7 +32,7 @@ void WirelessGameMenu_UpdateSelection(struct P *p)
         WirelessGameMenu_InitItemChoices(p);
         WirelessGameMenu_InitEquipmentChoices(p);
         p->requested = zero;
-        sub_08169DCC();
+        SceneHud_EnterOptionControls();
         p->ready = 1;
         p->countdown = 8;
         p->wait = 6;
