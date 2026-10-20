@@ -1,9 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.6%
-// Sibling of sub_0823614C. Instruction selection matches; register allocation differs.
-// The ROM keeps the emitter in r5 (mine r8), the random index in r1 and the seed pointer in r8
-// (rasolve: raise the emitter's priority, lower the seed's, raise the table's).
+#define ParticleBurst_EmitOrbitParticle sub_08236C04
 #include "engine.h"
 
 struct Unk08236C04Position {
@@ -38,7 +35,7 @@ static inline s32 Scale12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void sub_08236C04(u8 *owner, struct Unk08236C04Position *origin)
+void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *origin)
 {
     struct Unk08236C04Emitter *emitter = (struct Unk08236C04Emitter *)(owner + 0x9C);
 
@@ -46,12 +43,13 @@ void sub_08236C04(u8 *owner, struct Unk08236C04Position *origin)
         struct Unk08236C04Particle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        u32 i, mask;
+        register u32 i asm("r1");
+        u32 mask;
         struct Unk08236C04Particle *sprite;
 
         p->active = 1;
-        seed = &gUnk_03005308;
         table = gUnk_0203B400;
+        seed = &gUnk_03005308;
         i = *seed + 1;
         mask = 1023;
         i &= mask;
@@ -83,6 +81,3 @@ void sub_08236C04(u8 *owner, struct Unk08236C04Position *origin)
         owner[0x9E] = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08236C04);
-#endif

@@ -1,9 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 76.2%
-// Instruction selection and order match the ROM; only register allocation differs. The
-// ROM keeps the emitter in r6, the random index in r1, the table in r4 and the seed pointer
-// in r5 (rasolve: raise the seed pointer's priority). Pinning cascades into high registers.
+#define RadialBurstEffect_EmitOrbitParticle sub_0823614C
 #include "engine.h"
 
 struct Unk0823614CPosition {
@@ -40,7 +37,7 @@ static inline s32 Scale12(s32 n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-void sub_0823614C(u8 *owner, struct Unk0823614CPosition *origin)
+void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *origin)
 {
     struct Unk0823614CEmitter *emitter = (struct Unk0823614CEmitter *)(owner + 0x138);
 
@@ -48,7 +45,8 @@ void sub_0823614C(u8 *owner, struct Unk0823614CPosition *origin)
         struct Unk0823614CParticle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        u32 i, mask;
+        register u32 i asm("r1");
+        u32 mask;
 
         p->active = 1;
         p->origin = origin;
@@ -83,6 +81,3 @@ void sub_0823614C(u8 *owner, struct Unk0823614CPosition *origin)
         owner[0x13A] = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823614C);
-#endif
