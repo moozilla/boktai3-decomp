@@ -7089,7 +7089,7 @@ addr,name,mode,confidence,source,notes
 081CD454,SceneCharacter_UpdateCommands,thumb,low,src-alias,Forwards the character command update to its state dispatcher
 081CD460,SceneCharacter_OnCommandUpdate,thumb,low,src-alias,Character callback installed by PlaceFromScript that updates command processing and returns zero
 081CD46C,SceneCharacter_RegisterMessageReceiver,thumb,low,src-alias,Registers the character receiver under the supplied ID with scene-message receiver type 5
-081CD484,SceneNpc_DispatchCommands_081CD484,thumb,low,src-alias,
+081CD484,SceneNpc_DispatchCutsceneCommands,thumb,low,src-alias,
 081CDE14,SceneCharacter_UpdatePaletteFade,thumb,low,src-alias,
 081CDFFC,SceneNpc_UpdateCommands,thumb,low,src-alias,
 081CE014,SceneCharacter_UpdateDisplay,thumb,low,src-alias,Display callback that refreshes actor display flags and runs extra updates for kinds 9 and 29

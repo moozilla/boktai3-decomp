@@ -5,7 +5,6 @@
 #ifdef NONMATCHING
 // fuzzy: 89.1%
 // Remaining differences: state-transition address lifetimes and animation-step register allocation.
-#define Ooze_UpdateAttack Ooze_BeginAttack
 // Keep the existing exported name so the draft recorder resolves the fallback.
 
 struct Ooze {
@@ -145,7 +144,7 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
     return ended;
 }
 
-s32 Ooze_UpdateAttack(struct Ooze *p)
+s32 Ooze_BeginAttack(struct Ooze *p)
 {
     register s32 phase asm("r3") = p->phase;
     switch (phase) {
