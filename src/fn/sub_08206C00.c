@@ -3,9 +3,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.6%
-// Remaining differences: facing-change branch sharing, address lifetimes, and animation-step register allocation.
 #define VulcanCannon_UpdateTargeting sub_08206C00
 struct VulcanCannon {
     u8 pad0[0x18];
@@ -160,14 +157,28 @@ static inline u32 VulcanCannon_StepIdleAnimation(struct DisplaySequenceSprite *s
     return ended;
 }
 
+static inline s32 TargetDistance(struct SceneVec *player, struct SceneVec *position)
+{
+    struct SceneVec *a = player;
+    struct SceneVec *b = position;
+    s32 dx, dz;
+    dx = a->x - b->x;
+    dz = a->z - b->z;
+    return dx * dx + dz * dz;
+}
+static inline s32 TargetAngle(struct SceneVec *player, struct SceneVec *position)
+{
+    register struct SceneVec *a asm("r2") = player;
+    register struct SceneVec *b asm("r3") = position;
+    return Math_Atan2(a->x - b->x, a->z - b->z);
+}
+
 s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
-    struct SceneVec *player = Player_GetEffectivePosition(0);
-    s32 dx = player->x - p->display.spatial.position.x;
-    s32 dz = player->z - p->display.spatial.position.z;
-    s32 distance = dx * dx + dz * dz;
+    register struct SceneVec *player asm("r0") = Player_GetEffectivePosition(0);
+    s32 distance = TargetDistance(player, &p->display.spatial.position);
     struct SceneVec target = *Player_GetEffectivePosition(0);
-    asm("" : : "r"(&target) : "memory");
+    asm("" : "+m"(target));
     if (p->useDelayTable) {
         if (p->timer > p->delays[p->delayIndex]) {
             if (!p->facing)
@@ -224,15 +235,16 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         p->targetVisible = 0;
     if (p->aimTimer == 119) {
         u8 angle;
+        register s32 facing asm("r5");
         player = Player_GetEffectivePosition(0);
-        angle = Math_Atan2(player->x - p->display.spatial.position.x,
-                           player->z - p->display.spatial.position.z);
+        angle = TargetAngle(player, &p->display.spatial.position);
         p->timer = 0;
         p->shotCount = 0;
-        if (!p->facing) {
+        facing = p->facing;
+        if (!facing) {
             if ((u8)(angle - 0x21) <= 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
-                p->timer = 0;
+                p->timer = facing;
                 p->state = sub_08207350;
             }
         } else {
@@ -246,7 +258,3 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     VulcanCannon_StepIdleAnimation(&p->display.sprite, &p->sequence);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08206C00);
-#endif
