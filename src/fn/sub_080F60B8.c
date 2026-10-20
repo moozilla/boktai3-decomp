@@ -20,7 +20,6 @@ static inline u8 Take(u8 *s)
     return 0;
 }
 void Ivy_BeginChildRandomDelay(u8 *);
-#define IvyChild_UpdateAfterBob sub_080F60B8
 void IvyChild_UpdateAfterBob(u8 *s)
 {
     if (Take(s)) {

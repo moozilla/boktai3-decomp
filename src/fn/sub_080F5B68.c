@@ -26,7 +26,7 @@ struct TargetMotionCorrection {
     u32 pad : 16;
 };
 s32 Div(s32, s32);
-void sub_080F60B8(struct TargetMotion *);
+void IvyChild_UpdateAfterBob(struct TargetMotion *);
 void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
 {
     struct TargetMotionCorrection correction;
@@ -47,7 +47,7 @@ void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
             u32 one = 1;
             p->flags119 = one | p->flags119;
         }
-        p->callback164 = sub_080F60B8;
+        p->callback164 = IvyChild_UpdateAfterBob;
     }
 }
 #else
