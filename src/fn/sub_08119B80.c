@@ -1,8 +1,4 @@
 #include "global.h"
-#define Glove_UpdateEmitterRecoil sub_081190D4
-#define Glove_UpdateImpactRecoil  sub_08118B8C
-#define Glove_UpdateRecoil        sub_081188F4
-#define Glove_UpdateStaggerRecoil sub_08118E30
 struct GloveCommand {
     u8 unknown0[6], type, unknown7;
     s16 x, y;
@@ -63,8 +59,8 @@ void Glove_UpdateRecoil(void *);
 void Glove_UpdateImpactRecoil(void *);
 void Glove_UpdateStaggerRecoil(void *);
 void Glove_UpdateEmitterRecoil(void *);
-void sub_08119378(void *);
-void sub_08119638(void *);
+void Glove_UpdateRecoilReturn(void *);
+void Glove_UpdateStaggerReturn(void *);
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
 void *ActorAttachment_ReleaseResource(void *, s32, u32);
@@ -94,7 +90,6 @@ static inline void ReadMotion(struct GloveMotion *motion, struct GloveCommand *c
     motion->d = cmd->f;
 }
 // confidence=low: message kinds select glove recoil states and attachment effects.
-#define Glove_DispatchCommands sub_08119B80
 s32 Glove_DispatchCommands(struct Glove *p)
 {
     struct GloveState *state = &p->state;
@@ -128,11 +123,11 @@ s32 Glove_DispatchCommands(struct Glove *p)
             switch (cmd->type) {
                 case 2:
                     ReadMotion(motion, cmd);
-                    SetState(p, sub_08119378);
+                    SetState(p, Glove_UpdateRecoilReturn);
                     break;
                 case 6:
                     ReadMotion(motion, cmd);
-                    SetState(p, sub_08119638);
+                    SetState(p, Glove_UpdateStaggerReturn);
                     break;
                 case 5:
                     SetState(p, Glove_UpdateRecoil);

@@ -1,25 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Menu_StartFadeOut                 sub_081DC1DC
-#define TimeDisplay_GetLightPhaseGroup    sub_081EA78C
-#define TimeDisplay_GetCurrentMonth       sub_081EA7CC
-#define TimeDisplay_HideAnimatedObjects   sub_081EA9B4
-#define TimeDisplay_SetSelectionKeyframe  sub_081EAA80
-#define Actor_HideAuxiliarySprites        sub_081EAAAC
-#define Actor_UpdatePairedSpriteAnimation sub_081EAAE4
-#define Params3D0_CreateDisplay           sub_081EB7DC
-#define BgGfx_LoadTilemapAtPosition       sub_08216520
-#define Anim_LoadKeyframe                 sub_0821980C
-#define Task_Kill                         sub_0821A0C0
-#define Script_Call                       sub_0821AD08
-#define Palette_InterpolateBanks          sub_08221110
-#define ScreenTransition_SendCommand      sub_082279A8
-#define Sound_FadeOutChannel10            sub_0822B058
-#define Sound_PlaySong                    sub_0822B2F8
-#define Sound_IsSongPlaying               sub_0822B590
-#define Mod                               sub_0824859C
 // confidence=low: menu ownership follows Params3D0_CreateDisplay.
-#define Params3D0_UpdateDisplay sub_081EAB64
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
 struct Display {

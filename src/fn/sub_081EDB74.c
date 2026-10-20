@@ -1,18 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define Player_GetHorizontalVelocity        sub_08116C20
-#define Player_GetWorldPosition             sub_08116C4C
-#define SceneActors_EmitPeriodicParticles   sub_081EC5C8
-#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite     sub_081EC974
-#define SceneMover_ApproachScreenX          sub_081ECD44
-#define SceneMover_StepPastScreenX          sub_081ECE80
 // confidence=low: moves two sprite sequences left before destruction.
-#define SceneActors_UpdateLeftDeparture sub_081EDB74
-#define SceneActors_DestroyTask         sub_081EEAC4
-#define Anim_SetSequence                sub_08220C8C
-#define Anim_RestartSequence            sub_08220D20
 #include "scene_vec.h"
 #ifdef NONMATCHING
 // fuzzy: 96.1%
@@ -196,5 +184,5 @@ void SceneActors_UpdateLeftDeparture(u8 *input, s32 time)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EDB74);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateLeftDeparture);
 #endif

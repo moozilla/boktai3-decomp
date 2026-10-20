@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_EmitMovementEffects sub_08141C40
 
 #ifdef NONMATCHING
 // fuzzy: 99.9%
@@ -110,5 +109,5 @@ void Player_EmitMovementEffects(u8 *p, s32 quiet)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08141C40);
+INCLUDE_ASM("asm/nonmatching", Player_EmitMovementEffects);
 #endif

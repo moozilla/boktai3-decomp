@@ -85,7 +85,6 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
 
 extern const struct OctopusOffset gUnk_08606300[2][2];
 void *SceneActorRegistry_FindById(u32);
-#define Octopus_ThrowCapturedTarget sub_080EA410
 void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
 {
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
@@ -139,5 +138,5 @@ void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EA410);
+INCLUDE_ASM("asm/nonmatching", Octopus_ThrowCapturedTarget);
 #endif

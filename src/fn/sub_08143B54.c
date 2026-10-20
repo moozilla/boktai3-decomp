@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: limits the tether target distance and clips its position against terrain.
-#define Player_ConstrainTetherTarget sub_08143B54
 
 #ifdef NONMATCHING
 // fuzzy: 89.0%
@@ -57,7 +56,7 @@ struct PackedVec {
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-u32 sub_081439D8(void *, void *);
+u32 Player_TestTetherTarget(void *, void *);
 void TetherActor_SetInteractionTarget(void *, u32);
 static inline s32 scale(s32 v)
 {
@@ -102,7 +101,7 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
         candidate.z = actor->position.z + scale(gUnk_086149C4[angle & 255] * radius) + oz;
         candidate.x = (target->x * 3 + candidate.x) >> 2;
         candidate.z = (target->z * 3 + candidate.z) >> 2;
-        if (!sub_081439D8(actor, &candidate)) {
+        if (!Player_TestTetherTarget(actor, &candidate)) {
             s32 current = indexAt(&actor->position);
             s32 next = indexAt((void *)&candidate);
             if (current == next + 1)
@@ -134,5 +133,5 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08143B54);
+INCLUDE_ASM("asm/nonmatching", Player_ConstrainTetherTarget);
 #endif

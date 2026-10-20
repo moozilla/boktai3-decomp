@@ -23,7 +23,7 @@ struct RegionSpriteManager {
     const void *sequenceResource, *alternateResource;
 };
 extern struct RegionSpriteManager *gUnk_020001B4;
-void sub_08105AB4(struct RegionSprite *);
+void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
 {
@@ -158,7 +158,6 @@ union SparkPosition {
     } packed;
 };
 // confidence=low: emits periodic sparkles around the origin while the transition animation plays.
-#define RegionActor_AnimateSparkleTransition sub_081063D8
 void RegionActor_AnimateSparkleTransition(struct RegionSprite *p)
 {
     struct RegionSpriteManager *manager = gUnk_020001B4;

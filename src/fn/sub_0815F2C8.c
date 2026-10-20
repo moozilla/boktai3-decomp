@@ -2,16 +2,15 @@
 #include "global.h"
 #include "player.h"
 #include "contact_swarm.h"
-#define Player_InitializeFromScript sub_0815F2C8
 extern u16 gUnk_02000544;
 void TimedEffect_GetOrCreateManager(s32);
 void *ActorDebris_Create(void *, void *, void *);
 void Sprite_Init(void *, void *, s32);
 void Player_InitSlotFromScript(struct Player *);
-void sub_0813FC38(struct Player *);
-void sub_0813FFE4(struct Player *, s32);
+void Player_InitActionMode(struct Player *);
+void Player_InitBodyFromScript(struct Player *, s32);
 void sub_08140250(struct Player *);
-void sub_0813FB30(struct Player *);
+void Player_InitActionRequest(struct Player *);
 void Player_RefreshActionEquipment(struct Player *);
 void sub_08140244(struct Player *);
 void Player_InitEquipmentHook(struct Player *);
@@ -151,10 +150,10 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     Anim_SetSequence(state, *resource, 1, 0, 0);
     StepPlayback(sprite, state);
     Player_InitSlotFromScript(p);
-    sub_0813FC38(p);
-    sub_0813FFE4(p, slot);
+    Player_InitActionMode(p);
+    Player_InitBodyFromScript(p, slot);
     sub_08140250(p);
-    sub_0813FB30(p);
+    Player_InitActionRequest(p);
     Player_RefreshActionEquipment(p);
     sub_08140244(p);
     Player_InitEquipmentHook(p);

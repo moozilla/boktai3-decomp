@@ -122,7 +122,6 @@ struct ReleaseAnimation {
 u32 Player_ConsumeStateEntry(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 // confidence=low: drains the action timer and waits for the movement animation gate.
-#define Player_UpdateTimedMovementRecovery sub_081487B4
 void Player_UpdateTimedMovementRecovery(struct Player *p)
 {
     u8 *timer;

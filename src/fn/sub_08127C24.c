@@ -194,7 +194,6 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     return ended;
 }
 // confidence=low: shares the timed-sprite pool and transitions to its blinking state.
-#define TimedSprite_UpdateBallisticFlight sub_08127C24
 void TimedSprite_UpdateBallisticFlight(void *unused, struct Projectile *input)
 {
     struct Projectile *p = input;
@@ -238,5 +237,5 @@ void TimedSprite_UpdateBallisticFlight(void *unused, struct Projectile *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08127C24);
+INCLUDE_ASM("asm/nonmatching", TimedSprite_UpdateBallisticFlight);
 #endif

@@ -22,7 +22,6 @@ static inline s32 scale(s32 v)
     return -((-v) >> 12);
 }
 // confidence=low: defeat notification and recoil lead to a delayed fade phase.
-#define Player_UpdateDefeatSlide sub_08145B18
 void Player_UpdateDefeatSlide(struct Player *p)
 {
     s32 value, angle;

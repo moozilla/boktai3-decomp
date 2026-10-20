@@ -25,7 +25,6 @@ static inline void State(struct SceneActorRegistryResetView *actor, u32 state, u
     actor->field2B1 = 1;
 }
 // confidence=low: retains and halves stored horizontal velocity until the animation finishes.
-#define Ghost_DecelerateMovement sub_0809679C
 void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -83,5 +82,5 @@ void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809679C);
+INCLUDE_ASM("asm/nonmatching", Ghost_DecelerateMovement);
 #endif

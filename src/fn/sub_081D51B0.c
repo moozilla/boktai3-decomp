@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-void *sub_081D4F20(s32 k, s32 c);
+void *BestiaryDisplay_GetEntryForActor(s32 k, s32 c);
 void GameState_SetPairFlag(void *, s32 i);
 void RegistryA76D_SetFromScript(void)
 {
@@ -17,5 +17,5 @@ void RegistryA76D_SetFromScript(void)
         i = Script_GetValue();
     else
         i = 0;
-    GameState_SetPairFlag(sub_081D4F20(k, c), i);
+    GameState_SetPairFlag(BestiaryDisplay_GetEntryForActor(k, c), i);
 }

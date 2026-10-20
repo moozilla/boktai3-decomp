@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define RadialBurstEffect_EmitOrbitParticle sub_0823614C
 #include "engine.h"
 
 struct Unk0823614CPosition {

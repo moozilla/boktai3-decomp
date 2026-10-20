@@ -49,7 +49,7 @@ s32 ActorMotion_UpdateDampedFall(struct Obj *);
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void sub_0811AE9C(struct Obj *);
+void Terrain_ResolveActorMotion(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
@@ -103,7 +103,7 @@ void ActorPhysics_UpdateFallMotion(struct Obj *p)
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
         *pprevX = *px;
         *pprevZ = self->z;
-        sub_0811AE9C(self);
+        Terrain_ResolveActorMotion(self);
         a = (u32) ~(self->unk3C >> 12) >> 31;
         b = (u32) ~(self->unk38 >> 12) >> 31;
         if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&

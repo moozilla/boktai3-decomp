@@ -73,7 +73,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->word104 = 0;
 }
 // confidence=low: eases the stored reaction displacement to its target before restoring idle.
-#define Crow_RecoverFromDisplacement sub_0809F174
 void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     u8 *state = actor->context;
@@ -117,5 +116,5 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809F174);
+INCLUDE_ASM("asm/nonmatching", Crow_RecoverFromDisplacement);
 #endif

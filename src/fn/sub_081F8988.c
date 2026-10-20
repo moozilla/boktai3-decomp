@@ -90,7 +90,6 @@ s32 SlotController_IsSlotIdle(s32);
 void sub_081FEC38(void *, s32);
 struct Vec *SunOrb_GetPositionFromManager(void *, s32);
 void Ratatosk_GetPlayerOffsetNearestSelf(void *, void *);
-#define Ratatosk_UpdateSunOrbRelocation sub_081F8988
 void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
 {
     struct Actor *q = p;

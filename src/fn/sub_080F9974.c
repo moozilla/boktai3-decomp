@@ -19,7 +19,6 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->field2B1 = 1;
 }
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
-#define Axe_UpdateDamageSpin sub_080F9974
 void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group;
@@ -88,5 +87,5 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F9974);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateDamageSpin);
 #endif

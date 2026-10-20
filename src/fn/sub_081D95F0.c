@@ -65,7 +65,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
-        
+
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -138,10 +138,9 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, u16, u16, u16);
 u32 sub_08249498(u32, u32);
-void sub_081D7934(void *);
-void sub_081D9904(void *);
+void Task4E01_BeginImpactAnimation(void *);
+void Task4E01_SpawnImpactChildren(void *);
 // confidence=low: advances the projectile display and expands collision on every fifteenth tick.
-#define Task4E01_UpdateExpandingImpact sub_081D95F0
 s32 Task4E01_UpdateExpandingImpact(u8 *p)
 {
     u8 *config = p + 0x18;
@@ -149,8 +148,10 @@ s32 Task4E01_UpdateExpandingImpact(u8 *p)
     struct DisplaySequenceState *state;
     u32 ended;
     s32 ticks = --*(s32 *)(config + 8);
-    if (ticks <= 3) *(s32 *)(config + 8) = 4;
-    else *(u32 *)(p + 4) |= 1;
+    if (ticks <= 3)
+        *(s32 *)(config + 8) = 4;
+    else
+        *(u32 *)(p + 4) |= 1;
     if (!(*(u16 *)config & 0x10) || ((*(u32 *)p & 3) != ((*(u16 *)config & 0xf00) >> 8)))
         *(u32 *)(p + 4) |= 2;
     sprite = (void *)(p + 0x8c);
@@ -172,15 +173,16 @@ s32 Task4E01_UpdateExpandingImpact(u8 *p)
         }
     }
     if (*(u32 *)p >= *(u16 *)(config + 2)) {
-        if (*(u16 *)config & 0x10) sub_081D7934(p);
+        if (*(u16 *)config & 0x10)
+            Task4E01_BeginImpactAnimation(p);
         else {
             *(u16 *)config |= 0x40;
-            Projectile_SetUpdateCallback(config, sub_081D9904);
+            Projectile_SetUpdateCallback(config, Task4E01_SpawnImpactChildren);
         }
     }
     return 0;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D95F0);
+INCLUDE_ASM("asm/nonmatching", Task4E01_UpdateExpandingImpact);
 #endif

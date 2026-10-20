@@ -32,7 +32,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 }
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 static inline void SaveControl(u8 *packet, void *control, u8 behavior)
 {
     *(u32 *)(packet + 12) = 30;
@@ -59,7 +59,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
             u32 mask = ~0x100;
             *flags &= mask;
         }
-        sub_0807C72C(actor, 0, 2, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         SetState(actor, 3, 1, 0);
         SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         {

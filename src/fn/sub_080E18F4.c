@@ -5,7 +5,7 @@ struct SceneActorTimedAttackContext {
     u8 unknown0[0x624];
     struct ContactCollider collider;
 };
-void sub_081294B4(struct ContactPosition *, u32, u32, u32);
+void FeatherEffectPool_CreateDirectional(struct ContactPosition *, u32, u32, u32);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {
@@ -25,7 +25,7 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryRes
         variant = 0;
         if (palette == 1)
             variant = 1;
-        sub_081294B4(&a->position, a->direction, 0, variant);
+        FeatherEffectPool_CreateDirectional(&a->position, a->direction, 0, variant);
         Sound_PlaySong(0x3A5);
     }
     if (frame - 13 <= 10)

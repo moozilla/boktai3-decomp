@@ -39,7 +39,7 @@ struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
 void PursuingActor_InitColliders(struct Slash *, s32, s32, s32, s32, s32, s32, s32);
 void TimedEffect_UpdateVisibility(struct Slash *);
-void sub_0812B424(struct Slash *);
+void TwinSpriteEffect_EmitTrail(struct Slash *);
 void PursuingActor_TurnTowardPlayer(struct Slash *);
 void SlashEffect_UpdateColliders(struct Slash *);
 void SwooshProjectile_RemoveTrailSprites(struct Slash *);
@@ -173,7 +173,6 @@ static inline void Step(struct Slash *slot, struct DisplaySequenceState *state)
 }
 
 // confidence=low: paired-collider slash resource 8DC7, with a homing heading and trail sprites
-#define PursuingActor_CreateHomingSlash sub_0812BDA8
 void PursuingActor_CreateHomingSlash(const struct ContactPosition *position, s32 heading,
                                      s32 turnTimer, s32 turnSpeed, s32 turnDelay, s32 speed,
                                      s32 phase, s32 a, s32 b, s32 c, s32 d)

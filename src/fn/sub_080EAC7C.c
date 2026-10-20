@@ -88,7 +88,6 @@ void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
 
 void SceneActor_EndReactionAnimation(void);
-#define Octopus_UpdateStagger sub_080EAC7C
 void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
@@ -132,5 +131,5 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EAC7C);
+INCLUDE_ASM("asm/nonmatching", Octopus_UpdateStagger);
 #endif

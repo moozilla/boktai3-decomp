@@ -107,7 +107,6 @@ static inline u32 Step(struct TrailSprite *input, struct DisplaySequenceState *s
     return done;
 }
 
-#define Axe_EmitMotionTrail sub_080FBA38
 void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -146,5 +145,5 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FBA38);
+INCLUDE_ASM("asm/nonmatching", Axe_EmitMotionTrail);
 #endif

@@ -103,7 +103,6 @@ static inline u32 Step(struct TrailSprite *input, struct DisplaySequenceState *s
     return done;
 }
 
-#define ActorPhase_EmitTrailSprite sub_080FBC84
 void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
                                 const struct ContactPosition *position, u32 angle)
 {

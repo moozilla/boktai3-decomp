@@ -1,9 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define Armor_UpdateContactBoost         sub_0818AFEC
-#define Armor_UpdateBehaviorAfterContact sub_0818B2A0
-
 struct Sub {
     u8 pad[0x38];
     u32 flags;

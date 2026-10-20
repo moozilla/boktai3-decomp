@@ -1,5 +1,4 @@
 // confidence=low: existing Golem state interpretation retained.
-#define Golem_UpdateChargeStop sub_080C68F0
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
@@ -127,5 +126,5 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C68F0);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeStop);
 #endif

@@ -27,7 +27,7 @@ struct RegionSpriteManager {
     const void *sequenceResource, *alternateResource;
 };
 extern struct RegionSpriteManager *gUnk_020001B4;
-void sub_08105AB4(struct RegionSprite *);
+void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
 {
@@ -155,7 +155,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
 }
 
 // confidence=low: updates animation, enters the death state on depleted health, otherwise restores ten health.
-#define RegionActor_UpdateHealthAnimation sub_0810621C
 void RegionActor_UpdateHealthAnimation(struct RegionSprite *p)
 {
     p->sprite.flags &= ~1;
@@ -174,5 +173,5 @@ void RegionActor_UpdateHealthAnimation(struct RegionSprite *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0810621C);
+INCLUDE_ASM("asm/nonmatching", RegionActor_UpdateHealthAnimation);
 #endif

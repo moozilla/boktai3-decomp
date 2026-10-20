@@ -3,13 +3,13 @@
 #include "engine.h"
 
 /* What a target reference points at: an actor's block at +0x50 (position at +0x5C), or the
- * player record sub_080EC024 returns. */
+ * player record SceneActorTarget_FindNearbyPlayer returns. */
 struct IvyTargetRef {
     u8 unknown0[0xC];
     struct ContactPosition position;
 };
 
-struct IvyTargetRef *sub_080EC024(struct SceneActorRegistryResetView *);
+struct IvyTargetRef *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *);
 struct SceneActorRegistryResetView *
 SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
 
@@ -37,17 +37,16 @@ static inline u32 CellIndex(const struct ContactPosition *position)
     return gUnk_030052F4->rows[z] + x;
 }
 
-#define SceneActorReaction_FindAdjacentTarget sub_080EC0E8
-
-/* Ivy target search (tentative): the nearer of sub_080EC024's candidate and the nearest
+/* Ivy target search (tentative): the nearer of SceneActorTarget_FindNearbyPlayer's candidate and the nearest
  * category actor on the same level within the distance limit; it must stand on the terrain
  * cell next to the actor (mode 1: any side, turning to face it; otherwise the side it faces).
  * Stores the result at +0xDC. */
-struct IvyTargetRef *SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *actor, s32 mode)
+struct IvyTargetRef *
+SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *actor, s32 mode)
 {
     s32 best = actor->distanceLimitF8;
     struct SceneActorRegistryResetView *other;
-    struct IvyTargetRef *target = sub_080EC024(actor);
+    struct IvyTargetRef *target = SceneActorTarget_FindNearbyPlayer(actor);
     struct ContactPosition delta;
     u32 cell;
     if (target && actor->position.y == target->position.y) {

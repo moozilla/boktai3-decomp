@@ -55,13 +55,12 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 }
 
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
-void sub_080A915C(void *, s32);
-void sub_080A8F38(void *, s32);
+void TentacleBody_ResetDirectionalAnimations(void *, s32);
+void TentacleBody_RefreshDirectionalAnimations(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
-void sub_080A6F50(void);
+void TentacleBody_UpdateAttackRecovery(void);
 void SceneActor_AimArcAtPlayer(void *);
 void ActorTrail_ApplyAngularOffsets(void *, s32, s32, s32);
-#define TentacleBody_BeginDirectedAttack sub_080A6D18
 void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
 {
     u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
@@ -94,7 +93,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
     Select((void *)actor, entry[0x38], variant, flags);
     ActorTrail_ApplyAngularOffsets(actor, 18, 6, 0);
-    sub_080A8F38(actor->context, 15);
+    TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
     {
         u32 mask = 16;
         if (*attackFlags & mask) {
@@ -105,7 +104,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
                 *flags = mask & value;
             }
             {
-                void *callback = (void *)sub_080A6F50;
+                void *callback = (void *)TentacleBody_UpdateAttackRecovery;
                 u32 kind = 37;
                 actor->field2B2 = 1;
                 actor->field2B0 = 0;
@@ -127,5 +126,5 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A6D18);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_BeginDirectedAttack);
 #endif

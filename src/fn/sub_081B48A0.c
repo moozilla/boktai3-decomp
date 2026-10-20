@@ -3,7 +3,6 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 // confidence=low: moves the part along its stored retreat angle, then returns to idle.
-#define Vanargand_UpdatePartSidestep sub_081B48A0
 #ifdef NONMATCHING
 // fuzzy: 93.9%
 // Remaining differences: register lifetimes, instruction order and literal pools.
@@ -232,5 +231,5 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B48A0);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSidestep);
 #endif

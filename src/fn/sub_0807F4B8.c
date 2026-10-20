@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 #include "scene_actor_reset.h"
-void sub_0807C72C(struct SceneActorBehaviorView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
 extern const u8 gUnk_0824E114[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorControl_OnIdle(u8 *);
@@ -145,7 +145,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
         *((u8 *)group + 0x206) = 255;
     }
     actor = early;
-    sub_0807C72C(actor, 0, 0, actor->category);
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
     if (Test(gUnk_030053F4, 0x4800))
         return;
     {

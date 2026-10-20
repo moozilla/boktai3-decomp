@@ -1,5 +1,4 @@
 // confidence=low: inferred from player cue phases and animation consumers.
-#define PlayerCue_UpdateSpiralRecovery sub_08154CD4
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
@@ -220,5 +219,5 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08154CD4);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralRecovery);
 #endif

@@ -4,17 +4,16 @@ extern u16 gUnk_03005260[];
 void Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void DarkLoan_BeginClosing(void *);
-void sub_081BC76C(void *);
-void sub_081BC3B4(void *);
+void DarkLoan_FinishOpening(void *);
+void DarkLoan_UpdateBalanceDigits(void *);
 void StatGauge_DrawPreview(void *);
-void sub_081BC468(void *);
+void DarkLoan_UpdateAdjustmentDigits(void *);
 u32 StatGauge_GetSelectionGroup(u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void MessageWindow_ShowMessage(u32);
-#define H(off)                    (*(u16 *)(s + (off)))
-#define W(off)                    (*(u32 *)(s + (off)))
-#define DarkLoan_UpdateAdjustment sub_081BCCD4
+#define H(off) (*(u16 *)(s + (off)))
+#define W(off) (*(u32 *)(s + (off)))
 void DarkLoan_UpdateAdjustment(u8 *s)
 {
     u16 *balance, *limit;
@@ -47,7 +46,7 @@ void DarkLoan_UpdateAdjustment(u8 *s)
     }
     if (gUnk_03005260[1] & 2) {
         Sound_PlaySong(0xDE);
-        sub_081BC76C(s);
+        DarkLoan_FinishOpening(s);
         return;
     }
     if ((gUnk_03005260[0] & 0x20) &&
@@ -55,9 +54,9 @@ void DarkLoan_UpdateAdjustment(u8 *s)
         *balance + H(0x8EE) < *limit) {
         Sound_PlaySong(0x37D);
         H(0x8EE)++;
-        sub_081BC3B4(s);
+        DarkLoan_UpdateBalanceDigits(s);
         StatGauge_DrawPreview(s);
-        sub_081BC468(s);
+        DarkLoan_UpdateAdjustmentDigits(s);
         H(0x900) = 19;
         group = StatGauge_GetSelectionGroup(H(0x8FE));
         Anim_LoadKeyframe(s + 0x238, s + 0x18, (u16)(H(0x900) + group), 1);
@@ -67,9 +66,9 @@ void DarkLoan_UpdateAdjustment(u8 *s)
     } else if ((gUnk_03005260[0] & 0x10) && H(0x8EE)) {
         Sound_PlaySong(0x37D);
         H(0x8EE)--;
-        sub_081BC3B4(s);
+        DarkLoan_UpdateBalanceDigits(s);
         StatGauge_DrawPreview(s);
-        sub_081BC468(s);
+        DarkLoan_UpdateAdjustmentDigits(s);
         H(0x900) = 22;
         group = StatGauge_GetSelectionGroup(H(0x8FE));
         Anim_LoadKeyframe(s + 0x238, s + 0x18, (u16)(H(0x900) + group), 1);
@@ -93,7 +92,7 @@ void DarkLoan_UpdateAdjustment(u8 *s)
         H(0x908) = 60;
     if (H(0x908)) {
         if (--H(0x908) == 0) {
-            sub_081BC468(s);
+            DarkLoan_UpdateAdjustmentDigits(s);
             MessageWindow_ShowMessage(4);
             H(0x90A) = 0;
         } else {

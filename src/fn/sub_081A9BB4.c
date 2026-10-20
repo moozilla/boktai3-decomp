@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
-#define Vanargand_UpdateFacingPairAttack sub_081A9BB4
 #ifdef NONMATCHING
 // fuzzy: 98.5%
 // Remaining differences: RNG table and pair-slot offset use different low registers.
@@ -152,5 +151,5 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A9BB4);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateFacingPairAttack);
 #endif

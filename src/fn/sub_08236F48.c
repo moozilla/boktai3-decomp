@@ -29,7 +29,7 @@ struct Burst {
 };
 void ParticleBurst_AdvanceFrame(void *);
 void ParticleBurst_RewindFrame(void *);
-void sub_08236C04(struct Burst *, struct BurstVector *);
+void ParticleBurst_EmitOrbitParticle(struct Burst *, struct BurstVector *);
 
 void sub_08236F48(struct Burst *p)
 {
@@ -45,7 +45,7 @@ void sub_08236F48(struct Burst *p)
             p->position.y += p->offset.y;
             p->position.z += p->offset.z;
             if (p->mode == 1 && p->timer < p->limit28)
-                sub_08236C04(p, &p->position);
+                ParticleBurst_EmitOrbitParticle(p, &p->position);
         } else {
             ParticleBurst_RewindFrame(p->sprite);
         }

@@ -1,7 +1,6 @@
 #include "global.h"
 #define gGameState gUnk_02000710
 #include "game_state.h"
-#define InventoryPanel_DrawStatComparison sub_0816701C
 s32 InventoryPanel_CreateEntry(s32 *, s32, s32, s32, s32);
 s32 InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
 s32 InventoryPanel_UpdateSelectedEquipment(void *, s32, s32, s32, s32);

@@ -19,7 +19,6 @@ void SceneHud_ConfigureActionGrid(void *, u32, u32);
 void Hud_RestoreGridSelection(void *);
 void Hud_SetGridPosition(void *, u32, u32);
 // confidence=low: confirms transfers between fruit or unlock grid entries.
-#define SceneHud_UpdateActionTransferSelection sub_08172E70
 void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
 {
     u8 *grid = p->actionInput;

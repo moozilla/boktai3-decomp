@@ -1,7 +1,6 @@
 #include "global.h"
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-#define DarkLoan_UpdateAdjustmentDigits sub_081BC468
 void DarkLoan_UpdateAdjustmentDigits(u8 *p)
 {
     s32 digits[4];

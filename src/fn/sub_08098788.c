@@ -15,7 +15,7 @@ void sub_08098734(void *);
 void ActorVisibility_TickRevealDelay(void *);
 void sub_08097CB4(void *);
 void sub_08097E38(void *);
-void sub_080974F4(void *);
+void SceneActor_EasePlayerHeight(void *);
 static inline u8 Flag(u8 *p, u32 mask)
 {
     if (*(u32 *)(p + 0x558) & mask)
@@ -99,7 +99,6 @@ static inline u8 SaveFlag(u32 mask)
     return 0;
 }
 // confidence=low: coordinates Ghost visibility transitions with player reveal state.
-#define Ghost_UpdateVisibility sub_08098788
 u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorRegistryResetView *saved = a;
@@ -175,10 +174,10 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     sub_08097CB4(a);
     sub_08097E38(a);
 finish:
-    sub_080974F4(a);
+    SceneActor_EasePlayerHeight(a);
     return 1;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08098788);
+INCLUDE_ASM("asm/nonmatching", Ghost_UpdateVisibility);
 #endif

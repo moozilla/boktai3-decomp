@@ -1,6 +1,5 @@
 #include "rotation_phase.h"
 // confidence=low: launches toward the player and brakes sprite rotation on arrival.
-#define Axe_UpdateTargetLunge sub_080F8FFC
 #ifdef NONMATCHING
 // fuzzy: 84.5%
 #define F(p, o, t) (*(t *)((u8 *)(p) + (o)))
@@ -8,7 +7,7 @@ extern u8 *gUnk_02000580;
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
-void sub_080FBA38(void *);
+void Axe_EmitMotionTrail(void *);
 void sub_080FC094(void *, s32);
 void Axe_SetAuxiliarySpriteRenderState(void *, void *, u32);
 void SceneActorControl_FinishRotation(void);
@@ -55,7 +54,7 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
     else
         sprite->angle -= state[0xEAE];
     angle = NormalizeAngle(sprite->angle);
-    sub_080FBA38(a);
+    Axe_EmitMotionTrail(a);
     if (frame <= 27) {
         if (!Mod(frame, 10))
             state[0xEAE] += 4;
@@ -88,5 +87,5 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F8FFC);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateTargetLunge);
 #endif

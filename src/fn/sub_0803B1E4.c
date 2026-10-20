@@ -21,7 +21,7 @@ struct ResultMenu {
 extern u16 gUnk_03005260[];
 int Mod(int, int);
 void Sound_PlaySong(int);
-void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
+void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 static inline int clamp(int value)
 {
     if (value > 9999)
@@ -57,7 +57,7 @@ void WirelessResultPanel_UpdatePointsTransfer(struct ResultMenu *p)
         int value;
         value = clamp(p->remaining);
         desc = &p->primary;
-        sub_082213B8(draw, desc, value, 4, 51, 104, 96, 8, 0);
+        Anim_DrawDecimalDigits(draw, desc, value, 4, 51, 104, 96, 8, 0);
     }
     {
         struct Drawing *draw = &p->draws[18];
@@ -72,7 +72,7 @@ void WirelessResultPanel_UpdatePointsTransfer(struct ResultMenu *p)
                 value = maximum;
             else if (value < 0)
                 value = 0;
-            sub_082213B8(draw, descriptor, value, 4, 51, 104, 136, 8, 0);
+            Anim_DrawDecimalDigits(draw, descriptor, value, 4, 51, 104, 136, 8, 0);
         }
     }
     if (!p->remaining) {

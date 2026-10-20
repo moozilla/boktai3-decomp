@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
-#define NamedObject_PlayAdjacentExitSound sub_08103F44
 extern u8 *gUnk_020001AC;
 extern void *gUnk_02000580;
 u32 Player_TestAttachmentFlags(void *, u32);

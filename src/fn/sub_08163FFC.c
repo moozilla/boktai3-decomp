@@ -1,5 +1,4 @@
 #include "global.h"
-#define StatDisplay_DrawRatio sub_08163FFC
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 u32 Hud_GetStyleTileIndex(s32, s32);

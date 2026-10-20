@@ -3,7 +3,7 @@
 /* SceneActorControl_CompleteScriptedResponse_0809F368: SceneActorControl_CompleteScriptedResponse with other constants (ported by relatives.py, fixed by hand; provisional name) */
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
@@ -31,7 +31,6 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->z = Shift(gUnk_086149C4[angle] * speed);
 }
 // confidence=low: invokes a pending Slime script with motion and variant arguments, then resets control.
-#define Slime_RunPendingActionScript sub_0808FF68
 void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
 {
     s32 values[10];

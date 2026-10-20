@@ -5,7 +5,7 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
 {
@@ -52,7 +52,6 @@ static inline void ResetElapsed(struct DisplaySequenceState *sequence)
     sequence->elapsed = 0;
 }
 // confidence=low: Mimic defeat blink inferred from neighboring behavior callbacks.
-#define Mimic_UpdateDefeatBlink sub_080E76F0
 void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     s32 values[8];
@@ -96,7 +95,8 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
         {
             u32 m = 0x4000;
             if (!(actor->flags2D4 & m) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+                GameState_SetEventFlag(
+                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         }
     } else if (DrawableVisible(actor))
         ActorShadow_Disable((u8 *)actor + 0x320);

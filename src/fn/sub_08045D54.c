@@ -1,6 +1,6 @@
 #include "contact_sequence_actor.h"
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void sub_080148CC(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
@@ -12,7 +12,7 @@ void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
     struct ContactSequenceActor *saved;
     struct ContactPosition *position;
     saved = actor;
-    sub_0821FF8C(source, other);
+    Collision_CalculateDamageResponse(source, other);
     if (actor->cooldown == 0) {
         PlayerStats_AddContactHundredths(source, other, actor->reactionValue);
         actor->cooldown = 10;

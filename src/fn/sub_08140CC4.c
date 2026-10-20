@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Player_UpdateLockedMovement sub_08140CC4
-
 struct Obj {
     u8 pad0[0x18];
     s32 slot;
@@ -30,7 +28,7 @@ struct Obj {
 extern const s16 gUnk_086149C4[];
 u32 Player_IsStatusBit3ActionActive(u32 x);
 void Sound_PlaySong(u32);
-s32 sub_08140AC8(struct Obj *obj);
+s32 Player_SelectLockedTurnDirection(struct Obj *obj);
 
 static inline s32 scale(s32 value)
 {
@@ -55,7 +53,7 @@ void Player_UpdateLockedMovement(struct Obj *p)
                 p->timer = 0;
                 p->active = 0;
             } else {
-                p->dir = sub_08140AC8(p);
+                p->dir = Player_SelectLockedTurnDirection(p);
                 angle = ((p->dir + 5) & 7) * 32;
                 p->dx = scale(gUnk_086149C4[(angle + 64) & 255] * 10);
                 p->dz = scale(gUnk_086149C4[angle] * 10);

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0818D21C(void);
+void Armor_InitPartLunge(void);
 static inline u8 reset(u8 *p)
 {
     s32 one = 1;
@@ -22,5 +22,5 @@ static inline u8 reset(u8 *p)
 void Armor_StartPartReturnMotion(u8 *p)
 {
     if (reset(p))
-        *(void (**)(void))(p + 0x1d0) = sub_0818D21C;
+        *(void (**)(void))(p + 0x1d0) = Armor_InitPartLunge;
 }

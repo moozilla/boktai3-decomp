@@ -55,10 +55,9 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 }
 
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
-void sub_080A915C(void *, s32);
-void sub_080A8F38(void *, s32);
+void TentacleBody_ResetDirectionalAnimations(void *, s32);
+void TentacleBody_RefreshDirectionalAnimations(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
-#define TentacleBody_UpdateAttackRecovery sub_080A6F50
 void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     register u8 *entry asm("r10") = (void *)SceneActorProfiles_GetEntryAddress(
@@ -69,16 +68,16 @@ void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor
         actor->field2B2 = 0;
     TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
     Select((void *)actor, entry[0x44], variant, flags);
-    sub_080A915C(actor->context, 18);
+    TentacleBody_ResetDirectionalAnimations(actor->context, 18);
     sub_080A9DB0(actor, 20, 25600);
     if (frame > 40) {
         TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
         Select((void *)actor, entry[0x38], variant, flags);
-        sub_080A8F38(actor->context, 15);
+        TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
         actor->field2B0 = 1;
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A6F50);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateAttackRecovery);
 #endif

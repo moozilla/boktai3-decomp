@@ -18,7 +18,7 @@ struct ActorGroupRemovalPool {
     u8 unk0[0x62C];
     u32 active;
 };
-void sub_0810523C(struct ActorGroupMember *);
+void ActorGroup_EmitRemovalDebris(struct ActorGroupMember *);
 void ProximityActor_SetState(struct ActorGroupMember *, s32);
 void ScaledShadow_Destroy(void *);
 void ActorGroup_CallMemberScript(struct ActorGroupMember *);
@@ -29,7 +29,7 @@ void ActorGroup_UpdateMemberRemoval(struct ActorGroupRemovalPool *group,
                                     struct ActorGroupMember *member)
 {
     if (member->started) {
-        sub_0810523C(member);
+        ActorGroup_EmitRemovalDebris(member);
         if (member->value147 - member->value146 >= 0)
             Sound_PlaySong(0x3C7);
         ProximityActor_SetState(member, member->value147 - member->value146);

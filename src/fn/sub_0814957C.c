@@ -2,7 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-#define Player_UpdateOddDirectionPose sub_0814957C
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // Remaining differences: instruction selection and register allocation.
@@ -162,5 +161,5 @@ void Player_UpdateOddDirectionPose(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814957C);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateOddDirectionPose);
 #endif

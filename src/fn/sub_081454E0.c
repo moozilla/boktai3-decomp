@@ -32,7 +32,6 @@ static inline s32 eighth(s32 v)
     return -((-v) >> 3);
 }
 // confidence=low: follows a terrain target during recoil, then restores normal motion.
-#define Player_UpdateTerrainRecoil sub_081454E0
 void Player_UpdateTerrainRecoil(struct Player *p)
 {
     s32 x, z, angle, value;

@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Sword_UpdateDamage sub_080F645C
-
 #ifdef NONMATCHING
 // fuzzy: 97.6%
 // Remaining differences: allocation of the saturated defeat counter at offset 0x538.
@@ -94,5 +92,5 @@ void Sword_UpdateDamage(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F645C);
+INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
 #endif

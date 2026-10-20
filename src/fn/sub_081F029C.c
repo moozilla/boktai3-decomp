@@ -18,7 +18,8 @@ struct ActorReactionEvent {
 void ActorReaction_MarkSequenceHit(struct ActorReaction *p, struct ActorReactionEvent *event)
 {
     p->hit = 1;
-    if (p->update == SceneActors_UpdateHitSensitiveDeparture && event->sequence == p->sequence + 1) {
+    if (p->update == SceneActors_UpdateHitSensitiveDeparture &&
+        event->sequence == p->sequence + 1) {
         p->sequenceHit = 1;
         p->speed >>= 1;
     }

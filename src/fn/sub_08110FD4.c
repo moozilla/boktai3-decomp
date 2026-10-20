@@ -23,7 +23,7 @@ extern u16 gUnk_03004BD8;
 
 extern const u8 gUnk_0860B2D0[], gUnk_08607DB0[], gUnk_08606550[];
 extern const u8 gUnk_0860E3D0[], gUnk_0860A470[], gUnk_08609610[];
-void SpriteOam_QueueProjectedSprites(void), sub_08214B44(void), sub_08219624(void);
+void SpriteOam_QueueProjectedSprites(void), Sprite_RenderScaledList(void), sub_08219624(void);
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void SceneTilemap_LoadLayoutFromScript(struct TilemapPanel *),
     TilemapPanel_LoadScriptTileList(struct TilemapPanel *);
@@ -38,7 +38,8 @@ void SceneEffect_ExecuteCommandList(u16 *, s32);
 s32 TilemapPanel_Initialize(struct TilemapPanel *p)
 {
     s32 choice;
-    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
+    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
+                             sub_08219624);
     SceneTilemap_LoadLayoutFromScript(p);
     TilemapPanel_LoadScriptTileList(p);
     p->screenMap = Video_GetBackgroundMap(2);

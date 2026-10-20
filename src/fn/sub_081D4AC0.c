@@ -20,7 +20,7 @@ void DisplayAnimation_SetFlags(void *, u32);
 void DisplayAnimation_ClearFlags(void *, u32);
 void sub_081D4A34(void *);
 void Callback_InvokeActor(void *, void *);
-void sub_081D396C(s32, u8 *, u8 *, u32);
+void Dir_Decompose(s32, u8 *, u8 *, u32);
 void DisplayAnimation_SetEntry(void *, u32, u32, u32, u32, u32, u32);
 void DisplayAnimation_UpdatePlayback(void *);
 void sub_081D4990(void *, s32);
@@ -30,7 +30,6 @@ static inline s32 Scale(s32 n, s32 bits)
         return n >> bits;
     return -((-n) >> bits);
 }
-#define BestiaryDisplay_UpdateEntry sub_081D4AC0
 s32 BestiaryDisplay_UpdateEntry(u8 *p)
 {
     s32 i;
@@ -67,7 +66,7 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
     if (config->callback)
         Callback_InvokeActor(p, config->callback);
     if (!(config->flags & 4) && !p[0xa02]) {
-        sub_081D396C(config->animation, p + 0x9fe, p + 0x9ff, *(u16 *)(p + 0xa00));
+        Dir_Decompose(config->animation, p + 0x9fe, p + 0x9ff, *(u16 *)(p + 0xa00));
         DisplayAnimation_SetEntry(animations, *(u16 *)(p + 0x9fc), p[0x9fe], p[0x9ff], 1, 0, 5);
         DisplayAnimation_UpdatePlayback(animations);
     }
@@ -92,5 +91,5 @@ s32 BestiaryDisplay_UpdateEntry(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D4AC0);
+INCLUDE_ASM("asm/nonmatching", BestiaryDisplay_UpdateEntry);
 #endif

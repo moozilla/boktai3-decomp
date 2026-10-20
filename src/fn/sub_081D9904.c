@@ -64,7 +64,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
-        
+
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -137,9 +137,9 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32, s32);
 u32 sub_08249498(u32, u32);
-void sub_081D7934(void *);
+void Task4E01_BeginImpactAnimation(void *);
 
-void sub_081D95F0(void *);
+void Task4E01_UpdateExpandingImpact(void *);
 void Projectile_InitializeParams(void *);
 void Projectile_SetFlightParams(void *, u32, u32, s32, s32);
 void Projectile_SetDamageParams(void *, u32, u32, u32, u32, u32);
@@ -162,7 +162,6 @@ struct SpawnConfig {
     u16 count;
 };
 // confidence=low: emits three randomized child projectiles before removing the source.
-#define Task4E01_SpawnImpactChildren sub_081D9904
 s32 Task4E01_SpawnImpactChildren(u8 *input)
 {
     register u8 *p asm("r10") = input;
@@ -186,32 +185,42 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
                 config->direction = randomTable[*randomIndex];
             }
             Projectile_InitializeParams(params);
-            if (i == 0) *(u16 *)params |= 0x110;
-            else if (i == 1) *(u16 *)params = (*(u16 *)params & 0xfeef) | 0x210;
-            else *(u16 *)params = (*(u16 *)params & 0xfdef) | 0x310;
+            if (i == 0)
+                *(u16 *)params |= 0x110;
+            else if (i == 1)
+                *(u16 *)params = (*(u16 *)params & 0xfeef) | 0x210;
+            else
+                *(u16 *)params = (*(u16 *)params & 0xfdef) | 0x310;
             {
                 s32 half;
-                if (speed >= 0) half = speed >> 1;
-                else half = -((-speed) >> 1);
+                if (speed >= 0)
+                    half = speed >> 1;
+                else
+                    half = -((-speed) >> 1);
                 config->speed += half * (i - 1);
             }
-            Projectile_SetFlightParams(params, *(u16 *)params, config->lifetime + 30, config->direction, config->speed);
+            Projectile_SetFlightParams(params, *(u16 *)params, config->lifetime + 30,
+                                       config->direction, config->speed);
             *(u16 *)params |= config->flags;
             *(void **)(params + 0x54) = config;
-            Projectile_SetDamageParams(params, config->damage[0], config->damage[1], config->damage[2] >> 1, config->damage[3], config->damage[4]);
+            Projectile_SetDamageParams(params, config->damage[0], config->damage[1],
+                                       config->damage[2] >> 1, config->damage[3],
+                                       config->damage[4]);
             Projectile_SetCollisionSize(params, (s16)config->sizeX, 80, (s16)config->sizeZ);
             Projectile_SetTypeAndElement(params, config->type, config->element);
-            Projectile_SetSpriteParams(params, config->sprite[0], config->sprite[1], config->sprite[2]);
-            if (Projectile_Spawn(params, p + 0xa8) < 0) config->count--;
+            Projectile_SetSpriteParams(params, config->sprite[0], config->sprite[1],
+                                       config->sprite[2]);
+            if (Projectile_Spawn(params, p + 0xa8) < 0)
+                config->count--;
             config->direction = direction;
             config->speed = speed;
         }
     }
     StepPlayback((void *)(p + 0x8c), (void *)(p + 0x180));
-    sub_081D7934(p);
+    Task4E01_BeginImpactAnimation(p);
     return 0;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D9904);
+INCLUDE_ASM("asm/nonmatching", Task4E01_SpawnImpactChildren);
 #endif

@@ -156,7 +156,6 @@ static inline u8 Ended(struct VanargandPart *p)
 void CpuSet(const void *, void *, u32);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 // confidence=low: moves to the radial target and fades from the alternate palette.
-#define Vanargand_UpdatePartRevealFade sub_081B5A98
 void Vanargand_UpdatePartRevealFade(u8 *boss, struct VanargandPart *p, s32 frame)
 {
     u32 mask = 12;

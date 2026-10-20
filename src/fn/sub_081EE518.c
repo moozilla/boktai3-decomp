@@ -1,18 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Player_GetHorizontalVelocity        sub_08116C20
-#define Player_GetWorldPosition             sub_08116C4C
-#define SceneActors_EmitPeriodicParticles   sub_081EC5C8
-#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite     sub_081EC974
-#define SceneMover_ApproachScreenX          sub_081ECD44
-#define SceneMover_StepPastScreenX          sub_081ECE80
-#define Anim_SetSequence                    sub_08220C8C
-#define Anim_RestartSequence                sub_08220D20
-#define Sound_PlaySong                      sub_0822B2F8
 // confidence=low: hit callback slows this departure action.
-#define SceneActors_UpdateHitSensitiveDeparture sub_081EE518
 #ifdef NONMATCHING
 // fuzzy: 91.4%
 // Remaining differences: base preservation, second decoder allocation, and phase transitions.
@@ -260,5 +248,5 @@ void SceneActors_UpdateHitSensitiveDeparture(void *arg, int time)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EE518);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdateHitSensitiveDeparture);
 #endif

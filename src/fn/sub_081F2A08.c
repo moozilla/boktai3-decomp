@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SpriteTrail_CreateMotionEffect sub_081F2A08
 struct Vec {
     s32 x, y, z, pad;
 };

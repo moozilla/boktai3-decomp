@@ -1,4 +1,3 @@
-#define Presentation_UpdateAllocationSelection sub_08175008
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -157,5 +156,5 @@ finish:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08175008);
+INCLUDE_ASM("asm/nonmatching", Presentation_UpdateAllocationSelection);
 #endif

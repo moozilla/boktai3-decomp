@@ -3,7 +3,7 @@
 u8 SceneActor_IsFacingNearbyTarget(u8 *);
 void Vorn_BeginAction16(u8 *);
 void Vorn_SelectRetreatRoute(u8 *, u32);
-void sub_080B23A0(u8 *, u32);
+void Vorn_BeginPursuitRoute(u8 *, u32);
 
 void Vorn_SelectRecoveryAction(u8 *p)
 {
@@ -13,5 +13,5 @@ void Vorn_SelectRecoveryAction(u8 *p)
         else
             Vorn_SelectRetreatRoute(p, 1);
     } else
-        sub_080B23A0(p, 1);
+        Vorn_BeginPursuitRoute(p, 1);
 }

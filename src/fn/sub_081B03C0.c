@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
-#define PairedSceneActor_UpdatePlayerCapture sub_081B03C0
 // confidence=low: moves a paired half and holds/releases player position requests.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
@@ -239,5 +238,5 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B03C0);
+INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdatePlayerCapture);
 #endif

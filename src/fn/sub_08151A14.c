@@ -1,12 +1,4 @@
-#define Player_UpdateFacingSide sub_0813ADD0
-#define Player_SetAnimation sub_0813AE18
-#define ActorSequence_Begin sub_0813AFEC
-#define ActorVariant_GetTableValue sub_081419D4
-#define PlayerCue_EnterStandUpdate sub_0814F804
-#define PlayerCue_CompleteAction sub_0814F89C
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
-#define PlayerCue_UpdateTurningPalette sub_08151A14
-#define Sound_PlaySong sub_0822B2F8
 #include "global.h"
 #include "player.h"
 
@@ -128,5 +120,5 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08151A14);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTurningPalette);
 #endif

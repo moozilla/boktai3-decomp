@@ -28,7 +28,6 @@ static inline s32 LowZ(struct Position *p)
     return z & 255;
 }
 // confidence=low: compares base heights at positive subcell corners.
-#define Terrain_HasHigherCorner sub_0821D6F4
 #ifdef NONMATCHING
 // fuzzy: 97.7%
 // Remaining: Z low-byte load/mask selection and resulting pool alignment.
@@ -80,5 +79,5 @@ s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821D6F4);
+INCLUDE_ASM("asm/nonmatching", Terrain_HasHigherCorner);
 #endif

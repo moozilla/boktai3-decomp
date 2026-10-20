@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define VulcanCannon_UpdateTargeting sub_08206C00
-#define VulcanCannon_UpdateDefeatEffects sub_082071D0
-#define VulcanCannon_UpdateDamageState sub_082074F0
 #ifdef NONMATCHING
 // fuzzy: 90.6%
 // Collider and sequence-argument allocation and the defined zero return still differ.
@@ -14,7 +11,7 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
-void sub_081DB390(void *, s32, s32, s32, s32, s32, s32, s32);
+void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
 struct CannonEffectPair {
@@ -99,34 +96,34 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             {
                 register s32 zero asm("r3") = 0;
                 asm("" : "+r"(zero));
-                sub_081DB390(&smoke, 16, 0, zero, zero, 60, zero, zero);
+                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, zero);
             }
             smoke.x += 128;
             {
                 register s32 zero asm("r0") = 0;
                 asm("" : "+r"(zero));
-                sub_081DB390(&smoke, 16, 0, 0, zero, 60, zero, 2);
+                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
             }
             smoke.x -= 128;
             smoke.z += 128;
             {
                 register s32 zero asm("r1") = 0;
                 asm("" : "+r"(zero));
-                sub_081DB390(&smoke, 16, 0, 0, zero, 60, zero, 2);
+                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
             }
             smoke.z -= 128;
             smoke.x -= 128;
             {
                 register s32 zero asm("r2") = 0;
                 asm("" : "+r"(zero));
-                sub_081DB390(&smoke, 16, zero, 0, zero, 60, zero, 5);
+                Explosion_CreateAt(&smoke, 16, zero, 0, zero, 60, zero, 5);
             }
             smoke.x += 128;
             smoke.z -= 128;
             {
                 register s32 zero asm("r3") = 0;
                 asm("" : "+r"(zero));
-                sub_081DB390(&smoke, 16, 0, zero, zero, 60, zero, 5);
+                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
             }
             Anim_RestartSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
             AnimData_SelectPaletteBank(p->graphics, 0x1be);
@@ -183,5 +180,5 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082074F0);
+INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateDamageState);
 #endif

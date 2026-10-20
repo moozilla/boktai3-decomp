@@ -10,7 +10,7 @@ void SceneActorRecord_RecordPair(u16, u16);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
 void sub_08159164(u32);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -194,9 +194,9 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
             actor->flags2D4 &= ~(u32)0x10;
         }
         actor->field2C2 = 0x40;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         burn->timer = 0;
         return;

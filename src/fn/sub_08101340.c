@@ -5,7 +5,6 @@
 // The reviewed extent also includes 80 bytes at 08101500 not represented by this C.
 #include "named_object.h"
 #include "player.h"
-#define NamedObject_UpdateMovementSound sub_08101340
 static inline u8 Active(u32 mask, u32 bit)
 {
     if (mask & bit)
@@ -88,5 +87,5 @@ void NamedObject_UpdateMovementSound(u8 *manager)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08101340);
+INCLUDE_ASM("asm/nonmatching", NamedObject_UpdateMovementSound);
 #endif

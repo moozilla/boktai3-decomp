@@ -4,9 +4,8 @@
 // fuzzy: 96.6%
 // Remaining differences: instruction selection, load placement, and literal-mask materialization.
 // confidence=low: icon identity inferred from timed player status and save flags.
-#define Hud_UpdateTimedStatusIcon sub_08165020
 extern u8 *gUnk_02000710;
-s32 sub_0822D604(s32);
+s32 Selection_GetDisplayFrame(s32);
 void Anim_LoadKeyframe(void *, void *, u16, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Hud_GetStyleTileIndex(s32, s32);
@@ -21,7 +20,7 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
         *(u32 *)(p + 0xaa4) &= ~1;
         anim = p + 0xa9c;
         res = p + 0xa4;
-        Anim_LoadKeyframe(anim, res, sub_0822D604(*(u16 *)((u8 *)*player + 0x536)), 1);
+        Anim_LoadKeyframe(anim, res, Selection_GetDisplayFrame(*(u16 *)((u8 *)*player + 0x536)), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
         value = Div(*(u16 *)((u8 *)*player + 0x538) + 59, 60);
         digit = Div(value, 10);
@@ -33,7 +32,7 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
         *(u32 *)(p + 0xaa4) &= ~1;
         anim = p + 0xa9c;
         res = p + 0xa4;
-        Anim_LoadKeyframe(anim, res, sub_0822D604(0x1b), 1);
+        Anim_LoadKeyframe(anim, res, Selection_GetDisplayFrame(0x1b), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
         cell[0] = 0xd000;
         cell[1] = 0xd000;
@@ -42,7 +41,7 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
         *(u32 *)(p + 0xaa4) &= ~1;
         anim = p + 0xa9c;
         res = p + 0xa4;
-        Anim_LoadKeyframe(anim, res, sub_0822D604(0x1c), 1);
+        Anim_LoadKeyframe(anim, res, Selection_GetDisplayFrame(0x1c), 1);
         cell = Hud_GetTilemapCell(0, 1, 6);
         cell[0] = 0xd000;
         cell[1] = 0xd000;
@@ -57,5 +56,5 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08165020);
+INCLUDE_ASM("asm/nonmatching", Hud_UpdateTimedStatusIcon);
 #endif

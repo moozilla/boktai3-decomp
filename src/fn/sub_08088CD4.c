@@ -6,9 +6,9 @@
  * releases attachments, shows the drawable and clears the route; every 12 frames it emits
  * sparks while flag 8 is set, then a six-spark burst, the defeat script, the event flag and
  * the switch to SceneActorControl_OnIdle. */
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -62,9 +62,9 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         drawable->flags |= 2;
         SceneActorPlacement_PlayCategoryEventSound(actor);
@@ -155,7 +155,8 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         u32 test = actor->flags2D4 & mask;
         flags = &actor->flags2D4;
         if (!test && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
         zero = 0;
         drawable->alpha8 = 0x40;

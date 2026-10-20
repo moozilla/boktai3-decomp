@@ -197,7 +197,6 @@ static inline void Step(struct Render *owner, struct Frames *state)
     }
 }
 // confidence=low: script options initialize a member of Pool184's actor group.
-#define ActorGroup_CreateFromScript sub_08104350
 void ActorGroup_CreateFromScript(void)
 {
     struct Context *pool = gUnk_020001B0;
@@ -297,5 +296,5 @@ void ActorGroup_CreateFromScript(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08104350);
+INCLUDE_ASM("asm/nonmatching", ActorGroup_CreateFromScript);
 #endif

@@ -32,7 +32,6 @@ struct Camera {
     s32 x;
 };
 extern struct Camera *gUnk_020004B8;
-#define ActorMarkerPool_UpdateMarkers sub_081128F8
 s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
 {
     struct MarkerPool *base = pool;

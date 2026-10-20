@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
-#define NativeEffect_UpdateAcceleratingTrail sub_08113920
 #ifdef NONMATCHING
 // fuzzy: 95.4%
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
@@ -210,9 +209,9 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
             u32 x : 16, y : 16, z : 16, pad : 16;
         } offset;
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.x = (TrailRandom()) - 3;
+        offset.x = (TrailRandom())-3;
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.y = (TrailRandom()) - 3;
+        offset.y = (TrailRandom())-3;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }
     p->timer++;
@@ -224,5 +223,5 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08113920);
+INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateAcceleratingTrail);
 #endif

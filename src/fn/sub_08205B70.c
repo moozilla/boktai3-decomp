@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Ooze_BeginAttack sub_08205B70
 #include "display_animation.h"
 
 #ifdef NONMATCHING

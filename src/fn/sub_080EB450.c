@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *);
-s32 sub_080EC0E8(struct SceneActorRegistryResetView *, s32);
-void sub_080E99F8(void *);
+s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+void Ivy_ApplyHeldTargetDamage(void *);
 static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
 {
     u8 *flag = &actor->field2B1;
@@ -39,7 +39,7 @@ void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *a
         u8 byteZero;
         u32 state;
         actor->fieldDC = (u32)target;
-        callback = sub_080E99F8;
+        callback = Ivy_ApplyHeldTargetDamage;
         kind = 45;
         prepared = &actor->field2B2;
         zero = 0;
@@ -61,7 +61,7 @@ void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *a
         actor->word104 = zero;
         ResetState(actor, 3, 0, 0);
     } else {
-        if ((s32)actor->counter2AC > 300 || sub_080EC0E8(actor, 1)) {
+        if ((s32)actor->counter2AC > 300 || SceneActorReaction_FindAdjacentTarget(actor, 1)) {
             u32 one = 1;
             u32 zero = (u32)target;
             void *callback;

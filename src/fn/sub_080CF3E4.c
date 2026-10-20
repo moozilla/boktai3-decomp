@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: arrival callback restores the delayed behavior and retargets the chase.
-#define Golem_ArriveAndRestore sub_080CF3E4
 #ifdef NONMATCHING
 // fuzzy: 88.3%
 // Arrival and chase logic reconstructed; group and reroute pointer allocation,
@@ -159,5 +158,5 @@ void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
     Arrive(actor);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CF3E4);
+INCLUDE_ASM("asm/nonmatching", Golem_ArriveAndRestore);
 #endif

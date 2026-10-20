@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Player_SelectLockedTurnDirection sub_08140AC8
-
 /* tentative: probes tiles beside the facing and picks a diagonal direction */
 
 struct Vec16 {

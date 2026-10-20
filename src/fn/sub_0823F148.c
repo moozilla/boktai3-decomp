@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 
 // confidence=low: holding input charges recoil and release advances the tether attack.
-#define Player_UpdateChargedTetherStrike sub_0823F148
 
 #ifdef NONMATCHING
 // fuzzy: 96.0%
@@ -84,8 +83,8 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             *(u8 *)(p + 0xC0F) = 1;
             *(u16 *)(p + 0x4D2) = 0x1E;
             {
-            register u32 duration asm("r0") = 0x16E;
-            *(u16 *)(p + 0xAD6) = duration;
+                register u32 duration asm("r0") = 0x16E;
+                *(u16 *)(p + 0xAD6) = duration;
             }
             *(u16 *)(p + 0xAD8) = 0x24;
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
@@ -136,18 +135,18 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             {
-            register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
-            if (released) {
-                *(u8 *)(p + 0xBF6) = 0;
-                *(u8 *)(p + 0x458) = 1;
-                break;
-            }
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 0xE) {
-                register u32 zero asm("r0") = 0;
-                *(u8 *)(p + 0xBF6) = zero;
-                Player_SetTetherMode(p, 3, 7);
-            }
+                register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+                if (released) {
+                    *(u8 *)(p + 0xBF6) = 0;
+                    *(u8 *)(p + 0x458) = 1;
+                    break;
+                }
+                (*(u16 *)(p + 0x45A))++;
+                if (*(u16 *)(p + 0x45A) > 0xE) {
+                    register u32 zero asm("r0") = 0;
+                    *(u8 *)(p + 0xBF6) = zero;
+                    Player_SetTetherMode(p, 3, 7);
+                }
             }
             break;
         case 7:

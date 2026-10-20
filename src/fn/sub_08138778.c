@@ -1,4 +1,3 @@
-#define PositionEffectDisplay_UpdateSources sub_08138778
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
@@ -154,5 +153,5 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08138778);
+INCLUDE_ASM("asm/nonmatching", PositionEffectDisplay_UpdateSources);
 #endif

@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
-#define Mummy_UpdateDefeat sub_080D3878
 
 #ifdef NONMATCHING
 // fuzzy: 91.3%
@@ -15,9 +14,9 @@ void SceneEffect_EmitPositionPattern(void *);
 void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 
 /* Mummy defeat: hides the drawable, emits defeat effects, runs the script and returns to idle. */
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -101,9 +100,9 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
         *(u16 *)((u8 *)actor + 0x1EA) = 0x20;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         collider = &actor->colliderA;
         asm("" : "+r"(collider));
@@ -194,7 +193,8 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         u32 test = *motionFlags & mask;
         flags = &actor->flags2D4;
         if (!test && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+            GameState_SetEventFlag(
+                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
         zero = 0;
         one = 1;
@@ -235,5 +235,5 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D3878);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateDefeat);
 #endif

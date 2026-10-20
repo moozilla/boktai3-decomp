@@ -61,7 +61,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
-        
+
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -134,11 +134,10 @@ void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 u32 sub_08249498(u32, u32);
-void sub_081D7934(void *);
-void sub_081D9904(void *);
-void sub_081D95F0(void *);
+void Task4E01_BeginImpactAnimation(void *);
+void Task4E01_SpawnImpactChildren(void *);
+void Task4E01_UpdateExpandingImpact(void *);
 // confidence=low: selects the initial impact sequence according to projectile flags.
-#define Task4E01_StartImpactAnimation sub_081D9470
 s32 Task4E01_StartImpactAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
@@ -152,6 +151,6 @@ s32 Task4E01_StartImpactAnimation(u8 *p)
     }
     StepPlayback((void *)(p + 0x8c), (void *)(p + 0x180));
     *(u32 *)(p + 0x1a0) = 8;
-    Projectile_SetUpdateCallback(config, sub_081D95F0);
+    Projectile_SetUpdateCallback(config, Task4E01_UpdateExpandingImpact);
     return 0;
 }

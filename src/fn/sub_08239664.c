@@ -1,4 +1,3 @@
-#define PaletteFade_ApplySelectiveBrightness sub_08239664
 #include "global.h"
 
 /* tentative: copies a palette bank, optionally brightening each channel capped at 31 */

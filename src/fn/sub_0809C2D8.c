@@ -64,7 +64,6 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     *zero = 0;
     CpuSet(zero, v, 0x05000002);
 }
-#define Lun_ChooseMovementDestination sub_0809C2D8
 void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;
@@ -94,5 +93,5 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809C2D8);
+INCLUDE_ASM("asm/nonmatching", Lun_ChooseMovementDestination);
 #endif

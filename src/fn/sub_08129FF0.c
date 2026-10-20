@@ -210,7 +210,6 @@ static inline void StepDisc(struct Disc *p)
     Step((struct Sprite *)p, &p->anim);
 }
 // confidence=low: disc falls under gravity, then enters its impact state at terrain height.
-#define SunDiscPool_UpdateFallingDisc sub_08129FF0
 void SunDiscPool_UpdateFallingDisc(struct DiscPool *pool, struct Disc *p)
 {
     u16 height;
@@ -250,5 +249,5 @@ void SunDiscPool_UpdateFallingDisc(struct DiscPool *pool, struct Disc *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08129FF0);
+INCLUDE_ASM("asm/nonmatching", SunDiscPool_UpdateFallingDisc);
 #endif

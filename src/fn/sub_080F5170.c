@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: slows the sword component and selects its return path when it stops.
-#define Sword_DecelerateReturn sub_080F5170
 struct SwordReturn {
     u8 pad0[6];
     u8 rotation;

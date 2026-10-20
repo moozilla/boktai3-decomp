@@ -17,11 +17,11 @@ static inline u32 AboveCell(u16 *a, s32 cell)
 {
     u32 height = *SceneActorTerrain_GetCell(cell) & 15;
     u32 above = 0;
-    if ((s16)a[1] > (height << 8)) above = 1;
+    if ((s16)a[1] > (height << 8))
+        above = 1;
     return above;
 }
 // confidence=low: selects a cardinal direction from adjacent terrain heights for diagonal travel.
-#define Task4E01_ResolveTerrainDirection sub_081D7F8C
 s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
 {
     register u16 *a asm("r5") = input;
@@ -36,31 +36,39 @@ s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
         second = AboveCell(a, cell + width);
         if (first != second) {
             direction = 2;
-            if (second) direction = 6;
-        } else direction = 4;
+            if (second)
+                direction = 6;
+        } else
+            direction = 4;
     } else if (direction == 2) {
         first = AboveCell(a, cell - 1);
         second = AboveCell(a, cell + width);
-        if (first == second) direction = 6;
-        else direction = second ? 4 : 0;
+        if (first == second)
+            direction = 6;
+        else
+            direction = second ? 4 : 0;
     } else if (direction == 4) {
         first = AboveCell(a, cell - 1);
         second = AboveCell(a, cell - width);
         if (first != second) {
             direction = 6;
-            if (second) direction = 2;
-        } else direction = 0;
+            if (second)
+                direction = 2;
+        } else
+            direction = 0;
     } else if (direction == 6) {
         first = AboveCell(a, cell + 1);
         second = AboveCell(a, cell - width);
         if (first != second) {
             direction = 4;
-            if (second) direction = 0;
-        } else direction = 2;
+            if (second)
+                direction = 0;
+        } else
+            direction = 2;
     }
     return direction;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D7F8C);
+INCLUDE_ASM("asm/nonmatching", Task4E01_ResolveTerrainDirection);
 #endif

@@ -6,14 +6,14 @@ struct P {
     u8 g[0x6dc - 0x2d6];
     u32 v;
 };
-void sub_080B6210(struct P *);
+void Skeleton_UpdateFacingColliders(struct P *);
 void Skeleton_UpdateActionCooldown(struct P *);
 
 s32 Skeleton_UpdateActionFlags(struct P *p)
 {
     u32 m;
     u16 *q;
-    sub_080B6210(p);
+    Skeleton_UpdateFacingColliders(p);
     Skeleton_UpdateActionCooldown(p);
     m = 0x200;
     q = &p->fl;

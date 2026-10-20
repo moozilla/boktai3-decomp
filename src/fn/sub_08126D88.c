@@ -224,7 +224,6 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     return ended;
 }
 // confidence=low: projectile identity inferred from the pool and collider callbacks.
-#define SpriteProjectile_UpdateRebounds sub_08126D88
 void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
 {
     struct Projectile *p = input;
@@ -318,5 +317,5 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08126D88);
+INCLUDE_ASM("asm/nonmatching", SpriteProjectile_UpdateRebounds);
 #endif

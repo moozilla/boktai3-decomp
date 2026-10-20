@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: control reacquires a player route once the context delay clears.
-#define Mummy_UpdatePlayerRoute sub_080D3D60
 
 #ifdef NONMATCHING
 // fuzzy: 92.9%
@@ -199,5 +198,5 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D3D60);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
 #endif

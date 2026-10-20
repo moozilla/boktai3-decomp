@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define CannonTurret_FireAimedVolley sub_08208498
-#define CannonTurret_UpdateCombat sub_08208740
 #ifdef NONMATCHING
 // fuzzy: 84.5%
 // Collider and sprite views, constant reuse, and the defined zero return still differ.
@@ -281,5 +279,5 @@ s32 CannonTurret_UpdateCombat(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08208740);
+INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
 #endif

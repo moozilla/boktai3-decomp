@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Player_UpdateTetherRecall sub_0823EF58
-
 // MATCHING_CONCESSION: register-pinning
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 sub_08238280(u8 *, s32, s32);
@@ -47,18 +45,18 @@ void Player_UpdateTetherRecall(u8 *p)
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             {
-            register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
-            if (released) {
-                *(u8 *)(p + 0xBF6) = 0;
-                *(u8 *)(p + 0x458) = 1;
-            } else {
-                *(u16 *)(p + 0x45A) += 1;
-                if (*(u16 *)(p + 0x45A) > 9) {
-                    register u32 zero asm("r0") = 0;
-                    *(u8 *)(p + 0xBF6) = zero;
-                    Player_SetTetherMode(p, 3, 6);
+                register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+                if (released) {
+                    *(u8 *)(p + 0xBF6) = 0;
+                    *(u8 *)(p + 0x458) = 1;
+                } else {
+                    *(u16 *)(p + 0x45A) += 1;
+                    if (*(u16 *)(p + 0x45A) > 9) {
+                        register u32 zero asm("r0") = 0;
+                        *(u8 *)(p + 0xBF6) = zero;
+                        Player_SetTetherMode(p, 3, 6);
+                    }
                 }
-            }
             }
             break;
         case 6:

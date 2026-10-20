@@ -6,9 +6,9 @@ void Hud_DrawHealthMeter(struct SceneHudState *, s32, s32, s32, s32);
 void sub_08164480(struct SceneHudState *, s32, s32, s32, s32, s32, s32);
 void StatDisplay_DrawGauge(struct SceneHudState *, s32, s32);
 void StatusPanel_ClearLowerRows(struct SceneHudState *);
-void sub_08165020(struct SceneHudState *);
-void sub_08164C40(struct SceneHudState *, s32);
-void sub_08165254(struct SceneHudState *);
+void Hud_UpdateTimedStatusIcon(struct SceneHudState *);
+void Hud_DrawStoredEnergyGauge(struct SceneHudState *, s32);
+void Hud_UpdateCountdownDigits(struct SceneHudState *);
 void StatusPanel_DrawFirstValue(struct SceneHudState *);
 void StatusPanel_DrawSecondValue(struct SceneHudState *);
 void PauseMenu_LoadAttributeIconFrame(struct SceneHudState *, void *, s32);
@@ -24,9 +24,9 @@ void PauseMenu_RefreshStatusPanel(struct SceneHudState *p)
         sub_08164480(p, 0, 4, 2, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
         StatDisplay_DrawGauge(p, 3, 3);
         StatusPanel_ClearLowerRows(p);
-        sub_08165020(p);
-        sub_08164C40(p, p->controlMode);
-        sub_08165254(p);
+        Hud_UpdateTimedStatusIcon(p);
+        Hud_DrawStoredEnergyGauge(p, p->controlMode);
+        Hud_UpdateCountdownDigits(p);
         StatusPanel_DrawFirstValue(p);
         StatusPanel_DrawSecondValue(p);
         if ((s8)p->actionOwner->thresholdMode >= 0) {

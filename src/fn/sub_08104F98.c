@@ -4,7 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void SceneHud_SetTimedState(void *, s32, s32, u32, s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void CallbackPool_SpawnHitParticles(void *);
@@ -24,7 +24,7 @@ void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackP
     u32 *vector;
     if (entry->hitFlags != 0)
         return;
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     recipient->sprite44 = source->sprite44;
     damage = entry->health - entry->damage;
     if (damage < 0)

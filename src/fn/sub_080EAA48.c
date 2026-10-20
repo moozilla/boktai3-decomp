@@ -139,7 +139,6 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
 }
 
 void SceneActorTerrain_DisableCollision(void *);
-#define Octopus_ReturnToRoutePoint sub_080EAA48
 void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -187,5 +186,5 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EAA48);
+INCLUDE_ASM("asm/nonmatching", Octopus_ReturnToRoutePoint);
 #endif

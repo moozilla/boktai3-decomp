@@ -1,10 +1,9 @@
 #include "scene_actor_reset.h"
 // MATCHING_CONCESSION: register-pinning
-#define FIELD(p, o, T)                (*(T *)((u8 *)(p) + (o)))
-#define TentacleActor_UpdateKnockback sub_080A8750
+#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *p)
 {
     if (p->field2B1) {
@@ -60,7 +59,7 @@ void TentacleActor_UpdateKnockback(struct SceneActorRegistryResetView *p)
     {
         u32 mask = 16;
         if (p->flags2D0 & mask) {
-            sub_080A8904(p);
+            TentacleActor_SelectWanderRoute(p);
             SetControl(p, p->entryTarget228, 1);
             {
                 u32 phase = 2;

@@ -5,12 +5,11 @@ static inline u32 Test(u8 *p, u32 m)
     return *(u32 *)(p + 0x1A4) & m;
 }
 void Registry2388_UpdateTimedEffect(void);
-u16 *sub_081BB178(void *, s32);
+u16 *Registry3F74_FindFrameOffset(void *, s32);
 struct FlagAnim {
     u8 pad[8];
     u32 flags;
 };
-#define Registry2388_UpdateIndicators sub_081B98D8
 void Registry2388_UpdateIndicators(u8 *p)
 {
     u32 bits = *(u16 *)(p + 0x528);
@@ -70,7 +69,7 @@ void Registry2388_UpdateIndicators(u8 *p)
         ((struct FlagAnim *)(p + 0x4A0))->flags |= 1;
     } else {
         base = p + 0x440;
-        pos = sub_081BB178(*(void **)(p + 0x558), *(s16 *)(p + 0x530));
+        pos = Registry3F74_FindFrameOffset(*(void **)(p + 0x558), *(s16 *)(p + 0x530));
         if (pos) {
             *(u16 *)(base + 0x28) = pos[0];
             *(u16 *)(base + 0x2A) = pos[1];
@@ -82,7 +81,7 @@ void Registry2388_UpdateIndicators(u8 *p)
         }
         if (*(u16 *)(p + 0x532) <= 8) {
             base = p + 0x4A0;
-            pos = sub_081BB178(*(void **)(p + 0x558), *(s16 *)(p + 0x532));
+            pos = Registry3F74_FindFrameOffset(*(void **)(p + 0x558), *(s16 *)(p + 0x532));
             if (pos) {
                 *(u16 *)(base + 0x28) = pos[0] + 16;
                 *(u16 *)(base + 0x2A) = pos[1];

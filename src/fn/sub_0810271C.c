@@ -1,4 +1,3 @@
-#define NamedObject_ClampTetherToPlatform sub_0810271C
 #include "named_object.h"
 #include "player.h"
 extern const struct SceneVec gUnk_086064B4;

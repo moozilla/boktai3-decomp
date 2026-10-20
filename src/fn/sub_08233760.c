@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ChargedBurst_EmitTerminalDebris sub_08233760
 #include "engine.h"
 #include "contact_actor.h"
 

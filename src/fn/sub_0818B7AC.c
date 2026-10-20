@@ -1,5 +1,4 @@
 #include "global.h"
-#define Armor_ReceiveColliderContact sub_0818B7AC
 struct ArmorContactCollider {
     u8 pad0[6];
     u16 flags;
@@ -30,13 +29,14 @@ struct ArmorContactOwner {
     u8 padB54[0x1120 - 0xB54];
     u8 state;
 };
-void sub_0821FF8C(struct ArmorContactCollider *, struct ArmorContactCollider *);
+void Collision_CalculateDamageResponse(struct ArmorContactCollider *,
+                                       struct ArmorContactCollider *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void ActorController_SetBehavior(void *, s32);
 void ActorPalette_Reset(void *);
-void sub_08181300(void *);
+void ActorMarker_EmitRingEffects(void *);
 void Armor_SetPlanarVelocity(void *, s32, s32);
-void sub_0818B2A0(void *, s32, u32, s32);
+void Armor_UpdateBehaviorAfterContact(void *, s32, u32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -73,7 +73,7 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
     if (p->contactCooldown > 0)
         return;
     p->contactCooldown = attack->cooldown;
-    sub_0821FF8C(attack, contact);
+    Collision_CalculateDamageResponse(attack, contact);
     PlayerStats_AddContactHundredths(attack, contact, p->contactHundredths);
     critical = 0;
     damage = originalDamage = contact->damage;
@@ -92,7 +92,7 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
             ActorController_SetBehavior(p, 16);
             ActorPalette_Reset(p);
             if (contact->effect & 4)
-                sub_08181300(p);
+                ActorMarker_EmitRingEffects(p);
             sound = 1;
         } else {
             p->guardHealth -= damage;
@@ -114,11 +114,11 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 4:
                         contact->properties = 0x1F;
                         contact->category = 0x20;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         if (properties(attack, 0x10))
                             damage = -damage;
                         else if (properties(attack, 0x20))
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
                             damage >>= 1;
@@ -127,13 +127,13 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 5:
                         contact->properties = 0x2F;
                         contact->category = 0x10;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         contact->properties = savedProperties;
                         contact->category = savedCategory;
                         if (properties(attack, 0x20))
                             damage = -damage;
                         else if (properties(attack, 0x10))
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
                             damage >>= 1;
@@ -143,11 +143,11 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 13:
                         contact->properties = 0x3B;
                         contact->category = 4;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         if (properties(attack, 8))
                             damage = -damage;
                         else if (properties(attack, 4))
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
                             damage >>= 1;
@@ -157,11 +157,11 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 15:
                         contact->properties = 0x37;
                         contact->category = 8;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         if (properties(attack, 4))
                             damage = -damage;
                         else if (properties(attack, 8))
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
                             damage >>= 1;
@@ -170,11 +170,11 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 10:
                         contact->properties = 0x3E;
                         contact->category = 1;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         if (properties(attack, 2))
                             damage = -damage;
                         else if (properties(attack, 1))
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         else {
                             knockback >>= 2;
                             damage >>= 1;
@@ -183,14 +183,14 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
                     case 11:
                         contact->properties = 0x3D;
                         contact->category = 2;
-                        sub_0821FF8C(attack, contact);
+                        Collision_CalculateDamageResponse(attack, contact);
                         if (properties(attack, 1))
                             damage = -damage;
                         else if (!(properties(attack, 2))) {
                             knockback >>= 2;
                             damage >>= 1;
                         } else
-                            sub_08181300(p);
+                            ActorMarker_EmitRingEffects(p);
                         break;
                     default:
                         knockback >>= 2;
@@ -210,7 +210,7 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
             sound = 0;
         }
         if (contact->effect & 4)
-            sub_08181300(p);
+            ActorMarker_EmitRingEffects(p);
         if ((u8)(p->type - 2) <= 1 && p->state == 16) {
             knockback = 0;
         } else {
@@ -242,7 +242,7 @@ void Armor_ReceiveColliderContact(struct ArmorContactCollider *attack,
             broken = 1;
             sound = 3;
         }
-        sub_0818B2A0(p, originalDamage, attack->properties, broken);
+        Armor_UpdateBehaviorAfterContact(p, originalDamage, attack->properties, broken);
     }
     SceneHud_SetTimedState(p->actorId, p->health, p->maxHealth, 5, critical, -1);
     if (damage < 0) {

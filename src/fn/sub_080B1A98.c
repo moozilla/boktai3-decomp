@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: route role inferred from callers and terrain/path tests.
-#define Vorn_BeginTargetPursuit sub_080B1A98
 
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -45,12 +44,12 @@ static inline void ClearRouteBits(u16 *field, u32 bits)
 static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
                           struct ContactPosition *position, struct ContactPosition *target)
 {
-    s32 result = sub_0821F204(route, position, target);
+    s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         ClearRouteBits(&actor->flags2D4, 0x200);
         return 0;
     }
-    result = sub_0821F7A8(route, position, target);
+    result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(&actor->motion, 8);
@@ -86,7 +85,6 @@ extern const u8 gUnk_0824E230[];
 
 // confidence=low: routes toward the current target after a reaction.
 
-#define SceneActor_DispatchContextAction sub_080B3ADC
 u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *p, u32 mask)

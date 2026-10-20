@@ -2,7 +2,7 @@
 /* SceneActorControl_BeginSoundTransition_080EBC38: SceneActorControl_BeginSoundTransition with other constants (ported by relatives.py + repair.py; provisional name) */
 #include "scene_actor_control_phase.h"
 #include "engine.h"
-void sub_080EAC7C(struct SceneActorRegistryResetView *, s32);
+void Octopus_UpdateStagger(struct SceneActorRegistryResetView *, s32);
 static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u16 zero, u32 offset)
 {
     u32 state = 3;
@@ -17,7 +17,7 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
     offset += 8;
     *((u8 *)actor + offset) = 1;
     {
-        void *callback = sub_080EAC7C;
+        void *callback = Octopus_UpdateStagger;
         u32 kind = 0x2A;
         offset++;
         *((u8 *)actor + offset) = 1;

@@ -19,7 +19,7 @@ struct Hresvelgr {
     u8 unknown32B[0x4D];
     s16 contactShift, contactParameter;
 };
-void sub_0821FF8C(void *, void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
 static inline u32 testFlags(u16 *flags, u32 mask)
@@ -36,7 +36,7 @@ void Hresvelgr_OnBodyContact(struct ContactCollider *a, struct ContactCollider *
     struct Hresvelgr *saved = actor;
     if (actor->contactBlocked == 0) {
         s32 magnitude, shift;
-        sub_0821FF8C(a, b);
+        Collision_CalculateDamageResponse(a, b);
         magnitude = b->cost;
         shift = actor->contactShift;
         if (magnitude >= 0)

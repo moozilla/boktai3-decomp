@@ -1,7 +1,6 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-#define FIELD(p, o, T)                  (*(T *)((u8 *)(p) + (o)))
-#define TentacleActor_SelectWanderRoute sub_080A8904
+#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 #ifdef NONMATCHING
 // fuzzy: 87.6%
 // Remaining differences concern local lifetimes, register allocation and ordering.
@@ -97,5 +96,5 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A8904);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_SelectWanderRoute);
 #endif

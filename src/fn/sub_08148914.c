@@ -131,7 +131,6 @@ static inline s32 ScaleRecoil(s32 value)
     return -(-value >> 12);
 }
 // confidence=low: applies a fading impulse opposite the stored facing, then chooses recovery.
-#define Player_UpdateDecayingRecoil sub_08148914
 void Player_UpdateDecayingRecoil(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {

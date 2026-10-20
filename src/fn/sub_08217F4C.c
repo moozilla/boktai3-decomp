@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpriteOam_QueueProjectedSprites sub_08217F4C
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;

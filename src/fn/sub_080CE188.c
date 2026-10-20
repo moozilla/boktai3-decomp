@@ -1,5 +1,4 @@
 // confidence=low: existing Golem state interpretation retained.
-#define Golem_ResumeRouteAfterControl sub_080CE188
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -10,7 +9,7 @@
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *, void *);
 
 extern u8 *gUnk_02000580[4];
@@ -361,7 +360,7 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
                     control->counter = 0;
                     control->timer = 0;
                 }
-                sub_0807C72C(actor, 0, 2, actor->category);
+                SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
             }
             *flags |= 0x10;
             actor->field2C2 = 0x40;

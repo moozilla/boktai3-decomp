@@ -1,7 +1,7 @@
 #include "global.h"
 #include "proximity_actor.h"
 #include "engine.h"
-void sub_08105808(void);
+void ProximityActor_ApplyContactDamage(void);
 void ProximityActor_InitializeCollider(struct ProximityActor *actor)
 {
     struct ColliderVector {
@@ -24,6 +24,6 @@ void ProximityActor_InitializeCollider(struct ProximityActor *actor)
     }
     Collider_Init(actor->collider, 0, 0x4003, 0, 16, &size, &offset);
     Collider_SetPosition(actor->collider, &actor->colliderPosition, 0);
-    Collider_SetCallback(actor->collider, sub_08105808, actor);
+    Collider_SetCallback(actor->collider, ProximityActor_ApplyContactDamage, actor);
     Collider_Refresh(actor->collider);
 }

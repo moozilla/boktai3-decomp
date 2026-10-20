@@ -160,7 +160,6 @@ static inline u32 StepDebrisSprite(struct Visual *visual)
 }
 
 // confidence=low: restitution applies to the depth limits and terrain clearance.
-#define SceneDebris_UpdateBouncingMotion sub_08112EA8
 void SceneDebris_UpdateBouncingMotion(struct Debris *p)
 {
     struct Packed world, projected;

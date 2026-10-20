@@ -4,7 +4,6 @@
 // One commutative adds operand order remains different.
 #include "scene_hud_display.h"
 #include "player.h"
-#define PauseMenu_UpdateSelectedEquipmentIcons sub_08167910
 void PauseMenu_LoadAttributeIconFrame(void *, void *, s32);
 void PauseMenu_LoadEquipmentIconFrame(void *, void *, s32);
 void PauseMenu_LoadCategoryIconFrame(void *, void *, s32);
@@ -85,5 +84,5 @@ void PauseMenu_UpdateSelectedEquipmentIcons(struct SceneHudState *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08167910);
+INCLUDE_ASM("asm/nonmatching", PauseMenu_UpdateSelectedEquipmentIcons);
 #endif

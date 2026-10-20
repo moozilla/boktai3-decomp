@@ -58,7 +58,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 // confidence=low: initializes a random launch vector and ends the action on motion flag 0x10.
-#define Lun_UpdateLaunchedReaction sub_0809C630
 void Lun_UpdateLaunchedReaction(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;
@@ -94,5 +93,5 @@ void Lun_UpdateLaunchedReaction(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809C630);
+INCLUDE_ASM("asm/nonmatching", Lun_UpdateLaunchedReaction);
 #endif

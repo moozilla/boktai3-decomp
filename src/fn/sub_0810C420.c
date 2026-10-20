@@ -42,7 +42,6 @@ static inline u8 delayMessage(struct LinkPanel *p)
     }
     return 0;
 }
-#define LinkPanel_UpdateStatusMessage sub_0810C420
 void LinkPanel_UpdateStatusMessage(struct LinkPanel *p)
 {
     s32 state, status, connection;

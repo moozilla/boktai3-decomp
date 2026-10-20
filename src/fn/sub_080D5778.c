@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: control waits sixty frames before restoring or choosing a route.
-#define Mummy_ResumeDelayedRoute sub_080D5778
 
 #ifdef NONMATCHING
 // fuzzy: 92.1%
@@ -142,7 +141,6 @@ done:
 }
 
 // confidence=low: delayed return to route with a target-cell special action.
-#define Mummy_RequestStraightRoute sub_080D6FDC
 u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryResetView *);
 static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
@@ -210,5 +208,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D5778);
+INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
 #endif

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Anim_DrawDecimalDigits sub_082213B8
 struct DigitWidget {
     u8 p0[8];
     u32 flags;
@@ -75,5 +74,5 @@ void Anim_DrawDecimalDigits(struct DigitWidget *w, void *data, s32 value, s32 n,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082213B8);
+INCLUDE_ASM("asm/nonmatching", Anim_DrawDecimalDigits);
 #endif

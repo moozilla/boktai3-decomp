@@ -50,18 +50,18 @@ static inline u8 Disabled(struct SceneActorRegistryResetView *a)
     return 0;
 }
 struct ContactPosition *TetherActor_GetPosition(void);
-s32 sub_0821F204(void *, void *, void *);
-s32 sub_0821F7A8(void *, void *, void *);
+s32 Nav_IsPositionInMesh(void *, void *, void *);
+s32 Terrain_ApplyBlocked(void *, void *, void *);
 static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *pos, void *target)
 {
     u16 *flags;
-    s32 r = sub_0821F204(nav, pos, target);
+    s32 r = Nav_IsPositionInMesh(nav, pos, target);
     if (!r) {
         u16 off = 0x2d4;
         flags = (void *)((u8 *)a + off);
         goto clear;
     }
-    r = sub_0821F7A8(nav, pos, target);
+    r = Terrain_ApplyBlocked(nav, pos, target);
     if (!r) {
         u32 off = 0x2d4;
         flags = (void *)((u8 *)a + off);
@@ -78,7 +78,6 @@ clear: {
 }
     return 0;
 }
-#define SceneActorPlacement_TriggerTetherAction sub_080A3CD8
 s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);

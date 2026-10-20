@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *sub_081D4F20(u32,u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorControl_ConsumeLiftFlagPenalty(void *);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
@@ -39,24 +39,36 @@ static inline u8 TakeFlag(u8 *p)
     return 0;
 }
 // confidence=low: Lun defeat callback selects death animation and runs its completion script.
-#define Lun_UpdateDefeat sub_0809BCE8
 void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
- s32 values[8];
- struct ScriptUtilityArguments arguments;
- u16 script;
- if(TakeFlag(&actor->field2B2)){
- SceneActorAnimation_SelectProfileEntry((void *)actor,10);
- SceneActorPlacement_PlayCategoryEventSound(actor);
- {u32 *p=&actor->flags2D0;u32 m=~0x100000;*p &=m;}
- {struct ContactCollider *c=&actor->colliderB;c->flags|=4;}
- {struct ContactCollider *c=&actor->colliderA;c->flags|=4;}
- {u32 m=0x800;actor->flags2C0=m|actor->flags2C0;}
- SceneActorControl_ConsumeLiftFlagPenalty(actor);
- }
- if(actor->field2B3){
- actor->field2B0=1;
- SceneActorBehavior_CallTerrainScript(actor);
+    s32 values[8];
+    struct ScriptUtilityArguments arguments;
+    u16 script;
+    if (TakeFlag(&actor->field2B2)) {
+        SceneActorAnimation_SelectProfileEntry((void *)actor, 10);
+        SceneActorPlacement_PlayCategoryEventSound(actor);
+        {
+            u32 *p = &actor->flags2D0;
+            u32 m = ~0x100000;
+            *p &= m;
+        }
+        {
+            struct ContactCollider *c = &actor->colliderB;
+            c->flags |= 4;
+        }
+        {
+            struct ContactCollider *c = &actor->colliderA;
+            c->flags |= 4;
+        }
+        {
+            u32 m = 0x800;
+            actor->flags2C0 = m | actor->flags2C0;
+        }
+        SceneActorControl_ConsumeLiftFlagPenalty(actor);
+    }
+    if (actor->field2B3) {
+        actor->field2B0 = 1;
+        SceneActorBehavior_CallTerrainScript(actor);
         script = *(u16 *)((u8 *)actor + 0x1F8);
         if (script) {
             values[0] = actor->position.x;
@@ -74,9 +86,10 @@ void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         {
             u32 m = 0x4000;
             if (!(actor->flags2D4 & m) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+                GameState_SetEventFlag(
+                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         }
- SetControl(actor,16,SceneActorControl_OnIdle);
- SetState(actor,1,0,2);
- }
+        SetControl(actor, 16, SceneActorControl_OnIdle);
+        SetState(actor, 1, 0, 2);
+    }
 }

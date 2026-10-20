@@ -176,7 +176,6 @@ static inline s32 Truncate(s32 v)
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 // confidence=low: terminal animation releases the linked effect slot and collider.
-#define LinkedEffect_FinishRemoval sub_0812A7B8
 void LinkedEffect_FinishRemoval(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {

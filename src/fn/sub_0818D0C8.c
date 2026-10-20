@@ -3,7 +3,6 @@
 
 void sub_0818CF10(struct Motion0818Object *);
 void sub_0818CFEC(struct Motion0818Object *);
-#define Armor_DampPartWaveReturn sub_0818D0C8
 
 void Armor_DampPartWaveReturn(struct Motion0818Object *p)
 {

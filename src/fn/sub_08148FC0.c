@@ -1,7 +1,6 @@
 #include "contact_swarm.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: walking animation alternates footstep sounds and positional effects.
-#define Player_UpdateWalkFootsteps sub_08148FC0
 
 u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row, u32 flags);
 s32 RepeatedEffect_RequestNearby(void *);

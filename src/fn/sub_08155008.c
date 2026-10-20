@@ -1,7 +1,5 @@
 // confidence=low: replays the alternate cue resource after fade completion.
-#define PlayerCue_RestartAlternateAnimation sub_08154EE4
 // confidence=low: inferred from player cue phases and animation consumers.
-#define PlayerCue_UpdateAlternateFade sub_08155008
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
@@ -222,5 +220,5 @@ void PlayerCue_UpdateAlternateFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08155008);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateAlternateFade);
 #endif

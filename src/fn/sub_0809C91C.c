@@ -3,7 +3,6 @@
 #ifdef NONMATCHING
 // fuzzy: 97.1%
 // confidence=low: applies hovering height and drawable bobbing from the movement phase.
-#define Lun_UpdateHoverHeight sub_0809C91C
 // fuzzy: 96.6%
 // foundry draft (worker best 96.6%); what differs is mostly register allocation and instruction order
 struct Drw {
@@ -117,5 +116,5 @@ cont: {
     st->phase += 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809C91C);
+INCLUDE_ASM("asm/nonmatching", Lun_UpdateHoverHeight);
 #endif

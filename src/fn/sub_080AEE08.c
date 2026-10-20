@@ -1,17 +1,15 @@
-#define SceneActor_CallContextScriptB sub_080B0D28
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
-#define Vorn_UpdateDefeat sub_080AEE08
 #ifdef NONMATCHING
 // fuzzy: 83.4%
 // Remaining differences: register choices, address derivation, and two late constant reloads.
-void sub_0807C72C(void *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
@@ -54,9 +52,9 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        sub_0807C72C(actor, 0, 127, 0);
-        sub_0807C72C(actor, 1, 127, 0);
-        sub_0807C72C(actor, 3, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Flag(actor, 8, 0x2D4))
@@ -126,7 +124,8 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Script_Call(script, &arguments);
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
-        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+        GameState_SetEventFlag(
+            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     actor->fieldAA = 0;
     {
         u32 mask = 1;
@@ -168,5 +167,5 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AEE08);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
 #endif

@@ -22,7 +22,6 @@ void TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
 void TextWindow_SetString(s32, s32, const u8 *);
 void ScrollingDialogue_ClearScript(void);
-#define BestiaryDisplay_DrawEntryDetails sub_081D5478
 void BestiaryDisplay_DrawEntryDetails(struct BestiaryDetails *p)
 {
     s32 unlocked = GameState_IsEventFlagSet(p->entry);

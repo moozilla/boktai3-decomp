@@ -2,8 +2,6 @@
 #include "global.h"
 #include "player.h"
 
-#define Player_UpdateCameraOffset sub_0814159C
-
 extern struct SceneVec gUnk_030042A0;
 extern const s16 gUnk_086149C4[];
 void Player_ClampCameraOffsets(struct Player *);

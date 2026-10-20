@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: action phases push neighboring scene objects and emit position effects.
-#define Player_UpdateObjectPush sub_08142194
 
 #ifdef NONMATCHING
 // fuzzy: 92.9%
@@ -259,5 +258,5 @@ void Player_UpdateObjectPush(struct P *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08142194);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateObjectPush);
 #endif

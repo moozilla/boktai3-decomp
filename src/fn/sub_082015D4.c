@@ -3,7 +3,6 @@
 // fuzzy: 82.4%
 // Remaining differences: RNG store timing, loop hoisting and recipient-field register allocation.
 // confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
-#define ScriptCombatActor_ApplyHitReaction sub_082015D4
 
 // Remaining differences: RNG stores, loop constants, target-field scheduling and allocation.
 // MATCHING_CONCESSION: register-pinning
@@ -28,7 +27,7 @@ struct HitResult {
 };
 extern u32 gUnk_03005308;
 extern const struct SceneVec gUnk_0824FE44;
-void sub_0821FF8C(void *);
+void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -57,7 +56,7 @@ static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
 }
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit, u8 *p)
 {
-    sub_0821FF8C(source);
+    Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
@@ -92,5 +91,5 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082015D4);
+INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_ApplyHitReaction);
 #endif

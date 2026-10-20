@@ -42,7 +42,7 @@ static inline u32 Test32(u32 *p, u32 m)
 }
 
 extern u8 *gUnk_02000580[];
-u8 sub_080A4260(void *);
+u8 SceneActorPlacement_BeginContactRoute(void *);
 s32 Math_Atan2(s32, s32);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void sub_080A4798(void *);
@@ -90,7 +90,6 @@ static inline void BeginContact(struct SceneActorRegistryResetView *a, u8 *nav)
     }
 }
 // confidence=low: detects a player in front and selects close or distant contact behavior
-#define SceneActorPlacement_SelectPlayerApproach sub_080A4334
 u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *a)
 {
     u8 *transform = (u8 *)a + 0x50;
@@ -100,11 +99,11 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     s32 height, angle;
     u32 distance;
     if (!HasFlag(c, 2)) {
-        if (sub_080A4260(a))
+        if (SceneActorPlacement_BeginContactRoute(a))
             return 1;
         if (Test32((void *)(gUnk_02000580[0] + 0x20), 0x20000))
             return 0;
-    } else if (sub_080A4260(a))
+    } else if (SceneActorPlacement_BeginContactRoute(a))
         return 1;
     player = gUnk_02000580[0];
     if (!player)
@@ -138,5 +137,5 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A4334);
+INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_SelectPlayerApproach);
 #endif

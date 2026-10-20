@@ -7,7 +7,7 @@ struct DamageTarget {
     void *owner;
 };
 void SpriteParticle_SpawnBatch(void *, s32, s32, s32, s32);
-void sub_08122338(void *, void *, u32, u32, u32, u32);
+void SpriteEffect_SpawnTowardObject(void *, void *, u32, u32, u32, u32);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
 {
     void *callback = target;
@@ -58,7 +58,6 @@ static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
 // fuzzy: 91.9%
 // Remaining differences: instruction ordering and register allocation.
 // confidence=low: applies a contact effect to the held player and waits before release.
-#define Ivy_ApplyHeldTargetDamage sub_080E99F8
 void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -71,9 +70,10 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
         if (target->kind <= 3) {
             u8 *player = target->owner;
             SpriteParticle_SpawnBatch(&actor->position, 1, 2, 0, 0x154);
-            sub_08122338(&actor->position, player + 0x24, *(u16 *)((u8 *)actor + 0xB4),
-                         *(u16 *)((u8 *)actor + 0xBC), *(u32 *)((u8 *)actor + 0xCC),
-                         *(u16 *)((u8 *)actor + 0xC4));
+            SpriteEffect_SpawnTowardObject(
+                &actor->position, player + 0x24, *(u16 *)((u8 *)actor + 0xB4),
+                *(u16 *)((u8 *)actor + 0xBC), *(u32 *)((u8 *)actor + 0xCC),
+                *(u16 *)((u8 *)actor + 0xC4));
             Sound_PlaySong(0x1E0);
         }
         HideCollider(actor);
@@ -85,5 +85,5 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E99F8);
+INCLUDE_ASM("asm/nonmatching", Ivy_ApplyHeldTargetDamage);
 #endif

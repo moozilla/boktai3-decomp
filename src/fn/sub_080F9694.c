@@ -1,5 +1,4 @@
 #include "scene_actor_animation.h"
-#define Axe_UpdateWaitingAnimation sub_080F9694
 void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)

@@ -42,7 +42,6 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     dst->z = z - gUnk_03005418[2];
 }
 // Applies signed sprite scales and flip flags when testing resource bounds.
-#define Sprite_RenderScaledList sub_08214B44
 void Sprite_RenderScaledList(void)
 {
 

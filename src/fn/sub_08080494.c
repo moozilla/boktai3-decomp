@@ -7,7 +7,7 @@ s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct Contact
                         s32, s32, s32, u32);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void ActorParticles_SpawnWideBurst(void *);
-void *sub_081D4F20(u32, u32);
+void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
@@ -200,7 +200,8 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         Script_Call(script, &arguments);
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
-        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
+        GameState_SetEventFlag(
+            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     SetControl(actor);
     {
         u8 behavior = 2;

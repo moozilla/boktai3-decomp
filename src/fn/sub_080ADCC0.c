@@ -1,5 +1,4 @@
 // confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
-#define Vorn_UpdatePursuitDistance sub_080ADCC0
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
@@ -163,4 +162,3 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
     }
 }
-

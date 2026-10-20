@@ -18,7 +18,7 @@ s32 Inventory_GetConsumableId(u32);
 s32 Player_GetCandidateAttribute(s32, s32);
 s32 Player_GetCurrentAttribute(s32);
 void SceneHud_DrawComparisonBars(void *, s32, s32, s16 *);
-void sub_0816701C(void *, int, int, int, int, int);
+void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 s32 GameState_IsConsumableSlotEquipped(u32);
 void GameState_UnequipConsumableSlot(u32);
 void Player_RefreshEquipmentWithOptions(void *, const void *, s32);
@@ -55,7 +55,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
             differences[i] = value - Player_GetCurrentAttribute(i);
         }
         SceneHud_DrawComparisonBars(p, 10, 6, differences);
-        sub_0816701C(p, 0, 0, 1, 0, differences[2]);
+        InventoryPanel_DrawStatComparison(p, 0, 0, 1, 0, differences[2]);
     } else if (gUnk_03005260[1] & 1) {
         slot = p->actionCursor;
         if (Inventory_GetConsumableId(slot) == none) {
@@ -75,7 +75,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
                 differences[i] = value - Player_GetCurrentAttribute(i);
             }
             SceneHud_DrawComparisonBars(p, 10, 6, differences);
-            sub_0816701C(p, 0, 0, 1, 0, differences[2]);
+            InventoryPanel_DrawStatComparison(p, 0, 0, 1, 0, differences[2]);
         } else {
             Sound_PlaySong(0xDD);
             Hud_SaveGridSelection(input);

@@ -23,7 +23,7 @@ struct RegionSpriteManager {
     const void *sequenceResource, *alternateResource;
 };
 extern struct RegionSpriteManager *gUnk_020001B4;
-void sub_08105AB4(struct RegionSprite *);
+void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
 {
@@ -273,7 +273,6 @@ static inline u32 StepEntered(struct ContactSwarmSprite *sp, struct DisplaySeque
 
 void AnimatedParticles_EmitChargeSparkle(s32, s32, s32, s32, void *);
 // confidence=low: entered flag selects the final alternate animation and emits charge sparkles.
-#define RegionActor_AnimateRemoval sub_081065F8
 void RegionActor_AnimateRemoval(struct RegionSprite *input)
 {
     register struct RegionSprite *p asm("r5") = input;

@@ -2,7 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-#define Player_UpdateMovementPose sub_081493E4
 // Remaining differences: instruction selection and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {

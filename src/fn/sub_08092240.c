@@ -1,6 +1,13 @@
 #include "scene_actor_animation.h"
 void Bee_GetDirectionalFrameAndFlip(u8, u32 *, u32 *);
-static inline u8 Take(u8 *p) { if (*p) { *p=0; return 1; } return 0; }
+static inline u8 Take(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)
 {
@@ -50,27 +57,34 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-
 // confidence=low: preserves sequence timing when the Bee changes facing without entering a state.
-#define Bee_UpdateFacingAnimation sub_08092240
 void Bee_UpdateFacingAnimation(struct SceneActorAnimationView *actor)
 {
- u8 *body=*(u8 **)((u8 *)actor+0x3D0);
- u32 variant, flags;
- if (Take(&actor->directionalEntryFlag)) {
-  struct SceneActorProfileEntry *entry=(void *)SceneActorProfiles_GetEntryAddress(actor->profileId,actor->profileMode,1);
-  Bee_GetDirectionalFrameAndFlip(((u8 *)actor)[0xE9],&variant,&flags);
-  Select(actor,entry->value,variant,flags);
-  SceneActorAnimation_SelectDirectionalEntry(actor,1);
-  { u32 direction=((u8 *)actor)[0xE9]; body[0x3DF]=direction; }
- } else if (body[0x3DF]!=((u8 *)actor)[0xE9]) {
-  struct SceneActorProfileEntry *entry=(void *)SceneActorProfiles_GetEntryAddress(actor->profileId,actor->profileMode,1);
-  u8 *sequence=(u8 *)actor->drawable+0x48;
-  u32 frame=*(u16 *)(sequence+8), time=*(u16 *)(sequence+14);
-  Bee_GetDirectionalFrameAndFlip(((u8 *)actor)[0xE9],&variant,&flags);
-  Select(actor,entry->value,variant,flags);
-  *(u16 *)(sequence+8)=frame;
-  *(u16 *)(sequence+14)=time;
-  { u32 direction=((u8 *)actor)[0xE9]; body[0x3DF]=direction; }
- } else actor->restart=0;
+    u8 *body = *(u8 **)((u8 *)actor + 0x3D0);
+    u32 variant, flags;
+    if (Take(&actor->directionalEntryFlag)) {
+        struct SceneActorProfileEntry *entry =
+            (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
+        Bee_GetDirectionalFrameAndFlip(((u8 *)actor)[0xE9], &variant, &flags);
+        Select(actor, entry->value, variant, flags);
+        SceneActorAnimation_SelectDirectionalEntry(actor, 1);
+        {
+            u32 direction = ((u8 *)actor)[0xE9];
+            body[0x3DF] = direction;
+        }
+    } else if (body[0x3DF] != ((u8 *)actor)[0xE9]) {
+        struct SceneActorProfileEntry *entry =
+            (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
+        u8 *sequence = (u8 *)actor->drawable + 0x48;
+        u32 frame = *(u16 *)(sequence + 8), time = *(u16 *)(sequence + 14);
+        Bee_GetDirectionalFrameAndFlip(((u8 *)actor)[0xE9], &variant, &flags);
+        Select(actor, entry->value, variant, flags);
+        *(u16 *)(sequence + 8) = frame;
+        *(u16 *)(sequence + 14) = time;
+        {
+            u32 direction = ((u8 *)actor)[0xE9];
+            body[0x3DF] = direction;
+        }
+    } else
+        actor->restart = 0;
 }

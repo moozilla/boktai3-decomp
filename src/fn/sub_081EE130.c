@@ -1,20 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define Player_GetHorizontalVelocity        sub_08116C20
-#define Player_GetWorldPosition             sub_08116C4C
-#define SceneActors_EmitPeriodicParticles   sub_081EC5C8
-#define ActorDisplay_UpdateScreenAnchor     sub_081EC6BC
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
-#define ActorDisplay_UpdateAccentSprite     sub_081EC974
-#define ActorEffect_SpawnOffsetEffect       sub_081ECBC0
-#define SceneMover_ApproachScreenX          sub_081ECD44
-#define SceneMover_StepPastScreenX          sub_081ECE80
 // confidence=low: approaches screen X and periodically emits offset effects.
-#define SceneActors_UpdatePeriodicEffectAction sub_081EE130
-#define Anim_SetSequence                       sub_08220C8C
-#define Anim_RestartSequence                   sub_08220D20
-#define Div                                    sub_08248598
-#define Mod                                    sub_0824859C
 #include "scene_vec.h"
 // confidence=low: action role inferred from movement and effect calls.
 #ifdef NONMATCHING
@@ -279,5 +265,5 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EE130);
+INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePeriodicEffectAction);
 #endif

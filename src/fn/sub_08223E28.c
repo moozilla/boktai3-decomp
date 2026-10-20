@@ -1,8 +1,7 @@
 #include "global.h"
 #define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
-#define RfuManager_ApplyRequestResult sub_08223E28
-#define G                             ((struct Manager *)0x03005390)
+#define G ((struct Manager *)0x03005390)
 struct Manager {
     u8 f0, f1;
     volatile u8 f2;
@@ -21,7 +20,7 @@ void RfuManager_ClearState(void);
 void RfuManager_FinishSlotReception(void);
 u8 sub_08224908(void);
 void sub_082249CC(void);
-void sub_082239E0(u16);
+void RfuManager_UpdateLinkRecovery(u16);
 #ifdef NONMATCHING
 // fuzzy: 80.9%
 void RfuManager_ApplyRequestResult(u16 command, u16 result)
@@ -223,7 +222,7 @@ void RfuManager_ApplyRequestResult(u16 command, u16 result)
             u8 *buf = rfu_getSTWIRecvBuffer();
             buf[4] = gRfuLinkStatus->connSlotFlag;
             buf[5] = 1;
-            sub_082239E0(0x29);
+            RfuManager_UpdateLinkRecovery(0x29);
             result = 0;
         }
     }
@@ -306,5 +305,5 @@ void RfuManager_ApplyRequestResult(u16 command, u16 result)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08223E28);
+INCLUDE_ASM("asm/nonmatching", RfuManager_ApplyRequestResult);
 #endif

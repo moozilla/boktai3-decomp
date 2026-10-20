@@ -1,9 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "contact_actor.h"
-#define Player_InitBodyFromScript sub_0813FFE4
 void sub_0813FE30(void *);
-void sub_0821BC68(void *, void *);
+void CellObject_Init(void *, void *);
 void SceneBody_SetKeyframeDisplay(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void SceneBody_SetPositionOffset(void *, void *);
@@ -75,7 +74,7 @@ u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
             SceneBody_SetKeyframeDisplay(body, owner + 0x8c);
             break;
     }
-    sub_0821BC68(owner + 0x284, &position);
+    CellObject_Init(owner + 0x284, &position);
     SceneBody_SetMovementProbe(body, owner + 0x284, 30, 30);
     offset.x = 0;
     offset.y = 300;

@@ -75,7 +75,7 @@ void TentacleActor_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -125,7 +125,6 @@ static inline u8 Turned(s32 angle)
     return 0;
 }
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
-#define TentacleBody_UpdateSpiral sub_080A7F60
 void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
 {
     u32 zero;
@@ -177,5 +176,5 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A7F60);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateSpiral);
 #endif

@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
-#define Mummy_UpdateHiddenRecovery sub_080D1CD0
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // Entry take-flag allocation and zero-value lifetime still differ.
@@ -143,5 +142,5 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D1CD0);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
 #endif

@@ -163,7 +163,6 @@ struct Packed {
 s32 Mod(s32, s32);
 void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
 // confidence=low: rotates two short-lived copies of the parent sprite as a trail.
-#define TwinSpriteEffect_EmitTrail sub_0812B424
 void TwinSpriteEffect_EmitTrail(struct Effect *p)
 {
     if (!Mod(p->frame, p->interval)) {
@@ -192,5 +191,5 @@ void TwinSpriteEffect_EmitTrail(struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812B424);
+INCLUDE_ASM("asm/nonmatching", TwinSpriteEffect_EmitTrail);
 #endif

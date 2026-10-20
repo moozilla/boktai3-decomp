@@ -178,7 +178,6 @@ static inline s32 Truncate(s32 v)
 }
 void LinkedEffect_SetVariant(void *, u32);
 // confidence=low: expands the linked effect while preparing an elevated travel target.
-#define LinkedEffect_BeginRisingTravel sub_0812AA0C
 void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {
@@ -229,5 +228,5 @@ void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812AA0C);
+INCLUDE_ASM("asm/nonmatching", LinkedEffect_BeginRisingTravel);
 #endif

@@ -191,7 +191,6 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     return ended;
 }
 // confidence=low: stationary projectile state expires on animation completion or lifetime.
-#define SpriteProjectile_UpdateExpiry sub_08127274
 void SpriteProjectile_UpdateExpiry(void *unused, struct Projectile *input)
 {
     struct Projectile *p = input, *sprite = input;
@@ -217,5 +216,5 @@ void SpriteProjectile_UpdateExpiry(void *unused, struct Projectile *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08127274);
+INCLUDE_ASM("asm/nonmatching", SpriteProjectile_UpdateExpiry);
 #endif

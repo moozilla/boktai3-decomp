@@ -9,7 +9,7 @@ struct GhostPlayer {
     struct ContactPosition position;
 };
 extern struct GhostPlayer *gUnk_02000580;
-void sub_080980FC(struct SceneActorRegistryResetView *);
+void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *);
 void sub_08098344(void *, void *);
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
@@ -67,7 +67,6 @@ static inline u32 Facing(u32 value, u8 *direction)
     return (value & 63) + *direction;
 }
 // confidence=low: follows nine stored route points and retargets around the player; action role tentative.
-#define Ghost_PursuePlayerLoop sub_08099130
 void Ghost_PursuePlayerLoop(struct SceneActorRegistryResetView *actor)
 {
     struct GhostRoute *route = actor->context;
@@ -102,7 +101,7 @@ void Ghost_PursuePlayerLoop(struct SceneActorRegistryResetView *actor)
         route->speed = 1;
     }
     Delta(&delta, &actor->position, &route->points[route->index]);
-    sub_080980FC(actor);
+    Ghost_EmitAfterimage(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->direction = Math_Atan2(route->points[route->index].x - actor->position.x,
                                       route->points[route->index].z - actor->position.z);

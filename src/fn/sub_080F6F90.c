@@ -2,7 +2,6 @@
 #include "display_animation.h"
 
 // confidence=low: initializes the four active sword attack components.
-#define Sword_InitAttackComponents sub_080F6F90
 
 #ifdef NONMATCHING
 // fuzzy: 84.8%
@@ -221,5 +220,5 @@ void Sword_InitAttackComponents(u8 *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F6F90);
+INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
 #endif

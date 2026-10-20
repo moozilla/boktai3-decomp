@@ -15,7 +15,6 @@ struct Actor {
 extern const s16 gUnk_086149C4[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-#define Hresvelgr_SteerTowardTarget sub_0819CD60
 static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
@@ -82,5 +81,5 @@ void Hresvelgr_SteerTowardTarget(struct Actor *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819CD60);
+INCLUDE_ASM("asm/nonmatching", Hresvelgr_SteerTowardTarget);
 #endif

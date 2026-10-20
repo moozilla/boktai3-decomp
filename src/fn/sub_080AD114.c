@@ -11,7 +11,7 @@ struct SceneActorFacingTarget {
 extern struct SceneActorFacingTarget *gUnk_02000580;
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
-void sub_080B23A0(void *, u32);
+void Vorn_BeginPursuitRoute(void *, u32);
 void Vorn_RunPendingScript(void *);
 void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *actor, s32 frame)
 {
@@ -32,5 +32,5 @@ void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *a
         Vorn_RunPendingScript(actor->context);
     }
     if (frame > 60)
-        sub_080B23A0(actor, 1);
+        Vorn_BeginPursuitRoute(actor, 1);
 }

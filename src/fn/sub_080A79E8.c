@@ -93,7 +93,7 @@ void TentacleActor_ResetOscillation(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_080A8904(void *);
+void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -135,7 +135,6 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
 }
 // confidence=low: moves toward a saved waypoint using the facing quadrant behind the actor.
-#define TentacleBody_UpdateRetreat sub_080A79E8
 void TentacleBody_UpdateRetreat(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -149,7 +148,7 @@ void TentacleBody_UpdateRetreat(struct SceneActorRegistryResetView *actor)
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
-        sub_080A8904(actor);
+        TentacleActor_SelectWanderRoute(actor);
     }
 
     if (*(s16 *)(body + 0x8D6) <= 0)
@@ -157,7 +156,7 @@ void TentacleBody_UpdateRetreat(struct SceneActorRegistryResetView *actor)
     speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
-        sub_080A8904(actor);
+        TentacleActor_SelectWanderRoute(actor);
         Delta(&delta, &actor->position, (void *)(body + 0x904));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }

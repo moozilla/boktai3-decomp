@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: navigation probe events select turns or acceleration behaviors.
-#define Mummy_UpdateProbeNavigation sub_080D53F8
 
 #ifdef NONMATCHING
 // fuzzy: 83.1%
@@ -28,7 +27,6 @@ s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 sub_0807AF94(void *);
-#define Mummy_RequestStraightRoute sub_080D6FDC
 u8 Mummy_RequestStraightRoute(void *);
 static inline void BeginProbeTurn(void *obj, u32 saved)
 {
@@ -116,5 +114,5 @@ increment:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D53F8);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
 #endif

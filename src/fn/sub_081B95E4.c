@@ -10,11 +10,10 @@ s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 Math_StepTowardTarget(s32, s32, s32);
 s32 sub_081B89C0(struct OrbitMotion *);
 s32 sub_081B8B38(struct OrbitMotion *);
-s32 sub_081B8CB0(struct OrbitMotion *);
-s32 sub_081B8E44(struct OrbitMotion *);
-s32 sub_081B8F54(struct OrbitMotion *);
-s32 sub_081B9014(struct OrbitMotion *);
-#define MotionTrack_Update sub_081B95E4
+s32 OrbitMotion_UpdateAngle(struct OrbitMotion *);
+s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *);
+s32 OrbitMotion_UpdateAbsoluteSines(struct OrbitMotion *);
+s32 OrbitMotion_InterpolatePosition(struct OrbitMotion *);
 static inline s32 Square(s32 a)
 {
     return a * a;
@@ -71,18 +70,18 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
         case 7:
             return sub_081B8B38(p);
         case 8:
-            return sub_081B8CB0(p);
+            return OrbitMotion_UpdateAngle(p);
         case 9:
-            return sub_081B8E44(p);
+            return OrbitMotion_UpdateCrossedSines(p);
         case 10:
-            sub_081B8F54(p);
+            OrbitMotion_UpdateAbsoluteSines(p);
         case 5:
             out->x = Math_StepTowardTarget(out->x, target->x, step->x);
             out->y = Math_StepTowardTarget(out->y, target->y, step->y);
             out->z = Math_StepTowardTarget(out->z, target->z, step->z);
             break;
         case 12:
-            return sub_081B9014(p);
+            return OrbitMotion_InterpolatePosition(p);
     }
     if (target) {
         c = Square(p->offset.x) + Square(savedStep->z);
@@ -104,5 +103,5 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B95E4);
+INCLUDE_ASM("asm/nonmatching", MotionTrack_Update);
 #endif

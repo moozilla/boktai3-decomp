@@ -41,7 +41,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 // confidence=low: speed and phase duration depend on remaining health.
-#define Axe_UpdateHealthPacedMotion sub_080FA32C
 void Axe_UpdateHealthPacedMotion(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;

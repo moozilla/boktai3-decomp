@@ -1,5 +1,4 @@
 // confidence=low: inferred from player cue phases and animation consumers.
-#define Player_UpdateStateMotionCue sub_081556E0
 #include "global.h"
 
 // confidence=low: tentative cue role from callback phases.
@@ -122,5 +121,5 @@ void Player_UpdateStateMotionCue(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081556E0);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateStateMotionCue);
 #endif

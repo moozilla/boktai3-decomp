@@ -14,7 +14,7 @@ struct PeerMenu {
 int Wireless_GetPeerHandshakeData(void);
 int Wireless_GetLocalSessionId(void);
 int Wireless_GetConnectedSlotMask(void);
-void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
+void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 void WirelessPeerPanel_SetAvailable(void *, void *);
 void WirelessPeerPanel_SetUnavailable(void *, void *);
 void *WirelessPeerMenu_GetFirstConnectedPlayer(int);
@@ -30,7 +30,7 @@ void WirelessPeerPanel_Update(struct PeerMenu *p, struct PeerPanel *panel, int i
     void *peer;
     if (!index) {
         int value = Wireless_GetLocalSessionId();
-        sub_082213B8((u8 *)panel + 0x50, p->draw, value, 5, 0, 24, 70, 8, 0);
+        Anim_DrawDecimalDigits((u8 *)panel + 0x50, p->draw, value, 5, 0, 24, 70, 8, 0);
         goto available;
     }
     if (Wireless_GetConnectedSlotMask()) {

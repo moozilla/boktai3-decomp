@@ -1,4 +1,3 @@
-#define CameraTracking_UpdatePosition sub_08227624
 #include "global.h"
 struct CameraPosition {
     s16 x, y, z;

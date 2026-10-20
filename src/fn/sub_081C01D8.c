@@ -41,7 +41,6 @@ static inline void projectPosition(struct Vec *projected, struct Vec *world)
     projected->y = y - gUnk_03005418[1] + 80;
     projected->z = depth - gUnk_03005418[2];
 }
-#define TetherActor_PositionRequestIndicator sub_081C01D8
 void TetherActor_PositionRequestIndicator(struct Marker *p)
 {
     struct Vec *screen = &p->screen;
