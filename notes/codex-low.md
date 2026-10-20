@@ -3341,3 +3341,18 @@ Tags: #matching #octopus #scene-actors
 - 080EAC7C drafted 85.0% as `Octopus_UpdateStagger`; 31 realigned instruction differences, 14 ignoring registers. Selects animation 3, sets reaction flags, rewinds its initial frame through frame 17, then clears flags and hands off to SceneActor_EndReactionAnimation when complete. Remaining differences are mask materialization, flag address reuse and register allocation. Signed-mask and pointer-local experiments regressed the candidate and were reverted.
 
 All four production drafts use NONMATCHING guards with INCLUDE_ASM fallbacks and scores recorded by check.py --nonmatching --record. No register hints retained. No full build or network operations run. Ghidra export is absent. Each match/draft was queued separately through build/commit.sh.
+
+## Task 08226F20 — 2026-10-20
+
+Tags: #matching #camera #particles #palette
+
+All six assigned functions matched (100% of this task; +100 percentage points of task completion). Fast per-file checks only; batch ROM validation remains with the integrator. Three units use the authorized register-pinning concession, minimized with `tools/depin.py --write`.
+
+- 08226F20 matched as `Camera_UpdatePositionMode`. Eight modes snap/interpolate toward a fixed position, scene body, player-relative position, saved position or external vector. Packed signed 16-bit bitfields reproduce the register-resident player target. Multiplication operand order controls timer versus position load order. Sharing one body-pointer local between cases 3 and 4 removed all remaining register differences without pins. The movement flag at 0x1C is a halfword.
+- 08227624 matched as `CameraTracking_UpdatePosition` (existing name retained). Uses horizontal distance to approach a clamped scale, applies a 128-frame blend and interpolates the endpoints. Flag 1 fixes height to first endpoint plus 150. A small inline mask helper reproduces mask-before-load ordering; scale-before-blend multiplication reproduces operand load order. No pins.
+- 08239664 matched as `PaletteFade_ApplySelectiveBrightness`. The matched 0813C798 relative supplies the exact palette/channel idiom; removing its mode-2 exception matches this function. Preserves indices 5, 6 and 13 unless copyAll is set. No pins.
+- 0823614C matched as `RadialBurstEffect_EmitOrbitParticle`. Emits from a twelve-slot pool after three ticks; randomized radius, angle and tile place the particle about a retained origin pointer. Pinning the random cursor to r1 resolves the retained draft's allocation differences; depinning removed the empty barrier, leaving one pin.
+- 08236C04 matched as `ParticleBurst_EmitOrbitParticle`. Emits from an eight-slot pool after two ticks; snapshots the origin, randomizes speed/radius/angle and initializes an eight-tick lifetime. Cursor pin r1 plus table-before-seed assignment order matched. Depinning removed the barrier, leaving one pin.
+- 08233760 matched as `ChargedBurst_EmitTerminalDebris`. After sixteen ticks, compares signed object height (converted to unsigned for comparison) against terrain height and emits randomized debris if above it, then kills the task. Existing caller 08233714 selects this state after the charged-burst intro. Splitting the terrain mask into a local and reading the random sample before initializing the low mask fixes instruction selection/order. Depinning reduced nine hints to three: cursor r2, low mask r9 and an empty low-mask constraint. No handwritten instruction bodies.
+
+Ghidra export is unavailable here (`gen/ghidra/decomp.c` absent); assembly and matched relatives were sufficient. All accepted functions have file-local descriptive aliases. No drafts remain for this task.
