@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 93.9%
+// fuzzy: 96.1%
 // Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "engine.h"
@@ -117,6 +117,8 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
 {
     actor->collisionMask = mask;
 }
+// confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
+#define Hresvelgr_UpdateBoundaryBarrage sub_081A0BC8
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
     struct Action *action = &actor->action;
@@ -151,13 +153,15 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 action->frame = state;
                 SetHeading(actor, actor->targetHeading);
-                Hresvelgr_SetAnimation(actor, actor->animation, (u8 *)actor + 0x174, 2, 1, 0);
+                Hresvelgr_SetAnimation(actor, actor->animation, (u8 *)actor + 0x174, 2, state, 0);
                 SetCollisionMask(actor, 0xd000);
                 actor->collisionBounds = actor->boundsHigh;
                 Sound_PlaySong(0x4d0);
             } else {
                 sub_0819E754(actor, 32);
-                if (!(tick & state)) {
+                state &= tick;
+                asm("" : "+r"(state));
+                if (!state) {
                     u32 mask = 16;
                     *flags |= mask;
                 }
@@ -198,5 +202,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
+INCLUDE_ASM("asm/nonmatching", sub_081A0BC8);
 #endif
