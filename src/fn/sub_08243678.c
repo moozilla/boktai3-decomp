@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 void Player_SetSecondaryActionFlags(struct Player *, u32);
-#define Player_TickDamageBlink sub_08243678
 void Player_TickDamageBlink(struct Player *p)
 {
     struct Player *q;

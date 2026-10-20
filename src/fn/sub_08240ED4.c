@@ -7,7 +7,6 @@ void Player_SetDirectionalVelocity_08238300(struct Player *, s32);
 void sub_08238238(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
 void sub_08238280(struct Player *, s32, s32);
-#define Player_UpdateStumble sub_08240ED4
 void Player_UpdateStumble(struct Player *p)
 {
     u16 *frame;
