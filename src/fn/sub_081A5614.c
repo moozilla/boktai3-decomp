@@ -1,4 +1,6 @@
 #include "global.h"
+
+#define Vanargand_UpdatePaletteTransition sub_081A5614
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
