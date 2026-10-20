@@ -1,9 +1,11 @@
 #include "global.h"
+#define Mummy_UpdateHiddenRecovery sub_080D1CD0
 #ifdef NONMATCHING
-// fuzzy: 94.2%
+// fuzzy: 94.3%
+// Entry take-flag allocation and zero-value lifetime still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor)
+static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor, u32 zero)
 {
     u8 directionVariant, mirror;
     u32 selection;
@@ -19,13 +21,14 @@ static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor
     {
         u8 *mirrorAddress = &mirror;
         s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+        asm("" : "+r"(zero));
         asm("" : "+r"(quadrant), "+r"(mirrorAddress));
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
             *mirrorPointer = 1;
             *variantPointer = 3 - quadrant;
         } else {
-            *mirrorPointer = 0;
+            *mirrorPointer = zero;
             *variantPointer = quadrant;
         }
     }
@@ -101,7 +104,7 @@ static inline u8 TakePrepared(u8 *p)
 }
 void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u32 queued;
+    register u32 queued asm("r5");
     u8 *prepared;
     u32 mask = 1;
     if (!actor->drawableKind) {
@@ -112,17 +115,13 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         tile->flags |= mask;
     }
     prepared = &actor->field2B2;
-    if (*prepared) {
-        *prepared = 0;
-        queued = 1;
-    } else
-        queued = 0;
+    queued = TakePrepared(prepared);
     if (queued)
         ActorShadow_Disable((u8 *)actor + 0x320);
     else if (frame > 0x1A) {
         void *callback;
         u32 kind, zero, one;
-        SelectRecoveryAnimation((void *)actor);
+        SelectRecoveryAnimation((void *)actor, queued);
         callback = Mummy_UpdateRevival;
         kind = 13;
         zero = 0;
@@ -143,5 +142,5 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
+INCLUDE_ASM("asm/nonmatching", sub_080D1CD0);
 #endif
