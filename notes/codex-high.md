@@ -1979,3 +1979,86 @@ commutative operand order and where an inline's arguments are materialized can
 change many instructions without changing behavior. Score big functions with
 the realigned structural count. All accepted production changes retain readable
 C and the three nonmatches retain their default INCLUDE_ASM fallback.
+
+
+## 2026-10-20 — cloud task 08117948 (Glove)
+
+Tags: #matching #glove #motion #animation #register-pinning
+
+Assigned-body matching reached **34.14%, +34.14 percentage points** (2,028 of
+5,940 reviewed body/pool bytes). This contributes approximately +0.084
+percentage points against PROGRESS.md's recorded total-code denominator.
+All new exact bytes are unpinned. Drafts contribute zero exact coverage.
+Worked solo on the assigned cloud/08117948 branch without network actions,
+full builds, shared-document changes or generated-file edits. Each function
+commit was queued separately through build/commit.sh.
+
+- **08117948 — improved existing draft to 90.0%, Glove_UpdateStopping.**
+  Reviewed full extent: 1,572 bytes; candidate: 1,568. Added the required
+  file-local alias and address-named assembly fallback. The existing draft's
+  initial score was 82.3%. Observed fields in the motion object now represent
+  pending damage at 68, recovery value at 7E, action-active/cooldown at
+  307/308, action kind at 319, recovery/cooldown at 326/328, damage timer at
+  57A and signed damage flags at 5EE. Typed access improved to 84.4%; passing
+  the parent flags pointer (8F4) through the action inlines improved to 90.0%.
+  Remaining: 85 realigned instructions, 42 ignoring registers. Constant-one
+  pinning reduced structure to 25 differences but regressed total similarity
+  to 87.3%; retained the readable unpinned candidate. Explicit initialization
+  zero-width and additional recovery-zero temporaries did not help. Recorded
+  the full-extent NONMATCHING score and verified the default fallback exactly.
+- **081182E4 — drafted 80.7%, Glove_UpdateDefeatEffects (tentative).**
+  Reviewed full extent: 1,452 bytes; candidate: 1,432. Clears five model
+  animation flags, hides the marker, resets pending actions and sprite pair,
+  restores five graphics pointers and palettes, clears movement, then emits
+  bursts every twelve ticks through tick 29 and every six ticks through 59.
+  After tick 120, selects blinking recovery for linked mode or game-state
+  flag 100, otherwise Glove_OnActionComplete. A first complete reconstruction
+  scored 70.3%. Explicit locals for the action/slot/flag/graphics/style
+  addresses retained across the first loop improved to 77.9%. Retaining the
+  vertical-velocity and bias pointers, a separate action-motion pointer, and
+  a single height hint in sl produced 80.7%. Remaining: 140 realigned
+  differences, 66 ignoring registers, principally reset-action self-pointer
+  storage, sprite graphics addressing, motion temporaries and allocation.
+  Pointer grouping, extra motion-pointer caching, typed graphics rows and
+  a graphics setter inline did not improve it. Marked register-pinning.
+  depin.py ran on the unguarded candidate and correctly skipped the nonexact
+  source; it did not inspect or accidentally accept the assembly fallback.
+  Recorded the full-extent score and checked the default fallback exactly.
+- **08117F6C — stopped below draft threshold, best 67.2%; scratch only.**
+  Tentative role Glove_UpdateBlinkRecovery. Reviewed extent: 888 bytes.
+  Installed after defeat effects in linked/recovery-enabled mode. Sets parent
+  flag one, blinks the model every four updates, restores the primary resource
+  from its maximum and increases a signed halfword meter by 20 when more than
+  100 below maximum, otherwise by five. After tick 120, fills both meters,
+  shows the marker, clears the parent flag, restores the low-resource color
+  effect and installs Glove_UpdateStopping. Tested typed meter fields and
+  signed/unsigned reads, retained velocity/bias/y/step pointers, height and
+  motion-pointer hints, and combinations of those lifetime changes. They
+  plateaued below 80%; the best fuzzy candidate has 162 realigned differences,
+  81 ignoring registers. The motion loop's retained addresses and high-register
+  transfers differ substantially. No below-threshold production source was
+  added. Best authored scratch is wip/sub_08117F6C.c; isolated alternatives
+  and checker artifacts remain under ignored build/.
+- **08118B8C — matched, Glove_UpdateImpactRecoil (tentative), 676 bytes.**
+  Message command zero installs this callback. Reuses the exact matched
+  Glove_UpdateRecoil body, starts animation 20 and consumes its pending
+  trigger at parent+870 before the common recoil update. Matched on the first
+  check, with no register hints. The impact interpretation is provisional.
+- **08118E30 — matched, Glove_UpdateStaggerRecoil (tentative), 676 bytes.**
+  Message command one installs it. Same triggered recoil body with animation
+  21. Matched with no hints; the stagger interpretation is provisional.
+- **081190D4 — matched, Glove_UpdateEmitterRecoil (tentative), 676 bytes.**
+  Message command three configures the motion object's emitter bytes at
+  44/46/47 before installing it. Uses animation zero and consumes the same
+  pending trigger, then updates recoil, accessory animation and emitter.
+  Matched with no hints.
+
+The three matches were formatted and accepted by check.py with explicit
+676-byte reviewed extents. Both drafts were formatted, scored using
+--nonmatching --record with their reviewed extents, and their default assembly
+fallbacks passed byte-exact checks. No full build was run; combined ROM
+validation remains the integrator's responsibility. Useful family technique:
+start with the already matched recoil sibling, then model the extra pointers
+that survive across calls explicitly. On the larger callback, realigned
+structural counts were used to distinguish those lifetime changes from
+register-only changes.
