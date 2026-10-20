@@ -730,3 +730,50 @@ All four guarded candidates were formatted, checked with --nonmatching --record,
 and their default assembly fallbacks checked byte-identical. One-function
 commits were queued through build/commit.sh; follow-up fallback fixes retain the
 address name because INCLUDE_ASM stringifies its argument without macro expansion.
+
+## Task 081540D4 follow-up (2026-10-20)
+
+Tags: #matching #player #animation #cue
+
+Exact progress: 0.0 percentage-point gain. All six targets already had guarded
+C drafts. Restored file-local descriptive aliases and address-form INCLUDE_ASM
+fallbacks for the cached ELF; all six default fallbacks pass check.py exactly.
+Only per-file checks were used, with no full build or network operations.
+
+- 081543F0: retained PlayerCue_UpdateSideFade draft, recorded 86.4%, 131
+  realigned differences / 29 ignoring registers. Reviewed largest first using
+  asmat and relatives; the exact SideDeparture sibling shares its playback.
+  Removing sprite/state pins worsened to 79.0%; specializing final playback
+  with swapped pointer/mask pins worsened to 81.6%. Reverted both. Scale field
+  addressing, phase tails and playback allocation remain.
+- 08155008: retained PlayerCue_UpdateAlternateFade draft, recorded 86.0%,
+  131 realigned differences / 28 structural. Resource414/selection46B variant
+  of the same phase machine. Removing pointer pins worsened to 79.4%; swapping
+  final playback pins worsened to 82.2%. Reverted; same remaining issues.
+- 081540D4: improved PlayerCue_UpdateSideArrival draft from 91.5% to 98.5%,
+  nine realigned differences / seven structural. Reuse the phase value for
+  Face's zero flip and StepEnd's first mask; assign animation completion after
+  the index branches through shared labels. Removing the phase mask barrier
+  cuts one more difference. Completion store sharing and mask copies remain.
+- 08154AF0: retained PlayerCue_UpdateSideRecoil draft at 97.5%, six realigned
+  differences / zero structural (seven differing bytes). ROM uses r2 for the
+  recoil offset and r5 for direction offset; C uses r1/r2. Explicit offset pins
+  with barriers and a cached recoil pointer changed CSE and regressed to 95.7%;
+  keeping later field accesses independent regressed to 89.2%. Both reverted.
+- 08154CD4: improved PlayerCue_UpdateSpiralRecovery from 88.8% to 93.8%,
+  21 realigned differences / six structural. Keep resource 0x16F as a value
+  stored before shifting to derive its pointer (empty value barrier), and
+  preserve the widened increment before masking the cue timer. Remaining
+  resource-load ordering, effect timer constant copies and address allocation.
+- 081556E0: improved Player_UpdateStateMotionCue from 87.8% to 88.3%,
+  54 realigned differences / 31 structural. Express event bit31 as a signed
+  negative test, retaining the nullable-player guard. Mask argument barriers
+  regressed structure and were removed. Event mask ordering, resource selection
+  store sharing and playback still differ.
+
+Formatted with the pinned clang-format and recorded every score with
+check.py --nonmatching --record. depin.py --write tested default assembly
+fallbacks and incorrectly removed every hint from guarded drafts; restored the
+candidate hints and rechecked the recorded scores. Do not use its default path
+as evidence that a NONMATCHING candidate can lose its pins. Six one-function
+draft commits queued through build/commit.sh, followed by these notes.
