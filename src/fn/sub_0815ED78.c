@@ -12,7 +12,7 @@ s32 Player_GetUsableEnchantment(struct Player *);
 s32 Player_IsEnchantmentAvailable(struct Player *, s32);
 static inline void ApplyActionMode(struct Player *p, u32 mode, u32 resource)
 {
-    register u32 offset asm("r0") = 0x418;
+    u32 offset = 0x418;
     u8 *action;
     asm("" : "+r"(offset));
     action = (u8 *)p + offset;
