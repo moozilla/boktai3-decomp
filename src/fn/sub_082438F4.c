@@ -23,7 +23,7 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gUnk_020004B4->bit;
 }
-#define F(T, off) (*(T *)((u8 *)p + (off)))
+#define F(T, off)             (*(T *)((u8 *)p + (off)))
 #define Player_UpdateLinkCore sub_082438F4
 s32 Player_UpdateLinkCore(struct Player *p)
 {
