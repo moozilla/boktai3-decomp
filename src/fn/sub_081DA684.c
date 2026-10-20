@@ -11,7 +11,7 @@ struct TManager {
 };
 
 s32 ResourceRegistry_RegisterResource(u32, void *, u32);
-void sub_081DA0B4(void *, void *, s32);
+void TimedEffect_InitEntry(void *, void *, s32);
 void SpriteGroup_InitFourSprites(void *, u32);
 
 s32 TimedEffect_InitManager(struct TManager *manager, s32 count)
@@ -30,7 +30,7 @@ s32 TimedEffect_InitManager(struct TManager *manager, s32 count)
     manager->activeMask = 0;
     entry = manager->entries;
     for (i = 0; i < manager->count;) {
-        sub_081DA0B4(manager, entry, i);
+        TimedEffect_InitEntry(manager, entry, i);
         i++;
         entry += 0x1AC;
     }

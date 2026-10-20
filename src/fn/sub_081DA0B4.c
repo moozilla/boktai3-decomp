@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#define TimedEffect_InitEntry sub_081DA0B4
-
 struct TConfig {
     u8 pad0[0x14];
     u32 mode, contactFlags, resourceId, cost, option;
