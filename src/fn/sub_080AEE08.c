@@ -167,5 +167,5 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
+INCLUDE_ASM("asm/nonmatching", sub_080AEE08);
 #endif
