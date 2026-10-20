@@ -3,7 +3,8 @@
 
   rasolve.py FILE.c [FUNC] [--depth N] [--beam N]
 
-FILE.c holds one ROM function (tools/isolate.py). Uses an instrumented copy
+FILE.c may be a multi-function unit: the target is isolated automatically
+(tools/isolate.py ensure) and build/agbcc-instr is built on first use. Uses an instrumented copy
 of agbcc (build/agbcc-instr, made by tools/agbcc-instr.sh) that can add to a
 pseudo's allocation priority (AGBCC_PRI), pin a pseudo to a hard register
 (AGBCC_FORCE) and dump every pseudo's priority, lifetime and register before
@@ -199,6 +200,15 @@ def competitors(ps, p):
     return [o for o in ps.values() if o.kind == "G" and o.reg != p.reg]
 
 
+def ensure_instr():
+    """Build build/agbcc-instr on first use."""
+    if not os.path.exists(INSTR):
+        print("building build/agbcc-instr (first use, a few minutes)...", file=sys.stderr, flush=True)
+        subprocess.run([os.path.join(ROOT, "tools", "agbcc-instr.sh")], check=False)
+    if not os.path.exists(INSTR):
+        sys.exit(f"{INSTR} missing and tools/agbcc-instr.sh failed (run tools/setup.sh first?)")
+
+
 def floor_log2(n):
     return n.bit_length() - 1 if n > 0 else -1
 
@@ -223,10 +233,11 @@ def main():
     ap.add_argument("--json-out", help="write the compiler-space solution as targets for translate.py")
     ap.add_argument("--all", action="store_true", help="try every pseudo, not just the involved ones")
     a = ap.parse_args()
-    if not os.path.exists(INSTR):
-        sys.exit(f"{INSTR} missing: run tools/agbcc-instr.sh")
+    ensure_instr()
     src = os.path.abspath(a.src)
     func = a.func or regdiag.first_function(src)
+    import isolate
+    src = os.path.join(ROOT, isolate.ensure(src, func))  # multi-function unit: isolated copy
     t0 = time.time()
     with contextlib.redirect_stdout(io.StringIO()):
         an = regdiag.analyze(src, func)

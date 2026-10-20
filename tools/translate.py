@@ -22,7 +22,7 @@ does that.
 * A beam keeps the best states; every state's own dump tells where its
   targets now are, so the focus follows the code as it changes.
 
-FILE.c holds one ROM function (tools/isolate.py). The result is written to
+FILE.c may be a multi-function unit (isolated automatically, tools/isolate.py). The result is written to
 build/translate/FUNC/; review it like any permuter output (upstream passes
 do not always keep the program's meaning) and confirm with tools/check.py.
 """
@@ -464,6 +464,8 @@ def main():
         PASSES = SAFE_PASSES + UNSAFE_PASSES
     src = os.path.abspath(a.src)
     func = a.func or regdiag.first_function(src)
+    import isolate
+    src = os.path.join(ROOT, isolate.ensure(src, func))  # multi-function unit: isolated copy
     out_dir = os.path.join(ROOT, "build", "translate", func)
     os.makedirs(out_dir, exist_ok=True)
     t0 = time.time()
