@@ -1,74 +1,53 @@
 #include "global.h"
-#include "scene_actor_reset.h"
+#include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.6%
-// foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Ivy_UpdateActiveState(void);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    if (actor->field2B2) {
-        actor->field2B2 = 0;
-        return 1;
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
     }
-    return 0;
+    actor->word104 = 0;
 }
+
+static inline void SetStateB(struct SceneActorRegistryResetView *actor)
+{
+    u32 two = 2;
+    u8 *field = &actor->state2A8;
+    u32 zero = 0;
+    *field = zero;
+    actor->phase2A9 = zero;
+    actor->behavior2AA = two;
+    actor->counter2AC = zero;
+    actor->field2B1 = 1;
+}
+
 void SceneActorReaction_FinishAnimation17(struct SceneActorRegistryResetView *actor)
 {
-    u32 offset;
-    if (TakePrepared(actor)) {
-        u16 *flags = &actor->colliderA.flags;
-        u32 value = *flags;
-        u32 clear = 0xFFFB;
-        clear &= value;
-        clear |= 8;
-        *flags = clear;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        u16 *destination = &actor->colliderA.flags;
+        u32 flags = *destination;
+        u32 mask = 0xFFFB;
+        mask &= flags;
+        mask |= 8;
+        *destination = mask;
         {
-            u16 *fields = &actor->flags2C0;
-            u32 mask = ~0x800;
-            *fields = mask & *fields;
+            u16 *p = &actor->flags2C0;
+            u32 mask = 0xFFFFF7FF;
+            *p = mask & *p;
         }
-        SceneActorAnimation_SelectDirectionalEntry(actor, 17);
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
-    offset = 0x2B3;
-    if (*((u8 *)actor + offset)) {
-        void *callback = Ivy_UpdateActiveState;
-        u32 kind = 34;
-        u8 *field = &actor->field2B2;
-        u32 zero = 0;
-        u32 one = 1;
-        u32 targetOffset;
-        *field = one;
-        offset -= 3;
-        *((u8 *)actor + offset) = zero;
-        offset += 5;
-        *((u8 *)actor + offset) = kind;
-        targetOffset = 0x21C;
-        *(void **)((u8 *)actor + targetOffset) = callback;
-        field = (u8 *)&actor->field2C8;
-        offset = 0;
-        *(u16 *)field = zero;
-        {
-            u32 *flags = &actor->flags114;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->word104 = zero;
-        {
-            u32 stateOffset;
-            u32 behavior = 2;
-            stateOffset = 0x2A8;
-            *((u8 *)actor + stateOffset) = offset;
-            stateOffset++;
-            *((u8 *)actor + stateOffset) = offset;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = zero;
-            stateOffset += 8;
-            *((u8 *)actor + stateOffset) = one;
-        }
+    if (actor->field2B3) {
+        SetControl(actor, Ivy_UpdateActiveState, 0x22);
+        SetStateB(actor);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_FinishAnimation17);
-#endif
