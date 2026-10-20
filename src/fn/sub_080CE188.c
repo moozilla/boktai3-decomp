@@ -1,3 +1,5 @@
+// confidence=low: existing Golem state interpretation retained.
+#define Golem_ResumeRouteAfterControl sub_080CE188
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"

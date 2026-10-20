@@ -1,5 +1,8 @@
 #include "global.h"
 
+// confidence=low: axe attack behavior inferred from orbit and trail state updates.
+#define Axe_UpdateReturningTrail sub_080F8648
+
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 // Six instructions differ: player-address scheduling and stack-vector address reuse.
@@ -151,5 +154,5 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateReturningTrail);
+INCLUDE_ASM("asm/nonmatching", sub_080F8648);
 #endif
