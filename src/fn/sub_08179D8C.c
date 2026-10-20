@@ -2,9 +2,8 @@
 #include "contact_actor.h"
 #include "engine.h"
 void ActorImpact_CopyContact(void);
-#define ActorImpact_InitBodyCollider sub_08179D8C
 void Collider_SetBodyProperties(void *, s32, s32, s32);
-void sub_08179D8C(u8 *p, s32 resource)
+void ActorImpact_InitBodyCollider(u8 *p, s32 resource)
 {
     struct ContactPackedVector size, offset;
     void *c = p + 0x1cc;

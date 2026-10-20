@@ -1,5 +1,4 @@
 #include "global.h"
-#define PauseMenu_EnterPrompt sub_081764EC
 void PauseMenu_CloseTextWindows(u8 *);
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
