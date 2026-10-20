@@ -188,3 +188,101 @@ were recorded with `--nonmatching --record` and reviewed full extents. The four
 default assembly alternatives also passed full-extent per-file checks. The one
 match and four drafts were committed separately; this note is committed last.
 Complete combined-ROM validation remains with the batch integrator.
+
+# Codex high: task 080B8B84 (2026-10-20)
+
+Tags: #matching #skeleton #terrain #register-pinning
+
+Branch: `cloud/080B8B84`. Worked solo and offline, with per-file checks only;
+no make, full build, network operation, or direct git mutation. All commits used
+`build/commit.sh`. The pre-existing driver edit in `tools/cloud_task.py` was left
+alone. Read the existing guarded candidates before drafting; inspected callers,
+callees, condensed listings and matched relatives. Used `variants.py` to rank
+structural changes and `rtlprobe.py` loop/perline/dump diagnostics for the large
+inlines. The two accepted matches cover **6.52% of the task (+6.52 percentage
+points; 816 of 12,524 reviewed bytes)**, all Register-pinned. This adds about
+**0.034 percentage points** of repository code coverage. The draft adds no exact
+coverage.
+
+- **080B8B84 matched**, `SceneActorReaction_TrySink`, 400 bytes. Retained the
+  existing semantic name: a live, enabled actor on a sinking terrain cell switches
+  to its sink callback when its adjusted height is at or below ground. The prior
+  draft checked at 98.5%, with three structural differences from rematerializing
+  the flags2D0 offset. A local r2 offset derived as 0x2D4 minus four and an r0
+  pointer reproduce the original instruction sequence. `depin.py --write`
+  removed the initial mask hint and empty constraint, retaining only those two
+  pins. Formatted and checked over the complete 400-byte extent: zero differing
+  bytes. Committed separately.
+- **080BB61C matched**, `Skeleton_BeginKnockedFlight`, 416 bytes. Entry disables
+  body/context colliders, launches along the facing direction with speed 28..43
+  and upward speed 24..55, selects animation 17 and enables the shadow. Landing
+  stops horizontal secondary motion; flags2D0 bit 0x10 triggers the optional
+  bone sound and actor reset. Existing draft started at 86.3%, with two structural
+  and 29 total differences. A u8 angle formal recovers the argument-copy order.
+  Keeping the random value in r1 and the speed in r4 prevents the compiler from
+  folding their distinct lifetimes into one register. Actor r5 and the second
+  RNG table r2 complete allocation. The pre-existing dead 0x0403B714 literal is
+  retained with an empty constraint, without instruction text. A bounded
+  60-second permuter search saved no candidate. `depin.py --write` reduced six
+  hints to five. Formatted and checked over all 416 bytes: zero differing bytes.
+  Committed separately.
+- **080BBDD0 drafted 87.1%**, `Skeleton_ConvergeDisplacedPosition` (tentative),
+  reviewed extent 4,116 bytes; candidate 4,124 bytes. Skeleton creation installs
+  this callback alongside Skeleton_Update and its defeat/idle callbacks. It
+  converges saved X/Z displacement toward the anchor in quarter steps clamped
+  to +/-200, then resumes route/chase control. Existing draft checked at 80.0%,
+  with 610 total/96 structural differences. A signed 16-bit bitfield for clearing
+  group flag four was the main improvement (308 total/60 structural on its own).
+  The explicit retry exit, reading player index before the -1 sentinel, narrow
+  motion-mask accessor, signed short flag updates and a shared quarter-result
+  variable brought the final realigned count to **316 total/44 structural**.
+  Whole-header replacement with `scene_actor_chase.h` regressed and was rejected.
+  Remaining differences are flag/address lifetimes, retry-loop allocation and
+  shared recovery stack slots. No register hints remain in this draft. Added
+  the file-local alias and mismatch comment, formatted, recorded with
+  `check.py --nonmatching --record`, and verified the default INCLUDE_ASM path
+  over the full 4,116 bytes. Committed separately.
+- **080B9158 stopped below threshold**, tentative
+  `Skeleton_UpdateKnockedLanding`. Complete new candidate remains only in
+  ignored `wip/sub_080B9158.c`: 3,724 bytes versus the 3,768-byte reviewed extent,
+  34.3% fuzzy, **717 total/126 structural** differences. Entry chooses a usable
+  neighboring direction through 080B713C and starts a short upward launch. If no
+  direction is available, or after the landing flag, it selects animation 15,
+  installs chase control and expands route recovery. This includes two full
+  terrain/target/turn expansions. Starting with the rise-state helpers gave
+  806/185 differences; the displacement-state helpers reduced structure further.
+  Direct actor group accesses, byte-index load ordering and narrow state formals
+  helped. Shared-header replacement and forcing the outer actor to sb regressed.
+  Loop diagnostics confirmed both retry loops' invariant motion; remaining
+  differences need more work on inline pointer/control lifetimes and allocation.
+  No below-80% draft was added to src.
+- **080BA268 stopped below threshold**, tentative
+  `Skeleton_ReleaseBoneProjectiles`. New candidate remains only in ignored
+  `wip/sub_080BA268.c`: 764 versus 784 bytes, 68.8% fuzzy, **126 total/34
+  structural** differences. Selects animation 22, constructs a forward vector
+  and two randomized bone-effect launches (shared D45E/1DC3 resources), changes
+  to category five, reinitializes variant motion, and sets the attack collider
+  from the actor's BA/C2/D8/CA fields. Animation completion installs the threshold
+  reaction. First candidate was 56.8% with 187/64 differences. A signed Scale6
+  inline preserves the otherwise optimized-away signed division branches;
+  collecting collider arguments before the call recovers load/evaluation order;
+  separating RNG sampling from masking recovers the table-load order. Parameter
+  and register experiments, declaration swaps, and RTL inspection did not resolve
+  the remaining polar-copy, RNG-mask, literal-load and allocation differences.
+  No below-80% draft was added to src.
+- **080BF0E4 stopped below threshold**, tentative
+  `Skeleton_ResumeChaseAfterRising`. Existing production draft was left unchanged;
+  improved candidate remains only in ignored `wip/sub_080BF0E4.c`: 3,028 versus
+  3,040 bytes, 73.8% fuzzy, **426 total/162 structural** differences. Category
+  five/six/seven choose directional rise animations 0x63/0x65/0x67 or delegate
+  to the animation-B completion callback; completion expands the shared recovery
+  sequence. Initial production candidate was 72.7%, 473/164. Player-index load
+  ordering and the signed group-flag bitfield helped. Replacing the directional
+  macro with an inline function gave 452/170 and was discarded. Narrow selection,
+  variant changes and actor/selection pins did not improve structure. The packed
+  directional-animation expansion and its address/selection lifetimes remain the
+  main blockers; no below-80% source was newly committed.
+
+The two matches and improved guarded draft have separate commits. Full combined
+ROM validation remains with the integrator. Scratch candidates and diagnostic
+artifacts stay under ignored `wip/` and `build/` paths.
