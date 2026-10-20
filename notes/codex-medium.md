@@ -2147,3 +2147,68 @@ callers, named neighbors and matched relatives.
 Only the exact function and the >=80% guarded draft were promoted to src.
 The four lower-scoring sources remain local scratch and earn no progress.
 Full batch validation and name promotion remain with the integrator.
+
+## Task 081B0F34 — 2026-10-20
+
+Tags: #matching #actor-status #vanargand #register-allocation
+
+Worked solo on the assigned offline checkout. All six functions already had
+NONMATCHING drafts and promoted semantic names. Retained those names, restored
+file-local aliases, and changed each assembly fallback to its sub_XXXXXXXX
+identifier: INCLUDE_ASM stringifies its argument without macro expansion, and
+this checkout's cached assembly/ELF still uses address names. This also lets
+check.py --nonmatching --record associate each score with its fallback.
+Exact C gain: +0.0 percentage points. No full build or network operation.
+
+- **081B1F74 — retained/improved draft 94.5%,
+  Vanargand_UpdatePartPairedStrike (was 92.5%).** Read the large-function
+  workflow, assembly and matched relatives (notably the polar-vector and burst
+  sequences). Changing addition operand order and sharing the entry zero with
+  the post-MotionTrack_Initialize store improved the realigned count from
+  65 to 46 differing instructions; 9 ignore-register differences remain,
+  including jump-table data/padding. Entry-pointer copies, per-case state and
+  timer address allocation, zero lifetime, and literal placement remain.
+  A pinned entry-pointer experiment did not improve it and was discarded.
+- **081B1334 — retained/improved draft 86.0%,
+  ActorStatus_UpdateGuardedApproach (was 83.0%).** Isolated the guarded
+  behavior-18 request as an inline taking the action argument. This better
+  reproduces the argument/mask setup before the guards and reduces the
+  realigned count from 149/55 to 119/34 (total/ignoring registers). The guard
+  tests flag 0x100, previous actions 25/26 and completion before storing action,
+  reset, completion, countdown, state and timer. Entry/state pointer lifetimes
+  and packed-animation allocation remain. A volatile state read and raw
+  vector-component stores did not improve the candidate and were reverted.
+- **081B18C8 — retained draft 80.3%, ActorStatus_UpdateRisingStrike.**
+  80/27 realigned differences. State-address reuse and entry-pointer lifetime,
+  constant placement around Anim_SetSequence and stack-vector setup remain.
+  Volatile state and raw s16-pointer vector writes produced no improvement;
+  kept the original candidate with the required alias and working fallback.
+- **081B1B90 — retained draft 84.5%, ActorStatus_UpdateFlankingStrike.**
+  60/20 realigned differences. Assembly confirms the same +/-512 lateral
+  offsets as the tracking callback, then orbit motion and sequence eight.
+  Porting the improved pinned Offset inline and pinning entry pointers to r8
+  changed spills/allocation and did not improve the retained candidate.
+  Kept the original candidate with the required alias and working fallback.
+- **081B0F34 — retained draft 81.9%, ActorStatus_UpdatePlayerCapture.**
+  121/66 realigned differences. The ROM shares one player-position-request call
+  between variants, with different capture and slot arguments. Rewriting to
+  one C call reduced structural differences to 28 but scored only 72.7%, so
+  retained the better existing guarded draft. Volatile state reads and raw
+  component stores did not help. Request-branch merging, frame/entry pointer
+  lifetime, and vector/constant ordering remain.
+- **081B1E24 — retained/improved draft 98.1%,
+  Vanargand_UpdatePartTracking (was 90.7%).** A temporary register-pinning
+  concession in Offset fixes constant-before-load ordering and the shared z
+  offset tail: r1 component pointer, r2 x offset, r3 z offset and r0 arithmetic
+  value, with empty operand barriers only. No instruction bodies were added.
+  Only three instructions differ: after MotionTrack_Update, the compiler
+  materializes timer offset 0x168 in r1 instead of r2. Explicit timer/address
+  pins, integer signedness, declaration order, alternate timer predicates and
+  inline tick helpers failed to improve this residue. Retained the minimal
+  improved Offset candidate; discarded the larger timer-pinning attempts.
+
+All final C candidates were formatted directly with the venv clang-format and
+checked using check.py --nonmatching --record. Every default assembly fallback
+also passed check.py; those fallback matches earn no C credit. Six separate
+draft commits and this note were submitted through build/commit.sh. Full batch
+validation and name promotion remain with the integrator.
