@@ -23,6 +23,7 @@ on that branch; finish with a PR (docs/CLOUD.md).
 import argparse
 import csv
 import os
+import re
 import subprocess
 import sys
 import uuid
@@ -38,7 +39,11 @@ def git(*a):
 
 def tasks(min_insns, max_insns=None):
     done = worklist.done_names()
-    fs = [f for f in worklist.functions() if f["name"] not in done and f["insns"] >= min_insns
+    # By address too: gen/code_sym.s in a fresh worktree can predate names promoted on main.
+    done_addrs = {int(n[4:], 16) for n in done if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
+    done_addrs |= {int(r[0], 16) for r in csv.reader(open(os.path.join(ROOT, "symbols", "functions.csv")))
+                   if len(r) > 1 and r[1] in done and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
+    fs = [f for f in worklist.functions() if f["name"] not in done and f["addr"] not in done_addrs and f["insns"] >= min_insns
           and (max_insns is None or f["insns"] < max_insns)
           and not worklist.in_library(f["addr"]) and f["addr"] >= 0x0800145C]
     subs = [(int(r["start"], 16), int(r["end"], 16), r["name"])
