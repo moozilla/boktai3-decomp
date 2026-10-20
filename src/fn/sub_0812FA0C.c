@@ -341,5 +341,5 @@ void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *ac
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteReturn);
+INCLUDE_ASM("asm/nonmatching", sub_0812FA0C);
 #endif
