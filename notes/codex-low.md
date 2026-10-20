@@ -3154,3 +3154,125 @@ Tags: #matching #bee #bat #slime
 - 0808FA40 stopped below draft threshold: best initial candidate 66.6%, latest 64.0%. Slime_ChooseMovementDestination (tentative) picks a random direction, probes up to two cells with sub_0812E118, rotates by 64 up to four attempts, restores the requested direction, and stores the selected cell center at context +0x3EC. Loop layout, terrain-cell pointer/position lifetimes, stack spills and registers still differ substantially. Candidate remains at wip/sub_0808FA40.c, outside production sources.
 
 Four exact matches and one guarded draft committed separately through build/commit.sh. Only per-file check.py validation; no full build or network operations. Ghidra export is absent in this checkout.
+## Task 080C9848 — Golem defeat and reactions (2026-10-20)
+
+Tags: #matching #golem #register-pinning
+
+- **080C9848 matched**, named `Golem_UpdateDefeat`, in `src/golem_2.c`.
+  The Golem initializer references this callback alongside the default reaction
+  callback. It consumes field2B2, selects animation 10, releases attachment slots
+  0/1/3, clears group control and collision timers, plays song 0x13E, and marks
+  collider flags at 0x13A. Once field2B3 is set, it invokes terrain and optional
+  defeat scripts, records the category event, emits six sparks unless flags2CC
+  has 0x400, installs idle control, disables the shadow and marks its owner.
+  `Bat_UpdateDefeat` (08088CD4) provided the script arguments and particle burst.
+  A local group pointer preserved the group+0x4C addressing. Initializing zero
+  after taking the field2B2 address reduced realigned differences from 102 to 6;
+  a nested owner-group view fixed the final owner addressing. Register pinning
+  retains the burst table in sl and the collider mask/value in r0/r1, using an
+  empty compiler constraint only (no instruction body). Both the isolated
+  candidate (956 bytes) and complete unit passed `tools/check.py` byte-exactly.
+- **080C9C04 remains unmatched**, no draft retained. Reviewed first as the largest
+  target with asmat, condense and relatives. Entry sets context+0x628 bit 0x800,
+  clears actor flags2D0 bit 0x1000000, plays variant event sound, and branches on
+  flags2D4 bit 0x2000. The flagged path reverses saved facing, clears 0x2020,
+  sets movement bit 0x10 and resets route-motion state. Repeated terrain height,
+  route validation and charge transitions dominate the body. Golem_ReturnHome
+  (080CC910) explains 34%; Golem_ChargeOrReturnHome (080CEDF0) is another useful
+  source. No Ghidra export exists in this checkout. Stopped at structural
+  investigation without a complete candidate or score.
+- **080CBF24 remains unmatched**, no draft retained. Inspected asmat, condensed
+  listing and relatives. Entry consumes field2B1, invokes update270 and
+  sub_0812F3CC, waits until counter2AC > 60, releases attachment slot 0 with mode
+  2, and installs SceneActorReaction_RestoreAfterDelay with state/phase 3/1.
+  flags2D4 bit 0x80 selects further route/target handling; global 0x4800 selects
+  partner-player lookup. Golem_ReturnHome explains 34% of the body, including
+  route point copying and terrain height. Its complete branch structure still
+  needs reconstruction; stopped without a complete candidate or score.
+
+Only fast check.py validation was run; no full build or network operations.
+
+## Task 0813C9B4 — Player visual and action state (2026-10-20)
+
+Tags: #matching #player #register-pinning
+
+Five exact matches add approximately **0.113 percentage points** of code coverage
+(2,724 bytes). Two new guarded drafts are not exact progress. All changes are
+in `src/player_3.c`; each accepted function has its own driver commit and a
+file-local descriptive alias. Interpretations remain tentative.
+
+- **0813D178 matched**, `Player_InitVisualResources`: mode-zero resource selection
+  counts bonus flags 30, 29, 31 and action flag zero, selecting an individual
+  resource only when the count is at most one. Bonus flag 28 overrides that
+  selection. Modes 1, 2 and 6 select their own base resources. Initializes eight
+  resource selectors at +0xAB0. A local `u32 m = mask` inside the flag reader
+  reproduces mask-before-load ordering; the direct expression left seven
+  instruction-order differences. No register pins needed.
+- **0813E608 matched**, existing name `Player_BuildActionModifiers`: clears three
+  callback slots in each of three arrays, clears flag indices 0..6, and dispatches
+  two four-byte descriptor entries at +0xC. Installs modifier/hit callbacks,
+  sets periodic-stat flags and display choices, or subtracts category resistance.
+  Explicit callback pointers followed by increments fix initial counter setup;
+  a separate scoped flag-loop counter fixes allocation; a typed descriptor entry
+  fixes the final one-byte commutative-add difference. No register pins needed.
+- **0813D924 matched**, `Player_SelectTimedVisualMode`: consumes slot resource at
+  GameState +0x628, chooses resource-flash mode 6 and status-flash mode 2, advances
+  status timers, and restores the catalog option on expiry. Separate local slot
+  and global-state loads retain the required load-before-shift ordering. Typed
+  Player parameter fixes prologue copy ordering. No register pins needed.
+- **0813D548 matched**, `Player_QueueStatusEffect`: flushes incompatible pending
+  effects except kind 3, snapshots effect tick, resets a visual timer, samples a
+  random offset based on action mode, and queues effect 0xE10. Successful kind-2
+  emission adds ten to particleEmissionCount. `PlayerCue_ShakeEffect` supplies the
+  common random-vector/emission body; adding the missing prefix and kind-2
+  counter update produced an exact check immediately. Ordinary SceneVec members
+  reproduce the stack word read/modify/write shape; no custom bitfields needed.
+- **0813E90C matched**, `Player_ConfigureActionCollider`: configures descriptor
+  modes 0/4 with sizes 90/60, offset y=-25 and differing attack categories/costs;
+  action mode 6 uses size 170 and offset y=-20. Installs contact-cost callback
+  for descriptor modes. Ordinary SceneVec fields match the original aggregate
+  stores. Unsigned `0x10000U` is essential for two logical right shifts.
+- **0813CB8C drafted 87.9%**, `Player_UpdateVisualPalette`: covers enchantment
+  pulse, timed palette overlay, fade-out, reserved palette indices 5/6/13, and
+  visual-object vs actor destination selection. The unpinned draft scored 73.6%;
+  retaining incoming mode in r4 raises it to 87.9%. Remaining differences include
+  shared tail stores, timer load registers, and owner/source allocation. Unit
+  marked MATCHING_CONCESSION; no new exact function requires a pin. depin.py was
+  run: with the draft enabled it skips because the baseline is nonmatching;
+  testing removal separately confirms the score regression. Default-only depin
+  cannot assess hints hidden behind NONMATCHING.
+- **0813DB98 drafted 82.2%**, `Player_UpdateStatusVisuals`: status-five slowdown
+  ramps +0xAF2 to 64, controls songs 0x1EE/0x336 and the sound latch, scales both
+  movement speeds, and sets animation/status flags. Status six or action flag
+  three controls another visual flag. Cached speed locals prevent raw-pointer
+  aliasing from causing repeated timer loads. Remaining differences are inlined
+  decay allocation, flag-mask order and pointer lifetimes. No pins in this draft.
+- **0813C9B4 stopped, no retained draft**: full palette-blend candidate reached
+  40.8%. It preserves indices 5/6/13 for the actor palette, brightens source
+  channels with +0xAC6, clamps to 31, and combines weighted channels. Owner/source
+  spills and channel allocation differ substantially. Candidate remains only
+  in ignored build scratch files.
+- **0813CE20 stopped, no retained draft**: reconstructed alternate palette update
+  using the CB8C pulse/fade body and two repeated overlay copies. Best candidate
+  69.9%; textual expansion and mode pinning did not improve it. Extra saved r7,
+  pointer lifetimes and repeated palette-copy allocation remain. Below threshold.
+- **0813DF5C stopped, no retained draft**: complete effect initialization candidate
+  reached 68.9%. Initializes effect-group anchor, copies previous position,
+  initializes shadow and six effect components, then resets visual parameters
+  and globals. Typed known members plus raw accesses to unknown tail fields
+  produced different constant reuse and register allocation. Below threshold.
+- **0813EDDC stopped at structural investigation, no draft**: read BIG_FUNCTIONS,
+  asmat and condensed listing. Rebuilds equipment flags through a large
+  descriptor-driven switch. Condense folds repeated null checks and flag access
+  into five runs, leaving 495 instructions unfolded. The 0813F702 internal entry
+  is a finalization tail using the parent's saved registers, also reached by
+  early calls from this function; it is not an independent normal C function.
+  Existing boundaries retained. No complete candidate or defensible score; no
+  Ghidra export is present in this worktree.
+
+Validation: formatted directly with build/venv/bin/clang-format. Final default
+`tools/check.py src/player_3.c` reports zero differing bytes over 13,128 bytes.
+`--nonmatching --record` confirms both new draft scores and preserves the two
+preexisting draft scores (82.1% and 85.0%). Used local aliases for two external
+attack-charge names absent from the cached ELF symbol table. No full build,
+network operation, generated-file commit, or shared-document update was run.
