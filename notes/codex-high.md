@@ -1882,3 +1882,100 @@ No network, full build, generated-file edits, or shared-doc changes.
 
 The Ghidra export is absent locally. Fast check.py checks supplied acceptance;
 no full build was run. Combined ROM validation remains with integration.
+
+## 2026-10-20 — cloud task 080F67AC (Sword and Axe)
+
+Tags: #matching #sword #axe #animation #colliders
+
+Assigned-code matching reached 6.12%, a +6.12 percentage-point gain (404 of
+6,600 assigned bytes). One exact match and three guarded drafts were committed
+separately through build/commit.sh. No full build, network operation, shared-doc
+edit or generated-file commit was performed. Ghidra's local export is absent.
+
+- **080F67AC — stopped, 58.0% experimental candidate; no production draft.**
+  Tentative name Sword_InitBodyAndDisplays. Called by Sword_InitializeFromScript
+  after 080F6F90. Initializes body sequence at B58, body sprite B68, graphics B94,
+  shadow BB0, body colliders C1C/C70, four auxiliary sprites A8 (stride 2C),
+  their graphics 158 (stride 1C), and collider arrays 1C8/318 (stride 54).
+  Copies sixteen palette colors to D30 and uses that local palette thereafter.
+  Options A/T/p/K/V/M configure health/body properties, two attack-property
+  columns, position, a byte parameter, a halfword parameter and registry entry.
+  First unhinted draft was 49.7%; pinning the long-lived parent/body/resource
+  pointers gave 58.0%, 469 realigned differences / 172 ignoring registers.
+  Explicit initial-command input, a live flip mask, typed whole-task fields,
+  and several allocation variants did not improve it. Hard r7 pins combined
+  with typed fields can generate incorrect frame-relative accesses in agbcc;
+  do not accept those experiments on similarity alone. Scratch only:
+  wip/sub_080F67AC.c and wip/sword_init_support.h; unhinted/typed alternatives
+  are under build/080F67AC.*.c. Address lifetimes and the repeated animation
+  stepper remain substantially different. No >=80% candidate was obtained.
+- **080F79A8 — drafted 87.6%, Axe_UpdateOrbitAttack (tentative).**
+  Initializes center C98 from C88 and the actor's position, places the actor and
+  auxiliary sprite on opposite sides of an orbit, accelerates angular speed,
+  randomly reverses spin, steers the center toward the player and varies the
+  radius over timed intervals. Flag CAB.0 starts accelerating-trail phase 2E;
+  timeout disables six colliders and selects reverse-flicker phase 2F.
+  Typed actor/context/collider views improved 73.3% to 87.7%; entry-address and
+  collider grouping changes reduced structural differences further. Final
+  full-extent recorded score is 87.6%, 116 realigned differences / 64 ignoring
+  registers. Remaining differences include constant/address reuse, signedness
+  of the random-byte comparison, and recovery-loop/phase-pointer allocation.
+  No hints retained. Commit title used the preceding rounded score, 87.5%;
+  the source's recorded 87.6% is authoritative.
+- **080F6F90 — drafted 84.3%, Sword_InitAttackComponents (tentative).**
+  Configures four children at 4BC, stride 194; each has a 2C-byte sprite,
+  1C-byte graphics record and two 54-byte colliders. Reads c/C component/body
+  and attack settings; n defaults active component count D2C to four. A shared
+  stack animation sequence uses resource 922E/3F72, sequence 2 and row kind*4.
+  All four children advance that same temporary sequence once. Parent pointer
+  is stored at child+160, child index at 118 and initial dispatch state at 11E.
+  Typed component fields, caching animation flags, initializing collider offset
+  through its three bitfields, and passing sequence.commands separately into
+  the stepper improved the candidate to 84.3%. Retained one empty mask barrier
+  to preserve the animation timer mask's lifetime; marked register-pinning.
+  Explicit register pins regressed and were removed. Final full-extent check:
+  110 realigned differences / 26 ignoring registers, equal 1,224-byte extent.
+  depin.py was run on the unguarded candidate so it could not accept the asm
+  fallback; it correctly skipped a candidate that was not exact. Removing the
+  remaining barrier regressed below the draft threshold. Differences are
+  animation temporaries, address reuse and allocation.
+- **080F8648 — drafted 99.2%, Axe_UpdateReturningTrail (tentative).**
+  Starts velocity from facing at speed 12, spins the actor sprite, emits and
+  advances a trail at A24/A2C, steers toward the player for 120 frames and then
+  back toward the actor at speed 8. Near arrival (squared XZ distance <=1023)
+  or after 600 frames, snaps the trail to the actor and selects rotation phase
+  29. The first typed draft was 89.7%. Reversing commutative vector-add operands,
+  declaring callback/phase inside the transition block after its position copy,
+  and using a clear-flags inline with pointer first produced 99.2%. Only six
+  realigned instructions differ (four ignoring registers): player literal vs.
+  stack-address scheduling and the saved stack-vector pointer used by the two
+  square calculations. Typed player pointers, cast-based vector loads, a length
+  helper, reordered inline arguments and scoped distance locals did not help.
+  No pins/barriers retained. Full 972-byte extent checked with --nonmatching.
+- **080F8E68 — matched, Axe_UpdateTargetWindup (tentative), no hints.**
+  Saves actor facing at ED3 and the player's position at F1C, sets ED0, and plays
+  sound 16F. Rotates the drawable toward a windup angle, choosing delay/turn
+  speed from E3E/E3F according to health threshold E48; once rotation magnitude
+  exceeds 48 and delay expires, starts callback 080F8FFC, phase 36.
+  Reused NormalizeAngle and the established SceneActorRegistryResetView.
+  First candidate matched. Formatted and checked over the reviewed complete
+  404-byte extent; zero differing bytes.
+- **080F75C0 — stopped at 74.0%; no production draft.**
+  Tentative name Axe_OnOrbitColliderContact. Shares the standard unavailable
+  actor guard; applies contact reaction and initializes actor+172/+2E6/+178
+  from contact+3E/+43/+44. When CAB.1 is set and EB0 >2, disables the three
+  attack/body collider pairs, starts reverse-flicker phase 2F and clears EB0.
+  A RecoverOrbit inline accepting the individual phase-field pointers explains
+  their materialization before the collider loop, improving the first 42.1%
+  draft to 73.1%. Separate flag pointers reached 74.0% (50 realigned differences,
+  23 ignoring registers). Loop syntax variants, a caller-owned counter and a
+  pinned counter did not improve it. The ROM uses an increasing counter and
+  preserved stride register; the candidate reverses/eliminates that induction
+  variable and allocates the saved phase-field pointers differently. Best
+  scratch: wip/sub_080F75C0.c. No >=80% candidate was obtained.
+
+Useful shared technique: model vectors and colliders with observed types first;
+commutative operand order and where an inline's arguments are materialized can
+change many instructions without changing behavior. Score big functions with
+the realigned structural count. All accepted production changes retain readable
+C and the three nonmatches retain their default INCLUDE_ASM fallback.
