@@ -1,8 +1,10 @@
+// confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
+#define Vorn_ResumeReactionRoute sub_080AE6F0
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: resumes the route or runs the recovery script.
 #ifdef NONMATCHING
-// fuzzy: 83.9%
+// fuzzy: 82.8%
 // Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation; caching flags reduces register differences.
 extern const u8 gUnk_0824E20C[];
 u8 sub_080B54DC(void *);
@@ -99,5 +101,5 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     actor->field2C2 = 64;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Vorn_ResumeReactionRoute);
+INCLUDE_ASM("asm/nonmatching", sub_080AE6F0);
 #endif
