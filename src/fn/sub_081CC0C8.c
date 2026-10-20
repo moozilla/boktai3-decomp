@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateActor_StartAnimStep sub_081CC0C8
 struct S {
     u8 f0;
     u8 b1;
