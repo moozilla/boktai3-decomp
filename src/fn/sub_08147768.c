@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define Player_UpdateFormChangeCue sub_08147768
 // confidence=low: motion ten toggles actionMode between zero and one and refreshes equipment.
 extern u32 gUnk_030053F4, gUnk_02000560;
 u32 Player_ConsumeStateEntry(struct Player *);

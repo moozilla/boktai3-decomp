@@ -41,7 +41,6 @@ static inline u32 RandomFrom(const u16 *table)
     v &= 3;
     return v + 1;
 }
-#define Vorn_UpdateDefeat sub_080AEE08
 void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     s32 values[8];
@@ -92,16 +91,16 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             register struct ContactPosition *position asm("r6");
             SparkParticle_Spawn(position = &actor->position, Random4(), range, 0x20, count = 4,
                                 duration = 20, scale = 2, 1);
-            SparkParticle_Spawn(position, RandomFrom(table), range, 0x40, count, duration,
-                                scale, 1);
-            SparkParticle_Spawn(position, RandomFrom(table), range, 0x5E, count, duration,
-                                scale, 1);
-            SparkParticle_Spawn(position, RandomFrom(table), range, 0x80, count, duration,
-                                scale, 1);
-            SparkParticle_Spawn(position, RandomFrom(table), range, 0xC4, count, duration,
-                                scale, 1);
-            SparkParticle_Spawn(position, RandomFrom(table), range, 0xF0, count, duration,
-                                scale, 1);
+            SparkParticle_Spawn(position, RandomFrom(table), range, 0x40, count, duration, scale,
+                                1);
+            SparkParticle_Spawn(position, RandomFrom(table), range, 0x5E, count, duration, scale,
+                                1);
+            SparkParticle_Spawn(position, RandomFrom(table), range, 0x80, count, duration, scale,
+                                1);
+            SparkParticle_Spawn(position, RandomFrom(table), range, 0xC4, count, duration, scale,
+                                1);
+            SparkParticle_Spawn(position, RandomFrom(table), range, 0xF0, count, duration, scale,
+                                1);
         }
         category = actor->category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -130,7 +129,10 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         if (!actor->drawableKind)
             *(u32 *)actor->drawable |= mask;
         else {
-            struct VornDrawableTail { u32 unknown0[2]; u32 flags; } *tail;
+            struct VornDrawableTail {
+                u32 unknown0[2];
+                u32 flags;
+            } *tail;
             tail = (void *)((u8 *)actor->drawable + 0x20);
             tail->flags |= mask;
         }
@@ -162,5 +164,5 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AEE08);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
 #endif

@@ -2,7 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "player.h"
-#define Golem_UpdateChargePursuit sub_080CCD7C
 // confidence=low: Golem behavior table dispatches charge pursuit using stored heading, speed and stamina.
 #ifdef NONMATCHING
 // fuzzy: 80.4%
@@ -17,8 +16,8 @@ void Skeleton_StepPosition(struct ContactPosition *, u32);
 void sub_080C47DC(void *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
 void SceneActorReaction_SlideBack(void);
-void sub_080C68F0(void);
-void sub_080C6A68(void);
+void Golem_UpdateChargeStop(void);
+void Golem_UpdateChargeRecovery(void);
 
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
@@ -201,7 +200,7 @@ static inline void SetControlZ(struct SceneActorRegistryResetView *actor, u32 ki
         if (body->stamina680 > 0)                                                                  \
             goto resume;                                                                           \
         {                                                                                          \
-            void *target = sub_080C68F0;                                                           \
+            void *target = Golem_UpdateChargeStop;                                                 \
             SetControlZ(BODY, 0x27, target, byteZero, zero);                                       \
         }                                                                                          \
         behavior = 3;                                                                              \
@@ -516,7 +515,7 @@ route:
             resume:
                 body->target69C = *(struct ContactPosition *)(body->route5D0 + 0x1C);
                 {
-                    void *target = sub_080C6A68;
+                    void *target = Golem_UpdateChargeRecovery;
                     SetControlZ(BODY, 0x26, target, byteZero, zero);
                 }
                 behavior = 2;
@@ -570,5 +569,5 @@ advance:
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CCD7C);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargePursuit);
 #endif

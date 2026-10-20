@@ -91,8 +91,14 @@ selected:;
 
 #include "scene_actor_reaction.h"
 void Mummy_UpdateRevival(void *);
-static inline u8 TakePrepared(u8 *p) { if (*p) { *p = 0; return 1; } return 0; }
-#define Mummy_UpdateHiddenRecovery sub_080D1CD0
+static inline u8 TakePrepared(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
 void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u32 queued;
@@ -109,7 +115,8 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
     if (*prepared) {
         *prepared = 0;
         queued = 1;
-    } else queued = 0;
+    } else
+        queued = 0;
     if (queued)
         ActorShadow_Disable((u8 *)actor + 0x320);
     else if (frame > 0x1A) {
@@ -125,12 +132,16 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         actor->field2B5 = kind;
         actor->target = callback;
         actor->field2C8 = zero;
-        { u32 *flags = &actor->flags114; s32 mask = ~1; *flags &= mask; }
+        {
+            u32 *flags = &actor->flags114;
+            s32 mask = ~1;
+            *flags &= mask;
+        }
         actor->word104 = zero;
     } else
         actor->field2B3 = queued;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D1CD0);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
 #endif

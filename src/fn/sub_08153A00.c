@@ -157,7 +157,6 @@ void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
 extern u8 *gUnk_030042E4;
-#define PlayerCue_UpdateSideWalkTarget sub_08153A00
 // confidence=low: state-four variant uses eight-facing animation and axis-dependent speed.
 void PlayerCue_UpdateSideWalkTarget(struct P *p)
 {
@@ -213,5 +212,5 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08153A00);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideWalkTarget);
 #endif

@@ -13,7 +13,6 @@ static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
 }
 
 // confidence=low: dog cohort variant of the shared delayed restoration routine.
-#define Dog_RestoreRoute sub_080DDEC8
 void Dog_RestoreRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

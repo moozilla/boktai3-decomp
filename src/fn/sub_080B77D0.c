@@ -74,7 +74,6 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     return 0;
 }
 // confidence=low: probes neighboring cells in facing order and routes toward a retreat cell
-#define Skeleton_TrySelectRetreatCell sub_080B77D0
 static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 priorDirection,
                                 s32 steps)
 {
@@ -164,5 +163,5 @@ u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *actor, u32
     return SelectRetreat(actor, priorDirection, 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B77D0);
+INCLUDE_ASM("asm/nonmatching", Skeleton_TrySelectRetreatCell);
 #endif

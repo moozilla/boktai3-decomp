@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Slime_ResolveBodyContact sub_0808E2CC
 
 #ifdef NONMATCHING
 // fuzzy: 88.1%
@@ -103,5 +102,5 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808E2CC);
+INCLUDE_ASM("asm/nonmatching", Slime_ResolveBodyContact);
 #endif

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define Player_UpdateEnergyBurst sub_0814692C
 // confidence=low: energy-gated action creates ActorBurst and sets the shared burst latch.
 extern u16 gUnk_02000570;
 u32 Player_ConsumeStateEntry(struct Player *);

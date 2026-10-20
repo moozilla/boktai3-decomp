@@ -13,8 +13,13 @@ struct GroupLink {
     u32 unknown0;
     u32 flags;
 };
-struct FlagHalfword { s16 bits : 16; };
-static inline void ClearHit(struct FlagHalfword *flags, u32 mask) { flags->bits = mask & flags->bits; }
+struct FlagHalfword {
+    s16 bits : 16;
+};
+static inline void ClearHit(struct FlagHalfword *flags, u32 mask)
+{
+    flags->bits = mask & flags->bits;
+}
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -93,7 +98,6 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->word104 = 0;
 }
-#define SceneActorReaction_RecordDefeat sub_08134398
 u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags2C0;
@@ -229,4 +233,3 @@ u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
     }
     return (u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x268));
 }
-

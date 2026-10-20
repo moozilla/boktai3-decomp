@@ -1,7 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 92.8%
-#define Vanargand_UpdateChargedPairAttack sub_081A9F88
 // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
 struct Pair {
     u8 pad0[0x205];
@@ -39,7 +38,7 @@ void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 sub_081B64D4(void *);
+s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
@@ -93,7 +92,7 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 0x13);
                 p->timer++;
             }
-            if (sub_081B64D4(self->pair)) {
+            if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 u8 next = 2;
                 u32 zero = 0;
                 p->phase = next;
@@ -105,7 +104,7 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 0xC);
                 p->timer++;
             }
-            if (sub_081B64D4(self->pair)) {
+            if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 struct Pair *pair = self->pair;
                 u8 a = pair->first;
                 u8 b = pair->second;
@@ -135,5 +134,5 @@ void Vanargand_UpdateChargedPairAttack(struct Vanargand *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081A9F88);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateChargedPairAttack);
 #endif

@@ -19,14 +19,14 @@ struct SwordTask {
     u8 unknownD84[4];
     struct SwordStatus status;
 };
-void sub_080F645C(struct SwordTask *);
+void Sword_UpdateDamage(struct SwordTask *);
 void Ivy_DispatchState(void *);
 void Sword_UpdateComponents(void *);
 s32 Sword_UpdateTask(struct SwordTask *p)
 {
     if (p->owner->flags & 4)
         return 1;
-    sub_080F645C(p);
+    Sword_UpdateDamage(p);
     if (p->health <= 0 || (p->flagsC22 & 4)) {
         struct SwordStatus *status = &p->status;
         u32 mask = 1;

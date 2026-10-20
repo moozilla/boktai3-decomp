@@ -20,10 +20,10 @@ void Terrain_LoadPathsResource(u16);
 void sub_0821F15C(u16);
 struct TerrainTask *ResourceRegistry_GetResource(u32);
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
-void sub_08217F4C(void);
+void SpriteOam_QueueProjectedSprites(void);
 void sub_08214B44(void);
 void sub_08219624(void);
-void sub_08218254(void);
+void SpriteOam_QueueCameraRelativeSprites(void);
 void sub_08214D20(void);
 void sub_0821964C(void);
 /* Script: loads the stage terrain, either from one HP resource (-p) or from
@@ -56,11 +56,13 @@ void Terrain_LoadFromScript(void)
     if (Script_SeekToKeyword('v')) {
         s32 mode = Script_GetValue();
         if (mode == 0) {
-            Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
+            Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44,
+                                     sub_08219624);
             gUnk_030042A0.x = g->originX >> 4;
             gUnk_030042A0.y = g->originY >> 4;
         } else {
-            Video_SetRenderCallbacks(mode, sub_08218254, sub_08214D20, sub_0821964C);
+            Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
+                                     sub_0821964C);
             gUnk_030042A0.x = 0;
             gUnk_030042A0.y = 0;
         }

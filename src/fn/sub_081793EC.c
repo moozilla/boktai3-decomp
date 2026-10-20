@@ -1,5 +1,4 @@
 #include "global.h"
-#define FieldHud_UpdateTimeDigits sub_081793EC
 s32 Div(s32, s32);
 void Anim_SelectWidgetGlyph(void *, void *, u16);
 void FieldHud_UpdateTimeDigits(u8 *p)

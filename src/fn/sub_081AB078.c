@@ -1,5 +1,4 @@
 #include "global.h"
-#define Vanargand_UpdatePaletteLeap sub_081AB078
 // confidence=low: palette transition accompanies the leap motion track.
 #ifdef NONMATCHING
 // fuzzy: 93.0%
@@ -204,5 +203,5 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AB078);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteLeap);
 #endif

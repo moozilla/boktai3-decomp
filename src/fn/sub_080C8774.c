@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-#define Golem_ResumeBehaviorAfterDisplacement sub_080C8774
 // confidence=low: Golem initialization installs this displacement recovery callback.
 #ifdef NONMATCHING
 // fuzzy: 95.8%
@@ -403,5 +402,5 @@ moving: {
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C8774);
+INCLUDE_ASM("asm/nonmatching", Golem_ResumeBehaviorAfterDisplacement);
 #endif

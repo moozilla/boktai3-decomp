@@ -7,9 +7,9 @@
 #include "engine.h"
 
 // confidence=low: animation checkpoint emits repeated aimed shots; projectile kind is unknown.
-#define Mummy_FireAcceleratingVolley sub_080D62CC
 s32 Div(s32, s32);
-void sub_080692C8(struct ContactPackedVector *, struct ContactPosition *, struct ContactPosition *, u32, u32, u32, u32);
+void sub_080692C8(struct ContactPackedVector *, struct ContactPosition *, struct ContactPosition *,
+                  u32, u32, u32, u32);
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 value)
 {
@@ -17,7 +17,8 @@ static inline s32 Scale(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-static inline void Subtract(struct ContactPosition *out, struct ContactPosition *from, struct ContactPosition *to)
+static inline void Subtract(struct ContactPosition *out, struct ContactPosition *from,
+                            struct ContactPosition *to)
 {
     out->x = to->x - from->x;
     out->y = to->y - from->y;
@@ -65,9 +66,15 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     if (speed > *(u16 *)(body + 0x6cc))
         speed = *(u16 *)(body + 0x6cc);
     switch (actor->paletteOffset) {
-        case 0: count = 1; break;
-        case 1: count = 2; break;
-        default: count = 3; break;
+        case 0:
+            count = 1;
+            break;
+        case 1:
+            count = 2;
+            break;
+        default:
+            count = 3;
+            break;
     }
     facing = ((actor->direction + 32) & 255) >> 6 << 6;
     difference = actor->fieldE9 - facing;
@@ -94,5 +101,5 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D62CC);
+INCLUDE_ASM("asm/nonmatching", Mummy_FireAcceleratingVolley);
 #endif

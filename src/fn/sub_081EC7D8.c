@@ -2,7 +2,6 @@
 #include "global.h"
 #include "contact_swarm.h"
 
-#define ActorDisplay_UpdateForegroundSprite sub_081EC7D8
 // confidence=low: foreground role inferred from screen-coordinate placement and its refresh caller.
 struct Drawable {
     struct ContactSwarmSprite sprite;
@@ -168,9 +167,13 @@ void ActorDisplay_UpdateForegroundSprite(u8 *input)
         if (p[0xB3]) {
             off1 = 0x5E4;
             screen = (u16 *)(p + off1);
-            if (*(s16 *)screen) draw->sprite.flags |= 1;
-            else draw->sprite.flags &= ~1;
-        } else draw->sprite.flags &= ~1;
+            if (*(s16 *)screen)
+                draw->sprite.flags |= 1;
+            else
+                draw->sprite.flags &= ~1;
+        } else
+            draw->sprite.flags &= ~1;
     }
-    if (draw->mode != 1) draw->ended = StepPlayback(draw);
+    if (draw->mode != 1)
+        draw->ended = StepPlayback(draw);
 }

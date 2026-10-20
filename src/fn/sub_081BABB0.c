@@ -10,7 +10,7 @@ struct Registry3F74 {
 };
 
 void Video_SetRenderCallbacks(int, void *, void *, void *);
-void sub_08217F4C(void);
+void SpriteOam_QueueProjectedSprites(void);
 void sub_08214B44(void);
 void sub_08219624(void);
 void Registry3F74_InitBackground(struct Registry3F74 *);
@@ -24,7 +24,7 @@ s32 Registry3F74_InitFromScript(struct Registry3F74 *p)
 {
     s32 i;
     s32 *entry;
-    Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
+    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
     Registry3F74_InitBackground(p);
     sub_081BA81C(p);
     if (Script_SeekToKeyword('p')) {

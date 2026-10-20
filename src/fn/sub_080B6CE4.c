@@ -11,7 +11,7 @@ struct SceneActorReactionContext {
     u32 flags6DC;
 };
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
@@ -63,7 +63,7 @@ void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
         p->group.field418 = p->group.field416;
         if (Test16(&p->flags2D4, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->active) {
             if (!ContextBlocked(context))
-                sub_080B7C10(p);
+                Skeleton_SelectDistanceReaction(p);
         } else {
             SceneActorControl_SelectBehaviorByTargetAngle(p);
         }

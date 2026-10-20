@@ -1,7 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 96.2%
-#define Vanargand_UpdateRepeatedPairAttack sub_081AA178
 // confidence=low: command 9 alternates selected halves for six timed attacks.
 struct Vanargand {
     u8 pad0[0x9C];
@@ -31,7 +30,7 @@ void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 sub_081B64D4(void *);
+s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
@@ -68,7 +67,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             if (p->timer == 0) {
                 PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 7);
                 p->timer++;
-            } else if (sub_081B64D4(p->pair)) {
+            } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 p->selected = (RandomValue() >> 4) & 1;
                 p->phase = 1;
                 p->timer = phase;
@@ -92,7 +91,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             }
             break;
         case 2:
-            if (sub_081B64D4(p->pair)) {
+            if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 if (++p->timer > 15) {
                     p->phase = 3;
                     p->timer = result;
@@ -106,5 +105,5 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081AA178);
+INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateRepeatedPairAttack);
 #endif

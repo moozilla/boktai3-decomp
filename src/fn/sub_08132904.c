@@ -91,9 +91,17 @@ fail:
     return 0;
 }
 
-struct FlagHalfword { s16 bits : 16; };
-static inline void ClearHit(struct FlagHalfword *flags, u32 mask) { flags->bits = mask & flags->bits; }
-static inline void SetHit(u16 *p, u32 bit) { *p = bit | *p; }
+struct FlagHalfword {
+    s16 bits : 16;
+};
+static inline void ClearHit(struct FlagHalfword *flags, u32 mask)
+{
+    flags->bits = mask & flags->bits;
+}
+static inline void SetHit(u16 *p, u32 bit)
+{
+    *p = bit | *p;
+}
 static inline void Fill(u32 *zero, void *dst)
 {
     *zero = 0;
@@ -120,7 +128,6 @@ static inline u32 GetFlags(u32 **out, struct SceneActorRegistryResetView *actor,
     return result;
 }
 // Area-effect damage with a random knockback heading.
-#define SceneActorReaction_ApplyLinkedAreaDamage sub_08132904
 u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *actor)
 {
     u32 *flags2CC;
@@ -161,8 +168,14 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
             *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
-        { u32 eight = 8; actor->field1E8 = eight; }
-        { u32 bit = 0x8000; *flags2CC |= bit; }
+        {
+            u32 eight = 8;
+            actor->field1E8 = eight;
+        }
+        {
+            u32 bit = 0x8000;
+            *flags2CC |= bit;
+        }
         if (ShouldShowDamage(actor)) {
             u32 zero;
             u32 buffer[2];
@@ -173,7 +186,8 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             SceneHud_SetTimedState(actor->id, h, max, kind, 0, param);
             Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
-                DamageNumberDisplay_Show(collider, actor->reactionSoundVariant, 0, position, buffer, 1);
+                DamageNumberDisplay_Show(collider, actor->reactionSoundVariant, 0, position, buffer,
+                                         1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, dx, dz);
@@ -206,8 +220,15 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
-        { register u32 bit asm("r0") = 0x20; asm("" : "+r"(bit)); actor->flags2D4 = bit | actor->flags2D4; }
-        { void *control = actor->reactionTarget230; Reaction_SetControl(actor, 0x12, control); }
+        {
+            register u32 bit asm("r0") = 0x20;
+            asm("" : "+r"(bit));
+            actor->flags2D4 = bit | actor->flags2D4;
+        }
+        {
+            void *control = actor->reactionTarget230;
+            Reaction_SetControl(actor, 0x12, control);
+        }
         {
             u32 state = 3;
             actor->state2A8 = state;
@@ -217,7 +238,10 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             actor->field2B1 = 1;
         }
     }
-    { u32 mask = 0x2000; *flags2CC |= mask; }
+    {
+        u32 mask = 0x2000;
+        *flags2CC |= mask;
+    }
     return 1;
 fail:
     return 0;
@@ -225,5 +249,5 @@ fail:
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08132904);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyLinkedAreaDamage);
 #endif

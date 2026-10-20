@@ -52,7 +52,6 @@ static inline s32 WaitTime(struct GolemChargeContext *context, u32 mask, s32 shi
     }
     return ((Random() & 3) << shift) + base;
 }
-#define Golem_UpdateChargeBuildup sub_080C63D0
 // confidence=low: ramps speed and waits for a species-dependent windup duration.
 void Golem_UpdateChargeBuildup(struct SceneActorRegistryResetView *actor, s32 frame)
 {

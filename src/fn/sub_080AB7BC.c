@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define TentacleActor_UpdateSegmentColliders sub_080AB7BC
-
 #ifdef NONMATCHING
 // fuzzy: 93.1%
 // Remaining differences include stack-vector scheduling, flag access, and register allocation.
@@ -110,7 +108,10 @@ void TentacleActor_UpdateSegmentColliders(struct P *pp)
                     SetAttack(b, p, 2);
                 } else {
                     {
-                        struct AttackFlags { u8 pad[6]; u16 flags; };
+                        struct AttackFlags {
+                            u8 pad[6];
+                            u16 flags;
+                        };
                         struct AttackFlags *f = (void *)(base + off + 0x41c);
                         f->flags |= 0x100;
                     }
@@ -127,5 +128,5 @@ void TentacleActor_UpdateSegmentColliders(struct P *pp)
     } while (i < *(s16 *)(base + 0x8da));
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AB7BC);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateSegmentColliders);
 #endif

@@ -86,27 +86,43 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
-struct FlagHalfword { s16 bits : 16; };
-static inline void ClearHit(struct FlagHalfword *flags, u32 mask) { flags->bits = mask & flags->bits; }
-static inline void SetHit(u16 *p, u32 bit) { *p = bit | *p; }
+struct FlagHalfword {
+    s16 bits : 16;
+};
+static inline void ClearHit(struct FlagHalfword *flags, u32 mask)
+{
+    flags->bits = mask & flags->bits;
+}
+static inline void SetHit(u16 *p, u32 bit)
+{
+    *p = bit | *p;
+}
 static inline void Fill(u32 *zero, void *dst)
 {
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-#define SceneActorReaction_ApplyStaggerDamage sub_0813214C
 void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *actor)
 {
     u8 *collider = (u8 *)&actor->colliderA;
-    { u32 damage = actor->reactionSoundVariant; actor->health -= damage; }
+    {
+        u32 damage = actor->reactionSoundVariant;
+        actor->health -= damage;
+    }
     if (!(actor->field2D8 & 0x20000)) {
         u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
             *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
-        { u32 eight = 8; actor->field1E8 = eight; }
-        { u32 bit = 0x8000; actor->flags2CC |= bit; }
+        {
+            u32 eight = 8;
+            actor->field1E8 = eight;
+        }
+        {
+            u32 bit = 0x8000;
+            actor->flags2CC |= bit;
+        }
         if (ShouldShowDamage(actor)) {
             u32 zero;
             u32 buffer[2];
@@ -117,7 +133,8 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
             SceneHud_SetTimedState(actor->id, health, max, kind, 0, param);
             Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
-                DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0, &actor->position, buffer, 1);
+                DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
+                                         &actor->position, buffer, 1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, 0, 0);
@@ -151,8 +168,15 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
-        { register u32 bit asm("r0") = 0x20; asm("" : "+r"(bit)); actor->flags2D4 = bit | actor->flags2D4; }
-        { void *control = SceneActorReaction_PlayStaggerBurst; Reaction_SetControl(actor, 0x21, control); }
+        {
+            register u32 bit asm("r0") = 0x20;
+            asm("" : "+r"(bit));
+            actor->flags2D4 = bit | actor->flags2D4;
+        }
+        {
+            void *control = SceneActorReaction_PlayStaggerBurst;
+            Reaction_SetControl(actor, 0x21, control);
+        }
         {
             u32 state = 3;
             actor->state2A8 = state;
@@ -162,5 +186,8 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
             actor->field2B1 = 1;
         }
     }
-    { u32 mask = 0x2000; actor->flags2CC |= mask; }
+    {
+        u32 mask = 0x2000;
+        actor->flags2CC |= mask;
+    }
 }

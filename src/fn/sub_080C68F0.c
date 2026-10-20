@@ -17,7 +17,6 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-#define Golem_UpdateChargeStop sub_080C68F0
 // confidence=low: charge and slide behaviors install this completion control.
 void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 {
@@ -124,5 +123,5 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C68F0);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeStop);
 #endif

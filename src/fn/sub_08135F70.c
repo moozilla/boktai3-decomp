@@ -6,12 +6,12 @@
 // shared hit-flag expansion and temporary-register choices (see worker notes).
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
-u8 sub_08131D5C(void *);
+u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorBehavior_PlayReactionSound(void *);
-void sub_08134398(void *);
+void SceneActorReaction_RecordDefeat(void *);
 void SceneActorTerrain_ClearCollisionTimers(void *);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -232,7 +232,6 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-#define SceneActorReaction_ResolveDamage sub_08135F70
 u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags2D4;
@@ -245,7 +244,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 bits;
 
     if (!HasPendingHit(actor)) {
-        if (sub_08131D5C(actor)) {
+        if (SceneActorReaction_ApplyAreaDamage(actor)) {
             flags2D4 = &actor->flags2D4;
             UpdateHitFlags(actor, flags2D4);
             SceneActor_ClearReactionFlags(actor);
@@ -340,11 +339,11 @@ done: {
     keep &= value;
     *flags2CC = (value & 0xFFFEBE3F) | keep;
 }
-    sub_08134398(actor);
+    SceneActorReaction_RecordDefeat(actor);
     UpdateHitFlagsShared(actor, flags2D4, flags2CC);
     SceneActorTerrain_ClearCollisionTimers(actor);
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08135F70);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ResolveDamage);
 #endif

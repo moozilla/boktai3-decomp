@@ -134,7 +134,6 @@ static inline void Step(struct ContactSwarmSprite *sprite, struct DisplaySequenc
         }
     }
 }
-#define PlayerCue_UpdateMotionFade sub_08152174
 // confidence=low: motion 7 changes sprite scale and visibility over six phases.
 void PlayerCue_UpdateMotionFade(struct P *p)
 {
@@ -211,5 +210,5 @@ void PlayerCue_UpdateMotionFade(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08152174);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
 #endif

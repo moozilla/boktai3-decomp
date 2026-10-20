@@ -1,5 +1,4 @@
 #include "global.h"
-#define Player_UpdateSelectedAttackCharge sub_0814E3D8
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
@@ -11,7 +10,7 @@ void Player_UpdateAttackFacing(void *);
 void Sound_PlaySong(u32);
 u8 *Player_GetSpecialAttackDescriptor(s32);
 s32 ActorResponse_Apply(void *, s32);
-s32 sub_0814DFDC(void *);
+s32 Player_SpawnSelectedAttackProjectile(void *);
 void sub_081DAD94(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
@@ -80,7 +79,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                     goto release;
                 if (BYTE(0xBF4) != 8)
                     goto charged;
-                if (!sub_0814DFDC(p))
+                if (!Player_SpawnSelectedAttackProjectile(p))
                     goto release;
                 Player_SetActionPhase(p, 2);
             }
@@ -130,7 +129,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             break;
         case 5:
             if (!HALF(0x45A)) {
-                if (!sub_0814DFDC(p))
+                if (!Player_SpawnSelectedAttackProjectile(p))
                     Player_SetActionPhase(p, 6);
                 HALF(0xC0A)++;
             }
@@ -185,5 +184,5 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0814E3D8);
+INCLUDE_ASM("asm/nonmatching", Player_UpdateSelectedAttackCharge);
 #endif

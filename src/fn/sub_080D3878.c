@@ -54,7 +54,6 @@ static inline u32 RandomFrom(const u16 *table)
     v &= 3;
     return v + 1;
 }
-#define Mummy_UpdateDefeat sub_080D3878
 void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     s32 values[8];
@@ -112,40 +111,40 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         return;
     actor->field2B0 = 1;
     {
-    u32 test = Flag(actor, 0x400, 0x2CC);
-    motionFlags = &actor->flags2D4;
-    if (!test) {
-        u8 category;
-        if (!Flag(actor, 0xA007, 0x2D4)) {
-            SceneEffect_EmitPositionPattern(actor);
-            SceneStimulus_AddUntagged(actor->position.x, actor->position.z, 0x400, 0, 1);
-        } else {
-        rangeB.x = 80;
-        rangeB.y = 60;
-        rangeB.z = 60;
-        {
-            register const u16 *table asm("sl") = gUnk_0203B400;
-            s32 duration;
-            s32 scale;
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
-                                duration = 20, scale = 2, 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x40, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x5E, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x80, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xC4, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xF0, 4, duration,
-                                scale, 1);
+        u32 test = Flag(actor, 0x400, 0x2CC);
+        motionFlags = &actor->flags2D4;
+        if (!test) {
+            u8 category;
+            if (!Flag(actor, 0xA007, 0x2D4)) {
+                SceneEffect_EmitPositionPattern(actor);
+                SceneStimulus_AddUntagged(actor->position.x, actor->position.z, 0x400, 0, 1);
+            } else {
+                rangeB.x = 80;
+                rangeB.y = 60;
+                rangeB.z = 60;
+                {
+                    register const u16 *table asm("sl") = gUnk_0203B400;
+                    s32 duration;
+                    s32 scale;
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
+                                        duration = 20, scale = 2, 1);
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x40, 4,
+                                        duration, scale, 1);
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x5E, 4,
+                                        duration, scale, 1);
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x80, 4,
+                                        duration, scale, 1);
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xC4, 4,
+                                        duration, scale, 1);
+                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xF0, 4,
+                                        duration, scale, 1);
+                }
+                category = actor->category;
+                if (category == 4 || category == 1 || category == 5 || category == 7 ||
+                    category == 6 || category == 0x18 || category == 0x19)
+                    Sound_PlaySong(0xE5);
+            }
         }
-        category = actor->category;
-        if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
-            category == 0x18 || category == 0x19)
-            Sound_PlaySong(0xE5);
-        }
-    }
     }
     SceneActorBehavior_CallTerrainScript(actor);
     script = *(u16 *)((u8 *)actor + 0x1F8);
@@ -212,5 +211,5 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D3878);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateDefeat);
 #endif

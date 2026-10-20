@@ -165,7 +165,6 @@ static inline void Face(struct P *p)
         p->flip = 0;
     }
 }
-#define PlayerCue_UpdateSideDeparture sub_08153E1C
 // confidence=low: camera lift and scale descent precede hidden cue state.
 void PlayerCue_UpdateSideDeparture(struct P *p)
 {

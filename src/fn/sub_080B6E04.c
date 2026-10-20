@@ -136,7 +136,6 @@ static inline void OrFlags(u16 *flags, u32 mask)
 }
 
 // confidence=low: category-independent callback restores route target and resumes pursuit
-#define Skeleton_RestorePursuitRoute sub_080B6E04
 void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonRouteContext *context = actor->context;

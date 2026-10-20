@@ -3,7 +3,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* SceneActorReaction_TrySink: when a live, unblocked actor stands on a sinking cell (cell flag 0x40) at or below the ground height, hands control to its sink callback (default SceneActorReaction_SinkAndRemove, kind 0x16) in state 3 and marks it sinking (flags2D0 |= 0x20000); returns whether it did (provisional name) */
-#define SceneActorReaction_TrySink sub_080B8B84
 void SceneActorReaction_SinkAndRemove(void);
 
 static inline u8 Blocked(struct SceneActorRegistryResetView *actor)

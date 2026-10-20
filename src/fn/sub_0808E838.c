@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#define Slime_UpdateRandomWait sub_0808E838
 // confidence=low: plays profile animation 15 with a random duration, then enters the next Slime control.
 void sub_0808E9A0(void);
 static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 index, u32 inputFlags)

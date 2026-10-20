@@ -18,7 +18,6 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-#define Golem_UpdateRouteMotion sub_080C66B0
 // confidence=low: return-home behaviors use this control while moving to a cell center.
 void Golem_UpdateRouteMotion(struct SceneActorRegistryResetView *actor, u32 frame)
 {

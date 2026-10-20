@@ -2,7 +2,7 @@
 #include "player.h"
 void Player_EnterKindTwo(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
-void sub_08153E1C(struct Player *);
+void PlayerCue_UpdateSideDeparture(struct Player *);
 void sub_0815093C(struct Player *);
 void PlayerCue_BeginMode27(struct Player *p, s32 facing, s32 variant, u32 parameter)
 {
@@ -15,7 +15,7 @@ void PlayerCue_BeginMode27(struct Player *p, s32 facing, s32 variant, u32 parame
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0x1B, 0);
     if (p->actionMode == 4) {
-        p->triggerAnimationCallback = sub_08153E1C;
+        p->triggerAnimationCallback = PlayerCue_UpdateSideDeparture;
     } else {
         if (p->actionMode == 5) {
             p->actionLatch464 = 1;

@@ -133,9 +133,8 @@ done:
 }
 
 // confidence=low: straight-path test falls back to player route reacquisition.
-#define Mummy_TryDirectPursuit sub_080D6608
 u8 sub_0812E118(s32, s32, s32, u32);
-u8 sub_080D6FDC(struct SceneActorRegistryResetView *);
+u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
 extern u16 gUnk_02000508;
 static inline s32 GridWidth(void)
 {
@@ -194,7 +193,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     if (goal == actor->terrainCell || FindPath(actor, goal))
         return 1;
     if (!*(u16 *)(body + 0x6d2) && actor->terrainCell == goal) {
-        sub_080D6FDC(actor);
+        Mummy_RequestStraightRoute(actor);
         return 0;
     }
     actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
@@ -203,5 +202,5 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D6608);
+INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
 #endif

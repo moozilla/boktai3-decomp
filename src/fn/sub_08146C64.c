@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#define Player_UpdateAttachmentCue sub_08146C64
 // confidence=low: phases coordinate attachment creation, facing and a fading control cue.
 extern u8 *gUnk_02000488;
 extern u8 *gUnk_02000710;

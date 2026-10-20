@@ -14,7 +14,7 @@ struct SkeletonAttackContext {
     s32 guardHealth;
 };
 void SceneActorControl_OnIdle(void);
-void sub_080B7C10(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 static inline u8 TestBits(struct SkeletonAttackContext *context, u32 mask)
 {
     if (context->flags & mask)
@@ -52,7 +52,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->field2B1 = 1;
 }
 // confidence=low: category-seven angle/range gate chooses close or ranged behavior
-#define Skeleton_TryBeginArmedAttack sub_080B6884
 u32 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *actor,
                                  struct SkeletonAttackContext *context, s32 angle)
 {
@@ -81,7 +80,7 @@ u32 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *actor,
             context->attempts = 0;
             return 1;
         }
-        sub_080B7C10(actor);
+        Skeleton_SelectDistanceReaction(actor);
         return 1;
     }
     if (angle <= 20) {

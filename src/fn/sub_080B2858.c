@@ -95,7 +95,7 @@ extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 u8 sub_080B2580(void *, u32);
-u32 sub_080B3ADC(void *, u32);
+u32 SceneActor_DispatchContextAction(void *, u32);
 static inline u32 RandomBits(u32 mask)
 {
     u32 value;
@@ -119,7 +119,7 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
     dest->y = CellHeight(dest, CellIndex(dest));
     cell = CellIndex((struct ContactPosition *)((u8 *)actor->fieldDC + 12));
     if (cell == actor->terrainCell || (*(u32 *)(gUnk_02000580[0] + 0x20) & 0x20000)) {
-        sub_080B3ADC(actor->context, 0);
+        SceneActor_DispatchContextAction(actor->context, 0);
         return 0;
     }
     SceneActorTerrain_GetCenter(cell, &target);

@@ -288,9 +288,8 @@ struct SkeletonSelectionContext {
 };
 extern const u8 gUnk_0824E250[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-u32 sub_080B77D0(struct SceneActorRegistryResetView *, u32);
+u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *, u32);
 // confidence=low: selects retreat or route recovery by context distance thresholds
-#define Skeleton_SelectDistanceReaction sub_080B7C10
 void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonSelectionContext *context = actor->context;
@@ -302,7 +301,7 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
             u8 *direction = &actor->direction;
             s32 prior = *direction;
             *direction = actor->fieldE9 + 0x80;
-            if (!(u8)sub_080B77D0(actor, prior))
+            if (!(u8)Skeleton_TrySelectRetreatCell(actor, prior))
                 return;
         }
         {
@@ -326,5 +325,5 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B7C10);
+INCLUDE_ASM("asm/nonmatching", Skeleton_SelectDistanceReaction);
 #endif

@@ -25,7 +25,6 @@ static inline void ChasePlayer(struct SceneActorRegistryResetView *actor)
     actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
 }
 
-#define Golem_ReactToContact sub_080C12FC
 // confidence=low: contact flags select chase, roar, or a reaction control.
 u8 Golem_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
@@ -121,5 +120,5 @@ u8 Golem_ReactToContact(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C12FC);
+INCLUDE_ASM("asm/nonmatching", Golem_ReactToContact);
 #endif

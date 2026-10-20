@@ -7,7 +7,6 @@ static inline void SetEntry(u32 value, u32 flags, struct SceneActorProfileEntry 
     entry->flags = flags;
 }
 // confidence=low: writes the animation/action profile shared by the three Skeleton categories
-#define Skeleton_InitializeCategoryProfile sub_080B7350
 void Skeleton_InitializeCategoryProfile(struct SceneActorRegistryResetView *actor)
 {
     s32 category = actor->category;

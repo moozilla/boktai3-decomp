@@ -3,8 +3,9 @@
 #ifdef NONMATCHING
 // fuzzy: 88.2%
 
-#define Player_ApplyControlPresentation sub_0815767C
-struct Drawable { u32 a, b, flags; };
+struct Drawable {
+    u32 a, b, flags;
+};
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
 #define B(o) (*(u8 *)(p + (o)))
@@ -41,19 +42,27 @@ void Player_ApplyControlPresentation(u8 *p)
         H(0x236) &= ~4;
         Collider_SetPosition(p + 0x230, p + 0x30, 0);
     }
-    if (Player_GetControlFlags(p, 1)) ((struct Drawable *)(p + 0x8C))->flags |= 1;
-    else ((struct Drawable *)(p + 0x8C))->flags &= ~1;
-    if (Player_GetControlFlags(p, 2)) W(0x94) |= 0x200;
-    else W(0x94) &= ~0x200;
-    if (Player_GetControlFlags(p, 64)) W(0x14C) &= ~1;
-    else W(0x14C) |= 1;
+    if (Player_GetControlFlags(p, 1))
+        ((struct Drawable *)(p + 0x8C))->flags |= 1;
+    else
+        ((struct Drawable *)(p + 0x8C))->flags &= ~1;
+    if (Player_GetControlFlags(p, 2))
+        W(0x94) |= 0x200;
+    else
+        W(0x94) &= ~0x200;
+    if (Player_GetControlFlags(p, 64))
+        W(0x14C) &= ~1;
+    else
+        W(0x14C) |= 1;
     if (Player_GetControlFlags(p, 4) || !B(0x740))
         ActorShadow_Disable(p + 0x700);
-    else ActorShadow_Enable(p + 0x700);
+    else
+        ActorShadow_Enable(p + 0x700);
     if (Player_GetControlFlags(p, 256) && !Player_GetControlFlags(p, 1)) {
         ActorDebris_Show((void *)W(0xC84));
         PlayerEffect_SetPaletteSource((void *)W(0xC84), H(0xC6), W(0xD4));
-    } else ActorDebris_Hide((void *)W(0xC84));
+    } else
+        ActorDebris_Hide((void *)W(0xC84));
     H(0x32) += H(0x4EC);
     *(u64 *)(p + 0xAC) = *(u64 *)(p + 0x30);
     H(0xAC) += H(0x4E6);
@@ -70,5 +79,5 @@ void Player_ApplyControlPresentation(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0815767C);
+INCLUDE_ASM("asm/nonmatching", Player_ApplyControlPresentation);
 #endif

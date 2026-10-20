@@ -157,7 +157,6 @@ void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
 extern u8 *gUnk_030042E4;
-#define PlayerCue_UpdateSpiralMotion sub_08153610
 // confidence=low: motion 13 alternates facing while growing a spiral trail.
 void PlayerCue_UpdateSpiralMotion(struct P *p)
 {
@@ -213,5 +212,5 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08153610);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralMotion);
 #endif

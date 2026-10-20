@@ -1,5 +1,4 @@
 #include "global.h"
-#define Dog_UpdateCollisionBounds sub_080DEA7C
 // confidence=low: places forward collider and selects direction-dependent contact bounds.
 
 #ifdef NONMATCHING
@@ -108,5 +107,5 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
         ((struct ContactCollider *)(context + 0x624))->bounds = *(struct ContactPosition *)&narrow;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080DEA7C);
+INCLUDE_ASM("asm/nonmatching", Dog_UpdateCollisionBounds);
 #endif

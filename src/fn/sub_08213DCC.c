@@ -20,7 +20,7 @@ void sub_08217120(void);
 void Anim_ResetDefaultFlags(void);
 void ScanlineEffect_Initialize(void);
 void Text_LoadFontResource(void);
-void sub_08217F4C(void);
+void SpriteOam_QueueProjectedSprites(void);
 void sub_08214B44(void);
 void sub_08219624(void);
 void Video_SetRenderCallbacks(u32, void *, void *, void *);
@@ -83,7 +83,7 @@ void InterruptsAndVideo_InitRuntime(void)
     Anim_ResetDefaultFlags();
     ScanlineEffect_Initialize();
     Text_LoadFontResource();
-    Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
+    Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, sub_08214B44, sub_08219624);
     gUnk_03003A50 = zero;
     gUnk_03004264 = zero;
     a = &gUnk_03001118;

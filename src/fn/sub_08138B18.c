@@ -7,11 +7,11 @@ struct Vec3 {
 };
 struct BurstActor {
     void (*update)(struct BurstActor *);
-    u8 pad4[0x20-4];
+    u8 pad4[0x20 - 4];
     u32 spriteFlags;
-    u8 pad24[0x9c-0x24];
+    u8 pad24[0x9c - 0x24];
     struct Vec3 position;
-    u8 padAC[0xd4-0xac];
+    u8 padAC[0xd4 - 0xac];
     u8 active;
     u8 padD5[3];
     u16 timer;
@@ -20,7 +20,6 @@ s32 Mod(s32, s32);
 void ParticleEmitter_OnStop(struct BurstActor *);
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
-#define ParticleEmitter_UpdateScatterTrail sub_08138B18
 // confidence=low: emits a trail while moving left; emitter identity is tentative.
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];

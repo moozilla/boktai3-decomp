@@ -4,7 +4,6 @@
 // fuzzy: 85.9%
 // Remaining differences: packed position stores, stack-slot placement and animation pointer copies.
 /* Decelerate the charge, return to the current cell center, then restore the saved route. */
-#define Golem_UpdateChargeRecovery sub_080C6A68
 // confidence=low: installed when charge movement completes; the three phases slow, center, and settle it.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -266,5 +265,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C6A68);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeRecovery);
 #endif

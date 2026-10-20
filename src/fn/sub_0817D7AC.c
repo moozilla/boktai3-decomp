@@ -83,10 +83,9 @@ static inline s32 Scale(int x)
 }
 
 s32 ActorMovement_CanReachTarget(void *);
-s32 sub_08179F60(void *);
-void sub_0817D67C(void *);
+s32 ActorImpact_TestForwardPoint(void *);
+void ActorEffect_InitializeOffset(void *);
 // confidence=low: alternates aim and projectile states, capped at three impacts
-#define SceneVolume_UpdateRepeatedShot sub_0817D7AC
 void SceneVolume_UpdateRepeatedShot(struct VolumeActor *p)
 {
     struct VolumeActor *q = p;
@@ -123,12 +122,12 @@ void SceneVolume_UpdateRepeatedShot(struct VolumeActor *p)
             if (p->timer == 0)
                 goto increment;
             if (p->timer > 10) {
-                s32 result = sub_08179F60(p);
+                s32 result = ActorImpact_TestForwardPoint(p);
                 if (result) {
                     u32 phase = 2, zero = 0;
                     p->phase = phase;
                     p->timer = zero;
-                    sub_0817D67C(q);
+                    ActorEffect_InitializeOffset(q);
                 } else {
                     p->pending = 1;
                     p->phase = 3;

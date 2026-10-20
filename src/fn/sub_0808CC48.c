@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Ghoul_ResumePendingRoute sub_0808CC48
 
 #ifdef NONMATCHING
 // fuzzy: 86.1%
@@ -101,5 +100,5 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808CC48);
+INCLUDE_ASM("asm/nonmatching", Ghoul_ResumePendingRoute);
 #endif

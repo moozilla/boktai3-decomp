@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Password_InitializeEntryMenu sub_081E013C
 extern u32 gUnk_02000358[];
 extern u8 gUnk_03004FC0[];
 void AnimPanel_LoadSelections(u8 *);

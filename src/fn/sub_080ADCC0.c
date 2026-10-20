@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 85.7%
 // Remaining differences: inlined cell-centre temporaries, branch layout, and saved registers.
-#define Vorn_UpdatePursuitDistance sub_080ADCC0
 // confidence=low: target distance controls approach, idle animation, and a delayed action.
 void Vorn_BroadcastPosition(void *);
 void sub_080B1FA8(void *);
@@ -21,8 +20,7 @@ static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask)
     return 0;
 }
 static inline void Vorn_ApproachTarget(struct ContactPosition *center,
-                                     struct SceneActorRegistryResetView *actor,
-                                     u8 *group)
+                                       struct SceneActorRegistryResetView *actor, u8 *group)
 {
     struct ChaseTarget *target = (void *)actor->fieldDC;
     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
@@ -74,10 +72,10 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     sub_080B1FA8(actor);
                     Chase_SetBehavior(actor, 15);
                     {
-                    s32 mask = ~2;
-                    mask &= *flags;
-                    *flags = mask;
-                }
+                        s32 mask = ~2;
+                        mask &= *flags;
+                        *flags = mask;
+                    }
                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
                     context->nearTimer = 0;
                     return;
@@ -138,5 +136,5 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080ADCC0);
+INCLUDE_ASM("asm/nonmatching", Vorn_UpdatePursuitDistance);
 #endif

@@ -66,7 +66,6 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     out->z = z - gUnk_03005418[2];
 }
 // confidence=low: selects drawables with flag 0x1000; its higher-level meaning is unknown.
-#define SpriteOam_QueueFlaggedProjectedSprites sub_08218508
 void SpriteOam_QueueFlaggedProjectedSprites(void)
 {
     struct Vec pos;
@@ -184,5 +183,5 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08218508);
+INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueFlaggedProjectedSprites);
 #endif

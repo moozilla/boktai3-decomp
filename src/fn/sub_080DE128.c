@@ -1,40 +1,42 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#define Dog_SelectTargetAction sub_080DE128
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
-#define FIELD(p,n,T) (*(T *)((u8 *)(p)+(n)))
+#define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
 void sub_080DF400(void *);
-static inline u8 Flag(u8 *context,u32 mask)
+static inline u8 Flag(u8 *context, u32 mask)
 {
-    if (FIELD(context,0x678,u32) & mask) return 1;
+    if (FIELD(context, 0x678, u32) & mask)
+        return 1;
     return 0;
 }
-static inline u8 FarFlag(u8 *context,u32 mask)
+static inline u8 FarFlag(u8 *context, u32 mask)
 {
-    register u32 bit asm("r1")=mask;
-    register u32 offset asm("r3")=0x678;
+    register u32 bit asm("r1") = mask;
+    register u32 offset asm("r3") = 0x678;
     asm("" : "+r"(offset));
     {
-        register u32 *field asm("r0")=(u32 *)(context+offset);
+        register u32 *field asm("r0") = (u32 *)(context + offset);
         asm("" : "+r"(field));
-        if (*field&bit) return 1;
+        if (*field & bit)
+            return 1;
     }
     return 0;
 }
-static inline u8 OutsideFlag(u8 *context,u32 mask)
+static inline u8 OutsideFlag(u8 *context, u32 mask)
 {
-    register u32 bit asm("r1")=mask;
-    register u32 offset asm("r2")=0x678;
+    register u32 bit asm("r1") = mask;
+    register u32 offset asm("r2") = 0x678;
     asm("" : "+r"(offset));
     {
-        register u32 *field asm("r0")=(u32 *)(context+offset);
+        register u32 *field asm("r0") = (u32 *)(context + offset);
         asm("" : "+r"(field));
-        if (*field&bit) return 1;
+        if (*field & bit)
+            return 1;
     }
     return 0;
 }
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor,u32 mask)
+static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     register u32 bit asm("r1") = mask;
     asm("" : "+r"(bit));
@@ -42,62 +44,70 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor,u32 mask)
 }
 static inline s32 Absolute(s32 value)
 {
-    register s32 result asm("r0")=value;
-    if(result<0) result=-result;
+    register s32 result asm("r0") = value;
+    if (result < 0)
+        result = -result;
     asm("" : "+r"(result));
     return result;
 }
-static inline void Response(struct SceneActorRegistryResetView *actor,u8 *nav,u32 behavior,u32 response)
+static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, u32 behavior,
+                            u32 response)
 {
-    Chase_SetState(actor,0,2,behavior);
-    Chase_SetCtl(actor,(void *)SceneActorControl_OnIdle,0x10);
-    SceneActorReaction_ResetResponseState(nav+0x8C,gUnk_0824E2A8,response);
+    Chase_SetState(actor, 0, 2, behavior);
+    Chase_SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
+    SceneActorReaction_ResetResponseState(nav + 0x8C, gUnk_0824E2A8, response);
 }
 void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context=actor->context;
-    u8 *nav=(u8 *)&actor->group;
-    if (ActorFlag(actor,0x100)) return;
+    u8 *context = actor->context;
+    u8 *nav = (u8 *)&actor->group;
+    if (ActorFlag(actor, 0x100))
+        return;
     if (actor->distanceF0 < actor->rangeF4) {
         struct ContactPosition delta;
-        s32 difference,angle;
+        s32 difference, angle;
         {
-            struct ContactPosition *out=&delta;
-            struct ContactPosition *from=&actor->position;
-            struct ContactPosition *to=&((struct ChaseTarget *)actor->fieldDC)->position;
-            SceneActorTerrain_Subtract(out,to,from);
+            struct ContactPosition *out = &delta;
+            struct ContactPosition *from = &actor->position;
+            struct ContactPosition *to = &((struct ChaseTarget *)actor->fieldDC)->position;
+            SceneActorTerrain_Subtract(out, to, from);
         }
-        difference=Math_Atan2(delta.x,delta.z)-actor->direction;
-        if (difference>128) difference-=256;
-        else if (difference < -128) difference+=256;
-        angle=Absolute(difference);
-        if(angle<=23) {
-            u32 mode=FIELD(actor,0x1E6,u16);
-            if(mode==0 || mode==2) {
-                if(actor->distanceF0 < FIELD(context,0x67C,u32) && !FIELD(context,0x698,u16)) {
-                    Response(actor,nav,0,0x75);
+        difference = Math_Atan2(delta.x, delta.z) - actor->direction;
+        if (difference > 128)
+            difference -= 256;
+        else if (difference < -128)
+            difference += 256;
+        angle = Absolute(difference);
+        if (angle <= 23) {
+            u32 mode = FIELD(actor, 0x1E6, u16);
+            if (mode == 0 || mode == 2) {
+                if (actor->distanceF0 < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                    Response(actor, nav, 0, 0x75);
                     return;
                 }
             fallback:
-                if (Flag(context,8)) return;
+                if (Flag(context, 8))
+                    return;
                 goto move;
             } else {
-                if(actor->distanceF0 < FIELD(context,0x67C,u32) && !FIELD(context,0x698,u16)) {
-                    Response(actor,nav,0,0x82);
+                if (actor->distanceF0 < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                    Response(actor, nav, 0, 0x82);
                     return;
                 }
-                if(actor->distanceF0 < FIELD(context,0x680,u32) && angle<=5 && !FIELD(context,0x69A,u16)) {
-                    Response(actor,nav,1,0x87);
+                if (actor->distanceF0 < FIELD(context, 0x680, u32) && angle <= 5 &&
+                    !FIELD(context, 0x69A, u16)) {
+                    Response(actor, nav, 1, 0x87);
                     return;
                 }
                 goto fallback;
             }
         }
-        if (!FarFlag(context,8)) {
+        if (!FarFlag(context, 8)) {
         move:
             sub_080DF400(actor);
         }
     } else {
-        if (!OutsideFlag(context,8)) sub_080DF400(actor);
+        if (!OutsideFlag(context, 8))
+            sub_080DF400(actor);
     }
 }

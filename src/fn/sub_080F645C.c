@@ -6,7 +6,7 @@
 // Remaining differences: load scheduling, counter register allocation, final mask operand.
 extern u8 *gUnk_02000710;
 void Sword_UpdateBodyPaletteRestore(void *);
-void sub_080F3560(void *, u32, u32);
+void ChildGroup_ShowDamageNumber(void *, u32, u32);
 void sub_080F421C(void);
 #define H(p, n) (*(s16 *)((p) + (n)))
 #define U(p, n) (*(u16 *)((p) + (n)))
@@ -32,7 +32,6 @@ static inline void setState(struct SwordState *p, u8 one, u8 id)
     p->state = id;
     p->flags |= one;
 }
-#define Sword_UpdateDamage sub_080F645C
 void Sword_UpdateDamage(u8 *p)
 {
     u32 flags;
@@ -51,7 +50,7 @@ void Sword_UpdateDamage(u8 *p)
             H(p, 0xd78) += H(p, 0x7e);
             H(p, 0x7e) = zero;
         }
-        sub_080F3560(p, (u16)H(p, 0xd7a), 0);
+        ChildGroup_ShowDamageNumber(p, (u16)H(p, 0xd7a), 0);
         H(p, 0xd7a) = zero;
         H(p, 0xd78) = zero;
         if (H(p, 0x7e) <= 0) {
@@ -84,5 +83,5 @@ void Sword_UpdateDamage(u8 *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F645C);
+INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
 #endif

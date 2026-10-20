@@ -39,7 +39,6 @@ static inline void Bat_SetControl(struct SceneActorRegistryResetView *actor, u32
     }
     actor->word104 = 0;
 }
-#define Mummy_ResumeSavedTarget sub_080D1AFC
 void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct BatAnim *anim = &((struct BatDrawable *)actor->drawable)->anim;
@@ -86,7 +85,11 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
             Bat_SetControl(actor, 1, target);
             *(u16 *)(*(u8 **)((u8 *)actor + 0x5D4) + 6) = blocked;
             *(u16 *)((u8 *)actor + 0x2C2) = Div(64, 3);
-            { u32 mask = 16; u32 *flags = &actor->flags2CC; *flags |= mask; }
+            {
+                u32 mask = 16;
+                u32 *flags = &actor->flags2CC;
+                *flags |= mask;
+            }
         }
     } else if (anim->mode == 2) {
         u16 frame = anim->frame;

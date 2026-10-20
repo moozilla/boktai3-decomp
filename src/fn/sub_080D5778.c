@@ -133,8 +133,7 @@ done:
 }
 
 // confidence=low: delayed return to route with a target-cell special action.
-#define Mummy_ResumeDelayedRoute sub_080D5778
-u8 sub_080D6FDC(struct SceneActorRegistryResetView *);
+u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryResetView *);
 static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
 {
@@ -180,7 +179,7 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
         Chase_SetState(actor, 3, 1, 0);
         if (*(u16 *)(body + 0x6d2) &&
             actor->terrainCell == *(u16 *)(*(u8 **)(actor->fieldDC + 0x1c) + 6)) {
-            if (sub_080D6FDC(actor))
+            if (Mummy_RequestStraightRoute(actor))
                 return;
             PickRoute(actor);
             SceneActorMovement_ResolveRoutePosition(actor);
@@ -195,5 +194,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D5778);
+INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
 #endif

@@ -2,7 +2,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* Skeleton_BeginKnockedFlight: on entry makes the body's colliders inert, launches the actor along its facing at a random speed (0x1C-0x2B) with a random upward speed, and shows its shadow; on landing (motion bit 0) stops, and once flags2D0 & 0x10 plays the bone sound (if enabled) and resets the actor (provisional name) */
-#define Skeleton_BeginKnockedFlight sub_080BB61C
 void SceneActorPlacement_ResetActorState(void *, u16 *);
 extern const s16 gUnk_086149C4[];
 

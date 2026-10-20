@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Slime_ConvergeReactionMotion sub_0808EC80
 
 #ifdef NONMATCHING
 // fuzzy: 88.6%
@@ -118,5 +117,5 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808EC80);
+INCLUDE_ASM("asm/nonmatching", Slime_ConvergeReactionMotion);
 #endif

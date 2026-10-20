@@ -1,12 +1,11 @@
 #include "global.h"
-#define Hud_LoadLayoutResources sub_081779E8
 struct Header {
     u32 words[8];
 };
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void *AnimData_FindEntry(u32);
-void sub_08217DE0(void *, void *, u32);
+void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Hud_LoadLayoutResources(u8 *p)
 {
@@ -62,7 +61,7 @@ void Hud_LoadLayoutResources(u8 *p)
     effect = p + 0x4ce0;
     origin = -4;
     for (i = 3; i >= 0; i--) {
-        sub_08217DE0(effect, *(void **)(p + 0x4cdc), 128);
+        ParticleSprite_Initialize(effect, *(void **)(p + 0x4cdc), 128);
         Effect_SetOrigin(effect, origin, origin);
         *(u32 *)effect |= 17;
         effect[15] = 0;
