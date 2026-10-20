@@ -67,22 +67,22 @@ static inline void RestorePalette(struct PaletteTransition *p)
     if (!alternate)
         selector = 0x7f;
     switch (selector) {
-    case 0x6f:
-        CpuSet(gUnk_030042E4 + 0xde0, p->output, 0x4000020);
-        CpuSet(p->first, gUnk_03004FC0, 0x4000068);
-        SetStageColors(p->stage);
-        break;
-    case 0x82:
-        CpuSet(gUnk_030042E4 + 0x1040, p->output, 0x4000020);
-        CpuSet(p->second, gUnk_03004FC0, 0x4000068);
-        break;
-    case 0x7f:
-        CpuSet(gUnk_030042E4 + 0xfe0, p->output, 0x4000018);
-        CpuSet(p->third, gUnk_03004FC0, 0x4000068);
-        break;
-    default:
-        CpuSet(gUnk_030042E4 + 0x3240, p->output, 0x4000008);
-        break;
+        case 0x6f:
+            CpuSet(gUnk_030042E4 + 0xde0, p->output, 0x4000020);
+            CpuSet(p->first, gUnk_03004FC0, 0x4000068);
+            SetStageColors(p->stage);
+            break;
+        case 0x82:
+            CpuSet(gUnk_030042E4 + 0x1040, p->output, 0x4000020);
+            CpuSet(p->second, gUnk_03004FC0, 0x4000068);
+            break;
+        case 0x7f:
+            CpuSet(gUnk_030042E4 + 0xfe0, p->output, 0x4000018);
+            CpuSet(p->third, gUnk_03004FC0, 0x4000068);
+            break;
+        default:
+            CpuSet(gUnk_030042E4 + 0x3240, p->output, 0x4000008);
+            break;
     }
     Vanargand_ResetPaletteTransition(p);
 }
@@ -125,64 +125,64 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
     if (!alternate)
         selector = 0x7f;
     switch (p->mode) {
-    case 1:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
-                gUnk_030042E4 + 0x1040, p->frame, p->shift, 4);
-            Vanargand_BlendPaletteBanks(gUnk_03004FC0, p->first,
-                p->second, p->frame, p->shift, 13);
-        } else {
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
-    case 2:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
-                gUnk_030042E4 + 0xf60, p->frame, p->shift, 1);
-        } else {
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
-    case 3:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
-                gUnk_030042E4 + 0xf80, p->frame, p->shift, 1);
-        } else {
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
-    case 4:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf60,
-                gUnk_030042E4 + selector * 32, p->frame, p->shift, 1);
-        } else {
-            RestorePalette(p);
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
-    case 5:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf80,
-                gUnk_030042E4 + selector * 32, p->frame, p->shift, 1);
-        } else {
-            RestorePalette(p);
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
-    case 6:
-        if (p->frame < (1 << p->shift)) {
-            p->frame++;
-            BlendStageColors(p->stage, p->frame, 1 << p->shift);
-        } else {
-            SetStageColors(p->stage + 1);
-            Vanargand_ResetPaletteTransition(p);
-        }
-        break;
+        case 1:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
+                                            gUnk_030042E4 + 0x1040, p->frame, p->shift, 4);
+                Vanargand_BlendPaletteBanks(gUnk_03004FC0, p->first, p->second, p->frame, p->shift,
+                                            13);
+            } else {
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
+        case 2:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
+                                            gUnk_030042E4 + 0xf60, p->frame, p->shift, 1);
+            } else {
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
+        case 3:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + selector * 32,
+                                            gUnk_030042E4 + 0xf80, p->frame, p->shift, 1);
+            } else {
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
+        case 4:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf60,
+                                            gUnk_030042E4 + selector * 32, p->frame, p->shift, 1);
+            } else {
+                RestorePalette(p);
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
+        case 5:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf80,
+                                            gUnk_030042E4 + selector * 32, p->frame, p->shift, 1);
+            } else {
+                RestorePalette(p);
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
+        case 6:
+            if (p->frame < (1 << p->shift)) {
+                p->frame++;
+                BlendStageColors(p->stage, p->frame, 1 << p->shift);
+            } else {
+                SetStageColors(p->stage + 1);
+                Vanargand_ResetPaletteTransition(p);
+            }
+            break;
     }
 }
 
