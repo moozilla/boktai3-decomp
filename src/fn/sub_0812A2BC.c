@@ -38,9 +38,8 @@ static inline s32 TruncateShift(s32 value, u32 shift)
     return -(-value >> shift);
 }
 
-#define SunDiscPool_SpawnDisc sub_0812A2BC
-void sub_0812A2BC(const struct SunDiscVec *fromArg, const struct SunDiscVec *toArg, s32 aArg,
-                  s32 bArg, s32 c, s32 d, u32 e, s32 speed)
+void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDiscVec *toArg,
+                           s32 aArg, s32 bArg, s32 c, s32 d, u32 e, s32 speed)
 {
     register s32 a asm("sl") = aArg;
     const struct SunDiscVec *to = toArg;
@@ -113,5 +112,5 @@ void sub_0812A2BC(const struct SunDiscVec *fromArg, const struct SunDiscVec *toA
     sub_08129854(s, a, b, c, d);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812A2BC);
+INCLUDE_ASM("asm/nonmatching", SunDiscPool_SpawnDisc);
 #endif
