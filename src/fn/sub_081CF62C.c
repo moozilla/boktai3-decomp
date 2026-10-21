@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_terrain.h"
 // confidence=low: animation 9-12 dash with decreasing speed and height above terrain.
 struct NpcTag {
