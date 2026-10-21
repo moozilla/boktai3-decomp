@@ -8,13 +8,13 @@ struct FieldHud {
     u8 cueState;
 };
 extern struct FieldHud *gUnk_02000214;
-void sub_081675CC(struct FieldHud *, s32, s32, s32);
+void InventoryPanel_StartCallbackBurst(struct FieldHud *, s32, s32, s32);
 void Sound_PlaySong(u32);
 void Hud_BeginModeSixCue(void)
 {
     struct FieldHud *hud = gUnk_02000214;
     if (hud && !hud->blocked && hud->mode <= 2) {
-        sub_081675CC(hud, 0, 0xE0, 0x90);
+        InventoryPanel_StartCallbackBurst(hud, 0, 0xE0, 0x90);
         hud->cueState = 6;
         Sound_PlaySong(0x382);
     }

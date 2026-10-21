@@ -5648,8 +5648,10 @@ addr,name,mode,confidence,source,notes
 08166ED4,InventoryPanel_UpdateSelectedUnlock,thumb,low,src-alias,
 08166F84,InventoryPanel_UpdateSelectedEquipment,thumb,low,src-alias,
 0816701C,InventoryPanel_DrawStatComparison,thumb,low,src-alias,
+081672FC,InventoryPanel_ShowStatusIcons,thumb,low,src-alias,
 08167508,MenuParticle_UpdateMotion,thumb,low,src-alias,
 0816755C,InventoryPanel_UpdateCallbackGroups,thumb,low,src-alias,
+081675CC,InventoryPanel_StartCallbackBurst,thumb,low,src-alias,
 08167734,PlayerPanel_RemoveEffects,thumb,low,src-alias,
 0816778C,InventoryPanel_InitCallbackGroups,thumb,low,src-alias,
 0816781C,PauseMenu_InitHeaderTilemap,thumb,low,src-alias,Initializes nine consecutive palette-13 header tiles once; header identity is tentative
@@ -7021,6 +7023,8 @@ addr,name,mode,confidence,source,notes
 081B80BC,GrowthHazard_CreateManager,thumb,low,src-alias,Creates the singleton task with entry-update and cleanup callbacks
 081B8160,GrowthHazard_AddFromScript,thumb,low,src-alias,Ensures the manager exists then initializes another growth entry from script parameters
 081B817C,SceneScriptObject_RunPendingScript,thumb,low,src-alias,
+081B81D0,SceneScriptObject_UpdateFade,thumb,low,src-alias,
+081B83A0,SceneScriptObject_UpdateBurst,thumb,low,src-alias,
 081B8518,SceneScriptTask_Update,thumb,low,src-alias,
 081B854C,DungeonProp_Destroy,thumb,low,src-alias,Task destruction callback removes the sprite and collider plus type-12 auxiliary resources
 081B8578,SceneScriptObject_ApplyHitFlash,thumb,low,src-alias,

@@ -22,7 +22,7 @@ void sub_0816CDB8(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
@@ -71,7 +71,7 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
             SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
             SceneHud_ShowActionPreview(p);
             Hud_SaveGridSelection(q);
-            sub_081672FC(p);
+            InventoryPanel_ShowStatusIcons(p);
             MenuDisplay_UpdateActionPrompt(p, 4);
             InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, 0);
             MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);

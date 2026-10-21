@@ -9,7 +9,7 @@ void SceneHud_ClearWidgetFlags(void *, s32, u32);
 void SceneHud_SetWidgetFlags(void *, s32, u32);
 void SceneHud_GetActionIconPosition(void *, s32);
 void SceneHud_ShowActionPreview(void *);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
 void sub_08166534(void *, s32, s32);
 void MenuDisplay_SetPaletteOverrides(void *, s32, s32, s32, s32);
@@ -30,7 +30,7 @@ void SceneHud_ReturnToActionGrid(struct SceneHudState *s)
     SceneHud_SetWidgetFlags(s, 5, 1);
     SceneHud_GetActionIconPosition(&s->categoryWidgets[4].position, s->actionCursor);
     SceneHud_ShowActionPreview(s);
-    sub_081672FC(s);
+    InventoryPanel_ShowStatusIcons(s);
     MenuDisplay_UpdateActionPrompt(s, 4);
     sub_08166534(s, 10, 6);
     MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
