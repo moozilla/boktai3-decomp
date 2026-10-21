@@ -2969,6 +2969,7 @@ addr,name,mode,confidence,source,notes
 0808E660,Slime_RollMoveFlag,thumb,low,src-alias,Clears the prepared flag then randomly sets bit 0x10 or 0x20 in the 2D6 flags
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
+0808E9A0,Slime_PlayWaitAnimation,thumb,low,src-alias,Plays profile animation 15 then enters the wait-timer control; tentative
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
