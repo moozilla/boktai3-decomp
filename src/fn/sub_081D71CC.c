@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #define ScreenTransition_SetPhase TextSequence_SetState
@@ -25,12 +24,10 @@ void ScreenTransition_FadeBlendOut(struct ScreenTransition *p, struct ScreenTran
         gUnk_030051DC = 0x1084;
     if (++*timer >= step->duration) {
         TextSequence_SetState(p, 0);
-        ++p->state;
-        gUnk_030051D4 = ({
-            u32 z = 0;
-            asm("" : "+r"(z));
-            z;
-        });
+        do {
+            ++p->state;
+        } while (0);
+        gUnk_030051D4 = 0;
     } else {
         gUnk_030051D4 = 64 - Div(*timer << 6, step->duration);
     }
