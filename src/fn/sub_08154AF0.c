@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
-#ifdef NONMATCHING
-// fuzzy: 98.7%
 // Remaining three differences allocate the recoil offset to r1 instead of r2.
 
 struct P {
@@ -153,12 +151,16 @@ static inline s32 Truncate(s32 v)
 // confidence=low: inferred from the side-facing cue callbacks and effects.
 void PlayerCue_UpdateSideRecoil(struct P *p)
 {
+    register u32 d asm("r1");
     if (!p->timer) {
         Sound_PlaySong(0xE6);
         ++p->timer;
     }
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
+    asm("" : "=r"(d));
+    if (H(0x598))
+        asm("" ::"r"(d));
     if (H(0x598)) {
         register u32 directionOffset asm("r5") = 0x3A4;
         register u8 *direction asm("r0");
@@ -178,6 +180,3 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
         PlayerCue_CompleteAction(p);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideRecoil);
-#endif

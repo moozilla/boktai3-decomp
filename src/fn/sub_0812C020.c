@@ -21,7 +21,7 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
         if (IsActive(manager, i)) {
             struct PursuingActor *actor;
             actor = (void *)(i * sizeof(struct PursuingActor) + 0x3c);
-            actor = (void *)((u32)actor + (u32)manager);
+            actor = (void *)((u32)manager + (u32)actor);
             Collider_Remove(&actor->secondary);
             Sprite_Remove(actor);
             for (j = 0; j < 2; j++) {
