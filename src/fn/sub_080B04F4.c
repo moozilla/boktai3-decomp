@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (SceneActorControl_UpdateProbeApproach) with control SceneActorPhase_SelectLinkedAnimation and halfword flags at +0x6D4 (provisional name) */
 
@@ -69,14 +68,15 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct SceneActorRegistryRes
         }
     }
     if (SceneActor_IsFacingNearbyTarget(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
             return;
-        if (sub_0812F3CC(actor))
+        }
+        if (sub_0812F3CC(actor)) {
             return;
+        }
     }
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
+    speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
     actor->field2C2 = 0x20;
-    asm("" : "+r"(actor));
     {
         u32 mask = 0xA02F;
         if (actor->flags2D4 & mask) {
@@ -87,8 +87,9 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct SceneActorRegistryRes
             u16 *q = &actor->field2C2;
             u16 v = *q;
             scale = q;
-            if (v == 0)
+            if (v == 0) {
                 *scale = 0x40;
+            }
         }
     }
     if (actor->drawableKind == 0)
