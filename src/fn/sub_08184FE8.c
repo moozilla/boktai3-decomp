@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct DirectionalActor {
@@ -11,13 +10,10 @@ struct DirectionalActor {
 };
 s32 DirectionalActor_TryBeginState(struct DirectionalActor *p, u32 state)
 {
-    if (((volatile struct DirectionalActor *)p)->active) {
-        asm("" ::: "r1");
-        if (p->state != state || p->phase == 0xff)
-            goto begin;
-    }
-    return 0;
-begin:
+    if (!p->active)
+        return 0;
+    if (p->state == state && p->phase != 0xff)
+        return 0;
     p->state = state;
     p->phase = 0;
     p->counter = 0;
