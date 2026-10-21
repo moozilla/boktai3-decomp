@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct VanargandFadePart {
     u8 unknown0[0x38];
@@ -20,6 +19,7 @@ void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 void Vanargand_UpdatePartFadeOut(u8 *boss, struct VanargandFadePartState *p, s32 frame)
 {
     struct VanargandFadePart *q = (struct VanargandFadePart *)p;
+    u32 k2 = 0x194;
     u32 twelve = 12;
     p->flags |= twelve;
     if (p->reset) {
@@ -30,19 +30,19 @@ void Vanargand_UpdatePartFadeOut(u8 *boss, struct VanargandFadePartState *p, s32
         p->enter = 1;
     }
     {
-        register u32 offset asm("r1") = 0x164;
+        u32 offset = 0x164;
         u32 *statePtr;
         u32 value;
-        statePtr = (u32 *)((u8 *)p + offset);
+        statePtr = (u32 *)((u8 *)p - (-offset));
         value = *statePtr;
         switch (value) {
             case 0:
                 Palette_InterpolateBanks(q->palette, *(void **)((u8 *)p + 0x190),
-                                         *(void **)((u8 *)p + 0x194), frame, 6);
+                                         *(void **)((u8 *)p + k2), frame, 6);
                 if (frame > 63) {
                     u32 next = 1;
                     u32 off = 0x164;
-                    register u32 *state asm("r1");
+                    u32 *state;
                     state = (u32 *)((u8 *)p + off);
                     *state = next;
                     {
@@ -53,19 +53,17 @@ void Vanargand_UpdatePartFadeOut(u8 *boss, struct VanargandFadePartState *p, s32
                         }
                     }
                     {
-                        register u8 *ptr asm("r1");
+                        u8 *ptr;
                         off += 11;
-                        asm("" : "+r"(off));
-                        ptr = (u8 *)p + off;
+                        ptr = (u8 *)p - (-off);
                         *ptr = next;
                     }
                 }
                 break;
             case 1: {
-                register u32 off asm("r3") = 0x170;
-                asm("" : "+r"(off));
+                u32 off = 0x170;
                 {
-                    register u8 *ptr asm("r0") = (u8 *)p + off;
+                    u8 *ptr = (u8 *)p + off;
                     *ptr = 1;
                 }
                 ActorStatus_Deactivate(boss, p);
