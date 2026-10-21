@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct LargeEffectPoolSlot {
@@ -21,7 +20,7 @@ static inline u8 LargeEffectPool_IsUsed(u32 *used, u32 mask)
 struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *poolArg)
 {
     u8 *pool = poolArg;
-    register s32 i asm("r6") = 0;
+    s32 i = 0;
     u32 one = 1;
     u8 *index = pool + 0x197;
     u8 *slot = pool + 0x20;
@@ -29,8 +28,7 @@ struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *poolArg)
     do {
         if (!LargeEffectPool_IsUsed((u32 *)(pool + 0x1C), one << i)) {
             Memory_Clear(slot, 0x18C);
-            asm("" : "+r"(i));
-            *(u32 *)(pool + 0x1C) |= one << i;
+            *(u32 *)(pool + 0x1C) |= one << (*(&i));
             *index = i;
             result = (struct LargeEffectPoolSlot *)slot;
             goto done;
