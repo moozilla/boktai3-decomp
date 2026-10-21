@@ -45,7 +45,7 @@ static inline void RestoreHeading(struct ActorReaction *p)
 void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
 {
     register struct ActorReaction *p asm("r3") = actor;
-    register u32 t asm("r5") = tick;
+    u32 t = tick;
     RestoreHeading(p);
     actor->motion[0] = 0;
     actor->motion[1] = 0;

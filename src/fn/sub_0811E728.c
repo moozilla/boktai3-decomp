@@ -6,7 +6,7 @@ extern u32 gUnk_030053F0;
 s32 Div(s32, s32);
 s32 StatModifier_ScaleForGlobalMode(struct StatModifier *modifier_, s32 value)
 {
-    register struct StatModifier *modifier asm("r4") = modifier_;
+    struct StatModifier *modifier = modifier_;
     s32 result;
     register s32 input asm("r3") = value;
     if (modifier->enabled == 0)

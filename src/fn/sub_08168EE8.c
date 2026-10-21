@@ -21,7 +21,7 @@ s32 PauseMenu_GetEquipmentRowY(void *, s32, s32, s32, s32);
 void SceneHud_TickWidgetSlides(u8 *hud)
 {
     register u8 *dst asm("r6");
-    register s32 i asm("r5");
+    s32 i;
     Hud_SlideTick(0xC71, 0xC72, 0xCAA);
     Hud_SlideTick(0x13F3, 0xF48, 0xE4A);
     Hud_SlideTick(0xF4C, 0xF4A, 0xF92);
