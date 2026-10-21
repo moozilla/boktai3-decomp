@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
@@ -20,10 +19,12 @@ void SceneHud_RefreshEquipmentIcons(void *, int);
 void SceneHud_BeginEquipmentSelection(void *);
 void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
 {
-    register struct SceneHudState *p asm("r6") = input;
+    struct SceneHudState *p = input;
     s32 equipped;
     s32 slot;
     void *q;
+    do {
+    } while (0);
     q = p->actionInput;
     if (SceneInput_NavigateGridKeys(q, 0xf0)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
@@ -33,13 +34,15 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
         InventoryPanel_DrawStatComparison(p, 0, 1, 0, 0, 0);
     } else if (gUnk_03005260[1] & 1) {
         slot = p->actionCursor;
-        if (Inventory_GetEquipmentId(slot) == 0xff)
+        if (Inventory_GetEquipmentId(slot) == 0xff) {
             Sound_PlaySong(0x192);
-        else {
+        } else {
+            do {
             equipped = Inventory_IsEquipmentAssigned(slot);
             if (equipped) {
-                if (Inventory_RemoveAssignedSlot(slot))
+                    if (Inventory_RemoveAssignedSlot(slot)) {
                     goto success;
+                    }
                 Sound_PlaySong(0x192);
             } else if (Inventory_AddAssignedSlot(slot) == 1) {
                 u32 frame = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, equipped);
@@ -47,8 +50,10 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
                 InventoryPanel_SetEntryRow(p, 8, 4, frame, equipped, 0x47);
             success:
                 Sound_PlaySong(0xdd);
-            } else
+                } else {
                 Sound_PlaySong(0x192);
+                }
+            } while (0);
             MenuDisplay_UpdateActionPrompt(p, 2);
             SceneHud_RefreshEquipmentIcons(p, 0);
         }
