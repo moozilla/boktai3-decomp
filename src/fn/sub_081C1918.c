@@ -1,21 +1,35 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #include "player.h"
-
-#ifdef NONMATCHING
-// fuzzy: 89.8%
-// foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
 
 s32 Div(s32, s32);
 void Sound_PlaySong(u32 song);
 
 void ControlPanel_UpdateGaugeIndicator(struct Player *p)
 {
-    u16 v = gUnk_02000580[0]->indicatorUpdateRate;
+    register u32 v asm("r0");
     s32 inc;
+    {
+        register u8 *b asm("r0") = (u8 *)gUnk_02000580[0];
+        register u32 off asm("r2");
+        register u16 *q asm("r1");
+        asm("" : "+r"(b));
+        off = 0x524;
+        asm("" : "+r"(off));
+        q = (u16 *)(b + off);
+        asm("" : "+r"(q));
+        v = *q;
+    }
 
-    if (v != 0)
-        inc = Div(0x80, v);
-    if (v == 0 || inc <= 0)
+    if (v != 0) {
+        {
+            u32 a = v;
+            asm("" : "+r"(a));
+            inc = Div(0x80, a);
+        }
+        if (inc <= 0)
+            inc = 1;
+    } else
         inc = 1;
 
     p->indicatorStep = p->indicatorStep + inc;
@@ -24,7 +38,15 @@ void ControlPanel_UpdateGaugeIndicator(struct Player *p)
     p->position.x = p->indicatorStep >> 2;
 
     if (p->indicatorTickCounter == 0) {
-        u32 seg = gUnk_02000580[0]->displaySegmentCount;
+        u32 seg;
+        {
+            u8 *b = (u8 *)gUnk_02000580[0];
+            register u32 off asm("r2");
+            asm("" : "+r"(b));
+            off = 0x522;
+            asm("" : "+r"(off));
+            seg = *(u16 *)(b + off);
+        }
         if (seg <= 1)
             Sound_PlaySong(0x23A);
         else if (seg <= 3)
@@ -39,6 +61,3 @@ void ControlPanel_UpdateGaugeIndicator(struct Player *p)
     if (p->indicatorTickCounter > 9)
         p->indicatorTickCounter = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ControlPanel_UpdateGaugeIndicator);
-#endif

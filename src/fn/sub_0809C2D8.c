@@ -3,8 +3,9 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.4%
-// Remaining differences: defined destination padding and destination-pointer address reuse.
+// fuzzy: 99.6%
+// MATCHING_CONCESSION: register-pinning
+// Remaining difference: r3 is copied from r5 instead of recomputed as sp+4.
 
 struct LunRouteEntry {
     u8 unknown0[4];
@@ -44,7 +45,6 @@ static inline void RoutePosition(struct ContactPosition *p, struct LunRouteEntry
     p->z = route->point[1];
     p->y = Chase_Height(p);
     // The endpoint setter copies all eight bytes; define the scratch padding.
-    p->pad = 0;
 }
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
@@ -86,7 +86,18 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
         Lun_SetMovementEndpoints(actor, &local.target);
         sub_0809CCF4(actor);
         SetState(actor, 0, 0, 1);
-        *((u8 *)actor + 0x3CD) = Direction(&local.target, &local.target, &actor->position);
+        {
+            register struct ContactPosition *q asm("r3");
+            struct ContactPosition *p = &local.target;
+            struct ContactPosition *from = &actor->position;
+            asm("" : "+r"(from));
+            q = &local.target;
+            asm("" : "+r"(q));
+            q->x = q->x - from->x;
+            p->y = p->y - from->y;
+            p->z = p->z - from->z;
+            *((u8 *)actor + 0x3CD) = Math_Atan2(q->x, p->z);
+        }
         ClearVector(&local.zero, (struct ContactPosition *)(state + 0x424));
     }
     actor->counter2AC++;
