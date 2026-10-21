@@ -15,7 +15,7 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
         s16 x, y, z, pad;
     } v;
     s16 *vp;
-    register s32 a asm("r5");
+    s32 a;
     register s32 b asm("r6");
     s32 t;
     u32 zero, k;

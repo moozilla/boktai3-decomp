@@ -44,7 +44,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags;
-    register u32 bit asm("r9");
+    u32 bit;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -57,7 +57,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
         register u32 first asm("r1");
         u32 maskBit = bitOne;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -82,7 +81,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r3");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -154,15 +153,14 @@ void ActorEffect_SpawnOffsetEffect(struct P *);
 // confidence=low: sequence-one action periodically spawns offset effects.
 void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
 {
-    register struct P *input asm("r8") = arg;
-    register s32 time asm("r10") = ticks;
+    struct P *input = arg;
+    s32 time = ticks;
     struct P *p = input;
-    register u32 one asm("r9");
+    u32 one;
     {
         u32 random = RandomBits(0xFFFFFFFF);
         s32 *destination = (s32 *)((u8 *)input + 0x288);
         register u32 mask asm("r2") = 1;
-        asm("" : "+r"(mask) : "r"(destination));
         one = mask;
         *destination = random & mask;
     }
@@ -170,9 +168,8 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
         u8 *entry = (u8 *)input + 0xb1;
         if (*entry) {
             struct ContactSwarmSprite *sprite;
-            register u32 zero asm("r2") = 0;
+            u32 zero = 0;
             *entry = zero;
-            asm("" : "+r"(zero) : "r"(entry));
             sprite = &input->sprite;
             (*(s32 *)((u8 *)input + 0x298)) = 0;
             (*(s32 *)((u8 *)input + 0x290)) = 0;
@@ -182,7 +179,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                 *(s32 *)((u8 *)sprite + 0x3c) = sequence;
             }
             {
-                register struct DisplaySequenceState *state asm("r4") = &input->seq;
+                struct DisplaySequenceState *state = &input->seq;
                 Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 1, 0, 0);
                 Step(sprite, state, one);
             }
@@ -196,7 +193,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
             {
                 register u32 off asm("r2") = 0x398;
                 register u8 *q asm("r0");
-                register s32 z asm("r1") = 0;
+                s32 z = 0;
                 asm("" : "+r"(off));
                 q = (u8 *)p + off;
                 *(s32 *)q = z;
@@ -220,7 +217,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
     SceneMover_ApproachScreenX(input, 40);
     {
         register u32 poff asm("r1") = 0x398;
-        register s32 *phase asm("r5");
+        s32 *phase;
         asm("" : "+r"(poff));
         phase = (s32 *)((u8 *)p + poff);
         switch (*phase) {
@@ -261,8 +258,8 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                     W(0x304) = 0;
                     W(0x2fc) = 1;
                     {
-                        register u32 flags asm("r1") = B(0x2f0);
-                        register u32 mask asm("r0") = 4;
+                        u32 flags = B(0x2f0);
+                        u32 mask = 4;
                         asm("" : "+r"(flags), "+r"(mask));
                         B(0x2f0) = mask | flags;
                     }
@@ -272,8 +269,8 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                 }
                 break;
             case 2: {
-                register u32 flags asm("r1") = B(0x2f0);
-                register u32 mask asm("r0") = 4;
+                u32 flags = B(0x2f0);
+                u32 mask = 4;
                 asm("" : "+r"(flags), "+r"(mask));
                 B(0x2f0) = mask | flags;
             }

@@ -84,12 +84,11 @@ static inline void Step(struct Fragment *sprite)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -168,14 +167,12 @@ void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
         u16 *frame = &p->timer;
         s32 remainder = Mod(*frame, 12);
         timer = frame;
-        asm("" : "+r"(timer));
         if (!remainder)
             FragmentEffect_SpawnRandomParticle(&p->position);
     }
     {
-        register s16 *initial asm("r0") = &p->scaleTimer;
+        s16 *initial = &p->scaleTimer;
         register s32 remaining asm("r1") = *initial;
-        asm("" : "+r"(remaining));
         scaleTimer = initial;
         asm("" : "+r"(scaleTimer));
         if (remaining > 0) {
@@ -186,18 +183,16 @@ void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
     }
     Step(p);
     {
-        register s32 remaining asm("r0");
+        s32 remaining;
         register u32 hold asm("r1");
-        asm("" : "=r"(hold));
         remaining = *scaleTimer;
         asm("" : : "r"(hold));
-        asm("" : "+r"(remaining));
         if (remaining <= 0) {
             p->state = 2;
             p->flags &= ~2;
             p->entered = 1;
         } else {
-            register u16 *frame asm("r1") = timer;
+            u16 *frame = timer;
             (*frame)++;
         }
     }

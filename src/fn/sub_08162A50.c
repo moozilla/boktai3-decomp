@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_object.h"
-// MATCHING_CONCESSION: register-pinning
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
 struct SceneMarkerVector {
     u32 x : 16, y : 16, z : 16;
@@ -48,12 +47,11 @@ s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
         struct SceneVec position;
     } local;
     struct SceneMarkerVector size, offset;
-    register struct SceneVec *positionPtr asm("r9") = &local.position;
+    struct SceneVec *positionPtr = &local.position;
     void *collider;
     local.zero = 0;
     {
         u32 *src = &local.zero;
-        asm("" : "+r"(src));
         CpuSetFill(positionPtr, 0x5000002, src);
     }
     collider = p->collider;

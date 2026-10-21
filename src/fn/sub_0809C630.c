@@ -24,7 +24,6 @@ static inline u32 Random(void)
     offset = gUnk_03005308 * 2;
     {
         register u32 tab asm("r2") = (u32)gUnk_0203B400;
-        asm("" : "+r"(tab));
         return *(const u16 *)(offset + tab);
     }
 }
