@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 88.8%
-// foundry draft (worker best 88.8%); what differs is mostly register allocation and instruction order
 #define gParticleRandomIndex gUnk_03005308
 #define gParticleRandomTable gUnk_0203B400
 struct PlayerOrbitParticle {
@@ -40,9 +38,11 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
     }
     if (i < 16) {
         {
-            const u16 *randomTable;
-            u32 *randomIndex;
-            u32 range, mask, index;
+            register const u16 *randomTable asm("r6");
+            register u32 *randomIndex asm("r5");
+            register u32 range asm("r4");
+            register u32 mask asm("r3");
+            register u32 index asm("r1");
             p = &effect->particles[i];
             p->flags &= ~1;
             p->position = *position;
@@ -88,6 +88,3 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
         p->active = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerOrbitEffect_SpawnParticle);
-#endif

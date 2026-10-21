@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 #define gPlayerSlotDisplay gUnk_020004C0
 struct PlayerSlotDisplaySprite {
     u32 flags;
@@ -24,8 +22,9 @@ struct PlayerSlotDisplay {
     void *sequenceResource;
 };
 extern struct PlayerSlotDisplay *gPlayerSlotDisplay;
-s32 PlayerSlotDisplay_Initialize(register struct PlayerSlotDisplay *manager)
+s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
 {
+    register struct PlayerSlotDisplay *manager asm("r6") = input;
     s32 i = 0;
     u8 *buffer = manager->slots[0].buffer;
     struct DisplaySequenceState *animation = &manager->slots[0].animation;
@@ -59,6 +58,3 @@ s32 PlayerSlotDisplay_Initialize(register struct PlayerSlotDisplay *manager)
     gPlayerSlotDisplay = manager;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerSlotDisplay_Initialize);
-#endif

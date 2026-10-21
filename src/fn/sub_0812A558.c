@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.5%
-// foundry draft (worker best 88.5%); what differs is mostly register allocation and instruction order
 #define ActorEffect_SetDirection LinkedEffect_SetVariant
 #define gRandomIndex             gUnk_03005308
 #define gRandomTable             gUnk_0203B400
@@ -41,25 +39,19 @@ static inline void mark(struct ActorEffectSprite *s)
 {
     s->flags |= 4;
 }
-static inline u32 randomAngle(u32 *current)
-{
-    u32 index;
-    u32 mask;
-    index = *current + 1;
-    mask = 0x3ff;
-    index &= mask;
-    *current = index;
-    return (u8)gUnk_0203B400[index];
-}
 void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct ActorEffectPosition *b,
                                      struct ActorEffect *effect)
 {
     struct EffectVector delta;
     s32 angle;
+    register u32 index asm("r1");
     void *direction;
     subtract(&delta, &b->position, &a->position);
     if (delta.x == 0 && delta.z == 0) {
-        angle = randomAngle(&gUnk_03005308);
+        register u32 *cur asm("r0") = &gUnk_03005308;
+        index = (*cur + 1) & 0x3ff;
+        *cur = index;
+        angle = *(u8 *)((u32)gUnk_0203B400 + index * 2);
     } else {
         angle = Math_Atan2(delta.x, delta.z);
     }
@@ -71,6 +63,3 @@ void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct Actor
     effect->state = 3;
     effect->active = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_OrientFromPositions);
-#endif
