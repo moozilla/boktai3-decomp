@@ -1,9 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94%
-// remaining diffs: load order of the target pointer, Sqrt result zero-extend, one pointer copy
-
 struct MoverVec {
     s16 x, y, z, pad;
 };
@@ -28,18 +24,32 @@ static inline s32 Scale(s32 x)
 s32 SceneMover_SteerXY(struct SceneMover *m)
 {
     s32 result = 0;
+    struct MoverVec *tg = m->target;
     struct MoverVec *position = &m->position;
-    s32 angle = Math_Atan2(m->position.x - m->target->x, position->y - m->target->y);
-    s32 x = m->target->x - m->position.x;
-    s32 z = m->target->y - position->y;
-    s32 d2 = x * x + z * z;
+    s32 angle;
+    s32 x;
+    s32 z;
+    s32 d2;
     s32 next;
     s32 delta;
     s32 old;
+    {
+        s32 ax = m->position.x - tg->x;
+        s32 ay = position->y - tg->y;
+        angle = Math_Atan2(ax, ay);
+    }
+    {
+        struct MoverVec *tg2 = m->target;
+        x = m->position.x - tg2->x;
+        z = position->y - tg2->y;
+    }
+    d2 = x * x + z * z;
     if (d2 <= m->speed * m->speed) {
         struct MoverVec *v;
-        u32 dist = Sqrt(d2);
+        u16 d16 = Sqrt(d2);
+        u32 dist;
         v = (struct MoverVec *)((u8 *)m + 0x14);
+        dist = d16;
         v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * dist);
         v->y = Scale(gUnk_086149C4[angle & 255] * dist);
         v->z = 0;
@@ -47,7 +57,7 @@ s32 SceneMover_SteerXY(struct SceneMover *m)
         result = 1;
     }
     {
-        struct MoverVec *v, *t;
+        struct MoverVec *v, *t, *w;
         old = m->heading;
         delta = (angle - old) & 255;
         if (delta > 128 && delta < 256 - m->turnRate)
@@ -60,17 +70,16 @@ s32 SceneMover_SteerXY(struct SceneMover *m)
         v = &m->velocity;
         {
             s32 speed = m->speed;
-            v->x = Scale(gUnk_086149C4[(next + 64) & 255] * speed);
+            s32 prod = gUnk_086149C4[(next + 64) & 255] * speed;
+            w = v;
+            v->x = Scale(prod);
             v->y = Scale(gUnk_086149C4[next & 255] * speed);
             v->z = 0;
         }
         t = m->target;
         t->x += m->velocity.x;
-        t->y += v->y;
-        t->z += v->z;
+        t->y += w->y;
+        t->z += w->z;
     }
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneMover_SteerXY);
-#endif
