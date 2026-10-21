@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-// Open: `movs r2, #0` is scheduled after the first address computation in the original.
 void sub_0808E780(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
