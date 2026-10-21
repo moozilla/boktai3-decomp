@@ -1,8 +1,7 @@
 #include "scene_inventory_actions.h"
 #ifdef NONMATCHING
-// fuzzy: 93%
-// Open: the slot index lands in r5 and the widget base in r4 (swapped in the
-// original); pair-copy loop counter ordering as in SceneInventory_BeginItemSwapPair.
+// fuzzy: 99.3%
+// Open: 'movs r7,#1' (copy loop counter) is scheduled before the pointer setup.
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
@@ -40,7 +39,7 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         {
             u32 address = slot;
             struct GameState *game = gUnk_02000710;
-            address <<= 1;
+            do { address <<= 1; } while (0);
             address += (u32)game;
             id = ((struct SceneInventoryOwnedConsumables *)address)->id;
         }
