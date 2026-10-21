@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 #define SceneParticle_Allocate   SceneMovingParticle_AllocateEntry_0812D670
 #define SceneParticle_CreatePool ParticleEffectPool_GetOrCreate
 #define gSceneParticlePool       gUnk_02000194
@@ -88,11 +85,8 @@ struct SceneParticle *SceneParticle_Create(struct SceneParticleVector *position,
     }
     p->phase = 0;
     p->baseFrame = frame << 1;
-    {
-        u32 three = 3;
-        p->interval = three;
-        p->timer = three;
-    }
+    p->interval = 3;
+    p->timer = p->interval;
     p->position = *position;
     ParticleSprite_Initialize(p, pool->resource, 0);
     Effect_SetOrigin(p, -4, -4);
@@ -102,6 +96,3 @@ struct SceneParticle *SceneParticle_Create(struct SceneParticleVector *position,
     p->mode = mode;
     return p;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneParticle_Create);
-#endif
