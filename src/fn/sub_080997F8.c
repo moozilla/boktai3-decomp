@@ -2,7 +2,6 @@
 #include "scene_actor_control_phase.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Ghost_UpdateFacingTrigger sub_080997F8
 
 extern u8 *gUnk_02000580[];
 extern u32 gUnk_02000560;

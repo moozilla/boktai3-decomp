@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-#define Axe_UpdateRouteWander sub_080FAE50
 
 void Axe_SelectRandomRoutePoint(void *);
 void Axe_BeginMoveToPosition(void *, void *);

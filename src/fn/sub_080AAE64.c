@@ -1,6 +1,5 @@
 #include "global.h"
 /* TentacleActor_InitSegmentColliders: Sets up body and attack colliders for every tentacle segment */
-#define TentacleActor_InitSegmentColliders sub_080AAE64
 
 struct TentaclePacked {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -37,7 +36,7 @@ static inline void SetAttack(void *collider, u8 *p, s32 variant)
     Collider_SetAttackProperties(collider, a, b, 0, c, d);
 }
 
-void sub_080AAE64(u8 *p)
+void TentacleActor_InitSegmentColliders(u8 *p)
 {
     struct Body080AAE64 *g = *(struct Body080AAE64 **)(p + 0x3d0);
     struct TentaclePacked size, offset;

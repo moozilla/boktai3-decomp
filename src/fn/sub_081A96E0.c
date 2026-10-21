@@ -51,7 +51,6 @@ static inline s32 RandomValue(void)
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 s32 ScenePair_CountPositiveCounters(void *);
-#define Vanargand_UpdateSequencedPairAttack sub_081A96E0
 void Vanargand_UpdateSequencedPairAttack(struct Vanargand *p)
 {
     struct Vanargand *self = p;
