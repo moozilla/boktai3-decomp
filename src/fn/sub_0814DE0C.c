@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 98.3%
 // foundry draft (worker best 97.4%); what differs is mostly register allocation and instruction order
 u8 *Player_GetSpecialAttackDescriptor(s32 idx);
 s32 Player_GetAttackElementType(u32 x);
@@ -24,7 +23,17 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
         if (p->actionMode == 6)
             goto mode6;
         if (p) {
-            u32 flags = DisplayFlags(&p->statBonusFlags, 0x10000000);
+            u32 flags;
+            {
+                register u32 off asm("r1");
+                register u32 *fp asm("r0");
+                asm("" ::: "r1");
+                off = 0x444;
+                asm("" : "+r"(off));
+                fp = (u32 *)((u8 *)p + off);
+                asm("" : "+r"(fp));
+                flags = DisplayFlags(fp, 0x10000000);
+            }
             selection = 7;
             if (flags)
                 goto selected;
@@ -54,6 +63,3 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
     }
     Projectile_SetCollisionSize(p->statModifierContext.actionSelectionDisplay, 16, 100, 16);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_ConfigureActionSelectionDisplay);
-#endif
