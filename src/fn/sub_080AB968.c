@@ -7,7 +7,7 @@
 
 #ifdef NONMATCHING
 // fuzzy: 88.8%
-void sub_080A69F0(void);
+void TentacleBody_UpdateChargeSpread(void);
 void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -59,7 +59,7 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
     if (TakeEntry((u8 *)s)) {
-        SetControl(s, sub_080A69F0, 0x23);
+        SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
         *(u16 *)((u8 *)s + 0x2e8) = 8;
     }
     {

@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 80.5%
 // Close: the direction pointer sits in r0 instead of r1; check.py reports the rest.
-#define TentacleBody_UpdateSpreadRelease sub_080A65A8
-#define SPIN(b)                          (*((u8 *)(b) + 0x875))
+#define SPIN(b) (*((u8 *)(b) + 0x875))
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void sub_080A9DB0(void *, s32, s32);
@@ -109,5 +108,5 @@ void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor,
         sub_080A9DB0(actor, 64, 0xFFFF);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A65A8);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateSpreadRelease);
 #endif

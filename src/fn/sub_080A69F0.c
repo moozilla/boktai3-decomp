@@ -4,8 +4,7 @@
 #ifdef NONMATCHING
 // fuzzy: 92.5%
 // Differs in the direction pointer register and body/index high registers (sb vs r8).
-#define TentacleBody_UpdateChargeSpread sub_080A69F0
-#define SPIN(b)                         (*((u8 *)(b) + 0x875))
+#define SPIN(b) (*((u8 *)(b) + 0x875))
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void sub_080A9DB0(void *, s32, s32);
@@ -115,5 +114,5 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
         Control(actor, (void *)TentacleBody_BeginDirectedAttack, 36);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A69F0);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateChargeSpread);
 #endif
