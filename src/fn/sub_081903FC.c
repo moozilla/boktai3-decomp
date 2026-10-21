@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.7%
-// foundry draft (worker best 93.3%); what differs is mostly register allocation and instruction order
 
 #define gNidhoggrEffectPhaseDurations gUnk_0824F292
 #define gNidhoggrEffectPhaseFrames    gUnk_0824F28C
@@ -23,6 +21,7 @@ s32 Callback_InvokeActor(void *, void *);
 void Nidhoggr_UpdateDistanceLimitedEffect(struct NidhoggrDistanceEffect *effect)
 {
     if (effect->x - effect->startX <= 0x1000) {
+        asm("" ::: "r3");
         if (effect->phase > 5 && effect->speed > 8)
             effect->speed--;
         if (effect->phaseTimer < gNidhoggrEffectPhaseDurations[effect->phase])
@@ -45,6 +44,3 @@ advance: {
     effect->phaseTimer = 0;
 }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nidhoggr_UpdateDistanceLimitedEffect);
-#endif
