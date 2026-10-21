@@ -1,8 +1,5 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#ifdef NONMATCHING
-// fuzzy: 88.9%
-// foundry draft (worker best 87.9%); what differs is mostly register allocation and instruction order
 
 void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *actor)
 {
@@ -31,7 +28,7 @@ void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *act
         if ((s32)*counter > 30) {
             u32 phase = 2;
             actor->state2A8 = 0;
-            actor->phase2A9 = phase;
+            (*(&actor))->phase2A9 = phase;
             actor->behavior2AA = 0;
             actor->counter2AC = 0;
             actor->field2B1 = 1;
@@ -46,6 +43,3 @@ void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *act
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_TickPendingTarget);
-#endif

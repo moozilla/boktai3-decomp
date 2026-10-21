@@ -2962,22 +2962,30 @@ addr,name,mode,confidence,source,notes
 0808D1C0,Ghoul_OnMessage,thumb,low,src-alias,Callback forwarding to a shared actor handler; message role is tentative
 0808D1CC,Ghoul_Destroy,thumb,low,src-alias,Destruction callback releasing scene actor effect resources
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
+0808E208,Slime_ApplyBodyHit,thumb,low,src-alias,Collider callback: for hit type 1 records the hit value and clears flag 0x1000000; variant 3 rolls random variant flags
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
+0808E660,Slime_RollMoveFlag,thumb,low,src-alias,Clears the prepared flag then randomly sets bit 0x10 or 0x20 in the 2D6 flags
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
+0808E9A0,Slime_PlayWaitAnimation,thumb,low,src-alias,Plays profile animation 15 then enters the wait-timer control; tentative
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
+0808F03C,Slime_UpdateLaunch,thumb,low,src-alias,"Sets a heading-based launch velocity and plays sound 0x3C1, then enters Slime_UpdateStill when flag 0x10 sets; tentative"
 0808F1C4,Slime_UpdateStill,thumb,low,src-alias,
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
+0808F6F0,Slime_RestoreSavedTarget,thumb,low,src-alias,"On arrival restores the saved target as the control callback, then runs update270"
+0808F77C,Slime_RunUpdateThenWait,thumb,low,src-alias,Runs update270 each frame; when it returns 0 switches control to sub_0808E780 and state 3/1
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
+0808FCB0,Slime_TryEnrage,thumb,low,src-alias,"Checks vertical distance to the player and health/context flags, sets reaction flags 0x80 or 0x100; returns 1 when the trigger applies; tentative"
 0808FD9C,Slime_FollowPlayer,thumb,low,src-alias,
+0808FE64,Slime_OnInterrupt,thumb,low,src-alias,"Unless already in wait kinds 0x22-0x24 or 0x26, restarts the random wait control with behavior 0xF; tentative"
 0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise

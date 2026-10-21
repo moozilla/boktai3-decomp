@@ -1,10 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// Only register allocation differs: the original keeps actor in r6 and &p->angle in r7; here they swap.
-// The redundant if (p) is a permuter find that fixes block order.
-
 struct TurnSprite {
     u8 pad0[0x18];
     s16 x, y, z;
@@ -32,8 +27,19 @@ extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 static inline u32 randomBits(void)
 {
+    u32 v;
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return ((const u16 *)0x0203B400)[gUnk_03005308] & 0x3F;
+    v = ((const u16 *)0x0203B400)[gUnk_03005308];
+    v &= 0x3F;
+    return v;
+}
+static inline s32 randomNeg(void)
+{
+    u32 v;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+    v = ((const u16 *)0x0203B400)[gUnk_03005308];
+    v &= 0x3F;
+    return -(s32)v;
 }
 void sub_081D3750(u8 *actor, struct TurnParticle *p)
 {
@@ -57,9 +63,10 @@ void sub_081D3750(u8 *actor, struct TurnParticle *p)
         abs = diff;
         if (diff < 0)
             abs = -diff;
-        if (abs > actor[0x1e])
-            *angle = current + actor[0x1e];
-        else
+        if (abs > actor[0x1e]) {
+            *angle = current;
+            *angle = (*angle) + actor[0x1e];
+        } else
             *angle = current + diff;
         p->turn++;
         if (p->turn == 0)
@@ -74,7 +81,7 @@ void sub_081D3750(u8 *actor, struct TurnParticle *p)
             *angle = current - diff;
         p->turn--;
         if (p->turn == 0)
-            p->turn = -(s32)randomBits() - 0x40;
+            p->turn = randomNeg() - 0x40;
     }
     vx = (gUnk_086149C4[(*angle + 0x40) & 0xFF] * p->speed) >> 12;
     p->vx = vx;
@@ -89,6 +96,3 @@ void sub_081D3750(u8 *actor, struct TurnParticle *p)
         sprite->y = target->y;
     sprite->z += p->vz;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D3750);
-#endif

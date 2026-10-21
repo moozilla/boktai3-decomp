@@ -1,5 +1,5 @@
 #include "scene_actor_chase.h"
-void sub_0808F03C(void);
+void Slime_UpdateLaunch(void);
 
 struct Q {
     u8 filler[0x3d4];
@@ -35,5 +35,5 @@ void Slime_UpdateShake(struct SceneActorRegistryResetView *actor, s32 elapsed)
         *flags = mask;
     }
     if (elapsed > 30)
-        Chase_SetCtl(actor, sub_0808F03C, 0x2B);
+        Chase_SetCtl(actor, Slime_UpdateLaunch, 0x2B);
 }

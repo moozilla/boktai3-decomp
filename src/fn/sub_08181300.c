@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.5% (register allocation: the original keeps row and the position pointers in stack/high-register slots)
 struct ActorMarker {
     u8 pad0[0xd4];
     u16 position[3];
@@ -19,6 +17,7 @@ void ActorMarker_EmitRingEffects(struct ActorMarker *p)
     struct ActorMarkerEffectPosition position;
     s32 i;
     const u16 *actorPosition;
+    const u16(*tbl)[4];
     switch (((p->direction + 0x60) >> 6) & 3) {
         case 1:
         case 3:
@@ -30,10 +29,11 @@ void ActorMarker_EmitRingEffects(struct ActorMarker *p)
             break;
     }
     i = 0;
+    tbl = gUnk_0824E6F8;
     actorPosition = p->position;
     if (i <= 6) {
         do {
-            const u16 *offset = (const u16 *)(((row * 8 - row + i) * 8) + (u32)gUnk_0824E6F8);
+            const u16 *offset = (const u16 *)(((row * 8 - row + i) * 8) + (u32)tbl);
             position.x = actorPosition[0] + offset[0];
             position.y = p->position[1] + offset[1];
             position.z = p->position[2] + offset[2];
@@ -42,6 +42,3 @@ void ActorMarker_EmitRingEffects(struct ActorMarker *p)
         } while (i <= 6);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMarker_EmitRingEffects);
-#endif

@@ -6,7 +6,7 @@
 // Motion flag and saved-X pointer allocation differs; one pointer copy and a boolean copy remain.
 #include "scene_actor_chase.h"
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
-void sub_0808E660(void);
+void Slime_RollMoveFlag(void);
 struct SlimeSequence {
     u8 unknown0[14];
     u16 timer;
@@ -110,7 +110,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
                 *flags = mask & *flags;
             }
         } else {
-            Chase_SetCtl(actor, sub_0808E660, 0);
+            Chase_SetCtl(actor, Slime_RollMoveFlag, 0);
             Chase_SetState(actor, 0, 0, 0);
         }
     }
