@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// foundry draft (worker best 85.5%); what differs is mostly register allocation and instruction order
 struct ArmorActor {
     u8 pad0[0xb32];
     u16 flags;
@@ -15,6 +12,7 @@ void ActorController_SetBehavior(struct ArmorActor *, s32);
 
 void Armor_TriggerBehavior35(void *unused0, void *unused1, struct ArmorActor *p)
 {
+    struct ArmorActor *q = p;
     if (!(p->flags & 0x80)) {
         if ((u8)(p->type - 4) <= 1) {
             if (!(p->flags & 1) && p->accumulated <= 0) {
@@ -24,13 +22,10 @@ void Armor_TriggerBehavior35(void *unused0, void *unused1, struct ArmorActor *p)
             return;
         }
         if (p->type == 11) {
-            if ((p->flags & 1) && p->accumulated <= 0) {
-                p->accumulated = 300;
-                ActorController_SetBehavior(p, 35);
+            if ((p->flags & 1) && q->accumulated <= 0) {
+                q->accumulated = 300;
+                ActorController_SetBehavior(q, 35);
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_TriggerBehavior35);
-#endif

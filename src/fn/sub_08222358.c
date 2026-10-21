@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.3%
-// Open: the original reloads o->len (ldrh) after the t <= len test instead of reusing the register.
 
 struct Interp {
     u8 pad0[4];
@@ -22,7 +20,9 @@ u32 Interp_Step(struct Interp *o, void *p)
     if (o->len != 0) {
         o->t++;
         if (o->t <= o->len) {
-            s32 rem = o->len - o->t;
+            s32 rem;
+            asm("" ::: "memory");
+            rem = o->len - o->t;
             o->x = Div(o->x1 * rem + o->x0 * o->t, o->len);
             o->y = Div(o->y1 * rem + o->y0 * o->t, o->len);
             if (o->x < 0)
@@ -34,6 +34,3 @@ u32 Interp_Step(struct Interp *o, void *p)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Interp_Step);
-#endif

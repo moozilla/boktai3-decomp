@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.7%
-// foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-
 #define gActorCallbackGateFlags gUnk_02000560
 extern u32 gUnk_02000560;
 struct ActorReaction {
@@ -13,9 +9,9 @@ struct ActorReaction {
     u8 callbackBlocked;
 };
 void SceneActors_RunStateCallback(u32);
-void ActorReaction_UpdateCallbackGate(u32 raw)
+void ActorReaction_UpdateCallbackGate(struct ActorReaction *actor)
 {
-    struct ActorReaction *actor = (struct ActorReaction *)raw;
+    struct ActorReaction *saved = actor;
     actor->callbackBlocked = 0;
     {
         u32 mask = 4;
@@ -25,11 +21,8 @@ void ActorReaction_UpdateCallbackGate(u32 raw)
                 actor->flags = 0;
                 actor->callbackBlocked = one;
             } else {
-                SceneActors_RunStateCallback(raw);
+                SceneActors_RunStateCallback((u32)saved);
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorReaction_UpdateCallbackGate);
-#endif
