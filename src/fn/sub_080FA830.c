@@ -8,7 +8,6 @@ struct AxeColliderBlock {
 void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
 void sub_080F75C0(void);
 void Axe_OnAttackColliderContact(void);
-#define Axe_InitColliders sub_080FA830
 void Axe_InitColliders(struct SceneActorRegistryActor *actor)
 {
     struct AxeColliderBlock *blk = actor->context;

@@ -5,7 +5,7 @@
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
 void ActorPhase_EmitTrailSprite(void *, void *, u32);
-void sub_080FC998(void *);
+void Axe_UpdateTrailColliders(void *);
 void Axe_UpdateAttackColliderPositions(void *);
 void Axe_ReleaseAuxiliarySprite(void *);
 static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
@@ -86,7 +86,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
         if ((frame & 1) && context[0xA36] <= 19)
             context[0xA36]++;
         ActorPhase_EmitTrailSprite(actor, context + 0xA24, context[0xA34]);
-        sub_080FC998(actor);
+        Axe_UpdateTrailColliders(actor);
         Axe_UpdateAttackColliderPositions(actor);
         if (frame > 30)
             Axe_ReleaseAuxiliarySprite(actor);

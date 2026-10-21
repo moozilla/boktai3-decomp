@@ -12,7 +12,7 @@ struct SceneActorApproachContext {
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
 void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *, struct ContactPosition *,
                                 u32);
-void sub_080FC998(struct SceneActorRegistryResetView *);
+void Axe_UpdateTrailColliders(struct SceneActorRegistryResetView *);
 void ActorPhase_UpdateTimedFlicker(struct SceneActorRegistryResetView *);
 s32 Div(s32, s32);
 static inline u8 SceneActor_TakeApproachEntry(struct SceneActorRegistryResetView *p)
@@ -63,7 +63,7 @@ void SceneActor_AdvanceOffsetApproach(struct SceneActorRegistryResetView *p)
     }
     current = &context->current;
     ActorPhase_EmitTrailSprite(p, current, context->motionMode);
-    sub_080FC998(p);
+    Axe_UpdateTrailColliders(p);
     SceneActor_SubtractApproachPosition(&difference, &context->destination, current);
     current->x += Div(difference.x, context->remaining);
     context->remaining--;

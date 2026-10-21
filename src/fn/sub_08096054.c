@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#define Ghost_UpdateHitStagger sub_08096054
 s32 Mod(s32, s32);
 void Bee_ClearActionFlags(void *);
 void Bee_ConsumeFlag80(void *);
