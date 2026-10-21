@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 /* Actor_PlayFootstepSound: plays a step sound when the animation hits one of two marked frames */
 

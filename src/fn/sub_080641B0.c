@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "roaming_object_playback.h"
 void RoamingObjectB_UpdateAnimation(struct RoamingObject *owner)
 {

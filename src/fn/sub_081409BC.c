@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
 // confidence=low: tests whether the terrain cell under a position is flush with the actor height or flagged.

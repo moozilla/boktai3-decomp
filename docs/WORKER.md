@@ -341,3 +341,14 @@ Format C with `make format` (clang-format, pinned in requirements.txt) before
 committing; formatting never changes agbcc output.
 Before committing a hinted file, run `tools/depin.py FILE --write`: it
 removes every pin/barrier the match does not actually need.
+
+What counts as Register-pinned (`tools/progress.py`, 2026-10-21): any matched
+function whose own body, or a static helper or function-like macro it calls (in
+the unit or in a header), holds `register T x asm("rN")` or an empty `asm("")`
+of any shape: plain barrier, `"memory"` clobber, `"+r"(x)` / `"r"(x)` operands,
+or a register clobber `asm("" ::: "r3")`. The scan reads the source itself
+(outside NONMATCHING drafts), so it counts a hint even when the unit lacks the
+marker; keep adding the marker anyway. `progress.py --list-pinned` prints them
+all (smallest first, with the hint kinds) as the cleanup list. Not counted:
+`__asm__("Name")` symbol aliases on declarations (plain linkage names) and the
+upstream `asm("swi 0x2A")` in `src/lib/m4a.c`.

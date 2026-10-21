@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: uses heavy-attack animation records and per-frame collider tables.
