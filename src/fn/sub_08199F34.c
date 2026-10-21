@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.0%
-// foundry draft (worker best 91.0%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
 struct CannonBatteryPosition {
@@ -36,16 +34,11 @@ void CannonBattery_OnProjectileCollision(void);
 void CannonBattery_DestroyProjectile(void);
 void CannonBattery_UpdateProjectile(void);
 extern struct CannonBatteryPosition gUnk_0824F6E8, gUnk_0824F6F0;
-static inline void CannonBattery_SetProjectileShape(struct CannonBatteryCollider *collider)
-{
-    collider->size = gUnk_0824F6E8;
-    collider->offset = gUnk_0824F6F0;
-}
 void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonBatteryProjectile *p,
                                   struct CannonBatteryPosition *origin, s32 horizontal)
 {
     void *resource = (void *)CannonBattery_LoadAnimation();
-    struct CannonBatteryCollider *collider;
+    register struct CannonBatteryCollider *collider asm("r4");
     AnimData_Load(p->animation, 0x8D95);
     AnimData_SelectPaletteBank(p->animation, 0x8F);
     Sprite_Init(p->sprite, p->animation, 0);
@@ -63,7 +56,8 @@ void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonB
     collider = &p->collider;
     Collider_Init(collider, 0, 0x2103, 0, 1, &gUnk_0824F6E8, &gUnk_0824F6E8);
     Collider_SetAttackProperties(collider, pool->attack, pool->attackFlags, 0x10, 0x40000, 0xA);
-    CannonBattery_SetProjectileShape(collider);
+    collider->size = gUnk_0824F6E8;
+    collider->offset = gUnk_0824F6F0;
     if (horizontal) {
         p->direction = 0x10;
         {
@@ -87,6 +81,3 @@ void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonB
         p->destroy = destroy;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CannonBattery_InitProjectile);
-#endif

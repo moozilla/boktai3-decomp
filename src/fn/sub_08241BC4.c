@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// Remaining differences: register allocation only (r1/r2/r3/r6 choices after the sequence step).
 
 struct P {
     u8 pad0[0x14C];
@@ -179,45 +176,61 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
     }
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
-    if (H(0x270) != 0) {
-        if (B(0x479) != 0) {
-            s16 *target = *(s16 **)((u8 *)p + 0x47C);
-            s32 dx = target[0] - *(s16 *)((u8 *)p + 0x30);
-            s32 dz = target[2] - *(s16 *)((u8 *)p + 0x34);
-            H(0x38) = Scale3(dx);
-            H(0x3C) = Scale3(dz);
-            {
-                u16 *t = &H(0x45A);
-                if (*t <= 5) {
-                    if ((*t & 1) == 0) {
-                        Player_PlayLocalSong(W(0x18), 0x191);
-                        RisingSprite_Spawn((u8 *)p + 0x30);
+    {
+        register u32 dummy asm("r1");
+        u32 off270;
+        u16 *q270;
+        asm("" : "=r"(dummy));
+        off270 = 0x270;
+        q270 = (u16 *)((u8 *)p + off270);
+        asm("" ::"r"(dummy));
+        if (*q270 != 0) {
+            register u32 o479 asm("r6") = 0x479;
+            register u8 *a479 asm("r0");
+            asm("" : "+r"(o479));
+            a479 = (u8 *)p + o479;
+            if (*a479 != 0) {
+                register u32 o47c asm("r1") = 0x47C;
+                register u8 *a47c asm("r0");
+                s16 *target;
+                s32 dx, dz;
+                asm("" : "+r"(o47c));
+                a47c = (u8 *)p + o47c;
+                target = *(s16 **)a47c;
+                dx = target[0] - *(s16 *)((u8 *)p + 0x30);
+                dz = target[2] - *(s16 *)((u8 *)p + 0x34);
+                H(0x38) = Scale3(dx);
+                H(0x3C) = Scale3(dz);
+                {
+                    u16 *t = &H(0x45A);
+                    if (*t <= 5) {
+                        if ((*t & 1) == 0) {
+                            Player_PlayLocalSong(W(0x18), 0x191);
+                            RisingSprite_Spawn((u8 *)p + 0x30);
+                        }
+                        (*t)++;
                     }
-                    (*t)++;
                 }
+            } else {
+                u32 ang = ((p->dir + 5) & 7) << 5;
+                H(0x38) = -Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * H(0x270));
+                H(0x3C) = -Scale(gUnk_086149C4[ang] * H(0x270));
+            }
+            {
+                u16 *q = &H(0x270);
+                Camera_RequestShake(*q);
+                *q = (*q * 3) >> 2;
             }
         } else {
-            u32 ang = ((p->dir + 5) & 7) << 5;
-            H(0x38) = -Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * H(0x270));
-            H(0x3C) = -Scale(gUnk_086149C4[ang] * H(0x270));
-        }
-        {
-            u16 *q = &H(0x270);
-            Camera_RequestShake(*q);
-            *q = (*q * 3) >> 2;
-        }
-    } else {
-        H(0x270) = 0;
-        B(0x479) = 0;
-        B(0x4BA) = 0;
-        if (B(0x5B9) == 3 && B(0x5BB) != 0) {
-            Player_SetTetherMode(p, 0x16, 0);
-        } else {
-            sub_08238238(p);
-            Player_SetTetherMode(p, 0, 0);
+            H(0x270) = 0;
+            B(0x479) = 0;
+            B(0x4BA) = 0;
+            if (B(0x5B9) == 3 && B(0x5BB) != 0) {
+                Player_SetTetherMode(p, 0x16, 0);
+            } else {
+                sub_08238238(p);
+                Player_SetTetherMode(p, 0, 0);
+            }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTerrainSlide);
-#endif
