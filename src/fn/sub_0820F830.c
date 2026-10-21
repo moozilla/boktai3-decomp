@@ -136,7 +136,6 @@ static inline void OrangeSpine_StepAnimation(u8 *p, void *sprite, struct FanSeq 
         }
     }
 }
-#define OrangeSpine_InitializeFromScript sub_0820F830
 
 s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
 {

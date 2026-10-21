@@ -1,5 +1,4 @@
 #include "global.h"
-#define HomingProjectile_UpdateDefaultState sub_081FF454
 #ifdef NONMATCHING
 struct HomingVec {
     s16 x, y, z, pad;
@@ -216,5 +215,5 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FF454);
+INCLUDE_ASM("asm/nonmatching", HomingProjectile_UpdateDefaultState);
 #endif

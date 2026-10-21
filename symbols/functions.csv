@@ -8382,13 +8382,16 @@ addr,name,mode,confidence,source,notes
 081FF388,HomingProjectile_GetActiveCount,thumb,low,src-alias,Returns the active count from the three-slot projectile manager; identity tentative
 081FF39C,HomingProjectile_BeginImpact,thumb,low,src-alias,
 081FF450,HomingProjectile_OnSecondaryCollision,thumb,low,src-alias,Empty collision callback installed on each projectile's secondary collider
+081FF454,HomingProjectile_UpdateDefaultState,thumb,low,src-alias,
 081FF93C,HomingProjectile_UpdateDefaultBehavior,thumb,low,src-alias,Forwards to the default projectile state machine that aims toward the player
 081FF948,HomingProjectile_InitializeSlot,thumb,low,src-alias,
 081FFA74,HomingProjectile_ReleaseSlot,thumb,low,src-alias,Disables collision and removes the sprite before clearing occupancy and decrementing the count
+081FFAB8,HomingProjectile_UpdateManager,thumb,low,src-alias,
 081FFD78,HomingProjectile_DestroyManager,thumb,low,src-alias,Task destruction callback that removes occupied projectile colliders and sprites and clears the singleton
 081FFDBC,HomingProjectile_InitManager,thumb,low,src-alias,Initializes three projectile slots and clears the manager's tracking tables
 081FFE20,HomingProjectile_CreateManager,thumb,low,src-alias,Creates the singleton projectile task and installs update and destruction callbacks
 081FFE60,HomingProjectile_FindFreeSlot,thumb,low,src-alias,Returns the first unoccupied entry in the three-slot projectile pool and its index
+081FFE94,HomingProjectile_Spawn,thumb,low,src-alias,
 082001BC,HomingProjectile_SetBehaviorCallback,thumb,low,src-alias,Stores the behavior callback in the projectile parameter block
 082001C0,HomingProjectile_InitParams,thumb,low,src-alias,Clears projectile parameters and installs default behavior and motion and collision values
 08200200,HomingProjectile_SetMotionParams,thumb,low,src-alias,Sets lifetime and speed together with direction and behavior variant
@@ -8555,12 +8558,14 @@ addr,name,mode,confidence,source,notes
 0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
 0820EBEC,OrangeSpine_RecordDefeat,thumb,low,src-alias,Calls the defeat script and updates kill statistics; tentative actor prefix from its orange-red sprite palette
+0820EE34,OrangeSpine_ApplyHitReaction,thumb,low,src-alias,
 0820EFDC,OrangeSpine_InitCollider,thumb,low,src-alias,Initializes the actor collider and installs its collision callback; tentative actor identity
 0820F078,OrangeSpine_FireProjectile,thumb,low,src-alias,
 0820F1A0,OrangeSpine_TryFireAtPlayer,thumb,low,src-alias,
 0820F298,OrangeSpine_UpdateRecoveryDelay,thumb,low,src-alias,Counts down before starting animation 14 and switching state callbacks; recovery interpretation is tentative
 0820F2EC,OrangeSpine_UpdateDefeatEffect,thumb,low,src-alias,
 0820F824,OrangeSpine_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the actor sprite
+0820F830,OrangeSpine_InitializeFromScript,thumb,low,src-alias,
 0820FD10,OrangeSpine_Create,thumb,low,src-alias,Creates and initializes the actor task with update and destruction callbacks; tentative actor identity
 0820FEA8,Combat_ApplyHitReaction,thumb,low,src-alias,
 0820FFE4,Combat_SpawnDirectionalProjectile,thumb,low,src-alias,

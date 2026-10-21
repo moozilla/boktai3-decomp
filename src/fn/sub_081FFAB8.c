@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define HomingProjectile_UpdateManager sub_081FFAB8
 #ifdef NONMATCHING
 #include "display_animation.h"
 struct HomingVec {
@@ -223,5 +222,5 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FFAB8);
+INCLUDE_ASM("asm/nonmatching", HomingProjectile_UpdateManager);
 #endif
