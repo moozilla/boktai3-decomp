@@ -18,10 +18,11 @@ void ContactBurst_OnContact(struct ContactBurstHit *self, struct ContactBurstHit
     } while (0);
     {
         u32 mask = 256;
-        if (self->flags & mask)
+        if (self->flags & mask) {
             direction = self->direction;
-        else
+        } else {
             direction = Math_Atan2(other->x - self->x, other->z - self->z);
+        }
     }
     effect->contactDirection = direction;
 }
