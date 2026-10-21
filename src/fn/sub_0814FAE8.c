@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 97.1%
-// foundry draft (worker best 97.1%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define Player_FoldFacing              Player_UpdateFacingSide
 #define Player_SetAnimationPhase       ActorSequence_Begin
 #define Player_SetAnimationFlags       Player_AddControlFlags
@@ -39,8 +37,10 @@ void Player_UpdateTransitionAnimation(struct Player *p)
             Player_SetAnimation(p, 0x160, 0x40, 1);
             {
                 u32 frame = p->tetherFrame;
-                u16 mask = 7;
-                u16 low = mask;
+                register s32 mask asm("r1") = 7;
+                register s32 low asm("r2");
+                asm("" : "+r"(mask));
+                low = mask;
                 low &= frame;
                 frame >>= 3;
                 {
@@ -59,8 +59,10 @@ void Player_UpdateTransitionAnimation(struct Player *p)
             Player_SetAnimation(p, 0x160, 0x40, 1);
             {
                 u32 frame = p->tetherFrame;
-                u16 mask = 7;
-                u16 low = mask;
+                register s32 mask asm("r1") = 7;
+                register s32 low asm("r2");
+                asm("" : "+r"(mask));
+                low = mask;
                 low &= frame;
                 frame >>= 3;
                 {
@@ -77,6 +79,3 @@ void Player_UpdateTransitionAnimation(struct Player *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTransitionAnimation);
-#endif
