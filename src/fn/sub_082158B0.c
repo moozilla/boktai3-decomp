@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-// Remaining: the 0xff mask is materialized before the first halfword load.
 struct Background {
     u8 pad[0x20];
     u16 x, y;
