@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fuzzy: 98.7%
 // foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 struct ActorGroupPhaseState {
     u8 unknown0[0xe4c];
@@ -23,8 +23,15 @@ void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
     if (actor->field2B1)
         actor->field2B1 = 0;
     if (actor->field2B0) {
-        actor->flags2D4 &= ~0x100;
-        group->flags &= ~0x400;
+        {
+            u32 m = ~0x100;
+            actor->flags2D4 &= m;
+        }
+        {
+            u32 *g = &group->flags;
+            u32 m = ~0x400;
+            *g &= m;
+        }
         ResetPhase(actor, 0, 0, 3);
     } else {
         actor->counter2AC++;

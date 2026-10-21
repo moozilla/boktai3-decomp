@@ -1,14 +1,10 @@
 #include "global.h"
 #include "modifier_list.h"
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// foundry draft (worker best 90.0%); what differs is mostly register allocation and instruction order
 void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject *parts,
-                                    struct ModifierPreviewOrigin *origin, u16 flags)
+                                    struct ModifierPreviewOrigin *origin, u32 flags)
 {
-    u16 flip = flags;
     s32 i = 0;
-    flip &= 4;
+    u32 flip = flags & 4;
     for (; i <= 4; i++) {
         s32 x = 0;
         s32 y = 0;
@@ -28,6 +24,3 @@ void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject
         parts[i].y = origin->y + y;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CharacterPreview_PositionParts);
-#endif
