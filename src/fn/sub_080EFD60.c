@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 struct SceneActorTargetWaitState {
     u8 unknown0[0x634];
@@ -65,6 +62,7 @@ void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetV
         u8 zero8;
         value &= collider->flags;
         zero8 = 0;
+        asm("" : "+r"(zero8));
         zero = 0;
         value |= 8;
         collider->flags = value;
@@ -78,6 +76,3 @@ void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetV
     }
     actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateTargetApproachPhase);
-#endif

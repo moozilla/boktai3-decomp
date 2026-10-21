@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define SceneHud_BeginWidgetMotion SceneHud_BeginIconMotion
 #define SceneHud_SetWidgetPalette  PauseMenu_SetSpritePalette
 #define gSineTable                 gUnk_086149C4
@@ -21,9 +18,10 @@ static inline s32 BendCosine(s32 angle, s32 bend)
 }
 static inline s32 BendSine(s32 angle, s32 bend)
 {
-    u16 wrapped = angle;
-    wrapped &= 255;
-    return ScaleBend(gSineTable[wrapped] * bend);
+    const s16 *tbl = gSineTable;
+    s32 wrapped = 255;
+    wrapped &= angle;
+    return ScaleBend(tbl[wrapped] * bend);
 }
 void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe, u32 palette,
                               struct SceneVec *from, struct SceneVec *to, s32 bend, u32 duration)
@@ -35,6 +33,7 @@ void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe
     if (bend != 0) {
         s32 angle = (Math_Atan2(to->x - from->x, to->y - from->y) + 0x40) & 255;
         motion->bendX = BendCosine(angle, bend);
+        asm("" : "+r"(angle));
         motion->bendY = BendSine(angle, bend);
     } else {
         motion->bendX = bend;
@@ -49,6 +48,3 @@ void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe
     motion->duration = duration;
     motion->active = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_BeginIconMotion);
-#endif
