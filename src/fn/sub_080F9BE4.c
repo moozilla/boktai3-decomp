@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.9%
-// Remaining differences are instruction ordering and register allocation.
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -34,6 +31,11 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *a, u8 s, u8 
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
+inline static void CpuSet_2(int a2, struct ContactPosition *a1, u32 *a0)
+{
+    CpuSet(a0, a1, a2);
+}
+
 void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct {
@@ -69,13 +71,16 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         Axe_ReleaseAuxiliarySprite(actor);
     }
     if (Mod(frame, 2) == 0) {
-        s32 x, z;
+        s32 x, z, x2;
         range.x = 60;
         range.y = 60;
         range.z = 40;
         position.p = actor->position;
-        buf.zero = 0;
-        CpuSet(&buf.zero, &offset, 0x05000002);
+        {
+            struct ContactPosition *op = &offset;
+            buf.zero = 0;
+            CpuSet_2(0x05000002, op, &buf.zero);
+        }
         switch (context[0xED2]) {
             case 0:
                 offset.x = -120;
@@ -107,9 +112,9 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         x = Scale(offset.x * gUnk_086149C4[(drawable[6] + 64) & 255]);
         z = Scale(offset.z * gUnk_086149C4[drawable[6]]);
         position.v.x = x + z + position.p.x;
-        x = Scale(-(offset.x * gUnk_086149C4[drawable[6]]));
+        x2 = Scale(-(offset.x * gUnk_086149C4[drawable[6]]));
         z = Scale(offset.z * gUnk_086149C4[(drawable[6] + 64) & 255]);
-        position.v.z = x + z + position.p.z;
+        position.v.z = x2 + z + position.p.z;
         SparkParticle_Spawn(&position, 2, &range, 0, 0, 22, 2, 1);
     }
     if (!Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30))
@@ -156,7 +161,3 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     SetAnimation(actor, 1, 0, 2);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateDefeat);
-#endif
