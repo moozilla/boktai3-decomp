@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.0%
 // Remaining differences: amount and step swap r5/r7.
 struct Vec5B {
     u32 x : 16, y : 16, z : 16;
@@ -40,8 +38,14 @@ void sub_08235B34(u8 *arg)
                     value = 99;
             } else
                 value = *(s16 *)(gUnk_02000710 + 0x40);
-            flags = 0;
-            amount = value * 8;
+            /* permuter find: reading uninitialised step steers register allocation */
+            if (step) {
+                flags = 0;
+                amount = value * 8;
+            } else {
+                flags = 0;
+                amount = value * 8;
+            }
         }
         step = 0x1000;
         Collider_Init(e, 0, 0x3001, 0, (u16)flags, &scale, &position);
@@ -50,6 +54,3 @@ void sub_08235B34(u8 *arg)
     } while (0);
     Collider_SetPosition(e, *(u8 **)(p + 0x18) + 0x30, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08235B34);
-#endif
