@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 82.2%
-// remaining: agbcc CSEs the constant 7 into a callee-saved reg (orig reloads it), shifting resource/flags registers
+// MATCHING_CONCESSION: register-pinning
 struct PairE7 {
     u32 a, b;
 };
@@ -16,7 +14,11 @@ void sub_0823E704(u8 *p)
     *(struct PairE7 *)(p + 0xbe8) = *(struct PairE7 *)(p + 0x30);
     *(u16 *)(p + 0xbea) += 230;
     {
-        u32 v = ((p[0x3a4] + 5) & 7) << 5;
+        u32 x = p[0x3a4] + 5;
+        u32 m = 7;
+        u32 v;
+        asm("" : "+r"(m));
+        v = (x & m) << 5;
         p[0xc0c] = v;
     }
     resource = Player_GetConfiguredActionPower(p);
@@ -34,9 +36,9 @@ void sub_0823E704(u8 *p)
         *(u16 *)(p + 0xc06) = 9;
     }
     {
-        s32 bit = *(s8 *)(q + 0xc9);
-        if (bit >= 0) {
-            flags |= 1U << bit;
+        s8 *bp = (s8 *)(q + 0xc9);
+        if (*bp >= 0) {
+            flags |= 1U << *bp;
             Player_ConsumeActionResource(p);
         }
     }
@@ -44,11 +46,9 @@ void sub_0823E704(u8 *p)
                                  *(u16 *)(q + 0xba));
     {
         u8 h = q[0xc8];
-        u32 z = 0;
-        q[0x8a] = h;
+        u8 *d = q + 0x8a;
+        u16 z = 0;
+        *d = h;
         *(u16 *)(q + 0xc6) = z;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823E704);
-#endif
