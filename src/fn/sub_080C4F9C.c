@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.4%
+// fuzzy: 92.1%
 // foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
 struct Seq {
     const u16 *commands;
@@ -23,8 +23,8 @@ struct Inner {
     u8 pad62c[0x50];
     u32 w67c;
     u16 h680, h682, h684, h686, h688, h68a;
-    u8 b68c, b68d, b68e, b68f, b690;
-    u8 pad691[3];
+    u8 b68c, b68d, b68e, b68f, b690, b691;
+    u8 pad692[2];
     u8 a694[8];
     u8 a69c[8];
     u8 a6a4[8];
@@ -48,8 +48,8 @@ void sub_080C4F9C(u8 *p)
     in->b624 = 0;
     in->w628 = 0;
     in->w67c = 0;
-    in->h680 = 0;
     in->h682 = 0;
+    in->h680 = 0;
     in->h684 = 0;
     in->h686 = 0;
     in->h688 = 0;
@@ -59,6 +59,7 @@ void sub_080C4F9C(u8 *p)
     in->b68e = 0;
     in->b68f = 0;
     in->b690 = 0;
+    in->b691 = 0;
     Memory_Clear(in->a694, 8);
     Memory_Clear(in->a69c, 8);
     Memory_Clear(in->a6a4, 8);
@@ -71,14 +72,23 @@ void sub_080C4F9C(u8 *p)
     s = &spr->seq;
     cmd = (const u16 *)((u8 *)s->commands + s->index * 2);
     spr->frame = *cmd >> 6;
-    if ((s->flags & 1) != (((*cmd & 0x30) >> 4) & 1))
-        spr->flags |= 4;
-    else
-        spr->flags &= ~4;
-    if ((s->flags & 2) != (((*cmd & 0x30) >> 4) & 2))
-        spr->flags |= 8;
-    else
-        spr->flags &= ~8;
+    {
+        u32 m = 1;
+        u32 fl = m;
+        fl &= s->flags;
+        if (fl != (((*cmd & 0x30) >> 4) & m))
+            spr->flags |= 4;
+        else
+            spr->flags &= ~4;
+    }
+    {
+        u32 m = 2;
+        u8 fl = s->flags & m;
+        if (fl != (((*cmd & 0x30) >> 4) & m))
+            spr->flags |= 8;
+        else
+            spr->flags &= ~8;
+    }
     s->elapsed++;
     if (s->elapsed >= s->duration) {
         s->elapsed = 0;
@@ -102,7 +112,7 @@ void sub_080C4F9C(u8 *p)
         }
         cmd = (const u16 *)((u8 *)s->commands + s->index * 2);
         s->frameWeight = *cmd & 15;
-        s->duration = (s->speed * s->frameWeight) >> 6;
+        s->duration = (s->frameWeight * s->speed) >> 6;
         if (!s->duration)
             s->duration = 1;
     }
