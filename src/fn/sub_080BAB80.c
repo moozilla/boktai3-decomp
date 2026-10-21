@@ -68,8 +68,13 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
             base = (u8)angle;
         {
             register struct ContactPackedVector *sp asm("r4") = &spawn;
+            u32 b8, c0, d4, c8;
             asm("" : "+r"(sp));
-            MovingSprite_Create(sp, base, p->fieldB8, p->fieldC0, p->wordD4, p->fieldC8, 0x2A);
+            b8 = p->fieldB8;
+            c0 = p->fieldC0;
+            d4 = p->wordD4;
+            c8 = p->fieldC8;
+            MovingSprite_Create(sp, base, b8, c0, d4, c8, 0x2A);
         }
         Sound_PlaySong(0x3A8);
     }
