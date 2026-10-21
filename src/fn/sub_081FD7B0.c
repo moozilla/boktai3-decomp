@@ -6,13 +6,13 @@ struct S {
 };
 void Sound_PlaySong(u32);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
-void sub_081FD7EC(void);
+void OrbitEffect_FireVolley(void);
 u32 OrbitEffect_UpdateExpansion(struct S *p)
 {
     p->w3a4 += 0x4000;
     if (p->w3a4 > 0x40000) {
         Sound_PlaySong(0x564);
-        SunOrb_SetUpdateCallback((u8 *)p + 0x14, sub_081FD7EC);
+        SunOrb_SetUpdateCallback((u8 *)p + 0x14, OrbitEffect_FireVolley);
     }
     return 0;
 }
