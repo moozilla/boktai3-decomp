@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
 
@@ -33,8 +32,9 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
     s32 i;
     struct PlayerOrbitParticle *p;
     for (i = 0; i < 16; i++) {
-        if (!effect->particles[i].active)
+        if (!effect->particles[i].active) {
             break;
+        }
     }
     if (i < 16) {
         {
@@ -42,7 +42,7 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             u32 *randomIndex;
             u32 range;
             u32 mask;
-            register u32 index asm("r1");
+            u32 index;
             p = &effect->particles[i];
             p->flags &= ~1;
             p->position = *position;
@@ -53,7 +53,7 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             mask = 0x3FF;
             index &= mask;
             {
-                u32 random = randomTable[index];
+                u32 random = randomTable[*(&index)];
                 s32 x = (u16)p->position.x;
                 x -= 63;
                 range = 0x7F;
