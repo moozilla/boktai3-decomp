@@ -52,7 +52,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-#define TentacleBody_ResetDirectionalPose sub_080A5E84
 void TentacleBody_ResetDirectionalPose(struct SceneActorAnimationView *actor)
 {
     u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);

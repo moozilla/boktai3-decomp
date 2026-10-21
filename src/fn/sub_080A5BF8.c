@@ -26,7 +26,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 void TentacleActor_EnterHitReaction(struct SceneActorRegistryResetView *);
-#define TentacleBody_OnBodyContact sub_080A5BF8
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
                                 struct SceneActorRegistryResetView *actor)

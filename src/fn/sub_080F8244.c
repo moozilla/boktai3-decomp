@@ -51,7 +51,6 @@ static inline void clearFlags(u32 *p, u32 mask)
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void Axe_ReleaseAuxiliarySprite(struct PhaseActor *);
 void SceneActorControl_ResetRotation(void);
-#define ActorPhase_UpdateReverseFlickerExit sub_080F8244
 void ActorPhase_UpdateReverseFlickerExit(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;

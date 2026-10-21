@@ -8,7 +8,7 @@ struct Z {
 };
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
-void sub_080A5BF8(void);
+void TentacleBody_OnBodyContact(void);
 void TentacleBody_OnAttackCollision(void);
 void TentacleActor_InitCollision(u8 *p)
 {
@@ -18,7 +18,7 @@ void TentacleActor_InitCollision(u8 *p)
     s1.b.lo = 0x40;
     *(u32 *)&s2.a = 0x800000;
     *(u32 *)&s2.b &= 0xFFFF0000;
-    SceneActorCollision_InitBody(p, &s1, &s2, sub_080A5BF8, p);
+    SceneActorCollision_InitBody(p, &s1, &s2, TentacleBody_OnBodyContact, p);
     s3.a.lo = 0x40;
     s3.a.hi = 0x64;
     s3.b.lo = 0x40;

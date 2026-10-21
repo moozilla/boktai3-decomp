@@ -41,8 +41,7 @@ struct S {
     u16 at416;
     u16 at418;
 };
-#define Mummy_UpdateScriptedAction sub_080D48F4
-void sub_080D48F4(struct S *obj)
+void Mummy_UpdateScriptedAction(struct S *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
         void (*fn)(void) = SceneActorAnimation_UpdateDirectionalEntry;
