@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-// Remaining differences: allocation of the saturated defeat counter at offset 0x538.
 extern u8 *gUnk_02000710;
 void Sword_UpdateBodyPaletteRestore(void *);
 void ChildGroup_ShowDamageNumber(void *, u32, u32);
