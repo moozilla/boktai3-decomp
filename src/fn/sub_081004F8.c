@@ -28,7 +28,7 @@ void Sound_PlaySong(u32);
 extern u32 gUnk_030053F4;
 void FloorSwitch_Release(struct FloorSwitch *p)
 {
-    register u16 *flags asm("r6") = &p->flags88;
+    u16 *flags = &p->flags88;
     u32 f = *flags;
     if (2 & f) {
         u32 one;
@@ -36,15 +36,16 @@ void FloorSwitch_Release(struct FloorSwitch *p)
         u32 v;
         u32 mask;
         one = 1;
-        asm("" : "+r"(one));
         zero = 0;
         v = one;
         v = v | f;
         mask = 0xFFFD;
-        *flags = v & mask;
-        FloorSwitch_RunStateScript(p);
-        p->field10 = zero;
-        AnimData_SelectPaletteBank(p->anim, 0x16C);
+        do {
+            *flags = v & mask;
+            FloorSwitch_RunStateScript(p);
+            p->field10 = zero;
+            AnimData_SelectPaletteBank(p->anim, 0x16C);
+        } while (0);
         if (!(gUnk_030053F4 & 0x800)) {
             if (*flags & 4)
                 Sound_PlaySong(0x389);
