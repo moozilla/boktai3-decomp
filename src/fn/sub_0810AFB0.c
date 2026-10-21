@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 extern u32 gUnk_03005250;
@@ -64,10 +63,12 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
     u32 flags;
     s32 ready, i;
     gUnk_03005250 = 1;
-    if (Registry1745_ConsumeStateEntry(p))
+    if (Registry1745_ConsumeStateEntry(p)) {
         StageIconDisplay_Create(1, 0, 0, p);
-    if (Registry1745_CheckSessionReady(p) < 0)
+    }
+    if (Registry1745_CheckSessionReady(p) < 0) {
         goto shutdown;
+    }
     keys = *(vu16 *)0x04000130;
     keys &= 0xfff3;
     ready = 0;
@@ -75,8 +76,8 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
     i = 0;
     if (ready < p->participantCount) {
         u32 initialMask = 0x3c00;
-        register u32 mask asm("r8");
-        mask = initialMask;
+        u32 mask;
+        *(&mask) = initialMask;
         do {
             u16 value = Slot(p, i);
             if (ModeLeave(value, mask)) {
@@ -85,8 +86,9 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
             } else if (ModeInput(value, mask) || ModeCancel(value, mask)) {
                 LinkSelection_RecordSlotState(p, value, i, &flags, 0);
                 p->menuElapsed = 0;
-            } else if (value == 0xffff)
+            } else if (value == 0xffff) {
                 goto shutdown;
+            }
         } while (++i < p->participantCount);
     }
     if (p->menuElapsed > 60 && ready >= p->participantCount) {
@@ -98,8 +100,10 @@ shutdown:
     Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
     return -1;
 waiting:
-    if (!p->menuElapsed)
+    if (!p->menuElapsed) {
         LinkSelection_AdvanceBitExchange(p, flags, &keys);
+    }
+
     p->requestedMode = PackKeys(keys, 0x3400);
     c->frames++;
 end:
