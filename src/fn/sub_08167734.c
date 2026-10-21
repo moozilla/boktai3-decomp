@@ -1,9 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 struct PanelParticle {
     u8 unknown[0x40];
 };
@@ -31,8 +28,9 @@ void PlayerPanel_RemoveEffects(struct PlayerPanel *panel)
             Effect_Remove(particle);
             particle++;
         }
-        group++;
         offset += 0x208;
+        asm("" : "+r"(group));
+        group++;
     } while (group < 2);
     {
         struct PanelEffect *effect = panel->effects;
@@ -42,6 +40,3 @@ void PlayerPanel_RemoveEffects(struct PlayerPanel *panel)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerPanel_RemoveEffects);
-#endif
