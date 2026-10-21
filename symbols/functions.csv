@@ -2693,6 +2693,9 @@ addr,name,mode,confidence,source,notes
 0806CF0C,SceneSteeringActor_ResetPool,thumb,low,src-alias,
 0806CFE4,RouteSpriteActor_RunEventScript,thumb,low,src-alias,
 0806D000,RouteSpriteActor_FinishAnimation,thumb,low,src-alias,
+0806D184,RouteSpriteActor_TickHopToRandomPoint,thumb,low,src-alias,
+0806D438,RouteSpriteActor_PlanWanderPath,thumb,low,src-alias,
+0806D740,RouteSpriteActor_TickWandering,thumb,low,src-alias,
 0806DB20,RouteSpriteActor_TickPausing,thumb,low,src-alias,
 0806DCE4,RouteSpriteActor_TickEmitting,thumb,low,src-alias,
 0806DF60,RouteSpritePool_AllocateSlot,thumb,low,src-alias,
@@ -6613,6 +6616,7 @@ addr,name,mode,confidence,source,notes
 0819A104,CannonBattery_DestroyMuzzleFlash,thumb,low,src-alias,Destruction callback removing the firing effect sprite
 0819A110,CannonBattery_InitMuzzleFlash,thumb,low,src-alias,
 0819A1D8,CannonBattery_SpawnMuzzleFlash,thumb,low,src-alias,Claims a free shared effect slot and initializes a directional firing animation
+0819A23C,CannonBattery_Update,thumb,low,src-alias,
 0819A470,CannonBattery_ReadOptions,thumb,low,src-alias,Reads optional firing parameters and clears the cannon and effect pools
 0819A4D8,CannonBattery_Create,thumb,low,src-alias,Creates the task managing pooled cannons and their firing effects; tentative battery role
 0819A520,ScriptValues_LoadRotatedArray,thumb,low,src-alias,
@@ -8382,13 +8386,16 @@ addr,name,mode,confidence,source,notes
 081FF388,HomingProjectile_GetActiveCount,thumb,low,src-alias,Returns the active count from the three-slot projectile manager; identity tentative
 081FF39C,HomingProjectile_BeginImpact,thumb,low,src-alias,
 081FF450,HomingProjectile_OnSecondaryCollision,thumb,low,src-alias,Empty collision callback installed on each projectile's secondary collider
+081FF454,HomingProjectile_UpdateDefaultState,thumb,low,src-alias,
 081FF93C,HomingProjectile_UpdateDefaultBehavior,thumb,low,src-alias,Forwards to the default projectile state machine that aims toward the player
 081FF948,HomingProjectile_InitializeSlot,thumb,low,src-alias,
 081FFA74,HomingProjectile_ReleaseSlot,thumb,low,src-alias,Disables collision and removes the sprite before clearing occupancy and decrementing the count
+081FFAB8,HomingProjectile_UpdateManager,thumb,low,src-alias,
 081FFD78,HomingProjectile_DestroyManager,thumb,low,src-alias,Task destruction callback that removes occupied projectile colliders and sprites and clears the singleton
 081FFDBC,HomingProjectile_InitManager,thumb,low,src-alias,Initializes three projectile slots and clears the manager's tracking tables
 081FFE20,HomingProjectile_CreateManager,thumb,low,src-alias,Creates the singleton projectile task and installs update and destruction callbacks
 081FFE60,HomingProjectile_FindFreeSlot,thumb,low,src-alias,Returns the first unoccupied entry in the three-slot projectile pool and its index
+081FFE94,HomingProjectile_Spawn,thumb,low,src-alias,
 082001BC,HomingProjectile_SetBehaviorCallback,thumb,low,src-alias,Stores the behavior callback in the projectile parameter block
 082001C0,HomingProjectile_InitParams,thumb,low,src-alias,Clears projectile parameters and installs default behavior and motion and collision values
 08200200,HomingProjectile_SetMotionParams,thumb,low,src-alias,Sets lifetime and speed together with direction and behavior variant
@@ -8443,20 +8450,26 @@ addr,name,mode,confidence,source,notes
 0820337C,CannonEmitter_InitializeFromScript,thumb,low,src-alias,
 0820361C,CannonEmitter_CreateFromScript,thumb,low,src-alias,Creates a scripted proximity-triggered projectile emitter; cannon identity is tentative from its sprite and firing behavior
 08203660,EnemyF426_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 28 and defeat statistics; enemy identity is tentative
+082038A8,EnemyF426_ApplyHitReaction,thumb,low,src-alias,
 08203A54,EnemyF426_InitCollider,thumb,low,src-alias,Initializes the enemy collider and installs its collision callback
 08203AF0,EnemyF426_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
 08203B54,EnemyF426_SpawnProjectile,thumb,low,src-alias,
 08203D6C,EnemyF426_UpdateDeath,thumb,low,src-alias,Death state callback emits particles and records defeat on frame 12
+08203DF4,EnemyF426_UpdateDamageState,thumb,low,src-alias,
 08204224,EnemyF426_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
+08204230,EnemyF426_InitializeFromScript,thumb,low,src-alias,
 08204704,EnemyF426_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key F426
 08204748,EnemyD459_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 29 and defeat statistics; enemy identity is tentative
+08204990,EnemyD459_ApplyHitReaction,thumb,low,src-alias,
 08204B3C,EnemyD459_InitCollider,thumb,low,src-alias,Initializes the enemy collider and installs its collision callback
 08204BD8,EnemyD459_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
 08204C3C,EnemyD459_FireProjectile,thumb,low,src-alias,
 08204D84,EnemyD459_UpdateAttackTiming,thumb,low,src-alias,
 08204E5C,SceneSequence_UpdateCountdown,thumb,low,src-alias,
 08204EB8,EnemyD459_UpdateDeath,thumb,low,src-alias,Death state callback emits particles and records defeat on frame 12
+08204F40,EnemyD459_Update,thumb,low,src-alias,
 08205390,EnemyD459_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
+0820539C,EnemyD459_InitializeFromScript,thumb,low,src-alias,
 08205900,EnemyD459_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key D459
 08205944,Ooze_OnCollision,thumb,low,src-alias,Empty collision callback installed by the Ooze collider initializer
 08205948,Ooze_InitAttackCollider,thumb,low,src-alias,
@@ -8511,11 +8524,14 @@ addr,name,mode,confidence,source,notes
 0820A5B0,FanCannonManager_IsCreated,thumb,low,src-alias,Reports whether the manager singleton pointer is set
 0820A5CC,FanCannon_CreateFromScript,thumb,low,src-alias,
 0820AB3C,DragonPuppy_HandleDefeat,thumb,low,src-alias,Calls the defeat script and updates event flags and kill statistics
+0820AD84,DragonPuppy_ApplyHitReaction,thumb,low,src-alias,
 0820AF30,DragonPuppy_InitCollider,thumb,low,src-alias,Initializes the puppy collider and installs its collision callback
 0820AFD0,DragonPuppy_ReadAttackSchedule,thumb,low,src-alias,Reads up to eight script timing values consumed by the attack state
 0820B174,DragonPuppy_UpdateAttackTiming,thumb,low,src-alias,Attack state callback that triggers an attack on scheduled or periodic intervals
 0820B258,DragonPuppy_UpdateAttackRecovery,thumb,low,src-alias,Recovery callback that counts down before restoring animation and attack timing
+0820B3E0,DragonPuppy_UpdateCombat,thumb,low,src-alias,
 0820B7D4,DragonPuppy_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the puppy sprite
+0820B7E0,DragonPuppy_InitializeFromScript,thumb,low,src-alias,
 0820BCE0,DragonPuppy_Create,thumb,medium,gcl-name,name from GCL key 3D38 ドラゴンパピー (Dragon Puppy); registry callback
 0820BD24,Screamer_HandleDefeat,thumb,low,src-alias,Calls the defeat script and updates Screamer event flags and kill statistics
 0820BF6C,Screamer_OnColliderContact,thumb,low,src-alias,Empty callback installed during Screamer collider initialization
@@ -8531,10 +8547,12 @@ addr,name,mode,confidence,source,notes
 0820D23C,EnemyParticle_UpdateLifetime,thumb,low,src-alias,Marks the particle for motion refresh and reports expiration past its configured lifetime
 0820D258,SceneOverlayEntry_Init,thumb,low,src-alias,
 0820D2A0,EnemyParticle_ReleaseSlot,thumb,low,src-alias,Removes a particle sprite and clears its occupied slot bit
+0820D2C4,EnemyParticle_UpdatePool,thumb,low,src-alias,
 0820D5AC,EnemyParticle_DestroyPool,thumb,low,src-alias,Destruction callback that releases active particles and clears the global pool pointer
 0820D5E4,EnemyParticle_InitPool,thumb,low,src-alias,Registers the global pool and initializes all sixteen particle slots
 0820D614,EnemyParticle_CreatePool,thumb,low,src-alias,Creates the particle manager task and installs its update and destruction callbacks
 0820D654,EnemyParticle_FindFreeSlot,thumb,low,src-alias,Returns the first unoccupied particle slot and its index
+0820D684,EnemyParticle_Emit,thumb,low,src-alias,
 0820D934,EnemyParticle_InitParameters,thumb,low,src-alias,Clears a particle parameter block and installs default motion graphics and lifetime settings
 0820D990,EnemyParticle_SetMotionParameters,thumb,low,src-alias,Sets sprite flags lifetime direction and movement speed
 0820D9A4,EnemyParticle_SetGraphicsParameters,thumb,low,src-alias,Sets the animation resource sprite attribute and optional palette selection
@@ -8552,12 +8570,14 @@ addr,name,mode,confidence,source,notes
 0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
 0820EBEC,OrangeSpine_RecordDefeat,thumb,low,src-alias,Calls the defeat script and updates kill statistics; tentative actor prefix from its orange-red sprite palette
+0820EE34,OrangeSpine_ApplyHitReaction,thumb,low,src-alias,
 0820EFDC,OrangeSpine_InitCollider,thumb,low,src-alias,Initializes the actor collider and installs its collision callback; tentative actor identity
 0820F078,OrangeSpine_FireProjectile,thumb,low,src-alias,
 0820F1A0,OrangeSpine_TryFireAtPlayer,thumb,low,src-alias,
 0820F298,OrangeSpine_UpdateRecoveryDelay,thumb,low,src-alias,Counts down before starting animation 14 and switching state callbacks; recovery interpretation is tentative
 0820F2EC,OrangeSpine_UpdateDefeatEffect,thumb,low,src-alias,
 0820F824,OrangeSpine_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the actor sprite
+0820F830,OrangeSpine_InitializeFromScript,thumb,low,src-alias,
 0820FD10,OrangeSpine_Create,thumb,low,src-alias,Creates and initializes the actor task with update and destruction callbacks; tentative actor identity
 0820FEA8,Combat_ApplyHitReaction,thumb,low,src-alias,
 0820FFE4,Combat_SpawnDirectionalProjectile,thumb,low,src-alias,
