@@ -5230,6 +5230,8 @@ addr,name,mode,confidence,source,notes
 08151308,PlayerCue_UpdateAimHoldA,thumb,low,src-alias,Empty update callback installed by the first pair of motion 3 aim variants; aim interpretation is tentative
 0815130C,PlayerCue_UpdateAimHoldB,thumb,low,src-alias,Empty update callback installed by the second pair of motion 3 aim variants; aim interpretation is tentative
 08151310,Player_UpdateSixPhaseAction,thumb,low,src-alias,
+08151484,PlayerCue_UpdateAim,thumb,low,src-alias,
+081516C0,PlayerCue_UpdateRunTo,thumb,low,src-alias,
 0815196C,PlayerCue_UpdateRunOverlay,thumb,low,src-alias,Run cue callback that sets overlay animation 0x174 and its associated value to 0x18
 08151988,Player_UpdateThreePhaseBaseAnimationAction,thumb,low,src-alias,
 08151A14,PlayerCue_UpdateTurningPalette,thumb,low,src-alias,

@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];

@@ -35,12 +35,12 @@ void PlayerCue_Stand(struct P *, s32);
 void Player_UpdateSongCueAnimation(void);
 void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
-void sub_08151484(void);
+void PlayerCue_UpdateAim(void);
 
 void PlayerCue_AimEnd(struct P *p, u32 w)
 {
     p->w5a4 = w;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 3, 5);
-    p->fn = sub_08151484;
+    p->fn = PlayerCue_UpdateAim;
 }
