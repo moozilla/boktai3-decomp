@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_080A0364(void);
+void Crow_UpdateGroundHeight(void);
 
 u32 Crow_UpdatePreAction(void)
 {
-    sub_080A0364();
+    Crow_UpdateGroundHeight();
     return 1;
 }
