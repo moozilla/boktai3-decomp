@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "player.h"
 #include "contact_actor.h"
 
@@ -15,23 +14,25 @@ s32 ActorDirection_ComputeRelativeCardinal(struct ContactCollider *, struct Cont
 void Player_ApplyContactResponse(struct Player *p, struct ContactCollider *source,
                                  struct ContactCollider *target)
 {
+    s16 k2 = 0;
     u16 *response;
     u16 *in;
     u16 v;
     u16 *t;
     s32 zero;
-    if (p->positionResetState == 1)
+    if (p->positionResetState == 1) {
         target->responseParameter = 0;
+    }
     in = &source->responseParameter;
     v = *in;
     t = &target->responseParameter;
-    zero = 0;
-    asm("" : "+r"(zero));
+    zero = k2;
     *t = v;
     v = *in;
     response = t;
-    if (v > 200)
+    if (v > 200) {
         *response = 200;
+    }
     if (flagBits(&source->reactionFlags, 0x40000)) {
         p->contactSpecial = 1;
         goto compute;
