@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.4%
-// foundry draft (worker best 97.4%); what differs is mostly register allocation and instruction order
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 void Palette_InterpolateBanks(void *dest, void *a, void *b, u32 amount, u32 count);
 u32 PlayerParticleCloud_Create(u32 a, u32 b);
@@ -43,9 +41,12 @@ void sub_081CB5B0(u32 a, u8 *b, s32 c)
         case 1: {
             u32 zero;
             {
-                u16 m = 0x100;
-                *(u16 *)(b + 0xE) = m | *(u16 *)(b + 0xE);
+                u32 m = 0x100;
+                u16 old = *(u16 *)(b + 0xE);
                 zero = 0;
+                asm("" : "+r"(zero));
+                m |= old;
+                *(u16 *)(b + 0xE) = m;
             }
             if (c > 0x12C) {
                 CpuSet(gUnk_030042E4 + 0x680, b + 0x1CC, 0x04000008);
@@ -64,6 +65,3 @@ void sub_081CB5B0(u32 a, u8 *b, s32 c)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081CB5B0);
-#endif
