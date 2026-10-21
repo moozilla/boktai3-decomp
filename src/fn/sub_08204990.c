@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define EnemyD459_ApplyHitReaction sub_08204990
 struct Vec {
     u16 x, y, z, pad;
 };

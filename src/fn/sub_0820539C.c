@@ -5,7 +5,6 @@
 // Register choice for the z pointer (r7 in the ROM), the facing-index pointer
 // reloads and the Anim_SetSequence argument setup still differ.
 #include "scene_vec.h"
-#define EnemyD459_InitializeFromScript sub_0820539C
 struct PHVec {
     s16 x, y, z, pad;
 };
@@ -292,5 +291,5 @@ s32 EnemyD459_InitializeFromScript(u8 *p, void *parent)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820539C);
+INCLUDE_ASM("asm/nonmatching", EnemyD459_InitializeFromScript);
 #endif
