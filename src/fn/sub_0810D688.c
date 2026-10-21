@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 83.7%
-// foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct RecordPanel {
     u8 pad0[0x268];
     u32 spriteFlags;
@@ -16,11 +14,10 @@ void PanelText_DrawDecimal(s32, s32, s32, s32, s32);
 u16 *Bg_GetWrappedTilemapEntry(u32, u32, u32);
 void RecordPanel_DrawTime(struct RecordPanel *p)
 {
-    struct RecordPanel *panel = p;
-    s32 seconds;
-    s32 fraction;
+    register s32 time asm("r6");
     s32 index;
-    s32 time;
+    s32 fraction;
+    register s32 seconds asm("r5");
     u32 mask;
     index = SelectionPanel_GetSelection(p);
     time = GameState_GetChallengeBestScore(index);
@@ -35,18 +32,23 @@ void RecordPanel_DrawTime(struct RecordPanel *p)
     } else if (time < 0) {
     unavailable:
         Video_DrawBackgroundRowMarkers(2, 12);
-        panel->spriteFlags |= 1;
+        p->spriteFlags |= 1;
         return;
     }
 available:
-    Registry3C9F_SetSelectedDisplayResource(panel);
-    panel->spriteFlags &= ~1;
+    Registry3C9F_SetSelectedDisplayResource(p);
+    p->spriteFlags &= ~1;
     if (time > 59999) {
         seconds = 999;
         fraction = seconds;
     } else {
         seconds = Div(time, 60);
-        fraction = Div((time - seconds * 60) * 169, 10);
+        fraction = Div(({
+                           s32 t = time - seconds * 60;
+                           asm("" : "+r"(t) : "r"(time));
+                           t * 169;
+                       }),
+                       10);
     }
     {
         int zero = 0;
@@ -55,6 +57,3 @@ available:
     }
     *Bg_GetWrappedTilemapEntry(3, 9, 12) = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RecordPanel_DrawTime);
-#endif
