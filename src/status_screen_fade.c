@@ -61,7 +61,7 @@ void StatusScreen_WaitForStart(struct StatusScreen *p)
             {
                 struct StatusScreen *target = gUnk_02000044;
                 {
-                    register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_Reveal;
+                    register void (*state)(struct StatusScreen *) = StatusScreen_Reveal;
                     target->state = state;
                     target->timer = 0;
                 }
@@ -248,7 +248,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     *(volatile u16 *)0x04000008 |= 0x40;
     p->delay = Script_GetKeywordValue('w', 0);
     {
-        register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_WaitForStart;
+        register void (*state)(struct StatusScreen *) = StatusScreen_WaitForStart;
         p->state = state;
     }
     p->timer = 0;
