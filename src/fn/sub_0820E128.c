@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-// MATCHING_CONCESSION: register-pinning
 struct PoisonHandBurst {
     u8 pad0[0x18];
     s32 frame;
@@ -44,7 +43,7 @@ s32 PoisonHand_UpdateDefeatBurst(struct PoisonHandBurst *p)
     struct BurstVelocity velocity;
     s32 random, base;
     if (!p->timer) {
-        register s32 f asm("r12") = p->frame;
+        s32 f = p->frame;
         u32 attributes, palette;
         if (f <= 15) {
             PoisonHand_CopyPosition(&position, &p->position);

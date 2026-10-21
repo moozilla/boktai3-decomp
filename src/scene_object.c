@@ -779,7 +779,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) asm("r1") =
+                        register void (*callback)(struct SceneObject *) =
                             Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
@@ -818,7 +818,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) asm("r1") =
+                        register void (*callback)(struct SceneObject *) =
                             Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
@@ -976,7 +976,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
         if (p->type == 1) {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") =
+                    register void (*callback)(struct SceneObject *) =
                         Scene_UpdateFallingObject;
                     p->update = callback;
                 }
@@ -989,7 +989,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") =
+                    register void (*callback)(struct SceneObject *) =
                         Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
@@ -1004,7 +1004,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
         } else {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(struct SceneObject *) asm("r0") =
+                    register void (*callback)(struct SceneObject *) =
                         Scene_UpdateFallingObject;
                     p->update = callback;
                 }
@@ -1014,7 +1014,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") =
+                    register void (*callback)(struct SceneObject *) =
                         Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
@@ -1065,7 +1065,7 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
             Scene_PlayMovementEffect(p);
         }
         {
-            register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
+            register void (*callback)(struct SceneObject *) = Scene_UpdateObjectIdle;
             p->update = callback;
         }
         p->timer = 0;
@@ -1148,7 +1148,7 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
             setMode(&p->draw, p->phase);
         }
     } else {
-        register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectIdle;
+        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectIdle;
         p->update = callback;
         p->timer = 0;
         p->entered = 1;
@@ -1534,7 +1534,7 @@ s32 SceneObjects_CreateFromScript(void)
     struct SceneExtent position;
     s32 id, type;
     s32 initial, animation, script, defaultResource;
-    register s32 flags asm("r9"), resource asm("r6"), drawMode asm("r8"), health asm("r10");
+    register s32 flags asm("r9"), resource asm("r6"), drawMode, health;
     id = Script_GetKeywordValue('n', 0);
     type = Script_GetKeywordValue('t', 0);
     flags = Script_GetKeywordValue('f', 0);
