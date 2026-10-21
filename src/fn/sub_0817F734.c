@@ -55,7 +55,6 @@ static inline u32 TestFlags(struct BossSlot2Tick *p, u32 mask)
     return p->flags & mask;
 }
 
-#define BossSlot2_UpdateFrame sub_0817F734
 void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
 {
     struct BossSlot2Tick *actor = p;
