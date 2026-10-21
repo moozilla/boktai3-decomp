@@ -55,11 +55,9 @@ void RfuManager_SendData(int);
 void Wireless_RemoveConnectedSlots(struct Engine *, u8);
 void WirelessController_ResetSession(struct Engine *);
 int sub_082238F0(int);
-// MATCHING_CONCESSION: register-pinning
 void Wireless_OnChildTransferEvent(u8 command)
 {
-    register int key asm("r3") = command;
-    int saved = key;
+    int key = command;
     struct Engine *p = gUnk_02000484;
     if (!p)
         goto done;
@@ -105,9 +103,9 @@ last:
         goto error;
     goto done;
 lastMore:
-    if (saved == 0xF2)
+    if (command == 0xF2)
         goto error;
-    if (saved == 0xFF)
+    if (command == 0xFF)
         goto error;
     goto done;
 receive:
