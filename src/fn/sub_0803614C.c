@@ -115,8 +115,7 @@ receive:
     goto done;
 added: {
     u8 *slots = &p->selected;
-    register int incoming asm("r1") = (u8)gUnk_03005390.code;
-    *slots |= incoming;
+    *slots |= (u8)gUnk_03005390.code;
 }
     goto done;
 removed: {
