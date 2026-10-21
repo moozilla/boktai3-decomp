@@ -1,8 +1,5 @@
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 83.7%
-// foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
 #define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
 #define Player_DispatchPendingTrigger PlayerCue_CompleteAction
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -13,20 +10,16 @@ void Player_TurnTowardTargetFacing(struct Player *p)
 {
     if (p->tetherFrame > 1) {
         s32 target = p->targetFacing;
-        u32 facing = p->facing;
+        u8 *fp = &p->facing;
+        u32 facing = *fp;
         u32 shifted = facing;
         s32 delta;
         shifted -= 8;
         target -= shifted;
         delta = target & 7;
-        if (delta > 4)
-            facing += 7;
-        else
-            facing += 1;
-        p->facing = facing & 7;
+        *fp = (facing + (delta > 4 ? 7 : 1)) & 7;
         {
-            u8 *bytes = (u8 *)p;
-            u32 current = bytes[0x3A4];
+            u32 current = p->facing;
             if (current > 4) {
                 p->heading = 8 - current;
                 p->side = 1;
@@ -44,6 +37,3 @@ void Player_TurnTowardTargetFacing(struct Player *p)
         PlayerCue_CompleteAction(p);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_TurnTowardTargetFacing);
-#endif

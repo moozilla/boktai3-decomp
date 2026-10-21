@@ -3106,6 +3106,7 @@ addr,name,mode,confidence,source,notes
 0809D16C,SceneActorControl_ResetTargetFlags,thumb,low,src-alias,
 0809D1AC,RouteActor_UpdateRandomDestination,thumb,low,src-alias,
 0809D2A8,RouteActor_ReflectAtRaisedTerrain,thumb,low,src-alias,
+0809D424,Lun_EnterIdleOrCopyCell,thumb,low,src-alias,When flag 0x100 is set copies a word from the owner object; otherwise installs the idle control and sets bit 8 in the motion flags
 0809D3A4,Lun_OnTargetCheck,thumb,low,src-alias,Target-check callback tests vertical proximity and range before setting targeting flags
 0809D4EC,SceneActorControl_ConsumeLiftFlagPenalty,thumb,low,src-alias,
 0809D550,Lun_UpdateMovement,thumb,low,src-alias,Runs movement logic and waypoint handling before the main action callback
@@ -3113,6 +3114,7 @@ addr,name,mode,confidence,source,notes
 0809D938,Lun_InitSecondaryActionTable,thumb,low,src-alias,Installs the two-entry secondary action callback table at offset 0x28C
 0809D948,RouteActor_UpdatePlayerDestinationPhase,thumb,low,src-alias,
 0809DB9C,Lun_InitReactionTable,thumb,low,src-alias,Installs the two-entry callback table at offset 0x288 tentatively interpreted as reactions
+0809DBAC,Lun_PlayResponseAndResetState,thumb,low,src-alias,Plays a response sound by whether field 2E4 is set; marks the flag-0x20 reaction and resets control to code 0x12 then returns 1
 0809DC90,Lun_OnUpdate,thumb,low,src-alias,Actor update callback runs movement then dispatches the current action and checks terrain
 0809DCC8,Lun_OnPlayerTargetInit,thumb,low,src-alias,Initialization callback assigns the player position as target and invokes shared target setup
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry

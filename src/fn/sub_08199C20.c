@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.2%
-// foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
 struct CallbackPosition {
     u32 x, z;
 };
@@ -20,10 +18,13 @@ struct CallbackSlot {
 void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
 {
     u16 *component;
-    if (slot->flags & 4)
+    if (slot->flags & 4) {
         component = (u16 *)&slot->position.x;
-    else
+        asm("" : "+r"(component));
+    } else {
         component = (u16 *)&slot->position.z;
+        asm("" : "+r"(component));
+    }
     *component -= 3;
     if (++slot->timer > 19) {
         slot->position = slot->savedPosition;
@@ -32,6 +33,3 @@ void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
         slot->timer = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackSlot_RestorePosition);
-#endif

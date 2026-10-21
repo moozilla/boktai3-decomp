@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94%
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
@@ -16,14 +15,17 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
         s16 x, y, z, pad;
     } v;
     s16 *vp;
-    s32 a, b, t;
-    u32 zero;
+    register s32 a asm("r5");
+    register s32 b asm("r6");
+    s32 t;
+    u32 zero, k;
     AnimData_Load(anim, 0x89CA);
     *(u16 *)(anim + 6) = 0x6F;
     *(u8 **)(anim + 0xC) = parent + 0x718;
     Sprite_Init(obj, anim, 0);
-    *(u16 *)(obj + 0x10) = 0x18;
+    k = 0x18;
     zero = 0;
+    *(u16 *)(obj + 0x10) = k;
     obj[7] = 2;
     *(void **)(obj + 0x74) = ScriptProc_Start(0x922E, 0x572B);
     *(u32 *)obj |= 1;
@@ -41,6 +43,3 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
     t = ((b - a) * 32) / 3 + 0x40;
     out[2] = trunc1(t);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", HresvelgrChild_Init);
-#endif
