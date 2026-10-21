@@ -2984,6 +2984,7 @@ addr,name,mode,confidence,source,notes
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
 0808FD9C,Slime_FollowPlayer,thumb,low,src-alias,
+0808FE64,Slime_OnInterrupt,thumb,low,src-alias,Unless already in wait kinds 0x22-0x24 or 0x26, restarts the random wait control with behavior 0xF; tentative
 0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise
