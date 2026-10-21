@@ -1856,12 +1856,167 @@ void Nidhoggr_TrackPlayerDepth(struct Nidhoggr *t)
 }
 
 /* Tentative: called once per frame from Nidhoggr_UpdateState, right after the behavior
- * dispatch table. Likely the central per-row animation dispatcher that decides, for each
- * of the 26 parts, which SceneAnimation_UpdateSlotAnimationNN / Nidhoggr_UpdateXAnimationNN
- * handler to call based on that row's current animation id. 1088 bytes; not attempted
- * byte-for-byte this pass. confidence=low. */
-
-INCLUDE_ASM("asm/nonmatching", sub_08195334);
+ * dispatch table. Advances the per-part defeat sequences (dead[] latches 1..9): picks three
+ * row groups from the current mode, and for each stage waits for the row's animation to
+ * finish (rowDoneFlag/rowCounter) before requesting the next completed-part state.
+ * confidence=low. */
+#define Nidhoggr_UpdatePartSequences sub_08195334
+void Nidhoggr_UpdatePartSequences(struct Nidhoggr *t)
+{
+    s32 a = 0, b = 0, c = 0;
+    s32 i, p;
+    switch (t->mode) {
+        case 2:
+        case 3:
+        case 8:
+            a = 6;
+            b = 14;
+            c = 0x13;
+            break;
+        case 4:
+        case 5:
+        case 9:
+            a = 2;
+            b = 10;
+            c = 0x12;
+            break;
+    }
+    p = 0;
+    for (i = 0; i < 4; i++, p++) {
+        switch (t->dead[p]) {
+            case 0:
+                break;
+            case 1:
+                Nidhoggr_ChangeCompletedPartState(t, (a + i), 1);
+                t->dead[p]++;
+                break;
+            case 2:
+                if (t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 3);
+                    t->dead[p]++;
+                }
+                break;
+            case 4:
+            case 6:
+                if (t->rowCounter[(a + i)] > 0x27 && t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 3);
+                    t->dead[p]++;
+                }
+                break;
+            case 3:
+            case 7:
+                if (t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 2);
+                    t->dead[p]++;
+                }
+                break;
+            case 5:
+                if (t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 2);
+                    if (t->mode == 4)
+                        t->dead[p]++;
+                    else
+                        t->dead[p] = 8;
+                }
+                break;
+            case 8:
+                if (t->rowCounter[(a + i)] > 0x27 && t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 4);
+                    t->dead[p]++;
+                }
+                break;
+            case 9:
+                if (t->rowDoneFlag[(a + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (a + i), 0);
+                    t->dead[p] = 0;
+                }
+                break;
+        }
+    }
+    for (i = 0; i < 4; i++, p++) {
+        switch (t->dead[p]) {
+            case 0:
+                break;
+            case 1:
+                Nidhoggr_ChangeCompletedPartState(t, (b + i), 6);
+                t->dead[p]++;
+                break;
+            case 2:
+                if (t->rowCounter[(b + i)] > 0x31 && t->rowDoneFlag[(b + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (b + i), 8);
+                    t->dead[p]++;
+                }
+                break;
+            case 3:
+                if (t->rowDoneFlag[(b + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (b + i), 7);
+                    t->dead[p]++;
+                }
+                break;
+            case 4:
+                if (t->rowCounter[(b + i)] > 0x31 && t->rowDoneFlag[(b + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (b + i), 9);
+                    t->dead[p]++;
+                }
+                break;
+            case 5:
+                if (t->rowDoneFlag[(b + i)] != 0) {
+                    Nidhoggr_ChangeCompletedPartState(t, (b + i), 0);
+                    t->dead[p] = 0;
+                }
+                break;
+        }
+    }
+    switch (t->dead[p]) {
+        case 0:
+            break;
+        case 1:
+            Nidhoggr_ChangeCompletedPartState(t, c, 0xb);
+            t->dead[p]++;
+            break;
+        case 2:
+            if (t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0xd);
+                t->dead[p]++;
+            }
+            break;
+        case 4:
+        case 6:
+            if (t->rowCounter[c] > 0x13 && t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0xd);
+                t->dead[p]++;
+            }
+            break;
+        case 3:
+        case 7:
+            if (t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0xc);
+                t->dead[p]++;
+            }
+            break;
+        case 5:
+            if (t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0xc);
+                if (t->mode == 4)
+                    t->dead[p]++;
+                else
+                    t->dead[p] = 8;
+            }
+            break;
+        case 8:
+            if (t->rowCounter[c] > 0x13 && t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0xe);
+                t->dead[p]++;
+            }
+            break;
+        case 9:
+            if (t->rowDoneFlag[c] != 0) {
+                Nidhoggr_ChangeCompletedPartState(t, c, 0);
+                t->dead[p] = 0;
+            }
+            break;
+    }
+}
 
 s32 sub_08249350(s32, s32);
 
