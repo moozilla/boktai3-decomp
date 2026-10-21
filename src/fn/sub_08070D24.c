@@ -1,11 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-static inline u32 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabledInput,
+static inline s16 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabledInput,
                                 u32 excludedInput)
 {
-    register struct SceneActorRegistryActor *actor asm("r3") = input;
-    register u32 disabled asm("r9") = disabledInput;
-    register u32 excluded asm("r8") = excludedInput;
+    struct SceneActorRegistryActor *actor = input;
+    u32 disabled = disabledInput;
+    u32 excluded = excludedInput;
     if (actor) {
         u32 offset = 0x2d4;
         u32 mask;
@@ -40,18 +39,18 @@ SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *input)
 {
     const struct ContactPosition *position = input;
     struct SceneActorRegistryNode *node = gUnk_020004AC;
-    register struct SceneActorRegistryActor *actor asm("r3") = node->actor;
+    struct SceneActorRegistryActor *actor = node->actor;
     s32 bestDistance = 10000000;
     struct SceneActorRegistryActor *best = 0;
     if (actor) {
-        register u32 disabled asm("r9") = 0x40;
-        register u32 excluded asm("r8") = 0x20000;
+        u32 disabled = 0x40;
+        u32 excluded = 0x20000;
         struct ContactPosition difference;
         struct ContactPosition *delta = &difference;
         do {
             u32 category = actor->category;
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
-            asm("" : "+r"(unavailable));
+
             if (!unavailable && (category == 4 || category == 1 || category == 3) &&
                 actor->unknown2B5[0] != 21) {
                 const struct ContactPosition *right = &actor->position;
