@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.5%
-// foundry draft (worker best 89.5%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32, s32);
 u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *,
                                               struct SceneActorTimedBehaviorContext *, s32);
@@ -31,7 +29,9 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
     struct SceneActorTimedBehaviorContext *context;
     struct SceneActorTargetDelta delta;
     s32 angle;
-    if (!(s->flags2D4 & 0x100)) {
+    u32 m = 0x100;
+    asm("" : "+r"(m));
+    if (!(s->flags2D4 & m)) {
         context = s->context;
         if (s->distanceF0 < s->rangeF4) {
             struct SceneActorTargetDelta *difference = &delta;
@@ -72,6 +72,3 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_SelectBehaviorByTargetAngle);
-#endif
