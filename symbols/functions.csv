@@ -5483,7 +5483,9 @@ addr,name,mode,confidence,source,notes
 08160640,ActorDebris_Show,thumb,low,src-alias,Clears the hidden bit on both the debris task control flags and its sprite
 0816065C,PlayerEffect_SetPaletteSource,thumb,low,src-alias,Sets the effect palette selector and palette source with a default player palette fallback
 08160684,PlayerAttackEffect_SetEmissionState,thumb,low,src-alias,Requests an emission state and resets the emission counter when it differs from the previous state
+081608B0,PlayerAttackEffect_EmitPaletteBaseTrail,thumb,low,src-alias,
 08160EA4,PlayerAttackEffect_EmitPaletteZeroTrail,thumb,low,src-alias,Emits particles along state-dependent attack arcs using animation bank zero
+081612C8,PlayerAttackEffect_EmitPaletteFiveTrail,thumb,low,src-alias,
 081616D0,PlayerAttackEffect_EmitPaletteTwoTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank two
 08161AF4,PlayerAttackEffect_EmitPaletteThreeTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank three
 08161F18,PlayerAttackEffect_EmitPaletteFourTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank four
@@ -6092,6 +6094,9 @@ addr,name,mode,confidence,source,notes
 0817F21C,SceneEventActor_UpdateSongStopTransition,thumb,low,src-alias,
 0817F41C,BossSlot2_RunUnpausedStateCallback,thumb,low,src-alias,Clears a control field and runs the scene actor state callback when unpaused
 0817F444,BossSlot2_InitStateDispatch,thumb,low,src-alias,Validates states 1 through 17 and installs the corresponding dispatch entry while resetting state fields
+0817F49C,BossSlot2_ApplyPendingDamage,thumb,low,src-alias,
+0817F734,BossSlot2_UpdateFrame,thumb,low,src-alias,
+0817F9C0,BossSlot2_UpdatePresentation,thumb,low,src-alias,
 0817FD50,SceneActor_UpdateUnlessPaused,thumb,low,src-alias,
 0817FDA0,SceneActor_DestroyComponents,thumb,low,src-alias,
 08180380,BossSlot2_CreateFromScript,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task from script arguments
