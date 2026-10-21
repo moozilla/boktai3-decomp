@@ -13,8 +13,9 @@ s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorTerrainView *ac
     } while (0);
     for (; i <= 3; i++) {
         if (direction != opposite) {
-            if (SceneActorTerrain_GetNeighborCell(actor, direction) >= 0)
+            if (SceneActorTerrain_GetNeighborCell(actor, direction) >= 0) {
                 return direction;
+            }
         }
         direction = (direction + 1) & mask;
     }
