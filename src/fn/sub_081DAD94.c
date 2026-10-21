@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
 extern const s16 gUnk_086149C4[];
 void *ResourceRegistry_GetResource(u32);
 void Projectile_SetFlightParams(void *, u16, u16, s32, u32);
@@ -48,18 +47,26 @@ s32 sub_081DAD94(u8 direction, s32 index)
         return 1;
     entry = &task->entries[index];
     params = &entry->params;
-    dir = (s8)direction;
-    Projectile_SetFlightParams(params, entry->params.a, params->b, dir, params->d);
+    {
+        u16 pa = entry->params.a;
+        u16 pb = params->b;
+        dir = (s8)direction;
+        Projectile_SetFlightParams(params, pa, pb, dir, params->d);
+    }
     entry->direction = dir;
     entry->sector = ((u16)dir + 0x70 >> 5) & 7;
     v = &entry->vx;
     angle = params->c;
     speed = params->d;
-    v[0] = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-    v[1] = 0;
+    {
+        register s32 sv asm("r1");
+        register u32 zero asm("r0");
+        sv = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+        zero = 0;
+        asm("" : "+r"(zero));
+        v[0] = sv;
+        v[1] = zero;
+    }
     v[2] = scale(gUnk_086149C4[angle & 255] * speed);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081DAD94);
-#endif
