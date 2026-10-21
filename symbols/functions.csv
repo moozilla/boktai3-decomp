@@ -3841,6 +3841,7 @@ addr,name,mode,confidence,source,notes
 080FFBA4,WoodenCrate_UpdatePaletteTimers,thumb,low,src-alias,
 080FFC24,WoodenCrate_UpdateToggleAnimation,thumb,low,src-alias,
 080FFDD4,WoodenCrate_CheckTrigger,thumb,low,src-alias,
+080FFE44,WoodenCrate_Update,thumb,low,src-alias,"per-frame update: resets on request, steps sprite sequence, updates palette timers, trigger and shake"
 080FFF78,SlotPool_UpdateActiveSlots,thumb,low,src-alias,
 080FFFE4,WoodenCrate_DestroyManager,thumb,low,src-alias,Manager destruction callback that removes occupied crate sprites and colliders and clears the singleton
 08100038,WoodenCrate_InitManager,thumb,low,src-alias,Starts the manager script procedure and registers the singleton with an empty slot mask
