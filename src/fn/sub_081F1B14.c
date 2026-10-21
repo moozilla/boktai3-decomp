@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.7%
-// foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 
 struct SingletonSlot7Actor {
     u8 pad0[0x90];
@@ -62,12 +60,12 @@ static inline u8 PlayerHasFlag(void)
 
 s32 SingletonSlot7_Update(void *arg)
 {
-    struct SingletonSlot7Actor *p = arg;
-    struct SingletonSlot7Actor *actor = arg;
+    register struct SingletonSlot7Actor *actor asm("r6") = arg;
+    register struct SingletonSlot7Actor *p asm("r5") = actor;
     struct SingletonSlot7Scroll scroll[2];
     if (actor->motionMode == 0) {
         u32 flagged = PlayerHasFlag();
-        if (flagged == 1 && actor->callback != SceneActors_UpdateIdleDisplay) {
+        if (flagged == 1 && p->callback != SceneActors_UpdateIdleDisplay) {
             p->callback = SceneActors_UpdateIdleDisplay;
             p->callbackTimer = 0;
             p->callbackEntered = flagged;
@@ -75,8 +73,11 @@ s32 SingletonSlot7_Update(void *arg)
             p->valueA4 = 0;
             Sound_StopSong(0x590);
         }
-        Player_GetWorldPosition(actor->player, actor->position);
-        actor->velocity = Player_GetHorizontalVelocity(actor->player);
+        {
+            s32 *pl = &actor->player;
+            Player_GetWorldPosition(*pl, actor->position);
+            actor->velocity = Player_GetHorizontalVelocity(*pl);
+        }
         SceneTilemap_CopyScrollSourceState(&scroll[1]);
         actor->scrollX = scroll[1].a;
     }
@@ -86,12 +87,10 @@ s32 SingletonSlot7_Update(void *arg)
     SceneActors_TickStateCallback(actor);
     if (p->motionMode != 0) {
         u32 mask = 0x40;
-        p->effectFlags |= mask;
+        u32 *fp = &p->effectFlags;
+        *fp |= mask;
     }
     SceneActors_UpdateEffects(p);
     sub_081F1274(actor);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SingletonSlot7_Update);
-#endif
