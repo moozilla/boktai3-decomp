@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 97.1%
 // Tail address temporaries and register choices still differ.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -175,14 +173,38 @@ void Player_UpdateSpiralRelease(struct Player *p)
     Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, ((struct ReleaseAnimation *)p)->resource,
                      0, p->heading, p->side);
     Step(&((struct ReleaseAnimation *)p)->sprite, &((struct ReleaseAnimation *)p)->seq);
-    AnimData_SelectPaletteBank(p->visualObject, 0x2DD);
-    if (++p->tetherFrame > 31) {
-        p->actionLatch464 = 1;
-        p->actionLatch465 = 3;
-        ActorSequence_Begin(p, 0, 0);
+    {
+        register u32 o asm("r2") = 0x178;
+        register void **q asm("r0");
+        asm("" : "+r"(o));
+        q = (void **)((u8 *)p + o);
+        {
+            void *v = *q;
+            asm("" : "+r"(v));
+            AnimData_SelectPaletteBank(v, 0x2DD);
+        }
+    }
+    {
+        register u32 o asm("r0") = 0x45A;
+        register u16 *tf asm("r1");
+        asm("" : "+r"(o));
+        tf = (u16 *)((u8 *)p + o);
+        if (++*tf > 31) {
+            {
+                register u32 o2 asm("r2") = 0x464;
+                register u8 *q asm("r1");
+                asm("" : "+r"(o2));
+                q = (u8 *)p + o2;
+                *q = 1;
+            }
+            {
+                register u32 o3 asm("r0") = 0x465;
+                register u8 *q asm("r1");
+                asm("" : "+r"(o3));
+                q = (u8 *)p + o3;
+                *q = 3;
+            }
+            ActorSequence_Begin(p, 0, 0);
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralRelease);
-#endif

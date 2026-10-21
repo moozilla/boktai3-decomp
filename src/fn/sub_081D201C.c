@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.3%
 // differs: tail copy of tag pointer (r2 vs r4) and constant register order
 
 struct ArcTag {
@@ -60,21 +59,28 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
         switch (tag->mode) {
             case 0: {
                 s32 dx, dz;
-                struct ArcTag *t;
+                register struct ArcTag *t asm("r2");
+                s32 v;
                 tag->field6 = zero;
                 dx = npc->targetX - tag->startX;
                 dz = npc->targetZ - tag->startZ;
                 pos[0] = tag->startX + Div(tag->elapsed * dx, tag->duration);
                 pos[2] = tag->startZ + Div(tag->elapsed * dz, tag->duration);
+                v = 200 * gUnk_086149C4[Div(tag->elapsed << 7, tag->duration) & 0xff];
                 t = tag;
-                pos[1] = tag->startY +
-                         trunc12(200 * gUnk_086149C4[Div(tag->elapsed << 7, tag->duration) & 0xff]);
+                asm("" : "+r"(t));
+                pos[1] = tag->startY + trunc12(v);
                 if (tag->elapsed >= tag->duration) {
                     pos[1] = npc->targetY;
-                    t->mode = 1;
-                    t->field6 = 1;
-                    t->elapsed = 0;
-                    npc->done = 1;
+                    {
+                        u32 one = 1;
+                        u32 zero2 = 0;
+                        asm("" : "+r"(zero2));
+                        t->mode = one;
+                        t->field6 = one;
+                        t->elapsed = zero2;
+                        npc->done = 1;
+                    }
                 }
                 break;
             }
@@ -84,6 +90,3 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TaggedSceneNpc_UpdateArcMove);
-#endif
