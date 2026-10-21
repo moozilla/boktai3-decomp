@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-// foundry draft (worker best 87.6%); what differs is mostly register allocation and instruction order
 s32 Callback_InvokeActor(void *, void *);
 void SceneActor_WaitForCategoryAttachment(void);
 static inline u8 TakeEntry(u8 *flag)
@@ -17,23 +15,30 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
 {
     if (TakeEntry(&actor->field2B1)) {
         u32 *motion = &actor->fieldDC;
-        u32 zero = 0;
+        register u32 zero asm("r4") = 0;
         struct SceneActorRegistryResetView *context;
-        u32 one;
-        u16 *animationFlags;
-        u8 zero8;
-        u32 value;
+        register u32 one asm("r3");
+        register u16 *animationFlags asm("r1");
+        register u8 zero8 asm("r5");
+        register u32 value asm("r2");
         void *target;
         u8 kind;
         u32 *flags;
         s32 mask;
+        asm("" : "+r"(zero));
         *motion = zero;
         context = actor->context;
         one = 1;
+        asm("" : "+r"(one));
         animationFlags = &context->animationFlags65C;
         value = *animationFlags;
         zero8 = 0;
-        *animationFlags = one | value;
+        asm("" : "+r"(zero8));
+        {
+            u32 t;
+            asm("" : "=r"(t) : "0"(one));
+            *animationFlags = t | value;
+        }
         target = SceneActor_WaitForCategoryAttachment;
         kind = 0x25;
         actor->field2B2 = one;
@@ -60,6 +65,3 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
         Callback_InvokeActor(actor, actor->update270);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_StartFlaggedAnimationPhase);
-#endif

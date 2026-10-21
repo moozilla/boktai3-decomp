@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.2%
+// fuzzy: 97.3%
 // Remaining: destination-address reuse, source loads and zero scheduling.
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, u32);
@@ -30,6 +31,7 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
     u32 *flags;
     s32 result;
     u16 *target;
+    u16 v;
     kind = s + 0x438a;
     index = *kind + 10;
     {
@@ -47,9 +49,17 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
                              to, 24, 16);
     if (mode == 0) {
         s[0x487f] = 1;
-        ((struct RatioHud *)s)->prevA = H(OWNER(s), 0x424);
-        ((struct RatioHud *)s)->prevB = H(OWNER(s), 0x428);
+        {
+            register u32 off asm("r4") = 0x424;
+            u16 w;
+            asm("" : "+r"(off));
+            w = H(OWNER(s), off);
+            ((struct RatioHud *)s)->prevA = w;
+            off += 4;
+            v = H(OWNER(s), off);
+        }
         target = &((struct RatioHud *)s)->prevB;
+        *target = v;
         ((struct RatioHud *)s)->nextA = Div(H(OWNER(s), 0x426) * *target, H(OWNER(s), 0x42a));
         if (!((struct RatioHud *)s)->nextA && *target)
             ((struct RatioHud *)s)->nextA = 1;
