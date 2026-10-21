@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.8%
-// foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
 #define gBackgroundVisibility gUnk_03004BD8
 struct ScreenLayerPair {
     u8 unknown0[0x2C0];
@@ -15,8 +13,8 @@ struct ScreenLayerPair {
 extern u16 gUnk_03004BD8;
 void ScreenLayers_HidePair(struct ScreenLayerPair *screen)
 {
-    s32 mask;
-    u16 *control;
+    register s32 mask asm("r1");
+    register u16 *control asm("r0");
     screen->firstFlags |= 1;
     screen->secondFlags |= 1;
     if (screen->layer != 0) {
@@ -32,6 +30,3 @@ void ScreenLayers_HidePair(struct ScreenLayerPair *screen)
         *control = mask;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScreenLayers_HidePair);
-#endif
