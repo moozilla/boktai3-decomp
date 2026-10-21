@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 83.6%
-// foundry draft (worker best 81.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gDisplayControlShadow gUnk_03004BD8
 #define gPaletteShadow        gUnk_03004FC0
 
@@ -22,7 +20,7 @@ void sub_081C4708(struct S *p)
 {
     u8 *resource;
     u32 value;
-    void *script;
+    register void *script asm("r2");
     u16 cmd;
     u16 field;
     void *sun;
@@ -52,6 +50,3 @@ void sub_081C4708(struct S *p)
     sun = SceneTransition_StartSunScript();
     CpuSet((u8 *)sun + 0x14, gUnk_03004FC0, 0x04000080);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C4708);
-#endif
