@@ -93,6 +93,12 @@ Review the address-only CSV diff and commit it with the boundary change only
 after `make` prints `build/boktai3.gba: OK`. Never add `gen/code_sym.s` or a ROM.
 A name-only change in `symbols/functions.csv` needs no inventory refresh.
 
+When a C unit matches a function that gbadisasm keeps inside a neighbour's span
+(a split tail), `progress.py` still counts it: it takes the address from
+`symbols/functions.csv` (or the `sub_XXXXXXXX` name), adds a boundary in memory
+and prints a warning. Make it permanent by adding the address with evidence to
+`symbols/progress_extra_functions.csv` and refreshing the inventory as above.
+
 ## Registering the public project
 
 1. Land this workflow and metadata on the default branch of
