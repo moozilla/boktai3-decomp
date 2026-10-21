@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fuzzy: 93.7%
 // Differs: argument evaluation order of the final SpriteEffectController_Create call
 // (0x1C1E/0xD43F pool loads come last in the original) and a few register choices.
 
@@ -47,6 +47,7 @@ static inline s32 Truncate(s32 v)
 s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
 {
     register u32 a asm("r12") = a_;
+    s8 k2;
     u8 *p = p_;
     register u8 *q asm("r6") = p + 0x20;
     if (q[0xd] != 0) {
@@ -107,7 +108,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;
-                Palette_InterpolateBanks(d, s1, s2, 0x80 - *(s16 *)(q + 0xe), 6);
+                Palette_InterpolateBanks(d, s1, s2, (k2 = 0x80) - *(s16 *)(q + 0xe), 6);
             }
             t = (*(u16 *)(q + 0xe) + 1) & 0x7f;
             *(u16 *)(q + 0xe) = t;
