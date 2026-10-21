@@ -254,7 +254,6 @@ static inline u8 ConsumeEntry(u8 *p)
     return FALSE;
 }
 
-#define SingletonSlot7_UpdateTransitionDisplay sub_081EFE84
 void SingletonSlot7_UpdateTransitionDisplay(u8 *p)
 {
     u8 *context = p;

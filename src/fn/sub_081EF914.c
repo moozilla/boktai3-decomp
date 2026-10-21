@@ -274,7 +274,6 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
         *(u32 *)((p) + 0xA4) = 0;                                                                  \
     } while (0)
 
-#define SingletonSlot7_UpdateEndingScene sub_081EF914
 void SingletonSlot7_UpdateEndingScene(u8 *p)
 {
     u8 *context = p;
@@ -362,5 +361,5 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
     (*(u32 *)(context + 0xC4))++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081EF914);
+INCLUDE_ASM("asm/nonmatching", SingletonSlot7_UpdateEndingScene);
 #endif

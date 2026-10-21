@@ -50,7 +50,6 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
         (p)->progress = 0;                                                                         \
     } while (0)
 
-#define SingletonSlot7_UpdateEndingTransition sub_081EF4D8
 void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
 {
     register struct S7Trans *q asm("r5") = p;

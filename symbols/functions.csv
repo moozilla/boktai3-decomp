@@ -8026,10 +8026,13 @@ addr,name,mode,confidence,source,notes
 081EF398,SingletonSlot7_UpdateAlternateStateTransition,thumb,low,src-alias,Consumes the pending transition flag and installs the alternate state callback; tentative state identity
 081EF3EC,SingletonSlot7_UpdateDestroyTransition,thumb,low,src-alias,Consumes the pending transition flag and installs the cleanup and task destruction callback
 081EF440,Slot7_UpdateMotionPhase,thumb,low,src-alias,
+081EF4D8,SingletonSlot7_UpdateEndingTransition,thumb,low,src-alias,
 081EF6FC,SingletonSlot7_UpdateSecondaryDestroyTransition,thumb,low,src-alias,Second transition handler that installs the same cleanup and task destruction callback
 081EF7A8,ScreenPhase_BeginSelection,thumb,low,src-alias,
 081EF804,SceneActors_EnterHorizontalTweenState,thumb,low,src-alias,
 081EF8F0,SingletonSlot7_UpdatePrimaryTransitionWait,thumb,low,src-alias,Clears pending transition flags and advances the frame counter in the primary wait handler
+081EF914,SingletonSlot7_UpdateEndingScene,thumb,low,src-alias,
+081EFE84,SingletonSlot7_UpdateTransitionDisplay,thumb,low,src-alias,
 081F00FC,SceneActors_AdvanceToHorizontalTween,thumb,low,src-alias,
 081F0190,SingletonSlot7_UpdateSecondaryTransitionWait,thumb,low,src-alias,Clears pending transition flags and advances the frame counter in the secondary wait handler
 081F01B4,SingletonSlot7_DispatchPhaseCallback,thumb,low,src-alias,Invokes the callback selected by the phase byte at offset 0xAE
@@ -8046,10 +8049,12 @@ addr,name,mode,confidence,source,notes
 081F065C,SingletonSlot7_RegisterRenderCallback,thumb,low,src-alias,Registers the embedded render node with its payload and object-specific callback; tentative rendering role
 081F067C,SingletonSlot7_SetMotionMode,thumb,low,src-alias,
 081F0E24,SingletonSlot7_InitBackgroundAndMotion,thumb,low,src-alias,Configures background layers and copies script resources before initializing position and motion fields
+081F0F68,SingletonSlot7_InitDisplaySprites,thumb,low,src-alias,
 081F1240,SingletonSlot7_RemoveSprites,thumb,low,src-alias,Removes the two embedded sprites during object destruction
 081F1260,SingletonSlot7_ResetDisplayState,thumb,low,src-alias,Clears the state byte at offset 0xAA and calls the display update helper; tentative display role
 081F1B14,SingletonSlot7_Update,thumb,low,src-alias,
 081F1BF8,SingletonSlot7_OnDestroy,thumb,low,src-alias,Task destruction callback that stops sound and releases render nodes actor resources and sprites
+081F1C2C,SingletonSlot7_InitFromScript,thumb,low,src-alias,
 081F2034,SingletonSlot7_Create,thumb,low,src-alias,
 081F2088,SingletonSlot7_SetMotionModeFromScript,thumb,low,src-alias,
 081F213C,SingletonSlot7_SetTimerFromScript,thumb,low,src-alias,
