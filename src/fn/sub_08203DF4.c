@@ -3,8 +3,8 @@
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
-// fuzzy: 96.7%
-// Register allocation in the death-particle block and the collider branch still differs.
+// fuzzy: 96.9%
+// Remaining: collider flag-update registers and one copy of the constant 7 from sl.
 #define EnemyF426_UpdateDamageState sub_08203DF4
 struct DisplaySequenceState {
     const u16 *commands;
