@@ -4,8 +4,6 @@
 
 u8 SceneActor_DispatchContextAction(void *, u32);
 
-#define Skeleton_RerouteToTarget sub_080B551C
-
 u8 Skeleton_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;

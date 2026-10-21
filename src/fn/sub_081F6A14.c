@@ -1,5 +1,4 @@
 #include "global.h"
-#define Ratatosk_PlayAttachmentEffect sub_081F6A14
 struct Actor {
     u8 pad0[0x48];
     u8 body[0x104];

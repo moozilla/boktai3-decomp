@@ -4,7 +4,6 @@
 // fuzzy: 93.7%
 // Particle-pool update; register allocation of the loop pointers differs.
 #include "contact_swarm.h"
-#define Ratatosk_UpdateParticlePool sub_081FB8A0
 struct Particle {
     u32 age;
     u8 pad4[8];
@@ -191,5 +190,5 @@ s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FB8A0);
+INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateParticlePool);
 #endif

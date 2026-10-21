@@ -38,20 +38,20 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
             Sound_PlaySong(0x192);
         } else {
             do {
-            equipped = Inventory_IsEquipmentAssigned(slot);
-            if (equipped) {
+                equipped = Inventory_IsEquipmentAssigned(slot);
+                if (equipped) {
                     if (Inventory_RemoveAssignedSlot(slot)) {
-                    goto success;
+                        goto success;
                     }
-                Sound_PlaySong(0x192);
-            } else if (Inventory_AddAssignedSlot(slot) == 1) {
-                u32 frame = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, equipped);
-                SceneHud_FillDigitCells(3, 8, 3, 0);
-                InventoryPanel_SetEntryRow(p, 8, 4, frame, equipped, 0x47);
-            success:
-                Sound_PlaySong(0xdd);
+                    Sound_PlaySong(0x192);
+                } else if (Inventory_AddAssignedSlot(slot) == 1) {
+                    u32 frame = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, equipped);
+                    SceneHud_FillDigitCells(3, 8, 3, 0);
+                    InventoryPanel_SetEntryRow(p, 8, 4, frame, equipped, 0x47);
+                success:
+                    Sound_PlaySong(0xdd);
                 } else {
-                Sound_PlaySong(0x192);
+                    Sound_PlaySong(0x192);
                 }
             } while (0);
             MenuDisplay_UpdateActionPrompt(p, 2);
