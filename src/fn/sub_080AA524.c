@@ -16,7 +16,7 @@ struct ActorTrail {
     u8 unknown8DC[0xE];
     u8 activeCount;
 };
-void sub_080AB294(struct ContactPosition *);
+void TentacleActor_SpawnSparkBurst(struct ContactPosition *);
 static inline u8 isUnavailable(struct TrailSegment *segment)
 {
     u32 mask = 5;
@@ -42,7 +42,7 @@ removeSegment: {
     Collider_Remove(segment->collider);
     setFlag(segment, 1);
     trail->activeCount--;
-    sub_080AB294(&segment->position);
+    TentacleActor_SpawnSparkBurst(&segment->position);
     return 1;
 }
 scan:

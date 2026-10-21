@@ -71,7 +71,7 @@ void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
 void TentacleBody_ResetDirectionalAnimations(void *, s32);
 void TentacleBody_UpdateSegmentMotion(void *, s32);
 void ActorTrail_RemoveAllSegments(void *);
-void sub_080AB294(void *);
+void TentacleActor_SpawnSparkBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 static inline u32 Random4(void)
 {
@@ -115,7 +115,7 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         return;
     actor->field2B0 = 1;
     ActorTrail_RemoveAllSegments(actor);
-    sub_080AB294(&actor->position);
+    TentacleActor_SpawnSparkBurst(&actor->position);
     {
         u32 mask = 0x400;
         if (!(actor->flags2CC & mask))
