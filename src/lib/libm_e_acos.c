@@ -27,11 +27,11 @@
 {
  double z,p,q,r,w,s,c,df;
  __int32_t hx,ix;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (hx) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(hx, x);
  ix = hx&0x7fffffff;
  if(ix>=0x3ff00000) {
      __uint32_t lx;
-     do { ieee_double_shape_type gl_u; gl_u.value = (x); (lx) = gl_u.parts.lsw; } while (0);
+     GET_LOW_WORD(lx, x);
      if(((ix-0x3ff00000)|lx)==0) {
   if(hx>0) return 0.0;
   else return pi+2.0*pio2_lo;
@@ -57,7 +57,7 @@
      z = (one-x)*0.5;
      s = __ieee754_sqrt(z);
      df = s;
-     do { ieee_double_shape_type sl_u; sl_u.value = (df); sl_u.parts.lsw = (0); (df) = sl_u.value; } while (0);
+     SET_LOW_WORD(df, 0);
      c = (z-df*df)/(s+df);
      p = z*(pS0+z*(pS1+z*(pS2+z*(pS3+z*(pS4+z*pS5)))));
      q = one+z*(qS1+z*(qS2+z*(qS3+z*qS4)));
