@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 void sub_0808E780(struct SceneActorRegistryResetView *actor)
 {
@@ -10,7 +9,6 @@ void sub_0808E780(struct SceneActorRegistryResetView *actor)
     if (actor->field2B3) {
         u8 *q = &actor->state2A8;
         u32 z;
-        asm("" : "+r"(q));
         z = 0;
         *q = z;
         actor->phase2A9 = z;
