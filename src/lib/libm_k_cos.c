@@ -20,7 +20,7 @@
 {
  double a,hz,z,r,qx;
  __int32_t ix;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (ix) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(ix, x);
  ix &= 0x7fffffff;
  if(ix<0x3e400000) {
      if(((int)x)==0) return one;
@@ -33,7 +33,7 @@
      if(ix > 0x3fe90000) {
   qx = 0.28125;
      } else {
-         do { ieee_double_shape_type iw_u; iw_u.parts.msw = (ix-0x00200000); iw_u.parts.lsw = (0); (qx) = iw_u.value; } while (0);
+         INSERT_WORDS(qx, ix-0x00200000, 0);
      }
      hz = 0.5*z-qx;
      a = one-qx;

@@ -12,7 +12,7 @@
 {
  double y[2],z=0.0;
  __int32_t n,ix;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (ix) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(ix, x);
  ix &= 0x7fffffff;
  if(ix <= 0x3fe921fb) return __kernel_tan(x,z,1);
  else if (ix>=0x7ff00000) return x-x;

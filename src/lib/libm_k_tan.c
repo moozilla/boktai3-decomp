@@ -18,12 +18,12 @@ extern const double gUnk_08603238[];
 {
  double z,r,v,w,s;
  __int32_t ix,hx;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (hx) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(hx, x);
  ix = hx&0x7fffffff;
  if(ix<0x3e300000)
      {if((int)x==0) {
          __uint32_t low;
-  do { ieee_double_shape_type gl_u; gl_u.value = (x); (low) = gl_u.parts.lsw; } while (0);
+  GET_LOW_WORD(low, x);
   if(((ix|low)|(iy+1))==0) return one/fabs(x);
   else return (iy==1)? x: -one/x;
      }
@@ -50,10 +50,10 @@ extern const double gUnk_08603238[];
  else {
      double a,t;
      z = w;
-     do { ieee_double_shape_type sl_u; sl_u.value = (z); sl_u.parts.lsw = (0); (z) = sl_u.value; } while (0);
+     SET_LOW_WORD(z, 0);
      v = r-(z - x);
      t = a = -1.0/w;
-     do { ieee_double_shape_type sl_u; sl_u.value = (t); sl_u.parts.lsw = (0); (t) = sl_u.value; } while (0);
+     SET_LOW_WORD(t, 0);
      s = 1.0+t*z;
      return t+a*(s+t*v);
  }

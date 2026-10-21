@@ -14,7 +14,7 @@
 {
  __int32_t i0,i1,j0;
  __uint32_t i,j;
- do { ieee_double_shape_type ew_u; ew_u.value = (x); (i0) = ew_u.parts.msw; (i1) = ew_u.parts.lsw; } while (0);
+ EXTRACT_WORDS(i0, i1, x);
  j0 = ((i0>>20)&0x7ff)-0x3ff;
  if(j0<20) {
      if(j0<0) {
@@ -49,6 +49,6 @@
   i1 &= (~i);
      }
  }
- do { ieee_double_shape_type iw_u; iw_u.parts.msw = (i0); iw_u.parts.lsw = (i1); (x) = iw_u.value; } while (0);
+ INSERT_WORDS(x, i0, i1);
  return x;
 }
