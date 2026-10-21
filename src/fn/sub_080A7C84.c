@@ -1,7 +1,8 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fuzzy: 92.1%
 // Callback exit tail merging, state reset addressing, and register allocation still differ.
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -141,9 +142,20 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
         body[0x8E8] = 0;
         TentacleActor_SelectWanderRoute(actor);
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270)) {
-        State0(actor);
-        return;
+    {
+        u32 o = 0x270;
+        asm("" : "+r"(o));
+        if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + o))) {
+            u8 *q = (u8 *)actor + 0x2a8;
+            u32 zero = 0;
+            *q = zero;
+            *((u8 *)actor + 0x2a9) = zero;
+            *((u8 *)actor + 0x2aa) = zero;
+            o += 0x3c;
+            *(u32 *)((u8 *)actor + o) = zero;
+            actor->field2B1 = 1;
+            return;
+        }
     }
     if (*(s16 *)(body + 0x8D6) <= 0)
         *(s16 *)(body + 0x8D6) = 1;
