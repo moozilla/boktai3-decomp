@@ -2,8 +2,8 @@
 #include "area_effect_link.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.7%
-// foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
+// fuzzy: 97.5%
+// open: the two Registry1745_SetState calls are not tail-merged; asm memory barrier forces the selection reload
 #define LinkMenu_SetState       Registry1745_SetState
 #define LinkMenu_CheckSelection Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection Registry1745_BeginShutdown
@@ -42,10 +42,11 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
     if (IsMode9(*p->selection)) {
         RegistryF246_Close();
         Registry1745_SetState(p, 9, LinkMenu_ExchangeChoices);
-        return 0;
+    } else {
+        asm("" ::: "memory");
+        if (IsMode4(*p->selection))
+            Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
     }
-    if (IsMode4(*p->selection))
-        Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
     return 0;
 }
 #else
