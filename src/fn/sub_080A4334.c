@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.2%
+// fuzzy: 97.2%
 // Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -96,6 +96,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     u8 *c = (void *)SceneActorControl_GetState(a);
     struct ContactPosition delta;
     u8 *player;
+    struct ContactPosition *pos;
     s32 height, angle;
     u32 distance;
     if (!HasFlag(c, 2)) {
@@ -108,7 +109,9 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     player = gUnk_02000580[0];
     if (!player)
         return 0;
-    Delta(&delta, &a->position, (void *)(player + 0x30));
+    asm("" ::"r"(player));
+    pos = (void *)(player + 0x30);
+    Delta(&delta, &a->position, pos);
     height = delta.y;
     if (height < 0)
         height = -height;
@@ -118,13 +121,13 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     Math_Atan2(delta.x, delta.z);
     if (distance >= a->distanceLimitF8 * 2)
         return 0;
-    Delta(&delta, &a->position, (void *)(player + 0x30));
+    Delta(&delta, &a->position, pos);
     angle = Facing(a, &delta);
     if (angle < 0)
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!sub_0821D4F0(transform + 12, player + 0x30, 5, 256))
+    if (!sub_0821D4F0(transform + 12, (u8 *)pos, 5, 256))
         return 0;
     a->fieldDC = (u32)(player + 0x24);
     if ((s32)distance <= 0x3fff)
