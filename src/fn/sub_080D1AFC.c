@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -49,8 +48,9 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
     if (frame > 42) {
         u8 *group = (u8 *)&actor->group;
         u16 blocked;
-        if (!actor->field2B3)
+        if (!actor->field2B3) {
             return;
+        }
         actor->field2B0 = 1;
         SceneActor_SetPositionXZ(&actor->id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                  (*(struct BatRoutePoint **)(group + 0x1FC))->z);
@@ -70,8 +70,8 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
             *(u16 *)(*(u8 **)((u8 *)actor + 0x5D4) + 6) = 1;
             {
                 u16 *flags = (u16 *)(group + 0x40);
-                register u32 mask asm("r0") = 4;
-                *flags = mask | *flags;
+                u32 mask = 4;
+                *flags = (*(&mask)) | (*flags);
             }
         } else {
             void *target;
@@ -95,11 +95,13 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
         u16 frame = anim->frame;
         u32 loop = anim->loop;
         if (loop) {
-            if (frame == loop - 1)
+            if (frame == (loop - 1)) {
                 goto rewind;
+            }
             return;
-        } else if (frame)
+        } else if (frame) {
             return;
+        }
     rewind:
         anim->frame = 0;
     }
