@@ -1,8 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#ifdef NONMATCHING
-// fuzzy: 81.4%
-// foundry draft (worker best 81.4%); what differs is mostly register allocation and instruction order
 #define gGameState gUnk_02000710
 static inline s32 ClampRecord(s32 value)
 {
@@ -17,21 +14,16 @@ s32 GameRecords_UpdateMinimum(u32 index, s32 value)
 {
     s32 *record;
     if (index > 11 || value < 0)
-        goto failed;
+        return -1;
     value = ClampRecord(value);
     {
         struct GameState *state = gUnk_02000710;
-        state = (void *)(index * 4 + (u32)state);
-        record = &state->unk7C8[0];
+        record = (s32 *)(index * 4 + (u32)state + 0x7C8);
     }
     if (*record == -1 || *record > value)
         goto update;
-failed:
     return -1;
 update:
     *record = value;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GameRecords_UpdateMinimum);
-#endif
