@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Actor_OnDescendingFadeUpdate sub_0802EC90
 // Provisional name: Actor_OnDescendingFadeUpdate (tentative)
 struct Vec {
     s16 x, y, z, pad;

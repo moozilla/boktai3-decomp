@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Actor_OnPathFollowUpdate sub_0802F110
 // Provisional name: Actor_OnPathFollowUpdate (tentative)
 struct Vec {
     s16 x, y, z, pad;
