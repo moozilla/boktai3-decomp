@@ -3,7 +3,7 @@
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
-// fuzzy: 90.6%
+// fuzzy: 96.7%
 // Register allocation in the death-particle block and the collider branch still differs.
 #define EnemyF426_UpdateDamageState sub_08203DF4
 struct DisplaySequenceState {
@@ -125,27 +125,31 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
                 } spread, velocity;
                 struct Vec4 center;
                 const u16 *table;
+                u16 sample;
                 register u32 r asm("r1");
                 p->dead = 1;
                 if (p->terrainEnabled)
                     TerrainModifiers_UnregisterCell(p->terrain);
-                center = p->pos;
                 {
                     struct Vec4 *cp = &center;
+                    *cp = p->pos;
                     cp->y += 0x12c;
                 }
                 velocity.a.lo = -4;
                 table = (const u16 *)0x0203B400;
                 r = (gUnk_03005308 + 1) & 0x3ff;
-                velocity.a.hi = table[r] & 7;
+                sample = table[r];
+                velocity.a.hi = sample & 7;
                 velocity.b.lo = -4;
                 spread.a.lo = 0x18;
                 r = (r + 1) & 0x3ff;
-                spread.a.hi = (table[r] & 7) + 3;
+                sample = table[r];
+                spread.a.hi = (sample & 7) + 3;
                 spread.b.lo = 0x18;
                 r = (r + 1) & 0x3ff;
                 gUnk_03005308 = r;
-                sub_08014634((table[r] & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
+                sample = table[r];
+                sub_08014634((sample & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
                 Anim_RestartSequence(&p->seq, p->resource, 1, p->facing, 0);
                 AnimData_SelectPaletteBank(p->anim, 0x1b7);
                 p->ptr5c = gUnk_030042E4 + 0x44a0;
