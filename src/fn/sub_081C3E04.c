@@ -1,8 +1,5 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 80.7%
-// foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 
 extern u16 gUnk_03005418[];
 
@@ -12,11 +9,11 @@ void MotionTrack_Update(u8 *);
 static inline s32 scale(s32 x)
 {
     s32 r;
-    x *= 3;
-    if (x >= 0)
-        r = x >> 5;
+    s32 y = x * 3;
+    if (y >= 0)
+        r = y >> 5;
     else
-        r = -((-x) >> 5);
+        r = -((-y) >> 5);
     return r;
 }
 
@@ -46,7 +43,7 @@ struct ContactImpactEffect {
     s32 shakeTimer;
 };
 
-s32 ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
+void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
 {
     {
         u8 *base = (u8 *)effect + 0x94;
@@ -73,9 +70,17 @@ s32 ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
     {
         u16 *q = &effect->screenX;
         s16 *p = &effect->worldX;
-        s32 x = p[0], z = p[2], y;
-        q[0] = scale(x - z);
-        z = scale(x + z);
+        s32 y;
+        register s32 x asm("r4"), zz asm("r3");
+        s32 z;
+        x = p[0];
+        zz = p[2];
+        q[0] = scale(x - zz);
+        z = scale(({
+            s32 t = x + zz;
+            asm("" ::"r"(zz), "r"(x));
+            t;
+        }));
         y = scale(p[1]);
         q[1] = z - y;
         z += y;
@@ -93,11 +98,6 @@ s32 ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
 
         if (t > effect->shakeThreshold) {
             effect->shakeFlag = 1;
-            return 1;
         }
-        return t;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ContactImpactEffect_UpdateContact);
-#endif
