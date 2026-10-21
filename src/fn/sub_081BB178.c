@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.7%
-// foundry draft (worker best 94.4%); what differs is mostly register allocation and instruction order
 #define ResourceSprite_GetEntry Registry3F74_FindFrameOffset
 struct ResourceSpriteEntry {
     s32 values[4];
@@ -20,10 +17,10 @@ struct ResourceSprite {
 };
 struct ResourceSpriteEntry *Registry3F74_FindFrameOffset(struct ResourceSprite *object, s32 index)
 {
-    if (!object || index < 0 || index >= object->entryCount)
+    struct ResourceSprite *p = object;
+    if (!p)
         return 0;
-    return &object->entries[index];
+    if (index < 0 || index >= object->entryCount)
+        return 0;
+    return &p->entries[index];
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Registry3F74_FindFrameOffset);
-#endif
