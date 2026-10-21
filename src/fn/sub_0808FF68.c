@@ -19,7 +19,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
 }
 
 extern const s16 gUnk_086149C4[];
-void sub_08090160(void *);
+void Slime_EmitDeathDebris(void *);
 static inline s32 Shift(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -52,7 +52,7 @@ void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
         args.count = 10;
         args.values = values;
         Script_Call(*(u16 *)(body + 0x404), &args);
-        sub_08090160(actor);
+        Slime_EmitDeathDebris(actor);
         *(u16 *)(body + 0x404) = 0;
         {
             register u32 mask asm("r0") = 8;

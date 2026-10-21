@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define Slime_ApproachSavedTarget sub_0808F510
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
