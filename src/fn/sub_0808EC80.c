@@ -2,8 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.6%
-// Motion flag and saved-X pointer allocation differs; one pointer copy and a boolean copy remain.
+// fuzzy: 96.7%
+// Only temporaries after the at-rest test sit one register low (r1..r4 instead of r2..r5). A second pointer for flags2CC (t) reproduces the original copy; rest pinned to r0 avoids the boolean copy.
 #include "scene_actor_chase.h"
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 void Slime_RollMoveFlag(void);
@@ -44,6 +44,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     s16 *priorX;
     s16 *priorZ;
     u32 *actorFlags;
+    u32 *t;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->secondaryMotion.x = Quarter(actor->secondaryMotion.x);
         actor->secondaryMotion.z = Quarter(actor->secondaryMotion.z);
@@ -57,8 +58,8 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 mask = 0x2000;
-        actorFlags = &actor->flags2CC;
-        *actorFlags |= mask;
+        t = &actor->flags2CC;
+        *t |= mask;
     }
     {
         u32 mask = 0x10000;
@@ -69,6 +70,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
         s32 current = *(s16 *)((u8 *)actor + offset);
         s16 *field = (s16 *)((u8 *)actor + 0x318);
         s32 difference = current - *field;
+        actorFlags = t;
         priorX = field;
         x = Quarter(difference);
     }
@@ -86,32 +88,35 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     actor->motion.z += z;
     *priorX += x;
     *priorZ += z;
-    if (!AtRest(x, z))
-        sequence->timer = 0;
-    else if (actor->field2B3) {
-        u8 *field = &actor->field2B0;
-        u32 ready = 1;
-        *field = ready;
-        {
-            u16 *flags = &actor->flags2D4;
-            u32 mask = ready - 34;
-            *flags = mask & *flags;
-        }
-        {
-            u32 mask = ~0x80;
-            *actorFlags = mask & *actorFlags;
-        }
-        if (actor->health < *(u16 *)(context + 0x3DA) || TestContext(context, 8)) {
-            Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
-            Chase_SetBehavior(actor, 2);
+    {
+        register u32 rest asm("r0") = AtRest(x, z);
+        if (!rest)
+            sequence->timer = rest;
+        else if (actor->field2B3) {
+            u8 *field = &actor->field2B0;
+            u32 ready = 1;
+            *field = ready;
             {
-                u16 *flags = &actor->flags2D6;
-                u32 mask = ~0x980;
+                u16 *flags = &actor->flags2D4;
+                u32 mask = ready - 34;
                 *flags = mask & *flags;
             }
-        } else {
-            Chase_SetCtl(actor, Slime_RollMoveFlag, 0);
-            Chase_SetState(actor, 0, 0, 0);
+            {
+                u32 mask = ~0x80;
+                *actorFlags = mask & *actorFlags;
+            }
+            if (actor->health < *(u16 *)(context + 0x3DA) || TestContext(context, 8)) {
+                Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
+                Chase_SetBehavior(actor, 2);
+                {
+                    u16 *flags = &actor->flags2D6;
+                    u32 mask = ~0x980;
+                    *flags = mask & *flags;
+                }
+            } else {
+                Chase_SetCtl(actor, Slime_RollMoveFlag, 0);
+                Chase_SetState(actor, 0, 0, 0);
+            }
         }
     }
 }
