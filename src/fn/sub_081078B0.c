@@ -136,10 +136,9 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     }
     return ended;
 }
-#define TileTrigger_StepPress sub_081078B0
 #ifdef NONMATCHING
 // fuzzy: 87.1%
-void sub_081078B0(struct TileTrigger *p)
+void TileTrigger_StepPress(struct TileTrigger *p)
 {
     struct TileTrigger *self = p;
     u8 *frame;
@@ -159,5 +158,5 @@ void sub_081078B0(struct TileTrigger *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081078B0);
+INCLUDE_ASM("asm/nonmatching", TileTrigger_StepPress);
 #endif

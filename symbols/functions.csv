@@ -3987,6 +3987,10 @@ addr,name,mode,confidence,source,notes
 08107298,TileTrigger_IsTetherNearby,thumb,low,src-alias,
 08107320,TileTrigger_TickIdle,thumb,low,src-alias,
 0810764C,TileTrigger_TickDelay,thumb,low,src-alias,
+081076D0,TileTrigger_StepHold,thumb,low,src-alias,
+081078B0,TileTrigger_StepPress,thumb,low,src-alias,
+08107A08,TileTrigger_StepActivation,thumb,low,src-alias,
+08107B9C,TileTrigger_StepRelease,thumb,low,src-alias,
 08107D48,Pool1B8_RunPendingScripts,thumb,low,src-alias,Forwards to the helper that invokes and clears pending object script callbacks
 08107E90,Pool1B8_EnterStateThree,thumb,low,src-alias,Marks the object active and selects state three while clearing its counter and selected flags
 081081F0,Pool1B8_FindByName,thumb,low,src-alias,

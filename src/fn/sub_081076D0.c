@@ -147,9 +147,8 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     }
     return ended;
 }
-#define TileTrigger_StepHold sub_081076D0
 // confidence=low: plays the hold sequence while the 0x20 trigger flag is set; moves to state 6 when it ends.
-void sub_081076D0(struct TileTrigger *p)
+void TileTrigger_StepHold(struct TileTrigger *p)
 {
     struct TileTrigger *self;
     struct TileTriggerManager *manager;

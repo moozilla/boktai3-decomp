@@ -144,10 +144,8 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     }
     return ended;
 }
-#define TileTrigger_StepActivation sub_08107A08
-#define TileTrigger_StepRelease    sub_08107B9C
 // confidence=low: runs the trigger animation once the countdown passes 30 and advances the state when it ends.
-void sub_08107A08(struct TileTrigger *p)
+void TileTrigger_StepActivation(struct TileTrigger *p)
 {
     struct TileTrigger *self = p;
     struct TileTriggerManager *manager = gTileTriggerManager;
@@ -176,7 +174,7 @@ tick:
     p->timer++;
 }
 
-void sub_08107B9C(struct TileTrigger *p)
+void TileTrigger_StepRelease(struct TileTrigger *p)
 {
     struct TileTrigger *self;
     struct TileTriggerManager *manager;
