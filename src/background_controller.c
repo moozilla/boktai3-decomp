@@ -70,7 +70,7 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
 // MATCHING_CONCESSION: register-pinning
 s32 Background_Update(struct Background *p)
 {
-    s32 x, y asm("r6");
+    s32 x, y;
     s32 tileX, tileY;
 
     Background_ApplyQueuedCommands(p);
@@ -228,7 +228,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
 {
     struct BackgroundLayer *layer;
     u8 *resource;
-    register s32 offsetX asm("r9"), offsetY asm("r10");
+    register s32 offsetX asm("r9"), offsetY;
     s32 x, y;
     u32 mode;
     gUnk_02000000[c->layer] = p;
