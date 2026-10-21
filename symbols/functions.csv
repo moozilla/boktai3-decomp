@@ -3214,6 +3214,7 @@ addr,name,mode,confidence,source,notes
 080A97AC,TentacleActor_TargetMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and when state bit 0 is set copies its position and makes it the target
 080A985C,TentacleActor_ActivateMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and activates its associated object
 080A9910,TentacleActor_UpdateOscillation,thumb,low,src-alias,Advances the signed offset and reverses direction at either limit
+080A9988,TentacleActor_ShiftSegmentTrail,thumb,low,src-alias,Every few ticks passes each active segment position to the next segment's previous-position slot starting from the owner object position
 080A9970,TentacleActor_InitSegmentUpdateState,thumb,low,src-alias,Sets the segment update control byte to one; interpretation is tentative
 080A9AA0,ActorTrail_ApplyAngularOffsets,thumb,low,src-alias,
 080AA024,TentacleActor_ResetSegmentPositions,thumb,low,src-alias,Copies the supplied position into both position fields of every segment
