@@ -1,7 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 91.7%
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define gEffectRandomIndex gUnk_03005308
 #define gEffectRandomTable gUnk_0203B400
@@ -27,14 +26,28 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
 {
     struct EffectMotion motion;
     s32 duration;
+    const u16 *tbl;
 
     motion.x = target->position.x - source->position.x;
     motion.z = target->position.z - source->position.z;
+    tbl = gUnk_0203B400;
+    asm("" : "+r"(tbl));
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    duration = (gUnk_0203B400[gUnk_03005308] & 63u) + 30;
+    {
+        u32 v = tbl[gUnk_03005308];
+        u32 m = 63;
+        asm("" : "+r"(m));
+        duration = (v & m) + 30;
+    }
     motion.x = Div(motion.x, duration);
     motion.z = Div(motion.z, duration);
-    motion.y = Div(duration, 2) + (gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023] & 7u);
+    {
+        s32 q = Div(duration, 2);
+        u32 v = tbl[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
+        u32 m = 7;
+        asm("" : "+r"(m));
+        motion.y = q + (v & m);
+    }
     if (motion.x > 48)
         motion.x = 48;
     if (motion.x < -48)
@@ -45,6 +58,3 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
         motion.z = -48;
     return SpriteEffect_SpawnWithMotion(source, target, &motion, a, b, c, d);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteEffect_SpawnTowardObject);
-#endif
