@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// Remaining differences: instruction selection, load placement, and literal-mask materialization.
 // confidence=low: icon identity inferred from timed player status and save flags.
 extern u8 *gUnk_02000710;
 s32 Selection_GetDisplayFrame(s32);
@@ -25,8 +22,8 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
         value = Div(*(u16 *)((u8 *)*player + 0x538) + 59, 60);
         digit = Div(value, 10);
         value -= digit * 10;
-        *cell++ = Hud_GetStyleTileIndex(digit, 0) | 0xffffd000;
-        *cell = Hud_GetStyleTileIndex(value, 0) | 0xffffd000;
+        *cell++ = Hud_GetStyleTileIndex(digit, 0) | -0x3000;
+        *cell = Hud_GetStyleTileIndex(value, 0) | -0x3000;
         p[0xafc] = 1;
     } else if (*(s16 *)(gUnk_02000710 + 0x610)) {
         *(u32 *)(p + 0xaa4) &= ~1;
@@ -54,7 +51,3 @@ void Hud_UpdateTimedStatusIcon(u8 *p)
         p[0xafc] = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hud_UpdateTimedStatusIcon);
-#endif
