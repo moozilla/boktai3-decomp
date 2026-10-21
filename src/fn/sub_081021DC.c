@@ -1,8 +1,5 @@
 #include "named_object.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// Open: only a register swap (the delta pointer should be r6 and the y-difference temporary r5).
 extern const struct SceneVec gUnk_086064C4;
 extern struct EngineMap *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
@@ -36,7 +33,7 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                 s32 x, z, cell;
                 if (!HasFlag(8, &o->flags))
                     return;
-                x = ((struct SceneVec *)&o->x)->x >> 8;
+                x = ((((struct SceneVec *)&o->x)->x >> 4) >> 2) >> 2;
                 z = ((struct SceneVec *)&o->x)->z >> 8;
                 if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
                     cell = 0;
@@ -67,6 +64,3 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", NamedObject_ConstrainPlayer);
-#endif
