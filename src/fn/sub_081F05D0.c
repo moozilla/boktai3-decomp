@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.1%
 // foundry draft (worker best 97.1%); what differs is mostly register allocation and instruction order
 struct Slot7Actor {
     u8 pad0[0x5c0];
@@ -27,10 +26,22 @@ s32 SingletonSlot7_OnTargetContact(struct Slot7Target *target, s32 event, s32 am
             if (level <= 2)
                 duration = (u16)actor->contactDuration;
             else if (level <= 5) {
-                u16 base = actor->contactDuration;
+                register u32 off asm("r1") = 0x5F2;
+                register u8 *q asm("r0");
+                u16 base;
+                asm("" : "+r"(off));
+                q = (u8 *)actor + off;
+                base = *(u16 *)q;
                 duration = base + ((s16)base >> 2);
-            } else
-                duration = (u16)actor->contactDuration + (actor->contactDuration >> 1);
+            } else {
+                register u32 off asm("r1") = 0x5F2;
+                register u8 *q asm("r0");
+                u16 base;
+                asm("" : "+r"(off));
+                q = (u8 *)actor + off;
+                base = *(u16 *)q;
+                duration = base + ((s16)base >> 1);
+            }
             actor->duration = duration;
         }
         if (amount > 0)
@@ -39,6 +50,3 @@ s32 SingletonSlot7_OnTargetContact(struct Slot7Target *target, s32 event, s32 am
         return 0;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SingletonSlot7_OnTargetContact);
-#endif
