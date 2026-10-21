@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.0%
-// foundry draft (worker best 94.1%); what differs is mostly register allocation and instruction order
 
 struct LargeEffectPoolSlot {
     u8 unknown[0x177];
@@ -20,9 +18,10 @@ static inline u8 LargeEffectPool_IsUsed(u32 *used, u32 mask)
         return TRUE;
     return FALSE;
 }
-struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *pool)
+struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *poolArg)
 {
-    s32 i = 0;
+    register u8 *pool asm("r5") = poolArg;
+    register s32 i asm("r6") = 0;
     u32 one = 1;
     u8 *index = pool + 0x197;
     u8 *slot = pool + 0x20;
@@ -30,7 +29,8 @@ struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *pool)
     do {
         if (!LargeEffectPool_IsUsed((u32 *)(pool + 0x1C), one << i)) {
             Memory_Clear(slot, 0x18C);
-            *(u32 *)(pool + 0x1C) |= one << (u8)i;
+            asm("" : "+r"(i));
+            *(u32 *)(pool + 0x1C) |= one << i;
             *index = i;
             result = (struct LargeEffectPoolSlot *)slot;
             goto done;
@@ -43,6 +43,3 @@ struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *pool)
 done:
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LargeEffectPool_AllocateSlot);
-#endif
