@@ -12,14 +12,14 @@ void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s)
     u8 *p = q;
     u32 off = 0x764;
     s32 i = 3;
+    u32 one = 1;
     do {
         u16 *timer = (u16 *)(p + off);
         if (*timer != 0) {
             if (--*timer == 0) {
                 {
                     u32 f = *flags;
-                    u32 one = 1;
-                    asm volatile("" : "+r"(one));
+                    one = 1;
                     *flags = f | one;
                 }
             }
