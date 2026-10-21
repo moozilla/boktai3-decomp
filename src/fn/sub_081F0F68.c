@@ -127,7 +127,6 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     return ended;
 }
 
-#define SingletonSlot7_InitDisplaySprites sub_081F0F68
 void SingletonSlot7_InitDisplaySprites(u8 *p)
 {
     struct Drawable *foreground = (struct Drawable *)(p + 0x2C0);

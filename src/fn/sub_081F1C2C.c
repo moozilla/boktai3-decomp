@@ -22,12 +22,11 @@ void Sound_PlaySong(u32);
 void *SingletonSlot7_CreateEffectPool(void);
 void AnimData_SelectPaletteBank(void *, u32);
 s32 sub_081F0678(void);
-void SingletonSlot7_InitDisplaySprites(u8 *) __asm__("sub_081F0F68");
+void SingletonSlot7_InitDisplaySprites(u8 *) __asm__("SingletonSlot7_InitDisplaySprites");
 extern u32 gUnk_020004B8;
 
 #define F(ty, off) (*(ty *)(p + (off)))
 
-#define SingletonSlot7_InitFromScript sub_081F1C2C
 s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
 {
     register s32 health asm("r6") = 2000;
@@ -172,5 +171,5 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081F1C2C);
+INCLUDE_ASM("asm/nonmatching", SingletonSlot7_InitFromScript);
 #endif
