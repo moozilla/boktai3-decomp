@@ -1,4 +1,3 @@
-#define TentacleBody_UpdateAttackWindup sub_080A5C50
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_animation.h"
