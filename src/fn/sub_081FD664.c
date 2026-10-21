@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.4%
+// fuzzy: 97.5%
 // foundry draft (worker best 92.4%); what differs is mostly register allocation and instruction order
 struct OrbitEffectPosition {
     s16 x, y, z;
@@ -37,17 +38,16 @@ void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
         } else {
             u32 current = (u8)params->direction;
             s32 delta = (s8)desired;
-            s32 step;
-            s32 limit;
-            limit = params->turnSpeed;
+            register s32 limit asm("r0");
             delta = (s8)(delta - current);
-            step = limit;
+            limit = params->turnSpeed;
+            asm("" : "+r"(limit));
             if (delta > limit) {
-                delta = current + step;
-                params->direction = delta;
+                register u32 nd asm("r0") = current + limit;
+                asm("" : "+r"(nd));
+                params->direction = nd;
             } else if (delta < limit) {
-                delta = current - step;
-                params->direction = delta;
+                params->direction = current - limit;
             } else
                 params->direction = desired;
         }

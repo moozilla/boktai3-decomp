@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Ratatosk081F62A8 {
     u8 pad0[0x51];
@@ -27,23 +28,22 @@ void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int
 s32 Callback_InvokeActor(void *, void *);
 static inline void SetFacing(struct Ratatosk081F62A8 *p, int angle)
 {
+    register u32 value asm("r1");
     int shifted;
-    u32 value;
     p->angle = angle;
     shifted = p->angle + 0x60;
     shifted >>= 6;
     value = 3;
     value &= shifted;
+    asm("" : "+r"(value));
     p->facing = value;
     shifted = p->angle + 0x70;
     shifted >>= 5;
     value = 7;
     value &= shifted;
+    asm("" : "+r"(value));
     p->facing8 = value;
 }
-#ifdef NONMATCHING
-// fuzzy: 92.1%
-// only register choice in the shared SetFacing tail differs
 void sub_081F62A8(struct Ratatosk081F62A8 *p)
 {
     struct Ratatosk081F62A8 *p2 = p;
@@ -80,6 +80,3 @@ void sub_081F62A8(struct Ratatosk081F62A8 *p)
         p->h2 = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F62A8);
-#endif
