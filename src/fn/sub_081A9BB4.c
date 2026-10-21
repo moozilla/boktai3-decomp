@@ -47,7 +47,12 @@ extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+    {
+        u32 i = gUnk_03005308 << 1;
+        register u32 t asm("r2") = (u32)gUnk_0203B400;
+        asm("" : "+r"(t));
+        return *(u16 *)(i + t);
+    }
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
@@ -100,19 +105,21 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
             if (p->timer == 0) {
                 s32 command;
                 u32 active;
+                struct Pair **pp;
                 {
                     s32 bits = (RandomValue() >> 4) & 3;
                     command = 11;
                     if (bits)
                         command = 8;
                 }
-                active = PairedSceneActor_GetActiveMask(p->pair);
+                pp = &p->pair;
+                active = PairedSceneActor_GetActiveMask(*pp);
                 if (!preferSecond(p)) {
                     if (active & 1) {
-                        PairedSceneActor_ApplyToSelectedHalves(p->pair, 1, command);
+                        PairedSceneActor_ApplyToSelectedHalves(*pp, 1, command);
                         p->selectedHalf = 1;
                     } else if (active & 2) {
-                        PairedSceneActor_ApplyToSelectedHalves(p->pair, 2, command);
+                        PairedSceneActor_ApplyToSelectedHalves(*pp, 2, command);
                         p->selectedHalf = 2;
                     } else {
                         p->phase = 2;
@@ -121,10 +128,10 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
                     }
                 } else {
                     if (active & 2) {
-                        PairedSceneActor_ApplyToSelectedHalves(p->pair, 2, command);
+                        PairedSceneActor_ApplyToSelectedHalves(*pp, 2, command);
                         p->selectedHalf = 2;
                     } else if (active & 1) {
-                        PairedSceneActor_ApplyToSelectedHalves(p->pair, 1, command);
+                        PairedSceneActor_ApplyToSelectedHalves(*pp, 1, command);
                         p->selectedHalf = 1;
                     } else {
                         p->phase = 2;

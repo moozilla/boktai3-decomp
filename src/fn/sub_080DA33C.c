@@ -11,10 +11,12 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
 {
     register struct SceneActorRegistryResetView *actor asm("r6") = arg;
     struct SceneActorControlState **slot = &((struct SceneActorControlPhaseView *)actor)->control;
-    u16 *counter = (u16 *)((u8 *)*slot + 0x6D4);
-    u16 saved = *counter;
+    register u16 *counter asm("r5") = (u16 *)((u8 *)*slot + 0x6D4);
+    register u16 v asm("r0") = *counter;
+    register u16 saved asm("r7") = v;
+    asm("" : "+r"(v));
     if (saved) {
-        *counter = saved - 1;
+        *counter = v - 1;
         return 0;
     }
     if (BouncingObject_GetNearbyHeading(&actor->position) < 0) {

@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#ifdef NONMATCHING
-// fuzzy: 98.2%
 // foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
 void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *);
 void Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *, u32);
@@ -20,8 +19,13 @@ void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorAnimationLink *link = p->context;
     if (SceneActorControl_TakeFlag(&p->field2B1)) {
-        u16 shortZero = PrepareFlags(p);
+        register u32 mask0 asm("r0") = 0x100;
+        register u16 *flags0 asm("r2") = &p->flags2D4;
+        register u16 old asm("r1") = *flags0;
+        u16 shortZero = 0;
         u32 zero = 0;
+        asm("" : "+r"(shortZero));
+        *flags0 = mask0 | old;
         {
             void *control = SceneActor_UpdateTargetedAttack;
             u32 kind = 0x22;
@@ -52,6 +56,3 @@ void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
     } else
         ++p->counter2AC;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPhase_UpdateCooldown);
-#endif
