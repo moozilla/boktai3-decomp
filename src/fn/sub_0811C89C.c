@@ -1,8 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "modifier_list.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.0%
+// fuzzy: 97.6%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
 #define gCharacterPaletteResource       gUnk_030042E4
@@ -18,7 +19,7 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     u16 *palette;
     s32 resource;
     s32 offset, i;
-    struct CharacterPreviewPalette *flash = p;
+    register struct CharacterPreviewPalette *flash asm("r5") = p;
     flash->target = model;
     flash->flashPalette = gUnk_030042E4 + 0x3240;
     switch (model->view.metadata.kind) {

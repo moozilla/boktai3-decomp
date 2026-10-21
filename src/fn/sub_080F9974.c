@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.4%
-// Remaining differences are instruction ordering and register allocation.
 #include "scene_actor_control_phase.h"
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
@@ -60,13 +58,22 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
             ActorShadow_Disable(state + 0xCAC);
             *flags = 1;
         }
-        state[0xED6] = 1;
-        *(u16 *)(state + 0xED4) = 0;
+        {
+            register u32 off asm("r1") = 0xED6;
+            register u8 *q asm("r0");
+            asm("" : "+r"(off));
+            q = state + off;
+            *q = 1;
+            off -= 2;
+            q = state + off;
+            *(u16 *)q = 0;
+        }
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);
         {
             u32 mask = 32;
+            asm("" : "+r"(mask));
             actor->flags2D6 = mask | *(u16 *)((u8 *)actor + 0x2D6);
         }
     }
@@ -85,7 +92,3 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
             Axe_ReleaseAuxiliarySprite(actor);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateDamageSpin);
-#endif
