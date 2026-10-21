@@ -6529,6 +6529,7 @@ addr,name,mode,confidence,source,notes
 08198B70,SceneEffect_InitActor,thumb,low,src-alias,
 08198D58,SceneEffect_AllocateActor,thumb,low,src-alias,
 08198DC0,SceneEffect_LoadRingAnimation,thumb,low,src-alias,Loads the animation resource used by the small colored ring sprite
+08198DD8,SceneEffectRing_Update,thumb,low,src-alias,
 08198F24,SceneEffect_DestroyRing,thumb,low,src-alias,Destruction callback removing the ring effect collider and sprite
 08198F3C,SceneEffect_InitializeRing,thumb,low,src-alias,
 08199034,SceneEntryPool_CreateEntry,thumb,low,src-alias,
