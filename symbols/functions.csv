@@ -3808,6 +3808,7 @@ addr,name,mode,confidence,source,notes
 080FB984,SpriteGroup_InitAnimatedSprites,thumb,low,src-alias,
 080FBA38,Axe_EmitMotionTrail,thumb,low,src-alias,
 080FBC84,ActorPhase_EmitTrailSprite,thumb,low,src-alias,
+080FBEDC,Axe_TickAuxiliarySpriteTimers,thumb,low,src-alias,Counts down each auxiliary sprite timer and sets bit 0 of its flags when it expires
 080FBF20,Axe_RemoveAuxiliarySprites,thumb,low,src-alias,Removes each active sprite in the four-entry auxiliary sprite array
 080FBF4C,ActorPhase_SelectDistantWaypoint,thumb,low,src-alias,
 080FC3F8,Axe_UpdateScreenShake,thumb,low,src-alias,Requests a screen effect while its countdown remains active; shake interpretation is tentative
