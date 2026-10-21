@@ -2,9 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-#ifdef NONMATCHING
-// fuzzy: 98.6%
-// Remaining differences: instruction selection and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct DisplaySequenceState *state = st;
@@ -129,9 +126,30 @@ extern const s16 gUnk_086149C4[];
 #define SH(o) (*(s16 *)((u8 *)p + (o)))
 static inline void Approach(struct Player *p)
 {
+    register u32 o47c asm("r1") = 0x47C;
+    register u8 *a47c asm("r0");
+    s16 *target;
+    s32 x, z;
+    asm("" : "+r"(o47c));
+    a47c = (u8 *)p + o47c;
+    target = *(s16 **)a47c;
+    x = target[0] - SH(0x30);
+    z = target[2] - SH(0x34);
+    if (x >= 0)
+        SH(0x38) = x >> 3;
+    else
+        SH(0x38) = -(-x >> 3);
+    if (z >= 0)
+        SH(0x3C) = z >> 3;
+    else
+        SH(0x3C) = -(-z >> 3);
+}
+static inline void Approach2(struct Player *p)
+{
     s16 *target = *(s16 **)((u8 *)p + 0x47C);
-    s32 x = target[0] - SH(0x30);
-    s32 z = target[2] - SH(0x34);
+    s32 x, z;
+    x = target[0] - SH(0x30);
+    z = target[2] - SH(0x34);
     if (x >= 0)
         SH(0x38) = x >> 3;
     else
@@ -167,10 +185,19 @@ void Player_UpdateRecoilMotion(struct Player *p)
                      p->side);
     Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
     {
-        u32 off270 = 0x270;
-        u16 *q270 = (u16 *)((u8 *)p + off270);
+        register u32 dummy asm("r1");
+        u32 off270;
+        u16 *q270;
+        asm("" : "=r"(dummy));
+        off270 = 0x270;
+        q270 = (u16 *)((u8 *)p + off270);
+        asm("" ::"r"(dummy));
         if (*q270) {
-            if (B(0x479)) {
+            register u32 o479 asm("r6") = 0x479;
+            register u8 *a479 asm("r0");
+            asm("" : "+r"(o479));
+            a479 = (u8 *)p + o479;
+            if (*a479) {
                 Approach(p);
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {
@@ -180,7 +207,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                     H(0x45A)++;
                 }
             } else if (B(0x47B)) {
-                Approach(p);
+                Approach2(p);
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {
                         Sound_PlaySong(0x191);
@@ -189,7 +216,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                     H(0x45A)++;
                 }
             } else if (B(0x489)) {
-                Approach(p);
+                Approach2(p);
                 H(0x45A)++;
             } else {
                 s32 angle = ((p->facing + 5) & 7) << 5;
@@ -211,9 +238,5 @@ void Player_UpdateRecoilMotion(struct Player *p)
                 ActorSequence_Begin(p, 0, 0);
             }
         }
-        asm("" ::"r"(off270));
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateRecoilMotion);
-#endif
