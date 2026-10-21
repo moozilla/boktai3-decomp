@@ -2693,6 +2693,9 @@ addr,name,mode,confidence,source,notes
 0806CF0C,SceneSteeringActor_ResetPool,thumb,low,src-alias,
 0806CFE4,RouteSpriteActor_RunEventScript,thumb,low,src-alias,
 0806D000,RouteSpriteActor_FinishAnimation,thumb,low,src-alias,
+0806D184,RouteSpriteActor_TickHopToRandomPoint,thumb,low,src-alias,
+0806D438,RouteSpriteActor_PlanWanderPath,thumb,low,src-alias,
+0806D740,RouteSpriteActor_TickWandering,thumb,low,src-alias,
 0806DB20,RouteSpriteActor_TickPausing,thumb,low,src-alias,
 0806DCE4,RouteSpriteActor_TickEmitting,thumb,low,src-alias,
 0806DF60,RouteSpritePool_AllocateSlot,thumb,low,src-alias,
@@ -8517,11 +8520,14 @@ addr,name,mode,confidence,source,notes
 0820A5B0,FanCannonManager_IsCreated,thumb,low,src-alias,Reports whether the manager singleton pointer is set
 0820A5CC,FanCannon_CreateFromScript,thumb,low,src-alias,
 0820AB3C,DragonPuppy_HandleDefeat,thumb,low,src-alias,Calls the defeat script and updates event flags and kill statistics
+0820AD84,DragonPuppy_ApplyHitReaction,thumb,low,src-alias,
 0820AF30,DragonPuppy_InitCollider,thumb,low,src-alias,Initializes the puppy collider and installs its collision callback
 0820AFD0,DragonPuppy_ReadAttackSchedule,thumb,low,src-alias,Reads up to eight script timing values consumed by the attack state
 0820B174,DragonPuppy_UpdateAttackTiming,thumb,low,src-alias,Attack state callback that triggers an attack on scheduled or periodic intervals
 0820B258,DragonPuppy_UpdateAttackRecovery,thumb,low,src-alias,Recovery callback that counts down before restoring animation and attack timing
+0820B3E0,DragonPuppy_UpdateCombat,thumb,low,src-alias,
 0820B7D4,DragonPuppy_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the puppy sprite
+0820B7E0,DragonPuppy_InitializeFromScript,thumb,low,src-alias,
 0820BCE0,DragonPuppy_Create,thumb,medium,gcl-name,name from GCL key 3D38 ドラゴンパピー (Dragon Puppy); registry callback
 0820BD24,Screamer_HandleDefeat,thumb,low,src-alias,Calls the defeat script and updates Screamer event flags and kill statistics
 0820BF6C,Screamer_OnColliderContact,thumb,low,src-alias,Empty callback installed during Screamer collider initialization

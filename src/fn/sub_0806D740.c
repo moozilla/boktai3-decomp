@@ -3,9 +3,7 @@
 #include "display_animation.h"
 #include "engine.h"
 s32 Div(s32, s32);
-void sub_0806D438(struct RouteSpriteActor *);
-#define RouteSpriteActor_PlanWanderPath sub_0806D438
-#define RouteSpriteActor_TickWandering  sub_0806D740
+void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *);
 static inline s32 Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);

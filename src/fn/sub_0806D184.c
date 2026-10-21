@@ -19,7 +19,6 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = Truncate12(gUnk_086149C4[angle & 255] * radius);
 }
-#define RouteSpriteActor_TickHopToRandomPoint sub_0806D184
 /* Picks a random heading and distance, glides toward that point over 20 frames
  * while the animation plays, then records the position and enters state 2. */
 void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
