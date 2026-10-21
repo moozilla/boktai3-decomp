@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 extern u32 gUnk_030053F0;
 extern struct ModifierMenuActor *gUnk_020004B4;
@@ -25,9 +24,9 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
         struct ModifierMenuActor *actor = gUnk_020004B4;
         if (!actor) {
             id = -1;
-            asm("" : "+r"(id));
-        } else
-            id = actor->id;
+        } else {
+            *(&id) = actor->id;
+        }
         menu->previewActorId = id;
     } else {
         menu->previewActorId = flags;

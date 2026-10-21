@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 void SceneActorRegistry_AdvanceCursor(struct SceneActorRegistryManager *manager)
 {
@@ -6,11 +5,8 @@ void SceneActorRegistry_AdvanceCursor(struct SceneActorRegistryManager *manager)
         struct SceneActorRegistryNode *node = manager->cursor;
         if (node && node->actor) {
             u8 *state = (u8 *)node->actor + 0xDC;
-            u32 mask = 2;
-            u32 flags;
-            asm("" : "+r"(mask));
-            flags = state[0xF];
-            state[0xF] = mask | flags;
+            u8 mask = 2;
+            state[0xF] = mask | state[0xF];
             manager->cursor = node->next;
         } else
             manager->cursor = gUnk_020004AC;

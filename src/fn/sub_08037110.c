@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Blob {
     u32 words[8];
@@ -52,10 +51,6 @@ int WirelessStatusMenu_Destroy(struct LinkMenu *p)
     Bg_ClearTilemap(0);
     Bg_ClearTilemap(2);
     Anim_Remove(p->draw50);
-    {
-        struct LinkMenu **singleton = &gUnk_020000F8;
-        register u32 zero asm("r0");
-        zero = 0;
-        *singleton = (void *)zero;
-    }
+    gUnk_020000F8 = NULL;
+    return 0;
 }
