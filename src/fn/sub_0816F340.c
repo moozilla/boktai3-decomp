@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 #define SceneHud_TickWidgetMotion  PauseMenu_UpdateSpriteMotion
@@ -12,7 +11,8 @@ u32 PlayerPanel_GetStatusValue(void *);
 void SceneHud_TickActionResult(void);
 void SceneHud_AnimateActionResult(struct SceneHudState *s)
 {
-    u8 index;
+    short index;
+    u16 k2 = 1;
     s32 mode;
     u32 palette;
     struct SceneInputWidget *widget;
@@ -31,8 +31,7 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
         palette = 0x3A8;
     } else {
         index = 13;
-        asm("" : "+r"(index));
-        mode = 1;
+        mode = k2;
         palette = 0x3A9;
     }
     widget = &s->motionWidgets[14];
