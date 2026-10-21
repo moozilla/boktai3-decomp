@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.5%
-// foundry draft (worker best 93.5%); what differs is mostly register allocation and instruction order
 typedef struct HresvelgrPosition {
     s16 x, y, z, pad;
 } HresvelgrPosition;
@@ -32,18 +30,22 @@ int Path_SnapToNearestPoint(HresvelgrPosition *, HresvelgrPosition *, int);
 void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *p)
 {
     HresvelgrPosition target, nearest;
-    register HresvelgrActor *actor = p;
+    HresvelgrActor *actor = p;
+    register u32 zero asm("r6");
+    asm("" : "+r"(actor));
     {
         u32 mask = 0x200040;
         p->flags |= mask;
     }
     if (p->changed) {
-        p->changed = 0;
+        zero = 0;
+        asm("" : "+r"(zero));
+        p->changed = zero;
         Hresvelgr_GetTravelTarget(p, &target);
         if (Path_SnapToNearestPoint(&nearest, &target, 0) < 0)
             goto done;
         ColliderActor_SetTargetPosition(p, &nearest);
-        Hresvelgr_SetAnimation(p, p->animation, p->animationData, 0, 1, 0);
+        Hresvelgr_SetAnimation(p, p->animation, p->animationData, 0, 1, zero);
     }
     if (!(u8)Callback_InvokeActor(p, p->callback)) {
         if (p->pulse)
@@ -54,6 +56,3 @@ void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_PlayNearestPointTravel);
-#endif

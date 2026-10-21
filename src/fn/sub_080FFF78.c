@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.5%
 // Open: the original reloads the 0xA3C slot-mask offset into a fresh register for the loop pointer.
 extern void *gUnk_0860649C[];
 struct PoolSlot {
@@ -24,13 +23,18 @@ s32 SlotPool_UpdateActiveSlots(struct SlotPool *pool)
     struct PoolSlot *slots = pool->slots;
     s32 i;
     register u32 offset asm("r1") = 0xA3C;
-    u32 *guard = (u32 *)((u32)pool + offset);
+    register u32 *guard asm("r0");
+    asm("" : "+r"(offset));
+    guard = (u32 *)((u32)pool + offset);
     if (*guard) {
         u32 *used;
         void **table;
+        u32 off = 0xA3C;
         i = 0;
-        used = &pool->used;
+        asm("" : "+r"(off));
+        used = (u32 *)((u32)pool + off);
         table = gUnk_0860649C;
+        asm("" ::"r"(off));
         do {
             if (Occupied(used, 1u << i)) {
                 struct PoolSlot *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
@@ -41,6 +45,3 @@ s32 SlotPool_UpdateActiveSlots(struct SlotPool *pool)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SlotPool_UpdateActiveSlots);
-#endif
