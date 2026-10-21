@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.5%
-// foundry draft (worker best 90.5%); what differs is mostly register allocation and instruction order
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F4];
     u16 timer;
@@ -26,7 +24,7 @@ static inline void ClearFlags(u16 *p, u32 mask)
     *p &= mask;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u8 zero8,
-                              s16 zero)
+                              u32 zero)
 {
     u8 code = 0x2B;
     {
@@ -42,7 +40,11 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
         ((u8 *)actor)[field] = code;
         actor->target = fn;
         field += 0x13;
-        *(u16 *)((u8 *)actor + field) = zero;
+        {
+            u16 *q = (u16 *)((u8 *)actor + field);
+            asm("" : "+r"(q), "+r"(field));
+            *q = zero;
+        }
     } while (0);
     {
         u32 *flags = &actor->flags114;
@@ -55,11 +57,18 @@ void SceneActorApproach_RunAlternateTimedAction(struct SceneActorRegistryResetVi
 {
     struct SceneActorApproachActionContext *context = actor->context;
     if (TakeReady(actor)) {
+        register u8 zero8 asm("r3");
+        register u32 zero asm("r5");
         u32 flags = 0x100;
-        u16 *flagptr = &actor->flags2D4;
-        u32 value = *flagptr;
-        u8 zero8 = 0;
-        u32 zero = 0;
+        register u32 off asm("r1") = 0x2D4;
+        register u16 *flagptr asm("r2");
+        u32 value;
+        asm("" : "+r"(off));
+        flagptr = (u16 *)((u8 *)actor + off);
+        value = *flagptr;
+        zero8 = 0;
+        zero = 0;
+        asm("" : "+r"(zero8), "+r"(zero));
         flags |= value;
         *flagptr = flags;
         SetControl(actor, SceneActorReaction_TickMultiHitAnimation, zero8, zero);
@@ -72,6 +81,3 @@ void SceneActorApproach_RunAlternateTimedAction(struct SceneActorRegistryResetVi
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorApproach_RunAlternateTimedAction);
-#endif

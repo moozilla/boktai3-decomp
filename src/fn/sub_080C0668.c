@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.2%
-// foundry draft (worker best 91.2%); what differs is mostly register allocation and instruction order
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F0];
     u16 timer;
@@ -26,10 +24,10 @@ static inline void ClearFlags(u16 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u32 zero)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u32 zero,
+                              u8 zero8)
 {
     u8 code = 3;
-    u8 zero8 = 0;
     {
         u8 *taken = &actor->field2B2;
         *taken = 1;
@@ -43,7 +41,11 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
         ((u8 *)actor)[field] = code;
         actor->target = fn;
         field += 0x13;
-        *(u16 *)((u8 *)actor + field) = zero;
+        {
+            u16 *q = (u16 *)((u8 *)actor + field);
+            asm("" : "+r"(q), "+r"(field));
+            *q = zero;
+        }
     } while (0);
     {
         u32 *flags = &actor->flags114;
@@ -59,13 +61,15 @@ void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *ac
         u32 flags = 0x100;
         u16 *flagptr = &actor->flags2D4;
         u32 value = *flagptr;
+        u8 zero8 = 0;
         u32 zero = 0;
+        asm("" : "+r"(zero));
         flags |= value;
         *flagptr = flags;
         if (actor->category == 7)
-            SetControl(actor, SceneActorReaction_TickQueuedContact, zero);
+            SetControl(actor, SceneActorReaction_TickQueuedContact, zero, zero8);
         else
-            SetControl(actor, SceneActorReaction_TickContactAnimation, zero);
+            SetControl(actor, SceneActorReaction_TickContactAnimation, zero, zero8);
         Vorn_SpawnHazard(actor, 1);
         context->timer = context->duration;
     }
@@ -75,6 +79,3 @@ void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *ac
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorApproach_RunCategoryAction);
-#endif
