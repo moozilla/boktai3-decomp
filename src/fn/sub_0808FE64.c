@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 void Slime_StartRandomWait(void);
-#define Slime_OnInterrupt sub_0808FE64
 void Slime_OnInterrupt(struct SceneActorRegistryResetView *actor)
 {
     u8 kind = actor->field2B5;

@@ -12,7 +12,7 @@ struct W {
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void Slime_ResolveBodyContact(void);
-void sub_0808E208(void);
+void Slime_ApplyBodyHit(void);
 void Slime_InitColliders(u8 *p)
 {
     struct Z s1, s2;
@@ -28,5 +28,5 @@ void Slime_InitColliders(u8 *p)
     ((struct W *)&s2)->a = 0;
     ((struct W *)&s2)->b = 0x80;
     ((struct W *)&s2)->c = 0;
-    SceneActorCollision_InitAttack(p, &s1, &s2, sub_0808E208, 0, p);
+    SceneActorCollision_InitAttack(p, &s1, &s2, Slime_ApplyBodyHit, 0, p);
 }

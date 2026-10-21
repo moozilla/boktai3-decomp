@@ -42,7 +42,6 @@ one:
 zero:
     return 0;
 }
-#define Slime_ApplyBodyHit sub_0808E208
 void Slime_ApplyBodyHit(struct SlimeHitTarget *target, struct SlimeHitInfo *info,
                         struct SceneActorRegistryResetView *actor)
 {

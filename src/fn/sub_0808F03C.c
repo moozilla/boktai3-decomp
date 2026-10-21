@@ -24,7 +24,6 @@ static inline s32 Shift12(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-#define Slime_UpdateLaunch sub_0808F03C
 void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
 {
     struct SlimeDrawable *d = actor->drawable;
