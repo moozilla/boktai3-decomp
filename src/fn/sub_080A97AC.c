@@ -1,5 +1,4 @@
 #include "global.h"
-#define TentacleActor_TargetMarkedSegment sub_080A97AC
 struct Pos080A97AC {
     u32 v[2];
 };
@@ -35,7 +34,7 @@ inline static u8 TestMask16(u16 *flags, u32 mask)
     return 0;
 }
 
-void sub_080A97AC(u8 *p)
+void TentacleActor_TargetMarkedSegment(u8 *p)
 {
     struct Group080A97AC *g = *(struct Group080A97AC **)(p + 0x3d0);
     s32 found = 0xff;

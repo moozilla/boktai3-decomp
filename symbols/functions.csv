@@ -3106,8 +3106,8 @@ addr,name,mode,confidence,source,notes
 0809D16C,SceneActorControl_ResetTargetFlags,thumb,low,src-alias,
 0809D1AC,RouteActor_UpdateRandomDestination,thumb,low,src-alias,
 0809D2A8,RouteActor_ReflectAtRaisedTerrain,thumb,low,src-alias,
-0809D424,Lun_EnterIdleOrCopyCell,thumb,low,src-alias,When flag 0x100 is set copies a word from the owner object; otherwise installs the idle control and sets bit 8 in the motion flags
 0809D3A4,Lun_OnTargetCheck,thumb,low,src-alias,Target-check callback tests vertical proximity and range before setting targeting flags
+0809D424,Lun_EnterIdleOrCopyCell,thumb,low,src-alias,When flag 0x100 is set copies a word from the owner object; otherwise installs the idle control and sets bit 8 in the motion flags
 0809D4EC,SceneActorControl_ConsumeLiftFlagPenalty,thumb,low,src-alias,
 0809D550,Lun_UpdateMovement,thumb,low,src-alias,Runs movement logic and waypoint handling before the main action callback
 0809D568,Lun_UpdateTerrainBounce,thumb,low,src-alias,Invokes terrain checking that reverses horizontal movement at raised ground
@@ -3216,8 +3216,8 @@ addr,name,mode,confidence,source,notes
 080A97AC,TentacleActor_TargetMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and when state bit 0 is set copies its position and makes it the target
 080A985C,TentacleActor_ActivateMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and activates its associated object
 080A9910,TentacleActor_UpdateOscillation,thumb,low,src-alias,Advances the signed offset and reverses direction at either limit
-080A9988,TentacleActor_ShiftSegmentTrail,thumb,low,src-alias,Every few ticks passes each active segment position to the next segment's previous-position slot starting from the owner object position
 080A9970,TentacleActor_InitSegmentUpdateState,thumb,low,src-alias,Sets the segment update control byte to one; interpretation is tentative
+080A9988,TentacleActor_ShiftSegmentTrail,thumb,low,src-alias,Every few ticks passes each active segment position to the next segment's previous-position slot starting from the owner object position
 080A9AA0,ActorTrail_ApplyAngularOffsets,thumb,low,src-alias,
 080AA024,TentacleActor_ResetSegmentPositions,thumb,low,src-alias,Copies the supplied position into both position fields of every segment
 080AA078,TentacleActor_InitCollision,thumb,low,src-alias,Initializes the actor body and attack colliders with their respective callbacks

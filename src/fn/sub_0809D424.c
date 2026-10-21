@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Lun_EnterIdleOrCopyCell sub_0809D424
 extern u8 *gUnk_02000580;
 void SceneActorControl_OnIdle(void);
 struct S {

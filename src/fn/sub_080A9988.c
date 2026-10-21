@@ -1,5 +1,4 @@
 #include "global.h"
-#define TentacleActor_ShiftSegmentTrail sub_080A9988
 
 struct Pos080A9988 {
     u32 v[2];

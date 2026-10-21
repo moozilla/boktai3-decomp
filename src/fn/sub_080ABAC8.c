@@ -4,7 +4,7 @@ void TentacleActor_UpdateSegmentColliders(u8 *);
 void Tentacle_FireSecondaryAttack(u8 *);
 void ActorTrail_UpdateTimedScale(u8 *);
 void SpritePool_FlagEntries(u8 *);
-void sub_080A9988(u8 *);
+void TentacleActor_ShiftSegmentTrail(u8 *);
 void sub_080AAA90(u8 *);
 void sub_080AA8C4(u8 *);
 void sub_080AB04C(u8 *);
@@ -16,7 +16,7 @@ s32 TentacleActor_UpdateComponents(u8 *p)
     Tentacle_FireSecondaryAttack(p);
     ActorTrail_UpdateTimedScale(p);
     SpritePool_FlagEntries(p);
-    sub_080A9988(p);
+    TentacleActor_ShiftSegmentTrail(p);
     sub_080AAA90(p);
     sub_080AA8C4(p);
     sub_080AB04C(p);
