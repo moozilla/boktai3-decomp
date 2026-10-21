@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
-// foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
 #define gRandomTableIndex gUnk_03005308
 #define gRandomTable      gUnk_0203B400
 extern u32 gUnk_030053F4, gUnk_03005308;
@@ -14,12 +12,13 @@ void Player_CallEventScript(struct Player *, u32);
 void *PlayerBurst_Create(void *);
 static inline u16 nextRandom(void)
 {
-    const u16 *table;
+    register u32 table asm("r2");
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    table = gUnk_0203B400;
-    offset += (u32)table;
+    table = (u32)gUnk_0203B400;
+    asm("" : "+r"(table));
+    offset += table;
     return *(const u16 *)offset;
 }
 void PlayerContact_UpdateThresholdEvent(struct Player *p)
@@ -46,11 +45,18 @@ void PlayerContact_UpdateThresholdEvent(struct Player *p)
         }
     }
     return;
-clearReady:
-    *(u8 *)((u8 *)p + 0x53C) = zero;
-clearPending:
-    *(u8 *)((u8 *)p + 0x53B) = zero;
+clearReady: {
+    register u32 off asm("r2") = 0x53C;
+    register u8 *q asm("r0");
+    asm("" : "+r"(off));
+    q = (u8 *)p + off;
+    *q = zero;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerContact_UpdateThresholdEvent);
-#endif
+clearPending: {
+    register u32 off asm("r1") = 0x53B;
+    register u8 *q asm("r0");
+    asm("" : "+r"(off));
+    q = (u8 *)p + off;
+    *q = zero;
+}
+}

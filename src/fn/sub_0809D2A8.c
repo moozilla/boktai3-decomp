@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.0%
-// foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
     mask &= p->flags2CC;
@@ -41,9 +39,9 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
         if (actor->groundHeight2BE < height) {
-            u16 zero;
+            register s32 zero asm("r2");
             s32 off = 0x2EC;
-            s16 *x = (s16 *)((u8 *)actor + off);
+            register s16 *x asm("r1") = (s16 *)((u8 *)actor + off);
             s32 value = -*x;
             zero = 0;
             *x = value;
@@ -56,6 +54,3 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RouteActor_ReflectAtRaisedTerrain);
-#endif

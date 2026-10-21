@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 s32 Callback_InvokeActor(void *arg, void *function);
 s32 Route_GetCurrentPointNodeId(void *);
 u8 sub_0812F3CC(void *);
@@ -31,7 +29,7 @@ void sub_08130F60(u8 *s)
         u32 zero;
         u32 *flags;
         s32 mask;
-        s32 field;
+        register s32 field asm("r1");
         s32 off;
         {
             u8 *taken = s + 0x2B2;
@@ -52,10 +50,15 @@ void sub_08130F60(u8 *s)
                 u16 *hp = (u16 *)(s + (off = field));
                 *hp = zero;
             }
+            asm("" ::"r"(field));
         } while (0);
         {
-            u32 *fl = (u32 *)(s + 0x114);
-            u32 m = ~1;
+            register u32 o asm("r0") = 0x114;
+            register u32 *fl asm("r2");
+            u32 m;
+            asm("" : "+r"(o));
+            fl = (u32 *)(s + o);
+            m = ~1;
             *fl &= m;
         }
         *(u32 *)(s + 0x104) = zero;
@@ -76,6 +79,3 @@ void sub_08130F60(u8 *s)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08130F60);
-#endif

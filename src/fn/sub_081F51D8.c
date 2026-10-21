@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
 struct Ratatosk {
     u8 pad0[0x51];
     u8 angle;
@@ -48,7 +45,6 @@ s32 Callback_InvokeActor(void *, void *);
 void Ratatosk_UpdateDirectionalRecovery(struct Ratatosk *p, s32 timer)
 {
     struct Ratatosk *p2 = p;
-    u16 zero;
     if (p->entering) {
         int angle;
         p->entering = 0;
@@ -60,14 +56,8 @@ void Ratatosk_UpdateDirectionalRecovery(struct Ratatosk *p, s32 timer)
         }
         Sound_PlaySongChecked(0x55f);
     }
-    {
-        u16 *dst = &p2->motion;
-        u16 half;
-        zero = 0;
-        half = zero;
-        *dst = half;
-        p2->motionFlag = zero;
-    }
+    p2->motion = 0;
+    p2->motionFlag = 0;
     {
         u32 value;
         u32 mask = 12;
@@ -77,6 +67,3 @@ void Ratatosk_UpdateDirectionalRecovery(struct Ratatosk *p, s32 timer)
     if (!(u8)Callback_InvokeActor(p, p->callback) && timer > 19)
         p->complete = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDirectionalRecovery);
-#endif

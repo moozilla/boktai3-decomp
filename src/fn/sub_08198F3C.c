@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 
 struct RingVector {
     u32 x, y;
@@ -53,7 +51,7 @@ static inline u8 Ring_SetMode(struct SceneEffectRing *ring, u32 mode)
 void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing *ring,
                                 struct RingVector *pos, u32 mode)
 {
-    u8 flags;
+    register u8 flags asm("r0");
     u32 animation = SceneEffect_LoadRingAnimation();
     void *data = ring->animation;
     struct RingCollider *collider;
@@ -77,6 +75,3 @@ void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing 
     ring->update = update;
     ring->destroy = destroy;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneEffect_InitializeRing);
-#endif
