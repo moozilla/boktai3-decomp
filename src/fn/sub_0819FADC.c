@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 struct ActorReaction {
     u8 unknown0[0xAF];
     u8 finished;
@@ -30,9 +28,8 @@ static inline s32 UpdateMotionAnimation(struct ActorReaction *p)
 }
 void Hresvelgr_UpdateMotionPhase(struct ActorReaction *actor, u32 frame)
 {
-    if (!UpdateMotionAnimation(actor))
+    struct ActorReaction *q = actor;
+    asm("" : "+r"(q));
+    if (!UpdateMotionAnimation(q))
         sub_0819C8F8(actor, 12, frame << 2);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateMotionPhase);
-#endif
