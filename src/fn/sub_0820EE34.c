@@ -55,11 +55,6 @@ void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 
 #define OrangeSpine_ApplyHitReaction sub_0820EE34
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// Remaining diff: reload/scratch register choice only (0x40 mask via r1 not r3,
-// offset constants in r7 not r3, sparks setup r0/r1/r2 instead of r7/r0/r1).
-
 void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                                   struct Target *targetInput)
 {
@@ -69,6 +64,7 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
+    u32 m40, hitFlags;
     Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
@@ -91,30 +87,68 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 asm("" : : "r"(d));
             }
         }
-        if (source->flags & 0x40) {
-            target->flash = 8;
+        {
+            u32 flags = source->flags;
+            {
+                register u32 t asm("r3") = 0x40;
+                asm("" : "+r"(t));
+                m40 = t;
+            }
+            hitFlags = flags;
+        }
+        if (hitFlags & m40) {
+            {
+                register u32 off asm("r0") = 0x130;
+                asm("" : "+r"(off));
+                {
+                    register u8 *addr asm("r1") = (u8 *)target + off;
+                    *(u16 *)addr = 8;
+                }
+            }
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(target->collider, target->damage, 0, &target->displayPosition,
-                                     (u8 *)target + 0x80, 1);
+            {
+                s32 damage;
+                void *col = target->collider;
+                {
+                    register u32 d asm("r3");
+                    asm("" : "=r"(d));
+                    damage = target->damage;
+                    asm("" : : "r"(d));
+                }
+                DamageNumberDisplay_Show(col, damage, 0, &target->displayPosition,
+                                         (u8 *)target + 0x80, 1);
+            }
             {
                 register void *hud asm("r8");
                 s32 health;
                 s32 a, b, direction;
-                hud = target->hud;
                 {
-                    register u32 d asm("r1");
+                    register u32 off asm("r3") = 0x14c;
+                    asm("" : "+r"(off));
+                    {
+                        register u8 *addr asm("r0") = (u8 *)target + off;
+                        hud = *(void **)addr;
+                    }
+                }
+                {
+                    register u32 d asm("r3");
                     asm("" : "=r"(d));
                     health = target->health;
                     asm("" : : "r"(d));
                 }
-                a = target->hudA;
+                {
+                    register u32 d asm("r1");
+                    asm("" : "=r"(d));
+                    a = target->hudA;
+                    asm("" : : "r"(d));
+                }
                 b = target->hudB;
                 direction = 0;
                 if (target->direction == 4)
                     direction = 1;
                 SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
             }
-            if (source->flags & 0x40)
+            if (source->flags & m40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
@@ -155,6 +189,7 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                     u32 last = table[random];
                     x = pos->z - 0x40;
                     last &= mask;
+                    asm("" : : "r"(table));
                     x += last;
                     pos->z = x;
                 }
@@ -164,6 +199,3 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0820EE34);
-#endif
