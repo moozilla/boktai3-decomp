@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.0%
-// foundry draft (worker best 85.0%); what differs is mostly register allocation and instruction order
 #define gSpatialIndex gUnk_02000200
 struct SpatialEntry {
     u32 flags, mask, category;
@@ -32,6 +29,7 @@ void Heap_Free(void *);
 u8 SpatialIndex_RemoveEntry(struct SpatialEntry *entry)
 {
     struct SpatialIndex *index = gSpatialIndex;
+    struct SpatialBucket *matchBucket;
     struct SpatialBucket *bucket;
     struct SpatialLink *link;
     s32 column;
@@ -50,27 +48,28 @@ u8 SpatialIndex_RemoveEntry(struct SpatialEntry *entry)
     while (link) {
         if (link->entry == entry) {
             struct SpatialLink *previous;
+            matchBucket = bucket;
             entry->registrationFlags &= 0xfe;
             previous = link->previous;
             if (!previous) {
                 if (link->next) {
                     link->next->previous = previous;
                     if (entry->flags & 8) {
-                        bucket->active = link->next;
+                        matchBucket->active = link->next;
                         goto activeRemoved;
                     } else if (entry->flags & 16) {
-                        bucket->passive = link->next;
+                        matchBucket->passive = link->next;
                         goto passiveRemoved;
                     }
                     goto freeLink;
                 } else {
                     Heap_Free(link);
                     if (entry->flags & 8) {
-                        bucket->active = previous;
-                        bucket->activeCount--;
+                        matchBucket->active = previous;
+                        matchBucket->activeCount--;
                     } else if (entry->flags & 16) {
-                        bucket->passive = previous;
-                        bucket->passiveCount--;
+                        matchBucket->passive = previous;
+                        matchBucket->passiveCount--;
                     }
                     return 1;
                 }
@@ -81,10 +80,10 @@ u8 SpatialIndex_RemoveEntry(struct SpatialEntry *entry)
             }
             if (entry->flags & 8) {
             activeRemoved:
-                bucket->activeCount--;
+                matchBucket->activeCount--;
             } else if (entry->flags & 16) {
             passiveRemoved:
-                bucket->passiveCount--;
+                matchBucket->passiveCount--;
             }
         freeLink:
             Heap_Free(link);
@@ -94,6 +93,3 @@ u8 SpatialIndex_RemoveEntry(struct SpatialEntry *entry)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpatialIndex_RemoveEntry);
-#endif
