@@ -1,8 +1,5 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// Remaining differences: resource reload, selected register lifetimes, and explicit success result.
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
 s32 Script_SeekToKeyword(s32);
@@ -30,8 +27,9 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
     }
     {
         u32 frame = *command >> 6;
+        struct DisplaySequenceSprite *o = (struct DisplaySequenceSprite *)(owner + 0x24);
         asm("" : "+r"(sprite) : "r"(frame));
-        sprite->frame = frame;
+        o->frame = frame;
     }
     {
         u32 input = state->flags;
@@ -229,26 +227,49 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     resource = ScriptProc_Start(0x922e, 0x5184);
     *(void **)(p + 0x164) = resource;
     if (H(0x146) == 0) {
-        *(void (**)(void))(p + 0x108) = sub_0820843C;
+        {
+            register u32 off asm("r1") = 0x108;
+            register u8 *q asm("r0");
+            asm("" : "+r"(off));
+            q = p + off;
+            *(void (**)(void))q = sub_0820843C;
+        }
         sequenceResult = Anim_SetSequence(p + 0x10c, resource, 8, 0, 0);
     } else {
         *(void (**)(void))(p + 0x108) = sub_082086B8;
-        H(0x130) = 1;
-        asm("" : : : "memory");
-        sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, 0);
+        {
+            register u32 zero asm("r2");
+            s16 *q = &H(0x130);
+            zero = 0;
+            asm("" : "+r"(zero));
+            *q = 1;
+            asm("" : : : "memory");
+            sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, zero);
+        }
     }
     StepAnimation(p, (void *)(p + 0x10c), 4);
     asm("" : : "r"(sequenceResult));
-    if (H(0x146) == 0)
-        CannonTurret_InitCollider(p);
-    if (H(0x13e) != 0) {
-        SceneBody_Init(p + 0xc0, *(void **)(p + 0x148), p + 0x40, 0, 4, p);
-        SceneBody_SetSprite(p + 0xc0, p + 0x24);
-        TerrainOverlay_QueueAddActor(p + 0xc0);
+    {
+        register u32 off0 asm("r3") = 0x146;
+        register u8 *a0 asm("r1");
+        asm("" : "+r"(off0));
+        a0 = p + off0;
+        if (*(s16 *)a0 == 0)
+            CannonTurret_InitCollider(p);
     }
-    return 0;
+    {
+        register u32 off asm("r3") = 0x13e;
+        asm("" : "+r"(off));
+        if (*(s16 *)(p + off) != 0) {
+            u8 *body = p + 0xc0;
+            void *par;
+            register u8 *pa asm("r0");
+            off += 0xa;
+            pa = p + off;
+            par = *(void **)pa;
+            SceneBody_Init(body, par, p + 0x40, 0, 4, p);
+            SceneBody_SetSprite(body, p + 0x24);
+            TerrainOverlay_QueueAddActor(body);
+        }
+    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_InitializeFromScript);
-#endif
