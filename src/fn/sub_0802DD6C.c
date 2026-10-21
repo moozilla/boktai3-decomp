@@ -1,7 +1,4 @@
 #include "display_animation.h"
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// only difference: "adds r0, #2" on the table base is placed before the sound-index load instead of after it
 /* Actor_PlayFootstepSound: plays a step sound when the animation hits one of two marked frames */
 
 struct StepInfo {
@@ -45,11 +42,10 @@ void Actor_PlayFootstepSound(struct StepActor *actor, u32 mode)
             Sound_PlaySong(gUnk_086055D4[info->sound].a);
         else if (f[1] == frame) {
             const u16 *t = (const u16 *)gUnk_086055D4;
+            u32 s = info->sound << 2;
+            asm volatile("" : "+r"(s));
             t += 1;
-            Sound_PlaySong(t[info->sound * 2]);
+            Sound_PlaySong(*(u16 *)((u8 *)t + s));
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_PlayFootstepSound);
-#endif
