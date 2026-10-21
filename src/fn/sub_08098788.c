@@ -13,7 +13,7 @@ void ActorShadow_Disable(void *);
 void sub_0809852C(void *);
 void ActorTick_DecrementCounterAA(void *);
 void ActorVisibility_TickRevealDelay(void *);
-void sub_08097CB4(void *);
+void Ghost_UpdateRandomDestination(void *);
 void sub_08097E38(void *);
 void SceneActor_EasePlayerHeight(void *);
 static inline u8 Flag(u8 *p, u32 mask)
@@ -171,7 +171,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     }
     sub_0809852C(a);
     ActorVisibility_TickRevealDelay(a);
-    sub_08097CB4(a);
+    Ghost_UpdateRandomDestination(a);
     sub_08097E38(a);
 finish:
     SceneActor_EasePlayerHeight(a);

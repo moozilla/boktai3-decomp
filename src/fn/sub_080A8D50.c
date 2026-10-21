@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 /* TentacleBody_InitSegmentAnimations: Loads animation data and scripts for each tentacle segment */
-#define TentacleBody_InitSegmentAnimations sub_080A8D50
 
 s32 Div(s32, s32);
 s32 AnimData_Load(void *, s32);
@@ -39,7 +38,7 @@ struct Body080A8D50 {
     s32 limit;
 };
 
-void sub_080A8D50(u8 *p, s32 animId, u32 scriptKey, u32 direction)
+void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 direction)
 {
     struct Body080A8D50 *g = *(struct Body080A8D50 **)(p + 0x3d0);
     s32 first, i, phase;

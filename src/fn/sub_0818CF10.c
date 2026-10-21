@@ -4,7 +4,6 @@
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 
-#define Armor_UpdatePartWaveXReturn sub_0818CF10
 void Armor_UpdatePartWaveXReturn(struct Motion0818Object *p)
 {
     s32 wave;
