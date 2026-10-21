@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 84.2%
-// foundry draft (worker best 84.2%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define Animation_SetPlaybackRate Anim_SetFrameDurationScale
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
@@ -10,7 +8,7 @@ void Anim_SetFrameDurationScale(void *, u32);
 s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *p, s32 index, s32 rate)
 {
     struct PlayerAnimation *anim;
-    void *data;
+    register void *data asm("r5");
     u32 flags = 0;
     if (p->animationIndex == index)
         flags = 1;
@@ -29,6 +27,3 @@ s32 PlayerAnimation_SelectSecondaryKeyframes(struct Player *p, s32 index, s32 ra
     Anim_SetFrameDurationScale(anim, (u16)rate);
     return Anim_Step(anim, data);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerAnimation_SelectSecondaryKeyframes);
-#endif

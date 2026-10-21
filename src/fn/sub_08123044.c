@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 80.7%
-// foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
+// fuzzy: 96.4%
+// open: mask address (manager+0x920) must be rematerialized, not CSE with the occupancy test
 struct SpriteNotice {
     u8 unk0[0x42];
     u8 state;
@@ -23,7 +23,7 @@ static inline u8 Occupied(u32 *mask, s32 i)
 }
 s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
 {
-    struct SpriteNotice *start = manager->slots;
+    struct SpriteNotice *start;
     s32 i;
     u32 *mask;
     void **table;
@@ -31,6 +31,7 @@ s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
     struct SpriteNotice *slot;
     if (manager->occupiedMask) {
         i = 0;
+        start = manager->slots;
         mask = (u32 *)((u32)start + 0x900);
         table = gUnk_08610728;
         state = &manager->slots[0].state;
