@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 #define ScriptPanel_SetSelection Registry1745_SetMenuRequest
 struct ScriptPanel {
     u8 unk0[0x23];
@@ -35,12 +32,11 @@ s32 ScriptPanel_ConfirmSelection(struct ScriptPanel *p)
     }
     if (p->counter > 10)
         Registry1745_SetMenuRequest(3);
-    if (p->selection != 3)
+    if (p->selection == 3) {
+        Script_Call(p->script, 0);
+        Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
+        p->selection = 0;
         return 0;
-    Script_Call(p->script, 0);
-    Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
-    p->selection = 0;
+    }
+    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScriptPanel_ConfirmSelection);
-#endif

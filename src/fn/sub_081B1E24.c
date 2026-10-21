@@ -5,9 +5,6 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// Remaining difference: timer-address offset uses r1 instead of r2 (three instructions).
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -40,8 +37,18 @@ static inline void Difference(struct SceneVec *dst, struct SceneVec *a, struct S
 }
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
-    p->state = state;
-    p->timer = 0;
+    register u32 so asm("r3") = 0x164;
+    register u32 *sp asm("r0");
+    register u32 *tp asm("r1");
+    asm("" : "+r"(so));
+    sp = (u32 *)((u8 *)p + so);
+    *sp = state;
+    {
+        register u32 to asm("r0") = 0x168;
+        asm("" : "+r"(to));
+        tp = (u32 *)((u8 *)p + to);
+        *tp = 0;
+    }
 }
 static inline void Offset(struct SceneVec *v, s32 x, s32 z)
 {
@@ -84,9 +91,17 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
             MotionTrack_Update(p->motion);
-            if (++p->timer & 64) {
-                SetState(p, 1);
-                p->enter = 1;
+            {
+                register u32 off asm("r2") = 0x168;
+                u32 *t, v;
+                asm("" : "+r"(off));
+                t = (u32 *)((u8 *)p + off);
+                v = ++*t;
+                asm("" : : "r"(off));
+                if (v & 64) {
+                    SetState(p, 1);
+                    p->enter = 1;
+                }
             }
             break;
         case 1:
@@ -94,7 +109,3 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartTracking);
-#endif
