@@ -3477,6 +3477,7 @@ addr,name,mode,confidence,source,notes
 080D3D60,Mummy_UpdatePlayerRoute,thumb,low,src-alias,
 080D48C0,Mummy_UpdateBehavior,thumb,low,src-alias,Runs five mummy behavior helpers before the current state callback is dispatched
 080D48E8,Mummy_UpdateSpecialFlags,thumb,low,src-alias,Post-behavior helper clears special flags unless the current action is 0x27
+080D48F4,Mummy_UpdateScriptedAction,thumb,low,src-alias,"starts directional entry control and action script once; idle control when done"
 080D5360,Mummy_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288
 080D5370,Mummy_WaitReplaceResponse,thumb,low,src-alias,"waits on timer then replaces response slot 0 and restarts behavior 2"
 080D53F8,Mummy_UpdateProbeNavigation,thumb,low,src-alias,
