@@ -1,11 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *);
 
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// Only the register holding the 0x62C offset differs (r2 vs r5).
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;
@@ -40,8 +38,6 @@ void sub_080ED328(void *source, void *target, struct SceneActorRegistryResetView
         return;
     if (Test(ContextFlag(actor->context, 1), ~0))
         return;
+    asm("" ::"r"(actor));
     SceneActorBehavior_ApplyContactReaction(source, target);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080ED328);
-#endif
