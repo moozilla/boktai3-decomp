@@ -2,9 +2,6 @@
 #include "player.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 97.4%
-// Remaining mismatch: second-branch heading sum lacks the ROM register copy.
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
 void Collider_SetPosition(void *, void *, u32);
@@ -52,6 +49,7 @@ s32 Player_UpdateSweepAction(struct Player *p)
             {
                 register s32 sum asm("r0") = angle + *h;
                 angle = sum;
+                asm("" ::"r"(sum));
             }
             angle -= 0x20;
         }
@@ -76,6 +74,3 @@ s32 Player_UpdateSweepAction(struct Player *p)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSweepAction);
-#endif
