@@ -8449,11 +8449,14 @@ addr,name,mode,confidence,source,notes
 0820337C,CannonEmitter_InitializeFromScript,thumb,low,src-alias,
 0820361C,CannonEmitter_CreateFromScript,thumb,low,src-alias,Creates a scripted proximity-triggered projectile emitter; cannon identity is tentative from its sprite and firing behavior
 08203660,EnemyF426_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 28 and defeat statistics; enemy identity is tentative
+082038A8,EnemyF426_ApplyHitReaction,thumb,low,src-alias,
 08203A54,EnemyF426_InitCollider,thumb,low,src-alias,Initializes the enemy collider and installs its collision callback
 08203AF0,EnemyF426_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
 08203B54,EnemyF426_SpawnProjectile,thumb,low,src-alias,
 08203D6C,EnemyF426_UpdateDeath,thumb,low,src-alias,Death state callback emits particles and records defeat on frame 12
+08203DF4,EnemyF426_UpdateDamageState,thumb,low,src-alias,
 08204224,EnemyF426_Destroy,thumb,low,src-alias,Task destruction callback removes the enemy sprite
+08204230,EnemyF426_InitializeFromScript,thumb,low,src-alias,
 08204704,EnemyF426_Create,thumb,low,src-alias,Creates and initializes the enemy task registered under key F426
 08204748,EnemyD459_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 29 and defeat statistics; enemy identity is tentative
 08204990,EnemyD459_ApplyHitReaction,thumb,low,src-alias,
