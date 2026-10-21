@@ -46,7 +46,6 @@ struct Target {
     u8 p150[4];
     u32 damageType;
 };
-#define PoisonHand_ApplyHitReaction sub_0820DC18
 extern const struct Vec gUnk_0824FEA4;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -56,7 +55,8 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-void sub_0820DC18(struct Source *sourceInput, struct Hit *input, struct Target *targetInput)
+void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
+                                 struct Target *targetInput)
 {
     struct {
         struct Vec position, velocity;
@@ -147,5 +147,5 @@ void sub_0820DC18(struct Source *sourceInput, struct Hit *input, struct Target *
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820DC18);
+INCLUDE_ASM("asm/nonmatching", PoisonHand_ApplyHitReaction);
 #endif
