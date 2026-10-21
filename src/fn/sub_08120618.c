@@ -50,7 +50,7 @@ s32 Div(s32, s32);
 void Memory_Clear(void *, s32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Obj *);
-void sub_0811D91C(struct Obj *);
+void PalFade_Update(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(u8 *);
@@ -118,7 +118,7 @@ void SceneActor_UpdateFallState(struct Obj *p)
         self->flags40 &= ~1;
     }
     p->unk8AC = sum;
-    sub_0811D91C(self);
+    PalFade_Update(self);
     Actor_UpdateShadowSpriteParts(self, p->model);
     if (self->flags40 & 4)
         sub_0811BF44(self);

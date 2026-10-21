@@ -17,7 +17,7 @@ u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
 void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
-void sub_0811D6C8(void *, u32, u32, s32, u32, u32, u32, u32);
+void PalFade_Start(void *, u32, u32, s32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 void Character_SetLowResourceColorEffect(void *, void *);
 s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
@@ -45,10 +45,10 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     palette = CharacterModel_GetPrimaryPaletteIndex(owner + 0x610);
     started = ability->started;
     if (started == 0) {
-        sub_0811D6C8(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, started);
+        PalFade_Start(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, started);
         ability->started = 1;
     } else if (!(*(u32 *)(owner + 0x8e4) & 1)) {
-        sub_0811D6C8(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, 1);
+        PalFade_Start(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, 1);
     }
     if (ability->soundTimer == 0)
         ability->soundTimer = 30;

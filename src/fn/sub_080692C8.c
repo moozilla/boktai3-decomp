@@ -7,7 +7,6 @@
 // flag-set write register in the sequence step (1 insn pair).
 #include "bouncing_object.h"
 #include "engine.h"
-#define BouncingObject_Spawn sub_080692C8
 extern u32 gUnk_030053F4;
 static inline u32 Blocked(u32 mask)
 {
@@ -238,5 +237,5 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080692C8);
+INCLUDE_ASM("asm/nonmatching", BouncingObject_Spawn);
 #endif

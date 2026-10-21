@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneNpc_UpdateTransitionEffect sub_081D1404
 
 struct Pair {
     u32 a, b;

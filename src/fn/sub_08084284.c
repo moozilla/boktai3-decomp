@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 99.6%
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_WanderAroundPlayer sub_08084284
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
@@ -106,5 +105,5 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08084284);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_WanderAroundPlayer);
 #endif
