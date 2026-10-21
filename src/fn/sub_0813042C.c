@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -29,13 +28,17 @@ static inline void Enter(struct SceneActorRegistryResetView *actor, u32 zero)
 
 void SceneActorControl_EnterTimedState(struct SceneActorRegistryResetView *actor)
 {
-    register u32 bit asm("r1");
+    u32 masked;
+    u16 flags;
     u32 zero;
+    u32 bit;
     if (TakeReset(actor)) {
     }
     bit = 0x20;
-    zero = (u16)(*(u16 *)((u8 *)actor + 0x2d4) & bit);
-    if (zero == 0)
-        Enter(actor, zero);
+    masked = *(u16 *)((u8 *)actor + 0x2d4) & bit;
+    flags = (u16)masked;
+    zero = flags;
+    if ((bit = zero) == 0)
+        Enter(*(&actor), zero);
     actor->counter2AC++;
 }
