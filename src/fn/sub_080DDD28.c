@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.9%
-// foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 
 s32 Div(s32, s32);
 
@@ -34,14 +32,16 @@ void Actor_InitLaunchVelocity(struct Actor *actor)
     struct TargetEntity *target = actor->target;
     struct ActorPosition *tpos = &target->pos;
 
-    pdiff[0] = tpos->x - apos->x;
+    {
+        s16 v = tpos->x - apos->x;
+        s16 *q = diff;
+        asm("" : "+r"(q));
+        *q = v;
+    }
     pdiff[1] = tpos->y - apos->y;
     pdiff[2] = tpos->z - apos->z;
 
-    actor->vel.x = Div(pdiff[0], 0x1c);
+    actor->vel.x = Div(diff[0], 0x1c);
     actor->vel.y = 0x20;
     actor->vel.z = Div(pdiff[2], 0x1c);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_InitLaunchVelocity);
-#endif
