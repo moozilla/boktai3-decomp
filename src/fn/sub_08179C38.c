@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.9%
-// foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 void Collision_CalculateDamageResponse(void *);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Math_Atan2(s32, s32);
@@ -23,6 +21,7 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
                              struct ActorImpact *c)
 {
     u8 *d = (u8 *)c;
+    u8 *q;
     u32 v;
     int mask;
     Collision_CalculateDamageResponse(a);
@@ -34,10 +33,14 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
         ((struct ActorImpact *)c)->direction = Math_Atan2(b->x - a->x, b->z - a->z);
     ((struct ActorImpact *)c)->value472 = a->responseParameter;
     v = a->statRewardFlags;
-    *(u32 *)(d + 0xbc) = v;
+    q = d + 0xbc;
+    *(u32 *)q = v;
+    asm("" : "+r"(q));
     v = a->reactionFlags;
-    *(u32 *)(d + 0xc0) = v;
-    PlayerStats_AddContactHundredths(a, b, c->kind);
+    q += 4;
+    *(u32 *)q = v;
+    q += 0x22;
+    PlayerStats_AddContactHundredths(a, b, *q);
     {
         u32 one = 1;
         if (a->reactionFlags & one)
@@ -48,6 +51,3 @@ void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *
     ((struct ActorImpact *)c)->value4ee = a->responseValue;
     PlayerStats_AddContactHundredths(a, b, 12);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorImpact_CopyContact);
-#endif
