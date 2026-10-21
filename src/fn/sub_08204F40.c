@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.4%
-// Register choice for the collider/damage/health pointers, the zero reuse after
-// the death block and the palette-offset derivation still differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 #define EnemyD459_Update sub_08204F40
@@ -54,12 +50,8 @@ static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceStat
     const volatile u16 *c = s->commands + s->index;
     {
         u32 frame;
-        register void *highSprite asm("r8") = sprite;
-        void *frameSprite;
         frame = *c >> 6;
-        frameSprite = highSprite;
-        asm("" : "+r"(frameSprite));
-        *(u16 *)((u8 *)frameSprite + 0x10) = frame;
+        *(u16 *)((u8 *)sprite + 0x10) = frame;
     }
     {
         u32 input = s->flags, bit = 1;
@@ -148,9 +140,10 @@ s32 EnemyD459_Update(u8 *p)
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;
     if (H(0x12e) == 0) {
-        collider = (void *)(p + 0x6c);
-        collider->flags &= ~4;
-        Collider_SetPosition(collider, p + 0x40, 0);
+        struct ColliderView *c = (void *)(p + 0x6c);
+        c->flags &= ~4;
+        Collider_SetPosition(c, p + 0x40, 0);
+        collider = c;
     } else {
         struct ColliderView *c = (void *)(p + 0x6c);
         c->flags |= 4;
@@ -190,8 +183,11 @@ s32 EnemyD459_Update(u8 *p)
             sub_08014634((RandomFrom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             Anim_RestartSequence(p + 0x10c, *(void **)(p + 0x158), 4, 0, 0);
             *position = U(0x1c) + 0x40;
-            z = &H(0x44);
-            *z = U(0x20) + 0x40;
+            {
+                u16 v = U(0x20) + 0x40;
+                z = &H(0x44);
+                *z = v;
+            }
             AnimData_SelectPaletteBank(p + 0x50, 0x1b7);
             *(u8 **)(p + 0x5c) = gUnk_030042E4 + 0x44a0;
             H(0x130) = 0;
@@ -201,9 +197,13 @@ s32 EnemyD459_Update(u8 *p)
             *z -= 0x60;
             Sound_PlaySong(0x52b);
         }
-        H(0x130) = 8;
-        H(0x12a) = 1;
-        H(0x128) = 0;
+        {
+            s16 *flash = &H(0x130);
+            s32 zero = 0;
+            *flash = 8;
+            H(0x12a) = 1;
+            H(0x128) = zero;
+        }
     }
     if (H(0x130) > 0 && H(0x12e) == 0) {
         AnimData_SelectPaletteBank(p + 0x50, 0x192);
@@ -220,7 +220,3 @@ s32 EnemyD459_Update(u8 *p)
     StepAnimation(p, p + 0x24, (void *)(p + 0x10c));
     W(0x18)++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08204F40);
-#endif
