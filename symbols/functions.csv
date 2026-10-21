@@ -2973,6 +2973,7 @@ addr,name,mode,confidence,source,notes
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
+0808F03C,Slime_UpdateLaunch,thumb,low,src-alias,Sets a heading-based launch velocity and plays sound 0x3C1, then enters Slime_UpdateStill when flag 0x10 sets; tentative
 0808F1C4,Slime_UpdateStill,thumb,low,src-alias,
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
