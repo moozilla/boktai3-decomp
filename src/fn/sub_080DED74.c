@@ -2,8 +2,8 @@
 #include "scene_actor_registry.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.6%
-// foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
+// fuzzy: 97.9%
+// Remaining differences: the 0x3D0 context-offset temp lands in r0 instead of r5 (3 insns).
 struct SceneActorActionCooldown {
     u8 unknown0[0x678];
     u32 flags;
@@ -39,9 +39,11 @@ static inline void QueueAction(u8 *actor)
 {
     u32 behavior = 15;
     u32 offset = 0x2A8;
-    u32 zero = 0;
+    u32 zero;
     u32 odd;
-    ((u8 *)actor)[offset] = zero;
+    u8 *q = actor + offset;
+    zero = 0;
+    *q = zero;
     odd = 0x2A9;
     ((u8 *)actor)[odd] = zero;
     offset += 2;
@@ -50,8 +52,16 @@ static inline void QueueAction(u8 *actor)
     odd += 8;
     ((u8 *)actor)[odd] = 1;
     {
-        u32 *flags = &(*(struct SceneActorActionCooldown **)(actor + 0x3D0))->flags;
-        s32 mask = -2;
+        u32 off = 0x3D0;
+        u32 off2 = 0x678;
+        u32 *flags;
+        s32 mask;
+        u8 *ctx;
+        asm("" : "+r"(off));
+        ctx = *(u8 **)(actor + off);
+        asm("" : "+r"(off2));
+        flags = (u32 *)(ctx + off2);
+        mask = -2;
         *flags &= mask;
     }
 }

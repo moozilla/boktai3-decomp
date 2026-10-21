@@ -2,15 +2,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
-#ifdef NONMATCHING
-// fuzzy: 91.9%
-// Remaining differences: animation selector register allocation and flag-clear order.
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 #include "scene_object.h"
 extern const u16 gUnk_08606130[];
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
+#define A(a) ((struct SceneActorAnimationView *)(a))
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -22,7 +20,6 @@ static inline u8 TakeFlag(u8 *flag)
 // confidence=low: charge and slide behaviors install this completion control.
 void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorAnimationView *animation;
     if (TakeFlag(&actor->field2B2)) {
         {
             u8 directionVariant;
@@ -34,7 +31,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             u32 selection;
             u8 *variantReload;
             u32 force;
-            register u8 *restart asm("r8");
+            u8 *restart;
             variantPointer = &directionVariant;
             asm("" : "+r"(variantPointer));
             {
@@ -54,6 +51,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             {
                 register u32 mirrorValue asm("r2") = *mirrorPointer;
                 u32 flagMask = 4;
+                asm("" : "+r"(mirrorValue), "+r"(flagMask));
                 selection = 7;
                 variant = *variantReload;
                 flags = mirrorValue;
@@ -65,21 +63,20 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             } else {
                 force = 0;
             }
-            animation = (struct SceneActorAnimationView *)actor;
-            if (!animation->drawableKind) {
+            if (!A(actor)->drawableKind) {
                 struct SceneActorAnimationSequenceDrawable *drawable;
-                animation->selection = selection;
-                drawable = animation->drawable;
+                A(actor)->selection = selection;
+                drawable = A(actor)->drawable;
                 Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                                  (u8)variant, flags);
-                restart = &animation->restart;
+                restart = &A(actor)->restart;
             } else {
                 struct SceneActorAnimationTile *tile =
-                    &((struct SceneActorAnimationTileDrawable *)animation->drawable)->tile;
+                    &((struct SceneActorAnimationTileDrawable *)A(actor)->drawable)->tile;
                 u8 *savedSelection;
-                savedSelection = &animation->selection;
                 selection += variant;
-                restart = &animation->restart;
+                savedSelection = &A(actor)->selection;
+                restart = &A(actor)->restart;
                 if (((!force) && ((*savedSelection) == selection)) && (!(*restart))) {
                     if ((flags == 1) && (tile->flags & 4)) {
                         goto done;
@@ -92,14 +89,15 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
                 {
                     register u32 mask asm("r9") = 4;
                     u32 mode;
+                    asm("" : "+r"(mask));
                     if (flags & mask) {
                         mode = 6;
                     } else {
                         mode = 4;
                     }
                     Anim_SetKeyframes(
-                        &((struct SceneActorAnimationTileDrawable *)animation->drawable)->tile,
-                        animation->drawable, (u16)selection, 2, (u16)mode);
+                        &((struct SceneActorAnimationTileDrawable *)A(actor)->drawable)->tile,
+                        A(actor)->drawable, (u16)selection, 2, (u16)mode);
                     flags &= 1;
                     if (flags) {
                         tile->flags |= mask;
@@ -124,7 +122,3 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
         actor->field2B0 = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateChargeStop);
-#endif
