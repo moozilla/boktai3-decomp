@@ -1,8 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.3%
-// Remaining differences: instruction selection, load placement, and literal-mask materialization.
+// fuzzy: 99.0%
+// Remaining differences: loop-counter init is emitted before the hoisted 0xFFFFD000 literal in two loops.
 // confidence=low: transient gauges use two independent countdowns.
 extern u16 gUnk_0300517C;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
@@ -67,13 +67,13 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         cell = Hud_GetTilemapCell(0, 29, 1);
         n = 2;
         do {
-            *cell-- = tile | 0xffffd000;
+            *cell-- = tile | -0x3000;
             tile--;
         } while (--n >= 0);
         for (n = 0; n < full; n++)
             *cell-- = 0xd089;
         if (partial) {
-            *cell-- = (partial + 0x81) | 0xffffd000;
+            *cell-- = (partial + 0x81) | -0x3000;
             n++;
         }
         for (; n < width; n++)
