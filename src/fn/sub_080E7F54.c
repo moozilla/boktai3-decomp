@@ -2,9 +2,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.2%
-// foundry draft (worker best 91.2%); what differs is mostly register allocation and instruction order
 #define gPlayerSlots     gUnk_02000580
 #define gPlayerSlotFlags gUnk_02000560
 extern u32 gUnk_02000560[4];
@@ -26,11 +23,13 @@ u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
         if (player && !(*(u32 *)((u32)gUnk_02000560 + indexOffset) & excluded)) {
             struct SceneVec *source = &player->position;
             s32 x, z;
+            s16 new_var;
             delta->x = (u16)player->position.x - (u16)position->x;
             delta->y = (u16)source->y - (u16)position->y;
             delta->z = (u16)source->z - (u16)position->z;
             x = Square(delta->x);
-            z = Square(delta->z);
+            new_var = delta->z;
+            z = Square(new_var);
             if (x + z <= 0x2400) {
                 struct Player *nearby = *cursor;
                 if (nearby->inputKeys[1] & 1) {
@@ -45,6 +44,3 @@ u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
     } while (i <= 3);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_FindNearbyActivePlayer);
-#endif

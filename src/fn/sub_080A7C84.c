@@ -2,8 +2,8 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 92.1%
-// Callback exit tail merging, state reset addressing, and register allocation still differ.
+// fuzzy: 95.2%
+// Remaining differences: zero register in the shared exit tail and the end-path stores.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -131,6 +131,8 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
     s32 speed;
+    u32 o;
+    u32 zero;
     struct ContactPosition delta;
     if (Take(&actor->field2B1)) {
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
@@ -142,20 +144,20 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
         body[0x8E8] = 0;
         TentacleActor_SelectWanderRoute(actor);
     }
-    {
-        u32 o = 0x270;
-        asm("" : "+r"(o));
-        if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + o))) {
-            u8 *q = (u8 *)actor + 0x2a8;
-            u32 zero = 0;
-            *q = zero;
-            *((u8 *)actor + 0x2a9) = zero;
-            *((u8 *)actor + 0x2aa) = zero;
-            o += 0x3c;
-            *(u32 *)((u8 *)actor + o) = zero;
-            actor->field2B1 = 1;
-            return;
+    o = 0x270;
+    asm("" : "+r"(o));
+    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + o))) {
+        u8 *q = (u8 *)actor + 0x2a8;
+        {
+            register u32 z asm("r1") = 0;
+            asm("" : "+r"(z));
+            zero = z;
         }
+        *q = zero;
+        *((u8 *)actor + 0x2a9) = zero;
+        *((u8 *)actor + 0x2aa) = zero;
+        o += 0x3c;
+        goto tail;
     }
     if (*(s16 *)(body + 0x8D6) <= 0)
         *(s16 *)(body + 0x8D6) = 1;
@@ -177,8 +179,18 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     }
     TentacleActor_UpdateOscillation(actor, 120, 10);
     if ((s32)actor->counter2AC > 800) {
+        u32 two = 2;
         TentacleActor_SelectWanderRoute(actor);
-        State2(actor);
+        zero = 0;
+        actor->state2A8 = zero;
+        actor->phase2A9 = zero;
+        actor->behavior2AA = two;
+        o = 0x2a9;
+        asm("" : "+r"(o));
+        o += 3;
+    tail:
+        *(u32 *)((u8 *)actor + o) = zero;
+        actor->field2B1 = 1;
     } else
         actor->counter2AC++;
 }

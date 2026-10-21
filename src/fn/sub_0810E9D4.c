@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// foundry draft (worker best 91.8%); what differs is mostly register allocation and instruction order
 #define TileNumber_GetCell     Video_GetWrappedBackgroundMapEntry
 #define TileNumber_DrawDecimal PanelText_DrawDigits
 #define TimerDisplay_DrawEmpty Video_DrawBackgroundRowMarkers
@@ -17,8 +15,9 @@ void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unu
 {
     s32 ticks, seconds, fraction;
     {
-        u16 *cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
+        register u16 *cell asm("r1") = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
         u16 value = 31;
+        asm("" : "+r"(cell));
         *cell = value;
     }
     if (!records)
@@ -41,12 +40,10 @@ void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unu
         PanelText_DrawDigits(seconds, 100, x, y, 0);
         PanelText_DrawDigits(fraction, 100, x + 4, y, 0);
         {
-            u16 *cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
+            register u16 *cell asm("r1") = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
             u16 value = 1;
+            asm("" : "+r"(cell));
             *cell = value;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TimerDisplay_DrawRecord);
-#endif

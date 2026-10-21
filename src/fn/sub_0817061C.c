@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.2%
-// foundry draft (worker best 90.2%); what differs is mostly register allocation and instruction order
 #define SceneHud_BlendPosition PauseMenu_SmoothPoint
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -32,17 +30,38 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
         u32 v = *q, m = 1;
         *q = v | m;
         s->motionWidgets[1].flags |= m;
-        PauseMenu_SwapItemSlots(s, s->actionSelection, s->actionCursor);
+        {
+            u32 sel = s->actionSelection;
+            register u32 off asm("r2") = 0x4387;
+            register u8 *a asm("r0");
+            asm("" : "+r"(off));
+            a = (u8 *)s + off;
+            PauseMenu_SwapItemSlots(s, sel, *a);
+        }
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, PauseMenu_OnSwapSelectionUpdate, 1);
-        sub_0816CDB8(s->actionInput, 1, 0);
-        SceneHud_GetActionIconPosition((u8 *)s + 0x1620, s->actionCursor);
+        {
+            register u32 o1 asm("r1") = 0x4384;
+            register u8 *b asm("r1");
+            u8 *in;
+            u8 *pp;
+            asm("" : "+r"(o1));
+            in = (u8 *)s + o1;
+            sub_0816CDB8(in, 1, 0);
+            {
+                register u32 o3 asm("r2") = 0x1620;
+                pp = (u8 *)s + o3;
+            }
+            {
+                register u32 o2 asm("r2") = 0x4387;
+                asm("" : "+r"(o2));
+                b = (u8 *)s + o2;
+            }
+            SceneHud_GetActionIconPosition(pp, *b);
+        }
         SceneHud_ShowActionPreview(s);
         MenuDisplay_UpdateActionPrompt(s, 4);
         PauseMenu_AddSpriteFlags(s, 6, 1);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_FinishActionSlide);
-#endif

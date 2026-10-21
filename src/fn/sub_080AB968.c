@@ -6,8 +6,8 @@
 // confidence=low: inferred from segment state and collider updates.
 
 #ifdef NONMATCHING
-// fuzzy: 85.9%
-void sub_080A69F0(void);
+// fuzzy: 88.8%
+void TentacleBody_UpdateChargeSpread(void);
 void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
@@ -45,7 +45,10 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
 }
 static inline s32 Abs(s32 x)
 {
-    return x < 0 ? -x : x;
+    s32 r = x;
+    if (x < 0)
+        r = -x;
+    return r;
 }
 static inline void Advance(void *p, s32 x, s32 z)
 {
@@ -56,10 +59,15 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
     if (TakeEntry((u8 *)s)) {
-        SetControl(s, sub_080A69F0, 0x23);
+        SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
         *(u16 *)((u8 *)s + 0x2e8) = 8;
     }
-    Advance(s, Abs(*(s16 *)((u8 *)s + 0x2ec)), Abs(*(s16 *)((u8 *)s + 0x2f0)));
+    {
+        s32 ax = Abs(*(s16 *)((u8 *)s + 0x2ec));
+        s32 az = Abs(*(s16 *)((u8 *)s + 0x2f0));
+        asm("" ::"r"(ax), "r"(az));
+        Advance(s, ax, az);
+    }
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
     if (s->field2B0) {
         u32 zero;

@@ -4,6 +4,7 @@
 // fuzzy: 95.5%
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
 #define gSineTable gUnk_086149C4
+extern const s16 gUnk_086149C4[];
 static inline s32 half(s32 n)
 {
     if (n >= 0)
