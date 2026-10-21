@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -47,7 +46,6 @@ int Wireless_StartChildSearch(struct Engine *p)
 {
     int raw;
     int status;
-    int result;
     if (p->pending) {
         int i;
         void *buffer;
@@ -61,28 +59,25 @@ int Wireless_StartChildSearch(struct Engine *p)
     }
     raw = RfuManager_StartConnect(1, 0, 600, gUnk_0824DE60);
     {
-        register int narrowed asm("r1") = raw;
-        asm("" : "+r"(narrowed));
+        int narrowed = raw;
         status = (u8)narrowed;
     }
-    if (!status)
+    if (!status) {
         goto success;
+    }
     setOperation(p, 27, 0);
-    result = -1;
-    goto done;
+    return -1;
+
 success: {
-    register int operation asm("r1") = 7;
-    register int one asm("r1");
+    int operation = 7;
+    int one;
     p->flag = status;
     p->operation = operation;
     p->ticks = status;
     {
-        register u8 *pending asm("r2") = &p->pending;
+        u8 *pending = &p->pending;
         one = 1;
         *pending = one;
     }
 }
-    result = raw;
-done:
-    return result;
 }
