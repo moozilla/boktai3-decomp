@@ -1,2 +1,2 @@
 id,name,start,end,name_regex,evidence
-intentional_asm,Intentional assembly,08000000,0800145C,,GBA header/reset vector and IWRAM ARM helpers stay assembly; library assembly ranges are in symbols/progress_asm.csv; see docs/PROGRESS_CI.md
+intentional_asm,Intentional assembly,08000000,08000350,,GBA header and SDK crt0 (reset branch; crt0_Init; IntrMain) stay assembly; library assembly ranges are in symbols/progress_asm.csv; see docs/PROGRESS_CI.md

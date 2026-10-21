@@ -130,6 +130,13 @@ def load_asm_ranges(path=ASM):
     return ranges
 
 
+def intentional_asm(funcs, done, asm_ranges):
+    """Unmatched functions inside the reviewed assembly ranges. They stay
+    assembly by design, so headline totals leave them out; the Intentional
+    assembly category reports them on their own."""
+    return {n for n, a in funcs if n not in done and any(lo <= a < hi for lo, hi in asm_ranges)}
+
+
 def unit_areas(areas, unit_name, address):
     base = unit_name.split("/", 1)[-1].replace(" (auto, tentative)", "").replace(" (tentative)", "")
     ids = []
@@ -302,6 +309,8 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
     fuzzy = fuzzy or {}
     areas = areas or {}
     score = lambda n: 100 if n in done else fuzzy.get(n, 0)
+    asm = intentional_asm(funcs, done, asm_ranges)
+    counted = [(n, a) for n, a in funcs if n not in asm]
     libraries = sorted([*libraries, *subsystems], key=lambda group: group["start"])
     for left, right in zip(libraries, libraries[1:]):
         if left["end"] > right["start"]:
@@ -312,14 +321,16 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
     for n, a in funcs:
         library = next((lib for lib in libraries if lib["start"] <= a < lib["end"]), None)
         top = None
+        assembly = library and n in asm
         if categories:
             prefix = library.get("prefix", "libraries") if library else None
-            top = "libraries" if prefix == "libraries" else category_of(
+            # Assembly units sit with the libraries: the boot crt0 is SDK code too.
+            top = "libraries" if prefix == "libraries" or assembly else category_of(
                 categories, library or {"name": f"{a:08X}", "start": a})
             unit_name = f"{categories[top][0]}/{library['name'] if library else f'{a:08X}'}"
         else:
             unit_name = f"{library.get('prefix', 'libraries')}/{library['name']}" if library else f"functions/{a:08X}"
-        if library and n not in done and any(lo <= a < hi for lo, hi in asm_ranges):
+        if assembly:
             unit_name += ASM_SUFFIX
         if unit_name not in grouped:
             unit = {"name": unit_name, "functions": [], "metadata": {"progress_categories": []},
@@ -359,7 +370,7 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         unit.pop("_first")
     categories_out = []
     for cid, label in [("no_register_pinning", "No register pinning"), ("register_pinned", "Register-pinned")]:
-        members = [n for n, _ in funcs if (n in pinned) == (cid == "register_pinned")]
+        members = [n for n, _ in counted if (n in pinned) == (cid == "register_pinned")]
         if not members:
             continue
         matched = [n for n in members if n in done]
@@ -384,10 +395,11 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
             total_b, done_b, count, sum(u["measures"]["matched_functions"] for u in selected),
             units=len(selected), complete_units=sum(u["metadata"]["complete"] for u in selected),
             fuzzy_b=sum(u["measures"]["fuzzy_match_percent"] * int(u["measures"]["total_code"]) / 100 for u in selected))})
-    return {"version": 2, "categories": categories_out, "measures": measures(sum(sizes.values()),
-            sum(sizes[n] for n in done), len(funcs), len(done), units=len(units),
-            complete_units=sum(u["metadata"]["complete"] for u in units),
-            fuzzy_b=sum(sizes[n] * score(n) / 100 for n, _ in funcs)), "units": units}
+    counted_units = [u for u in units if not u["name"].endswith(ASM_SUFFIX)]
+    return {"version": 2, "categories": categories_out, "measures": measures(sum(sizes[n] for n, _ in counted),
+            sum(sizes[n] for n in done), len(counted), len(done), units=len(counted_units),
+            complete_units=sum(u["metadata"]["complete"] for u in counted_units),
+            fuzzy_b=sum(sizes[n] * score(n) / 100 for n, _ in counted)), "units": units}
 
 
 def main():
@@ -412,10 +424,13 @@ def main():
             parser.error("progress inventory differs from generated function boundaries")
     done = collect_done(funcs, Path(ROOT) / "src")
     pinned = collect_pinned(funcs, Path(ROOT) / "src") & done
-    total_b = sum(sizes.values())
+    asm = intentional_asm(funcs, done, load_asm_ranges())
+    counted = [(n, a) for n, a in funcs if n not in asm]
+    total_b = sum(sizes[n] for n, _ in counted)
     done_b = sum(sizes[n] for n in done)
-    print(f"functions: {len(done)}/{len(funcs)} ({100 * len(done) / len(funcs):.2f}%)")
+    print(f"functions: {len(done)}/{len(counted)} ({100 * len(done) / len(counted):.2f}%)")
     print(f"code bytes: {done_b}/{total_b} ({100 * done_b / total_b:.3f}%)")
+    print(f"intentional assembly (not counted above): {len(asm)} functions, {sum(sizes[n] for n in asm)} bytes")
     pinned_b = sum(sizes[n] for n in pinned)
     print(f"register-pinned: {100 * pinned_b / total_b:.3f}% of total code; no register pinning: {100 * (done_b - pinned_b) / total_b:.3f}%")
     fuzzy = {n: p for n, p in collect_fuzzy(funcs, Path(ROOT) / "src").items() if n not in done}
@@ -428,7 +443,8 @@ def main():
         report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
                              load_asm_ranges(), categories)
     if args.markdown:
-        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories)
+        write_markdown(args.markdown, counted, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories,
+                       asm_b=sum(sizes[n] for n in asm))
     if args.json:
         Path(args.json).write_text(json.dumps(report, indent=2) + "\n")
 
@@ -469,8 +485,12 @@ def subsystem_lines(report, categories):
     labels = {cid: label for cid, (label, _) in categories.items()}
     labels["libraries"] = "Libraries"
     by_label = {}
+    asm_units = []
     for unit in report["units"]:
         top, name = unit["name"].split("/", 1)
+        if name.endswith(ASM_SUFFIX):  # reported once, below, outside the totals
+            asm_units.append(unit)
+            continue
         by_label.setdefault(top, []).append((name, unit))
     seen = {cid for _, cids in SECTIONS for cid in cids}
     sections = SECTIONS + [("Other", [cid for cid in labels if cid not in seen])]
@@ -512,11 +532,19 @@ def subsystem_lines(report, categories):
                                                               if f["fuzzy_match_percent"] else "")
                             for f in left))
             body += ["", "</details>"]
+    if asm_units:
+        tb, _, tf, _ = stats(asm_units)
+        lines.append(f"| *Intentional assembly (not counted)* | {tf} functions | {tb:,} bytes | |")
+        body += ["", "### Intentional assembly", "",
+                 "Handwritten assembly that stays assembly (symbols/progress_asm.csv); "
+                 "left out of every total above.", ""]
+        body += [f"- {u['name']}: {u['measures']['total_functions']} functions, "
+                 f"{int(u['measures']['total_code']):,} bytes" for u in asm_units]
     return lines + body
 
 
 def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,
-                   categories=None):
+                   categories=None, asm_b=0):
     fuzzy = fuzzy or {}
     draft_b = sum(sizes[n] for n in fuzzy)
     mean = sum(sizes[n] * p for n, p in fuzzy.items()) / draft_b if draft_b else 0
@@ -532,6 +560,7 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              f"Register-pinned: **{100 * pinned_b / total_b:.3f}%** of total code (included above).", "",
              f"Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **{len(fuzzy)} functions**, "
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
+             f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:

@@ -11,7 +11,7 @@ Confidence: **high** = verified by rebuild, emulator, or rendering;
 |---|---|---|---|---|
 | `08000000–080000BF` | 192 B | GBA header (`BOKTAI3`, `U33J`, maker `A4`) | high | spec |
 | `080000C0–0800034F` | | crt0 (ARM): stacks, `IntrMain` install, `AgbMain` call; `IntrMain` at `080001F0` is copied to IWRAM `03003A60` | high | disasm |
-| `08000350–0800145B` | 4.3 KB | ARM code linked at **IWRAM `03000000`** (copy/blit/OAM helpers; bulk `ldm`/`stm` loops) | high | IWRAM dump matches ROM |
+| `08000350–0800145B` | 4.3 KB | ARM **C** (agbcc, APCS frames) linked at **IWRAM `03000000`**: six functions, the first `Palette_CacheObjectBankArm` (`src/iwram_code.c`) | high | IWRAM dump matches ROM; matched C |
 | `0800145C–0824DAF9` | 2.3 MB | **Thumb code** (agbcc), 7,868 functions; includes Nintendo `libagbsyscall` at `08248590` | high | bit-identical reassembly |
 | `0822F248–0822F647` | 1 KB | MP2K `SoundMainRAM` (mixer), linked at **IWRAM `030035F0`** | high | IWRAM dump; 0x630 stereo-buffer offset |
 | `0824DAFC–08250673` | 11 KB | misc constant tables after code | medium | |
