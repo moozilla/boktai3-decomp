@@ -33,7 +33,6 @@ static inline void Slime_SetFlags2D6(struct SceneActorRegistryResetView *actor, 
     mask |= *flags;
     *flags = mask;
 }
-#define Slime_TryEnrage sub_0808FCB0
 u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor)
 {
     struct SlimeContext *q = actor->context;

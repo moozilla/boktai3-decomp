@@ -50,7 +50,6 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
     }
     *restart = 0;
 }
-#define Slime_PlayWaitAnimation sub_0808E9A0
 void Slime_PlayWaitAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor))

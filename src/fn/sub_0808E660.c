@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#define Slime_RollMoveFlag sub_0808E660
 void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {

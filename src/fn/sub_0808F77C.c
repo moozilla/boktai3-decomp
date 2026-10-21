@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 void sub_0808E780(void);
-#define Slime_RunUpdateThenWait sub_0808F77C
 void Slime_RunUpdateThenWait(struct SceneActorRegistryResetView *actor)
 {
     u8 result;

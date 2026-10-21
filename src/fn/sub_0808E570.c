@@ -1,5 +1,5 @@
 #include "scene_actor_chase.h"
-void sub_0808E660(void);
+void Slime_RollMoveFlag(void);
 void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -13,7 +13,7 @@ void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
         r = *(u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
         r &= 31;
         if (r <= 23)
-            Chase_SetCtl(actor, sub_0808E660, 0);
+            Chase_SetCtl(actor, Slime_RollMoveFlag, 0);
         else
             Chase_SetCtl(actor, Slime_StartWalkChoice, 0x29);
     }
