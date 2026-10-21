@@ -964,7 +964,7 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
 
 #define Nidhoggr_UpdatePartMotion sub_0819321C
 #ifdef NONMATCHING
-// fuzzy: 91.9%
+// fuzzy: 95.7%
 extern void (*const gUnk_0824F364[])(void);
 extern const struct SceneVec gUnk_0824F2E4[];
 extern const struct SceneVec gUnk_0824F324[];
@@ -1031,7 +1031,8 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
     p20->x = pe->x + gUnk_0824F33C->x;
     p20->y = pe->y + gUnk_0824F33C->y;
     p20->z = pe->z + gUnk_0824F33C->z;
-    for (pf = &t->pos, i = 22; i <= 23; i++) {
+    i = 22;
+    for (pf = &t->pos; i <= 23; i++) {
         t->rows[i].pos.x = pf->x + gUnk_0824F344->x;
         t->rows[i].pos.y = pf->y + gUnk_0824F344->y;
         t->rows[i].pos.z = pf->z + gUnk_0824F344->z;
