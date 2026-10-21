@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.8%
+// fuzzy: 84.4%
 // Remaining differences: register allocation, stack lifetimes and instruction ordering.
 struct Pair {
     u32 a, b;
@@ -33,13 +33,16 @@ void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void SceneEffect_UpdateRecoil(struct Actor *a)
 {
     s32 state = a->entered;
+    u16 k;
+    u8 *t;
     switch (state) {
         case 0:
             Anim_SetKeyframes(a->anim, a->resource, 4, 2, 0);
             a->entered++;
             break;
         case 1:
-            if (a->timer <= 7)
+            t = &a->timer;
+            if (*t <= 7)
                 goto increment;
             else {
                 a->entered = 2;
@@ -79,11 +82,13 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
             }
             break;
         default:
-            if (a->timer <= 3) {
+            t = &a->timer;
+            if (*t <= 3) {
             increment:
-                a->timer++;
+                (*t)++;
             } else {
-                a->state = 8;
+                k = 8;
+                a->state = k;
                 a->entered = 0;
                 a->timer = 0;
             }

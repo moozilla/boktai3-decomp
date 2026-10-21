@@ -445,6 +445,7 @@ addr,name,mode,confidence,source,notes
 08013EF4,ShadowRegistry_SetEntryPosition,thumb,low,src-alias,finds an entry by id and overwrites its position struct
 08013F24,ShadowRegistry_SetPositionFromScript,thumb,low,src-alias,reads id and x/y/z keywords from script and calls ShadowRegistry_SetEntryPosition
 08013F98,ParticleGroup_Update,thumb,low,src-alias,
+08014330,ParticleGroup_UpdateFrozen,thumb,low,src-alias,
 08014498,ParticleManager_Update,thumb,low,src-alias,
 0801450C,ParticleManager_Kill,thumb,low,src-alias,Task kill callback for the particle manager: removes active effects from each of the 6 particle groups' 8 slots and clears the gUnk_02000060 singleton
 08014568,ParticleManager_Initialize,thumb,low,src-alias,
@@ -707,6 +708,7 @@ addr,name,mode,confidence,source,notes
 0801EA70,SceneObjects_ScriptPromote,thumb,low,src-alias,
 0801EB08,SceneObjects_ScriptReadPosition,thumb,low,src-alias,
 0801EC00,SceneObjects_HasTypeTwoResource,thumb,low,src-alias,
+0801EC4C,SceneObject_InitPlacement,thumb,low,src-alias,
 0801EF28,SceneObjects_AddPrimaryId,thumb,low,src-alias,
 0801EF58,SceneObject_UpdateInactiveIdle,thumb,low,src-alias,Empty per-object animate callback installed by SceneObjects_SetInactive/AnimateInactive once the inactive blink sequence finishes; terminal no-op stat
 0801EF5C,SceneObject_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SceneObjects_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
@@ -718,9 +720,11 @@ addr,name,mode,confidence,source,notes
 0801F4C4,SceneObject_UpdateLowering,thumb,low,src-alias,
 0801F580,SceneObject_UpdateRaised,thumb,low,src-alias,
 0801F5B8,SceneObject_UpdateLowered,thumb,low,src-alias,
+0801F5EC,SceneObject_InitSlotPlacement,thumb,low,src-alias,
 0801F934,SceneObject_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SceneObjects_Append for several object kinds; distinct from EF58/EF5C's idl
 0801F938,SceneObject_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
 080203D4,SceneObjects_Destroy,thumb,low,src-alias,
+0802048C,SceneObjects_Init,thumb,low,src-alias,
 08020964,SceneMessages_FindReceiver,thumb,low,src-alias,Finds the registered receiver matching both message ID and category.
 08020990,SceneMessages_LinkReceiver,thumb,low,src-alias,Prepends a receiver to the controller's doubly linked receiver list.
 080209AC,SceneMessages_UnlinkReceiver,thumb,low,src-alias,Removes a receiver from the controller's doubly linked receiver list.
@@ -6529,6 +6533,7 @@ addr,name,mode,confidence,source,notes
 08198B70,SceneEffect_InitActor,thumb,low,src-alias,
 08198D58,SceneEffect_AllocateActor,thumb,low,src-alias,
 08198DC0,SceneEffect_LoadRingAnimation,thumb,low,src-alias,Loads the animation resource used by the small colored ring sprite
+08198DD8,SceneEffectRing_Update,thumb,low,src-alias,
 08198F24,SceneEffect_DestroyRing,thumb,low,src-alias,Destruction callback removing the ring effect collider and sprite
 08198F3C,SceneEffect_InitializeRing,thumb,low,src-alias,
 08199034,SceneEntryPool_CreateEntry,thumb,low,src-alias,

@@ -33,7 +33,7 @@ void Sprite_Init(void *, void *, u32);
 void Anim_RestartSequence(void *, u32, u32, u32, u32);
 void Collider_Init(void *, u16, u32, u32, u32, const void *, const void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void sub_08198DD8(void *);
+void SceneEffectRing_Update(void *);
 void SceneEffect_DestroyRing(void *);
 extern const struct RingVector gUnk_0824F6B8, gUnk_0824F6C0;
 
@@ -70,7 +70,7 @@ void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing 
     collider->offset = gUnk_0824F6C0;
     flags = Ring_SetMode(ring, mode);
     ring->flags = flags;
-    update = sub_08198DD8;
+    update = SceneEffectRing_Update;
     destroy = SceneEffect_DestroyRing;
     ring->update = update;
     ring->destroy = destroy;
