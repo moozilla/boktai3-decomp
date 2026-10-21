@@ -2,8 +2,8 @@
 #include "rotation_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.1%
-// foundry draft (worker best 84.4%); what differs is mostly register allocation and instruction order
+// fuzzy: 91.4%
+// Remaining differences: the 0x2AC counter offset is kept live in a high register across the Mod call.
 s32 Mod(s32, s32);
 struct DampedMotionState {
     u8 unknown0[0xF14];
@@ -31,6 +31,7 @@ void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *act
         offset = 0x2AA;
         *((u8 *)actor + offset) = 0;
         offset = 0x2AC;
+        asm("" : "+r"(offset));
         *(u32 *)((u8 *)actor + offset) = 0;
         offset = 0x2B1;
         *((u8 *)actor + offset) = 1;
