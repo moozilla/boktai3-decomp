@@ -1,7 +1,6 @@
 #include "global.h"
 #include "rotation_phase.h"
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActorControl_RecoverRotation(void);
 static inline s32 FoldAngle(s32 a)
 {
@@ -20,6 +19,7 @@ static inline s32 Magnitude(s32 a)
 }
 void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
+    s32 angle_2;
     u8 *state = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;
     s32 angle, magnitude;
@@ -31,17 +31,19 @@ void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s
     }
     angle = FoldAngle(drawable->angle);
     magnitude = angle;
-    asm("" : "+r"(magnitude));
-    if (magnitude < 0)
+    if (magnitude < 0) {
         magnitude = -magnitude;
+    }
     if (magnitude > 48) {
-        if (elapsed > 42)
+        if (elapsed > 42) {
             RotationPhase_Change(actor, SceneActorControl_RecoverRotation, 50);
+        }
     } else {
-        angle = FoldAngle(32 - state[0xED3]);
-        if (angle < 0)
+        angle_2 = FoldAngle(32 - state[0xED3]);
+        if (angle_2 < 0) {
             drawable->angle -= 2;
-        else
+        } else {
             drawable->angle += 2;
+        }
     }
 }

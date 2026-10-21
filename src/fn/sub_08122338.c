@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
 #define gEffectRandomIndex gUnk_03005308
@@ -24,6 +23,7 @@ s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *, struct EffectSourc
 s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
                                    struct EffectSourceObject *target, u32 a, u32 b, u32 c, u32 d)
 {
+    s32 k2 = 1023;
     struct EffectMotion motion;
     s32 duration;
     const u16 *tbl;
@@ -31,8 +31,7 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
     motion.x = target->position.x - source->position.x;
     motion.z = target->position.z - source->position.z;
     tbl = gUnk_0203B400;
-    asm("" : "+r"(tbl));
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = (gUnk_03005308 + 1) & k2;
     {
         u32 v = tbl[gUnk_03005308];
         u32 m = 63;
@@ -46,13 +45,17 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
         u32 m = 7;
         motion.y = q + (v & m);
     }
-    if (motion.x > 48)
+    if (motion.x > 48) {
         motion.x = 48;
-    if (motion.x < -48)
+    }
+    if (motion.x < (-48)) {
         motion.x = -48;
-    if (motion.z > 48)
+    }
+    if (motion.z > 48) {
         motion.z = 48;
-    if (motion.z < -48)
+    }
+    if (motion.z < (-48)) {
         motion.z = -48;
+    }
     return SpriteEffect_SpawnWithMotion(source, target, &motion, a, b, c, d);
 }

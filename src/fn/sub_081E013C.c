@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u32 gUnk_02000358[];
 extern u8 gUnk_03004FC0[];
@@ -14,6 +13,7 @@ void sub_081DF1D8(u8 *);
 void Password_BuildLabels(u8 *);
 u32 Password_InitializeEntryMenu(u8 *s)
 {
+    u8 *obj_2;
     u32 *flags = (u32 *)(s + 0x34C);
     u32 zero;
     u32 size;
@@ -22,7 +22,7 @@ u32 Password_InitializeEntryMenu(u8 *s)
     void *p, *a;
     void *q;
     u8 *obj;
-    register u8 *first asm("r5");
+    u8 *first;
     u32 bank;
     s32 offA;
     s32 offB;
@@ -51,8 +51,9 @@ u32 Password_InitializeEntryMenu(u8 *s)
     *oneptr = one;
     *(u16 *)(s + 0x364) = zero;
     AnimPanel_LoadSelections(s);
-    if (gUnk_02000358[6])
+    if (gUnk_02000358[6]) {
         *flags = 0x41;
+    }
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
     Bg_ClearTilemap(2);
@@ -71,9 +72,9 @@ u32 Password_InitializeEntryMenu(u8 *s)
     first = s + 0x78;
     ResourceHeader_Relocate(first, p);
     Widget_InitLinked(s + 0x18, first, 0x39, 0x10, zero, zero, zero, zero);
-    obj = s + size;
-    ResourceHeader_Relocate(obj, p);
-    Widget_InitLinked(s + 0xA0, obj, 0x16, 0x10, zero, zero, zero, zero);
+    obj_2 = s + size;
+    ResourceHeader_Relocate(obj_2, p);
+    Widget_InitLinked(s + 0xA0, obj_2, 0x16, 0x10, zero, zero, zero, zero);
     obj = s + 0x188;
     ResourceHeader_Relocate(obj, p);
     Widget_InitLinked(s + 0x128, obj, 0x18, 0x10, zero, zero, zero, zero);

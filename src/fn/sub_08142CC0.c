@@ -20,12 +20,13 @@ static inline void SetByte(u8 *a, u32 value)
 {
     *a = value;
 }
-// MATCHING_CONCESSION: register-pinning
 void Player_UpdateFlaggedResourceRecovery(u8 *p)
 {
-    if (Player_ConsumeStateEntry(p))
-        B(0xac9) = 0;
-    switch (B(0x458)) {
+    s16 k2;
+    if (Player_ConsumeStateEntry(p)) {
+        *((u8 *)(p + 0xac9)) = 0;
+    }
+    switch (*((u8 *)(p + 0x458))) {
         case 0:
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
             Player_SetActionPhase(p, 1);
@@ -45,12 +46,15 @@ void Player_UpdateFlaggedResourceRecovery(u8 *p)
                 Player_SetActionOrigin(p);
                 ++H(0x45a);
             }
-            H(0x6fc) = 15;
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 8), 64, 1))
+            *((u16 *)(p + 0x6fc)) = 15;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 8), 64,
+                                     1)) {
                 break;
+            }
             Sound_PlaySong(0xcb);
-            if (!(*(*(u16 **)(p + 0x348)) & 1))
+            if (!((*(*((u16 **)(p + 0x348)))) & 1)) {
                 goto finish;
+            }
             if (Player_CanRecoverResourceWhileFlagged(p)) {
                 Sound_PlaySong(0xd8);
                 B(0x4fd) = 1;
@@ -61,20 +65,22 @@ void Player_UpdateFlaggedResourceRecovery(u8 *p)
             H(0x4f8) = 0;
             goto pause;
         case 2: {
-            register u32 zero asm("r5");
+            u32 zero;
             OrFlags((u32 *)(p + 0x20), 0xa0);
-            if (H(0x4f8) <= 4) {
-                if (++H(0x4f8) == 5) {
-                    if (B(0x418) == 1)
+            if ((*((u16 *)(p + 0x4f8))) <= 4) {
+                if ((++(*((u16 *)(p + 0x4f8)))) == 5) {
+                    if ((*((u8 *)(p + 0x418))) == 1) {
                         Sound_PlaySong(0x308);
-                    else
+                    } else {
                         Sound_PlaySong(0x128);
+                    }
                 }
             }
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 9), 64, 1);
             {
                 u16 *duration = (u16 *)(p + 0x6fc);
-                zero = 0;
+                k2 = 0;
+                zero = k2;
                 *duration = 30;
             }
             Player_SetActionOrigin(p);
@@ -84,8 +90,9 @@ void Player_UpdateFlaggedResourceRecovery(u8 *p)
                 B(0x4fd) = zero;
                 goto finish;
             }
-            if (Player_CanRecoverResourceWhileFlagged(p))
+            if (Player_CanRecoverResourceWhileFlagged(p)) {
                 break;
+            }
             Sound_StopSong(0xd8);
             B(0x4fd) = zero;
         }
@@ -101,8 +108,9 @@ void Player_UpdateFlaggedResourceRecovery(u8 *p)
                 Player_SetActionPhase(p, 4);
                 break;
             }
-            if (!Player_CanRecoverResourceWhileFlagged(p))
+            if (!Player_CanRecoverResourceWhileFlagged(p)) {
                 break;
+            }
             Sound_PlaySong(0xd8);
             B(0x4fd) = 1;
             H(0x4f8) = 0;

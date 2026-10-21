@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
 };
@@ -50,16 +49,22 @@ void Sprite_RenderScaledList(void)
     struct Sprite *p;
     u32 parity = gUnk_03003A50 & 1;
     u32 skip = 0x401;
-    if (parity)
+    if (parity) {
         skip = 0x201;
-    p = gUnk_030042C0[gUnk_03004290];
-    if (!p)
-        return;
+    }
     do {
-        s32 x, y;
-        register struct SpriteResource *resource asm("r6");
-        if (p->flags & skip)
+        p = gUnk_030042C0[gUnk_03004290];
+        if (!p) {
+            return;
+        }
+    } while (0);
+    do {
+        s32 x;
+        s32 y;
+        struct SpriteResource *resource;
+        if (p->flags & skip) {
             goto next;
+        }
         resource = p->resource;
         if (!(p->flags & 16)) {
             screen(&pos, &p->pos);
@@ -79,28 +84,34 @@ void Sprite_RenderScaledList(void)
                 s32 oy = (resource->offsetY * p->scaleY) >> 6;
                 width = (resource->width * p->scaleX) >> 6;
                 height = (resource->height * p->scaleY) >> 6;
-                if (p->flags & 4)
+                if (p->flags & 4) {
                     left = x + ox - width;
-                else
+                } else {
                     left = x - ox;
-                if (p->flags & 8)
+                }
+                if (p->flags & 8) {
                     top = y + oy - height;
-                else
+                } else {
                     top = y - oy;
+                }
             } else {
                 width = resource->width;
                 height = resource->height;
-                if (p->flags & 4)
+                if (p->flags & 4) {
                     left = x + resource->offsetX - width;
-                else
+                } else {
                     left = x - resource->offsetX;
-                if (p->flags & 8)
+                }
+                if (p->flags & 8) {
                     top = y + resource->offsetY - height;
-                else
+                } else {
                     top = y - resource->offsetY;
+                }
             }
-            if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
+            if ((((left > 240) || (top > 160)) || ((left + ((s32)width)) < 0)) ||
+                ((top + ((s32)height)) < 0)) {
                 goto next;
+            }
         }
         sub_08214600(p, x, y, z);
     next:

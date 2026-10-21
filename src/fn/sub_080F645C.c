@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 extern u8 *gUnk_02000710;
@@ -51,44 +50,54 @@ void Sword_UpdateDamage(u8 *p)
             H(p, 0x7e) = zero;
         }
         ChildGroup_ShowDamageNumber(p, (u16)H(p, 0xd7a), 0);
-        H(p, 0xd7a) = zero;
-        H(p, 0xd78) = zero;
-        if (H(p, 0x7e) <= 0) {
+        *((s16 *)(p + 0xd7a)) = zero;
+        *((s16 *)(p + 0xd78)) = zero;
+        if ((*((s16 *)(p + 0x7e))) <= 0) {
+            do {
             setState((void *)p, 1, 6);
             *(void (**)(void))(p + 0xcc8) = sub_080F421C;
             H(gUnk_02000710, 0x87C) =
                 H(gUnk_02000710, 0x87C) < 9999 ? H(gUnk_02000710, 0x87C) + 1 : 9999;
             {
-                register u8 *g asm("r0") = gUnk_02000710;
+                u8 *g = gUnk_02000710;
                 u32 off = 0x538;
-                register s16 *q asm("r3");
-                register u32 v asm("r4");
+                s16 *q;
+                u32 v;
                 q = (s16 *)(g + off);
                 v = *(u16 *)q;
                 *q = *q < 9999 ? v + 1 : 9999;
-                asm("" ::"r"(v));
-            }
-            {
-                u32 read = W(p, 0xCA8);
-                flags = read;
-            }
-            H(gUnk_02000710, 0x548) =
-                H(gUnk_02000710, 0x548) < 9999 ? H(gUnk_02000710, 0x548) + 1 : 9999;
-            if (flags & 0x80) {
-                INC(0x58A);
-            } else if (flags & 0x100) {
-                INC(0x58C);
-            } else if (flags & 0x200) {
-                INC(0x58E);
-            } else if (flags & 0x400) {
-                INC(0x590);
-            } else {
-                register u32 last asm("r2") = flags;
-                last &= 0x800;
-                if (last) {
-                    INC(0x592);
                 }
+                {
+                    u32 read = *((u32 *)(p + 0xCA8));
+                    flags = read;
             }
+                do {
+                    *((s16 *)(gUnk_02000710 + 0x548)) =
+                        ((*((s16 *)(gUnk_02000710 + 0x548))) < 9999)
+                            ? ((*((s16 *)(gUnk_02000710 + 0x548))) + 1)
+                            : (9999);
+                    if (flags & 0x80) {
+                        *((s16 *)(gUnk_02000710 + 0x58A)) =
+                            clamp((*((s16 *)(gUnk_02000710 + 0x58A))) + 1);
+                    } else if (flags & 0x100) {
+                        *((s16 *)(gUnk_02000710 + 0x58C)) =
+                            clamp((*((s16 *)(gUnk_02000710 + 0x58C))) + 1);
+                    } else if (flags & 0x200) {
+                        *((s16 *)(gUnk_02000710 + 0x58E)) =
+                            clamp((*((s16 *)(gUnk_02000710 + 0x58E))) + 1);
+                    } else if (flags & 0x400) {
+                        *((s16 *)(gUnk_02000710 + 0x590)) =
+                            clamp((*((s16 *)(gUnk_02000710 + 0x590))) + 1);
+                    } else {
+                        u32 last = flags;
+                        last &= 0x800;
+                        if (last) {
+                            *((s16 *)(gUnk_02000710 + 0x592)) =
+                                clamp((*((s16 *)(gUnk_02000710 + 0x592))) + 1);
+                        }
+                    }
+                } while (0);
+            } while (0);
         }
     }
 }
