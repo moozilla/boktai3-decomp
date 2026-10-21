@@ -47,8 +47,7 @@ static inline u32 TestFlags(struct VampireTick *p, u32 mask)
     return p->flags & mask;
 }
 
-#define Vampire_UpdateFrame sub_080287DC
-void sub_080287DC(struct VampireTick *p)
+void Vampire_UpdateFrame(struct VampireTick *p)
 {
     struct VampireTick *actor = p;
     struct VampireTick *owner = p;

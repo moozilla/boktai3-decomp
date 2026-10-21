@@ -1,5 +1,4 @@
 #include "global.h"
-#define TentacleActor_SpawnSparkBurst sub_080AB294
 // confidence=low: spawns six spark particles around the actor and plays a sound.
 extern u8 gUnk_0203B400[];
 extern s32 gUnk_03005308;

@@ -46,8 +46,7 @@ static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *),
     p->pending = zero;
 }
 
-#define Vampire_ApplyPendingDamage sub_080284FC
-int sub_080284FC(struct VampireDamage *p)
+int Vampire_ApplyPendingDamage(struct VampireDamage *p)
 {
     register struct VampireDamage *base asm("r6") = p;
     u8 *sprite = (u8 *)p + 0x48;
@@ -166,5 +165,5 @@ int sub_080284FC(struct VampireDamage *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080284FC);
+INCLUDE_ASM("asm/nonmatching", Vampire_ApplyPendingDamage);
 #endif
