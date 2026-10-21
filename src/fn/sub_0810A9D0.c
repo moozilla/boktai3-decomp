@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.2%
-// foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 #define gLinkSelectionDisplaySlots gUnk_03005274
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
@@ -31,7 +29,9 @@ static inline u8 IsItemSlot(u32 value, u32 mask)
 s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
 {
     u8 *extra = (u8 *)p + 0xe0;
-    s32 i, count, length;
+    s32 i;
+    register s32 count asm("r6");
+    s32 length;
     u32 mask;
     if (Registry1745_ConsumeStateEntry(p)) {
         Registry1745_SetMenuRequest(0);
@@ -42,7 +42,7 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
         return -1;
     }
     count = 0;
-    i = count;
+    i = 0;
     length = p->participantCount;
     if (i < length) {
         mask = 0x3c00;
@@ -73,6 +73,3 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
         p->requestedMode = 0x1023;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkSelection_WaitForEmptySlots);
-#endif

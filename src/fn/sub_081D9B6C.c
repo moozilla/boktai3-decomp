@@ -130,15 +130,17 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     return ended;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.2%
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_UpdateAnimationTail(void *);
 
 s32 Projectile_UpdateAnimation(u8 *p)
 {
     u8 *config = p + 0x18;
-    StepPlayback((void *)(p + 0x8c), (void *)(p + 0x180));
+    void *first = (void *)(p + 0x8c);
+    register u32 off asm("r1") = 0x180;
+    asm("" : "+r"(first));
+    asm("" : "+r"(off));
+    StepPlayback(first, (void *)(p + off));
     if (*(u32 *)p > 4 || (*(u32 *)p > 2 && (*(u16 *)(p + 0x18) & 0x10))) {
         if (*(u16 *)config & 0x10) {
             u16 *counter = (u16 *)(*(u8 **)(config + 0x54) + 0x50);
@@ -150,6 +152,3 @@ s32 Projectile_UpdateAnimation(u8 *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Projectile_UpdateAnimation);
-#endif
