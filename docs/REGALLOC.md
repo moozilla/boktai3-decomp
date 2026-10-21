@@ -162,3 +162,26 @@ agbcc source initializes `asm_insn_count` to one, then adds entries for newline
 or separator characters. Even an empty template therefore contributes one
 estimated instruction when branch shortening computes its length. Check the
 actual emitted branch distance before attributing the extra branch to C flow.
+
+## Replacing pins with plain C (depin worker, 2026-10-21)
+
+A Sonnet worker took the 60 smallest pinned functions (`progress.py
+--list-pinned`) and made 28 of them clean C with no pins or asm, plus 5 with
+fewer hints. Per-function edits and the blockers on the rest are in
+`notes/depin-manual_2026-10-21.md`. The edits that replaced pins most often:
+
+1. Many pins only made up for an earlier mistake: a parameter copy
+   (`T *x = input`), or a missing `return 0;` or early return. Use the
+   parameters directly and add the early returns first; the pin often goes away.
+2. `do { stmt; } while (0);` around a use raises its loop-depth weight and so
+   its register priority. It replaces a pin that forces a register order, and
+   it can be nested (three levels in ScriptUtility_SetFlag800).
+3. `(*(&x))++` or `(*(&x)) <<= n` instead of `asm("" : "+r"(x))`: the value
+   becomes opaque without asm, which blocks biv reversal, early increments
+   and CSE reuse.
+4. Small type and order changes: a `u8` constant temp, one int temp reused
+   for two constants, swapped `+` operands so the right load comes first,
+   storing `a + b` straight into the destination. Falling off the end of a
+   non-void function leaves the incoming r0, which removes a pinned result.
+5. For an unpinned copy under about 20 bytes off, `tools/permute.py FILE
+   RealName --run N -j 2` found 5 of the 28 (use the real name, not sub_X).

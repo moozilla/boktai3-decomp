@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
 static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
 {
@@ -6,16 +5,10 @@ static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorContacts_SetDistanceGate(struct SceneActorRegistryActor *inputActor,
-                                        struct SceneActorContactGateView *inputGate,
-                                        u32 inputMetric, u32 threshold, u32 inputMode,
-                                        u32 inputFlags)
+void SceneActorContacts_SetDistanceGate(struct SceneActorRegistryActor *actor,
+                                        struct SceneActorContactGateView *gate, u32 metric,
+                                        u32 threshold, u32 mode, u32 flags)
 {
-    struct SceneActorRegistryActor *actor = inputActor;
-    register struct SceneActorContactGateView *gate asm("r4") = inputGate;
-    u32 metric = inputMetric;
-    register u32 mode asm("r6") = inputMode;
-    u32 flags = inputFlags;
     flags &= 6;
     if (flags) {
         u32 result;
@@ -31,7 +24,9 @@ void SceneActorContacts_SetDistanceGate(struct SceneActorRegistryActor *inputAct
     yes:
         result = 1;
     write:
-        gate->enabled = result;
+        do {
+            gate->enabled = result;
+        } while (0);
     } else {
         gate->enabled = flags;
     }

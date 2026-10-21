@@ -1,13 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                          u32 index)
 {
     u8 flip[2];
-    register struct ContactSwarm *base asm("r6") = pool;
-    register struct ContactSwarmSlot *actor asm("r5") = slot;
-    u32 direction = ((actor->direction + 96) >> 6) & 3;
-    register u8 *first asm("r1") = &flip[0];
+    u32 direction = ((slot->direction + 96) >> 6) & 3;
+    u8 *first = &flip[0];
     u8 *second = &flip[1];
     u8 *saved;
     u32 check;
@@ -21,6 +18,6 @@ void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *pool, struct Conta
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&actor->display.animation.sequence, base->sequenceResource, (u16)index,
-                     flip[0], *saved);
+    Anim_SetSequence(&slot->display.animation.sequence, pool->sequenceResource, (u16)index, flip[0],
+                     *saved);
 }

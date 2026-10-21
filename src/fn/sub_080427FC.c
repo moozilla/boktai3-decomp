@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
 struct ContactModeActor {
@@ -18,7 +17,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
 {
     struct ContactCollider *source = sourceInput;
     struct ContactCollider *other = otherInput;
-    register struct ContactActor *owner asm("r4") = ownerInput;
+    struct ContactActor *owner = ownerInput;
     struct ContactPackedVector size;
     u32 directionMask;
     struct ContactPosition *position;
@@ -26,11 +25,14 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     u32 direction;
     struct ContactModeActor *actor;
     directionMask = 0x100;
-    if (source->flags & directionMask)
+    if (source->flags & directionMask) {
         direction = source->direction;
-    else
+    } else {
         direction = Math_Atan2(other->x - source->x, other->z - source->z);
+    }
+    do {
     owner->direction = direction;
+    } while (0);
     mode = 0;
     if (owner->targetIndex >= 0) {
         owner->retargetTimer = 250;
@@ -41,8 +43,9 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     actor = SceneActors_GetBySlot(0);
     if (actor) {
         u32 playerMode = gUnk_02000580[0]->actionMode;
-        if (actor->mode == 1 && playerMode != 2)
+        if ((actor->mode == 1) && (playerMode != 2)) {
             other->cost = mode;
+        }
     }
     size.x = 16;
     size.y = 0;
