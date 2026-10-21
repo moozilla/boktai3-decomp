@@ -17,7 +17,7 @@ struct RisingActor {
     u8 padF6[0x2ae];
     s32 height;
 };
-void sub_081FD7EC(void);
+void OrbitEffect_FireVolley(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 s32 RisingActor_AdvanceHeight(struct RisingActor *actor)
 {
@@ -29,7 +29,7 @@ s32 RisingActor_AdvanceHeight(struct RisingActor *actor)
         struct RisingDrawable *drawable = &actor->drawable;
         s32 mask = ~4;
         drawable->flags &= mask;
-        SunOrb_SetUpdateCallback(actor->controller, sub_081FD7EC);
+        SunOrb_SetUpdateCallback(actor->controller, OrbitEffect_FireVolley);
     }
     return zero;
 }

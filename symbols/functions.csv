@@ -1450,11 +1450,14 @@ addr,name,mode,confidence,source,notes
 0803C880,ScenePool_UpdateOccupiedActorSlots,thumb,low,src-alias,Updates occupied actor slots or releases those outside player bounds while counting processed slots
 0803C90C,ScenePool_GetRegistryBucketIndex,thumb,low,src-alias,Registry hash callback that selects one of sixteen buckets from key bits 16 through 19
 0803C914,ScenePool_RegisterEntry,thumb,low,src-alias,Initializes the entry's registry node with its resolved resource key and inserts it into the manager registry
+0803C940,WirelessObj_ApplyKnockback,thumb,low,src-alias,
 0803CC78,ScenePool_OnProximityContact,thumb,low,src-alias,Proximity collider callback that copies the contact halfword into the owning actor's contact timer
+0803CC90,WirelessObj_InitCollisionVolumes,thumb,low,src-alias,
 0803CDF0,ScenePool_ParseEntryParameters,thumb,low,src-alias,
 0803D1AC,ScenePool_DestroyActorSlot,thumb,low,src-alias,Releases an inline actor slot's resources and resets its handle during manager destruction
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
 0803D210,ScenePool_IsEntryInSpawnBand,thumb,low,src-alias,Tests whether the entry origin lies 100–200 units outside the selected side's actor bounds
+0803D288,ScenePool_SpawnEntriesNearPlayers,thumb,low,src-alias,
 0803D4D0,ScenePool_DestroyManager,thumb,low,src-alias,Task destruction callback that releases four actor slots and the registry and frees the entry pool
 0803D514,ScenePool_InitializeManager,thumb,low,src-alias,Allocates the configurable entry pool and initializes four actor slots and the registry
 0803D5A8,ScenePool_CreateManager,thumb,low,src-alias,Creates the manager task and installs its update and destruction callbacks
@@ -3416,6 +3419,7 @@ addr,name,mode,confidence,source,notes
 080BA7E4,Skeleton_TickDecayingLunge,thumb,low,src-alias,
 080BA9A0,Skeleton_UpdateAlternateAttackRecovery,thumb,low,src-alias,Plays animation 22 then returns to the timed idle callback; alternate recovery tentative
 080BAA28,SceneActorReaction_TickMultiHitAnimation,thumb,low,src-alias,
+080BAB80,Skeleton_UpdateHomingBurst,thumb,low,src-alias,
 080BAD7C,Skeleton_UpdateHeavyAttackRecovery,thumb,low,src-alias,Plays animation 21 then returns to the timed idle callback; heavy attack interpretation tentative
 080BB4DC,Skeleton_UpdateDownedState,thumb,low,src-alias,Plays animation eight and emits periodic feedback before entering recovery when the timer expires; downed interpretation tentative
 080BB5AC,Skeleton_UpdateRevivalState,thumb,low,src-alias,Plays animation seven and changes flags at frame 40 before completing after frame 120; revival interpretation tentative
@@ -4124,6 +4128,7 @@ addr,name,mode,confidence,source,notes
 0810B63C,SceneMenu_WaitForConfirmation,thumb,low,src-alias,
 0810B6DC,Registry1745_WaitForCompletionFlag,thumb,low,src-alias,Advances to the final state when the flag at offset 0x2B is set
 0810B704,Registry1745_EnterCompletedState,thumb,low,src-alias,Sets HUD mode 7 and marks completion on entry to the final state
+0810B724,Registry1745_RunSession,thumb,low,src-alias,
 0810B8A8,SessionMenu_Destroy,thumb,low,src-alias,
 0810B914,Registry1745_Create,thumb,low,src-alias,
 0810BB0C,SessionMenu_InvokeCallback,thumb,low,src-alias,
@@ -4204,6 +4209,7 @@ addr,name,mode,confidence,source,notes
 0810EEA4,LinkLobbyPanel_InitGlyphFrames,thumb,low,src-alias,Assigns nine initial glyph frame IDs for the panel
 0810EEFC,RecordMenu_InitializeSprites,thumb,low,src-alias,
 0810F00C,RecordMenu_PositionSprites,thumb,low,src-alias,
+0810F0A0,RecordMenu_LoadPlayerSprites,thumb,low,src-alias,
 0810F1FC,LinkLobbyPanel_HideSprites,thumb,low,src-alias,Sets the hide flag on nine panel sprites and both five-sprite groups
 0810F238,LinkLobbyPanel_RemoveSprites,thumb,low,src-alias,Removes the panel's nine primary animation objects
 0810F2DC,SceneTask_UpdateTextDelay,thumb,low,src-alias,
@@ -4755,6 +4761,7 @@ addr,name,mode,confidence,source,notes
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
+0812A2BC,SunDiscPool_SpawnDisc,thumb,low,src-alias,
 0812A418,EffectPool_UpdateSlots,thumb,low,src-alias,
 0812A480,SunDiscPool_DestroyTask,thumb,low,src-alias,Task destruction callback removes active sprites across twelve slots and clears the singleton
 0812A4C0,SunDiscPool_Init,thumb,low,src-alias,Loads the orange disc animation and script procedure then clears allocation and control state
@@ -6985,6 +6992,7 @@ addr,name,mode,confidence,source,notes
 081B6AB8,ActorEffect_UpdateRadialTrail,thumb,low,src-alias,
 081B6BC4,HomingEffect_TurnTowardTarget,thumb,low,src-alias,
 081B6C1C,ActorEffect_UpdateHomingFlight,thumb,low,src-alias,
+081B6D20,ActorEffect_UpdateApproachLaunch,thumb,low,src-alias,
 081B6E90,ActorEffect_UpdateRadialExpiry,thumb,low,src-alias,
 081B6F68,ActorEffect_UpdateExpiry,thumb,low,src-alias,
 081B6FA8,PooledController_UpdateAll,thumb,low,src-alias,
@@ -8052,6 +8060,7 @@ addr,name,mode,confidence,source,notes
 081EAAE4,Actor_UpdatePairedSpriteAnimation,thumb,low,src-alias,Advances a four-step paired keyframe sequence every ten ticks for the sprites at offsets 0x238 and 0x2C0.
 081EAB64,Params3D0_UpdateDisplay,thumb,low,src-alias,
 081EB598,Params3D0_DestroyDisplay,thumb,low,src-alias,Task destructor releases nine animations and clears background layer 2
+081EB5A8,Params3D0_InitDisplay,thumb,low,src-alias,
 081EB724,Params3D0_SetFromScript,thumb,low,src-alias,
 081EB7DC,Params3D0_CreateDisplay,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
 081EB81C,ScreenText_ShowIndexedString,thumb,low,src-alias,
@@ -8321,6 +8330,7 @@ addr,name,mode,confidence,source,notes
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,
 081FD704,OrbitEffect_FireProjectileOnContact,thumb,low,src-alias,
 081FD7B0,OrbitEffect_UpdateExpansion,thumb,low,src-alias,Expansion callback increases the radius then starts sound and switches to the active update; effect identity tentative
+081FD7EC,OrbitEffect_FireVolley,thumb,low,src-alias,
 081FDAAC,OrbitEffect_UpdateContraction,thumb,low,src-alias,Contraction callback decreases the radius except during state 26 and reports completion at zero
 081FDAF4,RisingActor_AdvanceHeight,thumb,low,src-alias,
 081FDB40,RisingActor_LowerHeight,thumb,low,src-alias,
@@ -9560,8 +9570,10 @@ addr,name,mode,confidence,source,notes
 082342AC,SolarBomb_Init,thumb,low,src-alias,Stores owner and position then initializes graphics and fuse timers and increments the owner count
 08234354,SolarBomb_Create,thumb,low,src-alias,Allocates the timed bomb task and installs its update and cleanup callbacks
 082343A0,SpiralBurst_SetState,thumb,low,src-alias,Stores the state callback and resets its frame counter; spiral burst identity is tentative
+082343B8,SpiralBurst_UpdateParticles,thumb,low,src-alias,
 0823450C,SpiralBurst_OnTaskUpdate,thumb,low,src-alias,Task update callback that invokes the current spiral burst state handler
 08234520,SpiralBurst_OnTaskDestroy,thumb,low,src-alias,Task cleanup callback that removes all eight spiral particle effects
+08234540,SpiralBurst_InitParticles,thumb,low,src-alias,
 082346EC,SpiralBurst_InitCollider,thumb,low,src-alias,Initializes the short-lived attack collider and binds it to the burst position
 08234770,SpiralBurst_Init,thumb,low,src-alias,Stores owner and position then initializes particles and collision and starts the burst state
 082347C8,SpiralBurst_Create,thumb,low,src-alias,Allocates the spiral burst task and installs its update and cleanup callbacks
