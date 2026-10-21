@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "group_objects.h"
 
 // MATCHING_CONCESSION: register-pinning
@@ -554,8 +555,10 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.4% (index register of the first Atan2 argument)
+static inline void CpuSet_2(u32 *a0, int a2, struct GroupVec *a1)
+{
+    CpuSet(a0, a1, a2);
+}
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -571,12 +574,19 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->anchor = p->position;
         p->direction = randomValue();
         zero = 0;
-        CpuSet(&zero, offset, 0x05000002);
+        CpuSet_2(&zero, 0x05000002, offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
         const u16 *table;
-        p->direction = Math_Atan2(-p->offset.x, -p->offset.z);
+        {
+            register u32 d asm("r1");
+            s32 ax;
+            asm("" : "=r"(d));
+            ax = -p->offset.x;
+            asm("" ::"r"(d));
+            p->direction = Math_Atan2(ax, -p->offset.z);
+        }
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 15) - 7;
         p->speed = (randomWith(table) & 7) + 8;
@@ -594,9 +604,6 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     BoardPiece_SetFacingAnim(m, p, 0);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010C10);
-#endif
 void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct GroupVec delta;

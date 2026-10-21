@@ -6426,6 +6426,7 @@ addr,name,mode,confidence,source,notes
 08193078,Nidhoggr_UpdatePartAnimation26,thumb,low,src-alias,Starts keyframe sequence 0x26 for the indexed part and steps it until completion
 08193104,Nidhoggr_UpdatePartAnimation28,thumb,low,src-alias,Starts keyframe sequence 0x28 for the indexed part and steps it until completion
 08193190,Nidhoggr_UpdatePartAnimation27,thumb,low,src-alias,Starts keyframe sequence 0x27 for the indexed part and steps it until completion
+0819321C,Nidhoggr_UpdatePartMotion,thumb,low,src-alias,
 08193514,Nidhoggr_InitBackgrounds,thumb,low,src-alias,Loads the background resource and configures layers during Nidhoggr initialization
 081935B8,Nidhoggr_UpdateBackgroundScroll,thumb,low,src-alias,Projects the boss position relative to the camera and applies matching scroll offsets to two backgrounds
 08193680,Nidhoggr_SetBackgroundMode,thumb,low,src-alias,Changes the background variant and two associated part states only when the mode changes
@@ -6441,6 +6442,7 @@ addr,name,mode,confidence,source,notes
 081945FC,Nidhoggr_StartSuspendedObjectShake,thumb,low,src-alias,Transitions the stationary object into its shaking sequence and resets its timer
 08194624,Nidhoggr_IsSuspendedObjectReady,thumb,low,src-alias,Tests state 4 reached after descent and collider placement
 08194640,Nidhoggr_IsSuspendedObjectHidden,thumb,low,src-alias,Tests state 0 restored after the object retracts and becomes hidden
+0819465C,Nidhoggr_UpdateSuspendedObject,thumb,low,src-alias,
 08194A40,Nidhoggr_StartFirstPartAction,thumb,low,src-alias,Selects a phase-dependent action for part 0 and sets its associated flags
 08194AA0,Nidhoggr_StartSecondPartAction,thumb,low,src-alias,Selects a phase-dependent action for part 1 and sets its associated flags
 08194B00,Nidhoggr_ResetPart22Animation,thumb,low,src-alias,Requests animation state 0 for part 22
@@ -6451,6 +6453,7 @@ addr,name,mode,confidence,source,notes
 08194C54,Nidhoggr_SelectRandomPart23AlternateAnimation,thumb,low,src-alias,Chooses one of six alternate animations beginning at state 0x2A for part 23
 08194CA8,Nidhoggr_SetPart23SpecialAnimation,thumb,low,src-alias,Requests the fixed animation state 0x32 for part 23; special action meaning is tentative
 08194CB8,Nidhoggr_PlayNearbyRandomSound,thumb,low,src-alias,Randomly plays sound 0x1BF or 0x1C0 when the supplied position is near the player
+08194D70,Nidhoggr_UpdateDamageFlashAndPartAnimations,thumb,low,src-alias,
 08194FA4,Nidhoggr_InitBobbingMotion,thumb,low,src-alias,Initializes relative fixed-point coordinates and velocities used by the bobbing movement updater
 08195014,Nidhoggr_InitRelativeMotion,thumb,low,src-alias,Initializes relative fixed-point coordinates with zero horizontal speed and negative Z speed
 08195078,Nidhoggr_UpdateAnchoredSway,thumb,low,src-alias,Updates horizontal and depth oscillation and positions the boss relative to the supplied anchor
