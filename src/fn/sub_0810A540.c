@@ -42,7 +42,6 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
         RegistryF246_Close();
         next = LinkMenu_ExchangeChoices;
         pp = p;
-        asm("" : "+r"(pp));
         mode = 9;
         goto call;
     }

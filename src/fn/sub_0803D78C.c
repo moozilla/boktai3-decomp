@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
+static inline void ClearHistory(int size, u32 *history)
+{
+    Memory_Clear(history, size);
+}
 s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
 {
     u32 *history = entry->history;
@@ -17,13 +20,13 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
     forward: {
         s32 one = 1;
         s32 zero;
-        entry->state = one;
+        entry->state = 1;
         zero = 0;
         entry->stateFrame = zero;
         entry->stateEntered = one;
         {
-            register u32 *arg asm("r0") = history;
-            Memory_Clear(arg, 0x100);
+            u32 *arg = history;
+            ClearHistory(0x100, arg);
         }
     }
     } else {
@@ -32,8 +35,8 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
         entry->stateFrame = 0;
         entry->stateEntered = 1;
         {
-            register u32 *arg asm("r0") = history;
-            Memory_Clear(arg, 0x100);
+            u32 *arg = history;
+            ClearHistory(0x100, arg);
         }
     }
     return 1;
