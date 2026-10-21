@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Actor_OnRisingFadeUpdate sub_0802EEA8
 // Provisional name: Actor_OnRisingFadeUpdate (tentative)
 struct Vec {
     s16 x, y, z, pad;
