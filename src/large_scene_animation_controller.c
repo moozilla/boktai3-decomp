@@ -957,7 +957,6 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
  * repositions each row's offset (rows[i].pos) and collider from t->pos plus constant offset
  * tables. confidence=low. */
 
-#define Nidhoggr_UpdatePartMotion sub_0819321C
 extern void (*const gUnk_0824F364[])(void);
 extern const struct SceneVec gUnk_0824F2E4[];
 extern const struct SceneVec gUnk_0824F324[];
@@ -1193,7 +1192,7 @@ void Nidhoggr_EmitSparks(u32 a)
 
 /* Tentative: a per-part "hit reaction" callback, assigned as sub_081940F8's anim-row
  * destroy/update callback (referenced five times from its literal pool) and probably
- * invoked through sub_0819321C's function-pointer table. Computes a collider-relative
+ * invoked through Nidhoggr_UpdatePartMotion's function-pointer table. Computes a collider-relative
  * part index via sub_08249420(colliderOffset, 0x54), adds contact damage
  * (PlayerStats_AddContactHundredths) scaled by t->optionS (0x7274), decrements that
  * part's hp (t->hp[i]) and checks t->groupHpA/groupHpB (0x728A/0x728C), plays sounds
@@ -1340,7 +1339,6 @@ u32 Nidhoggr_IsSuspendedObjectHidden(struct Nidhoggr *p)
  * pointer directly in a register and indexes the jitter pair through it rather than via
  * a separate pointer variable, which this draft did not reproduce. confidence=low. */
 
-#define Nidhoggr_UpdateSuspendedObject sub_0819465C
 struct SuspendedJitter {
     s16 x, y, z;
 };
@@ -1601,7 +1599,6 @@ void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
  * sets bits in t->flags[2] (0x724E); also calls sub_08194858/sub_0819494C (part completion)
  * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
-#define Nidhoggr_UpdateDamageFlashAndPartAnimations sub_08194D70
 extern const u8 gUnk_0824F584[];
 extern const u8 gUnk_0824F588[];
 
@@ -2873,10 +2870,10 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
         Camera_RequestShake(0x80);
         t->flags[0]--;
     }
-    sub_08194D70(t);
-    sub_0819465C(t);
+    Nidhoggr_UpdateDamageFlashAndPartAnimations(t);
+    Nidhoggr_UpdateSuspendedObject(t);
     Nidhoggr_UpdateBackgroundScroll(t);
-    sub_0819321C(t);
+    Nidhoggr_UpdatePartMotion(t);
     sub_0818ECFC(t->effectPool);
     Nidhoggr_ApproachCameraTarget(t);
     if (t->targetMode)
