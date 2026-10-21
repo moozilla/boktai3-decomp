@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.8%
+// fuzzy: 98.6%
 // Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
@@ -95,7 +95,7 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
 }
 static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
-    d->x = a->x + b->x;
+    d->x = b->x + a->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
