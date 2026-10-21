@@ -51,8 +51,7 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
             if (state == 0x26) {
                 int original = s->bmSlotOrg;
                 int current = s->bmSlot;
-                do {
-                } while (0);
+                DEBUG_NOP();
                 changed = current ^ original;
                 rfu_clearSlot(4, slot);
                 p->mask &= ~2;
@@ -65,8 +64,7 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
             } else if (state == 0x27) {
                 int original = s->bmSlotOrg;
                 int current = s->bmSlot;
-                do {
-                } while (0);
+                DEBUG_NOP();
                 changed = current ^ original;
                 rfu_clearSlot(4, slot);
                 {

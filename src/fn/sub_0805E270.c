@@ -16,8 +16,7 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
         position.first = 0;
         position.second &= mask;
     }
-    do {
-    } while (0);
+    DEBUG_NOP();
     zero = 0;
     positionPointer = (void *)&position;
     widget = pair->widgets;

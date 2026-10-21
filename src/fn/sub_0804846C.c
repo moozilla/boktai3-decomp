@@ -2,8 +2,7 @@
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
 {
     struct WirelessLinkIndicator *indicator = input;
-    do {
-    } while (0);
+    DEBUG_NOP();
     if (!Wireless_GetStatus()) {
         s32 strength = 255;
         if (Wireless_IsSessionConnected()) {
