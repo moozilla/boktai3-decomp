@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
 #define gSpriteGroup gUnk_02000138
 struct SpriteGroupEntry {
     u8 pad[10];
@@ -26,15 +23,14 @@ static inline u8 Occupied(u32 *used, u32 mask)
 s32 SpriteGroup_RemoveSprites(struct SpriteGroup *pool)
 {
     s32 i = 0;
+    u32 zero;
     u32 *used = &pool->used;
     struct SpriteGroupEntry *entry = pool->entries;
     for (; i < 8; entry++, i++) {
         if (Occupied(used, 1u << i))
             Sprite_Remove(pool->sprites + entry->slot * 0x2c);
     }
-    gSpriteGroup = 0;
+    zero = 0;
+    gSpriteGroup = (void *)zero;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteGroup_RemoveSprites);
-#endif
