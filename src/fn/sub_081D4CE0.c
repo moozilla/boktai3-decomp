@@ -22,9 +22,11 @@ void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void CpuSet(const void *, void *, u32);
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// only the placement of the CpuSet control-word load (ldr r2) differs
+static inline void CpuSetArgs(void *dest, u32 control, void *src)
+{
+    CpuSet(src, dest, control);
+}
+
 int sub_081D4CE0(struct PalTrans081D4CE0 *p)
 {
     u32 zero = 0;
@@ -53,9 +55,6 @@ int sub_081D4CE0(struct PalTrans081D4CE0 *p)
     p->w18 = zero;
     p->h26 = zero;
     fill = zero;
-    CpuSet(&fill, org, 0x05000002);
+    CpuSetArgs(org, 0x05000002, &fill);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D4CE0);
-#endif
