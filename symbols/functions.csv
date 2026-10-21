@@ -3935,6 +3935,7 @@ addr,name,mode,confidence,source,notes
 08101A3C,NamedObject_FindByName,thumb,low,src-alias,Searches twelve object entries for a matching name key
 08101A74,NamedObject_GetFollowTarget,thumb,low,src-alias,Finds the object matching the manager follow target key used by release-from-script
 08101AB4,ActorGroup_ReleaseMember,thumb,low,src-alias,
+08101B1C,NamedObject_RegisterFollowCells,thumb,low,src-alias,
 08101D2C,NamedObject_UpdateTerrainRegistration,thumb,low,src-alias,
 08101E20,NamedObject_IsMapCellOccupied,thumb,low,src-alias,Tests whether an entry with flag 1 at B8 records the supplied map cell index
 08101E6C,NamedObject_TryCapturePlayer,thumb,low,src-alias,
@@ -3946,6 +3947,7 @@ addr,name,mode,confidence,source,notes
 081028F8,NamedObject_ClearAttachmentFlag,thumb,low,src-alias,
 08102978,NamedObject_UpdatePlayerFollowFlags,thumb,low,src-alias,Updates player status flags and target name according to the object's state
 081029C0,NamedObject_UpdateTetherFollowFlags,thumb,low,src-alias,Updates tether actor status flags and target name according to the object's state
+081029F8,NamedObject_UpdatePlayerAttachment,thumb,low,src-alias,
 08102C0C,NamedObject_UpdateTetherAttachment,thumb,low,src-alias,
 08102D20,NamedObject_ResolveAttachmentPosition,thumb,low,src-alias,
 08102E98,NamedObject_UpdateFollowers,thumb,low,src-alias,Updates player and tether following then clears the object's accumulated displacement
@@ -6307,6 +6309,7 @@ addr,name,mode,confidence,source,notes
 08189CAC,Armor_UpdatePrimaryBehaviorByInverseFlag,thumb,low,src-alias,Selects the same primary behavior pair with the flag 0x200 mapping reversed
 08189CD8,Armor_UpdateSecondaryBehaviorByInverseFlag,thumb,low,src-alias,Selects the same secondary behavior pair with the flag 0x200 mapping reversed
 0818A4C8,Armor_DispatchTypeUpdate,thumb,low,src-alias,Calls the update handler indexed by armor type unless flag 0x80 suppresses it
+0818A500,Armor_ApplySceneCommands,thumb,low,src-alias,
 0818ADB4,Armor6_Destroy,thumb,low,src-alias,
 0818AEC8,Armor_InitExtendedCollider,thumb,low,src-alias,Initializes an armor collider with a callback and additional spatial parameters
 0818AF30,Armor_InitCollider,thumb,low,src-alias,Initializes and positions an armor collider with an optional callback
