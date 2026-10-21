@@ -11,7 +11,7 @@ void SceneHud_UpdateActionSelection(void);
 void sub_0816CDB8(void *, s32, s32);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
 void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 void MenuDisplay_SetPaletteOverrides(void *, s32, s32, s32, s32);
@@ -29,7 +29,7 @@ void SceneHud_FinishRandomActionReturn(struct SceneHudState *s)
         SceneHud_GetActionIconPosition(&s->categoryWidgets[5].position, s->actionCursor);
         SceneHud_ShowActionPreview(s);
         Hud_SaveGridSelection(input);
-        sub_081672FC(s);
+        InventoryPanel_ShowStatusIcons(s);
         MenuDisplay_UpdateActionPrompt(s, 4);
         InventoryPanel_DrawStatComparison(s, 0, 0, 0, 1, 0);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
