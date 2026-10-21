@@ -83,11 +83,12 @@ static inline void Vector(struct HomingVec *v, s32 angle, s32 scale)
     }
 }
 
-// fuzzy: 82.7%
+// fuzzy: 84.4%
 s32 HomingProjectile_UpdateManager(struct HomingManager *m)
 {
     struct HomingSlot *p = m->slots;
     s32 i;
+    s32 slot;
     for (i = 0; i <= 2; i++, p++) {
         void **palette = &p->graphics.palette;
         if (m->activeMask & (1 << i)) {
@@ -98,14 +99,19 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                 continue;
             if (gUnk_02000560 & 4)
                 continue;
-            if (params->behavior(p, i) == 1) {
-                HomingProjectile_ReleaseSlot(m, p, i);
+            slot = i;
+            if (params->behavior(p, slot) == 1) {
+                HomingProjectile_ReleaseSlot(m, p, slot);
                 continue;
             }
-            velocity = &p->velocity;
-            if (p->state & 1) {
-                Vector(velocity, params->angle, params->speed);
-                p->state &= ~1;
+            {
+                u32 test = p->state & 1;
+                u32 *flags = &p->state;
+                velocity = &p->velocity;
+                if (test) {
+                    Vector(velocity, params->angle, params->speed);
+                    *flags &= ~1;
+                }
             }
             position = &sprite->position;
             position->x += velocity->x;
@@ -209,8 +215,8 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                 p->flashTimer--;
             } else
                 *palette = m->palettes[0];
-            if (p->lifetime >= i * 30 + 200)
-                HomingProjectile_ReleaseSlot(m, p, i);
+            if (p->lifetime >= slot * 30 + 200)
+                HomingProjectile_ReleaseSlot(m, p, slot);
             p->lifetime++;
         }
     }
