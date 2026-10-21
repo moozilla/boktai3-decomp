@@ -1,0 +1,73 @@
+#include "global.h"
+#include "scene_vec.h"
+// MATCHING_CONCESSION: register-pinning
+struct PoisonHandBurst {
+    u8 pad0[0x18];
+    s32 frame;
+    u8 pad1C[0x24];
+    struct SceneVec position;
+    u8 pad48[0xd8];
+    s16 effectX, effectY, effectZ, unknown126;
+    u8 pad128[4];
+    u16 spread;
+    u8 pad12E[0x16];
+    s16 timer;
+};
+extern const u16 gUnk_0203B400[];
+extern u32 gUnk_03005308;
+void PoisonHand_RecordDefeat(void *);
+void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                    u32, s32, s32, u32, s32, u32, u32);
+struct BurstVelocity {
+    s32 x : 16;
+    s32 y : 16;
+    s32 z : 16;
+};
+static inline s32 PoisonHand_NextSpread(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+static inline void PoisonHand_CopyPosition(struct SceneVec *dst, struct SceneVec *src)
+{
+    *dst = *src;
+}
+static inline void PoisonHand_RaiseOrigin(struct SceneVec *p)
+{
+    p->y += 0x80;
+}
+#define PoisonHand_UpdateDefeatBurst sub_0820E128
+s32 sub_0820E128(struct PoisonHandBurst *p)
+{
+    struct SceneVec position;
+    struct BurstVelocity velocity;
+    s32 random, base;
+    if (!p->timer) {
+        register s32 f asm("r12") = p->frame;
+        u32 attributes, palette;
+        if (f <= 15) {
+            PoisonHand_CopyPosition(&position, &p->position);
+            PoisonHand_RaiseOrigin(&position);
+            random = PoisonHand_NextSpread(gUnk_0203B400);
+            base = p->spread - 8;
+            velocity.x = base + (random & 15);
+            velocity.y = 0;
+            velocity.z = base + (PoisonHand_NextSpread(gUnk_0203B400) & 15);
+            attributes = 0x8000;
+            palette = 0x1c5;
+            if (f & 1)
+                SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x200, 9,
+                                              palette, 2, 0, 0, 0, p->effectX, p->effectY,
+                                              attributes, p->effectZ, 0, 0);
+            else
+                SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x400, 9,
+                                              palette, 2, 0, 0, 0, p->effectX, p->effectY,
+                                              attributes, p->effectZ, 0, 0);
+        }
+        if (p->frame == 16)
+            PoisonHand_RecordDefeat(p);
+    }
+    return 0;
+}
