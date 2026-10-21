@@ -1,5 +1,4 @@
 #include "area_effect.h"
-// MATCHING_CONCESSION: register-pinning
 u32 SunClock_GetPhase(void);
 void AnimData_SelectPaletteBank(void *, u32);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
@@ -26,14 +25,13 @@ void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
         manager->graphicsId = id;
         i = 0;
         {
-            register u8 *cursor asm("r0") = &manager->count;
+            u8 *cursor = &manager->count;
             s32 n;
-            count = cursor;
             n = *cursor;
+            count = cursor;
             if (i < n) {
-                register u32 strideSeed asm("r1") = sizeof(struct AreaEffectEntry);
-                register u32 stride asm("r9");
-                asm("" : "+r"(strideSeed));
+                u32 strideSeed = sizeof(struct AreaEffectEntry);
+                u32 stride;
                 stride = strideSeed;
                 do {
                     u32 offset = stride * i;
