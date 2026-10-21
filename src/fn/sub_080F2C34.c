@@ -34,7 +34,7 @@ struct PhaseObject {
     u8 padCE0[0xd80 - 0xce0];
     u32 frame;
 };
-void sub_080F3B60(struct PhaseObject *);
+void ChildGroup_UpdateTrailingMembers(struct PhaseObject *);
 void sub_080F2BE4(struct PhaseObject *);
 void PhaseObject_TickCountdown(struct PhaseObject *p)
 {
@@ -54,7 +54,7 @@ void PhaseObject_TickCountdown(struct PhaseObject *p)
                 one |= *q;
                 *q = one;
             }
-            p->update = sub_080F3B60;
+            p->update = ChildGroup_UpdateTrailingMembers;
             callback = sub_080F2BE4;
             for (i = 0; i <= 3; i++) {
                 p->entries[i].flags |= 1;

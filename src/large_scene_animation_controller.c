@@ -1860,7 +1860,6 @@ void Nidhoggr_TrackPlayerDepth(struct Nidhoggr *t)
  * row groups from the current mode, and for each stage waits for the row's animation to
  * finish (rowDoneFlag/rowCounter) before requesting the next completed-part state.
  * confidence=low. */
-#define Nidhoggr_UpdatePartSequences sub_08195334
 void Nidhoggr_UpdatePartSequences(struct Nidhoggr *t)
 {
     s32 a = 0, b = 0, c = 0;
@@ -2961,13 +2960,13 @@ void Nidhoggr_UpdateArrival(struct Nidhoggr *t)
 
 extern const u8 gUnk_0824F5C0[];
 
-void sub_08195334(struct Nidhoggr *);
+void Nidhoggr_UpdatePartSequences(struct Nidhoggr *);
 
 void Nidhoggr_UpdateState(struct Nidhoggr *p)
 {
     const u32 *tbl = (const u32 *)gUnk_0824F5C0;
     Callback_InvokeActor(p, tbl[p->mode]);
-    sub_08195334(p);
+    Nidhoggr_UpdatePartSequences(p);
 }
 
 static inline s32 Approach(s32 d)

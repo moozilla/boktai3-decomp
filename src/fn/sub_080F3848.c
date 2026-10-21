@@ -18,7 +18,7 @@ struct ChildGroup {
 };
 void sub_080F1FE8(struct ChildGroup *);
 void Ivy_UpdateBobbing(struct ChildGroup *);
-void sub_080F3F48(struct ChildGroup *);
+void ChildGroup_UpdateLandingState(struct ChildGroup *);
 void Ivy_WaitForPrimaryActionCompletion(struct ChildGroup *);
 static inline u8 EnterState(struct ChildGroup *p)
 {
@@ -51,7 +51,7 @@ void ChildGroup_UpdateTimedOscillation(struct ChildGroup *p)
     Ivy_UpdateBobbing(p);
     if (--p->timer == 0) {
         SetState(p, 1, 4);
-        p->callbackCC8 = sub_080F3F48;
+        p->callbackCC8 = ChildGroup_UpdateLandingState;
         p->callbackCD8 = Ivy_WaitForPrimaryActionCompletion;
     }
 }

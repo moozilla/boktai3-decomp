@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_UpdateLandingState sub_080F3F48
 struct CGPos {
     u16 x, y, z, w;
 };
