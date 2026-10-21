@@ -99,8 +99,7 @@ void StatusScreen_Reveal(struct StatusScreen *p)
         }
         if (p->timer++ >= p->times[1]) {
             {
-                register void (*state)(struct StatusScreen *) =
-                    StatusScreen_WaitForReveal;
+                register void (*state)(struct StatusScreen *) = StatusScreen_WaitForReveal;
                 asm("" : "+r"(p) : "r"(state));
                 p->state = state;
             }
@@ -117,8 +116,7 @@ void StatusScreen_WaitForReveal(struct StatusScreen *p)
             do {
                 p->noise = StatusScreen_ClearScanlineNoise;
                 {
-                    register void (*state)(struct StatusScreen *) =
-                        StatusScreen_WaitForClose;
+                    register void (*state)(struct StatusScreen *) = StatusScreen_WaitForClose;
                     p->state = state;
                     p->timer = 0;
                 }

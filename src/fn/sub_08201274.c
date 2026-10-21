@@ -17,11 +17,11 @@ struct S {
 };
 void Memory_Clear(void *, u32);
 void PlayerClone_SetBehaviorCallback(void *, void (*)(void));
-void sub_082003BC(void);
+void PlayerClone_UpdateBehavior(void);
 void PlayerClone_InitConfig(struct S *p)
 {
     Memory_Clear(p, 0x20);
-    PlayerClone_SetBehaviorCallback(p, sub_082003BC);
+    PlayerClone_SetBehaviorCallback(p, PlayerClone_UpdateBehavior);
     p->h0 = 0;
     p->h2 = 0x3c;
     p->w8 = 0x10;
