@@ -5,10 +5,6 @@
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// Remaining differences: CpuSet control constant loaded before r0 setup; 0xFFFF mask temp in r2 not r1.
-
 struct CrowResetContext {
     u8 unknown0[0x3D4];
     u32 flags3D4;
@@ -72,7 +68,7 @@ static inline void StepSequence(void *obj)
     {
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r5");
-        register u32 temp asm("r2");
+        register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -165,29 +161,31 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
             *(struct CrowPlacement *)&actor->position;
     {
         void *dst = &context->vectors[0];
+        void *src = &zero;
         u32 control = 0x05000002;
         zero = 0;
+        asm("" : "+r"(src));
         asm("" : "+r"(control));
-        CpuSet(&zero, dst, control);
+        CpuSet(src, dst, control);
     }
     {
         void *dst = &context->vectors[1];
+        void *src = &zero;
         u32 control = 0x05000002;
         zero = 0;
+        asm("" : "+r"(src));
         asm("" : "+r"(control));
-        CpuSet(&zero, dst, control);
+        CpuSet(src, dst, control);
     }
     {
         void *dst = &context->vectors[2];
+        void *src = &zero;
         u32 control = 0x05000002;
         zero = 0;
+        asm("" : "+r"(src));
         asm("" : "+r"(control));
-        CpuSet(&zero, dst, control);
+        CpuSet(src, dst, control);
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     StepSequence(actor->drawable);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_ResetGroundState);
-#endif
