@@ -1,8 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.4%
 // foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
@@ -62,10 +60,10 @@ s32 LinkSelection_WaitForParticipantChoices(struct AreaEffectLinkState *p)
             Registry1745_SetState(p, 23, SessionMenu_ShowTimedMessage);
     } else if (p->menuChoice >= 0) {
         u32 choice = p->menuChoice;
-        p->requestedMode = ((choice << 16) | 0x2c000000) << 2 >> 18;
+        u32 shifted = choice << 16;
+        u32 k = 0x2c000000;
+        k |= shifted;
+        p->requestedMode = k << 2 >> 18;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkSelection_WaitForParticipantChoices);
-#endif
