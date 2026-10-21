@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.2%
-// foundry draft (worker best 86.2%); what differs is mostly register allocation and instruction order
 #define SceneInventory_IsSlotEquipped Inventory_IsEquipmentAssigned
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -20,8 +18,9 @@ void SceneHud_FillDigitCells(u32, u32, u32, u32);
 void InventoryPanel_SetEntryRow(void *, u32, u32, u32, u32, u32);
 void SceneHud_RefreshEquipmentIcons(void *, int);
 void SceneHud_BeginEquipmentSelection(void *);
-void SceneHud_TickEquipmentToggle(struct SceneHudState *p)
+void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
 {
+    register struct SceneHudState *p asm("r6") = input;
     s32 equipped;
     s32 slot;
     void *q;
@@ -58,6 +57,3 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *p)
         Sound_PlaySong(0xde);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_TickEquipmentToggle);
-#endif
