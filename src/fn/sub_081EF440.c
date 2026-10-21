@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.5%
+// fuzzy: 93.3%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
 struct Slot7Motion {
     u8 pad0[0xAE];
@@ -29,6 +29,7 @@ static inline void BeginPhase(struct PhaseState *p, s32 phase)
 void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
 {
     struct PhaseState *other = (struct PhaseState *)p;
+    asm("" : "+r"(other));
     if (p->reset) {
         BeginPhase((struct PhaseState *)p, 1);
     }
@@ -39,7 +40,9 @@ void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
                 BeginPhase((struct PhaseState *)p, 3);
                 p->previousPhase = 3;
             } else {
-                BeginPhase(other, 4);
+                ((struct PhaseState *)p)->phase = 4;
+                ((struct PhaseState *)p)->timer = 0;
+                other->entered = 1;
                 p->previousPhase = 4;
             }
         }
