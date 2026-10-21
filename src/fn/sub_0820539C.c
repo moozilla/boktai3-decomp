@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.2%
+// fuzzy: 93.9%
 // Register choice for the z pointer (r7 in the ROM), the facing-index pointer
 // reloads and the Anim_SetSequence argument setup still differ.
 #include "scene_vec.h"
@@ -63,12 +63,8 @@ static inline void EnemyD459_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
     const volatile u16 *c = s->commands + s->index;
     {
         u32 frame;
-        register void *highSprite asm("r8") = sprite;
-        void *frameSprite;
         frame = *c >> 6;
-        frameSprite = highSprite;
-        asm("" : "+r"(frameSprite));
-        *(u16 *)((u8 *)frameSprite + 0x10) = frame;
+        *(u16 *)((u8 *)sprite + 0x10) = frame;
     }
     {
         u32 input = s->flags, bit = 1;
@@ -153,8 +149,9 @@ s32 EnemyD459_InitializeFromScript(u8 *p, void *parent)
 {
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;
+    void **slot;
     register void *sprite asm("r9");
-    register s16 *position asm("r8");
+    s16 *position;
     s16 *zp;
     s32 dead;
     if (Script_SeekToKeyword('p')) {
@@ -244,25 +241,34 @@ s32 EnemyD459_InitializeFromScript(u8 *p, void *parent)
         *x += offsets.e[*h].x << 2;
         z = &H(0x44);
         *z += offsets.e[*h].z << 2;
-        sprite = earlySprite;
-        position = x;
-        zp = z;
-        if (*h <= 1)
-            *zp -= 0x50;
-        else
-            *position -= 0x50;
+        {
+            s32 facing = *h;
+            sprite = earlySprite;
+            position = x;
+            zp = z;
+            if (facing <= 1)
+                *zp -= 0x50;
+            else
+                *position -= 0x50;
+            asm("" : : "r"(earlySprite));
+        }
         AnimData_SelectPaletteBank(graphics, 0x227);
     }
     resource = ScriptProc_Start(0x922e, 0xfa45);
-    *(void **)(p + 0x158) = resource;
+    slot = (void **)(p + 0x158);
+    *slot = resource;
     dead = H(0x144);
     if (dead == 0) {
         *(void **)(p + 0x108) = EnemyD459_UpdateAttackTiming;
         Anim_SetSequence(p + 0x10c, resource, 2, (u8)B(0x132), dead);
     } else {
         *(void **)(p + 0x108) = EnemyD459_UpdateDeath;
-        H(0x12e) = 1;
-        Anim_SetSequence(p + 0x10c, *(void **)(p + 0x158), 4, 0, 0);
+        {
+            s16 *d = &H(0x12e);
+            s32 zero = 0;
+            *d = 1;
+            Anim_SetSequence(p + 0x10c, *slot, 4, 0, zero);
+        }
         *position = U(0x1c) + 0x40;
         *zp = U(0x20) + 0x40;
         *position -= 0x60;
