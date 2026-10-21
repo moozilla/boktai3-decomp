@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.0%
-// foundry draft (worker best 94.0%); what differs is mostly register allocation and instruction order
 
 #define gScreenPaletteBuffer gUnk_030050E0
 
@@ -35,12 +33,9 @@ void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
         Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
                                  palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
     } else {
-        u16 index = s->variant * 3;
-        u16 bank = index + 9;
-        u32 offset = bank * 32;
-        CpuSet(s->palettes + offset, gScreenPaletteBuffer, 0x04000008);
+        register u32 v asm("r1") = s->variant;
+        register u32 index asm("r0") = v * 3;
+        register u32 bank asm("r1") = index + 9;
+        CpuSet(s->palettes + (bank << 5), gScreenPaletteBuffer, 0x04000008);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScreenPalette_UpdateTransition);
-#endif
