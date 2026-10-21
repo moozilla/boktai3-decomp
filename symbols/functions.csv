@@ -8464,9 +8464,12 @@ addr,name,mode,confidence,source,notes
 0820D9C0,EnemyParticle_EnableShadow,thumb,low,src-alias,Provisionally enables the shadow option stored at parameter offset 0x2E
 0820D9C8,EnemyParticle_AddFlags,thumb,low,src-alias,Adds behavior flags to the particle parameter block
 0820D9D0,PoisonHand_RecordDefeat,thumb,low,src-alias,Calls the configured defeat script and updates event flags and enemy defeat counters
+0820DC18,PoisonHand_ApplyHitReaction,thumb,low,src-alias,
 0820DDC4,PoisonHand_InitCollider,thumb,low,src-alias,Initializes the collider with position contact callback and combat attributes
 0820DE60,PoisonHand_WaitForPlayerApproach,thumb,low,src-alias,State callback that starts the emergence sequence when the player enters range
+0820E128,PoisonHand_UpdateDefeatBurst,thumb,low,src-alias,
 0820E718,PoisonHand_Destroy,thumb,low,src-alias,Destruction callback that removes the Poison Hand sprite
+0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
 0820EBEC,OrangeSpine_RecordDefeat,thumb,low,src-alias,Calls the defeat script and updates kill statistics; tentative actor prefix from its orange-red sprite palette
 0820EFDC,OrangeSpine_InitCollider,thumb,low,src-alias,Initializes the actor collider and installs its collision callback; tentative actor identity

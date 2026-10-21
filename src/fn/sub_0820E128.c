@@ -38,8 +38,7 @@ static inline void PoisonHand_RaiseOrigin(struct SceneVec *p)
 {
     p->y += 0x80;
 }
-#define PoisonHand_UpdateDefeatBurst sub_0820E128
-s32 sub_0820E128(struct PoisonHandBurst *p)
+s32 PoisonHand_UpdateDefeatBurst(struct PoisonHandBurst *p)
 {
     struct SceneVec position;
     struct BurstVelocity velocity;

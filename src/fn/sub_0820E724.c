@@ -24,7 +24,7 @@ void *ScriptProc_Start(u32, u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void PoisonHand_InitCollider(void *);
 u32 PoisonHand_WaitForPlayerApproach(u8 *);
-void sub_0820E128(void);
+void PoisonHand_UpdateDefeatBurst(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -133,8 +133,7 @@ static inline void PoisonHand_StepAnimation(u8 *p, void *sprite, struct FanSeq *
         }
     }
 }
-#define PoisonHand_InitializeFromScript sub_0820E724
-s32 sub_0820E724(u8 *p, void *parent)
+s32 PoisonHand_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     register void *sprite asm("r8");
@@ -223,7 +222,7 @@ s32 sub_0820E724(u8 *p, void *parent)
         *(void (**)(void))(p + 0x108) = (void (*)(void))PoisonHand_WaitForPlayerApproach;
         Anim_SetSequence(p + 0x10c, resource, 0x17, 0, dead);
     } else {
-        *(void (**)(void))(p + 0x108) = sub_0820E128;
+        *(void (**)(void))(p + 0x108) = PoisonHand_UpdateDefeatBurst;
         {
             register u32 zero asm("r2");
             s16 *q = &H(0x132);
