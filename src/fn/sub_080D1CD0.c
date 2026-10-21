@@ -1,7 +1,5 @@
 #include "global.h"
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
-#ifdef NONMATCHING
-// fuzzy: 94.3%
 // Entry take-flag allocation and zero-value lifetime still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
@@ -21,7 +19,6 @@ static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor
     {
         u8 *mirrorAddress = &mirror;
         s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
-        asm("" : "+r"(zero));
         asm("" : "+r"(quadrant), "+r"(mirrorAddress));
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
@@ -94,17 +91,10 @@ selected:;
 
 #include "scene_actor_reaction.h"
 void Mummy_UpdateRevival(void *);
-static inline u8 TakePrepared(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
 void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     register u32 queued asm("r5");
+    u32 t;
     u8 *prepared;
     u32 mask = 1;
     if (!actor->drawableKind) {
@@ -114,11 +104,34 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
         tile->flags |= mask;
     }
-    prepared = &actor->field2B2;
-    queued = TakePrepared(prepared);
-    if (queued)
-        ActorShadow_Disable((u8 *)actor + 0x320);
-    else if (frame > 0x1A) {
+    {
+        register u32 off asm("r1") = 0x2B2;
+        register u8 *q asm("r0");
+        register u32 v asm("r1");
+        asm("" : "+r"(off));
+        q = (u8 *)actor + off;
+        asm("" : "+r"(q));
+        v = *q;
+        prepared = q;
+        asm("" : "+r"(v));
+        t = v ? ({
+            register u32 z asm("r0") = 0;
+            register u8 *pp asm("r5");
+            asm("" : "+r"(z));
+            pp = prepared;
+            asm("" : "+r"(pp));
+            *pp = z;
+            1;
+        })
+              : 0;
+    }
+    asm("" : "+r"(t));
+    queued = t;
+    if (queued) {
+        register u32 off asm("r1") = 0x320;
+        asm("" : "+r"(off));
+        ActorShadow_Disable((u8 *)actor + off);
+    } else if (frame > 0x1A) {
         void *callback;
         u32 kind, zero, one;
         SelectRecoveryAnimation((void *)actor, queued);
@@ -140,7 +153,3 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
     } else
         actor->field2B3 = queued;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateHiddenRecovery);
-#endif
