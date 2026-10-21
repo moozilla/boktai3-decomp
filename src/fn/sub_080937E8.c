@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_08092E30(void);
+void Bee_UpdateFlightHeight(void);
 
 u32 Bee_UpdateGroundHeight(void)
 {
-    sub_08092E30();
+    Bee_UpdateFlightHeight();
     return 1;
 }

@@ -9,7 +9,7 @@ s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
 void sub_0809345C(void *, void *);
-void sub_08093644(void *, void *, void *);
+void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
 static inline u8 Take(u8 *p)
 {

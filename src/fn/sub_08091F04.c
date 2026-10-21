@@ -57,7 +57,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-#define Bee_UpdateTurnAnimation sub_08091F04
 void Bee_UpdateTurnAnimation(struct SceneActorAnimationView *actor)
 {
     u8 *body = *(u8 **)((u8 *)actor + 0x3D0);

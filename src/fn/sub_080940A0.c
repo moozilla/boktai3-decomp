@@ -19,7 +19,6 @@ static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;
 }
-#define Bee_UpdateWanderPause sub_080940A0
 void Bee_UpdateWanderPause(struct SceneActorRegistryResetView *actor)
 {
     s32 cnt;

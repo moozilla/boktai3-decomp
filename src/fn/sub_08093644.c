@@ -2,7 +2,6 @@
 struct BeeVec {
     s16 x, y, z;
 };
-#define Bee_SubVector sub_08093644
 void *Bee_SubVector(void *unused, struct BeeVec *a, struct BeeVec *b)
 {
     struct BeeVec d;

@@ -131,7 +131,6 @@ static inline void Clear(u32 *fillp, u32 value, void *out)
     *fillp = value;
     CpuSet(fillp, out, 0x05000002);
 }
-#define Bee_ResetRoute sub_08092BD4
 void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
 {
     u32 zero4;

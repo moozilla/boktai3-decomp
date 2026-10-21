@@ -15,7 +15,7 @@ s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
 void sub_0809345C(void *, void *);
 u8 *SceneBody_GetById(int);
-void *sub_08093644(void *, void *, void *);
+void *Bee_SubVector(void *, void *, void *);
 
 static inline u8 Take(u8 *p)
 {
@@ -105,7 +105,6 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-#define Bee_StartMoveToBody sub_080929A4
 void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
 {
     register u8 *body asm("r8");
@@ -129,12 +128,12 @@ void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
     *(u16 *)(body + 0x43A) = 0x500;
     Add(&offset, (struct BeeVec *)&actor->position);
     sub_0809345C(actor, &offset);
-    sub_08093644(actor, &actor->position, &offset);
+    Bee_SubVector(actor, &actor->position, &offset);
     Clear(&fill, body + 0x480);
     State(actor, 2, 0, 10);
     Control(actor, actor->entryTarget228, 1);
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080929A4);
+INCLUDE_ASM("asm/nonmatching", Bee_StartMoveToBody);
 #endif
