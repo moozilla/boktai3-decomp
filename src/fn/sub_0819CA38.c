@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.5%
 // foundry draft (worker best 84.8%); what differs is mostly register allocation and instruction order
 #define OffsetActor_SetTravelTarget Hresvelgr_RefreshTarget
 struct OffsetActorVector {
@@ -43,9 +42,9 @@ static inline void Polar(struct OffsetActorVector *out, s32 angle, s32 radius)
 }
 static inline void Add(struct OffsetActorVector *a, struct OffsetActorVector *b)
 {
-    a->x = a->x + b->x;
+    a->x = b->x + a->x;
     a->y = a->y + b->y;
-    a->z = a->z + b->z;
+    a->z = b->z + a->z;
 }
 static inline void Subtract(struct OffsetActorVector *a, struct OffsetActorVector *b)
 {
@@ -59,18 +58,35 @@ s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
     struct OffsetActorVector v;
     struct OffsetActor *obj = p;
     Polar(&v, (p->side << 6) | 0x80, 0x300);
-    Add(&v, obj->origin);
+    {
+        struct OffsetActorVector *o = obj->origin;
+        struct OffsetActorVector *vp;
+        asm("" : "+r"(o));
+        vp = &v;
+        Add(vp, o);
+    }
     p->target = v;
     obj->facing = angles.a[p->side];
-    obj->facing4 = 3 & ((obj->facing + 0x60) >> 6);
-    obj->facing8 = 7 & ((obj->facing + 0x70) >> 5);
+    {
+        u32 v = (obj->facing + 0x60) >> 6;
+        u32 m = 3;
+        asm("" : "+r"(v));
+        asm("" : "+r"(m));
+        obj->facing4 = m & v;
+    }
+    {
+        u32 v = (obj->facing + 0x70) >> 5;
+        u32 m = 7;
+        asm("" : "+r"(v));
+        asm("" : "+r"(m));
+        obj->facing8 = m & v;
+    }
     Subtract(&v, &obj->position);
     {
         s32 result = Sqrt(v.x * v.x + v.z * v.z) * 0x274 / 0x6400;
-        p->travel = result;
+        register s32 t asm("r2") = result;
+        asm("" : "+r"(t));
+        p->travel = t;
         return result;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_RefreshTarget);
-#endif
