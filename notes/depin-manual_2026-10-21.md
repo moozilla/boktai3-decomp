@@ -20,6 +20,9 @@ Step 1 (`tools/depin.py --write` over all 60) auto-dropped hints in 9 files (com
 * DirectionalParticle_Update (08047DBC): the per-axis `movement`/`current` temporaries (pinned r0/r4) replaced by `position->x = (u16)position->x + (u16)motion->velocity.x;`. Operand order of the `+` decides which load is emitted first and thus the register.
 * WirelessResultPanel_Create (0803B6B8): early return `p = GetInstance(); if (p) return p;` instead of `result`/`p` copy pair + use-barrier.
 
+* SceneActorContacts_CanSelectNode (08072BC4): found by decomp-permuter; `u32 flags = node->flags; int mask = 2; mask = flags & mask; if (mask || ...)` (the mask test through a reused int temp) gives the pinned register roles.
+* SceneInventory_SelectActionDestination (0806147C): found by decomp-permuter; `short destination = (u16)panel->destination; s8 four; ... (destination & 3) + (four = 4)` (constant assigned to a narrow temp inside the expression; a separate `s8 four = 4;` statement does NOT work).
+
 ## Not solved (what blocked)
 
-(see end of file)
+See the end of the file (appended when the run ends).
