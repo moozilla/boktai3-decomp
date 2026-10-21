@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "status_screen.h"
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
@@ -120,7 +119,7 @@ int StatusScreen_CheckConfirm(struct StatusScreen *p)
     if ((gUnk_03005260[1] & 8) || (gUnk_03005260[1] & 1)) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
         {
-            register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_FadeAndExit;
+            register void (*state)(struct StatusScreen *) = StatusScreen_FadeAndExit;
             p->state = state;
         }
         p->timer = 0;
