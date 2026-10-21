@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define WirelessObj_ApplyKnockback sub_0803C940
-
 /* tentative: applies knockback velocity away from attacker and stun timer */
 
 struct Vec3s {

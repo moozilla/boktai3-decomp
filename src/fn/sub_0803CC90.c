@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define WirelessObj_InitCollisionVolumes sub_0803CC90
-
 struct CollisionPoint {
     s32 x : 16;
     s32 y : 16;
@@ -15,7 +13,7 @@ struct WirelessObj {
     u8 bodyVolume[0x40];
     u8 proxVolume[1];
 };
-void sub_0803C940();
+void WirelessObj_ApplyKnockback();
 void sub_0803CB40();
 void ScenePool_OnProximityContact();
 void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(),
@@ -36,7 +34,8 @@ void WirelessObj_InitCollisionVolumes(struct WirelessObj *p)
     offset.x = 0;
     offset.y = -size.y;
     offset.z = 2;
-    SpatialIndex_InitEntry((u8 *)p + 0x56C, &pos, &size, &offset, 21, 5, 1, 0, 12, sub_0803C940, p);
+    SpatialIndex_InitEntry((u8 *)p + 0x56C, &pos, &size, &offset, 21, 5, 1, 0, 12,
+                           WirelessObj_ApplyKnockback, p);
     SpatialIndex_InsertEntry((u8 *)p + 0x56C);
     ((s16 *)&size)[0] = 16;
     eight = 8;
