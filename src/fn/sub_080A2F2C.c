@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
@@ -15,20 +14,21 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-#ifdef NONMATCHING
-// fuzzy: 91.8%
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
 {
     u32 off = 0x2A8;
-    register u32 phase asm("r5");
-    u32 zero = 0;
-    FIELD(a, off, u8) = zero;
+    u32 phase;
+    u32 zero;
+    {
+        u8 *q = &FIELD(a, off, u8);
+        zero = 0;
+        *q = zero;
+    }
     phase = 0x2A9;
     FIELD(a, phase, u8) = zero;
     off += 2;
-    asm("" : "+r"(off));
     FIELD(a, off, u8) = behavior;
     phase += 3;
     FIELD(a, phase, u32) = zero;
@@ -103,7 +103,3 @@ void Spider_ApproachRouteProbe(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_ApproachRouteProbe);
-#endif

@@ -2,16 +2,15 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// Remaining differences: instruction selection and register allocation.
-static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 firstBit)
+static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 firstBit,
+                       u32 pin)
 {
     struct DisplaySequenceState *state = st;
     struct ContactSwarmSprite *sprite = sp;
-    register const volatile u16 *command asm("r6");
+    const volatile u16 *command;
     u32 duration, flags, bit;
-    u32 ended = 0;
+    u32 ended;
+    u32 endFlagTmp;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -24,13 +23,26 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
         register u32 first asm("r1");
         u32 maskBit = firstBit;
         bit = maskBit;
-        asm("" : "+r"(bit));
+        if (pin == 1)
+            asm("" : "+r"(bit));
+        if (pin == 2) {
+            register u32 f2 asm("r1");
+            register u32 inp asm("r0") = input;
+            asm("" : "=r"(f2) : "0"(bit));
+            f2 &= inp;
+            if (f2 != (((*command & 0x30) >> 4) & bit))
+                sprite->flags |= 4;
+            else
+                sprite->flags &= ~4;
+            goto done1;
+        }
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
+    done1:;
     }
     {
         u32 input = state->flags;
@@ -69,13 +81,14 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
                     hold &= flags;
                     if (hold) {
                         state->elapsed = savedDuration;
-                        ended = 1;
+                        goto setEnded;
                     } else {
-                        state->index = state->frameCount - 1;
-                        ended = 1;
+                        endFlagTmp = state->frameCount - 1;
+                        goto storeIndex;
                     }
                 } else {
                     state->index = index - 1;
+                    ended = 0;
                 }
             } else {
                 u32 index = state->index + 1;
@@ -89,16 +102,15 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                            ended = 1;
-                        }
-                    } else {
-                        state->index = 0;
-                        ended = 1;
+                        endFlag = frameCount - 1;
                     }
+                    endFlagTmp = endFlag;
+                storeIndex:
+                    state->index = endFlagTmp;
+                setEnded:
+                    ended = 1;
                 } else {
+                    ended = 0;
                 }
             }
             {
@@ -117,6 +129,8 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
                 if (!(u8)speed)
                     state->duration = 1;
             }
+        } else {
+            ended = 0;
         }
     }
     return ended;
@@ -145,7 +159,7 @@ void Player_UpdatePoseRecovery(struct Player *p)
             }
             Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
                              p->side);
-            Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), 1);
+            Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), 1, 1);
             if (*(u16 *)((u8 *)p + 0x4EC) <= 30) {
                 *(u16 *)((u8 *)p + 0x4EC) = 0;
                 Sound_PlaySong(0x1B0);
@@ -156,13 +170,10 @@ void Player_UpdatePoseRecovery(struct Player *p)
         case 1:
             Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 3, p->heading,
                              p->side);
-            if (Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), phase)) {
+            if (Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), phase, 2)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
             }
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdatePoseRecovery);
-#endif

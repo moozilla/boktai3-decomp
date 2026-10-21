@@ -1,6 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 90.3%
+// fuzzy: 96.6%
 // foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
 struct MotionActorState {
     u8 unknown0[0x68];
@@ -60,7 +61,7 @@ static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u3
 }
 void MotionActor_DispatchRequestedState(struct MotionActor *actor)
 {
-    struct MotionActorState *state;
+    register struct MotionActorState *state asm("r6");
     state = &actor->state;
     actor->flags = 0;
     if (TestActorFlags(actor, 4)) {
