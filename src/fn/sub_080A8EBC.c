@@ -1,5 +1,4 @@
 #include "global.h"
-#define TentacleActor_AssignSegmentPhases sub_080A8EBC
 struct Entry080A8EBC {
     u8 pad0[0x4CC - 0x3D4];
     u16 f4CC;
@@ -19,7 +18,7 @@ inline static u8 TestMask(struct Entry080A8EBC *e, char mask)
         return 1;
     return 0;
 }
-void sub_080A8EBC(struct Body080A8EBC *g)
+void TentacleActor_AssignSegmentPhases(struct Body080A8EBC *g)
 {
     s32 i;
     s32 k = 0;

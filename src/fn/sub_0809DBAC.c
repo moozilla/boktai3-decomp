@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_placement.h"
-#define Lun_PlayResponseAndResetState sub_0809DBAC
 
 static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
 {
