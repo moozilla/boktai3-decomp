@@ -28,8 +28,6 @@ s32 DisplayAnimation_TestFinished(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Actor_OnIdleUpdate(void);
 
-#ifdef NONMATCHING
-// fuzzy: 94.6%
 // a pinned to r2; the shift temp and mask registers still swap
 void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
 {
@@ -42,9 +40,22 @@ void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
         npc->entered = 0;
         npc->done = 0;
         a = npc->angle;
+        asm("" : "+r"(a));
         npc->angle65 = a;
-        npc->bit2 = 7 & ((a + 0x70) >> 5);
-        npc->bit1 = 3 & ((a + 0x60) >> 6);
+        {
+            register s32 t asm("r1") = (a + 0x70) >> 5;
+            register u32 m asm("r0") = 7;
+            asm("" : "+r"(m));
+            npc->bit2 = m & t;
+        }
+        {
+            register s32 t asm("r2") = (a + 0x60) >> 6;
+            register u32 m asm("r0");
+            asm("" : "+r"(t));
+            m = 3;
+            m &= t;
+            npc->bit1 = m;
+        }
         Actor_PlayAnimationEntry(npc, 4, 2, 0, 4);
         two = 2;
         f = npc->flagsC;
@@ -84,6 +95,3 @@ void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081CEE50);
-#endif
