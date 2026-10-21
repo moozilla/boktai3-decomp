@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #define ActorSoundPhase_StopSong Vanargand_StopActionSequence
@@ -35,11 +34,12 @@ static inline u8 SelectPhase(s16 variant)
 void ActorSoundPhase_UpdateConditionalStop(struct ActorSoundPhase *p)
 {
     struct ActorSoundPhase *q = p;
-    asm("" : "+r"(q));
     if (chk(p)) {
         u32 v = SelectPhase(*(s16 *)((u8 *)p + 0x5c2));
-        Vanargand_StopActionSequence((u8 *)q + 0x21C);
-        q->st = v;
+        do {
+            Vanargand_StopActionSequence((u8 *)q + 0x21C);
+            q->st = v;
+        } while (0);
     }
     if (q->af != 0) {
         ScenePanel_UpdatePairConditions(p);
