@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.6%
 // Remaining difference: scratch register of the final next-index address.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -191,8 +189,12 @@ void TwinSpriteEffect_EmitTrail(struct Effect *p)
             u32 off;
             u8 *b;
             register u32 d1 asm("r1");
-            asm("" : "=r"(d1));
-            off = p->next * 0x5c;
+            register u32 d0 asm("r0");
+            u8 *np;
+            asm("" : "=r"(d1), "=r"(d0));
+            np = &p->next;
+            asm("" ::"r"(d0));
+            off = *np * 0x5c;
             asm("" ::"r"(d1));
             asm("" : "+r"(off));
             b = (u8 *)p + 0x58;
@@ -207,7 +209,3 @@ void TwinSpriteEffect_EmitTrail(struct Effect *p)
             p->next = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TwinSpriteEffect_EmitTrail);
-#endif
