@@ -40,8 +40,7 @@ static inline s32 Quarter(s32 value)
 
 #ifdef NONMATCHING
 // fuzzy: 98.0%
-#define Skeleton_UpdateHomingBurst sub_080BAB80
-void sub_080BAB80(struct SceneActorRegistryResetView *p, s32 tick)
+void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
 {
     register u8 *context asm("r2") = p->context;
     if (SceneActorReaction_TakePrepared(p)) {
@@ -95,5 +94,5 @@ void sub_080BAB80(struct SceneActorRegistryResetView *p, s32 tick)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080BAB80);
+INCLUDE_ASM("asm/nonmatching", Skeleton_UpdateHomingBurst);
 #endif

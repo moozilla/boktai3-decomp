@@ -11,12 +11,12 @@ struct RisingActorConfig {
     void (*callback)(void);
 };
 void Memory_Clear(void *, u32);
-void sub_081FD7EC(void);
+void OrbitEffect_FireVolley(void);
 void SunOrb_SetUpdateCallback(struct RisingActorConfig *, void (*)(void));
 void RisingActorConfig_Initialize(struct RisingActorConfig *config)
 {
     Memory_Clear(config, 0x20);
-    SunOrb_SetUpdateCallback(config, sub_081FD7EC);
+    SunOrb_SetUpdateCallback(config, OrbitEffect_FireVolley);
     config->field0 = 0;
     config->duration = 600;
     config->field18 = 4;

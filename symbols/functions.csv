@@ -1457,6 +1457,7 @@ addr,name,mode,confidence,source,notes
 0803D1AC,ScenePool_DestroyActorSlot,thumb,low,src-alias,Releases an inline actor slot's resources and resets its handle during manager destruction
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
 0803D210,ScenePool_IsEntryInSpawnBand,thumb,low,src-alias,Tests whether the entry origin lies 100–200 units outside the selected side's actor bounds
+0803D288,ScenePool_SpawnEntriesNearPlayers,thumb,low,src-alias,
 0803D4D0,ScenePool_DestroyManager,thumb,low,src-alias,Task destruction callback that releases four actor slots and the registry and frees the entry pool
 0803D514,ScenePool_InitializeManager,thumb,low,src-alias,Allocates the configurable entry pool and initializes four actor slots and the registry
 0803D5A8,ScenePool_CreateManager,thumb,low,src-alias,Creates the manager task and installs its update and destruction callbacks
@@ -3418,6 +3419,7 @@ addr,name,mode,confidence,source,notes
 080BA7E4,Skeleton_TickDecayingLunge,thumb,low,src-alias,
 080BA9A0,Skeleton_UpdateAlternateAttackRecovery,thumb,low,src-alias,Plays animation 22 then returns to the timed idle callback; alternate recovery tentative
 080BAA28,SceneActorReaction_TickMultiHitAnimation,thumb,low,src-alias,
+080BAB80,Skeleton_UpdateHomingBurst,thumb,low,src-alias,
 080BAD7C,Skeleton_UpdateHeavyAttackRecovery,thumb,low,src-alias,Plays animation 21 then returns to the timed idle callback; heavy attack interpretation tentative
 080BB4DC,Skeleton_UpdateDownedState,thumb,low,src-alias,Plays animation eight and emits periodic feedback before entering recovery when the timer expires; downed interpretation tentative
 080BB5AC,Skeleton_UpdateRevivalState,thumb,low,src-alias,Plays animation seven and changes flags at frame 40 before completing after frame 120; revival interpretation tentative
@@ -8327,6 +8329,7 @@ addr,name,mode,confidence,source,notes
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,
 081FD704,OrbitEffect_FireProjectileOnContact,thumb,low,src-alias,
 081FD7B0,OrbitEffect_UpdateExpansion,thumb,low,src-alias,Expansion callback increases the radius then starts sound and switches to the active update; effect identity tentative
+081FD7EC,OrbitEffect_FireVolley,thumb,low,src-alias,
 081FDAAC,OrbitEffect_UpdateContraction,thumb,low,src-alias,Contraction callback decreases the radius except during state 26 and reports completion at zero
 081FDAF4,RisingActor_AdvanceHeight,thumb,low,src-alias,
 081FDB40,RisingActor_LowerHeight,thumb,low,src-alias,
