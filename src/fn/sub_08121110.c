@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.6%
-// foundry draft (worker best 87.9%); what differs is mostly register allocation and instruction order
 #define ActorAction_ResetFlags RegistryA8CB_ResetUpdateState
 #define ActorAction_FinishTick RegistryA8CB_UpdateAnimation
 struct ActorActionEntry {
@@ -23,7 +20,7 @@ s32 Callback_InvokeActor(void *, void *);
 s32 ActorAction_RunActiveCallbacks(struct ActorActionRunner *actor)
 {
     struct ActorActionEntry *action = &actor->action;
-    struct ActorActionRunner *object = (struct ActorActionRunner *)actor->object;
+    struct ActorActionEntry *object = (struct ActorActionEntry *)actor->object;
     s32 i = 0;
     do {
         if (action->active == 1) {
@@ -31,11 +28,10 @@ s32 ActorAction_RunActiveCallbacks(struct ActorActionRunner *actor)
             Callback_InvokeActor(object, action->callback);
             RegistryA8CB_UpdateAnimation(object);
         }
-        action++;
+        do {
+            action++;
+        } while (0);
         object++;
     } while (--i >= 0);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorAction_RunActiveCallbacks);
-#endif

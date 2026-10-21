@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.1%
-// foundry draft (worker best 94.1%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gTaskInput gUnk_03005260
 struct CallbackTask {
     u8 pad0[0x1C];
@@ -30,14 +28,14 @@ s32 CallbackTask_Update(struct CallbackTask *task)
         return 0;
     if (task->completed)
         return 0;
-    if (task->result)
-        return 0;
+    {
+        register u32 r asm("r2") = task->result;
+        if (r)
+            return 0;
+    }
     if (gUnk_03005260[1] & 2) {
         task->completed = 1;
         task->arg2 = 1;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackTask_Update);
-#endif
