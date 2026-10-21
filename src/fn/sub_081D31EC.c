@@ -1,8 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// Only register allocation of the two per-iteration constants (0 and 0xff) differs: original uses r6/r3, here r3/r6.
 
 struct CloudPair {
     u32 x, z;
@@ -87,11 +84,14 @@ u32 sub_081D31EC(u8 *p)
     e = (struct CloudParticle *)(p + 0x30);
     for (i = 39; i >= 0; i--, e = (struct CloudParticle *)((u8 *)e + 0x48)) {
         if (e->kind) {
-            u32 value = e->timer + 1;
-            u32 mask, zero;
-            e->timer = value;
+            register u32 value asm("r0") = e->timer + 1;
+            register u32 zero asm("r6");
+            register u32 mask asm("r3");
             zero = 0;
+            asm("" : "+r"(zero));
+            e->timer = value;
             mask = 0xff;
+            asm("" : "+r"(mask), "+r"(value));
             if ((u8)value >= gUnk_086126C8[e->frame]) {
                 e->timer = zero;
                 value = e->frame + 1;
@@ -109,6 +109,3 @@ u32 sub_081D31EC(u8 *p)
     *(u32 *)(p + 0x18) += 1;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D31EC);
-#endif

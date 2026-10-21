@@ -1,21 +1,9 @@
 #include "global.h"
 #include "level_advance_display.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.9%
-// foundry draft (worker best 90.9%); what differs is mostly register allocation and instruction order
-#define ParticleSprite_SetOffset   Effect_SetOrigin
-#define ParticleSprite_SetResource SpriteDrawable_SelectTileFrame
-#define ResourceSlots_Load         Palette_CacheReservedObjectBank
-#define SpriteQueue_Insert         Effect_LinkToList
-#define gSpritePaletteData         gUnk_030042E4
 u32 Palette_CacheReservedObjectBank(u32, void *);
 s32 Effect_LinkToList(struct LevelAdvanceParticle *, u32);
 extern u8 *gUnk_030042E4;
-static inline u8 selectQueue(u32 flags)
-{
-    return (flags & 0x80) != 0;
-}
 void ParticleSprite_Initialize(struct LevelAdvanceParticle *sprite, void *resource, u32 flags)
 {
     u32 zero = sprite->queued;
@@ -32,13 +20,10 @@ void ParticleSprite_Initialize(struct LevelAdvanceParticle *sprite, void *resour
         sprite->paletteSlot = Palette_CacheReservedObjectBank(
             *(u16 *)((u8 *)resource + 6), gUnk_030042E4 + (*(u16 *)((u8 *)resource + 6) << 5));
         {
-            u32 queue = selectQueue(flags);
+            u32 queue = (u32)(-(flags & 0x80)) >> 31;
             sprite->previous = (void *)zero;
             sprite->next = (void *)zero;
             Effect_LinkToList(sprite, queue);
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ParticleSprite_Initialize);
-#endif

@@ -1,10 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// Open: only register choice differs; the ROM keeps each scaled delta in the
-// register that held the speed factor (r4/r1), mine picks r1/r2.
 struct SweepSprite2 {
     u32 flags;
     u8 pad4[0x14];
@@ -47,16 +44,15 @@ void sub_08235E20(struct SweepSprite2 *p, void *anim)
     p->direction += p->turn;
     {
         u32 force = p->speed;
-        s32 delta = scale(gUnk_086149C4[(p->direction + 64) & 255] * force);
+        register s32 delta asm("r4") = scale(gUnk_086149C4[(p->direction + 64) & 255] * force);
+        asm("" : "+r"(delta));
         p->x = p->baseX + delta;
     }
     {
         u32 force = p->speed;
-        s32 delta = scale(gUnk_086149C4[p->direction] * force);
+        register s32 delta asm("r1") = scale(gUnk_086149C4[p->direction] * force);
+        asm("" : "+r"(delta));
         p->z = p->baseZ + delta;
     }
     p->y += p->rise;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08235E20);
-#endif

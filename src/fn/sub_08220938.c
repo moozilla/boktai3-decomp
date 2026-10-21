@@ -1,6 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91%
+// fuzzy: 97.1%
+// Open: reload of the hoisted flag-mask (sb) after the calls uses r1, ROM uses r2.
 struct Node {
     struct Node *next;
     u16 id;
@@ -26,40 +28,50 @@ void Collision_ProcessPairs(struct Node **listA, struct Node **listB)
     struct Node *cur;
     struct Node *other;
     int new_var;
+    register u32 two asm("sb");
     PositionList_UpdateTranslatedCoordinates(listA);
     cur = *listA;
     while (cur != 0) {
         a = cur;
         cur = a->next;
         b = *listB;
-        while (b != 0) {
-            other = b;
-            b = other->next;
-            if ((a->mask & other->mask) != 0)
-                continue;
-            if ((other->flags & 4) != 0)
-                continue;
-            if (other->id != 0 && other->id == a->id)
-                continue;
-            if ((a->flags & 1) == 0 && (other->flags & 1) != 0)
-                continue;
-            if ((a->flags & 0x1000) != 0 && (other->flags & 0x1000) == 0)
-                continue;
-            if (sub_08249240(a, other, Box_Overlaps) == 0)
-                continue;
-            other->f3e = 0;
-            new_var = 0x200000;
-            if ((a->f34 & new_var) != 0) {
-                if ((a->flags & 2) == 0 && other->cb != 0)
-                    sub_08249244(a, other, other->arg, other->cb);
-                if ((other->flags & 2) == 0 && a->cb != 0)
-                    sub_08249244(a, other, a->arg, a->cb);
-            } else {
-                if ((other->flags & 2) == 0 && a->cb != 0)
-                    sub_08249244(a, other, a->arg, a->cb);
-                if ((a->flags & 2) == 0 && other->cb != 0)
-                    sub_08249244(a, other, other->arg, other->cb);
+        if (b != 0) {
+            {
+                register u32 t asm("r2") = 2;
+                asm("" : "+r"(t));
+                two = t;
             }
+            asm("" : "+r"(two));
+            do {
+
+                other = b;
+                b = other->next;
+                if ((a->mask & other->mask) != 0)
+                    continue;
+                if ((other->flags & 4) != 0)
+                    continue;
+                if (other->id != 0 && other->id == a->id)
+                    continue;
+                if ((a->flags & 1) == 0 && (other->flags & 1) != 0)
+                    continue;
+                if ((a->flags & 0x1000) != 0 && (other->flags & 0x1000) == 0)
+                    continue;
+                if (sub_08249240(a, other, Box_Overlaps) == 0)
+                    continue;
+                other->f3e = 0;
+                new_var = 0x200000;
+                if ((a->f34 & new_var) != 0) {
+                    if ((a->flags & two) == 0 && other->cb != 0)
+                        sub_08249244(a, other, other->arg, other->cb);
+                    if ((other->flags & two) == 0 && a->cb != 0)
+                        sub_08249244(a, other, a->arg, a->cb);
+                } else {
+                    if ((other->flags & two) == 0 && a->cb != 0)
+                        sub_08249244(a, other, a->arg, a->cb);
+                    if ((a->flags & two) == 0 && other->cb != 0)
+                        sub_08249244(a, other, other->arg, other->cb);
+                }
+            } while (b != 0);
         }
     }
 }
