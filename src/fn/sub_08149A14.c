@@ -3,7 +3,7 @@
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
 #ifdef NONMATCHING
-// fuzzy: 97.3%
+// fuzzy: 98.6%
 // Remaining differences: instruction selection and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -166,47 +166,52 @@ void Player_UpdateRecoilMotion(struct Player *p)
     Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
                      p->side);
     Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
-    if (H(0x270)) {
-        if (B(0x479)) {
-            Approach(p);
-            if (H(0x45A) <= 5) {
-                if (!(H(0x45A) & 1)) {
-                    Sound_PlaySong(0x191);
-                    RisingSprite_Spawn((u8 *)p + 0x30);
+    {
+        u32 off270 = 0x270;
+        u16 *q270 = (u16 *)((u8 *)p + off270);
+        if (*q270) {
+            if (B(0x479)) {
+                Approach(p);
+                if (H(0x45A) <= 5) {
+                    if (!(H(0x45A) & 1)) {
+                        Sound_PlaySong(0x191);
+                        RisingSprite_Spawn((u8 *)p + 0x30);
+                    }
+                    H(0x45A)++;
                 }
-                H(0x45A)++;
-            }
-        } else if (B(0x47B)) {
-            Approach(p);
-            if (H(0x45A) <= 5) {
-                if (!(H(0x45A) & 1)) {
-                    Sound_PlaySong(0x191);
-                    SparkParticle_Spawn((u8 *)p + 0x30, 1, 0, 0, 0, 12, 2, 2);
+            } else if (B(0x47B)) {
+                Approach(p);
+                if (H(0x45A) <= 5) {
+                    if (!(H(0x45A) & 1)) {
+                        Sound_PlaySong(0x191);
+                        SparkParticle_Spawn((u8 *)p + 0x30, 1, 0, 0, 0, 12, 2, 2);
+                    }
+                    H(0x45A)++;
                 }
+            } else if (B(0x489)) {
+                Approach(p);
                 H(0x45A)++;
+            } else {
+                s32 angle = ((p->facing + 5) & 7) << 5;
+                SH(0x38) = -Scale(gUnk_086149C4[(angle + 64) & 255] * H(0x270));
+                SH(0x3C) = -Scale(gUnk_086149C4[angle] * H(0x270));
             }
-        } else if (B(0x489)) {
-            Approach(p);
-            H(0x45A)++;
+            Camera_RequestShake(H(0x270));
+            H(0x270) = H(0x270) * 3 >> 2;
         } else {
-            s32 angle = ((p->facing + 5) & 7) << 5;
-            SH(0x38) = -Scale(gUnk_086149C4[(angle + 64) & 255] * H(0x270));
-            SH(0x3C) = -Scale(gUnk_086149C4[angle] * H(0x270));
+            H(0x270) = 0;
+            B(0x479) = 0;
+            B(0x47B) = 0;
+            B(0x489) = 0;
+            B(0x4BA) = 0;
+            if (B(0x5B9) == 3 && B(0x5BB))
+                ActorSequence_Begin(p, 22, 0);
+            else {
+                Player_UpdateFacingSide(p);
+                ActorSequence_Begin(p, 0, 0);
+            }
         }
-        Camera_RequestShake(H(0x270));
-        H(0x270) = H(0x270) * 3 >> 2;
-    } else {
-        H(0x270) = 0;
-        B(0x479) = 0;
-        B(0x47B) = 0;
-        B(0x489) = 0;
-        B(0x4BA) = 0;
-        if (B(0x5B9) == 3 && B(0x5BB))
-            ActorSequence_Begin(p, 22, 0);
-        else {
-            Player_UpdateFacingSide(p);
-            ActorSequence_Begin(p, 0, 0);
-        }
+        asm("" ::"r"(off270));
     }
 }
 #else

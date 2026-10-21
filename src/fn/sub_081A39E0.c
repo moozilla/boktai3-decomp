@@ -5,7 +5,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 96.2%
+// fuzzy: 96.9%
 // Remaining differences: register choices in angle, animation and trail setup.
 struct Types {
     u32 values[4];
@@ -106,8 +106,10 @@ static inline void Animate(struct Entry *p)
         register u32 mask asm("r3") = 2;
         register u32 left asm("r1");
         asm("" : "+r"(input));
-        left = (u8)(mask & input);
-        asm("" : "+r"(left) : "r"(input));
+        left = mask;
+        left &= input;
+        asm("" : "+r"(left));
+        left = (u8)left;
         if (left != (((*entry & 0x30) >> 4) & mask))
             p->flags |= 8;
         else
@@ -159,7 +161,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
         diff -= heading;
         angleMask = 255;
         asm("" : "+r"(angleMask), "+r"(diff));
-        diff &= angleMask;
+        *(&diff) &= angleMask;
         if (diff > 128) {
             diff = angleMask - diff;
             reverse = 1;
