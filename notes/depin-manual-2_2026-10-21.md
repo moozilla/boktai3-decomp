@@ -21,6 +21,7 @@ Method: depin.py --write over all files (only LinkMenu_WaitSelectionMode lost a 
 * DirectionalActor_TryBeginState (08184FE8): two early returns instead of `goto begin` + volatile cast + clobber.
 * ScenePool_SelectRepeatedDirection (0803D78C), ScenePool_SelectInitialDirection (0803D680): Memory_Clear called through `static inline void ClearHistory(int size, u32 *p)` (size first, found by permuter) and a literal `state = 1`; replaces both r0 pins.
 * AnimatedBodyPool_Destroy (0812286C): `bodies` declared inside the loop body.
+* MotionPool_InitializeSlot (080454C8): permuter; CpuSet via a mode-first inline wrapper plus a copy of the slot pointer for the collider; replaces the +r barrier.
 
 ## Fewer hints
 
