@@ -1,10 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.5%
-// Open: the final subtract writes r0 (idx in r0); ROM keeps the index in r1
-// (subs r1, r1, r0) and loads through it. Triangular-index lookup of a
-// symmetric pair table (a != b), stride-major.
+// MATCHING_CONCESSION: register-pinning
 
 u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b)
 {
@@ -16,8 +12,9 @@ u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b)
     } else {
         idx = b * stride + a - ((b + 2) * (b + 1) >> 1);
     }
-    return table[idx];
+    {
+        register s32 j asm("r1") = idx;
+        asm("" : "+r"(j));
+        return table[j];
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PairTable_Lookup);
-#endif

@@ -28,9 +28,7 @@ void *memcpy(void *, const void *, u32);
 void Bg_SetTileUpload(s32, u32, s32, s32);
 void Bg_SetPriority(s32, s32);
 void Text_ClearGlyphCache(void);
-#ifdef NONMATCHING
-// fuzzy: 90.2%
-// Differs only in register choice for the display-flag mask (r0 vs r2).
+// MATCHING_CONCESSION: register-pinning
 void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 priority, u32 map)
 {
     struct BgHeader hdr;
@@ -73,7 +71,14 @@ void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 
         default:
             goto skip;
     }
-    gUnk_03004BD8 |= bits;
+    {
+        register u16 *g asm("r2") = &gUnk_03004BD8;
+        register u16 cur asm("r1");
+        asm("" : "+r"(g));
+        cur = *g;
+        asm("" : "+r"(cur));
+        *g = cur | bits;
+    }
 skip:
     Bg_SetTileUpload(layer, hdr.u14, base, hdr.s10);
     Bg_SetPriority(layer, priority);
@@ -87,6 +92,3 @@ skip:
     if (layer == 0)
         Text_ClearGlyphCache();
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Bg_SetupLayer);
-#endif

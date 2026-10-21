@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// foundry draft (worker best 97.9%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 s32 SceneHud_TickPaletteBlend(void *);
 void SceneHud_RefillActionStatB(void);
@@ -19,8 +17,10 @@ void SceneHud_TickActionResult(struct SceneHudState *s)
     }
     frame = s->actionTransferDelay;
     {
-        s32 mask = 7;
-        s32 phase = mask;
+        register s32 mask asm("r1") = 7;
+        register s32 phase asm("r2");
+        asm("" : "+r"(mask));
+        phase = mask;
         phase &= frame;
         if (phase < mask - (s32)(frame >> 3))
             s->motionWidgets[14].flags |= 1;
@@ -30,6 +30,3 @@ void SceneHud_TickActionResult(struct SceneHudState *s)
     if (++s->actionTransferDelay > 55)
         Hud_SetInteractionCallback(s, SceneHud_RefillActionStatB, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_TickActionResult);
-#endif
