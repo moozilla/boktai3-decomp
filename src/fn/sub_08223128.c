@@ -1,20 +1,15 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.2%
-// foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
 #define gSerialConnectionRole gUnk_0300531C
 #define gSerialTransferStatus gUnk_03005324
 extern s32 gUnk_0300531C, gUnk_03005324;
 void Serial_CheckMultiplayerReady(void)
 {
-    u16 status;
-    u16 mask;
+    u32 status;
     gUnk_0300531C = -1;
     gUnk_03005324 = 0;
-    mask = 0x88;
     status = *(vu16 *)0x04000128;
-    if ((u16)(status & mask) != 8) {
+    if ((u16)(status & 0x88) != 8) {
         gUnk_03005324 = -1;
     } else {
         if ((u16)(status & 4) == 0)
@@ -24,6 +19,3 @@ void Serial_CheckMultiplayerReady(void)
         *(vu16 *)0x0400012A = 0x4000;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Serial_CheckMultiplayerReady);
-#endif
