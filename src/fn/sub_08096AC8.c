@@ -1,6 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 98.0%
+// fuzzy: 98.7%
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain.h"
 #define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
@@ -19,8 +20,9 @@ void Ghost_StartMovementToPosition(void *, void *);
 void Ghost_SetMovementEndpoints(void *, void *);
 static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
 {
-    u32 zero = 0;
+    u32 zero;
     a->field2B2 = 1;
+    zero = 0;
     a->field2B0 = zero;
     a->field2B5 = kind;
     a->target = cb;
@@ -59,7 +61,12 @@ static inline void Endpoint(u8 *path, struct ContactPosition *pos)
     pos->z = FIELD(path, 8, u16 *)[1];
     pos->y = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(pos), pos);
 }
-static inline void Clear(void *dest, u32 *zero)
+static inline void Clear(u8 *base, u32 off, u32 *zero)
+{
+    *zero = 0;
+    CpuSet(zero, base + off, 0x05000002);
+}
+static inline void Clear2(void *dest, u32 *zero)
 {
     *zero = 0;
     CpuSet(zero, dest, 0x05000002);
@@ -71,19 +78,24 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
     struct ContactPosition pos;
     u32 zero;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        u8 angle;
+        u32 angle;
+        u32 n;
         Control(actor, sub_08096000, 0x24);
         Bee_ConsumeFlag80(actor);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        angle = *(u8 *)&gUnk_0203B400[gUnk_03005308];
-        Clear(context + 0x5FC, &zero);
+        gUnk_03005308 = n = (gUnk_03005308 + 1) & 1023;
+        angle = *(u8 *)&gUnk_0203B400[n];
+        {
+            register u32 off asm("r0") = 0x5FC;
+            asm("" : "+r"(off));
+            Clear2(context + off, &zero);
+        }
         FIELD(actor, 0x2EC, s16) = Scale(gUnk_086149C4[angle] * 64);
         FIELD(actor, 0x2F0, s16) = Scale(gUnk_086149C4[(angle + 64) & 255] * 64);
         actor->direction = Math_Atan2(FIELD(actor, 0x2EC, s16), FIELD(actor, 0x2F0, s16)) - 128;
     }
     if (actor->field2B0) {
         Bee_ClearActionFlags(actor);
-        Clear((u8 *)actor + 0x2EC, &zero);
+        Clear2((u8 *)actor + 0x2EC, &zero);
         State(actor, 0, 0, 2);
         Control(actor, SceneActorControl_OnIdle, 16);
         {
