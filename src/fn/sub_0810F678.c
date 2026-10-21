@@ -14,7 +14,7 @@ void Bg_ClearTilemap(s32);
 void Registry33FF_LoadBackground(struct RecordMenu *);
 void LinkLobbyPanel_InitGlyphFrames(struct RecordMenu *);
 void RecordMenu_InitializeSprites(struct RecordMenu *);
-void sub_0810F0A0(struct RecordMenu *);
+void RecordMenu_LoadPlayerSprites(struct RecordMenu *);
 void RecordMenu_PositionSprites(struct RecordMenu *);
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void Registry33FF_CreateTextWindows(struct RecordMenu *);
@@ -76,7 +76,7 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
         Registry33FF_LoadBackground(menu);
         LinkLobbyPanel_InitGlyphFrames(menu);
         RecordMenu_InitializeSprites(menu);
-        sub_0810F0A0(menu);
+        RecordMenu_LoadPlayerSprites(menu);
         RecordMenu_PositionSprites(menu);
         ModifierMenu_InitSelectionSnapshot(menu->textPanel, menu->paletteResource);
         Registry33FF_CreateTextWindows(menu);
