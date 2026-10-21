@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.8%
-// Trail addressing and mask-register allocation still differ.
+// fuzzy: 98.6%
+// Remaining difference: scratch register of the final next-index address.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -62,7 +62,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        register u32 mask asm("r5");
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -166,19 +166,37 @@ void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
 void TwinSpriteEffect_EmitTrail(struct Effect *p)
 {
     if (!Mod(p->frame, p->interval)) {
-        register struct Sprite *sprite asm("r5");
+        struct Sprite *sprite;
         struct Anim *anim;
-        Anim_SetSequence(&p->trail[p->next].anim, p->resource, 1, 0, 0);
+        register u32 k asm("r4");
         {
+            u32 idx = p->next;
+            k = 0x5c;
+            asm("" : "+r"(k));
+            Anim_SetSequence((void *)(idx * k + (u32)p + 0x84), p->resource, 1, 0, 0);
+        }
+        {
+            register u32 sp asm("r5");
             u32 index = p->next;
-            sprite = (void *)((u8 *)p + index * 0x5c + 0x3c);
-            anim = (void *)((u8 *)p + index * 0x5c + 0x84);
-            asm("" : "+r"(sprite), "+r"(anim));
+            sp = index;
+            sp = sp * k;
+            sp = sp + (u32)p;
+            sprite = (void *)(sp + 0x3c);
+            k = k * index;
+            anim = (void *)(k + (u32)p + 0x84);
         }
         Step(sprite, anim);
         {
-            struct Packed *dest = (void *)((u8 *)p + 0x58);
-            dest = (void *)((u8 *)dest + p->next * 0x5c);
+            struct Packed *dest;
+            u32 off;
+            u8 *b;
+            register u32 d1 asm("r1");
+            asm("" : "=r"(d1));
+            off = p->next * 0x5c;
+            asm("" ::"r"(d1));
+            asm("" : "+r"(off));
+            b = (u8 *)p + 0x58;
+            dest = (void *)(b + off);
             *dest = *(struct Packed *)&p->position;
         }
         p->trail[p->next].sprite.flags &= ~1;
