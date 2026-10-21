@@ -2818,6 +2818,7 @@ addr,name,mode,confidence,source,notes
 08074600,SceneActorProfiles_FindOrAdd,thumb,low,src-alias,
 0807462C,SceneActorRegistry_RegisterCategoryReceiver,thumb,low,src-alias,
 08074698,SceneActorRoute_AdvanceActorPoint,thumb,low,src-alias,
+080747B8,SceneActorMovement_UpdateAirborne,thumb,low,src-alias,
 08074A98,SceneActorMovement_UpdateHeight,thumb,low,src-alias,
 08074BF4,SceneActorCollision_InitBody,thumb,low,src-alias,
 08074C64,SceneActorCollision_InitBodyWithFlags,thumb,low,src-alias,

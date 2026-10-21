@@ -5,7 +5,7 @@
 #include "scene_actor_motion.h"
 #include "game_state.h"
 #include "repeated_effect.h"
-void sub_080747B8(struct SceneActorMotionView *);
+void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *);
 struct SceneActorRegistryResetView;
 void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
@@ -230,7 +230,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
         if (unavailable)
             return 1;
     }
-    sub_080747B8(actor);
+    SceneActorMovement_UpdateAirborne(actor);
     {
 
         register u32 *flags;
