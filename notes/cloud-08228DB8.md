@@ -22,8 +22,12 @@ Both matched exactly on 2026-10-20; the work is written up as a devlog artifact
   `movs rD, #K` before the compare that the ROM has (53 -> 18).
 * **A first operand loaded before the flag is a local.** The ROM's
   `ldrb r0, [m]; movs r3, #0; ldrb r1, [mB]` needs `u8 m = C.baseMinute;
-  day = 0; if (m < C.minuteB) ...`: the local's load comes first and
-  local-alloc's update_equiv_regs moves the second load down to its use.
+  day = 0; if (m < C.minuteB) ...`: the local's load is emitted first. The
+  second operand's load is folded into the compare by combine (Thumb has no
+  compare with memory), and reload re-emits it just before the `cmp`, after
+  the preset. Seen in the pass dumps of a toy leaf (`tools/rtlprobe.py dump`):
+  the load and its zero-extension merge into the compare in `.combine`, and
+  `.greg` has the load back as a new insn ahead of the compare.
 * **`ldr r0, =X; ...; adds r4, r0, #0` is a reaching-register copy.**
   Accessing `gUnk_03005430.field` directly (no pointer local) gave the copy;
   with `struct SunClock *c` there is none.
