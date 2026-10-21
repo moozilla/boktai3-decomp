@@ -1,8 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define gActorStateCallbacks gUnk_0824EF10
 
@@ -36,8 +34,11 @@ void ActorController_UpdateAnimation(u8 *p)
     if (Anim_Step(anim, p + 0x94))
         *finished = 1;
     {
-        u32 one = 1;
-        if (TestFlag(p + 0xD1, one))
+        u32 one;
+        u8 *q = p + 0xD1;
+        u32 r = *(volatile u8 *)q;
+        one = 1;
+        if (one & r)
             *finished = one;
         if (*(u16 *)(p + 0xB32) & 0x800)
             anim->flags |= one;
@@ -50,6 +51,3 @@ void ActorController_UpdateAnimation(u8 *p)
         anim->flags &= ~0x200;
     p[0xB42]++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorController_UpdateAnimation);
-#endif
