@@ -176,8 +176,7 @@ static inline void StepPlayback(struct Obj *sprite, struct Anim *state, u32 one)
         }
     }
 }
-#define SpriteParticle_Emit sub_081FF09C
-s32 sub_081FF09C(struct Params *params, struct Pos *pos)
+s32 SpriteParticle_Emit(struct Params *params, struct Pos *pos)
 {
     struct Pool *pool = gUnk_020005F0;
     struct Entry *e;

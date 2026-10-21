@@ -1,5 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#define Task4E01_UpdateTrailImpact sub_081D8934
 #include "global.h"
 void *ResourceRegistry_GetResource(u16);
 void Task4E01_ClearTrailSprites(void *);
