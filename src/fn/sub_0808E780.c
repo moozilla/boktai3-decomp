@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#ifdef NONMATCHING
-// fuzzy: 98.9%
 // Open: `movs r2, #0` is scheduled after the first address computation in the original.
 void sub_0808E780(struct SceneActorRegistryResetView *actor)
 {
@@ -10,10 +9,15 @@ void sub_0808E780(struct SceneActorRegistryResetView *actor)
         Anim_SetDurationScale((u8 *)actor->drawable + 0x48, 0x40);
     }
     if (actor->field2B3) {
-        Chase_SetState(actor, 0, 0, 0);
+        u8 *q = &actor->state2A8;
+        u32 z;
+        asm("" : "+r"(q));
+        z = 0;
+        *q = z;
+        actor->phase2A9 = z;
+        actor->behavior2AA = z;
+        actor->counter2AC = z;
+        actor->field2B1 = 1;
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0808E780);
-#endif
