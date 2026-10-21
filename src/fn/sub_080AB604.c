@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.4%
-// foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32, s32);
 struct ActorReactionTarget {
     u8 unknown0[0xC];
@@ -15,6 +12,9 @@ struct ActorReactionSensor {
     u8 flags;
     u32 unknown10;
     u32 distance, range;
+};
+struct ActorReactionDelta {
+    s16 x, y, z;
 };
 struct ActorReactionContext {
     u8 unknown0[0x8E8];
@@ -31,13 +31,11 @@ static inline u8 HasReactionFlag(struct SceneActorRegistryResetView *s)
 s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
 {
     u32 range;
-    struct {
-        s16 v[3];
-    } delta;
-    struct ActorReactionSensor *sensor;
+    struct ActorReactionDelta delta;
+    struct ActorReactionSensor *sensor, *sensor2;
     struct ActorReactionTarget *target;
     s32 angle, height;
-    s16 *out;
+    struct ActorReactionDelta *out;
     struct ActorReactionContext *context;
     if (!HasReactionFlag(s))
         return 0;
@@ -46,26 +44,32 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
         u32 mask = -3;
         sensor->flags &= mask;
     }
-    if (s->field2B5 == 0x27)
-        range = s->rangeF4 * 2;
-    else
-        range = s->rangeF4;
+    {
+        u32 kind = s->field2B5;
+        sensor2 = sensor;
+        if (kind == 0x27)
+            range = s->rangeF4 * 2;
+        else
+            range = s->rangeF4;
+    }
     if (s->distanceF0 > range)
         return 0;
     {
         const s16 *own;
         const s16 *other;
-        out = delta.v;
+        struct ActorReactionTarget *t;
+        out = &delta;
         own = (const s16 *)&s->position;
-        other = (const s16 *)&sensor->target->position;
-        out[0] = other[0] - own[0];
-        out[1] = other[1] - own[1];
-        out[2] = other[2] - own[2];
+        t = sensor2->target;
+        other = (const s16 *)&t->position;
+        delta.x = *(s16 *)((u8 *)t + 0xc) - own[0];
+        out->y = other[1] - own[1];
+        out->z = other[2] - own[2];
     }
-    angle = ((Math_Atan2(delta.v[0], out[2]) + 0x10) & 0xFF) >> 6;
+    angle = ((Math_Atan2(delta.x, out->z) + 0x10) & 0xFF) >> 6;
     if (angle != (((s->direction + 0x10) & 0xFF) >> 6))
         return 0;
-    height = out[1];
+    height = out->y;
     if (height < 0)
         height = -height;
     if (height > 0x1FF)
@@ -75,6 +79,3 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
     context->request = 0xE;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_TryRequestFacingReaction);
-#endif
