@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 86.1%
-// foundry draft (worker best 86.1%); what differs is mostly register allocation and instruction order
 #define SceneActorAttachment_UpdatePosition SpriteComponent_Update
 struct SceneActorAttachmentPosition {
     u32 xy, z;
@@ -27,17 +25,29 @@ void SpriteComponent_Update(struct SceneActorAttachment *p)
     if (p->flags & 1)
         Sound_PlaySong(0x202);
     p->flags &= ~1;
-    p->position = p->targetPosition;
+    {
+        register u32 a asm("r2") = p->targetPosition.xy;
+        register u32 b asm("r3") = p->targetPosition.z;
+        p->position.xy = a;
+        p->position.z = b;
+        asm("" ::"r"(a), "r"(b));
+    }
     {
         u32 offset = p->sortOffset;
-        s8 base = -0x60;
-        s32 order = base;
+        register s32 base asm("r5") = -0x60;
+        s32 order;
+        asm("" : "+r"(base));
+        order = base;
+        asm("" : "+r"(order));
         order -= offset;
+        asm("" ::"r"(base));
         p->sortOrder = order;
     }
-    p->colliderPosition = p->targetPosition;
+    {
+        register u32 a asm("r2") = p->targetPosition.xy;
+        register u32 b asm("r3") = p->targetPosition.z;
+        p->colliderPosition.xy = a;
+        p->colliderPosition.z = b;
+    }
     Collider_Refresh(p->colliderHeader);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteComponent_Update);
-#endif
