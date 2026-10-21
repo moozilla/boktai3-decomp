@@ -1,7 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 98.2%
 // foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
 // Temporary compatibility aliases for the local ELF's pre-promotion symbols.
 
@@ -53,27 +51,30 @@ void PreviewActor_ReplaceProjectileTowardPlayer(struct PreviewProjectileContact 
     u8 params[0x58];
     s16 origin[4], target[4];
     struct PreviewProjectileOwner *owner = contact->owner;
+    struct PositionWords *new_var;
+    struct PositionWords *new_var3;
+    s16 *new_var2;
     u8 angle;
     s16 *originPtr, *targetPtr;
     if ((contact->flags & 1) && (contact->contactFlags & 0x210) == 0x10 &&
         !(contact->targetFlags & 0x100)) {
-        originPtr = (s16 *)CopyPosition(
-            (struct PositionWords *)origin,
-            (struct PositionWords *)Task4E01_GetEntryPosition(owner->projectileIndex));
+        new_var3 = (struct PositionWords *)Task4E01_GetEntryPosition(owner->projectileIndex);
+        new_var2 = (s16 *)origin;
+        new_var = (struct PositionWords *)new_var2;
+        originPtr = (s16 *)CopyPosition(new_var, new_var3);
         if (Task4E01_RemoveEntry(owner->projectileIndex) == 0) {
-            targetPtr = (s16 *)CopyPosition((struct PositionWords *)target,
-                                            (struct PositionWords *)Player_GetEffectivePosition(0));
+            new_var2 = originPtr;
+            new_var3 = (struct PositionWords *)Player_GetEffectivePosition(0);
+            new_var = (struct PositionWords *)target;
+            targetPtr = (s16 *)CopyPosition(new_var, new_var3);
             targetPtr[1] += 128;
-            angle = Math_Atan2(targetPtr[0] - originPtr[0], targetPtr[2] - originPtr[2]);
+            angle = Math_Atan2(targetPtr[0] - new_var2[0], targetPtr[2] - new_var2[2]);
             Projectile_InitializeParams(params);
             Projectile_SetFlightParams(params, 0x8000, 90, angle, 36);
             Projectile_SetDamageParams(params, 0, 0, actor->damage, actor->damage2, actor->damage3);
             Projectile_SetTypeAndElement(params, 1, 6);
-            if (Projectile_Spawn(params, (struct SceneVec *)originPtr) >= 0)
+            if (Projectile_Spawn(params, (struct SceneVec *)new_var2) >= 0)
                 Sound_PlaySong(0x56e);
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PreviewActor_ReplaceProjectileTowardPlayer);
-#endif
