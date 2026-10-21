@@ -8406,6 +8406,7 @@ addr,name,mode,confidence,source,notes
 08200288,PlayerClone_SetAnimation,thumb,low,src-alias,
 08200324,PlayerClone_OnBodyColliderContact,thumb,low,src-alias,
 082003B8,PlayerClone_OnPassiveColliderContact,thumb,low,src-alias,Empty contact callback installed on the clone's passive colliders
+082003BC,PlayerClone_UpdateBehavior,thumb,low,src-alias,
 08200A10,PlayerClone_InitSlot,thumb,low,src-alias,Initializes a pooled Django-sprite instance with animation resources and four colliders; clone identity is tentative
 08200C40,PlayerClone_ReleaseSlot,thumb,low,src-alias,Stops instance effects and clears its occupancy bit while decrementing the active count
 08201024,PlayerClone_DestroyPool,thumb,low,src-alias,Removes all three slots' colliders and animation tasks and clears the singleton pointer
@@ -8481,6 +8482,7 @@ addr,name,mode,confidence,source,notes
 08206098,Ooze_InitializeFromScript,thumb,low,src-alias,
 08206470,Ooze_Create,thumb,medium,gcl-name,name from GCL key DA0E ウーズ (Ooze); registry callback
 082064B4,VulcanCannon_RecordDefeat,thumb,low,src-alias,Calls the death script and records event flag 35 and defeat statistics
+082066FC,VulcanCannon_ApplyHitReaction,thumb,low,src-alias,
 082068A4,VulcanCannon_InitCollider,thumb,low,src-alias,Initializes the cannon collider and installs its collision callback
 08206944,VulcanCannon_ReadScriptValueList,thumb,low,src-alias,Reads a counted list of up to eight signed values from the stored script pointer
 082069A8,VulcanCannon_FireProjectile,thumb,low,src-alias,

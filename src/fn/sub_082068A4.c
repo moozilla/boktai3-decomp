@@ -10,7 +10,7 @@ void Collider_Init(u8 *, u16, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
-void sub_082066FC(void);
+void VulcanCannon_ApplyHitReaction(void);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 struct Q {
     u8 pad[6];
@@ -27,7 +27,7 @@ void VulcanCannon_InitCollider(u8 *p)
     *(u32 *)&b.b &= 0xffff0000;
     Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
     Collider_SetPosition(q, p + 0x88, 0);
-    Collider_SetCallback(q, sub_082066FC, p);
+    Collider_SetCallback(q, VulcanCannon_ApplyHitReaction, p);
     Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x146), *(u16 *)(p + 0x148));
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;
