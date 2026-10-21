@@ -84,8 +84,9 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void Vector(struct HomingVec *v, s32 angle, s32 scale)
+static inline void Vector(struct HomingVec *v, s32 angle, s32 inScale)
 {
+    register s32 scale asm("r6") = inScale;
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
     {
@@ -187,14 +188,14 @@ static inline void StepSequence(struct HomingSprite *sprite, struct HomingSequen
     }
 }
 
-// fuzzy: 97.7%
+// fuzzy: 98.0%
 s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *position)
 {
     struct HomingManager *m = gUnk_020005F4;
     struct HomingSlot *p;
     s32 index;
     u16 animId, resourceId;
-    register u32 sequence asm("r6");
+    s32 sequence;
     u8 direction;
     u8 flips[2];
     u8 *first;
@@ -257,7 +258,7 @@ s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *positi
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&p->sequence, p->resource, sequence, flips[0], *saved);
+    Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
     StepSequence(&p->sprite, &p->sequence);
     p->sprite.flags &= ~1;
     Sprite_LinkToList(&p->sprite, 0);
