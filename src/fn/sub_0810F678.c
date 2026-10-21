@@ -2,7 +2,7 @@
 #include "record_menu.h"
 #include "area_effect_link.h"
 #ifdef NONMATCHING
-// fuzzy: 90.8%
+// fuzzy: 92.2%
 // foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
 #define gActiveRecordMenu gUnk_020001D0
 extern struct RecordMenu *gUnk_020001D0;
@@ -68,7 +68,6 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
     }
     selection = LimitSelection(menu->selection);
     {
-        s32 zero = 0;
         SetSelection(menu, selection);
         Bg_ClearTilemap(3);
         Bg_ClearTilemap(2);
@@ -87,9 +86,12 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
             menu->update = next;
         }
         menu->redraw = 1;
-        menu->leaving = zero;
-        if (Script_GetKeywordValue('f', 0))
-            ScreenTransition_SendCommand(2, 5, 4, 4, 4, 65535, zero);
+        {
+            s32 zero = 0;
+            menu->leaving = zero;
+            if (Script_GetKeywordValue('f', 0))
+                ScreenTransition_SendCommand(2, 5, 4, 4, 4, 65535, zero);
+        }
     }
     gUnk_020001D0 = menu;
     return 1;
