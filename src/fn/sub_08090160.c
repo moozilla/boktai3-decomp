@@ -4,7 +4,6 @@
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // Remaining: constant/pointer register allocation (a/b hoists land in sb/r8 swapped, zero index reg).
-#define Slime_EmitDeathDebris sub_08090160
 struct Position {
     s16 x, y, z, pad;
 };
@@ -74,5 +73,5 @@ void Slime_EmitDeathDebris(struct Actor *input)
     sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08090160);
+INCLUDE_ASM("asm/nonmatching", Slime_EmitDeathDebris);
 #endif
