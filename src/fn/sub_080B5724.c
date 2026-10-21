@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.4%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_EnterResetMode SceneActorPlacement_ResetActorState
 void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
@@ -10,13 +9,18 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        u16 offset = 0x2D4;
-        if (actor->flags2D4 & mask)
+        register u32 offset asm("r2") = 0x2D4;
+        if (*(u16 *)((u8 *)actor + offset) & mask)
             return 1;
         mask = 0x20000;
+        asm("" : "+r"(offset));
         offset -= 4;
-        if (actor->flags2D0 & mask)
-            return 1;
+        {
+            register u8 *q asm("r0");
+            q = (u8 *)actor + offset;
+            if (*(u32 *)q & mask)
+                return 1;
+        }
         if (actor->health <= 0)
             return 1;
     }
@@ -49,6 +53,3 @@ void SceneActorControl_RestartBehavior57(struct SceneActorRegistryResetView *act
     mode = 1;
     SceneActorPlacement_ResetActorState(actor, &mode);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_RestartBehavior57);
-#endif
