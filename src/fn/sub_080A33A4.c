@@ -1,9 +1,10 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.9%
-// foundry draft (worker best 89.0%); what differs is mostly register allocation and instruction order
+static inline u8 Peek(struct SceneActorRegistryResetView *s)
+{
+    return s->field2B0;
+}
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 {
     if (s->field2B1) {
@@ -31,7 +32,7 @@ void SceneActorControl_UpdateRouteResponse(struct SceneActorRegistryResetView *s
             *flags &= mask;
         }
         s->word104 = zero;
-    } else if (s->field2B0) {
+    } else if (Peek(s)) {
         u8 *group = (u8 *)s + 0x3D4;
         u32 twelve = 12;
         void *fn;
@@ -58,6 +59,3 @@ void SceneActorControl_UpdateRouteResponse(struct SceneActorRegistryResetView *s
         ++s->counter2AC;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateRouteResponse);
-#endif
