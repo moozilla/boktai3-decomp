@@ -3,8 +3,6 @@
 // confidence=low: approaches screen X and periodically emits offset effects.
 #include "scene_vec.h"
 // confidence=low: action role inferred from movement and effect calls.
-#ifdef NONMATCHING
-// fuzzy: 99.4%
 // Remaining differences: the +0x598 reset offset uses r3 instead of r1.
 struct P {
     u8 pad0[0x2c0];
@@ -188,15 +186,43 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
                 Anim_SetSequence(state, (*(void **)((u8 *)input + 0x390)), 1, 0, 0);
                 Step(sprite, state, one);
             }
-            W(0x598) = 0;
-            W(0x398) = 0;
-            W(0x2b8) = 4;
-            W(0x2bc) = 120;
+            {
+                register u32 off asm("r1") = 0x598;
+                register u8 *q asm("r0");
+                asm("" : "+r"(off));
+                q = (u8 *)p + off;
+                *(s32 *)q = 0;
+            }
+            {
+                register u32 off asm("r2") = 0x398;
+                register u8 *q asm("r0");
+                register s32 z asm("r1") = 0;
+                asm("" : "+r"(off));
+                q = (u8 *)p + off;
+                *(s32 *)q = z;
+            }
+            {
+                register u32 off asm("r3") = 0x2b8;
+                register u8 *q asm("r1");
+                asm("" : "+r"(off));
+                q = (u8 *)p + off;
+                *(s32 *)q = 4;
+            }
+            {
+                register u32 off asm("r0") = 0x2bc;
+                register u8 *q asm("r1");
+                asm("" : "+r"(off));
+                q = (u8 *)p + off;
+                *(s32 *)q = 120;
+            }
         }
     }
     SceneMover_ApproachScreenX(input, 40);
     {
-        register s32 *phase asm("r5") = &W(0x398);
+        register u32 poff asm("r1") = 0x398;
+        register s32 *phase asm("r5");
+        asm("" : "+r"(poff));
+        phase = (s32 *)((u8 *)p + poff);
         switch (*phase) {
             case 0:
                 if (time > 30) {
@@ -263,7 +289,3 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActors_UpdatePeriodicEffectAction);
-#endif

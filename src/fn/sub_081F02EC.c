@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.9%
 // foundry draft (worker best 95.9%); what differs is mostly register allocation and instruction order
 
 struct Slot7Action {
@@ -38,15 +37,23 @@ void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
         if ((s32)duration <= 2)
             duration = (u16)actor->baseDuration;
         else if ((s32)duration <= 5) {
-            duration = (u16)actor->baseDuration;
+            register u32 off asm("r1") = 0x5F0;
+            register u8 *q asm("r0");
+            asm("" : "+r"(off));
+            q = (u8 *)actor + off;
+            duration = *(u16 *)q;
             duration += (s16)duration >> 2;
-        } else
-            duration = (u16)actor->baseDuration + (actor->baseDuration >> 1);
+        } else {
+            register u32 off asm("r1") = 0x5F0;
+            register u8 *q asm("r0");
+            u16 base;
+            asm("" : "+r"(off));
+            q = (u8 *)actor + off;
+            base = *(u16 *)q;
+            duration = base + ((s16)base >> 1);
+        }
         actor->duration = duration;
         action->cooldown = 30;
         actor->flashTimer = 15;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SingletonSlot7_BeginScaledCooldown);
-#endif
