@@ -51,19 +51,25 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
         CpuSet(source, palette, 16);
     }
     CpuSet(flash->normalPalette, model->normalPalette, 16);
-    offset = 0;
-    i = 4;
-    do {
-        struct ModifierDisplayObject *part = (void *)((u8 *)flash->target + offset);
-        part->palette = palette;
-        part->tile = gUnk_020004B8->nextTile;
-        offset += 0x60;
-    } while (--i >= 0);
-    gUnk_020004B8->nextTile += 2;
-    if (gUnk_020004B8->nextTile > 0xafff)
-        gUnk_020004B8->nextTile = 0xa000;
-    else if (gUnk_020004B8->nextTile <= 0x9fff)
-        gUnk_020004B8->nextTile = 0xa000;
+    {
+        struct CharacterPreviewTileAllocator **ap = &gUnk_020004B8;
+        struct CharacterPreviewTileAllocator **lp;
+        asm("" : "+r"(ap));
+        lp = ap;
+        offset = 0;
+        i = 4;
+        do {
+            struct ModifierDisplayObject *part = (void *)((u8 *)flash->target + offset);
+            part->palette = palette;
+            part->tile = (*lp)->nextTile;
+            offset += 0x60;
+        } while (--i >= 0);
+        (*ap)->nextTile += 2;
+        if ((*ap)->nextTile > 0xafff)
+            (*ap)->nextTile = 0xa000;
+        else if ((*ap)->nextTile <= 0x9fff)
+            (*ap)->nextTile = 0xa000;
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", CharacterPreview_InitializePalette);
