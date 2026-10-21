@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_actor_reset.h"
-#define SceneActorMovement_UpdateAirborne sub_080747B8
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 struct BurstExtent {

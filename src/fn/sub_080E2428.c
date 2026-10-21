@@ -7,7 +7,7 @@
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-void sub_080747B8(struct SceneActorRegistryResetView *);
+void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
 void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
@@ -44,7 +44,7 @@ void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *acto
     u16 script;
     u16 *flags;
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    sub_080747B8(actor);
+    SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
     if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
         actor->field2B0 = 1;
