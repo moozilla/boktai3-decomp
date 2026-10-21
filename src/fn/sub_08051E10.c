@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 static inline void *resourceAt(void **resource)
 {
@@ -38,15 +37,16 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         SpriteDrawable_SelectTileFrame(particle, resourceAt(resource), 2);
         Effect_SetPalette(particle, 1);
         {
-            register u32 value asm("r1") = one;
-            asm("" : "+r"(value));
+            u32 value = one;
             ((u8 *)particle)[0xF] = value;
         }
         ((u8 *)particle)[0x10] = 20;
         particle->flags |= one;
         active = (u16 *)((u8 *)emitter + offset + 0xF0);
         {
-            register u32 zero asm("r0") = 0;
+            u32 zero = 0;
+            do {
+            } while (0);
             *active = zero;
         }
     } while (++i <= 7);
