@@ -18,8 +18,7 @@ struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *i
             slot->index = i;
             {
                 u32 mask = one;
-                do {
-                } while (0);
+                DEBUG_NOP();
                 mask <<= i;
                 *used |= mask;
             }

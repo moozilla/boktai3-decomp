@@ -11,7 +11,7 @@
  int isnan(double x)
 {
  __int32_t hx,lx;
- do { ieee_double_shape_type ew_u; ew_u.value = (x); (hx) = ew_u.parts.msw; (lx) = ew_u.parts.lsw; } while (0);
+ EXTRACT_WORDS(hx, lx, x);
  hx &= 0x7fffffff;
  hx |= (__uint32_t)(lx|(-lx))>>31;
  hx = 0x7ff00000 - hx;

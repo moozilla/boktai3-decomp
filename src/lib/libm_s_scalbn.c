@@ -16,12 +16,12 @@
  double scalbn (double x, int n)
 {
  __int32_t k,hx,lx;
- do { ieee_double_shape_type ew_u; ew_u.value = (x); (hx) = ew_u.parts.msw; (lx) = ew_u.parts.lsw; } while (0);
+ EXTRACT_WORDS(hx, lx, x);
         k = (hx&0x7ff00000)>>20;
         if (k==0) {
             if ((lx|(hx&0x7fffffff))==0) return x;
      x *= two54;
-     do { ieee_double_shape_type gh_u; gh_u.value = (x); (hx) = gh_u.parts.msw; } while (0);
+     GET_HIGH_WORD(hx, x);
      k = ((hx&0x7ff00000)>>20) - 54;
             if (n< -50000) return tiny*x;
      }
@@ -29,12 +29,12 @@
         k = k+n;
         if (k > 0x7fe) return huge*copysign(huge,x);
         if (k > 0)
-     {do { ieee_double_shape_type sh_u; sh_u.value = (x); sh_u.parts.msw = ((hx&0x800fffff)|(k<<20)); (x) = sh_u.value; } while (0); return x;}
+     {SET_HIGH_WORD(x, (hx&0x800fffff)|(k<<20)); return x;}
         if (k <= -54)
             if (n > 50000)
   return huge*copysign(huge,x);
      else return tiny*copysign(tiny,x);
         k += 54;
- do { ieee_double_shape_type sh_u; sh_u.value = (x); sh_u.parts.msw = ((hx&0x800fffff)|(k<<20)); (x) = sh_u.value; } while (0);
+ SET_HIGH_WORD(x, (hx&0x800fffff)|(k<<20));
         return x*twom54;
 }

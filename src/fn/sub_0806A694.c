@@ -6,8 +6,7 @@ void SpriteEffectController_RefreshCollider(struct SpriteEffectController *contr
     u32 enabled = flags & 4;
     if (enabled) {
         u32 refresh = flags & 0x100;
-        do {
-        } while (0);
+        DEBUG_NOP();
         if (refresh) {
             struct ContactCollider *collider = &controller->collider;
             if (position) {

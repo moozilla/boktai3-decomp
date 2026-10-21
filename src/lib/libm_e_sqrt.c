@@ -17,7 +17,7 @@
  __int32_t sign = (int)0x80000000;
  __uint32_t r,t1,s1,ix1,q1;
  __int32_t ix0,s0,q,m,t,i;
- do { ieee_double_shape_type ew_u; ew_u.value = (x); (ix0) = ew_u.parts.msw; (ix1) = ew_u.parts.lsw; } while (0);
+ EXTRACT_WORDS(ix0, ix1, x);
  if((ix0&0x7ff00000)==0x7ff00000) {
      return x*x+x;
  }
@@ -91,6 +91,6 @@
  ix1 = q1>>1;
  if ((q&1)==1) ix1 |= sign;
  ix0 += (m <<20);
- do { ieee_double_shape_type iw_u; iw_u.parts.msw = (ix0); iw_u.parts.lsw = (ix1); (z) = iw_u.value; } while (0);
+ INSERT_WORDS(z, ix0, ix1);
  return z;
 }

@@ -20,7 +20,7 @@
 {
  double z,r,v;
  __int32_t ix;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (ix) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(ix, x);
  ix &= 0x7fffffff;
  if(ix<0x3e400000)
     {if((int)x==0) return x;}

@@ -10,7 +10,10 @@ with every hint stripped (tools/unpin.py) goes to tools/translate.py with
 re-set a loop constant, move/split/reorder declarations, swap independent
 statements, reorder call arguments, re-spell conditions and arithmetic),
 then the best states again, scored by differing bytes. No empty blocks,
-`*(&x)` re-reads or asm, so a match reads like original source.
+`*(&x)` re-reads or asm, so a match reads like original source. A
+`do { } while (0)` around statements is allowed: it is how a statement macro
+expands, so write it as a named macro when the match is applied (an empty
+one becomes DEBUG_NOP(), global.h); an `if (1)` block is rejected.
 
 OUT_DIR/results.tsv has autosolve's columns, so `pinfarm.py apply
 OUT_DIR/results.tsv --list LIST.tsv --commit` splices the matches back
@@ -54,7 +57,12 @@ def solve(row, a):
     secs = round(time.time() - t0)
     if re.search(r"^MATCH after", log, re.M):
         dst = os.path.join(work, "match.c")
-        shutil.copy(os.path.join(ROOT, "build", "translate", func, "best.c"), dst)
+        text = open(os.path.join(ROOT, "build", "translate", func, "best.c")).read()
+        if re.search(r"\bif\s*\(\s*1\s*\)", text):
+            return (func, "natural", base, "if (1) block", 0, secs, "")
+        # an empty do/while(0) is a compiled-out debug macro (global.h)
+        text = re.sub(r"\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)\s*;", "DEBUG_NOP();", text)
+        open(dst, "w").write(text)
         return (func, "natural", base, "TRANSLATED", 0, secs, os.path.relpath(dst, ROOT))
     m = re.search(r"^(\d+) differing bytes after", log, re.M)
     return (func, "natural", base, "no natural edit", m.group(1) if m else "", secs, "")

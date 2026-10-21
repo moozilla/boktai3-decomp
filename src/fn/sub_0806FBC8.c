@@ -23,8 +23,7 @@ void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
         removed:
             manager->field32--;
             goto done;
-            do {
-            } while (0);
+            DEBUG_NOP();
         scan:
             next = node->next;
 

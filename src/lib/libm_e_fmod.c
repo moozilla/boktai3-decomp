@@ -16,8 +16,8 @@ extern const double gUnk_08602F48[];
 {
  __int32_t n,hx,hy,hz,ix,iy,sx,i;
  __uint32_t lx,ly,lz;
- do { ieee_double_shape_type ew_u; ew_u.value = (x); (hx) = ew_u.parts.msw; (lx) = ew_u.parts.lsw; } while (0);
- do { ieee_double_shape_type ew_u; ew_u.value = (y); (hy) = ew_u.parts.msw; (ly) = ew_u.parts.lsw; } while (0);
+ EXTRACT_WORDS(hx, lx, x);
+ EXTRACT_WORDS(hy, ly, y);
  sx = hx&0x80000000;
  hx ^=sx;
  hy &= 0x7fffffff;
@@ -87,7 +87,7 @@ extern const double gUnk_08602F48[];
  }
  if(iy>= -1022) {
      hx = ((hx-0x00100000)|((iy+1023)<<20));
-     do { ieee_double_shape_type iw_u; iw_u.parts.msw = (hx|sx); iw_u.parts.lsw = (lx); (x) = iw_u.value; } while (0);
+     INSERT_WORDS(x, hx|sx, lx);
  } else {
      n = -1022 - iy;
      if(n<=20) {
@@ -98,7 +98,7 @@ extern const double gUnk_08602F48[];
      } else {
   lx = hx>>(n-32); hx = sx;
      }
-     do { ieee_double_shape_type iw_u; iw_u.parts.msw = (hx|sx); iw_u.parts.lsw = (lx); (x) = iw_u.value; } while (0);
+     INSERT_WORDS(x, hx|sx, lx);
      x *= one;
  }
  return x;

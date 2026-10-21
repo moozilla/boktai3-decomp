@@ -32,7 +32,7 @@ extern const __int32_t gUnk_08603060[];
  __int32_t i,j,n,ix,hx;
  int e0,nx;
  __uint32_t low;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (hx) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(hx, x);
  ix = hx&0x7fffffff;
  if(ix<=0x3fe921fb)
      {y[0] = x; y[1] = 0; return 0;}
@@ -73,7 +73,7 @@ extern const __int32_t gUnk_08603060[];
          __uint32_t high;
          j = ix>>20;
          y[0] = r-w;
-  do { ieee_double_shape_type gh_u; gh_u.value = (y[0]); (high) = gh_u.parts.msw; } while (0);
+  GET_HIGH_WORD(high, y[0]);
          i = j-((high>>20)&0x7ff);
          if(i>16) {
       t = r;
@@ -81,7 +81,7 @@ extern const __int32_t gUnk_08603060[];
       r = t-w;
       w = fn*pio2_2t-((t-r)-w);
       y[0] = r-w;
-      do { ieee_double_shape_type gh_u; gh_u.value = (y[0]); (high) = gh_u.parts.msw; } while (0);
+      GET_HIGH_WORD(high, y[0]);
       i = j-((high>>20)&0x7ff);
       if(i>49) {
        t = r;
@@ -99,10 +99,10 @@ extern const __int32_t gUnk_08603060[];
  if(ix>=0x7ff00000) {
      y[0]=y[1]=x-x; return 0;
  }
- do { ieee_double_shape_type gl_u; gl_u.value = (x); (low) = gl_u.parts.lsw; } while (0);
- do { ieee_double_shape_type sl_u; sl_u.value = (z); sl_u.parts.lsw = (low); (z) = sl_u.value; } while (0);
+ GET_LOW_WORD(low, x);
+ SET_LOW_WORD(z, low);
  e0 = (int)((ix>>20)-1046);
- do { ieee_double_shape_type sh_u; sh_u.value = (z); sh_u.parts.msw = (ix - ((__int32_t)e0<<20)); (z) = sh_u.value; } while (0);
+ SET_HIGH_WORD(z, ix - ((__int32_t)e0<<20));
  for(i=0;i<2;i++) {
   tx[i] = (double)((__int32_t)(z));
   z = (z-tx[i])*two24;
