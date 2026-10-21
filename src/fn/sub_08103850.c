@@ -24,7 +24,7 @@ struct NamedObjectManager {
 extern u32 gUnk_030053F0;
 extern s32 gUnk_02000560;
 extern void *gUnk_086064CC[];
-void sub_08101B1C(struct NamedObject *);
+void NamedObject_RegisterFollowCells(struct NamedObject *);
 void NamedObject_UpdateFollowers(struct NamedObject *);
 void sub_0810103C(struct NamedObject *);
 void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObject *);
@@ -68,7 +68,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
                     Callback_InvokeActor(object, gUnk_086064CC[object->state]);
                     Callback_InvokeActor(object, object->callbackE8);
                     Callback_InvokeActor(object, object->callbackEC);
-                    sub_08101B1C(object);
+                    NamedObject_RegisterFollowCells(object);
                     NamedObject_UpdateFollowers(object);
                     sub_0810103C(object);
                     object->spritePosition = object->position;
