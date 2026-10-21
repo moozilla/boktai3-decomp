@@ -2,7 +2,6 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
 // confidence=low: timed-effect projectile update that turns at terrain steps.
-#define TimedEffect_UpdateTerrainTurn sub_081DA1DC
 
 struct TEConfig {
     u16 flags;
