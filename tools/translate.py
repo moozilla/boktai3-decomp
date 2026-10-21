@@ -58,6 +58,7 @@ SAFE_PASSES = [
     "perm_reorder_decls", "perm_ins_block", "perm_struct_ref", "perm_compound_assignment",
     "perm_commutative", "perm_add_sub", "perm_inequalities", "perm_condition",
     "perm_reverse_cond", "perm_chain_assignment", "perm_split_assignment",
+    "perm_param_copy", "perm_early_return", "perm_reset_const",
 ]
 # These can change the meaning (move a statement past a write or into dead
 # code, merge variables, narrow a type, hoist an expression past a call):
@@ -65,6 +66,16 @@ SAFE_PASSES = [
 UNSAFE_PASSES = [
     "perm_temp_for_expr", "perm_expand_expr", "perm_reorder_stmts", "perm_remove_var",
     "perm_cast_simple", "perm_randomize_internal_type", "perm_inline",
+]
+# Edits a programmer plausibly wrote (no empty blocks or loops, no `*(&x)`
+# re-reads, no literal addresses): --natural searches only these, so that a
+# match reads like original source rather than a compiler-steering trick.
+NATURAL_PASSES = [
+    "perm_param_copy", "perm_early_return", "perm_reset_const", "perm_move_to_use",
+    "perm_split_var", "perm_const_var", "perm_call_order", "perm_swap_stmts", "perm_reorder_decls",
+    "perm_struct_ref", "perm_compound_assignment", "perm_commutative", "perm_add_sub",
+    "perm_inequalities", "perm_condition", "perm_reverse_cond", "perm_chain_assignment",
+    "perm_split_assignment", "perm_loop_form",
 ]
 PASSES = SAFE_PASSES
 CAP_CHOICES = 48   # options tried at one choice point
@@ -458,9 +469,12 @@ def main():
     ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
                     help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--unsafe", action="store_true", help="also use passes that can change the program's meaning")
+    ap.add_argument("--natural", action="store_true", help="only edits a programmer plausibly wrote (NATURAL_PASSES)")
     a = ap.parse_args()
     global PASSES
-    if a.unsafe:
+    if a.natural:
+        PASSES = NATURAL_PASSES
+    elif a.unsafe:
         PASSES = SAFE_PASSES + UNSAFE_PASSES
     src = os.path.abspath(a.src)
     func = a.func or regdiag.first_function(src)

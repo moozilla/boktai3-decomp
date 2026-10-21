@@ -1,8 +1,8 @@
 diff --git a/default_weights.toml b/default_weights.toml
-index 1a67fff..fe2b03b 100644
+index 1a67fff..ef4b16a 100644
 --- a/default_weights.toml
 +++ b/default_weights.toml
-@@ -39,6 +39,15 @@ perm_var_cond_block = 5
+@@ -39,6 +39,18 @@ perm_var_cond_block = 5
  perm_alias_array = 1
  perm_remove_var = 5
  perm_reverse_cond = 1
@@ -15,10 +15,13 @@ index 1a67fff..fe2b03b 100644
 +perm_const_var = 0
 +perm_call_order = 0
 +perm_swap_stmts = 0
++perm_param_copy = 0
++perm_early_return = 0
++perm_reset_const = 0
  
  [ido]
  perm_float_literal = 10
-@@ -71,3 +80,14 @@ perm_dummy_comma_expr = 0.5
+@@ -71,3 +83,17 @@ perm_dummy_comma_expr = 0.5
  perm_add_self_assignment = 0.5
  perm_duplicate_assignment = 0.5
  perm_pad_var_decl = 0.5
@@ -33,12 +36,15 @@ index 1a67fff..fe2b03b 100644
 +perm_const_var = 15
 +perm_call_order = 6
 +perm_swap_stmts = 12
++perm_param_copy = 12
++perm_early_return = 6
++perm_reset_const = 4
 diff --git a/src/agbcc_passes.py b/src/agbcc_passes.py
 new file mode 100644
-index 0000000..603e1b4
+index 0000000..25618a4
 --- /dev/null
 +++ b/src/agbcc_passes.py
-@@ -0,0 +1,802 @@
+@@ -0,0 +1,923 @@
 +"""Randomization passes for agbcc (gcc 2.95) register allocation and scheduling.
 +
 +Each pass is a source change that has closed a match by hand in the Boktai 3
@@ -827,6 +833,124 @@ index 0000000..603e1b4
 +    stmts[i], stmts[i + 1] = stmts[i + 1], stmts[i]
 +
 +
++def _param_names(fn: ca.FuncDef) -> Set[str]:
++    assert isinstance(fn.decl.type, ca.FuncDecl)
++    args = fn.decl.type.args
++    return {q.name for q in (args.params if args else []) if isinstance(q, ca.Decl) and q.name}
++
++
++def _write_counts(fn: ca.FuncDef) -> Dict[str, int]:
++    counts: Dict[str, int] = {}
++
++    class V(ca.NodeVisitor):
++        def visit_Assignment(self, n: ca.Assignment) -> None:
++            if isinstance(n.lvalue, ca.ID):
++                counts[n.lvalue.name] = counts.get(n.lvalue.name, 0) + 1
++            self.generic_visit(n)
++
++        def visit_UnaryOp(self, n: ca.UnaryOp) -> None:
++            if n.op in ("p++", "p--", "++", "--", "&") and isinstance(n.expr, ca.ID):
++                counts[n.expr.name] = counts.get(n.expr.name, 0) + 1
++            self.generic_visit(n)
++
++    V().visit(fn.body)
++    return counts
++
++
++def perm_param_copy(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Use a parameter directly instead of a local copy of it (`T x = p;`
++    where neither is ever written again): in every use, or only in some.
++    The most common pin in the Boktai 3 depins only kept such a copy in
++    the register the original code gave the parameter itself."""
++    params = _param_names(fn)
++    writes = _write_counts(fn)
++    cands: List[Tuple[ca.Decl, str]] = []
++    for block, _ in all_blocks(fn):
++        for st in ast_util.get_block_stmts(block, False):
++            if (isinstance(st, ca.Decl) and st.name and isinstance(st.init, ca.ID)
++                    and st.init.name in params and is_scalar_decl(st)
++                    and region.contains_node(st)
++                    and writes.get(st.name, 0) == 0 and writes.get(st.init.name, 0) == 0):
++                cands.append((st, st.init.name))
++    ensure(cands)
++    decl, param = random.choice(cands)
++    uses: List[ca.ID] = [i for i in ids_in(fn.body) if i.name == decl.name]
++    ensure(uses)
++    if random_bool(random, 0.5):
++        chosen = uses
++    else:
++        k = random.randint(1, len(uses))
++        chosen = uses[-k:] if random_bool(random, 0.5) else uses[:k]
++    for i in chosen:
++        i.name = param
++    if len(chosen) == len(uses):
++        for block, _ in all_blocks(fn):
++            stmts = ast_util.get_block_stmts(block, True)
++            if decl in stmts:
++                stmts.remove(decl)
++                break
++
++
++def perm_early_return(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """`if (c) { body } [return k;]` at the end of the function becomes
++    `if (!c) return [k]; { body } [return k;]`. agbcc lays out the blocks
++    and live ranges differently; in the depins it replaced register clobber
++    hints (`asm("" ::: "rN")`) more than once."""
++    stmts = ast_util.get_block_stmts(fn.body, True)
++    cands: List[int] = []
++    for i, st in enumerate(stmts):
++        if not (isinstance(st, ca.If) and st.iffalse is None and region.contains_node(st)):
++            continue
++        tail = stmts[i + 1:]
++        if not tail or (len(tail) == 1 and isinstance(tail[0], ca.Return)
++                        and (tail[0].expr is None or isinstance(tail[0].expr, ca.Constant))):
++            cands.append(i)
++    ensure(cands)
++    i = random.choice(cands)
++    st = stmts[i]
++    tail = stmts[i + 1:]
++    value = copy.deepcopy(tail[0].expr) if tail else None
++    body = st.iftrue if isinstance(st.iftrue, ca.Compound) else ca.Compound([st.iftrue])
++    early = ca.If(ca.UnaryOp("!", st.cond), ca.Return(value), None)
++    stmts[i:i + 1] = [early, body]
++
++
++def perm_reset_const(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Assign a constant-initialised local (`u32 one = 1;`, never written
++    again) once more at the top of a loop that uses it. With two sets the
++    loop pass no longer treats it as invariant, which replaced an
++    `asm("" : "+r"(one))` barrier by hand."""
++    writes = _write_counts(fn)
++    consts: Dict[str, ca.Constant] = {}
++    for block, _ in all_blocks(fn):
++        for st in ast_util.get_block_stmts(block, False):
++            if (isinstance(st, ca.Decl) and st.name and isinstance(st.init, ca.Constant)
++                    and is_scalar_decl(st) and writes.get(st.name, 0) == 0):
++                consts[st.name] = st.init
++    ensure(consts)
++    cands: List[Tuple[ca.Node, str]] = []
++    for block, _ in all_blocks(fn):
++        for st in ast_util.get_block_stmts(block, False):
++            if isinstance(st, (ca.For, ca.While, ca.DoWhile)) and isinstance(st.stmt, ca.Compound) \
++                    and region.contains_node(st):
++                for name in names_in(st.stmt) & set(consts):
++                    cands.append((st, name))
++    ensure(cands)
++    loop, name = random.choice(cands)
++    items = loop.stmt.block_items or []
++    n = 0
++    while n < len(items) and isinstance(items[n], ca.Decl):
++        n += 1
++    items.insert(n, ca.Assignment("=", ca.ID(name), copy.deepcopy(consts[name])))
++    loop.stmt.block_items = items
++
++
 +AGBCC_PASSES = [
 +    perm_loop_form,
 +    perm_addr_deref,
@@ -836,6 +960,9 @@ index 0000000..603e1b4
 +    perm_const_var,
 +    perm_call_order,
 +    perm_swap_stmts,
++    perm_param_copy,
++    perm_early_return,
++    perm_reset_const,
 +]
 +
 +for _p in AGBCC_PASSES:
