@@ -3,13 +3,13 @@
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
 #ifdef NONMATCHING
-// fuzzy: 92.5%
+// fuzzy: 97.3%
 // Remaining differences: instruction selection and register allocation.
 static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st, u32 firstBit)
 {
     struct DisplaySequenceState *state = st;
     struct ContactSwarmSprite *sprite = sp;
-    register const volatile u16 *command asm("r6");
+    const volatile u16 *command;
     u32 duration, flags, bit;
     u32 ended = 0;
     {
@@ -24,7 +24,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
         register u32 first asm("r1");
         u32 maskBit = firstBit;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
