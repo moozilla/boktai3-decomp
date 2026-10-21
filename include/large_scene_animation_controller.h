@@ -59,7 +59,7 @@ struct Nidhoggr {
         terrainCells[2];      /* 0x7100: registered via TerrainModifiers_RegisterCell */
     u8 suspendedAnim[0x1C];   /* 0x7120: suspended-object sprite animation data */
     u8 suspendedSprite[0x1C]; /* 0x713C */
-    u32 suspendedBasePosX, suspendedBasePosZ; /* 0x7158 */
+    s16 suspendedPosX, suspendedPosY, suspendedPosZ, suspendedPosW; /* 0x7158 */
     u8 unknown7160[0x7168 - 0x7160];
     u8 suspendedCollider[0x54]; /* 0x7168 */
     u8 suspendedState;          /* 0x71BC: descent/retraction/shake sub-state */
