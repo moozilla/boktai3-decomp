@@ -1,9 +1,6 @@
 #include "global.h"
 // confidence=low: maintains paired-half presentation, colliders and completion flags.
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-// Remaining differences: member-offset and address register allocation.
 // confidence=low: updates each half's visible position, colliders and completion transition.
 struct PairPosition {
     s16 x, y, z, pad;
@@ -78,15 +75,19 @@ static inline u32 testFlags(struct PairHalf *half, u32 mask)
 {
     return half->flags & mask;
 }
+static inline u32 testFlagsP(u32 *fp, u32 mask)
+{
+    return *fp & mask;
+}
 static inline void setFlags(struct PairHalf *half, u32 mask)
 {
     half->flags |= mask;
 }
-static inline void setReady(struct PairHalf *half)
+static inline void setReady(struct PairHalf *half, u32 *fl)
 {
     u32 next = 2;
     u32 mask = 0x100;
-    u32 clear = half->flags & mask;
+    u32 clear = *fl & mask;
     if (!clear) {
         u32 previous = (u8)(half->previousState - 0x19);
         u8 *phase = &half->phase;
@@ -113,6 +114,7 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
 {
     struct PairPosition jitter;
     struct PairCollider *collider;
+    u32 *flagsp;
     {
         struct PairPosition *dst = &half->position;
         register struct PairPosition *offset asm("r1");
@@ -177,21 +179,29 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
     }
     collider = &half->body;
     {
-        u32 hidden = testFlags(half, 8);
+        register u32 fmask asm("r2") = 8;
+        register u32 foff asm("r3") = 0x160;
+        register u32 *fp asm("r1");
+        u32 hidden;
+        asm("" : "+r"(fmask));
+        asm("" : "+r"(foff));
+        fp = (u32 *)((u8 *)half + foff);
+        hidden = *fp & fmask;
+        flagsp = fp;
         if (!hidden) {
             Collider_SetPosition(collider, &half->position, 0);
             Collider_Refresh(collider);
         }
     }
     collider = &half->attack;
-    if (testFlags(half, 4)) {
+    if (testFlagsP(flagsp, 4)) {
         collider->flags |= 4;
     } else {
         s32 clearMask = ~4;
         collider->flags &= clearMask;
         Collider_SetPosition(collider, &half->position, 0);
     }
-    if (testFlags(half, 0x20)) {
+    if (testFlagsP(flagsp, 0x20)) {
         register struct PairShadowControl *control asm("r2") = &half->shadowControl;
         s32 mask = ~1;
         asm("" : "+r"(control));
@@ -215,12 +225,16 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
             (*timer)--;
             if (!*timer) {
                 register u32 paletteOffset asm("r1") = 0x190;
+                register void **palp asm("r0");
+                void *src;
                 asm("" : "+r"(paletteOffset));
-                CpuSet(*(void **)((u8 *)half + paletteOffset), half->palette, 0x04000008);
+                palp = (void **)((u8 *)half + paletteOffset);
+                src = *palp;
+                CpuSet(src, half->palette, 0x04000008);
             }
         }
     }
-    if (testFlags(half, 0x80) || (half->displayFlags & 1)) {
+    if (testFlagsP(flagsp, 0x80) || (half->displayFlags & 1)) {
         register u32 offset asm("r2") = 0x1A0;
         asm("" : "+r"(offset));
         ScaledShadow_Disable((u8 *)half + offset);
@@ -229,16 +243,41 @@ void PairedSceneActor_UpdateHalfPresentation(struct PairOwner *owner, struct Pai
         asm("" : "+r"(offset));
         ScaledShadow_Enable((u8 *)half + offset);
     }
-    if (half->previousState == 0x16 && half->phase) {
-        if (half->mode == 0)
-            owner->activeMask &= ~1;
-        else
-            owner->activeMask &= ~2;
-        setReady(half);
+    {
+        register u32 psoff asm("r4") = 0x16D;
+        register u8 *psp asm("r0");
+        asm("" : "+r"(psoff));
+        psp = (u8 *)half + psoff;
+        if (*psp == 0x16) {
+            register u32 phoff asm("r1") = 0x170;
+            register u8 *php asm("r0");
+            asm("" : "+r"(phoff));
+            php = (u8 *)half + phoff;
+            if (*php) {
+                register u32 moff asm("r2") = 0x15C;
+                register u32 *mp asm("r0");
+                asm("" : "+r"(moff));
+                mp = (u32 *)((u8 *)half + moff);
+                if (*mp == 0) {
+                    register u32 aoff asm("r3") = 0x5B4;
+                    register u32 *am asm("r0");
+                    u32 cur;
+                    asm("" : "+r"(aoff));
+                    am = (u32 *)((u8 *)owner + aoff);
+                    cur = *am;
+                    *am = cur & ~1;
+                } else {
+                    register u32 aoff asm("r4") = 0x5B4;
+                    register u32 *am asm("r0");
+                    u32 cur;
+                    asm("" : "+r"(aoff));
+                    am = (u32 *)((u8 *)owner + aoff);
+                    cur = *am;
+                    *am = cur & ~2;
+                }
+                setReady(half, flagsp);
+            }
+        }
     }
     half->state = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdateHalfPresentation);
-#endif

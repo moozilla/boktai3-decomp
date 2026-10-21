@@ -1,7 +1,6 @@
 #include "scene_actor_reset.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 85.4%
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 void *SceneActorContacts_FindObjectById(u16);
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
@@ -11,19 +10,22 @@ s32 SceneActorPlacement_BeginContactRoute(struct SceneActorRegistryResetView *p)
     struct SceneActorRegistryControlGroup *group;
     void *control;
     s32 result;
-    s32 offset;
+    register s32 offset asm("r6");
     if ((s32)p->field304 > 0)
         goto begin;
     result = 0;
     goto done;
-begin:
-    group = &p->group;
+begin: {
+    register u32 goff asm("r2") = 0x3D4;
+    asm("" : "+r"(goff));
+    group = (struct SceneActorRegistryControlGroup *)((u8 *)p + goff);
+}
     p->fieldDC = (u32)SceneActorContacts_FindObjectById(p->field304);
     {
         u16 behavior = 12;
         u8 *field;
         u32 zero;
-        u16 phaseOffset;
+        register u32 phaseOffset asm("r2");
         u32 counterOffset;
         u32 one;
         offset = 0x2A8;
@@ -54,12 +56,14 @@ begin:
             field = (u8 *)p + counterOffset;
             *(void **)field = control;
             phaseOffset = 0x2C8;
+            asm("" : "+r"(phaseOffset));
             field = (u8 *)p + phaseOffset;
             *(u16 *)field = zero;
             {
-                u32 *flags;
+                register u32 *flags asm("r2");
                 u32 mask;
                 offset = 0x114;
+                asm("" : "+r"(offset));
                 flags = (u32 *)((u8 *)p + offset);
                 mask = ~1;
                 *flags &= mask;
@@ -87,8 +91,13 @@ begin:
             *flags = mask;
         }
         {
-            u32 value = p->group.field416;
-            u16 *out;
+            register u32 voff asm("r2") = 0x416;
+            register u16 *vp asm("r0");
+            register u32 value asm("r1");
+            register u16 *out asm("r0");
+            asm("" : "+r"(voff));
+            vp = (u16 *)((u8 *)p + voff);
+            value = *vp;
             offset += 4;
             out = (u16 *)((u8 *)p + offset);
             *out = value;
@@ -98,6 +107,3 @@ begin:
 done:
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_BeginContactRoute);
-#endif

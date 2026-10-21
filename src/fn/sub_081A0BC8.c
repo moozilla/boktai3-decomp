@@ -3,7 +3,7 @@
 // confidence=low: spawns projectiles while traversing the arena boundary.
 
 #ifdef NONMATCHING
-// fuzzy: 96.1%
+// fuzzy: 99.4%
 // Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "engine.h"
@@ -122,7 +122,8 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
 // confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
-    struct Action *action = &actor->action;
+    u32 aoff = 0x2f0;
+    struct Action *action = (struct Action *)((u8 *)actor + aoff);
     struct Vec *target = actor->target;
     u32 *flags;
     register s32 state asm("r5");
@@ -168,15 +169,14 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                 }
                 if (!(tick & 7)) {
                     struct Vec pos;
-                    register const u16 *table asm("r9") = gUnk_0203B400;
+                    const u16 *table = gUnk_0203B400;
                     s32 rawX = RandomValue(table);
-                    register s32 px asm("r8") = actor->position.x;
-                    register s32 x asm("r2") = (rawX >> 3) % 512;
+                    s32 px = actor->position.x;
+                    s32 x = (rawX >> 3) % 512;
                     s32 rawZ = RandomValue(table);
                     s32 pz = actor->position.z;
-                    s32 z = (rawZ >> 3) % 512;
                     u32 height;
-                    SetVector(&pos, px + x - 256, 0x2000, pz + z - 256);
+                    SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
                     height = Height(&pos) - 256;
                     if (height <= 0x6ff)
                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
@@ -191,7 +191,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             }
             break;
         case 2:
-            actor->collisionMask = 0x2f0;
+            actor->collisionMask = aoff;
             actor->collisionBounds = actor->boundsLow;
             {
                 u32 mask = 16;
@@ -200,6 +200,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             actor->finished = 1;
             break;
     }
+    asm("" ::"r"(aoff));
 }
 
 #else
