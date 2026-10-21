@@ -282,3 +282,24 @@ compiler space. Everything else is a different decision in an earlier pass,
 and the C spellings that produce that decision are many-to-one. The most
 likely original spellings that no pass yet generates are macros and inline
 helpers (see the flag section above).
+
+### do/while(0) is a macro: write the macro
+
+A `do { ... } while (0)` that a match needs is not a trick to avoid; it is the
+expansion of a statement macro, which the original source almost certainly
+had. The rule is that it must be written as a named macro, not left bare:
+
+* An empty `do { } while (0);` is `DEBUG_NOP();` (include/global.h): the shape
+  a debug check compiled out of a release build takes. Its loop notes still
+  split the code around it, which is what the match needs.
+* fdlibm code uses newlib's own word macros (`EXTRACT_WORDS`,
+  `GET_HIGH_WORD`, ...; include/libm_compat.h).
+* A body that repeats across functions goes in that object family's header
+  as one macro; the enemy action reset at 0x2B0/0x2B5/0x21C/0x2C8 (Golem,
+  Mummy, Ghoul, Dog, Vorn, three `SetControl`s, sub_08130F60) is the largest
+  such group still written out.
+* A one-off wrapped body: name the macro for what it does, local to the unit.
+
+`translate.py --natural` may now insert `do { } while (0)` blocks
+(perm_ins_block); natfarm turns an empty one into `DEBUG_NOP()` and rejects
+`if (1)` blocks.
