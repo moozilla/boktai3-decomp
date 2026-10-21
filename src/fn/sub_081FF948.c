@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.3%
-// foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
 /* The checker ELF predates these names in functions.csv. */
 
 struct HomingProjectileParams {
@@ -67,7 +64,8 @@ void HomingProjectile_InitializeSlot(void *manager, struct HomingProjectile *p, 
     size.a.lo = 40;
     size.a.hi = 128;
     size.b.lo = 40;
-    *(u32 *)&offset.a = 0x00800000;
+    offset.a.lo = 0;
+    offset.a.hi = 128;
     offset.b.lo = 0;
     Collider_Init(collider, 0, 0x4001, 0, 16, &size, &offset);
     Collider_SetCallback(collider, HomingProjectile_BeginImpact, p);
@@ -88,6 +86,3 @@ void HomingProjectile_InitializeSlot(void *manager, struct HomingProjectile *p, 
     Collider_SetAttackProperties(collider, params->attack, params->element, 0, 0,
                                  params->attackFlags);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", HomingProjectile_InitializeSlot);
-#endif
