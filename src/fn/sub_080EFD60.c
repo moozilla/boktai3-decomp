@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-// foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 struct SceneActorTargetWaitState {
     u8 unknown0[0x634];
