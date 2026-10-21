@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.6%
-// 7 differing instruction runs; size -8 bytes; first diff at +0x2 (ldr r3, [pc, #0x68] vs ldr r3, [pc, #0x60])
+// fuzzy: 98.9%
+// Remaining: the 0xff mask is materialized before the first halfword load.
 struct Background {
     u8 pad[0x20];
     u16 x, y;
@@ -14,17 +14,16 @@ void Bg_UpdateScrollShadow(void)
 {
     u16 *dst = gUnk_03004C20;
     struct Background *src = gUnk_03004C30;
-    u32 first = src[0].x;
     u32 mask = 0xff;
-    dst[0] = mask & first;
+    dst[0] = mask & src[0].x;
     dst[1] = mask & src[0].y;
     dst[2] = mask & src[1].x;
     dst[3] = mask & src[1].y;
     if (!gUnk_03004BEC) {
         dst[4] = mask & src[2].x;
         dst[5] = mask & src[2].y;
-        dst[6] = mask & src[3].x;
-        dst[7] = mask & src[3].y;
+        dst[6] = mask & *(u16 *)((u8 *)src + 0xb0);
+        dst[7] = mask & *(u16 *)((u8 *)src + 0xb2);
     } else {
         u16 *a = gUnk_03004BF0, *b = gUnk_03004BD0;
         u32 *c;
