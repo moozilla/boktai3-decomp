@@ -31,7 +31,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
         direction = Math_Atan2(other->x - source->x, other->z - source->z);
     }
     do {
-    owner->direction = direction;
+        owner->direction = direction;
     } while (0);
     mode = 0;
     if (owner->targetIndex >= 0) {
