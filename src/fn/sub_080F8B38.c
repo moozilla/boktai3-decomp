@@ -1,9 +1,7 @@
 #include "global.h"
 #include "rotation_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// foundry draft (worker best 98.5%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 void SceneActorControl_RecoverRotation(void);
 static inline s32 FoldAngle(s32 a)
 {
@@ -32,7 +30,10 @@ void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s
         state[0xED3] = saved;
     }
     angle = FoldAngle(drawable->angle);
-    magnitude = __builtin_abs(angle);
+    magnitude = angle;
+    asm("" : "+r"(magnitude));
+    if (magnitude < 0)
+        magnitude = -magnitude;
     if (magnitude > 48) {
         if (elapsed > 42)
             RotationPhase_Change(actor, SceneActorControl_RecoverRotation, 50);
@@ -44,6 +45,3 @@ void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s
             drawable->angle += 2;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_TiltRotation);
-#endif
