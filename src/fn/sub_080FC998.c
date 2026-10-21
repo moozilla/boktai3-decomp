@@ -15,7 +15,6 @@ inline static void CpuSet_2(int a2, struct ContactPosition *a1, u32 *a0)
 {
     CpuSet(a0, a1, a2);
 }
-#define Axe_UpdateTrailColliders sub_080FC998
 void Axe_UpdateTrailColliders(u8 *actor)
 {
     u8 *ctx = *(u8 **)(actor + 0x3d0);

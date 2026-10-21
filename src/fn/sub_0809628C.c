@@ -5,7 +5,6 @@
 // Remaining difference: the script value array (values[]) stores go through a hoisted sp+0x24 base register instead of direct sp-relative stores; script/offset temporaries then shift registers.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-#define Ghost_UpdateDefeat sub_0809628C
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
@@ -132,5 +131,5 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809628C);
+INCLUDE_ASM("asm/nonmatching", Ghost_UpdateDefeat);
 #endif

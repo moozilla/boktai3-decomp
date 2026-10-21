@@ -38,7 +38,7 @@ struct AxeActor {
 };
 extern s16 gUnk_086149C4[];
 extern u8 *gUnk_02000580;
-void sub_080FC998(void *);
+void Axe_UpdateTrailColliders(void *);
 void ActorPhase_EmitTrailSprite(void *, struct Vec *, u32);
 void Sound_PlaySong(u32);
 s32 Math_Atan2(s32, s32);
@@ -114,7 +114,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
     p->sprite[6] = previous - trail->spinRate;
     if ((frame & 1) && trail->spinRate <= 11)
         trail->spinRate++;
-    sub_080FC998(p);
+    Axe_UpdateTrailColliders(p);
     if ((s32)previous < p->sprite[6])
         Sound_PlaySong(0x169);
     if (frame <= 119) {
