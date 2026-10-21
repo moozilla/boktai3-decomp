@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "large_scene_animation_controller.h"
 #include "game_state.h"
@@ -1191,7 +1192,7 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
     hz = 0;
     bz = 0;
     *(u16 *)(sprite + 0x10) = hz;
-    *(struct Pos081944C4 *)&t->suspendedBasePosX = gUnk_0824F4E4;
+    *(struct Pos081944C4 *)&t->suspendedPosX = gUnk_0824F4E4;
     t->suspendedState = bz;
     t->terrainCellsRegistered = bz;
     t->suspendedTimer = hz;
@@ -1267,7 +1268,95 @@ u32 Nidhoggr_IsSuspendedObjectHidden(struct Nidhoggr *p)
  * pointer directly in a register and indexes the jitter pair through it rather than via
  * a separate pointer variable, which this draft did not reproduce. confidence=low. */
 
-INCLUDE_ASM("asm/nonmatching", sub_0819465C);
+#define Nidhoggr_UpdateSuspendedObject sub_0819465C
+struct SuspendedJitter {
+    s16 x, y, z;
+};
+
+struct SuspendedOffset {
+    s16 x;
+    s16 pad;
+    s16 z;
+    s16 pad2;
+};
+
+extern const u8 gUnk_0824F4FC[];
+extern const struct SuspendedOffset gUnk_0824F504[];
+void Nidhoggr_CreateThreePointBurst(const void *);
+
+void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
+{
+    u8 *sp;
+    switch (t->suspendedState) {
+        case 0: {
+            u8 *sp = t->suspendedSprite;
+            *(u32 *)sp |= 1;
+        } break;
+        case 1:
+            sp = t->suspendedSprite;
+            *(u32 *)sp &= ~1;
+            *(u16 *)(sp + 0x10) = 1;
+            t->suspendedPosX = 0xdc0;
+            t->suspendedPosY = 0xfcc0;
+            t->suspendedPosZ = 0xa80;
+            t->suspendedState++;
+            t->suspendedTimer = 0x14;
+            Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
+            break;
+        case 2:
+            t->suspendedPosY += 0x33;
+            if (t->suspendedPosY > -0x140)
+                t->suspendedPosY = 0xfec0;
+            if ((s16)--t->suspendedTimer <= 0)
+                t->suspendedState++;
+            break;
+        case 3: {
+            u8 *sp2 = t->suspendedSprite;
+            *(u16 *)(sp2 + 0x10) = 0;
+        }
+            Collider_Refresh(t->suspendedCollider);
+            Collider_SetPosition(t->suspendedCollider, &t->suspendedPosX, 0);
+            t->suspendedState++;
+            Sound_PlaySongChecked(0x1be);
+            break;
+        case 4:
+            break;
+        case 5:
+            t->suspendedTimer = 0;
+            t->suspendedState++;
+            break;
+        case 6: {
+            u16 *tm = &t->suspendedTimer;
+            u32 i = *tm & 7;
+            const struct SuspendedOffset *tab = gUnk_0824F504;
+            const struct SuspendedOffset *e;
+            asm("" : "+r"(i));
+            e = tab + i;
+            t->suspendedPosX = 0xdc0 + e->x;
+            t->suspendedPosZ = 0xa80 + e->z;
+            (*tm)++;
+            break;
+        }
+        case 7: {
+            u8 *sp3 = t->suspendedSprite;
+            *(u16 *)(sp3 + 0x10) = 1;
+        }
+            t->suspendedState++;
+            break;
+        case 8:
+            t->suspendedPosY -= 0x33;
+            if (t->suspendedPosY < -0x340) {
+                {
+                    u8 *sp = t->suspendedSprite;
+                    *(u32 *)sp |= 1;
+                }
+                t->suspendedPosY = 0xfcc0;
+                t->suspendedState = 0;
+                Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
+            }
+            break;
+    }
+}
 
 /* Companion to sub_0819494C (part index 1): on bgMode, calls Nidhoggr_ChangeCompletedPartState for
  * part 0 or 1, copies two 8-byte blobs from gUnk_0824F544/4C or gUnk_0824F554/5C into collider and
@@ -2692,8 +2781,6 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
         } while (n > 0);
     }
 }
-
-void sub_0819465C(void *);
 
 void sub_0819321C(void *);
 
