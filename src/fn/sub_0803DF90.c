@@ -1,6 +1,6 @@
 #include "scene_pool.h"
 #ifdef NONMATCHING
-// fuzzy: 99.2%
+// fuzzy: 86.6%
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
@@ -84,33 +84,21 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             case 0:
             case 1:
                 state = 5;
-                goto choose;
+                break;
             case 2:
                 if (entry->mode != 0)
-                    goto seven;
-                state = 5;
-                goto choose;
-            seven:
-                state = 7;
-            choose:
-                entry->state = state;
-                entry->stateFrame = flag;
-                {
-                    u8 *chosenEntered = &entry->stateEntered;
-                    u32 one = 1;
-                    *chosenEntered = one;
-                    {
-                        u32 *arg = entry->history;
-                        Memory_Clear(arg, 0x100);
-                    }
-                }
-                goto done;
+                    state = 7;
+                else
+                    state = 5;
+                break;
             case 3:
                 Enter(entry, 7, flag);
                 goto done;
             default:
                 goto done;
         }
+        Enter(entry, state, flag);
+        goto done;
     }
     if (entry->stateFrame > 239) {
         flag = PlayerHasFlag(2);

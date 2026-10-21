@@ -2,9 +2,9 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.9%
-// Remaining differences: CpuSet size constant load order, the zero offset register in the second
-// sine-table read (r3 vs r1) and the 0x2B1 offset register.
+// fuzzy: 98.7%
+// Remaining differences: CpuSet size constant load order and the zero offset register
+// in the second sine-table read (r3 vs r1).
 #include "scene_actor_control_helpers.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -137,9 +137,7 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
             asm("" : "+r"(dst));
             zero[0] = zeroValue;
             {
-                register u32 ctl asm("r2") = 0x05000002;
-                asm("" : "+r"(ctl));
-                CpuSet(zero, dst, ctl);
+                CpuSet(zero, dst, 0x05000002);
             }
         }
         {
@@ -170,9 +168,9 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
         if (Approach(actor, (void *)(body + 0x3F0), speed)) {
             if ((u8)sub_08083C38(actor)) {
                 u32 base = (u32)actor;
-                u32 two;
-                u32 zero2;
-                u32 off;
+                register u32 two asm("r1");
+                register u32 zero2 asm("r2");
+                register u32 off asm("r3");
                 Trigger_ConsumePending((u8 *)actor + 0xC, 1);
                 two = 2;
                 {
@@ -185,9 +183,15 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
                 }
                 off = 0x2A9;
                 asm("" : "+r"(off));
-                *(u8 *)(base + off) = zero2;
+                {
+                    register u8 *a3 asm("r0") = (u8 *)(base + off);
+                    *a3 = zero2;
+                }
                 off += 1;
-                *(u8 *)(base + off) = two;
+                {
+                    register u8 *a4 asm("r0") = (u8 *)(base + off);
+                    *a4 = two;
+                }
                 {
                     register u32 o asm("r1") = 0x2AC;
                     register u32 *a asm("r0");
@@ -195,9 +199,13 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
                     a = (u32 *)(base + o);
                     *a = zero2;
                 }
-                off = 0x2B1;
-                asm("" : "+r"(off));
-                *(u8 *)(base + off) = 1;
+                {
+                    register u32 o2 asm("r2") = 0x2B1;
+                    register u8 *a2 asm("r1");
+                    asm("" : "+r"(o2));
+                    a2 = (u8 *)(base + o2);
+                    *a2 = 1;
+                }
             }
         } else {
             register u32 o asm("r3") = 0x2AC;
