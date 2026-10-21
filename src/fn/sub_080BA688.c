@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
-// fuzzy: 98.2%
+// fuzzy: 98.8%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
@@ -30,6 +30,7 @@ static inline void AddHalf(s16 *dst, const s16 *src)
 }
 void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
 {
+    u8 *new_var;
     register struct SceneActorRegistryResetView *p asm("r6") = p_;
     struct {
         u32 zero;
@@ -41,7 +42,8 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
-    HeadingStep(&scratch.step, &p->direction, 32);
+    new_var = &p->direction;
+    HeadingStep(&scratch.step, new_var, 32);
     AddHalf(&p->motion.x, &scratch.step.x);
     AddHalf(&p->motion.z, &scratch.step.z);
     {
