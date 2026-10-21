@@ -37,7 +37,7 @@ struct ChildGroupEvent {
     struct ChildGroup *owner;
 };
 void sub_080F38E0(struct ChildGroup *);
-void sub_080F3F48(struct ChildGroup *);
+void ChildGroup_UpdateLandingState(struct ChildGroup *);
 void AnimData_SelectPaletteBank(void *, u32);
 static inline void SetState(struct ChildGroup *p, u8 one, u8 id)
 {
@@ -74,7 +74,7 @@ s32 ChildGroup_ProcessEvent(struct ChildGroupEvent *event, s32 kind, s32 damage)
             break;
         case 1:
             p->fieldD53 = 0;
-            p->callback = sub_080F3F48;
+            p->callback = ChildGroup_UpdateLandingState;
             p->position = p->savedPosition;
             SetState(p, 1, 4);
             break;
