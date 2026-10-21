@@ -1450,7 +1450,9 @@ addr,name,mode,confidence,source,notes
 0803C880,ScenePool_UpdateOccupiedActorSlots,thumb,low,src-alias,Updates occupied actor slots or releases those outside player bounds while counting processed slots
 0803C90C,ScenePool_GetRegistryBucketIndex,thumb,low,src-alias,Registry hash callback that selects one of sixteen buckets from key bits 16 through 19
 0803C914,ScenePool_RegisterEntry,thumb,low,src-alias,Initializes the entry's registry node with its resolved resource key and inserts it into the manager registry
+0803C940,WirelessObj_ApplyKnockback,thumb,low,src-alias,
 0803CC78,ScenePool_OnProximityContact,thumb,low,src-alias,Proximity collider callback that copies the contact halfword into the owning actor's contact timer
+0803CC90,WirelessObj_InitCollisionVolumes,thumb,low,src-alias,
 0803CDF0,ScenePool_ParseEntryParameters,thumb,low,src-alias,
 0803D1AC,ScenePool_DestroyActorSlot,thumb,low,src-alias,Releases an inline actor slot's resources and resets its handle during manager destruction
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
