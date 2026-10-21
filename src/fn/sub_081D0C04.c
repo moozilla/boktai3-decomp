@@ -80,7 +80,7 @@ void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
 void SceneNpc_OnModeUpdate(void);
 void SceneNpc_OnStateUpdate(void);
-void sub_081D0928(void);
+void SceneNpc_OnStateEffectUpdate(void);
 void SceneNpc_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
@@ -184,7 +184,7 @@ void SceneNpc_CreateFromScript(void)
     setHandler(sub_081D0864, &npc->callbacks[0]);
     setHandler(SceneNpc_OnModeUpdate, &npc->callbacks[1]);
     setHandler(SceneNpc_OnStateUpdate, &npc->callbacks[2]);
-    setHandler(sub_081D0928, &npc->callbacks[3]);
+    setHandler(SceneNpc_OnStateEffectUpdate, &npc->callbacks[3]);
     setHandler(SceneNpc_OnDestroy, &npc->callbacks[4]);
     Actor_InitResources(manager, npc, model, 0);
     Actor_LinkToManager(manager, npc);

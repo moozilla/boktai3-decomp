@@ -16,7 +16,7 @@ u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
 void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
-void sub_0811D6C8(void *, u32, u32, s32, u32, u32, u32, u32);
+void PalFade_Start(void *, u32, u32, s32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
 {
@@ -35,7 +35,7 @@ s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
                 ability->cooldown = ability->interval;
                 CallbackList_SubtractStateTenValue(stats, ability, cost);
                 palette = CharacterModel_GetPrimaryPaletteIndex(owner + 0x610);
-                sub_0811D6C8(stats, 0x385, 0x385, palette, *(u16 *)(owner + 0x96), 16, 4, zero);
+                PalFade_Start(stats, 0x385, 0x385, palette, *(u16 *)(owner + 0x96), 16, 4, zero);
                 ability->remaining = ability->duration;
                 Sound_PlaySong(0x3e3);
             }
