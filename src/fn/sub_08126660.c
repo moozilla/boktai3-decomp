@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// foundry draft (worker best 95.0%); what differs is mostly register allocation and instruction order
 #define SmallEffectPool_Allocate SceneStatusIndicator_Allocate
 struct SmallEffectSlot {
     u8 unknown[0x2B];
@@ -33,6 +30,7 @@ struct SmallEffectSlot *SceneStatusIndicator_Allocate(struct SmallEffectPool *po
             index++;
         } else {
             u32 bit = one;
+            asm("" : "+r"(bit));
             bit <<= index;
             *allocated |= bit;
             *kind = index;
@@ -41,6 +39,3 @@ struct SmallEffectSlot *SceneStatusIndicator_Allocate(struct SmallEffectPool *po
     } while (index <= 11);
     return NULL;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneStatusIndicator_Allocate);
-#endif

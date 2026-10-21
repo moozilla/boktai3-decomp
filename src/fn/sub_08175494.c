@@ -1,8 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 94.8%); what differs is mostly register allocation and instruction order
 u16 *Hud_GetTilemapCell(u32, u32, u32);
 s32 Hud_GetMinimum(s32, s32);
 void SceneHud_DrawDecimalDigits(s32, s32, s32, s32, s32);
@@ -22,11 +19,10 @@ void MenuSelection_DrawNumericSummary(u8 *s)
         if (gUnk_02000710->level > 98) {
             u16 *p = Hud_GetTilemapCell(0, 23, 5);
             s32 i;
-            u32 tile = 0xF020;
-            i = 5;
+            i = 0;
             do {
-                *p++ = tile;
-            } while (--i >= 0);
+                *p++ = 0xF020;
+            } while (++i < 6);
         } else {
             SceneHud_DrawDecimalDigits(Hud_GetMinimum(SceneCatalog_GetLevelScaledValue(s), max),
                                        divisor, 23, 5, zero);
@@ -39,6 +35,3 @@ void MenuSelection_DrawNumericSummary(u8 *s)
         SceneHud_DrawDecimalDigits(99, 10, 25, 8, 0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", MenuSelection_DrawNumericSummary);
-#endif
