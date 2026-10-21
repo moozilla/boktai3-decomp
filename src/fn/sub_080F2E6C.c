@@ -1,6 +1,5 @@
 #include "global.h"
 
-// foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 
 struct PhaseEntry {
     u32 flags;
