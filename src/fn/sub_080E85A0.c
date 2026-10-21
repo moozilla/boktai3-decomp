@@ -12,8 +12,6 @@ static inline u8 HasMode(u8 *p)
     return 0;
 }
 
-#define Mimic_StartHitReaction sub_080E85A0
-
 u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
 {
     u8 *ctx = actor->context;

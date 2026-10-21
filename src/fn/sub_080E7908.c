@@ -39,8 +39,6 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-#define Mimic_ConvergeAndTurn sub_080E7908
-
 void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
