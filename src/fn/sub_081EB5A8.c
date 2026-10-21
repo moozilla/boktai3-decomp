@@ -20,9 +20,7 @@ void Actor_HideAuxiliarySprites(void *);
 void BgGfx_LoadTilemapAtPosition(s32, s32, s32);
 void Menu_StartFadeIn(void);
 
-#define Params3D0_InitDisplay sub_081EB5A8
-
-s32 sub_081EB5A8(u8 *p)
+s32 Params3D0_InitDisplay(u8 *p)
 {
     s32 i;
     u16 *q;

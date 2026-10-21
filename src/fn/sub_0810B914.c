@@ -55,7 +55,7 @@ u8 *Script_GetTextSourcePc(void);
 void Hud_SetMode(s32);
 void SessionMenu_Destroy(void *);
 void ScriptPanel_ConfirmSelection(void);
-void sub_0810B724(void);
+void Registry1745_RunSession(void);
 /* Registry routine 1745: creates the singleton at gUnk_020004B4 (0x268
    bytes) from the script options; returns the existing one if there is one,
    or 0 when a required option is missing. */
@@ -131,7 +131,7 @@ struct Registry1745 *Registry1745_Create(void)
     if (!Script_SeekToKeyword('e') || !(settings->field17C = Script_GetTextSourcePc()))
         goto fail;
     Hud_SetMode(7);
-    p->fieldB4 = sub_0810B724;
+    p->fieldB4 = Registry1745_RunSession;
     p->field53 = 1;
 }
 #else
