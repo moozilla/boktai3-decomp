@@ -5,9 +5,7 @@ struct MapIconEntry {
 extern const struct MapIconEntry gUnk_08611B80[];
 u32 GameState_GetWorldMapFlag(u32);
 u16 *Hud_GetTilemapCell(u32, s32, s32);
-#ifdef NONMATCHING
-// fuzzy: 98.2%
-// Differs only in the order of the table-address load vs. i*4 in the first loop.
+// MATCHING_CONCESSION: register-pinning
 void MapMenu_DrawLocationIcons(void *menu, s32 left, s32 top)
 {
     s32 i = 0, j, k;
@@ -16,7 +14,10 @@ void MapMenu_DrawLocationIcons(void *menu, s32 left, s32 top)
     s32 right = left + 32;
     s32 bottom = top + 32;
     for (i = 0; i <= 9; i++) {
-        const struct MapIconEntry *e = &gUnk_08611B80[i];
+        const struct MapIconEntry *tbl = gUnk_08611B80;
+        const struct MapIconEntry *e;
+        asm("" : "+r"(tbl));
+        e = (const struct MapIconEntry *)((i << 2) + (u32)tbl);
         if (GameState_GetWorldMapFlag(e->flag)) {
             s32 x = e->x;
             s32 y = e->y;
@@ -65,6 +66,3 @@ void MapMenu_DrawLocationIcons(void *menu, s32 left, s32 top)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", MapMenu_DrawLocationIcons);
-#endif
