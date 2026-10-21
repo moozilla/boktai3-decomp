@@ -2937,6 +2937,7 @@ addr,name,mode,confidence,source,notes
 08086DD0,Bat_UpdateAnimationRequest,thumb,low,src-alias,
 08086E2C,Bat_ResumeSavedTarget,thumb,low,src-alias,
 08088CD4,Bat_UpdateDefeat,thumb,low,src-alias,
+08089800,Ghoul_UpdateScriptedAction,thumb,low,src-alias,"starts scripted action once then idles when done; sets control flag 4"
 0808A224,Ghoul_SetBehaviorHandlers,thumb,low,src-alias,Installs the two ghoul behavior callbacks at actor offset 0x288
 0808A234,Ghoul_UpdateProbeApproach,thumb,low,src-alias,
 0808A430,SceneActorControl_RestartOrAdvance,thumb,low,src-alias,
