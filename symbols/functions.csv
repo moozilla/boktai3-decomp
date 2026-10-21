@@ -5520,10 +5520,12 @@ addr,name,mode,confidence,source,notes
 08162740,PlayerAttackEffect_SetElementMode,thumb,low,src-alias,Selects the emission dispatch mode apparently corresponding to the player's active element; tentative interpretation
 0816275C,PlayerAttackEffect_SetDefaultPaletteSource,thumb,low,src-alias,Updates the palette source only when the element mode is zero
 08162780,PlayerBarrier_DecrementDuration,thumb,low,src-alias,Decrements the shared defensive effect duration while clamping it to zero; barrier interpretation tentative
+081627A4,PlayerBarrier_Update,thumb,low,src-alias,
 08162A30,PlayerBarrier_Destroy,thumb,low,src-alias,Barrier task destruction callback that removes its two sprites
 08162A4C,PlayerBarrier_OnCollision,thumb,low,src-alias,Empty collision callback installed on the barrier collider
 08162A50,SceneMarker_InitSprites,thumb,low,src-alias,
 08162BA0,PlayerBarrier_Create,thumb,low,src-alias,Allocates and initializes the player defensive effect task with update and destruction callbacks
+08162BE4,PlayerBarrier_TryPlace,thumb,low,src-alias,
 08162D58,PlayerBarrier_TryActivate,thumb,low,src-alias,Enters active state three and plays its sound only when shared duration remains positive
 08162DAC,PlayerBarrier_BeginRecovery,thumb,low,src-alias,Switches the defensive effect to recovery state two and selects its transition palette
 08162DC8,PlayerBarrier_Hide,thumb,low,src-alias,Resets the defensive effect state and sets its hidden flag
@@ -7014,6 +7016,7 @@ addr,name,mode,confidence,source,notes
 081B79F8,GrowthHazard_UpdateCooldown,thumb,low,src-alias,Cooldown callback advances state once both the flash counter and cooldown have expired
 081B7A2C,GrowthHazard_RevealWhenCellVacant,thumb,low,src-alias,
 081B7C98,GrowthHazard_UpdateManager,thumb,low,src-alias,Task update callback runs entry callbacks and advances temporary palette flashes
+081B7E4C,GrowthHazard_InitEntryFromScript,thumb,low,src-alias,
 081B8098,GrowthHazard_InitManager,thumb,low,src-alias,Resets the entry count and binds the manager to the current scene context
 081B80BC,GrowthHazard_CreateManager,thumb,low,src-alias,Creates the singleton task with entry-update and cleanup callbacks
 081B8160,GrowthHazard_AddFromScript,thumb,low,src-alias,Ensures the manager exists then initializes another growth entry from script parameters
