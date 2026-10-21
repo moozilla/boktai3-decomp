@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
@@ -27,6 +26,7 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
 }
 void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
 {
+    s16 *x_2;
     struct ContactPosition target;
     if (TestFlag(actor, 0x2000)) {
         struct ContactPosition *p = &target;
@@ -41,14 +41,14 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
         if (actor->groundHeight2BE < height) {
             s32 zero;
             s32 off = 0x2EC;
-            register s16 *x asm("r1") = (s16 *)((u8 *)actor + off);
+            s16 *x = (s16 *)((u8 *)actor + off);
             s32 value = -*x;
             zero = 0;
             *x = value;
             off = 0x2F0;
-            x = (s16 *)((u8 *)actor + off);
-            value = -*x;
-            *x = value;
+            x_2 = (s16 *)(((u8 *)actor) + off);
+            value = -(*x_2);
+            *x_2 = value;
             actor->motion.x = zero;
             actor->motion.z = zero;
         }

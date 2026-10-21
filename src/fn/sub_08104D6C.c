@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "callback_pool.h"
 
@@ -18,13 +17,12 @@ s32 CallbackPool_UpdateEntries(struct CallbackPool *pool)
     struct CallbackPoolEntry *start = pool->entries;
     struct CallbackPoolEntry *entry;
     s32 i;
-    if (pool->activeMask) {
-        asm("" ::: "r2");
-        for (i = 0; i < 4; i++) {
-            entry = &start[i];
-            if (CallbackPool_IsActive(&pool->activeMask, i))
-                sub_08249240(pool, entry, gUnk_086064E8[pool->entries[i].callbackIndex]);
-        }
+    if (!pool->activeMask)
+        return 0;
+    for (i = 0; i < 4; i++) {
+        entry = &start[i];
+        if (CallbackPool_IsActive(&pool->activeMask, i))
+            sub_08249240(pool, entry, gUnk_086064E8[pool->entries[i].callbackIndex]);
     }
     return 0;
 }

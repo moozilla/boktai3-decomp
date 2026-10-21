@@ -1,5 +1,4 @@
 #include "cell_gate.h"
-// MATCHING_CONCESSION: register-pinning
 void CellGate_UpdatePassageBarrier(struct CellGate *);
 void CellGate_UpdateForcedDirection(struct CellGate *);
 void CellGate_UpdateConditionalBarrier(struct CellGate *);
@@ -9,14 +8,15 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
 
     s32 x, z;
     u32 value;
-    register CellGateUpdate callback asm("r0");
+    CellGateUpdate callback;
     u32 cell;
     gate->id = id;
     gate->registered = 0;
-    if (Script_SeekToKeyword('t'))
+    if (Script_SeekToKeyword('t')) {
         value = Script_GetValue();
-    else
+    } else {
         value = 9;
+    }
     gate->flags = value;
     if (Script_SeekToKeyword('p')) {
         position.x = Script_GetValue();
@@ -35,20 +35,22 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
         }
         z = coord->z >> 8;
     }
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
         cell = 0;
-    else
+    } else {
         cell = gUnk_030052F4->rows[z] + x;
+    }
     gate->cell = cell;
     gate->height = ((struct ContactPosition *)&position)->y >> 8;
     value = Script_SeekToKeyword('R');
-    if (value)
+    if (value) {
         value = Script_GetValue();
+    }
     gate->scriptId = value;
     {
         u32 flags = gate->flags;
         if (flags & 1) {
-            callback = CellGate_UpdatePassageBarrier;
+            *(&callback) = CellGate_UpdatePassageBarrier;
             goto assign;
         }
         {

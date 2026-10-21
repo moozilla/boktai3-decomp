@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 u32 Slime_GetRandomVariantFlags(u8 *p);
 struct SlimeHitInfo {
@@ -45,8 +44,8 @@ zero:
 void Slime_ApplyBodyHit(struct SlimeHitTarget *target, struct SlimeHitInfo *info,
                         struct SceneActorRegistryResetView *actor)
 {
-    if (!Slime_Unavailable(actor) && info->flags == 1) {
-        asm("" ::: "memory");
+    s32 k2 = 1;
+    if ((!Slime_Unavailable(actor)) && (info->flags == k2)) {
         if (!Slime_Unavailable(actor) && (info->flags & 0xF)) {
             actor->field304 = info->value;
             {
@@ -55,7 +54,8 @@ void Slime_ApplyBodyHit(struct SlimeHitTarget *target, struct SlimeHitInfo *info
                 *field &= mask;
             }
         }
-        if (*(u16 *)((u8 *)actor + 0x1E6) == 3)
+        if ((*((u16 *)(((u8 *)actor) + 0x1E6))) == 3) {
             target->variantFlags = Slime_GetRandomVariantFlags((u8 *)actor);
+        }
     }
 }

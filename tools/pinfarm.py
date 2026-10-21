@@ -232,6 +232,10 @@ def cmd_apply(a):
                 print(f"{name}: no longer found in src/; skipped")
                 continue
             unit = found
+        current = dict(definitions(open(os.path.join(ROOT, unit)).read())).get(name)
+        if current is not None and not hinted(current):
+            print(f"{name}: already free of hints in {unit}; skipped")
+            continue
         old = splice(unit, name, src, func)
         if old is None:
             print(f"{func}: could not splice into {unit}")

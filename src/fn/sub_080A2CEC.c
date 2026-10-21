@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -53,53 +52,49 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             gUnk_03005308 = index;
             index *= 2;
             {
-                register const u16 *table asm("r3") = gUnk_0203B400;
-                register u32 off asm("r5");
+                const u16 *table = (const u16 *)0x0203B400;
+                u32 off;
                 {
                     const u16 *entry = (void *)(index + (u32)table);
                     value = *entry;
                 }
                 off = 0x2BA;
-                asm("" : "+r"(off));
                 {
-                    register u8 *field asm("r0") = (u8 *)actor + off;
+                    u8 *field = (u8 *)actor + off;
                     *field = value;
                 }
             }
         }
         {
-            register u32 off asm("r0") = 0x2BB;
-            register u8 *p asm("r1");
-            asm("" : "+r"(off));
+            u32 off = 0x2BB;
+            u8 *p;
             p = (u8 *)actor + off;
             *p = 1;
         }
     }
     {
         u32 mask = 0x8000;
-        register u32 off asm("r3") = 0x2CC;
-        register u32 *p asm("r1");
+        u32 off = 0x2CC;
+        u32 *p;
         u32 v;
-        asm("" : "+r"(off));
         p = (u32 *)((u8 *)actor + off);
         v = *p & mask;
         stateFlags = p;
-        if (v)
+        if (v) {
             return;
+        }
     }
 
     if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
         {
-            register u32 off asm("r1") = 0x2B0;
-            register u8 *q asm("r0");
-            asm("" : "+r"(off));
+            u32 off = 0x2B0;
+            u8 *q;
             q = (u8 *)actor + off;
             *q = 1;
         }
         {
-            register u32 off asm("r2") = 0x1F8;
-            register u16 *q asm("r0");
-            asm("" : "+r"(off));
+            u32 off = 0x1F8;
+            u16 *q;
             q = (u16 *)((u8 *)actor + off);
             script = *q;
         }
@@ -118,14 +113,16 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         {
             u32 mask = 0x4000;
-            if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
+            if ((!(actor->flags2D4 & mask)) && (((u32)(actor->category - 11)) > 2)) {
                 GameState_SetEventFlag(
                     BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            }
         }
         {
             u32 mask = 0x400;
-            if (!(*stateFlags & mask))
+            if (!((*stateFlags) & mask)) {
                 SceneActorBehavior_CallTerrainScript((void *)actor);
+            }
         }
         {
             void *callback = (void *)SceneActorControl_OnIdle;
@@ -144,10 +141,9 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             actor->word104 = 0;
         }
         SetAnimation(actor, 1, 0, 2);
+    } else if (Hidden(actor)) {
+        ActorShadow_Disable(((u8 *)actor) + 0x320);
     } else {
-        if (Hidden(actor))
-            ActorShadow_Disable((u8 *)actor + 0x320);
-        else
             ActorShadow_Enable((u8 *)actor + 0x320);
     }
 }
