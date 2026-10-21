@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct VanargandFadePart {
     u8 unknown0[0x38];
@@ -32,7 +31,7 @@ void Vanargand_UpdatePartFlashFade(u8 *boss, struct VanargandFadePartState *p, s
         p->enter = 1;
     }
     {
-        register u32 offset asm("r1") = 0x164;
+        u32 offset = 0x164;
         u32 *statePtr;
         u32 value;
         statePtr = (u32 *)((u8 *)p + offset);
@@ -44,8 +43,8 @@ void Vanargand_UpdatePartFlashFade(u8 *boss, struct VanargandFadePartState *p, s
                 if (frame & mask) {
                     u32 next = 1;
                     u32 off = 0x164;
-                    register u32 *state asm("r1");
-                    state = (u32 *)((u8 *)p + off);
+                    u32 *state;
+                    state = (u32 *)(((u8 *)p) - (-off));
                     *state = next;
                     {
                         u32 off2 = 0x168;
@@ -55,19 +54,17 @@ void Vanargand_UpdatePartFlashFade(u8 *boss, struct VanargandFadePartState *p, s
                         }
                     }
                     {
-                        register u8 *ptr asm("r1");
+                        u8 *ptr;
                         off += 11;
-                        asm("" : "+r"(off));
-                        ptr = (u8 *)p + off;
+                        ptr = ((u8 *)p) - (-off);
                         *ptr = next;
                     }
                 }
                 break;
             case 1: {
-                register u32 off asm("r3") = 0x170;
-                asm("" : "+r"(off));
+                u32 off = 0x170;
                 {
-                    register u8 *ptr asm("r0") = (u8 *)p + off;
+                    u8 *ptr = (u8 *)p + off;
                     *ptr = 1;
                 }
             } break;
