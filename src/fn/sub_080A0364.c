@@ -3,8 +3,6 @@
 #include "scene_actor_terrain.h"
 #include "display_animation.h"
 
-#define Crow_UpdateGroundHeight sub_080A0364
-
 extern const s16 gUnk_086149C4[];
 
 struct CrowHeightState {

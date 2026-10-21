@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-#define Crow_ApproachPlayer sub_0809FE78
-
 extern u8 *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
