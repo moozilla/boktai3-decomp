@@ -5,7 +5,6 @@
 #ifdef NONMATCHING
 // fuzzy: 96.9%
 // Remaining: collider flag-update registers and one copy of the constant 7 from sl.
-#define EnemyF426_UpdateDamageState sub_08203DF4
 struct DisplaySequenceState {
     const u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
@@ -262,5 +261,5 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
     p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08203DF4);
+INCLUDE_ASM("asm/nonmatching", EnemyF426_UpdateDamageState);
 #endif

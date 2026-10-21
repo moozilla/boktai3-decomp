@@ -141,7 +141,6 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
         }
     }
 }
-#define EnemyF426_InitializeFromScript sub_08204230
 s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
 {
     register void *sprite asm("r8");
@@ -263,5 +262,5 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
     *(void (**)(void))(p + 0x108) = sub_08203CA0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08204230);
+INCLUDE_ASM("asm/nonmatching", EnemyF426_InitializeFromScript);
 #endif
