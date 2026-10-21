@@ -4,9 +4,6 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.7%
-// Sequence-ID constants, delay-script loads, and the defined return token still differ.
 struct OozeInit {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -240,35 +237,54 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     Anim_SetSequence(&p->sequence, p->resource, 0x22, (u8)p->facing, 8);
     Ooze_StepInitialAnimation(&p->sprite, &p->sequence);
-    if (p->variant == 0) {
-        p->idleSequence = 0x22;
-        p->startSequence = 0x23;
-        p->holdSequence = 0x24;
-        p->endSequence = 0x25;
-    } else {
-        p->idleSequence = 0x1e;
-        p->startSequence = 0x1f;
-        p->holdSequence = 0x20;
-        p->endSequence = 0x21;
+    {
+        u32 off = 0x122;
+        asm("" : "+r"(off));
+        if (*(s16 *)((u8 *)p + off) == 0) {
+            off += 0x24;
+            asm("" : "+r"(off));
+            *(u16 *)((u8 *)p + off) = 0x22;
+            p->startSequence = 0x23;
+            off += 4;
+            asm("" : "+r"(off));
+            *(u16 *)((u8 *)p + off) = 0x24;
+            p->endSequence = 0x25;
+        } else {
+            off = 0x146;
+            asm("" : "+r"(off));
+            *(u16 *)((u8 *)p + off) = 0x1e;
+            p->startSequence = 0x1f;
+            off += 4;
+            asm("" : "+r"(off));
+            *(u16 *)((u8 *)p + off) = 0x20;
+            p->endSequence = 0x21;
+        }
+        asm("" ::"r"(off));
     }
     Ooze_InitAttackCollider(p);
-    if (p->delayScript)
-        Ooze_ReadScriptValueList(p);
-    result = (s32)&p->solid;
-    if (p->solid) {
-        CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
-        if (p->variant == 1) {
-            Ooze_OffsetBodyPosition(&position, p->facing);
+    {
+        register u32 d asm("r0");
+        asm("" : "=r"(d));
+        if (p->delayScript)
+            Ooze_ReadScriptValueList(p);
+        asm("" ::"r"(d));
+    }
+    {
+        register u32 d0 asm("r0");
+        register s32 r asm("r1");
+        asm volatile("" : "=r"(d0));
+        r = p->solid;
+        asm volatile("" ::"r"(d0));
+        if (r) {
+            CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
+            if (p->variant == 1) {
+                Ooze_OffsetBodyPosition(&position, p->facing);
+            }
+            SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
+            SceneBody_SetSprite(p->body, &p->sprite);
+            result = TerrainOverlay_QueueAddActor(p->body);
         }
-        SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
-        SceneBody_SetSprite(p->body, &p->sprite);
-        result = TerrainOverlay_QueueAddActor(p->body);
     }
     p->state = Ooze_UpdateAttackDelay;
-    asm("" : "+r"(result));
     return result;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ooze_InitializeFromScript);
-#endif
