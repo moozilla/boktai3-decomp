@@ -67,8 +67,8 @@ UNSAFE_PASSES = [
     "perm_temp_for_expr", "perm_expand_expr", "perm_reorder_stmts", "perm_remove_var",
     "perm_cast_simple", "perm_randomize_internal_type", "perm_inline",
 ]
-# Edits a programmer plausibly wrote (no empty blocks or loops, no `*(&x)`
-# re-reads, no literal addresses): --natural searches only these, so that a
+# Edits a programmer plausibly wrote (no `*(&x)` re-reads, no literal
+# addresses; a do/while(0) block stands for a statement macro, see natfarm.py): --natural searches only these, so that a
 # match reads like original source rather than a compiler-steering trick.
 NATURAL_PASSES = [
     "perm_param_copy", "perm_early_return", "perm_reset_const", "perm_move_to_use",
@@ -76,6 +76,8 @@ NATURAL_PASSES = [
     "perm_struct_ref", "perm_compound_assignment", "perm_commutative", "perm_add_sub",
     "perm_inequalities", "perm_condition", "perm_reverse_cond", "perm_chain_assignment",
     "perm_split_assignment", "perm_loop_form",
+    # do { } while (0) around statements: a statement macro's expansion
+    "perm_ins_block",
     # unsafe in general, but a natural search keeps only exact matches, and
     # identical bytes cannot mean anything else: retyping a local, a new or
     # removed temporary, a cast, an inline helper, reordered statements

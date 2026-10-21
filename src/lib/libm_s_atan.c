@@ -24,11 +24,11 @@ extern const double gUnk_08602DD8[];
 {
  double w,s1,s2,z;
  __int32_t ix,hx,id;
- do { ieee_double_shape_type gh_u; gh_u.value = (x); (hx) = gh_u.parts.msw; } while (0);
+ GET_HIGH_WORD(hx, x);
  ix = hx&0x7fffffff;
  if(ix>=0x44100000) {
      __uint32_t low;
-     do { ieee_double_shape_type gl_u; gl_u.value = (x); (low) = gl_u.parts.lsw; } while (0);
+     GET_LOW_WORD(low, x);
      if(ix>0x7ff00000||
   (ix==0x7ff00000&&(low!=0)))
   return x+x;

@@ -45,8 +45,7 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         active = (u16 *)((u8 *)emitter + offset + 0xF0);
         {
             u32 zero = 0;
-            do {
-            } while (0);
+            DEBUG_NOP();
             *active = zero;
         }
     } while (++i <= 7);

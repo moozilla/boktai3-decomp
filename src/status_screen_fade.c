@@ -23,8 +23,7 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
                 int r = ((color & 31) * factor) & 0x7C0;
                 int g = ((color & 992) * factor) & 0xF800;
                 int blue = color & blueMask;
-                do {
-                } while (0);
+                DEBUG_NOP();
                 {
                     int b = (blue * factor) & 0x1F0000;
                     *out = (r | g | b) >> 6;
