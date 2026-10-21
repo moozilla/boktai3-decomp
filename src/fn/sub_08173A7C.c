@@ -7,7 +7,7 @@ void Hud_RestoreSecondaryGridSelection(void *);
 void SceneInput_BuildActionGrid_08173508(void *, int);
 void PauseMenu_ClearSpriteFlags(void *, int, int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void sub_08166534(void *, int, int);
 void PauseMenu_RefreshEquipmentPanel(void *);
@@ -28,7 +28,7 @@ void SceneHud_BeginEquipmentSelection(struct SceneHudState *p)
     PauseMenu_ClearSpriteFlags(p, 4, 1);
     PauseMenu_AddSpriteFlags(p, 6, 1);
     PauseMenu_AddSpriteFlags(p, 5, 1);
-    sub_081672FC(p);
+    InventoryPanel_ShowStatusIcons(p);
     MenuDisplay_UpdateActionPrompt(p, 2);
     sub_08166534(p, 10, 6);
     PauseMenu_RefreshEquipmentPanel(p);

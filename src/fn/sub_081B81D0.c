@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "palette_set.h"
-#define SceneScriptObject_UpdateFade sub_081B81D0
-#define gPaletteBanks                gUnk_030042E4
+#define gPaletteBanks gUnk_030042E4
 struct SceneScriptFadeWidget {
     u8 unknown0[6];
     u16 flags;

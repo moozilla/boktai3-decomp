@@ -5,8 +5,7 @@
 // Open: two spilled pointer slots are swapped and one mask constant is rematerialized;
 // everything else matches instruction for instruction.
 #include "scene_vec.h"
-#define SceneScriptObject_UpdateBurst sub_081B83A0
-#define gRandomIndex                  gUnk_03005308
+#define gRandomIndex gUnk_03005308
 struct SceneScriptBurstObject {
     u8 unknown0[0x34];
     struct SceneVec position;
@@ -83,5 +82,5 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
         object->counter++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081B83A0);
+INCLUDE_ASM("asm/nonmatching", SceneScriptObject_UpdateBurst);
 #endif

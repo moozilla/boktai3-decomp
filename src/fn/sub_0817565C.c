@@ -11,7 +11,7 @@ void Hud_DrawHeaderCounter(void);
 void InventoryPanel_UpdateSelectedUnlock(u8 *, u32, u32, u32, u32);
 void InventoryPanel_UpdateSelectedEquipment(u8 *, u32, u32, u32, u32);
 void PlayerPanel_SnapshotValues(u8 *);
-void sub_081672FC(u8 *);
+void InventoryPanel_ShowStatusIcons(u8 *);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
 void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
@@ -63,7 +63,7 @@ void Hud_InitStatusMenu(u8 *s)
     sub_08174BBC(s);
     SceneCatalog_SetSelection(s, 0);
     sub_08174D20(s);
-    sub_081672FC(s);
+    InventoryPanel_ShowStatusIcons(s);
     SceneCatalog_ResetTextWindow(s);
     PauseMenu_SetPromptIconPositions(s, 0, 8);
     neg = -1;

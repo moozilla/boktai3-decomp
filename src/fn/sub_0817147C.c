@@ -8,7 +8,7 @@ void PlayerPanel_SnapshotValues(void *);
 void sub_08166534(void *, int, int);
 void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void InventoryPanel_UpdateSelectedEquipment(void *, int, int, int, int);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void PauseInventory_UpdateConsumableActions(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MessageWindow_Clear(void);
@@ -31,7 +31,7 @@ void PauseInventory_ReturnToConsumableActions(u8 *p)
     z = 0;
     InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, z);
     InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, z);
-    sub_081672FC(p);
+    InventoryPanel_ShowStatusIcons(p);
     Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableActions, 0);
     MessageWindow_Clear();
     MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);

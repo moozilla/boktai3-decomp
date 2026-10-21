@@ -4,7 +4,6 @@
 // fuzzy: 91.0%
 // Open: temporary register choices only (constant 1 and rand address regs); pointer roles match.
 #include "level_advance_display.h"
-#define InventoryPanel_StartCallbackBurst sub_081675CC
 /* Tentative inventory display family, inferred from slot and item consumers. */
 struct InventoryPanelCallbackMetadata {
     u8 active, age;
@@ -84,5 +83,5 @@ void InventoryPanel_StartCallbackBurst(struct InventoryPanel *panel, s32 index, 
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081675CC);
+INCLUDE_ASM("asm/nonmatching", InventoryPanel_StartCallbackBurst);
 #endif
