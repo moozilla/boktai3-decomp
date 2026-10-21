@@ -1,8 +1,11 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void *AnimData_FindEntry(int);
 void ParticleSprite_Initialize(void *, void *, int);
+static inline void CpuSet_2(u32 control, void *dest, const void *src)
+{
+    CpuSet(src, dest, control);
+}
 int ResultMenu_CreateGraphics(u8 *arg)
 {
     u8 *p = arg;
@@ -18,11 +21,8 @@ int ResultMenu_CreateGraphics(u8 *arg)
     tmp.zero = 0;
     {
         u32 *src = &tmp.zero;
-        u32 *dst;
-        asm("" : "+r"(src));
-        dst = pos;
-        asm("" : "+r"(dst));
-        CpuSet(src, dst, 0x05000002);
+        u32 *dst = pos;
+        CpuSet_2(0x05000002, dst, src);
     }
     saved = pos;
     clear = 0;
@@ -35,8 +35,8 @@ int ResultMenu_CreateGraphics(u8 *arg)
     } while (i >= 0);
     {
         void *resource = AnimData_FindEntry(0x1c1a);
-        register u8 *a asm("r8") = p + 0xb8;
-        register u8 *b asm("sb") = p + 0xb9;
+        u8 *a = p + 0xb8;
+        u8 *b = p + 0xb9;
         out = p + 0x6e4;
         i = 3;
         do {
