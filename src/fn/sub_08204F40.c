@@ -2,7 +2,6 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
-#define EnemyD459_Update sub_08204F40
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560, gUnk_03005308;
 extern u8 *gUnk_030042E4;
 s32 Callback_InvokeActor(void *, void *);
