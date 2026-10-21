@@ -1,8 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "callback_pool.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.7%
+// fuzzy: 99.3%
 // foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 void Collision_CalculateDamageResponse(void *);
 void SceneHud_SetTimedState(void *, s32, s32, u32, s32, s32);
@@ -18,7 +19,7 @@ static inline void ClearVector(void *dest, u32 *zero)
 void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackPoolEntry *target,
                               struct CallbackPoolEntry *entry)
 {
-    struct CallbackPoolEntry *recipient = target;
+    register struct CallbackPoolEntry *recipient asm("r8") = target;
     s32 damage;
     u32 stack[3];
     u32 *vector;
