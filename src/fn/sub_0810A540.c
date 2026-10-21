@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// open: the two Registry1745_SetState calls are not tail-merged; asm memory barrier forces the selection reload
 #define LinkMenu_SetState       Registry1745_SetState
 #define LinkMenu_CheckSelection Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection Registry1745_BeginShutdown
@@ -35,20 +33,27 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
 {
     void (*next)(void);
     u32 mode;
+    struct AreaEffectLinkState *pp;
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (IsMode9(*p->selection)) {
         RegistryF246_Close();
-        Registry1745_SetState(p, 9, LinkMenu_ExchangeChoices);
-    } else {
-        asm("" ::: "memory");
-        if (IsMode4(*p->selection))
-            Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
+        next = LinkMenu_ExchangeChoices;
+        pp = p;
+        asm("" : "+r"(pp));
+        mode = 9;
+        goto call;
+    }
+    asm("" ::: "memory");
+    if (IsMode4(*p->selection)) {
+        next = LinkMenu_WaitForReadyPeers;
+        pp = p;
+        asm("" : "+r"(pp));
+        mode = 4;
+    call:
+        Registry1745_SetState(pp, mode, next);
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkMenu_WaitSelectionMode);
-#endif
