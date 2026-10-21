@@ -1,9 +1,7 @@
 #include "global.h"
 #include "route_sprite_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// foundry draft (worker best 93.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define Route_GetPoints Path_GetPointData
 #define gRandomIndex    gUnk_03005308
 #define gRandomTable    gUnk_0203B400
@@ -23,7 +21,7 @@ struct RouteSelectionPosition {
 };
 static inline s32 randomValue(void)
 {
-    const u16 *table;
+    register const u16 *table asm("r3");
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
@@ -75,10 +73,14 @@ void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
     {
         struct ContactPosition *dest = out;
         dest->x = route.current->x;
-        dest->y = actor->groundHeight;
+        {
+            register struct SceneActorRouteSelection *a asm("r2") = actor;
+            register u32 c asm("r3") = 0x2be;
+            register u16 *q asm("r1");
+            asm("" : "+r"(a), "+r"(c));
+            q = (u16 *)((u32)a + c);
+            dest->y = *q;
+        }
         dest->z = route.current->z;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_SelectDistantRoutePoint);
-#endif
