@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "region_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.5%
-// foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
 #define gRegionActorPool gUnk_020001B4
 extern struct RegionActorPool *gUnk_020001B4;
 void Sprite_Remove(void *);
@@ -19,10 +17,9 @@ static inline u8 IsUsed(struct RegionActorPool *pool, s32 index)
         return 1;
     return 0;
 }
-static inline u8 TestFlags(struct RegionActor *actor)
+static inline u8 TestFlagsValue(u32 v)
 {
-    u32 mask = 0x20;
-    if (actor->behaviorFlags & mask)
+    if (v)
         return 1;
     return 0;
 }
@@ -38,8 +35,17 @@ s32 RegionActorPool_DestroyActors(struct RegionActorPool *pool)
                 SceneBody_Unregister(actor->overlay);
             }
             {
-                u32 *flags = &actor->behaviorFlags;
-                if (TestFlags(actor)) {
+                register u32 m20 asm("r2") = 0x20;
+                u32 *flags;
+                register u32 *t asm("r1");
+                u32 v;
+                asm("" : "+r"(m20));
+                t = &actor->behaviorFlags;
+                v = *t;
+                v &= m20;
+                flags = t;
+                asm("" : "+r"(flags));
+                if (TestFlagsValue(v)) {
                     TerrainModifiers_UnregisterCell(actor->resource);
                     {
                         u32 mask = ~0x20;
@@ -53,6 +59,3 @@ s32 RegionActorPool_DestroyActors(struct RegionActorPool *pool)
     gUnk_020001B4 = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RegionActorPool_DestroyActors);
-#endif
