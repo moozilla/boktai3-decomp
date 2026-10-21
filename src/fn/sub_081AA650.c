@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 88.0%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 struct VanargandAnimation {
     u8 pad0[0x18];
@@ -36,9 +35,10 @@ void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
 {
     u32 result;
     struct VanargandAnimation *animation = &p->animation;
-    s32 phase;
+    register s32 phase asm("r2");
     u32 mask = 0x40;
-    p->flags |= mask;
+    register u32 *fp asm("r6") = &p->flags;
+    *fp |= mask;
     Vanargand_SetPendingCue(p, 1);
     result = (u8)Callback_InvokeActor(p, p->callback);
     if (result)
@@ -60,6 +60,7 @@ void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
         Sound_PlaySong(0x591);
     }
     phase = p->phase;
+    asm("" : "+r"(phase));
     switch (phase) {
         case 0:
             p->phaseTimer++;
@@ -70,7 +71,7 @@ void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
             break;
         case 1: {
             u32 flag = 0x04000000;
-            p->flags |= flag;
+            *fp |= flag;
         }
             p->phaseTimer++;
             if (p->phaseTimer > 240) {
@@ -88,6 +89,3 @@ void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateTimedAnimationAttack);
-#endif
