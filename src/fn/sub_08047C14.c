@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "temporary_animation_pool.h"
 s32 Widget_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
 static inline s32 initializeAnimation(struct ProjectedDisplayEntry *animation,
@@ -31,12 +30,7 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
         result = -1;
         goto done;
     }
-    {
-        struct ProjectedDisplayResource *destination = &pool->resource;
-        const struct ProjectedDisplayResource *source = resource;
-        *destination = *source;
-    }
-    asm("" : "+r"(pool));
+    pool->resource = *resource;
     relocated = &pool->resource;
     ResourceHeader_Relocate(relocated, (void *)resource);
     slot = pool->slots;
