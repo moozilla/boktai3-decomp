@@ -203,6 +203,7 @@ address,evidence
 0811525C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08115D4C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08116280,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0811B048,Independent 76-byte SpatialIndex_ScanBuckets tail after Terrain_ResolveActorMotion's pool (gbadisasm keeps it inside 0811AE9C); exact C in src/fn/sub_0811AE9C.c
 0811B774,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 0811B77C,Independent leaf following a reviewed gap function; exact standalone C
 0811D218,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
