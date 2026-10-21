@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.0%
 // Remaining differences: loop-counter init is emitted before the hoisted 0xFFFFD000 literal in two loops.
 // confidence=low: transient gauges use two independent countdowns.
 extern u16 gUnk_0300517C;
@@ -65,11 +64,20 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         if ((&gUnk_0300517C)[-1] != foreground)
             (&gUnk_0300517C)[-1] = foreground;
         cell = Hud_GetTilemapCell(0, 29, 1);
-        n = 2;
-        do {
-            *cell-- = tile | -0x3000;
-            tile--;
-        } while (--n >= 0);
+        {
+            s32 mk;
+            {
+                register s32 t asm("r0") = -0x3000;
+                asm("" : "+r"(t));
+                mk = t;
+            }
+            asm("" : "+r"(mk));
+            n = 2;
+            do {
+                *cell-- = tile | mk;
+                tile--;
+            } while (--n >= 0);
+        }
         for (n = 0; n < full; n++)
             *cell-- = 0xd089;
         if (partial) {
@@ -85,15 +93,26 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         StatDisplay_DrawTwoDigitCounter(*(s16 *)(p + 0xa6e));
     } else if (p[0xa7f]) {
         cell = Hud_GetTilemapCell(0, 29, 1);
-        n = 13;
-        do {
-            *cell-- = 0xd000;
-        } while (--n >= 0);
+        {
+            u32 z;
+            {
+                register u32 t asm("r1") = 0xd000;
+                asm("" : "+r"(t));
+                z = t;
+            }
+            asm("" : "+r"(z));
+            n = 13;
+            do {
+                *cell-- = z;
+            } while (--n >= 0);
+        }
         ResultPanel_ClearFiveTiles();
-        p[0xa7f] = 0;
+        {
+            register u32 off asm("r2") = 0xa7f;
+            register u8 *q asm("r1");
+            asm("" : "+r"(off));
+            q = p + off;
+            *q = 0;
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hud_UpdateTransientStatGauge);
-#endif

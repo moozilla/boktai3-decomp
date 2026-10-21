@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.6%
+// fuzzy: 98.8%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
@@ -20,12 +20,17 @@ static inline void HeadingStep(struct ContactPosition *v, u8 *heading, s32 speed
     v->y = 0;
     v->z = Truncate(speed * gUnk_086149C4[direction]);
 }
+static inline void CpuSet_2(int ctl, u32 *src, struct ContactPosition *dst)
+{
+    CpuSet(src, dst, ctl);
+}
 static inline void AddHalf(s16 *dst, const s16 *src)
 {
     *dst += *src;
 }
 void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
 {
+    u8 *new_var;
     register struct SceneActorRegistryResetView *p asm("r6") = p_;
     struct {
         u32 zero;
@@ -37,7 +42,8 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
-    HeadingStep(&scratch.step, &p->direction, 32);
+    new_var = &p->direction;
+    HeadingStep(&scratch.step, new_var, 32);
     AddHalf(&p->motion.x, &scratch.step.x);
     AddHalf(&p->motion.z, &scratch.step.z);
     {
@@ -46,7 +52,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         *fl |= mask;
     }
     scratch.zero = 0;
-    CpuSet(&scratch.zero, &scratch.step, 0x05000002);
+    CpuSet_2(0x05000002, &scratch.zero, &scratch.step);
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
