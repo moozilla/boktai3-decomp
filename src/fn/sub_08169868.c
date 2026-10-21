@@ -2,8 +2,6 @@
 #include "scene_hud_display.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.2%
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 
 #define SceneHud_RefreshPrimaryOptions SelectionPanel_RefreshVisibleEntries
@@ -28,14 +26,11 @@ void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
             p->selection = 0;
         {
             u16 *out = &gUnk_02000710->unk50;
-            *out = ((struct SceneHudState *)(p->selection * 8 + (u32)p))->secondaryFirstValue;
+            *out = *(s8 *)((u8 *)p + (p->selection << 3) + 0xDA8);
         }
         p->secondarySlideTimer = 8;
         SceneHud_RefreshSecondaryOptions(p);
     }
     SceneHud_TickWidgetSlides(p);
-    Palette_UpdateHighlightPulse(gUnk_03005164, p->unknown13F0);
+    Palette_UpdateHighlightPulse(gUnk_03005164, &p->unknown13F0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_CyclePrimarySecondaryOptions);
-#endif
