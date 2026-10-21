@@ -12,7 +12,7 @@ s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
 void sub_0809345C(void *, void *);
-void sub_08093644(void *, void *, void *);
+void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
 static inline u8 Take(u8 *p)
 {
@@ -124,7 +124,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
         }
         Add(&buf.dest, &actor->position);
         sub_0809345C(actor, &buf.dest);
-        sub_08093644(actor, &actor->position, &buf.dest);
+        Bee_SubVector(actor, &actor->position, &buf.dest);
         Clear(&buf.zero, body + 0x480);
     }
     Delta(&buf.delta, &actor->position, (struct ContactPosition *)(body + 0x3E0 + body[0x428] * 8));
@@ -147,7 +147,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
             Polar(&buf.dest, ((Rand() & 63) + *((u8 *)actor + 0xE9)) & 255, 512);
             Add(&buf.dest, &actor->position);
             sub_0809345C(actor, &buf.dest);
-            sub_08093644(actor, &actor->position, &buf.dest);
+            Bee_SubVector(actor, &actor->position, &buf.dest);
             {
                 s32 variant = Bee_GetMovementVariant(actor);
                 *(u16 *)(body + 0x43A) = *(u16 *)(body + 0x42C) << variant;

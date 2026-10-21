@@ -36,7 +36,6 @@ static inline s32 TruncateSine(s32 value, u32 shift)
 {
     return value >= 0 ? value >> shift : -((-value) >> shift);
 }
-#define Bee_UpdateFlightHeight sub_08092E30
 void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
 {
     s32 delta, absolute;
