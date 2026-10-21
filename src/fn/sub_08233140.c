@@ -1,7 +1,6 @@
 #include "global.h"
 /* Tentative: allocate a transient sprite from the pool, copy render state into it and link it into the draw list. */
-#ifdef NONMATCHING
-// fuzzy: 96.1%
+// MATCHING_CONCESSION: register-pinning
 // only differs: id halfword load uses r1 instead of r0
 extern u8 *gUnk_020000AC;
 extern u8 *gUnk_030042E4;
@@ -41,12 +40,12 @@ u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *
     else
         Sprite_LinkToList(sprite, 0);
     {
-        u16 v = id;
+        register u16 *ip asm("r1") = (u16 *)&id;
+        register u16 v asm("r1");
+        asm("" : "+r"(ip));
+        v = *ip;
         *(u16 *)(slot + 2) = v;
     }
     *slot = 1;
     return slot;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TransientSprite_Spawn);
-#endif
