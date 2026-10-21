@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.4%
+// fuzzy: 99.6%
 // Remaining differences: cases 0/1/3 should advance the timer through an in-place pointer (shared Apply tail).
 struct Pair {
     u8 pad0[0x205];
@@ -132,7 +132,7 @@ void Vanargand_UpdateSequencedPairAttack(struct Vanargand *p)
                 if (self->pair->second == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 2, 6);
                 p->timer++;
-            } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
+            } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 {
                     u8 next = 4;
                     u32 zero = 0;

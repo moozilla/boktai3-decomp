@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.7%
+// fuzzy: 98.6%
 // Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
@@ -95,7 +95,7 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
 }
 static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
-    d->x = a->x + b->x;
+    d->x = b->x + a->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
@@ -112,11 +112,19 @@ void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, struct Vec *);
 s32 SceneProjectile_ConsumeHitEvent(void);
+inline static void polar_2(u8 a1, struct Vec *a0, int a2)
+{
+    polar(a0, a1, a2);
+}
 void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
+    int new_var;
     u8 params[0x58];
     struct Vec delta, spawn;
+    s16 k2;
+    unsigned char new_var2;
     struct Actor *p2 = p;
+    new_var2 = 15;
     if (p->changed) {
         u32 zero = 0;
         p->changed = zero;
@@ -154,20 +162,21 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 u8 facingAngle = (p->facing << 6) - 64;
                 s32 difference = facingAngle - angle;
                 s32 i;
+                new_var = 16;
                 if (difference > 128)
                     difference = 255 - difference;
                 else if (difference < -128)
                     difference += 255;
                 if (difference > 32)
-                    angle = facingAngle - 32;
+                    angle = facingAngle - (k2 = 32);
                 else if (difference < -32) {
                     angle = 32;
                     angle |= facingAngle;
                 }
-                polar(&delta, (u8)((p->facing << 6) - 64), 180);
+                polar_2((u8)((p->facing << 6) - 64), &delta, 180);
                 sum(&spawn, &delta, &p2->anchor);
                 spawn.y += 200;
-                angle -= 16;
+                angle -= new_var;
                 Sound_PlaySong(0x568);
                 {
                     struct Vec *spawnPtr = &spawn;
@@ -177,10 +186,10 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                         Projectile_SetLaunchParameters(params, 0, 150, angle, 24);
                         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 498);
                         Projectile_SetScriptProcedure(params, 0x4363, 0);
-                        Projectile_SetCollisionParameters(params, 0, 0, 30, 15, 30);
+                        Projectile_SetCollisionParameters(params, 0, 0, 30, new_var2, 30);
                         Projectile_SetBehaviorMode(params, 1);
                         Projectile_SpawnAtPosition(params, spawnPtr);
-                        angle += 16;
+                        angle += new_var;
                     } while (--i >= 0);
                 }
                 p2->phase++;
