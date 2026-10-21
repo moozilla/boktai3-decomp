@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 88.8%
-// foundry draft (worker best 88.8%); what differs is mostly register allocation and instruction order
 struct SceneSelection {
     u8 pad0[0x1a];
     u16 slotCount;
@@ -53,25 +50,25 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
     i = 0;
     length = p->slotCount;
     if (i < length) {
-        u32 mask = 0x3c00;
-        do {
-            if (IsTransitionSlot(GetSlot(p, i) & mask))
-                count++;
-            i++;
-        } while (i < length);
+        unsigned short mask = 0x3c00;
+        if (1) {
+            do {
+                if (IsTransitionSlot(GetSlot(p, i) & mask))
+                    count++;
+                i++;
+            } while (i < length);
+        }
     }
     if (count == length)
         Registry1745_SetState(p, 16, SessionMenu_CreateStageIconDisplay);
     else if (p->timer > 9) {
         p->command = 0x2000;
+        count = 4;
         {
             u32 *flags = &gUnk_0300523C;
-            u32 mask = ~4;
+            u32 mask = ~count;
             *flags &= mask;
         }
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneSelection_WaitForSlotTransition);
-#endif
