@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// foundry draft (worker best 92.3%); what differs is mostly register allocation and instruction order
 struct ActorReaction {
     u8 unknown0[0x51];
     u8 direction;
@@ -37,8 +34,17 @@ void Hresvelgr_UpdateFacingActionPhase(struct ActorReaction *actor)
         ActionState_Reset(action);
         ActionState_SetState(action, 0);
         actor->direction = actor->targetDirection;
-        actor->facing4 = (u8)((actor->direction + 96) >> 6) & 3;
-        actor->facing8 = (u8)((actor->direction + 112) >> 5) & 7;
+        {
+            u32 t;
+            s32 sh = (actor->direction + 96) >> 6;
+            t = 3;
+            t &= sh;
+            actor->facing4 = t;
+            sh = (actor->direction + 112) >> 5;
+            t = 7;
+            t &= sh;
+            actor->facing8 = t;
+        }
     }
     {
         u32 mask = 0x600040;
@@ -62,6 +68,3 @@ void Hresvelgr_UpdateFacingActionPhase(struct ActorReaction *actor)
     }
     Callback_InvokeActor(actor, actor->callback);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateFacingActionPhase);
-#endif
