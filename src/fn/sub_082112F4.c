@@ -15,8 +15,6 @@ void Collection_UpdateHighlightPulse(void *);
 void Script_Call(void *, u32);
 void Task_Kill(void *);
 
-#define CollectionMenu_Update sub_082112F4
-
 #define PAGE        (*(s16 *)(m + 0xb80))
 #define COL         (*(s16 *)(m + 0xb84))
 #define ROW         (*(s16 *)(m + 0xb86))
