@@ -1,8 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define PlayerValue_GetBand Solar_GetLevelForIntensity
 #define gLinkSession        gUnk_020004B4
@@ -17,10 +15,11 @@ static inline u32 GetSelection(s32 player)
         return 0;
     index = session->previousSelectionPage;
     index <<= 2;
-    base = (u32)session + 0x54;
     {
-        u8 *field = (u8 *)(base + (player + index));
-        return *field;
+        u32 sum = player + index;
+        asm("" : "+r"(sum));
+        base = (u32)session + 0x54;
+        return *(u8 *)(base + sum);
     }
 }
 
@@ -39,6 +38,3 @@ void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *session)
     else
         session->value = Div(session->playerValueSum, session->participantCount);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkSession_UpdatePlayerValueAverage);
-#endif
