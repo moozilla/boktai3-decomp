@@ -1,5 +1,4 @@
 #include "global.h"
-// Remaining difference: scratch register of the final next-index address.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;

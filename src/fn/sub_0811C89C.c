@@ -2,8 +2,6 @@
 #include "global.h"
 #include "modifier_list.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.2%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
 #define gCharacterPaletteResource       gUnk_030042E4
@@ -20,7 +18,7 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     s32 resource;
     s32 offset, i;
     register struct CharacterPreviewPalette *flash asm("r5") = p;
-    flash->target = model;
+    p->target = model;
     flash->flashPalette = gUnk_030042E4 + 0x3240;
     switch (model->view.metadata.kind) {
         case 0:
@@ -43,14 +41,14 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
             resource = 0x378;
             break;
     }
-    flash->paletteId = index + 0x379;
+    p->paletteId = index + 0x379;
     {
         const u8 *source = gUnk_030042E4 + (resource << 5);
-        flash->normalPalette = gUnk_030042E4 + (flash->paletteId << 5);
+        p->normalPalette = gUnk_030042E4 + (p->paletteId << 5);
         palette = model->activePalette;
         CpuSet(source, palette, 16);
     }
-    CpuSet(flash->normalPalette, model->normalPalette, 16);
+    CpuSet(p->normalPalette, model->normalPalette, 16);
     {
         struct CharacterPreviewTileAllocator **ap = &gUnk_020004B8;
         struct CharacterPreviewTileAllocator **lp;
@@ -59,18 +57,15 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
         offset = 0;
         i = 4;
         do {
-            struct ModifierDisplayObject *part = (void *)((u8 *)flash->target + offset);
+            struct ModifierDisplayObject *part = (void *)((u8 *)p->target + offset);
             part->palette = palette;
             part->tile = (*lp)->nextTile;
             offset += 0x60;
         } while (--i >= 0);
-        (*ap)->nextTile += 2;
+        (*ap)->nextTile = (*ap)->nextTile + (offset = 2);
         if ((*ap)->nextTile > 0xafff)
             (*ap)->nextTile = 0xa000;
         else if ((*ap)->nextTile <= 0x9fff)
             (*ap)->nextTile = 0xa000;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CharacterPreview_InitializePalette);
-#endif
