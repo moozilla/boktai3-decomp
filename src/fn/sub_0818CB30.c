@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.8%
-// foundry draft (worker best 87.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ArmorBody {
@@ -40,12 +38,14 @@ void Armor_UpdatePartOrbit(struct ArmorPart *p)
     s32 scale;
     s32 state;
     s32 zero;
-    *angle += p->direction;
+    u8 a = *angle + p->direction;
     zero = 0;
+    asm("" : "+r"(zero));
+    *angle = a;
     sine = gUnk_086149C4;
     p->x = parent->orbitX + Div(sine[(*angle + 64) & 255] * 200, 4096);
     p->z = parent->orbitZ + Div(sine[*angle] * 200, 4096);
-    if (--p->timer == zero) {
+    if (--p->timer == 0) {
         state = parent->state;
         if (state == 3)
             goto change;
@@ -63,7 +63,5 @@ void Armor_UpdatePartOrbit(struct ArmorPart *p)
         p->flags119 |= one;
     }
     }
+    asm("" ::"r"(zero));
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdatePartOrbit);
-#endif

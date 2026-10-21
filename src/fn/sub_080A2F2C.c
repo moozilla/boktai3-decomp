@@ -16,15 +16,16 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
 #ifdef NONMATCHING
-// fuzzy: 90.8%
+// fuzzy: 91.8%
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
 {
     u32 off = 0x2A8;
-    register u32 phase asm("r5") = 0x2A9;
+    register u32 phase asm("r5");
     u32 zero = 0;
     FIELD(a, off, u8) = zero;
+    phase = 0x2A9;
     FIELD(a, phase, u8) = zero;
     off += 2;
     asm("" : "+r"(off));

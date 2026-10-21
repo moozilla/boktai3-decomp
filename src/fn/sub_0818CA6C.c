@@ -1,8 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.3%
-// foundry draft (worker best 80.3%); what differs is mostly register allocation and instruction order
+// fuzzy: 87.9%
+// remaining: flags119 OR keeps the constant in r4 (adds r0,r4,#0) in ROM
 #define gRandomTableIndex gUnk_03005308
 #define gRandomTable      gUnk_0203B400
 
@@ -35,23 +35,18 @@ void Armor_RetractPartStretch(struct ArmorPart *p)
     }
     p->stretchY = stretch;
     if (stretch == 64) {
-        s32 direction;
-        u32 random;
+        u32 r;
+        s32 d;
+        u32 one = 1;
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-        random = *(const u16 *)((gRandomTableIndex << 1) + (u32)gRandomTable);
-        {
-            s32 one = 1;
-            s32 negative;
-            random &= one;
-            negative = -1;
-            direction = negative;
-            if (random)
-                direction = 1;
-            p->direction = direction;
-            p->byte11E = one;
-            p->byte11F = one;
-            setFlag(&p->flags119, one);
-        }
+        r = gRandomTable[gRandomTableIndex] & one;
+        d = -1;
+        if (r)
+            d = 1;
+        p->direction = d;
+        p->byte11E = one;
+        p->byte11F = one;
+        p->flags119 |= one;
     }
 }
 #else
