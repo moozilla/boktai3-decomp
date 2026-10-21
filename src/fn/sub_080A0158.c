@@ -6,8 +6,8 @@
 #include "scene_actor_animation.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.3%
-// Remaining differences: callee-saved register rotation (actor/context/stored-position pseudos) and CpuSet control constant reload.
+// fuzzy: 98.1%
+// Remaining differences: CpuSet control constant loaded before r0 setup; 0xFFFF mask temp in r2 not r1.
 
 struct CrowResetContext {
     u8 unknown0[0x3D4];
@@ -163,18 +163,29 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
     else
         *(struct CrowPlacement *)((u8 *)actor->drawable + 0x40) =
             *(struct CrowPlacement *)&actor->position;
-    zero = 0;
-    CpuSet(&zero, &context->vectors[0], 0x05000002);
-    zero = 0;
-    CpuSet(&zero, &context->vectors[1], 0x05000002);
-    zero = 0;
-    CpuSet(&zero, &context->vectors[2], 0x05000002);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        StepSequence(drawable);
+        void *dst = &context->vectors[0];
+        u32 control = 0x05000002;
+        zero = 0;
+        asm("" : "+r"(control));
+        CpuSet(&zero, dst, control);
     }
+    {
+        void *dst = &context->vectors[1];
+        u32 control = 0x05000002;
+        zero = 0;
+        asm("" : "+r"(control));
+        CpuSet(&zero, dst, control);
+    }
+    {
+        void *dst = &context->vectors[2];
+        u32 control = 0x05000002;
+        zero = 0;
+        asm("" : "+r"(control));
+        CpuSet(&zero, dst, control);
+    }
+    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+    StepSequence(actor->drawable);
 }
 
 #else
