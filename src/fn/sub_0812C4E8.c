@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Remaining: signed scale-timer reload uses r1 as the zero index instead of r2 (two bytes).
 struct Fragment {
     u32 flags;
     u8 active, unknown5[3];
@@ -189,7 +186,11 @@ void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
     }
     Step(p);
     {
-        register s32 remaining asm("r0") = *scaleTimer;
+        register s32 remaining asm("r0");
+        register u32 hold asm("r1");
+        asm("" : "=r"(hold));
+        remaining = *scaleTimer;
+        asm("" : : "r"(hold));
         asm("" : "+r"(remaining));
         if (remaining <= 0) {
             p->state = 2;
@@ -201,7 +202,3 @@ void FragmentEffect_GrowToFullSize(struct Pool *pool, struct Fragment *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", FragmentEffect_GrowToFullSize);
-#endif

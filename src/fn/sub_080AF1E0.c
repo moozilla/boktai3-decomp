@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// only the temp register of the last strh in the init block differs (r0 vs r1)
+// MATCHING_CONCESSION: register-pinning
 
 extern const u8 gUnk_0824E218[];
 
@@ -40,10 +38,17 @@ void Vorn_UpdateScriptedAction(u8 *obj)
             } while (0);
             field += 5;
             ((u8 *)obj)[off = field] = code;
-            *(void **)(obj + 0x21C) = (void *)fn;
+            {
+                register void **q asm("r0") = (void **)(obj + 0x21C);
+                asm("" : "+r"(q));
+                *q = (void *)fn;
+            }
             field += 0x13;
-            h = (u16 *)(obj + field);
-            *h = zero;
+            {
+                register u16 *hh asm("r0") = (u16 *)(obj + field);
+                asm("" : "+r"(hh));
+                *hh = zero;
+            }
         } while (0);
         f = (u32 *)(obj + 0x114);
         mask = -2;
@@ -79,6 +84,3 @@ void Vorn_UpdateScriptedAction(u8 *obj)
         ++(*((u32 *)(obj + 0x2AC)));
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateScriptedAction);
-#endif
