@@ -3,8 +3,8 @@
 // confidence=low: parses the spawn script (position, attack, health, timing keywords), loads
 // graphics and the first animation frame, and installs the idle callback.
 #ifdef NONMATCHING
-// fuzzy: 95.6%
-// Resource/slot registers and the sequence-pointer constant derivation still differ.
+// fuzzy: 98.8%
+// Only the bit-3 flip update in the inlined animation step uses different registers and a shared store; the line after it loads 0xffff from a different pool slot.
 #include "scene_vec.h"
 struct PHVec {
     s16 x, y, z, pad;
@@ -142,10 +142,10 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
 #define EnemyF426_InitializeFromScript sub_08204230
 s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
 {
-    void *resource;
     register void *sprite asm("r8");
     void *earlySprite;
     void **slot;
+    void *resource;
     s32 found;
     s32 dead;
     if (Script_SeekToKeyword('p')) {
@@ -236,10 +236,12 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
     } else {
         register u32 zero asm("r2");
         s16 *q = &H(0x12e);
+        s32 four = 4;
         zero = 0;
         asm("" : "+r"(zero));
         *q = 1;
-        Anim_SetSequence(p + 0x10c, *slot, 1, *(u8 *)((u8 *)q + 4), zero);
+        asm("" : : : "memory");
+        Anim_SetSequence(p + 0x10c, *slot, 1, *(u8 *)((u8 *)q + four), zero);
     }
     EnemyF426_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
     if (H(0x144) == 0)
