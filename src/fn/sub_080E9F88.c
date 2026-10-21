@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// foundry draft (worker best 93.4%); what differs is mostly register allocation and instruction order
 void Ivy_UpdateActiveState_080E98B4(void *);
 void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
 {
@@ -18,6 +16,7 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 controlOffset = 0x2B3;
+        asm("" : "+r"(controlOffset));
         if (*((u8 *)actor + controlOffset)) {
             void *callback = Ivy_UpdateActiveState_080E98B4;
             u8 kind = 34;
@@ -46,13 +45,16 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
                 u32 state = 3;
                 actor->state2A8 = byteZero;
                 actor->phase2A9 = byteZero;
-                actor->behavior2AA = state;
+                {
+                    register u32 behOff asm("r4") = 0x2AA;
+                    register u8 *bq asm("r0");
+                    asm("" : "+r"(behOff));
+                    bq = (u8 *)actor + behOff;
+                    *bq = state;
+                }
                 actor->counter2AC = zero;
                 actor->field2B1 = one;
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_PlayEntry17);
-#endif
