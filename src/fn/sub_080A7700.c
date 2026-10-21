@@ -1,9 +1,4 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 93.9%
-// Register allocation, state reset addressing, and initialization instruction order still differ.
-#include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 
@@ -132,9 +127,26 @@ void TentacleBody_ApproachWaypoint(struct SceneActorRegistryResetView *actor)
     s32 speed;
     struct ContactPosition delta;
     if (Take(&actor->field2B1)) {
-        body[0x8D4] = 1;
-        *(u16 *)(body + 0x8D8) = 0;
-        Control(actor, *(void **)((u8 *)actor + 0x228), 1);
+        u8 *flag = body + 0x8D4;
+        u32 zero = 0;
+        u32 one = 1;
+        *flag = one;
+        *(u16 *)(body + 0x8D8) = zero;
+        {
+            u32 zero2 = 0;
+            void *cb = *(void **)((u8 *)actor + 0x228);
+            actor->field2B2 = one;
+            actor->field2B0 = zero2;
+            actor->field2B5 = one;
+            actor->target = cb;
+            actor->field2C8 = zero;
+            {
+                u32 *flags = &actor->flags114;
+                u32 mask = ~1;
+                *flags &= mask;
+            }
+            actor->word104 = zero;
+        }
         TentacleActor_ResetOscillation(actor);
     }
     if ((u8)Callback_InvokeActor(actor, actor->update270)) {
@@ -172,7 +184,3 @@ void TentacleBody_ApproachWaypoint(struct SceneActorRegistryResetView *actor)
     TentacleActor_UpdateOscillation(actor, 120, 10);
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_ApproachWaypoint);
-#endif
