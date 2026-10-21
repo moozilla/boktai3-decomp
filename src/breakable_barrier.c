@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "breakable_barrier.h"
 
 void BreakableBarrier_SetState(struct BreakableBarrier *s, u8 v)
@@ -224,8 +225,6 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
 void Vampire_DecrementBarrierCount(void);
 void Palette_StartSlide(s32, s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 83.1% (random index kept in r6 instead of r0, table/pointer registers differ)
 void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
     struct BarrierExtent size;
@@ -233,9 +232,10 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         disable(&p->collider);
     if ((p->timer & 3) == 0) {
         s32 angle, count, speed;
-        const u16 *table;
-        u32 *indexPtr;
-        u32 index, mask;
+        register const u16 *table asm("r5");
+        register u32 *indexPtr asm("r6");
+        register u32 index asm("r0");
+        register u32 mask asm("r4");
         size.x = 164;
         size.y = 16;
         size.z = 164;
@@ -247,10 +247,20 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         index &= mask;
         angle = (u8)table[index];
         index = (index + 1) & mask;
-        count = (table[index] & 3) + 2;
+        {
+            u32 v = table[index];
+            u32 m3 = 3;
+            v &= m3;
+            count = v + 2;
+        }
         index = (index + 1) & mask;
         *indexPtr = index;
-        speed = (table[index] & 3) + 20;
+        {
+            u32 v = table[index];
+            u32 m3 = 3;
+            v &= m3;
+            speed = v + 20;
+        }
         SparkParticle_Spawn(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
         sub_08012B34(m, p);
         Sound_PlaySongChecked(0x339);
@@ -270,9 +280,6 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         BreakableBarrier_SetState(p, 0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801310C);
-#endif
 
 extern const u32 gUnk_08604B84[];
 
