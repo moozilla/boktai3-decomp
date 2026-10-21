@@ -6987,6 +6987,7 @@ addr,name,mode,confidence,source,notes
 081B6AB8,ActorEffect_UpdateRadialTrail,thumb,low,src-alias,
 081B6BC4,HomingEffect_TurnTowardTarget,thumb,low,src-alias,
 081B6C1C,ActorEffect_UpdateHomingFlight,thumb,low,src-alias,
+081B6D20,ActorEffect_UpdateApproachLaunch,thumb,low,src-alias,
 081B6E90,ActorEffect_UpdateRadialExpiry,thumb,low,src-alias,
 081B6F68,ActorEffect_UpdateExpiry,thumb,low,src-alias,
 081B6FA8,PooledController_UpdateAll,thumb,low,src-alias,
