@@ -3796,6 +3796,7 @@ addr,name,mode,confidence,source,notes
 080FAD3C,Axe_GetDirectionalFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and mirror flag
 080FAD64,Axe_BeginMoveToPosition,thumb,low,src-alias,Stores movement endpoints and resets movement state while facing the destination
 080FAE08,Axe_ClearForcedMovement,thumb,low,src-alias,Clears actor and movement flags plus a timer; forced movement interpretation is tentative
+080FAE50,Axe_UpdateRouteWander,thumb,low,src-alias,Waits out a cooldown then picks a random route point and starts moving to it; interpretation tentative
 080FB050,Axe_TickCooldowns,thumb,low,src-alias,Decrements each of four nonzero cooldown counters
 080FB07C,Axe_PickAttack,thumb,low,src-alias,
 080FB1DC,Axe_InitRoutePointHistory,thumb,low,src-alias,Marks three recent route point slots unused and resets the insertion index
