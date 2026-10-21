@@ -22,7 +22,6 @@ struct Part6030 {
     u8 pad[8];
     u32 flags;
 };
-#define Golem_UpdateRevivalReturn sub_080C5F60
 void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
 {
     u32 queued;
@@ -65,5 +64,5 @@ void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080C5F60);
+INCLUDE_ASM("asm/nonmatching", Golem_UpdateRevivalReturn);
 #endif

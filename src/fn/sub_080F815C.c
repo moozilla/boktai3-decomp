@@ -51,7 +51,7 @@ static inline void clearFlags(u32 *p, u32 mask)
 #define ActorPhase_SetAnimation Axe_SetAuxiliarySpriteParameters
 u8 ActorPhase_UpdateReverseFlickerTimer(u32 *, s32, s32, s32);
 void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
-void sub_080F8244(void);
+void ActorPhase_UpdateReverseFlickerExit(void);
 void ActorPhase_UpdateReverseFlicker(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
@@ -61,7 +61,7 @@ void ActorPhase_UpdateReverseFlicker(struct PhaseActor *s, s32 frame)
         Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
     }
     if (ActorPhase_UpdateReverseFlickerTimer(&flags, frame, 10, 30)) {
-        void (*next)(void) = sub_080F8244;
+        void (*next)(void) = ActorPhase_UpdateReverseFlickerExit;
         u32 id = 0x30;
         s->entered = 1;
         s->phaseState = 0;

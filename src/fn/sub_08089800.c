@@ -13,8 +13,7 @@ inline static u8 TakeFlag(u8 *p)
     return 0;
 }
 
-#define Ghoul_UpdateScriptedAction sub_08089800
-void sub_08089800(struct SceneActorRegistryResetView *obj)
+void Ghoul_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
 {
     u8 *control = *(u8 **)((u8 *)obj + 0x3D0);
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {

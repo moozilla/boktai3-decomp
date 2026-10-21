@@ -141,7 +141,6 @@ static inline void Step(struct WoodenCrateStep *input)
     return;
 }
 
-#define WoodenCrate_Update sub_080FFE44
 void WoodenCrate_Update(void *unused, struct WoodenCrateStep *crate)
 {
     register struct WoodenCrateStep *keep asm("r5") = crate;
