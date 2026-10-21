@@ -1,7 +1,7 @@
 addr,name,mode,confidence,source,notes
 080001B4,crt0_Init,arm,high,disasm,"Nintendo SDK crt0: set IRQ/SYS stacks, install IntrMain, call AgbMain"
 080001F0,IntrMain,arm,high,disasm,SDK interrupt dispatcher; copied to IWRAM 0x03003A60; table at 0x03003A10
-08000350,Palette_CacheObjectBankArm,arm,medium,disasm,"ARM twin of Palette_CacheObjectBank (08217344); first of six ARM C functions (APCS frames) copied to IWRAM 0x03000000 by AgbMain; looks up a u16 key in a 16-entry table (0x030051F0) and otherwise appends a 32-byte palette to 0x03004DC0"
+08000350,Palette_CacheObjectBankArm,arm,medium,disasm,ARM twin of Palette_CacheObjectBank (08217344); first of six ARM C functions (APCS frames) copied to IWRAM 0x03000000 by AgbMain; looks up a u16 key in a 16-entry table (0x030051F0) and otherwise appends a 32-byte palette to 0x03004DC0
 0800145C,AgbMain,thumb,high,disasm,Game main entry (pointer at 0x08000344)
 080015AC,Background_ApplyQueuedCommands,thumb,low,src-alias,
 08001768,Background_Update,thumb,low,src-alias,
@@ -3045,6 +3045,7 @@ addr,name,mode,confidence,source,notes
 08095C00,Ghost_TurnTowardHeading,thumb,low,src-alias,
 08095EB4,Ghost_UpdateWaitingAnimation,thumb,low,src-alias,
 0809679C,Ghost_DecelerateMovement,thumb,low,src-alias,
+080968F0,Ghost_ChooseRouteDestination,thumb,low,src-alias,
 08096AC8,Ghost_RecoilTowardEndpoint,thumb,low,src-alias,
 080972AC,Ghost_InitMotionPreset,thumb,low,src-alias,Installs the Ghost motion preset at actor offset 0x284
 080972BC,SceneActor_BeginLinkedIdleReaction,thumb,low,src-alias,
@@ -3061,6 +3062,7 @@ addr,name,mode,confidence,source,notes
 08097B98,Ghost_GetDirectionalFrame,thumb,low,src-alias,Converts heading into a five-frame direction index and horizontal flip flag
 08097BC0,Ghost_StartMovementToPosition,thumb,low,src-alias,Stores movement endpoints and resets behavior state while setting heading toward the destination
 08097C64,Bee_ClearActionFlags,thumb,low,src-alias,
+08097CB4,Ghost_UpdateRandomDestination,thumb,low,src-alias,
 08098038,Ghost_GetControlStatus,thumb,low,src-alias,Ghost control callback always returning zero; status interpretation is tentative
 0809803C,Ghost_OnControlCleanup,thumb,low,src-alias,Empty Ghost callback in the control lifecycle; cleanup interpretation is tentative
 08098064,SceneActor_InitLinkedSprites,thumb,low,src-alias,
@@ -3076,7 +3078,9 @@ addr,name,mode,confidence,source,notes
 08099130,Ghost_PursuePlayerLoop,thumb,low,src-alias,
 08099580,Ghost_InitActionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x28C; action role is tentative
 08099590,Ghost_ApproachPlayer,thumb,low,src-alias,
+08099660,Ghost_ChooseMovementDestination,thumb,low,src-alias,
 080997E8,Ghost_InitReactionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x288; reaction role is tentative
+080997F8,Ghost_UpdateFacingTrigger,thumb,low,src-alias,
 08099A48,Ghost_InitEffectTable,thumb,low,src-alias,Installs the Ghost table at offset 0x29C; effect role is tentative
 08099A58,Ghost_OnBehaviorUpdate,thumb,low,src-alias,Ghost behavior callback dispatches the current state handler and runs supporting updates
 08099A90,Ghost_OnActorUpdate,thumb,low,src-alias,Ghost actor update callback binds the shared context and invokes the common update helper
@@ -3210,6 +3214,7 @@ addr,name,mode,confidence,source,notes
 080A88CC,TentacleBody_InitBehaviorTable,thumb,low,src-alias,Assigns the actor behavior table during initialization
 080A88DC,TentacleBody_GetDirectionFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and a mirror flag
 080A8904,TentacleActor_SelectWanderRoute,thumb,low,src-alias,
+080A8D50,TentacleBody_InitSegmentAnimations,thumb,low,src-alias,
 080A8EBC,TentacleActor_AssignSegmentPhases,thumb,low,src-alias,Cycles phase values 0 to 3 across segments whose flags lack bits one and four
 080A8F38,TentacleBody_RefreshDirectionalAnimations,thumb,low,src-alias,
 080A915C,TentacleBody_ResetDirectionalAnimations,thumb,low,src-alias,
@@ -3236,6 +3241,7 @@ addr,name,mode,confidence,source,notes
 080AAC8C,TentacleActor_OnSegmentAttackCollision,thumb,low,src-alias,Empty callback installed during segment attack collider initialization
 080AAC90,TentacleActor_ReactToContact,thumb,low,src-alias,
 080AADE4,TentacleActor_ApplyPendingRadialVelocity,thumb,low,src-alias,Consumes a pending state and computes a horizontal velocity vector from angle and magnitude
+080AAE64,TentacleActor_InitSegmentColliders,thumb,low,src-alias,
 080AAFF4,TentacleActor_InitProfile,thumb,low,src-alias,Finds or adds the actor profile using its type byte and stores the result
 080AB010,TentacleActor_OnResolveVariantValue,thumb,low,src-alias,Actor callback that returns a four-entry variant lookup when the resource condition permits
 080AB408,ActorTrail_UpdateTimedScale,thumb,low,src-alias,
@@ -3780,7 +3786,7 @@ addr,name,mode,confidence,source,notes
 080F97E4,Axe_ConvergeRecoveryMotion,thumb,low,src-alias,
 080F9974,Axe_UpdateDamageSpin,thumb,low,src-alias,
 080F9B60,Axe_ReleaseAndIdle,thumb,low,src-alias,
-080F9BE4,Axe_UpdateDefeat,thumb,low,src-alias,
+080F9BE4,Axe_UpdateDefeat,thumb,low,src-alias,permuter CpuSet arg-order wrapper
 080F9FB8,Axe_UpdatePursuit,thumb,low,src-alias,
 080FA214,SceneActorControl_ApplyDampedMotion,thumb,low,src-alias,
 080FA32C,Axe_UpdateHealthPacedMotion,thumb,low,src-alias,
@@ -3797,6 +3803,7 @@ addr,name,mode,confidence,source,notes
 080FAD3C,Axe_GetDirectionalFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and mirror flag
 080FAD64,Axe_BeginMoveToPosition,thumb,low,src-alias,Stores movement endpoints and resets movement state while facing the destination
 080FAE08,Axe_ClearForcedMovement,thumb,low,src-alias,Clears actor and movement flags plus a timer; forced movement interpretation is tentative
+080FAE50,Axe_UpdateRouteWander,thumb,low,src-alias,Waits out a cooldown then picks a random route point and starts moving to it; interpretation tentative
 080FB050,Axe_TickCooldowns,thumb,low,src-alias,Decrements each of four nonzero cooldown counters
 080FB07C,Axe_PickAttack,thumb,low,src-alias,
 080FB1DC,Axe_InitRoutePointHistory,thumb,low,src-alias,Marks three recent route point slots unused and resets the insertion index
@@ -3809,6 +3816,7 @@ addr,name,mode,confidence,source,notes
 080FB984,SpriteGroup_InitAnimatedSprites,thumb,low,src-alias,
 080FBA38,Axe_EmitMotionTrail,thumb,low,src-alias,
 080FBC84,ActorPhase_EmitTrailSprite,thumb,low,src-alias,
+080FBEDC,Axe_TickAuxiliarySpriteTimers,thumb,low,src-alias,Counts down each auxiliary sprite timer and sets bit 0 of its flags when it expires
 080FBF20,Axe_RemoveAuxiliarySprites,thumb,low,src-alias,Removes each active sprite in the four-entry auxiliary sprite array
 080FBF4C,ActorPhase_SelectDistantWaypoint,thumb,low,src-alias,
 080FC3F8,Axe_UpdateScreenShake,thumb,low,src-alias,Requests a screen effect while its countdown remains active; shake interpretation is tentative
@@ -3816,6 +3824,7 @@ addr,name,mode,confidence,source,notes
 080FC498,ActorPhase_UpdateFlicker,thumb,low,src-alias,
 080FC7F4,Axe_UpdateAttackColliderPositions,thumb,low,src-alias,Positions three pairs of colliders at the stored attack position and refreshes one collider per pair
 080FC844,Axe_ReleaseAuxiliarySprite,thumb,low,src-alias,Removes the auxiliary sprite and its three colliders plus associated resources
+080FC894,Axe_CopyAuxiliaryVector,thumb,low,src-alias,Copies an 8-byte vector into the axe auxiliary state
 080FC8B0,Axe_SetAuxiliarySpriteParameters,thumb,low,src-alias,Stores a halfword and word in the auxiliary sprite; parameter meanings are tentative
 080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,thumb,low,src-alias,
 080FCB3C,Axe_RemoveSecondaryColliders,thumb,low,src-alias,Removes two colliders from the axe auxiliary data
@@ -6230,6 +6239,7 @@ addr,name,mode,confidence,source,notes
 08186438,Armor_UpdateDelayedTrackingModeThree,thumb,low,src-alias,Uses tracking turn mode three until the timer expires then alternate movement mode two
 0818646C,Armor_StopAndFinishBehavior,thumb,low,src-alias,Requests action zero and marks the behavior substate complete
 08186488,Armor_UpdateAction36Completion,thumb,low,src-alias,Starts action 0x24 and completes the behavior when its action substate reaches 0xFF
+081864C4,Armor_UpdateAction10Sequence,thumb,low,src-alias,
 08186568,Armor_UpdateRandomFlankAction42,thumb,low,src-alias,
 08186618,Armor_UpdateFacingActionSequence,thumb,low,src-alias,
 081866E0,Armor_UpdateAxisChase,thumb,low,src-alias,
@@ -6276,6 +6286,8 @@ addr,name,mode,confidence,source,notes
 0818CC48,Armor_BeginPartTravelToPlayer,thumb,low,src-alias,
 0818CD80,Armor_UpdatePartTravelXWave,thumb,low,src-alias,State callback interpolates part position with rotation and a sinusoidal X offset
 0818CE48,Armor_UpdatePartTravelZWave,thumb,low,src-alias,State callback interpolates part position with rotation and a sinusoidal Z offset
+0818CF10,Armor_UpdatePartWaveXReturn,thumb,low,src-alias,
+0818CFEC,Armor_UpdatePartWaveZReturn,thumb,low,src-alias,
 0818D0C8,Armor_DampPartWaveReturn,thumb,low,src-alias,
 0818D21C,Armor_InitPartLunge,thumb,low,src-alias,
 0818D384,Armor_AcceleratePartTurn,thumb,low,src-alias,
@@ -7335,6 +7347,7 @@ addr,name,mode,confidence,source,notes
 081C6918,StateActor_OnUpdateDisplay,thumb,low,src-alias,Display update callback that processes actor state and updates position and animation
 081C6938,StateActor_OnRender,thumb,low,src-alias,Render callback that delegates actor visibility and display submission
 081C6944,StateActor_OnUnregisterReceiver,thumb,low,src-alias,Cleanup callback that removes the embedded scene message receiver
+081C6954,StateActor_CreateFromScriptEntry,thumb,low,src-alias,
 081C6B84,StateActor_CreateFromScript,thumb,low,src-alias,Creates the actor through its factory using script keyword n and the active script context
 081C6BA8,StateActor_UpdateAnimation4State,thumb,low,src-alias,Plays animation entry 4 for kind 27 and marks completion when playback finishes
 081C6C6C,StateActor_UpdateAnimation5State,thumb,low,src-alias,Plays animation entry 5 for kind 27 and waits for playback completion
@@ -7342,6 +7355,7 @@ addr,name,mode,confidence,source,notes
 081C6F68,StateActor_UpdateAnimation10State,thumb,low,src-alias,Plays animation entry 10 for kind 27 with the alternate playback flag and waits for completion
 081C725C,StateActor_UpdateAnimation11State,thumb,low,src-alias,
 081C73D0,StateActor_UpdateAnimation13State,thumb,low,src-alias,
+081C74F0,StateActor_UpdateDashAnimation13,thumb,low,src-alias,
 081C785C,StateActor_UpdateAnimation15State,thumb,low,src-alias,Plays animation entry 15 for kind 27 then restores entry zero once and marks completion
 081C7934,StateActor_UpdateAnimation16State,thumb,low,src-alias,
 081C7A9C,StateActor_UpdateAnimation17State,thumb,low,src-alias,
@@ -7361,6 +7375,7 @@ addr,name,mode,confidence,source,notes
 081C88F4,StateActor_StartKind28Animation4,thumb,low,src-alias,Starts animation entry 4 for kind 28 and immediately marks the state complete
 081C89A4,Actor_UpdateKindTwentyEightEntryFive,thumb,low,src-alias,Animation state callback selecting entry 5 for kind 28 and marking completion
 081C8A60,StateActor_RunApproachAndFinishSequence,thumb,low,src-alias,
+081C8C8C,StateActor_UpdateDescendingDash,thumb,low,src-alias,
 081C909C,Actor_UpdateAcceleratingBlink,thumb,low,src-alias,Tentatively controls blinking through progressively shorter intervals and reports completion
 081C90E0,StateActor_StartKind9Or10Animation4,thumb,low,src-alias,
 081C922C,StateActor_StartKind9Or10Animation2,thumb,low,src-alias,
@@ -7393,6 +7408,7 @@ addr,name,mode,confidence,source,notes
 081CAE88,SceneCharacter_UpdateAnimationSevenSixFive,thumb,low,src-alias,State callback plays kind 15 animations 7 then 6 then 5 and marks completion
 081CB090,SceneCharacter_UpdateAnimationFiveToIdle,thumb,low,src-alias,State callback plays kind 15 animation 5 then animation 0 before completing
 081CB174,StateActor_UpdateHoverBob,thumb,low,src-alias,
+081CB294,StateActor_UpdateRiseToTerrain,thumb,low,src-alias,
 081CB3F4,StateActor_UpdateKind29AttackEffect,thumb,low,src-alias,
 081CB6AC,StateActor_UpdateFacingAnimation,thumb,low,src-alias,
 081CB940,SceneCharacter_UpdateAnimationThirteen,thumb,low,src-alias,State callback plays kind 29 animation 13 and waits for completion

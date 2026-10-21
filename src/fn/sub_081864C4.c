@@ -11,7 +11,6 @@ struct S {
 };
 s32 Armor_TryStartAction(void *, s32);
 void sub_0818EA90(void *);
-#define Armor_UpdateAction10Sequence sub_081864C4
 void Armor_UpdateAction10Sequence(struct S *p)
 {
     u8 *q = &p->st;
@@ -45,5 +44,5 @@ void Armor_UpdateAction10Sequence(struct S *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081864C4);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateAction10Sequence);
 #endif

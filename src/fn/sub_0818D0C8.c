@@ -1,8 +1,8 @@
 #include "global.h"
 #include "motion_0818.h"
 
-void sub_0818CF10(struct Motion0818Object *);
-void sub_0818CFEC(struct Motion0818Object *);
+void Armor_UpdatePartWaveXReturn(struct Motion0818Object *);
+void Armor_UpdatePartWaveZReturn(struct Motion0818Object *);
 
 void Armor_DampPartWaveReturn(struct Motion0818Object *p)
 {
@@ -32,9 +32,9 @@ void Armor_DampPartWaveReturn(struct Motion0818Object *p)
                 if (z < 0)
                     z = -z;
                 if (x < z)
-                    p->callback = sub_0818CF10;
+                    p->callback = Armor_UpdatePartWaveXReturn;
                 else
-                    p->callback = sub_0818CFEC;
+                    p->callback = Armor_UpdatePartWaveZReturn;
             }
         }
         value = p->velocityX;

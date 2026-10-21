@@ -6,7 +6,6 @@
 #include "scene_actor_control_phase.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Ghost_ChooseMovementDestination sub_08099660
 
 struct GhostRouteEntry {
     u8 unknown0[4];
@@ -73,5 +72,5 @@ void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
     actor->counter2AC++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08099660);
+INCLUDE_ASM("asm/nonmatching", Ghost_ChooseMovementDestination);
 #endif

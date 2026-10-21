@@ -23,7 +23,7 @@ struct Obj {
 };
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
-void sub_0818CF10(struct Obj *);
+void Armor_UpdatePartWaveXReturn(struct Obj *);
 void Armor_UpdatePartTravelXWave(struct Obj *p)
 {
     s32 wave;
@@ -34,5 +34,5 @@ void Armor_UpdatePartTravelXWave(struct Obj *p)
     p->z = p->startZ + Div(p->dz * p->timer, 128);
     p->timer++;
     if (p->timer > 128)
-        p->callback = sub_0818CF10;
+        p->callback = Armor_UpdatePartWaveXReturn;
 }

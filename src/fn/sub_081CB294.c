@@ -2,7 +2,6 @@
 #include "terrain_cell_probe.h"
 
 extern const s16 gUnk_086149C4[];
-#define StateActor_UpdateRiseToTerrain sub_081CB294
 
 static inline s32 shift12(s32 x)
 {

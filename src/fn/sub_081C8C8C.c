@@ -1,5 +1,4 @@
 #include "scene_actor_terrain.h"
-#define StateActor_UpdateDescendingDash sub_081C8C8C
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
 struct NpcTag {
     u8 pad[2];

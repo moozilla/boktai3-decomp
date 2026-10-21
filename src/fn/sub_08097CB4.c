@@ -4,7 +4,6 @@
 #include "scene_actor_route.h"
 
 // confidence=low: when the idle flag is set and the delay expires, picks a random route point and starts moving to it.
-#define Ghost_UpdateRandomDestination sub_08097CB4
 
 struct GhostMoveContext {
     u8 unknown0[0x558];

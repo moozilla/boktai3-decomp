@@ -2,8 +2,8 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.3%
-// foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
+// fuzzy: 96.8%
+// Remaining differences: scratch registers for the random-table base (r1 vs r3) and the route index byte (r3 vs r2).
 #define ActorRoute_SelectDistantPoint ActorPhase_SelectDistantWaypoint
 #define ActorRoute_RememberPoint      Axe_RecordRoutePoint
 #define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
@@ -40,6 +40,8 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     struct RoutePointSelection point;
     struct RouteSelectionPosition delta;
     s32 bestDistance, i, distance;
+    unsigned long long wide;
+    u16 *entry;
     union {
         s32 value;
         u8 bytes[4];
@@ -68,9 +70,11 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     route.mode = 0;
     route.entry = (u16 *)Path_GetPointData(route.data);
     route.entry = (u16 *)((u8 *)route.entry + route.index * 8);
-    out->x = route.entry[0];
+    wide = route.entry[0];
+    out->x = wide;
     out->y = actor->groundHeight2BE;
-    out->z = route.entry[1];
+    entry = route.entry;
+    out->z = entry[1];
 }
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_SelectDistantWaypoint);

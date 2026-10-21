@@ -3,8 +3,8 @@
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
 
 #ifdef NONMATCHING
-// fuzzy: 99.2%
-// Six instructions differ: player-address scheduling and stack-vector address reuse.
+// fuzzy: 99.8%
+// Two instructions differ: the global address load is scheduled after the stack-vector address.
 // confidence=low: sends the axe trail toward the player, then returns it to the actor.
 struct Vec {
     s16 x, y, z, pad;
@@ -84,6 +84,10 @@ static inline s32 AngleDifference(s32 a, s32 b)
         delta += 256;
     return delta;
 }
+static inline s32 LengthSquared(struct Vec *v)
+{
+    return v->x * v->x + v->z * v->z;
+}
 static inline s32 Absolute(s32 value)
 {
     if (value < 0)
@@ -135,7 +139,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         if (Absolute(difference) > 12)
             trail->heading += 6;
         Velocity(&trail->velocity, trail->heading, 8);
-        if (delta.x * delta.x + delta.z * delta.z <= 1023 || frame > 600) {
+        if (LengthSquared(&delta) <= 1023 || frame > 600) {
             trail->position = p->position;
             {
                 void *callback = SceneActorControl_SettleRotation;
