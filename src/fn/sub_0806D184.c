@@ -2,9 +2,6 @@
 #include "route_sprite_playback.h"
 #include "engine.h"
 s32 Div(s32, s32);
-struct Pair {
-    u32 a, b;
-};
 static inline s32 Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -50,7 +47,7 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
         actor->sprite.position.x +=
             Div(actor->target.x - actor->sprite.position.x, actor->moveTimer);
         actor->sprite.position.y +=
-            Div(*(s16 *)((u8 *)actor + 0xD2) - actor->sprite.position.y, actor->moveTimer);
+            Div(actor->elevatedPosition.y - actor->sprite.position.y, actor->moveTimer);
         actor->sprite.position.z +=
             Div(actor->target.z - actor->sprite.position.z, actor->moveTimer);
         actor->moveTimer--;
@@ -71,7 +68,7 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
     if (actor->moveTimer <= 0) {
         register u32 offset asm("r6") = 0x148;
         asm("" : "+r"(offset));
-        *(struct Pair *)((u32)actor + offset) = *(struct Pair *)&actor->sprite.position;
+        *(struct ContactPosition *)((u32)actor + offset) = actor->sprite.position;
         actor->state = 2;
         {
             register u32 changed asm("r2") = 0x157;
