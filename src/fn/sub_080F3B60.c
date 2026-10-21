@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_UpdateTrailingMembers sub_080F3B60
 struct CGPos {
     u16 x, y, z, w;
 };
@@ -104,5 +103,5 @@ void ChildGroup_UpdateTrailingMembers(struct ChildGroup *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F3B60);
+INCLUDE_ASM("asm/nonmatching", ChildGroup_UpdateTrailingMembers);
 #endif

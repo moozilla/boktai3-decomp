@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_UpdateOrbitingMembers sub_080F3CC4
 struct CGPos {
     u16 x, y, z, w;
 };
