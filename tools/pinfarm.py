@@ -256,6 +256,8 @@ def cmd_apply(a):
         print(f"{name}: applied to {unit} ({how})")
         if a.commit:
             msg = f"{name}: drop register pins ({how})\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
+            if os.environ.get("CLAUDE_SESSION_URL"):
+                msg += f"Claude-Session: {os.environ['CLAUDE_SESSION_URL']}\n"
             subprocess.run(["git", "commit", "-q", "-m", msg, unit], cwd=ROOT, check=True)
 
 

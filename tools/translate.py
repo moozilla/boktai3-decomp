@@ -76,7 +76,10 @@ NATURAL_PASSES = [
     "perm_struct_ref", "perm_compound_assignment", "perm_commutative", "perm_add_sub",
     "perm_inequalities", "perm_condition", "perm_reverse_cond", "perm_chain_assignment",
     "perm_split_assignment", "perm_loop_form",
-]
+    # unsafe in general, but a natural search keeps only exact matches, and
+    # identical bytes cannot mean anything else: retyping a local, a new or
+    # removed temporary, a cast, an inline helper, reordered statements
+] + UNSAFE_PASSES
 PASSES = SAFE_PASSES
 CAP_CHOICES = 48   # options tried at one choice point
 CAP_RUNS = 400     # runs of one pass per state
