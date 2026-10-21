@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.8%
-// foundry draft (worker best 89.6%); what differs is mostly register allocation and instruction order
 #define gRandomIndex  gUnk_03005308
 #define gRandomValues gUnk_0203B400
 struct ActorReaction {
@@ -28,19 +25,17 @@ void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u3
 s32 sub_08249350(s32, s32);
 static inline void SetHeading(struct ActorReaction *p, s32 angle)
 {
-    s32 shifted;
-    u16 value;
+    u32 t;
+    s32 sh;
     p->heading = angle;
-    shifted = p->heading + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->direction4 = value;
-    shifted = p->heading + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->direction8 = value;
+    sh = (p->heading + 0x60) >> 6;
+    t = 3;
+    t &= sh;
+    p->direction4 = t;
+    sh = (p->heading + 0x70) >> 5;
+    t = 7;
+    t &= sh;
+    p->direction8 = t;
 }
 void Hresvelgr_BeginRestAnimation(struct ActorReaction *actor)
 {
@@ -58,6 +53,3 @@ void Hresvelgr_BeginRestAnimation(struct ActorReaction *actor)
         actor->flags |= flags;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_BeginRestAnimation);
-#endif
