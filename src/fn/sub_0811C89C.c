@@ -3,7 +3,7 @@
 #include "modifier_list.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.6%
+// fuzzy: 99.2%
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
 #define gCharacterPaletteResource       gUnk_030042E4
