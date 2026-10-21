@@ -26,3 +26,26 @@ Step 1 (`tools/depin.py --write` over all 60) auto-dropped hints in 9 files (com
 ## Not solved (what blocked)
 
 See the end of the file (appended when the run ends).
+
+## Later fully-clean fixes
+
+* Player_CollectCallbackFlags, PlayerPanel_RemoveEffects, EffectPoolA_AllocateSlot: `(*(&i))++;` replaces `asm("" : "+r"(i))`; makes the induction variable opaque so no biv reversal / early increment (PlayerPanel: `(*(&group))++` after `offset += 0x208`).
+* SceneStatusIndicator_Allocate: `u32 bit = one; (*(&bit)) <<= index;` (kept the pre-existing volatile pointer).
+* SelectionSlots_ClearValue: `u32 m; do { m = 0xFF; } while (0);` plus `u32 cur = (u8)*slot; *slot = cur | m;`.
+* DisplayAnimation_SetPosition (permuter): early `return -1`, no return on success path (r0 left as incoming value).
+* ProximityEmitter_TickParticle (permuter): int temp reused for `previous + 1` and later the constant 2.
+* SceneActorRegistry_FindAvailableAfterId (permuter): `(u8 *)actor - (-offset)` with `u32 offset = 0x2cc`.
+* Player_UpdateResetBlink (permuter): second pointer temp `q = p` used inside the `mode != 0x1E` branch.
+
+## Not solved (blockers)
+
+* sub_08221B9C/BE8/C34/D40: combine moves target load after current load; barrier acted as a second use. D40: r5/r6 swap for values/cursor persists with every `(*(&cursor))` variant.
+* sub_08066AE0: loop-invariant stride/dispatch hoisted into extra callee-saved regs.
+* sub_08068B8C: needs hoist order [const 0xfc8, used ptr, const 1]; best variants off by 6 bytes.
+* sub_0813B18C: the two `direction + 0xe0` get shared (tail merge).
+* sub_08199C20: gcc folds branch addresses to `+0x44` then `subs #4`. 08180570: 9 -> 3 hints.
+* sub_08056F30: original re-reads global pointer after stores (barrier forced it).
+* sub_08080008: pool-folded address vs `group + 0x40`.
+* sub_08229440: needs callee-saved r5 for a temp not crossing a call. sub_08074600: CSE deletes `mode = 0`. sub_0821F1C4: stride copy r2 from pin interplay.
+* Untried/low odds: 08075FC8, 0821E5C4, 0802D570, 08069788, 08057480, 08058B88, 080322B4, 0804DB60, 08083F3C (permuter best 400 vs 1500, not zero), 0804EBD8, 0802C8CC, 081EC670, 08108E5C, 0801F580, 0805DD98, 08040A74, 0806FCAC, 0810BB0C.
+* Permuter queue 2 was stopped after 1.5 functions (time budget).
