@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.2%
+// fuzzy: 97.4%
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
@@ -53,7 +53,7 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
         speed = -speed;
     if (speed > 9) {
         u32 offset;
-        s32 direction;
+        register s32 direction asm("r1");
         u32 random;
         p->start[0] = p->position[0];
         p->start[1] = p->position[1];
@@ -67,19 +67,30 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
         p->timer = 0;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         offset = gRandomIndex * 2;
-        random = *(const u16 *)(offset + (u32)gRandomTable);
+        {
+            register u32 tb asm("r2") = (u32)gRandomTable;
+            random = *(const u16 *)(offset + tb);
+        }
         random &= 1;
-        if (random)
-            direction = -1;
-        else
-            direction = 1;
+        direction = 1;
+        if (random) {
+            register s32 m asm("r4") = -1;
+            asm("" : "+r"(m));
+            direction = m;
+        }
         p->direction = direction;
-        x = p->delta[0];
-        if (x < 0)
-            x = -x;
-        z = p->delta[2];
-        if (z < 0)
-            z = -z;
+        {
+            s32 xx = p->delta[0];
+            if (xx < 0)
+                xx = -xx;
+            x = xx;
+        }
+        {
+            s32 zz = p->delta[2];
+            if (zz < 0)
+                zz = -zz;
+            z = zz;
+        }
         if (x < z)
             p->update174 = Sword_UpdateHorizontalWaveFlight;
         else
