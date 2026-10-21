@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.4%
-// Body has 12 register differences; the recorded score also includes the retained 76-byte tail.
 struct MotionPosition {
     u32 x : 16;
     s32 y : 16;
@@ -104,7 +101,7 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
         asm("" : "+r"(offset));
         p->verticalOffset = offset;
         p->y = floor << 12;
-        if (p->deltaY >= 0 && (Abs(offset) >> 12) <= 3)
+        if ((y = p->deltaY >= 0) && (Abs(offset) >> 12) <= 3)
             p->verticalOffset = 0;
     }
     p->previousShape = p->cellFlags;
@@ -117,6 +114,37 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
     Memory_Clear(&p->deltaX, 16);
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", Terrain_ResolveActorMotion);
-#endif
+struct SpatialLink {
+    void *entry;
+    struct SpatialLink *previous, *next;
+};
+struct SpatialBucket {
+    struct SpatialLink *active, *passive;
+    s32 activeCount, passiveCount;
+};
+struct SpatialIndex {
+    u8 unknown0[0x18];
+    struct SpatialBucket buckets[10];
+};
+extern struct SpatialIndex *gUnk_02000200;
+void SpatialIndex_ScanBuckets(u32 flags)
+{
+    if (gUnk_02000200) {
+        struct SpatialIndex *index = gUnk_02000200;
+        s32 i = 0;
+        u32 active = flags & 8;
+        u32 passive = flags & 16;
+        for (; i <= 9; i++) {
+            struct SpatialLink *link;
+            struct SpatialBucket *bucket = &index->buckets[i];
+            if (active)
+                link = bucket->active;
+            else if (passive)
+                link = bucket->passive;
+            else
+                return;
+            while (link)
+                link = link->next;
+        }
+    }
+}
