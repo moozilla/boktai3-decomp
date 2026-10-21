@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.7%
-// foundry draft (worker best 89.1%); what differs is mostly register allocation and instruction order
 struct SceneVolumeOwner {
     u8 pad0[0x418];
     u8 disabled;
@@ -20,12 +18,23 @@ struct SceneVolume {
 };
 s32 SceneVolume_CanActivate(struct SceneVolume *volume)
 {
-    if ((volume->mode == 2 || volume->mode == 10) && volume->phase == 4 &&
-        (*(u32 *)((u8 *)volume + 0x464) & 7) && !volume->owner->disabled &&
-        !*(u8 *)((u8 *)volume + 0x473))
-        return 1;
-    return 0;
+    register u32 o asm("r1");
+    register u8 *q asm("r0");
+    if (!(volume->mode == 2 || volume->mode == 10))
+        return 0;
+    if (volume->phase != 4)
+        return 0;
+    o = 0x464;
+    asm("" : "+r"(o));
+    q = (u8 *)volume + o;
+    if (!(*(u32 *)q & 7))
+        return 0;
+    if (volume->owner->disabled)
+        return 0;
+    o = 0x473;
+    asm("" : "+r"(o));
+    q = (u8 *)volume + o;
+    if (*q)
+        return 0;
+    return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneVolume_CanActivate);
-#endif

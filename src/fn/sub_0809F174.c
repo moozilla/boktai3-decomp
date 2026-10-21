@@ -1,9 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.8%
 // Remaining differences: placement of two zero constants and the halfword flag mask load.
 
 void Crow_DisableAttackCollision(struct SceneActorRegistryResetView *);
@@ -49,28 +48,29 @@ static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
         return 1;
     return 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
+                            u8 behavior, u32 zw)
 {
     actor->state2A8 = state;
     actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
+    actor->counter2AC = zw;
     actor->field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind,
+                              u32 zb, u32 zw)
 {
     actor->field2B2 = 1;
-    actor->field2B0 = 0;
+    actor->field2B0 = zb;
     actor->field2B5 = kind;
     actor->target = callback;
-    actor->field2C8 = 0;
+    actor->field2C8 = zw;
     {
         u32 *flags = &actor->flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->word104 = zw;
 }
 // confidence=low: eases the stored reaction displacement to its target before restoring idle.
 void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32 elapsed)
@@ -92,11 +92,19 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
         actor->flags2D6 = m;
     }
     if (EaseMotion(actor) && elapsed > 30) {
-        *(u16 *)((u8 *)actor + 0x178) += 10;
+        u32 z4, z6;
+        u16 v = *(u16 *)((u8 *)actor + 0x178) + 10;
+        z4 = 0;
+        z6 = 0;
+        asm("" : "+r"(z4), "+r"(z6));
+        *(u16 *)((u8 *)actor + 0x178) = v;
         actor->field2B0 = 1;
         {
-            u32 value = actor->flags2D4;
-            u32 mask = ~0x20;
+            u32 mask;
+            u32 value;
+            asm("" ::"r"(&actor->flags2D4));
+            mask = ~0x20;
+            value = actor->flags2D4;
             mask &= value;
             actor->flags2D4 = mask;
         }
@@ -105,16 +113,12 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
             u32 mask = ~0x80;
             *flags &= mask;
         }
-        state[0x3EC] = 0;
+        state[0x3EC] = z4;
         Crow_DisableAttackCollision(actor);
         actor->direction = actor->fieldE9;
-        SetControl(actor, SceneActorControl_OnIdle, 16);
-        SetState(actor, 0, 0, 1);
+        SetControl(actor, SceneActorControl_OnIdle, 16, z4, z6);
+        SetState(actor, z4, z4, 1, z6);
         actor->direction = actor->fieldE9;
         actor->field2C2 = 64;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_RecoverFromDisplacement);
-#endif
