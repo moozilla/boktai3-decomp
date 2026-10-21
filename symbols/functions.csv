@@ -2976,6 +2976,7 @@ addr,name,mode,confidence,source,notes
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
 0808F6F0,Slime_RestoreSavedTarget,thumb,low,src-alias,On arrival restores the saved target as the control callback, then runs update270
+0808F77C,Slime_RunUpdateThenWait,thumb,low,src-alias,Runs update270 each frame; when it returns 0 switches control to sub_0808E780 and state 3/1
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
