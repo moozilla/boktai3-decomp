@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 struct PackedVec {
@@ -107,6 +106,7 @@ static inline void setHandler(void *fn, void **slot)
    and setup depend on the kind; -i picks the starting behavior (0-8). */
 void SceneCharacter_PlaceFromScript(void)
 {
+    s16 k2 = 0;
     s32 name;
     s32 kind;
     s32 extra;
@@ -115,7 +115,7 @@ void SceneCharacter_PlaceFromScript(void)
     s32 colorA;
     s32 sound;
     s32 k, palette, key, flags, behavior;
-    register s32 angle asm("r9");
+    s32 angle;
 
     u8 mode;
     void (*updates[2])(void); /* two update temporaries; an array keeps agbcc's allocation */
@@ -124,8 +124,9 @@ void SceneCharacter_PlaceFromScript(void)
     colorA = 0;
     sound = 0x34;
     manager = gUnk_02000480;
-    if (!manager)
+    if (!manager) {
         return;
+    }
     name = Script_GetKeywordValue('n', 0);
     kind = Script_GetKeywordValue('k', 9);
     k = kind - 4;
@@ -154,12 +155,15 @@ void SceneCharacter_PlaceFromScript(void)
         key = 0;
     }
     npc = Actor_Allocate(name, kind);
-    if (!npc)
+    if (!npc) {
         return;
-    if (Actor_InitMotion(npc, name, &position, angle) < 0)
+    }
+    if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
-    if (Actor_InitDrawable(npc, flags, model, key, 0) < 0)
+    }
+    if (Actor_InitDrawable(npc, flags, model, key, k2) < 0) {
         return;
+    }
     if (palette >= 0) {
         if (k == 0x19) {
             CpuSet(gUnk_030042E4 + palette * 32, npc->colors, 0x04000008);
@@ -170,8 +174,9 @@ void SceneCharacter_PlaceFromScript(void)
                 d->palette = (u16 *)npc->colors;
             }
             *(u16 *)((u8 *)npc + 0x13A) = palette;
-        } else
+        } else {
             Actor_SetDefaultPaletteBank(npc, palette);
+        }
     }
     if (k == 0x19) {
         struct CharacterExtra *x = &npc->extra;
@@ -179,12 +184,13 @@ void SceneCharacter_PlaceFromScript(void)
         x->field12 = 0;
         x->field10 = colorA;
         x->field14 = 0x34;
-        if (sound == 1)
+        if (sound == 1) {
             sound = 0x174;
-        else if (sound == 9)
+        } else if (sound == 9) {
             sound = 0x16F;
-        else
+        } else {
             sound = 0x34;
+        }
         x->field18 = sound;
     } else if (k == 5) {
         struct CharacterExtra *x = &npc->extra;
@@ -198,10 +204,9 @@ void SceneCharacter_PlaceFromScript(void)
     {
         u16 a = angle;
         {
-            register s32 t asm("r2");
+            s32 t;
             u32 m;
             t = a + 0x70;
-            asm("" : "+r"(t));
             t >>= 5;
             m = 7;
             m &= t;
@@ -423,7 +428,9 @@ void SceneCharacter_PlaceFromScript(void)
             }
             break;
     }
-    if (npc->animMode == 1)
+
+    if (npc->animMode == 1) {
         Actor_PlayAnimationEntry(npc, 0, 0, 0, 0);
+    }
     SceneNpc_SetKindMotionVector(npc, kind);
 }
