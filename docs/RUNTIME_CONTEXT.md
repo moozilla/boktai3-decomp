@@ -22,8 +22,8 @@ or Thumb mode in the function's address span is
 `selected_any_halfword_observed`. Thus an entry hit and execution only inside
 the span remain distinct, and reserved coverage bits cannot produce a hit.
 Function spans use the next recognized function start as their end, clipped at
-the known data overlays `08000350–0800145C` and `0822F248–0822F648`. Coverage
-in those gaps or in an address whose mode does not match a function is counted
+the known data overlay `0822F248–0822F648`. Coverage
+in that gap or in an address whose mode does not match a function is counted
 under `coverage_diagnostics.*.unattributed_mode_halfwords` instead of being
 silently assigned to the preceding function. JSON reports this by tag; CSV
 repeats the diagnostic totals and boundary note on each function row.

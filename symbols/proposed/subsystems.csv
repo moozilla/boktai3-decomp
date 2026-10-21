@@ -1,6 +1,6 @@
 addr,name,confidence,evidence
 08000000,RomHeaderAndResetVector,high,gen/code_sym.s branch to crt0 plus embedded GBA header
-080001F0,InterruptDispatcherAndIwramHelpers,high,docs/ROM_MAP.md; existing report span includes following ARM helper blob
+080001F0,IntrMain,high,SDK crt0.s interrupt dispatcher (docs/ROM_MAP.md); the ARM C after it is split into its own functions
 080015AC,Background_ApplyQueuedCommands,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08001768,Background_Update,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08001AD0,Background_Destroy,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md

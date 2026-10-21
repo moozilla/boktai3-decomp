@@ -91,7 +91,7 @@ def main():
     done = done_names()
     fs = [f for f in functions() if f["name"] not in done]
     if a.chunks:
-        work = [f for f in fs if not in_library(f["addr"]) and f["addr"] >= 0x0800145C]
+        work = [f for f in fs if not in_library(f["addr"]) and f["addr"] >= 0x08000350]
         per = len(work) // a.chunks + 1
         for i in range(a.chunks):
             part = work[i * per:(i + 1) * per]

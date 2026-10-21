@@ -24,7 +24,7 @@ void Time_CalculateSunriseSunset(s32, s32, s32);
 void Script_InitRuntime(void);
 void SceneLifecycle_InitManager(void);
 void TaskSystem_RunFrame(void);
-extern u8 _08000350[], AgbMain__addr[], gUnk_03000000[];
+extern u8 Palette_CacheObjectBankArm[], AgbMain__addr[], gUnk_03000000[];
 void AgbMain(void)
 {
     u32 saved0, saved1, zero;
@@ -58,8 +58,8 @@ void AgbMain(void)
     Clock_CheckRtcDate();
     m4aSoundInit();
     InterruptsAndVideo_Initialize();
-    CpuSet(_08000350, gUnk_03000000,
-           (((s32)(AgbMain__addr - _08000350) / 4) & 0x1fffff) | 0x04000000);
+    CpuSet(Palette_CacheObjectBankArm, gUnk_03000000,
+           (((s32)(AgbMain__addr - Palette_CacheObjectBankArm) / 4) & 0x1fffff) | 0x04000000);
     Eeprom_SetCapacity(64);
     SceneLifecycle_InitFrameCounterPointer();
     GameState_SelectRamBase();

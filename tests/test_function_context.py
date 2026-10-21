@@ -22,8 +22,8 @@ AgbMain: @ 0x0800145C
             functions = parse_functions(asm)
         self.assertEqual([(f.address, f.name, f.mode, f.end) for f in functions], [
             (ROM_BASE, "sub_08000000", "thumb", ROM_BASE + 2),
-            (ROM_BASE + 2, "sub_08000002", "thumb", DATA_GAPS[0][0]),
-            (0x0800145C, "AgbMain", "arm", DATA_GAPS[1][0]),
+            (ROM_BASE + 2, "sub_08000002", "thumb", 0x0800145C),
+            (0x0800145C, "AgbMain", "arm", DATA_GAPS[0][0]),
         ])
 
     def test_exclusive_ranking_and_entry_vs_interior(self):
