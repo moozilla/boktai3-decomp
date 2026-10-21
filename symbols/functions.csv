@@ -6616,6 +6616,7 @@ addr,name,mode,confidence,source,notes
 0819A104,CannonBattery_DestroyMuzzleFlash,thumb,low,src-alias,Destruction callback removing the firing effect sprite
 0819A110,CannonBattery_InitMuzzleFlash,thumb,low,src-alias,
 0819A1D8,CannonBattery_SpawnMuzzleFlash,thumb,low,src-alias,Claims a free shared effect slot and initializes a directional firing animation
+0819A23C,CannonBattery_Update,thumb,low,src-alias,
 0819A470,CannonBattery_ReadOptions,thumb,low,src-alias,Reads optional firing parameters and clears the cannon and effect pools
 0819A4D8,CannonBattery_Create,thumb,low,src-alias,Creates the task managing pooled cannons and their firing effects; tentative battery role
 0819A520,ScriptValues_LoadRotatedArray,thumb,low,src-alias,
@@ -8546,10 +8547,12 @@ addr,name,mode,confidence,source,notes
 0820D23C,EnemyParticle_UpdateLifetime,thumb,low,src-alias,Marks the particle for motion refresh and reports expiration past its configured lifetime
 0820D258,SceneOverlayEntry_Init,thumb,low,src-alias,
 0820D2A0,EnemyParticle_ReleaseSlot,thumb,low,src-alias,Removes a particle sprite and clears its occupied slot bit
+0820D2C4,EnemyParticle_UpdatePool,thumb,low,src-alias,
 0820D5AC,EnemyParticle_DestroyPool,thumb,low,src-alias,Destruction callback that releases active particles and clears the global pool pointer
 0820D5E4,EnemyParticle_InitPool,thumb,low,src-alias,Registers the global pool and initializes all sixteen particle slots
 0820D614,EnemyParticle_CreatePool,thumb,low,src-alias,Creates the particle manager task and installs its update and destruction callbacks
 0820D654,EnemyParticle_FindFreeSlot,thumb,low,src-alias,Returns the first unoccupied particle slot and its index
+0820D684,EnemyParticle_Emit,thumb,low,src-alias,
 0820D934,EnemyParticle_InitParameters,thumb,low,src-alias,Clears a particle parameter block and installs default motion graphics and lifetime settings
 0820D990,EnemyParticle_SetMotionParameters,thumb,low,src-alias,Sets sprite flags lifetime direction and movement speed
 0820D9A4,EnemyParticle_SetGraphicsParameters,thumb,low,src-alias,Sets the animation resource sprite attribute and optional palette selection

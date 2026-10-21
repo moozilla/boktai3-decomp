@@ -17,7 +17,7 @@ void EnemyParticle_SetMotionParameters(void *, u16, u16, u8, u32);
 void EnemyParticle_SetVerticalMotion(void *, s32, s32);
 void EnemyParticle_EnableShadow(void *);
 void EnemyParticle_AddFlags(void *, u32);
-void sub_0820D684(void *, void *);
+void EnemyParticle_Emit(void *, void *);
 struct ScreamerParticleParameters {
     u32 data[14];
 };
@@ -92,7 +92,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
                     offsetPosition->x += 16;
                 else
                     offsetPosition->z += 16;
-                sub_0820D684(&parameters, &position);
+                EnemyParticle_Emit(&parameters, &position);
             }
             p->f1DE = 0;
             p->update = SceneDrawablePair_SetFlags;
