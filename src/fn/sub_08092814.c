@@ -1,7 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.1%
-// Remaining differences are register allocation in the random-motion setup.
+// fuzzy: 98.9%
+// Remaining differences: one zero-index register (r1 vs r2) in the first table load.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 extern u32 gUnk_03005308;
@@ -80,18 +81,58 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
     struct ContactPosition *motion;
     if (Take(&actor->field2B1)) {
         u8 *body = actor->context;
-        u32 angle;
+        register u32 angle asm("r3");
+        register u32 o1 asm("r4");
         Control(actor, actor->entryTarget228, 1);
         Clear(&zero, body + 0x480);
         angle = (u8)Rand();
-        *(s16 *)((u8 *)actor + 0x2EC) = Shift(gUnk_086149C4[angle], 6);
-        *(s16 *)((u8 *)actor + 0x2F0) = Shift(gUnk_086149C4[(angle + 64) & 255], 6);
+        asm("" : "+r"(angle));
+        {
+            register const s16 *tab1 asm("r1") = gUnk_086149C4;
+            register s32 vx asm("r1");
+            register s16 *q asm("r0");
+            asm("" : "+r"(tab1));
+            vx = Shift(tab1[angle], 6);
+            asm("" ::"r"(tab1));
+            o1 = 0x2EC;
+            asm("" : "+r"(o1));
+            q = (s16 *)((u8 *)actor + o1);
+            *q = vx;
+        }
+        {
+            register const s16 *tab asm("r2") = gUnk_086149C4;
+            register u32 idx asm("r0");
+            register u32 msk asm("r1");
+            s32 vz;
+            register u32 o asm("r2");
+            register s16 *q asm("r0");
+            asm("" : "+r"(tab));
+            idx = angle + 64;
+            msk = 255;
+            asm("" : "+r"(msk));
+            idx &= msk;
+            vz = Shift(tab[idx], 6);
+            asm("" ::"r"(tab));
+            o = 0x2F0;
+            asm("" : "+r"(o));
+            q = (s16 *)((u8 *)actor + o);
+            *q = vz;
+        }
+        asm("" ::"r"(angle));
+        asm("" ::"r"(o1));
     }
-    motion = (struct ContactPosition *)((u8 *)actor + 0x2EC);
+    {
+        register u32 mo asm("r6") = 0x2EC;
+        register u8 *ma asm("r4");
+        asm("" : "+r"(mo));
+        ma = (u8 *)actor + mo;
+        asm("" : "+r"(ma));
+        motion = (struct ContactPosition *)ma;
+    }
     length = motion->x * motion->x + motion->z * motion->z;
     if (!length) {
         Bee_DisableMovement(actor);
-        Clear(&zero, (u8 *)actor + 0x2EC);
+        Clear(&zero, (u8 *)motion);
         Bee_BeginMoveToPosition(actor, gUnk_02000580[0] + 0x30);
         State(actor, 2, 0);
     }

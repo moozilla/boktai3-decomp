@@ -1,7 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.1%
-// 13 differing instruction runs; first diff at +0x4 (adds r4, r0, #0 vs adds r5, r0, #0)
+// fuzzy: 95.0%
+// Remaining differences: amount and step swap r5/r7.
 struct Vec5B {
     u32 x : 16, y : 16, z : 16;
 };
@@ -10,12 +11,16 @@ void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec5B *, struct Vec5B *);
 void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
-void sub_08235B34(u8 *p)
+void sub_08235B34(u8 *arg)
 {
+    register u8 *p asm("r4") = arg;
     struct Vec5B scale, position;
-    u8 *e = p + 0x94;
+    register u8 *e asm("r6");
     s32 amount;
     u32 flags, step;
+    asm("" : "+r"(p));
+    e = p + 0x94;
+    asm("" : "+r"(e));
     do {
         scale.x = 30000;
         scale.y = 30000;
