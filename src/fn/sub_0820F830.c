@@ -76,8 +76,10 @@ static inline void OrangeSpine_StepAnimation(u8 *p, void *sprite, struct FanSeq 
         if (first != (((*c & 0x30) >> 4) & bit)) {
             register u32 *f asm("r3") = sprite;
             *f |= 8;
-        } else
-            *(u32 *)sprite &= ~8;
+        } else {
+            register u32 *f asm("r4") = sprite;
+            *f &= ~8;
+        }
     }
     elapsed = s->elapsed + 1;
     s->elapsed = elapsed;
@@ -136,20 +138,15 @@ static inline void OrangeSpine_StepAnimation(u8 *p, void *sprite, struct FanSeq 
 }
 #define OrangeSpine_InitializeFromScript sub_0820F830
 
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// Remaining diff: the 'a' default 300 is derived from the 0x124 offset register
-// (adds r3, #8) instead of being rebuilt in r0, which shifts the reload register
-// rotation (r2/r3) of the later offset constants.
-
 s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     register void *sprite asm("r8");
-    register void *earlySprite asm("r5");
+    void *earlySprite;
     void **slot;
     s32 found;
     s32 dead;
+    s16 *dp;
     if (Script_SeekToKeyword('p')) {
         H(0x1c) = Script_GetValue();
         H(0x1e) = Script_GetValue();
@@ -166,7 +163,12 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
         H(0x122) = 30;
         H(0x124) = 30;
         H(0x136) = 6;
-        H(0x13a) = 300;
+        {
+            s16 *q = &H(0x13a);
+            s32 v = 300;
+            asm("" : "+r"(v) : "r"(q));
+            *q = v;
+        }
     }
     if (Script_SeekToKeyword('l')) {
         s32 health = Script_GetValue();
@@ -246,19 +248,23 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
     } else {
         *(void (**)(void))(p + 0x108) = OrangeSpine_UpdateDefeatEffect;
         {
-            register u32 zero asm("r2");
+            u32 zero;
             s16 *q = &H(0x12e);
             zero = 0;
-            asm("" : "+r"(zero));
             *q = 1;
             asm("" : : : "memory");
             Anim_SetSequence(p + 0x10c, *slot, 0x10, *(u8 *)(p + 0x132), zero);
         }
     }
     OrangeSpine_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
-    if (H(0x14a) == 0)
+    {
+        register u32 off asm("r3") = 0x14a;
+        asm("" : "+r"(off));
+        dp = (s16 *)(p + off);
+    }
+    if (*dp == 0)
         OrangeSpine_InitCollider(p);
-    if (W(0x16c) && H(0x14a) == 0) {
+    if (W(0x16c) && *dp == 0) {
         s32 cell = OrangeSpine_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }
@@ -269,6 +275,3 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
         TerrainOverlay_QueueAddActor(body);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0820F830);
-#endif
