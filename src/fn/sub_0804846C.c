@@ -1,8 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "wireless_link_indicator.h"
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
 {
-    register struct WirelessLinkIndicator *indicator asm("r4") = input;
+    struct WirelessLinkIndicator *indicator = input;
+    do {
+    } while (0);
     if (!Wireless_GetStatus()) {
         s32 strength = 255;
         if (Wireless_IsSessionConnected()) {
@@ -22,18 +23,21 @@ void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
                 do {
                     if ((slots >> index) & connected) {
                         s32 current = values[index];
-                        if (strength > current)
+                        if (strength > current) {
                             strength = current;
+                        }
                     }
                     ++index;
                 } while (index <= 3);
-                if (!gRfuLinkStatus->connSlotFlag)
+                if (!gUnk_03006A80->connSlotFlag) {
                     WirelessLinkIndicator_SelectStrengthFrame(indicator, 0);
-                else
+                } else {
                     WirelessLinkIndicator_SelectStrengthFrame(indicator, strength);
+                }
             }
             indicator->animation.flags &= ~1;
-        } else
+        } else {
             indicator->animation.flags |= 1;
+        }
     }
 }
