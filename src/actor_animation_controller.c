@@ -336,7 +336,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             register u32 flags asm("r2") = p->flags;
             p->flags = one | flags;
             {
-                register void (*fn)(void *, void *) asm("r2") = Actor_OnInteractionChildRelease;
+                register void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
                 q->fn = fn;
             }
             one |= q->flags;
@@ -366,7 +366,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             register u32 flags asm("r2") = p->flags;
             p->flags = one | flags;
             {
-                register void (*fn)(void *, void *) asm("r2") = Actor_OnInteractionChildDelay;
+                register void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
                 q->fn = fn;
             }
             one |= q->flags;
@@ -1534,7 +1534,7 @@ void Actor_OnInteractionChildRelease(struct ActorAnimController *input,
             Script_Call(h, 0);
         }
         {
-            register void (*fn)(void *, void *) asm("r1") = Actor_OnInteractionChildUpdate;
+            register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             c->fn = fn;
         }
         {
@@ -3153,7 +3153,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             }
             {
                 u32 active = 4;
-                register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
+                register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
                 u32 reset = 1;
                 struct ActorChildCallbackView *child =
                     (struct ActorChildCallbackView
@@ -3963,7 +3963,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         }
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
+            register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView
