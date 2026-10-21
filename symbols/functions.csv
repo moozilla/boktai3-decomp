@@ -4346,6 +4346,7 @@ addr,name,mode,confidence,source,notes
 0811ADF0,Terrain_GetHeightAtPosition,thumb,low,src-alias,
 0811AE68,Terrain_GetHeightAtFixedPosition,thumb,low,src-alias,Converts fixed point X and Z coordinates to a packed position for the terrain height query
 0811AE9C,Terrain_ResolveActorMotion,thumb,low,src-alias,
+0811B048,SpatialIndex_ScanBuckets,thumb,low,src-alias,Walks every bucket list selected by the flags and discards the result; no caller found
 0811B094,Collider_ScheduleUpdates,thumb,low,src-alias,
 0811B150,Collider_OnContactDefault,thumb,low,src-alias,Provides the empty default contact callback installed during collider initialization
 0811B154,Collider_SetContactCallback,thumb,low,src-alias,Stores the contact callback and its associated user data
