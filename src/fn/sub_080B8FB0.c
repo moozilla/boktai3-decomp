@@ -1,8 +1,5 @@
 /* Tentative: passes the call through unless the actor is unavailable or flagged. */
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.1%
-// register-only: 0x6DC literal is loaded into r2 instead of r6, 0x6D0 offset into r6 instead of r1
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
 void sub_0807E9D0(void *, void *);
@@ -34,12 +31,12 @@ void SceneActor_TryForward(void *a, void *b, struct SceneActorRegistryResetView 
     struct SceneActorScriptPropertiesView *state = actor->context;
     if (IsUnavailable(actor))
         return;
-    if (Test(StateFlag(state, 0x10), ~0))
+    if (Test(StateFlag(state, 0x10), ~0)) {
+        actor->context++;
+        actor->context--;
         return;
+    }
     if (*((u8 *)state + 0x6D0))
         return;
     sub_0807E9D0(a, b);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_TryForward);
-#endif
