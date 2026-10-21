@@ -60,8 +60,6 @@ static inline s32 scale(s32 product)
     return product >= 0 ? product >> 12 : -((-product) >> 12);
 }
 
-#define SpiralBurst_UpdateParticles sub_082343B8
-
 #ifdef NONMATCHING
 // fuzzy: 90.4%
 // still differs: pool constant 0x202 is shared across the call and the loop-back branch layout
@@ -118,5 +116,5 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
         Task_Kill(p);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082343B8);
+INCLUDE_ASM("asm/nonmatching", SpiralBurst_UpdateParticles);
 #endif

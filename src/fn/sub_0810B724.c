@@ -39,8 +39,7 @@ static inline void FlagClear(u32 m)
     gUnk_0300523C &= ~m;
 }
 
-#define Registry1745_RunSession sub_0810B724
-u32 sub_0810B724(struct Reg1745Run *p)
+u32 Registry1745_RunSession(struct Reg1745Run *p)
 {
     struct Reg1745Run *q = p;
     gUnk_020001C0 = 0;

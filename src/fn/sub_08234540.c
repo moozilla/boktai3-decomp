@@ -39,8 +39,6 @@ static inline u32 randomValue(const u16 *table, u32 mask)
     return *(const u16 *)(offset + (u32)table);
 }
 
-#define SpiralBurst_InitParticles sub_08234540
-
 #ifdef NONMATCHING
 // fuzzy: 95.7%
 // still differs: the table and mask constants are loaded once and copied (r5 -> r6, r1 -> sb) in the ROM; the sine table literal is pooled twice
@@ -90,5 +88,5 @@ void SpiralBurst_InitParticles(u8 *p)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08234540);
+INCLUDE_ASM("asm/nonmatching", SpiralBurst_InitParticles);
 #endif

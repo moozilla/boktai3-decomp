@@ -32,7 +32,6 @@ no:
 yes:
     return 1;
 }
-#define RecordMenu_LoadPlayerSprites sub_0810F0A0
 void RecordMenu_LoadPlayerSprites(struct RecMenu *menu)
 {
     s32 i, next;
