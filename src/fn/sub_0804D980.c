@@ -1,14 +1,16 @@
 #include "staged_effect.h"
-// MATCHING_CONCESSION: register-pinning
 void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
 {
     u32 phase;
-    u32 nextFrame;
     if (effect->frame <= 3) {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        register u32 index asm("r1") = (gUnk_03005308 + 1) & 0x3FF;
-        register u32 sample asm("r0") = random[index];
-        u32 mask = 31;
+        u32 index = (gUnk_03005308 + 1) & 0x3FF;
+        u32 sample;
+        u32 *new_var;
+        u32 mask;
+        new_var = &index;
+        *(&sample) = random[*new_var];
+        mask = 31;
         sample &= mask;
         sample -= 16;
         effect->shakeX = sample;
@@ -24,16 +26,13 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         StagedEffect_MarkOuterSpritesAlternate(effect);
     else if (phase == 2)
         StagedEffect_MarkOuterSprites(effect);
-    nextFrame = effect->frame;
-    if (nextFrame > 15) {
+    if (effect->frame > 15) {
         effect->sprites[0].flags &= ~1;
         {
-            register u32 state asm("r1") = 3;
-            u16 *destination = &effect->state;
-            nextFrame = 0;
-            *destination = state;
+            u32 state = 3;
+            effect->state = state;
         }
+        effect->frame = 0;
     } else
-        nextFrame++;
-    effect->frame = nextFrame;
+        effect->frame++;
 }
