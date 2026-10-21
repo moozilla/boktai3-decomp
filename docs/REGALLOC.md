@@ -213,3 +213,31 @@ Third batch (14 of the next 50; `notes/depin-manual-3_2026-10-21.md`):
     constant gets.
 13. The permuter's dummy statements (`x++; x--;`, `s->q = s->q;`) are not
     acceptable depins; leave the pin instead.
+
+## Are the pins a sign of the wrong compiler or flags? (2026-10-21)
+
+No. `tools/flagprobe.py` took the 150 smallest pinned functions, stripped their
+hints, and compiled each under 12 variants: agbcc -O2 (the project's), old_agbcc
+-O2 and -O1, agbcc -O1 and -O3, and agbcc -O2 with -fno-regmove,
+-fno-expensive-optimizations, -fno-strength-reduce, -fno-gcse,
+-fno-caller-saves, -fno-rerun-loop-opt/-fno-rerun-cse-after-loop, and
+-fno-cse-follow-jumps/-fno-cse-skip-blocks.
+
+| Variant | New exact matches | Closer than -O2 | Further |
+|---|---:|---:|---:|
+| old_agbcc -O2 | 0 | 33 | 45 |
+| agbcc -O1 | 2 | 41 | 67 |
+| -fno-gcse | 2 | 8 | 11 |
+| -fno-cse-follow-jumps/-skip-blocks | 2 | 15 | 26 |
+| every other variant | 0 | ≤22 | ≥ as many |
+
+Six scattered single matches, no group, and every variant is further from the
+ROM on more functions than it is closer: -O2 agbcc stays the best fit, as the
+~9,900 exact matches already suggest. Pins are a C-spelling problem.
+
+`do { } while (0)` in particular is the standard statement-macro idiom, and
+inline helpers and macro arguments are where re-reads such as `*(&x)` and
+extra temporaries come from. The original source very likely had macros and
+inline functions (flag tests, list walks, fixed-point helpers) that expand to
+exactly these shapes, so a do/while(0) depin is best rewritten as the macro it
+probably was.
