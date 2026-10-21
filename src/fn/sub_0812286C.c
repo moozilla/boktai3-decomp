@@ -1,7 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
 // foundry draft (worker best 87.3%); what differs is mostly register allocation and instruction order
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
 #define SceneBody_Release              SceneBody_Unregister
@@ -37,22 +36,23 @@ s32 AnimatedBodyPool_Destroy(struct AnimatedBodyPool *pool)
 {
     s32 i = 0;
     u32 *occupied = &pool->occupied;
-    struct AnimatedBodySlot *slot = pool->slots;
     struct AnimatedBodySlot *bodies = (void *)pool->slots[0].body;
-    struct AnimatedBodyFlagsView *flags = (void *)&pool->slots[0].flags;
+    struct AnimatedBodyFlagsView *flags;
+    struct AnimatedBodySlot *slot;
+    asm("" : "+r"(bodies));
+    flags = (void *)&pool->slots[0].flags;
+    asm("" : "+r"(flags));
+    slot = pool->slots;
+    asm("" : "+r"(slot));
     do {
         if (HasSlot(occupied, 1 << i)) {
-            Anim_Remove(slot);
+            Anim_Remove(&slot[i]);
             if (flags[i].flags & 1)
                 TerrainOverlay_QueueRemoveActor((u32 *)&bodies[i]);
-            SceneBody_Unregister(slot->body);
+            SceneBody_Unregister(slot[i].body);
         }
-        slot++;
         i++;
     } while (i <= 3);
     gUnk_02000140 = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", AnimatedBodyPool_Destroy);
-#endif
