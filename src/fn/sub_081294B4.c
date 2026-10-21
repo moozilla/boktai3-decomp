@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fuzzy: 92.4%
 // Remaining differences: pool/angle registers, narrowing order and the sprite alias lifetime.
 struct Vec {
     s16 x, y, z, pad;
@@ -42,7 +42,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline void SelectDirection(s32 angle, u8 *row, u8 *flip)
 {
-    u32 quadrant = ((angle + 0x60) >> 6) & 3;
+    u32 quadrant = (((u8)angle + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *flip = 1;
         *row = 3 - quadrant;
@@ -206,7 +206,7 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
     sprite = p;
     asm("" : : "r"(sprite));
     sprite->position = *position;
-    SelectDirection((u8)angle, &row, &flip);
+    SelectDirection(angle, &row, &flip);
     Sprite_Init(sprite, pool->graphics, 0);
     Anim_SetSequence(&p->sequence, pool->sequences, 1, row, flip);
     p->variant = variant;
