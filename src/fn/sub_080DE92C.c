@@ -2,7 +2,6 @@
 #include "global.h"
 #include "scene_actor_profile.h"
 
-
 void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
