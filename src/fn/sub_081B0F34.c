@@ -4,7 +4,7 @@
 
 // confidence=low: carries a player position request along a motion track
 #ifdef NONMATCHING
-// fuzzy: 92.8%
+// fuzzy: 93.1%
 // Remaining differences: Player-request calls remain duplicated; entry and flag-mask allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -190,7 +190,6 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
         register u32 currentState asm("r4");
         register u32 offset asm("r1") = 0x164;
         register u32 *stateAddress asm("r0");
-        asm("" : "+r"(offset));
         stateAddress = (u32 *)((u8 *)p + offset);
         asm("" : "+r"(stateAddress));
         currentState = *stateAddress;
