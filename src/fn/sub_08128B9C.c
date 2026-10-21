@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// The sprite alias copy to ip occurs after the entry reset instead of before it.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -51,7 +48,8 @@ static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
         *row = quadrant;
     }
 }
-static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, struct Feather *base)
+static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, struct Feather *base,
+                       struct Feather *alias)
 {
     struct Feather *sprite = owner;
     const volatile u16 *command; /* preserve observed packed-command reads */
@@ -87,9 +85,9 @@ static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, str
         asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+            alias->flags |= 8;
         else
-            sprite->flags &= ~8;
+            alias->flags &= ~8;
     }
     {
         u32 elapsed = state->elapsed + 1;
@@ -175,18 +173,16 @@ void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct F
 {
     struct Feather *sprite = p;
     u8 row, flip;
+    struct Feather *alias = p;
+    asm("" : "+r"(alias));
     if (p->enter) {
         p->flags &= ~1;
         p->enter = 0;
     }
-    if (Step(sprite, &p->sequence, p)) {
+    if (Step(sprite, &p->sequence, p, alias)) {
         SelectDirection(&p->angle, &row, &flip);
         Anim_SetSequence(&p->sequence, pool->sequences, 1, row, flip);
         p->state = 2;
         p->enter = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_UpdateOpeningAnimation);
-#endif
