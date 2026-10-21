@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
 void ScaledShadow_Destroy(void *);
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
@@ -13,6 +12,7 @@ s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *input)
     u8 *status;
     void *shadow;
     u32 offset;
+    u32 shared;
     s32 i = 0;
     status = &pool->slots[0].shadowStatus;
     shadow = pool->slots[0].shadow;
@@ -26,14 +26,15 @@ s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *input)
             {
                 u32 location = offset;
                 location += 0x3C;
-                Sprite_Remove((void *)((u32)pool + location));
+                Sprite_Remove((void *)((shared = (u32)pool) + location));
             }
         }
         {
-            register u32 stride asm("r0") = sizeof(pool->slots[0]);
+            u32 stride = sizeof(pool->slots[0]);
+            shared = stride;
             status = (void *)((u32)status + stride);
-            shadow = (void *)((u32)shadow + stride);
-            offset += stride;
+            shadow = (void *)((u32)shadow + shared);
+            offset += shared;
         }
         i++;
     } while (i < 8);
