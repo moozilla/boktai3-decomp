@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 81.6%
-// foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gRandomIndex  gUnk_03005308
 #define gRandomValues gUnk_0203B400
 struct ActorReaction {
@@ -31,14 +29,24 @@ static inline void RestoreHeading(struct ActorReaction *p)
     if (p->pending) {
         p->pending = 0;
         p->heading = p->savedHeading;
-        p->direction4 = 3 & ((p->heading + 0x60) >> 6);
-        p->direction8 = 7 & ((p->heading + 0x70) >> 5);
+        {
+            u32 v;
+            s32 shifted = (p->heading + 0x60) >> 6;
+            v = 3;
+            v &= shifted;
+            p->direction4 = v;
+            shifted = (p->heading + 0x70) >> 5;
+            v = 7;
+            v &= shifted;
+            p->direction8 = v;
+        }
     }
 }
 void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
 {
-    struct ActorReaction *p = actor;
-    RestoreHeading(actor);
+    register struct ActorReaction *p asm("r3") = actor;
+    register u32 t asm("r5") = tick;
+    RestoreHeading(p);
     actor->motion[0] = 0;
     actor->motion[1] = 0;
     actor->motion[2] = 0;
@@ -47,7 +55,7 @@ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
         u32 flags = 12;
         actor->flags |= flags;
     }
-    if (!(tick & 7)) {
+    if (!(t & 7)) {
         s32 anim;
         s32 random;
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
@@ -56,6 +64,3 @@ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
         Hresvelgr_SetAnimation(actor, actor->collider194, actor->collider174, anim, 2, 4);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateRandomAnimation);
-#endif
