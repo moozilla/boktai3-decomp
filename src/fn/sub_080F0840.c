@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.2%
-// foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
 #define gPlayerSlots gUnk_02000580
 void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *actor)
 {
@@ -13,13 +11,17 @@ void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *acto
     struct ContactPosition difference;
     struct Player **slot;
     s32 i;
+    u32 flags;
     {
-        struct Player *player = gUnk_02000580[0];
+        register struct Player **g0 asm("r0") = gUnk_02000580;
+        struct Player *player = g0[0];
         u32 mask = 0x10000;
-        if (mask & player->statusFlags)
+        asm("" : "+r"(g0));
+        flags = player->statusFlags;
+        if (mask & flags)
             limit = 0x24000;
     }
-    if (actor->field2B5 == 3 && (gUnk_02000580[0]->statusFlags & 0x40000))
+    if (actor->field2B5 == 3 && (flags & 0x40000))
         return 0;
     {
         u32 blocked = 0x1000;
@@ -50,6 +52,3 @@ void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *acto
     }
     return target;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_FindNearbyPlayerTarget);
-#endif
