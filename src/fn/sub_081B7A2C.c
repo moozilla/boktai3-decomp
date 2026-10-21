@@ -3,8 +3,7 @@
 #include "player.h"
 #include "proximity_emitter.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
+// MATCHING_CONCESSION: register-pinning
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect
 #define gPlayers                       gUnk_02000580
@@ -31,10 +30,9 @@ u32 TetherActor_RequestKindNineAction(u32, u32);
 
 static inline s32 GrowthHazard_GetFacing(u32 flags)
 {
-    s32 direction = 0;
-    if (!(flags & 4))
-        direction = 0x40;
-    return direction;
+    u32 m = 4;
+    flags &= m;
+    return flags ? 0 : 0x40;
 }
 
 static inline s32 GrowthHazard_GetCell(const struct ContactPosition *position)
@@ -59,7 +57,7 @@ void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *marker)
         occupied = 1;
     }
     if (tetherCell == marker->terrainCell) {
-        u32 direction;
+        register u32 direction asm("r2");
         marker->flags |= 0x200;
         direction = GrowthHazard_GetFacing(marker->flags);
         TetherActor_RequestKindNineAction(0x80, direction);
@@ -71,6 +69,3 @@ void GrowthHazard_RevealWhenCellVacant(struct AnimatedMarker *marker)
         AnimatedMarker_BeginReveal(marker);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GrowthHazard_RevealWhenCellVacant);
-#endif
