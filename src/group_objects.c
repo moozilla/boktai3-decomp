@@ -556,6 +556,10 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
 
 #ifdef NONMATCHING
 // fuzzy: 98.4% (index register of the first Atan2 argument)
+static inline void CpuSet_2(u32 *a0, int a2, struct GroupVec *a1)
+{
+    CpuSet(a0, a1, a2);
+}
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -571,7 +575,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->anchor = p->position;
         p->direction = randomValue();
         zero = 0;
-        CpuSet(&zero, offset, 0x05000002);
+        CpuSet_2(&zero, 0x05000002, offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
