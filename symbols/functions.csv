@@ -4126,6 +4126,7 @@ addr,name,mode,confidence,source,notes
 0810B63C,SceneMenu_WaitForConfirmation,thumb,low,src-alias,
 0810B6DC,Registry1745_WaitForCompletionFlag,thumb,low,src-alias,Advances to the final state when the flag at offset 0x2B is set
 0810B704,Registry1745_EnterCompletedState,thumb,low,src-alias,Sets HUD mode 7 and marks completion on entry to the final state
+0810B724,Registry1745_RunSession,thumb,low,src-alias,
 0810B8A8,SessionMenu_Destroy,thumb,low,src-alias,
 0810B914,Registry1745_Create,thumb,low,src-alias,
 0810BB0C,SessionMenu_InvokeCallback,thumb,low,src-alias,
@@ -4206,6 +4207,7 @@ addr,name,mode,confidence,source,notes
 0810EEA4,LinkLobbyPanel_InitGlyphFrames,thumb,low,src-alias,Assigns nine initial glyph frame IDs for the panel
 0810EEFC,RecordMenu_InitializeSprites,thumb,low,src-alias,
 0810F00C,RecordMenu_PositionSprites,thumb,low,src-alias,
+0810F0A0,RecordMenu_LoadPlayerSprites,thumb,low,src-alias,
 0810F1FC,LinkLobbyPanel_HideSprites,thumb,low,src-alias,Sets the hide flag on nine panel sprites and both five-sprite groups
 0810F238,LinkLobbyPanel_RemoveSprites,thumb,low,src-alias,Removes the panel's nine primary animation objects
 0810F2DC,SceneTask_UpdateTextDelay,thumb,low,src-alias,
@@ -8055,6 +8057,7 @@ addr,name,mode,confidence,source,notes
 081EAAE4,Actor_UpdatePairedSpriteAnimation,thumb,low,src-alias,Advances a four-step paired keyframe sequence every ten ticks for the sprites at offsets 0x238 and 0x2C0.
 081EAB64,Params3D0_UpdateDisplay,thumb,low,src-alias,
 081EB598,Params3D0_DestroyDisplay,thumb,low,src-alias,Task destructor releases nine animations and clears background layer 2
+081EB5A8,Params3D0_InitDisplay,thumb,low,src-alias,
 081EB724,Params3D0_SetFromScript,thumb,low,src-alias,
 081EB7DC,Params3D0_CreateDisplay,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
 081EB81C,ScreenText_ShowIndexedString,thumb,low,src-alias,
@@ -9563,8 +9566,10 @@ addr,name,mode,confidence,source,notes
 082342AC,SolarBomb_Init,thumb,low,src-alias,Stores owner and position then initializes graphics and fuse timers and increments the owner count
 08234354,SolarBomb_Create,thumb,low,src-alias,Allocates the timed bomb task and installs its update and cleanup callbacks
 082343A0,SpiralBurst_SetState,thumb,low,src-alias,Stores the state callback and resets its frame counter; spiral burst identity is tentative
+082343B8,SpiralBurst_UpdateParticles,thumb,low,src-alias,
 0823450C,SpiralBurst_OnTaskUpdate,thumb,low,src-alias,Task update callback that invokes the current spiral burst state handler
 08234520,SpiralBurst_OnTaskDestroy,thumb,low,src-alias,Task cleanup callback that removes all eight spiral particle effects
+08234540,SpiralBurst_InitParticles,thumb,low,src-alias,
 082346EC,SpiralBurst_InitCollider,thumb,low,src-alias,Initializes the short-lived attack collider and binds it to the burst position
 08234770,SpiralBurst_Init,thumb,low,src-alias,Stores owner and position then initializes particles and collision and starts the burst state
 082347C8,SpiralBurst_Create,thumb,low,src-alias,Allocates the spiral burst task and installs its update and cleanup callbacks
