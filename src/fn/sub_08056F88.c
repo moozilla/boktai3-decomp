@@ -1,11 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
 void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
 {
     const u16 *table;
     u32 *randomIndex;
     u32 mask;
-    register u32 index asm("r2");
+    u32 index;
     s32 x, y, z;
     u32 rangeMask;
     u32 zero;
@@ -46,7 +45,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         u32 value = zero;
         particle->velocityX = value;
     }
-    index = (index + 1) & mask;
+    index = ((*(&index)) + 1) & mask;
     *randomIndex = index;
     {
         u32 value = table[index];

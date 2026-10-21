@@ -52,7 +52,6 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     {
         struct CharacterPreviewTileAllocator **ap = &gUnk_020004B8;
         struct CharacterPreviewTileAllocator **lp;
-        asm("" : "+r"(ap));
         lp = ap;
         offset = 0;
         i = 4;

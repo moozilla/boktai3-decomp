@@ -21,7 +21,9 @@ from concurrent.futures import ThreadPoolExecutor
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIN = r'\bregister\s+[^;=(){}]*?\s+asm\s*\(\s*"[a-z0-9]+"\s*\)'
 BAR = r'[ \t]*\b(?:__)?asm(?:__)?\s*(?:volatile\s*)?\(\s*""[^;]*\)\s*;[ \t]*\n?'
-HINT = re.compile(f'(?:{PIN})|(?:{BAR})')
+# a register name on a declarator without `register` (`s32 x, y asm("r6");`)
+REG = r'[ \t]+asm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)'
+HINT = re.compile(f'(?:{PIN})|(?:{BAR})|(?:{REG})')
 MARK = "// MATCHING_CONCESSION: register-pinning\n"
 
 
@@ -56,6 +58,8 @@ def drop(text, m):
     if s.lstrip().startswith("register"):
         s = re.sub(r'^register\s+', '', s)
         s = re.sub(r'\s+asm\s*\(\s*"[a-z0-9]+"\s*\)$', '', s)
+    elif re.match(REG + "$", s):
+        s = ""
     else:
         s = "\n" if s.endswith("\n") and m.start() > 0 and text[m.start() - 1] != "\n" else ""
     return text[:m.start()] + s + text[m.end():]

@@ -42,19 +42,18 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
         Hud_SetInteractionCallback(s, PauseMenu_OnSwapSelectionUpdate, 1);
         {
             register u32 o1 asm("r1") = 0x4384;
-            register u8 *b asm("r1");
+            u8 *b;
             u8 *in;
             u8 *pp;
             asm("" : "+r"(o1));
             in = (u8 *)s + o1;
             sub_0816CDB8(in, 1, 0);
             {
-                register u32 o3 asm("r2") = 0x1620;
+                u32 o3 = 0x1620;
                 pp = (u8 *)s + o3;
             }
             {
-                register u32 o2 asm("r2") = 0x4387;
-                asm("" : "+r"(o2));
+                u32 o2 = 0x4387;
                 b = (u8 *)s + o2;
             }
             SceneHud_GetActionIconPosition(pp, *b);

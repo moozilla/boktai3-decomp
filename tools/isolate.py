@@ -40,8 +40,13 @@ def select_drafts(text, func, nonmatching):
             return draft
         if not mine:
             # another function's draft: keep only its prototype, if any
+            # (unless the unit declares it already: a draft's signature may
+            # differ from the declaration the matched code uses)
             d = DEF.search(strip_comments(draft))
-            return d.group(2) + ";\n" if d and not d.group(1) else ""
+            if not d or d.group(1):
+                return ""
+            declared = re.compile(r"\b" + re.escape(d.group(3)) + r"\s*\([^;{}]*\)\s*;")
+            return "" if declared.search(text) else d.group(2) + ";\n"
         return fallback
     return block.sub(pick, text)
 

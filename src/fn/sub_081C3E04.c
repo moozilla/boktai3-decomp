@@ -70,7 +70,7 @@ void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
         u16 *q = &effect->screenX;
         s16 *p = &effect->worldX;
         s32 y;
-        s32 x, zz asm("r3");
+        s32 x, zz;
         s32 z;
         x = p[0];
         zz = p[2];

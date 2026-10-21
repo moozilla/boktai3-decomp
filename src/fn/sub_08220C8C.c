@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct DisplaySequenceState {
     const u16 *commands;
@@ -9,9 +8,8 @@ u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence,
 {
     u8 *entry = data + (sequence * 4 + 4);
     u8 *base = data + *(u16 *)(entry + 2);
-    register u32 prod asm("r0") = entry[1] * row * 2;
-    prod = (u32)base + prod;
-    state->commands = (const u16 *)prod;
+    u32 prod = entry[1] * row * 2;
+    state->commands = (const u16 *)(base + prod);
     state->speed = 0x40;
     if (state->sequence == sequence && state->frameCount) {
         if (flags & 4) {
@@ -29,10 +27,11 @@ restart:
     else
         state->index = 0;
     {
-        register u32 offset asm("r0") = state->index << 1;
+        u32 offset = state->index << 1;
         const volatile u16 *command;
         u8 weight;
-        command = (const volatile u16 *)((u32)state->commands + offset);
+        base = (u8 *)((u32)state->commands + offset);
+        command = (const volatile u16 *)base;
         weight = *command & 0xF;
         state->frameWeight = weight;
         state->duration = weight;

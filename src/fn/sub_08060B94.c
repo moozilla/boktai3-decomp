@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
@@ -31,7 +30,7 @@ void SceneInventory_BeginConsumableSpecialMove(struct SceneInventoryActionView *
     target = targets;
     SceneInput_GetGridPosition(target, 26);
     {
-        register u32 *frameOut asm("r6");
+        u32 *frameOut;
         u32 placeholder;
         u32 *attributeOut;
         enabled[1] = 0;
@@ -43,8 +42,8 @@ void SceneInventory_BeginConsumableSpecialMove(struct SceneInventoryActionView *
         {
             struct SceneInputPosition *start = starts;
             start[1].x = 0;
-            start[1].y = 0;
-            start[1].z = 0;
+            starts[1].y = 0;
+            starts[1].z = 0;
         }
         target[1].x = 0;
         target[1].y = 0;

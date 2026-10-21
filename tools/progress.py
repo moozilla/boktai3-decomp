@@ -241,7 +241,8 @@ def collect_done(funcs, source_root):
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
-HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""')
+HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
+                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)')
 
 
 def _bodies(text):
@@ -297,7 +298,7 @@ def hinted_functions(text, names, shared=frozenset()):
 
 
 HINT_KINDS = [
-    ("pin", re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)')),
+    ("pin", re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)')),
     ("clobber", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""[^;]*:\s*"(?:r\d+|sl|fp|ip|lr)"')),
     ("operand", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*:[^;:]*\(')),
     ("barrier", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*(?:\)|:\s*:\s*:\s*"memory")')),
