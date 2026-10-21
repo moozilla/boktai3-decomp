@@ -3668,6 +3668,7 @@ addr,name,mode,confidence,source,notes
 080EA65C,Octopus_ReleaseCapturedTarget,thumb,low,src-alias,
 080EAA48,Octopus_ReturnToRoutePoint,thumb,low,src-alias,
 080EAC7C,Octopus_UpdateStagger,thumb,low,src-alias,
+080EADD0,Octopus_UpdateDefeat,thumb,low,src-alias,
 080EB13C,Octopus_SetAnimationRefreshFlag,thumb,low,src-alias,Sets bit 4 in the animation component flags before behavior dispatch
 080EB150,Octopus_UpdateBodyColliderPosition,thumb,low,src-alias,Positions the body collider from the actor position
 080EB298,SceneActorReaction_ReacquireAdjacentTarget,thumb,low,src-alias,
@@ -8430,6 +8431,7 @@ addr,name,mode,confidence,source,notes
 08202654,TimedSpriteEffect_UpdateDefault,thumb,low,src-alias,Sets an update flag and advances motion before reporting whether the lifetime has elapsed
 0820267C,TimedSpriteEffect_InitSlot,thumb,low,src-alias,Initializes a pooled effect's configuration and sprite resources and installs its expiration collider callback
 0820270C,ProjectilePool_ReleaseSlot,thumb,low,src-alias,Removes the slot sprite and clears its bit in the pool occupancy mask
+08202730,ProjectilePool_Update,thumb,low,src-alias,
 08202A4C,ProjectilePool_Destroy,thumb,low,src-alias,Task destruction callback releases active projectiles and clears the singleton pointer
 08202A88,ProjectilePool_Init,thumb,low,src-alias,Registers the singleton and initializes all sixteen projectile slots
 08202ABC,ProjectilePool_Create,thumb,low,src-alias,Allocates the projectile pool task and installs its update and destruction callbacks
