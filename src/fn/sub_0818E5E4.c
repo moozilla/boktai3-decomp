@@ -1,5 +1,4 @@
 #include "global.h"
-#define Armor_InitParts sub_0818E5E4
 extern u8 *gUnk_030042E4;
 extern const u8 gUnk_0824F174[];
 extern const u8 gUnk_0824F17C[];
@@ -163,5 +162,5 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
     p->b5C0 = 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818E5E4);
+INCLUDE_ASM("asm/nonmatching", Armor_InitParts);
 #endif

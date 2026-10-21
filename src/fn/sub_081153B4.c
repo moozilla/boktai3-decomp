@@ -27,7 +27,6 @@ struct Col {
     u16 timer;
     void (*callback)(u8 *);
 };
-#define Collectible_StartDeath sub_081153B4
 extern u8 *gUnk_020004B8;
 void SpatialIndex_RemoveEntry(void *);
 void ActorParticles_SpawnAlternatingBurst(void *);

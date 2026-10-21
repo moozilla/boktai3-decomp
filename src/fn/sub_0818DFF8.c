@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Armor_InitPartStretch sub_0818DFF8
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];

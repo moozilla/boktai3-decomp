@@ -25,12 +25,11 @@ struct Col {
     u8 padEE[1];
     u8 flagEF, padF0, tick;
 };
-#define Collectible_UpdateEntry sub_08115674
 extern u8 *gUnk_020004B8;
 void SpatialIndex_SetPosition(void *, s32, s32, s32);
 void SpatialIndex_InsertEntry(void *);
 u8 Collectible_IsNearPlayer(void *);
-void sub_081153B4(void);
+void Collectible_StartDeath(void);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Collectible_UpdateEntry(struct Col *p)
@@ -208,7 +207,7 @@ void Collectible_UpdateEntry(struct Col *p)
             *ep = 8;
             if (p->hp <= 0) {
                 *flagsPtr |= hit;
-                *(u32 *)((u8 *)p + 0xF4) = (u32)sub_081153B4;
+                *(u32 *)((u8 *)p + 0xF4) = (u32)Collectible_StartDeath;
                 p->tick = hit;
             } else {
                 Sound_PlaySong(0x13E);
