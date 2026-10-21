@@ -30,7 +30,7 @@ extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 #ifdef NONMATCHING
-// fuzzy: 98.3%
+// fuzzy: 98.9%
 // Differs only in one register copy: the ROM loads g->type into r0 then copies to r3.
 void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
 {
@@ -49,7 +49,12 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
         u32 cell, v;
         u8 *q;
         u32 fl;
-        type = g->type;
+        type = ({
+            u32 z = g->type;
+            asm("" : "+r"(z));
+            z;
+        });
+
         if (type <= 0x14)
             e = (struct PEntry *)m->small;
         else
@@ -92,7 +97,7 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
                 *(u16 *)(p + 0x18) = e->c + base;
             } else {
                 *(u16 *)(p + 0x2a) = *(u16 *)(p + 6);
-                *(u16 *)(p + 0x18) = e->c + gUnk_08604B90[g->type];
+                *(u16 *)(p + 0x18) = e->c + *(u32 *)((g->type << 2) + (u32)gUnk_08604B90);
             }
         }
         p += 0x38;
