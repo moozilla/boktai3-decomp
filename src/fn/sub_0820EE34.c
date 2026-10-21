@@ -53,8 +53,6 @@ void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 
-#define OrangeSpine_ApplyHitReaction sub_0820EE34
-
 void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                                   struct Target *targetInput)
 {

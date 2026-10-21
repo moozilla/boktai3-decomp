@@ -17,12 +17,12 @@ struct S {
 };
 void Memory_Clear(void *, u32);
 void HomingProjectile_SetBehaviorCallback(void *, void (*)(void));
-void sub_081FF454(void);
+void HomingProjectile_UpdateDefaultState(void);
 void HomingProjectile_InitParams(struct S *p)
 {
     u32 a;
     Memory_Clear(p, 0x20);
-    HomingProjectile_SetBehaviorCallback(p, sub_081FF454);
+    HomingProjectile_SetBehaviorCallback(p, HomingProjectile_UpdateDefaultState);
 
     p->h0 = 0;
     p->h2 = 0x3c;

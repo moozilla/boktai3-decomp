@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define HomingProjectile_Spawn sub_081FFE94
 #ifdef NONMATCHING
 struct HomingVec {
     s16 x, y, z, pad;
@@ -268,5 +267,5 @@ s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *positi
     return index;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FFE94);
+INCLUDE_ASM("asm/nonmatching", HomingProjectile_Spawn);
 #endif
