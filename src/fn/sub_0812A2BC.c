@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// Remaining difference: the zero index register in the second sine lookup (r2 vs r3).
 
 struct SunDiscVec {
     u16 x, y, z, pad;
@@ -95,7 +92,11 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
         });
     }
     {
-        s32 sine = gUnk_086149C4[angle & 0xFF];
+        register u32 d asm("r2");
+        s32 sine;
+        asm("" : "=r"(d));
+        sine = gUnk_086149C4[angle & 0xFF];
+        asm("" ::"r"(d));
         s->velZ = TruncateShift(sine * ({
                                     register s32 t asm("r1") = speed;
                                     asm("" : "+r"(t) : "r"(sine));
@@ -111,6 +112,3 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     }
     sub_08129854(s, a, b, c, d);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SunDiscPool_SpawnDisc);
-#endif
