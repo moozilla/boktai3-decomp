@@ -2,8 +2,6 @@
 #include "global.h"
 #include "terrain_cell_probe.h"
 
-#define PlayerBarrier_Update sub_081627A4
-
 struct BarrierSpr {
     u32 flags;
     u32 pad[3];
