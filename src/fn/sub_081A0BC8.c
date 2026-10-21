@@ -200,7 +200,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             actor->finished = 1;
             break;
     }
-    asm("" :: "r"(aoff));
+    asm("" ::"r"(aoff));
 }
 
 #else
