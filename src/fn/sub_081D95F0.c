@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 82.3%
+// fuzzy: 87.9%
 // Remaining differences: register lifetimes, flag branches and collision-field copies.
 
 #include "contact_swarm.h"
@@ -150,17 +150,21 @@ s32 Task4E01_UpdateExpandingImpact(u8 *p)
     s32 ticks = --*(s32 *)(config + 8);
     if (ticks <= 3)
         *(s32 *)(config + 8) = 4;
-    else
-        *(u32 *)(p + 4) |= 1;
-    if (!(*(u16 *)config & 0x10) || ((*(u32 *)p & 3) != ((*(u16 *)config & 0xf00) >> 8)))
-        *(u32 *)(p + 4) |= 2;
+    else {
+        u32 one = 1;
+        *(u32 *)(p + 4) |= one;
+    }
+    if (!(*(u16 *)config & 0x10) || ((*(u32 *)p & 3) == ((*(u16 *)config & 0xf00) >> 8))) {
+        u32 two = 2;
+        *(u32 *)(p + 4) |= two;
+    }
     sprite = (void *)(p + 0x8c);
     state = (void *)(p + 0x180);
     ended = StepPlayback(sprite, state);
     if (ended == 1 && !(*(u16 *)config & 0x10) && !*(u32 *)(p + 0x190)) {
         *(u32 *)(p + 0x194) = 4;
         Anim_RestartSequence(state, *(void **)(p + 0x19c), 4, 0, 0);
-        StepPlayback(sprite, state);
+        StepPlayback((void *)(p + 0x8c), state);
         ++*(u32 *)(p + 0x190);
     }
     {
