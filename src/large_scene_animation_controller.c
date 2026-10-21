@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "large_scene_animation_controller.h"
 #include "game_state.h"
@@ -950,18 +951,90 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
     }
 }
 
-/* Tentative: called once per frame from Nidhoggr_Update. Loops i=0..25 over the 26 parts:
- * looks up a function pointer table (gUnk_0824F364) keyed by a per-part byte at
- * t->unknown71C2[i] (0x71C2+i) and calls it via sub_08249240(t, i, fn) when nonzero,
- * otherwise sets a flag bit and zeroes t->rowInitFlag[i]/t->rowDoneFlag[i]/row[i].flags;
+/* Tentative: called once per frame from Nidhoggr_Update. For each of the 26 parts it looks up
+ * a callback in gUnk_0824F364 keyed by t->unknown71C2[i] and runs it through sub_08249240
+ * (or resets the row latches when there is none), blinks the row via rowBlink, then
+ * repositions each row's offset (rows[i].pos) and collider from t->pos plus constant offset
+ * tables. confidence=low. */
 
- * a parallel per-part counter at t->unknown722A-ish and another at +0x71F6 track retries.
- * It then recomputes colliders[0..25]' positions (Collider_SetPosition) from t->pos plus
- * constant offset tables (gUnk_0824F2E4, gUnk_0824F324, gUnk_0824F344) for different part
- * ranges. 760 bytes with several undiscovered globals; not attempted byte-for-byte this
- * pass. confidence=low. */
+#define Nidhoggr_UpdatePartMotion sub_0819321C
+extern void (*const gUnk_0824F364[])(void);
+extern const struct SceneVec gUnk_0824F2E4[];
+extern const struct SceneVec gUnk_0824F324[];
+extern const struct SceneVec gUnk_0824F334[];
+extern const struct SceneVec gUnk_0824F33C[];
+extern const struct SceneVec gUnk_0824F344[];
 
-INCLUDE_ASM("asm/nonmatching", sub_0819321C);
+void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
+{
+    void **q;
+    s32 i;
+    s32 j;
+    struct SceneVec *p21, *p20;
+    struct SceneVec *pa, *pb, *pc, *pd, *pe, *pf;
+    for (i = 0; i <= 25; i++) {
+        if (gUnk_0824F364[t->unknown71C2[i]] == 0) {
+            t->rows[i].flags |= 1;
+            t->rowInitFlag[i] = 0;
+            t->rowCounter[i] = 0;
+            t->rowDoneFlag[i] = 1;
+        } else {
+            if (t->rowBlink[i] != 0) {
+                t->rowBlink[i]--;
+                if (i & 1)
+                    t->rows[i].flags |= 0x200;
+                else
+                    t->rows[i].flags |= 0x400;
+            } else {
+                t->rows[i].flags &= ~0x600;
+            }
+            sub_08249240(t, (void *)i, gUnk_0824F364[t->unknown71C2[i]]);
+            t->rowCounter[i]++;
+        }
+    }
+    for (i = 0, p21 = &t->rows[21].pos, p20 = &t->rows[20].pos, pa = &t->pos; i <= 1; i++) {
+        t->rows[i].pos.x = pa->x + gUnk_0824F344->x;
+        t->rows[i].pos.y = pa->y + gUnk_0824F344->y;
+        t->rows[i].pos.z = pa->z + gUnk_0824F344->z;
+        Collider_SetPosition(&t->colliders[i], pa, 0);
+        Collider_SetPosition(&t->altColliders[i + 1], pa, 0);
+    }
+    for (i = 2, j = 0, pb = &t->pos; i <= 9; i++, j++) {
+        t->rows[i].pos.x = pb->x + j[gUnk_0824F2E4].x;
+        t->rows[i].pos.y = pb->y + j[gUnk_0824F2E4].y;
+        t->rows[i].pos.z = pb->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    for (i = 10, j = 0, pc = &t->pos; i <= 17; i++, j++) {
+        t->rows[i].pos.x = pc->x + j[gUnk_0824F2E4].x;
+        t->rows[i].pos.y = pc->y + j[gUnk_0824F2E4].y;
+        t->rows[i].pos.z = pc->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    for (i = 18, j = 0, pd = &t->pos; i <= 19; i++, j++) {
+        t->rows[i].pos.x = pd->x + j[gUnk_0824F324].x;
+        t->rows[i].pos.y = pd->y + j[gUnk_0824F324].y;
+        t->rows[i].pos.z = pd->z + j[gUnk_0824F324].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    pe = &t->pos;
+    p21->x = pe->x + gUnk_0824F334->x;
+    p21->y = pe->y + gUnk_0824F334->y;
+    p21->z = pe->z + gUnk_0824F334->z;
+    p20->x = pe->x + gUnk_0824F33C->x;
+    p20->y = pe->y + gUnk_0824F33C->y;
+    p20->z = pe->z + gUnk_0824F33C->z;
+    i = 22;
+    for (; i <= 23; i++) {
+        t->rows[i].pos.x = (&t->pos)->x + gUnk_0824F344->x;
+        t->rows[i].pos.y = (&t->pos)->y + gUnk_0824F344->y;
+        t->rows[i].pos.z = (&t->pos)->z + gUnk_0824F344->z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    q = (void **)t->unknown72C4;
+    if (*q != 0)
+        Callback_InvokeActor(q, *q);
+}
 
 extern u16 gUnk_03004BD8;
 
@@ -972,6 +1045,11 @@ void Bg_SetPriority(u32, u32);
 static inline void Or16(u32 m, u16 *p)
 {
     *p |= m;
+}
+
+static inline void And16(u32 m, u16 *p)
+{
+    *p &= m;
 }
 
 void Nidhoggr_InitBackgrounds(struct Nidhoggr *t)
@@ -1186,7 +1264,7 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
     hz = 0;
     bz = 0;
     *(u16 *)(sprite + 0x10) = hz;
-    *(struct Pos081944C4 *)&t->suspendedBasePosX = gUnk_0824F4E4;
+    *(struct Pos081944C4 *)&t->suspendedPosX = gUnk_0824F4E4;
     t->suspendedState = bz;
     t->terrainCellsRegistered = bz;
     t->suspendedTimer = hz;
@@ -1262,7 +1340,95 @@ u32 Nidhoggr_IsSuspendedObjectHidden(struct Nidhoggr *p)
  * pointer directly in a register and indexes the jitter pair through it rather than via
  * a separate pointer variable, which this draft did not reproduce. confidence=low. */
 
-INCLUDE_ASM("asm/nonmatching", sub_0819465C);
+#define Nidhoggr_UpdateSuspendedObject sub_0819465C
+struct SuspendedJitter {
+    s16 x, y, z;
+};
+
+struct SuspendedOffset {
+    s16 x;
+    s16 pad;
+    s16 z;
+    s16 pad2;
+};
+
+extern const u8 gUnk_0824F4FC[];
+extern const struct SuspendedOffset gUnk_0824F504[];
+void Nidhoggr_CreateThreePointBurst(const void *);
+
+void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
+{
+    u8 *sp;
+    switch (t->suspendedState) {
+        case 0: {
+            u8 *sp = t->suspendedSprite;
+            *(u32 *)sp |= 1;
+        } break;
+        case 1:
+            sp = t->suspendedSprite;
+            *(u32 *)sp &= ~1;
+            *(u16 *)(sp + 0x10) = 1;
+            t->suspendedPosX = 0xdc0;
+            t->suspendedPosY = 0xfcc0;
+            t->suspendedPosZ = 0xa80;
+            t->suspendedState++;
+            t->suspendedTimer = 0x14;
+            Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
+            break;
+        case 2:
+            t->suspendedPosY += 0x33;
+            if (t->suspendedPosY > -0x140)
+                t->suspendedPosY = 0xfec0;
+            if ((s16)--t->suspendedTimer <= 0)
+                t->suspendedState++;
+            break;
+        case 3: {
+            u8 *sp2 = t->suspendedSprite;
+            *(u16 *)(sp2 + 0x10) = 0;
+        }
+            Collider_Refresh(t->suspendedCollider);
+            Collider_SetPosition(t->suspendedCollider, &t->suspendedPosX, 0);
+            t->suspendedState++;
+            Sound_PlaySongChecked(0x1be);
+            break;
+        case 4:
+            break;
+        case 5:
+            t->suspendedTimer = 0;
+            t->suspendedState++;
+            break;
+        case 6: {
+            u16 *tm = &t->suspendedTimer;
+            u32 i = *tm & 7;
+            const struct SuspendedOffset *tab = gUnk_0824F504;
+            const struct SuspendedOffset *e;
+            asm("" : "+r"(i));
+            e = tab + i;
+            t->suspendedPosX = 0xdc0 + e->x;
+            t->suspendedPosZ = 0xa80 + e->z;
+            (*tm)++;
+            break;
+        }
+        case 7: {
+            u8 *sp3 = t->suspendedSprite;
+            *(u16 *)(sp3 + 0x10) = 1;
+        }
+            t->suspendedState++;
+            break;
+        case 8:
+            t->suspendedPosY -= 0x33;
+            if (t->suspendedPosY < -0x340) {
+                {
+                    u8 *sp = t->suspendedSprite;
+                    *(u32 *)sp |= 1;
+                }
+                t->suspendedPosY = 0xfcc0;
+                t->suspendedState = 0;
+                Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
+            }
+            break;
+    }
+}
 
 /* Companion to sub_0819494C (part index 1): on bgMode, calls Nidhoggr_ChangeCompletedPartState for
  * part 0 or 1, copies two 8-byte blobs from gUnk_0824F544/4C or gUnk_0824F554/5C into collider and
@@ -1435,7 +1601,104 @@ void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
  * sets bits in t->flags[2] (0x724E); also calls sub_08194858/sub_0819494C (part completion)
  * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
-INCLUDE_ASM("asm/nonmatching", sub_08194D70);
+#define Nidhoggr_UpdateDamageFlashAndPartAnimations sub_08194D70
+extern const u8 gUnk_0824F584[];
+extern const u8 gUnk_0824F588[];
+
+void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
+{
+    if (t->flags[1]) {
+        s32 n = 0x1e - t->flags[1];
+        if (n <= 0xf) {
+            Or16(0x200, &gUnk_03004BD8);
+            Blend_SetAlpha(1, 0x10, gUnk_0824F588[n]);
+            Collider_Refresh(&t->altColliders[0]);
+        } else {
+            t->flags[2] |= 0x10;
+            {
+                u16 *g = &gUnk_03004BD8;
+                u32 m = ~0x200;
+                *g = *g & m;
+            }
+        }
+        t->flags[2] |= 3;
+        t->flags[1]--;
+    } else {
+        {
+            u16 *g = &gUnk_03004BD8;
+            u32 m = ~0x200;
+            *g = *g & m;
+        }
+    }
+    if (t->flags[2] & 4) {
+        t->flags[2] &= ~1;
+        Nidhoggr_StartFirstPartAction(t);
+    } else {
+        sub_08194858(t);
+    }
+    if (t->flags[2] & 8) {
+        t->flags[2] &= ~2;
+        Nidhoggr_StartSecondPartAction(t);
+    } else {
+        sub_0819494C(t);
+    }
+    if (t->flags[2] & 0x10) {
+        Nidhoggr_SetPart23SpecialAnimation((u32)t);
+    } else if (t->flags[2] & 1) {
+        Nidhoggr_SelectRandomPart22AlternateAnimation(t);
+        t->flags[2] &= ~1;
+    } else {
+        switch (t->flags[3]) {
+            case 0:
+                Nidhoggr_ResetPart22Animation((u32)t);
+                break;
+            case 1:
+            case 2:
+            case 3:
+                if (t->flags[5]) {
+                    Nidhoggr_ResetPart22Animation((u32)t);
+                    t->flags[5]--;
+                } else {
+                    Nidhoggr_SelectRandomPart22Animation(t);
+                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x66FC));
+                    t->flags[5] = gUnk_0824F584[t->flags[3]];
+                }
+                break;
+            case 4:
+                Nidhoggr_ResetPart22Animation((u32)t);
+                break;
+        }
+    }
+    if (t->flags[2] & 0x10) {
+        t->flags[2] &= ~0x10;
+        goto reset23;
+    } else if (t->flags[2] & 2) {
+        Nidhoggr_SelectRandomPart23AlternateAnimation(t);
+        t->flags[2] &= ~2;
+    } else {
+        switch (t->flags[4]) {
+            case 0:
+            reset23:
+                Nidhoggr_ResetPart23Animation((u32)t);
+                break;
+            case 1:
+            case 2:
+            case 3:
+                if (t->flags[6]) {
+                    Nidhoggr_ResetPart23Animation((u32)t);
+                    t->flags[6]--;
+                } else {
+                    Nidhoggr_SelectRandomPart23Animation(t);
+                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x6750));
+                    t->flags[6] = gUnk_0824F584[t->flags[4]];
+                }
+                break;
+            case 4:
+                Nidhoggr_ResetPart23Animation((u32)t);
+                break;
+        }
+    }
+}
 
 void Nidhoggr_InitBobbingMotion(struct Nidhoggr *p, s32 x, s32 y)
 {
@@ -2591,13 +2854,9 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
     }
 }
 
-void sub_08194D70(void *);
-
-void sub_0819465C(void *);
-
-void sub_0819321C(void *);
-
 void sub_0818ECFC(void *);
+
+void sub_081940F8(void *);
 
 void Camera_SetPosition(void *);
 
@@ -2720,8 +2979,6 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
 }
 
 void ScenePanelEffect_InitPool(void *);
-
-void sub_081940F8(void *);
 
 static inline void Fill32(void *dst, u32 *tmp, u32 size)
 {
