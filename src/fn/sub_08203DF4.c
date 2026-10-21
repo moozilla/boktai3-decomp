@@ -3,8 +3,8 @@
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
-// fuzzy: 86.2%
-// Register allocation in the death-particle block and the animation step still differs.
+// fuzzy: 90.6%
+// Register allocation in the death-particle block and the collider branch still differs.
 #define EnemyF426_UpdateDamageState sub_08203DF4
 struct DisplaySequenceState {
     const u16 *commands;
@@ -173,46 +173,86 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
             p->spr.flags &= ~1;
     }
     {
-        struct DisplaySequenceState *s = &p->seq;
         struct Spr *sp = &p->spr;
+        struct DisplaySequenceState *s = &p->seq;
         const u16 *c = s->commands + s->index;
         sp->frame = *c >> 6;
-        if ((s->flags & 1) != (((*c & 0x30) >> 4) & 1))
-            sp->flags |= 4;
-        else
-            sp->flags &= ~4;
-        if ((u8)(s->flags & 2) != (((*c & 0x30) >> 4) & 2))
-            sp->flags |= 8;
-        else
-            sp->flags &= ~8;
-        s->elapsed++;
-        if (s->elapsed >= s->duration) {
-            s->elapsed = 0;
-            if (s->flags & 4) {
-                if (s->index == 0) {
-                    if (s->flags & 8) {
-                        s->elapsed = s->duration;
-                        goto frame_ready;
-                    }
-                    s->index = s->frameCount;
-                }
-                s->index--;
-            } else {
-                s->index++;
-                if (s->index >= s->frameCount) {
-                    if (s->flags & 8) {
-                        s->elapsed = s->duration;
-                        s->index = s->frameCount - 1;
-                    } else
-                        s->index = 0;
-                }
+        {
+            u32 flags = s->flags;
+            u32 bit = 1;
+            u32 lhs = bit;
+            asm("" : "+r"(lhs));
+            lhs &= flags;
+            if (lhs != (((*c & 0x30) >> 4) & bit))
+                p->spr.flags |= 4;
+            else
+                p->spr.flags &= ~4;
+        }
+        {
+            u32 flags = s->flags;
+            u32 bit = 2;
+            u32 lhs = bit;
+            asm("" : "+r"(lhs));
+            lhs &= flags;
+            asm("" : "+r"(lhs));
+            if ((u8)lhs != (((*c & 0x30) >> 4) & bit))
+                sp->flags |= 8;
+            else
+                sp->flags &= ~8;
+        }
+        {
+            u32 elapsed = s->elapsed + 1;
+            u32 mask, duration;
+            register u32 saved asm("r4");
+            s->elapsed = elapsed;
+            {
+                register u32 temp asm("r2") = 0xffff;
+                asm("" : "+r"(temp));
+                mask = temp;
+                asm("" : "+&r"(mask) : "r"(temp));
             }
-        frame_ready:
-            c = s->commands + s->index;
-            s->frameWeight = *c & 15;
-            s->duration = (s->speed * s->frameWeight) >> 6;
-            if (s->duration == 0)
-                s->duration = 1;
+            duration = s->duration;
+            elapsed = (u16)elapsed;
+            saved = duration;
+            if (elapsed >= duration) {
+                u32 flags, idx;
+                s->elapsed = 0;
+                flags = s->flags;
+                if (flags & 4) {
+                    idx = s->index;
+                    if (idx == 0) {
+                        u32 hold = 8;
+                        hold &= flags;
+                        if (hold) {
+                            s->elapsed = saved;
+                            goto frame_ready;
+                        }
+                        idx = s->frameCount;
+                    }
+                    idx--;
+                } else {
+                    u32 count;
+                    idx = s->index + 1;
+                    s->index = idx;
+                    count = s->frameCount;
+                    if ((idx & mask) < count)
+                        goto frame_ready;
+                    idx = 8;
+                    idx &= flags;
+                    idx = (u8)idx;
+                    if (idx) {
+                        s->elapsed = duration;
+                        idx = count - 1;
+                    }
+                }
+                s->index = idx;
+            frame_ready:
+                c = s->commands + s->index;
+                s->frameWeight = *(const volatile u16 *)c & 15;
+                s->duration = (s->frameWeight * s->speed) >> 6;
+                if (s->duration == 0)
+                    s->duration = 1;
+            }
         }
     }
     p->timer++;
