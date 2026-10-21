@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "rotation_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
 void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
@@ -40,7 +38,12 @@ void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor
     angle = NormalizeAngle(32 - state->savedAngle);
     if (angle < 0) {
         u32 step = state->acceleration;
-        drawable->angle = drawable->angle + step;
+        asm("" : "+r"(step));
+        {
+            register u32 cur asm("r1") = drawable->angle;
+            step = step + cur;
+            drawable->angle = step;
+        }
     } else
         drawable->angle -= state->acceleration;
     if (Mod(elapsed, 4) == 0)
@@ -59,6 +62,3 @@ void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_RecoverRotation);
-#endif
