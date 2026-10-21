@@ -3739,6 +3739,9 @@ addr,name,mode,confidence,source,notes
 080F3728,ChildGroup_ProcessEvent,thumb,low,src-alias,
 080F3848,ChildGroup_UpdateTimedOscillation,thumb,low,src-alias,
 080F3ABC,ChildGroup_BeginInactiveState,thumb,low,src-alias,
+080F3B60,ChildGroup_UpdateTrailingMembers,thumb,low,src-alias,
+080F3CC4,ChildGroup_UpdateOrbitingMembers,thumb,low,src-alias,
+080F3F48,ChildGroup_UpdateLandingState,thumb,low,src-alias,
 080F40C8,ChildGroup_UpdateAlternatingCallbacks,thumb,low,src-alias,
 080F46A0,Ivy_UpdateActions,thumb,low,src-alias,Dispatches the primary and optional secondary action callbacks then refreshes ground height
 080F46D8,Ivy_DispatchState,thumb,low,src-alias,Invokes the state-indexed callback unless flag 0x10 suppresses dispatch
@@ -6473,6 +6476,7 @@ addr,name,mode,confidence,source,notes
 08195140,Nidhoggr_UpdateHorizontalSway,thumb,low,src-alias,Advances the horizontal sway offset and reverses velocity at its limits
 08195180,Nidhoggr_UpdateWideSway,thumb,low,src-alias,Applies wider horizontal oscillation and depth bobbing relative to the stored base position
 08195254,Nidhoggr_TrackPlayerDepth,thumb,low,src-alias,Smoothly adjusts base depth and speed to follow the player's Z position
+08195334,Nidhoggr_UpdatePartSequences,thumb,low,src-alias,
 08195774,Nidhoggr_ShufflePartOrder,thumb,low,src-alias,Shuffles nine part indices and resets the selection cursor
 081957E0,Nidhoggr_GetNextShuffledPart,thumb,low,src-alias,Returns the next part index and reshuffles when the sequence is exhausted
 08195810,Nidhoggr_ActivateRandomPart,thumb,low,src-alias,Periodically flags a living part while preventing simultaneous activation of its paired part
