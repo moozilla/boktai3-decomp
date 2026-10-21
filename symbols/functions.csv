@@ -2628,6 +2628,7 @@ addr,name,mode,confidence,source,notes
 08068A78,BouncingObject_InitializeColliders,thumb,low,src-alias,
 08068B8C,BouncingObject_Allocate,thumb,low,src-alias,
 08069214,BouncingObject_TickRemoval,thumb,low,src-alias,
+080692C8,BouncingObject_Spawn,thumb,low,src-alias,
 08069510,BouncingObject_UpdatePool,thumb,low,src-alias,
 080695C8,BouncingObject_DestroyPool,thumb,low,src-alias,
 08069620,BouncingObject_InitializePool,thumb,low,src-alias,
@@ -2925,10 +2926,12 @@ addr,name,mode,confidence,source,notes
 08084100,SceneActorControl_TryActivateProximityResponse,thumb,low,src-alias,Consumes status bit 2 and activates response flags when player height is within 512 and the actor F0 value is below F8; purpose is provisional.
 08084180,SceneActorControl_SetCollisionResponse,thumb,low,src-alias,
 08084210,SceneActorControl_TickHiddenResponse,thumb,low,src-alias,
+08084284,SceneActorControl_WanderAroundPlayer,thumb,low,src-alias,
 0808483C,SceneActorControl_SetApproachCallbacks,thumb,low,src-alias,Installs the two callbacks that approach a target and choose nearby player positions
 0808484C,SceneActorControl_TickVisibility,thumb,low,src-alias,
 080849DC,SceneActorControl_StartStoredCurve,thumb,low,src-alias,
 08084A60,SceneActorControl_RequestVisibility,thumb,low,src-alias,
+08084BCC,SceneActorControl_UpdateWanderTarget,thumb,low,src-alias,
 08084DB8,SceneActorControl_ConsumePendingEntry,thumb,low,src-alias,
 08084E50,SceneActorControl_SetStoredMotionCallbacks,thumb,low,src-alias,Installs the callback table containing stored-target approach and pending-entry handling
 08084E60,Bat_OnUpdate,thumb,low,src-alias,Update callback registered by Bat_Init; ticks hidden response then dispatches state and updates control
@@ -4496,6 +4499,8 @@ addr,name,mode,confidence,source,notes
 0811D63C,GameState_RecordChallengeRankFromScript,thumb,low,src-alias,Reads challenge and rank options and records an improved lower rank
 0811D66C,GameState_RecordChallengeScoreFromScript,thumb,low,src-alias,Reads challenge and value options and records an improved higher value capped at 60000
 0811D6A0,GameState_SetChallengeValueFromScript,thumb,low,src-alias,Validates c and t options then invokes the setter for the clamped runtime value at offset 0x88C
+0811D6C8,PalFade_Start,thumb,low,src-alias,
+0811D91C,PalFade_Update,thumb,low,src-alias,
 0811DAD4,StateFlags_TestIndexedFlag,thumb,low,src-alias,
 0811DB24,GameState_SetChallengeCompletionFlag,thumb,low,src-alias,Sets one of twelve bits in the mask at offset 0x634; completion interpretation tentative
 0811DB54,GameState_SetChallengeCompletionFlagFromScript,thumb,low,src-alias,Reads the c option and invokes the indexed completion-mask setter
@@ -7626,6 +7631,7 @@ addr,name,mode,confidence,source,notes
 081CFFAC,SceneNpc_OnStateChange,thumb,low,src-alias,State-change callback installs the requested state handler and resets its execution fields
 081D01C8,SceneNpc_DispatchCommands,thumb,low,src-alias,"kind 5 (NPC) cutscene receiver: commands set state 0 with a sub-state, 4/5/36 walk to a point, 13-16 palette, 64 place"
 081D07D8,SceneNpc_EnterProjectedIdle,thumb,low,src-alias,
+081D0928,SceneNpc_OnStateEffectUpdate,thumb,low,src-alias,
 081D0B8C,SceneNpc_OnDestroy,thumb,low,src-alias,Destruction callback releases the message receiver and effects then clears the current NPC
 081D0BC4,SceneNpc_OnModeUpdate,thumb,low,src-alias,Registered NPC callback runs the mode dispatcher and returns zero
 081D0BD0,SceneNpc_OnStateUpdate,thumb,low,src-alias,Registered NPC callback clears frame flags and invokes the state handler with its elapsed frame
@@ -7635,6 +7641,7 @@ addr,name,mode,confidence,source,notes
 081D10D8,SceneNpc_SetBehaviorTwoFromScript,thumb,low,src-alias,Selects the named or current NPC and installs the behavior used by creation option i=2
 081D1150,SceneNpc_RequestRigAction,thumb,low,src-alias,Tentatively requests a rig action by setting the current NPC rig flag at offset 0x2C
 081D116C,SceneNpc_SetBehaviorFourFromScript,thumb,low,src-alias,Selects the named or current NPC and installs the animation behavior used by creation option i=4
+081D1404,SceneNpc_UpdateTransitionEffect,thumb,low,src-alias,
 081D15C8,SceneNpc_OnTransitionEffectDestroy,thumb,low,src-alias,Transition effect task destructor removes its sprite and eight effect instances
 081D15EC,SceneEffect_InitParticleRing,thumb,low,src-alias,
 081D1688,SceneNpc_CreateTransitionEffect,thumb,low,src-alias,Creates and initializes the sprite and particle task used during the NPC transition sequence

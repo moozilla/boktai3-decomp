@@ -7,8 +7,8 @@
 #include "engine.h"
 
 s32 Div(s32, s32);
-void sub_080692C8(struct ContactPackedVector *, struct ContactPosition *, struct ContactPosition *,
-                  u32, u32, u32, u32);
+void BouncingObject_Spawn(struct ContactPackedVector *, struct ContactPosition *,
+                          struct ContactPosition *, u32, u32, u32, u32);
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 value)
 {
@@ -105,7 +105,7 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
             u32 shot = actor->fieldB8;
             u32 category = actor->fieldC0;
             void *target = (void *)(actor->fieldDC + 0xc);
-            sub_080692C8(&source, &delta, target, shot, category, strength, actor->id);
+            BouncingObject_Spawn(&source, &delta, target, shot, category, strength, actor->id);
         }
         strength = Div(strength << 3, 10);
         speed += Div(speed << 2, 10);

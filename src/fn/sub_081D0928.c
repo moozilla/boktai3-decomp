@@ -4,7 +4,6 @@
 // fuzzy: 92.0%
 // Differs: argument evaluation order of the final SpriteEffectController_Create call
 // (0x1C1E/0xD43F pool loads come last in the original) and a few register choices.
-#define SceneNpc_OnStateEffectUpdate sub_081D0928
 
 struct Camera {
     u8 pad[0x44];
@@ -168,5 +167,5 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D0928);
+INCLUDE_ASM("asm/nonmatching", SceneNpc_OnStateEffectUpdate);
 #endif

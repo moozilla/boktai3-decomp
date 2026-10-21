@@ -16,7 +16,7 @@ u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
 void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
-void sub_0811D6C8(void *, u32, u32, s32, u32, u32, u32, u32);
+void PalFade_Start(void *, u32, u32, s32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 struct ProjectileParameters {
     u32 a, b, c, d;

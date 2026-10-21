@@ -70,7 +70,7 @@ extern struct Globals {
 } *gUnk_0200047C;
 
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
-void sub_0811D6C8(struct Obj *, s32, s32, s32, s32, s32, s32, s32);
+void PalFade_Start(struct Obj *, s32, s32, s32, s32, s32, s32, s32);
 s8 SpriteSlots_AttachSource(void *);
 void Sound_PlaySong(u32);
 void TimedSpriteEffect_RequestStop(s32);
@@ -139,8 +139,8 @@ int SceneActor_DispatchCommands(struct Obj *p)
                 case 1: {
                     s32 x = cmd->x;
                     s32 y = cmd->y;
-                    sub_0811D6C8(self, x, y, CharacterModel_GetPrimaryPaletteIndex(p->model),
-                                 self->unk7E, cmd->c, 4, 0);
+                    PalFade_Start(self, x, y, CharacterModel_GetPrimaryPaletteIndex(p->model),
+                                  self->unk7E, cmd->c, 4, 0);
                     SetState(p, SceneActor_UpdateFallState);
                     break;
                 }

@@ -6,7 +6,6 @@
 // Remaining differences: register allocation only (CpuSet argument copy, the 0x260 callback
 // address temp, the speed copy slot and three offset-constant registers).
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_UpdateWanderTarget sub_08084BCC
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
@@ -186,5 +185,5 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08084BCC);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateWanderTarget);
 #endif

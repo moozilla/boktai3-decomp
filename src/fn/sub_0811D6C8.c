@@ -1,9 +1,7 @@
-#define PalFade_Start  sub_0811D6C8
-#define PalFade_Update sub_0811D91C
-// Tentative names: sub_0811D6C8 sets up a timed fade between two 16-colour palette rows.
+// Tentative names: PalFade_Start sets up a timed fade between two 16-colour palette rows.
 #include "global.h"
 s32 Div(s32, s32);
-void sub_0811D6C8(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode);
+void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode);
 extern u8 *gUnk_030042E4;
 struct PalFade {
     u16 out[32];
@@ -16,12 +14,12 @@ static inline s32 Trunc5(s32 v)
 {
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-#define PAL(o)   ((struct PalFade *)((u8 *)(o) + 0x348))
+#define PAL(o) ((struct PalFade *)((u8 *)(o) + 0x348))
 #ifdef NONMATCHING
 // fuzzy: 88.4%
 // Remaining diff: spill-slot numbering and the order in which the per-row
 // accumulator pointers are formed.
-void sub_0811D6C8(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode)
+void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode)
 {
     struct PalFade *f = PAL(self);
     u16 *src2;
@@ -83,6 +81,6 @@ void sub_0811D6C8(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 
     f->flags = flags;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811D6C8);
+INCLUDE_ASM("asm/nonmatching", PalFade_Start);
 #endif
-INCLUDE_ASM("asm/nonmatching", sub_0811D91C);
+INCLUDE_ASM("asm/nonmatching", PalFade_Update);

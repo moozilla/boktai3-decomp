@@ -69,7 +69,7 @@ s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Obj *);
-void sub_0811D91C(struct Obj *);
+void PalFade_Update(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
