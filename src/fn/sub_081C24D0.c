@@ -1,9 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #include "directional_interaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.2%
-// foundry draft (worker best 87.2%); what differs is mostly register allocation and instruction order
 struct Dimensions {
     u32 x : 16, y : 16, z : 16;
 };
@@ -26,11 +24,11 @@ void sub_081C24D0(u8 *p)
             u32 offset = i * 0x2c;
             Sprite_Init(offset + c + p, p + 0x234, 0x10);
             {
-                u8 *slotAddr = offset + p;
-                *(u16 *)(slotAddr + c + 0x10) = 0;
-            }
-            {
-                u8 *base = p + offset;
+                u8 *slotAddr = (u8 *)(offset + (u32)p);
+                u8 *base;
+                *(u16 *)((u32)slotAddr + c + 0x10) = 0;
+                asm("" : "+r"(offset));
+                base = p + offset;
                 *(struct Dimensions *)(base + 0x11c) = dimensions;
                 base = base + 0x107;
                 *(u8 *)base = 1;
@@ -39,6 +37,3 @@ void sub_081C24D0(u8 *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C24D0);
-#endif
