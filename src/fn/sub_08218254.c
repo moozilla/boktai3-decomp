@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Remaining differences: initial flag preservation and parity-mask instruction ordering.
 struct Vec {
     s16 x, y, z;
 };
@@ -69,9 +66,12 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         register u32 attr asm("r5");
         s32 depth;
         register s32 ox asm("r12"), oy asm("r8");
-        u32 initialFlags = p->flags;
+        register u32 initialFlags asm("r1") = p->flags;
+        u32 t = initialFlags;
+        asm("" : "+r"(t));
+        t &= skip;
         flags = initialFlags;
-        if (initialFlags & skip)
+        if (t)
             goto next;
 
         x = divide8(p->pos.x - gUnk_030042A0.x) + 120;
@@ -172,7 +172,3 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         p = p->next;
     } while (p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_QueueCameraRelativeSprites);
-#endif
