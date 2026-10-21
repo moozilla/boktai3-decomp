@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// open: mask address (manager+0x920) must be rematerialized, not CSE with the occupancy test
 struct SpriteNotice {
     u8 unk0[0x42];
     u8 state;
