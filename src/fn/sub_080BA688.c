@@ -6,7 +6,7 @@
 // fuzzy: 98.8%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
-void sub_080BA7E4(void);
+void Skeleton_TickDecayingLunge(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
                                        const struct ContactPosition *, const void *, s32, u32, u32);
 static inline s32 Truncate(s32 value)
@@ -58,7 +58,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     jitter.z = 0x52;
     SceneParticleBurst_CreateWithPause(&p->position, &scratch.step, &jitter, 1, 2, 4);
     if (p->field2B3) {
-        void (*f)(void) = sub_080BA7E4;
+        void (*f)(void) = Skeleton_TickDecayingLunge;
         u32 k = 0x29;
         u32 *w;
         s32 m;

@@ -3366,6 +3366,7 @@ addr,name,mode,confidence,source,notes
 080B43B0,Vorn_OnDestroy,thumb,low,src-alias,Destruction callback releases scene actor effect resources and returns zero
 080B43BC,Vorn_Init,thumb,medium,gcl-name,name from GCL key DFDC ヴォーン (Vorn); loader called by Vorn_Create
 080B54A8,Vorn_Create,thumb,medium,gcl-name,name from GCL key DFDC ヴォーン (Vorn); registry callback
+080B551C,Skeleton_RerouteToTarget,thumb,low,src-alias,
 080B5724,SceneActorControl_RestartBehavior57,thumb,low,src-alias,
 080B5D84,SceneActorControl_BeginTimedBehavior56,thumb,low,src-alias,
 080B5E54,SceneActorControl_CanTurnTowardTarget,thumb,low,src-alias,
@@ -3409,6 +3410,7 @@ addr,name,mode,confidence,source,notes
 080BA578,Skeleton_UpdateAttackRecovery,thumb,low,src-alias,Plays animation 23 then switches to the timed idle callback on restart; attack recovery tentative
 080BA600,Skeleton_UpdateAttackWindup,thumb,low,src-alias,Plays animation 19 then switches to the animation 20 attack callback; windup interpretation tentative
 080BA688,SceneActorReaction_TickForwardBurst,thumb,low,src-alias,
+080BA7E4,Skeleton_TickDecayingLunge,thumb,low,src-alias,
 080BA9A0,Skeleton_UpdateAlternateAttackRecovery,thumb,low,src-alias,Plays animation 22 then returns to the timed idle callback; alternate recovery tentative
 080BAA28,SceneActorReaction_TickMultiHitAnimation,thumb,low,src-alias,
 080BAD7C,Skeleton_UpdateHeavyAttackRecovery,thumb,low,src-alias,Plays animation 21 then returns to the timed idle callback; heavy attack interpretation tentative
@@ -8171,6 +8173,8 @@ addr,name,mode,confidence,source,notes
 081F63C4,Ratatosk_RunStateCallback,thumb,low,src-alias,Delegates Ratatosk state execution to SceneActors_RunStateCallback
 081F63D0,Ratatosk_InitRequestedState,thumb,low,src-alias,Validates the requested state and installs its table callback while resetting state entry fields
 081F6748,SceneActors_FireTrackingProjectileSpread,thumb,low,src-alias,
+081F6894,Ratatosk_FireTrackingShot,thumb,low,src-alias,
+081F6A14,Ratatosk_PlayAttachmentEffect,thumb,low,src-alias,
 081F71D8,SceneActor_UpdateState29Command,thumb,low,src-alias,Tentative actor command callback; requests state 29 on entry and consumes the pending trigger
 081F721C,SceneActor_UpdateState1Command,thumb,low,src-alias,Tentative actor command callback; requests state 1 on entry and advances the command timer
 081F7260,SceneActor_UpdateState2Command,thumb,low,src-alias,Tentative actor command callback; requests state 2 on entry and consumes the pending trigger
@@ -8237,6 +8241,7 @@ addr,name,mode,confidence,source,notes
 081FB788,Ratatosk_Create,thumb,medium,gcl-name,name from GCL key 1E93 ラタトスク (Ratatosk); registry callback
 081FB82C,OverlaySlot_Initialize,thumb,low,src-alias,
 081FB86C,RatatoskParticle_Remove,thumb,low,src-alias,Removes one pooled sprite and clears its active bit while decrementing the count; particle ownership tentative
+081FB8A0,Ratatosk_UpdateParticlePool,thumb,low,src-alias,
 081FBAA8,RatatoskParticle_Destroy,thumb,low,src-alias,Task destruction callback that removes all active pooled sprites and clears the singleton pointer; particle interpretation tentative
 081FBAE0,RatatoskParticle_Init,thumb,low,src-alias,Initializes 24 sprite slots and loads animation data and a script procedure; particle interpretation tentative
 081FBB38,Ratatosk_CreateParticlePool,thumb,low,src-alias,Creates the tentative Ratatosk particle task with 24 slots and update and destroy callbacks

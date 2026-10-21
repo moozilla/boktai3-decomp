@@ -92,8 +92,8 @@ s32 Player_GetForceDirection(struct Player *p)
     }
     do {
         do {
-    angle = d + 1;
-    d = angle << 5;
+            angle = d + 1;
+            d = angle << 5;
             return d;
         } while (0);
     } while (0);

@@ -43,11 +43,11 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
     s32 completed;
     s32 i;
     do {
-    record = (u8 *)p->records;
-    if (Registry1745_ConsumeStateEntry(p)) {
-        Registry1745_ClearParticipantCounters(p);
-        ClockPanel_CaptureTime(p);
-        *(u16 *)(record + 0x3E) = Crc_ComputeCcitt16(record, 0, 0x3E);
+        record = (u8 *)p->records;
+        if (Registry1745_ConsumeStateEntry(p)) {
+            Registry1745_ClearParticipantCounters(p);
+            ClockPanel_CaptureTime(p);
+            *(u16 *)(record + 0x3E) = Crc_ComputeCcitt16(record, 0, 0x3E);
         }
     } while (0);
     if (Registry1745_CheckSessionReady(p) < 0) {

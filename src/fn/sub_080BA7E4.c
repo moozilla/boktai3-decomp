@@ -12,8 +12,6 @@ s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
 s32 Collider_Refresh(void *);
 s32 Mod(s32, s32);
 
-#define Skeleton_TickDecayingLunge sub_080BA7E4
-
 static inline s32 Truncate(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -89,5 +87,5 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080BA7E4);
+INCLUDE_ASM("asm/nonmatching", Skeleton_TickDecayingLunge);
 #endif

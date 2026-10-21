@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Ratatosk_FireTrackingShot sub_081F6894
 struct Vec {
     s16 x, y, z, pad;
 };
