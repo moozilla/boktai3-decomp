@@ -1,8 +1,5 @@
 #include "global.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// foundry draft (worker best 98.9%); what differs is mostly register allocation and instruction order
 #define StatDisplay_GetTileAddress Hud_GetTilemapCell
 struct StatDisplay {
     u8 unknown0[0xA40];
@@ -18,10 +15,10 @@ void StatDisplay_DrawGauge(struct StatDisplay *p, s32 x, s32 y)
     u16 *tiles;
     if (!p->enabled) {
         tiles = StatDisplay_GetTileAddress(0, x - 3, y);
-        i = 13;
+        i = 0;
         do {
             *tiles++ = 0xD000;
-        } while (--i >= 0);
+        } while (++i < 14);
     } else {
         if ((u8)(p->player->actionMode - 1) <= 1) {
             if (p->player->statGaugeFull == 1)
@@ -37,6 +34,3 @@ void StatDisplay_DrawGauge(struct StatDisplay *p, s32 x, s32 y)
             *tiles++ = 0xD05E;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StatDisplay_DrawGauge);
-#endif
