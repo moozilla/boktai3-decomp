@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 98.3%
+// fuzzy: 98.6%
 // Remaining differences: mask materialization, collider/flags copies and register allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
@@ -175,14 +175,14 @@ static inline void Fill(u32 *zero, void *dst)
 void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 {
     struct BurnState *burn = (void *)&actor->group;
-    u16 *flags2C0;
+    register u16 *flags2C0 asm("r6");
     u8 *category;
     u8 *collider;
     u8 *hit;
     u32 kind;
     s32 i;
     struct ContactCollider *damageCollider;
-    register u32 *damageFlags asm("r6");
+    u32 *damageFlags;
     if (Blocked(actor))
         return;
     if (!burn->timer)
