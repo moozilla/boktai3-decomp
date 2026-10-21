@@ -46,8 +46,6 @@ void Sprite_Init(void *, void *, u32);
 void Anim_SetSequence(void *, void *, u16, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 
-#define CollectionMenu_InitGraphics sub_08210F04
-
 static inline void StepAnim(struct CollectionAnim *a, struct CollectionSprite *s)
 {
     const volatile u16 *entry = a->data + a->frame;

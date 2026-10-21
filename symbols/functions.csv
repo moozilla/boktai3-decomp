@@ -8608,7 +8608,9 @@ addr,name,mode,confidence,source,notes
 08210EB4,Collection_RefreshSelection,thumb,low,src-alias,Refreshes selection visuals plus collection count digits and selected entry text
 08210ED0,CollectionMenu_IsValidGridPosition,thumb,low,src-alias,Checks five columns and two rows against the final entry index of 26; collection identity tentative
 08210F00,CollectionMenu_FinalizeState,thumb,low,src-alias,Empty finalization hook called during menu destruction; ownership tentative
+08210F04,CollectionMenu_InitGraphics,thumb,low,src-alias,
 08211288,CollectionMenu_DestroyGraphics,thumb,low,src-alias,Removes all 27 entry sprites and eight animation objects
+082112F4,CollectionMenu_Update,thumb,low,src-alias,
 08211588,CollectionMenu_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that releases graphics and invokes finalization
 0821159C,CollectionMenu_Init,thumb,low,src-alias,Initializes menu state and script resources then configures graphics and starts music
 082116A8,CollectionMenu_Create,thumb,low,src-alias,Creates the menu task and installs update and destruction callbacks
