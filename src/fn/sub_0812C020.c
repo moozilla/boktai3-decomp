@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define gPursuingActorManager gUnk_02000184
 void Sprite_Remove(void *);
 extern struct PursuingActorManager *gUnk_02000184;
@@ -20,8 +18,11 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
     for (i = 0; i < 8; i++) {
         if (IsActive(manager, i)) {
             struct PursuingActor *actor;
-            actor = (void *)(i * sizeof(struct PursuingActor) + 0x3c);
-            actor = (void *)((u32)manager + (u32)actor);
+            {
+                register u32 off asm("r5") = i * sizeof(struct PursuingActor) + 0x3c;
+                asm("" : "+r"(off));
+                actor = (void *)((u32)manager + off);
+            }
             Collider_Remove(&actor->secondary);
             Sprite_Remove(actor);
             for (j = 0; j < 2; j++) {
@@ -32,6 +33,3 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
     }
     return (u32)(gUnk_02000184 = 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PursuingActors_ReleaseAll);
-#endif
