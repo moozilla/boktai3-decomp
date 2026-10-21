@@ -3,7 +3,6 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_route.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: when the idle flag is set and the delay expires, picks a random route point and starts moving to it.
 #define Ghost_UpdateRandomDestination sub_08097CB4
 
