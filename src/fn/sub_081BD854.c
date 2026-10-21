@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.9%
-// foundry draft (worker best 80.9%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 
 struct ScriptPanel {
     u8 pad0[0x8E4];
@@ -30,7 +28,7 @@ void DarkLoan_HideDisplay(void *);
 struct ScriptPanel *DarkLoan_CreateHiddenDisplay(u32 rate, s32 valueD, u32 displayMode,
                                                  u32 callbackPc)
 {
-    u8 *panel;
+    register u8 *panel asm("r5");
     u16 *rateField;
     panel = Task_Create(0xB, 0x934);
     if (panel)
@@ -48,6 +46,3 @@ struct ScriptPanel *DarkLoan_CreateHiddenDisplay(u32 rate, s32 valueD, u32 displ
     DarkLoan_HideDisplay(panel);
     return (struct ScriptPanel *)panel;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DarkLoan_CreateHiddenDisplay);
-#endif
