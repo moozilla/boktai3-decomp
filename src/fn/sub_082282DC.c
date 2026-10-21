@@ -19,18 +19,16 @@ struct Task082282DC {
 s32 MessageQueue_GetMessagesById(u32, struct Msg082282DC **);
 s32 Script_RunBlock(u32, void *);
 
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-// differs: n lands in r3 instead of r0 (0xFFFF sentinel register)
 void DelayedScript_Update(struct Task082282DC *t)
 {
     s32 n = MessageQueue_GetMessagesById(t->channel, &t->msgs);
+    s32 k = n;
     struct Msg082282DC *m = t->msgs;
-    s32 k = n - 1;
+    k--;
     if (n > 0) {
+        u32 sent = 0xFFFF;
         do {
-            n = 0xFFFF;
-            if (*m->b == n)
+            if (*m->b == sent)
                 goto kill;
             m++;
         } while (k-- > 0);
@@ -54,6 +52,3 @@ void DelayedScript_Update(struct Task082282DC *t)
             t->counter = r;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DelayedScript_Update);
-#endif

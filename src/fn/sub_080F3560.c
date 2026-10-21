@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.8%
 // foundry draft (worker best 98.8%); what differs is mostly register allocation and instruction order
 struct ChildGroup {
     u8 pad0[0x7E];
@@ -23,10 +21,9 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 struct ChildGroupOffset {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-static inline void clearOffset(void *dst)
+static inline void CpuSetC(void *dst, u32 control, void *src)
 {
-    u32 zero = 0;
-    CpuSet(&zero, dst, 0x05000002);
+    CpuSet(src, dst, control);
 }
 void ChildGroup_ShowDamageNumber(struct ChildGroup *p, u32 flags, s32 mode)
 {
@@ -39,11 +36,9 @@ void ChildGroup_ShowDamageNumber(struct ChildGroup *p, u32 flags, s32 mode)
                            p->fieldD86);
     vector = &scratch.offset;
     /* fill source is initialized with the call argument. */
-    CpuSet((scratch.fill = 0, &scratch.fill), vector, 0x05000002);
+    scratch.fill = 0;
+    CpuSetC(vector, 0x05000002, &scratch.fill);
     vector->y = -120;
     DamageNumberDisplay_Show(p->display, p->damage, mode, p->position, vector, 1);
     p->damage = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ChildGroup_ShowDamageNumber);
-#endif
