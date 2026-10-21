@@ -13,12 +13,10 @@ void sub_08235B34(u8 *arg)
 {
     register u8 *p asm("r4") = arg;
     struct Vec5B scale, position;
-    register u8 *e asm("r6");
+    u8 *e;
     s32 amount;
     u32 flags, step;
-    asm("" : "+r"(p));
     e = p + 0x94;
-    asm("" : "+r"(e));
     do {
         scale.x = 30000;
         scale.y = 30000;
