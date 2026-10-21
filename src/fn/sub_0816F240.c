@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
 void MessageWindow_Clear(void);
@@ -19,7 +17,9 @@ void SceneHud_AnimateActionResult(void);
 static inline s32 Panel_RandomPercent(void)
 {
     u32 next = gUnk_03005308 + 1;
-    u16 mask = 0x3FF;
+    u16 mask;
+    asm("" ::: "r1");
+    mask = 0x3FF;
     gUnk_03005308 = next & mask;
     return Mod(*(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR), 100);
 }
@@ -56,6 +56,3 @@ void ScenePanel_BeginRandomTransition(u8 *s)
         s[0x4861] = 0;
     Hud_SetInteractionCallback(s, SceneHud_AnimateActionResult, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScenePanel_BeginRandomTransition);
-#endif
