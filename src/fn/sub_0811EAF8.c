@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 83.3%
-// foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
 
 struct CallbackEntry {
     void *function;
@@ -18,7 +15,7 @@ struct CallbackList {
 s32 sub_08249240(void *, void *, void *);
 s32 CallbackList_RunMatchingState(struct CallbackList *list, void *value, s32 state)
 {
-    struct CallbackEntry *base = list->entries;
+    struct CallbackEntry *base = (*&list)->entries;
     s32 i = 0;
     if (i < list->count) {
         struct CallbackEntry *entry = base;
@@ -33,6 +30,3 @@ s32 CallbackList_RunMatchingState(struct CallbackList *list, void *value, s32 st
     }
     return (s32)value;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackList_RunMatchingState);
-#endif
