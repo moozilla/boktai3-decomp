@@ -2,10 +2,7 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.6%
 // MATCHING_CONCESSION: register-pinning
-// Remaining difference: r3 is copied from r5 instead of recomputed as sp+4.
 
 struct LunRouteEntry {
     u8 unknown0[4];
@@ -91,6 +88,7 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
             struct ContactPosition *p = &local.target;
             struct ContactPosition *from = &actor->position;
             asm("" : "+r"(from));
+            asm("" ::: "r7");
             q = &local.target;
             asm("" : "+r"(q));
             q->x = q->x - from->x;
@@ -102,7 +100,3 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
     }
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Lun_ChooseMovementDestination);
-#endif
