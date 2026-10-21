@@ -2,8 +2,6 @@
 #include "sun_clock.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
 #define gSunClock  gUnk_03005430
 #define gGameState gUnk_02000710
@@ -26,21 +24,24 @@ u32 GameState_HasEquippedConsumable(s32);
 void SceneActorStyle_InitializeFromGameState(void *);
 void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
 {
-    struct ClockPanelSnapshot *s = &p->snapshot;
     u8 *record;
+    struct ClockPanelSnapshot *s = &p->snapshot;
     u8 *dest;
     s32 *values;
-    u8 *src = (u8 *)gUnk_02000710 + 0x780;
+    u8 *src;
     s32 i;
     s32 party;
+    unsigned int new_var;
+    new_var = 16;
     record = s->bytes;
+    src = (u8 *)gUnk_02000710 + 0x780;
     for (i = 0; i < 16; i++)
         s->bytes[i] = src[i];
     src = (u8 *)gUnk_02000710 + 0x790;
     i = 0;
     values = s->values;
     record += 0xC0;
-    dest = s->bytes + 16;
+    dest = s->bytes + new_var;
     for (; i < 16; i++)
         dest[i] = src[i];
     for (i = 0; i < 5; i++)
@@ -77,6 +78,3 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
     }
     SceneActorStyle_InitializeFromGameState(record);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ClockPanel_CaptureSnapshot);
-#endif

@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.4%
 // 4 differing instruction runs; first diff at +0x1C (mov r0, r8 vs bl #0x820112c)
 struct Pair {
     u32 a, b;
@@ -19,14 +18,22 @@ u8 *Player_GetEffectivePosition(u32);
 void PlayerClone_SetBehaviorCallback(void *, void *);
 void sub_082003BC(void);
 void PlayerClone_CreatePool(void);
+static inline void CpuSetW(const void *src, void *dest, u32 control)
+{
+    CpuSet(src, dest, control);
+}
 s32 sub_08201160(u8 *resource, struct Pos *pos)
 {
+    u8 *t;
     struct {
         u32 fill;
         s32 index;
     } scratch;
-    u8 *pool = gUnk_020005F8;
-    if (pool) {
+    u8 *pool;
+    t = gUnk_020005F8;
+    pool = t;
+    asm("" : "+r"(pool));
+    if (t) {
         u8 *obj = PlayerClone_FindFreeSlot(((struct Pool *)pool)->data, &scratch.index);
         if (obj) {
             void *handler = obj + 0x198;
@@ -53,7 +60,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
             {
                 void *target = obj + 0xc;
                 scratch.fill = zero;
-                CpuSet(&scratch.fill, target, 0x05000002);
+                CpuSetW(&scratch.fill, target, 0x05000002);
             }
             *(u32 *)((u8 *)display + 8) |= 1;
             PlayerClone_SetBehaviorCallback(handler, sub_082003BC);
@@ -65,6 +72,3 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
         PlayerClone_CreatePool();
     return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08201160);
-#endif

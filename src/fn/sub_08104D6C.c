@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "callback_pool.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define gCallbackPoolUpdateTable gUnk_086064E8
 
@@ -20,6 +19,7 @@ s32 CallbackPool_UpdateEntries(struct CallbackPool *pool)
     struct CallbackPoolEntry *entry;
     s32 i;
     if (pool->activeMask) {
+        asm("" ::: "r2");
         for (i = 0; i < 4; i++) {
             entry = &start[i];
             if (CallbackPool_IsActive(&pool->activeMask, i))
@@ -28,6 +28,3 @@ s32 CallbackPool_UpdateEntries(struct CallbackPool *pool)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackPool_UpdateEntries);
-#endif
