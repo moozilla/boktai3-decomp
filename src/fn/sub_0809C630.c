@@ -2,21 +2,31 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// Structure matches; remaining differences are caller-scratch registers in launch initialization.
+// MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Lun_OnSpecialAnimation(void);
 void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView *);
+#define AT(base, off, rc, ra)                                                                      \
+    ({                                                                                             \
+        register u32 _o asm(rc) = (off);                                                           \
+        register u8 *_a asm(ra);                                                                   \
+        asm("" : "+r"(_o));                                                                        \
+        _a = (u8 *)(base) + _o;                                                                    \
+        _a;                                                                                        \
+    })
 static inline u32 Random(void)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    {
+        register u32 tab asm("r2") = (u32)gUnk_0203B400;
+        asm("" : "+r"(tab));
+        return *(const u16 *)(offset + tab);
+    }
 }
 static inline u32 *ClearFlags(u32 *field, u32 mask)
 {
@@ -69,7 +79,7 @@ void Lun_UpdateLaunchedReaction(struct SceneActorRegistryResetView *actor)
         SetControl(actor, Lun_OnSpecialAnimation, 0x24);
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
         angle = Random() & 255;
-        ClearVector(&zero, (struct ContactPosition *)(state + 0x424));
+        ClearVector(&zero, (struct ContactPosition *)AT(state, 0x424, "r3", "r1"));
         actor->secondaryMotion.x = Scale12(gUnk_086149C4[angle] * 12);
         actor->secondaryMotion.y = 10;
         actor->secondaryMotion.z = Scale12(gUnk_086149C4[(angle + 64) & 255] * 12);
@@ -91,7 +101,3 @@ void Lun_UpdateLaunchedReaction(struct SceneActorRegistryResetView *actor)
     }
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Lun_UpdateLaunchedReaction);
-#endif
