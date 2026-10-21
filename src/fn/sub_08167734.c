@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -30,8 +29,7 @@ void PlayerPanel_RemoveEffects(struct PlayerPanel *panel)
             particle++;
         }
         offset += 0x208;
-        asm("" : "+r"(group));
-        group++;
+        (*(&group))++;
     } while (group < 2);
     {
         struct PanelEffect *effect = panel->effects;
