@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
-// foundry draft (worker best 95.2%); what differs is mostly register allocation and instruction order
 struct ActorPaletteSource {
     u8 unknown0[0x74];
     u16 banks[3][16];
@@ -28,13 +25,6 @@ void ActorPalette_LoadScriptBanks(struct ActorPaletteOwner *p)
     bank = source->banks[1];
     Palette_CopyBank(palettes->banks[p->selected + 1], bank);
     bank = source->banks[2];
-    {
-        u32 offset = (p->selected << 5) + 0x48;
-        u32 address = (u32)palettes;
-        address = offset + address;
-        Palette_CopyBank((void *)address, bank);
-    }
+    Palette_CopyBank(palettes->banks[p->selected + 2], bank);
+    asm("" ::"r"(palettes));
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorPalette_LoadScriptBanks);
-#endif
