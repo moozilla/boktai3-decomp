@@ -65,7 +65,7 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 sprites = *(const struct OrbitW4 *)gUnk_0824FE34;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
                 {
-                    register u32 tb asm("r5") = (u32)gUnk_0203B400;
+                    register u32 tb asm("r5") = (u32)((const u16 *)0x0203B400);
                     r = *(const u16 *)((gUnk_03005308 << 1) + tb);
                 }
                 r &= 3;
@@ -101,7 +101,7 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 s16 sixty;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
                 {
-                    register u32 tb asm("r4") = (u32)gUnk_0203B400;
+                    register u32 tb asm("r4") = (u32)((const u16 *)0x0203B400);
                     r = *(const u16 *)((gUnk_03005308 << 1) + tb);
                 }
                 r &= 3;
@@ -131,7 +131,7 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 vp->z = v;
                 pos = *(struct OrbitPacked *)&p->position;
                 pos.y += 0x40;
-                vp->y = 0x36;
+                vel.y = 0x36;
                 sub_08127590(&pos, &vel, 0xB07C, 0x99CB, gUnk_08613F88[r], 0x1e, 2, 0,
                              gUnk_08613F98[r] + 0x26b, 0, 0, p->a22, p->a24, 0, 0);
                 if (p->count == 5)
