@@ -58,7 +58,6 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-#define EnemyF426_ApplyHitReaction sub_082038A8
 void EnemyF426_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                                 struct Target *targetInput)
 {
@@ -151,5 +150,5 @@ void EnemyF426_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082038A8);
+INCLUDE_ASM("asm/nonmatching", EnemyF426_ApplyHitReaction);
 #endif
