@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.8%
-// foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
 struct Vanargand {
     u8 pad0[0x9c];
     u32 flags;
@@ -33,7 +31,7 @@ void Vanargand_WaitForActionRelease(struct Vanargand *p)
     if (p->pending) {
         p->pending = 0;
         if (p->modeF34 <= 2) {
-            u16 delay = 6;
+            register u16 delay asm("r1") = 6;
             u16 *field;
             p->counterF1C = 0;
             field = &p->delayF20;
@@ -54,6 +52,3 @@ void Vanargand_WaitForActionRelease(struct Vanargand *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_WaitForActionRelease);
-#endif
