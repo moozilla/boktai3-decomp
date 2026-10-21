@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-
 s32 Div(s32, s32);
 
 struct ActorPosition {
