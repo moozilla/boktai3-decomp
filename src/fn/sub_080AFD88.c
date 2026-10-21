@@ -1,5 +1,4 @@
 #include "scene_actor_chase.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: follows a navigation descriptor, switching between acceleration and turning.
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
@@ -14,8 +13,9 @@ void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
     u8 *context = a->context;
     s32 motion;
     s32 event;
-    if (a->field2B1)
+    if (a->field2B1) {
         a->field2B1 = 0;
+    }
     Callback_InvokeActor(a, a->update270);
     motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
     {
@@ -33,8 +33,9 @@ void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
             u16 *p = &a->field2C2;
             u16 value = *p;
             rate = p;
-            if (!value)
+            if (!value) {
                 *rate = 64;
+            }
         }
         if (!a->drawableKind)
             Anim_SetDurationScale((u8 *)a->drawable + 0x48, *rate);
@@ -56,9 +57,8 @@ void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
             {
                 u32 m = 2;
                 u16 *flags;
-                asm("" : "+r"(m));
                 flags = (void *)(context + 0x6D4);
-                *flags = m | *flags;
+                *flags = (*(&m)) | (*flags);
             }
             return;
         }
