@@ -962,7 +962,88 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
  * ranges. 760 bytes with several undiscovered globals; not attempted byte-for-byte this
  * pass. confidence=low. */
 
+#define Nidhoggr_UpdatePartMotion sub_0819321C
+#ifdef NONMATCHING
+// fuzzy: 91.9%
+extern void (*const gUnk_0824F364[])(void);
+extern const struct SceneVec gUnk_0824F2E4[];
+extern const struct SceneVec gUnk_0824F324[];
+extern const struct SceneVec gUnk_0824F334[];
+extern const struct SceneVec gUnk_0824F33C[];
+extern const struct SceneVec gUnk_0824F344[];
+
+void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
+{
+    void **q;
+    s32 i;
+    s32 j;
+    struct SceneVec *p21, *p20;
+    struct SceneVec *pa, *pb, *pc, *pd, *pe, *pf;
+    for (i = 0; i <= 25; i++) {
+        if (gUnk_0824F364[t->unknown71C2[i]] == 0) {
+            t->rows[i].flags |= 1;
+            t->rowInitFlag[i] = 0;
+            t->rowCounter[i] = 0;
+            t->rowDoneFlag[i] = 1;
+        } else {
+            if (t->rowBlink[i] != 0) {
+                t->rowBlink[i]--;
+                if (i & 1)
+                    t->rows[i].flags |= 0x200;
+                else
+                    t->rows[i].flags |= 0x400;
+            } else {
+                t->rows[i].flags &= ~0x600;
+            }
+            sub_08249240(t, (void *)i, gUnk_0824F364[t->unknown71C2[i]]);
+            t->rowCounter[i]++;
+        }
+    }
+    for (i = 0, p21 = &t->rows[21].pos, p20 = &t->rows[20].pos, pa = &t->pos; i <= 1; i++) {
+        t->rows[i].pos.x = pa->x + gUnk_0824F344->x;
+        t->rows[i].pos.y = pa->y + gUnk_0824F344->y;
+        t->rows[i].pos.z = pa->z + gUnk_0824F344->z;
+        Collider_SetPosition(&t->colliders[i], pa, 0);
+        Collider_SetPosition(&t->altColliders[i + 1], pa, 0);
+    }
+    for (i = 2, j = 0, pb = &t->pos; i <= 9; i++, j++) {
+        t->rows[i].pos.x = pb->x + j[gUnk_0824F2E4].x;
+        t->rows[i].pos.y = pb->y + j[gUnk_0824F2E4].y;
+        t->rows[i].pos.z = pb->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    for (i = 10, j = 0, pc = &t->pos; i <= 17; i++, j++) {
+        t->rows[i].pos.x = pc->x + j[gUnk_0824F2E4].x;
+        t->rows[i].pos.y = pc->y + j[gUnk_0824F2E4].y;
+        t->rows[i].pos.z = pc->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    for (i = 18, j = 0, pd = &t->pos; i <= 19; i++, j++) {
+        t->rows[i].pos.x = pd->x + j[gUnk_0824F324].x;
+        t->rows[i].pos.y = pd->y + j[gUnk_0824F324].y;
+        t->rows[i].pos.z = pd->z + j[gUnk_0824F324].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    pe = &t->pos;
+    p21->x = pe->x + gUnk_0824F334->x;
+    p21->y = pe->y + gUnk_0824F334->y;
+    p21->z = pe->z + gUnk_0824F334->z;
+    p20->x = pe->x + gUnk_0824F33C->x;
+    p20->y = pe->y + gUnk_0824F33C->y;
+    p20->z = pe->z + gUnk_0824F33C->z;
+    for (pf = &t->pos, i = 22; i <= 23; i++) {
+        t->rows[i].pos.x = pf->x + gUnk_0824F344->x;
+        t->rows[i].pos.y = pf->y + gUnk_0824F344->y;
+        t->rows[i].pos.z = pf->z + gUnk_0824F344->z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+    }
+    q = (void **)t->unknown72C4;
+    if (*q != 0)
+        Callback_InvokeActor(q, *q);
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0819321C);
+#endif
 
 extern u16 gUnk_03004BD8;
 
@@ -2781,8 +2862,6 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
         } while (n > 0);
     }
 }
-
-void sub_0819321C(void *);
 
 void sub_0818ECFC(void *);
 

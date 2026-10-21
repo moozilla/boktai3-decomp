@@ -17,7 +17,9 @@
 struct NidhoggrAnimRow {
     u8 unknown0[8];
     u32 flags;
-    u8 unknown12[0x60 - 12];
+    u8 unknown12[0x20 - 12];
+    struct SceneVec pos;
+    u8 unknown28[0x60 - 0x28];
 };
 
 struct NidhoggrCollider {
@@ -68,13 +70,14 @@ struct Nidhoggr {
     u8 unknown71BF;
     u16 suspendedTimer; /* 0x71C0 */
     u8 unknown71C2[0x71DC - 0x71C2];
-    u8 rowInitFlag[0x7210 -
-                   0x71DC]; /* 0x71DC: per-row "keyframes loaded" latch, indexed like rows[] */
-    u8 rowDoneFlag[0x7244 - 0x7210]; /* 0x7210: per-row "animation finished" latch */
-    s16 timer;                       /* 0x7244: generic frame counter for the current state */
-    u16 timer2;                      /* 0x7246: a second, apparently independent frame counter
+    u8 rowInitFlag[26]; /* 0x71DC: per-row "keyframes loaded" latch, indexed like rows[] */
+    u8 rowCounter[26];  /* 0x71F6: per-row counter bumped by Nidhoggr_UpdatePartMotion */
+    u8 rowDoneFlag[26]; /* 0x7210: per-row "animation finished" latch */
+    u8 rowBlink[26];    /* 0x722A: per-row blink countdown */
+    s16 timer;          /* 0x7244: generic frame counter for the current state */
+    u16 timer2;         /* 0x7246: a second, apparently independent frame counter
                                           * used the same way by a different set of behaviors */
-    u8 active;                       /* 0x7248 */
+    u8 active;          /* 0x7248 */
     u8 mode;   /* 0x7249: top-level behavior select (Nidhoggr_SetBehavior); drives gUnk_0824F5C0 */
     u8 state;  /* 0x724A: sub-state within the current behavior */
     u8 bgMode; /* 0x724B: Nidhoggr_SetBackgroundMode's current mode */
