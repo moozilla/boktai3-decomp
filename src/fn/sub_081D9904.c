@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 89.0%
+// fuzzy: 90.4%
 // Remaining differences: parameter flag operations and saved pointer lifetimes.
 
 #include "contact_swarm.h"
@@ -176,7 +176,8 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
     if (!(config->flags & 0x10)) {
         randomIndex = &gUnk_03005308;
         randomTable = gUnk_0203B400;
-        for (i = 0; i <= 2; i++) {
+        i = 0;
+        do {
             if (config->flags & 0x20) {
                 *randomIndex = (*randomIndex + 1) & 1023;
                 config->direction = (randomTable[*randomIndex] & 63) - 32 + (u8)config->direction;
@@ -206,15 +207,16 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
             Projectile_SetDamageParams(params, config->damage[0], config->damage[1],
                                        config->damage[2] >> 1, config->damage[3],
                                        config->damage[4]);
-            Projectile_SetCollisionSize(params, (s16)config->sizeX, 80, (s16)config->sizeZ);
-            Projectile_SetTypeAndElement(params, config->type, config->element);
-            Projectile_SetSpriteParams(params, config->sprite[0], config->sprite[1],
+            Projectile_SetCollisionSize(storage, (s16)config->sizeX, 80, (s16)config->sizeZ);
+            Projectile_SetTypeAndElement(storage, config->type, config->element);
+            Projectile_SetSpriteParams(storage, config->sprite[0], config->sprite[1],
                                        config->sprite[2]);
-            if (Projectile_Spawn(params, p + 0xa8) < 0)
+            if (Projectile_Spawn(storage, p + 0xa8) < 0)
                 config->count--;
             config->direction = direction;
             config->speed = speed;
-        }
+            i++;
+        } while (i <= 2);
     }
     StepPlayback((void *)(p + 0x8c), (void *)(p + 0x180));
     Task4E01_BeginImpactAnimation(p);

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 82.2%
+// fuzzy: 84.0%
 // Remaining differences: switch branch layout and animation register allocation.
 
 #include "contact_swarm.h"
@@ -268,9 +268,9 @@ void sub_081D9D3C(void *);
 s32 Task4E01_StartTerminalAnimation(u8 *input)
 {
     register u8 *p asm("r8") = input;
-    register u8 *config asm("r9") = p + 0x18;
+    register u8 *config asm("r9") = input + 0x18;
     *(u16 *)config |= 0x1000;
-    *(u32 *)p = 0;
+    *(u32 *)input = 0;
     *(u32 *)(config + 8) = 0;
     switch (*(u32 *)(config + 0x48)) {
         case 0:
@@ -279,12 +279,12 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
         case 5:
         case 6:
         case 10:
-            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
-            *(u32 *)p = 0;
+            *(u32 *)input = 0;
             break;
         case 7:
-            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
             break;
         case 4:
@@ -292,19 +292,19 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
             break;
         case 3:
             if (*(u16 *)config & 0x10) {
-                *(u32 *)(p + 0x194) = 1;
-                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 1, 0, 0);
-                StepFirst((void *)(p + 0x8c), (void *)(p + 0x180));
+                *(u32 *)(input + 0x194) = 1;
+                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 1, 0, 0);
+                StepFirst((void *)(input + 0x8c), (void *)(input + 0x180));
             } else {
-                *(u32 *)(p + 0x194) = 6;
-                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 6, 0, 0);
-                StepSecond((void *)(p + 0x8c), (void *)(p + 0x180));
+                *(u32 *)(input + 0x194) = 6;
+                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 6, 0, 0);
+                StepSecond((void *)(input + 0x8c), (void *)(input + 0x180));
             }
             Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;
         case 11:
             if (!(*(u16 *)config & 0x2000))
-                ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+                ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, sub_081D9D3C);
             break;
         case 8:
