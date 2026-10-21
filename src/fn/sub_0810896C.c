@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// foundry draft (worker best 90.2%); what differs is mostly register allocation and instruction order
 struct CallbackSlot {
     u8 unk0[0x60];
     u16 callbackIndex;
@@ -14,10 +12,10 @@ struct CallbackSlots {
 };
 extern void *gUnk_08606530[];
 s32 sub_08249240(void *, void *, void *);
-static inline u8 IsSlotActive(struct CallbackSlot *slots, s32 i)
+static inline u8 IsSlotActive(u32 *used, s32 i)
 {
     u32 bit = 1 << i;
-    if (*(u32 *)(slots + 3) & bit)
+    if (*used & bit)
         return 1;
     return 0;
 }
@@ -25,17 +23,26 @@ s32 CallbackSlots_DispatchActive(struct CallbackSlots *obj)
 {
     struct CallbackSlot *slots = obj->slots;
     s32 i;
-    if (*(u32 *)((u8 *)obj + 0x154)) {
-        for (i = 0; i < 3; i++) {
-            if (IsSlotActive(slots, i))
-                sub_08249240(
-                    obj, (struct CallbackSlot *)((u32)(i * sizeof(*slots)) + (u32)slots),
-                    gUnk_08606530[((struct CallbackSlot *)((u32)(i * sizeof(*slots)) + (u32)slots))
-                                      ->callbackIndex]);
-        }
+    register u32 offset asm("r1") = 0x154;
+    register u32 *guard asm("r0");
+    asm("" : "+r"(offset));
+    guard = (u32 *)((u32)obj + offset);
+    if (*guard) {
+        u32 *used;
+        void **table;
+        u32 off = 0x154;
+        i = 0;
+        asm("" : "+r"(off));
+        used = (u32 *)((u32)obj + off);
+        table = gUnk_08606530;
+        asm("" ::"r"(off));
+        do {
+            if (IsSlotActive(used, i)) {
+                struct CallbackSlot *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
+                sub_08249240(obj, slot, table[slot->callbackIndex]);
+            }
+            i++;
+        } while (i < 3);
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackSlots_DispatchActive);
-#endif
