@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: animation completion resumes group movement or idle.
 void SceneActorControl_OnIdle(void);
@@ -18,12 +17,14 @@ void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->field2B3 = 0;
     }
-    if (!a->field2B3)
+    if (!a->field2B3) {
         return;
+    }
     group = (u8 *)&a->group;
     a->field2B0 = 1;
     {
-        register u32 mask asm("r1") = 0x80;
+        u32 mask = 0x80;
+        flags = a->flags2D4;
         flags = a->flags2D4 & mask;
     }
     if (flags) {
@@ -34,8 +35,8 @@ void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
         Chase_SetBehavior(a, 12);
         {
             u16 *field = (u16 *)((u8 *)a + 0x414);
-            register u32 mask asm("r0") = 4;
-            *field = mask | *field;
+            u32 mask = 4;
+            *field = (*(&mask)) | (*field);
         }
         a->field2C2 = 0x20;
     } else {
