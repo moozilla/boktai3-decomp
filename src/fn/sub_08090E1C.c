@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0808FE64(void *);
+void Slime_OnInterrupt(void *);
 
 static inline void Clr(u16 *q, u32 m)
 {
@@ -18,7 +18,7 @@ u32 Slime_ProcessPendingStateChange(u8 *p)
 {
     u32 m = 0x100;
     if (Tst((u16 *)(p + 0x2D6), m)) {
-        sub_0808FE64(p);
+        Slime_OnInterrupt(p);
         Clr((u16 *)(p + 0x2D6), ~0x100);
     }
     return 1;
