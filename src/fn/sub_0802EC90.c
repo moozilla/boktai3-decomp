@@ -1,12 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.8%
+#define Actor_OnDescendingFadeUpdate sub_0802EC90
+// Provisional name: Actor_OnDescendingFadeUpdate (tentative)
 struct Vec {
     s16 x, y, z, pad;
 };
 struct Actor {
-    u8 pad0[7];
+    u8 pad0a;
+    u8 kind;
+    u8 pad0b[5];
     u8 done;
     u8 pad8[1];
     u8 entered;
@@ -77,9 +79,12 @@ static inline int height(struct Vec *pos)
         index = 0;
     else
         index = gUnk_030052F4->rows[z] + x;
-    return (*cell(index) & 15) << 8;
+    {
+        register int c asm("r1") = *cell(index);
+        return c & 15;
+    }
 }
-void sub_0802EC90(void *unused, struct Actor *p, int ticks)
+void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
 {
     if (p->entered) {
         p->entered = 0;
@@ -96,14 +101,32 @@ void sub_0802EC90(void *unused, struct Actor *p, int ticks)
         int b = 0;
         switch (p->phase) {
             case 0: {
-                u32 k = 200;
+                register u32 k asm("r1");
+                int t = 8 - ticks;
+                k = 200;
                 asm("" : "+r"(k));
-                b = (8 - ticks) * k + 0xa0;
+                b = t * k + 0xa0;
                 {
-                    struct Vec *dp = *(struct Vec **)((u8 *)p + (k + 0x98));
-                    int h = height(dp);
-                    p->drawPos->y = h + b;
-                    asm("" ::"r"(h));
+                    register u8 *q asm("r0");
+                    struct Vec *dp;
+                    register int v asm("r0");
+                    register int h asm("r2");
+                    register struct Vec *dq asm("r1");
+                    register int sum asm("r0");
+                    register u32 off asm("r3");
+                    register u8 *q2 asm("r0");
+                    k += 0x98;
+                    q = (u8 *)p + k;
+                    dp = *(struct Vec **)q;
+                    v = height(dp);
+                    asm("" : "+r"(v));
+                    h = v << 8;
+                    off = 0x160;
+                    asm("" : "+r"(off));
+                    q2 = (u8 *)p + off;
+                    dq = *(struct Vec **)q2;
+                    sum = h + b;
+                    dq->y = sum;
                 }
                 if (ticks > 7)
                     p->phase++;
@@ -120,9 +143,15 @@ void sub_0802EC90(void *unused, struct Actor *p, int ticks)
                 if (ticks > 14)
                     p->phase = 2;
                 {
-                    int h = height(p->drawPos);
-                    p->drawPos->y = h + b;
-                    asm("" ::"r"(h));
+                    register int v asm("r0") = height(p->drawPos);
+                    register int h asm("r2");
+                    register struct Vec *dq asm("r1");
+                    register int sum asm("r0");
+                    asm("" : "+r"(v));
+                    h = v << 8;
+                    dq = p->drawPos;
+                    sum = h + b;
+                    dq->y = sum;
                 }
                 DisplayAnimation_SetPalette(&p->drawable, c, a, 0);
                 break;
@@ -133,15 +162,22 @@ void sub_0802EC90(void *unused, struct Actor *p, int ticks)
                 break;
         }
         {
-            u8 ang = p->targetAngle;
-            int zero = 0;
+            register int ang asm("r2") = p->targetAngle;
+            register int t1 asm("r1");
+            register int k asm("r0");
+            asm("" : "+r"(ang));
             p->angle = ang;
-            p->facing8 = ((ang + 112) >> 5) & 7;
-            p->facing4 = ((ang + 96) >> 6) & 3;
-            Actor_PlayAnimationEntry(p, 0, 2, zero, 0);
+            t1 = ang + 112;
+            t1 >>= 5;
+            k = 7;
+            k &= t1;
+            p->facing8 = k;
+            ang += 96;
+            ang >>= 6;
+            k = 3;
+            k &= ang;
+            p->facing4 = k;
+            Actor_PlayAnimationEntry(p, 0, 2, 0, 0);
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802EC90);
-#endif
