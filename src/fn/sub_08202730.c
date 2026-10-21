@@ -94,7 +94,6 @@ static inline u8 *CellData(int i)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-#define ProjectilePool_Update sub_08202730
 s32 ProjectilePool_Update(struct ProjPool *pool)
 {
     struct ProjEntry *cursor, *base;

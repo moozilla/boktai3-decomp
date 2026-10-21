@@ -188,8 +188,7 @@ static inline void StepPlayback(struct Entry *e, struct Obj *sprite, struct Anim
         }
     }
 }
-#define o                          ((struct Obj *)pos)
-#define Projectile_SpawnFromConfig sub_08202B30
+#define o ((struct Obj *)pos)
 s32 Projectile_SpawnFromConfig(struct Params *params, struct Pos *pos)
 {
     struct Pool *pool = gUnk_020005FC;
