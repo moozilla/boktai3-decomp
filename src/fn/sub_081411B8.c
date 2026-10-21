@@ -2,9 +2,7 @@
 #include "player.h"
 #include "directional_force.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gForceMagnitude     gUnk_02000550
 #define gForceThreshold     gUnk_0200052C
 #define gForceAngle         gUnk_0200053C
@@ -32,11 +30,13 @@ static inline s32 Player_ScaleForce(s32 value)
 }
 void Player_ApplyDirectionalForce(struct Player *p)
 {
-    s32 x, z, direction;
+    s32 x, direction;
+    register s32 z asm("r2");
     if (p->tetherMode == 4)
         return;
     if (p && Player_IsActiveInSceneFive(p))
         return;
+    asm("" : "+r"(p));
     if (p && Player_TestForceBlock(&p->statBonusFlags, 0x80))
         return;
     if (gForceMagnitude < gForceThreshold)
@@ -48,7 +48,8 @@ void Player_ApplyDirectionalForce(struct Player *p)
     x = gSineTable[(direction + 64) & 255];
     z = gSineTable[direction & 255];
     {
-        s32 scaledX = Player_ScaleForce(gForceMagnitude * x);
+        register s32 scaledX asm("r3");
+        scaledX = Player_ScaleForce(gForceMagnitude * x);
         p->velocityX -= scaledX;
     }
     {
@@ -56,6 +57,3 @@ void Player_ApplyDirectionalForce(struct Player *p)
         p->velocityZ -= scaledZ;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_ApplyDirectionalForce);
-#endif
