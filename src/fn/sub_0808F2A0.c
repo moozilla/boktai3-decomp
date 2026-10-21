@@ -16,7 +16,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-void sub_08090160(void *);
+void Slime_EmitDeathDebris(void *);
 static inline u8 Hidden(struct SceneActorRegistryResetView *a)
 {
     u32 mask = 1;
@@ -45,7 +45,7 @@ void Bat_RunDefeatScript(struct SceneActorRegistryResetView *actor, s32 frame)
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
-        sub_08090160(actor);
+        Slime_EmitDeathDebris(actor);
         {
             u16 *p = &actor->flags2D4;
             u32 mask = ~0x38;

@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.9%
-// foundry draft (worker best 88.9%); what differs is mostly register allocation and instruction order
 #define BossParts_SetState Nidhoggr_ChangeCompletedPartState
 struct BossParts {
     u8 unknown0[0x71C2];
@@ -19,6 +17,7 @@ s32 Nidhoggr_ChangeCompletedPartState(struct BossParts *boss, s32 index, s32 sta
     if (*ready != 0) {
         u8 *stateBase = (u8 *)boss;
         u8 *current;
+        asm("" ::: "r1");
         stateBase += 0x71C2;
         current = stateBase + index;
         if (*current != state) {
@@ -32,6 +31,3 @@ s32 Nidhoggr_ChangeCompletedPartState(struct BossParts *boss, s32 index, s32 sta
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nidhoggr_ChangeCompletedPartState);
-#endif

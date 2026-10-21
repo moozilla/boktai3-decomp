@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.2%
-// foundry draft (worker best 91.3%); what differs is mostly register allocation and instruction order
 struct RecordMenuSprite {
     u8 unknown[0x3a];
     u16 flags;
@@ -28,7 +26,11 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
 {
     s32 i;
     struct RecordMenuSprite *sprite;
-    *(void **)((u8 *)menu + 0x3e8) = ScriptProc_Start(0xcb05, 0x1289);
+    {
+        register void *t asm("r1") = ScriptProc_Start(0xcb05, 0x1289);
+        asm("" : "+r"(t));
+        *(void **)((u8 *)menu + 0x3e8) = t;
+    }
     ResourceHeader_Relocate(menu->rowResource);
     i = 0;
     {
@@ -43,7 +45,11 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
     }
     {
         s32 zero = 0;
-        *(void **)((u8 *)menu + 0x3ec) = ScriptProc_Start(0xcb05, 0x530d);
+        {
+            register void *t asm("r1") = ScriptProc_Start(0xcb05, 0x530d);
+            asm("" : "+r"(t));
+            *(void **)((u8 *)menu + 0x3ec) = t;
+        }
         ResourceHeader_Relocate(menu->resource);
         Widget_InitLinked(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, zero, zero,
                           zero, (void *)zero);
@@ -53,6 +59,3 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
     menu->sprites[8].flags = 0xa000;
     menu->sprites[8].tiles = menu->palette;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RecordMenu_InitializeSprites);
-#endif

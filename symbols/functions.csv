@@ -2983,6 +2983,7 @@ addr,name,mode,confidence,source,notes
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
+0808F510,Slime_ApproachSavedTarget,thumb,low,src-alias,
 0808F6F0,Slime_RestoreSavedTarget,thumb,low,src-alias,"On arrival restores the saved target as the control callback, then runs update270"
 0808F77C,Slime_RunUpdateThenWait,thumb,low,src-alias,Runs update270 each frame; when it returns 0 switches control to sub_0808E780 and state 3/1
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
@@ -2994,6 +2995,7 @@ addr,name,mode,confidence,source,notes
 0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise
+08090160,Slime_EmitDeathDebris,thumb,low,src-alias,
 08090A98,Slime_PlayPendingSound,thumb,low,src-alias,Callback playing song 0x3C2 once when the linked object's sound flag is set
 08090AE0,SceneActorMotion_ArmPrimaryCollider,thumb,low,src-alias,
 08090B4C,Slime_ResolveDamageReaction,thumb,low,src-alias,
@@ -8464,9 +8466,12 @@ addr,name,mode,confidence,source,notes
 0820D9C0,EnemyParticle_EnableShadow,thumb,low,src-alias,Provisionally enables the shadow option stored at parameter offset 0x2E
 0820D9C8,EnemyParticle_AddFlags,thumb,low,src-alias,Adds behavior flags to the particle parameter block
 0820D9D0,PoisonHand_RecordDefeat,thumb,low,src-alias,Calls the configured defeat script and updates event flags and enemy defeat counters
+0820DC18,PoisonHand_ApplyHitReaction,thumb,low,src-alias,
 0820DDC4,PoisonHand_InitCollider,thumb,low,src-alias,Initializes the collider with position contact callback and combat attributes
 0820DE60,PoisonHand_WaitForPlayerApproach,thumb,low,src-alias,State callback that starts the emergence sequence when the player enters range
+0820E128,PoisonHand_UpdateDefeatBurst,thumb,low,src-alias,
 0820E718,PoisonHand_Destroy,thumb,low,src-alias,Destruction callback that removes the Poison Hand sprite
+0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
 0820EBEC,OrangeSpine_RecordDefeat,thumb,low,src-alias,Calls the defeat script and updates kill statistics; tentative actor prefix from its orange-red sprite palette
 0820EFDC,OrangeSpine_InitCollider,thumb,low,src-alias,Initializes the actor collider and installs its collision callback; tentative actor identity
