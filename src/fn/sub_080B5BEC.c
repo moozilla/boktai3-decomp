@@ -73,17 +73,16 @@ static inline void Show(struct SceneActorRegistryResetView *input)
 void sub_080B5BEC(struct SceneActorRegistryResetView *input)
 {
     register struct SceneActorRegistryResetView *actor asm("r3") = input;
-    register struct SceneActorControlMotionState *state asm("r5");
+    struct SceneActorControlMotionState *state;
     u32 unavailable = IsUnavailable(actor);
     if (unavailable)
         return;
     {
         u32 offset = 0x3D0;
-        register u32 mask asm("r1");
+        u32 mask;
         u32 active;
         state = *(void **)((u8 *)actor + offset);
         mask = 0xC000;
-        asm("" : "+r"(mask));
         offset = 0x6DC;
         active = SceneActorControl_TestFlags(*(u32 *)((u8 *)state + offset), mask);
         if (!active)
@@ -93,9 +92,8 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *input)
         u32 counter;
         u32 value;
         {
-            register u32 offset asm("r1") = 0x748;
-            register u16 *field asm("r0");
-            asm("" : "+r"(offset));
+            u32 offset = 0x748;
+            u16 *field;
             field = (void *)((u8 *)state + offset);
             counter = (u32)*field << 16;
         }
@@ -173,7 +171,7 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *input)
         }
     }
     {
-        register u16 *counter asm("r1") = (void *)((u8 *)state + 0x748);
+        u16 *counter = (void *)((u8 *)state + 0x748);
         (*counter)++;
     }
 }

@@ -25,7 +25,7 @@ static inline u32 StepPlayback(struct DirectionalEffect *owner, struct DisplaySe
 {
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, bit;
-    register u32 duration asm("r2");
+    u32 duration;
     register u32 flags asm("r1");
     {
         u32 offset = state->index << 1;
@@ -100,7 +100,6 @@ static inline u32 StepPlayback(struct DirectionalEffect *owner, struct DisplaySe
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;

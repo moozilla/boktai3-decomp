@@ -29,7 +29,7 @@ void sub_08130F60(u8 *s)
         u32 zero;
         u32 *flags;
         s32 mask;
-        register s32 field asm("r1");
+        s32 field;
         s32 off;
         {
             u8 *taken = s + 0x2B2;

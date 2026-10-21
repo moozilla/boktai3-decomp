@@ -21,7 +21,6 @@ void Storage_InitWidgets(u8 *p)
     pos.z = 0;
     {
         register u32 blank asm("r1") = 0;
-        asm("" ::"r"(blank));
         Widget_InitLinked(p + 0x18, p + 0x1518, 0xD2, 0x30, blank, blank, 60, &pos);
     }
     Widget_InitLinked(p + 0x78, p + 0x1518, 0x41, 0x30, 0, 0, 60, &pos);

@@ -33,7 +33,7 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
             *savedSelection = next;
             {
                 register u32 mask asm("r1") = 4;
-                register u32 savedMask asm("r8");
+                u32 savedMask;
                 u32 mode;
                 asm("" : : "r"(savedMask));
                 if (flags & mask)

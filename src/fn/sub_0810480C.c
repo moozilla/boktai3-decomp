@@ -66,7 +66,7 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
 {
     if (p->started) {
         register s32 x asm("r6");
-        register s32 z asm("r3");
+        s32 z;
         p->frame = 0;
         p->flags = (p->flags & ~1) | 2;
         p->started = 0;
@@ -74,14 +74,10 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
         p->radiusX = 41;
         p->radiusZ = 148;
         x = ScaleTemp(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]);
-        asm("" : : "r"(x));
         x += Scale(p->radiusZ * gUnk_086149C4[p->angle]);
-        asm("" : : "r"(x));
         z = ScaleTemp(-(p->radiusX * gUnk_086149C4[p->angle]));
-        asm("" : : "r"(z));
         {
-            register s32 t asm("r2") = Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
-            asm("" : "+r"(t));
+            s32 t = Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
             p->x = p->originX + x;
             p->z = (z + t) + p->originZ;
             asm("" : : "r"(t), "r"(z));

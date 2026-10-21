@@ -232,10 +232,10 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         disable(&p->collider);
     if ((p->timer & 3) == 0) {
         s32 angle, count, speed;
-        register const u16 *table asm("r5");
+        const u16 *table;
         register u32 *indexPtr asm("r6");
         register u32 index asm("r0");
-        register u32 mask asm("r4");
+        u32 mask;
         size.x = 164;
         size.y = 16;
         size.z = 164;

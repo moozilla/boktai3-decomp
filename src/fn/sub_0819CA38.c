@@ -61,7 +61,6 @@ s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
     {
         struct OffsetActorVector *o = obj->origin;
         struct OffsetActorVector *vp;
-        asm("" : "+r"(o));
         vp = &v;
         Add(vp, o);
     }
@@ -70,14 +69,12 @@ s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
     {
         u32 v = (obj->facing + 0x60) >> 6;
         u32 m = 3;
-        asm("" : "+r"(v));
         asm("" : "+r"(m));
         obj->facing4 = m & v;
     }
     {
         u32 v = (obj->facing + 0x70) >> 5;
         u32 m = 7;
-        asm("" : "+r"(v));
         asm("" : "+r"(m));
         obj->facing8 = m & v;
     }
@@ -85,7 +82,6 @@ s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
     {
         s32 result = Sqrt(v.x * v.x + v.z * v.z) * 0x274 / 0x6400;
         register s32 t asm("r2") = result;
-        asm("" : "+r"(t));
         p->travel = t;
         return result;
     }

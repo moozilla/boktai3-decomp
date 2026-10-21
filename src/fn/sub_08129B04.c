@@ -150,9 +150,9 @@ static inline void Step(struct SunDiscEffect *input)
 
 void SunDiscEffect_Update(struct SunDiscEffectPool *pool, struct SunDiscEffect *effect)
 {
-    register struct SunDiscEffectPool *pl asm("r3") = pool;
+    struct SunDiscEffectPool *pl = pool;
     register struct SunDiscEffect *keep asm("r5") = effect;
-    register u8 *pending asm("r6") = &keep->resetPending;
+    u8 *pending = &keep->resetPending;
     if (*pending) {
         keep->colliderPosition = keep->position;
         keep->position.x -= 0x80;

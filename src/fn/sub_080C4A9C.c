@@ -32,7 +32,7 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
         {
             u16 *field = (u16 *)((u8 *)actor + 0x414);
             u32 mask = 4;
-            register u32 value asm("r1") = *field;
+            u32 value = *field;
             mask |= value;
             *field = mask;
         }

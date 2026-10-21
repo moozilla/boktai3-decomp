@@ -23,17 +23,17 @@ extern const u16 gUnk_0203B400[];
 
 static inline u8 *offsetR1(u8 *p, u32 off)
 {
-    register u32 offset asm("r1") = off;
+    u32 offset = off;
     return p + offset;
 }
 static inline u8 *offsetR2(u8 *p, u32 off)
 {
-    register u32 offset asm("r2") = off;
+    u32 offset = off;
     return p + offset;
 }
 static inline void setCollider(u8 *p)
 {
-    register u16 *ptr asm("r2") = (u16 *)(p + 0x236);
+    u16 *ptr = (u16 *)(p + 0x236);
     register u32 value asm("r1") = *ptr;
     register u32 mask asm("r0") = 4;
     *ptr = mask | value;
@@ -85,9 +85,9 @@ void Player_ApplyControlPresentation(u8 *p)
     H(0xAE) += H(0x4E8);
     H(0xB0) += H(0x4EA);
     if (B(0x53D)) {
-        register s32 jitter asm("r1");
+        s32 jitter;
         u32 random;
-        register u32 mask asm("r0");
+        u32 mask;
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         random = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
         mask = 15;

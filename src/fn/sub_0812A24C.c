@@ -20,7 +20,7 @@ static inline u8 EffectPool_IsUsed(u32 *used, u32 mask)
 }
 struct EffectPoolSlot *EffectPoolA_AllocateSlot(u8 *poolArg)
 {
-    register u8 *pool asm("r5") = poolArg;
+    u8 *pool = poolArg;
     register s32 i asm("r6") = 0;
     u32 one = 1;
     u8 *index = pool + 0x12F;

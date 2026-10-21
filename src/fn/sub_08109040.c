@@ -23,7 +23,6 @@ s32 SelectionSlots_ClearValue(void *unused, s32 value)
         return -1;
     {
         register u32 m asm("r1") = 0xFF;
-        asm("" : "+r"(m));
         slot = gUnk_020004B4->values;
         i = 4;
 

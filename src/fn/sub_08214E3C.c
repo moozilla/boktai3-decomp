@@ -29,8 +29,8 @@ static inline s32 project(s32 input)
 }
 static inline void screen(struct Vec *dst, struct Sprite *sp)
 {
-    register u32 off asm("r0") = 0x1c;
-    register struct Vec *t asm("r0");
+    u32 off = 0x1c;
+    struct Vec *t;
     register struct Vec *src asm("r12");
     s32 depth, height, y, z;
     s32 sx, sz;
@@ -39,8 +39,6 @@ static inline void screen(struct Vec *dst, struct Sprite *sp)
     t = (struct Vec *)off;
     src = t;
     sx = sp->pos.x;
-    asm("" ::"r"(src));
-    asm("" : "+r"(t));
     sz = t->z;
     dst->x = project(sx - sz);
     depth = project(sx + sz);
@@ -67,7 +65,7 @@ void Sprite_RenderFlipAwareList(void)
     if (!p)
         return;
     do {
-        register s32 x asm("r3"), y asm("r7"), z asm("r8");
+        s32 x, y asm("r7"), z asm("r8");
         struct SpriteResource *resource;
         if (p->flags & skip)
             goto next;
@@ -89,12 +87,12 @@ void Sprite_RenderFlipAwareList(void)
         }
         if (!(p->flags & 64)) {
             s32 left;
-            register s32 top asm("r4");
-            register u32 width asm("r12");
-            register u32 height asm("r1");
-            register s32 bot asm("r0");
+            s32 top;
+            u32 width;
+            u32 height;
+            s32 bot;
             if (p->flags & 4) {
-                register s32 edge asm("r0") = x + resource->offsetX;
+                s32 edge = x + resource->offsetX;
                 left = edge - resource->width;
             } else {
                 left = x - resource->offsetX;

@@ -45,12 +45,11 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -188,7 +187,6 @@ void Player_UpdateRecoilMotion(struct Player *p)
         register u32 dummy asm("r1");
         u32 off270;
         u16 *q270;
-        asm("" : "=r"(dummy));
         off270 = 0x270;
         q270 = (u16 *)((u8 *)p + off270);
         asm("" ::"r"(dummy));

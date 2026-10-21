@@ -46,7 +46,7 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
         u32 *seed;
         register u32 i asm("r1");
         u32 mask;
-        register struct SpParticle *sprite asm("r4");
+        struct SpParticle *sprite;
 
         p->active = 1;
         table = gUnk_0203B400;

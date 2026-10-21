@@ -17,8 +17,8 @@ void SceneHud_TickActionResult(struct SceneHudState *s)
     }
     frame = s->actionTransferDelay;
     {
-        register s32 mask asm("r1") = 7;
-        register s32 phase asm("r2");
+        s32 mask = 7;
+        s32 phase;
         asm("" : "+r"(mask));
         phase = mask;
         phase &= frame;

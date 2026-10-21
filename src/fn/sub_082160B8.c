@@ -74,9 +74,7 @@ void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 
     {
         register u16 *g asm("r2") = &gUnk_03004BD8;
         register u16 cur asm("r1");
-        asm("" : "+r"(g));
         cur = *g;
-        asm("" : "+r"(cur));
         *g = cur | bits;
     }
 skip:

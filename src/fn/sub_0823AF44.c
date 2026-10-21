@@ -113,8 +113,8 @@ void KeyframeActor_InitAuxiliarySprite(u8 *arg)
 {
     u8 *p = arg;
     void *data = p + 0x198;
-    register void *sequence asm("r8");
-    register struct Render *render asm("r6");
+    void *sequence;
+    struct Render *render;
     u32 zero;
     struct Frames *frames;
     AnimData_Load(data, 0xD495);
@@ -128,7 +128,7 @@ void KeyframeActor_InitAuxiliarySprite(u8 *arg)
         u32 value = *(u16 *)(p + 0x30);
         *(s16 *)(p + 0x168) = value;
         {
-            register u32 y asm("r0") = *(u16 *)(p + 0x32);
+            u32 y = *(u16 *)(p + 0x32);
             *(s16 *)(p + 0x16A) = y;
         }
         value = *(u16 *)(p + 0x34);

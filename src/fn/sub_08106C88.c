@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "region_actor.h"
 
@@ -35,16 +34,14 @@ s32 RegionActorPool_DestroyActors(struct RegionActorPool *pool)
                 SceneBody_Unregister(actor->overlay);
             }
             {
-                register u32 m20 asm("r2") = 0x20;
+                u32 m20 = 0x20;
                 u32 *flags;
-                register u32 *t asm("r1");
+                u32 *t;
                 u32 v;
-                asm("" : "+r"(m20));
                 t = &actor->behaviorFlags;
                 v = *t;
                 v &= m20;
                 flags = t;
-                asm("" : "+r"(flags));
                 if (TestFlagsValue(v)) {
                     TerrainModifiers_UnregisterCell(actor->resource);
                     {

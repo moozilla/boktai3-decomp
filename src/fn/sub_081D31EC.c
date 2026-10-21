@@ -85,13 +85,11 @@ u32 sub_081D31EC(u8 *p)
     for (i = 39; i >= 0; i--, e = (struct CloudParticle *)((u8 *)e + 0x48)) {
         if (e->kind) {
             register u32 value asm("r0") = e->timer + 1;
-            register u32 zero asm("r6");
+            u32 zero;
             register u32 mask asm("r3");
             zero = 0;
-            asm("" : "+r"(zero));
             e->timer = value;
             mask = 0xff;
-            asm("" : "+r"(mask), "+r"(value));
             if ((u8)value >= gUnk_086126C8[e->frame]) {
                 e->timer = zero;
                 value = e->frame + 1;

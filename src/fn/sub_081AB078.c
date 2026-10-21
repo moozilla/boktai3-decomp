@@ -110,13 +110,11 @@ static inline s32 Scale8(s32 n)
 
 void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
 {
-    register s32 savedFrame asm("sl") = frame;
+    s32 savedFrame = frame;
     struct Vanargand *self = p;
-    register u8 *animation asm("sb");
+    u8 *animation;
     s16 first[4];
-    asm("" : "+r"(self) : "r"(savedFrame));
     animation = p->animation;
-    asm("" : : "r"(animation));
     {
         u32 mask = 4;
         p->flags |= mask;
@@ -153,9 +151,8 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 r |= g << 5;
                 r |= b << 10;
                 {
-                    register u16 *pal asm("r1");
-                    register u32 color asm("r0") = (u16)r;
-                    asm("" : : "r"(color));
+                    u16 *pal;
+                    u32 color = (u16)r;
                     // Keep the second palette address independently rematerializable.
                     pal = (u16 *)VANARGAND_PALETTE_ADDR;
                     asm("" : : "r"(pal), "r"(color));

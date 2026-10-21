@@ -39,7 +39,7 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
         if (actor->groundHeight2BE < height) {
-            register s32 zero asm("r2");
+            s32 zero;
             s32 off = 0x2EC;
             register s16 *x asm("r1") = (s16 *)((u8 *)actor + off);
             s32 value = -*x;

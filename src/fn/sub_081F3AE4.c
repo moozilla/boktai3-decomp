@@ -60,24 +60,21 @@ void SceneActorAnimation_UpdateDiveApproach(ActorAnimation *p, int tick)
     if (p->changed) {
         p->changed = 0;
         {
-            register int off asm("r2") = 0x34c;
+            int off = 0x34c;
             u8 *data;
             u8 *anim;
-            asm("" : "+r"(off));
             data = (u8 *)p + off;
             anim = p->animation;
             SceneActors_StartDirectionalAnimation(p, data, anim, 0x14, 1, 4, 4);
         }
         PolarInterpolation_SetCurrentFromPoint(p->polar, (u8 *)p + 0x54);
         {
-            register int off2 asm("r2") = 0xe5c;
+            int off2 = 0xe5c;
             u8 *dst;
             u16 *count;
-            asm("" : "+r"(off2));
             dst = (u8 *)p + off2;
             {
-                register int off3 asm("r0") = 0xe6c;
-                asm("" : "+r"(off3));
+                int off3 = 0xe6c;
                 count = (u16 *)((u8 *)p + off3);
             }
             sub_082222BC(p->polar, dst, *count);
@@ -90,10 +87,9 @@ void SceneActorAnimation_UpdateDiveApproach(ActorAnimation *p, int tick)
         }
     } else {
         {
-            register int off asm("r2") = 0x34c;
+            int off = 0x34c;
             u8 *data;
             u8 *anim;
-            asm("" : "+r"(off));
             data = (u8 *)p + off;
             anim = p->animation;
             SceneActors_StartDirectionalAnimation(p, data, anim, 0x14, 1, 4, 1);

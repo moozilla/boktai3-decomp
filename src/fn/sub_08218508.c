@@ -50,7 +50,7 @@ static inline s32 divide2(s32 input)
 void SpriteOam_QueueFlaggedProjectedSprites(void)
 {
     struct Vec pos;
-    register struct Drawable *p asm("r4");
+    struct Drawable *p;
     s32 *matrixCount;
     u32 parity = gUnk_03003A50 & 1;
     u32 skip = 0x401;
@@ -61,12 +61,12 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         return;
     matrixCount = &gUnk_03004BA0;
     do {
-        register s32 x asm("r2"), y asm("r3");
-        register s32 z asm("r9");
-        register u32 flags asm("r6");
-        register u32 attr asm("r5");
+        s32 x, y asm("r3");
+        s32 z;
+        u32 flags;
+        u32 attr;
         s32 depth;
-        register s32 ox asm("r12"), oy asm("r8");
+        s32 ox, oy asm("r8");
         u32 initialFlags = p->flags;
         if (initialFlags & skip)
             goto next;
@@ -76,7 +76,7 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         if (!(initialFlags & 16)) {
             {
                 register struct Vec *out asm("r5") = &pos;
-                register struct Vec *in asm("r6") = &p->pos;
+                struct Vec *in = &p->pos;
                 s32 depth, height, y, z;
                 s32 sx = p->pos.x, sz = in->z;
                 out->x = project(sx - sz);
@@ -97,7 +97,7 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             z = p->pos.z;
         }
         {
-            register u32 loaded asm("r1") = p->flags;
+            u32 loaded = p->flags;
             u32 cull = loaded & 64;
             flags = loaded;
             ox = p->offsetX;
@@ -114,7 +114,7 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         depth = z;
         x &= 511;
         {
-            register u32 shifted asm("r0") = x << 16;
+            u32 shifted = x << 16;
             attr = p->attributes | shifted;
         }
         y &= 255;

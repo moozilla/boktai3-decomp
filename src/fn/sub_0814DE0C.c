@@ -25,13 +25,11 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
         if (p) {
             u32 flags;
             {
-                register u32 off asm("r1");
-                register u32 *fp asm("r0");
+                u32 off;
+                u32 *fp;
                 asm("" ::: "r1");
                 off = 0x444;
-                asm("" : "+r"(off));
                 fp = (u32 *)((u8 *)p + off);
-                asm("" : "+r"(fp));
                 flags = DisplayFlags(fp, 0x10000000);
             }
             selection = 7;

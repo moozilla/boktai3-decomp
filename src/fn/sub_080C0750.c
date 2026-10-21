@@ -60,10 +60,9 @@ void SceneActorApproach_RunTimedAction(struct SceneActorRegistryResetView *actor
         register u8 zero8 asm("r3");
         register u32 zero asm("r5");
         u32 flags = 0x100;
-        register u32 off asm("r1") = 0x2D4;
+        u32 off = 0x2D4;
         register u16 *flagptr asm("r2");
         u32 value;
-        asm("" : "+r"(off));
         flagptr = (u16 *)((u8 *)actor + off);
         value = *flagptr;
         zero8 = 0;

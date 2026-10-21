@@ -31,18 +31,16 @@ void ParticleBurst_EmitOrbitParticle(struct Burst *, struct BurstVector *);
 void sub_08236F48(struct Burst *p)
 {
     if (p->active) {
-        register u32 limit asm("r2");
+        u32 limit;
         register u32 l0 asm("r0") = p->limit2A;
-        register u32 tm asm("r1") = p->timer;
-        register u32 ta asm("r0"), tb asm("r1");
+        u32 tm = p->timer;
+        u32 ta, tb asm("r1");
         asm("" : "+r"(l0));
         limit = l0;
         if (tm < limit && p->variant != p->parent->variant)
             p->timer = limit;
         ta = ++p->timer << 16;
-        asm("" : "+r"(ta));
         tb = limit << 16;
-        asm("" : "+r"(tb));
         if (ta < tb) {
             ParticleBurst_AdvanceFrame(p->sprite);
             p->position = p->parent->position;

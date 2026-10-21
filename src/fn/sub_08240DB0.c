@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 void Player_SetTetherMode(struct Player *, u32, u32);
@@ -11,7 +10,7 @@ void sub_0823C280(struct Player *);
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 void Player_UpdateDefeatSequence(struct Player *p)
 {
-    register s32 phase asm("r4");
+    s32 phase;
     Player_SetSecondaryActionFlags(p, 4);
     phase = p->tetherPhase;
     switch (phase) {
