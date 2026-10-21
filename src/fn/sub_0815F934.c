@@ -38,10 +38,10 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
     }
     if (i < 16) {
         {
-            register const u16 *randomTable asm("r6");
-            register u32 *randomIndex asm("r5");
-            register u32 range asm("r4");
-            register u32 mask asm("r3");
+            const u16 *randomTable;
+            u32 *randomIndex;
+            u32 range;
+            u32 mask;
             register u32 index asm("r1");
             p = &effect->particles[i];
             p->flags &= ~1;

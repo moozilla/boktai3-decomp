@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 extern u8 *gUnk_030042E4;
 
@@ -39,14 +38,14 @@ void Sprite_Init(void *, void *, u32);
 void sub_082366A8(struct GlowUnit *p, struct GlowVector *pos)
 {
     struct GlowSprite *sprite = &p->sprite;
-    register u32 variant asm("r6");
+    u32 variant;
     u32 id;
     struct GlowAnim *anim;
     u16 *c;
-    register u16 *start asm("r2");
-    register u16 *lo asm("r1");
-    register u32 fill asm("r3");
-    register u8 *flag asm("r6");
+    u16 *start;
+    u16 *lo;
+    u32 fill;
+    u8 *flag;
     if (p->kind == 0) {
         variant = 0;
         id = 0xA2;

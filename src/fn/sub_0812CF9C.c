@@ -16,7 +16,7 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
     /* The original materializes this dead literal across its inlined RNG.
      * Keep the defined value live only for register-allocation matching. */
     register u32 opaque asm("r12") = 0x0403b714;
-    register const u16 *table asm("r4") = gUnk_0203B400;
+    const u16 *table = gUnk_0203B400;
     struct ContactPosition velocity;
     struct ContactPosition *v;
     s32 angle;

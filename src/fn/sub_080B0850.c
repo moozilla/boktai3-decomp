@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
@@ -59,7 +58,7 @@ void SceneActorPhase_BeginTimedMotion(struct SceneActorRegistryResetView *p)
                 *flags &= mask;
             }
             {
-                register u16 duration asm("r4");
+                u16 duration;
                 u32 *word104 = &p->word104;
                 u32 handler = (u32)Vorn_UpdateApproachRange;
                 duration = 40;

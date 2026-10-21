@@ -104,21 +104,16 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         tile->flags |= mask;
     }
     {
-        register u32 off asm("r1") = 0x2B2;
-        register u8 *q asm("r0");
-        register u32 v asm("r1");
-        asm("" : "+r"(off));
+        u32 off = 0x2B2;
+        u8 *q;
+        u32 v;
         q = (u8 *)actor + off;
-        asm("" : "+r"(q));
         v = *q;
         prepared = q;
-        asm("" : "+r"(v));
         t = v ? ({
-            register u32 z asm("r0") = 0;
-            register u8 *pp asm("r5");
-            asm("" : "+r"(z));
+            u32 z = 0;
+            u8 *pp;
             pp = prepared;
-            asm("" : "+r"(pp));
             *pp = z;
             1;
         })
@@ -127,8 +122,7 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
     asm("" : "+r"(t));
     queued = t;
     if (queued) {
-        register u32 off asm("r1") = 0x320;
-        asm("" : "+r"(off));
+        u32 off = 0x320;
         ActorShadow_Disable((u8 *)actor + off);
     } else if (frame > 0x1A) {
         void *callback;

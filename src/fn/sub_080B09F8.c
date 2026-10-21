@@ -19,8 +19,8 @@ void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorAnimationLink *link = p->context;
     if (SceneActorControl_TakeFlag(&p->field2B1)) {
-        register u32 mask0 asm("r0") = 0x100;
-        register u16 *flags0 asm("r2") = &p->flags2D4;
+        u32 mask0 = 0x100;
+        u16 *flags0 = &p->flags2D4;
         register u16 old asm("r1") = *flags0;
         u16 shortZero = 0;
         u32 zero = 0;

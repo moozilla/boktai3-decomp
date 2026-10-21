@@ -13,17 +13,17 @@ void ActorShadow_Enable(void *);
 
 static inline u8 *offsetR1(u8 *p, u32 off)
 {
-    register u32 offset asm("r1") = off;
+    u32 offset = off;
     return p + offset;
 }
 static inline u8 *offsetR2(u8 *p, u32 off)
 {
-    register u32 offset asm("r2") = off;
+    u32 offset = off;
     return p + offset;
 }
 static inline void setCollider(u8 *p)
 {
-    register u16 *ptr asm("r2") = (u16 *)(p + 0x236);
+    u16 *ptr = (u16 *)(p + 0x236);
     register u32 value asm("r1") = *ptr;
     register u32 mask asm("r0") = 4;
     *ptr = mask | value;

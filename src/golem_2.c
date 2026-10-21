@@ -101,8 +101,8 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(0x13E);
         {
             u16 *flags = (u16 *)((u8 *)actor + 0x13A);
-            register u32 value asm("r1") = *flags;
-            register u32 mask asm("r0") = 4;
+            u32 value = *flags;
+            u32 mask = 4;
             asm("" : "+r"(value), "+r"(mask));
             *flags = mask | value;
         }

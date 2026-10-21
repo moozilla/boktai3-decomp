@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -180,8 +179,7 @@ void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
     }
     destination->y = CellHeight(destination, CellIndex(destination));
     {
-        register u32 routeMask asm("r8") = 0x200;
-        asm("" : "+r"(routeMask));
+        u32 routeMask = 0x200;
         (*(struct ContactPosition **)((u8 *)group + routeMask))->pad = 0;
         if (!Chase(actor, group, routeMask))
             Callback_InvokeActor(actor, group->failure);

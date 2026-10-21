@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 extern const s16 gUnk_086149C4[];
@@ -39,7 +38,7 @@ s32 sub_081DAD94(u8 direction, s32 index)
     struct Task4E01 *task = ResourceRegistry_GetResource(0x4E01);
     struct Entry4E01 *entry;
     struct Flight *params;
-    register s32 dir asm("r4");
+    s32 dir;
     s32 speed;
     s16 *v;
     s32 angle;
@@ -59,11 +58,10 @@ s32 sub_081DAD94(u8 direction, s32 index)
     angle = params->c;
     speed = params->d;
     {
-        register s32 sv asm("r1");
-        register u32 zero asm("r0");
+        s32 sv;
+        u32 zero;
         sv = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
         zero = 0;
-        asm("" : "+r"(zero));
         v[0] = sv;
         v[1] = zero;
     }

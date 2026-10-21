@@ -31,7 +31,6 @@ static inline s32 Query(struct MotionPosition *p)
 static inline s32 Offset(s32 z)
 {
     s32 offset = z + 96;
-    asm("" : "+r"(offset));
     return offset;
 }
 // confidence=low: resolves glove and actor motion against terrain clearance and depth limits.
@@ -74,7 +73,7 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
     }
     bits = Terrain_GetCellHighByte(&next);
     {
-        register u32 source asm("r2") = bits;
+        u32 source = bits;
         register u32 mask asm("r3");
         asm("" : "+r"(source));
         flags = source;

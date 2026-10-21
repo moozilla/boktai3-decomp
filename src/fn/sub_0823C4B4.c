@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 83.3% (register-pinned w); open: -1 is materialized via movs/rsbs into ip and loop pointer in r1

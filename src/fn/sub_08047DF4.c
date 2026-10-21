@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "directional_particles.h"
 extern u32 gUnk_03005308;
 s32 DirectionalParticle_Update(void *, struct DirectionalParticle *);

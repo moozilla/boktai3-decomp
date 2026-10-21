@@ -23,7 +23,6 @@ void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
         asm("" : "+r"(component));
     } else {
         component = (u16 *)&slot->position.z;
-        asm("" : "+r"(component));
     }
     *component -= 3;
     if (++slot->timer > 19) {

@@ -4,6 +4,8 @@
   progress.py            human-readable summary
   progress.py --json F   objdiff v2 report for decomp.dev
   progress.py --markdown F   PROGRESS.md tracker (per-region bars)
+  progress.py --list-pinned  TSV of matched functions that use register pins or
+                             asm hints (the Register-pinned category), for cleanup
 """
 import argparse
 import csv
@@ -13,7 +15,7 @@ import re
 import sys
 
 from romlib import ROOT
-from split import c_functions, nonmatching_functions, function_nonentries
+from split import c_functions, nonmatching_functions, function_nonentries, split_nonmatching
 
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
@@ -242,37 +244,107 @@ MARK = "// MATCHING_CONCESSION: register-pinning"
 HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""')
 
 
-def hinted_functions(text, names):
-    """Functions of a unit that use register pins or asm barriers, directly or
-    through a static helper that does (a unit-wide marker is attributed so)."""
+def _bodies(text):
+    """{name: (is_static, item)} for the function definitions and
+    function-like macros of a C file or header."""
     from merge_unit import items
     bodies = {}
     for item in items(text):
+        m = re.match(r"#\s*define\s+(\w+)\(", item)
+        if m:
+            bodies[m.group(1)] = (True, item)
+            continue
         code = re.sub(r"^(\s*(//[^\n]*|/\*.*?\*/)\s*)+", "", item, flags=re.S)  # leading comments
-        m = re.match(r"(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", code, re.S)
+        m = re.match(r"(static\s+)?[A-Za-z_][\w\s\*]*?\b(\w+)\s*\([^;{]*\)\s*\{", code, re.S)
         if m:
             bodies[m.group(2)] = (bool(m.group(1)), item)
-    helpers = {n for n, (static, body) in bodies.items() if static and HINT.search(body)}
+    # "#define Name sub_XXXXXXXX" aliases, as split.c_functions reports them
+    for name, label in re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M):
+        if name in bodies:
+            bodies.setdefault(label, bodies[name])
+    return bodies
+
+
+def _hinted_helpers(bodies, known=frozenset()):
+    """Static helpers/macros that use hints, directly or via another such helper."""
+    helpers = set(known)
+    while True:
+        uses = re.compile(r"\b(" + "|".join(map(re.escape, helpers)) + r")\s*\(") if helpers else None
+        more = {n for n, (static, body) in bodies.items() if static and n not in helpers and
+                (HINT.search(body) or (uses and uses.search(body)))}
+        if not more:
+            return helpers
+        helpers |= more
+
+
+def header_helpers(roots=("include", "src")):
+    """Hinted static inline helpers and macros defined in headers."""
+    bodies = {}
+    for root in roots:
+        for path in sorted((Path(ROOT) / root).rglob("*.h")):
+            bodies.update(_bodies(path.read_text()))
+    return _hinted_helpers(bodies)
+
+
+def hinted_functions(text, names, shared=frozenset()):
+    """Functions of a unit that use register pins or asm barriers, directly or
+    through a static helper (in the unit or a header) that does."""
+    bodies = _bodies(text)
+    helpers = _hinted_helpers(bodies, shared)
     uses = re.compile(r"\b(" + "|".join(map(re.escape, helpers)) + r")\s*\(") if helpers else None
     return [n for n in names if n in bodies and (HINT.search(bodies[n][1]) or
                                                (uses and uses.search(bodies[n][1])))]
 
 
+HINT_KINDS = [
+    ("pin", re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)')),
+    ("clobber", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""[^;]*:\s*"(?:r\d+|sl|fp|ip|lr)"')),
+    ("operand", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*:[^;:]*\(')),
+    ("barrier", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*(?:\)|:\s*:\s*:\s*"memory")')),
+]
+
+
+def hint_kinds(text):
+    return [k for k, r in HINT_KINDS if r.search(text)]
+
+
 def collect_pinned(funcs, source_root):
+    """Matched functions that rely on register pins or empty asm() hints
+    (barriers, "+r"/"r" operands, "rN"/"memory" clobbers), directly or through
+    a static helper or macro in the unit or a header. Detected from the source
+    itself, outside NONMATCHING drafts, so a missing MATCHING_CONCESSION marker
+    does not hide one."""
     aliases = {f"sub_{a:08X}": n for n, a in funcs}
+    shared = header_helpers()
     pinned = set()
     for path in Path(source_root).rglob("*.c"):
-        text = path.read_text()
-        if MARK not in text:
-            continue
-        # A one-function file is pinned by its marker. In a multi-function unit
-        # the functions using pins or barriers (directly or via a static helper).
+        text, _ = split_nonmatching(path.read_text())
         names = c_functions(path, with_asm=False)
-        if len(names) > 1:  # in a unit, the hints themselves say which functions
-            pinned.update(aliases.get(n, n) for n in hinted_functions(text, names))
-        else:
-            pinned.update(aliases.get(n, n) for n in names)
+        pinned.update(aliases.get(n, n) for n in hinted_functions(text, names, shared))
     return pinned
+
+
+def list_pinned(funcs, sizes, pinned, source_root):
+    """name, address, bytes, hint kinds and file of each pinned function. Kinds:
+    pin = register asm("rN"), operand = asm("" : "+r"(x)) etc., clobber =
+    asm("" ::: "rN"), barrier = asm("") / "memory", helper = only through a
+    hinted static helper or macro."""
+    addr = dict(funcs)
+    aliases = {f"sub_{a:08X}": n for n, a in funcs}
+    shared = header_helpers()
+    rows = []
+    for path in sorted(Path(source_root).rglob("*.c")):
+        text, _ = split_nonmatching(path.read_text())
+        bodies = _bodies(text)
+        for n in c_functions(path, with_asm=False):
+            name = aliases.get(n, n)
+            if name in pinned:
+                kinds = hint_kinds(bodies[n][1]) if n in bodies else []
+                rows.append((sizes[name], name, addr[name], ",".join(kinds) or "helper",
+                             path.relative_to(ROOT)))
+    print("name\taddress\tbytes\tkinds\tfile")
+    for size, name, a, kinds, path in sorted(rows):
+        print(f"{name}\t{a:08X}\t{size}\t{kinds}\t{path}")
 
 
 def measures(total_b, done_b, count, done_count, *, units=None, complete_units=None, fuzzy_b=None):
@@ -406,6 +478,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", metavar="FILE")
     parser.add_argument("--markdown", metavar="FILE")
+    parser.add_argument("--list-pinned", action="store_true",
+                        help="print matched functions that use pins/asm hints, smallest first")
     parser.add_argument("--inventory", type=Path, default=INVENTORY)
     parser.add_argument("--refresh-inventory", metavar="ASSEMBLY", type=Path,
                         help="locally export address-only metadata from gen/code_sym.s")
@@ -424,6 +498,9 @@ def main():
             parser.error("progress inventory differs from generated function boundaries")
     done = collect_done(funcs, Path(ROOT) / "src")
     pinned = collect_pinned(funcs, Path(ROOT) / "src") & done
+    if args.list_pinned:
+        list_pinned(funcs, sizes, pinned, Path(ROOT) / "src")
+        return
     asm = intentional_asm(funcs, done, load_asm_ranges())
     counted = [(n, a) for n, a in funcs if n not in asm]
     total_b = sum(sizes[n] for n, _ in counted)

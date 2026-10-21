@@ -48,7 +48,7 @@ void Player_ApplyDirectionalForce(struct Player *p)
     x = gSineTable[(direction + 64) & 255];
     z = gSineTable[direction & 255];
     {
-        register s32 scaledX asm("r3");
+        s32 scaledX;
         scaledX = Player_ScaleForce(gForceMagnitude * x);
         p->velocityX -= scaledX;
     }

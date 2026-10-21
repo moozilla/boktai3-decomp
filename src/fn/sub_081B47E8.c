@@ -33,9 +33,8 @@ void Vanargand_UpdatePartFlashFade(u8 *boss, struct VanargandFadePartState *p, s
     }
     {
         register u32 offset asm("r1") = 0x164;
-        register u32 *statePtr asm("r0");
+        u32 *statePtr;
         u32 value;
-        asm("" : "+r"(offset));
         statePtr = (u32 *)((u8 *)p + offset);
         value = *statePtr;
         switch (value) {
@@ -43,17 +42,15 @@ void Vanargand_UpdatePartFlashFade(u8 *boss, struct VanargandFadePartState *p, s
                 Palette_InterpolateBanks(q->palette, *(void **)((u8 *)p + 0x190),
                                          *(void **)((u8 *)p + 0x198), frame, 7);
                 if (frame & mask) {
-                    register u32 next asm("r0") = 1;
-                    register u32 off asm("r2") = 0x164;
+                    u32 next = 1;
+                    u32 off = 0x164;
                     register u32 *state asm("r1");
-                    asm("" : "+r"(next), "+r"(off));
                     state = (u32 *)((u8 *)p + off);
                     *state = next;
                     {
-                        register u32 off2 asm("r3") = 0x168;
-                        asm("" : "+r"(off2));
+                        u32 off2 = 0x168;
                         {
-                            register u32 *ptr asm("r1") = (u32 *)((u8 *)p + off2);
+                            u32 *ptr = (u32 *)((u8 *)p + off2);
                             *ptr = 0;
                         }
                     }

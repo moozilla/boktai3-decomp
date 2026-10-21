@@ -43,7 +43,6 @@ void Actor_PlayFootstepSound(struct StepActor *actor, u32 mode)
         else if (f[1] == frame) {
             const u16 *t = (const u16 *)gUnk_086055D4;
             u32 s = info->sound << 2;
-            asm volatile("" : "+r"(s));
             t += 1;
             Sound_PlaySong(*(u16 *)((u8 *)t + s));
         }

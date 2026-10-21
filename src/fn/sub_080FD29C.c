@@ -24,7 +24,7 @@ void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
     if (actor->field2B0) {
         u32 z3, z4;
         {
-            register u32 m asm("r1");
+            u32 m;
             register u32 v asm("r1");
             asm("" ::"m"(actor->flags2D4));
             m = ~0x100;

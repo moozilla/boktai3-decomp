@@ -59,7 +59,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
             *flags = 1;
         }
         {
-            register u32 off asm("r1") = 0xED6;
+            u32 off = 0xED6;
             register u8 *q asm("r0");
             asm("" : "+r"(off));
             q = state + off;

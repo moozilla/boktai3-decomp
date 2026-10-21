@@ -59,7 +59,7 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
         switch (tag->mode) {
             case 0: {
                 s32 dx, dz;
-                register struct ArcTag *t asm("r2");
+                struct ArcTag *t;
                 s32 v;
                 tag->field6 = zero;
                 dx = npc->targetX - tag->startX;
@@ -68,7 +68,6 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
                 pos[2] = tag->startZ + Div(tag->elapsed * dz, tag->duration);
                 v = 200 * gUnk_086149C4[Div(tag->elapsed << 7, tag->duration) & 0xff];
                 t = tag;
-                asm("" : "+r"(t));
                 pos[1] = tag->startY + trunc12(v);
                 if (tag->elapsed >= tag->duration) {
                     pos[1] = npc->targetY;

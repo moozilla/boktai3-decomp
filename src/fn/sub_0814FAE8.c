@@ -37,8 +37,8 @@ void Player_UpdateTransitionAnimation(struct Player *p)
             Player_SetAnimation(p, 0x160, 0x40, 1);
             {
                 u32 frame = p->tetherFrame;
-                register s32 mask asm("r1") = 7;
-                register s32 low asm("r2");
+                s32 mask = 7;
+                s32 low;
                 asm("" : "+r"(mask));
                 low = mask;
                 low &= frame;
@@ -59,8 +59,8 @@ void Player_UpdateTransitionAnimation(struct Player *p)
             Player_SetAnimation(p, 0x160, 0x40, 1);
             {
                 u32 frame = p->tetherFrame;
-                register s32 mask asm("r1") = 7;
-                register s32 low asm("r2");
+                s32 mask = 7;
+                s32 low;
                 asm("" : "+r"(mask));
                 low = mask;
                 low &= frame;

@@ -39,7 +39,7 @@ static inline u8 HasRecordInput(struct SceneMenu *p)
 }
 s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
 {
-    register u8 *record asm("r4");
+    u8 *record;
     register struct SceneMenu *p asm("r5") = object;
     s32 completed, i;
     record = (u8 *)p->records;

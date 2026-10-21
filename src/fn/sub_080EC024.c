@@ -27,7 +27,6 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
         register struct Player *volatile *g0 asm("r0") = gScenePlayers;
         struct Player *initial = g0[0];
         u32 mask = 0x10000;
-        asm("" : "+r"(g0));
         flags = initial->statusFlags;
         if (flags & mask)
             limit = 0x24000;

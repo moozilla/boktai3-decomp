@@ -29,20 +29,17 @@ static inline u32 HasActionFlag(struct Player *p, u32 mask)
     if (!p)
         return 0;
     {
-        register u32 *flags asm("r0") = &p->actionFlags;
-        register u32 bits asm("r1") = mask;
-        asm("" : "+r"(flags), "+r"(bits));
+        u32 *flags = &p->actionFlags;
+        u32 bits = mask;
         return *flags & bits;
     }
 }
 /* Keep the two input-field address lifetimes separate, as in the ROM. */
 static inline const u16 *InitialInput(struct Player *p)
 {
-    register u32 offset asm("r1") = 0x348;
-    register const u16 **field asm("r0");
-    asm("" : "+r"(offset));
+    u32 offset = 0x348;
+    const u16 **field;
     field = (const u16 **)((u8 *)p + offset);
-    asm("" : "+r"(field));
     return *field;
 }
 static inline const u16 *ReloadInput(struct Player *p)
@@ -51,19 +48,16 @@ static inline const u16 *ReloadInput(struct Player *p)
     asm("" : "+r"(offset));
     {
         register const u16 **field asm("r0") = (const u16 **)((u8 *)p + offset);
-        asm("" : "+r"(field));
         return *field;
     }
 }
 static inline s32 HistoryHead(struct Player *p)
 {
-    register u32 offset asm("r2") = 0x34C;
-    register u16 *field asm("r0");
+    u32 offset = 0x34C;
+    u16 *field;
     s32 v;
-    asm("" : "+r"(offset));
     field = (u16 *)((u8 *)p + offset);
     v = (s16)field[0];
-    asm("" ::"r"(offset));
     return v;
 }
 static inline u32 IsSceneFive(struct Player *p)
@@ -188,7 +182,7 @@ s32 Player_SelectActionSequence(struct Player *p)
             if (keys[1] & 0x200) {
                 register u32 amoff asm("r2") = 0x418;
                 register u8 *amp asm("r0");
-                register u32 am asm("r1");
+                u32 am;
                 register u32 sgoff asm("r3");
                 register u8 *sgp asm("r0");
                 u32 sg;
@@ -207,7 +201,6 @@ s32 Player_SelectActionSequence(struct Player *p)
                     Sound_PlaySong(402);
                     goto end;
                 }
-                asm("" ::"r"(am));
                 if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
                     PlayerBarrier_Hide(p->actionRequestEffect);
                     goto end;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct SceneVolumeOwner {
     u8 pad0[0x418];
@@ -18,21 +17,19 @@ struct SceneVolume {
 };
 s32 SceneVolume_CanActivate(struct SceneVolume *volume)
 {
-    register u32 o asm("r1");
-    register u8 *q asm("r0");
+    u32 o;
+    u8 *q;
     if (!(volume->mode == 2 || volume->mode == 10))
         return 0;
     if (volume->phase != 4)
         return 0;
     o = 0x464;
-    asm("" : "+r"(o));
     q = (u8 *)volume + o;
     if (!(*(u32 *)q & 7))
         return 0;
     if (volume->owner->disabled)
         return 0;
     o = 0x473;
-    asm("" : "+r"(o));
     q = (u8 *)volume + o;
     if (*q)
         return 0;

@@ -40,13 +40,11 @@ void Vorn_UpdateScriptedAction(u8 *obj)
             ((u8 *)obj)[off = field] = code;
             {
                 register void **q asm("r0") = (void **)(obj + 0x21C);
-                asm("" : "+r"(q));
                 *q = (void *)fn;
             }
             field += 0x13;
             {
                 register u16 *hh asm("r0") = (u16 *)(obj + field);
-                asm("" : "+r"(hh));
                 *hh = zero;
             }
         } while (0);

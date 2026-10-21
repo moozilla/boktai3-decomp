@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 85.5%

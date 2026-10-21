@@ -39,20 +39,19 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 {
     register u32 so asm("r3") = 0x164;
     register u32 *sp asm("r0");
-    register u32 *tp asm("r1");
+    u32 *tp;
     asm("" : "+r"(so));
     sp = (u32 *)((u8 *)p + so);
     *sp = state;
     {
-        register u32 to asm("r0") = 0x168;
-        asm("" : "+r"(to));
+        u32 to = 0x168;
         tp = (u32 *)((u8 *)p + to);
         *tp = 0;
     }
 }
 static inline void Offset(struct SceneVec *v, s32 x, s32 z)
 {
-    register s16 *component asm("r1") = &v->x;
+    s16 *component = &v->x;
     register s32 first asm("r2");
     register s32 second asm("r3");
     register s32 value asm("r0");
@@ -94,7 +93,6 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
             {
                 register u32 off asm("r2") = 0x168;
                 u32 *t, v;
-                asm("" : "+r"(off));
                 t = (u32 *)((u8 *)p + off);
                 v = ++*t;
                 asm("" : : "r"(off));

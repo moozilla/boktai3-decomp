@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 void Slime_UpdateStill(void);
 void sub_08090724(void *);
@@ -40,7 +39,6 @@ void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
         v = (struct SlimeVelocity *)((u8 *)actor + 0x2EC);
         heading = *hp;
         speed = 0x12;
-        asm("" : "+r"(speed));
         v->x = Shift12(gUnk_086149C4[(heading + 0x40) & 0xFF] * speed);
         v->y = 0;
         v->z = Shift12(gUnk_086149C4[heading] * speed);

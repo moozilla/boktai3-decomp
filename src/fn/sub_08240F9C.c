@@ -191,38 +191,30 @@ void Player_UpdateChargeSpin(struct PRecover *p)
         asm("" : "+r"(off));
         {
             register u8 *a asm("r0") = (u8 *)p + off;
-            asm("" : "+r"(a));
             pal = *(void **)a;
         }
-        asm("" : "+r"(pal));
         bank = 0x16F;
-        asm("" : "+r"(bank));
         AnimData_SelectPaletteBank(pal, bank);
     }
     {
         register u32 ot asm("r0") = 0x45A;
-        register u16 *tp asm("r1");
+        u16 *tp;
         register u32 t asm("r0");
         asm("" : "+r"(ot));
         tp = (u16 *)((u8 *)p + ot);
         t = *tp + 1;
         *tp = t;
         t = (u16)t;
-        asm("" : "+r"(t));
         if (t > 0x1F) {
-            register u32 o1 asm("r2") = 0x464, o2 asm("r0");
-            register u8 *a1 asm("r1");
+            u32 o1 = 0x464, o2 asm("r0");
+            u8 *a1;
             register u32 v asm("r0");
-            asm("" : "+r"(o1));
             a1 = (u8 *)p + o1;
             v = 1;
-            asm("" : "+r"(v));
             *a1 = v;
             o2 = 0x465;
-            asm("" : "+r"(o2)::"r2");
             a1 = (u8 *)p + o2;
             v = 4;
-            asm("" : "+r"(v));
             *a1 = v;
             Player_SetTetherMode(p, 0, 0);
         }

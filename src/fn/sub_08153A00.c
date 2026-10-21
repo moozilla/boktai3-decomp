@@ -174,16 +174,14 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
             p->dir = p->finalDir;
             p->finalDir = -1;
         } else {
-            register u32 d asm("r1");
+            u32 d;
             register s32 t asm("r0");
             register u8 *q;
             t = (u16)angle + 112;
             asm("" : "+r"(t));
             t >>= 5;
             d = t & 7;
-            asm("" : "+r"(d));
             q = &p->dir;
-            asm("" : "+r"(q));
             *q = d;
         }
         if (p->dir > 4) {
@@ -227,17 +225,15 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
             }
         }
         {
-            register u32 dir asm("r2");
+            u32 dir;
             register u32 d2 asm("r1");
             register s32 t asm("r0");
             t = (u16)angle + 112;
             asm("" : "+r"(t));
             t >>= 5;
             d2 = t & 7;
-            asm("" : "+r"(d2));
             {
                 u8 *q = &p->dir;
-                asm("" : "+r"(q));
                 dir = d2;
                 *q = d2;
             }
@@ -249,9 +245,7 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
                 u8 *fq;
                 p->facing = d2;
                 fq = &p->flip;
-                asm("" : "+r"(fq));
                 z = 0;
-                asm("" : "+r"(z));
                 *fq = z;
             }
         }

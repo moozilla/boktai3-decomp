@@ -16,8 +16,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -52,7 +52,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;

@@ -34,7 +34,7 @@ void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
     typeof(npc->sub20) *sub = &npc->sub20;
     u32 play = 0;
     if (npc->entered) {
-        register s32 a asm("r2");
+        s32 a;
         u32 two;
         u32 f;
         npc->entered = 0;
@@ -44,14 +44,12 @@ void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
         npc->angle65 = a;
         {
             register s32 t asm("r1") = (a + 0x70) >> 5;
-            register u32 m asm("r0") = 7;
-            asm("" : "+r"(m));
+            u32 m = 7;
             npc->bit2 = m & t;
         }
         {
-            register s32 t asm("r2") = (a + 0x60) >> 6;
-            register u32 m asm("r0");
-            asm("" : "+r"(t));
+            s32 t = (a + 0x60) >> 6;
+            u32 m;
             m = 3;
             m &= t;
             npc->bit1 = m;
