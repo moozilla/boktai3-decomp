@@ -3,7 +3,6 @@
 void Vanargand_UpdatePartCollision(void *boss, void *part);
 void sub_081A7204(void *part);
 void SceneAnimation_SelectSequence(void *, s32, s32, s32);
-#define Vanargand_UpdatePartAnimation sub_081A72E8
 void Vanargand_UpdatePartAnimation(void *boss, struct RouteSpriteActor *part)
 {
     u32 f = part->sprite.flags;
