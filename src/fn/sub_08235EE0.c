@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -44,14 +43,14 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
         struct SpParticle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        register u32 i asm("r1");
+        u32 i;
         u32 mask;
         struct SpParticle *sprite;
 
         p->active = 1;
         table = gUnk_0203B400;
         seed = &gUnk_03005308;
-        i = *seed + 1;
+        *(&i) = (*seed) + 1;
         mask = 1023;
         i &= mask;
         {
@@ -77,8 +76,9 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
         sprite->y = p->origin.y;
         sprite->z = p->origin.z + Scale12(p->radius * gUnk_086149C4[p->angle]);
         sprite->visible = 2;
-        if (++emitter->next > 11)
+        if ((++emitter->next) > 11) {
             emitter->next = 0;
+        }
         emitter->delay = 0;
         owner[0x13A] = 1;
     }
