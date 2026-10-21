@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.8%
-// foundry draft (worker best 90.8%); what differs is mostly register allocation and instruction order
 
 struct ChildGroupMember {
     u8 active;
@@ -9,8 +7,7 @@ struct ChildGroupMember {
 } __attribute__((packed));
 struct ChildGroup {
     u8 pad0[0x8D];
-    u8 inactive : 1;
-    u8 flags : 7;
+    u8 flags8D;
     u8 pad8E[4];
     u8 state92, state93;
     u8 pad94[0x546];
@@ -43,16 +40,19 @@ void ChildGroup_WaitForInactiveMembers(struct ChildGroup *p)
         }
     }
     if (active == 0) {
-        u16 one = 1;
-        p->state92 = one;
-        p->state93 = one;
-        p->inactive = 1;
+        register u16 one asm("r0") = 1;
+        register u8 *q asm("r1");
+        asm("" : "+r"(one));
+        q = &p->state92;
+        asm("" : "+r"(q));
+        *q = one;
+        q++;
+        asm("" : "+r"(q));
+        *q = one;
+        p->flags8D = one | p->flags8D;
         p->callbackCC8 = ChildGroup_BeginInactiveState;
     } else if (active < p->count) {
         if (++p->timer <= 7)
             p->callbackCE4 = ChildGroup_WaitForInactiveMembers;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ChildGroup_WaitForInactiveMembers);
-#endif
