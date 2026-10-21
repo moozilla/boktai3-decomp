@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #define gActorLayeredEndAnimations gUnk_0824EDE8
 #include "global.h"
 struct ActorAnimationLayer {
@@ -21,9 +20,10 @@ void ActorController_UpdateLayeredEnd(u8 *p)
         p[0xb41] = 1;
         {
             u16 *f = (u16 *)(p + 0xb32);
-            register u32 v asm("r1") = *f;
-            register u32 two asm("r0") = 2;
-            *f = two | v;
+            u32 v = *f;
+            u32 two = 2;
+            two |= v;
+            *f = two;
         }
         four = 4;
         ((struct ActorAnimationLayer *)(p + 0x238))->flags &= ~four;

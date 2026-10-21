@@ -1,14 +1,16 @@
 #include "staged_effect.h"
-// MATCHING_CONCESSION: register-pinning
 void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
 {
     u32 frame = effect->frame;
-    u32 nextFrame;
     if (frame - 10 <= 19 || frame - 60 <= 19) {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        register u32 index asm("r1") = (gUnk_03005308 + 1) & 0x3FF;
-        register u32 sample asm("r0") = random[index];
-        u32 mask = 31;
+        u32 index = (gUnk_03005308 + 1) & 0x3FF;
+        u32 sample;
+        u32 *new_var;
+        u32 mask;
+        new_var = &index;
+        *(&sample) = random[*new_var];
+        mask = 31;
         sample &= mask;
         sample -= 16;
         effect->shakeX = sample;
@@ -24,13 +26,10 @@ void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
     }
     if (effect->frame == 10 || effect->frame == 20 || effect->frame == 60 || effect->frame == 70)
         Sound_PlaySong(0xD3);
-    nextFrame = effect->frame;
-    if (nextFrame > 89) {
-        register u32 state asm("r1") = 7;
-        u16 *destination = &effect->state;
-        nextFrame = 0;
-        *destination = state;
+    if (effect->frame > 89) {
+        u32 state = 7;
+        effect->state = state;
+        effect->frame = 0;
     } else
-        nextFrame++;
-    effect->frame = nextFrame;
+        effect->frame++;
 }
