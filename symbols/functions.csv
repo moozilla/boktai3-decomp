@@ -3815,6 +3815,7 @@ addr,name,mode,confidence,source,notes
 080FC498,ActorPhase_UpdateFlicker,thumb,low,src-alias,
 080FC7F4,Axe_UpdateAttackColliderPositions,thumb,low,src-alias,Positions three pairs of colliders at the stored attack position and refreshes one collider per pair
 080FC844,Axe_ReleaseAuxiliarySprite,thumb,low,src-alias,Removes the auxiliary sprite and its three colliders plus associated resources
+080FC894,Axe_CopyAuxiliaryVector,thumb,low,src-alias,Copies an 8-byte vector into the axe auxiliary state
 080FC8B0,Axe_SetAuxiliarySpriteParameters,thumb,low,src-alias,Stores a halfword and word in the auxiliary sprite; parameter meanings are tentative
 080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,thumb,low,src-alias,
 080FCB3C,Axe_RemoveSecondaryColliders,thumb,low,src-alias,Removes two colliders from the axe auxiliary data
