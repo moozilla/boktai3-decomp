@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// Remaining differences: one zero-index register (r1 vs r2) in the first table load.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 extern u32 gUnk_03005308;
@@ -91,9 +88,11 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
             register const s16 *tab1 asm("r1") = gUnk_086149C4;
             register s32 vx asm("r1");
             register s16 *q asm("r0");
+            s32 t;
             asm("" : "+r"(tab1));
-            vx = Shift(tab1[angle], 6);
+            t = tab1[angle];
             asm("" ::"r"(tab1));
+            vx = Shift(t, 6);
             o1 = 0x2EC;
             asm("" : "+r"(o1));
             q = (s16 *)((u8 *)actor + o1);
@@ -138,7 +137,3 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
     }
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Bee_ReturnToPlayerWhenStopped);
-#endif
