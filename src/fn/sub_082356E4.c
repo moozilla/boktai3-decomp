@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.4%
 // Draft: effect timer tick (screen transition at 0, collider refresh, shake).
 // Open: the original recomputes the u16 extension of the counter for the second
 // compare, and loads the pause-flag word after building the mask.
@@ -38,12 +37,12 @@ void sub_082356E4(u8 *p)
     *q = n;
     if ((u16)n > 0x2f) {
         Task_Kill(p);
-    } else if ((u16)n <= 0xf) {
+    } else if (({
+                   asm("" : "+r"(n));
+                   (u16) n;
+               }) <= 0xf) {
         Camera_RequestShake(0x20);
     } else {
         Camera_RequestShake(0x30 - *q);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082356E4);
-#endif
