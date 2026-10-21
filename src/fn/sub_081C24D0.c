@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "directional_interaction.h"
 
 struct Dimensions {
@@ -26,8 +25,8 @@ void sub_081C24D0(u8 *p)
             {
                 u8 *slotAddr = (u8 *)(offset + (u32)p);
                 u8 *base;
-                *(u16 *)((u32)slotAddr + c + 0x10) = 0;
-                asm("" : "+r"(offset));
+                slotAddr += c;
+                *(u16 *)(slotAddr + 0x10) = 0;
                 base = p + offset;
                 *(struct Dimensions *)(base + 0x11c) = dimensions;
                 base = base + 0x107;
