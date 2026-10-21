@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.6%
 // foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
 struct SceneActorReactionContext {
     u8 unknown0[0x6D0];
@@ -45,7 +43,9 @@ static inline void And32(u32 *p, u32 mask)
 }
 static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
 {
-    p->flags = mask | p->flags;
+    u32 v = mask;
+    v |= p->flags;
+    p->flags = v;
 }
 static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
 {
@@ -57,11 +57,16 @@ void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorReactionContext *context = p->context;
     u8 active = HasReaction(p);
+    u32 v;
+    u16 *f;
     if (active) {
         Or16(&p->group.flags414, 4);
-        Or16(&p->flags2D4, 0x80);
+        v = 0x80;
+        f = &p->flags2D4;
+        v |= *f;
+        *f = v;
         p->group.field418 = p->group.field416;
-        if (Test16(&p->flags2D4, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->active) {
+        if (Test16(f, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->active) {
             if (!ContextBlocked(context))
                 Skeleton_SelectDistanceReaction(p);
         } else {
@@ -88,6 +93,3 @@ void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
         OrMotion((struct SceneActorReactionMotion *)&p->fieldDC, 8);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateGate);
-#endif
