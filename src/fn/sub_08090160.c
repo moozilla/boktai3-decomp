@@ -1,0 +1,76 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+
+#ifdef NONMATCHING
+// fuzzy: 86.6%
+// Remaining: constant/pointer register allocation (a/b hoists land in sb/r8 swapped, zero index reg).
+#define Slime_EmitDeathDebris sub_08090160
+struct Position {
+    s16 x, y, z, pad;
+};
+struct Actor {
+    u8 pad[0x1E0];
+    u16 a;
+    u8 pad2[4];
+    u16 b;
+};
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+extern const s16 gUnk_086149C4[];
+void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+static inline s32 Scale(s32 x)
+{
+    if (x >= 0)
+        return x >> 12;
+    return -((-x) >> 12);
+}
+static inline u16 Rand(void)
+{
+    const u16 *table = gUnk_0203B400;
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    index *= 2;
+    return *(const u16 *)((u32)table + index);
+}
+static inline void Polar(s32 angle, struct Position *v, s32 radius, u32 mask)
+{
+    v->x = Scale(gUnk_086149C4[(angle + 64) & mask] * radius);
+    v->y = 0;
+    v->z = Scale(gUnk_086149C4[angle & 255] * radius);
+}
+// confidence=low: death burst of three debris particles.
+#define BURST(v)                                                                                   \
+    {                                                                                              \
+        register u32 mask asm("r5") = 255;                                                         \
+        s32 angle;                                                                                 \
+        asm("" : "+r"(mask));                                                                      \
+        angle = Rand() & 255;                                                                      \
+        Polar(angle, &v, (Rand() & 15) + 6, mask);                                                 \
+        asm("" : : "r"(mask));                                                                     \
+    }
+void Slime_EmitDeathDebris(struct Actor *input)
+{
+    register struct Actor *p asm("r6") = input;
+    struct Position v;
+    u16 *a;
+    u16 *b;
+    u32 sum;
+    u8 *pos;
+    BURST(v)
+    v.y = 0x30;
+    a = &p->a;
+    b = &p->b;
+    asm("" : "+r"(b), "+r"(a));
+    sum = *a + *b;
+    pos = (u8 *)p + 0x5C;
+    sub_08127590(pos, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+    BURST(v)
+    v.y = 0x25;
+    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, *a + *b, 0, 0, 0, 0, 0, 0);
+    BURST(v)
+    v.y = 0x20;
+    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, *a + *b, 1, 0, 0, 0, 0, 0);
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08090160);
+#endif
