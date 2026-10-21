@@ -3210,6 +3210,7 @@ addr,name,mode,confidence,source,notes
 080A9688,TentacleActor_UpdateSegmentHeadings,thumb,low,src-alias,Points each active segment toward the preceding segment; actor identity is tentative
 080A9738,TentacleActor_ResetOscillation,thumb,low,src-alias,Resets the oscillation offset to zero and its direction to positive
 080A975C,SpritePool_ConsumeStateFlag,thumb,low,src-alias,
+080A97AC,TentacleActor_TargetMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and when state bit 0 is set copies its position and makes it the target
 080A985C,TentacleActor_ActivateMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and activates its associated object
 080A9910,TentacleActor_UpdateOscillation,thumb,low,src-alias,Advances the signed offset and reverses direction at either limit
 080A9970,TentacleActor_InitSegmentUpdateState,thumb,low,src-alias,Sets the segment update control byte to one; interpretation is tentative
