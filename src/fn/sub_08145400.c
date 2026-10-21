@@ -1,9 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
-// foundry draft (worker best 94.2%); what differs is mostly register allocation and instruction order
 #define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
 #define Player_SetSequenceCallback   Player_SetPendingCallback
 #define Player_ClearAnimationFlagTwo Player_OnFadeMotionExit
@@ -44,10 +41,9 @@ void Player_UpdateScaleTransition(struct Player *p)
         case 2:
             animation->flags &= ~1;
             {
-                s32 scale = p->tetherFrame;
-                p->tetherFrame++;
-                scale++;
-                if (p->tetherFrame <= 63) {
+                s32 n = p->tetherFrame + 1;
+                long long scale = n;
+                if ((p->tetherFrame = n) <= 63) {
                     p->movementSpeedScale = scale;
                     p->secondarySpeedScale = scale;
                 } else {
@@ -58,6 +54,3 @@ void Player_UpdateScaleTransition(struct Player *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateScaleTransition);
-#endif
