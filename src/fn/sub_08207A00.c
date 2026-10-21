@@ -1,7 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.4%
-// Remaining differences: branch sharing, address lifetimes and register allocation.
+// fuzzy: 97.6%
+// Remaining difference: reload spill-register rotation after the inline animation step
+// (offset temps for inert/terrainEnabled and the terrain cell use r1/r2/r3 one step early).
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 s32 Script_SeekToKeyword(s32);
@@ -60,18 +61,12 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         p->allowTurn = Script_GetValue();
         {
             u32 facing = (u8)(p->facing = (p->facing - 1) / 2);
-            asm("" : "+r"(facing));
-            switch (facing) {
-                case 0:
-                case 1:
-                    p->facing = 0;
-                    break;
-                case 2:
-                case 3:
-                default:
-                    p->facing = 1;
-                    break;
-            }
+            if (facing > 3)
+                p->facing = 1;
+            else if (facing <= 1)
+                p->facing = 0;
+            else
+                p->facing = 1;
         }
     } else {
         p->facing = 1;
@@ -152,7 +147,6 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     }
     if (p->delayScript)
         VulcanCannon_ReadScriptValueList(p, p->delayScript);
-    return 0;
 }
 
 #else

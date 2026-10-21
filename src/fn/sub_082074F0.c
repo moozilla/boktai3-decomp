@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.6%
-// Collider and sequence-argument allocation and the defined zero return still differ.
 #include "vulcan_cannon_worker.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
 void VulcanCannon_UpdateTargeting(void);
@@ -55,12 +52,14 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
     Callback_InvokeActor(p, p->state);
     p->display.sprite.flags &= ~1;
     if (!p->dead) {
-        collider = (void *)p->collider;
-        collider->flags &= ~4;
-        Collider_SetPosition(collider, &p->display.spatial.position, 0);
+        struct CannonCollider *c = (void *)p->collider;
+        c->flags &= ~4;
+        Collider_SetPosition(c, &p->display.spatial.position, 0);
+        collider = c;
     } else {
-        collider = (void *)p->collider;
-        collider->flags |= 4;
+        struct CannonCollider *c = (void *)p->collider;
+        c->flags |= 4;
+        collider = c;
     }
     if (p->damage > 0 && !p->dead) {
         p->hp -= p->damage;
@@ -125,7 +124,32 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 asm("" : "+r"(zero));
                 Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
             }
-            Anim_RestartSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
+            {
+                void *seq, *res;
+                u32 facing;
+                {
+                    register u32 off asm("r4") = 0x10c;
+                    asm("" : "+r"(off));
+                    seq = (u8 *)p + off;
+                }
+                {
+                    register u32 off asm("r2") = 0x17c;
+                    asm("" : "+r"(off));
+                    {
+                        register u8 *addr asm("r1") = (u8 *)p + off;
+                        res = *(void **)addr;
+                    }
+                }
+                {
+                    register u32 off asm("r3") = 0x132;
+                    asm("" : "+r"(off));
+                    {
+                        register u8 *addr asm("r2") = (u8 *)p + off;
+                        facing = *addr;
+                    }
+                }
+                Anim_RestartSequence(seq, res, 0x13, facing, 0);
+            }
             AnimData_SelectPaletteBank(p->graphics, 0x1be);
             p->flash = 0;
             p->state = VulcanCannon_UpdateDefeatEffects;
@@ -172,13 +196,4 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
     p->timer++;
     if (p->aimTimer > 0)
         p->aimTimer--;
-    {
-        register s32 result asm("r0") = 0;
-        asm("" : "+r"(result));
-        return result;
-    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", VulcanCannon_UpdateDamageState);
-#endif
