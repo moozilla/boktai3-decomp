@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
-#ifdef NONMATCHING
-// fuzzy: 99.6%
-/* Only the scratch register used to reload height at the collider call differs. */
 #include "actor_attachment_state.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
@@ -212,7 +209,14 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
     Project(&projected, &p->position, p->height);
     *(struct Packed *)&p->sprite.position = projected;
     ActorAttachment_StepSprite(&p->sprite, &p->anim);
-    Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->height);
+    {
+        void *c = p->collider;
+        register s32 *hp asm("r0") = &p->height;
+        register s32 h asm("r2");
+        asm("" : "+r"(hp));
+        h = *hp;
+        Collider_SetFixedPositionWithYOffset(c, &p->position, h);
+    }
     SpatialIndex_InsertEntry(p->collider);
     if (SceneGroundEffect_IsBelowGround(p, 8)) {
         NativeEffect_SetState(p, NativeEffect_DestroyEntry);
@@ -220,7 +224,3 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
         NativeEffect_SetState(p, NativeEffect_DestroyEntry);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateRotatingFlight);
-#endif
