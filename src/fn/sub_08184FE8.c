@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// foundry draft (worker best 94.6%); what differs is mostly register allocation and instruction order
 struct DirectionalActor {
     u8 unknown0[0x196];
     u16 flags196;
@@ -14,6 +12,7 @@ struct DirectionalActor {
 s32 DirectionalActor_TryBeginState(struct DirectionalActor *p, u32 state)
 {
     if (((volatile struct DirectionalActor *)p)->active) {
+        asm("" ::: "r1");
         if (p->state != state || p->phase == 0xff)
             goto begin;
     }
@@ -26,6 +25,3 @@ begin:
     p->flagsB32 &= 0xfffd;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DirectionalActor_TryBeginState);
-#endif
