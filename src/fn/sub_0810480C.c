@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.5%
 // Register allocation and a few load/order choices still differ.
 // MATCHING_CONCESSION: register-pinning
 struct ActorGroupMember {
@@ -81,16 +79,27 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
         asm("" : : "r"(x));
         z = ScaleTemp(-(p->radiusX * gUnk_086149C4[p->angle]));
         asm("" : : "r"(z));
-        z += Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
-        p->x = p->originX + x;
-        p->z = z + p->originZ;
+        {
+            register s32 t asm("r2") = Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
+            asm("" : "+r"(t));
+            p->x = p->originX + x;
+            p->z = (z + t) + p->originZ;
+            asm("" : : "r"(t), "r"(z));
+        }
     }
     if (p->frame & 1) {
         if (ProximityActor_IsPlayerInsideOriginRange(p)) {
-            if (!(*(u32 *)(gUnk_02000580[0] + 0x20) & 8)) {
-                s32 active = 0;
+            u32 m8 = 8;
+            u8 *b8 = gUnk_02000580[0];
+            u32 fl;
+            asm("" : "+r"(m8));
+            fl = *(u32 *)(b8 + 0x20);
+            if (!(fl & m8)) {
+                s32 active;
                 if (gUnk_02000534 && !gUnk_02000500)
                     active = 1;
+                else
+                    active = 0;
                 if (!active && gUnk_02000580[0][0x418] != 3) {
                     if (p->previousDistanceSquared != p->distanceSquared && p->turnStep == 0) {
                         p->turnStep = 4;
@@ -109,7 +118,3 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
     ActorGroup_UpdateMemberSway(p);
     p->frame++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ActorGroup_UpdateMemberProximity);
-#endif
