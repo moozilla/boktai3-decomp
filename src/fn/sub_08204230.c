@@ -4,7 +4,7 @@
 // graphics and the first animation frame, and installs the idle callback.
 #ifdef NONMATCHING
 // fuzzy: 98.8%
-// Only the bit-3 flip update in the inlined animation step uses different registers and a shared store; the line after it loads 0xffff from a different pool slot.
+// The bit-3 clear branch of the inlined animation step shares its store with the set branch (ROM keeps a separate store via r4); the next offset constant then lands in r1 instead of r3.
 #include "scene_vec.h"
 struct PHVec {
     s16 x, y, z, pad;
@@ -79,10 +79,12 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)sprite |= 8;
-        else
+        if (first != (((*c & 0x30) >> 4) & bit)) {
+            register u32 *f asm("r3") = sprite;
+            *f |= 8;
+        } else {
             *(u32 *)sprite &= ~8;
+        }
     }
     elapsed = s->elapsed + 1;
     s->elapsed = elapsed;
