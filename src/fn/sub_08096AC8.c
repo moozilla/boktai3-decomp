@@ -1,13 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 98.7%
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain.h"
 #define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void SceneActorControl_OnIdle(void *);
 void CpuSet(const void *, void *, u32);
@@ -84,7 +80,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
         Control(actor, sub_08096000, 0x24);
         Bee_ConsumeFlag80(actor);
         gUnk_03005308 = n = (gUnk_03005308 + 1) & 1023;
-        angle = *(u8 *)&gUnk_0203B400[n];
+        angle = *(u8 *)&((const u16 *)RANDOM_TABLE_ADDR)[n];
         {
             register u32 off asm("r0") = 0x5FC;
             asm("" : "+r"(off));
@@ -108,7 +104,3 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
     } else
         ++actor->counter2AC;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_RecoilTowardEndpoint);
-#endif
