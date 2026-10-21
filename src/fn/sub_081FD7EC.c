@@ -42,10 +42,9 @@ void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, void *);
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-#define OrbitEffect_FireVolley sub_081FD7EC
 #ifdef NONMATCHING
 // fuzzy: 97.3%
-u32 sub_081FD7EC(struct OrbitEffectState *p)
+u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
 {
     if (p->wide == 0)
         OrbitEffect_UpdateWideRadius(p);
@@ -140,5 +139,5 @@ u32 sub_081FD7EC(struct OrbitEffectState *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081FD7EC);
+INCLUDE_ASM("asm/nonmatching", OrbitEffect_FireVolley);
 #endif

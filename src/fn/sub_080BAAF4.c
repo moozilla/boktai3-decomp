@@ -1,6 +1,6 @@
 #include "global.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
-void sub_080BAB80(void);
+void Skeleton_UpdateHomingBurst(void);
 static inline u8 tk(u8 *a)
 {
     if (*a) {
@@ -31,7 +31,7 @@ void sub_080BAAF4(struct S *p, s32 n)
     if (tk(&p->b2b2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0x13);
     if (n > 0x14 && p->b2b3) {
-        void (*f)(void) = sub_080BAB80;
+        void (*f)(void) = Skeleton_UpdateHomingBurst;
         u32 k = 0x2D;
         u32 z;
         u8 *a = &p->b2b2;

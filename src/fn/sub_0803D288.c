@@ -18,10 +18,9 @@ static inline u8 PlayerHasFlag(u32 mask)
         return 1;
     return 0;
 }
-#define ScenePool_SpawnEntriesNearPlayers sub_0803D288
 #ifdef NONMATCHING
 // fuzzy: 95.1%
-void sub_0803D288(struct ScenePoolManager *m0)
+void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
 {
     register struct ScenePoolManager *m asm("r8") = m0;
     register s32 i asm("sl");
@@ -88,5 +87,5 @@ void sub_0803D288(struct ScenePoolManager *m0)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803D288);
+INCLUDE_ASM("asm/nonmatching", ScenePool_SpawnEntriesNearPlayers);
 #endif
