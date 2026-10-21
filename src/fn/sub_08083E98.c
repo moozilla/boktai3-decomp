@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
+static inline void CpuSet_2(u32 control, void *dest, const void *src)
+{
+    CpuSet(src, dest, control);
+}
 void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *actor,
                                           const struct ContactPosition *target)
 {
@@ -9,29 +12,19 @@ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *ac
         struct ContactPosition delta;
     } temporary;
     u32 zeroValue;
+    u32 one;
     SceneActorControl_InitPositionCurveEndpoints(actor, target);
     sub_08083C38(actor);
+    one = 1;
     {
-        register u32 one asm("r1") = 1;
-        u32 offset = 0x2A8;
-        u32 phaseOffset;
-        register u8 *field asm("r0");
-        field = (u8 *)actor + offset;
+        u8 *field = &actor->state2A8;
         zeroValue = 0;
         *field = zeroValue;
-        phaseOffset = 0x2A9;
-        field = (u8 *)actor + phaseOffset;
-        *field = zeroValue;
-        offset += 2;
-        field = (u8 *)actor + offset;
-        *field = one;
-        phaseOffset += 3;
-        field = (u8 *)actor + phaseOffset;
-        *(u32 *)field = zeroValue;
-        offset += 7;
-        field = (u8 *)actor + offset;
-        *field = one;
     }
+    actor->phase2A9 = zeroValue;
+    actor->behavior2AA = one;
+    actor->counter2AC = zeroValue;
+    actor->field2B1 = one;
     {
         struct ContactPosition *difference = &temporary.delta;
         const struct ContactPosition *position = &actor->position;
@@ -41,19 +34,9 @@ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *ac
         *((u8 *)actor + 0x3CD) = Math_Atan2(difference->x, difference->z);
     }
     {
-        register u32 offset asm("r2") = 0x42C;
-        asm("" : "+r"(offset));
+        u32 offset = 0x42C;
         state = (void *)((u8 *)state + offset);
-        asm("" : "+r"(state));
     }
     temporary.fill = zeroValue;
-    {
-        register void *destination asm("r1");
-        const void *source = &temporary.fill;
-        u32 control;
-        asm("" : "+r"(source));
-        destination = state;
-        control = 0x05000002;
-        CpuSet(source, destination, control);
-    }
+    CpuSet_2(0x05000002, state, &temporary.fill);
 }
