@@ -1,9 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.1%
-// foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
 struct LinkScriptArgs {
     u32 count : 16, unused : 16;
     s32 *values;
@@ -11,9 +8,13 @@ struct LinkScriptArgs {
 void Script_Call(u32, struct LinkScriptArgs *);
 static inline u8 *LinkSession_GetData(struct AreaEffectLinkState *p)
 {
-    if (!p || p->unavailable)
+    u8 *flag;
+    if (!p)
         return NULL;
-    return p->sessionData;
+    flag = &p->unavailable;
+    if (*flag)
+        return NULL;
+    return flag + 0x8D;
 }
 void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 value)
 {
@@ -32,6 +33,3 @@ void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 val
         Script_Call(p->positionScript, &args);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkSession_CallPositionScript);
-#endif
