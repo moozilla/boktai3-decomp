@@ -54,7 +54,7 @@ struct PhaseVector {
 void ActorShadow_Disable(void *);
 void Sound_PlaySong(u32);
 void ActorPhase_EmitTrailSprite(struct PhaseActor *, void *, u32);
-void sub_080FC998(struct PhaseActor *);
+void Axe_UpdateTrailColliders(struct PhaseActor *);
 void Axe_UpdateAttackColliderPositions(struct PhaseActor *);
 void Axe_ReleaseAuxiliarySprite(struct PhaseActor *);
 void SceneActorControl_ResetRotation(void);
@@ -84,7 +84,7 @@ void ActorPhase_UpdateAcceleratingTrail(struct PhaseActor *s, s32 frame)
     if ((1 & frame) && data[0xa36] <= 19)
         data[0xa36]++;
     ActorPhase_EmitTrailSprite(s, data + 0xa24, data[0xa34]);
-    sub_080FC998(s);
+    Axe_UpdateTrailColliders(s);
     Axe_UpdateAttackColliderPositions(s);
     if ((*(u32 *)(data + 0xa38) & 1) && frame > 30) {
         Axe_ReleaseAuxiliarySprite(s);

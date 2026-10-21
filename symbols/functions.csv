@@ -894,6 +894,8 @@ addr,name,mode,confidence,source,notes
 08028394,SceneActors_RunUnpausedState,thumb,low,src-alias,Clears the leading actor field and runs its state callback when global flag 4 is clear
 080283BC,SceneActors_TryApplyRequestedState,thumb,low,src-alias,State transition callback that validates state 1 through 40 and installs its handler while resetting execution fields
 08028414,SceneActors_SpawnDestructionParticles,thumb,low,src-alias,Emits two randomized particle bursts from the actor drawable; destruction role follows its surrounding controller
+080284FC,Vampire_ApplyPendingDamage,thumb,low,src-alias,
+080287DC,Vampire_UpdateFrame,thumb,low,src-alias,
 08028DDC,Vampire_DecrementBarrierCount,thumb,low,src-alias,Called from breakable_barrier's timer-expiry path to tick down a per-vampire counter at the shared actor's offset 0x384
 08028E18,Vampire_TriggerBackgroundFlash,thumb,low,src-alias,Reads two script keywords to pick immediately between three BackgroundFlash_* effects on the vampire's handle
 08028E6C,Vampire_TryQueueCommand,thumb,low,src-alias,"Queues command 1 with a caller-supplied argument on the idle vampire task, gated by a frame-rate throttle; returns success"
@@ -3056,6 +3058,8 @@ addr,name,mode,confidence,source,notes
 08095AC0,Ghost_UpdateDirectionalPoseB,thumb,low,src-alias,
 08095C00,Ghost_TurnTowardHeading,thumb,low,src-alias,
 08095EB4,Ghost_UpdateWaitingAnimation,thumb,low,src-alias,
+08096054,Ghost_UpdateHitStagger,thumb,low,src-alias,
+0809628C,Ghost_UpdateDefeat,thumb,low,src-alias,
 0809679C,Ghost_DecelerateMovement,thumb,low,src-alias,
 080968F0,Ghost_ChooseRouteDestination,thumb,low,src-alias,
 08096AC8,Ghost_RecoilTowardEndpoint,thumb,low,src-alias,
@@ -3263,6 +3267,7 @@ addr,name,mode,confidence,source,notes
 080AAE64,TentacleActor_InitSegmentColliders,thumb,low,src-alias,
 080AAFF4,TentacleActor_InitProfile,thumb,low,src-alias,Finds or adds the actor profile using its type byte and stores the result
 080AB010,TentacleActor_OnResolveVariantValue,thumb,low,src-alias,Actor callback that returns a four-entry variant lookup when the resource condition permits
+080AB294,TentacleActor_SpawnSparkBurst,thumb,low,src-alias,
 080AB408,ActorTrail_UpdateTimedScale,thumb,low,src-alias,
 080AB4E0,TentacleActor_ResetRouteHistory,thumb,low,src-alias,Fills six history slots with the current route identifier and resets the write index; interpretation is tentative
 080AB51C,TentacleActor_HasVisitedRoute,thumb,low,src-alias,Tests whether the supplied identifier appears in the six route history slots; interpretation is tentative
@@ -3820,6 +3825,7 @@ addr,name,mode,confidence,source,notes
 080FA744,Axe_InitMotionTable,thumb,low,src-alias,Assigns the fixed table at actor offset 0x284; motion table interpretation is tentative
 080FA754,SceneActorControl_UpdateHoverHeight,thumb,low,src-alias,
 080FA7D0,Axe_SelectRandomRoutePoint,thumb,low,src-alias,Chooses a random route point different from the previous selection and resets its cursor
+080FA830,Axe_InitColliders,thumb,low,src-alias,
 080FAA1C,Axe_GetActorCategory,thumb,low,src-alias,Actor callback returning constant category four; category meaning is tentative
 080FAA20,Axe_SetMovementEndpoints,thumb,low,src-alias,Copies current and target positions into movement state and clears its timer
 080FAC14,Axe_InitProfile,thumb,low,src-alias,Finds or adds profile zero for the actor type and stores its handle
@@ -3852,6 +3858,7 @@ addr,name,mode,confidence,source,notes
 080FC894,Axe_CopyAuxiliaryVector,thumb,low,src-alias,Copies an 8-byte vector into the axe auxiliary state
 080FC8B0,Axe_SetAuxiliarySpriteParameters,thumb,low,src-alias,Stores a halfword and word in the auxiliary sprite; parameter meanings are tentative
 080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,thumb,low,src-alias,
+080FC998,Axe_UpdateTrailColliders,thumb,low,src-alias,
 080FCB3C,Axe_RemoveSecondaryColliders,thumb,low,src-alias,Removes two colliders from the axe auxiliary data
 080FD04C,ActorGroup_ReadScriptOptions,thumb,low,src-alias,
 080FD10C,Axe_PrepareUpdate,thumb,low,src-alias,Runs three preparation helpers before the axe state callback
