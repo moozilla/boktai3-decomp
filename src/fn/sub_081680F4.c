@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.7%
-// foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 struct Hud {
     u8 pad0[0xc70];
     u8 paletteEnabled;
@@ -16,8 +14,8 @@ s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
 void Palette_UpdateHighlightPulse(u16 *);
 void Hud_LoadConditionalPaletteRows(struct Hud *input)
 {
-    register s32 i;
-    struct Hud *hud = input;
+    register struct Hud *hud asm("r9") = input;
+    register s32 i asm("r8");
     const u16 *source = gUnk_08610E78;
     i = 0;
     do {
@@ -39,9 +37,10 @@ void Hud_LoadConditionalPaletteRows(struct Hud *input)
             source++;
         } while (--j >= 0);
     } while (i <= 3);
-    hud->paletteState = 0;
+    {
+        register u8 *state asm("r1") = &hud->paletteState;
+        register u32 zero asm("r0") = 0;
+        *state = zero;
+    }
     Palette_UpdateHighlightPulse(gUnk_03005164);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hud_LoadConditionalPaletteRows);
-#endif
