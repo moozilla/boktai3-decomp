@@ -2,9 +2,6 @@
 #include "engine.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.3%
-// foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
 #define TerrainRegistration_Remove  TerrainModifiers_UnregisterCell
 #define TerrainRegistration_SetCell TerrainModifiers_RegisterCell
 #define gPlayers                    gUnk_02000580
@@ -34,7 +31,9 @@ static inline void ClearFlag(s32 mask, s16 *flags)
 }
 static inline void SetFlag(u16 *flags, u32 mask)
 {
-    *flags = mask | *flags;
+    u32 m = mask;
+    asm("" : "+r"(m));
+    *flags = m | *flags;
 }
 static inline s32 GetCell(struct SceneVec *position, struct EngineMap *map)
 {
@@ -70,6 +69,3 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObjectTerrainState *objec
         SetFlag((u16 *)&object->flags, 1);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", NamedObject_UpdateTerrainRegistration);
-#endif
