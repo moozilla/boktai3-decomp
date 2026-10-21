@@ -73,6 +73,11 @@ assembly placeholders receive zero credit.
 
 ## Local use and refreshing metadata
 
+`PROGRESS.md` shows region bars and a "By subsystem" breakdown: sections
+(`SECTIONS` in `tools/progress.py`) over the report categories, then families
+(units sharing a first word, e.g. Monsters > Ghoul > Ghoul 1), then units with
+the functions still to match. decomp.dev only shows category > unit > function.
+
 From the repository root:
 
 ```sh

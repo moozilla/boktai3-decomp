@@ -421,13 +421,15 @@ def main():
     fuzzy = {n: p for n, p in collect_fuzzy(funcs, Path(ROOT) / "src").items() if n not in done}
     draft_b = sum(sizes[n] for n in fuzzy)
     print(f"nonmatching drafts: {len(fuzzy)} functions, {draft_b} bytes ({100 * draft_b / total_b:.3f}% of code)")
-    if args.markdown:
-        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b, fuzzy)
-    if args.json:
+    if args.markdown or args.json:
+        categories = load_categories()
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
         report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
-                             load_asm_ranges(), load_categories())
+                             load_asm_ranges(), categories)
+    if args.markdown:
+        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories)
+    if args.json:
         Path(args.json).write_text(json.dumps(report, indent=2) + "\n")
 
 
@@ -436,7 +438,85 @@ def bar(frac, width=30):
     return "█" * n + "░" * (width - n)
 
 
-def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None):
+# Broader sections above the report categories. decomp.dev's treemap stops at
+# category -> unit -> function, so this level only exists in PROGRESS.md.
+SECTIONS = [("Gameplay", ["player", "monsters", "bosses", "field", "actors", "minigames"]),
+            ("Presentation and UI", ["effects", "ui"]),
+            ("Engine and system", ["engine", "system", "link"]),
+            ("Libraries", ["libraries"])]
+
+
+def family(unit):
+    """Display family of a unit: its first word once numbering and the
+    assembly suffix are dropped ("Ghoul 2" -> "Ghoul", "Scene camera" -> "Scene")."""
+    name = unit.removesuffix(ASM_SUFFIX)
+    return re.sub(r" \d+$", "", name).split()[0]
+
+
+def stats(units):
+    get = lambda key: sum(int(u["measures"][key]) for u in units)
+    return get("total_code"), get("matched_code"), get("total_functions"), get("matched_functions")
+
+
+def stat_cells(units, width=20):
+    tb, db, tf, df = stats(units)
+    return f"{df}/{tf} | {100 * db / max(tb, 1):.1f}% | `{bar(db / max(tb, 1), width)}`"
+
+
+def subsystem_lines(report, categories):
+    """Section -> category -> family -> unit tables, with the functions still
+    to match listed per unit (draft score in brackets)."""
+    labels = {cid: label for cid, (label, _) in categories.items()}
+    labels["libraries"] = "Libraries"
+    by_label = {}
+    for unit in report["units"]:
+        top, name = unit["name"].split("/", 1)
+        by_label.setdefault(top, []).append((name, unit))
+    seen = {cid for _, cids in SECTIONS for cid in cids}
+    sections = SECTIONS + [("Other", [cid for cid in labels if cid not in seen])]
+    lines = ["", "## By subsystem", "",
+             "Sections group the report categories; inside each category, units sharing a first word "
+             "form a family. The same units (category -> unit -> function) are on decomp.dev.", "",
+             "| Section / category | Functions | Bytes matched | |", "|---|---:|---:|---|"]
+    body = []
+    for section, cids in sections:
+        cats = [(labels[c], by_label[labels[c]]) for c in cids if labels.get(c) in by_label]
+        if not cats:
+            continue
+        lines.append(f"| **{section}** | {stat_cells([u for _, us in cats for _, u in us])} |")
+        body += ["", f"### {section}"]
+        for label, units in cats:
+            lines.append(f"| &nbsp;&nbsp;{label} | {stat_cells([u for _, u in units])} |")
+            families = {}
+            for name, unit in units:
+                families.setdefault(family(name), []).append((name, unit))
+            tb, db, tf, df = stats([u for _, u in units])
+            body += ["", f"<details><summary><b>{label}</b>: {df}/{tf} functions, "
+                     f"{100 * db / max(tb, 1):.1f}% of bytes</summary>", "",
+                     "| Family / unit | Functions | Bytes matched | |", "|---|---:|---:|---|"]
+            for fam, members in sorted(families.items(), key=lambda kv: -stats([u for _, u in kv[1]])[0]):
+                if len(members) > 1:
+                    body.append(f"| **{fam}** | {stat_cells([u for _, u in members])} |")
+                for name, unit in members:
+                    indent = "&nbsp;&nbsp;" if len(members) > 1 else ""
+                    body.append(f"| {indent}{name} | {stat_cells([unit])} |")
+            remaining = [(name, f) for name, unit in units for f in unit["functions"]
+                         if f["fuzzy_match_percent"] != 100]
+            if remaining:
+                body += ["", f"Still to match ({len(remaining)}):", ""]
+                for name, unit in units:
+                    left = [f for f in unit["functions"] if f["fuzzy_match_percent"] != 100]
+                    if left:
+                        body.append(f"- {name}: " + ", ".join(
+                            f"`{f['name']}` {f['size']} B" + (f" ({f['fuzzy_match_percent']:.0f}%)"
+                                                              if f["fuzzy_match_percent"] else "")
+                            for f in left))
+            body += ["", "</details>"]
+    return lines + body
+
+
+def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,
+                   categories=None):
     fuzzy = fuzzy or {}
     draft_b = sum(sizes[n] for n in fuzzy)
     mean = sum(sizes[n] * p for n, p in fuzzy.items()) / draft_b if draft_b else 0
@@ -462,6 +542,8 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
         if not fs:
             continue
         lines.append(f"| `{lo:08X}–{hi:08X}` | {len(fs)} | {nd} | {100 * db / max(tb, 1):.1f}% | `{bar(db / max(tb, 1), 20)}` |")
+    if report and categories:
+        lines += subsystem_lines(report, categories)
     Path(out).write_text("\n".join(lines) + "\n")
 
 
