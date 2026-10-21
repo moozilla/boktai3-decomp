@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_object.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.1%
-// foundry draft (worker best 93.1%); what differs is mostly register allocation and instruction order
 #define gRandomIndex  gUnk_03005304
 #define gRandomValues gUnk_086141BC
 extern u32 gUnk_03005304;
@@ -17,7 +14,7 @@ static inline u16 NextRandom(void)
 }
 void ActorParticles_EmitOffsetBurst(void *actor)
 {
-    s32 i = 3;
+    s32 i = 0;
     struct SceneExtent offset;
     do {
         offset.x = (NextRandom() & 31) - 7;
@@ -25,8 +22,5 @@ void ActorParticles_EmitOffsetBurst(void *actor)
         offset.z = 0;
         ActorParticles_CreateAtOffset(actor, &offset, 0, 0x8639, 0x75f6, 0, 0, 0, 0, 0x153, 30, 0,
                                       0, 1, 0);
-    } while (--i >= 0);
+    } while (++i < 4);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorParticles_EmitOffsetBurst);
-#endif
