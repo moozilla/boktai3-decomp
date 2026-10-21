@@ -3,7 +3,7 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.9%
+// fuzzy: 94.1%
 // Remaining differences: register allocation around the ground-height lookup.
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 struct Pair8 {
@@ -32,7 +32,8 @@ static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
     else
         data = gUnk_030052F4->cells + 12 + cell * 4;
     type = data[0] >> 4;
-    height = (data[0] & 15) << 8;
+    height = data[0] & 15;
+    height <<= 8;
     {
         u32 slope;
         if (type == 1)
