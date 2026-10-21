@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.0%
+// fuzzy: 87.7%
 // Remaining differences: outer switch layout, frame setup, and packed animation register allocation.
 
 #include "contact_swarm.h"
@@ -283,9 +283,9 @@ struct ImpactHeader {
 s32 Task4E01_BeginImpactAnimation(u8 *input)
 {
     register u8 *p asm("r8") = input;
-    register u8 *config asm("r9") = p + 0x18;
-    ((struct ImpactHeader *)p)->config.flags |= 0x1000;
-    ((struct ImpactHeader *)p)->time = 0;
+    register u8 *config asm("r9") = input + 0x18;
+    ((struct ImpactHeader *)input)->config.flags |= 0x1000;
+    ((struct ImpactHeader *)input)->time = 0;
     ((struct ImpactConfig *)config)->time = 0;
     switch (((struct ImpactConfig *)config)->kind) {
         case 0:
@@ -294,16 +294,16 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
         case 5:
         case 6:
         case 10:
-            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
-            ((struct ImpactHeader *)p)->time = 0;
+            ((struct ImpactHeader *)input)->time = 0;
             break;
         case 7:
-            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
             break;
         case 8:
-            ((struct Drawable *)(p + 0x8c))->sprite.frame = 29;
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnType8DirectionalAnimation);
             break;
         case 4:
@@ -311,26 +311,26 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
             break;
         case 3:
             if (*(u16 *)config & 0x10) {
-                *(u32 *)(p + 0x194) = 1;
-                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 1, 0, 0);
-                StepFirst((void *)(p + 0x8c), (void *)(p + 0x180));
+                *(u32 *)(input + 0x194) = 1;
+                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 1, 0, 0);
+                StepFirst((void *)(input + 0x8c), (void *)(input + 0x180));
             } else {
-                *(u32 *)(p + 0x194) = 6;
-                Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19c), 6, 0, 0);
-                StepSecond((void *)(p + 0x8c), (void *)(p + 0x180));
+                *(u32 *)(input + 0x194) = 6;
+                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 6, 0, 0);
+                StepSecond((void *)(input + 0x8c), (void *)(input + 0x180));
             }
             Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;
         case 11:
             if (!(*(u16 *)config & 0x2000))
-                ((struct Drawable *)(p + 0x8c))->sprite.frame = 31;
+                ((struct Drawable *)(input + 0x8c))->sprite.frame = 31;
             Projectile_SetUpdateCallback(config, sub_081D9D3C);
             break;
         case 9:
         default:
             break;
     }
-    ((struct ImpactHeader *)p)->flags |= 1;
+    ((struct ImpactHeader *)input)->flags |= 1;
     return 0;
 }
 
