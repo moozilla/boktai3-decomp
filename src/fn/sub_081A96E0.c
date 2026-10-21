@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 91.4%
 // Remaining differences: cases 0/1/3 should advance the timer through an in-place pointer (shared Apply tail).
 struct Pair {
     u8 pad0[0x205];
