@@ -234,7 +234,7 @@ class AreaCategoryTest(unittest.TestCase):
         self.assertEqual(cats["libraries"]["total_code"], "4")
         self.assertEqual(cats["intentional_asm"]["total_code"], "8")
         self.assertEqual(cats["decompilable"]["total_code"], "4")
-        self.assertEqual(report["measures"]["total_code"], "12")
+        self.assertEqual(report["measures"]["total_code"], "4")  # headline leaves assembly out
         self.assertIn("libraries/SDK (assembly)", [u["name"] for u in report["units"]])
 
     def test_asm_ranges_load(self):

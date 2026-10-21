@@ -1,6 +1,7 @@
 addr,name,mode,confidence,source,notes
 080001B4,crt0_Init,arm,high,disasm,"Nintendo SDK crt0: set IRQ/SYS stacks, install IntrMain, call AgbMain"
 080001F0,IntrMain,arm,high,disasm,SDK interrupt dispatcher; copied to IWRAM 0x03003A60; table at 0x03003A10
+08000350,Palette_CacheObjectBankArm,arm,medium,disasm,"ARM twin of Palette_CacheObjectBank (08217344); first of six ARM C functions (APCS frames) copied to IWRAM 0x03000000 by AgbMain; looks up a u16 key in a 16-entry table (0x030051F0) and otherwise appends a 32-byte palette to 0x03004DC0"
 0800145C,AgbMain,thumb,high,disasm,Game main entry (pointer at 0x08000344)
 080015AC,Background_ApplyQueuedCommands,thumb,low,src-alias,
 08001768,Background_Update,thumb,low,src-alias,

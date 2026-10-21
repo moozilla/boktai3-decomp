@@ -1,5 +1,6 @@
 name,start,end,category,name_files,evidence
-Boot and ARM helpers,08000000,0800145C,,symbols/proposed/subsystems.csv,docs/ROM_MAP.md reset/header and IWRAM copy/blit code; original report spans retained
+GBA header and crt0,08000000,08000350,,symbols/proposed/subsystems.csv,docs/ROM_MAP.md cartridge header and SDK crt0 (reset branch; crt0_Init; IntrMain)
+IWRAM ARM code,08000350,0800145C,,,docs/ROM_MAP.md ARM C (APCS frames) copied to IWRAM 0x03000000 by AgbMain; six functions
 Game entry point,0800145C,080015AC,,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md AgbMain and reserved-word reset helper
 Background controllers,080015AC,08002AA8,,symbols/proposed/subsystems.csv,Background controller command queues and task lifecycle; docs/BACKGROUND_CONTROLLERS.md
 Palette controllers,08002AA8,080036F8,,symbols/proposed/subsystems.csv,Contiguous palette blending brightness transition task and script handlers; include/palette_controller.h

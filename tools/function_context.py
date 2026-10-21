@@ -21,7 +21,7 @@ CODE_END = 0x0824DAFA
 FUNC_LABEL = re.compile(r"^([A-Za-z_.$][\w.$]*):\s*@\s*0x([0-9A-Fa-f]{8})")
 START_DIRECTIVE = re.compile(r"\s*(thumb_func_start|arm_func_start|non_word_aligned_thumb_func_start)\s+(\S+)")
 # Known ROM ranges that hold data/overlays rather than ordinary function bodies.
-DATA_GAPS = ((0x08000350, 0x0800145C), (0x0822F248, 0x0822F648))
+DATA_GAPS = ((0x0822F248, 0x0822F648),)
 
 
 @dataclass(frozen=True)
