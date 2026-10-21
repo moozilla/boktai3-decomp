@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Task4E01_StartTimedImpact sub_081D8B98
 
 #include "contact_swarm.h"
 
