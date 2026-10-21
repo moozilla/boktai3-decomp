@@ -1,6 +1,5 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
 // MATCHING_CONCESSION: register-pinning
-#define StageResults_ShowTimeDigits sub_08112160
 #include "global.h"
 struct Digit {
     u32 flags;
@@ -100,5 +99,5 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08112160);
+INCLUDE_ASM("asm/nonmatching", StageResults_ShowTimeDigits);
 #endif

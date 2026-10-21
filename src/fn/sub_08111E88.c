@@ -1,6 +1,5 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
 #include "global.h"
-#define StageResults_InitCursorPositions sub_08111E88
 struct E {
     u8 pad[0x44];
     u16 x, y;

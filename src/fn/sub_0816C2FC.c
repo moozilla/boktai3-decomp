@@ -1,6 +1,5 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_UpdateInput sub_0816C2FC
-#define gMenuInput          gUnk_03005260
+#define gMenuInput gUnk_03005260
 #include "global.h"
 struct MapMenu {
     u8 pad0[0x3828];
