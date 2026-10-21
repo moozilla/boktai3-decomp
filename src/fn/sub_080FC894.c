@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Axe_CopyAuxiliaryVector sub_080FC894
 
 struct S080FC894 {
     u8 filler[0x3d0];

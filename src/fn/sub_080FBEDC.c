@@ -1,5 +1,4 @@
 #include "global.h"
-#define Axe_TickAuxiliarySpriteTimers sub_080FBEDC
 
 struct S080FBEDC {
     u8 filler[0x3d0];

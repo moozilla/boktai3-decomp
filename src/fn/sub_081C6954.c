@@ -3,10 +3,9 @@
 #ifdef NONMATCHING
 // fuzzy: 97.3%
 // Differs only in register choice for the else-branch offset constants (0x1EC/0x1ED/0x1EE).
-#define StateActor_CreateFromScript sub_081C6954
-#define B(o)                        (*(u8 *)((u8 *)npc + (o)))
-#define H(o)                        (*(u16 *)((u8 *)npc + (o)))
-#define W(o)                        (*(u32 *)((u8 *)npc + (o)))
+#define B(o) (*(u8 *)((u8 *)npc + (o)))
+#define H(o) (*(u16 *)((u8 *)npc + (o)))
+#define W(o) (*(u32 *)((u8 *)npc + (o)))
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -58,7 +57,7 @@ void sub_0802F298(void);
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
-s32 StateActor_CreateFromScript(void *manager, void *name)
+s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
 {
     s32 model;
     register s32 fail asm("r6");
@@ -188,5 +187,5 @@ s32 StateActor_CreateFromScript(void *manager, void *name)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081C6954);
+INCLUDE_ASM("asm/nonmatching", StateActor_CreateFromScriptEntry);
 #endif
