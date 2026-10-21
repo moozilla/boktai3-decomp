@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// foundry draft (worker best 97.9%); what differs is mostly register allocation and instruction order
 
 struct TimedEffectActor {
     u8 pad0[0x9C];
@@ -28,9 +26,13 @@ static inline void UpdateSequence(struct TimedEffectActor *p, u32 complete)
 {
     if (complete == 0) {
         if (p->timer == 0) {
-            u16 animation = 0x148;
-            SceneActors_StartEightDirectionAnimation(p, &p->animation, p->animationState, animation,
-                                                     3, 1, 4);
+            u16 animation;
+            u8 *a = &p->animation;
+            u8 *st = p->animationState;
+            asm("" : "+r"(a), "+r"(st));
+            animation = 0x148;
+            asm("" : "+r"(animation));
+            SceneActors_StartEightDirectionAnimation(p, a, st, animation, 3, 1, 4);
         }
         p->timer++;
         if (p->timer > 0xB4) {
@@ -60,6 +62,3 @@ void ActorEffect_UpdateTimedSequence(struct TimedEffectActor *p)
     if ((u8)Callback_InvokeActor(p, p->callback) == 0)
         UpdateSequence(p, p->complete);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateTimedSequence);
-#endif
