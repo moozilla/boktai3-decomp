@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Background {
     u8 pad[0x20];
     u16 x, y;
@@ -13,9 +12,8 @@ void Bg_UpdateScrollShadow(void)
     u16 *dst = gUnk_03004C20;
     struct Background *src = gUnk_03004C30;
     u32 mask;
-    register u32 t0 asm("r1") = src[0].x;
+    dst[0] = src[0].x & 0xff;
     mask = 0xff;
-    dst[0] = mask & t0;
     dst[1] = mask & src[0].y;
     dst[2] = mask & src[1].x;
     dst[3] = mask & src[1].y;
