@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 u32 Modifier_TestSelection(struct ModifierSelection *, s32);
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
@@ -8,12 +7,13 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
     struct ModifierSelection *current = &menu->current;
     s32 *window;
     s32 count;
-    register s32 id asm("r6");
+    s32 id;
     s32 y;
     switch (menu->mode) {
         case 0:
-            if (menu->state != 2)
+            if (menu->state != 2) {
                 break;
+            }
             window = &menu->detailWindow;
             TextWindow_SetBounds(*window, 1, 6, 28, 6);
             TextWindow_SetScript(*window, menu->textSources[0]);
@@ -26,8 +26,10 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             window = menu->listWindows;
             y = 4;
         selectedLoop:
-            if (!Modifier_TestSelection(current, id))
+            if (!Modifier_TestSelection(current, id)) {
                 goto nextId;
+            }
+
             TextWindow_SetBounds(*window, 13, y, 16, 2);
             TextWindow_SetScript(*window, menu->textSources[5]);
             TextWindow_Refresh(*window, id);
@@ -38,13 +40,16 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                 struct ModifierSelection *base = current;
                 s32 selectedCount;
                 selectedCount = base->count;
-                if (count >= selectedCount)
+                if (count >= selectedCount) {
                     goto collected;
+                }
             }
         nextId:
             id++;
-            if (id <= 31)
+
+            if (id <= 31) {
                 goto selectedLoop;
+            }
         collected:
             id = count;
             {
@@ -54,16 +59,15 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                     capacity = base->capacity;
                 }
                 if (id < capacity) {
-                    register s32 row asm("r5");
+                    s32 row;
                     window = (s32 *)(id * sizeof(*window) + (u32)menu->listWindows);
                     {
-                        register s32 rowBase asm("r0") = id * 2;
+                        s32 rowBase = id * 2;
                         row = rowBase + 4;
                     }
                     do {
                         TextWindow_SetBounds(*window, 13, row, 16, 2);
-                        asm("" : "+r"(menu));
-                        TextWindow_SetScript(*window, menu->textSources[0]);
+                        TextWindow_SetScript(*window, (*(&menu))->textSources[0]);
                         TextWindow_Refresh(*window, 5);
                         TextWindow_StartPlayback(*window++);
                         row += 2;
