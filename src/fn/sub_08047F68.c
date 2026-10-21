@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_burst.h"
 struct ContactBurstHit {
     u8 unknown0[6];
@@ -12,9 +11,11 @@ void ContactBurst_OnContact(struct ContactBurstHit *self, struct ContactBurstHit
                             struct ContactBurst *effectInput)
 {
     struct ContactBurstHit *other = otherInput;
-    register struct ContactBurst *effect asm("r4") = effectInput;
+    struct ContactBurst *effect = effectInput;
     u32 direction;
-    effect->contactTimer = 18;
+    do {
+        effect->contactTimer = 18;
+    } while (0);
     {
         u32 mask = 256;
         if (self->flags & mask)
