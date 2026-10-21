@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define gPairSlotStateCallbacks gUnk_08610734
 struct PairSlot {
@@ -23,13 +22,12 @@ static inline u8 PairSlotPool_IsAllocated(struct PairSlotPool *pool, s32 index)
 s32 PairSlotPool_Update(struct PairSlotPool *pool)
 {
     s32 index;
-    if (((u32 *)pool)[0x78]) {
-        asm("" ::: "r1");
-        for (index = 0; index < 2; index++) {
-            if (PairSlotPool_IsAllocated(pool, index)) {
-                struct PairSlot *entry = &pool->entries[index];
-                sub_08249240(pool, entry, gUnk_08610734[entry->state]);
-            }
+    if (!((u32 *)pool)[0x78])
+        return 0;
+    for (index = 0; index < 2; index++) {
+        if (PairSlotPool_IsAllocated(pool, index)) {
+            struct PairSlot *entry = &pool->entries[index];
+            sub_08249240(pool, entry, gUnk_08610734[entry->state]);
         }
     }
     return 0;

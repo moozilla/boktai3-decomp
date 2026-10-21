@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct ActorReaction {
     u8 unknown0[0xAF];
@@ -28,8 +27,10 @@ static inline s32 UpdateMotionAnimation(struct ActorReaction *p)
 }
 void Hresvelgr_UpdateMotionPhase(struct ActorReaction *actor, u32 frame)
 {
-    struct ActorReaction *q = actor;
-    asm("" : "+r"(q));
+    struct ActorReaction *a2;
+    struct ActorReaction *q;
+    q = actor;
+    a2 = *(&actor);
     if (!UpdateMotionAnimation(q))
-        sub_0819C8F8(actor, 12, frame << 2);
+        sub_0819C8F8(a2, 12, frame << 2);
 }

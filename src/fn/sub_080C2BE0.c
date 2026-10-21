@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 #include "scene_actor_control_phase.h"
@@ -67,14 +66,15 @@ void SceneActorControl_UpdateProbeApproach(struct SceneActorRegistryResetView *a
         }
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
             return;
-        if (sub_0812F3CC(actor))
+        }
+        if (sub_0812F3CC(actor)) {
             return;
+        }
     }
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
+    speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
     actor->field2C2 = 0x20;
-    asm("" : "+r"(actor));
     {
         u32 mask = 0xA02F;
         if (actor->flags2D4 & mask) {
@@ -85,8 +85,9 @@ void SceneActorControl_UpdateProbeApproach(struct SceneActorRegistryResetView *a
             u16 *q = &actor->field2C2;
             u16 v = *q;
             scale = q;
-            if (v == 0)
+            if (v == 0) {
                 *scale = 0x40;
+            }
         }
     }
     if (actor->drawableKind == 0)

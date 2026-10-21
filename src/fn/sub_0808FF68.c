@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 /* SceneActorControl_CompleteScriptedResponse_0809F368: SceneActorControl_CompleteScriptedResponse with other constants (ported by relatives.py, fixed by hand; provisional name) */
 #include "scene_actor_reaction.h"
@@ -55,9 +54,9 @@ void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
         Slime_EmitDeathDebris(actor);
         *(u16 *)(body + 0x404) = 0;
         {
-            register u32 mask asm("r0") = 8;
+            u32 mask = 8;
             u16 *p = (void *)(body + 0x40A);
-            *p = mask | *p;
+            *p = (*(&mask)) | (*p);
         }
         {
             void *callback = (void *)SceneActorControl_OnIdle;

@@ -185,3 +185,18 @@ fewer hints. Per-function edits and the blockers on the rest are in
    non-void function leaves the incoming r0, which removes a pinned result.
 5. For an unpinned copy under about 20 bytes off, `tools/permute.py FILE
    RealName --run N -j 2` found 5 of the 28 (use the real name, not sub_X).
+
+Second batch (19 of the next 60 made clean; `notes/depin-manual-2_2026-10-21.md`):
+
+6. An `asm("" ::: "rN")` clobber often stands in for an early return: a body
+   wrapped in `if (x) { loop }` matched once written `if (!x) return 0;`
+   before the loop. Splitting a compound final condition into two early
+   returns works the same way.
+7. A `static inline` wrapper that takes the arguments in another order
+   (`Wrap(size, p) { Fn(p, size); }`) changes which temporary gets the low
+   register; it replaced r0 pins (the permuter finds these with its
+   inline-wrapper mutation).
+8. Declaring a pointer temporary inside the loop body removed `"+r"` barriers
+   on loop-carried pointers.
+9. A permuter score of 0 is not a match: it ignores branch offsets. Port the
+   result by hand and run check.py.
