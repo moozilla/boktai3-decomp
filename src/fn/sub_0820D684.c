@@ -174,7 +174,6 @@ static inline void StepPlayback(struct Obj *flagsObj, struct Obj *sprite, struct
         }
     }
 }
-#define EnemyParticle_Emit sub_0820D684
 s32 EnemyParticle_Emit(struct Params *params, struct Pos *pos)
 {
     struct Pool *pool = gUnk_02000604;
