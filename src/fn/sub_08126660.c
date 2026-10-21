@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define SmallEffectPool_Allocate SceneStatusIndicator_Allocate
 struct SmallEffectSlot {
@@ -31,8 +30,7 @@ struct SmallEffectSlot *SceneStatusIndicator_Allocate(struct SmallEffectPool *po
             index++;
         } else {
             u32 bit = one;
-            asm("" : "+r"(bit));
-            bit <<= index;
+            (*(&bit)) <<= index;
             *allocated |= bit;
             *kind = index;
             return entry;

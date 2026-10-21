@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define gSelectionSlots gUnk_020004B4
 struct SelectionSlots {
@@ -19,19 +18,21 @@ s32 SelectionSlots_ClearValue(void *unused, s32 value)
 {
     s8 *slot;
     s32 i;
+    u32 m;
     if (!SelectionSlots_GetView())
         return -1;
-    {
-        register u32 m asm("r1") = 0xFF;
-        slot = gUnk_020004B4->values;
-        i = 4;
-
-        do {
-            if (*slot == value)
-                *slot |= m;
-            slot++;
-            i--;
-        } while (i >= 0);
-    }
+    do {
+        m = 0xFF;
+    } while (0);
+    slot = gUnk_020004B4->values;
+    i = 4;
+    do {
+        if (*slot == value) {
+            u32 cur = (u8)*slot;
+            *slot = cur | m;
+        }
+        slot++;
+        i--;
+    } while (i >= 0);
     return 0;
 }
