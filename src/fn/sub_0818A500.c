@@ -5,8 +5,6 @@
 // Remaining differences: literal-pool/temp register numbering and the loop entry test.
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
-#define Armor_ApplySceneCommands sub_0818A500
-
 typedef struct {
     u8 pad0[6];
     u8 count[2];
@@ -167,5 +165,5 @@ void Armor_ApplySceneCommands(u8 *arg)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818A500);
+INCLUDE_ASM("asm/nonmatching", Armor_ApplySceneCommands);
 #endif

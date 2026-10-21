@@ -1,5 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#define NamedObject_UpdatePlayerAttachment sub_081029F8
 #include "global.h"
 #include "player.h"
 struct NamedObjectVector {

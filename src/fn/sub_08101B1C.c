@@ -4,7 +4,6 @@
 // fuzzy: 95.8%
 // Still differs: HasFlag mask/pointer order and spill store position at 08101B80, base reload at 08101BE4,
 // sb/r1 reuse for the 'where' stores.
-#define NamedObject_RegisterFollowCells sub_08101B1C
 #include "player.h"
 #include "terrain_cell_probe.h"
 struct NamedObject {
@@ -106,5 +105,5 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08101B1C);
+INCLUDE_ASM("asm/nonmatching", NamedObject_RegisterFollowCells);
 #endif
