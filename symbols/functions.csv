@@ -4270,10 +4270,12 @@ addr,name,mode,confidence,source,notes
 08111D44,StageResults_DestroyTextWindows,thumb,low,src-alias,Releases all three text window handles during task destruction
 08111D64,StageResults_InitAnimationIds,thumb,low,src-alias,Initializes the animation identifiers for the screen's 23 sprite elements
 08111DE0,MessagePanel_InitSprites,thumb,low,src-alias,
+08111E88,StageResults_InitCursorPositions,thumb,low,src-alias,
 0811202C,StageResults_InitPortraitDisplay,thumb,low,src-alias,Tentatively initializes the portrait selection state and five sprite portrait display
 081120BC,SceneGauge_SelectThresholdFrame,thumb,low,src-alias,
 08112118,StageResults_HideSprites,thumb,low,src-alias,Sets the hide flag on all 23 screen sprites and the five auxiliary display sprites
 08112144,StageResults_DestroySprites,thumb,low,src-alias,Removes all 23 screen animations during task destruction
+08112160,StageResults_ShowTimeDigits,thumb,low,src-alias,
 0811235C,StageResults_UpdateRecordBlink,thumb,low,src-alias,Toggles a sprite every 20 frames when a new record is active and otherwise hides it
 081123C0,StageResults_RecordStagePerformance,thumb,low,src-alias,Records the current stage rating and attempts to improve its best completion time
 081123F0,StageResults_FinishDisplay,thumb,low,src-alias,Clears all background tilemaps and hides sprites before invoking the completion script with the stage index
@@ -5763,6 +5765,7 @@ addr,name,mode,confidence,source,notes
 0816C1A4,MapScreen_ClearMapLayer,thumb,low,src-alias,Fills the entire 32 by 32 background map with tile 0xE002
 0816C1D4,MapScreen_RefreshAreaDisplay,thumb,low,src-alias,Loads the selected area map or clears it and then refreshes its markers
 0816C230,MapMenu_SelectDirection,thumb,low,src-alias,
+0816C2FC,MapMenu_UpdateInput,thumb,low,src-alias,
 0816C50C,MapMenu_PositionMarkers,thumb,low,src-alias,
 0816C620,MapScreen_GetPositionMarkerKeyframe,thumb,low,src-alias,Returns the fixed keyframe zero used to initialize the map position marker
 0816C624,MapMenu_RefreshMarkers,thumb,low,src-alias,
@@ -5770,6 +5773,7 @@ addr,name,mode,confidence,source,notes
 0816C838,MapMenu_InitializeDisplay,thumb,low,src-alias,
 0816C9AC,GameState_SetWorldMapFlagFromScript,thumb,low,src-alias,Sets a script-selected flag controlling world map landmarks or overlays
 0816C9DC,GameState_GetWorldMapFlag,thumb,low,src-alias,Returns the selected world map overlay flag
+0816C9F8,MapMenu_DrawLocationIcons,thumb,low,src-alias,
 0816CC88,MapScreen_InitAreaView,thumb,low,src-alias,Loads area-specific map resources and initializes the map screen display
 0816CD6C,Inventory_SetUsePermissionFlagsFromScript,thumb,low,src-alias,Builds four item-use permission bits from script values; interpretation tentative
 0816CDA4,Inventory_GetUsePermissionFlag,thumb,low,src-alias,Returns a permission bit tested when deciding whether an item can be used
