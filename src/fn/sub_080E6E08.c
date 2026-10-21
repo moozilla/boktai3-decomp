@@ -32,7 +32,6 @@ static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 // Remaining differences: pinned-offset load order around Chase_TryRoute (route object load, cc copy in r8),
 // the flags2D4 clear offsets and the zero/mask registers in the SaveControl tails.
 // confidence=low: provisional name; recovery after a hit (state 3 -> delayed restore), Mimic-owned.
-#define Mimic_UpdateHitRecovery sub_080E6E08
 
 void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
 {
@@ -259,5 +258,5 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E6E08);
+INCLUDE_ASM("asm/nonmatching", Mimic_UpdateHitRecovery);
 #endif
