@@ -1,6 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 56.4%
+// fuzzy: 80.3%
+
 // 32 differing instruction runs; size +4 bytes; first diff at +0xA (adds r5, r1, #0 vs adds r4, r1, #0)
 struct Vec {
     s16 x, y, z, pad;
@@ -75,8 +77,9 @@ static inline int height(struct Vec *pos)
         index = gUnk_030052F4->rows[z] + x;
     return (*cell(index) & 15) << 8;
 }
-void sub_0802EA90(void *unused, struct Actor *p)
+void sub_0802EA90(void *unused, struct Actor *arg)
 {
+    register struct Actor *p asm("r5") = arg;
     if (p->entered) {
         int zero = 0;
         p->entered = zero;
@@ -84,8 +87,8 @@ void sub_0802EA90(void *unused, struct Actor *p)
         Actor_PlayAnimationEntry(p, 1, 1, zero, 4);
     }
     if ((u8)p->callback(p) != 1) {
-        struct Vec *pos = &p->pos;
-        struct Vec *target = &p->target;
+        register struct Vec *pos asm("r3") = &p->pos;
+        register struct Vec *target asm("r4") = &p->target;
         int dx = target->x - pos->x;
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
@@ -93,16 +96,18 @@ void sub_0802EA90(void *unused, struct Actor *p)
             p->pos = p->target;
             p->done = 1;
         } else {
-            int angle = p->angle;
-            int speed = p->speed;
+            u8 *ap = &p->angle;
+            register int angle asm("r6") = *ap;
+            register int speed asm("r7") = p->speed;
             struct Vec *vel = &p->velocity;
-            vel->x = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+            vel->x = scale(speed * gUnk_086149C4[(angle + 64) & 255]);
             vel->y = 0;
-            vel->z = scale(gUnk_086149C4[angle] * speed);
+            vel->z = scale(speed * gUnk_086149C4[angle]);
+            asm("" ::"r"(angle), "r"(speed));
             p->targetAngle = Math_Atan2(target->x - pos->x, target->z - pos->z);
             {
-                u32 value = p->targetAngle;
-                p->angle = value;
+                int value = p->targetAngle;
+                *ap = value;
                 p->facing8 = ((value + 112) >> 5) & 7;
                 p->facing4 = ((value + 96) >> 6) & 3;
             }
