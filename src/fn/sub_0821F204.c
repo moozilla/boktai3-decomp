@@ -1,9 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.4%
-
 struct Pos {
     u16 x, pad2, z;
 };
@@ -52,9 +49,9 @@ u32 Nav_IsPositionInMesh(struct NavQuery *q, void *unused, struct Pos *pos)
     if (flags & mask)
         return 0;
     for (meshIndex = 0; meshIndex < resource->count; meshIndex++) {
+        u32 sh = meshIndex << 2;
         struct NavMesh *mesh =
-            (void *)((u8 *)resource +
-                     *(u32 *)((meshIndex << 2) + (u32)(new_var = resource->offsets)));
+            (void *)((u8 *)resource + *(u32 *)((u32)(new_var = resource->offsets) + sh));
         struct NavRegion *regions = (void *)((u8 *)mesh + mesh->regionOffset);
         s32 i;
         for (i = 0; i < mesh->count; i++) {
@@ -67,6 +64,3 @@ u32 Nav_IsPositionInMesh(struct NavQuery *q, void *unused, struct Pos *pos)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nav_IsPositionInMesh);
-#endif

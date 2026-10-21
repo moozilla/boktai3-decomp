@@ -137,8 +137,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.2%
 void Player_BeginWalk(struct PRecover *p)
 {
     if (p->tetherActive != 1) {
@@ -151,7 +149,14 @@ void Player_BeginWalk(struct PRecover *p)
     sub_08238238(p);
     Anim_SetSequence(&p->seq, p->resource, 1, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
-    if (p->seq.index == 2 && p->seq.elapsed == 0) {
+    if (({
+            register u32 o asm("r2") = 0x404;
+            register u8 *q asm("r0");
+            asm("" : "+r"(o));
+            q = (u8 *)p + o;
+            *(u16 *)q;
+        }) == 2 &&
+        p->seq.elapsed == 0) {
         if (p->stepSoundFlag) {
             p->stepSoundFlag = 0;
             Player_PlayLocalSong(p->song, 0xC7);
@@ -161,6 +166,3 @@ void Player_BeginWalk(struct PRecover *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_BeginWalk);
-#endif

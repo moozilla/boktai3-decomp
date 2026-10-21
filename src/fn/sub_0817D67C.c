@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// foundry draft (worker best 96.5%); what differs is mostly register allocation and instruction order
 #define gDirectionSineTable gUnk_086149C4
 
 struct EffectPosition {
@@ -53,7 +51,8 @@ void ActorEffect_InitializeOffset(struct EffectActor *p)
 {
     struct EffectActor *actor = p;
     struct EffectPosition pos;
-    s32 z, x;
+    s32 x;
+    register s32 z asm("r2");
     u32 angle;
     Projectile_InitializeParams(p->effect);
     if (p->mode == 2)
@@ -75,6 +74,3 @@ void ActorEffect_InitializeOffset(struct EffectActor *p)
     pos.z = pos.z + z;
     Projectile_CreateForOwner(p->effect, (s16 *)&pos, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_InitializeOffset);
-#endif
