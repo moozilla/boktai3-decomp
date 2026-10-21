@@ -1,9 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// Open: ROM keeps limit in a second register (copy of the loaded halfword) and
-// compares (timer << 16) with (limit << 16); mine truncates with lsr instead.
 struct BurstVector {
     s16 x, y, z, pad;
 };
@@ -34,11 +31,19 @@ void ParticleBurst_EmitOrbitParticle(struct Burst *, struct BurstVector *);
 void sub_08236F48(struct Burst *p)
 {
     if (p->active) {
-        u16 limit = p->limit2A;
-        if (p->timer < limit && p->variant != p->parent->variant)
+        register u32 limit asm("r2");
+        register u32 l0 asm("r0") = p->limit2A;
+        register u32 tm asm("r1") = p->timer;
+        register u32 ta asm("r0"), tb asm("r1");
+        asm("" : "+r"(l0));
+        limit = l0;
+        if (tm < limit && p->variant != p->parent->variant)
             p->timer = limit;
-        p->timer++;
-        if ((u32)(p->timer << 16) < (u32)(limit << 16)) {
+        ta = ++p->timer << 16;
+        asm("" : "+r"(ta));
+        tb = limit << 16;
+        asm("" : "+r"(tb));
+        if (ta < tb) {
             ParticleBurst_AdvanceFrame(p->sprite);
             p->position = p->parent->position;
             p->position.x += p->offset.x;
@@ -51,6 +56,3 @@ void sub_08236F48(struct Burst *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08236F48);
-#endif

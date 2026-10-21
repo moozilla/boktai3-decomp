@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 // confidence=low: tests higher adjacent cells across the selected subcell corner.
@@ -22,15 +23,7 @@ static inline u8 *CellData(s32 index)
         return p + 4;
     return gUnk_030052F4->cells + (index * 4 + 12);
 }
-static inline s32 LowZ(struct Position *p)
-{
-    u32 z = (u16)p->z;
-    return z & 255;
-}
 // confidence=low: compares base heights at positive subcell corners.
-#ifdef NONMATCHING
-// fuzzy: 97.7%
-// Remaining: Z low-byte load/mask selection and resulting pool alignment.
 s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)
 {
     s32 x = (p->x & 0xff00) + 128;
@@ -40,17 +33,20 @@ s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)
     u8 *data = CellData(index);
     s32 height;
     struct Sample sample;
+    s32 m255;
     if (!data)
         return 0;
     height = *data & 15;
+    m255 = 255;
+    asm("" : "+r"(m255));
     if ((u8)p->x < threshold) {
-        if (LowZ(p) < threshold)
+        if ((m255 & (u16)p->z) < threshold)
             return 0;
         sample.x = x;
         sample.y = y;
         sample.z = z + 255;
         data = CellData(CellIndex((struct Position *)&sample));
-    } else if (LowZ(p) >= threshold) {
+    } else if ((m255 & (u16)p->z) >= threshold) {
         sample.x = x + 255;
         sample.y = y;
         sample.z = z;
@@ -77,7 +73,3 @@ s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)
         return 0;
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Terrain_HasHigherCorner);
-#endif
