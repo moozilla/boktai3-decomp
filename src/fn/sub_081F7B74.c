@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 struct PreviewActor {
     u8 pad0[0x51];
     u8 heading;
@@ -33,13 +30,13 @@ void PreviewActor_UpdateHeading(struct PreviewActor *p)
     p->heading = p->requestedHeading;
     {
         s32 angle = (p->heading + 0x60) >> 6;
-        u16 mask = 3;
+        s32 mask = 3;
         mask &= angle;
         p->direction4 = mask;
     }
     {
         s32 angle = (p->heading + 0x70) >> 5;
-        u16 mask = 7;
+        s32 mask = 7;
         mask &= angle;
         p->direction8 = mask;
     }
@@ -55,6 +52,3 @@ void PreviewActor_UpdateHeading(struct PreviewActor *p)
         q->animationFlag = 1;
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PreviewActor_UpdateHeading);
-#endif

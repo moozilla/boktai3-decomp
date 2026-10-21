@@ -34,9 +34,6 @@ struct Ctx081D0864 {
 void SceneNpc_DispatchCommands(void *);
 int Actor_UpdateMovementAnimationAndEffects(void *, void *);
 
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// pinned c to r1; original computes counter+1 into r0
 int sub_081D0864(struct Ctx081D0864 *ctx, struct SceneNpc081D0864 *npc)
 {
     struct Sub081D0864 *sub = &npc->sub20;
@@ -74,12 +71,10 @@ int sub_081D0864(struct Ctx081D0864 *ctx, struct SceneNpc081D0864 *npc)
                     sub->offset = -0x40;
             }
             sub->counter = c + 1;
+            asm("" ::"r"(c));
             npc->posSrc->h2 += sub->offset;
         }
     }
     npc->b5 = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D0864);
-#endif
