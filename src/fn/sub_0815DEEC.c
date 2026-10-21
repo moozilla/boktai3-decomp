@@ -1,15 +1,14 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.1%
-// foundry draft (worker best 92.5%); what differs is mostly register allocation and instruction order
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);
 void Collider_SetContactMode(void *, u32);
 static inline u32 ReadMaskedFlags(u32 mask, u32 *flags)
 {
+    asm("" : "+r"(mask));
     return *flags & mask;
 }
 static inline u32 PlayerCue_TestFlags(struct Player *p, u32 mask)
@@ -51,6 +50,3 @@ void PlayerCue_ApplyColliderScale(struct Player *p, void *collider)
         scale = 1;
     Collider_SetContactMode(collider, scale);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_ApplyColliderScale);
-#endif

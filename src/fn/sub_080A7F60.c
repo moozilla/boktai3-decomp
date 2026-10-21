@@ -1,8 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 86.1%
-// Register allocation and angle-test instruction order still differ.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -24,9 +22,12 @@ static inline u8 Take(u8 *p)
 
 static inline s32 Shift(s32 n, u32 bits)
 {
+    s32 r;
     if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
+        r = n >> bits;
+    else
+        r = -((-n) >> bits);
+    return r;
 }
 
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
@@ -120,24 +121,38 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
 s32 Mod(s32, s32);
 static inline u8 Turned(s32 angle)
 {
+    u8 r = 0;
     if (angle <= 31)
-        return 1;
-    return 0;
+        r = 1;
+    return r;
 }
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
 void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
 {
     u32 zero;
-    s32 speed, amplitude, turn, rate;
+    register s32 speed asm("r5");
+    s32 amplitude, turn, rate;
     s32 dx, dz;
     if (Take(&actor->field2B1)) {
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
-        *(u32 *)((u8 *)actor + 0x2D0) |= 0x100000;
+        {
+            u32 m = 0x100000;
+            asm("" : "+r"(m));
+            *(u32 *)((u8 *)actor + 0x2D0) |= m;
+        }
     }
     if (Mod(actor->counter2AC, 48) == 0)
         Sound_PlaySong(0x3D7);
-    zero = 0;
-    CpuSet(&zero, (u8 *)actor + 0x2EC, 0x05000002);
+    {
+        u8 *dst = (u8 *)actor + 0x2EC;
+        asm("" : "+r"(dst));
+        zero = 0;
+        {
+            register u32 *zp asm("r0") = &zero;
+            asm("" : "+r"(zp));
+            CpuSet(zp, dst, 0x05000002);
+        }
+    }
     if ((s32)actor->counter2AC > 115) {
         s32 angle = *((u8 *)actor + 0xE9) - actor->direction;
         if (angle > 128)
@@ -174,7 +189,3 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
     sub_080A9DB0(actor, amplitude, rate);
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateSpiral);
-#endif

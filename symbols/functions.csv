@@ -2983,6 +2983,7 @@ addr,name,mode,confidence,source,notes
 0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
 0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
+0808F510,Slime_ApproachSavedTarget,thumb,low,src-alias,
 0808F6F0,Slime_RestoreSavedTarget,thumb,low,src-alias,"On arrival restores the saved target as the control callback, then runs update270"
 0808F77C,Slime_RunUpdateThenWait,thumb,low,src-alias,Runs update270 each frame; when it returns 0 switches control to sub_0808E780 and state 3/1
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
@@ -2994,6 +2995,7 @@ addr,name,mode,confidence,source,notes
 0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise
+08090160,Slime_EmitDeathDebris,thumb,low,src-alias,
 08090A98,Slime_PlayPendingSound,thumb,low,src-alias,Callback playing song 0x3C2 once when the linked object's sound flag is set
 08090AE0,SceneActorMotion_ArmPrimaryCollider,thumb,low,src-alias,
 08090B4C,Slime_ResolveDamageReaction,thumb,low,src-alias,
@@ -3207,10 +3209,13 @@ addr,name,mode,confidence,source,notes
 080A5B54,Spider_Create,thumb,high,gcl-name,name from GCL key 87E4 スパイダー (Spider); registry callback
 080A5B8C,TentacleBody_OnAttackCollision,thumb,low,src-alias,Attack collider callback that records the contacted object ID and clears an actor flag; prefix is provisional
 080A5BF8,TentacleBody_OnBodyContact,thumb,low,src-alias,contact callback: applies contact reaction then enters hit reaction unless unavailable
+080A5C50,TentacleBody_UpdateAttackWindup,thumb,low,src-alias,
 080A5E84,TentacleBody_ResetDirectionalPose,thumb,low,src-alias,selects the defeat-profile directional pose without entry flag then resets directional animations
 080A5FB8,TentacleBody_OnIdleState,thumb,low,src-alias,Empty callback installed by the tentacle body initializer; idle role is tentative
 080A6030,TentacleBody_UpdateHiddenTransition,thumb,low,src-alias,State callback that hides graphics and shadow before transitioning to animation 9 after frame 26
 080A60E0,ActorTrail_RestoreSavedState,thumb,low,src-alias,
+080A65A8,TentacleBody_UpdateSpreadRelease,thumb,low,src-alias,
+080A69F0,TentacleBody_UpdateChargeSpread,thumb,low,src-alias,
 080A6D18,TentacleBody_BeginDirectedAttack,thumb,low,src-alias,
 080A6F50,TentacleBody_UpdateAttackRecovery,thumb,low,src-alias,
 080A73B4,TentacleBody_UpdateDefeat,thumb,low,src-alias,
@@ -3987,6 +3992,10 @@ addr,name,mode,confidence,source,notes
 08107298,TileTrigger_IsTetherNearby,thumb,low,src-alias,
 08107320,TileTrigger_TickIdle,thumb,low,src-alias,
 0810764C,TileTrigger_TickDelay,thumb,low,src-alias,
+081076D0,TileTrigger_StepHold,thumb,low,src-alias,
+081078B0,TileTrigger_StepPress,thumb,low,src-alias,
+08107A08,TileTrigger_StepActivation,thumb,low,src-alias,
+08107B9C,TileTrigger_StepRelease,thumb,low,src-alias,
 08107D48,Pool1B8_RunPendingScripts,thumb,low,src-alias,Forwards to the helper that invokes and clears pending object script callbacks
 08107E90,Pool1B8_EnterStateThree,thumb,low,src-alias,Marks the object active and selects state three while clearing its counter and selected flags
 081081F0,Pool1B8_FindByName,thumb,low,src-alias,
@@ -6426,6 +6435,7 @@ addr,name,mode,confidence,source,notes
 08193078,Nidhoggr_UpdatePartAnimation26,thumb,low,src-alias,Starts keyframe sequence 0x26 for the indexed part and steps it until completion
 08193104,Nidhoggr_UpdatePartAnimation28,thumb,low,src-alias,Starts keyframe sequence 0x28 for the indexed part and steps it until completion
 08193190,Nidhoggr_UpdatePartAnimation27,thumb,low,src-alias,Starts keyframe sequence 0x27 for the indexed part and steps it until completion
+0819321C,Nidhoggr_UpdatePartMotion,thumb,low,src-alias,
 08193514,Nidhoggr_InitBackgrounds,thumb,low,src-alias,Loads the background resource and configures layers during Nidhoggr initialization
 081935B8,Nidhoggr_UpdateBackgroundScroll,thumb,low,src-alias,Projects the boss position relative to the camera and applies matching scroll offsets to two backgrounds
 08193680,Nidhoggr_SetBackgroundMode,thumb,low,src-alias,Changes the background variant and two associated part states only when the mode changes
@@ -6441,6 +6451,7 @@ addr,name,mode,confidence,source,notes
 081945FC,Nidhoggr_StartSuspendedObjectShake,thumb,low,src-alias,Transitions the stationary object into its shaking sequence and resets its timer
 08194624,Nidhoggr_IsSuspendedObjectReady,thumb,low,src-alias,Tests state 4 reached after descent and collider placement
 08194640,Nidhoggr_IsSuspendedObjectHidden,thumb,low,src-alias,Tests state 0 restored after the object retracts and becomes hidden
+0819465C,Nidhoggr_UpdateSuspendedObject,thumb,low,src-alias,
 08194A40,Nidhoggr_StartFirstPartAction,thumb,low,src-alias,Selects a phase-dependent action for part 0 and sets its associated flags
 08194AA0,Nidhoggr_StartSecondPartAction,thumb,low,src-alias,Selects a phase-dependent action for part 1 and sets its associated flags
 08194B00,Nidhoggr_ResetPart22Animation,thumb,low,src-alias,Requests animation state 0 for part 22
@@ -6451,6 +6462,7 @@ addr,name,mode,confidence,source,notes
 08194C54,Nidhoggr_SelectRandomPart23AlternateAnimation,thumb,low,src-alias,Chooses one of six alternate animations beginning at state 0x2A for part 23
 08194CA8,Nidhoggr_SetPart23SpecialAnimation,thumb,low,src-alias,Requests the fixed animation state 0x32 for part 23; special action meaning is tentative
 08194CB8,Nidhoggr_PlayNearbyRandomSound,thumb,low,src-alias,Randomly plays sound 0x1BF or 0x1C0 when the supplied position is near the player
+08194D70,Nidhoggr_UpdateDamageFlashAndPartAnimations,thumb,low,src-alias,
 08194FA4,Nidhoggr_InitBobbingMotion,thumb,low,src-alias,Initializes relative fixed-point coordinates and velocities used by the bobbing movement updater
 08195014,Nidhoggr_InitRelativeMotion,thumb,low,src-alias,Initializes relative fixed-point coordinates with zero horizontal speed and negative Z speed
 08195078,Nidhoggr_UpdateAnchoredSway,thumb,low,src-alias,Updates horizontal and depth oscillation and positions the boss relative to the supplied anchor
@@ -7702,6 +7714,7 @@ addr,name,mode,confidence,source,notes
 081D7434,OptionMenu_Update,thumb,low,src-alias,
 081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
 081D75AC,ScreenParams2A0_CreateSelector,thumb,low,src-alias,Creates an input task that selects among eight script callbacks configured through ScreenParams2A0
+081D76F4,Task4E01_SpawnTrailSprite,thumb,low,src-alias,
 081D7874,Task4E01_ClearTrailSprites,thumb,low,src-alias,Clears four active bytes and hides their corresponding sprites; trail identity tentative
 081D789C,SpriteGroup_InitFourSprites,thumb,low,src-alias,
 081D7908,Task4E01_SetTrailSpriteResources,thumb,low,src-alias,Assigns the shared resource and requested animation data to four effect sprites; trail identity tentative
@@ -7720,6 +7733,7 @@ addr,name,mode,confidence,source,notes
 081D88D8,SpriteSequence_BeginStageAnimation,thumb,low,src-alias,
 081D8AAC,Task4E01_UpdateTimedSprite,thumb,low,src-alias,
 081D8B14,Task4E01_OnType7DirectionalAnimation,thumb,low,src-alias,Handles type seven directional frames and flips before completing after tick five
+081D8B98,Task4E01_StartTimedImpact,thumb,low,src-alias,
 081D8F88,Task4E01_OnType4Animation,thumb,low,src-alias,Immediately returns completion for the callback installed for type four
 081D8F8C,Task4E01_StartType4TimedAnimation,thumb,low,src-alias,Selects frame 25 and installs the timed completion callback in the type four handler group; role tentative
 081D8FAC,Projectile_UpdateTimedRemoval,thumb,low,src-alias,Expiry callback that sets flag 2 and returns removal status when the lifetime elapses
@@ -8457,9 +8471,12 @@ addr,name,mode,confidence,source,notes
 0820D9C0,EnemyParticle_EnableShadow,thumb,low,src-alias,Provisionally enables the shadow option stored at parameter offset 0x2E
 0820D9C8,EnemyParticle_AddFlags,thumb,low,src-alias,Adds behavior flags to the particle parameter block
 0820D9D0,PoisonHand_RecordDefeat,thumb,low,src-alias,Calls the configured defeat script and updates event flags and enemy defeat counters
+0820DC18,PoisonHand_ApplyHitReaction,thumb,low,src-alias,
 0820DDC4,PoisonHand_InitCollider,thumb,low,src-alias,Initializes the collider with position contact callback and combat attributes
 0820DE60,PoisonHand_WaitForPlayerApproach,thumb,low,src-alias,State callback that starts the emergence sequence when the player enters range
+0820E128,PoisonHand_UpdateDefeatBurst,thumb,low,src-alias,
 0820E718,PoisonHand_Destroy,thumb,low,src-alias,Destruction callback that removes the Poison Hand sprite
+0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
 0820EBEC,OrangeSpine_RecordDefeat,thumb,low,src-alias,Calls the defeat script and updates kill statistics; tentative actor prefix from its orange-red sprite palette
 0820EFDC,OrangeSpine_InitCollider,thumb,low,src-alias,Initializes the actor collider and installs its collision callback; tentative actor identity
