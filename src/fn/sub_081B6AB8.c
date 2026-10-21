@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.0%
 // foundry draft (worker best 97.0%); what differs is mostly register allocation and instruction order
 #define gEffectSineTable gUnk_086149C4
 struct EffectPosition {
@@ -47,10 +45,12 @@ void ActorEffect_UpdateRadialTrail(struct ActorEffect *effect)
     s32 index = effect->trailIndex - 1;
     s32 i;
     struct EffectPosition delta;
+    struct EffectPosition *new_var;
     struct EffectTrailSprite *sprite;
     if (index < 0)
         index = 5;
     for (i = 0, sprite = (struct EffectTrailSprite *)((u32)effect + 0x12c); i <= 5; i++, sprite++) {
+        new_var = &sprite->position;
         if (i * 2 > effect->flags) {
             sprite->position = ((struct ActorEffect *)(index * 8 + (u32)effect))->history[0];
             index--;
@@ -58,7 +58,7 @@ void ActorEffect_UpdateRadialTrail(struct ActorEffect *effect)
                 index = 5;
         } else {
             MakeOffset(&delta, effect->angles[i], effect->radii[i]);
-            AddOffset(&sprite->position, &delta);
+            AddOffset(new_var, &delta);
         }
     }
     if (!(effect->flags & 1)) {
@@ -69,6 +69,3 @@ void ActorEffect_UpdateRadialTrail(struct ActorEffect *effect)
             effect->trailIndex = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateRadialTrail);
-#endif
