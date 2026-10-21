@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.8%
-// foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 struct SceneEventActor {
     u8 unknown0[0x51];
     u8 angle;
@@ -64,15 +62,24 @@ void SceneEventActor_UpdateSongStopTransition(struct SceneEventActor *actor)
                 facing = 0x20;
                 actor->angle = facing;
                 zero = 0;
+                phase = 2;
+                asm("" : "+r"(phase));
                 shifted = actor->angle + 0x60;
                 shifted >>= 6;
-                phase = 2;
                 facing = 3;
                 facing &= shifted;
                 actor->facing = facing;
-                shifted = (actor->angle + 0x70) >> 5;
-                facing = 7 & shifted;
-                actor->facing8 = facing;
+                {
+                    register int sh asm("r0");
+                    register u32 m asm("r1");
+                    sh = actor->angle + 0x70;
+                    asm("" : "+r"(sh));
+                    sh >>= 5;
+                    m = 7;
+                    asm("" : "+r"(m));
+                    m &= sh;
+                    actor->facing8 = m;
+                }
                 SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC,
                                                          (u8 *)actor + 0x2AC, 0xF4, 1, 1, 4);
                 actor->phase = phase;
@@ -82,6 +89,3 @@ void SceneEventActor_UpdateSongStopTransition(struct SceneEventActor *actor)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneEventActor_UpdateSongStopTransition);
-#endif

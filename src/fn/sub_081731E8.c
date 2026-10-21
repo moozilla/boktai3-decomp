@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.3%
+// fuzzy: 98.4%
 // Remaining: shared grid address is reused rather than recomputed.
 #include "scene_hud_display.h"
 extern u16 gUnk_03005260[];
@@ -49,12 +49,15 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
             Hud_SetGridPosition(grid, 0, 0);
             SceneHud_ShowSelectionDescription(p);
         } else if (*selected == 38) {
+            u8 *g2;
             PauseMenu_RefreshFruitAndUnlockIcons(p);
             *(u32 *)(p + 0x1668) |= 1;
             Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
-            Hud_SetGridPosition(((struct SceneHudState *)p)->actionInput, 0, 0);
+            g2 = ((struct SceneHudState *)p)->actionInput;
+            asm("" : "+r"(g2));
+            Hud_SetGridPosition(g2, 0, 0);
             MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
-            SceneHud_ConfigureActionGrid(((struct SceneHudState *)p)->actionInput, 0, 0);
+            SceneHud_ConfigureActionGrid(g2, 0, 0);
             SceneHud_ShowSelectionDescription(p);
         }
         PauseMenu_ClearSpriteFlags(p, 5, 1);
