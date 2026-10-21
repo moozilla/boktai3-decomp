@@ -3107,12 +3107,14 @@ addr,name,mode,confidence,source,notes
 0809D1AC,RouteActor_UpdateRandomDestination,thumb,low,src-alias,
 0809D2A8,RouteActor_ReflectAtRaisedTerrain,thumb,low,src-alias,
 0809D3A4,Lun_OnTargetCheck,thumb,low,src-alias,Target-check callback tests vertical proximity and range before setting targeting flags
+0809D424,Lun_EnterIdleOrCopyCell,thumb,low,src-alias,When flag 0x100 is set copies a word from the owner object; otherwise installs the idle control and sets bit 8 in the motion flags
 0809D4EC,SceneActorControl_ConsumeLiftFlagPenalty,thumb,low,src-alias,
 0809D550,Lun_UpdateMovement,thumb,low,src-alias,Runs movement logic and waypoint handling before the main action callback
 0809D568,Lun_UpdateTerrainBounce,thumb,low,src-alias,Invokes terrain checking that reverses horizontal movement at raised ground
 0809D938,Lun_InitSecondaryActionTable,thumb,low,src-alias,Installs the two-entry secondary action callback table at offset 0x28C
 0809D948,RouteActor_UpdatePlayerDestinationPhase,thumb,low,src-alias,
 0809DB9C,Lun_InitReactionTable,thumb,low,src-alias,Installs the two-entry callback table at offset 0x288 tentatively interpreted as reactions
+0809DBAC,Lun_PlayResponseAndResetState,thumb,low,src-alias,Plays a response sound by whether field 2E4 is set; marks the flag-0x20 reaction and resets control to code 0x12 then returns 1
 0809DC90,Lun_OnUpdate,thumb,low,src-alias,Actor update callback runs movement then dispatches the current action and checks terrain
 0809DCC8,Lun_OnPlayerTargetInit,thumb,low,src-alias,Initialization callback assigns the player position as target and invokes shared target setup
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry
@@ -3201,6 +3203,7 @@ addr,name,mode,confidence,source,notes
 080A88CC,TentacleBody_InitBehaviorTable,thumb,low,src-alias,Assigns the actor behavior table during initialization
 080A88DC,TentacleBody_GetDirectionFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and a mirror flag
 080A8904,TentacleActor_SelectWanderRoute,thumb,low,src-alias,
+080A8EBC,TentacleActor_AssignSegmentPhases,thumb,low,src-alias,Cycles phase values 0 to 3 across segments whose flags lack bits one and four
 080A8F38,TentacleBody_RefreshDirectionalAnimations,thumb,low,src-alias,
 080A915C,TentacleBody_ResetDirectionalAnimations,thumb,low,src-alias,
 080A9374,TentacleBody_UpdateSegmentMotion,thumb,low,src-alias,Applies a shared motion helper to each enabled segment using parameters 10 and 30; motion interpretation is tentative
@@ -3210,9 +3213,11 @@ addr,name,mode,confidence,source,notes
 080A9688,TentacleActor_UpdateSegmentHeadings,thumb,low,src-alias,Points each active segment toward the preceding segment; actor identity is tentative
 080A9738,TentacleActor_ResetOscillation,thumb,low,src-alias,Resets the oscillation offset to zero and its direction to positive
 080A975C,SpritePool_ConsumeStateFlag,thumb,low,src-alias,
+080A97AC,TentacleActor_TargetMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and when state bit 0 is set copies its position and makes it the target
 080A985C,TentacleActor_ActivateMarkedSegment,thumb,low,src-alias,Finds the first segment with flag four and activates its associated object
 080A9910,TentacleActor_UpdateOscillation,thumb,low,src-alias,Advances the signed offset and reverses direction at either limit
 080A9970,TentacleActor_InitSegmentUpdateState,thumb,low,src-alias,Sets the segment update control byte to one; interpretation is tentative
+080A9988,TentacleActor_ShiftSegmentTrail,thumb,low,src-alias,Every few ticks passes each active segment position to the next segment's previous-position slot starting from the owner object position
 080A9AA0,ActorTrail_ApplyAngularOffsets,thumb,low,src-alias,
 080AA024,TentacleActor_ResetSegmentPositions,thumb,low,src-alias,Copies the supplied position into both position fields of every segment
 080AA078,TentacleActor_InitCollision,thumb,low,src-alias,Initializes the actor body and attack colliders with their respective callbacks

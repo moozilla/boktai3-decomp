@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.0%
-// foundry draft (worker best 90.0%); what differs is mostly register allocation and instruction order
 #define gSelectionSlots gUnk_020004B4
 struct SelectionSlots {
     u8 pad0[0x53];
@@ -23,16 +21,18 @@ s32 SelectionSlots_ClearValue(void *unused, s32 value)
     s32 i;
     if (!SelectionSlots_GetView())
         return -1;
-    slot = gUnk_020004B4->values;
-    i = 4;
-    do {
-        if (*slot == value)
-            *slot |= 0xFF;
-        slot++;
-        i--;
-    } while (i >= 0);
+    {
+        register u32 m asm("r1") = 0xFF;
+        asm("" : "+r"(m));
+        slot = gUnk_020004B4->values;
+        i = 4;
+
+        do {
+            if (*slot == value)
+                *slot |= m;
+            slot++;
+            i--;
+        } while (i >= 0);
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SelectionSlots_ClearValue);
-#endif
