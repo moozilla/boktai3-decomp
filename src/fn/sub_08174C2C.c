@@ -3,7 +3,7 @@
 #include "scene_hud_display.h"
 #include "player.h"
 
-void sub_081642CC(void *, u32, u32, u32, u32, u32, u32);
+void Hud_DrawHealthMeterCells(void *, u32, u32, u32, u32, u32, u32);
 void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedEquipment(void *, s32, s32, s32, s32);
@@ -16,7 +16,7 @@ void InventoryGrid_UpdateStatPreview(struct SceneHudState *p)
     if (value > 120)
         value = 120;
     t[0] = value * 10;
-    sub_081642CC(p, 1, 8, 8, 1, p->actionOwner->currentStatA, t[0]);
+    Hud_DrawHealthMeterCells(p, 1, 8, 8, 1, p->actionOwner->currentStatA, t[0]);
     value = p->comparisonValues[1] + p->comparisonOffsets[1] + p->comparisonDeltas[1];
     if (value > 120)
         value = 120;

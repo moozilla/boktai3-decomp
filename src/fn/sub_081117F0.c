@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define PaletteFade_InitFromScript sub_081117F0
 void PaletteFade_SetupBackground(u8 *, s32, s32, s32, s32);
 s32 PaletteFade_LoadPaletteResources(u8 *, s32, s32);
 void ScanlineScroll_Update(void);

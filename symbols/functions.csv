@@ -4256,6 +4256,7 @@ addr,name,mode,confidence,source,notes
 0811153C,PaletteFade_SetTransitionParameters,thumb,low,src-alias,Stores palette slot and target and rate and duration while resetting transition state
 08111748,PaletteFade_LoadPaletteResources,thumb,low,src-alias,Loads two palette resources and copies the initial palette into the working buffer
 081117A0,PaletteFade_SetupBackground,thumb,low,src-alias,Loads a background resource and configures its layers and initial tilemap
+081117F0,PaletteFade_InitFromScript,thumb,low,src-alias,
 081119B8,PaletteFade_CreateFromScript,thumb,low,src-alias,Creates the palette fade task and installs its callbacks before script initialization
 081119F8,PaletteFade_SetScrollPosition,thumb,low,src-alias,Sets two fixed point background scroll coordinates used by the task updater
 08111A48,PaletteFade_StartFromScript,thumb,low,src-alias,
@@ -5562,6 +5563,7 @@ addr,name,mode,confidence,source,notes
 08164158,ResultPanel_DrawCappedCounters,thumb,low,src-alias,
 081641C4,ResultPanel_DrawCappedSmallCounters,thumb,low,src-alias,
 08164224,StatDisplay_DrawPlayerValue,thumb,low,src-alias,
+081642CC,Hud_DrawHealthMeterCells,thumb,low,src-alias,
 08164438,Hud_DrawHealthMeter,thumb,low,src-alias,Draws a tentative health meter using the panel values at offsets 0x424 and 0x426
 0816446C,Hud_DrawDefaultHealthMeter,thumb,low,src-alias,Draws the panel health meter with the default rendering mode
 0816471C,Hud_DrawDefaultEnergyMeter,thumb,low,src-alias,Draws a tentative energy meter from supplied values with the default rendering mode
