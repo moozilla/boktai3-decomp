@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative player cue role; see callback body.
-#ifdef NONMATCHING
-// fuzzy: 96.9%
 // Signed scaling sign tests and direction-store layout still differ.
 struct P {
     u8 pad0[0x30];
@@ -40,6 +38,12 @@ static inline s32 Truncate(s32 v)
     if (v >= 0)
         return v >> 12;
     return -((-v) >> 12);
+}
+static inline s32 Trunc6(s32 v)
+{
+    if (v >= 0)
+        return v >> 6;
+    return -((-v) >> 6);
 }
 static inline void Step(struct ContactSwarmSprite *sprite, struct DisplaySequenceState *state)
 {
@@ -169,8 +173,19 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
         if (p->finalDir >= 0) {
             p->dir = p->finalDir;
             p->finalDir = -1;
-        } else
-            p->dir = (((u16)angle + 112) >> 5) & 7;
+        } else {
+            register u32 d asm("r1");
+            register s32 t asm("r0");
+            register u8 *q;
+            t = (u16)angle + 112;
+            asm("" : "+r"(t));
+            t >>= 5;
+            d = t & 7;
+            asm("" : "+r"(d));
+            q = &p->dir;
+            asm("" : "+r"(q));
+            *q = d;
+        }
         if (p->dir > 4) {
             p->facing = 8 - p->dir;
             p->flip = 1;
@@ -181,45 +196,66 @@ void PlayerCue_UpdateSideWalkTarget(struct P *p)
         Anim_SetSequence(&p->seq, *(void **)((u8 *)p + 0x410), 0, p->facing, p->flip);
         Step(&p->sprite, &p->seq);
         ActorSequence_Begin(p, 0, 0);
-        p->fn = Player_RestartAnimationFromResource;
+        {
+            register u32 off asm("r2") = 0x58C;
+            register u8 *q asm("r1");
+            asm("" : "+r"(off));
+            q = (u8 *)p + off;
+            *(void **)q = Player_RestartAnimationFromResource;
+        }
         PlayerCue_CompleteAction(p);
     } else {
         p->vx = Truncate(gUnk_086149C4[(angle + 64) & 255] * 12);
         p->vy = Truncate(gUnk_086149C4[angle & 255] * 12);
         if (U8(p, 0x28F) == 1) {
             s32 v;
-            if (p->vy < 0)
+            if (p->vy < 0) {
                 v = p->vy * 40;
-            else
+                p->vy = Trunc6(v);
+            } else {
                 v = p->vy * 52;
-            if (v >= 0)
-                p->vy = v >> 6;
-            else
-                p->vy = -((-v) >> 6);
+                p->vy = Trunc6(v);
+            }
         } else if (U8(p, 0x28F) == 2) {
             s32 v;
-            if (p->vx < 0)
+            if (p->vx < 0) {
                 v = p->vx * 40;
-            else
+                p->vx = Trunc6(v);
+            } else {
                 v = p->vx * 52;
-            if (v >= 0)
-                p->vx = v >> 6;
-            else
-                p->vx = -((-v) >> 6);
+                p->vx = Trunc6(v);
+            }
         }
-        p->dir = (((u16)angle + 112) >> 5) & 7;
-        if (p->dir > 4) {
-            p->facing = 8 - p->dir;
-            p->flip = 1;
-        } else {
-            p->facing = p->dir;
-            p->flip = 0;
+        {
+            register u32 dir asm("r2");
+            register u32 d2 asm("r1");
+            register s32 t asm("r0");
+            t = (u16)angle + 112;
+            asm("" : "+r"(t));
+            t >>= 5;
+            d2 = t & 7;
+            asm("" : "+r"(d2));
+            {
+                u8 *q = &p->dir;
+                asm("" : "+r"(q));
+                dir = d2;
+                *q = d2;
+            }
+            if (dir > 4) {
+                p->facing = 8 - dir;
+                p->flip = 1;
+            } else {
+                register u32 z asm("r0");
+                u8 *fq;
+                p->facing = d2;
+                fq = &p->flip;
+                asm("" : "+r"(fq));
+                z = 0;
+                asm("" : "+r"(z));
+                *fq = z;
+            }
         }
         Anim_SetSequence(&p->seq, *(void **)((u8 *)p + 0x410), 1, p->facing, p->flip);
         Step(&p->sprite, &p->seq);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideWalkTarget);
-#endif
