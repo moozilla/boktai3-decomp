@@ -589,8 +589,8 @@ done:
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
 {
     u32 commandType = type;
-    register s32 lengthLimit asm("r5") = length;
-    register s32 *input asm("r12") = args;
+    s32 lengthLimit = length;
+    s32 *input = args;
     struct Background *p = gUnk_02000000[layer];
     if (p && p->queue.count <= 7) {
         s32 j;
@@ -605,7 +605,7 @@ void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
             do {
                 *(s16 *)((u8 *)commands + ((j << 1) + (*count << 4))) = *source++;
                 j++;
-            } while (j < lengthLimit);
+            } while (j < length);
         }
         p->queue.count++;
     }
