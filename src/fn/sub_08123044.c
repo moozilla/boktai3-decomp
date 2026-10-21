@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.4%
 // open: mask address (manager+0x920) must be rematerialized, not CSE with the occupancy test
 struct SpriteNotice {
     u8 unk0[0x42];
@@ -26,13 +25,19 @@ s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
     struct SpriteNotice *start;
     s32 i;
     u32 *mask;
+    register u32 off2 asm("r2");
     void **table;
     u8 *state;
     struct SpriteNotice *slot;
-    if (manager->occupiedMask) {
+    register u32 off asm("r1") = 0x920;
+    asm("" : "+r"(off));
+    if (*(u32 *)((u8 *)manager + off)) {
+        asm("" ::"r"(off));
         i = 0;
         start = manager->slots;
-        mask = (u32 *)((u32)start + 0x900);
+        off2 = 0x920;
+        asm("" : "+r"(off2));
+        mask = (u32 *)((u32)manager + off2);
         table = gUnk_08610728;
         state = &manager->slots[0].state;
         slot = start;
@@ -46,6 +51,3 @@ s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteNotice_TickManager);
-#endif
