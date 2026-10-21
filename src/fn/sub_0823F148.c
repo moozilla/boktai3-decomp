@@ -3,8 +3,6 @@
 
 // confidence=low: holding input charges recoil and release advances the tether attack.
 
-#ifdef NONMATCHING
-// fuzzy: 96.0%
 // Remaining differences: charge-duration store and particle bitfield setup instruction order.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
@@ -84,10 +82,22 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             *(u8 *)(p + 0xC0F) = 1;
             *(u16 *)(p + 0x4D2) = 0x1E;
             {
-                register u32 duration asm("r0") = 0x16E;
-                *(u16 *)(p + 0xAD6) = duration;
+                register u32 off asm("r0") = 0xAD6;
+                register u8 *q asm("r1");
+                register u32 v asm("r0");
+                asm("" : "+r"(off));
+                q = p + off;
+                v = 0x16E;
+                asm("" : "+r"(v));
+                *(u16 *)q = v;
             }
-            *(u16 *)(p + 0xAD8) = 0x24;
+            {
+                register u32 off2 asm("r2") = 0xAD8;
+                register u8 *q2 asm("r1");
+                asm("" : "+r"(off2));
+                q2 = p + off2;
+                *(u16 *)q2 = 0x24;
+            }
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
             Player_SetTetherMode(p, 3, 4);
             break;
@@ -112,6 +122,12 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             r = (u16 *)(p + 0x4D2);
             if (*r != 0) {
                 if (*r > 5) {
+                    {
+                        register u32 k2 asm("r3") = 0xFFFF0000;
+                        register u32 k asm("r1") = 0xFFFF;
+                        asm("" ::"r"(k2));
+                        asm("" ::"r"(k));
+                    }
                     ba.a = 0;
                     ba.b = 0;
                     bb.a = 0x20;
@@ -167,6 +183,3 @@ void Player_UpdateChargedTetherStrike(u8 *p)
     }
     *(u8 *)(p + 0xAC9) = 8;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateChargedTetherStrike);
-#endif
