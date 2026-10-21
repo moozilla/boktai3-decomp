@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.3%
-// foundry draft (worker best 91.3%); what differs is mostly register allocation and instruction order
 struct SpiralParticle {
     u8 unknown0[0x18];
     u16 x, y, z;
@@ -21,13 +18,16 @@ extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(struct SpiralParticle *, void *, u32);
 void SpiralParticles_UpdateParticle(struct SpiralParticles *p, struct SpiralParticle *s)
 {
-    s32 delta, product, deltaZ;
+    s32 delta;
+    s32 product2;
+    s32 product;
+    s32 deltaZ;
     s->angle += s->angularSpeed;
-    product = s->radius * gUnk_086149C4[(s->angle + 0x40) & 0xff];
-    if (product >= 0)
-        delta = product >> 12;
+    product2 = s->radius * gUnk_086149C4[(s->angle + 0x40) & 0xff];
+    if (product2 >= 0)
+        delta = product2 >> 12;
     else
-        delta = -(-product >> 12);
+        delta = -(-product2 >> 12);
     s->x += delta;
     product = s->radius * gUnk_086149C4[s->angle];
     if (product >= 0)
@@ -59,6 +59,3 @@ void SpiralParticles_UpdateParticle(struct SpiralParticles *p, struct SpiralPart
     if (++s->animationFrame > 7)
         s->animationFrame = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpiralParticles_UpdateParticle);
-#endif
