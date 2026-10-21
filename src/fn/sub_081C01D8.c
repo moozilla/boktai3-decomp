@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "projected_display.h"
 struct Vec {
@@ -44,9 +43,9 @@ static inline void projectPosition(struct Vec *projected, struct Vec *world)
 void TetherActor_PositionRequestIndicator(struct Marker *p)
 {
     struct Vec *screen = &p->screen;
-    register struct Vec *world asm("r0") = TetherActor_GetPosition();
+    struct Vec *world = TetherActor_GetPosition();
     struct Vec *projected = &p->projected;
-    projectPosition(projected, world);
+    projectPosition(projected, *(&world));
     switch (DirectionMarker_Update(p)) {
         case 0:
             screen->x = (u16)p->projected.x - 32;
@@ -65,14 +64,17 @@ void TetherActor_PositionRequestIndicator(struct Marker *p)
             screen->y = (u16)p->projected.y + 32;
             break;
     }
-    if (screen->x < 16)
+
+    if (screen->x < 16) {
         screen->x = 16;
-    else if (screen->x > 208)
+    } else if (screen->x > 208) {
         screen->x = 208;
-    if (screen->y < 16)
+    }
+    if (screen->y < 16) {
         screen->y = 16;
-    else if (screen->y > 128)
+    } else if (screen->y > 128) {
         screen->y = 128;
+    }
     if (!sub_081C0048(p) || actorBlocked(p->actor) || p->request <= 0) {
         p->visible = 0;
         p->flags |= 1;
