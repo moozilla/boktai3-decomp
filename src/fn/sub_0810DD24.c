@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.3%
-// foundry draft (worker best 84.3%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct PreviewPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -27,11 +25,11 @@ void SelectionPanel_InitPreview(u8 *p)
     u32 mask = 0x800;
     u32 flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
     if (flags) {
-        u32 offset;
-        struct PreviewSource *source = gUnk_020004B4;
-        u8 *values;
+        register u32 offset asm("r4");
+        register struct PreviewSource *source asm("r1") = gUnk_020004B4;
+        register u8 *values asm("r3");
         u8 value;
-        u8 zero;
+        register u8 zero asm("r2");
         u8 *dest;
         if (!source || source->active != 1)
             return;
@@ -55,6 +53,7 @@ void SelectionPanel_InitPreview(u8 *p)
         value = values[3];
         offset--;
         p[offset] = value;
+        asm("" ::"r"(offset));
         frame = values[3];
         p[0xcde] = zero;
     } else {
@@ -73,6 +72,3 @@ void SelectionPanel_InitPreview(u8 *p)
     CharacterModel_SetComponentRenderMode(sprite, 0);
     CharacterModel_InitPalettes(sprite, frame);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SelectionPanel_InitPreview);
-#endif
