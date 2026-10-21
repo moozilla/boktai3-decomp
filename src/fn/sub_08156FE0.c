@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 98.0%
-// Remaining differences: 16 register-only instructions in the scene-five direction/input path and barrier-selection path.
 #include "player.h"
 // confidence=low: action-mode gates and input select the player's next sequence.
 extern u32 gUnk_030053F4;
@@ -57,6 +54,17 @@ static inline const u16 *ReloadInput(struct Player *p)
         asm("" : "+r"(field));
         return *field;
     }
+}
+static inline s32 HistoryHead(struct Player *p)
+{
+    register u32 offset asm("r2") = 0x34C;
+    register u16 *field asm("r0");
+    s32 v;
+    asm("" : "+r"(offset));
+    field = (u16 *)((u8 *)p + offset);
+    v = (s16)field[0];
+    asm("" ::"r"(offset));
+    return v;
 }
 static inline u32 IsSceneFive(struct Player *p)
 {
@@ -163,23 +171,43 @@ s32 Player_SelectActionSequence(struct Player *p)
                 if ((InitialInput(p)[1] & 1) &&
                     (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
                     goto idle;
-                if ((s16)p->directionHistory[0] == -1)
+                if (HistoryHead(p) == -1)
                     goto idle;
                 if (ReloadInput(p)[0] & 0x100)
                     goto idle;
                 ActorSequence_Begin(p, 1, 0);
                 goto end;
             }
-            keys = p->inputKeys;
+            {
+                register u32 koff asm("r1") = 0x348;
+                register const u16 **kf asm("r0");
+                asm("" : "+r"(koff));
+                kf = (const u16 **)((u8 *)p + koff);
+                keys = *kf;
+            }
             if (keys[1] & 0x200) {
-                if (p->actionMode == 6) {
+                register u32 amoff asm("r2") = 0x418;
+                register u8 *amp asm("r0");
+                register u32 am asm("r1");
+                register u32 sgoff asm("r3");
+                register u8 *sgp asm("r0");
+                u32 sg;
+                asm("" : "+r"(amoff));
+                amp = (u8 *)p + amoff;
+                am = *amp;
+                if (am == 6) {
                     ActorSequence_Begin(p, 2, 0);
                     goto end;
                 }
-                if (p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
+                sgoff = 0x45D;
+                asm("" : "+r"(sgoff));
+                sgp = (u8 *)p + sgoff;
+                sg = *sgp;
+                if (sg && (u8)(am - 1) <= 1) {
                     Sound_PlaySong(402);
                     goto end;
                 }
+                asm("" ::"r"(am));
                 if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
                     PlayerBarrier_Hide(p->actionRequestEffect);
                     goto end;
@@ -286,6 +314,3 @@ s32 Player_SelectActionSequence(struct Player *p)
 end:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectActionSequence);
-#endif

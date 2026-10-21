@@ -1,7 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 86.5%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 struct PhaseParent {
     u8 unknown0[0xB84];
@@ -43,8 +42,9 @@ void ActorPhase_OrbitParent(struct PhaseActor *p)
         p->z += Div(parent->z + Div(gUnk_086149C4[p->angle] * 200, 4096) - p->z, p->timer);
     }
     if (--p->timer == 0) {
-        u8 enabled, phase;
-        void (*update)(void) = parent->update;
+        register u32 enabled asm("r0");
+        register u32 phase asm("r1");
+        register void (*update)(void) asm("r3") = parent->update;
         if (update == Sword_UpdateWaveAttack) {
             enabled = 1;
             phase = 2;
@@ -62,6 +62,3 @@ void ActorPhase_OrbitParent(struct PhaseActor *p)
         p->update164 = update;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorPhase_OrbitParent);
-#endif
