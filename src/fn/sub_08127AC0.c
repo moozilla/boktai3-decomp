@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.5%
-// Structure matches; direction-selection and command-lookup registers still differ.
+// fuzzy: 96.0%
+// Structure matches; the mirrored flag is re-read via sp instead of r4 and the command-lookup registers differ.
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -169,12 +169,18 @@ void Anim_SetSequence(struct ParticleSequence *, void *, s32, s32, s32);
 void TimedSprite_BlinkAndRemove(struct TimedSpritePool *, struct Projectile *);
 static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {
-    u32 quadrant = ((*angle + 0x60) >> 6) & 3;
+    register u8 *t0 asm("r0") = flip;
+    register u8 *f asm("r4");
+    u32 quadrant;
+    asm("" : "+r"(t0));
+    quadrant = ((*angle + 0x60) >> 6) & 3;
+    f = t0;
+    asm("" : "+r"(f));
     if (quadrant > 1) {
-        *flip = 1;
+        *f = 1;
         *row = 3 - quadrant;
     } else {
-        *flip = 0;
+        *f = 0;
         *row = quadrant;
     }
 }
