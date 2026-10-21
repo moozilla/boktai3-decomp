@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 93.3%); what differs is mostly register allocation and instruction order
 #define gPairSlotStateCallbacks gUnk_08610734
 struct PairSlot {
     u8 unknown[0xDE];
@@ -26,6 +24,7 @@ s32 PairSlotPool_Update(struct PairSlotPool *pool)
 {
     s32 index;
     if (((u32 *)pool)[0x78]) {
+        asm("" ::: "r1");
         for (index = 0; index < 2; index++) {
             if (PairSlotPool_IsAllocated(pool, index)) {
                 struct PairSlot *entry = &pool->entries[index];
@@ -35,6 +34,3 @@ s32 PairSlotPool_Update(struct PairSlotPool *pool)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PairSlotPool_Update);
-#endif

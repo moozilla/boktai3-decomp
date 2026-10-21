@@ -1,7 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.7%
+// fuzzy: 98.9%
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 struct Ratatosk {
     u8 pad0[0x51];
@@ -55,7 +56,8 @@ void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
             angle = p->targetAngle + 0x80;
         Ratatosk_SetFacing(p, angle);
         {
-            u16 mode = 0;
+            u32 mode = 0;
+            asm("" : "+r"(mode));
             SceneActors_StartDirectionalAnimation(p, p2->anim, p2->animData, 0x1d, mode, 1, 4);
         }
         Sound_PlaySongChecked(0x55f);

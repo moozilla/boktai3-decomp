@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// foundry draft (worker best 96.6%); what differs is mostly register allocation and instruction order
 #define SceneHud_TickWidgetMotion  PauseMenu_UpdateSpriteMotion
 #define SceneHud_BeginPaletteBlend PauseMenu_StartPaletteTransition
 #define SceneHud_SetWidgetPalette  PauseMenu_SetSpritePalette
@@ -29,10 +27,12 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
     }
     if (!s->actionTransferBonus) {
         index = 13;
+        asm("" : "+r"(index));
         mode = 2;
         palette = 0x3A8;
     } else {
         index = 13;
+        asm("" : "+r"(index));
         mode = 1;
         palette = 0x3A9;
     }
@@ -42,6 +42,3 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
     Sound_PlaySong(0x10D);
     Hud_SetInteractionCallback(s, SceneHud_TickActionResult, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_AnimateActionResult);
-#endif

@@ -1,17 +1,16 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32, s32);
 s32 ContactCollider_GetImpactDirection(struct ContactCollider *a, struct ContactCollider *b)
 {
     s32 angle;
     s32 result;
     if (a->flags & 0x100) {
-        angle = a->direction;
-        angle += 0xe0;
+        u32 t = a->direction;
+        angle = t + 0xe0;
+        asm("" : "+r"(angle));
         goto done;
     } else {
         s32 x = a->x - b->x;
@@ -26,6 +25,3 @@ done:
     angle &= 0xff;
     return ((angle >> 6) << 1) + 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ContactCollider_GetImpactDirection);
-#endif
