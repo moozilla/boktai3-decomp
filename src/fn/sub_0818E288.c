@@ -1,5 +1,4 @@
 #include "global.h"
-#define Armor_UpdatePartFlash sub_0818E288
 struct FlashBody {
     u8 pad0[0x5BC];
     u16 palette;

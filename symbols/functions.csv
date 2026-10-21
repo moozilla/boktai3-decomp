@@ -4338,7 +4338,9 @@ addr,name,mode,confidence,source,notes
 08115210,EffectPool_CreateManager,thumb,low,src-alias,Returns the existing manager or creates its task and installs update and destruction callbacks
 08115268,ActorParticles_SpawnAlternatingBurst,thumb,low,src-alias,
 08115398,Collectible_OnDeactivate,thumb,low,src-alias,Cleanup callback clears the active and initialization flags of a collectible entry
+081153B4,Collectible_StartDeath,thumb,low,src-alias,
 081155FC,Collectible_IsNearPlayer,thumb,low,src-alias,Tests whether the collectible is within 160 horizontal units of either enabled player
+08115674,Collectible_UpdateEntry,thumb,low,src-alias,
 081158B8,CallbackPool_InvokeActive,thumb,low,src-alias,
 081158FC,Collectible_DestroyManager,thumb,low,src-alias,Task destruction callback removes all 48 pooled sprites and clears the manager pointer
 08115924,ActorParticles_InitPool,thumb,low,src-alias,
@@ -6348,12 +6350,15 @@ addr,name,mode,confidence,source,notes
 0818DEBC,Armor_UpdatePartRebound,thumb,low,src-alias,
 0818DF50,Armor_UpdatePartPaletteRestore,thumb,low,src-alias,Countdown callback restores the owner's palette bank and clears itself
 0818DF90,Armor_CapturePartMotionEndpoint,thumb,low,src-alias,Copies the current position into the endpoint and computes displacement from the start
+0818DFF8,Armor_InitPartStretch,thumb,low,src-alias,
 0818E1BC,Armor_StartPartSpinMotion,thumb,low,src-alias,Consumes the activation latch and installs the callback that captures position and initializes spin
 0818E200,Armor_StartPartReturnMotion,thumb,low,src-alias,Tentatively starts the alternate return sequence after consuming the activation latch
 0818E244,Armor_StartPartApproachMotion,thumb,low,src-alias,Consumes the activation latch and installs the documented approach-segment initializer
+0818E288,Armor_UpdatePartFlash,thumb,low,src-alias,
 0818E3F4,Armor_InitPartDescent,thumb,low,src-alias,Activates the part and configures its geometry and shadow before installing the descent callback
 0818E4BC,Armor_UpdatePartColliders,thumb,low,src-alias,
 0818E574,Armor_UpdatePart,thumb,low,src-alias,Updates the countdown and state handler then runs motion and auxiliary callbacks unless paused
+0818E5E4,Armor_InitParts,thumb,low,src-alias,
 0818E910,SceneEffectPool_Update,thumb,low,src-alias,
 0818E98C,Armor6_DestroySpriteColliders,thumb,low,src-alias,
 0818E9B8,SpriteColliderGroup_ActivateParts,thumb,low,src-alias,
