@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.6%
 #include "scene_actor_control_helpers.h"
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -57,9 +55,10 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+                          s32 inSpeed)
 {
     u8 *motion = (u8 *)actor + 0x50;
+    register s32 speed asm("r5") = inSpeed;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
     s16 dz = saved->position.z - *(u16 *)(motion + 16);
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
@@ -72,7 +71,6 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     return 0;
 }
 // confidence=low: homes on a stored point, then picks a new point around the player.
-// Remaining difference: the speed register copy after the callback is emitted one slot earlier.
 void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -104,6 +102,3 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
         actor->counter2AC++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_WanderAroundPlayer);
-#endif
