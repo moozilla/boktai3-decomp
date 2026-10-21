@@ -10,9 +10,9 @@ s32 Anim_Step(void *, void *);
 void Anim_SetFrameDurationScale(void *, u32);
 s32 Player_SetAnimation(void *p, u32 index, u32 rate, u32 mode)
 {
-    void *data;
-    struct PlayerAnimation *anim;
     struct Player *actor;
+    struct PlayerAnimation *anim;
+    void *data;
     u32 flags = 4;
     actor = p;
     if (actor->animationIndex == index)
@@ -20,7 +20,7 @@ s32 Player_SetAnimation(void *p, u32 index, u32 rate, u32 mode)
     actor->animationIndex = index;
     anim = &actor->animation;
     data = actor->animationData;
-    Anim_SetKeyframes(anim, data, (u16)((u32)actor->heading + index), (u16)mode, flags);
+    Anim_SetKeyframes(anim, data, (u16)(index + (u32)actor->heading), (u16)mode, flags);
     if (actor->side)
         anim->flags |= 4;
     else
