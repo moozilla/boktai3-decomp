@@ -36,8 +36,9 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
 static inline void HideCollider(struct SceneActorRegistryResetView *actor)
 {
     struct ContactCollider *collider = &actor->colliderA;
+    u32 f = collider->flags;
     u32 m = 4;
-    m |= collider->flags;
+    m |= f;
     m &= 0xFFF7;
     collider->flags = m;
     {
@@ -54,9 +55,6 @@ static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 91.9%
-// Remaining differences: instruction ordering and register allocation.
 // confidence=low: applies a contact effect to the held player and waits before release.
 void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 frame)
 {
@@ -69,11 +67,13 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
         }
         if (target->kind <= 3) {
             u8 *player = target->owner;
+            u32 a3, a4, a5, a6;
             SpriteParticle_SpawnBatch(&actor->position, 1, 2, 0, 0x154);
-            SpriteEffect_SpawnTowardObject(
-                &actor->position, player + 0x24, *(u16 *)((u8 *)actor + 0xB4),
-                *(u16 *)((u8 *)actor + 0xBC), *(u32 *)((u8 *)actor + 0xCC),
-                *(u16 *)((u8 *)actor + 0xC4));
+            a3 = *(u16 *)((u8 *)actor + 0xB4);
+            a4 = *(u16 *)((u8 *)actor + 0xBC);
+            a5 = *(u32 *)((u8 *)actor + 0xCC);
+            a6 = *(u16 *)((u8 *)actor + 0xC4);
+            SpriteEffect_SpawnTowardObject((u8 *)actor + 0x50, player + 0x24, a3, a4, a5, a6);
             Sound_PlaySong(0x1E0);
         }
         HideCollider(actor);
@@ -83,7 +83,3 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
         SetState(actor, 0, 0, 4);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ivy_ApplyHeldTargetDamage);
-#endif
