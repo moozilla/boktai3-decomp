@@ -1,10 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// Remaining differences: state-store constant register (r2/r1 swapped, 4 insns) and the
-// flag-set write register in the sequence step (1 insn pair).
 #include "bouncing_object.h"
 #include "engine.h"
 extern u32 gUnk_030053F4;
@@ -65,7 +61,14 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
             register u32 off asm("r3") = 0x136;
             u32 base = (u32)object;
             asm("" : "+r"(off));
-            *(u8 *)(base + off) = one = 1;
+            {
+                u8 *q = (u8 *)(base + off);
+                register u32 d asm("r2");
+                asm("" : "=r"(d));
+                one = 1;
+                asm("" ::"r"(d));
+                *q = one;
+            }
             off -= 2;
             *(u16 *)(base + off) = zero;
             object->origin = *target;
@@ -137,12 +140,13 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
                 first = (u8)first;
                 if (first != (((*command & 0x30) >> 4) & bit)) {
                     register struct BouncingObject *read asm("r1") = sprite;
-                    u32 value;
+                    register u32 value asm("r0");
                     asm("" : "+r"(read));
                     value = read->sprite.flags;
                     value |= 8;
                     {
                         register struct BouncingObject *write asm("r2") = sprite;
+                        asm("" : "+r"(write));
                         write->sprite.flags = value;
                     }
                 } else {
@@ -236,6 +240,3 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
         return object;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BouncingObject_Spawn);
-#endif
