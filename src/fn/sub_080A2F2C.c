@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
