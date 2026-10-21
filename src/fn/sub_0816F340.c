@@ -27,7 +27,6 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
     }
     if (!s->actionTransferBonus) {
         index = 13;
-        asm("" : "+r"(index));
         mode = 2;
         palette = 0x3A8;
     } else {
