@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.2%
 // Register allocation: the original keeps y in r4 and the output pointer in r5; here they swap.
 struct V {
     s16 x, y, z;
@@ -61,7 +59,11 @@ void sub_081982A0(u8 *p)
     a2 = gUnk_02000710;
     world = (struct V *)&in;
     y = *(s16 *)(a2 + 0x32);
-    a = out.x + gUnk_03005418.x - 0x78;
+    a = ({
+            struct V *q = &out;
+            q->x;
+        }) +
+        gUnk_03005418.x - 0x78;
     b = out.y + gUnk_03005418.y - 0x50;
     c = __divsi3((a + b) << 5, 3) + y;
     world->x = sh(c, 1);
@@ -73,6 +75,3 @@ void sub_081982A0(u8 *p)
     ((struct Q *)p)->y = in.y;
     ((struct Q *)p)->z = in.z;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081982A0);
-#endif
