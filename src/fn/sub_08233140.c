@@ -1,7 +1,6 @@
 #include "global.h"
 /* Tentative: allocate a transient sprite from the pool, copy render state into it and link it into the draw list. */
 // MATCHING_CONCESSION: register-pinning
-// only differs: id halfword load uses r1 instead of r0
 extern u8 *gUnk_020000AC;
 extern u8 *gUnk_030042E4;
 u8 *SpritePool_CreateSingleton(void);
