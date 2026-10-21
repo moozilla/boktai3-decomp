@@ -3,7 +3,6 @@
 // confidence=low: defeat state. The body spins (drawable+6) and drifts on the spin vector;
 // once the death flag (0x2D0 & 0x10) is set it runs the defeat effects, scripts and bestiary
 // flag, returns to idle and notifies the context's linked actor.
-#define Octopus_UpdateDefeat sub_080EADD0
 
 #ifdef NONMATCHING
 // fuzzy: 86.7%
@@ -182,5 +181,5 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         U16(actor, 0x2EE) -= 8;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080EADD0);
+INCLUDE_ASM("asm/nonmatching", Octopus_UpdateDefeat);
 #endif
