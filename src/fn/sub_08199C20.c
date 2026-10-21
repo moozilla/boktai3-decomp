@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct CallbackPosition {
     u32 x, z;
@@ -19,8 +18,7 @@ void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
 {
     u16 *component;
     if (slot->flags & 4) {
-        component = (u16 *)&slot->position.x;
-        asm("" : "+r"(component));
+        *(&component) = (u16 *)(&slot->position.x);
     } else {
         component = (u16 *)&slot->position.z;
     }
