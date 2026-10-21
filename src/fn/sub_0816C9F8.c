@@ -1,4 +1,3 @@
-#define MapMenu_DrawLocationIcons sub_0816C9F8
 #include "global.h"
 struct MapIconEntry {
     u8 x, y, big, flag;
@@ -67,5 +66,5 @@ void MapMenu_DrawLocationIcons(void *menu, s32 left, s32 top)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0816C9F8);
+INCLUDE_ASM("asm/nonmatching", MapMenu_DrawLocationIcons);
 #endif
