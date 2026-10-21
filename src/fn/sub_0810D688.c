@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct RecordPanel {
     u8 pad0[0x268];
     u32 spriteFlags;
@@ -17,7 +16,7 @@ void RecordPanel_DrawTime(struct RecordPanel *p)
     s32 time;
     s32 index;
     s32 fraction;
-    register s32 seconds asm("r5");
+    s32 seconds;
     u32 mask;
     index = SelectionPanel_GetSelection(p);
     time = GameState_GetChallengeBestScore(index);
@@ -40,7 +39,8 @@ available:
     p->spriteFlags &= ~1;
     if (time > 59999) {
         seconds = 999;
-        fraction = seconds;
+        mask = seconds;
+        fraction = mask;
     } else {
         seconds = Div(time, 60);
         fraction = Div(({
