@@ -3610,6 +3610,7 @@ addr,name,mode,confidence,source,notes
 080E696C,SceneActor_UpdateAlternateEntryPhase,thumb,low,src-alias,
 080E6A34,SceneActor_StartFlaggedAnimationPhase,thumb,low,src-alias,
 080E6BE4,Dog_UpdateShadowlessApproach,thumb,low,src-alias,
+080E6E08,Mimic_UpdateHitRecovery,thumb,low,src-alias,
 080E70B0,Mimic_InitBehaviorTable,thumb,low,src-alias,Installs the behavior callback table at actor offset 0x284
 080E70C0,Mimic_UpdateReactionState,thumb,low,src-alias,Runs the reaction state helper and returns success
 080E70CC,SceneActor_EnterFlaggedEntryPhase,thumb,low,src-alias,
@@ -3619,6 +3620,7 @@ addr,name,mode,confidence,source,notes
 080E7620,Mimic_OnAnimationStateChanged,thumb,low,src-alias,Consumes the animation change flag and selects an entry based on facing
 080E766C,SceneActor_WaitForCategoryAttachment,thumb,low,src-alias,
 080E76F0,Mimic_UpdateDefeatBlink,thumb,low,src-alias,
+080E7908,Mimic_ConvergeAndTurn,thumb,low,src-alias,
 080E7B68,Mimic_ResetPursuitDrawable,thumb,low,src-alias,
 080E7D08,Mimic_OnAttackContact,thumb,low,src-alias,Attack collider callback that records the contacted object ID and clears a reaction flag
 080E7D74,Mimic_OnBodyContact,thumb,low,src-alias,Body collider callback that delegates to the shared collision response
@@ -3630,6 +3632,7 @@ addr,name,mode,confidence,source,notes
 080E8340,SceneActor_PrepareStationaryReaction,thumb,low,src-alias,
 080E848C,Mimic_OnBehaviorComplete,thumb,low,src-alias,Installed behavior callback that returns zero without changing state; completion role tentative
 080E8490,SceneActor_ResetCollisionReaction,thumb,low,src-alias,
+080E85A0,Mimic_StartHitReaction,thumb,low,src-alias,
 080E8768,Mimic_InitActionTable,thumb,low,src-alias,Installs the action callback table at actor offset 0x288
 080E8778,Mimic_UpdateBehavior,thumb,low,src-alias,Dispatches the indexed behavior callback then performs shared and Mimic reaction updates
 080E87AC,Mimic_OnUpdate,thumb,low,src-alias,Actor update callback that invokes the shared behavior update routine
