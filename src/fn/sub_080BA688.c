@@ -46,7 +46,14 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         *fl |= mask;
     }
     scratch.zero = 0;
-    CpuSet(&scratch.zero, &scratch.step, 0x05000002);
+    {
+        u32 *src = &scratch.zero;
+        void *dst = &scratch.step;
+        register u32 ctl asm("r2");
+        asm("" : "+r"(src), "+r"(dst));
+        ctl = 0x05000002;
+        CpuSet(src, dst, ctl);
+    }
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
