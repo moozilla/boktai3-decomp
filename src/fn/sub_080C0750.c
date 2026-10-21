@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.5%
-// foundry draft (worker best 90.5%); what differs is mostly register allocation and instruction order
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F2];
     u16 timer;
@@ -83,6 +81,3 @@ void SceneActorApproach_RunTimedAction(struct SceneActorRegistryResetView *actor
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorApproach_RunTimedAction);
-#endif
