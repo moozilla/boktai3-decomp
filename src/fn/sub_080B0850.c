@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#ifdef NONMATCHING
-// fuzzy: 95.6%
-// foundry draft (worker best 95.6%); what differs is mostly register allocation and instruction order
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
 {
@@ -61,8 +59,11 @@ void SceneActorPhase_BeginTimedMotion(struct SceneActorRegistryResetView *p)
                 *flags &= mask;
             }
             {
-                u16 duration = 40;
-                p->word104 = (u32)Vorn_UpdateApproachRange;
+                register u16 duration asm("r4");
+                u32 *word104 = &p->word104;
+                u32 handler = (u32)Vorn_UpdateApproachRange;
+                duration = 40;
+                *word104 = handler;
                 p->word108 = zero;
                 p->word10C = zero;
                 p->word110 = duration;
@@ -72,6 +73,3 @@ void SceneActorPhase_BeginTimedMotion(struct SceneActorRegistryResetView *p)
     } else
         ++p->counter2AC;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPhase_BeginTimedMotion);
-#endif
