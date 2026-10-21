@@ -21,7 +21,7 @@ struct SpriteSequence {
 void *ResourceRegistry_GetResource(u16);
 void Projectile_SetUpdateCallback(void *, void *);
 void Task4E01_SetTrailSpriteResources(void *, u32);
-void sub_081D8934(void);
+void Task4E01_UpdateTrailImpact(void);
 extern const u32 gUnk_08613684[];
 s32 SpriteSequence_BeginStageAnimation(struct SpriteSequence *p)
 {
@@ -34,7 +34,7 @@ s32 SpriteSequence_BeginStageAnimation(struct SpriteSequence *p)
             struct SpriteSequenceSprite *sprite = &p->sprite;
             sprite->frame = 0x1A;
         }
-        Projectile_SetUpdateCallback(state, sub_081D8934);
+        Projectile_SetUpdateCallback(state, Task4E01_UpdateTrailImpact);
         Task4E01_SetTrailSpriteResources(group, gUnk_08613684[state->stage]);
         result = 0;
     } else {

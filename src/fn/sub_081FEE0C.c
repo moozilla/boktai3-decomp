@@ -44,8 +44,7 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define SpriteParticle_UpdateManager sub_081FEE0C
-s32 sub_081FEE0C(struct Pool *pool)
+s32 SpriteParticle_UpdateManager(struct Pool *pool)
 {
     struct Entry *base = pool->e, *cursor;
     s32 i;
