@@ -4,9 +4,8 @@
 #include "game_state.h"
 #include "player.h"
 #include "scene_hud_display.h"
-#define InventoryPanel_ShowStatusIcons sub_081672FC
-#define STATUS_WIDGET                  79
-#define STATUS(p, n)                   (*(struct SceneInputWidget *)((u8 *)(p) + ((n) * 96 + 0x31C0)))
+#define STATUS_WIDGET 79
+#define STATUS(p, n)  (*(struct SceneInputWidget *)((u8 *)(p) + ((n) * 96 + 0x31C0)))
 static inline u32 Offset(u32 base, u32 off)
 {
     u32 sum = base + off;

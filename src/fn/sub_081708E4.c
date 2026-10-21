@@ -14,7 +14,7 @@ void PlayerPanel_SnapshotValues(void *);
 void sub_08166534(void *, s32, s32);
 void SceneHud_InitializeActionInput(void *);
 void SceneHud_LayoutActionGrid(void *);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void InventoryPanel_DrawStatComparison(void *, s32, s32, s32, s32, s32);
 void ScrollingDialogue_RequestShow(void);
 void SceneHud_ShowActionPreview(void *);
@@ -50,7 +50,7 @@ void PauseInventory_InitEquipmentPage(u8 *p)
     sub_08166534(p, 10, 6);
     SceneHud_InitializeActionInput(p);
     SceneHud_LayoutActionGrid(p);
-    sub_081672FC(p);
+    InventoryPanel_ShowStatusIcons(p);
     InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, z);
     ScrollingDialogue_RequestShow();
     SceneHud_ShowActionPreview(p);

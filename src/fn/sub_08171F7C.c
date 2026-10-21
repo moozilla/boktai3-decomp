@@ -12,7 +12,7 @@ void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void InventoryPanel_UpdateSelectedEquipment(void *, int, int, int, int);
 void PlayerPanel_SnapshotValues(void *);
 void sub_08166534(void *, s32, s32);
-void sub_081672FC(void *);
+void InventoryPanel_ShowStatusIcons(void *);
 void PauseInventory_InitConsumableCursors(void *);
 void SceneHud_LayoutAlternateActionGrid(void *);
 void sub_08170D78(void *);
@@ -41,7 +41,7 @@ void sub_08171F7C(u8 *p)
     InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, 0);
     PlayerPanel_SnapshotValues(p);
     sub_08166534(p, 10, 6);
-    sub_081672FC(p);
+    InventoryPanel_ShowStatusIcons(p);
     ((struct HudObj *)(p + 0x1720))->flags &= ~1;
     Anim_LoadKeyframe(p + 0x1720, p + 0x64, 0x66, 0);
     ((struct HudObj *)(p + 0x1780))->flags &= ~1;

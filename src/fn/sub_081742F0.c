@@ -14,7 +14,7 @@ void PlayerPanel_SnapshotValues(u8 *);
 void sub_08166534(u8 *, u32, u32);
 void PauseInventory_InitItemCursors(u8 *);
 void SceneHud_LayoutEquipmentGrid(u8 *);
-void sub_081672FC(u8 *);
+void InventoryPanel_ShowStatusIcons(u8 *);
 void SceneHud_RefreshEquipmentIcons(u8 *, u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void Hud_UpdateInventoryMenuInput(void);
@@ -44,7 +44,7 @@ void Hud_InitInventoryMenu(u8 *s)
     sub_08166534(s, 10, 6);
     PauseInventory_InitItemCursors(s);
     SceneHud_LayoutEquipmentGrid(s);
-    sub_081672FC(s);
+    InventoryPanel_ShowStatusIcons(s);
     SceneHud_RefreshEquipmentIcons(s, 0);
     Hud_SetInteractionCallback(s, Hud_UpdateInventoryMenuInput, 0);
     PauseMenu_SetPromptIconPositions(s, 0, 0);
