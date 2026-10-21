@@ -23,8 +23,7 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
     s32 equipped;
     s32 slot;
     void *q;
-    do {
-    } while (0);
+    DEBUG_NOP();
     q = p->actionInput;
     if (SceneInput_NavigateGridKeys(q, 0xf0)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);

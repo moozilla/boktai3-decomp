@@ -66,8 +66,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
             u32 next;
             do {
                 next = fraction - 120;
-                do {
-                } while (0);
+                DEBUG_NOP();
                 amount++;
                 fraction = next;
             } while ((u16)next > 119);
