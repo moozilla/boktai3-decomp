@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.6%
+// fuzzy: 91.0%
 // Remaining: constant/pointer register allocation (a/b hoists land in sb/r8 swapped, zero index reg).
 #define Slime_EmitDeathDebris sub_08090160
 struct Position {
@@ -60,16 +60,18 @@ void Slime_EmitDeathDebris(struct Actor *input)
     v.y = 0x30;
     a = &p->a;
     b = &p->b;
-    asm("" : "+r"(b), "+r"(a));
+    asm("" : "+r"(a), "+r"(b));
     sum = *a + *b;
     pos = (u8 *)p + 0x5C;
     sub_08127590(pos, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
     BURST(v)
     v.y = 0x25;
-    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, *a + *b, 0, 0, 0, 0, 0, 0);
+    sum = *a + *b;
+    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
     BURST(v)
     v.y = 0x20;
-    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, *a + *b, 1, 0, 0, 0, 0, 0);
+    sum = *a + *b;
+    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08090160);
