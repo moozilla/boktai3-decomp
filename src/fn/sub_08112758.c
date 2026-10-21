@@ -31,7 +31,7 @@ void StageResults_LoadBackgroundResources(void *);
 void StageResults_InitAnimationIds(void *);
 void MessagePanel_InitSprites(void *);
 void StageResults_InitPortraitDisplay(void *);
-void sub_08111E88(void *);
+void StageResults_InitCursorPositions(void *);
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void StageResults_CreateTextWindows(void *);
 void StageResults_ShowSummaryText(void *);
@@ -85,7 +85,7 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     StageResults_InitAnimationIds(p);
     MessagePanel_InitSprites(p);
     StageResults_InitPortraitDisplay(p);
-    sub_08111E88(p);
+    StageResults_InitCursorPositions(p);
     ModifierMenu_InitSelectionSnapshot((u8 *)p + 0x944, p->palette);
     StageResults_CreateTextWindows(p);
     StageResults_ShowSummaryText(p);
