@@ -27,11 +27,10 @@ void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void sub_0820B2AC(void);
-#define DragonPuppy_UpdateCombat sub_0820B3E0
-#define H(o)                     (*(s16 *)(p + (o)))
-#define U(o)                     (*(u16 *)(p + (o)))
-#define W(o)                     (*(u32 *)(p + (o)))
-#define B(o)                     (*(u8 *)(p + (o)))
+#define H(o) (*(s16 *)(p + (o)))
+#define U(o) (*(u16 *)(p + (o)))
+#define W(o) (*(u32 *)(p + (o)))
+#define B(o) (*(u8 *)(p + (o)))
 static inline u32 Paused(u32 mask)
 {
     return (gUnk_030053F4 | gUnk_030053F0) & mask;
@@ -230,5 +229,5 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
     W(0x18)++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820B3E0);
+INCLUDE_ASM("asm/nonmatching", DragonPuppy_UpdateCombat);
 #endif

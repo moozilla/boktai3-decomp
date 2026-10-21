@@ -31,10 +31,9 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-#define DragonPuppy_InitializeFromScript sub_0820B7E0
-#define H(o)                             (*(s16 *)(p + (o)))
-#define W(o)                             (*(u32 *)(p + (o)))
-#define B(o)                             (*(u8 *)(p + (o)))
+#define H(o) (*(s16 *)(p + (o)))
+#define W(o) (*(u32 *)(p + (o)))
+#define B(o) (*(u8 *)(p + (o)))
 static inline s32 DragonPuppy_CellIndex(struct PHVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;

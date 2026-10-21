@@ -52,7 +52,6 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-#define DragonPuppy_ApplyHitReaction sub_0820AD84
 void DragonPuppy_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                                   struct Target *targetInput)
 {
