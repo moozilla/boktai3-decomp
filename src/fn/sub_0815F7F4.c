@@ -1,9 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.6%
-// foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define gOrbitSineTable gUnk_086149C4
 struct PlayerOrbitParticle {
     u8 unknown0[0x18];
@@ -34,13 +31,12 @@ void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
     s32 valueZ, deltaZ;
     struct Player *player;
     p->angle += p->angularSpeed;
-    value = p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF];
+    value = p->radius * gUnk_086149C4[(p->angle - -0x40) & 0xFF];
     delta = TruncateOrbitOffset(value);
-    player = effect->player;
-    p->x = (u16)player->position.x + delta;
+    p->x = (u16)effect->player->position.x + delta;
     valueZ = p->radius * gUnk_086149C4[p->angle];
     deltaZ = TruncateOrbitOffset(valueZ);
-    p->z = (u16)player->position.z + deltaZ;
+    p->z = (u16)effect->player->position.z + deltaZ;
     if (effect->frame >= p->expandDelay) {
         if ((effect->frame & 7) == 0 && p->angularSpeed > 2)
             p->angularSpeed--;
@@ -56,6 +52,3 @@ void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *effect,
     if (p->animationPhase > 7)
         p->animationPhase = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerOrbitEffect_UpdateParticle);
-#endif
