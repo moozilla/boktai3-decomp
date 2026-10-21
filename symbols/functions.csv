@@ -6744,6 +6744,7 @@ addr,name,mode,confidence,source,notes
 081A6FF4,ScenePanel_InitAuxiliarySprite_081A6FF4,thumb,low,src-alias,
 081A7040,Vanargand_InitPart,thumb,low,src-alias,Initializes a boss part with sprites animation script procedure trigger callback and parent references
 081A70F8,Vanargand_UpdatePartCollision,thumb,low,src-alias,
+081A72E8,Vanargand_UpdatePartAnimation,thumb,low,src-alias,Tentatively steps a boss part animation sequence; when it ends clears the active flag and selects sequence 3 then updates part collision
 081A7454,Vanargand_UpdateMode26,thumb,low,src-alias,Sets mode 26 on state entry and consumes the active trigger
 081A74A4,Vanargand_UpdateMode27,thumb,low,src-alias,Sets mode 27 on state entry and consumes the active trigger
 081A74F4,Vanargand_UpdateMode2,thumb,low,src-alias,
