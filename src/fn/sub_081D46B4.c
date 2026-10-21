@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.9%
 struct PaletteDisplayEntry {
     u16 id;
     u16 frames;
@@ -33,6 +31,7 @@ void PaletteTransition_InitDisplays(struct PaletteTransition *p)
     u16 t = p->timer;
     s32 i;
     u16 *dir;
+    u32 new_var;
     if (t == 0) {
         s32 x = e->offsetX;
         s32 y = e->offsetY;
@@ -49,10 +48,8 @@ void PaletteTransition_InitDisplays(struct PaletteTransition *p)
         DisplayAnimation_InitializeKeyframes(a, e->id, 0x10, (u8 *)p + 0x9ec);
         DisplayAnimation_SetPriority(a, 2);
     }
+    new_var = e->direction;
     dir = (u16 *)((u8 *)p + 0xa00);
-    *dir = e->direction;
+    *dir = new_var;
     Dir_Decompose(e->directionIndex, (u8 *)p + 0x9fe, (u8 *)p + 0x9ff, *dir);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PaletteTransition_InitDisplays);
-#endif
