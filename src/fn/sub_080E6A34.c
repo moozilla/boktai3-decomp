@@ -15,21 +15,19 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
 {
     if (TakeEntry(&actor->field2B1)) {
         u32 *motion = &actor->fieldDC;
-        register u32 zero asm("r4") = 0;
+        u32 zero = 0;
         struct SceneActorRegistryResetView *context;
-        register u32 one asm("r3");
-        register u16 *animationFlags asm("r1");
-        register u8 zero8 asm("r5");
-        register u32 value asm("r2");
+        u32 one;
+        u16 *animationFlags;
+        u8 zero8;
+        u32 value;
         void *target;
         u8 kind;
         u32 *flags;
         s32 mask;
-        asm("" : "+r"(zero));
         *motion = zero;
         context = actor->context;
         one = 1;
-        asm("" : "+r"(one));
         animationFlags = &context->animationFlags65C;
         value = *animationFlags;
         zero8 = 0;

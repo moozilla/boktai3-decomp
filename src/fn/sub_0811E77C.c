@@ -5,7 +5,7 @@ extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 s32 StatModifier_AddForGlobalMode(void *arg, s32 value)
 {
-    register struct StatModifier *modifier asm("r4") = arg;
+    struct StatModifier *modifier = arg;
     s32 result;
     register s32 input asm("r3") = value;
     if (modifier->enabled == 0)

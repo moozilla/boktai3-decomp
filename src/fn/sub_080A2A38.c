@@ -46,7 +46,6 @@ void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *ac
         offset = 0x2A8;
         *((u8 *)actor + offset) = zero;
         off2 = 0x2A9;
-        asm("" : "+r"(off2));
         *((u8 *)actor + off2) = zero;
         offset += 2;
         *((u8 *)actor + offset) = seven;
@@ -55,7 +54,6 @@ void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *ac
         off2 += 8;
         {
             register u8 *p asm("r0") = (u8 *)actor + off2;
-            asm("" : "+r"(p));
             one = 1;
             asm("" : "+r"(one));
             *p = one;
@@ -71,7 +69,6 @@ void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *ac
         {
             register void **dst asm("r0") = (void **)((u8 *)actor + offset);
             *dst = saved;
-            asm("" : "+r"(dst));
         }
         actor->field2C8 = timer;
         {

@@ -33,9 +33,9 @@ void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
         Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
                                  palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
     } else {
-        register u32 v asm("r1") = s->variant;
+        u32 v = s->variant;
         register u32 index asm("r0") = v * 3;
-        register u32 bank asm("r1") = index + 9;
+        u32 bank = index + 9;
         CpuSet(s->palettes + (bank << 5), gScreenPaletteBuffer, 0x04000008);
     }
 }

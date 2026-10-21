@@ -28,7 +28,6 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
     {
         u32 frame = *command >> 6;
         struct DisplaySequenceSprite *o = (struct DisplaySequenceSprite *)(owner + 0x24);
-        asm("" : "+r"(sprite) : "r"(frame));
         o->frame = frame;
     }
     {
@@ -41,8 +40,7 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit)) {
             u32 flags = (*(u32 *)(owner + 0x24));
-            register u32 flip asm("r2") = flipMask;
-            asm("" : : "r"(flip));
+            u32 flip = flipMask;
             (*(u32 *)(owner + 0x24)) = flags | flip;
         } else
             (*(u32 *)(owner + 0x24)) &= ~4;
@@ -154,7 +152,7 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
 s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
-    register u32 sequenceResult asm("r0");
+    u32 sequenceResult;
     if (Script_SeekToKeyword('p')) {
         H(0x1c) = Script_GetValue();
         H(0x1e) = Script_GetValue();
@@ -228,9 +226,8 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     *(void **)(p + 0x164) = resource;
     if (H(0x146) == 0) {
         {
-            register u32 off asm("r1") = 0x108;
-            register u8 *q asm("r0");
-            asm("" : "+r"(off));
+            u32 off = 0x108;
+            u8 *q;
             q = p + off;
             *(void (**)(void))q = sub_0820843C;
         }
@@ -238,17 +235,15 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     } else {
         *(void (**)(void))(p + 0x108) = sub_082086B8;
         {
-            register u32 zero asm("r2");
+            u32 zero;
             s16 *q = &H(0x130);
             zero = 0;
-            asm("" : "+r"(zero));
             *q = 1;
             asm("" : : : "memory");
             sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, zero);
         }
     }
     StepAnimation(p, (void *)(p + 0x10c), 4);
-    asm("" : : "r"(sequenceResult));
     {
         register u32 off0 asm("r3") = 0x146;
         register u8 *a0 asm("r1");
@@ -258,12 +253,11 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
             CannonTurret_InitCollider(p);
     }
     {
-        register u32 off asm("r3") = 0x13e;
-        asm("" : "+r"(off));
+        u32 off = 0x13e;
         if (*(s16 *)(p + off) != 0) {
             u8 *body = p + 0xc0;
             void *par;
-            register u8 *pa asm("r0");
+            u8 *pa;
             off += 0xa;
             pa = p + off;
             par = *(void **)pa;

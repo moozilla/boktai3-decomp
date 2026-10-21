@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct EntryMenu {
@@ -115,11 +114,11 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
             name = PlayerName_GetBuffer();
             code = Password_DecodeEntry(text, a, b, name);
             {
-                register u8 *name asm("r0") = PlayerName_GetBuffer();
-                register s32 i asm("r2");
+                u8 *name = PlayerName_GetBuffer();
+                s32 i;
                 i = 0;
                 do {
-                    register u32 ch asm("r1") = *name;
+                    u32 ch = *name;
                     if (ch == 0 && i <= 8)
                         name[1] = ch;
                     name++;

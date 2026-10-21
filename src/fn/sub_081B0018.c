@@ -16,9 +16,9 @@ void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
     void *data;
     void *shadow;
     register u32 zero asm("r4");
-    register u32 byteZero asm("r6");
-    register u32 scale asm("sb");
-    register u32 one asm("r8");
+    u32 byteZero;
+    u32 scale;
+    u32 one;
     FIELD(s32, half, 0x15C) = mode;
     data = half + 0x2C;
     AnimData_Load(data, 0x89CA);
@@ -46,14 +46,12 @@ void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
         byteZero = 0;
         zero = 0;
         scale = 1024;
-        asm("" : : "r"(byteZero), "r"(zero), "r"(scale));
         *size = scale;
     }
     FIELD(u16, half, 0xB0) = 3;
     {
         u16 *active = (u16 *)(half + 0x172);
         one = 1;
-        asm("" : : "r"(one));
         *active = one;
     }
     ActorStatus_InitializeCollider(half, 30, 128, 60);

@@ -41,13 +41,10 @@ void ChildGroup_WaitForInactiveMembers(struct ChildGroup *p)
     }
     if (active == 0) {
         register u16 one asm("r0") = 1;
-        register u8 *q asm("r1");
-        asm("" : "+r"(one));
+        u8 *q;
         q = &p->state92;
-        asm("" : "+r"(q));
         *q = one;
         q++;
-        asm("" : "+r"(q));
         *q = one;
         p->flags8D = one | p->flags8D;
         p->callbackCC8 = ChildGroup_BeginInactiveState;

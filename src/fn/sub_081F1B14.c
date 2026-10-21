@@ -60,7 +60,7 @@ static inline u8 PlayerHasFlag(void)
 
 s32 SingletonSlot7_Update(void *arg)
 {
-    register struct SingletonSlot7Actor *actor asm("r6") = arg;
+    struct SingletonSlot7Actor *actor = arg;
     register struct SingletonSlot7Actor *p asm("r5") = actor;
     struct SingletonSlot7Scroll scroll[2];
     if (actor->motionMode == 0) {

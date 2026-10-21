@@ -44,7 +44,7 @@ void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct Actor
 {
     struct EffectVector delta;
     s32 angle;
-    register u32 index asm("r1");
+    u32 index;
     void *direction;
     subtract(&delta, &b->position, &a->position);
     if (delta.x == 0 && delta.z == 0) {

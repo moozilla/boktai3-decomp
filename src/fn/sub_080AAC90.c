@@ -37,7 +37,7 @@ done:
 void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
                                   struct SceneActorBehaviorContactView *destination, void *input)
 {
-    register void *actor asm("r9") = input;
+    void *actor = input;
     register void *self asm("r8") = actor;
     struct SceneActorBehaviorView *target = FIELD(actor, 0x124, void *);
     if (!Unavailable(target)) {
@@ -46,7 +46,7 @@ void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
         struct ContactPosition *right = (void *)((u8 *)destination + 0x24);
         struct ContactPosition *left = (void *)((u8 *)source + 0x24);
         u32 table;
-        register u32 distance asm("r10");
+        u32 distance;
         register long long direction asm("r1");
         difference.x = (u16)left->x - (u16)right->x;
         delta->y = (u16)left->y - (u16)right->y;

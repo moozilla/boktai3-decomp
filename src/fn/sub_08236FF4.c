@@ -39,16 +39,16 @@ void Sprite_Init(void *, void *, u32);
 void AttachmentSprite_Setup(struct AtUnit *p0, struct AtVector *pos0)
 {
     register struct AtUnit *p asm("r5") = p0;
-    register struct AtVector *pos asm("sb") = pos0;
+    struct AtVector *pos = pos0;
     struct AtSprite *sprite = &p->sprite;
     u32 kind = p->kind;
-    register u32 id asm("r8");
+    u32 id;
     register struct AtAnim *anim asm("r6");
     u16 *c;
-    register u16 *start asm("r2");
-    register u16 *lo asm("r1");
-    register u32 fill asm("r5");
-    register u8 *flag asm("r3");
+    u16 *start;
+    u16 *lo;
+    u32 fill;
+    u8 *flag;
     u32 v = kind;
     asm("" : "+r"(v));
     id = 0xA2;
@@ -63,7 +63,7 @@ void AttachmentSprite_Setup(struct AtUnit *p0, struct AtVector *pos0)
     sprite->f10 = v;
     sprite->f07 = 3;
     {
-        register struct AtVector *t asm("r2") = pos;
+        struct AtVector *t = pos;
         sprite->position = *t;
     }
     sprite->position.x += p->offset.x;

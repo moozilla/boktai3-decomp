@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 
@@ -23,8 +22,7 @@ void PlayerCue_UpdateRecoilRecovery(struct Player *p)
     s32 phase = p->tetherPhase;
     switch (phase) {
         case 0: {
-            register u32 frame asm("r3") = p->tetherFrame;
-            asm("" : "+r"(frame));
+            u32 frame = p->tetherFrame;
             if (!frame) {
                 if ((u8)(s8)p->facing > 4) {
                     p->heading = (8 - p->facing) >> 1;

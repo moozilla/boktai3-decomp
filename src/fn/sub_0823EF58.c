@@ -46,7 +46,7 @@ void Player_UpdateTetherRecall(u8 *p)
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             {
-                register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+                u32 released = *(u8 *)(p + 0xBF6);
                 if (released) {
                     *(u8 *)(p + 0xBF6) = 0;
                     *(u8 *)(p + 0x458) = 1;

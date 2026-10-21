@@ -36,7 +36,7 @@ static inline s32 SubtractDamage(u16 *health, u16 *damage)
 void Sword_UpdateDamage(u8 *p)
 {
     u32 flags;
-    register u32 zero asm("r8");
+    u32 zero;
     if (U(p, 0xcb4))
         U(p, 0xcb4)--;
     Sword_UpdateBodyPaletteRestore(p);
@@ -44,7 +44,6 @@ void Sword_UpdateDamage(u8 *p)
         {
             s32 health = SubtractDamage(&U(p, 0x7e), &U(p, 0xd78));
             zero = 0;
-            asm("" : "+r"(zero));
             H(p, 0x7e) = health;
         }
         if (H(p, 0x7e) < 0) {
@@ -61,7 +60,7 @@ void Sword_UpdateDamage(u8 *p)
                 H(gUnk_02000710, 0x87C) < 9999 ? H(gUnk_02000710, 0x87C) + 1 : 9999;
             {
                 register u8 *g asm("r0") = gUnk_02000710;
-                register u32 off asm("r2") = 0x538;
+                u32 off = 0x538;
                 register s16 *q asm("r3");
                 register u32 v asm("r4");
                 q = (s16 *)(g + off);
@@ -70,8 +69,7 @@ void Sword_UpdateDamage(u8 *p)
                 asm("" ::"r"(v));
             }
             {
-                register u32 read asm("r2") = W(p, 0xCA8);
-                asm("" : "+r"(read));
+                u32 read = W(p, 0xCA8);
                 flags = read;
             }
             H(gUnk_02000710, 0x548) =
@@ -87,7 +85,6 @@ void Sword_UpdateDamage(u8 *p)
             } else {
                 register u32 last asm("r2") = flags;
                 last &= 0x800;
-                asm("" : "+r"(last));
                 if (last) {
                     INC(0x592);
                 }

@@ -4,7 +4,7 @@
 s32 Callback_InvokeActor(void *, void (*)(void));
 void SessionMenu_InvokeCallback(void)
 {
-    register struct AreaEffectLinkState *p asm("r3") = gUnk_020004B4;
+    struct AreaEffectLinkState *p = gUnk_020004B4;
     if (p) {
         register struct AreaEffectLinkState *q asm("r2") = p;
         switch (q->unavailable) {

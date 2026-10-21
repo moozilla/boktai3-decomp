@@ -49,15 +49,14 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         *(u16 *)((u8 *)actor + 0x2BC) = 60;
         {
             u32 index = (gUnk_03005308 + 1) & 1023;
-            register u32 value asm("r1");
+            u32 value;
             gUnk_03005308 = index;
             index *= 2;
             {
                 register const u16 *table asm("r3") = gUnk_0203B400;
                 register u32 off asm("r5");
-                asm("" : "+r"(table));
                 {
-                    register const u16 *entry asm("r0") = (void *)(index + (u32)table);
+                    const u16 *entry = (void *)(index + (u32)table);
                     value = *entry;
                 }
                 off = 0x2BA;

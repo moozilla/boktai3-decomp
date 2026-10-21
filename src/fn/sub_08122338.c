@@ -36,7 +36,6 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
     {
         u32 v = tbl[gUnk_03005308];
         u32 m = 63;
-        asm("" : "+r"(m));
         duration = (v & m) + 30;
     }
     motion.x = Div(motion.x, duration);
@@ -45,7 +44,6 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
         s32 q = Div(duration, 2);
         u32 v = tbl[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
         u32 m = 7;
-        asm("" : "+r"(m));
         motion.y = q + (v & m);
     }
     if (motion.x > 48)

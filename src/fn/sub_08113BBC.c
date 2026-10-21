@@ -52,7 +52,6 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
         asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -212,7 +211,7 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
     {
         void *c = p->collider;
         register s32 *hp asm("r0") = &p->height;
-        register s32 h asm("r2");
+        s32 h;
         asm("" : "+r"(hp));
         h = *hp;
         Collider_SetFixedPositionWithYOffset(c, &p->position, h);

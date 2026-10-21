@@ -26,10 +26,10 @@ void SelectionPanel_InitPreview(u8 *p)
     u32 flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
     if (flags) {
         register u32 offset asm("r4");
-        register struct PreviewSource *source asm("r1") = gUnk_020004B4;
-        register u8 *values asm("r3");
+        struct PreviewSource *source = gUnk_020004B4;
+        u8 *values;
         u8 value;
-        register u8 zero asm("r2");
+        u8 zero;
         u8 *dest;
         if (!source || source->active != 1)
             return;

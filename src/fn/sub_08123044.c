@@ -28,7 +28,7 @@ s32 SpriteNotice_TickManager(struct SpriteNoticeManager *manager)
     void **table;
     u8 *state;
     struct SpriteNotice *slot;
-    register u32 off asm("r1") = 0x920;
+    u32 off = 0x920;
     asm("" : "+r"(off));
     if (*(u32 *)((u8 *)manager + off)) {
         asm("" ::"r"(off));

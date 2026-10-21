@@ -138,12 +138,10 @@ static inline void changeState(struct Vanargand *p, s32 state, void *callback)
 {
     struct Vanargand *self = p;
     // Keep the transition owner distinct from the callback installation owner.
-    asm("" : "+r"(self));
     if (FIELD(u8, p, 0xAB) == 3)
         restorePalette(p, self);
     {
         u32 zero = 0;
-        asm("" : "+r"(zero));
         FIELD(u8, p, 0xAB) = state;
         FIELD(void *, p, 0x100) = callback;
         FIELD(u32, p, 0x90) = zero;

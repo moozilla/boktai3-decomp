@@ -14,7 +14,6 @@ void Bg_UpdateScrollShadow(void)
     struct Background *src = gUnk_03004C30;
     u32 mask;
     register u32 t0 asm("r1") = src[0].x;
-    asm("" : "+r"(t0));
     mask = 0xff;
     dst[0] = mask & t0;
     dst[1] = mask & src[0].y;

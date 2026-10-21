@@ -174,7 +174,6 @@ void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *pool, struct F
     struct Feather *sprite = p;
     u8 row, flip;
     struct Feather *alias = p;
-    asm("" : "+r"(alias));
     if (p->enter) {
         p->flags &= ~1;
         p->enter = 0;

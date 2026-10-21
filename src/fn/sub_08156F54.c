@@ -15,7 +15,7 @@ s32 Player_TestTetherActionInput(struct Player *p)
         struct TetherActor **g;
         struct TetherActor *a;
         {
-            register struct TetherActor **g0 asm("r0") = &gUnk_02000488;
+            struct TetherActor **g0 = &gUnk_02000488;
             a = *g0;
             g = g0;
             asm("" : "+r"(g));
@@ -23,7 +23,6 @@ s32 Player_TestTetherActionInput(struct Player *p)
         if (a && (a->state == 1 || a->state == 0x11)) {
             u32 t = p->tetherStatusTag;
             u32 f = p->tetherStatusFlags;
-            asm("" ::: "memory");
             if (TetherActor_TestMatchingStatus(t, f, (*g)->statusTag, (*g)->statusFlags))
                 return 1;
         }

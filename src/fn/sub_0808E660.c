@@ -3,14 +3,14 @@
 void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        register u16 *scale asm("r1") = &actor->field2C2;
+        u16 *scale = &actor->field2C2;
         *scale = 0x40;
         Anim_SetDurationScale((u8 *)actor->drawable + 0x48, 0x40);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x10);
     }
     {
         register s32 r asm("r0");
-        register u32 idx asm("r1");
+        u32 idx;
         register u32 *g asm("r0") = &gUnk_03005308;
         idx = (*g + 1) & 1023;
         *g = idx;

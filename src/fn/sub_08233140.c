@@ -41,7 +41,6 @@ u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *
     {
         register u16 *ip asm("r1") = (u16 *)&id;
         register u16 v asm("r1");
-        asm("" : "+r"(ip));
         v = *ip;
         *(u16 *)(slot + 2) = v;
     }
