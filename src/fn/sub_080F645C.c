@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// Remaining differences: allocation of the saturated defeat counter at offset 0x538.
 extern u8 *gUnk_02000710;
 void Sword_UpdateBodyPaletteRestore(void *);
 void ChildGroup_ShowDamageNumber(void *, u32, u32);
@@ -62,8 +59,16 @@ void Sword_UpdateDamage(u8 *p)
             *(void (**)(void))(p + 0xcc8) = sub_080F421C;
             H(gUnk_02000710, 0x87C) =
                 H(gUnk_02000710, 0x87C) < 9999 ? H(gUnk_02000710, 0x87C) + 1 : 9999;
-            H(gUnk_02000710, 0x538) =
-                H(gUnk_02000710, 0x538) < 9999 ? H(gUnk_02000710, 0x538) + 1 : 9999;
+            {
+                register u8 *g asm("r0") = gUnk_02000710;
+                register u32 off asm("r2") = 0x538;
+                register s16 *q asm("r3");
+                register u32 v asm("r4");
+                q = (s16 *)(g + off);
+                v = *(u16 *)q;
+                *q = *q < 9999 ? v + 1 : 9999;
+                asm("" ::"r"(v));
+            }
             {
                 register u32 read asm("r2") = W(p, 0xCA8);
                 asm("" : "+r"(read));
@@ -90,7 +95,3 @@ void Sword_UpdateDamage(u8 *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Sword_UpdateDamage);
-#endif
