@@ -189,6 +189,8 @@ def family(p, pinned, stripped):
 
 def analyze(path, func, show=0):
     text = open(path).read()
+    if unpin.strip_code(text) == text:
+        return "header", "header", []  # the hint is in a header helper, not in this copy
     with tempfile.TemporaryDirectory(prefix="passdiff-", dir=os.path.join(ROOT, "build")) as work:
         a = dumps(text, func, work)
         b = dumps(unpin.strip_code(text), func, work)

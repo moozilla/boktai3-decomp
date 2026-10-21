@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MARK = "// MATCHING_CONCESSION: register-pinning"
-PIN = re.compile(r'\bregister\s+([^;=()]*?)\s*\basm\s*\(\s*"\w+"\s*\)')
+PIN = re.compile(r'\bregister\s+([^;=]*?)\s*\basm\s*\(\s*"\w+"\s*\)')
 BARRIER = re.compile(r'^[ \t]*(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?::[^;]*)?\)\s*;[ \t]*\n', re.M)
 BARRIER_INLINE = re.compile(r'(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?::[^;]*)?\)\s*;')
 
