@@ -2,8 +2,6 @@
 #include "global.h"
 #include "terrain_cell_probe.h"
 
-#define PlayerBarrier_TryPlace sub_08162BE4
-
 struct SPos {
     s16 x, y, z, w;
 };

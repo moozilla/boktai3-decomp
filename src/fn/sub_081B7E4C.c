@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "terrain_cell_probe.h"
 
-#define GrowthHazard_InitEntryFromScript sub_081B7E4C
-
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void sub_081B7DC8(void *);
