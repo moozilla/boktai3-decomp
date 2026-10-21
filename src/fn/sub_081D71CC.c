@@ -1,8 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.6%
-// foundry draft (worker best 94.6%); what differs is mostly register allocation and instruction order
 #define ScreenTransition_SetPhase TextSequence_SetState
 #define gScreenBlendControl       gUnk_030051DC
 #define gScreenBlendAmount        gUnk_030051D4
@@ -28,11 +26,12 @@ void ScreenTransition_FadeBlendOut(struct ScreenTransition *p, struct ScreenTran
     if (++*timer >= step->duration) {
         TextSequence_SetState(p, 0);
         ++p->state;
-        gUnk_030051D4 = 0;
+        gUnk_030051D4 = ({
+            u32 z = 0;
+            asm("" : "+r"(z));
+            z;
+        });
     } else {
         gUnk_030051D4 = 64 - Div(*timer << 6, step->duration);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScreenTransition_FadeBlendOut);
-#endif
