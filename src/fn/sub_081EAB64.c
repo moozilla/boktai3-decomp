@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: menu ownership follows Params3D0_CreateDisplay.
 
@@ -46,6 +45,8 @@ void Task_Kill(void *);
 #define FLAGS(off) (*(u32 *)((u8 *)p + (off)))
 void Params3D0_UpdateDisplay(struct Display *p)
 {
+    u8 *source_3;
+    u8 *source_2;
     s32 value;
     s16 position;
     struct Message message;
@@ -92,15 +93,17 @@ void Params3D0_UpdateDisplay(struct Display *p)
         p->result = 5;
         p->fadeShift = gUnk_020003D0.fadeOut;
         Menu_StartFadeOut(p->fadeShift);
-        if (Sound_IsSongPlaying(0xA4))
+        if (Sound_IsSongPlaying(0xA4)) {
             Sound_FadeOutChannel10(p->fadeShift);
+        }
         p->idleTimer = 0;
         return;
     }
     switch (p->state) {
         case 0:
-            if (p->timer > (1 << p->fadeShift))
+            if (p->timer > (1 << p->fadeShift)) {
                 p->state = 1;
+            }
             break;
         case 1:
             if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 10)) {
@@ -116,12 +119,14 @@ void Params3D0_UpdateDisplay(struct Display *p)
             if (p->slide >= 0) {
                 p->state = 2;
                 p->slide = 0;
-            } else
+            } else {
                 p->slide += 4;
+            }
             break;
         case 2:
-            if (p->stateTimer > 10)
+            if (p->stateTimer > 10) {
                 p->state = 3;
+            }
             break;
         case 3:
             if (p->stateTimer == 0) {
@@ -130,16 +135,18 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 Sound_PlaySong(0x2BC);
                 p->musicTimer = p->timer;
                 ScreenTransition_SendCommand(0, 5, 31, 31, 31, 0xFFFF, 0);
-                FLAGS(0x20) &= ~1;
-                FLAGS(0x350) &= ~1;
-                FLAGS(0x3D8) &= ~1;
-                FLAGS(0x460) &= ~1;
-            } else if (p->stateTimer > 35)
+                *((u32 *)(((u8 *)p) + 0x20)) &= ~1;
+                *((u32 *)(((u8 *)p) + 0x350)) &= ~1;
+                *((u32 *)(((u8 *)p) + 0x3D8)) &= ~1;
+                *((u32 *)(((u8 *)p) + 0x460)) &= ~1;
+            } else if (p->stateTimer > 35) {
                 p->state = 4;
+            }
             break;
         case 4:
-            if (p->stateTimer > 10)
+            if (p->stateTimer > 10) {
                 p->state = 5;
+            }
             break;
         case 5:
             if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 10)) {
@@ -149,15 +156,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 }
             }
             {
-                register u8 *source asm("r2");
+                u8 *source;
                 u8 *input;
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
-                    FLAGS(0xA8) &= ~1;
-                    source = gUnk_030042E4 + 0x6240;
+                    *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
+                    source_2 = gUnk_030042E4 + 0x6240;
                     input = (u8 *)p + 0x520;
                     output = (u8 *)p + 0x700;
-                    Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
+                    Palette_InterpolateBanks(input, output, source_2, p->paletteStep, p->unused760);
                     source = gUnk_030042E4 + 0x6260;
                     Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
                                              p->unused760);
@@ -165,8 +172,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     p->paletteStep++;
                 }
             }
-            if (p->paletteStep > (1 << (p->unused760 - 1)) + 20 || p->skipped == 1)
+            if ((p->paletteStep > ((1 << (p->unused760 - 1)) + 20)) || (p->skipped == 1)) {
                 p->state = 6;
+            }
             break;
         case 6:
             if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
@@ -179,15 +187,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 }
             }
             {
-                register u8 *source asm("r2");
+                u8 *source;
                 u8 *input;
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
-                    FLAGS(0xA8) &= ~1;
-                    source = gUnk_030042E4 + 0x6240;
+                    *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
+                    source_3 = gUnk_030042E4 + 0x6240;
                     input = (u8 *)p + 0x520;
                     output = (u8 *)p + 0x700;
-                    Palette_InterpolateBanks(input, output, source, p->paletteStep, p->unused760);
+                    Palette_InterpolateBanks(input, output, source_3, p->paletteStep, p->unused760);
                     source = gUnk_030042E4 + 0x6260;
                     Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
                                              p->unused760);
@@ -217,8 +225,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
             }
             break;
         case 8:
-            if (p->timer < (1 << p->fadeShift))
+            if (p->timer < (1 << p->fadeShift)) {
                 break;
+            }
             if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 0x38)) {
                 p->idleTimer = 0;
                 if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
@@ -226,8 +235,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     if (p->selection == 0) {
                         Sound_PlaySong(0xE0);
                         p->fadeShift = gUnk_020003D0.confirmFade;
-                        if (p->fadeShift <= 5)
+                        if (p->fadeShift <= 5) {
                             p->fadeShift = 6;
+                        }
                     } else {
                         Sound_PlaySong(0xDD);
                         p->fadeShift = gUnk_020003D0.confirmFade;
@@ -236,22 +246,25 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     p->result = p->selection + 1;
                     Menu_StartFadeOut(p->fadeShift);
                     if (Sound_IsSongPlaying(0xA4)) {
-                        if (p->fadeShift <= 1)
+                        if (p->fadeShift <= 1) {
                             Sound_FadeOutChannel10(p->fadeShift);
-                        else
+                        } else {
                             Sound_FadeOutChannel10(p->fadeShift - 1);
+                        }
                     }
                     break;
                 } else if (gUnk_03005260[1] & 0x20) {
                     Sound_PlaySong(0x12B);
-                    if (--p->selection < 0)
+                    if ((--p->selection) < 0) {
                         p->selection = p->count - 1;
+                    }
                     p->state = 11;
                     break;
                 } else if (gUnk_03005260[1] & 0x10) {
                     Sound_PlaySong(0x12B);
-                    if (++p->selection >= p->count)
+                    if ((++p->selection) >= p->count) {
                         p->selection = 0;
+                    }
                     p->state = 9;
                     break;
                 }
@@ -272,8 +285,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
             break;
         case 10:
             Actor_UpdatePairedSpriteAnimation(p);
-            if (p->stateTimer <= 4)
+            if (p->stateTimer <= 4) {
                 Anim_LoadKeyframe((u8 *)p + 0x2C0, (u8 *)p + 0x4E0, 6, 0);
+            }
             p->velocity -= 2;
             position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
             *(u16 *)((u8 *)p + 0x1D0) = position;
@@ -304,8 +318,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
             break;
         case 12:
             Actor_UpdatePairedSpriteAnimation(p);
-            if (p->stateTimer <= 4)
+            if (p->stateTimer <= 4) {
                 Anim_LoadKeyframe((u8 *)p + 0x238, (u8 *)p + 0x4E0, 10, 0);
+            }
             p->velocity += 2;
             position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
             *(u16 *)((u8 *)p + 0x1D0) = position;
@@ -331,26 +346,29 @@ void Params3D0_UpdateDisplay(struct Display *p)
             }
             if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
                 TimeDisplay_HideAnimatedObjects(p);
-                if (p->result == 0)
+                if (p->result == 0) {
                     Script_Call(gUnk_020003D0.c, 0);
-                else if (p->result == 1)
+                } else if (p->result == 1) {
                     Script_Call(gUnk_020003D0.g, 0);
-                else if (p->result == 2) {
+                } else if (p->result == 2) {
                     value = 0;
                     Script_Call(gUnk_020003D0.o, &message);
-                } else if (p->result == 3)
+                } else if (p->result == 3) {
                     Script_Call(gUnk_020003D0.l, 0);
-                else if (p->result == 5)
+                } else if (p->result == 5) {
                     Script_Call(gUnk_020003D0.d, 0);
-                else if (p->result == 4)
+                } else if (p->result == 4) {
                     Script_Call(gUnk_020003D0.s, 0);
+                }
                 Task_Kill(p);
             }
             p->counter++;
             break;
     }
-    if (p->state != p->lastState)
+
+    if (p->state != p->lastState) {
         p->stateTimer = 0;
+    }
     p->lastState = p->state;
     p->stateTimer++;
     p->timer++;
