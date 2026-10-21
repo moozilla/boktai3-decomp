@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
-// Entry take-flag allocation and zero-value lifetime still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
 static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor, u32 zero)
