@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #define gActorLayeredMidRestoreAnimations gUnk_0824EE20
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.7% (movs r2,#0 is scheduled after the p+0xc4 address; orrs operand order on the 0x190 flag)
 struct ActorAnimationLayer {
     u16 unknown[3];
     u16 flags;
@@ -20,16 +18,26 @@ void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
     switch (st) {
         case 0: {
             u32 four = 4;
+            register u32 zero asm("r2");
+            u16 *c4;
             st = ((p[0xb39] + 0x60) >> 6) & 3;
             Armor_SetAnimationFromStart((u32)p, (u32)&gActorLayeredMidRestoreAnimations[st]);
-            *(u16 *)(p + 0xc4) = 0x10;
+            c4 = (u16 *)(p + 0xc4);
+            zero = 0;
+            asm("" : "+r"(zero));
+            *c4 = 0x10;
             (*s)++;
-            p[0xb41] = 0;
+            p[0xb41] = zero;
             *(u16 *)(p + 0xb32) |= 2;
             ((struct ActorAnimationLayer *)(p + 0x238))->flags &= ~four;
             ((struct ActorAnimationLayer *)(p + 0x1e4))->flags &= ~four;
             ((struct ActorAnimationLayer *)(p + 0x28c))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x190))->flags |= four;
+            {
+                struct ActorAnimationLayer *l = (struct ActorAnimationLayer *)(p + 0x190);
+                u16 f = l->flags;
+                f |= four;
+                l->flags = f;
+            }
             {
                 struct ActorRenderFlags *render = (void *)(p + 0x180);
                 u32 one = 1;
@@ -47,6 +55,3 @@ void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorController_UpdateLayeredMidWithRestoreDelay);
-#endif

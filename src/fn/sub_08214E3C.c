@@ -1,7 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 95.3%
 // Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
     s16 x, y, z;
@@ -29,13 +27,27 @@ static inline s32 project(s32 input)
     s32 v = input * 3;
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-static inline void screen(struct Vec *dst, struct Vec *src)
+static inline void screen(struct Vec *dst, struct Sprite *sp)
 {
+    register u32 off asm("r0") = 0x1c;
+    register struct Vec *t asm("r0");
+    register struct Vec *src asm("r12");
     s32 depth, height, y, z;
-    s32 sx = src->x, sz = src->z;
+    s32 sx, sz;
+    asm("" : "+r"(off));
+    off += (u32)sp;
+    t = (struct Vec *)off;
+    src = t;
+    sx = sp->pos.x;
+    asm("" ::"r"(src));
+    asm("" : "+r"(t));
+    sz = t->z;
     dst->x = project(sx - sz);
     depth = project(sx + sz);
-    height = project(src->y);
+    {
+        register struct Vec *q asm("r2") = src;
+        height = project(q->y);
+    }
     y = depth - height;
     z = depth + height;
     dst->x = dst->x - gUnk_03005418[0] + 120;
@@ -63,7 +75,7 @@ void Sprite_RenderFlipAwareList(void)
             goto next;
         resource = p->resource;
         if (!(p->flags & 16)) {
-            screen(&pos, &p->pos);
+            screen(&pos, p);
             {
                 register struct Vec *out asm("r0") = &pos;
                 x = out->x;
@@ -80,6 +92,7 @@ void Sprite_RenderFlipAwareList(void)
             register s32 top asm("r4");
             register u32 width asm("r12");
             register u32 height asm("r1");
+            register s32 bot asm("r0");
             if (p->flags & 4) {
                 register s32 edge asm("r0") = x + resource->offsetX;
                 left = edge - resource->width;
@@ -88,13 +101,15 @@ void Sprite_RenderFlipAwareList(void)
             }
             width = resource->width;
             if (p->flags & 8) {
-                top = y + resource->offsetY - resource->height;
+                register s32 t asm("r0") = y + resource->offsetY;
+                top = t - resource->height;
                 height = resource->height;
             } else {
-                top = y - resource->offsetY;
+                register s32 t asm("r0") = resource->offsetY;
+                top = y - t;
                 height = resource->height;
             }
-            if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
+            if (left > 240 || top > 160 || left + (s32)width < 0 || (bot = top + (s32)height) < 0)
                 goto next;
         }
         sub_08214600(p, x, y, z);
@@ -102,7 +117,3 @@ void Sprite_RenderFlipAwareList(void)
         p = p->next;
     } while (p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Sprite_RenderFlipAwareList);
-#endif
