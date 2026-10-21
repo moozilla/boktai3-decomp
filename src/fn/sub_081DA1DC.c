@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
 // confidence=low: timed-effect projectile update that turns at terrain steps.
@@ -65,7 +64,6 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TEntry *e)
             e->turn = Task4E01_SelectTerrainTurn(sp->pos, e->prev, e->turn);
             {
                 s32 n = e->turn;
-                asm("" : "+r"(n));
                 config->angle = (n << 5) - 0x60;
             }
             polar(&e->vel, config->angle, config->speed);
@@ -88,7 +86,6 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TEntry *e)
             }
             {
                 s32 n = e->turn;
-                asm("" : "+r"(n));
                 config->angle = (n << 5) - 0x60;
             }
             config->flags |= 0x20;

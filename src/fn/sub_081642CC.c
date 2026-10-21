@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: health meter drawn as a 10-cell bar (8 steps per cell).
 extern u16 gUnk_03005176;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
@@ -65,7 +64,6 @@ void Hud_DrawHealthMeterCells(u8 *p, s32 mode, s32 row, s32 col, s32 cap, s32 va
         *cell++ = fullTile | 0xd000;
     if (partial) {
         s32 r = partial - 8;
-        asm("" : "+r"(r));
         *cell++ = (fullTile - r) | 0xd000;
         n++;
     }

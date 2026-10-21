@@ -6,7 +6,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     struct ProximityEmitterParticle *particle = &emitter->particles[*next];
     const u16 *random;
     register u32 *indexAddress asm("r9");
-    register u32 index asm("r1"), mask asm("r3");
+    register u32 index asm("r1"), mask;
     register u32 xzMask asm("r8");
     SpriteDrawable_SelectTileFrame(particle, resource, 2);
     particle->flags &= ~1;

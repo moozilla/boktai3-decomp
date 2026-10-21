@@ -241,3 +241,44 @@ extra temporaries come from. The original source very likely had macros and
 inline functions (flag tests, list walks, fixed-point helpers) that expand to
 exactly these shapes, so a do/while(0) depin is best rewritten as the macro it
 probably was.
+
+## Which compiler pass a pin acts on: the idiom families (2026-10-21)
+
+`tools/passdiff.py FILE.c FUNC` compiles a pinned function and its
+hint-stripped copy with `agbcc -da` and compares the RTL after every pass
+(rtl jump cse addressof gcse loop cse2 flow combine regmove lreg greg jump2
+mach) on an operation skeleton: registers anonymous, low-part subregs folded,
+plain register copies dropped, hard register numbers kept only after reload.
+The first pass that differs, and the shape of the difference, name what the
+pin really steers. `--batch LIST OUT -j 4` runs it over `progress.py
+--list-pinned` (930 functions in about 15 minutes):
+
+| Family | Functions | What the pin changes | Natural levers (translate.py `--natural` passes) |
+|---|---:|---|---|
+| const-in-reg | 249 | A constant stays in a register instead of being folded into an instruction or re-materialized (mostly at cse, some at expand) | One named constant shared by two uses; set the constant again inside a loop (`reset_const`); a `u8`/`u16` constant temp; field access vs. a precomputed pointer for large struct offsets (`struct_ref`, `const_var`) |
+| alloc | 197 | Nothing until allocation: the RTL is identical through lreg; only the hard register differs | Declaration order (pseudo numbers break ties), use parameters directly (`param_copy`), split or merge a variable (`split_var`, `remove_var`), inline-wrapper argument order, early returns. If `rasolve.py` says "no priority change helps", the ROM's register comes from a conflict: the original had another value live there |
+| branch | 105 | Jump threading or block order | Early returns (`early_return`), split or combined conditions (`condition`, `reverse_cond`), loop form |
+| order | 95 | Same instructions, different order | Statement order (`swap_stmts`, `reorder_stmts`), call argument order, commutative operands, declaration placement (`move_to_use`) |
+| expr-shape | 91 | Different arithmetic or address form | `struct_ref`, `compound_assignment`, `add_sub`, index vs. pointer |
+| combine | 55 | Instruction fusion at combine/regmove | Split or chain an assignment, add or remove a temporary (`temp_for_expr`) |
+| extend | 35 | A zero/sign extension appears or disappears | The declared type of the variable (`randomize_internal_type`), a cast |
+| spill | 34 | Reload or spill code at greg | Shorter live ranges: `move_to_use`, `split_var` |
+| load-reuse | 28 | CSE reuses a loaded value instead of loading again (or the reverse) | Re-read the field instead of a local copy, or keep a copy; a store through a pointer or a call between the uses forces the reload |
+| header | 23 | The hint is in a header helper shared by other units | Unpin in the header and check every caller |
+| hoist | 11 | Loop-invariant motion | `reset_const`, declare inside the loop |
+| none | 7 | The stripped copy compiles to the same RTL | (stripping should already match) |
+
+The first run of this classification found two tooling gaps, both fixed:
+`unpin.py` never stripped function-pointer pins (`register void (*f)(T *)
+asm("r1")`; 36 pins in 15 files the pin farm had never really tried), and the
+farm skips a function whose hint lives in a header helper.
+
+Every lever above is now a natural pass in `translate.py --natural` (26
+passes; the ones that can change meaning are allowed there because only exact
+matches are kept), and `tools/natfarm.py` runs that search deterministically
+over the pin farm's list. The families show why a mechanical inversion is
+hard: only alloc (21%) is pure allocation, which `rasolve.py` can solve in
+compiler space. Everything else is a different decision in an earlier pass,
+and the C spellings that produce that decision are many-to-one. The most
+likely original spellings that no pass yet generates are macros and inline
+helpers (see the flag section above).

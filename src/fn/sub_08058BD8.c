@@ -51,7 +51,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         height = layer->height * 2;
     }
     {
-        s32 x, z asm("r4"), sum asm("r4");
+        s32 x, z, sum;
         s32 y;
         const struct ContactPosition *origin;
         projectedPointer = &projected;
@@ -99,7 +99,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             s32 target;
             register u8 *current asm("r2");
             register u8 *base asm("r0");
-            register s32 maxX asm("r12"), maxY asm("r8");
+            register s32 maxX asm("r12"), maxY;
             s32 minX;
             register s32 minY asm("r2");
             if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
@@ -205,7 +205,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 target++;
                 {
                     u32 offset = target * sizeof(entry);
-                    struct SceneOverlayMapEntry *destination, *mapEntries asm("r3");
+                    struct SceneOverlayMapEntry *destination, *mapEntries;
                     destination = entryPointer;
                     mapEntries = entries;
                     offset += (u32)mapEntries;
@@ -259,7 +259,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 secondOutput = output + index;
                             }
                         } else {
-                            register s32 blockX asm("r1"), block asm("r2"), halfX asm("r1"),
+                            register s32 blockX asm("r1"), block, halfX,
                                 halfY asm("r0");
                             u32 tile;
                             {
@@ -277,7 +277,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                             dy &= ringMask;
                             {
                                 s32 scaled = truncate1(dx);
-                                asm("" : "+r"(scaled));
                                 halfX = scaled;
                             }
                             halfY = truncate1(dy);
