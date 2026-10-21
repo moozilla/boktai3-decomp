@@ -7,7 +7,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
     u16 *kindCache;
     u32 kindValue;
     u32 timer;
-    register u32 left asm("r0"), right asm("r1");
+    register u32 left asm("r0"), right;
     if (!*active)
         return;
     kind = &manager->kind;
