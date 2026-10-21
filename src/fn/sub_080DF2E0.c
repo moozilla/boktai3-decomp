@@ -1,19 +1,15 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_behavior.h"
-#ifdef NONMATCHING
-// fuzzy: 97.1%
-// Remaining differences: the flag-test copy of the link pointer lands in r2 instead of r4.
 struct SceneActorTargetLink {
     u8 *target;
     u8 unknownE0[0xB];
     u8 flags;
 };
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *);
-static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
+static inline u8 BoolOf(u32 v)
 {
-    u32 mask = 2;
-    if (state->flags & mask)
+    if (v)
         return 1;
     return 0;
 }
@@ -90,8 +86,12 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         }
         return 1;
     } else {
-        state = (void *)((u8 *)owner + 0xDC);
-        if (TargetHasFlag(state)) {
+        struct SceneActorTargetLink *t = (void *)((u8 *)owner + 0xDC);
+        u32 m2 = 2;
+        u32 v = t->flags & m2;
+        state = t;
+        asm("" : "+r"(t));
+        if (BoolOf(v)) {
             u32 mask = ~0x10;
             mask &= (*(&state))->flags;
             (*(&state))->flags = mask;
@@ -99,6 +99,3 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         return 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Dog_ResolvePendingObject);
-#endif

@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.8%
 // Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -158,8 +156,16 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
             actor->flags2C0 = bit | actor->flags2C0;
         }
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
-        bank = (void *)((u8 *)actor + 0x1E0);
-        Palette(actor, *bank + 3);
+        {
+            u16 *b = (void *)((u8 *)actor + 0x1E0);
+            u32 v = *b + 3;
+            u32 kind = actor->drawableKind;
+            bank = b;
+            if (kind == 0)
+                AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, v);
+            else
+                *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + v * 32;
+        }
         Hide(actor);
         ((struct OctopusDrawable *)actor->drawable)->mode = 3;
         SpriteParticle_SpawnBatch(&actor->position, 1, 2, 1, 0x154);
@@ -185,6 +191,3 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
             *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->position;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Octopus_ReturnToRoutePoint);
-#endif
