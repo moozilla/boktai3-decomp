@@ -68,7 +68,7 @@ static inline u8 HasMode(u8 *p)
     return 0;
 }
 #ifdef NONMATCHING
-// fuzzy: 93.4%
+// fuzzy: 95.7%
 // Remaining differences: instruction ordering and register allocation.
 // confidence=low: generic scene actor leap; species ownership is not established.
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
@@ -88,24 +88,27 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             return;
         CellCenter(&point, actor->terrainCell);
         Delta(&point, &actor->position, &point);
-        correcting = 0;
-        switch (((actor->direction + 0x20) & 0xFF) >> 6) {
-            case 0:
-            case 2:
-                if ((point.z < 0 ? -point.z : point.z) > 0x40) {
-                    CellCenter(&point, actor->terrainCell);
-                    point.x = actor->position.x;
-                    correcting = 1;
-                }
-                break;
-            case 1:
-            case 3:
-                if ((point.x < 0 ? -point.x : point.x) > 0x40) {
-                    CellCenter(&point, actor->terrainCell);
-                    point.z = actor->position.z;
-                    correcting = 1;
-                }
-                break;
+        {
+            s32 quadrant = ((actor->direction + 0x20) & 0xFF) >> 6;
+            correcting = 0;
+            switch (quadrant) {
+                case 0:
+                case 2:
+                    if ((point.z < 0 ? -point.z : point.z) > 0x40) {
+                        CellCenter(&point, actor->terrainCell);
+                        point.x = actor->position.x;
+                        correcting = 1;
+                    }
+                    break;
+                case 1:
+                case 3:
+                    if ((point.x < 0 ? -point.x : point.x) > 0x40) {
+                        CellCenter(&point, actor->terrainCell);
+                        point.z = actor->position.z;
+                        correcting = 1;
+                    }
+                    break;
+            }
         }
         if (correcting) {
             Delta(&delta, &actor->position, &point);
