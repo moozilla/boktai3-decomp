@@ -200,3 +200,16 @@ Second batch (19 of the next 60 made clean; `notes/depin-manual-2_2026-10-21.md`
    on loop-carried pointers.
 9. A permuter score of 0 is not a match: it ignores branch offsets. Port the
    result by hand and run check.py.
+
+Third batch (14 of the next 50; `notes/depin-manual-3_2026-10-21.md`):
+
+10. Set a loop constant twice (`u32 one = 1;` before the loop and `one = 1;`
+    inside it): with two sets loop.c no longer hoists it. Replaced an
+    `asm volatile("" : "+r"(c))`.
+11. Reuse an existing local for a second value instead of a new temporary, or
+    re-derive `&actor->field` in some uses next to a local copy.
+12. A named int for a constant call argument (`int id = 0xB; Task_Create(id, ...)`)
+    and `(*(&off))` on a constant's first use both change which register the
+    constant gets.
+13. The permuter's dummy statements (`x++; x--;`, `s->q = s->q;`) are not
+    acceptable depins; leave the pin instead.
