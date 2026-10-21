@@ -1,45 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
-#include "terrain_cell_probe.h"
+#include "scene_object_slot.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 void SceneObject_UpdateInactiveIdle(void);
 void SceneObject_UpdateActiveIdle(void);
-
-struct Pair {
-    u32 a, b;
-};
-struct ObjSprite {
-    u32 flags;
-    u8 pad4[0x18];
-    u32 a, b;
-};
-struct ObjBlock {
-    u8 pad0[4];
-    u8 b4;
-    u8 pad5;
-    u16 w6;
-};
-struct SceneObjSlot {
-    u8 pad0[0x1c];
-    u32 a, b; /* 0x1c: also sprite fields */
-    u8 pad24[8];
-    struct ObjBlock *block;
-    void *callback;
-    u8 pad34[2];
-    u8 pad36;
-    u8 variant;
-    u8 dir;
-    u8 b39, b3a, b3b;
-    u16 cellA, cellB;
-    u8 type;
-    u8 pad41[7];
-    s32 pad48;
-    s32 value;
-    u8 pad50[0x18];
-    struct Pos16 pos;
-    u32 q0, q1;
-    u32 r0, r1;
-};
 
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
 #define SceneObject_InitPlacement sub_0801EC4C
