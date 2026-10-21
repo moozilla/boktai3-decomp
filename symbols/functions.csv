@@ -2965,6 +2965,7 @@ addr,name,mode,confidence,source,notes
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
+0808E660,Slime_RollMoveFlag,thumb,low,src-alias,Clears the prepared flag then randomly sets bit 0x10 or 0x20 in the 2D6 flags
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
