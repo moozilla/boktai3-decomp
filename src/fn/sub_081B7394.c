@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.8%
 // foundry draft (worker best 97.8%); what differs is mostly register allocation and instruction order
 struct EffectPoolSprite {
     u8 pad0[7];
@@ -23,6 +21,10 @@ struct EffectPoolSlot {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
+static inline void CpuSetC(void *dst, u32 control, const void *src)
+{
+    CpuSet(src, dst, control);
+}
 void EffectPool_InitSlot(void *pool, struct EffectPoolSlot *slot, s32 index)
 {
     vu32 zero;
@@ -40,8 +42,5 @@ void EffectPool_InitSlot(void *pool, struct EffectPoolSlot *slot, s32 index)
     position = (u8 *)slot + 0x20;
     zero = 0;
     source = (const void *)&zero;
-    CpuSet(source, position, 0x05000002);
+    CpuSetC(position, 0x05000002, source);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", EffectPool_InitSlot);
-#endif

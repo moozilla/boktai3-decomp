@@ -30,21 +30,23 @@ static inline s32 scale(s32 v)
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void Player_ShowDirectionalEffect(void *);
 
-#ifdef NONMATCHING
-// fuzzy: 98.8%
 // differs only in where 'movs r2, #0' is scheduled (the zero stores).
 void DirectionalEffect_Spawn(struct EffectState *p, s32 unused, struct Pos *pos)
 {
     u8 *sprite = p->sprite;
+    s32 yy;
+    s32 w;
+    u16 z;
     s32 angle = ((p->dir + 5) & 7) << 5;
     *(struct Pos *)(sprite + 0x1c) = *pos;
     *(u16 *)(sprite + 0x1c) += scale(0xB4 * gUnk_086149C4[(angle + 64) & 255]);
-    *(u16 *)(sprite + 0x20) += scale(0xB4 * gUnk_086149C4[angle]);
-    p->f858 = 0;
-    p->f85c = 0;
+    yy = scale(0xB4 * gUnk_086149C4[angle]);
+    w = *(u16 *)(sprite + 0x20);
+    w += yy;
+    z = 0;
+    *(u16 *)(sprite + 0x20) = w;
+    p->f858 = z;
+    p->f85c = z;
     Anim_SetSequence(p->anim, *(void **)((u8 *)p + 0x854), 2, 0, 0);
     Player_ShowDirectionalEffect(p);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DirectionalEffect_Spawn);
-#endif
