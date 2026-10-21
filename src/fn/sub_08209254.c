@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 80.7%
-// Remaining differences: stack-address materialization and register allocation.
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -61,8 +58,8 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         struct Vec position, velocity;
     } frame;
     struct Source *source = sourceInput;
-    struct Target *target = targetInput;
     struct Hit *hit = input;
+    struct Target *target = targetInput;
     Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
@@ -73,7 +70,7 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
             register void *hud asm("r8");
-            register s32 health asm("r10");
+            s32 health;
             s32 a, b, direction;
             target->reaction = 0x26;
             target->flash = 8;
@@ -83,6 +80,11 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             hud = target->hud;
             health = target->health;
             a = target->hudA;
+            {
+                register u32 d asm("r1");
+                asm("" : "=r"(d));
+                asm("" : : "r"(d));
+            }
             b = target->hudB;
             direction = 0;
             if (target->direction == 4)
@@ -95,15 +97,16 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     sparks:
         if (source->flags & target->sparkMask) {
             register s32 i asm("r6");
-            register struct Vec *vel asm("r10") = &frame.velocity;
-            register struct Vec *pos asm("r4") = &frame.position;
-            register u32 *index asm("r9") = &gUnk_03005308;
-            register u32 mask asm("r8") = 0x7f;
+            struct Vec *vel = &frame.velocity;
+            struct Vec *pos = &frame.position;
+            u32 *index = &gUnk_03005308;
+            u32 mask = 0x7f;
             i = 2;
             do {
                 register u32 random asm("r1");
                 register const u16 *table asm("r3");
-                u32 sample, x;
+                u32 sample;
+                u32 x;
                 frame.velocity = gUnk_0824FE8C;
                 frame.position = target->position;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -111,22 +114,25 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 sample = table[random];
                 x = pos->x - 0x40;
                 sample &= mask;
-                pos->x = x + sample;
+                x += sample;
+                pos->x = x;
                 random = (random + 1) & 0x3ff;
                 pos->y += (u8)table[random];
                 random = (random + 1) & 0x3ff;
-                *index = random;
-                sample = table[random];
-                x = pos->z - 0x40;
-                sample &= mask;
-                pos->z = x + sample;
-                SparkParticle_Spawn(pos, 1, vel, 0, 3, 8, 2, 2);
+                {
+                    register u32 *cursor asm("r7") = index;
+                    *cursor = random;
+                }
+                {
+                    u32 last = table[random];
+                    x = pos->z - 0x40;
+                    last &= mask;
+                    x += last;
+                    pos->z = x;
+                }
+                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", FanCannon_ApplyHitReaction);
-#endif
