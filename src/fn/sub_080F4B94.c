@@ -44,7 +44,7 @@ void ActorPhase_OrbitParent(struct PhaseActor *p)
     if (--p->timer == 0) {
         register u32 enabled asm("r0");
         register u32 phase asm("r1");
-        register void (*update)(void) asm("r3") = parent->update;
+        register void (*update)(void) = parent->update;
         if (update == Sword_UpdateWaveAttack) {
             enabled = 1;
             phase = 2;
