@@ -1,0 +1,182 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+// Provisional name: Actor_OnDescendingFadeUpdate (tentative)
+struct Vec {
+    s16 x, y, z, pad;
+};
+struct Actor {
+    u8 pad0a;
+    u8 kind;
+    u8 pad0b[5];
+    u8 done;
+    u8 pad8[1];
+    u8 entered;
+    u8 pada[4];
+    u16 flags;
+    u8 pad10[8];
+    u8 phase;
+    u8 facing4;
+    u8 facing8;
+    u8 targetAngle;
+    u8 pad1c[56];
+    struct Vec target;
+    u8 body[9];
+    u8 angle;
+    u8 pad66[2];
+    struct Vec pos;
+    struct Vec velocity;
+    u8 pad78[92];
+    u32 drawable;
+    u8 padd8[80];
+    struct Vec *sourcePos;
+    u8 pad12c[52];
+    struct Vec *drawPos;
+    u8 pad164[0x88];
+    u8 modeA, modeB;
+    u8 pad1ee[2];
+    u8 cap;
+    u8 pad1f1[0x17];
+    int speed;
+    u32 speedSquared;
+    u8 pad210[212];
+    int (*callback)(struct Actor *);
+};
+struct Map {
+    u32 pad;
+    u8 *cells;
+    u8 pad8[28];
+    u16 rows[1];
+};
+extern struct Map *gUnk_030052F4;
+extern u32 gUnk_030052F8, gUnk_030052FC;
+u8 *TerrainModifiers_FindCellOverride(int, int);
+extern const s16 gUnk_086149C4[];
+int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
+void Actor_PlayFootstepSound(struct Actor *, int);
+void DisplayAnimation_SetFlags(void *, int);
+void DisplayAnimation_ClearFlags(void *, int);
+void DisplayAnimation_SetPalette(void *, int, int, int);
+void Sound_PlaySong(int);
+int Math_Atan2(int, int);
+static inline int scale(int v)
+{
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
+}
+static inline u8 *cell(int i)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
+    if (p)
+        return p + 4;
+    return gUnk_030052F4->cells + 12 + i * 4;
+}
+static inline int height(struct Vec *pos)
+{
+    int x = pos->x >> 8, z = pos->z >> 8, index;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        index = 0;
+    else
+        index = gUnk_030052F4->rows[z] + x;
+    {
+        register int c asm("r1") = *cell(index);
+        return c & 15;
+    }
+}
+void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
+{
+    if (p->entered) {
+        p->entered = 0;
+        p->done = 0;
+        {
+            void *anim = &p->drawable;
+            DisplayAnimation_SetFlags(anim, 2);
+            DisplayAnimation_SetPalette(anim, 0x40, 0x40, 0);
+        }
+        Sound_PlaySong(0x201);
+    }
+    if ((u8)p->callback(p) != 1) {
+        int a = 0x40;
+        int b = 0;
+        switch (p->phase) {
+            case 0: {
+                register u32 k asm("r1");
+                int t = 8 - ticks;
+                k = 200;
+                asm("" : "+r"(k));
+                b = t * k + 0xa0;
+                {
+                    register u8 *q asm("r0");
+                    struct Vec *dp;
+                    register int v asm("r0");
+                    register int h asm("r2");
+                    register struct Vec *dq asm("r1");
+                    register int sum asm("r0");
+                    register u32 off asm("r3");
+                    register u8 *q2 asm("r0");
+                    k += 0x98;
+                    q = (u8 *)p + k;
+                    dp = *(struct Vec **)q;
+                    v = height(dp);
+                    asm("" : "+r"(v));
+                    h = v << 8;
+                    off = 0x160;
+                    asm("" : "+r"(off));
+                    q2 = (u8 *)p + off;
+                    dq = *(struct Vec **)q2;
+                    sum = h + b;
+                    dq->y = sum;
+                }
+                if (ticks > 7)
+                    p->phase++;
+                DisplayAnimation_SetPalette(&p->drawable, 1, 0x80, 0);
+                break;
+            }
+            case 1: {
+                int d = 15 - ticks;
+                int c = a - d * 4;
+                if (ticks > 8) {
+                    a = (24 - ticks) << 3;
+                    b = (d * 4 + d) * 4;
+                }
+                if (ticks > 14)
+                    p->phase = 2;
+                {
+                    register int v asm("r0") = height(p->drawPos);
+                    register int h asm("r2");
+                    register struct Vec *dq asm("r1");
+                    register int sum asm("r0");
+                    asm("" : "+r"(v));
+                    h = v << 8;
+                    dq = p->drawPos;
+                    sum = h + b;
+                    dq->y = sum;
+                }
+                DisplayAnimation_SetPalette(&p->drawable, c, a, 0);
+                break;
+            }
+            case 2:
+                DisplayAnimation_ClearFlags(&p->drawable, 2);
+                p->done = 1;
+                break;
+        }
+        {
+            register int ang asm("r2") = p->targetAngle;
+            register int t1 asm("r1");
+            register int k asm("r0");
+            asm("" : "+r"(ang));
+            p->angle = ang;
+            t1 = ang + 112;
+            t1 >>= 5;
+            k = 7;
+            k &= t1;
+            p->facing8 = k;
+            ang += 96;
+            ang >>= 6;
+            k = 3;
+            k &= ang;
+            p->facing4 = k;
+            Actor_PlayAnimationEntry(p, 0, 2, 0, 0);
+        }
+    }
+}

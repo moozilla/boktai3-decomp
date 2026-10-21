@@ -1046,7 +1046,10 @@ addr,name,mode,confidence,source,notes
 0802E698,Actor_InitBehaviorFromScript,thumb,low,src-alias,Loads path destination animation turning and proximity settings with defaults
 0802EA08,Actor_OnHiddenIdleUpdate,thumb,low,src-alias,Hidden idle callback that starts the idle animation and sets the hide flag before invoking the actor callback
 0802EA4C,Actor_OnIdleUpdate,thumb,low,src-alias,Idle callback that initializes the idle animation and sets the idle update flag
+0802EC90,Actor_OnDescendingFadeUpdate,thumb,low,src-alias,
+0802EEA8,Actor_OnRisingFadeUpdate,thumb,low,src-alias,
 0802F0C0,Actor_OnConfiguredAnimationUpdate,thumb,low,src-alias,Animation state callback that starts the configured animation and invokes the actor callback
+0802F110,Actor_OnPathFollowUpdate,thumb,low,src-alias,
 0802F524,Actor_OnTimedIdleUpdate,thumb,low,src-alias,Timed idle callback that finishes after eight ticks when the actor callback permits completion
 0802FCA8,Actor_SelectPathNodeAction,thumb,low,src-alias,Records the path node identifier and selects a wait turn or movement action from node flags
 0802FD14,SceneCharacter_GetPathNodeState,thumb,low,src-alias,Returns the current node action state within 40 units on both axes or movement state 9 otherwise
