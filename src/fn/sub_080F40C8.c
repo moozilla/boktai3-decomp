@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
 #define gChildGroupRandomIndex               gUnk_03005308
@@ -49,10 +48,10 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
         {
             u32 random = (gUnk_03005308 + 1) & 0x3FF;
             u32 value;
-            register const u16 *table asm("r2");
+            const u16 *table;
             gUnk_03005308 = random;
             random <<= 1;
-            table = gUnk_0203B400;
+            table = (u16 *)0x0203B400;
             value = *(u16 *)(random + (u32)table);
             p->randomByte = value;
         }
@@ -69,8 +68,9 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
         Sound_PlaySong(0x16F);
     }
     Ivy_UpdateBobbing(p);
-    if (p->callbackCE4)
+    if (p->callbackCE4) {
         Callback_InvokeActor(p, p->callbackCE4);
+    }
     if ((++p->timerD2A & 0x3FF) == 0) {
         p->timerD2A = 0;
         switch (p->mode) {
@@ -78,10 +78,11 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
                 p->callbackCE8 = Sword_UpdateSpinningLungeAttack;
                 break;
             case 1:
-                if (p->callbackCE8 == Sword_UpdateWaveAttack)
+                if (p->callbackCE8 == Sword_UpdateWaveAttack) {
                     p->callbackCE8 = Sword_UpdateThrustAttack;
-                else if (p->callbackCE8 == Sword_UpdateThrustAttack)
+                } else if (p->callbackCE8 == Sword_UpdateThrustAttack) {
                     p->callbackCE8 = Sword_UpdateWaveAttack;
+                }
                 break;
         }
     }
