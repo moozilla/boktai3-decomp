@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
@@ -22,13 +21,12 @@ void SceneActorControl_UpdatePausePhase(struct SceneActorRegistryResetView *acto
         control[0xEAA] = 0;
     }
     {
-        s32 *c = (s32 *)((u8 *)actor + 0x2AC);
+        s32 *c = (s32 *)(((u8 *)(*(&actor))) + 0x2AC);
         if (*c > 60) {
             u32 kind = 3;
             actor->state2A8 = 0;
             actor->phase2A9 = 0;
             actor->behavior2AA = kind;
-            asm("" : "+r"(actor));
             actor->counter2AC = 0;
             actor->field2B1 = 1;
         }
