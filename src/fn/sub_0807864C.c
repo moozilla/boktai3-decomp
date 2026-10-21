@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 static inline s32 Magnitude(s32 value)
 {
@@ -20,7 +19,6 @@ u8 SceneActorBehavior_RequestDescriptorTurn(struct SceneActorBehaviorView *actor
     s16 dz = (u16)descriptor->destination.z - (u16)actor->position.z;
     u32 targetQuadrant;
     u32 currentQuadrant;
-    register s32 direction asm("r2");
     if ((u32)Magnitude(dx) <= rangeX && (u32)Magnitude(dz) <= rangeZ)
         goto failure;
     {
@@ -33,12 +31,10 @@ u8 SceneActorBehavior_RequestDescriptorTurn(struct SceneActorBehaviorView *actor
     if (!Magnitude(targetQuadrant - currentQuadrant))
         goto failure;
     {
-        register u32 shifted asm("r0") = targetQuadrant << 30;
-        asm("" : "+r"(shifted));
-        direction = shifted >> 24;
+        u32 shifted = targetQuadrant << 30;
+        targetQuadrant = shifted >> 24;
     }
-    asm("" : : "r"(direction));
-    actor->requestedDirection = (Divide32(direction) + 3) & 7;
+    actor->requestedDirection = (Divide32(targetQuadrant) + 3) & 7;
     return 1;
 failure:
     return 0;
