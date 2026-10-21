@@ -20,7 +20,6 @@ void ActorGlyphTrail_Create(struct P *, s32, s32);
 void PlayerCue_CompleteAction(struct P *);
 void PlayerCue_EnterStandUpdate(struct P *);
 
-#define PlayerCue_UpdateAim sub_08151484
 void PlayerCue_UpdateAim(struct P *p)
 {
     p->flagAC9 = 4;

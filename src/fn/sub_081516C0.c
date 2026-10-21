@@ -59,7 +59,6 @@ static inline s32 Scale(s32 v, s32 k)
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // Only register choices differ: the 0x20 multiplier pin (r3) shifts temporaries in the velocity block.
-#define PlayerCue_UpdateRunTo sub_081516C0
 void PlayerCue_UpdateRunTo(struct P *p)
 {
     s32 dx, dy, angle, dist;
@@ -140,5 +139,5 @@ void PlayerCue_UpdateRunTo(struct P *p)
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 1), 0x20, 1);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081516C0);
+INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateRunTo);
 #endif
