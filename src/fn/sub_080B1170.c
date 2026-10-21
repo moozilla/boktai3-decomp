@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
 struct SceneActorRandomReaction {
@@ -46,9 +44,10 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRandomReaction *context = p->context;
     if (!unavailable(p) && !blocked(p) && p->field2B5 == 0x23 && active(context)) {
-        u16 remaining;
-        s32 timer = context->timer;
-        remaining = timer;
+        register u16 remaining asm("r0");
+        register s32 timer asm("r4");
+        remaining = context->timer;
+        timer = remaining;
         if (timer) {
             remaining--;
             context->timer = remaining;
@@ -69,6 +68,3 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_TickRandomReaction);
-#endif
