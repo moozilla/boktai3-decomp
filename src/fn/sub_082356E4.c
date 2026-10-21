@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.4%
+// fuzzy: 91.4%
 // Draft: effect timer tick (screen transition at 0, collider refresh, shake).
 // Open: the original recomputes the u16 extension of the counter for the second
 // compare, and loads the pause-flag word after building the mask.
@@ -14,13 +14,17 @@ s32 Collider_Refresh(void *);
 void Task_Kill(void *);
 void Camera_RequestShake(s32);
 
+static inline u32 Mask(u32 *a, u32 m)
+{
+    return *a & m;
+}
 void sub_082356E4(u8 *p)
 {
     u16 *counter = (u16 *)(p + 0x34e);
     u16 *q;
     s32 n;
     if (*counter == 0) {
-        gUnk_0300523C &= ~4;
+        gUnk_0300523C = Mask(&gUnk_0300523C, ~4);
         Sound_PlaySong(0x67);
         ScreenTransition_SendCommand(2, 4, 0x1f, 0x1f, 0x1f, 0x1fff, 1);
     }
