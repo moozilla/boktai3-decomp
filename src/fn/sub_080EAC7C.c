@@ -1,52 +1,10 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 85.0%
-// Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
 #include "scene_actor_reaction.h"
-#include "engine.h"
-#include "scene_vec.h"
-#include "gba/macro.h"
-#include "gba/syscall.h"
 
-struct Player;
-s32 Div(s32, s32);
-s32 Mod(s32, s32);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
-s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
-                                s32, s32, s32, u32);
-void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
-void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
-void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
-u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
-void Octopus_UpdateActiveState(void);
-extern u8 *gUnk_02000580;
-extern s16 *gUnk_020004B4;
+// confidence=low: stagger reaction; once it finishes, hands control to
+// SceneActor_EndReactionAnimation (kind 0x23) and restarts behaviour 3.
 
-struct OctopusContext {
-    u8 unknown0[0x628];
-    u32 flags;
-    u8 unknown630[0xC];
-    u8 startTick, holdTicks, interval;
-};
-
-struct OctopusTarget {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    void *player;
-};
-
-struct OctopusDrawable {
-    u8 unknown0[7];
-    u8 mode : 8;
-};
-
-struct OctopusOffset {
-    u16 x, y, z, pad;
-};
-extern const struct OctopusOffset gUnk_086062B0[2][5];
+void SceneActor_EndReactionAnimation(void);
 
 static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
 {
@@ -74,20 +32,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->field2B1 = 1;
 }
 
-struct GolemRoutePoint {
-    s16 x, z;
-};
-struct GolemRouteLink {
-    u8 unknown0[8];
-    struct GolemRoutePoint *point;
-};
-
-void SceneActorBehavior_PlayReactionSound(void *);
-void Camera_RequestShake(u32);
-void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
-void SceneActorReaction_RestoreAlternateAfterDelay(void);
-
-void SceneActor_EndReactionAnimation(void);
 void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
@@ -108,12 +52,12 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         {
             u32 bit = 0x20;
-            actor->flags2D4 = bit | actor->flags2D4;
+            actor->flags2D4 = *(&bit) | actor->flags2D4;
         }
     }
     {
         u32 bit = 0x10;
-        actor->flags2D6 = bit | actor->flags2D6;
+        actor->flags2D6 = *(&bit) | actor->flags2D6;
     }
     if (frame <= 17 && sequence->index == 0) {
         u16 elapsed = sequence->elapsed;
@@ -123,13 +67,17 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     if (actor->field2B3) {
         actor->field2B0 = 0;
-        actor->flags2D4 &= ~0x20;
-        actor->flags2CC &= ~0x80;
+        {
+            u16 bit = 0x20;
+            actor->flags2D4 &= ~bit;
+        }
+        {
+            u32 *field = &actor->flags2CC;
+            u32 mask = ~0x80;
+            *field &= mask;
+        }
         SetCtl(actor, SceneActor_EndReactionAnimation, 0x23);
         SetState(actor, 1, 0, 3);
         actor->direction = actor->fieldE9;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Octopus_UpdateStagger);
-#endif
