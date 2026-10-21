@@ -3750,6 +3750,7 @@ addr,name,mode,confidence,source,notes
 080F79A8,Axe_UpdateOrbitAttack,thumb,low,src-alias,
 080F8010,ActorPhase_UpdateAcceleratingTrail,thumb,low,src-alias,
 080F815C,ActorPhase_UpdateReverseFlicker,thumb,low,src-alias,
+080F8244,ActorPhase_UpdateReverseFlickerExit,thumb,low,src-alias,"blinks aux sprite until expired then releases it and switches to rotation reset phase 0x34"
 080F82E8,ActorPhase_UpdateSpriteCollapse,thumb,low,src-alias,
 080F83FC,ActorPhase_WaitBeforeRelocation,thumb,low,src-alias,
 080F84D4,ActorPhase_UpdateSpriteRestore,thumb,low,src-alias,
