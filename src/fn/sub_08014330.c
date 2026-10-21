@@ -28,7 +28,6 @@ extern u32 gUnk_030052F8;
 extern u32 gUnk_030052FC;
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-#define ParticleGroup_UpdateFrozen sub_08014330
 
 #ifdef NONMATCHING
 // fuzzy: 98.3%
@@ -101,5 +100,5 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
     } while (n >= 0);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08014330);
+INCLUDE_ASM("asm/nonmatching", ParticleGroup_UpdateFrozen);
 #endif
