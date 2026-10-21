@@ -39,7 +39,9 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         {
             u32 address = slot;
             struct GameState *game = gUnk_02000710;
-            do { address <<= 1; } while (0);
+            do {
+                address <<= 1;
+            } while (0);
             address += (u32)game;
             id = ((struct SceneInventoryOwnedConsumables *)address)->id;
         }
