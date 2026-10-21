@@ -951,20 +951,13 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
     }
 }
 
-/* Tentative: called once per frame from Nidhoggr_Update. Loops i=0..25 over the 26 parts:
- * looks up a function pointer table (gUnk_0824F364) keyed by a per-part byte at
- * t->unknown71C2[i] (0x71C2+i) and calls it via sub_08249240(t, i, fn) when nonzero,
- * otherwise sets a flag bit and zeroes t->rowInitFlag[i]/t->rowDoneFlag[i]/row[i].flags;
-
- * a parallel per-part counter at t->unknown722A-ish and another at +0x71F6 track retries.
- * It then recomputes colliders[0..25]' positions (Collider_SetPosition) from t->pos plus
- * constant offset tables (gUnk_0824F2E4, gUnk_0824F324, gUnk_0824F344) for different part
- * ranges. 760 bytes with several undiscovered globals; not attempted byte-for-byte this
- * pass. confidence=low. */
+/* Tentative: called once per frame from Nidhoggr_Update. For each of the 26 parts it looks up
+ * a callback in gUnk_0824F364 keyed by t->unknown71C2[i] and runs it through sub_08249240
+ * (or resets the row latches when there is none), blinks the row via rowBlink, then
+ * repositions each row's offset (rows[i].pos) and collider from t->pos plus constant offset
+ * tables. confidence=low. */
 
 #define Nidhoggr_UpdatePartMotion sub_0819321C
-#ifdef NONMATCHING
-// fuzzy: 95.7%
 extern void (*const gUnk_0824F364[])(void);
 extern const struct SceneVec gUnk_0824F2E4[];
 extern const struct SceneVec gUnk_0824F324[];
@@ -1032,19 +1025,16 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
     p20->y = pe->y + gUnk_0824F33C->y;
     p20->z = pe->z + gUnk_0824F33C->z;
     i = 22;
-    for (pf = &t->pos; i <= 23; i++) {
-        t->rows[i].pos.x = pf->x + gUnk_0824F344->x;
-        t->rows[i].pos.y = pf->y + gUnk_0824F344->y;
-        t->rows[i].pos.z = pf->z + gUnk_0824F344->z;
+    for (; i <= 23; i++) {
+        t->rows[i].pos.x = (&t->pos)->x + gUnk_0824F344->x;
+        t->rows[i].pos.y = (&t->pos)->y + gUnk_0824F344->y;
+        t->rows[i].pos.z = (&t->pos)->z + gUnk_0824F344->z;
         Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
     }
     q = (void **)t->unknown72C4;
     if (*q != 0)
         Callback_InvokeActor(q, *q);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0819321C);
-#endif
 
 extern u16 gUnk_03004BD8;
 
@@ -2866,6 +2856,8 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
 
 void sub_0818ECFC(void *);
 
+void sub_081940F8(void *);
+
 void Camera_SetPosition(void *);
 
 void Camera_SetIsometricOffset(s32, s32);
@@ -2987,8 +2979,6 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
 }
 
 void ScenePanelEffect_InitPool(void *);
-
-void sub_081940F8(void *);
 
 static inline void Fill32(void *dst, u32 *tmp, u32 size)
 {
