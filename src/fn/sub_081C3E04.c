@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 extern u16 gUnk_03005418[];
 
@@ -71,14 +70,13 @@ void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
         u16 *q = &effect->screenX;
         s16 *p = &effect->worldX;
         s32 y;
-        register s32 x asm("r4"), zz asm("r3");
+        s32 x, zz asm("r3");
         s32 z;
         x = p[0];
         zz = p[2];
         q[0] = scale(x - zz);
         z = scale(({
             s32 t = x + zz;
-            asm("" ::"r"(zz), "r"(x));
             t;
         }));
         y = scale(p[1]);
