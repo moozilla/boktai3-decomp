@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 // foundry draft (worker best 87.3%); what differs is mostly register allocation and instruction order
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
@@ -36,15 +35,12 @@ s32 AnimatedBodyPool_Destroy(struct AnimatedBodyPool *pool)
 {
     s32 i = 0;
     u32 *occupied = &pool->occupied;
-    struct AnimatedBodySlot *bodies = (void *)pool->slots[0].body;
     struct AnimatedBodyFlagsView *flags;
     struct AnimatedBodySlot *slot;
-    asm("" : "+r"(bodies));
     flags = (void *)&pool->slots[0].flags;
-    asm("" : "+r"(flags));
     slot = pool->slots;
-    asm("" : "+r"(slot));
     do {
+        struct AnimatedBodySlot *bodies = (void *)pool->slots[0].body;
         if (HasSlot(occupied, 1 << i)) {
             Anim_Remove(&slot[i]);
             if (flags[i].flags & 1)
