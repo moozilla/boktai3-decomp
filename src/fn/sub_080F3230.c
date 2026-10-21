@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.7%
-// Remaining differences: reset-loop register allocation and mode-store constant order.
+// MATCHING_CONCESSION: register-pinning
 struct PhaseEntryView {
     u32 flags;
     u8 pad4[2];
@@ -79,8 +77,7 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         u32 opacityValue = 64;
         u32 *flags = &p->entries[0].flags;
         u32 bit = 1;
-        s32 remaining;
-        for (remaining = 3; remaining >= 0; remaining--) {
+        for (i = 3; i >= 0; i--) {
             *(s16 *)(opacity + 0x14) = *targetX;
             *(s16 *)(opacity + 0x18) = *targetZ;
             *opacity = opacityValue;
@@ -92,16 +89,15 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         p->colliderFlagsA &= 0xFFFB;
         p->colliderFlagsB &= 0xFFFB;
         {
-            u32 modeValue = 5;
-            *enabled = 1;
-            *mode = modeValue;
+            register u32 one asm("r0") = 1;
+            register u32 five asm("r1") = 5;
+            asm("" : "+r"(one));
+            asm("" : "+r"(five));
+            *enabled = one;
+            *mode = five;
+            *flags8D = one | *flags8D;
         }
-        *flags8D |= 1;
         p->action = ChildGroup_UpdateAlternatingCallbacks;
         p->callback = sub_080F2F7C;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PhaseObject_ConvergeEntries);
-#endif

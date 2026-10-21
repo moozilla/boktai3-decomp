@@ -3,8 +3,8 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.1%
-// Remaining differences: register allocation around the ground-height lookup.
+// fuzzy: 96.1%
+// Remaining differences: ground-height lookup temporaries (r0/r1/r3 swap) and a derived pool constant.
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 struct Pair8 {
     u32 a, b;
@@ -25,8 +25,8 @@ static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
 {
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     u8 *data;
-    u32 type;
-    s32 height;
+    register u32 type asm("r2");
+    register s32 height asm("r1");
     if (override)
         data = override + 4;
     else
@@ -91,7 +91,7 @@ void Crow_ReadSpawnScript(void *input)
     if (Script_SeekToKeyword(0x70)) {
         u16 *height;
         u16 *cx, *cz;
-        u32 offset;
+        register u32 offset asm("r3");
         struct Pair8 *copy;
         actor->position.x = ReadOrZero();
         actor->position.y = ReadOrZero();
@@ -111,9 +111,14 @@ void Crow_ReadSpawnScript(void *input)
         cx = (u16 *)copy;
         cz = cx + 2;
         actor->cellIndex = CellAt((s16)*cx >> 8, (s16)*cz >> 8);
-        offset = 0x434;
-        asm("" : "+r"(offset));
-        actor->groundHeight = GroundHeight(actor->cellIndex, (void *)((u8 *)s + offset));
+        {
+            u32 cell = actor->cellIndex;
+            s32 gh;
+            offset = 0x434;
+            asm("" : "+r"(offset));
+            gh = GroundHeight(cell, (void *)((u8 *)s + offset));
+            actor->groundHeight = gh;
+        }
         {
             u16 y = *height;
             actor->heightOffset = y;
@@ -124,7 +129,10 @@ void Crow_ReadSpawnScript(void *input)
             u16 cell = actor->cellIndex;
             FIELD(s, 0x3E8, u16) = cell;
         }
-        FIELD(s, 0x3DE, u16) = actor->groundHeight;
+        {
+            u16 gh = actor->groundHeight;
+            FIELD(s, 0x3DE, u16) = gh;
+        }
     }
 }
 #else

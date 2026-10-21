@@ -4761,6 +4761,7 @@ addr,name,mode,confidence,source,notes
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
+0812A2BC,SunDiscPool_SpawnDisc,thumb,low,src-alias,
 0812A418,EffectPool_UpdateSlots,thumb,low,src-alias,
 0812A480,SunDiscPool_DestroyTask,thumb,low,src-alias,Task destruction callback removes active sprites across twelve slots and clears the singleton
 0812A4C0,SunDiscPool_Init,thumb,low,src-alias,Loads the orange disc animation and script procedure then clears allocation and control state
