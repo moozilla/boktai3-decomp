@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.2%
-// foundry draft (worker best 88.2%); what differs is mostly register allocation and instruction order
 struct MoverPosition {
     s32 x, y, z;
 };
@@ -34,8 +31,16 @@ static inline void Project(struct MoverPosition *pos, struct MoverScreen *screen
     screen->y = ((pos->z + y) >> 12) + 96;
     screen->z = pos->z >> 12;
 }
-s32 SceneMover_StepPastScreenX(struct SceneMover *p, s32 target, s32 speed)
+static inline void Project2(struct MoverPosition *pos, struct MoverScreen *screen)
 {
+    s32 y = pos->y;
+    screen->y = ((pos->z + y) >> 12) + 96;
+    screen->z = pos->z >> 12;
+}
+s32 SceneMover_StepPastScreenX(struct SceneMover *p0, s32 target0, s32 speed)
+{
+    s32 target = target0;
+    struct SceneMover *p = p0;
     s32 delta = target - p->screen.x;
     struct MoverPosition *pos;
     s16 screen[3];
@@ -47,7 +52,13 @@ s32 SceneMover_StepPastScreenX(struct SceneMover *p, s32 target, s32 speed)
     pos = &p->position;
     pos->x += p->speedX;
     p->position.z = p->height;
-    Project(pos, (struct MoverScreen *)screen);
+    {
+        struct MoverScreen *ms = (struct MoverScreen *)screen;
+        s32 sx = pos->x >> 12;
+        sx -= gUnk_020004B8->x;
+        screen[0] = sx;
+        Project2(pos, ms);
+    }
     if (delta < 0) {
         if (screen[0] < target)
             return 1;
@@ -57,6 +68,3 @@ s32 SceneMover_StepPastScreenX(struct SceneMover *p, s32 target, s32 speed)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneMover_StepPastScreenX);
-#endif
