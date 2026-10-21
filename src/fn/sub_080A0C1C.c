@@ -3,8 +3,6 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_chase.h"
 
-#define Crow_UpdateKnockback sub_080A0C1C
-
 s32 Callback_InvokeActor(void *, void *);
 void Crow_OnSpecialAnimation(void);
 

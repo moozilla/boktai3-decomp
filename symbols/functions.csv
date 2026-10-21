@@ -3148,8 +3148,11 @@ addr,name,mode,confidence,source,notes
 0809F84C,Crow_SteerAroundPlayer,thumb,low,src-alias,
 0809FC74,Crow_UpdateWanderTimer,thumb,low,src-alias,
 0809FDAC,Crow_UpdateReturnAnimation,thumb,low,src-alias,
+0809FE78,Crow_ApproachPlayer,thumb,low,src-alias,
 080A0044,Crow_InitActionTable,thumb,low,src-alias,Installs the five-entry Crow action callback table at offset 0x284
 080A0054,Crow_BeginScriptedAction,thumb,low,src-alias,Script-command handler queues action 0x10 and resets action counters and movement flags
+080A0158,Crow_ResetGroundState,thumb,low,src-alias,
+080A0364,Crow_UpdateGroundHeight,thumb,low,src-alias,
 080A05A0,Crow_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their Crow callbacks
 080A0634,Crow_GetTimedAction,thumb,low,src-alias,Selector callback returns one of four table values according to elapsed action time
 080A0664,Crow_InitProfile,thumb,low,src-alias,Assigns the shared actor profile for Crow type 0x13
@@ -3161,6 +3164,7 @@ addr,name,mode,confidence,source,notes
 080A09DC,Crow_ReadSpawnScript,thumb,low,src-alias,
 080A0C04,Crow_UpdatePreAction,thumb,low,src-alias,Wraps the pre-dispatch update helper and reports success
 080A0C10,Crow_UpdatePostAction,thumb,low,src-alias,Wraps the post-dispatch update helper and reports success
+080A0C1C,Crow_UpdateKnockback,thumb,low,src-alias,
 080A11F4,SceneActorControl_UpdateHeightReturn,thumb,low,src-alias,
 080A1348,Crow_SetBehaviorTable,thumb,low,src-alias,Installs the Crow-specific table at actor offset 0x28C
 080A1358,Crow_Update,thumb,low,src-alias,Main update callback runs preparation then the current action and shared processing

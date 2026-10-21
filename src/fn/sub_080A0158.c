@@ -8,7 +8,6 @@
 #ifdef NONMATCHING
 // fuzzy: 83.3%
 // Remaining differences: callee-saved register rotation (actor/context/stored-position pseudos) and CpuSet control constant reload.
-#define Crow_ResetGroundState sub_080A0158
 
 struct CrowResetContext {
     u8 unknown0[0x3D4];
@@ -179,5 +178,5 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A0158);
+INCLUDE_ASM("asm/nonmatching", Crow_ResetGroundState);
 #endif
