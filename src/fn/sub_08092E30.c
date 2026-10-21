@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 extern const s16 gUnk_086149C4[];
 struct BeeFlightState {
@@ -54,7 +53,6 @@ void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
         actor->field2EA -= diff;
         state->previousGround = *g;
     }
-    asm("" : "+r"(g));
     if (!ActorFlag(actor, 0x100000, 0x2D0)) {
         actor->position.y = *g + actor->field2EA;
         return;
