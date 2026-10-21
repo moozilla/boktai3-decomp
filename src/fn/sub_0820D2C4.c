@@ -79,7 +79,6 @@ static inline void ComputeVelocity(struct Pos *v, struct Params *params)
     v->y = 0;
     v->z = Truncate(magnitude * gUnk_086149C4[angle & 0xff]);
 }
-#define EnemyParticle_UpdatePool sub_0820D2C4
 s32 EnemyParticle_UpdatePool(struct Pool *pool)
 {
     struct Entry *base, *cursor;

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
-#define CannonBattery_Update sub_0819A23C
 struct CannonBatteryMessage {
     u32 id;
     u16 *data;
