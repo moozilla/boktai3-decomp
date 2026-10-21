@@ -6,8 +6,6 @@ extern u16 gUnk_03005176;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 
-#define Hud_DrawHealthMeterCells sub_081642CC
-
 void Hud_DrawHealthMeterCells(u8 *p, s32 mode, s32 row, s32 col, s32 cap, s32 value, s32 max)
 {
     s32 units, full, partial, n;

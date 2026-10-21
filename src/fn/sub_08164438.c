@@ -10,9 +10,9 @@ struct P {
     struct S *s;
 };
 
-void sub_081642CC(struct P *, u32, u32, u32, u32, u32, u32);
+void Hud_DrawHealthMeterCells(struct P *, u32, u32, u32, u32, u32, u32);
 
 void Hud_DrawHealthMeter(struct P *p, u32 a, u32 b, u32 c, u32 d)
 {
-    sub_081642CC(p, a, b, c, d, p->s->h24, p->s->h26);
+    Hud_DrawHealthMeterCells(p, a, b, c, d, p->s->h24, p->s->h26);
 }
