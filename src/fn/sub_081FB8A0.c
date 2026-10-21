@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.4%
+// fuzzy: 93.7%
 // Particle-pool update; register allocation of the loop pointers differs.
 #include "contact_swarm.h"
 #define Ratatosk_UpdateParticlePool sub_081FB8A0
@@ -161,11 +161,13 @@ s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
                 RatatoskParticle_Remove(a, e, i);
             } else {
                 s16 *vel = &e->vx;
-                if (e->flags & 1) {
+                if (*(volatile u32 *)&e->flags & 1) {
                     s32 angle = *(s8 *)(cfg + 6);
                     s32 speed = *(s32 *)(cfg + 8);
-                    vel[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-                    vel[1] = 0;
+                    s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+                    s32 zero = 0;
+                    vel[0] = x;
+                    vel[1] = zero;
                     vel[2] = Scale(gUnk_086149C4[angle & 255] * speed);
                     e->flags &= ~1;
                 }
