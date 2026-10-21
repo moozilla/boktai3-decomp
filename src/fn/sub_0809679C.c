@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.6%
+// fuzzy: 98.8%
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 s32 Mod(s32, s32);
@@ -61,8 +61,12 @@ void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *actor)
             *output = 0;
         }
     }
-    actor->motion.x += FIELD(context, 0x5FC, u16);
-    vx = (s16 *)(context + 0x5FC);
+    {
+        register u32 off asm("r2") = 0x5FC;
+        asm("" : "+r"(off));
+        vx = (s16 *)(context + off);
+        actor->motion.x += *(u16 *)vx;
+    }
     zero = 0;
     actor->motion.z += FIELD(context, 0x600, u16);
     vz = (s16 *)(context + 0x600);
