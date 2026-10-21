@@ -3,7 +3,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.7%
+// fuzzy: 98.3%
 // Remaining: pointer copies land in r4/r3 instead of r3/r4, and one constant load is scheduled later.
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
@@ -41,6 +41,7 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32
         if (reset == 1) {
             u32 mask = 2;
             q->field69E = 0;
+            asm("" : "+r"(mask));
             q->flags6D4 = mask | q->flags6D4;
         }
         sub_080B3110(p, reset, gUnk_0824E230, 0x60B);
