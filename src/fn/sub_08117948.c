@@ -82,7 +82,7 @@ s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Obj *);
-void sub_0811D91C(struct Obj *);
+void PalFade_Update(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
 void sub_0811BF44(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
@@ -93,7 +93,7 @@ u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 void Anim_Step(void *, void *);
-void sub_0811D6C8(void *, s32, u16, s32, s32, s32, s32, s32);
+void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 s32 sub_08249240(void *, s32, u32);
 void ChargeMarker_TickHold(void *, void *, u32);
@@ -117,14 +117,14 @@ static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
             if (p->input[0] & 1) {
                 if (!sub_08249240((u8 *)p + 0x32C, 0, U32(p, 0x32C))) {
                     if (U8(p, 0x343) == 1) {
-                        sub_0811D6C8(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
+                        PalFade_Start(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
                         U8(p, 0x343) = 0;
                     }
                     U8(p, 0x342) = 0;
                 }
             } else {
                 if (U8(p, 0x343) && (p->previousInput & 1)) {
-                    sub_0811D6C8(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
+                    PalFade_Start(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
                     U8(p, 0x342) = 0;
                 }
             }
@@ -145,7 +145,7 @@ static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
             self->pendingDamage = 0;
             if (!self->recoveryTimer) {
                 s32 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
-                sub_0811D6C8(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
+                PalFade_Start(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
             }
         }
         if (self->cooldown)
@@ -265,7 +265,7 @@ void Glove_UpdateStopping(struct Glove *p)
                 self->flags40 &= ~1;
             }
             p->height = h;
-            sub_0811D91C(self);
+            PalFade_Update(self);
 
             Actor_UpdateShadowSpriteParts(self, p->model);
             if (self->flags40 & 4)

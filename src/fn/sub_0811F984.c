@@ -13,7 +13,7 @@ struct ActorRecovery {
     u8 unknown57B[0x73];
     s8 damageFlags;
 };
-void sub_0811D6C8(struct ActorRecovery *, void *, u32, s32, s32, s32, s32, s32);
+void PalFade_Start(struct ActorRecovery *, void *, u32, s32, s32, s32, s32, s32);
 static inline void ClearDamageFlag(s8 *flags, s32 mask)
 {
     *flags &= mask;
@@ -26,7 +26,7 @@ s32 ActorAction_TickRecovery(struct ActorRecovery *actor, void *context)
         actor->damageTimer = 0;
         actor->pendingDamage = 0;
         if (!actor->recoveryTimer)
-            sub_0811D6C8(actor, context, actor->recoveryValue, 0, 0, 16, 1, 1);
+            PalFade_Start(actor, context, actor->recoveryValue, 0, 0, 16, 1, 1);
     }
     if (actor->cooldown)
         actor->cooldown--;

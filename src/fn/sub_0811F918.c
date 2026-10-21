@@ -9,7 +9,7 @@ struct ModifierActionActor {
 };
 u8 Modifier_IsFourthSourceReady(struct ModifierAction *);
 void CallbackList_SubtractStateTenValue(void *, struct ModifierAction *, s32);
-void sub_0811D6C8(void *, s32, s32, void *, s32, s32, s32, s32);
+void PalFade_Start(void *, s32, s32, void *, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 ModifierAction_SpawnBurst(struct ModifierActionActor *actor, void *target)
 {
@@ -20,7 +20,7 @@ s32 ModifierAction_SpawnBurst(struct ModifierActionActor *actor, void *target)
         if (!zero) {
             action->remaining = action->duration;
             CallbackList_SubtractStateTenValue(actor, action, 0);
-            sub_0811D6C8(actor, 0x385, 0x385, target, actor->parameter, 16, 4, zero);
+            PalFade_Start(actor, 0x385, 0x385, target, actor->parameter, 16, 4, zero);
             action->cooldown = action->interval;
             Sound_PlaySong(0x3e3);
         }

@@ -87,7 +87,7 @@ void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
 void SceneNpc_OnModeUpdate(void);
 void SceneNpc_OnStateUpdate(void);
-void sub_081D0928(void);
+void SceneNpc_OnStateEffectUpdate(void);
 void SceneNpc_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
