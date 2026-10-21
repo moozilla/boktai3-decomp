@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.0%
-// foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
 #define ActorSoundPhase_StopSong Vanargand_StopActionSequence
 struct ActorSoundPhase {
     u8 f0[0xAA];
@@ -37,16 +34,14 @@ static inline u8 SelectPhase(s16 variant)
 void ActorSoundPhase_UpdateConditionalStop(struct ActorSoundPhase *p)
 {
     struct ActorSoundPhase *q = p;
+    asm("" : "+r"(q));
     if (chk(p)) {
         u32 v = SelectPhase(*(s16 *)((u8 *)p + 0x5c2));
-        Vanargand_StopActionSequence((u8 *)p + 0x21C);
-        p->st = v;
+        Vanargand_StopActionSequence((u8 *)q + 0x21C);
+        q->st = v;
     }
-    if (p->af != 0) {
-        ScenePanel_UpdatePairConditions(q);
-        ScenePanel_ApplyPairTransition(q);
+    if (q->af != 0) {
+        ScenePanel_UpdatePairConditions(p);
+        ScenePanel_ApplyPairTransition(p);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorSoundPhase_UpdateConditionalStop);
-#endif
