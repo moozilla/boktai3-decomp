@@ -259,8 +259,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 secondOutput = output + index;
                             }
                         } else {
-                            register s32 blockX asm("r1"), block, halfX,
-                                halfY asm("r0");
+                            register s32 blockX asm("r1"), block, halfX, halfY asm("r0");
                             u32 tile;
                             {
                                 s32 scaled = truncate5(dx);

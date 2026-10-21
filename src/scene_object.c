@@ -779,8 +779,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) =
-                            Scene_UpdateObjectStep;
+                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;
@@ -818,8 +817,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(struct SceneObject *) =
-                            Scene_UpdateObjectStep;
+                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;
@@ -976,8 +974,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
         if (p->type == 1) {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(struct SceneObject *) =
-                        Scene_UpdateFallingObject;
+                    register void (*callback)(struct SceneObject *) = Scene_UpdateFallingObject;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -989,8 +986,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) =
-                        Scene_UpdateObjectIdle;
+                    register void (*callback)(struct SceneObject *) = Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1004,8 +1000,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
         } else {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(struct SceneObject *) =
-                        Scene_UpdateFallingObject;
+                    register void (*callback)(struct SceneObject *) = Scene_UpdateFallingObject;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1014,8 +1009,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) =
-                        Scene_UpdateObjectIdle;
+                    register void (*callback)(struct SceneObject *) = Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;

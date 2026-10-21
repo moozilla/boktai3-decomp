@@ -16,7 +16,7 @@ void Memory_Copy(void *, void *, u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
 u8 *Player_GetEffectivePosition(u32);
 void PlayerClone_SetBehaviorCallback(void *, void *);
-void sub_082003BC(void);
+void PlayerClone_UpdateBehavior(void);
 void PlayerClone_CreatePool(void);
 static inline void CpuSetW(const void *src, void *dest, u32 control)
 {
@@ -63,7 +63,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
                 CpuSetW(&scratch.fill, target, 0x05000002);
             }
             *(u32 *)((u8 *)display + 8) |= 1;
-            PlayerClone_SetBehaviorCallback(handler, sub_082003BC);
+            PlayerClone_SetBehaviorCallback(handler, PlayerClone_UpdateBehavior);
             *(u32 *)(pool + 0x18) |= 1 << scratch.index;
             (*(u32 *)(pool + 0x9e8))++;
             return scratch.index;

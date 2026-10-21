@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define PlayerClone_UpdateBehavior sub_082003BC
-
 extern u32 gUnk_03005308, gUnk_03005304;
 extern u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
@@ -266,5 +264,5 @@ s32 PlayerClone_UpdateBehavior(u8 *s, s32 i)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082003BC);
+INCLUDE_ASM("asm/nonmatching", PlayerClone_UpdateBehavior);
 #endif
