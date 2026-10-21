@@ -2962,6 +2962,7 @@ addr,name,mode,confidence,source,notes
 0808D1C0,Ghoul_OnMessage,thumb,low,src-alias,Callback forwarding to a shared actor handler; message role is tentative
 0808D1CC,Ghoul_Destroy,thumb,low,src-alias,Destruction callback releasing scene actor effect resources
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
+0808E208,Slime_ApplyBodyHit,thumb,low,src-alias,Collider callback: for hit type 1 records the hit value and clears flag 0x1000000; variant 3 rolls random variant flags
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
 0808E54C,Slime_ResetAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting profile entry 1
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
