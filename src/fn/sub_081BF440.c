@@ -1,9 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input_navigation.h"
-
-#ifdef NONMATCHING
-// fuzzy: 98.0%
-// foundry draft (worker best 98.0%); what differs is mostly register allocation and instruction order
 
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
@@ -51,7 +48,15 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
             Sound_PlaySong(0xDD);
             {
                 s32 descriptionMode = 4;
-                MenuPanel_ShowDescription(p, descriptionMode, p->description, (void *)-1);
+                register s32 none asm("r3");
+                void *description = p->description;
+                void *panel = p;
+                asm("" : "+r"(description));
+                asm("" : "+r"(panel));
+                asm("" : "+r"(descriptionMode));
+                none = -1;
+                asm("" : "+r"(none));
+                MenuPanel_ShowDescription(panel, descriptionMode, description, (void *)none);
             }
             SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
             SceneInventory_ResetCategoryPalette(p, p->colors);
@@ -60,6 +65,3 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Storage_BeginCategoryMode);
-#endif
