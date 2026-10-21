@@ -1,8 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.5%
+// fuzzy: 97.6%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
@@ -23,8 +24,9 @@ static inline void AddHalf(s16 *dst, const s16 *src)
 {
     *dst += *src;
 }
-void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
 {
+    register struct SceneActorRegistryResetView *p asm("r6") = p_;
     struct {
         u32 zero;
         struct ContactPosition step;
@@ -40,7 +42,8 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p)
     AddHalf(&p->motion.z, &scratch.step.z);
     {
         u32 mask = 0x2000;
-        p->flags2CC |= mask;
+        u32 *fl = &p->flags2CC;
+        *fl |= mask;
     }
     scratch.zero = 0;
     CpuSet(&scratch.zero, &scratch.step, 0x05000002);
@@ -63,6 +66,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p)
         *w = m & *w;
         p->word104 = 0;
     }
+    asm("" ::"r"(p));
 }
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_TickForwardBurst);

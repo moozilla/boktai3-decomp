@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 95.4%
+// fuzzy: 97.4%
 // Remaining: input/array address allocation and constant scheduling.
 struct AllocHud {
     u8 pad[0x48a8];
@@ -89,13 +89,18 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         Sound_PlaySong(0xdc);
         setDescription(p, p[0x48aa] + 20);
     } else if (key & 0x20) {
-        s16 *n = ((struct AllocHud *)p)->offsets + p[0x48aa];
+        s16 *n = (s16 *)((p + 0x48b6) + (p[0x48aa] << 1));
         if (*n > 0) {
             (*n)--;
             (*(u16 *)(p + 0x48a8))++;
             goto changed;
         }
-    } else if ((any = key & 0x10)) {
+    } else if (({
+                   any = 0x10;
+                   asm("" : "+r"(any));
+                   any &= key;
+                   any;
+               })) {
         u16 *remaining = (u16 *)(p + 0x48a8);
         register s32 index asm("r6");
         s32 stat;
@@ -105,8 +110,14 @@ void Presentation_UpdateAllocationSelection(u8 *p)
             goto display;
         owner = *(u8 **)(p + 0xa40);
         index = p[0x48aa];
-        stat = ((struct AllocOwner *)owner)->stats[index];
-        n = ((struct AllocHud *)p)->offsets + index;
+        {
+            u32 idx2 = index << 1;
+            u8 *b;
+            stat = *(u16 *)(owner + 0x41c + idx2);
+            b = p + 0x48b6;
+            asm("" : "+r"(b));
+            n = (s16 *)(b + idx2);
+        }
         if (stat + *n > 99)
             goto display;
         if (((struct AllocHud *)p)->values[index] + *n > 99)
