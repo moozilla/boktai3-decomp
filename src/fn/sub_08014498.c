@@ -10,7 +10,7 @@ struct Manager {
     struct Group groups[6];
 };
 extern u32 gUnk_0300523C;
-void sub_08014330(struct Manager *, struct Group *);
+void ParticleGroup_UpdateFrozen(struct Manager *, struct Group *);
 void sub_0801404C(struct Manager *, struct Group *);
 void ParticleGroup_Update(struct Manager *, struct Group *);
 int ParticleManager_Update(struct Manager *m)
@@ -21,7 +21,7 @@ int ParticleManager_Update(struct Manager *m)
         g = m->groups;
         for (i = 5; i >= 0; g++, i--) {
             if (g->active)
-                sub_08014330(m, g);
+                ParticleGroup_UpdateFrozen(m, g);
         }
     } else {
         g = m->groups;

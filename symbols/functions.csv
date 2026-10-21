@@ -445,6 +445,7 @@ addr,name,mode,confidence,source,notes
 08013EF4,ShadowRegistry_SetEntryPosition,thumb,low,src-alias,finds an entry by id and overwrites its position struct
 08013F24,ShadowRegistry_SetPositionFromScript,thumb,low,src-alias,reads id and x/y/z keywords from script and calls ShadowRegistry_SetEntryPosition
 08013F98,ParticleGroup_Update,thumb,low,src-alias,
+08014330,ParticleGroup_UpdateFrozen,thumb,low,src-alias,
 08014498,ParticleManager_Update,thumb,low,src-alias,
 0801450C,ParticleManager_Kill,thumb,low,src-alias,Task kill callback for the particle manager: removes active effects from each of the 6 particle groups' 8 slots and clears the gUnk_02000060 singleton
 08014568,ParticleManager_Initialize,thumb,low,src-alias,
