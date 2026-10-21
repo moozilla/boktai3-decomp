@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 92.9%
+// fuzzy: 94.3%
 // Remaining differences: register allocation (r1/r3 swaps) in the head and tail.
 
 struct P {
@@ -170,11 +170,9 @@ void PlayerCue_UpdateSpiralPose(struct P *p)
     H(0xAD6) = 0x16F;
     H(0xAD8) += 3;
     {
-        u32 mask;
-        register u32 tmp asm("r3");
-        tmp = 0xFFFF;
-        asm("" : "+r"(tmp));
-        mask = tmp;
+        register u32 mask asm("r2");
+        mask = 0xFFFF;
+        asm("" : "+r"(mask));
         if (H(0xAD8) > 0x20)
             H(0xAD8) = 0x20;
         {
