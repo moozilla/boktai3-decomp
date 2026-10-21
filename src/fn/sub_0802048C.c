@@ -3,7 +3,6 @@
 void ResourceRegistry_RegisterResource(u32, void *, u32);
 
 // confidence=low: loads the animation resources of the scene object manager and allocates its slot pool.
-#define SceneObjects_Init sub_0802048C
 s32 SceneObjects_Init(u8 *p, u16 arg, s32 unused)
 {
     s32 flag;

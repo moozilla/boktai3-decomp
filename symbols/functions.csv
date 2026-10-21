@@ -707,6 +707,7 @@ addr,name,mode,confidence,source,notes
 0801EA70,SceneObjects_ScriptPromote,thumb,low,src-alias,
 0801EB08,SceneObjects_ScriptReadPosition,thumb,low,src-alias,
 0801EC00,SceneObjects_HasTypeTwoResource,thumb,low,src-alias,
+0801EC4C,SceneObject_InitPlacement,thumb,low,src-alias,
 0801EF28,SceneObjects_AddPrimaryId,thumb,low,src-alias,
 0801EF58,SceneObject_UpdateInactiveIdle,thumb,low,src-alias,Empty per-object animate callback installed by SceneObjects_SetInactive/AnimateInactive once the inactive blink sequence finishes; terminal no-op stat
 0801EF5C,SceneObject_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SceneObjects_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
@@ -718,9 +719,11 @@ addr,name,mode,confidence,source,notes
 0801F4C4,SceneObject_UpdateLowering,thumb,low,src-alias,
 0801F580,SceneObject_UpdateRaised,thumb,low,src-alias,
 0801F5B8,SceneObject_UpdateLowered,thumb,low,src-alias,
+0801F5EC,SceneObject_InitSlotPlacement,thumb,low,src-alias,
 0801F934,SceneObject_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SceneObjects_Append for several object kinds; distinct from EF58/EF5C's idl
 0801F938,SceneObject_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
 080203D4,SceneObjects_Destroy,thumb,low,src-alias,
+0802048C,SceneObjects_Init,thumb,low,src-alias,
 08020964,SceneMessages_FindReceiver,thumb,low,src-alias,Finds the registered receiver matching both message ID and category.
 08020990,SceneMessages_LinkReceiver,thumb,low,src-alias,Prepends a receiver to the controller's doubly linked receiver list.
 080209AC,SceneMessages_UnlinkReceiver,thumb,low,src-alias,Removes a receiver from the controller's doubly linked receiver list.

@@ -6,7 +6,6 @@ void SceneObject_UpdateInactiveIdle(void);
 void SceneObject_UpdateActiveIdle(void);
 
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
-#define SceneObject_InitPlacement sub_0801EC4C
 void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos);
