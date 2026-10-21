@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_object.h"
-#ifdef NONMATCHING
-// fuzzy: 85.1%
-// foundry draft (worker best 83.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
 struct SceneMarkerVector {
     u32 x : 16, y : 16, z : 16;
@@ -39,15 +37,25 @@ static inline void SetFrame(struct SceneMarkerSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
+static inline void CpuSetFill(void *dest, u32 control, const void *src)
+{
+    CpuSet(src, dest, control);
+}
 s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
 {
-    u32 zero;
-    struct SceneVec position;
+    struct {
+        u32 zero;
+        struct SceneVec position;
+    } local;
     struct SceneMarkerVector size, offset;
-    register struct SceneVec *positionPtr = &position;
+    register struct SceneVec *positionPtr asm("r9") = &local.position;
     void *collider;
-    zero = 0;
-    CpuSet(&zero, positionPtr, 0x5000002);
+    local.zero = 0;
+    {
+        u32 *src = &local.zero;
+        asm("" : "+r"(src));
+        CpuSetFill(positionPtr, 0x5000002, src);
+    }
     collider = p->collider;
     size.x = 128;
     size.y = 128;
@@ -76,6 +84,3 @@ s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
     p->colliderState = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneMarker_InitSprites);
-#endif
