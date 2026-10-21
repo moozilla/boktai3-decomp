@@ -3201,6 +3201,7 @@ addr,name,mode,confidence,source,notes
 080A88CC,TentacleBody_InitBehaviorTable,thumb,low,src-alias,Assigns the actor behavior table during initialization
 080A88DC,TentacleBody_GetDirectionFrame,thumb,low,src-alias,Converts an angle into a folded five-frame direction index and a mirror flag
 080A8904,TentacleActor_SelectWanderRoute,thumb,low,src-alias,
+080A8EBC,TentacleActor_AssignSegmentPhases,thumb,low,src-alias,Cycles phase values 0 to 3 across segments whose flags lack bits one and four
 080A8F38,TentacleBody_RefreshDirectionalAnimations,thumb,low,src-alias,
 080A915C,TentacleBody_ResetDirectionalAnimations,thumb,low,src-alias,
 080A9374,TentacleBody_UpdateSegmentMotion,thumb,low,src-alias,Applies a shared motion helper to each enabled segment using parameters 10 and 30; motion interpretation is tentative
