@@ -176,32 +176,32 @@ Scene actor visibility and stored motion,08084280,08084F44,,,docs/SCENE_ACTOR_VI
 Bat 1,08084F44,08085D58,,,auto: 2 of 2 functions named Bat_*
 Ghoul 1,08085D58,08086C1C,,,auto: 7 of 9 functions named Ghoul_*
 Bat 2,08086C1C,08089168,,,auto: 4 of 7 functions named Bat_*
-Ghoul 2,08089168,0808E208,,,auto: 18 of 36 functions named Ghoul_*
-Slime,0808E208,08091E54,,,auto: 24 of 46 functions named Slime_*
-Bee,08091E54,08095574,,,auto: 30 of 45 functions named Bee_*
-Ghost,08095574,0809AE0C,,,auto: 25 of 62 functions named Ghost_*
-Lun,0809AE0C,0809ED00,,,auto: 29 of 50 functions named Lun_*
-Crow,0809ED00,080A2048,,,auto: 26 of 40 functions named Crow_*
+Ghoul 2,08089168,0808E208,,,auto: 21 of 36 functions named Ghoul_*
+Slime,0808E208,08091E54,,,auto: 32 of 46 functions named Slime_*
+Bee,08091E54,08095574,,,auto: 31 of 45 functions named Bee_*
+Ghost,08095574,0809AE0C,,,auto: 32 of 62 functions named Ghost_*
+Lun,0809AE0C,0809ED00,,,auto: 32 of 50 functions named Lun_*
+Crow,0809ED00,080A2048,,,auto: 29 of 40 functions named Crow_*
 Spider,080A2048,080A5B8C,,,auto: 20 of 45 functions named Spider_*
-Tentacle body,080A5B8C,080A7700,,,auto: 6 of 18 functions named TentacleBody_*
-Tentacle actor,080A7700,080ACBA8,,,auto: 24 of 66 functions named TentacleActor_*
-Vorn,080ACBA8,080B551C,,,auto: 54 of 106 functions named Vorn_*
+Tentacle body,080A5B8C,080A7700,,,auto: 8 of 18 functions named TentacleBody_*
+Tentacle actor,080A7700,080ACBA8,,,auto: 29 of 66 functions named TentacleActor_*
+Vorn,080ACBA8,080B551C,,,auto: 56 of 106 functions named Vorn_*
 Skeleton 1,080B551C,080C0668,,,auto: 26 of 74 functions named Skeleton_*
 Scene actor approach,080C0668,080C12FC,,,auto: 4 of 6 functions named SceneActorApproach_*
 Skeleton 2,080C12FC,080C47B8,,,auto: 6 of 13 functions named Skeleton_*
-Golem,080C47B8,080D0C30,,,auto: 40 of 62 functions named Golem_*
-Mummy,080D0C30,080DDD28,,,auto: 46 of 69 functions named Mummy_*
-Dog,080DDD28,080E6E08,,,auto: 39 of 71 functions named Dog_*
+Golem,080C47B8,080D0C30,,,auto: 45 of 62 functions named Golem_*
+Mummy,080D0C30,080DDD28,,,auto: 48 of 69 functions named Mummy_*
+Dog,080DDD28,080E6E08,,,auto: 41 of 71 functions named Dog_*
 Mimic,080E6E08,080E98A4,,,auto: 15 of 36 functions named Mimic_*
-Octopus,080E98A4,080ED328,,,auto: 19 of 46 functions named Octopus_*
+Octopus,080E98A4,080ED328,,,auto: 23 of 46 functions named Octopus_*
 Ivy 1,080ED328,080F2700,,,auto: 28 of 59 functions named Ivy_*
 Phase object,080F2700,080F33BC,,,auto: 6 of 14 functions named PhaseObject_*; also ColorPulse_*
 Child group,080F33BC,080F421C,,,auto: 7 of 16 functions named ChildGroup_*
 Ivy 2,080F421C,080F4B94,,,auto: 6 of 11 functions named Ivy_*
 Sword,080F4B94,080F75C0,,,auto: 24 of 42 functions named Sword_*; also Axe_*
-Actor phase,080F75C0,080F85B0,,,auto: 6 of 10 functions named ActorPhase_*
-Axe,080F85B0,080FF78C,,,auto: 46 of 94 functions named Axe_*
-Wooden crate,080FF78C,0810033C,,,auto: 21 of 25 functions named WoodenCrate_*
+Actor phase,080F75C0,080F85B0,,,auto: 7 of 10 functions named ActorPhase_*
+Axe,080F85B0,080FF78C,,,auto: 54 of 94 functions named Axe_*
+Wooden crate,080FF78C,0810033C,,,auto: 22 of 25 functions named WoodenCrate_*
 Floor switch,0810033C,08100A64,,,auto: 11 of 13 functions named FloorSwitch_*
 Named object,08100A64,08103AD0,,,auto: 34 of 45 functions named NamedObject_*
 Named actor,08103AD0,081041DC,,,auto: 7 of 14 functions named NamedActor_*; also NamedObject_*
@@ -275,10 +275,10 @@ Ballistic sprite effect,08139028,081395D4,,,auto: 4 of 8 functions named Ballist
 Particle burst effect,081395D4,08139FA0,,,auto: 6 of 14 functions named ParticleBurstEffect_*
 Sprite pair pool,08139FA0,0813A5B4,,,auto: 3 of 13 functions named SpritePairPool_*; also FollowingSpriteEffect_*
 Position linked sprite,0813A5B4,0813ADC4,,,auto: 2 of 22 functions named PositionLinkedSprite_*; also ActorMarker_* ScreenMote_* SpritePair_*
-Player 1,0813ADC4,0813C040,,,auto: 29 of 44 functions named Player_*
+Player 1,0813ADC4,0813C040,,,auto: 30 of 44 functions named Player_*
 Directional sprite effect (tentative),0813C040,0813C2EC,,,docs/REPORT_SUBSYSTEMS.md; shared sprite7FC and sequence840 orbit/directional effect consumers
 Four-effect center controller (tentative),0813C2EC,0813C798,,,docs/REPORT_SUBSYSTEMS.md; shared four-effect array9A8 and center coordinatesA80/A84
-Player 2,0813C798,0814F804,,,auto: 187 of 230 functions named Player_*
+Player 2,0813C798,0814F804,,,auto: 188 of 230 functions named Player_*
 Player cue 1,0814F804,08156BBC,,,auto: 31 of 53 functions named PlayerCue_*
 Player 3,08156BBC,0815A400,,,auto: 66 of 77 functions named Player_*
 Script actor 1,0815A400,0815AD24,,,auto: 12 of 23 functions named ScriptActor_*
@@ -408,7 +408,7 @@ Actor display,081EC380,081EEDDC,,,auto: 4 of 25 functions named ActorDisplay_*
 Scene actors,081EEDDC,081EF344,,,auto: 7 of 12 functions named SceneActors_*
 Singleton slot 7,081EF344,081F21C0,,,auto: 25 of 44 functions named SingletonSlot7_*; also Vector3_*
 Sprite trail,081F21C0,081F2CD4,,,auto: 5 of 21 functions named SpriteTrail_*; also MotionEffectPool_* SingletonSlot7_*
-Ratatosk,081F2CD4,081FC66C,,,auto: 79 of 157 functions named Ratatosk_*; also RatatoskParticle_*
+Ratatosk,081F2CD4,081FC66C,,,auto: 80 of 157 functions named Ratatosk_*; also RatatoskParticle_*
 Scene projectile,081FC66C,081FCFE8,,,auto: 11 of 13 functions named SceneProjectile_*
 Projectile 3,081FCFE8,081FD664,,,auto: 13 of 15 functions named Projectile_*
 Orbit effect,081FD664,081FE68C,,,auto: 15 of 20 functions named OrbitEffect_*
@@ -458,11 +458,11 @@ Collider,0821FDC8,08220B24,,,auto: 18 of 25 functions named Collider_*
 Anim 2,08220B24,08221774,,,auto: 8 of 26 functions named Anim_*; also Crc_*
 Scalar and vector interpolation,08221774,0822223C,,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; scalar approach wrapped angle clamp and vector helpers; 31 raw-tail entries independently reviewed and remain unmatched until exact C verification
 Serial,0822223C,08223534,,,auto: 20 of 40 functions named Serial_*; also HashTable_*
-RFU manager,08223534,08224E54,,,auto: 21 of 34 functions named RfuManager_*; also Wireless_*
+RFU manager,08223534,08224E54,,,auto: 25 of 34 functions named RfuManager_*; also Wireless_*
 Scene lifecycle,08224E54,08225410,,,auto: 12 of 19 functions named SceneLifecycle_*
 Script 1,08225410,082258A0,,,auto: 11 of 19 functions named Script_*
 Scene body,082258A0,08225E1C,,,auto: 19 of 25 functions named SceneBody_*; also Terrain_*
-Camera,08225E1C,08227900,,,auto: 45 of 58 functions named Camera_*; also CameraFollow_* PlayerName_*
+Camera,08225E1C,08227900,,,auto: 46 of 58 functions named Camera_*; also CameraFollow_* PlayerName_*
 Script 2,08227900,08227E9C,,,auto: 2 of 16 functions named Script_*
 Save data,08227E9C,082284F4,,,auto: 4 of 30 functions named SaveData_*; also Clock_* DelayedScript_*
 Clock and sun schedule (tentative),082284F4,0822AE7C,,,RTC date helpers Clock_DaysInMonth; sun clock src/sun_clock.c and sub_08228C40; Time_CalculateSunriseSunset ends the block
@@ -470,9 +470,9 @@ Music player slots (tentative),0822AE7C,0822B5D0,,,Sound_PlaySong/StopSong wrapp
 Scene stimulus,0822B5D0,0822BAD0,,,auto: 16 of 20 functions named SceneStimulus_*
 Save 1,0822BAD0,0822C110,,,auto: 19 of 30 functions named Save_*; also Region_* Registry3C8D_*
 Solar,0822C110,0822CCC8,,,auto: 17 of 26 functions named Solar_*
-Inventory 2,0822CCC8,0822E224,,,auto: 60 of 77 functions named Inventory_*
+Inventory 2,0822CCC8,0822E224,,,auto: 63 of 77 functions named Inventory_*
 Game state,0822E224,0822ED64,,,auto: 23 of 36 functions named GameState_*; also SolarFruit_*
-Save 2,0822ED64,0822F1B4,,,auto: 7 of 8 functions named Save_*
+Save 2,0822ED64,0822F1B4,,,auto: 8 of 8 functions named Save_*
 Effect part,08231448,08232370,,,auto: 5 of 25 functions named EffectPart_*; also EffectGroup_* SceneActorEffects_*
 Timed hazard,08232370,082329C8,,,auto: 5 of 13 functions named TimedHazard_*; also ColliderSpritePool_*
 Screen orbit effect,082329C8,082334F4,,,auto: 5 of 25 functions named ScreenOrbitEffect_*; also ExplosionEffect_* TransientSpritePool_*
@@ -485,7 +485,7 @@ Radial burst effect,08235DB0,0823669C,,,auto: 5 of 14 functions named RadialBurs
 Particle effect,0823669C,08236B30,,,auto: 3 of 11 functions named ParticleEffect_*
 Particle burst,08236B30,082377A8,,,auto: 7 of 33 functions named ParticleBurst_*; also MovingSprite_* RisingPuffPool_*
 Actor glyph trail,082377A8,08237EC8,,,auto: 8 of 14 functions named ActorGlyphTrail_*
-Player 4,08237EC8,082389D8,,,auto: 11 of 25 functions named Player_*
+Player 4,08237EC8,082389D8,,,auto: 12 of 25 functions named Player_*; also SpritePulseEffect_*
 Directional effect,082389D8,08239130,,,auto: 6 of 12 functions named DirectionalEffect_*
 Link player,08239130,0823AE5C,,,auto: 20 of 48 functions named LinkPlayer_*
 Keyframe actor,0823AE5C,0823B264,,,auto: 2 of 3 functions named KeyframeActor_*
