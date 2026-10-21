@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.1%
 // 7 differing instruction runs; size -4 bytes; first diff at +0xE (ldr r2, [pc, #0x2c] vs ldr r0, [pc, #0x28])
 extern void (*const gUnk_08610740[])(void);
 void sub_08249240(u8 *, u8 *, void (*)(void));
@@ -13,7 +12,11 @@ static inline u8 test(u32 *p, u32 mask)
 u32 sub_08126000(u8 *s)
 {
     u8 *first = s + 0x1C;
-    if (*(u32 *)((u32)s + 0x69C)) {
+    register u32 off asm("r2") = 0x69C;
+    register u32 *chk asm("r0");
+    asm("" : "+r"(off));
+    chk = (u32 *)(s + off);
+    if (*chk) {
         s32 i = 0;
         u32 *flags = (u32 *)(0x69C + s);
         void (*const *table)(void) = gUnk_08610740;
@@ -29,6 +32,3 @@ u32 sub_08126000(u8 *s)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08126000);
-#endif
