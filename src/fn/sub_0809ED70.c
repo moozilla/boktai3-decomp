@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
@@ -36,19 +35,21 @@ void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
     u32 index;
     s32 power;
     u32 sample;
-    if (Unavailable((u8 *)actor))
+    if (Unavailable((u8 *)actor)) {
         return;
+    }
     {
         u32 mask = 0x800;
-        if (source->flags & mask)
+        if (source->flags & mask) {
             return;
+        }
     }
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
     index = (gUnk_03005308 + 1) & 1023;
     gUnk_03005308 = index;
     index *= 2;
     {
-        register const u16 *table asm("r5") = gUnk_0203B400;
+        const u16 *table = (const u16 *)0x0203B400;
         sample = *(u16 *)(index + (u32)table);
     }
     {
