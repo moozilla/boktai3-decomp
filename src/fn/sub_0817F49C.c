@@ -1,10 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: BossSlot2 pending-damage handler: applies damage, shows numbers, picks hurt/knockback/death state.
-#define BossSlot2_ApplyPendingDamage sub_0817F49C
-#define H(o)                         (*(s16 *)(q + (o)))
-#define B(o)                         (*(u8 *)(q + (o)))
-#define W(o)                         (*(u32 *)(q + (o)))
+#define H(o) (*(s16 *)(q + (o)))
+#define B(o) (*(u8 *)(q + (o)))
+#define W(o) (*(u32 *)(q + (o)))
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -138,5 +137,5 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817F49C);
+INCLUDE_ASM("asm/nonmatching", BossSlot2_ApplyPendingDamage);
 #endif

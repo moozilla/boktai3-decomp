@@ -46,8 +46,7 @@ static inline u16 mask8(s32 x)
 {
     return x & 255;
 }
-#define PlayerAttackEffect_EmitPaletteBaseTrail sub_081608B0
-s32 sub_081608B0(u8 *p)
+s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
 {
     union VecU a, b, c;
     u32 state = W(0x59C);
@@ -142,5 +141,5 @@ done:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081608B0);
+INCLUDE_ASM("asm/nonmatching", PlayerAttackEffect_EmitPaletteBaseTrail);
 #endif

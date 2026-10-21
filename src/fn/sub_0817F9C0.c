@@ -1,10 +1,9 @@
 #include "global.h"
 // confidence=low: BossSlot2 late per-frame update: collider/shadow/camera flags and shake counters.
-#define BossSlot2_UpdatePresentation sub_0817F9C0
-#define H(o)                         (*(s16 *)(q + (o)))
-#define U(o)                         (*(u16 *)(q + (o)))
-#define B(o)                         (*(u8 *)(q + (o)))
-#define W(o)                         (*(u32 *)(q + (o)))
+#define H(o) (*(s16 *)(q + (o)))
+#define U(o) (*(u16 *)(q + (o)))
+#define B(o) (*(u8 *)(q + (o)))
+#define W(o) (*(u32 *)(q + (o)))
 struct A {
     u8 pad0[0x3dc];
     u8 shadow;
@@ -197,5 +196,5 @@ void BossSlot2_UpdatePresentation(u8 *p)
     (*(u32 *)(p + 0xe4))++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0817F9C0);
+INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdatePresentation);
 #endif
