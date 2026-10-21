@@ -3779,7 +3779,7 @@ addr,name,mode,confidence,source,notes
 080F97E4,Axe_ConvergeRecoveryMotion,thumb,low,src-alias,
 080F9974,Axe_UpdateDamageSpin,thumb,low,src-alias,
 080F9B60,Axe_ReleaseAndIdle,thumb,low,src-alias,
-080F9BE4,Axe_UpdateDefeat,thumb,low,src-alias,
+080F9BE4,Axe_UpdateDefeat,thumb,low,src-alias,permuter CpuSet arg-order wrapper
 080F9FB8,Axe_UpdatePursuit,thumb,low,src-alias,
 080FA214,SceneActorControl_ApplyDampedMotion,thumb,low,src-alias,
 080FA32C,Axe_UpdateHealthPacedMotion,thumb,low,src-alias,
