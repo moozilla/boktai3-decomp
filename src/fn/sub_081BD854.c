@@ -1,7 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 struct ScriptPanel {
     u8 pad0[0x8E4];
     void *procedureData;
@@ -28,15 +26,19 @@ void DarkLoan_HideDisplay(void *);
 struct ScriptPanel *DarkLoan_CreateHiddenDisplay(u32 rate, s32 valueD, u32 displayMode,
                                                  u32 callbackPc)
 {
-    register u8 *panel asm("r5");
+    int new_var;
+    u8 *panel;
     u16 *rateField;
-    panel = Task_Create(0xB, 0x934);
+    new_var = 0xB;
+    panel = Task_Create(new_var, 0x934);
     if (panel)
         Task_SetCallbacks(panel, DarkLoan_OnUpdate, DarkLoan_OnDestroy);
-    rateField = (u16 *)(panel + 0x8EC);
-    *rateField = rate;
-    if (rate - 2 > 7)
-        *rateField = DarkLoan_GetDefaultRate();
+    do {
+        rateField = (u16 *)(panel + 0x8EC);
+        *rateField = rate;
+        if (rate - 2 > 7)
+            *rateField = DarkLoan_GetDefaultRate();
+    } while (0);
     ScriptPanel_InitializeProcedure((struct ScriptPanel *)panel);
     DarkLoan_BuildDisplay((struct ScriptPanel *)panel, 1);
     ((struct ScriptPanel *)panel)->callbackPc = callbackPc;

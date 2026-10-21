@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 s32 Div(s32, s32);
@@ -34,7 +33,6 @@ void Actor_InitLaunchVelocity(struct Actor *actor)
     {
         s16 v = tpos->x - apos->x;
         s16 *q = diff;
-        asm("" : "+r"(q));
         *q = v;
     }
     pdiff[1] = tpos->y - apos->y;
