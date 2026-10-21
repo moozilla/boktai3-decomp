@@ -1,6 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.9%
+// MATCHING_CONCESSION: register-pinning
 // Remaining: the 0xff mask is materialized before the first halfword load.
 struct Background {
     u8 pad[0x20];
@@ -14,8 +13,11 @@ void Bg_UpdateScrollShadow(void)
 {
     u16 *dst = gUnk_03004C20;
     struct Background *src = gUnk_03004C30;
-    u32 mask = 0xff;
-    dst[0] = mask & src[0].x;
+    u32 mask;
+    register u32 t0 asm("r1") = src[0].x;
+    asm("" : "+r"(t0));
+    mask = 0xff;
+    dst[0] = mask & t0;
     dst[1] = mask & src[0].y;
     dst[2] = mask & src[1].x;
     dst[3] = mask & src[1].y;
@@ -36,6 +38,3 @@ void Bg_UpdateScrollShadow(void)
         c[1] = gUnk_03004C00;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Bg_UpdateScrollShadow);
-#endif
