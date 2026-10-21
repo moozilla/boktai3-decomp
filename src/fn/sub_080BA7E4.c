@@ -75,7 +75,10 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
         jitter.z = 0x52;
         np = &empty;
         scratch.zero = z;
-        { register u32 ctl asm("r2") = 0x05000002; CpuSet(&scratch.zero, np, ctl); }
+        {
+            register u32 ctl asm("r2") = 0x05000002;
+            CpuSet(&scratch.zero, np, ctl);
+        }
         SceneParticleBurst_CreateWithPause(&p->position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
