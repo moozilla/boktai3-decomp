@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.3%
-// Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
+// confidence=low: slam that ends a capture; at frames 60/90 the arm reappears and the held
+// player (kind <= 3) or actor (kind & 4) is released, after frame 120 it returns to idle.
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -17,19 +16,6 @@ s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s3
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
 void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
-void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
-void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
-u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
-void Octopus_UpdateActiveState(void);
-extern u8 *gUnk_02000580;
-extern s16 *gUnk_020004B4;
-
-struct OctopusContext {
-    u8 unknown0[0x628];
-    u32 flags;
-    u8 unknown630[0xC];
-    u8 startTick, holdTicks, interval;
-};
 
 struct OctopusTarget {
     u8 unknown0[8];
@@ -37,16 +23,6 @@ struct OctopusTarget {
     u8 unknown9[0x33];
     void *player;
 };
-
-struct OctopusDrawable {
-    u8 unknown0[7];
-    u8 mode : 8;
-};
-
-struct OctopusOffset {
-    u16 x, y, z, pad;
-};
-extern const struct OctopusOffset gUnk_086062B0[2][5];
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
@@ -146,9 +122,11 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
 }
 static inline void Show(struct SceneActorRegistryResetView *a)
 {
-    if (a->drawableKind == 0)
-        *(u32 *)a->drawable &= ~1;
-    else {
+    if (a->drawableKind == 0) {
+        u32 *d = a->drawable;
+        u32 mask = ~1;
+        *d &= mask;
+    } else {
         u8 *p = (u8 *)a->drawable + 0x20;
         u32 mask = ~1;
         *(u32 *)(p + 8) &= mask;
@@ -164,18 +142,22 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
 
 void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
+    u8 *group;
     u8 *drawable = actor->drawable;
-    u8 *group = (u8 *)actor + 0x3D4;
     struct OctopusTarget *target;
     struct ContactPosition position;
+    struct Player *player;
+    void *victim;
+    group = (u8 *)actor + 0x3D4;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
         {
             struct ContactCollider *collider = &actor->colliderA;
             u32 flags = collider->flags;
-            flags |= 4;
-            flags &= 0xFFF7;
-            collider->flags = flags;
+            u32 mask = 4;
+            mask |= flags;
+            mask &= 0xFFF7;
+            collider->flags = mask;
         }
         {
             u32 bit = 0x800;
@@ -203,14 +185,15 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
             actor->flags2CC |= bit;
         }
         if (target->kind <= 3) {
-            struct Player *player = target->player;
-            u32 request = *(u16 *)((u8 *)actor + 0xB8);
-            u32 option = *(u32 *)((u8 *)actor + 0xD4);
+            u32 request, option;
+            player = target->player;
+            request = *(u16 *)((u8 *)actor + 0xB8);
+            option = *(u32 *)((u8 *)actor + 0xD4);
             Player_BeginPositionRequest(player, (void *)&actor->position, 0, 0, 0, 0, 1, request,
                                         option);
             Sound_PlaySong(0xE6);
         } else if (target->kind & 4) {
-            void *victim = target->player;
+            victim = target->player;
             sub_0807D2E0(victim, 2, &position, 0, 0, 0);
             SceneActorBehavior_PlayReactionSound(victim);
         }
@@ -222,12 +205,14 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         Camera_RequestShake(40);
     if (frame > 120) {
         Hide(actor);
-        if (target->kind & 4)
-            sub_0807D2E0(target->player, 2, &position, 0, 0x40, 0);
-        else if (target->kind <= 3) {
-            struct Player *player = target->player;
-            s32 turn = (actor->direction + 0x20) & 0xFF;
-            s32 angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
+        if (target->kind & 4) {
+            victim = target->player;
+            sub_0807D2E0(victim, 2, &position, 0, 0x40, 0);
+        } else if (target->kind <= 3) {
+            s32 turn, angle;
+            player = target->player;
+            turn = (actor->direction + 0x20) & 0xFF;
+            angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
             CellCenter((void *)&position, actor->terrainCell);
             Player_ApplyPositionRequest(player, (void *)&position, 0x80, angle, 60, 0, 0, 0);
             SpriteParticle_SpawnBatch(&actor->position, 1, 1, 1, 0x154);
@@ -243,11 +228,12 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
             };
             struct Delay *delay = (void *)(group + 0x8C);
             void *cb = SceneActorControl_OnIdle;
+            u32 one = 1;
             delay->ticks = 60;
             delay->cb = cb;
             delay->a = 0;
             delay->b = 0;
-            delay->c = 1;
+            delay->c = one;
         }
         SetCtl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(actor, 3, 0, 0);
@@ -256,6 +242,3 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         *(struct ContactPosition *)(drawable + 0x1C) = actor->position;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Octopus_ReleaseCapturedTarget);
-#endif
