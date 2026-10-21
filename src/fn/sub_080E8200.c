@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.7%
-// foundry draft (worker best 98.7%); what differs is mostly register allocation and instruction order
 extern u32 gUnk_030053F4;
 void *SceneActorContacts_FindObjectById(u16);
 u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *);
@@ -81,8 +79,12 @@ collision:
     target = (void *)((struct SceneActorReactionMotion *)motion)->fieldDC;
     if (!target)
         goto zero;
-    if (actor->distanceF0 >= actor->distanceLimitF8)
-        goto zero;
+    {
+        struct SceneActorRegistryResetView *a2 = actor;
+        asm("" : "+r"(a2));
+        if (a2->distanceF0 >= actor->distanceLimitF8)
+            goto zero;
+    }
     if (!Nav_IsPositionInMesh(*(void **)(group + 0x1FC), &actor->position,
                               (struct ContactPosition *)((u8 *)target + 12)))
         goto zero;
@@ -92,6 +94,3 @@ collision:
 zero:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_AcquireCollisionTarget);
-#endif

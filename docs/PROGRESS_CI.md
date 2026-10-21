@@ -73,6 +73,11 @@ assembly placeholders receive zero credit.
 
 ## Local use and refreshing metadata
 
+`PROGRESS.md` shows region bars and a "By subsystem" breakdown: sections
+(`SECTIONS` in `tools/progress.py`) over the report categories, then families
+(units sharing a first word, e.g. Monsters > Ghoul > Ghoul 1), then units with
+the functions still to match. decomp.dev only shows category > unit > function.
+
 From the repository root:
 
 ```sh
@@ -163,13 +168,21 @@ hierarchy and the rules for placing new code. Register-pinned and unpinned
 functions share their unit; the unit carries both register categories when it has
 both, and the two register categories' totals are still computed per function.
 
-`symbols/progress_areas.csv` adds **Intentional assembly** (`intentional_asm`,
-`08000000-0800145C`: header, reset vector and IWRAM helpers that stay assembly, plus the
-library ranges in `symbols/progress_asm.csv`: SDK/GCC handwritten assembly such as the
-m4a_1.s mixer block, RFU callback trampolines, BIOS wrappers and libgcc division, whose
-unmatched functions move to `Libraries/<name> (assembly)` units and leave the Libraries
-category) and **Decompilable code** (everything except the intentional assembly).
-Overall totals are unchanged; category percentages use their own denominators.
+`symbols/progress_areas.csv` adds **Intentional assembly** (`intentional_asm`): the
+ranges in `symbols/progress_asm.csv`, i.e. the GBA header and SDK crt0
+(`08000000-08000350`: header data, reset branch, `crt0_Init`, `IntrMain`) and SDK/GCC
+handwritten assembly such as the m4a_1.s mixer block, RFU callback trampolines, BIOS
+wrappers and libgcc division. Their unmatched functions move to
+`Libraries/<name> (assembly)` units and leave every other category. **They are left out
+of the headline totals** (overall measures, register categories, PROGRESS.md) and are
+reported only in the Intentional assembly category, so the headline percentage is of
+code that should become C. **Decompilable code** is kept as a category and now equals
+the headline. A function in these ranges that does get matched in C counts normally.
+
+The ARM code after crt0 (`08000350-0800145C`, copied to IWRAM `03000000` by `AgbMain`)
+is *not* assembly: it is six agbcc ARM C functions (APCS frames, the same compiler as
+the RFU serial interrupt), now disassembled as functions in the `Engine core/IWRAM ARM
+code` unit and matched with `// COMPILER: agbcc_arm` (`src/iwram_code.c`).
 
 ## Integration references
 
@@ -192,8 +205,8 @@ This changes report presentation only: function identities, byte denominators an
 matching credit are preserved. Provisional labels are explicitly marked tentative.
 
 The beginning of the address-ordered report is **not AgbMain**. Its first span
-includes the GBA header/reset vector; the `IntrMain` span also includes the ARM
-helpers copied to IWRAM. These remain assembly. We retain the old denominator
-and do not turn header data or handwritten startup assembly into C credit.
+is the GBA header/reset vector, then the SDK crt0 (`crt0_Init`, `IntrMain`); these stay
+assembly, are reported as intentional assembly and are not in the headline
+denominator. The IWRAM ARM C after them is ordinary decompilation work.
 Treemap positions can change as groups and layout change; use unit labels and
 virtual addresses to identify a tile rather than its screen corner.

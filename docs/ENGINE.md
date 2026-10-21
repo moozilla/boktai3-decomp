@@ -66,8 +66,8 @@ the most readable summary of each subsystem.
 
 Entry point: `AgbMain` in [`src/fn/AgbMain.c`](../src/fn/AgbMain.c) (ROM
 `0800145C`, [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md)). The ARM crt0 at `080000C0`
-jumps to it; ARM helpers (`CpuSet` wrappers, block copy, OAM and DMA helpers) run
-from IWRAM at `03000000` (ROM `08000350`).
+jumps to it; six ARM C functions (agbcc ARM mode, `src/iwram_code.c`) run from IWRAM
+at `03000000` (ROM `08000350`).
 
 `AgbMain` in order:
 

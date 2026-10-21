@@ -1,4 +1,5 @@
 name,start,end,evidence
+GBA header and crt0,08000000,08000350,"Cartridge header (logo, title BOKTAI3, U33J), reset branch, crt0_Init and IntrMain: the SDK crt0.s, handwritten ARM assembly (docs/ROM_MAP.md). The ARM code after it (08000350, copied to IWRAM) is compiled C and stays decompilable"
 MP2K m4a_1.s block,0822F1B4,0822FDB4,"Contiguous block before MidiKeyToFreq: umul3232H32 veneer, SoundMain/SoundMainRAM/SoundMainBTM mixer, MPlayJumpTableCopy, ply_fine..ply_tune event handlers, TrackStop, ply_note/endtie/lfos/mod; handwritten assembly in the SDK's m4a_1.s (pokeemerald)"
 RFU callback trampolines,0824538C,08245398,"bx r2/r1/r0 stubs; naked assembly in the SDK (docs/RFU.md)"
 libagbsyscall,08248590,082485EC,"BIOS swi wrappers; handwritten SDK syscall assembly"

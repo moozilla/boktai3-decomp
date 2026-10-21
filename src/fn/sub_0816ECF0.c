@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.3%
 // Remaining: destination-address reuse, source loads and zero scheduling.
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, u32);
@@ -50,13 +48,17 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
     if (mode == 0) {
         s[0x487f] = 1;
         {
-            register u32 off asm("r4") = 0x424;
+            register u32 off asm("r4");
             u16 w;
+            register u8 *o asm("r0");
+            o = OWNER(s);
+            off = 0x424;
             asm("" : "+r"(off));
-            w = H(OWNER(s), off);
+            w = H(o, off);
             ((struct RatioHud *)s)->prevA = w;
+            o = OWNER(s);
             off += 4;
-            v = H(OWNER(s), off);
+            v = H(o, off);
         }
         target = &((struct RatioHud *)s)->prevB;
         *target = v;
@@ -69,17 +71,18 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
             ((struct RatioHud *)s)->nextB = 1;
         s[0x4861] = 0;
     } else {
-        s[0x487f] = 2;
+        register u32 zero asm("r3");
+        u8 *q = &s[0x487f];
+        asm("" : "+r"(q));
+        zero = 0;
+        asm("" : "+r"(zero));
+        *q = 2;
         ((struct RatioHud *)s)->prevA = H(OWNER(s), 0x424);
         ((struct RatioHud *)s)->prevB = H(OWNER(s), 0x428);
-        ((struct RatioHud *)s)->nextA = 0;
+        ((struct RatioHud *)s)->nextA = zero;
         ((struct RatioHud *)s)->nextB = H(OWNER(s), 0x42a);
         s[0x4861] = 1;
     }
     Sound_PlaySong(0x38a);
     Hud_SetInteractionCallback(s, SceneMenuPanel_FinishResultMotion, 1);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PauseMenu_BeginVitalRatioExchange);
-#endif

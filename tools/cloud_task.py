@@ -62,7 +62,7 @@ def tasks(min_insns, max_insns=None):
                    if len(r) > 1 and r[1] in done and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
     fs = [f for f in worklist.functions() if f["name"] not in done and f["addr"] not in done_addrs and f["insns"] >= min_insns
           and (max_insns is None or f["insns"] < max_insns)
-          and not worklist.in_library(f["addr"]) and f["addr"] >= 0x0800145C]
+          and not worklist.in_library(f["addr"]) and f["addr"] >= 0x08000350]
     subs = [(int(r["start"], 16), int(r["end"], 16), r["name"])
             for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv")))]
     groups = {}

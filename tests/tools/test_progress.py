@@ -185,6 +185,17 @@ class AreaCategoryTest(unittest.TestCase):
         self.assertEqual(report["measures"]["total_code"], "8")
         self.assertIn("Monsters/08086000", [u["name"] for u in report["units"]])
 
+    def test_markdown_subsystems_nest_families(self):
+        unit = lambda name, done: {"name": name, "measures": {"total_code": "4", "matched_code": str(4 * done),
+                                   "total_functions": 1, "matched_functions": done},
+                                   "functions": [{"name": name.split("/")[1], "size": "4",
+                                                  "fuzzy_match_percent": 100 if done else 90}]}
+        report = {"units": [unit("Monsters/Ghoul 1", 1), unit("Monsters/Ghoul 2", 0), unit("Monsters/Bat", 1)]}
+        lines = progress.subsystem_lines(report, {"monsters": ("Monsters", [])})
+        self.assertIn("| **Gameplay** | 2/3 | 66.7% | `" + progress.bar(2 / 3, 20) + "` |", lines)
+        self.assertIn("| **Ghoul** | 1/2 | 50.0% | `" + progress.bar(0.5, 20) + "` |", lines)
+        self.assertIn("- Ghoul 2: `Ghoul 2` 4 B (90%)", lines)
+
     def test_every_game_function_has_a_unit_and_category(self):
         funcs, sizes = progress.load_functions()
         done = progress.collect_done(funcs, Path(progress.ROOT) / "src")
@@ -223,7 +234,7 @@ class AreaCategoryTest(unittest.TestCase):
         self.assertEqual(cats["libraries"]["total_code"], "4")
         self.assertEqual(cats["intentional_asm"]["total_code"], "8")
         self.assertEqual(cats["decompilable"]["total_code"], "4")
-        self.assertEqual(report["measures"]["total_code"], "12")
+        self.assertEqual(report["measures"]["total_code"], "4")  # headline leaves assembly out
         self.assertIn("libraries/SDK (assembly)", [u["name"] for u in report["units"]])
 
     def test_asm_ranges_load(self):

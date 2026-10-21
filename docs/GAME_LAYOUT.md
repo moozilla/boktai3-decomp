@@ -98,7 +98,8 @@ Reset, the ARM crt0, the IWRAM helpers, `AgbMain` and the first frame. The
 
 | Range | Subsystem (from progress_subsystems.csv) | C location | What it does |
 |---|---|---|---|
-| `08000000`–`0800145C` | Boot and ARM helpers | - | Cartridge header, crt0 stacks and IntrMain install, and ARM helpers copied to IWRAM 0x03000000 (blit, copy, OAM and DMA helpers). |
+| `08000000`–`08000350` | GBA header and crt0 | - | Cartridge header, SDK crt0 (stacks, IntrMain install). Handwritten assembly; reported as intentional assembly. |
+| `08000350`–`0800145C` | IWRAM ARM code | `src/iwram_code.c` | Six ARM C functions copied to IWRAM 0x03000000 by AgbMain (palette bank cache, sprite/blit helpers). |
 | `0800145C`–`080015AC` | Game entry point | `src/fn/AgbMain.c` | `AgbMain`: hardware and subsystem startup, then the endless `TaskSystem_RunFrame` loop. See ENTRY_AND_MENUS.md. |
 
 [ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md) describes the entry point and the
