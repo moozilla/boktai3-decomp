@@ -38,11 +38,10 @@ static inline s32 half(s32 value)
         return value >> 1;
     return -((-value) >> 1);
 }
-#ifdef NONMATCHING
-// fuzzy: 97.0%
 // Remaining difference: entry-flag pointer lifetime in the airborne phase.
 void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
 {
+    struct Tagged *new_var;
     struct Tagged *t = &p->tagged;
     struct Vec *pos = &p->position;
     if (p->entered) {
@@ -81,6 +80,7 @@ void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
             u32 entered = a->entered;
             s32 dx, dz, curve;
             a->entered = 0;
+            new_var = a;
             if (entered)
                 TaggedSceneNpc_PlayTaggedAnimation(p, 8, 2, 0, 4);
             dx = p->target.x - t->x;
@@ -91,9 +91,9 @@ void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
             pos->y = t->velocity * t->ticks + t->y + curve;
             if (t->ticks >= t->duration) {
                 pos->y = p->target.y;
-                a->phase = 2;
-                a->entered = 1;
-                a->ticks = 0;
+                new_var->phase = 2;
+                new_var->entered = 1;
+                new_var->ticks = 0;
             }
             break;
         }
@@ -109,7 +109,3 @@ void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TaggedSceneNpc_UpdateJumpToTarget);
-#endif

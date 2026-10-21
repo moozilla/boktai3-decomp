@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.3%
 // foundry draft (worker best 97.3%); what differs is mostly register allocation and instruction order
 #define SceneHud_DrawThreeDigitValue StatusPanel_DrawDecimalValue
 #define SceneHud_GetTextDestination  Hud_GetTilemapCell
@@ -15,6 +14,7 @@ void StatusPanel_DrawDecimalValue(void *owner, s32 x, s32 y, s32 value)
     s32 started;
     u16 *dest;
     s32 i;
+    s32 mask;
     s32 *digit;
     digits[0] = Div(value, 100);
     value -= digits[0] * 100;
@@ -24,9 +24,14 @@ void StatusPanel_DrawDecimalValue(void *owner, s32 x, s32 y, s32 value)
     started = 0;
     dest = Hud_GetTilemapCell(0, x, y);
     i = 0;
+    {
+        register s32 t asm("r1") = 0xFFFFD000;
+        asm("" : "+r"(t));
+        mask = t;
+    }
+    asm("" : "+r"(mask));
     digit = digits;
     do {
-        s32 mask = 0xFFFFD000;
         if (*digit > 0) {
             started = 1;
             *dest = Hud_GetStyleTileIndex(*digit, 0) | mask;
@@ -41,6 +46,3 @@ void StatusPanel_DrawDecimalValue(void *owner, s32 x, s32 y, s32 value)
     } while (i <= 2);
     *dest = 0xD07B;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StatusPanel_DrawDecimalValue);
-#endif
