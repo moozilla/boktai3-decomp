@@ -36,12 +36,13 @@ void Sound_PlaySongChecked(u32 a);
 
 static inline s32 ScaleHeavyAttack(s32 n)
 {
-    n = 0xaaa * n;
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
+    s32 m = 0xaaa * n;
+    asm("" : "+r"(m));
+    return m >= 0 ? m >> 12 : -((-m) >> 12);
 }
 
 #ifdef NONMATCHING
-// fuzzy: 94.0%
+// fuzzy: 95.7%
 // Remaining differences: collider-base reuse, address selection, and multiply-result register.
 void ActorController_UpdateHeavyAttackCollider(u8 *p)
 {
