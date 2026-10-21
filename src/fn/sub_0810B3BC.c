@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 80.7%
-// foundry draft (worker best 80.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct SceneMenuRecord {
     u8 data[0x3E];
     u16 checksum;
@@ -41,8 +39,8 @@ static inline u8 HasRecordInput(struct SceneMenu *p)
 }
 s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
 {
-    u8 *record;
-    struct SceneMenu *p = object;
+    register u8 *record asm("r4");
+    register struct SceneMenu *p asm("r5") = object;
     s32 completed, i;
     record = (u8 *)p->records;
     if (Registry1745_ConsumeStateEntry(p)) {
@@ -78,6 +76,3 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
     if (completed == p->count && gUnk_020004B4 && gUnk_020004B4->state == 0)
         p->flags = 0x1800;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneMenu_UpdateRecords);
-#endif
