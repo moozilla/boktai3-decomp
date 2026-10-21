@@ -6,7 +6,7 @@
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
 #ifdef NONMATCHING
-// fuzzy: 91.6%
+// fuzzy: 94.7%
 // Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -184,12 +184,11 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
         MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
         {
             register u32 zero asm("r1") = 0;
-            register u32 offset asm("r3") = 0x164;
+            u32 offset = 0x164;
             asm("" : "+r"(zero));
             *(u32 *)((u8 *)p + offset) = zero;
             p->timer = zero;
             offset += 11;
-            asm("" : "+r"(offset));
             *(u8 *)((u8 *)p + offset) = 1;
         }
     }
