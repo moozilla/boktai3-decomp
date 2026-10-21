@@ -1,31 +1,32 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.0%
+// fuzzy: 95.7%
 // Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
+static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k, u32 z)
 {
     a->field2B2 = 1;
     a->field2B0 = 0;
     a->field2B5 = k;
     a->target = c;
-    a->field2C8 = 0;
+    a->field2C8 = z;
     {
         u32 *p = &a->flags114;
         u32 m = ~1;
         *p &= m;
     }
-    a->word104 = 0;
+    a->word104 = z;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k)
+static inline void State(struct SceneActorRegistryResetView *a, u32 k, u32 z)
 {
-    a->state2A8 = 0;
-    a->phase2A9 = 0;
+    a->state2A8 = z;
+    a->phase2A9 = z;
     a->behavior2AA = k;
-    a->counter2AC = 0;
+    a->counter2AC = z;
     a->field2B1 = 1;
 }
 
@@ -40,10 +41,18 @@ static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
 static inline u8 Disabled(struct SceneActorRegistryResetView *a)
 {
     if (a) {
-        if (Actor16(a, 64))
+        register u32 m asm("r1") = 64;
+        register u32 off asm("r2") = 0x2d4;
+        asm("" : "+r"(off));
+        if (F(a, off, u16) & m)
             return 1;
-        if (Actor32(a, 0x20000))
-            return 1;
+        m = 0x20000;
+        off -= 4;
+        {
+            register u32 *q asm("r0") = (u32 *)((u8 *)a + off);
+            if (*q & m)
+                return 1;
+        }
         if (F(a, 0x9c, s16) <= 0)
             return 1;
     }
@@ -54,22 +63,22 @@ s32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
 static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *pos, void *target)
 {
-    u16 *flags;
-    s32 r = Nav_IsPositionInMesh(nav, pos, target);
-    if (!r) {
-        u16 off = 0x2d4;
-        flags = (void *)((u8 *)a + off);
+    register u16 *flags asm("r0");
+    s32 r;
+    u32 off;
+    if (!Nav_IsPositionInMesh(nav, pos, target)) {
+        off = 0x2d4;
+        flags = (u16 *)((u8 *)a + off);
         goto clear;
     }
     r = Terrain_ApplyBlocked(nav, pos, target);
-    if (!r) {
-        u32 off = 0x2d4;
-        flags = (void *)((u8 *)a + off);
-        goto clear;
+    if (r) {
+        if (r != 2)
+            Memory_Clear((u8 *)a + 0x64, 8);
+        return 1;
     }
-    if (r != 2)
-        Memory_Clear((u8 *)a + 0x64, 8);
-    return 1;
+    off = 0x2d4;
+    flags = (u16 *)((u8 *)a + off);
 clear: {
     u32 m = 0xfffffdff;
     u32 v = *flags;
@@ -91,14 +100,16 @@ s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *
     if (!Route(a, F(nav, 0x1fc, void *), &a->position, target))
         return 0;
     {
-        u16 *p = (void *)(c + 0x62c);
-        u32 v = *p;
+        register u16 *p asm("r1") = (void *)(c + 0x62c);
+        register u32 v asm("r2") = *p;
         u32 m = 4;
+        u32 z5 = 0;
+        u32 z3 = 0;
         m |= v;
         *p = m;
+        Control(a, F(a, 0x228, void *), 1, z5);
+        State(a, 7, z3);
     }
-    Control(a, F(a, 0x228, void *), 1);
-    State(a, 7);
     a->field2C2 = 16;
     return 1;
 }
