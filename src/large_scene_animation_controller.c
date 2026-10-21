@@ -974,6 +974,11 @@ static inline void Or16(u32 m, u16 *p)
     *p |= m;
 }
 
+static inline void And16(u32 m, u16 *p)
+{
+    *p &= m;
+}
+
 void Nidhoggr_InitBackgrounds(struct Nidhoggr *t)
 {
     u32 index;
@@ -1435,7 +1440,104 @@ void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
  * sets bits in t->flags[2] (0x724E); also calls sub_08194858/sub_0819494C (part completion)
  * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
-INCLUDE_ASM("asm/nonmatching", sub_08194D70);
+#define Nidhoggr_UpdateDamageFlashAndPartAnimations sub_08194D70
+extern const u8 gUnk_0824F584[];
+extern const u8 gUnk_0824F588[];
+
+void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
+{
+    if (t->flags[1]) {
+        s32 n = 0x1e - t->flags[1];
+        if (n <= 0xf) {
+            Or16(0x200, &gUnk_03004BD8);
+            Blend_SetAlpha(1, 0x10, gUnk_0824F588[n]);
+            Collider_Refresh(&t->altColliders[0]);
+        } else {
+            t->flags[2] |= 0x10;
+            {
+                u16 *g = &gUnk_03004BD8;
+                u32 m = ~0x200;
+                *g = *g & m;
+            }
+        }
+        t->flags[2] |= 3;
+        t->flags[1]--;
+    } else {
+        {
+            u16 *g = &gUnk_03004BD8;
+            u32 m = ~0x200;
+            *g = *g & m;
+        }
+    }
+    if (t->flags[2] & 4) {
+        t->flags[2] &= ~1;
+        Nidhoggr_StartFirstPartAction(t);
+    } else {
+        sub_08194858(t);
+    }
+    if (t->flags[2] & 8) {
+        t->flags[2] &= ~2;
+        Nidhoggr_StartSecondPartAction(t);
+    } else {
+        sub_0819494C(t);
+    }
+    if (t->flags[2] & 0x10) {
+        Nidhoggr_SetPart23SpecialAnimation((u32)t);
+    } else if (t->flags[2] & 1) {
+        Nidhoggr_SelectRandomPart22AlternateAnimation(t);
+        t->flags[2] &= ~1;
+    } else {
+        switch (t->flags[3]) {
+            case 0:
+                Nidhoggr_ResetPart22Animation((u32)t);
+                break;
+            case 1:
+            case 2:
+            case 3:
+                if (t->flags[5]) {
+                    Nidhoggr_ResetPart22Animation((u32)t);
+                    t->flags[5]--;
+                } else {
+                    Nidhoggr_SelectRandomPart22Animation(t);
+                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x66FC));
+                    t->flags[5] = gUnk_0824F584[t->flags[3]];
+                }
+                break;
+            case 4:
+                Nidhoggr_ResetPart22Animation((u32)t);
+                break;
+        }
+    }
+    if (t->flags[2] & 0x10) {
+        t->flags[2] &= ~0x10;
+        goto reset23;
+    } else if (t->flags[2] & 2) {
+        Nidhoggr_SelectRandomPart23AlternateAnimation(t);
+        t->flags[2] &= ~2;
+    } else {
+        switch (t->flags[4]) {
+            case 0:
+            reset23:
+                Nidhoggr_ResetPart23Animation((u32)t);
+                break;
+            case 1:
+            case 2:
+            case 3:
+                if (t->flags[6]) {
+                    Nidhoggr_ResetPart23Animation((u32)t);
+                    t->flags[6]--;
+                } else {
+                    Nidhoggr_SelectRandomPart23Animation(t);
+                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x6750));
+                    t->flags[6] = gUnk_0824F584[t->flags[4]];
+                }
+                break;
+            case 4:
+                Nidhoggr_ResetPart23Animation((u32)t);
+                break;
+        }
+    }
+}
 
 void Nidhoggr_InitBobbingMotion(struct Nidhoggr *p, s32 x, s32 y)
 {
@@ -2590,8 +2692,6 @@ void Nidhoggr_CheckActivationTriggers(struct Nidhoggr *p)
         } while (n > 0);
     }
 }
-
-void sub_08194D70(void *);
 
 void sub_0819465C(void *);
 
