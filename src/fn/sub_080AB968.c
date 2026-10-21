@@ -5,8 +5,6 @@
 
 // confidence=low: inferred from segment state and collider updates.
 
-#ifdef NONMATCHING
-// fuzzy: 88.8%
 void TentacleBody_UpdateChargeSpread(void);
 void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
@@ -46,6 +44,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
 static inline s32 Abs(s32 x)
 {
     s32 r = x;
+    asm("" : "+r"(x));
     if (x < 0)
         r = -x;
     return r;
@@ -53,7 +52,9 @@ static inline s32 Abs(s32 x)
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
-    sub_080A9DB0(p, 4, 0x6400);
+    register s32 k asm("r2") = 0x6400;
+    asm("" : "+r"(k));
+    sub_080A9DB0(p, 4, k);
 }
 void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
 {
@@ -63,9 +64,17 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
         *(u16 *)((u8 *)s + 0x2e8) = 8;
     }
     {
-        s32 ax = Abs(*(s16 *)((u8 *)s + 0x2ec));
-        s32 az = Abs(*(s16 *)((u8 *)s + 0x2f0));
-        asm("" ::"r"(ax), "r"(az));
+        s32 x = *(s16 *)((u8 *)s + 0x2ec);
+        s32 ax = x;
+        s32 z;
+        s32 az;
+        if (x < 0)
+            ax = -x;
+        z = *(s16 *)((u8 *)s + 0x2f0);
+        az = z;
+        if (z < 0)
+            az = -z;
+        asm volatile("" ::"r"(ax), "r"(az), "r"(x), "r"(z));
         Advance(s, ax, az);
     }
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
@@ -82,13 +91,21 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
             *((u8 *)s + offset) = zero;
             offset++;
             *((u8 *)s + offset) = phase;
+            s->counter2AC = zero;
+            offset += 7;
+            {
+                register u8 *q asm("r0") = (u8 *)s + offset;
+                *q = 1;
+            }
         }
-        s->counter2AC = zero;
-        s->field2B1 = 1;
-    } else
-        s->counter2AC++;
+    } else {
+        register u32 o asm("r0") = 0x2ac;
+        asm("" : "+r"(o));
+        {
+            register u32 *c asm("r1") = (u32 *)((u8 *)s + o);
+            u32 v = *c;
+            v++;
+            *c = v;
+        }
+    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleActor_UpdateRetraction);
-#endif
