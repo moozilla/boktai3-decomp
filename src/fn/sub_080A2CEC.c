@@ -7,8 +7,6 @@ void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-#ifdef NONMATCHING
-// fuzzy: 97.7%
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                 u8 behavior)
 {
@@ -59,7 +57,7 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                 register u32 off asm("r5");
                 asm("" : "+r"(table));
                 {
-                    register const u16 *entry asm("r0") = (void *)((u32)table + index);
+                    register const u16 *entry asm("r0") = (void *)(index + (u32)table);
                     value = *entry;
                 }
                 off = 0x2BA;
@@ -71,15 +69,20 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             }
         }
         {
-            u32 off = 0x2BB;
-            register u8 *p asm("r1") = (u8 *)actor + off;
+            register u32 off asm("r0") = 0x2BB;
+            register u8 *p asm("r1");
+            asm("" : "+r"(off));
+            p = (u8 *)actor + off;
             *p = 1;
         }
     }
     {
         u32 mask = 0x8000;
-        u32 *p = &actor->flags2CC;
+        register u32 off asm("r3") = 0x2CC;
+        register u32 *p asm("r1");
         u32 v;
+        asm("" : "+r"(off));
+        p = (u32 *)((u8 *)actor + off);
         v = *p & mask;
         stateFlags = p;
         if (v)
@@ -87,8 +90,20 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     }
 
     if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
-        actor->field2B0 = 1;
-        script = *(u16 *)((u8 *)actor + 0x1F8);
+        {
+            register u32 off asm("r1") = 0x2B0;
+            register u8 *q asm("r0");
+            asm("" : "+r"(off));
+            q = (u8 *)actor + off;
+            *q = 1;
+        }
+        {
+            register u32 off asm("r2") = 0x1F8;
+            register u16 *q asm("r0");
+            asm("" : "+r"(off));
+            q = (u16 *)((u8 *)actor + off);
+            script = *q;
+        }
         if (script) {
             values[0] = actor->position.x;
             values[1] = actor->position.y;
@@ -137,7 +152,3 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             ActorShadow_Enable((u8 *)actor + 0x320);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_UpdateDefeat);
-#endif

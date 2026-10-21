@@ -1,8 +1,7 @@
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.8%
-// foundry draft (worker best 96.8%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
+
 #define gRandomTable gUnk_0203B400
 #define gRandomIndex gUnk_03005308
 struct ProximityProjectileEmitter {
@@ -41,7 +40,8 @@ u32 ProjectileEmitter_EmitAttackFrame(struct ProximityProjectileEmitter *p)
     struct ContactPosition position;
     struct ContactPosition offset;
     if (!p->disabled) {
-        if (p->frame <= 8) {
+        register s32 f asm("r12") = p->frame;
+        if (f <= 8) {
             copy(&position, &p->position);
             raisePosition(&position);
             {
@@ -49,7 +49,7 @@ u32 ProjectileEmitter_EmitAttackFrame(struct ProximityProjectileEmitter *p)
                 offset.y = 0;
                 offset.z = (randomValue((u32)gUnk_0203B400) & 15) - 8;
             }
-            if (p->frame & 1)
+            if (f & 1)
                 SpriteEffectController_Create(&position, &offset, 0x61F9, 0x31F4, 8, 0x200, 9,
                                               0x1C6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             else
@@ -63,6 +63,3 @@ u32 ProjectileEmitter_EmitAttackFrame(struct ProximityProjectileEmitter *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ProjectileEmitter_EmitAttackFrame);
-#endif
