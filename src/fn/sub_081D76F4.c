@@ -1,5 +1,4 @@
 #include "global.h"
-#define Task4E01_SpawnTrailSprite sub_081D76F4
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
