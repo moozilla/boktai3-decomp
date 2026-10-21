@@ -138,6 +138,18 @@ class ProgressTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'refresh inventory'):
                 progress.collect_done([('sub_08000100', 0x08000100)], root)
 
+    def test_split_definition_gets_boundary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            inventory = root / 'inventory.csv'
+            progress.write_inventory(inventory, [0x08000100])
+            symbols = root / 'functions.csv'
+            symbols.write_text('addr,name\n08000108,TailFunction\n')
+            (root / 'unit.c').write_text('void sub_08000100(void) { }\nvoid TailFunction(void) { }\n'
+                                         'void sub_08000104(void) { }\nvoid NoAddress(void) { }\n')
+            self.assertEqual(progress.source_boundaries(inventory, root, symbols),
+                             [0x08000104, 0x08000108])
+
     def test_export_only_function_start_addresses(self):
         with tempfile.TemporaryDirectory() as tmp:
             assembly = Path(tmp) / 'code.s'
