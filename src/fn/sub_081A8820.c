@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #define ActorSoundPhase_StopSong Vanargand_StopActionSequence

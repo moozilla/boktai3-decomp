@@ -17,7 +17,6 @@ static inline u16 nextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
     table = (u32)gUnk_0203B400;
-    asm("" : "+r"(table));
     offset += table;
     return *(const u16 *)offset;
 }
@@ -53,9 +52,8 @@ clearReady: {
     *q = zero;
 }
 clearPending: {
-    register u32 off asm("r1") = 0x53B;
-    register u8 *q asm("r0");
-    asm("" : "+r"(off));
+    u32 off = 0x53B;
+    u8 *q;
     q = (u8 *)p + off;
     *q = zero;
 }

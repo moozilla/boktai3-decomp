@@ -13,18 +13,15 @@ void ControlPanel_UpdateGaugeIndicator(struct Player *p)
         register u8 *b asm("r0") = (u8 *)gUnk_02000580[0];
         register u32 off asm("r2");
         register u16 *q asm("r1");
-        asm("" : "+r"(b));
         off = 0x524;
         asm("" : "+r"(off));
         q = (u16 *)(b + off);
-        asm("" : "+r"(q));
         v = *q;
     }
 
     if (v != 0) {
         {
             u32 a = v;
-            asm("" : "+r"(a));
             inc = Div(0x80, a);
         }
         if (inc <= 0)
@@ -42,7 +39,6 @@ void ControlPanel_UpdateGaugeIndicator(struct Player *p)
         {
             u8 *b = (u8 *)gUnk_02000580[0];
             register u32 off asm("r2");
-            asm("" : "+r"(b));
             off = 0x522;
             asm("" : "+r"(off));
             seg = *(u16 *)(b + off);

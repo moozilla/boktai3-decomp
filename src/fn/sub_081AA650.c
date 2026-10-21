@@ -60,7 +60,6 @@ void Vanargand_UpdateTimedAnimationAttack(struct Vanargand *p)
         Sound_PlaySong(0x591);
     }
     phase = p->phase;
-    asm("" : "+r"(phase));
     switch (phase) {
         case 0:
             p->phaseTimer++;

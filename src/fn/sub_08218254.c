@@ -49,7 +49,7 @@ static inline s32 divide2(s32 input)
 void SpriteOam_QueueCameraRelativeSprites(void)
 {
 
-    register struct Drawable *p asm("r4");
+    struct Drawable *p;
     s32 *matrixCount;
     u32 parity = gUnk_03003A50 & 1;
     u32 skip = 0x401;
@@ -60,12 +60,12 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         return;
     matrixCount = &gUnk_03004BA0;
     do {
-        register s32 x asm("r3"), y asm("r2");
-        register s32 z asm("r9");
+        s32 x, y asm("r2");
+        s32 z;
         register u32 flags asm("r6");
         register u32 attr asm("r5");
         s32 depth;
-        register s32 ox asm("r12"), oy asm("r8");
+        s32 ox, oy asm("r8");
         register u32 initialFlags asm("r1") = p->flags;
         u32 t = initialFlags;
         asm("" : "+r"(t));
@@ -96,7 +96,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         depth = z;
         x &= 511;
         {
-            register u32 shifted asm("r0") = x << 16;
+            u32 shifted = x << 16;
             attr = p->attributes | shifted;
         }
         y &= 255;

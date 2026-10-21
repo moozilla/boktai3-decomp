@@ -12,10 +12,8 @@ u8 Scene_CanOpenMenu(void)
     u32 mask;
     if (p && !(gUnk_030053F4 & 0x200)) {
         one = 1;
-        asm("" : "+r"(one));
         if ((gUnk_02000560 & one) && (u8)(p[0x418] - 3) > 2) {
             mask = 0x100000;
-            asm("" : "+r"(mask));
             if (!(*(u32 *)(p + 0x20) & mask) &&
                 (!*(u16 *)(p + 0x538) || (u16)(*(u16 *)(p + 0x534) - 5) > 1)) {
                 u8 v = p[0x457];

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #define gActorLayeredMidRestoreAnimations gUnk_0824EE20
 #include "global.h"
 struct ActorAnimationLayer {
@@ -18,13 +17,12 @@ void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
     switch (st) {
         case 0: {
             u32 four = 4;
-            register u32 zero asm("r2");
+            u32 zero;
             u16 *c4;
             st = ((p[0xb39] + 0x60) >> 6) & 3;
             Armor_SetAnimationFromStart((u32)p, (u32)&gActorLayeredMidRestoreAnimations[st]);
             c4 = (u16 *)(p + 0xc4);
             zero = 0;
-            asm("" : "+r"(zero));
             *c4 = 0x10;
             (*s)++;
             p[0xb41] = zero;

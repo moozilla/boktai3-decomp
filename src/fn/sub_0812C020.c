@@ -20,7 +20,6 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
             struct PursuingActor *actor;
             {
                 register u32 off asm("r5") = i * sizeof(struct PursuingActor) + 0x3c;
-                asm("" : "+r"(off));
                 actor = (void *)((u32)manager + off);
             }
             Collider_Remove(&actor->secondary);

@@ -29,7 +29,7 @@ void sub_08091E58(struct SceneActorBehaviorContactView *source,
                   struct SceneActorBehaviorContactView *destination,
                   struct SceneActorRegistryResetView *actor)
 {
-    register u32 index asm("r0");
+    u32 index;
     s32 power;
     u32 sample;
     if (Unavailable(actor))

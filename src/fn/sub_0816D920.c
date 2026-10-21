@@ -7,7 +7,6 @@ void SceneHud_GetActionIconPosition(struct IconPos *out, s32 index)
 {
     register s32 x asm("r0");
     s32 y = index;
-    asm("" : "+r"(y));
     if (y <= 15) {
         s32 col = y & 3;
         s32 row = y >> 2;

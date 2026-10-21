@@ -82,19 +82,16 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             *(u8 *)(p + 0xC0F) = 1;
             *(u16 *)(p + 0x4D2) = 0x1E;
             {
-                register u32 off asm("r0") = 0xAD6;
-                register u8 *q asm("r1");
-                register u32 v asm("r0");
-                asm("" : "+r"(off));
+                u32 off = 0xAD6;
+                u8 *q;
+                u32 v;
                 q = p + off;
                 v = 0x16E;
-                asm("" : "+r"(v));
                 *(u16 *)q = v;
             }
             {
-                register u32 off2 asm("r2") = 0xAD8;
-                register u8 *q2 asm("r1");
-                asm("" : "+r"(off2));
+                u32 off2 = 0xAD8;
+                u8 *q2;
                 q2 = p + off2;
                 *(u16 *)q2 = 0x24;
             }
@@ -123,8 +120,8 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             if (*r != 0) {
                 if (*r > 5) {
                     {
-                        register u32 k2 asm("r3") = 0xFFFF0000;
-                        register u32 k asm("r1") = 0xFFFF;
+                        u32 k2 = 0xFFFF0000;
+                        u32 k = 0xFFFF;
                         asm("" ::"r"(k2));
                         asm("" ::"r"(k));
                     }
@@ -152,7 +149,7 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             {
-                register u32 released asm("r0") = *(u8 *)(p + 0xBF6);
+                u32 released = *(u8 *)(p + 0xBF6);
                 if (released) {
                     *(u8 *)(p + 0xBF6) = 0;
                     *(u8 *)(p + 0x458) = 1;

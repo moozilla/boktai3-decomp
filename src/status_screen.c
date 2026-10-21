@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "status_screen.h"
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)

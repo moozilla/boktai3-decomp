@@ -180,7 +180,6 @@ void Player_UpdateSpiralRelease(struct Player *p)
         q = (void **)((u8 *)p + o);
         {
             void *v = *q;
-            asm("" : "+r"(v));
             AnimData_SelectPaletteBank(v, 0x2DD);
         }
     }
@@ -191,16 +190,14 @@ void Player_UpdateSpiralRelease(struct Player *p)
         tf = (u16 *)((u8 *)p + o);
         if (++*tf > 31) {
             {
-                register u32 o2 asm("r2") = 0x464;
-                register u8 *q asm("r1");
-                asm("" : "+r"(o2));
+                u32 o2 = 0x464;
+                u8 *q;
                 q = (u8 *)p + o2;
                 *q = 1;
             }
             {
-                register u32 o3 asm("r0") = 0x465;
-                register u8 *q asm("r1");
-                asm("" : "+r"(o3));
+                u32 o3 = 0x465;
+                u8 *q;
                 q = (u8 *)p + o3;
                 *q = 3;
             }

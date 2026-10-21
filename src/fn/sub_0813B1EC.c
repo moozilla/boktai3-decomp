@@ -16,9 +16,9 @@ void Player_ApplyContactResponse(struct Player *p, struct ContactCollider *sourc
                                  struct ContactCollider *target)
 {
     u16 *response;
-    register u16 *in asm("r2");
-    register u16 v asm("r0");
-    register u16 *t asm("r1");
+    u16 *in;
+    u16 v;
+    u16 *t;
     s32 zero;
     if (p->positionResetState == 1)
         target->responseParameter = 0;

@@ -10,9 +10,7 @@ u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence,
     u8 *entry = data + (sequence * 4 + 4);
     u8 *base = data + *(u16 *)(entry + 2);
     register u32 prod asm("r0") = entry[1] * row * 2;
-    asm("" : "+r"(prod));
     prod = (u32)base + prod;
-    asm("" : "+r"(prod));
     state->commands = (const u16 *)prod;
     state->speed = 0x40;
     if (state->sequence == sequence && state->frameCount) {
@@ -32,11 +30,9 @@ restart:
         state->index = 0;
     {
         register u32 offset asm("r0") = state->index << 1;
-        register const volatile u16 *command asm("r1");
+        const volatile u16 *command;
         u8 weight;
-        asm("" : "+r"(offset));
         command = (const volatile u16 *)((u32)state->commands + offset);
-        asm("" : "+r"(command));
         weight = *command & 0xF;
         state->frameWeight = weight;
         state->duration = weight;

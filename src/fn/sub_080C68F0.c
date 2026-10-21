@@ -25,7 +25,7 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             u8 directionVariant;
             u8 mirror;
             register u8 *mirrorPointer asm("r2");
-            register u8 *variantPointer asm("r4");
+            u8 *variantPointer;
             u32 flags;
             u32 variant;
             u32 selection;
@@ -33,7 +33,6 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
             u32 force;
             u8 *restart;
             variantPointer = &directionVariant;
-            asm("" : "+r"(variantPointer));
             {
                 u8 *mirrorAddress = &mirror;
                 s32 quadrant = ((((s32)actor->direction) + 0x60) >> 6) & 3;
@@ -87,9 +86,8 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
                 }
                 *savedSelection = selection;
                 {
-                    register u32 mask asm("r9") = 4;
+                    u32 mask = 4;
                     u32 mode;
-                    asm("" : "+r"(mask));
                     if (flags & mask) {
                         mode = 6;
                     } else {

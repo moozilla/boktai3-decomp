@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 72.7%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.

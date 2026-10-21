@@ -26,17 +26,15 @@ void SpriteComponent_Update(struct SceneActorAttachment *p)
         Sound_PlaySong(0x202);
     p->flags &= ~1;
     {
-        register u32 a asm("r2") = p->targetPosition.xy;
-        register u32 b asm("r3") = p->targetPosition.z;
+        u32 a = p->targetPosition.xy;
+        u32 b = p->targetPosition.z;
         p->position.xy = a;
         p->position.z = b;
-        asm("" ::"r"(a), "r"(b));
     }
     {
         u32 offset = p->sortOffset;
         register s32 base asm("r5") = -0x60;
         s32 order;
-        asm("" : "+r"(base));
         order = base;
         asm("" : "+r"(order));
         order -= offset;
@@ -44,8 +42,8 @@ void SpriteComponent_Update(struct SceneActorAttachment *p)
         p->sortOrder = order;
     }
     {
-        register u32 a asm("r2") = p->targetPosition.xy;
-        register u32 b asm("r3") = p->targetPosition.z;
+        u32 a = p->targetPosition.xy;
+        u32 b = p->targetPosition.z;
         p->colliderPosition.xy = a;
         p->colliderPosition.z = b;
     }

@@ -26,8 +26,8 @@ void Player_AddControlFlags(struct P *, u32);
 void PlayerCue_EnterStandUpdate(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
-    register struct ContactSwarmSprite *sprite asm("r5") = sp;
-    register struct DisplaySequenceState *state asm("r4") = st;
+    struct ContactSwarmSprite *sprite = sp;
+    struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
     {
@@ -154,7 +154,6 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         u32 timer = p->timer;
         register u32 seven asm("r1") = 7;
         register u32 low asm("r2") = seven;
-        asm("" : "+r"(low));
         low &= timer;
         if ((s32)low >= (s32)(seven - (timer >> 2))) {
             Player_AddControlFlags(p, 0x41);
@@ -166,10 +165,8 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     {
         u16 *target = (u16 *)((u8 *)p + 0xC6);
         u32 resource;
-        asm("" : "+r"(target));
         resource = 0x16F;
         *target = resource;
-        asm("" : "+r"(resource));
         W(0xD4) = (u32)(gUnk_030042E4 + (resource << 5));
     }
     {
@@ -187,11 +184,10 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
     {
         register u32 toff asm("r2") = 0xAD6;
         register u16 *target asm("r1");
-        register u32 resource asm("r0");
+        u32 resource;
         asm("" : "+r"(toff));
         target = (u16 *)((u8 *)p + toff);
         resource = 0x16F;
-        asm("" : "+r"(resource));
         *target = resource;
     }
     {
@@ -199,7 +195,7 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         register u32 mask asm("r2");
         register u32 temp asm("r3");
         register u32 off asm("r3") = 0xAD8;
-        register u16 *q asm("r1");
+        u16 *q;
         asm("" : "+r"(off));
         q = (u16 *)((u8 *)p + off);
         elapsed = *q + 3;
@@ -217,8 +213,7 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
             PlayerCue_EnterStandUpdate(p);
             {
                 register u32 off asm("r3") = 0x5A3;
-                register u8 *target asm("r0");
-                asm("" : "+r"(off));
+                u8 *target;
                 target = (u8 *)p + off;
                 asm("" : "+r"(target), "+r"(off));
                 *target = 1;

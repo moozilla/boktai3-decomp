@@ -21,9 +21,8 @@ static inline void ClearFlags16(u16 *p, u32 mask)
 }
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 {
-    register u32 offset asm("r0") = 0x2B2;
+    u32 offset = 0x2B2;
     u8 *field;
-    asm("" : "+r"(offset));
     field = (u8 *)actor + offset;
     if (*field) {
         *field = 0;
@@ -37,13 +36,11 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
     struct ContactPosition *position = &actor->position;
     s32 result;
     register u16 *fp asm("r0");
-    register struct ContactPosition *destination asm("r4");
+    struct ContactPosition *destination;
     u32 base = actor->fieldDC;
-    asm("" : "+r"(base));
     destination = (void *)(base + 12);
     if (!Nav_IsPositionInMesh(route, position, destination)) {
-        register u32 o1 asm("r1") = 0x2D4;
-        asm("" : "+r"(o1));
+        u32 o1 = 0x2D4;
         fp = (u16 *)((u8 *)actor + o1);
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
@@ -83,8 +80,8 @@ void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
         if (!TryMove(actor, group))
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
         else {
-            register u32 next asm("r1");
-            register u8 zero asm("r3");
+            u32 next;
+            u8 zero;
             register u32 zero2 asm("r4");
             u16 *flags = &context->flags;
             u32 mask = ~0x40;

@@ -4,7 +4,8 @@
   depin.py src/fn/sub_080390C4.c [...]   [-j 8] [--write]
 
 For each file, tries deleting each hint on its own (``register T x asm("rN")``
-becomes ``T x``; ``asm("" ...);`` is dropped) and keeps the deletion whenever
+becomes ``T x``; ``asm("" ...);`` is dropped; hints inside ``#ifdef
+NONMATCHING`` drafts are left alone, since check.py never compiles them) and keeps the deletion whenever
 tools/check.py still reports an exact match. Greedy, one hint at a time,
 repeated until a pass removes nothing, so the result is a locally minimal set of hints, not a global minimum. Candidates are
 checked from wip/depin/; with --write, an improved file replaces the original
@@ -22,6 +23,32 @@ PIN = r'\bregister\s+[^;=(){}]*?\s+asm\s*\(\s*"[a-z0-9]+"\s*\)'
 BAR = r'[ \t]*\b(?:__)?asm(?:__)?\s*(?:volatile\s*)?\(\s*""[^;]*\)\s*;[ \t]*\n?'
 HINT = re.compile(f'(?:{PIN})|(?:{BAR})')
 MARK = "// MATCHING_CONCESSION: register-pinning\n"
+
+
+def draft_spans(text):
+    """(start, end) offsets of #ifdef NONMATCHING ... #endif blocks: their hints
+    belong to unfinished drafts, which check.py does not compile."""
+    spans, start, depth, pos = [], None, 0, 0
+    for line in text.splitlines(keepends=True):
+        s = line.strip()
+        if start is None:
+            if re.match(r"#\s*ifdef\s+NONMATCHING\b", s):
+                start, depth = pos, 0
+        elif s.startswith("#if"):
+            depth += 1
+        elif s.startswith("#endif"):
+            if depth == 0:
+                spans.append((start, pos + len(line)))
+                start = None
+            else:
+                depth -= 1
+        pos += len(line)
+    return spans
+
+
+def hints(text):
+    spans = draft_spans(text)
+    return [m for m in HINT.finditer(text) if not any(a <= m.start() < b for a, b in spans)]
 
 
 def drop(text, m):
@@ -45,7 +72,7 @@ def matches(path, text):
 def minimize(src):
     text = open(src).read()
     trial = os.path.join(ROOT, "wip/depin", os.path.basename(src))
-    before = len(HINT.findall(text))
+    before = len(hints(text))
     if not matches(trial, text):
         return src, before, None, text
     # repeat until a whole pass removes nothing: dropping one hint can make
@@ -54,17 +81,17 @@ def minimize(src):
     while changed:
         changed, i = False, 0
         while True:
-            hints = list(HINT.finditer(text))
-            if i >= len(hints):
+            found = hints(text)
+            if i >= len(found):
                 break
-            cand = drop(text, hints[i])
+            cand = drop(text, found[i])
             if matches(trial, cand):
                 text, changed = cand, True
             else:
                 i += 1
     if not HINT.search(text):
         text = text.replace(MARK, "")
-    return src, before, len(HINT.findall(text)), text
+    return src, before, len(hints(text)), text
 
 
 def main():

@@ -14,7 +14,7 @@ s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
 void Palette_UpdateHighlightPulse(u16 *);
 void Hud_LoadConditionalPaletteRows(struct Hud *input)
 {
-    register struct Hud *hud asm("r9") = input;
+    struct Hud *hud = input;
     register s32 i asm("r8");
     const u16 *source = gUnk_08610E78;
     i = 0;
@@ -38,7 +38,7 @@ void Hud_LoadConditionalPaletteRows(struct Hud *input)
         } while (--j >= 0);
     } while (i <= 3);
     {
-        register u8 *state asm("r1") = &hud->paletteState;
+        u8 *state = &hud->paletteState;
         register u32 zero asm("r0") = 0;
         *state = zero;
     }

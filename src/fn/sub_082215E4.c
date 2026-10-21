@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // Empty asm hints keep agbcc from cross-jumping the shared "subs" tails.
 extern const u8 gUnk_08614C44[];
 s32 Div(s32, s32);
@@ -23,7 +22,6 @@ s32 Math_Atan2(s32 x, s32 y)
                 return gUnk_08614C44[Div(y << 8, x)];
             {
                 s32 r = 0x40 - gUnk_08614C44[Div(x << 8, y)];
-                asm("" : "+r"(r));
                 return r;
             }
         } else {
@@ -37,7 +35,6 @@ s32 Math_Atan2(s32 x, s32 y)
             s32 nx = -x;
             if (nx > y) {
                 s32 r = 0x80 - gUnk_08614C44[Div(y << 8, nx)];
-                asm("" : "+l"(r));
                 return r;
             }
             return gUnk_08614C44[-Div(x << 8, y)] + 0x40;
@@ -48,7 +45,6 @@ s32 Math_Atan2(s32 x, s32 y)
                 return gUnk_08614C44[-Div(y << 8, nx)] + 0x80;
             {
                 s32 r = 0xC0 - gUnk_08614C44[-Div(x << 8, ny)];
-                asm("" : "+r"(r)::"memory");
                 return r;
             }
         }

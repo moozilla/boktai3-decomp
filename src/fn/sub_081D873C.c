@@ -21,8 +21,8 @@ struct Actor {
 };
 s32 Task4E01_StepTimedSequence(struct Actor *p)
 {
-    register struct Render *r asm("r5");
-    register struct Frames *f asm("r4");
+    struct Render *r;
+    struct Frames *f;
     struct Frames *initial;
     u16 *word;
     u16 *cfg = &p->cfgFlags;

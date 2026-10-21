@@ -25,13 +25,11 @@ static inline u8 Vorn_TestMiddle(struct VornPursuitContext *p, u32 mask, u16 **o
 {
     register u32 offset asm("r3");
     register u16 *field asm("r1");
-    register u32 bits asm("r2") = mask;
+    u32 bits = mask;
     u32 value;
-    asm("" : "+r"(bits));
     offset = 0x6D4;
     asm("" : "+r"(offset));
     field = (u16 *)((u8 *)p + offset);
-    asm("" : "+r"(field), "+r"(bits));
     value = *field & bits;
     *out = field;
     if (value)
@@ -102,7 +100,7 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
                     struct ContactPosition *p = &center;
                     s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-                    register s32 z asm("sb") = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+                    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
                     u8 *data;
                     p->x = (x << 8) + 128;
                     data = TerrainModifiers_FindCellOverride(cell, 1);

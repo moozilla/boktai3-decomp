@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order

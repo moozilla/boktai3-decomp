@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 struct Vec {
@@ -74,8 +73,7 @@ void SceneNpc_UpdateTransitionFade(void *ctx, struct SceneNpc *npc, s32 tick)
             }
         }
         {
-            register u8 *subp asm("r1") = (u8 *)npc + 0xE0;
-            asm("" : "+r"(subp));
+            u8 *subp = (u8 *)npc + 0xE0;
             *(void **)(subp + 0xC) = npc->palette;
         }
         if (SceneNpc_IsTransitionEffectFinished(*effect)) {

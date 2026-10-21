@@ -5,7 +5,7 @@ extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 s32 StatModifier_AddForOwnerMode(struct StatModifier *modifier_, s32 value_)
 {
-    register struct StatModifier *modifier asm("r4") = modifier_;
+    struct StatModifier *modifier = modifier_;
     register s32 value asm("r3") = value_;
     s32 result;
     if (modifier->enabled == 0)

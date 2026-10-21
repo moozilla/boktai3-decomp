@@ -30,13 +30,12 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 {
     struct ContactSwarmSprite *sprite = sp;
     struct DisplaySequenceState *state = st;
-    register const volatile u16 *command asm("r6");
+    const volatile u16 *command;
     u32 duration, flags, bit;
     {
-        register u32 offset asm("r0") = state->index << 1;
-        register const volatile u16 *table asm("r1");
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
         table = state->commands;
-        asm("" : "+r"(offset), "+r"(table));
         command = (const volatile u16 *)((u32)table + offset);
     }
     sprite->frame = *command >> 6;
@@ -70,12 +69,11 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -119,10 +117,9 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
                 }
             }
             {
-                register u32 offset asm("r0") = state->index << 1;
-                register const volatile u16 *table asm("r1");
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
                 table = state->commands;
-                asm("" : "+r"(offset), "+r"(table));
                 command = (const volatile u16 *)((u32)table + offset);
             }
             state->frameWeight = *command & 15;
@@ -158,16 +155,13 @@ void PlayerCue_UpdateSideRecoil(struct P *p)
     }
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
-    asm("" : "=r"(d));
     if (H(0x598))
         asm("" ::"r"(d));
     if (H(0x598)) {
-        register u32 directionOffset asm("r5") = 0x3A4;
+        u32 directionOffset = 0x3A4;
         register u8 *direction asm("r0");
         u32 angle;
-        asm("" : "+r"(directionOffset));
         direction = (u8 *)p + directionOffset;
-        asm("" : "+r"(direction));
         angle = ((*direction + 5) & 7) << 5;
         H(0x38) = -Truncate(gUnk_086149C4[(angle + 64) & 255] * H(0x598));
         H(0x3C) = -Truncate(gUnk_086149C4[angle] * H(0x598));

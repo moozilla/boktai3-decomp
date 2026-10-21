@@ -26,7 +26,7 @@ extern const s16 gUnk_086149C4[];
 static inline void StepSequence(void *obj)
 {
     struct VanargandPart *owner = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
@@ -144,7 +144,6 @@ static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
     v->y = 0;
     {
         s32 sample = gUnk_086149C4[angle & 255];
-        asm("" : "+r"(sample));
         v->z = Scale(sample * scale);
     }
 }
@@ -163,7 +162,6 @@ void Vanargand_UpdatePartRadialTravel(u8 *boss, struct VanargandPart *p)
         MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
         {
             void *resource = *(void **)(boss + 0x4d0);
-            asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
         }
         StepSequence(p);

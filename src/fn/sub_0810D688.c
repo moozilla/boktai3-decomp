@@ -14,7 +14,7 @@ void PanelText_DrawDecimal(s32, s32, s32, s32, s32);
 u16 *Bg_GetWrappedTilemapEntry(u32, u32, u32);
 void RecordPanel_DrawTime(struct RecordPanel *p)
 {
-    register s32 time asm("r6");
+    s32 time;
     s32 index;
     s32 fraction;
     register s32 seconds asm("r5");
@@ -45,7 +45,6 @@ available:
         seconds = Div(time, 60);
         fraction = Div(({
                            s32 t = time - seconds * 60;
-                           asm("" : "+r"(t) : "r"(time));
                            t * 169;
                        }),
                        10);

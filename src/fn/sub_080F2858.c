@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct ColorPulsePart {
@@ -74,7 +73,7 @@ void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
                 else {
                     register void (*callback)(struct ColorPulse *) asm("r3") =
                         PhaseObject_TickEntryReset;
-                    register u16 one asm("r4") = 1;
+                    u16 one = 1;
                     struct ColorPulsePart *part = parts;
                     struct ColorPulsePart *end = part + 3;
                     do {

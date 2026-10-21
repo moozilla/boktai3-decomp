@@ -44,7 +44,7 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRandomReaction *context = p->context;
     if (!unavailable(p) && !blocked(p) && p->field2B5 == 0x23 && active(context)) {
-        register u16 remaining asm("r0");
+        u16 remaining;
         register s32 timer asm("r4");
         remaining = context->timer;
         timer = remaining;

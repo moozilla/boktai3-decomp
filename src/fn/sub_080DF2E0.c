@@ -90,7 +90,6 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         u32 m2 = 2;
         u32 v = t->flags & m2;
         state = t;
-        asm("" : "+r"(t));
         if (BoolOf(v)) {
             u32 mask = ~0x10;
             mask &= (*(&state))->flags;

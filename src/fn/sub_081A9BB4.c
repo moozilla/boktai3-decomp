@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
 #ifdef NONMATCHING

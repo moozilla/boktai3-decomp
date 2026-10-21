@@ -18,9 +18,9 @@ void AnimPanel_UpdateDigits(void *);
 void Menu_StartFadeIn(u32);
 s32 Time_InitializeDateMenu(u8 *s)
 {
-    register u32 zero asm("r9");
+    u32 zero;
     register u32 one asm("r10");
-    register u32 bank asm("r8");
+    u32 bank;
     register void *resource asm("r6");
     register u8 *first asm("r4");
     u8 *second;
@@ -30,11 +30,11 @@ s32 Time_InitializeDateMenu(u8 *s)
     u32 *palette;
     u8 *copy;
     u16 bits;
-    register u16 *half asm("r1");
-    register u32 off1 asm("r1");
-    register u32 off2 asm("r2");
-    register u32 off3 asm("r3");
-    register u32 off5 asm("r5");
+    u16 *half;
+    u32 off1;
+    u32 off2;
+    u32 off3;
+    u32 off5;
     *(u32 *)(s + 0x6E4) = zero = 0;
     *(u32 *)(s + 0x6D8) = zero;
     Bg_ClearTilemap(0);
@@ -94,7 +94,7 @@ s32 Time_InitializeDateMenu(u8 *s)
         off3 = 0x6E0;
         *(u32 *)(s + off3) = zero;
     } else {
-        register u32 offset asm("r0") = 0x6E0;
+        u32 offset = 0x6E0;
         *(u32 *)(s + offset) = 3;
     }
     Menu_StartFadeIn(*(u32 *)(s + 0x6E0));
