@@ -1,8 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 96.9%
-// foundry draft (worker best 96.9%); what differs is mostly register allocation and instruction order
 
 struct ColorPulsePart {
     u32 flags;
@@ -75,8 +72,9 @@ void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
                 if (x + z < 1000000)
                     *state = ColorPulse_BeginNearApproach;
                 else {
-                    void (*callback)(struct ColorPulse *) = PhaseObject_TickEntryReset;
-                    u16 one = 1;
+                    register void (*callback)(struct ColorPulse *) asm("r3") =
+                        PhaseObject_TickEntryReset;
+                    register u16 one asm("r4") = 1;
                     struct ColorPulsePart *part = parts;
                     struct ColorPulsePart *end = part + 3;
                     do {
@@ -91,6 +89,3 @@ void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
         } while (i < *speed);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ColorPulse_AlignTargetHeading);
-#endif
