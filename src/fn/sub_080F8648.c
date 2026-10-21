@@ -1,9 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
 
-#ifdef NONMATCHING
-// fuzzy: 99.8%
 // Two instructions differ: the global address load is scheduled after the stack-vector address.
 // confidence=low: sends the axe trail toward the player, then returns it to the actor.
 struct Vec {
@@ -123,7 +122,13 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
         Advance(&trail->position, &trail->velocity);
         trail->angle -= trail->angleDecay;
-        Difference(&delta, (void *)(gUnk_02000580 + 0x30), &trail->position);
+        {
+            u8 **gp = &gUnk_02000580;
+            struct Vec *d;
+            asm("" : "+r"(gp));
+            d = &delta;
+            Difference(d, (void *)(*gp + 0x30), &trail->position);
+        }
         difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->heading);
         if (Absolute(difference) > 32)
             trail->heading += 4;
@@ -155,7 +160,3 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateReturningTrail);
-#endif
