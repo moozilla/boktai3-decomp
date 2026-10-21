@@ -1,6 +1,6 @@
 #include "global.h"
 void Collection_LoadPageBackground(void *);
-void sub_08210F04(void *);
+void CollectionMenu_InitGraphics(void *);
 s32 Script_SeekToKeyword(s32);
 void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(s32, s32);
@@ -27,7 +27,7 @@ s32 CollectionMenu_Init(u8 *s)
     *(u16 *)(s + 0xb8c) = zero;
     *(u16 *)(s + 0xb88) = zero;
     Collection_LoadPageBackground(s);
-    sub_08210F04(s);
+    CollectionMenu_InitGraphics(s);
     if (!Script_SeekToKeyword(0x6d))
         goto fail;
     if (!(*(void **)(s + 0xb9c) = Script_GetTextSourcePc()))

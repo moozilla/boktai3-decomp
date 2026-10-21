@@ -8,7 +8,7 @@
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void sub_080747B8(void *);
+void SceneActorMovement_UpdateAirborne(void *);
 void SceneActorMovement_UpdateHeight(void *);
 void SceneEffect_EmitPositionPattern(void *);
 void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
@@ -124,7 +124,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
     }
     if (frame <= 0x22)
         *(u16 *)(anim + 0xE) = 0;
-    sub_080747B8(actor);
+    SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
     if (!actor->field2B3)
         return;

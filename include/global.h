@@ -17,8 +17,8 @@ asm(".include \"asm/macros.inc\"");
 /* An empty statement macro: the shape a debug check compiled out of a release
  * build takes. Its empty loop still splits the code around it, which some
  * functions need to match. The original name is unknown (confidence=low). */
-#define DEBUG_NOP() \
-    do {            \
+#define DEBUG_NOP()                                                                                \
+    do {                                                                                           \
     } while (0)
 #define RANDOM_TABLE_ADDR 0x0203B400 /* gUnk_0203B400 */
 

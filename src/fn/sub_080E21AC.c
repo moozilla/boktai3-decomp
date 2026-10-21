@@ -10,7 +10,7 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *, s32);
-void sub_080747B8(struct SceneActorRegistryResetView *);
+void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
 void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
@@ -64,7 +64,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    sub_080747B8(actor);
+    SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
     if (!actor->field2B3)
         return;
