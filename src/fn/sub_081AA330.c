@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 struct A {
     u8 pad0[0x9c];
@@ -64,7 +63,13 @@ void sub_081AA330(struct A *p)
                             break;
                     }
                     p->timer++;
-                } else if (PairedSceneActor_AreSelectedHalvesFinished(p->obj) != 0) {
+                } else if (({
+                               register u32 off asm("r2") = 0x56c;
+                               register u8 *q asm("r0");
+                               asm("" : "+r"(off));
+                               q = (u8 *)p + off;
+                               PairedSceneActor_AreSelectedHalvesFinished(*(void **)q);
+                           }) != 0) {
                     p->state = 1;
                     p->timer = 0;
                 }
@@ -75,6 +80,3 @@ void sub_081AA330(struct A *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081AA330);
-#endif

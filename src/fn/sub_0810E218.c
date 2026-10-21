@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.2%
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
@@ -26,8 +25,10 @@ void SelectionPanel_CommitSelection(struct SelectionPanel *p)
     if (context && context->mode == 1) {
         u8 *selection = &context->selection;
         if (selection) {
-            u32 columnOffset = 0xD24;
-            s8 *column = (s8 *)p + columnOffset;
+            register u32 off asm("r1") = 0xD24;
+            s8 *column;
+            asm("" : "+r"(off));
+            column = (s8 *)p + off;
             if (*column > 4) {
                 u32 offset;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -38,6 +39,3 @@ void SelectionPanel_CommitSelection(struct SelectionPanel *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SelectionPanel_CommitSelection);
-#endif
