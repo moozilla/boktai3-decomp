@@ -10,6 +10,7 @@ import csv
 import json
 from pathlib import Path
 import re
+import sys
 
 from romlib import ROOT
 from split import c_functions, nonmatching_functions, function_nonentries
@@ -180,10 +181,13 @@ def validate_addresses(addresses):
         raise ValueError("function addresses must be halfword aligned")
 
 
-def load_functions(inventory=INVENTORY, symbols=None):
+def load_functions(inventory=INVENTORY, symbols=None, extra=()):
     with Path(inventory).open(newline="") as f:
         addresses = [int(row["address"], 16) for row in csv.DictReader(f)]
     validate_addresses(addresses)
+    if extra:
+        addresses = sorted(set(addresses) | set(extra))
+        validate_addresses(addresses)
     symbols = symbols or Path(ROOT) / "symbols/functions.csv"
     with Path(symbols).open(newline="") as f:
         names = {int(row["addr"], 16): row["name"] for row in csv.DictReader(f)}
@@ -192,6 +196,26 @@ def load_functions(inventory=INVENTORY, symbols=None):
         raise ValueError("duplicate function names in symbol map")
     sizes = {n: b - a for (n, a), b in zip(funcs, addresses[1:] + [CODE_END])}
     return funcs, sizes
+
+
+def source_boundaries(inventory, source_root, symbols=None):
+    """Addresses of C definitions missing from the inventory, e.g. a tail that
+    was split off an assembly span and matched as its own function. Their
+    address comes from functions.csv or a sub_XXXXXXXX name; names with no
+    known address are left for collect_done to reject."""
+    with Path(inventory).open(newline="") as f:
+        known = {int(row["address"], 16) for row in csv.DictReader(f)}
+    symbols = symbols or Path(ROOT) / "symbols/functions.csv"
+    with Path(symbols).open(newline="") as f:
+        addrs = {row["name"]: int(row["addr"], 16) for row in csv.DictReader(f)}
+    missing = set()
+    for p in sorted(Path(source_root).rglob("*.c")):
+        for n in c_functions(p, with_asm=False):
+            m = re.fullmatch(r"sub_([0-9A-F]{8})", n)
+            a = int(m.group(1), 16) if m else addrs.get(n)
+            if a is not None and a not in known and 0x08000000 <= a < CODE_END and not a & 1:
+                missing.add(a)
+    return sorted(missing)
 
 
 def collect_done(funcs, source_root):
@@ -377,7 +401,12 @@ def main():
     args = parser.parse_args()
     if args.refresh_inventory:
         write_inventory(args.inventory, inventory_addresses(args.refresh_inventory))
-    funcs, sizes = load_functions(args.inventory)
+    split = source_boundaries(args.inventory, Path(ROOT) / "src")
+    if split:
+        print("warning: C functions without an inventory boundary (counted as splits; add them to "
+              f"{EXTRA_BOUNDARIES.name} and refresh the inventory): "
+              + ", ".join(f"{a:08X}" for a in split), file=sys.stderr)
+    funcs, sizes = load_functions(args.inventory, extra=split)
     if args.check_inventory:
         if [a for _, a in funcs] != inventory_addresses(args.check_inventory):
             parser.error("progress inventory differs from generated function boundaries")
