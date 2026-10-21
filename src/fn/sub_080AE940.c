@@ -36,13 +36,15 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
     void *route = *(void **)(group + 0x1FC);
     struct ContactPosition *position = &actor->position;
     s32 result;
+    register u16 *fp asm("r0");
     register struct ContactPosition *destination asm("r4");
     u32 base = actor->fieldDC;
     asm("" : "+r"(base));
     destination = (void *)(base + 12);
     if (!Nav_IsPositionInMesh(route, position, destination)) {
-        ClearFlags16(&actor->flags2D4, ~0x200);
-        return 0;
+        register u32 o1 asm("r1") = 0x2D4;
+        asm("" : "+r"(o1));
+        fp = (u16 *)((u8 *)actor + o1);
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
@@ -50,17 +52,27 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
                 Memory_Clear(&actor->motion, 8);
             return 1;
         } else {
-            ClearFlags16(&actor->flags2D4, ~0x200);
-            return 0;
+            register u32 o2 asm("r2") = 0x2D4;
+            asm("" : "+r"(o2));
+            fp = (u16 *)((u8 *)actor + o2);
         }
     }
+    {
+        u32 m = ~0x200;
+        m &= *fp;
+        *fp = m;
+    }
+    return 0;
 }
-#ifdef NONMATCHING
-// fuzzy: 91.9%
 void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
 {
     struct VornApproachContext *context = actor->context;
-    u8 *group = (void *)&actor->group;
+    u8 *group;
+    {
+        register u32 go asm("r2") = 0x3D4;
+        asm("" : "+r"(go));
+        group = (u8 *)actor + go;
+    }
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     else if (actor->distanceF0 > context->maximumDistance ||
@@ -90,11 +102,12 @@ void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
                 *((u8 *)actor + offset) = next;
                 actor->counter2AC = zero2;
                 offset += 7;
-                *((u8 *)actor + offset) = 1;
+                {
+                    register u8 *q asm("r1");
+                    q = (u8 *)actor + offset;
+                    *q = 1;
+                }
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateApproachRange);
-#endif
