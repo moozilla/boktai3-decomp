@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.3%
+// fuzzy: 98.4%
 // Remaining: shared grid address is reused rather than recomputed.
 #include "scene_hud_display.h"
 extern u16 gUnk_03005260[];

@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.6%
+// fuzzy: 98.2%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 extern const s16 gUnk_086149C4[];
 void sub_080BA7E4(void);
@@ -19,6 +19,10 @@ static inline void HeadingStep(struct ContactPosition *v, u8 *heading, s32 speed
     v->x = Truncate(gUnk_086149C4[(direction + 0x40) & 0xFF] * speed);
     v->y = 0;
     v->z = Truncate(speed * gUnk_086149C4[direction]);
+}
+static inline void CpuSet_2(int ctl, u32 *src, struct ContactPosition *dst)
+{
+    CpuSet(src, dst, ctl);
 }
 static inline void AddHalf(s16 *dst, const s16 *src)
 {
@@ -46,14 +50,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         *fl |= mask;
     }
     scratch.zero = 0;
-    {
-        u32 *src = &scratch.zero;
-        void *dst = &scratch.step;
-        register u32 ctl asm("r2");
-        asm("" : "+r"(src), "+r"(dst));
-        ctl = 0x05000002;
-        CpuSet(src, dst, ctl);
-    }
+    CpuSet_2(0x05000002, &scratch.zero, &scratch.step);
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
