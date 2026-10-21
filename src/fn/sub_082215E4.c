@@ -1,8 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.7%
-// Open: agbcc cross-jumps the shared "subs r0, r0, r1" tails of the
-// quadrant cases; the original keeps one per case.
+// MATCHING_CONCESSION: register-pinning
+// Empty asm hints keep agbcc from cross-jumping the shared "subs" tails.
 extern const u8 gUnk_08614C44[];
 s32 Div(s32, s32);
 s32 Math_Atan2(s32 x, s32 y)
@@ -23,7 +21,11 @@ s32 Math_Atan2(s32 x, s32 y)
         if (y > 0) {
             if (x > y)
                 return gUnk_08614C44[Div(y << 8, x)];
-            return 0x40 - gUnk_08614C44[Div(x << 8, y)];
+            {
+                s32 r = 0x40 - gUnk_08614C44[Div(x << 8, y)];
+                asm("" : "+r"(r));
+                return r;
+            }
         } else {
             s32 ny = -y;
             if (x > ny)
@@ -33,18 +35,22 @@ s32 Math_Atan2(s32 x, s32 y)
     } else {
         if (y > 0) {
             s32 nx = -x;
-            if (nx > y)
-                return 0x80 - gUnk_08614C44[Div(y << 8, nx)];
+            if (nx > y) {
+                s32 r = 0x80 - gUnk_08614C44[Div(y << 8, nx)];
+                asm("" : "+l"(r));
+                return r;
+            }
             return gUnk_08614C44[-Div(x << 8, y)] + 0x40;
         } else {
             s32 nx = -x;
             s32 ny = -y;
-            if (nx <= ny)
-                return 0xC0 - gUnk_08614C44[-Div(x << 8, ny)];
-            return gUnk_08614C44[-Div(y << 8, nx)] + 0x80;
+            if (nx > ny)
+                return gUnk_08614C44[-Div(y << 8, nx)] + 0x80;
+            {
+                s32 r = 0xC0 - gUnk_08614C44[-Div(x << 8, ny)];
+                asm("" : "+r"(r)::"memory");
+                return r;
+            }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Math_Atan2);
-#endif
