@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 
@@ -6,7 +5,8 @@ void Player_AddControlFlags(struct Player *, u32);
 
 void Player_UpdateResetBlink(struct Player *p)
 {
-    register s32 value asm("r5");
+    s32 value;
+    struct Player *q;
     value = p->positionResetValue;
     if (value > 0) {
         Player_AddControlFlags(p, 8);
@@ -15,10 +15,11 @@ void Player_UpdateResetBlink(struct Player *p)
             if (mode == 0x1D)
                 goto done;
             if (mode != 0x1E) {
+                q = p;
                 value--;
                 if (value != 0 && ((value >> 2) & 1) != 0)
-                    Player_AddControlFlags(p, 5);
-                p->positionResetValue = value;
+                    Player_AddControlFlags(q, 5);
+                q->positionResetValue = value;
             }
         }
     }
