@@ -28,12 +28,13 @@ static inline void SetByte(u8 *a, u32 value)
 {
     *a = value;
 }
-// MATCHING_CONCESSION: register-pinning
 void Player_UpdateUnflaggedResourceRecovery(u8 *p)
 {
-    if (Player_ConsumeStateEntry(p))
+    s16 k2 = 0;
+    if (Player_ConsumeStateEntry(p)) {
         Player_SetActionPhase(p, 0);
-    switch (B(0x458)) {
+    }
+    switch (*((u8 *)(p + 0x458))) {
         case 0:
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
             Player_SetActionPhase(p, 1);
@@ -53,12 +54,15 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
                 Player_SetActionOrigin(p);
                 ++H(0x45a);
             }
-            H(0x6fc) = 15;
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 8), 64, 1))
+            *((u16 *)(p + 0x6fc)) = 15;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 8), 64,
+                                     1)) {
                 break;
+            }
             Sound_PlaySong(0xcb);
-            if (!(*(*(u16 **)(p + 0x348)) & 1))
+            if (!((*(*((u16 **)(p + 0x348)))) & 1)) {
                 goto finish;
+            }
             if (Player_CanRecoverResourceWhileUnflagged(p)) {
                 Sound_PlaySong(0x2e4);
                 B(0x4fd) = 1;
@@ -69,7 +73,7 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
             H(0x4f8) = 0;
             goto pause;
         case 2: {
-            register u32 zero asm("r5");
+            u32 zero;
             OrFlags((u32 *)(p + 0x20), 0xa0);
             if (H(0x4f8) <= 4) {
                 if (++H(0x4f8) == 5) {
@@ -83,26 +87,29 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
             SetHalf((u16 *)(p + 0xad6), 0x16f);
             {
                 u32 counter = H(0x45a);
-                if (counter <= 31)
+                if (counter <= 31) {
                     SetPulse(p, counter);
-                else
+                } else {
                     SetPulse(p, 64 - counter);
+                }
             }
             {
                 u16 *timer = (u16 *)(p + 0x45a);
                 u32 value = *timer + 1;
-                zero = 0;
+                zero = k2;
                 *timer = value;
-                if ((u16)value > 64)
+                if (((u16)value) > 64) {
                     *timer = 0;
+                }
             }
             if (!(*(*(u16 **)(p + 0x348)) & 1)) {
                 Sound_StopSong(0x239);
                 B(0x4fd) = zero;
                 goto finish;
             }
-            if (Player_CanRecoverResourceWhileUnflagged(p))
+            if (Player_CanRecoverResourceWhileUnflagged(p)) {
                 break;
+            }
             Sound_StopSong(0x239);
             B(0x4fd) = zero;
         }
@@ -118,8 +125,9 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
                 Player_SetActionPhase(p, 4);
                 break;
             }
-            if (!Player_CanRecoverResourceWhileUnflagged(p))
+            if (!Player_CanRecoverResourceWhileUnflagged(p)) {
                 break;
+            }
             Sound_PlaySong(0x239);
             B(0x4fd) = 1;
             H(0x4f8) = 0;

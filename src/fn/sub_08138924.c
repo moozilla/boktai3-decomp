@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 
@@ -24,7 +23,8 @@ struct PlayerSlotDisplay {
 extern struct PlayerSlotDisplay *gPlayerSlotDisplay;
 s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
 {
-    register struct PlayerSlotDisplay *manager asm("r6") = input;
+    struct PlayerSlotDisplay *manager = input;
+    s32 k2 = 0;
     s32 i = 0;
     u8 *buffer = manager->slots[0].buffer;
     struct DisplaySequenceState *animation = &manager->slots[0].animation;
@@ -34,7 +34,7 @@ s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
     do {
         void *sequenceResource;
         if (AnimData_Load(resource, 0x409C)) {
-            Sprite_Init(sprite, resource, 0);
+            Sprite_Init(sprite, resource, k2);
             sequenceResource = ScriptProc_Start(0x922E, 0x1C22);
             manager->sequenceResource = sequenceResource;
             Anim_SetSequence(animation, sequenceResource, 1, 0, 0);
@@ -52,8 +52,9 @@ s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
             resource += 0x60;
             offset += 0x60;
             i++;
-        } else
+        } else {
             return -1;
+        }
     } while (i <= 3);
     gPlayerSlotDisplay = manager;
     return 0;

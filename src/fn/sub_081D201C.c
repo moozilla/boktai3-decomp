@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // differs: tail copy of tag pointer (r2 vs r4) and constant register order
@@ -58,7 +57,9 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
         zero = 0;
         switch (tag->mode) {
             case 0: {
-                s32 dx, dz;
+                u32 zero2 = 0;
+                s32 dx;
+                s32 dz;
                 struct ArcTag *t;
                 s32 v;
                 tag->field6 = zero;
@@ -73,8 +74,6 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
                     pos[1] = npc->targetY;
                     {
                         u32 one = 1;
-                        u32 zero2 = 0;
-                        asm("" : "+r"(zero2));
                         t->mode = one;
                         t->field6 = one;
                         t->elapsed = zero2;

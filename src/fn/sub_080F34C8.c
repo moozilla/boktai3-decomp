@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct ChildGroupMember {
@@ -40,10 +39,12 @@ void ChildGroup_WaitForInactiveMembers(struct ChildGroup *p)
         }
     }
     if (active == 0) {
-        register u16 one asm("r0") = 1;
+        u16 one = 1;
         u8 *q;
         q = &p->state92;
-        *q = one;
+        do {
+            *q = one;
+        } while (0);
         q++;
         *q = one;
         p->flags8D = one | p->flags8D;

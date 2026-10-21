@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define ActorEffect_SetDirection LinkedEffect_SetVariant
 #define gRandomIndex             gUnk_03005308
@@ -48,10 +47,10 @@ void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct Actor
     void *direction;
     subtract(&delta, &b->position, &a->position);
     if (delta.x == 0 && delta.z == 0) {
-        register u32 *cur asm("r0") = &gUnk_03005308;
+        u32 *cur = &gUnk_03005308;
         index = (*cur + 1) & 0x3ff;
         *cur = index;
-        angle = *(u8 *)((u32)gUnk_0203B400 + index * 2);
+        angle = *((u8 *)(((u32)((u16 *)0x0203B400)) + (index * 2)));
     } else {
         angle = Math_Atan2(delta.x, delta.z);
     }

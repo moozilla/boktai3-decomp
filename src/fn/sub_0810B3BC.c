@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct SceneMenuRecord {
     u8 data[0x3E];
     u16 checksum;
@@ -40,23 +39,27 @@ static inline u8 HasRecordInput(struct SceneMenu *p)
 s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
 {
     u8 *record;
-    register struct SceneMenu *p asm("r5") = object;
-    s32 completed, i;
+    struct SceneMenu *p = object;
+    s32 completed;
+    s32 i;
+    do {
     record = (u8 *)p->records;
     if (Registry1745_ConsumeStateEntry(p)) {
         Registry1745_ClearParticipantCounters(p);
         ClockPanel_CaptureTime(p);
         *(u16 *)(record + 0x3E) = Crc_ComputeCcitt16(record, 0, 0x3E);
-    }
+        }
+    } while (0);
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     if (HasRecordInput(p)) {
-        if (gUnk_020004B4 && gUnk_020004B4->state == 0)
+        if (gUnk_020004B4 && (gUnk_020004B4->state == 0)) {
             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
-        else
+        } else {
             Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
+        }
         return 0;
     }
     ByteSequence_AdvanceEncodedValue(p, record, 0x40);
@@ -73,6 +76,7 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
             i++;
         } while (i < p->count);
     }
-    if (completed == p->count && gUnk_020004B4 && gUnk_020004B4->state == 0)
+    if (((completed == p->count) && gUnk_020004B4) && (gUnk_020004B4->state == 0)) {
         p->flags = 0x1800;
+    }
 }

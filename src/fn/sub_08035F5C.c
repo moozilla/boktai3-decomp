@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -56,15 +55,16 @@ int Wireless_TryStartParentNiSend(struct Engine *p)
         goto failed;
     one = 1;
     {
-        int check = one;
-        check &= flags;
-        asm("" : "+r"(check));
+        int check = 1;
+        do {
+            check &= flags;
+        } while (0);
         if (!check)
             goto ready;
     }
     slot = &p->mode;
     rfu_clearSlot(4, *slot);
-    if (rfu_NI_setSendData((u8)(one << *slot), 15, (u8 *)p + 0xB8, 12))
+    if (rfu_NI_setSendData((u8)(1 << *slot), 15, (u8 *)p + 0xB8, 12))
         goto sendError;
     index = 0;
     if (!((*links)->connSlotFlag & one)) {
@@ -74,7 +74,7 @@ int Wireless_TryStartParentNiSend(struct Engine *p)
             index++;
             if (index > 3)
                 break;
-        } while (!(((*(struct RfuLinkStatus *volatile *)cursor)->connSlotFlag >> index) & bit));
+        } while (!(((*cursor)->connSlotFlag >> index) & bit));
     }
     *slot = index;
     p->mask = (p->mask & 0xFFFE) | 2;

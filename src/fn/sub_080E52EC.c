@@ -1,5 +1,4 @@
 // confidence=low: approaches the navigation probe and selects the next dog behavior.
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 #include "scene_actor_control_phase.h"
@@ -69,9 +68,8 @@ void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
             *flags |= bit;
         }
     }
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
+    speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
     actor->field2C2 = 0x20;
-    asm("" : "+r"(actor));
     {
         u32 mask = 0xA02F;
         if (actor->flags2D4 & mask) {
@@ -82,8 +80,9 @@ void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
             u16 *q = &actor->field2C2;
             u16 v = *q;
             scale = q;
-            if (v == 0)
+            if (v == 0) {
                 *scale = 0x40;
+            }
         }
     }
     if (actor->drawableKind == 0)
@@ -107,10 +106,12 @@ void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         return;
     }
     if (Dog_IsActionTimerExpired(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
             return;
-        if (sub_0812F3CC(actor))
+        }
+        if (sub_0812F3CC(actor)) {
             return;
+        }
     }
     actor->counter2AC++;
 }

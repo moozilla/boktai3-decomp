@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 #define gEffectSineTable gUnk_086149C4
 struct EffectVector {
@@ -35,10 +34,10 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedEffect *effect)
     struct EffectVector diff;
     s32 i, dx, dy, dz, z, x;
     struct EffectArcNode *node;
-    register struct EffectVector *d asm("r0");
+    struct EffectVector *d;
     SubVector(&diff, effect->end, effect->start);
     i = 0;
-    d = &diff;
+    *(&d) = &diff;
     dx = d->x;
     dy = d->y;
     dz = d->z;

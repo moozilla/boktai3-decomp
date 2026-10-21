@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -16,7 +15,6 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 controlOffset = 0x2B3;
-        asm("" : "+r"(controlOffset));
         if (*((u8 *)actor + controlOffset)) {
             void *callback = Ivy_UpdateActiveState_080E98B4;
             u8 kind = 34;
@@ -28,7 +26,7 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
             u8 byteZero;
             *prepared = one;
             controlOffset -= 3;
-            *((u8 *)actor + controlOffset) = zero;
+            *(((u8 *)actor) - (-controlOffset)) = zero;
             controlOffset += 5;
             *((u8 *)actor + controlOffset) = kind;
             actor->target = callback;
@@ -46,9 +44,8 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
                 actor->state2A8 = byteZero;
                 actor->phase2A9 = byteZero;
                 {
-                    register u32 behOff asm("r4") = 0x2AA;
-                    register u8 *bq asm("r0");
-                    asm("" : "+r"(behOff));
+                    u32 behOff = 0x2AA;
+                    u8 *bq;
                     bq = (u8 *)actor + behOff;
                     *bq = state;
                 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u16 gUnk_03005418[];
 
@@ -87,10 +86,11 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
     {
         struct PackedVec pos;
         u16 *q;
-        register struct Vec *p asm("ip");
+        struct Vec *p;
         s32 x;
         s32 z;
-        s32 y, sum;
+        s32 y;
+        s32 sum;
         pos.x = interpolate(effect->worldX, effect->targetX, effect->shakeThreshold,
                             effect->shakeTimer);
         pos.y = interpolate(effect->worldY, effect->targetY, effect->shakeThreshold,
@@ -104,7 +104,7 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
         q[0] = scale(x - z);
         sum = scale(x + z);
         {
-            register struct Vec *source asm("r2") = p;
+            struct Vec *source = p;
             y = scale(source->y);
         }
         {

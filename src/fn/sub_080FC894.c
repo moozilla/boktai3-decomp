@@ -8,7 +8,7 @@ struct S080FC894 {
 
 void Axe_CopyAuxiliaryVector(struct S080FC894 *s, u32 *src)
 {
-    register u32 *dst asm("r2");
+    u32 *dst;
     u32 off = 0xa54;
     u32 a, b;
     dst = (u32 *)s->q;

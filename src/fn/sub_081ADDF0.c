@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
@@ -16,7 +15,7 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
     } v;
     s16 *vp;
     s32 a;
-    register s32 b asm("r6");
+    s32 b;
     s32 t;
     u32 zero, k;
     AnimData_Load(anim, 0x89CA);
@@ -40,6 +39,7 @@ void HresvelgrChild_Init(u8 *parent, u8 *obj, u32 arg)
     t = ((a + b) * 32) / 3 + 0x40;
     out[0] = trunc1(t);
     out[1] = 0x40;
+    t = a;
     t = ((b - a) * 32) / 3 + 0x40;
     out[2] = trunc1(t);
 }

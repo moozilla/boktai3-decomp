@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
@@ -24,15 +23,17 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
     u32 excluded;
     s16 *difference;
     {
-        register struct Player *volatile *g0 asm("r0") = gScenePlayers;
+        struct Player *volatile *g0 = (struct Player **)0x02000580;
         struct Player *initial = g0[0];
         u32 mask = 0x10000;
         flags = initial->statusFlags;
-        if (flags & mask)
+        if (flags & mask) {
             limit = 0x24000;
+        }
     }
-    if (actor->field2B5 == 3 && (flags & 0x40000))
+    if ((actor->field2B5 == 3) && (flags & 0x40000)) {
         return 0;
+    }
     excluded = 0x1000;
     difference = delta;
     position = &actor->position;
