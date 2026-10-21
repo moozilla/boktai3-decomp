@@ -2,9 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// Remaining sprite offset and effect timer address registers differ.
 
 struct P {
     u8 pad0[0x14C];
@@ -181,26 +178,37 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         asm("" : "+r"(offset));
         seq = (struct DisplaySequenceState *)((u8 *)p + offset);
         Anim_SetSequence(seq, p->resource, 0, p->facing, p->flip);
-        Step(&p->sprite, seq);
+        {
+            register u32 so asm("r3") = 0x14C;
+            asm("" : "+r"(so));
+            Step((struct ContactSwarmSprite *)((u8 *)p + so), seq);
+        }
     }
     {
-        u16 *target = (u16 *)((u8 *)p + 0xAD6);
+        register u32 toff asm("r2") = 0xAD6;
+        register u16 *target asm("r1");
         register u32 resource asm("r0");
-        asm("" : "+r"(target));
+        asm("" : "+r"(toff));
+        target = (u16 *)((u8 *)p + toff);
         resource = 0x16F;
         asm("" : "+r"(resource));
         *target = resource;
     }
     {
-        u32 elapsed = H(0xAD8) + 3;
+        u32 elapsed;
         register u32 mask asm("r2");
         register u32 temp asm("r3");
-        H(0xAD8) = elapsed;
+        register u32 off asm("r3") = 0xAD8;
+        register u16 *q asm("r1");
+        asm("" : "+r"(off));
+        q = (u16 *)((u8 *)p + off);
+        elapsed = *q + 3;
+        *q = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
-        if (H(0xAD8) > 32)
-            H(0xAD8) = 32;
+        if ((u16)elapsed > 32)
+            *q = 32;
         elapsed = p->timer + 1;
         p->timer = elapsed;
         if ((elapsed & mask) > 31) {
@@ -218,6 +226,3 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralRecovery);
-#endif
