@@ -8,8 +8,6 @@ void Callback_InvokeActor(void *, void *);
 s32 Collider_Refresh(void *);
 void Collider_SetPosition(void *, void *, u32);
 
-#define SceneEffectRing_Update sub_08198DD8
-
 static inline s32 sh(s32 v)
 {
     s32 r;

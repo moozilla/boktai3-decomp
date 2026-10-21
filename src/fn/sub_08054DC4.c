@@ -14,9 +14,9 @@ void DisplayTrack_SetSequenceFromScript(void)
                 void *state;
                 track->mirror = Script_GetValue();
                 do {
-                variant = 0;
+                    variant = 0;
                     if (Script_SeekToKeyword('E')) {
-                    variant = Script_GetValue();
+                        variant = Script_GetValue();
                     }
                 } while (0);
                 if (variant) {

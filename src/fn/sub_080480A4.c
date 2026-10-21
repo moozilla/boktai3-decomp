@@ -68,8 +68,8 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
                 u32 sample, frame;
                 s32 direction;
                 do {
-                *randomState = (*randomState + 1) & 1023;
-                sample = randomTable[*randomState];
+                    *randomState = (*randomState + 1) & 1023;
+                    sample = randomTable[*randomState];
                 } while (0);
                 direction = index << 5;
                 sample &= 15;
