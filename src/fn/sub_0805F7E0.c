@@ -1,14 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_item_values.h"
 s32 SceneItemValue_CalculateEquipment(u32 slot)
 {
     struct SceneValueEquipment *equipment = Inventory_GetEquipmentEntry(slot);
-    s32 base;
     s32 percent;
     s32 result;
-    register s32 comparison asm("r3");
+    s32 comparison;
     if (*(volatile u8 *)&equipment->kind == 0xFF ||
-        !(base = Equipment_GetDefinition(equipment->kind)->baseValue))
+        !(result = Equipment_GetDefinition(equipment->kind)->baseValue))
         return 0;
     percent = 80;
     if (!equipment->condition)
@@ -33,9 +31,8 @@ s32 SceneItemValue_CalculateEquipment(u32 slot)
             percent += 20;
             break;
     }
-    result = Div(base * percent, 100);
+    result = Div(result * percent, 100);
     comparison = result;
-    asm("" ::"r"(comparison));
     if (comparison <= 0)
         return 1;
     return result;

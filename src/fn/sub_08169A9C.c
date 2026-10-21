@@ -29,7 +29,6 @@ void StatusPanel_DrawDecimalValue(void *owner, s32 x, s32 y, s32 value)
         asm("" : "+r"(t));
         mask = t;
     }
-    asm("" : "+r"(mask));
     digit = digits;
     do {
         if (*digit > 0) {

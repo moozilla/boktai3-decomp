@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct Vanargand {
@@ -29,12 +28,14 @@ void Vanargand_WaitForActionRelease(struct Vanargand *p)
     p->flags |= flag;
     Vanargand_SetPendingCue(p, 3);
     if (p->pending) {
-        p->pending = 0;
+        (*(&p))->pending = 0;
         if (p->modeF34 <= 2) {
-            register u16 delay asm("r1") = 6;
+            u16 delay = 6;
             u16 *field;
+            u16 *new_var;
             p->counterF1C = 0;
-            field = &p->delayF20;
+            new_var = &p->delayF20;
+            field = new_var;
             *field = delay;
             field++;
             *field = delay;

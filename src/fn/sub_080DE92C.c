@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_profile.h"
 
@@ -13,13 +12,11 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *a
         u16 v = actor->flags2D4 & mask;
 
         if (v) {
-            register u8 *q asm("r1");
-            register u32 z asm("r2");
-            register u32 four asm("r0") = 4;
-            asm("" : "+r"(four));
+            u8 *q;
+            u32 z;
+            u32 four = 4;
             z = 0;
             q = &entry[1].value;
-            asm("" : "+r"(z), "+r"(q));
             entry[1].value = four;
             q[1] = z;
         } else {
