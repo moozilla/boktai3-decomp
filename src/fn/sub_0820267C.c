@@ -1,4 +1,4 @@
-#include "global.h" // fuzzy: 98.5%
+#include "global.h"
 struct Data {
     u8 pad0[0x14];
     u32 w14, w18;
