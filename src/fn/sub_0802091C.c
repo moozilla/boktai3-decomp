@@ -1,7 +1,7 @@
 #include "global.h"
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
-s32 sub_0802048C(void *, void *, void *);
+s32 SceneObjects_Init(void *, void *, void *);
 void Task_Kill(void *);
 void sub_0801F93C(void);
 void SceneObjects_Destroy(void);
@@ -11,7 +11,7 @@ void *sub_0802091C(void *a, void *b)
     obj = Task_Create(9, 0x434);
     if (obj != 0) {
         Task_SetCallbacks(obj, sub_0801F93C, SceneObjects_Destroy);
-        if (sub_0802048C(obj, a, b) < 0) {
+        if (SceneObjects_Init(obj, a, b) < 0) {
             Task_Kill(obj);
             return 0;
         }

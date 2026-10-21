@@ -144,6 +144,6 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     } else if (Hidden(actor)) {
         ActorShadow_Disable(((u8 *)actor) + 0x320);
     } else {
-            ActorShadow_Enable((u8 *)actor + 0x320);
+        ActorShadow_Enable((u8 *)actor + 0x320);
     }
 }

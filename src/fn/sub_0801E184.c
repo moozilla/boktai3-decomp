@@ -7,8 +7,8 @@ void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 int Region_FindContaining(void *);
 void sub_0801F058(void *, void *);
-void sub_0801F5EC(void *, void *);
-void sub_0801EC4C(void *, void *);
+void SceneObject_InitSlotPlacement(void *, void *);
+void SceneObject_InitPlacement(void *, void *);
 int SceneObjects_Append(u8 *p, u16 id, Vec *position, int value, u8 kind, u8 variant,
                         u8 orientation, int type, int field88, int flags, int field41, u32 *data,
                         u8 field44, int field45)
@@ -48,35 +48,35 @@ int SceneObjects_Append(u8 *p, u16 id, Vec *position, int value, u8 kind, u8 var
             break;
         case 2:
             slot[0x45] = field45;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 8:
             slot[0x45] = 1;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 9:
             slot[0x45] = 2;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 10:
             slot[0x45] = 3;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 11:
             slot[0x45] = 4;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 12:
             slot[0x45] = 5;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 13:
             slot[0x45] = 6;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 14:
             slot[0x45] = 7;
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
         case 0:
         case 3:
@@ -85,10 +85,10 @@ int SceneObjects_Append(u8 *p, u16 id, Vec *position, int value, u8 kind, u8 var
         case 6:
         case 7:
         case 15:
-            sub_0801EC4C(p, slot);
+            SceneObject_InitPlacement(p, slot);
             break;
         case 16:
-            sub_0801F5EC(p, slot);
+            SceneObject_InitSlotPlacement(p, slot);
             break;
     }
     if (*(int *)(slot + 0x48)) {
