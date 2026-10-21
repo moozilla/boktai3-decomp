@@ -16,7 +16,7 @@ void ResourceHeader_Relocate(void *, void *);
 void *ScriptProc_Start(u32, u32);
 u32 Script_GetKeywordValue(u32, u32);
 void Anim_SetKeyframes(void *, void *, int, int, int);
-void sub_0818E5E4(void *, u32, u32);
+void Armor_InitParts(void *, u32, u32);
 void Armor_ReceiveTargetEvent(void);
 
 struct T {
@@ -273,6 +273,6 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
             r = 2;
             break;
     }
-    sub_0818E5E4(p->fB58, r, p->bB38);
+    Armor_InitParts(p->fB58, r, p->bB38);
     return 0;
 }
