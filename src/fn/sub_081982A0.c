@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.8%
+// fuzzy: 98.2%
 // Register allocation: the original keeps y in r4 and the output pointer in r5; here they swap.
 struct V {
     s16 x, y, z;
@@ -43,7 +43,7 @@ void sub_081982A0(u8 *p)
     struct P in;
     struct V out;
     s32 new_var;
-    u8 *actor;
+    u8 *actor, *a2;
     s32 y, a, b, c;
     struct V *world;
     ShadowActor_UpdateTransition(p);
@@ -53,17 +53,17 @@ void sub_081982A0(u8 *p)
     in.z = *(u16 *)(actor + 0x34);
     project(&out, (struct V *)&in);
     {
-        u32 mask = 4;
-        if (*(u32 *)(p + 0x30) & mask)
+        if (*(u32 *)(p + 0x30) & 4)
             out.x = 0xe0;
         else
             out.x = 0x10;
     }
-    y = *(s16 *)(gUnk_02000710 + 0x32);
+    a2 = gUnk_02000710;
+    world = (struct V *)&in;
+    y = *(s16 *)(a2 + 0x32);
     a = out.x + gUnk_03005418.x - 0x78;
     b = out.y + gUnk_03005418.y - 0x50;
     c = __divsi3((a + b) << 5, 3) + y;
-    world = (struct V *)&in;
     world->x = sh(c, 1);
     new_var = y;
     world->y = new_var;
