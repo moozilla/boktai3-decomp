@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.1%
 // foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
 struct TargetMotionVector {
     u32 x : 16;
@@ -35,11 +33,14 @@ void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 static inline u32 TargetMotion_ClearFlag(u32 flags)
 {
-    return ~1 & flags;
+    u32 m = ~1;
+    m &= flags;
+    return m;
 }
 static inline void TargetMotion_SetFlag(struct TargetMotionExit *p, u32 flag)
 {
     u32 value = flag;
+    asm("" : "+r"(value));
     p->flags119 = value | p->flags119;
 }
 static inline u8 TargetMotion_TakeExitFlag(struct TargetMotionExit *p)
@@ -85,6 +86,3 @@ void TargetMotion_UpdateFlashingExit(struct TargetMotionExit *p)
         p->elapsed += 2;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TargetMotion_UpdateFlashingExit);
-#endif
