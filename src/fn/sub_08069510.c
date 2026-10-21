@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "bouncing_object.h"
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
@@ -15,9 +14,10 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
     struct BouncingPool *pool = input;
     struct BouncingObject *slots = pool->slots;
     s32 i;
-    register u32 offset asm("r1") = (u32) & ((struct BouncingPool *)0)->used;
+    u32 offset = (u32) & ((struct BouncingPool *)0)->used;
     u32 *guard;
     guard = (void *)((u32)pool + offset);
+    offset = 0;
     if (!*guard) {
         u32 stoppingOffset;
         u32 *stopping;
@@ -54,5 +54,5 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
             }
         }
     }
-    return 0;
+    return offset;
 }

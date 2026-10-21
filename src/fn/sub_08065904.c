@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_state.h"
 void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
 {
@@ -9,11 +8,13 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
     finished = test;
     if (!finished) {
         struct ActorAttachmentSlotView *view = slot;
-        register s16 *value asm("r0");
+        s16 *value;
+        s16 new_var;
         s32 current;
         s16 *sample;
         value = view->value;
-        current = *value;
+        new_var = *value;
+        current = new_var;
         sample = value;
         if (current <= 0) {
             s16 *timer = &slot->timer;
@@ -29,7 +30,7 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
             }
             slot->frame = 4;
         } else {
-            register s32 level asm("r3") = 4;
+            s32 level = 4;
             s32 currentValue = *sample;
             s16 *threshold;
             s32 boundary;

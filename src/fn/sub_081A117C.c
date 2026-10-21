@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gRandomIndex  gUnk_03005308
 #define gRandomValues gUnk_0203B400
 struct ActorReaction {
@@ -44,16 +43,22 @@ static inline void RestoreHeading(struct ActorReaction *p)
 }
 void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
 {
-    register struct ActorReaction *p asm("r3") = actor;
+    int new_var;
+    struct ActorReaction *p = actor;
+    struct ActorReaction **new_var3;
     u32 t = tick;
+    struct ActorReaction *new_var2;
+    new_var2 = actor;
     RestoreHeading(p);
-    actor->motion[0] = 0;
-    actor->motion[1] = 0;
-    actor->motion[2] = 0;
-    actor->motion[3] = 0;
+    new_var2->motion[0] = 0;
+    new_var = 0;
+    new_var3 = &new_var2;
+    (*new_var3)->motion[1] = 0;
+    (*new_var3)->motion[2] = new_var;
+    (*new_var3)->motion[3] = 0;
     {
         u32 flags = 12;
-        actor->flags |= flags;
+        new_var2->flags |= flags;
     }
     if (!(t & 7)) {
         s32 anim;
@@ -61,6 +66,7 @@ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
         random = *(u16 *)(RANDOM_TABLE_ADDR + (gUnk_03005308 << 1));
         anim = sub_08249350(random >> 3, 5) + 27;
-        Hresvelgr_SetAnimation(actor, actor->collider194, actor->collider174, anim, 2, 4);
+        Hresvelgr_SetAnimation(*new_var3, (*new_var3)->collider194, (*new_var3)->collider174, anim,
+                               2, 4);
     }
 }
