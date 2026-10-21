@@ -1,4 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
+
 #include "global.h"
 #include "scene_input_navigation.h"
 
@@ -34,12 +34,14 @@ void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
 void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
 void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
 {
+    int new_var;
     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
     Storage_RefreshCategoryWidgets(p);
     Storage_RefreshSelectedItemDetails(p);
     {
         u32 modeIndex = mode - 1;
         p->mode = mode;
+        new_var = -1;
         if (modeIndex <= 1) {
             Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
             Storage_UpdateCursorPosition(&p->grid, p->cursor);
@@ -51,9 +53,8 @@ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
                 s32 none;
                 void *description = p->description;
                 void *panel = p;
-                asm("" : "+r"(panel));
-                asm("" : "+r"(descriptionMode));
-                none = -1;
+
+                none = new_var;
                 MenuPanel_ShowDescription(panel, descriptionMode, description, (void *)none);
             }
             SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);

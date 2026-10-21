@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 extern u8 *gUnk_02000580;
 void SceneActorControl_OnIdle(void);
 struct S {
@@ -27,12 +26,14 @@ struct S {
 
 void Lun_EnterIdleOrCopyCell(struct S *s)
 {
-    register u32 mask asm("r1");
+    u32 mask;
     u8 *g;
     u16 zero;
+    u16 zero_2;
     g = s->other;
     mask = 0x100;
-    zero = s->hflags & mask;
+    zero_2 = s->hflags;
+    zero = zero_2 & mask;
     if (zero) {
         u16 v = *(u16 *)(g + 0x442);
         *(u16 *)(g + 0x444) = v;

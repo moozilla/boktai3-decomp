@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -25,15 +24,12 @@ void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
         u32 z3, z4;
         {
             u32 m;
-            register u32 v asm("r1");
-            asm("" ::"m"(actor->flags2D4));
-            m = ~0x100;
-            asm("" : "+r"(m));
-            v = m & actor->flags2D4;
+            int c = 0x100;
+            u16 *f = &actor->flags2D4;
+            m = ~c;
+            actor->flags2D4 = m & *f;
             z3 = 0;
             z4 = 0;
-            asm("" : "+r"(z3), "+r"(z4));
-            actor->flags2D4 = v;
         }
         {
             u32 *g = &group->flags;

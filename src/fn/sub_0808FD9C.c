@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 void Slime_UpdateShake(void);
 
@@ -19,6 +18,8 @@ struct P {
 
 void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
 {
+    int new_var;
+    int new_var2;
     struct Q *q = actor->context;
     struct P *p;
     u32 zero;
@@ -34,21 +35,22 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
     dst = &q->pos;
     p = (struct P *)gUnk_02000580[0];
     *dst = p->pos;
+    new_var = 0;
     if (q->a >= q->b) {
         void (*fn)(void) = Slime_UpdateShake;
         u32 st = 0x2A;
-        asm("" : "+r"(fn), "+r"(st));
         actor->field2B2 = 1;
         actor->field2B0 = zero;
         actor->field2B5 = st;
         actor->target = fn;
+        new_var2 = -0x2C;
         actor->field2C8 = zero;
         {
             u32 *field = &actor->flags114;
-            u32 mask = st - 0x2C;
+            u32 mask = st + new_var2;
             *field &= mask;
         }
         actor->word104 = zero;
-        Chase_SetState(actor, 3, 0, 0);
+        Chase_SetState(actor, 3, new_var, new_var);
     }
 }

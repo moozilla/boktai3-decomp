@@ -1,11 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
 void StageIconDisplay_TickReveal(struct StageIconDisplay *display)
 {
-    if (!display->stateFrame)
-        Sound_PlaySong(706);
+    do {
+        if (!display->stateFrame)
+            Sound_PlaySong(706);
+    } while (0);
     if (++display->stateFrame > 60) {
-        register s32 *revealed asm("r5") = &display->revealedCount;
+        s32 *revealed = &display->revealedCount;
         if (*revealed > 2) {
             u32 *flags;
             s32 i;
