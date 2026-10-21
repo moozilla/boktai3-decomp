@@ -44,6 +44,7 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
     } scratch;
     struct ContactPackedVector jitter;
     struct ContactPosition empty;
+    struct ContactPosition *np;
     context = *(u8 **)((u8 *)p + 0x3D0);
     if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x15);
@@ -72,13 +73,13 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
         jitter.x = 0x52;
         jitter.y = 0;
         jitter.z = 0x52;
+        np = &empty;
         scratch.zero = z;
         {
-            u32 ctl = 0x05000002;
-            asm("" : "+r"(ctl));
-            CpuSet(&scratch.zero, &empty, ctl);
+            register u32 ctl asm("r2") = 0x05000002;
+            CpuSet(&scratch.zero, np, ctl);
         }
-        SceneParticleBurst_CreateWithPause(&p->position, &empty, &jitter, 1, 2, 4);
+        SceneParticleBurst_CreateWithPause(&p->position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
     if (p->field2B3 && context[0x6D1] == 0) {
