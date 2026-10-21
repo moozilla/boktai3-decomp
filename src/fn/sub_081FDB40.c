@@ -14,7 +14,7 @@ struct RisingActor {
     u8 padF6[0x2ae];
     s32 height;
 };
-void sub_081FD7EC(void);
+void OrbitEffect_FireVolley(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 static inline void showDrawable(struct RisingDrawable *drawable)
 {
@@ -28,7 +28,7 @@ s32 RisingActor_LowerHeight(struct RisingActor *actor)
     if (actor->height <= 0x40000) {
         actor->fieldF4 = 1;
         showDrawable(&actor->drawable);
-        SunOrb_SetUpdateCallback(actor->controller, sub_081FD7EC);
+        SunOrb_SetUpdateCallback(actor->controller, OrbitEffect_FireVolley);
     }
     return 0;
 }

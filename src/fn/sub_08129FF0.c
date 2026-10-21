@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.5%
+// fuzzy: 86.9%
 // Pointer lifetimes, saved registers and terrain-height comparison still differ.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -21,14 +21,14 @@ struct Anim {
     u8 flags, frameCount, frameWeight, duration;
     u16 index, unknownA, speed, elapsed;
 };
-static inline u32 Step(struct Sprite *sprite, struct Anim *state)
+static inline u32 Step(struct Sprite *sprite, struct Sprite *sprite2, struct Anim *state)
 {
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
-        table = state->commands;
+        table = *(const volatile u16 *const *)((u8 *)sprite + 0x2C);
         command = (const volatile u16 *)((u32)table + offset);
     }
     sprite->frame = *command >> 6;
@@ -56,9 +56,9 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
         asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+            sprite2->flags |= 8;
         else
-            sprite->flags &= ~8;
+            sprite2->flags &= ~8;
     }
     {
         u32 elapsed = state->elapsed + 1;
@@ -207,20 +207,23 @@ static inline u16 Height(struct Vec *position)
 }
 static inline void StepDisc(struct Disc *p)
 {
-    Step((struct Sprite *)p, &p->anim);
+    Step((struct Sprite *)p, (struct Sprite *)p, &p->anim);
 }
 // confidence=low: disc falls under gravity, then enters its impact state at terrain height.
-void SunDiscPool_UpdateFallingDisc(struct DiscPool *pool, struct Disc *p)
+void SunDiscPool_UpdateFallingDisc(struct DiscPool *poolArg, struct Disc *p)
 {
+    register struct DiscPool *pool asm("sl") = poolArg;
+    register struct Sprite *copy asm("r7") = (struct Sprite *)p;
     u16 height;
     struct Anim *anim = &p->anim;
+    asm("" : "+r"(copy));
     if (p->entered) {
         p->flags &= ~1;
         p->age = 0;
         p->entered = 0;
     }
     asm("" : "+r"(anim));
-    Step((struct Sprite *)p, anim);
+    Step((struct Sprite *)p, copy, anim);
     p->velocity.y -= 4;
     {
         struct Vec *position = &p->position, *velocity = &p->velocity;

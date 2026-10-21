@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 98.4%
+// fuzzy: 98.4% (31 differing bytes after pinning; remaining: zero-index registers)
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "player.h"
@@ -23,18 +24,18 @@ static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 zer
 }
 void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
-    struct SceneActorControlState *control = SceneActorControl_GetState(actor);
+    register struct SceneActorRegistryResetView *actor asm("r5") = input;
+    register struct SceneActorControlState *control asm("r4") = SceneActorControl_GetState(actor);
     u32 zero;
 
     u32 magnitude;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *callback = *(void **)((u8 *)actor + 0x228);
+        register void *callback asm("r2") = *(void **)((u8 *)actor + 0x228);
         u32 index;
         {
             u32 one = 1;
-            u32 offset = 0x2B2;
-            u32 clear;
+            register u32 offset asm("r6") = 0x2B2;
+            register u32 clear asm("r3");
             u8 *field;
             field = (u8 *)actor + offset;
             clear = 0;
@@ -47,8 +48,9 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             actor->target = callback;
             actor->field2C8 = 0;
             offset = 0x114;
+            asm("" : "+r"(offset));
             {
-                u32 *flags = (void *)((u8 *)actor + offset);
+                register u32 *flags asm("r2") = (void *)((u8 *)actor + offset);
                 u32 mask = ~1;
                 *flags &= mask;
             }
@@ -59,22 +61,29 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             zero = 0;
             {
                 u32 *source = &zero;
-                CpuSet(source, destination, 0x05000002);
+                u32 control = 0x05000002;
+                asm("" : "+r"(source));
+                asm("" : "+r"(control));
+                CpuSet(source, destination, control);
             }
         }
         index = (gUnk_03005308 + 1) & 1023;
         gUnk_03005308 = index;
         index *= 2;
         {
-            const u16 *table = gUnk_0203B400;
+            register const u16 *table asm("r3") = gUnk_0203B400;
             u32 value = *(u16 *)(index + (u32)table);
-            u32 offset = 0x3EC;
+            register u32 offset asm("r6") = 0x3EC;
+            asm("" : "+r"(offset));
             {
-                u8 *field = (u8 *)control + offset;
+                register u8 *field asm("r1") = (u8 *)control + offset;
                 *field = value;
                 {
-                    const s16 *sine = gUnk_086149C4;
+                    register const s16 *sine asm("r2") = gUnk_086149C4;
+                    register u32 d asm("r3");
+                    asm("" : "=r"(d));
                     actor->secondaryMotion.x = Scale(sine[*field]);
+                    asm("" ::"r"(d));
                 }
             }
         }
@@ -82,14 +91,17 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
     }
     if ((s32)actor->counter2AC <= 5) {
         const s16 *first = gUnk_086149C4;
-        u32 offset = 0x3EC;
-        u8 *field = (u8 *)control + offset;
+        register u32 offset asm("r6") = 0x3EC;
+        u8 *field;
         const s16 *table;
         s32 value;
+        asm("" : "+r"(offset));
+        field = (u8 *)control + offset;
         value = first[*field];
         table = first;
         actor->secondaryMotion.x = Scale(value);
         offset = 0x3EC;
+        asm("" : "+r"(offset));
         field = (u8 *)control + offset;
         actor->secondaryMotion.z = Scale(table[(*field + 64) & 255]);
     }
