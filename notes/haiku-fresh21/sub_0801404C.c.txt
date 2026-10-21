@@ -1,0 +1,161 @@
+#include "global.h"
+struct PFx {
+    u32 flags;
+    u8 b0[4];
+    u16 tile;
+    u8 b1[5];
+    u8 prio;
+    u8 b2[8];
+    s16 x;
+    u16 height;
+    s16 y;
+    u8 b3[10];
+};
+struct PParticle {
+    u8 active, pad1, age, life;
+    u16 cell;
+    s16 py;
+    s16 vx, vy, vz;
+    u8 pad2[2];
+    struct PFx fx;
+};
+struct PGroup {
+    u8 active, count, type, priority;
+    struct PParticle parts[8];
+};
+struct PManager {
+    u8 pad[24];
+    u32 timer;
+    u8 *small, *large;
+    struct PGroup groups[6];
+};
+struct PEntry {
+    u16 a, b;
+    u16 c, d;
+};
+struct PMap {
+    u32 pad0;
+    u8 *cells;
+    u8 pad1[28];
+    u16 rows[1];
+};
+extern struct PMap *gUnk_030052F4;
+extern u32 gUnk_030052F8;
+extern u32 gUnk_030052FC;
+extern u32 gUnk_03005308;
+extern u32 gUnk_08604B90[];
+extern const u16 gUnk_0203B400[];
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void Effect_Remove(void *);
+#define ParticleGroup_UpdateActive sub_0801404C
+
+static inline int scale(int a, int b)
+{
+    int v = a * b;
+    if (v >= 0)
+        return v >> 6;
+    else
+        return -((-v) >> 6);
+}
+
+#define RAND() (gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff, *(const u16 *)((const u8 *)gUnk_0203B400 + gUnk_03005308 * 2))
+
+#ifdef NONMATCHING
+void ParticleGroup_UpdateActive(struct PManager *m, struct PGroup *g)
+{
+    s32 i;
+    s32 alive;
+    u32 base;
+    base = gUnk_08604B90[0x27];
+    alive = 0;
+    i = 0;
+    if (i < g->count) {
+        struct PParticle *p = g->parts;
+        struct PFx *fx = &p->fx;
+        for (; i < g->count; i++, p++, fx = (struct PFx *)((u8 *)fx + 0x38)) {
+        u16 cell;
+        u32 v;
+        u8 *q;
+        struct PEntry *e;
+        s32 x, y;
+        if (p->active == 0)
+            continue;
+        x = p->fx.x >> 8;
+        y = p->fx.y >> 8;
+        if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+            cell = 0xFFFF;
+        else
+            cell = gUnk_030052F4->rows[y] + x;
+        if (g->type <= 0x14)
+            e = (struct PEntry *)m->small;
+        else
+            e = (struct PEntry *)m->large;
+        asm("" ::: "memory");
+        p->fx.x += p->vx;
+        p->fx.y += p->vz;
+        p->py += p->vy;
+        p->vy -= 1;
+        if (cell == 0xFFFF) {
+            v = 0xFFFF;
+        } else {
+            q = TerrainModifiers_FindCellOverride(cell, 1);
+            if (q)
+                q += 4;
+            else
+                q = gUnk_030052F4->cells + 0xc + cell * 4;
+            v = (*q & 0xf) << 8;
+            if (p->py < (s32)v) {
+                if (cell != p->cell) {
+                    s32 d = cell - p->cell;
+                    if (d < 0)
+                        d = -d;
+                    if (d == 1) {
+                        p->vx = -scale(p->vx, (RAND() & 7) + 0x32);
+                        if ((s32)(cell - p->cell) < 0)
+                            p->fx.x = (p->fx.x & 0xFFFFFF00) + 0x100;
+                        else
+                            p->fx.x = (p->fx.x & 0xFFFFFF00) - 1;
+                    } else {
+                        p->vz = -scale(p->vz, (RAND() & 7) + 0x32);
+                        if ((s32)(cell - p->cell) < 0)
+                            p->fx.y = (p->fx.y & 0xFFFFFF00) + 0x100;
+                        else
+                            p->fx.y = (p->fx.y & 0xFFFFFF00) - 1;
+                    }
+                } else {
+                    p->py = v;
+                }
+                p->vy = -scale(p->vy, (RAND() & 3) + 0x37);
+            }
+            q = TerrainModifiers_FindCellOverride(cell, 1);
+            if (q)
+                q += 4;
+            else
+                q = gUnk_030052F4->cells + 0xc + cell * 4;
+            if (*(u16 *)(q + 2) & 0x20)
+                v = 0xFFFF;
+        }
+        p->cell = cell;
+        if ((m->timer & 1) == (i & 1) && v != 0xFFFF) {
+            p->fx.height = v;
+            p->fx.tile = e->c + base;
+            p->fx.prio = 3;
+        } else {
+            p->fx.height = p->py;
+            p->fx.tile = e->c + gUnk_08604B90[g->type];
+            p->fx.prio = g->priority;
+        }
+        if (p->age++ >= p->life) {
+            p->active = 0;
+            Effect_Remove(fx);
+        } else {
+            alive++;
+        }
+    }
+    }
+    if (alive == 0)
+        g->active = 0;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0801404C);
+#endif
