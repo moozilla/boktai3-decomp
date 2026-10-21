@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_burst.h"
 #include "projected_display.h"
 extern u16 gUnk_03005418[];
@@ -53,13 +52,14 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
             if (effect->fade > 63) {
                 effect->sprite.flags &= ~2;
                 effect->fade = 64;
-            } else
+            } else {
                 effect->sprite.flags |= 2;
+            }
         }
         ContactBurst_UpdateContactAnimation(effect);
     } else {
         u32 previous = effect->previousEnabled;
-        register struct ContactCollider *collider asm("r9") = &effect->collider;
+        struct ContactCollider *collider = &effect->collider;
         if (previous) {
             s32 index = 0;
             const u16 *randomTable = (const u16 *)RANDOM_TABLE_ADDR;
@@ -67,8 +67,10 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
             do {
                 u32 sample, frame;
                 s32 direction;
+                do {
                 *randomState = (*randomState + 1) & 1023;
                 sample = randomTable[*randomState];
+                } while (0);
                 direction = index << 5;
                 sample &= 15;
                 direction += sample;
