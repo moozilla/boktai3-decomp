@@ -2,8 +2,8 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 87.0%
-// Remaining differences: stack layout, register allocation and instruction ordering.
+// fuzzy: 99.6%
+// Remaining difference: the incoming row argument is copied to r4 before the body pin, not after the kind spill.
 struct SegmentAnim {
     const u16 *data;
     u8 flags, count, factor, rate;
@@ -25,6 +25,25 @@ void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_SetSequence(void *, void *, u32, u8, u8);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
+static inline u8 TestMask4(struct SegmentAnim *p, u32 mask)
+{
+    register u32 m asm("r4");
+    u32 f = p->status;
+    asm("" : "+r"(f));
+    m = mask;
+    asm("" : "+r"(m));
+    if (f & m)
+        return 1;
+    return 0;
+}
+static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
+{
+    register u32 m asm("r1") = mask;
+    asm("" : "+r"(m));
+    if (*(volatile u8 *)&p->status & m)
+        return 1;
+    return 0;
+}
 static inline u8 TestMask(struct SegmentAnim *p, u32 mask)
 {
     u32 f = p->status;
@@ -43,24 +62,39 @@ static inline void *ScriptAt(u8 *body, s32 offset)
 }
 static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
 {
-    register struct Segment *o asm("r6") = sprite;
+    register struct Segment *seg asm("r8") = sprite;
+    register struct Segment *o asm("r6") = seg;
     struct SegmentAnim *a = input;
+    register struct SegmentAnim *b asm("r4") = input;
     const volatile u16 *entry;
-    asm("" : "+r"(o), "+r"(a));
+    asm("" : "+r"(o), "+r"(b));
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
         u32 input = a->flags;
         u32 left = 1;
-        u32 mask = 1;
+        u32 mask;
+        u32 bits;
         left &= input;
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        bits = (*entry & 0x30) >> 4;
+        if (left != (bits & ({
+                         register u32 m3 asm("r3") = 1;
+                         asm("" : "+r"(m3));
+                         m3;
+                     })))
             o->flags |= 4;
-        else
-            o->flags &= ~4;
+        else {
+            register u32 *pa asm("r1") = &seg->flags;
+            register u32 *pb asm("r2");
+            register u32 v asm("r0") = *pa;
+            v &= ~4;
+            pb = &seg->flags;
+            asm("" : "+r"(pb));
+            *pb = v;
+        }
     }
     {
-        register u32 input asm("r0") = a->flags;
+        register u32 input asm("r0") = b->flags;
         u32 mask = 2;
         u32 left = (u8)(mask & input);
         if (left != (((*entry & 0x30) >> 4) & mask))
@@ -69,84 +103,147 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
             o->flags &= ~8;
     }
     {
-        u32 elapsed = a->timer + 1;
-        u32 mask;
-        register u32 temp asm("r2");
+        u32 elapsed = b->timer + 1;
+        register u32 mask asm("r5");
+        register u32 temp asm("r3");
         register u32 savedDuration asm("r2");
-        u32 duration, flags;
-        a->timer = elapsed;
+        register u32 duration asm("r3");
+        u32 flags;
+        b->timer = elapsed;
         temp = 0xffff;
         asm("" : "+r"(temp));
         mask = temp;
-        duration = a->rate;
+        duration = b->rate;
         elapsed = (u16)elapsed;
         savedDuration = duration;
         if (elapsed >= duration) {
-            a->timer = 0;
-            flags = a->flags;
+            b->timer = 0;
+            flags = b->flags;
             if (flags & 4) {
-                u32 index = a->frame;
+                u32 index = b->frame;
                 if (index == 0) {
-                    if (flags & 8)
-                        a->timer = savedDuration;
+                    register u32 f8 asm("r0") = 8;
+                    f8 &= flags;
+                    if (f8)
+                        b->timer = savedDuration;
                     else
-                        a->frame = a->count - 1;
+                        b->frame = b->count - 1;
                 } else
-                    a->frame = index - 1;
+                    b->frame = index - 1;
             } else {
-                u32 index = a->frame + 1;
+                u32 index = b->frame + 1;
                 u32 frameCount;
-                a->frame = index;
-                frameCount = a->count;
+                b->frame = index;
+                frameCount = b->count;
                 if ((index & mask) >= frameCount) {
                     u32 endFlag = flags & 8;
                     asm("" : "+r"(endFlag));
                     if ((u8)endFlag) {
-                        a->timer = duration;
-                        a->frame = frameCount - 1;
+                        b->timer = duration;
+                        b->frame = frameCount - 1;
                     } else
-                        a->frame = 0;
+                        b->frame = 0;
                 }
             }
-            entry = a->data + a->frame;
-            a->factor = *entry & 15;
-            a->rate = (a->factor * a->scale) >> 6;
-            if (!a->rate)
-                a->rate = 1;
+            entry = b->data + b->frame;
+            b->factor = *entry & 15;
+            {
+                u32 r = (b->factor * b->scale) >> 6;
+                b->rate = r;
+                if (!(u8)r) {
+                    register u32 one asm("r0") = 1;
+                    b->rate = one;
+                }
+            }
         }
     }
 }
-void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kind, s32 row, s32 flags)
+void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32 flagsIn)
 {
     register u8 *body asm("r9") = input;
-    u8 *actor = body;
-    u8 *profile =
-        SceneActorProfiles_GetEntryAddress(FIELD(body, 0x308, u32), FIELD(body, 0x2c4, u32), 0);
-    s32 i;
+    struct {
+        s32 kind, flags;
+        u8 *actor, *profile;
+        s32 i;
+    } frame;
+    s32 row;
     register s32 offset asm("r10");
     struct SegmentAnim *a;
     register struct Segment *s asm("r8");
-    i = 0;
-    if (i >= FIELD(body, 0x8da, s16))
+    frame.kind = kindIn;
+    row = rowIn;
+    frame.flags = flagsIn;
+    frame.actor = body;
+    frame.profile =
+        SceneActorProfiles_GetEntryAddress(FIELD(body, 0x308, u32), FIELD(body, 0x2c4, u32), 0);
+    frame.i = 0;
+    if (frame.i >= FIELD(body, 0x8da, s16))
         return;
     offset = 0;
     a = (void *)(body + 0x4c4);
-    s = (void *)(body + 0x3d4);
+    {
+        register u32 t asm("r3") = 0x3d4;
+        asm("" : "+r"(t));
+        t += (u32)body;
+        s = (void *)t;
+    }
     do {
-        asm("" : "+m"(i));
-        if (!TestMask(a, 1)) {
-            if (TestMask(a, 4)) {
-                Anim_RestartSequence(a, ScriptAt(body, offset), 1, row, flags);
+        if (!TestMask4(a, 1)) {
+            if (TestMask2(a, 4)) {
+                Anim_RestartSequence(a, ScriptAt(body, offset), 1, row, ({
+                                         register s32 t asm("r2") = frame.flags;
+                                         u32 u = (u8)t;
+                                         asm("" ::"r"(t));
+                                         u;
+                                     }));
             } else {
-                Anim_RestartSequence(a, ScriptAt(body, offset), profile[kind * 4], row, flags);
-                Anim_SetDurationScale(a, FIELD(actor, 0x2c2, u16));
+                s32 four = 4;
+                Anim_RestartSequence(a, ScriptAt(body, offset),
+                                     *(u8 *)(({
+                                                 register s32 k asm("r2") = frame.kind;
+                                                 register s32 x asm("r0") = k * four;
+                                                 x;
+                                             }) +
+                                             (u32)({
+                                                 register u8 *pr asm("r3") = frame.profile;
+                                                 pr;
+                                             })),
+                                     row, ({
+                                         register s32 t asm("r4") = frame.flags;
+                                         u32 u = (u8)t;
+                                         asm("" ::"r"(t));
+                                         u;
+                                     }));
+                {
+                    register u8 *act asm("r1") = frame.actor;
+                    register u16 *ad asm("r0");
+                    asm("" : "+r"(act));
+                    ad = (u16 *)(act + 0x2c2);
+                    asm("" : "+r"(ad));
+                    Anim_SetDurationScale(a, *ad);
+                }
             }
             Step(a, s);
         }
-        offset += 0x128;
-        a = (void *)((u8 *)a + 0x128);
-        s = (void *)((u8 *)s + 0x128);
-    } while (++i < FIELD(body, 0x8da, s16));
+        {
+            register u32 step asm("r1") = 0x128;
+            asm("" : "+r"(step));
+            offset += step;
+            a = (void *)((u8 *)a + step);
+            s = (void *)((u8 *)s + step);
+        }
+    } while (({
+                 register s32 t asm("r2") = frame.i + 1;
+                 frame.i = t;
+                 t;
+             }) < ({
+                 register u32 d asm("r1");
+                 s32 cnt;
+                 asm("" : "=r"(d));
+                 cnt = FIELD(body, 0x8da, s16);
+                 asm("" ::"r"(d));
+                 cnt;
+             }));
 }
 
 #else
