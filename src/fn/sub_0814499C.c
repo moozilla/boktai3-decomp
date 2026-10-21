@@ -4,7 +4,7 @@
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetActionPhase(struct Player *, u8);
 s32 Player_CanSpendSharedResource(struct Player *, s32);
-s32 sub_08162BE4(void *, struct SceneVec *);
+s32 PlayerBarrier_TryPlace(void *, struct SceneVec *);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Sound_PlaySong(u32);
@@ -22,7 +22,7 @@ void Player_UpdateActionEffectSequence(struct Player *p)
     switch (p->tetherPhase) {
         case 0:
             if (Player_SetAnimation(p, 0x8B, 64, 1)) {
-                if (!sub_08162BE4(p->actionRequestEffect, &p->position))
+                if (!PlayerBarrier_TryPlace(p->actionRequestEffect, &p->position))
                     Sound_PlaySong(0x192);
                 else {
                     Sound_PlaySong(0xD0);
