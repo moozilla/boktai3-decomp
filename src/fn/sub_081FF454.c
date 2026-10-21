@@ -101,7 +101,7 @@ static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 s
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&p->sequence, p->resource, sequence, flips[0], *saved);
+    Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
 }
 
 static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
@@ -111,7 +111,7 @@ static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
     params->angle = Math_Atan2(player->x - position->x, player->z - position->z);
 }
 
-// fuzzy: 89.9%
+// fuzzy: 93.3%
 u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
 {
     struct HomingParams *params = &p->params;
@@ -131,8 +131,10 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 Face(p, params, sequence);
             }
             break;
-        case 1:
-            if (p->lifetime > slot * 30 + 30 + p->params.delay) {
+        case 1: {
+            u16 *delay = &p->params.delay;
+            s32 limit = slot * 30 + 30;
+            if (p->lifetime > limit + *delay) {
                 Aim(p, params);
                 sequence = params->variant == 0 ? 10 : 6;
                 p->sequence.flags |= 8;
@@ -140,6 +142,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 p->state = 2;
             }
             break;
+        }
         case 2:
             if (params->variant == 0) {
                 if (p->sequence.index != 5)
@@ -201,8 +204,9 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             if (p->lifetime & 1)
                 SpawnTrail(p);
             {
+                s32 limit = slot * 30;
                 u32 elapsed = p->lifetime - 200;
-                p->sprite.position.y = p->target.y - (30 - (slot * 30 - elapsed)) * 2;
+                p->sprite.position.y = p->target.y - (30 - (limit - elapsed)) * 2;
             }
             if (Sprite_BlinkUntilExpired(&p->sprite, p->blinkTimer, 0x2d, 0x5a))
                 return 1;
