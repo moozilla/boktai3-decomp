@@ -1,8 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 81.2%
-// foundry draft (worker best 81.2%); what differs is mostly register allocation and instruction order
 #define gEffectSineTable gUnk_086149C4
 struct EffectVector {
     s16 x, y, z, pad;
@@ -37,7 +35,7 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedEffect *effect)
     struct EffectVector diff;
     s32 i, dx, dy, dz, z, x;
     struct EffectArcNode *node;
-    struct EffectVector *d;
+    register struct EffectVector *d asm("r0");
     SubVector(&diff, effect->end, effect->start);
     i = 0;
     d = &diff;
@@ -63,6 +61,3 @@ void PositionedEffect_InterpolateArcNodes(struct PositionedEffect *effect)
         x += dx;
     } while (++i <= 5);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PositionedEffect_InterpolateArcNodes);
-#endif
