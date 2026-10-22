@@ -51,6 +51,8 @@ address,evidence
 0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 0802D014,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0802D05C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0802D0F4,Actor animation entry by four-way facing byte 0x180 with mirrored flip; first of two functions in the raw 0802D0F4-0802D1B0 span
+0802D15C,Actor animation entry using facing byte 0x180 directly (flip when above 1); part of the raw 0802D0F4-0802D1B0 span
 0802D960,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0802DB14,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0802DB18,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
