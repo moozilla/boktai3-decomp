@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+#define Axe_EmitMotionTrail sub_080FBA38
 #ifdef NONMATCHING
 // fuzzy: 81.8%
 // Remaining differences: sequence setup, field-access order, and register allocation.
@@ -145,5 +146,5 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Axe_EmitMotionTrail);
+INCLUDE_ASM("asm/nonmatching", sub_080FBA38);
 #endif
