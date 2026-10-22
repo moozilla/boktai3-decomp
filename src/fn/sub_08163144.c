@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.2%
-// foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
 struct TransitionPanelSprite {
     u32 flags;
     u8 unknown4[3], priority, scaleX, scaleY, unknownA[6];
@@ -26,38 +23,24 @@ void Sprite_InitUnlinked(void *, void *, s32);
 void TransitionPanel_InitSprites(struct TransitionPanel *p)
 {
     s32 i;
-    s32 x;
     struct TransitionPanelSprite *sprite;
     p->extentA = 1;
     p->extentB = 1;
-    i = 0;
-    sprite = p->sprites;
-    {
-        u8 *animation = sprite->animation;
-        struct TransitionPanelSprite *drawable = sprite;
-        x = 56;
-        do {
-            sprite->baseX = x;
-            sprite->baseY = 72;
-            if (i > 3)
-                sprite->baseX += 16;
-            AnimData_Load(animation, 0x654B);
-            Sprite_InitUnlinked(drawable, animation, 0);
-            sprite->priority = 0;
-            sprite->flags = 0x1033;
-            sprite->x = sprite->baseX;
-            sprite->y = sprite->baseY;
-            sprite->scaleX = p->extentA;
-            sprite->scaleY = p->extentB;
-            sprite->frame = i;
-            sprite++;
-            animation += 0x50;
-            drawable++;
-            x += 16;
-            i++;
-        } while (i < 8);
+    for (i = 0; i < 8; i++) {
+        s32 x = i * 16 + 56;
+        sprite = &p->sprites[i];
+        sprite->baseX = x;
+        sprite->baseY = 72;
+        if (i > 3)
+            sprite->baseX += 16;
+        AnimData_Load(sprite->animation, 0x654B);
+        Sprite_InitUnlinked(sprite, sprite->animation, 0);
+        sprite->priority = 0;
+        sprite->flags = 0x1033;
+        sprite->x = sprite->baseX;
+        sprite->y = sprite->baseY;
+        sprite->scaleX = p->extentA;
+        sprite->scaleY = p->extentB;
+        sprite->frame = i;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TransitionPanel_InitSprites);
-#endif
