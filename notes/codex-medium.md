@@ -4278,3 +4278,9 @@ as useful drafts; no byte-exact or fuzzy progress is claimed for them.
   pairs, and optional TargetRegistry event registration. The already-drafted
   Sword_InitAttackComponents provides a stepper idiom but does not cover this
   initializer's distinct body/script/collider setup. No partial C promoted.
+
+Recording caveat: after adding local aliases to already-canonical function
+names, check.py --nonmatching --record compared the correct `sub_` function but
+did not rewrite the old fuzzy comment in 080A11F4/080F6F90. Updated those two
+comments to the printed reviewed-extent 89.0%/85.0% results and reran the same
+--record checks. The final committed comments match the checker output.
