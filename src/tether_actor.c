@@ -1396,10 +1396,6 @@ done:
     return r;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 87.6%
-// Remaining: register allocation (position should be r5, dx r6, and the map pointer reused by
-// the first corner cell should be in sl).
 #define NEAR_CELL(out, px, pz)                                                                     \
     do {                                                                                           \
         s32 cx_ = (px) >> 8;                                                                       \
@@ -1439,6 +1435,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     s32 dz;
     s32 own;
     s32 other = 0;
+    struct EngineMap *map;
     s32 height;
     s32 diff;
     u32 state;
@@ -1472,8 +1469,9 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     }
     if (own == other)
         goto yes;
-    if (own == other + 1 || own == other - 1 || own == other + ((s16 *)gUnk_030052F4->cells)[2] ||
-        own == other - ((s16 *)gUnk_030052F4->cells)[2]) {
+    if (own == other + 1 || own == other - 1 ||
+        own == other + ((s16 *)(map = gUnk_030052F4)->cells)[2] ||
+        own == other - ((s16 *)map->cells)[2]) {
         diff = position->y - gUnk_02000488->position.y;
         if (diff < 0)
             diff = -diff;
@@ -1491,7 +1489,12 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     corner.v.z = position->z;
     {
         struct ContactPackedVector *cp = &corner.v;
-        NEAR_CELL(own, cp->x, cp->z);
+        s32 cx = cp->x >> 8;
+        s32 cz = cp->z >> 8;
+        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+            own = 0;
+        else
+            own = map->rows[cz] + cx;
         NEAR_HEIGHT(height, cp, own);
     }
     diff = position->y - height;
@@ -1514,12 +1517,6 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
 no:
     return 0;
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", TetherActor_TestNearbyInteraction);
-
-#endif
 
 void TetherActor_SetInteractionTarget(struct ContactPosition *a, u32 b)
 {
