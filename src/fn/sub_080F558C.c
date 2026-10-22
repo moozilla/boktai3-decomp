@@ -21,7 +21,7 @@ struct Obj {
     u8 done, pad18C, byte1DD;
 };
 s32 Div(s32, s32);
-void sub_080F5620(struct Obj *);
+void Sword_AccelerateReturnTurn(struct Obj *);
 void Sword_UpdateThrustRetraction(struct Obj *p)
 {
     p->x = p->startX + Div(p->dx * p->timer, 20);
@@ -30,6 +30,6 @@ void Sword_UpdateThrustRetraction(struct Obj *p)
     p->timer--;
     if (p->timer == 0) {
         p->done = 1;
-        p->callback = sub_080F5620;
+        p->callback = Sword_AccelerateReturnTurn;
     }
 }

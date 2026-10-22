@@ -5,7 +5,7 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u8 sub_080E7FF4(void *);
-u8 sub_080E80BC(void *);
+u8 Mimic_TryPursuitRoute(void *);
 s32 Math_Atan2(s32, s32);
 void ActorShadow_Enable(void *);
 extern const s16 gUnk_086149C4[];
@@ -60,6 +60,10 @@ static inline u8 TakeFlag(u8 *flag)
     return 0;
 }
 
+static inline void RouteDelta(struct ContactPosition *out, struct ContactPosition *from, u8 *group)
+{
+    Delta(out, from, (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+}
 static inline u8 HasMode(u8 *p)
 {
     u32 mask = 1;
@@ -69,7 +73,7 @@ static inline u8 HasMode(u8 *p)
 }
 #ifdef NONMATCHING
 // fuzzy: 95.7%
-// Remaining differences: instruction ordering and register allocation.
+// Remaining differences: heading/vector loads, context offset allocation and pointer reload.
 // confidence=low: generic scene actor leap; species ownership is not established.
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
@@ -84,7 +88,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
                 SceneActor_ResetCollisionReaction(actor);
                 return;
             }
-        } else if (!sub_080E80BC(actor->context))
+        } else if (!Mimic_TryPursuitRoute(actor->context))
             return;
         CellCenter(&point, actor->terrainCell);
         Delta(&point, &actor->position, &point);
@@ -114,11 +118,11 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             Delta(&delta, &actor->position, &point);
             speed = 4;
         } else {
-            Delta(&delta, &actor->position,
-                  (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+            RouteDelta(&delta, &actor->position, group);
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
             {
-                u32 random = gUnk_0203B400[gUnk_03005308];
+                u32 offset = gUnk_03005308 * 2;
+                u32 random = *(u16 *)(offset + (u32)gUnk_0203B400);
                 s32 base = context[0x65E] - 2;
                 speed = base + (random & 3);
             }

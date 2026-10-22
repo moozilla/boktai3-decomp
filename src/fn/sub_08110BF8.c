@@ -27,8 +27,8 @@ void TilemapPanel_DrawRegion(struct TilemapPanel *p, s32 col, s32 row, s32 x0, s
     for (y = y0; y < y1; y++) {
         s32 rowOff = p->width * y;
         for (x = x0; x < x1; x++) {
-            TileRows_CopyPackedRows(&screen[index], p->map[x + rowOff], offset, firstRow,
-                                    cellWidth, cellHeight, p->tileData);
+            TileRows_CopyPackedRows(&screen[index], p->map[x + rowOff], offset, firstRow, cellWidth,
+                                    cellHeight, p->tileData);
             index += cellWidth;
         }
         index = base + (y + 1) * 128;

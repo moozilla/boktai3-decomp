@@ -1,20 +1,22 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
+// confidence=low: refreshes the nearby route heading after the context cooldown expires.
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// Remaining difference: cmp uses r0 rather than the r7 copy of the counter.
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *);
 void SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *);
 
 s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
 {
-    register struct SceneActorRegistryResetView *actor asm("r6") = arg;
+    struct SceneActorRegistryResetView *actor = arg;
     struct SceneActorControlState **slot = &((struct SceneActorControlPhaseView *)actor)->control;
-    register u16 *counter asm("r5") = (u16 *)((u8 *)*slot + 0x6D4);
-    register u16 v asm("r0") = *counter;
-    register u16 saved asm("r7") = v;
-    asm("" : "+r"(v));
+    register u8 *context asm("r0") = (u8 *)*slot;
+    register u16 *counter asm("r5");
+    u32 v;
+    u32 saved;
+    counter = (u16 *)(context + 0x6D4);
+    v = *counter;
+    saved = v;
+    asm("" : "+r"(v), "+r"(saved));
     if (saved) {
         *counter = v - 1;
         return 0;
@@ -35,6 +37,3 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
     SceneActor_StartAdjacentCellRoute(actor);
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BouncingObject_RefreshNearbyHeading);
-#endif

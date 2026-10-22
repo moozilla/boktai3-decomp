@@ -15,7 +15,7 @@ struct ProximityProjectileEmitter {
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void Combat_SpawnDirectionalProjectile(struct ProximityProjectileEmitter *, u8);
-void sub_0820FD54(struct ProximityProjectileEmitter *);
+void PinkSpine_RecordDefeat(struct ProximityProjectileEmitter *);
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,
                                                              const struct ContactPosition *, s32,
                                                              u32, u32, u32, u32, u32, u32, u32, u32,
@@ -59,7 +59,7 @@ u32 ProjectileEmitter_EmitAttackFrame(struct ProximityProjectileEmitter *p)
                 Combat_SpawnDirectionalProjectile(p, p->frame - 1);
         }
         if (p->frame == 9)
-            sub_0820FD54(p);
+            PinkSpine_RecordDefeat(p);
     }
     return 0;
 }

@@ -3,7 +3,7 @@
 
 #ifdef NONMATCHING
 // fuzzy: 95.2%
-// Remaining differences: zero register in the shared exit tail and the end-path stores.
+// Remaining differences: early counter-offset lifetime and state-zero address scheduling.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -147,17 +147,8 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     o = 0x270;
     asm("" : "+r"(o));
     if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + o))) {
-        u8 *q = (u8 *)actor + 0x2a8;
-        {
-            register u32 z asm("r1") = 0;
-            asm("" : "+r"(z));
-            zero = z;
-        }
-        *q = zero;
-        *((u8 *)actor + 0x2a9) = zero;
-        *((u8 *)actor + 0x2aa) = zero;
-        o += 0x3c;
-        goto tail;
+        State0(actor);
+        return;
     }
     if (*(s16 *)(body + 0x8D6) <= 0)
         *(s16 *)(body + 0x8D6) = 1;
@@ -179,18 +170,8 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     }
     TentacleActor_UpdateOscillation(actor, 120, 10);
     if ((s32)actor->counter2AC > 800) {
-        u32 two = 2;
         TentacleActor_SelectWanderRoute(actor);
-        zero = 0;
-        actor->state2A8 = zero;
-        actor->phase2A9 = zero;
-        actor->behavior2AA = two;
-        o = 0x2a9;
-        asm("" : "+r"(o));
-        o += 3;
-    tail:
-        *(u32 *)((u8 *)actor + o) = zero;
-        actor->field2B1 = 1;
+        State2(actor);
     } else
         actor->counter2AC++;
 }

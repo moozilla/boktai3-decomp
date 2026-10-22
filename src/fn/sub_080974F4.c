@@ -2,9 +2,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.1%
-// foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
 #define gSceneActorSineTable gUnk_086149C4
 extern u16 gUnk_02000534, gUnk_02000500;
 extern const s16 gUnk_086149C4[];
@@ -23,6 +20,7 @@ static inline s32 ScaleWave(s32 wave)
         return wave >> 12;
     return -(-wave >> 12);
 }
+// MATCHING_CONCESSION: register-pinning
 void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
 {
     struct ActorHeightOscillation *state = actor->context;
@@ -36,18 +34,27 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
     else
         offset = 220;
     if (actor->field2B5 == 0x23) {
-        s32 target = gUnk_02000580[0]->position.y;
-        target += offset;
-        EaseHeight(&actor->position.y, target);
+        register s32 playerY asm("r0") = gUnk_02000580[0]->position.y;
+        register s32 target asm("r1");
+        s16 *height;
+        asm("" : : "r"(playerY));
+        target = playerY + offset;
+        asm("" : : "r"(target));
+        height = &actor->position.y;
+        *height += Div(target - *height, 10);
     } else {
         s32 wave = gUnk_086149C4[state->angle] << 5;
         s32 delta;
         delta = ScaleWave(wave);
-        delta = delta + (gUnk_02000580[0]->position.y + offset);
+        {
+            register s32 base asm("r0") = gUnk_02000580[0]->position.y + offset;
+            register s32 sum asm("r1");
+            asm("" : : "r"(base));
+            sum = base + delta;
+            asm("" : : "r"(sum));
+            delta = sum;
+        }
         EaseHeight(&actor->position.y, delta);
         state->angle += 2;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_EasePlayerHeight);
-#endif

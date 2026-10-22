@@ -1,7 +1,8 @@
 #include "rotation_phase.h"
-// confidence=low: launches toward the player and brakes sprite rotation on arrival.
 #ifdef NONMATCHING
-// fuzzy: 84.5%
+// fuzzy: 85.9%
+// Remaining: player-vector argument order, flags pointer lifetime, rotation scratch and phase-tail scheduling.
+// confidence=low: launches toward the player and brakes sprite rotation on arrival.
 #define F(p, o, t) (*(t *)((u8 *)(p) + (o)))
 extern u8 *gUnk_02000580;
 s32 Div(s32, s32);
@@ -22,13 +23,24 @@ static inline s32 Shift(s32 v)
 {
     return v >= 0 ? v >> 6 : -(-v >> 6);
 }
+static inline void BeginControl(struct SceneActorRegistryResetView *a, void *callback, u8 phase)
+{
+    u32 zero = 0;
+    a->field2B2 = 1;
+    a->field2B0 = zero;
+    a->field2B5 = phase;
+    a->target = callback;
+    a->field2C8 = zero;
+    a->flags114 &= ~1;
+    a->word104 = zero;
+}
 void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *state = a->context;
     struct RotatingDrawable *sprite = a->drawable;
     u8 entered = SceneActorControl_TakeFlag(&a->field2B2);
-    u32 *flags = &a->flags2D0;
     s32 angle;
+    u32 *flags = &a->flags2D0;
     if (entered) {
         struct ContactPosition delta;
         sprite->flags |= 2;
@@ -70,22 +82,13 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
     if (*flags & 0x10) {
         u32 zero = 0;
         state[0xED1] = 1;
-        a->field2B2 = 1;
-        a->field2B0 = zero;
-        a->field2B5 = 0x33;
-        a->target = SceneActorControl_FinishRotation;
-        a->field2C8 = zero;
-        {
-            u32 *p = &a->flags114;
-            u32 mask = ~1;
-            *p &= mask;
-        }
-        a->word104 = zero;
+        BeginControl(a, SceneActorControl_FinishRotation, 0x33);
         F(state, 0xE4C, u32) &= ~0x800;
         state[0xEB2] = 64;
         sub_080FC094(a, 14);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Axe_UpdateTargetLunge);
 #endif

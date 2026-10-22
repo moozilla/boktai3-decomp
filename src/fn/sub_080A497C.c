@@ -1,8 +1,15 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.2%
-// foundry draft (worker best 80.2%); what differs is mostly register allocation and instruction order
+static inline u32 TestResponse(struct SceneActorRegistryResetView *p)
+{
+    register u32 off asm("r2") = 0x2DC;
+    register u32 *field asm("r0");
+    asm("" : "+r"(off));
+    field = (void *)((u8 *)p + off);
+    asm("" : "+r"(field));
+    return *field & 0x40000;
+}
 s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView *p)
 {
     u32 offset;
@@ -10,14 +17,18 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
     u32 zero;
     u8 byteZero;
     u32 one;
-    u16 stateOffset;
+    register u32 stateOffset asm("r2");
     if (p->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x112);
-    if (p->field2DC & 0x40000) {
-        u32 mask = 32;
-        u16 *flags = &p->flags2D4;
+    if (TestResponse(p)) {
+        register u32 mask asm("r0") = 32;
+        register u32 off asm("r3") = 0x2D4;
+        register u16 *flags asm("r2");
+        asm("" : "+r"(off));
+        flags = (void *)((u8 *)p + off);
+        asm("" : "+r"(flags), "+r"(mask));
         mask |= *flags;
         *flags = mask;
     }
@@ -35,9 +46,11 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
         *((u8 *)p + offset) = kind;
         p->target = (void *)control;
         {
-            u16 *field;
-            u16 halfOffset = 0x2C8;
+            register u16 *field asm("r0");
+            register u32 halfOffset asm("r2") = 0x2C8;
+            asm("" : "+r"(halfOffset));
             field = (u16 *)((u8 *)p + halfOffset);
+            asm("" : "+r"(field));
             byteZero = 0;
             *field = zero;
         }
@@ -48,20 +61,28 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
         }
         p->word104 = zero;
         {
-            u8 state = 3;
+            register u32 state asm("r1") = 3;
             u32 stateOffset2;
-            u32 phaseOffset;
+            register u32 phaseOffset asm("r1");
+            asm("" : "+r"(state));
             stateOffset = 0x2A8;
             *((u8 *)p + stateOffset) = state;
+            asm("" : "+r"(stateOffset));
             phaseOffset = 0x2A9;
+            asm("" : "+r"(phaseOffset));
             *((u8 *)p + phaseOffset) = byteZero;
             stateOffset += 2;
-            *((u8 *)p + stateOffset) = byteZero;
+            {
+                register u8 *field asm("r0") = (u8 *)p + stateOffset;
+                asm("" : "+r"(field));
+                *field = byteZero;
+            }
             offset = 0x2AC;
             *(u32 *)((u8 *)p + offset) = zero;
             phaseOffset += 8;
             {
-                u8 *field = (u8 *)p + phaseOffset;
+                register u8 *field asm("r0") = (u8 *)p + phaseOffset;
+                asm("" : "+r"(field));
                 *field = one;
             }
         }
@@ -80,6 +101,3 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_BeginDefaultResponse);
-#endif

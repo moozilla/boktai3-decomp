@@ -78,7 +78,7 @@ void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void sub_081198F8(void *);
+void Glove_UpdateRestingMotion(void *);
 extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
 
@@ -164,7 +164,7 @@ void Glove_UpdateRecoilReturn(struct Glove *p)
     if (complete == 1) {
         Trigger_ConsumePending((u8 *)p + 0x870, 1);
         {
-            void (*callback)(void *) = sub_081198F8;
+            void (*callback)(void *) = Glove_UpdateRestingMotion;
             u8 *active = &p->active;
             u32 zero = 0;
             *active = complete;

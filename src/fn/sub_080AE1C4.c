@@ -5,7 +5,7 @@
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
-u8 sub_080B54DC(void *);
+u8 Vorn_HasActiveResponse(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 static inline s32 Quarter(s32 n)
 {
@@ -177,7 +177,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
             s32 mask = ~0x1E;
             *f &= mask;
         }
-        if (sub_080B54DC(actor->context)) {
+        if (Vorn_HasActiveResponse(actor->context)) {
             SetMotion((void *)&actor->fieldDC, 8);
             {
                 u32 mask = 0x80;

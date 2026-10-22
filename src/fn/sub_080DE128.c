@@ -3,7 +3,7 @@
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
-void sub_080DF400(void *);
+void Dog_SelectRetreatOrChase(void *);
 static inline u8 Flag(u8 *context, u32 mask)
 {
     if (FIELD(context, 0x678, u32) & mask)
@@ -100,10 +100,10 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
         }
         if (!FarFlag(context, 8)) {
         move:
-            sub_080DF400(actor);
+            Dog_SelectRetreatOrChase(actor);
         }
     } else {
         if (!OutsideFlag(context, 8))
-            sub_080DF400(actor);
+            Dog_SelectRetreatOrChase(actor);
     }
 }
