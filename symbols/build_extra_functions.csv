@@ -24,6 +24,7 @@ address,isa,evidence,replacement_end
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
 080164AC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080164B8
 08017264,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08017270
+08017428,thumb,Weather manager presence check: TRUE when gUnk_02000090 is set; raw span after the scanline wave allocator,08017444
 08018F2C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08018F38
 08019C64,thumb,Independent animation-frame wrapper in byte tail; exact C body,08019C9C
 08019E2C,thumb,Independent pool removal wrapper in byte tail; exact C body,08019E58
