@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct State {
     u8 pad0[15];
     u8 fresh;
@@ -63,11 +62,14 @@ static inline void setCallbackB(struct Actor *p, void *fn)
 int MessageWindow_Clear(void)
 {
     struct Actor *p = gUnk_020000DC;
-    register int result asm("r0");
-    if (p)
+    int result;
+    if (p) {
         goto run;
+    }
     result = 0;
-    goto done;
+done:
+    return result;
+
 run:
     result = TextWindow_BlankRect(p->x, p->y, p->width, p->height);
     {
@@ -83,6 +85,4 @@ run:
     }
     p->render.flags |= 1;
     p->wait = 65535;
-done:
-    return result;
 }
