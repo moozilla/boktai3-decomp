@@ -1,8 +1,8 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 84.4%
-// Sprite list cull/draw, unscaled variant of Sprite_RenderScaledList; only p (r4) and left (r5) are swapped.
+// Sprite list cull/draw, unscaled variant of Sprite_RenderScaledList.
+// The nested do/while(0) around the list-head load (likely a macro in the
+// original) is what gives p its register.
 struct Vec {
     s16 x, y, z;
 };
@@ -42,10 +42,12 @@ void sub_08214D20(void)
         skip = 0x201;
     }
     do {
-        p = gUnk_030042C0[gUnk_03004290];
-        if (!p) {
-            return;
-        }
+        do {
+            p = gUnk_030042C0[gUnk_03004290];
+            if (!p) {
+                return;
+            }
+        } while (0);
     } while (0);
     do {
         s32 x;
@@ -82,6 +84,3 @@ void sub_08214D20(void)
         p = p->next;
     } while (p);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08214D20);
-#endif
