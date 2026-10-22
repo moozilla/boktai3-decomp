@@ -1,14 +1,13 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern void ActorShadow_Disable(void *);
 extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 extern void Golem_UpdateRevival(void);
-#ifdef NONMATCHING
-// fuzzy: 89.5%
-// Remaining difference: flag pointer is copied to r6 after the load in the original; scratch register choice for the shadow offset.
-static inline u8 take6030(u8 *flag)
+#define Golem_UpdateRevivalReturn sub_080C5F60
+static inline u8 take6030(u8 *flag, u8 **held)
 {
-    if (*flag) {
+    u32 value = *flag;
+    *held = flag;
+    if (value) {
         *flag = 0;
         return 1;
     }
@@ -25,7 +24,7 @@ struct Part6030 {
 void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
 {
     u32 queued;
-    register u8 *flag asm("r6");
+    u8 *flag;
     {
         u32 mask = 1;
         if (s[8] == 0) {
@@ -39,7 +38,7 @@ void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
             part->flags = value | mask;
         }
     }
-    queued = take6030(flag = s + 0x2B2);
+    queued = take6030(s + 0x2B2, &flag);
     if (queued) {
         ActorShadow_Disable(s + 0x320);
     } else if (arg > 0x1A) {
@@ -63,6 +62,3 @@ void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
         s[0x2B3] = queued;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Golem_UpdateRevivalReturn);
-#endif
