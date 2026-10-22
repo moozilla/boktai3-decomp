@@ -99,6 +99,7 @@ static inline u8 SaveFlag(u32 mask)
     return 0;
 }
 // confidence=low: coordinates Ghost visibility transitions with player reveal state.
+#define Ghost_UpdateVisibility sub_08098788
 u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorRegistryResetView *saved = a;
@@ -179,5 +180,5 @@ finish:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Ghost_UpdateVisibility);
+INCLUDE_ASM("asm/nonmatching", sub_08098788);
 #endif
