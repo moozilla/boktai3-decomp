@@ -5,8 +5,8 @@
 #define Ghoul_UpdateDisplacementRecovery sub_08089168
 
 #ifdef NONMATCHING
-// fuzzy: 98.3%
-// Four differing bytes: zero-scratch registers in the two signed source loads.
+// fuzzy: 99.1%
+// Two differing bytes: zero-scratch register in the first signed source load.
 void SparkParticle_Spawn(void *, u32, void *, u32, u32, u32, u32, u32);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -73,6 +73,7 @@ static inline s32 AxisDelta(struct SceneActorRegistryResetView *actor, u32 offse
             register s16 *address asm("r0") = (void *)((u8 *)actor + sourceOffset);
             asm("" : "+r"(address));
             source = *address;
+            asm("" : : "r"(sourceOffset));
         }
     }
     if (offset == 0x310) {
