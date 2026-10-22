@@ -125,5 +125,5 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808EC80);
+INCLUDE_ASM("asm/nonmatching", Slime_ConvergeReactionMotion);
 #endif
