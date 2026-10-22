@@ -648,7 +648,9 @@ address,evidence
 0821E840,Hidden raw-tail function
 0821F0C4,Path dispatcher by mode (switch over Path_Snap* helpers) hidden after Path_SnapToRandomPointInBox literal pool
 0821F838,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
+0821FC34,8-way variant of the nav probe steering (sub_0821FB8C) hidden after it
 0821FF34,Hidden raw-tail function
+0822032C,Collider contact-normal helper (3-way switch on hit side) hidden after sub_08220204
 082207DC,Hidden tail after Collider_TestSegmentBounds
 08220D6C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08220E6C,Hidden raw-tail function: sets an animation frame inside a sequence
