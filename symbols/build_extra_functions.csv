@@ -493,10 +493,12 @@ address,isa,evidence,replacement_end
 082264B0,thumb,Hidden raw-tail function,082264D0
 08226528,thumb,Hidden raw-tail function,08226558
 082265D8,thumb,Hidden raw-tail function,082265F8
+0822797C,thumb,Hidden raw-tail function,082279A8
 08227F3C,thumb,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227FEC,thumb,Hidden raw-tail function (retained),
+082280F8,thumb,Hidden raw-tail function,08228130
 082281C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082281CC
 082281F0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082281FC
 08228234,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08228240
@@ -513,14 +515,24 @@ address,isa,evidence,replacement_end
 082290D0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290DC
 082290E8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290F4
 08229424,thumb,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md,
+0822B4B8,thumb,Hidden raw-tail function,0822B4E8
+0822B578,thumb,Hidden raw-tail function,0822B584
+0822B584,thumb,Hidden raw-tail function,0822B590
+0822B760,thumb,Hidden raw-tail function,0822B788
 0822BD58,thumb,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md,0822BDB8
+0822BE60,thumb,Hidden raw-tail function,0822BE78
 0822BEE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822BEE4
 0822C110,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C154,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C180,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C18C,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
+0822D650,thumb,Hidden raw-tail function,0822D688
+0822D6EC,thumb,Hidden raw-tail function,0822D704
 0822D730,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822D734
 0822D734,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0822D740
+0822DB2C,thumb,Hidden raw-tail function,0822DB54
+0822E420,thumb,Hidden equipment table entry getter (retained),
+0822E43C,thumb,Hidden leaf getter without lr push (retained),
 0822E54C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0822E564
 08231438,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08231444
 08231444,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08231448

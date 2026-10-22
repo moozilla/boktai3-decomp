@@ -514,10 +514,12 @@ address,evidence
 082264B0,Hidden raw-tail function
 08226528,Hidden raw-tail function
 082265D8,Hidden raw-tail function
+0822797C,Hidden raw-tail function
 08227F3C,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F4C,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F58,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227FEC,Hidden raw-tail function (retained)
+082280F8,Hidden raw-tail function
 082281C0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082281F0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08228234,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -534,14 +536,24 @@ address,evidence
 082290D0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082290E8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08229424,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md
+0822B4B8,Hidden raw-tail function
+0822B578,Hidden raw-tail function
+0822B584,Hidden raw-tail function
+0822B760,Hidden raw-tail function
 0822BD58,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md
+0822BE60,Hidden raw-tail function
 0822BEE0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0822C110,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822C154,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822C180,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822C18C,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
+0822D650,Hidden raw-tail function
+0822D6EC,Hidden raw-tail function
 0822D730,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0822D734,Code following a reviewed gap leaf; retained assembly
+0822DB2C,Hidden raw-tail function
+0822E420,Hidden equipment table entry getter (retained)
+0822E43C,Hidden leaf getter without lr push (retained)
 0822E54C,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
 08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
