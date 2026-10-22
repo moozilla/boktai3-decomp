@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.1%
+// fuzzy: 96.3%
 // Open: loop register allocation (ROM sets up &field6f before the counter and
 // compares the raw/copy pair the other way round).
 
@@ -62,10 +62,8 @@ void sub_08108C94(struct SlotMonitor *obj)
         obj->ticks++;
         base = obj->peers;
         zero = 0;
-        p = base;
-        i = 3;
-        do {
-            u16 raw = *p;
+        for (i = 0; i < 4; i++) {
+            u16 raw = base[i];
             s32 v = raw;
             if (v != 0xFFFF) {
                 if (first) {
@@ -83,9 +81,7 @@ void sub_08108C94(struct SlotMonitor *obj)
             } else {
                 first = 0;
             }
-            p++;
-            i--;
-        } while (i >= 0);
+        }
         if (count == 2 && matches == 2) {
             obj->field38++;
             if (obj->field38 >= obj->limit)
