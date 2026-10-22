@@ -73,7 +73,7 @@ typedef struct Obj {
     u8 unk3CC;
 } Obj;
 void ActorShadow_Enable(void *);
-void sub_080C4F9C(Obj *);
+void Golem_ResetCombatState(Obj *);
 void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u8 take_flag(Obj *s)
 {
@@ -113,7 +113,7 @@ void Golem_UpdateRevival(Obj *s)
     if (!peek_flag(s))
         return;
     {
-        sub_080C4F9C(s);
+        Golem_ResetCombatState(s);
         s->unk2CC = s->unk118;
         s->unk2D0 = s->unk11C;
         s->unk59 = s->unk120;

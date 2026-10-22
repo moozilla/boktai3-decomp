@@ -3,9 +3,6 @@
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Remaining difference: the route flag mask load is scheduled after the field load.
 static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
@@ -16,6 +13,10 @@ static inline u8 ContextFlags(u8 *context, u32 mask)
         return 1;
     return 0;
 }
+static inline u16 ReactionFlagMask(u16 flag)
+{
+    return flag;
+}
 void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 *group = (u8 *)&actor->group;
@@ -23,7 +24,7 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
     if (actor->field2B2)
         actor->field2B2 = 0;
     {
-        u32 mask = 16;
+        u32 mask = ReactionFlagMask(16);
         actor->flags2D6 = mask | actor->flags2D6;
     }
     if (frame <= 18)
@@ -59,7 +60,3 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
         actor->field2C2 = 32;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_ResumeRouteAfterDelay);
-#endif
