@@ -200,7 +200,6 @@ static inline void UpdateActions(struct Glove *p, u16 *flags)
     if ((!p || !(*flags & 4)) && (U32(self, 0xC) & 0x800))
         self->damageFlags |= 4;
 }
-#define Glove_UpdateStopping sub_08117948
 void Glove_UpdateStopping(struct Glove *p)
 {
     struct Obj *self = &p->motion;

@@ -1,6 +1,5 @@
 #include "scene_actor_reset.h"
 // confidence=low: animation completion restores the alternate control after a delay.
-#define Spider_UpdateHiddenRecovery sub_080A24D0
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void ScaledShadow_Enable(void *);
 void ScaledShadow_Destroy(void *);

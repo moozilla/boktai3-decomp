@@ -11,7 +11,7 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
 void Armor_OnPartStateSound(void);
-void sub_0818C6F8(void);
+void Armor_OnPartDamageCollision(void);
 struct ArmorInitA {
     u16 h0, h2, h4, h6, h8, ha, hc;
     u8 padE[0xc];
@@ -155,7 +155,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
         q->flags4E |= 4;
         Collider_Init(q->collider9C, 0, 0x5009, 0, 0x10, gUnk_0824F174, gUnk_0824F17C);
         Collider_SetBodyProperties(q->collider9C, 0x14, 0, 0);
-        Collider_SetCallback(q->collider9C, sub_0818C6F8, q);
+        Collider_SetCallback(q->collider9C, Armor_OnPartDamageCollision, q);
         Collider_Refresh(q->collider9C);
         q->flagsA2 |= 4;
     }

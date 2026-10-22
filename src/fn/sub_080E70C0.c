@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_080E7D9C(void);
+void Mimic_ResetExpiredTarget(void);
 
 s32 Mimic_UpdateReactionState(void)
 {
-    sub_080E7D9C();
+    Mimic_ResetExpiredTarget();
     return 1;
 }

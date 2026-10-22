@@ -2,7 +2,6 @@
 void Armor_InitPartOrbitTimer(void);
 void Armor_UpdatePartBobbing(void *);
 
-#define Armor_StartPartOrbitMotion sub_0818E170
 static inline u8 reset(u8 *p)
 {
     s32 one = 1;

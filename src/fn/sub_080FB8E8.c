@@ -21,7 +21,6 @@ struct AxePaletteActor {
     u8 pad[0x3d0 - 8];
     struct AxePaletteData *data;
 };
-#define Axe_InitEffectPalettes sub_080FB8E8
 void Axe_InitEffectPalettes(struct AxePaletteActor *s)
 {
     struct AxePaletteData *d = s->data;

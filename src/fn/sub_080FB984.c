@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpriteGroup_InitAnimatedSprites sub_080FB984
 #include "scene_actor_registry.h"
 
 #ifdef NONMATCHING
@@ -59,5 +58,5 @@ void SpriteGroup_InitAnimatedSprites(struct SceneActorRegistryActor *owner)
     group->phase = 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FB984);
+INCLUDE_ASM("asm/nonmatching", SpriteGroup_InitAnimatedSprites);
 #endif

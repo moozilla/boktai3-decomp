@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_animation.h"
 u32 SceneActor_GetDirectionFlags(u32);
-u8 sub_080E8444(struct SceneActorAnimationView *);
+u8 SceneActor_IsCollisionTargetUnavailable(struct SceneActorAnimationView *);
 void ActorShadow_Disable(void *);
 static inline u8 TakeFlag(u8 *flag)
 {
@@ -14,7 +14,7 @@ static inline u8 TakeFlag(u8 *flag)
 void SceneActor_EnterShadowlessPhase(struct SceneActorAnimationView *p)
 {
     if (TakeFlag(&p->directionalEntryFlag)) {
-        if (sub_080E8444(p)) {
+        if (SceneActor_IsCollisionTargetUnavailable(p)) {
             u32 flags = SceneActor_GetDirectionFlags(p->direction);
             SceneActorAnimation_SelectEntryFlags(p, 15, flags);
         } else {

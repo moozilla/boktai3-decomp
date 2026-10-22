@@ -6,7 +6,6 @@ static inline u8 Test(struct SceneActorRegistryResetView *actor, u32 mask)
     return 0;
 }
 // confidence=low: reports whether a response flag or nonnegative response distance is present.
-#define Vorn_HasActiveResponse sub_080B54DC
 u8 Vorn_HasActiveResponse(struct SceneActorRegistryResetView *context)
 {
     if (!Test(context, 1) && context->field67C < 0)

@@ -22,7 +22,7 @@ struct Obj {
 };
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
-void sub_080F4FA8(struct Obj *);
+void Sword_UpdateHorizontalWaveReturn(struct Obj *);
 void Sword_UpdateHorizontalWaveFlight(struct Obj *p)
 {
     s32 wave, position;
@@ -36,5 +36,5 @@ void Sword_UpdateHorizontalWaveFlight(struct Obj *p)
     p->z = p->startZ + Div(p->dz * p->timer, 128);
     p->timer++;
     if (p->timer > 128)
-        p->callback = sub_080F4FA8;
+        p->callback = Sword_UpdateHorizontalWaveReturn;
 }

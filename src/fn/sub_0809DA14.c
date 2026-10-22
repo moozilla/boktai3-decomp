@@ -61,7 +61,6 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     CpuSet(zero, v, 0x05000002);
 }
 // confidence=low: chooses a new route destination after the idle delay expires.
-#define Lun_ChooseDelayedDestination sub_0809DA14
 void Lun_ChooseDelayedDestination(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;

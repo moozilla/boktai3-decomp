@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
-#define Mummy_UpdateBurnDamage sub_080D812C
 #ifdef NONMATCHING
 // fuzzy: 99.9%
 // Two differing bytes: scratch register for the signed local-player index load.
@@ -432,5 +431,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D812C);
+INCLUDE_ASM("asm/nonmatching", Mummy_UpdateBurnDamage);
 #endif

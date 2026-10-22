@@ -32,7 +32,6 @@ static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2CC & mask;
 }
-#define Dog_ResetIdleControl sub_080E6848
 void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
 {
     if (Chase_TakeArrived(actor)) {

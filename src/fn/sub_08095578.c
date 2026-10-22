@@ -37,7 +37,6 @@ static inline void ColliderFlag(struct ContactCollider *c)
     c->flags |= 4;
 }
 // confidence=low: contact type 1 interrupts control and starts a linked-player reaction.
-#define Ghost_BeginContactReaction sub_08095578
 void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                                 struct SceneActorRegistryResetView *input)
 {

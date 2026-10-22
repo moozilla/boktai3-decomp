@@ -1,7 +1,6 @@
 #include "scene_actor_reset.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: selects delayed route recovery or alternate recovery after the context delay.
-#define Spider_SelectRecoveryRoute sub_080A2634
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void ScaledShadow_Enable(void *);
 void ScaledShadow_Destroy(void *);

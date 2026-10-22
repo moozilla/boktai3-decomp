@@ -4,8 +4,6 @@
 // fuzzy: 83.2%
 // Remaining: recoil address lifetimes, load scheduling, and scratch register allocation.
 
-#define Armor_OnPartDamageCollision sub_0818C6F8
-
 void Collision_CalculateDamageResponse(void *, void *);
 void AnimData_SelectPaletteBank(void *, u32);
 void Armor_UpdatePartPaletteRestore(void);
@@ -132,5 +130,5 @@ void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0818C6F8);
+INCLUDE_ASM("asm/nonmatching", Armor_OnPartDamageCollision);
 #endif

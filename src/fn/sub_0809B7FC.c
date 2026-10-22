@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 
 // confidence=low: resumes pursuit or waiting after the lifted-player penalty window.
-#define Lun_ResumeAfterLiftPenalty sub_0809B7FC
 
 #ifdef NONMATCHING
 // fuzzy: 81.8%
@@ -91,5 +90,5 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809B7FC);
+INCLUDE_ASM("asm/nonmatching", Lun_ResumeAfterLiftPenalty);
 #endif

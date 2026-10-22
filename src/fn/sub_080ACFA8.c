@@ -12,7 +12,6 @@ static inline s32 Direction(s32 value, s32 mask)
     return ((value + 0x60) >> 6) & mask;
 }
 // confidence=low: aligns idle facing with the saved route direction after animation completion.
-#define Vorn_UpdateIdleFacing sub_080ACFA8
 void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)actor + 0x50;

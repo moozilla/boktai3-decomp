@@ -1,5 +1,4 @@
 #include "global.h"
-#define Sword_DampTargetReturn sub_080F5C9C
 struct SwordReturnComponent {
     u8 pad0[6];
     u8 rotation; /* +006: wrapping orientation byte */
@@ -22,8 +21,8 @@ struct SwordReturnComponent {
     u16 pad14A;
     u16 fx, fy, fz, pad152; /* +14c: initial target-relative offset */
     u16 a, b, c, pad15A;    /* +154: phase-dependent scratch vector */
-    u16 *target; /* +15c: target position updated by the follow segment. */
-    u8 *parent; /* +160: enclosing Sword actor. */
+    u16 *target;            /* +15c: target position updated by the follow segment. */
+    u8 *parent;             /* +160: enclosing Sword actor. */
     u8 pad164[0x18];
     void (*callback)(struct SwordReturnComponent *);
     u32 unknown180;

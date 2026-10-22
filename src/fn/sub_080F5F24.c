@@ -67,7 +67,6 @@ static inline u8 reset(u8 *p)
 }
 void Ivy_BeginChildPulse(struct StretchPart *);
 // confidence=low: positions components around their parent; the resting-state role is tentative.
-#define Sword_BeginRestOrbit sub_080F5F24
 void Callback_InvokeActor(void *, void *);
 void Sword_BeginRestOrbit(struct StretchPart *p)
 {

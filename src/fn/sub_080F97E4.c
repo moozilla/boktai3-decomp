@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
-#define Axe_ConvergeRecoveryMotion sub_080F97E4
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
 void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *, s32);

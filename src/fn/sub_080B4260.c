@@ -48,7 +48,6 @@ inline static u8 TakeFlag(u8 *p)
 
 void SceneActor_TryLaunchItem13(struct S *);
 // confidence=low: launches the context item, consumes the trigger and restores saved control.
-#define Vorn_RestoreControlAfterItemLaunch sub_080B4260
 void Vorn_RestoreControlAfterItemLaunch(struct S *s)
 {
     struct S *context = s->other;

@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
-u8 sub_080B13E8(void *, void *);
+u8 Vorn_SelectUphillTurn(void *, void *);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     return a->flags2D4 & mask;
@@ -25,7 +25,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: periodically probes uphill destinations and queues a delayed route action.
-#define Vorn_TryUphillRoute sub_080B162C
 #ifdef NONMATCHING
 // fuzzy: 88.1%
 // Remaining differences: flag pointer lifetimes, mask scheduling, and reset offsets.
@@ -56,7 +55,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         return;
     point = (void *)(context + 0x6B0);
     SceneActor_SelectDistantRoutePoint(context, point, &actor->position, 0x400000);
-    if (!sub_080B13E8(context, point))
+    if (!Vorn_SelectUphillTurn(context, point))
         return;
     if (!Chase_TryRoute(actor, *(void **)(context + 0x5D0), &actor->position, point)) {
         Callback_InvokeActor(actor, *(void **)(context + 0x5F8));
@@ -83,5 +82,5 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B162C);
+INCLUDE_ASM("asm/nonmatching", Vorn_TryUphillRoute);
 #endif

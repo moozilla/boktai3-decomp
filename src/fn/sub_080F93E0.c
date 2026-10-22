@@ -1,5 +1,4 @@
 #include "scene_actor_animation.h"
-#define Axe_UpdateTurnAnimation sub_080F93E0
 #ifdef NONMATCHING
 // fuzzy: 86.0%
 // Remaining: direction arithmetic, constant derivation, address reuse and callback setup registers.
@@ -134,5 +133,5 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F93E0);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateTurnAnimation);
 #endif

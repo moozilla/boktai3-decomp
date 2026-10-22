@@ -1,5 +1,4 @@
 #include "global.h"
-#define PoisonHand_ApplyHitReaction sub_0820DC18
 #ifdef NONMATCHING
 // fuzzy: 99.0%
 // Remaining difference: first spark RNG cursor copy lands in r0 (original uses r7) and the 0x3ff mask in r7 (original r0).
@@ -148,5 +147,5 @@ void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820DC18);
+INCLUDE_ASM("asm/nonmatching", PoisonHand_ApplyHitReaction);
 #endif

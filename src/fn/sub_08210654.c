@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define PinkSpine_InitFromScript sub_08210654
 #ifdef NONMATCHING
 // fuzzy: 94.0%
 // Remaining differences: option/animation register allocation and defined success return.
@@ -8,7 +7,7 @@
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
 void ProjectileEmitter_WaitForPlayerApproach(void);
 void ProjectileEmitter_EmitAttackFrame(void);
-s32 sub_0820FF54(struct PinkSpineState *);
+s32 PinkSpine_InitCollider(struct PinkSpineState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
@@ -87,7 +86,7 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
         asm("" : : "r"(allocationToken));
     }
     if (!p->f13A)
-        sub_0820FF54(p);
+        PinkSpine_InitCollider(p);
     if (p->f138) {
         SceneBody_Init(p->body, p->f140, &p->sprite.position, 0, 4, p);
         SceneBody_SetSprite(p->body, sprite);
@@ -98,5 +97,5 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08210654);
+INCLUDE_ASM("asm/nonmatching", PinkSpine_InitFromScript);
 #endif

@@ -27,7 +27,6 @@ void ActorController_StartModeTwoTurn(void *, u32);
 void ActorController_StartModeThreeTurn(void *, u32);
 s32 DirectionalActor_TryBeginState(void *, s32);
 // confidence=low: computes an offset around the player before selecting movement or a turn.
-#define Armor_UpdateOffsetTracking sub_08185F70
 void Armor_UpdateOffsetTracking(struct ArmorTrackingActor *p, s32 mode, s32 alternate)
 {
     s32 dx = gUnk_02000710->x - p->x;

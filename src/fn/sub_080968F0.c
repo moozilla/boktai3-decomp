@@ -49,7 +49,6 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     CpuSet(zero, v, 0x05000002);
 }
 // confidence=low: after the first frame waits 60 ticks, then picks a random route point and starts moving to it.
-#define Ghost_ChooseRouteDestination sub_080968F0
 void Ghost_ChooseRouteDestination(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;

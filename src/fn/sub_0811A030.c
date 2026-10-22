@@ -59,7 +59,6 @@ static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u3
     p->callback = callback;
     p->scriptTimer = zero;
 }
-#define MotionActor_DispatchRequestedState sub_0811A030
 void MotionActor_DispatchRequestedState(struct MotionActor *actor)
 {
     register struct MotionActorState *state asm("r6");

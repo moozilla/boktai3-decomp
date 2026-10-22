@@ -5,7 +5,7 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u8 sub_080E7FF4(void *);
-u8 sub_080E80BC(void *);
+u8 Mimic_TryPursuitRoute(void *);
 s32 Math_Atan2(s32, s32);
 void ActorShadow_Enable(void *);
 extern const s16 gUnk_086149C4[];
@@ -75,7 +75,6 @@ static inline u8 HasMode(u8 *p)
 // fuzzy: 95.7%
 // Remaining differences: heading/vector loads, context offset allocation and pointer reload.
 // confidence=low: generic scene actor leap; species ownership is not established.
-#define SceneActor_LeapTowardTarget sub_080E7134
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -89,7 +88,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
                 SceneActor_ResetCollisionReaction(actor);
                 return;
             }
-        } else if (!sub_080E80BC(actor->context))
+        } else if (!Mimic_TryPursuitRoute(actor->context))
             return;
         CellCenter(&point, actor->terrainCell);
         Delta(&point, &actor->position, &point);

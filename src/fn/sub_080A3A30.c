@@ -5,7 +5,6 @@
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
-#define Spider_BeginPlayerPursuit sub_080A3A30
 extern u8 *gUnk_02000580;
 u32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
@@ -112,5 +111,5 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A3A30);
+INCLUDE_ASM("asm/nonmatching", Spider_BeginPlayerPursuit);
 #endif

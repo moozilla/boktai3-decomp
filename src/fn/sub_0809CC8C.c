@@ -2,7 +2,6 @@
 extern const u32 gUnk_08605E48[8];
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: maps the movement-curve progress to its capped eight-entry rate table.
-#define Lun_GetRouteProgressRate sub_0809CC8C
 u32 Lun_GetRouteProgressRate(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x3D0);

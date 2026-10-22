@@ -6,7 +6,6 @@ struct VornMessageActor {
     u8 *context;
 };
 // confidence=low: category messages six/seven toggle the foreign-position notification latch.
-#define Vorn_LatchForeignPosition sub_080B41A0
 void Vorn_LatchForeignPosition(struct SceneActorPlacementView *actor, const u16 *message)
 {
     if (!SceneActorPlacement_IsUnavailable(actor)) {

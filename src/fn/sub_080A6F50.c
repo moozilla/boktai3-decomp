@@ -49,7 +49,6 @@ void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
 void TentacleBody_ResetDirectionalAnimations(void *, s32);
 void TentacleBody_RefreshDirectionalAnimations(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
-#define TentacleBody_UpdateAttackRecovery sub_080A6F50
 
 void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {

@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 // confidence=low: animation-three state eases stored displacement into motion until animation completion.
-#define Ghoul_UpdateDisplacementRecovery sub_08089168
 
 #ifdef NONMATCHING
 // fuzzy: 99.1%
@@ -142,5 +141,5 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         actor->field2B0 = 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08089168);
+INCLUDE_ASM("asm/nonmatching", Ghoul_UpdateDisplacementRecovery);
 #endif

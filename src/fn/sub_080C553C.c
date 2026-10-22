@@ -3,7 +3,6 @@
 extern u32 gUnk_030053F4;
 extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
-#define Golem_OnAttackCollision sub_080C553C
 static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;

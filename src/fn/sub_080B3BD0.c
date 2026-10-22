@@ -2,7 +2,6 @@
 u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *, u32);
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryResetView *, u32);
 // confidence=low: enters directional animation three when the contact-ready flag is set.
-#define Vorn_BeginContactAnimation sub_080B3BD0
 u8 Vorn_BeginContactAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field5CA == 0 && (actor->field2E6 & 8)) {

@@ -89,7 +89,6 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     out->z = entry[1];
 }
 
-#define ActorPhase_SelectDistantWaypoint sub_080FBF4C
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_SelectDistantWaypoint);
 #endif

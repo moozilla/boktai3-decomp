@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Sword_UpdateHorizontalWaveReturn sub_080F4FA8
 struct Obj {
     u8 pad0[6];
     u8 rotation;

@@ -1,7 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define ActorContact_TickAuxiliaryTimers sub_080982E4
 
 void ActorContact_TickAuxiliaryTimers(u8 *actor)
 {

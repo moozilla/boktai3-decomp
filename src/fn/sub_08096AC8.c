@@ -8,7 +8,7 @@ extern u32 gUnk_03005308;
 void SceneActorControl_OnIdle(void *);
 void CpuSet(const void *, void *, u32);
 s32 Math_Atan2(s32, s32);
-void sub_08096000(void *);
+void Ghost_UpdateRecoilAnimation(void *);
 u8 Ghost_SelectRandomRouteEntry(void *);
 u8 sub_08097798(void *);
 void Bee_ConsumeFlag80(void *);
@@ -77,7 +77,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         u32 angle;
         u32 n;
-        Control(actor, sub_08096000, 0x24);
+        Control(actor, Ghost_UpdateRecoilAnimation, 0x24);
         Bee_ConsumeFlag80(actor);
         gUnk_03005308 = n = (gUnk_03005308 + 1) & 1023;
         angle = *(u8 *)&((const u16 *)RANDOM_TABLE_ADDR)[n];

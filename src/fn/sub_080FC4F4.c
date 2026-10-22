@@ -106,10 +106,9 @@ static inline void step(struct Frames *f, struct Render *r)
 
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
-void sub_080F7580(void);
+void Axe_LatchColliderContact(void);
 void Axe_OnSecondaryColliderContact(void);
 u32 Shadow_Initialize(void *, void *, s32);
-#define Axe_InitAttackTrail sub_080FC4F4
 void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
 {
     struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset;
@@ -147,7 +146,7 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
         Collider_Init(c, 0, 0x5001, 0, 16, &bodySize, &bodyOffset);
         Collider_SetBodyProperties(c, 0, 0, 0);
         Collider_SetPosition(c, d + 0xc88, 0);
-        Collider_SetCallback(c, sub_080F7580, d);
+        Collider_SetCallback(c, Axe_LatchColliderContact, d);
         Collider_Refresh(c);
     }
     attackSize.x = 24;
@@ -169,5 +168,5 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FC4F4);
+INCLUDE_ASM("asm/nonmatching", Axe_InitAttackTrail);
 #endif

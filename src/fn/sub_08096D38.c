@@ -128,7 +128,6 @@ static inline void SetCollider(struct ContactCollider *c)
 // fuzzy: 85.2%
 // Remaining differences: inline ordering, flag/address lifetimes, and register allocation.
 // confidence=low: follows a finite curved route, either withdrawing or moving toward the player.
-#define Ghost_AdvanceApproachRoute sub_08096D38
 void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
 {
     struct GhostRoute *route = actor->context;
@@ -191,5 +190,5 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08096D38);
+INCLUDE_ASM("asm/nonmatching", Ghost_AdvanceApproachRoute);
 #endif

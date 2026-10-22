@@ -251,7 +251,6 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     return ended;
 }
 
-#define Screamer_UpdateScream sub_0820C4D4
 s32 Screamer_UpdateScream(struct ScreamerState *p)
 {
     register s32 phase asm("r3");

@@ -8,7 +8,6 @@ static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
     asm("" : "+r"(m));
     return p->flags2D4 & m;
 }
-#define SceneActor_IsFacingNearbyTarget sub_080B335C
 
 s32 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *p)
 {

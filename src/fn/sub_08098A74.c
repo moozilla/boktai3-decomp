@@ -87,7 +87,6 @@ static inline void SaveInitialPlayer(struct ContactPosition *out, u8 **players)
 // fuzzy: 87.6%
 // Remaining differences: player-pointer copies, control-field offsets and animation-scale allocation.
 // confidence=low: follows the player's displacement while draining, then returns to idle.
-#define Ghost_FollowDrainedPlayer sub_08098A74
 void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -129,5 +128,5 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08098A74);
+INCLUDE_ASM("asm/nonmatching", Ghost_FollowDrainedPlayer);
 #endif

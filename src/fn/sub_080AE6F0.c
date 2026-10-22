@@ -5,7 +5,7 @@
 // fuzzy: 83.9%
 // Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation; caching flags reduces register differences.
 extern const u8 gUnk_0824E20C[];
-u8 sub_080B54DC(void *);
+u8 Vorn_HasActiveResponse(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_SendMessage(void *);
@@ -50,7 +50,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         s32 mask = ~10;
         *contextFlags &= mask;
     }
-    if (sub_080B54DC(context)) {
+    if (Vorn_HasActiveResponse(context)) {
         struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
         u32 mask = 8;
         u32 value = motion->flags;

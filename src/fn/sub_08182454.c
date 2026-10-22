@@ -3,7 +3,6 @@
 
 #ifdef NONMATCHING
 // fuzzy: 92.9%
-#define ActorController_SetAnimation sub_08182454
 // Remaining: side-constant scratch registers and final mode/flags argument scheduling.
 #define Armor_SetAnimation       ActorController_SetAnimation
 #define gArmorAnimationVariants  gUnk_0824EB60

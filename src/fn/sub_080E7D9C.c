@@ -22,12 +22,12 @@ static inline u16 TargetFlags(struct SceneActorRegistryResetView *actor, u32 mas
 // fuzzy: 89.8%
 // Remaining differences: retained flags pointer, zero scheduling and control offset reuse.
 // confidence=low: drops the acquired target when its response cooldown expires.
-#define Mimic_ResetExpiredTarget sub_080E7D9C
 void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags;
     u16 *timer;
-    if (!TargetFlags(actor, 0x80, &flags)) return;
+    if (!TargetFlags(actor, 0x80, &flags))
+        return;
     timer = (void *)((u8 *)actor + 0x418);
     if (!*timer && !(*flags & 0x38)) {
         struct SceneActorReactionMotion *motion;
@@ -80,5 +80,5 @@ void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E7D9C);
+INCLUDE_ASM("asm/nonmatching", Mimic_ResetExpiredTarget);
 #endif

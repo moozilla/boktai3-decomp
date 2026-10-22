@@ -5,7 +5,6 @@
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: eases landing displacement, then restores route pursuit.
-#define Spider_UpdateLandingMotion sub_080A2AEC
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void ScaledShadow_Enable(void *);
 void ScaledShadow_Destroy(void *);
@@ -181,5 +180,5 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A2AEC);
+INCLUDE_ASM("asm/nonmatching", Spider_UpdateLandingMotion);
 #endif

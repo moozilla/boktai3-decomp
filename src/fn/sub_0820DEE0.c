@@ -59,7 +59,6 @@ static inline s32 Scale(s32 x)
     return r;
 }
 // confidence=low: maintains the approach-triggered emergence animation and particle emission.
-#define PoisonHand_UpdateEmergence sub_0820DEE0
 struct Velocity {
     s16 x, y, z, pad;
 };
@@ -128,5 +127,5 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0820DEE0);
+INCLUDE_ASM("asm/nonmatching", PoisonHand_UpdateEmergence);
 #endif

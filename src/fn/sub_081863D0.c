@@ -6,13 +6,13 @@ struct E {
     u8 b;
 };
 void ActorController_UpdateTargetMovement(struct E *, s32, s32);
-void sub_08185F70(struct E *, s32, s32);
+void Armor_UpdateOffsetTracking(struct E *, s32, s32);
 void Armor_UpdateDelayedTrackingAction31(struct E *p)
 {
     if (p->b != 0) {
         p->b--;
         ActorController_UpdateTargetMovement(p, 0, 1);
     } else {
-        sub_08185F70(p, 0, 1);
+        Armor_UpdateOffsetTracking(p, 0, 1);
     }
 }

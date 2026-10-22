@@ -37,7 +37,6 @@ void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 // confidence=low: coordinates approach, aligned strike and recovery decisions.
-#define Armor_UpdateAlignedStrikeDecision sub_08189D04
 void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
 {
     register s32 dx asm("r5");
@@ -183,5 +182,5 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08189D04);
+INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedStrikeDecision);
 #endif

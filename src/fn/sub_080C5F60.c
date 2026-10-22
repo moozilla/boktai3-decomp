@@ -2,7 +2,6 @@
 extern void ActorShadow_Disable(void *);
 extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 extern void Golem_UpdateRevival(void);
-#define Golem_UpdateRevivalReturn sub_080C5F60
 static inline u8 take6030(u8 *flag, u8 **held)
 {
     u32 value = *flag;

@@ -12,7 +12,6 @@ struct AxeContactState {
     u8 flags;
 };
 // confidence=low: contact sets a latch and disables both actor colliders.
-#define Axe_LatchColliderContact sub_080F7580
 void Axe_LatchColliderContact(void *a, void *b, struct AxeContactState *s)
 {
     if (!(s->flags & 1)) {

@@ -33,7 +33,6 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     *zero = 0;
     CpuSet(zero, v, 0x05000002);
 }
-#define Ghost_ChooseMovementDestination sub_08099660
 void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;

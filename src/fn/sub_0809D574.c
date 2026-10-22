@@ -154,7 +154,6 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
     return gUnk_030052F4->rows[z] + x;
 }
 // confidence=low: follows the current route segment and renews its endpoint at the player.
-#define Lun_RenewPlayerRoute sub_0809D574
 void Lun_SetMovementEndpoints(void *, void *);
 void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
 {

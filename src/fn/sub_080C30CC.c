@@ -52,7 +52,6 @@ static inline u8 pending(u8 *p)
         return 1;
     return 0;
 }
-#define Skeleton_UpdateBehaviorCallbacks sub_080C30CC
 s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
 {
     u8 *state = (void *)p;

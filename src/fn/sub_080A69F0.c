@@ -60,7 +60,6 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     a->word104 = zero;
 }
 // confidence=low: spreads the body's segments out from the actor's position, then attacks.
-#define TentacleBody_UpdateChargeSpread sub_080A69F0
 
 void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, s32 frame)
 {

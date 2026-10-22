@@ -9,7 +9,7 @@ struct DogGateContext {
     u16 timer692;
 };
 u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-void sub_080DF400(struct SceneActorRegistryResetView *);
+void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *);
 void Dog_SelectTargetAction(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
@@ -53,7 +53,6 @@ static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
     v |= p->flags2D4;
     p->flags2D4 = v;
 }
-#define Dog_UpdateTargetGate sub_080DDD90
 void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
 {
     struct DogGateContext *context = p->context;
@@ -71,7 +70,7 @@ void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
         p->group.field418 = p->group.field416;
         if (Test16(f, 0x100) || !Dog_IsActionTimerExpired(p)) {
             if (!ContextBlocked(context))
-                sub_080DF400(p);
+                Dog_SelectRetreatOrChase(p);
             return;
         } else {
             Dog_SelectTargetAction(p);

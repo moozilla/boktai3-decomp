@@ -57,7 +57,6 @@ static inline s32 Trunc(s32 value, u32 shift)
 }
 
 // MATCHING_CONCESSION: register-pinning
-#define Lun_UpdateHoverHeight sub_0809C91C
 void Lun_UpdateHoverHeight(struct Act *a)
 {
     struct St *st = a->st;

@@ -124,7 +124,6 @@ static inline void StepSequence(void *obj)
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 // confidence=low: resets the ghoul route timers, positions, and response state before stepping animation.
-#define Ghoul_ResetRouteState sub_0808ACD4
 extern const u8 gUnk_0824E15C[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void Ghoul_ResetRouteState(struct SceneActorRegistryResetView *actor)

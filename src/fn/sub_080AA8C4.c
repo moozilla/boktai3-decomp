@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-#define TentacleActor_AlignSegmentsToTerrain sub_080AA8C4
 #ifdef NONMATCHING
 // fuzzy: 82.9%
 // Remaining differences: segment address lifetimes and register allocation.
@@ -126,5 +125,5 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AA8C4);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_AlignSegmentsToTerrain);
 #endif

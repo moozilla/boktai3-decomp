@@ -3,7 +3,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
-#define Ghost_DecelerateMovement sub_0809679C
 
 s32 Mod(s32, s32);
 static inline u8 TakeFlag(u8 *p)

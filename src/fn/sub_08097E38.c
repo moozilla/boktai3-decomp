@@ -82,7 +82,6 @@ static inline void State(struct SceneActorRegistryResetView *actor, u8 state, u8
 // fuzzy: 99.2%
 // Remaining differences: one player-slot literal reload and zero-store scheduling.
 // confidence=low: reacts to player motion within range, with separate drain and approach transitions.
-#define Ghost_ReactToPlayerMovement sub_08097E38
 void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
 {
     struct GhostPlayerReaction *state;
@@ -145,5 +144,5 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08097E38);
+INCLUDE_ASM("asm/nonmatching", Ghost_ReactToPlayerMovement);
 #endif

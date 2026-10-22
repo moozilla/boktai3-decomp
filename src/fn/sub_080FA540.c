@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Axe_UpdateCollapsePhase sub_080FA540
 #include "scene_actor_reset.h"
 
 void ActorPhase_UpdateSpriteCollapse(void);

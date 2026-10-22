@@ -29,8 +29,8 @@ struct SwordReturn {
     u8 pad18B[2];
     u8 turnRate;
 };
-void sub_080F4FA8(void);
-void sub_080F508C(void);
+void Sword_UpdateHorizontalWaveReturn(void);
+void Sword_UpdateDepthWaveReturn(void);
 static inline s32 Half(s32 x)
 {
     if (x >= 0)
@@ -64,9 +64,9 @@ void Sword_DecelerateReturn(struct SwordReturn *input)
             if (z < 0)
                 z = -z;
             if (x < z)
-                p->callback = sub_080F4FA8;
+                p->callback = Sword_UpdateHorizontalWaveReturn;
             else
-                p->callback = sub_080F508C;
+                p->callback = Sword_UpdateDepthWaveReturn;
         }
         p->velocityX = Half(p->velocityX);
         p->velocityZ = Half(p->velocityZ);

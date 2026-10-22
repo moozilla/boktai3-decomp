@@ -118,7 +118,6 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
     return gUnk_030052F4->rows[z] + x;
 }
 // confidence=low: follows saved route points and renews a destination after arrival.
-#define Ghost_FollowRoute sub_080964C4
 void Ghost_FollowRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;

@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: selects turn animation and rotates toward the route facing.
-#define Mummy_TurnTowardRoute sub_080D0FE8
 #ifdef NONMATCHING
 // fuzzy: 84.9%
 // MATCHING_CONCESSION: register-pinning
@@ -189,5 +188,5 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080D0FE8);
+INCLUDE_ASM("asm/nonmatching", Mummy_TurnTowardRoute);
 #endif
