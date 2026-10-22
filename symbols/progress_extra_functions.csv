@@ -13,6 +13,8 @@ address,evidence
 08008C18,Empty 4-byte bx lr function between 08008BD0 and 08008C1C (gbadisasm left it as data); exact C in src/pooled_interactable.c
 08009E30,Independent 12-byte global-pointer clear after directional script return and literal pool
 0800A800,Independent 12-byte effect manager global-pointer clear following collision controller teardown
+0800B2F4,Hidden raw-tail function
+0800B330,Hidden raw-tail function (retained)
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
 0800E3D4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0800F4B8,Independent 12-byte store of zero to gUnk_02000048 between sub_0800F474 and sub_0800F4C4 (twin of sub_0800F6EC)
@@ -244,6 +246,8 @@ address,evidence
 0810F820,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810F82C,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810FA0C,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames
+08110128,Hidden raw-tail function
+08110164,Hidden raw-tail function
 08110A8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08110A98,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 08110C84,Short busy-wait delay loop (32 iterations); raw span
@@ -577,6 +581,8 @@ address,evidence
 0821435C,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 082145F4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821607C,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08216ED0,Hidden raw-tail function
+08216F18,Hidden raw-tail function
 08216FFC,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 08217020,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C
 08217040,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -622,6 +628,7 @@ address,evidence
 0821FF34,Hidden raw-tail function
 082207DC,Hidden tail after Collider_TestSegmentBounds
 08220D6C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08220E6C,Hidden raw-tail function: sets an animation frame inside a sequence
 0822108C,Hidden raw-tail function (retained)
 082215B4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C

@@ -255,6 +255,21 @@ void *EffectManager_Create(void *a)
 
 INCLUDE_ASM("asm/nonmatching", sub_0800AC44);
 INCLUDE_ASM("asm/nonmatching", sub_0800AFE8);
+s32 sub_0800B2F4(void)
+{
+    struct EffectManager *manager = gUnk_02000040;
+    s32 total, i;
+    if (manager == NULL)
+        return 0;
+    total = 0;
+    for (i = 0; i < 6; i++) {
+        struct Effect *effect = &manager->effects[i];
+        if (effect->active)
+            total += effect->count;
+    }
+    return total;
+}
+INCLUDE_ASM("asm/nonmatching", sub_0800B330);
 
 static inline u32 randomValue(s32 reverse)
 {
