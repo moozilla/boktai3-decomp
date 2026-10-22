@@ -4,7 +4,7 @@ engine,Engine core,08213D10,0822F1B4,^(Sprite|Palette|Effect|Mosaic|Video|Widget
 minigames,Minigames,,,^(Transformation and result game|Result game tutorial),docs/GAME_LAYOUT.md section 9
 link,Link and wireless,,,^(Wireless|Link (?!effect)|RFU|Serial|Encoded records and password payloads|Registry 1745),docs/GAME_LAYOUT.md section 10 and Wireless/Link/RFU names
 link,Link and wireless,08108AD0,0811024C,,Contiguous link lobby and connection menus between the field objects and the save menu
-system,"Hardware, time and save",,,^(Clock and sun schedule|Cartridge solar sensor|Solar$|Save( \d+| data)?$|Game state|State flags|Game flag|Region$|Time palette transitions),docs/GAME_LAYOUT.md section 11 and Solar/Save/GameState names
+system,"Hardware, time and save",,,^(Clock and sun schedule|Cartridge solar sensor|Solar$|Save( \d+| data)?$|Game state|State flags|Game flag|Region$|Time palette transitions|Time$),docs/GAME_LAYOUT.md section 11 and Solar/Save/GameState names
 bosses,Bosses,,,^(Nidhoggr|Hresvelgr|Vanargand|Ratatosk|Boss slot)\b,Boss families named by tools/subsystems.py; docs/GAME_LAYOUT.md section 6
 field,Field objects and hazards,,,^(Wooden crate|Floor switch|Named object|Named actor|Tile trigger|Animated tile|Proximity actor|Region actor|Actor group|Pool 1B8)\b,Field objects that follow the enemy block (crates switches triggers)
 monsters,Monsters,08084F44,0810033C,,Contiguous enemy block Bat and Ghoul through Axe (one unit per enemy; names from function prefixes)

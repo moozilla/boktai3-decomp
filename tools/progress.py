@@ -49,8 +49,6 @@ def load_groups(funcs, sizes, path, prefix):
                 raise ValueError(f"{row['name']}: invalid group boundaries")
             if libraries and start < libraries[-1]["end"]:
                 raise ValueError("group ranges must be sorted and nonoverlapping")
-            if any(lib["name"] == row["name"] for lib in libraries):
-                raise ValueError("group names must be unique")
             members = [(n, a) for n, a in funcs if start <= a < end]
             if sum(sizes[n] for n, _ in members) != end - start:
                 raise ValueError(f"{row['name']}: group span is not contiguous")
