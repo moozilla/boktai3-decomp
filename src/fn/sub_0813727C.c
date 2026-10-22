@@ -3,7 +3,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 76.4%
+// fuzzy: 76.6%
 // Open: mostly register allocation (ROM: actor r5, group sl, flags2D4 pointer r8,
 // position spilled to sp); also a few reordered loads and spill-slot order.
 
