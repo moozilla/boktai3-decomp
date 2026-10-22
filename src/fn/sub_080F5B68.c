@@ -1,8 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#define TargetMotion_AdvanceFollowSegment sub_080F5B68
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// foundry draft (worker best 86.6%); what differs is mostly register allocation and instruction order
 struct TargetMotion {
     u8 unknown0[6], rotation, unknown7[0x15];
     s16 x, y, z;
@@ -39,17 +38,39 @@ void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
     p->z = correction.z + p->startZ + Div(p->dz * p->timer, 100);
     p->timer++;
     if (p->timer > 100) {
-        p->done = 1;
+        register u32 one asm("r0");
+        register u8 *done asm("r1") = &p->done;
+        asm("" : "+r"(done));
+        one = 1;
+        asm("" : "+r"(one));
+        *done = one;
         p->rotation = 128;
-        p->state11E = 1;
-        p->state11F = 1;
+        p->state11E = one;
         {
-            u32 one = 1;
-            p->flags119 = one | p->flags119;
+            register u32 offset asm("r3") = 0x11f;
+            register u8 *address asm("r1");
+            asm("" : "+r"(offset));
+            address = (u8 *)p + offset;
+            asm("" : "+r"(address));
+            *address = one;
         }
-        p->callback164 = IvyChild_UpdateAfterBob;
+        {
+            register u32 offset asm("r1") = 0x119;
+            register u8 *address asm("r2");
+            asm("" : "+r"(offset));
+            address = (u8 *)p + offset;
+            asm("" : "+r"(address));
+            one |= *address;
+            asm("" : "+r"(one));
+            *address = one;
+        }
+        {
+            register u32 offset asm("r2") = 0x164;
+            register u8 *address asm("r1");
+            asm("" : "+r"(offset));
+            address = (u8 *)p + offset;
+            asm("" : "+r"(address));
+            *(void **)address = IvyChild_UpdateAfterBob;
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TargetMotion_AdvanceFollowSegment);
-#endif
