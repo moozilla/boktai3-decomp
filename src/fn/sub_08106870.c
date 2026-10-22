@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.8%
-// Remaining: the constants 1 (sprite flag, kind) and 0 (sequence arguments) swap r4/r6.
+// fuzzy: 99.3%
+// Remaining: the sprite reload before the flag-1 store takes r1 instead of r2 (reload rotation;
+// rasolve: one reload fewer before it). `one` is pinned to r4 as in the ROM.
 #include "contact_swarm.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
@@ -168,6 +169,7 @@ void RegionActor_CreateFromScript(void)
     struct RegionSprite *p;
     s32 width, height, x, z, cell;
     struct ContactSwarmSprite *sprite;
+    register u32 one asm("r4");
     u32 *flags;
     if (!manager)
         return;
@@ -193,13 +195,17 @@ void RegionActor_CreateFromScript(void)
     sprite->position = p->origin;
     Sprite_Init(p, (u8 *)p + 0x2C, 0);
     Step(sprite, &p->sequence);
-    sprite->flags |= 1;
+    {
+        u32 f = sprite->flags;
+        one = 1;
+        sprite->flags = f | one;
+    }
     p->variant = Script_GetKeywordValue('m', 0);
     switch (p->variant) {
         case 0:
             AnimData_Load((u8 *)p + 0x2C, 0x4FDA);
             Anim_SetSequence(&p->sequence, manager->sequenceResource, 0, 0, 0);
-            p->kind = 1;
+            p->kind = one;
             sprite->priority = 3;
             flags = &p->behaviorFlags;
             break;
