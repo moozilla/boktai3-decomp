@@ -1,0 +1,5 @@
+addr,name,confidence,evidence
+0822B6C8,SceneStimulus_Add,medium,"fills first free stimulus slot (id<0) at ctx+0x18; AddUntagged/AddFromScript wrap it"
+0822B640,SceneStimulus_AgeSlots,low,"clears fresh flag 4 or resets slot each frame; called by SceneStimulus_UpdateTask"
+0822B5FC,SceneStimulus_IsSuppressedAt,low,"point inside any of 16 box ids at ctx+0x98"
+0806F06C,SceneActorQuery_FindInBox,medium,"cursor scan of up to 20 live actors inside center+-radius on x/y/z; sibling of SceneActorQuery_FindInRectangle"
