@@ -261,12 +261,21 @@ address,evidence
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAD4,Independent small function following a reviewed gap leaf; retained assembly (not yet matched)
+0815AB24,Hidden script command after ScriptActor_SetField4A2FromScript; exact C
+0815AB48,Hidden script command; exact C
+0815AB6C,Hidden script query; exact C
+0815AB98,Hidden script command; exact C
+0815ABB8,Hidden script command; exact C
+0815AC04,Hidden script command; retained assembly
 0815AD24,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD3C,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD60,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815CC78,Independent 128-byte sibling of ScriptActor_MoveToFromScript (gbadisasm left it as .byte after 0815CBF8)
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
+0815F5A0,Second function of the reviewed 0815F588-0815F6A8 span; exact C
+0815F5B4,Third function of the reviewed 0815F588-0815F6A8 span; retained assembly
+0815F5F8,Fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
@@ -425,8 +434,20 @@ address,evidence
 082220DC,"Independent hidden Thumb prologue; CFG returns at 08222120; literals and zero alignment close at 08222124; preserved raw tail of 08221800, not matched C"
 08222124,"Independent hidden Thumb prologue; CFG returns at 08222168; literals and zero alignment close at 0822216C; preserved raw tail of 08221800, not matched C"
 0822216C,"Independent hidden Thumb prologue; CFG returns at 082221DC; literals and zero alignment close at 082221E8; preserved raw tail of 08221800, not matched C"
+08222504,Hidden hash-table rekey function after HashTable_FindNode; exact C
+0822253C,Hidden IME-clear leaf after HashTable_FindNode; exact C
+08222548,Hidden IME-set leaf after HashTable_FindNode; exact C
 08222A00,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08222A04,Code following a reviewed gap leaf; retained assembly
+08222AA4,Serial stop; part of the reviewed 08222A04-08222C7C span
+08222AC4,Serial receive; part of the reviewed 08222A04-08222C7C span
+08222B64,Serial send; part of the reviewed 08222A04-08222C7C span
+08222BE4,Serial status getter; part of the reviewed 08222A04-08222C7C span
+08222BF8,Serial any-data check; part of the reviewed 08222A04-08222C7C span
+08222C24,Serial data check; part of the reviewed 08222A04-08222C7C span
+08222C44,Serial data check; part of the reviewed 08222A04-08222C7C span
+08222C64,Serial getter; part of the reviewed 08222A04-08222C7C span
+08222C70,Serial getter; part of the reviewed 08222A04-08222C7C span
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08224F98,Code following a reviewed gap leaf; retained assembly
 08225620,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
