@@ -12,13 +12,19 @@ address,isa,evidence,replacement_end
 0800E3D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0800E3E0
 080133C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080133CC
 080136A8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080136B4
+08013AB4,thumb,ScaledShadow_Initialize wrapper with swapped size arguments; first of three functions in the raw 08013AB4-08013B74 span,08013AE4
+08013AE4,thumb,ScaledShadow default init with caller sizes then graphic frame 6; part of the raw 08013AB4-08013B74 span,08013B2C
+08013B2C,thumb,ScaledShadow default init with caller sizes then graphic frame 7; part of the raw 08013AB4-08013B74 span,08013B74
 08013BDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08013C14
 08013F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08013F98
+08014C28,thumb,ParticleManager clear: removes every live effect in the six particle groups and clears their flags; raw 08014C28-08014CA4 span,08014C98
+08014C98,thumb,Clears the gUnk_02000064 pointer; leaf at the end of the raw 08014C28-08014CA4 span,08014CA4
 08015154,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08015160
 08015B1C,thumb,Independent exact 104-byte fan emission wrapper inside retained byte tail,08015B84
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
 080164AC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080164B8
 08017264,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08017270
+08017428,thumb,Weather manager presence check: TRUE when gUnk_02000090 is set; raw span after the scanline wave allocator,08017444
 08018F2C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08018F38
 08019C64,thumb,Independent animation-frame wrapper in byte tail; exact C body,08019C9C
 08019E2C,thumb,Independent pool removal wrapper in byte tail; exact C body,08019E58
@@ -35,27 +41,38 @@ address,isa,evidence,replacement_end
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802D014,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0802D020
 0802D05C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D080
+0802D0F4,thumb,Actor animation entry by four-way facing byte 0x180 with mirrored flip; first of two functions in the raw 0802D0F4-0802D1B0 span,0802D15C
+0802D15C,thumb,Actor animation entry using facing byte 0x180 directly (flip when above 1); part of the raw 0802D0F4-0802D1B0 span,0802D1B0
 0802D960,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D96C
 0802DB14,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0802DB18
 0802DB18,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0802DB1C
 0802DDEC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802DE3C
 0802E654,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802E698
 080308B0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080308BC
+08030CEC,thumb,MessageWindow: set a message table with up to 32 frame waits and restart text playback; raw span after MessageWindow_SetMessageTable,08030D9C
 08030EDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08030F20
 080313AC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080313C8
 0803200C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08032070
 08032CEC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08032D10
 08032ED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08032EDC
 080334A0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080334BC
+080334E0,thumb,Script command: string argument N from the text source pc; first of three functions in the raw 080334E0-08033568 span,080334FC
+080334FC,thumb,Script command: string argument N from sub_08227E9C; part of the raw 080334E0-08033568 span,08033518
+08033518,thumb,Script command: read the p keyword value list into the scrolling dialogue text state; part of the raw 080334E0-08033568 span,08033568
 080335D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080335E0
 080335E0,thumb,Independent small function following a reviewed gap leaf; exact standalone C,080335F4
+080338A8,thumb,TextWindow: set a message table with up to 32 frame waits on window N and restart its text; raw span after the preceding text window helper,08033924
 0803398C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080339B8
 08033A10,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033A38
 08033A80,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AB0
 08033AB0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AD0
 08033AD0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AF0
 08033C4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08033C58
+080347D8,thumb,Wireless parent link-manager message callback: maps LMAN messages to engine operations; raw span after the preceding wireless helper,080349F0
 080349FC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08034A14
+080359E4,thumb,"Wireless parent UNI session setup (packet queue, slot buffers, callbacks, send data); first of three functions in the raw 080359E4-08035CE8 span; retained assembly",
+08035B98,thumb,"Wireless child UNI session setup (slot lookup, buffers, callbacks, send data); part of the raw 080359E4-08035CE8 span; retained assembly",
+08035CD0,thumb,Wireless: clear all RFU slots when the engine's flag 0x30 is set; returns whether it did; end of the raw 080359E4-08035CE8 span,08035CE8
 080369F0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036A10
 08036BAC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036BD4
 08036C6C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036C88
@@ -143,9 +160,13 @@ address,isa,evidence,replacement_end
 08083F5C,thumb,Independent terrain response function with own push and pop-bx following collision latch helper; full 232-byte reviewed extent,08084044
 08084280,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08084284
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
+0808B264,thumb,"Vorn-style actor reset: copies context frame 0x64A to 0x648, sets behavior 15 and restarts the saved route; raw span before Vorn_ParseField624_0808B320; retained assembly",
+0808EB98,thumb,Slime: consume the prepared flag (replay profile animation 14) then pick the next move (roll flag or walk choice) at random; raw span before Slime_ConvergeReactionMotion,0808EC7C
+0808EC7C,thumb,Empty bx lr stub at the end of the raw 0808EB98-0808EC80 span,0808EC80
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
 08095574,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08095578
 08098040,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08098064
+080999A0,thumb,"Actor wait state: on arrival restore the saved target callback, otherwise set flag 0x800 and consume one pending trigger on the first tick; raw span after the preceding behaviour function",08099A48
 080A2F28,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A2F2C
 080A3804,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A382C
 080A5FBC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A5FC0
@@ -153,15 +174,19 @@ address,isa,evidence,replacement_end
 080A6294,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A62DC
 080A7188,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A71A0
 080A8CDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A8D50
+080AA688,thumb,Removes the colliders of every still-active part (flag bit 0 at part+0x105) and counts down the live total at context+0x8EA; raw span before the next function; retained assembly,
 080ACCD4,thumb,Independent 28-byte leaf (no push; old_agbcc) storing an entry position; left as incbin by gbadisasm; exact standalone C,080ACCF0
 080AD110,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080AD114
 080B1F48,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B1FA8
 080B2354,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080B23A0
 080B8A58,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B8AB8
+080D6FBC,thumb,Player flag test: TRUE when bit 3 of the player actor's flags (+0x20) is set; raw span before Mummy_RequestStraightRoute,080D6FDC
 080E81FC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E8200
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
 080ED484,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080ED4E0
+080F05B4,thumb,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId,080F05CC
+080F3638,thumb,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties,080F3650
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
 080FFDD0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFDD4
@@ -171,12 +196,16 @@ address,isa,evidence,replacement_end
 08101A34,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08101A38
 08101A38,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08101A3C
 08103AD0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08103ADC
+08103F24,thumb,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound",08103F44
 081041F0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,08104204
 081047B0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081047B4
 08105A40,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08105A44
 0810731C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08107320
 0810874C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08108750
 08108968,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810896C
+08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
+081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
+0810C128,thumb,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations,0810C14C
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
@@ -354,6 +383,8 @@ address,isa,evidence,replacement_end
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
+081BB114,thumb,Hidden raw-tail function,081BB124
+081BB124,thumb,Hidden raw-tail function,081BB13C
 081BB38C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,081BB3A0
 081C17C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081C17D4
 081C3EEC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081C3EF0
@@ -384,6 +415,8 @@ address,isa,evidence,replacement_end
 081FD46C,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081FD474
 081FDBC4,thumb,Hidden raw-tail function,081FDBF0
 081FE9B0,thumb,Hidden raw-tail function,081FE9DC
+081FEA04,thumb,Hidden raw-tail function,081FEA28
+081FEA28,thumb,Hidden raw-tail function,081FEA3C
 081FED14,thumb,Hidden raw-tail function,081FED40
 08200238,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08200244
 08202EEC,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,08202EF4
@@ -411,7 +444,9 @@ address,isa,evidence,replacement_end
 0821907C,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,082190BC
 082195AC,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,082195D0
 082195F8,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219624
+082196FC,thumb,Hidden raw-tail function,08219728
 08219DB4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219DD8
+0821A0CC,thumb,Hidden raw-tail function,0821A0F8
 0821A168,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821A184
 0821AB50,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821AB64
 0821AB64,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821AB78
@@ -425,9 +460,12 @@ address,isa,evidence,replacement_end
 0821E7B4,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7C4
 0821E7C4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7D0
 0821E7D0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7DC
+0821E820,thumb,Hidden raw-tail function,0821E840
+0821E840,thumb,Hidden raw-tail function,0821E860
 0821F838,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0821F840
 0821FF34,thumb,Hidden raw-tail function,0821FF50
 08220D6C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08220D78
+0822108C,thumb,Hidden raw-tail function (retained),
 082215B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215B8
 082215B8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215BC
 082215BC,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,082215D0
@@ -481,6 +519,9 @@ address,isa,evidence,replacement_end
 08224F14,thumb,Hidden raw-tail function,08224F20
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
 08224F98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08224FA4
+082250AC,thumb,Hidden raw-tail function,082250D8
+082254C8,thumb,Hidden scene start: init state then run start or main script,08225504
+08225504,thumb,Hidden leaf returning 0 without lr push (retained),
 08225620,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225624
 08225834,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08225840
 08225840,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08225844
@@ -494,6 +535,9 @@ address,isa,evidence,replacement_end
 08226528,thumb,Hidden raw-tail function,08226558
 082265D8,thumb,Hidden raw-tail function,082265F8
 0822797C,thumb,Hidden raw-tail function,082279A8
+08227E2C,thumb,Hidden raw-tail function (retained),
+08227E5C,thumb,Hidden raw-tail function (retained),
+08227E8C,thumb,Hidden empty function,08227E90
 08227F3C,thumb,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
@@ -531,9 +575,13 @@ address,isa,evidence,replacement_end
 0822D730,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822D734
 0822D734,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0822D740
 0822DB2C,thumb,Hidden raw-tail function,0822DB54
+0822DF68,thumb,Hidden raw-tail function,0822DFA0
+0822DFA0,thumb,Hidden raw-tail function,0822DFDC
 0822E420,thumb,Hidden equipment table entry getter (retained),
 0822E43C,thumb,Hidden leaf getter without lr push (retained),
 0822E54C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0822E564
+0822E6E4,thumb,Hidden raw-tail function,0822E728
+0822F174,thumb,Hidden raw-tail function,0822F1B4
 08231438,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08231444
 08231444,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08231448
 0823179C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082317A0
@@ -542,10 +590,18 @@ address,isa,evidence,replacement_end
 08232370,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0823237C
 082329C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082329D4
 08232F1C,thumb,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md,08232F68
+08232FD0,thumb,Hidden raw-tail function,08233038
 082371E4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082371F0
+08237764,thumb,Hidden raw-tail function,082377A8
+0823A518,thumb,Hidden raw-tail function,0823A53C
+0823A53C,thumb,Hidden raw-tail function,0823A550
+0823ABA8,thumb,Hidden raw-tail function,0823ABC0
+0823B8C4,thumb,Hidden raw-tail function (retained),
+0823C8FC,thumb,Hidden raw-tail function (retained),
 082436EC,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08243704
 08243704,thumb,Script command (actor i must exist; reads keyword T); first of two functions in the reviewed 08243704-082437A8 span,0824372C
 0824372C,thumb,Script command setting a player action slot (keyword w); second function of the reviewed 08243704-082437A8 span,082437A8
+08243B0C,thumb,Hidden raw-tail function,08243B54
 08243ED8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EE4
 08243EE4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EF0
 08243EF0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EFC
