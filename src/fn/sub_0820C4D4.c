@@ -251,6 +251,7 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     return ended;
 }
 
+#define Screamer_UpdateScream sub_0820C4D4
 s32 Screamer_UpdateScream(struct ScreamerState *p)
 {
     register s32 phase asm("r3");
@@ -260,7 +261,15 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     switch (phase) {
         case 0:
             Screamer_StepAnimation(p);
-            if (p->f1CA > p->f1D4) {
+            if (({
+                    register u32 off asm("r2") = 0x1ca;
+                    asm("" : "+r"(off));
+                    *(s16 *)((u8 *)p + off);
+                }) > ({
+                    register u32 off asm("r3") = 0x1d4;
+                    asm("" : "+r"(off));
+                    *(s16 *)((u8 *)p + off);
+                })) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1B, (u8)p->f1D8, 0);
                 Anim_SetDurationScale(&p->sequence, 0x20);
                 p->f1D6 = 1;

@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -38,9 +35,12 @@ static inline u8 TestActorFlags(struct MotionActor *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 TestStateFlags(u8 *p, u32 mask)
+static inline u8 TestStateFlags(struct MotionActorState *state, u32 mask, u8 **output)
 {
-    if (*p & mask)
+    u8 *p = &state->flags;
+    u32 value = *p & mask;
+    *output = p;
+    if (value)
         return 1;
     return 0;
 }
@@ -59,6 +59,7 @@ static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u3
     p->callback = callback;
     p->scriptTimer = zero;
 }
+#define MotionActor_DispatchRequestedState sub_0811A030
 void MotionActor_DispatchRequestedState(struct MotionActor *actor)
 {
     register struct MotionActorState *state asm("r6");
@@ -81,8 +82,8 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
         state->pending = zero;
     } else {
         u16 testMask = 2;
-        u8 *flags = &state->flags;
-        if (TestStateFlags(flags, testMask)) {
+        u8 *flags;
+        if (TestStateFlags(state, testMask, &flags)) {
             s32 mask = ~2;
             u16 zero;
             mask &= *flags;
@@ -96,6 +97,3 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
     if (!IsUpdated(actor))
         ActorStats_ApplyPendingIncrement(state);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", MotionActor_DispatchRequestedState);
-#endif

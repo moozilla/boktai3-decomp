@@ -1,4 +1,5 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
 struct Obj {
     u8 pad0[4];
@@ -199,15 +200,19 @@ static inline void UpdateActions(struct Glove *p, u16 *flags)
     if ((!p || !(*flags & 4)) && (U32(self, 0xC) & 0x800))
         self->damageFlags |= 4;
 }
+#define Glove_UpdateStopping sub_08117948
 void Glove_UpdateStopping(struct Glove *p)
 {
     struct Obj *self = &p->motion;
     s32 h, dx, dz;
     u32 a, b;
-    if (p->active) {
-        U16(p, 0x53C) = 0x88;
-        U16(p, 0x53E) = 0;
-        p->active = 0;
+    {
+        register u8 *entry asm("r4") = &p->active;
+        if (*entry) {
+            U16(p, 0x53C) = 0x88;
+            U16(p, 0x53E) = 0;
+            *entry = 0;
+        }
     }
     {
         u16 *flags = &p->flags;
