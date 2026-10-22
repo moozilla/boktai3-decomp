@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.4%
-// Remaining differences: constructor pointer lifetimes, register allocation, and instruction scheduling.
+// fuzzy: 97.8%
+// Remaining: the constants 1 (sprite flag, kind) and 0 (sequence arguments) swap r4/r6.
 #include "contact_swarm.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
@@ -35,9 +35,8 @@ static inline u8 Test(u32 *flags, u32 bit)
         return 1;
     return 0;
 }
-static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
+static inline u32 Step(struct ContactSwarmSprite *sprite, struct DisplaySequenceState *st)
 {
-    struct ContactSwarmSprite *sprite = sp;
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
@@ -51,7 +50,7 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        register u32 first asm("r2");
         u32 maskBit = 1;
         bit = maskBit;
         asm("" : "+r"(bit));
@@ -168,6 +167,8 @@ void RegionActor_CreateFromScript(void)
     struct RegionSpriteManager *manager = gUnk_020001B4;
     struct RegionSprite *p;
     s32 width, height, x, z, cell;
+    struct ContactSwarmSprite *sprite;
+    u32 *flags;
     if (!manager)
         return;
     p = Pool128_Allocate(manager);
@@ -188,24 +189,33 @@ void RegionActor_CreateFromScript(void)
     }
     p->health = Script_GetKeywordValue('h', 0);
     p->maxHealth = p->health;
-    p->sprite.position = p->origin;
+    sprite = &p->sprite;
+    sprite->position = p->origin;
     Sprite_Init(p, (u8 *)p + 0x2C, 0);
-    Step(&p->sprite, &p->sequence);
-    p->sprite.flags |= 1;
+    Step(sprite, &p->sequence);
+    sprite->flags |= 1;
     p->variant = Script_GetKeywordValue('m', 0);
     switch (p->variant) {
         case 0:
             AnimData_Load((u8 *)p + 0x2C, 0x4FDA);
             Anim_SetSequence(&p->sequence, manager->sequenceResource, 0, 0, 0);
             p->kind = 1;
-            p->sprite.priority = 3;
+            sprite->priority = 3;
+            flags = &p->behaviorFlags;
             break;
         case 1:
             AnimData_Load((u8 *)p + 0x2C, 0x863A);
             Anim_SetSequence(&p->sequence, manager->alternateResource, 2, 0, 0);
             p->kind = 2;
-            p->behaviorFlags |= 4;
-            p->sprite.priority = 2;
+            {
+                u32 bit = 4;
+                p->behaviorFlags |= bit;
+            }
+            sprite->priority = 2;
+            flags = &p->behaviorFlags;
+            break;
+        default:
+            flags = &p->behaviorFlags;
             break;
     }
     p->mode = 0;
@@ -218,9 +228,12 @@ void RegionActor_CreateFromScript(void)
     else
         cell = gUnk_030052F4->rows[z] + x;
     TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0, 128);
-    p->behaviorFlags |= 0x20;
+    {
+        u32 bit = 0x20;
+        *flags |= bit;
+    }
     if (Script_GetKeywordValue('P', 0))
-        p->behaviorFlags |= 0x80;
+        *flags |= 0x80;
     p->region = Region_FindContaining(&p->origin);
     if (Script_GetKeywordValue('s', 0)) {
         p->overlayActive = 1;
