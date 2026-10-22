@@ -628,6 +628,7 @@ address,evidence
 0821FF34,Hidden raw-tail function
 082207DC,Hidden tail after Collider_TestSegmentBounds
 08220D6C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08220E6C,Hidden raw-tail function: sets an animation frame inside a sequence
 0822108C,Hidden raw-tail function (retained)
 082215B4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
