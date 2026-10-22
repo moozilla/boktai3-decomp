@@ -259,6 +259,7 @@ address,evidence
 08152C3C,Independent push r4-r7-lr and stack allocation after 08152A5C pop-bx return and literal pool; ROM bytes F0 B5 83 B0 at 08152C3C
 08156C8C,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set)
 0815849C,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay
+08158754,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay
 08158C14,Hidden link-state reset in the raw tail after Player_UpdateLinkModeMovement; retained assembly (not yet matched)
 08158E68,Hidden helper in the raw tail after Player_BeginDirectionSequence (actor map tile index)
 0815910C,Hidden helper in the raw tail after Player_GetEquipmentLevelBonus (level bonus from an item)
