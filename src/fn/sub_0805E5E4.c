@@ -1,15 +1,11 @@
 #include "scene_input_grid.h"
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// Five FF constant birth orders differ (480/480 bytes).
 void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
 {
     s32 column, row;
     {
-        u32 fill;
-        for (column = 0, fill = 0xFF; column <= 3; column++)
+        for (column = 0; column <= 3; column++)
             for (row = 0; row <= 3; row++)
-                grid->cells[(row) + 4][column] |= fill;
+                grid->cells[(row) + 4][column] |= 0xFFu;
     }
     if (!SceneInput_TestGridFlags(grid, 1)) {
         for (column = 0; column <= 3; column++) {
@@ -22,10 +18,9 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
         }
     }
     {
-        u32 fill;
-        for (column = 0, fill = 0xFF; column <= 3; column++)
+        for (column = 0; column <= 3; column++)
             for (row = 0; row <= 3; row++)
-                grid->cells[row][column] |= fill;
+                grid->cells[row][column] |= 0xFFu;
     }
     if (!SceneInput_TestGridFlags(grid, 2)) {
         if (grid->kind & 1) {
@@ -68,23 +63,20 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
     if (SceneInput_TestGridFlags(grid, 0x10)) {
         if (SceneInput_TestGridFlags(grid, 8)) {
             {
-                u32 fill;
-                for (column = 0, fill = 0xFF; column <= 3; column++)
-                    grid->cells[8][column] |= fill;
+                for (column = 0; column <= 3; column++)
+                    grid->cells[8][column] |= 0xFFu;
             }
         } else {
             {
-                u32 fill;
-                for (column = 0, fill = 0xFF; column <= 3; column++)
-                    grid->cells[8][column] |= fill;
+                for (column = 0; column <= 3; column++)
+                    grid->cells[8][column] |= 0xFFu;
             }
             grid->cells[8][2] = 25;
         }
     } else if (grid->kind == 1) {
         {
-            u32 fill;
-            for (column = 0, fill = 0xFF; column <= 3; column++)
-                grid->cells[8][column] |= fill;
+            for (column = 0; column <= 3; column++)
+                grid->cells[8][column] |= 0xFFu;
         }
         if (!SceneInput_TestGridFlags(grid, 8))
             grid->cells[8][2] = 25;
@@ -98,6 +90,3 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
             grid->cells[8][3] = 25;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneInput_RebuildGrid);
-#endif
