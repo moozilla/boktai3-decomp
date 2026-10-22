@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
-// Open: the CpuSet arguments r1 (mov from ip) and r2 (literal) are loaded in the other order.
 #include "engine.h"
 #include "scene_vec.h"
 struct Frames {
@@ -165,9 +162,10 @@ s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
     p->resource.paletteIndex = PaletteIndex(p->state, p->parameter);
     p->resource.paletteData = p->resource.palette;
     {
+        u32 mode = 0x04000008;
         s32 bank = PaletteIndex(p->state, p->parameter);
         p->resource.paletteIndex = bank;
-        CpuSet(gUnk_030042E4 + bank * 32, p->resource.palette, 0x04000008);
+        CpuSet(gUnk_030042E4 + bank * 32, p->resource.palette, mode);
     }
     SceneScriptObject_InitHitCollider(p);
     if (p->state == 12) {
@@ -180,6 +178,3 @@ s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
     p->finished = 0;
     p->counter = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081B866C);
-#endif
