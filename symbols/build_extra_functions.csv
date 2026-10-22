@@ -185,6 +185,7 @@ address,isa,evidence,replacement_end
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
 080ED484,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080ED4E0
+080F05B4,thumb,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId,080F05CC
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
 080FFDD0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFDD4
