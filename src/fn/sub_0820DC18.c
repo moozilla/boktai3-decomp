@@ -1,4 +1,5 @@
 #include "global.h"
+#define PoisonHand_ApplyHitReaction sub_0820DC18
 #ifdef NONMATCHING
 // fuzzy: 99.0%
 // Remaining difference: first spark RNG cursor copy lands in r0 (original uses r7) and the 0x3ff mask in r7 (original r0).
