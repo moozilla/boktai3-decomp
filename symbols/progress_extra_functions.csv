@@ -19,6 +19,9 @@ address,evidence
 08012134,Independent 2-byte bx lr stub between sub_08012114 and AnimatedHazard_WaitForPlayer (left as data by gbadisasm); exact C in src/animated_hazard.c
 080133C0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 080136A8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08013AB4,ScaledShadow_Initialize wrapper with swapped size arguments; first of three functions in the raw 08013AB4-08013B74 span
+08013AE4,ScaledShadow default init with caller sizes then graphic frame 6; part of the raw 08013AB4-08013B74 span
+08013B2C,ScaledShadow default init with caller sizes then graphic frame 7; part of the raw 08013AB4-08013B74 span
 08013BDC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08013F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08015154,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
