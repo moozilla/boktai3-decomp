@@ -1,9 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// Only the second flag set differs: ROM loads the flags into r1 and the constant 2 into r0.
-// (`*(u16 *)probe |= 2` avoids an agbcc CSE leftover that `probe->flags |= 2` causes.)
 struct Vec3 {
     s16 x, y, z;
 };
@@ -40,20 +36,20 @@ s32 sub_0821FC34(struct NavProbe *probe, struct Vec3 *target, s32 angle, s32 dis
     if ((u32)(diff - 0x18) <= 0xD0) {
         ret = a + 0x10;
         ret &= 0xE0;
-        *(u16 *)probe |= 2;
+        probe->flags |= 2;
         return ret;
     }
     if (Actor_MoveAlongAngle(target, angle, dist) == 0) {
         if (diff <= 0x1F)
             a += 0x20;
         a &= 0xE0;
-        *(u16 *)probe |= 2;
+        {
+            s32 flags = probe->flags | 2; // int temp: keeps the constant tied to the result
+            probe->flags = flags;
+        }
         do {
         } while (0);
         return a;
     }
     return angle;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0821FC34);
-#endif
