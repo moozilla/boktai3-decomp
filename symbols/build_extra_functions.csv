@@ -413,6 +413,9 @@ address,isa,evidence,replacement_end
 082220DC,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,08222124
 08222124,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,0822216C
 0822216C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 124 bytes; currently preserved raw tail,082221E8
+08222504,thumb,Hidden hash-table rekey function in the raw tail after HashTable_FindNode; exact standalone C,0822253C
+0822253C,thumb,Hidden 12-byte IME-clear leaf in the raw tail after HashTable_FindNode; exact standalone C,08222548
+08222548,thumb,Hidden 12-byte IME-set leaf in the raw tail after HashTable_FindNode; exact standalone C,08222554
 08222A00,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08222A04
 08222A04,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08222C7C
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
