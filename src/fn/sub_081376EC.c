@@ -2,7 +2,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 70.3%
+// fuzzy: 78.2%
 // Open: register allocation (ROM: actor r6 with an early copy in r3, group sl, i in r5,
 // candidate pointer sb, position r8) and the MoveTo destination/branch layout.
 
@@ -184,7 +184,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     u32 found;
     s32 best;
     u32 bestTag;
-    u8 i;
+    s8 i;
     u16 *flagsp;
     u16 *timer;
     struct ContactPosition *dest;
@@ -201,7 +201,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     found = 0;
     best = 0x7FFFFFFF;
     bestTag = 0;
-    for (i = 0; (s8)i <= 7; i++) {
+    for (i = 0; i <= 7; i++) {
         u32 tag;
         s8 next;
         next = SceneStimulus_FindOverlapFromIndex(actor->position.x, actor->position.z,
