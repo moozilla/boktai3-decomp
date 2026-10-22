@@ -21,7 +21,8 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
 {
     struct TileTrigger *sprite = owner;
     const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
+    u32 ended, flags, bit;
+    register u32 duration asm("r2");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -70,7 +71,7 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
-        asm("" ::"r"(&base->frame));
+        asm("" : "+r"(savedDuration));
         if (elapsed >= duration) {
             state->elapsed = 0;
             flags = state->flags;
@@ -129,7 +130,6 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
                 if (!(u8)speed)
                     state->duration = 1;
             }
-            asm("" ::"r"(&base->frame));
         } else {
             ended = 0;
         }
@@ -137,24 +137,23 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     return ended;
 }
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 97.7%
+// Remaining: the savedDuration copy is emitted before the PRE-inserted
+// &p->frame and lands in r5, swapping with mask (ROM: saved r7, mask r5).
 void TileTrigger_StepPress(struct TileTrigger *p)
 {
     struct TileTrigger *self = p;
-    u8 *frame;
     p->flags &= ~1;
     if (p->animation.index == 1 && p->animation.elapsed != 0) {
         sub_08106E98(p);
-        frame = &p->frame;
-        (*frame)++;
+        p->frame++;
     } else {
         StepPlayback(self, &p->animation, p);
-        frame = &p->frame;
     }
-    if (*frame > 30) {
+    if (p->frame > 30) {
         p->state = 5;
         p->forced = 1;
-        *frame = 0;
+        p->frame = 0;
     }
 }
 #else

@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.1%
+// fuzzy: 81.7%
 // Remaining differences: stack-vector lifetime and low-register allocation.
 // confidence=low: emits four bobbing actors in a circular formation around this boss
 struct FormationActor {
@@ -56,7 +56,7 @@ void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
     do {
         u32 angle = (offset + base) & mask;
         GetOffset(position, angle, 256, mask);
-        position[0] = origin[0] + position[0];
+        position[0] = position[0] + origin[0];
         position[1] = position[1] + origin[1];
         position[2] = position[2] + origin[2];
         position[1] += 320;

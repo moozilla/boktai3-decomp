@@ -1,10 +1,12 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 26.9%
 #include "proximity_emitter.h"
 u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
 {
-    struct ContactPosition *tether = TetherActor_GetPosition();
+    /* The original keeps the call result live in r0 and returns it when the
+       tether is inside the box but outside the circle. */
+    register u32 result asm("r0") = (u32)TetherActor_GetPosition();
+    struct ContactPosition *tether = (struct ContactPosition *)result;
     if (!tether)
         goto outside;
     {
@@ -25,10 +27,5 @@ u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
         if (dx * dx + dz * dz <= 16383)
             return 1;
     }
-    /* The original retains this nonnull pointer in the square corners. */
-    return (u32)tether;
+    return result;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ProximityEmitter_IsTetherNearby);
-#endif

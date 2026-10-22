@@ -1,10 +1,13 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_object.h"
 #include "callback_pool.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.8%
-// foundry draft (worker best 82.7%); what differs is mostly register allocation and instruction order
+// fuzzy: 90.7%
+// Open: reload copies the spread mask 3 (kept in sb) through r1 where the ROM uses r7,
+// which also swaps the reload register for the 0xFFFF0000 mask. An empty asm keeps the
+// count's mask 3 out of CSE so the two masks get the ROM's separate pseudos.
 #define gShakeRandomTable gUnk_0203B400
 #define gShakeRandomIndex gUnk_03005308
 extern const u16 gUnk_0203B400[];
@@ -33,7 +36,11 @@ void CallbackPool_SpawnHitParticles(struct CallbackPoolEntry *entry)
     spread.y = (NextRandom() & 7U) + 15U;
     spread.z = (NextRandom() & 3U) + 15U;
     {
-        u32 count = (NextRandom() & 3) + 2;
+        u32 count = NextRandom();
+        u32 three;
+        asm("" : "=r"(three) : "0"(3));
+        count &= three;
+        count += 2;
         entry = (struct CallbackPoolEntry *)((u8 *)entry + 0x1c);
         sub_08014634(count, 17, (struct SceneExtent *)entry, velocity, &spread, 12, 15);
     }

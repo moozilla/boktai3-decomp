@@ -788,6 +788,7 @@ address,evidence
 08231A08,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08231C80,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08232370,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0823269C,Hidden function after sub_08232420 (timed hazard create from script); exact C
 082329C8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08232F1C,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md
 08232FD0,Hidden raw-tail function

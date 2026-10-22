@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.3%
-// 8 differing instruction runs; size -20 bytes; first diff at +0x14 (ldr r3, [pc, #0x80] vs movs r0, #0xc8)
 struct H {
     u32 lo : 16;
     u32 hi : 16;
@@ -19,7 +16,8 @@ void sub_08105194(u8 *s, u32 a, u32 b, u32 c)
 {
     struct Z v, w;
     u8 *q = s + 0x58;
-    *(u32 *)&w.a = 0x640000;
+    w.a.lo = 0;
+    w.a.hi = 0x64;
     w.b.lo = 0x40;
     v.a.lo = 0x40;
     v.a.hi = 0x3C;
@@ -31,6 +29,3 @@ void sub_08105194(u8 *s, u32 a, u32 b, u32 c)
     Collider_SetCallback(q, CallbackPool_ApplyDamage, s);
     Collider_Refresh(q);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08105194);
-#endif

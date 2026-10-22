@@ -1,9 +1,10 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 71.2%
-// Open: block layout of the scene-object scan (the original places the
-// "pressed" block before the loop) and reload/temporary register choices.
+// fuzzy: 96.6%
+// Open: the "pressed" block ORs a register holding 0 into flags88
+// (movs r5,#0; orrs r0,r5) before the & ~1; until that zero is reproduced,
+// &delta is hoisted before the registry call and ip/r8 swap.
 struct Vec16 {
     s16 x, y, z;
 };
@@ -54,6 +55,12 @@ static inline s32 optionalValue(void)
     else
         value = 0;
     return value;
+}
+static inline u8 FloorSwitch_InCurrentRegion(struct FloorSwitch *e)
+{
+    if (*(s32 *)((u8 *)gUnk_02000710 + 0x5A0) == e->region)
+        return TRUE;
+    return FALSE;
 }
 /* Registry routine AB8E (GCL proc place_floor_switch): takes a slot of the
    floor switch manager (0x020001A8, created on demand) and fills it from the
@@ -113,32 +120,40 @@ void FloorSwitch_Create(void)
         p->field10 = 0;
         AnimData_SelectPaletteBank(e->anim, 0x16C);
     }
-    if (SceneBody_GetRegistry()) {
+    {
         struct SceneObject *o;
         struct Vec16 *d = &delta;
+        if (SceneBody_GetRegistry())
+            goto scan;
+        goto skip;
+    found:
+        e->field5A = o->next0;
+        e->flags88 = (e->flags88 | 2) & ~1;
+        e->field8C = 0;
+        e->field10 = 1;
+        AnimData_SelectPaletteBank(e->anim, 0x16D);
+        goto skip;
+    scan:
         for (o = SceneBody_GetRegistry()->head; o; o = o->next) {
             if (!(o->flags & 2)) {
-                d->x = o->x - e->x;
-                d->y = o->y - e->y;
-                d->z = o->z - e->z;
-                if ((u16)d->x <= 0x100 && d->y <= 0x20 && d->y >= 0 && d->z <= 0x100 && d->z >= 0) {
-                    e->field5A = o->next0;
-                    e->flags88 = (e->flags88 | 2) & ~1;
-                    e->field8C = 0;
-                    e->field10 = 1;
-                    AnimData_SelectPaletteBank(e->anim, 0x16D);
-                    break;
-                }
+                struct Vec16 *op = (struct Vec16 *)&o->x;
+                struct Vec16 *ep = (struct Vec16 *)&e->x;
+                d->x = op->x - ep->x;
+                d->y = op->y - ep->y;
+                d->z = op->z - ep->z;
+                if ((u16)d->x <= 0x100 && d->y <= 0x20 && d->y >= 0 && d->z <= 0x100 && d->z >= 0)
+                    goto found;
             }
         }
     }
+skip:
     e->field8E = Script_GetKeywordValue('d', 0);
     e->field8C = 0;
     e->region = Region_FindContaining((struct Vec16 *)&p->x);
-    if (*(s32 *)((u8 *)gUnk_02000710 + 0x5A0) == e->region)
-        p->flags &= ~1;
-    else
+    if (!FloorSwitch_InCurrentRegion(e))
         p->flags |= 1;
+    else
+        p->flags &= ~1;
     e->field8B = 0;
     e->field8A = 0;
 }

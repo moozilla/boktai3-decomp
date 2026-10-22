@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.5%
-// Open: register allocation in the 448-byte body (17 instructions differ).
-// The reviewed extent also includes 80 bytes at 08101500 not represented by this C.
 #include "named_object.h"
 #include "player.h"
 static inline u8 Active(u32 mask, u32 bit)
@@ -61,20 +57,20 @@ void NamedObject_UpdateMovementSound(u8 *manager)
     }
     if (Player_TestAttachmentFlags(gUnk_02000580[0], 1))
         attached = 1;
-    o = NamedObject_FindByName(*(u16 *)((u8 *)gUnk_02000580[0] + 0x476));
-    if (!o)
+    objects = NamedObject_FindByName(*(u16 *)((u8 *)gUnk_02000580[0] + 0x476));
+    if (!objects)
         return;
-    if (o->field_E0 & 4)
+    if (objects->field_E0 & 4)
         return;
     if (attached) {
-        if ((s16)o->state != 1) {
+        if ((s16)objects->state != 1) {
             if (manager[0x1378] == 1) {
                 Stop();
                 manager[0x1378] = 0;
             }
         } else {
             if (!manager[0x1378]) {
-                Play(o);
+                Play(objects);
                 manager[0x1378] = 1;
             }
         }
@@ -85,7 +81,3 @@ void NamedObject_UpdateMovementSound(u8 *manager)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", NamedObject_UpdateMovementSound);
-#endif

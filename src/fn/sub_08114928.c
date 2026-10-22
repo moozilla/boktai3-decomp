@@ -1,8 +1,10 @@
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
-// fuzzy: 83.9%
-/* Group-id expression ordering, argument registers and slot initialization still differ. */
+// fuzzy: 93.8%
+/* Open: the ROM masks the second group id with 0xFF (word load of the timer) where this
+ * truncates, and the case-2 offset/constant temporaries swap r3/r4.
+ * The u8/u16 form keeps the timer address from being shared with the first GroupId. */
 #include "actor_attachment_state.h"
 struct Vec {
     s32 x, y, z, w;
@@ -106,7 +108,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
             m->effects[i].sprite.priority = 1;
             m->effects[i].active = 1;
             m->effects[i].state = 0;
-            m->effects[i].id = GroupId(m, group);
+            m->effects[i].id = (u8)group | (u16)(m->timer << 8);
             switch (profile->type) {
                 case 0:
                     m->effects[i].position.x += 0x4000;

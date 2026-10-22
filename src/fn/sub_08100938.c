@@ -1,11 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.5%
-// foundry draft (worker best 87.5%); what differs is mostly register allocation and instruction order
-#define SpriteSlot_CheckScene      FloorSwitch_UpdateRegionVisibility
-#define gSpriteSlotUpdateCallbacks gUnk_086064AC
-
 struct SpriteSlot {
     u8 pad00[0x86];
     s16 updateKind;
@@ -19,27 +13,28 @@ struct SpriteSlots {
 extern void *gUnk_086064AC[];
 u32 FloorSwitch_UpdateRegionVisibility(struct SpriteSlot *);
 s32 Callback_InvokeActor(void *, void *);
+
 static inline u8 SpriteSlots_IsActive(u32 *mask, s32 i)
 {
     if (*mask & (1 << i))
         return TRUE;
     return FALSE;
 }
+
 u32 SpriteSlots_UpdateActive(struct SpriteSlots *self)
 {
     struct SpriteSlot *slots = self->slots;
     struct SpriteSlot *slot;
     s32 i;
-    if (self->activeMask) {
-        for (i = 0, slot = slots; i < 8; i++, slot++) {
-            if (SpriteSlots_IsActive((u32 *)(slots + 8), i)) {
-                if ((u8)FloorSwitch_UpdateRegionVisibility(slot))
-                    Callback_InvokeActor(slot, gUnk_086064AC[self->slots[i].updateKind]);
-            }
+
+    if (!self->activeMask)
+        return 0;
+    for (i = 0; i < 8; i++) {
+        slot = &self->slots[i];
+        if (SpriteSlots_IsActive((u32 *)(slots + 8), i)) {
+            if ((u8)FloorSwitch_UpdateRegionVisibility(slot))
+                Callback_InvokeActor(slot, gUnk_086064AC[slot->updateKind]);
         }
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteSlots_UpdateActive);
-#endif
