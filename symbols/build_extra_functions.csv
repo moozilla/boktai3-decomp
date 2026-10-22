@@ -453,7 +453,8 @@ address,isa,evidence,replacement_end
 0819E7B0,thumb,Hidden raw-tail function,0819E7F0
 0819EB84,thumb,Hidden raw-tail function (retained),
 0819EBD0,thumb,Hidden raw-tail function (retained),
-0819F49C,thumb,Hidden tail after Hresvelgr_UpdateAdjacentRandomBurstPhase,
+0819F49C,thumb,Hidden tail function,0819F4D8
+0819F4D8,thumb,Hidden tail function,0819F55C
 081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
 081A398C,thumb,Hidden raw-tail function,081A39E0
 081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84

@@ -466,6 +466,7 @@ address,evidence
 0819EB84,Hidden raw-tail function (retained)
 0819EBD0,Hidden raw-tail function (retained)
 0819F49C,Hidden tail after Hresvelgr_UpdateAdjacentRandomBurstPhase
+0819F4D8,Hidden tail function
 081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
 081A398C,Hidden raw-tail function
 081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
