@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Only difference: ROM materialises 0x1000 before loading atk->attr for the first test.
 struct Collider {
     u8 pad0[6];
     u16 flags;
@@ -24,10 +21,13 @@ void sub_08220204(struct Collider *atk, struct Collider *def)
 
     if (def->damage != 0)
         return;
-    if (atk->attr & 0x1000)
-        dmg = atk->power;
-    else
-        dmg = atk->power - def->power;
+    {
+        u32 m = 0x1000;
+        if (atk->attr & m)
+            dmg = atk->power;
+        else
+            dmg = atk->power - def->power;
+    }
     if (dmg <= 0)
         dmg = 1;
     attr = atk->attr;
@@ -71,6 +71,3 @@ void sub_08220204(struct Collider *atk, struct Collider *def)
     if (def->damage == 0)
         def->damage = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08220204);
-#endif

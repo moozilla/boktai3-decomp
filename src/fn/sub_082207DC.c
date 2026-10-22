@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.0%
-// Box_Overlaps (sub_08220BF8) inlined. ROM keeps the stack box address in r5 and reads it
-// with ldrsh [r5, #off]; agbcc here folds it into sp-relative adds (pinning bp fixes the
-// shape but swaps r4/r5).
+// Box_Overlaps (sub_08220BF8) inlined; the stack box address is kept in a register
+// (pinned: agbcc otherwise folds it into sp-relative adds).
 
 struct HitPoint {
     s32 a, b;
@@ -48,7 +46,7 @@ u32 sub_082207DC(struct Collider *a, struct Collider *b)
 {
     struct Collider box;
     struct HitPoint out;
-    struct Collider *bp;
+    register struct Collider *bp asm("r4");
 
     sub_082203A8(a->pos, a->offset, &box);
     bp = &box;
@@ -62,6 +60,3 @@ u32 sub_082207DC(struct Collider *a, struct Collider *b)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082207DC);
-#endif
