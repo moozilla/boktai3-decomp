@@ -13,7 +13,8 @@ struct MenuDisplay {
 void SceneHud_FillDigitCells(s32, s32, s32, s32);
 void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *, s32, s32, s32, s32);
 
-void InventoryPanel_SetEntryRow(struct MenuDisplay *p, s32 x, s32 y, s32 value, s32 frameBase, s32 first)
+void InventoryPanel_SetEntryRow(struct MenuDisplay *p, s32 x, s32 y, s32 value, s32 frameBase,
+                                s32 first)
 {
     s32 i;
     if (value < 0) {
