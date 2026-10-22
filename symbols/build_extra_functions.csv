@@ -210,7 +210,7 @@ address,isa,evidence,replacement_end
 08103AD0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08103ADC
 08103F24,thumb,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound",08103F44
 081041F0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,08104204
-08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; retained assembly,
+08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; exact C,081042DC
 081047B0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081047B4
 08105A40,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08105A44
 0810731C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08107320
@@ -251,7 +251,7 @@ address,isa,evidence,replacement_end
 0811525C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115268
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
-0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
+0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout (terrain cell high nibble at summed x); exact C,0811AC54
 0811AC54,thumb,Hidden tail function,0811AC6C
 0811ACCC,thumb,Hidden raw-tail function: terrain cell nibble getter (bits 8-11),0811AD8C
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
@@ -408,7 +408,7 @@ address,isa,evidence,replacement_end
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
 0817A354,thumb,Hidden first position inside box search (retained),
-0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition,
+0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition (random reachable corner around player 0); exact C,0817AA14
 0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
 0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
 08180850,thumb,Hidden tail function,08180858
