@@ -1,20 +1,22 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.6%
-// foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
-static inline u32 TestFlag(u16 *p, u32 mask)
+static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
-    return *p & mask;
+    u32 m = mask;
+    asm("" : "+r"(m));
+    return p->flags2D4 & m;
 }
+#define SceneActor_IsFacingNearbyTarget sub_080B335C
+
 s32 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryResetView *q = p->context;
     s32 difference, absolute;
     if (q->field6E8)
         return 0;
-    if (TestFlag(&p->flags2D4, 0x100))
+    if (TestFlag(p, 0x100))
         return 0;
     if (p->distanceF0 > 0xFFFF)
         return 0;
@@ -30,6 +32,3 @@ s32 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *p)
         return 0;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_IsFacingNearbyTarget);
-#endif
