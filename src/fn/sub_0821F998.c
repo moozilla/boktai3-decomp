@@ -3,7 +3,6 @@
 /* NavMesh_StepTowardTarget: once the probe reaches its current waypoint node,
  * picks the neighbouring node with the smallest pair-table distance to the
  * target node and makes it the next waypoint (tentative). */
-#define NavMesh_StepTowardTarget sub_0821F998
 
 u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b);
 
@@ -49,7 +48,7 @@ struct NavProbe {
     } way;
 };
 
-void sub_0821F998(u8 *mesh, struct NavProbe *probe, s16 *pos)
+void NavMesh_StepTowardTarget(u8 *mesh, struct NavProbe *probe, s16 *pos)
 {
     u32 sh = probe->region << 2;
     u32 *ov;

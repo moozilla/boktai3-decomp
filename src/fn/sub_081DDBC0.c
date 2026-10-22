@@ -5,7 +5,6 @@
  * B (erase, or cancel on an empty name), SELECT (page toggle), START (jump to End) and A
  * (type / toggle / confirm); confirming stores the name and fades out. State 1 waits for
  * the fade, hides the widgets, runs the follow-up script and kills the task. (guess) */
-#define NameEntry_Update sub_081DDBC0
 
 struct NameEntryTask {
     u8 widgets[0x348];

@@ -5,11 +5,11 @@ struct A {
 };
 extern struct A *gUnk_030052F4;
 void sub_0821F864(void *, u16 *, u32);
-void sub_0821F998(void *, u16 *, u32);
+void NavMesh_StepTowardTarget(void *, u16 *, u32);
 void NavMesh_UpdateProbe(u16 *a, u32 b)
 {
     void *t = gUnk_030052F4->f14;
     sub_0821F864(t, a, b);
     if (*a & 1)
-        sub_0821F998(t, a, b);
+        NavMesh_StepTowardTarget(t, a, b);
 }
