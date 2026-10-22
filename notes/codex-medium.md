@@ -4082,3 +4082,119 @@ at batch integration.
   Candidate remains in ignored wip/codex-medium/sub_080BA268.c; no production
   edit. Forward-vector setup is present in the ROM even though its result is
   unused by the subsequent body, so the candidate preserves it.
+
+## 2026-10-22 — remaining Golem, Skeleton and Armor callbacks
+
+Tags: #matching #golem #skeleton #armor #navigation #nonmatching
+
+Offline pass on the preclaimed branch. One exact match adds **+0.0443 percentage
+points** of code coverage (1068 bytes, ordinary C with no register hints). Four
+new guarded drafts contribute no exact progress. Used only per-file check.py
+validation; no make, full build, network operation or direct git mutation.
+Commits were queued individually through build/commit.sh. Combined ROM
+validation and alias promotion remain integration work.
+
+- **080C5930 — skipped prior unsuccessful attempt.** The preceding section
+  records the complete facing-turn candidate and three helper/control-layout
+  hypotheses, best 37.1%. Kept that scratch work and did not repeat it.
+- **080C47DC — skipped existing draft.** Production src/fn/sub_080C47DC.c
+  already has a guarded 70.2% candidate. No edit or new draft credit.
+- **080BA268 — skipped prior unsuccessful attempt.** The preceding section
+  records its armor-break candidate at 66.9% and the allocation experiments.
+  Left production source unchanged.
+- **080BAE04 — stopped below threshold, Skeleton_UpdateFacingTurn
+  (tentative).** Ported the earlier Golem facing-turn candidate after reading
+  the Skeleton assembly and matched animation helpers. Added behavior-20
+  exclusion, mask 0x4480, profile entry two, 32-unit heading steps, the tile
+  animation checkpoint, and circular eight-way completion comparison. Replaced
+  the inline selector with the SceneActorAnimation_SelectExplicitVariant form
+  as a second hypothesis. Best coarse similarity was only 37.2%, with 551
+  structural realigned differences. The many shared sequence/keyframe tails
+  still compile in a substantially different order. Scratch only:
+  wip/codex-medium/sub_080BAE04.c; no production draft.
+- **08185F70 — matched, Armor_UpdateOffsetTracking.** Called by the four
+  delayed tracking wrappers at 0818639C–08186438. Computes player heading,
+  chooses cardinal/diagonal offsets (3072/2172 when horizontal Manhattan
+  distance <=512, otherwise 768/543), and shifts the eight-way sector by
+  phase-dependent +/-7. Sets the movement heading in 32-unit increments,
+  then selects mode-specific turn callbacks or movement states 34/35/37/41.
+  The flags bit 0x10 refreshes a 120-tick delay. A signed packed vector's
+  halfword bitfields exactly reproduce the partial register updates; ordinary
+  C matched on the first successful compilation. Formatted and checked over
+  the reviewed **1068-byte** body/pool extent; no pins or barriers.
+- **08186EB4 — drafted 96.9%, Armor_SelectTimedAttack (tentative).** Timed
+  Armor decision callback with attack cooldown 0x1122, flag-dependent
+  decisions, aligned close attacks and recovery. Ported the common typed
+  actor view and decision flow from the newly reconstructed 08189D04.
+  Preserving the close-range call at its original position improved the
+  candidate. Full-extent final residue: **89 differing instructions, 81
+  ignoring registers**, candidate 864 bytes versus 892 original. Repeated
+  facing loads and shared strike/zero-store tails remain. No authored hints.
+  The commit subject used an earlier estimate; the recorded **96.9%** is the
+  final per-draft score.
+- **08189D04 — drafted 82.5%, Armor_UpdateAlignedStrikeDecision
+  (tentative).** Decrements attack cooldown, gates on phase/behavior, rounds
+  player X/Z deltas to cells, and selects approach, strike and recovery from
+  decision byte 0x1120. Its flag-one path also advances the 300-tick sequence
+  timer. The original retains mode zero and constant one across separate
+  strike/reset paths. Local mode/delta hints preserved those paths; retained
+  candidate has **69 differing instructions, 22 ignoring registers**, 752
+  bytes versus 756 original. Five adjacent pin-removal hypotheses were checked;
+  dropping the az pin gave the best retained candidate. The unguarded depin
+  tool declines this non-exact base; it was not run on the assembly fallback.
+  Marked register-pinning concession. Final recorded score **82.5%** supersedes
+  the estimate in its commit subject.
+- **080C7E18 — drafted 85.8%, Golem_ResumeRouteAfterAnimation (tentative).**
+  Hidden function after Golem_ResumeSavedTarget; asmat prints its bytes rather
+  than decoded instructions. Reviewed the resolved Thumb body through the next
+  entry at 080C8774 (2396 bytes). Entry selects animation three, sets flags2D6
+  bit 0x10 and rewinds the early nonlooping animation checkpoint through frame
+  19. Once finished, selects animation zero and restores chase or home routing.
+  Successful chase stores a 30-tick restoration packet; home routing uses 40
+  ticks and duration scale 64. Ported the recovered 080CBF24 flow and its
+  neighboring Golem recovery inlines. Declaration order, a local flag mask,
+  and parameterized restoration duration reduced structural residue to **43**
+  (**173** total differing instructions); candidate is 2392 bytes. No authored
+  register hints. Full-extent score recorded; default INCLUDE_ASM checks exact.
+- **080CBF24 — drafted 80.8%, Golem_ResumeDelayedRoute (tentative), in
+  src/golem_2.c.** Consumes the entry flag, invokes update and reaction checks,
+  then waits for signed counter2AC >60. Replaces the response slot, selects
+  delayed restoration control, and restores chase or the route home. The chase
+  path stores a 30-tick packet and expands the usual same-cell/player-cell,
+  terrain-height and random-turn code. Home route success sets destination pad
+  to one; failure enters idle control. Reusing the matched Golem-relative
+  inlines, typing the delayed packet, scoping its pointer to each branch, and
+  moving the wait increment to its tail improved 65.1% to 78.2%. An inline
+  masked flag accessor improved the final candidate to **80.8%**, **272 total /
+  50 structural** differences, 2312 bytes versus 2300 original. The unit's
+  --record output reports this function's score separately from the 96.5%
+  whole-unit similarity. Kept the header additions local enough to avoid
+  conflicting tentative collision APIs. Default whole-unit check is exact.
+- **080B9158 — stopped at 67.7%, Skeleton_UpdateEscapeMovement (tentative).**
+  Installer 080B5D84 selects this as timed control kind 0x38. Entry chooses a
+  random speed 10..13 and an open neighbor relative to field2B6. Success
+  generates cosine/sine escape motion, faces the opposite cardinal direction,
+  randomizes vertical motion 12..27 and selects animation 14. No open neighbor
+  restores pursuit with animation 15 and sets context+0x6DC bit 0x80. The
+  flags2D0 bit 0x10 path also restores pursuit. Reconstructed both repeated
+  route-arrival expansions using scene_actor_chase.h; corrected the velocity
+  scale to signed truncation by 4096 and made actor-relative flag/timer stores
+  explicit. Best ordinary candidate: **724 total / 303 structural** differences,
+  3820 bytes versus 3768 original. An sb actor hint reduced structural residue
+  to 262 but worsened similarity to 35%, so discarded. Scratch only.
+- **081879A8 — stopped below threshold.** Reconstructed Armor_UpdateMeleeDecision
+  from assembly and the common actor view. Cooldowns decrement twice in fast
+  mode, collision flag four is gated, and fast mode toggles every 300 ticks
+  outside flag-one mode. Switches select approach and side attacks with a
+  180-tick cooldown; flag-one decision three checks aligned range <=4 and
+  vertical separation <=127. Computing heading before loading facing improved
+  **57.8% to 72.3%**, **218 total / 89 structural** differences (1356-byte C
+  versus 1436-byte original). Four bounded hypotheses covered facing reloads,
+  narrow atan return and delta/absolute-value pins. Extra facing reloads reached
+  73.2% but no eligible draft; kept ordinary source in scratch. This does not
+  improve the previous pass's 75.3% result. No production edit.
+
+All new guarded scores were recorded with check.py --nonmatching --record;
+all default assembly paths were checked. Scratch candidates and diagnostic
+artifacts remain ignored under wip/codex-medium/ and build/. No shared docs or
+progress totals were regenerated in this worker pass.
