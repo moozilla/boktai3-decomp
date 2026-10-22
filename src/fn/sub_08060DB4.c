@@ -1,8 +1,4 @@
 #include "scene_inventory_actions.h"
-#ifdef NONMATCHING
-// fuzzy: 99%
-// Open: the second (pair copy) loop counter 'movs #1' is scheduled before the
-// pointer setup instead of after.
 u32 Selection_GetDisplayFrame(s32);
 void SceneInventory_BeginItemSwapPair(struct SceneInventoryActionView *panel)
 {
@@ -33,15 +29,9 @@ void SceneInventory_BeginItemSwapPair(struct SceneInventoryActionView *panel)
         *attributeOut++ = 0x373;
         SceneInput_GetGridPosition(&starts[i], slot);
     }
-    i = 1;
-    do {
-        targetBase[1 - i] = starts[i];
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 2; i++)
+        targetBase[i] = starts[1 - i];
     SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair,
                                    enabledBase, starts, targetBase, frameBase, attributeBase, 12);
     Sound_PlaySong(0x38A);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneInventory_BeginItemSwapPair);
-#endif
