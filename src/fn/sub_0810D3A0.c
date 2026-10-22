@@ -1,7 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.7%
-// foundry draft (worker best 83.7%); what differs is mostly register allocation and instruction order
+// fuzzy: 87.5%
+// Open: GetSelectionCount sets its 0 result before the tests, and the clamped
+// store reuses the &s->count address instead of recomputing it after the join.
 #define SpriteGroup_Initialize PanelSequence_InitializeSprites
 #define gPanelSequence         gUnk_020001C8
 struct PanelSequence {
@@ -13,7 +14,7 @@ struct PanelSequence {
     u32 source, context, names;
     u8 pad13F8[4];
     u8 transition;
-    volatile u8 count;
+    u8 count;
     u8 pad13FE[0xE];
     u8 entering;
     u8 pad140D[5];
@@ -21,7 +22,7 @@ struct PanelSequence {
 };
 struct PanelSelection {
     u8 pad0[0x53];
-    volatile u8 type;
+    u8 type;
     u8 pad54[0x1BC];
     u8 count;
 };
@@ -45,17 +46,14 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetSelectionCount(void)
 {
     struct PanelSelection *p = gUnk_020004B4;
-    if (!p)
-        return 0;
-    if ((p->type & 0xFF) != 1)
-        return 0;
-    return &p->count;
+    if (p && p->type == 1)
+        return &p->count;
+    return 0;
 }
 s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
 {
     u8 *count;
     int n;
-    int zero;
     if (Script_SeekToKeyword('s')) {
         s->source = Script_GetTextSourcePc();
         if (!s->source)
@@ -75,11 +73,10 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     count = GetSelectionCount();
     if (!count)
         return -1;
-    s->count = *count;
-    n = s->count;
+    *(volatile u8 *)&s->count = *count;
+    n = *(volatile u8 *)&s->count;
     if (n > 10)
         n = 10;
-    zero = 0;
     s->count = n;
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);
@@ -93,16 +90,12 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     ModifierMenu_InitSelectionSnapshot(s->indicators, s->palette);
     LinkPanel_CreateTextWindows(s);
     LinkPanel_StartDescriptions(s);
-    {
-        void (*next)(struct PanelSequence *) = PanelSequence_UpdateDelay;
-        s->update = next;
-        s->entering = 1;
-        s->transition = zero;
-    }
-    if (Script_GetKeywordValue('f', 0)) {
-        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
-    }
-    gPanelSequence = s;
+    s->update = PanelSequence_UpdateDelay;
+    s->entering = 1;
+    s->transition = 0;
+    if (Script_GetKeywordValue('f', 0))
+        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
+    gUnk_020001C8 = s;
     return 1;
 }
 #else

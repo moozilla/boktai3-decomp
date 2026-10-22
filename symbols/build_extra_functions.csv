@@ -72,8 +72,8 @@ address,isa,evidence,replacement_end
 08033C4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08033C58
 080347D8,thumb,Wireless parent link-manager message callback: maps LMAN messages to engine operations; raw span after the preceding wireless helper,080349F0
 080349FC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08034A14
-080359E4,thumb,"Wireless parent UNI session setup (packet queue, slot buffers, callbacks, send data); first of three functions in the raw 080359E4-08035CE8 span; retained assembly",
-08035B98,thumb,"Wireless child UNI session setup (slot lookup, buffers, callbacks, send data); part of the raw 080359E4-08035CE8 span; retained assembly",
+080359E4,thumb,"Wireless parent UNI session setup (packet queue, slot buffers, callbacks, send data); first of three functions in the raw 080359E4-08035CE8 span; retained assembly",08035B98
+08035B98,thumb,"Wireless child UNI session setup (slot lookup, buffers, callbacks, send data); part of the raw 080359E4-08035CE8 span; retained assembly",08035CD0
 08035CD0,thumb,Wireless: clear all RFU slots when the engine's flag 0x30 is set; returns whether it did; end of the raw 080359E4-08035CE8 span,08035CE8
 080369F0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036A10
 08036BAC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08036BD4

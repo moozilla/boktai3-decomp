@@ -2,7 +2,6 @@
 #define gRfuSlotStatusNI gUnk_03006A70
 #define gRfuLinkStatus   gUnk_03006A80
 #include "rfu_compat.h"
-#define G ((struct Manager *)0x03005390)
 struct Manager {
     u8 f0, f1;
     volatile u8 f2;
@@ -23,79 +22,74 @@ void RfuManager_ClearState(void);
 void RfuManager_FinishSlotReception(void);
 u8 RfuManager_FindAllowedParents(void);
 void RfuManager_RemoveSendTargets(void);
-#ifdef NONMATCHING
-// fuzzy: 80.7%
-u32 RfuManager_UpdateLinkRecovery(u16 command)
+extern struct Manager gUnk_03005390;
+#define lman gUnk_03005390
+// pret/pokeemerald AgbRfu_LinkManager.c: rfu_LMAN_linkWatcher
+u8 RfuManager_UpdateLinkRecovery(u16 REQ_commandID)
 {
-    u8 loss, reason, recovered;
-    u32 disconnected = 0;
     u8 i;
-    rfu_REQBN_watchLink(command, &loss, &reason, &recovered);
-    if (loss) {
-        struct Manager *s = G;
-        s->f14 = loss;
-        s->f16 = reason;
-        if (s->f9) {
-            s->fa = 1;
-            if (!s->f6 && !reason)
-                s->fa = 4;
-            if (s->fa == 1) {
+    u8 bm_linkLossSlot;
+    u8 reason;
+    u8 bm_linkRecoverySlot;
+    u8 bm_disconnectSlot;
+
+    u8 disconnect_occure_flag = FALSE;
+    rfu_REQBN_watchLink(REQ_commandID, &bm_linkLossSlot, &reason, &bm_linkRecoverySlot);
+    if (bm_linkLossSlot) {
+        lman.f14 = bm_linkLossSlot;
+        lman.f16 = reason;
+        if (lman.f9) {
+            lman.fa = 1;
+            if (lman.f6 == 0 && reason == 0)
+                lman.fa = 4;
+            if (lman.fa == 1) {
                 for (i = 0; i < 4; i++) {
-                    if ((loss >> i) & 1) {
-                        s->f30 |= 1 << i;
-                        s->a34[i] = s->f32;
+                    if ((bm_linkLossSlot >> i) & 1) {
+                        lman.f30 |= (1 << i);
+                        lman.a34[i] = lman.f32;
                     }
                 }
                 RfuManager_NotifyEvent(0x31, 1);
             } else {
-                s->fa = 0;
-                RfuManager_DisconnectAndWait(loss);
-                disconnected = 1;
+                lman.fa = 0;
+                RfuManager_DisconnectAndWait(bm_linkLossSlot);
+                disconnect_occure_flag = TRUE;
                 RfuManager_NotifyEvent(0x33, 1);
             }
         } else {
-            RfuManager_DisconnectAndWait(loss);
-            disconnected = 1;
+            RfuManager_DisconnectAndWait(bm_linkLossSlot);
+            disconnect_occure_flag = TRUE;
             RfuManager_NotifyEvent(0x30, 2);
         }
         RfuManager_CompletePendingMscCycle();
     }
     if (gRfuLinkStatus->parentChild == 1) {
-        struct Manager *s;
-        if (recovered) {
+        if (bm_linkRecoverySlot) {
             for (i = 0; i < 4; i++) {
-                if (((G->f30 >> i) & 1) && ((recovered >> i) & 1))
-                    G->a34[i] = 0;
+                if ((lman.f30 >> i) & 1 && (bm_linkRecoverySlot >> i) & 1)
+                    lman.a34[i] = 0;
             }
-            G->f30 &= ~recovered;
-            G->f14 = recovered;
+            lman.f30 &= ~bm_linkRecoverySlot;
+            lman.f14 = bm_linkRecoverySlot;
             RfuManager_NotifyEvent(0x32, 1);
         }
-        s = G;
-        if (s->f30) {
-            u8 expired = 0;
+        if (lman.f30) {
+            bm_disconnectSlot = 0;
             for (i = 0; i < 4; i++) {
-                if (((s->f30 >> i) & 1) && s->a34[i] && --s->a34[i] == 0) {
-                    u32 bit = 1 << i;
-                    s->f30 &= ~bit;
-                    expired |= bit;
+                if ((lman.f30 >> i) & 1 && lman.a34[i] && --lman.a34[i] == 0) {
+                    lman.f30 &= ~(1 << i);
+                    bm_disconnectSlot |= (1 << i);
                 }
             }
-            if (expired) {
-                RfuManager_DisconnectAndWait(expired);
-                disconnected = 1;
-                G->f14 = expired;
+            if (bm_disconnectSlot) {
+                RfuManager_DisconnectAndWait(bm_disconnectSlot);
+                disconnect_occure_flag = TRUE;
+                lman.f14 = bm_disconnectSlot;
                 RfuManager_NotifyEvent(0x33, 1);
             }
-            s = G;
-            if (s->f30)
-                return disconnected;
         }
-        s->fa = 0;
+        if (!lman.f30)
+            lman.fa = 0;
     }
-    return disconnected;
+    return disconnect_occure_flag;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", RfuManager_UpdateLinkRecovery);
-#endif
