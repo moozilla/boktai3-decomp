@@ -18,7 +18,8 @@ static inline s32 scale(s32 value)
     return -((-value) >> 12);
 }
 
-s32 sub_0821E67C(struct PathCtx *ctx, s16 *pos, s16 *out, u8 *dir, u32 rangeX, u32 rangeZ, s32 speed)
+s32 sub_0821E67C(struct PathCtx *ctx, s16 *pos, s16 *out, u8 *dir, u32 rangeX, u32 rangeZ,
+                 s32 speed)
 {
     struct PathPt t;
     s32 dx, dz;
