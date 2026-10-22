@@ -1,6 +1,6 @@
 #include "global.h"
 #define Sword_DampTargetReturn sub_080F5C9C
-struct Motion0818Object {
+struct SwordReturnComponent {
     u8 pad0[6];
     u8 rotation; /* +006: wrapping orientation byte */
     u8 pad7[0x15];
@@ -20,12 +20,12 @@ struct Motion0818Object {
     u16 startX, startY, startZ, pad142; /* +13c: segment origin */
     s16 dx, dy, dz;
     u16 pad14A;
-    u16 fx, fy, fz, pad152; /* +14c: initial owner-relative offset */
+    u16 fx, fy, fz, pad152; /* +14c: initial target-relative offset */
     u16 a, b, c, pad15A;    /* +154: phase-dependent scratch vector */
-    u16 *target;
-    u8 *parent;             /* +15c: owner; position at +5ac */
+    u16 *target; /* +15c: target position updated by the follow segment. */
+    u8 *parent; /* +160: enclosing Sword actor. */
     u8 pad164[0x18];
-    void (*callback)(struct Motion0818Object *);
+    void (*callback)(struct SwordReturnComponent *);
     u32 unknown180;
     s32 timer;
     u8 targetRotation, pad189;
@@ -34,19 +34,19 @@ struct Motion0818Object {
     s8 byte1DD;
 };
 
-struct ReturnDampingCounter {
+struct SwordReturnCounter {
     u8 pad[0x126];
     u16 ticks;
 };
 s32 Mod(s32, s32);
-void TargetMotion_AdvanceFollowSegment(struct Motion0818Object *);
-void Sword_DampTargetReturn(struct Motion0818Object *p)
+void TargetMotion_AdvanceFollowSegment(struct SwordReturnComponent *);
+void Sword_DampTargetReturn(struct SwordReturnComponent *p)
 {
     s32 value, half;
     p->rotation += 20;
     p->x += p->velocityX;
     p->z += p->velocityZ;
-    if (Mod(++((struct ReturnDampingCounter *)p)->ticks, 5) == 0) {
+    if (Mod(++((struct SwordReturnCounter *)p)->ticks, 5) == 0) {
         if (p->velocityX == 0 && p->velocityZ == 0) {
             p->fieldA6 = 16;
             p->field52 = 16;
