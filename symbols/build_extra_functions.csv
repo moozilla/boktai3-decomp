@@ -253,7 +253,10 @@ address,isa,evidence,replacement_end
 0815AD60,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD78
 0815CC78,thumb,Independent 128-byte sibling of ScriptActor_MoveToFromScript with own push and pop-bx in its trailing data; exact standalone C,0815CCF8
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
-0815F588,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0815F6A8
+0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
+0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
+0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
 0816CE8C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,0816CEA0
 0816D3E8,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0816D40C
 081780B4,thumb,Independent 32-byte HUD mode refresh with own push and pop-bx after Hud_SetModeFromScript; exact standalone C,081780D4
