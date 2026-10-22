@@ -40,7 +40,7 @@ address,isa,evidence,replacement_end
 08028DFC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08028E18
 0802CCE0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802CD04
 0802CED0,thumb,Hidden raw-tail function: independent 40-byte body in 0802CD04 tail,0802CEF8
-0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
+0802CEF8,thumb,Hidden raw-tail function: independent 24-byte body in 0802CD04 tail,0802CF10
 0802D014,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0802D020
 0802D05C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D080
 0802D0F4,thumb,Actor animation entry by four-way facing byte 0x180 with mirrored flip; first of two functions in the raw 0802D0F4-0802D1B0 span,0802D15C
