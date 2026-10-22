@@ -587,83 +587,70 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 64.8%
-
-// Packed endpoint caching and register allocation differ; no exact credit.
-
-void TetherActor_UpdateSegments(struct TetherActor *input)
+// fuzzy: 87.9%
+// Remaining: the ROM hoists neither z endpoint out of the segment loop and keeps the
+// priority in sb; this hoists start.z and spills the priority.
+static inline s32 scaleOffsetR(s32 value)
 {
-    struct TetherActor *actor = input;
-    struct Player **globals = gUnk_02000580;
-    struct Player *player = globals[0];
-    u32 mode = player->tetherMode;
-    struct Player **slots = globals;
+    s32 result;
+    if (value >= 0)
+        result = value >> 12;
+    else
+        result = -((-value) >> 12);
+    return result;
+}
+void TetherActor_UpdateSegments(struct TetherActor *actor)
+{
     struct TetherSegment *segment;
-    struct ContactPackedVector start, end;
+    struct ContactPackedVector start;
+    struct ContactPackedVector end;
     s32 x;
     s32 z;
-    s32 offsetX, offsetZ;
+    s32 offsetX;
+    s32 offsetZ;
     u32 angle;
     s32 priority;
-    s32 index;
-    s32 accumulatedX, accumulatedY;
-    if (mode != 6) {
-        u32 hidden = 1;
-        segment = actor->segments;
-        index = 6;
-        do {
-            segment->flags |= hidden;
-            --index;
-            ++segment;
-        } while (index >= 0);
+    s32 i;
+    if ((*gUnk_02000580)->tetherMode != 6) {
+        s32 n;
+        for (n = 0, segment = actor->segments; n < 7; n++, segment++)
+            segment->flags |= 1;
         return;
     }
-    angle = ((player->heading + 1) & 7) * 32;
+    angle = (((*gUnk_02000580)->heading + 1) & 7) * 32;
     x = gUnk_086149C4[(angle + 64) & 255];
     z = gUnk_086149C4[angle & 255];
-    if (player->side) {
-        offsetX = scaleOffset(20 * (z - x));
-        offsetZ = scaleOffset(20 * (x + z));
+    if ((*gUnk_02000580)->side) {
+        offsetX = scaleOffsetR(20 * (z - x));
+        offsetZ = scaleOffsetR(20 * (x + z));
     } else {
-        offsetX = scaleOffset(20 * (x + z));
-        offsetZ = scaleOffset(20 * (z - x));
+        offsetX = scaleOffsetR(20 * (x + z));
+        offsetZ = scaleOffsetR(20 * (z - x));
     }
-    player = slots[0];
-    start.x = player->position.x + offsetX;
-    start.y = player->position.y + 220;
-    start.z = player->position.z + offsetZ;
+    start.x = (*gUnk_02000580)->position.x + offsetX;
+    start.y = (*gUnk_02000580)->position.y + 220;
+    start.z = (*gUnk_02000580)->position.z + offsetZ;
     angle = ((actor->heading + 5) & 7) * 32;
-    end.x = actor->position.x + scaleOffset(100 * gUnk_086149C4[(angle + 64) & 255]);
+    end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
     end.y = actor->position.y - 50;
-    end.z = actor->position.z + scaleOffset(100 * gUnk_086149C4[angle & 255]);
+    end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
     priority = -2;
-    if (slots[0]->heading == 4)
+    if ((*gUnk_02000580)->heading == 4)
         priority = -20;
     segment = actor->segments;
-    index = 0;
-    {
-        s32 startX = start.x;
-        s32 startY = start.y;
-        s32 endX = end.x;
-        s32 nextX = endX;
-        s32 endY = end.y;
-        s32 nextY = endY;
-        do {
-            s32 count = index + 1;
-            s32 remaining = 7 - index;
-            segment->position.x = (nextX + startX * remaining) >> 3;
-            segment->position.y = (nextY + startY * remaining) >> 3;
-            segment->position.z = (end.z * count + start.z * remaining) >> 3;
-            segment->priority = priority;
-            segment->flags &= ~1;
-            nextX += endX;
-            nextY += endY;
-            index = count;
-            ++segment;
-        } while (index <= 6);
-    }
+    i = 0;
+    do {
+        s32 count = i + 1;
+        s32 remaining = 7 - i;
+        segment->position.x = (end.x * count + start.x * remaining) >> 3;
+        segment->position.y = (end.y * count + start.y * remaining) >> 3;
+        segment->position.z = (start.z * remaining + end.z * count) >> 3;
+        segment->priority = priority;
+        segment->flags &= ~1;
+        i = count;
+        ++segment;
+    } while (i <= 6);
 }
-
 #else
 
 INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateSegments);
