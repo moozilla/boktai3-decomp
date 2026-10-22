@@ -1,6 +1,6 @@
 #include "scene_pool.h"
 #ifdef NONMATCHING
-// fuzzy: 96.0%
+// fuzzy: 98.6%
 struct WirelessSceneActor {
     u8 unknown0[4];
     u32 terrainFlags, previousTerrainFlags;
@@ -83,9 +83,13 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     s32 *ox, *i1, *i2;
 
     ScenePool_InitActorAppearance(a, e, e->duration, 100);
-    a->timerA = 0;
-    a->timerB = 0;
-    a->parameter = e->duration;
+    {
+        s32 zero = 0;
+        u32 duration = e->duration;
+        a->timerA = zero;
+        a->timerB = zero;
+        a->parameter = duration;
+    }
     a->position = e->position;
     speed = a->forwardSpeed + a->forwardBias;
     if (speed > 0xF000)
