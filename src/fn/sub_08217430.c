@@ -1,9 +1,9 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 93.4%
+// fuzzy: 96.5%
 // MATCHING_CONCESSION: register-pinning
-// Left: fast-path loop registers (the ROM keeps the bank address in r3), the 0x20 test's
+// Left: fast-path bank address register (ROM r3 plus a copy), the flags & 0x20
 // ands operand order, and src/dst allocation in the first blend loop.
 
 struct PaletteBank16 {
@@ -68,10 +68,10 @@ void sub_08217430(void)
 {
     register s32 level asm("sl");
     s32 inverse;
+    s32 i;
 
     if (gUnk_030051D4 == 0x40 && gUnk_030051C8 == 0) {
         if (gUnk_03004DAC != 0x40) {
-            s32 i;
             for (i = 0; i < gUnk_030051CC; i++) {
                 u8 *bank = gUnk_030042E4 + (gUnk_030051F0[i] << 5);
                 CpuFastSet(bank, &gUnk_03004DC0[i], 8);
@@ -83,7 +83,6 @@ void sub_08217430(void)
     level = gUnk_030051D4 >> 1;
     inverse = 32 - level;
     if (gUnk_030051DC == 0) {
-        s32 i;
         for (i = 0; i < 16; i++) {
             u16 *src, *dst;
             s32 j;
