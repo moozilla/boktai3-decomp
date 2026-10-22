@@ -257,6 +257,7 @@ address,evidence
 08115D4C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08116280,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0811ABD8,Hidden tail after Terrain_SetColumnLayout
+0811AC54,Hidden tail function
 0811ACCC,Hidden tail after Terrain_GetCellHighByte
 0811B048,Independent 76-byte SpatialIndex_ScanBuckets tail after Terrain_ResolveActorMotion's pool (gbadisasm keeps it inside 0811AE9C); exact C in src/fn/sub_0811AE9C.c
 0811B774,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -300,6 +301,8 @@ address,evidence
 0812C124,Hidden tail after SlashEffect_ResetManagerReference
 0812C4E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812CE30,Hidden tail after FragmentEffect_ResetManagerReference
+0812CE64,Hidden tail function
+0812CE90,Hidden tail function
 0812D17C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812D58C,Hidden tail after FragmentSpritePool_ResetSingleton
 0812D7A8,SceneParticle_Create wrapper with mode 1; raw span
@@ -500,6 +503,9 @@ address,evidence
 081C5660,Hidden raw-tail function
 081C5E84,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081CFCF8,Hidden tail after SceneNpc_UpdateProjectedIdle
+081CFD3C,Hidden tail function
+081CFD6C,Hidden tail function
+081CFD84,Hidden tail function
 081D31D8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31DC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31E0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -574,6 +580,9 @@ address,evidence
 08217040,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 08217050,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 08217090,Hidden tail after Video_SetBlendBrightness
+082170D4,Hidden tail function
+082170FC,Hidden tail function
+0821710C,Hidden tail function
 08217414,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 08218BC8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08218C40,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
