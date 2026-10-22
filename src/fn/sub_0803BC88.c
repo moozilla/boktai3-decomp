@@ -1,6 +1,6 @@
 #include "scene_pool.h"
 #ifdef NONMATCHING
-// fuzzy: 98.6%
+// fuzzy: 99.8%
 struct WirelessSceneActor {
     u8 unknown0[4];
     u32 terrainFlags, previousTerrainFlags;
@@ -169,10 +169,13 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     *motion &= mask;
     Collider_SetContactParameter(contact, e->parameter);
     ScenePool_ResetProximityContact(a);
-    if (e->kind == 3)
+    if (e->kind == 3) {
         a->controlFlags &= mask;
-    else
-        a->controlFlags = 1 | a->controlFlags;
+    } else {
+        u32 *flags = &a->controlFlags;
+        u32 bit = 1;
+        *flags = bit | *flags;
+    }
     CharacterModel_ClearAnimationFlags(a->model, 1);
     ScenePool_UpdateActorDrawablePosition(a);
     CharacterPreview_InitializePalette(a->preview, a->model, a->paletteIndex);
