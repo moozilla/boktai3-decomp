@@ -1397,9 +1397,9 @@ done:
 }
 
 #ifdef NONMATCHING
-// fuzzy: 85.5%
-// Remaining: register allocation (position should be r5, dx r6, the map pointer sl) and the
-// copy of the state byte before the 16/17 test.
+// fuzzy: 87.6%
+// Remaining: register allocation (position should be r5, dx r6, and the map pointer reused by
+// the first corner cell should be in sl).
 #define NEAR_CELL(out, px, pz)                                                                     \
     do {                                                                                           \
         s32 cx_ = (px) >> 8;                                                                       \
@@ -1438,7 +1438,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     s32 dx;
     s32 dz;
     s32 own;
-    s32 other;
+    s32 other = 0;
     s32 height;
     s32 diff;
     u32 state;
@@ -1463,7 +1463,12 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     NEAR_CELL(own, position->x, position->z);
     {
         struct ContactPosition *p = &gUnk_02000488->position;
-        NEAR_CELL(other, p->x, p->z);
+        s32 cx = p->x >> 8;
+        s32 cz = p->z >> 8;
+        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+            other = 0;
+        else
+            other = gUnk_030052F4->rows[cz] + cx;
     }
     if (own == other)
         goto yes;
