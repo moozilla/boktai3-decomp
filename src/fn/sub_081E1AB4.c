@@ -2,16 +2,16 @@
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
-void sub_081E132C(void);
+void GameStart_Update(void);
 void GameStart_Destroy(void);
-s32 sub_081E15C8(void *);
+s32 GameStart_Init(void *);
 
 void *GameStart_Create(void)
 {
     void *r = Task_Create(0xb, 0x4f0);
     if (r != 0) {
-        Task_SetCallbacks(r, sub_081E132C, GameStart_Destroy);
-        if (sub_081E15C8(r) < 0) {
+        Task_SetCallbacks(r, GameStart_Update, GameStart_Destroy);
+        if (GameStart_Init(r) < 0) {
             Task_Kill(r);
             return 0;
         }

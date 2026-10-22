@@ -306,7 +306,7 @@ def analyze(src, func=None, nonmatching=False):
     an.max_uid = max(l_insns) if l_insns else 0
     m = re.search(r";; \d+ regs to allocate:([^\n]*)", greg)
     if m:
-        an.global_order = [int(x) for x in m.group(1).split()]
+        an.global_order = [int(x) for x in m.group(1).split() if x.isdigit()]  # skip '(N)' word counts
     an.stats = {int(k): v for k, v in re.findall(r"^Register (\d+) (used .*)$", lreg, re.M)}
     an.disp = {int(p): int(h) for p, h in re.findall(r"(\d+) in (\d+)", greg.split(";; Register dispositions:")[-1])} \
         if ";; Register dispositions:" in greg else {}

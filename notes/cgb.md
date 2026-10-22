@@ -1,4 +1,13 @@
-# CgbSound (0x08230AC8) - not matched
+# CgbSound (0x08230AC8) - matched (register-pinning concession)
+
+Matched in src/lib/m4a.c. Keys: `vu8 chIdx` (the stack byte is a volatile
+local whose address agbcc keeps in [sp,#0x1c]), the NR52 test written as
+`(REG_NR52 >> chIdx) & 1`, the pokeemerald literal nrxN assignments (reload
+inheritance then produces the `adds rN,#k` derivations), and a plain
+`channels->n4 = 0x80`. The only concession is a pinned r0 -> r1 load/copy pair
+for REG_SOUNDBIAS_H (the ROM's copy implies the QI temp conflicts with the
+int variable; no pin-free form found yet). History of the earlier attempts:
+
 
 Best attempt: `notes/cgb_attempt.c` (drop-in replacement for the INCLUDE_ASM). Based on
 pokeemerald/pokeruby with fireemblem8u (FireEmblemUniverse/fireemblem8u src/m4a.c) naming/structure

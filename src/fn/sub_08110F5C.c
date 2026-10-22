@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.3%
-// 98.3%: only the order of the `count` copy (adds r2, r0, #0) and the dst load differ
 #define Background_LoadScriptTileList TilemapPanel_LoadScriptTileList
 struct Background {
     u8 pad0[0x2c];
@@ -33,23 +30,10 @@ void TilemapPanel_LoadScriptTileList(struct Background *bg)
         bg->tiles = Heap_Alloc(bg->tileCount * 2);
         Memory_Clear(bg->tiles, bg->tileCount * 2);
         {
-            s32 *src;
-            s32 count;
-            u16 *dst;
-            if (bg->tileCount > 0) {
-                src = values;
-                count = bg->tileCount;
-                dst = bg->tiles;
-                do {
-                    *dst = *src++;
-                    dst++;
-                    count--;
-                } while (count != 0);
-            }
+            s32 i;
+            for (i = 0; i < bg->tileCount; i++)
+                bg->tiles[i] = values[i];
         }
         Heap_Free(values);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TilemapPanel_LoadScriptTileList);
-#endif
