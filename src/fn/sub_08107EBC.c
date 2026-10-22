@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.2%
-// Open: in the 'T' clamp the ROM stores the call result before copying it to r1 for the
-// clamp; this copies first (a separate clamp variable fixes that but rotates spill slots).
 #include "engine.h"
 #include "scene_vec.h"
 struct Frames {
@@ -104,9 +100,7 @@ void sub_08107EBC(void)
     {
         s32 v = Script_GetKeywordValue('T', 0);
         p->sequence = v;
-        if ((u16)v > 4)
-            v = 4;
-        p->sequence = v;
+        p->sequence = (u16)v > 4 ? 4 : v;
     }
     sprite = &p->sprite;
     p->sprite.position = p->position;
@@ -120,7 +114,7 @@ void sub_08107EBC(void)
             break;
     }
     Sprite_Init(sprite, manager->resource, 0);
-    Anim_SetSequence(&p->frames, manager->animationData, 0, (u8)p->sequence, 0);
+    Anim_SetSequence(&p->frames, manager->animationData, 0, *(u8 *)&p->sequence, 0);
     f = &p->frames;
     frame = &f->data[f->index];
     sprite->frame = *frame >> 6;
@@ -199,6 +193,3 @@ void sub_08107EBC(void)
         TerrainOverlay_QueueAddActor(p->body);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08107EBC);
-#endif
