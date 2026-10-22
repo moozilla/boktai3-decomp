@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// Remaining differences: early sprite alias copy and initial flag-store register selection.
 #include "contact_swarm.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
@@ -35,9 +32,8 @@ static inline u8 Test(u32 *flags, u32 bit)
         return 1;
     return 0;
 }
-static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
+static inline u32 Step(struct ContactSwarmSprite *sprite, struct DisplaySequenceState *st)
 {
-    struct ContactSwarmSprite *sprite = sp;
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
@@ -157,9 +153,10 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
 // confidence=low: updates animation, enters the death state on depleted health, otherwise restores ten health.
 void RegionActor_UpdateHealthAnimation(struct RegionSprite *p)
 {
-    p->sprite.flags &= ~1;
+    struct ContactSwarmSprite *sprite = &p->sprite;
+    sprite->flags &= ~1;
     if (gUnk_020001B4) {
-        Step(&p->sprite, &p->sequence);
+        Step(sprite, &p->sequence);
         if (p->hit & 1) {
             if (p->health <= 0) {
                 p->behaviorFlags = 0x28;
@@ -171,7 +168,3 @@ void RegionActor_UpdateHealthAnimation(struct RegionSprite *p)
             p->health += 10;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", RegionActor_UpdateHealthAnimation);
-#endif
