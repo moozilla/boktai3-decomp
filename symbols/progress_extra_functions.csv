@@ -215,6 +215,7 @@ address,evidence
 08108968,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08109324,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest
 081093DC,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript
+0810C128,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations
 0810CB7C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810D548,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810D554,Independent screen teardown function following a reviewed gap leaf; exact standalone C
