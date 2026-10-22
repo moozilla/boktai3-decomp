@@ -83,4 +83,45 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
 #else
 INCLUDE_ASM("asm/nonmatching", PalFade_Start);
 #endif
-INCLUDE_ASM("asm/nonmatching", PalFade_Update);
+// PalFade_Update steps an active fade by one frame; returns 1 when the fade finishes or restarts.
+u32 PalFade_Update(void *self)
+{
+    struct PalFade *f = PAL(self);
+    s32 j, k;
+    u16 *out;
+
+    if (!(f->flags & 7))
+        return 0;
+    if (f->timer == 0) {
+        if (f->flags & 2) {
+            if ((f->flags & 8) && f->p4 == *(u16 *)((u8 *)self + 0x7E))
+                f->flags = 1;
+            PalFade_Start(self, f->p3, f->p4, f->p1, f->p2, f->duration, f->flags, 0);
+        } else {
+            if (!(f->flags & 4)) {
+                u8 *q = *(u8 **)((u8 *)self + 0x80);
+                u8 *v = q + 0x210;
+                for (k = 4; k >= 0; k--) {
+                    *(u8 **)(q + 0x48) = v;
+                    q += 0x60;
+                }
+            }
+            f->flags = 0;
+        }
+        return 1;
+    }
+    for (j = 0; j < 2; j++) {
+        // Row base formed as offset + struct address, as in the ROM.
+        out = (u16 *)(j * 32 + (u32)f);
+        for (k = 0; k < 16; k++) {
+            f->acc[0][j * 16 + k] += f->delta[0][j * 16 + k];
+            f->acc[1][j * 16 + k] += f->delta[1][j * 16 + k];
+            f->acc[2][j * 16 + k] += f->delta[2][j * 16 + k];
+            out[k] = Trunc5(f->acc[0][j * 16 + k]) | Trunc5(f->acc[1][j * 16 + k]) << 5 |
+                     Trunc5(f->acc[2][j * 16 + k]) << 10;
+        }
+    }
+    if (--f->timer == 0)
+        return 1;
+    return 0;
+}
