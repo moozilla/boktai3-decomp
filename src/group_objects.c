@@ -335,7 +335,63 @@ int sub_0801010C(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
 #endif
+#ifdef NONMATCHING
+// fuzzy: 65.2%
+// goto loop keeps loop.c from hoisting the table and the constants 0/1 (the ROM hoists only
+// index and mask, which are source-level here). Remaining (rasolve): y must rank below index,
+// mask and the constant 1 so it is spilled to the stack; one reload rotation step.
+static inline int step(const u16 *table, u32 *index, u32 mask)
+{
+    u32 offset;
+    *index = (*index + 1) & mask;
+    offset = *index * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+
+int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupActor *actor;
+    s32 y;
+    struct GroupVec position;
+    int i;
+    struct GroupPiece *p;
+    u32 *index;
+    u32 mask;
+    m->actorId = cmd->originX;
+    actor = SceneBody_GetById(m->actorId);
+    if (!actor)
+        return -1;
+    position = actor->position;
+    y = (s16)cmd->originY;
+    m->timer = 0;
+    index = &gUnk_03005308;
+    mask = 1023;
+    i = 15;
+    p = m->pieces;
+loop: {
+    int angle;
+    const u16 *table;
+    p->state = 3;
+    p->active = 1;
+    p->timer = 0;
+    p->target = position;
+    angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+    p->direction = angle;
+    table = gUnk_0203B400;
+    p->direction = angle - 16 + (step(table, index, mask) & 31);
+    p->duration = y;
+    p->speed = (step(table, index, mask) & 7) + 7;
+    i--;
+    p++;
+    if (i >= 0)
+        goto loop;
+}
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
+#endif
 
 static inline int count(struct GroupQueue *q)
 {
