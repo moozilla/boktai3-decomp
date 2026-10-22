@@ -395,7 +395,7 @@ address,isa,evidence,replacement_end
 081780B4,thumb,Independent 32-byte HUD mode refresh with own push and pop-bx after Hud_SetModeFromScript; exact standalone C,081780D4
 081782AC,thumb,Hidden option HUD setter: field 0xA8C=4 when mode 1-2,081782E0
 0817845C,thumb,Hidden raw-tail function,08178474
-08178474,thumb,Hidden raw-tail function (retained),
+08178474,thumb,Hidden raw-tail function: resets the transient HUD stat gauge,081784C0
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
@@ -595,7 +595,7 @@ address,isa,evidence,replacement_end
 0821AF04,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF2C
 0821BCE4,thumb,Hidden raw-tail function,0821BD48
 0821BDD8,thumb,Hidden raw-tail function,0821BE3C
-0821C884,thumb,Hidden tail after Terrain_SampleSurface,
+0821C884,thumb,Hidden raw-tail function: probes terrain at an offset position,0821C8F8
 0821DE0C,thumb,Hidden raw-tail function,0821DE30
 0821E500,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821E52C
 0821E654,thumb,Hidden raw-tail function,0821E67C
