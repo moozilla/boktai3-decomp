@@ -180,6 +180,7 @@ address,isa,evidence,replacement_end
 080B1F48,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B1FA8
 080B2354,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080B23A0
 080B8A58,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B8AB8
+080D6FBC,thumb,Player flag test: TRUE when bit 3 of the player actor's flags (+0x20) is set; raw span before Mummy_RequestStraightRoute,080D6FDC
 080E81FC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E8200
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
