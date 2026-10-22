@@ -483,6 +483,7 @@ address,isa,evidence,replacement_end
 082195F8,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219624
 082196FC,thumb,Hidden raw-tail function,08219728
 08219DB4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219DD8
+08219E44,thumb,Hidden raw-tail function,08219EBC
 0821A0CC,thumb,Hidden raw-tail function,0821A0F8
 0821A168,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821A184
 0821AB50,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821AB64
@@ -491,6 +492,8 @@ address,isa,evidence,replacement_end
 0821AED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821AEDC
 0821AEDC,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF04
 0821AF04,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF2C
+0821BCE4,thumb,Hidden raw-tail function,0821BD48
+0821BDD8,thumb,Hidden raw-tail function,0821BE3C
 0821DE0C,thumb,Hidden raw-tail function,0821DE30
 0821E500,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821E52C
 0821E654,thumb,Hidden raw-tail function,0821E67C

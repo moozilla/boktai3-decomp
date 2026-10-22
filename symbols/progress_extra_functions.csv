@@ -498,6 +498,7 @@ address,evidence
 082195F8,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 082196FC,Hidden raw-tail function
 08219DB4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08219E44,Hidden raw-tail function
 0821A0CC,Hidden raw-tail function
 0821A168,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821AAF4,Independent 36-byte operand-skip-to-terminator function (own push/pop-bx), unreferenced by any found bl/pointer; exact standalone C
@@ -509,6 +510,8 @@ address,evidence
 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
+0821BCE4,Hidden raw-tail function
+0821BDD8,Hidden raw-tail function
 0821DE0C,Hidden raw-tail function
 0821E0D0,Separate 52-byte Thumb function with own prologue/conditional return after E040 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E2F8,Separate 188-byte Thumb function with own prologue/calls/copy loops/return after E190 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
