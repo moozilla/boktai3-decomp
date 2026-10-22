@@ -4009,3 +4009,132 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## Mummy and Ghoul worker — 2026-10-22
+
+Tags: #matching #monsters #mummy #ghoul #register-pinning
+
+New exact gain: **+0.0572 percentage points of total code** (three functions,
+1,380 bytes), all in the Register-pinned category. One guarded draft retained.
+080DA5C8 was already exact in this checkout and earns no new progress.
+Only per-file check.py checks were run; no make, build.py, network, or full ROM
+build. All commits went through build/commit.sh. Integration still needs the
+combined ROM validation. No shared headers or symbol tables were changed.
+
+- **080D0C30 — stopped below threshold.** Attack-collider callback; the owner
+  comes from argument three, context from owner+0x3D0. The initial availability
+  check and repeated contact-recording blocks match the Skeleton callback
+  idiom. Contacts 1 through 8 additionally consume context flag 0x800, resolve
+  the contact object, set contact+0x46 bit one, and optionally arm a timed
+  response. Initial full candidate scored 62.0%; explicit register lifetimes
+  and a collider overlay did not improve it. Remaining problems include
+  context/owner allocation, flag-load ordering, and the response-field reload.
+  No production draft.
+- **080D1644 — stopped below threshold.** Tentative waiting-for-revival recovery:
+  consumes entry, replaces response slots 0/1/3, selects animation one and speed
+  Div(64,6), then switches to animation six and
+  Mummy_ResumeSavedRouteAfterAnimation when group+0x1F0 reaches zero. Candidate
+  improved from 50.5% to 66.7%; state/control helper decomposition and explicit
+  offset sharing still differed in instruction order and register lifetimes.
+  The pinned scratch alternative is not an accepted source. No production draft.
+- **080D453C — stopped below threshold (58.2%).** Tentative stimulus pursuit:
+  clears response bit 0x01000000; rejects unavailable movement modes; finds a
+  stimulus; initializes a 180-tick timer and behavior eleven; resolves the
+  stimulus position and tries the player/route checks. Success sets speed,
+  route flags and nearest-player retargeting. Full candidate compiles, but
+  materialized boolean checks, state setup order, and terrain/route pointer
+  lifetimes differ substantially. No production draft.
+- **080D7F50 — matched, Mummy_UpdateAttackCollider.** Reviewed 408-byte extent.
+  Started as an 88.6% guarded draft, subsequently replaced by exact C. The three
+  modes use expanded 64/100/64 bounds or ordinary 32/100/32 bounds, different
+  normal/alternate attack stats, and masks 0x200004 / 0x20000. Expanded mode also
+  latches flag 0x4000 at actor+0x2D6. Unsigned full-width vector bitfields recover
+  the first branch's read/modify/write construction; ordinary halfword writes
+  recover the other branches. Keeping the mode bit available for contactFlags
+  avoids an extra reload. Preserving the actor pointer through argument loading
+  prevents destructive pointer arithmetic at the end of the other branches.
+  depin reduced 26 hints to seven; formatted source rechecked exactly.
+- **080DA5C8 — already matched.** Existing Mummy_ResetResponseState passes
+  check.py at 176 bytes; left unchanged, not counted as new work.
+- **080D49DC — stopped below threshold.** Full candidate for delayed pursuit:
+  consumes the behavior entry flag, dispatches update270, waits sixty ticks,
+  then restores a response slot and chooses chase-arrival or saved-route logic.
+  The shared Chase_Arrive body explains the large repeated terrain and turn
+  sections. Initial reviewed-extent result 68.0%, 431 realigned differing
+  instructions / 179 ignoring registers. Widening the local copy of the motion
+  mask helper raised fuzzy similarity to 73.3% but worsened structural residue
+  to 183; stopped rather than accepting the scalar improvement. No production
+  draft; scratch helper copies are local to wip/.
+- **080D7568 — stopped below threshold.** Full candidate for contact pursuit:
+  checks movement/route flags and group+0x64 against the scene identifier,
+  selects a contact, calculates heading and squared distance, then chooses
+  direct pursuit or Chase_Arrive navigation. Successful direct pursuit latches
+  flags 0x80 at +0x2D6 and 0x10 at +0xEB. Initial 72.7%, 448 realigned
+  differences / 198 structural. The widened motion helper gave 73.4% but 200
+  structural differences, so it was not useful progress. No production draft.
+- **080D2584 — partial prefix only, stopped.** The recoil prefix shares the
+  animation timing, periodic sparks, and capped displacement-easing logic with
+  08089168, but additionally quarters secondary motion on entry, clears motion
+  flag one, and sets actor flags 0x2000 / 0x10000. A prefix candidate was checked
+  against the complete reviewed 4,852-byte extent, not credited as a short
+  matching function: 12.6%, then 12.9% after the first post-recoil flag updates.
+  The large post-animation route decision tree remains untranslated. Condense
+  finds four repeated terrain/arrival groups; the best relative explains only
+  about 31%. No production draft and no exact progress.
+- **08089168 — drafted 98.3%, Ghoul_UpdateDisplacementRecovery.** Reviewed
+  472-byte extent, four differing bytes, four realigned register differences,
+  zero structural differences. Starts animation three and sound 0xD4, emits
+  sparks under flag eight, eases stored X/Z displacement by a signed quarter
+  capped to +/-200, and completes after displacement and animation settle.
+  The two source loads use different zero scratch registers from the ROM.
+  Explicit source/current pointer lifetimes recover the desired copies and
+  signed-shift shape; the exact Bat Random4 expression recovers RNG order.
+  Targeted width/declaration/barrier variants did not improve the last four
+  bytes. Guarded with INCLUDE_ASM fallback and --nonmatching --record score.
+- **0808A664 — stopped below threshold.** Return-action candidate consumes
+  +0x2B1, starts callback 08085DD0, restores context timer 0x63C from 0x63E,
+  and, on completion, saves behavior twelve and validates context+0x62C as the
+  destination before invoking the fallback callback. Initial 53.3%; explicit
+  high-register lifetimes and alternate control-helper ordering did not improve
+  it (50.5% / 52.1%). No production draft.
+- **0808ACD4 — matched, Ghoul_ResetRouteState.** Reviewed 364-byte extent.
+  Clears context halfwords 0x62A, 0x628, 0x63C, 0x648; clears three position
+  buffers; resets actor+0x460 with gUnk_0824E15C and size 0x92; resolves route
+  position and steps animation zero. Exact sibling SceneActorRoute_ResetStep
+  (080A38E8) supplies the complete shared command stepper. Port was two bytes
+  off; changing its temporary mask register r1 to r2 closed the difference.
+  depin retained thirteen necessary hints; formatted source passed exact check.
+- **0808B264 — stopped below threshold.** Reviewed raw-byte function start from
+  symbols/build_extra_functions.csv; decoded locally with Capstone since
+  asmat.py shows bytes and relatives reports zero instructions. Copies context
+  0x64A to 0x648, sets context flag one while clearing two, enters behavior
+  fifteen, starts the opposite route-speed selection, calls 0808AF38, then
+  clears context flag two. Full candidates 31.9% / 56.0%; signed halfword mask
+  selection, initialization placement and live mask allocation remain off.
+  Existing Vorn-style boundary notes make the Ghoul ownership provisional.
+  No production draft.
+- **0808A9EC — matched, Ghoul_ResumeContactRoute.** Reviewed 608-byte extent.
+  Starts delayed restoration, saves a 30-tick behavior-twelve action or a
+  60-tick behavior-seven action, snaps the route destination and validates
+  the current contact target. Failure invokes group+0x224. Uses the existing
+  Chase helpers. Widening the mask helper to u32 removed extra copies;
+  preserving action/target/duration argument order reached 95%; a typed target
+  position and delayed saved-target load closed the match. depin reduced
+  fourteen hints to nine; formatted source rechecked exactly.
+- **0808AF38 — stopped below threshold.** Full route-point selection candidate:
+  builds a planar target-facing vector from the sine table, looks for a point
+  with a negative dot product that differs from the saved point, otherwise
+  selects a random non-current index. It snaps terrain height and validates
+  the chosen destination, then restores idle control on failure. Initial
+  reviewed-extent 48.3%; widening the selected-index slot and guarding origin
+  setup gave 49.9% but increased structural differences from 190 to 232.
+  Stack vector layout, inline search lifetime, and route tails remain off.
+  No production draft.
+
+Useful across this cohort: prefer realigned structural counts over fuzzy-score
+increases on the big functions; use an exact relative for the packed animation
+stepper; avoid computing target pointers through nested raw pointer arithmetic
+when a typed target position reproduces the original argument order. Run depin
+before exact acceptance: most exploratory pins and barriers were unnecessary.
+Unaccepted candidates remain ignored under wip/ and build/; only exact matches
+and the qualifying guarded draft were promoted to src/.
