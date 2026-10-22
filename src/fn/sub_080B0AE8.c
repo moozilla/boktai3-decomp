@@ -1,9 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#ifdef NONMATCHING
-// fuzzy: 94.6%
-// MATCHING_CONCESSION: register-pinning
-// Remaining: flags pointer copy placement and the one/duration register swap.
+
+#define SceneActorPhase_TryBeginSpecialMotion sub_080B0AE8
 void Vorn_UpdateScriptedAnimation(struct SceneActorRegistryResetView *);
 static inline u8 IsUnavailable(void *input)
 {
@@ -30,22 +28,23 @@ static inline u32 MaskedFlags(struct SceneActorRegistryResetView *p, u32 mask)
 {
     return p->flags2D4 & mask;
 }
+static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
+{
+    u16 *field = (u16 *)(base + 0x6D4);
+    u32 value = *field & mask;
+    *out = field;
+    if (value)
+        return 1;
+    return 0;
+}
 void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p)
 {
     u8 *base = (u8 *)p;
-    register u32 d asm("r2");
-    asm("" : "=r"(d));
+
     if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->field2B5 != 0x29 &&
         !MaskedFlags(p, 0xE3BF)) {
-        register u32 mask asm("r2") = 0xC;
         u16 *flags;
-        register u16 *f1 asm("r1");
-        asm("" : "+r"(mask));
-        asm("" : : "r"(d));
-        f1 = (u16 *)(base + 0x6D4);
-        asm("" : "+r"(f1));
-        flags = f1;
-        if (!HasFlags(flags, mask) && HasFlags(flags, 2)) {
+        if (!TestContext(base, 0xC, &flags) && HasFlags(flags, 2)) {
             u32 state = 0x18;
             u8 *field = &p->state2A8;
             u32 zero = 0;
@@ -71,8 +70,11 @@ void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p
                     *motionFlags &= mask;
                 }
                 {
-                    u32 duration = 0x29;
-                    p->word104 = (u32)Vorn_UpdateScriptedAnimation;
+                    u32 duration;
+                    u32 *slot = &p->word104;
+                    u32 callback = (u32)Vorn_UpdateScriptedAnimation;
+                    duration = 0x29;
+                    *slot = callback;
                     p->word108 = zero;
                     p->word10C = zero;
                     p->word110 = duration;
@@ -82,6 +84,3 @@ void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPhase_TryBeginSpecialMotion);
-#endif
