@@ -289,18 +289,24 @@ address,evidence
 0815D41C,Hidden script command (PlayerCue_WindblownVariant4; keyword r)
 0815D460,Hidden script command (PlayerCue_WindblownVariant2; keyword r)
 0815D4A4,Hidden script command (PlayerCue_StandDiagonal; keyword d)
+0815D5B0,Hidden script command: timed charge cue with t/c timers
 0815DBF4,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched)
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
 0815F5A0,Second function of the reviewed 0815F588-0815F6A8 span; exact C
 0815F5B4,Third function of the reviewed 0815F588-0815F6A8 span; retained assembly
 0815F5F8,Fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly
+0816A578,Hidden menu prompt setup: background layer then ramp display
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+08177D88,Hidden getter: option HUD field 0xA5C or -1
 081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
+081782AC,Hidden option HUD setter: field 0xA8C=4 when mode 1-2
 081792F8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081792FC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0817A238,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0817AAB8,Hidden predicate: field 0x94 not positive
+0817C19C,Hidden clear of flags 0xB0/0xAF
 08180898,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C
 08197AE0,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C
 08197C20,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C
@@ -341,6 +347,10 @@ address,evidence
 0819B824,Snapping array approach helper in the math helper block; exact standalone C
 0819B86C,Snapping array approach helper in the math helper block; exact standalone C
 0819B8B4,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched)
+081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
+081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
+081A47D0,Hidden Task_Kill wrapper for gUnk_02000240
+081A4ED8,Hidden Task_Kill wrapper for gUnk_02000244
 081A6458,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081A645C,Code following a reviewed gap leaf; retained assembly
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
