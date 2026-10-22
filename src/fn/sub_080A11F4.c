@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.6%
+// fuzzy: 89.0%
 // Ground-height load scheduling and final behavior-state offset derivation still differ.
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
