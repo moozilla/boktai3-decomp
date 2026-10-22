@@ -489,7 +489,10 @@ address,isa,evidence,replacement_end
 081C3EEC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081C3EF0
 081C5660,thumb,Hidden raw-tail function,081C569C
 081C5E84,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,081C5EA8
-081CFCF8,thumb,Hidden tail after SceneNpc_UpdateProjectedIdle,
+081CFCF8,thumb,Hidden tail function,081CFD3C
+081CFD3C,thumb,Hidden tail function,081CFD6C
+081CFD6C,thumb,Hidden tail function,081CFD84
+081CFD84,thumb,Hidden tail function,081CFDA4
 081D31D8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31DC
 081D31DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31E0
 081D31E0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081D31EC
