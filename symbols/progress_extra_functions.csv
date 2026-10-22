@@ -389,6 +389,7 @@ address,evidence
 0819B824,Snapping array approach helper in the math helper block; exact standalone C
 0819B86C,Snapping array approach helper in the math helper block; exact standalone C
 0819B8B4,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched)
+0819C870,Hidden raw-tail function (retained)
 0819D190,Hidden raw-tail function
 0819E7B0,Hidden raw-tail function
 0819EB84,Hidden raw-tail function (retained)
@@ -404,6 +405,7 @@ address,evidence
 081AF738,Hidden raw-tail function
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
+081B7614,Hidden raw-tail function (retained)
 081B8104,Hidden raw-tail function
 081B9ECC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081BB114,Hidden raw-tail function
@@ -424,6 +426,9 @@ address,evidence
 081D31D8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31DC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31E0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+081D36A4,Hidden raw-tail function
+081D36D4,Hidden raw-tail function
+081D3704,Hidden raw-tail function
 081D374C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D3A94,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081DACC4,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -449,6 +454,9 @@ address,evidence
 081EF12C,Hidden raw-tail function
 081F2084,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081F2B70,Hidden raw-tail function
+081F336C,Hidden raw-tail function
+081F339C,Hidden raw-tail function
+081F33CC,Hidden raw-tail function
 081FB7D8,Hidden counter difference with wrap (retained)
 081FB808,Hidden leaf returning 0
 081FB80C,Hidden velocity integrate step
@@ -467,6 +475,8 @@ address,evidence
 08203D18,Hidden raw-tail function
 0820602C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08210A2C,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
+08211820,Hidden raw-tail function
+08211860,Hidden raw-tail function
 08211DE0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08212F34,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 082141B4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
