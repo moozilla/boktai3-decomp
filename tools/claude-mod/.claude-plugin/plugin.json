@@ -1,0 +1,6 @@
+{
+  "name": "decomp-progress",
+  "version": "0.1.0",
+  "description": "A button beside the prompt that opens a popup of Boktai 3 decomp progress: PROGRESS.md, recent PRs and a treemap.",
+  "types": "./types/index.d.ts"
+}
