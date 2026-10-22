@@ -59,6 +59,8 @@ def starts(data):
 
 def scan():
     extra = extra_function_starts()
+    with open(os.path.join(ROOT, "symbols/progress_functions.csv")) as f:
+        extra |= {int(r["address"], 16) for r in csv.DictReader(f)}
     total = 0
     for addr, data in raw_runs():
         h = [addr + o for o in starts(data) if addr + o not in extra]
