@@ -1,3 +1,4 @@
+#define SceneActorControl_UpdateEntryWait sub_080A32A4
 #include "scene_actor_reaction.h"
 #include "engine.h"
 /* SceneActorControl_UpdateEntryWait: tentative */
@@ -11,8 +12,18 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 99.2%
+static inline void ClearFlag(u32 *flags, u32 mask) { *flags &= mask; }
+static inline void EntryControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
+    ClearFlag(&actor->flags114, ~1);
+    actor->word104 = 0;
+}
+
 void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
 {
     if (TakeEntry(s)) {
@@ -25,7 +36,7 @@ void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
         s->field2B5 = two;
         s->target = fn;
         s->field2C8 = zero;
-        s->flags114 &= ~1;
+        ClearFlag(&s->flags114, ~1);
         s->word104 = zero;
     } else {
         u8 result = Callback_InvokeActor(s, s->update270);
@@ -37,13 +48,10 @@ void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
                 s->behavior2AA = seven;
                 s->counter2AC = result;
                 s->field2B1 = 1;
-                SceneActorReaction_SetControl(s, 1, s->entryTarget228);
+                EntryControl(s, 1, s->entryTarget228);
             } else {
                 s->counter2AC++;
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateEntryWait);
-#endif
