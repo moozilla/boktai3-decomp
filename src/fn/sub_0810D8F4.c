@@ -1,9 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 80.5%
-// foundry draft (worker best 80.5%); what differs is mostly register allocation and instruction order
-#define TextWindow_Hide TextWindow_Clear
-#define TextWindow_Show TextWindow_StartPlayback
+// MATCHING_CONCESSION: register-pinning
 struct RecordPanel {
     u8 pad0[0xCEC];
     const u8 *labelScript;
@@ -20,10 +16,9 @@ s32 TextWindow_Refresh(s32, s32);
 u8 StateFlags_TestIndexedFlag(s32);
 void RecordPanel_RefreshEntryLabels(struct RecordPanel *p)
 {
-    s32 skip;
-    s32 base;
-    s32 next;
-    s32 i;
+    s32 skip, base, i;
+    register s32 next asm("r4");
+    s32 *windows;
     switch ((s8)p->mode) {
         case 0:
             skip = gUnk_0860654C[0] + 1;
@@ -36,23 +31,29 @@ void RecordPanel_RefreshEntryLabels(struct RecordPanel *p)
         default:
             return;
     }
-    for (i = 0; i <= 5; i = next) {
+    i = 0;
+    windows = p->windows;
+    for (; i <= 5; i = next) {
         if (skip == i) {
+            s32 *w;
             next = i + 1;
-            TextWindow_Clear(p->windows[next]);
+            w = &windows[next];
+            TextWindow_Clear(*w);
         } else {
+            s32 *w;
             next = i + 1;
-            TextWindow_Clear(p->windows[next]);
-            TextWindow_SetScript(p->windows[next], p->labelScript);
+            w = &windows[next];
+            TextWindow_Clear(*w);
+            TextWindow_SetScript(*w, p->labelScript);
             i += base;
             if (StateFlags_TestIndexedFlag(i))
-                TextWindow_Refresh(p->windows[next], i);
+                TextWindow_Refresh(*w, i);
             else
-                TextWindow_Refresh(p->windows[next], 12);
-            TextWindow_StartPlayback(p->windows[next]);
+                TextWindow_Refresh(*w, 12);
+            {
+                s32 *w2 = &windows[next];
+                TextWindow_StartPlayback(*w2);
+            }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RecordPanel_RefreshEntryLabels);
-#endif
