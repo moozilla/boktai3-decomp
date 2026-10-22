@@ -1,11 +1,10 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.3%
-// draft: size matches; the three flag read-modify-write arms load *flags before materializing the constant (original does constant first)
 struct HitSource {
     u8 pad[0xc];
-    u8 kind;
-    u8 pad2[3];
+    struct {
+        u8 kind;
+        u8 pad[3];
+    } slots[3];
 };
 struct P0823A5EC {
     u8 pad0[0x444];
@@ -27,7 +26,15 @@ void Player_GetTargetFlag8Bonus(void);
 void Player_GetTargetFlag9Bonus(void);
 void Player_GetTargetFlag10Bonus(void);
 void Player_GetTargetFlag11Bonus(void);
-void sub_0823A5EC(struct P0823A5EC *p, u32 *src)
+static inline void ClearFlags(u32 *f, u32 mask)
+{
+    *f &= ~mask;
+}
+static inline void SetFlags(u32 *f, u32 mask)
+{
+    *f |= mask;
+}
+void sub_0823A5EC(struct P0823A5EC *p, struct HitSource *src)
 {
     s32 i;
     void **q;
@@ -39,7 +46,7 @@ void sub_0823A5EC(struct P0823A5EC *p, u32 *src)
         q++;
     }
     for (i = 0; i <= 2; i++) {
-        switch (((u8 *)(src + i))[0xc]) {
+        switch (src->slots[i].kind) {
             case 2:
                 break;
             case 36:
@@ -82,27 +89,18 @@ void sub_0823A5EC(struct P0823A5EC *p, u32 *src)
                 p->hitHandlers[i] = Player_OnWeaponHitRollEffect80000Low;
                 break;
             case 44:
-                if (p) {
-                    u32 *f = &p->flags;
-                    *f &= ~1;
-                }
+                if (p)
+                    ClearFlags(&p->flags, 1);
                 break;
             case 43:
-                if (p) {
-                    u32 *f = &p->flags;
-                    *f &= ~2;
-                }
+                if (p)
+                    ClearFlags(&p->flags, 2);
                 break;
             case 13:
             case 14:
-                if (p) {
-                    u32 *f = &p->flags;
-                    *f |= 4;
-                }
+                if (p)
+                    SetFlags(&p->flags, 4);
                 break;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823A5EC);
-#endif
