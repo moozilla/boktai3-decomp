@@ -1,7 +1,4 @@
 #include "scene_actor_chase.h"
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// Remaining differences: register allocation and address/argument evaluation order.
 #define FIELD(p, n, T)           (*(T *)((u8 *)(p) + (n)))
 #define Dog_SelectRetreatOrChase sub_080DF400
 extern const u8 gUnk_0824E2A8[];
@@ -53,10 +50,17 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
             return;
         }
     }
-    Chase_SetState(a, 3, 1, 0);
+    {
+        u32 state = 3;
+        u32 phase = 1;
+        u8 *first = &a->state2A8;
+        u32 zero = 0;
+        *first = state;
+        a->phase2A9 = phase;
+        a->behavior2AA = zero;
+        a->counter2AC = zero;
+        a->field2B1 = phase;
+    }
     Chase_SetCtl(a, SceneActorMotion_TestTargetTransition, 0x2B);
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080DF400);
-#endif
