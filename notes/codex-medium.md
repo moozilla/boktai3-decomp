@@ -4101,3 +4101,163 @@ Local aliases use the neighboring Crow, TentacleBody and TentacleActor prefixes.
 Ghidra output is absent in this checkout; all attempts used assembly and matched
 relatives. Lower-scoring sources remain under ignored wip/; the four production
 source drafts retain INCLUDE_ASM in #else and recorded reviewed fuzzy scores.
+
+## 2026-10-22: Tentacle actor, Glove and Screamer, round 3
+
+Tags: #matching #tentacle #glove #screamer #scene-actor
+
+Offline solo pass on the preclaimed branch. Exact code gain: **+0.0606
+percentage points** (1,460 bytes): 648 bytes without hints and 812 bytes in
+the Register-pinned category. Three exact matches, one new guarded draft,
+and four improved inherited drafts. Drafts contribute no exact progress.
+Only tools/check.py per-file validation was used; no make, full build,
+network or direct Git mutations. All commits were queued through build/commit.sh.
+Shared progress/index/history files were left to the integrator.
+
+Exact matches:
+
+- **080A93F4 — matched, TentacleBody_RestartSegmentAnimations, 516 bytes.**
+  Existing functions.csv name reused, with the required local alias. The
+  inherited 99.6% candidate differed only in when the row argument moved
+  from r2 into r4. A sourceRow local pinned to r2, with a barrier consuming
+  the already-spilled kind and body pointer, delays that copy until after
+  the body move and kind spill. Removed the NONMATCHING guard. Unguarded
+  depin reduced 51 hints to 27; formatted source passes the reviewed-extent
+  exact check. Remaining hints include helpers as well as the function.
+- **081198F8 — matched, Glove_UpdateRestingMotion, 648 bytes, no hints.**
+  Ported the exact Glove_UpdateRecoilReturn (08119378) movement body.
+  This callback clamps height to 0xF000, calls Actor_ClampMovementSpeed,
+  updates shadow/accessory/particle work, and increments its timer rather
+  than returning through a recoil-completion transition. The caller at
+  08119378 installs this callback when recoil completes. Existing struct
+  Obj/Glove views reproduce all instruction selection and allocation.
+- **0811A030 — matched, MotionActor_DispatchRequestedState, 296 bytes.**
+  Reused its existing name. The last flag-test address copy was wrong.
+  Changed TestStateFlags to return its flag-byte address through an output
+  parameter, with the loaded value masked BEFORE that output assignment.
+  This permits the address to reuse the now-dead mask register, reproducing
+  the ROM's adds r2,r1 after ands. Unguarded depin retained the one state r6
+  pin. Formatted source passes the reviewed-extent exact check.
+
+Guarded drafts committed separately, with aliases and recorded full extents:
+
+- **080A7C84 — improved 95.2% to 98.0%, TentacleBody_UpdatePursuit.**
+  Replaced the hand-written shared exit with the already-present State0
+  and State2 helpers. Remaining: 10 realigned differing instructions,
+  three ignoring registers, concentrated in the early callback-offset
+  lifetime and zero-state address scheduling. Candidate is exactly 732
+  bytes long. Attempts to carry the earlier offset through State0 or pin
+  the shared zero globally worsened allocation; retained the 98.0% form.
+- **080A8280 — improved 89.5% to 90.3%, TentacleBody_ReturnToCellCenter.**
+  Recompute &actor->motion at AddVectors instead of passing the persistent
+  motion local. Structural residue fell from 12 to six instructions;
+  total residue is 45. Candidate 824 bytes, reviewed extent 828. Reversing
+  vector operands and angle-wrap branch order did not help.
+- **08117948 — improved 90.0% to 90.4%, Glove_UpdateStopping.**
+  An entry-byte pointer pinned to r4 recovers three register choices;
+  action/flag pointer lifetimes, zero scheduling and the later action code
+  remain different (82 realigned instructions, 42 structural). Candidate
+  1,568 bytes, reviewed extent 1,572. Deferring the action-flag address and
+  independently preserving clear widths did not improve structure.
+- **0811A6C4 — new 91.5% draft, Glove_InitFromScript.**
+  Reads participant/options, initializes primary/secondary appearance,
+  registers drawings, advances initial motion, configures HUD widgets,
+  chooses launch/stopping callbacks, registers the receiver and input slot.
+  Derived the movement body from the exact resting/recoil siblings. An
+  inline Mode(mask) accessor reproduces mask-before-global-load scheduling;
+  keyword 'n' writes +0x910, not +0x914. Remaining: 57 realigned differing
+  instructions, 30 structural, including position rematerialization,
+  participant accesses and pointer lifetimes. Candidate 1,132 bytes,
+  reviewed extent 1,140. No register hints.
+- **0820C4D4 — improved 96.6% to 97.1%, Screamer_UpdateScream.**
+  Preserving the initial delay-comparison offsets in r2/r3 removes four
+  differing instructions. Remaining: 20 realigned instructions, four
+  structural, chiefly signed/unsigned scream-count loading, derived restart
+  offsets and recovery scheduling. The alternative unsigned counter load
+  with independently preserved threshold offset reduced structure to three
+  but had a lower whole-extent score, so retained the stronger 97.1% body.
+  Candidate and reviewed extent both 1,200 bytes.
+
+All five draft C paths were checked with --nonmatching --record and their
+assembly fallbacks checked separately. For hinted nonexact drafts, unguarded
+scratch depin correctly declined to minimize a nonmatching base; no fallback
+check was treated as evidence that a hint was unnecessary.
+
+Other attempts and stopping points (no below-80% C was promoted):
+
+- **080AA688 — skipped.** Revisited the existing reverse segment-removal
+  candidate. Removing broad pins recovers pointer induction, but hoists the
+  active-count address across the loop; target rematerializes it. Best
+  reviewed-extent score this pass 63.9%. Explicit r3 mask and r7 trail hints
+  worsen the schedule. Body/pool extent is 156 bytes, ending at 080AA724.
+- **080AAA90 — skipped.** Tried explicit advancing segment and Y-impulse
+  pointers to reproduce the three independent induction variables. This
+  scored 59.2%; retained the earlier local approach as a reference. Flag
+  evaluation and induction scheduling remain unlike the ROM.
+- **080AA744 — skipped, improved local candidate to 70.8%.** Raw base+offset
+  segment tests and impulse destinations improve on the typed array form,
+  but the sine/random lookup and base induction still differ. Extent 384.
+- **080A9BD8 — skipped, best reviewed-extent 32.2%.** Reconstructed the
+  fixed-point cubic position interpolation and output stride. agbcc removes
+  zero tangent products which the ROM retains. A diagnostic r4 tangent
+  barrier recovers products but worsens the frame and allocation (21.8%).
+  No guarded source; neither experiment is an accepted reconstruction.
+- **080ABB18 — skipped, local candidate 44.6%.** Rechecked the segment-loss
+  reaction and tried a prechecked do-loop plus a full-width clearing mask.
+  These did not reproduce the fourteen field-address lifetimes and 0x30
+  frame. No guarded source.
+- **080A9DB0 — skipped, local baseline 66.3%.** ROM stores an initial head
+  position before the segment loop, then reloads it after TargetMarkedSegment.
+  C dead-store elimination drops the first copy. A volatile saved vector
+  changes access widths/allocation and worsens the result to 63.4%; segment
+  position/target pointers across Div calls remain problematic.
+- **080AA240 — skipped, local baseline 36.0%.** Revisited the alternating
+  wave's cubic interpolation with explicit half-step coefficients. It still
+  overoptimizes zero-tangent terms and differs heavily in spills/structure.
+- **080ABDCC — skipped after static reconstruction/relative triage, no C
+  candidate or score.** 1,551 instructions with a 0x128 frame, dual graphics
+  allocation paths, many script-option groups, terrain setup, packed
+  animation stepping and segment initialization. condense.py exposed the
+  repeated script readers; the strongest relative (Bee_ResetRoute) explains
+  only 12%. No dominant full-function port and no Ghidra export were
+  available. This remains a fresh large initializer for a future pass.
+- **081172C4 — skipped, best local 71.1%.** Launch ascent uses the common
+  movement body but retains velocity/bias addresses through the decay loop.
+  Explicit pointer lifetimes restore the 0x10 frame and reduce structural
+  residue, while broad register pins worsen it. Extent 820.
+- **081175F8 — skipped, local 67.1%.** Launch descent adds phase-four
+  transition to Glove_UpdateStopping. Same pointer/decay-loop allocation
+  residue as ascent; candidate is eight bytes short of the 848-byte extent.
+- **08117F6C — skipped, best local 61.7%.** Recovery callback blinks model
+  flag 1, replenishes resource toward its cap, then returns to stopping after
+  120 frames. Both explicit-pointer and sibling-style movement forms leave
+  substantial lifetime and scheduling differences. Extent 888.
+- **0811A158 — skipped, improved local 69.2% to 71.3%.** Collision/resource
+  update reconstructs spatial-index placement, local participant scroll,
+  pending damage, markers, resource regeneration and input history. A
+  full-width Flag return reduces unnecessary boolean materialization, but
+  nullable actor predicates and address lifetimes still differ widely.
+- **080A8F38 — retained 95.5% inherited draft.** Mask hoisting occupies r7
+  needed by the sprite pointer. Preventing the shared mask hoist, pinning its
+  temporary and changing Step's sprite access forms all worsened residue.
+- **080A8904 — retained 87.6% inherited draft.** Signed surface, explicit
+  descending do-loop and unsigned random helper variants did not improve it.
+- **080AA8C4 — retained 82.9% inherited draft.** Re-reading the packed cell
+  byte compiles identically; narrowing NearHeight or replacing its duplicate
+  operand check worsens structure. No source changes.
+- **081182E4 — retained 81.3% inherited draft.** Action-view r5 pinning
+  worsens spills. Recomputing the action-kind field raises coarse fuzzy to
+  82.4% but increases structural residue from 63 to 66, so kept the baseline.
+- **0820CD00 — retained 88.1% inherited draft.** Separate switch default
+  duplicates optimize identically; switching on computed orientation instead
+  of a field reload improves one structural instruction but lowers fuzzy to
+  86.9%. Defined success return remains intentional; no stale/uninitialized
+  return trick was introduced.
+- **0820C9AC — retained 81.3% inherited draft.** Pause inversion, equivalent
+  random-table base and do-loop variants all compile identically. Remaining
+  residue includes stack/random-pointer lifetime and defined callback return.
+
+Tentacle body-only entries were outside this round's Tentacle actor assignment.
+Previously matched 080AB04C was skipped. Existing production drafts not improved
+were left untouched. Full ROM validation and alias promotion remain integration
+work; no claim of combined-build validation is made here.
