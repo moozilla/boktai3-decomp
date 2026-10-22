@@ -1004,9 +1004,7 @@ ok:
     return p;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 93.0%
-// Clamping zero temporaries and their register allocation still differ.
+// MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
 {
     struct WirelessGameItems *owner = gUnk_02000100;
@@ -1036,7 +1034,7 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
                 current->timer = zero;
             }
             {
-                int value = count;
+                register int value asm("r0") = count;
                 int clear;
                 if (value > 10)
                     value = 10;
@@ -1055,8 +1053,10 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
             amount = 0;
         {
             int zero = 0;
+            register int flag asm("r0");
             target->count = amount;
-            target->pendingFlag = 0;
+            flag = 0;
+            target->pendingFlag = flag;
             target->state = 3;
             target->entered = 1;
             target->timer = zero;
@@ -1093,9 +1093,6 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", WirelessGameItems_QueueLocalItem);
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pendingArg)

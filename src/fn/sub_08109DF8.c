@@ -1,10 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// Open: the original copies p at entry (adds r5, r4) and uses the copy (r5)
-// only in the retry branch; p (r4) serves the rest and r5 is reused for 0xFFFF
-// in the init loop. A plain `q = p` copy gives the copy r7 and swaps roles
-// (86.5%); pinning q to r5 (88.9%) breaks the retry clear loop.
+// The original copies p at entry (adds r5, r4) and uses the copy only in the
+// retry branch; r5 is reused for 0xFFFF in the init loop. A plain `q = p` copy
+// gets r7 and swaps roles, so q is pinned to r5.
 
 struct PollPanel {
     u8 pad0[0x1d];
@@ -47,6 +45,7 @@ static inline void ScriptPanel_Retry(struct PollPanel *q)
 // confidence=low: starts multiplayer serial, then waits for a role and retries on timeout.
 s32 ScriptPanel_PollSelection(struct PollPanel *p)
 {
+    register struct PollPanel *q asm("r5") = p;
     s32 i;
     s32 role;
     if (Registry1745_ConsumeStateEntry(p)) {
@@ -65,11 +64,8 @@ s32 ScriptPanel_PollSelection(struct PollPanel *p)
             p->role = role;
             Registry1745_SetState(p, 3, ScriptPanel_WaitForSelectionData);
         } else {
-            ScriptPanel_Retry(p);
+            ScriptPanel_Retry(q);
         }
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScriptPanel_PollSelection);
-#endif

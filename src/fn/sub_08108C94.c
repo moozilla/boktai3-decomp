@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.3%
-// Open: loop register allocation (ROM sets up &field6f before the counter and
-// compares the raw/copy pair the other way round).
+// 0xFFFF lives in an unallocated pseudo outside the loop, so reload
+// rematerialises it into r7 at the compare.
 
 struct SlotMonitor {
     u8 unk0[0x20];
@@ -39,7 +38,7 @@ void sub_08108C94(struct SlotMonitor *obj)
 {
     s32 i;
     s32 count = 0;
-    s32 matches = 0;
+    register s32 matches asm("r6") = 0;
     s32 ready = 0;
     s32 first = 1;
     s32 stop;
@@ -59,13 +58,14 @@ void sub_08108C94(struct SlotMonitor *obj)
         u16 *base;
         u16 *p;
         s32 zero;
+        s32 none = 0xFFFF;
         obj->ticks++;
         base = obj->peers;
         zero = 0;
         for (i = 0; i < 4; i++) {
-            u16 raw = base[i];
+            register u16 raw asm("r3") = base[i];
             s32 v = raw;
-            if (v != 0xFFFF) {
+            if (v != none) {
                 if (first) {
                     if (v == (0x1BC0 | obj->config)) {
                         matches++;
@@ -122,6 +122,3 @@ void sub_08108C94(struct SlotMonitor *obj)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08108C94);
-#endif
