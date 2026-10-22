@@ -31,6 +31,7 @@ clone() {  # clone SRC DEST: APFS copy-on-write, else a plain copy
   cp -c -R "$1" "$2" 2>/dev/null || cp -R "$1" "$2"
 }
 link() { [ -e "$1" ] && [ ! -e "$2" ] && ln -s "$1" "$2"; return 0; }
+git -C "$DIR" config core.hooksPath .githooks  # tools/pii_check.py hooks
 mkdir -p "$DIR/build"
 link "$MAIN/baserom.gba" "$DIR/baserom.gba"
 link "$MAIN/build/tools" "$DIR/build/tools"

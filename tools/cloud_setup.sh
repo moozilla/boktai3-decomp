@@ -21,6 +21,7 @@
 # The ROM is never committed (.gitignore); nothing generated from it is either.
 set -e
 cd "$(dirname "$0")/.."
+git config core.hooksPath .githooks 2>/dev/null || true  # tools/pii_check.py hooks
 SHA=2651c5e6     # first 8 hex digits of baserom.gba's SHA-1 (README.md has the full value)
 CACHE=${B3_CACHE:-/opt/boktai3}
 BASE=$CACHE/base
