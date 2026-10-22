@@ -1,8 +1,4 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// Remaining: Only the mask and flag-load registers differ in the pursuit check.
-// fuzzy: 97.7%
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 
@@ -32,7 +28,16 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 
-static inline u16 Mask(struct SceneActorRegistryResetView *p, u32 mask) { return p->flags2D4 & mask; }
+// MATCHING_CONCESSION: register-pinning
+static inline u16 Mask(struct SceneActorRegistryResetView *p, u32 mask)
+{
+    register u32 m asm("r1") = mask;
+    register u32 v asm("r0");
+    asm("" : "+r"(m));
+    v = p->flags2D4;
+    asm("" : "+r"(v));
+    return v & m;
+}
 // confidence=low: applies stored route drift and halves it every four ticks before choosing pursuit or rest.
 #define Lun_DecayRouteMotion sub_0809C174
 void Lun_DecayRouteMotion(struct SceneActorRegistryResetView *actor)
@@ -58,7 +63,3 @@ void Lun_DecayRouteMotion(struct SceneActorRegistryResetView *actor)
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0809C174);
-#endif
