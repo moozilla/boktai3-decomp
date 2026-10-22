@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 84.0%
+// fuzzy: 87.0%
 // Option parsing, pointer lifetimes, loop shape and register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
 struct Frames {
@@ -266,14 +266,12 @@ void ActorGroup_CreateFromScript(void)
     }
     {
         u32 flag = Pool184_TestStatusFlags(p, 2);
-        s32 result;
         if (flag)
-            result = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 96, 100, 2560,
-                                             1, 5, 1, 0);
+            p->shadowId = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 96, 100,
+                                                  2560, 1, 5, 1, 0);
         else
-            result = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 128, 100, 2560,
-                                             1, 5, 1, flag);
-        p->shadowId = result;
+            p->shadowId = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 128, 100,
+                                                  2560, 1, 5, 1, flag);
     }
     value = Script_GetKeywordValue('I', 0);
     p->scriptI = value;
