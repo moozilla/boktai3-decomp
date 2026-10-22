@@ -151,5 +151,5 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809B94C);
+INCLUDE_ASM("asm/nonmatching", Lun_ApproachMovementTarget);
 #endif
