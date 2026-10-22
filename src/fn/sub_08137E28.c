@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.4%
+// fuzzy: 90.4%
 #include "scene_actor_chase.h"
 
 u8 *Path_GetPointData(u8 *);
@@ -52,6 +52,7 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
     s32 i;
     u8 found;
     u8 *cursor;
+    void *nav;
 
     t = *(struct ChaseTarget **)((u8 *)actor + 0xDC);
     angle = Math_Atan2(t->position.x - actor->position.x, t->position.z - actor->position.z);
@@ -63,7 +64,8 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
         delta.x = entry[0] - actor->position.x;
         delta.z = entry[1] - actor->position.z;
         if (Dot(&dir, &delta) < 0) {
-            if (**(u32 **)(group + 0x7C) == *(u32 *)entry)
+            u32 w = *(u32 *)entry;
+            if (w == **(u32 **)(group + 0x7C))
                 continue;
             selected = i;
             found = 1;
@@ -81,7 +83,8 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
         cursor = group + 0x74;
     }
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), cursor);
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+    nav = *(void **)(group + 0x1FC);
+    if (!Chase_TryRoute(actor, nav, &actor->position,
                         *(struct ContactPosition **)(group + 0x200))) {
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
         Chase_SetState(actor, 3, 0, 0);
