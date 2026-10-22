@@ -107,29 +107,17 @@ s32 Modifier_ApplyAmount(s32 a, s32 b, s32 c)
     return a;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-
-// Register allocation and a hoisted sort pointer (output + 1) differ; params used directly via macros; reviewed ROM extent is 256 bytes.
-
-s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
-                            struct ModifierSelection *selectionArg,
-                            struct ModifierRecord *outputArg, u32 includeSelected)
+s32 Modifier_CollectSources(struct ModifierSelection *actor, struct ModifierSelection *selection,
+                            struct ModifierRecord *output, u32 includeSelected)
 {
     struct ModifierRecord swap, scratch;
     s32 count = 0;
-#define actor     actorArg
-#define selection selectionArg
-#define output    outputArg
     s32 i;
-    struct ModifierRecord *out;
     i = 0;
     if (count < selection->count) {
-        out = output;
         do {
             ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gUnk_02000710->modifierIdsBytes)[i]);
-            *out = scratch;
-            out++;
+            output[count] = scratch;
             count++;
             i++;
         } while (i < selection->count);
@@ -154,45 +142,26 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
         output[count] = scratch;
         count++;
         {
-            s32 pass = 0;
-            do {
-                s32 nextPass;
-                struct ModifierRecord *right;
-                struct ModifierRecord *left;
-                s32 remaining;
-                nextPass = pass + 1;
-                right = output + 1;
-                left = output;
-                remaining = 2;
-                do {
-                    s32 leftOrder = left->order;
+            s32 pass;
+            for (pass = 0; pass < 4; pass++) {
+                s32 j;
+                for (j = 0; j < 3; j++) {
+                    s32 leftOrder = output[j].order;
                     if (leftOrder >= 0) {
-                        s32 rightOrder = right->order;
+                        s32 rightOrder = output[j + 1].order;
                         if (rightOrder >= 0 && leftOrder > rightOrder) {
-                            swap = *left;
-                            *left = *right;
-                            *right = swap;
+                            swap = output[j];
+                            output[j] = output[j + 1];
+                            output[j + 1] = swap;
                         }
                     }
-                    right++;
-                    left++;
-                } while (--remaining >= 0);
-                pass = nextPass;
-            } while (pass <= 3);
+                }
+            }
         }
     }
 done:
     return count;
 }
-#undef actor
-#undef selection
-#undef output
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", Modifier_CollectSources);
-
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 s32 Modifier_ApplyToStat(struct ModifierSelection *actorArg, struct ModifierSelection *selectionArg,
