@@ -515,6 +515,9 @@ address,evidence
 08226528,Hidden raw-tail function
 082265D8,Hidden raw-tail function
 0822797C,Hidden raw-tail function
+08227E2C,Hidden raw-tail function (retained)
+08227E5C,Hidden raw-tail function (retained)
+08227E8C,Hidden empty function
 08227F3C,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F4C,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F58,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
@@ -570,14 +573,18 @@ address,evidence
 08232370,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082329C8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08232F1C,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md
+08232FD0,Hidden raw-tail function
 082371E4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08237764,Hidden raw-tail function
+0823A518,Hidden raw-tail function
+0823A53C,Hidden raw-tail function
 0823ABA8,Hidden raw-tail function
 0823B8C4,Hidden raw-tail function (retained)
 0823C8FC,Hidden raw-tail function (retained)
 082436EC,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 08243704,Script command (actor i must exist; reads keyword T); first of two matched functions in the reviewed 08243704-082437A8 span
 0824372C,Script command setting a player action slot (keyword w); second matched function in the reviewed 08243704-082437A8 span
+08243B0C,Hidden raw-tail function
 08243ED8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08243EE4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08243EF0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
