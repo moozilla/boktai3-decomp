@@ -3,7 +3,7 @@
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 /* Open: the ROM masks the second group id with 0xFF (word load of the timer) where this
- * truncates; the group and reverse arguments swap r8/sb; local registers in case 2 differ.
+ * truncates, and the case-2 offset/constant temporaries swap r3/r4.
  * The u8/u16 form keeps the timer address from being shared with the first GroupId. */
 #include "actor_attachment_state.h"
 struct Vec {
