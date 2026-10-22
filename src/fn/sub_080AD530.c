@@ -1,11 +1,22 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
 #define Vorn_ResumeRouteAfterDelay sub_080AD530
 #ifdef NONMATCHING
-// fuzzy: 94.5%
-// Remaining differences: flag-load scheduling and derived group-field addresses.
+// fuzzy: 99.3%
+// Remaining difference: the route flag mask load is scheduled after the field load.
+static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2D4 & mask;
+}
+static inline u8 ContextFlags(u8 *context, u32 mask)
+{
+    if (*(u16 *)(context + 0x6D4) & mask)
+        return 1;
+    return 0;
+}
 void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 *group = (u8 *)&actor->group;
@@ -19,13 +30,17 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
     if (frame <= 18)
         return;
     actor->field2B0 = 1;
-    if (Chase_MotionFlags(actor, 2)) {
+    if (Motion(actor, 2)) {
         u32 mask;
         Chase_SetState(actor, 3, 0, 0);
-        Chase_SetCtl(actor, *(void **)(group + 0x208), 7);
+        {
+            u8 *base = group;
+            asm("" : "+r"(base));
+            Chase_SetCtl(actor, *(void **)(base + 0x208), 7);
+        }
         mask = ~0x983;
         actor->flags2D6 = mask & actor->flags2D6;
-    } else if (Chase_Test(*(u16 *)(context + 0x6D4), 0x1D))
+    } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
         actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
