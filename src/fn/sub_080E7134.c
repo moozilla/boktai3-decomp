@@ -60,6 +60,10 @@ static inline u8 TakeFlag(u8 *flag)
     return 0;
 }
 
+static inline void RouteDelta(struct ContactPosition *out, struct ContactPosition *from, u8 *group)
+{
+    Delta(out, from, (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+}
 static inline u8 HasMode(u8 *p)
 {
     u32 mask = 1;
@@ -69,8 +73,9 @@ static inline u8 HasMode(u8 *p)
 }
 #ifdef NONMATCHING
 // fuzzy: 95.7%
-// Remaining differences: instruction ordering and register allocation.
+// Remaining differences: heading/vector loads, context offset allocation and pointer reload.
 // confidence=low: generic scene actor leap; species ownership is not established.
+#define SceneActor_LeapTowardTarget sub_080E7134
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -114,11 +119,11 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             Delta(&delta, &actor->position, &point);
             speed = 4;
         } else {
-            Delta(&delta, &actor->position,
-                  (struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C));
+            RouteDelta(&delta, &actor->position, group);
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
             {
-                u32 random = gUnk_0203B400[gUnk_03005308];
+                u32 offset = gUnk_03005308 * 2;
+                u32 random = *(u16 *)(offset + (u32)gUnk_0203B400);
                 s32 base = context[0x65E] - 2;
                 speed = base + (random & 3);
             }
