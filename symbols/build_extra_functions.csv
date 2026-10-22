@@ -252,7 +252,7 @@ address,isa,evidence,replacement_end
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
 0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
 0811AC54,thumb,Hidden tail function,0811AC6C
-0811ACCC,thumb,Hidden tail after Terrain_GetCellHighByte,
+0811ACCC,thumb,Hidden raw-tail function: terrain cell nibble getter (bits 8-11),0811AD8C
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
 0811BB98,thumb,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span,0811BBE0
