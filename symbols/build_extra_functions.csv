@@ -245,6 +245,8 @@ address,isa,evidence,replacement_end
 0813E284,thumb,Independent modifier callback in equipment-level tail; own push and pop-bx; notes/player_3.md,0813E324
 0813F828,thumb,Independent energy-spend body after affordability test; push and pop-bx; notes/player_3.md,0813F84C
 08156C8C,thumb,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set),08156CAC
+08158E68,thumb,Hidden helper in the raw tail after Player_BeginDirectionSequence (actor map tile index),08158EC8
+0815910C,thumb,Hidden helper in the raw tail after Player_GetEquipmentLevelBonus (level bonus from an item),08159164
 08159228,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815924C
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
@@ -267,6 +269,7 @@ address,isa,evidence,replacement_end
 0815D41C,thumb,Hidden script command (PlayerCue_WindblownVariant4; keyword r),0815D460
 0815D460,thumb,Hidden script command (PlayerCue_WindblownVariant2; keyword r),0815D4A4
 0815D4A4,thumb,Hidden script command (PlayerCue_StandDiagonal; keyword d),0815D4E8
+0815DBF4,thumb,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched),
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
