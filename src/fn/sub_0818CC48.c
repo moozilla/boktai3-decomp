@@ -1,11 +1,10 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.5%
-// foundry draft (worker best 92.9%); what differs is mostly register allocation and instruction order
-#define gPlayerObject     gUnk_02000710
-#define gRandomTableIndex gUnk_03005308
-#define gRandomTable      gUnk_0203B400
+// MATCHING_CONCESSION: register-pinning
+#define Armor_BeginPartTravelToPlayer sub_0818CC48
+#define gPlayerObject                 gUnk_02000710
+#define gRandomTableIndex             gUnk_03005308
+#define gRandomTable                  gUnk_0203B400
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
 struct ArmorTravelTarget {
@@ -67,8 +66,17 @@ void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
         p->dz = p->endZ - p->startZ;
         p->timer = 0;
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-        random = *(const u16 *)((gRandomTableIndex << 1) + (u32)gRandomTable);
-        direction = (random & 1) ? -1 : 1;
+        {
+            u32 index = gRandomTableIndex << 1;
+            register const u16 *table asm("r2") = gRandomTable;
+            random = *(const u16 *)(index + (u32)table);
+        }
+        direction = 1;
+        if (random & 1) {
+            register s32 negative asm("r0") = -1;
+            asm("" : "+r"(negative));
+            direction = negative;
+        }
         p->direction = direction;
         dx = p->dx;
         if (dx < 0)
@@ -82,6 +90,3 @@ void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
             p->callback = Armor_UpdatePartTravelZWave;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_BeginPartTravelToPlayer);
-#endif
