@@ -36,9 +36,6 @@ static inline void ColliderFlag(struct ContactCollider *c)
 {
     c->flags |= 4;
 }
-#ifdef NONMATCHING
-// fuzzy: 88.2%
-// Remaining differences: context flag test and final player/context update allocation.
 // confidence=low: contact type 1 interrupts control and starts a linked-player reaction.
 #define Ghost_BeginContactReaction sub_08095578
 void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
@@ -83,24 +80,37 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                 *f &= mask;
             }
             {
-                u32 mask = 0x80;
-                u32 test = *(u32 *)(p + 0x558) & mask;
-                asm volatile("" : "+r"(test));
+                register u32 mask asm("r1") = 0x80;
+                register u32 offset asm("r2") = 0x558;
+                register u32 test asm("r0");
+                register u32 *field asm("r0");
+                asm("" : : "r"(offset));
+                field = (u32 *)(p + offset);
+                asm("" : : "r"(field));
+                test = *field & mask;
+                asm volatile("" : : "r"(test) : "memory");
             }
             {
-                u32 three = 3;
-                gUnk_02000580[0x4F6] += three;
+                u8 *player = gUnk_02000580;
+                register u32 three asm("r3");
+                asm("" : : "r"(player));
+                three = 3;
+                player[0x4F6] += 3;
                 {
-                    u32 mask = 0x80;
-                    *(u32 *)(p + 0x558) |= mask;
+                    register u32 mask asm("r2") = 0x80;
+                    u32 offset = 0x558;
+                    u32 *flags;
+                    asm("" : : "r"(mask));
+                    flags = (u32 *)(p + offset);
+                    *flags |= mask;
                 }
-                p[0x5BB] = three;
+                {
+                    register u8 *field asm("r0") = p + 0x5BB;
+                    asm("" : : "r"(field));
+                    *field = three;
+                }
             }
             Sound_PlaySong(0x3CB);
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08095578);
-#endif
