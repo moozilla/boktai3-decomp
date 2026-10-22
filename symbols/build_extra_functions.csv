@@ -718,7 +718,7 @@ address,isa,evidence,replacement_end
 0822BEE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822BEE4
 0822C110,thumb,Hidden raw-tail function,0822C154
 0822C154,thumb,Hidden raw-tail function,0822C180
-0822C180,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
+0822C180,thumb,Hidden raw-tail function,0822C18C
 0822C18C,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C970,thumb,Hidden raw-tail function,0822CA28
 0822D650,thumb,Hidden raw-tail function,0822D688
