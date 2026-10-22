@@ -192,6 +192,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     struct ContactPosition *target;
     u32 bit;
     struct ContactPosition *position;
+    s32 settle = 360;
 
     {
         u32 busy = IsBusy(actor);
@@ -253,7 +254,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
         }
     }
     GROUP_FIELD(group, 0x64, u32) = bestTag;
-    GROUP_FIELD(group, 0x60, u16) = 360;
+    GROUP_FIELD(group, 0x60, u16) = settle;
     dest = GROUP_FIELD(group, 0x200, struct ContactPosition *);
     {
         struct RouteLink *link = (void *)(group + 0x74);
