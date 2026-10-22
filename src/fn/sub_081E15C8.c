@@ -54,13 +54,12 @@ void Anim_SetSequence(void *, void *, u16, u32, u32);
 void Menu_StartFadeIn(u32);
 s32 GameStart_LoadAvailableSave(void *);
 void Sound_PlaySong(s32);
-void sub_081E0DD8(void *);
+void GameStart_DrawSaveInfo(void *);
 void GameStart_RunInitHook(void *);
 
-#define GameStart_Init sub_081E15C8
-#define W(o)           (*(s32 *)(p + (o)))
-#define U16(o)         (*(u16 *)(p + (o)))
-#define GS_H(o)        (*(s16 *)((u8 *)gUnk_02000710 + (o)))
+#define W(o)    (*(s32 *)(p + (o)))
+#define U16(o)  (*(u16 *)(p + (o)))
+#define GS_H(o) (*(s16 *)((u8 *)gUnk_02000710 + (o)))
 
 static inline void StepAnim(struct GameStartAnim *a, struct GameStartSprite *s)
 {
@@ -203,10 +202,10 @@ s32 GameStart_Init(u8 *p)
 check:
     if (GS_H(0x86e) == 0)
         W(0x4cc) = 1;
-    sub_081E0DD8(p);
+    GameStart_DrawSaveInfo(p);
     GameStart_RunInitHook(p);
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081E15C8);
+INCLUDE_ASM("asm/nonmatching", GameStart_Init);
 #endif
