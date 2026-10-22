@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 76.1%
-// Open: the peer-id search; jump2 cross-jumps the first test into the loop test
-// (ROM keeps a separate first test and reloads gRfuLinkStatus each iteration).
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -62,15 +58,9 @@ void sub_08035B98(struct Engine *p)
     u8 *scratch = p->scratch;
     int i;
     Bg_ClearTilemap(0);
-    i = 0;
-    if (p->peerIds[0] != gRfuLinkStatus->my.id) {
-        u16 *id = p->peerIds;
-        do {
-            id++;
-            i++;
-            if (i > 3)
-                break;
-        } while (*id != gRfuLinkStatus->my.id);
+    for (i = 0; i <= 3; i++) {
+        if (p->peerIds[i] == gRfuLinkStatus->my.id)
+            break;
     }
     p->flag1f = i;
     Wireless_InitPacketQueue(p->message);
@@ -98,6 +88,3 @@ void sub_08035B98(struct Engine *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08035B98);
-#endif
