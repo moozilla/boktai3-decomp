@@ -1,25 +1,13 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.0%
-// foundry draft (worker best 87.0%); what differs is mostly register allocation and instruction order
-#define Tilemap_GetCell Hud_GetTilemapCell
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void StatusPanel_ClearLowerRows(void)
 {
-    s32 row = 0;
-    u16 blank = 0xD000;
-    do {
+    s32 row;
+    for (row = 0; row <= 1; row++) {
         u16 *p = Hud_GetTilemapCell(0, 9, row + 17);
-        s32 next = row + 1;
         s32 col;
-        col = 11;
-        do {
-            *p++ = (u16)(blank | 0);
-        } while (--col >= 0);
-        row = next;
-    } while (row <= 1);
+        for (col = 0; col < 12; col++)
+            *p++ = 0xD000;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StatusPanel_ClearLowerRows);
-#endif
