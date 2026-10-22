@@ -36,8 +36,6 @@ struct MonsterBookGfx {
     u16 palette[16];
 };
 
-#define MonsterBook_InitWidgets sub_081D5908
-
 struct ResHdr *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(struct ResHdr *, struct ResHdr *);
 void Widget_InitLinked(struct BookWidget *, struct ResHdr *, u32, u32, u32, u32, u32,

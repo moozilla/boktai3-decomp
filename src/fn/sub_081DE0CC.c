@@ -5,7 +5,6 @@
 /* NameEntry_Initialize: reads the script's "b" (name slot) and "d" (initial name) keywords,
  * loads the slot's current name, counts its blank trailing pairs to place the cursor, then
  * sets up the keyboard backgrounds and six widgets. (guess) */
-#define NameEntry_Initialize sub_081DE0CC
 
 extern u32 gUnk_02000328[];
 extern u8 gUnk_020005B4[];

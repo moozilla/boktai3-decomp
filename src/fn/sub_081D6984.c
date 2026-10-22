@@ -12,7 +12,7 @@ s32 Script_GetKeywordValue(s32, s32);
 void ScrollingDialogue_ClearScript(void);
 u32 BestiaryDisplay_Create(u32, u32);
 void BestiaryDisplay_Hide(void);
-void sub_081D5908(u8 *);
+void MonsterBook_InitWidgets(u8 *);
 void MonsterBook_SetPage(u8 *, u32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
@@ -24,8 +24,6 @@ struct MonsterBook {
     u8 pad[0xDAC];
     struct E e[83];
 };
-
-#define MonsterBook_Init sub_081D6984
 
 s32 MonsterBook_Init(u8 *s)
 {
@@ -100,7 +98,7 @@ s32 MonsterBook_Init(u8 *s)
     ScrollingDialogue_ClearScript();
     *(u32 *)(s + 0xF1C) = BestiaryDisplay_Create(0, 0);
     BestiaryDisplay_Hide();
-    sub_081D5908(s);
+    MonsterBook_InitWidgets(s);
     MonsterBook_SetPage(s, 0);
     ScreenTransition_SendCommand(0, 4, 4, 4, 4, 0xFFFF, i);
     Sound_PlaySong(0x118);
