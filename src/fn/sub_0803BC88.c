@@ -72,6 +72,9 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     struct Vec16 pos;
     u32 above, below;
     s32 lim;
+    s32 mask;
+    s16 heading;
+    s32 frames;
     s32 *pprevX, *pprevZ;
     u16 *ph;
     u32 *motion;
@@ -88,8 +91,9 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     if (speed > 0xF000)
         speed = 0xF000;
     a->verticalSpeed += 0x200;
+    frames = a->impulseFrames;
     vert = &a->verticalSpeed;
-    if (a->impulseFrames > 0) {
+    if (frames > 0) {
         a->offsetX += a->impulse[0];
         a->impulse[0] += Div(-a->impulse[0], a->impulseFrames);
         a->impulse[1] += Div(-a->impulse[1], a->impulseFrames);
@@ -140,8 +144,9 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     {
         Character_GetHeightAdjustedPosition(a, &pos);
         SpatialIndex_SetPosition(&a->motionFlags, pos.x, pos.y, pos.z);
+        heading = *ph;
         motion = &a->motionFlags;
-        if ((s16)*ph < 0) {
+        if (heading < 0) {
             SpatialIndex_SetPosition(a->contactIndex, pos.x, pos.y, pos.z);
             contact = a->contactIndex;
         } else {
@@ -156,13 +161,14 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
             contact = a->contactIndex;
         }
     }
-    *motion &= ~1;
+    mask = ~1;
+    *motion &= mask;
     Collider_SetContactParameter(contact, e->parameter);
     ScenePool_ResetProximityContact(a);
     if (e->kind == 3)
-        a->controlFlags &= ~1;
+        a->controlFlags &= mask;
     else
-        a->controlFlags |= 1;
+        a->controlFlags = 1 | a->controlFlags;
     CharacterModel_ClearAnimationFlags(a->model, 1);
     ScenePool_UpdateActorDrawablePosition(a);
     CharacterPreview_InitializePalette(a->preview, a->model, a->paletteIndex);
