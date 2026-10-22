@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.8%
-// Open: in the second sprite-flag test the ROM keeps the constant 2 in r3 and the masked
-// value in r1 (truncated in place); this allocates them the other way round.
+// fuzzy: 99.2%
+// Open: in the 'T' clamp the ROM stores the call result before copying it to r1 for the
+// clamp; this copies first (a separate clamp variable fixes that but rotates spill slots).
 #include "engine.h"
 #include "scene_vec.h"
 struct Frames {
@@ -138,12 +138,11 @@ void sub_08107EBC(void)
     {
         u32 flags = f->flags;
         u32 two = 2;
-        u32 first, masked;
+        u32 first;
         asm("" : "=r"(first) : "0"(two));
         first &= flags;
-        asm("" : "=r"(masked) : "0"(first));
-        first = (u8)masked;
-        if (first != (((*frame & 0x30) >> 4) & two))
+        asm("" : "+r"(first));
+        if ((u8)first != (((*frame & 0x30) >> 4) & two))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
