@@ -5,7 +5,7 @@
 // confidence=low: initializes the four active sword attack components.
 
 #ifdef NONMATCHING
-// fuzzy: 84.8%
+// fuzzy: 85.0%
 // Animation mask lifetime, collider argument addresses and register allocation still differ.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
 #define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
