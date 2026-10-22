@@ -4208,3 +4208,198 @@ Only fast per-file checks and diagnostic tools were used; no make, build.py,
 full build, network operations or shared symbol/header edits. Each draft and
 this note are committed separately through build/commit.sh. Combined ROM
 validation and alias promotion remain integration work.
+
+## Mummy and Ghoul round 3 — 2026-10-22
+
+Tags: #matching #monsters #mummy #ghoul #register-pinning #nonmatching
+
+New exact gain: **+0.0156 percentage points of total code** (two functions,
+376 bytes), all Register-pinned. Four existing guarded drafts improved; these
+remain nonmatching and earn no exact progress. Worked solo and offline, using
+only fast per-file checking and diagnostics, never make or build.py. Every
+source change was committed through build/commit.sh. The two exact sources were
+depinned, clang-formatted, and accepted over their complete reviewed extents.
+All four retained drafts were formatted and scored with --nonmatching --record,
+and their default assembly alternatives passed full-extent checks. No shared
+headers, symbol tables, progress totals, or generated files were changed.
+Combined ROM validation and name promotion remain integration work.
+
+### Accepted work
+
+- **080DA33C — matched, BouncingObject_RefreshNearbyHeading, 112 bytes.**
+  Reused the existing symbol name. Counts down context+0x6D4, queries the nearby
+  heading, updates context+0x6F2 bit 0x400, and starts the adjacent-cell route on
+  success. The old draft's narrow hard-register variables produced a bad
+  stack-based comparison with this compiler. Full-width counter copies and an
+  empty two-output constraint retain two distinct values for the comparison and
+  decrement. Leaving the saved copy unpinned lets agbcc preserve r7 correctly;
+  explicitly pinning it produced r7 writes without the required save/restore.
+  A context pointer in r0 and counter pointer in r5 close the remaining load
+  allocation. depin reduced eight hints to three, then the source matched exactly.
+- **0808A430 — matched, SceneActorControl_RestartOrAdvance, 264 bytes.**
+  Reused the existing name. Entry restores the callback at actor+0x224 and
+  control kind two. After the context+0x63C gate expires it invokes actor+0x270
+  and the fallback query, consuming pending bit one on success. Otherwise it
+  advances to behavior fifteen or increments the counter. Explicit offset
+  lifetimes recover r3 for the callback offsets; r0 slot pointers preserve the
+  original loads. Assigning the entry-byte pointer after the saved callback
+  load prevents it from being hoisted. Full-width kind two avoids an unnecessary
+  allocation constraint. depin reduced seventeen hints to eight; formatted
+  source passes the full extent exactly.
+- **080D812C — improved draft 98.6% -> 99.9%, Mummy_UpdateBurnDamage.**
+  Reviewed and candidate extents both 6,504 bytes. Final residue is two bytes,
+  two register-only instructions, zero structural differences: the signed
+  local-player load at 080D8390 uses scratch r5 instead of r4. Reusing the
+  known 0x20 value produces the original subtraction-derived ~0x10 mask.
+  Keeping the damage value in r0 through both halfword stores removes an extra
+  copy. Scoped collider, flag, palette-owner and health pointer lifetimes
+  recover the expected early register copies. Making the collider address live
+  before saving the category pointer fixes the last scheduling pair. All new
+  scalar/pointer constraints have initialized inputs; no instruction asm bodies.
+  Attempts to carry health/mask values through the player query changed other
+  scratch allocations without closing the match. The retained helper reads
+  health through a signed halfword pointer in r5. Narrowed-mask or declaration
+  variants were not retained when structural or total differences increased.
+- **08089168 — improved draft 98.3% -> 99.1%,
+  Ghoul_UpdateDisplacementRecovery.** Reviewed and candidate extents both
+  472 bytes. One extra input-only empty constraint keeps the second source
+  offset alive through its signed load, selecting the correct zero scratch r5.
+  Final residue is two bytes/two register-only instructions in the first load,
+  which still uses r3 rather than r1. Tried removing pointer pins, extending
+  offset lifetimes, signedness, and volatile-load variants; none closed it.
+  Kept only the single improving constraint, not the exploratory alternatives.
+- **080D0FE8 — improved draft 83.8% -> 84.9%, Mummy_TurnTowardRoute.**
+  Reviewed extent 1,628 bytes; candidate 1,640. Widening TurnFlags' return from
+  u16 to u32 preserves its value (a halfword AND mask) and avoids nine register
+  differences. Structural count remains 247; total falls 310 -> 301. Added the
+  required local alias using the existing symbol name. No new pins were added.
+- **08086400 — improved draft 86.6% -> 87.8%, Ghoul_TurnTowardRoute.**
+  Reviewed extent 1,580 bytes; candidate 1,568. Same value-preserving TurnFlags
+  return-width change: 135 -> 126 realigned differences, still 63 structural.
+  Shared animation tails and duration-pointer allocation remain unresolved.
+  Retains its existing local alias and restart-register concession.
+
+For 080D812C and 080D0FE8, the checker initially printed the new score but did
+not update the source: the emitted symbol was sub_ADDR while the fallback used
+the promoted name, and draft_scores requires identical labels. Changing the
+fallback spelling to sub_ADDR let --record write the measured score; default
+fallbacks were checked again. Separate one-function follow-up commits record
+these corrections. This is a scorer/alias interaction, not extra matching work.
+
+### Other drafts: bounded attempts stopped
+
+Counts below are realigned total / structural instructions, not exact progress.
+Unaccepted alternatives remain ignored under wip/round3 and build/.
+
+- **080DC9D0 — retained existing 98.9% draft.** Started with six scheduling
+  differences (three constant/load pairs) over 588 bytes. Pointer barriers
+  disrupted PRE and route-tail sharing. Signed-halfword mask locals reduced
+  structure to two but changed scratch allocation and eight spill slots,
+  leaving 23 total differences. More than a dozen mask-width/lifetime variants
+  did not improve the retained six-instruction candidate; no source change.
+- **080D3D60 — retained 92.9% draft.** Baseline 71/26. Signed group-mask and
+  declaration-priority variants did not improve the RNG/flag-load/return tail.
+- **080D6608 — retained 92.5% draft.** Baseline 103/12. A signed -5 group-mask
+  local reduced the nominal result to 66/12 (94.1%), but inspection rejected it:
+  the generated retry loop assigned both the counter and RNG mask to r7.
+  Hoisting the pinned mask, adding constraints, pinning the counter and removing
+  the mask pin failed to give an improving, reviewed candidate. The 94.1%
+  experiment was never promoted. Existing guarded source was left unchanged;
+  its RNG pinning deserves a careful generated-code audit when resumed.
+- **080D5778 — retained 92.1% draft.** Baseline 82/21. Signed mask variants
+  increased register differences to 118; declaration swaps had no effect.
+- **080D3878 — retained 91.3% draft.** Baseline 47/12. Declaration variants
+  did not help. A nominal 44/11 result came from truncating ~0x141C0 to s16;
+  rejected because it changes a 32-bit mask's bit 0x10000, despite the score.
+- **080DC228 — retained 89.9% draft.** Baseline 99/34. A signed group-mask
+  local gave 100/32; a changed RNG-constant lifetime gave 94/35. Neither
+  improved both structure and allocation, so no production change.
+- **080D2194 — retained 88.5% draft.** Baseline 76/15. Widening the
+  MotionFlags return alone was identical; widening the loaded temporary
+  regressed to 121/17. Control pointers and spill order remain unresolved.
+- **080898FC — retained 86.3% draft.** Baseline 176/51. Signed mask-width
+  and declaration variants were identical or regressed; route-tail/RNG and
+  flag-address lifetimes remain the next substantial work.
+- **0808CC48 — retained 86.1% draft.** Baseline 36/12. Re-deriving motion
+  flags was identical; changing saved-control argument order gave 47/16,
+  replacing the inline route tail with Chase_TryRoute gave 51/24, and widening
+  the pending boolean removed required materialization (96/25). No change.
+- **080DA97C — retained 85.4% draft.** Baseline 459/147. Signed group-mask
+  local reduced structure to 141 but raised total to 462. Changing the RNG
+  constant lifetime raised structure to 150 despite fuzzy increasing to 86.4%.
+  Neither was promoted; repeated turn/arrival inlines still dominate.
+- **080D9B20 — retained 85.3% draft.** Existing candidate is only 1,444
+  bytes versus reviewed 1,768. Baseline anchored result is 681/574, much worse
+  than its fuzzy number suggests. Opaque initialized i values after the
+  passability calls preserve the final cell comparisons the compiler otherwise
+  removes: 276/150, but fuzzy drops to 56.8% and the candidate grows too far.
+  A cell-value barrier plus those comparisons gave 301/158 at 1,960 bytes.
+  No below-threshold or structurally incomplete replacement was committed.
+- **080D53F8 — retained 83.1% draft.** Baseline 77/19. Passing the motion
+  flag pointer explicitly into BeginProbeTurn recovers the full 896-byte size
+  but regresses to 92/30 (80.6%); the initial flag pointer and turn-loop spills
+  need a different lifetime model. No change.
+
+### Inventory reconciliation and fresh initializer
+
+Read the existing notes and git history before reattempting earlier stops.
+These listed functions already had exact work or stopped investigations in this
+checkout, so they were not counted or blindly translated again:
+
+- **080DA5C8 — already exact**, Mummy_ResetResponseState.
+- **080D7F50 — already exact**, Mummy_UpdateAttackCollider.
+- **0808A9EC — already exact**, Ghoul_ResumeContactRoute.
+- **0808ACD4 — already exact**, Ghoul_ResetRouteState.
+- **080D0C30 — prior stopped attack-collision candidate**, below threshold;
+  owner/context allocation and repeated contact blocks remain off.
+- **080D1644 — prior stopped recovery candidate**, below threshold;
+  state/control setup ordering remains off.
+- **080D453C — prior stopped stimulus-reaction candidate**, below threshold;
+  materialized booleans, terrain and route lifetimes remain off.
+- **080D49DC — prior stopped delayed-pursuit candidate**, below threshold;
+  repeated Chase_Arrive terrain/turn expansions remain off.
+- **080D7568 — prior stopped contact-pursuit candidate**, below threshold;
+  direct-pursuit and arrival structural differences remain.
+- **080D2584 — prior incomplete recoil candidate**, no production draft;
+  the large post-animation route decision tree still needs translation.
+- **0808A664 — prior stopped return-action candidate**, below threshold;
+  control setup and saved destination lifetimes remain off.
+- **0808AF38 — prior stopped retreat-route candidate**, below threshold;
+  planar vector, route scan, and failure tail remain off.
+- **0808B264 — prior stopped route-speed candidate**, below threshold;
+  raw-byte boundary and signed-halfword/entry ordering issues remain.
+- **08085DD0 — prior stopped saved-target disc throw**, below threshold;
+  player-path layout and target lifetimes remain off.
+- **08089340 — prior stopped contact/probed disc throw**, below threshold;
+  target pointer, terrain-loop exits, and launch allocation remain off.
+- **0808B3EC — prior structural investigation**, notes/codex-high.md already
+  records the three repeated chase/arrival expansions. Rechecked its 2,738
+  instructions and relatives: Dog_ChasePlayer explains 38%, not a whole-function
+  port. No fresh function was incorrectly claimed from this prior stop.
+- **080DCC98 — prior stopped Mummy_Init**, notes/codex-high.md records its
+  1,803-instruction drawable/parser/route initialization. Rechecked the opening
+  assembly and relatives; no complete matched initializer relative exists.
+- **0808D1D8 — fresh partial initializer attempt, stopped without draft.**
+  Reviewed 4,092-byte extent, 1,761 instructions. Wrote and checked a 344-byte
+  opening-section candidate against the entire extent (8.1%, not a match).
+  Entry clears context+0x628, sets object context to self, category four,
+  binds the profile, and parses field 0x624. It allocates either a 0x5C sprite
+  using asset 0x9247 and sequence 0x1DF8, or a 0x80 drawable initialized from
+  ScriptProc_Start(0xCB05,0x9247). The alternate header copy is exactly eight
+  words, followed by ResourceHeader_Relocate and Widget_InitLinked. It then
+  clears state flags, sets field 0x2E8 to eight, parses keyword M, sets duration
+  scale 64, parses N and seeks keyword a. The large common script-parameter
+  parser and later route/callback setup remain untranslated. Ghidra export is
+  absent; matched relatives explain only 12%, mostly the final packed animation
+  stepper. Stopped rather than crediting the prefix or retaining an incomplete
+  production draft. The ignored scratch candidate ends with a placeholder return
+  and is explicitly not a complete implementation.
+
+Useful lesson: resolved-byte checks with reviewed extents remain the acceptance
+criterion. An initialized input-only lifetime constraint can change a signed-load
+scratch register without adding instructions. Keep counter copies full-width,
+let agbcc save callee-saved registers naturally where possible, and inspect the
+actual retry loop when hard pins are involved. Reject mask narrowing that changes
+bits even when a similarity score improves. No further attempts were yielding
+reviewable exact progress in this cohort, so the remaining existing drafts/stops
+were left for a later pass.
