@@ -166,6 +166,7 @@ address,isa,evidence,replacement_end
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
 08095574,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08095578
 08098040,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08098064
+080999A0,thumb,"Actor wait state: on arrival restore the saved target callback, otherwise set flag 0x800 and consume one pending trigger on the first tick; raw span after the preceding behaviour function",08099A48
 080A2F28,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A2F2C
 080A3804,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A382C
 080A5FBC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A5FC0
