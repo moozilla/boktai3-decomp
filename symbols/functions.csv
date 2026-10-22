@@ -7769,9 +7769,11 @@ addr,name,mode,confidence,source,notes
 081D5478,BestiaryDisplay_DrawEntryDetails,thumb,low,src-alias,
 081D581C,ScrollingDialogue_Step,thumb,low,src-alias,
 081D58B4,MonsterBook_UpdateHighlightPulse,thumb,low,src-alias,Advances a looping 50-tick sequence and writes the highlight intensity; visual role tentative
+081D5908,MonsterBook_InitWidgets,thumb,low,src-alias,
 081D5C08,MonsterBook_SetupPageBackgrounds,thumb,low,src-alias,Loads page graphics and palettes and configures background layers
 081D6194,MonsterBook_SetPage,thumb,low,src-alias,Stores the page index and resets its state before rebuilding page graphics
 081D6898,MonsterBook_RemoveActiveAnimation,thumb,low,src-alias,Removes a book animation only when its active byte is set
+081D6984,MonsterBook_Init,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
 081D70C4,TextSequence_SetState,thumb,low,src-alias,Sets the sequence state and clears its frame counter; text sequence identity tentative
 081D71A0,TextSequence_UpdateHold,thumb,low,src-alias,Counts hold frames and switches to state two when the specified duration expires
@@ -7900,7 +7902,9 @@ addr,name,mode,confidence,source,notes
 081DD80C,NameEntry_MoveCursorLeft,thumb,low,src-alias,
 081DDA78,NameEntry_AppendChar,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
+081DDBC0,NameEntry_Update,thumb,low,src-alias,
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
+081DE0CC,NameEntry_Initialize,thumb,low,src-alias,
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
 081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
@@ -7942,8 +7946,11 @@ addr,name,mode,confidence,source,notes
 081E0D18,ScriptPrompt_Create,thumb,low,src-alias,Creates the prompt task and installs its update and destruction callbacks
 081E0D58,GameStart_LoadAvailableSave,thumb,low,src-alias,Tries the selected save then the alternate and copies successful data into active state
 081E0DD4,GameStart_RunInitHook,thumb,low,src-alias,Empty hook called during GameStart initialization; provisional name reflects its call site
+081E0DD8,GameStart_DrawSaveInfo,thumb,low,src-alias,
 081E1278,SelectionPalette_UpdatePulse,thumb,low,src-alias,
+081E132C,GameStart_Update,thumb,low,src-alias,
 081E154C,GameStart_Destroy,thumb,low,src-alias,GameStart task destruction callback that removes its sprite and ten animations and clears two control bits
+081E15C8,GameStart_Init,thumb,low,src-alias,
 081E1A2C,ScreenParams3A0_SetFromScript,thumb,low,src-alias,
 081E1AB4,GameStart_Create,thumb,medium,gcl-name,name from GCL key 15DE ゲームスタート (Game Start); registry callback
 081E1AF4,SoundTest_CountEntries,thumb,low,src-alias,
@@ -8952,6 +8959,7 @@ addr,name,mode,confidence,source,notes
 0821F204,Nav_IsPositionInMesh,thumb,low,src-alias,
 0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
+0821F998,NavMesh_StepTowardTarget,thumb,low,src-alias,
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
 0821FB04,Actor_MoveAlongAngle,thumb,low,src-alias,
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,

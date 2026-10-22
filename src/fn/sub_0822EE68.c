@@ -1,46 +1,34 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 60.0%
-// 17 differing instruction runs; size -4 bytes; first diff at +0xC (mov sb, r1 vs mov r8, r1)
 u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *), Eeprom_VerifyBlock(u16, const u16 *);
+
 s32 Save_WriteBlock(u16 start, const u16 *data, s32 length)
 {
     s32 blocks = length >> 3, i, address;
     const u16 *p;
     u16 header[4];
+
     p = data;
     address = start;
-    for (i = 0; i < blocks; i++, p += 4, address++)
+    for (i = 0; i < blocks; p += 4, address++, i++)
         if (Eeprom_WriteBlockWithFullDelay(address, p))
             goto fail;
     p = data;
     address = start;
-    for (i = 0; i < blocks; i++, p += 4, address++)
+    for (i = 0; i < blocks; p += 4, address++, i++)
         if (Eeprom_VerifyBlock(address, p))
             goto fail;
     header[0] = 0;
     header[1] = 0;
-    if ((length >> 1) > 0) {
-        u32 x = header[0], sum = 0;
-        p = data;
-        for (i = length >> 1; i > 0; i--, p++) {
-            u32 v = *p;
-            x ^= v;
-            sum += v;
-        }
-        header[1] = sum;
-        header[0] = x;
+    for (i = 0; i < length >> 1; i++) {
+        header[0] ^= data[i];
+        header[1] += data[i];
     }
     header[2] = length;
-    header[3] = 65535;
-    if (Eeprom_WriteBlockWithFullDelay((u16)address, header))
+    header[3] = 0xffff;
+    if (Eeprom_WriteBlockWithFullDelay(address, header) || Eeprom_VerifyBlock(address, header))
         goto fail;
-    if (Eeprom_VerifyBlock((u16)address, header))
-        goto fail;
-    return length + 8;
+    length += 8;
+    return length;
 fail:
     return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Save_WriteBlock);
-#endif

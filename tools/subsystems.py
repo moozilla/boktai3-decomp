@@ -291,19 +291,19 @@ def regroup(funcs, sizes, rows, libraries):
         new.append({"name": spaced(s["label"]) if s["label"] != "?" else f"Unnamed {lo:08X}",
                     "start": f"{lo:08X}", "end": f"{hi:08X}", "category": "", "name_files": "",
                     "evidence": ev})
-    # Unique names: ROM order numbering for repeats.
-    count = collections.Counter(r["name"] for r in new)
-    taken = {r["name"] for r in kept}
+    # Rows that share a name are one unit in the report, so an object cut
+    # into several ranges keeps its name. Only a clash with a reviewed row
+    # is numbered.
+    reviewed = {r["name"] for r in kept}
     seen = collections.Counter()
     for r in sorted(new, key=lambda r: r["start"]):
-        if count[r["name"]] > 1 or r["name"] in taken:
+        if r["name"] in reviewed:
             base = r["name"]
             seen[base] += 1
             r["name"] = f"{base} {seen[base]}"
-            while r["name"] in taken:
+            while r["name"] in reviewed:
                 seen[base] += 1
                 r["name"] = f"{base} {seen[base]}"
-        taken.add(r["name"])
     return kept + new
 
 

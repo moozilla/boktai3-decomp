@@ -1,0 +1,34 @@
+#include "global.h"
+extern u16 gUnk_03005274[];
+extern u32 gUnk_03005308;
+struct Q {
+    u8 pad[0x60];
+    u16 seed;
+};
+struct S {
+    u8 pad0[0x30];
+    u32 x30;
+    u8 pad34[0x4e - 0x34];
+    u8 x4e, x4f;
+    u8 pad50[0x84 - 0x50];
+    u16 x84[4];
+    u8 pad8c[0x94 - 0x8c];
+    u32 x94;
+    u8 pad98[0xe0 - 0x98];
+    struct Q q;
+};
+
+void sub_0810BD34(struct S *p)
+{
+    struct Q *q = &p->q;
+    s32 i;
+    p->x30 = 0;
+    for (i = 0; i <= 3; i++) {
+        p->x84[i] = 0;
+        gUnk_03005274[i] = 0x3ff;
+    }
+    p->x94 = 0;
+    p->x4e = 0;
+    p->x4f = 0;
+    gUnk_03005308 = q->seed & 0x3ff;
+}

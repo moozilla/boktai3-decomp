@@ -25,6 +25,8 @@ _call_via_r1 = Callback_InvokeActor;
 _call_via_r2 = sub_08249240;
 /* agbcc libgcc/lib1thumb.asm call_via r4: bx r4; nop (ROM 08249248). */
 _call_via_r4 = sub_08249248;
+/* lib1funcs __modsi3 (ROM 08249350), emitted for signed %. */
+__modsi3 = sub_08249350;
 /* Exact linked matches to pinned agbcc libgcc2 objects; see docs/LIBGCC.md. */
 __lshrdi3 = Libgcc_ShiftRightLogical64;
 __muldi3 = Libgcc_MultiplyInt64;

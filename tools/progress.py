@@ -12,6 +12,7 @@ import csv
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 from romlib import ROOT
@@ -48,8 +49,6 @@ def load_groups(funcs, sizes, path, prefix):
                 raise ValueError(f"{row['name']}: invalid group boundaries")
             if libraries and start < libraries[-1]["end"]:
                 raise ValueError("group ranges must be sorted and nonoverlapping")
-            if any(lib["name"] == row["name"] for lib in libraries):
-                raise ValueError("group names must be unique")
             members = [(n, a) for n, a in funcs if start <= a < end]
             if sum(sizes[n] for n, _ in members) != end - start:
                 raise ValueError(f"{row['name']}: group span is not contiguous")
@@ -238,6 +237,38 @@ def collect_done(funcs, source_root):
                 raise ValueError(f"{p}: {n} has no progress boundary; refresh inventory")
             done.add(known[n])
     return done
+
+
+def uncovered_tails(funcs, sizes, done, code_sizes, slack=3):
+    """Matched functions whose compiled code is shorter than the span progress
+    credits them: the remainder is assembly hidden after the C (a function
+    gbadisasm left as raw bytes) and must get its own boundary. code_sizes
+    maps a start address to its linked symbol size; slack allows alignment
+    padding. Returns [(name, address, credited, compiled)]."""
+    return [(n, a, sizes[n], code_sizes[a]) for n, a in funcs
+            if n in done and a in code_sizes and sizes[n] - code_sizes[a] > slack]
+
+
+def elf_code_sizes(elf):
+    out = subprocess.run(["arm-none-eabi-nm", "-S", str(elf)], capture_output=True, text=True,
+                         check=True).stdout
+    sizes = {}
+    for ln in out.splitlines():
+        p = ln.split()
+        if len(p) == 4 and p[2] in "Tt":
+            a = int(p[0], 16) & ~1
+            sizes[a] = max(sizes.get(a, 0), int(p[1], 16))
+    return sizes
+
+
+def check_tails(elf, source_root=Path(ROOT) / "src"):
+    """Messages for matched functions that would credit hidden assembly."""
+    split = source_boundaries(INVENTORY, source_root)
+    funcs, sizes = load_functions(INVENTORY, extra=split)
+    done = collect_done(funcs, source_root)
+    return [f"{n} ({a:08X}) is credited {span} bytes but compiles to {size}; register the tail at "
+            f"{a + size:08X} with tools/hidden_tails.py split"
+            for n, a, span, size in uncovered_tails(funcs, sizes, done, elf_code_sizes(elf))]
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
