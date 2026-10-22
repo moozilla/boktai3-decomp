@@ -47,14 +47,3 @@ export type DecompSnapshot = {
 }
 
 export type DecompTab = 'overview' | 'treemap' | 'recent'
-
-declare module 'claude-code' {
-  interface PluginState {
-    'decomp-progress': {
-      snapshot: DecompSnapshot | null
-      status: string
-      tab: DecompTab
-      expanded: string
-    }
-  }
-}

@@ -1,4 +1,3 @@
-import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { DecompCategory, DecompSnapshot, DecompTab } from '../types'
@@ -21,10 +20,28 @@ const PANE = 'decomp-progress'
 const TITLE = 'Decomp progress'
 const STALE_MS = 10 * 60 * 1000
 
-const snapshot = atom({ plugin: 'decomp-progress', key: 'snapshot' } as const, null)
-const status = atom({ plugin: 'decomp-progress', key: 'status' } as const, '')
-const tab = atom({ plugin: 'decomp-progress', key: 'tab' } as const, 'overview')
-const expanded = atom({ plugin: 'decomp-progress', key: 'expanded' } as const, '')
+// What the popup draws. Module variables rather than $.state, which older
+// builds (2.1.271) don't have; a reload starts over from the store.
+let snapshot: DecompSnapshot | null = null
+let status = ''
+let tab: DecompTab = 'overview'
+let expanded = ''
+
+function redraw($: EngineInterface): void {
+  $.ui.invalidate('ui.render')
+}
+function setStatus($: EngineInterface, value: string): void {
+  status = value
+  redraw($)
+}
+function setTab($: EngineInterface, value: DecompTab): void {
+  tab = value
+  redraw($)
+}
+function toggleExpanded($: EngineInterface, name: string): void {
+  expanded = expanded === name ? '' : name
+  redraw($)
+}
 
 const BLUE = '#3b74d9'
 const PINNED = '#2a4f8f'
@@ -34,9 +51,9 @@ const TRACK = '#3a3a3a'
 const HEADERS = { 'User-Agent': 'decomp-progress-mod', Accept: 'application/vnd.github+json' }
 
 async function refresh($: EngineInterface, force = false): Promise<void> {
-  const have = await read($, snapshot)
+  const have = snapshot
   if (!force && have && Date.now() - Date.parse(have.fetchedAt) < STALE_MS) return
-  await update($, status, () => 'Updating…')
+  setStatus($, 'Updating…')
   try {
     const [md, pulls, page] = await Promise.all([
       $.http.fetch(PROGRESS_URL, { headers: { 'User-Agent': HEADERS['User-Agent'] } }),
@@ -54,11 +71,11 @@ async function refresh($: EngineInterface, force = false): Promise<void> {
     }
     const prs = pulls.ok ? parsePulls(JSON.parse(pulls.text)).slice(0, 25) : (have?.prs ?? [])
     const next: DecompSnapshot = { ...parsed, prs, fetchedAt: new Date().toISOString() }
-    await update($, snapshot, () => next)
+    snapshot = next
     await $.store.set('snapshot', next)
-    await update($, status, () => (pulls.ok ? '' : `GitHub API: HTTP ${pulls.status}`))
+    setStatus($, pulls.ok ? '' : `GitHub API: HTTP ${pulls.status}`)
   } catch (err) {
-    await update($, status, () => `Couldn't update: ${err instanceof Error ? err.message : String(err)}`)
+    setStatus($, `Couldn't update: ${err instanceof Error ? err.message : String(err)}`)
   }
 }
 
@@ -67,20 +84,14 @@ async function openPopup($: EngineInterface): Promise<void> {
   void refresh($)
 }
 
-async function togglePopup($: EngineInterface): Promise<void> {
-  const isOpen = (await $.ui.panes()).some(p => p.id === PANE)
-  if (isOpen) await $.ui.close({ id: PANE })
-  else await openPopup($)
-}
-
 const fmt = (n: number) => n.toLocaleString('en-US')
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'decomp', description: 'Show Boktai 3 decomp progress in a popup' })
-    if (!(await read($, snapshot))) {
+    if (!snapshot) {
       const kept = (await $.store.get('snapshot')) as DecompSnapshot | undefined
-      if (kept?.fetchedAt) await update($, snapshot, () => kept)
+      if (kept?.fetchedAt) snapshot = kept
     }
     void refresh($)
     $.clock.every(STALE_MS, () => void refresh($))
@@ -98,15 +109,13 @@ export const register: Register = on => {
   on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
     const engine = await next(e)
     const { Box, Button, Text } = $.ui.resolve(e)
-    const snap = await read($, snapshot)
+    const snap = snapshot
     const label = snap ? `◔ ${snap.pct.toFixed(2)}%` : '◔ decomp'
 
     return (
       <Box flexDirection="row" gap={1} alignItems="center">
         {engine}
-        <Button key="decomp-progress-open" plain onPress={() => togglePopup($)}>
-          <Text dimColor>{label}</Text>
-        </Button>
+        <Button key="decomp-progress-open" plain label={label} onPress={() => openPopup($)} />
       </Box>
     )
   })
@@ -115,10 +124,10 @@ export const register: Register = on => {
     const el = $.ui.resolve(e)
     const { Box, Text, Button, Link } = el
     const Svg = e.surface !== 'terminal' && 'Svg' in el ? el.Svg : undefined
-    const snap = await read($, snapshot)
-    const note = await read($, status)
-    const current = await read($, tab)
-    const open = await read($, expanded)
+    const snap = snapshot
+    const note = status
+    const current = tab
+    const open = expanded
     const cols = Math.max(30, e.props.bodyColumns)
     const px = Math.max(260, Math.round(cols * 7.2))
     const now = Date.now()
@@ -168,7 +177,7 @@ export const register: Register = on => {
             key={`tab-${t}`}
             label={t === 'overview' ? 'Overview' : t === 'treemap' ? 'Treemap' : 'Recent PRs'}
             variant={t === current ? 'primary' : 'secondary'}
-            onPress={() => update($, tab, () => t)}
+            onPress={() => setTab($, t)}
           />
         ))}
       </Box>
@@ -188,14 +197,12 @@ export const register: Register = on => {
       const color = c.pct >= 100 ? GREEN : BLUE
       return (
         <Box flexDirection="column">
-          <Button key={`cat-${c.name}`} plain onPress={() => update($, expanded, v => (v === c.name ? '' : c.name))}>
-            {isOpen ? '▾ ' : '▸ '}
-            {c.name}{' '}
+          <Box flexDirection="row" justifyContent="space-between">
+            <Button key={`cat-${c.name}`} plain label={`${isOpen ? '▾' : '▸'} ${c.name}`} onPress={() => toggleExpanded($, c.name)} />
             <Text dimColor>
-              {c.done}/{c.total} · {c.left ? `${c.left} left${c.near ? `, ${c.near} ≥95%` : ''} · ` : ''}
-              {c.pct.toFixed(1)}%
+              {`${c.done}/${c.total} · ${c.left ? `${c.left} left${c.near ? `, ${c.near} ≥95%` : ''} · ` : ''}${c.pct.toFixed(1)}%`}
             </Text>
-          </Button>
+          </Box>
           {bar([{ pct: c.pct, color }], `bar-${c.name}`)}
           {isOpen && (
             <Box flexDirection="column" paddingLeft={2} marginTop={1}>
@@ -246,9 +253,7 @@ export const register: Register = on => {
             </Box>
           ))}
           <Box flexDirection="column">
-            <Button key="regions" plain onPress={() => update($, expanded, v => (v === '#regions' ? '' : '#regions'))}>
-              {open === '#regions' ? '▾ ' : '▸ '}ROM regions <Text dimColor>{snap.regions.length}</Text>
-            </Button>
+            <Button key="regions" plain label={`${open === '#regions' ? '▾' : '▸'} ROM regions`} onPress={() => toggleExpanded($, '#regions')} />
             {open === '#regions' &&
               snap.regions.map(r => (
                 <Box flexDirection="column" paddingLeft={2}>
