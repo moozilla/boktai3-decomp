@@ -4009,3 +4009,96 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## Ghost families — 2026-10-22
+
+Tags: #matching #ghost #scene-actor #animation #movement
+
+Worked offline in the assigned checkout. Three exact matches add **0.0465
+percentage points** of code coverage (1,120 bytes); 0.0163 points (392 bytes)
+are Register-pinned and 0.0302 points (728 bytes) are unpinned. Only fast
+`tools/check.py` checks were used. Each exact result was checked with its
+reviewed complete function extent after formatting; the integrator still needs
+the combined ROM build. All seven production candidates have local Ghost aliases
+with tentative semantic comments. Commits were queued through `build/commit.sh`.
+
+- **08095578 — drafted 88.2%, Ghost_BeginContactReaction.** Collider callback
+  installed by SceneActor_InitLinkedReactionColliders (08097690). Contact flags
+  must equal 1; unavailable/hidden actors are excluded. Resets actor control and
+  behavior, disables both colliders, adds three to player +0x4F6, sets context
+  +0x558 bit 0x80 and +0x5BB to 3, and plays 0x3CB. Crow_BeginScriptedAction
+  supplied the reset/availability shape. Keeping the actor in ip and using the
+  inline collider view reproduced most of the body. The discarded context-flag
+  test needs an empty volatile operand barrier to remain. Final register/address
+  scheduling differs: 12 realigned instructions, six ignoring registers. The
+  commit subject's 87.6% was the preceding candidate-length estimate.
+- **08096000 — matched, Ghost_UpdateRecoilAnimation, 84 bytes.** Called as the
+  control callback by Ghost_RecoilTowardEndpoint. Consumes field2B2, selects
+  directional entry 15, sets flags2D6 bit 0x20 through tick 29, and marks control
+  complete after tick 59. Two pins remain after depin; final complete-extent
+  check is byte-identical.
+- **080964C4 — matched, Ghost_FollowRoute, 728 bytes.** Lun_FollowRoute explains
+  89% of the instruction shape. Ghost uses context +0x5FC motion, +0x5C8 saved
+  position block, +0x60C route cursor, and +0x5B7 initialization flag. Removes
+  Lun's +0x270 callback gate, sets animation scale to 64 on entry, and checks
+  Ghost_SelectRandomRouteEntry's byte return before renewing the endpoint.
+  Existing Scale/Approach/Polar/cell-height inlines reproduced the whole body
+  without register hints. Includes a call to 08097798 on arrival.
+- **08096D38 — drafted 85.1%, Ghost_AdvanceApproachRoute.** Finite counterpart
+  of Ghost_FollowPlayerLoop. Context +0x558 bit 4 selects a destination offset
+  from the actor at radius 728, otherwise it starts toward the player. Saves
+  one quarter of squared distance at +0x55C, builds nine route points, and
+  accelerates up to speed 20. On completing point nine, it restores collider
+  flags and selects idle or approach behavior. Unlike FollowPlayerLoop this
+  body does not increment counter2AC. A saved flags pointer in sb and explicit
+  sign-preserving quarter shift improved the draft from 73.6%. Residue: inline
+  ordering, address lifetimes and allocation, 125 realigned instructions / 66
+  ignoring registers. Commit subject used the prior 84.9% estimate.
+- **08097798 — skipped, best candidate 35.9%.** Recovered endpoint interpolation
+  into context +0x5D4 from +0x5EC/+0x5F4 with both endpoint Y values cleared.
+  Parameter +0x5B4 advances by 128 until it exceeds 1023; +0x5B8 is signed.
+  Cubic terms use sign-preserving shifts by ten; their unusual literal +1 and
+  common tangent term were transcribed as observed. Factoring interpolation
+  into an inline recovered argument-evaluation order but not stack spills and
+  register lifetimes. Explicit register pins and a caller-owned fill temporary
+  regressed to 32.3%; reverted. No production draft below the 80% threshold.
+  Retained local source: ignored wip/sub_08097798.c. Ghidra export is unavailable.
+- **08097E38 — drafted 84.4%, Ghost_ReactToPlayerMovement.** Saves player position
+  at context +0x604 and gates reactions on nonzero horizontal displacement,
+  height difference <=512, distanceF0 < distanceLimitF8 and reaction flag 2.
+  Context +0x558 bit 0x10 distinguishes the two behavior transitions; reloads
+  +0x624 from +0x622 and imposes a ten-tick +0x5BA delay on first approach.
+  The byte flag lives in the +0xDC reaction view; using that view improved
+  80.6% to 84.4%. Explicit actor/context pins regressed to 61.4% and were
+  removed. Remaining differences: byte-mask selection and address lifetimes,
+  52 realigned instructions / 27 ignoring registers.
+- **08098344 — skipped, best candidate 35.7%.** Builds eight interpolated samples
+  at context +0x568 and copies the destination into the ninth at +0x5A8.
+  Uses Div(1024,8) and signed motion components at +0x5FC/+0x600 shifted by
+  seven as curve parameters. The body shares 08097798's fixed-point polynomial
+  shape and difficult stack/register allocation. Moving increment before the
+  inline sample regressed to 31.9% / 83 structural differences; restored the
+  original candidate (51 structural differences). No committed low-score draft;
+  retained local source: ignored wip/sub_08098344.c.
+- **0809852C — matched, Ghost_TickVisibilityTransition, 308 bytes.** Ported
+  SceneActorControl_TickVisibility (0808484C) to Ghost context +0x558 flags and
+  +0x5B2 timer. Ghost always uses the primary drawable flags and synchronizes
+  ActorShadow_Enable/Disable while flickering, then consumes bit 0x20 or 0x40.
+  It also performs the observed unused gUnk_030053F4 & 0x4800 test. Explicit
+  load/mask temporaries reproduced ordering; a Show-side r1 clobber prevents
+  agbcc replacing movs/rsbs with a subtraction from the preceding constant.
+  Depin reduced 33 hints to 16; formatted complete-extent check is exact.
+- **08098A74 — drafted 80.3%, Ghost_FollowDrainedPlayer.** Uses
+  Ghost_UpdateEnergyDrainAnimation as its control callback, follows player X/Z
+  displacement through saved context +0x5EC, and returns to idle behavior 3
+  when control completes or player +0x428 becomes zero. Entry sets flags2D4
+  bit 0x100 and flags2CC bit 0x02000000; each update sets +0x1EA to 64.
+  Recomputing the saved-position address and keeping flags/player pointer
+  lifetimes separate improved the first 68.9% draft. A signed sixteen-bit
+  collider bitfield reproduces the final ~4 mask without a pool literal.
+  Removing pointer hints regressed to 78.0% and 75.9%; retained 80.3% with
+  57 realigned differences, 17 ignoring registers. Default build uses assembly.
+
+Final draft scores are `--nonmatching --record` values over the full reviewed
+function extents. No full build, network operation, shared documentation update,
+or generated/ROM artifact commit was performed.
