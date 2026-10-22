@@ -1,8 +1,9 @@
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 87.9%
-// Open: register allocation (group and the 0x200 constant swap sb/r8; shape/position
-// swap r5/r6) and the zero registers of the final control reset.
+// fuzzy: 93.6%
+// Open: register allocation. The original keeps group in sb and the 0x200 constant in
+// r8 (this draft swaps them), and the final control reset uses separate zero registers
+// and loads the 0xFDFF mask before the halfword.
 
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -56,11 +57,14 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
     *flags &= mask;
 }
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape, void *destination,
-                        u32 blocked)
+static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
+                        struct SceneActorRegistryControlGroup *group, u32 blocked)
 {
-    if (Nav_IsPositionInMesh(shape, &actor->position, destination)) {
-        s32 result = Terrain_ApplyBlocked(shape, &actor->position, destination);
+    void *shape = GROUP_FIELD(group, 0x1fc, void *);
+    struct ContactPosition *position = &actor->position;
+    void *destination = GROUP_FIELD(group, blocked, void *);
+    if (Nav_IsPositionInMesh(shape, position, destination)) {
+        s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
                 Memory_Clear(&actor->motion, 8);
@@ -95,14 +99,14 @@ void sub_08136F58(struct SceneActorRegistryResetView *actor)
             SetControl(actor, actor->entryTarget228, 1);
             bit = 0x200;
             GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 1;
-            if (!MoveTo(actor, GROUP_FIELD(group, 0x1fc, void *), GROUP_FIELD(group, bit, void *),
-                        bit)) {
+            if (!MoveTo(actor, group, bit)) {
                 Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
             } else {
                 struct SceneActorRegistryControl *control = &group->control;
-                if (actor->flags2CC & 0x200000) {
+                u32 mask = 0x200000;
+                if (actor->flags2CC & mask) {
                     ClearWordFlags(&actor->flags2D0, ~0x1000000);
-                    ClearHalfFlags(&actor->flags2D4, ~0x200);
+                    actor->flags2D4 &= ~0x200;
                     control->mode = 0;
                     control->counter = 0;
                     control->timer = 0;
