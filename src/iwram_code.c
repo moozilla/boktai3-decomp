@@ -87,7 +87,48 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
 }
 
 INCLUDE_ASM("asm/nonmatching", sub_08000430);
+#ifdef NONMATCHING
+// fuzzy: 99.1%
+// Left: ROM copies flags (mov r6, r3) before the mask test's branch; ours copies after it.
+void sub_08000E90(void)
+{
+    struct IwObj *o;
+    u32 mask, flags;
+    s32 x, y, z;
+    struct IwVec s;
+
+    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+        if (o->flags & mask)
+            continue;
+        flags = o->flags;
+        if (!(flags & 0x10)) {
+            IwProject(&s, &o->pos);
+            x = s.x + o->dx;
+            y = s.y + o->dy;
+            z = s.z;
+        } else {
+            x = o->pos.x + o->dx;
+            y = o->pos.y + o->dy;
+            z = o->pos.z;
+        }
+        if (flags & 0x40) {
+            if (x + o->left < 0)
+                continue;
+            if (y + o->top < 0)
+                continue;
+            if (x + o->right > 0xF0)
+                continue;
+            if (y + o->bottom > 0xA0)
+                continue;
+        }
+        sub_08000430(o, x, y, z);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08000E90);
+#endif
+
 void sub_08001038(void)
 {
     struct IwObj *o;
