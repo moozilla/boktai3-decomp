@@ -58,6 +58,7 @@ static inline s32 Scale(s32 x)
         r = -((-x) >> 12);
     return r;
 }
+// confidence=low: maintains the approach-triggered emergence animation and particle emission.
 #define PoisonHand_UpdateEmergence sub_0820DEE0
 struct Velocity {
     s16 x, y, z, pad;
