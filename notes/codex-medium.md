@@ -4048,7 +4048,7 @@ with tentative semantic comments. Commits were queued through `build/commit.sh`.
   of Ghost_FollowPlayerLoop. Context +0x558 bit 4 selects a destination offset
   from the actor at radius 728, otherwise it starts toward the player. Saves
   one quarter of squared distance at +0x55C, builds nine route points, and
-  accelerates up to speed 20. On completing point nine, it restores collider
+  accelerates while the saved speed is at most 19. On completing point nine, it restores collider
   flags and selects idle or approach behavior. Unlike FollowPlayerLoop this
   body does not increment counter2AC. A saved flags pointer in sb and explicit
   sign-preserving quarter shift improved the draft from 73.6%. Residue: inline
