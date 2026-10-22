@@ -536,7 +536,7 @@ address,isa,evidence,replacement_end
 081F33CC,thumb,Hidden raw-tail function,081F33F0
 081F3414,thumb,Hidden tail after SceneDistance_ClearLinkedEntry,
 081F348C,thumb,Hidden tail function,081F34C8
-081FB7D8,thumb,Hidden counter difference with wrap (retained),
+081FB7D8,thumb,Hidden raw-tail function: wrapped counter difference,081FB808
 081FB808,thumb,Hidden leaf returning 0,081FB80C
 081FB80C,thumb,Hidden velocity integrate step,081FB828
 081FB828,thumb,Hidden leaf returning 0,081FB82C
@@ -609,7 +609,7 @@ address,isa,evidence,replacement_end
 082207DC,thumb,Hidden tail after Collider_TestSegmentBounds,
 08220D6C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08220D78
 08220E6C,thumb,Hidden raw-tail function: sets an animation frame inside a sequence,08220F00
-0822108C,thumb,Hidden raw-tail function (retained),
+0822108C,thumb,Hidden raw-tail function: sums an animation sequence's frame durations,082210B8
 082215B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215B8
 082215B8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215BC
 082215BC,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,082215D0
