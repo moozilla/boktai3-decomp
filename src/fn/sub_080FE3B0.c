@@ -2,6 +2,8 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
+// confidence=low: after the wait, selects a route point and starts the stored movement spline.
+#define Axe_UpdateRouteDestinationPhase sub_080FE3B0
 #ifdef NONMATCHING
 // fuzzy: 86.1%
 // Remaining differences: pointer register allocation (target/copy/zero use r7/r8/r5 instead of r7/r5/r8).
@@ -76,7 +78,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 
-void sub_080FE3B0(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
     struct AxeContext *context = actor->context;
     u32 zero;

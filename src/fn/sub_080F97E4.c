@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
+#define Axe_ConvergeRecoveryMotion sub_080F97E4
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
-#ifdef NONMATCHING
-// fuzzy: 81.0%
 void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *, s32);
 void Axe_ClearForcedMovement(void *);
 void Axe_ResetMovementFlags(void *);
@@ -25,13 +25,38 @@ static inline u8 AtRest(s32 x, s32 z)
     return 0;
 }
 
+static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 m)
+{
+    asm("" : "+r"(m));
+    a->flags2D4 = m | a->flags2D4;
+}
+static inline void SetForced(struct SceneActorRegistryResetView *a, u32 m)
+{
+    a->flags2D0 = m | a->flags2D0;
+}
+static inline void SetContext(u8 *p, u32 m)
+{
+    *(u32 *)(p + 0xE4C) = m | *(u32 *)(p + 0xE4C);
+}
+static inline void RestoreHistory(struct SceneActorRegistryResetView *a, u16 v)
+{
+    *(u16 *)((u8 *)a + 0x418) = v;
+}
+static inline void SetState(struct SceneActorRegistryResetView *a, u8 s, u8 p, u8 b)
+{
+    a->state2A8 = s;
+    a->phase2A9 = p;
+    a->behavior2AA = b;
+    a->counter2AC = 0;
+    a->field2B1 = 1;
+}
 void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
     s32 x, z;
     s16 *priorX, *priorZ;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
-        actor->flags2D4 = 0x20 | actor->flags2D4;
+        SetFlags(actor, 0x20);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         Axe_ClearForcedMovement(actor);
         Axe_ResetMovementFlags(actor);
@@ -58,20 +83,26 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
     *priorZ += z;
     if (AtRest(x, z)) {
         actor->field2B0 = 1;
-        actor->flags2D4 &= ~0x20;
-        actor->flags2CC &= ~0x80;
-        actor->flags2D0 |= 0x100000;
+        {
+            struct SignedFlag {
+                s32 bits : 16;
+            };
+            register struct SignedFlag *f asm("r2") = (void *)&actor->flags2D4;
+            register s32 m asm("r0") = ~0x20;
+            asm("" : : "r"(f), "r"(m));
+            m &= (u16)f->bits;
+            f->bits = m;
+        }
+        {
+            register u32 *f asm("r2") = &actor->flags2CC;
+            register s32 m asm("r1") = ~0x80;
+            asm("" : : "r"(f), "r"(m));
+            *f &= m;
+        }
+        SetForced(actor, 0x100000);
         Axe_ResetMovementFlags(actor);
-        *(u32 *)(context + 0xE4C) |= 0x10;
-        *(u16 *)((u8 *)actor + 0x418) = *(u16 *)((u8 *)actor + 0x416);
-        actor->state2A8 = 0;
-        actor->phase2A9 = 2;
-        actor->behavior2AA = 9;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        SetContext(context, 0x10);
+        RestoreHistory(actor, *(u16 *)((u8 *)actor + 0x416));
+        SetState(actor, 0, 2, 9);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_ConvergeRecoveryMotion);
-#endif

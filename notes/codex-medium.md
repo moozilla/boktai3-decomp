@@ -6547,3 +6547,279 @@ Tentacle body-only entries were outside this round's Tentacle actor assignment.
 Previously matched 080AB04C was skipped. Existing production drafts not improved
 were left untouched. Full ROM validation and alias promotion remain integration
 work; no claim of combined-build validation is made here.
+## 2026-10-22 — Axe families, task 080F7580
+
+Tags: #matching #axe #monster #register-pinning
+
+Offline worker; no network or full builds. All acceptance checks used
+`build/venv/bin/python tools/check.py`; commits went through `build/commit.sh`.
+Task completion by exact function count: 27.3%, a +27.3 percentage-point gain
+(three of eleven; 268 checker bytes). One additional function is a guarded
+85.3% draft; seven were stopped below the full-extent draft threshold.
+
+- **080F7580 — matched, Axe_LatchColliderContact (tentative).** Callback
+  installed by 080FC4F4 on the three body colliders, with the Axe context as
+  owner. Latches context byte CAB bit 0, then sets bit 4 on collider flags
+  at 18E and 13A. Separate pointers to the nested collider views recover
+  base+6 addressing and the initial r2-to-r3 copy. Depin removed the initial
+  r2 clobber; final match is unpinned. Exact check: 60 bytes.
+- **080F75C0 — stopped below threshold.** Body-contact callback installed by
+  Axe_InitColliders. Applies the common reaction, saves contact power/type/
+  duration if actor+178 is zero, and can interrupt into reverse flicker.
+  The u8 unavailable predicate reproduces the materialized boolean. Best
+  candidate reached 62.1%; manually advanced collider pointers reduced
+  structural differences but lowered fuzzy to 57.3%. Remaining differences:
+  address reuse, hoisted phase-field pointers, loop allocation and spills.
+  Scratch: wip/sub_080F75C0.c.
+- **080FAA5C — stopped below threshold.** Movement spline called by
+  Axe_BeginMoveToPosition and the destination phase. Copies endpoints F04/F0C,
+  clears their Y values, forms the delta, evaluates a cubic in elapsed EA8
+  with signed truncating shifts, writes through actor+5D0, and advances time
+  by 128 until it exceeds 1023. Scalarization of the vector temporaries,
+  stack layout and coefficient allocation differ; inline helper extraction
+  and a memory barrier did not recover the assembly. Last candidate 40.3%.
+  Scratch: wip/sub_080FAA5C.c.
+- **080FAFD0 — matched, Axe_InitAttackCooldowns (tentative).** Existing draft
+  was 95.1%, with only the quarter-health scratch register differing. Changing
+  the widened subtraction operand from u64 to u32 and pinning the loaded
+  health to r0 reproduces the original copy and r2 shift temporary. Depin
+  retains this one pin. Reads keyword P into EC0..EC6, clears EB8..EBE and
+  stores health minus its truncating quarter at EB4. Exact check: 128 bytes.
+  Initially committed as a named 95.1% draft; the match promotion accidentally
+  queued an unterminated guard. A corrective commit removes that guard; the
+  final production file passes the exact check.
+- **080FB30C — stopped below full-extent threshold.** Hit-flash update:
+  start/stop/reset bytes ED0/ED1/ED6 control flags 80/100, level ECF and
+  ten-tick counter ECE. The selected level sets animation profile 13F and
+  flash palette 908; finishing restores the actor palette bank. A persistent
+  flags pointer and mask-before-load form improved candidate-length fuzzy
+  from 81.0% to 95.0%. However --nonmatching --record gives only 58.5% over
+  the full symbol extent, which includes the undecoded bytes at FB4EC..FB743.
+  No production draft committed. Needs boundary review by the integrator;
+  no generated assembly was changed. Scratch: wip/sub_080FB30C.c.
+- **080FB744 — stopped below threshold.** Advances the 16-color RGB palette
+  transition at context+624. Accumulates three signed 8.8 channels with their
+  steps, packs RGB555, decrements the timer at 644, and binds the palette to
+  the actor and four auxiliary sprites unless actor flags 02008000 inhibit
+  it. Best first candidate 65.2%; explicit byte-offset indexing and an r8
+  actor hint worsened allocation (56.2%). Scratch best:
+  wip/sub_080FB744-best.c; last experiment: wip/sub_080FB744.c.
+- **080FB8E8 — matched, Axe_InitEffectPalettes.** Initializes palettes 888,
+  8A8, 8C8, 8E8, 908 to black, red, blue, white and the drawable's original
+  colors. Manual pointer advancement plus an empty constraint on the loop
+  counter prevents countdown conversion. Depin retains only the source
+  pointer r4 binding and the counter constraint; all color bindings/barriers
+  were removable. Leaving zero unpinned avoids the agbcc r7 save omission.
+  Exact check: 80 bytes, register-pinning concession.
+- **080FC094 — stopped below threshold.** Attack particle burst at a rotated
+  (-140,0,-140) offset from drawable position, range (120,60,120), zero
+  velocity, caller-supplied count and final parameters 2,4. Axe_UpdateDefeat
+  supplies the rotation/packed-position idiom. Best candidate 75.4%; grouping
+  stack vectors changed aliasing and worsened the result. Remaining stack
+  placement, pointer lifetimes and register transfers. Scratch:
+  wip/sub_080FC094.c (74.6% earlier form).
+- **080FC4F4 — drafted 85.3%, Axe_InitAttackTrail.** Creates the auxiliary
+  sprite at A38 with resource 5291 and lookup 922E/3F72, selects its animation
+  from the actor and ED7, steps the animation, initializes three body and
+  three attack colliders and creates/disables their shadow. Exact matched
+  animation stepper borrowed from SceneActors_UpdateDelayedMovement
+  (081ED8A0), found with relatives.py; it covers 114 consecutive instructions.
+  Initial candidate 81.9%, then moving sprite-address construction after
+  AnimData_Load and using the drawable+48 animation view improved it.
+  Final --nonmatching --record: 85.3%, 50 realigned differing instructions,
+  seven ignoring registers. Actor allocation, collider argument scheduling
+  and a stack spill remain. The existing stepper hints are marked as a
+  register-pinning concession. Assembly fallback retained.
+- **080FCB64 — stopped below threshold.** Enables/disables the actor's body
+  colliders and two context collider pairs, rotates offsets -120/-30/60
+  around the actor and updates the corresponding collider pair. The disable
+  path breaks out after disabling all colliders. Correcting the actor flag
+  width to u16 and manually advancing inner-loop pointers improved 60.4% to
+  66.0%; 115 realigned differences, 48 ignoring registers. Rotation scratch
+  layout, inner-loop allocation and common collider pointer lifetime remain.
+  Scratch: wip/sub_080FCB64.c.
+- **080FCDEC — stopped below threshold.** Selects attack property slot 2,
+  doubled slot 2, slot 1 or slot 0 from context flags 200/800/400/1000 and
+  updates actor collider 188 plus context colliders CEC/D40. The final two
+  branches both select slot 0. Explicit ordered argument temporaries improved
+  31.2% to 42.4%; compiler still merges repeated call tails and differs in
+  field-address lifetime and flag-mask scheduling. Scratch:
+  wip/sub_080FCDEC.c.
+
+Only the three exact files and the qualifying guarded draft are in production
+src. Below-threshold candidates remain ignored scratch files. Batch integration
+still needs the integrator's combined ROM build; no worker build was run.
+
+
+## 2026-10-22 — Axe, Pink spine and Poison hand, round 3
+
+Tags: #matching #axe #pink-spine #poison-hand #monster #register-pinning
+
+Offline solo worker. Four new exact functions, 1,188 bytes: 6.0% of the
+19,780 task-list bytes not already exact at this session's start, a +6.0
+percentage-point gain within that remaining cohort. Unpinned: 484 bytes;
+Register-pinned: 704 bytes. Drafts contribute no exact progress. Checks used
+only tools/check.py, with reviewed body/pool extents. No make, full build,
+network operations, generated-assembly edits or direct git mutations.
+Commits were queued through build/commit.sh; integration still needs its
+combined ROM build.
+
+New exact functions:
+
+- **0820FF54 matched — PinkSpine_InitCollider**, 144 bytes. Called by
+  PinkSpine_InitFromScript unless the script's disabled/dead option is set.
+  Ported PoisonHand_InitCollider: same packed bounds (100,120,100), position
+  offset, collider kind 5009 and disable flag; callback is the common
+  Combat_ApplyHitReaction and all body-property arguments are zero. No hints.
+- **0820FD54 matched — PinkSpine_RecordDefeat**, 340 bytes. Called by
+  ProjectileEmitter_EmitAttackFrame at frame nine. Ported PoisonHand_RecordDefeat,
+  using the Pink spine script/value offsets, event flag 2, family counter 56E
+  and the single 58A category counter. Script arguments retain signed position
+  coordinates and the shared saturating defeat-counter idiom. No hints.
+- **080FA540 matched — Axe_UpdateCollapsePhase**, 304 bytes, improved from
+  the inherited 94.7% candidate. On entry selects sprite-collapse control 23
+  and sets flags 1800; completion restores saved control and behavior 3.
+  Keeping the byte zero distinct with an empty constraint and materializing
+  the mask/result in r1 reproduces both zero initializations and the AND tie.
+  Register-pinning concession; readable C and no instruction bodies.
+- **080F97E4 matched — Axe_ConvergeRecoveryMotion**, 400 bytes, improved
+  from 81.0%. Quarter-steps and clamps saved/current motion differences;
+  when both axes stop, updates movement flags, copies history and enables
+  recovery behavior 9. Inline state and source-value copy helpers recovered
+  constant/address order (95.4%, then 99.0%). Two constrained negative masks
+  recover mask-before-load scheduling. A signed sixteen-bit bitfield store
+  retains the independent zero, while explicitly narrowing its read to u16
+  avoids an unwanted ldrsh. Final formatted source is byte-exact. Concession
+  includes the first flag-mask barrier and temporary pointer/mask bindings.
+
+New and improved guarded drafts (all recorded using --nonmatching --record,
+with default assembly fallbacks checked separately):
+
+- **0820DEE0 drafted 96.1% — PoisonHand_UpdateEmergence (tentative)**,
+  reviewed extent 584 bytes, candidate 588. WaitForPlayerApproach installs it,
+  selects animation 18 and starts a 180-frame timer. Emits randomized radial
+  particles every ten frames while the timer exceeds 90. At 30 frames,
+  player distance decides whether to repeat or retract; expiry returns to
+  animation 17 and the proximity callback. Reused the defeat-burst position/
+  effect API. Signed spread and a Polar inline prevent masked word stores;
+  angle r5, magnitude r2, sine r1, velocity sb, attributes r8 and palette r6
+  constraints brought 62.1% to 96.1%. Residue: 15 realigned instructions,
+  nine ignoring registers, chiefly output-pointer scheduling, scratch loads
+  and a derived effect-offset constant. Hints are marked as a concession.
+- **080FBF4C improved 96.8% -> 98.1% — ActorPhase_SelectDistantWaypoint**.
+  Constraining the RNG table base to r3 resolves two differences. Route pointer
+  and zero-mode constraints retain the store setup. Three register-only
+  differences remain: route index byte address/load/store use r3 instead of
+  r2. Byte-value and byte-pointer bindings either force word extraction or
+  change stack placement, so those were discarded.
+- **080F79A8 improved 90.1% -> 91.0% — Axe_UpdateOrbitAttack**, 1,640-byte
+  target. Corrected a substantive inherited layout error: the actor's attack
+  collider is at 188, not 288; callback stays at 21C and context at 3D0.
+  Scoped pointers to the two actor collider views improve the address shape.
+  Remaining 88 realigned instructions, 46 ignoring registers: polar address
+  reuse, signed RNG/direction access, collider loop and phase-tail scheduling.
+  Explicit advancing-loop pointers and counter constraints lowered structural
+  differences but worsened total similarity; retained the correct stronger
+  typed candidate. Declaration swaps made no change.
+- **080F8FFC improved 84.5% -> 85.9% — Axe_UpdateTargetLunge**, 688-byte
+  target, candidate 684. A BeginControl inline with a u8 phase recovers more
+  of the completion setup. Removing the persistent flags pointer worsened
+  shape; retain it. Remaining: player-delta argument order, flags pointer
+  lifetime, rotation registers and phase-tail scheduling (63 realigned,
+  29 ignoring registers). A result-local signed shift did not improve it.
+- **080F93E0 improved 83.0% -> 86.0% — Axe_UpdateTurnAnimation**, 692-byte
+  target, candidate 688. Explicit volatile drawable-pointer reads at the two
+  duration-scale calls preserve observed reloads after actor flag stores.
+  Equivalent current/target octant arithmetic worsened shape; declaration
+  swaps did nothing. Remaining 56 realigned instructions, 23 ignoring
+  registers: constant derivation, direction arithmetic and control setup.
+- **080FA214 improved 91.4% -> 94.3% — SceneActorControl_ApplyDampedMotion**,
+  280-byte target, candidate 284. Move the empty constraint from the counter
+  offset to the actor pointer at the final reset. Tail now has the observed
+  store/field address form; GCC still keeps 2AC in sb across Mod, adding the
+  high-register save instead of rematerializing it. Ten realigned differences,
+  nine ignoring registers. Removing the constraint entirely shares the earlier
+  counter pointer and falls to 86.1%; a volatile destination does not fix it.
+- **08210398 improved 89.9% -> 90.7% — PinkSpine_UpdateDamageAnimation**,
+  688-byte target and candidate. A scoped collider-base view keeps flags at
+  base+6 and passes the same base to Collider_SetPosition. Remaining pause
+  branch/flags scheduling, animation pointers and explicit defined callback
+  result: 38 realigned instructions, 21 ignoring registers. The defined return
+  is retained; no falling-off non-void function or uninitialized result added.
+
+Existing drafts revisited without an improvement; aliases and recorded scores
+were retained/refreshed where needed:
+
+- **0820DC18 retained 99.0% — PoisonHand_ApplyHitReaction**, 428 bytes. Only
+  initial spark RNG cursor copy/load differs (r0 versus ROM r7). Cursor r7
+  bindings and combined cursor/mask constraints interfere with the existing
+  particle scratch lifetime, worsening to about 80%; result/mask dependency
+  changes leave the original two-byte difference. Kept the readable inherited
+  candidate and its existing concession.
+- **080FB984 retained 98.9% — SpriteGroup_InitAnimatedSprites**, 180 bytes.
+  The zero offset's initialization is scheduled after the loop count instead
+  of before it. Declaration swaps, narrow count, offset indexing, input/output
+  constraints and counter/zero bindings did not improve it. Avoid hard-pinning
+  an induction variable used in stride arithmetic: exploratory outputs changed
+  unrelated register lifetimes and were discarded.
+- **08210654 retained 94.0% — PinkSpine_InitFromScript**, target 900 bytes,
+  candidate 908 (old comment was 93.5%). Sprite-address barrier removal/movement
+  yields 93.8% and does not fix the redundant derived sprite address. Remaining
+  23 realigned instructions, six ignoring registers, including explicit defined
+  success return. Keep that defined return for the creator's sign check.
+- **080FE3B0 retained 86.1% — Axe_UpdateRouteDestinationPhase (tentative)**,
+  388 bytes. After the callback/wait, chooses a route point, samples terrain,
+  sets spline endpoints, computes facing and clears F14. Pinning the target
+  copy/zero lifetimes, delaying the copy or moving zero initialization did not
+  improve it; last experiment worsened to 79.7%. Original 30 realigned
+  differences, 15 ignoring registers, remain. Added the required local alias.
+- **080FBC84 retained 85.2% — ActorPhase_EmitTrailSprite**, target 600 bytes,
+  candidate 596. Base-before-index arithmetic improves candidate length but
+  worsens score to 84.2%; removing hints gives 74.1%. Declaration swap is
+  unchanged. Sequence setup, pointer lifetime and scale-load order remain.
+- **080FBA38 retained 81.8% — Axe_EmitMotionTrail**, target 588 bytes,
+  candidate 584. Same base-arithmetic trial gives 80.1%; unpinning gives 72.9%.
+  Declaration swap is unchanged. Retain the original stepper and concession.
+- **080FC4F4 retained 85.3% — Axe_InitAttackTrail**, 768-byte target. Already
+  drafted in the prior round. Local declaration swaps are unchanged; removing
+  bindings falls to 78.7% (79 realigned differences versus original 50).
+  Keep the prior round's typed sprite/sequence views and collider setup.
+
+Stopped fresh work:
+
+- **0820E2A4 stopped below threshold — Poison hand damage/animation update**,
+  1,140-byte target, 514 instructions. Read full assembly and BIG_FUNCTIONS;
+  EnemyD459_Update supplies the outer damage/collider/HUD/flash/blink pattern,
+  while Screamer_UpdateDamageParticles supplies the eight-particle defeat loop.
+  Candidate handles health at 136, damage at 134, dead at 132, flash at 12A,
+  resource 168, defeat callback E128 and palette 1C5. Initial 47.5%; removing
+  sibling-specific stepper bindings and retaining loop table/counter bindings
+  reached 55.8% (338 realigned differences, 65 ignoring registers). Copying the
+  Pink spine stepper gives 51.9%. Random cursor/table lifetimes, stack-slot
+  placement and animation allocation remain too different for a useful draft.
+  Scratch best: build/poison-update-55.c; current experiment:
+  wip/sub_0820E2A4.c. Explicit defined result retained throughout.
+- **080FE68C Axe_Init — stopped at static analysis, no C candidate**. Reviewed
+  its full 4,296-byte body, the condensed listing and caller Axe_Create.
+  1,842 instructions; 0x154-byte stack frame; initial drawable-kind split
+  allocates 5C/80-byte drawable resources, followed by four attack-property
+  script records, actor/terrain/collider setup, three terrain samplers and the
+  packed animation stepper. Best relative Bee_ResetRoute explains only 15%,
+  mostly generic terrain/animation runs; no Ghidra export is available here.
+  No sufficiently complete initializer base emerged from this analysis, so
+  left the assembly intact instead of retaining an incomplete production draft.
+  Resume with a whole-function candidate and explicit context/property views.
+
+The prior round's exact **080F7580**, **080FAFD0**, **080FB8E8** were skipped.
+Its below-threshold attempts **080F75C0**, **080FAA5C**, **080FB30C**,
+**080FB744**, **080FC094**, **080FCB64**, **080FCDEC** were not repeated;
+see the immediately preceding entry for their evidence and scratch paths.
+
+Tooling detail: existing named placeholders 080FBF4C and 080FBC84 have no
+sub_ADDR assembly file in this checkout. Their fallbacks keep the real promoted
+assembly label. The required local alias follows each draft body, so the
+candidate still emits that promoted label and check.py --record associates the
+correct score. Other aliases use existing sub_ADDR placeholders. Every retained
+fallback was checked; no generated assembly was added or edited. Scores are
+full reviewed extents, not candidate-prefix acceptance. Shared docs, progress
+and indexes were left for batch integration.

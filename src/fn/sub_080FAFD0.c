@@ -1,9 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.1%
-// Remaining difference: scratch register for the sign-extended health in the final quarter calculation (r3 vs r2).
+// confidence=low: initializes scripted cooldown lengths and the health threshold.
+#define Axe_InitAttackCooldowns sub_080FAFD0
 
 struct Q080FAFD0 {
     u8 filler[0xeb4];
@@ -27,13 +27,13 @@ static inline s32 Quarter(s16 x)
     return -(-x >> 2);
 }
 
-void sub_080FAFD0(struct S080FAFD0 *s)
+void Axe_InitAttackCooldowns(struct S080FAFD0 *s)
 {
     struct Q080FAFD0 *q = s->q;
     s32 i;
-    s32 h;
+    register s32 h asm("r0");
     int zero;
-    unsigned long long hw;
+    u32 hw;
     s16 *hp;
     if (Script_SeekToKeyword(0x50) != 0) {
         for (i = 0; i <= 3; i++) {
@@ -48,6 +48,3 @@ void sub_080FAFD0(struct S080FAFD0 *s)
     hw = h;
     q->mid = hw - Quarter(h);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FAFD0);
-#endif

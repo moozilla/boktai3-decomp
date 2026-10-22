@@ -141,6 +141,7 @@ void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
         *(u16 *)(context + 0xE44) = 0;
 }
 
+#define ActorPhase_EmitTrailSprite sub_080FBC84
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_EmitTrailSprite);
 #endif
