@@ -2,25 +2,26 @@
 #include "scene_hud_display.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.2%
-// foundry draft (worker best 83.2%); what differs is mostly register allocation and instruction order
-
-#define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
-#define SceneHud_SetIconPalette     PauseMenu_SetSpritePalette
-s32 SceneHud_FindCategoryAction(u32, u32);
+// fuzzy: 97.9%
+// only the base copy (mov r7, r8) is placed after the flags/widget pointers; assigning it first makes CSE derive them from the copy
+s32 Inventory_GetQuantityByStorage(u32, u32);
 u32 Selection_GetDisplayFrame(s32);
 s32 SceneHud_CanApplySelectedAction(s32);
-void SceneHud_SetIconPalette(struct SceneInputWidget *, u16);
-void SceneHud_RefreshActionIcons(u8 *s)
+void PauseMenu_SetSpritePalette(struct SceneInputWidget *, u16);
+void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
 {
-    struct SceneHudState *owner = (struct SceneHudState *)s;
-    s32 i = 0;
-    u8 *category = &owner->actionCategory;
-    u8 *base = (u8 *)s;
-    u32 *flags = (u32 *)(s + 0x17e8);
-    struct SceneInputWidget *w = (struct SceneInputWidget *)(s + 0x17e0);
+    s32 i;
+    u8 *category;
+    u8 *base;
+    u32 *flags;
+    struct SceneInputWidget *w;
+    i = 0;
+    category = &owner->actionCategory;
+    flags = (u32 *)((u8 *)owner + 0x17e8);
+    w = (struct SceneInputWidget *)((u8 *)owner + 0x17e0);
+    base = (u8 *)owner;
     for (; i < 16; base += 0x60, w++, flags += 0x18, i++) {
-        s32 action = SceneHud_FindCategoryAction(*category, i);
+        s32 action = Inventory_GetQuantityByStorage(*category, i);
         if (action < 0) {
             *flags |= 1;
         } else {
@@ -29,11 +30,11 @@ void SceneHud_RefreshActionIcons(u8 *s)
             Anim_LoadKeyframe(w, owner->motionResource, (u16)Selection_GetDisplayFrame(action), 1);
             if (*category == 0) {
                 if ((u32)(action - 30) <= 1 || SceneHud_CanApplySelectedAction(action))
-                    SceneHud_SetIconPalette(w, 0x373);
+                    PauseMenu_SetSpritePalette(w, 0x373);
                 else
-                    SceneHud_SetIconPalette(w, 0x374);
+                    PauseMenu_SetSpritePalette(w, 0x374);
             } else {
-                SceneHud_SetIconPalette(w, 0x373);
+                PauseMenu_SetSpritePalette(w, 0x373);
             }
         }
     }
