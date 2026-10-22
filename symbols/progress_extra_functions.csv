@@ -264,7 +264,11 @@ address,evidence
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08159814,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C)
 0815A104,Hidden wrapper of sub_0815A048 with mode 0
+0815A444,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched)
+0815A4D8,Hidden script query (actor direction)
 0815A554,Hidden script query (Player_IsActiveInLocomotionState)
+0815A8A0,Hidden script command (keyword f flags; keyword p value)
+0815A918,Hidden script command (Player_EmitQueuedEffects)
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAD4,Independent small function following a reviewed gap leaf; retained assembly (not yet matched)
 0815AB24,Hidden script command after ScriptActor_SetField4A2FromScript; exact C
