@@ -4138,3 +4138,73 @@ when a typed target position reproduces the original argument order. Run depin
 before exact acceptance: most exploratory pins and barriers were unnecessary.
 Unaccepted candidates remain ignored under wip/ and build/; only exact matches
 and the qualifying guarded draft were promoted to src/.
+
+## Mummy and Ghoul continuation — 2026-10-22
+
+Tags: #matching #monsters #mummy #ghoul #register-pinning
+
+New exact progress: **0.0000 percentage points**. Two new guarded drafts; their
+fuzzy scores do not count as exact progress. Read the preceding round's record
+and git history first: 080DA5C8 is already exact, while 080D0C30, 080D1644,
+080D453C, 080D49DC, 080D7568, 080D2584, 0808A664, 0808AF38 and 0808B264
+already have stopped attempts documented above. Preserved those results and
+focused this continuation on the four functions without prior attempts.
+
+- **08089340 — stopped below threshold, best full candidate 63.2%.** Tentative
+  Ghoul disc-throw callback, selected by Ghoul_UpdateSpecialActionControl
+  (0808CE50). Starts directional animation five; on frame five/timer zero,
+  chooses the contact position when facing is sufficiently close to a cardinal
+  direction, otherwise probes the neighboring terrain cell with 0812E118 and
+  targets its facing edge. Raises the launch position by 220, calls
+  SunDiscPool_SpawnDisc, and plays sound 0xD6. Full reviewed extent is 1,216
+  bytes. Explicit signed facing reduction reduced structural differences from
+  169 to 149 but did not improve the fuzzy score. Actor/context pins and
+  explicit width lifetimes worsened structure; no production draft. Remaining
+  issues include hoisted argument-field pointers, loop exits, and target/context
+  allocation. Scratch sources remain ignored under wip/ and build/.
+- **08085DD0 — stopped below threshold, best full candidate 62.3%.** Tentative
+  Ghoul saved-target disc throw, installed by the return-action callback at
+  0808A664. Shares the targeting and projectile tail with 08089340. Entry
+  snaps facing from actor+0xE9, optionally skips to animation frame two under
+  context+0x628 flag four, and snapshots context+0x62C from either the selected
+  player position or the contact. The emission path writes context+0x634.
+  Full reviewed extent is 1,524 bytes. Full C compiles, but player-path layout,
+  pointer lifetimes and register allocation remain far apart (188 structural
+  differences in the final candidate). No production draft.
+- **08086400 — drafted 86.6%, Ghoul_TurnTowardRoute.** Reviewed extent 1,580
+  bytes; candidate 1,568 bytes. Ported the existing Mummy_TurnTowardRoute draft
+  (080D0FE8), with animation nine, direct route state at actor+0x448, behavior
+  exclusions six/seventeen, movement mask 0x4480, eight-way facing at +0x3CD,
+  and 32-unit turn steps on animation frames one/three with timer zero.
+  Direct actor->direction entry accesses and a freshly derived animation
+  sequence pointer recovered the original addressing. Final realigned count:
+  135 differing instructions, 63 ignoring registers. Duplicating flag-update
+  tails or pinning their scratch values worsened structure and was discarded.
+  Remaining differences concern shared animation tails, duration-pointer
+  lifetime, and register/branch allocation. Retains the inherited restart r4
+  hint and the concession marker. Local alias has the required confidence
+  comment, and the draft is guarded with the original INCLUDE_ASM fallback.
+- **080898FC — drafted 86.3%, Ghoul_ResumeDelayedChase.** Reviewed extent and
+  candidate both 2,344 bytes, including the interior 0808A210 increment label
+  and its common epilogue; that label is not a separate function. Waits sixty
+  updates after dispatching actor+0x270 and 0812F3CC, replaces response slot
+  zero with mode two, and selects restoration control. Movement flag 0x80
+  resumes contact pursuit through the shared Chase_Arrive logic. Otherwise
+  actor flag 0x10 validates the saved route; the final path saves behavior two
+  and a duration scale of 64. Signed timer comparison and a common increment
+  tail improved the full candidate from 71.1% to 75.5%. Pinning the RNG mask to
+  r7 reached 77.3%. Giving the entry flag pointer a separate opaque lifetime
+  (r1 with an empty constraint barrier) removed its long-lived PRE expression,
+  recovered the 0x80-byte stack frame and most early allocation, reaching
+  86.3%. Final realigned count: 176 differing instructions, 51 ignoring
+  registers. Remaining issues include flag/address allocation, retry-loop
+  temporaries, route-tail stack pointers and call-argument order. Chase helpers
+  are copied locally to keep the RNG concession out of the shared header.
+
+Both accepted drafts were clang-formatted, checked with
+`tools/check.py --nonmatching --record`, and separately checked in default
+configuration: their assembly fallbacks match their complete reviewed extents.
+Only fast per-file checks and diagnostic tools were used; no make, build.py,
+full build, network operations or shared symbol/header edits. Each draft and
+this note are committed separately through build/commit.sh. Combined ROM
+validation and alias promotion remain integration work.
