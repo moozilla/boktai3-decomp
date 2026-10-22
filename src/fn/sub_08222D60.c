@@ -36,7 +36,7 @@ static inline void AdvanceSend(void)
     }
 }
 #ifdef NONMATCHING
-// fuzzy: 83.3%
+// fuzzy: 86.5%
 void Serial_ServiceInterrupt(void)
 {
     u32 control;
@@ -49,8 +49,8 @@ void Serial_ServiceInterrupt(void)
         u32 bits = 0;
         u16 *receive = &gUnk_03005370[(1 - gUnk_0300172C) * 4];
         u16 *latest = &gUnk_03005340[(1 - gUnk_03001734) * 4];
-        register u32 first asm("r8") = IO(0x04000120);
-        u32 word = first;
+        u32 word = IO(0x04000120);
+        register u32 first asm("r8") = word;
         latest[0] = word;
         if (!(word & 0x8000))
             bits = word;
