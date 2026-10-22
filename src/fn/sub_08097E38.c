@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
@@ -42,6 +43,24 @@ static inline u8 HasFlag(u32 value, u32 mask)
         return 1;
     return 0;
 }
+static inline u8 ReactionFlag(struct SceneActorReactionMotion *reaction, u32 mask)
+{
+    if (reaction->flags & mask)
+        return 1;
+    return 0;
+}
+static inline u8 ContextFlag(struct GhostPlayerReaction *state, u32 input, u32 **saved)
+{
+    register u32 mask asm("r2") = input;
+    u32 *flags = &state->flags;
+    register u32 tested asm("r0");
+    tested = *flags & mask;
+    asm("" : : "r"(tested));
+    *saved = flags;
+    if (tested)
+        return 1;
+    return 0;
+}
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
 {
@@ -49,9 +68,19 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->y = to->y - from->y;
     out->z = to->z - from->z;
 }
+static inline void State(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                         u32 behavior, u32 counter)
+{
+    u32 selected = behavior;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = selected;
+    actor->counter2AC = counter;
+    actor->field2B1 = 1;
+}
 #ifdef NONMATCHING
-// fuzzy: 84.4%
-// Remaining differences: reaction flag masking and global/context address lifetimes.
+// fuzzy: 99.2%
+// Remaining differences: one player-slot literal reload and zero-store scheduling.
 // confidence=low: reacts to player motion within range, with separate drain and approach transitions.
 #define Ghost_ReactToPlayerMovement sub_08097E38
 void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
@@ -60,13 +89,21 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
     struct ContactPosition delta;
     s32 height;
     u32 active;
+    u32 *savedFlags;
     struct SceneActorReactionMotion *reaction;
     if (Blocked(actor))
         return;
     if (Flags(actor, 0x20))
         return;
     state = actor->context;
-    Delta(&delta, &state->previousPlayer, (void *)(gUnk_02000580 + 0x30));
+    {
+        register u8 **players asm("r2") = &gUnk_02000580;
+        register u8 **slots asm("r8");
+        asm("" : : "r"(players));
+        slots = players;
+        asm("" : : "r"(slots));
+        Delta(&delta, &state->previousPlayer, (void *)(gUnk_02000580 + 0x30));
+    }
     state->previousPlayer = *(struct ContactPosition *)(gUnk_02000580 + 0x30);
     if (state->delay) {
         state->delay--;
@@ -77,9 +114,12 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
     if (!delta.x && !delta.z)
         return;
     reaction = (void *)&actor->fieldDC;
-    if (!HasFlag(reaction->flags, 2))
+    if (!ReactionFlag(reaction, 2))
         return;
-    reaction->flags &= ~2;
+    {
+        u32 mask = ~2;
+        reaction->flags = mask & reaction->flags;
+    }
     height = actor->position.y - *(s16 *)(gUnk_02000580 + 0x32);
     if (height < 0)
         height = -height;
@@ -87,26 +127,18 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         return;
     if (actor->distanceF0 >= actor->distanceLimitF8)
         return;
-    active = HasFlag(state->flags, 0x10);
+    active = ContextFlag(state, 0x10, &savedFlags);
     if (active) {
         if (*(u16 *)(gUnk_02000580 + 0x428) == 0)
             return;
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 4;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        State(actor, 0, 0, 4, 0);
         state->timer = state->interval;
     } else {
         {
             u32 mask = 0x10;
-            state->flags |= mask;
+            *savedFlags |= mask;
         }
-        actor->state2A8 = active;
-        actor->phase2A9 = 2;
-        actor->behavior2AA = 1;
-        actor->counter2AC = active;
-        actor->field2B1 = 1;
+        State(actor, active, 2, 1, active);
         state->timer = state->interval;
         state->delay = 10;
     }
