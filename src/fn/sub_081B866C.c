@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.3%
-// Open: the second sprite-flag test allocates the constant 2 and the masked value the
-// other way round (ROM r3/r1), and the CpuSet arguments r1/r2 are loaded in the other order.
+// fuzzy: 99.7%
+// Open: the CpuSet arguments r1 (mov from ip) and r2 (literal) are loaded in the other order.
 #include "engine.h"
 #include "scene_vec.h"
 struct Frames {
@@ -127,12 +126,11 @@ s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
         {
             u32 flags = f->flags;
             u32 two = 2;
-            u32 first, masked;
+            u32 first;
             asm("" : "=r"(first) : "0"(two));
             first &= flags;
-            asm("" : "=r"(masked) : "0"(first));
-            first = (u8)masked;
-            if (first != (((*frame & 0x30) >> 4) & two))
+            asm("" : "+r"(first));
+            if ((u8)first != (((*frame & 0x30) >> 4) & two))
                 sprite->flags |= 8;
             else
                 sprite->flags &= ~8;
