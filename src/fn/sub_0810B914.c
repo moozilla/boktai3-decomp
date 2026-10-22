@@ -1,9 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 97.8%
-// Open: register choice for the global slot and the allocation (r5/r8), and the
-// clear loop, which rematerializes -1 instead of reusing the -1 just stored.
 struct Registry1745Settings {
     u8 pad0[0x15C];
     u32 field15C;
@@ -13,6 +9,11 @@ struct Registry1745Settings {
     u8 *field174;
     u8 *field178;
     u8 *field17C;
+};
+/* One u16 slot written through a 16-bit bitfield (an all-ones store
+   compiles to a read-or-write). */
+struct Bits16 {
+    u16 v : 16;
 };
 struct Registry1745 {
     u8 pad0[0x10];
@@ -102,7 +103,7 @@ struct Registry1745 *Registry1745_Create(void)
         p->fieldB8 = -1;
     }
     for (i = 0; i <= 3; i++) {
-        *entry |= -1;
+        ((struct Bits16 *)entry)->v = 0xFFFF;
         p->field64[i] = 0;
         entry++;
     }
@@ -134,6 +135,3 @@ struct Registry1745 *Registry1745_Create(void)
     p->fieldB4 = Registry1745_RunSession;
     p->field53 = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Registry1745_Create);
-#endif
