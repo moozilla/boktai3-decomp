@@ -390,6 +390,7 @@ address,evidence
 0819D190,Hidden raw-tail function
 0819E7B0,Hidden raw-tail function
 081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
+081A398C,Hidden raw-tail function
 081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
 081A47D0,Hidden Task_Kill wrapper for gUnk_02000240
 081A4ED8,Hidden Task_Kill wrapper for gUnk_02000244
@@ -399,14 +400,17 @@ address,evidence
 081AF738,Hidden raw-tail function
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
+081B8104,Hidden raw-tail function
 081B9ECC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081BB114,Hidden raw-tail function
 081BB124,Hidden raw-tail function
+081BB248,Hidden raw-tail function
 081BB38C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 081BE130,Hidden raw-tail function
 081BE140,Hidden delay loop
 081BE150,Hidden empty function
 081BE154,Hidden raw-tail function
+081C0A24,Hidden raw-tail function
 081C17C8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 081C3EEC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081C5660,Hidden raw-tail function
@@ -437,6 +441,10 @@ address,evidence
 081EF12C,Hidden raw-tail function
 081F2084,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081F2B70,Hidden raw-tail function
+081FB7D8,Hidden counter difference with wrap (retained)
+081FB808,Hidden leaf returning 0
+081FB80C,Hidden velocity integrate step
+081FB828,Hidden leaf returning 0
 081FD46C,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 081FDBC4,Hidden raw-tail function
 081FE9B0,Hidden raw-tail function
@@ -448,6 +456,7 @@ address,evidence
 08202F38,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 08202F40,Independent leaf following a reviewed gap function; exact standalone C
 08203200,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+08203D18,Hidden raw-tail function
 0820602C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08210A2C,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 08211DE0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
