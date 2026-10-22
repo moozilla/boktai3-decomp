@@ -2,8 +2,8 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.6%
-// foundry draft (worker best 85.2%); what differs is mostly register allocation and instruction order
+// fuzzy: 89.0%
+// Ground-height load scheduling and final behavior-state offset derivation still differ.
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -19,6 +19,7 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask)
 {
     return s->flags2D4 & mask;
 }
+#define SceneActorControl_UpdateHeightReturn sub_080A11F4
 void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
 {
     s32 delta;
@@ -56,10 +57,11 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
     else
         Anim_SetFrameDurationScale((u8 *)s->drawable + 0x20, *height);
     {
+        s32 ground = s->groundHeight2BE;
         s32 y = s->position.y;
         s32 offset = -280;
         y += offset;
-        delta = s->groundHeight2BE;
+        delta = ground;
         delta -= y;
     }
     if (delta < 0)
@@ -69,7 +71,7 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
         u32 zero = 0;
         u8 *state = &s->state2A8;
         *state = zero;
-        *(u8 *)((u32)s + 0x2A9) = zero;
+        s->phase2A9 = zero;
         s->behavior2AA = one;
         s->counter2AC = zero;
         s->field2B1 = one;
