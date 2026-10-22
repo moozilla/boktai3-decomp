@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.2%
-// foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 struct MenuDigit {
     u8 animation[0x60];
 };
@@ -16,17 +13,14 @@ s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *p, s32 value, s32 divisor, s32 frameBase,
                                    s32 first)
 {
-    struct MenuDigit *digit;
+    s32 i;
     if (value > 999)
         value = 999;
-    for (; divisor > 0; first++) {
+    for (i = 0; divisor > 0; i++) {
         s32 quotient = Div(value, divisor);
-        digit = p->digits;
-        Anim_SelectWidgetGlyph(&digit[first], p->animationData, (u16)(frameBase + quotient));
+        Anim_SelectWidgetGlyph(&p->digits[first + i], p->animationData,
+                               (u16)(frameBase + quotient));
         value -= quotient * divisor;
         divisor = Div(divisor, 10);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", MenuDisplay_LoadDecimalDigits);
-#endif
