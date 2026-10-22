@@ -377,6 +377,7 @@ address,isa,evidence,replacement_end
 0819B824,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B86C
 0819B86C,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B8B4
 0819B8B4,thumb,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched),0819B930
+0819C870,thumb,Hidden raw-tail function (retained),
 0819D190,thumb,Hidden raw-tail function,0819D1D0
 0819E7B0,thumb,Hidden raw-tail function,0819E7F0
 0819EB84,thumb,Hidden raw-tail function (retained),
@@ -391,6 +392,7 @@ address,isa,evidence,replacement_end
 081ADBB8,thumb,Hidden raw-tail function,081ADBF8
 081AF738,thumb,Hidden raw-tail function,081AF76C
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
+081B7614,thumb,Hidden raw-tail function (retained),
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
 081BB114,thumb,Hidden raw-tail function,081BB124
@@ -411,6 +413,9 @@ address,isa,evidence,replacement_end
 081D31D8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31DC
 081D31DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31E0
 081D31E0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081D31EC
+081D36A4,thumb,Hidden raw-tail function,081D36D4
+081D36D4,thumb,Hidden raw-tail function,081D3704
+081D3704,thumb,Hidden raw-tail function,081D372C
 081D374C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D3750
 081D3A94,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D3A98
 081DACC4,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081DACCC
@@ -434,6 +439,9 @@ address,isa,evidence,replacement_end
 081EF12C,thumb,Hidden raw-tail function,081EF140
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
 081F2B70,thumb,Hidden raw-tail function,081F2BB0
+081F336C,thumb,Hidden raw-tail function,081F339C
+081F339C,thumb,Hidden raw-tail function,081F33CC
+081F33CC,thumb,Hidden raw-tail function,081F33F0
 081FB7D8,thumb,Hidden counter difference with wrap (retained),
 081FB808,thumb,Hidden leaf returning 0,081FB80C
 081FB80C,thumb,Hidden velocity integrate step,081FB828
@@ -452,6 +460,8 @@ address,isa,evidence,replacement_end
 08203D18,thumb,Hidden raw-tail function,08203D6C
 0820602C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08206030
 08210A2C,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08210A48
+08211820,thumb,Hidden raw-tail function,08211860
+08211860,thumb,Hidden raw-tail function,082118A0
 08211DE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08211DE4
 08212F34,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08212F50
 082141B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082141B8
