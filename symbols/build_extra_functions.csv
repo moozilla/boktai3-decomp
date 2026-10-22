@@ -258,6 +258,11 @@ address,isa,evidence,replacement_end
 0815AD3C,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD60
 0815AD60,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD78
 0815CC78,thumb,Independent 128-byte sibling of ScriptActor_MoveToFromScript with own push and pop-bx in its trailing data; exact standalone C,0815CCF8
+0815D394,thumb,Hidden script command after ScriptActor_StartFormMotionFromScript (PlayerCue_Windblown; keyword r),0815D3D8
+0815D3D8,thumb,Hidden script command (PlayerCue_WindblownVariant3; keyword r),0815D41C
+0815D41C,thumb,Hidden script command (PlayerCue_WindblownVariant4; keyword r),0815D460
+0815D460,thumb,Hidden script command (PlayerCue_WindblownVariant2; keyword r),0815D4A4
+0815D4A4,thumb,Hidden script command (PlayerCue_StandDiagonal; keyword d),0815D4E8
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
