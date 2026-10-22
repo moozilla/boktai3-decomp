@@ -2,7 +2,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 60.0%
+// fuzzy: 70.3%
 // Open: register allocation (ROM: actor r6 with an early copy in r3, group sl, i in r5,
 // candidate pointer sb, position r8) and the MoveTo destination/branch layout.
 
@@ -22,6 +22,23 @@ static inline void ClearWordFlags(u32 *flags, u32 mask)
     *flags &= mask;
 }
 
+static inline void OrWord(u32 *flags, u32 mask)
+{
+    *flags |= mask;
+}
+
+static inline void SetWordFlags(u32 *flags, u32 input)
+{
+    u32 mask = input;
+    *flags |= mask;
+}
+
+static inline void SetHalfFlags(u16 *flags, u32 input)
+{
+    u32 mask = input;
+    *flags |= mask;
+}
+
 static inline u8 TestBit(struct SceneActorReactionMotion *motion, u32 input)
 {
     u32 mask = input;
@@ -39,6 +56,7 @@ static inline u8 IsIdle(u8 *raw)
 
 static inline u8 IsBusy(struct SceneActorRegistryResetView *actor)
 {
+    u8 *raw = (u8 *)actor;
     u32 flags2D0, flags2CC;
     u32 *p = &actor->flags2D0;
     {
@@ -63,7 +81,7 @@ static inline u8 IsBusy(struct SceneActorRegistryResetView *actor)
     }
     if (TestBit((struct SceneActorReactionMotion *)&actor->fieldDC, 0x10))
         return 1;
-    return IsIdle((u8 *)actor);
+    return IsIdle(raw);
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
@@ -137,10 +155,10 @@ struct RouteLink {
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
 static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
-                        struct ContactPosition *position, struct ContactPosition *destination,
-                        u16 *flags, u32 blocked)
+                        struct ContactPosition *position, u16 *flags, u32 blocked)
 {
     void *shape = GROUP_FIELD(group, 0x1fc, void *);
+    struct ContactPosition *destination = &GROUP_FIELD(group, 0x58, struct ContactPosition);
     s32 result;
     if (!Nav_IsPositionInMesh(shape, position, destination)) {
         *flags &= ~blocked;
@@ -208,7 +226,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     }
     if (!found)
         return 0;
-    control = &actor->group.control;
+    control = (struct SceneActorRegistryControl *)(group + 0x4C);
     timer = &control->timer;
     if (*timer == 0) {
         ClearWordFlags(&actor->flags2CC, 0xFFFEBE3F);
@@ -220,9 +238,9 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
         SetControl(actor, GROUP_FIELD(group, 0x68, void *), 9);
         SetState(actor, 0, 0, 11);
     }
-    flagsp = &actor->flags2D4;
     {
         u32 mask = 0x80;
+        flagsp = &actor->flags2D4;
         if (*flagsp & mask) {
             u16 *value = &FIELD(actor, 0x418, u16);
             *value += 300;
@@ -234,7 +252,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     GROUP_FIELD(group, 0x60, u16) = 360;
     dest = GROUP_FIELD(group, 0x200, struct ContactPosition *);
     {
-        struct RouteLink *link = (void *)&actor->route;
+        struct RouteLink *link = (void *)(group + 0x74);
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
@@ -242,15 +260,21 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     bit = 0x200;
     GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->position.y;
     GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 0;
-    target = &GROUP_FIELD(group, 0x58, struct ContactPosition);
-    if (!MoveTo(actor, group, &actor->position, target, flagsp, bit)) {
+    if (!MoveTo(actor, group, &actor->position, flagsp, bit)) {
         Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
     } else {
-        actor->flags2CC |= 0x10;
-        *flagsp |= 0x200;
+        {
+            u32 mask = 0x10;
+            actor->flags2CC |= mask;
+        }
+        SetHalfFlags(flagsp, 0x200);
         actor->field2C2 = 0x20;
-        actor->flags2D0 |= 0x1000000;
-        SceneActorAttachment_RetargetNearestPlayer(actor, target);
+        {
+            u32 mask = 0x1000000;
+            actor->flags2D0 |= mask;
+        }
+        SceneActorAttachment_RetargetNearestPlayer(
+            actor, &GROUP_FIELD(group, 0x58, struct ContactPosition));
         if (GROUP_FIELD(group, 0x6C, void *))
             Callback_InvokeActor(actor, GROUP_FIELD(group, 0x6C, void *));
     }
