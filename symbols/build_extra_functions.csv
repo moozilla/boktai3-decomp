@@ -368,6 +368,7 @@ address,isa,evidence,replacement_end
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
 081DB2B8,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md,081DB324
 081DBB00,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081DBB0C
+081DCF78,thumb,Hidden raw-tail function,081DCF84
 081E34C4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081E34D0
 081E4B0C,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4BD4
 081E4BD4,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4C74
@@ -377,8 +378,13 @@ address,isa,evidence,replacement_end
 081E9BA0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081E9BA4
 081EC384,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081EC388
 081ED89C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081ED8A0
+081EEEC0,thumb,Hidden raw-tail function,081EEECC
+081EF12C,thumb,Hidden raw-tail function,081EF140
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
 081FD46C,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081FD474
+081FDBC4,thumb,Hidden raw-tail function,081FDBF0
+081FE9B0,thumb,Hidden raw-tail function,081FE9DC
+081FED14,thumb,Hidden raw-tail function,081FED40
 08200238,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08200244
 08202EEC,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,08202EF4
 08202F38,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,08202F40
@@ -413,11 +419,14 @@ address,isa,evidence,replacement_end
 0821AED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821AEDC
 0821AEDC,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF04
 0821AF04,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF2C
+0821DE0C,thumb,Hidden raw-tail function,0821DE30
 0821E500,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821E52C
+0821E654,thumb,Hidden raw-tail function,0821E67C
 0821E7B4,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7C4
 0821E7C4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7D0
 0821E7D0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7DC
 0821F838,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0821F840
+0821FF34,thumb,Hidden raw-tail function,0821FF50
 08220D6C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08220D78
 082215B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215B8
 082215B8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215BC
@@ -468,15 +477,26 @@ address,isa,evidence,replacement_end
 08222C44,thumb,Serial data check (0300530C); part of the reviewed 08222A04-08222C7C span,08222C64
 08222C64,thumb,Serial getter (03005310); part of the reviewed 08222A04-08222C7C span,08222C70
 08222C70,thumb,Serial getter (03005318); part of the reviewed 08222A04-08222C7C span,08222C7C
+08224EFC,thumb,Hidden raw-tail function,08224F08
+08224F14,thumb,Hidden raw-tail function,08224F20
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
 08224F98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08224FA4
 08225620,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225624
 08225834,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08225840
 08225840,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08225844
+08225994,thumb,Hidden raw-tail function,082259A0
 08225E1C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225E20
+08225F40,thumb,Hidden raw-tail function,08225F5C
+0822624C,thumb,Hidden raw-tail function,08226268
+082263DC,thumb,Hidden raw-tail function,082263FC
+08226454,thumb,Hidden raw-tail function,08226474
+082264B0,thumb,Hidden raw-tail function,082264D0
+08226528,thumb,Hidden raw-tail function,08226558
+082265D8,thumb,Hidden raw-tail function,082265F8
 08227F3C,thumb,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
+08227FEC,thumb,Hidden raw-tail function (retained),
 082281C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082281CC
 082281F0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082281FC
 08228234,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08228240
