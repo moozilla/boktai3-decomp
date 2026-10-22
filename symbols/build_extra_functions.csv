@@ -564,6 +564,8 @@ address,isa,evidence,replacement_end
 0821435C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08214374
 082145F4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08214600
 0821607C,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,082160B8
+08216ED0,thumb,Hidden raw-tail function,08216F18
+08216F18,thumb,Hidden raw-tail function,08216F78
 08216FFC,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,08217020
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
