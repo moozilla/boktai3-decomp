@@ -1397,67 +1397,117 @@ done:
 }
 
 #ifdef NONMATCHING
-// fuzzy: 65.6%
+// fuzzy: 85.5%
+// Remaining: register allocation (position should be r5, dx r6, the map pointer sl) and the
+// copy of the state byte before the 16/17 test.
+#define NEAR_CELL(out, px, pz)                                                                     \
+    do {                                                                                           \
+        s32 cx_ = (px) >> 8;                                                                       \
+        s32 cz_ = (pz) >> 8;                                                                       \
+        if (cx_ < 0 || cz_ < 0 || (u32)cx_ >= gUnk_030052F8 || (u32)cz_ >= gUnk_030052FC)          \
+            out = 0;                                                                               \
+        else                                                                                       \
+            out = gUnk_030052F4->rows[cz_] + cx_;                                                  \
+    } while (0)
 
-/* Distance/status gate and orthogonal slope routes are understood; register lifetimes and branch layout still differ. */
+#define NEAR_HEIGHT(out, pos, index)                                                               \
+    do {                                                                                           \
+        u8 *properties_ = TerrainModifiers_FindCellOverride(index, 1);                             \
+        u32 surface_;                                                                              \
+        if (properties_)                                                                           \
+            properties_ += 4;                                                                      \
+        else {                                                                                     \
+            struct EngineMap *map_ = gUnk_030052F4;                                                \
+            u32 offset_ = index * 4 + 12;                                                          \
+            properties_ = map_->cells + offset_;                                                   \
+        }                                                                                          \
+        surface_ = *properties_ >> 4;                                                              \
+        out = (*properties_ & 15) << 8;                                                            \
+        switch (surface_) {                                                                        \
+            case 1:                                                                                \
+                out -= (u8)(pos)->z;                                                               \
+                break;                                                                             \
+            case 2:                                                                                \
+                out -= (u8)(pos)->x;                                                               \
+                break;                                                                             \
+        }                                                                                          \
+    } while (0)
 
 u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag, u32 flags)
 {
-    struct TetherActor *actor = gUnk_02000488;
-    s32 dx, dz, ownIndex, otherIndex;
+    s32 dx;
+    s32 dz;
+    s32 own;
+    s32 other;
+    s32 height;
+    s32 diff;
     u32 state;
-    u16 rawX, rawZ;
-    struct ContactPackedVector corner;
-    u32 result;
-    if (!actor)
+    union {
+        struct ContactPackedVector v;
+        struct ContactPosition p;
+    } corner;
+    if (!gUnk_02000488)
         goto no;
-    dx = position->x - actor->position.x;
-    dz = position->z - actor->position.z;
-    if ((s32)((u32)dx * dx + (u32)dz * dz) > 48400)
+    dx = position->x - gUnk_02000488->position.x;
+    dz = position->z - gUnk_02000488->position.z;
+    if (dx * dx + dz * dz > 48400)
         goto no;
-    state = actor->state;
+    state = gUnk_02000488->state;
     if ((u8)(state - 16) <= 1)
         goto yes;
-    if (state != 0 && state != 3 && state != 4)
+    if ((u8)state != 0 && (u8)state != 3 && (u8)state != 4)
         goto no;
-    actor = gUnk_02000488;
-    if (!TetherActor_TestMatchingStatus(tag, flags, actor->statusTag, actor->statusFlags))
+    if (!TetherActor_TestMatchingStatus(tag, flags, gUnk_02000488->statusTag,
+                                        gUnk_02000488->statusFlags))
         goto no;
-    rawX = position->x;
-    rawZ = position->z;
-    ownIndex = cellIndex_08049840((s16)rawX >> 8, (s16)rawZ >> 8);
-    actor = gUnk_02000488;
-    otherIndex = cellIndex_08049840(actor->position.x >> 8, actor->position.z >> 8);
-    if (ownIndex == otherIndex)
-        goto yes;
-    if (ownIndex == otherIndex + 1 || ownIndex == otherIndex - 1 ||
-        ownIndex == otherIndex + ((s16 *)gUnk_030052F4->cells)[2] ||
-        ownIndex == otherIndex - ((s16 *)gUnk_030052F4->cells)[2]) {
-        actor = gUnk_02000488;
-        if (absolute_08049840(position->y - actor->position.y) <= 255)
-            goto yes;
-        goto no;
+    NEAR_CELL(own, position->x, position->z);
+    {
+        struct ContactPosition *p = &gUnk_02000488->position;
+        NEAR_CELL(other, p->x, p->z);
     }
-    actor = gUnk_02000488;
-    if (absolute_08049840(position->y - actor->position.y) > 255)
-        goto no;
-    corner.x = rawX - dx;
-    corner.z = rawZ;
-    ownIndex = cellIndex_08049840(corner.x >> 8, corner.z >> 8);
-    if (absolute_08049840(position->y - terrainHeight(&corner, ownIndex)) <= 127)
+    if (own == other)
         goto yes;
-    corner.x = position->x;
-    corner.z = position->z - dz;
-    ownIndex = cellIndex_08049840(corner.x >> 8, corner.z >> 8);
-    if (absolute_08049840(position->y - terrainHeight(&corner, ownIndex)) <= 127)
+    if (own == other + 1 || own == other - 1 || own == other + ((s16 *)gUnk_030052F4->cells)[2] ||
+        own == other - ((s16 *)gUnk_030052F4->cells)[2]) {
+        diff = position->y - gUnk_02000488->position.y;
+        if (diff < 0)
+            diff = -diff;
+        if (diff > 255)
+            goto no;
+    yes:
+        return 1;
+    }
+    diff = position->y - gUnk_02000488->position.y;
+    if (diff < 0)
+        diff = -diff;
+    if (diff > 255)
+        goto no;
+    corner.v.x = position->x - dx;
+    corner.v.z = position->z;
+    {
+        struct ContactPackedVector *cp = &corner.v;
+        NEAR_CELL(own, cp->x, cp->z);
+        NEAR_HEIGHT(height, cp, own);
+    }
+    diff = position->y - height;
+    if (diff < 0)
+        diff = -diff;
+    if (diff <= 127)
+        goto yes;
+    corner.p.x = position->x;
+    corner.p.z = position->z - dz;
+    {
+        struct ContactPosition *cp = &corner.p;
+        NEAR_CELL(own, cp->x, cp->z);
+        NEAR_HEIGHT(height, cp, own);
+    }
+    diff = position->y - height;
+    if (diff < 0)
+        diff = -diff;
+    if (diff <= 127)
         goto yes;
 no:
-    result = 0;
-    goto done;
-yes:
-    result = 1;
-done:
-    return result;
+    return 0;
 }
 
 #else
