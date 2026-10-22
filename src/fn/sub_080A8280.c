@@ -13,7 +13,7 @@ void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
 #define TentacleBody_ReturnToCellCenter sub_080A8280
 #ifdef NONMATCHING
-// fuzzy: 89.5%
+// fuzzy: 90.3%
 // Remaining differences: segment address lifetimes and register allocation.
 static inline u8 Take(u8 *p)
 {
@@ -186,7 +186,7 @@ void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
             motion = &actor->motion;
         }
     }
-    AddVectors(&target, motion, &actor->position);
+    AddVectors(&target, &actor->motion, &actor->position);
     index = SceneActorTerrain_GetCellIndex(&target);
     if (*(u16 *)(body + 0x87a) != index) {
         Delta(&target, &target, (void *)(body + 0x924));
