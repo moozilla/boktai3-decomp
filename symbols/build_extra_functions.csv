@@ -8,6 +8,8 @@ address,isa,evidence,replacement_end
 08006EF4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08006F00
 08009E30,thumb,Independent 12-byte global-pointer clear after directional script return and literal pool,08009E3C
 0800A800,thumb,Independent 12-byte effect manager global-pointer clear following collision controller teardown,0800A80C
+0800B2F4,thumb,Hidden raw-tail function,0800B330
+0800B330,thumb,Hidden raw-tail function (retained),
 0800CBA0,thumb,Independent global manager reset after allocator return and pool; exact 12-byte C body,0800CBAC
 0800E3D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0800E3E0
 080133C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080133CC
@@ -234,6 +236,8 @@ address,isa,evidence,replacement_end
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
 0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
+08110128,thumb,Hidden raw-tail function,08110164
+08110164,thumb,Hidden raw-tail function,08110188
 08110A8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08110A98
 08110A98,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,08110AD4
 08110C84,thumb,Short busy-wait delay loop (32 iterations); raw span,08110C9C
@@ -483,7 +487,7 @@ address,isa,evidence,replacement_end
 081BE140,thumb,Hidden delay loop,081BE150
 081BE150,thumb,Hidden empty function,081BE154
 081BE154,thumb,Hidden raw-tail function,081BE16C
-081BEBE0,thumb,Hidden tail after Storage_ShowConsumableDescription,
+081BEBE0,thumb,Hidden raw-tail function,081BECA4
 081C0A24,thumb,Hidden raw-tail function,081C0A80
 081C17C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081C17D4
 081C3024,thumb,Hidden tail after RegistryF3E4_GetStateResult,
@@ -562,6 +566,8 @@ address,isa,evidence,replacement_end
 0821435C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08214374
 082145F4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08214600
 0821607C,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,082160B8
+08216ED0,thumb,Hidden raw-tail function,08216F18
+08216F18,thumb,Hidden raw-tail function,08216F78
 08216FFC,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,08217020
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
@@ -670,7 +676,7 @@ address,isa,evidence,replacement_end
 08225994,thumb,Hidden raw-tail function,082259A0
 08225E1C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225E20
 08225F40,thumb,Hidden raw-tail function,08225F5C
-082260D8,thumb,Hidden tail after Camera_RequestShake,
+082260D8,thumb,Hidden raw-tail function,08226178
 0822624C,thumb,Hidden raw-tail function,08226268
 082263DC,thumb,Hidden raw-tail function,082263FC
 08226454,thumb,Hidden raw-tail function,08226474
