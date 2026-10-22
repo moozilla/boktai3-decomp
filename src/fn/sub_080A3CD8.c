@@ -2,9 +2,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 
 static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k, u32 z)
@@ -100,20 +97,14 @@ s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *
     if (!Route(a, F(nav, 0x1fc, void *), &a->position, target))
         return 0;
     {
-        register u16 *p asm("r1") = (void *)(c + 0x62c);
-        register u32 v asm("r2") = *p;
-        u32 m = 4;
-        u32 z5 = 0;
-        u32 z3 = 0;
-        m |= v;
-        *p = m;
-        Control(a, F(a, 0x228, void *), 1, z5);
-        State(a, 7, z3);
+        struct Flags {
+            s16 bits : 16;
+        };
+        struct Flags *p = (void *)(c + 0x62C);
+        p->bits |= 4;
+        Control(a, F(a, 0x228, void *), 1, 0);
+        State(a, 7, 0);
     }
     a->field2C2 = 16;
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorPlacement_TriggerTetherAction);
-#endif

@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_080A06E8(void);
+void Crow_StopAtRaisedTerrain(void);
 u32 Crow_UpdatePostAction(void)
 {
-    sub_080A06E8();
+    Crow_StopAtRaisedTerrain();
     return 1;
 }

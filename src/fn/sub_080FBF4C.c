@@ -1,9 +1,11 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 98.1%
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.8%
-// Remaining differences: scratch registers for the random-table base (r1 vs r3) and the route index byte (r3 vs r2).
+// fuzzy: 98.1%
+// Remaining: route index byte uses r3 instead of r2.
 #define ActorRoute_SelectDistantPoint ActorPhase_SelectDistantWaypoint
 #define ActorRoute_RememberPoint      Axe_RecordRoutePoint
 #define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
@@ -30,7 +32,12 @@ u8 *Path_GetPointData(u8 *);
 static inline u32 Random(void)
 {
     gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-    return *(u16 *)(gRandomTableIndex * 2 + (u32)gRandomTable);
+    {
+        u32 offset = gRandomTableIndex * 2;
+        register const u16 *table asm("r3") = gRandomTable;
+        asm("" : "+r"(table));
+        return *(u16 *)(offset + (u32)table);
+    }
 }
 void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
                                       struct ContactPosition *out,
@@ -66,8 +73,13 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     if (!bestDistance)
         bestIndex.value = Mod(Random(), *route.data);
     ActorRoute_RememberPoint(actor, bestIndex.value);
-    route.index = bestIndex.bytes[0];
-    route.mode = 0;
+    {
+        register struct RoutePointSelection *dst asm("r0") = &route;
+        register u32 mode asm("r1") = 0;
+        asm("" : "+r"(dst), "+r"(mode));
+        dst->index = bestIndex.bytes[0];
+        dst->mode = mode;
+    }
     route.entry = (u16 *)Path_GetPointData(route.data);
     route.entry = (u16 *)((u8 *)route.entry + route.index * 8);
     wide = route.entry[0];
@@ -76,6 +88,7 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     entry = route.entry;
     out->z = entry[1];
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_SelectDistantWaypoint);
 #endif

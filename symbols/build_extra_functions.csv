@@ -175,6 +175,7 @@ address,isa,evidence,replacement_end
 080A5FBC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A5FC0
 080A5FC0,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080A6030
 080A6294,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A62DC
+080A68B0,thumb,Hidden tail after TentacleBody_UpdateSpreadRelease,080A69F0
 080A7188,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A71A0
 080A8CDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A8D50
 080AA240,thumb,Hidden tail after ActorTrail_ResetAtSavedPosition,
@@ -183,12 +184,12 @@ address,isa,evidence,replacement_end
 080AD110,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080AD114
 080B1F48,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B1FA8
 080B2354,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080B23A0
-080B6480,thumb,Hidden tail after SceneActor_UpdateProfileForCategory,
+080B6480,thumb,Hidden tail after SceneActor_UpdateProfileForCategory,080B6538
 080B8A58,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B8AB8
 080C7E18,thumb,Hidden tail after Golem_ResumeSavedTarget,
 080D6FBC,thumb,Player flag test: TRUE when bit 3 of the player actor's flags (+0x20) is set; raw span before Mummy_RequestStraightRoute,080D6FDC
-080DA5C8,thumb,Hidden tail after Mummy_ResetMotionState,
-080DE42C,thumb,Hidden tail after Dog_SelectTargetAction,
+080DA5C8,thumb,Hidden tail after Mummy_ResetMotionState,080DA678
+080DE42C,thumb,Hidden tail after Dog_SelectTargetAction,080DE550
 080DF6EC,thumb,Hidden tail after Dog_TickCooldown,
 080E81FC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E8200
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8

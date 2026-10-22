@@ -185,6 +185,7 @@ address,evidence
 080A5FBC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080A5FC0,Independent actor state handler following a reviewed gap leaf; exact standalone C
 080A6294,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+080A68B0,Hidden tail after TentacleBody_UpdateSpreadRelease
 080A7188,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080A8CDC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080AA240,Hidden tail after ActorTrail_ResetAtSavedPosition

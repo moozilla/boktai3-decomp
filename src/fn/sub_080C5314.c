@@ -14,7 +14,7 @@ struct Z {
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void Golem_OnBodyCollision(void);
-void sub_080C553C(void);
+void Golem_OnAttackCollision(void);
 void Golem_InitColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
@@ -31,5 +31,5 @@ void Golem_InitColliders(u8 *p)
     s4.a.lo = 0;
     s4.a.hi = 0x80;
     s4.b.lo = 0;
-    SceneActorCollision_InitAttack(p, &s3, &s4, sub_080C553C, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, Golem_OnAttackCollision, 0, p);
 }

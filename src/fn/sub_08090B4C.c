@@ -9,7 +9,8 @@ struct SlimeReactionContext {
 };
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-void sub_080903D4(void *), Slime_RunPendingActionScript(void *), SceneActorControl_OnIdle(void);
+void Slime_EmitTargetedReactionBurst(void *), Slime_RunPendingActionScript(void *),
+    SceneActorControl_OnIdle(void);
 static inline void Clear(u16 *p, u32 mask)
 {
     *p = mask & *p;
@@ -86,7 +87,7 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
     else
         Sound_PlaySong(0x3bf);
     if (actor->paletteOffset == 3)
-        sub_080903D4(actor);
+        Slime_EmitTargetedReactionBurst(actor);
     motionFlags = &actor->flags2D4;
     Clear(motionFlags, ~0x20);
     context->timer += 80;

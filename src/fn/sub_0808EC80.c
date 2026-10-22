@@ -2,8 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.7%
-// Only temporaries after the at-rest test sit one register low (r1..r4 instead of r2..r5). A second pointer for flags2CC (t) reproduces the original copy; rest pinned to r0 avoids the boolean copy.
+// fuzzy: 98.9%
+// Remaining: completion-field offset and ready-field pointer register choices.
 #include "scene_actor_chase.h"
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 void Slime_RollMoveFlag(void);
@@ -35,6 +35,7 @@ static inline u8 TestContext(u8 *p, u32 mask)
         return 1;
     return 0;
 }
+
 void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
 {
     register u8 *context asm("r8") = actor->context;
@@ -95,6 +96,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
         else if (actor->field2B3) {
             u8 *field = &actor->field2B0;
             u32 ready = 1;
+            asm("" ::: "r1");
             *field = ready;
             {
                 u16 *flags = &actor->flags2D4;

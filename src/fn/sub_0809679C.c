@@ -1,90 +1,65 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_control_phase.h"
-s32 Mod(s32, s32);
-#define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
-static inline u16 Flag(struct SceneActorRegistryResetView *actor, u32 input)
-{
-    register u32 mask asm("r1") = input;
-    asm("" : "+r"(mask));
-    {
-        register u32 result asm("r0") = actor->flags2D4 & mask;
-        asm("" : "+r"(result));
-        return result;
-    }
-}
-static inline void State(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                         u32 behavior, u32 counter)
-{
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = counter;
-    actor->field2B1 = 1;
-}
-// confidence=low: retains and halves stored horizontal velocity until the animation finishes.
-void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *actor)
-{
-    u8 *context = actor->context;
-    u32 zero;
-    s16 *vx, *vz;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *callback = FIELD(actor, 0x224, void *);
-        u32 kind = 2;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        {
-            register u32 offset asm("r4") = 0x2C8;
-            register u16 *output asm("r0");
-            asm("" : : "r"(offset));
-            output = (u16 *)((u8 *)actor + offset);
-            *output = 0;
-        }
-        {
-            register u32 offset asm("r0") = 0x114;
-            register u32 *flags asm("r2");
-            register u32 mask asm("r1");
-            asm("" : : "r"(offset));
-            flags = (u32 *)((u8 *)actor + offset);
-            mask = ~1;
-            *flags &= mask;
-        }
-        {
-            register u32 offset asm("r1") = 0x104;
-            register u32 *output asm("r0");
-            asm("" : : "r"(offset));
-            output = (u32 *)((u8 *)actor + offset);
-            *output = 0;
-        }
-    }
-    {
-        register u32 off asm("r2") = 0x5FC;
-        asm("" : "+r"(off));
-        vx = (s16 *)(context + off);
-        actor->motion.x += *(u16 *)vx;
-    }
-    zero = 0;
-    actor->motion.z += FIELD(context, 0x600, u16);
-    vz = (s16 *)(context + 0x600);
-    if (Mod(actor->counter2AC, 4) == 0) {
-        *vx >>= 1;
-        *vz >>= 1;
-    }
-    if (actor->field2B0) {
-        u32 flag = Flag(actor, 0x100);
-        if (flag) {
-            State(actor, zero, 2, 1, 0);
-        } else {
-            State(actor, zero, zero, zero, flag);
-        }
-    } else
-        ++actor->counter2AC;
-}
+#include "scene_actor_reset.h"
 
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_DecelerateMovement);
-#endif
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
+
+s32 Mod(s32, s32);
+static inline u8 TakeFlag(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+{
+    a->field2B2 = 1;
+    a->field2B0 = 0;
+    a->field2B5 = kind;
+    a->target = callback;
+    a->field2C8 = 0;
+    {
+        u32 *flags = &a->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    a->word104 = 0;
+}
+static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior,
+                            u32 zero)
+{
+    a->state2A8 = 0;
+    a->phase2A9 = phase;
+    a->behavior2AA = behavior;
+    a->counter2AC = zero;
+    a->field2B1 = 1;
+}
+void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *a)
+{
+    u8 *ctx = a->context;
+    if (TakeFlag(&a->field2B1))
+        SetControl(a, a->entryTarget224, 2);
+    a->motion.x += *(s16 *)(ctx + 0x5FC);
+    a->motion.z += *(s16 *)(ctx + 0x600);
+    if (Mod(a->counter2AC, 4) == 0) {
+        *(s16 *)(ctx + 0x5FC) >>= 1;
+        *(s16 *)(ctx + 0x600) >>= 1;
+    }
+    if (a->field2B0) {
+        register u32 mask asm("r1") = 0x100;
+        u16 *p = &a->flags2D4;
+        u16 flags;
+        asm("" : : "r"(mask));
+        {
+            u32 raw = *p & mask;
+            flags = (u16)raw;
+        }
+        if (flags)
+            SetState(a, 2, 1, 0);
+        else
+            SetState(a, 0, 0, flags);
+    } else
+        a->counter2AC++;
+}

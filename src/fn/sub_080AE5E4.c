@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 extern const u8 gUnk_0824E20C[];
-u8 sub_080B54DC(void *);
+u8 Vorn_HasActiveResponse(void *);
 void sub_080B3110(void *, u32, const u8 *, u32);
 static inline void Resume_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
                                      void *control)
@@ -39,7 +39,7 @@ void SceneActorReaction_ResumeOrRunScript(struct SceneActorRegistryResetView *ac
     if (actor->field2B3) {
         actor->field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        if (sub_080B54DC(actor->context)) {
+        if (Vorn_HasActiveResponse(actor->context)) {
             struct SceneActorResumeContext *context = actor->context;
             u16 *flags = &context->flags;
             s32 mask = ~3;

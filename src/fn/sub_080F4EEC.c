@@ -22,7 +22,7 @@ struct Obj {
 };
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
-void sub_080F508C(struct Obj *);
+void Sword_UpdateDepthWaveReturn(struct Obj *);
 void Sword_UpdateDepthWaveFlight(struct Obj *p)
 {
     s32 wave, position;
@@ -36,5 +36,5 @@ void Sword_UpdateDepthWaveFlight(struct Obj *p)
     p->z = p->startZ + Div(p->dz * p->timer, 128) + wave;
     p->timer++;
     if (p->timer > 128)
-        p->callback = sub_080F508C;
+        p->callback = Sword_UpdateDepthWaveReturn;
 }

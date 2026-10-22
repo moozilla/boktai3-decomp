@@ -1,8 +1,9 @@
 #include "scene_actor_animation.h"
+#ifdef NONMATCHING
+// fuzzy: 86.0%
+// Remaining: direction arithmetic, constant derivation, address reuse and callback setup registers.
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
-#ifdef NONMATCHING
-// fuzzy: 83.0%
 void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)
@@ -112,9 +113,9 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
             *scale = 0x40;
     }
     if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+        Anim_SetDurationScale((u8 *)*(void *volatile *)((u8 *)actor + 4) + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale((u8 *)*(void *volatile *)((u8 *)actor + 4) + 0x20, *scale);
     if (events & 4) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);

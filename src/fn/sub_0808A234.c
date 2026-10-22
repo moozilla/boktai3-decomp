@@ -4,7 +4,7 @@
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void sub_08088C24(void);
+void Bat_UpdateProbeReaction(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u32 NavMesh_ConsumeProbeEvent(void *);
@@ -63,7 +63,7 @@ void Ghoul_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
     u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetControl(actor, sub_08088C24, 0x24);
+        SetControl(actor, Bat_UpdateProbeReaction, 0x24);
     }
     if (!*(u16 *)(control + 0x63C)) {
         if ((u8)Callback_InvokeActor(actor, actor->update270)) {

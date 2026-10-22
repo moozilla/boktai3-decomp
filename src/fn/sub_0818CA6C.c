@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.9%
-// remaining: flags119 OR keeps the constant in r4 (adds r0,r4,#0) in ROM
+// MATCHING_CONCESSION: register-pinning
 #define gRandomTableIndex gUnk_03005308
 #define gRandomTable      gUnk_0203B400
 
@@ -36,19 +34,27 @@ void Armor_RetractPartStretch(struct ArmorPart *p)
     p->stretchY = stretch;
     if (stretch == 64) {
         u32 r;
-        s32 d;
-        u32 one = 1;
+        register s32 d asm("r1");
+        u32 one;
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-        r = gRandomTable[gRandomTableIndex] & one;
-        d = -1;
+        r = *(const u16 *)((gRandomTableIndex << 1) + (u32)gRandomTable);
+        one = 1;
+        r &= one;
+        {
+            register s32 negative asm("r2") = -1;
+            asm("" : "+r"(negative));
+            d = negative;
+        }
         if (r)
             d = 1;
         p->direction = d;
         p->byte11E = one;
         p->byte11F = one;
-        p->flags119 |= one;
+        {
+            u32 flags = p->flags119;
+            u32 value = one;
+            asm("" : "+r"(value) : "r"(flags));
+            p->flags119 = value | flags;
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_RetractPartStretch);
-#endif
