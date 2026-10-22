@@ -227,7 +227,7 @@ address,isa,evidence,replacement_end
 0810C774,thumb,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span,0810C798
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
 0810CE88,thumb,Clears the three text windows stored at 0x1408/0x1400/0x1404; raw span,0810CEBC
-0810D1A4,thumb,Hidden tail after Registry30AC_RemoveAnimations,
+0810D1A4,thumb,"Hidden raw-tail function: dialogue clear/show helper, empty stub, panel close and script-call-then-kill tasks",0810D22C
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
