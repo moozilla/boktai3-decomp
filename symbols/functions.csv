@@ -7946,8 +7946,11 @@ addr,name,mode,confidence,source,notes
 081E0D18,ScriptPrompt_Create,thumb,low,src-alias,Creates the prompt task and installs its update and destruction callbacks
 081E0D58,GameStart_LoadAvailableSave,thumb,low,src-alias,Tries the selected save then the alternate and copies successful data into active state
 081E0DD4,GameStart_RunInitHook,thumb,low,src-alias,Empty hook called during GameStart initialization; provisional name reflects its call site
+081E0DD8,GameStart_DrawSaveInfo,thumb,low,src-alias,
 081E1278,SelectionPalette_UpdatePulse,thumb,low,src-alias,
+081E132C,GameStart_Update,thumb,low,src-alias,
 081E154C,GameStart_Destroy,thumb,low,src-alias,GameStart task destruction callback that removes its sprite and ten animations and clears two control bits
+081E15C8,GameStart_Init,thumb,low,src-alias,
 081E1A2C,ScreenParams3A0_SetFromScript,thumb,low,src-alias,
 081E1AB4,GameStart_Create,thumb,medium,gcl-name,name from GCL key 15DE ゲームスタート (Game Start); registry callback
 081E1AF4,SoundTest_CountEntries,thumb,low,src-alias,
