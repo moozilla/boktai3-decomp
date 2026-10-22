@@ -227,14 +227,17 @@ void Palette_StartSlide(s32, s32, s32);
 
 void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
+    u32 index_3;
+    u32 index_2;
     struct BarrierExtent size;
-    if (BreakableBarrier_ConsumeEntered(p))
+    if (BreakableBarrier_ConsumeEntered(p)) {
         disable(&p->collider);
+    }
     if ((p->timer & 3) == 0) {
         s32 angle, count, speed;
         const u16 *table;
-        register u32 *indexPtr asm("r6");
-        register u32 index asm("r0");
+        u32 *indexPtr;
+        u32 index;
         u32 mask;
         size.x = 164;
         size.y = 16;
@@ -246,17 +249,17 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         mask = 1023;
         index &= mask;
         angle = (u8)table[index];
-        index = (index + 1) & mask;
+        index_2 = (index + 1) & mask;
         {
-            u32 v = table[index];
+            u32 v = table[index_2];
             u32 m3 = 3;
             v &= m3;
             count = v + 2;
         }
-        index = (index + 1) & mask;
-        *indexPtr = index;
+        index_3 = (index_2 + 1) & mask;
+        *indexPtr = index_3;
         {
-            u32 v = table[index];
+            u32 v = table[index_3];
             u32 m3 = 3;
             v &= m3;
             speed = v + 20;
