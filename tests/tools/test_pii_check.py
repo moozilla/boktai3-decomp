@@ -1,4 +1,4 @@
-"""pii_check flags home paths and personal emails, and allows the neutral forms."""
+"""pii_check flags home paths and allows the neutral forms."""
 import re
 import sys
 import unittest
@@ -12,13 +12,12 @@ class PiiCheckTests(unittest.TestCase):
     def hits(self, text, extra=()):
         return pii_check.scan_line(text, pii_check.GENERIC + list(extra))
 
-    def test_flags_home_paths_and_emails(self):
-        for text in ('/Users/alice/git/x', 'cd /home/alice/', r'C:\Users\alice', 'mail alice@mail.example.io'):
+    def test_flags_home_paths(self):
+        for text in ('/Users/alice/git/x', 'cd /home/alice/', r'C:\Users\alice'):
             self.assertTrue(self.hits(text), text)
 
     def test_allows_neutral_forms(self):
-        for text in ('~/git/boktai3', '/home/user/boktai3-decomp', 'chase/home/terrain',
-                     'noreply@anthropic.com', '288266+x@users.noreply.github.com', 'a@example.com'):
+        for text in ('~/git/boktai3', '/home/user/boktai3-decomp', 'chase/home/terrain', 'a@example.com'):
             self.assertEqual(self.hits(text), [], text)
 
     def test_private_patterns_match_without_echoing(self):

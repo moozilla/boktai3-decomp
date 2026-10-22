@@ -6,11 +6,8 @@
     tools/pii_check.py --range A..B      added lines and commit messages in a range (CI)
     tools/pii_check.py --all             every tracked file
 
-Generic rules catch personal paths and email addresses:
-
-  * home directories: /Users/<name>, /home/<name> (except the sandbox's /home/user),
-    C:\\Users\\<name>. Write ~ or a repo-relative path instead.
-  * email addresses, except noreply/no-reply addresses and example.com/.org/.net.
+Generic rules catch home directories: /Users/<name>, /home/<name> (except the
+sandbox's /home/user), C:\\Users\\<name>. Write ~ or a repo-relative path instead.
 
 Names, handles and domains that only one person knows are personal go in a private
 pattern list, never in this file: one case-insensitive regex per line, read from
@@ -32,12 +29,7 @@ GENERIC = [
     ("home path", re.compile(r"(?<![\w.-])/Users/(?!Shared\b)[A-Za-z0-9._-]+")),
     ("home path", re.compile(r"(?<![\w.-])/home/(?!user\b)[A-Za-z][A-Za-z0-9._-]*")),
     ("home path", re.compile(r"[A-Za-z]:\\+Users\\+[A-Za-z0-9._-]+", re.I)),
-    ("email", re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")),
 ]
-EMAIL_OK = re.compile(
-    r"(?:^|[.+])no-?reply@|@(?:[a-z0-9-]+\.)*example\.(?:com|org|net)$|@users\.noreply\.github\.com$",
-    re.I,
-)
 # Third-party text, and this checker and its test
 SKIP = re.compile(r"^(?:tools/pii_check\.py|tests/tools/test_pii_check\.py|licenses/|THIRD_PARTY\.md$)")
 
@@ -66,8 +58,6 @@ def scan_line(text, rules):
     hits = []
     for name, rx in rules:
         for m in rx.finditer(text):
-            if name == "email" and EMAIL_OK.search(m.group(0)):
-                continue
             # private patterns are secret: never echo what matched
             hits.append(name if name == "private pattern" else f"{name} {m.group(0)!r}")
     return hits

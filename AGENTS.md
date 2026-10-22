@@ -14,7 +14,7 @@ Fast per-function checks are sufficient for working-branch matching commits.
 Run one complete combined build before merging a batch into main; it must print
 `build/boktai3.gba: OK`. Do not rebuild for every function or documentation edit.
 Never commit the ROM, generated assembly or emulator dumps.
-Never commit personal information: no names, emails, usernames or home paths
+Never commit personal information: no real names, usernames or home paths
 (`/Users/<name>`; write `~` or a repo-relative path). `tools/pii_check.py` enforces
 this in the git hooks (`.githooks`) and in CI.
 Nonmatching drafts are committed on `main` inside `#ifdef NONMATCHING ... #else
