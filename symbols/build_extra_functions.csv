@@ -759,7 +759,7 @@ address,isa,evidence,replacement_end
 08243ED8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EE4
 08243EE4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EF0
 08243EF0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08243EFC
-08244A38,arm,IntrSIO32: exact compiled RFU_V1024 source; docs/RFU.md,
+08244A38,thumb,Hidden raw-tail function,08244A9C
 08244A9C,arm,sio32intr_clock_master: exact compiled RFU_V1024 source; docs/RFU.md,
 08244D2C,arm,sio32intr_clock_slave: exact compiled RFU_V1024 source; docs/RFU.md,
 08245138,arm,handshake_wait: exact compiled RFU_V1024 source; docs/RFU.md,
