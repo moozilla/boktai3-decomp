@@ -552,9 +552,13 @@ address,evidence
 0822D730,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0822D734,Code following a reviewed gap leaf; retained assembly
 0822DB2C,Hidden raw-tail function
+0822DF68,Hidden raw-tail function
+0822DFA0,Hidden raw-tail function
 0822E420,Hidden equipment table entry getter (retained)
 0822E43C,Hidden leaf getter without lr push (retained)
 0822E54C,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
+0822E6E4,Hidden raw-tail function
+0822F174,Hidden raw-tail function
 0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
 08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
 0823025C,Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
@@ -567,6 +571,10 @@ address,evidence
 082329C8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08232F1C,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md
 082371E4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08237764,Hidden raw-tail function
+0823ABA8,Hidden raw-tail function
+0823B8C4,Hidden raw-tail function (retained)
+0823C8FC,Hidden raw-tail function (retained)
 082436EC,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 08243704,Script command (actor i must exist; reads keyword T); first of two matched functions in the reviewed 08243704-082437A8 span
 0824372C,Script command setting a player action slot (keyword w); second matched function in the reviewed 08243704-082437A8 span

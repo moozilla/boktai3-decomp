@@ -531,9 +531,13 @@ address,isa,evidence,replacement_end
 0822D730,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822D734
 0822D734,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0822D740
 0822DB2C,thumb,Hidden raw-tail function,0822DB54
+0822DF68,thumb,Hidden raw-tail function,0822DFA0
+0822DFA0,thumb,Hidden raw-tail function,0822DFDC
 0822E420,thumb,Hidden equipment table entry getter (retained),
 0822E43C,thumb,Hidden leaf getter without lr push (retained),
 0822E54C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0822E564
+0822E6E4,thumb,Hidden raw-tail function,0822E728
+0822F174,thumb,Hidden raw-tail function,0822F1B4
 08231438,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08231444
 08231444,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08231448
 0823179C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082317A0
@@ -543,6 +547,10 @@ address,isa,evidence,replacement_end
 082329C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082329D4
 08232F1C,thumb,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md,08232F68
 082371E4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082371F0
+08237764,thumb,Hidden raw-tail function,082377A8
+0823ABA8,thumb,Hidden raw-tail function,0823ABC0
+0823B8C4,thumb,Hidden raw-tail function (retained),
+0823C8FC,thumb,Hidden raw-tail function (retained),
 082436EC,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08243704
 08243704,thumb,Script command (actor i must exist; reads keyword T); first of two functions in the reviewed 08243704-082437A8 span,0824372C
 0824372C,thumb,Script command setting a player action slot (keyword w); second function of the reviewed 08243704-082437A8 span,082437A8
