@@ -708,7 +708,7 @@ address,isa,evidence,replacement_end
 08229074,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08229078
 082290D0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290DC
 082290E8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290F4
-08229424,thumb,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md,
+08229424,thumb,Hidden raw-tail function,08229440
 0822B4B8,thumb,Hidden raw-tail function,0822B4E8
 0822B578,thumb,Hidden raw-tail function,0822B584
 0822B584,thumb,Hidden raw-tail function,0822B590
