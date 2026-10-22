@@ -77,9 +77,15 @@ static inline void State(struct SceneActorRegistryResetView *actor, u32 behavior
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
+static inline void SaveInitialPlayer(struct ContactPosition *out, u8 **players)
+{
+    register u8 **source asm("r4") = players;
+    asm("" : : "r"(source));
+    *out = *(struct ContactPosition *)(*source + 0x30);
+}
 #ifdef NONMATCHING
-// fuzzy: 80.3%
-// Remaining differences: control-field address reuse and player-pointer register lifetimes.
+// fuzzy: 87.6%
+// Remaining differences: player-pointer copies, control-field offsets and animation-scale allocation.
 // confidence=low: follows the player's displacement while draining, then returns to idle.
 #define Ghost_FollowDrainedPlayer sub_08098A74
 void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
@@ -91,8 +97,7 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
     register u16 *flags asm("r6") = &actor->flags2D4;
     if (taken) {
         Control(actor, Ghost_UpdateEnergyDrainAnimation, 0x23);
-        *((struct ContactPosition *)(context + 0x5EC)) =
-            *(struct ContactPosition *)((*player) + 0x30);
+        SaveInitialPlayer((void *)(context + 0x5EC), player);
         {
             u32 mask = 0x100;
             *flags = mask | *flags;
@@ -104,7 +109,7 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
         actor->direction = actor->fieldE9;
     }
     {
-        register u32 scale asm("r7") = 64;
+        u32 scale = 64;
         actor->field1EA = scale;
         Delta(&delta, ((struct ContactPosition *)(context + 0x5EC)), (void *)((*player) + 0x30));
         actor->motion.x += delta.x;
