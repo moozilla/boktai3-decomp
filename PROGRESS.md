@@ -33,37 +33,33 @@ Sections group the report categories; inside each category, units sharing a firs
 
 | Section / category | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Gameplay** | 5156/6068 | 55.3% | `███████████░░░░░░░░░` |
-| &nbsp;&nbsp;Player | 627/736 | 63.0% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Monsters | 1159/1511 | 40.0% | `████████░░░░░░░░░░░░` |
+| **Gameplay** | 5146/6057 | 55.3% | `███████████░░░░░░░░░` |
+| &nbsp;&nbsp;Player | 628/737 | 63.1% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Monsters | 1161/1515 | 39.9% | `████████░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Bosses | 520/645 | 46.3% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Field objects and hazards | 998/1082 | 79.6% | `████████████████░░░░` |
-| &nbsp;&nbsp;Scene actors and NPCs | 1783/2022 | 65.2% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Field objects and hazards | 987/1070 | 79.6% | `████████████████░░░░` |
+| &nbsp;&nbsp;Scene actors and NPCs | 1781/2018 | 65.5% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Minigames | 69/72 | 79.5% | `████████████████░░░░` |
-| **Presentation and UI** | 3255/3572 | 75.3% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Effects and presentation | 1384/1548 | 70.7% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Menus, HUD and dialogue | 1871/2024 | 78.9% | `████████████████░░░░` |
-| **Engine and system** | 1643/1813 | 71.0% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Engine core | 879/985 | 68.0% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Hardware, time and save | 221/224 | 97.3% | `███████████████████░` |
-| &nbsp;&nbsp;Link and wireless | 543/604 | 67.4% | `█████████████░░░░░░░` |
+| **Presentation and UI** | 3267/3582 | 75.2% | `███████████████░░░░░` |
+| &nbsp;&nbsp;Effects and presentation | 1404/1571 | 70.4% | `██████████████░░░░░░` |
+| &nbsp;&nbsp;Menus, HUD and dialogue | 1863/2011 | 79.2% | `████████████████░░░░` |
+| **Engine and system** | 1641/1814 | 71.0% | `██████████████░░░░░░` |
+| &nbsp;&nbsp;Engine core | 888/994 | 68.2% | `██████████████░░░░░░` |
+| &nbsp;&nbsp;Hardware, time and save | 216/223 | 93.0% | `███████████████████░` |
+| &nbsp;&nbsp;Link and wireless | 537/597 | 67.6% | `██████████████░░░░░░` |
 | **Libraries** | 298/298 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Libraries | 298/298 | 100.0% | `████████████████████` |
 | *Intentional assembly (not counted)* | 47 functions | 4,756 bytes | |
 
 ### Gameplay
 
-<details><summary><b>Player</b>: 627/736 functions, 63.0% of bytes</summary>
+<details><summary><b>Player</b>: 628/737 functions, 63.1% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Player** | 613/720 | 62.9% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Player 1 | 38/44 | 72.1% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Player 2 | 191/234 | 54.6% | `███████████░░░░░░░░░` |
-| &nbsp;&nbsp;Player cue 1 | 36/53 | 33.2% | `███████░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Player 3 | 80/86 | 89.5% | `██████████████████░░` |
-| &nbsp;&nbsp;Player cue 2 | 63/64 | 91.7% | `██████████████████░░` |
-| &nbsp;&nbsp;Player cue 3 | 10/10 | 100.0% | `████████████████████` |
+| **Player** | 614/721 | 62.9% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Player | 421/498 | 65.9% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Player cue | 110/128 | 48.6% | `██████████░░░░░░░░░░` |
 | &nbsp;&nbsp;Player contact | 11/12 | 90.3% | `██████████████████░░` |
 | &nbsp;&nbsp;Player orbit effect | 6/7 | 92.9% | `███████████████████░` |
 | &nbsp;&nbsp;Player burst | 17/18 | 76.8% | `███████████████░░░░░` |
@@ -71,17 +67,12 @@ Sections group the report categories; inside each category, units sharing a firs
 | &nbsp;&nbsp;Player barrier | 11/11 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Player particle cloud | 10/12 | 50.7% | `██████████░░░░░░░░░░` |
 | &nbsp;&nbsp;Player clone | 17/20 | 39.1% | `████████░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Player 4 | 20/25 | 66.7% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Player 5 | 92/109 | 80.4% | `████████████████░░░░` |
 | Target registry | 14/16 | 83.4% | `█████████████████░░░` |
 
 Still to match (109):
 
-- Player 1: `Player_UpdateFacingSide` 72 B, `ActorResponse_Apply` 104 B, `Player_RecalculateDerivedStats` 168 B (83%), `sub_0813B7C4` 152 B, `sub_0813B950` 104 B, `sub_0813BAD8` 720 B
-- Player 2: `sub_0813C9B4` 472 B, `Player_UpdateVisualPalette` 660 B (88%), `sub_0813CE20` 816 B, `SceneActor_StartRandomizedEffect` 304 B, `sub_0813D834` 192 B, `Player_SelectFlashingVisualMode` 56 B (82%), `Player_UpdateStatusVisuals` 492 B (82%), `sub_0813DF5C` 404 B, `PlayerAction_RefreshFlagState` 2412 B, `Player_SelectRequestedActionMode` 244 B (85%), `sub_0813FE30` 436 B, `Player_BeginTerrainFacingAction` 236 B (85%), `Player_SelectHistoryDirection` 100 B, `Player_GetSmoothedDirection` 108 B, `Player_EmitMovementEffects` 576 B (100%), `Player_UpdateObjectPush` 2316 B (93%), `Player_UpdateHeldInteraction` 808 B (89%), `Player_UpdateHeldEnergyBurst` 820 B (92%), `Player_ConstrainTetherTarget` 892 B (89%), `Player_UpdateTetherMovement` 1068 B (94%), `sub_08144AAC` 692 B, `sub_08145254` 412 B, `sub_081462DC` 412 B, `Player_UpdateSpiralAfterglow` 556 B (97%), `Player_UpdateWaveringMovement` 752 B (88%), `Player_UpdateSpiralDisorientation` 744 B (99%), `sub_081491E4` 512 B, `Player_UpdateOddDirectionPose` 420 B (98%), `Player_UpdateSpiralTrailAction` 556 B (99%), `ActorFlags_GetResponseBits` 48 B, `sub_0814A9D4` 1552 B, `sub_0814B078` 360 B, `sub_0814B1F8` 4176 B, `sub_0814C248` 336 B, `sub_0814C3A4` 2952 B, `Player_ComputeActionScale` 352 B (83%), `sub_0814D264` 1216 B, `sub_0814D9C4` 780 B, `Player_IsStatBBelow` 76 B (89%), `Player_UpdateSelectedAttackCharge` 1440 B (90%), `sub_0814E990` 1348 B, `sub_0814EEE0` 1072 B, `Player_UpdateAttachedAttackCharge` 1244 B (88%)
-- Player cue 1: `Player_AdvanceScriptDestination` 804 B (90%), `PlayerCue_UpdateMoveDestination` 776 B (80%), `PlayerCue_UpdateScaleTransition` 1032 B (84%), `PlayerCue_UpdateRunTo` 684 B (92%), `PlayerCue_UpdateTurningPalette` 892 B (83%), `PlayerCue_UpdateMotionFade` 2280 B (82%), `PlayerCue_UpdateRecoilSlide` 480 B (98%), `sub_08152C3C` 1512 B, `PlayerCue_UpdateFormChange` 1004 B (84%), `PlayerCue_UpdateSpiralMotion` 716 B (90%), `PlayerCue_UpdateSideArrival` 796 B (98%), `PlayerCue_UpdateSideFade` 1792 B (91%), `PlayerCue_UpdateAlternateFade` 1752 B (86%), `Player_UpdateStateMotionCue` 708 B (88%), `Player_UpdateTimedChargeAction` 948 B (87%), `sub_08155D58` 1104 B, `sub_081561EC` 2512 B
-- Player 3: `sub_08156DAC` 424 B, `sub_08158C14` 196 B, `sub_08159164` 172 B, `PlayerStats_AddHundredths` 152 B (75%), `sub_0815A048` 188 B, `sub_0815A1AC` 376 B
-- Player cue 2: `sub_0815C73C` 608 B
+- Player: `Player_UpdateFacingSide` 72 B, `ActorResponse_Apply` 104 B, `Player_RecalculateDerivedStats` 168 B (83%), `sub_0813B7C4` 152 B, `sub_0813B950` 104 B, `sub_0813BAD8` 720 B, `sub_0813C9B4` 472 B, `Player_UpdateVisualPalette` 660 B (88%), `sub_0813CE20` 816 B, `SceneActor_StartRandomizedEffect` 304 B, `sub_0813D834` 192 B, `Player_SelectFlashingVisualMode` 56 B (82%), `Player_UpdateStatusVisuals` 492 B (82%), `sub_0813DF5C` 404 B, `PlayerAction_RefreshFlagState` 2412 B, `Player_SelectRequestedActionMode` 244 B (85%), `sub_0813FE30` 436 B, `Player_BeginTerrainFacingAction` 236 B (85%), `Player_SelectHistoryDirection` 100 B, `Player_GetSmoothedDirection` 108 B, `Player_EmitMovementEffects` 576 B (100%), `Player_UpdateObjectPush` 2316 B (93%), `Player_UpdateHeldInteraction` 808 B (89%), `Player_UpdateHeldEnergyBurst` 820 B (92%), `Player_ConstrainTetherTarget` 892 B (89%), `Player_UpdateTetherMovement` 1068 B (94%), `sub_08144AAC` 692 B, `sub_08145254` 412 B, `sub_081462DC` 412 B, `Player_UpdateSpiralAfterglow` 556 B (97%), `Player_UpdateWaveringMovement` 752 B (88%), `Player_UpdateSpiralDisorientation` 744 B (99%), `sub_081491E4` 512 B, `Player_UpdateOddDirectionPose` 420 B (98%), `Player_UpdateSpiralTrailAction` 556 B (99%), `ActorFlags_GetResponseBits` 48 B, `sub_0814A9D4` 1552 B, `sub_0814B078` 360 B, `sub_0814B1F8` 4176 B, `sub_0814C248` 336 B, `sub_0814C3A4` 2952 B, `Player_ComputeActionScale` 352 B (83%), `sub_0814D264` 1216 B, `sub_0814D9C4` 780 B, `Player_IsStatBBelow` 76 B (89%), `Player_UpdateSelectedAttackCharge` 1440 B (90%), `sub_0814E990` 1348 B, `sub_0814EEE0` 1072 B, `Player_UpdateAttachedAttackCharge` 1244 B (88%), `sub_08156DAC` 424 B, `sub_08158C14` 196 B, `sub_08159164` 172 B, `PlayerStats_AddHundredths` 152 B (75%), `sub_0815A048` 188 B, `sub_0815A1AC` 376 B, `sub_08237ED8` 292 B, `sub_08238110` 184 B, `sub_08238238` 72 B, `sub_08238580` 292 B, `sub_082386DC` 104 B, `sub_0823B308` 188 B, `ActorMotion_ApplyHeadingDrift` 348 B (99%), `sub_0823B5D8` 204 B, `sub_0823B7A4` 176 B (52%), `sub_0823B8C4` 60 B, `sub_0823BB48` 268 B, `sub_0823C280` 232 B, `Player_SelectHistoryDirectionB` 100 B (92%), `sub_0823C424` 144 B (83%), `sub_0823C4B4` 108 B (83%), `sub_0823C8FC` 52 B, `Player_UpdateTerrainSidestep` 1708 B (86%), `sub_0824000C` 500 B, `sub_08241714` 1200 B, `PlayerCue_UpdateSpiralPose` 540 B (94%), `sub_082429AC` 900 B, `StatGauge_Draw` 188 B (89%)
+- Player cue: `Player_AdvanceScriptDestination` 804 B (90%), `PlayerCue_UpdateMoveDestination` 776 B (80%), `PlayerCue_UpdateScaleTransition` 1032 B (84%), `PlayerCue_UpdateRunTo` 684 B (92%), `PlayerCue_UpdateTurningPalette` 892 B (83%), `PlayerCue_UpdateMotionFade` 2280 B (82%), `PlayerCue_UpdateRecoilSlide` 480 B (98%), `sub_08152C3C` 1512 B, `PlayerCue_UpdateFormChange` 1004 B (84%), `PlayerCue_UpdateSpiralMotion` 716 B (90%), `PlayerCue_UpdateSideArrival` 796 B (98%), `PlayerCue_UpdateSideFade` 1792 B (91%), `PlayerCue_UpdateAlternateFade` 1752 B (86%), `Player_UpdateStateMotionCue` 708 B (88%), `Player_UpdateTimedChargeAction` 948 B (87%), `sub_08155D58` 1104 B, `sub_081561EC` 2512 B, `sub_0815C73C` 608 B
 - Player contact: `sub_0815E034` 444 B
 - Target registry: `sub_0815F5B4` 68 B, `sub_0815F5F8` 176 B
 - Player orbit effect: `PlayerOrbitEffect_UpdateParticles` 124 B (88%)
@@ -89,36 +80,25 @@ Still to match (109):
 - Player attack effect: `sub_081606C0` 496 B, `PlayerAttackEffect_EmitPaletteBaseTrail` 1524 B (98%), `sub_0816233C` 604 B, `sub_081625C0` 288 B (73%)
 - Player particle cloud: `sub_081D33A0` 556 B, `sub_081D3620` 132 B
 - Player clone: `PlayerClone_UpdateBehavior` 1620 B (82%), `sub_08200C94` 912 B, `PlayerClone_BeginActiveReactions` 180 B (85%)
-- Player 4: `sub_08237ED8` 292 B, `sub_08238110` 184 B, `sub_08238238` 72 B, `sub_08238580` 292 B, `sub_082386DC` 104 B
-- Player 5: `sub_0823B308` 188 B, `ActorMotion_ApplyHeadingDrift` 348 B (99%), `sub_0823B5D8` 204 B, `sub_0823B7A4` 176 B (52%), `sub_0823B8C4` 60 B, `sub_0823BB48` 268 B, `sub_0823C280` 232 B, `Player_SelectHistoryDirectionB` 100 B (92%), `sub_0823C424` 144 B (83%), `sub_0823C4B4` 108 B (83%), `sub_0823C8FC` 52 B, `Player_UpdateTerrainSidestep` 1708 B (86%), `sub_0824000C` 500 B, `sub_08241714` 1200 B, `PlayerCue_UpdateSpiralPose` 540 B (94%), `sub_082429AC` 900 B, `StatGauge_Draw` 188 B (89%)
 
 </details>
 
-<details><summary><b>Monsters</b>: 1159/1511 functions, 40.0% of bytes</summary>
+<details><summary><b>Monsters</b>: 1161/1515 functions, 39.9% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Skeleton** | 70/88 | 41.5% | `████████░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Skeleton 1 | 60/75 | 49.2% | `██████████░░░░░░░░░░` |
-| &nbsp;&nbsp;Skeleton 2 | 10/13 | 15.3% | `███░░░░░░░░░░░░░░░░░` |
+| Skeleton | 70/88 | 41.5% | `████████░░░░░░░░░░░░` |
 | Mummy | 49/71 | 17.1% | `███░░░░░░░░░░░░░░░░░` |
 | Golem | 47/63 | 26.8% | `█████░░░░░░░░░░░░░░░` |
-| **Armor** | 127/152 | 49.7% | `██████████░░░░░░░░░░` |
-| &nbsp;&nbsp;Armor 1 | 29/30 | 91.8% | `██████████████████░░` |
-| &nbsp;&nbsp;Armor 2 | 83/102 | 44.0% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Armor 3 | 15/20 | 69.4% | `██████████████░░░░░░` |
+| Armor | 127/152 | 49.7% | `██████████░░░░░░░░░░` |
 | Dog | 51/73 | 30.1% | `██████░░░░░░░░░░░░░░` |
 | Vorn | 73/106 | 34.6% | `███████░░░░░░░░░░░░░` |
-| Axe | 74/94 | 52.7% | `███████████░░░░░░░░░` |
+| Axe | 78/101 | 50.3% | `██████████░░░░░░░░░░` |
 | **Tentacle** | 65/86 | 45.4% | `█████████░░░░░░░░░░░` |
 | &nbsp;&nbsp;Tentacle body | 12/18 | 39.0% | `████████░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Tentacle actor | 53/68 | 47.5% | `█████████░░░░░░░░░░░` |
-| **Ghoul** | 32/46 | 15.1% | `███░░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Ghoul 1 | 7/9 | 17.9% | `████░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Ghoul 2 | 25/37 | 14.6% | `███░░░░░░░░░░░░░░░░░` |
-| **Ivy** | 59/71 | 64.1% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Ivy 1 | 51/60 | 69.4% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Ivy 2 | 8/11 | 17.3% | `███░░░░░░░░░░░░░░░░░` |
+| Ghoul | 32/46 | 15.1% | `███░░░░░░░░░░░░░░░░░` |
+| Ivy | 59/71 | 64.1% | `█████████████░░░░░░░` |
 | Ghost | 44/63 | 40.7% | `████████░░░░░░░░░░░░` |
 | Lun | 38/50 | 44.0% | `█████████░░░░░░░░░░░` |
 | Slime | 38/48 | 41.4% | `████████░░░░░░░░░░░░` |
@@ -126,16 +106,14 @@ Still to match (109):
 | Octopus | 39/46 | 58.4% | `████████████░░░░░░░░` |
 | Glove | 18/27 | 39.5% | `████████░░░░░░░░░░░░` |
 | Bee | 38/45 | 44.2% | `█████████░░░░░░░░░░░` |
-| **Bat** | 5/9 | 17.1% | `███░░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Bat 1 | 1/2 | 1.6% | `░░░░░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Bat 2 | 4/7 | 23.0% | `█████░░░░░░░░░░░░░░░` |
+| Bat | 5/9 | 17.1% | `███░░░░░░░░░░░░░░░░░` |
 | Crow | 31/40 | 41.0% | `████████░░░░░░░░░░░░` |
 | Mimic | 28/36 | 40.0% | `████████░░░░░░░░░░░░` |
 | **Enemy** | 36/41 | 61.0% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Enemy F426 | 8/12 | 34.0% | `███████░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Enemy D459 | 11/12 | 70.0% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Enemy particle | 17/17 | 100.0% | `████████████████████` |
-| Sword | 29/42 | 43.5% | `█████████░░░░░░░░░░░` |
+| Sword | 27/39 | 43.7% | `█████████░░░░░░░░░░░` |
 | **Cannon** | 37/43 | 69.6% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Cannon battery | 26/28 | 94.5% | `███████████████████░` |
 | &nbsp;&nbsp;Cannon emitter | 4/5 | 40.0% | `████████░░░░░░░░░░░░` |
@@ -152,12 +130,10 @@ Still to match (109):
 | Growth hazard | 18/24 | 71.3% | `██████████████░░░░░░` |
 | Ooze | 9/10 | 58.6% | `████████████░░░░░░░░` |
 
-Still to match (352):
+Still to match (354):
 
-- Bat 1: `Bat_Init` 3548 B
-- Ghoul 1: `sub_08085DD0` 1524 B, `sub_08086400` 1580 B
-- Bat 2: `sub_08087018` 2648 B, `sub_08087A70` 4532 B, `sub_08088C24` 176 B
-- Ghoul 2: `sub_08089168` 472 B, `sub_08089340` 1216 B, `sub_080898FC` 2344 B, `SceneActorControl_RestartOrAdvance` 264 B (91%), `sub_0808A664` 524 B, `sub_0808A9EC` 608 B, `sub_0808ACD4` 364 B, `sub_0808AF38` 812 B, `sub_0808B264` 188 B, `sub_0808B3EC` 6236 B, `Ghoul_ResumePendingRoute` 508 B (86%), `sub_0808D1D8` 4092 B
+- Bat: `Bat_Init` 3548 B, `sub_08087018` 2648 B, `sub_08087A70` 4532 B, `sub_08088C24` 176 B
+- Ghoul: `sub_08085DD0` 1524 B, `sub_08086400` 1580 B, `sub_08089168` 472 B, `sub_08089340` 1216 B, `sub_080898FC` 2344 B, `SceneActorControl_RestartOrAdvance` 264 B (91%), `sub_0808A664` 524 B, `sub_0808A9EC` 608 B, `sub_0808ACD4` 364 B, `sub_0808AF38` 812 B, `sub_0808B264` 188 B, `sub_0808B3EC` 6236 B, `Ghoul_ResumePendingRoute` 508 B (86%), `sub_0808D1D8` 4092 B
 - Slime: `Slime_ResolveBodyContact` 640 B (88%), `Slime_ConvergeReactionMotion` 728 B (97%), `sub_0808F8C8` 284 B, `sub_0808FA04` 60 B, `sub_0808FA40` 624 B, `Slime_EmitDeathDebris` 628 B (91%), `sub_080903D4` 848 B, `sub_08090724` 884 B, `Slime_ResolveDamageReaction` 720 B (92%), `Slime_Init` 3632 B
 - Bee: `Bee_UpdateMovementStop` 388 B (86%), `Bee_StartMoveToBody` 560 B (87%), `sub_08093138` 476 B, `sub_0809345C` 488 B, `Bee_FollowWanderRoute` 1288 B (82%), `sub_080941F4` 1128 B, `Bee_Init` 3548 B
 - Ghost: `sub_08095578` 348 B, `Ghost_TurnTowardHeading` 692 B (89%), `sub_08096000` 84 B, `Ghost_UpdateDefeat` 568 B (90%), `sub_080964C4` 728 B, `Ghost_DecelerateMovement` 340 B (99%), `Ghost_ChooseRouteDestination` 472 B (100%), `sub_08096D38` 1396 B, `SceneActor_EasePlayerHeight` 208 B (96%), `sub_08097798` 436 B, `sub_08097E38` 512 B, `Ghost_EmitAfterimage` 488 B (89%), `ActorContact_TickAuxiliaryTimers` 64 B, `sub_08098344` 488 B, `sub_0809852C` 308 B, `Ghost_UpdateVisibility` 628 B (84%), `sub_08098A74` 556 B, `Ghost_ChooseMovementDestination` 392 B (100%), `Ghost_Init` 4752 B
@@ -167,21 +143,17 @@ Still to match (352):
 - Tentacle body: `sub_080A62DC` 716 B, `TentacleBody_UpdateSpreadRelease` 1096 B (80%), `TentacleBody_UpdateChargeSpread` 808 B (92%), `TentacleBody_BeginDirectedAttack` 568 B (89%), `TentacleBody_UpdateAttackRecovery` 568 B (92%), `sub_080A71A0` 532 B
 - Tentacle actor: `TentacleBody_UpdatePursuit` 732 B (95%), `sub_080A8280` 828 B, `TentacleActor_SelectWanderRoute` 984 B (88%), `TentacleBody_RefreshDirectionalAnimations` 548 B (96%), `TentacleBody_RestartSegmentAnimations` 516 B (100%), `sub_080A9BD8` 472 B, `sub_080A9DB0` 628 B, `sub_080AA240` 740 B, `sub_080AA688` 156 B, `sub_080AA744` 384 B, `sub_080AA8C4` 460 B, `sub_080AAA90` 348 B, `sub_080AB04C` 584 B, `sub_080ABB18` 452 B, `sub_080ABDCC` 3548 B
 - Vorn: `sub_080ACFA8` 356 B, `sub_080AD530` 556 B, `sub_080AD75C` 1076 B, `sub_080ADB90` 304 B, `Vorn_UpdateKnockbackRecovery` 1056 B (82%), `Vorn_ResumeReactionRoute` 592 B (84%), `Vorn_TryRestorePatrolRoute` 660 B (80%), `Vorn_UpdateDefeat` 984 B (83%), `sub_080AF2BC` 2344 B, `sub_080B0038` 364 B, `sub_080B03BC` 312 B, `SceneActorPhase_TryBeginSpecialMotion` 336 B (95%), `sub_080B13E8` 580 B, `sub_080B162C` 640 B, `sub_080B197C` 284 B, `sub_080B1FA8` 812 B, `sub_080B2354` 76 B, `Vorn_BeginPursuitRoute` 440 B (83%), `Vorn_SelectReachableEscapeCell` 728 B (94%), `Vorn_SelectRetreatRoute` 1684 B (91%), `SceneActor_TrySoloAction` 336 B (89%), `sub_080B3110` 588 B, `SceneActor_IsFacingNearbyTarget` 124 B (84%), `Vorn_ResumeRouteAfterReaction` 1656 B (88%), `SceneActor_DispatchContextAction` 244 B (98%), `sub_080B3BD0` 76 B, `sub_080B3C1C` 572 B, `sub_080B3E58` 452 B, `sub_080B41A0` 96 B, `sub_080B4200` 96 B, `sub_080B4260` 208 B, `Vorn_Init` 4332 B, `sub_080B54DC` 64 B
-- Skeleton 1: `sub_080B57C0` 740 B, `sub_080B6480` 184 B, `Skeleton_TrySelectRetreatCell` 704 B (94%), `SceneActorTarget_ResolvePendingObjectSkeleton` 292 B (98%), `Skeleton_SelectDistanceReaction` 3656 B (93%), `sub_080B8DE0` 252 B, `sub_080B9158` 3768 B, `sub_080BA268` 784 B, `SceneActorReaction_TickForwardBurst` 348 B (99%), `Skeleton_TickDecayingLunge` 444 B (98%), `Skeleton_UpdateHomingBurst` 508 B (98%), `sub_080BAE04` 1752 B, `Skeleton_ConvergeDisplacedPosition` 4116 B (89%), `sub_080BF0E4` 3040 B (72%), `sub_080BFCC4` 2452 B (94%)
-- Skeleton 2: `Golem_ReactToContact` 6372 B (80%), `sub_080C30CC` 372 B, `Skeleton_Init` 4684 B
+- Skeleton: `sub_080B57C0` 740 B, `sub_080B6480` 184 B, `Skeleton_TrySelectRetreatCell` 704 B (94%), `SceneActorTarget_ResolvePendingObjectSkeleton` 292 B (98%), `Skeleton_SelectDistanceReaction` 3656 B (93%), `sub_080B8DE0` 252 B, `sub_080B9158` 3768 B, `sub_080BA268` 784 B, `SceneActorReaction_TickForwardBurst` 348 B (99%), `Skeleton_TickDecayingLunge` 444 B (98%), `Skeleton_UpdateHomingBurst` 508 B (98%), `sub_080BAE04` 1752 B, `Skeleton_ConvergeDisplacedPosition` 4116 B (89%), `sub_080BF0E4` 3040 B (72%), `sub_080BFCC4` 2452 B (94%), `Golem_ReactToContact` 6372 B (80%), `sub_080C30CC` 372 B, `Skeleton_Init` 4684 B
 - Golem: `sub_080C47DC` 480 B (70%), `sub_080C4F9C` 448 B (92%), `sub_080C53A8` 404 B, `sub_080C553C` 928 B, `sub_080C5930` 1584 B, `Golem_UpdateRevivalReturn` 176 B (90%), `Golem_UpdateChargeRecovery` 1264 B (86%), `Golem_UpdateSlideImpact` 860 B (91%), `sub_080C7E18` 2396 B, `Golem_ResumeBehaviorAfterDisplacement` 4304 B (96%), `sub_080C9C04` 8764 B, `sub_080CBF24` 2300 B, `Golem_UpdateChargePursuit` 4504 B (80%), `Golem_ResumeRouteAfterControl` 2364 B (90%), `Golem_ArriveAndRestore` 1972 B (88%), `Golem_Init` 4072 B
 - Mummy: `sub_080D0C30` 484 B, `Mummy_TurnTowardRoute` 1628 B (84%), `sub_080D1644` 320 B, `Mummy_ResumeRouteAfterRecovery` 1008 B (88%), `sub_080D2584` 4852 B, `Mummy_UpdateDefeat` 1256 B (91%), `Mummy_UpdatePlayerRoute` 2012 B (93%), `sub_080D453C` 900 B, `sub_080D49DC` 2436 B, `Mummy_UpdateProbeNavigation` 896 B (83%), `Mummy_ResumeDelayedRoute` 2144 B (92%), `Mummy_TryDirectPursuit` 2032 B (92%), `sub_080D7568` 2360 B, `sub_080D7F50` 408 B, `Mummy_UpdateBurnDamage` 6504 B (99%), `SceneActor_FindDirectionalCell` 1768 B (85%), `BouncingObject_RefreshNearbyHeading` 112 B (98%), `sub_080DA5C8` 176 B, `Mummy_SelectMovementResponse` 6316 B (85%), `Mummy_ResumePlayerPursuit` 1960 B (90%), `Mummy_ResumeRouteAfterCheckpoint` 588 B (99%), `Mummy_Init` 4188 B
 - Dog: `sub_080DDD90` 312 B, `sub_080DE42C` 292 B, `sub_080DE6E0` 588 B, `Dog_UpdateCollisionBounds` 680 B (99%), `SceneActorControl_TickActionCooldown` 292 B (98%), `sub_080DEF78` 800 B, `sub_080DF400` 724 B, `sub_080DF6EC` 540 B, `SceneActorAnimation_SpawnTrailAtPosition` 232 B, `sub_080DFA5C` 368 B, `sub_080DFC34` 1880 B, `sub_080E04D0` 204 B, `sub_080E0750` 4232 B, `Dog_ChooseReactionBehavior` 4500 B (84%), `sub_080E3874` 2360 B, `sub_080E41F8` 312 B, `sub_080E4330` 296 B, `Dog_BeginDelayedRouteRecovery` 1976 B (88%), `sub_080E5744` 4304 B, `sub_080E6848` 292 B, `sub_080E6B1C` 200 B, `Dog_UpdateShadowlessApproach` 548 B (84%)
 - Mimic: `Mimic_UpdateHitRecovery` 680 B (88%), `SceneActor_LeapTowardTarget` 912 B (96%), `sub_080E7D9C` 300 B, `sub_080E80BC` 156 B, `SceneActor_GetDirectionFlags` 48 B, `sub_080E8444` 72 B, `sub_080E86FC` 108 B, `Mimic_Init` 4264 B
 - Octopus: `sub_080E9C20` 872 B, `Octopus_UpdateDefeat` 876 B (87%), `sub_080EB168` 304 B, `sub_080EB8CC` 84 B, `sub_080EBA84` 96 B, `sub_080EBEE0` 172 B, `Octopus_Init` 3832 B
-- Ivy 1: `sub_080ED4E0` 856 B, `SceneActorControl_UpdateAnimationTransition` 328 B, `sub_080EFEA0` 180 B, `sub_080EFF6C` 84 B, `sub_080F0108` 92 B, `sub_080F0C20` 4020 B, `sub_080F1FE8` 196 B, `sub_080F20AC` 436 B, `sub_080F2538` 376 B
-- Ivy 2: `sub_080F421C` 1152 B, `sub_080F4708` 692 B, `ActorPhase_ApproachNeutral` 160 B (80%)
-- Sword: `ActorPhase_BeginLunge` 308 B (97%), `sub_080F4FA8` 228 B, `sub_080F508C` 228 B, `Sword_BeginTargetOrbit` 364 B (96%), `sub_080F5620` 184 B, `TargetMotion_AdvanceFollowSegment` 308 B (87%), `sub_080F5C9C` 472 B, `sub_080F5F24` 404 B, `sub_080F6370` 84 B, `sub_080F67AC` 2020 B, `Sword_InitAttackComponents` 1224 B (85%), `Sword_InitializeFromScript` 212 B (91%), `sub_080F7580` 60 B
-- Axe: `Axe_UpdateTargetLunge` 688 B (84%), `Axe_UpdateTurnAnimation` 692 B (83%), `Axe_ConvergeRecoveryMotion` 400 B (81%), `SceneActorControl_ApplyDampedMotion` 280 B (91%), `Axe_UpdateCollapsePhase` 304 B (94%), `sub_080FAA5C` 440 B, `sub_080FAFD0` 128 B (95%), `sub_080FB30C` 1080 B, `sub_080FB744` 420 B, `sub_080FB8E8` 80 B, `SpriteGroup_InitAnimatedSprites` 180 B (99%), `Axe_EmitMotionTrail` 588 B (82%), `ActorPhase_EmitTrailSprite` 600 B (85%), `ActorPhase_SelectDistantWaypoint` 328 B (97%), `sub_080FC094` 868 B, `sub_080FC4F4` 768 B, `sub_080FCB64` 648 B, `sub_080FCDEC` 608 B, `sub_080FE3B0` 388 B (86%), `Axe_Init` 4296 B
+- Ivy: `sub_080ED4E0` 856 B, `SceneActorControl_UpdateAnimationTransition` 328 B, `sub_080EFEA0` 180 B, `sub_080EFF6C` 84 B, `sub_080F0108` 92 B, `sub_080F0C20` 4020 B, `sub_080F1FE8` 196 B, `sub_080F20AC` 436 B, `sub_080F2538` 376 B, `sub_080F421C` 1152 B, `sub_080F4708` 692 B, `ActorPhase_ApproachNeutral` 160 B (80%)
+- Sword: `ActorPhase_BeginLunge` 308 B (97%), `sub_080F4FA8` 228 B, `sub_080F508C` 228 B, `Sword_BeginTargetOrbit` 364 B (96%), `sub_080F5620` 184 B, `TargetMotion_AdvanceFollowSegment` 308 B (87%), `sub_080F5C9C` 472 B, `sub_080F5F24` 404 B, `sub_080F6370` 84 B, `sub_080F67AC` 2020 B, `Sword_InitAttackComponents` 1224 B (85%), `Sword_InitializeFromScript` 212 B (91%)
+- Axe: `sub_080F7580` 60 B, `sub_080F75C0` 340 B, `Axe_UpdateOrbitAttack` 1640 B (90%), `Axe_UpdateTargetLunge` 688 B (84%), `Axe_UpdateTurnAnimation` 692 B (83%), `Axe_ConvergeRecoveryMotion` 400 B (81%), `SceneActorControl_ApplyDampedMotion` 280 B (91%), `Axe_UpdateCollapsePhase` 304 B (94%), `sub_080FAA5C` 440 B, `sub_080FAFD0` 128 B (95%), `sub_080FB30C` 1080 B, `sub_080FB744` 420 B, `sub_080FB8E8` 80 B, `SpriteGroup_InitAnimatedSprites` 180 B (99%), `Axe_EmitMotionTrail` 588 B (82%), `ActorPhase_EmitTrailSprite` 600 B (85%), `ActorPhase_SelectDistantWaypoint` 328 B (97%), `sub_080FC094` 868 B, `sub_080FC4F4` 768 B, `sub_080FCB64` 648 B, `sub_080FCDEC` 608 B, `sub_080FE3B0` 388 B (86%), `Axe_Init` 4296 B
 - Glove: `sub_081172C4` 820 B, `sub_081175F8` 848 B, `Glove_UpdateStopping` 1572 B (90%), `sub_08117F6C` 888 B, `Glove_UpdateDefeatEffects` 1452 B (81%), `sub_081198F8` 648 B, `MotionActor_DispatchRequestedState` 296 B (97%), `sub_0811A158` 1196 B, `sub_0811A6C4` 1140 B
-- Armor 1: `ActorController_SetAnimation` 232 B (83%)
-- Armor 2: `sub_08185F70` 1068 B, `Armor_UpdateAction10Sequence` 164 B (85%), `Armor_SelectAlignedAttack` 492 B (81%), `sub_08186EB4` 892 B, `Armor_UpdateAxisAttackDecision` 956 B (86%), `Armor_UpdateAlignedAttackDecision` 956 B (86%), `sub_081879A8` 1436 B, `sub_08187F44` 1656 B, `sub_081885BC` 1472 B, `sub_08188B7C` 1440 B, `sub_0818911C` 1460 B, `Armor_UpdateFacingDecision` 1412 B (82%), `sub_08189D04` 756 B, `sub_08189FF8` 1232 B, `Armor_ApplySceneCommands` 800 B (83%), `sub_0818A820` 1428 B, `sub_0818C6F8` 636 B, `Armor_RetractPartStretch` 132 B (88%), `Armor_BeginPartTravelToPlayer` 312 B (94%)
-- Armor 3: `sub_0818E170` 76 B, `Armor_InitParts` 812 B (86%), `Armor6_DestroySpriteColliders` 44 B, `SpriteColliderGroup_ActivateParts` 100 B (80%), `SpriteColliderGroup_ResetActiveParts` 84 B (95%)
+- Armor: `ActorController_SetAnimation` 232 B (83%), `sub_08185F70` 1068 B, `Armor_UpdateAction10Sequence` 164 B (85%), `Armor_SelectAlignedAttack` 492 B (81%), `sub_08186EB4` 892 B, `Armor_UpdateAxisAttackDecision` 956 B (86%), `Armor_UpdateAlignedAttackDecision` 956 B (86%), `sub_081879A8` 1436 B, `sub_08187F44` 1656 B, `sub_081885BC` 1472 B, `sub_08188B7C` 1440 B, `sub_0818911C` 1460 B, `Armor_UpdateFacingDecision` 1412 B (82%), `sub_08189D04` 756 B, `sub_08189FF8` 1232 B, `Armor_ApplySceneCommands` 800 B (83%), `sub_0818A820` 1428 B, `sub_0818C6F8` 636 B, `Armor_RetractPartStretch` 132 B (88%), `Armor_BeginPartTravelToPlayer` 312 B (94%), `sub_0818E170` 76 B, `Armor_InitParts` 812 B (86%), `Armor6_DestroySpriteColliders` 44 B, `SpriteColliderGroup_ActivateParts` 100 B (80%), `SpriteColliderGroup_ResetActiveParts` 84 B (95%)
 - Cannon battery: `sub_08199BD8` 72 B, `sub_0819A414` 92 B
 - Growth hazard: `sub_081B7614` 136 B, `AnimatedMarker_BeginStateThree` 36 B (83%), `AnimatedMarker_TickActive` 84 B, `sub_081B7B1C` 380 B, `sub_081B7D44` 132 B, `sub_081B7DC8` 132 B
 - Cannon emitter: `CannonEmitter_InitializeFromScript` 672 B (99%)
@@ -204,44 +176,36 @@ Still to match (352):
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
 | **Vanargand** | 140/189 | 37.0% | `███████░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Vanargand 1 | 2/3 | 3.8% | `█░░░░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Vanargand 2 | 103/132 | 46.9% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Vanargand 3 | 11/25 | 17.8% | `████░░░░░░░░░░░░░░░░` |
+| &nbsp;&nbsp;Vanargand | 116/160 | 36.0% | `███████░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Vanargand projectile pool | 24/29 | 53.9% | `███████████░░░░░░░░░` |
 | Hresvelgr | 200/235 | 61.6% | `████████████░░░░░░░░` |
 | Ratatosk | 141/167 | 51.9% | `██████████░░░░░░░░░░` |
-| **Boss** | 15/21 | 18.5% | `████░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Boss slot 2 1 | 8/10 | 9.8% | `██░░░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Boss slot 2 2 | 7/11 | 28.1% | `██████░░░░░░░░░░░░░░` |
+| Boss slot 2 | 15/21 | 18.5% | `████░░░░░░░░░░░░░░░░` |
 | Nidhoggr | 24/33 | 40.3% | `████████░░░░░░░░░░░░` |
 
 Still to match (125):
 
-- Boss slot 2 1: `sub_0817C318` 64 B, `BossSlot2_SelectCombatAction` 4412 B (83%)
-- Boss slot 2 2: `BossSlot2_ApplyPendingDamage` 664 B (83%), `BossSlot2_UpdatePresentation` 912 B (95%), `sub_0817FDE0` 1440 B, `BossSlot2_AdvanceStepFromScript` 176 B (75%)
+- Boss slot 2: `sub_0817C318` 64 B, `BossSlot2_SelectCombatAction` 4412 B (83%), `BossSlot2_ApplyPendingDamage` 664 B (83%), `BossSlot2_UpdatePresentation` 912 B (95%), `sub_0817FDE0` 1440 B, `BossSlot2_AdvanceStepFromScript` 176 B (75%)
 - Nidhoggr: `sub_0818EA90` 356 B, `sub_0818ECFC` 316 B, `Nidhoggr_StepPoolAnimation` 288 B (86%), `Nidhoggr_StepMovingSpriteEffect` 408 B, `sub_0818F0FC` 284 B, `Nidhoggr_UpdateFallingAttackEffect` 944 B (87%), `sub_0818FA54` 428 B, `sub_0818FEE4` 912 B, `sub_08190274` 392 B
 - Hresvelgr: `sub_0819BB18` 416 B, `sub_0819BCB8` 636 B, `Hresvelgr_GetTravelTarget` 216 B, `sub_0819C6AC` 232 B, `sub_0819C870` 136 B, `sub_0819C8F8` 136 B, `Hresvelgr_SteerTowardTarget` 652 B (82%), `ActorAction_FinishRecoveryAnimation` 120 B (85%), `sub_0819E3B4` 84 B, `sub_0819EB84` 76 B, `sub_0819EBD0` 56 B, `DirectionBurst_EmitOffset` 220 B (55%), `Hresvelgr_UpdateRandomVolleyPhase` 336 B (82%), `Hresvelgr_UpdatePlayerRelease` 1564 B (86%), `Hresvelgr_PlayDescent` 196 B (90%), `Hresvelgr_UpdateBoundaryBarrage` 732 B (99%), `Hresvelgr_EmitRandomMotionBurst` 332 B (85%), `sub_081A0FF0` 328 B, `sub_081A14FC` 1764 B, `sub_081A1D18` 324 B, `sub_081A1EFC` 1148 B, `Hresvelgr_InitializeRadialOffsets` 184 B (86%), `Hresvelgr_DispatchSceneMessages` 680 B (88%), `Hresvelgr_UpdateCollisionPresentation` 868 B (98%), `sub_081A2C80` 1520 B, `Hresvelgr_InitializeShots` 172 B (92%), `EffectPool_AllocateEntry` 256 B, `EffectPool_UpdateEntry` 800 B (97%), `EffectPool_CreateEntries` 188 B, `MotionEntry_UpdatePosition` 156 B, `MotionEntry_Create` 380 B, `sub_081A42AC` 744 B, `sub_081A4AB4` 204 B, `sub_081A4BF8` 404 B, `sub_081A4DF0` 232 B
-- Vanargand 1: `Vanargand_UpdatePaletteTransition` 2800 B (81%)
-- Vanargand 2: `sub_081A6A08` 228 B, `sub_081A6AEC` 736 B, `sub_081A7204` 228 B, `sub_081A76C8` 68 B, `sub_081A7760` 80 B, `sub_081A77B0` 92 B, `ScenePanel_ApplyPairTransition` 288 B, `Vanargand_UpdateMode3Transition` 160 B (92%), `Vanargand_UpdateTimedAlternateTransition` 176 B (95%), `sub_081A8A0C` 104 B, `sub_081A8AE4` 68 B, `sub_081A8B28` 124 B, `sub_081A8E08` 320 B, `Vanargand_UpdatePlayerDrain` 560 B (89%), `sub_081A9178` 552 B, `sub_081A93A0` 520 B, `Vanargand_UpdateSequencedPairAttack` 560 B (100%), `Vanargand_UpdateFacingPairAttack` 552 B (98%), `Vanargand_UpdateRepeatedPairAttack` 440 B (100%), `sub_081AA788` 1672 B, `Vanargand_UpdateOffsetMotion` 212 B (84%), `sub_081AB904` 352 B, `sub_081ABA64` 3824 B, `sub_081AD3E8` 380 B, `sub_081AD564` 1620 B, `sub_081ADBF8` 276 B, `sub_081AE0C0` 5064 B, `Vanargand_ProjectEffectOffset` 96 B, `sub_081AF7F4` 500 B
-- Vanargand 3: `Vanargand_UpdatePartPairedStrike` 1500 B (94%), `Vanargand_UpdatePartRetreat` 720 B (95%), `Vanargand_UpdatePartGroundStrike` 1632 B (100%), `Vanargand_UpdatePartOffsetStrike` 1240 B (93%), `Vanargand_UpdatePartSweepingStrike` 1692 B (94%), `Vanargand_UpdatePartLunge` 780 B (90%), `Vanargand_ReleaseRadialEffects` 648 B (87%), `Vanargand_EmitRadialPartEffects` 732 B (81%), `Vanargand_UpdatePartImpact` 1128 B (85%), `Vanargand_UpdatePartSidestep` 868 B (94%), `sub_081B4DA4` 1348 B, `sub_081B562C` 1132 B, `sub_081B5E38` 108 B, `sub_081B5EA4` 732 B
+- Vanargand: `Vanargand_UpdatePaletteTransition` 2800 B (81%), `sub_081A6A08` 228 B, `sub_081A6AEC` 736 B, `sub_081A7204` 228 B, `sub_081A76C8` 68 B, `sub_081A7760` 80 B, `sub_081A77B0` 92 B, `ScenePanel_ApplyPairTransition` 288 B, `Vanargand_UpdateMode3Transition` 160 B (92%), `Vanargand_UpdateTimedAlternateTransition` 176 B (95%), `sub_081A8A0C` 104 B, `sub_081A8AE4` 68 B, `sub_081A8B28` 124 B, `sub_081A8E08` 320 B, `Vanargand_UpdatePlayerDrain` 560 B (89%), `sub_081A9178` 552 B, `sub_081A93A0` 520 B, `Vanargand_UpdateSequencedPairAttack` 560 B (100%), `Vanargand_UpdateFacingPairAttack` 552 B (98%), `Vanargand_UpdateRepeatedPairAttack` 440 B (100%), `sub_081AA788` 1672 B, `Vanargand_UpdateOffsetMotion` 212 B (84%), `sub_081AB904` 352 B, `sub_081ABA64` 3824 B, `sub_081AD3E8` 380 B, `sub_081AD564` 1620 B, `sub_081ADBF8` 276 B, `sub_081AE0C0` 5064 B, `Vanargand_ProjectEffectOffset` 96 B, `sub_081AF7F4` 500 B, `Vanargand_UpdatePartPairedStrike` 1500 B (94%), `Vanargand_UpdatePartRetreat` 720 B (95%), `Vanargand_UpdatePartGroundStrike` 1632 B (100%), `Vanargand_UpdatePartOffsetStrike` 1240 B (93%), `Vanargand_UpdatePartSweepingStrike` 1692 B (94%), `Vanargand_UpdatePartLunge` 780 B (90%), `Vanargand_ReleaseRadialEffects` 648 B (87%), `Vanargand_EmitRadialPartEffects` 732 B (81%), `Vanargand_UpdatePartImpact` 1128 B (85%), `Vanargand_UpdatePartSidestep` 868 B (94%), `sub_081B4DA4` 1348 B, `sub_081B562C` 1132 B, `sub_081B5E38` 108 B, `sub_081B5EA4` 732 B
 - Vanargand projectile pool: `sub_081B6888` 364 B, `ActorEffect_UpdateApproachLaunch` 368 B (99%), `ActorEffect_UpdateRadialExpiry` 216 B (86%), `VanargandProjectile_Create` 300 B (80%), `sub_081B71D4` 304 B
 - Ratatosk: `Ratatosk_UpdatePointDistancesToPlayer` 84 B (85%), `sub_081F2F90` 244 B, `sub_081F3414` 120 B, `sub_081F3C68` 1308 B, `ActorMotion_UpdateTimedPaletteAnimation` 316 B (84%), `Ratatosk_UpdateProjectileVolley` 772 B (99%), `Ratatosk_UpdateDefeatSequence` 1064 B (86%), `Ratatosk_BeginDirectionalReaction` 184 B (99%), `sub_081F5290` 800 B, `sub_081F55B0` 320 B, `sub_081F5E60` 200 B, `sub_081F6428` 800 B, `SceneActors_FireTrackingProjectileSpread` 332 B (99%), `sub_081F6B90` 1608 B, `sub_081F79F8` 172 B, `Ratatosk_UpdateCloneAttack` 548 B (89%), `sub_081F7FD0` 1584 B, `Ratatosk_UpdateSunOrbPlacement` 672 B (96%), `sub_081F92C8` 2160 B, `sub_081F9BEC` 544 B, `sub_081FAE0C` 2428 B, `sub_081FB7D8` 48 B, `Ratatosk_UpdateParticlePool` 520 B (94%), `SceneParticles_SpawnAtPosition` 564 B (98%), `sub_081FBF2C` 576 B, `sub_081FC26C` 940 B
 
 </details>
 
-<details><summary><b>Field objects and hazards</b>: 998/1082 functions, 79.6% of bytes</summary>
+<details><summary><b>Field objects and hazards</b>: 987/1070 functions, 79.6% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
 | **Tether** | 129/135 | 84.0% | `█████████████████░░░` |
 | &nbsp;&nbsp;Tether actor (tentative) | 108/113 | 84.6% | `█████████████████░░░` |
 | &nbsp;&nbsp;Tether actor | 21/22 | 77.1% | `███████████████░░░░░` |
-| **Scene** | 104/115 | 82.4% | `████████████████░░░░` |
+| **Scene** | 95/105 | 82.6% | `█████████████████░░░` |
 | &nbsp;&nbsp;Scene objects (tentative) | 37/37 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene debris | 11/13 | 62.6% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Scene slot | 26/28 | 82.9% | `█████████████████░░░` |
-| &nbsp;&nbsp;Scene volume 1 | 19/23 | 65.0% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Scene volume 2 | 6/6 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Scene slot | 17/18 | 85.1% | `█████████████████░░░` |
+| &nbsp;&nbsp;Scene volume | 25/29 | 82.6% | `█████████████████░░░` |
 | &nbsp;&nbsp;Scene script object | 5/8 | 38.3% | `████████░░░░░░░░░░░░` |
 | **Named** | 53/61 | 76.6% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Named object | 39/46 | 74.3% | `███████████████░░░░░` |
@@ -249,12 +213,12 @@ Still to match (125):
 | **Native** | 41/44 | 72.6% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Native effect | 29/31 | 75.9% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Native particle | 12/13 | 58.9% | `████████████░░░░░░░░` |
-| **Terrain** | 62/64 | 95.8% | `███████████████████░` |
+| **Terrain** | 61/63 | 95.8% | `███████████████████░` |
 | &nbsp;&nbsp;Terrain overlays (tentative) | 11/11 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Terrain modifiers (tentative) | 20/20 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Terrain shadows | 13/13 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Terrain edge markers | 9/9 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Terrain | 9/11 | 74.4% | `███████████████░░░░░` |
+| &nbsp;&nbsp;Terrain | 8/10 | 72.8% | `███████████████░░░░░` |
 | Items and containers (tentative) | 29/30 | 92.0% | `██████████████████░░` |
 | **Proximity** | 23/30 | 68.2% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Proximity particle emitter | 10/11 | 94.2% | `███████████████████░` |
@@ -285,7 +249,7 @@ Still to match (125):
 | Pooled interactables (tentative) | 20/20 | 100.0% | `████████████████████` |
 | Collision controllers (tentative) | 16/16 | 100.0% | `████████████████████` |
 | Hit switch (tentative) | 17/17 | 100.0% | `████████████████████` |
-| Trap | 18/21 | 65.7% | `█████████████░░░░░░░` |
+| Trap | 17/20 | 65.1% | `█████████████░░░░░░░` |
 | Solar bomb | 7/10 | 23.1% | `█████░░░░░░░░░░░░░░░` |
 | Pool 1B8 | 11/13 | 41.7% | `████████░░░░░░░░░░░░` |
 | Floor switch | 11/13 | 55.2% | `███████████░░░░░░░░░` |
@@ -298,7 +262,7 @@ Still to match (125):
 | Saved-position marker | 9/9 | 100.0% | `████████████████████` |
 | Damage controller | 5/5 | 100.0% | `████████████████████` |
 
-Still to match (84):
+Still to match (83):
 
 - Items and containers (tentative): `sub_080070D0` 564 B
 - Group objects (tentative): `sub_0800FC28` 624 B (82%), `sub_0800FE98` 628 B (83%), `sub_0801010C` 396 B, `sub_08010298` 228 B
@@ -321,8 +285,8 @@ Still to match (84):
 - Collectible: `CallbackPool_InvokeActive` 68 B (82%), `sub_08115AC8` 644 B
 - Sprite drop: `sub_081160CC` 436 B
 - Terrain: `sub_0811ABD8` 124 B, `sub_0811ACCC` 192 B
-- Scene slot: `sub_0812D064` 280 B, `sub_0812D58C` 228 B
-- Scene volume 1: `sub_0817A918` 252 B, `BossSlot2_SpawnBobbingFormation` 332 B (81%), `sub_0817AEC8` 288 B, `sub_0817B2DC` 272 B
+- Scene slot: `sub_0812D064` 280 B
+- Scene volume: `sub_0817A918` 252 B, `BossSlot2_SpawnBobbingFormation` 332 B (81%), `sub_0817AEC8` 288 B, `sub_0817B2DC` 272 B
 - Scene script object: `SceneScriptObject_UpdateBurst` 376 B (84%), `SceneScriptObject_ApplyHitFlash` 104 B (85%), `sub_081B866C` 784 B
 - Tether actor: `sub_081C0048` 400 B
 - Ship wheel: `sub_081C49F4` 436 B, `sub_081C4EF0` 272 B, `sub_081C5264` 120 B, `sub_081C5308` 228 B
@@ -333,11 +297,11 @@ Still to match (84):
 
 </details>
 
-<details><summary><b>Scene actors and NPCs</b>: 1783/2022 functions, 65.2% of bytes</summary>
+<details><summary><b>Scene actors and NPCs</b>: 1781/2018 functions, 65.5% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Scene** | 584/675 | 57.9% | `████████████░░░░░░░░` |
+| **Scene** | 572/661 | 57.9% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Scene object controller (tentative) | 41/43 | 66.5% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Scene actor resources and lifecycle (tentative) | 20/20 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene actor animation and scripted actions (tentative) | 43/52 | 66.5% | `█████████████░░░░░░░` |
@@ -373,14 +337,13 @@ Still to match (84):
 | &nbsp;&nbsp;Scene actor sequence | 21/21 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene character | 11/12 | 95.2% | `███████████████████░` |
 | &nbsp;&nbsp;Scene NPC | 61/71 | 60.7% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Scene actors | 12/14 | 50.0% | `██████████░░░░░░░░░░` |
-| **Actor** | 467/529 | 72.4% | `██████████████░░░░░░` |
+| **Actor** | 466/526 | 73.4% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Actor graphics and basic states (tentative) | 70/82 | 56.4% | `███████████░░░░░░░░░` |
 | &nbsp;&nbsp;Actor animation and action controllers (tentative) | 16/18 | 78.3% | `████████████████░░░░` |
 | &nbsp;&nbsp;Actor projectile and reaction controllers (tentative) | 20/22 | 70.5% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Actor damage and lifecycle (tentative) | 9/12 | 21.4% | `████░░░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Actor attachment manager | 43/44 | 95.6% | `███████████████████░` |
-| &nbsp;&nbsp;Actor phase | 8/10 | 51.5% | `██████████░░░░░░░░░░` |
+| &nbsp;&nbsp;Actor phase | 6/6 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Actor recoil | 5/6 | 77.6% | `████████████████░░░░` |
 | &nbsp;&nbsp;Actor | 8/9 | 85.4% | `█████████████████░░░` |
 | &nbsp;&nbsp;Actor emitter | 9/9 | 100.0% | `████████████████████` |
@@ -395,18 +358,17 @@ Still to match (84):
 | &nbsp;&nbsp;Actor status | 10/19 | 23.5% | `█████░░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Actor animation controller (tentative) | 98/103 | 89.1% | `██████████████████░░` |
 | &nbsp;&nbsp;Actor display | 19/28 | 47.2% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Actor glyph trail | 11/14 | 44.5% | `█████████░░░░░░░░░░░` |
+| &nbsp;&nbsp;Actor glyph trail | 12/15 | 46.5% | `█████████░░░░░░░░░░░` |
 | State actor kind 086121C4 (tentative) | 86/96 | 80.0% | `████████████████░░░░` |
+| Singleton slot 7 | 49/58 | 43.9% | `█████████░░░░░░░░░░░` |
 | Grid attack actor (tentative) | 63/69 | 62.6% | `█████████████░░░░░░░` |
-| Singleton slot 7 | 37/44 | 43.2% | `█████████░░░░░░░░░░░` |
 | **Contact** | 45/50 | 69.9% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Contact actor pool setup and display (tentative) | 8/9 | 75.4% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Contact actor pool states and lifecycle (tentative) | 11/14 | 47.3% | `█████████░░░░░░░░░░░` |
 | &nbsp;&nbsp;Contact swarm states and spawning (tentative) | 17/18 | 87.2% | `█████████████████░░░` |
 | &nbsp;&nbsp;Contact burst effects | 9/9 | 100.0% | `████████████████████` |
-| **Script** | 84/92 | 60.2% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Script actor 1 | 31/34 | 74.0% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Script actor 2 | 47/47 | 100.0% | `████████████████████` |
+| **Script** | 83/91 | 59.4% | `████████████░░░░░░░░` |
+| &nbsp;&nbsp;Script actor | 77/80 | 88.6% | `██████████████████░░` |
 | &nbsp;&nbsp;Script combat actor | 6/11 | 26.8% | `█████░░░░░░░░░░░░░░░` |
 | Task 4E01 | 29/38 | 38.6% | `████████░░░░░░░░░░░░` |
 | Registry A8CB | 22/25 | 85.1% | `█████████████████░░░` |
@@ -416,13 +378,13 @@ Still to match (84):
 | **Orbit** | 18/23 | 58.3% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Orbit contact actor (tentative) | 8/8 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Orbit motion | 10/15 | 50.7% | `██████████░░░░░░░░░░` |
-| Pursuing actor | 18/21 | 63.1% | `█████████████░░░░░░░` |
 | **Pooled** | 53/54 | 98.1% | `████████████████████` |
 | &nbsp;&nbsp;Pooled actor manager | 9/9 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Pooled actor shared helpers (tentative) | 17/17 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Pooled actor controllers (tentative) | 27/28 | 96.6% | `███████████████████░` |
 | Child group | 12/17 | 68.8% | `██████████████░░░░░░` |
 | Scripted message actor 08612344 (tentative) | 88/88 | 100.0% | `████████████████████` |
+| Pursuing actor | 18/21 | 70.3% | `██████████████░░░░░░` |
 | Phase object | 10/15 | 68.3% | `██████████████░░░░░░` |
 | Sequence contact actor pool (tentative) | 21/22 | 85.8% | `█████████████████░░░` |
 | Common scene actor controller | 27/27 | 100.0% | `████████████████████` |
@@ -432,7 +394,7 @@ Still to match (84):
 | Spinning approach motion (tentative) | 4/4 | 100.0% | `████████████████████` |
 | Keyframe actor | 2/3 | 77.5% | `████████████████░░░░` |
 
-Still to match (239):
+Still to match (237):
 
 - Scene object controller (tentative): `sub_0801F058` 840 B, `sub_0801F93C` 2712 B
 - Actor graphics and basic states (tentative): `sub_08021F4C` 652 B, `sub_08022624` 112 B, `sub_08022694` 252 B, `sub_08022790` 232 B, `sub_08022878` 464 B, `sub_08022B18` 524 B, `sub_08022DBC` 232 B, `sub_08022EA4` 228 B, `SceneActors_DispatchCommands` 1644 B (81%), `sub_08023FE8` 692 B, `sub_080243CC` 116 B, `sub_0802483C` 264 B
@@ -468,18 +430,17 @@ Still to match (239):
 - Scene actor approach: `SceneActorApproach_CaptureTargetAndRunAction` 240 B (95%), `sub_080C09F0` 2300 B (93%)
 - Phase object: `ColorPulse_BeginNearApproach` 100 B, `sub_080F2BE4` 80 B, `PhaseObject_TickCountdown` 204 B (78%), `sub_080F2F24` 88 B, `sub_080F2F7C` 560 B
 - Child group: `sub_080F33BC` 100 B, `sub_080F3420` 168 B, `sub_080F38E0` 476 B, `sub_080F3B30` 48 B, `ChildGroup_UpdateTrailingMembers` 356 B (99%)
-- Actor phase: `sub_080F75C0` 340 B, `Axe_UpdateOrbitAttack` 1640 B (90%)
 - Actor recoil: `ActorRecoil_ApplyDirectionalImpulse` 340 B
 - Motion actor: `sub_081169A8` 548 B, `sub_08116E44` 1104 B
 - Actor: `sub_0811BF44` 344 B
 - Actor ability: `ActorAction_TrySpawn` 136 B (83%)
 - Registry A8CB: `ActorMotion_SetKnockback` 256 B, `sub_0811FEE0` 488 B, `sub_08120FF4` 208 B
 - Scene actor 14: `SpriteEffect_InitCollider` 156 B
-- Pursuing actor: `PursuingActor_AdvanceChase` 448 B (83%), `PursuingActor_UpdateRecoil` 516 B (83%), `sub_0812C124` 492 B
+- Pursuing actor: `sub_0812B350` 88 B, `PursuingActor_AdvanceChase` 448 B (83%), `PursuingActor_UpdateRecoil` 516 B (83%)
 - Actor mode: `sub_0812E094` 132 B, `sub_0812E118` 708 B, `sub_0812E46C` 312 B, `ActorParticles_SpawnBurst` 332 B (85%), `ActorParticles_SpawnWideBurst` 216 B (93%)
 - Scene actor behavior: `sub_0812E7EC` 1764 B, `sub_0812F3CC` 340 B, `SceneActorReaction_UpdateContactRoute` 800 B (81%), `SceneActorControl_UpdateEntryTransition` 280 B (80%), `SceneActorReaction_UpdateRouteReturn` 1976 B (85%), `SceneActorReaction_UpdateRouteRecovery` 616 B (89%), `sub_081304C8` 264 B, `sub_08130994` 288 B, `sub_08130CAC` 436 B, `sub_08131044` 688 B, `sub_081312F4` 500 B, `sub_081314E8` 824 B, `sub_08131A2C` 204 B, `sub_08131AF8` 72 B, `sub_08131B40` 132 B (66%), `SceneActorReaction_ApplyAreaDamage` 1008 B (88%)
 - Scene actor placement: `SceneActorReaction_ApplyLinkedAreaDamage` 1064 B (87%), `sub_08135CC4` 176 B, `SceneActorReaction_ResolveDamage` 1156 B (88%), `sub_081363F4` 1492 B, `sub_08136D40` 188 B
-- Script actor 1: `ScriptActor_TestFlagFromScript` 116 B (51%), `sub_0815A73C` 252 B, `sub_0815AC04` 240 B
+- Script actor: `ScriptActor_TestFlagFromScript` 116 B (51%), `sub_0815A73C` 252 B, `sub_0815AC04` 240 B
 - Actor position: `sub_0817A354` 112 B
 - Actor state: `ActorEffect_StepTurn` 176 B (83%)
 - Scene event actor: `sub_0817E378` 568 B (86%), `sub_0817E6E0` 912 B, `BossSlot2_UpdateSummonSpinSequence` 952 B (94%)
@@ -496,8 +457,7 @@ Still to match (239):
 - Task 4E01: `sub_081D75E8` 268 B, `Task4E01_BeginImpactAnimation` 820 B (88%), `Task4E01_StartTerminalAnimation` 804 B (84%), `Task4E01_ResolveTerrainDirection` 696 B (97%), `Task4E01_SelectTerrainTurn` 696 B (93%), `sub_081D8CF0` 664 B, `sub_081D905C` 544 B, `Task4E01_UpdateExpandingImpact` 788 B (88%), `Task4E01_SpawnImpactChildren` 616 B (90%)
 - Actor animation controller (tentative): `Actor_UpdateIdleWait` 292 B (88%), `sub_081E728C` 1640 B, `sub_081E9BA4` 248 B, `sub_081E9E44` 892 B, `sub_081EA4DC` 576 B
 - Actor display: `ActorEffect_SpawnRandomizedBurst` 292 B (87%), `ActorEffect_SpawnBurstAtAnchor` 284 B (86%), `sub_081EC628` 72 B, `ActorDisplay_UpdateScreenAnchor` 284 B (93%), `sub_081ED1A4` 1104 B, `SceneActors_UpdateLeftDeparture` 728 B (96%), `sub_081EDE4C` 740 B, `SceneActors_UpdateHitSensitiveDeparture` 1452 B (91%), `SceneActors_UpdatePaletteDispersal` 772 B (94%)
-- Scene actors: `sub_081EEDDC` 84 B, `sub_081EEECC` 608 B
-- Singleton slot 7: `Slot7_UpdateMotionPhase` 152 B (93%), `sub_081EF750` 88 B, `sub_081EF880` 112 B, `SingletonSlot7_UpdateEndingScene` 1392 B (94%), `sub_081F0734` 1776 B, `sub_081F1274` 2208 B, `SingletonSlot7_InitFromScript` 1032 B (80%)
+- Singleton slot 7: `sub_081EEDDC` 84 B, `sub_081EEECC` 608 B, `Slot7_UpdateMotionPhase` 152 B (93%), `sub_081EF750` 88 B, `sub_081EF880` 112 B, `SingletonSlot7_UpdateEndingScene` 1392 B (94%), `sub_081F0734` 1776 B, `sub_081F1274` 2208 B, `SingletonSlot7_InitFromScript` 1032 B (80%)
 - Script combat actor: `ScriptCombatActor_ApplyHitReaction` 432 B (82%), `sub_08201784` 276 B (63%), `ScriptCombatActor_UpdateProjectileAttack` 564 B (80%), `sub_08201D38` 1000 B (92%), `sub_0820212C` 1244 B
 - Actor glyph trail: `sub_082377B8` 384 B, `sub_08237938` 240 B, `sub_08237A28` 388 B
 - Keyframe actor: `sub_0823AE5C` 232 B (70%)
@@ -519,7 +479,7 @@ Still to match (3):
 
 ### Presentation and UI
 
-<details><summary><b>Effects and presentation</b>: 1384/1548 functions, 70.7% of bytes</summary>
+<details><summary><b>Effects and presentation</b>: 1404/1571 functions, 70.4% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -542,43 +502,42 @@ Still to match (3):
 | &nbsp;&nbsp;Scene effect | 14/17 | 56.7% | `███████████░░░░░░░░░` |
 | &nbsp;&nbsp;Scene effect queue | 4/8 | 31.1% | `██████░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Scene projectile | 12/13 | 47.8% | `██████████░░░░░░░░░░` |
-| **Palette** | 119/127 | 82.3% | `████████████████░░░░` |
+| **Particle** | 93/103 | 69.7% | `██████████████░░░░░░` |
+| &nbsp;&nbsp;Particle groups | 7/12 | 17.7% | `████░░░░░░░░░░░░░░░░` |
+| &nbsp;&nbsp;Particle effect pool | 12/13 | 80.7% | `████████████████░░░░` |
+| &nbsp;&nbsp;Particle emitter | 7/7 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Particle burst effect | 14/14 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Particle pool | 11/13 | 52.8% | `███████████░░░░░░░░░` |
+| &nbsp;&nbsp;Particle effect | 11/11 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Particle burst | 31/33 | 92.2% | `██████████████████░░` |
+| **Palette** | 120/128 | 82.3% | `████████████████░░░░` |
 | &nbsp;&nbsp;Palette controllers | 42/42 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Palette sets | 7/7 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Palette level transitions | 10/10 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Palette cycling | 6/7 | 60.4% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Palette frame cycling | 5/5 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Palette fade | 14/17 | 61.4% | `████████████░░░░░░░░` |
+| &nbsp;&nbsp;Palette fade | 15/18 | 61.9% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Palette transition | 35/39 | 79.5% | `████████████████░░░░` |
-| **Particle** | 82/91 | 68.9% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Particle groups | 7/12 | 17.7% | `████░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Particle emitter | 7/7 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Particle burst effect | 14/14 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Particle pool | 11/13 | 52.8% | `███████████░░░░░░░░░` |
-| &nbsp;&nbsp;Particle effect | 11/11 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Particle burst | 32/34 | 92.4% | `██████████████████░░` |
 | **Homing** | 30/35 | 57.4% | `███████████░░░░░░░░░` |
 | &nbsp;&nbsp;Homing and orbiting effects (tentative) | 15/17 | 73.4% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Homing projectile | 15/18 | 26.0% | `█████░░░░░░░░░░░░░░░` |
-| **Projectile** | 62/68 | 73.2% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Projectile 1 | 5/6 | 61.7% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Projectile 2 | 20/21 | 93.3% | `███████████████████░` |
-| &nbsp;&nbsp;Projectile 3 | 13/16 | 17.8% | `████░░░░░░░░░░░░░░░░` |
+| **Projectile** | 62/67 | 76.1% | `███████████████░░░░░` |
+| &nbsp;&nbsp;Projectile | 38/42 | 62.6% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Projectile pool | 24/25 | 96.1% | `███████████████████░` |
 | **Scripted** | 39/40 | 95.6% | `███████████████████░` |
 | &nbsp;&nbsp;Scripted display tracks | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scripted particle | 11/12 | 75.6% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Scripted presentation | 13/13 | 100.0% | `████████████████████` |
-| **Orbit** | 32/38 | 62.6% | `█████████████░░░░░░░` |
+| **Orbit** | 32/39 | 59.8% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Orbit background controller | 17/17 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Orbit effect | 15/21 | 42.6% | `█████████░░░░░░░░░░░` |
+| &nbsp;&nbsp;Orbit effect | 15/22 | 39.8% | `████████░░░░░░░░░░░░` |
+| **Fragment** | 28/36 | 42.8% | `█████████░░░░░░░░░░░` |
+| &nbsp;&nbsp;Fragment groups | 6/6 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Fragment burst | 10/15 | 19.9% | `████░░░░░░░░░░░░░░░░` |
+| &nbsp;&nbsp;Fragment effect | 12/15 | 50.9% | `██████████░░░░░░░░░░` |
 | **Registry** | 36/46 | 44.3% | `█████████░░░░░░░░░░░` |
 | &nbsp;&nbsp;Registry F3E4 | 19/25 | 39.6% | `████████░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Registry 6A37 | 17/21 | 56.6% | `███████████░░░░░░░░░` |
-| **Fragment** | 31/38 | 47.3% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Fragment groups | 6/6 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Fragment burst | 10/15 | 19.9% | `████░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Fragment effect | 15/17 | 61.1% | `████████████░░░░░░░░` |
 | **Health** | 26/35 | 50.1% | `██████████░░░░░░░░░░` |
 | &nbsp;&nbsp;Health restore effect | 14/17 | 62.0% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Health burst effect | 12/18 | 41.5% | `████████░░░░░░░░░░░░` |
@@ -590,13 +549,13 @@ Still to match (3):
 | &nbsp;&nbsp;Timed sprite | 12/14 | 47.9% | `██████████░░░░░░░░░░` |
 | &nbsp;&nbsp;Timed effect | 9/10 | 70.9% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Timed presentation | 3/3 | 100.0% | `████████████████████` |
-| Linked effect | 13/18 | 39.2% | `████████░░░░░░░░░░░░` |
+| **Position** | 31/34 | 72.9% | `███████████████░░░░░` |
+| &nbsp;&nbsp;Position effect display | 8/11 | 40.0% | `████████░░░░░░░░░░░░` |
+| &nbsp;&nbsp;Position linked sprite | 23/23 | 100.0% | `████████████████████` |
 | Animated particles | 14/16 | 92.1% | `██████████████████░░` |
+| Linked effect | 13/17 | 40.2% | `████████░░░░░░░░░░░░` |
 | Sun disc pool | 14/17 | 52.0% | `██████████░░░░░░░░░░` |
 | Feather effect pool | 10/13 | 39.7% | `████████░░░░░░░░░░░░` |
-| **Position** | 31/33 | 86.4% | `█████████████████░░░` |
-| &nbsp;&nbsp;Position effect display | 8/10 | 61.3% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Position linked sprite | 23/23 | 100.0% | `████████████████████` |
 | **Directional** | 16/19 | 71.4% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Directional particles | 1/2 | 13.1% | `███░░░░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Directional sprite effect (tentative) | 5/5 | 100.0% | `████████████████████` |
@@ -615,6 +574,7 @@ Still to match (3):
 | Positioned effect | 11/14 | 68.3% | `██████████████░░░░░░` |
 | Charged burst | 10/12 | 68.4% | `██████████████░░░░░░` |
 | Moving tile particles | 6/7 | 57.1% | `███████████░░░░░░░░░` |
+| Pal fade | 11/12 | 63.3% | `█████████████░░░░░░░` |
 | Five-slot burst emitter | 15/15 | 100.0% | `████████████████████` |
 | Orbiting particles | 9/9 | 100.0% | `████████████████████` |
 | Ballistic sprite effect | 7/8 | 57.0% | `███████████░░░░░░░░░` |
@@ -638,7 +598,7 @@ Still to match (3):
 | Temporary animation pool | 6/6 | 100.0% | `████████████████████` |
 | Hardware blend transitions | 4/5 | 42.9% | `█████████░░░░░░░░░░░` |
 
-Still to match (164):
+Still to match (167):
 
 - Homing and orbiting effects (tentative): `sub_0800AC44` 932 B, `sub_0800AFE8` 1016 B
 - Scanline presentation (tentative): `sub_0800D874` 300 B, `sub_0800DC90` 1020 B
@@ -657,6 +617,7 @@ Still to match (164):
 - Sprite effect controllers: `sub_0806AB1C` 1112 B, `sub_0806AF74` 848 B
 - Scheduled scene effects: `SceneEffectSchedule_AddFromScript` 412 B (97%)
 - Palette fade: `ScanlineScroll_AdvancePhases` 180 B, `sub_08111578` 464 B, `PaletteFade_StartFromScript` 380 B (55%)
+- Pal fade: `PalFade_Start` 596 B (88%)
 - Scene collider effect: `sub_08121504` 836 B, `sub_081218C0` 440 B, `SpriteParticle_AllocateSlot_08121D14` 80 B, `SpriteGroup_UpdateEntries` 104 B (84%)
 - Scene scheduled effect: `sub_0812298C` 84 B, `sub_08122B8C` 404 B, `sub_08122D58` 72 B
 - Sprite notice: `SpriteNotice_AllocateSlot` 76 B, `sub_08125928` 364 B
@@ -668,9 +629,10 @@ Still to match (164):
 - Fragment burst: `sub_081281D0` 148 B, `sub_08128268` 632 B, `FragmentBurst_UpdateImpactAnimation` 536 B (93%), `sub_081287D4` 556 B, `sub_08128A00` 92 B
 - Feather effect pool: `FeatherEffectPool_ClipScatterPath` 628 B (82%), `FeatherEffectPool_SpawnGroundScatter` 828 B (80%), `FeatherEffectPool_CreateDirectional` 540 B (92%)
 - Sun disc pool: `sub_08129C64` 908 B, `SunDiscPool_UpdateFallingDisc` 604 B (87%), `EffectPool_UpdateSlots` 104 B (85%)
-- Linked effect: `ActorEffect_InitColliders` 256 B, `LinkedEffect_SetVariant` 228 B, `LinkedEffect_BeginRisingTravel` 676 B (84%), `sub_0812ACB0` 980 B, `sub_0812B350` 88 B
-- Fragment effect: `sub_0812C3D0` 76 B, `sub_0812C8E0` 1072 B
-- Position effect display: `sub_08138630` 52 B, `PositionEffectDisplay_UpdateSources` 380 B (97%)
+- Linked effect: `ActorEffect_InitColliders` 256 B, `LinkedEffect_SetVariant` 228 B, `LinkedEffect_BeginRisingTravel` 676 B (84%), `sub_0812ACB0` 980 B
+- Fragment effect: `sub_0812C124` 492 B, `sub_0812C3D0` 76 B, `sub_0812C8E0` 1072 B
+- Particle effect pool: `sub_0812D58C` 228 B
+- Position effect display: `sub_081383E0` 592 B, `sub_08138630` 52 B, `PositionEffectDisplay_UpdateSources` 380 B (97%)
 - Ballistic sprite effect: `sub_08139028` 624 B
 - Sprite pair pool: `sub_08139FE0` 512 B
 - Particle pool: `sub_081639E4` 396 B (88%), `sub_08163C84` 392 B
@@ -684,13 +646,11 @@ Still to match (164):
 - Registry 6A37: `sub_081C4194` 284 B, `sub_081C42B0` 236 B, `sub_081C45E0` 136 B, `sub_081C47A0` 76 B
 - Frost emitter: `sub_081D2D78` 300 B, `sub_081D2EA4` 324 B, `sub_081D3094` 168 B
 - Palette transition: `sub_081D3B58` 312 B, `sub_081D3C90` 216 B, `sub_081D3D74` 432 B, `sub_081D409C` 240 B
-- Projectile 1: `sub_081D9D3C` 476 B
+- Projectile: `sub_081D9D3C` 476 B, `Projectile_InitializeParams` 124 B, `Projectile_SpawnAtPosition` 956 B, `sub_081FD4C0` 112 B
 - Timed effect: `sub_081DA3D8` 580 B
-- Projectile 2: `Projectile_InitializeParams` 124 B
 - Sprite trail: `sub_081F2208` 408 B, `SpriteTrail_UpdatePositions` 304 B, `sub_081F25A4` 212 B, `sub_081F28C4` 324 B, `sub_081F2BB0` 76 B
 - Scene projectile: `sub_081FCA44` 1268 B
-- Projectile 3: `Projectile_SpawnAtPosition` 956 B, `sub_081FD4C0` 112 B, `sub_081FD53C` 296 B
-- Orbit effect: `OrbitEffect_AdjustHeading` 160 B (98%), `OrbitEffect_FireVolley` 704 B (97%), `RisingActor_AdvanceHeight` 76 B (81%), `sub_081FDCB0` 272 B, `OrbitEffect_SpawnHomingTrail` 264 B (93%), `sub_081FE2C4` 896 B
+- Orbit effect: `sub_081FD53C` 296 B, `OrbitEffect_AdjustHeading` 160 B (98%), `OrbitEffect_FireVolley` 704 B (97%), `RisingActor_AdvanceHeight` 76 B (81%), `sub_081FDCB0` 272 B, `OrbitEffect_SpawnHomingTrail` 264 B (93%), `sub_081FE2C4` 896 B
 - Homing projectile: `HomingProjectile_UpdateDefaultState` 1256 B (93%), `HomingProjectile_UpdateManager` 704 B (84%), `HomingProjectile_Spawn` 808 B (98%)
 - Projectile pool: `sub_08202F48` 116 B
 - Effect part: `EffectGroup_FadeFirstActive` 60 B (97%), `sub_082318E0` 296 B, `sub_08231EF8` 228 B (78%), `sub_08231FDC` 228 B, `sub_082320C0` 228 B, `sub_08232264` 216 B
@@ -705,7 +665,7 @@ Still to match (164):
 
 </details>
 
-<details><summary><b>Menus, HUD and dialogue</b>: 1871/2024 functions, 78.9% of bytes</summary>
+<details><summary><b>Menus, HUD and dialogue</b>: 1863/2011 functions, 79.2% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -716,9 +676,7 @@ Still to match (164):
 | &nbsp;&nbsp;Scene panel control and lifecycle | 48/48 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene panel subjects | 18/18 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene sequence | 25/25 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Scene HUD 1 | 9/10 | 86.8% | `█████████████████░░░` |
-| &nbsp;&nbsp;Scene HUD 2 | 25/25 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Scene HUD 3 | 6/7 | 78.6% | `████████████████░░░░` |
+| &nbsp;&nbsp;Scene HUD | 40/42 | 93.2% | `███████████████████░` |
 | &nbsp;&nbsp;Scene catalog | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene dialog | 17/17 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene panel effect | 5/7 | 12.3% | `██░░░░░░░░░░░░░░░░░░` |
@@ -727,19 +685,14 @@ Still to match (164):
 | &nbsp;&nbsp;Inventory action transitions | 43/46 | 86.5% | `█████████████████░░░` |
 | &nbsp;&nbsp;Inventory transactions and catalogs | 41/41 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Inventory panel | 9/11 | 79.8% | `████████████████░░░░` |
-| &nbsp;&nbsp;Inventory 1 | 12/14 | 76.0% | `███████████████░░░░░` |
+| &nbsp;&nbsp;Inventory | 91/96 | 84.9% | `█████████████████░░░` |
 | &nbsp;&nbsp;Inventory grid | 6/6 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Inventory 2 | 79/82 | 87.4% | `█████████████████░░░` |
 | **Pause** | 132/153 | 75.7% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Pause menu 1 | 28/30 | 73.8% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Pause menu 2 | 36/42 | 63.8% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Pause menu 3 | 10/11 | 62.5% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Pause inventory 1 | 36/45 | 83.7% | `█████████████████░░░` |
-| &nbsp;&nbsp;Pause inventory 2 | 22/25 | 86.9% | `█████████████████░░░` |
+| &nbsp;&nbsp;Pause menu | 74/83 | 65.8% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Pause inventory | 58/70 | 84.7% | `█████████████████░░░` |
 | **HUD** | 93/102 | 67.9% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;HUD tilemaps and clock digits | 11/11 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;HUD 1 | 26/32 | 66.8% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;HUD 2 | 56/59 | 64.9% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;HUD | 82/91 | 65.6% | `█████████████░░░░░░░` |
 | **Modifier** | 79/82 | 86.2% | `█████████████████░░░` |
 | &nbsp;&nbsp;Modifier selection and stat previews (tentative) | 43/44 | 94.0% | `███████████████████░` |
 | &nbsp;&nbsp;Modifier menu graphics and input (tentative) | 23/24 | 82.9% | `█████████████████░░░` |
@@ -752,23 +705,19 @@ Still to match (164):
 | &nbsp;&nbsp;Dialogue text interpreter | 34/34 | 100.0% | `████████████████████` |
 | **Menu** | 60/65 | 76.9% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Menu display | 11/14 | 57.7% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Menu prompt | 14/14 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Menu prompt | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Menu transition | 14/16 | 70.7% | `██████████████░░░░░░` |
-| &nbsp;&nbsp;Menu cursor | 21/21 | 100.0% | `████████████████████` |
-| **Status** | 40/45 | 82.9% | `█████████████████░░░` |
+| &nbsp;&nbsp;Menu cursor | 20/20 | 100.0% | `████████████████████` |
+| **Status** | 39/44 | 82.7% | `█████████████████░░░` |
 | &nbsp;&nbsp;Status screen (tentative) | 20/23 | 74.7% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Status panel | 20/22 | 91.9% | `██████████████████░░` |
+| &nbsp;&nbsp;Status panel | 19/21 | 91.7% | `██████████████████░░` |
 | **Selection** | 61/65 | 85.8% | `█████████████████░░░` |
 | &nbsp;&nbsp;Selection menu (tentative) | 47/50 | 85.5% | `█████████████████░░░` |
 | &nbsp;&nbsp;Selection panel | 14/15 | 86.7% | `█████████████████░░░` |
-| Monster book | 10/14 | 39.9% | `████████░░░░░░░░░░░░` |
-| **Time** | 35/45 | 61.2% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Time result | 21/26 | 56.8% | `███████████░░░░░░░░░` |
-| &nbsp;&nbsp;Time 1 | 4/8 | 21.1% | `████░░░░░░░░░░░░░░░░` |
-| &nbsp;&nbsp;Time 2 | 10/11 | 94.8% | `███████████████████░` |
 | **Password** | 27/32 | 81.3% | `████████████████░░░░` |
 | &nbsp;&nbsp;Password decoding | 7/8 | 85.1% | `█████████████████░░░` |
 | &nbsp;&nbsp;Password | 20/24 | 80.7% | `████████████████░░░░` |
+| Monster book | 10/13 | 47.8% | `██████████░░░░░░░░░░` |
 | **Screen** | 27/30 | 62.1% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Screen params 2E8 | 11/12 | 85.2% | `█████████████████░░░` |
 | &nbsp;&nbsp;Screen message | 6/6 | 100.0% | `████████████████████` |
@@ -777,7 +726,10 @@ Still to match (164):
 | **Map** | 30/33 | 65.4% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Map screen | 19/21 | 41.4% | `████████░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Map menu | 11/12 | 89.2% | `██████████████████░░` |
-| Dark loan | 32/35 | 76.3% | `███████████████░░░░░` |
+| Dark loan | 34/37 | 76.7% | `███████████████░░░░░` |
+| **Stage** | 45/47 | 84.1% | `█████████████████░░░` |
+| &nbsp;&nbsp;Stage icon display (tentative) | 16/16 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Stage results | 29/31 | 79.3% | `████████████████░░░░` |
 | **Registry** | 44/45 | 95.0% | `███████████████████░` |
 | &nbsp;&nbsp;Registry 2388 | 27/27 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Registry 3F74 | 17/18 | 84.2% | `█████████████████░░░` |
@@ -785,26 +737,20 @@ Still to match (164):
 | &nbsp;&nbsp;Record panel | 8/10 | 53.2% | `███████████░░░░░░░░░` |
 | &nbsp;&nbsp;Record menu | 12/16 | 57.1% | `███████████░░░░░░░░░` |
 | &nbsp;&nbsp;Record display | 5/7 | 27.5% | `██████░░░░░░░░░░░░░░` |
-| Solar bank | 22/25 | 47.4% | `█████████░░░░░░░░░░░` |
+| Solar bank | 21/24 | 47.1% | `█████████░░░░░░░░░░░` |
 | Control panel | 31/35 | 72.1% | `██████████████░░░░░░` |
-| **Script** | 21/24 | 64.2% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Script display | 14/16 | 59.7% | `████████████░░░░░░░░` |
-| &nbsp;&nbsp;Script prompt | 7/8 | 71.4% | `██████████████░░░░░░` |
+| **Text** | 41/45 | 54.8% | `███████████░░░░░░░░░` |
+| &nbsp;&nbsp;Text window manager | 28/29 | 85.8% | `█████████████████░░░` |
+| &nbsp;&nbsp;Text sequence | 13/16 | 34.8% | `███████░░░░░░░░░░░░░` |
 | Game start | 8/9 | 67.7% | `██████████████░░░░░░` |
-| **Stage** | 31/31 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Stage icon display (tentative) | 16/16 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Stage results | 15/15 | 100.0% | `████████████████████` |
+| **Message** | 44/44 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Message menu | 7/7 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Message panel | 37/37 | 100.0% | `████████████████████` |
 | **Collection** | 23/23 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Collection | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Collection menu | 8/8 | 100.0% | `████████████████████` |
-| **Message** | 43/43 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Message menu | 7/7 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Message panel | 36/36 | 100.0% | `████████████████████` |
 | Sound-test menu | 16/16 | 100.0% | `████████████████████` |
 | Choice menu | 14/14 | 100.0% | `████████████████████` |
-| **Text** | 41/44 | 77.4% | `███████████████░░░░░` |
-| &nbsp;&nbsp;Text window manager | 28/29 | 85.8% | `█████████████████░░░` |
-| &nbsp;&nbsp;Text sequence | 13/15 | 66.9% | `█████████████░░░░░░░` |
 | Challenge menu | 23/27 | 69.2% | `██████████████░░░░░░` |
 | Transition panel | 21/24 | 79.0% | `████████████████░░░░` |
 | **Input** | 23/25 | 70.6% | `██████████████░░░░░░` |
@@ -813,12 +759,14 @@ Still to match (164):
 | Field HUD | 14/16 | 67.3% | `█████████████░░░░░░░` |
 | Save menu | 8/11 | 35.4% | `███████░░░░░░░░░░░░░` |
 | Floating number display | 17/18 | 73.4% | `███████████████░░░░░` |
+| Time result | 21/26 | 56.8% | `███████████░░░░░░░░░` |
 | Play stats | 6/7 | 16.4% | `███░░░░░░░░░░░░░░░░░` |
+| Slot menu | 14/15 | 73.8% | `███████████████░░░░░` |
 | Scrolling dialogue controller | 22/22 | 100.0% | `████████████████████` |
 | Options | 5/6 | 59.8% | `████████████░░░░░░░░` |
 | Bestiary | 18/18 | 100.0% | `████████████████████` |
 | Level advance display (tentative) | 14/14 | 100.0% | `████████████████████` |
-| Slot menu | 9/10 | 58.2% | `████████████░░░░░░░░` |
+| Script prompt | 7/8 | 71.4% | `██████████████░░░░░░` |
 | Scripted dialogue transitions | 12/12 | 100.0% | `████████████████████` |
 | Stat display | 11/11 | 100.0% | `████████████████████` |
 | Numeric overlay (tentative) | 5/7 | 19.8% | `████░░░░░░░░░░░░░░░░` |
@@ -828,7 +776,7 @@ Still to match (164):
 | Shaking icon display | 5/5 | 100.0% | `████████████████████` |
 | Result prompt | 4/4 | 100.0% | `████████████████████` |
 
-Still to match (153):
+Still to match (148):
 
 - Status screen (tentative): `sub_0800E5B8` 452 B, `sub_0800E974` 288 B (84%), `sub_0800EF90` 352 B
 - Numeric overlay (tentative): `sub_0800F4EC` 452 B, `sub_0800F6F8` 276 B
@@ -848,25 +796,20 @@ Still to match (153):
 - Record panel: `sub_0810D760` 404 B, `RecordPanel_RefreshEntryLabels` 188 B (80%)
 - Record menu: `RecordMenu_PositionSprites` 148 B, `sub_0810F254` 136 B, `RecordMenu_UpdateSelection` 508 B, `RecordMenu_Initialize` 348 B (92%)
 - Save menu: `sub_0811048C` 452 B, `sub_08110650` 484 B, `sub_08110894` 428 B
-- Script display: `sub_08112508` 524 B, `MessagePanel_ConfigureFromScript` 352 B (80%)
+- Stage results: `sub_08112508` 524 B, `MessagePanel_ConfigureFromScript` 352 B (80%)
 - Transition panel: `sub_08163020` 156 B, `TransitionPanel_InitSprites` 180 B (93%), `sub_08163700` 208 B
-- HUD 1: `sub_08164480` 668 B (90%), `sub_08164864` 800 B, `ResultPanel_ClearFiveTiles` 52 B (88%), `SceneHud_DrawDecimalDigits` 84 B, `SceneHud_FillDigitCells` 60 B (89%), `sub_081656E0` 272 B
-- Pause menu 1: `SceneHud_TickPaletteBlend` 360 B (82%), `sub_0816618C` 312 B
+- HUD: `sub_08164480` 668 B (90%), `sub_08164864` 800 B, `ResultPanel_ClearFiveTiles` 52 B (88%), `SceneHud_DrawDecimalDigits` 84 B, `SceneHud_FillDigitCells` 60 B (89%), `sub_081656E0` 272 B, `sub_08176F70` 2680 B, `sub_08178474` 76 B, `sub_08178C80` 840 B
+- Pause menu: `SceneHud_TickPaletteBlend` 360 B (82%), `sub_0816618C` 312 B, `sub_08167C84` 460 B, `sub_08167FC0` 248 B, `sub_08168214` 800 B, `sub_08168850` 444 B, `sub_08168A0C` 480 B, `PauseMenu_CreateSelectionWidgets` 564 B (82%), `sub_0816D634` 452 B
 - Menu display: `sub_08166534` 316 B, `sub_0816676C` 636 B, `MenuDisplay_LoadDecimalDigits` 112 B (96%)
 - Inventory panel: `InventoryPanel_SetEntryRow` 192 B, `InventoryPanel_StartCallbackBurst` 360 B (91%)
-- Pause menu 2: `sub_08167C84` 460 B, `sub_08167FC0` 248 B, `sub_08168214` 800 B, `sub_08168850` 444 B, `sub_08168A0C` 480 B, `PauseMenu_CreateSelectionWidgets` 564 B (82%)
 - Status panel: `StatusPanel_ClearLowerRows` 48 B (87%), `sub_0816A0D0` 272 B
 - Map screen: `MapMenu_DrawActiveMarkers` 312 B (96%), `sub_0816BC54` 1360 B
 - Map menu: `sub_0816CB50` 312 B
-- Inventory 1: `sub_0816CDB8` 212 B, `SceneHud_SelectUpgradeableStat` 156 B
-- Pause menu 3: `sub_0816D634` 452 B
-- Scene HUD 1: `SceneHud_RefreshActionIcons` 204 B (83%)
+- Inventory: `sub_0816CDB8` 212 B, `SceneHud_SelectUpgradeableStat` 156 B, `sub_0822D2E0` 292 B, `sub_0822D490` 320 B, `Selection_GetDisplayFrame` 76 B (67%)
+- Scene HUD: `SceneHud_RefreshActionIcons` 204 B (83%), `SceneHud_UpdateSecondaryActionSelection` 424 B (98%)
 - Menu transition: `sub_0816E570` 384 B, `sub_0816E6F0` 776 B
-- Pause inventory 1: `sub_08170A08` 320 B, `sub_08170D78` 368 B, `sub_08170F54` 28 B, `SceneHud_DrawComparisonBars` 320 B, `sub_08171258` 28 B, `sub_08171EFC` 128 B (66%), `sub_08172094` 64 B, `sub_081720D4` 44 B, `SceneHud_SetActionCursorPosition` 164 B
-- Scene HUD 3: `SceneHud_UpdateSecondaryActionSelection` 424 B (98%)
-- Pause inventory 2: `sub_08173450` 32 B, `SceneHud_RefreshEquipmentIcons` 296 B, `sub_081740CC` 220 B
+- Pause inventory: `sub_08170A08` 320 B, `sub_08170D78` 368 B, `sub_08170F54` 28 B, `SceneHud_DrawComparisonBars` 320 B, `sub_08171258` 28 B, `sub_08171EFC` 128 B (66%), `sub_08172094` 64 B, `sub_081720D4` 44 B, `SceneHud_SetActionCursorPosition` 164 B, `sub_08173450` 32 B, `SceneHud_RefreshEquipmentIcons` 296 B, `sub_081740CC` 220 B
 - Selection panel: `sub_0817597C` 272 B
-- HUD 2: `sub_08176F70` 2680 B, `sub_08178474` 76 B, `sub_08178C80` 840 B
 - Field HUD: `FieldHud_UpdateGaugePalette` 176 B, `FieldHud_UpdateNumberDisplay` 548 B (98%)
 - Scene panel effect: `sub_08190798` 888 B, `sub_08190B10` 392 B
 - Registry 3F74: `Registry3F74_InitAnimations` 264 B (99%)
@@ -878,43 +821,39 @@ Still to match (153):
 - Control panel: `sub_081C1DCC` 52 B, `sub_081C1E48` 212 B, `sub_081C1FC0` 640 B, `sub_081C2334` 272 B
 - Challenge menu: `sub_081C569C` 332 B, `sub_081C58BC` 200 B, `sub_081C5AF0` 124 B, `sub_081C5B6C` 192 B
 - Time result: `sub_081C5FC4` 120 B, `sub_081C6094` 184 B, `sub_081C61AC` 16 B, `sub_081C62B4` 404 B, `sub_081C6570` 164 B
-- Monster book: `sub_081D5CE0` 1204 B, `sub_081D61C0` 1752 B, `sub_081D68AC` 216 B, `sub_081D6C04` 1216 B
-- Text sequence: `sub_081D70DC` 196 B, `sub_081D7300` 240 B
+- Monster book: `sub_081D5CE0` 1204 B, `sub_081D61C0` 1752 B, `sub_081D68AC` 216 B
+- Text sequence: `sub_081D6C04` 1216 B, `sub_081D70DC` 196 B, `sub_081D7300` 240 B
 - Options: `Options_InitScreen` 704 B (85%)
 - Screen params 2E8: `Menu_DrawText` 256 B
-- Time 1: `Time_ShowRegionMenu` 132 B, `Time_OnRegionListSelect` 76 B, `Time_HandleRegionKeypad` 716 B, `Time_LoadRegionList` 756 B
 - Name entry: `sub_081DDB44` 124 B
-- Time 2: `sub_081DE630` 148 B
 - Password: `sub_081DF1D8` 340 B, `sub_081DFB18` 132 B, `sub_081DFB9C` 128 B, `sub_081E056C` 544 B
 - Script prompt: `sub_081E09A8` 384 B
 - Game start: `GameStart_Init` 1124 B (81%)
 - Screen params 3F8: `sub_081EB8E0` 1044 B, `sub_081EBD0C` 924 B
 - Forging book: `ForgingBook_RefreshEntrySprites` 436 B (94%), `ForgingBook_RefreshCategoryPreview` 824 B (84%), `ForgingBook_InitSprites` 920 B (80%), `sub_0821290C` 1112 B, `sub_0821358C` 644 B, `sub_08213888` 712 B
-- Inventory 2: `sub_0822D2E0` 292 B, `sub_0822D490` 320 B, `Selection_GetDisplayFrame` 76 B (67%)
 
 </details>
 
 ### Engine and system
 
-<details><summary><b>Engine core</b>: 879/985 functions, 68.0% of bytes</summary>
+<details><summary><b>Engine core</b>: 888/994 functions, 68.2% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
-| **Script** | 196/208 | 94.8% | `███████████████████░` |
+| **Script** | 205/217 | 95.0% | `███████████████████░` |
 | &nbsp;&nbsp;Script keyframe pool | 13/13 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Script utility references | 12/12 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Script options | 15/15 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Script options | 24/24 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Script record | 29/38 | 78.8% | `████████████████░░░░` |
 | &nbsp;&nbsp;Script virtual machine | 89/89 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Script 1 | 21/21 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Script 2 | 17/20 | 87.5% | `█████████████████░░░` |
-| **Scene** | 138/148 | 82.2% | `████████████████░░░░` |
+| &nbsp;&nbsp;Script | 38/41 | 93.1% | `███████████████████░` |
+| **Scene** | 137/147 | 82.1% | `████████████████░░░░` |
 | &nbsp;&nbsp;Scene message controller | 24/24 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene audio events | 15/15 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene grid queries | 6/7 | 69.5% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Scene state and spatial queries | 7/8 | 82.2% | `████████████████░░░░` |
 | &nbsp;&nbsp;Scene range watcher | 5/5 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Scene tilemap | 17/20 | 66.2% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Scene tilemap | 16/19 | 65.6% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Scene lifecycle | 22/22 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Scene body | 25/26 | 95.4% | `███████████████████░` |
 | &nbsp;&nbsp;Scene stimulus | 17/21 | 63.1% | `█████████████░░░░░░░` |
@@ -928,23 +867,21 @@ Still to match (153):
 | **BG** | 16/25 | 24.3% | `█████░░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;BG | 14/22 | 37.0% | `███████░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;BG GFX | 2/3 | 4.2% | `█░░░░░░░░░░░░░░░░░░░` |
-| **Anim** | 34/54 | 56.8% | `███████████░░░░░░░░░` |
-| &nbsp;&nbsp;Anim 1 | 15/27 | 87.8% | `██████████████████░░` |
-| &nbsp;&nbsp;Anim 2 | 19/27 | 43.9% | `█████████░░░░░░░░░░░` |
+| Anim | 34/54 | 56.8% | `███████████░░░░░░░░░` |
 | IWRAM ARM code | 1/6 | 5.1% | `█░░░░░░░░░░░░░░░░░░░` |
 | Palette | 30/37 | 33.8% | `███████░░░░░░░░░░░░░` |
-| Character model | 44/45 | 88.0% | `██████████████████░░` |
+| Character model | 43/44 | 87.8% | `██████████████████░░` |
 | Collider | 21/27 | 50.3% | `██████████░░░░░░░░░░` |
 | Nav mesh | 10/16 | 33.1% | `███████░░░░░░░░░░░░░` |
-| Path | 19/22 | 69.5% | `██████████████░░░░░░` |
+| Path | 20/23 | 70.0% | `██████████████░░░░░░` |
 | Scalar and vector interpolation | 37/37 | 100.0% | `████████████████████` |
 | Registry E7BC | 27/28 | 88.5% | `██████████████████░░` |
 | Music player slots (tentative) | 40/40 | 100.0% | `████████████████████` |
 | Interrupts and video | 10/11 | 75.5% | `███████████████░░░░░` |
 | Text | 20/21 | 82.3% | `████████████████░░░░` |
 | Scanline effect | 10/12 | 67.3% | `█████████████░░░░░░░` |
+| Spatial index | 11/13 | 64.5% | `█████████████░░░░░░░` |
 | Tile animation | 11/11 | 100.0% | `████████████████████` |
-| Spatial index | 10/12 | 61.9% | `████████████░░░░░░░░` |
 | Heap and memory operations | 9/9 | 100.0% | `████████████████████` |
 | Clock events | 5/5 | 100.0% | `████████████████████` |
 | Task scheduler | 12/12 | 100.0% | `████████████████████` |
@@ -972,44 +909,43 @@ Still to match (106):
 - Palette: `sub_08216E54` 292 B, `sub_082171C0` 216 B, `sub_08217430` 1328 B, `Palette_ApplyBackgroundFade` 604 B (87%), `sub_08217BBC` 192 B, `sub_08217C7C` 212 B, `sub_08217E40` 32 B
 - Text: `Text_DrawGlyph` 240 B
 - Scanline effect: `sub_08219134` 256 B, `sub_082194D4` 160 B
-- Anim 1: `sub_08219624` 8 B, `sub_0821962C` 24 B, `sub_08219644` 8 B, `sub_0821964C` 8 B, `sub_08219654` 24 B, `sub_0821966C` 8 B, `sub_08219674` 8 B, `sub_0821967C` 24 B, `sub_08219694` 8 B, `sub_0821969C` 8 B, `sub_082196A4` 24 B, `sub_082196BC` 8 B
+- Anim: `sub_08219624` 8 B, `sub_0821962C` 24 B, `sub_08219644` 8 B, `sub_0821964C` 8 B, `sub_08219654` 24 B, `sub_0821966C` 8 B, `sub_08219674` 8 B, `sub_0821967C` 24 B, `sub_08219694` 8 B, `sub_0821969C` 8 B, `sub_082196A4` 24 B, `sub_082196BC` 8 B, `Anim_SetKeyframes` 392 B, `Anim_SetFrameDurationScale` 112 B, `Anim_Step` 284 B, `sub_0822108C` 44 B, `Palette_InterpolateBanks` 248 B, `Palette_BlendBank` 212 B, `Anim_DrawDecimalDigits` 400 B (95%), `sub_08221548` 76 B
 - Runtime input and utilities: `Input_PollButtons` 180 B
 - Terrain modifiers: `sub_0821BE3C` 288 B, `sub_0821BF5C` 760 B, `sub_0821C254` 1280 B, `sub_0821C884` 116 B, `sub_0821C8F8` 2176 B, `sub_0821D178` 888 B, `sub_0821D4F0` 320 B
 - Path: `sub_0821E67C` 204 B, `SceneActorRoute_IsOutsidePointBounds` 88 B (96%), `Path_SnapToRandomPointInBox` 556 B (91%)
 - Nav mesh: `sub_0821F15C` 36 B, `sub_0821F2EC` 1212 B, `sub_0821F864` 308 B, `sub_0821FB8C` 336 B, `Navigation_FindContainingRegion` 96 B (85%), `ProximityVolume_TranslateBounds` 140 B
 - Collider: `sub_08220204` 420 B, `Collider_TestSegmentXAxis` 248 B, `Collider_TestSegmentYAxis` 248 B, `Collider_TestSegmentZAxis` 248 B, `sub_082207DC` 248 B, `Collision_ProcessPairs` 288 B (97%)
-- Anim 2: `Anim_SetKeyframes` 392 B, `Anim_SetFrameDurationScale` 112 B, `Anim_Step` 284 B, `sub_0822108C` 44 B, `Palette_InterpolateBanks` 248 B, `Palette_BlendBank` 212 B, `Anim_DrawDecimalDigits` 400 B (95%), `sub_08221548` 76 B
+- Script: `Power_EnterSleep` 84 B (92%), `sub_08227E2C` 48 B, `sub_08227E5C` 48 B
 - Scene body: `sub_08225C08` 64 B
 - Camera: `Camera_ClampDiagonalPosition` 152 B, `sub_082260D8` 160 B, `sub_08226380` 32 B, `sub_08226748` 136 B, `sub_082267D0` 152 B, `sub_08226CF8` 552 B
-- Script 2: `Power_EnterSleep` 84 B (92%), `sub_08227E2C` 48 B, `sub_08227E5C` 48 B
 - Scene stimulus: `sub_0822B5FC` 68 B (75%), `sub_0822B640` 84 B, `sub_0822B6C8` 152 B, `sub_0822B7E4` 168 B (59%)
 
 </details>
 
-<details><summary><b>Hardware, time and save</b>: 221/224 functions, 97.3% of bytes</summary>
+<details><summary><b>Hardware, time and save</b>: 216/223 functions, 93.0% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
 | Clock and sun schedule (tentative) | 52/52 | 100.0% | `████████████████████` |
+| **Time** | 17/22 | 64.8% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Time palette transitions (tentative) | 3/3 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Time | 14/19 | 63.1% | `█████████████░░░░░░░` |
 | **Save** | 71/72 | 99.4% | `████████████████████` |
 | &nbsp;&nbsp;Save data | 31/32 | 98.3% | `████████████████████` |
-| &nbsp;&nbsp;Save 1 | 31/31 | 100.0% | `████████████████████` |
-| &nbsp;&nbsp;Save 2 | 9/9 | 100.0% | `████████████████████` |
+| &nbsp;&nbsp;Save | 40/40 | 100.0% | `████████████████████` |
 | Solar | 27/27 | 100.0% | `████████████████████` |
 | Game state | 38/39 | 99.0% | `████████████████████` |
-| State flags | 19/20 | 73.3% | `███████████████░░░░░` |
 | Cartridge solar sensor | 11/11 | 100.0% | `████████████████████` |
-| Time palette transitions (tentative) | 3/3 | 100.0% | `████████████████████` |
 
-Still to match (3):
+Still to match (7):
 
-- State flags: `PalFade_Start` 596 B (88%)
+- Time: `Time_ShowRegionMenu` 132 B, `Time_OnRegionListSelect` 76 B, `Time_HandleRegionKeypad` 716 B, `Time_LoadRegionList` 756 B, `sub_081DE630` 148 B
 - Save data: `sub_08227FEC` 28 B
 - Game state: `sub_0822E420` 28 B
 
 </details>
 
-<details><summary><b>Link and wireless</b>: 543/604 functions, 67.4% of bytes</summary>
+<details><summary><b>Link and wireless</b>: 537/597 functions, 67.6% of bytes</summary>
 
 | Family / unit | Functions | Bytes matched | |
 |---|---:|---:|---|
@@ -1025,25 +961,24 @@ Still to match (3):
 | &nbsp;&nbsp;Wireless result panel (tentative) | 17/18 | 74.9% | `███████████████░░░░░` |
 | &nbsp;&nbsp;Wireless scene objects (tentative) | 16/19 | 40.1% | `████████░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Wireless link indicator | 9/9 | 100.0% | `████████████████████` |
-| **Link** | 108/127 | 64.0% | `█████████████░░░░░░░` |
-| &nbsp;&nbsp;Link handshake | 20/22 | 72.9% | `███████████████░░░░░` |
+| **Link** | 107/126 | 63.7% | `█████████████░░░░░░░` |
+| &nbsp;&nbsp;Link handshake | 19/21 | 70.9% | `██████████████░░░░░░` |
 | &nbsp;&nbsp;Link menu | 11/14 | 59.5% | `████████████░░░░░░░░` |
 | &nbsp;&nbsp;Link selection | 16/16 | 100.0% | `████████████████████` |
 | &nbsp;&nbsp;Link panel | 4/5 | 80.0% | `████████████████░░░░` |
 | &nbsp;&nbsp;Link score panel | 16/19 | 64.5% | `█████████████░░░░░░░` |
 | &nbsp;&nbsp;Link player | 41/51 | 44.5% | `█████████░░░░░░░░░░░` |
-| **Registry** | 77/96 | 44.0% | `█████████░░░░░░░░░░░` |
-| &nbsp;&nbsp;Registry 1745 1 | 4/5 | 53.0% | `███████████░░░░░░░░░` |
+| **Registry** | 72/90 | 43.1% | `█████████░░░░░░░░░░░` |
+| &nbsp;&nbsp;Registry 1745 | 20/24 | 28.4% | `██████░░░░░░░░░░░░░░` |
 | &nbsp;&nbsp;Registry F246 | 17/21 | 81.3% | `████████████████░░░░` |
-| &nbsp;&nbsp;Registry 30AC | 15/19 | 61.8% | `████████████░░░░░░░░` |
+| &nbsp;&nbsp;Registry 30AC | 10/14 | 46.3% | `█████████░░░░░░░░░░░` |
 | &nbsp;&nbsp;Registry 3C9F | 19/24 | 45.9% | `█████████░░░░░░░░░░░` |
 | &nbsp;&nbsp;Registry 33FF | 6/7 | 49.2% | `██████████░░░░░░░░░░` |
-| &nbsp;&nbsp;Registry 1745 2 | 16/20 | 21.1% | `████░░░░░░░░░░░░░░░░` |
 | RFU manager | 33/39 | 42.3% | `████████░░░░░░░░░░░░` |
 | Serial | 45/52 | 60.0% | `████████████░░░░░░░░` |
 | Encoded records and password payloads | 9/9 | 100.0% | `████████████████████` |
 
-Still to match (61):
+Still to match (60):
 
 - Wireless connection controller: `sub_080359E4` 436 B, `sub_08035B98` 312 B
 - Wireless game items and display (tentative): `sub_080399F4` 560 B, `sub_0803A068` 464 B, `WirelessGameItems_QueueLocalItem` 260 B (93%), `WirelessGameDisplay_Init` 308 B (86%)
@@ -1051,14 +986,13 @@ Still to match (61):
 - Wireless scene objects (tentative): `sub_0803BC88` 896 B, `sub_0803C114` 1752 B, `sub_0803CB40` 312 B
 - Link handshake: `sub_08108C94` 456 B, `sub_08108FB4` 108 B
 - Link menu: `ScriptPanel_PollSelection` 160 B, `LinkMenu_WaitForReadyPeers` 1000 B (89%), `sub_0810A304` 220 B
-- Registry 1745 1: `Registry1745_Create` 504 B (91%)
+- Registry 1745: `Registry1745_Create` 504 B (91%), `sub_08136F48` 1732 B, `sub_081376B4` 1524 B, `sub_08137E28` 812 B
 - Registry F246: `sub_0810BB4C` 68 B, `sub_0810BB90` 68 B, `sub_0810C0BC` 108 B, `LinkPanel_SelectActiveAnimation` 100 B
 - Link panel: `LinkPanel_UpdateAnimations` 252 B (87%)
 - Registry 30AC: `sub_0810CF90` 96 B, `sub_0810CFF0` 348 B, `sub_0810D1A4` 136 B, `PanelSequence_InitializeFromScript` 348 B (84%)
 - Registry 3C9F: `sub_0810DB0C` 368 B, `sub_0810DC7C` 168 B, `sub_0810DE88` 648 B, `sub_0810E4DC` 388 B, `sub_0810E6E4` 492 B
 - Registry 33FF: `RecordMenu_DrawRecords` 604 B
 - Link score panel: `sub_0810FADC` 436 B, `sub_0810FDDC` 256 B, `sub_081100A0` 232 B
-- Registry 1745 2: `sub_08136F48` 1732 B, `sub_081376B4` 1524 B, `sub_08137E28` 812 B, `sub_081383E0` 592 B
 - Serial: `sub_082222BC` 116 B, `sub_082225FC` 308 B, `sub_082227D8` 324 B, `sub_08222A04` 160 B, `Serial_ServiceInterrupt` 740 B (83%), `sub_08223044` 104 B, `sub_08223180` 188 B
 - RFU manager: `sub_082238F0` 240 B, `RfuManager_UpdateLinkRecovery` 452 B (81%), `sub_08223BC0` 504 B, `RfuManager_ApplyRequestResult` 1788 B (81%), `RfuManager_UpdateChildAdmissions` 548 B (82%), `sub_082247CC` 180 B
 - Link player: `sub_082392E8` 408 B, `sub_08239848` 472 B, `sub_08239A20` 608 B, `sub_08239D38` 308 B, `sub_0823A060` 604 B, `sub_0823A2E4` 164 B (67%), `sub_0823A3CC` 332 B, `sub_0823A5EC` 580 B, `sub_0823A830` 500 B, `sub_0823ADB4` 168 B (68%)
