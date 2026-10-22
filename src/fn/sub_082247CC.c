@@ -1,11 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 80.0%
-// Open: the original stores a fresh `movs r1, #0` into a28[f10]. agbcc expands
-// the byte store `s->f4 = 0x18` as (old & 0) | 0x18 and CSE reuses that zero
-// pseudo (held in r4 across the calls), which shifts s/a28 to r5/r7. Writing
-// the byte stores through `*&s->f4` / `*&s->f24` removes those zeros, but then
-// CSE follows the jump path and reuses the IME-store zero instead (71.8%).
 struct S {
     u8 pad0[2];
     volatile u8 f2;
@@ -37,40 +30,27 @@ void RfuManager_DisconnectAndWait(u32);
 void sub_082247CC(void)
 {
     u16 ime = *(vu16 *)0x04000208;
-    struct S *s;
     *(vu16 *)0x04000208 = 0;
-    s = &gUnk_03005390;
-    if (s->f4 == 0xf) {
-        u16 *a;
-        u16 *p;
-        u32 i = s->f10;
-        a = s->a28;
-        p = &a[i];
-        (*p)--;
-        if (*p == 0 || *gUnk_03006A70[s->f10] == 0x27) {
+    if (gUnk_03005390.f4 == 0xf) {
+        if (--gUnk_03005390.a28[gUnk_03005390.f10] == 0 ||
+            *gUnk_03006A70[gUnk_03005390.f10] == 0x27) {
             RfuManager_RequestMscCycleCompletion();
-            s->f4 = 0x18;
-            rfu_clearSlot(4, s->f10);
-            s->f24 &= ~(1 << s->f10);
-            a[s->f10] = 0;
+            gUnk_03005390.f4 = 0x18;
+            rfu_clearSlot(4, gUnk_03005390.f10);
+            gUnk_03005390.f24 &= ~(1 << gUnk_03005390.f10);
+            gUnk_03005390.a28[gUnk_03005390.f10] = 0;
         }
     }
     *(vu16 *)0x04000208 = ime;
-    s = &gUnk_03005390;
-    if (s->f4 == 0x18) {
-        u32 z;
-        if (s->f2 == 1)
+    if (gUnk_03005390.f4 == 0x18) {
+        if (gUnk_03005390.f2 == 1)
             RfuManager_RequestMscCycleCompletion();
-        z = s->f2;
-        if (z == 0) {
-            s->f5 = z;
-            s->f4 = z;
+        if (gUnk_03005390.f2 == 0) {
+            gUnk_03005390.f5 = 0;
+            gUnk_03005390.f4 = 0;
             RfuManager_DisconnectAndWait(gUnk_03006A80->f2 | gUnk_03006A80->f3);
-            s->f14 = z;
+            gUnk_03005390.f14 = 0;
             RfuManager_NotifyEvent(0x25, 1);
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082247CC);
-#endif
