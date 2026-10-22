@@ -483,7 +483,7 @@ address,isa,evidence,replacement_end
 081BE140,thumb,Hidden delay loop,081BE150
 081BE150,thumb,Hidden empty function,081BE154
 081BE154,thumb,Hidden raw-tail function,081BE16C
-081BEBE0,thumb,Hidden tail after Storage_ShowConsumableDescription,
+081BEBE0,thumb,Hidden raw-tail function,081BECA4
 081C0A24,thumb,Hidden raw-tail function,081C0A80
 081C17C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081C17D4
 081C3024,thumb,Hidden tail after RegistryF3E4_GetStateResult,
