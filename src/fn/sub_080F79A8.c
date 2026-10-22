@@ -1,9 +1,11 @@
 #include "global.h"
+#define Axe_UpdateOrbitAttack sub_080F79A8
+#ifdef NONMATCHING
+// fuzzy: 91.0%
+// Remaining: polar address reuse, signed RNG/direction loads, collider loop allocation and phase-tail scheduling.
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
 
-#ifdef NONMATCHING
-// fuzzy: 90.1%
 // Branch layout, address reuse and register allocation still differ.
 // confidence=low: the axe and its auxiliary sprite orbit a shared moving center.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
@@ -61,11 +63,11 @@ struct AxeActor {
     u32 flags114;
     u8 pad118[0x1C];
     struct ColliderFlags bodyCollider;
-    u8 pad13C[0xE0];
-    void *callback;
-    u8 pad220[0x68];
+    u8 pad13C[0x4C];
     struct ColliderFlags attackCollider;
-    u8 pad290[0x20];
+    u8 pad190[0x8C];
+    void *callback;
+    u8 pad220[0x90];
     u8 state;
     u8 pad2B1[0x1];
     u8 entered;
@@ -229,8 +231,14 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
         ChangePhase(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);
     } else if (frame > 1000) {
         s32 i;
-        p->attackCollider.flags |= 4;
-        p->bodyCollider.flags |= 4;
+        {
+            struct ColliderFlags *c = &p->attackCollider;
+            c->flags |= 4;
+        }
+        {
+            struct ColliderFlags *c = &p->bodyCollider;
+            c->flags |= 4;
+        }
         for (i = 0; i < 3; i++) {
             data->attack[i].flags |= 4;
             data->body[i].flags |= 4;
@@ -240,5 +248,5 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateOrbitAttack);
+INCLUDE_ASM("asm/nonmatching", sub_080F79A8);
 #endif
