@@ -42,7 +42,8 @@ static inline s32 PlayerSlot(u8 *target)
 static inline u32 TestSlot(s32 i)
 {
     u32 mask = 8;
-    return (&gPlayerSlotFlags)[i] & mask;
+    u32 *flags = &gPlayerSlotFlags;
+    return flags[i] & mask;
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
