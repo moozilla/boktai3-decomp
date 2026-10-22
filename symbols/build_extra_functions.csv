@@ -288,7 +288,9 @@ address,isa,evidence,replacement_end
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
 0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference,
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
-0812CE30,thumb,Hidden tail after FragmentEffect_ResetManagerReference,
+0812CE30,thumb,Hidden tail function,0812CE64
+0812CE64,thumb,Hidden tail function,0812CE90
+0812CE90,thumb,Hidden tail function,0812CE94
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
 0812D58C,thumb,Hidden tail after FragmentSpritePool_ResetSingleton,
 0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
@@ -366,7 +368,7 @@ address,isa,evidence,replacement_end
 0815D460,thumb,Hidden script command (PlayerCue_WindblownVariant2; keyword r),0815D4A4
 0815D4A4,thumb,Hidden script command (PlayerCue_StandDiagonal; keyword d),0815D4E8
 0815D5B0,thumb,Hidden script command: timed charge cue with t/c timers,0815D688
-0815DBF4,thumb,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched),
+0815DBF4,thumb,Hidden raw-tail function,0815DC48
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
@@ -466,7 +468,7 @@ address,isa,evidence,replacement_end
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
 081B94AC,thumb,Hidden tail after OrbitMotion_BeginArc,
-081B9864,thumb,Hidden tail after Registry2388_SetUpdate,
+081B9864,thumb,Hidden raw-tail function,081B98D8
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
 081BB114,thumb,Hidden raw-tail function,081BB124
 081BB124,thumb,Hidden raw-tail function,081BB13C
