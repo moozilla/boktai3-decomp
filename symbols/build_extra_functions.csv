@@ -234,6 +234,8 @@ address,isa,evidence,replacement_end
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
 0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
+08110128,thumb,Hidden raw-tail function,08110164
+08110164,thumb,Hidden raw-tail function,08110188
 08110A8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08110A98
 08110A98,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,08110AD4
 08110C84,thumb,Short busy-wait delay loop (32 iterations); raw span,08110C9C
