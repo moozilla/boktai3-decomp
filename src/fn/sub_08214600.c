@@ -1,9 +1,9 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.4%
-// Structure matches except the two OAM tail loops: agbcc reverses their k counter
-// (the ROM keeps k counting up against count) and register choices in the flag tests.
+// fuzzy: 96.9%
+// Left: reload registers in the affine attribute block (r3/r4) and the order of the
+// attrs[] giv init against the hoisted flags & 8 in the piece loop preheader.
 
 struct SpritePiece {
     u8 shape;
@@ -80,6 +80,28 @@ static inline s32 DIV4096(s32 v)
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 
+static inline void Oam_PushImmediate(u32 a, u32 t)
+{
+    s32 n = gUnk_03004798;
+    if (n <= 127) {
+        gUnk_03004390[n].attributes = a;
+        gUnk_03004390[n].tile = t;
+        gUnk_03004798 = n + 1;
+        gUnk_03003A04 |= 1;
+    }
+}
+static inline void Oam_PushSorted(u32 a, u32 t, s32 z, u32 priority)
+{
+    s32 n = gUnk_0300479C;
+    if (n <= 127) {
+        struct OamEntry *e = &gUnk_030047A0[n];
+        e->attributes = a;
+        e->tile = t;
+        e->depth = ((z + 128) & 0xFF) << 8;
+        gUnk_0300479C = n + 1;
+        gUnk_03004790[priority]++;
+    }
+}
 static inline s32 Affine_Alloc(u8 rotation, s8 sx, s8 sy)
 {
     s32 n;
@@ -229,30 +251,11 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
             (priority << 10) |
             (Palette_CacheObjectBank(res->paletteKey + anim->paletteOffset, res->palette) << 12);
         if (p->flags & 0x20) {
-            for (k = 0; k < count; k++) {
-                u32 t = (base + tiles[k]) | extra;
-                u32 a = attrs[k];
-                s32 n = gUnk_03004798;
-                if (n <= 127) {
-                    gUnk_03004390[n].attributes = a;
-                    gUnk_03004390[n].tile = t;
-                    gUnk_03004798 = n + 1;
-                    gUnk_03003A04 |= 1;
-                }
-            }
+            for (k = 0; k < count; k++)
+                Oam_PushImmediate(attrs[k], (base + tiles[k]) | extra);
         } else {
-            for (k = 0; k < count; k++) {
-                u32 t = (base + tiles[k]) | extra;
-                u32 a = attrs[k];
-                s32 n = gUnk_0300479C;
-                if (n <= 127) {
-                    gUnk_030047A0[n].attributes = a;
-                    gUnk_030047A0[n].tile = t;
-                    gUnk_030047A0[n].depth = ((z + 128) & 0xFF) << 8;
-                    gUnk_0300479C = n + 1;
-                    gUnk_03004790[priority]++;
-                }
-            }
+            for (k = 0; k < count; k++)
+                Oam_PushSorted(attrs[k], (base + tiles[k]) | extra, z, priority);
         }
     }
 }
