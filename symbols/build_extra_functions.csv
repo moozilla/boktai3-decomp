@@ -268,7 +268,13 @@ address,isa,evidence,replacement_end
 08197D94,thumb,Independent 60-byte palette-flash constructor for a sprite (push/pop-bx; literal pool) before sub_08197DD0; exact standalone C,08197DD0
 0819AE10,thumb,Independent 52-byte wrapper building a 0x20/0/0x20 extent on the stack for sub_080472A4; exact standalone C,0819AE44
 0819AE78,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0819AE84
-0819AE84,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0819AF14
+0819AE84,thumb,ActionState substate setter; first of seven small functions in the reviewed 0819AE84-0819AF14 span (each matched separately),0819AE90
+0819AE90,thumb,ActionState substate increment; part of the reviewed 0819AE84-0819AF14 span,0819AEA0
+0819AEA0,thumb,ActionState step counter reset; part of the reviewed 0819AE84-0819AF14 span,0819AEA8
+0819AEA8,thumb,ActionState step setter; part of the reviewed 0819AE84-0819AF14 span,0819AEB0
+0819AEB0,thumb,ActionState step increment; part of the reviewed 0819AE84-0819AF14 span,0819AEBC
+0819AEBC,thumb,Hresvelgr-local copy of the half-step scalar approach; part of the reviewed 0819AE84-0819AF14 span,0819AEE0
+0819AEE0,thumb,Hresvelgr-local copy of the quarter-step scalar approach; part of the reviewed 0819AE84-0819AF14 span,0819AF14
 0819AF48,thumb,Independent 52-byte approach helper (push/pop-bx) after preceding literal pool; exact standalone C,0819AF7C
 0819AF7C,thumb,Independent 40-byte angle wrap helper with own literal pool; exact standalone C,0819AFA4
 0819AFA4,thumb,Independent 20-byte clamp-around helper; exact standalone C,0819AFB8
