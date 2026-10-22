@@ -82,4 +82,3 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
         SceneHud_SetActionCursorPosition(p + 0x15c0, *selected);
     }
 }
-
