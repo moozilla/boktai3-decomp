@@ -367,7 +367,109 @@ void WirelessGameItems_UpdateHiddenItem(struct WirelessGameItems *p, struct Wire
 
 extern const u16 gUnk_0824DE7C[];
 
+#ifdef NONMATCHING
+// fuzzy: 95.7%
+// Open: the random-table address is loaded before the state address in ROM, and
+// the zeros for pos->z / p->timer are kept in registers.
+extern const u16 gUnk_0824DE8C[];
+
+static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct WirelessGameItem *p,
+                                  int index)
+{
+    int choice;
+    int count = p->count;
+    struct WirelessGameSprite *sprite = &p->sprite;
+    struct WirelessGameDrawing *drawing;
+    sprite->value = count;
+    p->sprite.flags &= ~1;
+    {
+        struct WirelessGameDrawing *d = drawing = &p->drawing;
+        struct WirelessGameResource *res = &owner->resource;
+        if (index > 7)
+            choice = (index & 3) + 4;
+        else
+            choice = index & 3;
+        Anim_LoadKeyframe(d, res, gUnk_0824DE7C[choice], 0);
+    }
+    p->drawing.flags &= ~1;
+}
+
+static inline u32 Item_NextRandom(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    return gUnk_0203B400[gUnk_03005308];
+}
+
+static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSprite *sprite,
+                              struct WirelessGameDrawing *drawing, int index)
+{
+    struct WirelessGamePosition *pos = &p->drawing.position.coords;
+    int y = 0x80;
+    if (index > 7)
+        y = 0x90;
+    pos->x = gUnk_0824DE8C[index & 3] + 0x50;
+    pos->y = y;
+    pos->z = 0;
+    if (p->shakeTicks) {
+        u32 r = Item_NextRandom();
+        {
+            s32 v = drawing->position.coords.x - 1;
+            drawing->position.coords.x = v + (r & 3);
+        }
+        r = Item_NextRandom();
+        {
+            s32 v = drawing->position.coords.y - 1;
+            drawing->position.coords.y = v + (r & 3);
+        }
+    }
+    *(struct WirelessGamePair *)&sprite->x = drawing->position.words;
+}
+
+void sub_080399F4(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
+{
+    if (p->entered) {
+        p->entered = 0;
+        Item_LoadFrame(owner, p, index);
+        p->shakeTicks = 0;
+        Item_Place(p, &p->sprite, &p->drawing, index);
+    }
+    if (p->count) {
+        int slot = index & 3;
+        int ticks = p->shakeTicks;
+        if (ticks) {
+            p->shakeTicks = ticks - 1;
+            Item_Place(p, &p->sprite, &p->drawing, index);
+        }
+        if (p->timer > 29) {
+            int zero = 0;
+            int state;
+            p->timer = 30;
+            if (index > 7) {
+                int sum = owner->current[slot] + owner->pending[slot];
+                if (sum <= 0) {
+                    state = 2;
+                } else {
+                    p->count = sum;
+                    goto load;
+                }
+            } else {
+                state = 4;
+            }
+            p->state = state;
+            p->entered = 1;
+            p->timer = zero;
+        }
+    load:
+        Item_LoadFrame(owner, p, index);
+    } else {
+        p->sprite.flags |= 1;
+        p->drawing.flags |= 1;
+    }
+    p->timer++;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_080399F4);
+#endif
 
 void WirelessGameItems_UpdateBlinkingItem(struct WirelessGameItems *p, struct WirelessGameItem *q,
                                           int index)
