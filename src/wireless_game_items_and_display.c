@@ -720,7 +720,93 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
     p->timer++;
 }
 
+extern const s16 gUnk_086149C4[];
+s32 Math_Atan2(s32, s32);
+
+static inline int ScaleSine(int n)
+{
+    return n >= 0 ? n >> 12 : -((-n) >> 12);
+}
+
+#ifdef NONMATCHING
+// fuzzy: ~90%
+// Register allocation of the angle/random chain and the owner pointer still differ.
+void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
+{
+    struct WirelessGameDrawing *drawing = &p->drawing;
+    struct WirelessGameSprite *sprite = &p->sprite;
+    if (p->entered) {
+        struct WirelessGameVector *start;
+        struct WirelessGameVector *end;
+        const u16 *entry;
+        int choice;
+        s8 angle;
+        p->entered = 0;
+        sprite->value = p->count;
+        p->sprite.flags &= ~1;
+        if (index > 7)
+            choice = (index & 3) + 4;
+        else
+            choice = index & 3;
+        Anim_LoadKeyframe(drawing, &owner->resource, gUnk_0824DE7C[choice], 0);
+        p->drawing.flags &= ~1;
+        start = &p->start;
+        entry = &gUnk_0824DE8C[index & 3];
+        p->start.x = 272 + *entry;
+        start->y = 32;
+        start->z = 0;
+        end = &p->end;
+        {
+            int y = 128;
+            if (index > 7)
+                y = 144;
+            p->end.x = *entry + 80;
+            end->y = y;
+            end->z = 0;
+        }
+        WirelessGameItem_SetRandomArcVelocity(p, 32, 15);
+        angle = Math_Atan2(p->start.x - p->end.x, start->y - end->y);
+        {
+            u32 r = gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
+            struct WirelessGameVector *drift = &p->drift;
+            s32 a = angle;
+            s8 b;
+            a -= 16;
+            a += r & 31;
+            b = a;
+            a = b;
+            drift->x = ScaleSine(gUnk_086149C4[(a + 64) & 255] * 8);
+            {
+                int k = 8;
+                drift->y = ScaleSine(k * gUnk_086149C4[a & 255]);
+            }
+            drift->z = 0;
+        }
+    }
+    if (p->timer <= 27) {
+        void *position = &drawing->position.words.x;
+        Vec16_Lerp(position, &p->start, &p->end, p->timer, 5);
+        WirelessGameItems_ApplyMotionWave(position, p->timer, p->arcVelocity);
+    } else {
+        struct WirelessGamePosition *pos = &drawing->position.coords;
+        struct WirelessGameVector *drift = &p->drift;
+        pos->x += drift->x;
+        pos->y += drift->y;
+        pos->z += drift->z;
+    }
+    sprite->x = drawing->position.words.x;
+    sprite->y = drawing->position.words.y;
+    if (p->timer > 43) {
+        int zero = 0;
+        p->state = zero;
+        p->entered = 1;
+        p->timer = zero;
+    }
+    p->timer++;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0803A068);
+#endif
 
 void WirelessGameItems_UpdateTemporaryItem(struct WirelessGameItems *p, struct WirelessGameItem *q,
                                            int index)
