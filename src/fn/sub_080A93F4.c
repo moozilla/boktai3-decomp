@@ -1,9 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 99.6%
-// Remaining difference: the incoming row argument is copied to r4 before the body pin, not after the kind spill.
 struct SegmentAnim {
     const u16 *data;
     u8 flags, count, factor, rate;
@@ -29,9 +26,7 @@ static inline u8 TestMask4(struct SegmentAnim *p, u32 mask)
 {
     register u32 m asm("r4");
     u32 f = p->status;
-    asm("" : "+r"(f));
     m = mask;
-    asm("" : "+r"(m));
     if (f & m)
         return 1;
     return 0;
@@ -39,7 +34,6 @@ static inline u8 TestMask4(struct SegmentAnim *p, u32 mask)
 static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
 {
     register u32 m asm("r1") = mask;
-    asm("" : "+r"(m));
     if (*(volatile u8 *)&p->status & m)
         return 1;
     return 0;
@@ -47,16 +41,14 @@ static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
 static inline u8 TestMask(struct SegmentAnim *p, u32 mask)
 {
     u32 f = p->status;
-    asm("" : "+r"(f));
     if (f & mask)
         return 1;
     return 0;
 }
 static inline void *ScriptAt(u8 *body, s32 offset)
 {
-    register u32 address asm("r0") = 0x4d4;
+    u32 address = 0x4d4;
     address += (u32)body;
-    asm("" : "+r"(address));
     address += offset;
     return *(void **)address;
 }
@@ -65,9 +57,8 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
     register struct Segment *seg asm("r8") = sprite;
     register struct Segment *o asm("r6") = seg;
     struct SegmentAnim *a = input;
-    register struct SegmentAnim *b asm("r4") = input;
+    struct SegmentAnim *b = input;
     const volatile u16 *entry;
-    asm("" : "+r"(o), "+r"(b));
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
@@ -79,7 +70,6 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
         bits = (*entry & 0x30) >> 4;
         if (left != (bits & ({
                          register u32 m3 asm("r3") = 1;
-                         asm("" : "+r"(m3));
                          m3;
                      })))
             o->flags |= 4;
@@ -89,7 +79,6 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
             register u32 v asm("r0") = *pa;
             v &= ~4;
             pb = &seg->flags;
-            asm("" : "+r"(pb));
             *pb = v;
         }
     }
@@ -104,9 +93,9 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
     }
     {
         u32 elapsed = b->timer + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r3");
-        register u32 savedDuration asm("r2");
+        u32 savedDuration;
         register u32 duration asm("r3");
         u32 flags;
         b->timer = elapsed;
@@ -122,7 +111,7 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
             if (flags & 4) {
                 u32 index = b->frame;
                 if (index == 0) {
-                    register u32 f8 asm("r0") = 8;
+                    u32 f8 = 8;
                     f8 &= flags;
                     if (f8)
                         b->timer = savedDuration;
@@ -151,27 +140,29 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
                 u32 r = (b->factor * b->scale) >> 6;
                 b->rate = r;
                 if (!(u8)r) {
-                    register u32 one asm("r0") = 1;
+                    u32 one = 1;
                     b->rate = one;
                 }
             }
         }
     }
 }
+#define TentacleBody_RestartSegmentAnimations sub_080A93F4
 void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32 flagsIn)
 {
-    register u8 *body asm("r9") = input;
+    u8 *body = input;
     struct {
         s32 kind, flags;
         u8 *actor, *profile;
         s32 i;
     } frame;
     s32 row;
-    register s32 offset asm("r10");
+    register s32 sourceRow asm("r2") = rowIn;
+    s32 offset;
     struct SegmentAnim *a;
     register struct Segment *s asm("r8");
     frame.kind = kindIn;
-    row = rowIn;
+    row = sourceRow;
     frame.flags = flagsIn;
     frame.actor = body;
     frame.profile =
@@ -182,8 +173,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
     offset = 0;
     a = (void *)(body + 0x4c4);
     {
-        register u32 t asm("r3") = 0x3d4;
-        asm("" : "+r"(t));
+        u32 t = 0x3d4;
         t += (u32)body;
         s = (void *)t;
     }
@@ -191,7 +181,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
         if (!TestMask4(a, 1)) {
             if (TestMask2(a, 4)) {
                 Anim_RestartSequence(a, ScriptAt(body, offset), 1, row, ({
-                                         register s32 t asm("r2") = frame.flags;
+                                         s32 t = frame.flags;
                                          u32 u = (u8)t;
                                          asm("" ::"r"(t));
                                          u;
@@ -217,9 +207,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
                 {
                     register u8 *act asm("r1") = frame.actor;
                     register u16 *ad asm("r0");
-                    asm("" : "+r"(act));
                     ad = (u16 *)(act + 0x2c2);
-                    asm("" : "+r"(ad));
                     Anim_SetDurationScale(a, *ad);
                 }
             }
@@ -227,7 +215,6 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
         }
         {
             register u32 step asm("r1") = 0x128;
-            asm("" : "+r"(step));
             offset += step;
             a = (void *)((u8 *)a + step);
             s = (void *)((u8 *)s + step);
@@ -239,13 +226,8 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
              }) < ({
                  register u32 d asm("r1");
                  s32 cnt;
-                 asm("" : "=r"(d));
                  cnt = FIELD(body, 0x8da, s16);
                  asm("" ::"r"(d));
                  cnt;
              }));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_RestartSegmentAnimations);
-#endif
