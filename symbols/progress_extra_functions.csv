@@ -316,6 +316,9 @@ address,evidence
 0812CE90,Hidden tail function
 0812D17C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812D58C,Hidden tail after FragmentSpritePool_ResetSingleton
+0812D5F0,Fragment pool: force all live actors to state 3 (0812D58C tail)
+0812D624,Spawn scripted collider actor variant 0x78 at fixed position (0812D58C tail)
+0812D66C,Empty bx-lr stub (0812D58C tail)
 0812D7A8,SceneParticle_Create wrapper with mode 1; raw span
 0812D7BC,SceneParticle_Create pass-through wrapper; raw span
 0812DEB0,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength

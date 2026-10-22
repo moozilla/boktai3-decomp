@@ -297,7 +297,7 @@ address,isa,evidence,replacement_end
 0812CE64,thumb,Hidden tail function,0812CE90
 0812CE90,thumb,Hidden tail function,0812CE94
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
-0812D58C,thumb,Hidden tail after FragmentSpritePool_ResetSingleton,
+0812D58C,thumb,Hidden raw-tail function: fragment pool: test active actor at position,0812D670
 0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
 0812D7BC,thumb,SceneParticle_Create pass-through wrapper; raw span,0812D7D0
 0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
