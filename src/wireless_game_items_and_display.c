@@ -368,9 +368,9 @@ void WirelessGameItems_UpdateHiddenItem(struct WirelessGameItems *p, struct Wire
 extern const u16 gUnk_0824DE7C[];
 
 #ifdef NONMATCHING
-// fuzzy: 95.7%
+// fuzzy: 97.1%
 // Open: the random-table address is loaded before the state address in ROM, and
-// the zeros for pos->z / p->timer are kept in registers.
+// the zero for pos->z in the second placement is kept in r1.
 extern const u16 gUnk_0824DE8C[];
 
 static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct WirelessGameItem *p,
@@ -441,23 +441,21 @@ void sub_080399F4(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
             Item_Place(p, &p->sprite, &p->drawing, index);
         }
         if (p->timer > 29) {
-            int zero = 0;
-            int state;
             p->timer = 30;
             if (index > 7) {
                 int sum = owner->current[slot] + owner->pending[slot];
                 if (sum <= 0) {
-                    state = 2;
+                    p->state = 2;
+                    p->entered = 1;
+                    p->timer = 0;
                 } else {
                     p->count = sum;
-                    goto load;
                 }
             } else {
-                state = 4;
+                p->state = 4;
+                p->entered = 1;
+                p->timer = 0;
             }
-            p->state = state;
-            p->entered = 1;
-            p->timer = zero;
         }
     load:
         Item_LoadFrame(owner, p, index);
