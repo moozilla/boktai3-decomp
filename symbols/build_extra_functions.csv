@@ -147,6 +147,7 @@ address,isa,evidence,replacement_end
 08072124,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08072188
 08072204,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08072264
 080762A8,thumb,Independent 296-byte profile animation selector with own push and pop-bx inside gbadisasm raw byte range after08076174,080763D0
+08077444,thumb,Hidden tail after SceneActorPlacement_ResetActorState,
 0807836C,thumb,Independent 196-byte drawable blink/cadence routine with PUSH-r4-r5-r6-LR and POP/BX after 0807827C return and literal pool; no stored Thumb pointer or direct branch reference found,08078430
 08078550,thumb,Independent 252-byte descriptor steering routine with PUSH/save prologue and POP/BX after 08078430 return; no stored Thumb pointer or direct branch reference found,0807864C
 08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08078BB4
@@ -174,18 +175,25 @@ address,isa,evidence,replacement_end
 080A6294,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A62DC
 080A7188,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A71A0
 080A8CDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A8D50
+080AA240,thumb,Hidden tail after ActorTrail_ResetAtSavedPosition,
 080AA688,thumb,Removes the colliders of every still-active part (flag bit 0 at part+0x105) and counts down the live total at context+0x8EA; raw span before the next function; retained assembly,
 080ACCD4,thumb,Independent 28-byte leaf (no push; old_agbcc) storing an entry position; left as incbin by gbadisasm; exact standalone C,080ACCF0
 080AD110,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080AD114
 080B1F48,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B1FA8
 080B2354,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080B23A0
+080B6480,thumb,Hidden tail after SceneActor_UpdateProfileForCategory,
 080B8A58,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B8AB8
+080C7E18,thumb,Hidden tail after Golem_ResumeSavedTarget,
 080D6FBC,thumb,Player flag test: TRUE when bit 3 of the player actor's flags (+0x20) is set; raw span before Mummy_RequestStraightRoute,080D6FDC
+080DA5C8,thumb,Hidden tail after Mummy_ResetMotionState,
+080DE42C,thumb,Hidden tail after Dog_SelectTargetAction,
+080DF6EC,thumb,Hidden tail after Dog_TickCooldown,
 080E81FC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E8200
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
 080ED484,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080ED4E0
 080F05B4,thumb,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId,080F05CC
+080F2D00,thumb,PhaseObject: counts callback hits and switches to PhaseObject_ApproachTarget after three; raw span,080F2D50
 080F3638,thumb,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties,080F3650
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
@@ -193,48 +201,78 @@ address,isa,evidence,replacement_end
 080FFF74,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFF78
 08100388,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810038C
 081010DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081010E0
+08101500,thumb,Moves the player and tether 0x80 along X from the gUnk_02000580 position; raw span,08101550
 08101A34,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08101A38
 08101A38,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08101A3C
 08103AD0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08103ADC
 08103F24,thumb,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound",08103F44
 081041F0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,08104204
+08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; retained assembly,
 081047B0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081047B4
 08105A40,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08105A44
 0810731C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08107320
 0810874C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08108750
 08108968,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810896C
+081090E0,thumb,Link session: stores a value in the first free of five slots at 0x164; -1 when unavailable; raw span,08109134
+08109184,thumb,Script command: writes LinkSession_CountPlayerKind of the script value to a reference; raw span,081091AC
+081091AC,thumb,Script command: writes link session halfword 0x18 (or -1) to a reference; raw span,081091E4
+08109264,thumb,Hidden tail after LinkSession_IncrementAlternateCounter,
 08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
 081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
+0810BD34,thumb,Registry-style reset: per-slot words and seed index from 0x140; raw span,0810BD8C
+0810BF60,thumb,Clears the three text windows stored at 0xF68/0xF60/0xF64; raw span,0810BF94
 0810C128,thumb,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations,0810C14C
+0810C774,thumb,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span,0810C798
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
+0810CE88,thumb,Clears the three text windows stored at 0x1408/0x1400/0x1404; raw span,0810CEBC
+0810D1A4,thumb,Hidden tail after Registry30AC_RemoveAnimations,
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
 0810E928,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810E964
+0810F254,thumb,Hidden tail after LinkLobbyPanel_RemoveSprites,
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
+0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
 08110A8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08110A98
 08110A98,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,08110AD4
+08110C84,thumb,Short busy-wait delay loop (32 iterations); raw span,08110C9C
+081111C4,thumb,SceneTilemap: word 0x54 minus 12 or -1 when inactive; raw span,081111E8
+08111A24,thumb,Stores a halfword into the gUnk_020001D8 table at 0x1AD8 when present; raw span before PaletteFade_StartFromScript,08111A48
 08113638,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08113644
 08114CA0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08114CAC
 08114CAC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08114CB0
+081150E4,thumb,sub_08114E68 wrapper that swaps the last two stack args and passes 0; raw span,08115104
 0811525C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115268
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
+0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
+0811ACCC,thumb,Hidden tail after Terrain_GetCellHighByte,
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
+0811BB98,thumb,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span,0811BBE0
 0811D218,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D234
 0811D234,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D250
+0811D2E4,thumb,Hidden tail after Video_DrawBackgroundRowMarkers,
+0811D47C,thumb,Copies up to four words as bytes into 0x08 and stores the count at 0x0C; raw span,0811D4AC
+0811E3DC,thumb,ScriptRecord table: count word 0x1C or 0 when the table is absent; raw span before ScriptRecord_FindModifier,0811E3F8
+0811E470,thumb,ScriptRecord table: count word 0xE8 or 0 when absent; raw span before ScriptRecord_FindExtendedModifier,0811E48C
+0811E514,thumb,ScriptRecord table: count word 0x13C or 0 when absent; raw span before ScriptRecord_FindAttributeModifier,0811E534
+0811E5B0,thumb,ScriptRecord table: count word 0x1A8 or 0 when absent; raw span before ScriptRecord_FindByteModifier,0811E5D0
+0811E644,thumb,Modifier table task: count word 0x1FC or 0 when absent; raw span before Modifier_ScaleDefaultStat,0811E660
+0811FEE0,thumb,Hidden tail after ActorCollision_InitBounds,
 0812125C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08121268
 08121454,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121458
 08121B98,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121B9C
 08121F70,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08121F7C
 08121F7C,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08121F80
+0812231C,thumb,SpriteEffect_SpawnWithMotion pass-through wrapper; raw span,08122338
 08122668,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812266C
 08122868,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812286C
 08122DF0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08122DF4
 08125498,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812549C
 08125524,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125528
+08125928,thumb,Hidden tail after PairSlotPool_Allocate,
 08125B64,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125B68
 08126140,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08126144
 08126650,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0812665C
@@ -246,22 +284,39 @@ address,isa,evidence,replacement_end
 08128B48,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08128B4C
 081298F0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081298F4
 0812A7B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812A7B8
+0812B350,thumb,Hidden tail after FragmentProjectilePool_ResetSingleton,
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
+0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference,
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
+0812CE30,thumb,Hidden tail after FragmentEffect_ResetManagerReference,
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
+0812D58C,thumb,Hidden tail after FragmentSpritePool_ResetSingleton,
+0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
+0812D7BC,thumb,SceneParticle_Create pass-through wrapper; raw span,0812D7D0
+0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
+0812DF94,thumb,Actor anchor clamp then Nav/terrain test that clears flag 0x200 or velocity; raw span,0812E058
 0812E094,thumb,Independent 132-byte command-selection routine with full high-register save prologue and restore after 0812E084 leaf return; removes132 false old retained-tail C bytes,0812E118
+0812E46C,thumb,Hidden tail after InventorySlot_PickRandom,
 0812EED0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812EED4
 0812F5C4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812F5C8
 0812F5C8,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5CC
 0812F5CC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5D0
 08130B20,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08130B24
+08135CC4,thumb,SceneActorPlacement state-3 reset gated on flag 0x4000; retained assembly (register allocation of hoisted zeros),
+08136A9C,thumb,SceneActorPlacement response: flag 0x20 and response slot 3 then sound 0x13E; returns 1; raw span,08136AF0
 08136F44,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08136F48
 08136F48,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0813760C
+08137E28,thumb,Hidden tail after SceneActorTarget_TrySelectNearestParticipant,
+081383E0,thumb,Hidden tail after Registry1745_InitParticipantOrder,
+08138664,thumb,Registry1745 reset: participant order and per-slot words then 08138630 and seed index; raw span,081386F0
+08138724,thumb,Registry1745: wraps three counters at 0x1F8 against limits table 086108DC; raw span,08138750
+08138750,thumb,Registry1745: TRUE when any of the first count flag bytes at 0x74 is set; raw span,08138778
 08138ABC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08138AC8
 08139FA0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08139FAC
 0813A614,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813A620
 0813A958,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813A964
 0813A9D4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0813A9D8
+0813AC58,thumb,ScreenMote_SpawnBatch wrapper that swaps the last two stack args and passes 0; raw span,0813AC78
 0813ADC4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813ADD0
 0813B3AC,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0813B3BC
 0813E0F0,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0813E108
@@ -273,6 +328,10 @@ address,isa,evidence,replacement_end
 0813E1B8,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E1D8
 0813E284,thumb,Independent modifier callback in equipment-level tail; own push and pop-bx; notes/player_3.md,0813E324
 0813F828,thumb,Independent energy-spend body after affordability test; push and pop-bx; notes/player_3.md,0813F84C
+0814A4F8,thumb,Player: actionVariant = savedActionIndex + 1 when positive else 0; raw span,0814A530
+0814A7CC,thumb,Player attack power wrapper: Player_CalculateBaseAttackPower(p 0); raw span after it,0814A7D8
+0814B02C,thumb,Player: folds an angle into heading/side bytes 0x3A2/0x3A3; raw span,0814B078
+0814CF2C,thumb,Player tether phase step: sound/animation on phase 0 and control flags 5 on phases 2-3; raw span,0814CFC0
 08156C8C,thumb,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set),08156CAC
 0815849C,thumb,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay,08158588
 08158754,thumb,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay,08158848
@@ -283,6 +342,7 @@ address,isa,evidence,replacement_end
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
 0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
+0815A1AC,thumb,Hidden tail after Player_AdvanceTetherPhase,
 0815A444,thumb,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched),
 0815A4D8,thumb,Hidden script query (actor direction),0815A534
 0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
@@ -312,29 +372,38 @@ address,isa,evidence,replacement_end
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
 0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
 0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+081656E0,thumb,Hidden tail after Hud_DrawHeaderCounter,
 0816A578,thumb,Hidden menu prompt setup: background layer then ramp display,0816A5A8
 0816A770,thumb,Hidden menu prompt setup: hide sprites then pulse display,0816A7D8
 0816AA28,thumb,Hidden scene HUD page exit fade,0816AAB0
+0816CB50,thumb,Hidden tail after MapMenu_DrawLocationIcons,
 0816CE8C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,0816CEA0
 0816D3E8,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0816D40C
 081711D8,thumb,Hidden pause inventory consumable effect delta,08171258
 08172094,thumb,Hidden inventory entry lock predicate (retained),
 081720D4,thumb,Hidden inventory entry unlocked or equipped (retained),
+081745DC,thumb,Hidden tail after Presentation_SelectGraphicResource,
+08174930,thumb,Hidden tail after InventoryGrid_GetSlotPosition,
 08177D88,thumb,Hidden getter: option HUD field 0xA5C or -1,08177DAC
 081780B4,thumb,Independent 32-byte HUD mode refresh with own push and pop-bx after Hud_SetModeFromScript; exact standalone C,081780D4
 081782AC,thumb,Hidden option HUD setter: field 0xA8C=4 when mode 1-2,081782E0
+0817845C,thumb,Hidden raw-tail function,08178474
+08178474,thumb,Hidden raw-tail function (retained),
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
 0817A354,thumb,Hidden first position inside box search (retained),
+0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition,
 0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
 0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
+08180850,thumb,Hidden tail after ProximityVolume_DispatchUpdate,
 08180898,thumb,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C,081808B4
 08197AE0,thumb,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C,08197B2C
 08197C20,thumb,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C,08197C58
 08197C58,thumb,Independent 64-byte palette-cycle constructor for a sprite (push/pop-bx; literal pool) before sub_08197C98; exact standalone C,08197C98
 08197D5C,thumb,Independent 56-byte palette-flash constructor for an anim (push/pop-bx; literal pool) after sub_08197C98; exact standalone C,08197D94
 08197D94,thumb,Independent 60-byte palette-flash constructor for a sprite (push/pop-bx; literal pool) before sub_08197DD0; exact standalone C,08197DD0
+0819946C,thumb,Hidden tail after SceneEffectQueue_Create,
 0819AE10,thumb,Independent 52-byte wrapper building a 0x20/0/0x20 extent on the stack for sub_080472A4; exact standalone C,0819AE44
 0819AE78,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0819AE84
 0819AE84,thumb,ActionState substate setter; first of seven small functions in the reviewed 0819AE84-0819AF14 span (each matched separately),0819AE90
@@ -375,25 +444,58 @@ address,isa,evidence,replacement_end
 0819B824,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B86C
 0819B86C,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B8B4
 0819B8B4,thumb,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched),0819B930
+0819BB18,thumb,Hidden tail after Hresvelgr_HasAdjacentOverride,
+0819C870,thumb,Hidden raw-tail function (retained),
+0819D190,thumb,Hidden raw-tail function,0819D1D0
+0819E7B0,thumb,Hidden raw-tail function,0819E7F0
+0819EB84,thumb,Hidden raw-tail function (retained),
+0819EBD0,thumb,Hidden raw-tail function (retained),
+0819F49C,thumb,Hidden tail after Hresvelgr_UpdateAdjacentRandomBurstPhase,
 081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
+081A398C,thumb,Hidden raw-tail function,081A39E0
 081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84
 081A47D0,thumb,Hidden Task_Kill wrapper for gUnk_02000240,081A47E4
 081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
+081AB904,thumb,Hidden tail after Vanargand_RunDefeatSequence,
+081ADBB8,thumb,Hidden raw-tail function,081ADBF8
+081AF738,thumb,Hidden raw-tail function,081AF76C
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
+081B7614,thumb,Hidden raw-tail function (retained),
+081B8104,thumb,Hidden raw-tail function,081B8160
+081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
+081B94AC,thumb,Hidden tail after OrbitMotion_BeginArc,
+081B9864,thumb,Hidden tail after Registry2388_SetUpdate,
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
 081BB114,thumb,Hidden raw-tail function,081BB124
 081BB124,thumb,Hidden raw-tail function,081BB13C
+081BB248,thumb,Hidden raw-tail function,081BB294
 081BB38C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,081BB3A0
+081BC2BC,thumb,Hidden raw-tail function,081BC2F0
+081BC2F0,thumb,Hidden raw-tail function,081BC320
+081BDC14,thumb,Hidden tail after Storage_InitSlotMapping,
+081BE130,thumb,Hidden raw-tail function,081BE140
+081BE140,thumb,Hidden delay loop,081BE150
+081BE150,thumb,Hidden empty function,081BE154
+081BE154,thumb,Hidden raw-tail function,081BE16C
+081BEBE0,thumb,Hidden tail after Storage_ShowConsumableDescription,
+081C0A24,thumb,Hidden raw-tail function,081C0A80
 081C17C8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081C17D4
+081C3024,thumb,Hidden tail after RegistryF3E4_GetStateResult,
 081C3EEC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081C3EF0
+081C5660,thumb,Hidden raw-tail function,081C569C
 081C5E84,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,081C5EA8
+081CFCF8,thumb,Hidden tail after SceneNpc_UpdateProjectedIdle,
 081D31D8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31DC
 081D31DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31E0
 081D31E0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081D31EC
+081D36A4,thumb,Hidden raw-tail function,081D36D4
+081D36D4,thumb,Hidden raw-tail function,081D3704
+081D3704,thumb,Hidden raw-tail function,081D372C
 081D374C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D3750
 081D3A94,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D3A98
+081D6C04,thumb,Hidden tail after MonsterBook_Create,
 081DACC4,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081DACCC
 081DACEC,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081DACF4
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
@@ -408,11 +510,26 @@ address,isa,evidence,replacement_end
 081E8370,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081E8374
 081E9BA0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081E9BA4
 081EC384,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081EC388
+081EC5F8,thumb,Hidden raw-tail function,081EC628
+081EC628,thumb,Hidden raw-tail function (retained),
+081ED1A4,thumb,Hidden tail after SceneActors_UpdateIdleDisplay,
 081ED89C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081ED8A0
 081EEEC0,thumb,Hidden raw-tail function,081EEECC
 081EF12C,thumb,Hidden raw-tail function,081EF140
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
+081F28C4,thumb,Hidden tail after SpriteTrail_InitRenderCollider,
+081F2B70,thumb,Hidden raw-tail function,081F2BB0
+081F2F90,thumb,Hidden tail after Ratatosk_FindPointNearestReference,
+081F336C,thumb,Hidden raw-tail function,081F339C
+081F339C,thumb,Hidden raw-tail function,081F33CC
+081F33CC,thumb,Hidden raw-tail function,081F33F0
+081F3414,thumb,Hidden tail after SceneDistance_ClearLinkedEntry,
+081FB7D8,thumb,Hidden counter difference with wrap (retained),
+081FB808,thumb,Hidden leaf returning 0,081FB80C
+081FB80C,thumb,Hidden velocity integrate step,081FB828
+081FB828,thumb,Hidden leaf returning 0,081FB82C
 081FD46C,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081FD474
+081FD53C,thumb,Hidden tail after Projectile_SetTrackingTarget,
 081FDBC4,thumb,Hidden raw-tail function,081FDBF0
 081FE9B0,thumb,Hidden raw-tail function,081FE9DC
 081FEA04,thumb,Hidden raw-tail function,081FEA28
@@ -423,8 +540,11 @@ address,isa,evidence,replacement_end
 08202F38,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,08202F40
 08202F40,thumb,Independent leaf following a reviewed gap function; exact standalone C,08202F48
 08203200,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08203204
+08203D18,thumb,Hidden raw-tail function,08203D6C
 0820602C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08206030
 08210A2C,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08210A48
+08211820,thumb,Hidden raw-tail function,08211860
+08211860,thumb,Hidden raw-tail function,082118A0
 08211DE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08211DE4
 08212F34,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08212F50
 082141B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082141B8
@@ -438,6 +558,7 @@ address,isa,evidence,replacement_end
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
 08217050,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217060
+08217090,thumb,Hidden tail after Video_SetBlendBrightness,
 08217414,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08217430
 08218BC8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08218BD4
 08218C40,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08218C5C
@@ -446,6 +567,7 @@ address,isa,evidence,replacement_end
 082195F8,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219624
 082196FC,thumb,Hidden raw-tail function,08219728
 08219DB4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219DD8
+08219E44,thumb,Hidden raw-tail function,08219EBC
 0821A0CC,thumb,Hidden raw-tail function,0821A0F8
 0821A168,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821A184
 0821AB50,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821AB64
@@ -454,6 +576,9 @@ address,isa,evidence,replacement_end
 0821AED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821AEDC
 0821AEDC,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF04
 0821AF04,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF2C
+0821BCE4,thumb,Hidden raw-tail function,0821BD48
+0821BDD8,thumb,Hidden raw-tail function,0821BE3C
+0821C884,thumb,Hidden tail after Terrain_SampleSurface,
 0821DE0C,thumb,Hidden raw-tail function,0821DE30
 0821E500,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821E52C
 0821E654,thumb,Hidden raw-tail function,0821E67C
@@ -464,6 +589,7 @@ address,isa,evidence,replacement_end
 0821E840,thumb,Hidden raw-tail function,0821E860
 0821F838,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0821F840
 0821FF34,thumb,Hidden raw-tail function,0821FF50
+082207DC,thumb,Hidden tail after Collider_TestSegmentBounds,
 08220D6C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08220D78
 0822108C,thumb,Hidden raw-tail function (retained),
 082215B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215B8
@@ -515,19 +641,23 @@ address,isa,evidence,replacement_end
 08222C44,thumb,Serial data check (0300530C); part of the reviewed 08222A04-08222C7C span,08222C64
 08222C64,thumb,Serial getter (03005310); part of the reviewed 08222A04-08222C7C span,08222C70
 08222C70,thumb,Serial getter (03005318); part of the reviewed 08222A04-08222C7C span,08222C7C
+08223884,thumb,Hidden raw-tail function,082238F0
+08224BC4,thumb,Hidden tail after RfuManager_SetEventCallback,
+08224CCC,thumb,Hidden raw-tail function,08224D3C
 08224EFC,thumb,Hidden raw-tail function,08224F08
 08224F14,thumb,Hidden raw-tail function,08224F20
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
 08224F98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08224FA4
 082250AC,thumb,Hidden raw-tail function,082250D8
 082254C8,thumb,Hidden scene start: init state then run start or main script,08225504
-08225504,thumb,Hidden leaf returning 0 without lr push (retained),
+08225504,thumb,Hidden leaf returning 0,08225508
 08225620,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225624
 08225834,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08225840
 08225840,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08225844
 08225994,thumb,Hidden raw-tail function,082259A0
 08225E1C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225E20
 08225F40,thumb,Hidden raw-tail function,08225F5C
+082260D8,thumb,Hidden tail after Camera_RequestShake,
 0822624C,thumb,Hidden raw-tail function,08226268
 082263DC,thumb,Hidden raw-tail function,082263FC
 08226454,thumb,Hidden raw-tail function,08226474
@@ -570,6 +700,7 @@ address,isa,evidence,replacement_end
 0822C154,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C180,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C18C,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
+0822C970,thumb,Hidden tail after sub_0822C8D8,
 0822D650,thumb,Hidden raw-tail function,0822D688
 0822D6EC,thumb,Hidden raw-tail function,0822D704
 0822D730,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822D734
@@ -578,7 +709,7 @@ address,isa,evidence,replacement_end
 0822DF68,thumb,Hidden raw-tail function,0822DFA0
 0822DFA0,thumb,Hidden raw-tail function,0822DFDC
 0822E420,thumb,Hidden equipment table entry getter (retained),
-0822E43C,thumb,Hidden leaf getter without lr push (retained),
+0822E43C,thumb,Hidden leaf getter: indexed s16 in game state,0822E458
 0822E54C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0822E564
 0822E6E4,thumb,Hidden raw-tail function,0822E728
 0822F174,thumb,Hidden raw-tail function,0822F1B4
@@ -598,6 +729,9 @@ address,isa,evidence,replacement_end
 0823ABA8,thumb,Hidden raw-tail function,0823ABC0
 0823B8C4,thumb,Hidden raw-tail function (retained),
 0823C8FC,thumb,Hidden raw-tail function (retained),
+0824000C,thumb,Hidden tail after Player_UpdateSolarBombCharge,
+08241714,thumb,Hidden tail after PlayerCue_UpdateOffsetBurst,
+082429AC,thumb,Hidden tail after Player_UpdateLinkKind,
 082436EC,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08243704
 08243704,thumb,Script command (actor i must exist; reads keyword T); first of two functions in the reviewed 08243704-082437A8 span,0824372C
 0824372C,thumb,Script command setting a player action slot (keyword w); second function of the reviewed 08243704-082437A8 span,082437A8
