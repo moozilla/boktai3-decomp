@@ -247,6 +247,7 @@ address,isa,evidence,replacement_end
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
 0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
+0811AC54,thumb,Hidden tail function,0811AC6C
 0811ACCC,thumb,Hidden tail after Terrain_GetCellHighByte,
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
@@ -345,7 +346,7 @@ address,isa,evidence,replacement_end
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
 0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
 0815A1AC,thumb,Hidden tail after Player_AdvanceTetherPhase,
-0815A444,thumb,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched),
+0815A444,thumb,Hidden raw-tail function,0815A4D8
 0815A4D8,thumb,Hidden script query (actor direction),0815A534
 0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
 0815A8A0,thumb,Hidden script command (keyword f flags; keyword p value),0815A918
