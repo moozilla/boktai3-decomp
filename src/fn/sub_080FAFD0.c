@@ -1,6 +1,9 @@
 #include "global.h"
 #include "engine.h"
 
+// confidence=low: initializes scripted cooldown lengths and the health threshold.
+#define Axe_InitAttackCooldowns sub_080FAFD0
+
 #ifdef NONMATCHING
 // fuzzy: 95.1%
 // Remaining difference: scratch register for the sign-extended health in the final quarter calculation (r3 vs r2).
@@ -27,7 +30,7 @@ static inline s32 Quarter(s16 x)
     return -(-x >> 2);
 }
 
-void sub_080FAFD0(struct S080FAFD0 *s)
+void Axe_InitAttackCooldowns(struct S080FAFD0 *s)
 {
     struct Q080FAFD0 *q = s->q;
     s32 i;
