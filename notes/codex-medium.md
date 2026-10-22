@@ -4198,3 +4198,211 @@ All new guarded scores were recorded with check.py --nonmatching --record;
 all default assembly paths were checked. Scratch candidates and diagnostic
 artifacts remain ignored under wip/codex-medium/ and build/. No shared docs or
 progress totals were regenerated in this worker pass.
+
+## 2026-10-22 — Golem, Skeleton and Armor round 3
+
+Tags: #matching #golem #skeleton #armor #nonmatching #register-pinning
+
+Offline follow-up on the preclaimed checkout. Six exact matches add **+0.0375
+percentage points** of project code (904 bytes): 416 ordinary-C bytes and 488
+Register-pinned bytes. One new draft and one improved existing draft add no
+exact coverage. Only fast check.py validation was used, with reviewed extents
+for every committed result; no make, full build or network operation. Each
+function was queued separately through build/commit.sh. Integration still needs
+the combined ROM build and alias promotion.
+
+Exact results:
+
+- **0818E170 — matched, Armor_StartPartOrbitMotion, 76 bytes, ordinary C.**
+  Clears the part's pending-entry flag and counter, installs
+  Armor_InitPartOrbitTimer, then calls Armor_UpdatePartBobbing. Ported the
+  adjacent matched Armor_StartPartSpinMotion entry-reset inline, preserving
+  its materialized byte boolean. Caller/motion context establishes Armor parts.
+- **0818E98C — matched, existing Armor6_DestroySpriteColliders, 44 bytes.**
+  Armor6_Destroy passes its componentB58. Three parts at stride 0x1E4 each
+  release a Sprite at the part base and Collider at +0x9C. Ordinary pointer
+  iteration merged the two cursors and hoisted the stride. An initialized r0
+  stride local restores rematerialization after the calls. depin reduced five
+  hints to this one pin; all values remain initialized. Formatted exact check.
+- **080C5F60 — matched, existing Golem_UpdateRevivalReturn, 176 bytes,
+  ordinary C.** Hides the drawable, consumes the queued entry, disables its
+  shadow or waits through tick 26 before returning to Golem_UpdateRevival.
+  Replaced early pinning of the entry-byte pointer with an inline that reads
+  the byte first, then returns its address through an output parameter.
+  This reproduces the late saved-pointer copy and both scratch-register
+  choices exactly. Removed the old register concession marker.
+- **0818CC48 — matched, existing Armor_BeginPartTravelToPlayer, 312 bytes.**
+  Accelerates rotation until magnitude exceeds nine, stores start/player-end
+  coordinates, selects random spin direction, and installs the X- or Z-wave
+  travel callback according to the larger delta. An explicit initialized
+  negative-direction temporary prevents subtraction from the existing one
+  constant; a short r2 table pointer selects the RNG-table scratch register.
+  depin reduced four hints to three (table pin, negative pin and its empty
+  value barrier). Formatted exact check; concession marker retained.
+- **081864C4 — matched, existing Armor_UpdateAction10Sequence, 164 bytes,
+  ordinary C.** Four-phase control: start action 10, wait for animation
+  completion and invoke 0818EA90, wait 20 ticks before action 12, then mark
+  sequence complete. Used the typed B58 component field instead of a pinned
+  offset and declared zero before the phase-two stores. These changes recover
+  both address and store scheduling, removing the old empty barrier.
+- **0818CA6C — matched, existing Armor_RetractPartStretch, 132 bytes.**
+  Retracts Y stretch to 64, selects random rotation sign, and requests the
+  next part state. Explicit RNG index arithmetic sinks the mask to its
+  observed position. Initialized negative-direction and value temporaries
+  preserve the original copies and flag OR. Four retained hints after depin;
+  all are pins/empty constraints, with no instruction bodies. Formatted exact
+  check; concession marker retained.
+
+Drafts:
+
+- **0818C6F8 — new draft 83.2%, Armor_OnPartDamageCollision, 636-byte reviewed
+  extent (632-byte candidate), no hints.** Validates part HP/attack state,
+  calculates damage response, copies collision metadata and flashes the
+  owner's damage palette. Depletion requests broken-part mode five. Eligible
+  wave/lunge/spinning motions capture their endpoint, select damping, and
+  recoil along the attack direction or contact vector, with a random heading
+  for coincident contacts. Both fresh source and resolved assembly were read.
+  Corrected the mode-two test: a callback *different from*
+  Armor_DampPartWaveReturn enters recoil. Explicit value-before-address stores,
+  mask accessor and reversed inline vector arguments improved 77.8% / 28
+  structural differences to 83.2% / 11; 75 differences total. Remaining:
+  address lifetimes, mode-pointer copy, table-load ordering and registers.
+  Recorded with --nonmatching --record; default assembly fallback checks exact.
+- **08182454 — improved existing draft 82.7% -> 92.9%, existing
+  ActorController_SetAnimation, 232-byte reviewed extent.** Side starts at one
+  and becomes zero under flag one; variant comes from the type/flag table,
+  then the mode and request flag select keyframes/render flags. Explicit ip
+  side, sb variant and r4 flag locals recover the original table addressing.
+  Final residue: 18 bytes / 14 instructions, six structural, same size. Moving
+  flags/mode through a wrapper or explicit argument-register locals worsened
+  the result. Added the required local alias and register concession marker.
+  check.py --record could record 92.9% only with a raw sub_08182454 fallback;
+  this checkout's actual assembly file has the promoted name. Restored the
+  existing named INCLUDE_ASM after recording and rechecked both C score and
+  exact default fallback. Two small corrective commits preserve that final
+  valid fallback/score; no checker or generated assembly was edited.
+
+Fresh functions stopped without eligible production drafts:
+
+- **08189FF8 — stopped at 66.7%, tentative Armor_UpdatePursuitAttackDecision.**
+  Reconstructed the full 1232-byte routine: fast-mode double cooldowns,
+  collision gate, 300-tick fast toggle, distance/facing decisions, random side
+  strikes and recovery. Ordinary C was 57.2% (235 structural differences);
+  diagnostic delta/mode hints gave 66.7% (230 structural). Shared switch tails,
+  facing loads and omitted redundant address formations still dominate.
+  Kept ordinary and diagnostic candidates under wip/codex-medium/ only.
+- **0818A820 — stopped at 67.2%, tentative Armor_UpdateActor.** Reconstructed
+  the full update: five message types, freeze gate, commands/type/behavior and
+  animation dispatch, decaying motion, movement probe, terrain snap, four
+  colliders, callback slots, part effects and resource release. Ordinary C:
+  65.3%, 112 structural differences. Typed control-flags base, integer slot
+  indexing and diagnostic body/position/motion pins gave 67.2%, 105 structural.
+  The compiler merges message collision tails and changes pointer/loop
+  lifetimes. Scratch only, no below-threshold source in production.
+- **080C9C04 — stopped at static reconstruction, no C draft.** Read asmat,
+  BIG_FUNCTIONS and the condensed body. 3860 instructions with a 0x150-byte
+  frame and repeated chase/home/terrain branches. Matched relatives explain
+  shared terrain runs (Golem_ChargeOrReturnHome, Golem_RestoreRoute) but not
+  the complete four repeated movement paths. No viable whole-function port
+  was available; no byte-match or fuzzy claim.
+- **080CFC14 — Golem_Init, stopped at static reconstruction, no C draft.**
+  Read entry and condensed body: 1758 instructions, 0x168-byte frame, object
+  context/category setup, alternative drawable allocation/animation paths and
+  extensive component/script configuration. Best relative explains 12%.
+  Ghidra export is absent. No complete candidate or eligible draft.
+- **080C3260 — Skeleton_Init, stopped at static reconstruction, no C draft.**
+  Read entry and condensed body: 2019 instructions, 0x160-byte frame, category
+  option 0x6B (default five), category-seven context flag 0x40, then alternate
+  drawable/component initialization. Best relative explains 14%; most of the
+  body remains unfolded. No complete candidate or eligible draft.
+
+Bounded revisits, all retained at their existing production versions:
+
+- **080BA688 — 98.8% retained.** Two-instruction step-Z base/address miss.
+  Separate pinned vector, clobber, output-pointer inline and reuse in CpuSet/
+  particles either removed the original's redundant add or enlarged the frame.
+- **080B8DE0 — 98.4% retained.** Saved state-flag pointer uses r4 versus r2.
+  Short and long r2 lifetimes, pointer-output accessor and empty constraints
+  did not close the difference; restored the original source.
+- **080BA7E4 — existing draft retained.** Reviewed extent gives 98.6%; recorded
+  source remains 98.2%. Reordering CpuSet arguments closes its constant-load
+  order, but forcing the step-Z pointer changes the preceding r6 copy to ip
+  and adds a copy/frame bytes. No reviewed-extent improvement kept.
+- **080BAB80 — existing 98.0% draft retained.** Reviewed extent gives 98.4%.
+  Moving the spawn pointer before heading clamping moved its copy but added
+  allocation differences (96.4%); no source change.
+- **080B7A90 — 97.9% retained.** Missing saved target-link copy before the
+  materialized flag boolean. Output-pointer helper did not change code;
+  diagnostic held-pointer pin/constraint worsened it to 95.1%.
+- **080C8774 — 95.8% retained.** Five RNG argument-order variants moved table/
+  wrap register and spill choices but increased structural residue from 12
+  to 18–26. No improvement selected from coarse-fuzzy-only increases.
+- **0818EA3C — 95.1% retained.** Two-byte initial count-register difference.
+  Count types, declaration ordering, early count-pointer lifetime and r5
+  diagnostic pin either left it unchanged or enlarged/changed the loop.
+- **080C4F9C — 92.1% retained.** Tried flag-load-before-mask ordering, a
+  halfword factor accessor and a retained index mask. Structural residue
+  improved from 14 to eight in one variant, but overall alignment/fuzzy fell
+  to 88.0%; volatile mask made it worse. Scratch only.
+- **080C725C — 91.3% retained.** Removing the explicit motion-X pointer made
+  alignment worse; declaration sweep had no improving candidate.
+- **080CE188 — 90.3% retained.** Adjacent declaration changes did not alter
+  allocation; removing the flags2CC pointer increased realigned differences.
+- **080CF3E4 — 88.3% retained.** Declaration alternatives were identical and
+  the pointer-local sweep found no removable address lifetime.
+- **080C6A68 — 86.5% retained.** Removing variant-reload, mirror-address or
+  saved-selection locals worsened alignment; no change retained.
+- **080CCD7C — 80.4% retained.** Replacing the flags2D4 pointer with direct
+  accesses increased realigned differences from 541 to 543.
+- **080B77D0 — 94.3% retained.** Reviewed 704-byte extent still misses 27
+  structural instructions in scans/address caching; no removable outer local.
+- **080BFCC4 — 94.4% retained.** Removing saved/link address locals increased
+  differences from 63 to 67/69, consistent with the recorded PRE spill issue.
+- **080B7C10 — 92.8% retained.** Inlining the saved direction address did not
+  change the 146 realigned differences.
+- **080BBDD0 — 88.9% retained.** Structural/local review found no removable
+  main-function field-address lifetime; kept the existing reconstruction.
+- **080C12FC — 80.2% retained.** Large contact-reaction reconstruction remains
+  structurally distant (745 realigned differences in the helper check); no
+  simple removable main-body pointer or viable new sibling port.
+- **080BF0E4 — 72.5% retained.** Removing category pointer increased alignment
+  differences from 479 to 505 despite a misleading higher coarse fuzzy score.
+- **08186EB4 — 96.9% retained.** Removing attack-cooldown pointer produced no
+  improvement; helper score differs from the reviewed-extent recorded score.
+- **081896D0 — 82.0% retained.** Main-body pointer-lifetime review found no
+  removable address local; retained the existing decision reconstruction.
+- **0818E5E4 — 85.5% retained.** Removing per-part typed q pointer worsened
+  realigned differences from 63 to 164. Original still has eight structural
+  differences in address-copy/argument scheduling and loop pointer updates.
+- **0818A500 — 83% listed draft retained.** No removable main-body field-address
+  local or fresh relative covering its command switch.
+- **08186CC8 — 81% listed draft retained.** Existing earlier analysis remains
+  applicable; main-body address-local probe found no rewrite candidate.
+- **08187230 / 081875EC — existing 86% listed drafts retained.** Removing timer/
+  cooldown pointers was identical; removing decision pointer worsened 71
+  aligned differences to 75. Kept the existing forms.
+- **0818E9B8 — 80.0% retained.** Reviewed differences remain initial count and
+  flag-pointer scheduling, terminal count scratch register and pool ordering.
+  The reset sibling's lifetime/declaration experiments did not provide a new
+  source-level hypothesis for this shared part loop.
+- **080C47DC — 70.2% recorded draft retained.** Removing goal pointer worsened
+  alignment from 58 to 63; delta/first pointer removal was identical. No new
+  below-threshold production draft was introduced.
+- **080C7E18 / 080CBF24 / 08189D04 — previous own drafts retained.** No useful
+  removable main-body pointer in the first two; removing the third's cooldown
+  pointer was identical. Whole-unit helper score for 080CBF24 is not its own
+  per-function score. Kept the recorded 85.8% / 80.8% / 82.5% scores.
+- **080C5930 / 080B9158 / 080BA268 / 080BAE04 / 081879A8 / 08187F44 /
+  081885BC / 08188B7C / 0818911C** retain the earlier unsuccessful attempts
+  documented above. No fresh sibling result resolved their shared expanded
+  animation/decision tails, so those scratch-only candidates were not repeated.
+- **080C53A8 / 080C553C / 080B57C0 / 080B6480 / 080C30CC / 08185F70** were
+  already matched in this checkout and were excluded.
+
+Useful results: returning a consumed flag's address *after* reading it fixed a
+late-copy miss without hints; a typed component field plus an explicit zero
+fixed action-phase store ordering. Existing high fuzzy scores can still hide
+nontrivial control/PRE work. Keep reviewed-extent acceptance separate from
+candidate-length helper scores, and do not adopt a worse structural candidate
+just because its scalar fuzzy increased. All failed experiments remain ignored
+under wip/codex-medium/ and build/. No shared docs or progress totals regenerated.
