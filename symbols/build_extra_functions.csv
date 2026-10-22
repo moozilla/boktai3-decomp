@@ -651,7 +651,9 @@ address,isa,evidence,replacement_end
 08222C64,thumb,Serial getter (03005310); part of the reviewed 08222A04-08222C7C span,08222C70
 08222C70,thumb,Serial getter (03005318); part of the reviewed 08222A04-08222C7C span,08222C7C
 08223884,thumb,Hidden raw-tail function,082238F0
-08224BC4,thumb,Hidden tail after RfuManager_SetEventCallback,
+08224BC4,thumb,Hidden tail function,08224C08
+08224C08,thumb,Hidden tail function,08224C44
+08224C44,thumb,Hidden tail function,08224C84
 08224CCC,thumb,Hidden raw-tail function,08224D3C
 08224EFC,thumb,Hidden raw-tail function,08224F08
 08224F14,thumb,Hidden raw-tail function,08224F20
