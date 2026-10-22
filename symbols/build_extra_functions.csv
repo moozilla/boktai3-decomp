@@ -431,7 +431,7 @@ address,isa,evidence,replacement_end
 082290D0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290DC
 082290E8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,082290F4
 08229424,thumb,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md,
-0822BD58,thumb,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md,
+0822BD58,thumb,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md,0822BDB8
 0822BEE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822BEE4
 0822C110,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C154,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
