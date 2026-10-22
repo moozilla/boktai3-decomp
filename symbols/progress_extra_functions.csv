@@ -612,6 +612,8 @@ address,evidence
 08222C44,Serial data check; part of the reviewed 08222A04-08222C7C span
 08222C64,Serial getter; part of the reviewed 08222A04-08222C7C span
 08222C70,Serial getter; part of the reviewed 08222A04-08222C7C span
+08223884,Hidden raw-tail function
+08224CCC,Hidden raw-tail function
 08224EFC,Hidden raw-tail function
 08224F14,Hidden raw-tail function
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
