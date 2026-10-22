@@ -5,6 +5,7 @@ addr,name,evidence
 082488D8,EEPROMCompare,docs/EEPROM.md exact EEPROM_V124 source
 08248930,EEPROMWrite1_check,docs/EEPROM.md exact EEPROM_V124 source
 08248E70,SiiRtcSetTime,docs/RTC.md exact 156-byte time-write routine
+08248F0C,SiiRtcSetAlarm,docs/RTC.md exact 308-byte alarm-write routine
 08249238,_call_via_r0,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
 0824923C,_call_via_r1,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
 08249240,_call_via_r2,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md

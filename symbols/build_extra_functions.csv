@@ -244,22 +244,62 @@ address,isa,evidence,replacement_end
 0813E1B8,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E1D8
 0813E284,thumb,Independent modifier callback in equipment-level tail; own push and pop-bx; notes/player_3.md,0813E324
 0813F828,thumb,Independent energy-spend body after affordability test; push and pop-bx; notes/player_3.md,0813F84C
+08156C8C,thumb,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set),08156CAC
+0815849C,thumb,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay,08158588
+08158754,thumb,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay,08158848
+08158C14,thumb,Hidden link-state reset in the raw tail after Player_UpdateLinkModeMovement; retained assembly (not yet matched),
+08158E68,thumb,Hidden helper in the raw tail after Player_BeginDirectionSequence (actor map tile index),08158EC8
+0815910C,thumb,Hidden helper in the raw tail after Player_GetEquipmentLevelBonus (level bonus from an item),08159164
 08159228,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815924C
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
+08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
+0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
+0815A444,thumb,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched),
+0815A4D8,thumb,Hidden script query (actor direction),0815A534
+0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
+0815A8A0,thumb,Hidden script command (keyword f flags; keyword p value),0815A918
+0815A918,thumb,Hidden script command (Player_EmitQueuedEffects),0815A938
 0815AAB8,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0815AAD4
 0815AAD4,thumb,Independent small function following a reviewed gap leaf; retained assembly (not yet matched),0815AAFC
+0815AB24,thumb,Hidden script command in the raw tail after ScriptActor_SetField4A2FromScript (sets actor byte 0x340),0815AB48
+0815AB48,thumb,Hidden script command (clears actor byte 0x340),0815AB6C
+0815AB6C,thumb,Hidden script query (actor byte 0xBF5),0815AB98
+0815AB98,thumb,Hidden script command (Player_EnterKindFour),0815ABB8
+0815ABB8,thumb,Hidden script command (enter kind four with optional d value then begin sequence 0x24),0815AC04
+0815AC04,thumb,Hidden script command in the same raw tail; retained assembly (not yet matched),
 0815AD24,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD3C
 0815AD3C,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD60
 0815AD60,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD78
 0815CC78,thumb,Independent 128-byte sibling of ScriptActor_MoveToFromScript with own push and pop-bx in its trailing data; exact standalone C,0815CCF8
+0815D394,thumb,Hidden script command after ScriptActor_StartFormMotionFromScript (PlayerCue_Windblown; keyword r),0815D3D8
+0815D3D8,thumb,Hidden script command (PlayerCue_WindblownVariant3; keyword r),0815D41C
+0815D41C,thumb,Hidden script command (PlayerCue_WindblownVariant4; keyword r),0815D460
+0815D460,thumb,Hidden script command (PlayerCue_WindblownVariant2; keyword r),0815D4A4
+0815D4A4,thumb,Hidden script command (PlayerCue_StandDiagonal; keyword d),0815D4E8
+0815D5B0,thumb,Hidden script command: timed charge cue with t/c timers,0815D688
+0815DBF4,thumb,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched),
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
-0815F588,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0815F6A8
+0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
+0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
+0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+0816A578,thumb,Hidden menu prompt setup: background layer then ramp display,0816A5A8
+0816A770,thumb,Hidden menu prompt setup: hide sprites then pulse display,0816A7D8
+0816AA28,thumb,Hidden scene HUD page exit fade,0816AAB0
 0816CE8C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,0816CEA0
 0816D3E8,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0816D40C
+081711D8,thumb,Hidden pause inventory consumable effect delta,08171258
+08172094,thumb,Hidden inventory entry lock predicate (retained),
+081720D4,thumb,Hidden inventory entry unlocked or equipped (retained),
+08177D88,thumb,Hidden getter: option HUD field 0xA5C or -1,08177DAC
 081780B4,thumb,Independent 32-byte HUD mode refresh with own push and pop-bx after Hud_SetModeFromScript; exact standalone C,081780D4
+081782AC,thumb,Hidden option HUD setter: field 0xA8C=4 when mode 1-2,081782E0
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
+0817A354,thumb,Hidden first position inside box search (retained),
+0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
+0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
 08180898,thumb,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C,081808B4
 08197AE0,thumb,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C,08197B2C
 08197C20,thumb,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C,08197C58
@@ -306,6 +346,10 @@ address,isa,evidence,replacement_end
 0819B824,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B86C
 0819B86C,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B8B4
 0819B8B4,thumb,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched),0819B930
+081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
+081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84
+081A47D0,thumb,Hidden Task_Kill wrapper for gUnk_02000240,081A47E4
+081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
@@ -410,8 +454,20 @@ address,isa,evidence,replacement_end
 082220DC,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,08222124
 08222124,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,0822216C
 0822216C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 124 bytes; currently preserved raw tail,082221E8
+08222504,thumb,Hidden hash-table rekey function in the raw tail after HashTable_FindNode; exact standalone C,0822253C
+0822253C,thumb,Hidden 12-byte IME-clear leaf in the raw tail after HashTable_FindNode; exact standalone C,08222548
+08222548,thumb,Hidden 12-byte IME-set leaf in the raw tail after HashTable_FindNode; exact standalone C,08222554
 08222A00,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08222A04
-08222A04,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08222C7C
+08222A04,thumb,Serial buffer reset and start; first of ten functions in the reviewed 08222A04-08222C7C span; retained assembly (not yet matched),
+08222AA4,thumb,Serial stop; part of the reviewed 08222A04-08222C7C span,08222AC4
+08222AC4,thumb,Serial receive-buffer read; part of the reviewed 08222A04-08222C7C span,08222B64
+08222B64,thumb,Serial send-buffer write; part of the reviewed 08222A04-08222C7C span,08222BE4
+08222BE4,thumb,Serial status getter; part of the reviewed 08222A04-08222C7C span,08222BF8
+08222BF8,thumb,Serial any-data check; part of the reviewed 08222A04-08222C7C span,08222C24
+08222C24,thumb,Serial data check (03005320); part of the reviewed 08222A04-08222C7C span,08222C44
+08222C44,thumb,Serial data check (0300530C); part of the reviewed 08222A04-08222C7C span,08222C64
+08222C64,thumb,Serial getter (03005310); part of the reviewed 08222A04-08222C7C span,08222C70
+08222C70,thumb,Serial getter (03005318); part of the reviewed 08222A04-08222C7C span,08222C7C
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
 08224F98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08224FA4
 08225620,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225624
@@ -472,4 +528,4 @@ address,isa,evidence,replacement_end
 08245390,arm,Existing bx r1 callback trampoline; retained assembly; docs/RFU.md,
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
-08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
+08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; matched C (SiiRtcSetAlarm); docs/RTC.md,08249040

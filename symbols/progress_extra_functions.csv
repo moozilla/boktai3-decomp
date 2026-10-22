@@ -257,22 +257,62 @@ address,evidence
 0813E284,Independent modifier callback following equipment-level function; notes/player_3.md
 0813F828,Independent energy-spend body after affordability test; notes/player_3.md
 08152C3C,Independent push r4-r7-lr and stack allocation after 08152A5C pop-bx return and literal pool; ROM bytes F0 B5 83 B0 at 08152C3C
+08156C8C,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set)
+0815849C,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay
+08158754,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay
+08158C14,Hidden link-state reset in the raw tail after Player_UpdateLinkModeMovement; retained assembly (not yet matched)
+08158E68,Hidden helper in the raw tail after Player_BeginDirectionSequence (actor map tile index)
+0815910C,Hidden helper in the raw tail after Player_GetEquipmentLevelBonus (level bonus from an item)
 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08159814,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C)
+0815A104,Hidden wrapper of sub_0815A048 with mode 0
+0815A444,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched)
+0815A4D8,Hidden script query (actor direction)
+0815A554,Hidden script query (Player_IsActiveInLocomotionState)
+0815A8A0,Hidden script command (keyword f flags; keyword p value)
+0815A918,Hidden script command (Player_EmitQueuedEffects)
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAD4,Independent small function following a reviewed gap leaf; retained assembly (not yet matched)
+0815AB24,Hidden script command after ScriptActor_SetField4A2FromScript; exact C
+0815AB48,Hidden script command; exact C
+0815AB6C,Hidden script query; exact C
+0815AB98,Hidden script command; exact C
+0815ABB8,Hidden script command; exact C
+0815AC04,Hidden script command; retained assembly
 0815AD24,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD3C,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD60,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815CC78,Independent 128-byte sibling of ScriptActor_MoveToFromScript (gbadisasm left it as .byte after 0815CBF8)
+0815D394,Hidden script command after ScriptActor_StartFormMotionFromScript (PlayerCue_Windblown; keyword r)
+0815D3D8,Hidden script command (PlayerCue_WindblownVariant3; keyword r)
+0815D41C,Hidden script command (PlayerCue_WindblownVariant4; keyword r)
+0815D460,Hidden script command (PlayerCue_WindblownVariant2; keyword r)
+0815D4A4,Hidden script command (PlayerCue_StandDiagonal; keyword d)
+0815D5B0,Hidden script command: timed charge cue with t/c timers
+0815DBF4,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched)
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
+0815F5A0,Second function of the reviewed 0815F588-0815F6A8 span; exact C
+0815F5B4,Third function of the reviewed 0815F588-0815F6A8 span; retained assembly
+0815F5F8,Fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly
+0816A578,Hidden menu prompt setup: background layer then ramp display
+0816A770,Hidden menu prompt setup: hide sprites then pulse display
+0816AA28,Hidden scene HUD page exit fade
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+081711D8,Hidden pause inventory consumable effect delta
+08172094,Hidden inventory entry lock predicate (retained)
+081720D4,Hidden inventory entry unlocked or equipped (retained)
+08177D88,Hidden getter: option HUD field 0xA5C or -1
 081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
+081782AC,Hidden option HUD setter: field 0xA8C=4 when mode 1-2
 081792F8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081792FC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0817A238,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0817A354,Hidden first position inside box search (retained)
+0817AAB8,Hidden predicate: field 0x94 not positive
+0817C19C,Hidden clear of flags 0xB0/0xAF
 08180898,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C
 08197AE0,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C
 08197C20,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C
@@ -319,6 +359,10 @@ address,evidence
 0819B824,Snapping array approach helper in the math helper block; exact standalone C
 0819B86C,Snapping array approach helper in the math helper block; exact standalone C
 0819B8B4,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched)
+081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
+081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
+081A47D0,Hidden Task_Kill wrapper for gUnk_02000240
+081A4ED8,Hidden Task_Kill wrapper for gUnk_02000244
 081A6458,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081A645C,Code following a reviewed gap leaf; retained assembly
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -431,8 +475,20 @@ address,evidence
 082220DC,"Independent hidden Thumb prologue; CFG returns at 08222120; literals and zero alignment close at 08222124; preserved raw tail of 08221800, not matched C"
 08222124,"Independent hidden Thumb prologue; CFG returns at 08222168; literals and zero alignment close at 0822216C; preserved raw tail of 08221800, not matched C"
 0822216C,"Independent hidden Thumb prologue; CFG returns at 082221DC; literals and zero alignment close at 082221E8; preserved raw tail of 08221800, not matched C"
+08222504,Hidden hash-table rekey function after HashTable_FindNode; exact C
+0822253C,Hidden IME-clear leaf after HashTable_FindNode; exact C
+08222548,Hidden IME-set leaf after HashTable_FindNode; exact C
 08222A00,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08222A04,Code following a reviewed gap leaf; retained assembly
+08222AA4,Serial stop; part of the reviewed 08222A04-08222C7C span
+08222AC4,Serial receive; part of the reviewed 08222A04-08222C7C span
+08222B64,Serial send; part of the reviewed 08222A04-08222C7C span
+08222BE4,Serial status getter; part of the reviewed 08222A04-08222C7C span
+08222BF8,Serial any-data check; part of the reviewed 08222A04-08222C7C span
+08222C24,Serial data check; part of the reviewed 08222A04-08222C7C span
+08222C44,Serial data check; part of the reviewed 08222A04-08222C7C span
+08222C64,Serial getter; part of the reviewed 08222A04-08222C7C span
+08222C70,Serial getter; part of the reviewed 08222A04-08222C7C span
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08224F98,Code following a reviewed gap leaf; retained assembly
 08225620,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
