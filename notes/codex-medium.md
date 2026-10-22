@@ -4009,3 +4009,95 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## 2026-10-22: Crow and Tentacle worker
+
+Tags: #matching #crow #tentacle #scene-actor #terrain
+
+Offline assigned worktree; only per-file `tools/check.py` checks, no make,
+full build, network or direct Git mutations. Commits use `build/commit.sh`.
+Exact gain: **+0.0242 percentage points** of code (584 bytes), all without
+register pinning. Four guarded drafts provide no exact credit.
+
+- **080A06E8 — drafted 89.3%, Crow_StopAtRaisedTerrain.** Called by
+  Crow_UpdatePostAction. Clears context +0x3D4 bit 1, probes terrain at
+  position + secondaryMotion + motion during control 0x25, clears motion and
+  context +0x42C/+0x42E/+0x430 when height blocks it, then cancels vertical
+  motion if the projected Y is below terrain. Typed actor fields and the
+  RouteActor_ReflectAtRaisedTerrain sibling supplied the terrain query.
+  Register hints improved the draft, but 21 realigned instructions remain,
+  eight ignoring registers; address lifetimes and scheduling remain.
+- **080A0E00 — drafted 98.0%, Crow_UpdateDiveAttack.** Sets directional pose
+  control 0x25, saves player position, derives dive velocity and height step,
+  approaches the saved target, then enters phase/behavior 2 with doubled
+  secondary motion on arrival or terrain blockage. Starts song 0xF7.
+  Crow_UpdateKnockback and TentacleBody_UpdateRetreat supplied control,
+  animation scaling and approach idioms. Memory barriers preserve the two
+  denominator reloads. Remaining: 11 realigned instructions, ten ignoring
+  registers, concentrated in CpuSet argument ordering, zero-store ordering,
+  approach arguments and bit-test constant scheduling.
+- **080A8280 — drafted 89.5%, TentacleBody_ReturnToCellCenter.** Saves current
+  terrain cell and its center, turns toward saved heading +0x3CD, corrects
+  motion toward the original cell center if projected movement leaves it,
+  advances the chain, and returns to behavior 2 when aligned in that cell.
+  Final reviewed score: 49 realigned instructions, 12 ignoring registers.
+  Context spilling, register allocation, angle-difference scheduling and
+  motion pointer lifetime remain. Explicit pins did not improve this body.
+- **080A9DB0 — skipped, best candidate-length fuzzy 63.6%.** Advances active,
+  nonremoved segments toward target positions when squared distance exceeds
+  the argument, fills gaps via 080A9BD8, and refreshes headings. Typed versus
+  raw segment access changed strength reduction but retained too many position
+  pointers across Div calls. Frame was shorter than ROM; no guarded draft.
+- **080AA240 — skipped, best candidate-length fuzzy 38.2%.** Confirmed raw
+  extra-function entry has its own prologue/epilogue, ending at 080AA4B8;
+  the subsequent raw routine is separate. Adds sine-based motion to the head,
+  alternates offsets on odd segments, and interpolates even segment positions
+  between chain points. Direct constant interpolation overoptimizes heavily;
+  keeping the interpolation parameter live changes spills but remains far off.
+- **080AA688 — skipped, best candidate-length fuzzy 64.4%.** Own body ends
+  at 080AA724. Reverse-scans segments, removes each nonremoved collider, marks
+  bit 0, and decrements the live total. ActorTrail_RemoveAllSegments is the
+  same operation with an additional spark call. Removing that call changes
+  active-count address hoisting and register lifetimes. Raw pointers, inline
+  accessors and pins failed to improve it; retained only in local WIP.
+- **080AA744 — skipped, best candidate-length fuzzy 62.8%.** Selects random
+  impulse angle masks 0xFF/0x7F/0x3F from squared secondary-motion length,
+  writes magnitude-12 segment impulses, and consumes context flag 4 with song
+  0x3D4. A Polar helper preserved multiplication rather than constant shift/add
+  expansion, but segment-base induction and register allocation still differ.
+- **080AA8C4 — drafted 82.9%, TentacleActor_AlignSegmentsToTerrain.** Skips
+  inactive actors and flag 0x100000; adjusts active, nonremoved segment Y to
+  terrain. Large steps snap to actor height; small downward steps use Div by
+  ten. Final reviewed score: 47 realigned instructions, 26 ignoring registers.
+  Duplicate height-distance tests and three parallel segment-field pointers
+  remain structurally different. No register hints in the retained draft.
+- **080AAA90 — skipped, best candidate-length fuzzy 62.2%.** Adds impulses
+  at context +0x4F0/+0x4F2/+0x4F4 to each active segment position, then halves
+  each signed impulse toward zero. Typed access was too compact; raw offsets
+  recovered stores but hoisted flags and X-velocity pointers unlike ROM.
+  Helper and decay variants did not improve the retained structure.
+- **080AB04C — matched, TentacleActor_ResolveBlockedMovement.** Called by
+  TentacleActor_UpdateComponents. Probes position + secondaryMotion; cancels
+  X/Z motion for raised terrain or cell flags 0x43. Tracks blockage from the
+  movement probe, rotates the wander variant after 30 frames, recomputes the
+  desired heading and returns to behavior 1 if the angle gap exceeds 32.
+  Exact **584-byte reviewed extent** checked after formatting. No hints.
+- **080ABB18 — skipped, initial candidate-length fuzzy 47.8%.** Selects a
+  hit sound from actor +0x2E4, starts context reaction timers, removes trailing
+  segments according to health / context +0x8EB, then enters idle control 0x10
+  and behavior 5. ROM hoists fourteen field addresses before the removal loop
+  and spills them in a 0x30-byte frame. Explicit pointer locals failed to
+  reproduce that schedule; no guarded draft.
+
+Useful compiler finding: direct assignments to a local ContactPosition let
+agbcc pack halfwords into word stores. An inline vector Add/Delta helper
+retains the ROM's halfword loads/stores and dramatically improved 080AB04C
+and 080A8280. Also pass the actor itself into a flag helper, rather than an
+already-computed field pointer, when the mask must load before field-address
+calculation: this removed the final four differing instructions in 080AB04C.
+
+No existing functions.csv names were present for the eleven assigned entries.
+Local aliases use the neighboring Crow, TentacleBody and TentacleActor prefixes.
+Ghidra output is absent in this checkout; all attempts used assembly and matched
+relatives. Lower-scoring sources remain under ignored wip/; the four production
+source drafts retain INCLUDE_ASM in #else and recorded reviewed fuzzy scores.
