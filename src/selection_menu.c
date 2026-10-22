@@ -684,8 +684,8 @@ void SelectionMenu_RefreshItemPage(struct SelectionMenu *p)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
-// Input pointer lifetime and branch sharing still differ.
+// fuzzy: 98.5%
+// Only the first held-input read in the repeat branch differs: the ROM reloads the input pointer from ip.
 int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 {
     int index = p->selectedSlot;
@@ -717,28 +717,27 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
             index = (index & 3) + 12;
         else
             index -= 4;
+        p->repeatTicks = 0;
     } else if (direction & 2) {
         int row = index >> 2;
-        if (row == 3) {
+        if (row == 3)
             index &= row;
-            goto moved;
-        }
-        index += 4;
+        else
+            index += 4;
+        p->repeatTicks = 0;
     } else if (direction & 4) {
         if (!(index & 3))
             index = (index & 0xfc) + 3;
         else
             index--;
+        p->repeatTicks = 0;
     } else if (direction & 8) {
-        if ((index & 3) == 3) {
+        if ((index & 3) == 3)
             index &= 0xfc;
-            goto moved;
-        }
-        index++;
-    } else
-        return index;
-moved:
-    p->repeatTicks = 0;
+        else
+            index++;
+        p->repeatTicks = 0;
+    }
     return index;
 }
 #else
