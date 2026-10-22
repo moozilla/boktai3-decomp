@@ -3,7 +3,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 60.0%
+// fuzzy: 76.4%
 // Open: mostly register allocation (ROM: actor r5, group sl, flags2D4 pointer r8,
 // position spilled to sp); also a few reordered loads and spill-slot order.
 
@@ -227,7 +227,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     bit = 0x200;
     GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 1;
-    if (!MoveTo(actor, group, position, flagsp, bit)) {
+    if (!MoveTo(actor, group, &actor->position, flagsp, bit)) {
         Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
     } else {
         GROUP_FIELD(group, 0x64, u32) = 0;

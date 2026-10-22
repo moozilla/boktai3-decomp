@@ -2,7 +2,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 92.9%
+// fuzzy: 78.2%
 // Open: register allocation (ROM: actor r6 with an early copy in r3, group sl, i in r5,
 // candidate pointer sb, position r8) and the MoveTo destination/branch layout.
 
