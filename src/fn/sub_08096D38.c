@@ -92,7 +92,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     }
     a->word104 = zero;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior)
+static inline void State(struct SceneActorRegistryResetView *a, u8 phase, u8 behavior)
 {
     a->state2A8 = 0;
     a->phase2A9 = phase;
@@ -114,14 +114,18 @@ static inline s32 Quarter(s32 n)
 }
 static inline void ClearCollider(struct ContactCollider *c)
 {
-    c->flags &= ~4;
+    struct SignedFlags {
+        u8 pad[6];
+        s32 bits : 16;
+    };
+    ((struct SignedFlags *)c)->bits &= ~4;
 }
 static inline void SetCollider(struct ContactCollider *c)
 {
     c->flags |= 4;
 }
 #ifdef NONMATCHING
-// fuzzy: 85.1%
+// fuzzy: 85.2%
 // Remaining differences: inline ordering, flag/address lifetimes, and register allocation.
 // confidence=low: follows a finite curved route, either withdrawing or moving toward the player.
 #define Ghost_AdvanceApproachRoute sub_08096D38
