@@ -1,8 +1,10 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#define ActorController_SetAnimation sub_08182454
 
 #ifdef NONMATCHING
 // fuzzy: 82.7%
-// foundry draft (worker best 81.1%); what differs is mostly register allocation and instruction order
+// Remaining: side-constant scratch registers and final mode/flags argument scheduling.
 #define Armor_SetAnimation       ActorController_SetAnimation
 #define gArmorAnimationVariants  gUnk_0824EB60
 #define gArmorAnimationKeyframes gUnk_0824E920
@@ -30,15 +32,14 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
                                   u32 flags)
 {
     u32 index = request->index;
-    u16 side;
-    s32 variant;
+    register u32 side asm("ip");
+    register s32 variant asm("sb");
     s32 kind;
-    u16 actorFlags = s->flags;
+    register u16 actorFlags asm("r4") = s->flags;
     s32 mode;
+    side = 1;
     if (actorFlags & 1)
         side = 0;
-    else
-        side = 1;
     kind = s->variant;
     if (actorFlags & 0x200)
         kind += 4;
