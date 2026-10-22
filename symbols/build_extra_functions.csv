@@ -206,6 +206,7 @@ address,isa,evidence,replacement_end
 08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
 081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
 0810C128,thumb,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations,0810C14C
+0810C774,thumb,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span,0810C798
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
@@ -213,11 +214,16 @@ address,isa,evidence,replacement_end
 0810E928,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810E964
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
+0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
 08110A8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08110A98
 08110A98,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,08110AD4
+08110C84,thumb,Short busy-wait delay loop (32 iterations); raw span,08110C9C
+081111C4,thumb,SceneTilemap: word 0x54 minus 12 or -1 when inactive; raw span,081111E8
+08111A24,thumb,Stores a halfword into the gUnk_020001D8 table at 0x1AD8 when present; raw span before PaletteFade_StartFromScript,08111A48
 08113638,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08113644
 08114CA0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08114CAC
 08114CAC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08114CB0
+081150E4,thumb,sub_08114E68 wrapper that swaps the last two stack args and passes 0; raw span,08115104
 0811525C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115268
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
@@ -225,11 +231,17 @@ address,isa,evidence,replacement_end
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
 0811D218,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D234
 0811D234,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D250
+0811E3DC,thumb,ScriptRecord table: count word 0x1C or 0 when the table is absent; raw span before ScriptRecord_FindModifier,0811E3F8
+0811E470,thumb,ScriptRecord table: count word 0xE8 or 0 when absent; raw span before ScriptRecord_FindExtendedModifier,0811E48C
+0811E514,thumb,ScriptRecord table: count word 0x13C or 0 when absent; raw span before ScriptRecord_FindAttributeModifier,0811E534
+0811E5B0,thumb,ScriptRecord table: count word 0x1A8 or 0 when absent; raw span before ScriptRecord_FindByteModifier,0811E5D0
+0811E644,thumb,Modifier table task: count word 0x1FC or 0 when absent; raw span before Modifier_ScaleDefaultStat,0811E660
 0812125C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08121268
 08121454,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121458
 08121B98,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121B9C
 08121F70,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08121F7C
 08121F7C,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08121F80
+0812231C,thumb,SpriteEffect_SpawnWithMotion pass-through wrapper; raw span,08122338
 08122668,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812266C
 08122868,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812286C
 08122DF0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08122DF4
