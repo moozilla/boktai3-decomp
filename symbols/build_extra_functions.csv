@@ -685,8 +685,8 @@ address,isa,evidence,replacement_end
 08226528,thumb,Hidden raw-tail function,08226558
 082265D8,thumb,Hidden raw-tail function,082265F8
 0822797C,thumb,Hidden raw-tail function,082279A8
-08227E2C,thumb,Hidden raw-tail function (retained),
-08227E5C,thumb,Hidden raw-tail function (retained),
+08227E2C,thumb,Hidden raw-tail function: increments a capped counter at +0x87C,08227E5C
+08227E5C,thumb,Hidden raw-tail function: increments a capped counter at +0x884,08227E8C
 08227E8C,thumb,Hidden empty function,08227E90
 08227F3C,thumb,Hidden raw-tail function,08227F4C
 08227F4C,thumb,Hidden raw-tail function,08227F58
