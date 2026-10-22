@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "record_menu.h"
 #define TileNumber_GetCell     Video_GetWrappedBackgroundMapEntry
 #define TileNumber_DrawDecimal PanelText_DrawDigits
 #define TimerDisplay_DrawEmpty Video_DrawBackgroundRowMarkers
@@ -46,4 +47,99 @@ void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unu
             *cell = value;
         }
     }
+}
+struct RecActor {
+    u8 unknown[0x18];
+    s16 side;
+    u8 pad1a[0x53 - 0x1a];
+    u8 flag;
+    u8 pad54[0x24c - 0x54];
+    u32 ticksA;
+    u32 ticksB;
+};
+struct RecScore {
+    u8 unknown[0x7b6];
+    s16 wins;
+    u8 pad7b8[0x7fa - 0x7b8];
+    s16 losses;
+    s16 draws;
+};
+extern struct RecActor *gUnk_020004B4;
+extern struct RecScore *gUnk_02000710;
+void Anim_SelectWidgetGlyph(void *, void *, u16);
+void Sound_PlayTrackedSong(u32);
+static inline s32 Clamp999(s32 x)
+{
+    if (x > 999)
+        x = 999;
+    else if (x < 0)
+        x = 0;
+    return x;
+}
+/* The store goes through a plain s16 lvalue (not a struct field), so the score pointer is reloaded after it. */
+#define CLAMP_SCORE(field, off)                                                                    \
+    *(s16 *)((u8 *)gUnk_02000710 + off) = Clamp999(gUnk_02000710->field);
+static inline s32 ActorSide(void)
+{
+    struct RecActor *a = gUnk_020004B4;
+    if (a == 0)
+        return -1;
+    return a->side;
+}
+void RecordMenu_DrawRecords(struct RecordMenu *menu)
+{
+    struct RecActor *rec;
+    u16 *cell;
+    s32 i;
+    {
+        struct RecActor *a = gUnk_020004B4;
+        u8 f;
+        if (a != 0) {
+            f = a->flag;
+            rec = a;
+            if (f != 1)
+                rec = 0;
+        } else
+            rec = 0;
+    }
+    TimerDisplay_DrawRecord((struct TimerRecords *)rec, 5, 0x11, menu->selection, 0);
+    TimerDisplay_DrawRecord((struct TimerRecords *)rec, 0x17, 0x11, menu->selection, 1);
+    cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, 0, 0x10);
+    {
+        u16 one = 1;
+        for (i = 0x1d; i >= 0; i--)
+            *cell++ = one;
+    }
+    if (rec->ticksA == rec->ticksB) {
+        gUnk_02000710->draws++;
+        menu->spriteIds[4] = 0x37;
+        menu->spriteIds[5] = 0x37;
+        for (i = 4; i <= 5; i++)
+            Anim_SelectWidgetGlyph(&menu->sprites[i], menu->rowResource, menu->spriteIds[i]);
+        menu->sprites[4].x = 0;
+        menu->sprites[5].x = 0x90;
+    } else if (rec->ticksA < rec->ticksB) {
+        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
+            gUnk_02000710->wins++;
+        else
+            gUnk_02000710->losses++;
+        menu->sprites[4].x = 0;
+        menu->sprites[5].x = 0x90;
+        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
+            Sound_PlayTrackedSong(0xa9);
+    } else {
+        s32 side = ActorSide();
+        if (side == 1)
+            gUnk_02000710->wins++;
+        else
+            gUnk_02000710->losses++;
+        menu->sprites[4].x = 0x90;
+        menu->sprites[5].x = 0;
+        side = ActorSide();
+        if (side == 1)
+            Sound_PlayTrackedSong(0xa9);
+    }
+    CLAMP_SCORE(wins, 0x7b6)
+    CLAMP_SCORE(losses, 0x7fa)
+    CLAMP_SCORE(draws, 0x7fc)
 }
