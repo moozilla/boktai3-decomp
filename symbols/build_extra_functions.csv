@@ -728,7 +728,7 @@ address,isa,evidence,replacement_end
 0822DB2C,thumb,Hidden raw-tail function,0822DB54
 0822DF68,thumb,Hidden raw-tail function,0822DFA0
 0822DFA0,thumb,Hidden raw-tail function,0822DFDC
-0822E420,thumb,Hidden equipment table entry getter (retained),
+0822E420,thumb,Hidden raw-tail function,0822E43C
 0822E43C,thumb,Hidden leaf getter: indexed s16 in game state,0822E458
 0822E54C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0822E564
 0822E6E4,thumb,Hidden raw-tail function,0822E728
