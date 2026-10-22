@@ -1,0 +1,85 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 76.3%
+// Scrolls the tilemap panel horizontally and draws the newly exposed 8px column(s).
+// Remaining: original keeps case 0/2 zeros as literals, sets offset (r1) by movs and
+// tail-merges every DrawRegion call into one bl; here the cases keep separate calls.
+struct TilemapPanel {
+    u8 pad0[0x3c];
+    s32 atEnd;
+    s32 drawnX;
+    s32 scrollX;
+    s32 scrollY;
+    u8 pad4c[8];
+    s32 width;
+};
+struct BgScroll {
+    u8 pad[0x80];
+    u16 x;
+};
+extern struct BgScroll gUnk_03004C30;
+s32 Mod(s32, s32);
+void TilemapPanel_DrawRegion(struct TilemapPanel *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                             s32);
+void sub_08110C9C(struct TilemapPanel *p)
+{
+    s32 *scroll = &p->scrollX;
+    s32 offset, top, sx, right, limit, diff, next, x0, col, cellWidth;
+    sx = Mod(p->scrollX, 256);
+    Mod(scroll[1], 256);
+    gUnk_03004C30.x = sx;
+    limit = scroll[4] - 12;
+    right = p->scrollX + 240;
+    diff = p->drawnX - right;
+    if (diff < 8) {
+        next = p->drawnX + 7;
+        if ((p->scrollX >> 5) > limit) {
+            next = p->drawnX;
+            p->atEnd = 1;
+        }
+    } else
+        next = p->drawnX;
+    if (next == p->drawnX)
+        return;
+    x0 = next >> 5;
+    col = (next & 0xff) >> 3;
+    if (diff < 0) {
+        cellWidth = 2;
+        next += 9;
+    } else
+        cellWidth = 1;
+    switch (col & 3) {
+    case 0:
+        offset = 0;
+        top = 0;
+        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+        break;
+    case 1:
+        offset = 1;
+        top = 0;
+        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+        break;
+    case 2:
+        offset = 2;
+        top = 0;
+        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+        break;
+    case 3:
+        offset = 3;
+        top = 0;
+        if (cellWidth == 1)
+            TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+        else {
+            cellWidth = 1;
+            TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+            x0++;
+            TilemapPanel_DrawRegion(p, (col + 1) & 31, 0, x0, top, x0 + 1, 1, cellWidth, 20, top,
+                                    top);
+        }
+        break;
+    }
+    p->drawnX = (next >> 3) << 3;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08110C9C);
+#endif
