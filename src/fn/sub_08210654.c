@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define PinkSpine_InitFromScript sub_08210654
 #ifdef NONMATCHING
-// fuzzy: 93.5%
+// fuzzy: 94.0%
 // Remaining differences: option/animation register allocation and defined success return.
 #include "pink_spine_playback.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
@@ -97,5 +98,5 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", PinkSpine_InitFromScript);
+INCLUDE_ASM("asm/nonmatching", sub_08210654);
 #endif
