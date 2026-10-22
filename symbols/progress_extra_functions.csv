@@ -196,6 +196,7 @@ address,evidence
 080ED480,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080ED484,Independent actor state handler following a reviewed gap leaf; exact standalone C
 080F05B4,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId
+080F2D00,PhaseObject: counts callback hits and switches to PhaseObject_ApproachTarget after three; raw span
 080F3638,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties
 080F469C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080F636C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -203,21 +204,29 @@ address,evidence
 080FFF74,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08100388,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081010DC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+08101500,Moves the player and tether 0x80 along X from the gUnk_02000580 position; raw span
 08101A34,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08101A38,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 08103AD0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08103F24,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound"
 081041F0,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
+08104280,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; retained assembly
 081047B0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08105A40,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0810731C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0810874C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08108968,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+081090E0,Link session: stores a value in the first free of five slots at 0x164; -1 when unavailable; raw span
+08109184,Script command: writes LinkSession_CountPlayerKind of the script value to a reference; raw span
+081091AC,Script command: writes link session halfword 0x18 (or -1) to a reference; raw span
 08109324,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest
 081093DC,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript
+0810BD34,Registry-style reset: per-slot words and seed index from 0x140; raw span
+0810BF60,Clears the three text windows stored at 0xF68/0xF60/0xF64; raw span
 0810C128,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations
 0810C774,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span
 0810CB7C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0810CE88,Clears the three text windows stored at 0x1408/0x1400/0x1404; raw span
 0810D548,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810D554,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810E91C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -240,8 +249,10 @@ address,evidence
 0811B048,Independent 76-byte SpatialIndex_ScanBuckets tail after Terrain_ResolveActorMotion's pool (gbadisasm keeps it inside 0811AE9C); exact C in src/fn/sub_0811AE9C.c
 0811B774,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 0811B77C,Independent leaf following a reviewed gap function; exact standalone C
+0811BB98,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span
 0811D218,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0811D234,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
+0811D47C,Copies up to four words as bytes into 0x08 and stores the count at 0x0C; raw span
 0811E3DC,ScriptRecord table: count word 0x1C or 0 when the table is absent; raw span before ScriptRecord_FindModifier
 0811E470,ScriptRecord table: count word 0xE8 or 0 when absent; raw span before ScriptRecord_FindExtendedModifier
 0811E514,ScriptRecord table: count word 0x13C or 0 when absent; raw span before ScriptRecord_FindAttributeModifier

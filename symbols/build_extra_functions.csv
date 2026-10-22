@@ -186,6 +186,7 @@ address,isa,evidence,replacement_end
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
 080ED484,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080ED4E0
 080F05B4,thumb,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId,080F05CC
+080F2D00,thumb,PhaseObject: counts callback hits and switches to PhaseObject_ApproachTarget after three; raw span,080F2D50
 080F3638,thumb,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties,080F3650
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
@@ -193,21 +194,29 @@ address,isa,evidence,replacement_end
 080FFF74,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFF78
 08100388,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810038C
 081010DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081010E0
+08101500,thumb,Moves the player and tether 0x80 along X from the gUnk_02000580 position; raw span,08101550
 08101A34,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08101A38
 08101A38,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08101A3C
 08103AD0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08103ADC
 08103F24,thumb,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound",08103F44
 081041F0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,08104204
+08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; retained assembly,
 081047B0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081047B4
 08105A40,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08105A44
 0810731C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08107320
 0810874C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08108750
 08108968,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810896C
+081090E0,thumb,Link session: stores a value in the first free of five slots at 0x164; -1 when unavailable; raw span,08109134
+08109184,thumb,Script command: writes LinkSession_CountPlayerKind of the script value to a reference; raw span,081091AC
+081091AC,thumb,Script command: writes link session halfword 0x18 (or -1) to a reference; raw span,081091E4
 08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
 081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
+0810BD34,thumb,Registry-style reset: per-slot words and seed index from 0x140; raw span,0810BD8C
+0810BF60,thumb,Clears the three text windows stored at 0xF68/0xF60/0xF64; raw span,0810BF94
 0810C128,thumb,Animation step wrapper: TRUE when Anim_Step returns nonzero or bit 0 of byte 0x1D is set; raw span before RegistryF246_HideAnimations,0810C14C
 0810C774,thumb,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span,0810C798
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
+0810CE88,thumb,Clears the three text windows stored at 0x1408/0x1400/0x1404; raw span,0810CEBC
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
@@ -229,8 +238,10 @@ address,isa,evidence,replacement_end
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
+0811BB98,thumb,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span,0811BBE0
 0811D218,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D234
 0811D234,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D250
+0811D47C,thumb,Copies up to four words as bytes into 0x08 and stores the count at 0x0C; raw span,0811D4AC
 0811E3DC,thumb,ScriptRecord table: count word 0x1C or 0 when the table is absent; raw span before ScriptRecord_FindModifier,0811E3F8
 0811E470,thumb,ScriptRecord table: count word 0xE8 or 0 when absent; raw span before ScriptRecord_FindExtendedModifier,0811E48C
 0811E514,thumb,ScriptRecord table: count word 0x13C or 0 when absent; raw span before ScriptRecord_FindAttributeModifier,0811E534
