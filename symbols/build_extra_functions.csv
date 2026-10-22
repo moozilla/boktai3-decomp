@@ -61,6 +61,7 @@ address,isa,evidence,replacement_end
 08033518,thumb,Script command: read the p keyword value list into the scrolling dialogue text state; part of the raw 080334E0-08033568 span,08033568
 080335D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080335E0
 080335E0,thumb,Independent small function following a reviewed gap leaf; exact standalone C,080335F4
+080338A8,thumb,TextWindow: set a message table with up to 32 frame waits on window N and restart its text; raw span after the preceding text window helper,08033924
 0803398C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080339B8
 08033A10,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033A38
 08033A80,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08033AB0
