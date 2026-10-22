@@ -1509,9 +1509,6 @@ int WirelessGameDisplay_Destroy(struct WirelessGameDisplay *p)
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 85.8%
-// Loop pointer lifetimes and register allocation still differ.
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
 {
     struct WirelessGameResource *resource;
@@ -1523,25 +1520,16 @@ int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
         return -1;
     p->resource = *resource;
     ResourceHeader_Relocate(&p->resource, resource);
-    drawing = p->drawings;
-    {
-        int count = 3;
-        do {
-            Widget_InitLinked(drawing, &p->resource, 24, 17, 0, 0, 60, 0);
-            count--;
-            drawing++;
-        } while (count >= 0);
-    }
+    for (i = 0, drawing = p->drawings; i < 4; i++, drawing++)
+        Widget_InitLinked(drawing, &p->resource, 24, 17, 0, 0, 60, 0);
     resource = ScriptProc_Start(0xcb05, 0x5d04);
     if (!resource)
         return -1;
     p->extraResource = *resource;
     ResourceHeader_Relocate(&p->extraResource, resource);
-    i = 0;
-    drawing = p->extra;
-    do {
+    for (i = 0; i < 2; i++) {
         int animation;
-        if (!i) {
+        if (i == 0) {
             position.x = 132;
             animation = 405;
         } else {
@@ -1550,19 +1538,14 @@ int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
         }
         position.y = 24;
         position.z = 0;
-        Widget_InitLinked(drawing, &p->extraResource, animation, 0x10010, 0, 0, 60, &position);
-        drawing++;
-        i++;
-    } while (i <= 1);
+        Widget_InitLinked(&p->extra[i], &p->extraResource, animation, 0x10010, 0, 0, 60, &position);
+    }
     p->state = 0;
     p->entered = 1;
     p->timer = 0;
     p->finished = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", WirelessGameDisplay_Init);
-#endif
 
 void *WirelessGameDisplay_Create(void)
 {
