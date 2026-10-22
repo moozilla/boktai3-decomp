@@ -676,7 +676,7 @@ address,isa,evidence,replacement_end
 08225994,thumb,Hidden raw-tail function,082259A0
 08225E1C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225E20
 08225F40,thumb,Hidden raw-tail function,08225F5C
-082260D8,thumb,Hidden tail after Camera_RequestShake,
+082260D8,thumb,Hidden raw-tail function,08226178
 0822624C,thumb,Hidden raw-tail function,08226268
 082263DC,thumb,Hidden raw-tail function,082263FC
 08226454,thumb,Hidden raw-tail function,08226474
