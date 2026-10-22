@@ -216,7 +216,7 @@ address,isa,evidence,replacement_end
 081090E0,thumb,Link session: stores a value in the first free of five slots at 0x164; -1 when unavailable; raw span,08109134
 08109184,thumb,Script command: writes LinkSession_CountPlayerKind of the script value to a reference; raw span,081091AC
 081091AC,thumb,Script command: writes link session halfword 0x18 (or -1) to a reference; raw span,081091E4
-08109264,thumb,Hidden tail after LinkSession_IncrementAlternateCounter,
+08109264,thumb,Hidden raw-tail function,081092F0
 08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
 081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
 0810BD34,thumb,Registry-style reset: per-slot words and seed index from 0x140; raw span,0810BD8C
@@ -247,13 +247,14 @@ address,isa,evidence,replacement_end
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
 0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
+0811AC54,thumb,Hidden tail function,0811AC6C
 0811ACCC,thumb,Hidden tail after Terrain_GetCellHighByte,
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
 0811BB98,thumb,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span,0811BBE0
 0811D218,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D234
 0811D234,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0811D250
-0811D2E4,thumb,Hidden tail after Video_DrawBackgroundRowMarkers,
+0811D2E4,thumb,Hidden tail function,0811D334
 0811D47C,thumb,Copies up to four words as bytes into 0x08 and stores the count at 0x0C; raw span,0811D4AC
 0811E3DC,thumb,ScriptRecord table: count word 0x1C or 0 when the table is absent; raw span before ScriptRecord_FindModifier,0811E3F8
 0811E470,thumb,ScriptRecord table: count word 0xE8 or 0 when absent; raw span before ScriptRecord_FindExtendedModifier,0811E48C
@@ -288,7 +289,9 @@ address,isa,evidence,replacement_end
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
 0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference,
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
-0812CE30,thumb,Hidden tail after FragmentEffect_ResetManagerReference,
+0812CE30,thumb,Hidden tail function,0812CE64
+0812CE64,thumb,Hidden tail function,0812CE90
+0812CE90,thumb,Hidden tail function,0812CE94
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
 0812D58C,thumb,Hidden tail after FragmentSpritePool_ResetSingleton,
 0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
@@ -343,7 +346,7 @@ address,isa,evidence,replacement_end
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
 0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
 0815A1AC,thumb,Hidden tail after Player_AdvanceTetherPhase,
-0815A444,thumb,Hidden script command in the raw tail after Script_ReadPositionOption (set position and direction); retained assembly (not yet matched),
+0815A444,thumb,Hidden raw-tail function,0815A4D8
 0815A4D8,thumb,Hidden script query (actor direction),0815A534
 0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
 0815A8A0,thumb,Hidden script command (keyword f flags; keyword p value),0815A918
@@ -366,7 +369,7 @@ address,isa,evidence,replacement_end
 0815D460,thumb,Hidden script command (PlayerCue_WindblownVariant2; keyword r),0815D4A4
 0815D4A4,thumb,Hidden script command (PlayerCue_StandDiagonal; keyword d),0815D4E8
 0815D5B0,thumb,Hidden script command: timed charge cue with t/c timers,0815D688
-0815DBF4,thumb,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched),
+0815DBF4,thumb,Hidden raw-tail function,0815DC48
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
@@ -396,7 +399,7 @@ address,isa,evidence,replacement_end
 0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition,
 0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
 0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
-08180850,thumb,Hidden tail after ProximityVolume_DispatchUpdate,
+08180850,thumb,Hidden tail function,08180858
 08180898,thumb,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C,081808B4
 08197AE0,thumb,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C,08197B2C
 08197C20,thumb,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C,08197C58
@@ -466,7 +469,7 @@ address,isa,evidence,replacement_end
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
 081B94AC,thumb,Hidden tail after OrbitMotion_BeginArc,
-081B9864,thumb,Hidden tail after Registry2388_SetUpdate,
+081B9864,thumb,Hidden raw-tail function,081B98D8
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
 081BB114,thumb,Hidden raw-tail function,081BB124
 081BB124,thumb,Hidden raw-tail function,081BB13C
@@ -474,7 +477,7 @@ address,isa,evidence,replacement_end
 081BB38C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,081BB3A0
 081BC2BC,thumb,Hidden raw-tail function,081BC2F0
 081BC2F0,thumb,Hidden raw-tail function,081BC320
-081BDC14,thumb,Hidden tail after Storage_InitSlotMapping,
+081BDC14,thumb,Hidden tail function,081BDC34
 081BE130,thumb,Hidden raw-tail function,081BE140
 081BE140,thumb,Hidden delay loop,081BE150
 081BE150,thumb,Hidden empty function,081BE154
@@ -486,7 +489,10 @@ address,isa,evidence,replacement_end
 081C3EEC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081C3EF0
 081C5660,thumb,Hidden raw-tail function,081C569C
 081C5E84,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,081C5EA8
-081CFCF8,thumb,Hidden tail after SceneNpc_UpdateProjectedIdle,
+081CFCF8,thumb,Hidden tail function,081CFD3C
+081CFD3C,thumb,Hidden tail function,081CFD6C
+081CFD6C,thumb,Hidden tail function,081CFD84
+081CFD84,thumb,Hidden tail function,081CFDA4
 081D31D8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31DC
 081D31DC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081D31E0
 081D31E0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,081D31EC
@@ -558,7 +564,10 @@ address,isa,evidence,replacement_end
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
 08217050,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217060
-08217090,thumb,Hidden tail after Video_SetBlendBrightness,
+08217090,thumb,Hidden tail function,082170D4
+082170D4,thumb,Hidden tail function,082170FC
+082170FC,thumb,Hidden tail function,0821710C
+0821710C,thumb,Hidden tail function,08217120
 08217414,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08217430
 08218BC8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08218BD4
 08218C40,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08218C5C
