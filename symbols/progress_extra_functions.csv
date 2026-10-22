@@ -557,6 +557,9 @@ address,evidence
 081F28C4,Hidden tail after SpriteTrail_InitRenderCollider
 081F2B70,Hidden raw-tail function
 081F2F90,Hidden tail after Ratatosk_FindPointNearestReference
+081F2FBC,Ratatosk find point with largest weight at +0xD24 (081F2F90 tail)
+081F2FE8,Ratatosk find point with largest summed weights (081F2F90 tail)
+081F3018,"Ratatosk find point nearest a position, returns pointer (081F2F90 tail)"
 081F336C,Hidden raw-tail function
 081F339C,Hidden raw-tail function
 081F33CC,Hidden raw-tail function

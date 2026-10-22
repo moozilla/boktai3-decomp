@@ -530,7 +530,7 @@ address,isa,evidence,replacement_end
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
 081F28C4,thumb,Hidden tail after SpriteTrail_InitRenderCollider,
 081F2B70,thumb,Hidden raw-tail function,081F2BB0
-081F2F90,thumb,Hidden tail after Ratatosk_FindPointNearestReference,
+081F2F90,thumb,Hidden raw-tail function: Ratatosk find point with largest weight at +0xD28,081F3084
 081F336C,thumb,Hidden raw-tail function,081F339C
 081F339C,thumb,Hidden raw-tail function,081F33CC
 081F33CC,thumb,Hidden raw-tail function,081F33F0
