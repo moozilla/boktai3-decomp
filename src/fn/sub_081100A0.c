@@ -1,6 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fuzzy: 91.2%
+// Open: the i<0 path should branch to the shared flag test (ROM keeps the flag compare),
+// and the clamp should load the score into r1 with a signed compare.
 #include "area_effect_link.h"
 
 struct LinkScorePanel {
@@ -46,8 +48,9 @@ sel:
         v = link2->menuResults[i];
     panel->score = v;
 clamp:
-    v = panel->score;
-    if (v > 9999)
+    if (panel->score <= 9999)
+        v = panel->score;
+    else
         v = 9999;
     panel->score = v;
     panel->timer = 0x5a;
