@@ -716,7 +716,7 @@ address,isa,evidence,replacement_end
 0822BD58,thumb,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md,0822BDB8
 0822BE60,thumb,Hidden raw-tail function,0822BE78
 0822BEE0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0822BEE4
-0822C110,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
+0822C110,thumb,Hidden raw-tail function,0822C154
 0822C154,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C180,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
 0822C18C,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md,
