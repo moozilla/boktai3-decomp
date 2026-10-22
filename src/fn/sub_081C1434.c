@@ -1,9 +1,6 @@
 #include "global.h"
 #include "message_menu.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
 extern u8 gUnk_0824F999[];
 
 struct RecordRowDimensions {
@@ -23,11 +20,10 @@ void sub_081C1434(u8 *p)
     dims.y = 0x38;
     dims.z = 0;
 
-    for (i = 0, obj = p + 0x90; i <= 7; i++) {
+    for (i = 0; i <= 7; i++) {
         dims.x = data[i];
-        Widget_InitLinked(obj, p + 0x18, 0, 0x30, 0, 0, 0x3c, &dims);
-        *(u32 *)(obj + 8) |= 1;
-        obj += 0x60;
+        Widget_InitLinked(p + 0x90 + i * 0x60, p + 0x18, 0, 0x30, 0, 0, 0x3c, &dims);
+        *(u32 *)(p + 0x98 + i * 0x60) |= 1;
     }
 
     Widget_InitLinked(p + 0x390, p + 0x18, 0x3c, 0x30, 0, 0, 0x3c, NULL);
@@ -36,6 +32,3 @@ void sub_081C1434(u8 *p)
     Widget_InitLinked(obj, p + 0x38, 0x80, 0x30, 0, 0, 0x3c, NULL);
     *(u32 *)(obj + 8) |= 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C1434);
-#endif

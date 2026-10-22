@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.5%
 struct NumberDisplay {
     s32 *source;
     s32 value, maximum;
@@ -76,16 +74,16 @@ void FieldHud_UpdateNumberDisplay(struct NumberDisplay *p)
         digit++;
         value -= 100;
     }
-    *tile = (digit + 17) | 0xffffd000;
+    *tile = (u16)((digit + 17) | 0xD000);
     tile = Background_GetWrappedTileEntry(0, 4, 1);
     digit = 0;
     while (value > 9) {
         digit++;
         value -= 10;
     }
-    *tile = (digit + 17) | 0xffffd000;
+    *tile = (u16)((digit + 17) | 0xD000);
     tile = Background_GetWrappedTileEntry(0, 5, 1);
-    *tile = (value + 17) | 0xffffd000;
+    *tile = (u16)((value + 17) | 0xD000);
     tile = Background_GetWrappedTileEntry(0, 6, 1);
     *tile = 0xd01c;
     value = p->maximum;
@@ -95,18 +93,14 @@ void FieldHud_UpdateNumberDisplay(struct NumberDisplay *p)
         digit++;
         value -= 100;
     }
-    *tile = (digit + 17) | 0xffffd000;
+    *tile = (u16)((digit + 17) | 0xD000);
     tile = Background_GetWrappedTileEntry(0, 8, 1);
     digit = 0;
     while (value > 9) {
         digit++;
         value -= 10;
     }
-    *tile = (digit + 17) | 0xffffd000;
+    *tile = (u16)((digit + 17) | 0xD000);
     tile = Background_GetWrappedTileEntry(0, 9, 1);
-    *tile = (value + 17) | 0xffffd000;
+    *tile = (u16)((value + 17) | 0xD000);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", FieldHud_UpdateNumberDisplay);
-#endif

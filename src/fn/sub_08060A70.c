@@ -1,7 +1,4 @@
 #include "scene_inventory_actions.h"
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Open: 'movs r7,#1' (copy loop counter) is scheduled before the pointer setup.
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
@@ -55,15 +52,9 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         *attributeOut++ = 0x373;
         SceneInput_GetGridPosition(&starts[i], slot);
     }
-    i = 1;
-    do {
-        targetBase[1 - i] = starts[i];
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 2; i++)
+        targetBase[i] = starts[1 - i];
     SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair,
                                    enabledBase, starts, targetBase, frameBase, attributeBase, 12);
     Sound_PlaySong(0x38A);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneInventory_BeginConsumableSwapPair);
-#endif

@@ -2,8 +2,9 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.1%
-// foundry draft (worker best 96.1%); what differs is mostly register allocation and instruction order
+// fuzzy: 96.7%
+// Open: the ROM loads each attribute constant (0xFFFFE400/0xFFFFE000) into a
+// temporary and copies it (HImode move?); this draft loads it straight into r0.
 #define MapMenu_GetMarkerKind    MapScreen_GetMarkerType
 #define MapMenu_GetMarkerVariant MapScreen_GetMarkerFlipFlags
 #define MapMenu_GetTileAddress   Hud_GetTilemapCell
@@ -69,8 +70,7 @@ void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
                 break;
         }
         dest = Hud_GetTilemapCell(1, x, y);
-        tile |= MapMenu_MarkerAttributes(MapScreen_GetMarkerFlipFlags(marker->type));
-        *dest = tile;
+        *dest = (u16)(tile | MapMenu_MarkerAttributes(MapScreen_GetMarkerFlipFlags(marker->type)));
     }
 }
 #else

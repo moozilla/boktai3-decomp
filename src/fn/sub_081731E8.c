@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// Remaining: shared grid address is reused rather than recomputed.
 #include "scene_hud_display.h"
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
@@ -23,6 +20,10 @@ void SceneHud_ShowSelectionDescription(void *);
 void PauseMenu_RefreshFruitAndUnlockIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, u32);
 u32 SceneInput_NavigateGridKeys(void *, u32);
+static inline u8 *SceneHud_GetActionInput(u8 *p)
+{
+    return p + 0x4384;
+}
 void SceneHud_UpdateSecondaryActionSelection(u8 *p)
 {
     if (gUnk_03005260[1] & 1) {
@@ -53,8 +54,7 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
             PauseMenu_RefreshFruitAndUnlockIcons(p);
             *(u32 *)(p + 0x1668) |= 1;
             Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
-            g2 = ((struct SceneHudState *)p)->actionInput;
-            asm("" : "+r"(g2));
+            g2 = SceneHud_GetActionInput(p);
             Hud_SetGridPosition(g2, 0, 0);
             MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
             SceneHud_ConfigureActionGrid(g2, 0, 0);
@@ -82,7 +82,3 @@ void SceneHud_UpdateSecondaryActionSelection(u8 *p)
         SceneHud_SetActionCursorPosition(p + 0x15c0, *selected);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_UpdateSecondaryActionSelection);
-#endif
