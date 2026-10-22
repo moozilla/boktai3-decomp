@@ -156,7 +156,49 @@ void sub_08001038(void)
     }
 }
 
+#ifdef NONMATCHING
+// fuzzy: 93.8%
+// Left: ROM copies flags (mov r5, r3) before the mask test's branch; flags and z then swap r5/lr.
+void sub_08001120(void)
+{
+    struct IwObj *o;
+    u32 mask, flags;
+    s32 x, y, z;
+    struct IwVec s;
+
+    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+        if (o->flags & mask)
+            continue;
+        flags = o->flags;
+        if (!(flags & 0x1000))
+            continue;
+        if (!(flags & 0x10)) {
+            IwProject(&s, &o->pos);
+            x = (s16)(s.x + o->dx);
+            y = (s16)(s.y + o->dy);
+            z = s.z;
+        } else {
+            x = (s16)(o->pos.x + o->dx);
+            y = (s16)(o->pos.y + o->dy);
+            z = o->pos.z;
+        }
+        if (!(flags & 0x40)) {
+            if (x + o->left < 0)
+                continue;
+            if (y + o->top < 0)
+                continue;
+            if (x + o->right > 0xF0)
+                continue;
+            if (y + o->bottom > 0xA0)
+                continue;
+        }
+        sub_08000430(o, x, y, z);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08001120);
+#endif
 
 void sub_080012E0(void)
 {
