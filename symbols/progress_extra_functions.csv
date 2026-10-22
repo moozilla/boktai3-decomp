@@ -497,6 +497,7 @@ address,evidence
 081B8104,Hidden raw-tail function
 081B8D84,Hidden tail after OrbitMotion_UpdateAngle
 081B94AC,Hidden tail after OrbitMotion_BeginArc
+081B9550,Orbit motion begin mode 9 with radii and speed 0x200/duration (081B94AC tail)
 081B9864,Hidden tail after Registry2388_SetUpdate
 081B9ECC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081BB114,Hidden raw-tail function
