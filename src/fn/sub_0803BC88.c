@@ -1,6 +1,6 @@
 #include "scene_pool.h"
 #ifdef NONMATCHING
-// fuzzy: 87.2%
+// fuzzy: 96.0%
 struct WirelessSceneActor {
     u8 unknown0[4];
     u32 terrainFlags, previousTerrainFlags;
@@ -152,7 +152,7 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
             o->x = Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius);
             o->y = 0;
             o->z = Scale(gUnk_086149C4[angle & 0xFF] * radius);
-            SpatialIndex_SetPosition(a->contactIndex, pos.x + o->x, pos.y, pos.z + off.z);
+            SpatialIndex_SetPosition(a->contactIndex, pos.x + off.x, pos.y, pos.z + off.z);
             contact = a->contactIndex;
         }
     }
