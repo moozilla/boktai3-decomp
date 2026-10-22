@@ -39,7 +39,7 @@ address,isa,evidence,replacement_end
 08021BC0,thumb,Independent available-position query after event-script return and literals; exact 36-byte C body,08021BE4
 08028DFC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08028E18
 0802CCE0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802CD04
-0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
+0802CED0,thumb,Hidden raw-tail function: independent 40-byte body in 0802CD04 tail,0802CEF8
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802D014,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0802D020
 0802D05C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D080
