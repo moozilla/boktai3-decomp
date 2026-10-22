@@ -1,4 +1,5 @@
 #include "global.h"
+#define SpriteGroup_InitAnimatedSprites sub_080FB984
 #include "scene_actor_registry.h"
 
 #ifdef NONMATCHING
