@@ -2,9 +2,6 @@
 #include "engine.h"
 #include "contact_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 84.8%
-// foundry draft (worker best 84.4%); what differs is mostly register allocation and instruction order
 #define Navigation_IsPointInRegion NavMesh_IsPointInsideRegion
 #define gTerrainMap                gUnk_030052F4
 struct NavigationRegion {
@@ -23,29 +20,16 @@ u32 NavMesh_IsPointInsideRegion(struct NavigationRegion *, const struct ContactP
 u32 Navigation_FindContainingRegion(const struct ContactPosition *position)
 {
     struct NavigationResource *resource = gUnk_030052F4->navigation;
-    s32 meshIndex = 0;
-    u32 result;
-    goto test;
-loop: {
-    struct NavigationMesh *mesh =
-        (void *)((u8 *)resource + *(u32 *)((meshIndex << 2) + (u32)resource->offsets));
-    struct NavigationRegion *regions = (void *)((u8 *)mesh + mesh->regionOffset);
-    s32 i = 0;
-    for (; i < mesh->count; i++) {
-        if (NavMesh_IsPointInsideRegion(regions, position, i)) {
-            result = i;
-            goto done;
+    s32 meshIndex, i;
+    for (meshIndex = 0; meshIndex < resource->count; meshIndex++) {
+        s32 off = meshIndex * 4;
+        u32 *offsets = resource->offsets;
+        struct NavigationMesh *mesh = (void *)((u8 *)resource + *(u32 *)((u32)offsets + off));
+        struct NavigationRegion *regions = (void *)((u8 *)mesh + mesh->regionOffset);
+        for (i = 0; i < mesh->count; i++) {
+            if (NavMesh_IsPointInsideRegion(regions, position, i))
+                return i;
         }
     }
-    meshIndex++;
+    return 255;
 }
-test:
-    if (meshIndex < resource->count)
-        goto loop;
-    result = 255;
-done:
-    return result;
-}
-#else
-INCLUDE_ASM("asm/nonmatching", Navigation_FindContainingRegion);
-#endif
