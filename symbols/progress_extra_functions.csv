@@ -417,8 +417,8 @@ address,evidence
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081711D8,Hidden pause inventory consumable effect delta
-08172094,Hidden inventory entry lock predicate (retained)
-081720D4,Hidden inventory entry unlocked or equipped (retained)
+08172094,Hidden inventory entry lock predicate
+081720D4,Hidden inventory entry unlocked or equipped
 081745DC,Hidden tail after Presentation_SelectGraphicResource
 08174930,Hidden tail after InventoryGrid_GetSlotPosition
 08177D88,Hidden getter: option HUD field 0xA5C or -1
