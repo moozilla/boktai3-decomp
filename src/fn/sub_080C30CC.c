@@ -52,8 +52,8 @@ static inline u8 pending(u8 *p)
         return 1;
     return 0;
 }
-#define Golem_UpdateBehaviorCallbacks sub_080C30CC
-s32 Golem_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
+#define Skeleton_UpdateBehaviorCallbacks sub_080C30CC
+s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
 {
     u8 *state = (void *)p;
     struct SceneActorRegistryCallbackBlock *block = (void *)p->unknown3D4;
