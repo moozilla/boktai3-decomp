@@ -1,8 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.4%
-// foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
-#define gSpritePaletteBanks gUnk_030042E4
+
 struct SceneScriptHitSource {
     u8 unknown0[0x38];
     u32 flags;
@@ -18,22 +15,23 @@ struct SceneScriptHitObject {
 };
 extern u8 *gUnk_030042E4;
 void Sound_PlaySong(u32);
+
 void SceneScriptObject_ApplyHitFlash(struct SceneScriptHitSource *source, void *unused,
                                      struct SceneScriptHitObject *object)
 {
+    u8 scratch[4]; /* unused; the original reserves a 4-byte frame */
     struct {
         struct SceneScriptHitObject *object;
-    } context = {object};
+    } context;
+
+    context.object = object;
     if (!(source->flags & 0x40))
         --context.object->hitCount;
     if (context.object->hitCount > 0) {
         context.object->flashTimer = 6;
         context.object->flashPeriod = 15;
         context.object->paletteBank = 0x192;
-        CpuSet(gSpritePaletteBanks + 0x3240, context.object->palette, 0x04000008);
+        CpuSet(gUnk_030042E4 + 0x3240, context.object->palette, 0x04000008);
         Sound_PlaySong(0x13E);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneScriptObject_ApplyHitFlash);
-#endif
