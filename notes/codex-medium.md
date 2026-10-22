@@ -4348,3 +4348,177 @@ All below-threshold reconstructions remain ignored scratch files. No ROM,
 generated assembly or emulator data was committed. Shared docs/index/progress
 files were left untouched under the worker instructions. Combined ROM
 validation and eventual alias promotion remain integration work.
+
+# Dog, Bat, Spider, Mimic round 3 — 2026-10-22
+
+Tags: #matching #dog #bat #spider #mimic #scene-actor #nonmatching #register-pinning
+
+Worked offline in codex/mons-b. Eight new exact matches add **0.0800
+percentage points** of code coverage (1,928 bytes). Four are Register-pinned,
+accounting for 0.0284 points (684 bytes). One fresh guarded draft and two
+improved guarded drafts were committed separately. Every changed production
+function has its required descriptive file-local alias. Validation used only
+check.py, with reviewed full body/pool extents; no make, full build, network,
+or direct Git mutation. All commits went through build/commit.sh.
+
+Exact matches:
+
+- **080DF400 — matched, Dog_SelectRetreatOrChase, 724 bytes.** The existing
+  95.5% candidate already matched until its final state transition. Computing
+  the first state-byte pointer before declaring the zero, then explicitly
+  storing state 3 / phase 1 / behavior 0, reproduces the original offset
+  lifetimes and subsequent control setup. No register hints.
+- **080A32A4 — matched, SceneActorControl_UpdateEntryWait, 256 bytes.** The
+  99.2% draft loaded flags before its mask. Applying the same small
+  pointer-and-mask clear helper in both entry and completion paths lets agbcc
+  cross-jump the entire correct tail. Changing only one path prevented that
+  sharing and grew the function. No register hints.
+- **080A3CD8 — matched, SceneActorPlacement_TriggerTetherAction, 336 bytes.**
+  Replaced the ordinary context-halfword OR with a signed full-width s16
+  bitfield insertion. This supplies the distinct byte and word zero values
+  needed by the control/state stores. Retains the earlier availability and
+  route hints; Register-pinned.
+- **080A497C — matched, SceneActorPlacement_BeginDefaultResponse, 228 bytes.**
+  Starts response control 18 and state 3, plays variant-dependent sound, and
+  clears motion/route flags. Changed the state value to full width and kept
+  the halfword control-offset computation separate. Short offset/address/
+  value constraints close the remaining allocation differences. Register-pinned.
+- **080E81CC — matched, SceneActor_GetDirectionFlags, 48 bytes.** Reused its
+  existing name. The signed four-way switch returns zero for quadrants 0/2,
+  one for 1/3, preserving its input on the default path. A signed intermediate
+  constrained before the shift preserves ASR rather than LSR; the result and
+  quadrant hints retain the original return register. Register-pinned.
+- **080E8444 — matched, SceneActor_IsCollisionTargetUnavailable, 72 bytes.**
+  Tentative name based on callers 080E6BE4, 080E74C4 and 080E8200. Returns true
+  for no target, or player target indices 0..3 with player flag 0x20000 or
+  participant flag 8. Non-player targets are available. Load the player pointer
+  before declaring the mask; short mask hints reproduce the remaining register
+  choices. Register-pinned.
+- **080E80BC — matched, Mimic_TryPursuitRoute, 156 bytes.** Tentative name from
+  the leap caller and saved context goal. Chase_TryRoute provides the complete
+  navigation/blocked-terrain sequence. Failure selects behavior 17. Separate
+  route-result and return-result variables reproduce the success branch and
+  final zero return; reusing one variable missed two instructions. No hints.
+- **080E86FC — matched, Mimic_BeginActionResponse, 108 bytes.** Tentative action
+  callback name: on entry invokes 080E8158 and selects behavior 2; otherwise
+  increments the behavior counter. Declare behavior 2 after the call and
+  before explicit state stores. The general state helper hoisted zero too
+  early; declaring behavior before the call needlessly saved another register.
+  No hints.
+
+Guarded drafts:
+
+- **080E7D9C — new draft 89.8%, Mimic_ResetExpiredTarget (tentative).** Requires
+  acquired-target flag 0x80, expired group+418 timer and clear mask 0x38.
+  Clears target/response flags and timers, resets optional route control, then
+  installs idle control and behavior 17. Initial direct reconstruction was
+  51.2%; reusing the typed reset block from Mimic_UpdateHitRecovery and retaining
+  both flags and timer pointers reached 89.8%. Reviewed extent 300 bytes;
+  candidate 304 bytes, 13 realigned differences / seven structural. An extra
+  flags-pointer copy through ip, zero scheduling and control offset reuse
+  remain. Register-pinning concession. Removed unrelated copied helpers before
+  recording the draft; default INCLUDE_ASM path checks exactly.
+- **080E7134 — improved draft 95.9%, SceneActor_LeapTowardTarget.** Previously
+  95.7%. An inline RouteDelta that accepts the raw group pointer computes the
+  stack output before loading the destination descriptor. Explicit RNG byte
+  offset plus table address restores index-before-table ordering. Reviewed
+  extent 912 bytes; candidate 916, 15 realigned differences / two structural.
+  Context and vector-load allocation and a redundant facing-pointer reload
+  remain. No new register-pinning concession. Default asm path checks exactly.
+- **080A3A30 — improved draft 90.5%, Spider_BeginPlayerPursuit.** Previously
+  90.1%. localsweep removed the source-position pointer local; retaining it
+  caused two extra differing instructions. Reviewed extent 464 bytes, candidate
+  also 464, 20 realigned differences / 12 structural. Global/mesh pointer
+  lifetimes and final route/motion flag scheduling remain. Retains its sl mesh
+  hint. Default asm path checks exactly.
+
+Stopped retries; existing better production drafts were preserved:
+
+- **080DEA7C — retained 99.4% draft.** Tried deriving availability offset 2D0
+  from 2D4 using the sibling availability idiom and scoped offset constraints.
+  Corrected instruction selection but shifted nine or more later scratch
+  registers. Sine-load and collider-offset hints added instructions; discarded.
+- **080DED74 — retained 97.9% draft.** The three-instruction context-offset
+  r0/r5 difference persists. Narrow/signed offset types and an extra lifetime
+  use were neutral. Pinning the offset disturbed the earlier context allocation;
+  pinning that context prevented address CSE and worsened the structure.
+- **080A4334 — retained 97.2% draft.** Pointer elimination, player barriers,
+  equivalent explicit endpoint expression, motion-mask helper and adjacent
+  declaration swaps did not improve the original. Null-check/player-copy
+  scheduling, endpoint pointer reuse and a mask's load order remain.
+- **080A28A8 — retained 90.7% draft.** Replaced the response halfword clear
+  with a signed bitfield insertion to seek separate zero values. Regressed to
+  88.7%; discarded. Control/state zero allocation remains.
+- **080E6E08 — retained 88.4% draft.** localsweep removing the typed control
+  pointer worsened 41 realigned differences to 73; no improving flags-pointer
+  removal compiled. Its entry reset was useful as the fresh 080E7D9C seed.
+- **080E4B34 — retained 87.7% full-extent draft.** Removing its flags pointer
+  worsened allocation. Recovery inlines, flag scheduling and stack lifetimes
+  remain (131 realigned / 40 structural with the reviewed 1,976-byte extent).
+- **080E6BE4 — retained 84.0% draft.** Removing the r8 group hint regressed to
+  80.9%; discarded. Route/control tail and flag scheduling remain.
+- **080E25FC — retained 83.5% full-extent draft.** localsweep flags-pointer
+  deletion worsened the candidate. Reviewed 4,500-byte comparison still has
+  386 realigned differences / 148 structural; branch sharing, recovery inlines
+  and pointer lifetimes remain.
+- **080A2AEC — retained 83.1% full-extent draft.** Removing the flags pointer
+  worsened the candidate; removing the motion pointer was neutral. Landing
+  delta allocation and repeated flag/pointer lifetimes remain.
+- **080E41F8 — retained 81.6% draft.** Signed bitfield insertion for motion OR
+  reduced some structure but regressed overall to 77.1%; discarded. Source
+  timer loads and attack argument lifetimes remain.
+- **080E4330 — retained 80.7% draft.** The corresponding bitfield experiment
+  regressed to 76.6%; discarded. Same argument/offset blockers as 080E41F8.
+- **080A4018 — retained 80.3% draft.** Both source-position and timer-pointer
+  removal worsened the candidate. RNG/vector lifetimes and timer scheduling
+  remain.
+
+Retried earlier below-threshold scratch candidates with the pointer-lifetime
+hypothesis (localsweep); none became an acceptable draft:
+
+- **080DE6E0:** 44.2%, no removable field pointer; effect/RNG allocation remains.
+- **080DEF78:** 59.8%, no removable field pointer; route-loop/map lifetimes remain.
+- **080DF6EC:** 53.0%, removing slot/item locals was neutral; contact/reset flow remains.
+- **080DFC34:** removing its motion-flags pointer improved the reviewed 1,880-byte
+  comparison to 58.2% (594 realigned / 376 structural). Still 1,968 candidate
+  bytes; directional tile guard sharing remains the main blocker.
+- **080E3874:** removing its source-position local improved the reviewed
+  2,360-byte comparison to 75.4% (344 realigned / 91 structural), candidate
+  2,356 bytes. Retained as ignored retry scratch; recovery reset/route lifetimes
+  still prevent a production draft.
+- **08087018:** unchanged 61.4%; no removable field pointer, repeated route-height
+  and reset/control expansion remains.
+- **08087A70:** unchanged retained scratch (76.8% candidate-length triage); no
+  removable field pointer. Prior corrected full-extent best remains 78.0%; the
+  earlier invalid 79.0% reconstruction was not promoted.
+- **080A21EC:** unchanged 68.0%; no removable field pointer. Tile guards and
+  direction-dependent branch sharing remain.
+- **080A34BC:** unchanged retained scratch (66.0% candidate-length triage); no
+  removable field pointer. Earlier full-extent best remains 66.7%; RNG/context
+  lifetime blockers remain.
+- **080E0750:** prior stopped 74.5% reconstruction is documented above, but no
+  retained source was found in this worktree. Did not recreate its large route/
+  turn expansion in this pass.
+
+Constructor triage, **deferred rather than claimed as completed C attempts**:
+
+- **080E5744 — Dog initializer, 4,304 bytes / 1,838 instructions.** Read entry
+  setup, condensed body and final callback/registry installation. Script_GetPc /
+  Script_GetValue option expansions dominate the middle. Best matched relative
+  Bee_ResetRoute covers only 12%, mainly terrain and sequence stepping.
+- **08084F44 — Bat_Init, 3,548 bytes / 1,548 instructions.** Read sprite/tile
+  allocation entry and condensed body. Best matched relative covers 11%; no
+  complete initializer seed was found. Address lookup in relatives misses the
+  named symbol; using Bat_Init works.
+- **080A4AFC — Spider_Init, 4,184 bytes / 1,812 instructions.** Read initial
+  context flags, profile/drawable setup and condensed body. Best relative covers
+  12%; the repeated script option, terrain and resource setup remains unrecovered.
+- **080E87C4 — Mimic_Init, 4,264 bytes / 1,848 instructions.** Read profile/
+  drawable entry and condensed body. Bee_ResetRoute explains 16%, mostly repeated
+  terrain computations and sequence stepping; no usable complete C seed.
+
+These four constructors and 080E0750 remain work for a later pass. No partial
+constructor was committed. Stopped candidates remain ignored under wip and
+build; no generated assembly, ROM or emulator data was committed. Shared docs,
+index and progress totals were left unchanged. Combined ROM validation and
+alias promotion remain the integrator's work.
