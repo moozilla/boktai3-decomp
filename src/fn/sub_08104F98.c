@@ -1,11 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "callback_pool.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// foundry draft (worker best 95.7%); what differs is mostly register allocation and instruction order
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *, void *);
 void SceneHud_SetTimedState(void *, s32, s32, u32, s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void CallbackPool_SpawnHitParticles(void *);
@@ -19,14 +15,14 @@ static inline void ClearVector(void *dest, u32 *zero)
 void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackPoolEntry *target,
                               struct CallbackPoolEntry *entry)
 {
-    register struct CallbackPoolEntry *recipient asm("r8") = target;
+
     s32 damage;
     u32 stack[3];
     u32 *vector;
     if (entry->hitFlags != 0)
         return;
-    Collision_CalculateDamageResponse(source);
-    recipient->sprite44 = source->sprite44;
+    Collision_CalculateDamageResponse(source, target);
+    target->sprite44 = source->sprite44;
     damage = entry->health - entry->damage;
     if (damage < 0)
         damage += entry->damage;
@@ -39,7 +35,7 @@ void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackP
                            entry->displayMode, 0, -1);
     vector = stack + 1;
     ClearVector(vector, stack);
-    DamageNumberDisplay_Show(recipient, damage, 0, &entry->position, vector, 1);
+    DamageNumberDisplay_Show(target, damage, 0, &entry->position, vector, 1);
     entry->hitTimer = 3;
     entry->shakeTimer = 10;
     CallbackPool_SpawnHitParticles(entry);
@@ -53,6 +49,3 @@ void CallbackPool_ApplyDamage(struct CallbackPoolEntry *source, struct CallbackP
         entry->defeated = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackPool_ApplyDamage);
-#endif
