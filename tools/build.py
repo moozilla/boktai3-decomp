@@ -259,6 +259,12 @@ def main():
             msg += (f"\n  layout shifted: sub_{moved} is not at its original address -- the C unit "
                     f"just before it compiles to a different size")
         sys.exit(msg)
+    # Every matched function must compile to the whole span progress credits
+    # it, or a raw tail after it would be counted as decompiled.
+    import progress
+    tails = progress.check_tails(elf)
+    if tails:
+        sys.exit(f"{a.out}: matches, but progress would credit hidden assembly:\n  " + "\n  ".join(tails))
     print(f"{a.out}: OK")
 
 
