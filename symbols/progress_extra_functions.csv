@@ -170,6 +170,7 @@ address,evidence
 08083F5C,Independent terrain response prologue and return following83F3C; full232-byte reviewed extent
 08084280,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0808AED8,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C
+0808B264,"Vorn-style actor reset: copies context frame 0x64A to 0x648, sets behavior 15 and restarts the saved route; raw span before Vorn_ParseField624_0808B320; retained assembly"
 0808EB98,Slime: consume the prepared flag (replay profile animation 14) then pick the next move (roll flag or walk choice) at random; raw span before Slime_ConvergeReactionMotion
 0808EC7C,Empty bx lr stub at the end of the raw 0808EB98-0808EC80 span
 0808F9E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
