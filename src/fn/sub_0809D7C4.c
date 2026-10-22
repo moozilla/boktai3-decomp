@@ -1,8 +1,4 @@
 #include "global.h"
-
-#ifdef NONMATCHING
-// Remaining: Entry control-store allocation and player/saved-position address order differ.
-// fuzzy: 86.5%
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 
@@ -55,9 +51,13 @@ void Lun_FollowPlayerDisplacement(struct SceneActorRegistryResetView *actor)
         *(struct Pair *)(body + 0x414) = *(struct Pair *)(gUnk_02000580 + 0x30);
         SceneActorControl_ResetTargetFlags(actor);
     }
-    saved = (void *)(body + 0x414);
-    player = (void *)(gUnk_02000580 + 0x30);
-    Delta(&delta, player, saved);
+    {
+        u8 **gp = &gUnk_02000580;
+        struct ContactPosition *d = &delta;
+        saved = (void *)(body + 0x414);
+        player = (void *)(*gp + 0x30);
+        Delta(d, player, saved);
+    }
     (*(struct ContactPosition *)((u8 *)actor + 0x64)).x += delta.x;
     (*(struct ContactPosition *)((u8 *)actor + 0x64)).z += delta.z;
     *(struct Pair *)saved = *(struct Pair *)player;
@@ -67,7 +67,3 @@ void Lun_FollowPlayerDisplacement(struct SceneActorRegistryResetView *actor)
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0809D7C4);
-#endif
