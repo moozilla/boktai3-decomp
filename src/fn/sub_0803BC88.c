@@ -1,6 +1,4 @@
 #include "scene_pool.h"
-#ifdef NONMATCHING
-// fuzzy: 99.8%
 struct WirelessSceneActor {
     u8 unknown0[4];
     u32 terrainFlags, previousTerrainFlags;
@@ -73,7 +71,8 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     u32 above, below;
     s32 lim;
     s32 mask;
-    s16 heading;
+    s32 heading;
+    u32 h;
     s32 frames;
     s32 *pprevX, *pprevZ;
     u16 *ph;
@@ -148,7 +147,8 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     {
         Character_GetHeightAdjustedPosition(a, &pos);
         SpatialIndex_SetPosition(&a->motionFlags, pos.x, pos.y, pos.z);
-        heading = *ph;
+        h = *ph;
+        heading = (s16)h;
         motion = &a->motionFlags;
         if (heading < 0) {
             SpatialIndex_SetPosition(a->contactIndex, pos.x, pos.y, pos.z);
@@ -183,6 +183,3 @@ void sub_0803BC88(struct WirelessSceneActor *a, struct ScenePoolEntry *e, u32 in
     ActorMarkerPool_ShowMarker(a->marker);
     a->index = index;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0803BC88);
-#endif
