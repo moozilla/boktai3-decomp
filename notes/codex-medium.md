@@ -4245,3 +4245,106 @@ aliases. Unsuccessful candidates remain ignored under wip/codex-medium. The
 scratch percentages above are triage measurements, not exact progress or
 accepted drafts. Shared documentation and progress totals were left untouched;
 combined ROM validation and alias promotion remain integration work.
+
+# Dog, Bat, and Spider remaining targets — 2026-10-22
+
+Tags: #matching #dog #bat #spider #scene-actor #nonmatching #register-pinning
+
+Worked offline on the existing codex/mons-b branch. Reviewed the earlier
+commits and this note before selecting new work. No new exact matches:
+exact code coverage gain is **+0 percentage points**. One of eleven assigned
+functions (9.1% by function count) now has a new guarded draft. Used only
+per-file check.py compilations, including reviewed full extents; no make,
+full build, network operation, or direct git mutation. The draft and these
+notes were submitted separately through build/commit.sh.
+
+- **080DEF78 — prior stopped attempt retained; no new production source.**
+  Dog_TryRetreatRoute remains below threshold (prior best 62.4%). The prior
+  cardinal-loop allocation, rotation, and map-pointer lifetime blockers are
+  recorded above; this pass focused on functions without earlier attempts.
+- **080DF6EC — prior stopped attempt retained; no new production source.**
+  Dog_StealContactItem remains below threshold (prior corrected candidate
+  53.0%). Inventory/health-cost control flow and position/argument allocation
+  remain the documented blockers.
+- **080DFC34 — stopped below threshold, 56.4% full-extent scratch check.**
+  Tentative Dog_UpdateRouteTurn in wip/codex-medium/sub_080DFC34.c. Rounds
+  facing, derives the target heading from the route unless motion flags or
+  behavior six override it, chooses among eight directional sequence/tile
+  turn paths, advances facing at sequence elapsed one, restores duration
+  scale, and resumes the saved turn control when aligned. Reviewed extent:
+  1,880 bytes. Reused the Spider cardinal-turn reconstruction and Slime
+  animation-selection idioms. Preserving the per-path input flags in r7
+  improved the candidate; replacing the conditional flip handling worsened
+  it. Retained scratch: 602 realigned differences / 362 structural. The
+  compiler merges repeated tile guards and control tails differently.
+- **080E3874 — stopped below threshold, best full-extent fuzzy 75.2%.**
+  Tentative Dog_ScheduleRouteRecovery in wip/codex-medium/sub_080E3874.c.
+  After update270 and 0812F3CC permit continuation and the behavior counter
+  exceeds 60, replaces the response slot and installs RestoreAfterDelay.
+  Saves a 30-tick packet with chase behavior 12, route behavior seven, or
+  ordinary behavior two. The chase branch expands Chase_Arrive; the route
+  branch snaps the saved endpoint and falls back to idle if routing fails.
+  Reviewed extent: 2,360 bytes, including the interior counter tail at
+  080E4198 (not a separate function). A typed recovery packet and early
+  group-pointer lifetime improved the candidate. The retained final scratch
+  prioritizes endpoint load order over fuzzy similarity; its remaining
+  differences concern shared reset pointer spills, RNG retry allocation,
+  mask-load order, and repeated route failures. No production draft.
+- **080E0750 — prior stopped attempt retained; no new production source.**
+  Dog_ResumeRouteAfterKnockback remains below threshold (prior 74.5%).
+  Existing route/turn tails, stack slots and retry allocation remain unresolved.
+- **08087018 — prior stopped attempt retained; no new production source.**
+  Bat_UpdateLandingRecovery remains below threshold (prior 61.4%). Its
+  duplicated height computations and control-reset/address lifetimes remain
+  recorded above.
+- **08087A70 — stopped below threshold, corrected scratch best 78.0%.**
+  Tentative Bat_UpdateKnockbackRecovery in wip/codex-medium/sub_08087A70.c.
+  Selects animation three, plays hit sounds/sparks when motion flag eight
+  is set, holds the early frame, and smooths offsets 310/314 toward 318/31C
+  by signed quarters clamped to +/-200. On rest and animation completion,
+  clears response flags and either enters 08087018 or retargets player zero
+  before reacquiring chase/route control. Reviewed extent: 4,532 bytes.
+  Both branches expand Chase_Arrive and retry the target route; a successful
+  retry must install the resumed control, not merely return. Corrected that
+  detail before retaining the candidate. Earlier 79.0% scratch lacked this
+  success transition and must not be promoted. Mask helpers, explicit
+  readiness booleans, pointer lifetime changes, and a flags-pointer hint
+  failed to reach the threshold. Large repeated call sequences make anchor
+  alignment unstable after the compiler shares/reorders their tails; the
+  current structural-ranked scratch is below the corrected coarse best.
+- **080A21EC — prior stopped attempt retained; no new production source.**
+  Spider_UpdateCardinalTurn remains below threshold (prior 68.0%). Repeated
+  tile guards, branch sharing and flag lifetimes remain the documented blockers.
+- **080A34BC — stopped below threshold, 66.7% full-extent scratch check.**
+  Tentative Spider_SelectPursuitRecovery in
+  wip/codex-medium/sub_080A34BC.c. Entry restores the saved control and scale
+  64. Context flag four chooses a tether-range test and delayed recovery;
+  otherwise counter >60 selects a random route point, resolves its position,
+  and uses palette-dependent RNG masks three/seven to select pursuit or
+  recovery. Recovery randomizes context+62A to 60..187. Reviewed extent:
+  780 bytes. Shared control helpers reconstruct the stores, but the original
+  preserves RNG table/index/mask across them. Group-pointer allocation helped;
+  broader context/RNG pins, an explicit control-offset local and flag-value
+  lifetime experiments did not close the differences. Final scratch:
+  148 realigned differences / 64 structural. No production draft.
+- **080A4018 — drafted 80.3%, Spider_UpdateWanderGoal (tentative).** Generates
+  radius 256..1279 and heading offset -63..64, probes a sine-table endpoint
+  every 30 behavior ticks, validates it against navigation, and refreshes
+  context+628 to 60/120 after choosing movement scale 16/64. Rejected probes
+  restore the route position and clear the timer; active timers count down.
+  Read callers including Spider_UpdateProbeNavigation and reused the shared
+  Chase_TryRoute helper. Signed radius multiplication is required for the
+  arithmetic shifts. A narrow transform view matches base-plus-position
+  accesses; passing the context to the flag predicate fixes mask/address
+  ordering. Explicit retry argument locals, short timer-pointer locals and
+  a heading constraint improved the retained candidate. Full reviewed extent
+  is 584 bytes; candidate is also 584 bytes, with 66 realigned differences /
+  26 structural. Remaining RNG/vector allocation, argument lifetimes and
+  timer-store scheduling prevent an exact match. Unit is marked
+  MATCHING_CONCESSION: register-pinning. Recorded with --nonmatching --record;
+  the default INCLUDE_ASM fallback checks byte-identically over all 584 bytes.
+
+All below-threshold reconstructions remain ignored scratch files. No ROM,
+generated assembly or emulator data was committed. Shared docs/index/progress
+files were left untouched under the worker instructions. Combined ROM
+validation and eventual alias promotion remain integration work.
