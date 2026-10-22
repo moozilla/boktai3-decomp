@@ -1,9 +1,9 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.9%
-// Left: reload registers in the affine attribute block (r3/r4) and the order of the
-// attrs[] giv init against the hoisted flags & 8 in the piece loop preheader.
+// fuzzy: 99.1%
+// Left: in the piece loop preheader the ROM initialises the attrs[] giv before the
+// hoisted flags & 8 (6 instructions in a different order).
 
 struct SpritePiece {
     u8 shape;
@@ -157,8 +157,9 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
             sx = -sx;
         if (p->flags & 8)
             sy = -sy;
-        if (!(p->flags & 0x20000) &&
-            ((sx >= 0 ? sx : -sx) > 60 || (sy >= 0 ? sy : -sy) > 60 || p->rotation != 0))
+        if (p->flags & 0x20000)
+            attr |= 0x100;
+        else if ((sx >= 0 ? sx : -sx) > 60 || (sy >= 0 ? sy : -sy) > 60 || p->rotation != 0)
             attr |= 0x300;
         else
             attr |= 0x100;
