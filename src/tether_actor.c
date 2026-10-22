@@ -3238,116 +3238,54 @@ u32 TetherActor_TestNearDelta(s32 a, s32 b)
     return 1;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.9%
-
-/* Complete body; remaining differences are scratch-register allocation. */
-
 void TetherActor_UpdateRoamingState(struct TetherActor *actor)
 {
-    struct ContactPosition *position;
     struct ContactPackedVector delta;
-    s32 activeMask;
-    s32 headingMask;
     if (actor->state != 3)
         TetherActor_SetState(actor, 3);
     if (gUnk_030053F4 & 512)
         return;
     if (actor->chargeReady) {
-        {
-            {
-                u16 *glow = &actor->glowMode;
-                *glow = 0;
-            }
-        }
-        {
-            u16 *frame = &actor->roamFrame;
-            *frame = 0;
-        }
+        actor->glowMode = 0;
+        actor->roamFrame = 0;
         TetherActor_UpdateShake(actor);
-        position = &actor->position;
     } else {
-        u16 *frame;
-        activeMask = 1;
-        actor->glowMode = activeMask;
-        {
-            u32 currentFrame = actor->roamFrame;
-            position = &actor->position;
-            if (currentFrame > 90) {
-                s32 dx;
-                s32 dz;
-                s16 *z;
+        actor->glowMode = 1;
+        if (actor->roamFrame > 90) {
+            s32 dx = actor->interactionProbe.target.x - actor->position.x;
+            s32 dz = actor->interactionProbe.target.z - actor->position.z;
+            if (dx || dz) {
+                u32 angle = Math_Atan2(dx, dz);
+                delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
+                delta.y = 0;
+                delta.z = scale(gUnk_086149C4[angle & 255] * 3);
+                if (TetherActor_TestStepDelta((struct ContactPackedVector *)&actor->position,
+                                              &delta, 0x841)) {
+                    actor->position.x += delta.x;
+                    actor->position.z += delta.z;
+                    actor->moving = 1;
+                } else
+                    actor->moving = 0;
                 {
-                    s32 targetX = actor->interactionProbe.target.x;
-                    s32 worldX = position->x;
-                    targetX -= worldX;
-                    dx = targetX;
+                    s32 sector = ((u16)angle + 112) >> 5;
+                    u32 mask = 7;
+                    mask &= sector;
+                    actor->heading = mask;
                 }
-                headingMask = 7;
-                {
-                    s32 targetZ = actor->interactionProbe.target.z;
-                    s16 *worldZ = &actor->position.z;
-                    s32 value = *worldZ;
-                    targetZ -= value;
-                    dz = targetZ;
-                    z = worldZ;
-                }
-                if (dx || dz) {
-                    u32 angle = Math_Atan2(dx, dz);
-                    delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
-                    delta.y = 0;
-                    {
-                        s32 stepZ = scale(gUnk_086149C4[angle & 255] * 3);
-                        delta.z = stepZ;
-                    }
-                    {
-                        u32 accepted = TetherActor_TestStepDelta(
-                            (struct ContactPackedVector *)position, &delta, 0x841);
-                        if (accepted) {
-                            position->x += delta.x;
-                            {
-                                u32 value = (u16)delta.z;
-                                s16 *source = z;
-                                u32 current = *(u16 *)source;
-                                s16 *destination;
-                                value += current;
-                                destination = z;
-                                *(u16 *)destination = value;
-                            }
-                            actor->moving = 1;
-                        } else
-                            actor->moving = accepted;
-                    }
-                    {
-                        s32 sector = (u16)angle;
-                        u32 mask = headingMask;
-                        sector += 112;
-                        sector >>= 5;
-                        mask &= sector;
-                        actor->heading = mask;
-                    }
-                }
-                if (!(actor->interactionProbe.flags & activeMask) &&
-                    TetherActor_TestNearDelta(dx, dz) && actor->interactionScriptId)
-                    Script_Call(actor->interactionScriptId, 0);
             }
+            if (!(actor->interactionProbe.flags & 1) && TetherActor_TestNearDelta(dx, dz) &&
+                actor->interactionScriptId)
+                Script_Call(actor->interactionScriptId, 0);
         }
-        frame = &actor->roamFrame;
-        if (++*frame > 119)
-            *frame = 0;
+        if (++actor->roamFrame > 119)
+            actor->roamFrame = 0;
         if (actor->kind == 5 && actor->moving)
             TetherActor_SetHeadingEntry(actor, 36);
         else
             TetherActor_SetEntry(actor, 0);
     }
-    NavMesh_UpdateProbe(&actor->interactionProbe, position);
+    NavMesh_UpdateProbe(&actor->interactionProbe, &actor->position);
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateRoamingState);
-
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 
