@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.9%
-// draft: register allocation differs (changed/keys swap r5/r6) and a few operand orders
 
 struct TimePanel {
     u8 f0[0x80];
@@ -25,6 +22,7 @@ void RecordPanel_RefreshEntryLabels(struct TimePanel *);
 void RecordPanel_DrawTime(struct TimePanel *);
 void Sound_PlaySong(u32);
 
+// confidence=low: handles cursor/selection input on the record time panel.
 void sub_0810DE88(struct TimePanel *p)
 {
     u16 *keys;
@@ -42,15 +40,13 @@ void sub_0810DE88(struct TimePanel *p)
             changed = 1;
         }
         if (changed) {
-            u8 v;
             if (p->cursor == 0) {
                 p->f422 = 0x1f;
-                v = gUnk_0860654C[0];
+                p->selMax = gUnk_0860654C[0];
             } else {
                 p->f422 = 0x20;
-                v = gUnk_0860654C[1];
+                p->selMax = gUnk_0860654C[1];
             }
-            p->selMax = v;
             if (p->selA > p->selMax)
                 p->selA = p->selMax;
             Anim_SelectWidgetGlyph((u8 *)p + 0x80, (u8 *)p + 0x400, p->f422);
@@ -58,28 +54,25 @@ void sub_0810DE88(struct TimePanel *p)
         }
     }
     {
-        u16 k;
-        keys = gUnk_03005260;
-        k = keys[1];
-        if (k & 0x40) {
+        if (gUnk_03005260[1] & 0x40) {
             p->selA--;
             if (p->selA < 0)
                 p->selA = p->selMax;
             changed = 1;
-        } else if (k & 0x80) {
+        } else if (gUnk_03005260[1] & 0x80) {
             p->selA++;
             if (p->selA > p->selMax)
                 p->selA = 0;
             changed = 1;
         }
-        k = keys[0];
-        if (k & 0x40) {
+        keys = gUnk_03005260;
+        if (keys[0] & 0x40) {
             if (p->holdState & 0x80)
                 p->repeat = 0;
             else
                 p->repeat++;
             p->holdState = 0x40;
-        } else if (k & 0x80) {
+        } else if (keys[0] & 0x80) {
             if (p->holdState & 0x40)
                 p->repeat = 0;
             else
@@ -89,12 +82,11 @@ void sub_0810DE88(struct TimePanel *p)
             p->repeat = 0;
         }
         if (p->repeat > 10) {
-            k = keys[0];
-            if (k & 0x40) {
+            if (keys[0] & 0x40) {
                 p->selA--;
                 if (p->selA < 0)
                     p->selA = p->selMax;
-            } else if (k & 0x80) {
+            } else if (keys[0] & 0x80) {
                 p->selA++;
                 if (p->selA > p->selMax)
                     p->selA = 0;
@@ -109,6 +101,3 @@ void sub_0810DE88(struct TimePanel *p)
     }
     p->f162 = p->selA << 4;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0810DE88);
-#endif
