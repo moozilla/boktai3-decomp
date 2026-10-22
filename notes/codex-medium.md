@@ -4009,3 +4009,124 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+# Dog then Bat worker — 2026-10-22
+
+Tags: #matching #dog #bat #scene-actor #register-pinning
+
+Branch: `codex/mons-b`, offline. Seven of fourteen assigned functions match
+exactly (50.0% of the assignment by function count); this tranche adds
+0.0765 percentage points of code coverage (1,844 bytes). Of that gain,
+0.0085 percentage points (204 bytes) use the register-pinning concession.
+Only per-file `tools/check.py` checks were run, including reviewed full
+extents after formatting. No full build or network operation was run.
+
+Commit blocker: this checkout has no `build/commit.sh`. Requested provisioning
+while continuing work. No git add/commit/checkout/stash was run, and the
+sources and this appended record remain uncommitted pending the driver.
+
+- **080DDD90 — matched, Dog_UpdateTargetGate, 312 bytes.** Refreshes context
+  timer 0x690 from 0x692, marks route/reaction flags and chooses target action
+  or retreat/chase control. Started from SceneActorReaction_UpdateGate
+  (080B6CE4). Returning from the blocked/action-not-ready path and sharing
+  the final motion-bit store reproduced the branch layout. Narrow typed
+  context layout fixed the timer offsets. No hints.
+- **080DE42C — matched, Dog_RequestHeadingTurn, 292 bytes.** Rejects headings
+  inside actor+0xEA tolerance or while control kind 2 is selected, enters
+  idle control and behavior 13/6 according to motion flag 0x80, and stores
+  the eight-way target heading at 0x3CD. This extra entry is emitted as raw
+  bytes by asmat, so decoded the existing ELF with objdump. Separate mask,
+  loaded field and result locals preserve the narrowing and evaluation
+  order. depin removed all diagnostic hints.
+- **080DE6E0 — stopped below draft threshold (43.6%).** Candidate
+  Dog_GetGaitSpeed in `wip/codex-medium/sub_080DE6E0.c`. Returns the gait
+  table entry at 086061E4 when the sequence elapsed count is zero and emits
+  directional randomized dust for palette variants 1/3 at frames 1/5/7.
+  No strong complete relative. Initial candidate has 247 realigned
+  differences, 141 structural. RNG pairing, packed-vector initialization,
+  and the many effect-call arguments differ. The candidate initializes the
+  temporary y component rather than reading an unset value; retain that
+  validity constraint in future matching attempts.
+- **080DEF78 — stopped below draft threshold (best 62.4%).** Candidate
+  Dog_TryRetreatRoute in `wip/codex-medium/sub_080DEF78.c`. Tries one cell
+  in facing direction, rotates up to four times according to context+0x6A6,
+  restores the supplied heading and requests the resulting route. Success
+  increments context+0x6A7. A Cell/Height helper plus explicit cardinal loops
+  recovered the behavior, but outer-loop rotation, signed division shape,
+  map/field address lifetimes and counter comparisons remain different.
+  A goto-based outer loop reduced structural differences to 121 while
+  worsening fuzzy similarity to 59.0%; no production draft was retained.
+- **080DF400 — drafted 95.5%, Dog_SelectRetreatOrChase.** Reviewed 724-byte
+  extent: 19 realigned differences, six structural. Clears response state,
+  tries retreat while close or action-cooling, selects chase when distant,
+  otherwise installs the target-transition control. Correct packed state
+  comparison is 0x000C0000. Computing route, source position and destination
+  in the observed order improved 91.8% to 95.5%. Remaining differences are
+  the shared final state reset and local allocation. No hints.
+- **080DF6EC — stopped below draft threshold (best 55.6%).** Candidate
+  Dog_StealContactItem in `wip/codex-medium/sub_080DF6EC.c`. Contact callback
+  uses InventorySlot_PickRandom, emits the selected item through 08017044,
+  clears its inventory slot, and for item types 2/5/14 schedules a health
+  cost and refreshes the player target. Extra entry decoded from the ELF.
+  Corrected field offsets: damage at actor+0x2E4, reaction flag at 0x2E6,
+  capability test at 0x2C0; repeated zero stores are 0x2D8/0x2DC. These
+  corrections lowered fuzzy to 52.6% (141 realigned / 51 structural), so
+  stopped rather than preserving the earlier incorrect candidate.
+- **080DFA5C — matched, Dog_OnAttackContact, 368 bytes.** Rejects unavailable
+  actors, offsets the collider center opposite facing by one cell, computes
+  contact heading, and records the other collider id while clearing pending
+  resolution flag 0x01000000. Packed position union reproduces full-word
+  bitfield updates. Explicit Delta argument locals fix source ordering.
+  A separate facingActor alias preserves the original incoming r2 through
+  the first guard. depin removed all four diagnostic hints; no hints remain.
+- **080E04D0 — matched, Dog_UpdateArrivalAnimation (tentative), 204 bytes.**
+  Installed by Dog_ResumeRoute and Dog_UpdateScriptedAction as control kind
+  10. Plays entry 11, temporarily sets animation duration scale, restores
+  the actor speed field, and signals completion. Holding the original
+  speed-field offset in r1 prevents address sharing with later scale code.
+  depin removed the empty barrier but retained that offset pin. Unit is
+  marked MATCHING_CONCESSION: register-pinning.
+- **080E41F8 — drafted 81.6%, Dog_UpdateLeapAttack.** Reviewed 312-byte extent;
+  candidate is 308 bytes, 29 realigned differences / nine structural.
+  Starts Dog_UpdateLeapWindup, configures the context attack collider from
+  actor B6/BE/D0/C6, refreshes the leap timer and returns to retreat/chase
+  selection on completion. Typed context timers reproduce source-before-
+  destination halfword stores. Explicit zero temporaries, full-width
+  bitfields and register barriers did not resolve the retained offset and
+  call-argument allocation. Final guarded draft has no hints.
+- **080E4330 — drafted 80.7%, Dog_UpdateTrailAttack.** Reviewed 296-byte extent;
+  30 realigned differences / 11 structural. Sibling of 080E41F8 using
+  SceneActorAnimation_EmitDirectionalTrail, actor B8/C0/D4/C8 attack values,
+  context flag 2 and the second cooldown timer. Same allocation/evaluation
+  blockers; final guarded draft has no hints.
+- **080E6848 — matched, Dog_ResetIdleControl, 292 bytes.** On entry resets
+  collision/reaction state, clears the target, installs saved control kind
+  zero and then invokes update270. Started from SceneActor_ResetCollisionReaction
+  (080E8490). Delaying the motion pointer assignment until its first use
+  corrected its lifetime and every downstream register choice. No hints.
+- **080E6B1C — matched, Dog_UpdateLeapControl, 200 bytes.** On entry installs
+  SceneActor_LeapTowardTarget as kind 0x23; completion selects behavior 16.
+  Otherwise invokes update270 and sets flag 0x2000. Declaring the mask
+  before the flags pointer reproduces the original mask-load order. No hints.
+- **08088C24 — matched, Bat_UpdateProbeReaction (tentative), 176 bytes.**
+  Waits through control entry, reacts to context+0x628 bit 2, optionally
+  selects animation zero when distant, calls 0808AF38, clears the probe bit
+  and enters behavior 15; otherwise selects animation one. Signed 16-bit
+  bitfield assignment emits the paired zero temporaries; passing the clear
+  mask through an inline gives the correct load order. No hints.
+- **08087018 — stopped below draft threshold (61.4%).** Candidate
+  Bat_UpdateLandingRecovery (tentative) in `wip/codex-medium/sub_08087018.c`.
+  Read BIG_FUNCTIONS and condensed the 1,157-instruction body. Animation 3
+  completion branches on motion flags 2/0x80, schedules delayed recovery,
+  resolves route coordinates/heights and falls back to idle when routing
+  fails. Shared Chase_Arrive / Chase_BeginTurn recover the large inlined
+  navigation sequence, but candidate remains 621 realigned differences /
+  235 structural. Duplicated route-height calculations, state-reset order,
+  map-pointer lifetimes and the very large stack frame require a dedicated
+  pass. No below-threshold source was retained in src.
+
+Three guarded drafts have recorded fuzzy scores and INCLUDE_ASM fallback.
+All seven matches and three drafts have descriptive file-local aliases.
+Scratch candidates remain ignored under wip; no generated assembly, ROM or
+emulator data was added. Shared HANDOFF/INDEX/history were left untouched
+under the worker rules. Ghidra's export is absent in this checkout.
