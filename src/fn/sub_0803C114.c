@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 53.9%
+// fuzzy: 57.2%
 // Open: first full draft; register allocation and several block layouts differ.
 
 typedef void (*ScenePoolStateFunc)(u8 *, u8 *, u8 *, u32);
@@ -52,15 +52,20 @@ static inline u8 TestBit(u8 *value, u32 input)
     return 0;
 }
 
+static inline void ClearBits(u8 *p, s32 mask)
+{
+    *p &= mask;
+}
+
 static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void RestartState(u8 *item, u32 state)
+static inline void RestartState(u8 *item, u32 state, u32 zero)
 {
     FIELD(item, 0x68, u32) = state;
-    FIELD(item, 0x44, u32) = 0;
+    FIELD(item, 0x44, u32) = zero;
     item[0x64] = 1;
     Memory_Clear(item + 0x6C, 0x100);
 }
@@ -79,29 +84,38 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
     s32 dx, dz;
     s16 position[4];
     s16 offset[4];
+    u32 one;
 
     {
         u32 *p = &FIELD(actor, 0x5FC, u32);
+        u32 mask;
         *p = 0;
         FIELD(actor, 0x858, u32) = 0;
-        if (!(*p & 0x20) && (FIELD(actor, 0xC, u32) & 0x800))
-            actor[0x5EE] |= 4;
+        mask = 0x20;
+        if (!(*p & mask) && (FIELD(actor, 0xC, u32) & 0x800)) {
+            u32 bit = 4;
+            actor[0x5EE] |= bit;
+        }
     }
     if (TestBit(&view[0x5EE], 4)) {
-        slot[0x5EE] &= ~6;
-        RestartState(item, 11);
-    } else if (TestBit(&slot[0x5EE], 2)) {
-        slot[0x5EE] &= ~2;
-        RestartState(item, 10);
+        ClearBits(&slot[0x5EE], ~6);
+        RestartState(item, 11, 0);
+    } else {
+        u8 *state = &slot[0x5EE];
+        if (TestBit(state, 2)) {
+            ClearBits(state, ~2);
+            RestartState(item, 10, 0);
+        }
     }
     if (FIELD(view, 0x40, u32) & 2)
         FIELD(view, 0x5B4, u32) = 0;
-    if (FIELD(view, 0x40, u32) & 1)
+    one = 1;
+    if (FIELD(view, 0x40, u32) & one)
         FIELD(view, 0x5B0, u32) = 0;
     {
-        u32 offsetIndex = FIELD(item, 0x40, u32) << 4;
-        FIELD(item, 0x58, s32) = FIELD(pool + offsetIndex, 0x2324, s32) - FIELD(slot, 0x10, s32);
-        FIELD(item, 0x5C, s32) = FIELD(pool + offsetIndex, 0x232C, s32) - FIELD(slot, 0x18, s32);
+        struct Vec16 *anchors = (struct Vec16 *)(pool + 0x2324);
+        FIELD(item, 0x58, s32) = anchors[FIELD(item, 0x40, u32)].a - FIELD(slot, 0x10, s32);
+        FIELD(item, 0x5C, s32) = anchors[FIELD(item, 0x40, u32)].c - FIELD(slot, 0x18, s32);
     }
     if (FIELD(item, 0x68, u32) <= 11)
         gUnk_0860585C[FIELD(item, 0x68, u32)](pool, slot, item, index);
@@ -109,11 +123,14 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
         ScenePool_ApplyMotionControls(slot, item);
     Callback_InvokeActor(actor, FIELD(actor, 0xB0, void *));
     FIELD(actor, 0x5AC, s32) -= 0x20;
-    flags = &FIELD(slot, 0x5FC, u32);
-    if (!(*flags & 0x20))
-        ScenePool_ClampMotionSpeeds(actor);
+    {
+        u32 mask = 0x20;
+        flags = &FIELD(slot, 0x5FC, u32);
+        if (!(*flags & mask))
+            ScenePool_ClampMotionSpeeds(actor);
+    }
     FIELD(actor, 0x5B4, s32) = Div(FIELD(actor, 0x5B4, s32) * 90, 100);
-    if (*flags & 1) {
+    if (*flags & one) {
         FIELD(slot, 0x5AC, s32) = 0;
         FIELD(slot, 0x5B4, s32) = 0;
         FIELD(slot, 0xC0, s32) = 0;
@@ -184,9 +201,10 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
         SpatialIndex_SetPosition(actor + 0x52C, position[0], position[1], position[2]);
     } else {
         s32 angle = (s16)*heading;
-        offset[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * 20);
+        s32 radius = 20;
+        offset[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
         offset[1] = 0;
-        offset[2] = Scale(gUnk_086149C4[angle & 255] * 20);
+        offset[2] = Scale(gUnk_086149C4[angle & 255] * radius);
         SpatialIndex_SetPosition(actor + 0x52C, position[0] + offset[0], position[1],
                                  position[2] + offset[2]);
     }
