@@ -5,3 +5,4 @@ RFU callback trampolines,0824538C,08245398,"bx r2/r1/r0 stubs; naked assembly in
 libagbsyscall,08248590,082485EC,"BIOS swi wrappers; handwritten SDK syscall assembly"
 libgcc call_via and division (part 1),08249238,0824930C,"_call_via_rN veneers, __divsi3 and __div0; GCC lib1funcs assembly (docs/LIBGCC.md)"
 libgcc division (part 2),08249350,08249558,"__modsi3, __udivsi3 and __umodsi3; GCC lib1funcs assembly (docs/LIBGCC.md)"
+IWRAM call veneers,08219624,082196C4,"Four thumb-to-ARM call veneers into IWRAM routines 03000B40/03000CE8/03000DD0/03000F90: push lr; add r1,pc; bx r1, then ARM ldr r1,=target; add lr,pc; bx r1, then thumb pop {r0}; bx r0. Mixed-mode stubs that no compiler emits; handwritten assembly"

@@ -1,10 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Only the first keyframe lookup differs: ROM loads anim->frames after scaling the frame
-// index (ldrh; lsls; ldr), this schedules the ldr first.
-
 struct AnimFrame {
     u16 key, duration;
 };
@@ -33,16 +28,14 @@ s32 Anim_Step(struct AnimState *anim, void *data)
 {
     s32 done;
     u32 flags;
+    struct AnimFrame *f;
 
     if (!anim->mode)
         return 0;
     done = 0;
     anim->status = 0;
     if (anim->timer == 0) {
-        struct AnimFrame *f;
-        u32 idx = anim->frame;
-        f = anim->frames;
-        f += idx;
+        f = &anim->frames[anim->frame];
         Anim_LoadKeyframe(anim, data, f->key, anim->mode);
     }
     anim->unk6++;
@@ -78,11 +71,10 @@ s32 Anim_Step(struct AnimState *anim, void *data)
                 anim->frame = 0;
         }
         anim->status |= 4;
-    reset: {
-        struct AnimFrame *f = &anim->frames[anim->frame];
+    reset:
+        f = &anim->frames[anim->frame];
         anim->timer = 0;
         anim->duration = Scale6(f->duration * anim->scale);
-    }
         if (anim->duration == 0)
             anim->duration = 1;
     } else if (anim->timer + 1 >= anim->duration) {
@@ -94,6 +86,3 @@ s32 Anim_Step(struct AnimState *anim, void *data)
     }
     return done;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Anim_Step);
-#endif
