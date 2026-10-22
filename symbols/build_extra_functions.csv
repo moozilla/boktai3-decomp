@@ -573,6 +573,7 @@ address,isa,evidence,replacement_end
 08214344,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0821435C
 0821435C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08214374
 082145F4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08214600
+08215B18,thumb,Affine BG matrix/offset setup (rotation-scale from angle tables) hidden after sub_08215AC4,
 0821607C,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,082160B8
 08216ED0,thumb,Hidden raw-tail function,08216F18
 08216F18,thumb,Hidden raw-tail function,08216F78

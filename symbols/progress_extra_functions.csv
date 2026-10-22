@@ -602,6 +602,7 @@ address,evidence
 08214344,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0821435C,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 082145F4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08215B18,Affine BG matrix/offset setup (rotation-scale from angle tables) hidden after sub_08215AC4
 0821607C,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08216ED0,Hidden raw-tail function
 08216F18,Hidden raw-tail function
