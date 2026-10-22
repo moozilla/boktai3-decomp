@@ -4009,3 +4009,76 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## 2026-10-22: Golem then Skeleton monster cohort
+
+Tags: #matching #golem #skeleton #scene-actor #collision
+
+Offline worker pass, using only fast per-file checks and the commit driver.
+No full build or network operations. Five exact matches and one guarded draft;
+all exact matches are free of register hints. Complete ROM validation belongs
+at batch integration.
+
+- **080C53A8 — matched, Golem_UpdateAttackProperties, 404 bytes.** Called by
+  Golem_UpdateEffectsAndContacts. Configures the attack collider at actor+0x188:
+  flag 0x10 selects alternate attack parameters, flag 0x100 scales power by
+  signed context+0x682 speed (clamped to 10..20), otherwise uses base parameters.
+  Active alternatives set actor+0x2D6 bit 0x4000. Explicit argument temporaries,
+  a shared active label, full-width callee argument declarations, and local mask
+  constants recovered the original scheduling. Reviewed-extent exact check.
+- **080C553C — matched, Golem_OnAttackCollision, 928 bytes.** Installed by
+  Golem_InitColliders. Offsets the contact origin by facing quadrant, computes
+  the collider direction, records player contacts, and accumulates context+0x688
+  impact by 200 capped at 400. During charge, frontal contacts set response bit
+  1 and save the contacted ID at context+0x634; other contacts inspect the
+  appropriate player slot. Swapping inline vector argument order, loading the
+  contacted ID before its destination address, and materializing the 400 store
+  through a local pointer closed the match. Temporary hints were removed by
+  depin; the resulting ordinary C still matched. Reviewed-extent exact check.
+- **080C30CC — matched, Skeleton_UpdateBehaviorCallbacks, 372 bytes.** Ported
+  SceneActor_UpdateBehaviorCallbacks (0812F270), omitting ActivatePendingControl
+  and suppressing active/fallback callbacks when actor+0x6DC bit 0x10 is set.
+  The flag is read relative to the actor itself, unlike most Skeleton context
+  flags. The initial Golem prefix was corrected to Skeleton after checking
+  neighboring Skeleton_Update, Skeleton_Destroy, and Skeleton_Init ownership.
+  Reviewed-extent exact check after the naming correction.
+- **080C5930 — skipped, below draft threshold.** Recovered a tentative
+  Golem_UpdateFacingTurn candidate in ignored wip/codex-medium/. Quantizes the
+  heading, selects clockwise/counterclockwise turn animations for eight-way
+  target facing, advances heading by 22, and restores the saved control.
+  Read BIG_FUNCTIONS and used condensed assembly/realigned scoring. Three
+  helper/control-layout hypotheses and a register diagnostic failed to approach
+  draft quality. Best retained ordinary-C candidate: fuzzy 37.1%, 443 structural
+  realigned differences. Repeated sequence-versus-keyframe selection and
+  cross-jumped helper tails remain substantially different. No production edit.
+- **080B6480 — matched, Skeleton_TryEnterIdleRange (tentative), 184 bytes.**
+  Enters idle control/state when actor distanceF0 lies strictly between context
+  bounds at 0x708 and 0x70C. Adapted the state/control transition from nearby
+  080B6538. asmat initially displayed raw bytes for this extra function; the
+  resolved checker correctly identified the lower-bound shift as 3, not 2.
+  Reviewed-extent exact check.
+- **080B8DE0 — drafted 98.4%, Skeleton_OnAttackCollision, 252 bytes.** Installed
+  by the Skeleton behavior-collider initializer. Mirrors Skeleton_OnContactEvent
+  contact recording, except context flag 0x10 blocks it; when flag 0x800 is also
+  set it clears actor motion halfwords 0x2EC and 0x2F0. Only two bytes differ:
+  the saved extended-state flags pointer uses r4 instead of r2. Several pointer
+  lifetime/register experiments worsened allocation, so the original unpinned
+  candidate was retained with NONMATCHING, INCLUDE_ASM fallback, local alias,
+  and a reviewed-extent --nonmatching --record score.
+- **080B57C0 — matched, Skeleton_BeginStationaryPursuit (tentative), 740 bytes.**
+  Rejects disabled/moving/cooling actors, binds the first player's position,
+  selects movement control according to actor flag 0x80, validates/applies the
+  route, and sets context+0x6D8 to 360. Ported state/control and route helpers
+  from Skeleton_RestorePursuitRoute. Accessing the capped timer through the actor
+  group rather than a separate group pointer improved 87.2% to 97%; declaring
+  route, position, then target in Chase resolved the remaining lifetime/order
+  differences. Reviewed-extent exact check. Unused terrain helper code removed.
+- **080BA268 — skipped, below draft threshold.** Tentative armor-break callback:
+  animation 22, two debris spawns (kinds 2 and 3), category change to 5,
+  profile/motion reload and external attack refresh, then threshold recovery.
+  Ordinary C improved from 64.5% to 66.9% by preserving the RNG halfword and
+  explicit vector component loads (32 structural realigned differences).
+  Actor/table register diagnostics and declaration swaps did not improve it.
+  Candidate remains in ignored wip/codex-medium/sub_080BA268.c; no production
+  edit. Forward-vector setup is present in the ROM even though its result is
+  unused by the subsequent body, so the candidate preserves it.
