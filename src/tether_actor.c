@@ -2966,110 +2966,45 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 67.9%
-
-/* Distance limiter recovered; scratch-register allocation still differs. */
-
-void TetherActor_LimitPlayerDistance(struct TetherActor *input)
+static inline s32 TetherActor_Cosine70(s32 angle)
 {
-    struct TetherActor *actor = input;
-    struct Player **savedSlot;
-    s32 angle;
-    s32 offsetX;
-    s32 offsetZ;
-    s16 *savedX;
-    s16 *savedZ;
-    s16 *sourceX;
-    s16 *sourceZ;
-    s32 dx;
-    s32 dz;
-    {
-        struct Player **slot = gUnk_02000580;
-        u32 value = (*slot)->facing;
-        const s16 *table;
-        s32 sample;
-        s32 product;
-        value = (value + 1) & 7;
-        angle = value << 5;
-        table = gUnk_086149C4;
-        sample = table[(angle + 64) & 255];
-        product = 70;
-        product *= sample;
-        savedSlot = slot;
-        offsetX = truncateShift(product, 12);
-        sample = table[angle & 255];
-        product = 70;
-        product *= sample;
-        product = truncateShift(product, 12);
-        offsetZ = product;
-    }
-    {
-        struct Player *player = *savedSlot;
-        s32 value = player->position.x + offsetX;
-        sourceX = &actor->position.x;
-        {
-            s32 other = *sourceX;
-            dx = value - other;
-        }
-        value = player->position.z + offsetZ;
-        sourceZ = &actor->position.z;
-        {
-            s32 other = *sourceZ;
-            dz = value - other;
-        }
-    }
-    {
-        s32 squaredX = dx * dx;
-        s32 squaredZ = dz * dz;
-        s32 limit;
-        squaredX += squaredZ;
-        limit = 22500;
-        savedX = sourceX;
-        savedZ = sourceZ;
-        if (squaredX <= limit)
-            return;
-    }
-    angle = Math_Atan2(dx, dz);
-    {
-        struct Player **slot;
-        s32 radialX = cosine(angle, 150);
-        s32 radialZ = sine(angle, 150);
-        s32 targetX;
-        s32 targetZ;
-        s16 *axis = savedX;
-        s32 sample = *axis;
-        s32 value = offsetX;
-        sample -= value;
-        targetX = sample + radialX;
-        axis = savedZ;
-        value = *axis;
-        value -= offsetZ;
-        targetZ = value + radialZ;
-        slot = gUnk_02000580;
-        value = (*slot)->position.x * 3 + targetX;
-        savedSlot = slot;
-        {
-            s32 result = truncateShift(value, 2);
-            (*savedSlot)->position.x = result;
-        }
-        value = (*savedSlot)->position.z * 3 + targetZ;
-        {
-            s32 result = truncateShift(value, 2);
-            (*savedSlot)->position.z = result;
-        }
-        TetherActor_BlockPlayerAcrossTerrain(actor);
-        {
-            (*savedSlot)->colliderPosition = (*savedSlot)->position;
-        }
-    }
+    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 70, 12);
+    return result;
 }
 
-#else
+static inline s32 TetherActor_Sine70(s32 angle)
+{
+    s32 result = truncateShift(gUnk_086149C4[angle & 255] * 70, 12);
+    return result;
+}
 
-INCLUDE_ASM("asm/nonmatching", TetherActor_LimitPlayerDistance);
+static inline s32 TetherActor_Cosine150(s32 angle)
+{
+    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 150, 12);
+    return result;
+}
 
-#endif
+void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
+{
+    s32 angle = (((*gUnk_02000580)->facing + 1) & 7) << 5;
+    s32 offsetX = TetherActor_Cosine70(angle);
+    s32 offsetZ = TetherActor_Sine70(angle);
+    s32 dx = (*gUnk_02000580)->position.x + offsetX - actor->position.x;
+    s32 dz = (*gUnk_02000580)->position.z + offsetZ - actor->position.z;
+    if (dx * dx + dz * dz > 22500) {
+        s32 radialZ, targetX, targetZ;
+        angle = Math_Atan2(dx, dz);
+        /* The radial X offset reuses dx's register. */
+        dx = TetherActor_Cosine150(angle);
+        radialZ = truncateShift(gUnk_086149C4[angle & 255] * 150, 12);
+        targetX = actor->position.x - offsetX + dx;
+        targetZ = actor->position.z - offsetZ + radialZ;
+        (*gUnk_02000580)->position.x = truncateShift((*gUnk_02000580)->position.x * 3 + targetX, 2);
+        (*gUnk_02000580)->position.z = truncateShift((*gUnk_02000580)->position.z * 3 + targetZ, 2);
+        TetherActor_BlockPlayerAcrossTerrain(actor);
+        (*gUnk_02000580)->colliderPosition = (*gUnk_02000580)->position;
+    }
+}
 
 // MATCHING_CONCESSION: register-pinning
 
