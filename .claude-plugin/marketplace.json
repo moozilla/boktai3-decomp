@@ -1,0 +1,11 @@
+{
+  "name": "boktai3-decomp",
+  "owner": { "name": "boktai3-decomp" },
+  "plugins": [
+    {
+      "name": "decomp-progress",
+      "source": "./tools/claude-mod",
+      "description": "A button beside the prompt that opens a popup of Boktai 3 decomp progress: PROGRESS.md, recent PRs and a treemap."
+    }
+  ]
+}
