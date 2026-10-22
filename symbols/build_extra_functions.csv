@@ -12,6 +12,9 @@ address,isa,evidence,replacement_end
 0800E3D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0800E3E0
 080133C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080133CC
 080136A8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080136B4
+08013AB4,thumb,ScaledShadow_Initialize wrapper with swapped size arguments; first of three functions in the raw 08013AB4-08013B74 span,08013AE4
+08013AE4,thumb,ScaledShadow default init with caller sizes then graphic frame 6; part of the raw 08013AB4-08013B74 span,08013B2C
+08013B2C,thumb,ScaledShadow default init with caller sizes then graphic frame 7; part of the raw 08013AB4-08013B74 span,08013B74
 08013BDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08013C14
 08013F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08013F98
 08015154,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08015160
