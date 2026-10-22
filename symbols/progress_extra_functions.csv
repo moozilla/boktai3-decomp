@@ -257,8 +257,12 @@ address,evidence
 0813E284,Independent modifier callback following equipment-level function; notes/player_3.md
 0813F828,Independent energy-spend body after affordability test; notes/player_3.md
 08152C3C,Independent push r4-r7-lr and stack allocation after 08152A5C pop-bx return and literal pool; ROM bytes F0 B5 83 B0 at 08152C3C
+08156C8C,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set)
 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08159814,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C)
+0815A104,Hidden wrapper of sub_0815A048 with mode 0
+0815A554,Hidden script query (Player_IsActiveInLocomotionState)
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAD4,Independent small function following a reviewed gap leaf; retained assembly (not yet matched)
 0815AB24,Hidden script command after ScriptActor_SetField4A2FromScript; exact C
