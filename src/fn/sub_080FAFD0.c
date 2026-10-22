@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -34,9 +35,9 @@ void Axe_InitAttackCooldowns(struct S080FAFD0 *s)
 {
     struct Q080FAFD0 *q = s->q;
     s32 i;
-    s32 h;
+    register s32 h asm("r0");
     int zero;
-    unsigned long long hw;
+    u32 hw;
     s16 *hp;
     if (Script_SeekToKeyword(0x50) != 0) {
         for (i = 0; i <= 3; i++) {
@@ -51,6 +52,3 @@ void Axe_InitAttackCooldowns(struct S080FAFD0 *s)
     hw = h;
     q->mid = hw - Quarter(h);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FAFD0);
-#endif
