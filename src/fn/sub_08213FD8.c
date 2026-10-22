@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 70.2%
-// 23 differing instruction runs; first diff at +0x6 (ldr r1, [pc, #0x58] vs ldr r1, [pc, #0x5c])
+// fuzzy: 87.1%
+// Remaining: register allocation only (affine/matrix in the BG2 matrix copy, the DMA control pointer).
 struct Dma {
     vu32 src, dest, control;
 };
@@ -52,32 +52,30 @@ void sub_08213FD8(void)
             *affine = matrix[2];
             affine++;
             *affine = matrix[3];
-            affine = (vu16 *)0x04000028;
-            xy = gUnk_03004C18;
-            *affine = xy[0];
-            affine++;
-            *affine = (xy[0] & 0x0fff0000) >> 16;
-            affine++;
-            *affine = xy[1];
-            affine++;
-            *affine = (xy[1] & 0x0fff0000) >> 16;
+            {
+                vu16 *ref = (vu16 *)0x04000028;
+                xy = gUnk_03004C18;
+                *ref = xy[0];
+                ref++;
+                *ref = (xy[0] & 0x0fff0000) >> 16;
+                ref++;
+                *ref = xy[1];
+                ref++;
+                *ref = (xy[1] & 0x0fff0000) >> 16;
+            }
         }
         mode = gUnk_03004274;
         if (mode) {
             vu32 *control = (vu32 *)0x040000b8;
-            vu32 *addresses;
-            u32 count, flags;
+            u32 count;
             *control = 0;
-            addresses = (vu32 *)0x040000b0;
-            *addresses = gUnk_03004278;
-            addresses++;
-            *addresses = gUnk_03003A00;
+            *(vu32 *)0x040000b0 = gUnk_03004278;
+            *(vu32 *)0x040000b4 = gUnk_03003A00;
             count = gUnk_03004270;
-            if (mode == 1)
-                flags = 0xa2600000;
+            if (mode != 1)
+                *control = 0xa6600000 | count;
             else
-                flags = 0xa6600000;
-            *control = flags | count;
+                *control = 0xa2600000 | count;
         } else {
             struct Dma *dma = (struct Dma *)0x040000b0;
             dma->src = mode;
