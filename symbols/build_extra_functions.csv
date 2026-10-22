@@ -251,7 +251,7 @@ address,isa,evidence,replacement_end
 0811525C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115268
 08115D4C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08115D58
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
-0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
+0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout (terrain cell high nibble at summed x); exact C,0811AC54
 0811AC54,thumb,Hidden tail function,0811AC6C
 0811ACCC,thumb,Hidden raw-tail function: terrain cell nibble getter (bits 8-11),0811AD8C
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
