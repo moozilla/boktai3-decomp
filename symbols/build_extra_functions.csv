@@ -617,7 +617,7 @@ address,isa,evidence,replacement_end
 0821F838,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0821F840
 0821FC34,thumb,8-way variant of the nav probe steering (sub_0821FB8C) hidden after it,0821FCDC
 0821FF34,thumb,Hidden raw-tail function,0821FF50
-0822032C,thumb,Collider contact-normal helper (3-way switch on hit side) hidden after sub_08220204,
+0822032C,thumb,Collider contact-normal helper (3-way switch on hit side) hidden after sub_08220204,082203A8
 082207DC,thumb,Hidden tail after Collider_TestSegmentBounds,
 08220D6C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08220D78
 08220E6C,thumb,Hidden raw-tail function: sets an animation frame inside a sequence,08220F00
