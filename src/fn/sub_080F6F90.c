@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#define Sword_InitAttackComponents sub_080F6F90
 
 // confidence=low: initializes the four active sword attack components.
 
 #ifdef NONMATCHING
-// fuzzy: 84.8%
+// fuzzy: 85.0%
 // Animation mask lifetime, collider argument addresses and register allocation still differ.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
 #define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
@@ -142,7 +143,6 @@ void Sword_InitAttackComponents(u8 *input)
     struct DisplaySequenceState sequence;
     s32 i;
     u32 zero;
-    struct DisplaySequenceState *state;
     size.x = 100;
     size.y = 100;
     size.z = 100;
@@ -171,7 +171,6 @@ void Sword_InitAttackComponents(u8 *input)
     Anim_SetSequence(&sequence, (void *)ScriptProc_Start(0x922E, 0x3F72), 2, (u8)(B(p, 0xD55) << 2),
                      0);
     zero = 0;
-    state = &sequence;
     for (i = 0; i < 4; i++) {
         struct SwordComponent *child = (void *)P(p, 0x4BC + i * 0x194);
         struct DisplaySequenceSprite *sprite = &child->sprite;
@@ -193,7 +192,7 @@ void Sword_InitAttackComponents(u8 *input)
         child->field168 = zero;
         AnimData_Load(graphics, 0x5291);
         Sprite_Init(child, graphics, 0);
-        Step(sprite, state, sequence.commands);
+        Step(sprite, &sequence, sequence.commands);
         sprite->flags = 3;
         AnimData_SelectPaletteBank((void *)sprite->resource, H(p, 0xD56));
         child->field118 = i;
