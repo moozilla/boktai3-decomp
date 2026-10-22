@@ -545,6 +545,7 @@ address,evidence
 081F339C,Hidden raw-tail function
 081F33CC,Hidden raw-tail function
 081F3414,Hidden tail after SceneDistance_ClearLinkedEntry
+081F348C,Hidden tail function
 081FB7D8,Hidden counter difference with wrap (retained)
 081FB808,Hidden leaf returning 0
 081FB80C,Hidden velocity integrate step
