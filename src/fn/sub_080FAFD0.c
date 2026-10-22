@@ -5,10 +5,6 @@
 // confidence=low: initializes scripted cooldown lengths and the health threshold.
 #define Axe_InitAttackCooldowns sub_080FAFD0
 
-#ifdef NONMATCHING
-// fuzzy: 95.1%
-// Remaining difference: scratch register for the sign-extended health in the final quarter calculation (r3 vs r2).
-
 struct Q080FAFD0 {
     u8 filler[0xeb4];
     u16 mid;
