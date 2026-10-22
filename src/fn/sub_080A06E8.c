@@ -39,7 +39,6 @@ static inline void Set(struct CrowTerrainState *p, u32 m)
 {
     p->flags |= m;
 }
-#define Crow_StopAtRaisedTerrain sub_080A06E8
 void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
 {
     struct CrowTerrainState *context = actor->context;

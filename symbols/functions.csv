@@ -3510,6 +3510,7 @@ addr,name,mode,confidence,source,notes
 080C4E8C,Skeleton_TryTriggerAction,thumb,low,src-alias,
 080C4EF0,Golem_ResetIdleControl,thumb,low,src-alias,
 080C4F80,Golem_InitAnimationProfile,thumb,low,src-alias,Finds or adds profile type three and stores its identifier in the animation profile field
+080C4F9C,Golem_ResetCombatState,thumb,low,src-alias,
 080C515C,Golem_ClearControlFlag,thumb,low,src-alias,Callback that clears bit two of actor flags at 0x2D0; flag purpose unresolved
 080C5170,SceneActor_AccelerateForTerrain,thumb,low,src-alias,
 080C5234,Golem_InvokeEnabledBehavior,thumb,low,src-alias,Invokes the callback at 0x26C when flag 0x100 permits it and returns its byte result

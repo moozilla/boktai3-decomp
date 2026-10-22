@@ -1,6 +1,6 @@
 # Push20 high worker
 
-Worktree: `/Users/benjaminharris/git/wt/push20-high`, branch `codex/push20-high`, base `5ff44e3`.
+Worktree: `~/git/wt/push20-high`, branch `codex/push20-high`, base `5ff44e3`.
 
 41 byte-identical functions, 6604 emitted bytes. Every source passed `tools/check.py`; accepted batches passed full `tools/build.py` before separate one-TU commits. No naming or data changes. Parent owns integration and shift regression. Final build log: `build/high-last-pass-build.txt`.
 

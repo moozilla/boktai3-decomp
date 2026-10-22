@@ -137,7 +137,6 @@ static inline void StepSequence(void *obj)
 }
 
 // confidence=low: resets golem combat counters and restarts the idle animation.
-#define Golem_ResetCombatState sub_080C4F9C
 void Golem_ResetCombatState(u8 *p)
 {
     struct GolemCombatResetContext *in = *(struct GolemCombatResetContext **)(p + 0x3d0);
