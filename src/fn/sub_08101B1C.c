@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.9%
-// Still differs: the spill store of 'flags' comes before the ldrh/ands at 08101B88 (ROM: after),
-// and 'base' is reused from r0 at 08101BE4 instead of reloaded from its stack slot.
 #include "player.h"
 #include "terrain_cell_probe.h"
 struct NamedObject {
@@ -31,18 +27,16 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 static inline s32 GetCell(struct Pos16 *p)
 {
-    s32 x, z, cell;
+    s32 x, z;
     x = (s16)p->x >> 8;
     z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
-        cell = 0;
-    else
-        cell = gUnk_030052F4->rows[z] + x;
-    return cell;
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
 }
-static inline u8 HasFlag(u32 mask, u16 *flags)
+static inline u8 TestV(u32 flags, u32 bit)
 {
-    if (*flags & mask)
+    if (flags & bit)
         return TRUE;
     return FALSE;
 }
@@ -70,7 +64,10 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
     }
     {
         u32 m = 0x800;
-        if (HasFlag(m, flags = &object->flags))
+        u16 *fp = &object->flags;
+        u32 v = *fp & m;
+        flags = fp;
+        if (TestV(v, ~0))
             return;
     }
     base = GetCell(&object->position);
@@ -107,6 +104,3 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
         registration += 0x10;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", NamedObject_RegisterFollowCells);
-#endif
