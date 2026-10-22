@@ -249,19 +249,29 @@ address,isa,evidence,replacement_end
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
+0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
+0812D7BC,thumb,SceneParticle_Create pass-through wrapper; raw span,0812D7D0
+0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
+0812DF94,thumb,Actor anchor clamp then Nav/terrain test that clears flag 0x200 or velocity; raw span,0812E058
 0812E094,thumb,Independent 132-byte command-selection routine with full high-register save prologue and restore after 0812E084 leaf return; removes132 false old retained-tail C bytes,0812E118
 0812EED0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812EED4
 0812F5C4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812F5C8
 0812F5C8,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5CC
 0812F5CC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5D0
 08130B20,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08130B24
+08135CC4,thumb,SceneActorPlacement state-3 reset gated on flag 0x4000; retained assembly (register allocation of hoisted zeros),
+08136A9C,thumb,SceneActorPlacement response: flag 0x20 and response slot 3 then sound 0x13E; returns 1; raw span,08136AF0
 08136F44,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08136F48
 08136F48,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0813760C
+08138664,thumb,Registry1745 reset: participant order and per-slot words then 08138630 and seed index; raw span,081386F0
+08138724,thumb,Registry1745: wraps three counters at 0x1F8 against limits table 086108DC; raw span,08138750
+08138750,thumb,Registry1745: TRUE when any of the first count flag bytes at 0x74 is set; raw span,08138778
 08138ABC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08138AC8
 08139FA0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08139FAC
 0813A614,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813A620
 0813A958,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813A964
 0813A9D4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0813A9D8
+0813AC58,thumb,ScreenMote_SpawnBatch wrapper that swaps the last two stack args and passes 0; raw span,0813AC78
 0813ADC4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813ADD0
 0813B3AC,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0813B3BC
 0813E0F0,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0813E108
@@ -273,6 +283,10 @@ address,isa,evidence,replacement_end
 0813E1B8,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E1D8
 0813E284,thumb,Independent modifier callback in equipment-level tail; own push and pop-bx; notes/player_3.md,0813E324
 0813F828,thumb,Independent energy-spend body after affordability test; push and pop-bx; notes/player_3.md,0813F84C
+0814A4F8,thumb,Player: actionVariant = savedActionIndex + 1 when positive else 0; raw span,0814A530
+0814A7CC,thumb,Player attack power wrapper: Player_CalculateBaseAttackPower(p 0); raw span after it,0814A7D8
+0814B02C,thumb,Player: folds an angle into heading/side bytes 0x3A2/0x3A3; raw span,0814B078
+0814CF2C,thumb,Player tether phase step: sound/animation on phase 0 and control flags 5 on phases 2-3; raw span,0814CFC0
 08156C8C,thumb,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set),08156CAC
 0815849C,thumb,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay,08158588
 08158754,thumb,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay,08158848
