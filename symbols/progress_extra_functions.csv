@@ -335,6 +335,8 @@ address,evidence
 08177D88,Hidden getter: option HUD field 0xA5C or -1
 081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
 081782AC,Hidden option HUD setter: field 0xA8C=4 when mode 1-2
+0817845C,Hidden raw-tail function
+08178474,Hidden raw-tail function (retained)
 081792F8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081792FC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0817A238,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -389,6 +391,8 @@ address,evidence
 0819B8B4,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched)
 0819D190,Hidden raw-tail function
 0819E7B0,Hidden raw-tail function
+0819EB84,Hidden raw-tail function (retained)
+0819EBD0,Hidden raw-tail function (retained)
 081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
 081A398C,Hidden raw-tail function
 081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
@@ -406,6 +410,8 @@ address,evidence
 081BB124,Hidden raw-tail function
 081BB248,Hidden raw-tail function
 081BB38C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
+081BC2BC,Hidden raw-tail function
+081BC2F0,Hidden raw-tail function
 081BE130,Hidden raw-tail function
 081BE140,Hidden delay loop
 081BE150,Hidden empty function
@@ -434,6 +440,8 @@ address,evidence
 081E8370,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081E9BA0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081EC384,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+081EC5F8,Hidden raw-tail function
+081EC628,Hidden raw-tail function (retained)
 081ED89C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081EDE4C,Independent callback after 081EDB74 return and pool at 081EDE44-081EDE48; own push r4-r7/lr and saved r8-sl prologue; retained assembly through 081EE130
 081EEDDC,Independent callback after 081EEAD8 epilogue at 081EEDDA; own push r4/lr and return before 081EEE30; retained assembly
