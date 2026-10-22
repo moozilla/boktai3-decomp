@@ -382,6 +382,7 @@ address,evidence
 081DB24C,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md
 081DB2B8,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md
 081DBB00,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+081DCF78,Hidden raw-tail function
 081E34C4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 081E4B0C,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail
 081E4BD4,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail
@@ -393,8 +394,13 @@ address,evidence
 081ED89C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081EDE4C,Independent callback after 081EDB74 return and pool at 081EDE44-081EDE48; own push r4-r7/lr and saved r8-sl prologue; retained assembly through 081EE130
 081EEDDC,Independent callback after 081EEAD8 epilogue at 081EEDDA; own push r4/lr and return before 081EEE30; retained assembly
+081EEEC0,Hidden raw-tail function
+081EF12C,Hidden raw-tail function
 081F2084,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081FD46C,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
+081FDBC4,Hidden raw-tail function
+081FE9B0,Hidden raw-tail function
+081FED14,Hidden raw-tail function
 08200238,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08202EEC,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 08202F38,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -432,13 +438,16 @@ address,evidence
 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
+0821DE0C,Hidden raw-tail function
 0821E0D0,Separate 52-byte Thumb function with own prologue/conditional return after E040 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E2F8,Separate 188-byte Thumb function with own prologue/calls/copy loops/return after E190 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E500,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821E654,Hidden raw-tail function
 0821E7B4,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7C4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7D0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821F838,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
+0821FF34,Hidden raw-tail function
 08220D6C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082215B4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -489,15 +498,26 @@ address,evidence
 08222C44,Serial data check; part of the reviewed 08222A04-08222C7C span
 08222C64,Serial getter; part of the reviewed 08222A04-08222C7C span
 08222C70,Serial getter; part of the reviewed 08222A04-08222C7C span
+08224EFC,Hidden raw-tail function
+08224F14,Hidden raw-tail function
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08224F98,Code following a reviewed gap leaf; retained assembly
 08225620,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08225834,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08225840,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
+08225994,Hidden raw-tail function
 08225E1C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+08225F40,Hidden raw-tail function
+0822624C,Hidden raw-tail function
+082263DC,Hidden raw-tail function
+08226454,Hidden raw-tail function
+082264B0,Hidden raw-tail function
+08226528,Hidden raw-tail function
+082265D8,Hidden raw-tail function
 08227F3C,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F4C,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F58,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
+08227FEC,Hidden raw-tail function (retained)
 082281C0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082281F0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08228234,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
