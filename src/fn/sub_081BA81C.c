@@ -1,10 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99%
-// only the position of the loop counter init differs (movs r5, #4)
-
 struct Registry3F74ResourceHeader {
     u32 words[8];
 };
@@ -30,12 +26,11 @@ void Registry3F74_InitAnimations(struct Registry3F74Display *p)
         p->resource = *resource;
         ResourceHeader_Relocate(&p->resource, resource);
         anim = p->animations;
-        count = 4;
-        do {
+        for (count = 0; count < 5; count++) {
             Widget_InitLinked(anim, &p->resource, 0, 0x10, 2, 0, 0x3c, 0);
             anim->layer = 3;
             anim++;
-        } while (--count >= 0);
+        }
         Anim_LoadKeyframe(&p->animations[2], &p->resource, 0x26, 0);
         p->animations[2].layer = 1;
         Anim_LoadKeyframe(&p->animations[0], &p->resource, 0x27, 0);
@@ -47,6 +42,3 @@ void Registry3F74_InitAnimations(struct Registry3F74Display *p)
         Anim_Step(&p->animations[4], &p->resource);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Registry3F74_InitAnimations);
-#endif
