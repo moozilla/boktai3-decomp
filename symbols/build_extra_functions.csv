@@ -314,7 +314,10 @@ address,isa,evidence,replacement_end
 08136A9C,thumb,SceneActorPlacement response: flag 0x20 and response slot 3 then sound 0x13E; returns 1; raw span,08136AF0
 08136F44,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08136F48
 08136F48,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); exact 14-byte old_agbcc leaf,08136F58
-08136F58,thumb,Code following the 14-byte leaf sub_08136F48 (own boundary so it can be replaced); retained assembly,0813760C
+08136F58,thumb,Code following the 14-byte leaf sub_08136F48 (own boundary so it can be replaced); retained assembly,08137180
+08137180,thumb,Scene actor state handler with own push and pop-bx (entry flag 0x2B1 then callback 0x270); retained assembly,08137240
+08137240,thumb,Scene actor state tick with own push and pop-bx: clear entry flag 0x2B1 then count idle frames at 0x2AC,0813727C
+0813727C,thumb,Code following scene actor state tick 08137240 (own push and pop-bx); retained assembly,0813760C
 081376EC,thumb,Code following sub_081376B4 (own boundary so the 56-byte function can be replaced); retained assembly,08137CA8
 08137E28,thumb,Hidden tail after SceneActorTarget_TrySelectNearestParticipant,
 081383E0,thumb,Hidden tail after Registry1745_InitParticipantOrder,
