@@ -1,8 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.1%
-// Open: loop register allocation (orig keeps the counter in ip and the &field6f/count pair in r8/r9;
-// candidate spills the counter).
+// fuzzy: 94.1%
+// Open: loop register allocation (ROM sets up &field6f before the counter and
+// compares the raw/copy pair the other way round).
 
 struct SlotMonitor {
     u8 unk0[0x20];
@@ -33,7 +33,7 @@ void SerialLink_StartTransferIfIdle(void);
 void Serial_StopCommunication(void);
 u8 SlotMonitor_CheckTimeout(struct SlotMonitor *);
 u8 LinkHandshake_AdvanceTimeout(void *);
-void sub_08108BF0(void);
+void LinkHandshake_UpdateRestartState(void);
 
 void sub_08108C94(struct SlotMonitor *obj)
 {
@@ -58,8 +58,10 @@ void sub_08108C94(struct SlotMonitor *obj)
     if (obj->result >= 0) {
         u16 *base;
         u16 *p;
+        s32 zero;
         obj->ticks++;
         base = obj->peers;
+        zero = 0;
         p = base;
         i = 3;
         do {
@@ -92,7 +94,7 @@ void sub_08108C94(struct SlotMonitor *obj)
         } else {
             if (LinkHandshake_AdvanceTimeout(obj))
                 obj->finished = 1;
-            obj->field38 = 0;
+            obj->field38 = zero;
         }
         if (ready == 2) {
             obj->field28 = 1;
@@ -113,7 +115,7 @@ void sub_08108C94(struct SlotMonitor *obj)
             if (obj->retryTimer > 29) {
             timeout:
                 Serial_StopCommunication();
-                obj->callback = sub_08108BF0;
+                obj->callback = LinkHandshake_UpdateRestartState;
                 obj->field6e = 1;
                 return;
             }
