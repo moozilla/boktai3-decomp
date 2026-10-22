@@ -59,6 +59,7 @@ address,evidence
 0802DDEC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0802E654,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080308B0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08030CEC,MessageWindow: set a message table with up to 32 frame waits and restart text playback; raw span after MessageWindow_SetMessageTable
 08030EDC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080313AC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0803200C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
