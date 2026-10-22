@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_reset.h"
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// Differs in the direction pointer register and body/index high registers (sb vs r8).
 #define SPIN(b) (*((u8 *)(b) + 0x875))
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
@@ -62,20 +60,32 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     a->word104 = zero;
 }
 // confidence=low: spreads the body's segments out from the actor's position, then attacks.
+
 void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct TentacleBodyView *body = actor->context;
     s32 n, i;
     u32 angle, scale;
+    u8 *direction;
+    asm("" ::: "r8");
     if (Take(&actor->field2B2))
         SPIN(body) = 0;
     {
         u8 raw = SPIN(body);
-        if ((s8)SPIN(body) >= 0)
-            angle = actor->direction;
-        else
-            angle = (actor->direction + 128) & 255;
-        scale = (raw & 0x7F) >> 4;
+        u8 *field;
+        if ((s8)SPIN(body) >= 0) {
+            field = &actor->direction;
+            angle = *field;
+        } else {
+            field = &actor->direction;
+            angle = (*field + 128) & 255;
+        }
+        {
+            u32 mask = 0x7F;
+            asm("" : "+r"(mask));
+            scale = (mask & raw) >> 4;
+        }
+        direction = field;
     }
     *(u16 *)((u8 *)actor + 0x64) += Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
     *(u16 *)((u8 *)actor + 0x68) += Shift(gUnk_086149C4[angle] * scale, 12);
@@ -88,18 +98,16 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
             body->segments[i].offsetZ = Div(*(s16 *)((u8 *)actor + 0x68), i + 1);
             switch (n) {
                 case 0:
-                    body->segments[i].posX =
-                        *(u16 *)((u8 *)actor + 0x5C) -
-                        Shift(gUnk_086149C4[(actor->direction + 64) & 255] * 54, 12);
-                    body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                             Shift(gUnk_086149C4[actor->direction] * 54, 12);
+                    body->segments[i].posX = *(u16 *)((u8 *)actor + 0x5C) -
+                                             Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
+                    body->segments[i].posZ =
+                        *(u16 *)((u8 *)actor + 0x60) - Shift(gUnk_086149C4[*direction] * 54, 12);
                     break;
                 case 1:
-                    body->segments[i].posX =
-                        *(u16 *)((u8 *)actor + 0x5C) -
-                        Shift(gUnk_086149C4[(actor->direction + 64) & 255] * 20, 12);
-                    body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                             Shift(gUnk_086149C4[actor->direction] * 20, 12);
+                    body->segments[i].posX = *(u16 *)((u8 *)actor + 0x5C) -
+                                             Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
+                    body->segments[i].posZ =
+                        *(u16 *)((u8 *)actor + 0x60) - Shift(gUnk_086149C4[*direction] * 20, 12);
                     break;
                 default:
                     body->segments[i].posX = *(u16 *)((u8 *)actor + 0x5C);
@@ -113,6 +121,3 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
     if (frame > 60)
         Control(actor, (void *)TentacleBody_BeginDirectedAttack, 36);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateChargeSpread);
-#endif

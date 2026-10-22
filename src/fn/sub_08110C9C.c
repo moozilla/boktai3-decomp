@@ -49,34 +49,34 @@ void sub_08110C9C(struct TilemapPanel *p)
     } else
         cellWidth = 1;
     switch (col & 3) {
-    case 0:
-        offset = 0;
-        top = 0;
-        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
-        break;
-    case 1:
-        offset = 1;
-        top = 0;
-        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
-        break;
-    case 2:
-        offset = 2;
-        top = 0;
-        TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
-        break;
-    case 3:
-        offset = 3;
-        top = 0;
-        if (cellWidth == 1)
+        case 0:
+            offset = 0;
+            top = 0;
             TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
-        else {
-            cellWidth = 1;
+            break;
+        case 1:
+            offset = 1;
+            top = 0;
             TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
-            x0++;
-            TilemapPanel_DrawRegion(p, (col + 1) & 31, 0, x0, top, x0 + 1, 1, cellWidth, 20, top,
-                                    top);
-        }
-        break;
+            break;
+        case 2:
+            offset = 2;
+            top = 0;
+            TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+            break;
+        case 3:
+            offset = 3;
+            top = 0;
+            if (cellWidth == 1)
+                TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+            else {
+                cellWidth = 1;
+                TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+                x0++;
+                TilemapPanel_DrawRegion(p, (col + 1) & 31, 0, x0, top, x0 + 1, 1, cellWidth, 20,
+                                        top, top);
+            }
+            break;
     }
     p->drawnX = (next >> 3) << 3;
 }

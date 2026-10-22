@@ -6,7 +6,7 @@
 extern u32 gUnk_030053F4;
 void *SceneActorContacts_FindObjectById(u16);
 u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *);
-u8 sub_080E8444(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsCollisionTargetUnavailable(struct SceneActorRegistryResetView *);
 static inline u8 motionFlag(struct SceneActorRegistryResetView *actor)
 {
     u8 *motion = (u8 *)&actor->fieldDC;
@@ -59,7 +59,7 @@ s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
     if (collisionMode()) {
         if (SceneActor_FindNearbyActivePlayer(actor))
             goto yes;
-        if (!sub_080E8444(actor))
+        if (!SceneActor_IsCollisionTargetUnavailable(actor))
             goto collision;
         goto zero;
     } else {

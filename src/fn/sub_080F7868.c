@@ -18,7 +18,7 @@ struct PhaseActor {
     u8 pad2ca[0x106];
     u8 *data;
 };
-void sub_080FC4F4(struct PhaseActor *);
+void Axe_InitAttackTrail(struct PhaseActor *);
 void Axe_CopyAuxiliaryVector(struct PhaseActor *, void *);
 void ActorShadow_Enable(void *);
 void Sound_PlaySong(u32);
@@ -42,7 +42,7 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
     u8 *data = s->data;
     u32 flags;
     if (consumeEntry(s)) {
-        sub_080FC4F4(s);
+        Axe_InitAttackTrail(s);
         Axe_CopyAuxiliaryVector(s, data + 0xc88);
         *(u16 *)(data + 0x90a) = 0;
         *(u32 *)(data + 0xa38) &= ~1;

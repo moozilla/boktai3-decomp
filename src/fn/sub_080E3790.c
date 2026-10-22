@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_080E04D0(void);
+void Dog_UpdateArrivalAnimation(void);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
 void Dog_SelectTargetAction(u8 *);
@@ -44,7 +44,7 @@ struct S {
 void Dog_UpdateScriptedAction(struct S *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = sub_080E04D0;
+        void (*fn)(void) = Dog_UpdateArrivalAnimation;
         u8 code = 10;
         u32 zero;
         u32 *f;

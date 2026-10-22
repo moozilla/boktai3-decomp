@@ -6,8 +6,8 @@ void ActorTrail_UpdateTimedScale(u8 *);
 void SpritePool_FlagEntries(u8 *);
 void TentacleActor_ShiftSegmentTrail(u8 *);
 void sub_080AAA90(u8 *);
-void sub_080AA8C4(u8 *);
-void sub_080AB04C(u8 *);
+void TentacleActor_AlignSegmentsToTerrain(u8 *);
+void TentacleActor_ResolveBlockedMovement(u8 *);
 
 s32 TentacleActor_UpdateComponents(u8 *p)
 {
@@ -18,8 +18,8 @@ s32 TentacleActor_UpdateComponents(u8 *p)
     SpritePool_FlagEntries(p);
     TentacleActor_ShiftSegmentTrail(p);
     sub_080AAA90(p);
-    sub_080AA8C4(p);
-    sub_080AB04C(p);
+    TentacleActor_AlignSegmentsToTerrain(p);
+    TentacleActor_ResolveBlockedMovement(p);
     timer = (s16 *)(p + 0x8d6);
     if (*timer > 0)
         (*timer)--;

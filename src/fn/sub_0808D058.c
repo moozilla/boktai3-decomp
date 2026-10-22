@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08089168(void);
+void Ghoul_UpdateDisplacementRecovery(void);
 void Trigger_ConsumePending(u8 *, u32);
 struct S {
     u8 pad[0x9C];
@@ -48,7 +48,7 @@ void Ghoul_UpdateAttackControl(struct S *s)
     void (*new_var)(void);
     s32 off;
     if (TakeFlag(&s->queued)) {
-        void (*fn)(void) = sub_08089168;
+        void (*fn)(void) = Ghoul_UpdateDisplacementRecovery;
         u8 code = 0x12;
         u32 zero;
         u32 *flags;

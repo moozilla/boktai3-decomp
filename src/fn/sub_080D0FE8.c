@@ -1,6 +1,7 @@
 #include "global.h"
+// confidence=low: selects turn animation and rotates toward the route facing.
 #ifdef NONMATCHING
-// fuzzy: 83.8%
+// fuzzy: 84.9%
 // MATCHING_CONCESSION: register-pinning
 // Shared animation tails, branch layout, and flag-pointer allocation still differ.
 #include "scene_actor_chase.h"
@@ -64,7 +65,7 @@ static inline void SelectTurn(struct SceneActorAnimationView *actor, u32 selecti
     }
     *restart = 0;
 }
-static inline u16 TurnFlags(u16 *field, u32 mask)
+static inline u32 TurnFlags(u16 *field, u32 mask)
 {
     return *field & mask;
 }
