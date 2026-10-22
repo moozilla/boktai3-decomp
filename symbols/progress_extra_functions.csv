@@ -206,6 +206,7 @@ address,evidence
 08101A34,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08101A38,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 08103AD0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08103F24,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound"
 081041F0,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 081047B0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08105A40,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
