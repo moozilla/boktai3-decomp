@@ -66,5 +66,5 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
     s->flags &= ~0x20;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08182454);
+INCLUDE_ASM("asm/nonmatching", ActorController_SetAnimation);
 #endif
