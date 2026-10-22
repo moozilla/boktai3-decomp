@@ -56,6 +56,9 @@ address,isa,evidence,replacement_end
 08032CEC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08032D10
 08032ED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08032EDC
 080334A0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080334BC
+080334E0,thumb,Script command: string argument N from the text source pc; first of three functions in the raw 080334E0-08033568 span,080334FC
+080334FC,thumb,Script command: string argument N from sub_08227E9C; part of the raw 080334E0-08033568 span,08033518
+08033518,thumb,Script command: read the p keyword value list into the scrolling dialogue text state; part of the raw 080334E0-08033568 span,08033568
 080335D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080335E0
 080335E0,thumb,Independent small function following a reviewed gap leaf; exact standalone C,080335F4
 0803398C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080339B8
