@@ -1,20 +1,26 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// confidence=low: restarts saved control or advances behavior after callbacks complete.
+#define SceneActorControl_RestartOrAdvance sub_0808A430
 #include "scene_actor_control_phase.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 90.8%
-// foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void SceneActorControl_RestartOrAdvance(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        u32 saved = *(u32 *)((u8 *)actor + 0x224);
-        u8 two = 2;
+        register u32 offset asm("r3") = 0x224;
+        u32 saved;
+        register u32 *slot asm("r0");
+        u32 two;
         u8 zero;
-        u8 *q2 = &actor->field2B2;
+        u8 *q2;
+        asm("" : "+r"(offset));
+        slot = (void *)((u8 *)actor + offset);
+        saved = *slot;
+        two = 2;
+        q2 = &actor->field2B2;
         zero = 0;
         *q2 = 1;
         actor->field2B0 = zero;
@@ -31,14 +37,25 @@ void SceneActorControl_RestartOrAdvance(struct SceneActorRegistryResetView *inpu
     {
         u16 *gate = (void *)((u8 *)control + 0x63C);
         if (*gate == 0) {
-            void *fn = *(void **)((u8 *)actor + 0x270);
+            register u32 offset asm("r3") = 0x270;
+            void *fn;
+            register void **slot asm("r0");
             register u16 *flags asm("r0");
+            asm("" : "+r"(offset));
+            slot = (void *)((u8 *)actor + offset);
+            fn = *slot;
             if ((u8)Callback_InvokeActor(actor, fn)) {
-                flags = (void *)((u8 *)control + 0x628);
+                {
+                    u32 offset = 0x628;
+                    flags = (void *)((u8 *)control + offset);
+                }
             } else {
                 if (!sub_0812F3CC(actor))
                     goto fieldCheck;
-                flags = (void *)((u8 *)control + 0x628);
+                {
+                    u32 offset = 0x628;
+                    flags = (void *)((u8 *)control + offset);
+                }
             }
             {
                 s32 mask = -2;
@@ -67,6 +84,3 @@ fieldCheck: {
     }
 }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_RestartOrAdvance);
-#endif
