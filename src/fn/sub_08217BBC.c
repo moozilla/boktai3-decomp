@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 56.2%
-// ROM keeps the channel masks inside the inner loop and hoists 0x3AA; this draft hoists the masks and spills i.
 extern u8 *Palette_GetBackgroundBuffer(void);
 extern u8 *gUnk_030051E0;
 extern s32 gUnk_030051CC;
@@ -18,6 +15,7 @@ void sub_08217BBC(void)
     s32 next;
     u16 *src;
     u16 *dst;
+    u16 tag;
 
     gUnk_030051E0 = Palette_GetBackgroundBuffer();
     for (i = 0; i <= 15; i = next) {
@@ -26,14 +24,19 @@ void sub_08217BBC(void)
         else
             src = gUnk_03004DC0[i];
         dst = gUnk_03004DC0[i];
+        tag = gUnk_030051F0[i];
         next = i + 1;
-        if (gUnk_030051F0[i] != 0x3AA) {
+        if (tag != 0x3AA) {
             j = 15;
             do {
                 s32 color = *src;
-                s32 v = (color & 0x1F) + ((color & 0x3E0) >> 5) + ((color & 0x7C00) >> 10);
+                s32 r = color & 0x1F, g = (color & 0x3E0) >> 5, b = (color & 0x7C00) >> 10;
+                s32 v = r + g + b;
                 v = (v >> 2) + (v >> 4) + (v >> 6);
-                *dst = v | (v << 5) | (v << 10);
+                {
+                    u16 o = v | (v << 5) | (v << 10);
+                    *dst = o;
+                }
                 src++;
                 dst++;
                 j--;
@@ -41,6 +44,3 @@ void sub_08217BBC(void)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08217BBC);
-#endif
