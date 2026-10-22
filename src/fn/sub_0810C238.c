@@ -1,11 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.8%
-// foundry draft (worker best 86.8%); what differs is mostly register allocation and instruction order
-#define LinkPanel_SelectReadyAnimation    RegistryF246_ShowSlotReadyFrame
-#define LinkPanel_SelectInactiveAnimation RegistryF246_ShowSlotDefaultFrame
-#define gLinkPanelState                   gUnk_020004B4
-
 struct LinkPanelPeer {
     u8 pad0[0x53];
     u8 active;
@@ -40,48 +33,35 @@ static inline u8 valid(s32 i)
         return 0;
     return 1;
 }
+// confidence=low: per link slot, picks the slot frame from the peer state, then steps its glyph animation.
 void LinkPanel_UpdateAnimations(struct LinkPanel *p)
 {
-    s32 i = 0;
-
+    s32 i;
     struct LinkPanelPeer *peer;
-    void *anim = p->animations;
-    register u32 j = 0;
-    struct LinkPanelEntry *entry = p->entries;
-    u8 *timer = &p->entries[0].timer;
-    for (; i <= 1; i++) {
+    for (i = 0; i <= 1; i++) {
         peer = gUnk_020004B4;
         if (peer && peer->active == 1 && valid(i) && (u8 *)peer + (0x120 + i * 0x40)) {
-            if (entry->timer > 30) {
-                if (entry->state > 1)
+            if (p->entries[i].timer > 30) {
+                if (p->entries[i].state > 1)
                     LinkPanel_SelectActiveAnimation(p, i);
-                else if (entry->state == 1)
+                else if (p->entries[i].state == 1)
                     RegistryF246_ShowSlotReadyFrame(p, i);
                 else
                     goto inactive;
-                goto step;
             } else
                 goto increment;
         } else {
         inactive:
             RegistryF246_ShowSlotDefaultFrame(p, i);
-            goto step;
         }
+        goto step;
     increment:
-        *timer = entry->timer + 1;
+        p->entries[i].timer++;
     step:
-        if (p->selected[j >> 1] != p->previous[j >> 1]) {
-            Anim_SelectWidgetGlyph(anim, p->data, p->selected[j >> 1]);
-            p->previous[j >> 1] = p->selected[j >> 1];
+        if (p->selected[i] != p->previous[i]) {
+            Anim_SelectWidgetGlyph(p->animations[i], p->data, p->selected[i]);
+            p->previous[i] = p->selected[i];
         }
-        Anim_Step(anim, p->data);
-        anim = (u8 *)anim + 0x60;
-
-        j += 2;
-        entry++;
-        timer += 0x5FC;
+        Anim_Step(p->animations[i], p->data);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", LinkPanel_UpdateAnimations);
-#endif
