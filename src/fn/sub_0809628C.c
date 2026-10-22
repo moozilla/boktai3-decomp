@@ -22,6 +22,7 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
 }
 // confidence=low: defeat control; emits debris sprites, runs the defeat script, then returns to idle.
+#define Ghost_UpdateDefeat sub_0809628C
 void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     u8 *ctx = actor->context;
@@ -131,5 +132,5 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", Ghost_UpdateDefeat);
+INCLUDE_ASM("asm/nonmatching", sub_0809628C);
 #endif
