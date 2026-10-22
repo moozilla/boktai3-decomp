@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.9%
-// Open: two spilled pointer slots are swapped and one mask constant is rematerialized;
-// everything else matches instruction for instruction.
+// fuzzy: 87.6%
+// Open: the seed address takes r7 for the first sample, so the 0x1f mask is rematerialized
+// instead of shared in r7, and the parameter-pointer spill is set up later than in the ROM.
 #include "scene_vec.h"
 #define gRandomIndex gUnk_03005308
 struct SceneScriptBurstObject {
@@ -40,10 +40,10 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
     if (object->counter == 0) {
         register s32 i asm("r6") = 0;
         s16 *statePtr = &object->state;
-        s16 *parameterPtr = &object->parameter;
         struct SceneVec *position = &object->position;
         register u32 mask asm("r8") = 0x3ff;
         struct SceneVec *v = &velocity;
+        s16 *parameterPtr = &object->parameter;
         register s32 zero asm("r5") = 0;
         do {
             s32 kind = (i & 1) ? 0x400 : 0x200;
