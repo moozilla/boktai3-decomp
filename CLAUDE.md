@@ -4,6 +4,8 @@ Read `README.md` first, then `docs/HANDOFF.md` (current state and next steps). L
 things up in `docs/INDEX.md` and with `python3 tools/docindex.py ADDR` rather than
 reading docs in full; `docs/history/` is a record, not required reading. The ROM (`baserom.gba`, SHA-1 `2651c5e6…`) is never
 committed, and neither is anything generated from it (`build/`, `extracted/`).
+Never commit personal information (real names, usernames, `/Users/<name>` paths;
+write `~`). The hooks in `.githooks` and the CI job run `tools/pii_check.py`.
 
 ## Ground rules
 
