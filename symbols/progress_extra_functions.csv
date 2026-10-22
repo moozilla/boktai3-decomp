@@ -258,6 +258,8 @@ address,evidence
 0813F828,Independent energy-spend body after affordability test; notes/player_3.md
 08152C3C,Independent push r4-r7-lr and stack allocation after 08152A5C pop-bx return and literal pool; ROM bytes F0 B5 83 B0 at 08152C3C
 08156C8C,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set)
+08158E68,Hidden helper in the raw tail after Player_BeginDirectionSequence (actor map tile index)
+0815910C,Hidden helper in the raw tail after Player_GetEquipmentLevelBonus (level bonus from an item)
 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08159814,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C)
@@ -280,6 +282,7 @@ address,evidence
 0815D41C,Hidden script command (PlayerCue_WindblownVariant4; keyword r)
 0815D460,Hidden script command (PlayerCue_WindblownVariant2; keyword r)
 0815D4A4,Hidden script command (PlayerCue_StandDiagonal; keyword d)
+0815DBF4,Hidden scene-message helper in the raw tail after PlayerCue_Dispatch; retained assembly (not yet matched)
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
 0815F5A0,Second function of the reviewed 0815F588-0815F6A8 span; exact C
