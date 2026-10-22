@@ -1,7 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 84.8%
+#define Armor_UpdateAction10Sequence sub_081864C4
 struct S {
     u8 f[0xB3D];
     u8 st;
@@ -25,12 +24,13 @@ void Armor_UpdateAction10Sequence(struct S *p)
         case 1:
             if (*(u8 *)((u8 *)p + 0xB40) == 0xff) {
                 {
-                    u32 off = 0xB58;
-                    asm("" : "+r"(off));
-                    sub_0818EA90((u8 *)p + off);
+                    sub_0818EA90(p->obj);
                 }
-                *q = 2;
-                p->sub = 0;
+                {
+                    u32 zero = 0;
+                    *q = 2;
+                    p->sub = zero;
+                }
             }
             break;
         case 2:
@@ -43,6 +43,3 @@ void Armor_UpdateAction10Sequence(struct S *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateAction10Sequence);
-#endif
