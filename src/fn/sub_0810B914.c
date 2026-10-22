@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 91.1%
+// fuzzy: 97.8%
 // Open: register choice for the global slot and the allocation (r5/r8), and the
 // clear loop, which rematerializes -1 instead of reusing the -1 just stored.
 struct Registry1745Settings {
@@ -69,9 +69,12 @@ struct Registry1745 *Registry1745_Create(void)
     u16 *entry;
     if (existing)
         return existing;
-    m = Heap_Alloc(0x268);
-    if (!m)
-        return 0;
+    {
+        void *t = Heap_Alloc(0x268);
+        if (!t)
+            return 0;
+        m = t;
+    }
     Memory_Clear(m, 0x268);
     p = m;
     settings = &p->settings;
@@ -98,13 +101,10 @@ struct Registry1745 *Registry1745_Create(void)
         p->field4F = zero;
         p->fieldB8 = -1;
     }
-    {
-        s32 mask = -1;
-        for (i = 0; i <= 3; i++) {
-            *entry |= mask;
-            p->field64[i] = 0;
-            entry++;
-        }
+    for (i = 0; i <= 3; i++) {
+        *entry |= -1;
+        p->field64[i] = 0;
+        entry++;
     }
     Registry1745_ResetTransferCounters(m);
     Registry1745_InitSessionSettings(m);
