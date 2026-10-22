@@ -125,6 +125,14 @@ class ProgressTests(unittest.TestCase):
             self.assertIsInstance(report['units'][0]['functions'][0]['size'], str)
             self.assertIsInstance(report['units'][0]['functions'][0]['metadata']['virtual_address'], str)
 
+    def test_uncovered_tails_flag_short_matched_functions(self):
+        funcs = [('a', 0x08000100), ('b', 0x08000110), ('c', 0x08000200)]
+        sizes = dict(a=0x10, b=0xF0, c=4)
+        code = {0x08000100: 0x0E, 0x08000110: 0x20, 0x08000200: 4}
+        self.assertEqual(progress.uncovered_tails(funcs, sizes, {'a', 'b'}, code),
+                         [('b', 0x08000110, 0xF0, 0x20)])
+        self.assertEqual(progress.uncovered_tails(funcs, sizes, {'a'}, code), [])
+
     def test_reject_bad_inventory(self):
         for addresses in ([], [0x08000100, 0x08000100], [0x08000200, 0x08000100],
                           [0x07000000], [progress.CODE_END]):
