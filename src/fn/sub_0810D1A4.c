@@ -35,7 +35,7 @@ void sub_0810D1B8(u8 *self)
     }
 }
 
-void sub_0810D20C(u8 *self)
+void sub_0810D208(u8 *self)
 {
     if (*(u16 *)(self + 0x1410) != 0) {
         Script_Call(*(u16 *)(self + 0x1410), 0);

@@ -240,7 +240,7 @@ address,evidence
 0810D1A4,Hidden tail after Registry30AC_RemoveAnimations
 0810D1B4,Empty bx-lr stub inside 0810D1A4 hidden tail
 0810D1B8,Panel close: clear dialogue and BG tilemaps then run exit script and kill task (0810D1A4 tail)
-0810D20C,Run exit script at +0x1410 then kill task (0810D1A4 tail)
+0810D208,Run exit script at +0x1410 then kill task (0810D1A4 tail)
 0810D548,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810D554,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810E91C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -248,7 +248,7 @@ address,evidence
 0810F254,Hidden tail after LinkLobbyPanel_RemoveSprites
 0810F264,Empty bx-lr stub inside 0810F254 hidden tail
 0810F268,Link lobby panel close: clear dialogue and BG tilemaps then run exit script and kill task (0810F254 tail)
-0810F2BC,Run exit script at +0x1500 then kill task (0810F254 tail)
+0810F2B8,Run exit script at +0x1500 then kill task (0810F254 tail)
 0810F820,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810F82C,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810FA0C,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames
