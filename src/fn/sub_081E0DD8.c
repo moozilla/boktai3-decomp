@@ -36,10 +36,9 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
-#define GameStart_DrawSaveInfo sub_081E0DD8
-#define W(o)                   (*(s32 *)(p + (o)))
-#define GS_H(o)                (*(s16 *)((u8 *)gUnk_02000710 + (o)))
-#define GS_W(o)                (*(s32 *)((u8 *)gUnk_02000710 + (o)))
+#define W(o)    (*(s32 *)(p + (o)))
+#define GS_H(o) (*(s16 *)((u8 *)gUnk_02000710 + (o)))
+#define GS_W(o) (*(s32 *)((u8 *)gUnk_02000710 + (o)))
 
 static inline void StepAnim(struct GameStartAnim *a, struct GameStartSprite *s)
 {
