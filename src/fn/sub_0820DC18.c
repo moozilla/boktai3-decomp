@@ -148,5 +148,5 @@ void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", PoisonHand_ApplyHitReaction);
+INCLUDE_ASM("asm/nonmatching", sub_0820DC18);
 #endif
