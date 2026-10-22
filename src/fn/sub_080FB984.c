@@ -59,5 +59,5 @@ void SpriteGroup_InitAnimatedSprites(struct SceneActorRegistryActor *owner)
     group->phase = 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SpriteGroup_InitAnimatedSprites);
+INCLUDE_ASM("asm/nonmatching", sub_080FB984);
 #endif
