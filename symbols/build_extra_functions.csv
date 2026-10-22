@@ -688,7 +688,7 @@ address,isa,evidence,replacement_end
 08227E2C,thumb,Hidden raw-tail function (retained),
 08227E5C,thumb,Hidden raw-tail function (retained),
 08227E8C,thumb,Hidden empty function,08227E90
-08227F3C,thumb,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
+08227F3C,thumb,Hidden raw-tail function,08227F4C
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227FEC,thumb,Hidden raw-tail function (retained),
