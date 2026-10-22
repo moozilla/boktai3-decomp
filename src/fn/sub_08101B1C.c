@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 95.8%
-// Still differs: HasFlag mask/pointer order and spill store position at 08101B80, base reload at 08101BE4,
-// sb/r1 reuse for the 'where' stores.
+// fuzzy: 96.9%
+// Still differs: the spill store of 'flags' comes before the ldrh/ands at 08101B88 (ROM: after),
+// and 'base' is reused from r0 at 08101BE4 instead of reloaded from its stack slot.
 #include "player.h"
 #include "terrain_cell_probe.h"
 struct NamedObject {
@@ -60,7 +60,7 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
     s32 base, cell, col, row;
     s32 i;
     struct Pos16 where;
-    register struct Pos16 *w asm("sb");
+    struct Pos16 *w;
     u16 *flags;
     u8 *registration;
     if (!manager || object->name != manager->followName || object->kind == 2 ||
@@ -68,8 +68,11 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
         ActorGroup_ReleaseMember(object);
         return;
     }
-    if (HasFlag(0x800, flags = &object->flags))
-        return;
+    {
+        u32 m = 0x800;
+        if (HasFlag(m, flags = &object->flags))
+            return;
+    }
     base = GetCell(&object->position);
     cell = base + 1;
     i = 0;
