@@ -728,9 +728,20 @@ static inline int ScaleSine(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: ~90%
-// Register allocation of the angle/random chain and the owner pointer still differ.
+static inline u32 WirelessGame_Random(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+}
+
+static inline void WirelessGameItem_SetDrift(struct WirelessGameVector *drift, int angle)
+{
+    int k = 8;
+    drift->x = ScaleSine(gUnk_086149C4[(angle + 64) & 255] * 8);
+    drift->y = ScaleSine(gUnk_086149C4[angle & 255] * k);
+    drift->z = 0;
+}
+
 void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
 {
     struct WirelessGameDrawing *drawing = &p->drawing;
@@ -744,14 +755,21 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         p->entered = 0;
         sprite->value = p->count;
         p->sprite.flags &= ~1;
-        if (index > 7)
-            choice = (index & 3) + 4;
-        else
-            choice = index & 3;
-        Anim_LoadKeyframe(drawing, &owner->resource, gUnk_0824DE7C[choice], 0);
+        {
+            struct WirelessGameDrawing *d = drawing;
+            struct WirelessGameResource *res = &owner->resource;
+            if (index > 7)
+                choice = (index & 3) + 4;
+            else
+                choice = index & 3;
+            Anim_LoadKeyframe(d, res, gUnk_0824DE7C[choice], 0);
+        }
         p->drawing.flags &= ~1;
         start = &p->start;
-        entry = &gUnk_0824DE8C[index & 3];
+        {
+            const u16 *table = gUnk_0824DE8C;
+            entry = &table[index & 3];
+        }
         p->start.x = 272 + *entry;
         start->y = 32;
         start->z = 0;
@@ -767,20 +785,10 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         WirelessGameItem_SetRandomArcVelocity(p, 32, 15);
         angle = Math_Atan2(p->start.x - p->end.x, start->y - end->y);
         {
-            u32 r = gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
-            struct WirelessGameVector *drift = &p->drift;
-            s32 a = angle;
-            s8 b;
-            a -= 16;
-            a += r & 31;
-            b = a;
-            a = b;
-            drift->x = ScaleSine(gUnk_086149C4[(a + 64) & 255] * 8);
-            {
-                int k = 8;
-                drift->y = ScaleSine(k * gUnk_086149C4[a & 255]);
-            }
-            drift->z = 0;
+            u32 r = WirelessGame_Random();
+            s32 t = angle - 16;
+            t += r & 31;
+            WirelessGameItem_SetDrift(&p->drift, (s8)t);
         }
     }
     if (p->timer <= 27) {
@@ -794,8 +802,7 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         pos->y += drift->y;
         pos->z += drift->z;
     }
-    sprite->x = drawing->position.words.x;
-    sprite->y = drawing->position.words.y;
+    *(struct WirelessGamePair *)&sprite->x = *(struct WirelessGamePair *)&drawing->position.words.x;
     if (p->timer > 43) {
         int zero = 0;
         p->state = zero;
@@ -804,9 +811,6 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
     }
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0803A068);
-#endif
 
 void WirelessGameItems_UpdateTemporaryItem(struct WirelessGameItems *p, struct WirelessGameItem *q,
                                            int index)
