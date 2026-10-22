@@ -368,6 +368,8 @@ address,evidence
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
 081B9ECC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+081BB114,Hidden raw-tail function
+081BB124,Hidden raw-tail function
 081BB38C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 081C17C8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 081C3EEC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -400,6 +402,8 @@ address,evidence
 081FD46C,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 081FDBC4,Hidden raw-tail function
 081FE9B0,Hidden raw-tail function
+081FEA04,Hidden raw-tail function
+081FEA28,Hidden raw-tail function
 081FED14,Hidden raw-tail function
 08200238,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08202EEC,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -427,7 +431,9 @@ address,evidence
 0821907C,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 082195AC,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 082195F8,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+082196FC,Hidden raw-tail function
 08219DB4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821A0CC,Hidden raw-tail function
 0821A168,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821AAF4,Independent 36-byte operand-skip-to-terminator function (own push/pop-bx), unreferenced by any found bl/pointer; exact standalone C
 0821AB50,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
@@ -446,9 +452,12 @@ address,evidence
 0821E7B4,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7C4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7D0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0821E820,Hidden raw-tail function
+0821E840,Hidden raw-tail function
 0821F838,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 0821FF34,Hidden raw-tail function
 08220D6C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0822108C,Hidden raw-tail function (retained)
 082215B4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215BC,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -502,6 +511,9 @@ address,evidence
 08224F14,Hidden raw-tail function
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08224F98,Code following a reviewed gap leaf; retained assembly
+082250AC,Hidden raw-tail function
+082254C8,Hidden scene start: init state then run start or main script
+08225504,Hidden leaf returning 0 without lr push (retained)
 08225620,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08225834,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08225840,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
