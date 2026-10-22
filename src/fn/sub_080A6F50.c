@@ -1,14 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.4%
-// Register allocation and inline animation restart-pointer lifetimes still differ.
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)
 {
     u32 force;
-    u8 *restart;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
@@ -20,21 +15,17 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->restart;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
-        u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
-        restart = &actor->restart;
-        if (!force && *savedSelection == selection && !*restart) {
+        if (!force && actor->selection == selection && !actor->restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
             if (flags == 0 && !(tile->flags & 4))
                 return;
         }
-        *savedSelection = selection;
+        actor->selection = selection;
         {
             u32 mask = 4;
             u32 mode;
@@ -51,16 +42,18 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
                 tile->flags &= ~4;
         }
     }
-    *restart = 0;
+    actor->restart = 0;
 }
 
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
 void TentacleBody_ResetDirectionalAnimations(void *, s32);
 void TentacleBody_RefreshDirectionalAnimations(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
+#define TentacleBody_UpdateAttackRecovery sub_080A6F50
+
 void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    register u8 *entry asm("r10") = (void *)SceneActorProfiles_GetEntryAddress(
+    u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct SceneActorAnimationView *)actor)->profileId,
         ((struct SceneActorAnimationView *)actor)->profileMode, 0);
     u32 variant, flags;
@@ -77,7 +70,3 @@ void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor
         actor->field2B0 = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdateAttackRecovery);
-#endif
