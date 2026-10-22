@@ -226,7 +226,7 @@ Record panel,0810D548,0810DA38,,,auto: 3 of 10 functions named RecordPanel_*
 Registry 3C9F,0810DA38,0810E91C,,,auto: 9 of 24 functions named Registry3C9F_*
 Registry 33FF,0810E91C,0810EDC0,,,auto: 3 of 7 functions named Registry33FF_*
 Record menu,0810EDC0,0810F820,,,auto: 6 of 16 functions named RecordMenu_*; also LinkLobbyPanel_*
-Link score panel,0810F820,0811024C,,,auto: 10 of 19 functions named LinkScorePanel_*
+Link score panel,0810F820,0811024C,,,auto: 10 of 21 functions named LinkScorePanel_*
 Save menu,0811024C,08110A8C,,,auto: 7 of 11 functions named SaveMenu_*
 Scene tilemap,08110A8C,081111C4,,,auto: 9 of 19 functions named SceneTilemap_*
 Palette fade,081111C4,08111C44,,,auto: 12 of 18 functions named PaletteFade_*; also ScanlineScroll_*
@@ -440,7 +440,7 @@ Interrupts and video,08213D10,082142DC,,,auto: 7 of 11 functions named Interrupt
 Sprite,082142DC,08215698,,,auto: 13 of 37 functions named Sprite_*; also AnimData_* ObjGfx_* SpriteOam_*
 BG,08215698,08216520,,,auto: 11 of 22 functions named Bg_*
 BG GFX,08216520,08216E54,,,auto: 3 of 3 functions named BgGfx_*
-Palette,08216E54,08217F4C,,,auto: 9 of 37 functions named Palette_*; also Effect_*
+Palette,08216E54,08217F4C,,,auto: 9 of 39 functions named Palette_*; also Effect_*
 Sprite OAM,08217F4C,08218B30,,,auto: 4 of 4 functions named SpriteOam_*
 Text,08218B30,0821907C,,,auto: 12 of 21 functions named Text_*; also TextWindow_*
 Scanline effect,0821907C,08219574,,,auto: 6 of 12 functions named ScanlineEffect_*; also Mosaic_*
@@ -456,7 +456,7 @@ Trap,0821DDBC,0821E654,,,auto: 5 of 20 functions named Trap_*; also Route_*
 Path,0821E654,0821F15C,,,auto: 13 of 23 functions named Path_*
 Nav mesh,0821F15C,0821FDC8,,,auto: 4 of 16 functions named NavMesh_*
 Collider,0821FDC8,08220B24,,,auto: 18 of 27 functions named Collider_*
-Anim,08220B24,08221774,,,auto: 8 of 27 functions named Anim_*; also Crc_*
+Anim,08220B24,08221774,,,auto: 8 of 28 functions named Anim_*; also Crc_*
 Scalar and vector interpolation,08221774,0822223C,,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; scalar approach wrapped angle clamp and vector helpers; 31 raw-tail entries independently reviewed and remain unmatched until exact C verification
 Serial,0822223C,08223534,,,auto: 20 of 52 functions named Serial_*; also HashTable_*
 RFU manager,08223534,08224E54,,,auto: 25 of 39 functions named RfuManager_*; also Wireless_*
