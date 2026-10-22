@@ -1,11 +1,11 @@
 #include "global.h"
 #include "display_animation.h"
 #ifdef NONMATCHING
-// fuzzy: 85.6%
+// fuzzy: 98.6%
 // (this draft uses local register pinning)
-// Remaining: p is allocated r5 instead of r6 (rasolve: p's allocno priority must
-// drop just below `command`/`duration`, plus one reload rotation at the
-// TimePalette_InitTransition call); and p->owner = owner should copy r8 twice.
+// Remaining: the ROM stores paletteData off p (`str r0, [r6, #0x50]`); writing
+// it as p->paletteData raises p's allocno priority and moves p to r5, so the
+// draft stores it off `resource`. The owner copy for the store uses r1, not r2.
 struct WheelSprite {
     u32 flags;
     u8 pad4[0xC];
@@ -158,7 +158,7 @@ s32 sub_081C49F4(struct Wheel *p, void *owner)
     AnimData_Load(resource, 0x2173);
     TimePalette_InitTransition(p->palette, gUnk_030042E4 + 0x2D20, gUnk_030042E4 + 0x2D40,
                                gUnk_030042E4 + 0x2D60);
-    p->paletteData = p->paletteBuffer;
+    *(void **)(resource + 0xC) = p->paletteBuffer; /* p->paletteData */
     p->paletteIndex = 0x169;
     Sprite_Init(sprite, resource, 0);
     p->animationData = ScriptProc_Start(0x922E, 0x2990);
@@ -170,8 +170,12 @@ s32 sub_081C49F4(struct Wheel *p, void *owner)
         sprite->x = Script_GetValue();
         sprite->y = Script_GetValue();
         sprite->z = Script_GetValue();
-        p->owner = owner;
-        SceneMessages_RegisterReceiver(p->receiver, owner, 10);
+        {
+            void **slot = &p->owner;
+            *slot = owner;
+            asm("" ::: "memory");
+            SceneMessages_RegisterReceiver((u8 *)slot - 0x34, owner, 10);
+        }
         return 0;
     }
     return -1;
