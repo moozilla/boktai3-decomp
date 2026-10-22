@@ -13,6 +13,8 @@ address,evidence
 08008C18,Empty 4-byte bx lr function between 08008BD0 and 08008C1C (gbadisasm left it as data); exact C in src/pooled_interactable.c
 08009E30,Independent 12-byte global-pointer clear after directional script return and literal pool
 0800A800,Independent 12-byte effect manager global-pointer clear following collision controller teardown
+0800B2F4,Hidden raw-tail function
+0800B330,Hidden raw-tail function (retained)
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
 0800E3D4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0800F4B8,Independent 12-byte store of zero to gUnk_02000048 between sub_0800F474 and sub_0800F4C4 (twin of sub_0800F6EC)
