@@ -7,7 +7,7 @@ void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void SceneActorBehavior_OnContactForward(void);
-void sub_08095578(void);
+void Ghost_BeginContactReaction(void);
 union LinkedColliderVector {
     struct ContactPackedVector packed;
     struct ContactPosition position;
@@ -35,6 +35,6 @@ void SceneActor_InitLinkedReactionColliders(struct SceneActorRegistryResetView *
         Collider_Init(collider, actor->id, flags, 0, 16, &size, &offset);
         Collider_SetAttackProperties(&actor->colliderB, 0, 0, 0, 0, 0);
         Collider_SetPosition(&actor->colliderB, &actor->position, 0);
-        Collider_SetCallback(&actor->colliderB, sub_08095578, actor);
+        Collider_SetCallback(&actor->colliderB, Ghost_BeginContactReaction, actor);
     }
 }

@@ -21,14 +21,14 @@ static inline void Dog_SetMovementBits(struct SceneActorRegistryResetView *actor
     u32 *flags = &actor->flags2CC;
     *flags |= mask;
 }
-void sub_080E04D0(void);
+void Dog_UpdateArrivalAnimation(void);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
 {
     u8 *group = (u8 *)&a->group;
     u8 *context = a->context;
     if (Chase_TakeArrived(a))
-        Chase_SetCtl(a, sub_080E04D0, 10);
+        Chase_SetCtl(a, Dog_UpdateArrivalAnimation, 10);
     if ((u8)Callback_InvokeActor(a, a->update270))
         return;
     if (sub_0812F3CC(a))

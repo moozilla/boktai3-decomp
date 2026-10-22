@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94%
-// Remaining differences: the two zero constants swap registers (r3/r4) in the second phase.
 void ActorPhase_UpdateSpriteCollapse(void);
 static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
 {
@@ -56,13 +54,16 @@ void Axe_UpdateCollapsePhase(struct SceneActorRegistryResetView *actor)
     }
     if (actor->field2B0) {
         u16 *flags = &actor->flags2C0;
-        u32 mask = ~0x1800;
+        register u32 mask asm("r1") = ~0x1800;
         u32 zero;
         u8 zero8;
-        u32 masked = mask & *flags;
+        register u32 masked asm("r1");
+        asm("" : "+r"(mask));
+        masked = mask & *flags;
+        zero8 = 0;
+        asm("" : "+r"(zero8));
         zero = 0;
         *flags = masked;
-        zero8 = 0;
         BeginControl2(actor, actor->savedTarget, zero8, zero);
         {
             u32 behavior = 3;
@@ -77,6 +78,3 @@ void Axe_UpdateCollapsePhase(struct SceneActorRegistryResetView *actor)
         actor->counter2AC++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateCollapsePhase);
-#endif

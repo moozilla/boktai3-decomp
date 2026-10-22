@@ -1,6 +1,6 @@
 #include "scene_actor_reset.h"
 
-void sub_080A62DC(void);
+void TentacleBody_UpdateSpreadWindup(void);
 void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *);
 static inline u8 TakeQueuedFlag(u8 *flag)
 {
@@ -14,7 +14,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetVie
 {
     s32 savedOffset;
     if (TakeQueuedFlag(&p->field2B1)) {
-        void (*control)(void) = sub_080A62DC;
+        void (*control)(void) = TentacleBody_UpdateSpreadWindup;
         u8 kind = 38;
         u32 zero;
         u32 *flags;

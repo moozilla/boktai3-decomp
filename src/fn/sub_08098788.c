@@ -10,11 +10,11 @@ extern u8 *gUnk_02000580;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 void ActorShadow_Disable(void *);
-void sub_0809852C(void *);
+void Ghost_TickVisibilityTransition(void *);
 void ActorTick_DecrementCounterAA(void *);
 void ActorVisibility_TickRevealDelay(void *);
 void Ghost_UpdateRandomDestination(void *);
-void sub_08097E38(void *);
+void Ghost_ReactToPlayerMovement(void *);
 void SceneActor_EasePlayerHeight(void *);
 static inline u8 Flag(u8 *p, u32 mask)
 {
@@ -117,7 +117,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
                 *flags &= mask;
             }
         } else
-            sub_0809852C(a);
+            Ghost_TickVisibilityTransition(a);
         ActorTick_DecrementCounterAA(a);
         goto finish;
     }
@@ -169,10 +169,10 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             }
         }
     }
-    sub_0809852C(a);
+    Ghost_TickVisibilityTransition(a);
     ActorVisibility_TickRevealDelay(a);
     Ghost_UpdateRandomDestination(a);
-    sub_08097E38(a);
+    Ghost_ReactToPlayerMovement(a);
 finish:
     SceneActor_EasePlayerHeight(a);
     return 1;
