@@ -78,6 +78,7 @@ address,evidence
 08033AB0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08033AD0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08033C4C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+080347D8,Wireless parent link-manager message callback: maps LMAN messages to engine operations; raw span after the preceding wireless helper
 080349FC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080369F0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08036BAC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
