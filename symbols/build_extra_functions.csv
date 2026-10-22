@@ -232,7 +232,7 @@ address,isa,evidence,replacement_end
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
 0810E928,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810E964
-0810F254,thumb,Hidden tail after LinkLobbyPanel_RemoveSprites,
+0810F254,thumb,"Hidden raw-tail function: dialogue clear/show helper, empty stub, link lobby panel close and script-call-then-kill tasks",0810F2DC
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
 0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
