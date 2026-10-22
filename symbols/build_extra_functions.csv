@@ -174,6 +174,7 @@ address,isa,evidence,replacement_end
 080A6294,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A62DC
 080A7188,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A71A0
 080A8CDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A8D50
+080AA688,thumb,Removes the colliders of every still-active part (flag bit 0 at part+0x105) and counts down the live total at context+0x8EA; raw span before the next function; retained assembly,
 080ACCD4,thumb,Independent 28-byte leaf (no push; old_agbcc) storing an entry position; left as incbin by gbadisasm; exact standalone C,080ACCF0
 080AD110,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080AD114
 080B1F48,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,080B1FA8
