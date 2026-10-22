@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.6%
+// fuzzy: 87.8%
 // Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
@@ -64,7 +64,7 @@ static inline void SelectTurn(struct SceneActorAnimationView *actor, u32 selecti
     }
     *restart = 0;
 }
-static inline u16 TurnFlags(u16 *field, u32 mask)
+static inline u32 TurnFlags(u16 *field, u32 mask)
 {
     return *field & mask;
 }
