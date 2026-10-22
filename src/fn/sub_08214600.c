@@ -1,10 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Left: in the piece loop preheader the ROM initialises the attrs[] giv before the
-// hoisted flags & 8 (6 instructions in a different order).
-
 struct SpritePiece {
     u8 shape;
     u8 pad1;
@@ -114,6 +109,8 @@ static inline s32 Affine_Alloc(u8 rotation, s8 sx, s8 sy)
     return n;
 }
 
+// Culls one sprite's frame pieces against the screen, allocates its affine matrix,
+// tiles and palette, and queues the visible pieces as OAM entries (immediate or by priority).
 void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
 {
     u32 attrs[32];
@@ -123,7 +120,8 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
     u32 attr;
     s32 count;
     struct SpriteRes *res;
-    s32 tile, prev;
+    s32 tile;
+    u8 prev;
     s32 baseX, baseY;
     u32 priority;
     struct SpriteAnim *anim;
@@ -260,6 +258,3 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08214600);
-#endif

@@ -1,0 +1,1 @@
+08214600,Sprite_EmitFramePieces,low,"called per visible sprite by Sprite_RenderScaledList; culls frame pieces, allocates affine/tiles/palette, queues OAM (03004390 immediate, 030047A0 by priority)"
