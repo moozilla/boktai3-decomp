@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 81.7%
-// foundry draft (worker best 81.7%); what differs is mostly register allocation and instruction order
+// The do/while(0) around `delay` raises its allocation weight (loop depth).
 struct ScheduledCollider {
     u32 flags;
     u8 unknown4[0x30];
@@ -47,7 +45,9 @@ void Collider_ScheduleUpdates(void *unused, struct ColliderScheduler *scheduler)
         }
         count = Div(count, divisor);
     }
-    delay = count - 1;
+    do {
+        delay = count - 1;
+    } while (0);
     if (link) {
         one = 1;
         do {
@@ -69,6 +69,3 @@ void Collider_ScheduleUpdates(void *unused, struct ColliderScheduler *scheduler)
         } while (link);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Collider_ScheduleUpdates);
-#endif
