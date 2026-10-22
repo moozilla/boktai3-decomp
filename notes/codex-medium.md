@@ -4009,3 +4009,100 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## Lun and Bee assignment — 2026-10-22
+
+Tags: #matching #monster #lun #bee #register-pinning
+
+Final result: four exact matches and one guarded draft. This batch adds
+0.071 percentage points of exact code coverage (1,712 bytes secondary):
+0.040 points unpinned (964 bytes), 0.031 points in Register-pinned (748 bytes).
+Only per-file check.py checks were used. No make, full build, network operation,
+shared documentation change, ROM commit or generated assembly commit occurred.
+Every accepted source has a file-local descriptive alias. Existing symbols had
+no names for these ten targets; neighbouring prefixes and static callers guided
+the tentative names. Ghidra export was unavailable in this worker checkout.
+
+- **0809AE0C — stopped below draft threshold.** Fresh tentative
+  Lun_ApplyCaptureContact candidate scored 40.3%, 186 realigned differences /
+  114 ignoring registers. The attack-collider callback requires contact kind 1,
+  rejects disabled actors, checks the player's vertical reach, sets a lift state,
+  disables both colliders and applies a speed bonus or status effect according
+  to actor+0x1E6. The original retains discarded context+0x3D4 bit calculations;
+  a volatile read preserves the read but loses the discarded AND. State-store
+  constant derivation and actor/player pointer lifetimes also remain different.
+  Read the caller Lun_InitColliders (0809CBB8) and prior notes before drafting;
+  no below-threshold C was promoted.
+- **0809B7FC — drafted 82.6%, Lun_ResumeAfterLift.** Consumes the animation
+  entry flag, invokes the lift penalty, marks response flags, and after tick 30
+  either restores the pursuit timer from context+0x442 to +0x444 and starts
+  movement toward the player, or selects Lun_UpdateWaitingAnimation and resets
+  direction/scale. Reviewed-extent --nonmatching --record result: 42 realigned
+  differences / 19 ignoring registers. The control and state stores' constants
+  and offset derivation differ; simple mask-pointer rewrites regressed and were
+  reverted. INCLUDE_ASM remains the default branch.
+- **0809C174 — matched, Lun_DecayRouteMotion (Register-pinned).** Applies
+  context+0x424/+0x428 to actor motion at +0x64/+0x68, halves the signed drift
+  every four ticks, and after control completion chooses pursuit or rest from
+  flag 0x100. An explicit pointer to motion.z recovers its address increment;
+  a mask helper taking the actor (rather than the field address) recovers mask
+  setup order. The resulting 97.7% draft had only four register differences.
+  Pinning mask to r1 and loaded flags to r0 with empty operand barriers closes
+  those differences. No handwritten instruction body. Exact check: 356 bytes.
+- **0809CCF4 — stopped below draft threshold.** Tentative
+  Lun_AdvanceRouteCurve copies endpoints at context+0x414/+0x41C, clears their
+  vertical component, evaluates a cubic using +0x3E0 progress and signed +0x3E4
+  tangent, writes +0x3F4 and advances progress by 128 until complete. Best
+  retained scratch: 63.9%, 98 realigned differences / 51 ignoring registers.
+  A caller aggregate containing zero/start/end reproduces the initial stack
+  offsets, and a shared drift term improves the initial 33.2% attempt. Coefficient
+  common-subexpression lifetimes, arithmetic ordering and spills remain. An
+  explicit doubled/tripled-coefficient experiment lowered structural differences
+  to 37 but worsened total allocation; the better fuzzy candidate was restored.
+- **0809D574 — matched, Lun_PursuePlayerPosition (unpinned).** Adapted
+  Lun_FollowRoute (0809BE98): its initial body and approach calculation are the
+  same, but callback +0x270's return is ignored and arrival resets endpoints to
+  the player's current position before facing it. Reusing a State inline with
+  an explicit behavior constant recovers the ROM's adjacent state-offset
+  derivation. Exact check: 592 bytes.
+- **0809D7C4 — matched, Lun_FollowPlayerDisplacement (unpinned).** Saves the
+  player's position at context+0x414 on entry, invokes the participant action,
+  adds the player's frame displacement to actor motion, and refreshes the saved
+  position. Completion switches behavior and idle control. The first scalar
+  draft optimized away the stack delta; an inline Delta restores it. Declaring
+  its destination pointer before the saved/player pointers improves 86.5% to
+  99.5%; declaring a global-pointer address local before that destination fixes
+  the final two load-order differences. Exact check: 372 bytes. Earlier guarded
+  draft is superseded by the exact matching commit.
+- **0809DA14 — matched, Lun_RenewRouteDestination (Register-pinned category).**
+  Ported the route-selection tail of Lun_ChooseMovementDestination (0809C2D8),
+  removing its entry-control and height checks. The timer advances only while
+  waiting (the else branch), rather than after selecting the new route. Carries
+  the seed's r7 clobber and its MATCHING_CONCESSION marker. Exact check: 392 bytes.
+- **08093138 — stopped below draft threshold.** Tentative Bee_AdvanceRouteCurve
+  shares the Lun cubic core, using endpoint offsets +0x470/+0x478 and output
+  +0x450. Progress at +0x430 advances by a random 256..511, clamps at 1024,
+  then resets and returns completion on the next call. Scratch: 65.6%,
+  99 realigned differences / 48 ignoring registers. The caller
+  Bee_BeginMoveToPosition (08093370) establishes the endpoints/trajectory role.
+  Same coefficient/spill problem as 0809CCF4; no qualifying draft.
+- **0809345C — stopped below draft threshold.** Tentative Bee_BuildRouteCurve
+  samples eight curve positions at context+0x3E0 with parameter increments
+  Div(1024,8), using tangents +0x480/+0x484 shifted left four, then stores the
+  destination at +0x420. Built from the same cubic helper with the additional
+  initial-tangent factor and t-cubed minus t-squared term. Scratch: 37.2%,
+  232 realigned differences / 37 ignoring registers. Most remaining differences
+  are allocation, loop address lifetimes and spills, but extent also differs;
+  not suitable for promotion.
+- **080941F4 — stopped below draft threshold.** Tentative Bee_FollowTargetRoute
+  starts from the committed Bee_FollowWanderRoute draft (08093810). It recomputes
+  facing to the object at context+0x440 on entry, each update and route restart;
+  randomizes within 63 heading units, uses radius +0x43E, starts the movement
+  budget at 1280 and restarts with +0x42C << 5. Scratch: 53.0%, 303 realigned
+  differences / 145 ignoring registers. Read BIG_FUNCTIONS.md and used realigned
+  counts; stack-vector/pointer lifetimes remain substantially different.
+
+Scratch attempts remain ignored under wip/; below-threshold functions have no
+new production source. All four exact files passed byte-resolved check.py;
+combined ROM validation remains the integrator's batch step. Intermediate
+97.7%/86.5% draft commits for 0809C174/0809D7C4 are superseded by exact commits.
