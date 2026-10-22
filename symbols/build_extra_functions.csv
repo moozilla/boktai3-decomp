@@ -417,7 +417,16 @@ address,isa,evidence,replacement_end
 0822253C,thumb,Hidden 12-byte IME-clear leaf in the raw tail after HashTable_FindNode; exact standalone C,08222548
 08222548,thumb,Hidden 12-byte IME-set leaf in the raw tail after HashTable_FindNode; exact standalone C,08222554
 08222A00,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08222A04
-08222A04,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08222C7C
+08222A04,thumb,Serial buffer reset and start; first of ten functions in the reviewed 08222A04-08222C7C span; retained assembly (not yet matched),
+08222AA4,thumb,Serial stop; part of the reviewed 08222A04-08222C7C span,08222AC4
+08222AC4,thumb,Serial receive-buffer read; part of the reviewed 08222A04-08222C7C span,08222B64
+08222B64,thumb,Serial send-buffer write; part of the reviewed 08222A04-08222C7C span,08222BE4
+08222BE4,thumb,Serial status getter; part of the reviewed 08222A04-08222C7C span,08222BF8
+08222BF8,thumb,Serial any-data check; part of the reviewed 08222A04-08222C7C span,08222C24
+08222C24,thumb,Serial data check (03005320); part of the reviewed 08222A04-08222C7C span,08222C44
+08222C44,thumb,Serial data check (0300530C); part of the reviewed 08222A04-08222C7C span,08222C64
+08222C64,thumb,Serial getter (03005310); part of the reviewed 08222A04-08222C7C span,08222C70
+08222C70,thumb,Serial getter (03005318); part of the reviewed 08222A04-08222C7C span,08222C7C
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98
 08224F98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08224FA4
 08225620,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08225624
