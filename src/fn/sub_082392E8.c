@@ -1,11 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 99.0%
-// Open: in the final random draw the original loads the table address into
-// r2 (ldr r2; adds r0, r0, r2); this draft uses r1. Without the r5 mask pin
-// the table/0xFF registers (r4/r5) are swapped as well (96.6%).
 typedef struct Point {
     u16 x, pad2, y, pad6;
 } Point;
@@ -35,7 +30,7 @@ void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)((u8 *)gUnk_0203B400 + (gUnk_03005308 << 1));
+    return *(u16 *)((u8 *)RANDOM_TABLE_ADDR + (gUnk_03005308 << 1));
 }
 static inline s32 random_first(void)
 {
@@ -56,6 +51,8 @@ static inline u16 linkValue(s32 index)
         return 0;
     return link->playerValues[index];
 }
+// The final draw reads the table through RANDOM_TABLE_ADDR: a literal address
+// changes reload register rotation (r2 instead of r1), as in the original.
 // confidence=low: spawns a converging particle at a rate scaled by the link player's value.
 void sub_082392E8(State *s, Point *pos)
 {
@@ -89,6 +86,3 @@ void sub_082392E8(State *s, Point *pos)
         s->active = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082392E8);
-#endif
