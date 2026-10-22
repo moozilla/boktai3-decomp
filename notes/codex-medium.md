@@ -4009,3 +4009,125 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## Vorn then Slime worker — 2026-10-22
+
+Tags: #matching #vorn #slime #nonmatching #register-pinning
+
+Worked solo in the assigned offline checkout. Exact C covers 24.56% of the
+assigned body/pool extents, a +24.56 percentage-point gain (1,280 of 5,212
+bytes). Four matches and three guarded drafts were committed separately with
+build/commit.sh. No make, full build, network operations, shared generated-file
+edits, or integration actions. The Ghidra export is absent. Read entry-point,
+worker, cloud, candidate, large-function guidance and address-indexed prior
+notes; used existing shared layouts and matched siblings. All target addresses
+were unnamed in symbols/functions.csv; added provisional file-local aliases.
+
+- **080ACFA8 matched — Vorn_UpdateIdleFacing (tentative), 356 bytes.** Consumes
+  prepared flag 2B2, quantizes facing, compares the route/saved octant at 3CD,
+  selects animation zero and signals completion. The normal path applies the
+  animation duration scale and handles animation completion. Mask-taking inline
+  helpers reproduce constant-before-load order. Final facing normalization
+  needs an r1 value pin and empty read/write constraint; depin.py reduced four
+  hints to two. Register-pinned category. Full reviewed-extent check:
+  build/check/run-tr79sk9c.
+- **080ADB90 stopped below threshold — Vorn_UpdatePursuitWait (tentative).**
+  Context timer 69C is cleared on entry. Context flag 6D4 bit 2 waits until
+  distance is below 19000 or the timer exceeds 120, then calls 080B1FA8,
+  clears that flag and selects behavior 15. Otherwise plays directional entry
+  one. Initial 72.6%; separate byte/word zero locals and operand-order changes
+  worsened to 71.5%. State reset offset derivation, mask result registers and
+  timer-address scratch allocation remain. Scratch:
+  wip/mons-d/sub_080ADB90.c; initial artifacts build/check/run-zll5w2cx.
+- **080B0038 stopped below threshold — Vorn_RestoreRouteMovement (tentative).**
+  Recovered route-resume cleanup, route position resolution, conditional control
+  timer reset, flag clearing, destination clearing, and restoration of saved
+  control/default motion callbacks. Candidate 72.7%, 57 realigned differences,
+  20 ignoring registers (build/check/run-pf9j2pb_). Prior notes document the
+  same blocking group-address/control reset derivations and unsuccessful pins;
+  did not repeat that search. Scratch wip/mons-d/sub_080B0038.c.
+- **080B03BC stopped below threshold — Vorn_AdvanceEntryAction (tentative).**
+  Installs entryTarget224 as control kind 2, invokes update270 and 0812F3CC,
+  then switches to behavior 19 and restores saved control/motion when complete.
+  Clean candidate 65.2%, 74 realigned differences / 27 structural. Explicit r6
+  field2B0 offset lifetime worsened to 63.6%; restored clean scratch. Main
+  residue is shared reset/control offset derivation and saved offset registers.
+  Scratch wip/mons-d/sub_080B03BC.c; build/check/run-o_zmydy0.
+- **080B197C stopped below threshold — Vorn_SelectReactionControl (tentative).**
+  Clears context 6D4 bit 8; bit 1 or nonnegative context 67C selects response
+  279 via 080B3110. Otherwise dispatches context action zero if motion flag 8
+  was already set, or installs idle control/state, and latches motion flag 8.
+  Typed direct flag storage plus passing the cleared value into the predicate
+  avoids a reload; pinning actor r5 raised 66.0% to 74.8% (46 realigned / 13
+  structural differences). Motion-mask inline changes did not improve further.
+  Remaining reset offsets, mask scheduling and motion pointer copy.
+  Scratch wip/mons-d/sub_080B197C.c; build/check/run-7sxeqney.
+- **080AD530 drafted 94.5% — Vorn_ResumeRouteAfterDelay (tentative).** Sets
+  flags2D6 bit 10 and completes after frame 18. Motion flag 2 restores a saved
+  reaction; context bits 1D dispatch a context action; otherwise routes toward
+  player target and resumes behavior 7 with scale 32. Existing Chase helpers
+  yielded a much closer candidate than earlier notes. Replacing several flag
+  operations with new inline accessors changed allocation widely and worsened
+  to 61.8%; restored the 94.5% form. Remaining 16 realigned / 10 structural
+  differences: flag-load order and group+208 address folding. Recorded against
+  full 556-byte extent: build/check/run-du0qiefd. No hints. Assembly fallback
+  checked exact.
+- **080B13E8 matched — Vorn_SelectUphillTurn (tentative), 580 bytes.** Samples
+  terrain at the input position and +256 along X/Z; if X is higher adds
+  110/100 to context turn weights 6B0/6B4 and sets 6B9 zero; otherwise if Z
+  is higher adds 100/110 and sets 6B9 one. Returns whether it found an uphill
+  direction. Shared terrain idioms and a packed X/Y bitfield reproduce the
+  stack probe insertion. Explicit `else if (heightZ - height <= 0)` before
+  the positive Z body fixes the final branch layout; no hints. Full extent:
+  build/check/run-ofmlxcrg.
+- **080B162C drafted 88.1% — Vorn_TryUphillRoute (tentative).** Guards actor
+  availability, motion/control/context flags and cooldown; a random threshold
+  selects a distant route probe and 080B13E8's uphill bias. On success queues
+  delayed action kind 19 for 30..45 frames, sets context bit 8 and enters
+  restore-after-delay control. Deferred context flag pointer construction in an
+  inline out-parameter accessor improved 82.4% to 87.1%; reading a full RNG
+  halfword before applying mask 15 improved to 88.1%. Remaining 50 realigned /
+  15 structural differences: pointer lifetimes, mask order, reset offsets.
+  Full 640-byte recorded extent: build/check/run-jw00wmjn. No hints. Default
+  assembly fallback checked exact.
+- **0808F8C8 matched — Slime_ResetIdlePlayback (tentative), 284 bytes.** Clears
+  context 40A and 3D4, selects idle entry zero, and steps packed display
+  animation. Reused the reviewed Ivy/ScenePanelRig stepper, with mask in r5
+  and temporary in r2. Passing drawable through r0 with an empty constraint
+  preserves the original copy. depin.py removed one redundant hint; remaining
+  stepper hints retained. Register-pinned category. Full reviewed extent ends
+  before the separate no-op at 0808F9E4: build/check/run-q9f0dco6.
+- **0808FA04 matched — Slime_GetAnimationMovePulse (tentative), 60 bytes.**
+  Returns zero unless animation elapsed is zero; then sets flags2D0 bit 10000
+  and returns table 08605D58[index modulo 6]. Splitting the modulo from table
+  addressing prevented hoisting the table across Mod. A temporary r1 table
+  pin matched; depin.py removed both the pin and constraint while preserving
+  the exact result. No concession remains. Full extent:
+  build/check/run-q5ng5t0y.
+- **0808FA40 stopped below threshold — Slime_ChooseMovementDestination
+  (tentative).** Random direction, terrain height/shape query, two-cell cardinal
+  probes, up to four rotated attempts, requested facing restoration, then
+  writes destination center to context 3EC. Initial 62.4%; signed truncation
+  inline plus do/while inner probes and explicit outer exit raised to 71.9%
+  (126 realigned / 102 structural differences, build/check/run-klwvtpsg).
+  Outer-loop rotation, actor stack residency, terrain pointer reuse and saved
+  stack slots still differ. Scratch wip/mons-d/sub_0808FA40.c.
+- **080903D4 drafted 88.9% — Slime_EmitTargetedReactionBurst (tentative).**
+  Aims from actor toward target+12, adds random angle 0..15 and speed 6..13,
+  emits three projectiles through 08127590 with vertical velocities 48/37/32,
+  kinds 6/7/6 and final mode 1. Passes palette sum, B6/BE/D0/C6 properties and
+  random variant flags. Initial 61.2%; corrected palette source to basePaletteBank
+  at 1E0 and computed each argument before the next pointer assignment, rather
+  than evaluating all fields inside call arguments. Actor sl pin and sequential
+  pointer/load lifetimes reached the retained candidate. Decl-swaps and an
+  inlined emitter wrapper did not improve. Full 848-byte recorded comparison
+  is 88.9%, 54 realigned / 24 structural differences (candidate 824 bytes):
+  stack pointer-copy pairs, argument lifetime spills and polar registers remain.
+  Register-pinning marker retained on this guarded draft. Recorded artifacts:
+  build/check/run-o6q9k3cj. Default assembly fallback checked exact.
+
+All exact sources were formatted with the venv clang-format and checked with
+explicit reviewed target sizes. Drafts use NONMATCHING guards and raw-address
+INCLUDE_ASM fallbacks, and their scores were recorded with --nonmatching --record.
+Useful failed candidates remain outside src/; they are uncommitted scratch,
+not exact progress. Combined ROM validation remains with batch integration.
