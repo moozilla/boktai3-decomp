@@ -3,7 +3,6 @@
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
-#define Vorn_ResumeRouteAfterDelay sub_080AD530
 static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
