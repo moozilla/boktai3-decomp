@@ -39,8 +39,8 @@ address,isa,evidence,replacement_end
 08021BC0,thumb,Independent available-position query after event-script return and literals; exact 36-byte C body,08021BE4
 08028DFC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08028E18
 0802CCE0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802CD04
-0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
-0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
+0802CED0,thumb,Hidden raw-tail function: independent 40-byte body in 0802CD04 tail,0802CEF8
+0802CEF8,thumb,Hidden raw-tail function: independent 24-byte body in 0802CD04 tail,0802CF10
 0802D014,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0802D020
 0802D05C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D080
 0802D0F4,thumb,Actor animation entry by four-way facing byte 0x180 with mirrored flip; first of two functions in the raw 0802D0F4-0802D1B0 span,0802D15C
@@ -227,12 +227,12 @@ address,isa,evidence,replacement_end
 0810C774,thumb,SlotMenu: calls the script at 0xF70 when set then kills the task; raw span,0810C798
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
 0810CE88,thumb,Clears the three text windows stored at 0x1408/0x1400/0x1404; raw span,0810CEBC
-0810D1A4,thumb,Hidden tail after Registry30AC_RemoveAnimations,
+0810D1A4,thumb,"Hidden raw-tail function: dialogue clear/show helper, empty stub, panel close and script-call-then-kill tasks",0810D22C
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
 0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
 0810E928,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810E964
-0810F254,thumb,Hidden tail after LinkLobbyPanel_RemoveSprites,
+0810F254,thumb,"Hidden raw-tail function: dialogue clear/show helper, empty stub, link lobby panel close and script-call-then-kill tasks",0810F2DC
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
 0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
 0810FA0C,thumb,Clears eight text windows stored at 0x1004; raw span before LinkScorePanel_InitGlyphFrames,0810FA2C
@@ -252,7 +252,7 @@ address,isa,evidence,replacement_end
 08116280,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0811628C
 0811ABD8,thumb,Hidden tail after Terrain_SetColumnLayout,
 0811AC54,thumb,Hidden tail function,0811AC6C
-0811ACCC,thumb,Hidden tail after Terrain_GetCellHighByte,
+0811ACCC,thumb,Hidden raw-tail function: terrain cell nibble getter (bits 8-11),0811AD8C
 0811B774,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,0811B77C
 0811B77C,thumb,Independent leaf following a reviewed gap function; exact standalone C,0811B784
 0811BB98,thumb,Clamps the halfword at gUnk_02000710+0x892 to 0..999 and returns it (pointer read as volatile); raw span,0811BBE0
@@ -297,7 +297,7 @@ address,isa,evidence,replacement_end
 0812CE64,thumb,Hidden tail function,0812CE90
 0812CE90,thumb,Hidden tail function,0812CE94
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
-0812D58C,thumb,Hidden tail after FragmentSpritePool_ResetSingleton,
+0812D58C,thumb,Hidden raw-tail function: fragment pool: test active actor at position,0812D670
 0812D7A8,thumb,SceneParticle_Create wrapper with mode 1; raw span,0812D7BC
 0812D7BC,thumb,SceneParticle_Create pass-through wrapper; raw span,0812D7D0
 0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
@@ -349,7 +349,7 @@ address,isa,evidence,replacement_end
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
 0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
-0815A1AC,thumb,Hidden tail after Player_AdvanceTetherPhase,
+0815A1AC,thumb,Hidden raw-tail function: spawns a randomly offset player effect group and plays its sound,0815A324
 0815A444,thumb,Hidden raw-tail function,0815A4D8
 0815A4D8,thumb,Hidden script query (actor direction),0815A534
 0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
@@ -379,7 +379,7 @@ address,isa,evidence,replacement_end
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
 0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
 0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
-081656E0,thumb,Hidden tail after Hud_DrawHeaderCounter,
+081656E0,thumb,Hidden raw-tail function: HUD header label and counter clamp by mode,081657F0
 0816A578,thumb,Hidden menu prompt setup: background layer then ramp display,0816A5A8
 0816A770,thumb,Hidden menu prompt setup: hide sprites then pulse display,0816A7D8
 0816AA28,thumb,Hidden scene HUD page exit fade,0816AAB0
@@ -473,7 +473,7 @@ address,isa,evidence,replacement_end
 081B7614,thumb,Hidden raw-tail function (retained),
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
-081B94AC,thumb,Hidden tail after OrbitMotion_BeginArc,
+081B94AC,thumb,Hidden raw-tail function: orbit motion begin XY distance wave (mode 7),081B9598
 081B9864,thumb,Hidden raw-tail function,081B98D8
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0
 081BB114,thumb,Hidden raw-tail function,081BB124
@@ -530,7 +530,7 @@ address,isa,evidence,replacement_end
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
 081F28C4,thumb,Hidden tail after SpriteTrail_InitRenderCollider,
 081F2B70,thumb,Hidden raw-tail function,081F2BB0
-081F2F90,thumb,Hidden tail after Ratatosk_FindPointNearestReference,
+081F2F90,thumb,Hidden raw-tail function: Ratatosk find point with largest weight at +0xD28,081F3084
 081F336C,thumb,Hidden raw-tail function,081F339C
 081F339C,thumb,Hidden raw-tail function,081F33CC
 081F33CC,thumb,Hidden raw-tail function,081F33F0
@@ -685,8 +685,8 @@ address,isa,evidence,replacement_end
 08226528,thumb,Hidden raw-tail function,08226558
 082265D8,thumb,Hidden raw-tail function,082265F8
 0822797C,thumb,Hidden raw-tail function,082279A8
-08227E2C,thumb,Hidden raw-tail function (retained),
-08227E5C,thumb,Hidden raw-tail function (retained),
+08227E2C,thumb,Hidden raw-tail function: increments a capped counter at +0x87C,08227E5C
+08227E5C,thumb,Hidden raw-tail function: increments a capped counter at +0x884,08227E8C
 08227E8C,thumb,Hidden empty function,08227E90
 08227F3C,thumb,Hidden raw-tail function,08227F4C
 08227F4C,thumb,Hidden raw-tail function,08227F58
