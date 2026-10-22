@@ -5311,3 +5311,450 @@ nontrivial control/PRE work. Keep reviewed-extent acceptance separate from
 candidate-length helper scores, and do not adopt a worse structural candidate
 just because its scalar fuzzy increased. All failed experiments remain ignored
 under wip/codex-medium/ and build/. No shared docs or progress totals regenerated.
+## Vorn then Slime worker — 2026-10-22
+
+Tags: #matching #vorn #slime #nonmatching #register-pinning
+
+Worked solo in the assigned offline checkout. Exact C covers 24.56% of the
+assigned body/pool extents, a +24.56 percentage-point gain (1,280 of 5,212
+bytes). Four matches and three guarded drafts were committed separately with
+build/commit.sh. No make, full build, network operations, shared generated-file
+edits, or integration actions. The Ghidra export is absent. Read entry-point,
+worker, cloud, candidate, large-function guidance and address-indexed prior
+notes; used existing shared layouts and matched siblings. All target addresses
+were unnamed in symbols/functions.csv; added provisional file-local aliases.
+
+- **080ACFA8 matched — Vorn_UpdateIdleFacing (tentative), 356 bytes.** Consumes
+  prepared flag 2B2, quantizes facing, compares the route/saved octant at 3CD,
+  selects animation zero and signals completion. The normal path applies the
+  animation duration scale and handles animation completion. Mask-taking inline
+  helpers reproduce constant-before-load order. Final facing normalization
+  needs an r1 value pin and empty read/write constraint; depin.py reduced four
+  hints to two. Register-pinned category. Full reviewed-extent check:
+  build/check/run-tr79sk9c.
+- **080ADB90 stopped below threshold — Vorn_UpdatePursuitWait (tentative).**
+  Context timer 69C is cleared on entry. Context flag 6D4 bit 2 waits until
+  distance is below 19000 or the timer exceeds 120, then calls 080B1FA8,
+  clears that flag and selects behavior 15. Otherwise plays directional entry
+  one. Initial 72.6%; separate byte/word zero locals and operand-order changes
+  worsened to 71.5%. State reset offset derivation, mask result registers and
+  timer-address scratch allocation remain. Scratch:
+  wip/mons-d/sub_080ADB90.c; initial artifacts build/check/run-zll5w2cx.
+- **080B0038 stopped below threshold — Vorn_RestoreRouteMovement (tentative).**
+  Recovered route-resume cleanup, route position resolution, conditional control
+  timer reset, flag clearing, destination clearing, and restoration of saved
+  control/default motion callbacks. Candidate 72.7%, 57 realigned differences,
+  20 ignoring registers (build/check/run-pf9j2pb_). Prior notes document the
+  same blocking group-address/control reset derivations and unsuccessful pins;
+  did not repeat that search. Scratch wip/mons-d/sub_080B0038.c.
+- **080B03BC stopped below threshold — Vorn_AdvanceEntryAction (tentative).**
+  Installs entryTarget224 as control kind 2, invokes update270 and 0812F3CC,
+  then switches to behavior 19 and restores saved control/motion when complete.
+  Clean candidate 65.2%, 74 realigned differences / 27 structural. Explicit r6
+  field2B0 offset lifetime worsened to 63.6%; restored clean scratch. Main
+  residue is shared reset/control offset derivation and saved offset registers.
+  Scratch wip/mons-d/sub_080B03BC.c; build/check/run-o_zmydy0.
+- **080B197C stopped below threshold — Vorn_SelectReactionControl (tentative).**
+  Clears context 6D4 bit 8; bit 1 or nonnegative context 67C selects response
+  279 via 080B3110. Otherwise dispatches context action zero if motion flag 8
+  was already set, or installs idle control/state, and latches motion flag 8.
+  Typed direct flag storage plus passing the cleared value into the predicate
+  avoids a reload; pinning actor r5 raised 66.0% to 74.8% (46 realigned / 13
+  structural differences). Motion-mask inline changes did not improve further.
+  Remaining reset offsets, mask scheduling and motion pointer copy.
+  Scratch wip/mons-d/sub_080B197C.c; build/check/run-7sxeqney.
+- **080AD530 drafted 94.5% — Vorn_ResumeRouteAfterDelay (tentative).** Sets
+  flags2D6 bit 10 and completes after frame 18. Motion flag 2 restores a saved
+  reaction; context bits 1D dispatch a context action; otherwise routes toward
+  player target and resumes behavior 7 with scale 32. Existing Chase helpers
+  yielded a much closer candidate than earlier notes. Replacing several flag
+  operations with new inline accessors changed allocation widely and worsened
+  to 61.8%; restored the 94.5% form. Remaining 16 realigned / 10 structural
+  differences: flag-load order and group+208 address folding. Recorded against
+  full 556-byte extent: build/check/run-du0qiefd. No hints. Assembly fallback
+  checked exact.
+- **080B13E8 matched — Vorn_SelectUphillTurn (tentative), 580 bytes.** Samples
+  terrain at the input position and +256 along X/Z; if X is higher adds
+  110/100 to context turn weights 6B0/6B4 and sets 6B9 zero; otherwise if Z
+  is higher adds 100/110 and sets 6B9 one. Returns whether it found an uphill
+  direction. Shared terrain idioms and a packed X/Y bitfield reproduce the
+  stack probe insertion. Explicit `else if (heightZ - height <= 0)` before
+  the positive Z body fixes the final branch layout; no hints. Full extent:
+  build/check/run-ofmlxcrg.
+- **080B162C drafted 88.1% — Vorn_TryUphillRoute (tentative).** Guards actor
+  availability, motion/control/context flags and cooldown; a random threshold
+  selects a distant route probe and 080B13E8's uphill bias. On success queues
+  delayed action kind 19 for 30..45 frames, sets context bit 8 and enters
+  restore-after-delay control. Deferred context flag pointer construction in an
+  inline out-parameter accessor improved 82.4% to 87.1%; reading a full RNG
+  halfword before applying mask 15 improved to 88.1%. Remaining 50 realigned /
+  15 structural differences: pointer lifetimes, mask order, reset offsets.
+  Full 640-byte recorded extent: build/check/run-jw00wmjn. No hints. Default
+  assembly fallback checked exact.
+- **0808F8C8 matched — Slime_ResetIdlePlayback (tentative), 284 bytes.** Clears
+  context 40A and 3D4, selects idle entry zero, and steps packed display
+  animation. Reused the reviewed Ivy/ScenePanelRig stepper, with mask in r5
+  and temporary in r2. Passing drawable through r0 with an empty constraint
+  preserves the original copy. depin.py removed one redundant hint; remaining
+  stepper hints retained. Register-pinned category. Full reviewed extent ends
+  before the separate no-op at 0808F9E4: build/check/run-q9f0dco6.
+- **0808FA04 matched — Slime_GetAnimationMovePulse (tentative), 60 bytes.**
+  Returns zero unless animation elapsed is zero; then sets flags2D0 bit 10000
+  and returns table 08605D58[index modulo 6]. Splitting the modulo from table
+  addressing prevented hoisting the table across Mod. A temporary r1 table
+  pin matched; depin.py removed both the pin and constraint while preserving
+  the exact result. No concession remains. Full extent:
+  build/check/run-q5ng5t0y.
+- **0808FA40 stopped below threshold — Slime_ChooseMovementDestination
+  (tentative).** Random direction, terrain height/shape query, two-cell cardinal
+  probes, up to four rotated attempts, requested facing restoration, then
+  writes destination center to context 3EC. Initial 62.4%; signed truncation
+  inline plus do/while inner probes and explicit outer exit raised to 71.9%
+  (126 realigned / 102 structural differences, build/check/run-klwvtpsg).
+  Outer-loop rotation, actor stack residency, terrain pointer reuse and saved
+  stack slots still differ. Scratch wip/mons-d/sub_0808FA40.c.
+- **080903D4 drafted 88.9% — Slime_EmitTargetedReactionBurst (tentative).**
+  Aims from actor toward target+12, adds random angle 0..15 and speed 6..13,
+  emits three projectiles through 08127590 with vertical velocities 48/37/32,
+  kinds 6/7/6 and final mode 1. Passes palette sum, B6/BE/D0/C6 properties and
+  random variant flags. Initial 61.2%; corrected palette source to basePaletteBank
+  at 1E0 and computed each argument before the next pointer assignment, rather
+  than evaluating all fields inside call arguments. Actor sl pin and sequential
+  pointer/load lifetimes reached the retained candidate. Decl-swaps and an
+  inlined emitter wrapper did not improve. Full 848-byte recorded comparison
+  is 88.9%, 54 realigned / 24 structural differences (candidate 824 bytes):
+  stack pointer-copy pairs, argument lifetime spills and polar registers remain.
+  Register-pinning marker retained on this guarded draft. Recorded artifacts:
+  build/check/run-o6q9k3cj. Default assembly fallback checked exact.
+
+All exact sources were formatted with the venv clang-format and checked with
+explicit reviewed target sizes. Drafts use NONMATCHING guards and raw-address
+INCLUDE_ASM fallbacks, and their scores were recorded with --nonmatching --record.
+Useful failed candidates remain outside src/; they are uncommitted scratch,
+not exact progress. Combined ROM validation remains with batch integration.
+
+## Vorn, Slime and Tentacle follow-up — 2026-10-22
+
+Tags: #matching #vorn #slime #tentacle #nonmatching #register-pinning
+
+Worked solo and offline in the preclaimed checkout. New exact C covers 18.41%
+of the 17 assigned body/pool extents, a +18.41 percentage-point gain (1,784
+of 9,688 bytes). Eight matches and one guarded draft were committed separately
+through build/commit.sh. Seven matches use no hints; 080A62DC is in the
+Register-pinned category (716 bytes). No make, full build, network operations,
+direct git mutations, shared-header changes or generated-file edits.
+
+Read the entry-point guidance, WORKER/CLOUD, BIG_FUNCTIONS, git log and previous
+codex-medium notes. All 17 target addresses lack entries in functions.csv;
+new aliases follow the existing Vorn, Slime and TentacleBody prefixes. Names
+are provisional with confidence comments. Fast checks below used reviewed
+full body/pool extents. The exact code was formatted with venv clang-format.
+
+- **080B2354 matched — Vorn_UpdateDelayedScript, 76 bytes.** Reads actor
+  context+624 script key, increments byte elapsed at 627, compares duration at
+  626, invokes Script_Call(key, NULL), and clears key/duration/elapsed when
+  elapsed reaches duration. Initially described in commentary as a sound
+  callback, corrected after decoding its call to Script_Call (0821AD08).
+  This independently split entry is byte data in gen/code.s; inspected its
+  Thumb instructions with capstone without editing generated assembly.
+  A narrow typed context reproduces its address derivations. No hints.
+  Final exact artifacts: build/check/run-hh3dc1oq.
+- **080B3BD0 matched — Vorn_BeginContactAnimation, 76 bytes.** When actor+5CA
+  is zero and flags2E6 bit 8 is set, sets a 45-frame timer, 5CA=65 and selects
+  directional animation three. Then returns the byte result of
+  SceneActor_DispatchContextAction(actor, 0). Read caller 080B3E58 and the
+  dispatcher before choosing the tentative name. No hints.
+  Final exact artifacts: build/check/run-qijsdj4l (also run-78q64zgq).
+- **080B41A0 matched — Vorn_LatchForeignPosition, 96 bytes.** Availability
+  predicate rejects actor flags2D4 bit 40, flags2D0 bit 20000 or health <=0.
+  For a message whose second halfword differs from actor id at 50, sets
+  context+6C0 to one. Read the message senders 080B4134/080B416C and callback
+  table; reused SceneActorPlacement_IsUnavailable. No hints.
+  Final exact artifacts: build/check/run-jpzbulx9.
+- **080B4200 matched — Vorn_ClearForeignPosition, 96 bytes.** Same message
+  identity/availability guards as 080B41A0, clears context+6C0 instead. The
+  predicate's zero return is naturally reused for the store. No hints.
+  Final exact artifacts: build/check/run-kdmc8bm4.
+- **080B4260 matched — Vorn_RestoreControlAfterItemLaunch, 208 bytes.** Takes
+  queued flag 2B1, invokes SceneActor_TryLaunchItem13 on context, sets context
+  response 67C to FFFF, consumes the trigger and restores savedTarget as
+  control kind zero with state/phase/behavior 2/0/2. Otherwise increments
+  counter2AC. Ghoul_UpdateSpecialActionControl supplied the reset pattern.
+  A typed context response field removes the raw-cast store's extra constant
+  copy; otherwise exact immediately. No hints. Final: build/check/run-1sa0t_vq.
+- **080B54DC matched — Vorn_HasActiveResponse, 64 bytes.** Context response
+  flag 6D4 bit one or signed field67C >=0 returns one, otherwise zero. Used
+  by the Vorn reaction/route callbacks. A u8 inline flag predicate reproduces
+  the materialized boolean. No hints. Final: build/check/run-czpniplx.
+- **080B3E58 matched — Vorn_SelectHitRecovery, 452 bytes.** Clears context
+  flag eight, optionally plays variant hit sound 211/1CB, rejects flags8002,
+  installs reaction control for field2DC mask C0000, or dispatches context
+  action / selects pursuit versus retreat using context foreign-position
+  latch 6C0. Read Mimic_StartHitReaction for the reset pattern and retained
+  the original context argument to 080B3BD0. Explicit wide mask locals,
+  separate byte zero, pointer-before-mask setup, and a reused foreign-value
+  local improved 88.7% to exact. Temporary hints identified two allocation
+  issues; depin removed all four hints while preserving the match.
+  Final exact artifacts: build/check/run-_tp9cv2a.
+- **080B3110 stopped below draft threshold — Vorn_BeginResponsePursuit.**
+  Context cooldown69E gates entry; response flag1 requires flag2. Clears
+  collision/motion state, initializes response cooldown and frame698, optionally
+  starts the alternate route, calls 080B1FA8, and installs pursuit behavior15
+  with delayed control 080ADB90. SceneActor_ResetCollisionReaction supplies
+  the reset prefix. Best candidate 67.5%, 99 realigned differences / 39
+  ignoring registers (588-byte reviewed extent; candidate576). Explicit
+  wide flag values and group-relative route indexes improved structure from
+  60 to39, but flag insertion, saved zeros, reset offsets and group/high-register
+  allocation still differ. No production draft. Scratch:
+  wip/mons-next/sub_080B3110.c; build/check/run-yald1dzy.
+- **080B3C1C skipped as previously attempted.** Earlier codex-medium entry
+  records Vorn_AcquireContactTarget at69.9%, persistent pointer/register swaps.
+- **080AD75C skipped as previously attempted.** Earlier codex-medium entry
+  records Vorn_UpdateStaggerRecovery at77.2%, below retention threshold.
+- **080B1FA8 skipped as previously attempted.** Two previous codex-medium
+  attempts document route-point scanning and remaining stack-vector/allocation
+  differences; latest candidate55.2%. No duplicate attempt this round.
+- **0808FA40 skipped as previously attempted.** Immediately preceding round
+  reached71.9% on movement destination selection; outer-loop rotation, terrain
+  pointer reuse and stack slots remained. No duplicate attempt this round.
+- **08090724 drafted80.4% — Slime_EmitScatteredReactionBurst, 884-byte target.**
+  Ported the prior 080903D4 draft after reading the complete target. Three
+  independent random directions add jitter0..15 to angle0..255; speeds are
+  12..19,12..19,6..13 with vertical components48,37,32. Projectile kinds6/7/6
+  and final emission mode1 remain. Preserves the original unused target delta
+  computation before the first random angle. Final candidate848 bytes,95
+  realigned differences /39 ignoring registers. Extra stack pointer-copy pairs,
+  RNG pointer/register lifetimes and polar arithmetic allocation remain.
+  Declaration swaps did not improve. Retains actor sl pin; unguarded depin
+  correctly declined this non-exact base. Score recorded with --nonmatching
+  --record against884 bytes; default assembly fallback checked exact. Final
+  draft artifacts: build/check/run-hkxhzauc. Guarded source committed separately.
+- **080A62DC matched — TentacleBody_UpdateSpreadWindup, 716 bytes.** Entry
+  sets motion flag100000, restarts segment animation18 and sets body8D0 bit2.
+  Clears secondary motion, increases signed field2EA toward200/300 (body8EA
+  selects threshold), backs away at speed1/2 and arranges active segments at
+  distances54,20,0 behind the actor. At threshold installs spread-release
+  control kind39. Read 080A65A8 and shared segment callbacks. Defining segment
+  base3D4, position+1C and flags+105 recovers the original induction variables;
+  segment stride128 and count8DA are retained. A stack struct fixes fill-word,
+  direction-row and direction-flags ordering at sp0/sp4/sp8. Keeping a separate
+  scalar zero across CpuSet improves85.4% to98.3%. Two empty read/write
+  constraints preserve flag-mask and CpuSet-source scheduling; depin reduced
+  eight hints to two (no hard register bindings remain). Register-pinning
+  concession marker retained. Final exact artifacts: build/check/run-gwf10ica.
+- **080A71A0 stopped below threshold — TentacleBody_UpdateSegmentRetraction.**
+  Removes excess trail segments based on health/body8EB, sets motion flags,
+  retracts coordinate pairs310/318 and314/31C using signed quarter deltas
+  clamped to200, and restores idle control/behavior5 at rest. Clean first
+  candidate59.1% had136/44 realigned differences; making pointer arguments
+  explicit and retaining flag/velocity addresses raised coarse similarity to
+  66.4% but worsened structure (128/81). Pinning the observed high-register
+  pointers worsened to52.7%; retained the clean structure candidate in
+  build/mons-a71a0-clean.c and pointer experiments under build/. No source draft.
+  Reviewed target532 bytes. Main issue is eight address lifetimes hoisted
+  across entry, plus separate byte/word zero and state-reset allocation.
+- **080A9BD8 stopped below threshold — TentacleBody_InterpolateSegmentPositions.**
+  Copies endpoints, computes step1024/(last-first+1), and fills intermediate
+  position records at3F0+index*128 using signed cubic fixed-point arithmetic.
+  Faithful first formula candidate29.7%; reproducing retained zero products
+  with an empty constraint raises to39.0%,204 realigned /47 structural
+  differences (candidate448,target472). The original polynomial's retained
+  zero terms, vector-stack residency and expression lifetimes still need
+  recovery before allocation work. No production draft. Scratch:
+  wip/mons-next/sub_080A9BD8.c; build/check/run-n6c_k_17.
+- **080AF2BC skipped as previously attempted.** Earlier codex-medium entry
+  records delayed route recovery below80%, with an ignored candidate retained.
+
+All eight exact sources passed full reviewed-extent per-file checks. Only the
+Slime draft uses a NONMATCHING fallback, and its fuzzy score is not exact credit.
+No totals or shared docs were regenerated; batch ROM validation and alias
+promotion remain with the integrator. Notes are committed through the driver.
+
+## Vorn, Slime and Tentacle body round 3 — 2026-10-22
+
+Tags: #matching #vorn #slime #tentacle #nonmatching #register-pinning
+
+Worked solo and offline in the already claimed checkout. Five exact matches
+recover 7.92% of the bytes still unresolved in the three requested PROGRESS
+rows at session entry, a +7.92 percentage-point gain within that cohort
+(2,612 / 32,980 bytes, after reviewing the spread-release boundary). This is
+cohort progress, not a repository-wide percentage. Three existing guarded
+drafts improved. Register-pinned matches: 080B335C, 080A65A8, 080A69F0
+(1,708 bytes); unpinned matches: 080B0AE8 and 080A6F50 (904 bytes).
+
+No make, full build, network operation, direct git mutation, shared-header
+change or generated-file edit. All commits used build/commit.sh. Read the
+entry-point docs, CLOUD, WORKER, CANDIDATES, BIG_FUNCTIONS, local history and
+previous codex-medium attempts. Reused functions.csv names. Tentacle actor's
+separate PROGRESS row was outside this round's body-family assignment.
+
+### Exact matches
+
+- **080B0AE8 matched — SceneActorPhase_TryBeginSpecialMotion, 336 bytes.**
+  Availability, field682=1, control-kind and motion/context flag guards install
+  behavior24 and scripted-animation motion kind41. The context predicate now
+  returns its field pointer through an out parameter, preserving the load/and/
+  pointer-copy order. Explicit callback-slot and callback locals recover the
+  duration-store scheduling. Removed the previous draft's output-only empty
+  constraint for an otherwise unused value. Temporary pins established the
+  desired allocation; depin removed all seven hints. No concession remains.
+  Formatted reviewed-extent exact check: build/check/run-sy6c3jci.
+- **080B335C matched — SceneActor_IsFacingNearbyTarget, 124 bytes.** Rejects
+  context cooldown6E8, motion flag100 and distance aboveFFFF; wraps the heading
+  difference and accepts magnitude <=18. Pass the actor to the mask accessor,
+  rather than an already formed field pointer. One empty read/write constraint
+  on its mask fixes constant scheduling and prevents reuse of that constant
+  for the later heading adjustment. depin removed three of four hints; no hard
+  register binding remains. Register-pinned category. Formatted exact check:
+  build/check/run-xo4xdwse.
+- **080A6F50 matched — TentacleBody_UpdateAttackRecovery, 568 bytes.** Selects
+  profile entry44, resets segment animations18 and updates their movement;
+  after40 frames selects entry38, refreshes animations15 and marks completion.
+  Removing both restart and saved-selection pointer locals from the inlined
+  animation selector makes it access the actor fields at each use. This removes
+  redundant PRE copies, taking92.4% to99.3% to exact. depin removed the existing
+  entry-table r10 pin. No concession remains. Formatted exact check:
+  build/check/run-gw9ntut9.
+- **080A65A8 matched — TentacleBody_UpdateSpreadRelease, 776 bytes.** Shared
+  spin/velocity calculation places enabled segments54/20/0 behind the actor;
+  after the body8E6 duration marks completion, switches movement mode to2 and
+  clears body flag2; otherwise updates segment movement. Keep the direction
+  field pointer in a block through scale calculation, then assign the ordinary
+  saved pointer after it. This produces the single late stack spill. depin
+  reduced four hints to two empty constraints (negative-direction pointer and
+  scale mask), removing all hard bindings. Register-pinned category. Formatted
+  exact check: build/check/run-4_he5wzc.
+  **Extent finding:** PROGRESS's1096-byte row includes a separate function at
+  080A68B0. That byte-encoded tail starts push{r4,r5,r6,lr}, has its own frame,
+  calls and return, and ends at080A69F0. The spread-release return/pool ends at
+  080A68B0. Its old80.5% recorded draft was96.9% against the reviewed776 bytes.
+  No generated assembly or function boundaries were changed. The integrator
+  should preserve/review the independent080A68B0 tail; it is not exact C credit.
+- **080A69F0 matched — TentacleBody_UpdateChargeSpread, 808 bytes.** Same
+  segment spreading, then after60 frames installs directed-attack control kind36.
+  The direction-pointer lifetime change from080A65A8 fixes selection and
+  scheduling. A single empty r8 clobber before the prepared-flag test selects
+  body sb / index-base r8, instead of the swapped high registers. depin reduced
+  five hints to two: that clobber and the scale-mask constraint. No hard variable
+  binding remains. Register-pinned category. Formatted exact check:
+  build/check/run-_8wq_ix3.
+
+### Improved guarded drafts
+
+- **080AD530 drafted99.3% — Vorn_ResumeRouteAfterDelay**, up from94.5%.
+  A u32 motion-mask accessor fixes result-register tying; a context-pointer
+  predicate places its mask before the load. An empty constraint on a scoped
+  group-pointer copy prevents folding group+208 into actor+5DC. The remaining
+  two realigned instruction differences / eight differing bytes are one mask
+  load scheduled after the field load. Generic and fixed-register mask barriers
+  changed zero/flag pointer allocation and regressed; retained the99.3% form.
+  No hard bindings. Register-pinning marker retained on this guarded draft.
+  Recorded reviewed556-byte check: build/check/run-1iisyk53. Default fallback
+  checked exact: build/check/run-b3ewusk3.
+- **080B3ADC drafted99.1% — SceneActor_DispatchContextAction**, from98.3%.
+  Scoped incoming actor r3, followed by an ordinary saved pointer and a separate
+  constrained working pointer, fixes the initial register-copy directions.
+  The remaining two differing bytes are the reset-argument save scheduled
+  before, rather than after, the incoming actor copy. Simultaneous operands,
+  fixed reset r1 and r5 clobbers regressed. Difference-byte count is unchanged;
+  this is a source/allocation improvement, not exact credit. Added the required
+  file-local alias. Final score recorded against244 bytes; default fallback
+  checked exact: build/check/run-598u6pp3.
+- **0808EC80 drafted98.9% — Slime_ConvergeReactionMotion**, from96.7%.
+  An empty r1 clobber in the at-rest completion block raises its temporary
+  allocation to the original registers. Four bytes / four register-only insns
+  remain: completion-field offset and ready-field pointer register choices.
+  Raw offset pins disturb CSE and earlier convergence code; moving the clobber
+  earlier loses its benefit. Retained original context/sequence/rest pins and
+  added the required alias. Recorded728-byte check: build/check/run-4zbsq13g.
+  **Fallback detail:** retain the original named INCLUDE_ASM token. Both named
+  and raw generated files exist, but the stale raw copy references sub_0808E660
+  without its Thumb bit in the standalone checker. The current named copy uses
+  Slime_RollMoveFlag correctly. Restoring that named token makes the default
+  fallback exact (build/check/run-nun86i3c), without touching generated files.
+
+### Other attempted drafts and stopping points
+
+Read the existing sources and retained their bodies after bounded allocation
+experiments. Adjacent declaration swaps did not improve any of the following;
+variant sources/results remain under build/variants/ and wip/mons-r3/.
+Realigned counts below are structural / total from those comparisons; their
+recorded production scores were not changed.
+
+- **080B2580 retained draft94.5% — Vorn_SelectReachableEscapeCell.** 8/23;
+  stack-slot order, width-load rematerialization and pool placement remain.
+- **080B2858 retained draft90.7% — Vorn_SelectRetreatRoute.** 33/90;
+  reset offsets, terrain helpers and route/control pointer lifetimes remain.
+- **080B2EEC retained draft89.2% — SceneActor_TrySoloAction.** 6/22;
+  unavailable-predicate offset derivation, context-mask scheduling, timer copy
+  and state-reset offset registers remain.
+- **080B162C retained draft88.1% — Vorn_TryUphillRoute.** 15/50;
+  terrain-vector/predicate pointers and reset address lifetimes remain.
+- **080B3464 retained draft87.8% — Vorn_ResumeRouteAfterReaction.** 70/113;
+  repeated Resume inlines and callback/flag address derivations remain.
+- **080AE6F0 retained existing draft.** Current standalone baseline82.8%,
+  21/57; saved zero/context flags/control-reset scheduling remain. Did not
+  overwrite its prior recorded83.9% merely to reflect the baseline discrepancy.
+- **080AEE08 retained draft83.4% — Vorn_UpdateDefeat.** 9/84;
+  RNG literal/pointer copies and final control-state allocation remain.
+- **080B23A0 retained draft83.4% — Vorn_BeginPursuitRoute.** 19/40;
+  route/context flag updates and reset constants remain.
+- **080AE1C4 retained existing draft.** Current standalone baseline81.2%,
+  36/113; collision/motion pointer reuse and reset scheduling remain. Did not
+  overwrite its prior recorded82.1% based on declaration trials.
+- **080AEB74 retained draft80.2% — Vorn_TryRestorePatrolRoute.** 32/67;
+  destination stack spill and reset pointer/saved-motion lifetimes remain.
+- **08090B4C retained draft91.5% — Slime_ResolveDamageReaction.** 8/31;
+  reaction-field addresses, RNG compare and control-reset allocation remain.
+- **08090160 retained draft91.0% — Slime_EmitDeathDebris.** 11/31;
+  palette-pointer hoists, polar temporaries and zero-index registers remain.
+- **080903D4 retained draft88.9% — Slime_EmitTargetedReactionBurst.** 24/54;
+  argument-pointer stack copies and polar arithmetic allocation remain.
+- **0808E2CC retained draft88.1% — Slime_ResolveBodyContact.** 4/45;
+  reviewed the missing incoming actor/health copy and vector-pointer copies;
+  declaration order did not repair them.
+- **08090724 retained draft80.4% — Slime_EmitScatteredReactionBurst.** 39/95;
+  RNG/argument stack residency and polar temporaries remain.
+- **080A6D18 retained draft89.0% — TentacleBody_BeginDirectedAttack.**
+  21/41; tried the exact recovery selector's direct restart/selection accesses
+  and flags-test spelling as well as declaration order. They did not improve
+  this single-selector case. Body/flags/control-reset allocation remains.
+
+### Initializer recovery and previous skips
+
+- **08090FEC stopped below threshold — Slime_Init.** Recovered the full
+  initializer into ignored scratch, including both drawable forms, script
+  options a/e/l/A/X/p/j, terrain placement, palette handling, callback table,
+  snapshot fields and link result. Reused the shared terrain and animation
+  sequence layouts. Full3632-byte comparison43.8%, candidate3132,
+  999 structural /1338 total realigned differences (build/check/run-2g11lxs4).
+  Reifying the many constant field addresses as function-scope pointer locals
+  grew the frame/body but worsened to39.5%,1164/1498. Restore the baseline
+  build/slime-init-baseline.c for continuation; the pointer-local experiment
+  is wip/mons-r3/sub_08090FEC.c. No production draft. The compiler's numerous
+  hoisted field addresses/spills need a closer source layout before allocation.
+- **080B43BC stopped at partial recovery — Vorn_Init.** Read its1861-insn
+  body, related initializers/terrain/animation helpers, and condensed listing.
+  Recovered initialization of the actor/profile, nine Vorn option/setup calls,
+  both drawable allocations, flags, M/N options and the four stat tuples in
+  wip/mons-r3/sub_080B43BC.c. This is explicitly incomplete: route construction,
+  extended reaction callback installation and initial action controls still
+  need transcription. A full4332-byte check of that508-byte prefix cannot
+  establish progress (build/check/run-vgnpydkh); no production draft or useful
+  whole-function fuzzy score is claimed. Static recovery identifies l's third
+  value as group+42, n's pair as group+4C/+4E, and r's route descriptor at
+  group+74. The nearest exact relative covers only11%; Ghidra export is absent.
+- **080AD75C,080ADB90,080AF2BC,080B0038,080B03BC,080B197C,080B1FA8,
+  080B3110,080B3C1C,0808FA40,080A71A0:** skipped repeated sub-threshold
+  searches documented in the preceding codex-medium rounds. Their retained
+  candidates and stopping reasons remain there; no duplicate drafts committed.
+- All other addresses in the three requested PROGRESS rows were already exact
+  in this worktree before this round and were skipped after source/history
+  inventory. No Tentacle actor functions were added to the assignment.
+
+Every newly exact source was formatted and passed a reviewed-full-extent fast
+check after depin. All three changed guarded drafts retain assembly defaults;
+those defaults were checked exactly. Scratch initializers and failed variants
+are not production C or exact progress. Full ROM validation, alias promotion,
+tail-boundary review, progress/index regeneration and batch integration remain
+with the integrator. Notes are committed through build/commit.sh.

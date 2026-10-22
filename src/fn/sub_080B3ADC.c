@@ -3,8 +3,8 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 98.3%
-// Remaining: pointer copies land in r4/r3 instead of r3/r4, and one constant load is scheduled later.
+// fuzzy: 99.1%
+// Remaining: the incoming reset argument is saved before the actor pointer.
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_BeginPursuitRoute(void *, u32);
@@ -29,14 +29,21 @@ static inline u8 TestValue(u32 value)
         return 1;
     return 0;
 }
+#define SceneActor_DispatchContextAction sub_080B3ADC
+
 u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32 reset)
 {
     struct SceneActorRegistryResetView *q;
-    struct SceneActorRegistryResetView *p = p0;
+    struct SceneActorRegistryResetView *p;
     u16 *flags;
     u32 first;
-    asm("" : "+r"(p));
-    q = p;
+    {
+        register struct SceneActorRegistryResetView *input asm("r3") = p0;
+        asm("" : "+r"(input));
+        q = input;
+    }
+    p = q;
+    asm("" : "+r"(q));
     if (TestActor(p, 1)) {
         if (reset == 1) {
             u32 mask = 2;
@@ -73,5 +80,5 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SceneActor_DispatchContextAction);
+INCLUDE_ASM("asm/nonmatching", sub_080B3ADC);
 #endif
