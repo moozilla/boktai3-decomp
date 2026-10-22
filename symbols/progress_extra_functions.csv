@@ -24,6 +24,8 @@ address,evidence
 08013B2C,ScaledShadow default init with caller sizes then graphic frame 7; part of the raw 08013AB4-08013B74 span
 08013BDC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08013F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08014C28,ParticleManager clear: removes every live effect in the six particle groups and clears their flags; raw 08014C28-08014CA4 span
+08014C98,Clears the gUnk_02000064 pointer; leaf at the end of the raw 08014C28-08014CA4 span
 08015154,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08015A0C,Independent Thumb function prologue after 136-byte ring emission wrapper; retained unmatched byte tail
 08015B1C,Independent 104-byte fan emission wrapper after volume emitter and its literal pool
