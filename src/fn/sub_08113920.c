@@ -2,7 +2,7 @@
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
-// fuzzy: 95.4%
+// fuzzy: 96.6%
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
@@ -186,6 +186,10 @@ static inline u32 TrailRandom(void)
     asm("" : "+r"(value));
     return value;
 }
+static inline u8 Odd(u32 t)
+{
+    return t & 1;
+}
 // confidence=low: horizontal motion accelerates and leaves a short particle trail.
 void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
 {
@@ -204,7 +208,7 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
     Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->height);
     SpatialIndex_InsertEntry(p->collider);
     p->velocity.x += p->direction << 9;
-    if (p->timer <= 9 && (p->timer & 1)) {
+    if (p->timer <= 9 && Odd(p->timer)) {
         struct {
             u32 x : 16, y : 16, z : 16, pad : 16;
         } offset;
