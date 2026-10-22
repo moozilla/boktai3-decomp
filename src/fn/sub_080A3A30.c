@@ -1,7 +1,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.1%
+// fuzzy: 90.5%
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
@@ -72,7 +72,6 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     u8 ready;
     register void **mesh asm("sl");
     struct ContactPosition **point;
-    struct ContactPosition *source;
     void *terrain, *dest;
     s32 result;
     if (Blocked(a))
@@ -86,8 +85,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
         return;
     mesh = (void **)(group + 0x1FC);
     asm("" : "+r"(mesh));
-    source = &a->position;
-    if (!Nav_IsPositionInMesh(*mesh, source, gUnk_02000580 + 0x30))
+    if (!Nav_IsPositionInMesh(*mesh, &a->position, gUnk_02000580 + 0x30))
         return;
     point = (void *)(group + 0x200);
     **point = a->position;
@@ -97,8 +95,8 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     SetControl(a, a->entryTarget228, 1);
     terrain = *mesh;
     dest = (void *)(a->fieldDC + 12);
-    if (Nav_IsPositionInMesh(terrain, source, dest) &&
-        (result = Terrain_ApplyBlocked(terrain, source, dest))) {
+    if (Nav_IsPositionInMesh(terrain, &a->position, dest) &&
+        (result = Terrain_ApplyBlocked(terrain, &a->position, dest))) {
         if (result != 2)
             Memory_Clear(&a->motion, 8);
     } else {
