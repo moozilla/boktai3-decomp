@@ -1,10 +1,9 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Armor_BeginPartTravelToPlayer sub_0818CC48
-#define gPlayerObject                 gUnk_02000710
-#define gRandomTableIndex             gUnk_03005308
-#define gRandomTable                  gUnk_0203B400
+#define gPlayerObject     gUnk_02000710
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
 struct ArmorTravelTarget {

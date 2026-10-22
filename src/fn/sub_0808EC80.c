@@ -35,7 +35,6 @@ static inline u8 TestContext(u8 *p, u32 mask)
         return 1;
     return 0;
 }
-#define Slime_ConvergeReactionMotion sub_0808EC80
 
 void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
 {

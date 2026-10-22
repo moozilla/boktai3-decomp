@@ -53,7 +53,6 @@ zero:
     return 0;
 }
 
-#define Dog_OnAttackContact sub_080DFA5C
 static inline void Delta(struct ContactPosition *out, struct ContactPosition *to,
                          struct ContactPosition *from)
 {

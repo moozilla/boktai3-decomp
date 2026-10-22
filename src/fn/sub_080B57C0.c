@@ -124,7 +124,6 @@ static inline s32 MotionSquared(struct ContactPosition *p)
     return p->x * p->x + p->y * p->y + p->z * p->z;
 }
 // confidence=low: starts pursuit when stationary, with a six-second cooldown.
-#define Skeleton_BeginStationaryPursuit sub_080B57C0
 void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
 {
     u8 *context;

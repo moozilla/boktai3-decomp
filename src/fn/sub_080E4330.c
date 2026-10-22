@@ -11,10 +11,9 @@ struct DogAttackContext {
     u8 unknown6A0[7];
     u8 emitted;
 };
-#define FIELD(p, n, T)        (*(T *)((u8 *)(p) + (n)))
-#define Dog_UpdateTrailAttack sub_080E4330
+#define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 void SceneActorAnimation_EmitDirectionalTrail(void);
-void sub_080DF400(struct SceneActorRegistryResetView *);
+void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *);
 static inline void And32(u32 *p, u32 mask)
 {
     *p &= mask;
@@ -67,11 +66,11 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
             u32 mask = ~0x100;
             *flags = mask & *flags;
         }
-        sub_080DF400(a);
+        Dog_SelectRetreatOrChase(a);
     } else
         a->counter2AC++;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080E4330);
+INCLUDE_ASM("asm/nonmatching", Dog_UpdateTrailAttack);
 #endif

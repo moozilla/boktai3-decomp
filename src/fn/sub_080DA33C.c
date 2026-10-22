@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 // confidence=low: refreshes the nearby route heading after the context cooldown expires.
-#define BouncingObject_RefreshNearbyHeading sub_080DA33C
 
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *);
 void SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *);

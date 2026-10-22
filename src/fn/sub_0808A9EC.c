@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: sets a timed route-return command and validates the current contact target.
-#define Ghoul_ResumeContactRoute sub_0808A9EC
 struct GhoulSavedAction {
     u8 pad[8];
     u8 state, phase, behavior, padB;

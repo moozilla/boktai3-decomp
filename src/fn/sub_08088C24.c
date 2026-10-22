@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 // confidence=low: reacts to the context probe flag and enters behavior 15 after clearing it.
-#define Bat_UpdateProbeReaction sub_08088C24
 void sub_0808AF38(struct SceneActorRegistryResetView *);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
 {

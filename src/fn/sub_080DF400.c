@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
-#define FIELD(p, n, T)           (*(T *)((u8 *)(p) + (n)))
-#define Dog_SelectRetreatOrChase sub_080DF400
+#define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
 u8 sub_080DEF78(struct SceneActorRegistryResetView *, u32);
 u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
@@ -63,4 +62,3 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
     }
     Chase_SetCtl(a, SceneActorMotion_TestTargetTransition, 0x2B);
 }
-

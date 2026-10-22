@@ -31,7 +31,6 @@ static inline void Finish(struct PhaseActor *p, u8 one)
     p->flags119 |= one;
     p->update164 = IvyChild_UpdateAfterBob;
 }
-#define Sword_AccelerateReturnTurn sub_080F5620
 void Sword_AccelerateReturnTurn(struct PhaseActor *p)
 {
     struct PhaseParent *parent = p->parent;
@@ -50,5 +49,5 @@ void Sword_AccelerateReturnTurn(struct PhaseActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F5620);
+INCLUDE_ASM("asm/nonmatching", Sword_AccelerateReturnTurn);
 #endif

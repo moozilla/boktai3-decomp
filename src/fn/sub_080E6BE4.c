@@ -5,7 +5,7 @@
 // fuzzy: 84.0%
 void SceneActor_EnterShadowlessPhase(void);
 void SceneActorControl_OnIdle(void);
-u8 sub_080E8444(void *);
+u8 SceneActor_IsCollisionTargetUnavailable(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 static inline u8 TestContext(u8 *context, u32 mask)
 {
@@ -30,7 +30,7 @@ void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
                 Chase_SetBehavior(actor, 0);
             } else
                 Chase_SetBehavior(actor, 15);
-        } else if (sub_080E8444(actor)) {
+        } else if (SceneActor_IsCollisionTargetUnavailable(actor)) {
             Chase_SetState(actor, 3, 0, 0);
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 16);
             *(u16 *)(group + 0x44) = 0;

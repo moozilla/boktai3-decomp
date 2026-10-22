@@ -49,7 +49,6 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-#define TentacleActor_ResolveBlockedMovement sub_080AB04C
 void TentacleActor_ResolveBlockedMovement(struct SceneActorRegistryResetView *actor)
 {
     u8 *trail;

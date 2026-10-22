@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActorControl_ApplyDampedMotion sub_080FA214
 #ifdef NONMATCHING
 // fuzzy: 94.3%
 // Remaining: counter offset is kept in sb across Mod rather than rematerialized at the final store.
@@ -43,5 +42,5 @@ void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *act
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080FA214);
+INCLUDE_ASM("asm/nonmatching", SceneActorControl_ApplyDampedMotion);
 #endif

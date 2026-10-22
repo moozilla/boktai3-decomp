@@ -147,7 +147,6 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
         }
     }
 }
-#define TentacleBody_RestartSegmentAnimations sub_080A93F4
 void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32 flagsIn)
 {
     u8 *body = input;

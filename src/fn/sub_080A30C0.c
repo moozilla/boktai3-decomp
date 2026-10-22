@@ -56,8 +56,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *target)
     a->word104 = 0;
 }
 // confidence=low: updates probe navigation and switches between turn, approach, and idle behaviors.
-#define Spider_UpdateProbeNavigation sub_080A30C0
-void sub_080A4018(void *);
+void Spider_UpdateWanderGoal(void *);
 struct SpiderProbeFlags {
     s16 bits : 16;
 };
@@ -121,7 +120,7 @@ void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
     else
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
     if (!GetFlags(actor, 0x4000, &flags) && !HasFlag(actor->context, 4))
-        sub_080A4018(actor);
+        Spider_UpdateWanderGoal(actor);
     nav += 0x1FC;
     probe = NavMesh_ConsumeProbeEvent(FIELD(nav, 0, void *));
     if (!probe) {

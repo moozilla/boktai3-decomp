@@ -1,5 +1,4 @@
 #include "global.h"
-#define Axe_UpdateOrbitAttack sub_080F79A8
 #ifdef NONMATCHING
 // fuzzy: 91.0%
 // Remaining: polar address reuse, signed RNG/direction loads, collider loop allocation and phase-tail scheduling.
@@ -248,5 +247,5 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F79A8);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateOrbitAttack);
 #endif

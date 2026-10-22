@@ -160,7 +160,8 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
 }
 void Crow_UpdateDirectionalPose(void *);
 void Sound_PlaySong(u32);
-static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u32 phase, u32 behavior)
+static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u32 phase,
+                            u32 behavior)
 {
     a->state2A8 = state;
     a->phase2A9 = phase;
@@ -179,7 +180,6 @@ static inline u8 BodyFlag(u8 *body, u32 mask)
     return Test(*(u32 *)(body + 0x3d4), mask);
 }
 // confidence=low: advances a directed response, then recoils when it reaches the player or terrain.
-#define Crow_ApproachPlayerThenRecoil sub_080A0E00
 void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -193,7 +193,8 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         Fill(body + 0x42c, zero, 0);
         Delta(&delta, &actor->position, saved);
         actor->direction = Math_Atan2(delta.x, delta.z);
-        *(s16 *)(body + 0x42c) = Shift(gUnk_086149C4[(actor->direction + 64) & 255] * body[0x3d9], 12);
+        *(s16 *)(body + 0x42c) =
+            Shift(gUnk_086149C4[(actor->direction + 64) & 255] * body[0x3d9], 12);
         {
             register s32 depth asm("r1") = Shift(gUnk_086149C4[actor->direction] * body[0x3d9], 12);
             asm("" : "+r"(depth));
@@ -230,5 +231,5 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A0E00);
+INCLUDE_ASM("asm/nonmatching", Crow_ApproachPlayerThenRecoil);
 #endif

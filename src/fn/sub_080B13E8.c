@@ -32,7 +32,6 @@ done:
     return height;
 }
 // confidence=low: biases turn weights toward a neighboring cell with higher terrain.
-#define Vorn_SelectUphillTurn sub_080B13E8
 s32 Vorn_SelectUphillTurn(struct VornTerrainChoice *context, struct ContactPosition *position)
 {
     struct VornProbe probe;

@@ -19,7 +19,6 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask)
 {
     return s->flags2D4 & mask;
 }
-#define SceneActorControl_UpdateHeightReturn sub_080A11F4
 void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
 {
     s32 delta;

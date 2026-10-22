@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: animation 11 is the route-arrival reaction selected by Dog_ResumeRoute.
-#define Dog_UpdateArrivalAnimation sub_080E04D0
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {

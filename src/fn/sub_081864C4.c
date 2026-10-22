@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Armor_UpdateAction10Sequence sub_081864C4
 struct S {
     u8 f[0xB3D];
     u8 st;

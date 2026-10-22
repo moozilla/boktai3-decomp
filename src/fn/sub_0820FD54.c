@@ -1,5 +1,4 @@
 #include "global.h"
-#define PinkSpine_RecordDefeat sub_0820FD54
 struct Args {
     s32 x, y, z, a, b, c, d, e;
 };

@@ -15,7 +15,6 @@ struct PlayerFlags {
 extern struct PlayerFlags *gUnk_02000580[];
 extern u32 gUnk_02000560[];
 // confidence=low: tests whether the collision target is absent or its player is unavailable.
-#define SceneActor_IsCollisionTargetUnavailable sub_080E8444
 u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
 {
     struct Target *target = actor->target;

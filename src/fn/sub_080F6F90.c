@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
-#define Sword_InitAttackComponents sub_080F6F90
 
 // confidence=low: initializes the four active sword attack components.
 

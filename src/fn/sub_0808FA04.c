@@ -3,7 +3,6 @@
 s32 Mod(s32, s32);
 extern const u16 gUnk_08605D58[];
 // confidence=low: emits the profile's six-frame movement pulse at animation frame boundaries.
-#define Slime_GetAnimationMovePulse sub_0808FA04
 s32 Slime_GetAnimationMovePulse(struct SceneActorRegistryResetView *actor)
 {
     struct DisplaySequenceState *sequence =

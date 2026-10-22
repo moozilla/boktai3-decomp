@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: restarts saved control or advances behavior after callbacks complete.
-#define SceneActorControl_RestartOrAdvance sub_0808A430
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);

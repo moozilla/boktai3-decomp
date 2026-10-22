@@ -69,7 +69,6 @@ static inline u32 TurnFlags(u16 *field, u32 mask)
     return *field & mask;
 }
 // confidence=low: rotates the Ghoul toward the route point facing using animation nine.
-#define Ghoul_TurnTowardRoute sub_08086400
 void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = (u8 *)actor + 0x50;
@@ -191,5 +190,5 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08086400);
+INCLUDE_ASM("asm/nonmatching", Ghoul_TurnTowardRoute);
 #endif

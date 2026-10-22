@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define TargetMotion_AdvanceFollowSegment sub_080F5B68
 
 struct TargetMotion {
     u8 unknown0[6], rotation, unknown7[0x15];

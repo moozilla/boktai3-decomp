@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 // confidence=low: selects attack bounds and properties from mummy movement flags.
-#define Mummy_UpdateAttackCollider sub_080D7F50
 void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
 static inline u8 Unavailable(u8 *input)
 {

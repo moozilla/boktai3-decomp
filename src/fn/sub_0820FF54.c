@@ -1,5 +1,4 @@
 #include "global.h"
-#define PinkSpine_InitCollider sub_0820FF54
 struct H {
     u32 lo : 16;
     u32 hi : 16;

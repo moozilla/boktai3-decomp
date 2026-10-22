@@ -3,7 +3,6 @@
 #include "engine.h"
 
 // confidence=low: initializes scripted cooldown lengths and the health threshold.
-#define Axe_InitAttackCooldowns sub_080FAFD0
 
 struct Q080FAFD0 {
     u8 filler[0xeb4];

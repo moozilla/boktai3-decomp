@@ -12,7 +12,7 @@ void Golem_ResetIdleControl(u8 *);
 void Camera_RequestShake(u32);
 void Skeleton_TryTriggerAction(void *);
 void Skeleton_ClearPendingFlag(void *);
-void sub_080C53A8(void *);
+void Golem_UpdateAttackProperties(void *);
 
 inline static u8 TakeFlag(u8 *p)
 {
@@ -583,7 +583,6 @@ static inline void DelayedRecovery_PrepareDelay(u8 *group, void *callback, u32 b
     saved->behavior = behavior;
 }
 // confidence=low: waits for a recovery delay, then restores chase or return-home movement.
-#define Golem_ResumeDelayedRoute sub_080CBF24
 void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
@@ -625,7 +624,7 @@ waiting:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080CBF24);
+INCLUDE_ASM("asm/nonmatching", Golem_ResumeDelayedRoute);
 #endif
 
 void Golem_InitActionHandlers(struct SceneActorRegistryResetView *actor)
@@ -664,6 +663,6 @@ s32 Golem_UpdateEffectsAndContacts(struct SceneActorRegistryResetView *actor)
     }
     Skeleton_TryTriggerAction(actor);
     Skeleton_ClearPendingFlag(actor);
-    sub_080C53A8(actor);
+    Golem_UpdateAttackProperties(actor);
     return 1;
 }

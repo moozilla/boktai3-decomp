@@ -120,7 +120,6 @@ static inline void StepSequence(void *obj)
 }
 
 // confidence=low: clears context timers, selects idle animation, and advances its first frame.
-#define Slime_ResetIdlePlayback sub_0808F8C8
 void Slime_ResetIdlePlayback(struct SceneActorRegistryResetView *actor)
 {
     struct SlimeAnimationContext *context = actor->context;

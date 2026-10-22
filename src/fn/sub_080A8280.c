@@ -11,7 +11,6 @@ void CpuSet(const void *, void *, u32);
 void sub_0809345C(void *, void *);
 void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
-#define TentacleBody_ReturnToCellCenter sub_080A8280
 #ifdef NONMATCHING
 // fuzzy: 90.3%
 // Remaining differences: segment address lifetimes and register allocation.
@@ -206,5 +205,5 @@ void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A8280);
+INCLUDE_ASM("asm/nonmatching", TentacleBody_ReturnToCellCenter);
 #endif

@@ -2,7 +2,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 // confidence=low: recoil callback selects animation 15 and completes after sixty ticks.
-#define Ghost_UpdateRecoilAnimation sub_08096000
 void Ghost_UpdateRecoilAnimation(struct SceneActorRegistryResetView *actor, s32 tick)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B2))

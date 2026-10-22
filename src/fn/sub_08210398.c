@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define PinkSpine_UpdateDamageAnimation sub_08210398
 #ifdef NONMATCHING
 // fuzzy: 90.7%
 // Remaining: pause branch layout, flags allocation and the defined callback return differ.
@@ -75,5 +74,5 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08210398);
+INCLUDE_ASM("asm/nonmatching", PinkSpine_UpdateDamageAnimation);
 #endif

@@ -1,5 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#define SceneActorPlacement_BeginDefaultResponse sub_080A497C
 #include "scene_actor_reset.h"
 
 static inline u32 TestResponse(struct SceneActorRegistryResetView *p)
@@ -73,9 +72,11 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
             asm("" : "+r"(phaseOffset));
             *((u8 *)p + phaseOffset) = byteZero;
             stateOffset += 2;
-            { register u8 *field asm("r0") = (u8 *)p + stateOffset;
-              asm("" : "+r"(field));
-              *field = byteZero; }
+            {
+                register u8 *field asm("r0") = (u8 *)p + stateOffset;
+                asm("" : "+r"(field));
+                *field = byteZero;
+            }
             offset = 0x2AC;
             *(u32 *)((u8 *)p + offset) = zero;
             phaseOffset += 8;

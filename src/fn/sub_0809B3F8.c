@@ -98,7 +98,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 }
 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
-#define Lun_TurnTowardSavedDirection sub_0809B3F8
 void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
 {
     u8 *motion = (u8 *)actor + 0x50;
@@ -159,5 +158,5 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809B3F8);
+INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
 #endif

@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 Div(s32, s32);
-#define Golem_UpdateAttackProperties sub_080C53A8
 static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;

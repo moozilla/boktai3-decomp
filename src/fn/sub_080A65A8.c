@@ -43,7 +43,6 @@ static inline s32 Shift(s32 n, u32 bits)
     return -((-n) >> bits);
 }
 // confidence=low: spreads the body's segments out from the actor's position, then releases.
-#define TentacleBody_UpdateSpreadRelease sub_080A65A8
 
 void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor, s32 frame)
 {

@@ -299,7 +299,6 @@ done:
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: waits sixty updates, then restores chase or saved-route behavior after a response change.
-#define Ghoul_ResumeDelayedChase sub_080898FC
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 struct GhoulResumeAction {
     u8 pad[8];
@@ -363,5 +362,5 @@ increment:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080898FC);
+INCLUDE_ASM("asm/nonmatching", Ghoul_ResumeDelayedChase);
 #endif

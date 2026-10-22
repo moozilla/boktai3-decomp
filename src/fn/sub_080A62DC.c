@@ -55,7 +55,6 @@ static inline void SetBodyFlag(struct TentacleBodyView *body, u32 input)
     *f = mask | *f;
 }
 // confidence=low: winds up a segment-spread attack while backing away from the target.
-#define TentacleBody_UpdateSpreadWindup sub_080A62DC
 void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
 {
     struct TentacleBodyView *body = actor->context;

@@ -21,7 +21,6 @@ static inline s32 ScaleWave(s32 wave)
     return -(-wave >> 12);
 }
 // MATCHING_CONCESSION: register-pinning
-#define SceneActor_EasePlayerHeight sub_080974F4
 void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
 {
     struct ActorHeightOscillation *state = actor->context;

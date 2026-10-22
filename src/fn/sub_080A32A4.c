@@ -1,4 +1,3 @@
-#define SceneActorControl_UpdateEntryWait sub_080A32A4
 #include "scene_actor_reaction.h"
 #include "engine.h"
 /* SceneActorControl_UpdateEntryWait: tentative */
@@ -12,7 +11,10 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
     return 0;
 }
 
-static inline void ClearFlag(u32 *flags, u32 mask) { *flags &= mask; }
+static inline void ClearFlag(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
 static inline void EntryControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
 {
     actor->field2B2 = 1;

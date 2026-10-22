@@ -1,12 +1,11 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 // confidence=low: retries the saved pursuit goal and selects idle behavior on failure.
-#define Mimic_TryPursuitRoute sub_080E80BC
 u8 Mimic_TryPursuitRoute(struct SceneActorRegistryResetView *actor)
 {
     u32 output;
-    u32 result = Chase_TryRoute(actor, *(void **)((u8 *)actor + 0x5D0),
-                               &actor->position, (void *)((u8 *)actor + 0x650));
+    u32 result = Chase_TryRoute(actor, *(void **)((u8 *)actor + 0x5D0), &actor->position,
+                                (void *)((u8 *)actor + 0x650));
     if (result)
         output = 1;
     else {

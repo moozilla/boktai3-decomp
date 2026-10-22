@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-#define SceneActorPhase_TryBeginSpecialMotion sub_080B0AE8
 void Vorn_UpdateScriptedAnimation(struct SceneActorRegistryResetView *);
 static inline u8 IsUnavailable(void *input)
 {

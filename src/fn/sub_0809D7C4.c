@@ -3,7 +3,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: follows player displacement while the participant-progress control runs.
-#define Lun_FollowParticipantDisplacement sub_0809D7C4
 
 extern u8 *gUnk_02000580;
 void ActorBehavior_TickParticipantProgress(void);

@@ -82,7 +82,7 @@ typedef struct Obj {
     u8 unk3CC;
 } Obj;
 void ActorShadow_Enable(void *);
-void sub_0808ACD4(Obj *);
+void Ghoul_ResetRouteState(Obj *);
 void Sound_PlaySong(u32);
 void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u8 take_flag(Obj *s)
@@ -128,7 +128,7 @@ void Bat_RestoreSavedState(Obj *s)
     if (!peek_flag(s))
         return;
     {
-        sub_0808ACD4(s);
+        Ghoul_ResetRouteState(s);
         s->unk2CC = s->unk118;
         s->unk2D0 = s->unk11C;
         s->unk59 = s->unk120;

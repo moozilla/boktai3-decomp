@@ -36,7 +36,6 @@ void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 // confidence=low: coordinates approach, aligned strike and recovery decisions.
-#define Armor_SelectTimedAttack sub_08186EB4
 void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
 {
     s32 dx, dy, dz, ax, ay, az;
@@ -197,5 +196,5 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08186EB4);
+INCLUDE_ASM("asm/nonmatching", Armor_SelectTimedAttack);
 #endif

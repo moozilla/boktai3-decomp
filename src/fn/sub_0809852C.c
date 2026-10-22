@@ -64,7 +64,6 @@ static inline void Show(struct SceneActorRegistryResetView *input)
     }
 }
 // confidence=low: flickers the drawable and shadow during a pending visibility transition.
-#define Ghost_TickVisibilityTransition sub_0809852C
 void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
 {
     register struct SceneActorRegistryResetView *actor asm("r3") = input;

@@ -3,7 +3,6 @@
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
-#define Vorn_ResumeRouteAfterDelay sub_080AD530
 #ifdef NONMATCHING
 // fuzzy: 99.3%
 // Remaining difference: the route flag mask load is scheduled after the field load.
@@ -62,5 +61,5 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080AD530);
+INCLUDE_ASM("asm/nonmatching", Vorn_ResumeRouteAfterDelay);
 #endif

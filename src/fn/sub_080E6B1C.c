@@ -1,5 +1,4 @@
 #include "scene_actor_chase.h"
-#define Dog_UpdateLeapControl sub_080E6B1C
 void SceneActor_LeapTowardTarget(void);
 void Dog_UpdateLeapControl(struct SceneActorRegistryResetView *a)
 {

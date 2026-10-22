@@ -1,7 +1,6 @@
 #include "scene_actor_chase.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
-#define Spider_UpdateWanderGoal sub_080A4018
 
 #ifdef NONMATCHING
 // fuzzy: 80.3%
@@ -49,8 +48,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     if (Mod(a->counter2AC, 30) == 0) {
         if (ctx->timer > 0)
             goto decrement;
-        target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) +
-                   transform->position.x;
+        target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
         if (!Nav_IsPositionInMesh(*(void **)((u8 *)a + 0x5D0), &a->position, (void *)&target)) {
@@ -91,5 +89,5 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080A4018);
+INCLUDE_ASM("asm/nonmatching", Spider_UpdateWanderGoal);
 #endif

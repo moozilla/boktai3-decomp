@@ -32,7 +32,6 @@ static inline void Delta(struct ContactPosition *v, struct ContactPosition *from
     v->z = to->z - from->z;
 }
 // confidence=low: launches three randomized reaction projectiles in independent random directions.
-#define Slime_EmitScatteredReactionBurst sub_08090724
 #ifdef NONMATCHING
 // fuzzy: 80.4%
 // Remaining differences: pointer spills/copies and random/polar-vector register lifetimes.
@@ -100,5 +99,5 @@ void Slime_EmitScatteredReactionBurst(struct SceneActorRegistryResetView *input)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08090724);
+INCLUDE_ASM("asm/nonmatching", Slime_EmitScatteredReactionBurst);
 #endif

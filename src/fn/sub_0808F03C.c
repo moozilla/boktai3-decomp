@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 void Slime_UpdateStill(void);
-void sub_08090724(void *);
+void Slime_EmitScatteredReactionBurst(void *);
 extern const s16 gUnk_086149C4[];
 struct SlimeDrawable {
     u32 flags;
@@ -63,8 +63,8 @@ void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
     mask = 0x10;
     if (actor->flags2D0 & mask) {
         Chase_SetCtl(actor, Slime_UpdateStill, 0x2C);
-        sub_08090724(actor);
-        sub_08090724(actor);
+        Slime_EmitScatteredReactionBurst(actor);
+        Slime_EmitScatteredReactionBurst(actor);
         Sound_PlaySong(0x3C2);
     }
 }

@@ -1,5 +1,4 @@
 #include "rotation_phase.h"
-#define Axe_UpdateTargetLunge sub_080F8FFC
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 // Remaining: player-vector argument order, flags pointer lifetime, rotation scratch and phase-tail scheduling.
@@ -91,5 +90,5 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080F8FFC);
+INCLUDE_ASM("asm/nonmatching", Axe_UpdateTargetLunge);
 #endif

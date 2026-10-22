@@ -29,7 +29,6 @@ static inline u8 TestValue(u32 value)
         return 1;
     return 0;
 }
-#define SceneActor_DispatchContextAction sub_080B3ADC
 
 u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32 reset)
 {
@@ -80,5 +79,5 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080B3ADC);
+INCLUDE_ASM("asm/nonmatching", SceneActor_DispatchContextAction);
 #endif

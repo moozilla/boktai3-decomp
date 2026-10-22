@@ -120,7 +120,6 @@ static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
     p->update = fn;
     p->timer = zero;
 }
-#define Glove_InitFromScript sub_0811A6C4
 s32 Glove_InitFromScript(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -229,5 +228,5 @@ s32 Glove_InitFromScript(struct Glove *p)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0811A6C4);
+INCLUDE_ASM("asm/nonmatching", Glove_InitFromScript);
 #endif

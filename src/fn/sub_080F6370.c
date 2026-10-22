@@ -1,9 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Sword_UpdateComponentControl sub_080F6370
 void Callback_InvokeActor(void *, void *);
 void Armor_UpdatePartColliders_080F2260(void *);
-static inline u32 Flags(u8 *p, u32 mask) {
+static inline u32 Flags(u8 *p, u32 mask)
+{
     register u32 m asm("r1") = mask;
     register u32 bits asm("r0");
     asm("" : "+r"(m));

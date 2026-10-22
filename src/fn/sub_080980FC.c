@@ -90,7 +90,6 @@ static inline void Step(struct GhostVisual *visual)
         done = 0;
 }
 // confidence=low: refreshes one of four timed Ghost afterimage sprites at the actor's position.
-#define Ghost_EmitAfterimage sub_080980FC
 void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *actor)
 {
     struct GhostVisualContext *ctx = actor->context;
@@ -115,5 +114,5 @@ void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080980FC);
+INCLUDE_ASM("asm/nonmatching", Ghost_EmitAfterimage);
 #endif

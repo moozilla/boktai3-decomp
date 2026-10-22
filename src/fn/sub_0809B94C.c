@@ -11,7 +11,7 @@ extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 s32 Mod(s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
-void sub_0809B7FC(void);
+void Lun_ResumeAfterLiftPenalty(void);
 void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
 void SceneActorControl_ResetCollisionFlags(void *);
@@ -85,7 +85,6 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
-#define Lun_ApproachMovementTarget sub_0809B94C
 void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *ctx = a->context;
@@ -130,7 +129,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         ctx[0x3E2] = 0;
         if (a->flags2D4 & 8) {
             SetState(a, 3, 0, 0);
-            SetControl(a, sub_0809B7FC, 20);
+            SetControl(a, Lun_ResumeAfterLiftPenalty, 20);
             ((struct Flags *)&a->flags2D4)->bits &= ~8;
             a->field2C2 = 64;
         } else if (*(u16 *)(ctx + 0x444)) {

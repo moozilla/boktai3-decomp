@@ -1,8 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define Armor6_DestroySpriteColliders sub_0818E98C
-
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 

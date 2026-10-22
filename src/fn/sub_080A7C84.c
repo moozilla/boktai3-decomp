@@ -127,7 +127,6 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
 }
 // confidence=low: pursues saved waypoints with an 800-frame transition.
-#define TentacleBody_UpdatePursuit sub_080A7C84
 void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;

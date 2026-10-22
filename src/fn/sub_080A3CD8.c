@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActorPlacement_TriggerTetherAction sub_080A3CD8
 #include "scene_actor_control_phase.h"
 
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
@@ -98,7 +97,9 @@ s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *
     if (!Route(a, F(nav, 0x1fc, void *), &a->position, target))
         return 0;
     {
-        struct Flags { s16 bits : 16; };
+        struct Flags {
+            s16 bits : 16;
+        };
         struct Flags *p = (void *)(c + 0x62C);
         p->bits |= 4;
         Control(a, F(a, 0x228, void *), 1, 0);
@@ -107,4 +108,3 @@ s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *
     a->field2C2 = 16;
     return 1;
 }
-
