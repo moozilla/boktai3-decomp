@@ -503,6 +503,9 @@ address,evidence
 081C5660,Hidden raw-tail function
 081C5E84,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 081CFCF8,Hidden tail after SceneNpc_UpdateProjectedIdle
+081CFD3C,Hidden tail function
+081CFD6C,Hidden tail function
+081CFD84,Hidden tail function
 081D31D8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31DC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081D31E0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
