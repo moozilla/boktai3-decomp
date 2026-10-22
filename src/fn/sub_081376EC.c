@@ -2,7 +2,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 #ifdef NONMATCHING
-// fuzzy: 78.2%
+// fuzzy: 92.9%
 // Open: register allocation (ROM: actor r6 with an early copy in r3, group sl, i in r5,
 // candidate pointer sb, position r8) and the MoveTo destination/branch layout.
 
@@ -182,14 +182,15 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     struct ContactPosition candidate;
     struct ContactPosition delta;
     u32 found;
-    s32 best;
     u32 bestTag;
+    s32 best;
     s8 i;
     u16 *flagsp;
     u16 *timer;
     struct ContactPosition *dest;
     struct ContactPosition *target;
     u32 bit;
+    struct ContactPosition *position;
 
     {
         u32 busy = IsBusy(actor);
@@ -201,6 +202,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     found = 0;
     best = 0x7FFFFFFF;
     bestTag = 0;
+    position = &actor->position;
     for (i = 0; i <= 7; i++) {
         u32 tag;
         s8 next;
@@ -226,9 +228,9 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     }
     if (!found)
         return 0;
-    control = (struct SceneActorRegistryControl *)(group + 0x4C);
-    timer = &control->timer;
+    timer = &GROUP_FIELD(group, 0x54, u16);
     if (*timer == 0) {
+        control = (struct SceneActorRegistryControl *)(group + 0x4C);
         ClearWordFlags(&actor->flags2CC, 0xFFFEBE3F);
         control->counter = 0;
         FIELD(control, 0x14, u16) = 0;
@@ -260,7 +262,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     bit = 0x200;
     GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->position.y;
     GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 0;
-    if (!MoveTo(actor, group, &actor->position, flagsp, bit)) {
+    if (!MoveTo(actor, group, position, flagsp, bit)) {
         Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
     } else {
         {
