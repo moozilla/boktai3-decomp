@@ -1,13 +1,53 @@
 #include "global.h"
-
-// confidence=low: follows the existing Lun movement callback interpretation.
-
 #ifdef NONMATCHING
-// fuzzy: 82.8%
-// Remaining differences: instruction ordering and register allocation.
+// fuzzy: 88.5%
+// Remaining differences include octant-mask lifetime, control initialization and registers.
+#include "scene_actor_reaction.h"
+#include "scene_actor_terrain.h"
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+extern const s16 gUnk_086149C4[];
+extern u8 *gUnk_02000580[];
+s32 Math_Atan2(s32, s32);
+s32 Div(s32, s32);
+void CpuSet(const void *, void *, u32);
+void sub_0809345C(void *, void *);
+void Bee_SubVector(void *, void *, void *);
+s32 Bee_GetMovementVariant(void *);
+static inline u8 Take(u8 *p)
+{
+    if (*p) {
+        *p = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline u32 Bits(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    return a->flags2CC & mask;
+}
+
+static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+{
+    u32 zero = 0;
+    a->field2B2 = 1;
+    a->field2B0 = zero;
+    a->field2B5 = kind;
+    a->target = cb;
+    a->field2C8 = zero;
+    {
+        u32 *flags = &a->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    a->word104 = zero;
+}
+
 #include "scene_actor_animation.h"
-#include "scene_actor_reset.h"
 void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
+s32 Mod(s32, s32);
+void Player_SubtractEnergy(void *, u32);
+void sub_0813D834(void *, u32, u32);
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)
 {
@@ -57,81 +97,67 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-void Anim_SetDurationScale(void *, u16);
-void Anim_SetFrameDurationScale(void *, u16);
-static inline u8 TakeFlag(u8 *p)
+// confidence=low: turns one octant at animation events until reaching the requested heading.
+#define Lun_TurnTowardSavedDirection sub_0809B3F8
+void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
 {
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
-{
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = kind;
-    a->target = callback;
-    a->field2C8 = 0;
-    {
-        u32 *flags = &a->flags114;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->word104 = 0;
-}
-// confidence=low: turns Lun in 32-angle increments until its saved direction is reached.
-void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *a)
-{
-    u8 *identity = (u8 *)a + 0x50;
-    u8 *anim;
-    u16 *scale;
-    if (TakeFlag(&a->field2B2)) {
-        s32 facing = ((a->direction + 0x70) >> 5) & 7;
-        u8 saved = *((u8 *)a + 0x3CD);
-        s32 goal = ((saved + 0x70) >> 5) & 7;
-        if (facing == goal) {
-            a->direction = saved;
-            SetControl(a, a->savedTarget, 0);
-            a->field2B0 = 1;
+    u8 *motion = (u8 *)actor + 0x50;
+    u8 *sequence;
+    if (Take(&actor->field2B2)) {
+        s32 current = (((s32)actor->direction + 0x70) >> 5) & 7;
+        u8 desired = *((u8 *)actor + 0x3CD);
+        s32 target = (((s32)desired + 0x70) >> 5) & 7;
+        if (current == target) {
+            actor->direction = desired;
+            Control(actor, actor->savedTarget, 0);
+            actor->field2B0 = 1;
             return;
         }
-        if (((facing - (goal - 8)) & 7) <= 4)
-            a->flags2CC &= ~0x10000;
-        else {
+        target -= 8;
+        if (((current - target) & 7) <= 4) {
+            u32 *p = &actor->flags2CC;
+            u32 mask = ~0x10000;
+            *p &= mask;
+        } else {
             u32 mask = 0x10000;
-            a->flags2CC |= mask;
+            actor->flags2CC |= mask;
         }
     }
-    anim = (u8 *)a->drawable + 0x48;
-    if (a->flags2D4 & 0xA02F) {
-        scale = &a->field2C2;
-        *scale = 64;
-    } else {
-        scale = &a->field2C2;
-        if (!*scale)
-            *scale = 64;
-    }
-    if (!a->drawableKind)
-        Anim_SetDurationScale((u8 *)a->drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)a->drawable + 0x20, *scale);
-    if (a->field2CA & 4) {
-        struct SceneActorProfileEntry *entry =
-            (void *)SceneActorProfiles_GetEntryAddress(a->profileId, a->profileMode, 1);
-        u32 variant, flags;
-        SetControl(a, a->entryTarget224, 2);
-        if (a->flags2CC & 0x10000)
-            identity[9] += 32;
+    sequence = *(u8 **)((u8 *)actor + 4) + 0x48;
+    {
+        u32 mask = 0xA02F;
+        u16 *scale;
+        if (actor->flags2D4 & mask) {
+            actor->field2C2 = 64;
+            scale = &actor->field2C2;
+        } else {
+            u16 *p = &actor->field2C2;
+            u16 value = *p;
+            scale = p;
+            if (!value)
+                *scale = 64;
+        }
+        if (!*((u8 *)actor + 8))
+            Anim_SetDurationScale(*(u8 **)((u8 *)actor + 4) + 0x48, *scale);
         else
-            identity[9] -= 32;
-        Lun_GetDirectionalFrame(identity[9], &variant, &flags);
-        anim[5] = 0;
-        Select((void *)a, entry->value, variant, flags);
+            Anim_SetFrameDurationScale(*(u8 **)((u8 *)actor + 4) + 0x20, *scale);
+    }
+    if (actor->field2CA & 4) {
+        u32 variant, flags, selection;
+        struct SceneActorProfileEntry *entry =
+            (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
+        Control(actor, actor->entryTarget224, 2);
+        if (Bits(actor, 0x10000))
+            motion[9] += 32;
+        else
+            motion[9] -= 32;
+        Lun_GetDirectionalFrame(motion[9], &variant, &flags);
+        sequence[5] = 0;
+        selection = entry->value;
+        Select((void *)actor, selection, variant, flags);
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
+INCLUDE_ASM("asm/nonmatching", sub_0809B3F8);
 #endif

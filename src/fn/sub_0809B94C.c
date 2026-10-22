@@ -85,6 +85,7 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
+#define Lun_ApproachMovementTarget sub_0809B94C
 void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *ctx = a->context;
