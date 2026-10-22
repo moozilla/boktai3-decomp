@@ -117,4 +117,22 @@ static inline s32 ScalarApproach_Profile(s32 current, s32 target, s32 coefficien
         factor = (s32)(0u - (u32)((s32)(0u - (u32)coefficient) >> 8));
     return (s32)(((u32)target - (u32)current) * (u32)factor + (u32)current);
 }
+/* Same result as ScalarApproach_Linear; this layout matches the hidden entries. */
+static inline s32 ScalarApproach_Step(s32 current, s32 target, s32 step)
+{
+    s32 n, r;
+    if (current < target) {
+        n = current + step;
+        if (n < target)
+            goto set;
+        r = target;
+    } else {
+        n = current - step;
+        r = target;
+        if (n > r)
+        set:
+            r = n;
+    }
+    return r;
+}
 #endif
