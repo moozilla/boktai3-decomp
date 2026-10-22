@@ -4009,3 +4009,106 @@ Scores above are the final reviewed-extent --nonmatching --record results;
 some queue commit subjects used the preceding candidate-length estimate. Every
 source has its required local alias and every draft retains INCLUDE_ASM in the
 #else branch. Draft experiments remain under ignored wip/ and build/ paths.
+
+## 2026-10-22 — Axe families, task 080F7580
+
+Tags: #matching #axe #monster #register-pinning
+
+Offline worker; no network or full builds. All acceptance checks used
+`build/venv/bin/python tools/check.py`; commits went through `build/commit.sh`.
+Task completion by exact function count: 27.3%, a +27.3 percentage-point gain
+(three of eleven; 268 checker bytes). One additional function is a guarded
+85.3% draft; seven were stopped below the full-extent draft threshold.
+
+- **080F7580 — matched, Axe_LatchColliderContact (tentative).** Callback
+  installed by 080FC4F4 on the three body colliders, with the Axe context as
+  owner. Latches context byte CAB bit 0, then sets bit 4 on collider flags
+  at 18E and 13A. Separate pointers to the nested collider views recover
+  base+6 addressing and the initial r2-to-r3 copy. Depin removed the initial
+  r2 clobber; final match is unpinned. Exact check: 60 bytes.
+- **080F75C0 — stopped below threshold.** Body-contact callback installed by
+  Axe_InitColliders. Applies the common reaction, saves contact power/type/
+  duration if actor+178 is zero, and can interrupt into reverse flicker.
+  The u8 unavailable predicate reproduces the materialized boolean. Best
+  candidate reached 62.1%; manually advanced collider pointers reduced
+  structural differences but lowered fuzzy to 57.3%. Remaining differences:
+  address reuse, hoisted phase-field pointers, loop allocation and spills.
+  Scratch: wip/sub_080F75C0.c.
+- **080FAA5C — stopped below threshold.** Movement spline called by
+  Axe_BeginMoveToPosition and the destination phase. Copies endpoints F04/F0C,
+  clears their Y values, forms the delta, evaluates a cubic in elapsed EA8
+  with signed truncating shifts, writes through actor+5D0, and advances time
+  by 128 until it exceeds 1023. Scalarization of the vector temporaries,
+  stack layout and coefficient allocation differ; inline helper extraction
+  and a memory barrier did not recover the assembly. Last candidate 40.3%.
+  Scratch: wip/sub_080FAA5C.c.
+- **080FAFD0 — matched, Axe_InitAttackCooldowns (tentative).** Existing draft
+  was 95.1%, with only the quarter-health scratch register differing. Changing
+  the widened subtraction operand from u64 to u32 and pinning the loaded
+  health to r0 reproduces the original copy and r2 shift temporary. Depin
+  retains this one pin. Reads keyword P into EC0..EC6, clears EB8..EBE and
+  stores health minus its truncating quarter at EB4. Exact check: 128 bytes.
+  Initially committed as a named 95.1% draft; the match promotion accidentally
+  queued an unterminated guard. A corrective commit removes that guard; the
+  final production file passes the exact check.
+- **080FB30C — stopped below full-extent threshold.** Hit-flash update:
+  start/stop/reset bytes ED0/ED1/ED6 control flags 80/100, level ECF and
+  ten-tick counter ECE. The selected level sets animation profile 13F and
+  flash palette 908; finishing restores the actor palette bank. A persistent
+  flags pointer and mask-before-load form improved candidate-length fuzzy
+  from 81.0% to 95.0%. However --nonmatching --record gives only 58.5% over
+  the full symbol extent, which includes the undecoded bytes at FB4EC..FB743.
+  No production draft committed. Needs boundary review by the integrator;
+  no generated assembly was changed. Scratch: wip/sub_080FB30C.c.
+- **080FB744 — stopped below threshold.** Advances the 16-color RGB palette
+  transition at context+624. Accumulates three signed 8.8 channels with their
+  steps, packs RGB555, decrements the timer at 644, and binds the palette to
+  the actor and four auxiliary sprites unless actor flags 02008000 inhibit
+  it. Best first candidate 65.2%; explicit byte-offset indexing and an r8
+  actor hint worsened allocation (56.2%). Scratch best:
+  wip/sub_080FB744-best.c; last experiment: wip/sub_080FB744.c.
+- **080FB8E8 — matched, Axe_InitEffectPalettes.** Initializes palettes 888,
+  8A8, 8C8, 8E8, 908 to black, red, blue, white and the drawable's original
+  colors. Manual pointer advancement plus an empty constraint on the loop
+  counter prevents countdown conversion. Depin retains only the source
+  pointer r4 binding and the counter constraint; all color bindings/barriers
+  were removable. Leaving zero unpinned avoids the agbcc r7 save omission.
+  Exact check: 80 bytes, register-pinning concession.
+- **080FC094 — stopped below threshold.** Attack particle burst at a rotated
+  (-140,0,-140) offset from drawable position, range (120,60,120), zero
+  velocity, caller-supplied count and final parameters 2,4. Axe_UpdateDefeat
+  supplies the rotation/packed-position idiom. Best candidate 75.4%; grouping
+  stack vectors changed aliasing and worsened the result. Remaining stack
+  placement, pointer lifetimes and register transfers. Scratch:
+  wip/sub_080FC094.c (74.6% earlier form).
+- **080FC4F4 — drafted 85.3%, Axe_InitAttackTrail.** Creates the auxiliary
+  sprite at A38 with resource 5291 and lookup 922E/3F72, selects its animation
+  from the actor and ED7, steps the animation, initializes three body and
+  three attack colliders and creates/disables their shadow. Exact matched
+  animation stepper borrowed from SceneActors_UpdateDelayedMovement
+  (081ED8A0), found with relatives.py; it covers 114 consecutive instructions.
+  Initial candidate 81.9%, then moving sprite-address construction after
+  AnimData_Load and using the drawable+48 animation view improved it.
+  Final --nonmatching --record: 85.3%, 50 realigned differing instructions,
+  seven ignoring registers. Actor allocation, collider argument scheduling
+  and a stack spill remain. The existing stepper hints are marked as a
+  register-pinning concession. Assembly fallback retained.
+- **080FCB64 — stopped below threshold.** Enables/disables the actor's body
+  colliders and two context collider pairs, rotates offsets -120/-30/60
+  around the actor and updates the corresponding collider pair. The disable
+  path breaks out after disabling all colliders. Correcting the actor flag
+  width to u16 and manually advancing inner-loop pointers improved 60.4% to
+  66.0%; 115 realigned differences, 48 ignoring registers. Rotation scratch
+  layout, inner-loop allocation and common collider pointer lifetime remain.
+  Scratch: wip/sub_080FCB64.c.
+- **080FCDEC — stopped below threshold.** Selects attack property slot 2,
+  doubled slot 2, slot 1 or slot 0 from context flags 200/800/400/1000 and
+  updates actor collider 188 plus context colliders CEC/D40. The final two
+  branches both select slot 0. Explicit ordered argument temporaries improved
+  31.2% to 42.4%; compiler still merges repeated call tails and differs in
+  field-address lifetime and flag-mask scheduling. Scratch:
+  wip/sub_080FCDEC.c.
+
+Only the three exact files and the qualifying guarded draft are in production
+src. Below-threshold candidates remain ignored scratch files. Batch integration
+still needs the integrator's combined ROM build; no worker build was run.
