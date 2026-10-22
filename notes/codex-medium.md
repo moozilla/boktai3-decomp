@@ -4102,3 +4102,175 @@ with tentative semantic comments. Commits were queued through `build/commit.sh`.
 Final draft scores are `--nonmatching --record` values over the full reviewed
 function extents. No full build, network operation, shared documentation update,
 or generated/ROM artifact commit was performed.
+
+## Ghost and Lun families — round 3, 2026-10-22
+
+Tags: #matching #ghost #lun #scene-actor #animation #movement
+
+This round adds **0.1683 percentage points** of exact code coverage (4,056
+bytes, twelve functions): **0.1437 points Register-pinned** (3,464 bytes)
+and **0.0246 points unpinned** (592 bytes). Ten functions have retained or
+updated guarded drafts; these add no exact credit. The previous worktree's
+08096000, 080964C4 and 0809852C matches were left alone. No network operation,
+full build, generated-artifact commit or shared progress/index update was run.
+All commits went through build/commit.sh. Combined ROM validation remains for
+integration.
+
+Exact functions (all formatted and checked with their reviewed body/pool extent):
+
+- **080982E4 matched — ActorContact_TickAuxiliaryTimers**, 64 bytes. Existing
+  name reused. ActorContact_UpdateColliderPositions calls this; four auxiliary
+  entries have stride 0x60, timers at context+0x430 and flags at +0x3D4. On a
+  timer's transition to zero, sets entry flag 1. A scoped r1 bit operand keeps
+  the constant inside the loop; an offset operand barrier places 0x430 before
+  the countdown initialization. Marked Register-pinned.
+- **0809C174 matched — Lun_DecayRouteMotion**, 356 bytes. Installs actor+0x224
+  control on entry, adds saved context+0x424/+0x428 horizontal motion and halves
+  it arithmetically every four ticks. On control completion chooses pursuit
+  (phase 2, behavior 1) or rest (phase 0, behavior 2). A u16 flags result retains
+  the observed narrowing; an input-only r1 mask hint preserves its constant
+  value and removes the final register swap. A read/write mask operand would
+  incorrectly change optimization and lose the narrowing. Register-pinned.
+- **0809DA14 matched — Lun_ChooseDelayedDestination**, 392 bytes. Port of the
+  exact Lun_ChooseMovementDestination, omitting entry control setup and the
+  height gate, and incrementing the counter only while waiting. Chooses a
+  random route point after 60 ticks, starts its endpoints, stores facing and
+  clears saved horizontal motion. The sibling's r7 clobber makes the second
+  stack-vector pointer a fresh sp+4, fixing the last two structural differences.
+  Register-pinned.
+- **0809D574 matched — Lun_RenewPlayerRoute**, 592 bytes, unpinned. Starts the
+  route control, invokes update and movement-rate callbacks, adjusts animation
+  scale, updates sway and approaches the saved endpoint. When the curve ends,
+  renews both endpoints at the player and saves the new heading. Reused the
+  exact Lun_FollowRoute inlines. A state-setting inline with u8 state/phase/
+  behavior parameters reproduces contiguous offset derivation and removes an
+  extra literal; direct assignments did not.
+- **080968F0 matched — Ghost_ChooseRouteDestination**, 472 bytes. Existing
+  name reused. Replaced exploratory pointer pins with the exact sibling's r7
+  clobber, preserving distinct stack-vector pointers through the direction
+  calculation. Promotes the inherited 99.6% draft. Register-pinned.
+- **08099660 matched — Ghost_ChooseMovementDestination**, 392 bytes. Same
+  stack-pointer repair as 080968F0 and 0809DA14; promotes the inherited 99.5%
+  draft. Existing name reused. Register-pinned.
+- **0809679C matched — Ghost_DecelerateMovement**, 340 bytes. Existing name
+  reused. Ported the new exact Lun_DecayRouteMotion to context+0x5FC/+0x600 and
+  changed the rest behavior to zero. This removes the inherited draft's many
+  exploratory offset pins; only the shared r1 mask hint remains. Register-pinned.
+- **0809C91C matched — Lun_UpdateHoverHeight**, 476 bytes. Existing name reused.
+  Preserves the full hover-height/bobbing behavior. An r4 offset and r0 pointer
+  hint, with r4 clobbered before rematerializing 0x2D0, fixes allocation without
+  deriving that offset from the preceding control-kind constant. At the final
+  height store, loading ground into a separate local before adding the hover
+  offset fixes the two remaining literal-load bytes. Register-pinned.
+- **080974F4 matched — SceneActor_EasePlayerHeight**, 208 bytes. Existing name
+  reused. Retains its two player-height paths and division by ten. Separating
+  the player-Y load (r0) from the target sum (r1) fixes the first difference;
+  separate base/sum operands fix the wave path's addition order. An explicit
+  zero operand initially duplicated the signed-load zero and was removed.
+  Register-pinned.
+- **0809CC8C matched — Lun_GetRouteProgressRate**, 44 bytes. The Lun initializer
+  installs this as the movement-rate callback; indexes the existing eight-entry
+  table with min(curveProgress>>7,7). An input-only r0 hint on the shifted
+  progress preserves the observed copy into the signed index variable.
+  Register-pinned.
+- **08095578 matched — Ghost_BeginContactReaction**, 348 bytes. Promotes this
+  worker's inherited draft. Scoped input-only operands preserve the discarded
+  context flag test, its r2 offset/r0 pointer, the order of the player-pointer
+  load and three-value setup, and the final context byte's address. The player
+  increment uses literal 3; its separately retained three-value is used for
+  context+0x5BB. Empty barriers contain no instruction bodies. Register-pinned.
+- **0809D7C4 matched — Lun_FollowParticipantDisplacement**, 372 bytes. Its
+  entry control is ActorBehavior_TickParticipantProgress, followed by target
+  flag reset. Applies player X/Z displacement from context+0x414 and returns
+  to idle behavior 3 when control completes. This round's initial 86.5% draft
+  improved to 99.5% by recomputing saved/player addresses at each Delta/copy
+  use instead of carrying pointer locals. An input-only r0 operand on the
+  player-slot address fixes the final literal-load scheduling. Register-pinned.
+
+Guarded drafts (final full-extent --nonmatching --record scores):
+
+- **0809B7FC drafted 81.8% — Lun_ResumeAfterLiftPenalty**, new. Consumes the lift
+  penalty on entry, sets update flags, then after 30 ticks resumes pursuit if
+  context+0x444 is nonzero or selects the waiting control and rest phase.
+  Reading the delay once and carrying separate word/byte zeros recovers much
+  of the reset shape. Broad actor/context pins regressed and were discarded.
+  Remaining: 40 realigned differences, 22 ignoring registers.
+- **08095C00 retained 89.1% — Ghost_TurnTowardHeading**. Added the required
+  alias. Octant/motion/desired-register experiments worsened structural score
+  and were discarded. Remaining: 39 realigned differences, four structural;
+  initial octant-mask lifetime, pointer allocation and control-reset scheduling.
+- **0809628C retained 90.5% — Ghost_UpdateDefeat**. Added the required alias.
+  Changing script values from an array to a struct, adding volatile, and moving
+  declarations to function scope did not remove the hoisted stack-array base.
+  Restored the inherited source: 30 realigned differences, 13 structural.
+- **08096D38 improved to 85.2% — Ghost_AdvanceApproachRoute**. Narrow state
+  parameters and a signed full-width collider flag view improve the endpoint
+  transition. Still 119 realigned differences / 60 structural, chiefly inline
+  ordering, route/flag address lifetimes and allocation. Preserves the observed
+  route-speed threshold and no counter increment.
+- **08097E38 improved to 99.2% — Ghost_ReactToPlayerMovement**. Pointer-taking
+  reaction/context flag inlines place masks before loads; returning the saved
+  flags pointer prevents recomputation. A full-width masked-result temporary
+  and input-only operand let the mask die before the pointer copy. A typed
+  state-setting inline recovers transition constant/offset order. Three
+  differences remain: player-slot address reload instead of an r8 copy and
+  zero-store scheduling in the active transition. Retains scoped register
+  operands and is marked Register-pinned. Broader pointer pinning regressed.
+- **080980FC improved to 90.4% — Ghost_EmitAfterimage**. Extracting the existing
+  sequence step into an inline taking the visual entry improves the candidate;
+  keeps actual table/resource labels and timer/flip semantics. Remaining: 26
+  realigned differences / 11 structural, mostly entry/address lifetimes and
+  allocation. The original lower-scoring form had six structural differences;
+  both alternatives remain under ignored build/ for further analysis.
+- **08098788 retained 84.4% — Ghost_UpdateVisibility**. Added the required alias.
+  Returning the context flags pointer from its test removes one structural
+  difference but worsens total allocation; scoped mask pins also regress.
+  Restored the inherited source: 55 realigned differences, 18 structural.
+- **08098A74 improved to 87.6% — Ghost_FollowDrainedPlayer**. Removed the scale
+  r7 hint: it conflicted with the context lifetime and produced invalid-looking
+  stack-vector address setup in the old candidate. With scale unpinned, context
+  naturally stays in ip and the vector stores use sp. A scoped initial player
+  copy inline restores r4 ownership and the original extent. Remaining: 39
+  realigned differences / 11 structural; later player copies, control offsets
+  and animation-scale allocation. Context pinning regressed and was removed.
+- **0809B3F8 improved to 88.5% — Lun_TurnTowardSavedDirection**. Ported the Ghost
+  turn draft but kept Lun's profile lookup before the control reset and frame
+  lookup. Moving that call to Ghost's position badly distorts call-anchor
+  alignment. Final residue: 40 differences, four structural. Required alias added.
+- **0809B94C retained 81.1% — Lun_ApproachMovementTarget**. Narrow state params
+  did not improve it; an actor/offset-based flag inline regressed below 80%.
+  Restored the inherited C and added its alias. Its existing named assembly
+  fallback must remain: changing INCLUDE_ASM to sub_0809B94C makes check.py's
+  generated stub resolve sub_0809B6AC to even 0809B6AC, corrupting one literal
+  byte at 0809BCDC. The named baseline and restored named fallback both check
+  exact; no generated files were edited. A corrective commit preserves it.
+
+Stopped below the draft threshold, with no production C added:
+
+- **08097798 — Ghost endpoint curve**. Revisited the prior scratch interpolation
+  with endpoint-first inline argument order. Fuzzy 38.0%, but structural residue
+  rose to 75; restored the earlier output-first form. Stack layout, polynomial
+  operand order and register lifetimes remain unresolved.
+- **08098344 — Ghost approach-route samples**. Rechecked the prior scratch body
+  (36.7%, 49 structural differences). Endpoint-first curve arguments give 37.1%
+  but worsen structure to 55; restored the original shape. No production draft.
+- **0809CCF4 — Lun endpoint curve**. Ported 08097798's interpolation to progress
+  +0x3E0, tangent +0x3E4, output +0x3F4 and endpoints +0x414/+0x41C. Best full
+  candidate 39.5%, 66 structural differences. Endpoint-first arguments regress
+  to 38.6% / 75 structural differences. Scratch retained in wip/sub_0809CCF4.c.
+- **0809AE0C — Lun player-lift contact**. Recovered contact-kind/availability
+  guards, height window, collision/control resets, context lift bit, and the
+  action-speed/status-effect calls selected by paletteOffset. Best experiment
+  56.1%, still 49 structural differences; actor pinning and pointer reload
+  barriers did not yield a useful production candidate. Scratch retained.
+- **08099B44 (Ghost_Init) and 0809DD78 (Lun initializer)**. Read/folded both full
+  bodies using BIG_FUNCTIONS.md. Reconstructed only the common drawable setup
+  and initial script-parameter prefix: sprite/linked-widget allocation, resource
+  relocation, zero vectors, flags and M/N keyword values. These are explicitly
+  incomplete prefix experiments, not full-function drafts or exact progress.
+  The remaining large inlined script-option, route and callback initialization
+  was not reconstructed in this pass. Scratch prefixes remain in wip/; no
+  production files or misleading fuzzy drafts were created.
+
+All ten final drafts retain an assembly fallback. Default fallback checks pass;
+new/updated C scores are separate from those checks. No shared header changes.
