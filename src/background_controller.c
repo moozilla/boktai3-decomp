@@ -228,9 +228,11 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
 {
     struct BackgroundLayer *layer;
     u8 *resource;
-    register s32 offsetX asm("r9"), offsetY;
-    s32 x, y;
-    u32 mode;
+    s32 offsetX;
+    s32 offsetY;
+    s32 x;
+    s32 y;
+    short mode;
     gUnk_02000000[c->layer] = p;
     p->id = id;
     p->flags = c->flags;
@@ -294,8 +296,8 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     } else {
         void *map = Video_GetBackgroundMap(p->layer);
         u32 layerId = p->layer;
-        register u32 drawMode asm("r1") = mode;
-        Bg_SetupLayer(layerId, drawMode, resource, 0, offsetX, offsetY, c->mode, map);
+        u32 drawMode = mode;
+        Bg_SetupLayer(layerId, drawMode, resource, 0, (short)offsetX, offsetY, c->mode, map);
     }
     if (p->limitX && p->limitY) {
         layer->halfWidth = p->limitX / 2;
