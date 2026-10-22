@@ -186,6 +186,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     s32 best;
     s8 i;
     u16 *flagsp;
+    u16 *flags2D4;
     u16 *timer;
     struct ContactPosition *dest;
     struct ContactPosition *target;
@@ -243,7 +244,8 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     {
         u32 mask = 0x80;
         flagsp = &actor->flags2D4;
-        if (*flagsp & mask) {
+        flags2D4 = flagsp;
+        if (*flags2D4 & mask) {
             u16 *value = &FIELD(actor, 0x418, u16);
             *value += 300;
             if (*value > FIELD(actor, 0x416, u16))
@@ -269,7 +271,7 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
             u32 mask = 0x10;
             actor->flags2CC |= mask;
         }
-        SetHalfFlags(flagsp, 0x200);
+        SetHalfFlags(flags2D4, 0x200);
         actor->field2C2 = 0x20;
         {
             u32 mask = 0x1000000;
