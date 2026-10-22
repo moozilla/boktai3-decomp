@@ -297,14 +297,20 @@ address,evidence
 0815F5B4,Third function of the reviewed 0815F588-0815F6A8 span; retained assembly
 0815F5F8,Fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly
 0816A578,Hidden menu prompt setup: background layer then ramp display
+0816A770,Hidden menu prompt setup: hide sprites then pulse display
+0816AA28,Hidden scene HUD page exit fade
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+081711D8,Hidden pause inventory consumable effect delta
+08172094,Hidden inventory entry lock predicate (retained)
+081720D4,Hidden inventory entry unlocked or equipped (retained)
 08177D88,Hidden getter: option HUD field 0xA5C or -1
 081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
 081782AC,Hidden option HUD setter: field 0xA8C=4 when mode 1-2
 081792F8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081792FC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0817A238,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0817A354,Hidden first position inside box search (retained)
 0817AAB8,Hidden predicate: field 0x94 not positive
 0817C19C,Hidden clear of flags 0xB0/0xAF
 08180898,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C
