@@ -1,7 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 64.8%
-// 10 differing instruction runs; size -4 bytes; first diff at +0xC (ldr r1, [pc, #0x70] vs ldr r3, [pc, #0x6c])
+// fuzzy: 87.5%
+// Only allocation differs: the outer `entry` gets r2 (ROM: r1, shared with `e`), so the
+// 0x06010000 temporary takes r1 and a copy to `e` is added at the loop top.
 struct Entry {
     u32 src;
     u16 size, count;
@@ -13,28 +14,29 @@ extern struct Entry gUnk_02039000[];
 extern u32 gUnk_03004304;
 void ObjGfx_LoadTiles(u32 start)
 {
+    u32 i;
     struct Entry *entry = gUnk_02039000;
     u32 dst = 0x06010000 + (start << 5);
-    u32 i = 0, total = gUnk_03004304;
+    u32 total = gUnk_03004304;
+    i = 0;
     if (i < total) {
+        u32 n = total;
         do {
-            u32 src = entry->src;
-            s32 j = 0;
-            struct Entry *next;
-            i++;
-            next = entry + 1;
-            while (j < entry->count) {
+            struct Entry *e = entry;
+            u32 src = e->src;
+            s32 j;
+            for (j = 0; j < e->count; j++) {
                 struct Dma *dma = (struct Dma *)0x040000d4;
                 dma->src = src;
                 dma->dest = dst;
-                dma->control = (entry->size >> 2) | 0x84000000;
+                dma->control = (e->size >> 2) | 0x84000000;
                 (void)dma->control;
                 src += 0x200;
-                dst += entry->size;
-                j++;
+                dst += e->size;
             }
-            entry = next;
-        } while (i < total);
+            i++;
+            entry++;
+        } while (i < n);
     }
     gUnk_03004304 = 0;
 }
