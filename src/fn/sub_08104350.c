@@ -1,8 +1,5 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.9%
-// Register choice for the render/sequence pointers and the argument-loop address order still differ.
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
 struct Frames {
     u16 *data;
     u8 flags;
@@ -89,17 +86,9 @@ static inline s32 ReadOptional(void)
     return 0;
 }
 void Anim_SetSequence(struct Frames *, void *, u16, int, int);
-void Anim_RestartSequence(struct Frames *, void *, u16, int, int);
 s32 Div(s32, s32);
-static inline u8 Test(u8 *p, u32 mask)
-{
-    if (*(u32 *)(p + 0x108) & mask)
-        return 1;
-    return 0;
-}
 static inline void Step(struct Member *m, struct Render *owner, struct Frames *state)
 {
-    struct Render *r = owner;
     register struct Frames *f asm("r4") = state;
     const volatile u16 *word;
 
@@ -108,7 +97,7 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         const volatile u16 *table = m->frames.data;
         word = (const volatile u16 *)((u32)table + offset);
     }
-    r->tile = *word >> 6;
+    owner->tile = *word >> 6;
     {
         int settings = f->flags;
         register int mask asm("r3") = 1;
@@ -119,9 +108,9 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         bits = (*word & 48) >> 4;
         bits &= mask;
         if (mine != bits)
-            r->flags |= 4;
+            owner->flags |= 4;
         else
-            r->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
         int settings = f->flags;
@@ -135,12 +124,12 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         bits = (*word & 48) >> 4;
         bits &= mask;
         if (mine != bits)
-            r->flags |= 8;
+            owner->flags |= 8;
         else
-            r->flags &= ~8;
+            owner->flags &= ~8;
     }
     {
-        u32 mask;
+        register u32 mask asm("r5");
         register int duration asm("r2");
         register int savedDuration asm("r3");
         u32 timer = f->timer + 1;
@@ -296,8 +285,9 @@ void ActorGroup_CreateFromScript(void)
         if (Script_SeekToKeyword('G')) {
             i = 0;
         next: {
-            u32 *dest = p->arguments;
-            dest += i;
+            u32 offset = i * 4;
+            u32 *base = p->arguments;
+            u32 *dest = (u32 *)((u32)base + offset);
             *dest = ReadOptional();
         }
             if (++i <= 2)
@@ -309,7 +299,3 @@ void ActorGroup_CreateFromScript(void)
     Step(p, render, sequence);
     sub_08105194(p, a, b, c);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ActorGroup_CreateFromScript);
-#endif
