@@ -18,3 +18,21 @@
 - 0812D064 (66%, wip only): sibling of SceneSlot_EmitPulse (same dead 0x0403B714 literal); a port
   of that function's pinning still differs in the second RNG half.
 - 0817B2DC: draft committed at 89.6%.
+
+## wip/field6 pass
+
+- Matched: sub_081B866C (mode local before the bank), CallbackPool_ApplyDamage
+  (Collision_CalculateDamageResponse takes (source, target); no pinning),
+  RegionActor_UpdateHealthAnimation (function-scope sprite alias passed to Step, no inner
+  copy), sub_08107EBC (ternary clamp + `*(u8 *)&p->sequence`: one fewer RTL insn puts the
+  GCSE table back at T=187, which fixes the spill-slot order).
+- Tool tip: when only stack slots rotate, `rtlprobe.py gcse` + `try-t` shows whether the PRE
+  bucket count T is the cause; `perline` lists lines where an insn can be cut.
+- T sweeps (+-20) find nothing for: sub_081C49F4, TileTrigger_StepPress, sub_08017684,
+  ProximityActor_SetState, FloorSwitch_Create, NativeEffect_UpdateAcceleratingTrail,
+  NativeEffect_CreateFromProfile, sub_0801010C, sub_08114E68, sub_08018028.
+- NativeEffect_CreateFromProfile: writing the id as the GroupId body inline
+  (`frame = m->timer; mask = 255; (group & mask) | ((frame & mask) << 8)`) gets the
+  structure (3 struct diffs) but group/reverse swap sb/r8 (93.0%, not committed).
+- NativeEffect_UpdateAcceleratingTrail: u8 Odd() helper committed (96.6%); rasolve then wants
+  1023 above the table address (tie) plus one reload rotation.
