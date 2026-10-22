@@ -349,7 +349,7 @@ address,isa,evidence,replacement_end
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
 08159814,thumb,Hidden player helper in the raw tail after PlayerStats_AddHundredths (decrement 0x42C),08159844
 0815A104,thumb,Hidden wrapper of sub_0815A048 with mode 0,0815A110
-0815A1AC,thumb,Hidden tail after Player_AdvanceTetherPhase,
+0815A1AC,thumb,Hidden raw-tail function: spawns a randomly offset player effect group and plays its sound,0815A324
 0815A444,thumb,Hidden raw-tail function,0815A4D8
 0815A4D8,thumb,Hidden script query (actor direction),0815A534
 0815A554,thumb,Hidden script query (Player_IsActiveInLocomotionState),0815A578
