@@ -149,7 +149,8 @@ int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 /* Script command handler that follows sub_08232420 inside its ROM symbol (no label of its own). */
-s32 TimedHazard_CreateFromScript(void)
+// Provisional name: TimedHazard_CreateFromScript (hidden function, confidence low)
+s32 sub_0823269C(void)
 {
     struct HazardPackedVec position;
     s32 id, flags, delay, health;

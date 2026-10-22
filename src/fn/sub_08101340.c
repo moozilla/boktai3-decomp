@@ -81,20 +81,3 @@ void NamedObject_UpdateMovementSound(u8 *manager)
         }
     }
 }
-
-struct ContactPosition;
-u32 TetherActor_CopyPosition(struct ContactPosition *);
-void TetherActor_SetPosition(struct ContactPosition *);
-/* Follows NamedObject_UpdateMovementSound inside its ROM symbol (no label of its own).
- * Places the local player 0x80 along x from where it stands, then hands the position to the
- * tether helpers with another 0x80 added (confidence=low). */
-void NamedObject_PlacePlayerAndTether(void)
-{
-    struct Player *player = gUnk_02000580[0];
-    struct SceneVec position = player->position;
-    position.x += 0x80;
-    Player_SetPositionAndSave(player, &position);
-    TetherActor_CopyPosition((struct ContactPosition *)&position);
-    position.x += 0x80;
-    TetherActor_SetPosition((struct ContactPosition *)&position);
-}
