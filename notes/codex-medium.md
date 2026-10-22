@@ -4106,3 +4106,175 @@ Scratch attempts remain ignored under wip/; below-threshold functions have no
 new production source. All four exact files passed byte-resolved check.py;
 combined ROM validation remains the integrator's batch step. Intermediate
 97.7%/86.5% draft commits for 0809C174/0809D7C4 are superseded by exact commits.
+
+## Bee, Crow, Sword round 3 — 2026-10-22
+
+Tags: #matching #monster #bee #crow #sword #register-pinning
+
+Six exact matches, two new guarded drafts, and two improved existing guarded
+ drafts. Exact contribution: 0.0715% of total code (+0.0715 percentage points;
+1,724 bytes secondary). Of that, 0.0196 points are unpinned (472 bytes), and
+0.0519 points are Register-pinned (1,252 bytes). Every accepted source has its
+file-local descriptive alias; existing symbol names were reused. Only per-file
+check.py validation was used, with reviewed target extents. No make, full build,
+network operation or generated-assembly/ROM commit. Batch ROM validation remains
+the integrator's step. Ghidra export is unavailable. Scratch variants remain
+ignored under wip/ and build/.
+
+### Exact matches
+
+- **080F6370 — matched, Sword_UpdateComponentControl (Register-pinned).**
+  Component update skips disabled components, decrements their countdown, runs
+  the pre-collision callback, refreshes part colliders, and runs the second
+  callback. The adjacent Sword_UpdateComponents dispatch and the collider
+  updater establish the component role. A mask-taking inline gets the initial
+  mask-before-load shape; r1 mask/r0 flags pins resolve three register choices.
+  Exact reviewed extent: 84 bytes.
+- **080F4FA8 — matched, Sword_UpdateHorizontalWaveReturn (Register-pinned).**
+  Starts from Sword_UpdateHorizontalWaveFlight, uses sine index
+  (256 - timer) & 255, decrements the timer, and marks completion at zero.
+  Sword_DecelerateReturn selects this callback by trajectory direction.
+  Pinning the completion value to r0 after the rotation store preserves the
+  existing offset derivations; accumulating flags into that value fixes the
+  final OR destination. Exact reviewed extent: 228 bytes.
+- **080F508C — matched, Sword_UpdateDepthWaveReturn (Register-pinned).**
+  Depth-wave sibling of 080F4FA8, with the sine displacement on Z. Same completion
+  concession, independently checked. Exact reviewed extent: 228 bytes.
+- **080F5C9C — matched, Sword_DampTargetReturn (unpinned).**
+  Adapted SpinningApproach_DampReturnMovement (0818DC50). Every five ticks it
+  halves horizontal drift; once stopped it rebuilds the segment from the target
+  at component+0x15C, snapshots that target, reverses turn direction, and selects
+  TargetMotion_AdvanceFollowSegment. Local layout has callback+0x17C,
+  timer+0x184 and turn direction+0x18A; the first port omitted the +0x180 word,
+  leaving exactly four wrong offset constants. Correcting the layout matched.
+  Exact reviewed extent: 472 bytes.
+- **080F5F24 — matched, Sword_BeginRestOrbit (Register-pinned).**
+  Adapted Armor_InitPartStretch (0818DFF8). Initializes angular spacing from the
+  parent component count/base angle, positions each component 200 units around
+  the parent's position, sets the tracked target pointer, and dispatches its
+  pulse callback. Resting-state interpretation is explicitly tentative above
+  the alias. Pinning the RNG table, the shared one-to-minus-one value, callback
+  store and dispatch addresses resolves the remaining register/derivation
+  choices. Exact reviewed extent: 404 bytes.
+- **080F5B68 — matched, TargetMotion_AdvanceFollowSegment (Register-pinned).**
+  Improved the existing 87.3% draft. The interpolation and target correction
+  already matched; all residue was the completion tail. Keeping a shared r0
+  completion value, separately materializing +0x11F, and pinning the field and
+  callback addresses reproduces the exact stores without instruction bodies.
+  All values are initialized. Exact reviewed extent: 308 bytes.
+
+### New and improved guarded drafts
+
+- **080A0E00 — drafted 99.2%, Crow_ApproachPlayerThenRecoil.** Tentative name.
+  Starts from Lun_PursuePlayerPosition's control, scale and approach inlines.
+  Entry snapshots the player at context+0x3FC, computes approach durations in
+  +0x42C/+0x430 and vertical correction in +0x42E, and plays sound 247.
+  Arrival/terrain contact starts recoil at twice the movement speed. Replacing
+  a velocity-vector pointer with individual observed offsets improves 71.2%
+  to 98.6%; a mask-taking context helper and r1 depth-result pin reach 99.2%.
+  Four realigned differences remain: scheduling of zero before the depth store
+  and loading approach speed relative to the actor motion-address calculation.
+  Explicit pointer/zero barriers and revised Approach arguments regressed and
+  were discarded. Reviewed extent: 1,012 bytes, candidate also 1,012.
+- **080F5620 — drafted 94.6%, Sword_AccelerateReturnTurn.** The thrust-retraction
+  callback (080F558C) selects this after its return finishes. Adapted
+  ActorPhase_AccelerateTurn (080F542C), replacing angle target and completion
+  actions. Six differing instructions remain in the hoisted callback/state
+  address derivation order. Typed callback fields, u8/u32 inline parameters and
+  explicit pointer locals did not improve it. Reviewed extent: 184 bytes,
+  candidate also 184. No register pinning in this draft.
+- **080A11F4 — improved draft 86.6% to 89.0%,
+  SceneActorControl_UpdateHeightReturn.** Reusing the existing symbol name.
+  Reading ground height before forming the signed vertical difference and
+  writing the explicit phase field reduces realigned differences from 30/14
+  to 22/10 (total/ignoring registers). Ground-height load scheduling and final
+  state/phase offset derivation remain; candidate 332 vs reviewed 340 bytes.
+- **080F6F90 — improved draft 84.8% to 85.0%,
+  Sword_InitAttackComponents.** localsweep's removal of the `state = &sequence`
+  local reduces realigned differences from 115 to 114. Removing the component
+  sprite local instead regresses to about 74%, so it stays. Animation mask
+  lifetimes, collider argument addressing and register allocation remain.
+  Reviewed extent: 1,224 bytes. Preserves its existing register concession.
+
+### Stopped attempts; existing production sources retained
+
+- **08093138 — below threshold, 66.2%.** Retested the prior Bee_AdvanceRouteCurve
+  scratch against 476 bytes: 94 realigned differences / 43 ignoring registers;
+  candidate is 488 bytes. Cubic coefficient lifetimes/spills remain. No draft.
+- **0809345C — below threshold, 37.2%.** Prior Bee_BuildRouteCurve scratch still
+  has 232/37 realigned differences at the reviewed 488-byte extent. The sampler
+  loop and cubic coefficient allocation remain unsuitable for promotion.
+- **080941F4 — below threshold, 53.3%.** Prior Bee_FollowTargetRoute scratch has
+  298/140 realigned differences against 1,128 bytes, candidate 1,140. Stack
+  vectors and waypoint-address lifetimes remain; no new production source.
+- **080924EC — existing draft retained at 86.5%.** Typed context flags did not
+  change code; localsweep's removal of the flags pointer regressed. The exit
+  duplicates the context flag address, with additional low-register differences
+  and zero-store scheduling. Best remains 27/6 realigned differences.
+- **080929A4 — existing draft retained at 86.7%.** Removing the r8 context pin
+  regressed to 71.1% (89/39 realigned differences). Stack vectors, control setup
+  and state-store derivations remain. Keep the original pinned candidate.
+- **08093810 — existing draft retained at 82.1%.** Replacing byte-offset route
+  addressing with typed ContactPosition array indexing was code-identical:
+  130/71 realigned differences. Original guarded candidate retained.
+- **080A06E8 — below threshold, Crow_StopAtRaisedTerrain.** Adapted
+  RouteActor_ReflectAtRaisedTerrain (0809D2A8): sums position, secondary motion
+  and motion, evaluates terrain height, and clears movement on a raised cell.
+  Unpinned best was 76.4%, 49/19 realigned differences, candidate 404 vs reviewed
+  396 bytes. An r7 context pin produced an incorrect SP-relative derivation
+  (r7/frame-pointer interaction); rejected despite a higher coarse score.
+  A target pointer pin lowered structural residue but worsened total allocation.
+  No qualifying draft was committed.
+- **0809FC74 — existing draft retained at 98.7%.** Two differing instructions
+  select r2 instead of r3 for the +0x3ED timer-store offset. Explicit address
+  pins hoist the RNG mask and perturb the prologue; extending the RNG table's
+  lifetime also regresses. Original guarded candidate retained.
+- **0809EF50 — existing draft retained at 96.1%.** Body matches; prologue and
+  epilogue omit r7 preservation even though the existing r7 flag hint uses it.
+  An r7 clobber does not repair that compiler behavior; unpinning flags regresses
+  to 88.2%. No exact claim or source change.
+- **0809F510 — existing draft retained at 95.6%.** localsweep removing the
+  entry-flag address local worsens realigned differences (23 to 30 in its
+  legacy-length comparison). Entry-flag spill and control/reset ordering remain.
+- **0809F84C — existing draft retained at 91.5%.** Rewriting the Minimum ternary
+  as an explicit branch was code-identical (50/14 realigned differences).
+  Retained the defined vector padding rather than introducing uninitialized
+  scratch bytes to mimic the original paired-word copy.
+- **080A09DC — existing draft retained at 96.1%.** Mask accumulator and pinned
+  height-store offset experiments regressed to 93.4%. Ground-height temporary
+  destinations, derived +0x2EA constant and literal-pool extent remain.
+- **080F4CFC — existing draft retained at 97.4%.** Explicit pinned signed-load
+  zero indices grew the function to 324 bytes and regressed to 86.7%.
+  Original has only four differing register choices around the X/Z magnitude
+  loads. Existing ActorPhase_BeginLunge name remains appropriate.
+- **080F52C0 — existing draft retained at 95.5%.** Pinning the RNG table and
+  minus-one value regressed to 82.0%; original table register, minus-one copy
+  and four-byte extent deficit remain. No replacement retained.
+- **080F7458 — existing draft retained at 91.4%.** Pinning the clamped kind to
+  r1 regressed to 84.9%. Initial kind reload/store destination, pointer
+  rematerialization and associated palette/animation constants remain.
+
+### Large fresh initializers: inspected, no retained C candidate
+
+Read BIG_FUNCTIONS.md, generated condensed listings, inspected initialization,
+script-option and callback-registration sections, and queried matched relatives.
+These were stopped at static triage rather than presenting partial initializers
+as useful drafts; no byte-exact or fuzzy progress is claimed for them.
+
+- **08094764 — Bee_Init, 1,559 instructions / 3,548 bytes.** Best matched
+  relative covers only 11% (Bee_ResetRoute, principally the animation stepper
+  and terrain query). Sprite/tile allocation branches, extensive script options,
+  shadow/collider initialization, behavior-table installation and registry
+  snapshot/registration still need a complete candidate.
+- **080A1440 — Crow_Init, 1,334 instructions / 3,024 bytes.** Best relative
+  covers 11% (Mimic_ResetPursuitDrawable, mostly animation playback). Its final
+  setup installs Crow action/behavior tables and command/target/destroy
+  callbacks, then snapshots registry state and registers the actor. No complete
+  initializer candidate was constructed.
+- **080F67AC — tentative Sword_InitializeBodyAndColliders, 846 instructions /
+  2,020 bytes.** Best relative covers 25% (SingletonSlot7_InitDisplaySprites,
+  shared animation playback). The body sets up parent-target state, animation
+  and palette buffers, shadow, A/T/p/K/V script options, four child collider
+  pairs, and optional TargetRegistry event registration. The already-drafted
+  Sword_InitAttackComponents provides a stepper idiom but does not cover this
+  initializer's distinct body/script/collider setup. No partial C promoted.
