@@ -765,7 +765,7 @@ address,isa,evidence,replacement_end
 08245138,thumb,Hidden raw-tail function,082451A0
 082451A0,thumb,Hidden raw-tail function,082452B0
 082452B0,thumb,Hidden raw-tail function,08245300
-08245300,arm,STWI_init_slave: exact compiled RFU_V1024 source; docs/RFU.md,
+08245300,thumb,Hidden raw-tail function,0824538C
 0824538C,arm,Existing bx r2 callback trampoline; retained assembly; docs/RFU.md,
 08245390,arm,Existing bx r1 callback trampoline; retained assembly; docs/RFU.md,
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
