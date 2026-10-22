@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// Remaining difference: the second pointer to the local vector (r3) is a copy of r5 instead of a fresh sp+4.
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 
@@ -36,6 +33,7 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     *zero = 0;
     CpuSet(zero, v, 0x05000002);
 }
+#define Ghost_ChooseMovementDestination sub_08099660
 void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;
@@ -55,12 +53,11 @@ void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
         sub_08097798(actor);
         SetState(actor, 0, 0, 1);
         {
-            register struct ContactPosition *q asm("r3");
+            struct ContactPosition *q;
             struct ContactPosition *p = &local.target;
             struct ContactPosition *from = &actor->position;
-            asm("" : "+r"(from));
+            asm("" ::: "r7");
             q = &local.target;
-            asm("" : "+r"(q));
             q->x = q->x - from->x;
             p->y = p->y - from->y;
             p->z = p->z - from->z;
@@ -71,6 +68,3 @@ void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
     }
     actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_ChooseMovementDestination);
-#endif
