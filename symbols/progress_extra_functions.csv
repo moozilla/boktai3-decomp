@@ -269,6 +269,7 @@ address,evidence
 0811ABD8,Hidden tail after Terrain_SetColumnLayout
 0811AC54,Hidden tail function
 0811ACCC,Hidden tail after Terrain_GetCellHighByte
+0811AD2C,Terrain cell nibble getter (bits 12-15) in 0811ACCC hidden tail
 0811B048,Independent 76-byte SpatialIndex_ScanBuckets tail after Terrain_ResolveActorMotion's pool (gbadisasm keeps it inside 0811AE9C); exact C in src/fn/sub_0811AE9C.c
 0811B774,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 0811B77C,Independent leaf following a reviewed gap function; exact standalone C
