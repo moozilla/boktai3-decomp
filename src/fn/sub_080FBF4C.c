@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorPhase_SelectDistantWaypoint sub_080FBF4C
 #ifdef NONMATCHING
+// fuzzy: 98.1%
 #include "scene_actor_reset.h"
 
 // fuzzy: 98.1%
@@ -89,6 +89,7 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     out->z = entry[1];
 }
 
+#define ActorPhase_SelectDistantWaypoint sub_080FBF4C
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_SelectDistantWaypoint);
 #endif
