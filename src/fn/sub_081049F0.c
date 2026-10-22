@@ -1,8 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 82.2%
-// Register allocation and a few load/order choices still differ.
-// MATCHING_CONCESSION: register-pinning
+// fuzzy: 91.9%
+// Register allocation still differs in a few places.
 struct ActorGroupMember {
     u32 flags;
     u8 pad4[2];
@@ -30,12 +29,6 @@ static inline s32 Half(s32 x)
         return x >> 1;
     return -((-x) >> 1);
 }
-static inline s32 ScaleTemp(s32 x)
-{
-    register s32 result asm("r0") = Scale(x);
-    asm("" : : "r"(result));
-    return result;
-}
 static inline s32 WrapAngle(s32 x)
 {
     if (x > 128)
@@ -53,13 +46,10 @@ void ActorGroup_UpdateMemberSway(struct ActorGroupMember *p)
 
     if (angle == 0 && p->turnStep == 0)
         return;
-    {
-        register s32 part asm("r2") = ScaleTemp(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]);
-        asm("" : "+r"(part));
-        x = part + Scale(p->radiusZ * gUnk_086149C4[p->angle]);
-    }
-    z = ScaleTemp(-(p->radiusX * gUnk_086149C4[p->angle]));
-    z += Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
+    x = Scale(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]) +
+        Scale(p->radiusZ * gUnk_086149C4[p->angle]);
+    z = Scale(-(p->radiusX * gUnk_086149C4[p->angle])) +
+        Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
     p->x = p->originX + x;
     p->z = z + p->originZ;
     if (p->turnStep == 0) {
