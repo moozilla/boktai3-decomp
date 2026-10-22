@@ -1,8 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 84.5%
-// foundry draft (worker best 84.5%); what differs is mostly register allocation and instruction order
 
 #define WoodenCrate_TestFlag      WoodenCrate_HasFlags
 #define WoodenCrate_SetFlag       WoodenCrate_SetFlags
@@ -30,37 +27,32 @@ static inline u32 hitFlags(struct CrateHit *hit, u32 mask)
 {
     return hit->flags & mask;
 }
-static inline void react(struct CrateHit *hit, struct WoodenCrate *p)
+/* Returns TRUE when the hit starts the crate's toggle (state 3), FALSE when it only shakes. */
+static inline s32 WoodenCrate_ApplyHit(struct CrateHit *hit, struct WoodenCrate *p)
 {
     if (WoodenCrate_HasFlags(p, 16) || !hitFlags(hit, 0x17)) {
-        if (!p->shakeTimer)
+        u8 *shake = &p->shakeTimer;
+        if (!*shake)
             Sound_PlaySong(0x14D);
-        p->shakeTimer = 10;
+        *shake = 10;
     } else if (!p->timer) {
         p->state = 3;
         p->timer = 24;
         if (p->script)
             Script_Call(p->script, 0);
-    } else
-        return;
+        return TRUE;
+    }
+    return FALSE;
 }
+
 void WoodenCrate_ReactToHit(struct CrateHit *hit, void *unused, struct WoodenCrate *p)
 {
-    if (WoodenCrate_HasFlags(p, 16) || !hitFlags(hit, 0x17)) {
-        if (!p->shakeTimer)
-            Sound_PlaySong(0x14D);
-        p->shakeTimer = 10;
-    } else if (!p->timer) {
-        struct WoodenCrate *q = p;
-        q->state = 3;
-        q->timer = 24;
-        if (q->script)
-            Script_Call(q->script, 0);
-        WoodenCrate_BeginToggleAnimation(p);
-        if (WoodenCrate_HasFlags(p, 8))
-            WoodenCrate_SetFlags(p, 16);
+    /* Pinned: the ROM keeps a second copy of p (r5) for the calls after the inlined test. */
+    register struct WoodenCrate *target asm("r4") = p;
+    struct WoodenCrate *crate = target;
+    if (WoodenCrate_ApplyHit(hit, target)) {
+        WoodenCrate_BeginToggleAnimation(crate);
+        if (WoodenCrate_HasFlags(crate, 8))
+            WoodenCrate_SetFlags(crate, 16);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", WoodenCrate_ReactToHit);
-#endif

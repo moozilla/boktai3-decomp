@@ -587,83 +587,70 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 64.8%
-
-// Packed endpoint caching and register allocation differ; no exact credit.
-
-void TetherActor_UpdateSegments(struct TetherActor *input)
+// fuzzy: 87.9%
+// Remaining: the ROM hoists neither z endpoint out of the segment loop and keeps the
+// priority in sb; this hoists start.z and spills the priority.
+static inline s32 scaleOffsetR(s32 value)
 {
-    struct TetherActor *actor = input;
-    struct Player **globals = gUnk_02000580;
-    struct Player *player = globals[0];
-    u32 mode = player->tetherMode;
-    struct Player **slots = globals;
+    s32 result;
+    if (value >= 0)
+        result = value >> 12;
+    else
+        result = -((-value) >> 12);
+    return result;
+}
+void TetherActor_UpdateSegments(struct TetherActor *actor)
+{
     struct TetherSegment *segment;
-    struct ContactPackedVector start, end;
+    struct ContactPackedVector start;
+    struct ContactPackedVector end;
     s32 x;
     s32 z;
-    s32 offsetX, offsetZ;
+    s32 offsetX;
+    s32 offsetZ;
     u32 angle;
     s32 priority;
-    s32 index;
-    s32 accumulatedX, accumulatedY;
-    if (mode != 6) {
-        u32 hidden = 1;
-        segment = actor->segments;
-        index = 6;
-        do {
-            segment->flags |= hidden;
-            --index;
-            ++segment;
-        } while (index >= 0);
+    s32 i;
+    if ((*gUnk_02000580)->tetherMode != 6) {
+        s32 n;
+        for (n = 0, segment = actor->segments; n < 7; n++, segment++)
+            segment->flags |= 1;
         return;
     }
-    angle = ((player->heading + 1) & 7) * 32;
+    angle = (((*gUnk_02000580)->heading + 1) & 7) * 32;
     x = gUnk_086149C4[(angle + 64) & 255];
     z = gUnk_086149C4[angle & 255];
-    if (player->side) {
-        offsetX = scaleOffset(20 * (z - x));
-        offsetZ = scaleOffset(20 * (x + z));
+    if ((*gUnk_02000580)->side) {
+        offsetX = scaleOffsetR(20 * (z - x));
+        offsetZ = scaleOffsetR(20 * (x + z));
     } else {
-        offsetX = scaleOffset(20 * (x + z));
-        offsetZ = scaleOffset(20 * (z - x));
+        offsetX = scaleOffsetR(20 * (x + z));
+        offsetZ = scaleOffsetR(20 * (z - x));
     }
-    player = slots[0];
-    start.x = player->position.x + offsetX;
-    start.y = player->position.y + 220;
-    start.z = player->position.z + offsetZ;
+    start.x = (*gUnk_02000580)->position.x + offsetX;
+    start.y = (*gUnk_02000580)->position.y + 220;
+    start.z = (*gUnk_02000580)->position.z + offsetZ;
     angle = ((actor->heading + 5) & 7) * 32;
-    end.x = actor->position.x + scaleOffset(100 * gUnk_086149C4[(angle + 64) & 255]);
+    end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
     end.y = actor->position.y - 50;
-    end.z = actor->position.z + scaleOffset(100 * gUnk_086149C4[angle & 255]);
+    end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
     priority = -2;
-    if (slots[0]->heading == 4)
+    if ((*gUnk_02000580)->heading == 4)
         priority = -20;
     segment = actor->segments;
-    index = 0;
-    {
-        s32 startX = start.x;
-        s32 startY = start.y;
-        s32 endX = end.x;
-        s32 nextX = endX;
-        s32 endY = end.y;
-        s32 nextY = endY;
-        do {
-            s32 count = index + 1;
-            s32 remaining = 7 - index;
-            segment->position.x = (nextX + startX * remaining) >> 3;
-            segment->position.y = (nextY + startY * remaining) >> 3;
-            segment->position.z = (end.z * count + start.z * remaining) >> 3;
-            segment->priority = priority;
-            segment->flags &= ~1;
-            nextX += endX;
-            nextY += endY;
-            index = count;
-            ++segment;
-        } while (index <= 6);
-    }
+    i = 0;
+    do {
+        s32 count = i + 1;
+        s32 remaining = 7 - i;
+        segment->position.x = (end.x * count + start.x * remaining) >> 3;
+        segment->position.y = (end.y * count + start.y * remaining) >> 3;
+        segment->position.z = (start.z * remaining + end.z * count) >> 3;
+        segment->priority = priority;
+        segment->flags &= ~1;
+        i = count;
+        ++segment;
+    } while (i <= 6);
 }
-
 #else
 
 INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateSegments);
@@ -1409,75 +1396,127 @@ done:
     return r;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 65.6%
+#define NEAR_CELL(out, px, pz)                                                                     \
+    do {                                                                                           \
+        s32 cx_ = (px) >> 8;                                                                       \
+        s32 cz_ = (pz) >> 8;                                                                       \
+        if (cx_ < 0 || cz_ < 0 || (u32)cx_ >= gUnk_030052F8 || (u32)cz_ >= gUnk_030052FC)          \
+            out = 0;                                                                               \
+        else                                                                                       \
+            out = gUnk_030052F4->rows[cz_] + cx_;                                                  \
+    } while (0)
 
-/* Distance/status gate and orthogonal slope routes are understood; register lifetimes and branch layout still differ. */
+#define NEAR_HEIGHT(out, pos, index)                                                               \
+    do {                                                                                           \
+        u8 *properties_ = TerrainModifiers_FindCellOverride(index, 1);                             \
+        u32 surface_;                                                                              \
+        if (properties_)                                                                           \
+            properties_ += 4;                                                                      \
+        else {                                                                                     \
+            struct EngineMap *map_ = gUnk_030052F4;                                                \
+            u32 offset_ = index * 4 + 12;                                                          \
+            properties_ = map_->cells + offset_;                                                   \
+        }                                                                                          \
+        surface_ = *properties_ >> 4;                                                              \
+        out = (*properties_ & 15) << 8;                                                            \
+        switch (surface_) {                                                                        \
+            case 1:                                                                                \
+                out -= (u8)(pos)->z;                                                               \
+                break;                                                                             \
+            case 2:                                                                                \
+                out -= (u8)(pos)->x;                                                               \
+                break;                                                                             \
+        }                                                                                          \
+    } while (0)
 
 u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag, u32 flags)
 {
-    struct TetherActor *actor = gUnk_02000488;
-    s32 dx, dz, ownIndex, otherIndex;
+    s32 dx;
+    s32 dz;
+    s32 own;
+    s32 other = 0;
+    struct EngineMap *map;
+    s32 height;
+    s32 diff;
     u32 state;
-    u16 rawX, rawZ;
-    struct ContactPackedVector corner;
-    u32 result;
-    if (!actor)
+    union {
+        struct ContactPackedVector v;
+        struct ContactPosition p;
+    } corner;
+    if (!gUnk_02000488)
         goto no;
-    dx = position->x - actor->position.x;
-    dz = position->z - actor->position.z;
-    if ((s32)((u32)dx * dx + (u32)dz * dz) > 48400)
+    dx = position->x - gUnk_02000488->position.x;
+    dz = position->z - gUnk_02000488->position.z;
+    if (dx * dx + dz * dz > 48400)
         goto no;
-    state = actor->state;
+    state = gUnk_02000488->state;
     if ((u8)(state - 16) <= 1)
         goto yes;
-    if (state != 0 && state != 3 && state != 4)
+    if ((u8)state != 0 && (u8)state != 3 && (u8)state != 4)
         goto no;
-    actor = gUnk_02000488;
-    if (!TetherActor_TestMatchingStatus(tag, flags, actor->statusTag, actor->statusFlags))
+    if (!TetherActor_TestMatchingStatus(tag, flags, gUnk_02000488->statusTag,
+                                        gUnk_02000488->statusFlags))
         goto no;
-    rawX = position->x;
-    rawZ = position->z;
-    ownIndex = cellIndex_08049840((s16)rawX >> 8, (s16)rawZ >> 8);
-    actor = gUnk_02000488;
-    otherIndex = cellIndex_08049840(actor->position.x >> 8, actor->position.z >> 8);
-    if (ownIndex == otherIndex)
-        goto yes;
-    if (ownIndex == otherIndex + 1 || ownIndex == otherIndex - 1 ||
-        ownIndex == otherIndex + ((s16 *)gUnk_030052F4->cells)[2] ||
-        ownIndex == otherIndex - ((s16 *)gUnk_030052F4->cells)[2]) {
-        actor = gUnk_02000488;
-        if (absolute_08049840(position->y - actor->position.y) <= 255)
-            goto yes;
-        goto no;
+    NEAR_CELL(own, position->x, position->z);
+    {
+        struct ContactPosition *p = &gUnk_02000488->position;
+        s32 cx = p->x >> 8;
+        s32 cz = p->z >> 8;
+        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+            other = 0;
+        else
+            other = gUnk_030052F4->rows[cz] + cx;
     }
-    actor = gUnk_02000488;
-    if (absolute_08049840(position->y - actor->position.y) > 255)
-        goto no;
-    corner.x = rawX - dx;
-    corner.z = rawZ;
-    ownIndex = cellIndex_08049840(corner.x >> 8, corner.z >> 8);
-    if (absolute_08049840(position->y - terrainHeight(&corner, ownIndex)) <= 127)
+    if (own == other)
         goto yes;
-    corner.x = position->x;
-    corner.z = position->z - dz;
-    ownIndex = cellIndex_08049840(corner.x >> 8, corner.z >> 8);
-    if (absolute_08049840(position->y - terrainHeight(&corner, ownIndex)) <= 127)
+    if (own == other + 1 || own == other - 1 ||
+        own == other + ((s16 *)(map = gUnk_030052F4)->cells)[2] ||
+        own == other - ((s16 *)map->cells)[2]) {
+        diff = position->y - gUnk_02000488->position.y;
+        if (diff < 0)
+            diff = -diff;
+        if (diff > 255)
+            goto no;
+    yes:
+        return 1;
+    }
+    diff = position->y - gUnk_02000488->position.y;
+    if (diff < 0)
+        diff = -diff;
+    if (diff > 255)
+        goto no;
+    corner.v.x = position->x - dx;
+    corner.v.z = position->z;
+    {
+        struct ContactPackedVector *cp = &corner.v;
+        s32 cx = cp->x >> 8;
+        s32 cz = cp->z >> 8;
+        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+            own = 0;
+        else
+            own = map->rows[cz] + cx;
+        NEAR_HEIGHT(height, cp, own);
+    }
+    diff = position->y - height;
+    if (diff < 0)
+        diff = -diff;
+    if (diff <= 127)
+        goto yes;
+    corner.p.x = position->x;
+    corner.p.z = position->z - dz;
+    {
+        struct ContactPosition *cp = &corner.p;
+        NEAR_CELL(own, cp->x, cp->z);
+        NEAR_HEIGHT(height, cp, own);
+    }
+    diff = position->y - height;
+    if (diff < 0)
+        diff = -diff;
+    if (diff <= 127)
         goto yes;
 no:
-    result = 0;
-    goto done;
-yes:
-    result = 1;
-done:
-    return result;
+    return 0;
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", TetherActor_TestNearbyInteraction);
-
-#endif
 
 void TetherActor_SetInteractionTarget(struct ContactPosition *a, u32 b)
 {
@@ -2966,110 +3005,45 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 67.9%
-
-/* Distance limiter recovered; scratch-register allocation still differs. */
-
-void TetherActor_LimitPlayerDistance(struct TetherActor *input)
+static inline s32 TetherActor_Cosine70(s32 angle)
 {
-    struct TetherActor *actor = input;
-    struct Player **savedSlot;
-    s32 angle;
-    s32 offsetX;
-    s32 offsetZ;
-    s16 *savedX;
-    s16 *savedZ;
-    s16 *sourceX;
-    s16 *sourceZ;
-    s32 dx;
-    s32 dz;
-    {
-        struct Player **slot = gUnk_02000580;
-        u32 value = (*slot)->facing;
-        const s16 *table;
-        s32 sample;
-        s32 product;
-        value = (value + 1) & 7;
-        angle = value << 5;
-        table = gUnk_086149C4;
-        sample = table[(angle + 64) & 255];
-        product = 70;
-        product *= sample;
-        savedSlot = slot;
-        offsetX = truncateShift(product, 12);
-        sample = table[angle & 255];
-        product = 70;
-        product *= sample;
-        product = truncateShift(product, 12);
-        offsetZ = product;
-    }
-    {
-        struct Player *player = *savedSlot;
-        s32 value = player->position.x + offsetX;
-        sourceX = &actor->position.x;
-        {
-            s32 other = *sourceX;
-            dx = value - other;
-        }
-        value = player->position.z + offsetZ;
-        sourceZ = &actor->position.z;
-        {
-            s32 other = *sourceZ;
-            dz = value - other;
-        }
-    }
-    {
-        s32 squaredX = dx * dx;
-        s32 squaredZ = dz * dz;
-        s32 limit;
-        squaredX += squaredZ;
-        limit = 22500;
-        savedX = sourceX;
-        savedZ = sourceZ;
-        if (squaredX <= limit)
-            return;
-    }
-    angle = Math_Atan2(dx, dz);
-    {
-        struct Player **slot;
-        s32 radialX = cosine(angle, 150);
-        s32 radialZ = sine(angle, 150);
-        s32 targetX;
-        s32 targetZ;
-        s16 *axis = savedX;
-        s32 sample = *axis;
-        s32 value = offsetX;
-        sample -= value;
-        targetX = sample + radialX;
-        axis = savedZ;
-        value = *axis;
-        value -= offsetZ;
-        targetZ = value + radialZ;
-        slot = gUnk_02000580;
-        value = (*slot)->position.x * 3 + targetX;
-        savedSlot = slot;
-        {
-            s32 result = truncateShift(value, 2);
-            (*savedSlot)->position.x = result;
-        }
-        value = (*savedSlot)->position.z * 3 + targetZ;
-        {
-            s32 result = truncateShift(value, 2);
-            (*savedSlot)->position.z = result;
-        }
-        TetherActor_BlockPlayerAcrossTerrain(actor);
-        {
-            (*savedSlot)->colliderPosition = (*savedSlot)->position;
-        }
-    }
+    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 70, 12);
+    return result;
 }
 
-#else
+static inline s32 TetherActor_Sine70(s32 angle)
+{
+    s32 result = truncateShift(gUnk_086149C4[angle & 255] * 70, 12);
+    return result;
+}
 
-INCLUDE_ASM("asm/nonmatching", TetherActor_LimitPlayerDistance);
+static inline s32 TetherActor_Cosine150(s32 angle)
+{
+    s32 result = truncateShift(gUnk_086149C4[(angle + 64) & 255] * 150, 12);
+    return result;
+}
 
-#endif
+void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
+{
+    s32 angle = (((*gUnk_02000580)->facing + 1) & 7) << 5;
+    s32 offsetX = TetherActor_Cosine70(angle);
+    s32 offsetZ = TetherActor_Sine70(angle);
+    s32 dx = (*gUnk_02000580)->position.x + offsetX - actor->position.x;
+    s32 dz = (*gUnk_02000580)->position.z + offsetZ - actor->position.z;
+    if (dx * dx + dz * dz > 22500) {
+        s32 radialZ, targetX, targetZ;
+        angle = Math_Atan2(dx, dz);
+        /* The radial X offset reuses dx's register. */
+        dx = TetherActor_Cosine150(angle);
+        radialZ = truncateShift(gUnk_086149C4[angle & 255] * 150, 12);
+        targetX = actor->position.x - offsetX + dx;
+        targetZ = actor->position.z - offsetZ + radialZ;
+        (*gUnk_02000580)->position.x = truncateShift((*gUnk_02000580)->position.x * 3 + targetX, 2);
+        (*gUnk_02000580)->position.z = truncateShift((*gUnk_02000580)->position.z * 3 + targetZ, 2);
+        TetherActor_BlockPlayerAcrossTerrain(actor);
+        (*gUnk_02000580)->colliderPosition = (*gUnk_02000580)->position;
+    }
+}
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -3238,116 +3212,54 @@ u32 TetherActor_TestNearDelta(s32 a, s32 b)
     return 1;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.9%
-
-/* Complete body; remaining differences are scratch-register allocation. */
-
 void TetherActor_UpdateRoamingState(struct TetherActor *actor)
 {
-    struct ContactPosition *position;
     struct ContactPackedVector delta;
-    s32 activeMask;
-    s32 headingMask;
     if (actor->state != 3)
         TetherActor_SetState(actor, 3);
     if (gUnk_030053F4 & 512)
         return;
     if (actor->chargeReady) {
-        {
-            {
-                u16 *glow = &actor->glowMode;
-                *glow = 0;
-            }
-        }
-        {
-            u16 *frame = &actor->roamFrame;
-            *frame = 0;
-        }
+        actor->glowMode = 0;
+        actor->roamFrame = 0;
         TetherActor_UpdateShake(actor);
-        position = &actor->position;
     } else {
-        u16 *frame;
-        activeMask = 1;
-        actor->glowMode = activeMask;
-        {
-            u32 currentFrame = actor->roamFrame;
-            position = &actor->position;
-            if (currentFrame > 90) {
-                s32 dx;
-                s32 dz;
-                s16 *z;
+        actor->glowMode = 1;
+        if (actor->roamFrame > 90) {
+            s32 dx = actor->interactionProbe.target.x - actor->position.x;
+            s32 dz = actor->interactionProbe.target.z - actor->position.z;
+            if (dx || dz) {
+                u32 angle = Math_Atan2(dx, dz);
+                delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
+                delta.y = 0;
+                delta.z = scale(gUnk_086149C4[angle & 255] * 3);
+                if (TetherActor_TestStepDelta((struct ContactPackedVector *)&actor->position,
+                                              &delta, 0x841)) {
+                    actor->position.x += delta.x;
+                    actor->position.z += delta.z;
+                    actor->moving = 1;
+                } else
+                    actor->moving = 0;
                 {
-                    s32 targetX = actor->interactionProbe.target.x;
-                    s32 worldX = position->x;
-                    targetX -= worldX;
-                    dx = targetX;
+                    s32 sector = ((u16)angle + 112) >> 5;
+                    u32 mask = 7;
+                    mask &= sector;
+                    actor->heading = mask;
                 }
-                headingMask = 7;
-                {
-                    s32 targetZ = actor->interactionProbe.target.z;
-                    s16 *worldZ = &actor->position.z;
-                    s32 value = *worldZ;
-                    targetZ -= value;
-                    dz = targetZ;
-                    z = worldZ;
-                }
-                if (dx || dz) {
-                    u32 angle = Math_Atan2(dx, dz);
-                    delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
-                    delta.y = 0;
-                    {
-                        s32 stepZ = scale(gUnk_086149C4[angle & 255] * 3);
-                        delta.z = stepZ;
-                    }
-                    {
-                        u32 accepted = TetherActor_TestStepDelta(
-                            (struct ContactPackedVector *)position, &delta, 0x841);
-                        if (accepted) {
-                            position->x += delta.x;
-                            {
-                                u32 value = (u16)delta.z;
-                                s16 *source = z;
-                                u32 current = *(u16 *)source;
-                                s16 *destination;
-                                value += current;
-                                destination = z;
-                                *(u16 *)destination = value;
-                            }
-                            actor->moving = 1;
-                        } else
-                            actor->moving = accepted;
-                    }
-                    {
-                        s32 sector = (u16)angle;
-                        u32 mask = headingMask;
-                        sector += 112;
-                        sector >>= 5;
-                        mask &= sector;
-                        actor->heading = mask;
-                    }
-                }
-                if (!(actor->interactionProbe.flags & activeMask) &&
-                    TetherActor_TestNearDelta(dx, dz) && actor->interactionScriptId)
-                    Script_Call(actor->interactionScriptId, 0);
             }
+            if (!(actor->interactionProbe.flags & 1) && TetherActor_TestNearDelta(dx, dz) &&
+                actor->interactionScriptId)
+                Script_Call(actor->interactionScriptId, 0);
         }
-        frame = &actor->roamFrame;
-        if (++*frame > 119)
-            *frame = 0;
+        if (++actor->roamFrame > 119)
+            actor->roamFrame = 0;
         if (actor->kind == 5 && actor->moving)
             TetherActor_SetHeadingEntry(actor, 36);
         else
             TetherActor_SetEntry(actor, 0);
     }
-    NavMesh_UpdateProbe(&actor->interactionProbe, position);
+    NavMesh_UpdateProbe(&actor->interactionProbe, &actor->position);
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateRoamingState);
-
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 

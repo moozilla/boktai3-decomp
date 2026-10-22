@@ -2,9 +2,12 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.4%
-// Remaining: the early zp pointer only exists to give z the lowest stack slot (as in the ROM);
-// it costs a register and a spill for a. Replace it with whatever makes z first.
+// fuzzy: 92.3%
+// Remaining: the ROM loads the else-branch 0 for b into r1 (so the two `mov sb` are not
+// cross-jumped), schedules the CpuFill32 mode literal after the fill store, and keeps the
+// flags address in r2.
+#include "gba/macro.h"
+#include "gba/syscall.h"
 struct PackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -28,8 +31,6 @@ void sub_080697C8(void)
     struct PackedVec zero;
     s32 a, b, l, n;
     u8 *object;
-    u32 z;
-    u32 *zp = &z;
     b = 0;
     a = 0;
     if (Script_SeekToKeyword('p')) {
@@ -39,7 +40,10 @@ void sub_080697C8(void)
     }
     if (Script_SeekToKeyword('a')) {
         a = optionalValue();
-        b = optionalValue();
+        if (!Script_GetPc())
+            b = 0;
+        else
+            b = Script_GetValue();
     }
     if (Script_SeekToKeyword('v')) {
         vel.x = optionalValue();
@@ -52,8 +56,7 @@ void sub_080697C8(void)
     }
     l = Script_GetKeywordValue('l', 0);
     n = Script_GetKeywordValue('n', 0);
-    *zp = 0;
-    CpuSet(zp, &zero, 0x05000002);
+    CpuFill32(0, &zero, 8);
     object = BouncingObject_Spawn(&pos, &vel, &zero, a, b, l, n);
     if (object)
         *(u16 *)(object + 0x134) |= 1;

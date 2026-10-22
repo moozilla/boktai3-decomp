@@ -1,19 +1,25 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.0%
-// Option parsing, pointer lifetimes, loop shape and register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
 struct Frames {
     u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, pada, rate, timer;
+    u8 flags;
+    u8 count;
+    u8 multiplier;
+    u8 duration;
+    u16 index;
+    u16 pada;
+    u16 rate;
+    u16 timer;
 };
 struct Render {
     u32 flags;
     u8 pad[12];
     u16 tile;
     u8 pad12[10];
-    s16 x, y, z, pad22;
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 pad22;
 };
 struct Context {
     u8 pad[0x18];
@@ -34,7 +40,10 @@ s32 ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s
 void Memory_Clear(void *, u32);
 void sub_08105194(void *, s32, s32, s32);
 struct Position {
-    s16 x, y, z, pad;
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 pad;
 };
 struct Member {
     struct Render render;
@@ -70,7 +79,6 @@ struct Member {
     u32 scriptI;
     u32 arguments[8];
 };
-
 static inline s32 ReadOptional(void)
 {
     if (Script_GetPc())
@@ -78,26 +86,18 @@ static inline s32 ReadOptional(void)
     return 0;
 }
 void Anim_SetSequence(struct Frames *, void *, u16, int, int);
-void Anim_RestartSequence(struct Frames *, void *, u16, int, int);
 s32 Div(s32, s32);
-static inline u8 Test(u8 *p, u32 mask)
+static inline void Step(struct Member *m, struct Render *owner, struct Frames *state)
 {
-    if (*(u32 *)(p + 0x108) & mask)
-        return 1;
-    return 0;
-}
-static inline void Step(struct Render *owner, struct Frames *state)
-{
-    struct Render *r = owner;
     register struct Frames *f asm("r4") = state;
     const volatile u16 *word;
 
     {
         u32 offset = f->index << 1;
-        const volatile u16 *table = f->data;
+        const volatile u16 *table = m->frames.data;
         word = (const volatile u16 *)((u32)table + offset);
     }
-    r->tile = *word >> 6;
+    owner->tile = *word >> 6;
     {
         int settings = f->flags;
         register int mask asm("r3") = 1;
@@ -108,9 +108,9 @@ static inline void Step(struct Render *owner, struct Frames *state)
         bits = (*word & 48) >> 4;
         bits &= mask;
         if (mine != bits)
-            r->flags |= 4;
+            owner->flags |= 4;
         else
-            r->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
         int settings = f->flags;
@@ -124,12 +124,12 @@ static inline void Step(struct Render *owner, struct Frames *state)
         bits = (*word & 48) >> 4;
         bits &= mask;
         if (mine != bits)
-            r->flags |= 8;
+            owner->flags |= 8;
         else
-            r->flags &= ~8;
+            owner->flags &= ~8;
     }
     {
-        u32 mask;
+        register u32 mask asm("r5");
         register int duration asm("r2");
         register int savedDuration asm("r3");
         u32 timer = f->timer + 1;
@@ -203,8 +203,10 @@ void ActorGroup_CreateFromScript(void)
     struct Member *p;
     struct Render *render;
     s32 c;
-    s32 a, b;
-    u32 zero, one;
+    s32 a;
+    s32 b;
+    u32 zero;
+    u32 one;
     struct Frames *sequence;
     s32 i;
     s32 value;
@@ -223,9 +225,12 @@ void ActorGroup_CreateFromScript(void)
         AnimData_Load(graphics, 0x9385);
         Sprite_Init(p, graphics, 0);
     }
-    zero = 0;
-    one = 1;
-    p->started = one;
+    {
+        u8 *started = &p->started;
+        zero = 0;
+        one = 1;
+        *started = one;
+    }
     p->damageIndex = zero;
     p->scriptM = Script_GetKeywordValue('m', 0);
     if (Pool184_TestStatusFlags(p, 2))
@@ -266,35 +271,31 @@ void ActorGroup_CreateFromScript(void)
     }
     {
         u32 flag = Pool184_TestStatusFlags(p, 2);
-        s32 result;
         if (flag)
-            result = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 96, 100, 2560,
-                                             1, 5, 1, 0);
+            p->shadowId = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 96, 100,
+                                                  2560, 1, 5, 1, 0);
         else
-            result = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 128, 100, 2560,
-                                             1, 5, 1, flag);
-        p->shadowId = result;
+            p->shadowId = ScaledShadow_Initialize((u8 *)&p->shadow, &p->render.x, 64, 16, 128, 100,
+                                                  2560, 1, 5, 1, flag);
     }
-    value = Script_GetKeywordValue('I', 0);
-    p->scriptI = value;
+    p->scriptI = Script_GetKeywordValue('I', 0);
     sequence = &p->frames;
-
-    if (value) {
+    if (p->scriptI) {
         Memory_Clear((u8 *)&p->arguments, 32);
         if (Script_SeekToKeyword('G')) {
-            for (i = 0; i <= 2; i++) {
-                u32 *dest;
-                dest = (u32 *)((u8 *)p + 0x164 + i * 4);
-                *dest = ReadOptional();
-            }
+            i = 0;
+        next: {
+            u32 offset = i * 4;
+            u32 *base = p->arguments;
+            u32 *dest = (u32 *)((u32)base + offset);
+            *dest = ReadOptional();
+        }
+            if (++i <= 2)
+                goto next;
         }
     }
     Anim_SetSequence(sequence, pool->resource, 0, 0, p->animationFlags);
 
-    Step(render, sequence);
+    Step(p, render, sequence);
     sub_08105194(p, a, b, c);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ActorGroup_CreateFromScript);
-#endif
