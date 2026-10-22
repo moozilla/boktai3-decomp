@@ -1,9 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: planar debris lifetime follows completion of its visual animation.
-#ifdef NONMATCHING
-// fuzzy: 96.2%
-/* ROM has an uninitialized projected depth; this draft explicitly uses zero. */
+/* ROM copies an uninitialized projected depth halfword; keep it uninitialized to match. */
 #include "actor_attachment_state.h"
 struct Visual {
     u8 unknown0[0x1c];
@@ -193,8 +191,6 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
     p->position.y = p->position.y + p->velocity.y;
     projected.x = p->position.x - gUnk_020004B8->x;
     projected.y = p->position.y - gUnk_020004B8->y;
-    /* Defined draft: the ROM copies this scratch halfword without initializing it. */
-    projected.z = 0;
     output = (void *)&projected;
     asm("" : "+r"(output));
     if (!p->visualType) {
@@ -220,6 +216,3 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
     }
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", SceneDebris_UpdateAnimatedMotion);
-#endif

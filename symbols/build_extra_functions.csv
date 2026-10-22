@@ -606,6 +606,8 @@ address,isa,evidence,replacement_end
 0821BDD8,thumb,Hidden raw-tail function,0821BE3C
 0821C884,thumb,Hidden raw-tail function: probes terrain at an offset position,0821C8F8
 0821DE0C,thumb,Hidden raw-tail function,0821DE30
+0821E0D0,thumb,Separate 52-byte Thumb function hidden after Trap_DispatchEvent (any box with id exists),0821E104
+0821E2F8,thumb,Separate 188-byte Thumb function hidden after Trap_Register (removes traps by script id),0821E3B4
 0821E500,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0821E52C
 0821E654,thumb,Hidden raw-tail function,0821E67C
 0821E7B4,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0821E7C4
