@@ -466,6 +466,7 @@ address,evidence
 0819EB84,Hidden raw-tail function (retained)
 0819EBD0,Hidden raw-tail function (retained)
 0819F49C,Hidden tail after Hresvelgr_UpdateAdjacentRandomBurstPhase
+0819F4D8,Hidden tail function
 081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
 081A398C,Hidden raw-tail function
 081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
@@ -545,6 +546,7 @@ address,evidence
 081F339C,Hidden raw-tail function
 081F33CC,Hidden raw-tail function
 081F3414,Hidden tail after SceneDistance_ClearLinkedEntry
+081F348C,Hidden tail function
 081FB7D8,Hidden counter difference with wrap (retained)
 081FB808,Hidden leaf returning 0
 081FB80C,Hidden velocity integrate step
@@ -672,6 +674,8 @@ address,evidence
 08222C70,Serial getter; part of the reviewed 08222A04-08222C7C span
 08223884,Hidden raw-tail function
 08224BC4,Hidden tail after RfuManager_SetEventCallback
+08224C08,Hidden tail function
+08224C44,Hidden tail function
 08224CCC,Hidden raw-tail function
 08224EFC,Hidden raw-tail function
 08224F14,Hidden raw-tail function
