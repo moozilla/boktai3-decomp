@@ -216,7 +216,7 @@ address,isa,evidence,replacement_end
 081090E0,thumb,Link session: stores a value in the first free of five slots at 0x164; -1 when unavailable; raw span,08109134
 08109184,thumb,Script command: writes LinkSession_CountPlayerKind of the script value to a reference; raw span,081091AC
 081091AC,thumb,Script command: writes link session halfword 0x18 (or -1) to a reference; raw span,081091E4
-08109264,thumb,Hidden tail after LinkSession_IncrementAlternateCounter,
+08109264,thumb,Hidden raw-tail function,081092F0
 08109324,thumb,Link session: sets byte 0x25 of gUnk_020004B4 when present; raw span before Registry1745_SetCancelRequest,08109340
 081093DC,thumb,Link session: TRUE when gUnk_020004B4 exists and byte 0x1E is set; raw span before LinkSession_CallPositionScript,081093FC
 0810BD34,thumb,Registry-style reset: per-slot words and seed index from 0x140; raw span,0810BD8C
@@ -560,7 +560,10 @@ address,isa,evidence,replacement_end
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
 08217050,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217060
-08217090,thumb,Hidden tail after Video_SetBlendBrightness,
+08217090,thumb,Hidden tail function,082170D4
+082170D4,thumb,Hidden tail function,082170FC
+082170FC,thumb,Hidden tail function,0821710C
+0821710C,thumb,Hidden tail function,08217120
 08217414,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08217430
 08218BC8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08218BD4
 08218C40,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08218C5C

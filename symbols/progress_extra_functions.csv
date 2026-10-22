@@ -576,6 +576,9 @@ address,evidence
 08217040,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 08217050,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 08217090,Hidden tail after Video_SetBlendBrightness
+082170D4,Hidden tail function
+082170FC,Hidden tail function
+0821710C,Hidden tail function
 08217414,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 08218BC8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08218C40,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
