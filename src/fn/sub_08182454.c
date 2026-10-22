@@ -1,9 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define ActorController_SetAnimation sub_08182454
 
 #ifdef NONMATCHING
-// fuzzy: 82.7%
+// fuzzy: 92.9%
+#define ActorController_SetAnimation sub_08182454
 // Remaining: side-constant scratch registers and final mode/flags argument scheduling.
 #define Armor_SetAnimation       ActorController_SetAnimation
 #define gArmorAnimationVariants  gUnk_0824EB60
@@ -66,5 +66,5 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
     s->flags &= ~0x20;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", ActorController_SetAnimation);
+INCLUDE_ASM("asm/nonmatching", sub_08182454);
 #endif
