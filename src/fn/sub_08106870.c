@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Remaining: the sprite reload before the flag-1 store takes r1 instead of r2 (reload rotation;
-// rasolve: one reload fewer before it). `one` is pinned to r4 as in the ROM.
 #include "contact_swarm.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
@@ -196,9 +192,10 @@ void RegionActor_CreateFromScript(void)
     Sprite_Init(p, (u8 *)p + 0x2C, 0);
     Step(sprite, &p->sequence);
     {
-        u32 f = sprite->flags;
+        register struct ContactSwarmSprite *s asm("r2") = sprite;
+        u32 f = s->flags;
         one = 1;
-        sprite->flags = f | one;
+        s->flags = f | one;
     }
     p->variant = Script_GetKeywordValue('m', 0);
     switch (p->variant) {
@@ -249,7 +246,3 @@ void RegionActor_CreateFromScript(void)
     } else
         p->overlayActive = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", RegionActor_CreateFromScript);
-#endif
