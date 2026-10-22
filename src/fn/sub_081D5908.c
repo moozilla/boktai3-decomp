@@ -1,113 +1,97 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 50.3%
-// 59 differing instruction runs; size -56 bytes; first diff at +0xA (sub sp, #0x38 vs sub sp, #0x34)
-struct A {
-    u32 a[8];
+
+struct ResHdr {
+    u32 words[8];
 };
-struct V {
+struct BookWidget {
+    u8 pad0[8];
+    u32 flags;
+    u8 pad1[0x16];
+    u16 x22;
+    u8 pad2[0x24];
+    void *pal;
+    u8 pad3[0x14];
+};
+struct WidgetPos {
     s16 x, y, z, w;
 };
-struct A *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(struct A *, struct A *);
-void Widget_InitLinked(u8 *, struct A *, u32, u32, u32, u32, u32, struct V *);
-u32 sub_081D5908(u8 *s)
+struct MonsterBookGfx {
+    u8 pad0[0x48];
+    u8 page;
+    u8 pad1[3];
+    struct ResHdr hdr;
+    struct BookWidget title;
+    struct BookWidget w1;
+    struct BookWidget w2;
+    struct BookWidget w3;
+    struct BookWidget w4;
+    struct BookWidget w5;
+    struct BookWidget rows[7];
+    struct BookWidget cells[7][2];
+    struct BookWidget a[2];
+    struct BookWidget b;
+    struct BookWidget c[2];
+    struct BookWidget d;
+    struct BookWidget e;
+    u16 palette[16];
+};
+
+struct ResHdr *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(struct ResHdr *, struct ResHdr *);
+void Widget_InitLinked(struct BookWidget *, struct ResHdr *, u32, u32, u32, u32, u32,
+                       struct WidgetPos *);
+
+static inline void WidgetPos_Clear(struct WidgetPos *p)
 {
-    struct V v;
-    struct A *a = ScriptProc_Start(0xCB05, 0xE2AB);
-    struct A *b = (struct A *)(s + 0x4C);
-    u8 *dst;
-    u8 *other;
-    s32 i, j;
-    s32 stride;
-    u32 zero;
-    *b = *a;
-    ResourceHeader_Relocate(b, a);
-    v.x = 0;
-    v.y = 0;
-    v.z = 0;
-    v.w = 0;
-    i = 0;
-    stride = 0;
-    other = s + 0x2AC;
-    do {
-        dst = s + (stride + 0x54C);
-        j = 1;
-        do {
-            Widget_InitLinked(dst, b, 0, 0x10, 0, 2, 0x3C, &v);
-            dst += 0x60;
-            --j;
-        } while (j >= 0);
-        Widget_InitLinked(other, b, 0x14, 0x10, 0, 2, 0x3C, &v);
-        other += 0x60;
-        stride += 0xC0;
-        ++i;
-    } while (i <= 6);
-    v.x = 0;
-    v.y = 0;
-    v.z = 0;
-    v.w = 0;
-    dst = s + 0xA8C;
-    other = s + 0xBAC;
-    j = 1;
-    do {
-        Widget_InitLinked(dst, b, 0, 0x10, 0, 2, 0x3C, &v);
-        Widget_InitLinked(other, b, 0, 0x10, 0, 2, 0x3C, &v);
-        other += 0x60;
-        dst += 0x60;
-        --j;
-    } while (j >= 0);
-    Widget_InitLinked(s + 0xB4C, b, 0x15, 0x10, 0, 2, 0x3C, &v);
-    zero = 0;
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    dst = s + 0xC6C;
-    Widget_InitLinked(dst, b, 0x3E, 0x10, 0, 2, 0x3C, &v);
-    *(u32 *)(dst + 8) |= 1;
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0xCCC, b, 0x40, 0x10, 0, 2, 0x3C, &v);
-    *(u32 *)(s + 0xCD4) |= 1;
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0x24C, b, 0x3F, 0x10, 0, 2, 0x3C, &v);
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0x12C, b, 0x48, 0x10, 0, 2, 0x3C, &v);
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0x1EC, b, 1, 0x10, 0, 2, 0x3C, &v);
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0x18C, b, 0x41, 0x10, 0, 2, 0x3C, &v);
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0x6C, b, 0x46, 0x10, 0, 2, 0x3C, &v);
-    *(u16 *)(s + 0x8E) = s[0x48] << 4;
-    v.x = zero;
-    v.y = zero;
-    v.z = zero;
-    v.w = zero;
-    Widget_InitLinked(s + 0xCC, b, 0x47, 0x10, 0, 2, 0x3C, &v);
-    dst = s + 0xD2C;
-    CpuSet(*(void **)(s + 0xB4), dst, 0x04000008);
-    *(void **)(s + 0xB4) = dst;
-    *(void **)(s + 0x114) = dst;
+    p->x = 0;
+    p->y = 0;
+    p->z = 0;
+    p->w = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D5908);
-#endif
+
+u32 MonsterBook_InitWidgets(struct MonsterBookGfx *s)
+{
+    struct WidgetPos v;
+    struct ResHdr *res;
+    s32 i, j;
+    struct BookWidget *d;
+
+    res = ScriptProc_Start(0xCB05, 0xE2AB);
+    s->hdr = *res;
+    ResourceHeader_Relocate(&s->hdr, res);
+    WidgetPos_Clear(&v);
+    for (i = 0; i < 7; i++) {
+        for (j = 0; j < 2; j++)
+            Widget_InitLinked(&s->cells[i][j], &s->hdr, 0, 0x10, 0, 2, 0x3C, &v);
+        Widget_InitLinked(&s->rows[i], &s->hdr, 0x14, 0x10, 0, 2, 0x3C, &v);
+    }
+    WidgetPos_Clear(&v);
+    for (i = 0; i < 2; i++) {
+        Widget_InitLinked(&s->a[i], &s->hdr, 0, 0x10, 0, 2, 0x3C, &v);
+        Widget_InitLinked(&s->c[i], &s->hdr, 0, 0x10, 0, 2, 0x3C, &v);
+    }
+    Widget_InitLinked(&s->b, &s->hdr, 0x15, 0x10, 0, 2, 0x3C, &v);
+    WidgetPos_Clear(&v);
+    d = &s->d;
+    Widget_InitLinked(d, &s->hdr, 0x3E, 0x10, 0, 2, 0x3C, &v);
+    d->flags |= 1;
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->e, &s->hdr, 0x40, 0x10, 0, 2, 0x3C, &v);
+    s->e.flags |= 1;
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->w5, &s->hdr, 0x3F, 0x10, 0, 2, 0x3C, &v);
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->w2, &s->hdr, 0x48, 0x10, 0, 2, 0x3C, &v);
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->w4, &s->hdr, 1, 0x10, 0, 2, 0x3C, &v);
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->w3, &s->hdr, 0x41, 0x10, 0, 2, 0x3C, &v);
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->title, &s->hdr, 0x46, 0x10, 0, 2, 0x3C, &v);
+    s->title.x22 = s->page << 4;
+    WidgetPos_Clear(&v);
+    Widget_InitLinked(&s->w1, &s->hdr, 0x47, 0x10, 0, 2, 0x3C, &v);
+    CpuSet(s->title.pal, s->palette, 0x04000008);
+    s->title.pal = s->palette;
+    s->w1.pal = s->palette;
+}
