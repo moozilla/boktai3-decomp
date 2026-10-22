@@ -176,6 +176,7 @@ address,evidence
 0808F9E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08095574,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08098040,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+080999A0,"Actor wait state: on arrival restore the saved target callback, otherwise set flag 0x800 and consume one pending trigger on the first tick; raw span after the preceding behaviour function"
 080A2F28,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080A3804,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 080A5FBC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
