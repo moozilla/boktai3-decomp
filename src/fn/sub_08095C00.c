@@ -98,6 +98,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 }
 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
+#define Ghost_TurnTowardHeading sub_08095C00
 void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor)
 {
     u8 *motion = (u8 *)actor + 0x50;
@@ -157,5 +158,5 @@ void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor)
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", Ghost_TurnTowardHeading);
+INCLUDE_ASM("asm/nonmatching", sub_08095C00);
 #endif
