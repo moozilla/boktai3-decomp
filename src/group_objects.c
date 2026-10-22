@@ -276,7 +276,65 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
 #endif
+#ifdef NONMATCHING
+// fuzzy: 94.8%
+// Remaining: the random table address is loaded after the index (ROM loads it first), and
+// the origin pointer is hoisted after the piece pointer copy.
+s32 Div(s32, s32);
+struct PackedVec {
+    u32 x : 16, y : 16, z : 16;
+};
+
+int sub_0801010C(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct PackedVec origin;
+    struct GroupVec d;
+    int i;
+    int radius;
+    void *palette;
+    struct GroupPiece *p;
+    struct GroupPiece *r;
+    origin.x = cmd->originX;
+    origin.y = cmd->originY;
+    origin.z = cmd->originZ;
+    radius = cmd->radius0;
+    if (radius <= 0)
+        radius = 1;
+    *(struct PackedVec *)&m->origin = origin;
+    m->timer = 0;
+    r = m->pieces;
+    i = 0;
+    palette = m->palette;
+    p = r;
+    for (; i < 16; i++, p++, r++) {
+        int angle;
+        struct GroupVec *o = (struct GroupVec *)&origin;
+        struct GroupVec *dp = &d;
+        p->state = 7;
+        p->active = 1;
+        p->timer = 0;
+        dp->x = o->x - p->position.x;
+        dp->y = o->y - p->position.y;
+        dp->z = o->z - p->position.z;
+        angle = Math_Atan2(dp->x, dp->z);
+        p->duration = Div(scale(dp->x * gUnk_086149C4[(angle + 64) & 255] + dp->z * gUnk_086149C4[angle & 255]), radius);
+        *(struct PackedVec *)&p->target = origin;
+        p->angle = randomValue();
+        p->targetY = i * 16 + p->position.y;
+        p->speed = (randomValue() & 7) + 7;
+        p->sprite.position = p->position;
+        p->sprite.flags &= ~1;
+        BoardPiece_SetFacingAnim(m, r, 0);
+        AnimData_SelectPaletteBank(&r->resource, 0x2D3);
+        p->resource.palette = palette;
+        ActorShadow_Enable(r->transform);
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
+#endif
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
 
 static inline int count(struct GroupQueue *q)
