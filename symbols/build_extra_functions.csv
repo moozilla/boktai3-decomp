@@ -248,6 +248,12 @@ address,isa,evidence,replacement_end
 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
 0815AAB8,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0815AAD4
 0815AAD4,thumb,Independent small function following a reviewed gap leaf; retained assembly (not yet matched),0815AAFC
+0815AB24,thumb,Hidden script command in the raw tail after ScriptActor_SetField4A2FromScript (sets actor byte 0x340),0815AB48
+0815AB48,thumb,Hidden script command (clears actor byte 0x340),0815AB6C
+0815AB6C,thumb,Hidden script query (actor byte 0xBF5),0815AB98
+0815AB98,thumb,Hidden script command (Player_EnterKindFour),0815ABB8
+0815ABB8,thumb,Hidden script command (enter kind four with optional d value then begin sequence 0x24),0815AC04
+0815AC04,thumb,Hidden script command in the same raw tail; retained assembly (not yet matched),
 0815AD24,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD3C
 0815AD3C,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD60
 0815AD60,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0815AD78
