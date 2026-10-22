@@ -323,6 +323,8 @@ address,isa,evidence,replacement_end
 08177D88,thumb,Hidden getter: option HUD field 0xA5C or -1,08177DAC
 081780B4,thumb,Independent 32-byte HUD mode refresh with own push and pop-bx after Hud_SetModeFromScript; exact standalone C,081780D4
 081782AC,thumb,Hidden option HUD setter: field 0xA8C=4 when mode 1-2,081782E0
+0817845C,thumb,Hidden raw-tail function,08178474
+08178474,thumb,Hidden raw-tail function (retained),
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
@@ -377,6 +379,8 @@ address,isa,evidence,replacement_end
 0819B8B4,thumb,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched),0819B930
 0819D190,thumb,Hidden raw-tail function,0819D1D0
 0819E7B0,thumb,Hidden raw-tail function,0819E7F0
+0819EB84,thumb,Hidden raw-tail function (retained),
+0819EBD0,thumb,Hidden raw-tail function (retained),
 081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
 081A398C,thumb,Hidden raw-tail function,081A39E0
 081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84
@@ -393,6 +397,8 @@ address,isa,evidence,replacement_end
 081BB124,thumb,Hidden raw-tail function,081BB13C
 081BB248,thumb,Hidden raw-tail function,081BB294
 081BB38C,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,081BB3A0
+081BC2BC,thumb,Hidden raw-tail function,081BC2F0
+081BC2F0,thumb,Hidden raw-tail function,081BC320
 081BE130,thumb,Hidden raw-tail function,081BE140
 081BE140,thumb,Hidden delay loop,081BE150
 081BE150,thumb,Hidden empty function,081BE154
@@ -421,6 +427,8 @@ address,isa,evidence,replacement_end
 081E8370,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081E8374
 081E9BA0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081E9BA4
 081EC384,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081EC388
+081EC5F8,thumb,Hidden raw-tail function,081EC628
+081EC628,thumb,Hidden raw-tail function (retained),
 081ED89C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081ED8A0
 081EEEC0,thumb,Hidden raw-tail function,081EEECC
 081EF12C,thumb,Hidden raw-tail function,081EF140
