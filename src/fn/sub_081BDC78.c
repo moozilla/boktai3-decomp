@@ -1,22 +1,14 @@
 #include "global.h"
 #include "scene_input_grid.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
-
 /* Tentative storage navigation: two 4x4 groups and four category cells. */
 void Storage_RebuildGrid(struct SceneInputGrid *p)
 {
     s32 i, j;
     {
-        s32 fill;
         for (i = 0; i <= 3; i++)
-            for (j = 0, fill = 0xFF; j <= 3; j++) {
-                u32 value = (u8)p->cells[j + 4][i];
-                value |= fill;
-                p->cells[j + 4][i] = value;
-            }
+            for (j = 0; j <= 3; j++)
+                p->cells[j + 4][i] |= 0xFFu;
     }
     if (!SceneInput_TestGridFlags(p, 1)) {
         for (i = 0; i <= 3; i++) {
@@ -29,13 +21,9 @@ void Storage_RebuildGrid(struct SceneInputGrid *p)
         }
     }
     {
-        s32 fill;
         for (i = 0; i <= 3; i++)
-            for (j = 0, fill = 0xFF; j <= 3; j++) {
-                u32 value = (u8)p->cells[j][i];
-                value |= fill;
-                p->cells[j][i] = value;
-            }
+            for (j = 0; j <= 3; j++)
+                p->cells[j][i] |= 0xFFu;
     }
     if (!SceneInput_TestGridFlags(p, 2)) {
         for (i = 0; i <= 3;) {
@@ -50,14 +38,8 @@ void Storage_RebuildGrid(struct SceneInputGrid *p)
         }
     }
     if (SceneInput_TestGridFlags(p, 0x10)) {
-        s32 fill;
-        for (i = 0; i <= 3; i++) {
-            u32 value;
-            fill = 0xFF;
-            value = (u8)p->cells[8][i];
-            value |= fill;
-            p->cells[8][i] = value;
-        }
+        for (i = 0; i <= 3; i++)
+            p->cells[8][i] |= 0xFFu;
     } else {
         p->cells[8][0] = -1;
         p->cells[8][1] = 0x22;
@@ -65,6 +47,3 @@ void Storage_RebuildGrid(struct SceneInputGrid *p)
         p->cells[8][3] = 0x20;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Storage_RebuildGrid);
-#endif
