@@ -1,17 +1,15 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.2%
-// foundry draft (worker best 93.2%); what differs is mostly register allocation and instruction order
 #define gSlotController gUnk_020005EC
 struct ControllerSlot {
+    u8 unknown0[0x14];
     u8 callback[0xE0];
     s16 state;
-    u8 unknownE2[0x3AC - 0xE2];
+    u8 unknownF6[0x3AC - 0xF6];
 };
 struct SlotController {
     u8 unknown0[0x18];
     u32 activeMask;
-    u8 unknown1C[0x4C - 0x1C];
+    u8 unknown1C[0x38 - 0x1C];
     struct ControllerSlot slots[1];
 };
 extern struct SlotController *gUnk_020005EC;
@@ -31,6 +29,3 @@ s32 SlotController_RequestReset(s32 index)
         SunOrb_SetUpdateCallback(&controller->slots[index].callback, RisingActor_LowerHeight);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SlotController_RequestReset);
-#endif
