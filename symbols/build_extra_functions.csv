@@ -210,7 +210,7 @@ address,isa,evidence,replacement_end
 08103AD0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08103ADC
 08103F24,thumb,"Named object: returns p+0x10C when gUnk_020001AC is set, else NULL; raw span before NamedObject_PlayAdjacentExitSound",08103F44
 081041F0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,08104204
-08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; retained assembly,
+08104280,thumb,Finds the active entry (mask bit set) of four 0x184-byte records whose key matches; exact C,081042DC
 081047B0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081047B4
 08105A40,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08105A44
 0810731C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08107320
