@@ -1,8 +1,7 @@
 #include "terrain_cell_probe.h"
-#ifdef NONMATCHING
-// fuzzy: 91%
 
-extern const u16 gUnk_0203B400[];
+// The random table (gUnk_0203B400) is addressed by its numeric address here; the
+// symbol form changes reload order and register choice in the loop.
 
 u8 *Path_GetDefinition(u32 id);
 s32 Path_GetPointData(u8 *def);
@@ -45,7 +44,7 @@ s32 Path_SnapToRandomPointInBox(struct Pos16 *out, struct Pos16 *lo, struct Pos1
     {
         u32 r = (gUnk_03005308 + 1) & 0x3FF;
         gUnk_03005308 = r;
-        start = Mod(*(const u16 *)((u8 *)gUnk_0203B400 + r * 2), def[0]);
+        start = Mod(*(const u16 *)((u8 *)0x0203B400 + r * 2), def[0]);
     }
     Path_GetPointPosition(&pos, data, 0);
     out->x = pos.x;
@@ -62,6 +61,3 @@ s32 Path_SnapToRandomPointInBox(struct Pos16 *out, struct Pos16 *lo, struct Pos1
     Pos16_SnapToTerrain(out);
     return best;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Path_SnapToRandomPointInBox);
-#endif

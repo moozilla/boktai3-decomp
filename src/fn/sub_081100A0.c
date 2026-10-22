@@ -1,8 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 91.2%
-// Open: the i<0 path should branch to the shared flag test (ROM keeps the flag compare),
-// and the clamp should load the score into r1 with a signed compare.
+// Open: the clamp should load the score into r1 with a signed compare and recompute
+// the store address (ROM puts 9999 in r0).
 #include "area_effect_link.h"
 
 struct LinkScorePanel {
@@ -11,9 +11,16 @@ struct LinkScorePanel {
     u16 score;
 };
 
-static inline u8 Id(u8 x)
+static inline u8 validSelection(s32 i)
 {
-    return x;
+    if (i < 0)
+        goto no;
+    if (i <= 1)
+        goto yes;
+no:
+    return 0;
+yes:
+    return 1;
 }
 
 void sub_081100A0(struct LinkScorePanel *panel)
@@ -29,20 +36,16 @@ void sub_081100A0(struct LinkScorePanel *panel)
     i = link2->localPlayer;
     if (i >= 0)
         goto hi;
-    goto bad;
+    goto lo;
 zero:
     panel->score = 0;
     goto clamp;
+lo:
+    v = 0;
 hi:
-    if (i <= 1)
-        goto good;
-bad:
-    ok = 0;
-    goto sel;
-good:
-    ok = 1;
+    ok = validSelection(i);
 sel:
-    if (!Id(ok))
+    if (!ok)
         v = 0;
     else
         v = link2->menuResults[i];

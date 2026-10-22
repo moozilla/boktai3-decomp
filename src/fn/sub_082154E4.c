@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 82.6%
+// fuzzy: 84.5%
 // Remaining differences: priority-loop allocation and invariant address hoisting.
 struct OamEntry {
     u32 attributes;
@@ -30,7 +30,7 @@ void SpriteOam_FinalizeQueue(void)
     struct OamEntry *entry;
     s32 i;
     register s32 count asm("r5");
-    struct OamEntry *buffer;
+    register struct OamEntry *buffer asm("r9");
     work.fill = -1;
     CpuFastSet(&work.fill, work.heads, 0x1000040);
     {
@@ -45,8 +45,9 @@ void SpriteOam_FinalizeQueue(void)
         }
     }
     {
-        s32 sum = gUnk_03004798;
+        s32 sum;
         buffer = gUnk_03004390;
+        sum = gUnk_03004798;
         for (i = 0; i < 4; i++) {
             priorities[i] = sum;
             sum += gUnk_03004790[i];
@@ -61,7 +62,7 @@ void SpriteOam_FinalizeQueue(void)
                 entry = &gUnk_030047A0[index];
                 next = &priorities[(entry->tile >> 10) & 3];
                 if (*next < 128) {
-                    buffer[*next] = *entry;
+                    gUnk_03004390[*next] = *entry;
                     count++;
                     (*next)++;
                 }

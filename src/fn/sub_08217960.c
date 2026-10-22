@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 86.7%
+// fuzzy: 89.3%
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
 extern s32 gUnk_03004DA0, gUnk_030051D8, gUnk_03004DA8;
 extern u16 *gUnk_030051E0;
@@ -27,12 +27,12 @@ void Palette_ApplyBackgroundFade(void)
         dst = buffer;
         for (i = 0; i < 16; i++) {
             if ((gUnk_030051C4 >> i) & 1) {
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     *dst++ = gUnk_03005214;
                 }
             } else {
                 src = gUnk_03004FC0 + i * 16;
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     *dst++ = *src++;
                 }
             }
@@ -48,7 +48,7 @@ void Palette_ApplyBackgroundFade(void)
         dst = buffer;
         for (i = 0; i < 16; i++) {
             if ((gUnk_030051C4 >> i) & 1) {
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     u32 c = *src;
                     *dst =
                         (((level * (c & 0x7c1f)) & 0xf83e0) | ((level * (c & 0x3e0)) & 0x7c00)) >>
@@ -57,7 +57,7 @@ void Palette_ApplyBackgroundFade(void)
                     dst++;
                 }
             } else {
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     *dst++ = *src++;
                 }
             }
@@ -72,7 +72,7 @@ void Palette_ApplyBackgroundFade(void)
                 register u32 green asm("r8") = g * other;
                 register u32 mask asm("r9") = 0x7c1f;
                 register u32 redblue asm("r7") = rb * other;
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     u32 c = *src;
                     register u32 redTerm asm("r2") = level * (c & mask) + redblue;
                     register u32 greenTerm asm("r0");
@@ -83,7 +83,7 @@ void Palette_ApplyBackgroundFade(void)
                     dst++;
                 }
             } else {
-                for (j = 15; j >= 0; j--) {
+                for (j = 0; j < 16; j++) {
                     *dst++ = *src++;
                 }
             }

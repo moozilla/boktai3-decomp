@@ -1,7 +1,7 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.2%
-// 23 differing instruction runs; first diff at +0x6 (ldr r1, [pc, #0x58] vs ldr r1, [pc, #0x5c])
+// MATCHING_CONCESSION: register-pinning
+// VBlank handler: sound, BG scroll/affine registers, HBlank DMA, link/clock ticks.
+// mode, count and affine are pinned (register-pinning concession).
 struct Dma {
     vu32 src, dest, control;
 };
@@ -20,7 +20,7 @@ void sub_08213FD8(void)
     if (gUnk_0300426C) {
         vu16 *regs;
         u16 *offset;
-        s32 mode;
+        register s32 mode asm("r3");
         gUnk_03004268 = gUnk_03003A48;
         gUnk_03003A4C = gUnk_03004280;
         regs = (vu16 *)0x04000010;
@@ -42,7 +42,7 @@ void sub_08213FD8(void)
             regs++;
             *regs = offset[7];
         } else {
-            vu16 *affine = (vu16 *)0x04000020;
+            register vu16 *affine asm("r2") = (vu16 *)0x04000020;
             u16 *matrix = gUnk_03004BF0;
             u32 *xy;
             *affine = matrix[0];
@@ -52,32 +52,29 @@ void sub_08213FD8(void)
             *affine = matrix[2];
             affine++;
             *affine = matrix[3];
-            affine = (vu16 *)0x04000028;
-            xy = gUnk_03004C18;
-            *affine = xy[0];
-            affine++;
-            *affine = (xy[0] & 0x0fff0000) >> 16;
-            affine++;
-            *affine = xy[1];
-            affine++;
-            *affine = (xy[1] & 0x0fff0000) >> 16;
+            {
+                vu16 *ref = (vu16 *)0x04000028;
+                xy = gUnk_03004C18;
+                *ref = xy[0];
+                ref++;
+                *ref = (xy[0] & 0x0fff0000) >> 16;
+                ref++;
+                *ref = xy[1];
+                ref++;
+                *ref = (xy[1] & 0x0fff0000) >> 16;
+            }
         }
         mode = gUnk_03004274;
         if (mode) {
-            vu32 *control = (vu32 *)0x040000b8;
-            vu32 *addresses;
-            u32 count, flags;
-            *control = 0;
-            addresses = (vu32 *)0x040000b0;
-            *addresses = gUnk_03004278;
-            addresses++;
-            *addresses = gUnk_03003A00;
+            register u32 count asm("r1");
+            *(vu32 *)0x040000b8 = 0;
+            *(vu32 *)0x040000b0 = gUnk_03004278;
+            *(vu32 *)0x040000b4 = gUnk_03003A00;
             count = gUnk_03004270;
-            if (mode == 1)
-                flags = 0xa2600000;
+            if (mode != 1)
+                *(vu32 *)0x040000b8 = 0xa6600000 | count;
             else
-                flags = 0xa6600000;
-            *control = flags | count;
+                *(vu32 *)0x040000b8 = 0xa2600000 | count;
         } else {
             struct Dma *dma = (struct Dma *)0x040000b0;
             dma->src = mode;
@@ -93,6 +90,3 @@ void sub_08213FD8(void)
     }
     *(vu16 *)0x03007ff8 = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08213FD8);
-#endif

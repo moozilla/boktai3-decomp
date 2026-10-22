@@ -1,10 +1,8 @@
 #include "scene_grid.h"
-#ifdef NONMATCHING
-// fuzzy: 99.5%
 // Moves from one grid cell toward another along walkable cells of equal height
 // (row/column scans), writing the next waypoint to *out.
-// Remaining: the `*out = center` copy is not cross-jumped into the `*out = *to`
-// store as in the ROM (one duplicated mov/str/str/b), which shifts branch targets.
+// The `goto done` on the from==to path (not `return 1`) lets cross-jumping merge
+// the `*out = center` store into it, as in the ROM.
 #include "contact_actor.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -58,7 +56,7 @@ s32 sub_0806EB70(struct ContactPosition *out, const struct ContactPosition *from
         return 0;
     if (fromIndex == toIndex) {
         *out = *to;
-        return 1;
+        goto done;
     }
     FillCenter(&center, fromIndex);
     {
@@ -121,8 +119,6 @@ found:
         return 1;
     }
     FillCenter(out, result);
+done:
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0806EB70);
-#endif

@@ -646,6 +646,7 @@ address,evidence
 0821E7D0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E820,Hidden raw-tail function
 0821E840,Hidden raw-tail function
+0821F0C4,Path dispatcher by mode (switch over Path_Snap* helpers) hidden after Path_SnapToRandomPointInBox literal pool
 0821F838,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 0821FF34,Hidden raw-tail function
 082207DC,Hidden tail after Collider_TestSegmentBounds

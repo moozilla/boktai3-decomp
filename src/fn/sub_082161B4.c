@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.4%
-// Open: the mode-7 DISPCNT ORs (the original loads each bit constant just
-// before its OR) and the loop counter register.
 struct BgResource {
     u8 signature[2];
     u16 unk02;
@@ -126,8 +122,9 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
             sub_08215AC4(3, 0);
             sub_08215AC4(1, 0);
             {
-                u32 bg1 = 0x200, bg2 = 0x400, bg3 = 0x800;
-                gUnk_03004BD8 = ((bg1 | gUnk_03004BD8) | bg2) | bg3;
+                enableBg(0x200);
+                enableBg(0x400);
+                enableBg(0x800);
             }
             offset = hdr.size << 5;
             break;
@@ -156,17 +153,20 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
         layer->field22 = 0;
         layer->scaleX = 0x1000;
         layer->scaleY = 0x1000;
-        layer->x = (s16)x >> 4;
-        layer->y = (s16)y >> 4;
+        {
+            s16 lx = (s16)x >> 4, ly = (s16)y >> 4;
+            layer->x = lx;
+            layer->y = ly;
+        }
         layer->extra = hdr.extra;
         layer->data = entry.data;
-        layer->width = entry.width;
-        layer->height = entry.height;
-        layer->width2 = entry.width;
-        layer->height2 = entry.height;
+        {
+            u16 w, h;
+            layer->width = w = entry.width;
+            layer->height = h = entry.height;
+            layer->width2 = w;
+            layer->height2 = h;
+        }
         layer->map = Video_GetBackgroundMap(bg);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Bg_SetupLayers);
-#endif
