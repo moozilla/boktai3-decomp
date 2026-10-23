@@ -2,8 +2,8 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 82.4%
-// Remaining: constant-address reuse, PRE lifetimes, palette registers and state tails.
+// fuzzy: 83.2%
+// Remaining: constant-address reuse, PRE stack order, palette registers and state tails.
 struct VanargandPart {
     u8 pad0[0x10];
     u16 state;
@@ -55,6 +55,7 @@ struct Vanargand {
     u8 padF38[0xF44 - 0xF38];
     void *afterimages;
 };
+s32 __divsi3(s32, s32);
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
@@ -225,7 +226,8 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     struct InitPosition position;
     s32 type = Script_GetKeywordValue('t', 5);
     s32 scale;
-    s32 health, limitA, limitB;
+    register s32 health asm("sl");
+    s32 limitA, limitB;
     s32 effect;
     s32 mode;
     s32 flags;
@@ -234,6 +236,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         return -1;
     SceneActors_Register(p, 5);
     FIELD(u32, p, 0x570) = 1;
+    asm("" : : "r"(&p->variant), "r"(p->palette));
     {
         register u8 **target asm("r2") = (void *)((u8 *)p + 0x110);
         u8 **slot = (void *)((u8 *)p + 0x10C);
@@ -285,16 +288,18 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         for (i = 2; i >= 0; i--)
             *out++ = Script_GetValue();
     } else {
+        s32 value = 200;
         for (i = 2; i >= 0; i--)
-            FIELD(u16, p, 0x598 + i * 2) = 200;
+            FIELD(u16, p, 0x598 + i * 2) = value;
     }
     if (Script_SeekToKeyword('V')) {
         u16 *out = (void *)((u8 *)p + 0x59E);
         for (i = 2; i >= 0; i--)
             *out++ = Script_GetValue();
     } else {
+        s32 value = 200;
         for (i = 2; i >= 0; i--)
-            FIELD(u16, p, 0x59E + i * 2) = 200;
+            FIELD(u16, p, 0x59E + i * 2) = value;
     }
     if (Script_SeekToKeyword('W')) {
         Script_GetValue();
@@ -309,11 +314,13 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         position.y = Script_GetValue();
         position.z = Script_GetValue();
         flags = 32;
+        asm("" : "+r"(flags));
     } else {
         position.x = 640;
         position.y = 768;
         position.z = 640;
         flags = 32;
+        asm("" : "+r"(flags));
     }
     if (Script_SeekToKeyword('m'))
         p->variant = Script_GetValue();
@@ -326,8 +333,9 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         for (i = 2; i >= 0; i--)
             *out++ = Script_GetValue();
     } else {
+        s32 value = 0;
         for (i = 2; i >= 0; i--)
-            FIELD(u32, p, 0xF28 + i * 4) = 0;
+            FIELD(u32, p, 0xF28 + i * 4) = value;
     }
     if (Script_SeekToKeyword('c')) {
         s32 a = Script_GetValue();
@@ -432,7 +440,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     FIELD(u8, p, 0x5C5) = 0;
     FIELD(u8, p, 0x5C6) = 0;
     {
-        s32 v = 3 - FIELD(u8, self, 0xE1) / 43;
+        s32 v = 3 - __divsi3(FIELD(u8, self, 0xE1), 43);
         asm("" : "+r"(v));
         FIELD(u8, p, 0x5C7) = v;
     }
