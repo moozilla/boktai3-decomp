@@ -201,12 +201,12 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         Camera_SetOffset(8, p2->position);
     } else {
     defaultCamera:
-    if (test(flags, 2)) {
-        Camera_SetOffset(8, p2->position);
-    } else {
-        p->cameraState = 0;
-        Camera_ResetOffset(8);
-    }
+        if (test(flags, 2)) {
+            Camera_SetOffset(8, p2->position);
+        } else {
+            p->cameraState = 0;
+            Camera_ResetOffset(8);
+        }
     }
 cameraDone:
     if (test(&*flags, 0x400000)) {
@@ -222,4 +222,3 @@ cameraDone:
     *resetA = 0;
     *resetB = 0;
 }
-
