@@ -21,3 +21,10 @@ The wrap-up marker arrived before the Glove family began. Exact gain is 0.0252 p
 Validation: combined batch build printed `build/boktai3.gba: OK`.
 
 Batch result: 2 matched, 1 drafted, 8 skipped; resume at 081172C4.
+
+## Continuation session h2: carried Glove drafts
+
+- 081172C4: drafted 74.2%. Launch ascent/slowdown and stopping cue reconstructed; motion pointer allocation and terrain-response ordering remain different.
+- 081175F8: drafted 70.6%. Launch ascent/slowdown and callback transition reconstructed; common movement and scratch-register lifetimes remain different.
+
+Validation: carried draft batch rebased onto current main; combined build printed `build/boktai3.gba: OK`. Both functions remain guarded and earn no exact progress.
