@@ -589,7 +589,7 @@ def main():
     _init(src, func, targets)
     base_b, base_feat, _ = evaluate(base)
     g0 = gap(base_feat, targets, base_feat)
-    print(f"base: {base_b} differing bytes, target gap {g0:.3f}")
+    print(f"base: {base_b} differing bytes (shape {base_feat.get('shape', 0)}), target gap {g0:.3f}")
     ctx = multiprocessing.get_context("spawn")
     with concurrent.futures.ProcessPoolExecutor(a.j, mp_context=ctx, initializer=_init,
                                                 initargs=(src, func, targets, base_feat)) as pool:

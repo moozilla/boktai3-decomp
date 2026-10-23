@@ -39,6 +39,19 @@ index 1a67fff..ef4b16a 100644
 +perm_param_copy = 12
 +perm_early_return = 6
 +perm_reset_const = 4
+diff --git a/perm_pycparser/c_parser.py b/perm_pycparser/c_parser.py
+index e4eadee..faa2a1d 100644
+--- a/perm_pycparser/c_parser.py
++++ b/perm_pycparser/c_parser.py
+@@ -1768,7 +1768,7 @@ class CParser(PLYParser):
+             p[0] = p[1]
+ 
+     def p_parenthesized_compound_expression(self, p):
+-        """ assignment_expression : LPAREN compound_statement RPAREN """
++        """ primary_expression : LPAREN compound_statement RPAREN """
+         p[0] = p[2]
+ 
+     def p_typedef_name(self, p):
 diff --git a/src/agbcc_passes.py b/src/agbcc_passes.py
 new file mode 100644
 index 0000000..25618a4
@@ -993,10 +1006,38 @@ index 50e6b89..02bfde6 100644
          if isinstance(fptr_type, ca.PtrDecl):
              fptr_type = fptr_type.type
 diff --git a/src/ast_util.py b/src/ast_util.py
-index 2431205..e322147 100644
+index 2431205..edb7332 100644
 --- a/src/ast_util.py
 +++ b/src/ast_util.py
-@@ -396,6 +396,107 @@ def normalize_ast(fn: ca.FuncDef, ast: ca.FileAST) -> None:
+@@ -102,6 +102,27 @@ class PatchedCGenerator(c_generator.CGenerator):
+             n2 = ca.If(cond=n.cond, iftrue=n.iftrue, iffalse=n.iffalse.block_items[0])
+         return super().visit_If(n2)  # type: ignore
+ 
++    # A GNU statement expression `({ ... })` parses as a Compound in an
++    # expression; the stock generator prints it without its parentheses
++    # wherever it is not an assignment's right-hand side (an if condition,
++    # a call argument), which does not compile. Statement-position blocks
++    # come through _generate_stmt or a function body; any other is an
++    # expression and keeps its parentheses.
++    def visit_FuncDef(self, n: ca.FuncDef) -> str:
++        self._stmt_block = n.body
++        return super().visit_FuncDef(n)  # type: ignore
++
++    def _generate_stmt(self, n: ca.Node, add_indent: bool = False) -> str:
++        if isinstance(n, ca.Compound):
++            self._stmt_block = n
++        return super()._generate_stmt(n, add_indent)  # type: ignore
++
++    def visit_Compound(self, n: ca.Compound) -> str:
++        if getattr(self, "_stmt_block", None) is n:
++            self._stmt_block = None
++            return super().visit_Compound(n)  # type: ignore
++        return "(" + super().visit_Compound(n) + ")"  # type: ignore
++
+ 
+ def extract_fn(ast: ca.FileAST, fn_name: str) -> Tuple[ca.FuncDef, int]:
+     ret = []
+@@ -396,6 +417,107 @@ def normalize_ast(fn: ca.FuncDef, ast: ca.FileAST) -> None:
      rec(fn.body)
  
  
