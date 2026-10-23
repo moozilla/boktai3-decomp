@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 83.3%
 
 // confidence=low: navigation probe events select turns or acceleration behaviors.
 
-#ifdef NONMATCHING
-// fuzzy: 83.1%
 // Remaining differences: motion-flags pointer reuse, PRE spill order and random-turn allocation.
 #include "scene_actor_chase.h"
 static inline u32 PlayerFlags(u32 *flags, u32 mask)
@@ -28,6 +28,10 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 sub_0807AF94(void *);
 u8 Mummy_RequestStraightRoute(void *);
+static inline u32 Mummy_RandomBits(u32 mask)
+{
+    return gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023] & mask;
+}
 static inline void BeginProbeTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
@@ -37,7 +41,7 @@ static inline void BeginProbeTurn(void *obj, u32 saved)
         s32 tries = 0;
         s32 choice;
         do {
-            choice = Chase_RandomBits(3) << 6;
+            choice = Mummy_RandomBits(3) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);
