@@ -245,3 +245,51 @@ The next build caught a named fallback using its raw address token. Removed
 that draft-only alias so both the recorded candidate and default fallback use
 the existing descriptive symbol. Both modes rechecked. Corrected combined
 validation: `build/boktai3.gba: OK`.
+
+
+## Session h2, batch 4: seeking effects and script combat actors
+
+Tags: #matching #nidhoggr #effects #script-combat-actor
+
+- 0818FA54 matched, `Nidhoggr_CreateFallingAttackEffect` (tentative),
+  full 428-byte extent. Reused the matched sibling constructor, advancing the
+  animation cursor to recover collider allocation. Grouped callback loads,
+  reversed vector operand order and a mask argument helper recover scheduling.
+  Inverting a retained collision mask before the final flag load avoids bics.
+  Two register hints remain after depin.
+- 0818FEE4 drafted 64.3%, `Nidhoggr_UpdateSeekingAttackEffect` (tentative),
+  full 912-byte extent. New complete C models playback, acceleration, seeking
+  angles, randomized steering, proximity arming and both impact exits. Flat
+  playback, explicit phase labels and releasing the initial state pointer
+  reduce the core difference to 38 instructions. Tested volatile motion,
+  vector arrays, direct coordinates, cursor helpers, phase bindings and
+  compiler-pass flips; these plateau or regress. A superficially higher fuzzy
+  form had materially worse structure and was not retained.
+- 08190274 matched, `Nidhoggr_CreateSeekingAttackEffect` (tentative),
+  full 392-byte extent. Reused the falling constructor with seeking callbacks,
+  shared bounds and enabled default shadow. Declaring the shared bounds table
+  without const prevents word caching across calls, recovers its saved pointer
+  and makes the constructor exact. Two register hints remain after depin.
+- 082015D4 drafted 96.7% (was 82.4%),
+  `ScriptCombatActor_ApplyHitReaction`. Typed recipient fields reproduce the
+  first half exactly apart from argument-copy order. Batched cursor updates,
+  explicit index/count lifetimes, preserving the blocked recipient pointer,
+  reversed flag intersection and HUD argument bindings reduce the residue to
+  eight total / two structural differences (22 bytes). A focused permutation
+  search identifies a redundant HUD value binding; removing it is the last
+  improvement. Mask barriers, final-sample
+  bindings, pointer bindings and alternate loop forms regress. Compiler-pass
+  flips find no improvement. Default fallback remains exact over 432 bytes.
+- 08201784 matched, `ScriptCombatActor_InitializeColliders` (tentative),
+  full 276-byte extent, without register hints. Explicitly preserving the
+  upper packed word when clearing the first collider offset recovers the
+  target word load/mask/store. Removing the owner binding then recovers all
+  register allocation. Pointer, size and collider bindings regress.
+
+Batch 4 adds three exact matches: +0.0455 percentage points (1096 bytes),
+including 820 Register-pinned bytes and 276 bytes without hints. Two guarded
+new/improved drafts remain. Resume at 08201A78 after integration, then continue
+through 08201D38 and 0820212C before the tagged NPC family. The required revisit
+queue from earlier batches remains outstanding.
+
+Batch 4 combined validation after rebase: `build/boktai3.gba: OK`.
