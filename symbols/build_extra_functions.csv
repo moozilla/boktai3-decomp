@@ -555,7 +555,8 @@ address,isa,evidence,replacement_end
 081F336C,thumb,Hidden raw-tail function,081F339C
 081F339C,thumb,Hidden raw-tail function,081F33CC
 081F33CC,thumb,Hidden raw-tail function,081F33F0
-081F3414,thumb,Hidden tail after SceneDistance_ClearLinkedEntry,
+081F3414,thumb,Independent nearest-distance search with own push and pop-bx followed by literal at 081F344C,081F3450
+081F3450,thumb,Independent sibling search with own push and pop-bx followed by literal at 081F3488,081F348C
 081F348C,thumb,Hidden tail function,081F34C8
 081FB7D8,thumb,Hidden raw-tail function: wrapped counter difference,081FB808
 081FB808,thumb,Hidden leaf returning 0,081FB80C
