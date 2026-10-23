@@ -5,7 +5,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 96.9%
+// fuzzy: 97.4%
 // Remaining differences: register choices in angle, animation and trail setup.
 struct Types {
     u32 values[4];
@@ -183,7 +183,12 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
         p->collider[0x42] = zero;
     }
     Collider_Refresh(p->collider);
-    if (p->trailCount <= 3 && !(Frame(p) & 31)) {
+    {
+    register u8 *cursor asm("r3") = &p->trailCount;
+    u8 *trailCount;
+    asm("" : "+r"(cursor));
+    trailCount = cursor;
+    if (*trailCount <= 3 && !(Frame(p) & 31)) {
         s32 index;
         u32 types[4];
         s32 angle, sample;
@@ -199,9 +204,10 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             sample = loaded;
         }
         angle = ((sample >> 3) & 127) + 64;
-        p->trails[p->trailCount] =
+        p->trails[*trailCount] =
             MotionEntry_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
-        p->trailCount++;
+        (*trailCount)++;
+    }
     }
     if (p->lifetime)
         p->lifetime--;
