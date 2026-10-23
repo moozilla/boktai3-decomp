@@ -23,6 +23,10 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **Vanargand initializer draft** (2026-10-23): improved the complete guarded
+  initializer with script-flag and palette lifetimes. No new exact match.
+  [Worker notes](../notes/cx-xhigh.md) retain the experiments and resume point
+  at 080D2584 after the campaign wrap-up marker. Combined ROM validation passed.
 * **Mummy damage and reaction drafts** (2026-10-23): matched the complete
   timer-driven damage callback with four register pins and improved guarded
   Golem, Mummy and Ghoul reaction drafts. [Worker notes](../notes/cx-xhigh.md)
