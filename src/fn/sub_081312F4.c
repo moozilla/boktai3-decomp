@@ -5,9 +5,7 @@
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 // confidence=low: selects a route return phase from motion and route flags.
 #define SceneActorRoute_UpdateReturnEntry sub_081312F4
-#ifdef NONMATCHING
-// fuzzy: 84.8%
-// Remaining differences: state/control offset reuse and flag-result registers.
+
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
                                 u32 zero)
 {
@@ -60,15 +58,28 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior, u3
     a->counter2AC = zero;
     a->field2B1 = 1;
 }
+static inline void *SavedControl(u8 *group)
+{
+    register void **field asm("r0") = (void *)(group + 0x214);
+    return *field;
+}
 static inline u32 Finished(struct SceneActorRegistryResetView *a)
 {
     register u32 offset asm("r3") = 0x2B0;
     asm("" : "+r"(offset));
-    return FIELD(a, offset, u8);
+    {
+        register u8 *field asm("r0") = (void *)((u8 *)a + offset);
+        return *field;
+    }
 }
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    return a->flags2D4 & mask;
+    register u32 offset asm("r2") = 0x2D4;
+    asm("" : : "r"(offset));
+    {
+        register u16 *field asm("r0") = (void *)((u8 *)a + offset);
+        return *field & mask;
+    }
 }
 void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
 {
@@ -86,7 +97,7 @@ void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor
         u16 flags = MotionFlags(actor, 0x10);
         if (flags) {
             State(actor, 8, result);
-            BeginControl(actor, FIELD(group, 0x214, void *), 0x13, result);
+            BeginControl(actor, SavedControl(group), 0x13, result);
         } else {
             u32 bits = actor->flags2CC & 0x10;
             if (bits)
@@ -98,7 +109,3 @@ void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081312F4);
-#endif
