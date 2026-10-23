@@ -208,6 +208,31 @@ def sp_addr_local(fn):
             yield f"address of {text(lv)[:30]} in a local first", f2
 
 
+def sp_goto_loop(fn):
+    """for (i = a; c; i++) body  ->  i = a; if (!c) goto E; L: body; i++; if (c) goto L; E:;
+    loop.c only optimizes loops it sees as loops: when the ROM recomputes an invariant address
+    inside the loop and does no strength reduction, the original loop was written with goto."""
+    pred = lambda n, p, s: isinstance(n, (ca.For, ca.While)) and not any(
+        isinstance(x, (ca.Continue, ca.Break)) for x, _, _ in walk(n.stmt))
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        lp, par, slot = nth(f2, pred, k)
+        top, end = new_name(f2, "loop"), new_name(f2, "done")
+        cond = lp.cond or ca.Constant("int", "1")
+        items = []
+        if isinstance(lp, ca.For) and lp.init is not None:
+            items += lp.init.decls if isinstance(lp.init, ca.DeclList) else [lp.init]
+        items.append(ca.If(ca.UnaryOp("!", copy.deepcopy(cond)), ca.Goto(end), None))
+        body = lp.stmt.block_items or [] if isinstance(lp.stmt, ca.Compound) else [lp.stmt]
+        items.append(ca.Label(top, ca.Compound(list(body))))
+        if isinstance(lp, ca.For) and lp.next is not None:
+            items.append(lp.next)
+        items.append(ca.If(copy.deepcopy(cond), ca.Goto(top), None))
+        items.append(ca.Label(end, ca.EmptyStatement()))
+        set_child(par, slot, ca.Compound(items))
+        yield f"loop {k + 1} written with goto (no loop optimization)", f2
+
+
 def sp_cmp_sign(fn):
     """a < b  ->  (s32)a < b / (u32)a < b  (the branch's signedness is the comparison's type)."""
     pred = lambda n, p, s: isinstance(n, ca.BinaryOp) and n.op in CMP
@@ -426,7 +451,7 @@ def sp_index_local(fn):
 
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
-             sp_split_offset, sp_addr_local]
+             sp_split_offset, sp_addr_local, sp_goto_loop]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
@@ -435,8 +460,8 @@ DECISIONS = {
     "comparison type": ["sp_cmp_sign", "rw_width"],
     "order": ["sp_helper_arg", "sp_specialize", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
-    "loop-invariant": ["sp_into_loop", "sp_inline_decl"],
-    "strength-reduce": ["sp_into_loop", "perm_loop_form"],
+    "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl"],
+    "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form"],
     "cse-skip": ["sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-reuse": ["sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
