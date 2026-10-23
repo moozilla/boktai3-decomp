@@ -233,6 +233,36 @@ def sp_goto_loop(fn):
         yield f"loop {k + 1} written with goto (no loop optimization)", f2
 
 
+def sp_addr_before_next(fn):
+    """L = E; S;  ->  { T *q = &L; S; *q = E; }  for S a simple assignment or declaration (the ROM
+    computes L's address, then S's value, then stores: the address was taken in a local first)."""
+    for bi, b in enumerate(blocks(fn)):
+        items = b.block_items or []
+        for i in range(len(items) - 1):
+            st, nx = items[i], items[i + 1]
+            if not (isinstance(st, ca.Assignment) and st.op == "=" and
+                    isinstance(st.lvalue, (ca.ArrayRef, ca.StructRef, ca.UnaryOp))):
+                continue
+            if not (isinstance(nx, ca.Assignment) and isinstance(nx.lvalue, ca.ID) or isinstance(nx, ca.Decl)):
+                continue
+            f2 = copy.deepcopy(fn)
+            it = blocks(f2)[bi].block_items
+            st2, nx2 = it[i], it[i + 1]
+            q = new_name(f2, "q")
+            lv = st2.lvalue
+            qd = ca.Decl(name=q, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                         type=ca.PtrDecl([], ca.TypeDecl(q, [], None, ca.Typeof(copy.deepcopy(lv)))),
+                         init=ca.UnaryOp("&", copy.deepcopy(lv)), bitsize=None, asmlabel=None)
+            st2.lvalue = ca.UnaryOp("*", ca.ID(q))
+            if isinstance(nx2, ca.Decl):  # keep the declaration in scope for what follows
+                it[i:i + 2] = [nx2, ca.Compound([qd, st2])]
+                nx2.init, init = None, nx2.init
+                it[i + 1].block_items.insert(1, ca.Assignment("=", ca.ID(nx2.name), init))
+            else:
+                it[i:i + 2] = [ca.Compound([qd, nx2, st2])]
+            yield f"address of {text(lv)[:24]} before `{text(nx)[:24]}`", f2
+
+
 def sp_cmp_sign(fn):
     """a < b  ->  (s32)a < b / (u32)a < b  (the branch's signedness is the comparison's type)."""
     pred = lambda n, p, s: isinstance(n, ca.BinaryOp) and n.op in CMP
@@ -451,14 +481,15 @@ def sp_index_local(fn):
 
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
-             sp_split_offset, sp_addr_local, sp_goto_loop]
+             sp_split_offset, sp_addr_local, sp_goto_loop,
+             sp_addr_before_next]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width"],
-    "order": ["sp_helper_arg", "sp_specialize", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
+    "order": ["sp_helper_arg", "sp_specialize", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
     "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl"],
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form"],
