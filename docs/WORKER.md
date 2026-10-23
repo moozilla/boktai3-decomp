@@ -133,7 +133,24 @@ still differs. Only commit drafts that compile and are worth resuming.
 
 **Scratch files:** never use fixed paths under `/tmp` (other workers share it). Put helper scripts in your worktree under `build/` (gitignored) or a directory named after your worker.
 
-## When stuck: ask the compiler debugger (October 23)
+## When stuck: let fix.py try first, then ask the compiler debugger (October 23)
+
+Before working a draft by hand, and again before committing it as a
+NONMATCHING draft, run
+
+    python3 tools/fix.py FILE.c [FUNC] [--nonmatching] --budget 120
+
+It names the decision at each divergence and compiles the C spellings known
+to flip it (helper constants, address-first locals, split offsets, casts,
+ternaries, the TakeFlag pattern...), keeping the best few in a beam. A match
+is written to `build/fix/FUNC.c` (copy it over the draft, drop the
+`#ifdef NONMATCHING` wrapper, `make format`, then `tools/check.py`);
+otherwise `build/fix/FUNC.partial.c` holds its best version, often several
+instructions closer. Its output is reprinted C: tidy obvious extra
+parentheses before committing. It solved 7 of 7 of the October 23
+hand-matched drafts unaided, in 10 to 25 s each (`tools/fix_suite.py`).
+Differences that are only register allocation are its weak spot; use
+`tools/rasolve.py` there.
 
 Before trying spellings at random, ask which compiler decision differs.
 Each call costs one or two compiles:

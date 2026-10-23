@@ -53,15 +53,20 @@ def strip_draft(text):
 
 def find_def(text, name):
     """(start, end) of NAME's definition in TEXT (static helpers included), or None."""
-    m = re.search(r"^[A-Za-z_][\w \t\*]*?\b" + re.escape(name) + r"\s*\([^;{)]*\)\s*\{", text, re.M)
+    m = re.search(r"^(?:[A-Za-z_][\w \t\*]*?)?\b" + re.escape(name) + r"\s*\([^;{)]*\)\s*\{", text, re.M)
     if not m:
         return None
+    start = m.start()
+    if text[start:].startswith(name):  # the return type on the line before
+        prev = text.rfind("\n", 0, start - 1) + 1
+        if re.fullmatch(r"(static\s+|inline\s+)*[A-Za-z_][\w \t\*]*", text[prev:start - 1]):
+            start = prev
     depth, i = 0, m.end() - 1
     while i < len(text):
         depth += {"{": 1, "}": -1}.get(text[i], 0)
         i += 1
         if depth == 0:
-            return m.start(), i
+            return start, i
     return None
 
 
@@ -70,8 +75,9 @@ class Draft:
 
     def __init__(self, src_text, func, workdir):
         self.func = func
-        alias = re.search(r"^#define (\w+) " + re.escape(func) + r"$", src_text, re.M)
-        self.src_name = alias.group(1) if alias else func  # the name the source text uses
+        alias = re.search(r"^#define (\w+)\s+" + re.escape(func) + r"\s*$", src_text, re.M)
+        # the name the source text defines the function under
+        self.src_name = alias.group(1) if alias and find_def(src_text, alias.group(1)) else func
         self.text = src_text
         self.path = os.path.join(workdir, f"{func}.c")
         open(self.path, "w").write(src_text)
@@ -121,6 +127,11 @@ class Draft:
             return None
         regs = atlas.regions(self.rom, mine)
         total = sum(max(i2 - i1, j2 - j1) for _, i1, i2, j1, j2 in regs)
+        if total == 0 and mine != self.rom:
+            # regions() lets branch offsets follow from the instructions; a label that moves
+            # (a statement into or out of a loop) shows only there
+            diff = [i for i, (a, b) in enumerate(zip(self.rom, mine)) if a != b]
+            return max(1, len(diff)), (diff[0] if diff else len(self.rom))
         return total, (regs[0][1] if regs else len(self.rom))
 
     def materialize(self, fn, helpers):
@@ -342,7 +353,7 @@ def main():
     src = os.path.abspath(a.src)
     asm = re.search(r'INCLUDE_ASM\("asm/nonmatching", (\w+)\)', open(a.src).read())
     func = a.func or (asm.group(1) if a.nonmatching and asm else None) or re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(src).read(), re.M)[-1]
-    alias = re.search(r"^#define " + re.escape(func) + r" (\w+)$", open(src).read(), re.M)
+    alias = re.search(r"^#define " + re.escape(func) + r"\s+(\w+)\s*$", open(src).read(), re.M)
     if alias:  # a draft that names the function through a #define compiles to the ROM name
         func = alias.group(1)
     os.chdir(ROOT)
