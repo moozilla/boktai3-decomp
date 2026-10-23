@@ -76,3 +76,34 @@ The combined build printed `build/boktai3.gba: OK`. The batch contains eight
 matches, six new or improved guarded drafts, and the notes above; guarded drafts
 receive no exact credit. No C conflicts occurred during the rebase. Concurrent
 history entries were preserved and the documentation index was regenerated.
+
+## Batch 3 (2026-10-23)
+
+Tags: #matching #ratatosk #nonmatching #register-pinning
+
+Three exact functions add +0.0193 percentage points (464 reviewed bytes):
++0.0035 plain C and +0.0158 register-pinned. Five complete guarded drafts
+preserve larger callbacks. Every remaining Ratatosk target has now received
+a full C attempt, including the three previously deferred large callbacks.
+
+| Address | Result | Notes |
+| --- | --- | --- |
+| 081F2E34 | matched | Ratatosk_UpdatePointDistancesToPlayer, 84 bytes, plain C. Use a byte-offset stride with a typed distance base. Removing the remaining count binding and barriers keeps the exact result. |
+| 081F3414 | matched | Ratatosk_FindNearestPointExcept, 60 bytes, register-pinned. Best index in r4. The former 120-byte span contains two independent 60-byte searches; 081F3450 retains its own assembly boundary and receives no exact credit. |
+| 081F423C | skipped, retained 98.1% | Revisited shared-zero scheduling with inline zero-return, delayed zero and pointer constraints. All increased residue. |
+| 081F4378 | skipped, retained 98.6% | Revisited vector-address placement, signed high-byte wrapping and final duration reload. Operand-order variants worsened the six-instruction residue. |
+| 081F4CF8 | skipped, retained 86.1% | Revisited explicit random masks, table bindings and particle-pointer lifetimes. Stack and random-source changes did not improve the retained full draft. |
+| 081F55B0 | matched | Ratatosk_UpdateOrbitingParticlePose, 320 bytes, register-pinned. Expand polar math; retain the timer address after the first product, reverse the vector x operands and use a local mask. Depin removes the timer binding; four hints remain. |
+| 081F3C68 | drafted 79.4% | Full 1308-byte radial summon attack. Baseline 70.0%. Typed colliders, explicit random widths, hoisted loop pointers, angle/pattern/variant bindings and helper order improved it. Candidate 1292 bytes; vector and collider lifetimes remain. |
+| 081F5290 | drafted 72.5% | Full 800-byte knockback recovery. Baseline 50.2%. State helper, random widths, scalar bindings, a flags pointer, shared one and sequential scale-pointer setup improved it. Candidate 808 bytes; owner/random lifetimes remain. |
+| 081F6B90 | drafted 95.5% | Full 1608-byte scene-command dispatcher. Baseline 48.1%. Separate message roots, a pinned message pointer, prechecked loop, typed palette and anchor views, and signed zero arguments recovered the body. Tested all 120 palette-helper argument orders and compiler decision flips; palette register lifetimes and shared tails remain. |
+| 081F7FD0 | drafted 81.7% | Full 1300-byte player-orbit attack. Baseline 69.6%. Signed sequence, animation helper and explicit scratch layout improved it. Pointer/pin variants and random/angle expressions plateaued. Independent callback 081F84E4 occupies the remaining 284 bytes of the old span and stays assembly. Refreshed the progress inventory so its reviewed extent is 1300 bytes. |
+| 081F92C8 | drafted 86.4% | Full 2160-byte attack selector. Baseline 81.1%. Constant-one state stores, an explicit anchor pointer and direct random-byte loads improved it. Tried phase-derived one values, snapshot root variants, pins, declaration swaps and compiler decision flips. Saved-state address reuse, table lifetimes and merged tails remain. |
+
+The new 081F3414 and 081F7FD0 boundaries follow independent prologues,
+returns and final literal pools. No retained assembly tail is counted as C.
+No symbol names, totals, shared generated outputs or ROM artifacts were edited.
+
+Combined validation after rebasing: all three matches pass explicit reviewed-extent
+checks, privacy and diff checks pass, and the full ROM build prints
+`build/boktai3.gba: OK`. The progress inventory includes both new tail boundaries.
