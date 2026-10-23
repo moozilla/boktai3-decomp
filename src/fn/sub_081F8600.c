@@ -1,8 +1,13 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.3%
+
+#define Ratatosk_UpdateSunOrbPlacement sub_081F8600
 struct RatatoskPosition {
     u32 xy, z;
+};
+struct PointSlot {
+    s32 active;
+    struct RatatoskPosition position;
+    u8 padC[12];
 };
 struct OrbSlot {
     s32 active;
@@ -15,7 +20,8 @@ struct Ratatosk {
     u8 animation, padAB[3], state, ready, active;
     u8 padB1[0x180 - 0xb1];
     s32 sequence, complete;
-    u8 pad188[0xdf0 - 0x188];
+    u8 pad188[0xd18 - 0x188];
+    struct PointSlot points[9];
     struct OrbSlot slots[3];
     u8 padE38[0xe4c - 0xe38];
     u16 selectedOrb;
@@ -92,7 +98,10 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
             p->hasOrb = 0;
             HALF(p, 0xee2) = 0;
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            HALF(p, 0xf0e) = (u8)gUnk_0203B400[gUnk_03005308];
+            {
+                s32 sample = (u8)((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+                HALF(p, 0xf0e) = sample;
+            }
             if (HALF(p, 0xf0e) > 128)
                 HALF(p, 0xf0e) = 1;
             else
@@ -150,10 +159,9 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
                         SunOrb_SetMotionParams(&config, 360, 4, 0, 2);
                         ((u16 *)&config)[11] = HALF(p, 0xf0e);
                         {
-                            s32 slot =
-                                SunOrb_CreateAtPosition(&config, (u8 *)p + 0xd1c + point * 24);
+                            s32 slot = SunOrb_CreateAtPosition(&config, &p->points[point].position);
                             if (slot >= 0) {
-                                *(s32 *)((u8 *)p + 0xd18 + point * 24) = 1;
+                                p->points[point].active = 1;
                                 p->slots[slot].active = 1;
                                 RisingActorManager_BeginRaise(slot);
                                 HALF(p, 0xe4e) = slot;
@@ -174,7 +182,3 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateSunOrbPlacement);
-#endif

@@ -1,9 +1,10 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.4%
-// foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
+// fuzzy: 97.6%
+// Remaining difference: loop initializers are emitted in reverse order.
 #define SceneDistance_UpdateSquaredDistances Ratatosk_UpdatePointDistancesToPlayer
 struct SceneDistanceEntry {
     struct SceneVec position;
@@ -19,7 +20,7 @@ struct SceneVec *Player_GetEffectivePosition(s32);
 void Ratatosk_UpdatePointDistancesToPlayer(struct SceneDistanceSet *set)
 {
     struct SceneDistanceEntry *entry = set->entries;
-    s32 count = 8;
+    register s32 count asm("r6") = 8;
     u32 offset = 0;
     do {
         struct SceneVec *target = Player_GetEffectivePosition(0);

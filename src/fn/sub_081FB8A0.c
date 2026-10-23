@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.7%
-// Particle-pool update; register allocation of the loop pointers differs.
+#define Ratatosk_UpdateParticlePool sub_081FB8A0
 #include "contact_swarm.h"
 struct Particle {
     u32 age;
@@ -136,7 +134,7 @@ static inline void updatePlayback(struct DisplaySequenceState *state,
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
                 if (!(u8)speed) {
-                    u32 one = 1;
+                    register u32 one asm("r0") = 1;
                     state->duration = one;
                 }
             }
@@ -144,51 +142,74 @@ static inline void updatePlayback(struct DisplaySequenceState *state,
     }
 }
 
+static inline u32 TestMask(u32 mask, struct ParticlePool *pool)
+{
+    struct ParticlePool *p = pool;
+    return p->mask & mask;
+}
+static inline void ClearFlags(u32 mask, struct Particle *e)
+{
+    e->flags &= mask;
+}
 s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
 {
-    register struct ParticlePool *a asm("sb") = aIn;
-    register s32 i asm("sl");
+    struct ParticlePool *a = aIn;
+    s32 i;
     struct Particle *e;
+    s32 last;
     e = a->particles;
     i = 0;
     do {
-        if (a->mask & (1 << i)) {
-            u8 *cfg = (u8 *)e + 0x14;
+        if (TestMask(1 << i, a)) {
             register struct ContactSwarmSprite *sprite asm("r6") =
                 (struct ContactSwarmSprite *)((u8 *)e + 0x2c);
+            u8 *cfg = (u8 *)e + 0x14;
             if (sub_08249240(e, (void *)i, *(void **)(cfg + 0x10)) == 1) {
                 RatatoskParticle_Remove(a, e, i);
             } else {
+                u32 active = *(volatile u32 *)&e->flags & 1;
                 s16 *vel = &e->vx;
-                if (*(volatile u32 *)&e->flags & 1) {
+                if (active) {
+                    s16 *dst = vel;
                     s32 angle = *(s8 *)(cfg + 6);
                     s32 speed = *(s32 *)(cfg + 8);
                     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
                     s32 zero = 0;
-                    vel[0] = x;
-                    vel[1] = zero;
-                    vel[2] = Scale(gUnk_086149C4[angle & 255] * speed);
-                    e->flags &= ~1;
+                    dst[0] = x;
+                    dst[1] = zero;
+                    dst[2] = Scale(gUnk_086149C4[angle & 255] * speed);
+                    ClearFlags(~1, e);
                 }
                 {
                     struct ContactPosition *pos = &sprite->position;
                     sprite->position.x += e->vx;
-                    pos->y += vel[1];
-                    pos->z += vel[2];
+                    {
+                        s16 *v = vel;
+                        pos->y += v[1];
+                    }
+                    {
+                        s16 *v = vel;
+                        pos->z += v[2];
+                    }
                     sprite->position.y -= e->lift >> 12;
                 }
                 updatePlayback(&e->sequence, sprite);
-                if (e->age >= *(u16 *)(cfg + 2))
-                    RatatoskParticle_Remove(a, e, i);
+                {
+                    u32 age = e->age;
+                    register u8 *data asm("r1") = cfg;
+                    asm("" : "+r"(data));
+                    if (age >= *(u16 *)(data + 2))
+                        RatatoskParticle_Remove(a, e, i);
+                }
                 e->age++;
             }
         }
-        i++;
+        {
+            u32 one = 1;
+            i += one;
+        }
         e++;
-    } while (i <= 23);
+        last = i;
+    } while (last <= 23);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateParticlePool);
-#endif

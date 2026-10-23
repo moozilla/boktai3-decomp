@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.2%
-// Only the sprite pointer copy kept in ip and the e+0x33 byte store address differ.
+#define SceneParticles_SpawnAtPosition sub_081FBBA8
 #include "contact_swarm.h"
 struct Particle {
     u32 age;
@@ -41,13 +39,15 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceState *state,
-                                  struct ContactSwarmSprite *sprite)
+static inline struct ContactSwarmSprite *updatePlayback(struct Particle *eIn,
+                                                        struct DisplaySequenceState *state,
+                                                        struct ContactSwarmSprite *sprite)
 {
     register struct Particle *e asm("r5") = eIn;
     const volatile u16 *command;
     register u32 flags asm("r1");
     u32 bit;
+    struct ContactSwarmSprite *result;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -62,10 +62,14 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
         bit = maskBit;
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            e->sprite.flags |= 4;
-        else
-            e->sprite.flags &= ~4;
+        {
+            u32 second = ((*command & 0x30) >> 4) & bit;
+            result = sprite;
+            if (first != second)
+                e->sprite.flags |= 4;
+            else
+                e->sprite.flags &= ~4;
+        }
     }
     {
         u32 input = state->flags;
@@ -117,7 +121,6 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -151,6 +154,7 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
             }
         }
     }
+    return result;
 }
 
 s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct ContactPosition *position)
@@ -191,6 +195,7 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
         {
             struct DisplaySequenceState *state;
             struct ContactSwarmSprite *sprite;
+            struct ContactSwarmSprite *link;
             if (*(u32 *)((u8 *)e + 0x28) != 2) {
                 state = &e->sequence;
                 Anim_SetSequence(state, *(void **)((u8 *)pool + 0xb18), 4, 0, zero);
@@ -199,17 +204,16 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
                 Anim_RestartSequence(state, *(void **)((u8 *)pool + 0xb18), 5, 0, zero);
             }
             sprite = (struct ContactSwarmSprite *)((u8 *)e + 0x2c);
-            updatePlayback(e, state, sprite);
+            link = updatePlayback(e, state, sprite);
             e->sprite.flags &= ~1;
-            Sprite_LinkToList(&e->sprite, 0);
-            *((u8 *)e + 0x33) = 2;
+            Sprite_LinkToList(link, 0);
+            {
+                register u8 *kind asm("r1") = (u8 *)e + 0x33;
+                *kind = 2;
+            }
         }
     }
     pool->mask |= 1 << slot;
     *(u32 *)((u8 *)pool + 0xb1c) += 1;
     return slot;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneParticles_SpawnAtPosition);
-#endif

@@ -1,8 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.7%
-// foundry draft (worker best 82.9%); what differs is mostly register allocation and instruction order
+// fuzzy: 98.1%
+// Remaining difference: shared zero initialization is emitted before the direction load.
 struct DirectionalActor {
     u8 pad0[0x51];
     u8 angle;
@@ -46,7 +46,7 @@ static inline void facing(struct DirectionalActor *p, int angle)
 }
 void PaletteEffect_RefreshPalette(void *);
 void Player_ClearFlag740(void);
-static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8 mode)
+static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8 mode, u32 zero)
 {
     p->paletteTimer = duration;
     p->paletteMode = mode;
@@ -55,16 +55,17 @@ static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8
         u8 value = 32;
         p->paletteValue = value;
     } else if (p->paletteMode == 1)
-        p->paletteValue = 0;
+        p->paletteValue = zero;
 }
 void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 frame)
 {
     struct DirectionalActor *q = p;
+    u32 zero = 0;
     facing(p, p->requestedAngle);
     if (p->changed) {
-        p->changed = 0;
+        p->changed = zero;
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
-        palette(p, 500, 5, 4);
+        palette(p, 500, 5, 4, zero);
         q->motionE52 = 0;
         q->motionE54 = 0;
         q->motionE58 = 0;
