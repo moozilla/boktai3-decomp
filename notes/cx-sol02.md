@@ -293,3 +293,64 @@ through 08201D38 and 0820212C before the tagged NPC family. The required revisit
 queue from earlier batches remains outstanding.
 
 Batch 4 combined validation after rebase: `build/boktai3.gba: OK`.
+
+
+## Session h2, batch 5: script combat actors and tagged NPCs
+
+Tags: #matching #script-combat-actor #scene-npc #palette
+
+- 08201A78 matched, `ScriptCombatActor_UpdateProjectileAttack`, full 564-byte
+  extent, without hints. Reused the attack-start handler layout and a matched
+  orbit-particle RNG sequence. An explicit signed-byte aim temporary retains
+  the target sign extension; an inline vector copy emits the destination
+  address before copying. Typed origin/position fields and staged RNG cursor
+  updates recover the tail exactly.
+- 08201D38 matched, `ScriptCombatActor_UpdateState` (tentative), full
+  1000-byte extent. Reused the packed sprite-playback helper, with first-bit,
+  mask, duration and weight lifetimes adapted to this actor. Retaining the
+  damage offset recovers constant reuse. A temporary disabled-collider pointer
+  and a bound receiving pointer recover the final missing copy. Fourteen
+  hints remain after depin. Callback use is confirmed by 08202608.
+- 0820212C matched, `ScriptCombatActor_InitializeFromScript` (tentative), full
+  1244-byte extent. Ported the matched PoisonHand initializer, mapped every
+  script field and added period/delay options. A complete typed actor layout
+  moves the first draft from 85.9% to 98.8%. A sprite-load clobber, frame pointer
+  and retained initial-death field offset close the remaining bytes. Nineteen
+  hints remain after depin. All script, collision, terrain and scene-body paths
+  are retained; no extra split boundary is required.
+- 082015D4 matched, `ScriptCombatActor_ApplyHitReaction`, full 432-byte extent.
+  Required revisit closes the prior 96.7% draft. A forward-counting three-pass
+  loop produces the reversed count initialization after invariant hoisting.
+  Explicit index increments, a table binding after vector copies and separate
+  blocked-state zero recover scheduling. Passing the final sample to an inline
+  coordinate setter permits destructive reuse of the dead index register.
+  Four hints remain after depin. The script combat actor family is now exact.
+- 081D1908 drafted 44.5%, `SceneNpc_BlendPalette`, full new C for sixteen
+  RGB555 palette entries. Explicit packed-color shifts, a palette-binding
+  helper and retained blue channel reduce structure to 22 differences.
+  Tested separate result variables, phase/divisor bindings, scratch records,
+  helper argument order, loop forms and pass flips; none closes the channel
+  spill and loop allocation plateau. The strongest structural form is retained
+  rather than a superficially higher fuzzy form. Default fallback is exact
+  over 264 bytes. The observed palette binding is at actor offset 0x148.
+- 081D1A44 matched, `SceneNpc_EnterIdleFacing` (tentative), full 72-byte extent,
+  without hints. Initial matching constraints are all removed by reusing the
+  signed-short facing helper from 081D1BA8; this preserves arithmetic shifts
+  and mask operand order naturally.
+- 081D1A8C drafted 61.2%, full new walking-handler C. Reused the signed-short
+  facing helper, fixed-point scale helper and target-distance pattern. Keeping
+  the speed and heading lifetimes improves structure to six differences.
+  Tested alternate helper argument orders, position/target bindings, owner and
+  distance-result bindings, a typed velocity view and an enclosing velocity
+  helper; these plateau or regress. A bounded permutation search produced only
+  a weaker, more complicated candidate. Default fallback is exact over 284
+  bytes. Source remains guarded; the unguarded legacy check otherwise compares
+  only the candidate length, which can distort these short-layout scores.
+
+The real wrapup marker reappeared before 081D1C38. Its assembly was inspected,
+without starting a C draft; it remains unattempted for the continuation.
+Resume at 081D1C38, then 081D2160, 081D2318 and 081D2610. Continue the original
+function list afterward and perform the recorded earlier-session revisit queue.
+This batch has five exact matches: +0.1374 percentage points (3312 bytes),
+including 2676 Register-pinned bytes and 636 bytes without hints. Two new full
+NONMATCHING drafts are retained. No function is newly classified as skipped.
