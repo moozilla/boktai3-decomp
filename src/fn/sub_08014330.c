@@ -1,4 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#define ParticleGroup_UpdateFrozen sub_08014330
 struct PGroup {
     u8 active, count, type, priority;
     u8 particles[448];
@@ -29,9 +31,6 @@ extern u32 gUnk_030052FC;
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// Differs only in one register copy: the ROM loads g->type into r0 then copies to r3.
 void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
 {
     u8 *p;
@@ -50,7 +49,7 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
         u8 *q;
         u32 fl;
         type = ({
-            u32 z = g->type;
+            register u32 z asm("r0") = g->type;
             asm("" : "+r"(z));
             z;
         });
@@ -88,11 +87,7 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
                 }
             } else
                 v = cell;
-            if (({
-                    asm("" : "+r"(type));
-                    (u8) type;
-                }) <= 8 &&
-                (m->timer & 1) && v != 0xFFFF) {
+            if (({ (u8) type; }) <= 8 && (m->timer & 1) && v != 0xFFFF) {
                 *(u16 *)(p + 0x2a) = v;
                 *(u16 *)(p + 0x18) = e->c + base;
             } else {
@@ -104,6 +99,3 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
         n--;
     } while (n >= 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ParticleGroup_UpdateFrozen);
-#endif

@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 98.7%
 struct HomingVec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -79,7 +80,7 @@ static inline void SpawnTrail(struct HomingSlot *p)
                                             2, 0x200);
 }
 
-static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 sequence)
+static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 sequence, u32 one)
 {
     u8 direction;
     u8 flips[2];
@@ -93,7 +94,7 @@ static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 s
     check = (u8)(direction - 1);
     saved = second;
     if (check <= 1)
-        *first = 1;
+        *first = one;
     else
         *first = 0;
     if (direction > 1)
@@ -110,6 +111,16 @@ static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
     params->angle = Math_Atan2(player->x - position->x, player->z - position->z);
 }
 
+static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
+{
+    register u32 offset asm("r0") = 0x12a;
+    asm("" : "+r"(offset));
+    {
+        register s16 *dest asm("r2") = (void *)((u8 *)p + offset);
+        asm("" : "+r"(dest));
+        *dest = height;
+    }
+}
 // fuzzy: 93.3%
 u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
 {
@@ -117,27 +128,33 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     s32 *state = &p->state;
     u32 sequence;
     switch (*state) {
-        case 0:
-            if (p->lifetime & 1)
+        case 0: {
+            register u32 one asm("r5");
+            u32 time = p->lifetime;
+            one = 1;
+            asm("" : "+r"(one));
+            if (time & one)
                 SpawnTrail(p);
             p->sprite.flags |= 0x400;
             p->sprite.position.y = p->target.y - (30 - p->lifetime) * 2;
             if (p->lifetime > 30) {
-                *state = 1;
+                *state = one;
                 p->sprite.flags &= ~0x400;
                 Aim(p, params);
                 sequence = params->variant == 0 ? 7 : 0;
-                Face(p, params, sequence);
+                Face(p, params, sequence, one);
             }
             break;
+        }
         case 1: {
-            u16 *delay = &p->params.delay;
+            register u16 *delay asm("r2") = &p->params.delay;
             s32 limit = slot * 30 + 30;
+            asm("" : "+r"(delay));
             if (p->lifetime > limit + *delay) {
                 Aim(p, params);
                 sequence = params->variant == 0 ? 10 : 6;
                 p->sequence.flags |= 8;
-                Face(p, params, sequence);
+                Face(p, params, sequence, 1);
                 p->state = 2;
             }
             break;
@@ -191,7 +208,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 }
             }
             sequence = params->variant == 0 ? 7 : 0;
-            Face(p, params, sequence);
+            Face(p, params, sequence, 1);
             p->state = 3;
             {
                 struct HomingCollider *collider = &p->primaryCollider;
@@ -205,11 +222,25 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             {
                 s32 limit = slot * 30;
                 u32 elapsed = p->lifetime - 200;
-                p->sprite.position.y = p->target.y - (30 - (limit - elapsed)) * 2;
+                SetRiseHeight(p, p->target.y - (30 - (limit - elapsed)) * 2);
             }
-            if (Sprite_BlinkUntilExpired(&p->sprite, p->blinkTimer, 0x2d, 0x5a))
-                return 1;
-            p->blinkTimer++;
+            {
+                register u32 spriteOffset asm("r1");
+                register u32 timerOffset asm("r2");
+                register struct HomingSprite *sprite asm("r0");
+                register s16 *timer asm("r4");
+                spriteOffset = 0x10c;
+                asm("" : "+r"(spriteOffset));
+                sprite = (void *)((u8 *)p + spriteOffset);
+                asm("" : "+r"(sprite));
+                timerOffset = 0x15e;
+                asm("" : "+r"(timerOffset));
+                timer = (void *)((u8 *)p + timerOffset);
+                asm("" : "+r"(timer));
+                if (Sprite_BlinkUntilExpired(sprite, *timer, 0x2d, 0x5a))
+                    return 1;
+                (*timer)++;
+            }
             break;
     }
     return 0;
