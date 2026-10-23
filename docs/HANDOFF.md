@@ -23,7 +23,12 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
-* **Mummy, reaction and Ivy reconstruction** (2026-10-23): checkpoint recovery and anchor approach match; complete guarded reaction and Ivy drafts preserve larger callbacks. [Worker notes](../notes/cx-sol05.md) identify the incomplete deep-pass resume point. Combined ROM builds passed.
+* **Mummy and reaction reconstruction** (2026-10-23): one exact checkpoint recovery and eleven new or improved guarded drafts; [worker notes](../notes/cx-sol05.md) identify remaining deep attempts. Combined ROM build passed.
+
+* **Script combat actor family recovered** (2026-10-23): the initializer, actor
+  update, projectile attack, collider setup and hit reaction now match exactly.
+  Tagged NPC continuation details are in [worker notes](../notes/cx-sol02.md).
+
 * **State actor campaign continuation** (2026-10-23): three control, palette and target-turn matches plus complete guarded drafts; resume details in [worker notes](../notes/cx-sol11.md).
 * **Effect constructors and actor colliders** (2026-10-23): sol02 recovers two
   Nidhoggr attack-effect constructors and the script combat actor collider
