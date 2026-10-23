@@ -27,12 +27,25 @@ Tags: #matching #scene-actors #register-pinning
 - 081F0734: inspected and skipped. Large receiver command dispatcher has a 66-entry sparse jump table and mixed resource, palette, sound and motion commands; no draft or Ghidra export. Reconstruction deferred.
 - 081F1274: inspected and skipped. Large update combines collider insertion, palette interpolation and several particle branches. No draft or Ghidra export; reconstruction deferred.
 - 081F1C2C: skipped at existing 80.5%. Pointer-local sweep found no improvement; script/local-vector and initialization register allocation remain.
-- 08095C00: skipped at existing 89.1%. Declaration-swap batch found no improvement; octant-mask lifetime and control setup remain.
+- 08095C00: skipped at existing 89.1%. Declaration swaps found no improvement. Pinning the motion/sequence pointers and moving the control zero worsened the candidate; octant-mask lifetime and control setup remain.
 - 0809628C: skipped at existing 90.5%. Named argument struct and volatile array both retain the same hoisted array-base stores; script argument stack layout remains the blocker.
-- 08096D38: existing 85.2% draft inspected; 60 structural differences remain in the route/motion inline. Further work pending.
-- 08097798: inspected; vector interpolation reconstructs a quadratic route curve and advances its phase by 128 up to 1023. Further work pending.
+- 08096D38: skipped at existing 85.2%. Declaration swaps found no improvement; 60 structural differences remain in the route/motion inline.
+- 08097798: skipped at 30.7%. Reconstructed cubic route interpolation and phase advance by 128 up to 1023. The scalar/vector coefficient lifetimes and stack allocation differ substantially; scratch only.
 - 08097E38: drafted 99.6%, improved from 99.2%. A zero-initializing state helper fixes store scheduling; one player-slot literal reload remains. Explicit slot reads disturbed vector and player-copy allocation, so those variants were rejected.
 
 ## Batch 1
 
 Nine matches, four new or improved guarded drafts. Exact code gain: approximately 0.069 percentage points (1,672 bytes), including three register-pinned matches (980 bytes). Notes distinguish inspected functions from functions with compiled candidates. Combined validation: `build/cxbuild` printed `build/boktai3.gba: OK`. The first build exposed stale assembly fallback names in the two improved drafts; restored their promoted names and reran the complete build successfully. The independent callback also required its reviewed boundary in build_extra_functions.csv.
+
+## Wrap-up
+
+Tags: #matching #ghost
+
+- 080980FC: inspected and skipped at existing 90.4%. The inlined animation stepper still differs in address scheduling and tests; no improved candidate retained.
+- 08098344: inspected and skipped. Eight-point cubic route sampling shares the preceding interpolation family, but introduces separate motion coefficients and loop stack slots. The wrap-up signal arrived before a C candidate was checked.
+- 08098788: inspected and skipped at existing 84.4%. Visibility gates and global/player addressing remain; no improved candidate retained.
+- 08098A74: inspected and skipped at existing 87.6%. Player displacement, animation scaling and control setup remain; no improved candidate retained.
+
+The literal-reference sweep on 08097E38 found no improvement. All bounded searches have ended. The wrap-up signal stopped function work; the remaining fifty assigned functions were not attempted. Batch 1 was merged in PR #582 after the full build printed OK. No further source changes followed that validation and merge.
+
+Final: 9 matched, 4 drafted or improved, 21 skipped (including inspection-only skips); 50 not attempted before wrap-up.
