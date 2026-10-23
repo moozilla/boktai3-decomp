@@ -6,9 +6,9 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void sub_080B1FA8(void *);
 void Vorn_UpdatePursuitDistance(void);
 #ifdef NONMATCHING
-// fuzzy: 83.4%
+// fuzzy: 89.0%
 // Flag reloads, route-index addressing, constant lifetimes, and register allocation still differ.
-static inline u8 Test(u16 *p, u32 bits)
+static inline u8 Test(volatile u16 *p, u32 bits)
 {
     if (*p & bits)
         return 1;
