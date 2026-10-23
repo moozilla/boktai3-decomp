@@ -31,3 +31,37 @@ Remaining Ratatosk targets, including the larger callbacks temporarily deferred
 while establishing the reusable particle loops: 081F4CF8, 081F5290, 081F6428,
 081F6B90, 081F7FD0, 081F92C8 and 081F9BEC. Resume these before the next family.
 No totals files, symbol registry or shared generated files were edited.
+
+## Batch 2 (2026-10-23)
+
+Tags: #matching #ratatosk #tentacle #nonmatching
+
+Session 2 found no new exact matches: +0.0000 percentage points of exact code
+coverage. Two new guarded drafts preserve recovered behavior. The wrap-up flag
+arrived during tentacle-family triage, so the remaining list is unattempted in
+this session. A final branch audit confirmed Batch 1 was still unmerged;
+its eight matches and four drafts are included in this integration.
+
+| Address | Result | Notes |
+| --- | --- | --- |
+| 081F2E34 | skipped, retained 97.6% | Tried input-only and read/write barriers, byte offsets and offset bindings to reverse the two initializers. These disturbed strength reduction or allocation. Bounded one-process permuter search found no exact candidate. |
+| 081F423C | skipped, retained 98.1% | Tried delaying the shared zero behind explicit angle/address operands and a high-register clobber. This introduced an extra high register and pointer copies. The hint tool could not compile the isolated source. |
+| 081F4CF8 | skipped, retained 86.1% | Passed random table/mask explicitly, moved the spawn pointer out of the loop and tested actor/table/mask bindings. Stack layout and random-source lifetimes worsened. |
+| 081F5290 | skipped | Reconstructed recoil, scale decay, particle emission and recovery/defeat transitions. Tick/owner bindings and explicit scale pointers remained below the prior recorded attempt; no draft promoted. |
+| 081F6428 | drafted 64.8% | Ratatosk_ApplyQueuedDamage (tentative), reviewed extent 800 bytes. Consumes queued damage, advances health phases, applies vulnerability scaling, emits three sparks and transitions to recoil or defeat. Random-source lifetimes, particle field accesses and callback setup differ. |
+| 081F6B90 | deferred | Inspected command dispatcher and its jump table. No Ghidra export is present; no dominant full-function port identified. No new candidate. |
+| 081F7FD0 | deferred | Inspected the attack-state entry and four-phase dispatcher. Large projectile/position body remains assembly; no new candidate. |
+| 081F92C8 | deferred | Inspected callback dispatch and interrupt gating. Large state-selection body remains assembly; no new candidate. |
+| 081F9BEC | drafted 67.9% | Ratatosk_OnDamageCollision (tentative), reviewed extent 544 bytes. Queues collision damage, derives impact direction, tracks repeated attacks and triggers feedback. Attack/flags lifetimes, masks and address scheduling differ. Broad bindings reduced instruction residue but worsened byte similarity and were discarded. |
+| 080A7C84 | skipped, retained source | Reviewed-extent check reports 98.0%. Tried offset bindings, preserving its lifetime through the callback and an explicit shared state exit. The callback-offset and zero-state scheduling differences remain. |
+| 080A8280 | skipped, retained 90.3% | Tested motion/x bindings, a split turn temporary, vector operand order and removing the motion alias. No coherent structural improvement; retained the original draft. |
+| 080A8904 | skipped, retained 87.6% | Tested indexed stack initialization, random-table spelling, surface widths and facing signedness. No useful improvement. |
+| 080A8F38 | skipped, retained 95.5% | Tested a local pinned mask to stop hoisting and removed the secondary sprite-pointer binding. This changed the frame and mask schedule without resolving the sprite-pointer spill. |
+| 080AA688 | skipped, retained 96.1% | Three stride-register instructions remain. Explicit collider/flag pointers, stride bindings, clobbers and a bounded one-process permuter run found no exact candidate. The permuter base score did not reproduce the fast checker baseline; no output accepted. |
+| 080AA744 | skipped | Reconstructed motion-dependent scatter mask and active-segment velocity generation. Sequential dot-product terms and loop/owner bindings improved the new local attempt to 62.0%, below prior documented work. No draft promoted. |
+
+Ten functions received matching attempts and were skipped, two received new
+drafts, and three larger callbacks received static triage only. No exact credit
+is claimed. Remaining function-list entries, including the earlier deferred
+large Ratatosk callbacks, still need future work. All unaccepted experiments
+remain in ignored local scratch storage.
