@@ -314,6 +314,18 @@ see `docs/COMPILER_REFERENCES.md` for the scoring controls and limitations.
 
 ## Local orchestration safeguards
 
+**Wrong extents: fix the boundary, don't skip.** If a listed function's extent
+also holds other complete routines (its own `pop {pc}`/`bx` and literal pool,
+then another `push {..., lr}`, often after raw `.byte` runs), register the
+missing start instead of skipping the function:
+`build/venv/bin/python tools/hidden_tails.py split START,END,DESCRIPTION`
+(no commas in DESCRIPTION; END empty keeps the new function as retained assembly; `scan` lists
+candidates). It updates `symbols/build_extra_functions.csv`,
+`symbols/progress_extra_functions.csv` and the progress inventory. Check the
+start with objdump and look for references first (see
+`docs/SCENE_ACTOR_BEHAVIOR.md`), then match the shortened function. Commit the
+boundary separately (`boundary XXXXXXXX: ...`); the full build validates it.
+
 Before drafting, confirm the function is absent from `src/` (including library
 units); matching an existing function earns no new coverage. Worker checkouts
 share generated files read-only: invoke `build/venv/bin/python tools/build.py`
