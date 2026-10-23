@@ -1,7 +1,5 @@
 #include "scene_actor_chase.h"
-#ifdef NONMATCHING
-// fuzzy: 80.7%
-// Remaining differences: register allocation and address/argument evaluation order.
+// MATCHING_CONCESSION: register-pinning
 struct DogAttackContext {
     u8 unknown0[0x624];
     u8 collider[0x54];
@@ -28,15 +26,21 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
 {
     struct DogAttackContext *context = a->context;
     if (Chase_TakeArrived(a)) {
-        u8 zero8;
-        u32 zero;
-        And32(&context->flags, ~8);
+        u32 zero8;
+        register u32 zero asm("r4");
+        {
+            register u32 offset asm("r0") = 0x678;
+            u32 *p;
+            p = (u32 *)((u8 *)context + offset);
+            And32(p, ~8);
+        }
         {
             u32 bit = 0x100;
-            u16 *flags = &a->flags2D4;
-            u32 value = *flags;
+            register u16 *flags asm("r2") = &a->flags2D4;
+            register u32 value asm("r1") = *flags;
             zero8 = 0;
             zero = 0;
+            asm("" : "+r"(zero8), "+r"(zero), "+r"(bit), "+r"(flags), "+r"(value));
             *flags = bit | value;
         }
         {
@@ -51,12 +55,23 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
             a->word104 = zero;
         }
         {
-            u32 *p = (void *)((u8 *)a->context + 0x678);
+            u8 *ctx = a->context;
             u32 bit = 2;
+            u32 *p;
+            p = (void *)(ctx + 0x678);
             *p |= bit;
         }
-        Collider_SetAttackProperties(context->collider, a->fieldB8, a->fieldC0, 0, a->wordD4,
-                                     a->fieldC8);
+        {
+            void *collider = context->collider;
+            u32 damage = a->fieldB8;
+            u32 response = a->fieldC0;
+            u8 *p = (u8 *)a + 0xD4;
+            u32 power = *(u32 *)p;
+            u32 extra;
+            p -= 12;
+            extra = *(u16 *)p;
+            Collider_SetAttackProperties(collider, damage, response, 0, power, extra);
+        }
         context->emitted = zero8;
     }
     if (a->field2B0) {
@@ -70,7 +85,3 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
     } else
         a->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Dog_UpdateTrailAttack);
-#endif
