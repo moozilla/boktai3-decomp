@@ -4,7 +4,7 @@
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
 
 #ifdef NONMATCHING
-// fuzzy: 91.3%
+// fuzzy: 91.5%
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -67,6 +67,10 @@ static inline u32 RandomFrom(const u16 *table)
     v &= 3;
     return v + 1;
 }
+static inline void StoreSpeed(struct SceneActorRegistryResetView *a, u32 v)
+{
+    *(u16 *)((u8 *)a + 0x1EA) = v;
+}
 void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
 {
     register s32 frame asm("r8") = input;
@@ -99,7 +103,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
-        *(u16 *)((u8 *)actor + 0x1EA) = 0x20;
+        StoreSpeed(actor, 0x20);
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
