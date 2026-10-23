@@ -77,3 +77,41 @@ Summary: 1 matched, 3 drafts improved, 1 skipped; 54 not attempted before wrap-u
 Wrap-up batch validation after rebasing onto main: both guarded draft scores
 were recorded over their complete reviewed targets, and the combined build
 printed `build/boktai3.gba: OK`. No exact progress is claimed for the drafts.
+
+## Session 2
+
+Started from a clean branch with all prior commits merged and no open batch PR.
+
+- 08078EE8: skipped after renewed boundary, condensed-listing and relative
+  review. The full 5,956-byte body remains a single routine. No complete draft
+  exists; the strongest matched relative still covers only 11% of its
+  instruction windows. No new reconstruction was retained.
+- 081AE0C0: drafted 83.2% from 82.4%, tentative Vanargand_Init. The reviewed
+  target is 5,064 bytes; the candidate is 5,088. Realigned residue improves
+  from 442 total / 101 structural to 426 / 76. Explicit constants before the
+  default initialization loops fix their load order. A signed division helper
+  call reproduces the untruncated result used by the final byte subtraction.
+  Keeping position flags distinct across the script lookups, pinning health
+  to sl, and materializing the variant/palette addresses before the player
+  loop recover the palette spill and some ordering. All asm constraints have
+  initialized inputs; no instruction bodies were added. The ordinary depin
+  command leaves guarded drafts alone, so no minimal-hint claim is made.
+  Pointer locals, volatile palette storage, helper palette arguments, entry
+  pointer order, target-loop barriers and declaration-order variants supplied
+  no further combined improvement. Compiler decision flips did not help;
+  forced PRE bucket sizes only swapped a few residual stack accesses. The
+  remaining work is constant-address reuse, PRE stack order, palette reload
+  registers and repeated state tails. The source remains guarded and receives
+  no exact credit.
+
+The wrap-up marker appeared before starting 080D2584. Resume there; 52 later
+assignment entries remain unattempted by this worker. The earlier skipped
+080C9C04 and the reaction drafts remain available for a later closest-draft pass.
+
+Session 2 summary: 0 matched, 1 draft improved, 1 skipped; exact code gain
++0.0000 percentage points. Across both sessions: 1 matched, 4 drafts improved,
+2 skipped; 52 not attempted before wrap-up.
+
+Session 2 combined validation after rebasing onto main printed
+`build/boktai3.gba: OK`. The draft score was recorded over its full reviewed
+extent. Report files and exact totals were not changed.
