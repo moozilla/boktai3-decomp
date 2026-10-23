@@ -1,8 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 88.9%
+// fuzzy: 89.8%
 // confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
 // Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
@@ -51,7 +52,7 @@ struct ApproachGroup {
     void *failure;
 };
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
     actor->field2B2 = 1;
     actor->field2B0 = 0;
@@ -121,11 +122,9 @@ static inline u8 TestFlag16(u16 *p, u32 mask)
 }
 static inline s32 PlayerSlot(u8 *target)
 {
-    u32 index = target[8];
-    s32 slot = -1;
-    if (index <= 3)
-        slot = index;
-    return slot;
+    if (target[8] <= 3)
+        return target[8];
+    return -1;
 }
 static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
                          struct ContactPosition *position, struct ContactPosition *destination)
@@ -179,6 +178,13 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
         }
     }
 }
+static inline u32 RandomBits(u32 mask)
+{
+    const u16 *table = gUnk_0203B400;
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return table[index] & mask;
+}
 static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
 {
     u32 current = actor->direction;
@@ -186,8 +192,7 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
     u8 direction;
     i = 0;
     do {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        direction = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        direction = RandomBits(3) << 6;
         if (direction != current)
             goto chosen;
     } while (++i <= 3);
@@ -211,7 +216,7 @@ static inline void Resume(struct SceneActorRegistryResetView *raw, u8 direction)
             saved->behavior = actor->behavior2AA;
         }
         group->savedDirection = direction;
-        SetControl(actor, 0x1B, group->control);
+        SetControl(actor, group->control, 0x1B);
         SetState(actor, 3, 1, 0);
         group->timer = 6;
     }
@@ -263,13 +268,13 @@ static inline u8 ReturnHome(void *p)
         if (test) {
             {
                 void *control = group->entryControl41C;
-                SetControl(actor, 0x1A, control);
+                SetControl(actor, control, 0x1A);
             }
             SetState(actor, 0, 0, 12);
         } else {
             {
                 void *control = actor->entryTarget228;
-                SetControl(actor, 1, control);
+                SetControl(actor, control, 1);
             }
             SetState(actor, 0, 0, 5);
             destination = group->destination;
@@ -365,7 +370,11 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         struct ShortFlags {
             s16 bits : 16;
         };
-        ((struct ShortFlags *)&actor->flags2D6)->bits |= 2;
+        {
+            u32 mask = 2;
+            asm("" : "+r"(mask));
+            ((struct ShortFlags *)&actor->flags2D6)->bits |= mask;
+        }
         return;
     }
     mask = 0x80;
@@ -383,7 +392,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         }
         {
             void *control = group->entryControl41C;
-            SetControl(actor, 0x1A, control);
+            SetControl(actor, control, 0x1A);
         }
         SetState(actor, 0, 0, 12);
     } else {
@@ -402,7 +411,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         }
         {
             void *control = actor->entryTarget228;
-            SetControl(actor, 1, control);
+            SetControl(actor, control, 1);
         }
         SetState(actor, 0, 0, 7);
         actor->field2C2 = 0x20;
