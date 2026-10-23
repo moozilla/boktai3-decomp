@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
-// fuzzy: 83.3%
+// fuzzy: 87.0%
+// fix.py best version (reprinted C)
 // Remaining: sine/RNG load order, position and terrain register allocation, and collider temporaries.
 struct SlashCollider {
     u8 pad[6];
@@ -77,10 +78,11 @@ static inline u8 *CellData(s32 index)
         return p + 4;
     else {
         struct EngineMap *map = gUnk_030052F4;
-        u32 offset = index * 4 + 12;
+        u8 offset = (index * 4) + 12;
         return map->cells + offset;
     }
 }
+
 static inline void Disable(struct SlashCollider *c)
 {
     c->flags |= 4;
@@ -107,7 +109,8 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
 // confidence=low: contact reaction reverses horizontal velocity, adds upward motion and retires the slash
 void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
 {
-    struct ContactPosition *position, *velocity;
+    struct ContactPosition *position;
+    struct ContactPosition *velocity;
     s32 angle;
     s32 magnitude;
     s32 height;
@@ -115,7 +118,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
         p->timer = 0;
         {
             register u32 mask asm("r1") = 255;
-            angle = (Math_Atan2(p->velocity.x, p->velocity.z) + 128);
+            angle = Math_Atan2(p->velocity.x, p->velocity.z) + 128;
             mask = 255;
             asm("" : "+r"(mask));
             angle &= mask;
@@ -136,7 +139,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
             velocity->z = Truncate(gUnk_086149C4[masked] * magnitude);
         }
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u16 index = (gUnk_03005308 + 1) & 1023;
             gUnk_03005308 = index;
             {
                 register u32 offset asm("r0") = index * 2;
@@ -144,7 +147,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
                 asm("" : "+r"(offset));
                 source = gUnk_0203B400;
                 {
-                    register u32 sample asm("r0") = *(const u16 *)((u32)source + offset);
+                    register u32 sample asm("r0") = *((const u16 *)(((u32)source) + offset));
                     asm("" : "+r"(sample));
                     p->velocity.y = (sample & 15) + 8;
                 }
@@ -160,13 +163,13 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
         register struct ContactPosition *current asm("r2") = &p->position;
         register struct ContactPosition *velocity asm("r1") = &p->velocity;
         asm("" : "+r"(current), "+r"(velocity));
-        p->position.x = (u16)p->position.x + (u16)velocity->x;
-        current->y = (u16)current->y + (u16)velocity->y;
-        current->z = (u16)current->z + (u16)velocity->z;
+        p->position.x = ((u16)p->position.x) + ((u16)velocity->x);
+        current->y = ((u16)current->y) + ((u16)velocity->y);
+        current->z = ((u16)current->z) + ((u16)velocity->z);
     }
     position = &p->position;
     p->velocity.y -= 2;
-    height = (*CellData(CellIndex(position)) & 15) << 8;
+    height = ((*CellData(CellIndex(position))) & 15) << 8;
     if (p->position.y < height) {
         p->velocity.x = 0;
         p->velocity.y = 0;
@@ -183,7 +186,6 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
     } else
         p->timer++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PursuingActor_UpdateRecoil);
 #endif

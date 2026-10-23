@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.7%
+// fuzzy: 93.9%
+// fix.py best version (reprinted C)
 // Remaining differences: stack-vector lifetime and low-register allocation.
 // confidence=low: emits four bobbing actors in a circular formation around this boss
 struct FormationActor {
@@ -36,14 +37,21 @@ static inline s32 Scale(s32 value)
 static inline void GetOffset(s16 *position, u32 angle, s32 distance, u32 mask)
 {
     position[0] = Scale(gUnk_086149C4[(angle + 64) & mask] * distance);
-    position[1] = 0;
+    {
+        u8 k1 = 0;
+        position[1] = k1;
+    }
     position[2] = Scale(gUnk_086149C4[angle & mask] * distance);
 }
+
 void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
 {
     struct FormationActor *q = p;
-    u32 base, mask;
-    s32 count, offset, direction;
+    u32 base;
+    u32 mask;
+    s32 count;
+    s32 offset;
+    s32 direction;
     s16 position[4];
     s16 *origin;
     SceneActors_StartUnmirroredAnimation(p, &p->animation, p->animationState, 0x12D, 2, 4);
@@ -64,9 +72,8 @@ void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
                                               1, 16, p->parameter, 128, 4, 30);
         direction += 64;
         offset += 64;
-    } while (--count >= 0);
+    } while ((--count) >= 0);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", BossSlot2_SpawnBobbingFormation);
 #endif

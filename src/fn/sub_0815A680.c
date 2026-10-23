@@ -1,7 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 51.0%
+// fuzzy: 65.4%
+// fix.py best version (reprinted C)
 // Open: the original keeps two copies of the actor pointer (r4 and r5).
 extern u8 *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
@@ -9,12 +10,14 @@ s32 Script_GetActorIndex(void);
    scripted actor chosen by -i; returns the masked word (nonzero if set). */
 u32 ScriptActor_TestFlagFromScript(void)
 {
-    u8 *actor, *p;
+    u8 *actor;
+    u8 *p;
     s32 i = Script_GetActorIndex();
-    p = actor = gUnk_02000580[i];
+    p = (actor = gUnk_02000580[i]);
     if (actor && Script_SeekToKeyword('f')) {
         u32 flag = Script_GetValue();
-        u32 *word, mask;
+        u32 *word;
+        u8 mask;
         if (flag >= 64) {
             word = (u32 *)(actor + 0x44C);
             mask = 1 << (flag - 64);
@@ -25,7 +28,7 @@ u32 ScriptActor_TestFlagFromScript(void)
             word = (u32 *)(p + 0x444);
             mask = 1 << flag;
         }
-        return *word & mask;
+        return mask & (*word);
     }
     return 0;
 }

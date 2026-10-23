@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 86.8%
 #include "display_animation.h"
+#ifdef NONMATCHING
+// fuzzy: 91.7%
+// fix.py best version (reprinted C)
 struct HomingVec {
     s16 x, y, z;
 };
@@ -83,12 +84,12 @@ static inline void Vector(struct HomingVec *v, s32 angle, s32 scale)
     }
 }
 
-// fuzzy: 84.4%
 s32 HomingProjectile_UpdateManager(struct HomingManager *m)
 {
     struct HomingSlot *p = m->slots;
     s32 i;
     s32 slot;
+    u32 k1;
     for (i = 0; i <= 2; i++, p++) {
         void **palette = &p->graphics.palette;
         if (m->activeMask & (1 << i)) {
@@ -122,14 +123,15 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
             {
                 struct DisplaySequenceState *state = &p->sequence;
                 const volatile u16 *command = p->sequence.commands + p->sequence.index;
-                u32 duration, flags;
-                sprite->frame = *command >> 6;
+                u32 duration;
+                u32 flags;
+                sprite->frame = (*command) >> (k1 = 6);
                 {
                     u32 input = p->sequence.flags;
                     register u32 left asm("r2") = 1;
                     u32 mask = 1;
                     left &= input;
-                    if (left != (((*command & 0x30) >> 4) & mask))
+                    if (left != ((((*command) & 0x30) >> 4) & mask))
                         sprite->flags |= 4;
                     else
                         sprite->flags &= ~4;
@@ -138,7 +140,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                     register u32 input asm("r0") = state->flags;
                     u32 mask = 2;
                     register u32 left asm("r1") = (u8)(mask & input);
-                    if (left != (((*command & 0x30) >> 4) & mask))
+                    if (left != ((((*command) & 0x30) >> 4) & mask))
                         sprite->flags |= 8;
                     else
                         sprite->flags &= ~8;
@@ -190,13 +192,13 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                             }
                         }
                         command = state->commands + state->index;
-                        state->frameWeight = *command & 15;
+                        state->frameWeight = (*command) & 15;
                         {
                             register s32 weight asm("r1") = state->frameWeight;
                             s32 speed = state->speed;
-                            speed = (speed * weight) >> 6;
+                            speed = (speed * weight) >> k1;
                             state->duration = speed;
-                            if (!(u8)speed)
+                            if (!((u8)speed))
                                 state->duration = 1;
                         }
                     }
@@ -217,11 +219,12 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                 p->flashTimer--;
             } else
                 *palette = m->palettes[0];
-            if (p->lifetime >= slot * 30 + 200)
+            if (p->lifetime >= ((slot * 30) + 200))
                 HomingProjectile_ReleaseSlot(m, p, slot);
             p->lifetime++;
         }
     }
+
     return 0;
 }
 #else

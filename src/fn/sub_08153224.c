@@ -1,7 +1,8 @@
 #include "contact_swarm.h"
-// confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 84.4%
+// fuzzy: 94.7%
+// fix.py best version (reprinted C)
+// confidence=low: tentative player cue role; see callback body.
 // Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.
 struct P {
     u8 pad3A2[0x3A2];
@@ -65,6 +66,11 @@ s32 ActorVariant_GetTableValue(s32, s32);
 void Player_SetActionPhase(struct P *, s32);
 void Player_InitVisualResources(struct P *);
 // confidence=low: toggles actor variant between zero and one through four motion phases.
+static inline u32 Arg1(u32 k_, struct P *p)
+{
+    return p->timer >> k_;
+}
+
 void PlayerCue_UpdateFormChange(struct P *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -84,7 +90,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
     Player_AddControlFlags(p, 8);
     switch (p->phase) {
         case 0:
-            if ((u8)(p->dir - 2) <= 4) {
+            if (((u8)(p->dir - 2)) <= 4) {
                 p->dir = 4;
                 p->facing = 4;
                 p->flip = 0;
@@ -97,7 +103,8 @@ void PlayerCue_UpdateFormChange(struct P *p)
             p->facing >>= 2;
             if (p->f4EE) {
                 struct {
-                    u32 a, b;
+                    u32 a;
+                    u8 b;
                 } particles;
                 particles.a = 0;
                 particles.b = 15;
@@ -106,6 +113,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
             }
             Player_SetActionPhase(p, 1);
             break;
+
         case 1:
             if (p->f4EE) {
                 p->fAD8 += 3;
@@ -119,30 +127,32 @@ void PlayerCue_UpdateFormChange(struct P *p)
                 p->f430 = 4000;
             }
             break;
+
         case 2:
-            if ((p->timer & 7) < 7 - (p->timer >> 2))
+            if ((p->timer & 7) < (7 - Arg1(2, p)))
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 10), 64, 1);
             else if (p->variant != 1) {
-                Anim_SetKeyframes((u8 *)p + 0x8C, (u8 *)p + 0x6C, 0xE4, 0, 0);
-                Anim_Step((u8 *)p + 0x8C, (u8 *)p + 0x6C);
+                Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0xE4, 0, 0);
+                Anim_Step(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C);
             } else
                 Player_SetAnimation(p, ActorVariant_GetTableValue(0, 10), 64, 1);
             p->fAD8 += 3;
             if (p->fAD8 > 32)
                 p->fAD8 = 32;
             p->f6FC = 30;
-            if (++p->timer > 19) {
+            if ((++p->timer) > 19) {
                 if (p->variant != 1)
                     p->variant = 1;
                 else
                     p->variant = 0;
                 Player_InitVisualResources(p);
                 p->fAC4 = 65535;
-                if (p->f536 != 21 && p->f536 != 49)
+                if ((p->f536 != 21) && (p->f536 != 49))
                     p->f538 = 0;
                 Player_SetActionPhase(p, 3);
             }
             break;
+
         case 3:
             p->f6FC = 15;
             if (p->variant != 1) {
@@ -158,9 +168,9 @@ void PlayerCue_UpdateFormChange(struct P *p)
                 }
             } else {
                 if (p->timer == 0)
-                    Anim_SetKeyframes((u8 *)p + 0x8C, (u8 *)p + 0x6C, 0xE4, 1, 0);
-                Anim_Step((u8 *)p + 0x8C, (u8 *)p + 0x6C);
-                if (++p->timer > 29) {
+                    Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0xE4, 1, 0);
+                Anim_Step(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C);
+                if ((++p->timer) > 29) {
                     Player_UpdateFacingSide(p);
                     ActorSequence_Begin(p, 0, 0);
                     Player_UpdateFacingSide(p);
@@ -174,7 +184,6 @@ void PlayerCue_UpdateFormChange(struct P *p)
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
 #endif

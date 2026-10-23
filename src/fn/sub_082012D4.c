@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.4%
+// fuzzy: 94.4%
+// fix.py best version (reprinted C)
 // foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
 #define gPlayerCloneManager gUnk_020005F8
 struct ClonePosition {
@@ -52,12 +53,12 @@ static inline u32 enableClone(u32 value)
 void PlayerClone_BeginActiveReactions(void)
 {
     struct PlayerCloneManager *manager = gUnk_020005F8;
+    u32 k1 = 0x344;
     if (manager) {
         struct PlayerCloneReactionSlot *s = manager->slots;
         s32 i = 0;
-        u16 zero = 0;
         u32 *flags = &s->flags;
-        struct CloneAnimationState *animationFlags = (void *)&s->animationFlags;
+        struct CloneAnimationState *animationFlags = (void *)(&s->animationFlags);
         u32 timer = 660;
         do {
             if (manager->activeSlots & (1 << i)) {
@@ -66,7 +67,7 @@ void PlayerClone_BeginActiveReactions(void)
                 s->position.y = animationFlags->position.y + 128;
                 s->position.z = animationFlags->position.z;
                 flags[1] = 5;
-                animationFlags->flags = zero;
+                animationFlags->flags = 0;
                 {
                     u16 one = 1;
                     *flags |= one;
@@ -75,14 +76,14 @@ void PlayerClone_BeginActiveReactions(void)
                     struct CloneColliderState *collider = &s->collider;
                     collider->flags |= 4;
                 }
-                flags[6] = zero;
+                flags[6] = 0;
                 Anim_LoadKeyframe(s->animation, s->resource, 0, 1);
                 s->timer = timer;
             }
             timer += 30;
             i++;
-            flags = (void *)((u8 *)flags + 0x344);
-            animationFlags = (void *)((u8 *)animationFlags + 0x344);
+            flags = (void *)(((u8 *)flags) + k1);
+            animationFlags = (void *)(((u8 *)animationFlags) + k1);
             s++;
         } while (i <= 2);
     }

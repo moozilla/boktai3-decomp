@@ -3,7 +3,8 @@
 #include "state_actor.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.3%
+// fuzzy: 97.4%
+// fix.py best version (reprinted C)
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
 
@@ -50,12 +51,10 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
 {
     s32 facing;
     s32 result;
-
     if (ctx->target != 0)
         facing = ((u8 *)ctx->targetActor)[0x2d];
     else
         facing = 0;
-
     if (!near(p, ctx->target))
         goto fail;
     if (checkAngle == 0)
@@ -65,11 +64,11 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
         struct StateActorPos *target = ctx->target;
         s32 dx = a->x - target->x;
         s32 dz = a->z - target->z;
-        s32 diff1;
+        u16 diff1;
         u8 diff2u;
-        s32 d1, d2;
-
-        diff1 = facing - (s8)Math_Atan2(dx, dz);
+        s32 d1;
+        s32 d2;
+        diff1 = facing - ((s8)Math_Atan2(dx, dz));
         {
             s32 angle = p->angle + 0x80;
             asm("" : "+r"(angle));
@@ -88,9 +87,11 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
     }
 success:
     result = 1;
+
     goto done;
 fail:
     result = 0;
+
 done:
     return result;
 }

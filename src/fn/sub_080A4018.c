@@ -1,9 +1,10 @@
 #include "scene_actor_chase.h"
 // MATCHING_CONCESSION: register-pinning
+#ifdef NONMATCHING
+// fuzzy: 90.1%
+// fix.py best version (reprinted C)
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 
-#ifdef NONMATCHING
-// fuzzy: 80.3%
 // RNG/vector allocation, route argument lifetimes, and timer-store scheduling still differ.
 struct Transform {
     u8 pad[9];
@@ -27,16 +28,15 @@ static inline u8 Test(struct SpiderContext *ctx, u32 mask)
 
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *a asm("r4") = input;
-    register struct SpiderContext *ctx asm("r8") = a->context;
-    u8 *group = (u8 *)&a->group;
-    register struct Transform *transform asm("r5") = (void *)((u8 *)a + 0x50);
+    register struct SpiderContext *ctx asm("r8") = input->context;
+    u8 *group = (u8 *)(&input->group);
+    register struct Transform *transform asm("r5") = (void *)(((u8 *)input) + 0x50);
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gUnk_0203B400;
     register u32 *indexAddress asm("sl") = &gUnk_03005308;
     register u32 mask asm("sb") = 1023;
-    u32 index = (*indexAddress + 1) & mask;
-    s32 distance = table[index] & mask;
+    u16 index = ((*indexAddress) + 1) & mask;
+    u16 distance = table[index] & mask;
     u8 heading;
     s32 angle;
     distance += 256;
@@ -45,30 +45,32 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     angle = (table[index] & 127) - 63;
     heading = angle + transform->facing;
     asm("" : "+r"(heading));
-    if (Mod(a->counter2AC, 30) == 0) {
+    if (Mod(input->counter2AC, 30) == 0) {
         if (ctx->timer > 0)
             goto decrement;
         target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
-        if (!Nav_IsPositionInMesh(*(void **)((u8 *)a + 0x5D0), &a->position, (void *)&target)) {
+        if (!Nav_IsPositionInMesh(*((void **)(((u8 *)input) + 0x5D0)), &input->position,
+                                  (void *)(&target))) {
             if (!Test(ctx, 16))
-                a->field2C2 = 64;
-            SceneActorMovement_ResolveRoutePosition(a);
+                input->field2C2 = 64;
+            SceneActorMovement_ResolveRoutePosition(input);
             ctx->timer = 0;
         } else {
-            *(struct ContactPosition *)((u8 *)a + 0x310) = *(struct ContactPosition *)&target;
-            if (!(table[(*indexAddress = (*indexAddress + 1) & mask)] & 3))
-                a->field2C2 = 16;
+            *((struct ContactPosition *)(((u8 *)input) + 0x310)) =
+                *((struct ContactPosition *)(&target));
+            if (!(table[ *indexAddress = ((*indexAddress) + 1) & mask] & 3))
+                input->field2C2 = 16;
             else
-                a->field2C2 = 64;
+                input->field2C2 = 64;
             {
-                void *mesh = *(void **)(group + 0x1FC);
+                void *mesh = *((void **)(group + 0x1FC));
                 struct ContactPosition *from = &transform->position;
-                struct ContactPosition *to = (void *)((u8 *)a + 0x310);
-                u8 moved = Chase_TryRoute(a, mesh, from, to);
+                struct ContactPosition *to = (void *)(((u8 *)input) + 0x310);
+                u8 moved = Chase_TryRoute(input, mesh, from, to);
                 if (!moved) {
-                    SceneActorMovement_ResolveRoutePosition(a);
+                    SceneActorMovement_ResolveRoutePosition(input);
                     ctx->timer = moved;
                 }
             }

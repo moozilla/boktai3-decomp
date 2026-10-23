@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.8%
+// fuzzy: 95.7%
+// fix.py best version (reprinted C)
 // Animation setup and tail scheduling still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -35,24 +36,29 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
                                struct ActorStatusPart *base, u32 one)
 {
     struct DisplaySequenceState *state = sequence;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
+    const volatile u16 *command;
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    typeof(bit) c1;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = base->sequence.commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    owner->frame = *command >> 6;
+    owner->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
         u32 maskBit = one;
         bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
+        c1 = bit;
+        asm("" : "+r"(c1));
+        first = c1;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->spriteFlags |= 4;
         else
             owner->spriteFlags &= ~4;
@@ -67,7 +73,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->spriteFlags |= 8;
         else
             owner->spriteFlags &= ~8;
@@ -130,16 +136,16 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         } else {
@@ -168,6 +174,7 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
     register u8 *enter asm("r8");
     register u32 state asm("r7");
     u32 mask = 8;
+    typeof(state) c1;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -176,8 +183,9 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
         p->enter = 1;
     }
     state = p->state;
+    c1 = state;
     asm("" : "+r"(state));
-    switch (state) {
+    switch (c1) {
         case 0: {
             register u32 entered asm("r1");
             {
@@ -200,7 +208,7 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
                     target.z += 512;
                 }
                 OrbitMotion_BeginDistanceWave(p->motion, &p->offset, &target,
-                                              (p->variant * 128 + 96) & 255, 4);
+                                              ((p->variant * 128) + 96) & 255, 4);
             }
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
@@ -212,6 +220,7 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
             }
             break;
         }
+
         case 1: {
             register struct DisplaySequenceState *seq asm("r4");
             register u32 entered asm("r1");
@@ -227,9 +236,9 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
                 register u32 zero asm("r2") = 0;
                 asm("" : "+r"(zero));
                 *enter = zero;
-                Anim_SetSequence(seq, *(void **)(boss + 0x4d0), 8, (u8)p->variant, zero);
+                Anim_SetSequence(seq, *((void **)(boss + 0x4d0)), 8, (u8)p->variant, zero);
             }
-            if (StepPlayback(p, seq, p, state)) {
+            if (StepPlayback(p, seq, p, c1)) {
                 {
                     register u32 next asm("r1") = 2;
                     asm("" : "+r"(next));
@@ -240,12 +249,12 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
             }
             break;
         }
+
         case 2:
             p->finished = 1;
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateFlankingStrike);
 #endif

@@ -3,7 +3,8 @@
 #include "scene_actor_attachment.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 81.3%
+// fuzzy: 82.1%
+// fix.py best version (reprinted C)
 /* Candidate keys match the search order; vector pointer allocation still differs. */
 s32 Nav_IsPositionInMesh(void *, const struct ContactPosition *, const struct ContactPosition *);
 static inline s32 DistanceSquared(struct ContactPosition *difference,
@@ -24,13 +25,15 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
                                                 void *context, struct ContactPosition *output,
                                                 const struct ContactPosition *input)
 {
-    struct SceneActorEffectCandidate candidates[4];
-    struct ContactPosition center, difference;
-    register struct ContactPosition *delta asm("r8") = &difference;
     s32 cell = SceneActorTerrain_GetCellIndex(input);
+    struct SceneActorEffectCandidate candidates[4];
+    struct ContactPosition center;
+    struct ContactPosition difference;
+    register struct ContactPosition *delta asm("r8") = &difference;
     s32 adjacent;
     struct SceneActorEffectCandidate *candidate;
-    if (!(*(u16 *)(SceneActorTerrain_GetCell(cell) + 2) & 0xC3) &&
+    typeof(&center) t1;
+    if ((!((*((u16 *)(SceneActorTerrain_GetCell(cell) + 2))) & 0xC3)) &&
         Nav_IsPositionInMesh(context, &source->position, input)) {
         *output = *input;
         return;
@@ -54,20 +57,20 @@ void SceneActorAttachment_FindReachableNeighbor(const struct SceneActorPositionS
     SceneActorEffect_SortCandidates(candidates, 4);
     candidate = candidates;
     do {
-        if (!(*(u16 *)(SceneActorTerrain_GetCell(candidate->value) + 2) & 0xC3)) {
-            SceneActorTerrain_GetCenter(candidate->value, &center);
+        if (!((*((u16 *)(SceneActorTerrain_GetCell(candidate->value) + 2))) & 0xC3)) {
+            t1 = &center;
+            SceneActorTerrain_GetCenter(candidate->value, t1);
             if (Nav_IsPositionInMesh(context, &source->position, &center)) {
                 *output = center;
                 return;
             }
         }
         candidate++;
-    } while (candidate <= &candidates[3]);
+    } while (candidate <= (&candidates[3]));
     output->x = 30000;
     output->y = 0;
     output->z = 30000;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorAttachment_FindReachableNeighbor);
 #endif

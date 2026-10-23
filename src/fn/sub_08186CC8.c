@@ -1,8 +1,9 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 90.6%
+// fix.py best version (reprinted C)
 // confidence=low: behavior selection aligns the actor with the player and remembers attack origins.
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 80.6%
 // Remaining differences: decision-pointer lifetime, merged fallback calls and register allocation.
 struct ArmorSelection {
     u8 pad0[0x48];
@@ -34,16 +35,15 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
     s32 az;
     s32 playerY;
     s32 actorY;
-    u32 flags;
-
+    u8 flags;
     if (p->f1122 > 0)
         p->f1122--;
-    if (p->fb3d != 255 && p->fb3c != 2 && p->fb3c != 19)
+    if (((p->fb3d != 255) && (p->fb3c != 2)) && (p->fb3c != 19))
         return;
-    x = *(s16 *)(gUnk_02000710 + 0x30) - p->f48;
-    playerY = *(s16 *)(gUnk_02000710 + 0x32);
+    x = (*((s16 *)(gUnk_02000710 + 0x30))) - p->f48;
+    playerY = *((s16 *)(gUnk_02000710 + 0x32));
     actorY = p->f4a;
-    z = *(s16 *)(gUnk_02000710 + 0x34) - p->f4c;
+    z = (*((s16 *)(gUnk_02000710 + 0x34))) - p->f4c;
     x = (x + 128) >> 8;
     z = (z + 128) >> 8;
     ax = x;
@@ -72,60 +72,62 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
                         goto near;
                     goto displaced;
                 } else {
-                    if (z != 0 || ax > 1)
+                    if ((z != 0) || (ax > 1))
                         goto far;
                     if (!Armor_IsNearSavedPosition(p))
                         goto displaced;
                 }
             near:
                 ActorController_SetBehavior(p, 3);
+
                 goto save;
             displaced:
                 ActorController_SetBehavior(p, 4);
+
             save:
                 Armor_SaveCurrentPosition(p);
+
                 break;
             far:
                 ActorController_SetBehaviorIfFinished(p, 2);
+
                 break;
+
             case 1:
-                if (p->f1122 <= 0 || (x && z))
+                if ((p->f1122 <= 0) || (x && z))
                     p->f1120 = 0;
                 else {
                     u32 action = p->fb3c;
-                    if ((u8)(action - 10) > 1 && action != 13)
+                    if ((((u8)(action - 10)) > 1) && (action != 13))
                         ActorController_SetBehavior(p, 10);
                 }
                 break;
         }
-    } else {
-        if (p->fb3c == 3) {
-            if (y <= 127) {
-                if (!x) {
-                    if (z < 0 && p->fb39 == 0xc0)
-                        goto aligned;
-                    if (p->fb39 == 0x40)
-                        goto aligned;
-                } else if (!z) {
-                    if (x < 0 && p->fb39 == 0x80)
-                        goto aligned;
-                    if (!p->fb39)
-                        goto aligned;
-                }
-            }
-            ActorController_SetBehaviorIfFinished(p, 2);
-            return;
-        aligned:
-            ActorController_SetBehavior(p, 22);
-        } else {
-            if (y <= 127 && ((!x && az <= 1) || (!z && ax <= 1)))
-                ActorController_SetBehavior(p, 3);
-            else
-                ActorController_SetBehaviorIfFinished(p, 2);
-        }
-    }
-}
 
+    } else if (p->fb3c == 3) {
+        if (y <= 127) {
+            if (!x) {
+                if ((z < 0) && (p->fb39 == 0xc0))
+                    goto aligned;
+                if (p->fb39 == 0x40)
+                    goto aligned;
+            } else if (!z) {
+                if ((x < 0) && (p->fb39 == 0x80))
+                    goto aligned;
+                if (!p->fb39)
+                    goto aligned;
+            }
+        }
+        return;
+        ActorController_SetBehaviorIfFinished(p, 2);
+    aligned:
+        ActorController_SetBehavior(p, 22);
+
+    } else if ((y <= 127) && (((!x) && (az <= 1)) || ((!z) && (ax <= 1))))
+        ActorController_SetBehavior(p, 3);
+    else
+        ActorController_SetBehaviorIfFinished(p, 2);
+}
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_SelectAlignedAttack);
 #endif

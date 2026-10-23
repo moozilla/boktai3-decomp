@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 94.1%
+// fix.py best version (reprinted C)
 extern u8 *gUnk_030042E4;
 extern const u8 gUnk_0824F174[];
 extern const u8 gUnk_0824F17C[];
@@ -61,8 +64,6 @@ struct ArmorInit {
     u16 h5BE;
     u8 b5C0, b5C1, b5C2, b5C3, b5C4, b5C5;
 };
-#ifdef NONMATCHING
-// fuzzy: 85.5%
 void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
 {
     s32 k3 = 0;
@@ -78,6 +79,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
     p->h5BE = 0x192;
     switch (mode) {
         case 0:
+
         default:
             value = 0;
             p->palette = 0x2BD;
@@ -85,6 +87,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
             tbl = gUnk_030042E4 + (off << 5);
             p->palettePtr = tbl;
             break;
+
         case 11:
             value = 1;
             p->palette = 0x2BD;
@@ -92,19 +95,23 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
             tbl = gUnk_030042E4 + (off << 5);
             p->palettePtr = tbl;
             break;
+
         case 3:
             value = 2;
             script = ScriptProc_Start(0x92B3, 0xCB8F);
-            p->palettePtr = (u8 *)script + 0xF4;
+            p->palettePtr = ((u8 *)script) + 0xF4;
             p->palette = 0xF2BD;
             break;
+
         case 5:
             value = 2;
             script = ScriptProc_Start(0x92B3, 0xCB8F);
-            p->palettePtr = (u8 *)script + 0x154;
+            p->palettePtr = ((u8 *)script) + 0x154;
             p->palette = 0xF2BD;
             break;
+
         case 7:
+
         case 13:
             value = 2;
             p->palette = 0x216;
@@ -112,18 +119,21 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
             tbl = gUnk_030042E4 + (off << 5);
             p->palettePtr = tbl;
             break;
+
         case 9:
+
         case 15:
             value = 2;
             script = ScriptProc_Start(0x92B3, 0xCB7F);
-            p->palettePtr = (u8 *)script + 0xF4;
+            p->palettePtr = ((u8 *)script) + 0xF4;
             p->palette = 0xF2BD;
             break;
     }
+
     p->b5C3 = count;
     p->b5C4 = 0;
     p->value5B8 = 200;
-    p->b5C0 = p->z = p->y = p->x = p->b5C5 = p->b5C2 = 0;
+    p->b5C0 = (p->z = (p->y = (p->x = (p->b5C5 = (p->b5C2 = 0)))));
     for (i = 0; i <= 2; i++) {
         struct ArmorInitPart *q = &p->parts[i];
         q->a.h0 = 0;
@@ -132,8 +142,11 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
         q->a.h8 = 0;
         q->a.ha = 1;
         new_var = q->anim;
-        q->word1CC = q->b.h10 = q->b.h0e = q->b.b13 = q->b.b12 = q->b.b2 = q->a.h1a = q->b.b1 =
-            q->a.hc = 0;
+        q->word1CC =
+            (q->b.h10 =
+                 (q->b.h0e =
+                      (q->b.b13 =
+                           (q->b.b12 = (q->b.b2 = (q->a.h1a = (q->b.b1 = (q->a.hc = 0))))))));
         AnimData_Load(new_var, 0x5292);
         Sprite_Init(q, new_var, 0);
         q->flags = 3;
@@ -150,8 +163,8 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
         Collider_Init(q->collider48, 0, 0x2001, 0, 0x10, gUnk_0824F174, gUnk_0824F17C);
         Collider_SetCallback(q->collider48, Armor_OnPartStateSound, q);
         Collider_Refresh(q->collider48);
-        new_var2 = 0x1e;
         Collider_SetAttackProperties(q->collider48, 0x14, 10, 0x2000, 0, new_var2);
+        new_var2 = 0x1e;
         q->flags4E |= 4;
         Collider_Init(q->collider9C, 0, 0x5009, 0, 0x10, gUnk_0824F174, gUnk_0824F17C);
         Collider_SetBodyProperties(q->collider9C, 0x14, 0, 0);
@@ -159,6 +172,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
         Collider_Refresh(q->collider9C);
         q->flagsA2 |= 4;
     }
+
     p->b5C0 = 3;
 }
 #else

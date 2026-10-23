@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 81.3%
+// fuzzy: 85.2%
+// fix.py best version (reprinted C)
 // Remaining differences: pause branch layout, random-table lifetimes, stack slots and explicit callback return.
 #include "screamer_playback.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
@@ -51,22 +52,25 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         return 0;
     Callback_InvokeActor(p, p->update);
     graphics = p->graphics;
-    if (p->f1DC > 0 && !p->f1E0) {
+    if ((p->f1DC > 0) && (!p->f1E0)) {
         p->f1E4 -= p->f1DC;
         p->f200 = p->f204;
         Sound_PlaySong(0x13E);
         if (p->f1DC > 0) {
-            DamageNumberDisplay_Show(p->bodyCollider, p->f1DC, 0, (u8 *)p + 0xCC, (u8 *)p + 0xD4,
-                                     1);
-            SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, *((u8 *)p + 0x103) == 4,
+            DamageNumberDisplay_Show(p->bodyCollider, p->f1DC, 0, ((u8 *)p) + 0xCC,
+                                     ((u8 *)p) + 0xD4, 1);
+            SceneHud_SetTimedState(p->f1F8, p->f1E4, p->f1E6, p->f1EC, (*(((u8 *)p) + 0x103)) == 4,
                                    p->f1F4);
         }
         if (p->f1E4 <= 0) {
             register const u16 *randomTable asm("r10");
             p->f1E0 = 1;
-            *(u16 *)((u8 *)p + 0x104) = 0;
+            {
+                u16 *d1 = (u16 *)(((u8 *)p) + 0xFC);
+                d1[4] = 0;
+            }
             offsetPosition = &position;
-            asm("" : "+r"(offsetPosition));
+            asm("" : "+r"(&position));
             randomTable = (const u16 *)(gUnk_0203B000 + 0x400);
             asm("" : "+r"(randomTable));
             for (i = 0; i <= 7; i++) {
@@ -89,11 +93,12 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
                     EnemyParticle_AddFlags(&parameters, 8);
                 position = p->sprite.position;
                 if (!p->f1D8)
-                    offsetPosition->x += 16;
+                    (&position)->x += 16;
                 else
-                    offsetPosition->z += 16;
+                    (&position)->z += 16;
                 EnemyParticle_Emit(&parameters, &position);
             }
+
             p->f1DE = 0;
             p->update = SceneDrawablePair_SetFlags;
             p->age = 0;
@@ -105,24 +110,23 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         p->f1DC = 0;
     }
     if (p->f1DE > 0) {
-        AnimData_SelectPaletteBank(graphics, 0x192);
+        AnimData_SelectPaletteBank(p->graphics, 0x192);
         asm("" : "=r"(allocationToken));
         p->f1DE--;
     } else {
-        AnimData_SelectPaletteBank(graphics, 0x1C4);
+        AnimData_SelectPaletteBank(p->graphics, 0x1C4);
         asm("" : "=r"(allocationToken));
     }
-    blink = (u16 *)((u8 *)p + 0x104);
-    if (*blink && !p->f1E0) {
+    blink = (u16 *)(((u8 *)p) + 0x104);
+    if ((*blink) && (!p->f1E0)) {
         (*blink)--;
-        if ((*blink >> 2) & 1)
+        if (((*blink) >> 2) & 1)
             p->sprite.flags |= 1;
         else
             p->sprite.flags &= ~1;
     }
     p->age++;
     asm("" : : "r"(allocationToken));
-    // Task callbacks discard the ROM's incidental result.
     return 0;
 }
 #else
