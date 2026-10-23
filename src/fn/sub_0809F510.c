@@ -2,9 +2,8 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.6%
-// Remaining differences: entry-flag spill and inline control/reset instruction ordering.
+// confidence=low: hops within the stored home terrain cell.
+#define Crow_HopWithinHomeCell sub_0809F510
 
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
@@ -39,6 +38,15 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
+}
+static inline void CopyWords(u32 control, const u32 *src, struct ContactPosition *dst)
+{
+    CpuSet(src, dst, control);
+}
+static inline void ZeroVector(u32 *zero, struct ContactPosition *dst)
+{
+    *zero = 0;
+    CopyWords(0x05000002, zero, dst);
 }
 static inline void ClearVector(struct ContactPosition *v)
 {
@@ -82,6 +90,17 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
+static inline u8 TakeEntry(struct SceneActorRegistryResetView *actor, u8 **saved)
+{
+    u8 *field = &actor->field2B1;
+    u32 value = *field;
+    *saved = field;
+    if (value) {
+        *field = 0;
+        return 1;
+    }
+    return 0;
+}
 // confidence=low: random horizontal motion and gravity keep the hop inside its home cell.
 void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
 {
@@ -93,14 +112,12 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
     s32 ground = Chase_HeightAt(actor->terrainCell, &actor->position);
     u8 *arrived;
     s32 cell;
-    arrived = &actor->field2B1;
-    if (SceneActorControl_TakeFlag(arrived)) {
+    if (TakeEntry(actor, &arrived)) {
         u32 angle;
         SetControl(actor, actor->savedTarget, 0);
         CellPosition(&local.home, state->homeCell);
         actor->direction = angle = Random(gUnk_0203B400) & 255;
-        local.zero = 0;
-        CpuSet(&local.zero, &state->velocity, 0x05000002);
+        ZeroVector(&local.zero, &state->velocity);
         Polar(&state->velocity, angle, (Random(gUnk_0203B400) & 7) + 1);
         state->velocity.y = 14;
     }
@@ -119,8 +136,7 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
     if (ground >= (s16)actor->field2EA) {
         actor->position.y = ground;
         actor->field2EA = ground;
-        local.zero = 0;
-        CpuSet(&local.zero, &state->velocity, 0x05000002);
+        ZeroVector(&local.zero, &state->velocity);
         actor->state2A8 = 0;
         actor->phase2A9 = 0;
         actor->behavior2AA = 0;
@@ -129,7 +145,3 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_HopWithinHomeCell);
-#endif
