@@ -9,7 +9,7 @@ then `docs/WORKER.md` before matching. Everything else is looked up, not read:
 Dated progress reports live in [docs/history/](history/README.md); they are
 records, not instructions. Keep this file short: it describes the present.
 
-## Current state (2026-10-16)
+## Current state (2026-10-23)
 
 Numbers live in one place: [PROGRESS.md](../PROGRESS.md) (regenerated at batch
 integration with `python3 tools/progress.py --markdown PROGRESS.md`) and the
@@ -24,6 +24,11 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 Recent work, newest first (details in [history](history/README.md)):
 
 * **State actor campaign continuation** (2026-10-23): three control, palette and target-turn matches plus complete guarded drafts; resume details in [worker notes](../notes/cx-sol11.md).
+* **Effect constructors and actor colliders** (2026-10-23): sol02 recovers two
+  Nidhoggr attack-effect constructors and the script combat actor collider
+  initializer. Full draft work and remaining targets are in
+  [worker notes](../notes/cx-sol02.md).
+
 * **Every scene's procedures have working names** (2026-10-19):
   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
   and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
