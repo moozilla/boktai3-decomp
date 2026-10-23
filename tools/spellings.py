@@ -524,10 +524,25 @@ def sp_index_local(fn):
         yield f"index of {text(a.name)[:24]} in a local first", f2
 
 
+def sp_loop_weight(fn):
+    """S;  ->  do { S; } while (0)  for an assignment or call statement S. flow counts a pseudo's
+    references weighted by loop depth (REG_N_REFS += loop_depth), and do/while(0) still emits
+    loop notes, so this doubles the weight of every register S sets or uses in the allocation
+    priority (refs * log2 refs / life) without changing the code. It raises a variable that the
+    ROM allocates ahead of a competitor (rasolve's "raise priority"); sub_08136F58 matched so."""
+    def pred(n, p, s):
+        return isinstance(n, (ca.Assignment, ca.FuncCall, ca.UnaryOp)) and isinstance(p, ca.Compound)
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        a, par, s = nth(f2, pred, k)
+        set_child(par, s, ca.DoWhile(ca.Constant("int", "0"), ca.Compound([a])))
+        yield f"do {{ {text(a)[:30]}; }} while (0)", f2
+
+
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
              sp_split_offset, sp_addr_local, sp_goto_loop,
-             sp_addr_before_next]
+             sp_addr_before_next, sp_loop_weight]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
@@ -542,8 +557,8 @@ DECISIONS = {
     "cse-reuse": ["sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_loop_weight", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_loop_weight", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload": ["sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const"],
 }

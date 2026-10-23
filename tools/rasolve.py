@@ -448,7 +448,7 @@ def guided_search(src, func, cc, targets, seconds, jobs, src_lines=()):
     focus = {i + 1 + k for i, ln in enumerate(lines) for k in (-1, 0, 1)
              if any(re.search(rf"\b{re.escape(n)}\b", ln) for n in names)}
     focus |= {b for b, l in line_map.items() if l in set(src_lines)}
-    focus = sorted(focus)
+    focus = [] if os.environ.get("RASOLVE_FOCUS_ALL") else sorted(focus)
     print(f"\nguided C search: targets {[(n, 'raise' if r else 'lower', round(g / 10000, 3)) for n, r, g in targets]}"
           f", {len(focus)} focus lines, {jobs} workers, {seconds}s", flush=True)
     job = os.path.join(cc.work, "job.json")
