@@ -82,3 +82,25 @@ Ten exact matches add approximately 0.263 percentage points of code coverage (6,
 Tooling: the private instrumented compiler is available for hint flips. Cause searches require a causebook corpus that is not present; guarded drafts may need an unguarded local scratch copy for these diagnostics. Source semantics remain the acceptance requirement alongside byte equality.
 
 Batch 3 validation: the rebase conflict was limited to docs/INDEX.md and resolved by regeneration. After rebasing, build/cxbuild printed `build/boktai3.gba: OK`.
+
+
+## Batch 4
+
+Tags: #player #matching #terrain #camera
+
+- 08238110 matched (register-pinned), tentative PlayerOrbitEffect_InitMovingParticle: heading-based velocity and impact variant setup. Scoped velocity pointers and zero locals recover the stores; a pointer increment with a binding reproduces the otherwise folded halfword store. Depin retains one hint.
+- 08238238 matched without hints, tentative Player_UpdateActionFacingSide: identical body to the verified facing-fold helper at 0813ADD0.
+- 08238580 matched (register-pinned), tentative Player_ApplyLinkedContactResponse: adapt the standard contact-response sibling without the position-reset gate. Separate impact-direction call paths using a barrier before the shared store, and explicit deferred-response pointer/value lifetimes, reproduce the tail. Depin retains one hint.
+- 082386DC drafted 84.0%: full brief sprite animation updater. Comparing the stored byte after increment improves the original full-temporary draft. Explicit timer/pointer constraints, truncated and full-width temporaries, barriers and hint flips do not close the gap; reject hard-register variants that disturb pointer lifetimes. Five structural and eight total instruction differences remain.
+- 0823B308 matched without hints, tentative Player_SpawnActionSpark: packed bitfield vectors reproduce the partial stack-word stores; modes three and four use the stored interaction position, other modes raise the normal position.
+- 0823B47C skipped at the existing 99.4% draft: forcing the comparison copy before the facing store fixes that pair but changes else-branch allocation and prevents the shared flip store. Tested narrow/wide copies, explicit destination pointer, readonly constraints, comparison-only alias, clobber and retained-value bindings; all regress. Original retained for the final close-draft pass.
+- 0823B5D8 matched without hints, tentative Player_InitFacingDriftOffset: reuse the heading-drift layout and signed scale helper; fixed radius 800 produces the observed shift/add multiplication directly.
+- 0823B7A4 matched without hints, tentative Player_SmoothCameraAnchor: explicit per-axis input loads before destination pointer formation remove the extra persistent address. An inline controller-ID reader preserves its null arm and literal-pool split. Depin removes the final pointer barrier; improves 52.3% to exact.
+- 0823BB48 matched without hints, tentative Player_IsTerrainStepBlocked: height helper and repeated cell lookup preserve the terrain override and slope logic. Separate attribute reader and masked local fix the final load/mask ordering; depin removes every hint.
+- 0823C280 matched (register-pinned), tentative Player_RestoreLinkedActionState: full linked action reset restores resources, position, cell object and facing. Explicit first-copy offset, destination and distinct zero lifetimes reproduce the reset sequence. Retain natural root allocation: a forced r7 root produces unsafe stack-relative accesses in this compiler and was rejected. Depin retains three narrow hints.
+- 0823C368 matched (register-pinned): identical to the verified history selector at 08141A1C. Pointer traversal and separate sentinel lifetimes preserve the early returns; both inherited hints remain after depin.
+- 0823C424 drafted 93.0% (from 83.3%): separate safe state and flag predicates restore redundant null checks and the full-sized body. Remaining boolean materialization occurs around the state predicate instead of the flag predicate. Raw field-return, narrow predicate and explicit outer-guard alternatives regress.
+- 0823C4B4 drafted 94.4% (from 83.3%): adapt the signed history smoothing sibling. Only the final pointer/zero load registers are swapped. Explicit reload-pointer pin, index-zero pin and clobber alternatives disturb earlier reloads or retain worse control flow; best source retained.
+- 0823C8FC matched without hints, tentative Player_IsWithinSidestepCellMargin: decoded the reviewed raw tail; choose the perpendicular coordinate, mask to a byte and reject values outside the cell margin. An inverse early-return form fixes branch layout. Depin removes both temporary hints.
+
+Ten exact matches add approximately 0.073 percentage points of code coverage (1,768 bytes). Four use register-pinning concessions (808 bytes); six need no hints (960 bytes). One new and two improved guarded drafts earn no exact credit. One existing close draft is retained unchanged. Next assigned function: Player_UpdateTerrainSidestep at 0823C930.
