@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 78.2%
-// foundry draft (worker best 93.1%); what differs is mostly register allocation and instruction order
 struct PhaseEntry {
     u32 flags;
     u8 pad4[0x28];
@@ -44,20 +41,18 @@ void PhaseObject_TickCountdown(struct PhaseObject *p)
             void (*callback)(struct PhaseObject *);
             p->direction = -p->direction;
             {
-                u16 one = 1;
-                u16 two = 2;
-                u8 *q = &p->mode;
-                *q = one;
-                q++;
-                *q = two;
-                q -= 6;
-                one |= *q;
-                *q = one;
+                u8 one = 1;
+                u8 two = 2;
+                p->mode = one;
+                p->step = two;
+                p->flags8D |= one;
             }
             p->update = ChildGroup_UpdateTrailingMembers;
-            callback = sub_080F2BE4;
             for (i = 0; i <= 3; i++) {
                 p->entries[i].flags |= 1;
+                /* set in the loop: loop.c hoists it between the loop's
+                   other invariants, where the ROM loads it */
+                callback = sub_080F2BE4;
                 p->drawableA[i].flags |= 4;
                 p->drawableB[i].flags |= 4;
             }
@@ -73,6 +68,3 @@ void PhaseObject_TickCountdown(struct PhaseObject *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PhaseObject_TickCountdown);
-#endif
