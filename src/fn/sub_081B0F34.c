@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 95.1%
+// fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: carries a player position request along a motion track
-#ifdef NONMATCHING
-// fuzzy: 93.1%
 // Remaining differences: Player-request calls remain duplicated; entry and flag-mask allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -170,8 +171,10 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
 }
 void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
 {
-    struct SceneVec target, playerTarget;
+    struct SceneVec target;
+    struct SceneVec playerTarget;
     u32 mask = 12;
+    typeof(mask) t1;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -184,13 +187,13 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
         }
         p->enter = 1;
     }
-    mask = 16;
-    p->flags |= mask;
+    mask = (t1 = 16);
+    p->flags |= t1;
     {
         register u32 currentState asm("r4");
         register u32 offset asm("r1") = 0x164;
         register u32 *stateAddress asm("r0");
-        stateAddress = (u32 *)((u8 *)p + offset);
+        stateAddress = (u32 *)(((u8 *)p) + offset);
         asm("" : "+r"(stateAddress));
         currentState = *stateAddress;
         asm("" : "+r"(currentState));
@@ -211,19 +214,19 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                     MotionTrack_Initialize(p->motion, &p->offset, &target, 0, 4);
                 }
                 {
-                    volatile s16 *out = (void *)&playerTarget;
+                    volatile s16 *out = (void *)(&playerTarget);
                     struct SceneVec *position = &p->position;
                     out[0] = position->x;
                     out[1] = position->y - 128;
                     out[2] = position->z;
                 }
                 if (!p->variant) {
-                    if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
+                    if ((*((u32 *)(gUnk_02000580 + 0x20))) & 0x40000)
                         goto complete;
                     Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, 1, currentState,
                                                 currentState, currentState, 1);
                 } else {
-                    if (*(u32 *)(gUnk_02000580 + 0x20) & 0x40000)
+                    if ((*((u32 *)(gUnk_02000580 + 0x20))) & 0x40000)
                         goto complete;
                     Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, currentState,
                                                 currentState, currentState, currentState, 2);
@@ -240,13 +243,13 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                 }
                 break;
             }
+
             case 1:
                 p->finished = currentState;
                 break;
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
 #endif

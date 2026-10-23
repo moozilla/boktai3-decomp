@@ -1,9 +1,10 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-// confidence=low: energy meter plus a 4-digit timer shown below it.
 #ifdef NONMATCHING
-// fuzzy: 90.1%
+// fuzzy: 90.4%
+// fix.py best version (reprinted C)
+// confidence=low: energy meter plus a 4-digit timer shown below it.
 // Remaining differences: register choice for the tile cursor and repeated player-pointer reloads in the timer test.
 extern u8 *gUnk_02000710;
 extern u32 gUnk_030053F4;
@@ -19,15 +20,27 @@ static inline u32 TestBits(u32 v, u32 mask)
 
 #define PLAYER (*(u8 **)(p + 0xa40))
 
+static inline u32 Arg1(u32 k_, u8 *p)
+{
+    return p + k_;
+}
+
 void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap)
 {
-    s32 units, full, partial, n, i;
-    s32 fullTile, emptyTile, endTile;
+    s32 units;
+    s32 full;
+    s32 partial;
+    s32 n;
+    s32 i;
+    s32 fullTile;
+    s32 emptyTile;
+    s32 endTile;
     s32 color;
     u16 *cell;
     s32 digits[4];
     s32 *dp;
-    s32 rem, kind;
+    s32 rem;
+    s32 kind;
     u32 m;
     if (value == 0) {
         units = 0;
@@ -39,7 +52,7 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         partial = units - (full << 3);
     }
     {
-        register u8 *player asm("r2") = *(u8 **)(p + 0xa40);
+        register u8 *player asm("r2") = *((u8 **)(p + 0xa40));
         register u16 *c asm("r2");
         kind = *(player + 0x418);
         color = 0x1f;
@@ -51,11 +64,11 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             endTile = 0x4c;
             m = 0x60;
             asm("" : "+r"(m));
-            if (*(u32 *)(player + 0x20) & m) {
+            if ((*((u32 *)(player + 0x20))) & m) {
                 u16 *timer = (u16 *)(p + 0xa62);
                 s32 bit;
-                ++*timer;
-                bit = (*timer >> 2) & 1;
+                ++(*timer);
+                bit = ((*timer) >> 2) & 1;
                 if (bit == 0)
                     color = 0x7fff;
             }
@@ -72,35 +85,39 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             else
                 c = Hud_GetTilemapCell(0, row - 1, col);
         }
-        asm("" ::"r"(p));
+        asm("" : : "r"(p));
         if (gUnk_03005178 != color)
             gUnk_03005178 = color;
-        if (mode != 0 && cap != 0)
-            *c++ = endTile | 0xd400;
+        if ((mode != 0) && (cap != 0))
+            *(c++) = endTile | 0xd400;
         for (n = 0; n < full; n++)
-            *c++ = fullTile | 0xd000;
+            *(c++) = fullTile | 0xd000;
+
         if (partial) {
             s32 r = partial - 8;
             asm("" : "+r"(r));
-            *c++ = (fullTile - r) | 0xd000;
+            *(c++) = (fullTile - r) | 0xd000;
             n++;
         }
         for (; n < 10; n++)
-            *c++ = emptyTile | 0xd000;
+            *(c++) = emptyTile | 0xd000;
+
         if (cap != 0)
             *c = endTile | 0xd000;
     }
-    if (!(gUnk_030053F4 & 0x1000) && !(*(u32 *)(gUnk_02000710 + 0x868) & 0x80) && mode == 0) {
-        if (PLAYER && (*(u32 *)(PLAYER + 0x444) & 0x40))
+    if (((!(gUnk_030053F4 & 0x1000)) && (!((*((u32 *)(gUnk_02000710 + 0x868))) & 0x80))) &&
+        (mode == 0)) {
+        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x444))) & 0x40))
             goto digits;
-        asm("" ::: "memory");
-        if (PLAYER && (*(u32 *)(PLAYER + 0x44c) & 0x10))
+        asm("" : : : "memory");
+        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x44c))) & 0x10))
             goto digits;
-        asm("" ::: "memory");
-        if (*(u8 *)(PLAYER + 0xc18) == 7) {
+        asm("" : : : "memory");
+        if ((*((u8 *)((*((u8 **)Arg1(0xa40, p))) + 0xc18))) == 7) {
         digits:
-            digits[0] = Div(*(s32 *)(gUnk_02000710 + 0x77c), 1000);
-            rem = *(s32 *)(gUnk_02000710 + 0x77c) - digits[0] * 1000;
+            digits[0] = Div(*((s32 *)(gUnk_02000710 + 0x77c)), 1000);
+
+            rem = (*((s32 *)(gUnk_02000710 + 0x77c))) - (digits[0] * 1000);
             digits[1] = Div(rem, 100);
             rem -= digits[1] * 100;
             digits[2] = Div(rem, 10);
@@ -109,13 +126,15 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             cell = Hud_GetTilemapCell(0, 9, 4);
             dp = digits;
             for (i = 3; i >= 0; i--) {
-                *cell++ = Hud_GetStyleTileIndex(*dp++, 0) | -0x3000;
+                *(cell++) = Hud_GetStyleTileIndex(*(dp++), 0) | (-0x3000);
             }
+
             p[0xa99] = 1;
         } else if (p[0xa99]) {
             cell = Hud_GetTilemapCell(0, 9, 4);
             for (i = 3; i >= 0; i--)
-                *cell++ = 0xd000;
+                *(cell++) = 0xd000;
+
             p[0xa99] = 0;
         }
     }

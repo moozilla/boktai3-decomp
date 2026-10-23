@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 96.7%
+// fix.py best version (reprinted C)
 // Initial position rematerialization, participant access and register lifetimes still differ.
 
 // confidence=low: recoil completion returns to the callback at 081198F8.
@@ -120,32 +121,39 @@ static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
     p->update = fn;
     p->timer = zero;
 }
+static inline u32 Mode_1(void)
+{
+    return (gUnk_030053F4 | gUnk_030053F0) & 0x800;
+}
+
 s32 Glove_InitFromScript(struct Glove *p)
 {
     struct Obj *self = &p->motion;
-    s32 h, dx, dz;
-    u32 a, b;
-    Memory_Clear((u8 *)p + 0x5d4, 0x10);
-    U32(p, 0x900) = 0;
-    U32(p, 0x8fc) = 0;
-    *(void **)((u8 *)p + 0x60c) = p;
+    s32 h;
+    s32 dx;
+    s32 dz;
+    u32 a;
+    u32 b;
+    Memory_Clear(((u8 *)p) + 0x5d4, 0x10);
+    *((u32 *)(((u8 *)p) + 0x900)) = 0;
+    *((u32 *)(((u8 *)p) + 0x8fc)) = 0;
+    *((void **)(((u8 *)p) + 0x60c)) = p;
     MotionActor_ParsePosition(p);
-    Memory_Clear((u8 *)p + 0x8b4, 0x10);
+    Memory_Clear(((u8 *)p) + 0x8b4, 0x10);
     Memory_Clear(gUnk_020004E0, 0x10);
-    CharacterModel_SetPrimaryAppearance(p->model, (u8 *)p + 0x28);
-    CharacterModel_SetSecondaryAppearance(p->model, (u8 *)p + 0x28, (u8 *)p + 0x50);
+    CharacterModel_SetPrimaryAppearance(p->model, ((u8 *)p) + 0x28);
+    CharacterModel_SetSecondaryAppearance(p->model, ((u8 *)p) + 0x28, ((u8 *)p) + 0x50);
     p->participant = Script_GetKeywordValue('i', 0);
-    U32(p, 0x908) = Script_GetKeywordValue('G', 0);
-    U32(p, 0x90c) = Script_GetKeywordValue('e', 0);
-    U32(p, 0x910) = Script_GetKeywordValue('n', 0);
+    *((u32 *)(((u8 *)p) + 0x908)) = Script_GetKeywordValue('G', 0);
+    *((u32 *)(((u8 *)p) + 0x90c)) = Script_GetKeywordValue('e', 0);
+    *((u32 *)(((u8 *)p) + 0x910)) = Script_GetKeywordValue('n', 0);
     if (!Mode(0x800))
-        U32(p, 0x904) = Script_GetKeywordValue('g', 0);
+        *((u32 *)(((u8 *)p) + 0x904)) = Script_GetKeywordValue('g', 0);
     sub_081169A8(p);
     ActorSprite_InitPartDrawings(self, p->model, 0x3d99);
-    if (S32(p, 0x5f4) == 0x20000)
+    if ((*((s32 *)(((u8 *)p) + 0x5f4))) == 0x20000)
         self->x = -0x40000;
     h = self->vy + self->unkC0;
-
     self->y += 0x200;
     if (self->steps > 0) {
         self->x += self->dx;
@@ -156,11 +164,14 @@ s32 Glove_InitFromScript(struct Glove *p)
     } else {
         Memory_Clear(&self->dx, 0x10);
     }
-
     {
-        s32 *pprevZ, *pprevX, *pvz, *px, *py;
+        s32 *pprevZ;
+        s32 *pprevX;
+        s32 *pvz;
+        s32 *px;
+        s32 *py;
         s32 lim;
-        self->outX = h + self->x - self->prevX;
+        self->outX = (h + self->x) - self->prevX;
         self->outY = self->y + self->dy;
         self->outZ = self->vz + self->dz;
         dx = (self->x - self->prevX) >> 12;
@@ -173,17 +184,18 @@ s32 Glove_InitFromScript(struct Glove *p)
         pvz = &self->vz;
         if (h > lim)
             dx = 0x80;
-        if (dx == 0 && dz == 0)
+        if ((dx == 0) && (dz == 0))
             self->angle = 0xFFFF;
         else
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
         *pprevX = *px;
         *pprevZ = self->z;
         Terrain_ResolveActorMotion(self);
-        a = (u32) ~(self->unk3C >> 12) >> 31;
-        b = (u32) ~(self->unk38 >> 12) >> 31;
-        if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
-            a == 1) {
+        a = ((u32)(~(self->unk3C >> 12))) >> 31;
+        b = ((u32)(~(self->unk38 >> 12))) >> 31;
+        if (((((self->unk4 != self->unk8) && (self->unk4 & 0x1000)) && (!(self->unk8 & 0xF000))) &&
+             (b <= 1)) &&
+            (a == 1)) {
             s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
             if (v < 4)
                 v = 4;
@@ -194,39 +206,39 @@ s32 Glove_InitFromScript(struct Glove *p)
         }
         Actor_UpdateShadowSpriteParts(self, p->model);
     }
-    if (Mode(0x800)) {
+    if (Mode_1()) {
         if (p->participant == Slot()) {
             void *ref = gUnk_020004B4;
             void *optional;
-            if (ref && U8(ref, 0x53) == 1)
-                optional = (u8 *)ref + 0x260;
+            if (ref && ((*((u8 *)(((u8 *)ref) + 0x53))) == 1))
+                optional = ((u8 *)ref) + 0x260;
             else
                 optional = 0;
-            FieldHud_InitializeWidgets((u8 *)self + 0x5c, &p->height, (u8 *)self + 0x58,
-                                       U16(self, 0x5a), optional);
+            FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
+                                       *((u16 *)(((u8 *)self) + 0x5a)), optional);
         }
         SetCallback(p, sub_081175F8, 0);
     } else {
         s32 ready;
-        FieldHud_InitializeWidgets((u8 *)self + 0x5c, &p->height, (u8 *)self + 0x58,
-                                   U16(self, 0x5a), (u8 *)p + 0x900);
+        FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
+                                   *((u16 *)(((u8 *)self) + 0x5a)), ((u8 *)p) + 0x900);
         ready = Script_GetKeywordValue('R', 0);
         if (ready)
             SetCallback(p, (void (*)(void *))Glove_UpdateStopping, 0);
         else
             SetCallback(p, sub_081172C4, ready);
     }
-    CharacterPreview_InitializePalette((u8 *)self + 0x68, p->model, U8(self, 0x4b));
+    CharacterPreview_InitializePalette(((u8 *)self) + 0x68, p->model,
+                                       *((u8 *)(((u8 *)self) + 0x4b)));
     ActorRecoil_InitCollisionVolumes(p);
     SceneTilemap_SetScrollSource(gUnk_020004E0);
     gUnk_020004F0[p->participant] = p;
     Glove_RegisterMessageReceiver(p);
-    *(void **)((u8 *)p + 0x8c4) = gUnk_03005260 + p->participant * 8;
-    U32(p, 0x91c) = p->participant;
-    Memory_Clear((u8 *)p + 0x950, 8);
+    *((void **)(((u8 *)p) + 0x8c4)) = gUnk_03005260 + (p->participant * 8);
+    *((u32 *)(((u8 *)p) + 0x91c)) = p->participant;
+    Memory_Clear(((u8 *)p) + 0x950, 8);
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Glove_InitFromScript);
 #endif

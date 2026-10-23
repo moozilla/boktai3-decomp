@@ -2,7 +2,8 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 86.2%
+// fuzzy: 89.4%
+// fix.py best version (reprinted C)
 // Remaining: terrain/center allocation and pointer/register lifetimes.
 // The original falls through on the unobstructed path without setting its result.
 struct Vec {
@@ -68,10 +69,12 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
 {
     struct {
         u32 zero;
-        struct Vec velocity, center;
+        struct Vec velocity;
+        struct Vec center;
     } local;
     register s32 direction asm("r9") = inputDirection;
-    s32 previous, height;
+    s32 previous;
+    s32 height;
     struct Vec *velocity = &local.velocity;
     asm("" : "+r"(direction), "+r"(velocity));
     local.zero = 0;
@@ -83,58 +86,69 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                 case 0:
                     current++;
                     break;
+
                 case 1:
-                    current += *(s16 *)(gUnk_030052F4->cells + 4);
+                    current += *((s16 *)(gUnk_030052F4->cells + 4));
                     break;
+
                 case 2:
                     current--;
                     break;
+
                 case 3:
-                    current -= *(s16 *)(gUnk_030052F4->cells + 4);
+                    current -= *((s16 *)(gUnk_030052F4->cells + 4));
                     break;
             }
-            if (*CellData(current) >> 4)
+
+            if ((*CellData(current)) >> 4)
                 return 1;
-            height = *CellData(previous) & 15;
-            if (height < (*CellData(current) & 15)) {
+            height = (*CellData(previous)) & 15;
+            if (height < ((*CellData(current)) & 15)) {
                 register struct Vec *center asm("r6") = &local.center;
                 s32 x;
                 register s32 z asm("r8");
                 asm("" : "+r"(center));
-                x = Mod(current, *(s16 *)(gUnk_030052F4->cells + 4));
-                z = Div(current, *(s16 *)(gUnk_030052F4->cells + 4));
+                x = Mod(current, *((s16 *)(gUnk_030052F4->cells + 4)));
+                z = Div(current, *((s16 *)(gUnk_030052F4->cells + 4)));
                 center->x = (x << 8) + 128;
-                center->y = (*CellData(current) & 15) << 8;
+                center->y = ((*CellData(current)) & 15) << 8;
                 center->z = (z << 8) + 128;
                 switch (direction) {
                     case 0:
                         spot->x = center->x - 128;
                         return 1;
+
                     case 1:
                         spot->z = center->z - 128;
                         return 1;
+
                     case 2:
                         spot->x = center->x + 128;
                         break;
+
                     case 3:
                         spot->z = center->z + 128;
                         break;
                 }
+
                 {
-                    register const u16 *table asm("r5") = (const u16 *)RANDOM_TABLE_ADDR;
+                    register const u16 *table asm("r5") = (const u16 *)0x0203B400;
                     register u32 *rng asm("r4") = &gUnk_03005308;
                     register u32 mask asm("r6") = 1023;
                     u32 index;
                     register u32 zero asm("r3");
                     asm("" : "+r"(table), "+r"(rng), "+r"(mask));
-                    index = (*rng + 1) & mask;
+                    {
+                        u8 k1 = 1;
+                        index = ((*rng) + k1) & mask;
+                    }
                     *rng = index;
                     spot->y = (height << 8) + (table[index] & 255);
                     zero = 0;
                     asm("" : "+r"(zero));
                     if (!p->variant) {
                         s32 life;
-                        index = (*rng + 1) & mask;
+                        index = ((*rng) + 1) & mask;
                         *rng = index;
                         life = (table[index] & 63) + 30;
                         SpriteEffectController_Create(spot, &local.velocity, 0x1C1A, 0xD1B8, 3,
@@ -151,7 +165,6 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
         } while (current != target);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_ClipScatterPath);
 #endif

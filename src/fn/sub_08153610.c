@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-// confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 89.9%
+// fuzzy: 92.3%
+// fix.py best version (reprinted C)
+// confidence=low: tentative player cue role; see callback body.
 // Constant derivation, resource pointer setup and timer mask lifetimes differ.
 struct P {
     u8 pad0[0x30];
@@ -163,14 +164,14 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
 {
     if (p->timer == 0) {
         if (p->flip)
-            p->dir = 7 - p->facing * 2;
+            p->dir = 7 - (p->facing * 2);
         else
-            p->dir = p->facing * 2 + 1;
-        U16(p, 0xAD8) = 0;
+            p->dir = (p->facing * 2) + 1;
+        *((u16 *)(((u8 *)p) + 0xAD8)) = 0;
         Sound_PlaySong(0x37F);
         SpiralTrail_CreateWithParticles(p, 1, 0, 32, 56);
     }
-    if ((p->timer & 7) < 7 - (p->timer >> 2)) {
+    if ((p->timer & 7) < (7 - (p->timer >> 2))) {
         if (p->dir > 3) {
             p->facing = (7 - p->dir) >> 1;
             p->flip = 1;
@@ -182,9 +183,11 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
         Player_AddControlFlags(p, 0x41);
         {
             struct PositionPair {
-                u32 x, y;
+                u32 x;
+                u32 y;
             };
-            *(struct PositionPair *)((u8 *)p + 0xAC) = *(struct PositionPair *)((u8 *)p + 0x30);
+            *((struct PositionPair *)(((u8 *)p) + 0xAC)) =
+                *((struct PositionPair *)(((u8 *)p) + 0x30));
         }
         if (p->dir > 4) {
             p->facing = 8 - p->dir;
@@ -197,25 +200,27 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
     Player_SetAnimation(p, 0x9A, 64, 1);
     {
         u32 resource = 0x16F;
-        U16(p, 0xC6) = resource;
+        *((u16 *)(((u8 *)p) + 0xC6)) = resource;
         asm("" : "+r"(resource));
-        *(void **)((u8 *)p + 0xD4) = gUnk_030042E4 + (resource << 5);
+        *((void **)(((u8 *)p) + 0xD4)) = gUnk_030042E4 + (resource << 5);
     }
     Anim_SetSequence(&p->seq, (void *)p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
-    U16(p, 0xAD6) = 0x2DD;
-    U16(p, 0xAD8) += 3;
-    if (U16(p, 0xAD8) > 32)
-        U16(p, 0xAD8) = 32;
-    if (++p->timer > 31) {
-        U8(p, 0x464) = 1;
-        U8(p, 0x465) = 1;
+    *((u16 *)(((u8 *)p) + 0xAD8)) += 3;
+    *((u16 *)(((u8 *)p) + 0xAD6)) = 0x2DD;
+    {
+        u16 *d1 = (u16 *)(((u8 *)p) + 0xAD4);
+        if (d1[2] > 32)
+            *((u16 *)(((u8 *)p) + 0xAD8)) = 32;
+    }
+    if ((++p->timer) > 31) {
+        *((u8 *)(((u8 *)p) + 0x464)) = 1;
+        *((u8 *)(((u8 *)p) + 0x465)) = 1;
         Player_UpdateFacingSide(p);
         PlayerCue_EnterStandUpdate(p);
-        U8(p, 0x5A3) = 1;
+        *((u8 *)(((u8 *)p) + 0x5A3)) = 1;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralMotion);
 #endif

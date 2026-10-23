@@ -2,7 +2,8 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.0%
+// fuzzy: 89.6%
+// fix.py best version (reprinted C)
 // Ground-height load scheduling and final behavior-state offset derivation still differ.
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
@@ -52,9 +53,9 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
             *height = 0x40;
     }
     if (!s->drawableKind)
-        Anim_SetDurationScale((u8 *)s->drawable + 0x48, *height);
+        Anim_SetDurationScale(((u8 *)s->drawable) + 0x48, *height);
     else
-        Anim_SetFrameDurationScale((u8 *)s->drawable + 0x20, *height);
+        Anim_SetFrameDurationScale(((u8 *)s->drawable) + 0x20, *height);
     {
         s32 ground = s->groundHeight2BE;
         s32 y = s->position.y;
@@ -63,16 +64,18 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
         delta = ground;
         delta -= y;
     }
-    if (delta < 0)
+    if (((u32)delta) < 0)
         delta = -delta;
-    if (delta <= 16 && (s32)s->counter2AC > 80) {
+    if ((delta <= 16) && (((s32)s->counter2AC) > 80)) {
         u32 one = 1;
-        u32 zero = 0;
         u8 *state = &s->state2A8;
-        *state = zero;
-        s->phase2A9 = zero;
+        {
+            u8 k1 = 0;
+            *state = k1;
+        }
+        s->phase2A9 = 0;
         s->behavior2AA = one;
-        s->counter2AC = zero;
+        s->counter2AC = 0;
         s->field2B1 = one;
     } else {
         ++s->counter2AC;

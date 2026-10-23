@@ -1,6 +1,7 @@
 #include "scene_actor_animation.h"
 #ifdef NONMATCHING
-// fuzzy: 86.0%
+// fuzzy: 88.0%
+// fix.py best version (reprinted C)
 // Remaining: direction arithmetic, constant derivation, address reuse and callback setup registers.
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
@@ -81,9 +82,19 @@ static inline void Control(struct SceneActorAnimationView *a, void *callback, u3
     FIELD(a, 0x104, u32) = zero;
 }
 // confidence=low: turns one octant toward the requested direction on animation ticks.
+static inline u32 Arg1(u32 k_, struct SceneActorAnimationView *actor)
+{
+    return (*((u16 *)(((u8 *)actor) + 0x2D4))) & k_;
+}
+
+static inline u32 Arg2(u32 k_, struct SceneActorAnimationView *actor)
+{
+    return (*((u32 *)(((u8 *)actor) + 0x2CC))) & k_;
+}
+
 void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
 {
-    u8 *direction = (u8 *)actor + 0x50;
+    u8 *direction = ((u8 *)actor) + 0x50;
     u8 *sequence;
     u16 *scale;
     if (Take(&actor->directionalEntryFlag)) {
@@ -91,37 +102,40 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
             actor->direction = actor->nextDirection;
-            Control(actor, FIELD(actor, 0x22C, void *), 0);
+            Control(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
             actor->unknown2B0 = 1;
             return;
         }
         if (((current - (target - 8)) & 7) <= 4)
-            FIELD(actor, 0x2CC, u32) &= ~0x10000;
+            *((u32 *)(((u8 *)actor) + 0x2CC)) &= ~0x10000;
         else
-            FIELD(actor, 0x2CC, u32) |= 0x10000;
+            *((u32 *)(((u8 *)actor) + 0x2CC)) |= 0x10000;
     }
-    sequence = (u8 *)actor->drawable + 0x48;
-    if (FIELD(actor, 0x2D4, u16) & 0xA02F) {
-        u16 *p = &FIELD(actor, 0x2C2, u16);
+    sequence = ((u8 *)actor->drawable) + 0x48;
+    if (Arg1(0xA02F, actor)) {
+        u16 *p = &(*((u16 *)(((u8 *)actor) + 0x2C2)));
         *p = 0x40;
         scale = p;
     } else {
-        u16 *p = &FIELD(actor, 0x2C2, u16);
+        u16 *p = &(*((u16 *)(((u8 *)actor) + 0x2C2)));
         u16 v = *p;
         scale = p;
         if (!v)
             *scale = 0x40;
     }
     if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)*(void *volatile *)((u8 *)actor + 4) + 0x48, *scale);
+        Anim_SetDurationScale(((u8 *)(*((void *volatile *)(((u8 *)actor) + 4)))) + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)*(void *volatile *)((u8 *)actor + 4) + 0x20, *scale);
+        Anim_SetFrameDurationScale(((u8 *)(*((void *volatile *)(((u8 *)actor) + 4)))) + 0x20,
+                                   *scale);
     if (events & 4) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
-        u32 variant, flags, selection;
-        Control(actor, FIELD(actor, 0x224, void *), 2);
-        if (FIELD(actor, 0x2CC, u32) & 0x10000)
+        u32 variant;
+        u32 flags;
+        u32 selection;
+        Control(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
+        if (Arg2(0x10000, actor))
             direction[9] += 32;
         else
             direction[9] -= 32;
@@ -131,7 +145,6 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         Select(actor, selection, variant, flags);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Axe_UpdateTurnAnimation);
 #endif

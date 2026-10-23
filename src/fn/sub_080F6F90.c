@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
 
+#ifdef NONMATCHING
+// fuzzy: 95.1%
+// fix.py best version (reprinted C)
 // confidence=low: initializes the four active sword attack components.
 
-#ifdef NONMATCHING
-// fuzzy: 85.0%
 // Animation mask lifetime, collider argument addresses and register allocation still differ.
 #define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
 #define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
@@ -138,7 +139,8 @@ void sub_080F4708(void);
 void Sword_InitAttackComponents(u8 *input)
 {
     u8 *p = input;
-    struct SwordSize size, offset;
+    struct SwordSize size;
+    struct SwordSize offset;
     struct DisplaySequenceState sequence;
     s32 i;
     u32 zero;
@@ -149,29 +151,28 @@ void Sword_InitAttackComponents(u8 *input)
     offset.y = 0;
     offset.z = 0;
     if (Script_SeekToKeyword('c')) {
-        H(p, 0xD14) = ReadArgument();
-        H(p, 0xD16) = ReadArgument();
-        H(p, 0xD18) = ReadArgument();
-        H(p, 0xD1A) = ReadArgument();
-        B(p, 0xD7E) = ReadArgument();
-        H(p, 0xD1C) = ReadArgument();
-        H(p, 0xD1E) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD14)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD16)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD18)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD1A)) = ReadArgument();
+        *(((u8 *)p) + 0xD7E) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD1C)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD1E)) = ReadArgument();
     }
     if (Script_SeekToKeyword('C')) {
-        H(p, 0xD20) = ReadArgument();
-        H(p, 0xD22) = ReadArgument();
-        H(p, 0xD24) = ReadArgument();
-        H(p, 0xD26) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD20)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD22)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD24)) = ReadArgument();
+        *((u16 *)(((u8 *)p) + 0xD26)) = ReadArgument();
     }
     if (Script_SeekToKeyword('n'))
-        B(p, 0xD2C) = Script_GetValue();
+        *(((u8 *)p) + 0xD2C) = Script_GetValue();
     else
-        B(p, 0xD2C) = 4;
-    Anim_SetSequence(&sequence, (void *)ScriptProc_Start(0x922E, 0x3F72), 2, (u8)(B(p, 0xD55) << 2),
-                     0);
-    zero = 0;
+        *(((u8 *)p) + 0xD2C) = 4;
+    Anim_SetSequence(&sequence, (void *)ScriptProc_Start(0x922E, 0x3F72), 2,
+                     (u8)((*(((u8 *)p) + 0xD55)) << 2), 0);
     for (i = 0; i < 4; i++) {
-        struct SwordComponent *child = (void *)P(p, 0x4BC + i * 0x194);
+        struct SwordComponent *child = (void *)(((u8 *)p) + (0x4BC + (i * 0x194)));
         struct DisplaySequenceSprite *sprite = &child->sprite;
         void *graphics = child->graphics;
         void *collider;
@@ -193,7 +194,7 @@ void Sword_InitAttackComponents(u8 *input)
         Sprite_Init(child, graphics, 0);
         Step(sprite, &sequence, sequence.commands);
         sprite->flags = 3;
-        AnimData_SelectPaletteBank((void *)sprite->resource, H(p, 0xD56));
+        AnimData_SelectPaletteBank((void *)sprite->resource, *((u16 *)(((u8 *)p) + 0xD56)));
         child->field118 = i;
         child->field11E = 0;
         child->field11F = 0;
@@ -205,18 +206,21 @@ void Sword_InitAttackComponents(u8 *input)
         Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(collider, Ivy_OnChildDestroy, child);
         Collider_Refresh(collider);
-        Collider_SetAttackProperties(collider, S(p, 0xD20), S(p, 0xD22), 0x2000, S(p, 0xD24),
-                                     S(p, 0xD26));
+        Collider_SetAttackProperties(collider, *((s16 *)(((u8 *)p) + 0xD20)),
+                                     *((s16 *)(((u8 *)p) + 0xD22)), 0x2000,
+                                     *((s16 *)(((u8 *)p) + 0xD24)), *((s16 *)(((u8 *)p) + 0xD26)));
         child->attack.flags |= 4;
         collider = &child->body;
         Collider_Init(collider, 0, 0x5009, 0, 16, &size, &offset);
-        Collider_SetBodyProperties(collider, S(p, 0xD16), S(p, 0xD1C), S(p, 0xD1E));
+        Collider_SetBodyProperties(collider, *((s16 *)(((u8 *)p) + 0xD16)),
+                                   *((s16 *)(((u8 *)p) + 0xD1C)), *((s16 *)(((u8 *)p) + 0xD1E)));
         Collider_SetCallback(collider, sub_080F4708, child);
         Collider_Refresh(collider);
         child->body.flags |= 4;
     }
-}
 
+    zero = 0;
+}
 #else
 INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
 #endif

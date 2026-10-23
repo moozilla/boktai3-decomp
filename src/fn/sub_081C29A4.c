@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.6%
+// fuzzy: 92.7%
+// fix.py best version (reprinted C)
 // RNG stores, literal-load order and scratch registers still differ.
 struct Vec {
     s16 x, y, z, pad;
@@ -60,7 +61,9 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
     struct Emitter *emitter = input;
     struct Particle *particle;
     struct Vec screen;
-    s32 angle, speed;
+    s32 angle;
+    s32 speed;
+    s32 t1;
     if (emitter->speed <= 1)
         return;
     particle = ParticlePool_FindFreeEntry(emitter);
@@ -68,15 +71,15 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
         return;
     emitter->count++;
     particle->flags &= ~1;
-    circle((emitter->angle + ((random() >> 4) & 63) + 128) & 255, &screen, 150);
+    circle(((emitter->angle + ((random() >> 4) & 63)) + 128) & 255, &screen, t1);
+    t1 = 150;
     screen.x += 120;
     screen.y += 80;
     unproject(&particle->pos, &screen);
-    polar(&particle->vel, emitter->angle + ((random() >> 4) & 15) - 8,
+    polar(&particle->vel, (emitter->angle + ((random() >> 4) & 15)) - 8,
           emitter->speed + ((random() >> 4) & 3));
     particle->age = 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", SparkleEmitter_EmitParticle);
 #endif

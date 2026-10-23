@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.3%
+// fuzzy: 87.1%
+// fix.py best version (reprinted C)
 // Remaining differences include shared route tails, flag/address lifetimes, and register allocation.
 /* Local chase helpers follow scene_actor_chase.h; the RNG mask pin reproduces
  * this caller's retry-loop allocation without changing the shared header. */
@@ -321,7 +322,10 @@ static inline void SaveAction(struct GhoulResumeAction *input, void *callback, u
 }
 void Ghoul_ResumeDelayedChase(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)actor + 0x3D4;
+    u8 *group = ((u8 *)actor) + 0x3D4;
+    typeof(*((void **)(group + 0x1FC))) t1;
+    typeof(&actor->position) t2;
+    typeof(*((struct ContactPosition **)(group + 0x200))) t3;
     asm("" : "+r"(group));
     {
         register u8 *entry asm("r1") = &actor->field2B1;
@@ -329,29 +333,31 @@ void Ghoul_ResumeDelayedChase(struct SceneActorRegistryResetView *actor)
         if (*entry)
             *entry = 0;
     }
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)))
+    if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x270))))
         return;
     if (sub_0812F3CC(actor))
         return;
-    if ((s32)actor->counter2AC <= 60)
+    if (((s32)actor->counter2AC) <= 60)
         goto increment;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
     Chase_SetState(actor, 3, 1, 0);
     Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (Chase_MotionFlags(actor, 0x80)) {
-        SaveAction((void *)(group + 0x8C), *(void **)(group + 0x48), 12);
+        SaveAction((void *)(group + 0x8C), *((void **)(group + 0x48)), 12);
         Chase_Arrive(actor);
     } else if (Chase_Bits32(&actor->flags2CC, 0x10)) {
         struct ContactPosition *destination;
         SaveAction((void *)(group + 0x8C), actor->entryTarget228, 7);
-        destination = *(struct ContactPosition **)(group + 0x200);
+        destination = *((struct ContactPosition **)(group + 0x200));
         Chase_SnapToRoute(destination, group + 0x74);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                            *(struct ContactPosition **)(group + 0x200))) {
+        t1 = *((void **)(group + 0x1FC));
+        t2 = &actor->position;
+        t3 = *((struct ContactPosition **)(group + 0x200));
+        if (!Chase_TryRoute(actor, t1, t2, t3)) {
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
             Chase_SetState(actor, 3, 0, 0);
         } else
-            (*(struct ContactPosition **)(group + 0x200))->pad = 1;
+            (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
     } else {
         SaveAction((void *)(group + 0x8C), actor->entryTarget228, 2);
         actor->field2C2 = 64;
@@ -360,7 +366,6 @@ void Ghoul_ResumeDelayedChase(struct SceneActorRegistryResetView *actor)
 increment:
     actor->counter2AC++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ghoul_ResumeDelayedChase);
 #endif

@@ -1,11 +1,12 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 95.8%
+// fix.py best version (reprinted C)
 // confidence=low: coordinates a part strike with its opposite part.
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.5%
 // Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -71,6 +72,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
 {
     u8 *enter;
     u32 mask = 0x20;
+    s32 t1;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -83,14 +85,12 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 p->target.x -= 112;
                 p->target.z += 112;
             }
+        } else if (p->variant == 1) {
+            p->target.x -= 256;
+            p->target.z += 256;
         } else {
-            if (p->variant == 1) {
-                p->target.x -= 256;
-                p->target.z += 256;
-            } else {
-                p->target.x += 256;
-                p->target.z -= 256;
-            }
+            p->target.x += 256;
+            p->target.z -= 256;
         }
         p->target.y = p->origin.y;
         p->state = 0;
@@ -117,26 +117,29 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             }
             break;
         }
+
         case 1:
             enter = &p->enter;
             if (p->enter) {
                 u32 zero = 0;
                 *enter = zero;
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 1);
-                *(u32 *)((u8 *)p + 0x19c) = zero;
+                *((u32 *)(((u8 *)p) + 0x19c)) = zero;
             }
-            if (++p->timer > 0) {
+            if ((++p->timer) > 0) {
                 Sound_PlaySong(0x588);
                 SetState(p, 2);
                 *enter = 1;
             }
             break;
+
         case 2:
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
-                if (ScenePair_CountPositiveCounters(boss) == 2 &&
-                    boss[p->variant == 1 ? 0x205 : 0x421] == 5) {
-                    struct SceneVec delta, position;
+                if ((ScenePair_CountPositiveCounters(boss) == 2) &&
+                    (boss[(p->variant == 1) ? (0x205) : (0x421)] == 5)) {
+                    struct SceneVec delta;
+                    struct SceneVec position;
                     if (p->variant == 1)
                         MakeVector(&delta, 224, 256);
                     else
@@ -145,13 +148,14 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                     MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 2);
                     Sound_PlaySong(0x1ba);
                     AddVector(&position, &p->target, p->base);
-                    AnimatedParticles_EmitBurst(&position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4, 4, 4,
-                                                4);
+                    AnimatedParticles_EmitBurst(&position, *((s16 *)(((u8 *)p) + 0xb0)), 0, 64, 4,
+                                                4, 4, 4);
                     SetState(p, 6);
                 } else {
                     Sound_PlaySong(0x3d9);
-                    AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0,
-                                                64, 4, 4, 4, 4);
+                    t1 = 4;
+                    AnimatedParticles_EmitBurst(&p->sprite.position, *((s16 *)(((u8 *)p) + 0xb0)),
+                                                0, 64, t1, 4, 4, 4);
                     SetState(p, 6);
                 }
                 p->enter = 1;
@@ -159,27 +163,30 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             } else if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             break;
+
         case 3:
             enter = &p->enter;
             if (p->enter) {
                 *enter = 0;
                 SetFlags(p, 8);
                 {
-                    u16 saved = *(u16 *)((u8 *)p + 0x172);
-                    *(u16 *)((u8 *)p + 0xf0) = saved;
+                    u16 saved = *((u16 *)(((u8 *)p) + 0x172));
+                    *((u16 *)(((u8 *)p) + 0xf0)) = saved;
                 }
-                *(u32 *)((u8 *)p + 0x19c) = 16;
+                *((u32 *)(((u8 *)p) + 0x19c)) = 16;
             }
-            if (p->timer <= 44 && !(p->timer & 15)) {
+            if ((p->timer <= 44) && (!(p->timer & 15))) {
                 struct SceneVec position;
                 AddVector(&position, &p->target, p->base);
-                AnimatedParticles_EmitBurst(&position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4, 4, 4, 4);
+                AnimatedParticles_EmitBurst(&position, *((s16 *)(((u8 *)p) + 0xb0)), 0, 64, 4, 4, 4,
+                                            4);
             }
-            if (++p->timer > 90) {
+            if ((++p->timer) > 90) {
                 SetState(p, 4);
                 *enter = 1;
             }
             break;
+
         case 4:
             SetFlags(p, 8);
             MotionTrack_Update(p->motion);
@@ -188,20 +195,21 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 p->enter = 1;
             }
             break;
+
         case 5:
             SetFlags(p, 8);
-            if (++p->timer > 30) {
+            if ((++p->timer) > 30) {
                 SetState(p, 6);
                 p->enter = 1;
             }
             break;
+
         case 6:
             SetFlags(p, 8);
             p->finished = 1;
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartPairedStrike);
 #endif

@@ -1,9 +1,10 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 88.5%
+// fix.py best version (reprinted C)
 // confidence=low: coordinates player positioning and release.
 
-#ifdef NONMATCHING
-// fuzzy: 87.5%
 // Remaining differences: release-target vector/address lifetimes and RNG register allocation.
 #include "engine.h"
 
@@ -153,13 +154,21 @@ static inline void FindReleaseTarget(struct Hresvelgr *actor, struct Vec *out)
     }
 }
 // confidence=low: coordinates player positioning, landing, and release.
+static inline u8 PlayerCanMove_1(struct Player *p)
+{
+    u8 result = 0;
+    if (!(p->flags & 0x40000))
+        result = 1;
+    return result;
+}
+
 void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 {
     struct Hresvelgr *saved = actor;
     struct Action *action = &actor->action;
     if (actor->pending) {
         actor->pending = 0;
-        if (PlayerCanMove(actor->player, 0x40000)) {
+        if (PlayerCanMove_1(actor->player)) {
             Player_BeginPositionRequest(actor->player, actor->requestedPosition, 0, 0, 0, 0, 1, 0,
                                         64);
             ActionState_Reset(action);
@@ -173,13 +182,14 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
     }
     switch (action->state) {
         case 0:
-            if (++action->frame > 1) {
+            if ((++action->frame) > 1) {
                 if (PlayerHasFlag(actor->player, 0x1000))
                     ActionState_AdvanceState(action);
                 else
                     ActionState_SetState(action, 6);
             }
             break;
+
         case 1:
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 0);
@@ -189,6 +199,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (actor->pulse)
                 ActionState_AdvanceState(action);
             break;
+
         case 2:
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 1);
@@ -200,7 +211,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 ActionState_AdvanceState(action);
             else {
                 struct Vec delta;
-                s32 x = (RandomValue(gUnk_0203B400) >> 3) & 31;
+                u8 x = (RandomValue(gUnk_0203B400) >> 3) & 31;
                 s32 z = (RandomValue(gUnk_0203B400) >> 3) & 31;
                 SetVector(&delta, x - 16, 0, z - 16);
                 actor->velocity = saved->step;
@@ -214,6 +225,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                     Math_ApproachEighth(actor->position.z, saved->target.z) - actor->position.z;
             }
             break;
+
         case 3: {
             u32 y;
             if (!action->frame) {
@@ -222,7 +234,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 Sound_PlaySong(0x3dd);
             }
             y = actor->position.y;
-            if (y <= (u32)Height(&actor->position)) {
+            if (y <= ((u32)Height(&actor->position))) {
                 actor->position.y = Height(&actor->position);
                 ActionState_AdvanceState(action);
             } else {
@@ -238,18 +250,20 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             }
             break;
         }
+
         case 4: {
             u32 amount;
             if (!action->frame)
                 Sound_PlaySong(0x3df);
             amount = 30 - action->frame;
-            Camera_RequestShake(amount * amount >> 2);
-            if (++action->frame > 29) {
+            Camera_RequestShake((amount * amount) >> 2);
+            if ((++action->frame) > 29) {
                 Sound_PlaySong(0x4f4);
                 ActionState_AdvanceState(action);
             }
             break;
         }
+
         case 5:
             if (!action->frame) {
                 Hresvelgr_SetAnimation(saved, saved->animation, saved->animationData, 12, 2, 0);
@@ -260,12 +274,12 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (actor->pulse)
                 ActionState_AdvanceState(action);
             break;
+
         case 6:
             actor->finished = 1;
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
 #endif

@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 94.0%
+// fix.py best version (reprinted C)
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 92.2%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -32,15 +33,18 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
                                struct VanargandPart *base, u32 one)
 {
     struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
+    const volatile u16 *command;
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = base->sequence.commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -49,7 +53,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->sprite.flags |= 4;
         else
             owner->sprite.flags &= ~4;
@@ -64,7 +68,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->sprite.flags |= 8;
         else
             owner->sprite.flags &= ~8;
@@ -72,7 +76,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r2");
+        register u16 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -127,16 +131,16 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         } else {
@@ -145,6 +149,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     return ended;
 }
+
 // confidence=low: paired part travels to an impact point and emits a burst.
 void MotionTrack_Update(void *);
 s32 ScenePair_CountPositiveCounters(void *);
@@ -212,8 +217,8 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     u32 zero = 0;
                     *enter = zero;
                     asm("" : "+r"(zero));
-                    Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 8, (u8)p->variant,
-                                     zero);
+                    Anim_SetSequence(&p->sequence, *((void **)(savedBoss + 0x4d0)), 8,
+                                     (u8)p->variant, zero);
                 }
             }
             if (StepPlayback(p, &p->sequence, p, 1)) {
@@ -221,6 +226,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                 *enter = 1;
             }
             break;
+
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
@@ -242,6 +248,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             }
             break;
         }
+
         case 2:
             entering = p->enter;
             asm("" : "+r"(entering));
@@ -258,8 +265,8 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             }
             MotionTrack_Update(p->motion);
             if (Ended(p)) {
-                if (ScenePair_CountPositiveCounters(savedBoss) == 2 &&
-                    savedBoss[p->variant == 1 ? 0x205 : 0x421] == 12) {
+                if ((ScenePair_CountPositiveCounters(savedBoss) == 2) &&
+                    (savedBoss[(p->variant == 1) ? (0x205) : (0x421)] == 12)) {
                     struct SceneVec point;
                     Sound_PlaySong(0x1ba);
                     Add(&point, p->basePosition, &p->target);
@@ -268,7 +275,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     SetState(p, 3);
                 } else {
                     Sound_PlaySong(0x3d9);
-                    AnimatedParticles_EmitBurst((u8 *)p + 0x1c, p->particleAngle, 0, 64, 4, 4, 4,
+                    AnimatedParticles_EmitBurst(((u8 *)p) + 0x1c, p->particleAngle, 0, 64, 4, 4, 4,
                                                 4);
                     SetState(p, 3);
                 }
@@ -277,12 +284,12 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             } else if (!(savedFrame & 1))
                 Vanargand_EmitPartTrail(p);
             break;
+
         case 3:
             p->finished = 1;
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartImpact);
 #endif

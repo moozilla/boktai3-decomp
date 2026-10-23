@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 72.1%
+// fuzzy: 86.5%
+// fix.py best version (reprinted C)
 // Remaining differences: vector alias lifetimes, timer/track spills and register allocation.
 // confidence=low: starts a target-directed motion track and emits afterimages.
 #define Vanargand_UpdateTargetDash sub_081A9178
@@ -51,7 +52,8 @@ static inline void SetVector(s16 *v, s32 x, s32 y, s32 z)
 }
 static inline void AddVector(s16 *v, s16 *a, s16 *b)
 {
-    u16 av = a[0], bv = b[0];
+    u16 av = a[0];
+    s8 bv = b[0];
     v[0] = av + bv;
     av = b[1];
     bv = a[1];
@@ -60,6 +62,7 @@ static inline void AddVector(s16 *v, s16 *a, s16 *b)
     bv = b[2];
     v[2] = av + bv;
 }
+
 static inline u8 IsComplete(struct DashActor *p)
 {
     u8 result = 0;
@@ -80,13 +83,13 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
     if (result)
         return;
     phase = &p->phase;
-    asm("" : "+r"(phase));
+    asm("" : "+r"(&p->phase));
     if (p->pendingAnimation) {
         p->pendingAnimation = result;
-        *phase = result;
+        *(&p->phase) = result;
         p->timer = result;
     }
-    switch (*phase) {
+    switch (*(&p->phase)) {
         case 0:
             if (p->timer == 0) {
                 SceneActors_StartUnmirroredAnimation(p, p->animation, p->drawable, 4, 1, 0);
@@ -94,23 +97,26 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
                 p->timer++;
             }
             if (p->frame > 10) {
-                *phase = 1;
+                *(&p->phase) = 1;
                 p->timer = 0;
             }
             break;
+
         case 1:
             if (p->timer == 0) {
                 void *track = p->track;
                 s16 *target = p->target;
-                s16 center[4], destination[4];
-                s32 dx, dz;
+                s16 center[4];
+                s16 destination[4];
+                s32 dx;
+                s32 dz;
                 s16 *first;
                 SetVector(center, 640, 768, 640);
                 first = center;
                 asm("" : "+r"(first));
                 dx = first[0] - target[0];
                 dz = 640 - target[2];
-                if (dx * dx + dz * dz <= 0x100000) {
+                if (((dx * dx) + (dz * dz)) <= 0x100000) {
                     MotionTrack_Initialize(track, p->position, target, 0, 3);
                 } else {
                     s32 radius = 1024;
@@ -129,12 +135,13 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             if (IsComplete(self)) {
                 u8 next = 2;
                 u32 zero = 0;
-                *phase = next;
+                *(&p->phase) = next;
                 p->timer = zero;
             } else {
                 VanargandAfterimagePool_Spawn(self->afterimages, p->position);
             }
             break;
+
         case 2:
             p->finished = 1;
             break;

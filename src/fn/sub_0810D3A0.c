@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.5%
+// fuzzy: 89.1%
+// fix.py best version (reprinted C)
 // Open: GetSelectionCount sets its 0 result before the tests, and the clamped
 // store reuses the &s->count address instead of recomputing it after the join.
 #define SpriteGroup_Initialize PanelSequence_InitializeSprites
@@ -46,14 +47,18 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetSelectionCount(void)
 {
     struct PanelSelection *p = gUnk_020004B4;
-    if (p && p->type == 1)
-        return &p->count;
+    if (p && (p->type == 1))
+        goto ret1;
     return 0;
+ret1:
+    return &p->count;
 }
+
 s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
 {
     u8 *count;
     int n;
+    typeof(*count) t1;
     if (Script_SeekToKeyword('s')) {
         s->source = Script_GetTextSourcePc();
         if (!s->source)
@@ -73,10 +78,9 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     count = GetSelectionCount();
     if (!count)
         return -1;
-    *(volatile u8 *)&s->count = *count;
-    n = *(volatile u8 *)&s->count;
-    if (n > 10)
-        n = 10;
+    t1 = *count;
+    *((volatile u8 *)(&s->count)) = t1;
+    n = (n > 10) ? (10) : (*((volatile u8 *)(&s->count)));
     s->count = n;
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);

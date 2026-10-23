@@ -1,12 +1,13 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 89.3%
+// fix.py best version (reprinted C)
 // confidence=low: dispatches pending scene messages into action and animation state.
 
 // confidence=low: dispatches scene messages into action and animation state.
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 87.5%
 // Remaining differences: trigger indexing and shared mode/action constant lifetimes.
 // confidence=low: dispatches pending cutscene messages into action and animation state.
 struct Vec {
@@ -90,6 +91,31 @@ static inline void SetAction(struct Hresvelgr *p, u8 action, void (*callback)(vo
     p->phase = 0;
     p->phaseFrame = 0;
 }
+static inline void SetMode_1(struct Hresvelgr *p, u32 parameter, u32 one)
+{
+    {
+        u8 k1 = 2;
+        p->mode = k1;
+    }
+    p->modePhase = 0;
+    p->modeParameter = parameter;
+    p->modeFrame = 0;
+    p->modeEntered = one;
+}
+
+static inline void SetAction_1(struct Hresvelgr *p, void (*callback)(void *))
+{
+    {
+        u8 k1 = 0x1f;
+        p->action = k1;
+    }
+    p->callback = callback;
+    p->actionFrame = 0;
+    p->entered = 1;
+    p->phase = 0;
+    p->phaseFrame = 0;
+}
+
 void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 {
     struct Hresvelgr *actor = p;
@@ -98,38 +124,44 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
     for (; i < trigger->count[gUnk_0200047C->active]; i++) {
         register void (*callback)(void *) asm("r1");
         register u32 action asm("r0");
-        struct Message *message =
-            *(struct Message **)((gUnk_0200047C->active << 4) + (i << 2) + (u8 *)trigger + 8);
+        struct Message *message = *(
+            (struct Message **)((((gUnk_0200047C->active << 4) + (i << 2)) + ((u8 *)trigger)) + 8));
         SceneMessages_SetPendingTrigger(trigger, message);
         switch (message->command) {
             case 0:
-                SetMode(p, 2, 0, 0, 1);
+                SetMode_1(p, 0, 1);
                 callback = Hresvelgr_OnActionTwentyEight;
                 action = 0x1c;
                 goto setAction;
+
             case 1:
                 SetMode(p, 2, 0, 1, 1);
                 callback = Hresvelgr_BeginRestAnimation;
                 action = 0x1d;
                 goto setAction;
+
             case 19:
                 SetMode(p, 2, 0, 2, 1);
                 callback = Hresvelgr_UpdateRandomAnimation;
                 action = 0x1e;
             setAction:
                 SetAction(p, action, callback);
+
                 break;
+
             case 26:
                 actor->colliderDirection = 1;
                 SetMode(p, 2, 0, 3, 1);
-                SetAction(p, 0x1f, Hresvelgr_UpdateRisingProjectile);
+                SetAction_1(p, Hresvelgr_UpdateRisingProjectile);
                 break;
+
             case 9:
                 SceneActors_ConfigureEffect(p, message->args[0], 180, 180);
                 Trigger_ConsumePending(&p->trigger, 1);
                 break;
+
             case 5:
-                p->heading = (*(u8 *)message->args + 5) << 5;
+                p->heading = ((*((u8 *)message->args)) + 5) << 5;
                 p->direction4 = 3 & ((p->heading + 0x60) >> 6);
                 p->direction8 = 7 & ((p->heading + 0x70) >> 5);
                 actor->colliderDirection = p->direction4 >> 1;
@@ -137,6 +169,7 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
                                        actor->sequence, actor->animationFlags, actor->scale);
                 Trigger_ConsumePending(&p->trigger, 1);
                 break;
+
             case 2:
                 p->position.x = message->args[0];
                 p->position.y = message->args[1];
@@ -149,7 +182,6 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
 #endif

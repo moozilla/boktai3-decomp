@@ -2,9 +2,10 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-// confidence=low: moves the part along its stored retreat angle, then returns to idle.
 #ifdef NONMATCHING
-// fuzzy: 97.0%
+// fuzzy: 98.4%
+// fix.py best version (reprinted C)
+// confidence=low: moves the part along its stored retreat angle, then returns to idle.
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -166,13 +167,12 @@ static inline void AddPlanar(struct SceneVec *v, struct SceneVec *origin)
 // confidence=low: action role inferred from local motion and animation.
 void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
 {
-    register u8 *boss asm("r8") = bossArg;
     u32 mask = 12;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
         {
-            void *resource = *(void **)(boss + 0x4d0);
+            void *resource = *((void **)(bossArg + 0x4d0));
             asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 11, (u8)p->variant, 0);
         }
@@ -197,7 +197,7 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
                 enter = &p->enter;
                 if (entering) {
                     *enter = 0;
-                    Vector(&target, *((u8 *)p + 0x187), 128);
+                    Vector(&target, *(((u8 *)p) + 0x187), 128);
                     AddPlanar(&target, &p->origin);
                     target.y = p->origin.y;
                     MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
@@ -214,15 +214,16 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
                 }
                 break;
             }
+
             case 1:
                 if (p->enter) {
                     p->enter = 0;
+                    asm("" : "+r"(state));
                     {
-                        void *resource = *(void **)(boss + 0x4d0);
+                        void *resource = *((void **)(bossArg + 0x4d0));
                         asm("" : "+r"(resource));
                         Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
                     }
-                    asm("" : "+r"(state));
                     StepSequence(p, state);
                 }
                 p->finished = 1;

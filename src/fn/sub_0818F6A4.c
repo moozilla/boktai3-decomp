@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.9%
+// fuzzy: 92.0%
+// fix.py best version (reprinted C)
 // Remaining differences: state dispatch, coordinate lifetimes and register allocation.
 #include "global.h"
 #include "display_animation.h"
@@ -183,12 +184,12 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
     u8 *state;
     Nidhoggr_StepAnimation(p);
     age = &p->age;
-    if (!(*age & 3))
+    if (!((*age) & 3))
         Nidhoggr_CreatePalette426Effect(p->boss + 0x54, &p->sprite.position);
     state = &p->state;
     switch (*state) {
         case 0:
-            if (*age > 15) {
+            if ((*age) > 15) {
                 *state = 1;
                 p->anchor = 0;
                 p->velocity.x = 0;
@@ -198,69 +199,80 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
             } else
                 p->velocity.y += 0x33;
             break;
+
         case 1:
-            if (p->sprite.position.y - p->ground > 0x1000) {
+            if ((p->sprite.position.y - p->ground) > 0x1000) {
                 register u8 *boss asm("r9") = p->boss;
                 struct NidhoggrVector *position;
                 register struct NidhoggrVector *savedPosition asm("r8");
-                u16 *xField, *zField;
+                u16 *xField;
+                u16 *zField;
                 u16 value;
-                int x, z, index, slope, height;
+                int x;
+                int z;
+                int index;
+                int slope;
+                int height;
                 u8 *c;
                 struct NidhoggrVector v;
-                value = *(u16 *)(gUnk_02000710 + 0x30);
-                xField = (u16 *)&p->sprite.position.x;
+                value = *((u16 *)(gUnk_02000710 + 0x30));
+                xField = (u16 *)(&p->sprite.position.x);
                 *xField = value;
-                value = *(u16 *)(gUnk_02000710 + 0x34);
-                zField = (u16 *)&p->sprite.position.z;
-                *zField = value;
+                value = *((u16 *)(gUnk_02000710 + 0x34));
+                zField = (u16 *)(&p->sprite.position.z);
+                *((u16 *)(&p->sprite.position.z)) = value;
                 p->velocity.y = -0x33;
                 (*state)++;
-                Anim_RestartSequence(&p->sequence, *(void **)(boss + 0x5400), 4, 0, 0);
+                Anim_RestartSequence(&p->sequence, *((void **)(boss + 0x5400)), 4, 0, 0);
                 position = &p->sprite.position;
                 x = position->x >> 8;
                 z = position->z >> 8;
                 savedPosition = position;
                 asm("" : "+r"(savedPosition));
-                if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+                if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) ||
+                    (((u32)z) >= gUnk_030052FC))
                     index = 0;
                 else
                     index = gUnk_030052F4->rows[z] + x;
                 c = cell(index);
-                slope = *c >> 4;
-                height = (*c & 15) << 8;
+                slope = (*c) >> 4;
+                height = ((*c) & 15) << 8;
                 switch (slope) {
                     case 1:
                         height -= (u8)position->z;
                         break;
+
                     case 2:
                         height -= (u8)position->x;
                         break;
                 }
+
                 p->ground = height;
                 {
                     struct EffectCollider {
                         u8 pad[6];
                         u16 flags;
                     };
-                    struct EffectCollider *collider = (void *)((u8 *)p + 0xcc);
+                    struct EffectCollider *collider = (void *)(((u8 *)p) + 0xcc);
                     u32 mask = ~4;
                     collider->flags &= mask;
                 }
-                ScaledShadow_Enable((u8 *)p + 0x60);
+                ScaledShadow_Enable(((u8 *)p) + 0x60);
                 v.x = savedPosition->x;
                 v.y = p->ground;
-                v.z = *zField;
+                v.z = *((u16 *)(&p->sprite.position.z));
                 EffectPool_CreateTimedEffect(boss + 0x54, &v);
             }
             break;
+
         case 2:
-            if (p->sprite.position.y - p->ground <= 0x87f) {
+            if ((p->sprite.position.y - p->ground) <= 0x87f) {
                 Sound_PlaySongChecked(0x1b5);
                 (*state)++;
             }
+
         case 3:
-            if (p->sprite.position.y < p->ground + 0x100) {
+            if (p->sprite.position.y < (p->ground + 0x100)) {
                 u8 *boss = p->boss;
                 struct NidhoggrVector v;
                 v.x = p->sprite.position.x;
@@ -276,12 +288,14 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                 goto destroy;
             }
             break;
+
         case 255: {
             u8 *boss = p->boss;
             Nidhoggr_CreateTimedPositionEffect(&p->sprite.position, boss);
         }
         destroy:
             p->update = 0;
+
             if (p->destroy) {
                 Callback_InvokeActor(p, p->destroy);
                 p->destroy = 0;
@@ -289,7 +303,6 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Nidhoggr_UpdateFallingAttackEffect);
 #endif

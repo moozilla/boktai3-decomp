@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fuzzy: 87.5%
+// fix.py best version (reprinted C)
 // Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
@@ -158,6 +159,11 @@ static inline void increment(u16 *v)
     else
         *v = 9999;
 }
+static inline u32 Arg1(u32 k_, struct Actor *p)
+{
+    return p->flags | k_;
+}
+
 void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
 {
     u8 params[0x1c];
@@ -168,7 +174,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         if (p->locked)
             facing(p, p->savedAngle);
         else {
-            Task_Kill(*(void **)((u8 *)p2 + 0xf20));
+            Task_Kill(*((void **)(((u8 *)p2) + 0xf20)));
             SceneActors_RunFirstEventScript(p, &p2->anchor);
         }
         clearFade((void *)p2->animationData);
@@ -178,7 +184,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         p2->scaleZ = 0;
         p2->scaleStep = 0;
         PlayerClone_BeginActiveReactions();
-        SunOrb_FadeOutAll(*(void **)((u8 *)p2 + 0xf2c));
+        SunOrb_FadeOutAll(*((void **)(((u8 *)p2) + 0xf2c)));
         Sound_StopSong(0x56b);
         Sound_StopSong(0x569);
         Sound_StopSong(0x570);
@@ -199,7 +205,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         Sound_PlaySong(0x33a);
         SceneActors_StartAnimation(p, p2->animationData, p2->animation, 28, 0, 4);
     }
-    if ((Mod(tick, 16) == 0 || tick > 136) && tick <= 150) {
+    if (((Mod(tick, 16) == 0) || (tick > 136)) && (tick <= 150)) {
         s32 i = 1;
         do {
             u16 speed = randomA() & 15;
@@ -210,38 +216,37 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             spawn = p->position;
             position->x -= 128;
             position->y += 64;
-            variant <<= 12;
             drift <<= 12;
+            variant <<= 12;
             Ratatosk_InitAnimatedParticleParams(params);
             Ratatosk_ConfigureAnimatedParticle(params, (randomA() & 31) + 292, speed, angle, 1,
                                                variant, drift);
             sub_081FC26C(params, position);
-        } while (--i >= 0);
+        } while ((--i) >= 0);
     }
     if (tick == 440) {
         if (!p->locked) {
             s32 value;
             SceneActors_RunSecondEventScript(p, &p2->anchor);
-            sub_08159164(U(0xed2));
+            sub_08159164(*((u16 *)(((u8 *)p2) + 0xed2)));
             GameState_SetEventFlag(0x51);
             increment((u16 *)(gUnk_02000710 + 0x87c));
             increment((u16 *)(gUnk_02000710 + 0x538));
             increment((u16 *)(gUnk_02000710 + 0x55e));
-            value = *(s16 *)(gUnk_02000710 + 0x592) + 1;
+            value = (*((s16 *)(gUnk_02000710 + 0x592))) + 1;
             if (value > 9999)
                 value = 9999;
             else if (value < 0)
                 value = 0;
-            *(u16 *)(gUnk_02000710 + 0x592) = value;
+            *((u16 *)(gUnk_02000710 + 0x592)) = value;
         }
         p->finished = 1;
     }
     {
-        u32 value = p->flags | 15;
-        p->flags = value & ~16;
+        u32 value = Arg1(15, p);
+        p->flags = value & (~16);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDefeatSequence);
 #endif

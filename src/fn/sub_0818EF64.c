@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.8%
+// fuzzy: 86.7%
+// fix.py best version (reprinted C)
 // Remaining differences: owner allocation, packed-coordinate temporaries and pointer copies.
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
@@ -146,24 +147,23 @@ void Nidhoggr_StepMovingSpriteEffect(struct NidhoggrAnimatedSlot *ownerArg)
     position->y = position->y + motion->y;
     position->z = position->z + motion->z;
     {
-        u32 low = (u32)(-((s16)motion->x >> 4)) << 16;
-        u32 high = (u32)(-((s16)owner->motion.y >> 4) - 8) << 16;
+        u32 low = ((u32)(-(((s16)motion->x) >> 4))) << 16;
+        u32 high = ((u32)((-(((s16)owner->motion.y) >> 4)) - 8)) << 16;
         asm("" : "+r"(low), "+r"(high));
         delta.packed[0] = (low >> 16) | high;
     }
-    delta.bits.z = -((s16)owner->motion.z >> 4);
+    delta.bits.z = -(((s16)owner->motion.z) >> 4);
     motion->x = delta.words.x + motion->x;
     motion->y = delta.words.y + motion->y;
-    motion->z = delta.words.z + motion->z;
-    if (--owner->lifetime == 0) {
+    if ((--owner->lifetime) == 0) {
         owner->update = 0;
         if (owner->onComplete) {
             Callback_InvokeActor(owner, owner->onComplete);
             owner->onComplete = 0;
         }
     }
+    motion->z = delta.words.z + motion->z;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Nidhoggr_StepMovingSpriteEffect);
 #endif

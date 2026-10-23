@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 70.4%
+// fuzzy: 89.9%
+// fix.py best version (reprinted C)
 // confidence=low: coordinates paired animations with an offset motion track.
 #define Vanargand_UpdateMovingPairAttack sub_081A93A0
 struct MovingPairActor {
@@ -61,12 +62,12 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
 {
     struct MovingPairActor *self = p;
     u32 mask = 0x40;
-    u8 result;
+    u32 result;
     p->flags |= mask;
     Vanargand_SetPendingCue(p, 0);
-    result = Callback_InvokeActor(p, p->callback);
     if (result)
         return;
+    result = Callback_InvokeActor(p, p->callback);
     if (p->pendingAnimation) {
         p->pendingAnimation = result;
         p->phase = result;
@@ -87,6 +88,7 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
                 p->timer = 0;
             }
             break;
+
         case 1: {
             u32 mask = 4;
             p->flags |= mask;
@@ -114,10 +116,12 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
             }
             break;
         }
+
         case 3:
             p->finished = 1;
             PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 2);
             break;
+
         case 2:
             p->finished = 1;
             {

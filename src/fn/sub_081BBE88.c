@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.1%
+// fuzzy: 96.3%
+// fix.py best version (reprinted C)
 // Provisional: SolarBank rate display setup (loads CB05 resources 32BA/530D,
 // rate digits, widget rows, two A47C sprites). Remaining: resA/resB spill
 // slots swapped and loop zero/counter registers swapped.
@@ -64,8 +65,10 @@ void sub_081BBE88(struct SolarBankDisplay *p)
 {
     struct Res *res;
     struct Pos pos;
-    s32 v, tens, i, j;
-
+    s32 v;
+    s32 tens;
+    s32 i;
+    s32 j;
     res = ScriptProc_Start(0xCB05, 0x32BA);
     p->resA = *res;
     ResourceHeader_Relocate(&p->resA, res);
@@ -75,20 +78,21 @@ void sub_081BBE88(struct SolarBankDisplay *p)
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
-    j = 0;
     Widget_InitLinked(&p->w58, &p->resA, 0, 0x30, j, j, 0x3C, &pos);
+    j = 0;
     if (Script_SeekToKeyword(0x52)) {
         s32 rate = Script_GetValue();
         if (rate < 0)
             rate = 0;
         if (rate > 13)
             rate = 13;
-        *(s16 *)(gUnk_02000710 + 0x598) = rate + 0x41;
-    } else if (*(s16 *)(gUnk_02000710 + 0x598) == 0) {
+        *((s16 *)(gUnk_02000710 + 0x598)) = rate + 0x41;
+    } else if ((*((s16 *)(gUnk_02000710 + 0x598))) == 0) {
         s32 sec = SunClock_GetSecond();
-        *(s16 *)(gUnk_02000710 + 0x598) = Mod(*(u32 *)(gUnk_02000710 + 0x614) ^ sec, 13) + 0x41;
+        *((s16 *)(gUnk_02000710 + 0x598)) =
+            Mod((*((u32 *)(gUnk_02000710 + 0x614))) ^ sec, 13) + 0x41;
     }
-    v = ((100 * *(s16 *)(gUnk_02000710 + 0x598)) >> 6) - 100;
+    v = ((100 * (*((s16 *)(gUnk_02000710 + 0x598)))) >> 6) - 100;
     tens = Div(v, 10);
     v -= tens * 10;
     Widget_InitLinked(&p->w118, &p->resA, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);
@@ -99,19 +103,21 @@ void sub_081BBE88(struct SolarBankDisplay *p)
     pos.x = -8;
     pos.y = -8;
     Widget_InitLinked(&p->wB8, &p->resB, 0x4B, 0x10, 0, 0, 0x3C, &pos);
-    *(void **)((u8 *)p + 0x100) = (u8 *)p + 0x710;
+    *((void **)(((u8 *)p) + 0x100)) = ((u8 *)p) + 0x710;
     pos.x = 0x28;
     pos.y = 0x28;
     for (j = 0; j < 4; j++) {
         Widget_InitLinked(&p->w238[j], &p->resB, 0, 0x30, 0, 0, 0x3C, &pos);
         pos.x += 8;
     }
+
     pos.x = 0x88;
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
         Widget_InitLinked(&p->w3B8[i], &p->resB, 0, 0x30, 0, 0, 0x3C, &pos);
         pos.x += 8;
     }
+
     for (i = 0; i < 2; i++) {
         AnimData_Load(&p->anims[i], 0xA47C);
         Sprite_Init(&p->sprites[i], &p->anims[i], 0);
@@ -121,11 +127,12 @@ void sub_081BBE88(struct SolarBankDisplay *p)
             p->sprites[0].flags |= 4;
         if (i == 1)
             AnimData_SelectPaletteBank(&p->anims[1], 0x1B1);
-        p->sprites[i].x = 0x38 + i * 0x60;
+        p->sprites[i].x = 0x38 + (i * 0x60);
         p->sprites[i].y = 0x58;
         p->sprites[i].z = 0;
     }
-    Widget_InitLinked(&p->w538, &p->resA, 0x21, 0x30, 0, 0, 0x3C, NULL);
+
+    Widget_InitLinked(&p->w538, &p->resA, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
     Pos_Set(&pos, -0x85, -0x18, 0);
     Widget_InitLinked(&p->w598, &p->resB, 0x7E, 0x30, 0, 0, 0x3C, &pos);
     Widget_InitLinked(&p->w5F8, &p->resB, 0x7F, 0x30, 0, 0, 0x3C, &pos);

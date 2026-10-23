@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fuzzy: 93.6%
+// fix.py best version (reprinted C)
 // Open: the seed address takes r7 for the first sample, so the 0x1f mask is rematerialized
 // instead of shared in r7, and the parameter-pointer spill is set up later than in the ROM.
 #include "scene_vec.h"
@@ -35,7 +36,7 @@ static inline s32 PaletteIndex(s32 state, s32 parameter)
 void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
 {
     struct SceneVec velocity;
-    u32 index;
+    u16 index;
     u16 counter;
     if (object->counter == 0) {
         register s32 i asm("r6") = 0;
@@ -46,13 +47,15 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
         s16 *parameterPtr = &object->parameter;
         register s32 zero asm("r5") = 0;
         do {
-            s32 kind = (i & 1) ? 0x400 : 0x200;
-            u32 table = RANDOM_TABLE_ADDR;
-            s32 x, y, z;
+            s32 kind = (i & 1) ? (0x400) : (0x200);
+            u32 table = 0x0203B400;
+            s32 x;
+            s32 y;
+            s32 z;
             register u32 index asm("r1");
             s32 threshold;
             asm("" : "+r"(table) : "r"(index));
-            index = (gRandomIndex + 1) & mask;
+            index = (gUnk_03005308 + 1) & mask;
             x = (Sample(table, index) >> 4) & 0x1f;
             index = (index + 1) & mask;
             y = (Sample(table, index) >> 4) & 0x1f;
@@ -65,7 +68,7 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
             v->y = y;
             v->z = z;
             index = (index + 1) & mask;
-            gRandomIndex = index;
+            gUnk_03005308 = index;
             threshold = ((Sample(table, index) >> 4) & 0x7f) + 0x20;
             sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, zero,
                          PaletteIndex(*statePtr, *parameterPtr), zero, i & 1, zero, zero, zero,
@@ -74,9 +77,9 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
         } while (i <= 3);
     }
     counter = object->counter;
-    index = (gRandomIndex + 1) & 0x3ff;
-    gRandomIndex = index;
-    if (counter >= (s32)(((Sample(RANDOM_TABLE_ADDR, index) >> 4) & 0x7f) + 0x20))
+    index = (gUnk_03005308 + 1) & 0x3ff;
+    gUnk_03005308 = index;
+    if (counter >= ((s32)(((Sample(0x0203B400, index) >> 4) & 0x7f) + 0x20)))
         Task_Kill(object);
     else
         object->counter++;

@@ -3,7 +3,8 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.7%
+// fuzzy: 88.4%
+// fix.py best version (reprinted C)
 struct TerrainPos {
     s16 x, y, z;
 };
@@ -29,17 +30,30 @@ static inline s32 cellIndex(struct TerrainPos *pos)
 
 u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
 {
-    u16 toIndex, fromIndex;
-    u8 *toCell, *fromCell, *cell, *other, *found;
+    u16 toIndex;
+    u16 fromIndex;
+    u8 *toCell;
+    u8 *fromCell;
+    u8 *cell;
+    u8 *other;
+    u8 *found;
     u16 toFlags;
     u32 mask;
-    s32 limit, diff, n;
-    u32 fromKind, toKind;
+    s32 limit;
+    s32 diff;
+    s32 n;
+    u32 fromKind;
+    u32 toKind;
     u32 height;
-
     toIndex = cellIndex(to);
-    CELL_AT(toCell, toIndex);
-    toFlags = *(u16 *)(toCell + 2);
+    {
+        u8 *found = TerrainModifiers_FindCellOverride(toIndex, 1);
+        if (found)
+            toCell = found + 4;
+        else
+            toCell = (gUnk_030052F4->cells + 12) + (toIndex * 4);
+    };
+    toFlags = *((u16 *)(toCell + 2));
     if (kind == 4) {
         mask = 2;
         limit = 0x80;
@@ -48,19 +62,25 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         limit = 100;
     }
     if (toFlags & mask)
-        return 0;
+        goto ret1;
     if (sub_0821BE3C(from, to) > limit)
-        return 0;
+        goto ret1;
     fromIndex = cellIndex(from);
-    CELL_AT(fromCell, fromIndex);
-    fromKind = *fromCell >> 4;
-    toKind = *toCell >> 4;
+    {
+        u8 *found = TerrainModifiers_FindCellOverride(fromIndex, 1);
+        if (found)
+            fromCell = found + 4;
+        else
+            fromCell = (gUnk_030052F4->cells + 12) + (fromIndex * 4);
+    };
+    fromKind = (*fromCell) >> 4;
+    toKind = (*toCell) >> 4;
     diff = toIndex - fromIndex;
     if (fromKind == 1) {
-        if (diff != 1 && diff != -1)
+        if ((diff != 1) && (diff != (-1)))
             return 1;
         if ((gUnk_02000710->flags868 & 0x10) && (toFlags & 0x80))
-            return 0;
+            goto ret1;
         if (toKind != 0)
             return 1;
         if ((to->z & 0xFF) <= 0x7F) {
@@ -73,19 +93,19 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         if (found)
             cell = found + 4;
         else
-            cell = gUnk_030052F4->cells + 12 + n * 4;
-        if (*cell >> 4)
-            return 0;
-        if ((*cell & 15) != (*toCell & 15))
-            return 0;
-        if (*(u16 *)(cell + 2) & mask)
-            return 0;
+            cell = (gUnk_030052F4->cells + 12) + (n * 4);
+        if ((*cell) >> 4)
+            goto ret1;
+        if (((*cell) & 15) != ((*toCell) & 15))
+            goto ret1;
+        if ((*((u16 *)(cell + 2))) & mask)
+            goto ret1;
         return 1;
     } else if (fromKind == 2) {
-        if (diff != gUnk_030052F8 && diff != -gUnk_030052F8)
+        if ((diff != gUnk_030052F8) && (diff != (-gUnk_030052F8)))
             return 1;
         if ((gUnk_02000710->flags868 & 0x10) && (toFlags & 0x80))
-            return 0;
+            goto ret1;
         if (toKind != 0)
             return 1;
         if ((to->x & 0xFF) <= 0x7F) {
@@ -98,16 +118,16 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         if (found)
             cell = found + 4;
         else
-            cell = gUnk_030052F4->cells + 12 + n * 4;
-        if (*cell >> 4)
-            return 0;
-        if ((*cell & 15) != (*toCell & 15))
-            return 0;
-        if (*(u16 *)(cell + 2) & mask)
-            return 0;
+            cell = (gUnk_030052F4->cells + 12) + (n * 4);
+        if ((*cell) >> 4)
+            goto ret1;
+        if (((*cell) & 15) != ((*toCell) & 15))
+            goto ret1;
+        if ((*((u16 *)(cell + 2))) & mask)
+            goto ret1;
         return 1;
     } else {
-        if (diff == gUnk_030052F8 || diff == -gUnk_030052F8) {
+        if ((diff == gUnk_030052F8) || (diff == (-gUnk_030052F8))) {
             if (toKind != 2)
                 return 1;
             if ((to->x & 0xFF) <= 0x7F) {
@@ -120,8 +140,8 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             if (found)
                 cell = found + 4;
             else
-                cell = gUnk_030052F4->cells + 12 + n * 4;
-        } else if (diff == 1 || diff == -1) {
+                cell = (gUnk_030052F4->cells + 12) + (n * 4);
+        } else if ((diff == 1) || (diff == (-1))) {
             if (toKind != 1)
                 return 1;
             if ((to->z & 0xFF) <= 0x7F) {
@@ -134,17 +154,19 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             if (found)
                 cell = found + 4;
             else
-                cell = gUnk_030052F4->cells + 12 + n * 4;
+                cell = (gUnk_030052F4->cells + 12) + (n * 4);
         } else
             return 1;
-        if (*cell >> 4)
-            return 0;
-        if ((*cell & 15) != (*fromCell & 15))
-            return 0;
-        if (*(u16 *)(cell + 2) & mask)
-            return 0;
+        if ((*cell) >> 4)
+            goto ret1;
+        if (((*cell) & 15) != ((*fromCell) & 15))
+            goto ret1;
+        if ((*((u16 *)(cell + 2))) & mask)
+            goto ret1;
         return 1;
     }
+ret1:
+    return 0;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0821BF5C);

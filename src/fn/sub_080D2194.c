@@ -1,7 +1,8 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.5%
 // MATCHING_CONCESSION: register-pinning
+#ifdef NONMATCHING
+// fuzzy: 88.7%
+// fix.py best version (reprinted C)
 // Control-pointer allocation, spill ordering, and initial flag operations still differ.
 #include "scene_actor_chase.h"
 // confidence=low: recovery animation restores retreat, chase, or the saved route.
@@ -56,28 +57,28 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
 }
 void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct RecoverySequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
+    struct RecoverySequence *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
     u16 *reactionFlags;
     if (actor->field2B2)
         actor->field2B2 = 0;
     SetFlags(&actor->flags2D6, 0x10);
-    reactionFlags = &actor->flags2D6;
-    if (frame <= 0x11 && !sequence->frame && sequence->timer == (sequence->mode != 0) &&
-        sequence->mode != 1)
+    if ((((frame <= 0x11) && (!sequence->frame)) && (sequence->timer == (sequence->mode != 0))) &&
+        (sequence->mode != 1))
         sequence->timer = 0;
+    reactionFlags = &actor->flags2D6;
     if (actor->field2B3) {
-        u8 *group = (u8 *)&actor->group;
+        u8 *group = (u8 *)(&actor->group);
         actor->field2B0 = 1;
         if (MotionFlags(actor, 2)) {
             Chase_SetState(actor, 3, 0, 0);
-            Chase_SetCtl(actor, *(void **)((u8 *)actor + 0x5DC), 7);
+            Chase_SetCtl(actor, *((void **)(((u8 *)actor) + 0x5DC)), 7);
             ClearFlags(reactionFlags, 0x983);
             return;
         }
         if (MotionFlags(actor, 0x80)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             Chase_SetBehavior(actor, 14);
-            Chase_SetCtl(actor, *(void **)(group + 0x48), 0x25);
+            Chase_SetCtl(actor, *((void **)(group + 0x48)), 0x25);
             return;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -88,15 +89,15 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
             u32 mask = 0x10;
             actor->flags2CC |= mask;
         }
-        Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
+        Chase_SnapToRoute(*((struct ContactPosition **)(((u8 *)actor) + 0x5D4)),
+                          ((u8 *)actor) + 0x448);
         if (!TryRoute(actor, group)) {
             Chase_SetCtl(actor, (void *)SceneActorControl_OnIdle, 0);
             Chase_SetState(actor, 3, 0, 0);
         } else
-            (*(struct ContactPosition **)(group + 0x200))->pad = 1;
+            (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_ResumeRouteAfterRecovery);
 #endif

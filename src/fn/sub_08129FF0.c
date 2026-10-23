@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fuzzy: 88.2%
+// fix.py best version (reprinted C)
 // Pointer lifetimes, saved registers and terrain-height comparison still differ.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -212,10 +213,10 @@ static inline void StepDisc(struct Disc *p)
 // confidence=low: disc falls under gravity, then enters its impact state at terrain height.
 void SunDiscPool_UpdateFallingDisc(struct DiscPool *poolArg, struct Disc *p)
 {
-    register struct DiscPool *pool asm("sl") = poolArg;
     register struct Sprite *copy asm("r7") = (struct Sprite *)p;
     u16 height;
     struct Anim *anim = &p->anim;
+    u32 t1;
     asm("" : "+r"(copy));
     if (p->entered) {
         p->flags &= ~1;
@@ -226,31 +227,32 @@ void SunDiscPool_UpdateFallingDisc(struct DiscPool *poolArg, struct Disc *p)
     Step((struct Sprite *)p, copy, anim);
     p->velocity.y -= 4;
     {
-        struct Vec *position = &p->position, *velocity = &p->velocity;
+        struct Vec *position = &p->position;
+        struct Vec *velocity = &p->velocity;
         position->x = position->x + velocity->x;
         position->y = position->y + velocity->y;
         position->z = position->z + velocity->z;
     }
-    *(struct Packed *)&p->projected = *(struct Packed *)&p->position;
-    height = Height(&p->position);
+    *((struct Packed *)(&p->projected)) = *((struct Packed *)(&p->position));
+    t1 = Height(&p->position) << 16;
+    height = t1 >> 16;
     p->age++;
     if (p->position.y <= 0) {
         p->flags |= 1;
-        pool->allocated &= ~(1 << p->slot);
+        poolArg->allocated &= ~(1 << p->slot);
         Sprite_Remove(p);
         p->state = 0;
-    } else if (p->position.y <= (s16)height) {
+    } else if (p->position.y <= ((s16)height)) {
         p->position.y = height;
         p->velocity.x = 0;
         p->velocity.y = 0;
         p->velocity.z = 0;
         p->state = 3;
         p->entered = 1;
-        *(struct Packed *)&p->projected = *(struct Packed *)&p->position;
+        *((struct Packed *)(&p->projected)) = *((struct Packed *)(&p->position));
         Sound_PlaySong(242);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", SunDiscPool_UpdateFallingDisc);
 #endif

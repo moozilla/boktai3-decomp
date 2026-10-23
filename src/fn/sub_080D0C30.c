@@ -1,14 +1,16 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 93.6%
+// fix.py best version (reprinted C)
 // confidence=low: records attack contacts and queues a timed reaction.
 #define Mummy_OnAttackCollision sub_080D0C30
-#ifdef NONMATCHING
-// fuzzy: 88.9%
-// Remaining differences: attack-kind lifetime, response-copy addressing and allocation.
-inline static u8 blocked2048(u8 *c)
+// Pointer lifetimes and response field addressing still differ.
+static inline u8 blocked2048(u8 *c)
 {
     u32 mask;
     u32 *p;
     u32 off;
+    typeof(mask) c1;
     if (!c)
         goto zero;
     mask = 0x40;
@@ -18,15 +20,17 @@ inline static u8 blocked2048(u8 *c)
     if ((*((u16 *)p)) & mask)
         goto one;
     mask = 0x80;
+    c1 = mask;
     mask <<= 10;
     off -= 4;
     p = (u32 *)(c + off);
-    if ((*p) & mask)
+    if ((*p) & c1)
         goto one;
     if ((*((s16 *)(c + 0x9C))) > 0)
         goto zero;
 one:
     return 1;
+
 zero:
     return 0;
 }
@@ -38,12 +42,6 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-struct MummyResponseHead {
-    u8 unknown0[0x3E];
-    u16 enabled;
-    u8 unknown40[4];
-    u16 timer;
-};
 void *SceneActorContacts_FindObjectById(u16);
 static inline u32 WordFlag(u32 *p, u32 mask)
 {
@@ -58,56 +56,49 @@ static inline u8 SaveFlag(u8 *state, u16 **saved, u32 mask)
         return 1;
     return 0;
 }
+// MATCHING_CONCESSION: register-pinning
+static inline u32 Arg1(u32 k_, u8 *base)
+{
+    return base + k_;
+}
+
 void Mummy_OnAttackCollision(u8 *unused, u8 *obj, u8 *input)
 {
-    u8 *ctx = input;
-    u8 *base = ctx;
-    u8 *state = *(u8 **)(ctx + 0x3D0);
-    u32 timer;
-    if (blocked2048(ctx))
+    u8 *base = input;
+    u8 *state = *((u8 **)(input + 0x3D0));
+    if (blocked2048(input))
         return;
-    if ((u16)(*(u16 *)(obj + 10) - 1) <= 7) {
+    if (((u16)((*((u16 *)(obj + 10))) - 1)) <= 7) {
         u16 *flags;
-        if (!SaveFlag(state, &flags, 0x800) && WordFlag((u32 *)(*(u8 **)(obj + 0x50) + 0x20), 8))
+        if ((!SaveFlag(state, &flags, 0x800)) &&
+            WordFlag((u32 *)((*((u8 **)(obj + 0x50))) + 0x20), 8))
             return;
         {
             u32 mask = ~0x800;
             *flags &= mask;
         }
-        if (!blocked2048(ctx) && (*(u16 *)(obj + 10) & 15)) {
-            *(u32 *)(ctx + 0x304) = *(u16 *)(obj + 4);
-            {
-                u32 *field = (void *)(ctx + 0x2D0);
-                u32 mask = 0xFEFFFFFF;
-                *field &= mask;
-            }
+        if ((!blocked2048(input)) && ((*((u16 *)(obj + 10))) & 15)) {
+            *((u32 *)(input + 0x304)) = *((u16 *)(obj + 4));
+            *((u32 *)(input + 0x2D0)) &= 0xFEFFFFFF;
         }
-        *(void **)(base + 0xDC) = SceneActorContacts_FindObjectById(*(u16 *)(base + 0x304));
-        {
-            u32 flags = obj[0x46];
-            obj[0x46] = 1 | flags;
+        *((void **)(base + 0xDC)) = SceneActorContacts_FindObjectById(*((u16 *)(base + 0x304)));
+        obj[0x46] |= 1;
+        if ((!(*((u16 *)Arg1(0x178, base)))) &&
+            WordFlag((u32 *)((*((u8 **)(obj + 0x50))) + 0x20), 0x200)) {
+            *((u32 *)(base + 0x2E0)) = 1;
+            *((u32 *)(base + 0x2DC)) = 4;
+            *((u32 *)(base + 0x2D8)) = 0;
+            *((u16 *)(base + 0x172)) = 1;
+            *((u16 *)(base + 0x2E4)) = *((volatile u16 *)(base + 0x172));
+            *((u16 *)(base + 0x174)) = 1;
+            *((u16 *)(base + 0x178)) = 30;
+            *((u16 *)(base + 0x2E6)) = 4;
         }
-        timer = *(u16 *)(base + 0x178);
-        if (!timer && WordFlag((u32 *)(*(u8 **)(obj + 0x50) + 0x20), 0x200)) {
-            *(u32 *)(base + 0x2E0) = 1;
-            *(u32 *)(base + 0x2DC) = 4;
-            *(u32 *)(base + 0x2D8) = timer;
-            ((struct MummyResponseHead *)(base + 0x134))->enabled = 1;
-            *(u16 *)(base + 0x2E4) = *(volatile u16 *)(base + 0x172);
-            *(u16 *)(base + 0x174) = 1;
-            ((struct MummyResponseHead *)(base + 0x134))->timer = 30;
-            *(u16 *)(base + 0x2E6) = 4;
-        }
-    } else if (!blocked2048(ctx) && (*(u16 *)(obj + 10) & 15)) {
-        *(u32 *)(ctx + 0x304) = *(u16 *)(obj + 4);
-        {
-            u32 *field = (void *)(ctx + 0x2D0);
-            u32 mask = 0xFEFFFFFF;
-            *field &= mask;
-        }
+    } else if ((!blocked2048(input)) && ((*((u16 *)(obj + 10))) & 15)) {
+        *((u32 *)(input + 0x304)) = *((u16 *)(obj + 4));
+        *((u32 *)(input + 0x2D0)) &= 0xFEFFFFFF;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080D0C30);
 #endif

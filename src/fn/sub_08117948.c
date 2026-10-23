@@ -1,6 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
+#ifdef NONMATCHING
+// fuzzy: 91.0%
+// fix.py best version (reprinted C)
 struct Obj {
     u8 pad0[4];
     u32 unk4;
@@ -102,8 +105,6 @@ extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u8 *gUnk_02000710, *gUnk_020004B4;
 void Glove_UpdateStopping(struct Glove *);
 
-#ifdef NONMATCHING
-// fuzzy: 90.0%
 // Action-pointer lifetimes, constant reuse and register allocation still differ.
 static inline void ClearDamageFlag(s8 *p, s32 mask)
 {
@@ -112,34 +113,30 @@ static inline void ClearDamageFlag(s8 *p, s32 mask)
 static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
 {
     struct Obj *self = &p->motion;
-    if (U8(p, 0x33C)) {
-        if (U8(p, 0x331) == 5) {
-            s32 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
+    if (*((u8 *)(((u8 *)p) + 0x33C))) {
+        if ((*((u8 *)(((u8 *)p) + 0x331))) == 5) {
+            s8 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
             if (p->input[0] & 1) {
-                if (!sub_08249240((u8 *)p + 0x32C, 0, U32(p, 0x32C))) {
-                    if (U8(p, 0x343) == 1) {
-                        PalFade_Start(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
-                        U8(p, 0x343) = 0;
+                if (!sub_08249240(((u8 *)p) + 0x32C, 0, *((u32 *)(((u8 *)p) + 0x32C)))) {
+                    if ((*((u8 *)(((u8 *)p) + 0x343))) == 1) {
+                        PalFade_Start(self, palette, *((u16 *)(((u8 *)p) + 0x96)), 0, 0, 16, 1, 1);
+                        *((u8 *)(((u8 *)p) + 0x343)) = 0;
                     }
-                    U8(p, 0x342) = 0;
+                    *((u8 *)(((u8 *)p) + 0x342)) = 0;
                 }
-            } else {
-                if (U8(p, 0x343) && (p->previousInput & 1)) {
-                    PalFade_Start(self, palette, U16(p, 0x96), 0, 0, 16, 1, 1);
-                    U8(p, 0x342) = 0;
-                }
+            } else if ((*((u8 *)(((u8 *)p) + 0x343))) && (p->previousInput & 1)) {
+                PalFade_Start(self, palette, *((u16 *)(((u8 *)p) + 0x96)), 0, 0, 16, 1, 1);
+                *((u8 *)(((u8 *)p) + 0x342)) = 0;
             }
-        } else {
-            if (p->input[1] & 1)
-                sub_08249240((u8 *)p + 0x32C, 0, U32(p, 0x32C));
-        }
+        } else if (p->input[1] & 1)
+            sub_08249240(((u8 *)p) + 0x32C, 0, *((u32 *)(((u8 *)p) + 0x32C)));
         if (self->actionKind == 4) {
             if (self->recoveryTimer) {
                 u16 bit = 2;
                 *flags |= bit;
                 self->recoveryTimer--;
             }
-        } else if (self->actionKind == 1 && self->recoveryTimer) {
+        } else if ((self->actionKind == 1) && self->recoveryTimer) {
             self->recoveryTimer--;
             ClearDamageFlag(&self->damageFlags, ~1);
             self->damageTimer = 0;
@@ -153,6 +150,7 @@ static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
             self->cooldown--;
     }
 }
+
 static inline void UpdateActions(struct Glove *p, u16 *flags)
 {
     struct Obj *self = &p->motion;
@@ -203,14 +201,21 @@ static inline void UpdateActions(struct Glove *p, u16 *flags)
 void Glove_UpdateStopping(struct Glove *p)
 {
     struct Obj *self = &p->motion;
-    s32 h, dx, dz;
-    u32 a, b;
+    s32 h;
+    s32 dx;
+    s32 dz;
+    u32 a;
+    u32 b;
     {
         register u8 *entry asm("r4") = &p->active;
         if (*entry) {
-            U16(p, 0x53C) = 0x88;
-            U16(p, 0x53E) = 0;
-            *entry = 0;
+            {
+                typeof(*((u16 *)(((u8 *)p) + 0x53C))) *q1 = &(*((u16 *)(((u8 *)p) + 0x53C)));
+                u8 z1 = 0;
+                *q1 = 0x88;
+                *((u16 *)(((u8 *)p) + 0x53E)) = z1;
+                *entry = z1;
+            }
         }
     }
     {
@@ -220,7 +225,6 @@ void Glove_UpdateStopping(struct Glove *p)
         h = self->vy + self->unkC0;
         if (h > 0xF000)
             h = 0xF000;
-
         self->y += 0x200;
         if (self->steps > 0) {
             self->x += self->dx;
@@ -232,11 +236,14 @@ void Glove_UpdateStopping(struct Glove *p)
             Memory_Clear(&self->dx, 0x10);
         }
         Actor_ClampMovementSpeed(self);
-
         {
-            s32 *pprevZ, *pprevX, *pvz, *px, *py;
+            s32 *pprevZ;
+            s32 *pprevX;
+            s32 *pvz;
+            s32 *px;
+            s32 *py;
             s32 lim;
-            self->outX = h + self->x - self->prevX;
+            self->outX = (h + self->x) - self->prevX;
             self->outY = self->y + self->dy;
             self->outZ = self->vz + self->dz;
             dx = (self->x - self->prevX) >> 12;
@@ -249,17 +256,19 @@ void Glove_UpdateStopping(struct Glove *p)
             pvz = &self->vz;
             if (h > lim)
                 dx = 0x80;
-            if (dx == 0 && dz == 0)
+            if ((dx == 0) && (dz == 0))
                 self->angle = 0xFFFF;
             else
                 self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
             *pprevX = *px;
             *pprevZ = self->z;
             Terrain_ResolveActorMotion(self);
-            a = (u32) ~(self->unk3C >> 12) >> 31;
-            b = (u32) ~(self->unk38 >> 12) >> 31;
-            if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&
-                b <= 1 && a == 1) {
+            a = ((u32)(~(self->unk3C >> 12))) >> 31;
+            b = ((u32)(~(self->unk38 >> 12))) >> 31;
+            if (((((self->unk4 != self->unk8) && (self->unk4 & 0x1000)) &&
+                  (!(self->unk8 & 0xF000))) &&
+                 (b <= 1)) &&
+                (a == 1)) {
                 s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
                 if (v < 4)
                     v = 4;
@@ -270,7 +279,6 @@ void Glove_UpdateStopping(struct Glove *p)
             }
             p->height = h;
             PalFade_Update(self);
-
             Actor_UpdateShadowSpriteParts(self, p->model);
             if (self->flags40 & 4)
                 sub_0811BF44(self);
@@ -279,7 +287,6 @@ void Glove_UpdateStopping(struct Glove *p)
             if (self->flags40 & 1)
                 *py = 0;
         }
-
         UpdateActions(p, flags);
     }
     CharacterModel_UpdateAccessoryAnimations(p->model);

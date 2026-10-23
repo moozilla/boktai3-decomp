@@ -1,6 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#ifdef NONMATCHING
+// fuzzy: 86.9%
+// fix.py best version (reprinted C)
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -124,14 +127,13 @@ static inline void SetCollider(struct ContactCollider *c)
 {
     c->flags |= 4;
 }
-#ifdef NONMATCHING
-// fuzzy: 85.2%
 // Remaining differences: inline ordering, flag/address lifetimes, and register allocation.
 // confidence=low: follows a finite curved route, either withdrawing or moving toward the player.
 void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
 {
     struct GhostRoute *route = actor->context;
-    struct ContactPosition target, delta;
+    struct ContactPosition target;
+    struct ContactPosition delta;
     register u32 *flags asm("r9") = &route->flags;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         Control(actor, actor->entryTarget228, 1);
@@ -144,7 +146,7 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
             target = gUnk_02000580->position;
         }
         Delta(&delta, &actor->position, &target);
-        route->distance = Quarter(delta.x * delta.x + delta.z * delta.z);
+        route->distance = Quarter((delta.x * delta.x) + (delta.z * delta.z));
         Polar(&route->motion, Facing(RandomMotion(), &actor->fieldE9) & 255, 32);
         sub_08098344(actor, &target);
         route->speed = 1;
@@ -158,14 +160,14 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
     if (!Test(*flags, 4))
         ClearCollider(&actor->colliderB);
     Ghost_EmitAfterimage(actor);
-    if (delta.x * delta.x + delta.z * delta.z > 1024) {
+    if (((delta.z * delta.z) + (delta.x * delta.x)) > 1024) {
         actor->direction = Math_Atan2(route->points[route->index].x - actor->position.x,
                                       route->points[route->index].z - actor->position.z);
         Polar(&delta, actor->direction, route->speed);
         actor->motion.x += delta.x;
         actor->motion.z += delta.z;
         route->motion = actor->motion;
-    } else if (++route->index > 8) {
+    } else if ((++route->index) > 8) {
         actor->position.x = route->points[8].x;
         actor->position.z = route->points[8].z;
         actor->flags2D4 &= ~0x100;
@@ -181,14 +183,11 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
         return;
     }
     if (actor->paletteOffset == 0) {
-        if (Mod(actor->counter2AC, 8) == 0 && route->speed <= 19)
+        if ((Mod(actor->counter2AC, 8) == 0) && (route->speed <= 19))
             ++route->speed;
-    } else {
-        if (Mod(actor->counter2AC, 4) == 0 && route->speed <= 19)
-            route->speed += 2;
-    }
+    } else if ((Mod(actor->counter2AC, 4) == 0) && (route->speed <= 19))
+        route->speed += 2;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ghost_AdvanceApproachRoute);
 #endif

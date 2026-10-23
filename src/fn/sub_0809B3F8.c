@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.5%
+// fuzzy: 99.1%
+// fix.py best version (reprinted C)
 // Remaining differences include octant-mask lifetime, control initialization and registers.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -29,18 +30,17 @@ static inline u32 Bits(struct SceneActorRegistryResetView *a, u32 mask)
 
 static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
 {
-    u32 zero = 0;
     a->field2B2 = 1;
-    a->field2B0 = zero;
+    a->field2B0 = 0;
     a->field2B5 = kind;
     a->target = cb;
-    a->field2C8 = zero;
+    a->field2C8 = 0;
     {
         u32 *flags = &a->flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = zero;
+    a->word104 = 0;
 }
 
 #include "scene_actor_animation.h"
@@ -100,12 +100,12 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
 void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
 {
-    u8 *motion = (u8 *)actor + 0x50;
+    u8 *motion = ((u8 *)actor) + 0x50;
     u8 *sequence;
     if (Take(&actor->field2B2)) {
-        s32 current = (((s32)actor->direction + 0x70) >> 5) & 7;
-        u8 desired = *((u8 *)actor + 0x3CD);
-        s32 target = (((s32)desired + 0x70) >> 5) & 7;
+        s32 current = ((((s32)actor->direction) + 0x70) >> 5) & 7;
+        u8 desired = *(((u8 *)actor) + 0x3CD);
+        s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->direction = desired;
             Control(actor, actor->savedTarget, 0);
@@ -113,7 +113,7 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
             return;
         }
         target -= 8;
-        if (((current - target) & 7) <= 4) {
+        if ((((current - target) << 29) >> 29) <= 4) {
             u32 *p = &actor->flags2CC;
             u32 mask = ~0x10000;
             *p &= mask;
@@ -122,7 +122,7 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
             actor->flags2CC |= mask;
         }
     }
-    sequence = *(u8 **)((u8 *)actor + 4) + 0x48;
+    sequence = (*((u8 **)(((u8 *)actor) + 4))) + 0x48;
     {
         u32 mask = 0xA02F;
         u16 *scale;
@@ -136,13 +136,15 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
             if (!value)
                 *scale = 64;
         }
-        if (!*((u8 *)actor + 8))
-            Anim_SetDurationScale(*(u8 **)((u8 *)actor + 4) + 0x48, *scale);
+        if (!(*(((u8 *)actor) + 8)))
+            Anim_SetDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x48, *scale);
         else
-            Anim_SetFrameDurationScale(*(u8 **)((u8 *)actor + 4) + 0x20, *scale);
+            Anim_SetFrameDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x20, *scale);
     }
     if (actor->field2CA & 4) {
-        u32 variant, flags, selection;
+        u32 variant;
+        u32 flags;
+        u32 selection;
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
         Control(actor, actor->entryTarget224, 2);
@@ -156,7 +158,6 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
         Select((void *)actor, selection, variant, flags);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
 #endif

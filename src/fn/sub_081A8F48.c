@@ -1,10 +1,11 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
+#ifdef NONMATCHING
+// fuzzy: 93.9%
+// fix.py best version (reprinted C)
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
-#ifdef NONMATCHING
-// fuzzy: 90.6%
 // Remaining differences: initial vector aliases, register choices and constant scheduling.
 struct PlayerDrainTarget {
     u8 pad0[0x20];
@@ -66,20 +67,24 @@ static inline void SetPosition(s16 *out, s32 x, s32 y, s32 z)
 }
 static inline void AddPosition(s16 *out, s16 *a, s16 *b)
 {
-    u16 av = a[0], bv = b[0];
+    u16 av = a[0];
+    u16 bv = b[0];
+    typeof(bv) c1;
     out[0] = av + bv;
     av = a[1];
     bv = b[1];
-    out[1] = av + bv;
+    c1 = bv;
+    out[1] = av + c1;
     av = a[2];
     bv = b[2];
-    out[2] = av + bv;
+    out[2] = av + c1;
 }
 
 void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
 {
     struct DrainActor *self = p;
-    s16 initial[4], position[4];
+    s16 initial[4];
+    s16 position[4];
     s16 *initialBase;
     {
         u32 mask = 12;
@@ -96,7 +101,8 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         one = 1;
         asm("" : "+r"(one));
         if (!TestFlags(&gUnk_02000580[0]->flags, 0x40000)) {
-            void *animation, *drawable;
+            void *animation;
+            void *drawable;
             Player_BeginPositionRequest(gUnk_02000580[0], initial, 0, 0, 0, 0, one, 0, 2);
             animation = p->animation;
             drawable = p->drawable;
@@ -105,15 +111,18 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
                     SceneActors_StartUnmirroredAnimation(p, animation, drawable, 12, one, 0);
                     CpuSet(Player_GetCollisionData(), p->collision[0], 0x4000008);
                     break;
+
                 case 1:
                     SceneActors_StartUnmirroredAnimation(p, animation, drawable, 13, one, 0);
                     CpuSet(Player_GetCollisionData(), p->collision[1], 0x4000008);
                     break;
+
                 case 2:
                     SceneActors_StartUnmirroredAnimation(p, animation, drawable, 14, one, 0);
                     CpuSet(Player_GetCollisionData(), p->collision[2], 0x4000008);
                     break;
             }
+
             self->startFrame = p->player->frame;
         } else {
             p->finished = one;
@@ -125,11 +134,12 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         s32 start = self->startFrame;
         s32 current = player->frame;
         s32 bias = -256;
-        asm("" : "+r"(bias));
         start += bias;
+        asm("" : "+r"(bias));
         if (((current - start) & 255) <= 19) {
             if (p->ready) {
-                s32 amount, health;
+                s32 amount;
+                s32 health;
                 OffsetPosition(position, p->position);
                 if (!TestFlags(&p->player->flags, 0x40000)) {
                     amount = Player_BeginPositionRequest(p->player, position, 0, 0, 0, 0, 1,
@@ -137,11 +147,11 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
                     health = self->health;
                     SceneActors_SetHealth(self, health + amount);
                     if (health != self->health)
-                        DamageNumberDisplay_ShowWithDefaultScale((u8 *)self + 0x6C4, amount, 1,
+                        DamageNumberDisplay_ShowWithDefaultScale(((u8 *)self) + 0x6C4, amount, 1,
                                                                  self->position, 1);
                     sub_081A6398(self);
                     Sound_PlaySongChecked(0x225);
-                    if (!TestFlags(&gUnk_02000560, 4) && p->action <= 4)
+                    if ((!TestFlags(&gUnk_02000560, 4)) && (p->action <= 4))
                         return;
                 }
                 p->finished = 1;
@@ -151,7 +161,6 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePlayerDrain);
 #endif

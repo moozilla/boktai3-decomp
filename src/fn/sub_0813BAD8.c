@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 63.9%
+// fuzzy: 65.7%
+// fix.py best version (reprinted C)
 // Directional pair placement recovered; stack-vector allocation and projection ordering differ.
 
 struct Vec {
@@ -33,15 +34,16 @@ static inline s32 Scale(s32 value)
 
 static inline void Project(struct Vec *screen, struct PackedVec *world)
 {
-    s32 x = world->x;
+    u8 x = world->x;
     s32 z = world->z;
-    s32 depth, height;
+    s32 depth;
+    s8 height;
     screen->x = Scale(x - z);
     depth = Scale(x + z);
     height = Scale(world->y);
-    screen->x = (u16)screen->x - (u16)gUnk_03005418.x + 120;
-    screen->y = depth - height - (u16)gUnk_03005418.y + 80;
-    screen->z = depth + height - (u16)gUnk_03005418.z;
+    screen->x = (((u16)screen->x) - ((u16)gUnk_03005418.x)) + 120;
+    screen->y = ((depth - height) - ((u16)gUnk_03005418.y)) + 80;
+    screen->z = (depth + height) - ((u16)gUnk_03005418.z);
 }
 
 static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
@@ -53,61 +55,68 @@ static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
 
 void sub_0813BAD8(u8 *p)
 {
-    struct Vec first, second;
+    struct Vec first;
+    struct Vec second;
     struct PackedVec position;
     struct Vec projected;
     s32 direction;
-    s32 height, depth;
+    s32 height;
+    s32 depth;
     if (p[0x7C8] != 1) {
-        *(u32 *)(p + 0x778) |= 1;
-        *(u32 *)(p + 0x7A0) |= 1;
+        *((u32 *)(p + 0x778)) |= 1;
+        *((u32 *)(p + 0x7A0)) |= 1;
         return;
     }
     p[0x7C8] = 0;
-    *(u32 *)(p + 0x778) &= ~1;
-    *(u32 *)(p + 0x7A0) &= ~1;
+    *((u32 *)(p + 0x778)) &= ~1;
+    *((u32 *)(p + 0x7A0)) &= ~1;
     direction = ((p[0x2D] + 0x70) >> 5) & 7;
     switch (direction) {
         case 1:
-            Player_SetDirectionalEffectFrame(p + 0x778, *(void **)(p + 0x774),
-                                             15 - *(s16 *)(gUnk_02000710 + 0x10));
-            Player_SetDirectionalEffectFrame(p + 0x7A0, *(void **)(p + 0x774),
-                                             13 - *(s16 *)(gUnk_02000710 + 0x10));
+            Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
+                                             15 - (*((s16 *)(gUnk_02000710 + 0x10))));
+            Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
+                                             13 - (*((s16 *)(gUnk_02000710 + 0x10))));
             SetVec(&first, -28, -44, 0);
             SetVec(&second, 12, -4, 0);
             break;
+
         case 3:
-            Player_SetDirectionalEffectFrame(p + 0x778, *(void **)(p + 0x774),
-                                             9 - *(s16 *)(gUnk_02000710 + 0x10));
-            Player_SetDirectionalEffectFrame(p + 0x7A0, *(void **)(p + 0x774),
-                                             15 - *(s16 *)(gUnk_02000710 + 0x10));
+            Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
+                                             9 - (*((s16 *)(gUnk_02000710 + 0x10))));
+            Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
+                                             15 - (*((s16 *)(gUnk_02000710 + 0x10))));
             SetVec(&first, 16, -32, 0);
             SetVec(&second, -24, 8, 0);
             break;
+
         case 5:
-            Player_SetDirectionalEffectFrame(p + 0x778, *(void **)(p + 0x774),
-                                             11 - *(s16 *)(gUnk_02000710 + 0x10));
-            Player_SetDirectionalEffectFrame(p + 0x7A0, *(void **)(p + 0x774),
-                                             9 - *(s16 *)(gUnk_02000710 + 0x10));
+            Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
+                                             11 - (*((s16 *)(gUnk_02000710 + 0x10))));
+            Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
+                                             9 - (*((s16 *)(gUnk_02000710 + 0x10))));
             SetVec(&first, 16, 8, 0);
             SetVec(&second, -24, -32, 0);
             break;
+
         case 7:
-            Player_SetDirectionalEffectFrame(p + 0x778, *(void **)(p + 0x774),
-                                             13 - *(s16 *)(gUnk_02000710 + 0x10));
-            Player_SetDirectionalEffectFrame(p + 0x7A0, *(void **)(p + 0x774),
-                                             11 - *(s16 *)(gUnk_02000710 + 0x10));
+            Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
+                                             13 - (*((s16 *)(gUnk_02000710 + 0x10))));
+            Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
+                                             11 - (*((s16 *)(gUnk_02000710 + 0x10))));
             SetVec(&first, -20, -4, 0);
             SetVec(&second, 20, -44, 0);
             break;
+
         default:
-            *(u32 *)(p + 0x778) |= 1;
-            *(u32 *)(p + 0x7A0) |= 1;
+            *((u32 *)(p + 0x778)) |= 1;
+            *((u32 *)(p + 0x7A0)) |= 1;
             return;
     }
-    position.x = *(s16 *)(p + 0x30);
-    position.z = *(s16 *)(p + 0x34);
-    position.y = *(s16 *)(p + 0x32);
+
+    position.x = *((s16 *)(p + 0x30));
+    position.z = *((s16 *)(p + 0x34));
+    position.y = *((s16 *)(p + 0x32));
     Project(&projected, &position);
     first.x -= 4;
     first.y -= 4;
@@ -117,7 +126,6 @@ void sub_0813BAD8(u8 *p)
     Add((struct Vec *)(p + 0x7B8), &projected, &second);
     return;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0813BAD8);
 #endif

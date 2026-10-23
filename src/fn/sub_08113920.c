@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
-// fuzzy: 96.6%
+// fuzzy: 97.6%
+// fix.py best version (reprinted C)
+// confidence=low: profile-driven native effect motion and creation.
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
@@ -180,12 +181,14 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
 static inline u32 TrailRandom(void)
 {
     register u32 value asm("r0");
-    value = gUnk_086141BC[gUnk_03005304];
-    asm("" : "+r"(value));
+    typeof(value) t1;
+    value = (t1 = gUnk_086141BC[gUnk_03005304]);
+    asm("" : "+r"(t1));
     value &= 7;
     asm("" : "+r"(value));
     return value;
 }
+
 static inline u8 Odd(u32 t)
 {
     return t & 1;
@@ -203,29 +206,31 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
     p->position.y += p->velocity.y;
     p->position.z += p->velocity.z;
     Project(&projected, &p->position, p->height);
-    *(struct Packed *)&p->sprite.position = projected;
+    *((struct Packed *)(&p->sprite.position)) = projected;
     ActorAttachment_StepSprite(&p->sprite, &p->anim);
     Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->height);
     SpatialIndex_InsertEntry(p->collider);
     p->velocity.x += p->direction << 9;
-    if (p->timer <= 9 && Odd(p->timer)) {
+    if ((p->timer <= 9) && Odd(p->timer)) {
         struct {
-            u32 x : 16, y : 16, z : 16, pad : 16;
+            u32 x : 16;
+            u32 y : 16;
+            u32 z : 16;
+            u32 pad : 16;
         } offset;
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.x = (TrailRandom())-3;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        offset.y = (TrailRandom())-3;
+        offset.x = TrailRandom() - 3;
+        gUnk_03005304 = ((gUnk_03005304 + 1) << 22) >> 22;
+        offset.y = TrailRandom() - 3;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }
     p->timer++;
     if (SceneGroundEffect_IsBelowGround(p, 0)) {
         NativeEffect_SetState(p, SpriteEffect_RemoveWithBurst);
-    } else if (!--p->lifetime) {
+    } else if (!(--p->lifetime)) {
         NativeEffect_SetState(p, SpriteEffect_RemoveWithBurst);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", NativeEffect_UpdateAcceleratingTrail);
 #endif

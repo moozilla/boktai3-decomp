@@ -1,10 +1,11 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 88.5%
+// fix.py best version (reprinted C)
 // confidence=low: selects approach, attack and recovery behaviors along a shared X/Z axis.
 
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 85.8%
 // Remaining differences: branch layout, merged decision stores and register allocation.
 
 struct ArmorDecisionActor {
@@ -51,9 +52,10 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
     s32 ay;
     register s32 az asm("r2");
     s16 *cooldown = &p->attackCooldown;
-    if (*cooldown > 0)
-        --*cooldown;
-    if (p->phase != 255 && p->behavior != 20)
+    u32 k1;
+    if ((*cooldown) > 0)
+        --(*cooldown);
+    if ((p->phase != 255) && (p->behavior != 20))
         return;
     dx = gUnk_02000710->x - p->x;
     dy = gUnk_02000710->y - p->y;
@@ -79,7 +81,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                     ActorController_SetBehavior(p, 12);
                     break;
                 }
-                if (p->behavior != 20 || !(p->taskFlags & 4))
+                if ((p->behavior != 20) || (!(p->taskFlags & 4)))
                     goto idle;
                 if (dx == 0) {
                     if (dz < 0) {
@@ -87,8 +89,11 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                             goto idle;
                     } else if (p->facing != 64)
                         goto idle;
-                    if (ay <= 127 && az <= 1) {
-                        p->decision = 1;
+                    if ((ay <= 127) && (az <= 1)) {
+                        {
+                            u8 k2 = 1;
+                            p->decision = k2;
+                        }
                         goto attack;
                     }
                     if (az > 3)
@@ -99,7 +104,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                             goto idle;
                     } else if (p->facing != 0)
                         goto idle;
-                    if (ay <= 127 && ax <= 1) {
+                    if ((ay <= 127) && (ax <= 1)) {
                         p->decision = 1;
                         goto attack;
                     }
@@ -108,12 +113,13 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 } else
                     goto idle;
                 p->decision = 1;
-                ActorController_SetBehavior(p, 10);
+                ActorController_SetBehavior(p, k1 = 10);
                 break;
+
             case 1:
                 if (p->behavior == 3)
                     goto recover;
-                if (p->behavior == 21 && !(u16)(p->taskFlags & 4))
+                if ((p->behavior == 21) && (!((u16)(p->taskFlags & 4))))
                     *decision = 0;
                 if (dx == 0) {
                     if (dz < 0) {
@@ -121,7 +127,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                             goto reset;
                     } else if (p->facing != 64)
                         goto reset;
-                    if (ay <= 127 && az <= 1)
+                    if ((ay <= 127) && (az <= 1))
                         goto attack;
                 } else if (dz == 0) {
                     if (dx < 0) {
@@ -129,15 +135,16 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                             goto reset;
                     } else if (p->facing != 0)
                         goto reset;
-                    if (ay <= 127 && ax <= 1)
+                    if ((ay <= 127) && (ax <= 1))
                         goto attack;
                 } else
                     goto reset;
                 ActorController_SetBehaviorIfFinished(p, 21);
                 break;
+
             case 2:
-                if ((u8)(p->behavior - 10) > 1 && p->behavior != 13)
-                    ActorController_SetBehavior(p, 10);
+                if ((((u8)(p->behavior - k1)) > 1) && (p->behavior != 13))
+                    ActorController_SetBehavior(p, k1);
                 if (p->attackCooldown > 0)
                     break;
                 if (dx == 0)
@@ -149,10 +156,12 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                     p->decision = 0;
                 }
                 break;
+
             case 16:
                 ActorController_SetBehavior(p, 40);
                 break;
         }
+
     } else {
         u8 *decision = &p->decision;
         switch (*decision) {
@@ -160,6 +169,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 if (p->behavior == 3) {
                 recover:
                     ActorController_SetBehavior(p, 4);
+
                     break;
                 }
                 if (ay <= 127) {
@@ -170,20 +180,24 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                         if (ax <= 1) {
                         attack:
                             ActorController_SetBehavior(p, 3);
+
                             break;
                         }
                     }
                 }
-                if (++p->collisionCooldown > 300 && Armor_IsSequenceIncomplete((u8 *)p + 0xb58)) {
+                if (((++p->collisionCooldown) > 300) &&
+                    Armor_IsSequenceIncomplete(((u8 *)p) + 0xb58)) {
                     ActorController_SetBehavior(p, 31);
                     p->collisionCooldown = 0;
                     break;
                 }
             idle:
                 ActorController_SetBehaviorIfFinished(p, 20);
+
                 break;
+
             case 1:
-                if (*cooldown <= 0) {
+                if ((*cooldown) <= 0) {
                     ActorController_SetBehavior(p, 6);
                     *decision = mode;
                     p->secondaryCooldown = mode;
@@ -191,19 +205,20 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 } else
                     ActorController_SetBehaviorIfFinished(p, 5);
                 break;
+
             case 2:
                 ActorController_SetBehaviorIfFinished(p, 23);
                 *decision = mode;
                 p->secondaryCooldown = mode;
                 p->collisionCooldown = mode;
                 break;
+
             case 16:
                 ActorController_SetBehavior(p, 40);
                 break;
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedAttackDecision);
 #endif

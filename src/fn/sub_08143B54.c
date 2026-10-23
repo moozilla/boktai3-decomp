@@ -1,9 +1,10 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 94.7%
+// fix.py best version (reprinted C)
 // confidence=low: limits the tether target distance and clips its position against terrain.
 
-#ifdef NONMATCHING
-// fuzzy: 90.8%
 struct Position {
     s16 x, y, z, pad;
 };
@@ -88,39 +89,41 @@ static inline s32 heightAt(struct Position *position)
 // MATCHING_CONCESSION: register-pinning
 void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radius)
 {
+    register s32 oz asm("r8") = scale(70 * dz);
     register struct Actor *actor asm("r6") = input;
     register s32 ox asm("r7") = scale(70 * dx);
-    register s32 oz asm("r8") = scale(70 * dz);
     struct Position *target = TetherActor_GetPosition();
-    s32 x = target->x - actor->position.x - ox;
-    s32 z = target->z - actor->position.z - oz;
-    if (x * x + z * z > radius * radius) {
+    s32 x = (target->x - actor->position.x) - ox;
+    s32 z = (target->z - actor->position.z) - oz;
+    if (((x * x) + (z * z)) > (radius * radius)) {
         s32 angle = Math_Atan2(x, z);
         struct PackedVec candidate;
-        candidate.x = actor->position.x + scale(gUnk_086149C4[(angle + 64) & 255] * radius) + ox;
-        candidate.z = actor->position.z + scale(gUnk_086149C4[angle & 255] * radius) + oz;
-        candidate.x = (target->x * 3 + candidate.x) >> 2;
-        candidate.z = (target->z * 3 + candidate.z) >> 2;
+        candidate.x = (actor->position.x + scale(gUnk_086149C4[(angle + 64) & 255] * radius)) + ox;
+        candidate.z = (actor->position.z + scale(gUnk_086149C4[angle & 255] * radius)) + oz;
+        candidate.x = ((target->x * 3) + candidate.x) >> 2;
+        candidate.z = ((target->z * 3) + candidate.z) >> 2;
         if (!Player_TestTetherTarget(actor, &candidate)) {
             u16 ax = actor->position.x;
-            s32 cellx = (s16)ax >> 8, cellz = actor->position.z >> 8;
-            s32 current, next;
-            if (cellx < 0 || cellz < 0 || (u32)cellx >= gUnk_030052F8 ||
-                (u32)cellz >= gUnk_030052FC)
+            s16 cellx = ((s16)ax) >> 8;
+            s32 cellz = actor->position.z >> 8;
+            s32 current;
+            s32 next;
+            if ((((cellx < 0) || (cellz < 0)) || (((u32)cellx) >= gUnk_030052F8)) ||
+                (((u32)cellz) >= gUnk_030052FC))
                 current = 0;
             else
                 current = gUnk_030052F4->rows[cellz] + cellx;
-            asm("" ::: "memory");
-            next = indexAt((void *)&candidate);
-            if (current == next + 1)
-                candidate.x = (((s16)ax >> 8) << 8) + 2;
-            else if (current == next - 1)
-                candidate.x = ((((s16)ax >> 8) + 1) << 8) - 2;
+            asm("" : : : "memory");
+            next = indexAt((void *)(&candidate));
+            if (current == (next + 1))
+                candidate.x = ((((s16)ax) >> 8) << 8) + 2;
+            else if (current == (next - 1))
+                candidate.x = (((((s16)ax) >> 8) + 1) << 8) - 2;
             else {
-                s32 width = *(s16 *)(gUnk_030052F4->cells + 4);
-                if (current == next + width)
+                s32 width = *((s16 *)(gUnk_030052F4->cells + 4));
+                if (current == (next + width))
                     candidate.z = ((actor->position.z >> 8) << 8) + 2;
-                else if (current == next - width)
+                else if (current == (next - width))
                     candidate.z = (((actor->position.z >> 8) + 1) << 8) - 2;
                 else {
                     candidate.x = ax;
@@ -128,18 +131,15 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
                 }
             }
             if (!TetherActor_GetStatusFlags())
-                candidate.y = heightAt((void *)&candidate);
-        } else {
-            if (!TetherActor_GetStatusFlags())
-                candidate.y = heightAt((void *)&candidate);
-        }
+                candidate.y = heightAt((void *)(&candidate));
+        } else if (!TetherActor_GetStatusFlags())
+            candidate.y = heightAt((void *)(&candidate));
         x = actor->position.x - candidate.x;
         z = actor->position.z - candidate.z;
         angle = Math_Atan2(x, z);
-        TetherActor_SetInteractionTarget(&candidate, (((u16)angle + 0x70) >> 5) & 7);
+        TetherActor_SetInteractionTarget(&candidate, ((((u16)angle) + 0x70) >> 5) & 7);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Player_ConstrainTetherTarget);
 #endif

@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.0%
+// fuzzy: 93.3%
+// fix.py best version (reprinted C)
 // Remaining differences: center-vector stack layout, branch sharing and registers.
 #include "scene_actor_terrain.h"
 
@@ -32,6 +33,9 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
     u16 center[3];
     s8 k2;
     u32 angle;
+    typeof(Math_Atan2(inline_fn(a[0]) - inline_fn(new_var[0]),
+                      inline_fn(a[2]) - inline_fn(new_var[2]))) t1;
+    typeof((sub_08249350(cell, width) << 8) + 128) t2;
     TerrainModifiers_FindCellOverride(CellIndex(a), 1);
     if (inline_fn(direction) & (k2 = 1)) {
         direction += 4;
@@ -49,11 +53,13 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
     } else {
         far = 1;
     }
-    center[0] = (sub_08249350(cell, width) << 8) + 128;
+    t2 = (sub_08249350(cell, width) << 8) + 128;
+    center[0] = t2;
     center[2] = ((cell / width) << 8) + 128;
     new_var = center;
-    angle = Math_Atan2(inline_fn(a[0]) - inline_fn(new_var[0]),
-                       inline_fn(a[2]) - inline_fn(new_var[2]));
+    t1 = Math_Atan2(inline_fn(a[0]) - inline_fn(new_var[0]),
+                    inline_fn(a[2]) - inline_fn(new_var[2]));
+    angle = t1;
     if (inline_fn(direction) == 0) {
         if ((angle - 33) <= 126) {
             direction -= 2;
@@ -109,7 +115,6 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
     }
     return (s16)direction;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Task4E01_SelectTerrainTurn);
 #endif

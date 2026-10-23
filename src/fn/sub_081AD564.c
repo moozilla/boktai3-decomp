@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.1%
+// fuzzy: 85.9%
+// fix.py best version (reprinted C)
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define Vanargand_UpdatePresentation sub_081AD564
 struct PresentationVec {
@@ -104,6 +105,11 @@ static inline s32 RandomValue(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
 }
+static inline u32 Arg1(u32 k_, struct VanargandPresentation *self)
+{
+    return self->flags & k_;
+}
+
 void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
 {
     struct VanargandPresentation *self = p;
@@ -116,24 +122,29 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
             p->debugValue++;
         }
     }
-    if (self->flags & 0x200000) {
+    if (Arg1(0x200000, self)) {
         switch (p->cameraMode) {
             case 3:
                 Camera_SetOffset(8, &self->position);
                 break;
+
             case 1:
                 Camera_BlendOffset(self->target, &p->collisionPosition, 128);
                 break;
+
             case 2:
                 if (p->selectedHalf & 1)
                     Camera_BlendOffset(self->target, p->pair + 0xB4, 128);
                 else if (p->selectedHalf & 2)
                     Camera_BlendOffset(self->target, p->pair + 0x2D0, 128);
                 break;
+
             case 4:
                 Camera_SetOffset(8, &p->cameraPosition);
                 break;
+
             case 0:
+
             default:
                 Camera_BlendOffset(self->target, &p->cameraPosition, 128);
                 break;
@@ -177,20 +188,22 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
         c = p->colliders;
         i = 0;
         do {
-            Collider_SetPosition(c, (u8 *)p + 0x17C, 0);
+            Collider_SetPosition(c, ((u8 *)p) + 0x17C, 0);
             Collider_Refresh(c);
             c++;
             i++;
         } while (i <= 1);
     }
     if (p->restorePaletteTimer > 0) {
-        if (--p->restorePaletteTimer == 0) {
+        if ((--p->restorePaletteTimer) == 0) {
             s32 kind = 0x6F;
             if (!p->variant)
                 kind = 0x7F;
             switch (kind) {
                 case 0x6F: {
-                    s32 r, g, b;
+                    s32 r;
+                    s32 g;
+                    s32 b;
                     s32 t;
                     CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x4000020);
                     CpuSet(p->fadeA, gUnk_03004FC0, 0x4000068);
@@ -219,18 +232,22 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     }
                     break;
                 }
+
                 case 0x82:
                     CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x4000020);
                     CpuSet(p->fadeB, gUnk_03004FC0, 0x4000068);
                     break;
+
                 case 0x7F:
                     CpuSet(gUnk_030042E4 + 0xFE0, p->palette, 0x4000018);
                     CpuSet(p->fadeC, gUnk_03004FC0, 0x4000068);
                     break;
+
                 default:
                     CpuSet(gUnk_030042E4 + 0x3240, p->palette, 0x4000008);
                     break;
             }
+
             Vanargand_ResetPaletteTransition(p);
         }
     } else if (p->paletteTransition) {

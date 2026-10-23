@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fuzzy: 88.8%
+// fix.py best version (reprinted C)
 // Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
@@ -71,20 +72,20 @@ static inline u32 TurnFlags(u16 *field, u32 mask)
 // confidence=low: rotates the Ghoul toward the route point facing using animation nine.
 void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *direction = (u8 *)actor + 0x50;
-    void *route = (u8 *)actor + 0x448;
-    u8 *group = (u8 *)&actor->group;
+    u8 *direction = ((u8 *)actor) + 0x50;
+    void *route = ((u8 *)actor) + 0x448;
+    u8 *group = (u8 *)(&actor->group);
     u16 *motionFlags;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     motionFlags = &actor->flags2D4;
     if (prepared) {
         s32 quadrant;
         s32 facing;
-        actor->direction = (((actor->direction + 0x60) >> 6) & 3) * 64 - 64;
+        actor->direction = ((((actor->direction + 0x60) >> 6) & 3) * 64) - 64;
         quadrant = ((actor->direction + 0x60) >> 6) & 3;
-        if (actor->behavior2AA != 6 && actor->behavior2AA != 17 &&
-            !TurnFlags(motionFlags, 0x4480)) {
-            facing = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
+        if (((actor->behavior2AA != 6) && (actor->behavior2AA != 17)) &&
+            (!TurnFlags(motionFlags, 0x4480))) {
+            facing = ((((u16)Route_GetCurrentPointFacing(route)) + 0x70) >> 5) & 7;
             ((struct SceneActorAnimationView *)actor)->nextDirection = facing;
         } else
             facing = ((struct SceneActorAnimationView *)actor)->nextDirection;
@@ -93,14 +94,14 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             if (TurnFlags(motionFlags, 0x400)) {
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
                 Chase_SetState(actor, 3, 1, 0);
-                Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
+                Chase_SetCtl(actor, *((void **)(group + 0x21C)), 0x1B);
             } else
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             return;
         }
         switch (quadrant) {
             case 0:
-                if ((u32)(facing - 2) <= 3) {
+                if (((u32)(facing - 2)) <= 3) {
                     SelectTurn((void *)actor, 9, 1, 0);
                     goto forward;
                 } else {
@@ -108,8 +109,9 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                     goto backward;
                 }
                 break;
+
             case 1:
-                if ((u32)(facing - 4) <= 3) {
+                if (((u32)(facing - 4)) <= 3) {
                     SelectTurn((void *)actor, 9, 2, 0);
                     goto forward;
                 } else {
@@ -117,8 +119,9 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                     goto backward;
                 }
                 break;
+
             case 2:
-                if ((u32)(facing - 1) > 4) {
+                if (((u32)(facing - 1)) > 4) {
                     SelectTurn((void *)actor, 9, 1, 5);
                     goto forward;
                 } else {
@@ -126,8 +129,9 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                     goto backward;
                 }
                 break;
+
             case 3:
-                if ((u32)facing <= 3) {
+                if (((u32)facing) <= 3) {
                     SelectTurn((void *)actor, 9, 0, 0);
                     goto forward;
                 } else {
@@ -136,21 +140,24 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                 }
                 break;
         }
+
         goto entryDone;
     forward: {
-        u32 mask = 0x10000;
+        s16 mask = 0x10000;
         mask |= actor->flags2CC;
         actor->flags2CC = mask;
     }
+
         goto entryDone;
     backward:
         actor->flags2CC &= ~0x10000;
+
     entryDone:
         actor->field2B3 = 0;
     }
     {
-        struct TurnSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
-        if (!sequence->timer && (sequence->frame == 1 || sequence->frame == 3)) {
+        struct TurnSequence *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
+        if ((!sequence->timer) && ((sequence->frame == 1) || (sequence->frame == 3))) {
             s32 desired = ((((struct SceneActorAnimationView *)actor)->nextDirection + 5) & 7) << 5;
             s32 difference = actor->direction - desired;
             if (difference < 0)
@@ -163,14 +170,14 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                 direction[9] -= 0x20;
         }
     }
-    if (*motionFlags & 0xA02F)
+    if ((*motionFlags) & 0xA02F)
         actor->field2C2 = 0x40;
     else if (!actor->field2C2)
         actor->field2C2 = 0x40;
     if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, actor->field2C2);
+        Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, actor->field2C2);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, actor->field2C2);
+        Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, actor->field2C2);
     if (actor->field2B3) {
         s32 facing = ((actor->direction + 0x70) >> 5) & 7;
         s32 difference = ((struct SceneActorAnimationView *)actor)->nextDirection - facing;
@@ -178,17 +185,16 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             difference = -difference;
         if (difference <= 0) {
             actor->field2B0 = 1;
-            actor->direction = (((actor->direction + 0x60) >> 6) & 3) * 64 - 64;
+            actor->direction = ((((actor->direction + 0x60) >> 6) & 3) * 64) - 64;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             if (TurnFlags(motionFlags, 0x400)) {
                 Chase_SetState(actor, 3, 1, 0);
-                Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
+                Chase_SetCtl(actor, *((void **)(group + 0x21C)), 0x1B);
             }
         } else
             Chase_SetCtl(actor, actor->entryTarget224, 2);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ghoul_TurnTowardRoute);
 #endif

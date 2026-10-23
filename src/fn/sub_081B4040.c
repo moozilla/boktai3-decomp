@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 88.6%
+// fix.py best version (reprinted C)
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 85.2%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -179,24 +180,27 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
     p->flags |= mask;
     p->flags |= 128;
     if (p->reset) {
-        struct SceneVec zero, point;
+        struct SceneVec zero;
+        struct SceneVec point;
         u32 fill;
-        u32 *state, *timer;
+        u32 *state;
+        u32 *timer;
         u8 *enter;
         s32 i;
         p->reset = 0;
-        Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 10, (u8)p->variant, 0);
-        fill = 0;
+        Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 10, (u8)p->variant, 0);
         CpuSet(&fill, &zero, 0x05000002);
+        fill = 0;
         i = 0;
         state = &p->state;
         timer = &p->timer;
         enter = &p->enter;
         for (; i < 6; i++) {
-            Vector(&point, i * 255 / 6, 128);
-            Add(&point, (struct SceneVec *)((u8 *)p + 0x1c), &point);
+            Vector(&point, (i * 255) / 6, 128);
+            Add(&point, (struct SceneVec *)(((u8 *)p) + 0x1c), &point);
             VanargandEffect_Create(3, i * 2, &point, &zero, p->variant);
         }
+
         *state = 0;
         *timer = 0;
         *enter = 1;
@@ -209,11 +213,12 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
                 p->flashTimer = 32;
             }
             if (p->flashTimer == 0) {
-                SetState(p, 1);
                 *enter = 1;
+                SetState(p, 1);
             }
             break;
         }
+
         case 1:
             if (StepPlayback(p, &p->sequence, p, p->state)) {
                 Sound_PlaySong(0x58c);
@@ -221,6 +226,7 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
                 p->enter = 1;
             }
             break;
+
         case 2:
             p->finished = 1;
             ActorStatus_Deactivate(boss, p);

@@ -1,9 +1,10 @@
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 83.5%
+// fix.py best version (reprinted C)
 // confidence=low: follows the existing Lun movement callback interpretation.
 
-#ifdef NONMATCHING
-// fuzzy: 81.1%
 // Remaining differences: instruction ordering, address lifetimes, and registers.
 #include "scene_actor_reset.h"
 extern u32 gUnk_03005308;
@@ -85,6 +86,11 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
+static inline u32 Arg1(u32 k_, struct SceneActorRegistryResetView *a)
+{
+    return a->flags2D4 & k_;
+}
+
 void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *ctx = a->context;
@@ -98,11 +104,14 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         }
         {
             struct ContactCollider *c = &a->colliderA;
-            c->flags |= 4;
+            {
+                typeof(c->flags) *q1 = &c->flags;
+                *q1 |= 4;
+            }
         }
         SetFlag(&a->flags2C0, 0x800);
     }
-    if (Mod(frame, 12) == 0 && (a->flags2D4 & 8)) {
+    if ((Mod(frame, 12) == 0) && Arg1(8, a)) {
         struct ContactPackedVector range;
         range.x = 20;
         range.y = 20;
@@ -116,7 +125,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
     }
     if (Move(a)) {
         a->field2B0 = 1;
-        ((struct Flags *)&a->flags2D4)->bits &= ~0x120;
+        ((struct Flags *)(&a->flags2D4))->bits &= ~0x120;
         {
             u32 *p = &a->flags2CC;
             u32 mask = ~0x80;
@@ -130,11 +139,11 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         if (a->flags2D4 & 8) {
             SetState(a, 3, 0, 0);
             SetControl(a, Lun_ResumeAfterLiftPenalty, 20);
-            ((struct Flags *)&a->flags2D4)->bits &= ~8;
+            ((struct Flags *)(&a->flags2D4))->bits &= ~8;
             a->field2C2 = 64;
-        } else if (*(u16 *)(ctx + 0x444)) {
+        } else if (*((u16 *)(ctx + 0x444))) {
             SetFlag(&a->flags2D4, 0x100);
-            *(u16 *)(ctx + 0x444) = *(u16 *)(ctx + 0x442);
+            *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
             Lun_BeginMoveToPosition(a, gUnk_02000580[0] + 0x30);
             SetState(a, 0, 2, 1);
             SceneActorControl_ResetCollisionFlags(a);
@@ -148,7 +157,6 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Lun_ApproachMovementTarget);
 #endif

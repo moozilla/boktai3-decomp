@@ -1,6 +1,7 @@
 #include "scene_pool.h"
 #ifdef NONMATCHING
-// fuzzy: 86.6%
+// fuzzy: 89.1%
+// fix.py best version (reprinted C)
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
@@ -23,6 +24,17 @@ static inline void Enter(struct ScenePoolEntry *entry, u32 state, u32 zero)
     entry->stateEntered = 1;
     Memory_Clear(entry->history, 0x100);
 }
+static inline void Enter_1(struct ScenePoolEntry *entry, u32 zero)
+{
+    entry->state = 7;
+    entry->stateFrame = zero;
+    {
+        typeof(entry->stateEntered) *q1 = &entry->stateEntered;
+        *q1 = 1;
+    }
+    Memory_Clear(entry->history, 0x100);
+}
+
 s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                                  struct ScenePoolEntry *entry)
 {
@@ -78,25 +90,30 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
     } else
         history[0] = 0;
     flag = PlayerHasFlag(2);
-    if (!flag && history[0] > 9) {
+    if ((!flag) && (history[0] > 9)) {
         u32 state;
         switch (entry->kind) {
             case 0:
+
             case 1:
                 state = 5;
                 break;
+
             case 2:
                 if (entry->mode != 0)
                     state = 7;
                 else
                     state = 5;
                 break;
+
             case 3:
-                Enter(entry, 7, flag);
+                Enter_1(entry, flag);
                 goto done;
+
             default:
                 goto done;
         }
+
         Enter(entry, state, flag);
         goto done;
     }
@@ -109,7 +126,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 u32 offset = gUnk_03005308 << 1;
                 const u8 *table;
                 table = (const u8 *)gUnk_0203B400;
-                random = *(const u8 *)(offset + (u32)table);
+                random = *((const u8 *)(offset + ((u32)table)));
             }
             if (random <= 127) {
                 entry->state = 2;
@@ -126,11 +143,12 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             }
         } else if (entry->direction > 0) {
             value = 1;
-            entry->state = value;
+            entry->state = 1;
             entry->stateFrame = flag;
             entered = &entry->stateEntered;
         sharedEntry:
-            *entered = value;
+            *entered = 1;
+
             {
                 u32 *arg = entry->history;
                 Memory_Clear(arg, 0x100);
@@ -144,7 +162,6 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
 done:
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", ScenePool_StateTrackAdaptive);
 #endif

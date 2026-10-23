@@ -2,7 +2,8 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 #ifdef NONMATCHING
-// fuzzy: 78.6%
+// fuzzy: 78.8%
+// fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, state scheduling, and register allocation.
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
@@ -50,14 +51,41 @@ static inline u32 Random4(void)
 }
 // confidence=low: converges stagger motion before selecting delayed recovery or pursuit.
 #define Vorn_UpdateStaggerRecovery sub_080AD75C
+static inline void Chase_SetCtl_(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+{
+    void *callback = cb;
+    u32 kind = k;
+    {
+        typeof(actor->field2B2) *q1 = &actor->field2B2;
+        *q1 = 1;
+    }
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = callback;
+    actor->field2C8 = 0;
+    {
+        u32 *field = &actor->flags114;
+        u32 mask = ~1;
+        *field &= mask;
+    }
+    actor->word104 = 0;
+}
+
+static inline u32 Arg1(u32 k_, u8 *anim)
+{
+    return anim + k_;
+}
+
 void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 tick)
 {
     u8 *ctx = actor->context;
-    register u8 *anim asm("r7") = (u8 *)actor->drawable + 0x20;
-    register u8 *group asm("sl") = (u8 *)&actor->group;
+    register u8 *anim asm("r7") = ((u8 *)actor->drawable) + 0x20;
+    register u8 *group asm("sl") = (u8 *)(&actor->group);
     struct ContactPosition range;
-    s32 x, z;
-    s16 *priorX, *priorZ;
+    s32 x;
+    s32 z;
+    s16 *priorX;
+    s16 *priorZ;
     register u32 *action asm("sb");
     u16 *flags;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
@@ -69,22 +97,22 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         }
         {
             s32 mask = ~1;
-            *flags = mask & *flags;
+            *flags = mask & (*flags);
         }
         actor->field2B3 = 0;
     }
     action = &actor->flags2CC;
     {
         u32 mask = 0x2000;
-        *action = mask | *action;
+        *action = mask | (*action);
     }
     {
         u32 mask = 0x10000;
         actor->flags2D0 = mask | actor->flags2D0;
     }
     if (tick <= 17)
-        *(u16 *)(anim + 12) = 0;
-    if (Mod(tick, 12) == 0 && Test(&actor->flags2D4, 8)) {
+        *((u16 *)Arg1(12, anim)) = 0;
+    if ((Mod(tick, 12) == 0) && Test(&actor->flags2D4, 8)) {
         range.x = 60;
         range.y = 60;
         range.z = 40;
@@ -93,19 +121,19 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
     }
     {
         u32 offset = 0x310;
-        s32 current = *(s16 *)((u8 *)actor + offset);
+        s32 current = *((s16 *)(((u8 *)actor) + offset));
         u32 priorOffset = 0x318;
-        s16 *field = (void *)((u8 *)actor + priorOffset);
-        s32 difference = current - *field;
+        s16 *field = (void *)(((u8 *)actor) + priorOffset);
+        s32 difference = current - (*field);
         priorX = field;
         x = Quarter(difference);
     }
     {
         u32 offset = 0x314;
-        s32 current = *(s16 *)((u8 *)actor + offset);
+        s32 current = *((s16 *)(((u8 *)actor) + offset));
         u32 priorOffset = 0x31C;
-        s16 *field = (void *)((u8 *)actor + priorOffset);
-        s32 difference = current - *field;
+        s16 *field = (void *)(((u8 *)actor) + priorOffset);
+        s32 difference = current - (*field);
         priorZ = field;
         z = Quarter(difference);
     }
@@ -120,7 +148,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         flags = &actor->flags2D4;
         {
             s32 mask = ~0x120;
-            *flags = mask & *flags;
+            *flags = mask & (*flags);
         }
         *action &= ~0x80;
         if (actor->field2D8 & 0x80000) {
@@ -129,31 +157,30 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         }
         if (Test(flags, 8)) {
             Chase_SetState(actor, 3, 0, 0);
-            Chase_SetCtl(actor, Vorn_ResumeRouteAfterDelay, 20);
+            Chase_SetCtl_(actor, Vorn_ResumeRouteAfterDelay, 20);
             {
                 s32 mask = ~8;
-                *flags = mask & *flags;
+                *flags = mask & (*flags);
             }
             actor->field2C2 = 64;
         } else if (ContextFlags(ctx))
             SceneActor_DispatchContextAction(ctx, 1);
         else {
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+            actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
             *action |= 16;
-            (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-            if (!Skeleton_RerouteToTarget(actor) &&
-                !Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                                (void *)(actor->fieldDC + 12))) {
-                Callback_InvokeActor(actor, *(void **)(group + 0x224));
+            (*((struct ContactPosition **)(group + 0x200)))->pad = 0;
+            if ((!Skeleton_RerouteToTarget(actor)) &&
+                (!Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->position,
+                                 (void *)(actor->fieldDC + 12)))) {
+                Callback_InvokeActor(actor, *((void **)(group + 0x224)));
                 return;
             }
-            Chase_SetCtl(actor, actor->entryTarget228, 1);
+            Chase_SetCtl_(actor, actor->entryTarget228, 1);
             Chase_SetBehavior(actor, 7);
             actor->field2C2 = 32;
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080AD75C);
 #endif

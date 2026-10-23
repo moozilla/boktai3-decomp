@@ -1,7 +1,8 @@
 #include "global.h"
-// confidence=low: arrival callback restores the delayed behavior and retargets the chase.
 #ifdef NONMATCHING
-// fuzzy: 88.3%
+// fuzzy: 90.4%
+// fix.py best version (reprinted C)
+// confidence=low: arrival callback restores the delayed behavior and retargets the chase.
 // Arrival and chase logic reconstructed; group and reroute pointer allocation,
 // turn-loop constants, and several pointer copies still differ.
 // MATCHING_CONCESSION: register-pinning
@@ -33,9 +34,11 @@ static inline u8 TestField(u16 *field, u32 mask)
 static inline void Arrive_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&((struct SceneActorRegistryResetView *)obj)->group;
-    if (!LoadMotionFlags((struct SceneActorRegistryResetView *)obj, 0x400) &&
-        !TestField((u16 *)((u8 *)obj + 0x414), 4)) {
+    u8 *group = (u8 *)(&((struct SceneActorRegistryResetView *)obj)->group);
+    s32 t1;
+    t1 = 4;
+    if ((!LoadMotionFlags((struct SceneActorRegistryResetView *)obj, 0x400)) &&
+        (!TestField((u16 *)(((u8 *)obj) + 0x414), t1))) {
         s32 prior = actor->direction;
         s32 tries;
         s32 choice;
@@ -44,12 +47,14 @@ static inline void Arrive_BeginTurn(void *obj, u8 saved)
             if (choice != prior)
                 goto chosen;
         }
+
         choice = prior;
     chosen:
         group[0x204] = choice;
+
         Chase_SavePacket(group + 0x8C, actor);
         group[0x205] = saved;
-        Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
+        Chase_SetCtl(actor, *((void **)(group + 0x21C)), 0x1B);
         Chase_SetState(actor, 3, 1, 0);
         group[0x206] = 6;
     }
@@ -136,7 +141,7 @@ done:
 
 void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, Skeleton_ClearDirectionalEntryFlag, 0x2C);
         actor->field2B0 = 0;
@@ -146,7 +151,7 @@ void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
     if (LoadMotionFlags(actor, 0x80))
-        SaveDelay(group + 0x8C, *(void **)(group + 0x48), 0xC, 0x78);
+        SaveDelay(group + 0x8C, *((void **)(group + 0x48)), 0xC, 0x78);
     else
         SaveDelay(group + 0x8C, actor->entryTarget228, 7, 0x78);
     {
