@@ -2,7 +2,9 @@
 
 // confidence=low: projects a sine-scaled speed opposite the actor side.
 #define Hresvelgr_SetSineScaledVelocity sub_0819C870
-struct BurstVector { s16 x, y, z, pad; };
+struct BurstVector {
+    s16 x, y, z, pad;
+};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
