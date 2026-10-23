@@ -46,8 +46,7 @@ static inline s32 Mul32(s32 v)
 static inline s32 Scale(s32 v, s32 k)
 {
     if (k == 40) {
-        v = v * 5;
-        v <<= 3;
+        v = ((v << 2) + v) << 3;
     } else {
         v = k * v;
     }
@@ -57,7 +56,7 @@ static inline s32 Scale(s32 v, s32 k)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 92.1%
 // Only register choices differ: the 0x20 multiplier pin (r3) shifts temporaries in the velocity block.
 void PlayerCue_UpdateRunTo(struct P *p)
 {
