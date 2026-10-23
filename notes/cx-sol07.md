@@ -107,3 +107,27 @@ No symbol names, totals, shared generated outputs or ROM artifacts were edited.
 Combined validation after rebasing: all three matches pass explicit reviewed-extent
 checks, privacy and diff checks pass, and the full ROM build prints
 `build/boktai3.gba: OK`. The progress inventory includes both new tail boundaries.
+
+## Batch 4 attempts (2026-10-23)
+
+Tags: #matching #tentacle #nonmatching
+
+| Address | Result | Notes |
+| --- | --- | --- |
+| 080A9BD8 | skipped, local 36.5% | Full 472-byte cubic segment interpolation draft. Copied endpoints, signed fixed-point square/cube, zero tangents and 296-byte output stride recovered. Tried typed vector views, an opaque zero multiplier and r4 binding; these changed stack residency and overexpanded the polynomial. Existing historical attempts confirm the zero-product problem. No guarded source promoted. |
+| 080A9DB0 | drafted 79.7% | Full 628-byte segment follower. Baseline 52.6%. Sequential squared-distance evaluation, a divisor binding, initial head-copy operand and delta stack operand improved it. Explicit halfword position updates and removing the byte-root alias fixed more address lifetimes. Group/index/flag bindings, max helper and head-copy variants plateaued. Candidate 612 bytes; group/flag induction and head address reuse remain. |
+| 080AA240 | skipped, local 45.8% | Full 632-byte alternating-wave callback drafted. Sine offsets and even-segment interpolation recovered. Typed vector copies improved the 40.1% baseline; explicit coefficient constraints, hoisting and aggregate frames plateaued. The old 740-byte inventory span includes an independent callback at 080AA4B8. No production source or boundary changes promoted. |
+| 080AA8C4 | drafted 85.1% | Improved the existing 82.9% terrain-alignment draft. Raw halfword Y cursor restores the third induction variable and frame; mask-taking helper restores flag evaluation order. Actor pin, separate read view, integer base and halfword-stride variants did not improve further. Candidate and reviewed extent both 460 bytes. |
+| 080AAA90 | drafted 81.8% | Full 348-byte signed impulse-decay loop. Baseline 54.4%. Raw halfword fields, byte flag accessor and r9/r8 mask bindings improved it. Tested separate advancing cursors, prechecked loops, mask types and opaque flag-base operands. Last variants reach the correct size but worsen allocation; retained 332-byte candidate. |
+| 080ABB18 | matched | TentacleActor_RecoverFromSegmentLoss, 452 bytes, register-pinned. Full baseline 45.3%. Explicit reset-field pointers, declaration order matching spill slots, an early initial-count address, full-width mask helpers and distinct byte/word zero lifetimes closed it. Depin removes 19 of 26 hints; seven remain. |
+
+The real wrap-up marker arrived after committing 080ABB18, before starting
+a new attempt on 080AA688. Batch 4 adds +0.0188 percentage points (452 bytes),
+all register-pinned, plus three guarded drafts and two full-draft skips.
+The earlier near misses at 080AA688 and 080AA744 remain at their prior status.
+The Scene NPC family and subsequent families remain unstarted in this campaign.
+No claim of a complete 89-function pass is made.
+
+Batch 4 combined validation after rebase: the 452-byte match passes its
+reviewed-extent check, privacy and diff checks pass, and the full ROM build
+prints `build/boktai3.gba: OK`. No C conflicts occurred.

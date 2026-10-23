@@ -258,7 +258,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-sol04.md](../notes/cx-sol04.md) | cx-sol04 campaign | #matching #player #cue #animation #campaign | 23 |
 | [notes/cx-sol05.md](../notes/cx-sol05.md) | Campaign worker sol05 | #matching #mummy #campaign | 18 |
 | [notes/cx-sol06.md](../notes/cx-sol06.md) | cx-sol06 campaign notes | #matching #hresvelgr | 18 |
-| [notes/cx-sol07.md](../notes/cx-sol07.md) | Campaign worker sol07 | #matching #ratatosk #particles #nonmatching #register-pinning | 12 |
+| [notes/cx-sol07.md](../notes/cx-sol07.md) | Campaign worker sol07 | #matching #ratatosk #particles #nonmatching #register-pinning | 15 |
 | [notes/cx-sol08.md](../notes/cx-sol08.md) | cx-sol08 campaign notes | #matching #actors #particles | 16 |
 | [notes/cx-sol09.md](../notes/cx-sol09.md) | Campaign worker sol09 | #matching #axe #scene-actor | 16 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 8 |
