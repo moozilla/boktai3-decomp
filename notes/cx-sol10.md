@@ -49,3 +49,14 @@ Tags: #matching #ghost
 The literal-reference sweep on 08097E38 found no improvement. All bounded searches have ended. The wrap-up signal stopped function work; the remaining fifty assigned functions were not attempted. Batch 1 was merged in PR #582 after the full build printed OK. No further source changes followed that validation and merge.
 
 Final: 9 matched, 4 drafted or improved, 21 skipped (including inspection-only skips); 50 not attempted before wrap-up.
+
+## Continuation: carried Orbit effect batch
+
+Tags: #matching #orbit-effect #register-pinning
+
+- 081FD664: matched, 160 bytes, register-pinned. Typed steering and position fields preserve the target reloads; the consumed direction and turn limit use the observed low registers.
+- 081FD7EC: matched, 704 bytes, register-pinned. Separate projectile and particle branches retain stack parameter layouts; packed position fields preserve the particle position copy.
+- 081FDCB0: matched, 272 bytes, register-pinned. Timed homing trail reconstructs distance gates, periodic heading adjustment and signed polar scaling. Empty compiler constraints preserve the zero lifetime and position reloads; no instruction bodies.
+
+Three carried matches contribute approximately 0.047 percentage points of exact code (1,136 bytes), all in the Register-pinned category. Per-function exact checks passed after rebasing onto current main.
+Combined validation: `build/cxbuild` printed `build/boktai3.gba: OK`.
