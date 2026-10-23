@@ -40,8 +40,36 @@ Tags: #matching #monsters #compiler #register-pinning
   its __addr symbol is required by the combined linker script. The initial
   combined build caught that fallback-label mismatch before integration.
 
-Resume the ordered assignment at 080DA97C (Mummy_SelectMovementResponse).
-
 Batch validation after rebasing onto main: the final exact Mummy source uses
 four register pins and no empty asm constraints; the combined campaign build
 printed `build/boktai3.gba: OK`. The Golem draft remains guarded.
+
+## Continuation
+
+- 080DA97C: drafted 86.5% from 86.3%. An explicit signed mask local delays
+  the entry word load to the original position. A shared zero passed through
+  the arrival control and behavior helpers, plus the scoped signed group
+  mask, reduces realigned residue from 448 / 135 to 419 / 127 total/structural.
+  No new register hints. Whole reviewed extent is 6,316 bytes; candidate is
+  6,272. Shared motion-pointer variants, direct masks, cached entry flags and
+  separately constrained turn-group lifetimes regressed. Compiler flips and
+  automatic repair supplied no improvement. The guarded final score is
+  recorded; remaining issues are PRE stack ordering and arrival/turn layout.
+
+- 0808B3EC: drafted 81.2% from 79.2%, tentative
+  Ghoul_ResumeBehaviorAfterHit. The prior turn direction in r7 and RNG mask
+  in r1 reduce the turn expansion; a shared arrival zero and explicit signed
+  group/context masks recover store/load ordering. Realigned residue improves
+  from 818 / 394 to 693 / 356 total/structural. Candidate length is 6,204 bytes
+  against the 6,236-byte target. Widened motion flags score 81.3% but worsen
+  both realigned measures, so were rejected. Explicit retry-path nesting was
+  byte-equivalent; table lifetime and other prior-register choices regressed.
+  Two pins are marked as a concession; the normal build keeps the assembly.
+
+## Wrap-up
+
+The stop marker appeared before starting 08078EE8. No later function was
+started. Remaining 54 assignment entries are deferred, beginning at 08078EE8;
+this is distinct from the one attempted-and-skipped Golem function.
+
+Summary: 1 matched, 3 drafts improved, 1 skipped; 54 not attempted before wrap-up.
