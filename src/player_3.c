@@ -648,7 +648,72 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
+#ifdef NONMATCHING
+// fuzzy: 95.7%
+// Register copies and indexed timer-load allocation remain different.
+
+void Player_EmitQueuedEffects(struct Player *);
+s32 Mod(s32, s32);
+extern u16 gUnk_02000504;
+static inline int Player_NextStatusRandom(void)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+}
+
+static inline u32 Player_ReadStatusBonusBits(u32 *flags, u32 mask)
+{
+    u32 m = mask;
+    return *flags & m;
+}
+static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration)
+{
+    *(u16 *)((u8 *)timers + offset) = duration;
+}
+void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
+{
+    register s32 kind asm("r3") = inputKind;
+    s32 offset;
+    switch (kind) {
+        case 0: {
+            u32 count = p->movementModifierActive;
+            offset = 0;
+            if (count && p->movementModifierKind != 3)
+                Player_EmitQueuedEffects(p);
+        } break;
+        case 1:
+            if (p) {
+                u32 flags = Player_ReadStatusBonusBits(&p->statBonusFlags, 0x20000000);
+                offset = 2;
+                if (flags)
+                    break;
+            }
+            {
+                u32 current = p->scriptStatus[kind];
+                offset = kind * 2;
+                if (!current) {
+                    u16 *target = &gUnk_02000504;
+                    s32 random = Mod(Player_NextStatusRandom(), 7);
+                    s32 selection = (s8)p->catalogSavedOption + 1;
+                    selection += random;
+                    selection &= 7;
+                    *target = selection;
+                    p->catalogSavedOption = selection;
+                    Sound_PlaySong(0x138);
+                }
+            }
+            break;
+        default:
+            return;
+    }
+    Player_StoreStatusTimer(p->scriptStatus, offset, duration);
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813D834);
+#endif
 
 void Player_ClearStateTimer(struct Player *p, s32 idx)
 {
