@@ -4,7 +4,7 @@
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
 #ifdef NONMATCHING
-// fuzzy: 88.7%
+// fuzzy: 90.6%
 // Remaining differences: initial vector aliases, register choices and constant scheduling.
 struct PlayerDrainTarget {
     u8 pad0[0x20];
@@ -121,8 +121,9 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         }
     }
     {
+        struct PlayerDrainTarget *player = p->player;
         s32 start = self->startFrame;
-        s32 current = p->player->frame;
+        s32 current = player->frame;
         s32 bias = -256;
         asm("" : "+r"(bias));
         start += bias;
