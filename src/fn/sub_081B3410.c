@@ -8,7 +8,7 @@
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
 #ifdef NONMATCHING
-// fuzzy: 94.5%
+// fuzzy: 94.6%
 // Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -228,8 +228,15 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 AddVector(&delta, &p->origin, &delta);
                 OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &delta,
                                               ((p->variant << 7) + 96) & 255, 16);
-                Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 8, (u8)p->variant, 4);
-                StepPlayback(p, &p->sequence, p, 1);
+                {
+                    void *data = *(void **)(boss + 0x4d0);
+                    register u32 flip asm("r9") = 4;
+                    struct DisplaySequenceState *seq;
+                    asm("" : "+r"(flip));
+                    seq = &p->sequence;
+                    Anim_SetSequence(seq, data, 8, (u8)p->variant, flip);
+                    StepPlayback(p, &p->sequence, p, 1);
+                }
             }
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
@@ -266,7 +273,12 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             if (entering) {
                 p->enter = 0;
                 Difference(&p->target, Player_GetEffectivePosition(0), p->base);
-                p->target.y = Player_GetEffectivePosition(0)->y - (p->base)->y;
+                {
+                    struct SceneVec *player = Player_GetEffectivePosition(0);
+                    u32 baseY = (u16)p->base->y;
+                    u32 playerY = (u16)player->y;
+                    p->target.y = playerY - baseY;
+                }
                 OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &p->target,
                                               ((p->variant << 7) + 96) & 255, 16);
                 *(u32 *)((u8 *)p + 0x19c) = 0;
