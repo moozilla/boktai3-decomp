@@ -40,6 +40,10 @@ the orchestrator reviews and validates their combined work before merging a
 batch into `main`. Such integration PRs may contain multiple translation units;
 individual matching commits should still contain only one. Progress Actions run
 only on pushes to `main` (or explicit manual dispatch), never per worker commit.
+Every batch integration PR regenerates the checked-in report in the same commit:
+`python3 tools/progress.py --markdown PROGRESS.md` writes `PROGRESS.md` and
+`PROGRESS.json` (the tree that the progress mod reads); commit both. CI does not
+commit them.
 
 Local register pinning is user-authorized as a temporary matching concession.
 Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
