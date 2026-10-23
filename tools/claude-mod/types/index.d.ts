@@ -46,4 +46,27 @@ export type DecompSnapshot = {
   prs: DecompPr[]
 }
 
+
+/** One function of PROGRESS.json: name, address, bytes, percent, pinned, file, and its name in the C file when that differs. */
+export type DecompTreeFunction = [string, string, number, number, number, number, string?]
+
+export type DecompTree = {
+  version: number
+  files: string[]
+  categories: { name: string; units: { name: string; functions: DecompTreeFunction[] }[] }[]
+}
+
+/** A tile in the treemap, at any level. */
+export type DecompNode = {
+  name: string
+  bytes: number
+  doneBytes: number
+  done: number
+  total: number
+  /** Drafts at 95% or better. */
+  near: number
+  /** Set at the function level. */
+  fn?: { address: string; pct: number; pinned: boolean; file: string | null; cName?: string }
+}
+
 export type DecompTab = 'overview' | 'treemap' | 'recent'
