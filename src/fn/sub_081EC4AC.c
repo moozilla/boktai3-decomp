@@ -1,10 +1,9 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.7%
-// foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
-#define gEffectRandomIndex gUnk_03005304
-#define gEffectRandomTable gUnk_086141BC
+// MATCHING_CONCESSION: register-pinning
+#define ActorEffect_SpawnBurstAtAnchor sub_081EC4AC
+#define gEffectRandomIndex             gUnk_03005304
+#define gEffectRandomTable             gUnk_086141BC
 struct BurstActor {
     u8 pad0[0x268];
     s32 height;
@@ -32,10 +31,14 @@ void ActorEffect_SpawnBurstAtAnchor(struct BurstActor *actor, u32 variant)
     position.y = 158;
     position.z = 50;
     gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    velocity.x = (gUnk_086141BC[gUnk_03005304] & 1) + 2;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    velocity.y = -(gUnk_086141BC[gUnk_03005304] & 1);
-    velocity.z = 0;
+    {
+        u32 sample = gUnk_086141BC[gUnk_03005304];
+        register u16 one asm("r5") = 1;
+        velocity.x = (sample & one) + 2;
+        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        velocity.y = -(gUnk_086141BC[gUnk_03005304] & one);
+        velocity.z = 0;
+    }
     if (variant == 0)
         sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 5, 0, 0, 0, 2, 42, 0,
                      512, 1, 0);
@@ -43,6 +46,3 @@ void ActorEffect_SpawnBurstAtAnchor(struct BurstActor *actor, u32 variant)
         sub_08113398(&position, &velocity, actor->resourceA, actor->resourceB, 6, 0, 0, 0, 2, 30, 0,
                      512, 1, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_SpawnBurstAtAnchor);
-#endif
