@@ -263,7 +263,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-sol09.md](../notes/cx-sol09.md) | Campaign worker sol09 | #matching #axe #scene-actor | 16 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 14 |
 | [notes/cx-sol11.md](../notes/cx-sol11.md) | Campaign worker sol11 | #matching #actors | 13 |
-| [notes/cx-xhigh.md](../notes/cx-xhigh.md) | Campaign worker xhigh | #matching #monsters #compiler #register-pinning | 3 |
+| [notes/cx-xhigh.md](../notes/cx-xhigh.md) | Campaign worker xhigh | #matching #monsters #compiler #register-pinning | 5 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |
 | [notes/depin-manual-2_2026-10-21.md](../notes/depin-manual-2_2026-10-21.md) | depin-manual-2 worklog (2026-10-21) | *#tooling* | 8 |
 | [notes/depin-manual-3_2026-10-21.md](../notes/depin-manual-3_2026-10-21.md) | depin-manual-3 worklog (2026-10-21) | *#actors #tooling* | 7 |
