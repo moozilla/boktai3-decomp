@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// foundry draft (worker best 92.4%); what differs is mostly register allocation and instruction order
+
 struct OrbitEffectPosition {
     s16 x, y, z;
 };
@@ -22,6 +20,7 @@ struct OrbitEffect {
     u32 flags;
 };
 s32 Math_Atan2(s32, s32);
+#define OrbitEffect_AdjustHeading sub_081FD664
 void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
 {
     struct OrbitEffectSteering *params = &p->steering;
@@ -36,15 +35,14 @@ void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
             heading += 0x40;
             params->direction = heading;
         } else {
-            u32 current = (u8)params->direction;
-            s32 delta = (s8)desired;
+            register u32 current asm("r2") = (u8)params->direction;
+            s32 signedHeading = (s8)desired;
+            s32 delta;
             register s32 limit asm("r0");
-            delta = (s8)(delta - current);
+            delta = (s8)(signedHeading - current);
             limit = params->turnSpeed;
-            asm("" : "+r"(limit));
             if (delta > limit) {
-                register u32 nd asm("r0") = current + limit;
-                asm("" : "+r"(nd));
+                u32 nd = current + limit;
                 params->direction = nd;
             } else if (delta < limit) {
                 params->direction = current - limit;
@@ -57,6 +55,3 @@ void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
         p->flags |= flag;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", OrbitEffect_AdjustHeading);
-#endif
