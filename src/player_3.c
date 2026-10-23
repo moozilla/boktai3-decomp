@@ -2193,50 +2193,49 @@ static inline void SetModeFlag(struct Player *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 85.0%
 // Preserved owner/request registers differ; one exit reloads the mode.
+// MATCHING_CONCESSION: register-pinning
+#define Player_SelectRequestedActionMode sub_0813F8F8
+
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {
-    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
+    register struct PlayerActionRequest *request asm("r2") =
+        (struct PlayerActionRequest *)&p->thresholdMode;
     if (request->kind >= 0 && request->enabled && !request->blocked) {
-        if (p->tetherMode > 1)
-            return p->tetherMode;
+        u8 *mode = &p->tetherMode;
+        if (*mode > 1)
+            return *mode;
         {
             switch (request->kind) {
                 case 3:
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 19;
                 case 2:
                     if (p->actionRequestRestricted == 1) {
                         Sound_PlaySong(0x192);
-                        return p->tetherMode;
+                        return *mode;
                     }
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 10;
                 case 1:
                     if (p->actionRequestRestricted == 1) {
                         Sound_PlaySong(0x192);
-                        return p->tetherMode;
+                        return *mode;
                     }
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 11;
                 case 0:
                     if (p->actionMode == 0 || p->actionMode == 6)
                         return 2;
-                    return p->tetherMode;
+                    return *mode;
             }
         }
     }
     return p->tetherMode;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectRequestedActionMode);
-#endif
 
 void Player_SetActionRequest(struct Player *p, s32 kind)
 {
