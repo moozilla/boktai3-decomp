@@ -1,9 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.2%
-// MATCHING_CONCESSION: register-pinning
-// Remaining: p+0xb84 is folded into the index sum (original adds p+0xb84 after offset+i).
 struct FbFlags {
     u32 flags;
     u8 rest[0x5c];
@@ -24,10 +20,11 @@ s32 ForgingBook_IsWeaponDiscovered(u32);
 s32 ForgingBook_IsItemDiscovered(u32);
 u32 ForgingBook_GetEntryAnimation(u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
+#define ForgingBook_RefreshEntrySprites sub_08211AC4
 u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
 {
-    register s32 offset asm("sl") = ForgingBook_GetCategoryEntryOffset(p->category);
-    register s32 count asm("sb") = ForgingBook_GetCategoryEntryCount(p->category);
+    s32 offset = ForgingBook_GetCategoryEntryOffset(p->category);
+    s32 count = ForgingBook_GetCategoryEntryCount(p->category);
     s32 i;
     u32 hidden = 1;
 
@@ -39,9 +36,10 @@ u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
     if (p->category <= 5) {
         for (i = 0; i < count; i++) {
             u8 *e;
+            u8 *entries;
             s32 idx = offset + i;
-            asm("" : "+r"(idx));
-            e = p->entry + idx;
+            entries = p->entry;
+            e = entries + idx;
             if (ForgingBook_IsWeaponDiscovered(*e))
                 p->slot[i].flags &= ~1;
             Anim_LoadKeyframe(p->animBase + i * 0x60, p->base,
@@ -52,14 +50,15 @@ u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
             Anim_LoadKeyframe(p->animBase + i * 0x60, p->base, 0x189, 0);
         }
     } else {
-        register s32 n asm("r8");
+        s32 n;
         i = 0;
         n = count - 1;
         for (; i < n; i++) {
             u8 *e;
+            u8 *entries;
             s32 idx = offset + i;
-            asm("" : "+r"(idx));
-            e = p->entry + idx;
+            entries = p->entry;
+            e = entries + idx;
             if (ForgingBook_IsItemDiscovered(*e))
                 p->slot[i].flags &= ~1;
             Anim_LoadKeyframe(p->animBase + i * 0x60, p->base,
@@ -72,6 +71,3 @@ u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ForgingBook_RefreshEntrySprites);
-#endif

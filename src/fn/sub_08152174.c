@@ -3,7 +3,7 @@
 // confidence=low: motion seven changes sprite scale and visibility over six phases.
 // confidence=low: tentative player cue role; see callback body.
 #ifdef NONMATCHING
-// fuzzy: 81.7%
+// fuzzy: 84.3%
 // Animation registers, scale-store addressing and phase branch layout differ.
 struct P {
     u8 pad0[0x14C];
@@ -150,9 +150,9 @@ void PlayerCue_UpdateMotionFade(struct P *p)
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
             p->sprite.flags |= 2;
-            *((u8 *)&p->sprite + 8) = 64 - ((u8)p->timer << 2);
+            p->sprite.unknown8[0] = 64 - ((u8)p->timer << 2);
             if (p->timer > 8) {
-                *((u8 *)&p->sprite + 9) = p->timer << 3;
+                p->sprite.unknown8[1] = p->timer << 3;
                 p->scale = (p->timer - 8) * 20;
                 Player_AddControlFlags(p, 4);
             }
@@ -176,8 +176,8 @@ void PlayerCue_UpdateMotionFade(struct P *p)
             Step(&p->sprite, &p->seq);
             Player_AddControlFlags(p, 4);
             p->sprite.flags |= 2;
-            *((u8 *)&p->sprite + 8) = 4;
-            *((u8 *)&p->sprite + 9) = 120;
+            p->sprite.unknown8[0] = 4;
+            p->sprite.unknown8[1] = 120;
             p->scale = (8 - p->timer) * 200 + 160;
             if (++p->timer > 7)
                 ActorSequence_Begin(p, 7, 4);
@@ -186,12 +186,12 @@ void PlayerCue_UpdateMotionFade(struct P *p)
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
             p->sprite.flags |= 2;
-            *((u8 *)&p->sprite + 8) = 64 - ((15 - (u8)p->timer) << 2);
+            p->sprite.unknown8[0] = 64 - ((15 - (u8)p->timer) << 2);
             if (p->timer <= 7) {
-                *((u8 *)&p->sprite + 9) = (15 - p->timer) << 3;
+                p->sprite.unknown8[1] = (15 - p->timer) << 3;
                 p->scale = (8 - p->timer) * 20;
             } else {
-                *((u8 *)&p->sprite + 9) = 64;
+                p->sprite.unknown8[1] = 64;
                 p->scale = 0;
                 Player_AddControlFlags(p, 4);
             }
