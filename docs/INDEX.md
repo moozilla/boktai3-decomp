@@ -255,7 +255,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 9 |
 | [notes/cx-sol05.md](../notes/cx-sol05.md) | Campaign worker sol05 | #matching #mummy #campaign | 13 |
 | [notes/cx-sol06.md](../notes/cx-sol06.md) | cx-sol06 campaign notes | #matching #hresvelgr | 8 |
-| [notes/cx-sol07.md](../notes/cx-sol07.md) | Campaign worker sol07 | #matching #ratatosk #particles #nonmatching #register-pinning | 8 |
+| [notes/cx-sol07.md](../notes/cx-sol07.md) | Campaign worker sol07 | #matching #ratatosk #particles #nonmatching #register-pinning | 9 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 7 |
 | [notes/cx-sol11.md](../notes/cx-sol11.md) | Campaign worker sol11 | #matching #actors | 3 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |

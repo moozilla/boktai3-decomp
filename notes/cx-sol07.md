@@ -6,7 +6,8 @@ Tags: #matching #ratatosk #particles #nonmatching #register-pinning
 
 Eight exact matches add +0.1487 percentage points of code coverage (3,584
 reviewed bytes): +0.0433 pp without hints and +0.1054 pp register-pinned.
-Fast checks use reviewed full extents. Combined build and merge are pending.
+Fast checks use reviewed full extents. Combined validation printed
+`build/boktai3.gba: OK`; integration includes Batch 2 below.
 
 | Address | Result | Notes |
 | --- | --- | --- |
@@ -37,9 +38,9 @@ No totals files, symbol registry or shared generated files were edited.
 Tags: #matching #ratatosk #tentacle #nonmatching
 
 Session 2 found no new exact matches: +0.0000 percentage points of exact code
-coverage. Two new guarded drafts preserve recovered behavior. The wrap-up flag
-arrived during tentacle-family triage, so the remaining list is unattempted in
-this session. A final branch audit confirmed Batch 1 was still unmerged;
+coverage. Two new guarded drafts preserve recovered behavior. A temporary
+batch-integration signal arrived during tentacle-family triage. The orchestrator
+then removed it and instructed work to resume after merging. A final branch audit confirmed Batch 1 was still unmerged;
 its eight matches and four drafts are included in this integration.
 
 | Address | Result | Notes |
@@ -65,3 +66,13 @@ drafts, and three larger callbacks received static triage only. No exact credit
 is claimed. Remaining function-list entries, including the earlier deferred
 large Ratatosk callbacks, still need future work. All unaccepted experiments
 remain in ignored local scratch storage.
+
+
+### Combined integration validation
+
+All eight matches pass explicit reviewed-extent checks after rebasing onto
+current main. Source review, formatting and commit-range privacy checks pass.
+The combined build printed `build/boktai3.gba: OK`. The batch contains eight
+matches, six new or improved guarded drafts, and the notes above; guarded drafts
+receive no exact credit. No C conflicts occurred during the rebase. Concurrent
+history entries were preserved and the documentation index was regenerated.
