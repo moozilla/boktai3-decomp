@@ -80,3 +80,5 @@ Tags: #player #matching #charge #terrain
 Ten exact matches add approximately 0.263 percentage points of code coverage (6,336 bytes). Seven use register-pinning concessions (5,540 bytes); three need no hints (796 bytes). Four new guarded drafts earn no exact credit. The next assigned function is 08238110. Earlier reviewed-only skips still require a second pass after the remaining list.
 
 Tooling: the private instrumented compiler is available for hint flips. Cause searches require a causebook corpus that is not present; guarded drafts may need an unguarded local scratch copy for these diagnostics. Source semantics remain the acceptance requirement alongside byte equality.
+
+Batch 3 validation: the rebase conflict was limited to docs/INDEX.md and resolved by regeneration. After rebasing, build/cxbuild printed `build/boktai3.gba: OK`.
