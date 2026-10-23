@@ -209,7 +209,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-17.md](../docs/history/2026-10-17.md) | Handoff history: 2026-10-17 | #actors #scripts | 0 |
 | [docs/history/2026-10-18.md](../docs/history/2026-10-18.md) | 2026-10-18 | #actor-stats #assets #collision #foundry #history #input #inventory #matching #player #route #scene-actor #scene-hud #scripts #state-actor #stats | 5 |
 | [docs/history/2026-10-19.md](../docs/history/2026-10-19.md) | 2026-10-19.md | #history #scripts #tooling | 1 |
-| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | 2026-10-23 | #actors #effect-pool #hresvelgr #matching #monsters #register-pinning #scene-actors | 2 |
+| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | October 23: campaign worker sol05 | #actors #campaign #effect-pool #hresvelgr #inventory #matching #monsters #mummy #register-pinning #scene-actors | 2 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
@@ -242,7 +242,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
-| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 4 |
+| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 6 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
 | [notes/contact-sequence-actor_2026-10-14.md](../notes/contact-sequence-actor_2026-10-14.md) | Sequence contact actor pool, October 14 | *#actors* | 6 |
@@ -252,6 +252,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
 | [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 2 |
+| [notes/cx-sol05.md](../notes/cx-sol05.md) | Campaign worker sol05 | #matching #mummy #campaign | 12 |
 | [notes/cx-sol06.md](../notes/cx-sol06.md) | cx-sol06 campaign notes | #matching #hresvelgr | 5 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 6 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |
