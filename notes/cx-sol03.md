@@ -50,3 +50,11 @@ register hints; the others retain only the hints required by depin. This batch
 is gated by a combined ROM build before integration. Functions marked deferred
 above received static review but not a completed fresh matching attempt; return
 to them after the first pass through the remaining assignment.
+
+## Wrap-up checkpoint
+
+The marker arrived during batch integration. Stop after landing this batch;
+resume with the unfinished pause-menu family. Current assignment disposition:
+10 matched, 2 new/improved guarded drafts, 32 skipped or statically reviewed and
+deferred, and 41 not yet attempted. Static-only deferrals are explicitly marked
+above so they are not confused with completed fresh matching attempts.
