@@ -78,10 +78,22 @@ static inline void State(struct SceneActorRegistryResetView *actor, u8 state, u8
     actor->counter2AC = counter;
     actor->field2B1 = 1;
 }
+
 #ifdef NONMATCHING
-// fuzzy: 99.2%
-// Remaining differences: one player-slot literal reload and zero-store scheduling.
+// fuzzy: 99.6%
+// Remaining difference: one player-slot literal reload.
 // confidence=low: reacts to player motion within range, with separate drain and approach transitions.
+static inline void ZeroState(struct SceneActorRegistryResetView *actor, u32 behavior)
+{
+    u8 *field = &actor->state2A8;
+    u32 zero = 0;
+    *field = zero;
+    actor->phase2A9 = zero;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = zero;
+    actor->field2B1 = 1;
+}
+#define Ghost_ReactToPlayerMovement sub_08097E38
 void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
 {
     struct GhostPlayerReaction *state;
@@ -130,7 +142,7 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
     if (active) {
         if (*(u16 *)(gUnk_02000580 + 0x428) == 0)
             return;
-        State(actor, 0, 0, 4, 0);
+        ZeroState(actor, 4);
         state->timer = state->interval;
     } else {
         {
