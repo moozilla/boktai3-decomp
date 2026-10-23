@@ -2,7 +2,9 @@
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18
-struct BurstVector { s16 x, y, z, pad; };
+struct BurstVector {
+    s16 x, y, z, pad;
+};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
