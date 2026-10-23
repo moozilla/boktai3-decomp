@@ -1,9 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-#define gPreviewKeys gUnk_03005260
-#define gRandomIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define Ratatosk_UpdateCloneAttack sub_081F7DAC
+#define gPreviewKeys               gUnk_03005260
+#define gRandomIndex               gUnk_03005308
+#define gRandomTable               gUnk_0203B400
 struct RatatoskPosition {
     u32 packedXY, packedZ;
 };
@@ -50,10 +50,15 @@ static inline u8 ConsumeActivation(struct Ratatosk *p)
     }
     return 0;
 }
-static inline u32 NextRandom(void)
+static inline u32 NextRandom(const u16 *table)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gUnk_03005308 * 2 + (u32)table);
+}
+static inline s32 RandomModulo(s32 divisor)
+{
+    s32 bound = divisor;
+    return Mod(NextRandom(gUnk_0203B400), bound);
 }
 void PlayerClone_BeginActiveReactions(void);
 u32 PlayerClone_GetActiveCount(void);
@@ -108,12 +113,13 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                         }
                         p->duration = 128;
                         {
-                            s32 value = Mod(NextRandom(), 2230);
+                            register s32 value asm("r4");
+                            value = RandomModulo(2230);
+                            asm("" : "+r"(value));
                             value += 1060;
                             p->x = value;
-                        }
-                        {
-                            s32 value = Mod(NextRandom(), 1710);
+                            value = RandomModulo(1710);
+                            asm("" : "+r"(value));
                             value += 1320;
                             p->z = value;
                         }
@@ -151,7 +157,3 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateCloneAttack);
-#endif
