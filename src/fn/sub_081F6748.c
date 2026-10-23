@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define SceneActors_FireTrackingProjectileSpread sub_081F6748
-#define gSceneAngleSineTable                     gUnk_086149C4
+#define gSceneAngleSineTable gUnk_086149C4
 typedef struct ProjectilePosition {
     s16 x, y, z, pad;
 } ProjectilePosition;

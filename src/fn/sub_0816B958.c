@@ -37,7 +37,6 @@ static inline struct MapMenuMarker *MarkerAt(struct MapMenuMarker **array, s32 i
     register struct MapMenuMarker *base asm("r0") = *array;
     return (struct MapMenuMarker *)((u8 *)base + offset);
 }
-#define MapMenu_DrawActiveMarkers sub_0816B958
 void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
 {
     s32 i;

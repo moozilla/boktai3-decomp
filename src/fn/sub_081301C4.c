@@ -38,7 +38,6 @@ static inline void SaveControl(u8 *packet, void *control, u8 behavior)
     packet[9] = 0;
     packet[10] = behavior;
 }
-#define SceneActorReaction_UpdateRouteRecovery sub_081301C4
 void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

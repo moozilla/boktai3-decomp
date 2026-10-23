@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Mimic_UpdateHitRecovery sub_080E6E08
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 

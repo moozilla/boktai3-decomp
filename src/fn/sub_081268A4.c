@@ -19,7 +19,6 @@ static inline u8 allocated(u32 *flags, s32 index)
         return 1;
     return 0;
 }
-#define SceneStatusIndicator_UpdateManager sub_081268A4
 s32 SceneStatusIndicator_UpdateManager(struct SceneStatusIndicatorManager *manager)
 {
     struct SceneStatusIndicatorSlot *start = manager->slots;

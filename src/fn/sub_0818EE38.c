@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Nidhoggr_StepPoolAnimation sub_0818EE38
-
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
     u8 flags, frameCount, frameWeight, duration;

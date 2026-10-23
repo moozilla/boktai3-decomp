@@ -43,7 +43,6 @@ void Projectile_SpawnAtPosition(void *, void *);
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 
-#define OrbitEffect_FireVolley sub_081FD7EC
 u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
 {
     if (p->wide == 0)

@@ -148,27 +148,27 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         }
     }
     do {
-display:
-    *(u32 *)(p + 0x3348) &= ~1;
-    if (p[0xa58]) {
-        ((struct AllocSprite *)(p + 0x33a0))->flags &= ~1;
-        *(u16 *)(p + 0x33c0) = 0;
-        *(u16 *)(p + 0x33c2) = 8;
-        PauseMenu_HidePromptIcons(p);
-        PauseMenu_SetPromptIconPositions(p, 0, 8);
-        SceneHud_SetPairedIcons(p, 1, -1);
-    } else {
-        *(u32 *)(p + 0x33a8) |= 1;
-        PauseMenu_SetPromptIconPositions(p, 0, 8);
-        SceneHud_SetPairedIcons(p, 1, -1);
-    }
-    *(u32 *)(p + 0x1608) &= ~1;
-    Anim_Step(p + 0x1600, p + 0x64);
-finish:
-    InventoryGrid_UpdateStatPreview(p);
-    if (*(s8 *)(p + 0x48ab) >= 0) {
-        SceneCatalog_SetDescription(p, *(s8 *)(p + 0x48ab));
-        p[0x48ab] = 255;
+    display:
+        *(u32 *)(p + 0x3348) &= ~1;
+        if (p[0xa58]) {
+            ((struct AllocSprite *)(p + 0x33a0))->flags &= ~1;
+            *(u16 *)(p + 0x33c0) = 0;
+            *(u16 *)(p + 0x33c2) = 8;
+            PauseMenu_HidePromptIcons(p);
+            PauseMenu_SetPromptIconPositions(p, 0, 8);
+            SceneHud_SetPairedIcons(p, 1, -1);
+        } else {
+            *(u32 *)(p + 0x33a8) |= 1;
+            PauseMenu_SetPromptIconPositions(p, 0, 8);
+            SceneHud_SetPairedIcons(p, 1, -1);
+        }
+        *(u32 *)(p + 0x1608) &= ~1;
+        Anim_Step(p + 0x1600, p + 0x64);
+    finish:
+        InventoryGrid_UpdateStatPreview(p);
+        if (*(s8 *)(p + 0x48ab) >= 0) {
+            SceneCatalog_SetDescription(p, *(s8 *)(p + 0x48ab));
+            p[0x48ab] = 255;
         }
     } while (0);
 }

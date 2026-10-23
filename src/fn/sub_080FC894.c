@@ -13,9 +13,9 @@ void Axe_CopyAuxiliaryVector(struct S080FC894 *s, u32 *src)
     dst = (u32 *)s->q;
     dst = (u32 *)((u8 *)dst + off);
     do {
-    a = src[0];
-    b = src[1];
-    dst[0] = a;
+        a = src[0];
+        b = src[1];
+        dst[0] = a;
     } while (0);
     dst[1] = b;
 }

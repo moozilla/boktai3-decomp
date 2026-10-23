@@ -38,7 +38,6 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state,
 }
 void Bee_DisableMovement(void *);
 // confidence=low: eases saved motion before returning to idle.
-#define Bee_UpdateMovementStop sub_080924EC
 void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;

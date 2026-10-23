@@ -24,13 +24,13 @@ void StageIconDisplay_InitAnimations(struct StageIconDisplay *argument, s32 vari
             u32 scratch;
             struct SceneExtent *point;
             do {
-            scratch = (u32)&position;
+                scratch = (u32)&position;
             } while (0);
             Widget_InitLinked(&display->icon, header, 48, 48, variant, variant, 60,
                               (void *)scratch);
             do {
-            scratch = 0;
-            point = &position;
+                scratch = 0;
+                point = &position;
             } while (0);
             indicator = (void *)((u8 *)header + 0x80);
             i = 2;

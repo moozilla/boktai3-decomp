@@ -39,7 +39,7 @@ void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
         u32 one;
         u8 *done = &p->done;
         do {
-        one = 1;
+            one = 1;
         } while (0);
         *done = one;
         p->rotation = 128;

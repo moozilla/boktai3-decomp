@@ -58,7 +58,6 @@ static inline void ToScreen(struct Vec *screen, struct Vec *world)
     screen->z = screen->z - gUnk_03005418[2];
 }
 
-#define SceneTarget_BeginMove sub_081C32C8
 static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 {
     *slot = callback;

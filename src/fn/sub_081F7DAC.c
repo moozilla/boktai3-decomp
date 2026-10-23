@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Ratatosk_UpdateCloneAttack sub_081F7DAC
-#define gPreviewKeys               gUnk_03005260
-#define gRandomIndex               gUnk_03005308
-#define gRandomTable               gUnk_0203B400
+#define gPreviewKeys gUnk_03005260
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 struct RatatoskPosition {
     u32 packedXY, packedZ;
 };

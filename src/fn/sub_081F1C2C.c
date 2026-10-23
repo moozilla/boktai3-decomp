@@ -1,8 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-
-
 #ifdef NONMATCHING
 /* Remaining differences: script/vector stack layout and state/resource setup lifetimes. */
 s32 Script_SeekToKeyword(u32);
@@ -30,7 +28,6 @@ void CpuSet(const void *, void *, u32);
 
 #define F(ty, off) (*(ty *)(p + (off)))
 
-#define SingletonSlot7_InitFromScript sub_081F1C2C
 s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
 {
     register s32 health asm("r6") = 2000;

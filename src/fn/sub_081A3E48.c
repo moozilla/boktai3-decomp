@@ -1,7 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define EffectPool_CreateEntries sub_081A3E48
 struct Vec {
     s16 x, y, z, pad;
 };

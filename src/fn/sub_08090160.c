@@ -2,7 +2,6 @@
 #include "global.h"
 
 // confidence=low: emits three debris particles during the Slime death reaction.
-#define Slime_EmitDeathDebris sub_08090160
 
 struct Position {
     s16 x, y, z, pad;

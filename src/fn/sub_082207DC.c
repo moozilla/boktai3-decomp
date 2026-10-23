@@ -1,6 +1,6 @@
 #include "global.h"
 
-// Box_Overlaps (sub_08220BF8) inlined; the stack box address is kept in a register
+// Box_Overlaps (Box_Overlaps) inlined; the stack box address is kept in a register
 // (pinned: agbcc otherwise folds it into sp-relative adds).
 
 struct HitPoint {

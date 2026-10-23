@@ -49,7 +49,6 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
     asm volatile("" : : "r"(flags));
 }
 // confidence=low: plays profile entry two when the action begins.
-#define Crow_PlayEntry2 sub_0809EF50
 void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor))

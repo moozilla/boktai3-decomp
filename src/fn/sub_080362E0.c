@@ -91,7 +91,7 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
         }
     }
     do {
-    rfu_clearSlot(4, *slot);
+        rfu_clearSlot(4, *slot);
     } while (0);
     if (rfu_NI_setSendData((u8)(one << (*slot)), 14, ((u8 *)p) + 0xB8, 12)) {
         goto sendError;

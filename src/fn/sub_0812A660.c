@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define ActorEffect_InitColliders sub_0812A660
 struct Packed {
     s32 x : 16;
     s32 y : 16;

@@ -20,7 +20,6 @@ struct OrbitEffect {
     u32 flags;
 };
 s32 Math_Atan2(s32, s32);
-#define OrbitEffect_AdjustHeading sub_081FD664
 void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
 {
     struct OrbitEffectSteering *params = &p->steering;

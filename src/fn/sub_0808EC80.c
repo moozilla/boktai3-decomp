@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Slime_ConvergeReactionMotion sub_0808EC80
-
 #include "scene_actor_chase.h"
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 void Slime_RollMoveFlag(void);

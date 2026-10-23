@@ -115,7 +115,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
                 u32 zero = 0;
                 shift = zero;
             }
-        q = e->bytes;
+            q = e->bytes;
         } while (0);
         do {
             int value;

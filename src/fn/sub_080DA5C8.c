@@ -28,7 +28,7 @@ void Mummy_ResetResponseState(u8 *p)
         u32 loaded = body[15];
         u32 value = mask;
         do {
-        value &= loaded;
+            value &= loaded;
         } while (0);
         zero = 0;
         body[15] = value;

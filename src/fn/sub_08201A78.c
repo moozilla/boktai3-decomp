@@ -54,7 +54,6 @@ static inline void raisePosition(struct Vec *p)
 {
     p->y += 128;
 }
-#define ScriptCombatActor_UpdateProjectileAttack sub_08201A78
 u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
 {
     u8 config[0x5c];

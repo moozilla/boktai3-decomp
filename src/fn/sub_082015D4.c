@@ -78,7 +78,6 @@ static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
     gUnk_03005308 = index;
     AdjustCoordinate(z, table[index]);
 }
-#define ScriptCombatActor_ApplyHitReaction sub_082015D4
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
                                         struct HitActor *p)
 {

@@ -142,7 +142,8 @@ void PlayerCue_UpdateFacingPose(struct P *p)
 {
     u16 heading;
     s32 signedHeading;
-    if (B(0x457) != 0x17) Player_SetTetherMode(p, 0x17, 0);
+    if (B(0x457) != 0x17)
+        Player_SetTetherMode(p, 0x17, 0);
     heading = H(0x34C);
     signedHeading = S(0x34C);
     if (signedHeading >= 0) {
@@ -169,12 +170,13 @@ void PlayerCue_UpdateFacingPose(struct P *p)
     Anim_SetSequence(&p->seq, (void *)p->resource, 2, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
     asm("" : : : "r6");
-    { u32 statusOffset = 0x4F3;
-      u8 *status;
-      status = (u8 *)p + statusOffset;
-    if ((s8)*status < 0) {
-        sub_08238238(p);
-        Player_SetTetherMode(p, 0, 0);
-    }
+    {
+        u32 statusOffset = 0x4F3;
+        u8 *status;
+        status = (u8 *)p + statusOffset;
+        if ((s8)*status < 0) {
+            sub_08238238(p);
+            Player_SetTetherMode(p, 0, 0);
+        }
     }
 }

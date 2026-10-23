@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#define FIELD(p,n,t) (*(t *)((u8 *)(p)+(n)))
+#define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 // confidence=low: selects a route return phase from motion and route flags.
 #define SceneActorRoute_UpdateContactRecovery sub_081314E8
@@ -68,7 +68,10 @@ static inline u32 Finished(struct SceneActorRegistryResetView *a)
     asm("" : "+r"(offset));
     return FIELD(a, offset, u8);
 }
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask) { return a->flags2D4 & mask; }
+static inline u16 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    return a->flags2D4 & mask;
+}
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 static inline u32 FlagsSave(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
@@ -79,8 +82,8 @@ static inline u32 FlagsSave(struct SceneActorRegistryResetView *a, u32 mask, u16
     return value;
 }
 static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                         struct ContactPosition *position, struct ContactPosition *target,
-                         u16 *flags, u32 mask)
+                          struct ContactPosition *position, struct ContactPosition *target,
+                          u16 *flags, u32 mask)
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
@@ -104,22 +107,43 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
     asm("" : "+r"(group));
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         BeginControlZero(actor, actor->savedTarget, 0);
-        { u32 *flags = &actor->flags2CC; u32 mask = ~0x80; *flags &= mask; }
-        { u32 *flags = &actor->flags2D0; u32 mask = ~0x1000000; *flags &= mask; }
-        { u16 *flags = &actor->flags2D4; u32 mask = ~0x200; *flags &= mask; }
+        {
+            u32 *flags = &actor->flags2CC;
+            u32 mask = ~0x80;
+            *flags &= mask;
+        }
+        {
+            u32 *flags = &actor->flags2D0;
+            u32 mask = ~0x1000000;
+            *flags &= mask;
+        }
+        {
+            u16 *flags = &actor->flags2D4;
+            u32 mask = ~0x200;
+            *flags &= mask;
+        }
         actor->field2C2 = 64;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270)) return;
+    if ((u8)Callback_InvokeActor(actor, actor->update270))
+        return;
     result = sub_0812F3CC(actor);
-    if (result) return;
+    if (result)
+        return;
     if (FlagsSave(actor, 0x1000, &motionFlags)) {
         struct ContactPosition delta;
         struct ContactPosition *p = (void *)(*(u8 **)FIELD(group, 0x88, void *) + 0xC);
         SceneActorTerrain_Subtract(&delta, p, &actor->position);
         if ((u32)(delta.x * delta.x + delta.z * delta.z) <= 0xFFFE) {
             BeginControl(actor, FIELD(group, 0x238, void *), 0x19, result);
-            { u32 state = 3; u8 *field = &actor->state2A8; *field = state; } actor->phase2A9 = 1; actor->behavior2AA = 0;
-            actor->counter2AC = result; actor->field2B1 = 1;
+            {
+                u32 state = 3;
+                u8 *field = &actor->state2A8;
+                *field = state;
+            }
+            actor->phase2A9 = 1;
+            actor->behavior2AA = 0;
+            actor->counter2AC = result;
+            actor->field2B1 = 1;
             return;
         }
     }
@@ -138,19 +162,25 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         destinationOffset = 0x200;
         destination = (void *)(group + destinationOffset);
         (*destination)->pad = 1;
-        if (!TryRoute(actor, FIELD(group, 0x1FC, void *), &actor->position, *destination, motionFlags, destinationOffset)) {
+        if (!TryRoute(actor, FIELD(group, 0x1FC, void *), &actor->position, *destination,
+                      motionFlags, destinationOffset)) {
             Callback_InvokeActor(actor, FIELD(group, 0x224, void *));
             return;
         }
         if (actor->flags2CC & 0x200000) {
             u8 *control = group + 0x4C;
-            { u32 *flags = &actor->flags2D0; u32 mask = ~0x1000000; *flags &= mask; }
+            {
+                u32 *flags = &actor->flags2D0;
+                u32 mask = ~0x1000000;
+                *flags &= mask;
+            }
             *motionFlags &= ~0x200;
             control[0xA] = 0;
             FIELD(control, 0x18, u32) = 0;
             FIELD(control, 8, u16) = 0;
         }
-    } else actor->counter2AC++;
+    } else
+        actor->counter2AC++;
 }
 
 #else

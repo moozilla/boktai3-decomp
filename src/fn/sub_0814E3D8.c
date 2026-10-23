@@ -44,7 +44,6 @@ static inline void SetChargeParameter(u8 *p)
     u32 value = 0x16E;
     *target = value;
 }
-#define Player_UpdateSelectedAttackCharge sub_0814E3D8
 void Player_UpdateSelectedAttackCharge(u8 *p)
 {
     struct BurstA ba;

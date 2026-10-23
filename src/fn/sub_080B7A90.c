@@ -2,7 +2,6 @@
 /* Skeleton variant of SceneActorTarget_ResolvePendingObject that also clears state bits 0x300 */
 #include "global.h"
 // confidence=low: resolves the pending contact object and clears Skeleton context state bits.
-#define SceneActorTarget_ResolvePendingObjectSkeleton sub_080B7A90
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_behavior.h"

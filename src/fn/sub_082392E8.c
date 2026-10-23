@@ -68,7 +68,7 @@ void sub_082392E8(State *s, Point *pos)
         SpriteDrawable_SelectTileFrame(draw, s->graphics, 2);
         angle = random_first() & mask;
         do {
-        radius = (random_first() & 63) + 128;
+            radius = (random_first() & 63) + 128;
         } while (0);
         do {
             e->dx = scale(radius * gUnk_086149C4[(angle + 64) & mask]);

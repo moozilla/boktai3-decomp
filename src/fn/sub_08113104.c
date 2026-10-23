@@ -215,4 +215,3 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
         p->entered = 1;
     }
 }
-

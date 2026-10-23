@@ -3,7 +3,6 @@
 #include "game_state.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Player_IsStatBBelow sub_0814DF0C
 extern struct GameState *gUnk_02000710;
 s32 Player_IsStatBBelow(struct Player *p, s32 threshold)
 {

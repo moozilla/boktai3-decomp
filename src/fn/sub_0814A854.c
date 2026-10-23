@@ -1,7 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define ActorFlags_GetResponseBits sub_0814A854
 u32 Callback_InvokeActor(void *, void *);
 u32 ActorFlags_GetResponseBits(u8 *p)
 {

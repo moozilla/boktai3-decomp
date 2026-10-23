@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SpriteColliderGroup_ActivateParts sub_0818E9B8
 // MATCHING_CONCESSION: register-pinning
 struct SpriteColliderPartState {
     u8 flags, unknown1[4], active, counter;

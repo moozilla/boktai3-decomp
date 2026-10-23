@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: refreshes inventory icons and equipped-slot markers.
-#define SceneHud_RefreshEquipmentIcons sub_0817373C
 #ifdef NONMATCHING
 // fuzzy: 51.1%
 // Remaining: loop induction, marker pointers and register allocation.

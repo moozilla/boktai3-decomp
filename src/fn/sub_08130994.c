@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 void SceneActorControl_OnIdle(void);
-#define FIELD(p,n,t) (*(t *)((u8 *)(p)+(n)))
+#define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 // confidence=low: starts the actor callback at 0x234 then consumes its trigger.
 #define SceneActorControl_UpdateCallbackTrigger sub_08130994
 #ifdef NONMATCHING
@@ -52,7 +52,8 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 zero, u8 byteZero)
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 zero,
+                            u8 byteZero)
 {
     actor->state2A8 = state;
     actor->phase2A9 = byteZero;

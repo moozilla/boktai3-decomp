@@ -1173,10 +1173,10 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
     z = position->z >> 8;
     do {
         if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
-        cell = 0;
+            cell = 0;
         } else {
-        u32 row = gUnk_030052F4->rows[z];
-        cell = row + x;
+            u32 row = gUnk_030052F4->rows[z];
+            cell = row + x;
         }
     } while (0);
     properties = TerrainModifiers_FindCellOverride(cell, 1);

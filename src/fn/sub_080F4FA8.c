@@ -38,9 +38,9 @@ void Sword_UpdateHorizontalWaveReturn(struct Obj *p)
     if (p->timer == 0) {
         u32 one;
         do {
-        p->rotation = 128;
-        one = 1;
-        *(u8 *)((u8 *)p + 0x11e) = one;
+            p->rotation = 128;
+            one = 1;
+            *(u8 *)((u8 *)p + 0x11e) = one;
         } while (0);
         *(u8 *)((u8 *)p + 0x11f) = one;
         one |= *(u8 *)((u8 *)p + 0x119);

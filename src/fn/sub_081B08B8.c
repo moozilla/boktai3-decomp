@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorStatus_UpdatePlayerApproach sub_081B08B8
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
 #include "display_animation.h"

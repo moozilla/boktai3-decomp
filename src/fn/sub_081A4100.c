@@ -2,7 +2,6 @@
 
 #ifdef NONMATCHING
 // Remaining differences: random-table reload and lifetime/mode scratch registers.
-#define MotionEntry_Create sub_081A4100
 struct MotionVector {
     s16 x, y, z, pad;
 };

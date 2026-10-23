@@ -36,7 +36,6 @@ static inline u8 Test(u32 value, u32 mask)
 }
 
 // confidence=low: records a collision target unless the Skeleton is unavailable.
-#define Skeleton_OnAttackCollision sub_080B8DE0
 void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;

@@ -68,7 +68,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             u8 *p = (u8 *)gUnk_02000580[0] + 0x701;
             f = *p;
             do {
-            v = 1 | f;
+                v = 1 | f;
             } while (0);
             *p = v;
         }

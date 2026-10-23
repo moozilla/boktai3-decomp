@@ -14,7 +14,7 @@ void SceneHud_DrawDecimalDigits(s32 value, s32 div, s32 x, s32 y, s32 flag)
         u16 t = d + base;
         *cell++ = t | 0xF000;
         do {
-        value -= div * d;
+            value -= div * d;
         } while (0);
         div = Div(div, 10);
     }

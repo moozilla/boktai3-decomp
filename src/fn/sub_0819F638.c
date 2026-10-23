@@ -1,9 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_UpdateRandomVolleyPhase sub_0819F638
-#define gRandomIndex                      gUnk_03005308
-#define gRandomTable                      gUnk_0203B400
-#define gHresvelgrVolleyState             gUnk_02000230
+#define gRandomIndex          gUnk_03005308
+#define gRandomTable          gUnk_0203B400
+#define gHresvelgrVolleyState gUnk_02000230
 struct ReactionVector {
     s16 x, y, z, pad;
 };

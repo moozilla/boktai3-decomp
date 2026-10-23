@@ -25,7 +25,7 @@ void sub_081C6094(u8 *p)
             s32 r;
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
             do {
-            r = table[gUnk_03005308];
+                r = table[gUnk_03005308];
             } while (0);
             ChallengeResult_LoadDigit(digit, resource, sub_08249350(r >> 4, 10));
             digit += 0x60;

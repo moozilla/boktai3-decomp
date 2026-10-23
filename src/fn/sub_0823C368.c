@@ -2,7 +2,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: alternate action handlers use the same history selection rule.
-#define Player_SelectHistoryDirectionB sub_0823C368
 
 /* Signed view of the history entries read by this selector. */
 struct PlayerHistory {

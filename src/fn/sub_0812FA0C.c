@@ -293,7 +293,6 @@ done:
 
 // confidence=low: waits before restoring control and choosing a route back toward the target.
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-#define SceneActorReaction_UpdateRouteReturn sub_0812FA0C
 void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

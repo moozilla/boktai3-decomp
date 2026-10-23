@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define ParticleGroup_UpdateFrozen sub_08014330
 struct PGroup {
     u8 active, count, type, priority;
     u8 particles[448];

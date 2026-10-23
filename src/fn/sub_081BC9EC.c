@@ -5,7 +5,10 @@ void Bg_SetLayerMap(s32, s32, s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 s32 MessageWindow_ShowMessage(s32);
 void StatGauge_WaitBeforeFade(void);
-struct G { u8 pad[0x534]; s16 level; };
+struct G {
+    u8 pad[0x534];
+    s16 level;
+};
 extern struct G *gUnk_02000710;
 void StatGauge_ShowCompletionMessage(u8 *p)
 {

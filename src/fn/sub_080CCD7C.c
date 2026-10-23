@@ -401,7 +401,6 @@ static inline void SetCommand(struct SceneActorReactionCommand *command, void *p
     command->second = 0;
     command->kind = kind;
 }
-#define Golem_UpdateChargePursuit sub_080CCD7C
 void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorControl_RestoreMotion sub_08083560
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 void CpuSet(const void *, void *, u32);

@@ -40,13 +40,13 @@ void WirelessGameMenu_UpdateSelectionExchange(struct P *p)
         u8 *q;
         p->entered = 0;
         do {
-        data = 0;
-        e = &p->entry;
-        packed = 0;
-        total = 0;
-        i = 0;
-        shift = 0;
-        q = e->bytes;
+            data = 0;
+            e = &p->entry;
+            packed = 0;
+            total = 0;
+            i = 0;
+            shift = 0;
+            q = e->bytes;
         } while (0);
         do {
             int value;

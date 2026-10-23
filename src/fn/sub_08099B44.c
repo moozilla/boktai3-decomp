@@ -366,7 +366,6 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
     if (Test(a->flags2C0, 0x40))
         U16(a, 0x13A) &= ~0x100;
 }
-#define Ghost_Init sub_08099B44
 s32 Ghost_Init(struct SceneActorRegistryResetView *a)
 {
     u32 fill;

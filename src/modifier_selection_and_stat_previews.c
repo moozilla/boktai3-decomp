@@ -696,7 +696,7 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
         case 0:
         case 2:
             do {
-            ModifierMenu_DrawStatComparison(first, first, 21, 6, 2);
+                ModifierMenu_DrawStatComparison(first, first, 21, 6, 2);
             } while (0);
             ModifierMenu_DrawStatComparison(second, second, 21, 7, 3);
             ModifierMenu_DrawStatComparison(third, third, 21, 8, 4);
@@ -715,10 +715,10 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
                     goto invalidPreview;
                 }
                 do {
-            validPreview:
-                ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
-                ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 3);
-                ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 4);
+                validPreview:
+                    ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
+                    ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 3);
+                    ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 4);
                 } while (0);
                 ModifierMenu_DrawCapacity(count, capacity, nextCapacity, 8, 16);
                 break;

@@ -69,7 +69,7 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
         u16 zero;
         mask &= *flags;
         do {
-        zero = 0;
+            zero = 0;
         } while (0);
         *flags = mask;
         SetCallback(actor, sub_08116E44, zero);

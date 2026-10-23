@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Vanargand_UpdateOffsetMotion sub_081AB438
 struct MotionTrackVector {
     s16 x, y, z, padding;
 };

@@ -79,7 +79,6 @@ static inline void SetFlags(u32 *field, u32 mask)
     *field = bits | *field;
 }
 // confidence=low: terrain probes select sideways motion along the coordinate axis.
-#define Player_UpdateTerrainSidestep sub_0823C930
 void Player_UpdateTerrainSidestep(u8 *p)
 {
     struct PackedVec pt;

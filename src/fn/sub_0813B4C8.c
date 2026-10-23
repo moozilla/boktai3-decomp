@@ -3,7 +3,6 @@
 #include "game_state.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Player_RecalculateDerivedStats sub_0813B4C8
 
 s32 Div(s32, s32);
 void Player_RecalculateDerivedStats(struct Player *p)

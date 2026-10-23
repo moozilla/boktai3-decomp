@@ -305,7 +305,6 @@ static inline void ChasePlayer(struct SceneActorRegistryResetView *actor)
 }
 
 // confidence=low: contact flags select chase, roar, or a reaction control.
-#define Golem_ReactToContact sub_080C12FC
 u8 Golem_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
