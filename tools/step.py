@@ -212,6 +212,17 @@ def analyze(src, func=None, nonmatching=False):
                         note = (f"two-operand `{mc[1].group(1)}`: you copy operand 1 = {pseudo_name(p1)} and use "
                                 f"operand 2 = {pseudo_name(p2)}; the ROM copies the other one. The decision is the "
                                 f"operand order of insn {u} before regmove, not register allocation.")
+        if kind in ("insert", "delete", "replace"):
+            # a narrowing right after a call: the callee's declared return type
+            for side, xs, other in (("ROM", orig, cand), ("yours", cand, orig)):
+                m = re.match(r"lsls (r\d+), \1, #(0x18|0x10)$", xs[0][1]) if xs else None
+                seq = an.od if side == "ROM" else an.cd
+                k = next((n_ for n_, (o, _) in enumerate(seq) if xs and o == xs[0][0]), None)
+                if m and k and seq[k - 1][1].startswith("bl ") and not any(t.startswith("lsls") for _, t in other):
+                    width = "u8/s8" if m.group(2) == "0x18" else "u16/s16"
+                    note = (f"call result: {'the ROM narrows' if side == 'ROM' else 'you narrow'} the value returned by "
+                            f"`{seq[k - 1][1]}` to {width}; {'declare or cast' if side == 'ROM' else 'do not cast'} "
+                            f"the callee's return type that way.")
         if kind in ("delete", "replace") and orig:
             near = [an.off_line.get(an.cd[k][0]) for k in (idx - 1, idx, idx + 1) if 0 <= k < len(an.cd)]
             gone = vanished(dumps, func, {x for x in near if x})
@@ -280,6 +291,8 @@ def render(st, e, title, trails=2):
     if e["note"]:
         out.append(f"   {e['note']}")
     if e["kind"] == "order":
+        pass
+    elif e["note"] and e["note"].startswith("call result"):
         pass
     elif e["evs"]:
         for u, p, k, text in sorted(e["evs"], key=lambda x: PASS_RANK.get(x[1], 99)):

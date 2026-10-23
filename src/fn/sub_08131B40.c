@@ -1,44 +1,37 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 66.2%
-// 7 differing instruction runs; first diff at +0x18 (movs r1, #4 vs ldr r0, [pc, #0x38])
+
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-void Callback_InvokeActor(u8 *, void *);
-static inline u32 test(u32 *p, u32 m)
+
+static inline u32 Input_Held(u32 mask)
 {
-    return *p & m;
+    return (gUnk_030053F4 | gUnk_030053F0) & mask;
 }
-struct S {
-    u8 pad[0x284];
-    void **table;
-    u8 pad2[0x20];
-    u8 b[4];
-    u32 word;
-    u8 pad3;
-    u8 end;
-};
-void sub_08131B40(u8 *s)
+
+static inline u32 Game_Flag(u32 mask)
 {
-    u32 mask = 0x400;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask || test(&gUnk_02000560, 4)) {
-        u32 two = 2;
-        u32 one = 1;
-        u8 *p = s + 0x2A8;
-        u32 zero = 0;
-        *p = two;
-        p = s + 0x2A9;
-        *p = zero;
-        ++p;
-        *p = one;
-        p += 2;
-        *(u32 *)p = zero;
-        s[0x2B1] = one;
-    } else {
-        u32 i = s[0x2AA];
-        struct S *obj = (struct S *)s;
-        Callback_InvokeActor(s, obj->table[i]);
+    return gUnk_02000560 & mask;
+}
+
+static inline void SetState(u8 *p, u32 s, u32 b)
+{
+    u8 *state = &p[0x2A8];
+    u32 zero = 0;
+    *state = s;
+    p[0x2A9] = zero;
+    p[0x2AA] = b;
+    *(u32 *)(p + 0x2AC) = zero;
+    p[0x2B1] = 1;
+}
+
+/* Leave the state (2, behaviour 1) on input 0x400 or game flag 4;
+   otherwise run the behaviour callback. The masks are helper arguments:
+   the ROM loads each before its global. */
+void sub_08131B40(u8 *p)
+{
+    if (Input_Held(0x400) || Game_Flag(4))
+        SetState(p, 2, 1);
+    else {
+        u32 i = p[0x2AA];
+        Callback_InvokeActor(p, (*(void ***)(p + 0x284))[i]);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08131B40);
-#endif
