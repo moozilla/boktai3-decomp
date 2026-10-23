@@ -12,7 +12,9 @@ write `~`). The hooks in `.githooks` and the CI job run `tools/pii_check.py`.
 * New worktree: `tools/worktree.sh --here` (seconds; clones the built base in
   `../b3-base`, no build). Workers use `tools/check.py`, never a full build.
 * Fast exact checks suffice for working-branch commits. Run one combined ROM
-  build before batch integration into main (`build/boktai3.gba: OK`). Rebuild or
+  build before batch integration into main (`build/boktai3.gba: OK`). Each batch
+  integration PR also regenerates `PROGRESS.md` and `PROGRESS.json` with
+  `python3 tools/progress.py --markdown PROGRESS.md` (see `AGENTS.md`). Rebuild or
   run relocation/emulator tests again only when changes or failures justify it.
 * Matching means byte-identical. No hand-written instructions inside `asm()`
   to force a match. `INCLUDE_ASM` is the placeholder for unfinished functions.
