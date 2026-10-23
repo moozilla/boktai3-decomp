@@ -120,9 +120,8 @@ test('the popup shows PROGRESS.md, the treemap down to functions, and recent PRs
     const ui = await $.ui.mount({ ...PANE, surface })
     expect(await ui.find({ type: 'Text', text: '64.50%' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '10,578 / 11,780 functions' })).toBeDefined()
-    // The details are drawn hidden, for the pointer to reveal.
-    expect(await ui.find({ type: 'Text', text: /Nonmatching drafts: 475 functions/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /107 left · 1 draft ≥95%/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /47\.6% without register pinning · 475 drafts at 87\.7% fuzzy/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: '107 left' })).toBeDefined()
 
     // A category opens the treemap there, its units listed most-left first.
     await ui.press({ key: 'cat-Player' })

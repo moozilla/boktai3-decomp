@@ -4,9 +4,10 @@ A Claude Code mod that puts a small `◔ 64.50%` button in the prompt footer, be
 the mode labels. Clicking it (or typing `/decomp`) opens a popup with the Boktai 3
 decomp's progress, in three tabs:
 
-* **Overview**: the headline and one bar per category, by section. Hover the
-  headline or a category for the details (bytes, register pinning, drafts, functions
-  left); click a category to open it in the treemap. ROM regions fold at the bottom.
+* **Overview**: the headline (with the unpinned share and the drafts in one line),
+  then one bar per category, by section, with the functions left and the share of
+  bytes matched. Click a category to open it in the treemap. ROM regions fold at the
+  bottom.
 * **Treemap**: like decomp.dev's, one level at a time: categories, then a category's
   units, then a unit's functions, sized by code bytes and shaded by bytes matched
   (green is complete). Hover a tile for numbers. Under it, the tiles as a list, most

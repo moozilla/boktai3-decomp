@@ -338,15 +338,6 @@ export const register: Register = on => {
       return <Text color={parts[0]?.color ?? BLUE}>{textBar(parts.reduce((s, p) => s + p.pct, 0), Math.max(10, cols - 2))}</Text>
     }
 
-    // Lines a row shows only while the pointer is on it.
-    const details = (lines: string[]) => (
-      <Box flexDirection="column" display="none" hover={{ display: 'flex' }} paddingLeft={2}>
-        {lines.map(l => (
-          <Text dimColor>{l}</Text>
-        ))}
-      </Box>
-    )
-
     const header = (
       <Box flexDirection="row" justifyContent="space-between" alignItems="center">
         <Text dimColor>Boktai 3 decomp</Text>
@@ -383,15 +374,16 @@ export const register: Register = on => {
       <Box key={`row-${c.name}`} flexDirection="column">
         <Box flexDirection="row" justifyContent="space-between">
           <Button key={`cat-${c.name}`} plain label={c.name} onPress={() => drill($, { category: c.name })} />
-          <Text color={c.pct >= 100 ? GREEN : undefined} dimColor={c.pct < 100}>
-            {pctLabel(c.pct)}
-          </Text>
+          {c.pct >= 100 ? (
+            <Text color={GREEN}>✓</Text>
+          ) : (
+            <Box flexDirection="row" gap={2}>
+              <Text dimColor>{`${c.left} left`}</Text>
+              <Text>{pctLabel(c.pct)}</Text>
+            </Box>
+          )}
         </Box>
         {bar([{ pct: c.pct, color: c.pct >= 100 ? GREEN : BLUE }], `bar-${c.name}`)}
-        {details([
-          `${c.done}/${c.total} functions${c.left ? ` · ${c.left} left` : ''}${c.near ? ` · ${c.near} ${c.near === 1 ? 'draft' : 'drafts'} ≥95%` : ''}`,
-          `${c.units.length} units · click to open in the treemap`,
-        ])}
       </Box>
     )
 
@@ -413,15 +405,12 @@ export const register: Register = on => {
               ],
               'bar-headline',
             )}
-            {details([
-              `Code matched in C, by bytes: ${fmt(snap.bytesDone)} / ${fmt(snap.bytesTotal)}`,
-              `Without register pinning ${clean.toFixed(2)}% · pinned ${snap.pinnedPct.toFixed(2)}% (darker)`,
-              `Nonmatching drafts: ${snap.drafts.count} functions, ${snap.drafts.pct.toFixed(1)}% of code, fuzzy ${snap.drafts.fuzzy}%`,
-              `Intentional assembly, not counted: ${fmt(snap.asmBytes)} bytes`,
-            ])}
+            <Text dimColor>
+              {`${clean.toFixed(1)}% without register pinning · ${snap.drafts.count} drafts at ${snap.drafts.fuzzy}% fuzzy`}
+            </Text>
           </Box>
           {snap.sections.map(s => (
-            <Box flexDirection="column" gap={1}>
+            <Box flexDirection="column">
               <Box flexDirection="row" justifyContent="space-between">
                 <Text dimColor bold>
                   {s.name}
