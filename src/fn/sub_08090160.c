@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.0%
-// Remaining: constant/pointer register allocation (a/b hoists land in sb/r8 swapped, zero index reg).
+// confidence=low: emits three debris particles during the Slime death reaction.
+#define Slime_EmitDeathDebris sub_08090160
+
 struct Position {
     s16 x, y, z, pad;
 };
@@ -40,12 +40,10 @@ static inline void Polar(s32 angle, struct Position *v, s32 radius, u32 mask)
 // confidence=low: death burst of three debris particles.
 #define BURST(v)                                                                                   \
     {                                                                                              \
-        register u32 mask asm("r5") = 255;                                                         \
+        u32 mask = 255;                                                                            \
         s32 angle;                                                                                 \
-        asm("" : "+r"(mask));                                                                      \
         angle = Rand() & 255;                                                                      \
         Polar(angle, &v, (Rand() & 15) + 6, mask);                                                 \
-        asm("" : : "r"(mask));                                                                     \
     }
 void Slime_EmitDeathDebris(struct Actor *input)
 {
@@ -53,25 +51,28 @@ void Slime_EmitDeathDebris(struct Actor *input)
     struct Position v;
     u16 *a;
     u16 *b;
-    u32 sum;
     u8 *pos;
     BURST(v)
     v.y = 0x30;
     a = &p->a;
     b = &p->b;
-    asm("" : "+r"(a), "+r"(b));
-    sum = *a + *b;
-    pos = (u8 *)p + 0x5C;
-    sub_08127590(pos, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+    asm("" : : "r"(a));
+
+    {
+        u32 sum = *a + *b;
+        pos = (u8 *)p + 0x5C;
+        sub_08127590(pos, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+    }
     BURST(v)
     v.y = 0x25;
-    sum = *a + *b;
-    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+    {
+        u32 sum = *a + *b;
+        sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+    }
     BURST(v)
     v.y = 0x20;
-    sum = *a + *b;
-    sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
+    {
+        u32 sum = *a + *b;
+        sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Slime_EmitDeathDebris);
-#endif

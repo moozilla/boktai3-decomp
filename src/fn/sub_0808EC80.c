@@ -1,9 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// Remaining: completion-field offset and ready-field pointer register choices.
+#define Slime_ConvergeReactionMotion sub_0808EC80
+
 #include "scene_actor_chase.h"
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 void Slime_RollMoveFlag(void);
@@ -36,10 +34,16 @@ static inline u8 TestContext(u8 *p, u32 mask)
     return 0;
 }
 
+static inline u32 Slime_IsReactionComplete(struct SceneActorRegistryResetView *actor)
+{
+    u32 complete = actor->field2B3;
+    return complete;
+}
+
 void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *context asm("r8") = actor->context;
-    register struct SlimeSequence *sequence asm("sb") = (void *)((u8 *)actor->drawable + 0x48);
+    u8 *context = actor->context;
+    struct SlimeSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
     s32 x;
     s32 z;
     s16 *priorX;
@@ -90,13 +94,13 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     *priorX += x;
     *priorZ += z;
     {
-        register u32 rest asm("r0") = AtRest(x, z);
+        u32 rest = AtRest(x, z);
         if (!rest)
             sequence->timer = rest;
-        else if (actor->field2B3) {
+        else if (Slime_IsReactionComplete(actor)) {
             u8 *field = &actor->field2B0;
             u32 ready = 1;
-            asm("" ::: "r1");
+
             *field = ready;
             {
                 u16 *flags = &actor->flags2D4;
@@ -122,7 +126,3 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Slime_ConvergeReactionMotion);
-#endif
