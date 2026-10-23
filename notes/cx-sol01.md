@@ -104,3 +104,5 @@ Tags: #player #matching #terrain #camera
 - 0823C8FC matched without hints, tentative Player_IsWithinSidestepCellMargin: decoded the reviewed raw tail; choose the perpendicular coordinate, mask to a byte and reject values outside the cell margin. An inverse early-return form fixes branch layout. Depin removes both temporary hints.
 
 Ten exact matches add approximately 0.073 percentage points of code coverage (1,768 bytes). Four use register-pinning concessions (808 bytes); six need no hints (960 bytes). One new and two improved guarded drafts earn no exact credit. One existing close draft is retained unchanged. Next assigned function: Player_UpdateTerrainSidestep at 0823C930.
+
+Batch 4 validation: rebase conflicts affected only the history heading and generated documentation index; both workers' entries were preserved and the index regenerated. The combined build printed `build/boktai3.gba: OK`.
