@@ -475,9 +475,47 @@ void Player_InitVisualState(struct Player *p)
     Player_UpdateVisualPalette(p, 0);
 }
 
+#define SceneActor_StartRandomizedEffect sub_0813D3B0
+
+void EffectGroup_FadeFirstActive(void *);
+void EffectGroup_SpawnPart(void *, s32, struct SceneVec *, struct SceneVec *, struct SceneVec *,
+                           s32, s32);
+static inline int EffectRandomWith(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+
 void SceneActor_StartRandomizedEffect(struct Player *);
 
-INCLUDE_ASM("asm/nonmatching", SceneActor_StartRandomizedEffect);
+void SceneActor_StartRandomizedEffect(struct Player *p)
+{
+    struct SceneVec position, velocity, scale;
+    struct SceneVec *source;
+    const u16 *random;
+    if (p->movementModifierKind == 1) {
+        EffectGroup_FadeFirstActive(&p->effectGroup);
+    } else {
+        if (p->movementModifierKind == 2)
+            Sound_PlaySong(0x134);
+        else if (p->movementModifierKind == 3)
+            Sound_PlaySong(0x134);
+        source = *(struct SceneVec **)((u8 *)p + 0x5C0);
+        position.x = source->x;
+        position.y = source->y + 128;
+        position.z = source->z;
+        random = gUnk_0203B400;
+        velocity.x = (EffectRandomWith(random) & 15) - 7;
+        velocity.y = (EffectRandomWith(random) & 31) - 16;
+        velocity.z = (EffectRandomWith(random) & 15) - 7;
+        scale.x = 5;
+        scale.y = 10;
+        scale.z = 5;
+        EffectGroup_SpawnPart(&p->effectGroup, 3, &position, &velocity, &scale, 40, 40);
+    }
+}
 
 void Player_EmitQueuedEffects(struct Player *p)
 {
@@ -513,14 +551,6 @@ void Player_FlushQueuedEffects(struct Player *p)
 }
 
 s32 EffectGroup_Spawn(void *, s32, s32, struct SceneVec *);
-
-static inline int EffectRandomWith(const u16 *table)
-{
-    u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
 
 // confidence=low: queues a randomized status particle and its sound cue.
 void Player_QueueStatusEffect(struct Player *p, s32 a)
