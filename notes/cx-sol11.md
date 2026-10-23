@@ -56,7 +56,7 @@ Tags: #matching #actors #compiler
 
 The instrumented compiler was built locally for hint/flip diagnostics. No shared compiler or generated output was changed. New emphasis: every remaining larger function receives a full draft; revisit review-only entries and retained close drafts before finishing the assignment.
 
-Current unmerged exact gain: approximately 0.0715 percentage points (1,724 bytes): 424 ordinary C and 1,300 Register-pinned. Combined validation remains pending for this batch.
+Current unmerged exact gain: approximately 0.0715 percentage points (1,724 bytes): 424 ordinary C and 1,300 Register-pinned. Combined batch validation printed `build/boktai3.gba: OK`.
 
 ## Continuation session h2: scripted actor actions
 
@@ -67,4 +67,4 @@ Tags: #matching #actors #compiler
 - 0802EA90: improved 80.3% to 96.2%. High-register copies preserve the position and target pointers through polar velocity calculation; a saved angle pointer recovers the facing update. Natural speed allocation restores the correct callee saves. Remaining differences: signed-load scratch registers and an overlong conditional branch caused by hint accounting. Tested helper boundaries, pointer bindings, compiler flips and removal variants.
 - 0802EBD0: drafted 63.2%. Complete bounded turn, facing update and completion signal reconstructed. Explicit word mask recovers flag-update ordering. Signed-byte wrapping and facing conversion simplify differently. Tested helper return/input types, byte versus word result constraints and compiler flips. Causebook diagnostics unavailable because the local pairs database is absent.
 
-Batch integration checkpoint: three new exact functions and sixteen new or improved drafts; combined validation follows before merging.
+Batch integration checkpoint: three new exact functions and sixteen new or improved drafts. Rebased onto current main, preserving both history entries during documentation conflicts; no C files conflicted. Combined validation printed `build/boktai3.gba: OK`.
