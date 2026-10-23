@@ -2,7 +2,7 @@
 #include "global.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
 #ifdef NONMATCHING
-// fuzzy: 98.5%
+// fuzzy: 99.2%
 // Remaining differences: RNG table and pair-slot offset use different low registers.
 struct Pair {
     u8 pad0[0x205];
