@@ -1497,7 +1497,48 @@ void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
 /* Companion to sub_08194858 (part index 0); same shape, operating on parts 1/0 and
  * colliders[0]/[1] respectively. See sub_08194858's note. */
 
-INCLUDE_ASM("asm/nonmatching", sub_0819494C);
+extern const struct CopyPair gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
+// confidence=low: restores second-part collider ranges after the completion state.
+#define Nidhoggr_RestoreSecondPartRanges sub_0819494C
+void Nidhoggr_RestoreSecondPartRanges(struct Nidhoggr *p)
+{
+    struct PartColliderView *c;
+    register const struct CopyPair *a asm("r4");
+    const struct CopyPair *b;
+    if (p->bgMode) {
+        if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x35)) {
+            c = (void *)((u8 *)p + 0x66D8);
+            a = &gUnk_0824F56C;
+            c->second = *a;
+            b = &gUnk_0824F564;
+            c->first = *b;
+            c = (void *)((u8 *)p + 0x5E50);
+            goto copy;
+        }
+    } else {
+        if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x14)) {
+            c = (void *)((u8 *)p + 0x672C);
+            a = &gUnk_0824F57C;
+            c->second = *a;
+            b = &gUnk_0824F574;
+            c->first = *b;
+            c = (void *)((u8 *)p + 0x5EA4);
+        copy:
+            c->second = *a;
+            c->first = *b;
+        }
+    }
+    if (p->active) {
+        ((struct PartColliderView *)((u8 *)p + 0x672C))->flags |= 4;
+        ((struct PartColliderView *)((u8 *)p + 0x5EA4))->flags |= 4;
+        SetExtra((void *)((u8 *)p + 0x6F70), 1);
+    } else {
+        struct PartColliderView *first = (void *)((u8 *)p + 0x672C);
+        s32 mask = ~4;
+        first->flags &= mask;
+        ((struct PartColliderView *)((u8 *)p + 0x5EA4))->flags &= mask;
+    }
+}
 
 struct H {
     u8 f[6];
