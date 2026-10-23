@@ -39,3 +39,7 @@ Unchanged or deferred:
 - 081A14FC, 081A1EFC, 081A2C80: inspected entry/control structure and existing notes; deferred large defeat/damage/script-initialization bodies for a later pass. No new draft claimed.
 
 All accepted matches passed check.py with explicit reviewed target extents. Full batch build and integration result are recorded below when complete. Register constraints use only empty compiler barriers and are marked as matching concessions; no instruction bodies were added.
+
+Batch 1 validation: the first combined build exposed an alias-related splitter bug that removed retained assembly after 0819F55C. The splitter now compares generated exact names; regression tests cover both alias directions and ensure the retained blob appears exactly once. Registered independent tail 0819F5B4 in build/progress inventories so its 132 bytes remain assembly credit. Focused splitter tests passed (nine test methods), and the corrected combined build printed `build/boktai3.gba: OK`.
+
+Batch 1 exact gain: 0.1216 percentage points (2,932 bytes), including 0.1026 percentage points register-pinned (2,472 bytes) and 0.0191 percentage points without pins (460 bytes). Eight guarded drafts gained fuzzy coverage only.
