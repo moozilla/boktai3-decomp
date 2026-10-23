@@ -363,12 +363,14 @@ def main():
         # A worker may retain its address-style definition after the CSV name
         # was promoted. Keep references from the generated assembly linkable,
         # including the even-address labels used for interior offsets.
+        generated_exact_names = set()
         for name in exact_names:
             generated = name
             if name not in index and f"sub_{csv_addr.get(name, '')}" in index:
                 generated = f"sub_{csv_addr[name]}"
             elif name not in index and csv_name.get(name[4:]) in index:
                 generated = csv_name[name[4:]]
+            generated_exact_names.add(generated)
             if generated != name:
                 aliases.append(f"{generated} = {name};")
                 aliases.append(f"{generated}__addr = {name}__addr;")
@@ -376,7 +378,7 @@ def main():
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
         ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]
         end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges,
-                                includes_asm=funcs[last][0] not in exact_names)
+                                includes_asm=funcs[last][0] not in generated_exact_names)
         # Labels that disappear with the asm are redefined relative to the
         # unit's first function, so references from elsewhere still resolve.
         base_name, base_addr = funcs[first][0], funcs[first][1]

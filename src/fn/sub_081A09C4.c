@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.9%
-// foundry draft (worker best 88.4%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
+#define Hresvelgr_PlayDescent sub_081A09C4
 typedef struct OrbitPosition {
     s16 x, y, z, pad;
 } OrbitPosition;
@@ -32,6 +31,7 @@ void Sound_PlaySong(u32);
 void Hresvelgr_PlayDescent(void *p, int tick)
 {
     OrbitActor *actor = p;
+    asm("" : "+r"(actor));
     {
         u32 mask = 0x200000;
         actor->flags |= mask;
@@ -54,6 +54,3 @@ void Hresvelgr_PlayDescent(void *p, int tick)
     } else if (!(tick & 31))
         Hresvelgr_RefreshTarget(p);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_PlayDescent);
-#endif

@@ -1,8 +1,9 @@
 #include "global.h"
 
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 91.5%
-// foundry draft (worker best 91.5%); what differs is mostly register allocation and instruction order
+// fuzzy: 95.1%
+// Remaining differences: lifetime store and collider-argument scratch registers.
 struct HresvelgrShotSprite {
     u32 flags;
     u8 unknown04[0xC];
@@ -27,6 +28,20 @@ s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
 s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *, s32, s32, s32);
+static inline void SetPosition(struct HresvelgrShotSprite *sprite, s32 x, s32 y, s32 z)
+{
+    sprite->x = x;
+    {
+        register u32 value asm("r1") = y;
+        asm("" : "+r"(value));
+        sprite->y = value;
+    }
+    {
+        register u32 value asm("r2") = z;
+        asm("" : "+r"(value));
+        sprite->z = value;
+    }
+}
 s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
 {
     struct HresvelgrShot *shot;
@@ -42,12 +57,9 @@ s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
     y = 0x100;
     z = 0x4B0;
     do {
-        u16 x = 0x708;
         Sprite_Init(shot, pool->animationData, 0);
         sprite->animation = zero;
-        sprite->x = x;
-        sprite->y = y;
-        sprite->z = z;
+        SetPosition(sprite, 0x708, y, z);
         sprite->flags |= 1;
         shot->lifetime = zero;
         Hresvelgr_InitShotCollider(shot, pool->attackA, pool->attackB, pool->attackC);

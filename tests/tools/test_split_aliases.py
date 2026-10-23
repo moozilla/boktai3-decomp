@@ -25,7 +25,8 @@ class SplitAliasTests(unittest.TestCase):
                 (root / 'symbols/build_extra_functions.csv').write_text('address,isa\n')
                 (root / 'gen/code_sym.s').write_text(
                     f'\tthumb_func_start {generated}\n{generated}: @ 0x08004000\n'
-                    '\tpush {lr}\n_08004002:\n\tbx lr\n')
+                    '\tpush {lr}\n_08004002:\n\tbx lr\n'
+                    '_08004004:\n\t.incbin "baserom.gba", 0x4004, 0x4\n')
                 alias = '#define Panel_Update sub_08004000\n' if definition.startswith('sub_') else ''
                 (root / 'src/panel.c').write_text(alias + 'void Panel_Update(void) {}\n')
                 with patch.object(split, 'ROOT', directory), \
@@ -34,6 +35,10 @@ class SplitAliasTests(unittest.TestCase):
                      contextlib.redirect_stderr(io.StringIO()):
                     split.main()
                 labels = (root / 'build/c_labels.ld').read_text()
+                retained = ''.join(path.read_text() for path in
+                                   (root / 'build/asm').glob('seg_*.s'))
+                self.assertEqual(retained.count('.incbin "baserom.gba", 0x4004, 0x4'), 1)
+                self.assertNotIn('_08004004 =', labels)
                 self.assertIn(f'_08004002 = {generated}__addr + 0x2;', labels)
                 if generated != definition:
                     self.assertIn(f'{generated} = {definition};', labels)
