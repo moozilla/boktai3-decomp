@@ -73,3 +73,7 @@ started. Remaining 54 assignment entries are deferred, beginning at 08078EE8;
 this is distinct from the one attempted-and-skipped Golem function.
 
 Summary: 1 matched, 3 drafts improved, 1 skipped; 54 not attempted before wrap-up.
+
+Wrap-up batch validation after rebasing onto main: both guarded draft scores
+were recorded over their complete reviewed targets, and the combined build
+printed `build/boktai3.gba: OK`. No exact progress is claimed for the drafts.
