@@ -8,7 +8,7 @@
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
 #ifdef NONMATCHING
-// fuzzy: 93.2%
+// fuzzy: 96.0%
 // Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -210,7 +210,7 @@ static inline void OffsetTarget(struct SceneVec *v, u32 variant)
 // confidence=low: attacks a position offset from the player before returning.
 void Vanargand_UpdatePartOffsetStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
-    register u8 *enter asm("r9");
+    u8 *enter;
     register u32 entering asm("r1");
     u32 mask = 0x20;
     p->flags |= mask;
