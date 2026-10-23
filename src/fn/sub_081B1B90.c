@@ -1,11 +1,14 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 93.8%
+// Animation setup and tail scheduling still differ.
+#define ActorStatus_UpdateFlankingStrike sub_081B1B90
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: approaches a side of the player before playing sequence eight
-#ifdef NONMATCHING
-// fuzzy: 90.4%
-// Remaining differences: Entry-pointer copies, flank-offset operands, and transition allocation differ.
+
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -32,7 +35,7 @@ void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, u32, u32)
 static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequenceState *sequence,
                                struct ActorStatusPart *base, u32 one)
 {
-    register struct DisplaySequenceState *state asm("r4") = sequence;
+    struct DisplaySequenceState *state = sequence;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
     {
@@ -45,7 +48,9 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        bit = one;
+        u32 maskBit = one;
+        bit = maskBit;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
