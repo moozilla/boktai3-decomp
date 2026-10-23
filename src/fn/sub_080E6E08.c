@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#define Mimic_UpdateHitRecovery sub_080E6E08
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 
@@ -11,6 +12,23 @@ static inline void SaveControl(u8 *packet, void *control, u8 behavior)
     packet[8] = 0;
     packet[9] = 0;
     packet[10] = behavior;
+}
+static inline void ClearContextFlag(u16 *flags, u32 zero)
+{
+    s32 mask = zero - 2;
+    mask &= *flags;
+    *flags = mask;
+}
+static inline u32 SaveStoppedControl(u8 *packet, void *control)
+{
+    u32 zero;
+    *(u32 *)(packet + 12) = 30;
+    *(void **)(packet + 16) = control;
+    zero = 0;
+    packet[8] = zero;
+    packet[9] = zero;
+    packet[10] = zero;
+    return zero;
 }
 static inline void clearFlag(u32 *flags)
 {
@@ -27,10 +45,68 @@ static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
     return actor->flags2CC & mask;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 88.4%
-// Remaining differences: pinned-offset load order around Chase_TryRoute (route object load, cc copy in r8),
-// the flags2D4 clear offsets and the zero/mask registers in the SaveControl tails.
+static inline void ClearSavedFlags(u32 *original, s32 clearMask)
+{
+    s32 mask = clearMask;
+    register u32 *flags asm("r2");
+    flags = original;
+    *flags &= mask;
+}
+static inline void *EntryTarget(struct SceneActorRegistryResetView *actor)
+{
+    register u32 offset asm("r3") = 0x228;
+    register void **field asm("r0");
+    asm("" : "+r"(offset));
+    field = (void *)((u8 *)actor + offset);
+    return *field;
+}
+static inline void *UpdateCallback(struct SceneActorRegistryResetView *actor)
+{
+    u32 offset = 0x270;
+    void **field;
+    field = (void *)((u8 *)actor + offset);
+    return *field;
+}
+static inline void *SavedTarget(struct SceneActorRegistryResetView *actor)
+{
+    register u32 offset asm("r3") = 0x22c;
+    register void **field asm("r0");
+    asm("" : "+r"(offset));
+    field = (void *)((u8 *)actor + offset);
+    return *field;
+}
+static inline u8 TryRouteSaved(struct SceneActorRegistryResetView *actor, void *route,
+                               struct ContactPosition *position, struct ContactPosition *target,
+                               u32 *before, u32 **after)
+{
+    s32 result = Nav_IsPositionInMesh(route, position, target);
+    u32 *saved = before;
+    register u16 *failedFlags asm("r0");
+    *after = saved;
+    if (!result) {
+        register u32 offset asm("r3") = 0x2d4;
+        asm("" : : "r"(offset));
+        failedFlags = (void *)((u8 *)actor + offset);
+        goto failed;
+    }
+    result = Terrain_ApplyBlocked(route, position, target);
+    if (result) {
+        if (result != 2)
+            Memory_Clear(&actor->motion, 8);
+        return 1;
+    }
+    {
+        register u32 offset asm("r1") = 0x2d4;
+        asm("" : : "r"(offset));
+        failedFlags = (void *)((u8 *)actor + offset);
+    }
+failed: {
+    s32 mask = ~0x200;
+    mask &= *failedFlags;
+    *failedFlags = mask;
+}
+    return 0;
+}
 // confidence=low: provisional name; recovery after a hit (state 3 -> delayed restore), Mimic-owned.
 
 void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
@@ -43,20 +119,22 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
         motion = (void *)&actor->fieldDC;
         motion->fieldDC = 0;
         {
-            register u32 o asm("r3") = 0x2C2;
-            register u16 *h asm("r1");
-            register u32 v asm("r0");
-            asm("" : "+r"(o));
+            u32 o = 0x2C2;
+            u16 *h;
+            u32 v;
             h = (u16 *)((u8 *)actor + o);
             v = 0x40;
-            asm("" : "+r"(v));
             *h = v;
         }
-        actor->group.flags414 = 0;
         {
-            register u32 o asm("r3") = 0x418;
-            register u16 *h asm("r0");
-            asm("" : "+r"(o));
+            u32 offset = 0x414;
+            u16 *field;
+            field = (void *)((u8 *)actor + offset);
+            *field = 0;
+        }
+        {
+            u32 o = 0x418;
+            u16 *h;
             h = (u16 *)((u8 *)actor + o);
             *h = 0;
         }
@@ -92,17 +170,17 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
     }
     {
         register u32 oc asm("r3") = 0x2AC;
-        register u32 *cnt asm("r4");
+        u32 *cnt;
         asm("" : "+r"(oc));
         cnt = (u32 *)((u8 *)actor + oc);
         if ((s32)*cnt > 30) {
             u8 *group;
             u32 *cc;
-            register u32 one asm("r4");
+            u32 one;
             register u32 z8 asm("r8");
-            register u32 z5 asm("r5");
+            u32 z5;
             {
-                register u32 og asm("r0") = 0x3D4;
+                u32 og = 0x3D4;
                 asm("" : "+r"(og));
                 group = (u8 *)actor + og;
             }
@@ -111,18 +189,14 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
                 asm("" : "+r"(occ));
                 cc = (u32 *)(occ + (u32)actor);
             }
-            {
-                register u32 *p asm("r2") = cc;
-                u32 mask = ~0x100;
-                *p &= mask;
-            }
+            ClearSavedFlags(cc, ~0x100);
             {
                 register u32 o asm("r3") = 0x3D0;
-                register u8 *c asm("r1");
-                register u32 k asm("r0");
-                register u16 *mode asm("r1");
+                u8 *c;
+                u32 k;
+                u16 *mode;
                 register u32 value asm("r2");
-                register u32 m asm("r0");
+                u32 m;
                 asm("" : "+r"(o));
                 {
                     register u8 **cp asm("r0") = (u8 **)((u8 *)actor + o);
@@ -135,54 +209,44 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
                 value = *mode;
                 z8 = 0;
                 z5 = 0;
-                asm("" : "+r"(z8), "+r"(z5));
                 m = one;
                 m |= value;
                 *mode = m;
             }
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
             {
-                register u32 three asm("r1") = 3;
-                register u32 o8 asm("r2") = 0x2A8;
-                register u32 o9 asm("r3");
-                register u32 oa asm("r1");
+                u32 three = 3;
+                u32 o8 = 0x2A8;
+                u32 o9;
+                u32 oa;
                 register u8 *a asm("r0");
-                asm("" : "+r"(three), "+r"(o8));
                 a = (u8 *)actor + o8;
                 *a = three;
                 o9 = 0x2A9;
-                asm("" : "+r"(o9));
                 a = (u8 *)actor + o9;
                 *a = one;
                 oa = 0x2AA;
-                asm("" : "+r"(oa));
                 a = (u8 *)actor + oa;
                 *a = z8;
                 o9 += 3;
-                asm("" : "+r"(o9));
                 {
-                    register u32 *w asm("r0") = (u32 *)((u8 *)actor + o9);
+                    u32 *w = (u32 *)((u8 *)actor + o9);
                     *w = z5;
                 }
                 oa += 7;
-                asm("" : "+r"(oa));
                 a = (u8 *)actor + oa;
                 *a = one;
                 {
                     register u32 ctl asm("r2") = (u32)SceneActorReaction_RestoreAfterDelay;
                     register u32 kind asm("r1") = 14;
-                    asm("" : "+r"(ctl), "+r"(kind));
                     o9 += 6;
-                    asm("" : "+r"(o9));
                     a = (u8 *)actor + o9;
                     *a = one;
                     o9 -= 2;
-                    asm("" : "+r"(o9));
                     a = (u8 *)actor + o9;
                     *a = z8;
                     {
-                        register u32 o5 asm("r3") = 0x2B5;
-                        asm("" : "+r"(o5));
+                        u32 o5 = 0x2B5;
                         a = (u8 *)actor + o5;
                         *a = kind;
                     }
@@ -204,11 +268,10 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
                 {
                     register u32 o asm("r3") = 0x114;
                     register u32 *fl asm("r2");
-                    register u32 m asm("r1");
+                    u32 m;
                     asm("" : "+r"(o));
                     fl = (u32 *)((u8 *)actor + o);
                     m = ~1;
-                    asm("" : "+r"(m));
                     *fl = m & *fl;
                 }
                 {
@@ -220,43 +283,49 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
                 }
             }
             {
-                register struct ContactPosition *pos asm("r6") = &actor->position;
-                register void *route asm("r5");
-                register struct ContactPosition *tgt asm("r4") =
-                    (struct ContactPosition *)(context + 0x650);
+                register struct ContactPosition *pos asm("r6");
+                u32 *afterFlags;
+                void *route;
+                struct ContactPosition *tgt;
                 {
                     register u32 orr asm("r2") = 0x5D0;
                     register void **rp asm("r0");
                     asm("" : "+r"(orr));
                     rp = (void **)((u8 *)actor + orr);
-                    asm("" : "+r"(rp));
                     route = *rp;
                 }
+                pos = &actor->position;
+                tgt = (void *)(context + 0x650);
                 asm("" : "+r"(pos), "+r"(route), "+r"(tgt));
-                if (Chase_TryRoute(actor, route, pos, tgt)) {
+                if (TryRouteSaved(actor, route, pos, tgt, cc, &afterFlags)) {
                     u8 outside = SceneActorAttachment_TestPositionWindow(
                         (void *)actor, (struct ContactPosition *)(context + 0x650), 32, 32);
                     if (!outside) {
-                        register u32 *flags asm("r2") = cc;
-                        u32 mask = ~0xC0;
-                        *flags &= mask;
-                        SaveControl(group + 0x8c, actor->entryTarget228, 2);
+                        ClearSavedFlags(afterFlags, ~0xc0);
+                        {
+                            u8 *packet = group + 0x8c;
+                            SaveControl(packet, EntryTarget(actor), 2);
+                        }
                     } else {
-                        register u32 *flags asm("r2") = cc;
-                        u32 mask = ~0xC0;
-                        *flags &= mask;
-                        SaveControl(group + 0x8c, actor->savedTarget, 0);
-                        *(u16 *)(context + 0x65C) &= ~1;
+                        ClearSavedFlags(afterFlags, ~0xc0);
+                        {
+                            u8 *packet = group + 0x8c;
+                            u32 zero;
+                            zero = SaveStoppedControl(packet, SavedTarget(actor));
+                            ClearContextFlag((void *)(context + 0x65c), zero);
+                        }
                     }
-                    actor->field2C2 = 0x40;
+                    {
+                        u32 offset = 0x2c2;
+                        u16 *field;
+                        field = (void *)((u8 *)actor + offset);
+                        *field = 0x40;
+                    }
                 }
             }
         } else {
-            Callback_InvokeActor(actor, actor->update270);
+            Callback_InvokeActor(actor, UpdateCallback(actor));
             *cnt += 1;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Mimic_UpdateHitRecovery);
-#endif
