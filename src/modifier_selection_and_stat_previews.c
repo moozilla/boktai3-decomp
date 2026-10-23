@@ -163,47 +163,33 @@ done:
     return count;
 }
 
-// MATCHING_CONCESSION: register-pinning
-s32 Modifier_ApplyToStat(struct ModifierSelection *actorArg, struct ModifierSelection *selectionArg,
-                         s32 valueArg, u32 includeSelected, u32 kindArg)
+s32 Modifier_ApplyToStat(struct ModifierSelection *actor, struct ModifierSelection *selection,
+                         s32 value, u32 includeSelected, u32 kindArg)
 {
-    register struct ModifierSelection *actor asm("r12") = actorArg;
-    register struct ModifierSelection *selection asm("r8") = selectionArg;
-    u32 kind;
-    s32 value;
+    u32 kind = kindArg;
+    s32 acc = value;
     /* Original frame reserves an unused eight-byte prefix before the records. */
     struct {
         u8 unused[8];
         struct ModifierRecord records[8];
     } workspace;
-    struct ModifierRecord *record;
-    register struct ModifierRecord *iterator asm("r2");
-    register s32 i asm("r5");
+    struct ModifierRecord *record = workspace.records;
+    s32 i;
     s32 result;
-    register u32 mask asm("r1");
-    kind = kindArg;
-    value = valueArg;
-    record = workspace.records;
-    mask = 255;
-    asm("" : : "r"(mask));
-    iterator = record;
-    i = 7;
-    do {
-        iterator->order = -1;
-        iterator++;
-    } while (--i >= 0);
+    for (i = 0; i < 8; i++)
+        record[i].order = -1;
     result = Modifier_CollectSources(actor, selection, record, includeSelected);
     if (result > 0) {
         s32 count = result;
         do {
             if (record->kind == kind)
-                value = Modifier_ApplyAmount(value, kind, record->amount);
+                acc = Modifier_ApplyAmount(acc, kind, record->amount);
             record++;
         } while (--count != 0);
     }
-    if (value > 999)
-        value = 999;
-    return value;
+    if (acc > 999)
+        acc = 999;
+    return acc;
 }
 
 s32 Modifier_ApplyKindSix(struct ModifierSelection *a, struct ModifierSelection *b, s32 c, u32 d)

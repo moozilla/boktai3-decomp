@@ -914,3 +914,116 @@
        /* Certain fixed registers might be of the class NO_REGS.  This means
  	 that not only can they not be allocated by the compiler, but
  	 they cannot be used in substitutions or canonicalizations
+--- a/local-alloc.c
++++ b/local-alloc.c
+@@ -1329,6 +1329,28 @@
+ /* Allocate hard regs to the pseudo regs used only within block number B.
+    Only the pseudos that die but once can be handled.  */
+ 
++/* AGBCC_NOTIE=uid,uid,...: never tie an output to an input at these insns
++   (explain.py's counterfactual probes).  */
++static int
++agbcc_notie_p (uid)
++     int uid;
++{
++  char *e = getenv ("AGBCC_NOTIE");
++  if (!e)
++    return 0;
++  while (*e)
++    {
++      if (atoi (e) == uid)
++	return 1;
++      while (*e && *e != ',')
++	e++;
++      if (*e == ',')
++	e++;
++    }
++  return 0;
++}
++
++
+ static void
+ block_alloc (b)
+      int b;
+@@ -1492,7 +1514,7 @@
+ 			   );
+ 		      
+ 		      if (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
+-			win = combine_regs (r1, r0, may_save_copy,
++			win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, may_save_copy,
+ 					    insn_number, insn, 0);
+ 		    }
+ 		  if (win)
+@@ -1528,12 +1550,12 @@
+ 	      if (r1 = XEXP (note, 0), GET_CODE (r1) == REG
+ 		  /* Check that we have such a sequence.  */
+ 		  && no_conflict_p (insn, r0, r1))
+-		win = combine_regs (r1, r0, 1, insn_number, insn, 1);
++		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 1, insn_number, insn, 1);
+ 	      else if (GET_RTX_FORMAT (GET_CODE (XEXP (note, 0)))[0] == 'e'
+ 		       && (r1 = XEXP (XEXP (note, 0), 0),
+ 			   GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
+ 		       && no_conflict_p (insn, r0, r1))
+-		win = combine_regs (r1, r0, 0, insn_number, insn, 1);
++		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 0, insn_number, insn, 1);
+ 
+ 	      /* Here we care if the operation to be computed is
+ 		 commutative.  */
+@@ -1543,7 +1565,7 @@
+ 		       && (r1 = XEXP (XEXP (note, 0), 1),
+ 			   (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG))
+ 		       && no_conflict_p (insn, r0, r1))
+-		win = combine_regs (r1, r0, 0, insn_number, insn, 1);
++		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 0, insn_number, insn, 1);
+ 
+ 	      /* If we did combine something, show the register number
+ 		 in question so that we know to ignore its death.  */
+--- a/regmove.c
++++ b/regmove.c
+@@ -1718,6 +1718,28 @@
+ /* END CYGNUS LOCAL */
+ #endif  /* AUTO_INC_DEC */
+ 
++
++/* AGBCC_NOTIE=uid,uid,...: never tie an output to an input at these insns
++   (explain.py's counterfactual probes).  */
++static int
++agbcc_notie_p (uid)
++     int uid;
++{
++  char *e = getenv ("AGBCC_NOTIE");
++  if (!e)
++    return 0;
++  while (*e)
++    {
++      if (atoi (e) == uid)
++	return 1;
++      while (*e && *e != ',')
++	e++;
++      if (*e == ',')
++	e++;
++    }
++  return 0;
++}
++
+ static int *regno_src_regno;
+ 
+ /* Indicate how good a choice REG (which appears as a source) is to replace
+@@ -2653,6 +2675,8 @@
+ 		}
+ #endif
+ /* END CYGNUS LOCAL */
++	      if (agbcc_notie_p (INSN_UID (insn)))
++		continue;
+ 	      if (fixup_match_1 (insn, set, src, src_subreg, dst, pass,
+ 				 op_no, match_no,
+ 				 regmove_dump_file))
+@@ -2682,7 +2706,7 @@
+ 	  int op_no, match_no;
+ 	  int success = 0;
+ 
+-	  if (! find_matches (insn, &match))
++	  if (! find_matches (insn, &match) || agbcc_notie_p (INSN_UID (insn)))
+ 	    continue;
+ 
+ 	  /* Now scan through the operands looking for a destination operand
