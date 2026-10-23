@@ -7,7 +7,7 @@
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
 #ifdef NONMATCHING
-// fuzzy: 90.3%
+// fuzzy: 96.6%
 // Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -67,6 +67,7 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
 {
     u8 *enter;
+    u32 entering;
     u32 mask = 0x20;
     p->flags |= mask;
     if (p->reset) {
@@ -78,8 +79,10 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
     switch (p->state) {
         case 0: {
             struct SceneVec delta;
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 *enter = 0;
                 MakeVector(&delta, 160, 256);
                 AddVector(&delta, &p->origin, &delta);
@@ -94,8 +97,10 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
         }
         case 1: {
             struct SceneVec delta;
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 struct SceneVec *player, *base;
                 *enter = 0;
                 player = Player_GetEffectivePosition(0);
@@ -127,8 +132,10 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
             break;
         case 4: {
             struct SceneVec delta;
+            entering = p->enter;
+            asm("" : "+r"(entering));
             enter = &p->enter;
-            if (*enter) {
+            if (entering) {
                 *enter = 0;
                 MakeVector(&delta, p->heading, p->distance);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
