@@ -1,9 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #define Hresvelgr_UpdateRandomVolleyPhase sub_0819F638
-#define gRandomIndex          gUnk_03005308
-#define gRandomTable          gUnk_0203B400
-#define gHresvelgrVolleyState gUnk_02000230
+#define gRandomIndex                      gUnk_03005308
+#define gRandomTable                      gUnk_0203B400
+#define gHresvelgrVolleyState             gUnk_02000230
 struct ReactionVector {
     s16 x, y, z, pad;
 };
@@ -40,7 +40,8 @@ void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u3
 void Sound_PlaySong(u32);
 
 s32 Callback_InvokeActor(void *, void *);
-static inline void AddReactionVector(struct ReactionVector *out, struct ReactionVector *a, struct ReactionVector *b)
+static inline void AddReactionVector(struct ReactionVector *out, struct ReactionVector *a,
+                                     struct ReactionVector *b)
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
