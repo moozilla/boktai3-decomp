@@ -1,15 +1,17 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 67.3%
-// foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
+// The two barriers preserve distinct addition tails for the first two ranges.
+#define Selection_GetDisplayFrame sub_0822D604
 s32 Selection_GetDisplayFrame(s32 selection)
 {
-    if (selection <= 29)
+    if (selection <= 29) {
         selection += 0x151;
-    else if (selection <= 31)
+        asm("" : "+r"(selection));
+    } else if (selection <= 31) {
         selection += 0x152;
-    else if (selection <= 35)
+        asm("" : "+r"(selection) : "i"(0));
+    } else if (selection <= 35)
         selection = 0x173;
     else if (selection <= 38)
         selection = 0x172;
@@ -19,6 +21,3 @@ s32 Selection_GetDisplayFrame(s32 selection)
         selection += 0x14D;
     return selection;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Selection_GetDisplayFrame);
-#endif
