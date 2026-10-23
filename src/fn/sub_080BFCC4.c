@@ -1,13 +1,12 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 94.4% (agent draft, 19 structural / 63 total insns off: PRE spill-slot order)
-/* Skeleton (tentative): after 60 frames either return to the route point (blocked, flag 0x80)
- * or start a delayed restore and walk back to the route destination.
- * Status: same instruction stream except register allocation / spill-slot order in the
- * Resume block (hoisted address pseudos from GCSE/PRE; ROM needs a hash table of >= 465
- * buckets, ours has 447) and the 0x200 mask register in MoveToDestination. */
+// fuzzy: 95.5%
+// Skeleton (tentative): delayed recovery and route-home response.
+// Remaining differences: random-turn allocation, PRE spill-slot order, and the
+// destination-offset register in MoveToDestination.
 u8 sub_0812F3CC(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_0807E334(void *);
@@ -192,11 +191,12 @@ static inline u8 MoveToDestination(struct SceneActorRegistryResetView *actor,
         }
     }
 }
-static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
+static inline s32 PickDirection(struct SceneActorRegistryResetView *actor)
 {
-    u32 current = actor->direction;
+    register u32 current asm("r7") = actor->direction;
     s32 i;
     u32 direction;
+    asm("" : "+r"(current));
     i = 0;
     for (;;) {
         {
