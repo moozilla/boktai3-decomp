@@ -1,9 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
+#define SingletonSlot7_UpdateEndingScene sub_081EF914
 #ifdef NONMATCHING
-// what differs: the param and entry flag are in swapped high registers (sb/r8), plus a few case-1/3 temporaries
-// fuzzy: 94.3%
+// fuzzy: 96.2%
+
+// Remaining differences: playback temporaries and zero/constant placement in timed phases.
+// fuzzy: 96.2%
 
 #include "contact_swarm.h"
 
@@ -277,7 +279,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 void SingletonSlot7_UpdateEndingScene(u8 *p)
 {
     u8 *context = p;
-    u32 flag = ConsumeEntry(context);
+    register u32 flag asm("r8") = ConsumeEntry(context);
     if (flag == 1) {
         struct Drawable *foreground = (struct Drawable *)(p + 0x2C0);
         struct DisplaySequenceState *state;
@@ -360,6 +362,7 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
     }
     (*(u32 *)(context + 0xC4))++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SingletonSlot7_UpdateEndingScene);
 #endif
