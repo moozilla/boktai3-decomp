@@ -585,6 +585,7 @@ address,evidence
 081F3414,Independent nearest-distance search
 081F3450,Independent sibling minimum-weight search retained in assembly
 081F348C,Hidden tail function
+081F84E4,Independent raw-tail callback after orbit attack retained in assembly
 081FB7D8,Hidden counter difference with wrap (retained)
 081FB808,Hidden leaf returning 0
 081FB80C,Hidden velocity integrate step
