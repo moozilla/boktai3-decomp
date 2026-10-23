@@ -3,8 +3,8 @@
 // confidence=low: checkpoint completion restores player-route control and retries the route.
 
 #ifdef NONMATCHING
-// fuzzy: 99.3%
-// Three constant/load ordering differences remain; control flow and registers agree.
+// fuzzy: 99.6%
+// One mask/address ordering pair remains; control flow and registers agree.
 #include "scene_actor_chase.h"
 
 void SceneActor_UpdateAnimationCheckpoint(void);
@@ -15,6 +15,11 @@ struct MummyCheckpointContext {
     u8 unknown0[0x6F2];
     s16 flags6F2 : 16;
 };
+
+static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 mask)
+{
+    flags->bits &= mask;
+}
 
 void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
 {
@@ -29,7 +34,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
         Chase_ClearMotionFlags(actor, 0x100);
         body->flags6F2 &= ~contextBits;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~6;
+        Mummy_ClearCheckpointFlags((void *)(group + 0x40), ~6);
         {
             u32 mask = 0x1000;
             body->flags6F2 = mask | body->flags6F2;

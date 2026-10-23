@@ -97,3 +97,20 @@ after rebasing onto the campaign's latest main. A subsequent rebase retained
 main's three concurrently landed Ivy implementations, each fast-checked;
 its combined build was repeated before integration. Both history entries
 were preserved and the index regenerated.
+
+## Session 2 wrap-up
+
+Tags: #matching #campaign #mummy
+
+- 080DC9D0: drafted 99.6% from 99.3%. A file-local signed-mask helper
+  moves the group flag clear mask before its halfword load, removing one
+  ordering pair. Reviewed extent remains 588 bytes; two differing instructions
+  and eight differing bytes remain in the motion flag mask/address ordering.
+  Instrumented compiler diagnostics found no helpful single-pass flip.
+  Moving the context-mask initialization, changing motion clear helper argument
+  types, and adding address/register barriers did not improve that residue;
+  those experiments were discarded. The retained improvement uses no hints.
+- The wrap-up marker appeared before starting the next function. No new exact
+  functions were recovered in this session; exact gain is 0 percentage points.
+
+Session 2 combined validation: `build/cxbuild` printed `build/boktai3.gba: OK`.
