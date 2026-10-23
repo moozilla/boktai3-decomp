@@ -390,3 +390,5 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/wireless-controller_2026-10-12.md](../notes/wireless-controller_2026-10-12.md) | Wireless connection controller | *#inventory #wireless* | 4 |
 | [notes/wireless-tether_2026-10-14.md](../notes/wireless-tether_2026-10-14.md) | Wireless link indicator and tether actor, October 14 | *#actors #wireless #tether #assets* | 7 |
 | [notes/wireless_game_items_and_display.md](../notes/wireless_game_items_and_display.md) | Wireless game items and display (tentative) | #wireless #matching #types | 6 |
+| [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #matching #actors | 1 |
+| [notes/cx-sol08.md](../notes/cx-sol08.md) | cx-sol08 campaign notes | #matching #actors #particles | 10 |
