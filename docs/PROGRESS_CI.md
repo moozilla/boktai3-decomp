@@ -77,6 +77,9 @@ assembly placeholders receive zero credit.
 (`SECTIONS` in `tools/progress.py`) over the report categories, then families
 (units sharing a first word, e.g. Monsters > Ghoul > Ghoul 1), then units with
 the functions still to match. decomp.dev only shows category > unit > function.
+The same run writes `PROGRESS.json` beside it: every function with its size,
+status (matched, pinned, draft score) and C unit, which the `tools/claude-mod`
+popup's treemap and source pane read from `main`. Commit the two together.
 
 From the repository root:
 

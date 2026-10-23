@@ -3,15 +3,20 @@
 import type {
   DecompBar,
   DecompCategory,
+  DecompNode,
   DecompPr,
   DecompSnapshot,
-  DecompUnit,
+  DecompTree,
 } from '../types'
 
 export const REPO = 'moozilla/boktai3-decomp'
 export const PROGRESS_URL = `https://raw.githubusercontent.com/${REPO}/main/PROGRESS.md`
 export const PULLS_URL = `https://api.github.com/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=40`
 export const DECOMP_DEV_URL = `https://decomp.dev/${REPO}`
+export const TREE_URL = `https://raw.githubusercontent.com/${REPO}/main/PROGRESS.json`
+export const rawUrl = (path: string) => `https://raw.githubusercontent.com/${REPO}/main/${path}`
+export const blobUrl = (path: string, line?: number) =>
+  `https://github.com/${REPO}/blob/main/${path}${line ? `#L${line}` : ''}`
 
 const num = (s: string) => Number(s.replace(/,/g, ''))
 const ROW = /^\| (\*\*)?(?:&nbsp;&nbsp;)?([^|*][^|]*?)(\*\*)? \| (\d+)\/(\d+) \| ([\d.]+)% \|/
@@ -97,22 +102,6 @@ export function parseProgress(md: string): Omit<DecompSnapshot, 'prs' | 'fetched
   }
 }
 
-/** Unit sizes in code bytes, keyed `Category/Unit`, from decomp.dev's page. */
-export function parseUnitBytes(html: string): Record<string, number> {
-  const m = html.match(/window\.units\s*=\s*(\[.*?\]);/s)
-  if (!m) return {}
-  const out: Record<string, number> = {}
-  for (const u of JSON.parse(m[1]!) as { name: string; total_code: number }[]) out[u.name] = u.total_code
-  return out
-}
-
-export function attachUnitBytes(categories: DecompCategory[], bytes: Record<string, number>): void {
-  for (const c of categories) for (const u of c.units) {
-    const b = bytes[`${c.name}/${u.name}`]
-    if (b) u.bytes = b
-  }
-}
-
 type GithubPull = { number: number; title: string; body: string | null; merged_at: string | null }
 
 /** Merged PRs, newest first, with the match count and progress they report. */
@@ -147,68 +136,6 @@ export function ago(iso: string, now: number): string {
   return `${Math.round(s / 86400)} d ago`
 }
 
-// --- Treemap ---------------------------------------------------------------
-
-export type Rect = { x: number; y: number; w: number; h: number }
-type Sized<T> = { item: T; size: number }
-
-/** Squarified treemap layout: each item's rectangle, in the order given. */
-export function squarify<T>(items: Sized<T>[], box: Rect): { item: T; rect: Rect }[] {
-  const total = items.reduce((s, i) => s + i.size, 0)
-  if (total <= 0 || box.w <= 0 || box.h <= 0) return []
-  const scale = (box.w * box.h) / total
-  const queue = [...items].filter(i => i.size > 0).sort((a, b) => b.size - a.size)
-  const out: { item: T; rect: Rect }[] = []
-  let { x, y, w, h } = box
-
-  const worst = (row: number[], side: number) => {
-    const sum = row.reduce((a, b) => a + b, 0)
-    const max = Math.max(...row)
-    const min = Math.min(...row)
-    return Math.max((side * side * max) / (sum * sum), (sum * sum) / (side * side * min))
-  }
-
-  while (queue.length) {
-    const side = Math.min(w, h)
-    const row: Sized<T>[] = [queue.shift()!]
-    while (queue.length) {
-      const next = queue[0]!
-      const areas = row.map(r => r.size * scale)
-      if (worst([...areas, next.size * scale], side) > worst(areas, side)) break
-      row.push(queue.shift()!)
-    }
-    const sum = row.reduce((s, r) => s + r.size * scale, 0)
-    if (w >= h) {
-      const rw = sum / h
-      let cy = y
-      for (const r of row) {
-        const rh = (r.size * scale) / rw
-        out.push({ item: r.item, rect: { x, y: cy, w: rw, h: rh } })
-        cy += rh
-      }
-      x += rw
-      w -= rw
-    } else {
-      const rh = sum / w
-      let cx = x
-      for (const r of row) {
-        const rw = (r.size * scale) / rh
-        out.push({ item: r.item, rect: { x: cx, y, w: rw, h: rh } })
-        cx += rw
-      }
-      y += rh
-      h -= rh
-    }
-  }
-  return out
-}
-
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-const r1 = (n: number) => Math.round(n * 10) / 10
-/** Cuts a label to the width it has, at a rough glyph width. */
-const fit = (s: string, width: number, glyph: number) =>
-  s.length * glyph <= width ? s : s.slice(0, Math.max(1, Math.floor(width / glyph) - 1)) + '…'
-
 /** The fill for a share matched: dark grey at nothing, blue as it grows, green when done. */
 export function shade(pct: number): string {
   if (pct >= 100) return '#3f9b4f'
@@ -217,48 +144,134 @@ export function shade(pct: number): string {
   return `rgb(${mix(52, 46)},${mix(54, 104)},${mix(60, 214)})`
 }
 
-/** The whole treemap as one SVG: categories, each split into its units. */
-export function treemapSvg(categories: DecompCategory[], width: number, height: number): string {
-  const parts: string[] = []
-  const unitSize = (u: DecompUnit) => u.bytes ?? u.total * 200
-  const placed = squarify(
-    categories.map(c => ({ item: c, size: c.units.reduce((s, u) => s + unitSize(u), 0) || c.total * 200 })),
-    { x: 0, y: 0, w: width, h: height },
-  )
-  for (const { item: c, rect } of placed) {
-    const label = rect.w > 60 && rect.h > 26
-    const inner = { x: rect.x + 1, y: rect.y + (label ? 14 : 1), w: rect.w - 2, h: rect.h - (label ? 15 : 2) }
-    parts.push(
-      `<g><title>${esc(c.name)}: ${c.pct}% of bytes, ${c.done}/${c.total} functions</title>` +
-        `<rect x="${r1(rect.x)}" y="${r1(rect.y)}" width="${r1(rect.w)}" height="${r1(rect.h)}" fill="#1f1f1f" stroke="#141414"/>`,
-    )
-    if (label) {
-      parts.push(
-        `<text x="${r1(rect.x + 4)}" y="${r1(rect.y + 10.5)}" font-size="9.5" fill="#d8d8d8" font-weight="600">${esc(fit(`${c.name} · ${c.pct}%`, rect.w - 8, 5.6))}</text>`,
-      )
-    }
-    parts.push('</g>')
-    for (const { item: u, rect: ur } of squarify(c.units.map(u => ({ item: u, size: unitSize(u) })), inner)) {
-      const fits = ur.w > 44 && ur.h > 13
-      parts.push(
-        `<g><title>${esc(c.name)} / ${esc(u.name)}: ${u.pct}% of ${u.bytes ? `${u.bytes.toLocaleString('en-US')} bytes` : 'bytes'}, ${u.done}/${u.total} functions</title>` +
-          `<rect x="${r1(ur.x)}" y="${r1(ur.y)}" width="${r1(ur.w)}" height="${r1(ur.h)}" fill="${shade(u.pct)}" stroke="#1f1f1f" stroke-width="0.75"/>` +
-          (fits
-            ? `<text x="${r1(ur.x + 3)}" y="${r1(ur.y + 10)}" font-size="8" fill="#ffffffcc">${esc(fit(u.name, ur.w - 6, 4.6))}</text>`
-            : '') +
-          '</g>',
-      )
+// --- Function tree (PROGRESS.json) ------------------------------------------
+
+/** The children of a treemap level: [] for the root, [category], [category, unit]. */
+export function treeLevel(tree: DecompTree, path: string[]): DecompNode[] {
+  const fnNode = (f: DecompTree['categories'][number]['units'][number]['functions'][number]): DecompNode => {
+    const [name, address, bytes, pct, pinned, file, cName] = f
+    return {
+      name,
+      bytes,
+      doneBytes: pct >= 100 ? bytes : 0,
+      done: pct >= 100 ? 1 : 0,
+      total: 1,
+      near: pct < 100 && pct >= 95 ? 1 : 0,
+      fn: {
+        address,
+        pct,
+        pinned: pinned === 1,
+        file: file === -2 ? null : file === -1 ? `src/fn/sub_${address}.c` : (tree.files[file] ?? null),
+        ...(cName ? { cName } : {}),
+      },
     }
   }
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" ` +
-    `font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">` +
-    `<style>g:hover > rect { stroke: #fff; stroke-width: 1.5 }</style>${parts.join('')}</svg>`
-  )
+  const sum = (name: string, kids: DecompNode[]): DecompNode => ({
+    name,
+    bytes: kids.reduce((s, k) => s + k.bytes, 0),
+    doneBytes: kids.reduce((s, k) => s + k.doneBytes, 0),
+    done: kids.reduce((s, k) => s + k.done, 0),
+    total: kids.reduce((s, k) => s + k.total, 0),
+    near: kids.reduce((s, k) => s + k.near, 0),
+  })
+  const unitNode = (u: DecompTree['categories'][number]['units'][number]) => sum(u.name, u.functions.map(fnNode))
+  const [cat, unit] = path
+  if (cat === undefined) return tree.categories.map(c => sum(c.name, c.units.map(unitNode)))
+  const c = tree.categories.find(x => x.name === cat)
+  if (!c) return []
+  if (unit === undefined) return c.units.map(unitNode)
+  return c.units.find(x => x.name === unit)?.functions.map(fnNode) ?? []
 }
 
-/** Matched share as a text bar, for surfaces that draw no SVG. */
-export function textBar(pct: number, cells: number): string {
-  const full = Math.round((Math.max(0, Math.min(100, pct)) / 100) * cells)
-  return '█'.repeat(full) + '░'.repeat(Math.max(0, cells - full))
+export function totalOf(nodes: DecompNode[], name: string): DecompNode {
+  return {
+    name,
+    bytes: nodes.reduce((s, k) => s + k.bytes, 0),
+    doneBytes: nodes.reduce((s, k) => s + k.doneBytes, 0),
+    done: nodes.reduce((s, k) => s + k.done, 0),
+    total: nodes.reduce((s, k) => s + k.total, 0),
+    near: nodes.reduce((s, k) => s + k.near, 0),
+  }
+}
+
+export const pctOf = (n: DecompNode) => (n.fn ? n.fn.pct : n.bytes ? (100 * n.doneBytes) / n.bytes : 0)
+
+/**
+ * Strip treemap: rows top to bottom, each a share of the height, its tiles a
+ * share of the row's width. Two levels of boxes, so it draws with flex alone.
+ * `aspect` is the box's width over its height.
+ */
+export function stripLayout<T>(
+  items: { item: T; size: number }[],
+  aspect: number,
+): { height: number; size: number; tiles: { item: T; width: number; size: number }[] }[] {
+  const sorted = items.filter(i => i.size > 0).sort((a, b) => b.size - a.size)
+  const total = sorted.reduce((s, i) => s + i.size, 0)
+  if (!total) return []
+  const W = aspect
+  const H = 1
+  const rows: { item: T; size: number }[][] = []
+  let row: { item: T; size: number }[] = []
+  const worst = (r: { size: number }[]) => {
+    const sum = r.reduce((s, i) => s + i.size, 0)
+    const h = (sum / total) * H
+    return Math.max(...r.map(i => {
+      const w = (i.size / sum) * W
+      return Math.max(w / h, h / w)
+    }))
+  }
+  for (const it of sorted) {
+    if (row.length && worst([...row, it]) > worst(row)) {
+      rows.push(row)
+      row = []
+    }
+    row.push(it)
+  }
+  if (row.length) rows.push(row)
+  return rows.map(r => {
+    const sum = r.reduce((s, i) => s + i.size, 0)
+    return { height: (100 * sum) / total, size: sum, tiles: r.map(i => ({ item: i.item, width: (100 * i.size) / sum, size: i.size })) }
+  })
+}
+
+/** A function's colour at the function level: green done, teal pinned, amber drafts, grey nothing yet. */
+export function fnShade(pct: number, pinned: boolean): string {
+  if (pct >= 100) return pinned ? '#2f7f78' : '#3f9b4f'
+  if (pct <= 0) return '#3a3a3a'
+  const t = Math.max(0, Math.min(1, (pct - 50) / 50))
+  const mix = (a: number, b: number) => Math.round(a + (b - a) * t)
+  return `rgb(${mix(110, 214)},${mix(84, 150)},${mix(40, 46)})`
+}
+
+/** The function's text in a C file, with its 1-based first line; the whole file if it can't be found. */
+export function extractFunction(text: string, names: string[]): { source: string; line: number; isWhole: boolean } {
+  const lines = text.split('\n')
+  // `#define Name sub_XXXXXXXX` lets the definition use the friendly name.
+  for (const m of text.matchAll(/^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$/gm)) if (names.includes(m[2]!)) names = [...names, m[1]!]
+  for (const name of names) {
+    const re = new RegExp(`\\b${name}\\s*\\(`)
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i]!
+      if (!re.test(l) || /^\s*(#|\/\/|\*|\/\*)/.test(l) || /;\s*$/.test(l) || /^\s/.test(l)) continue
+      // A definition: the text from here reaches `{` before any `;`.
+      const rest = lines.slice(i, i + 12).join('\n')
+      const brace = rest.indexOf('{')
+      const semi = rest.indexOf(';')
+      if (brace < 0 || (semi >= 0 && semi < brace)) continue
+      let start = i
+      while (start > 0 && /^\s*(\/\/|\/\*|\*)/.test(lines[start - 1]!)) start--
+      let depth = 0
+      let seen = false
+      for (let j = i; j < lines.length; j++) {
+        for (const ch of lines[j]!) {
+          if (ch === '{') {
+            depth++
+            seen = true
+          } else if (ch === '}') depth--
+        }
+        if (seen && depth === 0) return { source: lines.slice(start, j + 1).join('\n'), line: start + 1, isWhole: false }
+      }
+    }
+  }
+  return { source: text.replace(/\n$/, ''), line: 1, isWhole: true }
 }
