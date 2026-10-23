@@ -4,7 +4,7 @@
 #include "scene_vec.h"
 // confidence=low: moves the part along its stored retreat angle, then returns to idle.
 #ifdef NONMATCHING
-// fuzzy: 93.9%
+// fuzzy: 97.0%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -46,6 +46,7 @@ static inline void StepSequence(void *obj, u32 firstMask)
         u32 input = state->flags;
         register u32 first asm("r1");
         bit = firstMask;
+        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -148,7 +149,7 @@ static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
     v->y = 0;
     {
         s32 sample = gUnk_086149C4[angle & 255];
-        asm("" : "+r"(sample));
+
         v->z = Scale(sample * scale);
     }
 }
@@ -159,9 +160,8 @@ static inline u8 Ended(struct VanargandPart *p)
 
 static inline void AddPlanar(struct SceneVec *v, struct SceneVec *origin)
 {
-    v->x = origin->x + v->x;
-    v->z = origin->z + v->z;
-    v->y = origin->y;
+    v->x = v->x + origin->x;
+    v->z = v->z + origin->z;
 }
 // confidence=low: action role inferred from local motion and animation.
 void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
@@ -176,11 +176,7 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
             asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 11, (u8)p->variant, 0);
         }
-        {
-            register u32 firstBit asm("r3") = 1;
-            asm("" : "+r"(firstBit));
-            StepSequence(p, firstBit);
-        }
+        StepSequence(p, 1);
         {
             register u32 zero asm("r1") = 0;
             asm("" : "+r"(zero));
@@ -195,11 +191,15 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
         switch (state) {
             case 0: {
                 struct SceneVec target;
-                register u8 *enter asm("r6") = &p->enter;
-                if (*enter) {
+                u32 entering = p->enter;
+                u8 *enter;
+                asm("" : "+r"(entering));
+                enter = &p->enter;
+                if (entering) {
                     *enter = 0;
                     Vector(&target, *((u8 *)p + 0x187), 128);
                     AddPlanar(&target, &p->origin);
+                    target.y = p->origin.y;
                     MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
                 }
                 MotionTrack_Update(p->motion);
