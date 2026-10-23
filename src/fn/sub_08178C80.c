@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.9%
 void Bg_SetPriority(u32, u32);
 extern u16 gUnk_020005A4;
 extern u32 gUnk_02000580;
@@ -29,7 +28,15 @@ void InventoryPanel_InitCallbackGroups(u8 *);
 void SceneHud_RebuildTertiaryOptions(u8 *);
 u32 DarkLoan_CreateHiddenDisplay(u32, u32, u32, u32);
 
-u32 sub_08178C80(u8 *s)
+static inline void MinusOne(u8 *base, u32 offset)
+{
+    u8 *p = base + offset;
+    register s32 one asm("r0") = 1;
+    *p = -one;
+}
+// confidence=low: initializes the scene HUD and its script-configured panels.
+#define SceneHud_InitFromScript sub_08178C80
+u32 SceneHud_InitFromScript(u8 *s)
 {
     u32 zero, value;
     u32 r;
@@ -98,13 +105,16 @@ u32 sub_08178C80(u8 *s)
         Hud_SetUpdateCallback(s, sub_08167C84);
     }
     InventoryPanel_InitCallbackGroups(s);
-    z = 0;
-    s[0xB01] = 2;
+    {
+        u8 *field = s + 0xB01;
+        z = 0;
+        *field = 2;
+    }
     s[0xB02] = 0xFF;
-    *(s8 *)(s + 0xB03) = -1;
+    MinusOne(s, 0xB03);
     one = 1;
     offset = 0xA5F;
-    *(s8 *)(s + offset) = -one;
+    MinusOne(s, offset);
     *(u32 *)(s + 0x4928) = z;
     gUnk_02000214 = s;
     SceneHud_RebuildTertiaryOptions(s);
@@ -115,6 +125,3 @@ u32 sub_08178C80(u8 *s)
                                                             s[0x48E7], *(u32 *)(s + 0x58));
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08178C80);
-#endif
