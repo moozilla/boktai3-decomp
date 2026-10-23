@@ -133,6 +133,43 @@ still differs. Only commit drafts that compile and are worth resuming.
 
 **Scratch files:** never use fixed paths under `/tmp` (other workers share it). Put helper scripts in your worktree under `build/` (gitignored) or a directory named after your worker.
 
+## When stuck: ask the compiler debugger (October 23)
+
+Before trying spellings at random, ask which compiler decision differs.
+Each call costs one or two compiles:
+
+* `python3 tools/hint.py FILE.c [FUNC] [--nonmatching]` explains the first
+  difference: the decision, its rule, and the agbcc source lines that make
+  it. Aim it with `--line N`, `--at 0x080F3438` (a ROM address) or
+  `--insn U`. Add `--flips` (about 10 s) to flip one compiler decision at
+  a time; the flip that helps names the pass (cse skip-blocks, gcse,
+  strength reduction...).
+* `python3 tools/hint.py --about "cse skip"` gives a rule and its compiler
+  source with no draft. `tools/step.py FILE --all` lists every difference.
+
+How to read its notes:
+
+* **order**: agbcc has no instruction scheduler, so the ROM's order is the
+  source evaluation order. Move the value with a local initialized at that
+  point, an inline-helper argument (arguments are evaluated before the
+  body), or statement order. Loop invariants are hoisted in loop-body order.
+* **frame** with `pop {r1}`: the function returns a value, possibly a
+  non-void function with no return statement.
+* **call result**: cast the callee's result to u8/u16.
+* **comparison type**: make the compared value signed or unsigned.
+
+Patterns that matched:
+
+* Actor flag at 0x2B1: `if (SceneActorControl_TakeFlag(&p[0x2B1])) {}`
+  with an empty body, not `if (f) f = 0;`. Pair it with a reset helper that
+  takes the address before the shared zero:
+  `u8 *state = &p[0x2A8]; u32 zero = 0; *state = zero;`. See
+  include/ivy_phase.h.
+* A mask loaded before its global is an inline-helper argument.
+* An alias like `u8 *a = (u8 *)actor;` costs a `mov ip` copy; cast inline.
+
+The rules and worked examples are in notes/compiler-debugger-2026-10-23.md.
+
 ## agbcc matching tips
 
 * **Use real struct types, not `*(u16 *)(p + 0x20)` casts**, whenever the
