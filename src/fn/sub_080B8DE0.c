@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* Skeleton_OnContactEvent: records the hit and flags the state unless the actor is unavailable */
 inline static u8 blocked2048(u8 *c)
@@ -34,27 +35,30 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// Register allocation differs for the saved extended-state flags pointer.
+// confidence=low: records a collision target unless the Skeleton is unavailable.
+#define Skeleton_OnAttackCollision sub_080B8DE0
 void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;
     u8 *base = ctx;
-    u32 *state = *(u32 **)(ctx + 0x3D0);
+    register u32 *state asm("r4") = *(u32 **)(ctx + 0x3D0);
+    asm("" : "+r"(state));
     if (blocked2048(ctx))
         return;
     {
         u32 bit = 0x10;
-        u32 *sp = (u32 *)((u8 *)state + 0x6DC);
-        u32 *held;
-        u32 v = *sp & bit;
+        register u32 *sp asm("r1") = (u32 *)((u8 *)state + 0x6DC);
+        register u32 *held asm("r2");
+        u32 v;
+        asm("" : "+r"(sp));
+        v = *sp & bit;
         held = sp;
-        state = held;
+        asm("" : "+r"(held), "+r"(v));
+
         if (Test(v, ~0)) {
             u32 bit = 0x800;
-            if (Test(*state, bit)) {
+            if (Test(*held, bit)) {
                 *(u16 *)(base + 0x2EC) = 0;
                 *(u16 *)(base + 0x2F0) = 0;
             }
@@ -68,6 +72,3 @@ void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
         *flags &= mask;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Skeleton_OnAttackCollision);
-#endif
