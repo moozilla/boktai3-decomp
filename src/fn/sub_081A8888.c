@@ -1,9 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.4%
-// foundry draft (worker best 94.3%); what differs is mostly register allocation and instruction order
-/* Tentative: action state transition, with restart on flag 0x20000. */
+#define Vanargand_UpdateTimedAlternateTransition sub_081A8888
+
+/* Selects the next transition after the active timer passes 120. */
 struct VanargandTransition {
     u8 pad0[0x9C];
     u32 flags;
@@ -28,10 +28,6 @@ static inline u8 Vanargand_ConsumePending(struct VanargandTransition *p)
     }
     return FALSE;
 }
-static inline u32 Vanargand_TestFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void Vanargand_UpdateTimedAlternateTransition(void *object)
 {
     struct VanargandTransition *p = object;
@@ -44,13 +40,17 @@ void Vanargand_UpdateTimedAlternateTransition(void *object)
         u32 state;
         u32 alternate = ((struct VanargandTransition *)object)->alternate;
         if (!alternate) {
-            u8 mode = 13;
-            p->phase = alternate;
-            p->subphase = alternate;
-            p->mode = mode;
+            u32 mode = 13;
+            u8 *field = &p->phase;
+            asm("" : "+r"(mode), "+r"(field));
+            *field++ = alternate;
+            *field++ = alternate;
+            *field = mode;
             p->counter = alternate;
-            p->pending = 1;
+            field += 2;
+            asm("" : "+r"(field));
             state = 1;
+            *field = state;
         } else {
             u32 zero = 0, mode = 18;
             p->phase = zero;
@@ -66,6 +66,3 @@ void Vanargand_UpdateTimedAlternateTransition(void *object)
         p->counter++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateTimedAlternateTransition);
-#endif
