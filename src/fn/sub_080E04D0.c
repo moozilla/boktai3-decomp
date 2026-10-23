@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: animation 11 is the route-arrival reaction selected by Dog_ResumeRoute.
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
@@ -19,7 +18,7 @@ void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
     u16 *flags;
     u16 *scale;
     u16 *originalScale;
-    register u32 originalOffset asm("r1");
+    unsigned long long originalOffset;
     if (TakeEntry(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
         a->field2B3 = 0;
@@ -30,8 +29,9 @@ void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
     {
         u32 mask = 0x80;
         flags = &a->flags2D4;
-        if (Test(flags, mask))
+        if (Test(flags, mask)) {
             *originalScale = Div(0x40, 3);
+        }
     }
 
     if (Test(flags, 0xA02F)) {
@@ -42,14 +42,16 @@ void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
         u16 *p = &a->field2C2;
         u16 value = *p;
         scale = p;
-        if (!value)
+        if (!value) {
             *scale = 0x40;
+        }
     }
     if (!a->drawableKind)
         Anim_SetDurationScale((u8 *)a->drawable + 0x48, *scale);
     else
         Anim_SetFrameDurationScale((u8 *)a->drawable + 0x20, *scale);
     a->field2C2 = saved;
-    if (a->field2B3)
+    if (a->field2B3) {
         a->field2B0 = 1;
+    }
 }

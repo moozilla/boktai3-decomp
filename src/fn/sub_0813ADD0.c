@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Player_UpdateFacingSide sub_0813ADD0
-
 struct FacingState {
     u8 pad[0x3A2];
     u8 side;

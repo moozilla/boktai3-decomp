@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define FeatherEffectPool_CreateDirectional sub_081294B4
 struct Vec {
     s16 x, y, z, pad;
 };

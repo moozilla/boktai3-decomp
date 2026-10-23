@@ -1,9 +1,8 @@
 #include "global.h"
 
 // confidence=low: energy-gated burst sequence with a held middle animation.
-#define Player_UpdateHeldEnergyBurst sub_08143604
-#define B(n)                         (*(u8 *)(p + (n)))
-#define H(n)                         (*(u16 *)(p + (n)))
+#define B(n) (*(u8 *)(p + (n)))
+#define H(n) (*(u16 *)(p + (n)))
 struct Position {
     s16 x, y, z, pad;
 };

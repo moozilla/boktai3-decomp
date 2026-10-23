@@ -99,7 +99,6 @@ static inline void SetSequence(struct Actor *p, u16 sequence, u32 offset)
     p->f1CE = sequence;
     p->f1DC = (u8 *)p + offset;
 }
-#define Hresvelgr_UpdateCollisionPresentation sub_081A2858
 void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
 {
     struct Actor *p2 = p;

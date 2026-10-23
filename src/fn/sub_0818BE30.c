@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct ArmorCollider {
     u8 pad0[6];
     u16 flags;
@@ -38,38 +37,41 @@ static inline void addCategory(struct ArmorCollider *p, u32 mask)
 }
 void Armor_InitCombatColliders(struct ArmorColliderOwner *input, u32 inputId)
 {
+    struct ArmorCollider *c_2;
     struct ArmorColliderOwner *p = input;
     u32 id = inputId;
     s32 value, power;
     s32 defense;
-    register struct ArmorCollider *c asm("r4");
+    struct ArmorCollider *c;
     void *position;
 
     Armor_InitCollider(&p->secondaryAttack, id, p->position, gUnk_0824F10C, gUnk_0824F114, 0, 0);
     value = p->attackPower << 10;
-    if (value >= 0)
+    if (value >= 0) {
         power = value >> 12;
-    else
+    } else {
         power = -(-value >> 12);
+    }
     c = &p->secondaryAttack;
     Collider_SetAttackProperties(c, power, 50, 0, 0x40000, 30);
     c->flags |= 4;
-    c = &p->contact;
+    c_2 = &p->contact;
     defense = p->defensePower;
     position = p->position;
-    Armor_InitExtendedCollider(c, id, defense, position, gUnk_0824F10C, gUnk_0824F114,
+    Armor_InitExtendedCollider(c_2, id, defense, position, gUnk_0824F10C, gUnk_0824F114,
                                Armor_ReceiveColliderContact, p);
-    addFlags(c, 0x100C);
+    addFlags(c_2, 0x100C);
     c = &p->trigger;
     Armor_InitExtendedCollider(c, id, 0, position, gUnk_0824F10C, gUnk_0824F11C,
                                Armor_TriggerBehavior35, p);
     c->flags |= 6;
     Armor_InitCollider(&p->attack, id, position, gUnk_0824F10C, gUnk_0824F114, 0, p);
     value = p->attackPower << 11;
-    if (value >= 0)
+    if (value >= 0) {
         power = value >> 12;
-    else
+    } else {
         power = -(-value >> 12);
+    }
     c = &p->attack;
     Collider_SetAttackProperties(c, power, 50, 0x2000, 0x60000, 30);
     c->flags |= 4;

@@ -1,8 +1,12 @@
 #include "global.h"
 #include "engine.h"
 void memcpy(void *, const void *, u32);
-struct P2 { u16 x, y; };
-struct T5 { struct P2 e[5]; };
+struct P2 {
+    u16 x, y;
+};
+struct T5 {
+    struct P2 e[5];
+};
 extern struct T5 gUnk_0824F9C8;
 extern struct T5 gUnk_0824F9DC;
 struct V {

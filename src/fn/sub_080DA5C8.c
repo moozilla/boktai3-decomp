@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: clears movement response flags and restores the response speed and sentinel.
 #define Mummy_ResetResponseState sub_080DA5C8
@@ -28,8 +27,9 @@ void Mummy_ResetResponseState(u8 *p)
     {
         u32 loaded = body[15];
         u32 value = mask;
-        asm("" : "+r"(value) : "r"(loaded));
-        value &= loaded;
+        do {
+            value &= loaded;
+        } while (0);
         zero = 0;
         body[15] = value;
     }

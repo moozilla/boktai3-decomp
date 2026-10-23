@@ -1,7 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Player_SelectHistoryDirection sub_08141A1C
 
 /* Signed view of the history entries read by this selector. */
 struct PlayerHistory {

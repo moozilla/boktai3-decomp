@@ -1,9 +1,8 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define ActorEffect_SpawnBurstAtAnchor sub_081EC4AC
-#define gEffectRandomIndex             gUnk_03005304
-#define gEffectRandomTable             gUnk_086141BC
+#define gEffectRandomIndex gUnk_03005304
+#define gEffectRandomTable gUnk_086141BC
 struct BurstActor {
     u8 pad0[0x268];
     s32 height;

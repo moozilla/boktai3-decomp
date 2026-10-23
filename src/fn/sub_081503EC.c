@@ -27,7 +27,6 @@ static inline void putH(u8 *p, u32 o, u32 v)
 {
     *(u16 *)(p + o) = v;
 }
-#define PlayerCue_UpdateScaleTransition sub_081503EC
 void PlayerCue_UpdateScaleTransition(u8 *p)
 {
     u16 *t;

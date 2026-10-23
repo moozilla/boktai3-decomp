@@ -19,7 +19,10 @@ struct Slot7CommandOwner {
     u8 unknownC8[0x118 - 0xC8];
     struct Slot7Receiver receiver;
 };
-struct Slot7CommandScene { u8 unknown0[0x24]; u8 bank; };
+struct Slot7CommandScene {
+    u8 unknown0[0x24];
+    u8 bank;
+};
 extern struct Slot7CommandScene *gUnk_0200047C;
 extern u16 gUnk_03005040[];
 void SceneMessages_SetPendingTrigger(void *, void *);
@@ -40,7 +43,10 @@ static inline void SetPhase(struct Slot7CommandOwner *owner, u32 phase)
     owner->counter = wordZero;
     owner->entered = 1;
 }
-struct Slot7ResourceRows { u8 *palettes[4]; u8 *resources[4]; };
+struct Slot7ResourceRows {
+    u8 *palettes[4];
+    u8 *resources[4];
+};
 static inline void SetResources(u8 *actor, u32 a, u32 b, u32 base)
 {
     s32 i;
@@ -80,156 +86,157 @@ void SingletonSlot7_DispatchPendingCommands(struct Slot7CommandOwner *input)
     u8 *actor = (u8 *)owner;
     register struct Slot7Receiver *receiver asm("r10") = &owner->receiver;
     s32 i = 0;
-    if (i < receiver->count[gUnk_0200047C->bank]) do {
-        struct Slot7Command *command = receiver->commands[gUnk_0200047C->bank][i];
-        register s32 next asm("r9");
-        u32 kind;
-        SceneMessages_SetPendingTrigger(receiver, command);
-        kind = command->command;
-        next = i + 1;
-        asm("" : : "r"(next), "r"(owner), "r"(receiver));
-        switch (kind) {
-        case 0:
-            FIELD(actor, 0x294, s32) = -100;
-            FIELD(actor, 0x5D2, u16) = 1;
-            SetPhase(owner, 2);
-            break;
-        case 1:
-            FIELD(actor, 0x294, s32) = command->args[0];
-            FIELD(actor, 0x5D2, u16) = 1;
-            SetPhase(owner, 3);
-            break;
-        case 10:
-            FIELD(actor, 0x5C2, u16) = 15;
-            Sound_PlaySong(0x587);
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 58:
-            FIELD(actor, 0x294, s32) = command->args[0];
-            FIELD(actor, 0x5D2, u16) = command->args[1];
-            SetPhase(owner, 4);
-            break;
-        case 59:
-            SetPhase(owner, 7);
-            break;
-        case 60:
-            FIELD(actor, 0x5A5, u8) = command->args[0];
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 61:
-            if (command->args[0] == 0) {
-                FIELD(actor, 0x5A0, u32) = 0;
-                FIELD(actor, 0x304, u32) = 0;
-                FIELD(actor, 0x34C, u32) = 0;
-                Trigger_ConsumePending(receiver, 1);
-            } else {
-                FIELD(actor, 0x5A6, u16) = 2;
-                SetPhase(owner, 9);
+    if (i < receiver->count[gUnk_0200047C->bank])
+        do {
+            struct Slot7Command *command = receiver->commands[gUnk_0200047C->bank][i];
+            register s32 next asm("r9");
+            u32 kind;
+            SceneMessages_SetPendingTrigger(receiver, command);
+            kind = command->command;
+            next = i + 1;
+            asm("" : : "r"(next), "r"(owner), "r"(receiver));
+            switch (kind) {
+                case 0:
+                    FIELD(actor, 0x294, s32) = -100;
+                    FIELD(actor, 0x5D2, u16) = 1;
+                    SetPhase(owner, 2);
+                    break;
+                case 1:
+                    FIELD(actor, 0x294, s32) = command->args[0];
+                    FIELD(actor, 0x5D2, u16) = 1;
+                    SetPhase(owner, 3);
+                    break;
+                case 10:
+                    FIELD(actor, 0x5C2, u16) = 15;
+                    Sound_PlaySong(0x587);
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 58:
+                    FIELD(actor, 0x294, s32) = command->args[0];
+                    FIELD(actor, 0x5D2, u16) = command->args[1];
+                    SetPhase(owner, 4);
+                    break;
+                case 59:
+                    SetPhase(owner, 7);
+                    break;
+                case 60:
+                    FIELD(actor, 0x5A5, u8) = command->args[0];
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 61:
+                    if (command->args[0] == 0) {
+                        FIELD(actor, 0x5A0, u32) = 0;
+                        FIELD(actor, 0x304, u32) = 0;
+                        FIELD(actor, 0x34C, u32) = 0;
+                        Trigger_ConsumePending(receiver, 1);
+                    } else {
+                        FIELD(actor, 0x5A6, u16) = 2;
+                        SetPhase(owner, 9);
+                    }
+                    break;
+                case 62:
+                    SetPhase(owner, 8);
+                    break;
+                case 16:
+                    if (command->args[0] == 0) {
+                        SetResources(actor, 3, 2, 0x408);
+                    } else if (command->args[1] == 0) {
+                        SetResources(actor, 502, 501, 0x488);
+                    } else {
+                        SetResources(actor, 502, 501, 0x488);
+                    }
+                    FIELD(actor, 0x5FC, u32) = FIELD(actor, 0x5F8, u32);
+                    FIELD(actor, 0x608, u32) = FIELD(actor, 0x604, u32);
+                    FIELD(actor, 0x5A8, u32) = 0;
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 64:
+                    FIELD(actor, 0x5D8, u16) = command->args[0];
+                    FIELD(actor, 0x5DA, u16) = command->args[1];
+                    FIELD(actor, 0x5DC, u16) = command->args[2];
+                    FIELD(actor, 0x5A6, u16) = 0;
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 2:
+                    FIELD(actor, 0x278, u16) = command->args[0];
+                    FIELD(actor, 0x294, s32) = FIELD(actor, 0x278, s16);
+                    FIELD(actor, 0x5D2, u16) = 1;
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 63:
+                    if (command->args[0] == 0) {
+                        SetResources(actor, 3, 2, 0x408);
+                    } else {
+                        SetResources(actor, 502, 501, 0x488);
+                    }
+                    FIELD(actor, 0x5FC, u32) = FIELD(actor, 0x5F8, u32);
+                    FIELD(actor, 0x608, u32) = FIELD(actor, 0x604, u32);
+                    FIELD(actor, 0x5A8, u32) = 0;
+                    Sound_PlaySong(0x598);
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 65:
+                    SingletonSlot7_SetMotionMode(actor, 0);
+                    Trigger_ConsumePending(receiver, 1);
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                case 56:
+                case 57:
+                default:
+                    break;
             }
-            break;
-        case 62:
-            SetPhase(owner, 8);
-            break;
-        case 16:
-            if (command->args[0] == 0) {
-                SetResources(actor, 3, 2, 0x408);
-            } else if (command->args[1] == 0) {
-                SetResources(actor, 502, 501, 0x488);
-            } else {
-                SetResources(actor, 502, 501, 0x488);
-            }
-            FIELD(actor, 0x5FC, u32) = FIELD(actor, 0x5F8, u32);
-            FIELD(actor, 0x608, u32) = FIELD(actor, 0x604, u32);
-            FIELD(actor, 0x5A8, u32) = 0;
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 64:
-            FIELD(actor, 0x5D8, u16) = command->args[0];
-            FIELD(actor, 0x5DA, u16) = command->args[1];
-            FIELD(actor, 0x5DC, u16) = command->args[2];
-            FIELD(actor, 0x5A6, u16) = 0;
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 2:
-            FIELD(actor, 0x278, u16) = command->args[0];
-            FIELD(actor, 0x294, s32) = FIELD(actor, 0x278, s16);
-            FIELD(actor, 0x5D2, u16) = 1;
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 63:
-            if (command->args[0] == 0) {
-                SetResources(actor, 3, 2, 0x408);
-            } else {
-                SetResources(actor, 502, 501, 0x488);
-            }
-            FIELD(actor, 0x5FC, u32) = FIELD(actor, 0x5F8, u32);
-            FIELD(actor, 0x608, u32) = FIELD(actor, 0x604, u32);
-            FIELD(actor, 0x5A8, u32) = 0;
-            Sound_PlaySong(0x598);
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 65:
-            SingletonSlot7_SetMotionMode(actor, 0);
-            Trigger_ConsumePending(receiver, 1);
-            break;
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 11:
-        case 12:
-        case 13:
-        case 14:
-        case 15:
-        case 17:
-        case 18:
-        case 19:
-        case 20:
-        case 21:
-        case 22:
-        case 23:
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 28:
-        case 29:
-        case 30:
-        case 31:
-        case 32:
-        case 33:
-        case 34:
-        case 35:
-        case 36:
-        case 37:
-        case 38:
-        case 39:
-        case 40:
-        case 41:
-        case 42:
-        case 43:
-        case 44:
-        case 45:
-        case 46:
-        case 47:
-        case 48:
-        case 49:
-        case 50:
-        case 51:
-        case 52:
-        case 53:
-        case 54:
-        case 55:
-        case 56:
-        case 57:
-        default:
-            break;
-        }
-        i = next;
-    } while (i < receiver->count[gUnk_0200047C->bank]);
+            i = next;
+        } while (i < receiver->count[gUnk_0200047C->bank]);
 }
 
 #else

@@ -16,7 +16,6 @@ static inline s32 HasFlag(struct Player *p, u32 mask)
     }
 }
 
-#define PlayerStats_AddHundredths sub_0815977C
 void PlayerStats_AddHundredths(struct Player *p, s32 amount)
 {
     if (p->kind == 1 && p->actionMode == 0) {

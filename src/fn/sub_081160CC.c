@@ -25,9 +25,8 @@ struct DropManager *SpriteDrop_CreateManager(void);
 s32 Terrain_GetCellClearance(void *);
 void SpriteDrop_UpdateEntry(struct DropEntry *);
 void SpriteDrop_OnExpire(struct DropEntry *);
-void SpatialIndex_InitEntry(void *, struct PackedVec *, struct PackedVec *, struct PackedVec *,
-                            s32, s32, s32, s32, s32, void (*)(struct DropEntry *),
-                            struct DropEntry *);
+void SpatialIndex_InitEntry(void *, struct PackedVec *, struct PackedVec *, struct PackedVec *, s32,
+                            s32, s32, s32, s32, void (*)(struct DropEntry *), struct DropEntry *);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 
 #define E (m->entries[i])

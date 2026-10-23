@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input_grid.h"
-#define Storage_BeginSwapTransition sub_081BDE94
 #ifdef NONMATCHING
 // fuzzy: 75.6%
 // Remaining: transition-array pointer induction, stack lifetimes and register allocation.

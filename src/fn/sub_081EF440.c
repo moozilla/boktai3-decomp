@@ -27,7 +27,6 @@ static inline void BeginPhase(struct PhaseState *p, s32 phase)
     p->timer = 0;
     p->entered = 1;
 }
-#define Slot7_UpdateMotionPhase sub_081EF440
 void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
 {
     struct PhaseState *other = (struct PhaseState *)p;

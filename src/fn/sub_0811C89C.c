@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "modifier_list.h"
 
@@ -17,7 +16,7 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     u16 *palette;
     s32 resource;
     s32 offset, i;
-    register struct CharacterPreviewPalette *flash asm("r5") = p;
+    struct CharacterPreviewPalette *flash = p;
     p->target = model;
     flash->flashPalette = gUnk_030042E4 + 0x3240;
     switch (model->view.metadata.kind) {
@@ -57,14 +56,15 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
         i = 4;
         do {
             struct ModifierDisplayObject *part = (void *)((u8 *)p->target + offset);
-            part->palette = palette;
+            part->palette = model->activePalette;
             part->tile = (*lp)->nextTile;
             offset += 0x60;
         } while (--i >= 0);
         (*ap)->nextTile = (*ap)->nextTile + (offset = 2);
-        if ((*ap)->nextTile > 0xafff)
+        if ((*ap)->nextTile > 0xafff) {
             (*ap)->nextTile = 0xa000;
-        else if ((*ap)->nextTile <= 0x9fff)
+        } else if ((*ap)->nextTile <= 0x9fff) {
             (*ap)->nextTile = 0xa000;
+        }
     }
 }

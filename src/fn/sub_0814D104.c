@@ -2,7 +2,6 @@
 #include "player.h"
 #include "scene_object.h"
 #include "game_state.h"
-#define Player_ComputeActionScale sub_0814D104
 s32 Div(s32, s32);
 u32 SunClock_GetPhase(void);
 static inline u32 Test(u32 *p, u32 mask)

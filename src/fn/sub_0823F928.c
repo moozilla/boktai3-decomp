@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 // confidence=low: charge phases and orbiting attack collider identify a spinning attack.
@@ -33,12 +32,16 @@ static inline s32 scale(s32 v)
 }
 void Player_UpdateChargedSpinAttack(u8 *p)
 {
-    if (B(0x457) != 3)
+    s32 k2 = 0;
+    if ((*((u8 *)(p + 0x457))) != 3) {
         Player_SetTetherMode(p, 3, 0);
-    switch (B(0x458)) {
+    }
+    switch (*((u8 *)(p + 0x458))) {
         case 0:
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x23), 0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x23),
+                                         0x40)) {
                 Player_SetTetherMode(p, 3, 1);
+            }
             break;
         case 1:
             Player_UpdateFacingFromInputHistory(p);
@@ -48,9 +51,9 @@ void Player_UpdateChargedSpinAttack(u8 *p)
                 if (H(0x428) <= 9) {
                     Player_PlayLocalSong(W(0x18), 0xD5);
                     Player_SetTetherMode(p, 3, 5);
-                } else if ((**(u16 **)(p + 0x348)) & 2)
+                } else if ((*(*((u16 **)(p + 0x348)))) & 2) {
                     Player_SetTetherMode(p, 3, 2);
-                else {
+                } else {
                     Player_PlayLocalSong(W(0x18), 0x203);
                     Player_SetTetherMode(p, 3, 5);
                 }
@@ -87,14 +90,17 @@ void Player_UpdateChargedSpinAttack(u8 *p)
             }
             break;
         case 5:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x25), 0x40);
-            if ((*(u16 **)(p + 0x348))[1] & 2)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x25),
+                                     0x40);
+            if ((*((u16 **)(p + 0x348)))[1] & 2) {
                 B(0xBF6) = 1;
-            if (++H(0x45A) > 4)
+            }
+            if ((++(*((u16 *)(p + 0x45A)))) > 4) {
                 Player_SetTetherMode(p, 3, 6);
+            }
             break;
         case 6: {
-            register u32 pending asm("r0");
+            u32 pending;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 B(0xBF6) = 1;
@@ -103,23 +109,26 @@ void Player_UpdateChargedSpinAttack(u8 *p)
                 B(0xBF6) = 0;
                 B(0x458) = 1;
             } else if (++H(0x45A) > 14) {
-                B(0xBF6) = 0;
+                *((u8 *)(p + 0xBF6)) = k2;
                 Player_SetTetherMode(p, 3, 7);
             }
             break;
         }
         case 7:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x23), 0x40);
-            if (++H(0x45A) > 4)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x23),
+                                     0x40);
+            if ((++(*((u16 *)(p + 0x45A)))) > 4) {
                 Player_SetTetherMode(p, 0, 0);
+            }
             break;
         case 8: {
             struct AttackVec offset, size, pos;
             s32 angle;
-            B(0x4B9) = 0;
-            if (Player_UpdateFacingFromInputHistory(p))
+            *((u8 *)(p + 0x4B9)) = 0;
+            if (Player_UpdateFacingFromInputHistory(p)) {
                 Player_SetDirectionalVelocity_08238300(p, 6);
-            if (!(H(0x45A) & 3)) {
+            }
+            if (!((*((u16 *)(p + 0x45A))) & 3)) {
                 offset.x = 0;
                 offset.y = 0;
                 offset.z = 0;

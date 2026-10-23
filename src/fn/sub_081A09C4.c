@@ -1,7 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_PlayDescent sub_081A09C4
 typedef struct OrbitPosition {
     s16 x, y, z, pad;
 } OrbitPosition;

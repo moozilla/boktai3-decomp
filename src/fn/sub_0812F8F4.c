@@ -65,7 +65,6 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->word104 = zero;
 }
-#define SceneActorControl_UpdateEntryTransition sub_0812F8F4
 void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
 {
     u8 result;

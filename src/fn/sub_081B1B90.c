@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 93.8%
 // Animation setup and tail scheduling still differ.
-#define ActorStatus_UpdateFlankingStrike sub_081B1B90
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls

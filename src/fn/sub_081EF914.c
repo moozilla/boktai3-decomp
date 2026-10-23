@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SingletonSlot7_UpdateEndingScene sub_081EF914
-
 
 // Remaining differences: playback pointer lifetimes and a few operand/order choices.
 
@@ -256,7 +254,8 @@ static inline u32 ConsumeEntry(u8 *p)
         *q = 0;
         *(q - 1) = 0;
         result = TRUE;
-    } else result = FALSE;
+    } else
+        result = FALSE;
     asm("" : "+r"(result));
     return result;
 }

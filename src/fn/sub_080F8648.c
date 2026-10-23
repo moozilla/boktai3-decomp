@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
@@ -125,7 +124,6 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         {
             u8 **gp = &gUnk_02000580;
             struct Vec *d;
-            asm("" : "+r"(gp));
             d = &delta;
             Difference(d, (void *)(*gp + 0x30), &trail->position);
         }

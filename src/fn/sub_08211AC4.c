@@ -20,7 +20,6 @@ s32 ForgingBook_IsWeaponDiscovered(u32);
 s32 ForgingBook_IsItemDiscovered(u32);
 u32 ForgingBook_GetEntryAnimation(u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-#define ForgingBook_RefreshEntrySprites sub_08211AC4
 u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
 {
     s32 offset = ForgingBook_GetCategoryEntryOffset(p->category);

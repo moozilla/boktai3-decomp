@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SceneActor_LeapTowardTarget sub_080E7134
 #include "scene_actor_reaction.h"
 #include "engine.h"
 s32 Div(s32, s32);

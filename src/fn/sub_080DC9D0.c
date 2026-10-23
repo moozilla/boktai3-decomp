@@ -1,7 +1,6 @@
 #include "global.h"
 
 // confidence=low: checkpoint completion restores player-route control and retries the route.
-#define Mummy_ResumeRouteAfterCheckpoint sub_080DC9D0
 
 #include "scene_actor_chase.h"
 

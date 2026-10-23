@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gCannonBatteryProjectileSize   gUnk_0824F6E8
 #define gCannonBatteryProjectileOffset gUnk_0824F6F0
 struct CannonBatteryPosition {
@@ -38,7 +37,7 @@ void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonB
                                   struct CannonBatteryPosition *origin, s32 horizontal)
 {
     void *resource = (void *)CannonBattery_LoadAnimation();
-    register struct CannonBatteryCollider *collider asm("r4");
+    struct CannonBatteryCollider *collider;
     AnimData_Load(p->animation, 0x8D95);
     AnimData_SelectPaletteBank(p->animation, 0x8F);
     Sprite_Init(p->sprite, p->animation, 0);
@@ -73,7 +72,7 @@ void CannonBattery_InitProjectile(struct CannonBatteryPool *pool, struct CannonB
         }
         p->startCoordinate = p->position.z;
     }
-    Collider_SetCallback(collider, CannonBattery_OnProjectileCollision, p);
+    Collider_SetCallback(&p->collider, CannonBattery_OnProjectileCollision, p);
     {
         u32 update = (u32)CannonBattery_UpdateProjectile;
         u32 destroy = (u32)CannonBattery_DestroyProjectile;

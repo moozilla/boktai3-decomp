@@ -4,7 +4,9 @@
 // fuzzy: 85.1%
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define Vanargand_UpdatePresentation sub_081AD564
-struct PresentationVec { s16 x, y, z, pad; };
+struct PresentationVec {
+    s16 x, y, z, pad;
+};
 struct PresentationCollider {
     u8 pad0[6];
     u16 flags;

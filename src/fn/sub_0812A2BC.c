@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct SunDiscVec {
@@ -38,13 +37,13 @@ static inline s32 TruncateShift(s32 value, u32 shift)
 void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDiscVec *toArg,
                            s32 aArg, s32 bArg, s32 c, s32 d, u32 e, s32 speed)
 {
-    register s32 a asm("sl") = aArg;
+    s32 a = aArg;
     const struct SunDiscVec *to = toArg;
     s32 b = bArg;
-    register u32 zero asm("r6");
-    register struct SunDiscSprite *sprite asm("r8");
-    register u8 *pool asm("r5") = gUnk_0200017C;
-    register struct SunDiscSprite *s asm("r4");
+    u32 zero;
+    struct SunDiscSprite *sprite;
+    u8 *pool = gUnk_0200017C;
+    struct SunDiscSprite *s;
     struct SunDiscDelta delta;
     s32 angle;
     if (!pool) {
@@ -71,7 +70,7 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     Anim_SetSequence((u8 *)s + 0x2C, *(void **)(pool + 0x34), 0, 0, zero);
     AnimData_SelectPaletteBank(*(void **)((u8 *)s + 0xC), 1);
     {
-        register const struct SunDiscVec *src asm("r2") = fromArg;
+        const struct SunDiscVec *src = fromArg;
         s->position = *src;
     }
     {
@@ -84,24 +83,20 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     }
     {
         s32 sine = gUnk_086149C4[(angle + 0x40) & 0xFF];
-        register s32 spd asm("r2") = speed;
-        asm("" : "+r"(spd) : "r"(sine));
-        s->velX = ({
-            register s32 vx asm("r1") = TruncateShift(spd * sine, 12);
+        s32 spd = speed;
+        s->velX = (({
+            s32 vx = TruncateShift(spd * sine, 12);
             vx;
-        });
+        }));
     }
     {
-        register u32 d asm("r2");
+        u32 d;
         s32 sine;
-        asm("" : "=r"(d));
         sine = gUnk_086149C4[angle & 0xFF];
-        asm("" ::"r"(d));
-        s->velZ = TruncateShift(sine * ({
-                                    register s32 t asm("r1") = speed;
-                                    asm("" : "+r"(t) : "r"(sine));
+        s->velZ = TruncateShift(sine * ((({
+                                    s32 t = speed;
                                     t;
-                                }),
+                                }))),
                                 12);
     }
     *(u16 *)((u8 *)s + 0x8E) = 0;

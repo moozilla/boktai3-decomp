@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define HomingProjectile_Spawn sub_081FFE94
 struct HomingVec {
     s16 x, y, z, pad;
 };

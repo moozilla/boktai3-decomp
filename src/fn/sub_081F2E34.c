@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
 
-#define Ratatosk_UpdatePointDistancesToPlayer sub_081F2E34
 struct SceneDistanceEntry {
     struct SceneVec position;
     u8 pad8[4];

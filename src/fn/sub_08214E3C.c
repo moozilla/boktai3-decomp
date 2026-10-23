@@ -59,23 +59,28 @@ void Sprite_RenderFlipAwareList(void)
     struct Sprite *p;
     u32 parity = gUnk_03003A50 & 1;
     u32 skip = 0x401;
-    if (parity)
+    if (parity) {
         skip = 0x201;
+    }
     p = gUnk_030042C0[gUnk_03004290];
-    if (!p)
+    if (!p) {
         return;
+    }
     do {
         s32 x, y asm("r7"), z asm("r8");
         struct SpriteResource *resource;
-        if (p->flags & skip)
+        if (p->flags & skip) {
             goto next;
-        if (!(p->flags & 0x1000))
+        }
+        if (!(p->flags & 0x1000)) {
             goto next;
+        }
         resource = p->resource;
         if (!(p->flags & 16)) {
             screen(&pos, p);
             {
-                register struct Vec *out asm("r0") = &pos;
+                struct Vec *out = &pos;
+                DEBUG_NOP();
                 x = out->x;
                 y = out->y;
                 z = out->z;
@@ -99,16 +104,18 @@ void Sprite_RenderFlipAwareList(void)
             }
             width = resource->width;
             if (p->flags & 8) {
-                register s32 t asm("r0") = y + resource->offsetY;
+                s32 t = y + resource->offsetY;
                 top = t - resource->height;
                 height = resource->height;
             } else {
-                register s32 t asm("r0") = resource->offsetY;
+                short t = resource->offsetY;
                 top = y - t;
                 height = resource->height;
             }
-            if (left > 240 || top > 160 || left + (s32)width < 0 || (bot = top + (s32)height) < 0)
+            if ((((left > 240) || (top > 160)) || ((left + ((s32)width)) < 0)) ||
+                ((bot = top + ((s32)height)) < 0)) {
                 goto next;
+            }
         }
         sub_08214600(p, x, y, z);
     next:

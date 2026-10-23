@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Vanargand_UpdateMode3Transition sub_081A84B0
-
 struct VanargandTarget {
     u8 pad0[0x418];
     u8 mode;

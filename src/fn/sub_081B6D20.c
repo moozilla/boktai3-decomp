@@ -38,7 +38,6 @@ static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-#define ActorEffect_UpdateApproachLaunch sub_081B6D20
 void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, s32 index)
 {
     struct EffectPosition delta;

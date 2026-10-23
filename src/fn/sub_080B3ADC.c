@@ -3,7 +3,6 @@
 #include "scene_actor_reset.h"
 
 // confidence=low: dispatches response, pursuit, and retreat actions from context flags.
-#define SceneActor_DispatchContextAction sub_080B3ADC
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_BeginPursuitRoute(void *, u32);

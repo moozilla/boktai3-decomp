@@ -61,7 +61,6 @@ static inline u32 bonus(u8 *p, u32 mask)
     return *field & bits;
 }
 // confidence=low: attached task tiers and buffered restart define this charge handler.
-#define Player_UpdateAttachedAttackCharge sub_0814F328
 void Player_UpdateAttachedAttackCharge(u8 *p)
 {
     struct BurstA ba;

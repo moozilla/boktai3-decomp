@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_panel_schedule.h"
 // MATCHING_CONCESSION: register-pinning
-#define DirectionBurst_EmitOffset sub_0819F55C
 void DirectionBurst_EmitOffset(const struct ContactPosition *origin, s32 index, s32 direction,
                                s32 spacing, u32 kind, u32 parameter)
 {

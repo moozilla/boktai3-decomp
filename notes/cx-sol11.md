@@ -68,3 +68,18 @@ Tags: #matching #actors #compiler
 - 0802EBD0: drafted 63.2%. Complete bounded turn, facing update and completion signal reconstructed. Explicit word mask recovers flag-update ordering. Signed-byte wrapping and facing conversion simplify differently. Tested helper return/input types, byte versus word result constraints and compiler flips. Causebook diagnostics unavailable because the local pairs database is absent.
 
 Batch integration checkpoint: three new exact functions and sixteen new or improved drafts. Rebased onto current main, preserving both history entries during documentation conflicts; no C files conflicted. Combined validation printed `build/boktai3.gba: OK`.
+
+## Continuation after PR 605
+
+Tags: #matching #actors #compiler
+
+The three-match state actor batch landed in PR 605. A second rebase was required after main advanced; only documentation conflicted. The combined build was rerun and printed `build/boktai3.gba: OK` before the merge.
+
+- 0802F298: drafted 83.3%. Full target-facing, attachment cue selection and proximity/angle response reconstruction. Corrected the scalar global flag declaration from the original load count. Branch-local wrapping stores and explicit opposite-angle arithmetic improve alignment. Boolean width, helper-return form, flag extraction and target reload variants tested; flips indicate source/allocation differences. A lower-fuzzy alternative reduces structural residue further; retained the stronger byte similarity candidate.
+
+- 0802F584: drafted 98.2%, then improved to 99.1%. Exact 476-byte extent and instruction sequence; two signed-load scratch-register choices remain. Full reconstruction covers entry setup, frame-boundary speed selection, polar movement, arrival and probe updates. Tested pointer lifetimes, explicit offset bindings, a 3,000-compile allocation search, compiler flips, source translation and source variants. Keeping the animation reader live recovers the first of the two scratch choices. Unused helper removed; no exact credit.
+- 0802F760: matched, 460 bytes, Register-pinned. Reconstructed the sibling with animation-state gating and fixed 48-unit polar motion. Short-lived offset bindings preserve the signed-load scratch choices; explicit low-word sum lifetimes preserve addition operand order. Required depin reduced 85 hints to 38; final reviewed-extent check is exact. Pointers bound directly to r7 were rejected because the compiler treats that hard register as the frame pointer before elimination; natural allocation to r7 is safe.
+
+Compiler finding: the Thumb `extendhisi2` pattern uses an early-clobber low-register scratch and emits the constant-offset move inside the output template. A source-level constant in another register cannot remove that scratch move. Extending an existing offset or pointer's lifetime across the load can change the scratch register without changing instructions. Dynamic register-plus-register addresses are rejected before reload, explaining why an explicit runtime offset often adds an address calculation instead of producing the desired load form.
+
+Current unmerged exact gain: approximately 0.0191 percentage points (460 Register-pinned bytes). Combined validation pending for this new batch. Resume with 0802F92C, then the 0802FB68 sibling.

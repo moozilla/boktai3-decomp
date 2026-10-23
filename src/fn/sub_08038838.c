@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // Tentative link result layout: four scores are capped and packed as nibbles.
@@ -36,17 +35,19 @@ void WirelessGameMenu_UpdateSelectionExchange(struct P *p)
         struct Entry *e;
         u32 packed;
         int total;
-        register int i asm("r12");
+        int i;
         int shift;
         u8 *q;
         p->entered = 0;
-        data = 0;
-        e = &p->entry;
-        packed = 0;
-        total = 0;
-        i = 0;
-        shift = 0;
-        q = e->bytes;
+        do {
+            data = 0;
+            e = &p->entry;
+            packed = 0;
+            total = 0;
+            i = 0;
+            shift = 0;
+            q = e->bytes;
+        } while (0);
         do {
             int value;
             u32 flag = e->flag;
@@ -54,25 +55,27 @@ void WirelessGameMenu_UpdateSelectionExchange(struct P *p)
                 value = *q;
             } else {
                 int old = *q;
-                register u8 *score asm("r1");
-                register int n asm("r2");
+                u8 *score;
+                int n;
                 score = p->scores;
                 score += i;
                 n = *score;
                 value = old + n;
                 total += n;
-                *score = flag;
+                *score = (float)flag;
             }
             e->bytes[i] = 0;
-            if (value > 15)
+            if (value > 15) {
                 value = 15;
+            }
             packed |= value << shift;
             q++;
             i++;
             shift += 4;
         } while (i <= 3);
-        if (total > 0)
+        if (total > 0) {
             WirelessGame_AddWeightedScore(3, 1);
+        }
         data |= packed;
         WirelessExchange_SendPacket(p, 2, &data, 1);
         WirelessGameMenu_SetStatusPanelState(p, 1);

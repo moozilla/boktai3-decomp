@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
@@ -18,8 +17,9 @@ void PauseMenu_OnSwapSelectionUpdate(void);
 void SceneHud_FinishActionSlide(struct SceneHudState *s)
 {
     u16 *timer = &s->actionTransferDelay;
-    if (!*timer)
+    if (!(*timer)) {
         Sound_PlaySong(0x38a);
+    }
     (*timer)++;
     if (*timer <= 11) {
         s32 n = 12 - *timer;
@@ -32,20 +32,18 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
         s->motionWidgets[1].flags |= m;
         {
             u32 sel = s->actionSelection;
-            register u32 off asm("r2") = 0x4387;
-            register u8 *a asm("r0");
-            asm("" : "+r"(off));
+            unsigned long long off = 0x4387;
+            u8 *a;
             a = (u8 *)s + off;
             PauseMenu_SwapItemSlots(s, sel, *a);
         }
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, PauseMenu_OnSwapSelectionUpdate, 1);
         {
-            register u32 o1 asm("r1") = 0x4384;
+            u32 o1 = 0x4384;
             u8 *b;
             u8 *in;
             u8 *pp;
-            asm("" : "+r"(o1));
             in = (u8 *)s + o1;
             sub_0816CDB8(in, 1, 0);
             {

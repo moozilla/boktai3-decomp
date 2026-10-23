@@ -1,9 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define ActorController_SetAnimation sub_08182454
-#define gArmorAnimationVariants      gUnk_0824EB60
-#define gArmorAnimationKeyframes     gUnk_0824E920
+#define gArmorAnimationVariants  gUnk_0824EB60
+#define gArmorAnimationKeyframes gUnk_0824E920
 struct ArmorActor {
     u8 pad0[0x94];
     u8 animationData[0x20];

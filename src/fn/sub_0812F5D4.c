@@ -83,7 +83,6 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
     actor->counter2AC = counter;
     actor->field2B1 = 1;
 }
-#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

@@ -54,7 +54,6 @@ void sub_0802F298(void);
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
-#define StateActor_CreateFromScriptEntry sub_081C6954
 s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
 {
     s32 model;

@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define PlayerAttackEffect_EmitPaletteBaseTrail sub_081608B0
 struct Vec {
     u32 x : 16;
     u32 y : 16;

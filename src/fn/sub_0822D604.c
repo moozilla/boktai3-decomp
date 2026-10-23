@@ -2,7 +2,6 @@
 #include "global.h"
 
 // The two barriers preserve distinct addition tails for the first two ranges.
-#define Selection_GetDisplayFrame sub_0822D604
 s32 Selection_GetDisplayFrame(s32 selection)
 {
     if (selection <= 29) {

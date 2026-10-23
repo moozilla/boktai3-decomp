@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SpriteProjectile_UpdateExpiry sub_08127274
 struct ParticleVector {
     u16 x, y, z, unused;
 };

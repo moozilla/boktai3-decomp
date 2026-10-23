@@ -151,7 +151,6 @@ void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
 s32 WirelessGame_GetSelectedEquipmentEffect(s32);
 s32 Player_GetUsableEnchantment(struct Player *);
 // MATCHING_CONCESSION: register-pinning
-#define Player_UpdateVisualPalette sub_0813CB8C
 
 static inline s32 Player_GetPalettePulseWeight(const u16 *timer)
 {
@@ -475,8 +474,6 @@ void Player_InitVisualState(struct Player *p)
     Player_UpdateVisualPalette(p, 0);
 }
 
-#define SceneActor_StartRandomizedEffect sub_0813D3B0
-
 void EffectGroup_FadeFirstActive(void *);
 void EffectGroup_SpawnPart(void *, s32, struct SceneVec *, struct SceneVec *, struct SceneVec *,
                            s32, s32);
@@ -797,7 +794,6 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
 }
 
 // MATCHING_CONCESSION: register-pinning
-#define Player_SelectFlashingVisualMode sub_0813DB60
 
 s32 Player_SelectFlashingVisualMode(struct Player *arg, s32 inputMode)
 {
@@ -844,7 +840,6 @@ static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
     }
 }
 // confidence=low: applies visual status flags and ramps the paired speed scales.
-#define Player_UpdateStatusVisuals sub_0813DB98
 
 void Player_UpdateStatusVisuals(void *actor)
 {
@@ -1672,7 +1667,6 @@ void Player_ConsumeActionCharge(struct Player *p)
 void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag);
 
 // confidence=low: rebuilds equipment-derived stat and action flags.
-#define PlayerAction_RefreshFlagState sub_0813EDDC
 struct EquipmentFlagState {
     u8 unknown0[6];
     u16 bonus[3];
@@ -2195,7 +2189,6 @@ static inline void SetModeFlag(struct Player *p)
 
 // Preserved owner/request registers differ; one exit reloads the mode.
 // MATCHING_CONCESSION: register-pinning
-#define Player_SelectRequestedActionMode sub_0813F8F8
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {

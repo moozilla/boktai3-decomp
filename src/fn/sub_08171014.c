@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneHud_DrawComparisonBars sub_08171014
 struct HudPos {
     s16 x, y, z, pad;
 };

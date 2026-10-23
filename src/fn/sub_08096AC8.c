@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain.h"
 #define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
@@ -82,8 +81,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
         gUnk_03005308 = n = (gUnk_03005308 + 1) & 1023;
         angle = *(u8 *)&((const u16 *)RANDOM_TABLE_ADDR)[n];
         {
-            register u32 off asm("r0") = 0x5FC;
-            asm("" : "+r"(off));
+            u32 off = 0x5FC;
             Clear2(context + off, &zero);
         }
         FIELD(actor, 0x2EC, s16) = Scale(gUnk_086149C4[angle] * 64);
