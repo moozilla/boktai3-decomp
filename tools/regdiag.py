@@ -312,7 +312,7 @@ def analyze(src, func=None, nonmatching=False):
         if ";; Register dispositions:" in greg else {}
 
     wants = collections.defaultdict(collections.Counter)
-    an.cd, an.od, an.opcodes = cd, od, sm.get_opcodes()
+    an.cd, an.od, an.opcodes, an.by_off = cd, od, sm.get_opcodes(), by_off
     for tag, i1, i2, j1, j2 in an.opcodes:
         if tag != "equal":
             an.struct_ops.append((tag, cd[i1:i2], od[j1:j2]))

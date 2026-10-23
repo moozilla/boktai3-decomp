@@ -16,7 +16,7 @@ and [AGENTS.md](../AGENTS.md) (rules) · [HANDOFF](HANDOFF.md) (current state) �
 [WORKER](WORKER.md) (matching playbook) · [WORKER_ROUND](WORKER_ROUND.md) and
 [UNIT_WORKER](UNIT_WORKER.md) (worker briefs).
 
-**Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [REGALLOC](REGALLOC.md) ·
+**Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [AGBCC_RULES](AGBCC_RULES.md) (why agbcc chose it; `tools/why.py`) · [REGALLOC](REGALLOC.md) ·
 [FOUNDRY](FOUNDRY.md) (asm-to-match pipeline and funnel numbers) · [BIG_FUNCTIONS](BIG_FUNCTIONS.md) (anchordiff, variants, rtlprobe: 500+ instruction functions) · [PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
 [MODEL_BENCHMARK](MODEL_BENCHMARK.md) (explain.py/idioms.py vs check.py with Haiku/Sonnet) ·
 [COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
@@ -89,6 +89,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 |---|---|---|---:|
 | [docs/ACTOR_ATTACHMENT.md](../docs/ACTOR_ATTACHMENT.md) | Actor attachment state and offsets | *#actors* | 9 |
 | [docs/ACTOR_ATTACHMENT_MANAGER.md](../docs/ACTOR_ATTACHMENT_MANAGER.md) | Attachment manager lifecycle and scene actor pool prefix | *#actors #scene #assets* | 8 |
+| [docs/AGBCC_RULES.md](../docs/AGBCC_RULES.md) | agbcc rules: why the compiler wrote it that way | #matching #regalloc #tooling | 4 |
 | [docs/ANIMATION_081E.md](../docs/ANIMATION_081E.md) | Animation controller matching batch | *#scripts #animation #assets #matching* | 5 |
 | [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 9 |
 | [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 33 |
@@ -110,7 +111,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
-| [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
+| [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 13 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
@@ -125,9 +126,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
-| [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 11 |
+| [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 13 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
-| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 9 |
+| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 18 |
 | [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#tooling #progress* | 10 |
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
@@ -195,7 +196,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 21 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 22 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
@@ -222,7 +223,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
-| [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) - not matched | *#sound* | 2 |
+| [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) - matched (register-pinning concession) | *#sound* | 3 |
 | [notes/cloud-08084F44.md](../notes/cloud-08084F44.md) | Cloud task 08084F44 (Bat, unassigned functions) | #matching #cloud | 1 |
 | [notes/cloud-080B7C10.md](../notes/cloud-080B7C10.md) | Cloud task 080B7C10 (Skeleton states) |  | 1 |
 | [notes/cloud-080BFCC4.md](../notes/cloud-080BFCC4.md) | Cloud task 080BFCC4 | *#actors* | 1 |
@@ -235,16 +236,25 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cloud-08132D2C.md](../notes/cloud-08132D2C.md) | Cloud task 08132D2C |  | 1 |
 | [notes/cloud-0819E7F0_2026-10-19.md](../notes/cloud-0819E7F0_2026-10-19.md) | Cloud task 0819E7F0: Hresvelgr burst phases (2026-10-19) | #matching #hresvelgr | 2 |
 | [notes/cloud-081AA438.md](../notes/cloud-081AA438.md) | Cloud task 081AA438 (Vanargand phase scripts) | *#scripts* | 3 |
+| [notes/cloud-08228DB8.md](../notes/cloud-08228DB8.md) | Cloud task 08228DB8: SunClock_GetPhase (and Camera_SetPosition) |  | 3 |
 | [notes/cloud-08231A0C.md](../notes/cloud-08231A0C.md) | Cloud task 08231A0C | *#animation #assets* | 1 |
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
-| [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 285 |
+| [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
 | [notes/contact-sequence-actor_2026-10-14.md](../notes/contact-sequence-actor_2026-10-14.md) | Sequence contact actor pool, October 14 | *#actors* | 6 |
 | [notes/contact-swarm_2026-10-14.md](../notes/contact-swarm_2026-10-14.md) | Contact swarm, 08043F64–08044C80 | *#assets* | 4 |
 | [notes/countdown-timer_2026-10-14.md](../notes/countdown-timer_2026-10-14.md) | Singleton countdown timer |  | 2 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |
+| [notes/depin-manual-2_2026-10-21.md](../notes/depin-manual-2_2026-10-21.md) | depin-manual-2 worklog (2026-10-21) | *#tooling* | 8 |
+| [notes/depin-manual-3_2026-10-21.md](../notes/depin-manual-3_2026-10-21.md) | depin-manual-3 worklog (2026-10-21) | *#actors #tooling* | 7 |
+| [notes/depin-manual-4a_2026-10-21.md](../notes/depin-manual-4a_2026-10-21.md) | depin-manual-4a worklog (2026-10-21) | *#tooling* | 6 |
+| [notes/depin-manual-4b_2026-10-21.md](../notes/depin-manual-4b_2026-10-21.md) | depin-manual-4b worklog (2026-10-21) | *#scripts* | 3 |
+| [notes/depin-manual-5a_2026-10-21.md](../notes/depin-manual-5a_2026-10-21.md) | depin-manual-5a worklog (2026-10-21) |  | 1 |
+| [notes/depin-manual-5c_2026-10-21.md](../notes/depin-manual-5c_2026-10-21.md) | depin-manual-5c worklog (2026-10-21) |  | 1 |
+| [notes/depin-manual_2026-10-21.md](../notes/depin-manual_2026-10-21.md) | depin-manual worklog (2026-10-21) | *#tooling* | 6 |
+| [notes/depin-search-2026-10-23.md](../notes/depin-search-2026-10-23.md) | Faster depin search: measurements and ideas (2026-10-23) | *#tooling* | 10 |
 | [notes/dialogue-vm_2026-10-12.md](../notes/dialogue-vm_2026-10-12.md) | Dialogue interpreter and scrolling controller |  | 2 |
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
@@ -267,6 +277,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
 | [notes/large_scene_animation_controller.md](../notes/large_scene_animation_controller.md) | Large scene animation controller = Nidhoggr boss (081915E0-0819792C) | *#scene #animation* | 5 |
+| [notes/link-field2.md](../notes/link-field2.md) | Field objects and hazards: open near misses (wip/field2) | *#particles #animation #assets* | 3 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
 | [notes/matching-idioms-batch_2026-10-19.md](../notes/matching-idioms-batch_2026-10-19.md) | Matching idioms from the 2026-10-19 cloud batch | #matching #agbcc #techniques | 3 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
