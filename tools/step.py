@@ -119,26 +119,32 @@ def vanished(dumps, func, lines):
     return out
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("src")
-    ap.add_argument("func", nargs="?")
-    ap.add_argument("--nonmatching", action="store_true")
-    ap.add_argument("--all", action="store_true", help="explain every difference, not only the first")
-    a = ap.parse_args()
-    src = os.path.abspath(a.src)
-    an = regdiag.analyze(src, a.func, a.nonmatching)
-    func = an.func
+class Step:
+    """The explained differences of one draft: entries sorted first-divergence first.
+    Each entry is a dict: rank, idx, kind (order/registers/insert/delete/replace), cand and
+    orig ([(offset, text)]), uids, evs ([(uid, pass, kind, text)]), note, lines (source lines)."""
+
+
+def analyze(src, func=None, nonmatching=False):
+    """A Step for SRC, or one with .matched set. Compiles twice (regdiag and the -da dumps)."""
+    st = Step()
+    an = regdiag.analyze(src, func, nonmatching)
+    st.an, st.func, st.src = an, an.func, src
+    st.matched = an.matched
+    st.entries = []
     if an.matched:
-        print(f"{func}: matches the ROM")
-        return 0
+        return st
+    func = an.func
     lines = open(src).read().splitlines()
+    st.lines = lines
 
     def show(ln):
         return f"line {ln}: {lines[ln - 1].strip()[:80]}" if ln and 0 < ln <= len(lines) else "line ?"
+    st.show = show
 
     with tempfile.TemporaryDirectory() as wd:
         dumps = why.compile_dumps(src, wd)
+    st.dumps = dumps
     tied = why.ties(dumps, func)
     combine_uids = regdiag.insns_by_uid(dumps.get("combine", {}).get(func, ""))
     first_new = max(combine_uids) + 1 if combine_uids else 1 << 30
@@ -157,8 +163,8 @@ def main():
                     diffs.append(("registers", i1 + k, [(co, ct)], [(oo, ot)]))
         else:
             diffs.append((tag, i1, an.cd[i1:i2], an.od[j1:j2]))
-    print(f"{func}: {len(diffs)} differing places "
-          f"({sum(1 for d in diffs if d[0] == 'registers')} register-only)")
+    st.n_places = len(diffs)
+    st.n_register = sum(1 for d in diffs if d[0] == "registers")
 
     explained = []
     # an instruction the ROM has earlier (or later) than you: a pure ordering difference
@@ -176,6 +182,8 @@ def main():
     diffs = [d for n_, d in enumerate(diffs) if n_ not in used]
     frame = re.compile(r"^(push|pop|add sp|sub sp|bx)\b")
     diffs = [d for d in diffs if not all(frame.match(t) for _, t in d[2] + d[3])] or diffs
+    raw = re.compile(r"^[0-9a-f]{4}$|^\.(\dbyte|word|hword|short)")  # literal pool words, not code
+    diffs = [d for d in diffs if not all(raw.match(t) for _, t in d[2] + d[3])] or diffs
     for kind, idx, cand, orig in diffs:
         uids = [an.by_off[o][0] for o, _ in cand if an.by_off.get(o)]
         if not uids and idx < len(an.cd):
@@ -217,44 +225,74 @@ def main():
 
     for i1, c1, i2, o2 in orders:
         mine = an.off_line.get(c1[0][0])
-        at = an.off_line.get(an.cd[i2][0]) if i2 < len(an.cd) else None
-        when = "before" if i2 < i1 else "after"
-        k = next((n_ for n_, (o, _) in enumerate(an.od) if o == o2[-1][0]), None)
-        ctx = "; ".join(t for _, t in an.od[k + 1:k + 3]) if k is not None else ""
-        where = f"`{ctx}` ({show(at)})" if at != mine else f"`{ctx}`"
-        note = (f"order: the ROM computes `{'; '.join(t for _, t in c1)}` ({show(mine)}) right {when} "
-                f"{where}; you compute it elsewhere. agbcc has no instruction scheduler: code comes out in source evaluation order, "
-                f"minus what cse/loop/combine delete or move. So evaluate that value {when} it in the C: a local "
-                f"initialized there, an argument (evaluated before the call or inline body), or statement order.")
+        when = "later" if i2 > i1 else "earlier"
+        k0 = next((n_ for n_, (o, _) in enumerate(an.od) if o == o2[0][0]), None)
+        k1 = next((n_ for n_, (o, _) in enumerate(an.od) if o == o2[-1][0]), None)
+        before = an.od[k0 - 1][1] if k0 else "(start)"
+        after = an.od[k1 + 1][1] if k1 is not None and k1 + 1 < len(an.od) else "(end)"
+        at = an.off_line.get(an.cd[min(i2, len(an.cd) - 1)][0]) if an.cd else None
+        where = f" ({show(at)})" if at and at != mine else ""
+        note = (f"order: the ROM computes `{'; '.join(t for _, t in c1)}` ({show(mine)}) {when} than you, between "
+                f"`{before}` and `{after}`{where}. agbcc has no instruction scheduler: code comes out in source "
+                f"evaluation order, minus what cse/loop/combine delete or move. So evaluate that value at that "
+                f"point in the C: a local initialized there, an argument (evaluated before the call or inline "
+                f"body), or statement order.")
         explained.append((0, min(i1, i2), "order", c1, [], [], [], note))
     explained.sort(key=lambda x: (x[0], x[1]))
-    for n, (rank, idx, kind, cand, orig, uids, evs, note) in enumerate(explained):
+    for rank, idx, kind, cand, orig, uids, evs, note in explained:
+        src_lines = sorted({an.off_line.get(o) for o, _ in cand if an.off_line.get(o)})
+        if not src_lines and kind == "order":
+            src_lines = [x for x in [an.off_line.get(cand[0][0])] if x]
+        st.entries.append(dict(rank=rank, idx=idx, kind=kind, cand=cand, orig=orig, uids=uids, evs=evs,
+                               note=note, lines=src_lines))
+    return st
+
+
+def render(st, e, title, trails=2):
+    """The lines that explain entry E of Step ST."""
+    out = [f"== {title}"]
+    for ln in e["lines"][:3]:
+        out.append(f"   {st.show(ln)}")
+    out.append(f"   ROM:   {'; '.join(t for _, t in e['orig']) or '(nothing)'}")
+    out.append(f"   yours: {'; '.join(t for _, t in e['cand']) or '(nothing)'}")
+    if e["note"]:
+        out.append(f"   {e['note']}")
+    if e["kind"] == "order":
+        pass
+    elif e["evs"]:
+        for u, p, k, text in sorted(e["evs"], key=lambda x: PASS_RANK.get(x[1], 99)):
+            out.append(f"   [{p}] {k}, insn {u}: {text}")
+    else:
+        out.append("   no decision before allocation touched these insns: the difference is the register "
+                   "choice (tools/regdiag.py, tools/rasolve.py)")
+    for u in e["uids"][:trails]:
+        tr = why.trail(st.dumps, st.func, u)
+        if tr:
+            out.append(f"   trail of insn {u}:")
+            for p, r in tr:
+                out.append(f"      [{p:8}] {r[:120]}")
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("src")
+    ap.add_argument("func", nargs="?")
+    ap.add_argument("--nonmatching", action="store_true")
+    ap.add_argument("--all", action="store_true", help="explain every difference, not only the first")
+    a = ap.parse_args()
+    st = analyze(os.path.abspath(a.src), a.func, a.nonmatching)
+    if st.matched:
+        print(f"{st.func}: matches the ROM")
+        return 0
+    print(f"{st.func}: {st.n_places} differing places ({st.n_register} register-only)")
+    for n, e in enumerate(st.entries):
         if n and not a.all:
-            rest = len(explained) - 1
+            rest = len(st.entries) - 1
             print(f"\n({rest} later difference{'s' * (rest != 1)}; fix this one first, or --all)")
             break
-        src_lines = sorted({an.off_line.get(o) for o, _ in cand if an.off_line.get(o)})
-        print(f"\n== first divergence" if n == 0 else f"\n== difference {n + 1}")
-        for ln in src_lines[:3]:
-            print(f"   {show(ln)}")
-        print(f"   ROM:   {'; '.join(t for _, t in orig) or '(nothing)'}")
-        print(f"   yours: {'; '.join(t for _, t in cand) or '(nothing)'}")
-        if note:
-            print(f"   {note}")
-        if kind == "order":
-            pass
-        elif evs:
-            for u, p, k, text in sorted(evs, key=lambda e: PASS_RANK.get(e[1], 99)):
-                print(f"   [{p}] {k}, insn {u}: {text}")
-        else:
-            print("   no decision before allocation touched these insns: the difference is the register "
-                  "choice (tools/regdiag.py, tools/rasolve.py)")
-        for u in uids[:2]:
-            tr = why.trail(dumps, func, u)
-            if tr:
-                print(f"   trail of insn {u}:")
-                for p, r in tr:
-                    print(f"      [{p:8}] {r[:120]}")
+        print()
+        print("\n".join(render(st, e, "first divergence" if n == 0 else f"difference {n + 1}")))
     return 1
 
 

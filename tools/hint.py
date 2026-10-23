@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
-"""What C edit closes each difference: the causebook's causes, tested on your draft.
+"""Ask about one difference between your draft and the ROM: the decision, and the agbcc source behind it.
 
-  hint.py FILE.c [FUNC] [--nonmatching] [--compiles N] [--show K]
+  hint.py FILE.c [FUNC] [--line N | --insn U | --at ADDR] [--flips] [--nonmatching]
+  hint.py --about WORDS                  a decision's rule and compiler source, no draft needed
+  hint.py FILE.c [FUNC] --causes [--compiles N] [--show K]
   hint.py --eval [--functions N] [--mutants M] [--compiles N] [--seed S]
 
-For each region where your function's code differs from the ROM, prints the
-ROM's and your instructions, then the edit types that the causebook
-(tools/causebook.py) has seen produce exactly that difference in matched code,
-with how often. It then applies the highest-ranked edits to your draft (up to
---compiles of them, through the agbcc fork server, about 10 ms each) and
-lists the ones that remove a region without adding one, as C diffs you can
-apply. An exact match is written to build/hint/FUNC.c.
+Point it at the spot you are stuck on: a source line, an RTL insn number (from
+tools/step.py), or an address (offset in the function, or ROM address). It
+prints only the differences there: the ROM's and your instructions, the
+decision events that produced yours (tools/step.py), the rule for that kind of
+decision, and the lines of agbcc's source that make it (tools/agbccsrc.py), so
+you read the compiler's condition rather than a summary of it. With no spot it
+takes the first divergence. --flips also compiles the draft with each single
+compiler decision flipped (tools/flip.py, about 10 s) and reports the ones that
+close the difference.
+
+--about takes a topic or free words ("cse skip", "biv zero", "move2add").
+
+--causes is the causebook mode: for each differing region, the edit types the
+causebook (tools/causebook.py) has seen produce that difference in matched
+code; it then applies the highest-ranked edits to your draft (up to
+--compiles, through the agbcc fork server) and lists those that remove a
+region without adding one. An exact match is written to build/hint/FUNC.c.
 
 --eval measures the causebook's ordering without any model: it takes functions
 that the causebook was not built from, breaks each with one random edit, and
@@ -22,6 +34,7 @@ import collections
 import json
 import os
 import random
+import re
 import sys
 import time
 
@@ -99,6 +112,104 @@ def cmd_hint(a):
     for n, desc, t in good[:a.show]:
         print(f"  -> {n} regions left: {desc}")
         print("\n".join("      " + ln for ln in atlas.cdiff(base_text, t)))
+    return 1
+
+
+# --- ask mode ------------------------------------------------------------------------------
+
+def topics_for(st, e):
+    """agbccsrc topic keys for an explained difference, in pipeline order."""
+    import step
+    import why
+    ts = []
+    if e["kind"] == "order":
+        ts.append("order")
+    if e["note"] and "two-operand" in e["note"]:
+        ts += ["cse-swap", "regmove-copy"]
+    for u, p, k, text in sorted(e["evs"], key=lambda ev: step.PASS_RANK.get(ev[1], 99)):
+        if k == "swap":
+            ts.append("cse-swap" if p in ("cse", "cse2") else "combine")
+        elif k == "deleted":
+            ts.append({"cse": "cse-reuse", "cse2": "cse-reuse", "gcse": "gcse", "loop": "loop-invariant"}.get(p))
+            if p == "cse":
+                ts.append("cse-skip")
+        elif k == "tie":
+            ts.append("regmove-tie")
+        elif k == "copy":
+            ts.append("regmove-copy")
+        elif k == "born":
+            if p == "loop":
+                tr = why.trail(st.dumps, st.func, u)
+                zero = tr and "(const_int 0)" in tr[0][1] and tr[0][1].startswith("(set (reg")
+                ts.append("biv-final" if zero else "loop-invariant")
+            else:
+                ts.append({"gcse": "gcse", "combine": "combine", "regmove": "regmove-copy",
+                           "reload": "reload"}.get(p))
+    if any(re.match(r"(adds|subs) r\d+, #", t) for _, t in e["orig"]) and \
+            any(t.startswith("movs") for _, t in e["cand"]):
+        ts.append("move2add")
+    if not e["evs"] and e["kind"] != "order":
+        ts += ["local-alloc", "global-alloc"]
+    seen = []
+    for t in ts:
+        if t and t not in seen:
+            seen.append(t)
+    return seen
+
+
+def select(st, a):
+    es = st.entries
+    if a.line:
+        return [e for e in es if a.line in e["lines"]]
+    if a.insn:
+        return [e for e in es if a.insn in e["uids"] or any(ev[0] == a.insn for ev in e["evs"])]
+    if a.at:
+        x = int(a.at, 16)
+        if x >= 0x08000000:
+            x -= st.an.addr
+        hit = [e for e in es if any(o == x for o, _ in e["cand"] + e["orig"])]
+        if hit:
+            return hit
+        near = sorted(es, key=lambda e: min([abs(o - x) for o, _ in e["cand"] + e["orig"]] or [1 << 30]))
+        return near[:1]
+    return es[:1]
+
+
+def cmd_ask(a):
+    import step
+    import agbccsrc
+    src = os.path.abspath(a.file)
+    st = step.analyze(src, a.func, a.nonmatching)
+    if st.matched:
+        print(f"{st.func}: matches the ROM")
+        return 0
+    picked = select(st, a)
+    print(f"{st.func}: {len(st.entries)} differences")
+    if not picked:
+        where = sorted({ln for e in st.entries for ln in e["lines"]})
+        print(f"nothing differs there; differences are on lines {', '.join(map(str, where)) or '?'}")
+        return 1
+    for n, e in enumerate(picked[:3]):
+        k = st.entries.index(e)
+        print()
+        print("\n".join(step.render(st, e, f"difference {k + 1} of {len(st.entries)}", trails=1)))
+        for t in topics_for(st, e)[:2 if a.brief else 3]:
+            print("\n".join(agbccsrc.show(t, source=not a.brief)))
+    if len(picked) > 3:
+        print(f"\n({len(picked) - 3} more differences there)")
+    if a.flips:
+        import flip
+        flip.wrapper()
+        base = flip.score(src, st.func, a.nonmatching)
+        print(f"\nflips (as written: {base[1]} differing insns, {base[2]} bytes):")
+        found = False
+        for flag, meaning, where in flip.FLIPS:
+            r = flip.score(src, st.func, a.nonmatching, flag)
+            if r is not None and base and r[1] < base[1]:
+                found = True
+                print(f"  {flag}: {'MATCH' if r[2] == 0 else f'{r[1]} insns, {r[2]} bytes'}; {meaning}")
+        if not found:
+            print("  none helps: the C itself or register allocation decides it")
     return 1
 
 
@@ -196,18 +307,30 @@ def main():
     ap.add_argument("--compiles", type=int, default=60)
     ap.add_argument("--show", type=int, default=5)
     ap.add_argument("--eval", action="store_true")
+    ap.add_argument("--causes", action="store_true", help="the causebook mode")
+    ap.add_argument("--about", nargs="+", metavar="WORDS")
+    ap.add_argument("--line", type=int)
+    ap.add_argument("--insn", type=int)
+    ap.add_argument("--at")
+    ap.add_argument("--flips", action="store_true")
+    ap.add_argument("--brief", action="store_true", help="rules without the compiler source")
     ap.add_argument("--functions", type=int, default=60)
     ap.add_argument("--mutants", type=int, default=4)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("-j", "--jobs", type=int, default=os.cpu_count())
     a = ap.parse_args()
+    if a.about:
+        import agbccsrc
+        sys.argv = ["agbccsrc"] + a.about
+        return agbccsrc.main()
+    if not a.eval and not a.causes:
+        return cmd_ask(a)
     os.chdir(ROOT)
     import permute
     sys.path.insert(0, permute.PERMUTER)
     if a.eval:
         return cmd_eval(a)
     if a.func is None:
-        import re
         a.func = re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(a.file).read(), re.M)[-1]
     return cmd_hint(a)
 
