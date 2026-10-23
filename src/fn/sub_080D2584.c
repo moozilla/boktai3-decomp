@@ -1,265 +1,305 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 74.8%
-// Remaining differences are helper control flow, pointer lifetimes, and register allocation.
-#include "global.h"
-#include "scene_actor_terrain.h"
+// fuzzy: 84.1%
+// Remaining differences are flag-pointer lifetimes, PRE spills, turn-loop allocation, and address reloads.
 #include "scene_actor_reaction.h"
+#include "scene_actor_terrain.h"
 
-void Skeleton_UpdateScriptWaitState(void);
-void sub_0807E334(void *);
-s32 Mod(s32, s32);
-s32 Div(s32, s32);
-void Anim_SetDurationScale(void *, u32);
-void Anim_SetFrameDurationScale(void *, u32);
-extern u32 gUnk_03005308;
+s32 Callback_InvokeActor(void *, void *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
+void sub_0807E334(struct SceneActorRegistryResetView *);
+void Sound_PlaySong(u32);
+extern u8 *gUnk_02000580[4];
 
-struct ChasePlayer {
-    u8 unknown0[0x20];
-    u32 flags;
-    u8 unknown24[0x1C];
-    u16 *cell;
+#define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
+#define F16(a, o) (*(u16 *)((u8 *)(a) + (o)))
+#define S16(a, o) (*(s16 *)((u8 *)(a) + (o)))
+#define F32(a, o) (*(u32 *)((u8 *)(a) + (o)))
+#define PTR(a, o) (*(void **)((u8 *)(a) + (o)))
+
+struct RecoveryRoutePoint {
+    s16 x, z;
 };
-extern struct ChasePlayer *gUnk_02000580[];
-
-struct ChaseTarget {
+struct RecoveryRouteLink {
     u8 unknown0[8];
-    u8 index;
-    u8 unknown9[3];
-    struct ContactPosition position;
+    struct RecoveryRoutePoint *point;
+};
+struct RecoveryFlags16 {
+    u16 value;
+};
+#define HOME (*(struct ContactPosition **)(group + 0x200))
+struct RecoveryTurn {
+    u8 direction, savedDirection, mode;
+};
+struct RecoverySavedControl {
+    void *target;
+    u8 state, phase, behavior, kind;
 };
 
-static inline u8 Chase_Test(u32 value, u32 mask)
+static inline u8 TakeFlag2B2(struct SceneActorRegistryResetView *actor)
+{
+    if (actor->field2B2) {
+        actor->field2B2 = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline s32 Quarter(s32 v)
+{
+    return v >= 0 ? v >> 2 : -(-v >> 2);
+}
+static inline s32 Clamp(s32 v)
+{
+    if (v > 200)
+        return 200;
+    if (v < -200)
+        return -200;
+    return v;
+}
+static inline u8 AtRest(s32 x, s32 z)
+{
+    if (!x && !z)
+        return 1;
+    return 0;
+}
+static inline u32 Flag16(void *p, u32 maskInput, u32 off)
+{
+    u32 mask = maskInput;
+    return *(u16 *)((u8 *)p + off) & mask;
+}
+static inline u32 Flag32(void *p, u32 maskInput, u32 off)
+{
+    u32 mask = maskInput;
+    return *(u32 *)((u8 *)p + off) & mask;
+}
+static inline u8 TestBits16(u16 *p, u32 maskInput)
+{
+    u32 mask = maskInput;
+    if (*p & mask)
+        return 1;
+    return 0;
+}
+static inline s32 PlayerSlot(u8 *actor)
+{
+    if (actor[8] <= 3)
+        return actor[8];
+    return -1;
+}
+static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-static inline void Chase_SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
 {
-    void *callback = cb;
-    u32 kind = k;
     actor->field2B2 = 1;
     actor->field2B0 = 0;
     actor->field2B5 = kind;
-    actor->target = callback;
+    actor->target = control;
     actor->field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
-        u32 mask = ~1;
-        *field &= mask;
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
     }
     actor->word104 = 0;
 }
-static inline void Chase_SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
+                            u32 behavior)
+
 {
-    u32 behavior = b;
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline void Chase_SetBehavior(struct SceneActorRegistryResetView *actor, u32 b)
-{
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
-}
-static inline u16 Chase_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
 }
-static inline u32 Chase_Bits32(u32 *field, u32 mask)
+static inline u32 KeepFlagPointer(struct SceneActorRegistryResetView *actor, u32 mask, u16 **out)
 {
-    return *field & mask;
+    u16 *flags = &actor->flags2D4;
+    *out = flags;
+    return *flags & mask;
 }
-static inline s32 Chase_CellIndex(s32 x, s32 z)
+static inline u16 *Flags2D4(struct SceneActorRegistryResetView *actor)
 {
+    return &actor->flags2D4;
+}
+static inline u32 CellIndex(struct ContactPosition *p)
+{
+    s32 x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-static inline s32 Chase_CellAt(struct ContactPosition *position)
+static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
-    return Chase_CellIndex(position->x >> 8, position->z >> 8);
-}
-static inline u32 Chase_HeightAt(s32 cell, struct ContactPosition *position)
-{
+    u32 shape, height;
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 kind, height;
     if (data)
         data += 4;
-    else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
-    kind = *data >> 4;
+    else {
+        struct EngineMap *map = gUnk_030052F4;
+        u32 offset = cell * 4 + 12;
+        data = map->cells + offset;
+    }
+    shape = *data >> 4;
     height = (*data & 15) << 8;
-    if (kind == 1)
+    if (shape == 1)
         goto slopeZ;
-    if (kind == 2)
+    if (shape == 2)
         goto slopeX;
     goto done;
 slopeZ:
-    height -= *(u8 *)&position->z;
+    height -= *((u8 *)position + 4);
     goto done;
 slopeX:
-    height -= *(u8 *)&position->x;
+    height -= *(u8 *)position;
 done:
     return height;
 }
-static inline u32 Chase_Height(struct ContactPosition *position)
+static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
+                         struct ContactPosition *position, struct ContactPosition *destination)
 {
-    return Chase_HeightAt(Chase_CellAt(position), position);
-}
-static inline void Chase_SnapToRoute(struct ContactPosition *p, u8 *route)
-{
-    p->x = (*(u16 **)(route + 8))[0];
-    p->z = (*(u16 **)(route + 8))[1];
-    p->y = Chase_Height(p);
-}
-static inline void Chase_ClearBits(u16 *field, u32 bits)
-{
-    s32 mask = ~bits;
-    *field = mask & *field;
-}
-static inline u8 Chase_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                                struct ContactPosition *position, struct ContactPosition *target)
-{
-    s32 result = Nav_IsPositionInMesh(route, position, target);
-    if (!result) {
-        Chase_ClearBits(&actor->flags2D4, 0x200);
+    s32 result;
+    if (!Nav_IsPositionInMesh(route, position, destination)) {
+        u32 mask = ~0x200;
+        actor->flags2D4 = mask & actor->flags2D4;
         return 0;
+    } else {
+        result = Terrain_ApplyBlocked(route, position, destination);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&actor->motion, 8);
+            return 1;
+        } else {
+            u32 mask = ~0x200;
+            actor->flags2D4 = mask & actor->flags2D4;
+            return 0;
+        }
     }
-    result = Terrain_ApplyBlocked(route, position, target);
-    if (result) {
-        if (result != 2)
-            Memory_Clear(&actor->motion, 8);
-        return 1;
+}
+static inline u32 Random(const u16 *table, u32 *seed, u32 wrap, u32 bits)
+{
+    u32 index = (*seed + 1) & wrap;
+    u32 v;
+    *seed = index;
+    index *= 2;
+    v = *(const u16 *)(index + (u32)table);
+    v &= bits;
+    return v;
+}
+static inline u32 RandomDirectionExcept(u32 current)
+{
+    s32 i;
+    for (i = 0; i <= 3; i++) {
+        u32 d = Random(gUnk_0203B400, &gUnk_03005308, 0x3FF, 3) << 6;
+        if (d != current)
+            return d;
     }
-    Chase_ClearBits(&actor->flags2D4, 0x200);
-    return 0;
+    return current;
 }
-
-struct ChaseFlags40 {
-    s16 bits : 16;
-};
-
-struct ChasePacket {
-    void *control;
-    u8 state, phase, behavior, kind;
-};
-static inline void Chase_SavePacket(void *p, struct SceneActorRegistryResetView *actor)
+static inline void Wander(struct SceneActorRegistryResetView *input, u8 direction)
 {
-    struct ChasePacket *packet = p;
-    packet->control = actor->target;
-    packet->kind = actor->field2B5;
-    packet->state = actor->state2A8;
-    packet->phase = actor->phase2A9;
-    packet->behavior = actor->behavior2AA;
-}
-static inline u32 Chase_RandomBits(u32 mask)
-{
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
-    return gUnk_0203B400[index] & mask;
-}
-static inline void Chase_BeginTurn(void *obj, u8 saved)
-{
-    struct SceneActorRegistryResetView *actor = obj;
+    struct SceneActorRegistryResetView *actor = input;
     u8 *group = (u8 *)&actor->group;
-    if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
-        s32 tries = 0;
-        s32 choice;
-        do {
-            choice = Chase_RandomBits(3) << 6;
-            if (choice != prior)
-                goto chosen;
-        } while (++tries <= 3);
-        choice = prior;
-    chosen:
-        group[0x204] = choice;
-        Chase_SavePacket(group + 0x8C, actor);
-        group[0x205] = saved;
-        Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
-        Chase_SetState(actor, 3, 1, 0);
+    if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
+        ((struct RecoveryTurn *)(group + 0x204))->direction =
+            RandomDirectionExcept(actor->direction);
+        ((struct RecoverySavedControl *)(group + 0x8C))->target = actor->target;
+        ((struct RecoverySavedControl *)(group + 0x8C))->kind = actor->field2B5;
+        ((struct RecoverySavedControl *)(group + 0x8C))->state = actor->state2A8;
+        ((struct RecoverySavedControl *)(group + 0x8C))->phase = actor->phase2A9;
+        ((struct RecoverySavedControl *)(group + 0x8C))->behavior = actor->behavior2AA;
+        group[0x205] = direction;
+        {
+            void *target = PTR(group, 0x21C);
+            SetControl(actor, 0x1B, target);
+        }
+        SetState(actor, 3, 1, 0);
         group[0x206] = 6;
     }
 }
-
-static inline u8 Chase_Arrive(void *obj)
+static inline u8 Chase(struct SceneActorRegistryResetView *input)
 {
-    struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
-    struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
-    s32 cell;
-    s32 player;
-    Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
-        struct ChaseTarget *t = *slot;
-        if (!t)
-            goto invoke;
-        {
-            u32 index = t->index;
-            player = -1;
-            if (index <= 3)
-                player = index;
-        }
-        if (player < 0)
-            goto invoke;
-        cell = gUnk_02000580[player]->cell[3];
-    } else {
-        struct ChaseTarget *t = *slot;
-        cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
-        player = 0;
+    struct SceneActorRegistryResetView *actor;
+    u8 *group;
+    u32 cell;
+    s32 slot;
+    u32 *targetp;
+    actor = input;
+    group = (u8 *)&actor->group;
+    targetp = &actor->fieldDC;
+    {
+        struct ContactPosition *dest = actor->state5D4;
+        struct RecoveryRouteLink *link = (void *)&actor->route;
+        dest->x = link->point->x;
+        dest->z = link->point->z;
+        dest->y = CellHeight(CellIndex(dest), dest);
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
-        goto reroute;
-    if (Chase_MotionFlags(actor, 0x400))
-        goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
-    if (Chase_MotionFlags(actor, 0x80)) {
-        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
-        Chase_SetBehavior(actor, 12);
+    if (Test(gUnk_030053F4, 0x4800)) {
+        u8 *target = (u8 *)*targetp;
+        if (!target)
+            goto fail;
+        slot = PlayerSlot(target);
+        if (slot < 0)
+            goto fail;
+        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
     } else {
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
-        Chase_SetBehavior(actor, 5);
-        Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-        (*(struct ContactPosition **)(group + 0x200))->y =
-            Chase_HeightAt(Chase_CellAt(*(struct ContactPosition **)(group + 0x200)),
-                           *(struct ContactPosition **)(group + 0x200));
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
+        cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
+        slot = 0;
+    }
+    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+        u16 busy = Flag16(actor, 0x400, 0x2D4);
+        u16 blocked;
+        if (busy)
+            return 0;
+        {
+            struct RecoveryFlags16 *flags = (void *)(group + 0x40);
+            s32 mask = ~4;
+            flags->value = mask & flags->value;
+        }
+        blocked = Flag16(actor, 0x80, 0x2D4);
+        if (blocked) {
+            void *target = PTR(group, 0x48);
+            SetControl(actor, 0x1A, target);
+            SetState(actor, 0, 0, 12);
+        } else {
+            {
+                void *target = actor->entryTarget228;
+                SetControl(actor, 1, target);
+            }
+            SetState(actor, 0, 0, 5);
+            {
+                struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
+                struct RecoveryRouteLink *link = (struct RecoveryRouteLink *)(group + 0x74);
+                dest->x = link->point->x;
+                dest->z = link->point->z;
+                dest->y = CellHeight(CellIndex(dest), dest);
+                HOME->y = CellHeight(CellIndex(HOME), HOME);
+                HOME->pad = 0;
+            }
+        }
+        Wander(input, actor->direction);
+        sub_0807E334(input);
+        actor->field2C2 = 0x20;
+        return 0;
     }
     {
-        u8 saved = actor->direction;
-        Chase_BeginTurn(obj, saved);
+        struct ContactPosition center;
+        SceneActorTerrain_GetCenter(cell, &center);
+        if (!TryMove(input, PTR(group, 0x1FC), &actor->position, &center)) {
+        fail:
+            Callback_InvokeActor(actor, PTR(group, 0x224));
+            return 0;
+        }
     }
-    sub_0807E334(actor);
-    actor->field2C2 = 0x20;
-    goto done;
-reroute: {
-    struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    u8 *data;
-    targetPointer->x = (x << 8) + 0x80;
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
-    targetPointer->y = (*data & 15) << 8;
-    targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
-        return 1;
-invoke:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
-}
-done:
-    return 0;
+    return 1;
 }
 
 void Sound_PlaySong(u32);
@@ -283,12 +323,6 @@ struct RecoveryRoute {
     struct RecoveryRoutePoints *points;
     void *current;
 };
-static inline s32 Quarter(s32 value)
-{
-    if (value >= 0)
-        return value >> 2;
-    return -((-value) >> 2);
-}
 static inline s32 AxisDelta(struct SceneActorRegistryResetView *actor, u32 offset, s16 **out)
 {
     s32 source = *(s16 *)((u8 *)actor + offset);
@@ -305,8 +339,8 @@ static inline u8 Stopped(s32 x, s32 z)
 }
 static inline u8 RetryTarget(struct SceneActorRegistryResetView *actor, u8 *group)
 {
-    return Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                          &((struct ChaseTarget *)actor->fieldDC)->position);
+    return TryMove(actor, *(void **)(group + 0x1FC), &actor->position,
+                   (struct ContactPosition *)(actor->fieldDC + 12));
 }
 // confidence=low: recoil easing completes into a route or chase recovery state.
 #define Mummy_UpdateDisplacementRecovery sub_080D2584
@@ -317,23 +351,26 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     s16 *x, *z;
     s32 dx, dz;
     u8 *group;
+    u32 *actorFlags, *flagsPointer;
     if (SceneActorReaction_TakePrepared(actor)) {
+        u16 *flags;
         *(s16 *)((u8 *)actor + 0x2EC) = Quarter(*(s16 *)((u8 *)actor + 0x2EC));
         *(s16 *)((u8 *)actor + 0x2F0) = Quarter(*(s16 *)((u8 *)actor + 0x2F0));
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
-        if (Chase_MotionFlags(actor, 8)) {
+        if (KeepFlagPointer(actor, 8, &flags)) {
             Sound_PlaySong(0x12A);
             Sound_PlaySong(0xFD);
         }
         {
             s32 mask = ~1;
-            actor->flags2D4 = mask & actor->flags2D4;
+            *flags = mask & *flags;
         }
         actor->field2B3 = 0;
     }
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        flagsPointer = &actor->flags2CC;
+        *flagsPointer |= mask;
     }
     {
         u32 mask = 0x10000;
@@ -342,7 +379,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     if (frame <= 17 && anim->index == 0 && anim->elapsed == (anim->duration != 0) &&
         anim->duration != 1)
         anim->elapsed = 0;
-    if (Mod(frame, 12) == 0 && Chase_MotionFlags(actor, 8)) {
+    if (Mod(frame, 12) == 0 && MaskFlags(actor, 8)) {
         u32 index;
         u32 sample;
         range.x = 60;
@@ -353,9 +390,10 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         index *= 2;
         sample = *(const u16 *)((u32)gUnk_0203B400 + index);
         sample &= 3;
-        SparkParticle_Spawn(&actor->position, sample + 1, &range, actor->direction + 128, 10, 6, 2,
-                            2);
+        sample += 1;
+        SparkParticle_Spawn(&actor->position, sample, &range, actor->direction + 128, 10, 6, 2, 2);
     }
+    actorFlags = flagsPointer;
     dx = AxisDelta(actor, 0x310, &x);
     dz = AxisDelta(actor, 0x314, &z);
     if (dx > 200)
@@ -382,9 +420,9 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     }
     {
         s32 mask = ~0x80;
-        actor->flags2CC &= mask;
+        *actorFlags &= mask;
     }
-    if (Chase_MotionFlags(actor, 0x10)) {
+    if (MaskFlags(actor, 0x10)) {
         struct RecoveryRoute *route = actor->currentRoute;
         u8 choice;
         u32 index = (gUnk_03005308 + 1) & 1023;
@@ -402,8 +440,11 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
             route->current = base + route->index * 8;
         }
         SceneActorMovement_ResolveRoutePosition(actor);
-        Chase_SetBehavior(actor, 8);
-        Chase_SetCtl(actor, *(void **)((u8 *)actor + 0x5E8), 0x13);
+        SetState(actor, 0, 0, 8);
+        {
+            void *target = *(void **)((u8 *)actor + 0x5E8);
+            SetControl(actor, 0x13, target);
+        }
         {
             s32 mask = ~8;
             actor->flags2D4 = mask & actor->flags2D4;
@@ -411,12 +452,19 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         return;
     }
     if (actor->field2DC & 0x80000) {
-        actor->flags2D6 |= 2;
+        {
+            u32 mask = 2;
+            u16 *flags = &actor->flags2D6;
+            *flags = mask | *flags;
+        }
         return;
     }
-    if (actor->flags2D4 & 8) {
-        Chase_SetState(actor, 3, 0, 0);
-        Chase_SetCtl(actor, Mummy_ResumeRouteAfterRecovery, 0x14);
+    if (MaskFlags(actor, 8)) {
+        SetState(actor, 3, 0, 0);
+        {
+            void *target = Mummy_ResumeRouteAfterRecovery;
+            SetControl(actor, 0x14, target);
+        }
         {
             s32 mask = ~8;
             actor->flags2D4 = mask & actor->flags2D4;
@@ -424,30 +472,38 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         actor->field2C2 = 64;
         return;
     }
-    if (actor->flags2D4 & 0x80) {
-        actor->flags2CC |= 0x80;
+    if (MaskFlags(actor, 0x80)) {
+        *actorFlags |= 0x80;
         actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
-        if (Chase_Arrive(actor) || RetryTarget(actor, group)) {
+        if (Chase(actor) || RetryTarget(actor, group)) {
             *(u16 *)(group + 0x40) |= 4;
-            Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
-            Chase_SetBehavior(actor, 12);
+            {
+                void *target = *(void **)(group + 0x48);
+                SetControl(actor, 0x1A, target);
+            }
+            SetState(actor, 0, 0, 12);
             return;
         }
         goto failed;
     } else {
-        actor->flags2CC |= 0x10;
+        *actorFlags |= 0x10;
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
         actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
-        if (Chase_Arrive(actor) || RetryTarget(actor, group)) {
-            Chase_SetCtl(actor, actor->entryTarget228, 1);
-            Chase_SetBehavior(actor, 7);
+        if (!Chase(actor) && !RetryTarget(actor, group)) {
+        failed:
+            Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        } else {
+            {
+                void *target = actor->entryTarget228;
+                SetControl(actor, 1, target);
+            }
+            SetState(actor, 0, 0, 7);
             actor->field2C2 = Div(64, 3);
-            return;
         }
     }
-failed:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    return;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080D2584);
 #endif

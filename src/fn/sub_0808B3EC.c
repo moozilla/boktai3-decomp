@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 79.2%
+// fuzzy: 81.2%
 // Remaining differences are helper control flow, pointer lifetimes, and register allocation.
 #include "global.h"
 #include "scene_actor_terrain.h"
@@ -170,11 +171,12 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        register s32 prior asm("r7") = actor->direction;
         s32 tries = 0;
         s32 choice;
         do {
-            choice = Chase_RandomBits(3) << 6;
+            register u32 bits asm("r1") = 3;
+            choice = Chase_RandomBits(bits) << 6;
             if (choice != prior)
                 goto chosen;
         } while (++tries <= 3);
@@ -189,6 +191,31 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
     }
 }
 
+static inline void Ghoul_SetCtlZero(struct SceneActorRegistryResetView *actor, void *cb, u32 k,
+                                    u32 zero)
+{
+    void *callback = cb;
+    u32 kind = k;
+    actor->field2B2 = 1;
+    actor->field2B0 = zero;
+    actor->field2B5 = kind;
+    actor->target = callback;
+    actor->field2C8 = 0;
+    {
+        u32 *field = &actor->flags114;
+        u32 mask = ~1;
+        *field &= mask;
+    }
+    actor->word104 = 0;
+}
+static inline void Ghoul_SetBehaviorZero(struct SceneActorRegistryResetView *actor, u32 b, u32 zero)
+{
+    actor->state2A8 = zero;
+    actor->phase2A9 = zero;
+    actor->behavior2AA = b;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
 static inline u8 Chase_Arrive(void *obj)
 {
     struct ContactPosition target;
@@ -197,6 +224,7 @@ static inline u8 Chase_Arrive(void *obj)
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
+    u8 zero;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
     if (Chase_Test(gUnk_030053F4, 0x4800)) {
         struct ChaseTarget *t = *slot;
@@ -220,13 +248,18 @@ static inline u8 Chase_Arrive(void *obj)
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
+    {
+        struct ChaseFlags40 *field = (void *)(group + 0x40);
+        s32 mask = ~4;
+        field->bits &= mask;
+        zero = 0;
+    }
     if (Chase_MotionFlags(actor, 0x80)) {
-        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
-        Chase_SetBehavior(actor, 12);
+        Ghoul_SetCtlZero(actor, *(void **)(group + 0x48), 0x1A, zero);
+        Ghoul_SetBehaviorZero(actor, 12, zero);
     } else {
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
-        Chase_SetBehavior(actor, 5);
+        Ghoul_SetCtlZero(actor, actor->entryTarget228, 1, zero);
+        Ghoul_SetBehaviorZero(actor, 5, zero);
         Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
         (*(struct ContactPosition **)(group + 0x200))->y =
             Chase_HeightAt(Chase_CellAt(*(struct ContactPosition **)(group + 0x200)),
@@ -326,7 +359,11 @@ u8 Ghoul_ResumeBehaviorAfterHit(struct SceneActorRegistryResetView *actor)
         return 0;
     if (actor->field2B8)
         return 0;
-    *(u16 *)(context + 0x628) &= ~1;
+    {
+        u16 *field = (void *)(context + 0x628);
+        s32 mask = ~1;
+        *field &= mask;
+    }
     if (actor->flags2D4 & 0x80) {
         BeginContactAnimation(actor);
         if (!actor->fieldDC)

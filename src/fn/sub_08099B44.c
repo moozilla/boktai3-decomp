@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 58.1%
 // Full initialization draft; remaining differences are address hoisting,
 // helper boundaries, stack layout and animation register allocation.
 #include "scene_actor_control_motion.h"
@@ -56,6 +57,13 @@ void Ghost_Destroy(void);
 extern const u8 gUnk_08605E14[];
 extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000580[];
+struct GhostRoutePoint {
+    s16 x, z;
+};
+struct GhostRouteLink {
+    u8 unknown0[8];
+    struct GhostRoutePoint *point;
+};
 struct ResourceCopy {
     u32 words[8];
 };
@@ -84,8 +92,11 @@ static inline u32 Height(u32 cell, struct ContactPosition *p)
     u32 shape, height;
     if (data)
         data += 4;
-    else
-        data = gUnk_030052F4->cells + cell * 4 + 12;
+    else {
+        struct EngineMap *map = gUnk_030052F4;
+        u32 offset = cell * 4 + 12;
+        data = map->cells + offset;
+    }
     shape = *data >> 4;
     height = (*data & 15) << 8;
     if (shape == 1)
@@ -215,27 +226,47 @@ static inline void StepSequence(void *obj)
     }
 }
 
-static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a)
+struct GhostAttackFields {
+    u16 first[4];
+    u16 second[4];
+    u16 parameter[4];
+    u32 flags[4];
+};
+static inline void InitializeAttackFields(struct SceneActorRegistryResetView *a)
 {
-    u32 fill, id;
+    struct GhostAttackFields *fields = (void *)((u8 *)a + 0xB4);
+    s32 i;
+    if (!Script_SeekToKeyword('a'))
+        return;
+    for (i = 0; i < 4; i++) {
+        fields->first[i] = Value(24);
+        fields->second[i] = Value(24);
+        fields->flags[i] = Value(0);
+        fields->parameter[i] = Value(0);
+    }
+}
+struct GhostTargeting {
+    u32 target;
+    u8 unknown4[10];
+    u8 heading, flags;
+    u16 x, z;
+    u32 distance, range, limit, zSquared;
+};
+static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a, u32 *fill)
+{
+    u32 id;
     struct ContactPosition origin;
     s32 i, first, second;
+    struct GhostTargeting *motion = (void *)&a->fieldDC;
     a->flags2CC = 0;
     a->flags2D0 = 0;
     a->enabled = 0;
     U16(a, 0x2E8) = 8;
     a->flags2C0 = Script_GetKeywordValue('M', 0);
-    fill = 0;
-    CpuSet(&fill, &origin, 0x05000002);
+    *fill = 0;
+    CpuSet(fill, &origin, 0x05000002);
     id = Script_GetKeywordValue('N', 0);
-    if (Script_SeekToKeyword('a')) {
-        for (i = 0; i < 4; i++) {
-            U16(a, 0xB4 + i * 2) = Value(24);
-            U16(a, 0xBC + i * 2) = Value(24);
-            U32(a, 0xCC + i * 4) = Value(0);
-            U16(a, 0xC4 + i * 2) = Value(0);
-        }
-    }
+    InitializeAttackFields(a);
     {
         u32 x, z;
         u8 angle;
@@ -248,16 +279,16 @@ static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a)
             z = 0x30;
             angle = 0x40;
         }
-        a->fieldDC = 0;
-        U16(a, 0xEC) = x;
-        U16(a, 0xEE) = z;
-        a->distanceLimitF8 = x * x;
-        U32(a, 0xFC) = z * z;
-        U8(a, 0xEA) = angle;
-        if (Test(a->flagsEB, 4))
-            a->rangeF4 = a->distanceLimitF8;
+        motion->target = 0;
+        motion->x = x;
+        motion->z = z;
+        motion->limit = x * x;
+        motion->zSquared = z * z;
+        motion->heading = angle;
+        if (Test(motion->flags, 4))
+            motion->range = motion->limit;
         else
-            a->rangeF4 = Div(a->distanceLimitF8 * 7, 10);
+            motion->range = Div(motion->limit * 7, 10);
     }
     if (Script_SeekToKeyword('l')) {
         first = Value(300);
@@ -282,7 +313,12 @@ static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a)
     a->target = SceneActorControl_OnIdle;
     a->field2B2 = 1;
     a->field2B0 = 0;
-    a->health = a->defaultHealth > 0 ? a->defaultHealth : 0;
+    {
+        s32 health = (u16)a->defaultHealth;
+        if ((s16)health <= 0)
+            health = 0;
+        a->health = health;
+    }
     a->fieldAA = 0;
     if (second <= 0)
         second = first;
@@ -304,22 +340,34 @@ static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a)
     SceneBody_SetSprite((u8 *)a + 0x50, a->drawableKind ? 0 : a->drawable);
     SceneBody_SetMovementProbe((u8 *)a + 0x50, (u8 *)a + 0x40, 0x40, 0x40);
 }
-static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
+static inline void InstallPrimaryCallbacks(struct SceneActorRegistryResetView *a, void *cb274,
+                                           void *cb260, void *cb224, void *cb228, void *cb22C,
+                                           void *cb230, void *cb234)
 {
-    SceneActor_InitLinkedReactionColliders(a);
-    a->flags2CC |= 0x2000;
-    PTR(a, 0x274) = Ghost_OnBehaviorUpdate;
-    PTR(a, 0x260) = Ghost_GetBehaviorCode;
-    a->entryTarget224 = Ghost_TurnTowardHeading;
-    a->entryTarget228 = Ghost_UpdateDirectionalPose;
-    a->savedTarget = Ghost_UpdateDirectionalPoseB;
-    a->reactionTarget230 = Ghost_UpdateHitStagger;
-    PTR(a, 0x234) = Ghost_UpdateDefeat;
+    void *defaultReaction = SceneActorReaction_OnEnemyDefault;
+    u32 zero = 0;
+    u32 mask = 0x2000;
+    a->flags2CC |= mask;
+    PTR(a, 0x274) = cb274;
+    PTR(a, 0x260) = cb260;
+    a->entryTarget224 = cb224;
+    a->entryTarget228 = cb228;
+    a->savedTarget = cb22C;
+    a->reactionTarget230 = cb230;
+    PTR(a, 0x234) = cb234;
     PTR(a, 0x220) = 0;
-    PTR(a, 0x278) = SceneActorReaction_OnEnemyDefault;
+    PTR(a, 0x278) = defaultReaction;
     PTR(a, 0x270) = 0;
     PTR(a, 0x248) = 0;
     PTR(a, 0x26C) = 0;
+}
+static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
+{
+    SceneActor_InitLinkedReactionColliders(a);
+    InstallPrimaryCallbacks(a, Ghost_OnBehaviorUpdate, Ghost_GetBehaviorCode,
+                            Ghost_TurnTowardHeading, Ghost_UpdateDirectionalPose,
+                            Ghost_UpdateDirectionalPoseB, Ghost_UpdateHitStagger,
+                            Ghost_UpdateDefeat);
     PTR(a, 0x238) = SceneActorReaction_SinkAndRemove;
     PTR(a, 0x264) = SceneActorReaction_ResolveDamage;
     PTR(a, 0x268) = SceneActorPlacement_PlayResponseAndResetState;
@@ -363,8 +411,11 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
         U16(a, 0x2FA) = U32(gUnk_02000710, 0x5A0);
     else
         U16(a, 0x2FA) = Region_FindContaining(&a->position);
-    if (Test(a->flags2C0, 0x40))
-        U16(a, 0x13A) &= ~0x100;
+    if (Test(a->flags2C0, 0x40)) {
+        struct ContactCollider *collider = &a->colliderA;
+        u32 mask = ~0x100;
+        collider->flags = mask & collider->flags;
+    }
 }
 s32 Ghost_Init(struct SceneActorRegistryResetView *a)
 {
@@ -402,7 +453,7 @@ s32 Ghost_Init(struct SceneActorRegistryResetView *a)
         Widget_InitLinked(d + 0x20, d, 0, 0, 2, 2, 0x3C, &zero);
         U8(a, 0x2B7) = 0xFF;
     }
-    InitializeScriptFields(a);
+    InitializeScriptFields(a, &fill);
     route = (u8 *)a + 0x60C;
     route[0xF] = 0;
     if (Script_SeekToKeyword('r')) {
@@ -411,15 +462,27 @@ s32 Ghost_Init(struct SceneActorRegistryResetView *a)
         route[0x12] = Value(0);
         route[0xC] = route[0x12];
         route[0xD + route[0xF]] = route[0x10];
-        route[0xD + (route[0xF] ^ 1)] = Value(route[0x10]);
+        {
+            u8 *out = route + 0xD + (route[0xF] ^ 1);
+            u32 value;
+            if (Script_GetPc())
+                value = Script_GetValue();
+            else
+                value = route[0x10];
+            *out = value;
+        }
         Path_GetPointPositionById((u16 *)&point, route[0x10], route[0x12]);
         a->terrainCell = Cell(&point);
         a->groundHeight2BE = Height(a->terrainCell, &point);
         point.y = a->groundHeight2BE;
         SceneBody_StartRoute((u8 *)a + 0x50, route, route[0x10], route[0x11], route[0x12]);
-        a->position.x = ((u16 *)PTR(route, 8))[0];
-        a->position.z = ((u16 *)PTR(route, 8))[1];
-        a->position.y = Height(Cell(&a->position), &a->position);
+        {
+            struct ContactPosition *dest = &a->position;
+            struct GhostRouteLink *link = (void *)route;
+            dest->x = link->point->x;
+            dest->z = link->point->z;
+            dest->y = Height(Cell(dest), dest);
+        }
         DrawablePosition(a);
         a->direction = Route_GetCurrentPointFacing(route);
     } else {

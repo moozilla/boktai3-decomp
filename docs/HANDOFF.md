@@ -23,10 +23,15 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
-* **Mummy burn damage** (2026-10-23): matched the complete timer-driven damage
-  callback with four register pins and improved the guarded Golem contact
-  response draft. [Worker notes](../notes/cx-xhigh.md) explain the reload
-  diagnosis and safe minimization. Combined ROM validation passed.
+* **Vanargand initializer draft** (2026-10-23): improved the complete guarded
+  initializer with script-flag and palette lifetimes. No new exact match.
+  [Worker notes](../notes/cx-xhigh.md) retain the experiments and resume point
+  at 080D2584 after the campaign wrap-up marker. Combined ROM validation passed.
+* **Mummy damage and reaction drafts** (2026-10-23): matched the complete
+  timer-driven damage callback with four register pins and improved guarded
+  Golem, Mummy and Ghoul reaction drafts. [Worker notes](../notes/cx-xhigh.md)
+  explain the reload diagnosis, safe minimization and wrap-up boundary.
+  Both combined ROM validations passed.
 * **Script combat actor family recovered** (2026-10-23): the initializer, actor
   update, projectile attack, collider setup and hit reaction now match exactly.
   Tagged NPC continuation details are in [worker notes](../notes/cx-sol02.md).
