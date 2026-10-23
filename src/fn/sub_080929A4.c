@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.7%
-// Remaining differences: stack slot order (fill vs delta/offset), the IsUnavailable result register, and arg-store scheduling.
+// fuzzy: 89.2%
+// Remaining: unavailable-result register, context address lifetimes and argument-store scheduling.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_control_phase.h"
@@ -108,7 +108,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
 void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
 {
     register u8 *body asm("r8");
-    u32 fill;
+    volatile u32 fill;
     struct BeeVec delta, offset;
     u32 angle;
     if (IsUnavailable(actor))
@@ -116,7 +116,10 @@ void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
     if (!ActorFlag(actor, 0x4000, 0x2D4))
         return;
     body = actor->context;
-    *(u16 *)(body + 0x43C) = args[1];
+    {
+        u16 value = args[1];
+        *(u16 *)(body + 0x43C) = value;
+    }
     *(u8 **)(body + 0x440) = SceneBody_GetById(*(u16 *)(body + 0x43C));
     *(u16 *)(body + 0x43E) = args[2];
     body[0x428] = 0;

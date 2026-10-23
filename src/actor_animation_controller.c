@@ -1,6 +1,8 @@
 #include "global.h"
 #include "actor_animation_controller.h"
 
+#define Actor_UpdateIdleWait sub_081E42C4
+
 // Provisional name: ActorPalette_BeginFade
 
 void AnimData_SelectPaletteBank(void *, s32);
@@ -495,7 +497,7 @@ extern u8 gUnk_03005430[];
 
 /* Provisional name: Actor_UpdateIdleWait */
 
-void Actor_UpdateIdleWait(void *);
+void Actor_UpdateIdleWait(struct ActorAnimController *);
 
 static inline s32 absolute(s32 x)
 {
@@ -541,14 +543,7 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
 
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 
-#ifdef NONMATCHING
-
-// fuzzy: 87.6%
-
-// Differs in pool-constant reuse around delay/interrupted/savedPhase and the
-
-// phase<<4 write; not a structural mismatch.
-
+// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gUnk_03005260) {
@@ -561,32 +556,45 @@ void Actor_UpdateIdleWait(struct ActorAnimController *p)
     if (++p->timer > p->delay) {
         if (p->done) {
             p->interrupted = 0;
-            p->savedPhase = *(u16 *)((u8 *)p + 0xf5a) >> 4;
             {
-                register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-                register u32 mask asm("r2") = 15;
-                *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0x50;
+                register u32 offset asm("r1") = 0xF5A;
+                u16 *field = (void *)((u8 *)p + offset);
+                p->savedPhase = *field >> 4;
+            }
+            {
+                u32 offset = 0xF5A;
+                u16 *field;
+                register u32 raw asm("r1");
+                register u32 mask asm("r3");
+                field = (void *)((u8 *)p + offset);
+                raw = *field;
+                mask = 15;
+                *field = (mask & raw) | 0x50;
                 if (p->oldMode == 3) {
-                    register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
+                    register u32 bits asm("r0") = mode_bits((u8 *)field, mask);
                     if (bits == 3) {
                         p->savedFrame = p->anim.frame;
                         p->savedTimer = p->anim.timer;
                     }
                 }
             }
-            p->flags |= 1;
-            p->fn = Actor_UpdateIdlePhaseRestoration;
-            p->count = 0;
-            p->savedY2 = p->obj.y;
+            {
+                u32 one = 1;
+                u32 zero;
+                u8 *field;
+                u32 value;
+                field = &p->flags;
+                value = *field;
+                zero = 0;
+                one |= value;
+                *field = one;
+                p->fn = Actor_UpdateIdlePhaseRestoration;
+                p->count = zero;
+                p->savedY2 = p->obj.y;
+            }
         }
     }
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", Actor_UpdateIdleWait);
-
-#endif
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */

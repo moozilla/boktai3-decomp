@@ -52,7 +52,111 @@ void SceneActorGraphics_SelectResource(u8 *p)
     }
 }
 
+#ifdef NONMATCHING
+// fuzzy: 84.5%
+// Remaining: contact-store scheduling, field-address lifetimes, and registers.
+#define SceneActorGraphics_OnDamageContact sub_08021F4C
+extern u8 *gUnk_02000580;
+extern u32 gUnk_030053F4;
+void Collision_CalculateDamageResponse(void *, void *);
+void PlayerStats_AddContactHundredths(void *, void *, s32);
+void Sound_PlaySongChecked(u32);
+void DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
+s32 Math_Atan2(s32, s32);
+s32 WirelessGame_TryAddCyclingItem(void *);
+void WirelessGame_AddItem(void *, s32);
+struct ContactVector {
+    s16 x, y, z;
+};
+void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg)
+{
+    register u8 *contact asm("r4") = contactArg;
+    register u8 *p asm("r5") = actorArg;
+    register u8 *actor asm("r8") = p;
+    register u8 *sprite asm("sb") = p + 0x48;
+    register u32 mode asm("sl");
+    struct ContactVector size;
+    u8 *position;
+    s32 item;
+    if (*(u16 *)(p + 0x34e))
+        return;
+    mode = gUnk_02000580[0x418];
+    Collision_CalculateDamageResponse(source, contact);
+    if (*(u32 *)(p + 0x358) == 1 && mode != 2)
+        *(u16 *)(contact + 0x3e) = 0;
+    if (!(gUnk_030053F4 & 0x1000))
+        PlayerStats_AddContactHundredths(source, contact, *(s16 *)(p + 0x380));
+    *(u32 *)(p + 0x33c) = *(u16 *)(contact + 0x3e);
+    asm("" ::: "memory");
+    if (*(u16 *)(contact + 0x3e) == 0) {
+        Sound_PlaySongChecked(0x211);
+        *(u16 *)(p + 0x34c) = 10;
+        *(void **)(p + 0x288) = p + 0x5c4;
+        size.x = 16;
+        size.y = 0;
+        size.z = 16;
+        DamageNumberDisplay_Show(contact, *(u16 *)(contact + 0x3e), 0, sprite + 12, &size, 1);
+    }
+    if (*(u16 *)(source + 6) & 0x100)
+        p[0x342] = source[0x42];
+    else
+        p[0x342] = Math_Atan2(*(s16 *)(contact + 0x24) - *(s16 *)(source + 0x24),
+                              *(s16 *)(contact + 0x28) - *(s16 *)(source + 0x28));
+    *(u32 *)(actor + 0xbc) = *(u32 *)(source + 0x34);
+    *(u32 *)(actor + 0xc0) = *(u32 *)(source + 0x38);
+    *(u16 *)(p + 0x34e) = *(u16 *)(source + 0x44);
+    PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
+    if (*(s32 *)(p + 0x33c) > 0 && (*(u32 *)(source + 0x38) & 1))
+        p[0x340] = 1;
+    if (!(gUnk_030053F4 & 0x1000))
+        return;
+    if (mode - 1 <= 1) {
+        position = contact + 0xc;
+        if (WirelessGame_TryAddCyclingItem(position) && (contact[0x43] & 8))
+            WirelessGame_AddItem(position, 0);
+        return;
+    }
+    if (contact[0x43] & 8)
+        WirelessGame_AddItem(contact + 0xc, 0);
+    if (!(*(u32 *)(source + 0x38) & 0x800000))
+        return;
+    item =
+        (s16)(*(u16 *)((u8 *)gUnk_02000710 + (*(s16 *)((u8 *)gUnk_02000710 + 0x52) << 1) + 0x88) -
+              6);
+    switch ((u32)item) {
+        case 0:
+            WirelessGame_AddItem(contact + 0xc, 2);
+            break;
+        case 1:
+            WirelessGame_AddItem(contact + 0xc, 1);
+            break;
+        case 2:
+            WirelessGame_AddItem(contact + 0xc, 3);
+            break;
+        case 3:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 1);
+            break;
+        case 4:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 3);
+            break;
+        case 5:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 1);
+            WirelessGame_AddItem(position, 3);
+            break;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08021F4C);
+#endif
 
 void SceneActorGraphics_InitBodyNoOp(void)
 {
@@ -92,7 +196,7 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     }
 }
 
-void sub_08021F4C(void);
+void sub_08021F4C(u8 *, u8 *, u8 *);
 
 void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
 {
@@ -423,9 +527,121 @@ fail:
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022DBC);
+// confidence=low: chooses the next action phase from the reaction kind and flash state.
+#define SceneActorState_SelectReactionPhase sub_08022DBC
+// MATCHING_CONCESSION: register-pinning
+static inline s32 phaseValue(u8 *p)
+{
+    s32 value = *p;
+    return value;
+}
+void SceneActorState_SelectReactionPhase(u8 *p)
+{
+    u32 phase;
+    u8 *actor = p;
+    if (*(u32 *)(p + 0x358) == 3) {
+        if (p[0x3b9]) {
+            phase = 14;
+            goto set;
+        }
+    } else {
+        if (p[0x3b9] == 3)
+            SceneActors_StopBackgroundFlash(p);
+        else if (p[0x3b9]) {
+            phase = 14;
+            asm("" : : "i"(1));
+            goto set;
+        }
+    }
+    switch (*(u16 *)(actor + 0x3b2)) {
+        case 0:
+            phase = 9;
+            break;
+        case 1:
+            phase = 10;
+            break;
+        case 2:
+            if (*(u32 *)(actor + 0x358) != 3 && phaseValue(p + 0xe1) <= 63) {
+                u8 *flag = actor + 0x394;
+                *flag = 1;
+            } else {
+                u8 *flag = actor + 0x394;
+                *flag = 0;
+            }
+            phase = 2;
+            break;
+        case 3:
+            phase = 11;
+            break;
+        case 4:
+            if (phaseValue(p + 0xe1) <= 63) {
+                phase = 14;
+                asm("" : : "i"(3));
+            } else {
+                phase = 11;
+                asm("" : : "i"(4));
+            }
+            break;
+        case 5:
+            phase = 15;
+            break;
+        case 6:
+            phase = 16;
+            break;
+        default:
+            return;
+    }
+set: {
+    register u8 *phaseField asm("r2") = p + 0xae;
+    u32 zero = 0;
+    *phaseField = phase;
+    *(u32 *)(p + 0xc4) = zero;
+    p[0xb0] = 1;
+}
+}
 
-INCLUDE_ASM("asm/nonmatching", sub_08022EA4);
+// confidence=low: reaction-kind selector controls the far-point mode and motion timer.
+#define SceneActorState_SnapReactionPosition sub_08022EA4
+// MATCHING_CONCESSION: register-pinning
+void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
+struct SnapVector {
+    u32 a, b;
+};
+void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
+{
+    u8 *sprite = p + 0x48;
+    switch (*(u16 *)(p + 0x3b2)) {
+        case 0:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 0, 65536);
+            break;
+        case 1:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
+            break;
+        case 2:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 1, 65536);
+            *(u16 *)(p + 0x354) = 32;
+            return;
+        case 3:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            break;
+        case 4:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            asm("" : : "i"(4));
+            break;
+        case 5:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            asm("" : : "i"(5));
+            break;
+        case 6:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
+            asm("" : : "i"(6));
+            break;
+        default:
+            *position = *(struct SnapVector *)(p + 0x54);
+            break;
+    }
+    *(u16 *)(p + 0x354) = 64;
+}
 
 #ifdef NONMATCHING
 
@@ -1401,7 +1617,7 @@ static inline u8 enter_08023E24(State_08023E24 *p)
     return 0;
 }
 
-void sub_08022EA4(void *, void *);
+void sub_08022EA4(u8 *, struct SnapVector *);
 
 void SceneActorState_WaitForDelayedAction(Actor_08023E24 *p)
 {
@@ -1464,7 +1680,7 @@ static inline u8 enter_08023EC0(State_08023EC0 *p)
     return 0;
 }
 
-void sub_08022DBC(void *);
+void sub_08022DBC(u8 *);
 
 void SceneActorState_UpdateVariantActionPlayback(Actor_08023EC0 *p)
 {
@@ -2066,7 +2282,85 @@ void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
         p->c4++;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0802483C);
+// confidence=low: variant-dependent recovery animations and timed return to the default action.
+#define SceneActorState_UpdateVariantRecovery sub_0802483C
+// MATCHING_CONCESSION: register-pinning
+struct VariantRecoveryActor {
+    u8 pad0[0xaa];
+    u8 animation, state, mode, index, phase, finished, enter;
+    u8 padb1[0x13];
+    u32 timer;
+    u8 padc8[0x28e];
+    u16 delay;
+    u32 kind;
+    u8 pad35c[0x50];
+    u32 flags;
+    u8 pad3b0[9];
+    u8 alternate;
+};
+extern u32 gUnk_030053F4;
+static inline u8 enterVariant(struct VariantRecoveryActor *p)
+{
+    if (p->enter) {
+        p->enter = 0;
+        p->finished = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline u8 variantAlternate(struct VariantRecoveryActor *q, u32 offset)
+{
+    u32 adjusted = offset + 0x61;
+    {
+        u8 *address = (u8 *)q + adjusted;
+        return *address;
+    }
+}
+void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
+{
+    struct VariantRecoveryActor *q = p;
+    if (enterVariant(p)) {
+        u32 offset = 0x358;
+        if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset))
+            SceneActorState_SetValueClampedWhenActive(q, 38);
+        else
+            SceneActorState_SetValueClampedWhenActive(q, 17);
+    }
+    if (p->finished) {
+        if (q->state == 3) {
+            u32 animation;
+            u32 offset = 0x358;
+            if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset)) {
+                animation = 38;
+                asm("" : "+r"(animation));
+            } else {
+                animation = 17;
+            }
+            q->animation = animation;
+        } else if (p->state == 17) {
+            register u32 animation asm("r0");
+            if (q->flags & 4) {
+                animation = 19;
+            } else {
+                animation = 18;
+            }
+            p->animation = animation;
+        } else {
+            u32 zero = 0;
+            q->mode = zero;
+            q->index = zero;
+            q->phase = zero;
+            q->timer = zero;
+            q->enter = 1;
+            if (gUnk_030053F4 & 0x1000)
+                q->delay = zero;
+            else
+                q->delay = 90;
+            return;
+        }
+    }
+    p->timer++;
+}
 
 struct S_08024944 {
     u8 f0[0x9a];

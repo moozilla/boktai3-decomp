@@ -1,12 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 92.9%
-// Remaining: side-constant scratch registers and final mode/flags argument scheduling.
-#define Armor_SetAnimation       ActorController_SetAnimation
-#define gArmorAnimationVariants  gUnk_0824EB60
-#define gArmorAnimationKeyframes gUnk_0824E920
+#define ActorController_SetAnimation sub_08182454
+#define gArmorAnimationVariants      gUnk_0824EB60
+#define gArmorAnimationKeyframes     gUnk_0824E920
 struct ArmorActor {
     u8 pad0[0x94];
     u8 animationData[0x20];
@@ -32,14 +29,27 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
 {
     u32 index = request->index;
     register u32 side asm("ip");
-    register s32 variant asm("sb");
+    s32 variant;
     s32 kind;
     register u16 actorFlags asm("r4") = s->flags;
     s32 mode;
-    side = 1;
-    if (actorFlags & 1)
-        side = 0;
-    kind = s->variant;
+    {
+        u32 test = actorFlags & 1;
+        register u32 one asm("r6") = 1;
+        asm("" : "+r"(one));
+        side = one;
+        if (test) {
+            u32 zero = 0;
+            side = zero;
+        }
+    }
+    {
+        u32 offset = 0xB38;
+        {
+            u8 *address = (u8 *)s + offset;
+            kind = *address;
+        }
+    }
     if (actorFlags & 0x200)
         kind += 4;
     variant = gUnk_0824EB60[kind];
@@ -59,11 +69,22 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
         s->renderFlags |= 4;
     else
         s->renderFlags &= ~4;
-    Anim_SetKeyframes(s->animation, s->animationData, gUnk_0824E920[variant][side][index], mode,
-                      (u16)flags);
+    {
+        void *animation = s->animation;
+        void *data = s->animationData;
+        u32 keyframe = gUnk_0824E920[variant][side][index];
+        u32 callMode = mode;
+        register u32 wideFlags asm("r6");
+        register u32 callFlags asm("r4");
+        asm("" : "+r"(animation), "+r"(data), "+r"(keyframe), "+r"(callMode));
+        wideFlags = flags;
+        asm("" : "+r"(wideFlags));
+        callFlags = (u16)wideFlags;
+        Anim_SetKeyframes(animation, data, keyframe, callMode, callFlags);
+    }
     s->animationSpeed = 0x40;
-    s->flags &= ~0x20;
+    {
+        register u32 offset asm("r7") = 0xB32;
+        *(u16 *)((u8 *)s + offset) &= ~0x20;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorController_SetAnimation);
-#endif

@@ -37,45 +37,54 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 void Bee_DisableMovement(void *);
-// confidence=low: eases saved motion before returning to idle; register allocation still differs.
-#ifdef NONMATCHING
-// fuzzy: 86.5%
+// confidence=low: eases saved motion before returning to idle.
+#define Bee_UpdateMovementStop sub_080924EC
 void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
-    register u8 *body asm("r8") = actor->context;
+    u8 *body = actor->context;
     s32 x;
     s32 z;
     s16 *priorX;
     s16 *priorZ;
-    asm("" : "+r"(body));
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    u16 *animationFlags;
+    register u32 previousOffset asm("r4");
+    register u32 entryOffset asm("r2") = 0x2B2;
+    asm("" : "+r"(entryOffset));
+    if (SceneActorControl_TakeFlag((u8 *)actor + entryOffset)) {
         {
             register u32 mask asm("r0") = 0x20;
-            u16 *flags = &actor->flags2D4;
-            *flags = mask | *flags;
+            u32 offset = 0x2D4;
+            animationFlags = (void *)((u8 *)actor + offset);
+            *animationFlags = mask | *animationFlags;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         {
             u32 mask = ~0x100;
-            actor->flags2D4 = mask & actor->flags2D4;
+            *animationFlags = mask & *animationFlags;
         }
     }
     {
         u32 mask = 0x100000;
-        u32 offset = 0x2D0;
-        u32 *flags = (void *)((u8 *)actor + offset);
+        u32 *flags;
+        previousOffset = 0x2D0;
+        flags = (void *)((u8 *)actor + previousOffset);
         *flags |= mask;
     }
     {
         u32 offset = 0x310;
-        s32 current = *(s16 *)((u8 *)actor + offset);
+        s32 current;
+        s16 *currentField;
         u32 priorOffset;
         s16 *field;
         s32 difference;
-        priorOffset = 0x318;
+        currentField = (void *)((u8 *)actor + offset);
+        current = *currentField;
+        previousOffset += 0x48;
+        priorOffset = previousOffset;
         field = (void *)((u8 *)actor + priorOffset);
         difference = current - *field;
+        asm("" : : "r"(previousOffset));
         priorX = field;
         x = Quarter(difference);
     }
@@ -98,20 +107,32 @@ void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
-        register u32 zeroWord asm("r6") = 0;
-        register u32 zeroByte asm("r4");
-        asm("" : "+r"(zeroWord));
-        actor->field2B0 = 1;
+        u32 zeroWord;
+        u32 zeroByte;
         {
-            u16 *p = &actor->flags2D4;
-            u32 mask = ~0x20;
-            *p = mask & *p;
-            zeroByte = 0;
-            asm("" : "+r"(zeroByte));
+            u8 *state = &actor->field2B0;
+            zeroWord = 0;
+            asm("" : "+r"(zeroWord));
+            *state = 1;
         }
         {
-            u32 *p = &actor->flags2CC;
-            u32 mask = ~0x80;
+            u32 offset = 0x2D4;
+            u16 *p;
+            u32 mask;
+            u32 value;
+            p = (void *)((u8 *)actor + offset);
+            mask = ~0x20;
+            asm("" : "+r"(mask));
+            value = mask & *p;
+            zeroByte = 0;
+            *p = value;
+        }
+        {
+            u32 offset = 0x2CC;
+            u32 *p;
+            u32 mask;
+            p = (void *)((u8 *)actor + offset);
+            mask = ~0x80;
             *p &= mask;
         }
         Bee_DisableMovement(actor);
@@ -137,12 +158,9 @@ void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
         }
         {
             u32 mask = 8;
-            *(u32 *)(body + 0x3D4) |= mask;
+            u32 *flags = (void *)(body + 0x3D4);
+            *flags |= mask;
         }
         body[0x42A] = 60;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Bee_UpdateMovementStop);
-#endif
