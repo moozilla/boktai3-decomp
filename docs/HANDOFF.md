@@ -23,6 +23,7 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **State actor campaign continuation** (2026-10-23): three control, palette and target-turn matches plus complete guarded drafts; resume details in [worker notes](../notes/cx-sol11.md).
 * **Every scene's procedures have working names** (2026-10-19):
   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
   and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
