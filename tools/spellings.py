@@ -147,7 +147,7 @@ def sp_specialize(fn, helpers):
             c.args.exprs = keep_a
             desc = f"{text(c)[:30]}: constants written in the helper"
             yield desc, (f2, [h])
-            for sp in (sp_addr_then_const, sp_scoped_operand):
+            for sp in (sp_addr_then_const, sp_scoped_operand, sp_inline_decl, sp_addr_local):
                 for d2, h2 in sp(h):
                     yield desc + "; " + d2, (f2, [h2])
 
@@ -188,6 +188,24 @@ def sp_split_offset(fn):
                 else:
                     set_child(p2, s2, ca.ArrayRef(base, ca.Constant("int", str(m))))
                 yield f"offset {hex(kval)} as {hex(k1)} + [{m}]{' through a local' if local else ''}", f2
+
+
+def sp_addr_local(fn):
+    """L op= E  ->  { typeof(L) *q = &L; *q op= E; }  (the ROM computes the address before the value)."""
+    pred = lambda n, p, s: (isinstance(n, ca.Assignment) and isinstance(n.lvalue, (ca.StructRef, ca.ArrayRef))
+                            and not (isinstance(n.lvalue, ca.StructRef) and n.lvalue.type == "." and
+                                     isinstance(n.lvalue.name, ca.ID)))
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        a, _, _ = nth(f2, pred, k)
+        q = new_name(f2, "q")
+        lv = a.lvalue
+        qd = ca.Decl(name=q, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                     type=ca.PtrDecl([], ca.TypeDecl(q, [], None, ca.Typeof(copy.deepcopy(lv)))),
+                     init=ca.UnaryOp("&", copy.deepcopy(lv)), bitsize=None, asmlabel=None)
+        a.lvalue = ca.UnaryOp("*", ca.ID(q))
+        if _put_before(f2, a, qd):
+            yield f"address of {text(lv)[:30]} in a local first", f2
 
 
 def sp_cmp_sign(fn):
@@ -408,14 +426,14 @@ def sp_index_local(fn):
 
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
-             sp_split_offset]
+             sp_split_offset, sp_addr_local]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width"],
-    "order": ["sp_helper_arg", "sp_specialize", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
+    "order": ["sp_helper_arg", "sp_specialize", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
     "loop-invariant": ["sp_into_loop", "sp_inline_decl"],
     "strength-reduce": ["sp_into_loop", "perm_loop_form"],

@@ -70,6 +70,8 @@ class Draft:
 
     def __init__(self, src_text, func, workdir):
         self.func = func
+        alias = re.search(r"^#define (\w+) " + re.escape(func) + r"$", src_text, re.M)
+        self.src_name = alias.group(1) if alias else func  # the name the source text uses
         self.text = src_text
         self.path = os.path.join(workdir, f"{func}.c")
         open(self.path, "w").write(src_text)
@@ -127,7 +129,7 @@ class Draft:
         for name, h in helpers.items():
             span = find_def(text, name) if name in self.helpers else None
             if name not in self.helpers:  # a new helper: before the function
-                span = find_def(text, self.func)
+                span = find_def(text, self.src_name)
                 text = text[:span[0]] + ast_util.to_c(h).strip() + "\n\n" + text[span[0]:]
             elif span:
                 text = text[:span[0]] + ast_util.to_c(h).strip() + "\n" + text[span[1]:]
@@ -140,13 +142,16 @@ class Draft:
                 for n, _, _ in rewrites.walk(fn):
                     if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID) and n.name.name == name:
                         n.name.name = new
-                span = find_def(text, self.func)
+                span = find_def(text, self.src_name)
                 text = text[:span[0]] + ast_util.to_c(h2).strip() + "\n\n" + text[span[0]:]
         if self.take == "TakeFlag_" and "TakeFlag_(" in ast_util.to_c(fn) and "TakeFlag_(u8" not in text:
-            span = find_def(text, self.func)
+            span = find_def(text, self.src_name)
             text = text[:span[0]] + TAKE + "\n" + text[span[0]:]
-        span = find_def(text, self.func)
-        return text[:span[0]] + ast_util.to_c(fn).strip() + "\n" + text[span[1]:]
+        span = find_def(text, self.src_name)
+        body = ast_util.to_c(fn).strip()
+        if self.src_name != self.func:
+            body = re.sub(r"\b" + self.func + r"\b", self.src_name, body, count=1)
+        return text[:span[0]] + body + "\n" + text[span[1]:]
 
 
 def decision(path, func):
@@ -198,7 +203,7 @@ def candidates(d, seeds):
             yield fam, desc, f2, {}
 
 
-def one_round(d, keys, show, try_all, seeds, log):
+def one_round(d, keys, show, try_all, seeds, log, deadline=None):
     base = d.score()
     prefer = []
     for k in keys:
@@ -207,6 +212,8 @@ def one_round(d, keys, show, try_all, seeds, log):
     cands = list(candidates(d, seeds))
     cands.sort(key=lambda c: (c[0] not in prefer, prefer.index(c[0]) if c[0] in prefer else 0))
     for fam, desc, fn, helpers in cands:
+        if deadline and time.time() > deadline:
+            break
         if not try_all and fam not in prefer and any(r[0][0] < base[0] for r in results if r[2] in prefer):
             break
         src = ast_util.to_c(fn) + "".join(ast_util.to_c(h) for h in helpers.values())
@@ -228,7 +235,7 @@ def one_round(d, keys, show, try_all, seeds, log):
     return base, good, compiles
 
 
-def expand(text, func, wd, show, try_all, seeds, log, verbose):
+def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
     path = os.path.join(wd, f"{func}.c")
     open(path, "w").write(text)
@@ -237,7 +244,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose):
         return "match", 0
     st, e = dec
     d = Draft(text, func, wd)
-    base, good, n = one_round(d, keys, show, try_all, seeds, log)
+    base, good, n = one_round(d, keys, show, try_all, seeds, log, deadline)
     if base is None:
         return [], n
     if verbose:
@@ -253,7 +260,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose):
     return [(sc, d.materialize(fn, helpers), desc, fam) for sc, desc, fam, fn, helpers in keep], n
 
 
-def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, log=print, beam=4):
+def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, log=print, beam=4, budget=None):
     """Beam search over one-edit steps: each round expands the BEAM best states (fewest differing
     instructions, then the latest first divergence)."""
     text = open(src).read()
@@ -262,6 +269,7 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
     t0 = time.time()
     total = 0
     states = [((10 ** 9, 0), text, [])]
+    start = None
     seen = {text}
     best = states[0]
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
@@ -269,8 +277,13 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
             log(f"\n== round {rnd + 1}")
             children = []
             for i, (sc, txt, path) in enumerate(states):
-                kids, n = expand(txt, func, wd, show, try_all, seeds, log, verbose=(i == 0))
+                if budget and time.time() - t0 > budget:
+                    break
+                kids, n = expand(txt, func, wd, show, try_all, seeds, log, verbose=(i == 0),
+                                 deadline=budget and t0 + budget)
                 total += n
+                if rnd == 0 and isinstance(kids, list) and start is None:
+                    start = Draft(txt, func, wd).score()
                 if kids == "match":
                     kids = [((0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:
@@ -306,7 +319,8 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
             log(f"   beam: {', '.join(str(c[0][0]) for c in states)} differing insns")
     sc, txt, path = best
     log("\n".join("   " + p for p in path))
-    log(f"\nno match: best {sc[0]} differing insns after {len(path)} edit(s), {total} compiles, "
+    log(f"\nno match: best {sc[0]} differing insns (from {start[0] if start else '?'}) after {len(path)} edit(s), "
+        f"{total} compiles, "
         f"{time.time() - t0:.0f} s")
     os.makedirs(OUT, exist_ok=True)
     open(os.path.join(OUT, func + ".partial.c"), "w").write(txt)
@@ -323,11 +337,16 @@ def main():
     ap.add_argument("--seeds", type=int, default=2)
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--beam", type=int, default=4)
+    ap.add_argument("--budget", type=float, help="seconds; no new state is expanded after it")
     a = ap.parse_args()
     src = os.path.abspath(a.src)
-    func = a.func or re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(src).read(), re.M)[-1]
+    asm = re.search(r'INCLUDE_ASM\("asm/nonmatching", (\w+)\)', open(a.src).read())
+    func = a.func or (asm.group(1) if a.nonmatching and asm else None) or re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(src).read(), re.M)[-1]
+    alias = re.search(r"^#define " + re.escape(func) + r" (\w+)$", open(src).read(), re.M)
+    if alias:  # a draft that names the function through a #define compiles to the ROM name
+        func = alias.group(1)
     os.chdir(ROOT)
-    rc, _, _ = run(src, func, a.nonmatching, a.depth, a.show, a.all, a.seeds, beam=a.beam)
+    rc, _, _ = run(src, func, a.nonmatching, a.depth, a.show, a.all, a.seeds, beam=a.beam, budget=a.budget)
     return rc
 
 
