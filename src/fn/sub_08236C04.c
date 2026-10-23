@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -42,7 +41,7 @@ void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *orig
         struct Unk08236C04Particle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        register u32 i asm("r1");
+        unsigned short i;
         u32 mask;
         struct Unk08236C04Particle *sprite;
 
@@ -74,8 +73,9 @@ void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *orig
         sprite->x = p->origin.x + Scale12(p->radius * gUnk_086149C4[(p->angle + 0x40) & 0xFF]);
         sprite->y = p->origin.y;
         sprite->z = p->origin.z + Scale12(p->radius * gUnk_086149C4[p->angle]);
-        if (++emitter->next > 7)
+        if ((++emitter->next) > 7) {
             emitter->next = 0;
+        }
         emitter->delay = 0;
         owner[0x9E] = 1;
     }

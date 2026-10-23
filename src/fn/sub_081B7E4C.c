@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "terrain_cell_probe.h"
@@ -22,10 +21,10 @@ struct Two {
 
 void GrowthHazard_InitEntryFromScript(u8 *input)
 {
-    register struct Mgr *manager asm("r8") = (struct Mgr *)input;
+    struct Mgr *manager = (struct Mgr *)input;
     u8 *entry;
     u8 *sprite;
-    register u16 *collisionId asm("r9");
+    u16 *collisionId;
     u16 *world;
     u32 present;
     {
@@ -78,14 +77,14 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
         if (entry[0xED]) {
             void *body = entry + 0x9C;
             {
-                register u16 *cid asm("r2") = collisionId;
-                asm("" : "+r"(cid));
+                u16 *cid = collisionId;
                 SceneBody_Init(body, *cid, sprite + 0x1C, 0, 7, entry);
             }
             TerrainOverlay_QueueAddActor(body);
         }
-    } else
+    } else {
         entry[0xED] = 0;
+    }
     *(u16 *)(entry + 0xF8) = 0;
     if (Script_SeekToKeyword(0x41))
         *(u16 *)(entry + 0xFA) = Script_GetValue();
@@ -98,27 +97,24 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
         *(u16 *)(entry + 0xFE) = 3;
     sub_081B7DC8(entry);
     {
-        register u32 off asm("r3") = 0x100;
-        register u8 *p asm("r1");
-        asm("" : "+r"(off));
+        u32 off = 0x100;
+        u8 *p;
         p = entry + off;
         *p = 0;
     }
     {
         u32 found = Script_SeekToKeyword(0x73);
-        register u8 *p asm("r1");
+        u8 *p;
         u32 val = found;
         if (found) {
             val = Script_GetValue();
             {
-                register u32 off asm("r2") = 0x102;
-                asm("" : "+r"(off));
+                u32 off = 0x102;
                 p = entry + off;
             }
         } else {
             {
-                register u32 off asm("r3") = 0x102;
-                asm("" : "+r"(off));
+                u32 off = 0x102;
                 p = entry + off;
             }
         }
@@ -127,11 +123,10 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
     {
         u32 flag;
         u32 value;
-        register u16 *bob asm("r1");
+        u16 *bob;
         {
-            register u32 off asm("r1") = 0x102;
-            register u8 *q asm("r0");
-            asm("" : "+r"(off));
+            u32 off = 0x102;
+            u8 *q;
             q = entry + off;
             flag = *q;
         }
@@ -143,14 +138,12 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
             *(u16 *)(sprite + 0x10) = two;
             sprite[7] = 2;
             {
-                register void *fn asm("r1") = GrowthHazard_UpdateCooldown;
-                asm("" : "+r"(fn));
+                void *fn = GrowthHazard_UpdateCooldown;
                 *(void **)(entry + 0x114) = fn;
             }
             *(u16 *)(entry + 0xF4) = zero;
             {
                 u16 *t = (u16 *)(entry + 0x48);
-                asm("" : "+r"(t));
                 bob = t;
             }
             value = 0x20;
@@ -160,23 +153,21 @@ void GrowthHazard_InitEntryFromScript(u8 *input)
             *(u16 *)(sprite + 0x10) = flag;
             sprite[7] = 3;
             {
-                register void *fn asm("r1") = GrowthHazard_UpdateIdle;
-                asm("" : "+r"(fn));
+                void *fn = GrowthHazard_UpdateIdle;
                 *(void **)(entry + 0x114) = fn;
             }
             *(u16 *)(entry + 0xF4) = flag;
             {
                 u16 *t = (u16 *)(entry + 0x48);
-                asm("" : "+r"(t));
                 bob = t;
             }
             value = 0x10;
         }
-        bob[5] = value;
+        bob[5] = (char)value;
     }
     *(u16 *)(entry + 0xF6) = 0;
     {
-        register struct Mgr *m asm("r3") = manager;
+        struct Mgr *m = manager;
         m->count++;
     }
 }

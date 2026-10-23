@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // The original copies p at entry (adds r5, r4) and uses the copy only in the
 // retry branch; r5 is reused for 0xFFFF in the init loop. A plain `q = p` copy
@@ -45,10 +44,11 @@ static inline void ScriptPanel_Retry(struct PollPanel *q)
 // confidence=low: starts multiplayer serial, then waits for a role and retries on timeout.
 s32 ScriptPanel_PollSelection(struct PollPanel *p)
 {
-    register struct PollPanel *q asm("r5") = p;
+    struct PollPanel *q = p;
     s32 i;
     s32 role;
     if (Registry1745_ConsumeStateEntry(p)) {
+        DEBUG_NOP();
         SerialLink_InitMultiplayer();
         for (i = 0; i <= 1; i++) {
             p->buttons[i] = 0;

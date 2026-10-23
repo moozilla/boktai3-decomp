@@ -1,10 +1,9 @@
 #include "global.h"
 
 // confidence=low: approaches the saved interaction position, then holds an energy-consuming action.
-#define Player_UpdateHeldInteraction sub_081432DC
-#define B(n)                         (*(u8 *)(p + (n)))
-#define H(n)                         (*(u16 *)(p + (n)))
-#define S(n)                         (*(s16 *)(p + (n)))
+#define B(n) (*(u8 *)(p + (n)))
+#define H(n) (*(u16 *)(p + (n)))
+#define S(n) (*(s16 *)(p + (n)))
 extern u8 *gUnk_02000710;
 extern const s16 gUnk_086149C4[];
 s32 Player_GetMovementSpeed(void *);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct SceneEventActor {
     u8 unknown0[0x51];
@@ -27,6 +26,7 @@ void Sound_StopSong(u32);
 void SceneVolume_ResetPendingSequence(void *);
 void SceneEventActor_UpdateSongStopTransition(struct SceneEventActor *actor)
 {
+    s16 k2;
     if (actor->restart) {
         actor->restart = 0;
         actor->phase = 0;
@@ -62,21 +62,19 @@ void SceneEventActor_UpdateSongStopTransition(struct SceneEventActor *actor)
                 facing = 0x20;
                 actor->angle = facing;
                 zero = 0;
-                phase = 2;
-                asm("" : "+r"(phase));
+                k2 = 2;
+                phase = k2;
                 shifted = actor->angle + 0x60;
                 shifted >>= 6;
                 facing = 3;
                 facing &= shifted;
                 actor->facing = facing;
                 {
-                    register int sh asm("r0");
-                    register u32 m asm("r1");
+                    int sh;
+                    u32 m;
                     sh = actor->angle + 0x70;
-                    asm("" : "+r"(sh));
                     sh >>= 5;
                     m = 7;
-                    asm("" : "+r"(m));
                     m &= sh;
                     actor->facing8 = m;
                 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 extern u16 gUnk_03005418[];
@@ -20,9 +19,9 @@ static inline s32 sh(s32 v)
 
 void SceneEffectRing_Update(u8 *param)
 {
-    register u8 *p asm("r6") = param;
+    u8 *p = param;
     s16 buf[3];
-    register s16 *out asm("r5") = buf;
+    s16 *out = buf;
     s16 *pos = (s16 *)(p + 0x40);
     s32 x = pos[0], z = pos[2], a, c, y;
     u8 *mode;
@@ -83,5 +82,4 @@ void SceneEffectRing_Update(u8 *param)
     col = p + 0x60;
     Collider_Refresh(col);
     Collider_SetPosition(col, refpos, 0);
-    asm("" ::"r"(p));
 }

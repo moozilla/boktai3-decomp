@@ -38,16 +38,29 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
+static inline void SetChargeParameter(u8 *p)
+{
+    u16 *target = (u16 *)(p + 0xAD6);
+    u32 value = 0x16E;
+    *target = value;
+}
 void Player_ReleaseActionEffectOnExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 void Player_UpdateAttachedEntryPosition(void *);
 s32 Task4E01_GetKind7Value(s32);
 static inline u32 bonus(u8 *p, u32 mask)
 {
-    return *(u32 *)(p + 0x444) & mask;
+    u32 offset;
+    u32 *field;
+    u32 bits;
+    if (!p)
+        return 0;
+    offset = 0x444;
+    field = (u32 *)(p + offset);
+    bits = mask;
+    return *field & bits;
 }
-#ifdef NONMATCHING
-// fuzzy: 87.8%
+// confidence=low: attached task tiers and buffered restart define this charge handler.
 void Player_UpdateAttachedAttackCharge(u8 *p)
 {
     struct BurstA ba;
@@ -55,15 +68,19 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
     u16 *t;
     u16 *r;
     if (Player_ConsumeStateEntry(p)) {
-        HALF(0xC0A) = 0;
-        *(s32 *)(p + 0xC74) = -1;
+        u16 *first = (u16 *)(p + 0xC0A);
+        s32 zero = 0;
+        *first = zero;
+        *(s32 *)(p + 0xC74) = --zero;
         Player_SetPendingCallback(p, Player_ReleaseActionEffectOnExit);
     }
     switch (BYTE(0x458)) {
         case 0:
             if (ANIMATE(0x26)) {
-                HALF(0xC10) = 60;
-                BYTE(0x53A) = 0;
+                u16 *duration = (u16 *)(p + 0xC10);
+                u32 zero = 0;
+                *duration = 60;
+                BYTE(0x53A) = zero;
                 Player_SetActionPhase(p, 1);
             }
             break;
@@ -82,11 +99,11 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
                     Sound_PlaySong(0xD5);
                     goto release;
                 }
-                if (p && bonus(p, 0x10000000))
+                if (bonus(p, 0x10000000))
                     Player_SetActionPhase(p, 4);
                 else
                     Player_SetActionPhase(p, 2);
-                if (!(p && bonus(p, 0x10000000)))
+                if (!(bonus(p, 0x10000000)))
                     Player_SetActionPhase(p, 4);
                 else {
                     if (!Player_SpawnSelectedAttackProjectile(p))
@@ -103,25 +120,34 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
             if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
                 BYTE(0xC0F) = 1;
                 HALF(0x4D2) = 30;
-                HALF(0xAD6) = 0x16E;
+                SetChargeParameter(p);
                 HALF(0xAD8) = 36;
                 Player_SetActionPhase(p, 3);
             }
             goto face;
-        case 3:
-            if (!HELD)
+        case 3: {
+            register u32 inputOffset asm("r2") = 0x348;
+            register u16 **input asm("r0");
+            asm("" : "+r"(inputOffset));
+            input = (u16 **)(p + inputOffset);
+            if (!(**input & 2))
                 goto fire;
             if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
                 BYTE(0xC0F) = 1;
                 HALF(0x4D2) = 30;
-                HALF(0xAD6) = 0x16E;
+                SetChargeParameter(p);
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F5);
                 Player_SetActionPhase(p, 4);
             }
             goto face;
-        case 4:
-            if (!HELD) {
+        }
+        case 4: {
+            register u32 inputOffset asm("r2") = 0x348;
+            register u16 **input asm("r0");
+            asm("" : "+r"(inputOffset));
+            input = (u16 **)(p + inputOffset);
+            if (!(**input & 2)) {
             fire:
                 if (Player_SpawnSelectedAttackProjectile(p))
                     Sound_PlaySong(0x1F6);
@@ -135,6 +161,7 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
         attached:
             Player_UpdateAttachedEntryPosition(p);
             break;
+        }
         case 5:
             ANIMATE(0x28);
             if (PRESSED)
@@ -143,6 +170,9 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
             if (*r) {
                 s32 ang, n;
                 if (*r > 5) {
+                    u32 upper = 0xFFFF0000;
+                    u32 lower = 0xFFFF;
+                    asm("" : : "r"(upper), "r"(lower));
                     ba.a = 0;
                     ba.b = 0;
                     bb.a = 32;
@@ -182,7 +212,3 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
     }
     BYTE(0xAC9) = 4;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateAttachedAttackCharge);
-#endif

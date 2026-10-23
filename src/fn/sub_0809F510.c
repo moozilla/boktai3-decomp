@@ -3,7 +3,6 @@
 #include "scene_actor_control_phase.h"
 
 // confidence=low: hops within the stored home terrain cell.
-#define Crow_HopWithinHomeCell sub_0809F510
 
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];

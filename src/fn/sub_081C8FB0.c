@@ -1,8 +1,9 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #include "state_actor.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.1%
+// fuzzy: 86.3%
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
 
@@ -69,7 +70,11 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
         s32 d1, d2;
 
         diff1 = facing - (s8)Math_Atan2(dx, dz);
-        diff2u = facing - (p->angle + 0x80);
+        {
+            s32 angle = p->angle + 0x80;
+            asm("" : "+r"(angle));
+            diff2u = facing - angle;
+        }
         d1 = (s8)diff1;
         if (d1 < 0)
             d1 = -d1;

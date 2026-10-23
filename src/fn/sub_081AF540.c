@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Vanargand_ProjectEffectOffset sub_081AF540
-struct VanargandEffectVec { s16 x, y, z; };
+struct VanargandEffectVec {
+    s16 x, y, z;
+};
 static inline s32 SignedHalf(s32 value)
 {
     if (value >= 0)

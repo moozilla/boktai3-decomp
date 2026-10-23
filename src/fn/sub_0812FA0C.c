@@ -6,9 +6,8 @@
 
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 84.8%
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.
+#ifdef NONMATCHING
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
 s32 Mod(s32, s32);
@@ -332,7 +331,11 @@ void SceneActorReaction_UpdateRouteReturn(struct SceneActorRegistryResetView *ac
             packet[9] = 0;
             packet[10] = 12;
         }
-        actor->state2A8 = 3;
+        {
+            u32 state = 3;
+            u8 *field = &actor->state2A8;
+            *field = state;
+        }
         actor->phase2A9 = 1;
         actor->behavior2AA = 0;
         actor->counter2AC = result;

@@ -1,7 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.4%
-// CSE reuses the first (u16)v extension for the "< 16" test; the ROM re-extends it there
+// confidence=low: bounces the discard icon before entering consumable discard selection.
+#define PauseInventory_UpdateDiscardBounce sub_08171EFC
 void Sound_PlaySong(u32);
 void PauseInventory_BeginConsumableDiscardSelection(u8 *, u32);
 struct S08171EFC {
@@ -10,7 +10,7 @@ struct S08171EFC {
     u8 padA50[0x26A2 - 0xA50];
     u16 y;
 };
-void sub_08171EFC(struct S08171EFC *s)
+void PauseInventory_UpdateDiscardBounce(struct S08171EFC *s)
 {
     u16 *timer = &s->timer;
     s32 v;
@@ -25,11 +25,9 @@ void sub_08171EFC(struct S08171EFC *s)
             s->y = 104 - ((20 - *timer) >> 3);
         return;
     }
+    asm("" : "+r"(v));
     if ((u16)v < 16)
         s->y = 104;
     else
         PauseInventory_BeginConsumableDiscardSelection((u8 *)s, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08171EFC);
-#endif

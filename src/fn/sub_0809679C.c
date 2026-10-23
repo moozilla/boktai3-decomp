@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: decays saved horizontal route motion before returning to pursuit or rest.
 
 s32 Mod(s32, s32);
@@ -48,10 +47,9 @@ void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *a)
         *(s16 *)(ctx + 0x600) >>= 1;
     }
     if (a->field2B0) {
-        register u32 mask asm("r1") = 0x100;
+        u32 mask = 0x100;
         u16 *p = &a->flags2D4;
         u16 flags;
-        asm("" : : "r"(mask));
         {
             u32 raw = *p & mask;
             flags = (u16)raw;

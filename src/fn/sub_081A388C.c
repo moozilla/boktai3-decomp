@@ -55,7 +55,6 @@ extern struct Pool *gUnk_0200023C;
 struct Entry *EffectPool_FindIdleActiveEntry(void);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void ScaledShadow_Enable(void *);
-#define EffectPool_AllocateEntry sub_081A388C
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);

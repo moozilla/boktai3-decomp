@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 63.1%
-// 23 differing instruction runs; first diff at +0xA (mov sb, r0 vs adds r7, r0, #0)
 struct H {
     u32 lo : 16;
     u32 hi : 16;
@@ -21,8 +18,11 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 s32 Collider_Refresh(u8 *);
 void ScriptCombatActor_OnPassiveColliderContact(void);
 void ScriptCombatActor_ApplyHitReaction(void);
-void sub_08201784(u8 *p)
+// confidence=low: initializes passive and damage-response colliders embedded in the actor.
+#define ScriptCombatActor_InitializeColliders sub_08201784
+void ScriptCombatActor_InitializeColliders(u8 *pArg)
 {
+    u8 *p = pArg;
     struct Z a, b;
     u8 *q = p + 0x6c;
     u16 *v, *r;
@@ -30,7 +30,7 @@ void sub_08201784(u8 *p)
     a.a.hi = 120;
     a.b.lo = 120;
     *(u32 *)&b.a = 0x780000;
-    b.b.lo = 0;
+    *(u32 *)&b.b &= 0xffff0000;
     Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
     Collider_SetCallback(q, ScriptCombatActor_OnPassiveColliderContact, p);
     Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0,
@@ -51,6 +51,3 @@ void sub_08201784(u8 *p)
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08201784);
-#endif

@@ -1,6 +1,5 @@
 #include "global.h"
 #ifdef NONMATCHING
-#define Axe_UpdateOrbitAttack sub_080F79A8
 // fuzzy: 93.3%
 
 // Remaining: polar address reuse, signed RNG/direction loads, collider loop allocation and phase-tail scheduling.

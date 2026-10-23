@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define MotionEntry_UpdatePosition sub_081A4064
 struct MotionVector {
     s16 x, y, z, pad;
 };

@@ -1,4 +1,5 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "engine.h"
 s32 Div(s32, s32);
@@ -71,9 +72,16 @@ static inline u8 HasMode(u8 *p)
         return 1;
     return 0;
 }
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// Remaining differences: heading/vector loads, context offset allocation and pointer reload.
+static inline s32 SpeedBase(u8 *context)
+{
+    register u8 *base asm("r4") = context;
+    u32 offset;
+    register u8 *sample asm("r0");
+    asm("" : "+r"(base));
+    offset = 0x65e;
+    sample = base + offset;
+    return *sample - 2;
+}
 // confidence=low: generic scene actor leap; species ownership is not established.
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
@@ -123,12 +131,21 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             {
                 u32 offset = gUnk_03005308 * 2;
                 u32 random = *(u16 *)(offset + (u32)gUnk_0203B400);
-                s32 base = context[0x65E] - 2;
+                s32 base = SpeedBase(context);
                 speed = base + (random & 3);
             }
         }
-        actor->direction = Math_Atan2(delta.x, delta.z);
-        Polar(&actor->secondaryMotion, actor->direction, speed);
+        {
+            s32 angle = Math_Atan2(delta.x, delta.z);
+            u8 *heading = &actor->direction;
+            asm("" : "+r"(heading));
+            *heading = angle;
+            {
+                register u32 offset asm("r2") = 0x2ec;
+                asm("" : "+r"(offset));
+                Polar((void *)((u8 *)actor + offset), *heading, speed);
+            }
+        }
         *(u16 *)((u8 *)actor + 0x2EE) = 24;
         SceneActorAnimation_SelectEntryFlags((void *)actor, 14,
                                              SceneActor_GetDirectionFlags(actor->direction));
@@ -140,7 +157,3 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             actor->field2B0 = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_LeapTowardTarget);
-#endif

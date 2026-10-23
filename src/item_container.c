@@ -253,13 +253,12 @@ void Trigger_UpdateShake(struct Trigger *p)
             p->position->z = p->baseZ;
         } else {
             const u16 *table = gUnk_0203B400;
-            register u32 random asm("r0");
+            unsigned short random;
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
             random = table[gUnk_03005308];
             {
                 struct SceneVec *position = p->position;
                 random &= 15;
-                asm("" : : "r"(random));
                 position->x = random + p->baseX - 4;
             }
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -268,7 +267,7 @@ void Trigger_UpdateShake(struct Trigger *p)
                 struct SceneVec *position = p->position;
                 random &= 7;
                 position->z = random + ({
-                                  register u32 base asm("r7") = (u16)p->baseZ;
+                                  u32 base = (u16)p->baseZ;
                                   base;
                               }) -
                               4;

@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 struct PhaseEntryView {
     u32 flags;
     u8 pad4[2];
@@ -63,8 +62,9 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         entry->entries[0].x = p->target.x + x;
         entry->entries[0].z = p->target.z + Div((p->target.z - p->saved[i].z) * p->delay, 15);
         entry->entries[0].opacity += 3;
-        if (entry->entries[0].opacity > 63)
+        if (entry->entries[0].opacity > 63) {
             entry->entries[0].opacity = 64;
+        }
     }
     if (!(p->flagsD80 & 1) && --p->delay == 0) {
         u8 *enabled = &p->enabled;
@@ -89,10 +89,9 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         p->colliderFlagsA &= 0xFFFB;
         p->colliderFlagsB &= 0xFFFB;
         {
-            register u32 one asm("r0") = 1;
-            register u32 five asm("r1") = 5;
-            asm("" : "+r"(one));
-            asm("" : "+r"(five));
+            u32 one = 1;
+            u32 five = 5;
+            DEBUG_NOP();
             *enabled = one;
             *mode = five;
             *flags8D = one | *flags8D;

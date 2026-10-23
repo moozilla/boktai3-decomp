@@ -1400,7 +1400,6 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             u32 i = *tm & 7;
             const struct SuspendedOffset *tab = gUnk_0824F504;
             const struct SuspendedOffset *e;
-            asm("" : "+r"(i));
             e = tab + i;
             t->suspendedPosX = 0xdc0 + e->x;
             t->suspendedPosZ = 0xa80 + e->z;

@@ -1,10 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 82.4%
-// Remaining differences: RNG store timing, loop hoisting and recipient-field register allocation.
-// confidence=low: shares Combat_ApplyHitReaction and emits sparks for selected damage flags.
 
-// Remaining differences: RNG stores, loop constants, target-field scheduling and allocation.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
 
@@ -25,6 +20,34 @@ struct HitResult {
     u8 state;
     u16 blocked;
 };
+struct HitActor {
+    u8 pad0[0x40];
+    struct SceneVec position;
+    u8 pad48[0x78];
+    u8 display[12];
+    struct SceneVec origin;
+    struct SceneVec offset;
+    u8 padDC[0x27];
+    u8 mode;
+    u16 reaction;
+    u8 pad106[0x76];
+    s16 hudValue;
+    u8 pad17E[2];
+    s16 damage;
+    u8 pad182[10];
+    s16 flash;
+    u8 pad18E[10];
+    s16 hudX;
+    u8 pad19A[2];
+    u16 damageFlags;
+    s16 hudY;
+    u8 pad1A0[2];
+    s16 hudTime;
+    u8 pad1A4[8];
+    void *hud;
+    u8 pad1B0[8];
+    u32 damageType;
+};
 extern u32 gUnk_03005308;
 extern const struct SceneVec gUnk_0824FE44;
 void Collision_CalculateDamageResponse(void *);
@@ -33,63 +56,66 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-#define H(o) (*(s16 *)(p + (o)))
-#define U(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-static inline u32 RandomSample(const u16 *table)
+static inline void AdjustCoordinate(u16 *coordinate, u32 sample)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    u32 base = *coordinate - 64;
+    *coordinate = base + (sample & 127);
 }
 static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
 {
     u16 *x = (u16 *)&v->x, *y = (u16 *)&v->y, *z = (u16 *)&v->z;
-    u32 sample = RandomSample(table);
-    u32 base = *x - 64;
-    asm("" : "+r"(base));
+    register u32 index asm("r1");
+    u32 sample, base;
+    index = gUnk_03005308;
+    index++;
+    index &= 1023;
+    sample = table[index];
+    base = *x - 64;
     *x = base + (sample & 127);
-    *y = *y + (u8)RandomSample(table);
-    sample = RandomSample(table);
-    base = *z - 64;
-    asm("" : "+r"(base));
-    *z = base + (sample & 127);
+    index = (index + 1) & 1023;
+    *y = *y + (u8)table[index];
+    index = (index + 1) & 1023;
+    gUnk_03005308 = index;
+    AdjustCoordinate(z, table[index]);
 }
-void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit, u8 *p)
+void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
+                                        struct HitActor *p)
 {
     Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
+        register u32 zero asm("r0") = 0;
         hit->damage = 0;
-        hit->state = 0;
+        hit->state = zero;
     } else {
-        H(0x180) = hit->damage;
-        W(0x1b8) = source->damageType;
-        U(0x104) = source->reaction;
+        p->damage = hit->damage;
+        p->damageType = source->damageType;
+        p->reaction = source->reaction;
         if (source->flags & 0x40) {
-            U(0x104) = 0x26;
-            H(0x18c) = 8;
+            p->reaction = 0x26;
+            p->flash = 8;
             Sound_PlaySong(0x211);
-            DamageNumberDisplay_Show(p + 0xc0, H(0x180), 0, p + 0xcc, p + 0xd4, 1);
-            SceneHud_SetTimedState(*(void **)(p + 0x1ac), H(0x17c), H(0x198), H(0x19e),
-                                   p[0x103] == 4, H(0x1a2));
+            DamageNumberDisplay_Show(p->display, p->damage, 0, &p->origin, &p->offset, 1);
+            {
+                register void *hud asm("r8") = p->hud;
+                SceneHud_SetTimedState(hud, p->hudValue, p->hudX, p->hudY, p->mode == 4,
+                                       p->hudTime);
+            }
             if (source->flags & 0x40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
-        if (U(0x19c) & source->flags) {
+        if (source->flags & p->damageFlags) {
             struct SceneVec velocity, position;
-            register const u16 *table asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
-            s32 i = 2;
-            do {
+            s32 i;
+            for (i = 0; i < 3; ++i) {
+                register const u16 *table asm("r3");
                 velocity = gUnk_0824FE44;
-                position = *(struct SceneVec *)(p + 0x40);
+                position = p->position;
+                table = (const u16 *)RANDOM_TABLE_ADDR;
                 RandomizePosition(&position, table);
                 SparkParticle_Spawn(&position, 1, &velocity, 0, 3, 8, 2, 2);
-            } while (--i >= 0);
+            }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_ApplyHitReaction);
-#endif

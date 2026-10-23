@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_object_slot.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
@@ -42,8 +41,7 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
         u8 v = *SceneActorTerrain_GetCell(c) & 15;
         cellField = &obj->b3b;
         {
-            register u32 zero asm("r5") = 0;
-            asm("" : "+r"(zero));
+            u32 zero = 0;
             *cellField = v;
             TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, *cellField, 0xff, zero);
         }
@@ -51,12 +49,11 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
     {
         struct SceneObjSlot *sprite = obj;
         u8 *cf2;
-        if (({
+        if (((({
                 s32 m = *(s32 *)(mgr + 0x34);
                 cf2 = cellField;
-                asm("" : "+r"(cf2));
                 m;
-            }) == 0) {
+            }))) == 0) {
             switch (obj->type) {
                 case 2:
                     AnimData_SelectPaletteBank(mgr + (obj->value * 28 + 0x154), 0xe6);
@@ -120,9 +117,9 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
             obj->b39 = 0;
             obj->b3a = 0;
         } else if (t == 1) {
-            u32 two = 2;
+            u32 two;
             obj->callback = SceneObject_UpdateIdleB;
-            asm("" : "+r"(two));
+            two = 2;
             obj->b39 = two;
             obj->b3a = 0;
         } else {

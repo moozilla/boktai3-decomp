@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 82.9%
+// fuzzy: 85.1%
 // Remaining differences: segment address lifetimes and register allocation.
 struct TrailSegment {
     u8 unknown0[0x1c];
@@ -97,27 +97,27 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
     if (IsInactive(actor))
         return;
     trail = actor->context;
-    if (actor->flags2D0 & 0x100000)
+    if (WordFlag(actor, 0x100000))
         return;
     for (i = 0; i < trail->segmentCount; i++) {
         struct TrailSegment *segment = &trail->segments[i];
         if (TestSegment(segment, 2) && !TestSegment(segment, 1)) {
             s32 height =
                 Height(SceneActorTerrain_GetCellIndex(&segment->position), &segment->position);
-            s32 y = segment->position.y;
+            s32 y = (*(s16 *)((u8 *)trail + i * 296 + 0x3f2));
             if (y != height) {
                 if (y < height) {
                     s32 delta = height - y;
                     if (!NearHeight(delta, delta, 255))
-                        segment->position.y = actor->position.y;
+                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = actor->position.y;
                     else
-                        segment->position.y = height;
+                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = height;
                 } else {
                     s32 delta = height - y;
                     if (Abs(delta) > 256)
-                        segment->position.y = actor->position.y;
+                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = actor->position.y;
                     else
-                        segment->position.y += Div(delta, 10);
+                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) += Div(delta, 10);
                 }
             }
         }

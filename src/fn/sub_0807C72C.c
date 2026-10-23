@@ -3,16 +3,26 @@
 #include "scene_actor_attachment.h"
 #include "actor_attachment_manager.h"
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fuzzy: 89.0%
 /* Remaining differences are register lifetimes and inline mask/address selection. */
 s32 ActorAttachment_IsUnavailable(struct ActorAttachmentSlotView *);
 void *ActorAttachment_CreatePartsSlotWithCount(u32, void *, u32, s32, u32, s16 *, s32, u32, void *,
                                                void *);
 void SceneStimulus_AddTagged(s32, s32, s32, u32, u32, u16);
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *actor,
-                                              u8 inputkind, u8 event, u8 category)
+static inline u32 TestWord(u32 *p, u32 mask)
 {
-    register s32 kind asm("r5") = inputkind;
+    return *p & mask;
+}
+static inline u32 TestHalf(u16 *p, u32 mask)
+{
+    return *p & mask;
+}
+void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *actor,
+                                              u32 inputkind, u32 inputevent, u32 inputcategory)
+{
+    register s32 kind asm("r5") = (u8)inputkind;
+    u8 event = inputevent;
+    u8 category = inputcategory;
     void *group = &actor->group;
     struct ActorAttachmentFollowView *follow = (void *)&actor->id;
     s32 y, z;
@@ -45,11 +55,11 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                 actor->attachment =
                     ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
                 SceneActorAttachment_SelectOffsets(category, 0, &y, &z);
-                if (event == 0 && (actor->flags2D0 & 0x8000))
+                if (event == 0 && TestWord(&actor->flags2D0, 0x8000))
                     event = 3;
-                actor->attachment = ActorAttachment_CreateSpriteSlot(event, &follow->anchor,
-                                                                     (void *)follow->identity, y, z,
-                                                                     category, actor, follow);
+                *(void **)((u8 *)group + 0xA0) = ActorAttachment_CreateSpriteSlot(
+                    event, &follow->anchor, (void *)follow->identity, y, z, category, actor,
+                    follow);
                 SceneActorEffect_PlayCategorySoundIfEnabled(kind, event, category,
                                                             *((u8 *)actor + 0x1E6));
                 if (event == 0 || event == 3)
@@ -58,7 +68,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                                             (u16)follow->identity);
                 break;
             case 1:
-                if (actor->flags2D4 & 2)
+                if (TestHalf(&actor->flags2D4, 2))
                     break;
                 actor->attachment =
                     ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Target {
     u8 pad[8];
@@ -21,14 +20,12 @@ u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
     if (target) {
         if (target->player <= 3) {
             struct PlayerFlags *player = gUnk_02000580[target->player];
-            register u32 mask asm("r1") = 0x20000;
-            asm("" : "+r"(mask));
+            u32 mask = 0x20000;
             if (player->flags & mask)
                 return 1;
             {
-                register u32 mask8 asm("r0") = 8;
+                u32 mask8 = 8;
                 u32 flags = gUnk_02000560[target->player];
-                asm("" : "+r"(mask8));
                 if (flags & mask8)
                     return 1;
             }

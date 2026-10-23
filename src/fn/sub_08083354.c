@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 98.4% (31 differing bytes after pinning; remaining: zero-index registers)
+// fuzzy: 98.4%
+// Open: two signed-load zero-index scratch registers use r1 instead of r6.
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "player.h"
@@ -121,19 +122,20 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             SceneActorControl_ResetCollisionPhase(actor);
             zero = magnitude;
             {
-                u32 *source = &zero;
+                register u32 *source asm("r0") = &zero;
                 {
-                    void *destination = motion;
+                    register void *destination asm("r1") = motion;
+                    asm("" : "+r"(source), "+r"(destination));
                     CpuSet(source, destination, 0x05000002);
                 }
             }
             SceneActorControl_StartPositionCurve(
                 actor, (const struct ContactPosition *)&gUnk_02000580[0]->position);
             {
-                u32 phase = 2;
-                u32 stateOffset = 0x2A8;
-                u32 phaseOffset;
-                u32 behaviorOffset;
+                register u32 phase asm("r1") = 2;
+                register u32 stateOffset asm("r2") = 0x2A8;
+                register u32 phaseOffset asm("r3");
+                register u32 behaviorOffset asm("r1");
                 u8 *field = (u8 *)actor + stateOffset;
                 *field = magnitude;
                 phaseOffset = 0x2A9;
@@ -144,15 +146,16 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
                 *(u32 *)((u8 *)actor + stateOffset) = magnitude;
                 phaseOffset += 8;
                 {
-                    u8 *field = (u8 *)actor + phaseOffset;
+                    register u8 *field asm("r1") = (u8 *)actor + phaseOffset;
                     *field = 1;
                 }
             }
         }
     }
     {
-        u32 offset = 0x2AC;
-        u32 *counter = (void *)((u8 *)actor + offset);
+        register u32 offset asm("r6") = 0x2AC;
+        register u32 *counter asm("r1") = (void *)((u8 *)actor + offset);
+        asm("" : "+r"(offset), "+r"(counter));
         ++*counter;
     }
 }

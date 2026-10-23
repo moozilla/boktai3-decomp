@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Ratatosk_UpdateSunOrbPlacement sub_081F8600
 struct RatatoskPosition {
     u32 xy, z;
 };

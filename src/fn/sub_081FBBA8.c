@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneParticles_SpawnAtPosition sub_081FBBA8
 #include "contact_swarm.h"
 struct Particle {
     u32 age;

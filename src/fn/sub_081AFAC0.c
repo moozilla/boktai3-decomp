@@ -3,7 +3,6 @@
 // fuzzy: 97.1%
 // Parameter-save order and the first signed-load scratch still differ.
 // MATCHING_CONCESSION: register-pinning
-#define ActorStatus_InitializeContact sub_081AFAC0
 #include "global.h"
 
 s32 Math_Atan2(s32, s32);

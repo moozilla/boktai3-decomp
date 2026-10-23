@@ -1,5 +1,4 @@
 #include "global.h"
-#define Armor_SelectTimedAttack sub_08186EB4
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;

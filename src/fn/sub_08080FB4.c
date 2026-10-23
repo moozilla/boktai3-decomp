@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -62,8 +61,9 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     s32 values[8];
     struct ScriptUtilityArguments arguments;
     u16 script;
-    if (!SceneActorReaction_TakePrepared(actor))
+    if (!SceneActorReaction_TakePrepared(actor)) {
         return;
+    }
     if (IsPrimary(actor)) {
         {
             struct SceneActorRegistryControl *control = &actor->group.control;
@@ -98,12 +98,12 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     actor->field2B0 = 1;
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
-        register u32 offset asm("r4") = 0;
+        u32 offset = 0;
         values[0] = *(s16 *)((u8 *)&actor->position + offset);
         values[1] = actor->position.y;
         values[2] = actor->position.z;
         offset = 0x1FC;
-        values[3] = *(s32 *)((u8 *)actor + offset);
+        values[3] = *((s32 *)(((u8 *)actor) - (-offset)));
         values[4] = *(s32 *)((u8 *)actor + 0x200);
         values[5] = *(s32 *)((u8 *)actor + 0x204);
         offset += 0xE4;
@@ -112,17 +112,18 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         arguments.count = 8;
         arguments.values = values;
         /* Keep the payload offset live through argument construction. */
-        asm("" : : "r"(offset));
         Script_Call(script, &arguments);
     }
-    if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
+    if ((!Flag(actor, 0x4000, 0x2D4)) && (((u32)(actor->category - 11)) > 2)) {
         GameState_SetEventFlag(
             BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+    }
     actor->fieldAA = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
-    if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if ((!Test(gUnk_030053F4, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+    }
     ActorShadow_Disable((u8 *)actor + 0x320);
     switch (actor->category) {
         case 4:

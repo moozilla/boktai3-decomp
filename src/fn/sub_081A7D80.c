@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScenePanel_ApplyPairTransition sub_081A7D80
 struct Transition {
     u8 pad0[0xAE];
     u8 mode;

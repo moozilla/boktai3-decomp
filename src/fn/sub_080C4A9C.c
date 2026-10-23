@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* Golem_RestoreRoute: unless flags2D4 bit 0x100 is set, restores after a delay, records the follow-up control (chase when flags2D4 & 0x80, else the entry target) and routes back toward the chased object via the route point (provisional name) */
 #include "scene_actor_chase.h"
@@ -19,10 +18,11 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
     u32 chasing;
 
     {
-        register u32 mask asm("r1") = 0x100;
+        unsigned short mask = 0x100;
         flags = &actor->flags2D4;
-        if ((u16)(*flags & mask))
+        if ((u16)((*flags) & mask)) {
             return;
+        }
     }
     Chase_SetState(actor, 3, 1, 0);
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define Ratatosk_UpdateParticlePool sub_081FB8A0
 #include "contact_swarm.h"
 struct Particle {
     u32 age;

@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 85.7%
 // foundry draft (worker best 83.6%); what differs is mostly register allocation and instruction order
 struct SceneStatusIndicatorSlot {
     u8 unknown0[0x2A];
@@ -28,7 +27,11 @@ s32 SceneStatusIndicator_UpdateManager(struct SceneStatusIndicatorManager *manag
     u32 *flags;
     void **callbacks;
     u8 *active;
-    if (manager->allocated) {
+    register u32 offset asm("r2") = 0x25C;
+    register u32 *initial asm("r0");
+    asm("" : "+r"(offset));
+    initial = (u32 *)((u8 *)manager + offset);
+    if (*initial) {
         i = 0;
         flags = (u32 *)((u32)manager + 0x25C);
         callbacks = gUnk_08610758;
@@ -44,6 +47,3 @@ s32 SceneStatusIndicator_UpdateManager(struct SceneStatusIndicatorManager *manag
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneStatusIndicator_UpdateManager);
-#endif

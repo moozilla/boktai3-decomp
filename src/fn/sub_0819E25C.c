@@ -27,7 +27,6 @@ static inline u8 TakeFlag(struct ActorHold *p)
     }
     return FALSE;
 }
-#define ActorAction_FinishRecoveryAnimation sub_0819E25C
 void ActorAction_FinishRecoveryAnimation(struct ActorHold *arg)
 {
     struct ActorHold *p = arg;

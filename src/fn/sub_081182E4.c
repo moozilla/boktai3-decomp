@@ -4,7 +4,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 81.3%
+// fuzzy: 86.6%
 // Reset-action pointer lifetimes, motion temporaries and register allocation still differ.
 
 struct Obj {
@@ -241,34 +241,40 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
     }
     {
         s32 *vy = &self->vy, *bias = &self->unkC0;
+        s32 *py, *px, *idy, *idz;
         h = *vy + *bias;
         if (h > 0xF000)
             h = 0xF000;
 
         self->y += 0x200;
+        py = &self->y;
         if (self->steps > 0) {
             self->x += self->dx;
             self->dx += Div(-self->dx, self->steps);
             self->dy += Div(-self->dy, self->steps);
             self->dz += Div(-self->dz, self->steps);
             self->steps--;
+            px = &self->x;
+            idy = &self->dy;
+            idz = &self->dz;
         } else {
             Memory_Clear(&self->dx, 0x10);
+            px = &self->x;
+            idy = &self->dy;
+            idz = &self->dz;
         }
         Actor_ClampMovementSpeed(self);
 
         {
-            s32 *pprevZ, *pprevX, *pvz, *px, *py;
+            s32 *pprevZ, *pprevX, *pvz;
             s32 lim;
-            self->outX = h + self->x - self->prevX;
-            self->outY = self->y + self->dy;
-            self->outZ = self->vz + self->dz;
-            dx = (self->x - self->prevX) >> 12;
+            self->outX = *px + h - self->prevX;
+            self->outY = *py + *idy;
+            self->outZ = self->vz + *idz;
+            dx = (*px - self->prevX) >> 12;
             dz = (self->z - self->prevZ) >> 12;
             lim = 0x3000;
-            px = &self->x;
             pprevX = &self->prevX;
-            py = &self->y;
             pprevZ = &self->prevZ;
             pvz = &self->vz;
             if (h > lim)

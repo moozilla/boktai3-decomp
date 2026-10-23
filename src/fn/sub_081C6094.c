@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 extern u16 gUnk_03005260[];
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -18,18 +17,22 @@ void sub_081C6094(u8 *p)
         sub_081C62B4(p);
         ChallengeResult_SetState(p, TimeResult_UpdateResultHold);
     } else {
-        register u8 *resource asm("r9") = p + 0x38;
+        u8 *resource = p + 0x38;
         const u16 *table = gUnk_0203B400;
         u8 *digit = p + 0x118;
         s32 i;
         for (i = 0; i < 6; i++) {
             s32 r;
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-            r = table[gUnk_03005308];
+            do {
+                r = table[gUnk_03005308];
+            } while (0);
             ChallengeResult_LoadDigit(digit, resource, sub_08249350(r >> 4, 10));
             digit += 0x60;
         }
-        if (*(s32 *)(p + 0x370) & 1)
+
+        if ((*((s32 *)(p + 0x370))) & 1) {
             Sound_PlaySong(0x273);
+        }
     }
 }

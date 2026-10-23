@@ -211,6 +211,9 @@ address,evidence
 080F3638,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties
 080F469C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080F636C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+080FB4EC,Function in the listed extent of sub_080FB30C; push after its literal pool; retained assembly
+080FB620,Function after the bx and literal pool following 080FB4EC's jump table; retained assembly
+080FC1F8,Function in the listed extent of sub_080FC094; push after its bx r0 return and padding; retained assembly
 080FFDD0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080FFF74,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08100388,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -499,10 +502,13 @@ address,evidence
 081A4ED8,Hidden Task_Kill wrapper for gUnk_02000244
 081A6458,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081A645C,Code following a reviewed gap leaf; retained assembly
+081A6C24,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; retained assembly
+081A6D0C,Function after 081A6C24's literal pool; independent push and bl; retained assembly
 081AB904,Hidden tail after Vanargand_RunDefeatSequence
 081ADBB8,Hidden raw-tail function
 081AF738,Hidden raw-tail function
 081B0244,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+081B512C,Function in the listed extent of sub_081B4DA4; push after its pop and bx r0 return; retained assembly
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
 081B7614,Hidden raw-tail function (retained)
 081B8104,Hidden raw-tail function
@@ -582,8 +588,10 @@ address,evidence
 081F336C,Hidden raw-tail function
 081F339C,Hidden raw-tail function
 081F33CC,Hidden raw-tail function
-081F3414,Hidden tail after SceneDistance_ClearLinkedEntry
+081F3414,Independent nearest-distance search
+081F3450,Independent sibling minimum-weight search retained in assembly
 081F348C,Hidden tail function
+081F84E4,Independent raw-tail callback after orbit attack retained in assembly
 081FB7D8,Hidden counter difference with wrap (retained)
 081FB808,Hidden leaf returning 0
 081FB80C,Hidden velocity integrate step
@@ -812,6 +820,7 @@ address,evidence
 0823C8FC,Hidden raw-tail function (retained)
 0824000C,Hidden tail after Player_UpdateSolarBombCharge
 08241714,Hidden tail after PlayerCue_UpdateOffsetBurst
+082418CC,Separate entry after the complete 08241714 return and literal pool; full prologue and independent return
 082429AC,Hidden tail after Player_UpdateLinkKind
 082436EC,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 08243704,Script command (actor i must exist; reads keyword T); first of two matched functions in the reviewed 08243704-082437A8 span

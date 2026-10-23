@@ -2,22 +2,39 @@
 
 s32 Div(s32, s32);
 
+static inline u32 FullState(u8 *p)
+{
+    if (!p)
+        return 0;
+    if (*(u16 *)(p + 0x538) != 0) {
+        if (*(u16 *)(p + 0x534) == 1)
+            return 1;
+    }
+    return 0;
+}
+static inline u32 FullFlag(u8 *p)
+{
+    u32 *field;
+    u32 bits;
+    if (!p)
+        return 0;
+    field = (u32 *)(p + 0x448);
+    bits = 0x40;
+    if (*field & bits)
+        return 1;
+    return 0;
+}
 #ifdef NONMATCHING
-// fuzzy: 83.3%
-// Open: the original keeps a redundant second null check of p (inlined macro) before the flag test.
+// fuzzy: 93.0%
+// Remaining differences: boolean materialization belongs to the flag predicate rather than the state predicate.
 
-s32 sub_0823C424(u8 *p)
+// confidence=low: flags and active modifiers choose and shorten the linked action delay.
+#define Player_ComputeLinkedActionDelay sub_0823C424
+s32 Player_ComputeLinkedActionDelay(u8 *p)
 {
     s32 n, t;
-    if (p != 0) {
-        if (*(u16 *)(p + 0x538) != 0 && *(u16 *)(p + 0x534) == 1) {
-            goto full;
-        }
-        t = (p != 0 && (*(u32 *)(p + 0x448) & 0x40)) ? 1 : 0;
-        if (t != 0) {
-            goto full;
-        }
-    }
+    if (FullState(p) || FullFlag(p))
+        goto full;
     n = Div(0, 100);
     if (n > 16) {
     full:

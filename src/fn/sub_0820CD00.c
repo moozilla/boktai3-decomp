@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.6%
-// Remaining differences: orientation switch range guard, animation pointer lifetimes and defined success return.
+// fuzzy: 94.7%
+// Remaining differences: orientation range guard and later address/allocation ordering.
 #include "global.h"
 #define SCREAMER_TEMP     "r2"
 #define SCREAMER_FIRST    "r2"
@@ -71,6 +71,8 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
                 break;
             case 2:
             case 3:
+                p->f1D8 = 1;
+                break;
             default:
                 p->f1D8 = 1;
                 break;
@@ -124,12 +126,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1E0 = 1;
         Anim_SetSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 8);
     }
-    {
-        register u32 allocationToken asm("r0");
-        asm("" : "=r"(allocationToken));
-        Screamer_StepAnimation(p);
-        asm("" : : "r"(allocationToken));
-    }
+    Screamer_StepAnimation(p);
     if (!p->f1F6)
         Screamer_InitColliders(p);
     if (!p->f1D8)
@@ -153,9 +150,9 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1FC = p->f1DA * p->f1DA;
     else
         p->f1FC = p->f1DA;
-    // The creator consumes the sign of the incidental ROM return word.
-    return 0;
+    // The ROM leaves its incidental return word in r0.
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Screamer_InitFromScript);
 #endif

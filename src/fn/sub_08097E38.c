@@ -93,7 +93,6 @@ static inline void ZeroState(struct SceneActorRegistryResetView *actor, u32 beha
     actor->counter2AC = zero;
     actor->field2B1 = 1;
 }
-#define Ghost_ReactToPlayerMovement sub_08097E38
 void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
 {
     struct GhostPlayerReaction *state;

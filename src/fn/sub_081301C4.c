@@ -5,9 +5,6 @@
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-// Remaining differences: state/control offset reuse, vector-store allocation, and packet zeros.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -46,7 +43,8 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     u8 *group = (u8 *)&actor->group;
     u8 result;
     u32 *savedFlags;
-    Chase_TakeArrived(actor);
+    if (Chase_TakeArrived(actor)) {
+    }
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
     result = sub_0812F3CC(actor);
@@ -72,11 +70,18 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
             u16 *route = *(u16 **)(group + 0x7c);
             p->x = route[0];
             p->z = route[1];
-            savedFlags = &actor->flags2CC;
-            asm("" : "+r"(savedFlags));
-            p->y = Chase_Height(p);
+            {
+                s32 x = p->x >> 8;
+                s32 z = p->z >> 8;
+                savedFlags = &actor->flags2CC;
+                p->y = Chase_HeightAt(Chase_CellIndex(x, z), p);
+            }
         }
-        target.y = actor->position.y;
+        {
+            register u32 height asm("r1") = (u16)actor->position.y;
+            asm("" : "+r"(height));
+            target.y = height;
+        }
         Chase_TryRoute(actor, *(void **)(group + 0x1fc), &actor->position, &target);
         (*(struct ContactPosition **)(group + 0x200))->pad = 1;
         if (!(u8)SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
@@ -98,6 +103,3 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     }
     actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateRouteRecovery);
-#endif

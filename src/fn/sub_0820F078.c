@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.3%
+// fuzzy: 86.7%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
 
 #define Projectile_Spawn Projectile_SpawnFromConfig
@@ -44,7 +44,7 @@ static inline void vector(struct OrangeSpinePosition *p, s32 angle, s32 magnitud
 static inline void add(struct OrangeSpinePosition *out, struct OrangeSpinePosition *a,
                        struct OrangeSpinePosition *b)
 {
-    out->x = b->x + a->x;
+    out->x = a->x + b->x;
     out->y = a->y + b->y;
     out->z = b->z + a->z;
 }

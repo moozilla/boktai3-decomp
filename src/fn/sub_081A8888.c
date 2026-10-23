@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#define Vanargand_UpdateTimedAlternateTransition sub_081A8888
-
 /* Selects the next transition after the active timer passes 120. */
 struct VanargandTransition {
     u8 pad0[0x9C];

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -34,24 +33,24 @@ void sub_08235E20(struct SweepSprite2 *p, void *anim)
         p->active = 0;
         return;
     }
-    if (p->timer == 6)
+    if (p->timer == 6) {
         SpriteDrawable_SelectTileFrame(p, anim, p->frame + 1);
+    }
     if (p->timer > 3) {
         p->rise++;
-        if (p->timer > 8)
+        if (p->timer > 8) {
             p->turn--;
+        }
     }
     p->direction += p->turn;
     {
         u32 force = p->speed;
-        register s32 delta asm("r4") = scale(gUnk_086149C4[(p->direction + 64) & 255] * force);
-        asm("" : "+r"(delta));
+        s32 delta = scale(force * gUnk_086149C4[(p->direction + 64) & 255]);
         p->x = p->baseX + delta;
     }
     {
         u32 force = p->speed;
-        register s32 delta asm("r1") = scale(gUnk_086149C4[p->direction] * force);
-        asm("" : "+r"(delta));
+        s32 delta = scale(force * gUnk_086149C4[p->direction]);
         p->z = p->baseZ + delta;
     }
     p->y += p->rise;

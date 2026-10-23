@@ -1,10 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// Open: the original sets the zero local (movs r4, #0) before the strh value
-// register (movs r2, #0) after computing &p[0x6f8]; this draft emits r2 first.
-
 typedef struct Pos8 {
     u32 a, b;
 } Pos8;
@@ -30,7 +26,8 @@ static inline s32 LocalPlayer(void)
 }
 
 // confidence=low: initializes a link player actor: shadow, effects and state bytes.
-void sub_0823A3CC(u8 *p)
+#define LinkPlayer_InitializeActor sub_0823A3CC
+void LinkPlayer_InitializeActor(u8 *p)
 {
     Pos8 *pos;
     s32 local;
@@ -38,7 +35,12 @@ void sub_0823A3CC(u8 *p)
     u32 four;
     sub_08232264(p + 0x5b8, pos = (Pos8 *)(p + 0xac), 0, 0, 1);
     *(Pos8 *)(p + 0x6f0) = *pos;
-    *(u16 *)(p + 0x6f8) = zero = 0;
+    {
+        u16 *dest = (u16 *)(p + 0x6F8);
+        zero = 0;
+        asm("" : "+r"(zero));
+        *dest = 0;
+    }
     *(u16 *)(p + 0x6fa) = 0;
     *(u16 *)(p + 0x6fc) = 0;
     Shadow_Initialize(p + 0x700, p + 0x6f0, 0);
@@ -75,6 +77,3 @@ void sub_0823A3CC(u8 *p)
     gUnk_02000590 = 0;
     p[0x4f3] = 0xff;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823A3CC);
-#endif

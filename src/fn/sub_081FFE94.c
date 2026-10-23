@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
 struct HomingVec {
     s16 x, y, z, pad;
 };
@@ -187,7 +186,6 @@ static inline void StepSequence(struct HomingSprite *sprite, struct HomingSequen
     }
 }
 
-// fuzzy: 98.0%
 s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *position)
 {
     struct HomingManager *m = gUnk_020005F4;
@@ -259,13 +257,26 @@ s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *positi
         *second = 0;
     Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
     StepSequence(&p->sprite, &p->sequence);
-    p->sprite.flags &= ~1;
-    Sprite_LinkToList(&p->sprite, 0);
-    p->sprite.priority = 2;
-    m->activeMask |= 1 << index;
+    {
+        register u32 offset asm("r2") = 0x10c;
+        struct HomingSprite *sprite;
+        asm("" : "+r"(offset));
+        sprite = (void *)((u8 *)p + offset);
+        sprite->flags &= ~1;
+        Sprite_LinkToList(sprite, 0);
+    }
+    {
+        register u32 offset asm("r3") = 0x113;
+        register u8 *priority asm("r1");
+        asm("" : "+r"(offset));
+        priority = (u8 *)p + offset;
+        *priority = 2;
+    }
+    {
+        u32 bit = 1 << index;
+        register struct HomingManager *held asm("r4") = m;
+        held->activeMask |= bit;
+    }
     m->count++;
     return index;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", HomingProjectile_Spawn);
-#endif

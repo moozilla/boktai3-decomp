@@ -201,6 +201,9 @@ address,isa,evidence,replacement_end
 080F3638,thumb,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties,080F3650
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
+080FB4EC,thumb,Function in the listed extent of sub_080FB30C; push after its literal pool; retained assembly,
+080FB620,thumb,Function after the bx and literal pool following 080FB4EC's jump table; retained assembly,
+080FC1F8,thumb,Function in the listed extent of sub_080FC094; push after its bx r0 return and padding; retained assembly,
 080FFDD0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFDD4
 080FFF74,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFF78
 08100388,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810038C
@@ -348,6 +351,7 @@ address,isa,evidence,replacement_end
 0814A7CC,thumb,Player attack power wrapper: Player_CalculateBaseAttackPower(p 0); raw span after it,0814A7D8
 0814B02C,thumb,Player: folds an angle into heading/side bytes 0x3A2/0x3A3; raw span,0814B078
 0814CF2C,thumb,Player tether phase step: sound/animation on phase 0 and control flags 5 on phases 2-3; raw span,0814CFC0
+08152C3C,thumb,Independent push and stack allocation after recoil callback return and literal pool; ends at next cue entry,08153224
 08156C8C,thumb,Hidden player helper in the raw tail after Player_StopMovementEffects (restore camera follow if 0x4B6 set),08156CAC
 0815849C,thumb,Hidden player per-frame update in the raw tail after Player_UpdateInteractionHoverDisplay,08158588
 08158754,thumb,Hidden player per-frame update in the raw tail after Player_SynchronizeInteractionDisplay,08158848
@@ -477,10 +481,13 @@ address,isa,evidence,replacement_end
 081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
+081A6C24,thumb,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; retained assembly,
+081A6D0C,thumb,Function after 081A6C24's literal pool; independent push and bl; retained assembly,
 081AB904,thumb,Hidden tail after Vanargand_RunDefeatSequence,081ABA64
 081ADBB8,thumb,Hidden raw-tail function,081ADBF8
 081AF738,thumb,Hidden raw-tail function,081AF76C
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
+081B512C,thumb,Function in the listed extent of sub_081B4DA4; push after its pop and bx r0 return; retained assembly,
 081B7614,thumb,Hidden raw-tail function (retained),
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
@@ -555,8 +562,10 @@ address,isa,evidence,replacement_end
 081F336C,thumb,Hidden raw-tail function,081F339C
 081F339C,thumb,Hidden raw-tail function,081F33CC
 081F33CC,thumb,Hidden raw-tail function,081F33F0
-081F3414,thumb,Hidden tail after SceneDistance_ClearLinkedEntry,
+081F3414,thumb,Independent nearest-distance search with own push and pop-bx followed by literal at 081F344C,081F3450
+081F3450,thumb,Independent sibling search with own push and pop-bx followed by literal at 081F3488,081F348C
 081F348C,thumb,Hidden tail function,081F34C8
+081F84E4,thumb,Independent raw-tail callback with push at 081F84E4 and pop-bx before final literals,081F8600
 081FB7D8,thumb,Hidden raw-tail function: wrapped counter difference,081FB808
 081FB808,thumb,Hidden leaf returning 0,081FB80C
 081FB80C,thumb,Hidden velocity integrate step,081FB828
@@ -778,6 +787,7 @@ address,isa,evidence,replacement_end
 0823C8FC,thumb,Hidden raw-tail function (retained),
 0824000C,thumb,Hidden tail after Player_UpdateSolarBombCharge,
 08241714,thumb,Hidden tail after PlayerCue_UpdateOffsetBurst,
+082418CC,thumb,Separate entry after the complete 08241714 return and literal pool; full prologue and independent return,
 082429AC,thumb,Hidden tail after Player_UpdateLinkKind,
 082436EC,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08243704
 08243704,thumb,Script command (actor i must exist; reads keyword T); first of two functions in the reviewed 08243704-082437A8 span,0824372C

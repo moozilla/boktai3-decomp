@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -33,7 +32,8 @@ void Ratatosk_FireTrackingShot(struct Actor *p, struct Vec *position, u32 parame
     u8 params[0x58];
     struct PackedVec offset;
     struct Vec spawn;
-    register struct Actor *p2 asm("r8") = p;
+    struct Actor *p2 = p;
+    s8 k2 = 5;
     s32 direction = 0;
     switch (p2->facing) {
         case 0:
@@ -46,7 +46,7 @@ void Ratatosk_FireTrackingShot(struct Actor *p, struct Vec *position, u32 parame
             break;
     }
     Projectile_InitParameters(params);
-    Projectile_SetLaunchParameters(params, 0, parameter, (direction + 5) << 5, 24);
+    Projectile_SetLaunchParameters(params, 0, parameter, (direction + k2) << 5, 24);
     Projectile_SetHomingParameters(params, 300, p->target, 1);
     Projectile_SetSpriteParameters(params, 0x8e5a, 0, 499);
     Projectile_SetScriptProcedure(params, 0x4363, 3);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 struct NamedObjectVector {
@@ -64,12 +63,13 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             object->flags = mask | object->flags;
         }
         {
-            register u32 f asm("r2");
-            register u32 v asm("r0");
+            u32 f;
+            u32 v;
             u8 *p = (u8 *)gUnk_02000580[0] + 0x701;
             f = *p;
-            asm("" : "+r"(f));
-            v = 1 | f;
+            do {
+                v = 1 | f;
+            } while (0);
             *p = v;
         }
     } else if (manager->playerName == object->name) {

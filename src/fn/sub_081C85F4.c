@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.9%
-// foundry draft (worker best 81.5%); what differs is mostly register allocation and instruction order
 struct S {
     u8 f0[1];
     u8 b1;
@@ -28,6 +25,20 @@ s32 DisplayAnimation_SetPalette(void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 s32 __divsi3(s32, s32);
 void sub_081FED40(s32);
+static inline s32 Interpolate(s32 start, s32 end, s32 tick, s32 duration)
+{
+    s32 delta;
+    if (tick <= 0)
+        return start;
+    if (tick >= duration)
+        return end;
+    delta = __divsi3((s32)((u32)(end - start) << 8) * tick, duration);
+    if (delta >= 0)
+        delta >>= 8;
+    else
+        delta = -(-delta >> 8);
+    return start + delta;
+}
 void StateActor_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
 {
     s32 *base20 = (s32 *)((u8 *)p + 0x20);
@@ -83,53 +94,16 @@ void StateActor_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
     switch (p->b18) {
         case 0: {
             s32 color;
-            s16 base;
+            s32 base;
             s32 hi;
             s32 r2;
             if (a2 > 0x77)
                 goto finalize;
-            if (a2 > 0)
-                goto colorUpper;
-            color = 0x40;
-            goto colorDone;
-        colorUpper:
-            if (a2 < 0x78)
-                goto colorCompute;
-            color = 0;
-            goto colorDone;
-        colorCompute: {
-            s32 t = a2 * (s32)0xFFFFC000;
-            t = __divsi3(t, 0x78);
-            if (t < 0)
-                t = -(-t >> 8);
-            else
-                t = t >> 8;
-            color = t + 0x40;
-        }
-        colorDone:
+            color = Interpolate(0x40, 0, a2, 0x78);
             DisplayAnimation_SetPalette(p->d4, color, color, 0);
             base = p->h56;
             hi = base + 0x40;
-            if (a2 > 0)
-                goto posUpper;
-            r2 = base;
-            goto posDone;
-        posUpper:
-            if (a2 < 0x78)
-                goto posCompute;
-            r2 = hi;
-            goto posDone;
-        posCompute: {
-            s32 d = hi - base;
-            d = d << 8;
-            d = __divsi3(d * a2, 0x78);
-            if (d < 0)
-                d = -(-d >> 8);
-            else
-                d = d >> 8;
-            r2 = base + d;
-        }
-        posDone:
+            r2 = Interpolate(base, hi, a2, 0x78);
             p->h6a = r2;
             break;
         finalize:
@@ -151,6 +125,3 @@ void StateActor_RunPaletteFlashSequence(u32 a, struct S *p, s32 a2)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StateActor_RunPaletteFlashSequence);
-#endif

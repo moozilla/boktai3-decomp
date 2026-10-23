@@ -4,7 +4,7 @@
 // confidence=low: resumes pursuit from the route point, with a delayed control transition.
 
 #ifdef NONMATCHING
-// fuzzy: 89.9%
+// fuzzy: 90.0%
 // Still differs in turn-loop allocation, PRE stack slots, terrain temporaries, and flag-load order.
 #include "scene_actor_chase.h"
 
@@ -12,7 +12,7 @@ void SceneActor_UpdateDirectionalAnimation(void);
 
 struct MummyPursuitContext {
     u8 unknown0[0x6F2];
-    u16 flags6F2;
+    s16 flags6F2 : 16;
 };
 struct MummyDelayedControl {
     u8 unknown0[8];
@@ -157,6 +157,7 @@ void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_ResumePlayerPursuit);
 #endif

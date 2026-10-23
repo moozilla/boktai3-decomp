@@ -1,9 +1,8 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define Hresvelgr_EmitRandomMotionBurst sub_081A0EA4
-#define gMotionRandomIndex              gUnk_03005308
-#define gMotionRandomTable              gUnk_0203B400
+#define gMotionRandomIndex gUnk_03005308
+#define gMotionRandomTable gUnk_0203B400
 typedef struct MotionDelta {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } MotionDelta;

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -61,7 +60,7 @@ static inline void SetCallback(struct MotionActor *p, void (*callback)(void), u3
 }
 void MotionActor_DispatchRequestedState(struct MotionActor *actor)
 {
-    register struct MotionActorState *state asm("r6");
+    struct MotionActorState *state;
     state = &actor->state;
     actor->flags = 0;
     if (TestActorFlags(actor, 4)) {
@@ -69,13 +68,16 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
         s32 mask = ~7;
         u16 zero;
         mask &= *flags;
-        zero = 0;
+        do {
+            zero = 0;
+        } while (0);
         *flags = mask;
         SetCallback(actor, sub_08116E44, zero);
         {
             u32 mask = 0x800;
-            if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
+            if (!((gUnk_030053F4 | gUnk_030053F0) & mask)) {
                 StageIconDisplay_Create(1, 0, 0, actor);
+            }
         }
         state->mode = zero;
         state->pending = zero;
@@ -93,6 +95,7 @@ void MotionActor_DispatchRequestedState(struct MotionActor *actor)
         }
     }
     Glove_DispatchCommands(actor);
-    if (!IsUpdated(actor))
+    if (!IsUpdated(actor)) {
         ActorStats_ApplyPendingIncrement(state);
+    }
 }

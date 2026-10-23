@@ -1,11 +1,28 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.2%
 struct Vec {
     s16 x, y, z, pad;
 };
-extern const u16 gUnk_0203B400[];
+struct ScriptCombatActor {
+    u8 unknown0[0x1c];
+    struct Vec origin;
+    u8 unknown24[0x1c];
+    struct Vec position;
+    u8 unknown48[0x114];
+    u32 (*update)(void *);
+    u8 animation[0x10];
+    s32 attackDistance;
+    s16 attackA, attackB, attackC;
+    u8 unknown17A[10];
+    u16 timer;
+    u8 unknown186[8];
+    u16 duration;
+    s16 enabled;
+    u8 unknown192[4];
+    u16 phase;
+    u8 unknown198[0x34];
+    void *sequence;
+};
 extern u32 gUnk_03005308;
 struct Vec *Player_GetEffectivePosition(u32);
 s32 Mod(s32, s32);
@@ -19,69 +36,96 @@ void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
 void Projectile_SpawnFromConfig(void *, void *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 u32 ScriptCombatActor_TryProjectileAttack(void *);
-#define H(off) (*(s16 *)(p + (off)))
-#define U(off) (*(u16 *)(p + (off)))
-#define W(off) (*(u32 *)(p + (off)))
-static inline s32 RandomValue(const u16 *table)
+static inline s32 RandomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)((u32)table + gUnk_03005308 * 2);
+    return *(const u16 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2);
 }
 static inline s32 distanceSquared(struct Vec *a, struct Vec *b)
 {
     s32 x = a->x - b->x, z = a->z - b->z;
     return x * x + z * z;
 }
+static inline void CopyPosition(struct Vec *out, struct Vec *in)
+{
+    *out = *in;
+}
 static inline void raisePosition(struct Vec *p)
 {
     p->y += 128;
 }
-// Remaining differences: random-load lifetimes, stack-vector addressing, and registers.
-u32 ScriptCombatActor_UpdateProjectileAttack(u8 *p)
+u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
 {
     u8 config[0x5c];
     struct Vec position;
     s32 velocity;
     s32 distance;
-    struct Vec *pos = &position;
     u32 angle;
+    s8 aim;
+    struct Vec *pos;
     struct Vec *target;
     struct Vec *origin;
-    if (Mod(H(0x184), 10) == 0 && H(0x184) > H(0x18e) - 30) {
+    if (Mod((s16)p->timer, 10) == 0 && (s16)p->timer > (s16)p->duration - 30) {
         velocity = 0x1400;
-        distance = distanceSquared(Player_GetEffectivePosition(0), (struct Vec *)(p + 0x40));
-        origin = (struct Vec *)(p + 0x40);
+        distance = distanceSquared(Player_GetEffectivePosition(0), &p->position);
+        origin = &p->position;
         ProjectileConfig_Init(config);
-        position = *(struct Vec *)(p + 0x40);
+        pos = &position;
+        CopyPosition(pos, &p->position);
         raisePosition(pos);
         target = Player_GetEffectivePosition(0);
-        angle = (u8)((s8)Math_Atan2(target->x - origin->x, target->z - origin->z) +
-                     ((RandomValue(gUnk_0203B400) & 31) - 16));
+        aim = Math_Atan2(target->x - origin->x, target->z - origin->z);
+        angle = (u8)(aim + ((RandomValue() & 31) - 16));
         if (distance <= 0x15f8f)
             velocity = 0x1800;
         else if (distance > 0x40000)
             velocity = 0x1000;
         ProjectileConfig_SetAppearance(config, 0x7e7c, 0, -1);
-        ProjectileConfig_SetCollision(config, 0, 0x200000, H(0x174), H(0x176), H(0x178));
+        ProjectileConfig_SetCollision(config, 0, 0x200000, p->attackA, p->attackB, p->attackC);
         ProjectileConfig_SetMovement(config, 0, 120, angle, 12);
         ProjectileConfig_SetVerticalMotion(config, velocity, 0x18000);
-        if (RandomValue(gUnk_0203B400) & 1)
+        if (RandomValue() & 1)
             ProjectileConfig_SetAnimation(config, 0xa6cf, 0, 0);
         else
             ProjectileConfig_SetAnimation(config, 0xa6cf, 1, 0);
         Projectile_SpawnFromConfig(config, pos);
     }
-    U(0x40) = U(0x1c) - 8 + (RandomValue(gUnk_0203B400) & 15);
-    U(0x42) = U(0x1e);
-    U(0x44) = U(0x20) - 8 + (RandomValue(gUnk_0203B400) & 15);
-    if (H(0x184) > 0)
-        U(0x184)--;
+    {
+        const u16 *table;
+        u32 *cursor;
+        u32 range;
+        u32 mask;
+        u32 index;
+        table = (const u16 *)RANDOM_TABLE_ADDR;
+        cursor = &gUnk_03005308;
+        index = *cursor;
+        index++;
+        mask = 1023;
+        index &= mask;
+        {
+            u32 sample = table[*(&index)];
+            s32 x = (u16)p->origin.x;
+            x -= 8;
+            range = 15;
+            sample &= range;
+            p->position.x = x + sample;
+        }
+        p->position.y = p->origin.y;
+        index = (index + 1) & mask;
+        *cursor = index;
+        {
+            u32 sample = table[index];
+            s32 z = (u16)p->origin.z;
+            z -= 8;
+            sample &= range;
+            p->position.z = z + sample;
+        }
+    }
+    if ((s16)p->timer > 0)
+        p->timer--;
     else {
-        Anim_RestartSequence(p + 0x160, *(void **)(p + 0x1cc), 0, 0, 0);
-        *(u32(**)(void *))(p + 0x15c) = ScriptCombatActor_TryProjectileAttack;
+        Anim_RestartSequence(p->animation, p->sequence, 0, 0, 0);
+        p->update = ScriptCombatActor_TryProjectileAttack;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScriptCombatActor_UpdateProjectileAttack);
-#endif

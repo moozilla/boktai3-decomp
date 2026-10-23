@@ -2,8 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 80.5%
-
+/* Remaining differences: script/vector stack layout and state/resource setup lifetimes. */
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 s32 Script_GetKeywordValue(u32, s32);
@@ -16,7 +15,7 @@ void SingletonSlot7_InitCollider(u8 *);
 void SingletonSlot7_InitContactCollider(u8 *, s32);
 void SingletonSlot7_RegisterRenderCallback(u8 *);
 void SingletonSlot7_InitBackgroundAndMotion(u8 *);
-void *ScriptProc_Start(u32, u32);
+void *ScriptProc_Start(u16, u16);
 void SceneActors_InitResources(u8 *);
 void Sound_PlaySong(u32);
 void *SingletonSlot7_CreateEffectPool(void);
@@ -24,6 +23,8 @@ void AnimData_SelectPaletteBank(void *, u32);
 s32 sub_081F0678(void);
 void SingletonSlot7_InitDisplaySprites(u8 *) __asm__("SingletonSlot7_InitDisplaySprites");
 extern u32 gUnk_020004B8;
+extern u8 gUnk_03004FC0[], gUnk_03005040[];
+void CpuSet(const void *, void *, u32);
 
 #define F(ty, off) (*(ty *)(p + (off)))
 
@@ -41,6 +42,7 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
         s16 x, y, z, w;
     } vec;
     register u8 *b3 asm("r4");
+    u8 *modeField;
 
     if (Script_SeekToKeyword(0x65))
         F(s32, 0x588) = Script_GetValue();
@@ -77,7 +79,11 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
         b3 = q + 0xB3;
         *b3 = v;
     }
-    *(void **)(q + 0x104) = sub_081F0678;
+    {
+        register s32 (*callback)(void) asm("r1") = sub_081F0678;
+        asm("" : : "r"(callback));
+        *(void **)(q + 0x104) = callback;
+    }
     SceneActors_SetHealthLimits(q, health, health, extra);
     F(u16, 0x5F0) = Div(health, 7);
     F(u16, 0x5F2) = Div(health, 10);
@@ -87,11 +93,11 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
     SingletonSlot7_RegisterRenderCallback(p);
     SingletonSlot7_InitBackgroundAndMotion(p);
     F(u32, 0x38C) = 0xEBF6;
-    F(void *, 0x390) = ScriptProc_Start(0x922E, 0);
+    F(void *, 0x390) = ScriptProc_Start(0x922E, 0xEBF6);
     F(u32, 0x388) = 0x2E90;
     SingletonSlot7_InitDisplaySprites(p);
     {
-        u32 *flags = (u32 *)(b3 - 0x17);
+        u32 *flags;
         u8 *s0 = q + 0xAC;
         u8 *s1 = q + 0xAD;
         u8 *s2 = q + 0xAE;
@@ -99,27 +105,35 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
         u8 *s4 = q + 0xB0;
         s32 i = 15;
         u16 *w = (u16 *)(p + 0x3C6);
+        modeField = b3;
+        b3 -= 0x17;
+        flags = (u32 *)b3;
         do {
             *w-- = 0x7FFF;
         } while (--i >= 0);
         SceneActors_InitResources(p);
         *flags |= 0x10;
-        if (*b3 == 0) {
+        if (*modeField == 0) {
             u32 nz = 0;
+            register u32 phase asm("r0") = 5;
+            asm("" : : "r"(phase));
             *s0 = nz;
             *s1 = nz;
-            *s2 = 5;
+            *s2 = phase;
             *s3 = nz;
             *s4 = 1;
         } else {
             if (hasShared) {
+                register u8 byteZero asm("r3") = 0;
+                register u32 wordZero asm("r4") = 0;
+                asm("" : "+r"(byteZero), "+r"(wordZero));
                 F(u16, 0x278) = shared;
                 F(s32, 0x294) = F(s16, 0x278);
                 F(u16, 0x5D2) = 1;
                 *s0 = 1;
-                *s1 = 0;
+                *s1 = byteZero;
                 *s2 = 3;
-                *s3 = 0;
+                *s3 = wordZero;
                 *s4 = 1;
             } else {
                 F(u16, 0x278) = hasShared;
@@ -137,8 +151,8 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
     F(void *, 0x62C) = SingletonSlot7_CreateEffectPool();
     F(u32, 0x5AC) = 7;
     F(u32, 0x5A8) = 0x80;
-    if (*b3 && mode > 0) {
-        CpuSet(p + 0x488, (void *)0x03005040, 0x40);
+    if (*modeField && mode > 0) {
+        CpuSet(p + 0x488, gUnk_03005040, 0x40);
         AnimData_SelectPaletteBank(p + 0x350, 0x1F6);
         CpuSet(F(void *, 0x35C), p + 0x3C8, 0x10);
         AnimData_SelectPaletteBank(p + 0x36C, 0x1F5);
@@ -156,7 +170,7 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
             F(u16, 0x5E4) = 0;
         }
     } else {
-        u8 *src = (u8 *)0x03004FC0 + 0x80;
+        u8 *src = gUnk_03004FC0 + 0x80;
         u8 *dst = p + 0x508;
         s32 i = 3;
         do {

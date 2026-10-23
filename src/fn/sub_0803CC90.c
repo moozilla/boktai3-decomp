@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct CollisionPoint {
@@ -23,7 +22,7 @@ void WirelessObj_InitCollisionVolumes(struct WirelessObj *p)
 {
     struct CollisionPoint pos, size, offset;
     s16 *pp;
-    register s32 eight asm("r8");
+    s32 eight;
     pos.x = 0;
     pos.y = -96;
     pos.z = -96;
@@ -39,7 +38,6 @@ void WirelessObj_InitCollisionVolumes(struct WirelessObj *p)
     SpatialIndex_InsertEntry((u8 *)p + 0x56C);
     ((s16 *)&size)[0] = 16;
     eight = 8;
-    asm("" : "+r"(eight));
     ((s16 *)&size)[1] = eight;
     ((s16 *)&size)[2] = 6;
     ((s16 *)&offset)[0] = 0;

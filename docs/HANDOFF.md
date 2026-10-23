@@ -9,7 +9,7 @@ then `docs/WORKER.md` before matching. Everything else is looked up, not read:
 Dated progress reports live in [docs/history/](history/README.md); they are
 records, not instructions. Keep this file short: it describes the present.
 
-## Current state (2026-10-16)
+## Current state (2026-10-23)
 
 Numbers live in one place: [PROGRESS.md](../PROGRESS.md) (regenerated at batch
 integration with `python3 tools/progress.py --markdown PROGRESS.md`) and the
@@ -22,6 +22,21 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 | Report | every function in one of ~490 subsystem units under 11 game categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent work, newest first (details in [history](history/README.md)):
+
+* **Mummy burn damage** (2026-10-23): matched the complete timer-driven damage
+  callback with four register pins and improved the guarded Golem contact
+  response draft. [Worker notes](../notes/cx-xhigh.md) explain the reload
+  diagnosis and safe minimization. Combined ROM validation passed.
+* **Script combat actor family recovered** (2026-10-23): the initializer, actor
+  update, projectile attack, collider setup and hit reaction now match exactly.
+  Tagged NPC continuation details are in [worker notes](../notes/cx-sol02.md).
+
+* **Mummy, reaction and Ivy reconstruction** (2026-10-23): checkpoint recovery and anchor approach match; complete guarded reaction and Ivy drafts preserve larger callbacks. [Worker notes](../notes/cx-sol05.md) identify the incomplete deep-pass resume point. Combined ROM builds passed.
+* **State actor campaign continuation** (2026-10-23): three control, palette and target-turn matches plus complete guarded drafts; resume details in [worker notes](../notes/cx-sol11.md).
+* **Effect constructors and actor colliders** (2026-10-23): sol02 recovers two
+  Nidhoggr attack-effect constructors and the script combat actor collider
+  initializer. Full draft work and remaining targets are in
+  [worker notes](../notes/cx-sol02.md).
 
 * **Every scene's procedures have working names** (2026-10-19):
   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)

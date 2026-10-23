@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 86.8%
 #include "display_animation.h"
 struct HomingVec {
     s16 x, y, z;
@@ -93,7 +94,8 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
         if (m->activeMask & (1 << i)) {
             struct HomingSprite *sprite = &p->sprite;
             struct HomingParams *params = &p->params;
-            struct HomingVec *velocity, *position;
+            register struct HomingVec *velocity asm("ip");
+            struct HomingVec *position;
             if (TestPause(0x400))
                 continue;
             if (gUnk_02000560 & 4)
@@ -107,6 +109,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                 u32 test = p->state & 1;
                 u32 *flags = &p->state;
                 velocity = &p->velocity;
+                asm("" : "+r"(velocity));
                 if (test) {
                     Vector(velocity, params->angle, params->speed);
                     *flags &= ~1;

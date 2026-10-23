@@ -1,8 +1,6 @@
 #include "global.h"
 #include "actor_animation_controller.h"
 
-#define Actor_UpdateIdleWait sub_081E42C4
-
 // Provisional name: ActorPalette_BeginFade
 
 void AnimData_SelectPaletteBank(void *, s32);

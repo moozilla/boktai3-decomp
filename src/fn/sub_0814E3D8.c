@@ -38,9 +38,12 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-// Remaining differences: merged tier-transition tail, temporary lifetimes, particle initialization.
-#ifdef NONMATCHING
-// fuzzy: 90.0%
+static inline void SetChargeParameter(u8 *p)
+{
+    u16 *target = (u16 *)(p + 0xAD6);
+    u32 value = 0x16E;
+    *target = value;
+}
 void Player_UpdateSelectedAttackCharge(u8 *p)
 {
     struct BurstA ba;
@@ -52,8 +55,10 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
     switch (BYTE(0x458)) {
         case 0:
             if (ANIMATE(0x23)) {
-                HALF(0xC10) = 60;
-                BYTE(0x53A) = 0;
+                u16 *duration = (u16 *)(p + 0xC10);
+                u32 zero = 0;
+                *duration = 60;
+                BYTE(0x53A) = zero;
                 Player_SetActionPhase(p, 1);
             }
             break;
@@ -66,8 +71,10 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                 ANIMATE(0x24);
             }
             if (++*t > 6) {
-                s32 cost =
-                    ActorResponse_Apply(p, Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2]);
+                register s32 amount asm("r2") = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
+                register s32 cost asm("r2");
+                cost = ActorResponse_Apply(p, amount);
+                asm("" : "+r"(cost));
                 BYTE(0xC0F) = 0;
                 HALF(0x4D2) = 0;
                 if (HALF(0x428) < cost) {
@@ -98,9 +105,10 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             if (++*t >= HALF(0xC10)) {
                 BYTE(0xC0F) = 1;
                 HALF(0x4D2) = 30;
-                HALF(0xAD6) = 0x16E;
+                SetChargeParameter(p);
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F9);
+                asm("" ::: "memory");
                 goto charged;
             }
             break;
@@ -113,7 +121,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             if (++HALF(0x45A) >= HALF(0xC10)) {
                 BYTE(0xC0F) = 2;
                 HALF(0x4D2) = 60;
-                HALF(0xAD6) = 0x16E;
+                SetChargeParameter(p);
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F9);
                 goto charged;
@@ -142,6 +150,9 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             if (*r) {
                 s32 ang, n;
                 if (*r > 5) {
+                    u32 upper = 0xFFFF0000;
+                    u32 lower = 0xFFFF;
+                    asm("" : : "r"(upper), "r"(lower));
                     ba.a = 0;
                     ba.b = 0;
                     bb.a = 32;
@@ -187,7 +198,3 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
     }
     BYTE(0xAC9) = Player_GetAttackEffectType(BYTE(0xC18));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSelectedAttackCharge);
-#endif

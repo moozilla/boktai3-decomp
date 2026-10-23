@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 // confidence=low: refreshes the nearby route heading after the context cooldown expires.
 
@@ -9,14 +8,13 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
 {
     struct SceneActorRegistryResetView *actor = arg;
     struct SceneActorControlState **slot = &((struct SceneActorControlPhaseView *)actor)->control;
-    register u8 *context asm("r0") = (u8 *)*slot;
-    register u16 *counter asm("r5");
+    u8 *context = (u8 *)*slot;
+    u16 *counter;
     u32 v;
     u32 saved;
     counter = (u16 *)(context + 0x6D4);
     v = *counter;
-    saved = v;
-    asm("" : "+r"(v), "+r"(saved));
+    saved = (unsigned short)v;
     if (saved) {
         *counter = v - 1;
         return 0;

@@ -1,5 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 51.7%
+// fuzzy: 53.6%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
@@ -38,6 +39,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         struct ContactPosition *center;
         u32 type, packed;
         s32 height;
+        register u32 observed asm("r8");
         const u16 *table;
         u32 angle, radius;
         struct ContactPosition *write;
@@ -50,11 +52,17 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         packed = *cell(cellIndex(center));
         type = packed >> 4;
         height = (packed & 15) * 256;
-        if (type == 1)
-            height -= (u8)center->z;
-        else if (type == 2)
-            height -= (u8)center->x;
+        switch (type) {
+            case 1:
+                height -= (u8)center->z;
+                break;
+            case 2:
+                height -= (u8)center->x;
+                break;
+        }
         pool->retreatCenter.y = height;
+        observed = 0x0403B714;
+        asm volatile("" : : "r"(observed));
         table = (const u16 *)RANDOM_TABLE_ADDR;
         angle = nextRandom(table) & 255;
         radius = (nextRandom(table) & 127) + 16;
