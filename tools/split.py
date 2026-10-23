@@ -360,6 +360,18 @@ def main():
         # The C object replaces only the last function's instructions (and its
         # literal pools); trailing undisassembled data in that block stays asm.
         exact_names = c_functions(os.path.join(ROOT, rel), with_asm=False)
+        # A worker may retain its address-style definition after the CSV name
+        # was promoted. Keep references from the generated assembly linkable,
+        # including the even-address labels used for interior offsets.
+        for name in exact_names:
+            generated = name
+            if name not in index and f"sub_{csv_addr.get(name, '')}" in index:
+                generated = f"sub_{csv_addr[name]}"
+            elif name not in index and csv_name.get(name[4:]) in index:
+                generated = csv_name[name[4:]]
+            if generated != name:
+                aliases.append(f"{generated} = {name};")
+                aliases.append(f"{generated}__addr = {name}__addr;")
         covered = {int(n[4:], 16) for n in exact_names
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
         ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]

@@ -241,11 +241,13 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
+| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 4 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
 | [notes/contact-sequence-actor_2026-10-14.md](../notes/contact-sequence-actor_2026-10-14.md) | Sequence contact actor pool, October 14 | *#actors* | 6 |
 | [notes/contact-swarm_2026-10-14.md](../notes/contact-swarm_2026-10-14.md) | Contact swarm, 08043F64–08044C80 | *#assets* | 4 |
 | [notes/countdown-timer_2026-10-14.md](../notes/countdown-timer_2026-10-14.md) | Singleton countdown timer |  | 2 |
+| [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 2 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |
 | [notes/depin-manual-2_2026-10-21.md](../notes/depin-manual-2_2026-10-21.md) | depin-manual-2 worklog (2026-10-21) | *#tooling* | 8 |
 | [notes/depin-manual-3_2026-10-21.md](../notes/depin-manual-3_2026-10-21.md) | depin-manual-3 worklog (2026-10-21) | *#actors #tooling* | 7 |
@@ -255,7 +257,6 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/depin-manual-5c_2026-10-21.md](../notes/depin-manual-5c_2026-10-21.md) | depin-manual-5c worklog (2026-10-21) |  | 1 |
 | [notes/depin-manual_2026-10-21.md](../notes/depin-manual_2026-10-21.md) | depin-manual worklog (2026-10-21) | *#tooling* | 6 |
 | [notes/depin-search-2026-10-23.md](../notes/depin-search-2026-10-23.md) | Faster depin search: measurements and ideas (2026-10-23) | *#tooling* | 10 |
-| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: step.py, flip.py, causebook; confirmed agbcc rules (2026-10-23) | *#matching* *#tooling* | 6 |
 | [notes/dialogue-vm_2026-10-12.md](../notes/dialogue-vm_2026-10-12.md) | Dialogue interpreter and scrolling controller |  | 2 |
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
@@ -310,6 +311,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/push20-mid.md](../notes/push20-mid.md) | Push20 mid-range worker | *#text* | 10 |
 | [notes/push20-root.md](../notes/push20-root.md) | Push toward 20%: parent matches |  | 8 |
 | [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 5 |
+| [notes/research-handoff-2026-10-23.md](../notes/research-handoff-2026-10-23.md) | Research handoff: making matching cheaper (2026-10-23) | *#matching #process* | 7 |
 | [notes/resource-station_2026-10-14.md](../notes/resource-station_2026-10-14.md) | Stored-resource station (Sol, 2026-10-14) | *#assets #tooling* | 3 |
 | [notes/root-batch6.md](../notes/root-batch6.md) | Main-thread batch 6 evidence | *#scene #hardware #tooling* | 2 |
 | [notes/round1-luna-a.md](../notes/round1-luna-a.md) | Luna A production round |  | 2 |
