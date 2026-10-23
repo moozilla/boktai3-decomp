@@ -1,9 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// Remaining differences: address calculations, branch layout and register allocation.
+#define Player_UpdateSpiralAfterglow sub_08147FB8
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -161,17 +159,32 @@ void Player_UpdateSpiralAfterglow(struct Player *p)
     {
         register u32 offset asm("r2") = 0x178;
         asm("" : "+r"(offset));
-        AnimData_SelectPaletteBank(*(void **)((u8 *)p + offset), 0x16F);
+        {
+            register void **resource asm("r0") = (void **)((u8 *)p + offset);
+            {
+                void *data = *resource;
+                AnimData_SelectPaletteBank(data, 0x16F);
+            }
+        }
     }
-    if (++p->tetherFrame > 31) {
-        register u32 offset asm("r2") = 0x464;
-        asm("" : "+r"(offset));
-        *(u8 *)((u8 *)p + offset) = 1;
-        p->actionLatch465 = 4;
-        ActorSequence_Begin(p, 0, 0);
+    {
+        register u32 timerOffset asm("r0") = 0x45A;
+        register u16 *timer asm("r1");
+        asm("" : "+r"(timerOffset));
+        timer = (u16 *)((u8 *)p + timerOffset);
+        if (++*timer > 31) {
+            u32 offset = 0x464;
+            {
+                u8 *flag = (u8 *)p + offset;
+                *flag = 1;
+            }
+            {
+                u32 latchOffset = 0x465;
+                u8 *latch;
+                latch = (u8 *)p + latchOffset;
+                *latch = 4;
+            }
+            ActorSequence_Begin(p, 0, 0);
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralAfterglow);
-#endif
