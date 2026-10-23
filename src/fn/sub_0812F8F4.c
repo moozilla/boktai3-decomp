@@ -1,9 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.3%
-// foundry draft (worker best 80.3%); what differs is mostly register allocation and instruction order
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 static inline u8 SceneActorControl_TakeFlag(u8 *flag)
 {
@@ -13,11 +11,14 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
     }
     return 0;
 }
-static inline u32 finished(struct SceneActorRegistryResetView *actor)
+static inline u32 HasFinishedControl(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B0)
-        return 1;
-    return 0;
+    register u32 offset asm("r1") = 0x2B0;
+    register u8 *field asm("r0");
+    /* Keep the completion-field address local to this check. */
+    asm("" : "+r"(offset));
+    field = (u8 *)actor + offset;
+    return *field;
 }
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
@@ -34,20 +35,48 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->field2C8 = zero;
-    actor->flags114 &= ~1;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
     actor->word104 = zero;
 }
+static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
+                                    u32 kind)
+{
+    u32 offset;
+    u32 zero;
+    {
+        u8 *field = &actor->field2B2;
+        zero = 0;
+        *field = 1;
+    }
+    offset = 0x2B0;
+    *((u8 *)actor + offset) = zero;
+    actor->field2B5 = kind;
+    offset -= 0x94;
+    *(void **)((u8 *)actor + offset) = control;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = zero;
+}
+#define SceneActorControl_UpdateEntryTransition sub_0812F8F4
 void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
 {
     u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        BeginControl(actor, actor->entryTarget224, 2, 0);
+        BeginControlZero(actor, actor->entryTarget224, 2);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
         result = sub_0812F3CC(actor);
         if (!result) {
-            if (finished(actor)) {
+            if (HasFinishedControl(actor)) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);
                 {
                     u32 behavior = 12;
@@ -63,6 +92,3 @@ void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView 
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateEntryTransition);
-#endif
