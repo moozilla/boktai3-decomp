@@ -135,3 +135,4 @@ Batch integration: the first full build exposed a duplicated binary tail after
 recorded replacement end 081ABA64 in `symbols/build_extra_functions.csv` and
 folded that boundary correction into the function's matching commit. The
 352-byte exact C object now replaces the whole reviewed body.
+Corrected combined validation: `build/boktai3.gba: OK`.
