@@ -25,12 +25,14 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 #define TIMER         FIELD(u16, 0x706)
 #define DIRECTION     FIELD(u16, 0x708)
 
-#ifdef NONMATCHING
-// fuzzy: 96.7%
-/* Remaining: (h & 3)/(h & 7) results land in the other register, and the
- * right-hand branch picks different scratch registers for its field
- * addresses (SPEED is addressed from the HOLD constant instead of TRANSFER). */
-void sub_081BB904(struct SolarBankPanel *panel)
+// MATCHING_CONCESSION: register-pinning
+static inline u32 MaskHold(u32 value, u32 mask)
+{
+    asm("" : "+r"(mask));
+    return mask & value;
+}
+#define SolarBank_UpdateTransferInput sub_081BB904
+void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
 {
     s32 v;
     u16 t;
@@ -87,7 +89,7 @@ void sub_081BB904(struct SolarBankPanel *panel)
             SPEED = 2;
             TIMER = 4;
         } else if (*hold > 0x3f) {
-            if (!(h & 3))
+            if (!(MaskHold(h, 3)))
                 Sound_PlaySong(0x37d);
             (*bal)++;
             (*xfer)--;
@@ -97,7 +99,7 @@ void sub_081BB904(struct SolarBankPanel *panel)
             (*hold)++;
         } else {
             *hold = h + 1;
-            if (!(h & 7)) {
+            if (!(MaskHold(h, 7))) {
                 Sound_PlaySong(0x37d);
                 (*bal)++;
                 (*xfer)--;
@@ -105,14 +107,21 @@ void sub_081BB904(struct SolarBankPanel *panel)
             }
         }
     } else if ((t = gUnk_03005260.held & 0x10) != 0) {
-        u32 *bal = &BALANCE;
+        register u32 balOffset asm("r1") = 0x6F8;
+        u32 *bal;
         u32 *xfer;
         u16 *hold;
         u16 *timer;
         u16 h;
+        asm("" : : "r"(balOffset));
+        bal = (u32 *)((u8 *)panel + balOffset);
         if (*bal == 0)
             goto reset;
-        xfer = &TRANSFER;
+        {
+            register u32 offset asm("r3") = 0x6F4;
+            asm("" : : "r"(offset));
+            xfer = (u32 *)((u8 *)panel + offset);
+        }
         if (*xfer > 9998)
             goto reset;
         if (HOLD == 0)
@@ -144,7 +153,7 @@ void sub_081BB904(struct SolarBankPanel *panel)
             SPEED = 2;
             TIMER = 4;
         } else if (*hold > 0x3f) {
-            if (!(h & 3))
+            if (!(MaskHold(h, 3)))
                 Sound_PlaySong(0x37d);
             (*xfer)++;
             (*bal)--;
@@ -154,7 +163,7 @@ void sub_081BB904(struct SolarBankPanel *panel)
             (*hold)++;
         } else {
             *hold = h + 1;
-            if (!(h & 7)) {
+            if (!(MaskHold(h, 7))) {
                 Sound_PlaySong(0x37d);
                 (*xfer)++;
                 (*bal)--;
@@ -206,6 +215,3 @@ blink:
 step:
     Anim_Step(&panel->label, panel->labelData);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081BB904);
-#endif
