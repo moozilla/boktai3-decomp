@@ -4,7 +4,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 84.9%
+// fuzzy: 92.2%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -72,7 +72,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
+        register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -167,20 +167,15 @@ static inline void Diff(struct SceneVec *v, struct SceneVec *a, struct SceneVec 
     v->y = a->y - b->y;
     v->z = a->z - b->z;
 }
-static inline void Vector(struct SceneVec *v, s32 angle)
+static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
 {
-    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * 64);
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
-    {
-        s32 sample = gUnk_086149C4[angle & 255];
-        s32 scale = 64;
-        asm("" : "+r"(sample));
-        v->z = Scale(sample * scale);
-    }
+    v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
 static inline void Add(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
 {
-    v->x = a->x + b->x;
+    v->x = b->x + a->x;
     v->y = b->y + a->y;
     v->z = a->z + b->z;
 }
@@ -188,11 +183,16 @@ static inline u8 Ended(struct VanargandPart *p)
 {
     return p->motion[0x29] == 2;
 }
+static inline void SetState(struct VanargandPart *p, u32 state)
+{
+    p->state = state;
+    p->timer = 0;
+}
 void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 {
     u8 *enter;
     register u32 entering asm("r1");
-    register u8 *savedBoss asm("r6") = boss;
+    u8 *savedBoss = boss;
     register u32 savedFrame asm("r8") = frame;
     u32 mask = 0x20;
     p->flags |= mask;
@@ -208,16 +208,16 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
-                *enter = 0;
-                Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 8, (u8)p->variant, 0);
+                {
+                    u32 zero = 0;
+                    *enter = zero;
+                    asm("" : "+r"(zero));
+                    Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 8, (u8)p->variant,
+                                     zero);
+                }
             }
             if (StepPlayback(p, &p->sequence, p, 1)) {
-                {
-                    u32 next = 1;
-                    asm("" : "+r"(next));
-                    p->state = next;
-                }
-                p->timer = 0;
+                SetState(p, 1);
                 *enter = 1;
             }
             break;
@@ -229,20 +229,15 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             if (entering) {
                 *enter = 0;
                 if (p->variant == 1)
-                    Vector(&delta, 224);
+                    Vector(&delta, 224, 64);
                 else
-                    Vector(&delta, 96);
+                    Vector(&delta, 96, 64);
                 Add(&delta, &p->origin, &delta);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
             MotionTrack_Update(p->motion);
             if (Ended(p)) {
-                {
-                    u32 next = 2;
-                    asm("" : "+r"(next));
-                    p->state = next;
-                }
-                p->timer = 0;
+                SetState(p, 2);
                 *enter = 1;
             }
             break;
@@ -270,22 +265,12 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     Add(&point, p->basePosition, &p->target);
                     AnimatedParticles_EmitBurst(&point, p->particleAngle, 0, 64, 4, 4, 4, 4);
                     p->flashTimer = 15;
-                    {
-                        u32 next = 3;
-                        asm("" : "+r"(next));
-                        p->state = next;
-                    }
-                    p->timer = 0;
+                    SetState(p, 3);
                 } else {
                     Sound_PlaySong(0x3d9);
                     AnimatedParticles_EmitBurst((u8 *)p + 0x1c, p->particleAngle, 0, 64, 4, 4, 4,
                                                 4);
-                    {
-                        u32 next = 3;
-                        asm("" : "+r"(next));
-                        p->state = next;
-                    }
-                    p->timer = 0;
+                    SetState(p, 3);
                 }
                 *enter = 1;
                 p->finished = 1;
