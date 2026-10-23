@@ -800,3 +800,4 @@ address,isa,evidence,replacement_end
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; matched C (SiiRtcSetAlarm); docs/RTC.md,08249040
+08152C3C,thumb,Independent push and stack allocation after recoil callback return and literal pool; ends at next cue entry,08153224
