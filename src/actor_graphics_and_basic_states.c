@@ -529,7 +529,48 @@ fail:
 
 INCLUDE_ASM("asm/nonmatching", sub_08022DBC);
 
-INCLUDE_ASM("asm/nonmatching", sub_08022EA4);
+// confidence=low: reaction-kind selector controls the far-point mode and motion timer.
+#define SceneActorState_SnapReactionPosition sub_08022EA4
+// MATCHING_CONCESSION: register-pinning
+void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
+struct SnapVector {
+    u32 a, b;
+};
+void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
+{
+    u8 *sprite = p + 0x48;
+    switch (*(u16 *)(p + 0x3b2)) {
+        case 0:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 0, 65536);
+            break;
+        case 1:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
+            break;
+        case 2:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 1, 65536);
+            *(u16 *)(p + 0x354) = 32;
+            return;
+        case 3:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            break;
+        case 4:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            asm("" : : "i"(4));
+            break;
+        case 5:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
+            asm("" : : "i"(5));
+            break;
+        case 6:
+            Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
+            asm("" : : "i"(6));
+            break;
+        default:
+            *position = *(struct SnapVector *)(p + 0x54);
+            break;
+    }
+    *(u16 *)(p + 0x354) = 64;
+}
 
 #ifdef NONMATCHING
 
@@ -1505,7 +1546,7 @@ static inline u8 enter_08023E24(State_08023E24 *p)
     return 0;
 }
 
-void sub_08022EA4(void *, void *);
+void sub_08022EA4(u8 *, struct SnapVector *);
 
 void SceneActorState_WaitForDelayedAction(Actor_08023E24 *p)
 {
