@@ -1,8 +1,10 @@
 #include "global.h"
-
 #ifdef NONMATCHING
-// fuzzy: 81.4%
-// foundry draft (worker best 81.4%); what differs is mostly register allocation and instruction order
+// fuzzy: 97.1%
+// Parameter-save order and the first signed-load scratch still differ.
+// MATCHING_CONCESSION: register-pinning
+#define ActorStatus_InitializeContact sub_081AFAC0
+#include "global.h"
 
 s32 Math_Atan2(s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
@@ -38,9 +40,10 @@ struct ActorStatus {
     u8 contactDirection;
     u16 strengthShift;
 };
-void ActorStatus_InitializeContact(struct ContactActor *actor, struct ContactActor *other,
+void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactActor *other,
                                    struct ActorStatus *status)
 {
+    register struct ContactActor *actor asm("r5") = input;
     u8 *world = gUnk_02000580;
     s32 strength, shift, scaled;
     u32 value;
@@ -73,6 +76,7 @@ void ActorStatus_InitializeContact(struct ContactActor *actor, struct ContactAct
     status->contactDirection = direction;
     PlayerStats_AddContactHundredths(actor, other, 5);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorStatus_InitializeContact);
 #endif
