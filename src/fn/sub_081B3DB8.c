@@ -7,7 +7,7 @@
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
 #ifdef NONMATCHING
-// fuzzy: 87.4%
+// fuzzy: 89.3%
 // Remaining differences: radial-loop allocation and animation-step register lifetimes.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -34,11 +34,11 @@ static inline s32 TruncateScale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void MakeVector(struct SceneVec *out, s32 angle)
+static inline void MakeVector(struct SceneVec *out, s32 angle, s32 scale)
 {
-    out->x = TruncateScale(gUnk_086149C4[(angle + 64) & 255] * 128);
+    out->x = TruncateScale(gUnk_086149C4[(angle + 64) & 255] * scale);
     out->y = 0;
-    out->z = TruncateScale(gUnk_086149C4[angle & 255] * 128);
+    out->z = TruncateScale(gUnk_086149C4[angle & 255] * scale);
 }
 static inline void AddVector(struct SceneVec *dst, struct SceneVec *a, struct SceneVec *b)
 {
@@ -164,6 +164,11 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     return ended;
 }
+static inline void SetState(struct VanargandPart *p, u32 state)
+{
+    p->state = state;
+    p->timer = 0;
+}
 void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
 {
     u32 mask = 12;
@@ -185,7 +190,7 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
         entered = &p->enter;
         phase = 0;
         do {
-            MakeVector(&position, phase / 6);
+            MakeVector(&position, phase / 6, 128);
             AddVector(&position, (struct SceneVec *)&p->sprite.position, &position);
             VanargandEffect_Create(1, i << 1, &position, &velocity, p->variant);
             phase += 255;
@@ -199,8 +204,7 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
     switch (p->state) {
         case 0:
             if (StepPlayback(p, &p->sequence, p, 1)) {
-                p->state = 1;
-                p->timer = 0;
+                SetState(p, 1);
                 p->enter = 1;
             }
             break;
