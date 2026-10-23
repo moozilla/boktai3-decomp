@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fuzzy: 88.6%
 // Remaining differences: orientation switch range guard, animation pointer lifetimes and defined success return.
 #include "global.h"
 #define SCREAMER_TEMP     "r2"
@@ -20,8 +20,6 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
 {
     struct ActorPosition position;
     void *graphics;
-    void *sprite;
-    void *initialSprite;
     void *sequences;
     s32 value;
     if (Script_SeekToKeyword('p')) {
@@ -111,15 +109,13 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     p->f1F8 = resource;
     graphics = p->graphics;
     AnimData_Load(graphics, 0x7E7D);
-    initialSprite = &p->sprite;
-    Sprite_Init(initialSprite, graphics, 1);
+    Sprite_Init(&p->sprite, graphics, 1);
     p->sprite.position = p->initialPosition;
     AnimData_SelectPaletteBank(graphics, 0x1C4);
     *((u8 *)&p->sprite + 7) = 3;
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f218 = sequences;
-    asm("" : "+r"(initialSprite));
-    sprite = initialSprite;
+    asm("" : "+r"(&p->sprite));
     if (!p->f1F6) {
         p->update = Screamer_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0x1A, (u8)p->f1D8, 8);
@@ -150,7 +146,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         else
             offsetPosition->z += 128;
         SceneBody_Init(p->body, p->f1F8, &position, 0, 4, p);
-        SceneBody_SetSprite(p->body, sprite);
+        SceneBody_SetSprite(p->body, &p->sprite);
         TerrainOverlay_QueueAddActor(p->body);
     }
     if (p->f1DA > 0)
