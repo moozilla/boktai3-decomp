@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// fix.py best version (reprinted C)
 // 19 differing instruction runs; first diff at +0x4 (adds r6, r0, #0 vs adds r5, r0, #0)
 struct BlobAE {
     u32 words[8];
@@ -33,8 +30,11 @@ void sub_0823AE5C(u8 *p)
         else
             p[0x548] = found;
         t1 = p[0x548];
-        p[0x3a4] = t1;
-        zero = 0;
+        {
+            u8 *q = &p[0x3a4];
+            zero = 0;
+            *q = t1;
+        }
         sub_08238238(p);
         *((u16 *)(p + 0x3a0)) = zero;
         Anim_SetKeyframes(p + 0x8c, (struct BlobAE *)(p + 0x6c), p[0x3a2], 1, zero);
@@ -44,6 +44,3 @@ void sub_0823AE5C(u8 *p)
             *((u32 *)(p + 0x94)) &= ~4;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823AE5C);
-#endif
