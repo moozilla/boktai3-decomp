@@ -1670,7 +1670,140 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
 INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateAnimationAndTargets);
 #endif
 
+#ifdef NONMATCHING
+// fuzzy: 57.4%
+// Collider flag flow, palette branch layout and register allocation still differ.
+s32 ContactSequencePool_GetActiveCount(void *);
+void ContactBurst_SetEnabled(void *, s32);
+s32 ContactBurst_GetEnabled(void *);
+void SceneActors_ConfigureEffect(void *, s32, s32, s32);
+void SceneActors_UpdateEffects(void *);
+void CameraTracking_Update(void *);
+void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *);
+void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
+void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
+{
+    struct GridAttackActor *base = p;
+    struct GridAttackTransform *transform = &p->transform;
+    struct ContactCollider *damage;
+    struct ContactCollider *body;
+    if (ContactSequencePool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
+        ContactBurst_SetEnabled(p->contactBurst, 1);
+        p->flags |= 4;
+        p->attackCount = 0;
+    } else {
+        if (!p->attackCount && ContactBurst_GetEnabled(p->contactBurst)) {
+            SceneActors_ConfigureEffect(p, 1, 0, 0);
+            Sound_PlaySongChecked(0x54D);
+        }
+        ContactBurst_SetEnabled(base->contactBurst, 0);
+        if (base->attackCount < base->attackLimit)
+            base->attackCount++;
+    }
+    if (ContactBurst_GetEnabled(base->contactBurst))
+        p->flags &= ~0x40;
+    SceneActors_UpdateEffects(p);
+    if (base->stun) {
+        p->flags |= 4;
+        base->stun--;
+    }
+    damage = &base->damageCollider;
+    if (p->flags & 4)
+        damage->flags |= 4;
+    else {
+        damage->flags &= ~4;
+        Collider_SetPosition(damage, base->drawable.position, 0);
+        damage->direction = transform->angle;
+    }
+    body = &base->bodyCollider;
+    if (!(p->flags & 8)) {
+        Collider_SetPosition(body, base->drawable.position, 0);
+        body->direction = transform->angle;
+        Collider_Refresh(body);
+    }
+    if (p->flags & 16) {
+        (*(u32 *)base->drawable.sprite) |= 1;
+        (*(u32 *)((u8 *)base + 0x8F0)) &= ~1;
+        damage->flags &= ~8;
+    } else {
+        (*(u32 *)base->drawable.sprite) &= ~1;
+        if (p->locked)
+            (*(u32 *)((u8 *)base + 0x8F0)) &= ~1;
+        else
+            (*(u32 *)((u8 *)base + 0x8F0)) |= 1;
+        if (p->flags & 32)
+            damage->flags |= 8;
+        else
+            damage->flags &= ~8;
+    }
+    if (base->shake) {
+        base->shake--;
+        p->flags |= 0x20000;
+    }
+    if (base->flash > 0) {
+        if (!--base->flash)
+            base->animData.palette = base->palette;
+    } else {
+        u8 *palette = base->palette;
+        switch (base->effectMode) {
+            case 1:
+                if (base->effectVariant >= (1 << base->effectDuration))
+                    break;
+                base->effectVariant++;
+                Palette_InterpolateBanks(palette, gUnk_030042E4,
+                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
+                                         base->effectDuration);
+                base->animData.palette = palette;
+                break;
+            case 2:
+                if (base->effectVariant > 0) {
+                    base->effectVariant--;
+                    Palette_InterpolateBanks(palette, gUnk_030042E4,
+                                             gUnk_030042E4 + (base->effectId << 5),
+                                             base->effectVariant, base->effectDuration);
+                } else {
+                    base->effectVariant = 0;
+                    base->effectMode = 0;
+                    base->effectId = 1;
+                    CpuSet(gUnk_030042E4 + 0x2BA0, palette, 0x04000008);
+                }
+                base->animData.palette = palette;
+                break;
+            case 3:
+                Palette_InterpolateBanks(palette, gUnk_030042E4,
+                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
+                                         base->effectDuration);
+                base->animData.palette = palette;
+                if (!base->effectDirection) {
+                    if (++base->effectVariant > 31) {
+                        base->effectVariant = 32;
+                        base->effectDirection = 1;
+                    }
+                } else {
+                    if (--base->effectVariant <= 0) {
+                        base->effectVariant = 0;
+                        base->effectDirection = 0;
+                    }
+                }
+                break;
+        }
+    }
+    if (base->projectedDisplay)
+        base->drawable.sprite[7] = 1;
+    else
+        base->drawable.sprite[7] = 2;
+    if (!p->locked)
+        CameraTracking_Update((u8 *)base + 0x8D0);
+    if (p->locked && base->messageParameter && !(p->effectTimer & 15))
+        GridAttackActor_EmitSpriteParticles(base);
+    p->contactSource = 0;
+    p->contactFlags = 0;
+    p->effectTimer++;
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateCollidersAndPalette);
+#endif
 
 int GridAttack_Update(struct GridAttackActor *p)
 {
