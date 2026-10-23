@@ -136,3 +136,112 @@ recorded replacement end 081ABA64 in `symbols/build_extra_functions.csv` and
 folded that boundary correction into the function's matching commit. The
 352-byte exact C object now replaces the whole reviewed body.
 Corrected combined validation: `build/boktai3.gba: OK`.
+
+## Batch 3 — session h2 continuation
+
+Tags: #matching #vanargand #animation #effects
+
+- 081B2608 drafted 95.3% (was 94.7%). Retaining the consumed entry-byte value
+  across a constraint improves entry allocation. Reset offset pins, typed
+  state stores, a flag-taking helper and playback-mask constraints did not
+  close the transition-address and entry-copy residue.
+- 081B28D8 skipped at retained 99.9%. Four bytes reverse two independent
+  copies in state four. Tried saved flag pointers, pointer/declaration
+  bindings and address-input constraints. Compiler pass flips found no
+  improvement; a bounded two-process focused permuter run saved no candidate.
+  Revisit this closest draft before campaign completion.
+- 081B2F38 drafted 96.0% (was 93.2%). Removing the entry-pointer binding
+  halves the structural residue. Tried a volatile saved X, a Z binding,
+  retained motion/one lifetimes and a mask binding. Remaining X spill,
+  motion argument copies and playback constants.
+- 081B3410 drafted 94.6% (was 94.5%). Ordered animation setup and loading
+  base height before player height reduce structural differences from 18
+  to 11. Ground-strike stepper transplant and motion-pointer variants regress.
+- 081B3AAC drafted 96.6% (was 90.3%). Separate entry-value loads before
+  retaining the entry pointer recover all three phase entries. Destination
+  pointer aliases/bindings and zero-argument reuse do not close the remaining
+  player-relative vector setup (15 total / four structural differences).
+- 081B3DB8 drafted 89.3% (was 87.4%). An inline scale argument gives the
+  expected shift/multiply pair; a state setter recovers transition ordering.
+  Clear-vector helper, explicit position cursor and scale barriers regress.
+- 081B4040 drafted 85.2% (was 81.0%). Reused the scale argument, release
+  stepper, state setters, earlier loop-index initialization and reversed X
+  addition. Eleven structural differences remain, chiefly loop cursors,
+  stack addresses and state-zero entry lifetime.
+- 081B431C drafted 92.2% (was 84.9%). State setter, vector scale argument,
+  unbound owner, shared animation zero, reversed X addition and duration-mask
+  temporary recover most of the body. Remaining 57 total / six structural
+  differences include final completion-store sharing and vector cursors.
+- 081B48A0 drafted 97.0% (was 93.9%). Move the first mask into playback,
+  load entry separately, remove the sample constraint, reverse X/Z addition,
+  and write origin Y outside the planar helper. State/entry bindings regress.
+  Remaining 15 total / four structural differences.
+- 081B4DA4 reviewed-only skip: confirmed prior boundary evidence. The listed
+  extent includes another independent function at 081B512C; earlier scratch
+  source is absent here. Needs a complete new draft and boundary recovery
+  during the required revisit, rather than another review-only disposition.
+- 081B562C drafted 90.0%, `Vanargand_UpdatePartEmergence` (tentative).
+  Full new C models hidden/display flags, two owner keyframe tracks, radial
+  emergence, contact setup and screen projection. Reused reveal-fade layout
+  and packed stepper. Ordered animation data/zero setup is the strongest
+  improvement. Projection uses implicit struct padding. Reviewed full extent
+  1132 bytes through 081B5A98. Default fallback exact.
+- 081B5E38 matched, `Vanargand_DestroyPartController` (tentative), 108 bytes.
+  Removes owner animation and two embedded colliders/sprites/shadows/nodes,
+  then clears the singleton. Binding the per-iteration stride to r0 prevents
+  invariant hoisting. Depin removes three of four hints; one stride binding
+  remains. Reviewed full body/pool through 081B5EA4.
+- 081B5EA4 drafted 72.0%, `Vanargand_InitializePartController` (tentative).
+  Full new resource/palette setup and two-part initialization, including
+  hidden and visible modes. Multiple advancing field cursors, a call-clobbered
+  stride, delayed keyframe pointers and earlier index initialization improve
+  the first loop. Mode/palette/half/key bindings regress. Second-loop cursor
+  addressing and action guard dominate the remaining residue. Reviewed full
+  732-byte extent through 081B6180.
+- 0818EA90 exploratory scratch reached 51.1%. Full C queues unused falling
+  slots around player X/Z with 224-unit heading steps and ascending heights.
+  Split flag/position/target cursors and constrained loop stride reduce
+  structure but allocation is still far off. Needs deeper retry before list
+  completion; scratch is ignored under wip/cx-sol02/.
+- 0818ECFC drafted 73.5%, `ScenePanelEffect_UpdatePool` (tentative).
+  Full new C dispatches 24 simple and 48 collision effects, clears occupancy
+  bits, applies anchored/delta motion and staggers collider updates by parity.
+  Based on ScenePanelEffect_InitPool's observed layout. Separate motion/position
+  cursors and pool/remaining bindings regress. Reviewed 316-byte extent through
+  0818EE38.
+- 0818EE38 matched, `Nidhoggr_StepPoolAnimation`, 288 bytes. Applying the
+  Vanargand packed-stepper operand, mask and duration patterns closes the
+  retained draft in one check. Depin removes one of twelve hints.
+- 0818EF64 drafted 80.8%, `Nidhoggr_StepMovingSpriteEffect`.
+  New full C combines packed playback, position integration, signed velocity
+  damping/gravity and lifetime completion. Union word/bitfield views retain
+  the stack acceleration vector; explicit low/high packing recovers paired
+  stores. Owner binding improves fuzzy to 85.6% but adds structural copies;
+  retained the full-sized 80.8% form with seven structural differences.
+- 0818F0FC matched, `ScenePanelEffect_TickSpriteLifetime` (tentative), 284 bytes.
+  Reused the complete stepper and lifetime tail from the moving-effect draft.
+  Reviewed body plus alignment through 0818F218.
+  Eleven hints remain after depin.
+- 0818F6A4 drafted 87.9% (was 87.1%). Deeper iteration after steering:
+  move age-address creation after playback, retain separate X/Z field pointers
+  and a saved position through terrain work, then load the owner before the
+  state-255 sprite argument. Reduces structure from 35 to 18. Tested age/state
+  bindings, unsigned-coordinate views and owner unbinding; these do not close
+  it. Pass flips find no improving compiler switch. The optional causes mode
+  needs an absent local causebook database; no tool changes made.
+
+This batch adds three exact matches: +0.028 percentage points (680 bytes), all
+Register-pinned. Thirteen guarded drafts are new or improved. Resume at
+0818FA54 after integration, checking origin/main and the wrapup marker first.
+Required revisit queue includes all earlier-session skips plus 081B28D8,
+081B4DA4 and 0818EA90; prioritize the closest retained drafts.
+
+Batch 3 integration: the initial build caught five redundant extra-boundary
+rows. These entries already have decoded starts in gen/code.s despite lacking
+CSV names. Removed the rows from the corresponding function commits before
+rebuilding; no generated files changed. Documentation conflicts preserve both
+workers' history entries, followed by index regeneration.
+The next build caught a named fallback using its raw address token. Removed
+that draft-only alias so both the recorded candidate and default fallback use
+the existing descriptive symbol. Both modes rechecked. Corrected combined
+validation: `build/boktai3.gba: OK`.
