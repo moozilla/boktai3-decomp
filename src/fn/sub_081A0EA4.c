@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// foundry draft (worker best 84.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
+#define Hresvelgr_EmitRandomMotionBurst sub_081A0EA4
 #define gMotionRandomIndex gUnk_03005308
 #define gMotionRandomTable gUnk_0203B400
 typedef struct MotionDelta {
@@ -42,7 +41,7 @@ static inline void emitBurst(u32 emitter)
 {
     int i;
 
-    for (i = 3; i >= 0; --i) {
+    for (i = 0; i < 4; ++i) {
         MotionDelta delta = {0};
         register const u16 *table asm("r4") = gUnk_0203B400;
         asm("" : "+r"(table));
@@ -67,6 +66,3 @@ void Hresvelgr_EmitRandomMotionBurst(HresvelgrActor *p)
         p->finished = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_EmitRandomMotionBurst);
-#endif
