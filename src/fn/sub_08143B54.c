@@ -3,7 +3,7 @@
 // confidence=low: limits the tether target distance and clips its position against terrain.
 
 #ifdef NONMATCHING
-// fuzzy: 89.0%
+// fuzzy: 90.8%
 struct Position {
     s16 x, y, z, pad;
 };
@@ -102,12 +102,20 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
         candidate.x = (target->x * 3 + candidate.x) >> 2;
         candidate.z = (target->z * 3 + candidate.z) >> 2;
         if (!Player_TestTetherTarget(actor, &candidate)) {
-            s32 current = indexAt(&actor->position);
-            s32 next = indexAt((void *)&candidate);
+            u16 ax = actor->position.x;
+            s32 cellx = (s16)ax >> 8, cellz = actor->position.z >> 8;
+            s32 current, next;
+            if (cellx < 0 || cellz < 0 || (u32)cellx >= gUnk_030052F8 ||
+                (u32)cellz >= gUnk_030052FC)
+                current = 0;
+            else
+                current = gUnk_030052F4->rows[cellz] + cellx;
+            asm("" ::: "memory");
+            next = indexAt((void *)&candidate);
             if (current == next + 1)
-                candidate.x = ((actor->position.x >> 8) << 8) + 2;
+                candidate.x = (((s16)ax >> 8) << 8) + 2;
             else if (current == next - 1)
-                candidate.x = (((actor->position.x >> 8) + 1) << 8) - 2;
+                candidate.x = ((((s16)ax >> 8) + 1) << 8) - 2;
             else {
                 s32 width = *(s16 *)(gUnk_030052F4->cells + 4);
                 if (current == next + width)
@@ -115,7 +123,7 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
                 else if (current == next - width)
                     candidate.z = (((actor->position.z >> 8) + 1) << 8) - 2;
                 else {
-                    candidate.x = actor->position.x;
+                    candidate.x = ax;
                     candidate.z = actor->position.z;
                 }
             }
