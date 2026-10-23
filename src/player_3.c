@@ -44,7 +44,107 @@ void Player_LoadVisualParameters(struct Player *p)
     p->visualParameterC = t[1];
 }
 
+#ifdef NONMATCHING
+// fuzzy: 60.3%
+// Palette blend layout recovered; channel allocation remains tentative.
+void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weightB, s32 shift)
+{
+    register struct Player *p asm("sl") = actor;
+    register s32 sourceWeight asm("ip") = weightA;
+    register s32 baseWeight asm("sb") = weightB;
+    register const u16 *source asm("r8");
+    register u16 *base asm("r6");
+    s32 i;
+    u8 *brightnessPtr;
+    u32 *palette;
+    if (!sourceWeight) {
+        if (!p->unk419)
+            p->actionVariantResource = (u32)p->visualParameters;
+        else
+            p->visualObject->parameters = (u32)p->visualParameters;
+        return;
+    }
+    source = input;
+    if (!p->unk419) {
+        i = 0;
+        palette = &p->actionVariantResource;
+        base = (u16 *)p->visualParameters;
+        brightnessPtr = p->unkAC6;
+        for (; i < 16; i++) {
+            if ((u32)(i - 5) <= 1 || i == 13)
+                base[16] = base[0];
+            else {
+                u32 color = *source;
+                s32 brightness;
+                register s32 r asm("r4");
+                register s32 g asm("r2");
+                register s32 b asm("r5");
+                s32 br, bg, bb;
+                r = color & 31;
+                brightness = *brightnessPtr;
+                r += brightness;
+                if (r > 31)
+                    r = 31;
+                g = (((u16)color >> 5) & 31) + brightness;
+                if (g > 31)
+                    g = 31;
+                b = (((u16)color >> 10) & 31) + brightness;
+                if (b > 31)
+                    b = 31;
+                color = *base;
+                br = color & 31;
+                bg = ((u16)color >> 5) & 31;
+                bb = ((u16)color >> 10) & 31;
+                r = (sourceWeight * r + baseWeight * br) >> shift;
+                g = (sourceWeight * g + baseWeight * bg) >> shift;
+                b = (sourceWeight * b + baseWeight * bb) >> shift;
+                base[16] = (b << 10) | (g << 5) | r;
+            }
+            source++;
+            base++;
+        }
+        *palette = (u32)((u8 *)p + 0x380);
+    } else {
+        i = 0;
+        brightnessPtr = p->unkAC6;
+        base = (u16 *)p->visualParameters;
+        for (; i < 16; i++) {
+            {
+                u32 color = *source;
+                s32 brightness;
+                register s32 r asm("r4");
+                register s32 g asm("r2");
+                register s32 b asm("r5");
+                s32 br, bg, bb;
+                r = color & 31;
+                brightness = *brightnessPtr;
+                r += brightness;
+                if (r > 31)
+                    r = 31;
+                g = (((u16)color >> 5) & 31) + brightness;
+                if (g > 31)
+                    g = 31;
+                b = (((u16)color >> 10) & 31) + brightness;
+                if (b > 31)
+                    b = 31;
+                color = *base;
+                br = color & 31;
+                bg = ((u16)color >> 5) & 31;
+                bb = ((u16)color >> 10) & 31;
+                r = (sourceWeight * r + baseWeight * br) >> shift;
+                g = (sourceWeight * g + baseWeight * bg) >> shift;
+                b = (sourceWeight * b + baseWeight * bb) >> shift;
+                base[16] = (b << 10) | (g << 5) | r;
+            }
+            source++;
+            base++;
+        }
+        p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
+#endif
 
 void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
