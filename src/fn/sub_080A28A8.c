@@ -28,10 +28,11 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 k)
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-#ifdef NONMATCHING
-// fuzzy: 90.7%
+
 // confidence=low: Spider callback; plays a footstep sound on an animation frame and begins contact after n ticks.
-void sub_080A28A8(struct SceneActorRegistryResetView *a, s32 n)
+// confidence=low: windup emits a contact cue before entering the pursuit phase.
+#define Spider_UpdateContactWindup sub_080A28A8
+void Spider_UpdateContactWindup(struct SceneActorRegistryResetView *a, s32 n)
 {
     u8 *anim = (u8 *)a->drawable + 0x48;
     u8 *nav = (u8 *)a + 0x3D4;
@@ -59,76 +60,96 @@ void sub_080A28A8(struct SceneActorRegistryResetView *a, s32 n)
     }
     {
         u32 q = 0x2B3;
-        register s32 nn asm("r5") = n;
-        if (F(a, q, u8) && nn > 60) {
-            register u16 *fl asm("r6") = &a->flags2D4;
-            register u32 z4 asm("r4");
-            register u32 z3 asm("r3");
-            void *t;
-            {
-                u32 m = ~0x100;
-                u32 v = *fl;
-                m &= v;
-                z4 = 0;
-                z3 = 0;
-                *fl = m;
-            }
-            q -= 0xB;
-            F(a, q, u8) = z4;
-            nn = 0x2A9;
-            F(a, nn, u8) = z4;
-            q += 2;
-            F(a, q, u8) = 12;
-            nn += 3;
-            F(a, nn, u32) = z3;
-            {
-                u32 b = 0x2B1;
-                F(a, b, u8) = 1;
-            }
-            t = F(nav, 0x48, void *);
-            nn += 6;
-            F(a, nn, u8) = 1;
-            {
-                u32 b = 0x2B0;
-                u32 k = 26;
-                F(a, b, u8) = z4;
+        if (F(a, q, u8)) {
+            register s32 nn asm("r5") = n;
+            asm("" : "+r"(nn));
+            if (nn > 60) {
+                u16 *fl = &a->flags2D4;
+                u32 z4;
+                register u32 z3 asm("r3");
+                void *t;
+                register u32 kind asm("r2");
+                u32 behavior;
+                {
+                    u32 m = ~0x100;
+                    u32 v = *fl;
+                    m &= v;
+                    z4 = 0;
+                    z3 = 0;
+                    *fl = m;
+                }
+                behavior = 12;
+                q -= 0xB;
+                F(a, q, u8) = z4;
+                nn = 0x2A9;
+                F(a, nn, u8) = z4;
+                q += 2;
+                F(a, q, u8) = behavior;
                 nn += 3;
-                F(a, nn, u8) = k;
-                b -= 0x94;
-                F(a, b, void *) = t;
-            }
-            nn += 0x13;
-            F(a, nn, u16) = z3;
+                F(a, nn, u32) = z3;
+                {
+                    u32 b = 0x2B1;
+                    F(a, b, u8) = 1;
+                }
+                t = F(nav, 0x48, void *);
+                kind = 26;
+                asm("" : "+r"(kind));
+                nn += 6;
+                F(a, nn, u8) = 1;
+                {
+                    register u32 b asm("r1") = 0x2B0;
+                    u32 k = kind;
+                    F(a, b, u8) = z4;
+                    nn += 3;
+                    F(a, nn, u8) = k;
+                    b -= 0x94;
+                    {
+                        register void **address asm("r0") = (void **)((u8 *)a + b);
+                        register void *callback asm("r2") = t;
+                        asm("" : "+r"(address), "+r"(callback));
+                        *address = callback;
+                    }
+                }
+                nn += 0x13;
+                F(a, nn, u16) = z3;
+                asm("" : : "r"(nn));
 
-            {
-                u32 *p = &a->flags114;
-                u32 m = ~1;
-                *p &= m;
-            }
-            a->word104 = z3;
-            sub_080A4798(a);
-            SceneActorMovement_ResolveRoutePosition(a);
-            {
-                u16 *p = (void *)((u8 *)a + 0x414);
-                u32 m = 4;
-                u32 v = *p;
-                m |= v;
-                *p = m;
-            }
-            {
-                u32 m = 128;
-                u32 v = *fl;
-                m |= v;
-                *fl = m;
-            }
-            {
-                u32 v = F(a, 0x416, u16);
-                F(a, 0x418, u16) = v;
+                {
+                    u32 *p = &a->flags114;
+                    u32 m = ~1;
+                    *p &= m;
+                }
+                a->word104 = z3;
+                sub_080A4798(a);
+                SceneActorMovement_ResolveRoutePosition(a);
+                {
+                    register u32 offset asm("r5") = 0x414;
+                    u16 *p;
+                    u32 m;
+                    u32 v;
+                    p = (void *)((u8 *)a + offset);
+                    m = 4;
+                    v = *p;
+                    m |= v;
+                    *p = m;
+                    asm("" : : "r"(offset));
+                }
+                {
+                    u32 m = 128;
+                    u32 v = *fl;
+                    m |= v;
+                    *fl = m;
+                }
+                {
+                    register u32 offset asm("r1") = 0x416;
+                    register u16 *field asm("r0");
+                    u32 v;
+                    asm("" : "+r"(offset));
+                    field = (void *)((u8 *)a + offset);
+                    v = *field;
+                    F(a, 0x418, u16) = v;
+                }
             }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080A28A8);
-#endif

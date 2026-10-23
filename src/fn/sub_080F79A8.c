@@ -1,6 +1,8 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.0%
+#define Axe_UpdateOrbitAttack sub_080F79A8
+// fuzzy: 93.3%
+
 // Remaining: polar address reuse, signed RNG/direction loads, collider loop allocation and phase-tail scheduling.
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
@@ -103,9 +105,9 @@ static inline void Difference(struct Vec *v, struct Vec *a, struct Vec *b)
 }
 static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
 {
-    out->x = a->x + b->x;
+    out->x = b->x + a->x;
     out->y = b->y + a->y;
-    out->z = a->z + b->z;
+    out->z = b->z + a->z;
 }
 static inline s32 Scale(s32 value, s32 bits)
 {
@@ -117,6 +119,10 @@ static inline void Clear(u32 mask, u32 *flags)
 {
     *flags &= mask;
 }
+static inline void ClearFlags(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
 static inline void ChangePhase(struct AxeActor *p, void *callback, u32 phase)
 {
     p->entered = 1;
@@ -124,7 +130,7 @@ static inline void ChangePhase(struct AxeActor *p, void *callback, u32 phase)
     p->phase = phase;
     p->callback = callback;
     p->timer = 0;
-    Clear(~1, &p->flags114);
+    ClearFlags(&p->flags114, ~1);
     p->word104 = 0;
 }
 void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
@@ -163,7 +169,10 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
         if (Mod(frame, 4) == 0) {
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
             if ((s32) * (const u8 *)&gUnk_0203B400[gUnk_03005308] <= 19) {
-                data->direction = -(s8)data->direction;
+                {
+                    s32 direction = data->direction;
+                    data->direction = -direction;
+                }
                 Sound_PlaySong(0x169);
             }
         }
