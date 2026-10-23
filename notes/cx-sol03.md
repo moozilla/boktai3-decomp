@@ -58,3 +58,7 @@ resume with the unfinished pause-menu family. Current assignment disposition:
 10 matched, 2 new/improved guarded drafts, 32 skipped or statically reviewed and
 deferred, and 41 not yet attempted. Static-only deferrals are explicitly marked
 above so they are not confused with completed fresh matching attempts.
+
+Combined batch validation printed `build/boktai3.gba: OK` after rebasing onto
+main. Privacy range and whitespace checks passed. All ten exact matches retain
+separate per-function commits; the two guarded drafts retain assembly defaults.
