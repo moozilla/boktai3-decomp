@@ -1,13 +1,13 @@
+#include "global.h"
+#include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.9%
 // fix.py best version (reprinted C)
 // confidence=low: waits twenty updates, saves the group behavior and attempts route recovery.
-#include "global.h"
 // confidence=low: waits twenty updates before saving chase behavior and rerouting.
 
 // Recovery inline register allocation and several flag updates still differ.
-#include "scene_actor_chase.h"
 static inline void Dog_ClearGroupBits(u8 *group, u32 mask)
 {
     ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~mask;

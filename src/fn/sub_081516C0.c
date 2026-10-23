@@ -1,9 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
+#include "global.h"
+
 #ifdef NONMATCHING
 // fuzzy: 93.1%
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers (PlayerCue_RunTo).
-#include "global.h"
 struct P {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;

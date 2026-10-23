@@ -1,10 +1,10 @@
+#include "global.h"
+#include "player.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.4%
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
-#include "global.h"
-#include "player.h"
 
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);

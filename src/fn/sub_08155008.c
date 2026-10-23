@@ -1,3 +1,4 @@
+#include "contact_swarm.h"
 
 #ifdef NONMATCHING
 // fuzzy: 91.9%
@@ -5,7 +6,6 @@
 // confidence=low: replays the alternate cue resource after fade completion.
 // confidence=low: inferred from player cue phases and animation consumers.
 // MATCHING_CONCESSION: register-pinning
-#include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
 // Remaining phase scale addressing and playback register lifetimes differ.
 

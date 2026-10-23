@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+
 #ifdef NONMATCHING
 // fuzzy: 91.5%
 // fix.py best version (reprinted C)

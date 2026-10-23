@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_actor_position_search.h"
+
 #ifdef NONMATCHING
 // fuzzy: 90.1%
 // fix.py best version (reprinted C)

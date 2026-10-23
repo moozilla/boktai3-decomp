@@ -1,9 +1,9 @@
+#include "global.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.6%
 // fix.py best version (reprinted C)
 // confidence=low: inferred from player cue phases and animation consumers.
-#include "global.h"
 
 // confidence=low: tentative cue role from callback phases.
 // Remaining event mask ordering, resource selection stores and playback differ.

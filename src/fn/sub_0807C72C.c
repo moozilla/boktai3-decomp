@@ -2,6 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_attachment.h"
 #include "actor_attachment_manager.h"
+
 #ifdef NONMATCHING
 // fuzzy: 91.2%
 // fix.py best version (reprinted C)

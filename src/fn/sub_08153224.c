@@ -1,4 +1,5 @@
 #include "contact_swarm.h"
+
 #ifdef NONMATCHING
 // fuzzy: 94.7%
 // fix.py best version (reprinted C)

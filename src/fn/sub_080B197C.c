@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
+
 #ifdef NONMATCHING
 // fuzzy: 83.6%
 // fix.py best version (reprinted C)

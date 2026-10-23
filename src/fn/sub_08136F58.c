@@ -1,4 +1,5 @@
 #include "scene_actor_reset.h"
+
 #ifdef NONMATCHING
 // fuzzy: 96.6%
 // fix.py best version (reprinted C)

@@ -1,11 +1,11 @@
+#include "global.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_terrain.h"
 
 #ifdef NONMATCHING
 // fuzzy: 92.8%
 // fix.py best version (reprinted C)
 // confidence=low: existing Golem state interpretation retained.
-#include "global.h"
-#include "scene_actor_reaction.h"
-#include "scene_actor_terrain.h"
 // confidence=low: Golem behavior table dispatches completion into chase or saved-route recovery.
 // Remaining mismatch: Shared RNG loop allocation, outer group pointer lifetime and flag resets still differ.
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
