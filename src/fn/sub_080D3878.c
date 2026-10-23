@@ -4,7 +4,7 @@
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
 
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 92.3%
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -36,6 +36,10 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
+}
+static inline u32 Mummy_HalfFlags(u16 *field, u32 mask)
+{
+    return *field & mask;
 }
 static inline void ShowTile(struct SceneActorAnimationTile *tile, u32 mask)
 {
@@ -95,8 +99,9 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         }
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
+            u32 *flags = &actor->flags2CC;
             u32 mask = ~0x141C0;
-            actor->flags2CC &= mask;
+            *flags &= mask;
             control->counter = 0;
             *(u16 *)((u8 *)control + 0x14) = 0;
             control->timer = 0;
@@ -138,7 +143,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         motionFlags = &actor->flags2D4;
         if (!test) {
             u8 category;
-            if (!(*motionFlags & 0xA007)) {
+            if (!Mummy_HalfFlags(motionFlags, 0xA007)) {
                 SceneEffect_EmitPositionPattern(actor);
                 SceneStimulus_AddUntagged(actor->position.x, actor->position.z, 0x400, 0, 1);
             } else {
