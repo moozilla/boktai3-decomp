@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
 
 struct Keys {
     u16 held;
@@ -37,7 +35,9 @@ void Task_Kill(void *);
 #define BUSY        (*(s16 *)(m + 0x71e))
 #define TRACKED     (*(s16 *)(m + 0x722))
 
-s32 sub_08213888(u8 *m)
+// confidence=low: handles collection-grid selection and the menu close transition.
+#define CollectionBook_UpdateMenu sub_08213888
+s32 CollectionBook_UpdateMenu(u8 *m)
 {
     u32 pageChanged = 0;
     u32 moved = 0;
@@ -57,7 +57,8 @@ s32 sub_08213888(u8 *m)
             if (CollectionBook_IsEntryCollected(*(s16 *)(ids + o)) && LOCKED == 0) {
                 Sound_PlaySong(0xdd);
                 {
-                    s16 t = *(s16 *)(ids + *ip * 2);
+                    s32 off = *ip * 2;
+                    s16 t = *(s16 *)(ids + off);
                     TRACKED = t;
                 }
                 CollectionBook_UpdateTrackedEntryMarker(m);
@@ -109,6 +110,3 @@ s32 sub_08213888(u8 *m)
         ForgingBook_UpdateCursorPulse(m);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08213888);
-#endif
