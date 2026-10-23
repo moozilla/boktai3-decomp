@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Depin with natural C edits only: deterministic search, no compiler targets.
 
-  natfarm.py LIST.tsv OUT_DIR [--seconds N] [--steps N] [--beam N] [-j N]
+  natfarm.py LIST.tsv OUT_DIR [--seconds N] [--steps N] [--beam N] [-j N] [--classic]
 
 LIST.tsv is `pinfarm.py list` output. For each function, the isolated copy
 with every hint stripped (tools/unpin.py) goes to tools/translate.py with
@@ -14,6 +14,13 @@ then the best states again, scored by differing bytes. No empty blocks,
 `do { } while (0)` around statements is allowed: it is how a statement macro
 expands, so write it as a named macro when the match is applied (an empty
 one becomes DEBUG_NOP(), global.h); an `if (1)` block is rejected.
+
+The search is translate.py's --lazy mode: neighbors are generated one pass
+at a time, the passes that most often lead to matches first (LEARNED_ORDER
+there), and it stops at the first match. On two 48-function samples it found
+the same matches as the old breadth-first search in half the CPU time, so the
+default budget is 120 s instead of 300 s (notes/depin-search-2026-10-23.md).
+--classic runs the old search.
 
 OUT_DIR/results.tsv has autosolve's columns, so `pinfarm.py apply
 OUT_DIR/results.tsv --list LIST.tsv --commit` splices the matches back
@@ -45,6 +52,7 @@ def solve(row, a):
     open(stripped, "w").write(unpin.strip_code(open(os.path.join(ROOT, iso)).read()))
     try:
         r = subprocess.run([PY, "tools/translate.py", stripped, func, "--targets", "none", "--natural",
+                            *([] if a.classic else ["--lazy"]),
                             "--seconds", str(a.seconds), "--steps", str(a.steps), "--beam", str(a.beam),
                             "-j", "1"], cwd=ROOT, capture_output=True, text=True,
                            timeout=a.seconds + 300)
@@ -72,7 +80,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("list")
     ap.add_argument("out")
-    ap.add_argument("--seconds", type=int, default=300)
+    ap.add_argument("--seconds", type=int, default=120)
+    ap.add_argument("--classic", action="store_true", help="breadth-first search (before 2026-10-23)")
     ap.add_argument("--steps", type=int, default=3)
     ap.add_argument("--beam", type=int, default=4)
     ap.add_argument("-j", type=int, default=1, help="functions in parallel (one core each)")
