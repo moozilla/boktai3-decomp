@@ -1,10 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
-#ifdef NONMATCHING
-// fuzzy: 99.8%
-// Open: register allocation (ROM: actor r6 with an early copy in r3, group sl, i in r5,
-// candidate pointer sb, position r8) and the MoveTo destination/branch layout.
 
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -175,7 +172,8 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
 }
 
 // confidence=low: scene actor picks the closest reachable overlapping stimulus (8 slots), arms its control timer and walks there.
-u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
+#define SceneActorTarget_ApproachNearestStimulus sub_081376EC
+u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView *actor)
 {
     u8 *group;
     struct SceneActorRegistryControl *control;
@@ -203,8 +201,10 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     found = 0;
     best = 0x7FFFFFFF;
     bestTag = 0;
+    i = 0;
+    asm("" : : "r"(i));
     position = &actor->position;
-    for (i = 0; i <= 7; i++) {
+    for (; i <= 7; i++) {
         u32 tag;
         s8 next;
         next = SceneStimulus_FindOverlapFromIndex(actor->position.x, actor->position.z,
@@ -285,6 +285,3 @@ u32 sub_081376EC(struct SceneActorRegistryResetView *actor)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081376EC);
-#endif
