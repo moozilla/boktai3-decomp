@@ -210,7 +210,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-18.md](../docs/history/2026-10-18.md) | 2026-10-18 | #actor-stats #assets #collision #foundry #history #input #inventory #matching #player #route #scene-actor #scene-hud #scripts #state-actor #stats | 5 |
 | [docs/history/2026-10-19.md](../docs/history/2026-10-19.md) | 2026-10-19.md | #history #scripts #tooling | 1 |
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #compiler-debugger #matching #particles #weather | 1 |
-| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #screamer #script-combat-actor #slime #spider #tentacle #terrain #vanargand | 12 |
+| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #linked-effect #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #screamer #script-combat-actor #slime #spider #tentacle #terrain #vanargand | 13 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
@@ -260,7 +260,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-sol06.md](../notes/cx-sol06.md) | cx-sol06 campaign notes | #matching #hresvelgr | 18 |
 | [notes/cx-sol07.md](../notes/cx-sol07.md) | Campaign worker sol07 | #matching #ratatosk #particles #nonmatching #register-pinning | 12 |
 | [notes/cx-sol08.md](../notes/cx-sol08.md) | cx-sol08 campaign notes | #matching #actors #particles | 16 |
-| [notes/cx-sol09.md](../notes/cx-sol09.md) | Campaign worker sol09 | #matching #axe #scene-actor | 9 |
+| [notes/cx-sol09.md](../notes/cx-sol09.md) | Campaign worker sol09 | #matching #axe #scene-actor | 16 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 8 |
 | [notes/cx-sol11.md](../notes/cx-sol11.md) | Campaign worker sol11 | #matching #actors | 10 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |

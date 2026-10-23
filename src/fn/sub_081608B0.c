@@ -1,8 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// Open: state 2 keeps angle+64 live across the call in sl (original materialises it in r0 then copies).
+
+#define PlayerAttackEffect_EmitPaletteBaseTrail sub_081608B0
 struct Vec {
     u32 x : 16;
     u32 y : 16;
@@ -68,20 +67,16 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
                 s32 t = W(0x584) * step;
                 s32 h = t + step / 2;
                 s32 k = -256;
-                asm("" : "+r"(k));
                 a6 = angle - (h + k) + 32;
                 m = 255;
-                asm("" : "+r"(m));
                 a6 &= m;
                 angle = angle - (t + k) + 32;
             } else {
                 s32 t = W(0x584) * step;
                 s32 h = t + step / 2;
                 s32 k = 256;
-                asm("" : "+r"(k));
                 a6 = angle + (h + k) - 32;
                 m = 255;
-                asm("" : "+r"(m));
                 a6 &= m;
                 angle = angle + (t + k) - 32;
             }
@@ -109,8 +104,13 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
             pitch = (306 - W(0x584) * 10) & 255;
             b.v.y = D(0x22) + shift12(I(0xC0) * SIN(pitch)) + 190;
             distance = shift_distance(I(0xC0) * SIN(pitch + 64));
-            a64 = angle + 64;
-            b.v.x = D(0x20) + shift12(SIN(a64) * distance) - 16;
+            {
+                s32 temporary = angle + 64;
+                s32 product;
+                product = distance * SIN(temporary);
+                a64 = temporary;
+                b.v.x = D(0x20) + shift12(product) - 16;
+            }
             b.v.z = D(0x24) + shift12(distance * gUnk_086149C4[angle]) + 16;
             sub_081606C0(p, &b.v, 5, p + 0x18, 0, 0);
             pitch = (311 - W(0x584) * 10) & 255;
@@ -140,6 +140,3 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
 done:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerAttackEffect_EmitPaletteBaseTrail);
-#endif

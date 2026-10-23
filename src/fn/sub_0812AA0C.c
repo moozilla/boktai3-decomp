@@ -1,7 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.8%
-// Entry vector arithmetic and register allocation still differ.
+// fuzzy: 87.4%
+// Open: entry vector pointer allocation, reset offsets, and six structural differences.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -170,32 +170,38 @@ static inline u32 RandomValue(void)
 {
     u32 index = (gUnk_03005308 + 1) & 1023;
     gUnk_03005308 = index;
-    return gUnk_0203B400[index];
+    return *(const u16 *)((index << 1) + (u32)gUnk_0203B400);
 }
 static inline s32 Truncate(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
+struct UnsignedVector {
+    u16 x, y, z, pad;
+};
 void LinkedEffect_SetVariant(void *, u32);
 // confidence=low: expands the linked effect while preparing an elevated travel target.
 void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {
         register u32 heading asm("r3");
+        u32 sample;
         register u32 distance asm("r4");
-        struct Vec *velocity, *position;
+        struct UnsignedVector *velocity;
+        struct Vec *position;
         p->sprite.flags = (p->sprite.flags & ~1) | 2;
         p->ended = 0;
         heading = p->heading;
-        distance = (u8)RandomValue();
-        velocity = &p->velocity;
+        sample = (u8)RandomValue();
+        velocity = (void *)&p->velocity;
         asm("" : "+r"(velocity));
-        distance += 64;
+        distance = sample + 64;
         asm("" : "+r"(heading), "+r"(distance));
-        velocity->x = Truncate(distance * gUnk_086149C4[(heading + 64) & 255]);
+        sample = 255;
+        velocity->x = Truncate(distance * gUnk_086149C4[(heading + 64) & sample]);
         velocity->y = 0;
         velocity->z = Truncate(distance * gUnk_086149C4[heading]);
-        velocity = &p->velocity;
+        velocity = (void *)&p->velocity;
         position = &p->sprite.position;
         {
             u32 x = velocity->x;

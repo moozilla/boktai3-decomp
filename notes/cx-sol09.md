@@ -69,3 +69,40 @@ Search tooling: Ghidra export and the worktree's instrumented agbcc are absent, 
 ## First batch integration
 
 Two exact matches, both Register-pinned, add 0.0855 percentage points of code coverage (2060 bytes). Five guarded drafts improve retained candidates or add new starting points. The pending player-trail candidate has only a commutative multiply register difference and is preserved locally for the next batch.
+
+
+## Continued pass after first merge
+
+The first batch merged after its combined ROM build printed `build/boktai3.gba: OK`. Named guarded drafts must retain their named assembly fallback: putting an address alias outside the guard changes the fallback's generated symbol and can break linking. Restore the fallback name and keep draft aliases inside the guard.
+
+### Player attack effect
+
+- 081606C0: drafted 66.1%, PlayerAttackEffect_AllocateParticle (tentative). Complete sixteen-slot allocator and packed-animation stepper. Iterated structure copies, slot truncation, helper reuse, pointer views, register lifetimes, compiler-decision flips, and declaration variants. The sequence array starts at 0x384. Remaining: pointer reuse, angle truncation, and stepper allocation. Higher-scoring hard-register variants clobbered live pointers and were discarded.
+- 081608B0: matched, PlayerAttackEffect_EmitPaletteBaseTrail, 1524 bytes, Register-pinned. Keep angle plus sixty-four in the call register until the first cosine product; reversing commutative multiplication operands resolves the last two bytes. Required depinning reduced nine hints to one; formatted full-extent check passes.
+- 0816233C: drafted 70.9%, PlayerAttackEffect_UpdateParticles (tentative). Complete lifetime, animation, and spiral-motion update. An observed effect view recovers the sprite, sequence, and slot arrays at 0xC4, 0x384, and 0x484. Tried scalar and typed views, volatile vector storage, branch spelling, declaration swaps, and decision flips. Remaining: inactive-path sharing, stepper allocation, and vector temporaries.
+- 081625C0: matched, PlayerAttackEffect_Initialize, 288 bytes, ordinary C. Initialize the shared zero before the sprite loop and return zero explicitly for its consuming caller. A typed slot array fixes the final address-add order. Depinning removes both hints; formatted full-extent check passes.
+
+### Scene actor control phases
+
+- 08082648: drafted 69.3%, SceneActorControl_ApplyRecoveryContact (tentative). Complete healing-contact callback, saturated health update, feedback gating, collider reset, and recovery phase selection. Reused observed reaction types and exact feedback helpers. Delaying collider-address construction into the healing branches improves alignment. Mask helpers, zero-value propagation, decision flips, pinning, and declaration variants were also tried. Remaining: health temporaries and reset-pointer lifetimes.
+- 08083354: drafted 98.4%, SceneActorControl_TickRandomMotion. Rechecked starting C was 91.6% despite its stale 98.4% annotation. Constrain the final phase offsets and counter address, and materialize copy-call arguments in observed order. Remaining: six differing bytes at two signed-load scratch registers. Tried explicit zero indices, opaque scratch lifetimes, compiler hints and allocation diagnostics; stronger constraints regress other loads.
+- 08083560: matched, SceneActorControl_RestoreMotion, 628 bytes, Register-pinned. Restored the historical 92.2% candidate after confirming the current source was stripped to 58.7%. Reworked terrain-cell and height-difference pointer lifetimes, retained the map pointer while computing the cell offset, and shared a destination-first vector-clear helper. Computing the difference before its destination and deferring the actor-Y address recover instruction order; three scoped destination offsets resolve the remaining reload registers. Required depinning reduces thirty-seven hints to twenty-one; formatted full-extent validation passes.
+- 08083C38: skipped fresh full interpolation draft, best 41.3%. Recovered fixed-point coefficients, vector interpolation, and randomized phase advance. Tried packed and halfword views, inline subtraction, volatile snapshots, and decision flips. Scalarization, coefficient allocation, and stack-pointer lifetimes remain different; scratch C is retained locally.
+
+### Linked effect
+
+- 0812A660: matched, ActorEffect_InitColliders, 256 bytes, Register-pinned. Packed initial sizes and halfword updates reproduce both collider setups. Widen attack-property arguments to match the observed ABI. Bounded permutation finds a shared collider-value local and an addressable actor alias, resolving final allocation and copy order. Depinning reduces five hints to three; formatted full-extent check passes.
+- 0812A928: drafted 80.0%, LinkedEffect_SetVariant. Complete six-particle burst with randomized radial speed, height, and lifetime. A register pointer preserves halfword stores; a separate random-height temporary and declaration order improve allocation. Tried loop-invariant views, random helpers, decision flips, and two bounded searches. Discarded hard-pointer variants that overwrite the random-index address. Remaining: loop-invariant order, sine-table reuse, and random-result allocation.
+- 0812AA0C: drafted 87.4%, LinkedEffect_BeginRisingTravel, from 83.8%. Unsigned vector halves remove a signed reload; evaluate the random-table address after its index shift. Reuse the sample local for the cosine mask. Bounded permutation confirms that mask lifetime improves the candidate. Remaining: six structural differences plus entry and reset allocation.
+- 0812ACB0: drafted 80.7%, LinkedEffect_FollowTarget (tentative), above the earlier documented 79.1% exploratory attempt. Complete animation selection, target steering, acceleration, rising motion, stepper, colliders, and expiry. Preserve all three delta halfwords in an addressable array. Separate delay and turning countdowns; construct the positive angle-wrap constant after atan2 to prevent CSE keeping the target-pointer offset live across the call. This recovers the original saved-register frame. Remaining: turn-branch sharing and vector/address allocation, 115 differing instructions, 41 structural.
+
+Technique: restore historical draft hints before trusting stale fuzzy annotations. A prior broad depinning commit checked guarded assembly fallbacks and removed needed hints. Run depinning only on unguarded exact C. Never retain a close-looking pinned candidate without inspecting whether a live pointer or argument was overwritten.
+
+
+### Scene actor motion
+
+- 0807A8CC: drafted 99.5%, SceneActorMotion_Update. Restored the historical complete 1736-byte C candidate: current source had fallen to 66.4% after guarded-fallback depinning. Four instructions differ, all register choices: the unavailable-health signed-load scratch and the mode-field literal reload. Tried offset and pointer constraints, a retained-offset load helper, volatile offsets, address spellings, allocation diagnostics, declaration variants, and a bounded permutation search. Stronger constraints alter reload rotation or make a nearby conditional branch expand. Restored guarded C is retained with the accurately recorded score.
+
+## Second batch integration
+
+Four exact matches add 0.1118 percentage points of code coverage (2696 bytes): three Register-pinned functions (2408 bytes) and one ordinary-C function (288 bytes). Eight new, improved, or restored guarded drafts are retained. After rebasing onto current main, the combined ROM build printed `build/boktai3.gba: OK`. Exact sources also passed their individual reviewed-extent checks.
