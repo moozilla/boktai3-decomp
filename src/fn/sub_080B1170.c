@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -44,13 +43,8 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRandomReaction *context = p->context;
     if (!unavailable(p) && !blocked(p) && p->field2B5 == 0x23 && active(context)) {
-        u16 remaining;
-        register s32 timer asm("r4");
-        remaining = context->timer;
-        timer = remaining;
-        if (timer) {
-            remaining--;
-            context->timer = remaining;
+        if (context->timer) {
+            context->timer--;
         } else {
             context->timer = context->period;
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
@@ -61,7 +55,7 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
                     p->state2A8 = 0;
                     p->phase2A9 = 0;
                     p->behavior2AA = behavior;
-                    p->counter2AC = timer;
+                    p->counter2AC = 0;
                     p->field2B1 = 1;
                 }
             }
