@@ -64,3 +64,7 @@ Batch 1 merged as PR 577 after the verified combined build.
 The campaign wrap-up marker appeared before starting the Slime family. Stopped new matching work and began batch 2 integration immediately. Remaining assigned families were not attempted.
 
 Batch 2 exact gain: 0.0407 percentage points (980 bytes), including 0.0174 percentage points register-pinned (420 bytes) and 0.0232 percentage points without pins (560 bytes). Three new guarded drafts add fuzzy coverage only.
+
+Batch 2 validation: rebased onto current main, regenerated the documentation index after its merge conflict, and ran the combined ROM build. It printed `build/boktai3.gba: OK`. No code conflicts required resolution.
+
+Campaign result at wrap-up: 14 matched functions, 11 new or improved guarded drafts, 13 unchanged/deferred functions; the remaining 52 assigned functions were not attempted after the stop marker. Exact gain is 0.1623 percentage points (3,912 bytes). Register-pinned gain is 0.1200 percentage points (2,892 bytes), and gain without pins is 0.0423 percentage points (1,020 bytes). Both batches received full ROM validation before submission.
