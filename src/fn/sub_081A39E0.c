@@ -184,30 +184,30 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     }
     Collider_Refresh(p->collider);
     {
-    register u8 *cursor asm("r3") = &p->trailCount;
-    u8 *trailCount;
-    asm("" : "+r"(cursor));
-    trailCount = cursor;
-    if (*trailCount <= 3 && !(Frame(p) & 31)) {
-        s32 index;
-        u32 types[4];
-        s32 angle, sample;
-        const u16 *table = gUnk_0203B400;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        sample = table[gUnk_03005308];
-        index = Mod((sample >> 3) & 15, 4);
-        *(struct Types *)types = *(const struct Types *)gUnk_0824F760;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        {
-            register s32 loaded asm("r2") = table[gUnk_03005308];
-            asm("" : "+r"(loaded));
-            sample = loaded;
+        register u8 *cursor asm("r3") = &p->trailCount;
+        u8 *trailCount;
+        asm("" : "+r"(cursor));
+        trailCount = cursor;
+        if (*trailCount <= 3 && !(Frame(p) & 31)) {
+            s32 index;
+            u32 types[4];
+            s32 angle, sample;
+            const u16 *table = gUnk_0203B400;
+            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            sample = table[gUnk_03005308];
+            index = Mod((sample >> 3) & 15, 4);
+            *(struct Types *)types = *(const struct Types *)gUnk_0824F760;
+            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            {
+                register s32 loaded asm("r2") = table[gUnk_03005308];
+                asm("" : "+r"(loaded));
+                sample = loaded;
+            }
+            angle = ((sample >> 3) & 127) + 64;
+            p->trails[*trailCount] =
+                MotionEntry_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
+            (*trailCount)++;
         }
-        angle = ((sample >> 3) & 127) + 64;
-        p->trails[*trailCount] =
-            MotionEntry_CreateConfigured(&p->position, index, angle, 96, types[index], 200);
-        (*trailCount)++;
-    }
     }
     if (p->lifetime)
         p->lifetime--;
