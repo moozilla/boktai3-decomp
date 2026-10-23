@@ -1,10 +1,9 @@
 #include "global.h"
 
 // confidence=low: energy-gated burst sequence with a held middle animation.
-#ifdef NONMATCHING
-// fuzzy: 92.1%
-#define B(n) (*(u8 *)(p + (n)))
-#define H(n) (*(u16 *)(p + (n)))
+#define Player_UpdateHeldEnergyBurst sub_08143604
+#define B(n)                         (*(u8 *)(p + (n)))
+#define H(n)                         (*(u16 *)(p + (n)))
 struct Position {
     s16 x, y, z, pad;
 };
@@ -17,9 +16,16 @@ s32 Player_SetAnimation(void *, s32, s32, s32);
 void Player_UpdateFacingSide(void *);
 void Sound_PlaySong(u32);
 void ActorBurst_Create(void *, void *, void *, u32, u32);
+static inline void ResetBurstSize(u8 *p)
+{
+    u16 *dst = (u16 *)(p + 0xAD6);
+    u32 value;
+    value = 0x16E;
+    *dst = value;
+}
 static inline void grow(u8 *p)
 {
-    H(0xAD6) = 0x16E;
+    ResetBurstSize(p);
     if ((H(0xAD8) += 3) > 32)
         H(0xAD8) = 32;
 }
@@ -59,7 +65,7 @@ void Player_UpdateHeldEnergyBurst(u8 *p)
                 B(0x3A2) = 0;
             if (B(0x4EE)) {
                 Sound_PlaySong(0x128);
-                H(0xAD6) = 0x16E;
+                ResetBurstSize(p);
                 H(0xAD8) = 2;
                 ActorBurst_Create(p, p + 0x30, p + 0xA80, 0, H(0x4A2));
             }
@@ -95,7 +101,3 @@ void Player_UpdateHeldEnergyBurst(u8 *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateHeldEnergyBurst);
-#endif
