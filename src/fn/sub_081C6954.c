@@ -1,8 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-// Differs only in register choice for the else-branch offset constants (0x1EC/0x1ED/0x1EE).
 #define B(o) (*(u8 *)((u8 *)npc + (o)))
 #define H(o) (*(u16 *)((u8 *)npc + (o)))
 #define W(o) (*(u32 *)((u8 *)npc + (o)))
@@ -57,10 +54,11 @@ void sub_0802F298(void);
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
+#define StateActor_CreateFromScriptEntry sub_081C6954
 s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
 {
     s32 model;
-    register s32 fail asm("r6");
+    s32 fail;
     s32 variant;
     s32 angle;
     struct SceneNpc *npc;
@@ -110,7 +108,7 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
     }
     {
         register u32 o6 asm("r6");
-        register u32 o2 asm("r2");
+        u32 o2;
         {
             register void *h asm("r1");
             h = StateActor_EnterPendingState;
@@ -137,10 +135,16 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             *(u8 *)((u8 *)npc + (o6 -= 0xF0)) = Script_GetValue();
             B(0x1ED) = Script_GetValue();
             *(u16 *)((u8 *)npc + (o6 += 2)) = Script_GetValue();
+            asm("" ::"r"(o6));
         } else {
-            B(0x1EC) = 0;
-            B(0x1ED) = 1;
-            H(0x1EE) = 0;
+            u32 offset = 0x1EC;
+            *(u8 *)((u8 *)npc + offset) = 0;
+            asm("" ::"r"(offset));
+            o6 = 0x1ED;
+            *(u8 *)((u8 *)npc + o6) = 1;
+            offset = 0x1EE;
+            *(u16 *)((u8 *)npc + offset) = 0;
+            asm("" ::"r"(offset));
         }
     }
     Actor_InitResources(manager, npc, model, 0);
@@ -149,7 +153,7 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
         case 0: {
             register u32 o6 asm("r6") = 0x21C;
             u8 one;
-            register u32 ten asm("r1");
+            u32 ten;
             void (*fn)(void);
             *(u32 *)((u8 *)npc + o6) = 0x400;
             W(0x220) = 0x1000;
@@ -163,7 +167,6 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             fn = sub_0802F298;
             npc->state = ten;
             o6 += 0xB0;
-            asm("" : "+r"(o6));
             *(void **)((u8 *)npc + o6) = fn;
             asm("" ::"r"(o6));
             npc->field10 = 0;
@@ -186,6 +189,3 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
         } break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StateActor_CreateFromScriptEntry);
-#endif

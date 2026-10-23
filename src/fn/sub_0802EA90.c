@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 80.3%
+// fuzzy: 96.2%
 
 // 32 differing instruction runs; size +4 bytes; first diff at +0xA (adds r5, r1, #0 vs adds r4, r1, #0)
 struct Vec {
@@ -77,7 +77,9 @@ static inline int height(struct Vec *pos)
         index = gUnk_030052F4->rows[z] + x;
     return (*cell(index) & 15) << 8;
 }
-void sub_0802EA90(void *unused, struct Actor *arg)
+// confidence=low: advances toward the scripted position using the current movement angle.
+#define SceneActorAnimation_UpdateWalkToPosition sub_0802EA90
+void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
 {
     register struct Actor *p asm("r5") = arg;
     if (p->entered) {
@@ -88,28 +90,68 @@ void sub_0802EA90(void *unused, struct Actor *arg)
     }
     if ((u8)p->callback(p) != 1) {
         register struct Vec *pos asm("r3") = &p->pos;
-        register struct Vec *target asm("r4") = &p->target;
+        struct Vec *target = &p->target;
         int dx = target->x - pos->x;
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
-        if (distance <= p->speedSquared) {
+        u32 limit = p->speedSquared;
+        register struct Vec *savedPos asm("r8") = pos;
+        register struct Vec *savedTarget asm("ip") = target;
+
+        if (distance <= limit) {
             p->pos = p->target;
             p->done = 1;
         } else {
-            u8 *ap = &p->angle;
+            register u8 *ap asm("r3") = &p->angle;
+            register struct Vec *vel asm("r4") = &p->velocity;
             register int angle asm("r6") = *ap;
-            register int speed asm("r7") = p->speed;
-            struct Vec *vel = &p->velocity;
-            vel->x = scale(speed * gUnk_086149C4[(angle + 64) & 255]);
+            int speed = p->speed;
+
+            s32 product = speed * gUnk_086149C4[(angle + 64) & 255];
+            register u8 *savedAngle asm("sb") = ap;
+
+            vel->x = scale(product);
             vel->y = 0;
             vel->z = scale(speed * gUnk_086149C4[angle]);
             asm("" ::"r"(angle), "r"(speed));
-            p->targetAngle = Math_Atan2(target->x - pos->x, target->z - pos->z);
+            {
+                register struct Vec *target asm("r3") = savedTarget;
+                s32 x;
+                register struct Vec *pos asm("r6");
+                s32 z;
+
+                x = target->x;
+                pos = savedPos;
+
+                x -= pos->x;
+
+                z = target->z - pos->z;
+                p->targetAngle = Math_Atan2(x, z);
+            }
             {
                 int value = p->targetAngle;
-                *ap = value;
-                p->facing8 = ((value + 112) >> 5) & 7;
-                p->facing4 = ((value + 96) >> 6) & 3;
+                register u8 *out asm("r4") = savedAngle;
+
+                *out = value;
+                {
+                    register s32 shifted asm("r2") = value + 112;
+                    register s32 mask asm("r0");
+                    asm("" : "+r"(shifted));
+                    shifted >>= 5;
+                    mask = 7;
+                    asm("" ::"r"(shifted), "r"(mask));
+                    p->facing8 = mask & shifted;
+                }
+                {
+                    register s32 mask asm("r0");
+                    s32 shifted = (value + 96) >> 6;
+                    asm("" ::"r"(shifted));
+                    mask = 3;
+                    asm("" ::"r"(mask));
+                    mask &= shifted;
+                    asm("" : "+r"(mask));
+                    p->facing4 = mask;
+                }
             }
             Actor_PlayAnimationEntry(p, 1, 1, 0, 1);
         }

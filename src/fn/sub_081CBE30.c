@@ -1,6 +1,7 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 79.5%
+// fuzzy: 91.7%
 // register allocation: b/frame/state get r5/r6/r4 instead of r6/r4/r5
 struct Vec081CBE30 {
     s16 x, y, z, pad;
@@ -10,9 +11,11 @@ s32 DisplayAnimation_TestFinished(void *);
 void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
-void sub_081CBE30(u8 *a, u8 *b, s32 frame)
+void sub_081CBE30(u8 *a, u8 *b, s32 inputFrame)
 {
+    register s32 frame asm("r4") = inputFrame;
     u32 anim;
+    s32 state;
     if (b[9]) {
         b[9] = 0;
         b[7] = 0;
@@ -60,7 +63,8 @@ void sub_081CBE30(u8 *a, u8 *b, s32 frame)
             *(u32 *)(b + 0x10) = zero;
         }
     }
-    switch (b[0x18]) {
+    state = b[0x18];
+    switch (state) {
         case 0:
             if (frame == 15) {
                 s16 *p = (s16 *)(b + 0x68);
@@ -71,7 +75,8 @@ void sub_081CBE30(u8 *a, u8 *b, s32 frame)
                 v[0] = x - 0x20;
                 v[1] = y + 0x180;
                 v[2] = z + 0x20;
-                TimedSpriteEffect_Create((struct Vec081CBE30 *)v, 0xa0, 0x20, 1, 1, 0, 0, 0, 0);
+                TimedSpriteEffect_Create((struct Vec081CBE30 *)v, 0xa0, 0x20, 1, 1, state, state,
+                                         state, state);
             }
             if (DisplayAnimation_TestFinished(b + 0xd4))
                 b[0x18] = 1;

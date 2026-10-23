@@ -3,7 +3,7 @@
 #include "engine.h"
 #include "scene_actor_position_search.h"
 #ifdef NONMATCHING
-// fuzzy: 85.5%
+// fuzzy: 87.9%
 /* Remaining differences: pointer lifetimes, state/reset constants, and command setup. */
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
@@ -65,16 +65,41 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
 static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *group,
                         struct ContactPosition *destination)
 {
+    register struct SceneActorRegistryResetView *owner asm("r8") = actor;
     void *shape = *(void **)((u8 *)group + 0x1FC);
     if (Nav_IsPositionInMesh(shape, &actor->position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, &actor->position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&owner->motion, 8);
             return 1;
         }
     }
-    actor->flags2D4 &= ~0x200;
+    {
+        s32 mask = ~0x200;
+        owner->flags2D4 &= mask;
+    }
+    return 0;
+}
+
+static inline u8 MoveToSource(struct SceneActorRegistryResetView *actor, void *group,
+                              struct SceneActorPositionSource **source)
+{
+    register struct SceneActorRegistryResetView *owner asm("r8") = actor;
+    void *shape = *(void **)((u8 *)group + 0x1FC);
+    struct ContactPosition *destination = &(*source)->position;
+    if (Nav_IsPositionInMesh(shape, &actor->position, destination)) {
+        s32 result = Terrain_ApplyBlocked(shape, &actor->position, destination);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&owner->motion, 8);
+            return 1;
+        }
+    }
+    {
+        s32 mask = ~0x200;
+        owner->flags2D4 &= mask;
+    }
     return 0;
 }
 
@@ -109,12 +134,11 @@ void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView
     void **source;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     destination = actor->state5D4;
-    source = (void **)((u8 *)group + 0x74);
+    source = (void **)((u8 *)actor + 0x448);
     destination->x = (*(s16 **)((u8 *)source + 8))[0];
     destination->z = (*(s16 **)((u8 *)source + 8))[1];
     destination->y = HeightAt(destination);
-    if (!MoveTo(actor, group,
-                &(**(struct SceneActorPositionSource ***)((u8 *)group + 0x88))->position)) {
+    if (!MoveToSource(actor, group, *(struct SceneActorPositionSource ***)((u8 *)group + 0x88))) {
         s16 *coordinates = *(s16 **)((u8 *)group + 0x7C);
         SetCoordinates(&position, coordinates);
         MoveTo(actor, group, &position);
