@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 87.9%
 // Remaining differences: state dispatch, coordinate lifetimes and register allocation.
 #include "global.h"
 #include "display_animation.h"
@@ -179,9 +179,10 @@ static inline u8 *cell(int index)
 // confidence=low: rising effect retargets the player before descending and emitting an impact.
 void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
 {
-    u8 *age = &p->age;
+    u8 *age;
     u8 *state;
     Nidhoggr_StepAnimation(p);
+    age = &p->age;
     if (!(*age & 3))
         Nidhoggr_CreatePalette426Effect(p->boss + 0x54, &p->sprite.position);
     state = &p->state;
@@ -200,17 +201,27 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
         case 1:
             if (p->sprite.position.y - p->ground > 0x1000) {
                 register u8 *boss asm("r9") = p->boss;
-                struct NidhoggrVector *position = &p->sprite.position;
+                struct NidhoggrVector *position;
+                register struct NidhoggrVector *savedPosition asm("r8");
+                u16 *xField, *zField;
+                u16 value;
                 int x, z, index, slope, height;
                 u8 *c;
                 struct NidhoggrVector v;
-                position->x = *(u16 *)((u8 *)gUnk_02000710 + 0x30);
-                position->z = *(u16 *)((u8 *)gUnk_02000710 + 0x34);
+                value = *(u16 *)(gUnk_02000710 + 0x30);
+                xField = (u16 *)&p->sprite.position.x;
+                *xField = value;
+                value = *(u16 *)(gUnk_02000710 + 0x34);
+                zField = (u16 *)&p->sprite.position.z;
+                *zField = value;
                 p->velocity.y = -0x33;
                 (*state)++;
                 Anim_RestartSequence(&p->sequence, *(void **)(boss + 0x5400), 4, 0, 0);
+                position = &p->sprite.position;
                 x = position->x >> 8;
                 z = position->z >> 8;
+                savedPosition = position;
+                asm("" : "+r"(savedPosition));
                 if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
                     index = 0;
                 else
@@ -237,9 +248,9 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                     collider->flags &= mask;
                 }
                 ScaledShadow_Enable((u8 *)p + 0x60);
-                v.x = position->x;
+                v.x = savedPosition->x;
                 v.y = p->ground;
-                v.z = position->z;
+                v.z = *zField;
                 EffectPool_CreateTimedEffect(boss + 0x54, &v);
             }
             break;
@@ -265,8 +276,10 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                 goto destroy;
             }
             break;
-        case 255:
-            Nidhoggr_CreateTimedPositionEffect(&p->sprite.position, p->boss);
+        case 255: {
+            u8 *boss = p->boss;
+            Nidhoggr_CreateTimedPositionEffect(&p->sprite.position, boss);
+        }
         destroy:
             p->update = 0;
             if (p->destroy) {

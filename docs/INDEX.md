@@ -210,7 +210,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-18.md](../docs/history/2026-10-18.md) | 2026-10-18 | #actor-stats #assets #collision #foundry #history #input #inventory #matching #player #route #scene-actor #scene-hud #scripts #state-actor #stats | 5 |
 | [docs/history/2026-10-19.md](../docs/history/2026-10-19.md) | 2026-10-19.md | #history #scripts #tooling | 1 |
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #matching | 1 |
-| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #axe #campaign #effect-pool #hresvelgr #inventory #matching #monsters #mummy #nonmatching #particles #player #ratatosk #register-pinning #scene-actor #scene-actors #spider #tentacle #vanargand | 8 |
+| [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #campaign #effect-pool #effects #hresvelgr #inventory #matching #monsters #mummy #nonmatching #particles #player #ratatosk #register-pinning #scene-actor #scene-actors #spider #tentacle #vanargand | 8 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
@@ -253,8 +253,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
 | [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 10 |
-| [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 9 |
-| [notes/cx-sol03.md](../notes/cx-sol03.md) | cx-sol03 campaign | #matching #armor #campaign | 9 |
+| [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 16 |
+| [notes/cx-sol03.md](../notes/cx-sol03.md) | cx-sol03 campaign | #matching #armor #campaign | 11 |
 | [notes/cx-sol04.md](../notes/cx-sol04.md) | cx-sol04 campaign | #matching #player #cue #animation #campaign | 11 |
 | [notes/cx-sol05.md](../notes/cx-sol05.md) | Campaign worker sol05 | #matching #mummy #campaign | 13 |
 | [notes/cx-sol06.md](../notes/cx-sol06.md) | cx-sol06 campaign notes | #matching #hresvelgr | 8 |

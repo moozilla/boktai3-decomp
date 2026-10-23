@@ -6,7 +6,7 @@
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fuzzy: 95.3%
 // Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -209,7 +209,9 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
         case 1:
             enter = &p->enter;
             if (*enter) {
-                *enter = 0;
+                u32 value = *enter;
+                asm("" : "+r"(value));
+                *enter = value = 0;
                 Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 7, (u8)p->variant, 0);
             }
             if (StepPlayback(p, &p->sequence, p, state)) {
