@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 99.1%
+// fuzzy: 99.7%
 
 struct CollectionRes {
     u32 w[8];
@@ -44,6 +44,7 @@ void sub_0821358C(u8 *m)
     struct CollectionPos pos;
     s32 i;
     u16 k;
+    u32 k2;
 
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *(struct CollectionRes *)(m + 0x24) = *res;
@@ -99,7 +100,8 @@ void sub_0821358C(u8 *m)
             pos.y = 0x28;
         }
         k = 0x6e0;
-        *(u16 *)(m + k + i * 2) = gUnk_0861407C[i];
+        k2 = 2;
+        *(u16 *)(m + k + i * k2) = gUnk_0861407C[i];
     }
     CpuSet(*(void **)(m + 0x10c), m + 0x3c4, 0x10);
     *(void **)(m + 0x10c) = m + 0x3c4;
