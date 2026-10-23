@@ -2,7 +2,9 @@
 
 // confidence=low: projects a cosine-scaled speed opposite the actor side.
 #define Hresvelgr_SetCosineScaledVelocity sub_0819C8F8
-struct BurstVector { s16 x, y, z, pad; };
+struct BurstVector {
+    s16 x, y, z, pad;
+};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
