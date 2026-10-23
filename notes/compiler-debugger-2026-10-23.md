@@ -12,7 +12,9 @@ draft in this order:
 | `tools/step.py FILE FUNC` | Which decision differs first? It follows each differing insn through the `-da` pass dumps and names operand swaps, ties, deletions by cse/gcse/loop, and pure ordering differences. | 1 compile |
 | `tools/flip.py FILE FUNC` | Which pass is responsible? It flips one decision at a time (`-fno-cse-skip-blocks`, `-fno-strength-reduce`, `-fno-gcse`...) with the instrumented agbcc, and prints where that decision lives in the compiler source. | about 16 compiles, 10 s |
 | `tools/rasolve.py` | If only allocation differs: which priority or reload change? | seconds |
-| `tools/hint.py`, `tools/causebook.py` | Which C edits are known to cause a given kind of difference? It mines 145k single-edit mutants of 3,000 matched functions. | offline |
+| `tools/hint.py FILE [FUNC] [--line N / --insn U / --at ADDR] [--flips]` | Ask about one spot: the decision there (step.py), its rule, and the agbcc source lines that make it. `--about WORDS` asks about a decision with no draft. | 1-2 compiles |
+| `tools/agbccsrc.py [TOPIC or words]` | The rule and the anchored compiler source excerpt for one decision (cse-skip, cse-swap, biv-final, move2add, loop-invariant, ...). | none |
+| `tools/hint.py --causes`, `tools/causebook.py` | Which C edits are known to cause a given kind of difference? It mines 145k single-edit mutants of 3,000 matched functions. | offline |
 | `tools/retrobench.py` | A benchmark of broken copies of matched functions, for measuring agents. | offline |
 
 Held-out check of the causebook: the true edit type is in its top 3 for
@@ -65,6 +67,41 @@ Held-out check of the causebook: the true edit type is in its top 3 for
   move2add turns `movs rX, #K` into `adds/subs rX, #d` when rX still holds
   K-d. sub_080EFF6C differs only in this. rasolve: one more reload before
   `count = p + 0x2AC` in the rotation leaves 5 bytes.
+
+## Second session: the ask-driven hint on new and skipped functions
+
+14 matches in the 080E8000-080F8000 range, 4 of them skipped drafts, most
+in 1-5 compiles. Rules confirmed along the way:
+
+* **An empty `if` on a taking helper ends cse's block.**
+  `if (SceneActorControl_TakeFlag(&p[0x2B1])) {}` (a debug print compiled
+  out, probably) stops cse from carrying values across the flag test; a
+  plain `if (f) f = 0;` lets it, and then cse folds `sub + 0x42` into
+  `p + 0x416`. Found from flip (`-fno-cse-skip-blocks`) and the cse-skip
+  excerpt. Used by sub_080F0108, sub_080EFF6C, sub_080EB8CC, sub_080EBA84;
+  the helper Ivy_ResetPhase is in include/ivy_phase.h.
+* **The ROM's epilogue says whether a value is returned.** `pop {r1}` with
+  the argument copied out of r0 is a non-void function with no return
+  statement (sub_080F1FE8). step.py now reports this as `frame`.
+* **Loop invariants are hoisted in body order.** A value the ROM loads among
+  a loop's hoisted constants was written inside the loop body at that point
+  (PhaseObject_TickCountdown's callback).
+* **Constant-then-address and address-then-constant are both source order.**
+  A shared zero after the first address is `u8 *x = &...; u32 zero = 0;`;
+  a bit loaded before its address is a local initialized first
+  (sub_080F3B30, sub_080EBEE0, sub_080F4AB4's `u8 one`).
+* An unfolded `+0x20` then `+8` is a pointer local stepped first
+  (`u32 *d = ptr + 8; d[2] |= 1;`).
+
+Parked, with what is known:
+
+* sub_080F3420: the found block (moved before the loop) recomputes `i *
+  0x194` twice with `muls`; every spelling tried lets cse reuse the loop's
+  multiply. Drafts in build/exp/w.
+* Sword_AccelerateReturnTurn (src draft, 10 bytes): loop.c hoists the
+  0x119, 0x164 and 0x11E addresses in that order in the ROM; the draft
+  hoists 0x11E before 0x164 (second-pass "not desirable" decisions in the
+  loop dump).
 
 ## Drafts left in build/exp only (not committed)
 
