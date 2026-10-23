@@ -3,10 +3,8 @@
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
 #ifdef NONMATCHING
-// fuzzy: 78.1%
+// fuzzy: 84.4%
 // Remaining differences: guard evaluation order, animation temporaries and register allocation.
-// fuzzy: 82.7%
-// Remaining differences: pointer lifetimes, animation flag stores and register allocation.
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -53,7 +51,7 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
         table = base->sequence.commands;
         command = (const volatile u16 *)((u32)table + offset);
     }
-    sprite->frame = *command >> 6;
+    base->frame = *command >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -63,9 +61,9 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+            base->flags |= 4;
         else
-            sprite->flags &= ~4;
+            base->flags &= ~4;
     }
     {
         u32 input = state->flags;
@@ -178,6 +176,14 @@ static inline u32 Rand(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
     return gUnk_0203B400[gUnk_03005308];
 }
+static inline u32 Busy(u32 mask)
+{
+    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+}
+static inline u32 TestFlags(u32 *value, u32 mask)
+{
+    return *value & mask;
+}
 struct Projectile *SpriteProjectile_Create(struct ParticleVector *position0,
                                            struct ParticleVector *velocity, u32 resource0,
                                            u32 script0, u32 sequence, u32 lifetime, u32 flags,
@@ -187,16 +193,16 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position0,
     register struct ParticleVector *position asm("sb") = position0;
     register u32 resource asm("r8") = resource0;
     register u32 script asm("sl") = script0;
-    struct ProjectilePool *pool = gUnk_02000164;
+    register struct ProjectilePool *pool asm("r3") = gUnk_02000164;
     struct Projectile *p;
     if (!pool) {
         pool = SpriteProjectile_EnsurePool();
         if (!pool)
             return 0;
     }
-    if ((gUnk_030053F4 | gUnk_030053F0) & 0x400)
+    if (Busy(0x400))
         return 0;
-    if (gUnk_02000560 & 4)
+    if (TestFlags(&gUnk_02000560, 4))
         return 0;
     p = SpritePool10_AllocateSlot(pool);
     if (!p)
@@ -208,8 +214,18 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position0,
     p->colliderFlags = colliderFlags;
     p->resourceId = resource;
     p->soundDelay = 0;
-    p->active = p->colliderFlags ? 2 : 1;
-    p->position = *position;
+    if (!p->colliderFlags) {
+        p->active = 1;
+        asm("" ::: "memory");
+    } else {
+        p->active = 2;
+        asm("" ::: "memory");
+    }
+    {
+        register struct ParticleVector *src asm("r2") = position;
+        asm("" : "+r"(src));
+        p->position = *src;
+    }
     AnimData_Load((u8 *)p + 0x3C, resource);
     *(void **)((u8 *)p + 0xAC) = ScriptProc_Start(0x922E, script);
     Sprite_Init(p, (u8 *)p + 0x3C, 0);
