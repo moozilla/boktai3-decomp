@@ -54,3 +54,5 @@ The wrap-up marker appeared during integration; no further function attempts wer
 ## Batch 2
 
 Nine exact matches add approximately 0.241 percentage points of code coverage (5,812 bytes). Five use register-pinning concessions (3,476 bytes); four need no hints (2,336 bytes). Four new or improved guarded drafts earn no exact credit. Five other functions retain their earlier drafts after bounded attempts. The initial 08141BAC continuation draft was validated and merged separately before this batch. Next assigned function: Player_ComputeActionScale.
+
+Batch 2 validation: rebase changed only the generated documentation index conflict, resolved by regeneration with both sides present. The combined build printed `build/boktai3.gba: OK`.
