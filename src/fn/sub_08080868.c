@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *actor)
 {
@@ -26,13 +25,13 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
         }
         {
             struct ContactCollider *collider = &actor->colliderA;
-            register u32 old asm("r1");
-            register u32 flag asm("r0");
+            u32 old;
+            u32 flag;
             u32 zero;
             old = collider->flags;
             flag = 4;
+            collider->flags = flag | collider->flags;
             zero = 0;
-            collider->flags = flag | old;
             *(u16 *)((u8 *)actor + 0x178) = zero;
         }
         if (actor->drawableKind == 0) {
@@ -62,8 +61,8 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
         else
             *((u8 *)actor->drawable + 0x3A) = state;
         {
-            register u32 mask asm("r2") = 0x80000;
-            register u32 *field asm("r1");
+            u32 mask = 0x80000;
+            u32 *field;
             field = &actor->flags2D0;
             *field |= mask;
         }

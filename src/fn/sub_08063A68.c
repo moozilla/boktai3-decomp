@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "roaming_object.h"
 static inline s32 Scale(s32 value)
 {
@@ -11,15 +10,14 @@ void RoamingObject_ApplyImpulse(struct RoamingObject *owner)
     owner->animation = 2;
     if (owner->impulse) {
         s32 x = owner->impulse;
-        register const s16 *table asm("r2") = gUnk_086149C4;
+        const s16 *table = gUnk_086149C4;
         x = Scale(table[(owner->angle + 64) & 255] * x);
 
         owner->velocity.x += x;
         {
-            register s32 y asm("r1") = owner->impulse;
-            y = Scale(table[owner->angle] * y);
-            asm("" : "+r"(y));
-            owner->velocity.z += y;
+            s32 y = owner->impulse;
+            ;
+            owner->velocity.z += Scale(y * gUnk_086149C4[owner->angle]);
         }
         owner->impulse = (owner->impulse * 3) >> 2;
     } else {

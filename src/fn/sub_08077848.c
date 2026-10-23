@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
 void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *actor, u32 event)
 {
@@ -25,11 +24,11 @@ void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *a
             }
             break;
         case 1:
-            if (!actor->field2E4)
+            if (!actor->field2E4) {
                 Sound_PlaySong(529);
-            else {
-                u32 soundFlags = actor->flags2E6;
-                register u32 soundMask asm("r0") = 4;
+            } else {
+                unsigned long long soundFlags = actor->flags2E6;
+                u32 soundMask = 4;
                 if (!SceneActorPlacement_TestMask(soundMask, soundFlags)) {
                     switch ((s32)actor->paletteOffset) {
                         case 0:
