@@ -1,8 +1,4 @@
 #include "global.h"
-// confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
-#ifdef NONMATCHING
-// fuzzy: 99.9%
-// Two differing bytes: scratch register for the signed local-player index load.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
@@ -141,7 +137,7 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gUnk_030053F4, 0x4800)) {
-        register u32 *owner asm("r1") = &actor->field2E0;
+        u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
@@ -174,10 +170,11 @@ static inline void Fill(u32 *zero, void *dst)
 }
 static inline s32 CurrentHealth(struct SceneActorRegistryResetView *actor)
 {
-    register s16 *health asm("r5") = (void *)&actor->health;
-    asm("" : : "r"(health));
+    s16 *health = (void *)&actor->health;
     return *health;
 }
+// confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
+#define Mummy_UpdateBurnDamage sub_080D812C
 void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 {
     struct BurnState *burn = (void *)&actor->group;
@@ -195,9 +192,8 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         return;
     if (actor->field2B5 == 0x15) {
         {
-            register u32 n asm("r0") = 0x20;
+            u32 n = 0x20;
             actor->field1EA = n;
-            asm("" : "+r"(n));
             actor->flags2D4 &= n - 0x31;
         }
         actor->field2C2 = 0x40;
@@ -226,7 +222,6 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         goto statusDone;
     setStatus: {
         register u16 *flags asm("r2") = &actor->flags2D6;
-        asm("" : "+r"(flags));
         *flags = status | *flags;
     }
     statusDone:;
@@ -246,40 +241,32 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
     burn->timer--;
     if (Mod(burn->timer, 40) == 0) {
         {
-            register struct ContactCollider *initial asm("r3") = &actor->colliderA;
-            register u32 *flags asm("r2");
-            register u32 masked asm("r1");
-            asm("" : "+r"(initial));
+            struct ContactCollider *initial = &actor->colliderA;
+            u32 *flags;
+            u32 masked;
             {
-                register u32 cost asm("r0") = 1 << burn->intensity;
-                asm("" : "+r"(cost));
+                u32 cost = 1 << burn->intensity;
                 initial->cost = cost;
                 actor->reactionSoundVariant = cost;
             }
             {
                 u32 amount = initial->cost;
-                register u16 *health asm("r5");
-                asm("" : "+r"(amount));
+                u16 *health;
                 health = (void *)&actor->health;
-                asm("" : "+r"(health));
                 *health -= amount;
             }
             flags = &actor->field2D8;
-            asm("" : "+r"(flags));
             masked = *flags & 0x20000;
-            asm("" : "+r"(masked));
             damageCollider = initial;
             damageFlags = flags;
             if (!masked) {
                 u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
                 {
-                    register struct SceneActorRegistryResetView *p asm("r2") = actor;
-                    asm("" : "+r"(p));
+                    struct SceneActorRegistryResetView *p = actor;
                     if (p->drawableKind == 0)
                         AnimData_SelectPaletteBank((u8 *)p->drawable + 0x2C, bank);
                     else {
-                        register struct SceneActorRegistryResetView *q asm("r3") = actor;
-                        asm("" : "+r"(q));
+                        struct SceneActorRegistryResetView *q = actor;
                         *(u8 **)((u8 *)q->drawable + 0x68) = gUnk_030042E4 + bank * 32;
                     }
                 }
@@ -331,7 +318,6 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         kind = *address;
         owner = actor->field2E0 & 1;
         collider = (u8 *)&actor->colliderA;
-        asm("" : : "r"(collider));
         category = address;
         flags2C0 = &actor->flags2C0;
         if (!owner)
@@ -429,7 +415,3 @@ done:
     burn->timer = 0;
     actor->field2B8 = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateBurnDamage);
-#endif
