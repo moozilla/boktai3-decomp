@@ -59,11 +59,21 @@ static inline void ToScreen(struct Vec *screen, struct Vec *world)
 }
 
 #define SceneTarget_BeginMove sub_081C32C8
+static inline void SetCallback(void (*callback)(void), void (**slot)(void))
+{
+    *slot = callback;
+}
+
 #ifdef NONMATCHING
 // Full arc-motion reconstruction; pointer lifetimes, parameter spills and projection allocation differ.
-void SceneTarget_BeginMove(struct ContactImpactEffect *effect, struct Vec *from, struct Vec *to,
-                           s32 rampFrom, u32 rampTo, u32 arcParameter, u32 trackMode)
+void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct Vec *source,
+                           struct Vec *destination, s32 initialScale, u32 rampTo, u32 arcParameter,
+                           u32 trackMode)
 {
+    struct Vec *from = source;
+    struct Vec *to = destination;
+    s32 rampFrom = initialScale;
+    struct ContactImpactEffect *effect = input;
     struct Vec *origin;
     struct Vec *screen;
     struct Vec *target;
@@ -114,7 +124,7 @@ void SceneTarget_BeginMove(struct ContactImpactEffect *effect, struct Vec *from,
     OrbitMotion_BeginArc((u8 *)effect + 0xA0, origin, target, arcParameter, trackMode);
     effect->shakeThreshold = trackMode;
     *(u32 *)((u8 *)effect + 0x34) &= ~1;
-    *(void **)((u8 *)effect + 0xF4) = ContactImpactEffect_UpdateContact;
+    SetCallback(ContactImpactEffect_UpdateContact, (void *)((u8 *)effect + 0xF4));
     effect->shakeTimer = 0;
     effect->shakeFlag = 0;
     Callback_InvokeActor(effect);
