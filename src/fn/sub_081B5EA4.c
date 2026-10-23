@@ -2,7 +2,8 @@
 #include "global.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 72.0%
+// fuzzy: 75.8%
+// fix.py best version (reprinted C)
 // Remaining differences: second-loop field cursors, action-state addressing and spills.
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
@@ -50,6 +51,7 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     u16 *key;
     s32 i;
     void *data = ScriptProc_Start(0xcb05, 0xb3de);
+    typeof(half) c1;
     resource = boss + 0x78;
     ResourceHeader_Relocate(resource, data);
     animation = boss + 0x18;
@@ -65,15 +67,15 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     CpuSet(source, boss + 0x554, 0x04000008);
     source = gUnk_030042E4 + 0x1060;
     CpuSet(source, boss + 0x574, 0x04000010);
-    *(u32 *)(boss + 0x20) |= 1;
-    *(void **)(boss + 0x4d0) = ScriptProc_Start(0x922e, 0x572b);
+    *((u32 *)(boss + 0x20)) |= 1;
+    *((void **)(boss + 0x4d0)) = ScriptProc_Start(0x922e, 0x572b);
     i = 0;
     links = (void **)(boss + 0x228);
-    palette = (void **)(boss + 0xd0);
     key = (u16 *)(boss + 0xca);
     half = boss + 0x98;
+    c1 = half;
     do {
-        PairedSceneActor_InitializeHalf(half, arg, i);
+        PairedSceneActor_InitializeHalf(c1, arg, i);
         if (i == 1) {
             *key = 0x70;
             links[0] = boss + 0x514;
@@ -96,35 +98,37 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
         {
             register u32 stride asm("r0") = 0x21c;
             asm("" : "+r"(stride));
-            links = (void **)((u8 *)links + stride);
-            palette = (void **)((u8 *)palette + stride);
-            key = (u16 *)((u8 *)key + stride);
+            links = (void **)(((u8 *)links) + stride);
+            palette = (void **)(((u8 *)palette) + stride);
+            key = (u16 *)(((u8 *)key) + stride);
             half += stride;
         }
+        palette = (void **)(boss + 0xd0);
         i++;
     } while (i <= 1);
-    *(u32 *)(boss + 0x5b4) = 0;
+    *((u32 *)(boss + 0x5b4)) = 0;
     switch (mode) {
         case 0:
-            *(u16 *)(boss + 0x20c) = 0;
-            *(u16 *)(boss + 0x428) = 0;
+            *((u16 *)(boss + 0x20c)) = 0;
+            *((u16 *)(boss + 0x428)) = 0;
             break;
+
         case 1:
             half = boss + 0x98;
             do {
-                *(u16 *)(half + 0x174) = *(u16 *)(half + 0x176);
-                *(u32 *)half &= ~1;
-                CpuSet(*(void **)(half + 0x190), *(void **)(half + 0x38), 0x04000008);
-                Vector((struct SceneVec *)(half + 0x9c), *(s16 *)(half + 0xac),
-                       *(s16 *)(half + 0xae));
+                *((u16 *)(half + 0x174)) = *((u16 *)(half + 0x176));
+                *((u32 *)half) &= ~1;
+                CpuSet(*((void **)(half + 0x190)), *((void **)(half + 0x38)), 0x04000008);
+                Vector((struct SceneVec *)(half + 0x9c), *((s16 *)(half + 0xac)),
+                       *((s16 *)(half + 0xae)));
                 ChangeAction(half, 2);
                 half += 0x21c;
-            } while (half <= boss + 0x2b4);
+            } while (half <= (boss + 0x2b4));
             break;
     }
+
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081B5EA4);
 #endif

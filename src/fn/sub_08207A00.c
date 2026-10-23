@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.6%
+// fuzzy: 99.4%
+// fix.py best version (reprinted C)
 // Remaining difference: reload spill-register rotation after the inline animation step
 // (offset temps for inert/terrainEnabled and the terrain cell use r1/r2/r3 one step early).
 // MATCHING_CONCESSION: register-pinning
@@ -18,6 +19,128 @@ void SceneBody_Init(void *, void *, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 extern u32 gUnk_030052F8, gUnk_030052FC;
+static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
+{
+    struct DisplaySequenceSprite *sprite = &owner->display.sprite;
+    struct DisplaySequenceState *state = &owner->sequence;
+    const volatile u16 *command;
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    u32 k1 = 0x30;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)(((u32)table) + offset);
+    }
+    sprite->frame = (*command) >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r1");
+        u32 maskBit = 1;
+        bit = maskBit;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != ((((*command) & k1) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r1");
+        bit = 2;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != ((((*command) & k1) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        register u32 mask asm("r5");
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                    ended = 1;
+                } else {
+                    state->index = index - 1;
+                    ended = 0;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    ended = 1;
+                } else {
+                    ended = 0;
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)(((u32)table) + offset);
+            }
+            state->frameWeight = (*command) & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!((u8)speed))
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
 s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
 {
     if (Script_SeekToKeyword('p')) {
@@ -44,7 +167,7 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         s32 hp = Script_GetValue();
         p->maxHp = hp;
         p->hp = hp;
-        if ((s16)hp < 0)
+        if (((s16)hp) < 0)
             p->inert = 1;
     } else {
         p->maxHp = 120;
@@ -125,15 +248,15 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         p->dead = 1;
         Anim_SetSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
     }
-    VulcanCannon_StepAnimation(p);
+    VulcanCannon_StepAnimation_(p);
     if (!p->inert)
         VulcanCannon_InitCollider(p);
-    if (p->terrainEnabled && !p->inert) {
+    if (p->terrainEnabled && (!p->inert)) {
         struct SceneVec *position = &p->display.spatial.position;
         s32 x = position->x >> 8;
         s32 z = position->z >> 8;
         s32 index;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
             index = 0;
         else
             index = gUnk_030052F4->rows[z] + x;
@@ -148,7 +271,6 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     if (p->delayScript)
         VulcanCannon_ReadScriptValueList(p, p->delayScript);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", VulcanCannon_InitializeFromScript);
 #endif

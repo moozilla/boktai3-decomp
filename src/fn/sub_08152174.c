@@ -1,9 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+
+#ifdef NONMATCHING
+// fuzzy: 91.2%
+// fix.py best version (reprinted C)
 // confidence=low: motion seven changes sprite scale and visibility over six phases.
 // confidence=low: tentative player cue role; see callback body.
-#ifdef NONMATCHING
-// fuzzy: 84.3%
 // Animation registers, scale-store addressing and phase branch layout differ.
 struct P {
     u8 pad0[0x14C];
@@ -139,38 +141,42 @@ static inline void Step(struct ContactSwarmSprite *sprite, struct DisplaySequenc
 // confidence=low: motion 7 changes sprite scale and visibility over six phases.
 void PlayerCue_UpdateMotionFade(struct P *p)
 {
+    typeof(&p->sprite) t1;
     switch (p->phase) {
         case 0:
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
-            if (++p->timer > 27)
+            if ((++p->timer) > 27)
                 ActorSequence_Begin(p, 7, 1);
             break;
+
         case 1:
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
             p->sprite.flags |= 2;
-            p->sprite.unknown8[0] = 64 - ((u8)p->timer << 2);
+            p->sprite.unknown8[0] = 64 - (((u8)p->timer) << 2);
             if (p->timer > 8) {
                 p->sprite.unknown8[1] = p->timer << 3;
                 p->scale = (p->timer - 8) * 20;
                 Player_AddControlFlags(p, 4);
             }
-            if (++p->timer > 15)
+            if ((++p->timer) > 15)
                 ActorSequence_Begin(p, 7, 2);
             break;
+
         case 2:
             Player_AddControlFlags(p, 4);
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
-            p->scale = p->timer * 200 + 160;
-            if (++p->timer > 7) {
+            p->scale = (p->timer * 200) + 160;
+            if ((++p->timer) > 7) {
                 Player_AddControlFlags(p, 1);
                 ActorSequence_Begin(p, 0, 0);
                 p->fn = PlayerCue_UpdateHidden;
                 PlayerCue_CompleteAction(p);
             }
             break;
+
         case 3:
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
@@ -178,15 +184,16 @@ void PlayerCue_UpdateMotionFade(struct P *p)
             p->sprite.flags |= 2;
             p->sprite.unknown8[0] = 4;
             p->sprite.unknown8[1] = 120;
-            p->scale = (8 - p->timer) * 200 + 160;
-            if (++p->timer > 7)
+            p->scale = ((8 - p->timer) * 200) + 160;
+            if ((++p->timer) > 7)
                 ActorSequence_Begin(p, 7, 4);
             break;
+
         case 4:
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
             p->sprite.flags |= 2;
-            p->sprite.unknown8[0] = 64 - ((15 - (u8)p->timer) << 2);
+            p->sprite.unknown8[0] = 64 - ((15 - ((u8)p->timer)) << 2);
             if (p->timer <= 7) {
                 p->sprite.unknown8[1] = (15 - p->timer) << 3;
                 p->scale = (8 - p->timer) * 20;
@@ -195,14 +202,16 @@ void PlayerCue_UpdateMotionFade(struct P *p)
                 p->scale = 0;
                 Player_AddControlFlags(p, 4);
             }
-            if (++p->timer > 15)
+            if ((++p->timer) > 15)
                 ActorSequence_Begin(p, 7, 5);
             break;
+
+            t1 = &p->sprite;
         case 5:
             p->sprite.flags &= ~2;
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-            Step(&p->sprite, &p->seq);
-            if (++p->timer > 3) {
+            Step(t1, &p->seq);
+            if ((++p->timer) > 3) {
                 PlayerCue_EnterStandUpdate(p);
                 p->fn = Player_RestartAnimationFromSetup;
                 PlayerCue_CompleteAction(p);
@@ -210,7 +219,6 @@ void PlayerCue_UpdateMotionFade(struct P *p)
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMotionFade);
 #endif

@@ -3,7 +3,8 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 90.0%
+// fuzzy: 95.2%
+// fix.py best version (reprinted C)
 // Remaining differences: keyframe pointer allocation, vector lifetimes and projection stores.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -141,7 +142,7 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
+static inline void Vector(struct SceneVec *v, s32 angle, s16 scale)
 {
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
@@ -150,6 +151,7 @@ static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
         v->z = Scale(sample * scale);
     }
 }
+
 static inline u8 Ended(struct VanargandPart *p)
 {
     return p->motion[0x29] == 2;
@@ -193,8 +195,11 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
 {
     struct EmergenceProjection projected;
     u8 *enter;
-    u32 entering, state;
+    u32 entering;
+    u32 state;
     u32 mask = 12;
+    typeof(*((void **)(((u8 *)p) + 0x190))) t1;
+    typeof(*((void **)(((u8 *)p) + 0x38))) t2;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -204,19 +209,21 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
             p->enter = 1;
             return;
         }
-        *(u32 *)(boss + 0x20) &= ~1;
+        *((u32 *)(boss + 0x20)) &= ~1;
         if (p->variant == 0)
-            *(u32 *)(boss + 0x20) |= 4;
+            *((u32 *)(boss + 0x20)) |= 4;
         else
-            *(u32 *)(boss + 0x20) &= ~4;
+            *((u32 *)(boss + 0x20)) &= ~4;
         {
-            void *data = *(void **)(boss + 0x4d0);
+            void *data = *((void **)(boss + 0x4d0));
             u32 zero = 0;
             asm("" : "+r"(zero));
             Anim_SetSequence(&p->sequence, data, 9, (u8)p->variant, zero);
         }
         StepSequence(p);
-        CpuSet(*(void **)((u8 *)p + 0x190), *(void **)((u8 *)p + 0x38), 0x04000008);
+        t2 = *((void **)(((u8 *)p) + 0x38));
+        t1 = *((void **)(((u8 *)p) + 0x190));
+        CpuSet(t1, t2, 0x04000008);
         SetState(p, 0);
         p->enter = 1;
     }
@@ -235,8 +242,9 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
                 SetState(p, 1);
                 *enter = 1;
             }
-            p->sprite.position = *(struct ContactPosition *)p->basePosition;
+            p->sprite.position = *((struct ContactPosition *)p->basePosition);
             break;
+
         case 1:
             entering = p->enter;
             asm("" : "+r"(entering));
@@ -248,10 +256,11 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
             if (Anim_Step(boss + 0x18, boss + 0x78)) {
                 SetState(p, 2);
                 *enter = 1;
-                *(u32 *)(boss + 0x20) |= 1;
+                *((u32 *)(boss + 0x20)) |= 1;
             }
-            p->sprite.position = *(struct ContactPosition *)p->basePosition;
+            p->sprite.position = *((struct ContactPosition *)p->basePosition);
             break;
+
         case 2: {
             struct SceneVec target;
             entering = p->enter;
@@ -273,16 +282,17 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
             }
             break;
         }
+
         case 3:
             p->finished = 1;
             break;
     }
-    Project(&projected, p->basePosition);
-    projected.x = projected.x - gUnk_03005418[0] + 120;
-    projected.y = projected.y - gUnk_03005418[1] + 92;
-    *(struct EmergenceProjection *)(boss + 0x38) = projected;
-}
 
+    Project(&projected, p->basePosition);
+    projected.x = (projected.x - gUnk_03005418[0]) + 120;
+    projected.y = (projected.y - gUnk_03005418[1]) + 92;
+    *((struct EmergenceProjection *)(boss + 0x38)) = projected;
+}
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081B562C);
 #endif

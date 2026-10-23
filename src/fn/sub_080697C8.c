@@ -12,12 +12,10 @@ u8 *BouncingObject_Spawn(struct PackedVec *, struct PackedVec *, struct PackedVe
 static inline s32 optionalValue(void)
 {
     s32 value;
-    if (Script_GetPc())
-        value = Script_GetValue();
-    else
-        value = 0;
+    value = (Script_GetPc()) ? (Script_GetValue()) : (0);
     return value;
 }
+
 // confidence=low: spawns a bouncing object from script keywords p (position), a (shot,
 // category), v (velocity), l and n, and sets flag 1 at 0x134.
 #define BouncingObject_SpawnFromScript sub_080697C8
@@ -26,7 +24,9 @@ void BouncingObject_SpawnFromScript(void)
     struct PackedVec pos;
     struct PackedVec vel;
     struct PackedVec zero;
-    s32 a, l, n;
+    s32 a;
+    s32 l;
+    s32 n;
     register s32 b asm("r9");
     struct PackedVec *out;
     u8 *object;
@@ -63,7 +63,7 @@ void BouncingObject_SpawnFromScript(void)
         out = &zero;
         fill = 0;
         {
-            const void *source = (const void *)&fill;
+            const void *source = (const void *)(&fill);
             register void *dest asm("r1") = out;
             asm("" : : "r"(source), "r"(dest));
             CpuSet(source, dest, 0x05000002);

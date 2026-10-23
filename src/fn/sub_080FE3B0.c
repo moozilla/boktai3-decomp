@@ -2,9 +2,10 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-// confidence=low: after the wait, selects a route point and starts the stored movement spline.
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fuzzy: 95.2%
+// fix.py best version (reprinted C)
+// confidence=low: after the wait, selects a route point and starts the stored movement spline.
 // Remaining differences: pointer register allocation (target/copy/zero use r7/r8/r5 instead of r7/r5/r8).
 
 void Axe_SelectRandomRoutePoint(void *);
@@ -87,16 +88,18 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
     struct AxeVec *copy;
     struct AxeRoutePoint *point;
     struct AxeLink *link;
+    typeof(target->x) t1;
+    typeof(copy->z) t2;
     if (actor->field2B1)
         actor->field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
-    if ((s32)actor->counter2AC > 60) {
+    if (((s32)actor->counter2AC) > 60) {
         Axe_SelectRandomRoutePoint(actor);
         target = &targetStorage;
-        copy = target;
-        link = (struct AxeLink *)((u8 *)actor + 0x448);
+        link = (struct AxeLink *)(((u8 *)actor) + 0x448);
         point = link->point;
+        copy = target;
         target->x = point->x;
         target->z = point->z;
         target->y = CellHeight(target, CellIndex(target));
@@ -105,14 +108,16 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         sub_080FAA5C(actor);
         SetState(actor, 0, 0, 1, zero);
         {
-            struct AxeVec *position = (struct AxeVec *)&actor->position;
+            struct AxeVec *position = (struct AxeVec *)(&actor->position);
             target->x -= position->x;
             copy->y -= position->y;
             copy->z -= position->z;
         }
-        *((u8 *)actor + 0x3cd) = Math_Atan2(target->x, copy->z);
+        t2 = copy->z;
+        t1 = target->x;
+        *(((u8 *)actor) + 0x3cd) = Math_Atan2(t1, t2);
         tmp = zero;
-        CpuSet((void *)&tmp, context->clearF14, 0x05000002);
+        CpuSet((void *)(&tmp), context->clearF14, 0x05000002);
     } else
         actor->counter2AC++;
 }

@@ -1,6 +1,8 @@
 #include "rotation_phase.h"
+
 #ifdef NONMATCHING
-// fuzzy: 85.9%
+// fuzzy: 95.8%
+// fix.py best version (reprinted C)
 // Remaining: player-vector argument order, flags pointer lifetime, rotation scratch and phase-tail scheduling.
 // confidence=low: launches toward the player and brakes sprite rotation on arrival.
 #define F(p, o, t) (*(t *)((u8 *)(p) + (o)))
@@ -26,7 +28,10 @@ static inline s32 Shift(s32 v)
 static inline void BeginControl(struct SceneActorRegistryResetView *a, void *callback, u8 phase)
 {
     u32 zero = 0;
-    a->field2B2 = 1;
+    {
+        typeof(a->field2B2) *q1 = &a->field2B2;
+        *q1 = 1;
+    }
     a->field2B0 = zero;
     a->field2B5 = phase;
     a->target = callback;
@@ -34,6 +39,12 @@ static inline void BeginControl(struct SceneActorRegistryResetView *a, void *cal
     a->flags114 &= ~1;
     a->word104 = zero;
 }
+
+static inline u32 Arg1(u32 k_, u32 *flags)
+{
+    return (*flags) & k_;
+}
+
 void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
 {
     u8 *state = a->context;
@@ -46,21 +57,21 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
         sprite->flags |= 2;
         state[0xEAE] = 2;
         Delta(&delta, (void *)(gUnk_02000580 + 0x30), &a->position);
-        if (a->health <= F(state, 0xE48, s32)) {
-            F(a, 0x2EC, s16) = Div(delta.x, 44);
-            F(a, 0x2EE, s16) = 44;
-            F(a, 0x2F0, s16) = Div(delta.z, 44);
+        if (a->health <= (*((s32 *)(((u8 *)state) + 0xE48)))) {
+            *((s16 *)(((u8 *)a) + 0x2EC)) = Div(delta.x, 44);
+            *((s16 *)(((u8 *)a) + 0x2EE)) = 44;
+            *((s16 *)(((u8 *)a) + 0x2F0)) = Div(delta.z, 44);
         } else {
-            F(a, 0x2EC, s16) = Shift(delta.x);
-            F(a, 0x2EE, s16) = 64;
-            F(a, 0x2F0, s16) = Shift(delta.z);
+            *((s16 *)(((u8 *)a) + 0x2EC)) = Shift(delta.x);
+            *((s16 *)(((u8 *)a) + 0x2EE)) = 64;
+            *((s16 *)(((u8 *)a) + 0x2F0)) = Shift(delta.z);
         }
         state[0xEB3] = 0;
         *flags &= ~0x100000;
         Axe_SetAuxiliarySpriteRenderState(a, state + 0x8A8, 0x13D);
         Sound_PlaySong(0x1E5);
     }
-    a->position.y += F(a, 0x2EA, u16);
+    a->position.y += *((u16 *)(((u8 *)a) + 0x2EA));
     if (NormalizeAngle(32 - state[0xED3]) < 0)
         sprite->angle += state[0xEAE];
     else
@@ -79,16 +90,15 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
         else
             state[0xEAE] = 0;
     }
-    if (*flags & 0x10) {
+    if (Arg1(0x10, flags)) {
         u32 zero = 0;
         state[0xED1] = 1;
         BeginControl(a, SceneActorControl_FinishRotation, 0x33);
-        F(state, 0xE4C, u32) &= ~0x800;
+        *((u32 *)(((u8 *)state) + 0xE4C)) &= ~0x800;
         state[0xEB2] = 64;
         sub_080FC094(a, 14);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Axe_UpdateTargetLunge);
 #endif

@@ -1,10 +1,11 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 90.5%
+// fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 // confidence=low: moves a paired half and holds/releases player position requests.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
-#ifdef NONMATCHING
-// fuzzy: 88.6%
 // Remaining differences: Packed-animation allocation, request-call setup, and shared phase-entry tails differ.
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
 struct PairPosition {
@@ -45,23 +46,24 @@ static inline void StepSequence(void *obj)
     struct PairHalf *owner = obj;
     struct DisplaySequenceState *state;
     const volatile u16 *command;
-    u32 duration, flags, bit;
+    u32 duration;
+    u32 flags;
+    u32 bit;
     state = &owner->sequence;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = owner->sequence.commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    owner->frame = *command >> 6;
+    owner->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
+        bit = 1;
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->flags |= 4;
         else
             owner->flags &= ~4;
@@ -76,7 +78,7 @@ static inline void StepSequence(void *obj)
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->flags |= 8;
         else
             owner->flags &= ~8;
@@ -135,16 +137,16 @@ static inline void StepSequence(void *obj)
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         }
@@ -178,16 +180,16 @@ static inline void setPhase(struct PairHalf *half, u32 phase)
 }
 void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHalf *half)
 {
-    struct PairPosition target, position;
-    register struct PairOwner *self asm("r8") = owner;
-    asm("" : "+r"(self));
+    struct PairPosition target;
+    struct PairPosition position;
+    asm("" : "+r"(owner));
     {
         u32 mask = 12;
         half->controlFlags |= mask;
     }
     if (half->entered) {
         half->entered = 0;
-        Anim_SetSequence(&half->sequence, self->resource, 12, (u8)half->mode, 0);
+        Anim_SetSequence(&half->sequence, owner->resource, 12, (u8)half->mode, 0);
         StepSequence(half);
         setPhase(half, 0);
     }
@@ -204,34 +206,37 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
                     Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 1, 0, 0, 0, 1);
                 else
                     goto abortCapture;
-            } else {
-                if (!(gUnk_02000580->flags & 0x40000))
-                    Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 0, 0, 0, 0, 2);
-                else
-                    goto abortCapture;
-            }
+            } else if (!(gUnk_02000580->flags & 0x40000))
+                Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 0, 0, 0, 0, 2);
+            else
+                goto abortCapture;
             goto advanceTrack;
         abortCapture:
             setPhase(half, 3);
+
             break;
         advanceTrack:
             MotionTrack_Update(half->track);
+
             if (trackFinished(half))
                 setPhase(half, 1);
             break;
+
         case 1:
-            if (++half->timer > 120) {
-                Anim_SetSequence(&half->sequence, self->resource, 9, (u8)half->mode, 0);
+            if ((++half->timer) > 120) {
+                Anim_SetSequence(&half->sequence, owner->resource, 9, (u8)half->mode, 0);
                 StepSequence(half);
                 setPhase(half, 2);
             }
             break;
+
         case 2:
             Player_ApplyPositionRequest(gUnk_02000580, &half->position, 80, 32, 128, 0, 0, 0);
-            Anim_SetSequence(&half->sequence, self->resource, 9, (u8)half->mode, 0);
+            Anim_SetSequence(&half->sequence, owner->resource, 9, (u8)half->mode, 0);
             StepSequence(half);
             setPhase(half, 3);
             break;
+
         case 3:
             half->finished = 1;
             break;

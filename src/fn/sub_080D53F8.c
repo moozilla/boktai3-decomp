@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 83.3%
 
+#ifdef NONMATCHING
+// fuzzy: 87.0%
+// fix.py best version (reprinted C)
 // confidence=low: navigation probe events select turns or acceleration behaviors.
 
 // Remaining differences: motion-flags pointer reuse, PRE spill order and random-turn allocation.
@@ -15,9 +16,9 @@ static inline u32 ActorMotionFlags(struct SceneActorRegistryResetView *actor, u3
 {
     return actor->flags2D4 & mask;
 }
-static inline u8 Test16(u16 *field, u32 mask)
+static inline u8 Test16(u16 *field, u16 mask)
 {
-    if (*field & mask)
+    if ((*field) & mask)
         return 1;
     return 0;
 }
@@ -28,10 +29,11 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 sub_0807AF94(void *);
 u8 Mummy_RequestStraightRoute(void *);
-static inline u32 Mummy_RandomBits(u32 mask)
+static inline u32 Mummy_RandomBits(s16 mask)
 {
     return gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023] & mask;
 }
+
 static inline void BeginProbeTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
@@ -58,7 +60,7 @@ static inline void BeginProbeTurn(void *obj, u32 saved)
 
 void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u8 *body = actor->context;
     register s32 speed asm("r6");
     if (Chase_TakeArrived(actor)) {
@@ -70,7 +72,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     {
         u32 mask = 0xa02f;
         u16 *scale;
@@ -84,12 +86,12 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
                 *scale = 0x40;
         }
         if (actor->drawableKind == 0)
-            Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+            Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, *scale);
         else
-            Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+            Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, *scale);
     }
-    if (NavMesh_ConsumeProbeEvent(*(void **)(group + 0x1fc))) {
-        if (!SceneActorBehavior_RequestDescriptorTurn(actor, *(void **)(group + 0x1fc), 32, 32,
+    if (NavMesh_ConsumeProbeEvent(*((void **)(group + 0x1fc)))) {
+        if (!SceneActorBehavior_RequestDescriptorTurn(actor, *((void **)(group + 0x1fc)), 32, 32,
                                                       speed))
             goto increment;
         if (!Test16((u16 *)(group + 0x40), 4)) {
@@ -102,21 +104,18 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
             }
         }
         Chase_SetBehavior(actor, 13);
-    } else {
-        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
-                                                          speed)) {
-            if (PlayerFlags(&gUnk_02000580[0]->flags, 8) && !*(u16 *)(body + 0x6d2)) {
-                if (Mummy_RequestStraightRoute(actor))
-                    return;
-            }
-            Chase_SetBehavior(actor, 14);
-            return;
+    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *((void **)(group + 0x1fc)), 32,
+                                                             32, speed)) {
+        if (PlayerFlags(&gUnk_02000580[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
+            if (Mummy_RequestStraightRoute(actor))
+                return;
         }
+        Chase_SetBehavior(actor, 14);
+        return;
     }
 increment:
     actor->counter2AC++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
 #endif

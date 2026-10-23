@@ -1,6 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
-// confidence=low: tentative cue role inferred from named callers (PlayerCue_RunTo).
 #include "global.h"
+
+#ifdef NONMATCHING
+// fuzzy: 93.1%
+// fix.py best version (reprinted C)
+// confidence=low: tentative cue role inferred from named callers (PlayerCue_RunTo).
 struct P {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;
@@ -55,18 +59,20 @@ static inline s32 Scale(s32 v, s32 k)
     return -((-v) >> 6);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 92.1%
 // Only register choices differ: the 0x20 multiplier pin (r3) shifts temporaries in the velocity block.
 void PlayerCue_UpdateRunTo(struct P *p)
 {
-    s32 dx, dy, angle, dist;
+    s32 dx;
+    s32 dy;
+    s32 angle;
+    s32 dist;
+    typeof(p->vy) t1;
     if (p->frame == 0)
         Sound_PlaySong(0x298);
     dx = p->tx - p->x;
     dy = p->ty - p->y;
     angle = Math_Atan2(dx, dy);
-    dist = dx * dx + dy * dy;
+    dist = (dx * dx) + (dy * dy);
     if (dist <= 0x400) {
         p->x = p->tx;
         p->y = p->ty;
@@ -75,7 +81,7 @@ void PlayerCue_UpdateRunTo(struct P *p)
             p->finalDir = -1;
         } else {
             {
-                register s32 t asm("r0") = (u16)angle + 0x70;
+                register s32 t asm("r0") = ((u16)angle) + 0x70;
                 register s32 d asm("r1");
                 asm("" : "+r"(t));
                 t >>= 5;
@@ -111,13 +117,13 @@ void PlayerCue_UpdateRunTo(struct P *p)
     p->frame++;
     {
         s32 vy;
-        const s16 *tbl = gUnk_086149C4;
-        p->vx = Truncate(Mul32(tbl[(angle + 64) & 255]));
-        vy = Truncate(Mul32(tbl[angle & 255]));
+        p->vx = Truncate(Mul32(gUnk_086149C4[(angle + 64) & 255]));
+        vy = Truncate(Mul32(gUnk_086149C4[angle & 255]));
         p->vy = vy;
         if (p->scaleAxis == 1) {
+            t1 = p->vy;
             if (vy < 0)
-                p->vy = Scale(p->vy, 40);
+                p->vy = Scale(t1, 40);
             else
                 p->vy = Scale(p->vy, 0x34);
         } else if (p->scaleAxis == 2) {

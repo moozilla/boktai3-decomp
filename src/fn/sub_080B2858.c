@@ -1,12 +1,13 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#ifdef NONMATCHING
+// fuzzy: 92.3%
+// fix.py best version (reprinted C)
 // confidence=low: inherited route/reaction interpretation from static callers.
 
 // confidence=low: route role inferred from callers and terrain/path tests.
 
-#ifdef NONMATCHING
-// fuzzy: 90.7%
 // Inline actor/group lifetimes, random-mask ordering, and register allocation still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -141,18 +142,19 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u8 old;
-    if (!reset && *(u16 *)(body + 0x6d0))
+    typeof(old) c1;
+    if ((!reset) && (*((u16 *)(body + 0x6d0))))
         return 0;
-    *(u16 *)(body + 0x6d0) = 60;
+    *((u16 *)(body + 0x6d0)) = 60;
     {
         u32 *field = &actor->flags2CC;
         s32 mask = ~0x10;
         *field &= mask;
     }
     {
-        u32 bit = 0x10;
+        u16 bit = 0x10;
         struct Flags {
             s16 bits : 16;
         };
@@ -161,15 +163,15 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
         flags->bits &= ~0x40;
     }
     SceneActorReaction_ResetResponseState(group + 0x8c, gUnk_0824E230, 0x486);
-    (*(u32 *)(body + 0x6c4))++;
-    if (actor->distanceF0 < *(u32 *)(body + 0x6c8)) {
+    (*((u32 *)(body + 0x6c4)))++;
+    if (actor->distanceF0 < (*((u32 *)(body + 0x6c8)))) {
         old = actor->direction;
         actor->direction = actor->fieldE9 + 0x80;
         if (!Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
-    } else if (actor->distanceF0 > *(u32 *)(body + 0x6cc)) {
+    } else if (actor->distanceF0 > (*((u32 *)(body + 0x6cc)))) {
         old = actor->direction;
         {
             u32 random = RandomBits(0xffffffff);
@@ -177,19 +179,20 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
         }
         if (!actor->fieldDC)
             actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
-        if (!SelectRoute(actor) && !Vorn_SelectReachableEscapeCell(actor, old))
+        if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
     } else {
         old = actor->direction;
+        c1 = old;
         {
             u32 random = RandomBits(0xffffffff);
             actor->direction = (random & 63) + actor->fieldE9;
         }
         if (!actor->fieldDC)
             actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
-        if (!SelectRoute(actor) && !Vorn_SelectReachableEscapeCell(actor, old))
+        if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, c1)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
@@ -203,7 +206,6 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     }
     return 1;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_SelectRetreatRoute);
 #endif

@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 70.7%
+// fuzzy: 72.5%
+// fix.py best version (reprinted C)
 // NPC cutscene dispatcher: most commands set state 0 with a sub-state;
 // 36/4/5 walk towards a point (aim + speed), 3/8/17/18 set the angle,
 // 13-16 swap the palette, 64 places the NPC, 24 runs sub_081D010C.
@@ -92,7 +93,7 @@ static inline void aim(struct SceneNpc *npc, s16 *m)
     npc->angle = Math_Atan2(t->x - p->x, t->z - p->z);
 }
 
-static inline void setSpeed(struct SceneNpc *npc, s32 speed)
+static inline void setSpeed(struct SceneNpc *npc, u8 speed)
 {
     npc->speed = speed;
     npc->speed2 = speed * speed;
@@ -103,7 +104,6 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
     Entry *entry = &npc->entry;
     struct Sub *sub = &npc->sub20;
     s32 i;
-
     i = 0;
     if (i < entry->count[gUnk_0200047C[0x24]])
         do {
@@ -119,6 +119,7 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                         setState(npc, 0);
                     npc->changed = 1;
                     break;
+
                 case 1:
                     setFacing(npc, (u8)((m[4] + 5) << 5));
                     if (sub->flag) {
@@ -129,37 +130,44 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                         npc->changed = 1;
                     }
                     break;
+
                 case 36:
                     aim(npc, m);
                     setSpeed(npc, 10);
                     setState(npc, 2);
                     npc->changed = 1;
                     break;
+
                 case 4:
                     aim(npc, m);
                     setSpeed(npc, 10);
                     setState(npc, 0x15);
                     npc->changed = 1;
                     break;
+
                 case 5:
                     aim(npc, m);
                     setSpeed(npc, 20);
                     setState(npc, 0x15);
                     npc->changed = 1;
                     break;
+
                 case 3:
                     npc->angle = (m[4] + 5) << 5;
                     setState(npc, 3);
                     npc->changed = 1;
                     break;
+
                 case 6:
                     setState(npc, 4);
                     npc->changed = 1;
                     break;
+
                 case 7:
                     setState(npc, 5);
                     npc->changed = 1;
                     break;
+
                 case 8:
                     npc->angle = (m[4] + 5) << 5;
                     npc->flags |= ((u16 *)m)[2] & 3;
@@ -169,67 +177,81 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     setState(npc, 0x10);
                     npc->changed = 1;
                     break;
+
                 case 9:
                     npc->flags |= (u16)(((u16 *)m)[2] & 2);
                     setState(npc, 0x11);
                     npc->changed = 1;
                     break;
+
                 case 10:
                     setState(npc, 0x13);
                     npc->changed = 1;
                     break;
+
                 case 25:
                     if (sub->flag)
                         sub_081CFFE8(npc, m[4]);
                     else
                         Actor_SetAttachmentEffect(npc, m[4], 0xB4, 0xB4);
                     break;
+
                 case 11:
                     setState(npc, 0x14);
                     npc->changed = 1;
                     break;
+
                 case 12:
                     setState(npc, 0x1E);
                     npc->changed = 1;
                     break;
+
                 case 65:
                     setState(npc, 0x1F);
                     npc->changed = 1;
                     break;
+
                 case 66:
                     setState(npc, 0x20);
                     npc->changed = 1;
                     break;
+
                 case 67:
                     setState(npc, 0x21);
                     npc->changed = 1;
                     break;
+
                 case 13:
                     npc->flags |= 4;
                     CpuSet(gUnk_030042E4 + 0x2B00, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
+
                 case 14:
                     npc->flags &= ~4;
                     CpuSet(gUnk_030042E4 + 0x2B60, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
+
                 case 16:
                     npc->flags &= ~4;
                     CpuSet(gUnk_030042E4 + 0x2AE0, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
+
                 case 15:
                     npc->flags |= 4;
                     sub->h2E = 0;
                     CpuSet(gUnk_030042E4 + 0x2AE0, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
+
                 case 64:
                     npc->pos.x = m[4];
                     npc->pos.y = m[5];
                     npc->pos.z = m[6];
                     break;
+
                 case 17:
                     npc->angle = (m[4] + 5) << 5;
                     setFacing(npc, (u8)(npc->angle + 0x80));
@@ -237,6 +259,7 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     setState(npc, 0x17);
                     npc->changed = 1;
                     break;
+
                 case 18:
                     npc->angle = (m[4] + 5) << 5;
                     setFacing(npc, (u8)(npc->angle + 0x80));
@@ -244,32 +267,39 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     setState(npc, 0x18);
                     npc->changed = 1;
                     break;
+
                 case 19:
                     setFacing(npc, (u8)((m[4] + 5) << 5));
                     setState(npc, 0x19);
                     npc->changed = 1;
                     break;
+
                 case 20:
                     setState(npc, 0x1A);
                     npc->changed = 1;
                     break;
+
                 case 21:
                     setState(npc, 0x1B);
                     npc->changed = 1;
                     break;
+
                 case 22:
                     setState(npc, 0x1C);
                     npc->changed = 1;
                     break;
+
                 case 23:
                     setFacing(npc, (u8)((m[4] + 5) << 5));
                     setState(npc, 0x1D);
                     npc->changed = 1;
                     break;
+
                 case 24:
                     sub_081D010C(npc, m);
                     break;
             }
+
             i++;
         } while (i < entry->count[gUnk_0200047C[0x24]]);
 }

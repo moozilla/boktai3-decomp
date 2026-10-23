@@ -1,7 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 89.3%
+// fuzzy: 90.7%
+// fix.py best version (reprinted C)
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
 extern s32 gUnk_03004DA0, gUnk_030051D8, gUnk_03004DA8;
 extern u16 *gUnk_030051E0;
@@ -13,8 +14,10 @@ void Palette_ApplyBackgroundFade(void)
     u16 *buffer = Palette_GetBackgroundBuffer();
     s32 product = gUnk_03004DA0 * gUnk_030051D8;
     s32 value = product >> 6;
-    s32 i, j;
-    u16 *src, *dst;
+    s32 i;
+    s32 j;
+    u16 *src;
+    u16 *dst;
     register s32 level asm("r12");
     s32 other;
     u32 rb;
@@ -28,15 +31,17 @@ void Palette_ApplyBackgroundFade(void)
         for (i = 0; i < 16; i++) {
             if ((gUnk_030051C4 >> i) & 1) {
                 for (j = 0; j < 16; j++) {
-                    *dst++ = gUnk_03005214;
+                    *(dst++) = gUnk_03005214;
                 }
+
             } else {
-                src = gUnk_03004FC0 + i * 16;
+                src = gUnk_03004FC0 + (i * 16);
                 for (j = 0; j < 16; j++) {
-                    *dst++ = *src++;
+                    *(dst++) = *(src++);
                 }
             }
         }
+
         gUnk_030051E0 = buffer;
         return;
     }
@@ -56,15 +61,20 @@ void Palette_ApplyBackgroundFade(void)
                     src++;
                     dst++;
                 }
+
             } else {
                 for (j = 0; j < 16; j++) {
-                    *dst++ = *src++;
+                    *(dst++) = *(src++);
                 }
             }
         }
+
     } else {
         rb = gUnk_03005214 & 0x7c1f;
-        g = gUnk_03005214 & 0x3e0;
+        {
+            u8 k1 = 0x3e0;
+            g = gUnk_03005214 & k1;
+        }
         src = gUnk_03004FC0;
         dst = buffer;
         for (i = 0; i < 16; i++) {
@@ -74,32 +84,32 @@ void Palette_ApplyBackgroundFade(void)
                 register u32 redblue asm("r7") = rb * other;
                 for (j = 0; j < 16; j++) {
                     u32 c = *src;
-                    register u32 redTerm asm("r2") = level * (c & mask) + redblue;
+                    register u32 redTerm asm("r2") = (level * (c & mask)) + redblue;
                     register u32 greenTerm asm("r0");
                     redTerm &= 0xf83e0;
-                    greenTerm = (level * (c & 0x3e0) + green) & 0x7c00;
+                    greenTerm = ((level * (c & 0x3e0)) + green) & 0x7c00;
                     *dst = (redTerm | greenTerm) >> 5;
                     src++;
                     dst++;
                 }
+
             } else {
                 for (j = 0; j < 16; j++) {
-                    *dst++ = *src++;
+                    *(dst++) = *(src++);
                 }
             }
         }
     }
     if (gUnk_03004DB0) {
-        u32 c = gUnk_03005214;
-        u32 rb = c & 0x7c1f, g = c & 0x3e0;
+        u32 rb = gUnk_03005214 & 0x7c1f;
+        u32 g = gUnk_03005214 & 0x3e0;
         s32 old = gUnk_030051D0;
-        gUnk_030051D0 = (((level * (old & 0x7c1f) + rb * other) & 0xf83e0) |
-                         ((level * (old & 0x3e0) + g * other) & 0x7c00)) >>
+        gUnk_030051D0 = ((((level * (old & 0x7c1f)) + (rb * other)) & 0xf83e0) |
+                         (((level * (old & 0x3e0)) + (g * other)) & 0x7c00)) >>
                         5;
     }
     gUnk_03004DA8 = value;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
 #endif

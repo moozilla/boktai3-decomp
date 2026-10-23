@@ -3,7 +3,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 89.8%
+// fuzzy: 90.7%
+// fix.py best version (reprinted C)
 // confidence=low: installed by Skeleton_Init; converges saved displacement before route/chase recovery
 // Remaining differences: flag-address reuse, RNG retry allocation, and inlined recovery stack slots.
 /* Drift toward the anchor at 0x318/0x31C (quarter steps, clamped to 200); once settled,
@@ -360,6 +361,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
     u32 *flags2CC;
     u16 test;
     u32 mask;
+    typeof(mask) t1;
     ClearSettleFlags(actor);
     flags2CC = &actor->flags2CC;
     {
@@ -373,17 +375,16 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         {
             u32 mask = 2;
             asm("" : "+r"(mask));
-            ((struct ShortFlags *)&actor->flags2D6)->bits |= mask;
+            ((struct ShortFlags *)(&actor->flags2D6))->bits |= mask;
         }
         return;
     }
-    mask = 0x80;
-    test = actor->flags2D4 & mask;
+    mask = (t1 = 0x80);
+    test = actor->flags2D4 & t1;
     if (test) {
-        *flags2CC |= mask;
-
+        *flags2CC |= t1;
         group->flags414 |= 4;
-        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
         if (!ReturnHome(actor)) {
             if (!Chase(actor, group)) {
                 Callback_InvokeActor(actor, group->failure);
@@ -396,14 +397,14 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         }
         SetState(actor, 0, 0, 12);
     } else {
-        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->flags2CC |= t1;
         }
         group->destination->pad = 0;
         if (!ReturnHome(actor)) {
-            *(u16 *)(context + 0x6F0) = 0;
+            *((u16 *)(context + 0x6F0)) = 0;
             if (!Chase(actor, group)) {
                 Callback_InvokeActor(actor, group->failure);
                 return;
@@ -417,9 +418,10 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         actor->field2C2 = 0x20;
     }
 }
+
 void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *actor)
 {
-    struct ApproachGroup *group = (void *)&actor->group;
+    struct ApproachGroup *group = (void *)(&actor->group);
     if (Drift(actor)) {
         u8 *context = actor->context;
         actor->field2B0 = 1;

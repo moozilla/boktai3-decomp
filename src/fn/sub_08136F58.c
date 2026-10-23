@@ -1,6 +1,8 @@
 #include "scene_actor_reset.h"
+
 #ifdef NONMATCHING
-// fuzzy: 93.6%
+// fuzzy: 96.6%
+// fix.py best version (reprinted C)
 // Open: register allocation. The original keeps group in sb and the 0x200 constant in
 // r8 (this draft swaps them), and the final control reset uses separate zero registers
 // and loads the 0xFDFF mask before the halfword.
@@ -79,7 +81,6 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
 void sub_08136F58(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group;
-
     if (ConsumeEntry(actor)) {
         SetControl(actor, actor->savedTarget, 0);
         ClearWordFlags(&actor->flags2CC, ~0x80);
@@ -87,26 +88,29 @@ void sub_08136F58(struct SceneActorRegistryResetView *actor)
         ClearHalfFlags(&actor->flags2D4, ~0x200);
         actor->field2C2 = 0x40;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270) == 0) {
+    if (((u8)Callback_InvokeActor(actor, actor->update270)) == 0) {
         u32 *counter = &actor->counter2AC;
-        if (*counter == 30) {
+        if ((*counter) == 30) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
             sub_08136F48(actor, &group->control);
         }
-        if ((s32)*counter > 60) {
+        if (((s32)(*counter)) > 60) {
             u32 bit;
             SetState(actor, 0, 0, 7);
             SetControl(actor, actor->entryTarget228, 1);
             bit = 0x200;
-            GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 1;
+            (*((struct ContactPosition **)(((u8 *)group) + bit)))->pad = 1;
             if (!MoveTo(actor, group, bit)) {
-                Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
+                Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
             } else {
                 struct SceneActorRegistryControl *control = &group->control;
                 u32 mask = 0x200000;
                 if (actor->flags2CC & mask) {
                     ClearWordFlags(&actor->flags2D0, ~0x1000000);
-                    actor->flags2D4 &= ~0x200;
+                    {
+                        u16 k1 = 0x200;
+                        actor->flags2D4 &= ~k1;
+                    }
                     control->mode = 0;
                     control->counter = 0;
                     control->timer = 0;

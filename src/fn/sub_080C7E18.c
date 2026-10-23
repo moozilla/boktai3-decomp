@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.8%
+// fuzzy: 87.1%
+// fix.py best version (reprinted C)
 // Remaining: random-turn spills, shared flag addresses and recovery scheduling.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -70,12 +71,13 @@ static inline s32 PlayerSlot(u8 *actor)
         return actor[8];
     return -1;
 }
-static inline u8 Test(u32 value, u32 mask)
+static inline u8 Test(s16 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
+
 static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
 {
     actor->field2B2 = 1;
@@ -305,8 +307,8 @@ void Golem_ResumeRouteAfterAnimation(struct SceneActorRegistryResetView *actor, 
         u8 padA[4];
         u16 frame;
     };
-    struct RecoveryAnim *anim = (void *)((u8 *)actor->drawable + 0x48);
-    u8 *group = (u8 *)&actor->group;
+    struct RecoveryAnim *anim = (void *)(((u8 *)actor->drawable) + 0x48);
+    u8 *group = (u8 *)(&actor->group);
     if (TakeFlag2B2(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
     {
@@ -314,7 +316,8 @@ void Golem_ResumeRouteAfterAnimation(struct SceneActorRegistryResetView *actor, 
         mask |= actor->flags2D6;
         actor->flags2D6 = mask;
     }
-    if (frame <= 19 && !anim->mode && anim->frame == (anim->loop != 0) && anim->loop != 1)
+    if ((((frame <= 19) && (!anim->mode)) && (anim->frame == (anim->loop != 0))) &&
+        (anim->loop != 1))
         anim->frame = 0;
     if (!actor->field2B3)
         return;
@@ -324,27 +327,27 @@ void Golem_ResumeRouteAfterAnimation(struct SceneActorRegistryResetView *actor, 
     SetControl(actor, 14, SceneActorReaction_RestoreAfterDelay);
     if (MaskFlags(actor, 0x80)) {
         if (Chase(actor))
-            PrepareDelay(group, *(void **)(group + 0x48), 12, 30);
+            PrepareDelay(group, *((void **)(group + 0x48)), 12, 30);
     } else {
         struct ContactPosition *dest;
         struct GolemRouteLink *link;
         PrepareDelay(group, actor->entryTarget228, 7, 40);
         actor->flags2CC |= 0x10;
         actor->field2C2 = 0x40;
-        dest = HOME;
+        dest = *((struct ContactPosition **)(group + 0x200));
         link = (void *)(group + 0x74);
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
-        if (!TryMove(actor, PTR(group, 0x1fc), &actor->position, HOME)) {
+        if (!TryMove(actor, *((void **)(((u8 *)group) + 0x1fc)), &actor->position,
+                     *((struct ContactPosition **)(group + 0x200)))) {
             SetControl(actor, 0, SceneActorControl_OnIdle);
             SetState(actor, 3, 0, 0);
         } else
-            HOME->pad = 1;
+            (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
     }
     return;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080C7E18);
 #endif

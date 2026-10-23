@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.4%
+// fuzzy: 95.9%
+// fix.py best version (reprinted C)
 struct ParticleVec {
     s16 x, y, z, pad;
 };
@@ -60,11 +61,12 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
     if (!position)
         return -1;
     m = gUnk_020001DC;
-    if (!m && !(m = EffectPool_CreateManager()))
+    if ((!m) && (!(m = EffectPool_CreateManager())))
         return -1;
     for (i = 0; i < count; i++) {
         struct ParticleEntry *e = NativeParticle_AllocateEntry(m);
-        u32 sequence, flag;
+        s8 sequence;
+        u32 flag;
         if (!e)
             return -1;
         sprite = &m->sprites[e->index];
@@ -98,11 +100,15 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
             sequence = 14;
         Anim_SetSequence(m->animations[e->index], m->resource, sequence, 0,
                          (u8)(Mod(random(&gUnk_03005304), 2) | animFlags));
-        sprite->flags = sprite->flags | 0x11 | spriteFlags;
         sprite->priority = priority;
+        {
+            u8 k1 = 0x11;
+            sprite->flags = (sprite->flags | k1) | spriteFlags;
+        }
         e->active = 1;
         e->tag = tag;
     }
+
     return 0;
 }
 #else

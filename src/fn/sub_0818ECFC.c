@@ -1,7 +1,8 @@
 #include "global.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 73.5%
+// fuzzy: 77.8%
+// fix.py best version (reprinted C)
 // Remaining differences: retained pool cursors, loop-stride hoisting and collider temporary allocation.
 struct PanelEffectSlot {
     void *update, *onComplete;
@@ -31,12 +32,17 @@ void Collider_Refresh(void *);
 extern u32 gUnk_03003A50;
 // confidence=low: dispatches two effect pools and advances live collision-effect positions.
 #define ScenePanelEffect_UpdatePool sub_0818ECFC
+static inline u32 Arg1(u32 k_, s8 index)
+{
+    return index & k_;
+}
+
 void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
 {
     struct PanelEffectSlot *small = pool->small;
     u32 mask = 1;
     s32 remaining = 24;
-    s32 index;
+    s8 index;
     struct PanelCollisionSlot *large;
     do {
         if (small->update)
@@ -54,11 +60,11 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
         if (large->update)
             Callback_InvokeActor(large, large->update);
         if (!large->update)
-            pool->largeMask[index >> 5] &= ~(1 << (index & 31));
+            pool->largeMask[index >> 5] &= ~(1 << Arg1(31, index));
         else {
             struct SceneVec *anchor = large->anchor;
             if (anchor) {
-                large->position.x = large->delta.x + anchor->x;
+                large->position.x = anchor->x + large->delta.x;
                 large->position.y = large->delta.y + anchor->y;
                 large->position.z = large->delta.z + anchor->z;
             } else {
@@ -78,7 +84,6 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
         index++;
     } while (remaining > 0);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0818ECFC);
 #endif

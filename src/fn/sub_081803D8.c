@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 74.7%
+// fuzzy: 81.9%
+// fix.py best version (reprinted C)
 // Open: the step address is kept in a callee-saved register; the original
 // recomputes it per branch, and the zero/one constants reuse the step value.
 struct BossTask {
@@ -21,12 +22,16 @@ void *SceneActors_GetBySlot(u32 slot);
 /* Shared state change of the boss tasks (as in Vanargand_ResetFromScript). */
 static inline void setState(struct BossTask *p, u8 state)
 {
-    p->fieldAC = 0;
+    {
+        s32 k1 = 0;
+        p->fieldAC = k1;
+    }
     p->fieldAD = 0;
     p->fieldAE = state;
     p->fieldC4 = 0;
     p->fieldB0 = 1;
 }
+
 /* Registry routine 4EC9: cycles the singleton in slot 2 through steps 0-2
    (+0x4EA), entering state 8, 10 or 3, then clears +0xB3, +0x4EB, +0x4E8. */
 void BossSlot2_AdvanceStepFromScript(void)
@@ -38,13 +43,16 @@ void BossSlot2_AdvanceStepFromScript(void)
             p->step = 1;
             setState(p, 8);
         } else if (p->step == 1) {
-            p->step = 2;
             setState(p, 10);
+            p->step = 2;
         } else {
             p->step = 0;
             setState(p, 3);
         }
-        task->fieldB3 = 0;
+        {
+            u8 k1 = 0;
+            task->fieldB3 = k1;
+        }
         p->field4EB = 0;
         p->field4E8 = 0;
     }

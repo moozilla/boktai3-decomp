@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.1%
+// fuzzy: 86.9%
+// fix.py best version (reprinted C)
 // Packed playback register allocation and frame layout still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -144,22 +145,24 @@ void Projectile_SetCollisionSize(void *, s32, s32, s32);
 s32 Task4E01_UpdateGrowingImpact(u8 *p)
 {
     u8 *config = p + 0x18;
-    if (*(u32 *)p <= 11) {
-        *(u32 *)(p + 0x1A0) += 10;
-        Projectile_SetCollisionSize(config, *(u32 *)(p + 0x1A0), 0x50, *(u32 *)(p + 0x1A0));
-        *(struct Pos8 *)(p + 0xD4) = *(struct Pos8 *)(p + 0x40);
+    u32 k1;
+    u32 k2;
+    if ((*((u32 *)p)) <= 11) {
+        *((u32 *)(p + 0x1A0)) += 10;
+        Projectile_SetCollisionSize(config, *((u32 *)(p + 0x1A0)), 0x50, *((u32 *)(p + 0x1A0)));
+        *((struct Pos8 *)(p + 0xD4)) = *((struct Pos8 *)(p + 0x40));
     }
-    if (StepPlayback((void *)(p + 0x8C), (void *)(p + 0x180)) == 1 && !*(u32 *)(p + 0x190)) {
-        Anim_RestartSequence(p + 0x180, *(void **)(p + 0x19C), 8, 0, 0);
+    if ((StepPlayback((void *)(p + 0x8C), (void *)(p + 0x180)) == 1) &&
+        (!(*((u32 *)(p + (k1 = 0x190)))))) {
+        Anim_RestartSequence(p + 0x180, *((void **)(p + 0x19C)), 8, 0, 0);
         StepPlayback((void *)(p + 0x8C), (void *)(p + 0x180));
-        ++*(u32 *)(p + 0x190);
+        ++(*((u32 *)(p + k1)));
     }
-    *(u32 *)(p + 4) |= 2;
-    if (*(u32 *)p >= *(u16 *)(config + 2))
-        return 2;
+    *((u32 *)(p + 4)) |= (k2 = 2);
+    if ((*((u32 *)p)) >= (*((u16 *)(config + k2))))
+        return k2;
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081D8CF0);
 #endif

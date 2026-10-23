@@ -4,7 +4,8 @@
 #include "display_animation.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.0%
+// fuzzy: 94.5%
+// fix.py best version (reprinted C)
 // Transition constants, mask copies, and register allocation still differ.
 
 struct Ooze {
@@ -28,15 +29,18 @@ void Ooze_UpdateAttackDelay(void);
 static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
                                            struct DisplaySequenceState *state, u32 initialMask)
 {
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
+    const volatile u16 *command;
+    u32 ended;
+    u32 duration;
+    u8 flags;
+    u32 bit;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -45,7 +49,7 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
@@ -60,7 +64,7 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
@@ -74,7 +78,6 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
         asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -125,16 +128,16 @@ static inline u32 Ooze_StepAttackAnimation(struct DisplaySequenceSprite *sprite,
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         } else {
@@ -159,11 +162,12 @@ s32 Ooze_BeginAttack(struct Ooze *p)
                 Sound_PlaySong(0x523);
             }
             break;
+
         case 1: {
-            void *collider = (u8 *)p + 0x68;
+            void *collider = ((u8 *)p) + 0x68;
             if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence, phase)) {
                 if (p->repeatAttack) {
-                    if (++p->repeatCount >= p->repeatLimit) {
+                    if ((++p->repeatCount) >= p->repeatLimit) {
                         Anim_RestartSequence(&p->sequence, p->resource, p->endSequence, p->facing,
                                              0);
                         p->phase = 2;
@@ -173,9 +177,10 @@ s32 Ooze_BeginAttack(struct Ooze *p)
                     p->phase = 2;
                 }
             }
-            Collider_SetPosition(collider, (u8 *)p + 0x3c, 0);
+            Collider_SetPosition(collider, ((u8 *)p) + 0x3c, 0);
             Collider_Refresh(collider);
         } break;
+
         case 2:
             if (Ooze_StepAttackAnimation(&p->sprite, &p->sequence, 1)) {
                 Anim_RestartSequence(&p->sequence, p->resource, p->idleSequence, p->facing, 8);
@@ -186,11 +191,11 @@ s32 Ooze_BeginAttack(struct Ooze *p)
             }
             break;
     }
+
     p->sprite.flags &= ~1;
     p->timer++;
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ooze_BeginAttack);
 #endif

@@ -1,7 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+
 #ifdef NONMATCHING
-// fuzzy: 83.0%
+// fuzzy: 87.7%
+// fix.py best version (reprinted C)
 // Remaining: heading/velocity temporaries, projected-position lifetime and state-entry tail sharing.
 struct SlashCollider {
     u8 pad[6];
@@ -103,7 +105,8 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
 void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
 {
     struct ContactPosition next;
-    struct ContactPosition *velocity, *position;
+    struct ContactPosition *velocity;
+    struct ContactPosition *position;
     register s32 angle asm("r4");
     register s32 magnitude asm("r6");
     {
@@ -117,12 +120,12 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
     TimedEffect_UpdateVisibility(p);
     {
         register u32 offset asm("r2") = 0x1A5;
-        register u8 *heading asm("r1") = (void *)((u8 *)p + offset);
+        register u8 *heading asm("r1") = (void *)(((u8 *)p) + offset);
         register u16 *speed asm("r0");
         offset += 3;
-        speed = (void *)((u8 *)p + offset);
+        speed = (void *)(((u8 *)p) + offset);
         offset -= 12;
-        velocity = (void *)((u8 *)p + offset);
+        velocity = (void *)(((u8 *)p) + offset);
         asm("" : "+r"(velocity));
         angle = *heading;
         magnitude = *speed;
@@ -143,21 +146,21 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
         {
             register u32 value asm("r0") = (u16)v->x;
             asm("" : "+r"(value));
-            next.x = value + (u16)p->position.x;
+            next.x = value + ((u16)p->position.x);
         }
         {
             register u32 value asm("r0") = (u16)v->y;
             asm("" : "+r"(value));
-            out->y = value + (u16)current->y;
+            out->y = value + ((u16)current->y);
         }
         {
             register u32 value asm("r1") = (u16)v->z;
             asm("" : "+r"(value));
-            out->z = value + (u16)current->z;
+            out->z = value + ((u16)current->z);
         }
         position = current;
     }
-    if (((*CellData(CellIndex(&next)) & 15) << 8) > p->position.y) {
+    if ((((*CellData(CellIndex(&next))) & 15) << 8) > p->position.y) {
         p->state = 2;
         asm("" : : : "memory");
         p->entered = 1;
@@ -167,17 +170,17 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
             {
                 register u32 value asm("r0") = (u16)p->position.x;
                 asm("" : "+r"(value));
-                p->position.x = value + (u16)v->x;
+                p->position.x = value + ((u16)v->x);
             }
             {
                 register u32 value asm("r0") = (u16)position->y;
                 asm("" : "+r"(value));
-                position->y = value + (u16)v->y;
+                position->y = value + ((u16)v->y);
             }
             {
                 register u32 value asm("r0") = (u16)position->z;
                 asm("" : "+r"(value));
-                position->z = value + (u16)v->z;
+                position->z = value + ((u16)v->z);
             }
         }
         PursuingActor_TurnTowardPlayer(p);
@@ -185,15 +188,15 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
         p->phase += 8;
         {
             u16 *frame = &p->timer;
-            (*frame)++;
             if (!Mod(*frame, 4)) {
                 u16 *speed = &p->speed;
                 (*speed)++;
             }
+            (*frame)++;
         }
         {
             s32 *lifetime = &p->lifetime;
-            if (*lifetime > 0)
+            if (((u32)(*lifetime)) > 0)
                 (*lifetime)--;
             else {
                 p->state = 3;
@@ -202,7 +205,6 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PursuingActor_AdvanceChase);
 #endif

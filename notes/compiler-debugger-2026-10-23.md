@@ -110,3 +110,43 @@ These have their decisions named but no spelling yet:
 * sub_080F0108: cse skip-blocks; 2 instructions with the flag.
 * sub_080EFF6C: reload rotation; 7 instructions.
 * sub_081C5B6C: dead-biv zero. An existing draft is in src.
+
+## Third session: fix.py, the inverse step
+
+`tools/fix.py FILE.c [FUNC] [--nonmatching] [--budget S]` turns the
+diagnosis into edits. step.py names the decision at the first divergence;
+`tools/spellings.py` maps each decision to C rewrites known to flip it, and
+the generic rewrites/permuter passes follow. Every candidate is compiled
+through the fork server and scored by differing instructions (branch targets
+included); a beam keeps half its states by fewest differences and half by
+latest first divergence, plus score-neutral spellings that can enable the
+next one (if/else to ternary, then inline the temporary).
+
+Spellings, each from a real case:
+
+* `sp_specialize`: a helper called with constants becomes a helper with the
+  constants in its body (then shared-constant spellings on it).
+* `sp_helper_arg`: `E & K` becomes `H(K)` (helper arguments are evaluated
+  before the body).
+* `sp_local_to_arg`: a helper's first local (`a = &p->position`) becomes an
+  argument (sub_081C8FB0).
+* `sp_addr_before_next`: `L = E; zero = 0;` becomes
+  `{ q = &L; zero = 0; *q = E; }` (sub_0823AE5C).
+* `sp_split_offset`: `*(u32 *)(X + 0x28)` becomes `((u32 *)(X + 0x20))[2]`.
+* `sp_goto_loop`: a loop written with goto is not optimized by loop.c: the
+  ROM recomputes invariant addresses inside it and does no strength reduction.
+* Also: address-first locals, index locals, comparison casts, call-result
+  casts, ternaries, the empty-if TakeFlag, non-void without return.
+
+Results on October 23:
+
+* `tools/fix_suite.py` (tests/fix/: the day's drafts before their hand
+  fix): 7/7 matched, 10 to 25 s each.
+* Batch over the 421 single-function NONMATCHING drafts, 60 s each, CPU
+  only: 8 matches; 246 improved (13,240 to 10,200 differing instructions);
+  171 drafts rewritten with fix.py's version where the fuzzy score rose.
+  Two more matched by one hand edit on fix.py's draft, each since added as a
+  spelling.
+* Old drafts' residue is mostly register allocation (often with pins).
+  rasolve found no exact compiler-space fix on 8 sampled; that needs its own
+  catalog (priority changes as C edits).

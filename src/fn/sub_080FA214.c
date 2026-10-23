@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.3%
 // Remaining: counter offset is kept in sb across Mod rather than rematerialized at the final store.
 #include "rotation_phase.h"
 
@@ -25,22 +23,18 @@ void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *act
     }
     if (actor->field2B0) {
         u32 offset = 0x2A8;
-        u8 *field = (u8 *)actor + offset;
+        u8 *field = ((u8 *)actor) + offset;
         *field = 0;
         offset = 0x2A9;
-        *((u8 *)actor + offset) = 0;
+        *(((u8 *)actor) + offset) = 0;
         offset = 0x2AA;
-        *((u8 *)actor + offset) = 0;
+        *(((u8 *)actor) + offset) = 0;
         offset = 0x2AC;
         asm("" : "+r"(actor));
-        *(u32 *)((u8 *)actor + offset) = 0;
+        *((u32 *)(((u8 *)actor) - (-offset))) = 0;
         offset = 0x2B1;
-        *((u8 *)actor + offset) = 1;
+        *(((u8 *)actor) + offset) = 1;
     } else {
         ++actor->counter2AC;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_ApplyDampedMotion);
-#endif

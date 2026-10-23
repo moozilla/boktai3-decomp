@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.3%
+// fuzzy: 92.6%
+// fix.py best version (reprinted C)
 // Remaining differences: pointer lifetimes, flag-test address reuse, and decoder register allocation.
 #include "contact_swarm.h"
 struct RegionSprite {
@@ -155,26 +156,27 @@ void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
 {
     struct RegionSprite *p = input;
     struct RegionSpriteManager *manager = gUnk_020001B4;
+    typeof(&p->behaviorFlags) t1;
     if (manager) {
         p->sprite.flags &= ~1;
+        t1 = &p->behaviorFlags;
         if (Test(&p->behaviorFlags, 0x10)) {
             if (Step(&p->sprite, &p->sequence)) {
                 Anim_SetSequence(&p->sequence, manager->sequenceResource, 0, 0, 0);
                 p->sequence.index = 3;
                 p->behaviorFlags = 0x21;
             }
-        } else if (Test(&p->behaviorFlags, 2)) {
+        } else if (Test(t1, 2)) {
             Step(&p->sprite, &p->sequence);
             if (p->sequence.index == 3)
                 p->behaviorFlags = 0x24;
         } else {
-            ProximityActor_UpdateDamageAnimation(p);
             if (Test(&p->behaviorFlags, 1))
                 Step(&p->sprite, &p->sequence);
+            ProximityActor_UpdateDamageAnimation(p);
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", RegionActor_UpdateBehaviorAnimation);
 #endif

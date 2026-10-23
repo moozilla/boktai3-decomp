@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fuzzy: 92.5%
+// fix.py best version (reprinted C)
 // Remaining: pause branch layout, flags allocation and the defined callback return differ.
 #include "pink_spine_playback.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
@@ -27,17 +28,17 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
         struct ColliderView {
             u8 pad[6];
             u16 flags;
-        } *c = (void *)&p->collider;
+        } *c = (void *)(&p->collider);
         c->flags &= ~4;
         Collider_SetPosition(c, &p->sprite.position, 0);
     } else {
         struct ColliderView {
             u8 pad[6];
             u16 flags;
-        } *c = (void *)&p->collider;
+        } *c = (void *)(&p->collider);
         c->flags |= 4;
     }
-    if (p->f130 > 0 && !p->f134) {
+    if ((p->f130 > 0) && (!p->f134)) {
         p->f136 -= p->f130;
         p->f144 = p->f148;
         Sound_PlaySong(0x13E);
@@ -64,15 +65,13 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
         u32 ended;
         asm("" : "=r"(allocationToken));
         ended = PinkSpine_StepAnimation(p);
-        asm("" : : "r"(allocationToken));
-        if (ended && p->update == ProjectileEmitter_UpdateAttack)
+        if (ended && (p->update == ProjectileEmitter_UpdateAttack))
             Sound_PlaySong(0x521);
+        asm("" : : "r"(allocationToken));
     }
-    p->age++;
-    // Callback callers discard the ROM's incidental result.
     return 0;
+    p->age++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PinkSpine_UpdateDamageAnimation);
 #endif

@@ -1,18 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.2%
 
+#ifdef NONMATCHING
+// fuzzy: 92.3%
+// fix.py best version (reprinted C)
 // confidence=low: control waits sixty frames before restoring or choosing a route.
 
 // Remaining differences: entry flag-load order, route selection registers and random-turn hoisting.
 #include "scene_actor_chase.h"
-static inline void Mummy_ClearMotion(struct SceneActorRegistryResetView *actor, u32 bits)
-{
-    struct ChaseFlags40 *field = (void *)&actor->flags2D4;
-    s32 mask = ~bits;
-    field->bits &= mask;
-}
 
 static inline u8 Test16(u16 *p, u32 mask)
 {
@@ -178,41 +173,40 @@ static inline void PickRoute(struct SceneActorRegistryResetView *actor)
 }
 void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u8 *body = actor->context;
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, actor->savedTarget, 0);
-        Mummy_ClearMotion(actor, 0x200);
+        Chase_ClearMotionFlags(actor, 0x200);
         actor->flags2CC &= ~0x80;
-        *(u16 *)(group + 0x54) = 0;
+        *((u16 *)(group + 0x54)) = 0;
     }
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
-    if ((s32)actor->counter2AC > 60) {
+    if (((s32)actor->counter2AC) > 60) {
         {
             struct ChaseFlags40 *flags = (void *)(group + 0x40);
             s32 mask = ~6;
             flags->bits = mask & flags->bits;
         }
         Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
-        SaveDelay(group + 0x8c, *(void **)(group + 0x48), 12, 30);
+        SaveDelay(group + 0x8c, *((void **)(group + 0x48)), 12, 30);
         Chase_SetState(actor, 3, 1, 0);
-        if (*(u16 *)(body + 0x6d2) &&
-            actor->terrainCell == *(u16 *)(*(u8 **)(actor->fieldDC + 0x1c) + 6)) {
+        if ((*((u16 *)(body + 0x6d2))) &&
+            (actor->terrainCell == (*((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6))))) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
             PickRoute(actor);
             SceneActorMovement_ResolveRoutePosition(actor);
             {
-                u32 mask = 4;
-                *(u16 *)(group + 0x40) |= mask;
+                u16 mask = 4;
+                *((u16 *)(group + 0x40)) |= mask;
             }
         } else
             Arrive(actor);
     } else
         actor->counter2AC++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_ResumeDelayedRoute);
 #endif

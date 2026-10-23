@@ -1,10 +1,12 @@
-// confidence=low: existing Golem state interpretation retained.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-// confidence=low: Golem behavior table dispatches completion into chase or saved-route recovery.
+
 #ifdef NONMATCHING
-// fuzzy: 90.3%
+// fuzzy: 92.8%
+// fix.py best version (reprinted C)
+// confidence=low: existing Golem state interpretation retained.
+// confidence=low: Golem behavior table dispatches completion into chase or saved-route recovery.
 // Remaining mismatch: Shared RNG loop allocation, outer group pointer lifetime and flag resets still differ.
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
@@ -129,30 +131,37 @@ static inline u32 CellIndex(struct ContactPosition *p)
 }
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
-    u32 shape, height;
+    u32 shape;
+    u32 height;
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {
         struct EngineMap *map = gUnk_030052F4;
-        u32 offset = cell * 4 + 12;
+        u32 offset = (cell * 4) + 12;
         data = map->cells + offset;
     }
-    shape = *data >> 4;
-    height = (*data & 15) << 8;
+    shape = (*data) >> 4;
+    {
+        u8 k1 = 15;
+        height = ((*data) & k1) << 8;
+    }
     if (shape == 1)
         goto slopeZ;
     if (shape == 2)
         goto slopeX;
     goto done;
 slopeZ:
-    height -= *((u8 *)position + 4);
+    height -= *(((u8 *)position) + 4);
+
     goto done;
 slopeX:
-    height -= *(u8 *)position;
+    height -= *((u8 *)position);
+
 done:
     return height;
 }
+
 static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
                          struct ContactPosition *position, struct ContactPosition *destination)
 {
@@ -328,7 +337,7 @@ static inline void SetCommand(struct SceneActorReactionCommand *command, void *p
 }
 void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     if (TakeFlag2B1(actor))
         ;
     if (Golem_InvokeEnabledBehavior(actor))
@@ -337,10 +346,10 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
         u16 blocked;
         SetState(actor, 3, 1, 0);
         SetControl(actor, 14, SceneActorReaction_RestoreAfterDelay);
-        ProximityVolume_TranslateBounds(*(void **)(group + 0x1FC), &actor->position);
+        ProximityVolume_TranslateBounds(*((void **)(group + 0x1FC)), &actor->position);
         blocked = MaskFlags(actor, 0x80);
         if (blocked) {
-            SetCommand((void *)(group + 0x8C), *(void **)(group + 0x48), 12, 30);
+            SetCommand((void *)(group + 0x8C), *((void **)(group + 0x48)), 12, 30);
             if (Test(gUnk_030053F4, 0x4800)) {
                 if (!SceneActorTarget_TrySelectNearestParticipant(actor))
                     return;
@@ -353,7 +362,7 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
             u32 *flags = &actor->flags2CC;
             if (MaskFlags(actor, bit)) {
                 struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
-                if (*flags & 0x200000) {
+                if ((*flags) & 0x200000) {
                     actor->flags2D0 &= ~0x1000000;
                     actor->flags2D4 &= ~bit;
                     control->mode = 0;
@@ -365,11 +374,11 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
             *flags |= 0x10;
             actor->field2C2 = 0x40;
             SetCommand((void *)(group + 0x8C), actor->entryTarget228, 7, 60);
-            LoadRoutePoint(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-            (*(struct ContactPosition **)(group + 0x200))->pad = 1;
-            if (!RouteToBit(actor, *(void **)(group + 0x1FC), &actor->position,
-                            *(struct ContactPosition **)(group + 0x200), bit))
-                Callback_InvokeActor(actor, *(void **)(group + 0x224));
+            LoadRoutePoint(*((struct ContactPosition **)(group + 0x200)), group + 0x74);
+            (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
+            if (!RouteToBit(actor, *((void **)(group + 0x1FC)), &actor->position,
+                            *((struct ContactPosition **)(group + 0x200)), bit))
+                Callback_InvokeActor(actor, *((void **)(group + 0x224)));
         }
     } else
         actor->counter2AC++;

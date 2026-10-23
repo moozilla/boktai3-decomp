@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.8%
+// fuzzy: 97.9%
+// fix.py best version (reprinted C)
 // Remaining differences: cell-index register reuse and height-test ordering.
 #include "scene_actor_terrain.h"
 
@@ -29,7 +30,6 @@ s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
     register u32 first asm("r6");
     register u32 second asm("r2");
     TerrainModifiers_FindCellOverride(CellIndex(input), 1);
-    width = gUnk_030052F8;
     cell = CellIndex(input);
     if (direction == 0) {
         first = AboveCell(input, cell + 1);
@@ -73,9 +73,9 @@ s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
             direction = 2;
         }
     }
+    width = gUnk_030052F8;
     return direction;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Task4E01_ResolveTerrainDirection);
 #endif

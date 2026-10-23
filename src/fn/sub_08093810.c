@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 82.1%
+// fuzzy: 82.4%
+// fix.py best version (reprinted C)
 // Remaining differences include stack-vector addressing, waypoint address reuse and registers.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -102,24 +103,26 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
 {
     struct {
         u32 zero;
-        struct ContactPosition dest, delta;
+        struct ContactPosition dest;
+        struct ContactPosition delta;
     } buf;
     u8 *body = actor->context;
+    u32 k1 = 0x3D4;
     if (Take(&actor->field2B1)) {
         Control(actor, actor->entryTarget228, 1);
         body[0x428] = 0;
-        if (Test(*(u32 *)(body + 0x3D4), 8)) {
-            Polar(&buf.dest, (*((u8 *)actor + 0xE9) + ((Rand() & 63) + 128)) & 255, 320);
-            *(u32 *)(body + 0x3D4) &= ~8;
+        if (Test(*((u32 *)(body + k1)), 8)) {
+            Polar(&buf.dest, ((*(((u8 *)actor) + 0xE9)) + ((Rand() & 63) + 128)) & 255, 320);
+            *((u32 *)(body + k1)) &= ~8;
             {
                 s32 variant = Bee_GetMovementVariant(actor);
-                *(u16 *)(body + 0x43A) = 6 << variant;
+                *((u16 *)(body + 0x43A)) = 6 << variant;
             }
         } else {
-            Polar(&buf.dest, ((Rand() & 63) + *((u8 *)actor + 0xE9)) & 255, 512);
+            Polar(&buf.dest, ((Rand() & 63) + (*(((u8 *)actor) + 0xE9))) & 255, 512);
             {
                 s32 variant = Bee_GetMovementVariant(actor);
-                *(u16 *)(body + 0x43A) = 40 << variant;
+                *((u16 *)(body + 0x43A)) = 40 << variant;
             }
         }
         Add(&buf.dest, &actor->position);
@@ -127,51 +130,49 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
         Bee_SubVector(actor, &actor->position, &buf.dest);
         Clear(&buf.zero, body + 0x480);
     }
-    Delta(&buf.delta, &actor->position, (struct ContactPosition *)(body + 0x3E0 + body[0x428] * 8));
-    ((u8 *)actor)[0x59] = *((u8 *)actor + 0xE9);
-    if (*(s16 *)(body + 0x43A) > 0 &&
-        buf.delta.x * buf.delta.x + buf.delta.z * buf.delta.z > 1024) {
-        s32 steps = Shift(*(s16 *)(body + 0x43A), 5);
+    Delta(&buf.delta, &actor->position,
+          (struct ContactPosition *)((body + 0x3E0) + (body[0x428] * 8)));
+    ((u8 *)actor)[0x59] = *(((u8 *)actor) + 0xE9);
+    if (((*((s16 *)(body + 0x43A))) > 0) &&
+        (((buf.delta.x * buf.delta.x) + (buf.delta.z * buf.delta.z)) > 1024)) {
+        s32 steps = Shift(*((s16 *)(body + 0x43A)), 5);
         if (steps < 1)
             steps = 1;
-        *(u16 *)((u8 *)actor + 0x64) +=
-            Div(*(s16 *)(body + 0x3E0 + body[0x428] * 8) - actor->position.x, steps);
-        *(u16 *)((u8 *)actor + 0x68) +=
-            Div(*(s16 *)(body + 0x3E4 + body[0x428] * 8) - actor->position.z, steps);
-        *(struct MotionPair *)(body + 0x480) = *(struct MotionPair *)((u8 *)actor + 0x64);
-        *(u16 *)(body + 0x43A) -= actor->counter2AC;
-    } else {
-        if (++body[0x428] > 8) {
-            actor->position.x = *(u16 *)(body + 0x420);
-            actor->position.z = *(u16 *)(body + 0x424);
-            Polar(&buf.dest, ((Rand() & 63) + *((u8 *)actor + 0xE9)) & 255, 512);
-            Add(&buf.dest, &actor->position);
-            sub_0809345C(actor, &buf.dest);
-            Bee_SubVector(actor, &actor->position, &buf.dest);
-            {
-                s32 variant = Bee_GetMovementVariant(actor);
-                *(u16 *)(body + 0x43A) = *(u16 *)(body + 0x42C) << variant;
-            }
-            body[0x428] = 0;
-            actor->counter2AC = 0;
-            return;
-        } else {
-            actor->position.x = *(u16 *)(body + 0x3E0 + (body[0x428] - 1) * 8);
-            actor->position.z = *(u16 *)(body + 0x3E4 + (body[0x428] - 1) * 8);
+        *((u16 *)(((u8 *)actor) + 0x64)) +=
+            Div((*((s16 *)((body + 0x3E0) + (body[0x428] * 8)))) - actor->position.x, steps);
+        *((u16 *)(((u8 *)actor) + 0x68)) +=
+            Div((*((s16 *)((body + 0x3E4) + (body[0x428] * 8)))) - actor->position.z, steps);
+        *((struct MotionPair *)(body + 0x480)) = *((struct MotionPair *)(((u8 *)actor) + 0x64));
+        *((u16 *)(body + 0x43A)) -= actor->counter2AC;
+    } else if ((++body[0x428]) > 8) {
+        actor->position.x = *((u16 *)(body + 0x420));
+        actor->position.z = *((u16 *)(body + 0x424));
+        Polar(&buf.dest, ((Rand() & 63) + (*(((u8 *)actor) + 0xE9))) & 255, 512);
+        Add(&buf.dest, &actor->position);
+        sub_0809345C(actor, &buf.dest);
+        Bee_SubVector(actor, &actor->position, &buf.dest);
+        {
+            s32 variant = Bee_GetMovementVariant(actor);
+            *((u16 *)(body + 0x43A)) = (*((u16 *)(body + 0x42C))) << variant;
         }
+        body[0x428] = 0;
+        actor->counter2AC = 0;
+        return;
+    } else {
+        actor->position.x = *((u16 *)((body + 0x3E0) + ((body[0x428] - 1) * 8)));
+        actor->position.z = *((u16 *)((body + 0x3E4) + ((body[0x428] - 1) * 8)));
     }
-    if ((s32)actor->counter2AC <= 19)
+    if (((s32)actor->counter2AC) <= 19)
         actor->counter2AC++;
     if (body[0x42A])
         body[0x42A]--;
-    else if (*(u32 *)((u8 *)actor + 0xF0) <= 0xFFFE) {
+    else if ((*((u32 *)(((u8 *)actor) + 0xF0))) <= 0xFFFE) {
         if (body[0x3DC])
             State(actor, 2, 1);
         else
             State(actor, 2, 2);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Bee_FollowWanderRoute);
 #endif

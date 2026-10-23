@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 89.2%
+// fuzzy: 89.9%
+// fix.py best version (reprinted C)
 // Remaining: unavailable-result register, context address lifetimes and argument-store scheduling.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -58,12 +59,13 @@ static inline void Diff(struct BeeVec *d, struct BeeVec *a, struct BeeVec *b)
     d->y = b->y - a->y;
     d->z = b->z - a->z;
 }
-static inline void Polar(struct BeeVec *out, s32 angle, s32 radius)
+static inline void Polar(struct BeeVec *out, u16 angle, s32 radius)
 {
     out->x = Shift(gUnk_086149C4[(angle + 0x40) & 255] * radius, 12);
     out->y = 0;
     out->z = Shift(gUnk_086149C4[angle & 255] * radius, 12);
 }
+
 static inline void Add(struct BeeVec *a, struct BeeVec *b)
 {
     a->x = b->x + a->x;
@@ -109,34 +111,38 @@ void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
 {
     register u8 *body asm("r8");
     volatile u32 fill;
-    struct BeeVec delta, offset;
+    struct BeeVec delta;
+    struct BeeVec offset;
     u32 angle;
+    typeof(body) c1;
+    typeof(args[2]) t1;
     if (IsUnavailable(actor))
         return;
     if (!ActorFlag(actor, 0x4000, 0x2D4))
         return;
     body = actor->context;
+    c1 = body;
     {
         u16 value = args[1];
-        *(u16 *)(body + 0x43C) = value;
+        *((u16 *)(c1 + 0x43C)) = value;
     }
-    *(u8 **)(body + 0x440) = SceneBody_GetById(*(u16 *)(body + 0x43C));
-    *(u16 *)(body + 0x43E) = args[2];
-    body[0x428] = 0;
-    Diff(&delta, (struct BeeVec *)&actor->position,
-         (struct BeeVec *)(*(u8 **)(body + 0x440) + 0xC));
+    *((u8 **)(c1 + 0x440)) = SceneBody_GetById(*((u16 *)(c1 + 0x43C)));
+    t1 = args[2];
+    *((u16 *)(c1 + 0x43E)) = t1;
+    c1[0x428] = 0;
+    Diff(&delta, (struct BeeVec *)(&actor->position),
+         (struct BeeVec *)((*((u8 **)(c1 + 0x440))) + 0xC));
     actor->fieldE9 = Math_Atan2(delta.x, delta.z);
     angle = ((Rand() & 0x3F) + actor->fieldE9) & 0xFF;
     Polar(&offset, angle, 0x200);
-    *(u16 *)(body + 0x43A) = 0x500;
-    Add(&offset, (struct BeeVec *)&actor->position);
+    *((u16 *)(body + 0x43A)) = 0x500;
+    Add(&offset, (struct BeeVec *)(&actor->position));
     sub_0809345C(actor, &offset);
     Bee_SubVector(actor, &actor->position, &offset);
     Clear(&fill, body + 0x480);
     State(actor, 2, 0, 10);
     Control(actor, actor->entryTarget228, 1);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Bee_StartMoveToBody);
 #endif

@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.8%
+// fuzzy: 83.5%
+// fix.py best version (reprinted C)
 // Remaining differences: sequence setup, field-access order, and register allocation.
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -29,8 +30,11 @@ static inline void CopyAngle(struct TrailSprite *src, u8 *dest)
 }
 static inline void CopyScaleX(struct TrailSprite *src, u8 *dest)
 {
-    *(u8 *)(dest + 0x710) = src->scaleX;
+    typeof(src->scaleX) t1;
+    t1 = src->scaleX;
+    *((u8 *)(dest + 0x710)) = t1;
 }
+
 static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
 {
     *(u8 *)(dest + 0x711) = src->scaleY;
@@ -112,38 +116,42 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
     u8 *context = actor->context;
     struct TrailSprite *sprite;
     struct DisplaySequenceState *state;
-    if (*(u32 *)actor->drawable & 1)
+    typeof(actor->drawable) t1;
+    typeof(context + ((*((u16 *)(context + 0xE44))) * 0x60)) t2;
+    if ((*((u32 *)actor->drawable)) & 1)
         return;
     {
-        register s32 zero asm("ip") = Mod(actor->field2CA, *(u16 *)(context + 0xE46));
+        register s32 zero asm("ip") = Mod(actor->field2CA, *((u16 *)(context + 0xE46)));
         if (zero)
             return;
         {
-            struct DisplaySequenceState *source = (void *)((u8 *)actor->drawable + 0x48);
+            struct DisplaySequenceState *source = (void *)(((u8 *)actor->drawable) + 0x48);
             u16 sequence = source->unknownA;
-            Anim_SetSequence((void *)(context + 0x708 + *(u16 *)(context + 0xE44) * 0x60 + 0x48),
-                             *(void **)(*(u16 *)(context + 0xE44) * 0x60 + (u32)(context + 0x760)),
-                             sequence, context[0xED7], zero);
+            Anim_SetSequence(
+                (void *)(((context + 0x708) + ((*((u16 *)(context + 0xE44))) * 0x60)) + 0x48),
+                *((void **)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)(context + 0x760)))),
+                sequence, context[0xED7], zero);
         }
     }
-    sprite = (void *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)context + 0x708);
-    state = (void *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)context + 0x750);
+    sprite = (void *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x708);
+    state = (void *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x750);
     Step(sprite, state);
-    *(struct ContactPosition *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)context + 0x724) =
-        actor->position;
+    *((struct ContactPosition *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) +
+                                 0x724)) = actor->position;
     {
         u8 *slots = context + 0x708;
-        *(u32 *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)slots) &= ~1;
-        *(u32 *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)slots) |= 2;
+        *((u32 *)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)slots))) &= ~1;
+        *((u32 *)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)slots))) |= 2;
     }
-    *(u16 *)(*(u16 *)(context + 0xE44) * 0x60 + (u32)context + 0x764) = 8;
-    CopyAngle(actor->drawable, context + *(u16 *)(context + 0xE44) * 0x60);
-    CopyScaleX(actor->drawable, context + *(u16 *)(context + 0xE44) * 0x60);
-    CopyScaleY(actor->drawable, context + *(u16 *)(context + 0xE44) * 0x60);
-    if (++*(u16 *)(context + 0xE44) > 3)
-        *(u16 *)(context + 0xE44) = 0;
+    *((u16 *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x764)) = 8;
+    t1 = actor->drawable;
+    t2 = context + ((*((u16 *)(context + 0xE44))) * 0x60);
+    CopyAngle(t1, t2);
+    CopyScaleX(actor->drawable, context + ((*((u16 *)(context + 0xE44))) * 0x60));
+    CopyScaleY(actor->drawable, context + ((*((u16 *)(context + 0xE44))) * 0x60));
+    if ((++(*((u16 *)(context + 0xE44)))) > 3)
+        *((u16 *)(context + 0xE44)) = 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Axe_EmitMotionTrail);
 #endif

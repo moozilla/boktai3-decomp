@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+#ifdef NONMATCHING
+// fuzzy: 95.0%
+// fix.py best version (reprinted C)
 // confidence=low: control reacquires a player route once the context delay clears.
 
-#ifdef NONMATCHING
-// fuzzy: 92.9%
 // Remaining differences: random-turn hoisting, flag-load order and return/pool placement.
 #include "scene_actor_chase.h"
 static inline void SetHalf(u16 *field, u32 bits)
@@ -36,14 +37,18 @@ static inline u32 PickTurn(u32 dir, u32 mask)
             u32 v;
             gUnk_03005308 = index;
             index *= 2;
-            v = *(const u16 *)(index + (u32)gUnk_0203B400);
+            v = *((const u16 *)(index + ((u32)gUnk_0203B400)));
             d = (v & mask) << 6;
         }
         if (d != dir)
-            return d;
+            goto ret1;
     }
+
     return dir;
+ret1:
+    return d;
 }
+
 struct MummySavedControl {
     void *target;
     u8 state, phase, behavior, kind;
@@ -167,7 +172,7 @@ static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
 void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     if (TakeControlEntry(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -181,22 +186,21 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
     else if (actor->behavior2AA == 18)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     actor->field2C2 = 32;
-    if (!*(u16 *)(body + 0x6d6)) {
-        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+    if (!(*((u16 *)(body + 0x6d6)))) {
+        actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
         {
             u32 mask = 4;
             SetHalf((u16 *)(group + 0x40), mask);
         }
         actor->flags2D0 = ClearWordValue(&actor->flags2D0, 4);
-        *(u16 *)(body + 0x6f2) &= ~0x1400;
+        *((u16 *)(body + 0x6f2)) &= ~0x1400;
         if (Arrive(actor)) {
-            Chase_SetCtl(actor, *(void **)(group + 0x48), 0x25);
+            Chase_SetCtl(actor, *((void **)(group + 0x48)), 0x25);
             Chase_SetBehavior(actor, 12);
         }
     } else
         actor->counter2AC++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
 #endif

@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+
 #ifdef NONMATCHING
-// fuzzy: 94.3%
+// fuzzy: 96.9%
+// fix.py best version (reprinted C)
 // Remaining differences: register allocation (r1/r3 swaps) in the head and tail.
 
 struct P {
@@ -146,41 +148,46 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 // confidence=low: an alternate-form cue that counts up while sliding the pose window
+static inline u32 Arg1(u32 k_, struct P *p)
+{
+    return ((u8 *)p) + k_;
+}
+
 void PlayerCue_UpdateSpiralPose(struct P *p)
 {
-    if (B(0x457) != 0xe) {
+    if ((*((u8 *)(((u8 *)p) + 0x457))) != 0xe) {
         Player_SetTetherMode(p, 0xe, 0);
-        H(0xAD8) = 0;
+        *((u16 *)(((u8 *)p) + 0xAD8)) = 0;
         LinkPlayer_FlushPendingEffects(p);
-        Player_PlayLocalSong(W(0x18), 0x39A);
+        Player_PlayLocalSong(*((u32 *)(((u8 *)p) + 0x18)), 0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 0x20, 0x38);
     }
     {
-        u16 t = p->timer;
+        u8 t = p->timer;
         s32 c = 7;
-        if ((c & t) >= c - (t >> 2)) {
+        if ((c & t) >= (c - (t >> 2))) {
             Player_SetSecondaryActionFlags(p, 0x41);
-            *(struct SceneVec *)((u8 *)p + 0xAC) = *(struct SceneVec *)((u8 *)p + 0x30);
+            *((struct SceneVec *)(((u8 *)p) + 0xAC)) = *((struct SceneVec *)(((u8 *)p) + 0x30));
         }
     }
     Player_SetAnimationIndex(p, 0x9a, 0x40);
-    W(0xD4) = (u32)gUnk_030042E4 + 0x2DE0;
+    *((u32 *)(((u8 *)p) + 0xD4)) = ((u32)gUnk_030042E4) + 0x2DE0;
     Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
-    H(0xAD6) = 0x16F;
-    H(0xAD8) += 3;
+    *((u16 *)(((u8 *)p) + 0xAD6)) = 0x16F;
+    *((u16 *)(((u8 *)p) + 0xAD8)) += 3;
     {
         register u32 mask asm("r2");
         mask = 0xFFFF;
         asm("" : "+r"(mask));
-        if (H(0xAD8) > 0x20)
-            H(0xAD8) = 0x20;
+        if ((*((u16 *)Arg1(0xAD8, p))) > 0x20)
+            *((u16 *)(((u8 *)p) + 0xAD8)) = 0x20;
         {
-            u32 nt = H(0x45A) + 1;
-            H(0x45A) = nt;
+            u32 nt = (*((u16 *)(((u8 *)p) + 0x45A))) + 1;
+            *((u16 *)(((u8 *)p) + 0x45A)) = nt;
             if ((nt & mask) > 0x1f) {
-                B(0x464) = 1;
-                B(0x465) = 1;
+                *((u8 *)(((u8 *)p) + 0x464)) = 1;
+                *((u8 *)(((u8 *)p) + 0x465)) = 1;
                 Player_SetTetherMode(p, 0, 0);
             }
         }

@@ -98,7 +98,7 @@ def reads_of(node, want):
     assignment target."""
     out = []
     for n, p, s in walk(node):
-        if isinstance(p, ca.Assignment) and s == "lvalue":
+        if isinstance(p, ca.Assignment) and s == "lvalue" or isinstance(p, ca.StructRef) and s == "field":
             continue
         if isinstance(n, (ca.ID, ca.UnaryOp, ca.StructRef, ca.ArrayRef, ca.Cast)) and text(n) == want:
             out.append((n, p, s))

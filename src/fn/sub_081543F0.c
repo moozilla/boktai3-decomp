@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-// confidence=low: tentative cue role from callback phases.
+
 #ifdef NONMATCHING
-// fuzzy: 91.3%
+// fuzzy: 91.5%
+// fix.py best version (reprinted C)
+// confidence=low: tentative cue role from callback phases.
 // Remaining scale offsets, phase tails and playback register lifetimes differ.
 
 struct P {
@@ -36,14 +38,17 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     register struct ContactSwarmSprite *sprite asm("r5") = sp;
     register struct DisplaySequenceState *state asm("r4") = st;
     const volatile u16 *command;
-    u32 duration, flags, bit;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    u32 k1;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -52,7 +57,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & (k1 = 0x30)) >> 4) & bit))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
@@ -67,7 +72,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & k1) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
@@ -126,21 +131,22 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         }
     }
 }
+
 // confidence=low: motion 7 changes sprite scale and visibility over six phases.
 void PlayerCue_UpdateSideFade(struct P *p)
 {
@@ -152,30 +158,33 @@ void PlayerCue_UpdateSideFade(struct P *p)
             }
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
-            if (++p->timer > 27)
+            if ((++p->timer) > 27)
                 ActorSequence_Begin(p, 7, 1);
             break;
+
         case 1:
             p->sprite.flags |= 2;
-            p->sprite.unknown8[0] = 64 - ((u8)p->timer << 2);
+            p->sprite.unknown8[0] = 64 - (((u8)p->timer) << 2);
             if (p->timer > 8) {
                 p->sprite.unknown8[1] = p->timer << 3;
                 p->scale = (p->timer - 8) * 20;
                 Player_AddControlFlags(p, 4);
             }
-            if (++p->timer > 15)
+            if ((++p->timer) > 15)
                 ActorSequence_Begin(p, 7, 2);
             break;
+
         case 2:
             Player_AddControlFlags(p, 4);
-            p->scale = p->timer * 200 + 160;
-            if (++p->timer > 7) {
+            p->scale = (p->timer * 200) + 160;
+            if ((++p->timer) > 7) {
                 Player_AddControlFlags(p, 1);
                 ActorSequence_Begin(p, 0, 0);
                 p->fn = PlayerCue_UpdateHidden;
                 PlayerCue_CompleteAction(p);
             }
             break;
+
         case 3:
             if (!p->timer) {
                 p->dir = 4;
@@ -187,15 +196,16 @@ void PlayerCue_UpdateSideFade(struct P *p)
             p->sprite.flags |= 2;
             p->sprite.unknown8[0] = 4;
             p->sprite.unknown8[1] = 120;
-            p->scale = (8 - p->timer) * 200 + 160;
-            if (++p->timer > 7)
+            p->scale = ((8 - p->timer) * 200) + 160;
+            if ((++p->timer) > 7)
                 ActorSequence_Begin(p, 7, 4);
             break;
+
         case 4:
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
             p->sprite.flags |= 2;
-            p->sprite.unknown8[0] = 64 - ((15 - (u8)p->timer) << 2);
+            p->sprite.unknown8[0] = 64 - ((15 - ((u8)p->timer)) << 2);
             if (p->timer <= 7) {
                 p->sprite.unknown8[1] = (15 - p->timer) << 3;
                 p->scale = (8 - p->timer) * 20;
@@ -204,14 +214,15 @@ void PlayerCue_UpdateSideFade(struct P *p)
                 p->scale = 0;
                 Player_AddControlFlags(p, 4);
             }
-            if (++p->timer > 15)
+            if ((++p->timer) > 15)
                 ActorSequence_Begin(p, 7, 5);
             break;
+
         case 5:
             p->sprite.flags &= ~2;
             Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
             Step(&p->sprite, &p->seq);
-            if (++p->timer > 3) {
+            if ((++p->timer) > 3) {
                 Player_UpdateFacingSide(p);
                 PlayerCue_EnterStandUpdate(p);
                 p->fn = Player_RestartAnimationFromResource;
@@ -220,7 +231,6 @@ void PlayerCue_UpdateSideFade(struct P *p)
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideFade);
 #endif

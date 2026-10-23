@@ -1,7 +1,8 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.5%
+// fuzzy: 93.2%
+// fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
@@ -71,28 +72,31 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     u8 ready;
     register void **mesh asm("sl");
     struct ContactPosition **point;
-    void *terrain, *dest;
+    void *terrain;
+    void *dest;
     s32 result;
+    typeof(mesh) c1;
     if (Blocked(a))
         return;
     if (!gUnk_02000580)
         return;
     ctx = a->context;
-    group = (u8 *)&a->group;
+    group = (u8 *)(&a->group);
     ready = HasFlag(ctx, 1);
     if (ready)
         return;
-    mesh = (void **)(group + 0x1FC);
     asm("" : "+r"(mesh));
+    mesh = (void **)(group + 0x1FC);
+    c1 = mesh;
     if (!Nav_IsPositionInMesh(*mesh, &a->position, gUnk_02000580 + 0x30))
         return;
     point = (void *)(group + 0x200);
-    **point = a->position;
+    *(*point) = a->position;
     (*point)->pad = ready;
     a->fieldDC = (u32)(gUnk_02000580 + 0x24);
     SetState(a, 0, 0, 7);
     SetControl(a, a->entryTarget228, 1);
-    terrain = *mesh;
+    terrain = *c1;
     dest = (void *)(a->fieldDC + 12);
     if (Nav_IsPositionInMesh(terrain, &a->position, dest) &&
         (result = Terrain_ApplyBlocked(terrain, &a->position, dest))) {
@@ -109,7 +113,6 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     }
     ctx->timer = 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Spider_BeginPlayerPursuit);
 #endif

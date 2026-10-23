@@ -1,11 +1,13 @@
-// confidence=low: waits twenty updates, saves the group behavior and attempts route recovery.
 #include "global.h"
-// confidence=low: waits twenty updates before saving chase behavior and rerouting.
+#include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.7%
+// fuzzy: 87.9%
+// fix.py best version (reprinted C)
+// confidence=low: waits twenty updates, saves the group behavior and attempts route recovery.
+// confidence=low: waits twenty updates before saving chase behavior and rerouting.
+
 // Recovery inline register allocation and several flag updates still differ.
-#include "scene_actor_chase.h"
 static inline void Dog_ClearGroupBits(u8 *group, u32 mask)
 {
     ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~mask;
@@ -114,9 +116,24 @@ done:
     return 0;
 }
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+static inline void Chase_SetState_(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+{
+    u32 behavior = b;
+    actor->phase2A9 = p;
+    actor->state2A8 = s;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+
+static inline u32 Arg1(u32 k_, u8 *group)
+{
+    return group + k_;
+}
+
 void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)(&a->group);
     if (Chase_TakeArrived(a)) {
         Chase_SetCtl(a, a->savedTarget, 0);
         {
@@ -130,24 +147,24 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
         return;
     if (sub_0812F3CC(a))
         return;
-    if ((s32)a->counter2AC > 20) {
+    if (((s32)a->counter2AC) > 20) {
         {
-            u16 *flags = (u16 *)(group + 0x40);
+            u16 *flags = (u16 *)Arg1(0x40, group);
             s32 mask = -7;
-            *flags = mask & *flags;
+            *flags = mask & (*flags);
         }
         Chase_SetCtl(a, SceneActorReaction_RestoreAfterDelay, 14);
         {
-            u32 duration = *(u16 *)(group + 0x46);
-            void *control = *(void **)(group + 0x48);
+            u32 duration = *((u16 *)(group + 0x46));
+            void *control = *((void **)(group + 0x48));
             u8 *packet = group + 0x8C;
-            *(u32 *)(packet + 12) = duration;
-            *(void **)(packet + 16) = control;
+            *((u32 *)(packet + 12)) = duration;
+            *((void **)(packet + 16)) = control;
             packet[8] = 0;
             packet[9] = 0;
             packet[10] = 12;
         }
-        Chase_SetState(a, 3, 1, 0);
+        Chase_SetState_(a, 3, 1, 0);
         Dog_RerouteToTarget(a);
     } else
         a->counter2AC++;

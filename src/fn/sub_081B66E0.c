@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.0%
+// fuzzy: 88.0%
+// fix.py best version (reprinted C)
 // foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
 
 /* Tentative Vanargand family; the two vectors are copied as eight-byte records. */
@@ -63,16 +64,29 @@ s32 VanargandEffect_Initialize(struct VanargandEffect *effect, s32 variant, s32 
             palette = 0x83;
     }
     AnimData_SelectPaletteBank(effect->animation, palette);
-    effect->variant = variant;
-    effect->delay = delay;
-    effect->lifetime = 30;
-    effect->position = *position;
-    effect->motion.data = 0;
-    effect->motion.active = 0;
-    effect->motion.mode = 0;
-    effect->motion.cursor = 0;
-    MotionTrack_Initialize(&effect->motion, &effect->position, 0, target, 0);
-    return 0;
+    {
+        typeof(effect->variant) *q1 = &effect->variant;
+        *q1 = variant;
+    }
+    {
+        typeof(effect->delay) *q2 = &effect->delay;
+        *q2 = delay;
+    }
+    {
+        typeof(effect->lifetime) *q3 = &effect->lifetime;
+        *q3 = 30;
+    }
+    {
+        typeof(effect->position) *q4 = &effect->position;
+        u8 z1 = 0;
+        *q4 = *position;
+        effect->motion.data = z1;
+        effect->motion.active = z1;
+        effect->motion.mode = z1;
+        effect->motion.cursor = z1;
+        MotionTrack_Initialize(&effect->motion, &effect->position, 0, target, 0);
+        return 0;
+    }
 }
 #else
 INCLUDE_ASM("asm/nonmatching", VanargandEffect_Initialize);

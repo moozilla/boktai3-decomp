@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 84.0%
+// fuzzy: 86.8%
+// fix.py best version (reprinted C)
 // Remaining differences: switch branch layout and animation register allocation.
 
 #include "contact_swarm.h"
@@ -17,25 +18,26 @@ struct Drawable {
 static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState *state)
 {
     struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, bit;
+    const volatile u16 *command;
+    u32 ended;
+    u32 bit;
     register u32 duration asm("r2");
     register u32 flags asm("r1");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
         register u32 maskBit asm("r4") = 1;
         bit = maskBit;
-        first = bit;
+        first = maskBit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & maskBit))
             owner->sprite.flags |= 4;
         else
             owner->sprite.flags &= ~4;
@@ -48,7 +50,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
         first = bit;
         first &= input;
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->sprite.flags |= 8;
         else
             owner->sprite.flags &= ~8;
@@ -63,8 +65,6 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
         asm("" : "+r"(temp));
         mask = temp;
         asm("" : "+r"(mask));
-        /* Keep the live mask distinct from its source without binding r7. */
-
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -114,16 +114,16 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         } else {
@@ -269,52 +269,64 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
 {
     register u8 *p asm("r8") = input;
     register u8 *config asm("r9") = input + 0x18;
-    *(u16 *)config |= 0x1000;
-    *(u32 *)input = 0;
-    *(u32 *)(config + 8) = 0;
-    switch (*(u32 *)(config + 0x48)) {
+    *((u16 *)config) |= 0x1000;
+    *((u32 *)input) = 0;
+    *((u32 *)(config + 8)) = 0;
+    switch (*((u32 *)(config + 0x48))) {
         case 0:
+
         case 1:
+
         case 2:
+
         case 5:
+
         case 6:
+
         case 10:
             ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
-            *(u32 *)input = 0;
+            *((u32 *)input) = 0;
             break;
+
         case 7:
             ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
             break;
+
         case 4:
             Projectile_SetUpdateCallback(config, Task4E01_OnType4Animation);
             break;
+
         case 3:
-            if (*(u16 *)config & 0x10) {
-                *(u32 *)(input + 0x194) = 1;
-                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 1, 0, 0);
+            if ((*((u16 *)config)) & 0x10) {
+                *((u32 *)(input + 0x194)) = 1;
+                Anim_RestartSequence(input + 0x180, *((void **)(input + 0x19c)), 1, 0, 0);
                 StepFirst((void *)(input + 0x8c), (void *)(input + 0x180));
             } else {
-                *(u32 *)(input + 0x194) = 6;
-                Anim_RestartSequence(input + 0x180, *(void **)(input + 0x19c), 6, 0, 0);
+                *((u32 *)(input + 0x194)) = 6;
+                Anim_RestartSequence(input + 0x180, *((void **)(input + 0x19c)), 6, 0, 0);
                 StepSecond((void *)(input + 0x8c), (void *)(input + 0x180));
             }
             Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;
+
         case 11:
-            if (!(*(u16 *)config & 0x2000))
+            if (!((*((u16 *)config)) & 0x2000))
                 ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, sub_081D9D3C);
             break;
+
         case 8:
+
         case 9:
+
         default:
             break;
     }
+
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Task4E01_StartTerminalAnimation);
 #endif

@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 83.3%
+// fuzzy: 92.6%
+// fix.py best version (reprinted C)
 // 12 differing instruction runs; size +8 bytes; first diff at +0xE (mov sl, r1 vs mov sb, r1)
 extern u8 *gUnk_02000154;
 extern u16 gUnk_0203B400[];
@@ -17,54 +18,65 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
                            u32 k, u32 l, u32 m, u32 n, u32 o, u32 p, u32 q, u32 r)
 {
     struct Pair {
-        u32 x, y;
+        u32 x;
+        u32 y;
     };
     u8 *context = gUnk_02000154;
-    u8 *s, *resource, *fields;
+    u8 *s;
+    u8 *resource;
+    u8 *fields;
     u32 zero;
     u16 *table;
     u32 *rng;
     u32 mask;
     s32 value;
+    typeof((Mod(table[*rng], e) - (e >> 1)) + d) t1;
     if (!context) {
         context = ScriptedParticle_EnsurePool();
         if (!context)
             goto end;
     }
-    fields = s = ScriptedParticle_AllocateSlot(context);
+    fields = (s = ScriptedParticle_AllocateSlot(context));
     if (!s)
         goto end;
     fields += 0x58;
     zero = 0;
-    *fields = 1;
+    {
+        u8 k1 = 1;
+        *fields = k1;
+    }
     fields += 0xE;
-    *(u16 *)fields = zero;
-    *(struct Pair *)(s + 0x1C) = *(struct Pair *)a;
+    *((u16 *)fields) = zero;
+    *((struct Pair *)(s + 0x1C)) = *((struct Pair *)a);
     resource = s + 0x2C;
     AnimData_Load(resource, n);
-    *(void **)(context + 0x18) = ScriptProc_Start(0x922E, (u16)o);
+    *((void **)(context + 0x18)) = ScriptProc_Start(0x922E, (u16)o);
     Sprite_Init(s, resource, 0);
-    Anim_SetSequence(s + 0x48, *(void **)(context + 0x18), (u16)p, (u8)q, zero);
+    Anim_SetSequence(s + 0x48, *((void **)(context + 0x18)), (u16)p, (u8)q, zero);
     AnimData_SelectPaletteBank(resource, r);
     table = gUnk_0203B400;
     rng = &gUnk_03005308;
     mask = 0x3FF;
-    *rng = (*rng + 1) & mask;
+    *rng = ((*rng) + 1) & mask;
     value = Mod(table[*rng], c) + b;
-    *(u16 *)(s + 0x5C) = value;
-    *rng = (*rng + 1) & mask;
-    value = Mod(table[*rng], e) - (e >> 1) + d;
-    *(u16 *)(s + 0x5E) = value;
-    *rng = (*rng + 1) & mask;
+    *((u16 *)(s + 0x5C)) = value;
+    *rng = ((*rng) + 1) & mask;
+    t1 = (Mod(table[*rng], e) - (e >> 1)) + d;
+    value = t1;
+    *((u16 *)(s + 0x5E)) = value;
+    *rng = ((*rng) + 1) & mask;
     value = Mod(table[*rng], h) + g;
     s[0x5A] = value;
-    *(u16 *)(s + 0x64) = f;
-    *(u16 *)(s + 0x68) = i;
+    *((u16 *)(s + 0x64)) = f;
+    *((u16 *)(s + 0x68)) = i;
     s[0x6D] = 12;
-    *(u32 *)s |= 1 | l;
+    *((u32 *)s) |= 1 | l;
     s[7] = j;
-    *(u16 *)(s + 0x6E) = m;
+    *((u16 *)(s + 0x6E)) = m;
 end:;
+
+    ;
+    ;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", SpriteParticle_Create);

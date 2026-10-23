@@ -1,7 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 47.7%
+// fuzzy: 85.9%
+// fix.py best version (reprinted C)
 // Open: the original keeps mode in r4 and ORs it in after `mode == 4`
 // instead of the folded constant; mode/two registers swapped.
 struct NamedActor {
@@ -19,18 +20,19 @@ void NamedActor_PlayMovementSound(struct NamedActor *);
    set for 2 or cleared, and NamedActor_PlayMovementSound runs (tentative). */
 void NamedActor_SetMoveModeFromScript(void)
 {
-    s32 mode = Script_GetKeywordValue('m', 1);
+    s16 mode = (u8)Script_GetKeywordValue('m', 1);
     s32 name = Script_GetKeywordValue('n', 0);
     struct NamedActor *actor;
+    u32 k1 = 4;
     if (gUnk_020001AC && name) {
         actor = NamedObject_FindByName(name);
         if (actor && (actor->flagsE0 & 2)) {
             s32 two = 2;
             actor->fieldB6 = 2;
-            if (mode == 4)
-                actor->flagsB8 = (actor->flagsB8 & ~two) | mode;
+            if (mode == k1)
+                actor->flagsB8 = (actor->flagsB8 & (~two)) | mode;
             else {
-                actor->flagsB8 &= ~4;
+                actor->flagsB8 &= ~k1;
                 if (mode == 2)
                     actor->flagsB8 |= mode;
                 else

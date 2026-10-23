@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.0%
+// fuzzy: 86.8%
+// fix.py best version (reprinted C)
 // Remaining differences: turn-loop allocation, PRE spills, and contact flag addressing.
 // confidence=low: selects and pursues a contact or restores the delayed response.
 #define Mummy_ProcessContactPursuit sub_080D7568
@@ -145,10 +146,10 @@ static inline u32 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mas
 u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     struct ChaseTarget **target;
     struct SceneActorContactNode *contact;
-    u32 cell;
+    s16 cell;
     if (MotionFlags(actor, 0x10))
         return 0;
     if ((u8)Callback_InvokeActor(actor, actor->update26C))
@@ -159,9 +160,9 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         return 0;
     if (!Chase_Bits32(&actor->flags2D0, 0x1000000))
         return 0;
-    if (*(u32 *)(group + 0x64) != gUnk_02000508)
+    if ((*((u32 *)(group + 0x64))) != gUnk_02000508)
         return 0;
-    target = (void *)&actor->fieldDC;
+    target = (void *)(&actor->fieldDC);
     ((struct MummyContactState *)target)->flags |= 2;
     if (!actor->distanceLimitF8)
         goto restore;
@@ -169,32 +170,33 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
     if (!contact)
         goto restore;
     *target = contact->object;
-    cell = *(u16 *)(*(u8 **)((u8 *)*target + 0x1C) + 6);
-    if (*(u32 *)((u8 *)actor + 0x100)) {
+    cell = *((u16 *)((*((u8 **)(((u8 *)(*target)) + 0x1C))) + 6));
+    if (*((u32 *)(((u8 *)actor) + 0x100))) {
         if (Test16(&actor->flags2C0, 2))
-            *target = (void *)((u8 *)gUnk_02000580[0] + 0x24);
-        else if (!*target)
+            *target = (void *)(((u8 *)gUnk_02000580[0]) + 0x24);
+        else if (!(*target))
             goto threshold;
         {
             s32 x = (*target)->position.x - actor->position.x;
             s32 z = (*target)->position.z - actor->position.z;
             actor->fieldE9 = Math_Atan2(x, z);
-            actor->distanceF0 = x * x + z * z;
+            actor->distanceF0 = (x * x) + (z * z);
         }
     threshold:
-        if (!(u8)Mummy_CanPassMovementThreshold(actor)) {
+        if (!((u8)Mummy_CanPassMovementThreshold(actor))) {
             if (TestContext(context, 0x1400))
                 return 0;
             Mummy_Arrive(actor);
             return 0;
         }
+
         if (!Mummy_TryDirectPursuit(actor))
             return 0;
         if (Test8(&((struct MummyContactState *)target)->flags, 8)) {
-            if (*(u16 *)((u8 *)actor + 0x2F8) != cell) {
-                Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+            if ((*((u16 *)(((u8 *)actor) + 0x2F8))) != cell) {
+                Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->position,
                                &(*target)->position);
-                *(u16 *)((u8 *)actor + 0x2F8) = cell;
+                *((u16 *)(((u8 *)actor) + 0x2F8)) = cell;
             }
         } else
             SceneActorTarget_ResetContactResponse(actor);
@@ -202,20 +204,21 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         ((struct MummyContactState *)target)->flags |= 0x10;
         return 1;
     }
-    if ((actor->flags2CC & 0x80) && !MotionFlags(actor, 0x400))
+    if ((actor->flags2CC & 0x80) && (!MotionFlags(actor, 0x400)))
         goto restore;
     if (TestContext(context, 0x1400))
         goto restore;
     if (actor->field2C2 != 64)
         return 0;
-    if (*(u32 *)(group + 0x64) != gUnk_02000508)
+    if ((*((u32 *)(group + 0x64))) != gUnk_02000508)
         return 0;
     actor->flags2D6 |= 0x100;
 restore:
     if (TestContext(context, 0x4000)) {
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
-        *(u16 *)(context + 0x6F2) &= ~0x4000;
+        *((u16 *)(context + 0x6F2)) &= ~0x4000;
     }
+
     return 0;
 }
 #else

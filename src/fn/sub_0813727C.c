@@ -1,9 +1,11 @@
-#define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
+
 #ifdef NONMATCHING
-// fuzzy: 79.8%
+// fuzzy: 80.3%
+// fix.py best version (reprinted C)
+#define gPlayerSlotFlags gUnk_02000560
 // Open: mostly register allocation (ROM: actor r5, group sl, flags2D4 pointer r8,
 // position spilled to sp); also a few reordered loads and spill-slot order.
 
@@ -174,12 +176,12 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     struct ContactPosition *dest;
     struct SceneActorRegistryControl *control;
     u32 bit;
-
+    s8 k1 = 0x10;
     if (IsUnavailable(actor))
         return 0;
-    motion = (struct SceneActorReactionMotion *)&actor->fieldDC;
+    motion = (struct SceneActorReactionMotion *)(&actor->fieldDC);
     targetp = &motion->fieldDC;
-    target = (u8 *)*targetp;
+    target = (u8 *)(*targetp);
     if (!target)
         return 0;
     slot = PlayerSlot(target);
@@ -197,11 +199,11 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         if (t)
             return 0;
     }
-    if (FIELD(actor, 0x2EC, u32))
+    if (*((u32 *)(((u8 *)actor) + 0x2EC)))
         return 0;
-    if (FIELD(actor, 0x2F0, s16))
+    if (*((s16 *)(((u8 *)actor) + 0x2F0)))
         return 0;
-    group = (u8 *)&actor->group;
+    group = (u8 *)(&actor->group);
     ClearHalfFlags(flagsp, ~0x20);
     actor->field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
@@ -209,12 +211,12 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     flags2CC = &actor->flags2CC;
-    *flags2CC |= 0x10;
+    *flags2CC |= k1;
     {
         u8 *saved = group + 0x8C;
         void *callback = actor->entryTarget228;
-        FIELD(saved, 0xC, u32) = 30;
-        FIELD(saved, 0x10, void *) = callback;
+        *((u32 *)(((u8 *)saved) + 0xC)) = 30;
+        *((void **)(((u8 *)saved) + k1)) = callback;
         saved[8] = 0;
         saved[9] = 0;
         saved[10] = 7;
@@ -224,21 +226,21 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     ProximityVolume_TranslateBounds(actor->routeObject, position = &actor->position);
     dest = actor->state5D4;
     {
-        struct RouteLink *link = (void *)&actor->route;
+        struct RouteLink *link = (void *)(&actor->route);
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
     }
     bit = 0x200;
-    GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 1;
+    (*((struct ContactPosition **)(((u8 *)group) + bit)))->pad = 1;
     if (!MoveTo(actor, group, &actor->position, flagsp, bit)) {
-        Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
+        Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
     } else {
-        GROUP_FIELD(group, 0x64, u32) = 0;
-        GROUP_FIELD(group, 0x60, u16) = 0;
+        *((u32 *)(((u8 *)group) + 0x64)) = 0;
+        *((u16 *)(((u8 *)group) + 0x60)) = 0;
         actor->field2C2 = 0x40;
-        FIELD(actor, 0x414, u16) = 0;
-        FIELD(actor, 0x418, u16) = 0;
+        *((u16 *)(((u8 *)actor) + 0x414)) = 0;
+        *((u16 *)(((u8 *)actor) + 0x418)) = 0;
         ClearHalfFlags(flagsp, ~0x380);
         {
             s32 mask = ~0x18;

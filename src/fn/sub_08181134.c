@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.9%
+// fuzzy: 90.2%
+// fix.py best version (reprinted C)
 // foundry draft (worker best 83.8%); what differs is mostly register allocation and instruction order
 struct ActorMarker {
     u8 pad0[0xd4];
@@ -29,19 +30,22 @@ void ActorMarker_InitOffsetPosition(struct ActorMarker *p)
             p->offsetPosition[2] = p->position[2] - 200;
             p->state = 0;
             break;
+
         case 2:
             p->offsetPosition[0] = p->position[0] - 200;
             p->offsetPosition[1] = p->position[1] + 100;
             p->offsetPosition[2] = p->position[2] - 50;
             p->state = 0;
             break;
-        case 0:
+
         case 3:
             p->offsetPosition[0] = p->position[0] - 200;
             p->offsetPosition[1] = p->position[1] + 100;
             p->offsetPosition[2] = p->position[2] - 200;
             p->state = 0;
             break;
+
+        case 0:
     }
 }
 #else

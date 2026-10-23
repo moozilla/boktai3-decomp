@@ -2,7 +2,8 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 94.7%
+// fix.py best version (reprinted C)
 // Remaining differences: defined vector padding, inline clamps, argument order and registers.
 
 extern u8 *gUnk_02000580;
@@ -84,21 +85,28 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct CrowSteeringState *state = actor->context;
-    struct ContactPosition delta, velocity;
-    s32 angle, turn, step;
+    struct ContactPosition delta;
+    struct ContactPosition velocity;
+    s32 angle;
+    s32 turn;
+    s32 step;
+    typeof(delta.x) t1;
+    typeof(delta.z) t2;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        *(u32 *)actor->drawable |= 2;
+        *((u32 *)actor->drawable) |= 2;
         SetControl(actor, actor->entryTarget224, 2);
     }
-    if (state->approachTime < (s32)actor->counter2AC) {
+    if (state->approachTime < ((s32)actor->counter2AC)) {
         Delta(&delta, &actor->position, (struct ContactPosition *)(gUnk_02000580 + 0x30));
-        angle = Math_Atan2(delta.x, delta.z);
+        t1 = delta.x;
+        t2 = delta.z;
+        angle = Math_Atan2(t1, t2);
         turn = Normalize(angle - actor->direction);
         if (turn < 0)
             turn = -turn;
         if (turn <= 11) {
             state->approachTurns = 0;
-            *(u32 *)actor->drawable &= ~2;
+            *((u32 *)actor->drawable) &= ~2;
             SetState(actor, 0, 2, 0);
             return;
         }
@@ -155,8 +163,8 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             actor->direction += step;
         else
             actor->direction -= step;
-        *((u8 *)actor->drawable + 6) = 0x9F - actor->direction;
-        if (*(u16 *)((u8 *)actor + 0x1E6) == 0)
+        *(((u8 *)actor->drawable) + 6) = 0x9F - actor->direction;
+        if ((*((u16 *)(((u8 *)actor) + 0x1E6))) == 0)
             state->turnDelay = 4;
         else
             state->turnDelay = 2;
@@ -165,7 +173,6 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         state->turnDelay--;
     actor->counter2AC++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Crow_SteerAroundPlayer);
 #endif

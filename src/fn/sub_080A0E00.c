@@ -3,8 +3,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
-#ifdef NONMATCHING
-// fuzzy: 99.2%
 // Zero-store scheduling and the approach speed load still occur in a different order.
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -180,6 +178,21 @@ static inline u8 BodyFlag(u8 *body, u32 mask)
     return Test(*(u32 *)(body + 0x3d4), mask);
 }
 // confidence=low: advances a directed response, then recoils when it reaches the player or terrain.
+static inline u8 Approach_1(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
+                            u8 *motion, s32 speed)
+{
+    s16 dx = saved->position.x - (*((u16 *)(motion + 12)));
+    s16 dz = saved->position.z - (*((u16 *)(motion + 16)));
+    if ((((dx < 0) ? (-dx) : (dx)) <= 32) && (((dz < 0) ? (-dz) : (dz)) <= 32))
+        return 1;
+    if (dx || dz) {
+        motion[9] = Math_Atan2(dx, dz);
+        *((u16 *)(motion + 20)) += Shift(gUnk_086149C4[(motion[9] + 64) & 255] * speed, 12);
+        *((u16 *)(motion + 24)) += Shift(gUnk_086149C4[motion[9]] * speed, 12);
+    }
+    return 0;
+}
+
 void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -189,39 +202,41 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         struct ContactPosition *saved;
         Control(actor, Crow_UpdateDirectionalPose, 0x25);
         saved = (void *)(body + 0x3fc);
-        *(struct SavedPair *)saved = *(struct SavedPair *)(*gUnk_02000580 + 0x30);
+        *((struct SavedPair *)saved) = *((struct SavedPair *)((*gUnk_02000580) + 0x30));
         Fill(body + 0x42c, zero, 0);
         Delta(&delta, &actor->position, saved);
         actor->direction = Math_Atan2(delta.x, delta.z);
-        *(s16 *)(body + 0x42c) =
+        *((s16 *)(body + 0x42c)) =
             Shift(gUnk_086149C4[(actor->direction + 64) & 255] * body[0x3d9], 12);
         {
             register s32 depth asm("r1") = Shift(gUnk_086149C4[actor->direction] * body[0x3d9], 12);
             asm("" : "+r"(depth));
-            *(s16 *)(body + 0x430) = depth;
-            *(s16 *)(body + 0x42e) = 0;
+            {
+                typeof(*((s16 *)(body + 0x430))) *q1 = &(*((s16 *)(body + 0x430)));
+                u32 z1 = 0;
+                *q1 = depth;
+                *((s16 *)(body + 0x42e)) = z1;
+            }
         }
-        if (*(s16 *)(body + 0x42c))
-            *(s16 *)(body + 0x42c) = Div(delta.x, *(s16 *)(body + 0x42c));
-        if (*(s16 *)(body + 0x430))
-            *(s16 *)(body + 0x430) = Div(delta.z, *(s16 *)(body + 0x430));
-        if (*(s16 *)(body + 0x42c) > *(s16 *)(body + 0x430)) {
-            if (*(s16 *)(body + 0x42c))
-                *(s16 *)(body + 0x42e) = Div(delta.y - 32, *(s16 *)(body + 0x42c));
-        } else {
-            if (*(s16 *)(body + 0x430))
-                *(s16 *)(body + 0x42e) = Div(delta.y - 32, *(s16 *)(body + 0x430));
-        }
+        if (*((s16 *)(body + 0x42c)))
+            *((s16 *)(body + 0x42c)) = Div(delta.x, *((s16 *)(body + 0x42c)));
+        if (*((s16 *)(body + 0x430)))
+            *((s16 *)(body + 0x430)) = Div(delta.z, *((s16 *)(body + 0x430)));
+        if ((*((s16 *)(body + 0x42c))) > (*((s16 *)(body + 0x430)))) {
+            if (*((s16 *)(body + 0x42c)))
+                *((s16 *)(body + 0x42e)) = Div(delta.y - 32, *((s16 *)(body + 0x42c)));
+        } else if (*((s16 *)(body + 0x430)))
+            *((s16 *)(body + 0x42e)) = Div(delta.y - 32, *((s16 *)(body + 0x430)));
         Sound_PlaySong(247);
         body[0x3ec] = 0;
     } else {
-
         Callback_InvokeActor(actor, actor->update270);
         Scale(actor);
-        *(s16 *)((u8 *)actor + 0x2ea) += *(s16 *)(body + 0x42e);
+        *((s16 *)(((u8 *)actor) + 0x2ea)) += *((s16 *)(body + 0x42e));
         if (!Mod(actor->counter2AC, 6))
-            *(s16 *)(body + 0x42e) = Shift(*(s16 *)(body + 0x42e), 1);
-        if (Approach(actor, (void *)(body + 0x3f0), body[0x3d9]) || BodyFlag(body, 2)) {
+            *((s16 *)(body + 0x42e)) = Shift(*((s16 *)(body + 0x42e)), 1);
+        if (Approach_1(actor, (void *)(body + 0x3f0), ((u8 *)actor) + 0x50, body[0x3d9]) ||
+            BodyFlag(body, 2)) {
             Polar(&actor->secondaryMotion, actor->direction, body[0x3d9] * 2);
             SetState(actor, 0, 2, 2);
         } else {
@@ -229,7 +244,3 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_ApproachPlayerThenRecoil);
-#endif

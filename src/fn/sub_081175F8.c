@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 70.6%
+// fuzzy: 76.0%
+// fix.py best version (reprinted C)
 // Motion-pointer lifetimes and register allocation still differ.
 struct Obj {
     u8 pad0[4];
@@ -92,55 +93,65 @@ void Character_UpdateLoopingSound(void *);
 void Glove_UpdateLaunchSlowdown(struct Glove *p)
 {
     struct Obj *self = &p->motion;
-    s32 h, dx, dz;
-    u32 a, b;
+    s32 h;
+    s32 dx;
+    s32 dz;
+    u32 a;
+    u32 b;
     if (p->active) {
         p->active = 0;
         p->launchPhase = 0;
         p->launchSpeed = 0;
-        U16(p, 0x53E) = 0;
+        *((u16 *)(((u8 *)p) + 0x53E)) = 0;
     }
     switch (p->launchPhase) {
         case 0:
             p->launchSpeed += 32;
             self->x += p->launchSpeed;
-            U16(p, 0x53C) = 0x92;
-            asm("" ::: "memory");
+            *((u16 *)(((u8 *)p) + 0x53C)) = 0x92;
+            asm("" : : : "memory");
             if (self->x > 0x40000)
                 p->launchPhase = 3;
             break;
+
         case 3:
             if (p->launchSpeed > 0)
                 p->launchSpeed -= 256;
             else
                 p->launchPhase = 4;
-            U16(self, 0x524) = 0x88;
+            *((u16 *)(((u8 *)self) + 0x524)) = 0x88;
             self->x += p->launchSpeed;
             break;
-        case 4:
-            p->active = 1;
+
+        case 4: {
+            typeof(p->active) *q1 = &p->active;
+            *q1 = 1;
+        }
             p->update = (void (*)(void *))Glove_UpdateStopping;
             p->timer = 0;
             break;
     }
+
     ScenePool_ClampMotionSpeeds(self);
     h = self->vy + self->unkC0;
-
     self->y += 0x200;
     if (self->steps > 0) {
         self->x += self->dx;
-        self->dx += Div(-self->dx, self->steps);
         self->dy += Div(-self->dy, self->steps);
+        self->dx += Div(-self->dx, self->steps);
         self->dz += Div(-self->dz, self->steps);
         self->steps--;
     } else {
         Memory_Clear(&self->dx, 0x10);
     }
-
     {
-        s32 *pprevZ, *pprevX, *pvz, *px, *py;
+        s32 *pprevZ;
+        s32 *pprevX;
+        s32 *pvz;
+        s32 *px;
+        s32 *py;
         s32 lim;
-        self->outX = h + self->x - self->prevX;
+        self->outX = (h + self->x) - self->prevX;
         self->outY = self->y + self->dy;
         self->outZ = self->vz + self->dz;
         dx = (self->x - self->prevX) >> 12;
@@ -153,17 +164,18 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
         pvz = &self->vz;
         if (h > lim)
             dx = 0x80;
-        if (dx == 0 && dz == 0)
+        if ((dx == 0) && (dz == 0))
             self->angle = 0xFFFF;
         else
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
         *pprevX = *px;
         *pprevZ = self->z;
         Terrain_ResolveActorMotion(self);
-        a = (u32) ~(self->unk3C >> 12) >> 31;
-        b = (u32) ~(self->unk38 >> 12) >> 31;
-        if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) && b <= 1 &&
-            a == 1) {
+        a = ((u32)(~(self->unk3C >> 12))) >> 31;
+        b = ((u32)(~(self->unk38 >> 12))) >> 31;
+        if (((((self->unk4 != self->unk8) && (self->unk4 & 0x1000)) && (!(self->unk8 & 0xF000))) &&
+             (b <= 1)) &&
+            (a == 1)) {
             s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
             if (v < 4)
                 v = 4;
@@ -173,7 +185,6 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
             self->flags40 &= ~1;
         }
         p->height = h;
-
         Actor_UpdateShadowSpriteParts(self, p->model);
         if (self->flags40 & 4)
             sub_0811BF44(self);
@@ -182,14 +193,11 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
         if (self->flags40 & 1)
             *py = 0;
     }
-
     if (LinkParticipant_IsLocallySelected(p))
         Character_UpdateLoopingSound(self);
     CharacterModel_UpdateAccessoryAnimations(p->model);
-
     p->timer++;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081175F8);
 #endif

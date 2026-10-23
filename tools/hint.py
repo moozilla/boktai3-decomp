@@ -2,6 +2,8 @@
 """Ask about one difference between your draft and the ROM: the decision, and the agbcc source behind it.
 
   hint.py FILE.c [FUNC] [--line N | --insn U | --at ADDR] [--flips] [--nonmatching]
+  hint.py FILE.c [FUNC] --fix [--nonmatching]   the same as tools/fix.py: try the spellings that flip
+                                         each divergence's decision, one divergence at a time
   hint.py --about WORDS                  a decision's rule and compiler source, no draft needed
   hint.py FILE.c [FUNC] --causes [--compiles N] [--show K]
   hint.py --eval [--functions N] [--mutants M] [--compiles N] [--seed S]
@@ -315,6 +317,7 @@ def main():
     ap.add_argument("--insn", type=int)
     ap.add_argument("--at")
     ap.add_argument("--flips", action="store_true")
+    ap.add_argument("--fix", action="store_true", help="tools/fix.py on the draft")
     ap.add_argument("--brief", action="store_true", help="rules without the compiler source")
     ap.add_argument("--functions", type=int, default=60)
     ap.add_argument("--mutants", type=int, default=4)
@@ -325,6 +328,10 @@ def main():
         import agbccsrc
         sys.argv = ["agbccsrc"] + a.about
         return agbccsrc.main()
+    if a.fix:
+        import fix
+        sys.argv = ["fix.py", a.file] + ([a.func] if a.func else []) + (["--nonmatching"] if a.nonmatching else [])
+        return fix.main()
     if not a.eval and not a.causes:
         return cmd_ask(a)
     os.chdir(ROOT)

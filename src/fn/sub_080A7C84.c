@@ -1,9 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
-// Remaining differences: early counter-offset lifetime and state-zero address scheduling.
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -56,13 +53,13 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
 }
 static inline void State0(struct SceneActorRegistryResetView *a)
 {
-    u32 behavior = 0;
     a->state2A8 = 0;
     a->phase2A9 = 0;
-    a->behavior2AA = behavior;
+    a->behavior2AA = 0;
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
+
 static inline void State2(struct SceneActorRegistryResetView *a)
 {
     u32 behavior = 2;
@@ -134,48 +131,45 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     u32 o;
     u32 zero;
     struct ContactPosition delta;
+    typeof(o) t1;
     if (Take(&actor->field2B1)) {
-        Control(actor, *(void **)((u8 *)actor + 0x228), 1);
+        Control(actor, *((void **)(((u8 *)actor) + 0x228)), 1);
         TentacleActor_ResetOscillation(actor);
         {
-            u32 direction = (((*((u8 *)actor + 0xE9)) + 32) & 255) >> 6;
+            u32 direction = (((*(((u8 *)actor) + 0xE9)) + 32) & 255) >> 6;
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
         TentacleActor_SelectWanderRoute(actor);
     }
-    o = 0x270;
-    asm("" : "+r"(o));
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + o))) {
+    o = (t1 = 0x270);
+    asm("" : "+r"(t1));
+    if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + o)))) {
         State0(actor);
         return;
     }
-    if (*(s16 *)(body + 0x8D6) <= 0)
-        *(s16 *)(body + 0x8D6) = 1;
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    if ((*((s16 *)(body + 0x8D6))) <= 0)
+        *((s16 *)(body + 0x8D6)) = 1;
+    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
         Delta(&delta, &actor->position, (void *)(body + 0x904));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
+        *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);
     {
         u16 *p = (void *)(body + 0x8E4);
         if (*p) {
             sub_080A9DB0(actor, 18, 0x1000);
-            --*p;
+            --(*p);
         } else
             sub_080A9DB0(actor, 20, 0x6400);
     }
     TentacleActor_UpdateOscillation(actor, 120, 10);
-    if ((s32)actor->counter2AC > 800) {
+    if (((s32)actor->counter2AC) > 800) {
         TentacleActor_SelectWanderRoute(actor);
         State2(actor);
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_UpdatePursuit);
-#endif

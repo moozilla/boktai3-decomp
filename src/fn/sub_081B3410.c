@@ -3,12 +3,13 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
+#ifdef NONMATCHING
+// fuzzy: 95.9%
+// fix.py best version (reprinted C)
 // confidence=low: player-directed sweeping strike followed by a timed retreat.
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
-#ifdef NONMATCHING
-// fuzzy: 94.6%
 // Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -203,6 +204,11 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
 }
 
 // confidence=low: aims at the player, winds back, strikes, and returns to rest.
+static inline u32 Arg1(u32 k_, struct VanargandPart *p)
+{
+    return p->variant << k_;
+}
+
 void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
     u8 *enter;
@@ -221,15 +227,14 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
-
             if (entering) {
                 *enter = 0;
                 MakeVector(&delta, AimAngle(p), 256);
                 AddVector(&delta, &p->origin, &delta);
                 OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &delta,
-                                              ((p->variant << 7) + 96) & 255, 16);
+                                              (Arg1(7, p) + 96) & 255, 16);
                 {
-                    void *data = *(void **)(boss + 0x4d0);
+                    void *data = *((void **)(boss + 0x4d0));
                     register u32 flip asm("r9") = 4;
                     struct DisplaySequenceState *seq;
                     asm("" : "+r"(flip));
@@ -245,12 +250,12 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             }
             break;
         }
+
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
-
             if (entering) {
                 *enter = 0;
                 MakeVector(&delta, (AimAngle(p) + 128) & 255, 512);
@@ -265,11 +270,11 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             }
             break;
         }
+
         case 2:
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
-
             if (entering) {
                 p->enter = 0;
                 Difference(&p->target, Player_GetEffectivePosition(0), p->base);
@@ -281,37 +286,38 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
                 }
                 OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &p->target,
                                               ((p->variant << 7) + 96) & 255, 16);
-                *(u32 *)((u8 *)p + 0x19c) = 0;
+                *((u32 *)(((u8 *)p) + 0x19c)) = 0;
             }
-            if (++p->timer > 23) {
+            if ((++p->timer) > 23) {
                 Sound_PlaySong(0x589);
                 SetState(p, 3);
                 *enter = 1;
             }
             break;
+
         case 3:
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 Sound_PlaySong(0x3d9);
-                AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4,
-                                            4, 4, 4);
+                AnimatedParticles_EmitBurst(&p->sprite.position, *((s16 *)(((u8 *)p) + 0xb0)), 0,
+                                            64, 4, 4, 4, 4);
                 SetState(p, 4);
                 p->enter = 1;
             } else if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             break;
+
         case 4: {
             struct SceneVec *v;
             SetFlags(p, 8);
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
-
             if (entering) {
                 *enter = 0;
                 {
-                    u16 saved = *(u16 *)((u8 *)p + 0x172);
-                    *(u16 *)((u8 *)p + 0xf0) = saved;
+                    u16 saved = *((u16 *)(((u8 *)p) + 0x172));
+                    *((u16 *)(((u8 *)p) + 0xf0)) = saved;
                 }
             }
             v = (struct SceneVec *)(p->motion + 0x14);
@@ -319,19 +325,19 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             v->y = TruncateShift(v->y, 1);
             v->z = TruncateShift(v->z, 1);
             AddVector(&p->origin, v, &p->origin);
-            if (++p->timer > 59) {
+            if ((++p->timer) > 59) {
                 SetState(p, 5);
                 *enter = 1;
             }
             break;
         }
+
         case 5: {
             struct SceneVec delta;
             SetFlags(p, 8);
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
-
             if (entering) {
                 *enter = 0;
                 MakeVector(&delta, p->heading, p->distance);
@@ -344,13 +350,13 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             }
             break;
         }
+
         case 6:
             SetFlags(p, 8);
             p->finished = 1;
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSweepingStrike);
 #endif

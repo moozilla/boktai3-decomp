@@ -1,7 +1,8 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.3%
 
+#ifdef NONMATCHING
+// fuzzy: 95.8%
+// fix.py best version (reprinted C)
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
@@ -45,15 +46,15 @@ s32 sub_0816E6F0(u8 *m)
     u16 *angle = (u16 *)(m + 0x4406);
     s16 *spin = (s16 *)(m + 0x4404);
     s32 stopped;
-    s32 a, b;
-
+    s32 a;
+    s32 b;
+    typeof(*angle) t1;
     pos[0] += vel[0];
     pos[1] += vel[1];
     vel[1]++;
     {
-        s32 c = ++*(s16 *)(m + 0xA4E);
+        s32 c = ++(*((s16 *)(m + 0xA4E)));
         if (!((c & 0xFFFF) % 16)) {
-
             if (vel[0] > 0)
                 vel[0]--;
             else if (vel[0] < 0)
@@ -77,11 +78,11 @@ s32 sub_0816E6F0(u8 *m)
         v = Halve(-vel[1]);
         zero = 0;
         vel[1] = v;
-        if (v > -2) {
+        if (v > (-2)) {
             vel[0] = zero;
             vel[1] = zero;
             *spin = zero;
-            if ((u16)(*angle - 0x40) < 0x80)
+            if (((u16)((*angle) - 0x40)) < 0x80)
                 *angle = 0x80;
             else
                 *angle = zero;
@@ -91,38 +92,39 @@ s32 sub_0816E6F0(u8 *m)
         }
     }
     if (stopped) {
-        *(u32 *)(m + 0x2AA8) &= ~2;
+        *((u32 *)(m + 0x2AA8)) &= ~2;
         {
             u16 t = pos[0] - 8;
-            *(u16 *)(m + 0x2AC0) = t;
+            *((u16 *)(m + 0x2AC0)) = t;
         }
         {
             u16 t = pos[1] - 8;
-            *(u16 *)(m + 0x2AC2) = t;
+            *((u16 *)(m + 0x2AC2)) = t;
         }
         {
-            *(u16 *)(m + 0x2AD6) = *angle;
-            if (*(u16 *)(m + 0x2AD6) == 0)
+            t1 = *angle;
+            if ((*((u16 *)(m + 0x2AD6))) == 0)
                 return 0;
+            *((u16 *)(m + 0x2AD6)) = t1;
         }
         Anim_LoadKeyframe(m + 0x2AA0, m + 0xA4, 0xCE, 1);
         return 1;
     }
-    *angle = (*angle + 0x100 + *spin) & 0xFF;
-    a = Shift12(-(gUnk_086149C4[(*angle + 0x40) & 0xFF] * 8));
-    b = Shift12(-(gUnk_086149C4[*(u8 *)angle] * 8));
-    *(u32 *)(m + 0x2AA8) |= 2;
+    *angle = (((*angle) + 0x100) + (*spin)) & 0xFF;
+    a = Shift12(-(gUnk_086149C4[((*angle) + 0x40) & 0xFF] * 8));
+    b = Shift12(-(gUnk_086149C4[*((u8 *)angle)] * 8));
+    *((u32 *)(m + 0x2AA8)) |= 2;
     {
-        u16 t = pos[0] + b + a;
-        *(u16 *)(m + 0x2AC0) = t;
+        u16 t = (pos[0] + b) + a;
+        *((u16 *)(m + 0x2AC0)) = t;
     }
     {
-        u16 t = pos[1] + a - b;
-        *(u16 *)(m + 0x2AC2) = t;
+        u16 t = (pos[1] + a) - b;
+        *((u16 *)(m + 0x2AC2)) = t;
     }
     {
         u16 t = *angle;
-        *(u16 *)(m + 0x2AD6) = t;
+        *((u16 *)(m + 0x2AD6)) = t;
     }
     return -1;
 }

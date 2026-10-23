@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.6%
+// fuzzy: 91.8%
+// fix.py best version (reprinted C)
 // Differs: case 28 loads 3 before 2 in the ROM, the hoisted zero (r5) comes first, and i++ is
 // reloaded into r4 and compared directly instead of reloaded again.
 #include "scene_panel.h"
@@ -44,21 +45,19 @@ void sub_0817B2DC(struct BlinkActor *p)
                     p->timer = 0;
                     p->active = op;
                     break;
+
                 case 5:
                     p->level = (command->value + 5) << 5;
-                    p->modeA = 2;
+                    {
+                        typeof(p->modeA) *q1 = &p->modeA;
+                        *q1 = 2;
+                    }
                     p->modeB = 0;
                     p->modeC = 1;
                     p->timer = 0;
                     p->active = 1;
                     break;
-                case 27:
-                    p->modeA = 2;
-                    p->modeB = 0;
-                    p->modeC = 2;
-                    p->timer = 0;
-                    p->active = 1;
-                    break;
+
                 case 28:
                     p->modeA = 2;
                     p->modeB = 0;
@@ -66,7 +65,16 @@ void sub_0817B2DC(struct BlinkActor *p)
                     p->timer = 0;
                     p->active = 1;
                     break;
+
+                case 27:
+                    p->modeA = 2;
+                    p->modeB = 0;
+                    p->modeC = 2;
+                    p->timer = 0;
+                    p->active = 1;
+                    break;
             }
+
             i++;
         } while (i < receiver->count[gUnk_0200047C->bank]);
     }

@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fuzzy: 89.1%
+// fix.py best version (reprinted C)
 // confidence=low: spawns one particle (kind 0/1 picks tile frames) into a 16-slot pool.
 // Remaining difference: random-index/table register allocation in the position jitter.
 #include "scene_vec.h"
@@ -35,22 +36,21 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
 {
     s32 i;
     struct PoolParticle *p;
-    struct ParticlePool *pool = inPool;
-    register struct SceneVec *pos asm("r4") = position;
-    asm("" : "+r"(pos));
+    asm("" : "+r"(position));
     for (i = 0; i < 16; i++) {
-        if (!pool->particles[i].active) {
+        if (!inPool->particles[i].active) {
             break;
         }
     }
+
     if (i < 16) {
         {
             u32 range;
             u32 mask;
             u32 index;
-            p = &pool->particles[i];
+            p = &inPool->particles[i];
             p->flags &= ~1;
-            p->position = *pos;
+            p->position = *position;
             index = gUnk_03005308;
             index++;
             mask = 0x3FF;
@@ -69,24 +69,22 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
                 u32 random = gUnk_0203B400[index];
                 s32 z = (u16)p->position.z;
                 z -= 63;
-                random &= range;
                 p->position.z = z + random;
+                random &= range;
             }
         }
         p->position.y += 128;
         if (kind != 0) {
             if (kind == 1) {
                 if ((i & kind) == 0)
-                    SpriteDrawable_SelectTileFrame(p, pool->resource, 4);
+                    SpriteDrawable_SelectTileFrame(p, inPool->resource, 4);
                 else
-                    SpriteDrawable_SelectTileFrame(p, pool->resource, 5);
+                    SpriteDrawable_SelectTileFrame(p, inPool->resource, 5);
             }
-        } else {
-            if ((i & 1) == 0)
-                SpriteDrawable_SelectTileFrame(p, pool->resource, 2);
-            else
-                SpriteDrawable_SelectTileFrame(p, pool->resource, 3);
-        }
+        } else if ((i & 1) == 0)
+            SpriteDrawable_SelectTileFrame(p, inPool->resource, 2);
+        else
+            SpriteDrawable_SelectTileFrame(p, inPool->resource, 3);
         p->velocityX = TruncatePoolOffset(6 * gUnk_086149C4[(angle + 64) & 255]);
         p->velocityZ = TruncatePoolOffset(6 * gUnk_086149C4[angle & 255]);
         p->animationPhase = 0;
@@ -95,7 +93,7 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             u32 index = (gUnk_03005308 + 1) & 0x3FF;
             gUnk_03005308 = index;
             {
-                u32 random = *(u16 *)((index << 1) + (u32)gUnk_0203B400);
+                u32 random = *((u16 *)((index << 1) + ((u32)gUnk_0203B400)));
                 u32 range = 7;
                 p->lifetime = (random & range) + 8;
             }

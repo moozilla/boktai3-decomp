@@ -1,8 +1,10 @@
 #include "scene_actor_chase.h"
+
+#ifdef NONMATCHING
+// fuzzy: 91.3%
+// fix.py best version (reprinted C)
 // confidence=low: restores a saved patrol destination and delayed command.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
-#ifdef NONMATCHING
-// fuzzy: 87.4%
 // Remaining differences: terrain destination spill, flag-address reuse, and reset scheduling; savedMotion need not be volatile.
 void Vorn_SendMessage(void *);
 struct VornPatrolRoute {
@@ -29,13 +31,14 @@ static inline void ClearMotion(struct SceneActorRegistryResetView *a, s32 mask)
 }
 s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u8 *context = actor->context;
     struct SceneActorReactionMotion *motion;
     struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
-    if (!Bits(actor, 0x400000) || !Bits(actor, 0x200000) ||
-        !CanRestore(motion = (void *)&actor->fieldDC, 1))
+    u32 k1;
+    if (((!Bits(actor, 0x400000)) || (!Bits(actor, 0x200000))) ||
+        (!CanRestore(motion = (void *)(&actor->fieldDC), 1)))
         return 0;
     savedMotion = motion;
     Mark(actor, 0x100);
@@ -54,17 +57,17 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
         command->second = 0;
         command->kind = kind;
     }
-    destination = *(struct ContactPosition **)(group + 0x200);
+    destination = *((struct ContactPosition **)(group + (k1 = 0x200)));
     {
         struct VornPatrolRoute *route = (void *)(group + 0x74);
         destination->x = ((u16 *)route->points)[0];
         destination->z = ((u16 *)route->points)[1];
     }
     destination->y = Chase_Height(destination);
-    (*(struct ContactPosition **)(group + 0x200))->pad = 1;
+    (*((struct ContactPosition **)(group + k1)))->pad = 1;
     actor->field2C2 = 64;
-    *(u16 *)((u8 *)actor + 0x414) = 0;
-    *(u16 *)((u8 *)actor + 0x418) = 0;
+    *((u16 *)(((u8 *)actor) + 0x414)) = 0;
+    *((u16 *)(((u8 *)actor) + 0x418)) = 0;
     ClearMotion(actor, ~0x380);
     {
         struct SceneActorReactionMotion *m = savedMotion;
@@ -75,18 +78,21 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
         struct SceneActorRegistryControl *control = &actor->group.control;
         u32 *flags = &actor->flags2D0;
         if (Bits(actor, 0x200000)) {
-            *flags &= ~0x1000000;
-            ClearMotion(actor, ~0x200);
-            *((u8 *)control + 10) = 0;
+            {
+                u32 k2 = 0x1000000;
+                *flags &= ~k2;
+            }
+            ClearMotion(actor, ~k1);
+            *(((u8 *)control) + 10) = 0;
             control->counter = 0;
             control->timer = 0;
         }
         ClearMotion(actor, ~0x400);
-        *((u8 *)actor + 0x5DA) = 0xFF;
+        *(((u8 *)actor) + 0x5DA) = 0xFF;
         ClearMotion(actor, ~0x1000);
-        *(u16 *)(context + 0x6D4) = 0;
-        *(u16 *)(context + 0x69E) = 0;
-        *(u16 *)(context + 0x6AC) = 0;
+        *((u16 *)(context + 0x6D4)) = 0;
+        *((u16 *)(context + 0x69E)) = 0;
+        *((u16 *)(context + 0x6AC)) = 0;
         {
             s32 mask = ~4;
             *flags &= mask;

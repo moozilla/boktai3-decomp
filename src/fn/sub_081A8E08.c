@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 76.4%
+// fuzzy: 86.5%
+// fix.py best version (reprinted C)
 // Remaining differences: stack-vector aliases, zero lifetimes and constant scheduling.
 // confidence=low: selects a player-mode collision copy and completes a position request.
 #define Vanargand_UpdateCaptureSetup sub_081A8E08
@@ -38,15 +39,19 @@ static inline void SetPosition(s16 *out, s32 x, s32 y, s32 z)
 }
 static inline void AddPosition(s16 *out, s16 *a, s16 *b)
 {
-    u16 av = a[0], bv = b[0];
+    s8 av = a[0];
+    u16 bv = b[0];
+    typeof(bv) c1;
     out[0] = av + bv;
     av = a[1];
     bv = b[1];
-    out[1] = av + bv;
+    c1 = bv;
+    out[1] = a[1] + c1;
     av = a[2];
     bv = b[2];
-    out[2] = av + bv;
+    out[2] = a[2] + c1;
 }
+
 void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
 {
     register struct CaptureActor *q asm("r6") = p;
@@ -56,7 +61,8 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
     p->flags |= mask;
     Vanargand_SetPendingCue(p, 0);
     if (p->pendingAnimation) {
-        void *animation, *drawable;
+        void *animation;
+        void *drawable;
         s16 *base;
         u32 two;
         register u32 zero asm("r12") = 0;
@@ -74,10 +80,12 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
                 SceneActors_StartUnmirroredAnimation(p, animation, drawable, 12, two, 0);
                 CpuSet(Player_GetCollisionData(), p->collision[0], 0x4000008);
                 break;
+
             case 1:
                 SceneActors_StartUnmirroredAnimation(p, animation, drawable, 13, two, 0);
                 CpuSet(Player_GetCollisionData(), p->collision[1], 0x4000008);
                 break;
+
             case 2:
                 SceneActors_StartUnmirroredAnimation(p, animation, drawable, 14, two, zero);
                 CpuSet(Player_GetCollisionData(), p->collision[2], 0x4000008);
@@ -86,11 +94,10 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
     }
     if (p->ready) {
         SceneActors_StartUnmirroredAnimation(p, q->animation, q->drawable, 3, 0, 2);
-        Player_ApplyPositionRequest(gUnk_02000580[0], (u8 *)q + 0x1AC, 128, 32, 120, 0, 0, 0);
+        Player_ApplyPositionRequest(gUnk_02000580[0], ((u8 *)q) + 0x1AC, 128, 32, 120, 0, 0, 0);
         p->active = 1;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081A8E08);
 #endif

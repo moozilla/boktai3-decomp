@@ -3,9 +3,6 @@
 
 // confidence=low: resumes pursuit or waiting after the lifted-player penalty window.
 
-#ifdef NONMATCHING
-// fuzzy: 81.8%
-// Remaining differences: state/reset zero lifetimes, derived offsets, and registers.
 void SceneActorControl_ConsumeLiftFlagPenalty(void *);
 void SceneActorControl_ResetCollisionFlags(void *);
 void Lun_BeginMoveToPosition(void *, void *);
@@ -47,48 +44,45 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u3
 void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 elapsed)
 {
     s32 frame = elapsed;
-    struct SceneActorRegistryResetView *a = input;
     u8 zero8;
-    if (TakeFlag(&a->field2B2))
-        SceneActorControl_ConsumeLiftFlagPenalty(a);
+    if (TakeFlag(&input->field2B2))
+        SceneActorControl_ConsumeLiftFlagPenalty(input);
     {
         u32 flags = 0x10;
-        u16 *p = &a->flags2D6;
+        u16 *p = &input->flags2D6;
         u32 v = *p;
-        zero8 = 0;
+        {
+            u8 k1 = 0;
+            zero8 = k1;
+        }
         asm("" : "+r"(zero8));
         flags = flags | v;
         *p = flags;
     }
     {
         u32 mask = 0x100000;
-        u32 *p = &a->flags2D0;
+        u32 *p = &input->flags2D0;
         *p |= mask;
     }
     if (frame > 30) {
-        u8 *ctx = a->context;
-
+        u8 *ctx = input->context;
         u16 delay;
-        SceneActorControl_ResetCollisionFlags(a);
-        delay = *(u16 *)(ctx + 0x444);
+        SceneActorControl_ResetCollisionFlags(input);
+        delay = *((u16 *)(ctx + 0x444));
         if (delay) {
             u32 flags = 0x100;
-            u16 *p = &a->flags2D4;
-            flags = flags | *p;
+            u16 *p = &input->flags2D4;
+            flags = flags | (*p);
             *p = flags;
-            *(u16 *)(ctx + 0x444) = *(u16 *)(ctx + 0x442);
-            Lun_BeginMoveToPosition(a, gUnk_02000580 + 0x30);
-            SetState(a, 2, 0, zero8);
+            *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
+            Lun_BeginMoveToPosition(input, gUnk_02000580 + 0x30);
+            SetState(input, 2, 0, zero8);
         } else {
             u32 zero = delay;
-            SetControl(a, Lun_UpdateWaitingAnimation, 10, zero, zero8);
-            SetState(a, 1, zero, zero8);
-            a->direction = a->fieldE9;
-            a->field2C2 = 64;
+            SetControl(input, Lun_UpdateWaitingAnimation, 10, zero, zero8);
+            SetState(input, 1, zero, zero8);
+            input->direction = input->fieldE9;
+            input->field2C2 = 64;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Lun_ResumeAfterLiftPenalty);
-#endif

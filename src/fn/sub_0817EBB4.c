@@ -1,7 +1,8 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 93.8%
+// fuzzy: 94.7%
+// fix.py best version (reprinted C)
 // Remaining differences: palette constant lifetimes, rotation mask reuse, and registers.
 // confidence=low: summons a formation before rotating through an effect burst
 struct BossActor {
@@ -46,7 +47,7 @@ static inline void SetDirection(struct BossActor *p, s32 angle)
     p->direction = angle;
     {
         s32 d = (p->direction + 0x60) >> 6;
-        u32 mask = 3;
+        s8 mask = 3;
         mask &= d;
         p->direction4 = mask;
     }
@@ -57,6 +58,7 @@ static inline void SetDirection(struct BossActor *p, s32 angle)
         p->direction8 = mask;
     }
 }
+
 void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
 {
     struct BossActor *q = p;
@@ -80,17 +82,22 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
                 Sound_PlaySong(0x2E4);
                 Sound_PlaySong(0x1A8);
                 q->paletteMode = 3;
-                q->paletteShift = 5;
+                {
+                    u8 k1 = 5;
+                    q->paletteShift = k1;
+                }
                 q->paletteTimer = zero;
                 q->palette = q->paletteData;
             }
-            if (++p->timer > 8) {
-                u32 phase = 1, zero = 0;
+            if ((++p->timer) > 8) {
+                u32 phase = 1;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             }
             break;
         }
+
         case 1:
             if (!p->timer) {
                 SceneActors_StartUnmirroredAnimation(p, &q->animation, q->animationState, 0x12B, 2,
@@ -98,11 +105,13 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
                 p->timer++;
             }
             if (p->finished == 1) {
-                u32 phase = 2, zero = 0;
+                u32 phase = 2;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             }
             break;
+
         case 2:
             if (!p->timer) {
                 SceneActors_StartUnmirroredAnimation(p, &q->animation, q->animationState, 0x12D, 2,
@@ -110,22 +119,26 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
                 BossSlot2_SpawnBobbingFormation(p);
             }
             if (p->timer > 30) {
-                u32 phase = 3, zero = 0;
+                u32 phase = 3;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             } else
                 p->timer++;
             break;
+
         case 3:
             if (!p->timer)
                 SceneActors_StartUnmirroredAnimation(p, &q->animation, q->animationState, 0x12F, 2,
                                                      4);
-            if (++p->timer > 30) {
-                u32 phase = 4, zero = 0;
+            if ((++p->timer) > 30) {
+                u32 phase = 4;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             }
             break;
+
         case 4:
             if (!p->timer) {
                 register u32 one asm("r4") = 1;
@@ -134,12 +147,14 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
                                                          one, one, 4);
                 Sound_PlaySong(0x2E9);
             }
-            if (++p->timer > 20) {
-                u32 phase = 5, zero = 0;
+            if ((++p->timer) > 20) {
+                u32 phase = 5;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             }
             break;
+
         case 5:
             SetDirection(p, p->timer + 15);
             SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0x13E, 1,
@@ -158,6 +173,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             if (p->timer == 128)
                 sub_0806CCC8(p->target, 180, -2);
             break;
+
         case 7:
             if (!p->timer) {
                 register u32 one asm("r4") = 1;
@@ -166,12 +182,14 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
                                                          one, one, 4);
             }
             if (p->timer > 20) {
-                u32 phase = 8, zero = 0;
+                u32 phase = 8;
+                u32 zero = 0;
                 p->phase = phase;
                 p->timer = zero;
             } else
                 p->timer++;
             break;
+
         case 8:
             if (!p->timer) {
                 SetDirection(p, 32);
@@ -188,7 +206,6 @@ void BossSlot2_UpdateSummonSpinSequence(struct BossActor *p)
             break;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdateSummonSpinSequence);
 #endif

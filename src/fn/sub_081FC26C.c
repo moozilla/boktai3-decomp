@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 72.9%
+// fuzzy: 80.0%
+// fix.py best version (reprinted C)
 // Remaining differences: random-source lifetimes, sprite pointers and inlined sequence allocation.
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
@@ -55,9 +56,9 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
         u32 offset = state->index << 1;
         const volatile u16 *table;
         table = e->sequence.commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const volatile u16 *)(((u32)table) + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         u32 first;
@@ -66,7 +67,7 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
         first = bit;
         first &= input;
         {
-            u32 second = ((*command & 0x30) >> 4) & bit;
+            u32 second = (((*command) & 0x30) >> 4) & bit;
             result = sprite;
             if (first != second)
                 e->sprite.flags |= 4;
@@ -81,11 +82,11 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
         bit = 2;
         first = bit;
         first &= input;
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
+        first = (u8)first;
     }
     {
         u32 elapsed = state->elapsed + 1;
@@ -140,16 +141,16 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed) {
+                if (!((u8)speed)) {
                     u32 one = 1;
                     state->duration = one;
                 }
@@ -183,7 +184,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     Ratatosk_SetAnimatedParticleUpdateCallback(config, gUnk_08613F6C[config->behavior]);
     Memory_Copy(&e->appearanceFlags, config, 0x1c);
     e->age = 0;
-    e->lift = *(u32 *)((u8 *)e + 0x24);
+    e->lift = *((u32 *)(((u8 *)e) + 0x24));
     {
         s16 *vel = &e->vx;
         s32 angle = config->angle;
@@ -196,13 +197,11 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     }
     e->sprite.position = *position;
     e->appearanceFlags = 0;
-    kind = RandomSample() & 3;
-    if (kind == 3)
-        kind = 1;
+    kind = (kind == 3) ? (1) : (RandomSample() & 3);
     e->appearanceFlags = kind;
     if ((e->appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
-            Anim_SetSequence(&e->sequence, *(void **)((u8 *)pool + 0xf38), 1, 0, 0);
+            Anim_SetSequence(&e->sequence, *((void **)(((u8 *)pool) + 0xf38)), 1, 0, 0);
             sprite = &e->sprite;
             updatePlayback(e, &e->sequence, sprite);
         } else {
@@ -230,7 +229,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
         e->sequence.flags |= 2;
         e->appearanceFlags |= 0x20;
     }
-    if ((e->appearanceFlags & 15) != 2 && !(e->appearanceFlags & 0x200)) {
+    if (((e->appearanceFlags & 15) != 2) && (!(e->appearanceFlags & 0x200))) {
         if (RandomSample() & 1) {
             e->sequence.flags |= 4;
             e->appearanceFlags |= 0x100;
@@ -238,12 +237,11 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     }
     e->sprite.flags &= ~1;
     Sprite_LinkToList(sprite, 0);
-    *((u8 *)e + 0x37) = 1;
+    *(((u8 *)e) + 0x37) = 1;
     pool->mask |= 1 << slot;
-    *(u32 *)((u8 *)pool + 0xf3c) += 1;
+    *((u32 *)(((u8 *)pool) + 0xf3c)) += 1;
     return slot;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081FC26C);
 #endif

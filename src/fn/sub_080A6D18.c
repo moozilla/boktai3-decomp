@@ -2,7 +2,8 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.0%
+// fuzzy: 90.8%
+// fix.py best version (reprinted C)
 // Register allocation and inline animation restart-pointer lifetimes still differ.
 static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
                           u32 flags)
@@ -61,15 +62,25 @@ void sub_080A9DB0(void *, s32, s32);
 void TentacleBody_UpdateAttackRecovery(void);
 void SceneActor_AimArcAtPlayer(void *);
 void ActorTrail_ApplyAngularOffsets(void *, s32, s32, s32);
+static inline u8 SceneActorControl_TakeFlag_(u8 *flag)
+{
+    if (*flag) {
+        return 1;
+        *flag = 0;
+    }
+    return 0;
+}
+
 void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
 {
     u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct SceneActorAnimationView *)actor)->profileId,
         ((struct SceneActorAnimationView *)actor)->profileMode, 0);
     register u8 *body asm("r5") = actor->context;
-    u32 variant, flags;
+    u32 variant;
+    u32 flags;
     u32 *attackFlags = &actor->flags2D0;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag_(&actor->field2B2)) {
         SceneActor_AimArcAtPlayer(actor);
         actor->direction = Math_Atan2(actor->secondaryMotion.x, actor->secondaryMotion.z);
         {
@@ -81,7 +92,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
             *attackFlags &= mask;
         }
         {
-            u32 mask = ~2;
+            u16 mask = ~2;
             u16 *p = (u16 *)(body + 0x8D0);
             u32 value = *p;
             mask &= value;
@@ -96,9 +107,9 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
     {
         u32 mask = 16;
-        if (*attackFlags & mask) {
+        if ((*attackFlags) & mask) {
             {
-                u32 mask = ~256;
+                u8 mask = ~256;
                 u16 *flags = &actor->flags2D4;
                 u32 value = *flags;
                 *flags = mask & value;
@@ -124,7 +135,6 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", TentacleBody_BeginDirectedAttack);
 #endif

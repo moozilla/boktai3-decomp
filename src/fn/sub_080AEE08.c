@@ -2,10 +2,11 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 
+#ifdef NONMATCHING
+// fuzzy: 90.0%
+// fix.py best version (reprinted C)
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
-#ifdef NONMATCHING
-// fuzzy: 88.3%
 // Remaining differences: register choices, address derivation, and two late constant reloads.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -49,6 +50,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
     u16 script;
+    u32 t1;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->field2B3 = 0;
@@ -57,7 +59,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound(actor);
-        if (Flag(actor, 8, 0x2D4))
+        if (Flag(actor, t1 = 8, 0x2D4))
             Sound_PlaySong(0x12A);
         {
             struct SceneActorRegistryControl *control = &actor->group.control;
@@ -65,7 +67,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
-            *(u16 *)((u8 *)control + 0x14) = 0;
+            *((u16 *)(((u8 *)control) + 0x14)) = 0;
             control->timer = 0;
         }
         {
@@ -83,7 +85,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         SceneActor_CallContextScriptB(actor);
         rangeB.x = 80;
         rangeB.y = 60;
-        rangeB.z = 60;
+        rangeB.z = t1 + 52;
         {
             register const u16 *table asm("r4") = gUnk_0203B400;
             register s32 duration asm("r8");
@@ -105,42 +107,44 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
                                 1);
         }
         category = actor->category;
-        if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
-            category == 0x18 || category == 0x19)
+        if (((((((category == 4) || (category == 1)) || (category == 5)) || (category == 7)) ||
+              (category == 6)) ||
+             (category == 0x18)) ||
+            (category == 0x19))
             Sound_PlaySong(0xE5);
     }
     {
         register u32 offset asm("r4") = 0x1F8;
         asm("" : "+r"(offset));
-        script = *(u16 *)((u8 *)actor + offset);
+        script = *((u16 *)(((u8 *)actor) + offset));
     }
     if (script) {
         values[0] = actor->position.x;
         values[1] = actor->position.y;
         values[2] = actor->position.z;
-        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
-        values[6] = *(s32 *)((u8 *)actor + 0x2E0);
+        values[3] = *((s32 *)(((u8 *)actor) + 0x1FC));
+        values[4] = *((s32 *)(((u8 *)actor) + 0x200));
+        values[5] = *((s32 *)(((u8 *)actor) + 0x204));
+        values[6] = *((s32 *)(((u8 *)actor) + 0x2E0));
         values[7] = actor->id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
+    if ((!Flag(actor, 0x4000, 0x2D4)) && (((u32)(actor->category - 11)) > 2))
         GameState_SetEventFlag(
             BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
     actor->fieldAA = 0;
     {
         u32 mask = 1;
         if (!actor->drawableKind)
-            *(u32 *)actor->drawable |= mask;
+            *((u32 *)actor->drawable) |= mask;
         else {
             struct VornDrawableTail {
                 u32 unknown0[2];
                 u32 flags;
             } *tail;
-            tail = (void *)((u8 *)actor->drawable + 0x20);
+            tail = (void *)(((u8 *)actor->drawable) + 0x20);
             tail->flags |= mask;
         }
     }
@@ -167,9 +171,8 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         actor->counter2AC = 0;
         actor->field2B1 = 1;
     }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(((u8 *)actor) + 0x320);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
 #endif

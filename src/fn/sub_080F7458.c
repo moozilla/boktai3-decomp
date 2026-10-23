@@ -1,7 +1,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.4%
+// fuzzy: 96.7%
+// fix.py best version (reprinted C)
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct SwordTask {
     u8 unknown0[0x86];
@@ -24,10 +25,14 @@ void Sword_InitAttackComponents(struct SwordTask *);
 void sub_080F67AC(struct SwordTask *);
 static inline u8 Sword_ClampKind(s32 kind)
 {
-    if (kind > 1)
-        kind = 1;
-    return kind;
+    if (kind <= 1)
+        goto ret1;
+    kind = 1;
+    return 1;
+ret1:
+    return 1;
 }
+
 s32 Sword_InitializeFromScript(struct SwordTask *p)
 {
     s32 i;
@@ -39,13 +44,14 @@ s32 Sword_InitializeFromScript(struct SwordTask *p)
     Script_SeekToKeyword('a');
     i = 0;
     argument = p->arguments;
-    for (; i < 2 && Script_GetPc(); i++)
-        *argument++ = Script_GetValue();
+    for (; (i < 2) && Script_GetPc(); i++)
+        *(argument++) = Script_GetValue();
+
     if (Script_SeekToKeyword('e'))
         p->valueD6C = Script_GetValue();
     if (Script_SeekToKeyword('X')) {
-        p->valueA4 = Script_GetPc() ? Script_GetValue() : 0;
-        p->value86 = Script_GetPc() ? Script_GetValue() : 0;
+        p->valueA4 = (Script_GetPc()) ? (Script_GetValue()) : (0);
+        p->value86 = (Script_GetPc()) ? (Script_GetValue()) : (0);
     }
     Sword_InitAttackComponents(p);
     sub_080F67AC(p);

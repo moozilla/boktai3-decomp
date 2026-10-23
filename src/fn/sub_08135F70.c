@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.2%
+// fuzzy: 90.2%
+// fix.py best version (reprinted C)
 // Remaining differences: health and +0x2D8 pointer spills, mode lifetime,
 // shared hit-flag expansion and temporary-register choices (see worker notes).
 #include "scene_actor_reset.h"
@@ -242,7 +243,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 updated;
     register u32 four asm("r4");
     u32 bits;
-
+    u32 k1;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
             flags2D4 = &actor->flags2D4;
@@ -255,16 +256,17 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     if (SceneActorBehavior_DispatchFlaggedCategory(actor))
         return 1;
     SceneActor_ClearReactionFlags(actor);
-    SceneActorMovement_ProjectProbe(actor, FIELD(actor, 0x174, u16), FIELD(actor, 0x174, u16));
+    SceneActorMovement_ProjectProbe(actor, *((u16 *)(((u8 *)actor) + 0x174)),
+                                    *((u16 *)(((u8 *)actor) + 0x174)));
     {
         u32 d = actor->reactionSoundVariant;
         health = &actor->health;
         *health -= d;
     }
-    updated = 0x20;
+    updated = (k1 = 0x20);
     flags2D4 = &actor->flags2D4;
-    updated |= *flags2D4;
     *flags2D4 = updated;
+    updated |= *flags2D4;
     {
         u32 v = actor->field2E6;
         four = 4;
@@ -275,31 +277,31 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     }
     flags2D8 = &actor->field2D8;
     {
-        u32 blocked = *flags2D8 & 0x20000;
+        u32 blocked = (*flags2D8) & 0x20000;
         flags2CC = &actor->flags2CC;
         if (blocked)
             goto done;
     }
     {
-        if ((mode & four) && !(updated & four)) {
+        if ((mode & four) && (!(updated & four))) {
             SceneActorBehavior_PlayReactionSound(actor);
-            FIELD(actor, 0x30C, u16) = 12;
+            *((u16 *)(((u8 *)actor) + 0x30C)) = 12;
         }
         flags2CC = &actor->flags2CC;
         if (mode) {
             {
-                u16 bank = FIELD(actor, 0x1E2, u16);
+                u16 bank = *((u16 *)(((u8 *)actor) + 0x1E2));
                 if (actor->drawableKind == 0)
-                    AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+                    AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
                 else
-                    FIELD(actor->drawable, 0x68, u8 *) = gUnk_030042E4 + bank * 32;
+                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * k1);
             }
             {
                 u32 eight = 8;
                 actor->field1E8 = eight;
             }
             flags2CC = &actor->flags2CC;
-            if ((mode & 4) && actor->category == 0x19) {
+            if ((mode & 4) && (actor->category == 0x19)) {
                 {
                     u32 bit = 0x2000000;
                     *flags2CC |= bit;
@@ -319,15 +321,15 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                 register u32 one asm("r9");
                 {
                     s32 h = *health;
-                    s32 maxh = FIELD(actor, 0xB0, u16);
-                    s32 kind = FIELD(actor, 0xB2, s16);
-                    s32 param = FIELD(actor, 0x9A, s16);
+                    s32 maxh = *((u16 *)(((u8 *)actor) + 0xB0));
+                    s32 kind = *((s16 *)(((u8 *)actor) + 0xB2));
+                    s32 param = *((s16 *)(((u8 *)actor) + 0x9A));
                     one = 1;
                     asm("" : "+r"(one));
                     SceneHud_SetTimedState(actor->id, h, maxh, kind, mode >> 2, param);
                 }
                 Fill(&zero, buffer);
-                if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
+                if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                     DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
                                              &actor->position, buffer, one);
             }
@@ -339,6 +341,7 @@ done: {
     keep &= value;
     *flags2CC = (value & 0xFFFEBE3F) | keep;
 }
+
     SceneActorReaction_RecordDefeat(actor);
     UpdateHitFlagsShared(actor, flags2D4, flags2CC);
     SceneActorTerrain_ClearCollisionTimers(actor);

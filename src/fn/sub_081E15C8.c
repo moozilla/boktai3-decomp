@@ -3,8 +3,8 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
-// fuzzy: 81.4%
-
+// fuzzy: 92.1%
+// fix.py best version (reprinted C)
 struct GameStartRes {
     u32 w[8];
 };
@@ -116,10 +116,9 @@ s32 GameStart_Init(u8 *p)
     struct GameStartPos pos;
     void *res;
     s32 i;
-
     Bg_ClearTilemap(0);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     {
@@ -128,18 +127,16 @@ s32 GameStart_Init(u8 *p)
         Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layers);
     }
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
-
+    CpuSet(((u8 *)ScriptProc_Start(0x92b3, 0x204)) + 0x14, gUnk_03004FC0, 0x100);
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate(p + 0x7c, res);
-    *(struct GameStartRes *)(p + 0x1b4) = *(struct GameStartRes *)(p + 0x7c);
+    *((struct GameStartRes *)(p + 0x1b4)) = *((struct GameStartRes *)(p + 0x7c));
     Widget_InitLinked(p + 0x1c, p + 0x7c, 0x36, 0x10, 0, 0, 0, 0);
     ResourceHeader_Relocate(p + 0x104, res);
     Widget_InitLinked(p + 0xa4, p + 0x104, 0x28, 0x10, 0, 0, 0, 0);
-    W(0xac) |= 1;
-    U16(0xc4) = 0;
-    U16(0xc6) = 0xffe0;
-
+    *((s32 *)(p + 0xac)) |= 1;
+    *((u16 *)(p + 0xc4)) = 0;
+    *((u16 *)(p + 0xc6)) = 0xffe0;
     {
         u32 group = 0xcb05;
         asm("" : "+r"(group));
@@ -147,38 +144,37 @@ s32 GameStart_Init(u8 *p)
     }
     ResourceHeader_Relocate(p + 0x18c, res);
     Widget_InitLinked(p + 0x12c, p + 0x18c, 0x8a, 0x10, 0, 0, 0, 0);
-    U16(0x14c) = 0;
-    U16(0x14e) = 0xfff8;
-
+    *((u16 *)(p + 0x14c)) = 0;
+    *((u16 *)(p + 0x14e)) = 0xfff8;
     AnimData_Load(p + 0x4a0, 0x593a);
     Sprite_Init(p + 0x474, p + 0x4a0, 0x11);
-    U16(0x490) = 0x18;
-    U16(0x492) = 0x2c;
-    *(void **)(p + 0x4ec) = ScriptProc_Start(0x922e, 0x4bbf);
-    Anim_SetSequence(p + 0x4bc, *(void **)(p + 0x4ec), 0, 0, 0);
+    *((u16 *)(p + 0x490)) = 0x18;
+    *((u16 *)(p + 0x492)) = 0x2c;
+    *((void **)(p + 0x4ec)) = ScriptProc_Start(0x922e, 0x4bbf);
+    Anim_SetSequence(p + 0x4bc, *((void **)(p + 0x4ec)), 0, 0, 0);
     StepAnim((struct GameStartAnim *)(p + 0x4bc), (struct GameStartSprite *)(p + 0x474));
-
     pos.x = 0xa8;
     pos.y = 0x28;
     for (i = 0; i <= 4; i++) {
-        Widget_InitLinked(p + 0x1d4 + i * 0x60, p + 0x1b4, i == 2 ? 0x14 : 0, 0x30, 1, 0, 0x3c,
-                          &pos);
-        U16(0x1f4 + i * 0x60) += i * 8;
+        Widget_InitLinked((p + 0x1d4) + (i * 0x60), p + 0x1b4, (i == 2) ? (0x14) : (0), 0x30, 1, 0,
+                          0x3c, &pos);
+        *((u16 *)(p + (0x1f4 + (i * 0x60)))) += i * 8;
         ((struct GameStart *)p)->items[i].flags |= 1;
     }
+
     pos.x = 0xc0;
     pos.y = 0x38;
     for (i = 0; i <= 1; i++) {
-        Widget_InitLinked(p + 0x3b4 + i * 0x60, p + 0x1b4, 0, 0x30, 1, 0, 0x3c, &pos);
-        U16(0x3d4 + i * 0x60) += i * 8;
+        Widget_InitLinked((p + 0x3b4) + (i * 0x60), p + 0x1b4, 0, 0x30, 1, 0, 0x3c, &pos);
+        *((u16 *)(p + (0x3d4 + (i * 0x60)))) += i * 8;
         ((struct GameStart *)p)->choices[i].flags |= 1;
     }
-    W(0x4d8) = 0;
+
+    *((s32 *)(p + 0x4d8)) = 0;
     if (gUnk_020003A0[6] == 1)
         Menu_StartFadeIn(0);
     else
         Menu_StartFadeIn(3);
-
     if (gUnk_020003A0[6] == 0) {
         u8 *name = gUnk_020005C0;
         u8 *slot = gUnk_020005B4;
@@ -187,21 +183,22 @@ s32 GameStart_Init(u8 *p)
         do {
             *q = 0x41;
             q--;
-        } while ((s32)q >= (s32)end);
+        } while (((s32)q) >= ((s32)end));
         name[0x18] = 0;
         slot[0] = 4;
         slot[1] = 0;
         if (gUnk_020003A0[6] == 0) {
-            W(0x4e4) = GameStart_LoadAvailableSave(p);
+            *((s32 *)(p + 0x4e4)) = GameStart_LoadAvailableSave(p);
             Sound_PlaySong(0xb3);
             goto check;
         }
     }
-    if (GS_H(0x86e) != 0)
+    if ((*((s16 *)(((u8 *)gUnk_02000710) + 0x86e))) != 0)
         GameState_RestoreActiveRegions();
 check:
-    if (GS_H(0x86e) == 0)
-        W(0x4cc) = 1;
+    if ((*((s16 *)(((u8 *)gUnk_02000710) + 0x86e))) == 0)
+        *((s32 *)(p + 0x4cc)) = 1;
+
     GameStart_DrawSaveInfo(p);
     GameStart_RunInitHook(p);
     return 0;

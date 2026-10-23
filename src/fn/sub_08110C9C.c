@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 76.3%
+// fuzzy: 91.2%
+// fix.py best version (reprinted C)
 // Scrolls the tilemap panel horizontally and draws the newly exposed 8px column(s).
 // Remaining: original keeps case 0/2 zeros as literals, sets offset (r1) by movs and
 // tail-merges every DrawRegion call into one bl; here the cases keep separate calls.
@@ -21,10 +22,24 @@ extern struct BgScroll gUnk_03004C30;
 s32 Mod(s32, s32);
 void TilemapPanel_DrawRegion(struct TilemapPanel *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
+static inline u32 Arg1(u32 k_, s32 x0)
+{
+    return x0 + k_;
+}
+
 void sub_08110C9C(struct TilemapPanel *p)
 {
     s32 *scroll = &p->scrollX;
-    s32 offset, top, sx, right, limit, diff, next, x0, col, cellWidth;
+    s32 offset;
+    s32 top;
+    s32 sx;
+    s32 right;
+    s32 limit;
+    s32 diff;
+    s32 next;
+    s32 x0;
+    s32 col;
+    s32 cellWidth;
     sx = Mod(p->scrollX, 256);
     Mod(scroll[1], 256);
     gUnk_03004C30.x = sx;
@@ -54,16 +69,19 @@ void sub_08110C9C(struct TilemapPanel *p)
             top = 0;
             TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
             break;
+
         case 1:
             offset = 1;
             top = 0;
             TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
             break;
+
         case 2:
             offset = 2;
             top = 0;
-            TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
+            TilemapPanel_DrawRegion(p, col, 0, x0, top, Arg1(1, x0), 1, cellWidth, 20, offset, top);
             break;
+
         case 3:
             offset = 3;
             top = 0;
@@ -78,6 +96,7 @@ void sub_08110C9C(struct TilemapPanel *p)
             }
             break;
     }
+
     p->drawnX = (next >> 3) << 3;
 }
 #else

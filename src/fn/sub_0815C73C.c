@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 78.4%
+// fix.py best version (reprinted C)
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 #define B(o)   (*(u8 *)(p + (o)))
@@ -14,47 +17,82 @@ void Sound_PlaySong(u32);
     H(0xB0A) = value;                                                                              \
     ATTACH = ActorAttachment_UpdateFromDescriptor(ATTACH, p + 0x24, B(0xB08), 0, p + 0xB0A,        \
                                                   (s16)arg, 150, 230)
-#ifdef NONMATCHING
-// fuzzy: 73.0%
 // confidence=low: selects player attachment descriptors and associated sound effects.
 #define Player_ConfigureAttachmentEffect sub_0815C73C
+static inline u32 Arg1(u32 k_, u8 *p)
+{
+    return p + k_;
+}
+
 void Player_ConfigureAttachmentEffect(u8 *p, u32 action, s32 value, s32 arg)
 {
     switch (action) {
         case 0:
-            START(1, 0x1B1);
+            *((u8 *)(p + 0xB08)) = 0;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 1, 0, 0, 0, 80);
+            Sound_PlaySong(0x1B1);
             break;
+
         case 1:
-            START(3, 0x1EC);
+            *((u8 *)(p + 0xB08)) = 0;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 3, 0, 0, 0, 80);
+            Sound_PlaySong(0x1EC);
             break;
+
         case 2:
-            START(0, 0x1EC);
+            *((u8 *)(p + 0xB08)) = 0;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, 0, 0, 0, 80);
+            Sound_PlaySong(0x1EC);
             break;
+
         case 3:
-            START(2, 0x1ED);
+            *((u8 *)(p + 0xB08)) = 0;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 2, 0, 0, 0, 80);
+            Sound_PlaySong(0x1ED);
             break;
+
         case 4:
-            EMIT(1);
+            *((u8 *)(p + 0xB08)) = 1;
+            *((u16 *)(p + 0xB0A)) = value;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, p + 0xB0A, (s16)arg,
+                150, 230);
             break;
+
         case 5:
-            EMIT(3);
+            *((u8 *)(p + 0xB08)) = 3;
+            *((u16 *)(p + 0xB0A)) = value;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, p + 0xB0A, (s16)arg,
+                150, 230);
             break;
+
         case 6:
-            B(0xB08) = 5;
-            H(0xB0A) = 0;
-            ATTACH =
-                ActorAttachment_UpdateFromDescriptor(ATTACH, p + 0x24, B(0xB08), 0, 0, 0, 150, 230);
+            *((u8 *)(p + 0xB08)) = 5;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, 0, 0, 150, 230);
             break;
+
         case 7:
-            B(0xB08) = 4;
-            H(0xB0A) = 0;
-            ATTACH =
-                ActorAttachment_UpdateFromDescriptor(ATTACH, p + 0x24, B(0xB08), 0, 0, 0, 150, 230);
+            *((u8 *)(p + 0xB08)) = 4;
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, 0, 0, 150, 230);
             break;
+
         case 8:
-            H(0xB0A) = 0;
-            ATTACH =
-                ActorAttachment_UpdateFromDescriptor(ATTACH, p + 0x24, B(0xB08), 127, 0, 0, 0, 80);
+            *((u16 *)(p + 0xB0A)) = 0;
+            *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
+                *((void **)(p + 0xB04)), p + 0x24, *((u8 *)Arg1(0xB08, p)), 127, 0, 0, 0, 80);
             break;
     }
 }

@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.4%
+// fuzzy: 91.0%
+// fix.py best version (reprinted C)
 // Remaining differences: parameter flag operations and saved pointer lifetimes.
 
 #include "contact_swarm.h"
@@ -17,17 +18,18 @@ struct Drawable {
 static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceState *state)
 {
     struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, bit;
+    const volatile u16 *command;
+    u32 ended;
+    u32 bit;
     register u32 duration asm("r2");
     register u32 flags asm("r1");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
+        command = (const volatile u16 *)(((u32)table) + offset);
         table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
     }
-    sprite->frame = *command >> 6;
+    sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -35,7 +37,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         bit = maskBit;
         first = bit;
         first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->sprite.flags |= 4;
         else
             owner->sprite.flags &= ~4;
@@ -48,7 +50,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         first = bit;
         first &= input;
         first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             owner->sprite.flags |= 8;
         else
             owner->sprite.flags &= ~8;
@@ -63,8 +65,6 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         asm("" : "+r"(temp));
         mask = temp;
         asm("" : "+r"(mask));
-        /* Keep the live mask distinct from its source without binding r7. */
-
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -114,16 +114,16 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
                 u32 offset = state->index << 1;
                 const volatile u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = *command & 15;
+            state->frameWeight = (*command) & 15;
             {
                 register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
-                if (!(u8)speed)
+                if (!((u8)speed))
                     state->duration = 1;
             }
         } else {
@@ -179,19 +179,23 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
         i = 0;
         do {
             if (config->flags & 0x20) {
-                *randomIndex = (*randomIndex + 1) & 1023;
-                config->direction = (randomTable[*randomIndex] & 63) - 32 + (u8)config->direction;
+                *randomIndex = ((*randomIndex) + 1) & 1023;
+                {
+                    u8 k1 = 32;
+                    config->direction =
+                        ((randomTable[*randomIndex] & 63) - k1) + ((u8)config->direction);
+                }
             } else {
-                *randomIndex = (*randomIndex + 1) & 1023;
+                *randomIndex = ((*randomIndex) + 1) & 1023;
                 config->direction = randomTable[*randomIndex];
             }
             Projectile_InitializeParams(params);
             if (i == 0)
-                *(u16 *)params |= 0x110;
+                *((u16 *)params) |= 0x110;
             else if (i == 1)
-                *(u16 *)params = (*(u16 *)params & 0xfeef) | 0x210;
+                *((u16 *)params) = ((*((u16 *)params)) & 0xfeef) | 0x210;
             else
-                *(u16 *)params = (*(u16 *)params & 0xfdef) | 0x310;
+                *((u16 *)params) = ((*((u16 *)params)) & 0xfdef) | 0x310;
             {
                 s32 half;
                 if (speed >= 0)
@@ -200,10 +204,10 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
                     half = -((-speed) >> 1);
                 config->speed += half * (i - 1);
             }
-            Projectile_SetFlightParams(params, *(u16 *)params, config->lifetime + 30,
+            Projectile_SetFlightParams(params, *((u16 *)params), config->lifetime + 30,
                                        config->direction, config->speed);
-            *(u16 *)params |= config->flags;
-            *(void **)(params + 0x54) = config;
+            *((u16 *)params) |= config->flags;
+            *((void **)(params + 0x54)) = config;
             Projectile_SetDamageParams(params, config->damage[0], config->damage[1],
                                        config->damage[2] >> 1, config->damage[3],
                                        config->damage[4]);
@@ -222,7 +226,6 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
     Task4E01_BeginImpactAnimation(p);
     return 0;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Task4E01_SpawnImpactChildren);
 #endif

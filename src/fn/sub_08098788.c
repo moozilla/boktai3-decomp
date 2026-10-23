@@ -2,7 +2,8 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 84.4%
+// fuzzy: 87.4%
+// fix.py best version (reprinted C)
 // Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"
 extern u32 gUnk_030053F4;
@@ -99,6 +100,11 @@ static inline u8 SaveFlag(u32 mask)
     return 0;
 }
 // confidence=low: coordinates Ghost visibility transitions with player reveal state.
+static inline u32 PlayerFlag_1(u8 *p)
+{
+    return (*((u32 *)(p + 0x448))) & 0x10;
+}
+
 u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorRegistryResetView *saved = a;
@@ -109,11 +115,11 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     }
     if (ReadFlags16(a, 0x4000)) {
         if (Flag((u8 *)a, 0x200)) {
-            *(u32 *)a->drawable |= 1;
-            ActorShadow_Disable((u8 *)a + 0x320);
+            *((u32 *)a->drawable) |= 1;
+            ActorShadow_Disable(((u8 *)a) + 0x320);
             {
-                u32 mask = ~0x20;
-                u32 *flags = (void *)((u8 *)saved + 0x558);
+                s8 mask = ~0x20;
+                u32 *flags = (void *)(((u8 *)saved) + 0x558);
                 *flags &= mask;
             }
         } else
@@ -126,11 +132,11 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
         u32 discarded = gUnk_030053F4 & 0x4800;
         u32 *flags = (u32 *)(ctx + 0x558);
         s32 reveal;
-        asm("" : : "r"(discarded));
         if (Flag(ctx, 0x100)) {
             reveal = SaveFlag(0x20);
         } else
-            reveal = *(s16 *)((u8 *)gUnk_02000710 + 0x876);
+            reveal = *((s16 *)(((u8 *)gUnk_02000710) + 0x876));
+        asm("" : : "r"(discarded));
         if (reveal > 0) {
             u32 mode;
             if (gUnk_030053F4 & 0x800)
@@ -138,7 +144,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             else {
                 if (gUnk_02000478 > 0)
                     goto hide;
-                if (gUnk_02000580 && PlayerFlag(gUnk_02000580, 0x10))
+                if (gUnk_02000580 && PlayerFlag_1(gUnk_02000580))
                     goto hide;
                 mode = GlobalMode();
             }
@@ -147,10 +153,10 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             if (!Flag(ctx, 0x40)) {
                 u32 hidden = Hidden(a);
                 if (!hidden) {
-                    *(u16 *)(ctx + 0x5B2) = hidden;
+                    *((u16 *)(ctx + 0x5B2)) = hidden;
                     {
                         u32 mask = ~0x20;
-                        u32 value = *flags & mask;
+                        u32 value = (*flags) & mask;
                         *flags = value | 0x40;
                     }
                 }
@@ -159,10 +165,10 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
         hide:
             if (!Flag(ctx, 0x20)) {
                 if (Hidden(a)) {
-                    *(u16 *)(ctx + 0x5B2) = 0;
+                    *((u16 *)(ctx + 0x5B2)) = 0;
                     {
                         u32 mask = ~0x40;
-                        u32 value = *flags & mask;
+                        u32 value = (*flags) & mask;
                         *flags = value | 0x20;
                     }
                 }
@@ -175,9 +181,9 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     Ghost_ReactToPlayerMovement(a);
 finish:
     SceneActor_EasePlayerHeight(a);
+
     return 1;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", Ghost_UpdateVisibility);
 #endif
