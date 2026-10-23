@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_panel_schedule.h"
-#ifdef NONMATCHING
-// fuzzy: 55.4%
-// foundry draft (worker best 97.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
+#define DirectionBurst_EmitOffset sub_0819F55C
 void DirectionBurst_EmitOffset(const struct ContactPosition *origin, s32 index, s32 direction,
                                s32 spacing, u32 kind, u32 parameter)
 {
@@ -13,9 +12,10 @@ void DirectionBurst_EmitOffset(const struct ContactPosition *origin, s32 index, 
     *coordinate = *coordinate - spacing * 2 + spacing * index;
     if (!direction)
         DirectionBurst_Emit(&position, index * 16 - 32, kind, parameter);
-    else
-        DirectionBurst_Emit(&position, direction * 64 - (index * 16 - 32), kind, parameter);
+    else {
+        s32 angle = direction * 64;
+        s32 offset = index * 16 - 32;
+        asm("" : "+r"(offset));
+        DirectionBurst_Emit(&position, angle - offset, kind, parameter);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DirectionBurst_EmitOffset);
-#endif
