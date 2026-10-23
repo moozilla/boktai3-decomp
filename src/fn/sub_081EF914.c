@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define SingletonSlot7_UpdateEndingScene sub_081EF914
+
+
+// Remaining differences: playback pointer lifetimes and a few operand/order choices.
+
 #ifdef NONMATCHING
-// fuzzy: 96.2%
-
-// Remaining differences: playback temporaries and zero/constant placement in timed phases.
-// fuzzy: 96.2%
-
 #include "contact_swarm.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
@@ -249,15 +248,17 @@ static inline u32 StepPlaybackOne(struct Drawable *owner, struct DisplaySequence
     return ended;
 }
 
-static inline u8 ConsumeEntry(u8 *p)
+static inline u32 ConsumeEntry(u8 *p)
 {
     u8 *q = p + 0xB0;
+    register u32 result asm("r1");
     if (*q) {
         *q = 0;
         *(q - 1) = 0;
-        return TRUE;
-    }
-    return FALSE;
+        result = TRUE;
+    } else result = FALSE;
+    asm("" : "+r"(result));
+    return result;
 }
 
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
@@ -300,8 +301,9 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
             if (*(context + 0xAF)) {
                 struct Drawable *foreground;
                 struct DisplaySequenceState *state;
+                u32 *field = (void *)(p + 0x304);
                 register u32 one asm("r5") = 1;
-                *(u32 *)(p + 0x304) = one;
+                *field = one;
                 asm("" : "+r"(one));
                 *(u32 *)(p + 0x2FC) = 3;
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
@@ -314,10 +316,27 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
             break;
         case 1:
             if (*(s16 *)(p + 0x5DE) > 0x78) {
-                *(u32 *)(p + 0x304) = 0;
+                u32 *field = (void *)(p + 0x304);
+                u32 zero = 0;
+                *field = zero;
                 *(u32 *)(p + 0x294) = 0xA0;
-                *(u16 *)(p + 0x5D2) = 0x1E;
-                SETCB(context);
+                {
+                    u16 *timer = (void *)(p + 0x5D2);
+                    register u8 byteZero asm("r3") = 0;
+                    register void (*callback)(void) asm("r1");
+                    register u32 offset asm("r0") = 0x1E;
+                    asm("" : "+r"(byteZero));
+                    *timer = offset;
+                    asm("" : "+r"(offset));
+                    callback = SceneMover_InterpolateScreenX;
+                    asm("" : : "r"(callback));
+                    offset += 0xE2;
+                    SetCallback(callback, (void (**)(void))(context + offset));
+                    *(u32 *)(context + 0x90) = zero;
+                    context[0xB1] = 1;
+                    context[0xA2] = byteZero;
+                    *(u32 *)(context + 0xA4) = zero;
+                }
                 *(u32 *)(p + 0x39C) = 2;
             }
             (*(u16 *)(p + 0x5DE))++;
@@ -330,16 +349,37 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
             break;
         case 3:
             if (*(s16 *)(p + 0x5DE) > 0x78) {
+                u32 *field = (void *)(p + 0x304);
                 u32 zero = 0;
                 struct DisplaySequenceState *state;
-                *(u32 *)(p + 0x304) = zero;
+                *field = zero;
                 *(u32 *)(p + 0x2FC) = 3;
-                *(u8 *)(p + 0x2F0) |= 4;
+                {
+                    register u32 mask asm("r0") = 4;
+                    u8 *field = p + 0x2F0;
+                    asm("" : "+r"(mask));
+                    *field = mask | *field;
+                }
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
                 Anim_RestartSequence(state, *(void **)(p + 0x390), *(u16 *)(p + 0x2FC), 0, zero);
                 *(u32 *)(p + 0x294) = 0x3C;
-                *(u16 *)(p + 0x5D2) = 0xB4;
-                SETCB(context);
+                {
+                    u16 *timer = (void *)(p + 0x5D2);
+                    register u8 byteZero asm("r2") = 0;
+                    register void (*callback)(void) asm("r1");
+                    register u32 offset asm("r0") = 0xB4;
+                    asm("" : "+r"(byteZero));
+                    *timer = offset;
+                    asm("" : "+r"(offset));
+                    callback = SceneMover_InterpolateScreenX;
+                    asm("" : : "r"(callback));
+                    offset += 0x4C;
+                    SetCallback(callback, (void (**)(void))(context + offset));
+                    *(u32 *)(context + 0x90) = zero;
+                    context[0xB1] = 1;
+                    context[0xA2] = byteZero;
+                    *(u32 *)(context + 0xA4) = zero;
+                }
                 *(u32 *)(p + 0x39C) = 4;
             }
             (*(u16 *)(p + 0x5DE))++;
@@ -348,8 +388,9 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
             if (*(context + 0xAF)) {
                 struct Drawable *foreground;
                 struct DisplaySequenceState *state;
+                u32 *field = (void *)(p + 0x5BC);
                 register u32 one asm("r5") = 1;
-                *(u32 *)(p + 0x5BC) = one;
+                *field = one;
                 asm("" : "+r"(one));
                 *(u32 *)(p + 0x2FC) = 0;
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
