@@ -4,7 +4,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 81.0%
+// fuzzy: 85.2%
 // Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
@@ -72,12 +72,13 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     {
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r5");
-        register u32 temp asm("r1");
+        register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
+        asm("" : "+r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -154,24 +155,24 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void Vector(struct SceneVec *v, s32 angle)
+static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
 {
-    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * 128);
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
-    {
-        s32 sample = gUnk_086149C4[angle & 255];
-        s32 scale = 128;
-        asm("" : "+r"(sample));
-        v->z = Scale(sample * scale);
-    }
+    v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
 static inline void Add(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
 {
-    v->x = a->x + b->x;
+    v->x = b->x + a->x;
     v->y = b->y + a->y;
     v->z = a->z + b->z;
 }
 // confidence=low: emits six surrounding effects before retiring the part.
+static inline void SetState(struct VanargandPart *p, u32 state)
+{
+    p->state = state;
+    p->timer = 0;
+}
 void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
 {
     u32 mask = 12;
@@ -187,11 +188,12 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
         Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 10, (u8)p->variant, 0);
         fill = 0;
         CpuSet(&fill, &zero, 0x05000002);
+        i = 0;
         state = &p->state;
         timer = &p->timer;
         enter = &p->enter;
-        for (i = 0; i < 6; i++) {
-            Vector(&point, i * 255 / 6);
+        for (; i < 6; i++) {
+            Vector(&point, i * 255 / 6, 128);
             Add(&point, (struct SceneVec *)((u8 *)p + 0x1c), &point);
             VanargandEffect_Create(3, i * 2, &point, &zero, p->variant);
         }
@@ -207,8 +209,7 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
                 p->flashTimer = 32;
             }
             if (p->flashTimer == 0) {
-                p->state = 1;
-                p->timer = 0;
+                SetState(p, 1);
                 *enter = 1;
             }
             break;
@@ -216,8 +217,7 @@ void Vanargand_EmitRadialPartEffects(u8 *boss, struct VanargandPart *p)
         case 1:
             if (StepPlayback(p, &p->sequence, p, p->state)) {
                 Sound_PlaySong(0x58c);
-                p->state = 2;
-                p->timer = 0;
+                SetState(p, 2);
                 p->enter = 1;
             }
             break;
