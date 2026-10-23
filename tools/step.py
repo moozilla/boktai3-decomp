@@ -109,8 +109,10 @@ def vanished(dumps, func, lines):
         if ln not in lines:
             continue
         tr = why.trail(dumps, func, uid)
-        if tr and tr[-1][1] == "(deleted)" and len(tr) >= 2:
+        if tr and tr[-1][1] == "(deleted)" and len(tr) >= 2 and tr[-1][0] in ("cse", "gcse", "cse2", "loop"):
             first = tr[0][1]
+            if re.match(r"\(set \(reg[^()]*\) \((reg|const_int)[^()]*\)\)$", first):
+                continue  # copies and constant loads come and go
             if first.startswith("(set (pc)") or "(use " in first or "(clobber" in first:
                 continue
             out.append((uid, first, tr[-1][0]))
@@ -159,6 +161,21 @@ def main():
           f"({sum(1 for d in diffs if d[0] == 'registers')} register-only)")
 
     explained = []
+    # an instruction the ROM has earlier (or later) than you: a pure ordering difference
+    import idioms
+    shp = lambda xs: [idioms.shape(t) for _, t in xs]
+    orders, used = [], set()
+    for a_, (k1, i1, c1, o1) in enumerate(diffs):
+        if k1 != "delete" or a_ in used:  # opcodes run candidate -> ROM: "delete" is yours only
+            continue
+        for b_, (k2, i2, c2, o2) in enumerate(diffs):
+            if k2 == "insert" and b_ not in used and shp(o2) == shp(c1):
+                used |= {a_, b_}
+                orders.append((i1, c1, i2, o2))
+                break
+    diffs = [d for n_, d in enumerate(diffs) if n_ not in used]
+    frame = re.compile(r"^(push|pop|add sp|sub sp|bx)\b")
+    diffs = [d for d in diffs if not all(frame.match(t) for _, t in d[2] + d[3])] or diffs
     for kind, idx, cand, orig in diffs:
         uids = [an.by_off[o][0] for o, _ in cand if an.by_off.get(o)]
         if not uids and idx < len(an.cd):
@@ -194,10 +211,22 @@ def main():
                 evs.append((u, p, "deleted", f"your insn `{first[:70]}` was deleted by {p}: "
                                              + DELETED_BY.get(p, "")))
         rank = min([PASS_RANK.get(e[1], 99) for e in evs] or [PASS_RANK["greg"] + (kind == "registers")])
-        if kind == "registers":
-            rank += 100  # register-only differences usually follow from a shape difference
+        # shape differences in code order, then register-only ones (usually consequences)
+        rank = 100 if kind == "registers" else 0
         explained.append((rank, idx, kind, cand, orig, uids, evs, note))
 
+    for i1, c1, i2, o2 in orders:
+        mine = an.off_line.get(c1[0][0])
+        at = an.off_line.get(an.cd[i2][0]) if i2 < len(an.cd) else None
+        when = "before" if i2 < i1 else "after"
+        k = next((n_ for n_, (o, _) in enumerate(an.od) if o == o2[-1][0]), None)
+        ctx = "; ".join(t for _, t in an.od[k + 1:k + 3]) if k is not None else ""
+        where = f"`{ctx}` ({show(at)})" if at != mine else f"`{ctx}`"
+        note = (f"order: the ROM computes `{'; '.join(t for _, t in c1)}` ({show(mine)}) right {when} "
+                f"{where}; you compute it elsewhere. agbcc has no instruction scheduler: code comes out in source evaluation order, "
+                f"minus what cse/loop/combine delete or move. So evaluate that value {when} it in the C: a local "
+                f"initialized there, an argument (evaluated before the call or inline body), or statement order.")
+        explained.append((0, min(i1, i2), "order", c1, [], [], [], note))
     explained.sort(key=lambda x: (x[0], x[1]))
     for n, (rank, idx, kind, cand, orig, uids, evs, note) in enumerate(explained):
         if n and not a.all:
@@ -212,7 +241,9 @@ def main():
         print(f"   yours: {'; '.join(t for _, t in cand) or '(nothing)'}")
         if note:
             print(f"   {note}")
-        if evs:
+        if kind == "order":
+            pass
+        elif evs:
             for u, p, k, text in sorted(evs, key=lambda e: PASS_RANK.get(e[1], 99)):
                 print(f"   [{p}] {k}, insn {u}: {text}")
         else:
