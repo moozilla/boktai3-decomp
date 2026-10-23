@@ -56,6 +56,10 @@ elif ! git -C decomp-permuter apply --reverse --check "$PATCH" 2>/dev/null; then
     git -C decomp-permuter clean -qfd src
     git -C decomp-permuter apply "$PATCH"
 fi
+# the patch changes the parser grammar (statement expressions anywhere an
+# expression goes): rebuild its tables when they predate that
+grep -q "primary_expression -> LPAREN compound_statement RPAREN" decomp-permuter/perm_pycparser/yacctab.py ||
+    (cd decomp-permuter/perm_pycparser && rm -f yacctab.py && python3 _build_tables.py >/dev/null)
 
 # mGBA harness
 [ -n "$MINIMAL" ] || make -s -C ../../tools/emu

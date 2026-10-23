@@ -85,6 +85,15 @@ functions first.
 * A sweep that strips the pin and checks the result (1-2 s each) finds the
   free depins. Run it over the whole list before any search.
 
+Both are fixed now. The permuter patch parses a statement expression
+anywhere an expression can go and prints it with its parentheses
+(`tools/setup.sh` rebuilds the parser tables). That rescued 6 of the 8
+failing sample functions. natfarm's triage pass records the free depins
+and orders the search: allocation-only first, then fewest differing bytes.
+A tools checkout set up before the patch gained param_copy, early_return and
+reset_const silently lacked those passes; `tools/setup.sh` re-applies a
+changed patch.
+
 ## Ideas with the biggest payoff (literature pass)
 
 Related work: Schulte et al., "Evolving Exact Decompilation" (genetic
