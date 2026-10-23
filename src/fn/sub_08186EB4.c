@@ -1,7 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.9%
-// Remaining: strike-tail merging, branch polarity and pointer/register lifetimes.
+#define Armor_SelectTimedAttack sub_08186EB4
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;
@@ -69,18 +67,18 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
                     ActorController_SetBehavior(p, 12);
                     break;
                 }
-                if (ay <= 127) {
-                    if (dx == 0) {
-                        if (az <= 1)
-                            goto near;
-                    } else if (dz == 0) {
-                        if (ax <= 1) {
-                        near:
-                            ActorController_SetBehavior(p, 4);
-                            break;
-                        }
-                    }
+                if (ay > 127)
+                    goto far;
+                if (dx == 0) {
+                    if (az > 1)
+                        goto far;
+                } else {
+                    if (dz != 0 || ax > 1)
+                        goto far;
                 }
+                ActorController_SetBehavior(p, 4);
+                break;
+            far:
                 ActorController_SetBehaviorIfFinished(p, 2);
                 break;
 
@@ -150,8 +148,11 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
             case 1:
                 if (ay <= 127) {
                     if (dx == 0) {
-                        if (dz < 0 && p->facing == 192)
-                            goto strike;
+                        if (dz < 0 && p->facing == 192) {
+                            ActorController_SetBehavior(p, 22);
+                            *decision = mode;
+                            break;
+                        }
                         if (p->facing == 64) {
                             ActorController_SetBehavior(p, 22);
                             p->decision = 0;
@@ -159,7 +160,6 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
                         }
                     } else if (dz == 0) {
                         if (dx < 0 && p->facing == 128) {
-                        strike:
                             ActorController_SetBehavior(p, 22);
                             *decision = mode;
                             break;
@@ -194,7 +194,3 @@ void Armor_SelectTimedAttack(struct ArmorDecisionActor *p)
     }
     return;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_SelectTimedAttack);
-#endif
