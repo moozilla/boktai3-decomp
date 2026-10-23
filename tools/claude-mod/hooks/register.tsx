@@ -64,6 +64,11 @@ function zoomTo($: EngineInterface, path: string[]): void {
   tab = 'treemap'
   redraw($)
 }
+function resetView($: EngineInterface): void {
+  zoom = []
+  tab = 'overview'
+  redraw($)
+}
 function toggleWhole($: EngineInterface): void {
   if (source) source = { ...source, showWhole: !source.showWhole }
   redraw($)
@@ -123,6 +128,8 @@ async function openSource($: EngineInterface, node: DecompNode, where: string[])
 }
 
 const fmt = (n: number) => n.toLocaleString('en-US')
+/** A percent share as flexGrow, which surfaces take only up to 10000. */
+const grow = (p: number) => Math.max(0.01, Math.round(p * 100) / 100)
 /** A share as a Box size: whole percent steps are all a surface takes. */
 const share = (p: number) => `${Math.max(0, Math.min(100, Math.round(p)))}%`
 const pct1 = (p: number) => `${p.toFixed(p >= 100 || p === 0 ? 0 : 1)}%`
@@ -286,15 +293,15 @@ export const register: Register = on => {
             </Text>
             <Box flexDirection="column" height={rows} width="100%">
               {layout.map((row, r) => (
-                <Box flexDirection="row" height={0} flexGrow={row.size} flexShrink={1} width="100%">
-                  {row.tiles.map(({ item: n, width, size }) => {
+                <Box flexDirection="row" height={0} flexGrow={grow(row.height)} flexShrink={1} width="100%">
+                  {row.tiles.map(({ item: n, width }) => {
                     const color = n.fn ? fnShade(n.fn.pct, n.fn.pinned) : shade(pctOf(n))
                     const showPct = (width / 100) * cols > n.name.length + 6
                     return (
                       <Box
                         key={`tile-${r}-${n.name}`}
                         width={0}
-                        flexGrow={size}
+                        flexGrow={grow(width)}
                         flexShrink={1}
                         height="100%"
                         backgroundColor={color}
@@ -353,6 +360,15 @@ export const register: Register = on => {
         {tabs}
         {body}
         {spread(<Link href={DECOMP_DEV_URL} label="decomp.dev →" />, <Link href={blobUrl('PROGRESS.md')} label="PROGRESS.md →" />)}
+      </Box>
+    )
+  }).catch(($, e) => {
+    // A view the surface refuses must not leave the popup blank: offer a way back.
+    const { Box, Text, Button } = $.ui.resolve(e)
+    return (
+      <Box flexDirection="column" gap={1}>
+        <Text>Couldn't draw this view.</Text>
+        <Button key="reset" label="Back to overview" onPress={() => resetView($)} />
       </Box>
     )
   })
