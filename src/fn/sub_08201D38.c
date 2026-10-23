@@ -1,32 +1,30 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.6%
-// foundry draft (worker best 91.3%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct DisplaySequenceState {
-    const u16 *commands;
+    const volatile u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
     u16 index, unknownA, speed, elapsed;
 };
-struct Col {
+struct ActorColliderView {
     u8 pad[6];
     u16 flags;
 };
-struct Spr {
+struct ActorSpriteView {
     u32 flags;
     u8 pad[12];
     u16 frame;
 };
-struct S {
+struct ScriptCombatActorState {
     u8 p0[0x18];
     s32 timer;
     u8 p1c[0x24 - 0x1c];
-    struct Spr spr;
+    struct ActorSpriteView spr;
     u8 p36[0x40 - 0x38 + 0];
     u8 pos[0x10];
     u8 anim[0x5c - 0x50];
     void *ptr5c;
     u8 p60[0xc0 - 0x60];
-    struct Col col;
+    struct ActorColliderView col;
     u8 pc8[0xcc - 0xc8];
     u8 dmgA[8];
     u8 dmgB[0x100 - 0xd4];
@@ -78,9 +76,105 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
 u32 ScriptCombatActor_UpdateDefeatEffect(void *);
-u32 sub_08201D38(struct S *p)
+static inline void StepSequence(struct ScriptCombatActorState *owner)
 {
-    struct Col *c;
+    struct ActorSpriteView *sprite = &owner->spr;
+    struct DisplaySequenceState *state = &owner->seq;
+    const volatile u16 *command = state->commands + state->index;
+    register u32 duration asm("r3");
+    u32 flags, bit;
+    sprite->frame = *command >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r2");
+        u32 one = 1;
+        bit = one;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        u32 bit = 2;
+        register u32 first asm("r2");
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 mask;
+        register u32 temp asm("r2");
+        u32 savedDuration;
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        asm("" : "+r"(mask));
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold)
+                        state->elapsed = savedDuration;
+                    else
+                        state->index = state->frameCount - 1;
+                } else {
+                    state->index = index - 1;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        state->index = frameCount - 1;
+                    } else
+                        state->index = 0;
+                }
+            }
+            command = state->commands + state->index;
+            state->frameWeight = *command & 15;
+            {
+                register s32 weight asm("r2") = state->frameWeight;
+                s32 speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        }
+    }
+}
+
+// confidence=low: runs the actor action, damage response, palette timers and sprite playback.
+#define ScriptCombatActor_UpdateState sub_08201D38
+u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
+{
+    register struct ActorColliderView *c asm("r4");
     u32 m = 0x400;
     if ((gUnk_030053F4 | gUnk_030053F0) & m)
         return 0;
@@ -93,12 +187,16 @@ u32 sub_08201D38(struct S *p)
     p->spr.flags &= ~1;
     if (p->dead == 0) {
         c = &p->col;
-        c->flags &= ~4;
+        {
+            register u32 flags asm("r1") = c->flags;
+            c->flags = 0xfffb & flags;
+        }
         Collider_SetPosition(c, p->pos, 0);
     } else {
-        c = &p->col;
-        c->flags |= 4;
+        register struct ActorColliderView *disabled asm("r2") = &p->col;
+        disabled->flags |= 4;
         p->ptr5c = gUnk_030042E4 + 0x36e0;
+        c = disabled;
     }
     {
         u32 off = 0x180;
@@ -161,51 +259,6 @@ u32 sub_08201D38(struct S *p)
                 p->spr.flags &= ~1;
         }
     }
-    {
-        struct DisplaySequenceState *s = &p->seq;
-        struct Spr *sp = &p->spr;
-        const u16 *c = s->commands + s->index;
-        sp->frame = *c >> 6;
-        if ((s->flags & 1) != (((*c & 0x30) >> 4) & 1))
-            sp->flags |= 4;
-        else
-            sp->flags &= ~4;
-        if ((u8)(s->flags & 2) != (((*c & 0x30) >> 4) & 2))
-            sp->flags |= 8;
-        else
-            sp->flags &= ~8;
-        s->elapsed++;
-        if (s->elapsed >= s->duration) {
-            s->elapsed = 0;
-            if (s->flags & 4) {
-                if (s->index == 0) {
-                    if (s->flags & 8) {
-                        s->elapsed = s->duration;
-                        goto frame_ready;
-                    }
-                    s->index = s->frameCount;
-                }
-                s->index--;
-            } else {
-                s->index++;
-                if (s->index >= s->frameCount) {
-                    if (s->flags & 8) {
-                        s->elapsed = s->duration;
-                        s->index = s->frameCount - 1;
-                    } else
-                        s->index = 0;
-                }
-            }
-        frame_ready:
-            c = s->commands + s->index;
-            s->frameWeight = *c & 15;
-            s->duration = (s->speed * s->frameWeight) >> 6;
-            if (s->duration == 0)
-                s->duration = 1;
-        }
-    }
+    StepSequence(p);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08201D38);
-#endif
