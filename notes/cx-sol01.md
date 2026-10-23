@@ -26,3 +26,7 @@ Tags: #player #matching
 Ten exact matches add approximately 0.127 percentage points of code coverage (3,064 bytes). Eight use register-pinning concessions (2,688 bytes); two need no hints (376 bytes). Five new or improved guarded drafts earn no exact credit. Three functions were skipped after bounded attempts. Per-function checks use reviewed extents; combined player_3 checks also pass. After rebasing, build/cxbuild printed `build/boktai3.gba: OK`.
 
 The wrap-up marker appeared during integration; no further function attempts were started. Next function in assignment order: 08141BAC, Player_GetSmoothedDirection. The remaining 93 assigned functions were not attempted.
+
+## Session h2 continuation
+
+- 08141BAC drafted 94.4%: signed history smoothing loop recovered in the pending continuation commit. Three register-only instructions differ; no exact credit. Reviewed extent is 108 bytes.
