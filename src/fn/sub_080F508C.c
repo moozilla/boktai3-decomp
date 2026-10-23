@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Obj {
     u8 pad0[6];
     u8 rotation;
@@ -37,14 +36,14 @@ void Sword_UpdateDepthWaveReturn(struct Obj *p)
     p->z = p->startZ + Div(p->dz * p->timer, 128) + wave;
     p->timer--;
     if (p->timer == 0) {
-        register u32 one asm("r0");
+        u32 one;
+        do {
         p->rotation = 128;
         one = 1;
-        asm("" : "+r"(one));
         *(u8 *)((u8 *)p + 0x11e) = one;
+        } while (0);
         *(u8 *)((u8 *)p + 0x11f) = one;
         one |= *(u8 *)((u8 *)p + 0x119);
-        asm("" : "+r"(one));
         *(u8 *)((u8 *)p + 0x119) = one;
         *(void (**)(struct Obj *))((u8 *)p + 0x164) = IvyChild_UpdateAfterBob;
     }

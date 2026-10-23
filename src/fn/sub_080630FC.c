@@ -1,14 +1,13 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_catalog.h"
 extern const s8 gUnk_0824DF7C[];
 void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *input)
 {
-    register struct SceneInventoryScriptCatalog *p asm("r6") = input;
+    struct SceneInventoryScriptCatalog *p = input;
     s32 page, next asm("r5"), count asm("r4");
     s8 *destination;
     const s8 *source;
     const s8 *table;
-    register u8 *pageCount asm("r1");
+    u8 *pageCount;
     s8 *base;
     u32 pageOffset;
     const s8 *tableSource;
@@ -35,7 +34,7 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
             source++;
         } while (--count >= 0);
         page = next;
-    } while (page < *pageCount);
+    } while (page < (*(((u8 *)p) + pageOffset)));
     if (page <= 6) {
         u32 mask = 0xFF;
         s32 baseOffset;
@@ -59,7 +58,7 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
     if (Script_SeekToKeyword(0x61)) {
         u32 value = Script_GetTextSourcePc();
         u32 textOffset = 0x1A98;
-        register u32 *text asm("r1");
+        u32 *text;
         text = (u32 *)((u8 *)p + textOffset);
         *text = value;
     }

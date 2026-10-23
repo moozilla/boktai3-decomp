@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u32 timer;
@@ -50,14 +49,14 @@ static inline void set(u32 mask)
 }
 void WirelessGameMenu_UpdateActiveRound(struct P *input)
 {
-    register struct P *p asm("r8") = input;
+    struct P *p = input;
     u32 data;
     u8 *entered = &p->entered;
     if (*entered) {
         *entered = 0;
         {
             u32 value = 720;
-            register struct P *view asm("r1");
+            struct P *view;
             view = p;
             view->remaining = value;
         }
@@ -67,15 +66,16 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
         p->active = 1;
     }
     WirelessGameMenu_UpdateHealthIndicators(p);
-    if (({
-            register struct P *view asm("r2") = p;
+    if (((({
+            struct P *view = p;
             view->timer;
-        }) == 30)
+        }))) == 30) {
         WirelessGameMenu_SignalStatusPanel(p);
-    if (Mod(({
-                register struct P *view asm("r3") = p;
+    }
+    if (Mod((({
+                struct P *view = p;
                 view->timer;
-            }),
+            })),
             60) == 0) {
         struct Actor *actor = gUnk_02000580;
         struct Target *target = SceneActors_GetBySlot(0);
@@ -86,59 +86,62 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
         int i;
         int shift;
         u8 *q;
-        if (actor && actor->maximum)
+        if (actor && actor->maximum) {
             a = Div(100 * actor->current, actor->maximum);
-        else
+        } else {
             a = 0;
-        if (a == 0 && actor->current)
+        }
+        if ((a == 0) && actor->current) {
             a = 1;
-        if (target && target->maximum > 0)
+        }
+        if (target && (target->maximum > 0)) {
             b = Div(100 * target->current, target->maximum);
-        else
+        } else {
             b = 0;
-        if (b == 0 && target->current > 0)
-            b = 1;
-        data = a | (b << 8);
-        e = &p->entry;
-        asm("" : "+r"(e));
-        {
-            register u32 zero asm("r3") = 0;
-            packed = zero;
-            total = zero;
         }
-        i = 0;
-        {
-            register u32 zero asm("r0") = 0;
-            asm("" : "+r"(zero));
-            shift = zero;
-        }
+        do {
+            if ((b == 0) && (target->current > 0)) {
+                b = 1;
+            }
+            data = a | (b << 8);
+            e = &p->entry;
+            {
+                u32 zero = 0;
+                packed = zero;
+                total = zero;
+            }
+            i = 0;
+            {
+                u32 zero = 0;
+                shift = zero;
+            }
         q = e->bytes;
+        } while (0);
         do {
             int value;
             u32 flag = e->flag;
-            if (flag)
+            if (flag) {
                 value = *q;
-            else {
+            } else {
                 int old = *q;
-                register u8 *score asm("r1");
-                register int n asm("r2");
+                u8 *score;
+                int n;
                 score = p->scores;
                 score += i;
                 n = *score;
                 value = old + n;
                 total += n;
-                *score = flag;
+                *score = (float)flag;
             }
             e->bytes[i] = 0;
-            if (value > 15)
+            if (value > 15) {
                 value = 15;
+            }
             {
-                register int count asm("r1") = shift;
-                register u32 merged asm("r2");
-                asm("" : "+r"(count));
+                int count = shift;
+                u32 merged;
                 value <<= count;
                 merged = packed;
-                asm("" : "+r"(merged));
                 merged |= value;
                 packed = merged;
             }
@@ -146,11 +149,12 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
             i++;
             shift += 4;
         } while (i <= 3);
-        if (({
+        if (((({
                 int v = total;
                 v;
-            }) > 0)
+            }))) > 0) {
             WirelessGame_AddWeightedScore(3, 1);
+        }
         {
             u32 v = packed;
             u32 shifted;
@@ -160,7 +164,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
         WirelessExchange_SendPacket(p, 0, &data, 1);
     }
     {
-        register struct P *view asm("r3") = p;
+        struct P *view = p;
         if ((view->status & 0xffff00) || test(&view->flags, 128)) {
             u32 eight;
             u8 *state;
@@ -189,13 +193,13 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
             *state = two;
             p->entered = 1;
             {
-                register struct P *view asm("r2") = p;
+                struct P *view = p;
                 view->timer = remaining;
             }
             set(4);
             p->active = 0;
         } else {
-            register struct P *view asm("r3") = p;
+            struct P *view = p;
             view->timer++;
         }
     }

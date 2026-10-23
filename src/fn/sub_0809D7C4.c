@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: follows player displacement while the participant-progress control runs.
 
 extern u8 *gUnk_02000580;
@@ -48,6 +47,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 }
 void Lun_FollowParticipantDisplacement(struct SceneActorRegistryResetView *a)
 {
+    u8 **new_var;
     u8 *ctx = a->context;
     struct ContactPosition delta;
     if (TakeFlag(&a->field2B1)) {
@@ -57,9 +57,8 @@ void Lun_FollowParticipantDisplacement(struct SceneActorRegistryResetView *a)
         SceneActorControl_ResetTargetFlags(a);
     }
     {
-        register u8 **players asm("r0") = &gUnk_02000580;
-        asm("" : : "r"(players));
-        Delta(&delta, (void *)(ctx + 0x414), (void *)(gUnk_02000580 + 0x30));
+        u8 **players = &gUnk_02000580;
+        Delta(&delta, (void *)(ctx + 0x414), (void *)((*(new_var = &gUnk_02000580)) + 0x30));
     }
     a->motion.x += delta.x;
     a->motion.z += delta.z;
@@ -67,6 +66,7 @@ void Lun_FollowParticipantDisplacement(struct SceneActorRegistryResetView *a)
     if (a->field2B0) {
         SetState(a, 0, 3, 0);
         SetControl(a, SceneActorControl_OnIdle, 0x10);
-    } else
+    } else {
         a->counter2AC++;
+    }
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct Sub {
     u8 pad[0x38];
@@ -41,6 +40,7 @@ static inline void clearFlags(struct Sub *p, u32 mask)
 
 void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 flag)
 {
+    s32 k2 = 0;
     s32 v;
     u16 *q;
     s32 sum;
@@ -101,8 +101,7 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                 p->timer = 0x5A;
                 {
                     u32 zero = 0;
-                    asm("" : "+r"(zero));
-                    *q = zero;
+                    *q = k2;
                 }
             } else if (p->keys & 1) {
                 if ((s16)sum > 400) {
@@ -121,8 +120,9 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                 }
                 *q = flag;
             }
-            if ((u16)(p->hB1C - 1) <= 0x30)
+            if (((u16)(p->hB1C - 1)) <= 0x30) {
                 p->state = 0x10;
+            }
             break;
         case 4:
         case 5:
@@ -178,13 +178,15 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
             break;
         case 12:
         case 13:
-            if (!(p->keys & 0x200))
+            if (!(p->keys & 0x200)) {
                 goto afec;
+            }
             goto b178;
         case 14:
         case 15:
-            if (p->keys & 0x200)
+            if (p->keys & 0x200) {
                 goto afec;
+            }
         b178:
             Armor_UpdateAccumulatedBehavior(p, delta, flags);
             break;

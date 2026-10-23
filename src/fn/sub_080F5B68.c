@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct TargetMotion {
     u8 unknown0[6], rotation, unknown7[0x15];
@@ -37,38 +36,31 @@ void TargetMotion_AdvanceFollowSegment(struct TargetMotion *p)
     p->z = correction.z + p->startZ + Div(p->dz * p->timer, 100);
     p->timer++;
     if (p->timer > 100) {
-        register u32 one asm("r0");
-        register u8 *done asm("r1") = &p->done;
-        asm("" : "+r"(done));
+        u32 one;
+        u8 *done = &p->done;
+        do {
         one = 1;
-        asm("" : "+r"(one));
+        } while (0);
         *done = one;
         p->rotation = 128;
         p->state11E = one;
         {
-            register u32 offset asm("r3") = 0x11f;
-            register u8 *address asm("r1");
-            asm("" : "+r"(offset));
+            u32 offset = 0x11f;
+            u8 *address;
             address = (u8 *)p + offset;
-            asm("" : "+r"(address));
             *address = one;
         }
         {
-            register u32 offset asm("r1") = 0x119;
-            register u8 *address asm("r2");
-            asm("" : "+r"(offset));
+            u32 offset = 0x119;
+            u8 *address;
             address = (u8 *)p + offset;
-            asm("" : "+r"(address));
             one |= *address;
-            asm("" : "+r"(one));
             *address = one;
         }
         {
-            register u32 offset asm("r2") = 0x164;
-            register u8 *address asm("r1");
-            asm("" : "+r"(offset));
+            u32 offset = 0x164;
+            u8 *address;
             address = (u8 *)p + offset;
-            asm("" : "+r"(address));
             *(void **)address = IvyChild_UpdateAfterBob;
         }
     }

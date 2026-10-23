@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_object_slot.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
@@ -42,8 +41,7 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         u8 v = *SceneActorTerrain_GetCell(c) & 15;
         cellField = &obj->b3b;
         {
-            register u32 zero asm("r5") = 0;
-            asm("" : "+r"(zero));
+            u32 zero = 0;
             *cellField = v;
             TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, *cellField, 0xff, zero);
         }
@@ -54,7 +52,6 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         switch (({
             u32 ty = obj->type;
             cf2 = cellField;
-            asm("" : "+r"(cf2));
             ty;
         })) {
             case 0:
@@ -92,9 +89,9 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
             obj->b39 = 0;
             obj->b3a = 0;
         } else if (t == 1) {
-            u32 two = 2;
+            u32 two;
             obj->callback = SceneObject_UpdateActiveIdle;
-            asm("" : "+r"(two));
+            two = 2;
             obj->b39 = two;
             obj->b3a = 0;
         } else {

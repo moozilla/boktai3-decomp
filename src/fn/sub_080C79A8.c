@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorReaction_SlideBack: on entry plays sequence 8 facing the context direction (+0x691); slides along the dominant axis of that direction at the context speed (+0x682), decaying it by 0x10 per frame, and flags completion (+0x2B0) 12 frames after it stops (provisional name) */
 #include "scene_actor_reset.h"
@@ -32,7 +31,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
     s16 *speed;
 
     if (TakeFlag(&actor->field2B2)) {
-        register u8 *direction asm("r1") = &((struct SceneActorAnimationView *)actor)->direction;
+        u8 *direction = &((struct SceneActorAnimationView *)actor)->direction;
         u8 saved = *direction;
         u8 directionVariant, mirror;
         u8 *mirrorPointer;
@@ -56,7 +55,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
                 *variantPointer = quadrant;
             }
         }
-        *direction = saved;
+        *(&((struct SceneActorAnimationView *)actor)->direction) = saved;
         variantReload = &directionVariant;
         {
             u32 mirrorValue = *mirrorPointer;
@@ -68,8 +67,9 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
         if (flags & 0x10) {
             force = 0x10;
             flags &= ~0x10;
-        } else
+        } else {
             force = 0;
+        }
         if (!((struct SceneActorAnimationView *)actor)->drawableKind) {
             struct SceneActorAnimationSequenceDrawable *drawable;
             ((struct SceneActorAnimationView *)actor)->selection = selection;
@@ -89,19 +89,22 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
             savedSelection = &((struct SceneActorAnimationView *)actor)->selection;
             restart = &((struct SceneActorAnimationView *)actor)->restart;
             if (!force && *savedSelection == selection && !*restart) {
-                if (flags == 1 && (tile->flags & 4))
+                if ((flags == 1) && (tile->flags & 4)) {
                     goto done;
-                if (flags == 0 && !(tile->flags & 4))
+                }
+                if ((flags == 0) && (!(tile->flags & 4))) {
                     goto done;
+                }
             }
             *savedSelection = selection;
             {
                 u32 mask = 4;
                 u32 mode;
-                if (flags & mask)
+                if (flags & mask) {
                     mode = 6;
-                else
+                } else {
                     mode = 4;
+                }
                 Anim_SetKeyframes(
                     &((struct SceneActorAnimationTileDrawable *)((struct SceneActorAnimationView *)
                                                                      actor)
@@ -110,10 +113,11 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
                     ((struct SceneActorAnimationView *)actor)->drawable, (u16)selection, 2,
                     (u16)mode);
                 flags &= 1;
-                if (flags)
+                if (flags) {
                     tile->flags |= mask;
-                else
+                } else {
                     tile->flags &= ~4;
+                }
             }
         }
         *restart = 0;
@@ -131,10 +135,11 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
     }
     dx = Scale16(gUnk_086149C4[(body[0x691] + 0x40) & 0xFF] * *(s16 *)(body + 0x682));
     dz = Scale16(gUnk_086149C4[body[0x691]] * *(s16 *)(body + 0x682));
-    if ((dx < 0 ? -dx : dx) < (dz < 0 ? -dz : dz))
+    if (((dx < 0) ? (-dx) : (dx)) < ((dz < 0) ? (-dz) : (dz))) {
         motion->z = dz;
-    else
+    } else {
         motion->x = dx;
+    }
     speed = (s16 *)(body + 0x682);
     if (*speed <= 0) {
         s16 zero = 0;
@@ -143,6 +148,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
             actor->field2B0 = 1;
             *speed = zero;
         }
-    } else
+    } else {
         *speed -= 0x10;
+    }
 }

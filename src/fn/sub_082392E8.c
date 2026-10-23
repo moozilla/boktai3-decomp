@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 typedef struct Point {
@@ -63,12 +62,14 @@ void sub_082392E8(State *s, Point *pos)
         Effect *draw = e;
         s32 angle;
         s32 radius;
-        register s32 mask asm("r5") = 255;
+        s32 mask = 255;
         draw->flags &= ~1;
         e->kind = 2;
         SpriteDrawable_SelectTileFrame(draw, s->graphics, 2);
         angle = random_first() & mask;
+        do {
         radius = (random_first() & 63) + 128;
+        } while (0);
         do {
             e->dx = scale(radius * gUnk_086149C4[(angle + 64) & mask]);
         } while (0);

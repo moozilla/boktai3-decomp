@@ -559,30 +559,35 @@ void SelectionMenu_AdvanceChoice(struct SelectionMenu *p)
 // MATCHING_CONCESSION: register-pinning
 void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
 {
-    int value, a, b;
+    s16 k2 = 10;
+    int value;
+    int a;
+    int b;
     SceneHud_DrawClock(p->statisticsPage);
     SceneHud_DrawNumericStatus(p->statisticsPage);
     value = gUnk_02000710->level;
-    if (value > 99)
+    if (value > 99) {
         value = 99;
-    else if (value < 0)
+    } else if (value < 0) {
         value = 0;
+    }
     {
         int x = 10;
-        asm("" : "+r"(x));
-        Text_DrawNumber(0, x, 9, value, 33, 2, 15);
+        Text_DrawNumber(0, k2, 9, value, 33, 2, 15);
     }
     a = 0;
     b = 0;
     SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
-    if (b > 0)
+    if (b > 0) {
         Text_DrawNumber(0, 9, 10, b, 33, 3, 15);
-    else
+    } else {
         SceneHud_FillTile020(9, 10, 3);
-    if (a > 0)
+    }
+    if (a > 0) {
         Text_DrawNumber(0, 9, 11, a, 33, 3, 15);
-    else
+    } else {
         SceneHud_FillTile020(9, 11, 3);
+    }
     Text_DrawNumber(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
     Text_DrawNumber(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);
     Text_DrawNumber(0, 11, 14, Player_GetCurrentAttribute(2), 33, 3, 15);

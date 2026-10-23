@@ -86,16 +86,14 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
             struct SignedFlag {
                 s32 bits : 16;
             };
-            register struct SignedFlag *f asm("r2") = (void *)&actor->flags2D4;
-            register s32 m asm("r0") = ~0x20;
-            asm("" : : "r"(f), "r"(m));
+            struct SignedFlag *f = (void *)&actor->flags2D4;
+            s32 m = ~0x20;
             m &= (u16)f->bits;
             f->bits = m;
         }
         {
-            register u32 *f asm("r2") = &actor->flags2CC;
-            register s32 m asm("r1") = ~0x80;
-            asm("" : : "r"(f), "r"(m));
+            u32 *f = &actor->flags2CC;
+            s32 m = ~0x80;
             *f &= m;
         }
         SetForced(actor, 0x100000);

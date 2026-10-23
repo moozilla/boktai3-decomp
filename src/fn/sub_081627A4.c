@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "terrain_cell_probe.h"
 
@@ -28,10 +27,8 @@ s32 PlayerBarrier_Update(u8 *b)
             *(s32 *)(b + 0xB8) = 0;
     }
     pst = (s32 *)(b + 0xB8);
-    asm("" : "+r"(pst));
     st = *pst;
     q = pst;
-    asm("" : "+r"(q));
     if (st == 3) {
         u32 *cnt;
         AnimData_SelectPaletteBank(pst + 1, 0x64);

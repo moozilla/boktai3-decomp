@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -44,7 +43,7 @@ void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *
         struct Unk0823614CParticle *p = &emitter->particles[emitter->next];
         const u16 *table;
         u32 *seed;
-        register u32 i asm("r1");
+        unsigned short i;
         u32 mask;
 
         p->active = 1;
@@ -74,8 +73,9 @@ void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *
         p->y = p->origin->y;
         p->z = p->origin->z + Scale12(p->radius * gUnk_086149C4[p->angle]);
         p->visible = 1;
-        if (++emitter->next > 11)
+        if ((++emitter->next) > 11) {
             emitter->next = 0;
+        }
         emitter->delay = 0;
         owner[0x13A] = 1;
     }

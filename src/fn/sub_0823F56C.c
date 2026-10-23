@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 // confidence=low: held charge followed by decaying reverse motion suggests a charged dash.
@@ -33,26 +32,33 @@ static inline s32 scale(s32 v)
 }
 void Player_UpdateChargedDashAttack(u8 *p)
 {
-    switch (B(0x458)) {
+    s32 k2 = 0;
+    switch (*((u8 *)(p + 0x458))) {
         case 0:
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40))
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x26),
+                                         0x40)) {
                 Player_SetTetherMode(p, 3, 1);
-            break;
-        case 1:
-            Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
-            if (++H(0x45A) > 6) {
-                B(0xC0F) = 0;
-                H(0x4D2) = 0;
-                if (H(0x428) <= 2) {
-                    Player_PlayLocalSong(W(0x18), 0xD5);
-                    Player_SetTetherMode(p, 3, 5);
-                } else if (**(u16 **)(p + 0x348) & 2)
-                    Player_SetTetherMode(p, 3, 4);
-                else
-                    goto release;
             }
             break;
+
+        case 1:
+            Player_UpdateFacingFromInputHistory(p);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x27),
+                                     0x40);
+            if ((++(*((u16 *)(p + 0x45A)))) > 6) {
+                *((u8 *)(p + 0xC0F)) = 0;
+                *((u16 *)(p + 0x4D2)) = 0;
+                if ((*((u16 *)(p + 0x428))) <= 2) {
+                    Player_PlayLocalSong(*((u32 *)(p + 0x18)), 0xD5);
+                    Player_SetTetherMode(p, 3, 5);
+                } else if ((*(*((u16 **)(p + 0x348)))) & 2) {
+                    Player_SetTetherMode(p, 3, 4);
+                } else {
+                    goto release;
+                }
+            }
+            break;
+
         case 2:
             Player_UpdateFacingFromInputHistory(p);
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
@@ -102,12 +108,13 @@ void Player_UpdateChargedDashAttack(u8 *p)
                     s32 zSpeed = H(0x4D2);
                     H(0x3C) = -scale(gUnk_086149C4[angle] * zSpeed);
                 }
-                H(0x4D2) = (H(0x4D2) * 3) >> 2;
-            } else if (++H(0x45A) > 4)
+                *((u16 *)(p + 0x4D2)) = ((*((u16 *)(p + 0x4D2))) * 3) >> 2;
+            } else if ((++(*((u16 *)(p + 0x45A)))) > 4) {
                 Player_SetTetherMode(p, 3, 6);
+            }
             break;
         case 6: {
-            register u32 pending asm("r0");
+            u32 pending;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 B(0xBF6) = 1;
@@ -116,15 +123,17 @@ void Player_UpdateChargedDashAttack(u8 *p)
                 B(0xBF6) = 0;
                 B(0x458) = 1;
             } else if (++H(0x45A) > 14) {
-                B(0xBF6) = 0;
+                *((u8 *)(p + 0xBF6)) = k2;
                 Player_SetTetherMode(p, 3, 7);
             }
             break;
         }
         case 7:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x26), 0x40);
-            if (++H(0x45A) > 4)
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x26),
+                                     0x40);
+            if ((++(*((u16 *)(p + 0x45A)))) > 4) {
                 Player_SetTetherMode(p, 0, 0);
+            }
             break;
     }
     B(0xAC9) = 4;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // Box_Overlaps (sub_08220BF8) inlined; the stack box address is kept in a register
@@ -46,12 +45,14 @@ u32 sub_082207DC(struct Collider *a, struct Collider *b)
 {
     struct Collider box;
     struct HitPoint out;
-    register struct Collider *bp asm("r4");
+    struct Collider *bp;
 
     sub_082203A8(a->pos, a->offset, &box);
     bp = &box;
-    if (!Box_Overlaps(bp, b) || !Collider_TestSegmentBounds(a->pos, a->offset, b, &out))
+    DEBUG_NOP();
+    if ((!Box_Overlaps(bp, b)) || (!Collider_TestSegmentBounds(a->pos, a->offset, b, &out))) {
         return 0;
+    }
     if (!(b->flags & 2)) {
         b->hit = out;
         a->hit = out;

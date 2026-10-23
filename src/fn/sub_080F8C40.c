@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "rotation_phase.h"
 
@@ -38,9 +37,8 @@ void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor
     angle = NormalizeAngle(32 - state->savedAngle);
     if (angle < 0) {
         u32 step = state->acceleration;
-        asm("" : "+r"(step));
         {
-            register u32 cur asm("r1") = drawable->angle;
+            u32 cur = drawable->angle;
             step = step + cur;
             drawable->angle = step;
         }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 static inline u8 Unavailable(struct SceneActorBehaviorView *actor)
 {
@@ -27,7 +26,7 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
 {
     u32 *flags;
     u32 clear;
-    register u32 zero asm("r6");
+    u32 zero;
     const void *control;
     u32 kind;
     if (Unavailable(actor)) {
@@ -62,7 +61,6 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
     {
         u8 *field = &actor->prepared;
         zero = 0;
-        asm("" : "+r"(zero));
         *field = 1;
     }
     actor->substate = zero;
@@ -71,8 +69,7 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
     actor->field2C8 = zero;
     *flags &= clear;
     {
-        u32 offset = 0x82;
-        asm("" : "+r"(offset));
+        unsigned long long offset = 0x82;
         offset *= 2;
         *(const void **)((u32)actor + offset) = (void *)zero;
     }

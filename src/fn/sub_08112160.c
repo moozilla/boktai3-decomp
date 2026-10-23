@@ -20,7 +20,7 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
     s32 base;
     s32 outer;
     s32 j;
-    register s32 divisor asm("r5");
+    s32 divisor;
     u32 glyph;
     s32 seen;
     s32 idx;
@@ -42,7 +42,6 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
         }
         outer = 0;
         fb = (struct Digit *)(s + 0x2c);
-        asm("" : "+r"(fb));
         do {
             divisor = 100;
             base = outer * 3 + 8;
@@ -80,7 +79,6 @@ void StageResults_ShowTimeDigits(u8 *s, s32 mode, s32 time)
         seen = 0;
         j = 0;
         fb = (struct Digit *)(s + 0x2c);
-        asm("" : "+r"(fb));
         for (; j < 3; j++) {
             glyph = 0x3e;
             idx = mode + j;

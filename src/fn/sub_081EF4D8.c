@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct S7Trans {
     u8 pad0[0x90];
     u32 frame;
@@ -52,11 +51,10 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 
 void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
 {
-    register struct S7Trans *q asm("r5") = p;
+    struct S7Trans *q = p;
     u32 f = ConsumeEntry(p);
     if (f == 1) {
         SetCallback(SceneMover_InterpolateScreenX, &p->callback);
-        asm("" ::: "r1");
         p->frame = 0;
         p->initialize = 1;
         p->progressFlag = 0;
@@ -64,7 +62,6 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
         q->val294 = 100;
         q->state = 0;
         q->counter = 0;
-        asm("" ::"r"(f));
     }
     switch (q->state) {
         case 0:
@@ -109,5 +106,4 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
         } break;
     }
     p->timer++;
-    asm("" ::"r"(q));
 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -47,26 +46,27 @@ void sub_08249238(void *);
 int Wireless_ExchangeChildNiPacket(struct Engine *argument)
 {
     struct Engine *p = argument;
-    int flags = p->mask;
+    unsigned long long flags = p->mask;
     struct RfuLinkStatus **links;
     int one;
     u8 *slot;
     int index;
     {
-        register int test asm("r0") = 2 & flags;
-        if (test)
+        int test = 2 & flags;
+        if (test) {
             goto failed;
+        }
     }
-    if (gUnk_03006A80->linkLossSlotFlag)
+    if (gUnk_03006A80->linkLossSlotFlag) {
         goto failed;
+    }
     {
         struct RfuSlotStatusNI **slots = gUnk_03006A70;
-        register u8 *initial asm("r2");
+        u8 *initial;
         int state;
-        register int index asm("r0");
+        int index;
         initial = &p->index;
         index = *initial;
-        asm("" : "+r"(index));
         state = slots[index]->recv.state;
         slot = initial;
         if (state == 0x46) {
@@ -76,22 +76,26 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
             rfu_clearSlot(8, *slot);
         } else if ((u16)(state - 0x47) <= 1) {
             void *callback = *(void **)((u8 *)p + 0x384);
-            if (callback)
+            if (callback) {
                 sub_08249238(callback);
+            }
         }
     }
     flags = p->mask;
     one = 1;
     {
         int check = one;
-        asm("" : "+r"(check));
         check &= flags;
-        if (!check)
+        if (!check) {
             goto ready;
+        }
     }
+    do {
     rfu_clearSlot(4, *slot);
-    if (rfu_NI_setSendData((u8)(one << *slot), 14, (u8 *)p + 0xB8, 12))
+    } while (0);
+    if (rfu_NI_setSendData((u8)(one << (*slot)), 14, ((u8 *)p) + 0xB8, 12)) {
         goto sendError;
+    }
     index = 0;
     links = &gUnk_03006A80;
     if (!((*links)->connSlotFlag & one)) {
@@ -99,8 +103,9 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
         int bit = 1;
         do {
             index++;
-            if (index > 3)
+            if (index > 3) {
                 break;
+            }
         } while (!(((*(struct RfuLinkStatus *volatile *)cursor)->connSlotFlag >> index) & bit));
     }
     *slot = index;
