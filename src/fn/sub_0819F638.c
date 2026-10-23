@@ -1,7 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.6%
-// foundry draft (worker best 81.6%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
+#define Hresvelgr_UpdateRandomVolleyPhase sub_0819F638
 #define gRandomIndex          gUnk_03005308
 #define gRandomTable          gUnk_0203B400
 #define gHresvelgrVolleyState gUnk_02000230
@@ -41,22 +40,22 @@ void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u3
 void Sound_PlaySong(u32);
 
 s32 Callback_InvokeActor(void *, void *);
-static inline void AddReactionVector(s16 *out, struct ReactionVector *a, struct ReactionVector *b)
+static inline void AddReactionVector(struct ReactionVector *out, struct ReactionVector *a, struct ReactionVector *b)
 {
-    out[0] = a->x + b->x;
-    out[1] = a->y + b->y;
-    out[2] = a->z + b->z;
+    out->x = a->x + b->x;
+    out->y = a->y + b->y;
+    out->z = a->z + b->z;
 }
 static inline s32 RandomReactionValue(const u16 *table)
 {
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)((u32)table + offset);
+    return *(const u16 *)(offset + (u32)table);
 }
 void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
 {
-    s16 pos[4];
+    struct ReactionVector pos;
     if (actor->pending) {
         actor->pending = 0;
         Hresvelgr_SetAnimation(actor, actor->collider194, actor->collider174, 18, 2, 4);
@@ -72,16 +71,17 @@ void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
         Sound_PlaySong(0x3E2);
     if (frame > 15) {
         if ((actor->timer & 3) == 0) {
-            s32 a, b;
-            const u16 *table;
-            s16 *p = pos;
+            register s32 a asm("r12");
+            s32 b;
+            register const u16 *table asm("r3");
             frame = actor->timer >> 2;
-            AddReactionVector(p, &actor->position, &actor->offsets[actor->variant]);
-            p[1] = actor->ground->y + 128;
+            AddReactionVector(&pos, &actor->position, &actor->offsets[actor->variant]);
+            pos.y = actor->ground->y + 128;
             table = gRandomTable;
+            asm("" : "+r"(table));
             a = (RandomReactionValue(table) >> 3) % 32 + 64;
             b = (RandomReactionValue(table) >> 3) % 64 + 96;
-            DirectionBurst_EmitOffset(p, frame, actor->variant, a, frame + 12, b);
+            DirectionBurst_EmitOffset(&pos, frame, actor->variant, a, frame + 12, b);
             if (frame == 4)
                 actor->finished = 1;
         }
@@ -89,6 +89,3 @@ void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
     }
     Callback_InvokeActor(actor, actor->callback);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateRandomVolleyPhase);
-#endif
