@@ -93,3 +93,125 @@ The temporary wrap-up signal was removed and work resumed from main.
 
 Continuation draft batch: no exact coverage gain (0 percentage points).
 Combined validation printed `build/boktai3.gba: OK`; assembly defaults remain.
+
+## Session d2: projectile and feather continuation
+
+- 08127274 SpriteProjectile_UpdateExpiry: matched, 516 bytes. Flattened the
+  animation stepper and separated source-pointer, mask and destination-pointer
+  lifetimes. Shared flag stores reproduce the target exactly. Depin reduced
+  42 hints to 22; formatted source still passes the full-extent check.
+- 08126D88 SpriteProjectile_UpdateRebounds: improved guarded draft from 82.7%
+  through 86.6% to 98.0%. Flattened playback, distinct flag destinations,
+  value-before-address sound-delay writes, explicit halfword floor reload and
+  angle temporaries align all instruction shapes. Twelve differing bytes remain
+  in scratch registers for the squared-velocity sum. Full register-pinned
+  expansion and pointer-address variants worsened code; best draft retained.
+- 08127590 SpriteProjectile_Create: improved guarded draft 78.1% to 84.4%.
+  Inline guard arguments establish mask order; separate active-state branches
+  recover stores. Explicit position source fixes aggregate load order. Flattened
+  stepper and extended alias pinning were rejected after worsening lifetimes.
+- 08128F98 FeatherEffectPool_SpawnGroundScatter: retained 80.1% draft after
+  RNG volatility, packed z/padding writes, early velocity pointer, count pin,
+  operand order, declaration sweep and bitfield-layout trials. Combined RNG
+  and padding edits reached 80.8% but worsened structural alignment; no source
+  change retained. Vector scalarization and RNG store scheduling remain.
+
+The optional compiler debugger could not run here: guarded named-function
+preprocessing failed, causebook data was absent, and the isolated flip path
+failed while assembling the macro include. Check/variants remain usable.
+
+- 081294B4 FeatherEffectPool_CreateDirectional: matched, 540 bytes. Five
+  angle-lifetime references fix pool/angle allocation. Flattened playback
+  removes its second sprite alias; shifting the angle before the inline
+  direction helper recovers split narrowing. Explicit final flag combination
+  keeps the desired shared store. Depin leaves 18 hints.
+- 0800FC28 / 0800FE98: retained existing 81.6% / 83.3% drafts. Full packed-origin
+  reconstructions with table lifetime, duplicate piece pointers, loop forms,
+  local register pins and declaration sweeps reached 14 / 13 structural
+  differences, but broad register allocation remained off and fuzzy scores
+  were below existing drafts. No production change retained.
+- 0801010C BoardPieces_StartConvergence: matched, 396 bytes. A table argument
+  assigned to r2 establishes random-table load order. Move the piece alias
+  inside the loop; swap delta/origin pointer declarations to order invariant
+  hoists. Separate state/zero locals recover loop-head order. Depin removes
+  all six temporary barriers/hints except the table's r2 hint. Whole unit and
+  isolated full-extent checks pass.
+- 08010298: retained existing draft after standard-loop, index/mask priority,
+  explicit high-register state/index/mask, and packed lifetime experiments.
+  Priority-only scratch reached 71.4% but added a structural difference; no
+  production edit retained. Stack duration and reload rotation remain.
+- 081BDE94 Storage_BeginSwapTransition: new guarded draft 75.6%, full 536-byte
+  extent reviewed. Reconstructs category-dependent enabled/frame records,
+  selected-grid/equipped-marker hiding, reversed positions, twelve-frame pair
+  transition and sound. Signed category switch and typed category/slot views
+  reduce structural differences; short-lived item/equipment ID hints improve
+  register allocation. Descending reversal and outer-loop pins worsen it.
+- 081BE2E0 / 081BE504: full fresh typed reconstructions from the matched item
+  refresher. Added equipped markers, palettes, eligibility and frame modes.
+  Separate row/flags/widget/marker offsets, volatile counters, pointer aliases,
+  alternate flag addresses and declaration sweeps reduced structural residue
+  but did not beat prior documented candidates (best fresh full-extent scores
+  56.7% / 53.2%). No production draft retained. The compiler collapses the
+  original's independent row/marker inductions and spills different counters.
+- 0820F078 OrangeSpine_FireProjectile: improved 85.3% to 86.7% by changing
+  x-addition operand order. Shared position aliases and vector helpers worsened
+  allocation; retained the single improvement.
+- 0820F378 OrangeSpine_UpdateDamageState (tentative): new full guarded draft
+  83.6%, covering damage, defeat feedback, palette blinking and animation.
+  Cached palette/blink aliases and declaration order did not improve it.
+- 08067E3C / 08068500: new complete scene-particle constructor drafts, 61.6%
+  and 63.9%. Recovered optional velocity/jitter, packed position copies,
+  sequence and flip selection, singleton and anchored-source differences.
+  Argument lifetimes, packed destinations, loop indices, local register hints
+  and declaration variants improved the initial forms; remaining differences
+  include random scheduling and several independent pointer inductions.
+- 08171014 SceneHud_DrawComparisonBars: matched, 320 bytes. A short-lived
+  mask hint after reading flags preserves the next sprite's constant offset.
+- 08171EFC PauseInventory_UpdateDiscardBounce (tentative): matched, 128 bytes.
+  A value barrier before the second halfword comparison preserves narrowing.
+- 08170D78 PauseInventory_RefreshConsumableIcons (tentative): new full guarded
+  draft 61.8%. Recovered inventory icons, equipped markers and hiding loops.
+  Unsigned loop index and ordinary signed slot reads improve code generation;
+  volatile reads, coordinate induction and declaration changes did not help.
+- 0817373C SceneHud_RefreshEquipmentIcons: new full guarded draft 51.1%.
+  Recovered mode eligibility, assigned-marker positions and unused hiding.
+  Flag-base aliases, index signedness and marker hints reduced some structural
+  differences but lost fuzzy score; retained the ordinary typed form.
+- 08232A70 / 08232BE8: new full guarded orbit drafts 77.0% / 70.4%. Cached
+  projected coordinates and arithmetic ordering recover the shared projection.
+  Tracking and fixed slots differ in angle updates, visibility windows and
+  reset periods. Local aliases and materialized flag tests improve structure;
+  remaining differences are coordinate and controller register lifetimes.
+- 081D2EA4 FrostEmitter_UpdateParticle: matched, 324 bytes. Typed particle
+  layout, flattened animation, explicit velocity loads and separate flag
+  pointer lifetimes recover the target. Depin leaves 27 hints.
+- 081D2D78 FrostEmitter_SpawnParticle: new full guarded draft 69.3%.
+  Recovered twelve-slot search, position copy, randomized velocity, lifetime
+  and playback. Alternate scans, random splitting and slot hints worsened it.
+  The original also materializes an unexplained unused hardware literal.
+- 081D3094 FrostEmitter_Initialize: matched, 168 bytes. Separate graphics
+  aliases and enabled/age destinations recover setup order. Explicit loop-zero
+  return preserves the observed success ABI. Depin leaves two hints.
+- 082343B8 SpiralBurst_UpdateParticles: improved 90.4% to 95.2%. Explicit
+  timer-offset materialization prevents its constant surviving the refresh
+  call. Remaining differences include pointer registers and loop branch form.
+- 08234540 SpiralBurst_InitParticles: retained 95.7%. Table/mask lifetime and
+  first-random local experiments aligned a prefix but prevented combining the
+  following random updates and reduced the score.
+- 0810067C FloorSwitch_Create: retained 96.6%. Explicit zero OR, zero-register
+  alternatives and delayed delta-pointer setup reduced some structural
+  differences but lost fuzzy score. Registry-loop pointer hoisting remains.
+
+The wrap-up marker ended function work before 08077444 and the subsequent
+assignment entries. Assembly review of 08077444 recovered pending-point
+placement and terrain-height adjustment, but no complete draft was retained.
+These entries and the earlier deferred-only entries still require real attempts.
+
+Session d2 final batch: seven matches, +0.0992 percentage points (2,392 bytes),
+all in the Register-pinned category; thirteen distinct new or improved guarded
+drafts. Several unsuccessful trials retain their existing production drafts.
+
+After rebasing onto main, combined validation printed
+`build/boktai3.gba: OK`. Two new guarded fallbacks needed their existing
+canonical symbol names; those fixes are folded into the function commits.
+Documentation conflicts retained both workers' entries and regenerated INDEX.

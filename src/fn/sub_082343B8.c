@@ -61,7 +61,7 @@ static inline s32 scale(s32 product)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 90.4%
+// fuzzy: 95.2%
 // still differs: pool constant 0x202 is shared across the call and the loop-back branch layout
 void SpiralBurst_UpdateParticles(struct SbOwner *p)
 {
@@ -71,8 +71,14 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
     u32 off;
     struct SbPart *e;
     u16 *tp;
-    if (p->timer <= 11)
-        Collider_Refresh(p->collider);
+    {
+        register u32 offset asm("r1") = 0x202;
+        register u16 *address asm("r0");
+        asm("" : "+r"(offset));
+        address = (void *)((u8 *)p + offset);
+        if (*address <= 11)
+            Collider_Refresh(p->collider);
+    }
     asm("" : "+r"(p)::"r4");
     tp = &p->timer;
     off = 0;

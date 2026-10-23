@@ -1,6 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.2%
+#define SceneHud_DrawComparisonBars sub_08171014
 struct HudPos {
     s16 x, y, z, pad;
 };
@@ -38,7 +38,9 @@ static inline void SetPos(struct HudPos *pos, s32 x, s32 y)
 }
 static inline void Show(struct HudSprite *s)
 {
-    s->flags &= ~1;
+    u32 flags = s->flags;
+    register u32 mask asm("r2") = ~1;
+    s->flags = flags & mask;
 }
 void SceneHud_DrawComparisonBars(struct HudPanel *p, s32 col, s32 row, s16 *diff)
 {
@@ -65,6 +67,3 @@ void SceneHud_DrawComparisonBars(struct HudPanel *p, s32 col, s32 row, s16 *diff
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_DrawComparisonBars);
-#endif
