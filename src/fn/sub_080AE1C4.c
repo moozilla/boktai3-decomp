@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 // confidence=low: converges saved motion and restores the route after a reaction timer.
 #ifdef NONMATCHING
-// fuzzy: 82.1%
+// fuzzy: 82.6%
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
@@ -92,7 +92,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
             control->timer = 0;
         }
         ClearMotion(motionFlags, ~0x400);
-        group[0x206] = 0xFF;
+        *((u8 *)actor + 0x5DA) = 0xFF;
         {
             s32 mask = ~0x80;
             *actionFlags &= mask;
@@ -116,7 +116,10 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         }
         Vorn_SendMessage(actor);
     }
-    *(u16 *)((u8 *)actor + 0x1EA) = 65;
+    {
+        u32 value = 65;
+        *(u16 *)((u8 *)actor + 0x1EA) = value;
+    }
     timer = (s16)actor->fieldAA;
     if ((u32)(timer - 30) <= 89) {
         s32 frame = Mod(timer, 30);

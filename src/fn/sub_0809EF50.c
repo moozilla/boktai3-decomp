@@ -6,7 +6,7 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u32 selection = entry->value;
     u8 *restart;
-    register u32 flags asm("r7") = inputFlags;
+    u32 flags = inputFlags;
     register u32 spare asm("r8");
     asm volatile("" : "=r"(spare));
     asm volatile("" : "+r"(flags));
@@ -46,14 +46,12 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
             return;
     }
     *restart = 0;
+    asm volatile("" : : "r"(flags));
 }
-#ifdef NONMATCHING
-// fuzzy: 96%
+// confidence=low: plays profile entry two when the action begins.
+#define Crow_PlayEntry2 sub_0809EF50
 void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor))
         SelectAnimation((void *)actor, 2, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_PlayEntry2);
-#endif

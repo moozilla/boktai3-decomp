@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 /* Skeleton variant of SceneActorTarget_ResolvePendingObject that also clears state bits 0x300 */
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// only difference: in the else branch the flag pointer is copied (adds r4, r2, #0) before the test
+// confidence=low: resolves the pending contact object and clears Skeleton context state bits.
+#define SceneActorTarget_ResolvePendingObjectSkeleton sub_080B7A90
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_behavior.h"
@@ -12,10 +12,20 @@ struct SceneActorTargetLink {
     u8 flags;
 };
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *);
-static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
+static inline u8 TargetHasFlag(struct SceneActorTargetLink *state,
+                               struct SceneActorTargetLink **saved)
 {
+    register struct SceneActorTargetLink *input asm("r2") = state;
     u32 mask = 2;
-    if (state->flags & mask)
+    u32 value;
+    asm("" : "+r"(input));
+    value = input->flags & mask;
+    {
+        register struct SceneActorTargetLink *copy asm("r4") = input;
+        asm("" : "+r"(copy), "+r"(value));
+        *saved = copy;
+    }
+    if (value)
         return 1;
     return 0;
 }
@@ -93,7 +103,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         return 1;
     } else {
         struct SceneActorTargetLink *state = (void *)((u8 *)owner + 0xDC);
-        if (TargetHasFlag(state)) {
+        if (TargetHasFlag(state, &state)) {
             u32 mask = ~0x10;
             mask &= state->flags;
             state->flags = mask;
@@ -101,6 +111,3 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         return 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorTarget_ResolvePendingObjectSkeleton);
-#endif

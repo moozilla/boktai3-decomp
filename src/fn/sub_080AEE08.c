@@ -5,7 +5,7 @@
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
 #ifdef NONMATCHING
-// fuzzy: 83.4%
+// fuzzy: 88.3%
 // Remaining differences: register choices, address derivation, and two late constant reloads.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -109,7 +109,11 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    {
+        register u32 offset asm("r4") = 0x1F8;
+        asm("" : "+r"(offset));
+        script = *(u16 *)((u8 *)actor + offset);
+    }
     if (script) {
         values[0] = actor->position.x;
         values[1] = actor->position.y;

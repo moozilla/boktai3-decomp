@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
 u8 Vorn_SelectUphillTurn(void *, void *);
@@ -26,7 +27,7 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
 }
 // confidence=low: periodically probes uphill destinations and queues a delayed route action.
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fuzzy: 88.7%
 // Remaining differences: flag pointer lifetimes, mask scheduling, and reset offsets.
 void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
 {
@@ -38,7 +39,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         return;
     if (MotionFlags(actor, 0xE3BF))
         return;
-    if (actor->flags2CC & 16)
+    if (Chase_Bits32(&actor->flags2CC, 16))
         return;
     if (actor->field2B5 != 1)
         return;
@@ -76,7 +77,8 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         command->kind = kind;
     }
     {
-        u32 mask = 8;
+        register u32 mask asm("r0") = 8;
+        asm("" : "+r"(mask));
         *flags = mask | *flags;
     }
 }

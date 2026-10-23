@@ -2,7 +2,7 @@
 #include "scene_actor_chase.h"
 // confidence=low: resumes the route or runs the recovery script.
 #ifdef NONMATCHING
-// fuzzy: 83.9%
+// fuzzy: 84.6%
 // Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation; caching flags reduces register differences.
 extern const u8 gUnk_0824E20C[];
 u8 Vorn_HasActiveResponse(void *);
@@ -25,6 +25,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     register u32 *flags asm("r8");
     u16 *motionFlags;
     u16 *contextFlags;
+    register u32 zero asm("sl");
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->direction = ((actor->direction + 128) & 255) >> 6 << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -44,6 +45,8 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         s32 mask = ~0x38;
         *motionFlags &= mask;
     }
+    zero = 0;
+    asm volatile("" : "+r"(zero));
     StartRoute(actor, group);
     contextFlags = (u16 *)(context + 0x6D4);
     {
@@ -86,7 +89,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         if (*actionFlags & 0x200000) {
             *flags &= ~0x1000000;
             ClearMotion(motionFlags, ~0x200);
-            *((u8 *)control + 10) = 0;
+            *((u8 *)control + 10) = zero;
             control->counter = 0;
             control->timer = 0;
         }
