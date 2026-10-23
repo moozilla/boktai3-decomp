@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.0%
-// foundry draft (worker best 80.0%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
 struct PhaseActor {
@@ -35,9 +32,8 @@ void ActorPhase_ApproachNeutral(struct PhaseActor *p)
     }
     p->phase = phase;
     if (phase == 64) {
-        s32 direction;
         u32 random;
-        u16 one;
+        u8 one;
         u32 offset;
         p->update16C = Ivy_BeginChildPulse;
         gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -45,16 +41,10 @@ void ActorPhase_ApproachNeutral(struct PhaseActor *p)
         random = *(const u16 *)(offset + (u32)gRandomTable);
         one = 1;
         random &= one;
-        direction = -1;
-        if (random)
-            direction = 1;
-        p->direction = direction;
+        p->direction = random ? 1 : -1;
         p->field11E = one;
         p->field11F = one;
         p->flags119 = one | p->flags119;
         p->update164 = IvyChild_UpdateAfterBob;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorPhase_ApproachNeutral);
-#endif
