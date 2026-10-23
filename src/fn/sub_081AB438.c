@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.5%
-// foundry draft (worker best 80.6%); what differs is mostly register allocation and instruction order
+#define Vanargand_UpdateOffsetMotion sub_081AB438
 struct MotionTrackVector {
     s16 x, y, z, padding;
 };
@@ -36,7 +35,8 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
     Vanargand_SetPendingCue(p, 1);
     if (p->pending) {
         s16 target[3];
-        s16 *v;
+        register s16 *v asm("r4");
+        s16 *first;
         struct MotionTrack *track;
         s32 x, y, z;
         p->pending = 0;
@@ -48,7 +48,10 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
         x -= 256;
         z -= 256;
         v = target;
-        v[0] = x;
+        asm("" : "+r"(v));
+        first = v;
+        asm("" : "+r"(first));
+        first[0] = x;
         v[1] = y;
         v[2] = z;
         MotionTrack_Initialize(track, &p->x, (struct MotionTrackVector *)v, 0, 4);
@@ -68,6 +71,3 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateOffsetMotion);
-#endif
