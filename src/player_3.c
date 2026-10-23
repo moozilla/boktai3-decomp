@@ -796,23 +796,21 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
     return mode;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.1%
-// Register allocation swaps the preserved actor and input mode.
-s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
+// MATCHING_CONCESSION: register-pinning
+#define Player_SelectFlashingVisualMode sub_0813DB60
+
+s32 Player_SelectFlashingVisualMode(struct Player *arg, s32 inputMode)
 {
-    s32 result = mode;
+    struct Player *p = arg;
+    register s32 mode asm("r2") = inputMode;
     if (p->movementRequestScale) {
         if ((--p->movementRequestScale >> 2) & 1)
             goto flash;
     }
-    return result;
+    return mode;
 flash:
     return p->movementRequestParameter;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectFlashingVisualMode);
-#endif
 
 static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
 {
