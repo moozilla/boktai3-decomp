@@ -1,6 +1,6 @@
 #include "global.h"
 // confidence=low: restores route control or enters defeat when the contact response completes.
-#define SceneActorReaction_UpdateRouteRecovery sub_080800A4
+#define SceneActorReaction_UpdateContactRouteRecovery sub_080800A4
 #ifdef NONMATCHING
 // fuzzy: 64.3%
 // Full state flow recovered; field lifetimes and route/reset allocation still differ.
@@ -59,7 +59,7 @@ static inline void Reaction_SetDrawMode(struct SceneActorRegistryResetView *acto
     else
         *((u8 *)actor->drawable + 0x3A) = mode;
 }
-void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     struct ContactCollider *collider = &actor->colliderA;
