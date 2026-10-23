@@ -1,8 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.2%
-// Open: the ROM subtracts 0x10 from off before loading scale (subs r1,#0x10 first);
-// writing off -= 0x10 separately fixes that order but swaps the off/pointer registers.
 struct GameOverLetter {
     u8 scaleX, scaleY;
     u8 pad02[0x12];
@@ -18,21 +15,25 @@ struct GameOver {
     s16 scale;
     s16 scaleY;
 };
-void sub_08163020(struct GameOver *p)
+#define GameOver_UpdateLetterTransforms sub_08163020
+void GameOver_UpdateLetterTransforms(struct GameOver *p)
 {
     s32 i;
-    s32 off;
+    register s32 off asm("r1");
     for (i = 0; i <= 7; i++) {
         p->letters[i].scaleX = p->scale;
         p->letters[i].scaleY = p->scaleY;
     }
+    i = 3;
     off = 0;
-    for (i = 3; i >= 0; i--) {
+    for (; i >= 0; i--) {
         if (p->scale > 0x40) {
             p->letters[i].x = p->letters[i].baseX - off;
             {
-                s32 t = p->scale;
-                off += -0x10 + (t >> 2);
+                s32 t;
+                off -= 16;
+                t = p->scale;
+                off += t >> 2;
             }
         } else
             p->letters[i].x = p->letters[i].baseX;
@@ -42,13 +43,12 @@ void sub_08163020(struct GameOver *p)
         if (p->scale > 0x40) {
             p->letters[i].x = p->letters[i].baseX + off;
             {
-                s32 t = p->scale;
-                off += -0x10 + (t >> 2);
+                s32 t;
+                off -= 16;
+                t = p->scale;
+                off += t >> 2;
             }
         } else
             p->letters[i].x = p->letters[i].baseX;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08163020);
-#endif
