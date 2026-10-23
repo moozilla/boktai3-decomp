@@ -122,6 +122,8 @@ def topics_for(st, e):
     import step
     import why
     ts = []
+    if e["kind"] == "frame":
+        return ts
     if e["kind"] == "order":
         ts.append("order")
     if e["note"] and "two-operand" in e["note"]:

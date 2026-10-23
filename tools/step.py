@@ -238,6 +238,26 @@ def analyze(src, func=None, nonmatching=False):
                 f"point in the C: a local initialized there, an argument (evaluated before the call or inline "
                 f"body), or statement order.")
         explained.append((0, min(i1, i2), "order", c1, [], [], [], note))
+    # the frame: which registers are live at exit, and how many are saved
+    def frame(xs):
+        pops = [t for _, t in xs if t.startswith("pop")]
+        push = next((t for _, t in xs if t.startswith("push")), "")
+        return pops, len(re.findall(r"r\d+", push))
+    (cp, cn), (op, on) = frame(an.cd), frame(an.od)
+    ret_c, ret_o = any("{r0}" in t for t in cp), any("{r0}" in t for t in op)
+    if ret_c != ret_o and (cp and op):
+        note = ("frame: the ROM's epilogue pops the return address into "
+                + ("r0, so nothing is returned: make the function void."
+                   if ret_o else
+                   "r1, so r0 is live at exit: the function returns a value. If nothing in the ROM sets r0, the "
+                   "original is non-void with no return statement (r0 still holds the argument, which is then "
+                   "copied out of r0)."))
+        explained.append((-1, 0, "frame", [], [], [], [], note))
+    elif cn != on:
+        explained.append((101, 0, "frame", [], [], [], [], (
+            f"frame: the ROM saves {on - 1} registers, you save {cn - 1}: "
+            f"{'more' if on > cn else 'fewer'} values are live at once in the original (a value kept instead "
+            f"of recomputed, or a constant held in a register).")))
     explained.sort(key=lambda x: (x[0], x[1]))
     for rank, idx, kind, cand, orig, uids, evs, note in explained:
         src_lines = sorted({an.off_line.get(o) for o, _ in cand if an.off_line.get(o)})
@@ -251,6 +271,8 @@ def analyze(src, func=None, nonmatching=False):
 def render(st, e, title, trails=2):
     """The lines that explain entry E of Step ST."""
     out = [f"== {title}"]
+    if e["kind"] == "frame":
+        return out + [f"   {e['note']}"]
     for ln in e["lines"][:3]:
         out.append(f"   {st.show(ln)}")
     out.append(f"   ROM:   {'; '.join(t for _, t in e['orig']) or '(nothing)'}")

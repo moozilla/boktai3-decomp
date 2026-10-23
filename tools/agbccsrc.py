@@ -27,7 +27,10 @@ TOPICS = {
         "agbcc has no Thumb instruction scheduler: instructions come out in source evaluation order, minus what "
         "cse/gcse/loop/combine delete or hoist. An instruction the ROM has earlier or later is a value the "
         "original evaluated at another point: a local initialized there, a call or inline-helper argument "
-        "(arguments are evaluated before the body), or a different statement order.",
+        "(arguments are evaluated before the body), or a different statement order. One exception: values "
+        "loop.c hoists. If the ROM loads a value among a loop's hoisted invariants (just before the loop, "
+        "between other constants and addresses), the original computed it inside the loop body, at the "
+        "matching point: loop.c moves invariants out in body order (see loop-invariant).",
         []),
     "cse-skip": (
         "cse skip skip-blocks branch around if block extended carry knowledge label",
