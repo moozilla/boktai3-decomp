@@ -1,5 +1,4 @@
 #include "area_effect.h"
-// MATCHING_CONCESSION: register-pinning
 s32 AreaEffect_FindContainingEntry(struct AreaEffectPosition *);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *);
 void sub_0800AC44(u32, u32, u32, void *, void *, u32, u32);
@@ -12,7 +11,8 @@ struct PackedPosition {
 };
 void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
 {
-    register s32 active asm("r4");
+    u32 step = 256;
+    s32 active;
     if (!manager->visible) {
         s32 i;
         manager->visible = 1;
@@ -33,10 +33,12 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     }
     active = 0;
     if (manager->player->stateTag == 1) {
-        if (gUnk_02000710->flags868 & 2)
+        if (gUnk_02000710->flags868 & 2) {
             goto action;
-        if (AreaEffect_FindContainingEntry(&manager->player->position) >= 0)
+        }
+        if (AreaEffect_FindContainingEntry(&manager->player->position) > (0 - 1)) {
             active = 1;
+        }
     }
     if (active) {
     action: {
@@ -59,7 +61,6 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
                         }
                         {
                             u32 y = (s32)xy >> 16;
-                            register u32 step asm("r0") = 256;
                             u32 lowMask;
                             y += step;
                             y <<= 16;
@@ -78,20 +79,23 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
                 }
                 manager->actionFrame++;
             }
-        } else
+        } else {
             manager->actionFrame = 0;
+        }
     }
-    } else
+
+    } else {
         manager->actionFrame = active;
+    }
     AreaEffect_UpdateGraphicsId(manager);
     {
         struct AreaEffectPlayer *player = manager->player;
         u32 mask = 32;
         u32 flags = player->flags;
         u32 mode;
-        if (flags & mask)
+        if (flags & mask) {
             mode = 2;
-        else {
+        } else {
             u32 negative = 0 - (flags & 16);
             mode = negative >> 31;
         }

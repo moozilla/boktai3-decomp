@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
 void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *argument)
 {
@@ -10,10 +9,11 @@ void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActo
         return;
     }
     {
-        u32 soundFlags = actor->flags2E6;
-        register u32 soundMask asm("r0") = 4;
-        if (SceneActorPlacement_TestMask(soundMask, soundFlags))
+        unsigned long long soundFlags = actor->flags2E6;
+        u32 soundMask = 4;
+        if (SceneActorPlacement_TestMask(soundMask, soundFlags)) {
             return;
+        }
     }
     switch (actor->category) {
         case 4:

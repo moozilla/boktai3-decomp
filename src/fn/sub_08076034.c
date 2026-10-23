@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
 {
@@ -6,19 +5,18 @@ void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u8 directionVariant, mirror;
     u32 selection;
-    register u8 *mirrorPointer asm("r2");
+    u8 *mirrorPointer;
     u8 *variantPointer = &directionVariant;
     u32 flags;
-    register u32 mirrorValue asm("r2");
+    u32 mirrorValue;
     u8 variant;
-    register u32 entryFlags asm("r0");
+    u32 entryFlags;
     u8 *variantReload;
     u32 force;
     u8 *restart;
     {
         u8 *mirrorAddress = &mirror;
         s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
-        asm("" : "+r"(quadrant), "+r"(mirrorAddress));
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
             *mirrorPointer = 1;
@@ -29,16 +27,18 @@ void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *
         }
     }
     variantReload = &directionVariant;
-    mirrorValue = *mirrorPointer;
+    index = *mirrorPointer;
     entryFlags = entry->flags;
+    DEBUG_NOP();
     selection = entry->value;
     variant = *variantReload;
-    flags = mirrorValue | entryFlags;
+    flags = index | entryFlags;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
-    } else
+    } else {
         force = 0;
+    }
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->selection = selection;
@@ -47,9 +47,9 @@ void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *
             void *sequence = drawable->sequence;
             void *resource = (void *)drawable->resource;
             u32 selected = (u16)selection;
-            register u32 row asm("r3");
+            u32 row;
             row = variant;
-            Anim_SetSequence(sequence, resource, selected, row, flags);
+            Anim_SetSequence(sequence, resource, selected, (char)row, flags);
         }
         restart = &actor->restart;
     } else {
@@ -61,27 +61,30 @@ void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *
         savedSelection = &actor->selection;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
-            if (flags == 1 && (tile->flags & 4))
+            if ((flags == 1) && (tile->flags & 4)) {
                 return;
-            if (flags == 0 && !(tile->flags & 4))
+            }
+            if ((flags == 0) && (!(tile->flags & 4))) {
                 return;
+            }
         }
         *savedSelection = selection;
         {
             u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & mask) {
                 mode = 6;
-            else
+            } else {
                 mode = 4;
+            }
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
-            asm("" : "+r"(flags));
-            if (flags)
+            if (flags) {
                 tile->flags |= mask;
-            else
+            } else {
                 tile->flags &= ~4;
+            }
         }
     }
     *restart = 0;

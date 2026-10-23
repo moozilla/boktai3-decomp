@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
@@ -32,9 +31,9 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
         struct SceneActorControlMotionState *raw = SceneActorControl_GetMotionState(actor);
         state = raw;
     }
-
-    if (IsUnavailable(actor))
+    if (IsUnavailable(actor)) {
         return;
+    }
     {
         volatile u32 *stateFlags;
         u32 firstValue;
@@ -58,8 +57,9 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
                 }
             }
             actor->field2EA += TruncateSine(gUnk_086149C4[state->phase], 9);
-            if (state->phase <= 63)
+            if (state->phase <= 63) {
                 state->phase++;
+            }
         }
     }
     {
@@ -69,28 +69,33 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
     }
     absolute = delta >= 0 ? delta : -delta;
     if (absolute > 16) {
-        if (delta < 0)
+        if (delta < 0) {
             actor->field2EA -= 2;
-        else
+        } else {
             actor->field2EA += 2;
-    }
-    if (((struct SceneActorControlGroundView *)actor)->ground != state->previousGround)
-        actor->field2EA -=
-            ((struct SceneActorControlGroundView *)actor)->ground - state->previousGround;
-    {
-        register u32 offset asm("r0") = actor->field2EA;
-        {
-            register u32 ground asm("r4") = ((struct SceneActorControlGroundView *)actor)->ground;
-            actor->position.y = offset + ground;
         }
     }
+    if (((struct SceneActorControlGroundView *)actor)->ground != state->previousGround) {
+        actor->field2EA -=
+            ((struct SceneActorControlGroundView *)actor)->ground - state->previousGround;
+    }
+    do {
+        {
+            u32 offset = actor->field2EA;
+            {
+                u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
+                actor->position.y = actor->field2EA + ground;
+            }
+        }
+    } while (0);
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
         drawable->position.y -= TruncateSine(gUnk_086149C4[state->phase], 5);
     }
-    if (state->phase > 64)
+    if (state->phase > 64) {
         state->phase = 0;
-    else
+    } else {
         state->phase += 8;
+    }
     state->previousGround = ((struct SceneActorControlGroundView *)actor)->ground;
 }
