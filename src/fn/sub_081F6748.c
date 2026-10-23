@@ -1,9 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// foundry draft (worker best 99.4%); what differs is mostly register allocation and instruction order
-#define gSceneAngleSineTable gUnk_086149C4
+#define SceneActors_FireTrackingProjectileSpread sub_081F6748
+#define gSceneAngleSineTable                     gUnk_086149C4
 typedef struct ProjectilePosition {
     s16 x, y, z, pad;
 } ProjectilePosition;
@@ -41,9 +40,9 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     ProjectilePosition spawn;
     u8 angle;
     u8 facing;
-    u16 step;
+    register u16 step asm("r8");
     int speed;
-    int rawFacing;
+    u32 rawFacing;
     int count;
     s16 *velocity;
     ProjectilePosition *target;
@@ -51,9 +50,11 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     target = &p->target;
     angle = (u8)Math_Atan2(target->x - position->x, target->z - position->z);
     step = 16;
-    facing = (p->facing << 6) - 64;
+    // Keep the wrapped facing angle in the high byte until the vector is addressed.
+    rawFacing = ((u32)p->facing << 30) + 0xc0000000;
+    asm("" : "+r"(rawFacing));
     velocity = (s16 *)&delta;
-    facing = (u8)facing;
+    facing = rawFacing >> 24;
     speed = 180;
     {
         int x = trunc12(gUnk_086149C4[(facing + 64) & 255] * speed);
@@ -80,6 +81,3 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     } while (count >= 0);
     Sound_PlaySong(1384);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActors_FireTrackingProjectileSpread);
-#endif
