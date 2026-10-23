@@ -52,7 +52,111 @@ void SceneActorGraphics_SelectResource(u8 *p)
     }
 }
 
+#ifdef NONMATCHING
+// fuzzy: 84.5%
+// Remaining: contact-store scheduling, field-address lifetimes, and registers.
+#define SceneActorGraphics_OnDamageContact sub_08021F4C
+extern u8 *gUnk_02000580;
+extern u32 gUnk_030053F4;
+void Collision_CalculateDamageResponse(void *, void *);
+void PlayerStats_AddContactHundredths(void *, void *, s32);
+void Sound_PlaySongChecked(u32);
+void DamageNumberDisplay_Show(void *, u32, u32, void *, void *, u32);
+s32 Math_Atan2(s32, s32);
+s32 WirelessGame_TryAddCyclingItem(void *);
+void WirelessGame_AddItem(void *, s32);
+struct ContactVector {
+    s16 x, y, z;
+};
+void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg)
+{
+    register u8 *contact asm("r4") = contactArg;
+    register u8 *p asm("r5") = actorArg;
+    register u8 *actor asm("r8") = p;
+    register u8 *sprite asm("sb") = p + 0x48;
+    register u32 mode asm("sl");
+    struct ContactVector size;
+    u8 *position;
+    s32 item;
+    if (*(u16 *)(p + 0x34e))
+        return;
+    mode = gUnk_02000580[0x418];
+    Collision_CalculateDamageResponse(source, contact);
+    if (*(u32 *)(p + 0x358) == 1 && mode != 2)
+        *(u16 *)(contact + 0x3e) = 0;
+    if (!(gUnk_030053F4 & 0x1000))
+        PlayerStats_AddContactHundredths(source, contact, *(s16 *)(p + 0x380));
+    *(u32 *)(p + 0x33c) = *(u16 *)(contact + 0x3e);
+    asm("" ::: "memory");
+    if (*(u16 *)(contact + 0x3e) == 0) {
+        Sound_PlaySongChecked(0x211);
+        *(u16 *)(p + 0x34c) = 10;
+        *(void **)(p + 0x288) = p + 0x5c4;
+        size.x = 16;
+        size.y = 0;
+        size.z = 16;
+        DamageNumberDisplay_Show(contact, *(u16 *)(contact + 0x3e), 0, sprite + 12, &size, 1);
+    }
+    if (*(u16 *)(source + 6) & 0x100)
+        p[0x342] = source[0x42];
+    else
+        p[0x342] = Math_Atan2(*(s16 *)(contact + 0x24) - *(s16 *)(source + 0x24),
+                              *(s16 *)(contact + 0x28) - *(s16 *)(source + 0x28));
+    *(u32 *)(actor + 0xbc) = *(u32 *)(source + 0x34);
+    *(u32 *)(actor + 0xc0) = *(u32 *)(source + 0x38);
+    *(u16 *)(p + 0x34e) = *(u16 *)(source + 0x44);
+    PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
+    if (*(s32 *)(p + 0x33c) > 0 && (*(u32 *)(source + 0x38) & 1))
+        p[0x340] = 1;
+    if (!(gUnk_030053F4 & 0x1000))
+        return;
+    if (mode - 1 <= 1) {
+        position = contact + 0xc;
+        if (WirelessGame_TryAddCyclingItem(position) && (contact[0x43] & 8))
+            WirelessGame_AddItem(position, 0);
+        return;
+    }
+    if (contact[0x43] & 8)
+        WirelessGame_AddItem(contact + 0xc, 0);
+    if (!(*(u32 *)(source + 0x38) & 0x800000))
+        return;
+    item =
+        (s16)(*(u16 *)((u8 *)gUnk_02000710 + (*(s16 *)((u8 *)gUnk_02000710 + 0x52) << 1) + 0x88) -
+              6);
+    switch ((u32)item) {
+        case 0:
+            WirelessGame_AddItem(contact + 0xc, 2);
+            break;
+        case 1:
+            WirelessGame_AddItem(contact + 0xc, 1);
+            break;
+        case 2:
+            WirelessGame_AddItem(contact + 0xc, 3);
+            break;
+        case 3:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 1);
+            break;
+        case 4:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 3);
+            break;
+        case 5:
+            contact += 0xc;
+            position = contact;
+            WirelessGame_AddItem(position, 2);
+            WirelessGame_AddItem(position, 1);
+            WirelessGame_AddItem(position, 3);
+            break;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08021F4C);
+#endif
 
 void SceneActorGraphics_InitBodyNoOp(void)
 {
@@ -92,7 +196,7 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     }
 }
 
-void sub_08021F4C(void);
+void sub_08021F4C(u8 *, u8 *, u8 *);
 
 void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
 {
