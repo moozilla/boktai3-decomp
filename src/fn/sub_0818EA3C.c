@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.1%
-// foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
+#define SpriteColliderGroup_ResetActiveParts sub_0818EA3C
+// MATCHING_CONCESSION: register-pinning
 struct SpriteColliderPartState {
     u8 flags, unknown1[4], active, counter;
     u8 unknown7[0x1DD];
@@ -19,7 +18,7 @@ void SpriteColliderGroup_ResetActiveParts(struct SpriteColliderGroup *p)
     struct SpriteColliderPartState *part;
     u8 *count;
     u32 five, one;
-    u8 total;
+    register u8 total asm("r5");
     i = 0;
     total = p->count;
     if (i >= total)
@@ -28,18 +27,17 @@ void SpriteColliderGroup_ResetActiveParts(struct SpriteColliderGroup *p)
     five = 5;
     count = &p->count;
     part = (struct SpriteColliderPartState *)((u8 *)p + 0x119);
-    for (; i < *count; part++, i++) {
+    do {
         if (part->active) {
             part->active = one;
             part->counter = five;
             part->flags = one | part->flags;
             changed = 1;
         }
-    }
+        part++;
+        i++;
+    } while (i < *count);
 done:
     if (changed)
         Sound_PlaySongChecked(0x13e);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteColliderGroup_ResetActiveParts);
-#endif
