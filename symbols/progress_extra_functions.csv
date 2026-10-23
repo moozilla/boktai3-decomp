@@ -494,6 +494,7 @@ address,evidence
 081A36FC,Hidden Task_Kill wrapper for gUnk_02000238
 081A398C,Hidden raw-tail function
 081A3F70,Hidden Task_Kill wrapper for gUnk_0200023C
+081A4420,Independent falling-motion updater clone with own prologue and return after 081A42AC
 081A47D0,Hidden Task_Kill wrapper for gUnk_02000240
 081A4ED8,Hidden Task_Kill wrapper for gUnk_02000244
 081A6458,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
