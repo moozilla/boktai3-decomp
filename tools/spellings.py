@@ -414,7 +414,7 @@ def sp_addr_then_const(fn):
         items = b.block_items
         stores = [i for i, st in enumerate(items) if isinstance(st, ca.Assignment) and st.op == "="
                   and isinstance(st.lvalue, (ca.ArrayRef, ca.StructRef, ca.UnaryOp))]
-        if len(stores) < 3:
+        if len(stores) < 2:
             continue
         consts = {}
         for i in stores:
@@ -422,30 +422,29 @@ def sp_addr_then_const(fn):
             if isinstance(r, ca.Constant):
                 consts.setdefault(r.value, []).append(i)
         for kval, uses in consts.items():
-            if len(uses) < 2:
-                continue
-            first = stores[0]
-            for zt in ("u32", "u8"):
-                f2 = copy.deepcopy(fn)
-                b2 = blocks(f2)[bi]
-                it = b2.block_items
-                q, z = new_name(f2, "q"), new_name(f2, "z")
-                lv = it[first].lvalue
-                qd = ca.Decl(name=q, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
-                             type=ca.PtrDecl([], ca.TypeDecl(q, [], None, ca.Typeof(copy.deepcopy(lv)))),
-                             init=ca.UnaryOp("&", copy.deepcopy(lv)), bitsize=None, asmlabel=None)
-                zd = int_decl(z, zt, ca.Constant("int", kval))
-                body = []
-                for j in range(first, len(it)):
-                    st = it[j]
-                    if j == first:
-                        st.lvalue = ca.UnaryOp("*", ca.ID(q))
-                    if isinstance(st, ca.Assignment) and isinstance(st.rvalue, ca.Constant) and \
-                            st.rvalue.value == kval:
-                        st.rvalue = ca.ID(z)
-                    body.append(st)
-                b2.block_items = it[:first] + [ca.Compound([qd, zd] + body)]
-                yield f"address of {text(lv)[:24]} before a shared {zt} {kval}", f2
+            later = [i for i in stores if i < uses[0]]
+            for first in sorted(set(later[-1:] + stores[:1])):
+                for zt in ("u32", "u8"):
+                    f2 = copy.deepcopy(fn)
+                    b2 = blocks(f2)[bi]
+                    it = b2.block_items
+                    q, z = new_name(f2, "q"), new_name(f2, "z")
+                    lv = it[first].lvalue
+                    qd = ca.Decl(name=q, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                                 type=ca.PtrDecl([], ca.TypeDecl(q, [], None, ca.Typeof(copy.deepcopy(lv)))),
+                                 init=ca.UnaryOp("&", copy.deepcopy(lv)), bitsize=None, asmlabel=None)
+                    zd = int_decl(z, zt, ca.Constant("int", kval))
+                    body = []
+                    for j in range(first, len(it)):
+                        st = it[j]
+                        if j == first:
+                            st.lvalue = ca.UnaryOp("*", ca.ID(q))
+                        if isinstance(st, ca.Assignment) and isinstance(st.rvalue, ca.Constant) and \
+                                st.rvalue.value == kval:
+                            st.rvalue = ca.ID(z)
+                        body.append(st)
+                    b2.block_items = it[:first] + [ca.Compound([qd, zd] + body)]
+                    yield f"address of {text(lv)[:24]} before a shared {zt} {kval}", f2
 
 
 def sp_inline_decl(fn):

@@ -251,7 +251,11 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
     path = os.path.join(wd, f"{func}.c")
     open(path, "w").write(text)
-    dec, keys = decision(path, func)
+    try:
+        dec, keys = decision(path, func)
+    except (Exception, SystemExit) as ex:  # a state step.py cannot compile: drop it
+        log(f"   (step.py failed on a state: {type(ex).__name__})")
+        return [], 0
     if dec is None:
         return "match", 0
     st, e = dec
