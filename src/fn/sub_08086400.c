@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.8%
+// fuzzy: 88.1%
 // Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
@@ -152,7 +152,7 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
         struct TurnSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
         if (!sequence->timer && (sequence->frame == 1 || sequence->frame == 3)) {
             s32 desired = ((((struct SceneActorAnimationView *)actor)->nextDirection + 5) & 7) << 5;
-            s32 difference = direction[9] - desired;
+            s32 difference = actor->direction - desired;
             if (difference < 0)
                 difference = -difference;
             if (difference <= 0x20)
