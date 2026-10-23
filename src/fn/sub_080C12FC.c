@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 80.2%
+// fuzzy: 84.7%
 // Golem/skeleton reaction dispatcher (returns 1 when it changed control): hit (0x2000) turns
 // round and chases, 0xC0000 hands over to reactionTarget230, otherwise roar-and-chase through
 // three copies of Chase_Arrive; 080C23FC is its far tail.
@@ -179,21 +180,25 @@ static inline u8 Chase_Test16(u16 *p, u32 mask)
 }
 static inline u32 PickTurn(u32 dir)
 {
-    u32 d;
-    s32 i;
-    for (i = 0; i < 4; i++) {
+    register s32 prior asm("r7") = dir;
+    s32 tries = 0;
+    s32 choice;
+    do {
         {
+            register u32 bits asm("r1") = 3;
             u32 index = (gUnk_03005308 + 1) & 1023;
             u32 v;
             gUnk_03005308 = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
-            d = (v & 3) << 6;
+            choice = (v & bits) << 6;
         }
-        if (d != dir)
-            return d;
-    }
-    return dir;
+        if (choice != prior)
+            goto chosen;
+    } while (++tries <= 3);
+    choice = prior;
+chosen:
+    return choice;
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
