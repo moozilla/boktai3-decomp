@@ -2,9 +2,8 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Remaining: the incoming reset argument is saved before the actor pointer.
+// confidence=low: dispatches response, pursuit, and retreat actions from context flags.
+#define SceneActor_DispatchContextAction sub_080B3ADC
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_BeginPursuitRoute(void *, u32);
@@ -30,15 +29,18 @@ static inline u8 TestValue(u32 value)
     return 0;
 }
 
-u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32 reset)
+u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32 reset0)
 {
     struct SceneActorRegistryResetView *q;
     struct SceneActorRegistryResetView *p;
     u16 *flags;
     u32 first;
+    u32 reset;
     {
         register struct SceneActorRegistryResetView *input asm("r3") = p0;
-        asm("" : "+r"(input));
+        register u32 incomingReset asm("r1") = reset0;
+        asm("" : "+r"(input), "+r"(incomingReset));
+        reset = incomingReset;
         q = input;
     }
     p = q;
@@ -78,6 +80,3 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_DispatchContextAction);
-#endif
