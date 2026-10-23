@@ -3,15 +3,19 @@
 import type {
   DecompBar,
   DecompCategory,
+  DecompFunction,
   DecompPr,
+  DecompReportUnit,
   DecompSnapshot,
-  DecompUnit,
 } from '../types'
 
 export const REPO = 'moozilla/boktai3-decomp'
 export const PROGRESS_URL = `https://raw.githubusercontent.com/${REPO}/main/PROGRESS.md`
 export const PULLS_URL = `https://api.github.com/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=40`
 export const DECOMP_DEV_URL = `https://decomp.dev/${REPO}`
+/** decomp.dev's copy of the objdiff report: every unit with its functions. */
+export const REPORT_URL = `${DECOMP_DEV_URL}.json?mode=report`
+export const RAW_URL = `https://raw.githubusercontent.com/${REPO}/main`
 
 const num = (s: string) => Number(s.replace(/,/g, ''))
 const ROW = /^\| (\*\*)?(?:&nbsp;&nbsp;)?([^|*][^|]*?)(\*\*)? \| (\d+)\/(\d+) \| ([\d.]+)% \|/
@@ -139,6 +143,64 @@ export function parsePulls(pulls: GithubPull[]): DecompPr[] {
     })
 }
 
+type ReportJson = {
+  units: {
+    name: string
+    measures: { total_code?: string; matched_code_percent?: number; total_functions?: number; matched_functions?: number }
+    functions?: { name: string; size: string; fuzzy_match_percent?: number; metadata?: { virtual_address?: string } }[]
+  }[]
+}
+
+/** decomp.dev's report as units of functions; assembly units are left out. */
+export function parseReport(report: ReportJson): DecompReportUnit[] {
+  return report.units
+    .filter(u => !u.name.endsWith(' (assembly)'))
+    .map(u => {
+      const cut = u.name.indexOf('/')
+      const functions: DecompFunction[] = (u.functions ?? []).map(f => ({
+        name: f.name,
+        addr: Number(f.metadata?.virtual_address ?? 0),
+        size: Number(f.size),
+        pct: f.fuzzy_match_percent ?? 0,
+      }))
+      return {
+        category: cut < 0 ? '' : u.name.slice(0, cut),
+        name: cut < 0 ? u.name : u.name.slice(cut + 1),
+        bytes: Number(u.measures.total_code ?? 0),
+        pct: u.measures.matched_code_percent ?? 0,
+        done: u.measures.matched_functions ?? 0,
+        total: u.measures.total_functions ?? functions.length,
+        functions,
+      }
+    })
+}
+
+/** The names a function's source may go by: its report name, then `sub_<address>`. */
+export function sourceNames(fn: DecompFunction): string[] {
+  const sub = `sub_${fn.addr.toString(16).toUpperCase().padStart(8, '0')}`
+  return fn.name === sub ? [sub] : [fn.name, sub]
+}
+
+/** Picks the definition among `git grep -n` lines (`path:line:text`): not a prototype. */
+export function definitionHit(grep: string): { path: string; line: number } | undefined {
+  for (const l of grep.split('\n')) {
+    const m = l.match(/^([^:]+):(\d+):(.*)$/)
+    if (m && !m[3]!.trimEnd().endsWith(';')) return { path: m[1]!, line: Number(m[2]) }
+  }
+  return undefined
+}
+
+/** The function starting at 1-based `line` of `text`, through its closing brace at column 0. */
+export function functionAt(text: string, line: number): { text: string; startLine: number } {
+  const lines = text.split('\n')
+  let start = line - 1
+  // Take the comment block right above the definition with it.
+  while (start > 0 && /^\s*(\/\/|\/\*|\*)/.test(lines[start - 1]!)) start--
+  let end = line - 1
+  while (end < lines.length - 1 && lines[end] !== '}') end++
+  return { text: lines.slice(start, end + 1).join('\n'), startLine: start + 1 }
+}
+
 export function ago(iso: string, now: number): string {
   const s = Math.max(0, Math.round((now - Date.parse(iso)) / 1000))
   if (s < 60) return 'just now'
@@ -217,38 +279,43 @@ export function shade(pct: number): string {
   return `rgb(${mix(52, 46)},${mix(54, 104)},${mix(60, 214)})`
 }
 
-/** The whole treemap as one SVG: categories, each split into its units. */
-export function treemapSvg(categories: DecompCategory[], width: number, height: number): string {
+/** A treemap tile: sized by code bytes, shaded by the share matched, `title` its hover text. */
+export type TreemapNode = { name: string; size: number; pct: number; title: string; children?: TreemapNode[] }
+
+/** One level of the treemap as one SVG: each node a tile, its children tiled inside it. */
+export function treemapSvg(nodes: TreemapNode[], width: number, height: number): string {
   const parts: string[] = []
-  const unitSize = (u: DecompUnit) => u.bytes ?? u.total * 200
   const placed = squarify(
-    categories.map(c => ({ item: c, size: c.units.reduce((s, u) => s + unitSize(u), 0) || c.total * 200 })),
+    nodes.map(n => ({ item: n, size: n.size })),
     { x: 0, y: 0, w: width, h: height },
   )
-  for (const { item: c, rect } of placed) {
+  const leaf = (n: TreemapNode, r: Rect, stroke: string) => {
+    const fits = r.w > 44 && r.h > 13
+    parts.push(
+      `<g><title>${esc(n.title)}</title>` +
+        `<rect x="${r1(r.x)}" y="${r1(r.y)}" width="${r1(r.w)}" height="${r1(r.h)}" fill="${shade(n.pct)}" stroke="${stroke}" stroke-width="0.75"/>` +
+        (fits ? `<text x="${r1(r.x + 3)}" y="${r1(r.y + 10)}" font-size="8" fill="#ffffffcc">${esc(fit(n.name, r.w - 6, 4.6))}</text>` : '') +
+        '</g>',
+    )
+  }
+  for (const { item: n, rect } of placed) {
+    if (!n.children?.length) {
+      leaf(n, rect, '#141414')
+      continue
+    }
     const label = rect.w > 60 && rect.h > 26
     const inner = { x: rect.x + 1, y: rect.y + (label ? 14 : 1), w: rect.w - 2, h: rect.h - (label ? 15 : 2) }
     parts.push(
-      `<g><title>${esc(c.name)}: ${c.pct}% of bytes, ${c.done}/${c.total} functions</title>` +
+      `<g><title>${esc(n.title)}</title>` +
         `<rect x="${r1(rect.x)}" y="${r1(rect.y)}" width="${r1(rect.w)}" height="${r1(rect.h)}" fill="#1f1f1f" stroke="#141414"/>`,
     )
     if (label) {
       parts.push(
-        `<text x="${r1(rect.x + 4)}" y="${r1(rect.y + 10.5)}" font-size="9.5" fill="#d8d8d8" font-weight="600">${esc(fit(`${c.name} · ${c.pct}%`, rect.w - 8, 5.6))}</text>`,
+        `<text x="${r1(rect.x + 4)}" y="${r1(rect.y + 10.5)}" font-size="9.5" fill="#d8d8d8" font-weight="600">${esc(fit(`${n.name} · ${n.pct.toFixed(1)}%`, rect.w - 8, 5.6))}</text>`,
       )
     }
     parts.push('</g>')
-    for (const { item: u, rect: ur } of squarify(c.units.map(u => ({ item: u, size: unitSize(u) })), inner)) {
-      const fits = ur.w > 44 && ur.h > 13
-      parts.push(
-        `<g><title>${esc(c.name)} / ${esc(u.name)}: ${u.pct}% of ${u.bytes ? `${u.bytes.toLocaleString('en-US')} bytes` : 'bytes'}, ${u.done}/${u.total} functions</title>` +
-          `<rect x="${r1(ur.x)}" y="${r1(ur.y)}" width="${r1(ur.w)}" height="${r1(ur.h)}" fill="${shade(u.pct)}" stroke="#1f1f1f" stroke-width="0.75"/>` +
-          (fits
-            ? `<text x="${r1(ur.x + 3)}" y="${r1(ur.y + 10)}" font-size="8" fill="#ffffffcc">${esc(fit(u.name, ur.w - 6, 4.6))}</text>`
-            : '') +
-          '</g>',
-      )
-    }
+    for (const { item: c, rect: cr } of squarify(n.children.map(c => ({ item: c, size: c.size })), inner)) leaf(c, cr, '#1f1f1f')
   }
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" ` +
