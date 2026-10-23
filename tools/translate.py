@@ -85,6 +85,14 @@ NATURAL_PASSES = [
 PASSES = SAFE_PASSES
 CAP_CHOICES = 48   # options tried at one choice point
 CAP_RUNS = 400     # runs of one pass per state
+# --lazy tries passes in this order: the ones whose edits most often ended in
+# a natfarm best state on a 48-function sample (2026-10-23; notes/depin-search-2026-10-23.md)
+LEARNED_ORDER = [
+    "perm_expand_expr", "perm_ins_block", "perm_cast_simple", "perm_randomize_internal_type",
+    "perm_const_var", "perm_split_assignment", "perm_reorder_stmts", "perm_move_to_use",
+    "perm_split_var", "perm_commutative",
+]
+PASS_ORDER = None
 
 
 class Enumerate(random.Random):
@@ -289,6 +297,57 @@ def _neighbors_of(base_ast, func, focus_lines, name, seen, shallow=False):
 
 # --- scoring ---------------------------------------------------------------
 
+def _thumb_mask(h):
+    """Mask the register fields of one Thumb halfword (allocation-blind shape)."""
+    top5 = h >> 11
+    if top5 <= 2:  # shift by immediate
+        return h & ~0x3F
+    if top5 == 3:  # add/sub register or imm3
+        return h & ~(0x3F | (0 if h & 0x400 else 0x1C0))
+    if top5 <= 7:  # mov/cmp/add/sub imm8
+        return h & ~0x700
+    if h >> 10 == 0x10:  # ALU
+        return h & ~0x3F
+    if h >> 10 == 0x11:  # hi-register ops / bx
+        return h & ~0xFF
+    if top5 == 9:  # ldr pc-relative
+        return h & ~0x700
+    if h >> 12 == 5:  # load/store register offset
+        return h & ~0x1FF
+    if h >> 13 == 3 or h >> 12 == 8:  # load/store immediate offset, halfword
+        return h & ~0x3F
+    if h >> 12 in (9, 10):  # sp-relative load/store, add to pc/sp
+        return h & ~0x700
+    if h >> 12 == 11 and (h >> 9) & 3 == 2:  # push/pop
+        return h & ~0xFF
+    if h >> 12 == 12:  # ldm/stm
+        return h & ~0x7FF
+    return h
+
+
+def shape_distance(orig, mine):
+    """Halfwords that differ with register fields masked: how far the code's
+    shape is from the ROM's, apart from allocation."""
+    a = [_thumb_mask(int.from_bytes(orig[i:i + 2], "little")) for i in range(0, len(orig) - 1, 2)]
+    b = [_thumb_mask(int.from_bytes(mine[i:i + 2], "little")) for i in range(0, len(mine) - 1, 2)]
+    if a == b:
+        return 0
+    import difflib
+    sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    return max(1, sum(max(i2 - i1, j2 - j1) for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag != "equal"))
+
+
+_last_pair = [None]
+_orig_distance = rasolve.distance
+
+
+def _recording_distance(orig, mine):
+    _last_pair[0] = (orig, mine)
+    return _orig_distance(orig, mine)
+
+
+rasolve.distance = _recording_distance
+
 _cc = None
 _targets = None
 _base_feat = None
@@ -310,9 +369,10 @@ def evaluate(text):
     if b is None:
         return None
     feat = summarize(dump)
+    feat["shape"] = shape_distance(*_last_pair[0]) if b and _last_pair[0] else 0
     # where each reload target's statement is in this text
-    lines = [norm_line(x) for x in text.splitlines()]
-    feat["anchors"] = {i: [n + 1 for n, x in enumerate(lines) if x == t["anchor"]]
+    lines = [norm_line(x) for x in text.splitlines()] if _targets else []
+    feat["anchors"] = {} if not _targets else {i: [n + 1 for n, x in enumerate(lines) if x == t["anchor"]]
                        for i, t in enumerate(_targets or []) if t.get("anchor")}
     # what the candidate compiles to, without debug lines: equal code, equal state
     code = re.sub(r"^\s*\.(stab|loc|file|ident)[^\n]*\n|^\.?L[MBT]?\w*:\n", "",
@@ -475,8 +535,16 @@ def main():
                     help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--unsafe", action="store_true", help="also use passes that can change the program's meaning")
     ap.add_argument("--natural", action="store_true", help="only edits a programmer plausibly wrote (NATURAL_PASSES)")
+    ap.add_argument("--lazy", action="store_true",
+                    help="generate each state's neighbors one pass at a time, most productive passes first "
+                         "across all states, and stop at the first match")
+    ap.add_argument("--shape", action="store_true",
+                    help="beam also keeps the states whose code is closest to the ROM's with registers masked")
+    ap.add_argument("--pass-order", default="",
+                    help="comma-separated pass priority for --lazy (default: LEARNED_ORDER)")
     a = ap.parse_args()
-    global PASSES
+    global PASSES, PASS_ORDER
+    PASS_ORDER = a.pass_order.split(",") if a.pass_order else LEARNED_ORDER
     if a.natural:
         PASSES = NATURAL_PASSES
     elif a.unsafe:
@@ -534,29 +602,62 @@ def main():
         step = 0
         while time.time() - t0 < a.seconds and best[2] != 0 and not (a.steps and step >= a.steps):
             step += 1
-            gen_jobs, owners = [], []
-            for st in states:
-                focus = focus_for(st[3], st[4], targets, func)
-                for name in PASSES:
-                    gen_jobs.append((st[3], func, focus, name))
-                    owners.append(st)
-            jobs = []
-            for st, outs in zip(owners, pool.map(expand, gen_jobs)):
-                for cand in outs:
-                    h = hashlib.sha1(cand.encode()).digest()
-                    if h not in seen:
-                        seen.add(h)
-                        jobs.append((cand, st[5]))
-            if not jobs:
-                print("no new neighbors")
-                break
-            # in chunks, best states' candidates first: stop at a match or when the time is up
-            results, cands, chunk = [], [c for c, _ in jobs], max(16, 8 * a.j)
-            for i in range(0, len(cands), chunk):
-                part = list(pool.map(evaluate, cands[i:i + chunk], chunksize=2))
-                results += part
-                if any(r and r[0] == 0 for r in part) or time.time() - t0 >= a.seconds:
+            if a.lazy:
+                # (state, pass) pairs in priority order: every state's most
+                # productive passes before any state's least productive ones;
+                # neighbors generated only when their turn comes
+                order = PASS_ORDER or PASSES
+                pairs = sorted(((order.index(n) if n in order else len(order), si, st, n)
+                                for si, st in enumerate(states) for n in PASSES), key=lambda x: x[:2])
+                jobs, results = [], []
+                focus_of = {}
+                hit = False
+                for _, si, st, name in pairs:
+                    if si not in focus_of:
+                        focus_of[si] = focus_for(st[3], st[4], targets, func)
+                    new_jobs = []
+                    for cand in expand((st[3], func, focus_of[si], name)):
+                        h = hashlib.sha1(cand.encode()).digest()
+                        if h not in seen:
+                            seen.add(h)
+                            new_jobs.append((cand, st[5] + [name]))
+                    for i in range(0, len(new_jobs), 16):
+                        part = new_jobs[i:i + 16]
+                        res = list(pool.map(evaluate, [c for c, _ in part], chunksize=2))
+                        jobs += part
+                        results += res
+                        if any(r and r[0] == 0 for r in res) or time.time() - t0 >= a.seconds:
+                            hit = True
+                            break
+                    if hit:
+                        break
+                if not jobs:
+                    print("no new neighbors")
                     break
+            else:
+                gen_jobs, owners = [], []
+                for st in states:
+                    focus = focus_for(st[3], st[4], targets, func)
+                    for name in PASSES:
+                        gen_jobs.append((st[3], func, focus, name))
+                        owners.append(st)
+                jobs = []
+                for st, job, outs in zip(owners, gen_jobs, pool.map(expand, gen_jobs)):
+                    for cand in outs:
+                        h = hashlib.sha1(cand.encode()).digest()
+                        if h not in seen:
+                            seen.add(h)
+                            jobs.append((cand, st[5] + [job[3]]))
+                if not jobs:
+                    print("no new neighbors")
+                    break
+                # in chunks, best states' candidates first: stop at a match or when the time is up
+                results, cands, chunk = [], [c for c, _ in jobs], max(16, 8 * a.j)
+                for i in range(0, len(cands), chunk):
+                    part = list(pool.map(evaluate, cands[i:i + chunk], chunksize=2))
+                    results += part
+                    if any(r and r[0] == 0 for r in part) or time.time() - t0 >= a.seconds:
+                        break
             jobs = jobs[:len(results)]
             scored = []
             for (cand, hist), res in zip(jobs, results):
@@ -566,7 +667,7 @@ def main():
                 if feat["code"] in seen_code:  # same code as a state already tried
                     continue
                 seen_code.add(feat["code"])
-                scored.append((residual, gap(feat, targets, base_feat), b, cand, feat, hist + ["edit"]))
+                scored.append((residual, gap(feat, targets, base_feat), b, cand, feat, hist))
             if not scored:
                 break
             # On the path: nothing else broken (low residual), closer to the
@@ -576,7 +677,14 @@ def main():
             by_gap = sorted(scored, key=lambda s: (s[1], s[0], s[2]))
             by_bytes = sorted(scored, key=lambda s: (s[2], s[0]))
             keep = []
-            for s_ in by_path[:a.beam] + by_gap[:max(1, a.beam // 2)] + by_bytes[:max(1, a.beam // 3)]:
+            pool_ = by_path[:a.beam] + by_gap[:max(1, a.beam // 2)] + by_bytes[:max(1, a.beam // 3)]
+            if a.shape:
+                # the code's shape apart from allocation: a state with the
+                # ROM's instructions in other registers is one allocation
+                # decision away, even when its byte count is not the lowest
+                by_shape = sorted(scored, key=lambda s: (s[4].get("shape", 0), s[2]))
+                pool_ = by_bytes[:max(1, a.beam // 2)] + by_shape[:a.beam]
+            for s_ in pool_:
                 if s_ not in keep:
                     keep.append(s_)
             states = keep
@@ -586,11 +694,13 @@ def main():
             print(f"step {step}: {len(jobs)} candidates, {len(scored)} new codes; on-path: residual "
                   f"{by_path[0][0]} gap {by_path[0][1]:.3f} bytes {by_path[0][2]}; closest: gap {by_gap[0][1]:.3f} "
                   f"residual {by_gap[0][0]}; fewest bytes {by_bytes[0][2]}; "
-                  f"{time.time() - t0:.0f}s", flush=True)
+                  f"{time.time() - t0:.0f}s; best shape {min(s[4].get('shape', 0) for s in scored)}", flush=True)
     path = os.path.join(out_dir, "best.c")
     open(path, "w").write(best[3])
     print(f"\n{'MATCH' if best[2] == 0 else f'{best[2]} differing bytes'} after "
           f"{len(best[5])} edit(s): {path}")
+    if best[5]:
+        print("edits: " + " ".join(best[5]))
 
 
 if __name__ == "__main__":
