@@ -224,7 +224,54 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
     p->entered = one;
 }
 
+#ifdef NONMATCHING
+// fuzzy: 67.0%
+// Stack copy scheduling, random masks and register lifetimes still differ.
+void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
+void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
+                                             struct GridAttackPoint *point, int kind)
+{
+    register struct GridAttackActor *p asm("sl") = actor;
+    u32 zero;
+    struct GridAttackPoint velocity;
+    struct SceneVec position;
+    struct GridAttackPoint target;
+    struct GridAttackPoint original;
+    register struct GridAttackPoint *vel asm("r7") = &velocity;
+    volatile s16 *pos;
+    asm("" : : "r"(p), "r"(vel));
+    zero = 0;
+    CpuSet(&zero, vel, 0x05000002);
+    pos = (volatile s16 *)&position;
+    original = *point;
+    *(struct GridAttackPoint *)&position = original;
+    {
+        register const u16 *table asm("sb") = gUnk_0203B400;
+        register u32 *randomIndex asm("r8") = &gUnk_03005308;
+        register u32 index asm("r2");
+        register u32 indexMask asm("r6") = 1023;
+        register s32 upper asm("r4") = ~255;
+        register u32 mask asm("r5") = 63;
+        u32 sample;
+        asm("" : : "r"(table), "r"(randomIndex));
+        index = (*randomIndex + 1) & indexMask;
+        asm("" : : "r"(indexMask));
+        sample = table[index];
+        asm("" : : "r"(upper), "r"(mask));
+        pos[0] = (pos[0] & upper) + ((sample & mask) + 128) - 32;
+        pos[1] += 1024;
+        index = (index + 1) & indexMask;
+        *randomIndex = index;
+        sample = table[index];
+        pos[2] = (pos[2] & upper) + ((sample & mask) + 128) - 32;
+    }
+    target = original;
+    BouncingObject_Spawn(&position, vel, &target, p->projectileDamage, 50, kind, 0);
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", GridAttackActor_SpawnTargetedProjectile);
+#endif
 
 int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
 {
