@@ -2,7 +2,7 @@
 
 // confidence=low: updates movement and step cues while constraining the tether target.
 #ifdef NONMATCHING
-// fuzzy: 93.9%
+// fuzzy: 99.9%
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define S(n) (*(s16 *)(p + (n)))
@@ -33,16 +33,39 @@ static inline s32 scale6(s32 v)
         return v >> 6;
     return -((-v) >> 6);
 }
-static inline u32 modeFive(u8 *p)
+static inline u8 modeFive(u8 *p)
 {
-    u32 result = 0;
-    if (H(0x538) && H(0x534) == 5)
+    u16 active = H(0x538);
+    u8 result = 0;
+    if (active && H(0x534) == 5)
         result = 1;
     return result;
 }
 static inline u32 flags(u32 *p, u32 mask)
 {
     return *p & mask;
+}
+static inline u32 FlagFour(u8 *p)
+{
+    if (!p)
+        return 0;
+    return flags((u32 *)(p + 0x448), 4);
+}
+static inline u32 FlagMovement(u8 *p)
+{
+    if (!p)
+        return 0;
+    return flags((u32 *)(p + 0x448), 0x20000);
+}
+static inline u32 GlobalMask(u32 mask)
+{
+    return *(u32 *)(gUnk_02000710 + 0x868) & mask;
+}
+static inline u8 HasGlobalFlag(void)
+{
+    if (GlobalMask(1))
+        return 1;
+    return 0;
 }
 void Player_UpdateTetherMovement(u8 *p)
 {
@@ -101,9 +124,9 @@ void Player_UpdateTetherMovement(u8 *p)
     if (moving && S(0x34E) >= 0 && !(H(0xA0) & 3) && !H(0x98)) {
         if (p && H(0x538) && H(0x534) == 0)
             goto animate;
-        if (flags((u32 *)(p + 0x448), 4))
+        if (FlagFour(p))
             goto animate;
-        if (p && flags((u32 *)(p + 0x448), 0x20000)) {
+        if (FlagMovement(p)) {
             if (!H(0xA0))
                 Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x5AE);
             else
@@ -130,7 +153,7 @@ void Player_UpdateTetherMovement(u8 *p)
                 else
                     Sound_PlaySong(0x28D);
             }
-            if (*(u32 *)(gUnk_02000710 + 0x868) & 1)
+            if (HasGlobalFlag())
                 Player_PlayPositionEffect(p, p + 0x30, 1, 2, 0, 0, 0);
         }
     }

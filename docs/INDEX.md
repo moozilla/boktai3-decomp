@@ -252,7 +252,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra1.md](../notes/cx-astra1.md) | Campaign worker astra1 | #matching #monsters #register-pinning | 7 |
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
-| [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 5 |
+| [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 9 |
 | [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 9 |
 | [notes/cx-sol03.md](../notes/cx-sol03.md) | cx-sol03 campaign | #matching #armor #campaign | 9 |
 | [notes/cx-sol04.md](../notes/cx-sol04.md) | cx-sol04 campaign | #matching #player #cue #animation #campaign | 11 |

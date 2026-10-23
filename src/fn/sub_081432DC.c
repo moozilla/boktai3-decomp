@@ -1,11 +1,10 @@
 #include "global.h"
 
 // confidence=low: approaches the saved interaction position, then holds an energy-consuming action.
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-#define B(n) (*(u8 *)(p + (n)))
-#define H(n) (*(u16 *)(p + (n)))
-#define S(n) (*(s16 *)(p + (n)))
+#define Player_UpdateHeldInteraction sub_081432DC
+#define B(n)                         (*(u8 *)(p + (n)))
+#define H(n)                         (*(u16 *)(p + (n)))
+#define S(n)                         (*(s16 *)(p + (n)))
 extern u8 *gUnk_02000710;
 extern const s16 gUnk_086149C4[];
 s32 Player_GetMovementSpeed(void *);
@@ -22,8 +21,63 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void Player_UpdateHeldInteraction(u8 *p)
+static inline void SetFacing(u8 *p, u32 facing)
 {
+    u32 value = facing;
+    u8 *dst;
+    dst = p + 0x3A4;
+    *dst = value;
+}
+static inline u32 MaskFlags(u32 *p, u32 mask)
+{
+    return *p | mask;
+}
+static inline void ClearHolding(u8 *p)
+{
+    register u32 offset asm("r1") = 0x4FD;
+    u8 *state;
+    register u32 zero asm("r1");
+    asm("" : "+r"(offset));
+    state = p + offset;
+    zero = 0;
+    *state = zero;
+}
+static inline u32 Quantize(s32 angle)
+{
+    register s32 value asm("r0") = (u16)angle;
+    asm("" : "+r"(value));
+    value = (value + 0x70) >> 5;
+    return value & 7;
+}
+static inline u32 ReadVariant(u8 *p)
+{
+    register u32 offset asm("r2") = 0x418;
+    asm("" : "+r"(offset));
+    {
+        register u8 *field asm("r0") = p + offset;
+        return *field;
+    }
+}
+static inline u32 ReadHeldInput(u8 *p)
+{
+    u32 offset = 0x348;
+    {
+        u16 **field = (u16 **)(p + offset);
+        return **field & 1;
+    }
+}
+static inline s32 ReadHeldEnergy(void)
+{
+    u8 *global = gUnk_02000710;
+    register u32 offset asm("r2");
+    offset = 0x77C;
+    asm("" : "+r"(offset));
+    return *(s32 *)(global + offset);
+}
+// MATCHING_CONCESSION: register-pinning
+void Player_UpdateHeldInteraction(u8 *arg)
+{
+    u8 *p = arg;
     s32 song;
     switch (B(0x458)) {
         case 0: {
@@ -35,34 +89,39 @@ void Player_UpdateHeldInteraction(u8 *p)
                 speed = 0;
                 H(0x38) = x;
                 H(0x3C) = z;
-                B(0x3A4) = H(0x4A0);
-                Player_UpdateFacingSide(p);
-                Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
-                if (B(0x3A4) > 4) {
-                    B(0x3A2) = speed;
-                    B(0x3A3) = 1;
-                } else {
-                    B(0x3A2) = speed;
-                    B(0x3A3) = speed;
+                {
+                    u32 facing = H(0x4A0);
+                    u8 *direction = p + 0x3A4;
+                    *direction = facing;
+                    Player_UpdateFacingSide(p);
+                    Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
+                    if (*direction > 4) {
+                        B(0x3A2) = speed;
+                        B(0x3A3) = 1;
+                    } else {
+                        B(0x3A2) = speed;
+                        B(0x3A3) = speed;
+                    }
+                    ActorSequence_Begin(p, 8, 1);
                 }
-                ActorSequence_Begin(p, 8, 1);
             } else {
                 s32 angle = Math_Atan2(x, z);
                 H(0x38) = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
                 H(0x3C) = scale(gUnk_086149C4[angle & 255] * speed);
-                B(0x3A4) = (((u16)angle + 0x70) >> 5) & 7;
+                SetFacing(p, Quantize(angle));
                 Player_UpdateFacingSide(p);
                 Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 1), 64, 1);
             }
             break;
         }
-        case 1:
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 12), 64, 1))
+        case 1: {
+            u8 *variant = p + 0x418;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*variant, 12), 64, 1))
                 break;
             Sound_PlaySong(0xCB);
             if (!(**(u16 **)(p + 0x348) & 1))
                 goto release;
-            if (B(0x418) == 6)
+            if (*variant == 6)
                 goto empty;
             if (H(0x428) >= H(0x42A)) {
                 song = 0x12E;
@@ -74,6 +133,7 @@ void Player_UpdateHeldInteraction(u8 *p)
             B(0x4FD) = 1;
             ActorSequence_Begin(p, 8, 2);
             break;
+        }
         case 2:
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 13), 64, 1);
             if (!(**(u16 **)(p + 0x348) & 1)) {
@@ -83,20 +143,17 @@ void Player_UpdateHeldInteraction(u8 *p)
             }
             if (H(0x428) >= H(0x42A)) {
                 Sound_StopSong(0xD8);
-                B(0x4FD) = 0;
+                ClearHolding(p);
                 song = 0x12E;
                 goto cue;
             }
-            if (*(s32 *)(gUnk_02000710 + 0x77C) > 0)
+            if (ReadHeldEnergy() > 0)
                 goto holding;
             {
                 Sound_StopSong(0xD8);
-                B(0x4FD) = 0;
+                ClearHolding(p);
                 goto empty;
             }
-        holding:
-            *(u32 *)(p + 0x20) |= 0x40;
-            break;
         empty:
             song = 0x124;
             goto cue;
@@ -104,22 +161,21 @@ void Player_UpdateHeldInteraction(u8 *p)
             Sound_PlaySong(song);
             ActorSequence_Begin(p, 8, 3);
             break;
+        holding:
+            *(u32 *)(p + 0x20) = MaskFlags((u32 *)(p + 0x20), 0x40);
+            break;
         case 3:
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 14), 64, 1);
-            if (!(**(u16 **)(p + 0x348) & 1)) {
+            Player_SetAnimation(p, ActorVariant_GetTableValue(ReadVariant(p), 14), 64, 1);
+            if (!(ReadHeldInput(p))) {
             release:
                 ActorSequence_Begin(p, 8, 4);
             }
             break;
         case 4:
-            if (Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 15), 64, 1)) {
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(ReadVariant(p), 15), 64, 1)) {
                 ActorSequence_Begin(p, 0, 0);
                 Player_UpdateFacingSide(p);
             }
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateHeldInteraction);
-#endif
