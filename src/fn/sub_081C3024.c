@@ -59,13 +59,22 @@ static inline void ToScreen(struct Vec *screen, struct Vec *world)
 }
 // confidence=low: configures a contact effect's movement and independent scale ramp.
 #define ContactImpactEffect_BeginMotion sub_081C3024
-#ifdef NONMATCHING
-// fuzzy: 73.9%
-// Full reconstruction; vector pointer lifetimes and projection/ramp register allocation differ.
-void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *effect, struct Vec *from,
-                                     struct Vec *to, u32 duration, u32 trackMode, u32 rampDuration,
-                                     s32 rampFrom, u32 rampTo)
+static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 {
+    *slot = callback;
+}
+
+#ifdef NONMATCHING
+// fuzzy: 75.4%
+// Full reconstruction; vector pointer lifetimes and projection/ramp register allocation differ.
+void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input, struct Vec *source,
+                                     struct Vec *destination, u32 time, u32 trackMode,
+                                     u32 rampDuration, s32 rampFrom, u32 rampTo)
+{
+    struct Vec *from = source;
+    struct Vec *to = destination;
+    u32 duration = time;
+    struct ContactImpactEffect *effect = input;
     register struct Vec *origin asm("sl");
     struct Vec *screen;
     struct Vec *target;
@@ -106,7 +115,7 @@ void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *effect, struct 
     effect->byte3C = effect->rampFrom;
     effect->byte3D = effect->rampFrom;
     *(u32 *)((u8 *)effect + 0x34) &= ~1;
-    *(void **)((u8 *)effect + 0xF4) = ContactImpactEffect_UpdateContact;
+    SetCallback(ContactImpactEffect_UpdateContact, (void *)((u8 *)effect + 0xF4));
     effect->shakeTimer = 0;
     effect->shakeFlag = 0;
 }
