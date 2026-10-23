@@ -129,3 +129,9 @@ Wrapup marker observed before starting 081B2608; no edits made to that function.
 This batch adds six exact matches (0.067 percentage points, 1620 bytes), with
 868 bytes using register-pinning concessions. Seven guarded draft records are
 new or updated; four functions were skipped after attempts or renewed review.
+
+Batch integration: the first full build exposed a duplicated binary tail after
+081AB904. Its reviewed body contains several symbolized incbin fragments;
+recorded replacement end 081ABA64 in `symbols/build_extra_functions.csv` and
+folded that boundary correction into the function's matching commit. The
+352-byte exact C object now replaces the whole reviewed body.
