@@ -257,7 +257,126 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: alternate overlay ramp, pulse and fade modes.
+#define Player_UpdateAlternateVisualPalette sub_0813CE20
+
+void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
+{
+    register u32 mode asm("r4") = requestedMode;
+    s32 intensity;
+    s32 weight;
+    if (p->actionVariant != p->baseActionVariant) {
+        p->baseActionVariant = p->actionVariant;
+        Player_LoadVisualParameters(p);
+    }
+    intensity = Player_GetVisualEffectFlags(p);
+    if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
+        p->savedSpriteResource = mode;
+        p->unkAC6[0] = intensity;
+        PaletteFade_ApplyBrightenedPalette(p);
+    }
+    if (*(u16 *)((u8 *)p + 0xAE4) == 1) {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            {
+                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                u16 *destination, *base;
+                s32 i;
+                if (!p->unk419) {
+                    u32 *palette;
+                    i = 0;
+                    palette = &p->actionVariantResource;
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    base = (u16 *)p->visualParameters;
+                    for (; i < 16; i++) {
+                        if ((u32)(i - 5) <= 1 || i == 13)
+                            *destination = *base;
+                        else
+                            *destination = *source;
+                        source++;
+                        destination++;
+                        base++;
+                    }
+                    *palette = (u32)((u8 *)p + 0x380);
+                } else {
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    for (i = 15; i >= 0; i--)
+                        *destination++ = *source++;
+                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                }
+            }
+        } else {
+            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+            p->actionEighteenDuration++;
+        }
+    } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
+        const u16 *source;
+        p->actionRequestTimer = 0;
+        source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+        weight = Player_GetPalettePulseWeight(&p->actionEighteenDuration);
+        sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        if (++p->actionEighteenDuration > 95)
+            p->actionEighteenDuration = 0;
+    } else if (p->actionEighteenDuration) {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            {
+                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                u16 *destination, *base;
+                s32 i;
+                if (!p->unk419) {
+                    u32 *palette;
+                    i = 0;
+                    palette = &p->actionVariantResource;
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    base = (u16 *)p->visualParameters;
+                    for (; i < 16; i++) {
+                        if ((u32)(i - 5) <= 1 || i == 13)
+                            *destination = *base;
+                        else
+                            *destination = *source;
+                        source++;
+                        destination++;
+                        base++;
+                    }
+                    *palette = (u32)((u8 *)p + 0x380);
+                } else {
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    for (i = 15; i >= 0; i--)
+                        *destination++ = *source++;
+                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                }
+            }
+        } else {
+            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        }
+        p->actionEighteenDuration--;
+    } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
+        const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+        if ((u16)(p->actionRequestTimer - 33) <= 14)
+            p->actionRequestTimer = 48;
+        if (p->actionRequestTimer <= 32) {
+            weight = p->actionRequestTimer;
+            p->actionRequestTimer = weight - 1;
+        } else {
+            weight = 80 - p->actionRequestTimer;
+            if (++p->actionRequestTimer > 79)
+                p->actionRequestTimer = 0;
+        }
+        sub_0813C9B4(p, source, weight, 32 - weight, 5);
+    } else {
+        p->actionRequestTimer = 0;
+        if (!p->unk419)
+            p->actionVariantResource = (u32)p->visualParameters;
+        else
+            p->visualObject->parameters = (u32)p->visualParameters;
+    }
+}
 
 void Player_SelectSpriteResource(struct Player *p)
 {
@@ -695,7 +814,7 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
 s32 Player_SelectFlashingVisualMode(struct Player *, s32);
 
-void sub_0813CE20(void *, s32);
+void sub_0813CE20(struct Player *, u32);
 
 void sub_0813B950(void *);
 
