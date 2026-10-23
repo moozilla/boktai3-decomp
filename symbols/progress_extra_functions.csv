@@ -206,7 +206,7 @@ address,evidence
 080ED480,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080ED484,Independent actor state handler following a reviewed gap leaf; exact standalone C
 080F05B4,Sends message 6 to scene actor category 0x18; raw span before Ivy_InitProfileId
-080F2028,Function in the raw span after sub_080F1FE8 (push {r4,r5,lr} after its pool); retained assembly
+080F2028,Function in the raw span after sub_080F1FE8; push after its literal pool; retained assembly
 080F2D00,PhaseObject: counts callback hits and switches to PhaseObject_ApproachTarget after three; raw span
 080F3638,Ivy: stores one value into the word at +0x1B8 of four 0x1C-byte segment records; raw span before Ivy_SetSegmentProperties
 080F469C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
