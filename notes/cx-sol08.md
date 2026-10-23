@@ -74,3 +74,23 @@ Tags: cx-sol08, particle-groups, compiler-debugger
 - `08017510` matched, 372 bytes, `Weather_UpdateTilemapScroll` (tentative), register-pinned. Full reconstruction of weather layer scroll and drift. Typed camera fields retain the shared base address. Two separate compound stores preserve the original step-then-drift arithmetic. Direct global random-cursor references let CSE reuse the updated seed; masked sample and read-before-save helpers fix register/ordering choices. Depin reduced nine hints to four; formatted exact check passed.
 - `08017684` skipped at retained 98.3% draft after iteration. Only the animation-field address and loop-count initialization swap order. Tried for/do/while induction spellings, explicit field pointer, evaluated address, zero/count ordering, body pointer, volatile resource, pinned count, and an extracted initializer helper. None improved the baseline; no tracked C change.
 - `080177AC` drafted 80.4%, 704-byte target. Full two-endpoint terrain particle spawner, including cooldown, flags, slope height, sprite setup and random delay. Began at 65.6%; iterated helpers, source layouts, compiler flips, direct random cursor access, fixed sample registers and loop variants. Flattened second-endpoint fields remove derived-pointer spills. Retaining one across the effect-link call matches the final active store. Eleven structural differences remain, mostly counter spill and delay-halfword address setup. A two-counter alternative has nine structural differences at 80.3%; an aggregate-argument experiment reaches the exact length but scores lower; both remain scratch candidates.
+
+## Weather continuation
+
+Tags: #matching #weather
+
+- `08017A6C` matched, 332 bytes, `Weather_UpdateStormTrigger` (tentative), register-pinned. Full reconstruction of brightness/display reset, pause/light gates, cooldown clamp and randomized storm entry. A shared transition label restores branch layout. Scoped timer-address evaluation prevents keeping the 0x630 offset across calls. Passing the display address before its mask reproduces load order. Depin reduced eleven hints to three; formatted exact check passed.
+- `08018028` matched, 724 bytes, `Weather_Initialize`, register-pinned. Completed the 90.9% draft by placing the final random table, cursor, index and masks at their evaluation points. Reading the sensor through a scoped address after the player-pointer load prevents keeping its offset across the clamp. This removes the extra r7 frame save. Depin reduced eighteen hints to three; formatted exact check passed.
+- `080E6E08` matched, 680 bytes, `Mimic_UpdateHitRecovery`, register-pinned. Completed the 88.4% draft. Route loading must precede position/target pointer setup; retain the flags pointer in r8 immediately after the first navigation test. Shared failure label reproduces route-flag clearing. Separate stopped-control setup retains the cleared zero for the context mask; helper argument order preserves packet setup. Final field getters resolve local reload choices. Depin reduced 103 hints to 43; formatted exact check passed.
+- `080E7134` matched, 912 bytes, `SceneActor_LeapTowardTarget`, register-pinned. Completed the 95.9% draft. Retain the heading pointer through the vector setup and separate the context-field and motion-vector address calculations. Removing the context offset barrier makes its constant use a normal reload and rotates the following signed-load scratch registers into the ROM's choices. Allocation diagnosis independently found the same two-slot reload rotation. Depin reduced nine hints to six; formatted exact check passed.
+
+The real wrapup signal arrived before starting `080E7D9C`; its existing draft
+was only inspected and remains untouched. The next pass starts there, then
+continues the remaining assigned functions. The first-pass reviewed-only and
+existing-draft skips still need the requested deeper revisit, closest scores
+first, after the remaining functions have received full attempts.
+
+This final batch adds four exact register-pinned matches, +0.1099 percentage
+points (2,648 bytes). Combined with the two landed batches, this campaign
+retains fourteen matches, eighteen new or improved drafts, and twenty-five
+skips; thirty-two assigned functions remain unattempted at the stop signal.
