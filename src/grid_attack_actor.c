@@ -1040,7 +1040,83 @@ static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mod
     p->entered = 1;
 }
 
+#ifdef NONMATCHING
+// fuzzy: 73.6%
+// Receiver loop, action constants and pointer lifetimes still differ.
+void SceneActors_ConfigureEffect(void *, s32, s32, s32);
+static inline void GridAttack_StartMessageAction(struct GridAttackActor *p, s32 mode, s32 zero,
+                                                 s32 id)
+{
+    p->active = mode;
+    p->actionReset = zero;
+    p->action = id;
+    p->actionTimer = zero;
+    p->entered = 1;
+}
+void GridAttack_ProcessMessages(struct GridAttackActor *p)
+{
+    struct GridAttackActor *base = p;
+    struct SceneEventReceiver *receiver = &p->receiver;
+    s32 i = 0;
+    while (i < receiver->count[gUnk_0200047C->phase]) {
+        struct SceneEventCommand *command = receiver->pending[gUnk_0200047C->phase][i];
+        s32 action;
+        SceneMessages_SetPendingTrigger(receiver, command);
+        switch (command->kind) {
+            case 0:
+                GridAttack_StartMessageAction(p, 2, 0, 0);
+                break;
+            case 1:
+                p->savedAngle = (((u8 *)&command->value)[0] + 5) << 5;
+                GridAttack_StartMessageAction(p, 2, 0, 1);
+                break;
+            case 10:
+                GridAttack_StartMessageAction(p, 2, 0, 2);
+                break;
+            case 11:
+                GridAttack_StartMessageAction(p, 2, 0, 3);
+                break;
+            case 29:
+                GridAttack_StartMessageAction(p, 2, 0, 4);
+                break;
+            case 30:
+                GridAttack_StartMessageAction(p, 2, 0, 5);
+                break;
+            case 31:
+                GridAttack_StartMessageAction(p, 2, 0, 6);
+                break;
+            case 32:
+                GridAttack_StartMessageAction(p, 2, 0, 7);
+                break;
+            case 18:
+                GridAttack_StartMessageAction(p, 2, 0, 8);
+                break;
+            case 9:
+                SceneActors_ConfigureEffect(p, command->value, 180, 180);
+                Trigger_ConsumePending(&p->receiver, 1);
+                break;
+            case 17:
+                base->messageParameter = command->value;
+                Trigger_ConsumePending(&p->receiver, 1);
+                break;
+            case 2: {
+                *(u16 *)((u8 *)p + 0x54) = *(u16 *)((u8 *)command + 8);
+                *(u16 *)((u8 *)p + 0x56) = *(u16 *)((u8 *)command + 10);
+                *(u16 *)((u8 *)p + 0x58) = *(u16 *)((u8 *)command + 12);
+                *(u16 *)((u8 *)base + 0x8A4) = *(u16 *)((u8 *)p + 0x54);
+                *(u16 *)((u8 *)base + 0x8A6) = *(u16 *)((u8 *)p + 0x56) + base->height;
+                *(u16 *)((u8 *)base + 0x8A8) = *(u16 *)((u8 *)p + 0x58);
+                Trigger_ConsumePending(&p->receiver, 1);
+                break;
+            }
+        }
+        i++;
+    }
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", GridAttack_ProcessMessages);
+#endif
 
 void GridAttack_UpdateStateNineAction(struct GridAttackActor *p)
 {
