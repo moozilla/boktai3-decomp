@@ -3,7 +3,7 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
-// fuzzy: 96.1%
+// fuzzy: 97.3%
 // Remaining differences: ground-height lookup temporaries (r0/r1/r3 swap) and a derived pool constant.
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 struct Pair8 {
@@ -26,7 +26,7 @@ static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     u8 *data;
     register u32 type asm("r2");
-    register s32 height asm("r1");
+    s32 height;
     if (override)
         data = override + 4;
     else
