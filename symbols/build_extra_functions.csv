@@ -522,7 +522,7 @@ address,isa,evidence,replacement_end
 081D6E0C,thumb,Hidden raw-tail function,081D6EE4
 081D6EE4,thumb,Hidden raw-tail function,081D6F78
 081D6F78,thumb,Hidden raw-tail leaf,081D6F98
-081D6F98,thumb,Hidden raw-tail function with embedded jump table,
+081D6F98,thumb,Hidden raw-tail function with embedded jump table,081D70C4
 081DACC4,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081DACCC
 081DACEC,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081DACF4
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
