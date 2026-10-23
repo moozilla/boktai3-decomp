@@ -1,8 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.2%
-// Open: the clamp should load the score into r1 with a signed compare and recompute
-// the store address (ROM puts 9999 in r0).
+// confidence=low: copies the local link result and clamps its displayed score.
+#define LinkScorePanel_UpdateDisplayedScore sub_081100A0
 #include "area_effect_link.h"
 
 struct LinkScorePanel {
@@ -23,7 +21,15 @@ yes:
     return 1;
 }
 
-void sub_081100A0(struct LinkScorePanel *panel)
+static inline s32 ClampScore(struct LinkScorePanel *panel)
+{
+    s32 v = panel->score;
+    s32 limit = 9999;
+    if (v > limit)
+        v = limit;
+    return v;
+}
+void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
 {
     struct AreaEffectLinkState *link = gUnk_020004B4;
     struct AreaEffectLinkState *link2;
@@ -51,13 +57,6 @@ sel:
         v = link2->menuResults[i];
     panel->score = v;
 clamp:
-    if (panel->score <= 9999)
-        v = panel->score;
-    else
-        v = 9999;
-    panel->score = v;
+    panel->score = ClampScore(panel);
     panel->timer = 0x5a;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081100A0);
-#endif
