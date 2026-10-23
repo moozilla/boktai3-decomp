@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 52.3%; open: agbcc CSEs the 0x4A8 address into callee-saved r6 (orig recomputes it for the final call)
-
 extern u8 *gUnk_020004B4;
 
 s32 Div(s32, s32);
@@ -18,19 +15,51 @@ struct Q {
     s16 tx, ty, tz;
 };
 
-void sub_0823B7A4(struct Q *p)
+static inline s32 ControllerId(void)
+{
+    if (!gUnk_020004B4)
+        return -1;
+    return *(s16 *)(gUnk_020004B4 + 0x18);
+}
+// confidence=low: smooths the camera anchor toward actor position and motion offset.
+#define Player_SmoothCameraAnchor sub_0823B7A4
+void Player_SmoothCameraAnchor(struct Q *p)
 {
     s32 other;
-    p->cx = Div(p->x + p->tx + p->cx * 4, 5);
-    p->cy = Div(p->y + p->ty + (p->cy * 4 + 0x96), 5);
-    p->cz = Div(p->z + p->tz + p->cz * 4, 5);
-    if (gUnk_020004B4 == 0)
-        other = -1;
-    else
-        other = *(s16 *)(gUnk_020004B4 + 0x18);
-    if (p->id == other)
+    u32 id;
+    {
+        s32 value = p->x;
+        s32 offset = p->tx;
+        s32 sum = value + offset;
+        s16 *target = &p->cx;
+        s32 previous = *target;
+        previous = previous * 4 + 0;
+        sum += previous;
+        *target = Div(sum, 5);
+    }
+    {
+        s32 value = p->y;
+        s32 offset = p->ty;
+        s32 sum = value + offset;
+        s16 *target = &p->cy;
+        s32 previous = *target;
+        previous = previous * 4 + 150;
+        sum += previous;
+        *target = Div(sum, 5);
+    }
+    {
+        s32 value = p->z;
+        s32 offset = p->tz;
+        s32 sum = value + offset;
+        s16 *target = &p->cz;
+        s32 previous = *target;
+        previous = previous * 4 + 0;
+        sum += previous;
+        *target = Div(sum, 5);
+    }
+    id = p->id;
+    other = ControllerId();
+    if (id == other) {
         Camera_SnapToWithoutCompletion(&p->cx);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823B7A4);
-#endif
