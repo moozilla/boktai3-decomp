@@ -1,9 +1,10 @@
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: reaction flags select special control, chase, route recovery or a timed turn.
 #include "global.h"
 // confidence=low: chooses chase or route recovery after an actor reaction.
 
 #ifdef NONMATCHING
-// fuzzy: 83.5%
+// fuzzy: 84.6%
 // Branch layout, flag-address lifetimes and register allocation still differ.
 #include "scene_actor_chase.h"
 static inline void Dog_ClearGroupBits(u8 *group, u32 mask)
@@ -20,7 +21,7 @@ static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!Dog_ReadMotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        register s32 prior asm("r7") = actor->direction;
         s32 tries = 0;
         s32 choice;
         const u16 *table = gUnk_0203B400;
@@ -105,10 +106,12 @@ reroute: {
         data = gUnk_030052F4->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
-        return 1;
-invoke:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer)) {
+    invoke:
+        Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        return 0;
+    }
+    return 1;
 }
 done:
     return 0;
