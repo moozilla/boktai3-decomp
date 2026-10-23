@@ -1,12 +1,18 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 92.2%
 
 // confidence=low: control waits sixty frames before restoring or choosing a route.
 
-#ifdef NONMATCHING
-// fuzzy: 92.1%
 // Remaining differences: entry flag-load order, route selection registers and random-turn hoisting.
 #include "scene_actor_chase.h"
+static inline void Mummy_ClearMotion(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    struct ChaseFlags40 *field = (void *)&actor->flags2D4;
+    s32 mask = ~bits;
+    field->bits &= mask;
+}
 
 static inline u8 Test16(u16 *p, u32 mask)
 {
@@ -176,7 +182,7 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, actor->savedTarget, 0);
-        Chase_ClearMotionFlags(actor, 0x200);
+        Mummy_ClearMotion(actor, 0x200);
         actor->flags2CC &= ~0x80;
         *(u16 *)(group + 0x54) = 0;
     }

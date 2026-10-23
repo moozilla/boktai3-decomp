@@ -19,11 +19,7 @@ static inline u32 PickTurn(u32 dir)
     s32 i;
     for (i = 0; i < 4; i++) {
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
-            u32 v;
-            gUnk_03005308 = index;
-            index *= 2;
-            v = *(const u16 *)(index + (u32)gUnk_0203B400);
+            u32 v = gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
             {
                 register u32 mask asm("r7") = 3;
                 d = (v & mask) << 6;

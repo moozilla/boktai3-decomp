@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.6%
-// Remaining differences: timer/count operand allocation and derived restart-sequence offsets.
+// fuzzy: 99.5%
+// Remaining difference: recovery timer offset reload uses r3 instead of r0.
 #include "screamer_playback.h"
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
@@ -262,12 +262,18 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
             Screamer_StepAnimation(p);
             if (({
                     register u32 off asm("r2") = 0x1ca;
+                    register s16 *field asm("r1");
                     asm("" : "+r"(off));
-                    *(s16 *)((u8 *)p + off);
+                    field = (void *)((u8 *)p + off);
+                    asm("" : : "r"(field));
+                    *field;
                 }) > ({
                     register u32 off asm("r3") = 0x1d4;
+                    register s16 *field asm("r0");
                     asm("" : "+r"(off));
-                    *(s16 *)((u8 *)p + off);
+                    field = (void *)((u8 *)p + off);
+                    asm("" : : "r"(field));
+                    *field;
                 })) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1B, (u8)p->f1D8, 0);
                 Anim_SetDurationScale(&p->sequence, 0x20);
@@ -281,9 +287,27 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
         case 1:
             if (Screamer_StepScreamLoop(p, phase)) {
                 {
-                    u32 next = p->f1D2 + 1;
-                    p->f1D2 = next;
-                    if ((s16)next >= p->f1D0) {
+                    register u32 countOffset asm("r3") = 0x1D2;
+                    register u16 *count asm("r1");
+                    u32 next;
+                    register u32 limitOffset asm("r2");
+                    register s16 *limit asm("r1");
+                    asm("" : "+r"(countOffset));
+                    count = (void *)((u8 *)p + countOffset);
+                    asm("" : : "r"(count));
+                    next = *count + 1;
+                    *count = next;
+                    limitOffset = 0x1D0;
+                    asm("" : : "r"(limitOffset));
+                    limit = (void *)((u8 *)p + limitOffset);
+                    asm("" : : "r"(limit));
+                    if ((s16)next >= ({
+                            s32 value;
+                            asm("" : : "r"(limit));
+                            value = *limit;
+                            asm("" : : "r"(limitOffset));
+                            value;
+                        })) {
                         Anim_RestartSequence(&p->sequence, p->f218, 0x1D, (u8)p->f1D8, 0);
                         p->f1D6 = 2;
                     }
@@ -312,6 +336,7 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     p->f1CA++;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
 #endif
