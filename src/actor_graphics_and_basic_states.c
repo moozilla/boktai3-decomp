@@ -2282,7 +2282,85 @@ void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
         p->c4++;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0802483C);
+// confidence=low: variant-dependent recovery animations and timed return to the default action.
+#define SceneActorState_UpdateVariantRecovery sub_0802483C
+// MATCHING_CONCESSION: register-pinning
+struct VariantRecoveryActor {
+    u8 pad0[0xaa];
+    u8 animation, state, mode, index, phase, finished, enter;
+    u8 padb1[0x13];
+    u32 timer;
+    u8 padc8[0x28e];
+    u16 delay;
+    u32 kind;
+    u8 pad35c[0x50];
+    u32 flags;
+    u8 pad3b0[9];
+    u8 alternate;
+};
+extern u32 gUnk_030053F4;
+static inline u8 enterVariant(struct VariantRecoveryActor *p)
+{
+    if (p->enter) {
+        p->enter = 0;
+        p->finished = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline u8 variantAlternate(struct VariantRecoveryActor *q, u32 offset)
+{
+    u32 adjusted = offset + 0x61;
+    {
+        u8 *address = (u8 *)q + adjusted;
+        return *address;
+    }
+}
+void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
+{
+    struct VariantRecoveryActor *q = p;
+    if (enterVariant(p)) {
+        u32 offset = 0x358;
+        if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset))
+            SceneActorState_SetValueClampedWhenActive(q, 38);
+        else
+            SceneActorState_SetValueClampedWhenActive(q, 17);
+    }
+    if (p->finished) {
+        if (q->state == 3) {
+            u32 animation;
+            u32 offset = 0x358;
+            if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset)) {
+                animation = 38;
+                asm("" : "+r"(animation));
+            } else {
+                animation = 17;
+            }
+            q->animation = animation;
+        } else if (p->state == 17) {
+            register u32 animation asm("r0");
+            if (q->flags & 4) {
+                animation = 19;
+            } else {
+                animation = 18;
+            }
+            p->animation = animation;
+        } else {
+            u32 zero = 0;
+            q->mode = zero;
+            q->index = zero;
+            q->phase = zero;
+            q->timer = zero;
+            q->enter = 1;
+            if (gUnk_030053F4 & 0x1000)
+                q->delay = zero;
+            else
+                q->delay = 90;
+            return;
+        }
+    }
+    p->timer++;
+}
 
 struct S_08024944 {
     u8 f0[0x9a];
