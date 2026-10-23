@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.7%
 // foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
 
 #define Projectile_Spawn Projectile_SpawnFromConfig
@@ -46,8 +44,9 @@ static inline void add(struct OrangeSpinePosition *out, struct OrangeSpinePositi
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
-    out->z = b->z + a->z;
+    out->z = a->z + b->z;
 }
+
 void OrangeSpine_FireProjectile(struct OrangeSpine *p)
 {
     u8 config[0x5c];
@@ -56,20 +55,19 @@ void OrangeSpine_FireProjectile(struct OrangeSpine *p)
     struct OrangeSpinePosition *pos;
     s32 facing = p->facing;
     s32 angle = 64;
+    typeof(&position) t1;
     angle &= -(facing != 0);
-    pos = &position;
-    *pos = p->position;
-    pos->y += 128;
+    t1 = &position;
+    pos = t1;
+    *(&position) = p->position;
+    (&position)->y += 128;
     vector(&delta, angle, 160);
-    add(&position, pos, &delta);
+    add(&position, &position, &delta);
     ProjectileConfig_Init(config);
     ProjectileConfig_SetAppearance(config, 0x7e7c, 0, 0x1c1);
     ProjectileConfig_SetCollision(config, 0, 0x80000, p->collisionX, p->collisionY, p->collisionZ);
     ProjectileConfig_SetMovement(config, 0, p->speed, angle, p->movement);
     ProjectileConfig_SetAnimation(config, 0xa6cf, 4, 0);
-    Projectile_Spawn(config, pos);
+    Projectile_SpawnFromConfig(config, &position);
     Sound_PlaySong(0x51e);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", OrangeSpine_FireProjectile);
-#endif
