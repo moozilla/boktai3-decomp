@@ -212,6 +212,16 @@ def analyze(src, func=None, nonmatching=False):
                         note = (f"two-operand `{mc[1].group(1)}`: you copy operand 1 = {pseudo_name(p1)} and use "
                                 f"operand 2 = {pseudo_name(p2)}; the ROM copies the other one. The decision is the "
                                 f"operand order of insn {u} before regmove, not register allocation.")
+        if kind == "registers" or kind == "replace":
+            # a signed/unsigned condition: the comparison's type
+            SIGNED = {"blt": "bcc", "bge": "bcs", "bgt": "bhi", "ble": "bls"}
+            pair = SIGNED | {v: k for k, v in SIGNED.items()}
+            for (_, ct), (_, ot) in zip(cand, orig):
+                c0, o0 = ct.split(" ")[0], ot.split(" ")[0]
+                if pair.get(c0) == o0:
+                    sgn = "signed" if o0 in SIGNED else "unsigned"
+                    note = (f"comparison type: the ROM branches with `{o0}` ({sgn}), you with `{c0}`; make the "
+                            f"compared value {sgn} (a cast or the field's type).")
         if kind in ("insert", "delete", "replace"):
             # a narrowing right after a call: the callee's declared return type
             for side, xs, other in (("ROM", orig, cand), ("yours", cand, orig)):
