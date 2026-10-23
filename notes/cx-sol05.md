@@ -114,3 +114,87 @@ Tags: #matching #campaign #mummy
   functions were recovered in this session; exact gain is 0 percentage points.
 
 Session 2 combined validation: `build/cxbuild` printed `build/boktai3.gba: OK`.
+
+## Session 2 continued: deeper reconstruction
+
+Tags: #matching #campaign #mummy #screamer #reactions
+
+One exact match adds approximately 0.0244 percentage points of code coverage
+(588 bytes), entirely without register pinning. Eleven guarded drafts are new
+or improved. Scratch experiments and generated decompiler output are not committed.
+
+- 080DC9D0: matched, Mummy_ResumeRouteAfterCheckpoint. A signed halfword
+  bitfield helper initializes the field pointer before complementing its mask;
+  that preserves the final two instruction positions. Exact 588-byte check.
+- 0820C4D4: drafted 99.5% from 97.1%. Three register differences remain.
+  Compiler register-allocation search found a possible reload rotation, but
+  translation and a longer natural-source search found no equivalent C edit.
+- 0820CD00: drafted 94.7% from 88.6%. Separate script mode cases improve the
+  control flow. Removed an uninitialized output-only operand and the explicit
+  return value that was absent from the original incidental return behavior.
+- 080D0C30: drafted 88.9% from 69.5%. Typed response-header stores and a
+  shorter timer lifetime improve the collision handler; removed its register
+  hint. Cached attack-kind and explicit offset-register variants were worse.
+- 080D453C: new full 58.2% draft, Mummy_TryStimulusRoute (tentative). Recovered
+  contact gating, route setup, route failure and motion reset. Corrected the
+  embedded position/motion offsets; the candidate now has the full 900-byte
+  extent. Remaining differences include route helper and flag lifetimes.
+- 080D5778: drafted 92.2% from 92.1%. Signed motion mask helper reduces
+  structural differences from 21 to 19; four bytes of extent remain absent.
+- 080D53F8: drafted 83.3% from 83.1%. Table-first random-index evaluation
+  reduces structural differences from 19 to 15. A longer-lived motion pointer
+  and removal of the existing speed hint both worsened it.
+- 080D3878: drafted 92.3% from 91.5%. Initial flag-pointer evaluation before
+  mask initialization and a halfword-test helper reduce structural residue
+  from ten instructions to six.
+- 080DC228: drafted 90.0% from 89.9%. Signed context-flag bitfield removes
+  two structural differences. Candidate remains four bytes short.
+- 080D6608: drafted 92.5%, unchanged rounded score but structural differences
+  improve from twelve to eight. Table-first random evaluation is simpler;
+  byte differences also decrease. Four-byte extent difference remains.
+- 080800A4: new full 64.3% draft, SceneActorReaction_UpdateRouteRecovery
+  (tentative). Reconstructed reset, drawable, route, sound and defeat branches.
+  Route helper barrier variants did not improve the retained hint-free source.
+- 08080BE0: new full 92.8% draft, SceneActorReaction_SetMotionMode (tentative).
+  Improved the first 80.4% reconstruction through pointer order, mask helpers,
+  reused flag tests and positive-first fixed-point scaling. Structural residue
+  fell from 99 instructions to 26. Signed motion overlays, truncated mask tests,
+  explicit current-flag locals, word-set helpers and compiler decision flips
+  did not close the remainder. Pseudocode cross-check supports both modes.
+- 080D0FE8: retried existing 84.9%. Control helper extraction, unpinning,
+  alternate flag lifetimes and block barriers were worse. Shared turn-control
+  tails remain the main structural difference; no production change.
+- 080D2194: retried existing recovery draft at 88.5%. Signed flag access,
+  typed motion setters, mask unpinning and address lifetime changes did not
+  improve the full candidate; no production change.
+- 080D3D60: retried player-route draft at 92.9%. Alternate random evaluation
+  reduced structural differences but shortened the extent and lowered fuzzy
+  score. Return-type experiments were rejected after checking the actual ROM
+  epilogue; compiler diagnostics had misidentified its return register.
+- 080D9B20: retried directional-cell draft at 85.3%. Sequential and inverted
+  tests, per-case barriers and boolean helper returns did not improve it.
+  Repeated cell tests still merge into tails unlike the original; no change.
+- 08082184: retried 98.3%. Compiler flips and depth-two allocation search
+  found no improvement. Explicit late offset binding worsened earlier code.
+- 080EE000: full animation-transition scratch reaches about 61%. Setter
+  widths and expression order remain unresolved; no production change yet.
+- 081078B0: retried 97.7% tile-press draft. Duration lifetime, pointer helpers
+  and alternative return flows did not improve its five differing instructions.
+- 0803D288: retried 95.1% scene-pool spawn draft. Volatile count and structured
+  temporary storage variants did not improve it; no production change.
+- 0816D1A4: retried 97.4%. Offset types, arrays, casts and selective binding
+  did not close its two operand differences.
+- 081E09A8: retried 95.6%. Key-mask lifetimes and binding variants worsened
+  the eight remaining register differences; no production change.
+- 0823350C: full charged-burst scratch improves substantially, but a hinted
+  candidate allowed overlapping live base/index registers. Rejected that
+  invalid variant; valid reconstruction still needs further matching work.
+- 08018E00: full blend initializer scratch reaches about 80%. Cursor ordering
+  helps; register bindings and signed-loop variants were worse. Not retained.
+
+Locally isolated headless decompiler analysis now provides pseudocode for
+remaining reviewed-only bodies. Its generated output remains under build/.
+
+Combined validation after rebase: `build/cxbuild` printed
+`build/boktai3.gba: OK`. The new reaction draft's assembly fallback declaration
+was corrected before that successful build. No C conflicts occurred on rebase.
