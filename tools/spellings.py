@@ -263,6 +263,52 @@ def sp_addr_before_next(fn):
             yield f"address of {text(lv)[:24]} before `{text(nx)[:24]}`", f2
 
 
+def sp_local_to_arg(fn, helpers):
+    """H(p, ...) whose body starts with T *a = <expr of its parameters>;  ->  H_(p, <expr>, ...) taking a
+    as an argument (an inline helper's arguments are evaluated before its body: the ROM computes
+    the value before the helper's first statement and its other arguments)."""
+    pred = lambda n, p, s: (isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID) and n.name.name in helpers
+                            and n.args is not None)
+    for k in range(sites(fn, pred)):
+        c0, _, _ = nth(fn, pred, k)
+        h0 = helpers[c0.name.name]
+        params = [x.name for x in h0.decl.type.args.params if isinstance(x, ca.Decl)]
+        items = h0.body.block_items or []
+        for di, d in enumerate(items):
+            if not isinstance(d, ca.Decl):
+                break
+            if d.init is None:
+                continue
+            ids = [x for x, par, sl in walk(d.init) if isinstance(x, ca.ID)
+                   and not (isinstance(par, ca.StructRef) and sl == "field")]
+            if d.init is None or not ids or not all(x.name in params for x in ids):
+                continue
+            for pos in range(len(params) + 1):
+                f2 = copy.deepcopy(fn)
+                c, _, _ = nth(f2, pred, k)
+                h = copy.deepcopy(h0)
+                name = new_name(f2, c.name.name + "_")
+                h.decl.name = name
+                for n, _, _ in walk(h.decl.type):
+                    if isinstance(n, ca.TypeDecl) and n.declname == c.name.name:
+                        n.declname = name
+                dd = h.body.block_items.pop(di)
+                arg = copy.deepcopy(dd.init)
+                for r in [x for x in walk(arg) if isinstance(x[0], ca.ID) and x[0].name in params
+                          and not (isinstance(x[1], ca.StructRef) and x[2] == "field")]:
+                    i = params.index(r[0].name)
+                    if r[1] is None:
+                        arg = copy.deepcopy(c.args.exprs[i])
+                    else:
+                        set_child(r[1], r[2], copy.deepcopy(c.args.exprs[i]))
+                newp = ca.Decl(name=dd.name, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                               type=dd.type, init=None, bitsize=None, asmlabel=None)
+                h.decl.type.args.params.insert(pos, newp)
+                c.args.exprs.insert(pos, arg)
+                c.name.name = name
+                yield f"{dd.name} of {h0.decl.name} as argument {pos + 1}", (f2, [h])
+
+
 def sp_cmp_sign(fn):
     """a < b  ->  (s32)a < b / (u32)a < b  (the branch's signedness is the comparison's type)."""
     pred = lambda n, p, s: isinstance(n, ca.BinaryOp) and n.op in CMP
@@ -489,7 +535,7 @@ DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width"],
-    "order": ["sp_helper_arg", "sp_specialize", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
+    "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
     "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl"],
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form"],

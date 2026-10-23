@@ -203,12 +203,13 @@ def candidates(d, seeds):
                 if os.environ.get("FIX_DEBUG"):
                     print(f"   ({fam}: {type(ex).__name__}: {ex})")
                 continue
-    try:
-        for desc, (f2, extra) in spellings.sp_specialize(d.fn, d.helpers):
-            yield "sp_specialize", desc, f2, {e.decl.name: e for e in extra}
-    except Exception as ex:
-        if os.environ.get("FIX_DEBUG"):
-            print(f"   (sp_specialize: {type(ex).__name__}: {ex})")
+    for sp in (spellings.sp_specialize, spellings.sp_local_to_arg):
+        try:
+            for desc, (f2, extra) in sp(d.fn, d.helpers):
+                yield sp.__name__, desc, f2, {e.decl.name: e for e in extra}
+        except Exception as ex:
+            if os.environ.get("FIX_DEBUG"):
+                print(f"   ({sp.__name__}: {type(ex).__name__}: {ex})")
     for t, (fam, desc, f2) in atlas.edits(d.fn, d.ast, d.func, seeds).items():
         if fam not in {r.__name__ for r in rewrites.REWRITES}:
             yield fam, desc, f2, {}
