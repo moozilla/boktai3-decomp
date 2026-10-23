@@ -1,8 +1,6 @@
 #define gEffectSineTable gUnk_086149C4
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.9%
-// Open: the pool load of the random table (gUnk_0203B400) uses r1 instead of r4.
+// MATCHING_CONCESSION: register-pinning
 struct EffectPosition {
     s16 x, y, z, pad;
 };
@@ -40,6 +38,7 @@ static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
+#define ActorEffect_UpdateApproachLaunch sub_081B6D20
 void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, s32 index)
 {
     struct EffectPosition delta;
@@ -63,7 +62,7 @@ void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, 
         {
             u32 off = gUnk_03005308 << 1;
             const u8 *table4;
-            table4 = gUnk_0203B400;
+            table4 = (const u8 *)RANDOM_TABLE_ADDR;
             byte = *(const u8 *)(off + (u32)table4);
         }
         if (byte <= 0x7F)
@@ -105,6 +104,3 @@ void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, 
     } else
         effect->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateApproachLaunch);
-#endif
