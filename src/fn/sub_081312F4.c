@@ -1,0 +1,104 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#include "scene_actor_control_phase.h"
+#define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
+u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+// confidence=low: selects a route return phase from motion and route flags.
+#define SceneActorRoute_UpdateReturnEntry sub_081312F4
+#ifdef NONMATCHING
+// fuzzy: 84.8%
+// Remaining differences: state/control offset reuse and flag-result registers.
+static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
+                                u32 zero)
+{
+    u32 offset;
+    {
+        u8 *field = &actor->field2B2;
+        *field = 1;
+    }
+    offset = 0x2B0;
+    *((u8 *)actor + offset) = zero;
+    actor->field2B5 = kind;
+    offset -= 0x94;
+    *(void **)((u8 *)actor + offset) = control;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = zero;
+}
+static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
+                                    u32 kind)
+{
+    u32 offset;
+    u32 zero;
+    {
+        u8 *field = &actor->field2B2;
+        zero = 0;
+        *field = 1;
+    }
+    offset = 0x2B0;
+    *((u8 *)actor + offset) = zero;
+    actor->field2B5 = kind;
+    offset -= 0x94;
+    *(void **)((u8 *)actor + offset) = control;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = zero;
+}
+static inline void State(struct SceneActorRegistryResetView *a, u32 behavior, u32 zero)
+{
+    a->state2A8 = zero;
+    a->phase2A9 = zero;
+    a->behavior2AA = behavior;
+    a->counter2AC = zero;
+    a->field2B1 = 1;
+}
+static inline u32 Finished(struct SceneActorRegistryResetView *a)
+{
+    register u32 offset asm("r3") = 0x2B0;
+    asm("" : "+r"(offset));
+    return FIELD(a, offset, u8);
+}
+static inline u16 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    return a->flags2D4 & mask;
+}
+void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
+{
+    register u8 *group asm("r6") = (u8 *)&actor->group;
+    u8 result;
+    asm("" : "+r"(group));
+    if (SceneActorControl_TakeFlag(&actor->field2B1))
+        BeginControlZero(actor, actor->entryTarget224, 2);
+    if ((u8)Callback_InvokeActor(actor, actor->update270))
+        return;
+    result = sub_0812F3CC(actor);
+    if (result)
+        return;
+    if (Finished(actor)) {
+        u16 flags = MotionFlags(actor, 0x10);
+        if (flags) {
+            State(actor, 8, result);
+            BeginControl(actor, FIELD(group, 0x214, void *), 0x13, result);
+        } else {
+            u32 bits = actor->flags2CC & 0x10;
+            if (bits)
+                State(actor, 7, flags);
+            else
+                State(actor, 2, bits);
+            BeginControlZero(actor, actor->entryTarget228, 1);
+        }
+    } else
+        actor->counter2AC++;
+}
+
+#else
+INCLUDE_ASM("asm/nonmatching", sub_081312F4);
+#endif
