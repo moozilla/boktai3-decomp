@@ -150,10 +150,23 @@ void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
 s32 WirelessGame_GetSelectedEquipmentEffect(s32);
 s32 Player_GetUsableEnchantment(struct Player *);
-#ifdef NONMATCHING
-// fuzzy: 87.9%
-// Owner/mode register allocation and shared tail stores differ.
-// confidence=low: applies timed palette overlays and the current enchantment pulse.
+// MATCHING_CONCESSION: register-pinning
+#define Player_UpdateVisualPalette sub_0813CB8C
+
+static inline s32 Player_GetPalettePulseWeight(const u16 *timer)
+{
+    s32 value;
+    if (*timer <= 31)
+        value = *timer;
+    else if (*timer <= 47)
+        value = 32;
+    else if (*timer <= 79)
+        value = 80 - *timer;
+    else
+        value = 0;
+    return value;
+}
+
 void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 {
     register u32 mode asm("r4") = requestedMode;
@@ -182,14 +195,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         if (effect >= 0) {
             p->actionRequestHold = effect + 0x16E;
             source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
-            if (p->actionRequestTimer <= 31)
-                weight = p->actionRequestTimer;
-            else if (p->actionRequestTimer <= 47)
-                weight = 32;
-            else if (p->actionRequestTimer <= 79)
-                weight = 80 - p->actionRequestTimer;
-            else
-                weight = 0;
+            weight = Player_GetPalettePulseWeight(&p->actionRequestTimer);
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             if (++p->actionRequestTimer > 95)
                 p->actionRequestTimer = 0;
@@ -215,13 +221,17 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 p->visualObject->parameters = (u32)p->visualParameters;
         }
     } else {
+        const u16 *source;
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
             if (!p->unk419) {
+                u32 *palette;
+                i = 0;
+                palette = &p->actionVariantResource;
                 destination = (u16 *)((u8 *)p + 0x380);
                 base = (u16 *)p->visualParameters;
-                for (i = 0; i < 16; i++) {
+                for (; i < 16; i++) {
                     if ((u32)(i - 5) <= 1 || i == 13)
                         *destination = *base;
                     else
@@ -230,7 +240,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                     destination++;
                     base++;
                 }
-                p->actionVariantResource = (u32)((u8 *)p + 0x380);
+                *palette = (u32)((u8 *)p + 0x380);
             } else {
                 destination = (u16 *)((u8 *)p + 0x380);
                 for (i = 15; i >= 0; i--) {
@@ -246,10 +256,6 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         p->actionEighteenDuration--;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateVisualPalette);
-#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
 
