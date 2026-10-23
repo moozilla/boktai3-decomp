@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+
+// Remaining difference: the first two pointer copies use the opposite register order.
 #ifdef NONMATCHING
-// fuzzy: 93.3%
-// foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
 struct Slot7Motion {
     u8 pad0[0xAE];
     u8 phase, reset, entered;
@@ -27,11 +27,13 @@ static inline void BeginPhase(struct PhaseState *p, s32 phase)
     p->timer = 0;
     p->entered = 1;
 }
+#define Slot7_UpdateMotionPhase sub_081EF440
 void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
 {
     struct PhaseState *other = (struct PhaseState *)p;
+    u8 *reset = &p->reset;
     asm("" : "+r"(other));
-    if (p->reset) {
+    if (*reset) {
         BeginPhase((struct PhaseState *)p, 1);
     }
     Callback_InvokeActor(p, gUnk_08613DA8[p->phase]);
@@ -41,8 +43,10 @@ void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
                 BeginPhase((struct PhaseState *)p, 3);
                 p->previousPhase = 3;
             } else {
-                ((struct PhaseState *)p)->phase = 4;
-                ((struct PhaseState *)p)->timer = 0;
+                u32 phase = 4;
+                u32 zero = 0;
+                ((struct PhaseState *)p)->phase = phase;
+                ((struct PhaseState *)p)->timer = zero;
                 other->entered = 1;
                 p->previousPhase = 4;
             }
