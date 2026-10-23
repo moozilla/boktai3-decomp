@@ -1,8 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 82.4%
-// Remaining differences: timer/radius register lifetimes and vector load ordering.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -63,7 +61,7 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
 }
 static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
-    d->x = b->x + a->x;
+    d->x = a->x + b->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
@@ -82,6 +80,7 @@ void Ratatosk_UpdateOrbitingParticlePose(struct Actor *p)
     u8 params[0x18];
     struct Vec delta, spawn;
     u32 *timer;
+    u32 *savedTimer;
     if (p->changed) {
         p->changed = 0;
         SceneActors_StartUnmirroredAnimation(p, p->animationData, p->animation, 31, 1, 4);
@@ -89,21 +88,36 @@ void Ratatosk_UpdateOrbitingParticlePose(struct Actor *p)
     }
     spawn = p->anchor;
     timer = &p->timer;
-    polar(&delta, (u8)(Mod(*timer, 31) << 3), 160);
+    {
+        s32 angle = (u8)(Mod(*timer, 31) << 3);
+        s32 radius = 160;
+        struct Vec *out = &delta;
+        s32 product = gUnk_086149C4[(angle + 64) & 255] * radius;
+        savedTimer = timer;
+        out->x = trunc12(product);
+        out->y = 0;
+        out->z = trunc12(gUnk_086149C4[angle] * radius);
+    }
     sum(&spawn, &spawn, &delta);
     spawn.y += 256;
     SlotMotion_Initialize(params);
     Ratatosk_ConfigureParticle(params, 20, 0, 0, 2, 0);
     SceneParticles_SpawnAtPosition(params, &spawn);
-    if (*timer > 5)
-        p->flags |= 0x800000;
-    if (*timer > 120) {
-        Sound_StopSong(0x56b);
-        p->finished = 1;
+    {
+        register u32 *current asm("r1") = savedTimer;
+        asm("" : "+r"(current));
+        if (*current > 5) {
+            u32 mask = 0x800000;
+            p->flags |= mask;
+        }
+    }
+    {
+        register u32 *current asm("r2") = savedTimer;
+        asm("" : "+r"(current));
+        if (*current > 120) {
+            Sound_StopSong(0x56b);
+            p->finished = 1;
+        }
     }
     Callback_InvokeActor(p, p->callback);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F55B0);
-#endif
