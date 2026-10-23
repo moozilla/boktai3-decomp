@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 82.7%
+// fuzzy: 86.6%
 // Remaining differences: pointer lifetimes, animation flag stores and register allocation.
 struct ParticleVector {
     u16 x, y, z, unused;
@@ -126,9 +126,9 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+            { struct Projectile *dst = sprite; asm("" : "+r"(dst)); dst->flags |= 4; }
         else
-            sprite->flags &= ~4;
+            { struct Projectile *dst = sprite; asm("" : "+r"(dst)); dst->flags &= ~4; }
     }
     {
         u32 input = state->flags;
