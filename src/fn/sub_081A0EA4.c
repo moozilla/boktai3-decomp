@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 84.6%
+// fuzzy: 95.7%
 // foundry draft (worker best 84.6%); what differs is mostly register allocation and instruction order
 #define gMotionRandomIndex gUnk_03005308
 #define gMotionRandomTable gUnk_0203B400
@@ -31,12 +31,12 @@ void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void *MotionEntry_CreateWithDelta(u32, MotionDelta *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
-static inline s32 nextRandom(void)
+static inline s32 nextRandom(const u16 *table)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + (u32)table);
 }
 static inline void emitBurst(u32 emitter)
 {
@@ -44,10 +44,12 @@ static inline void emitBurst(u32 emitter)
 
     for (i = 3; i >= 0; --i) {
         MotionDelta delta = {0};
-        delta.x = (nextRandom() & 15) - 8;
-        delta.y = nextRandom() & 7;
-        delta.z = (nextRandom() & 15) - 8;
-        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom() % 4, 60);
+        register const u16 *table asm("r4") = gUnk_0203B400;
+        asm("" : "+r"(table));
+        delta.x = (nextRandom(table) & 15) - 8;
+        delta.y = nextRandom(table) & 7;
+        delta.z = (nextRandom(table) & 15) - 8;
+        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table) % 4, 60);
     }
 }
 void Hresvelgr_EmitRandomMotionBurst(HresvelgrActor *p)
