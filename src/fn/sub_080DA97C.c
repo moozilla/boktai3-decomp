@@ -4,7 +4,7 @@
 // confidence=low: chooses a route, pursuit, or recovery response from the movement flags.
 
 #ifdef NONMATCHING
-// fuzzy: 85.4%
+// fuzzy: 86.3%
 // Still differs in turn-loop allocation, PRE stack slots, flag-load order, and far-branch layout.
 #include "scene_actor_chase.h"
 
@@ -61,7 +61,7 @@ static inline void Mummy_BeginTurn(void *obj, u8 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!Chase_MotionFlags(actor, 0x400) && !Mummy_TestGroup(actor, 4)) {
-        s32 prior = actor->direction;
+        register s32 prior asm("r7") = actor->direction;
         s32 tries = 0;
         s32 choice;
         do {

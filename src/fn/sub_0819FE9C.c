@@ -3,7 +3,7 @@
 // confidence=low: coordinates player positioning and release.
 
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fuzzy: 87.5%
 // Remaining differences: release-target vector/address lifetimes and RNG register allocation.
 #include "engine.h"
 
@@ -216,16 +216,14 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             break;
         case 3: {
             u32 y;
-            struct Vec *position;
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 2);
                 action->frame = 1;
                 Sound_PlaySong(0x3dd);
             }
             y = actor->position.y;
-            position = &actor->position;
-            if (y <= (u32)Height(position)) {
-                actor->position.y = Height(position);
+            if (y <= (u32)Height(&actor->position)) {
+                actor->position.y = Height(&actor->position);
                 ActionState_AdvanceState(action);
             } else {
                 struct Vec delta;

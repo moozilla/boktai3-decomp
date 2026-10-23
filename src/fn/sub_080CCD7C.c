@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: existing Golem state interpretation retained.
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -193,8 +194,9 @@ static inline void SetControlZ(struct SceneActorRegistryResetView *actor, u32 ki
 /* Turn towards direction690, spending stamina; jumps to the caller's resume/commit labels. */
 #define GOLEM_TURN(body)                                                                           \
     {                                                                                              \
-        body->direction691 = body->direction690;                                                   \
         zero = 0;                                                                                  \
+        asm("" : "+r"(zero));                                                                      \
+        body->direction691 = body->direction690;                                                   \
         body->direction = body->direction690;                                                      \
         body->stamina680 -= 10;                                                                    \
         byteZero = 0;                                                                              \
@@ -399,6 +401,7 @@ static inline void SetCommand(struct SceneActorReactionCommand *command, void *p
     command->second = 0;
     command->kind = kind;
 }
+#define Golem_UpdateChargePursuit sub_080CCD7C
 void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;

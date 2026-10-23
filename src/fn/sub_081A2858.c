@@ -99,16 +99,14 @@ static inline void SetSequence(struct Actor *p, u16 sequence, u32 offset)
     p->f1CE = sequence;
     p->f1DC = (u8 *)p + offset;
 }
-// Remaining differences: loop-index constant scheduling and camera flag operand allocation.
-#ifdef NONMATCHING
-// fuzzy: 98.3%
+#define Hresvelgr_UpdateCollisionPresentation sub_081A2858
 void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
 {
     struct Actor *p2 = p;
     struct Collider *c;
-    register s32 i asm("r5");
+    s32 i;
     u32 *flags;
-    u32 *resetA, *resetB;
+    u32 *resetB, *resetA;
     SceneActors_UpdateEffects(p);
     if (p->invulnA) {
         u32 mask = 4;
@@ -136,18 +134,16 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         p->unused31C = 0;
         resetA = &p2->resetA;
         resetB = &p2->resetB;
-        i = 1;
-        do {
+        for (i = 0; i < 2; i++) {
             c->flags |= 4;
             c->flags &= ~8;
             c++;
-        } while (--i >= 0);
+        }
     } else {
         c->box = p->attackBox;
         resetA = &p2->resetA;
         resetB = &p2->resetB;
-        i = 1;
-        do {
+        for (i = 0; i < 2; i++) {
             {
                 s32 mask = ~4;
                 c->flags = (c->flags & mask) | 8;
@@ -155,7 +151,7 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
             Collider_SetPosition(c, &p->collisionPosition, 0);
             c->direction = p->direction << 6;
             c++;
-        } while (--i >= 0);
+        }
     }
     c = &p->body;
     if (!test(&*flags, 8)) {
@@ -193,17 +189,24 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
             SetSequence(p, 0x2F0, 0x424);
         }
     }
-    if (test(flags, 0x200000) && !test(&gUnk_02000560, 4)) {
-        if (!(p2->cameraFlags & 4)) {
+    if (test(flags, 0x200000)) {
+        register u32 cameraMask asm("r1") = 4;
+        asm("" : "+r"(cameraMask));
+        if (gUnk_02000560 & cameraMask)
+            goto defaultCamera;
+        if (!(p2->cameraFlags & cameraMask)) {
             ColliderActor_UpdateCameraOffset(p);
             goto cameraDone;
         }
         Camera_SetOffset(8, p2->position);
-    } else if (test(flags, 2)) {
-        Camera_SetOffset(8, p2->position);
     } else {
-        p->cameraState = 0;
-        Camera_ResetOffset(8);
+    defaultCamera:
+        if (test(flags, 2)) {
+            Camera_SetOffset(8, p2->position);
+        } else {
+            p->cameraState = 0;
+            Camera_ResetOffset(8);
+        }
     }
 cameraDone:
     if (test(&*flags, 0x400000)) {
@@ -219,7 +222,3 @@ cameraDone:
     *resetA = 0;
     *resetB = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateCollisionPresentation);
-#endif

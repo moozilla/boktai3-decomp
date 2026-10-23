@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.5%
-// foundry draft (worker best 88.2%); what differs is mostly register allocation and instruction order
+#define Vanargand_UpdateMode3Transition sub_081A84B0
+
 struct VanargandTarget {
     u8 pad0[0x418];
     u8 mode;
@@ -37,11 +36,11 @@ static inline u8 Vanargand_IsTargetMode(u8 mode)
         return TRUE;
     return FALSE;
 }
-static inline u8 Vanargand_SelectMode(s16 condition)
+static inline void SetNext(struct VanargandTransition *p, u32 mode, u32 zero)
 {
-    if (condition == 0)
-        return 14;
-    return 11;
+    p->mode = mode;
+    p->counter = zero;
+    p->pending = 1;
 }
 void Vanargand_UpdateMode3Transition(void *object)
 {
@@ -56,14 +55,9 @@ void Vanargand_UpdateMode3Transition(void *object)
         p->state = state;
     } else if (p->active) {
         if (((struct VanargandTransition *)object)->condition == 0)
-            p->mode = 14;
+            SetNext(p, 14, consumed);
         else
-            p->mode = 11;
-        p->counter = consumed;
-        p->pending = 1;
+            SetNext(p, 11, consumed);
     }
     p->counter++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateMode3Transition);
-#endif
