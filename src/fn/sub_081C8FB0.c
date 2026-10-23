@@ -2,9 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "state_actor.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.4%
-// fix.py best version (reprinted C)
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
 
@@ -14,9 +11,8 @@ struct Context {
     struct StateActor *targetActor;
 };
 
-static inline s32 near(struct StateActor *p, struct StateActorPos *b)
+static inline s32 near(struct StateActor *p, struct StateActorPos *a, struct StateActorPos *b)
 {
-    struct StateActorPos *a = &p->position;
     s32 limit;
     s32 x;
     s32 result;
@@ -55,7 +51,7 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
         facing = ((u8 *)ctx->targetActor)[0x2d];
     else
         facing = 0;
-    if (!near(p, ctx->target))
+    if (!near(p, &p->position, ctx->target))
         goto fail;
     if (checkAngle == 0)
         goto success;
@@ -95,6 +91,3 @@ fail:
 done:
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C8FB0);
-#endif
