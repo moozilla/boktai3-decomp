@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 struct SlimeReactionContext {
     u8 unknown0[0x3d4];
@@ -74,32 +75,37 @@ static inline u32 DamageFlags(struct SceneActorRegistryResetView *actor)
     return actor->field2DC;
 }
 #ifdef NONMATCHING
-// fuzzy: 91.5%
-// Remaining differences: reaction-field addressing, RNG comparison, and register allocation.
+// fuzzy: 96.6%
+// Remaining differences: reaction-field addressing, split-script offset reuse, and register allocation.
 // confidence=low: reaction callback chooses split/idle/recovery states after damage.
 u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
 {
     struct SlimeReactionContext *context = actor->context;
     u16 *motionFlags;
     u32 zero;
+    u32 damage;
     if (actor->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x3bf);
     if (actor->paletteOffset == 3)
         Slime_EmitTargetedReactionBurst(actor);
-    motionFlags = &actor->flags2D4;
-    Clear(motionFlags, ~0x20);
+    Clear(&actor->flags2D4, ~0x20);
     context->timer += 80;
-    if (!(MaskedDamage((void *)&actor->flags2D4, CollisionFlags(&actor->colliderA), 0x7f)) &&
-        context->splitScript) {
+    damage = MaskedDamage((void *)&actor->flags2D4, CollisionFlags(&actor->colliderA), 0x7f);
+    motionFlags = &actor->flags2D4;
+    if (damage == 0 && context->splitScript) {
         if (actor->health < context->healthThreshold)
             Slime_RunPendingActionScript(actor);
         else {
             u32 index = (gUnk_03005308 + 1) & 1023;
             gUnk_03005308 = index;
-            if ((s32) * (const u8 *)((u32)gUnk_0203B400 + index * 2) <= 24)
-                Slime_RunPendingActionScript(actor);
+            {
+                s32 random = *(const u8 *)((u32)gUnk_0203B400 + index * 2);
+                asm("" : "+r"(random));
+                if (random <= 24)
+                    Slime_RunPendingActionScript(actor);
+            }
         }
     }
     if ((DamageFlags(actor) & 0x40000)) {
