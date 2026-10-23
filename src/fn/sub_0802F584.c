@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 98.2%
+// fuzzy: 99.1%
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -68,12 +68,6 @@ static inline s32 CurrentX(struct Probe *p)
     register struct Probe *raw asm("r4") = p;
     asm("" ::"r"(raw));
     return raw->current.x;
-}
-static inline u32 AnimType(u32 *p)
-{
-    register u32 *raw asm("r4") = p;
-    asm("" ::"r"(raw));
-    return *raw;
 }
 static inline s32 TargetX(struct Probe *p)
 {
@@ -165,18 +159,23 @@ void SceneActorAnimation_UpdateNavigationWalk(void *unused, u8 *p)
         } else {
             u32 flags;
             if (DisplayAnimation_GetFrameBoundary(anim, &flags)) {
+                register u32 *reader asm("r4") = anim;
                 s32 speed;
+                s32 targetX;
                 s32 angle;
                 struct Vec step;
-                if (AnimType(anim) == 2) {
+                asm("" ::"r"(reader));
+                if (*reader == 2) {
                     s32 flag = flags & 1;
                     speed = 64;
                     if (flag)
                         speed = 32;
                 } else
                     speed = 16;
-                angle = Math_Atan2(TargetX(probe) - motion->pos.x,
-                                   TargetZ(probe) - PositionZ(savedPos));
+                targetX = TargetX(probe);
+                targetX -= motion->pos.x;
+                asm("" ::"r"(reader));
+                angle = Math_Atan2(targetX, TargetZ(probe) - PositionZ(savedPos));
                 U8(p, 0x65) = angle;
                 Facing(p, angle);
                 Polar(&step, motion->angle, speed);
