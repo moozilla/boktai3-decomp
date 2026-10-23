@@ -2,7 +2,6 @@
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
-
 struct Types {
     u32 values[4];
 };
