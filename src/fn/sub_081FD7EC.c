@@ -35,15 +35,15 @@ void OrbitEffect_AdjustHeading(void *);
 struct OrbitVec *Player_GetEffectivePosition(s32);
 s32 Math_Atan2(s32, s32);
 void Projectile_InitParameters(void *);
-void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
+void Projectile_SetLaunchParameters(void *, u16, u32, u32, u32);
 void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, void *);
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-#ifdef NONMATCHING
-// fuzzy: 97.3%
+
+#define OrbitEffect_FireVolley sub_081FD7EC
 u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
 {
     if (p->wide == 0)
@@ -65,7 +65,7 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 sprites = *(const struct OrbitW4 *)gUnk_0824FE34;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
                 {
-                    register u32 tb asm("r5") = (u32)((const u16 *)0x0203B400);
+                    u32 tb = (u32)((const u16 *)RANDOM_TABLE_ADDR);
                     r = *(const u16 *)((gUnk_03005308 << 1) + tb);
                 }
                 r &= 3;
@@ -101,7 +101,7 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 s16 sixty;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
                 {
-                    register u32 tb asm("r4") = (u32)((const u16 *)0x0203B400);
+                    u32 tb = (u32)((const u16 *)RANDOM_TABLE_ADDR);
                     r = *(const u16 *)((gUnk_03005308 << 1) + tb);
                 }
                 r &= 3;
@@ -144,6 +144,3 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", OrbitEffect_FireVolley);
-#endif
