@@ -1,44 +1,31 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 66.2%
-// 7 differing instruction runs; first diff at +0x18 (movs r1, #4 vs ldr r0, [pc, #0x38])
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-void Callback_InvokeActor(u8 *, void *);
-static inline u32 test(u32 *p, u32 m)
-{
-    return *p & m;
-}
-struct S {
-    u8 pad[0x284];
-    void **table;
-    u8 pad2[0x20];
-    u8 b[4];
-    u32 word;
-    u8 pad3;
-    u8 end;
-};
-void sub_08131B40(u8 *s)
+#include "scene_actor_reset.h"
+extern u32 gUnk_030053F0, gUnk_02000560;
+static inline u32 IsSuspended(void)
 {
     u32 mask = 0x400;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask || test(&gUnk_02000560, 4)) {
-        u32 two = 2;
+    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+}
+static inline u32 HasOverride(void)
+{
+    u32 mask = 4;
+    return gUnk_02000560 & mask;
+}
+#define SceneActorBehavior_DispatchTable284OrEnterState2 sub_08131B40
+void SceneActorBehavior_DispatchTable284OrEnterState2(struct SceneActorRegistryResetView *actor)
+{
+    if (IsSuspended() || HasOverride()) {
+        u32 state = 2;
         u32 one = 1;
-        u8 *p = s + 0x2A8;
-        u32 zero = 0;
-        *p = two;
-        p = s + 0x2A9;
-        *p = zero;
-        ++p;
-        *p = one;
-        p += 2;
-        *(u32 *)p = zero;
-        s[0x2B1] = one;
+        u32 zero;
+        u8 *p = &actor->state2A8;
+        zero = 0;
+        *p = state;
+        actor->phase2A9 = zero;
+        actor->behavior2AA = one;
+        actor->counter2AC = zero;
+        actor->field2B1 = one;
     } else {
-        u32 i = s[0x2AA];
-        struct S *obj = (struct S *)s;
-        Callback_InvokeActor(s, obj->table[i]);
+        Callback_InvokeActor(actor, actor->callbacks284[actor->behavior2AA]);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08131B40);
-#endif

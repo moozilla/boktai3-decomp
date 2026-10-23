@@ -543,6 +543,7 @@ address,isa,evidence,replacement_end
 081EC628,thumb,Hidden raw-tail function (retained),
 081ED1A4,thumb,Hidden tail after SceneActors_UpdateIdleDisplay,
 081ED89C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081ED8A0
+081EEDDC,thumb,Independent display callback after 081EEAD8 return with its own push r4-lr and pop-bx; exact 84-byte C body,081EEE30
 081EEEC0,thumb,Hidden raw-tail function,081EEECC
 081EF12C,thumb,Hidden raw-tail function,081EF140
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
