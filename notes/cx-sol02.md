@@ -32,3 +32,11 @@ Tags: #matching #vanargand
   categorized as Register-pinned. Removed an inherited unsupported flag comment.
 - 081A8A0C matched: `Vanargand_UpdateMode23Transition`.
 - 081A8AE4 matched: `Vanargand_UpdateMode24Transition`.
+
+## Session 2 integration
+
+- The combined build exposed missing linker aliases when an exact worker
+  definition retains `sub_XXXXXXXX` after its descriptive name is in the CSV.
+  Updated `tools/split.py` to preserve both function and even-address aliases;
+  focused fixtures cover both naming directions and interior references.
+- Combined batch validation: `build/boktai3.gba: OK`.
