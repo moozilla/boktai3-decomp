@@ -30,3 +30,27 @@ The wrap-up marker appeared during integration; no further function attempts wer
 ## Session h2 continuation
 
 - 08141BAC drafted 94.4%: signed history smoothing loop recovered in the pending continuation commit. Three register-only instructions differ; no exact credit. Reviewed extent is 108 bytes.
+
+- 08141C40 skipped: existing 99.9% draft differs in one null-branch target. Explicit bypasses, nested guards and empty barriers disturb redundant checks and constant reuse; retained the original draft.
+- 081432DC matched (register-pinned): explicit facing local preserves load order and pointer reuse. Holding block follows the cue tail; narrow reset and field-read helpers resolve register allocation. Depin reduces the hints from 26 to 10.
+- 08143604 matched without hints: separate parameter setter controls the 366 constant lifetime; depin removes every hint.
+- 08143B54 drafted 90.8% (from 89.0%): inline actor-cell calculation preserves the direct field loads and an explicit saved x coordinate. A memory barrier retains the later z reload. Two structural and 39 total instruction differences remain; fixed-register experiments did not help.
+- 08143ED0 drafted 99.9% (from 93.9%): safe flag helpers and byte-valued mode/global predicates recover the tail. One null-branch target remains, as in 08141C40. Explicit bypass variants regress.
+- 08144AAC matched without hints, tentative Player_UpdateBarrierRecovery: ported the resource-recovery sibling and retained the positive-input early break in phase two to reproduce its branch trampoline.
+- 08145254 matched without hints, tentative Player_UpdateInterpolatedMotion: duration and elapsed pointer locals plus a retained duration value reproduce the deltas and divisions. A nested rounding helper returns through a separate local. Depin removes every hint; broad coordinate pins had regressed.
+- 081462DC matched without hints, tentative Player_UpdateTimedScreenTransition: six animation/transition phases; declaring the flag pointer before the zero local fixes the last ordering difference.
+- 08147FB8 matched (register-pinned): explicit resource load, timer address and final latch addresses repair the tail. Depin reduces hints from 29 to 17.
+- 08148318 skipped: existing 87.6% wavering draft has RNG allocation, even-direction scheduling and literal-pool differences. Masked RNG helper and explicit offset/return constraints regressed to 84.7%; original retained.
+- 08148B64 skipped: existing 99.4% draft differs only in duration-offset register r0 versus r3. Direct pointer pins alter earlier allocation; readonly offset constraints add a copy. Clobber and memory barriers do not improve it.
+- 081491E4 matched (register-pinned), tentative Player_UpdateRearSpiralCue: reused the sprite stepper; a packed position copy reproduces the paired coordinate writes without uninitialized values. Sixteen-frame exit completes the body.
+- 0814957C skipped: existing 97.6% draft differs in facing-address scheduling and final state-offset register. An explicit facing pointer fixes the first order but breaks side-store tail merging; inline setter and tail pointer constraints also regress.
+- 08149DF0 skipped: existing 99.3% draft has the same two duration-offset register differences as 08148B64. Natural parameter setter, readonly offsets and scoped duration helpers did not improve it.
+
+- 0814A854 matched (register-pinned): an empty loop-counter barrier retains the observed ascending three-entry callback loop; depin removes the register binding.
+- 0814A9D4 matched (register-pinned), tentative Player_UpdateSelectedSpinAttack: adapted the exact 0823F928 sibling. Added the intermediate charge stage, standard-player callbacks, selected projectile and attack-facing APIs, and the timer-zero spin cue. Reviewed all nine phases and the packed particle/collider vectors; no new instruction hints were required beyond the sibling's pending-value binding.
+- 0814B078 drafted 80.2%: nearest visible list target and distance-derived motion duration recovered. Typed player accesses and the exact projection helper improve the shape; a source-pointer barrier prevents inappropriate coordinate reuse. Remaining duplicated-flag and projection-temporary scheduling differs. Natural-only and broad high-register variants regress.
+- 0814C248 drafted 77.8%: related fixed-range target scan, with signed squared-distance comparison and no duration calculation. Ported the retained target/projection layout; register and frame scheduling remain different.
+
+## Batch 2
+
+Nine exact matches add approximately 0.241 percentage points of code coverage (5,812 bytes). Five use register-pinning concessions (3,476 bytes); four need no hints (2,336 bytes). Four new or improved guarded drafts earn no exact credit. Five other functions retain their earlier drafts after bounded attempts. The initial 08141BAC continuation draft was validated and merged separately before this batch. Next assigned function: Player_ComputeActionScale.
