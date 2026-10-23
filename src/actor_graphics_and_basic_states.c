@@ -527,7 +527,78 @@ fail:
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022DBC);
+// confidence=low: chooses the next action phase from the reaction kind and flash state.
+#define SceneActorState_SelectReactionPhase sub_08022DBC
+// MATCHING_CONCESSION: register-pinning
+static inline s32 phaseValue(u8 *p)
+{
+    s32 value = *p;
+    return value;
+}
+void SceneActorState_SelectReactionPhase(u8 *p)
+{
+    u32 phase;
+    u8 *actor = p;
+    if (*(u32 *)(p + 0x358) == 3) {
+        if (p[0x3b9]) {
+            phase = 14;
+            goto set;
+        }
+    } else {
+        if (p[0x3b9] == 3)
+            SceneActors_StopBackgroundFlash(p);
+        else if (p[0x3b9]) {
+            phase = 14;
+            asm("" : : "i"(1));
+            goto set;
+        }
+    }
+    switch (*(u16 *)(actor + 0x3b2)) {
+        case 0:
+            phase = 9;
+            break;
+        case 1:
+            phase = 10;
+            break;
+        case 2:
+            if (*(u32 *)(actor + 0x358) != 3 && phaseValue(p + 0xe1) <= 63) {
+                u8 *flag = actor + 0x394;
+                *flag = 1;
+            } else {
+                u8 *flag = actor + 0x394;
+                *flag = 0;
+            }
+            phase = 2;
+            break;
+        case 3:
+            phase = 11;
+            break;
+        case 4:
+            if (phaseValue(p + 0xe1) <= 63) {
+                phase = 14;
+                asm("" : : "i"(3));
+            } else {
+                phase = 11;
+                asm("" : : "i"(4));
+            }
+            break;
+        case 5:
+            phase = 15;
+            break;
+        case 6:
+            phase = 16;
+            break;
+        default:
+            return;
+    }
+set: {
+    register u8 *phaseField asm("r2") = p + 0xae;
+    u32 zero = 0;
+    *phaseField = phase;
+    *(u32 *)(p + 0xc4) = zero;
+    p[0xb0] = 1;
+}
+}
 
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
 #define SceneActorState_SnapReactionPosition sub_08022EA4
@@ -1609,7 +1680,7 @@ static inline u8 enter_08023EC0(State_08023EC0 *p)
     return 0;
 }
 
-void sub_08022DBC(void *);
+void sub_08022DBC(u8 *);
 
 void SceneActorState_UpdateVariantActionPlayback(Actor_08023EC0 *p)
 {
