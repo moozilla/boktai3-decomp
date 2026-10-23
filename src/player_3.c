@@ -44,16 +44,129 @@ void Player_LoadVisualParameters(struct Player *p)
     p->visualParameterC = t[1];
 }
 
+#ifdef NONMATCHING
+// fuzzy: 60.3%
+// Palette blend layout recovered; channel allocation remains tentative.
+void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weightB, s32 shift)
+{
+    register struct Player *p asm("sl") = actor;
+    register s32 sourceWeight asm("ip") = weightA;
+    register s32 baseWeight asm("sb") = weightB;
+    register const u16 *source asm("r8");
+    register u16 *base asm("r6");
+    s32 i;
+    u8 *brightnessPtr;
+    u32 *palette;
+    if (!sourceWeight) {
+        if (!p->unk419)
+            p->actionVariantResource = (u32)p->visualParameters;
+        else
+            p->visualObject->parameters = (u32)p->visualParameters;
+        return;
+    }
+    source = input;
+    if (!p->unk419) {
+        i = 0;
+        palette = &p->actionVariantResource;
+        base = (u16 *)p->visualParameters;
+        brightnessPtr = p->unkAC6;
+        for (; i < 16; i++) {
+            if ((u32)(i - 5) <= 1 || i == 13)
+                base[16] = base[0];
+            else {
+                u32 color = *source;
+                s32 brightness;
+                register s32 r asm("r4");
+                register s32 g asm("r2");
+                register s32 b asm("r5");
+                s32 br, bg, bb;
+                r = color & 31;
+                brightness = *brightnessPtr;
+                r += brightness;
+                if (r > 31)
+                    r = 31;
+                g = (((u16)color >> 5) & 31) + brightness;
+                if (g > 31)
+                    g = 31;
+                b = (((u16)color >> 10) & 31) + brightness;
+                if (b > 31)
+                    b = 31;
+                color = *base;
+                br = color & 31;
+                bg = ((u16)color >> 5) & 31;
+                bb = ((u16)color >> 10) & 31;
+                r = (sourceWeight * r + baseWeight * br) >> shift;
+                g = (sourceWeight * g + baseWeight * bg) >> shift;
+                b = (sourceWeight * b + baseWeight * bb) >> shift;
+                base[16] = (b << 10) | (g << 5) | r;
+            }
+            source++;
+            base++;
+        }
+        *palette = (u32)((u8 *)p + 0x380);
+    } else {
+        i = 0;
+        brightnessPtr = p->unkAC6;
+        base = (u16 *)p->visualParameters;
+        for (; i < 16; i++) {
+            {
+                u32 color = *source;
+                s32 brightness;
+                register s32 r asm("r4");
+                register s32 g asm("r2");
+                register s32 b asm("r5");
+                s32 br, bg, bb;
+                r = color & 31;
+                brightness = *brightnessPtr;
+                r += brightness;
+                if (r > 31)
+                    r = 31;
+                g = (((u16)color >> 5) & 31) + brightness;
+                if (g > 31)
+                    g = 31;
+                b = (((u16)color >> 10) & 31) + brightness;
+                if (b > 31)
+                    b = 31;
+                color = *base;
+                br = color & 31;
+                bg = ((u16)color >> 5) & 31;
+                bb = ((u16)color >> 10) & 31;
+                r = (sourceWeight * r + baseWeight * br) >> shift;
+                g = (sourceWeight * g + baseWeight * bg) >> shift;
+                b = (sourceWeight * b + baseWeight * bb) >> shift;
+                base[16] = (b << 10) | (g << 5) | r;
+            }
+            source++;
+            base++;
+        }
+        p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
+#endif
 
 void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
 s32 WirelessGame_GetSelectedEquipmentEffect(s32);
 s32 Player_GetUsableEnchantment(struct Player *);
-#ifdef NONMATCHING
-// fuzzy: 87.9%
-// Owner/mode register allocation and shared tail stores differ.
-// confidence=low: applies timed palette overlays and the current enchantment pulse.
+// MATCHING_CONCESSION: register-pinning
+#define Player_UpdateVisualPalette sub_0813CB8C
+
+static inline s32 Player_GetPalettePulseWeight(const u16 *timer)
+{
+    s32 value;
+    if (*timer <= 31)
+        value = *timer;
+    else if (*timer <= 47)
+        value = 32;
+    else if (*timer <= 79)
+        value = 80 - *timer;
+    else
+        value = 0;
+    return value;
+}
+
 void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 {
     register u32 mode asm("r4") = requestedMode;
@@ -82,14 +195,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         if (effect >= 0) {
             p->actionRequestHold = effect + 0x16E;
             source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
-            if (p->actionRequestTimer <= 31)
-                weight = p->actionRequestTimer;
-            else if (p->actionRequestTimer <= 47)
-                weight = 32;
-            else if (p->actionRequestTimer <= 79)
-                weight = 80 - p->actionRequestTimer;
-            else
-                weight = 0;
+            weight = Player_GetPalettePulseWeight(&p->actionRequestTimer);
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             if (++p->actionRequestTimer > 95)
                 p->actionRequestTimer = 0;
@@ -115,13 +221,17 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 p->visualObject->parameters = (u32)p->visualParameters;
         }
     } else {
+        const u16 *source;
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
             if (!p->unk419) {
+                u32 *palette;
+                i = 0;
+                palette = &p->actionVariantResource;
                 destination = (u16 *)((u8 *)p + 0x380);
                 base = (u16 *)p->visualParameters;
-                for (i = 0; i < 16; i++) {
+                for (; i < 16; i++) {
                     if ((u32)(i - 5) <= 1 || i == 13)
                         *destination = *base;
                     else
@@ -130,7 +240,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                     destination++;
                     base++;
                 }
-                p->actionVariantResource = (u32)((u8 *)p + 0x380);
+                *palette = (u32)((u8 *)p + 0x380);
             } else {
                 destination = (u16 *)((u8 *)p + 0x380);
                 for (i = 15; i >= 0; i--) {
@@ -147,11 +257,126 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
     }
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateVisualPalette);
-#endif
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: alternate overlay ramp, pulse and fade modes.
+#define Player_UpdateAlternateVisualPalette sub_0813CE20
 
-INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
+void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
+{
+    register u32 mode asm("r4") = requestedMode;
+    s32 intensity;
+    s32 weight;
+    if (p->actionVariant != p->baseActionVariant) {
+        p->baseActionVariant = p->actionVariant;
+        Player_LoadVisualParameters(p);
+    }
+    intensity = Player_GetVisualEffectFlags(p);
+    if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
+        p->savedSpriteResource = mode;
+        p->unkAC6[0] = intensity;
+        PaletteFade_ApplyBrightenedPalette(p);
+    }
+    if (*(u16 *)((u8 *)p + 0xAE4) == 1) {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            {
+                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                u16 *destination, *base;
+                s32 i;
+                if (!p->unk419) {
+                    u32 *palette;
+                    i = 0;
+                    palette = &p->actionVariantResource;
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    base = (u16 *)p->visualParameters;
+                    for (; i < 16; i++) {
+                        if ((u32)(i - 5) <= 1 || i == 13)
+                            *destination = *base;
+                        else
+                            *destination = *source;
+                        source++;
+                        destination++;
+                        base++;
+                    }
+                    *palette = (u32)((u8 *)p + 0x380);
+                } else {
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    for (i = 15; i >= 0; i--)
+                        *destination++ = *source++;
+                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                }
+            }
+        } else {
+            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+            p->actionEighteenDuration++;
+        }
+    } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
+        const u16 *source;
+        p->actionRequestTimer = 0;
+        source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+        weight = Player_GetPalettePulseWeight(&p->actionEighteenDuration);
+        sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        if (++p->actionEighteenDuration > 95)
+            p->actionEighteenDuration = 0;
+    } else if (p->actionEighteenDuration) {
+        p->actionRequestTimer = 0;
+        if (p->actionEighteenDuration > 31) {
+            {
+                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                u16 *destination, *base;
+                s32 i;
+                if (!p->unk419) {
+                    u32 *palette;
+                    i = 0;
+                    palette = &p->actionVariantResource;
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    base = (u16 *)p->visualParameters;
+                    for (; i < 16; i++) {
+                        if ((u32)(i - 5) <= 1 || i == 13)
+                            *destination = *base;
+                        else
+                            *destination = *source;
+                        source++;
+                        destination++;
+                        base++;
+                    }
+                    *palette = (u32)((u8 *)p + 0x380);
+                } else {
+                    destination = (u16 *)((u8 *)p + 0x380);
+                    for (i = 15; i >= 0; i--)
+                        *destination++ = *source++;
+                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                }
+            }
+        } else {
+            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            weight = p->actionEighteenDuration;
+            sub_0813C9B4(p, source, weight, 32 - weight, 5);
+        }
+        p->actionEighteenDuration--;
+    } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
+        const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+        if ((u16)(p->actionRequestTimer - 33) <= 14)
+            p->actionRequestTimer = 48;
+        if (p->actionRequestTimer <= 32) {
+            weight = p->actionRequestTimer;
+            p->actionRequestTimer = weight - 1;
+        } else {
+            weight = 80 - p->actionRequestTimer;
+            if (++p->actionRequestTimer > 79)
+                p->actionRequestTimer = 0;
+        }
+        sub_0813C9B4(p, source, weight, 32 - weight, 5);
+    } else {
+        p->actionRequestTimer = 0;
+        if (!p->unk419)
+            p->actionVariantResource = (u32)p->visualParameters;
+        else
+            p->visualObject->parameters = (u32)p->visualParameters;
+    }
+}
 
 void Player_SelectSpriteResource(struct Player *p)
 {
@@ -250,9 +475,47 @@ void Player_InitVisualState(struct Player *p)
     Player_UpdateVisualPalette(p, 0);
 }
 
+#define SceneActor_StartRandomizedEffect sub_0813D3B0
+
+void EffectGroup_FadeFirstActive(void *);
+void EffectGroup_SpawnPart(void *, s32, struct SceneVec *, struct SceneVec *, struct SceneVec *,
+                           s32, s32);
+static inline int EffectRandomWith(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
+}
+
 void SceneActor_StartRandomizedEffect(struct Player *);
 
-INCLUDE_ASM("asm/nonmatching", SceneActor_StartRandomizedEffect);
+void SceneActor_StartRandomizedEffect(struct Player *p)
+{
+    struct SceneVec position, velocity, scale;
+    struct SceneVec *source;
+    const u16 *random;
+    if (p->movementModifierKind == 1) {
+        EffectGroup_FadeFirstActive(&p->effectGroup);
+    } else {
+        if (p->movementModifierKind == 2)
+            Sound_PlaySong(0x134);
+        else if (p->movementModifierKind == 3)
+            Sound_PlaySong(0x134);
+        source = *(struct SceneVec **)((u8 *)p + 0x5C0);
+        position.x = source->x;
+        position.y = source->y + 128;
+        position.z = source->z;
+        random = gUnk_0203B400;
+        velocity.x = (EffectRandomWith(random) & 15) - 7;
+        velocity.y = (EffectRandomWith(random) & 31) - 16;
+        velocity.z = (EffectRandomWith(random) & 15) - 7;
+        scale.x = 5;
+        scale.y = 10;
+        scale.z = 5;
+        EffectGroup_SpawnPart(&p->effectGroup, 3, &position, &velocity, &scale, 40, 40);
+    }
+}
 
 void Player_EmitQueuedEffects(struct Player *p)
 {
@@ -288,14 +551,6 @@ void Player_FlushQueuedEffects(struct Player *p)
 }
 
 s32 EffectGroup_Spawn(void *, s32, s32, struct SceneVec *);
-
-static inline int EffectRandomWith(const u16 *table)
-{
-    u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
 
 // confidence=low: queues a randomized status particle and its sound cue.
 void Player_QueueStatusEffect(struct Player *p, s32 a)
@@ -393,7 +648,72 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
+#ifdef NONMATCHING
+// fuzzy: 95.7%
+// Register copies and indexed timer-load allocation remain different.
+
+void Player_EmitQueuedEffects(struct Player *);
+s32 Mod(s32, s32);
+extern u16 gUnk_02000504;
+static inline int Player_NextStatusRandom(void)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+}
+
+static inline u32 Player_ReadStatusBonusBits(u32 *flags, u32 mask)
+{
+    u32 m = mask;
+    return *flags & m;
+}
+static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration)
+{
+    *(u16 *)((u8 *)timers + offset) = duration;
+}
+void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
+{
+    register s32 kind asm("r3") = inputKind;
+    s32 offset;
+    switch (kind) {
+        case 0: {
+            u32 count = p->movementModifierActive;
+            offset = 0;
+            if (count && p->movementModifierKind != 3)
+                Player_EmitQueuedEffects(p);
+        } break;
+        case 1:
+            if (p) {
+                u32 flags = Player_ReadStatusBonusBits(&p->statBonusFlags, 0x20000000);
+                offset = 2;
+                if (flags)
+                    break;
+            }
+            {
+                u32 current = p->scriptStatus[kind];
+                offset = kind * 2;
+                if (!current) {
+                    u16 *target = &gUnk_02000504;
+                    s32 random = Mod(Player_NextStatusRandom(), 7);
+                    s32 selection = (s8)p->catalogSavedOption + 1;
+                    selection += random;
+                    selection &= 7;
+                    *target = selection;
+                    p->catalogSavedOption = selection;
+                    Sound_PlaySong(0x138);
+                }
+            }
+            break;
+        default:
+            return;
+    }
+    Player_StoreStatusTimer(p->scriptStatus, offset, duration);
+}
+
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0813D834);
+#endif
 
 void Player_ClearStateTimer(struct Player *p, s32 idx)
 {
@@ -476,28 +796,37 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
     return mode;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.1%
-// Register allocation swaps the preserved actor and input mode.
-s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
+// MATCHING_CONCESSION: register-pinning
+#define Player_SelectFlashingVisualMode sub_0813DB60
+
+s32 Player_SelectFlashingVisualMode(struct Player *arg, s32 inputMode)
 {
-    s32 result = mode;
+    struct Player *p = arg;
+    register s32 mode asm("r2") = inputMode;
     if (p->movementRequestScale) {
         if ((--p->movementRequestScale >> 2) & 1)
             goto flash;
     }
-    return result;
+    return mode;
 flash:
     return p->movementRequestParameter;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectFlashingVisualMode);
-#endif
 
-static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
+static inline void Player_SetVisualStatusBits(u32 *flags, u32 mask)
+{
+    u32 m = mask;
+    *flags |= m;
+}
+static inline void Player_StoreVisualSpeeds(u8 *speeds, s32 speed)
+{
+    *speeds++ = speed;
+    *speeds = speed;
+}
+static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 {
     u16 *timer = (u16 *)((u8 *)p + 0xAF2);
     if (*timer) {
+        s32 speed;
         u8 *sound = (u8 *)p + 0x4E1;
         if (*sound) {
             Sound_PlaySong(0x336);
@@ -505,22 +834,18 @@ static inline void DecayVisualSlowdown(struct Player *p, u32 zero)
         }
         if (--*timer == 0) {
             p->animation.flags &= ~2;
-            p->movementSpeedScale = 64;
-            p->secondarySpeedScale = 64;
+            Player_StoreVisualSpeeds(&p->movementSpeedScale, 64);
         } else {
             p->animation.flags |= 2;
-            {
-                s32 speed = 64 - (*timer >> 1);
-                p->movementSpeedScale = speed;
-                p->secondarySpeedScale = speed;
-            }
+            asm("" ::: "memory");
+            speed = 64 - (*timer >> 1);
+            Player_StoreVisualSpeeds(&p->movementSpeedScale, speed);
         }
     }
 }
-#ifdef NONMATCHING
-// fuzzy: 82.2%
-// Inlined slowdown allocation, flag mask ordering and pointer reuse differ.
 // confidence=low: applies visual status flags and ramps the paired speed scales.
+#define Player_UpdateStatusVisuals sub_0813DB98
+
 void Player_UpdateStatusVisuals(void *actor)
 {
     struct Player *p = actor;
@@ -537,36 +862,32 @@ void Player_UpdateStatusVisuals(void *actor)
             }
             p->animation.flags |= 2;
             {
-                s32 speed = 64 - (*timer >> 1);
+                s32 speed = 64 - (*(u16 *)((u8 *)p + 0xAF2) >> 1);
                 p->movementSpeedScale = speed;
                 p->secondarySpeedScale = speed;
             }
-            p->statusFlags |= 0x50000;
+            Player_SetVisualStatusBits(&p->statusFlags, 0x50000);
         } else {
-            DecayVisualSlowdown(p, 0);
+            Player_DecayVisualSlowdown(p, 0);
         }
         if (*(u16 *)((u8 *)p + 0x534) == 6 || VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
-            p->statusFlags |= 0x20000;
+            Player_SetVisualStatusBits(&p->statusFlags, 0x20000);
         } else {
             p->animation.flags &= ~0x200;
         }
         if (p->kind & 1)
             --*(u16 *)((u8 *)p + 0x538);
     } else {
-        DecayVisualSlowdown(p, remaining);
+        Player_DecayVisualSlowdown(p, remaining);
         if (VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
-            p->statusFlags |= 0x20000;
+            Player_SetVisualStatusBits(&p->statusFlags, 0x20000);
         } else {
             p->animation.flags &= ~0x200;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateStatusVisuals);
-#endif
 
 void Player_AdvanceEffectTick(struct Player *p)
 {
@@ -589,7 +910,7 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
 
 s32 Player_SelectFlashingVisualMode(struct Player *, s32);
 
-void sub_0813CE20(void *, s32);
+void sub_0813CE20(struct Player *, u32);
 
 void sub_0813B950(void *);
 
@@ -1872,50 +2193,49 @@ static inline void SetModeFlag(struct Player *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 85.0%
 // Preserved owner/request registers differ; one exit reloads the mode.
+// MATCHING_CONCESSION: register-pinning
+#define Player_SelectRequestedActionMode sub_0813F8F8
+
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {
-    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
+    register struct PlayerActionRequest *request asm("r2") =
+        (struct PlayerActionRequest *)&p->thresholdMode;
     if (request->kind >= 0 && request->enabled && !request->blocked) {
-        if (p->tetherMode > 1)
-            return p->tetherMode;
+        u8 *mode = &p->tetherMode;
+        if (*mode > 1)
+            return *mode;
         {
             switch (request->kind) {
                 case 3:
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 19;
                 case 2:
                     if (p->actionRequestRestricted == 1) {
                         Sound_PlaySong(0x192);
-                        return p->tetherMode;
+                        return *mode;
                     }
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 10;
                 case 1:
                     if (p->actionRequestRestricted == 1) {
                         Sound_PlaySong(0x192);
-                        return p->tetherMode;
+                        return *mode;
                     }
                     if (gUnk_030053F4 & 0x1000)
-                        return p->tetherMode;
+                        return *mode;
                     return 11;
                 case 0:
                     if (p->actionMode == 0 || p->actionMode == 6)
                         return 2;
-                    return p->tetherMode;
+                    return *mode;
             }
         }
     }
     return p->tetherMode;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectRequestedActionMode);
-#endif
 
 void Player_SetActionRequest(struct Player *p, s32 kind)
 {
