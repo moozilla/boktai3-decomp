@@ -4,9 +4,8 @@
 
 // MATCHING_CONCESSION: register-pinning
 
+// Remaining differences: PRE stack slots, random-loop allocation, and inline reset order.
 #ifdef NONMATCHING
-// fuzzy: 81.1%
-// Remaining differences: PRE stack slots, random-loop allocation, and duration setup order.
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -55,10 +54,13 @@ static inline void BeginContactTurn(void *obj, u32 saved)
         s32 choice;
         const u16 *table = gUnk_0203B400;
         u32 *randomIndex = &gUnk_03005308;
-        register u32 wrap asm("r7") = 1023;
-        register u32 mask asm("r6") = 3;
+        register u32 wrap asm("r7");
+        register u32 mask asm("r6");
         do {
-            u32 index = (*randomIndex + 1) & wrap;
+            u32 index;
+            wrap = 1023;
+            mask = 3;
+            index = (*randomIndex + 1) & wrap;
             *randomIndex = index;
             choice = (table[index] & mask) << 6;
             if (choice != prior)
@@ -81,19 +83,25 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
     actor->counter2AC = counter;
     actor->field2B1 = 1;
 }
+#define SceneActorReaction_UpdateContactRoute sub_0812F5D4
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     u32 result;
     s32 event;
     u16 *scale;
-    Chase_TakeArrived(actor);
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    register u32 updateOffset asm("r4");
+    if (Chase_TakeArrived(actor)) {
+    }
+    updateOffset = 0x270;
+    asm("" : "+r"(updateOffset));
+    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + updateOffset)))
         return;
     if (sub_0812F3CC(actor))
         return;
     result = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
-    if (FullFlags(actor, 0xa02f)) {
+    updateOffset += 0x64;
+    if (*(u16 *)((u8 *)actor + updateOffset) & 0xa02f) {
         u16 *field = &actor->field2C2;
         *field = 64;
         scale = field;
