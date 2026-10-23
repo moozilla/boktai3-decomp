@@ -1,7 +1,9 @@
 #include "global.h"
 
 #define Hresvelgr_GetTravelTarget sub_0819C5D4
-struct BurstVector { s16 x, y, z, pad; };
+struct BurstVector {
+    s16 x, y, z, pad;
+};
 struct BurstActor {
     u8 unknown0[0x51];
     u8 direction;
