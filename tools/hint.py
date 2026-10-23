@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""What C edit closes each difference: the causebook's causes, tested on your draft.
+
+  hint.py FILE.c [FUNC] [--nonmatching] [--compiles N] [--show K]
+  hint.py --eval [--functions N] [--mutants M] [--compiles N] [--seed S]
+
+For each region where your function's code differs from the ROM, prints the
+ROM's and your instructions, then the edit types that the causebook
+(tools/causebook.py) has seen produce exactly that difference in matched code,
+with how often. It then applies the highest-ranked edits to your draft (up to
+--compiles of them, through the agbcc fork server, about 10 ms each) and
+lists the ones that remove a region without adding one, as C diffs you can
+apply. An exact match is written to build/hint/FUNC.c.
+
+--eval measures the causebook's ordering without any model: it takes functions
+that the causebook was not built from, breaks each with one random edit, and
+counts the compiles until the causebook-ordered and a randomly ordered list of
+single edits find one that matches again.
+"""
+import argparse
+import collections
+import json
+import os
+import random
+import sys
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import causebook as atlas  # noqa: E402
+from romlib import ROOT  # noqa: E402
+
+
+def ordered_edits(at, sig, cands, rng=None):
+    """CANDS ({text: (type, desc, fn)}) in the causebook's order for SIG (random order with RNG)."""
+    items = list(cands.items())
+    if rng is not None:
+        rng.shuffle(items)
+        return items
+    rank = {e: i for i, e in enumerate(at.rank(sig))}
+    random.Random(0).shuffle(items)  # ties: no preference for generation order
+    return sorted(items, key=lambda kv: rank.get(kv[1][0], len(rank)))
+
+
+def describe(reg, rom, at):
+    lv, c, nf = at.explain(reg)
+    kind, _, rest = reg["k0"].partition("|")
+    out = [f"region at ROM insn {reg['at']} ({kind}): {rest.replace('|', '  ->  ')[:110]}"]
+    if c:
+        tot = sum(c.values())
+        causes = ", ".join(f"{e} {v / tot:.0%}" for e, v in c.most_common(3))
+        out.append(f"  seen in {nf} matched functions ({lv}); edits that cause it: {causes}")
+    else:
+        out.append("  not in the causebook")
+    return out
+
+
+def cmd_hint(a):
+    import fixsearch
+    import isolate
+    from src import ast_util
+    rel = isolate.ensure(a.file, a.func) if not a.nonmatching else a.file
+    rel, ast, fn, prefix = fixsearch.prepare(rel, a.func)
+    rom = atlas.init_compiler(rel, a.func)
+    base_text = ast_util.to_c(fn)
+    mine = atlas.texts_of(prefix + base_text)
+    if mine is None:
+        print("does not compile")
+        return 2
+    if mine == rom:
+        print("MATCH")
+        return 0
+    at = atlas.Causebook(atlas.load())
+    sig = atlas.signature(rom, mine)
+    print(f"{a.func}: {len(sig)} differing regions (shapes: registers R, constants K)\n")
+    for reg in sig:
+        print("\n".join(describe(reg, rom, at)))
+    cands = atlas.edits(fn, ast, a.func, seeds=3)
+    order = ordered_edits(at, sig, cands)[:a.compiles]
+    before = {(s["k0"]) for s in sig}
+    good = []
+    for t, (etype, desc, _) in order:
+        m2 = atlas.texts_of(prefix + t)
+        if m2 is None:
+            continue
+        if m2 == rom:
+            os.makedirs(os.path.join(ROOT, "build", "hint"), exist_ok=True)
+            path = os.path.join(ROOT, "build", "hint", a.func + ".c")
+            open(path, "w").write(prefix + t)
+            print(f"\nMATCH with {desc}:")
+            print("\n".join("    " + ln for ln in atlas.cdiff(base_text, t)))
+            print(f"written to {os.path.relpath(path, ROOT)}")
+            return 0
+        s2 = atlas.signature(rom, m2)
+        after = {s["k0"] for s in s2}
+        if len(s2) < len(sig) and after <= before:
+            good.append((len(s2), desc, t))
+    good.sort(key=lambda x: x[0])
+    print(f"\ntested {len(order)} edits; {len(good)} remove a region and add none")
+    for n, desc, t in good[:a.show]:
+        print(f"  -> {n} regions left: {desc}")
+        print("\n".join("      " + ln for ln in atlas.cdiff(base_text, t)))
+    return 1
+
+
+# --- evaluation --------------------------------------------------------------------------
+
+def _eval_one(job):
+    unit, func, n_mut, max_compiles, seed, exclude = job
+    import fixsearch
+    import isolate
+    from src import ast_util
+    try:
+        rel = isolate.ensure(unit, func)
+        rel, ast, fn, prefix = fixsearch.prepare(rel, func)
+        rom = atlas.init_compiler(rel, func)
+        if atlas.texts_of(prefix + ast_util.to_c(fn)) != rom:
+            return func, []
+        global _AT
+        rng = random.Random(seed + hash(func) % 1000)
+        muts = list(atlas.edits(fn, ast, func, seeds=3).items())
+        rng.shuffle(muts)
+        out = []
+        for t, (etype, desc, f2) in muts:
+            if len(out) >= n_mut:
+                break
+            mine = atlas.texts_of(prefix + t)
+            if mine is None or mine == rom:
+                continue
+            sig = atlas.signature(rom, mine)
+            ast.ext[-1] = f2
+            cands = atlas.edits(f2, ast, func, seeds=3)
+            ast.ext[-1] = fn
+            res = {"edit": etype, "neighbours": len(cands)}
+            for arm, order in (("atlas", ordered_edits(_AT, sig, cands)),
+                               ("random", ordered_edits(_AT, sig, cands, rng=random.Random(seed)))):
+                res[arm] = None
+                for k, (t2, _) in enumerate(order[:max_compiles]):
+                    if atlas.texts_of(prefix + t2) == rom:
+                        res[arm] = k + 1
+                        break
+            out.append(res)
+        return func, out
+    except Exception as e:
+        return func, [{"err": str(e)[:80]}]
+
+
+_AT = None
+
+
+def cmd_eval(a):
+    global _AT
+    rows = list(atlas.load())
+    mined = {r["func"] for r in rows}
+    import check
+    _, _, sizes = check.inventory()
+    pool_funcs = [x for x in atlas.clean_functions(12, 400) if x[1] not in mined]
+    rng = random.Random(a.seed)
+    rng.shuffle(pool_funcs)
+    test = pool_funcs[:a.functions]
+    _AT = atlas.Causebook(rows)
+    import multiprocessing
+    jobs = [(u, f, a.mutants, a.compiles, a.seed, None) for u, f, _ in test]
+    results = []
+    t0 = time.time()
+    with multiprocessing.get_context("fork").Pool(a.jobs, maxtasksperchild=1) as pool:
+        for k, (func, out) in enumerate(pool.imap_unordered(_eval_one, jobs)):
+            results += [dict(r, func=func) for r in out if "err" not in r]
+            if k % 10 == 0:
+                print(f"{k + 1}/{len(test)} functions, {len(results)} mutants, {time.time() - t0:.0f} s", flush=True)
+    os.makedirs(atlas.OUT, exist_ok=True)
+    json.dump(results, open(os.path.join(atlas.OUT, "eval.json"), "w"))
+    n = len(results)
+    print(f"\n{n} broken mutants of {len(test)} functions the causebook has not seen; "
+          f"mean {sum(r['neighbours'] for r in results) / max(n, 1):.0f} single edits each")
+    for arm in ("atlas", "random"):
+        found = [r[arm] for r in results if r[arm]]
+        for k in (1, 3, 10, a.compiles):
+            print(f"  {arm:6} fixed within {k:3} compiles: {sum(1 for x in found if x <= k) / max(n, 1):5.0%}")
+        if found:
+            print(f"  {arm:6} median compiles when fixed: {sorted(found)[len(found) // 2]}")
+    by = collections.defaultdict(lambda: [0, 0, 0])
+    for r in results:
+        by[r["edit"]][0] += 1
+        by[r["edit"]][1] += bool(r["atlas"] and r["atlas"] <= 3)
+        by[r["edit"]][2] += bool(r["random"] and r["random"] <= 3)
+    print("\nper breaking edit: mutants, fixed within 3 (atlas / random)")
+    for e, (m, x, y) in sorted(by.items(), key=lambda kv: -kv[1][0]):
+        print(f"  {e:28} {m:5}  {x / m:5.0%} / {y / m:5.0%}")
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("file", nargs="?")
+    ap.add_argument("func", nargs="?")
+    ap.add_argument("--nonmatching", action="store_true")
+    ap.add_argument("--compiles", type=int, default=60)
+    ap.add_argument("--show", type=int, default=5)
+    ap.add_argument("--eval", action="store_true")
+    ap.add_argument("--functions", type=int, default=60)
+    ap.add_argument("--mutants", type=int, default=4)
+    ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("-j", "--jobs", type=int, default=os.cpu_count())
+    a = ap.parse_args()
+    os.chdir(ROOT)
+    import permute
+    sys.path.insert(0, permute.PERMUTER)
+    if a.eval:
+        return cmd_eval(a)
+    if a.func is None:
+        import re
+        a.func = re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(a.file).read(), re.M)[-1]
+    return cmd_hint(a)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

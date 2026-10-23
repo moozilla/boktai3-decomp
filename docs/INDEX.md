@@ -255,6 +255,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/depin-manual-5c_2026-10-21.md](../notes/depin-manual-5c_2026-10-21.md) | depin-manual-5c worklog (2026-10-21) |  | 1 |
 | [notes/depin-manual_2026-10-21.md](../notes/depin-manual_2026-10-21.md) | depin-manual worklog (2026-10-21) | *#tooling* | 6 |
 | [notes/depin-search-2026-10-23.md](../notes/depin-search-2026-10-23.md) | Faster depin search: measurements and ideas (2026-10-23) | *#tooling* | 10 |
+| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: step.py, flip.py, causebook; confirmed agbcc rules (2026-10-23) | *#matching* *#tooling* | 6 |
 | [notes/dialogue-vm_2026-10-12.md](../notes/dialogue-vm_2026-10-12.md) | Dialogue interpreter and scrolling controller |  | 2 |
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
