@@ -3,7 +3,7 @@
 // confidence=low: moves two sprite sequences left before destruction.
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 96.1%
+// fuzzy: 98.3%
 // Remaining differences: time/context allocation, decoder literal scheduling, callback setup.
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -160,7 +160,7 @@ void SceneActors_UpdateLeftDeparture(u8 *input, s32 time)
         StepPlayback(foreground, state);
         accent->unknown3C = 4;
         state = &accent->sequence;
-        Anim_SetSequence(state, *(void **)(context + 0x390), 4, 0, 0);
+        Anim_SetSequence(state, *(void **)(p + 0x390), 4, 0, 0);
         StepPlayback(accent, state);
     }
     W(0x280) = -0x5000;
@@ -169,7 +169,7 @@ void SceneActors_UpdateLeftDeparture(u8 *input, s32 time)
     if (S(0x278) < 0) {
         {
             void (*callback)(void *) = SceneActors_DestroyTask;
-            asm("" : "+r"(callback));
+            asm("" : : "r"(callback));
             *(void (**)(void *))((u8 *)input + 0x100) = callback;
         }
         *(s32 *)((u8 *)input + 0x90) = 0;
