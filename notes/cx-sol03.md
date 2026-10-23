@@ -62,3 +62,34 @@ above so they are not confused with completed fresh matching attempts.
 Combined batch validation printed `build/boktai3.gba: OK` after rebasing onto
 main. Privacy range and whitespace checks passed. All ten exact matches retain
 separate per-function commits; the two guarded drafts retain assembly defaults.
+
+
+## Continuation after batch 1
+
+Batch 1 merged in PR #591 after the combined build printed `build/boktai3.gba: OK`.
+The temporary wrap-up signal was removed and work resumed from main.
+
+- SceneHud_TickPaletteBlend: retained 81.7% draft. Separating head and loop
+  timer pointers reduced structural differences from 20 to 9 but increased
+  extent to 372 bytes; early pointer pins and base barriers did not improve it.
+- sub_08167C84: skipped, complete fresh HUD effect update candidate 45.7%.
+  Reconstructed randomized velocity, position, effect arguments and selection
+  transition; stack-vector scalarization and random-state stores remain off.
+- sub_08168214: retained 96.2% draft. The remaining differences are two loop
+  induction spill slots and their initialization/update order. Explicit row and
+  offset locals, earlier row initialization and operand/barrier variants worsened.
+- sub_08168A0C: skipped, complete fresh primary-option reconstruction 56.3%.
+  Four option records are observed, although the shared HUD view exposes three.
+  Register pins worsened the candidate; retained scratch source outside src.
+- PauseMenu_CreateSelectionWidgets: retained 81.9% draft. Compiler flips did
+  not help; separate pinned x/full-vector pointers with early and late barriers
+  worsened allocation and stack handling. Original draft preserved.
+
+- 08127590 SpriteProjectile_Create: new guarded draft 78.1%, reconstructed
+  pooled allocation, sprite/animation setup, random spin and optional collider.
+  Guard order and animation lifetimes remain.
+- 08128D24 FeatherEffectPool_ClipScatterPath: improved guarded draft to 86.2%.
+  Remaining terrain/center pointer lifetimes and register allocation.
+
+Continuation draft batch: no exact coverage gain (0 percentage points).
+Combined validation printed `build/boktai3.gba: OK`; assembly defaults remain.

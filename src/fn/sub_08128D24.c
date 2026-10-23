@@ -2,8 +2,9 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 82.2%
-// Remaining: terrain/center allocation and a defined zero result on the unobstructed path.
+// fuzzy: 86.2%
+// Remaining: terrain/center allocation and pointer/register lifetimes.
+// The original falls through on the unobstructed path without setting its result.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -149,7 +150,6 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
             }
         } while (current != target);
     }
-    return 0;
 }
 
 #else
