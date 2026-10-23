@@ -2,7 +2,7 @@
 // confidence=low: restores a saved patrol destination and delayed command.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
 #ifdef NONMATCHING
-// fuzzy: 80.2%
+// fuzzy: 87.4%
 // Remaining differences: terrain destination spill, flag-address reuse, and reset scheduling; savedMotion need not be volatile.
 void Vorn_SendMessage(void *);
 struct VornPatrolRoute {
@@ -76,13 +76,13 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
         u32 *flags = &actor->flags2D0;
         if (Bits(actor, 0x200000)) {
             *flags &= ~0x1000000;
-            actor->flags2D4 &= ~0x200;
+            ClearMotion(actor, ~0x200);
             *((u8 *)control + 10) = 0;
             control->counter = 0;
             control->timer = 0;
         }
         ClearMotion(actor, ~0x400);
-        *(u8 *)(group + 0x206) = 0xFF;
+        *((u8 *)actor + 0x5DA) = 0xFF;
         ClearMotion(actor, ~0x1000);
         *(u16 *)(context + 0x6D4) = 0;
         *(u16 *)(context + 0x69E) = 0;
