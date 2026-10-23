@@ -1,35 +1,43 @@
 #include "global.h"
-#include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-s32 Player_SelectHistoryDirectionB(struct Player *s)
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: alternate action handlers use the same history selection rule.
+#define Player_SelectHistoryDirectionB sub_0823C368
+
+/* Signed view of the history entries read by this selector. */
+struct PlayerHistory {
+    u8 unknown0[0x34C];
+    s16 directionHistory[10];
+    u8 unknown360[0x3A4 - 0x360];
+    u8 facing;
+};
+
+s32 Player_SelectHistoryDirectionB(struct PlayerHistory *arg)
 {
-    s32 i, previous, direction, clockwise, counterclockwise;
-    s16 *history = s->directionHistory;
-    direction = history[1];
-    if (direction != -1) {
-        if (direction & 1) {
-        returnDirection:
+    struct PlayerHistory *p = arg;
+    s32 direction = p->directionHistory[1];
+    register s32 initialMissing asm("r1") = -1;
+    if (direction != initialMissing) {
+        s32 next, previous, i;
+        register s32 missing asm("r6");
+        const s16 *history;
+        if (direction & 1)
             return direction;
-        }
-        clockwise = (direction + 1) & 7;
-        counterclockwise = (direction + 7) & 7;
-        for (i = 2; i < 10; i++) {
-            previous = history[i];
-            if (previous == -1)
-                continue;
-            if (previous == clockwise)
-                return previous;
-            if (previous == counterclockwise)
-                return previous;
-            if (previous != direction)
-                goto returnDirection;
-        }
+        next = (direction + 1) & 7;
+        previous = (direction + 7) & 7;
+        i = 2;
+        missing = initialMissing;
+        history = &p->directionHistory[2];
+        do {
+            s32 sample = *history;
+            if (sample != missing) {
+                if (sample == next || sample == previous)
+                    return sample;
+                if (sample != direction)
+                    return direction;
+            }
+            history++;
+        } while (++i <= 9);
     }
-    return s->facing;
+    return p->facing;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_SelectHistoryDirectionB);
-#endif
