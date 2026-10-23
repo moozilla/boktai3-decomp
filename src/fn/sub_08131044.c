@@ -9,9 +9,6 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
 #define SceneActorRoute_UpdateRouteCompletion sub_08131044
 
-#ifdef NONMATCHING
-// fuzzy: 81.7%
-// Remaining differences: flag/control offsets, descriptor arguments, and zero-value allocation.
 static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
                                     u32 kind)
 {
@@ -59,6 +56,13 @@ static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior
     }
     a->field2B1 = 1;
 }
+static inline u32 FlagsSave(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
+{
+    u16 *flags = &a->flags2D4;
+    u32 value = *flags & mask;
+    *out = flags;
+    return value;
+}
 static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     return a->flags2D4 & mask;
@@ -83,15 +87,17 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
     u8 *group = (u8 *)&actor->group;
     s32 speed, event;
     u16 *scale;
+    u16 *motionFlags;
 
-    SceneActorControl_TakeFlag(&actor->field2B1);
+    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    }
     if ((u8)Callback_InvokeActor(actor, actor->update270))
         return;
     if ((u8)sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
-    if (Flags(actor, 0xA02F)) {
+    if (FlagsSave(actor, 0xA02F, &motionFlags)) {
         u16 *p = &actor->field2C2;
         *p = 64;
         scale = p;
@@ -116,22 +122,37 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
             }
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
                                                                  speed)) {
-            struct ContactPosition **destination = (void *)(group + 0x200);
+            struct ContactPosition **destination;
+            u32 destinationOffset;
             u32 zero = event;
             *(u16 *)(group + 0x54) = zero;
+            destinationOffset = 0x200;
+            destination = (void *)(group + destinationOffset);
             if ((*destination)->pad != 0) {
                 u8 *control;
                 State(actor, 0, 0, 2, zero);
                 SceneActorMovement_ResolveRoutePosition(actor);
                 control = group + 0x4C;
-                if (actor->flags2CC & 0x200000) {
-                    actor->flags2D0 &= ~0x1000000;
-                    actor->flags2D4 &= ~0x200;
-                    control[0xA] = 0;
-                    *(u32 *)(control + 0x18) = zero;
-                    *(u16 *)(control + 8) = zero;
+                {
+                    register u32 mask asm("r1") = 0x200000;
+                    asm("" : : "r"(mask));
+                    if (actor->flags2CC & mask) {
+                        {
+                            u32 *flags = &actor->flags2D0;
+                            u32 mask = ~0x1000000;
+                            *flags &= mask;
+                        }
+                        *motionFlags &= ~destinationOffset;
+                        control[0xA] = 0;
+                        *(u32 *)(control + 0x18) = zero;
+                        *(u16 *)(control + 8) = zero;
+                    }
                 }
-                actor->flags2CC &= ~0x90;
+                {
+                    u32 *flags = &actor->flags2CC;
+                    u32 mask = ~0x90;
+                    *flags &= mask;
+                }
                 actor->field2C2 = 64;
                 Memory_Clear(*destination, 8);
             } else {
@@ -143,7 +164,3 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
     }
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08131044);
-#endif

@@ -1,9 +1,6 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.9%
-// Open: the 0x876 offset constant is kept in r7 across the clamp where the ROM
-// rematerializes it, and the final random block reuses the earlier seed address and
-// allocates its registers differently (ROM r4 table, r5 seed, r1 index, r3 mask, r2 sample mask).
+// MATCHING_CONCESSION: register-pinning
+#define Weather_Initialize sub_08018028
 #include "background_controller.h"
 struct WeatherState {
     u8 task[0x20];
@@ -38,7 +35,7 @@ static inline u16 RAND(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     return *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
 }
-s32 sub_08018028(struct WeatherState *p)
+s32 Weather_Initialize(struct WeatherState *p)
 {
     u8 *resource;
     void *map;
@@ -93,7 +90,12 @@ s32 sub_08018028(struct WeatherState *p)
     Weather_SetRandomDuration(p);
     p->unknown20 = Script_GetKeywordValue(0x61, 1);
     {
-        s32 storm = gUnk_02000710->unk876;
+        u8 *base = (u8 *)gUnk_02000710;
+        register u32 offset asm("r4") = 0x876;
+        s16 *sensor;
+        s32 storm;
+        sensor = (void *)(base + offset);
+        storm = *sensor;
         *(s32 *)((u8 *)gUnk_02000710 + 0x630) += storm >> 2;
     }
     if (*(s32 *)((u8 *)gUnk_02000710 + 0x630) >= gUnk_02000080)
@@ -127,20 +129,25 @@ s32 sub_08018028(struct WeatherState *p)
     {
         const u16 *table = gUnk_0203B400;
         u32 *seed = &gUnk_03005308;
-        u32 index = (*seed + 1) & 0x3FF;
-        u32 m;
-        p->f4C = (table[index] & 0x7F) + 0x80;
-        index = (index + 1) & 0x3FF;
-        m = 7;
-        p->f44 = (table[index] & m) - 2;
-        index = (index + 1) & 0x3FF;
+        register u32 index asm("r1");
+        u32 mask;
+        register u32 sampleMask asm("r2");
+        u32 sample;
+        index = *seed + 1;
+        mask = 0x3ff;
+        index &= mask;
+        sample = table[index];
+        sampleMask = 127;
+        p->f4C = (sample & sampleMask) + 128;
+        index = (index + 1) & mask;
+        sample = table[index];
+        sampleMask = 7;
+        p->f44 = (sample & sampleMask) - 2;
+        index = (index + 1) & mask;
         *seed = index;
-        p->f48 = (table[index] & m) - 2;
+        p->f48 = (table[index] & sampleMask) - 2;
     }
+
     sub_08017684(p);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08018028);
-#endif

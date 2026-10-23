@@ -1,7 +1,54 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 57.2%
-// Open: first full draft; register allocation and several block layouts differ.
+// fuzzy: 63.1%
+// Open: motion-pointer lifetimes, initial control layout and register allocation differ.
+
+struct WirelessSceneActor {
+    u8 unknown0[4];
+    u32 terrainFlags, previousTerrainFlags;
+    u8 unknownC[4];
+    struct {
+        s32 x, y, z, w;
+    } position;
+    s32 motion[3];
+    u8 unknown2c[0xc];
+    s32 heightA, heightB;
+    u32 flags40;
+    u8 colorEffect[4];
+    u8 unknown48[3];
+    u8 paletteIndex;
+    u8 unknown4c[0xc];
+    u16 timerA, timerB;
+    s32 parameter;
+    u8 unknown60[8];
+    u8 preview[0x58];
+    s32 forwardBias;
+    u8 unknownc4[0x468];
+    u8 contactIndex[0x40];
+    u32 motionFlags;
+    u8 unknown570[0x3c];
+    s32 forwardSpeed, verticalSpeed, lateralSpeed;
+    u8 unknown5b8[4];
+    s32 previousX;
+    u8 unknown5c0[4];
+    s32 previousZ;
+    u8 unknown5c8[4];
+    s32 impulse[4];
+    s32 offsetX;
+    u8 unknown5e0[0xc];
+    s8 impulseFrames;
+    u8 unknown5ed;
+    u8 stateFlags, unknown5ef;
+    u16 heading;
+    u8 unknown5f2[0xa];
+    u32 actionFlags;
+    u8 model[0x250];
+    s8 marker;
+    u8 unknown851[3];
+    u32 index;
+    u32 timer858, timer85C;
+    u32 controlFlags;
+};
 
 typedef void (*ScenePoolStateFunc)(u8 *, u8 *, u8 *, u32);
 extern ScenePoolStateFunc gUnk_0860585C[];
@@ -72,12 +119,14 @@ static inline void RestartState(u8 *item, u32 state, u32 zero)
 
 // confidence=low: per-frame update of one occupied scene-pool actor slot: state dispatch, motion integration,
 // spatial-index placement, proximity/damage effects and marker visibility.
-void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
+#define ScenePool_UpdateOccupiedActor sub_0803C114
+void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
 {
+    struct WirelessSceneActor *a = (struct WirelessSceneActor *)slot;
     u8 *actor = slot;
     u8 *view = actor;
-    u32 *flags;
     s32 speed;
+    u32 *flags;
     s32 *pos5DC, *pos5D0, *pos5D4;
     s32 *speedA, *speedB, *height;
     u16 *heading;
@@ -87,10 +136,10 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
     u32 one;
 
     {
-        u32 *p = &FIELD(actor, 0x5FC, u32);
+        u32 *p = &a->actionFlags;
         u32 mask;
         *p = 0;
-        FIELD(actor, 0x858, u32) = 0;
+        a->timer858 = 0;
         mask = 0x20;
         if (!(*p & mask) && (FIELD(actor, 0xC, u32) & 0x800)) {
             u32 bit = 4;
@@ -107,84 +156,84 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
             RestartState(item, 10, 0);
         }
     }
-    if (FIELD(view, 0x40, u32) & 2)
-        FIELD(view, 0x5B4, u32) = 0;
+    if (a->flags40 & 2)
+        a->lateralSpeed = 0;
     one = 1;
-    if (FIELD(view, 0x40, u32) & one)
-        FIELD(view, 0x5B0, u32) = 0;
+    if (a->flags40 & one)
+        a->verticalSpeed = 0;
     {
-        struct Vec16 *anchors = (struct Vec16 *)(pool + 0x2324);
-        FIELD(item, 0x58, s32) = anchors[FIELD(item, 0x40, u32)].a - FIELD(slot, 0x10, s32);
-        FIELD(item, 0x5C, s32) = anchors[FIELD(item, 0x40, u32)].c - FIELD(slot, 0x18, s32);
+        u32 anchorIndex = FIELD(item, 0x40, u32);
+        FIELD(item, 0x58, s32) = ((struct Vec16 *)(pool + 0x2324))[anchorIndex].a - a->position.x;
+        FIELD(item, 0x5C, s32) = ((struct Vec16 *)(pool + 0x232C))[anchorIndex].a - a->position.z;
     }
     if (FIELD(item, 0x68, u32) <= 11)
         gUnk_0860585C[FIELD(item, 0x68, u32)](pool, slot, item, index);
-    if ((s8)actor[0x5EC] <= 0)
+    if (a->impulseFrames <= 0)
         ScenePool_ApplyMotionControls(slot, item);
     Callback_InvokeActor(actor, FIELD(actor, 0xB0, void *));
-    FIELD(actor, 0x5AC, s32) -= 0x20;
+    a->forwardSpeed -= 0x20;
     {
         u32 mask = 0x20;
-        flags = &FIELD(slot, 0x5FC, u32);
+        flags = &a->actionFlags;
         if (!(*flags & mask))
             ScenePool_ClampMotionSpeeds(actor);
     }
-    FIELD(actor, 0x5B4, s32) = Div(FIELD(actor, 0x5B4, s32) * 90, 100);
+    a->lateralSpeed = Div(a->lateralSpeed * 90, 100);
     if (*flags & one) {
-        FIELD(slot, 0x5AC, s32) = 0;
-        FIELD(slot, 0x5B4, s32) = 0;
-        FIELD(slot, 0xC0, s32) = 0;
+        a->forwardSpeed = 0;
+        a->lateralSpeed = 0;
+        a->forwardBias = 0;
         FIELD(slot, 0xC8, s32) = 0;
-        actor[0x5EC] = 0;
+        a->impulseFrames = 0;
     }
-    speedA = &FIELD(actor, 0x5AC, s32);
-    speedB = &FIELD(actor, 0xC0, s32);
+    speedA = &a->forwardSpeed;
+    speedB = &a->forwardBias;
     speed = *speedA + *speedB;
     if (speed > 0xF000)
         speed = 0xF000;
-    height = &FIELD(actor, 0x5B0, s32);
+    height = &a->verticalSpeed;
     *height += 0x200;
-    if ((s8)actor[0x5EC] > 0) {
+    if (a->impulseFrames > 0) {
         s32 *drift;
-        pos5DC = &FIELD(actor, 0x5DC, s32);
-        drift = &FIELD(actor, 0x5CC, s32);
-        *pos5DC += *drift;
-        *drift += Div(-*drift, (s8)actor[0x5EC]);
-        pos5D0 = &FIELD(actor, 0x5D0, s32);
-        *pos5D0 += Div(-*pos5D0, (s8)actor[0x5EC]);
-        pos5D4 = &FIELD(actor, 0x5D4, s32);
-        *pos5D4 += Div(-*pos5D4, (s8)actor[0x5EC]);
-        actor[0x5EC]--;
+        drift = &a->impulse[0];
+        a->offsetX += *drift;
+        pos5DC = &a->offsetX;
+        *drift += Div(-*drift, a->impulseFrames);
+        pos5D0 = &a->impulse[1];
+        *pos5D0 += Div(-*pos5D0, a->impulseFrames);
+        pos5D4 = &a->impulse[2];
+        *pos5D4 += Div(-*pos5D4, a->impulseFrames);
+        a->impulseFrames--;
     } else {
         Memory_Clear(actor + 0x5CC, 0x10);
-        pos5DC = &FIELD(actor, 0x5DC, s32);
-        pos5D0 = &FIELD(actor, 0x5D0, s32);
-        pos5D4 = &FIELD(actor, 0x5D4, s32);
+        pos5DC = &a->offsetX;
+        pos5D0 = &a->impulse[1];
+        pos5D4 = &a->impulse[2];
     }
     Actor_ClampMovementSpeed(actor);
-    FIELD(actor, 0x20, s32) = speed + *pos5DC - FIELD(actor, 0x5BC, s32);
-    FIELD(actor, 0x24, s32) = *height + *pos5D0;
-    FIELD(actor, 0x28, s32) = FIELD(actor, 0x5B4, s32) + *pos5D4;
-    dx = (*pos5DC - FIELD(actor, 0x5BC, s32)) >> 12;
-    dz = (FIELD(actor, 0x18, s32) - FIELD(actor, 0x5C4, s32)) >> 12;
+    a->motion[0] = speed + *pos5DC - a->previousX;
+    a->motion[1] = *height + *pos5D0;
+    a->motion[2] = a->lateralSpeed + *pos5D4;
+    dx = (*pos5DC - a->previousX) >> 12;
+    dz = (a->position.z - a->previousZ) >> 12;
     if (speed > 0x3000)
         dx = 0x80;
     if (dx == 0 && dz == 0) {
-        heading = &FIELD(actor, 0x5F0, u16);
+        heading = &a->heading;
         *heading = 0xFFFF;
     } else {
         s32 angle = (Math_Atan2(dx, dz) >> 5) << 5;
-        heading = &FIELD(actor, 0x5F0, u16);
+        heading = &a->heading;
         *heading = angle;
     }
-    FIELD(actor, 0x5BC, s32) = *pos5DC;
-    FIELD(actor, 0x5C4, s32) = FIELD(actor, 0x18, s32);
+    a->previousX = *pos5DC;
+    a->previousZ = a->position.z;
     Terrain_ResolveActorMotion(actor);
     {
-        u32 landedZ = (FIELD(actor, 0x3C, s32) >> 12) >= 0;
-        u32 landedX = (FIELD(actor, 0x38, s32) >> 12) >= 0;
-        u32 cur = FIELD(actor, 4, u32);
-        u32 prev = FIELD(actor, 8, u32);
+        u32 landedZ = (u32) ~(a->heightB >> 12) >> 31;
+        u32 landedX = (u32) ~(a->heightA >> 12) >> 31;
+        u32 cur = a->terrainFlags;
+        u32 prev = a->previousTerrainFlags;
         if (cur != prev && (cur & 0x1000) && !(prev & 0xF000) && landedX <= 1 && landedZ == 1) {
             s32 n = ((*speedA >> 10) + (*speedB >> 8)) >> 1;
             if (n <= 3)
@@ -192,7 +241,7 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
             if (n > 0x12)
                 n = 0x12;
             *height -= n << 9;
-            FIELD(actor, 0x40, u32) &= ~1;
+            a->flags40 &= ~1;
         }
     }
     Character_GetHeightAdjustedPosition(actor, position);
@@ -229,7 +278,7 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
             goto countdown;
         if (ScenePool_UpdateProximityCooldown(slot)) {
             ModifierAction_SpawnBurst(actor, CharacterModel_GetPrimaryPaletteIndex(slot + 0x600));
-            FIELD(slot, 0x85C, u32) = 480;
+            a->timer85C = 480;
             item[0x3B] = 0xF0;
         }
     }
@@ -259,7 +308,7 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
         ActorMarkerPool_ShowMarker((s8)slot[0x850]);
     }
     {
-        u32 *visible = &FIELD(slot, 0x56C, u32);
+        u32 *visible = &a->motionFlags;
         if (!(*flags & 8))
             *visible &= ~1;
         else
@@ -279,7 +328,7 @@ void sub_0803C114(u8 *pool, u8 *slot, u8 *item, u32 index)
     }
     ScenePool_ResetProximityContact(slot);
     Character_UpdateTimedEffect(actor + 0x68);
-    if (!(*flags & 0x20) && (FIELD(actor, 0x40, u32) & 4))
+    if (!(*flags & 0x20) && (a->flags40 & 4))
         sub_0811BF44(actor);
     FIELD(item, 0x14, struct Vec16) = FIELD(actor, 0x10, struct Vec16);
 }
