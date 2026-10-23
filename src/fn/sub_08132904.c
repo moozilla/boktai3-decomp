@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 87.1%
+// fuzzy: 88.1%
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -111,8 +111,10 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u32 RandomBits(u32 mask)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308] & mask;
+    const u16 *table = gUnk_0203B400;
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return *(const u16 *)((u32)table + index * 2) & mask;
 }
 static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
