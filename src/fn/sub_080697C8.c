@@ -1,11 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// Remaining: the ROM loads the else-branch 0 for b into r1 (so the two `mov sb` are not
-// cross-jumped), schedules the CpuFill32 mode literal after the fill store, and keeps the
-// flags address in r2.
 #include "gba/macro.h"
 #include "gba/syscall.h"
 struct PackedVec {
@@ -24,12 +20,15 @@ static inline s32 optionalValue(void)
 }
 // confidence=low: spawns a bouncing object from script keywords p (position), a (shot,
 // category), v (velocity), l and n, and sets flag 1 at 0x134.
-void sub_080697C8(void)
+#define BouncingObject_SpawnFromScript sub_080697C8
+void BouncingObject_SpawnFromScript(void)
 {
     struct PackedVec pos;
     struct PackedVec vel;
     struct PackedVec zero;
-    s32 a, b, l, n;
+    s32 a, l, n;
+    register s32 b asm("r9");
+    struct PackedVec *out;
     u8 *object;
     b = 0;
     a = 0;
@@ -40,10 +39,13 @@ void sub_080697C8(void)
     }
     if (Script_SeekToKeyword('a')) {
         a = optionalValue();
-        if (!Script_GetPc())
-            b = 0;
-        else
+        if (Script_GetPc())
             b = Script_GetValue();
+        else {
+            register u32 value asm("r1") = 0;
+            asm("" : "+r"(value));
+            b = value;
+        }
     }
     if (Script_SeekToKeyword('v')) {
         vel.x = optionalValue();
@@ -56,11 +58,23 @@ void sub_080697C8(void)
     }
     l = Script_GetKeywordValue('l', 0);
     n = Script_GetKeywordValue('n', 0);
-    CpuFill32(0, &zero, 8);
-    object = BouncingObject_Spawn(&pos, &vel, &zero, a, b, l, n);
-    if (object)
-        *(u16 *)(object + 0x134) |= 1;
+    {
+        vu32 fill;
+        out = &zero;
+        fill = 0;
+        {
+            const void *source = (const void *)&fill;
+            register void *dest asm("r1") = out;
+            asm("" : : "r"(source), "r"(dest));
+            CpuSet(source, dest, 0x05000002);
+        }
+    }
+    object = BouncingObject_Spawn(&pos, &vel, out, a, b, l, n);
+    if (object) {
+        u16 *flags = (u16 *)(object + 0x134);
+        u32 value = *flags;
+        u32 mask = 1;
+        mask |= value;
+        *flags = mask;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080697C8);
-#endif

@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 72.7%
+// fuzzy: 86.1%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
@@ -28,7 +28,7 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
 {
     struct ContactActor *slot;
     s32 index;
-    const u16 *table;
+    register const u16 *table asm("r8");
     pool->hideRequested = 0;
     pool->clearRequested = 0;
     pool->lifetime = 0;
@@ -43,13 +43,13 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
     pool->retreatCenter = *center;
     slot = &pool->slots[0];
     index = 0;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
     do {
         struct ContactStartSprite *sprite;
         struct ContactPosition *actorPosition;
         struct ContactCollider *health;
         u32 radius;
         u32 direction;
+        table = (const u16 *)RANDOM_TABLE_ADDR;
         slot->state = 0;
         slot->enter = 1;
         slot->stateFrame = 0;
@@ -58,10 +58,10 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         slot->unknown12 = parameter;
         sprite = (void *)&slot->sprite;
         if (pool->mode == 2) {
-            if (index > 7)
-                slot->targetIndex = 0;
-            else
+            if (index <= 7)
                 slot->targetIndex = 1;
+            else
+                slot->targetIndex = 0;
         } else if (pool->mode == 1)
             slot->targetIndex = 0;
         else {
