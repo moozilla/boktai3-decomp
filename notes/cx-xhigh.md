@@ -115,3 +115,38 @@ Session 2 summary: 0 matched, 1 draft improved, 1 skipped; exact code gain
 Session 2 combined validation after rebasing onto main printed
 `build/boktai3.gba: OK`. The draft score was recorded over its full reviewed
 extent. Report files and exact totals were not changed.
+
+## Session 3
+
+- 080D2584: drafted 84.1% from 74.8%, tentative
+  Mummy_UpdateDisplacementRecovery. The complete reviewed target and candidate
+  are both 4,852 bytes. Ported typed route, arrival and turn helpers from the
+  retained Golem recovery draft. Placing the shared failure callback before
+  the success tail recovered the repeated chase layout. Preserving a separate
+  flags2CC pointer across the easing prefix and using the halfword motion-mask
+  helper together improved the remaining lifetimes. An output-pointer helper
+  retains the entry motion-flags address through both sound calls. Realigned
+  residue fell from 829 / 333 to 409 / 68 total/structural. No register pins or
+  asm constraints were retained. Compiler decision flips identified a CSE
+  skip-block sensitivity; PRE table-size probes only changed a few residual
+  stack accesses. Direct actor parameters, cached motion-flag values, forced
+  wrap registers, volatile table slots and a shared pinned zero regressed.
+  Remaining work concerns the flags2CC and motion-flags spills, repeated
+  address reloads, and the two RNG table/wrap allocation choices. The draft
+  remains guarded and receives no exact credit.
+
+- 08099B44: drafted 58.1% from the measured 52.2% retained draft, which
+  previously lacked its fuzzy annotation. Reviewed the complete 4,752-byte
+  initializer through 0809ADD4; no hidden routine boundary was found. Typed
+  route-point and targeting-state views recover address and load order. The
+  optional route fallback is now read after checking Script_GetPc, matching
+  the observed evaluation order. Typed attack arrays, an early-return attack
+  helper and a shared clear word improve the script prefix. A callback
+  installer takes the seven actor callbacks as arguments, recovering their
+  preload order; the collider flag clear uses the observed collider field.
+  Realigned residue improves from 1,413 / 881 to 1,253 / 790 total/structural.
+  The candidate remains shorter than the target; missing address-hoisting
+  expansions, callback setup, animation allocation and PRE stack layout still
+  dominate. Flattening either large helper regressed. Compiler flips show
+  CSE skip-block and follow-jump sensitivities but no near-exact solution.
+  No register hints were added. The complete guarded score was recorded.
