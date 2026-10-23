@@ -143,3 +143,31 @@ allocation (Unison).
 The order of ideas 1-5 is the recommended build order. Idea 1 is the only one
 that adds spellings the current search cannot reach. The other four make the
 existing search cheaper.
+
+## Corpus retrieval (idea 1): prototype and trial
+
+`tools/bigcode.py mine` compiles every unit with `-g` and records each
+instruction as a register-masked shape token with the C line that produced
+it (845k instructions). Functions with pins or asm hints are left out of the
+4-gram index. `tools/bigcode.py query FUNC FILE` aligns a pin-free copy's
+shape against the ROM and, for each differing window, prints the C lines
+that produced it and clean functions whose code has the ROM's shape there.
+
+* Coverage: 30% of the differing ROM windows of farm failures appear
+  verbatim in clean code.
+* SceneActor_TickRandomReaction, where the farm stalled at 1 byte, was
+  depinned by hand from a retrieved spelling (`if (x->timer) x->timer--;
+  else {...}`).
+* Controlled trial: 10 farm failures (2-26 bytes), two Sonnet agents with
+  about 10 compiles per function. Arm A had `query`, arm B only the
+  asm and register diff. Neither arm matched any function. Arm A shrank
+  8 of 10 (total 132 to 85 bytes), arm B 3 of 10. Retrieval led to one of
+  arm A's improvements (`if (++a->timer >= a->rate)`, from a window showing
+  the load order); the rest came from the register diff. For the main
+  remaining pattern (a constant mask copied into its own register before
+  `ands`), the only corpus hits were pinned functions.
+
+Verdict: retrieval is a useful hint for a person or agent working by hand,
+but it is not a step change. Its index holds only spellings that already
+appear in clean code, and the remaining near misses are mostly spellings
+nobody has found yet. It is not wired into natfarm.
