@@ -124,7 +124,42 @@ def state(func):
             return "running"
     except OSError:
         pass
+    if not os.path.exists(os.path.join(wd, "result.json")) and failed_turn(wd):
+        return "failed"
     return "done"
+
+
+def failed_turn(wd):
+    """The worker's last event was a failed turn (e.g. 'Selected model is at capacity')."""
+    try:
+        tail = open(os.path.join(wd, "codex.json")).read()[-3000:]
+    except OSError:
+        return None
+    m = re.findall(r'"type":"turn.failed","error":\{"message":"([^"]*)"', tail)
+    return m[-1] if m else None
+
+
+def resume(r, model):
+    func = r["func"]
+    wd = os.path.join(CAMP, func)
+    head = open(os.path.join(wd, "codex.json")).read(4000)
+    m = re.search(r'"thread_id":"([0-9a-f-]+)"', head)
+    n = int(open(os.path.join(wd, "retries")).read()) if os.path.exists(os.path.join(wd, "retries")) else 0
+    if not m or n >= 3:
+        open(os.path.join(wd, "gave_up"), "w").write(failed_turn(wd) or "?")
+        print(f"gave up on {func} after {n} resumes")
+        return False
+    open(os.path.join(wd, "retries"), "w").write(str(n + 1))
+    note = (f"You were interrupted by an error ({failed_turn(wd)}). Continue the same task from where you"
+            f" stopped; your files are in {os.path.relpath(wd, ROOT)}. Finish with the deliverables.")
+    log = open(os.path.join(wd, "codex.json"), "a")
+    p = subprocess.Popen(["codex", "exec", "resume", "-c", "model_reasoning_effort=high", "--json", "-o",
+                          os.path.join(wd, "last.txt"), m.group(1), note],
+                         cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                         start_new_session=True)
+    open(os.path.join(wd, "pid"), "w").write(str(p.pid))
+    print(f"resumed {func} (attempt {n + 1})", flush=True)
+    return True
 
 
 def start(r, model):
@@ -157,6 +192,10 @@ def cmd_tick(args):
     model = args[args.index("--model") + 1] if "--model" in args else "gpt-6.1-sol"
     rows = json.load(open(QUEUE))
     running = {r["func"] for r in rows if state(r["func"]) == "running"}
+    for r in rows:  # resume workers a model error stopped, before starting new ones
+        if len(running) < workers and state(r["func"]) == "failed" and \
+                not os.path.exists(os.path.join(CAMP, r["func"], "gave_up")) and resume(r, model):
+            running.add(r["func"])
     for r in rows:
         if len(running) >= workers:
             break
@@ -175,10 +214,11 @@ def cmd_tick(args):
         return 0
     print(f"{len(running)} running: {', '.join(sorted(running))}", flush=True)
     while True:
-        done = [f for f in running if state(f) == "done"]
+        done = [f for f in running if state(f) in ("done", "failed")]
         if done:
             for f in done:
-                print(f"finished {f}: {summary(f)}")
+                print(f"finished {f}: {summary(f)}" if state(f) == "done" else
+                      f"stopped {f}: {failed_turn(os.path.join(CAMP, f))} (the next tick resumes it)")
             return 0
         time.sleep(30)
 

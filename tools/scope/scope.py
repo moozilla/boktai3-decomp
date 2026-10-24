@@ -1481,9 +1481,14 @@ def cmd_spill(src, func, env):
     regs = sorted({r[2] for r in rel})
     print(f"{func}: {base} differing insns; {len(rel)} reload register choices, spill registers seen"
           f" {', '.join('r%d' % r for r in regs)}")
+    budget = int(os.environ.get("SCOPE_SPILL_MAX", "42"))
     spec, best, tried, accepted = [], base, 0, []
+    print(f"  searching up to {budget} compiles (SCOPE_SPILL_MAX=N to change); each reload choice costs 7")
     for k, uid, reg, line, lab in rel:
         if best == 0:
+            break
+        if tried + 7 > budget:
+            print(f"  stopped at the budget ({tried} compiles); later reload choices were not tried")
             break
         if pos.get(uid, 1 << 30) < first - 2:
             continue
@@ -1530,6 +1535,84 @@ def cmd_why_all(src, func, env):
         cmd_why(src, func, u, env)
         print()
     return 1
+
+
+def regmove_fixes(wd):
+    """[(kind, insn, operand)] from the regmove dump's log, in order. kind: 'tie' (fixup_match_1: the output
+    of a two-address insn takes its dying input's register), 'rename' (the backward pass renames the input
+    to the output back to the insn that set it), 'offset' (fixup_match_2: an add rewritten from an earlier
+    add of the same base), 'could' (a tie it considered and did not make)."""
+    path = os.path.join(wd, "u.i.regmove")
+    if not os.path.exists(path):
+        return []
+    out, section = [], 0
+    for ln in open(path):
+        if ln.startswith("Starting backward pass..."):
+            section += 1
+        elif ln.startswith("Starting forward pass"):
+            section = 0
+        m = re.match(r"(Fixed|Could fix) operand (?:(\d+) )?of insn (\d+)", ln)
+        if not m:
+            continue
+        if m.group(1) == "Could fix":
+            out.append(("could", int(m.group(3)), m.group(2)))
+        elif m.group(2) is None:
+            out.append(("offset", int(m.group(3)), None))
+        else:
+            out.append(("rename" if section >= 3 else "tie", int(m.group(3)), m.group(2)))
+    return out
+
+
+def explain_regmove(wd, uid, gone, new, nm, at):
+    """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
+    what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
+    fixes = [f for f in regmove_fixes(wd) if f[0] != "could"]
+    pats = {u: r for u, _, r in insn_list(wd, "combine")}
+    regs = set(gone) | set(new)
+    hit = [f for f in fixes if f[1] == uid] or \
+          [f for f in fixes if any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % r, pats.get(f[1], "")) for r in regs)]
+    regs = regs  # noqa: keeps the search above readable
+    if not hit:
+        print("    (the regmove log names no tie that touches these registers: a copy coalesced by"
+              " optimize_reg_copy, which does not log)")
+        return
+    kind, u, op = hit[0]
+    # operand by operand, before and after regmove: which pseudo took which one's place
+    before = regs_of(next((r for x, _, r in insn_list(wd, "combine") if x == uid), None))
+    after = regs_of(next((r for x, _, r in insn_list(wd, "regmove") if x == uid), None))
+    swaps = [(x, y) for x, y in zip(before, after) if x != y] if len(before) == len(after) else []
+    if swaps:  # the output pseudo (x) now lives in the input's register (y)
+        out_r, in_r = swaps[0]
+        b, a = nm(out_r), nm(in_r)
+    else:
+        a = ", ".join(nm(r) for r in new) or "the input"
+        b = ", ".join(nm(r) for r in gone) or "the output"
+    what = {"tie": f"insn {u} is a two-address Thumb op (its output must equal its operand {op}); the input {a}"
+                   f" died there, so regmove (fixup_match_1) put the output {b} in {a}'s register instead of"
+                   f" copying an operand into {b} first",
+            "rename": f"insn {u} is a two-address Thumb op; its input {a} died there and was set earlier in the"
+                      f" same block with nothing in between using {a} or {b}, so regmove renamed {a} to {b} back"
+                      " to that set and the copy disappeared",
+            "offset": f"regmove (fixup_match_2) rewrote the add at insn {u} relative to an earlier add of the"
+                      " same base"}[kind]
+    print(f"    {what} [{at(u)}].")
+    if kind != "offset":
+        print(f"    If the ROM keeps a separate copy here, its C differs in one of the things regmove checks:"
+              f" {a} is still used after insn {u} (so it does not die there), or {a} or {b} is read between"
+              f" {a}'s set and insn {u}, or a label, branch or call separates them, or {a} is a constant set in"
+              " another block. Levers: use the value again later, compute it in its own statement before an"
+              " if, or give the result its own variable that is read before the operation.")
+    # the same tie in other inlined copies of this code: same pattern up to register numbers
+    shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
+    rowline = {}
+    if os.path.exists(os.path.join(wd, "diff.json")):
+        rowline = {r["uid"]: r["line"] for r in json.load(open(os.path.join(wd, "diff.json"))) if r.get("uid")}
+    twins = [f[1] for f in fixes if f[0] == kind and f[1] != u and shape(pats.get(f[1])) == shape(pats.get(u))
+             and rowline.get(f[1]) is not None and rowline.get(f[1]) == rowline.get(u)]
+    us = ",".join(map(str, [u] + twins))
+    print(f"    what-if: AGBCC_NOTIE={us} (forbids this tie" + (f", here and in {len(twins)} inlined cop"
+          f"{'ies' if len(twins) > 1 else 'y'} of the same code" if twins else "") + "; the copy should come back."
+          " What differs after that is a separate cause: ask `why` again with the knob set)")
 
 
 def explain_move2add(wd, uid, row, at):
@@ -1648,7 +1731,10 @@ def cmd_why(src, func, uid, env, via=None):
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read())
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
-            if p not in ("greg", "lreg"):
+            if p == "regmove":
+                print(f"  regmove replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}.")
+                explain_regmove(wd, uid, gone, new, nm, at)
+            elif p not in ("greg", "lreg"):
                 print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}"
                       " (no explainer for this pass yet)")
             continue
@@ -1707,8 +1793,11 @@ def cmd_why(src, func, uid, env, via=None):
         rel = reload_records(wd, info["obj_name"])
         order = [u for u, _, _ in insn_list(wd, "greg")]
         nxt = order[order.index(uid):][:4] if uid in order else []
-        if row:  # an insn split after reload (mach) serves the next insns in the listing
-            i = rows.index(row)
+        i = next((j for j, r in enumerate(rows) if row and r["uid"] == row["uid"]
+                  and r.get("rom_addr") == row.get("rom_addr")), None)
+        if i is None and row:  # a redirected row (a final-pass pool load explained via its origin)
+            i = next((j for j, r in enumerate(rows) if r.get("rom_addr") == row.get("rom_addr")), None)
+        if i is not None:  # an insn split after reload (mach) serves the next insns in the listing
             nxt += [r["uid"] for r in rows[i + 1:i + 4] if r["uid"]]
         rec = next((r for u in nxt for r in rel if r[1] == u and r[2] == got), None)
         if rec:

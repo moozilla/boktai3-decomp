@@ -46,7 +46,7 @@ Other commands:
 ```
 scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
 scope.py A.c vs B.c                 two drafts' register allocation side by side
-scope.py FILE.c spill               is the whole difference reload's spill rotation?
+scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
 scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
@@ -92,6 +92,12 @@ register canonical in cse).
   combine drops a mask only when the value's register is set once, so the
   ROM's form is a second assignment (`a = b + c; a &= 255;`).
 * **`x = a % n` / `a / n`** put the quotient in `x`; `a - a / n * n` does not.
+* **A copy the ROM keeps and the draft lost** (`adds r1, r3, #0` then an op
+  in the ROM; the op straight into the input's register in the draft):
+  regmove tied a two-address op's output to its dying input. `why` names
+  the tie, the conditions it needed, and `AGBCC_NOTIE=UID,...` (every
+  inlined copy) to confirm. In C: keep the input alive past the op, read it
+  or the result in between, or put a branch between the set and the op.
 * **Reload rotation:** if `spill` says the difference is only reload's
   choices, the fix is upstream (which values got no register, which
   constants reload loads).
