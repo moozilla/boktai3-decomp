@@ -1,7 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -32,59 +29,48 @@ s32 Math_Atan2(s32, s32);
 void NavMesh_UpdateProbe(void *, void *);
 static inline u8 *TerrainResponse(u8 *p)
 {
-    register s32 offset asm("r3") = 0x23C;
-    asm("" ::"r"(offset));
+    s32 offset = 0x23C;
     return p + offset;
 }
 static inline void ClearCounter(u8 *p, s32 value)
 {
-    register s32 offset asm("r4") = 0x224;
-    asm("" ::"r"(offset));
+    s32 offset = 0x224;
     U8(p, offset) = value;
-    asm("" ::"r"(offset));
 }
 static inline s32 Callback(u8 *p)
 {
-    register s32 offset asm("r1") = 0x2E4;
-    asm("" ::"r"(offset));
+    s32 offset = 0x2E4;
     {
         s32 (**slot)(u8 *) = (void *)(p + offset);
-        asm("" ::"r"(offset));
         return (*slot)(p);
     }
 }
 static inline struct Vec *ProbePosition(u8 *p)
 {
-    register s32 offset asm("r2") = 0x1B4;
-    asm("" ::"r"(offset));
+    s32 offset = 0x1B4;
     {
         struct Vec *result = (void *)(p + offset);
-        asm("" ::"r"(offset));
         return result;
     }
 }
 static inline s32 CurrentX(struct Probe *p)
 {
-    register struct Probe *raw asm("r4") = p;
-    asm("" ::"r"(raw));
+    struct Probe *raw = p;
     return raw->current.x;
 }
 static inline s32 TargetX(struct Probe *p)
 {
-    register struct Probe *raw asm("r1") = p;
-    asm("" ::"r"(raw));
+    struct Probe *raw = p;
     return raw->target.x;
 }
 static inline s32 TargetZ(struct Probe *p)
 {
-    register struct Probe *raw asm("r4") = p;
-    asm("" ::"r"(raw));
+    struct Probe *raw = p;
     return raw->target.z;
 }
 static inline s32 PositionZ(struct Vec *p)
 {
-    register struct Vec *raw asm("r3") = p;
-    asm("" ::"r"(raw));
+    struct Vec *raw = p;
     return raw->z;
 }
 static inline s32 Scale(s32 value)
@@ -95,21 +81,18 @@ static inline s32 Scale(s32 value)
 }
 static inline void Facing(u8 *p, u16 angle)
 {
-    register s32 value asm("r0") = angle;
-    register s32 shifted asm("r2") = value + 112;
-    register s32 mask asm("r1");
-    asm("" : "+r"(shifted));
+    s32 value = angle;
+    s32 shifted = value + 112;
+    s32 facing8;
+    s32 facing4;
     shifted >>= 5;
-    mask = 7;
-    mask &= shifted;
-    asm("" : "+r"(mask));
-    U8(p, 0x1A) = mask;
+    facing8 = 7;
+    facing8 &= shifted;
+    U8(p, 0x1A) = facing8;
     value = (value + 96) >> 6;
-    asm("" ::"r"(value));
-    mask = 3;
-    mask &= value;
-    asm("" : "+r"(mask));
-    U8(p, 0x19) = mask;
+    facing4 = 3;
+    facing4 &= value;
+    U8(p, 0x19) = facing4;
 }
 static inline void Polar(struct Vec *v, s32 angle, s32 speed)
 {
@@ -122,9 +105,8 @@ static inline void Polar(struct Vec *v, s32 angle, s32 speed)
 void SceneActorAnimation_UpdateNavigationWalk(void *unused, u8 *p)
 {
     struct Motion *motion = (void *)P(p, 0x5C);
-    register struct Probe *probe asm("r8") = (void *)P(p, 0x1A8);
-    register u32 *anim asm("sb") = (void *)P(p, 0xD4);
-    asm("" ::"r"(motion), "r"(probe), "r"(anim));
+    struct Probe *probe = (void *)P(p, 0x1A8);
+    u32 *anim = (void *)P(p, 0xD4);
     if (U8(p, 9)) {
         s32 zero = 0;
         struct Vec *pos;
@@ -151,20 +133,18 @@ void SceneActorAnimation_UpdateNavigationWalk(void *unused, u8 *p)
         s32 limit = 0x1103;
         struct Vec *savedPos = pos;
         if (distance <= limit) {
-            register struct Probe *read asm("r3") = probe;
-            asm("" ::"r"(read));
+            struct Probe *read = probe;
             motion->pos.x = read->target.x;
             motion->pos.z = read->target.z;
             U8(p, 7) = 1;
         } else {
             u32 flags;
             if (DisplayAnimation_GetFrameBoundary(anim, &flags)) {
-                register u32 *reader asm("r4") = anim;
+                u32 *reader = anim;
                 s32 speed;
                 s32 targetX;
                 s32 angle;
                 struct Vec step;
-                asm("" ::"r"(reader));
                 if (*reader == 2) {
                     s32 flag = flags & 1;
                     speed = 64;
@@ -174,7 +154,6 @@ void SceneActorAnimation_UpdateNavigationWalk(void *unused, u8 *p)
                     speed = 16;
                 targetX = TargetX(probe);
                 targetX -= motion->pos.x;
-                asm("" ::"r"(reader));
                 angle = Math_Atan2(targetX, TargetZ(probe) - PositionZ(savedPos));
                 U8(p, 0x65) = angle;
                 Facing(p, angle);
@@ -188,7 +167,3 @@ void SceneActorAnimation_UpdateNavigationWalk(void *unused, u8 *p)
         Actor_PlayAnimationEntry(p, 3, 1, 0, 1);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802F584);
-#endif
