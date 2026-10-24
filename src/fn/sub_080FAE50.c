@@ -81,7 +81,6 @@ static inline u32 HasMark(struct AxeContext *context)
         asm("" : "+r"(r));
     } else
         r = 0;
-    asm("" : "+r"(r));
     return r;
 }
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,

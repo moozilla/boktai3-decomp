@@ -1,7 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 // confidence=low: stores a randomized elevated travel point in the actor.
 #define Hresvelgr_SetRandomTravelTarget sub_0819C6AC
 struct BurstVector {
@@ -39,27 +37,27 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
-static inline s32 randomValue(const u16 *table)
+static inline s32 randomValue(u32 table)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(u16 *)(offset + (u32)table);
+    return *(u16 *)(offset + table);
 }
-// The table pin is the one concession (as in Hresvelgr_EmitRandomMotionBurst):
-// unpinned, the table loses r4 to the 1023 mask constant (priority 576 vs
-// 789; AGBCC_PRI=26:+214 matches). See tools/scope/README.md.
+// One variable holds the table address and later the angle (the ROM keeps both in r4): set twice,
+// it is not a constant register, so its priority is not halved and it wins r4 over the 1023 mask
+// (update_equiv_regs in local-alloc.c only marks a pseudo whose every set stores one constant).
 void Hresvelgr_SetRandomTravelTarget(struct BurstActor *actor)
 {
     struct BurstActor *saved = actor;
-    register const u16 *table asm("r4") = gUnk_0203B400;
-    s32 radius = (randomValue(table) >> 3) % 512 + 256;
-    s32 sample = randomValue(table);
+    u32 work = (u32)gUnk_0203B400;
+    s32 radius = (randomValue(work) >> 3) % 512 + 256;
+    s32 sample = randomValue(work);
     s32 base = actor->side << 6;
     s32 offset = (sample >> 3) % 32 + 112;
-    s32 angle = base + offset;
-    angle &= 255;
-    polar(&actor->travelTarget, angle, radius);
+    work = base + offset;
+    work &= 255;
+    polar(&actor->travelTarget, work, radius);
     {
         struct BurstVector *target = saved->target;
         add(&actor->travelTarget, target, &actor->travelTarget);

@@ -65,13 +65,13 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
 {
     u32 alive = 0;
     s32 i;
-    register u8 *s asm("r6");
+    register u8 *s;
     u32 off;
     struct SbPart *e;
     u16 *tp;
     {
         register u32 offset asm("r1") = 0x202;
-        register u16 *address asm("r0");
+        register u16 *address;
         address = (void *)((u8 *)p + offset);
         if (*address <= 11)
             Collider_Refresh(p->collider);
@@ -101,7 +101,6 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
                 SpriteDrawable_SelectTileFrame(s, p->res, 12);
             else if (e->f13 == 4) {
                 u32 q = off + 0x78;
-                asm("" : "+r"(q));
                 SpriteDrawable_SelectTileFrame((u8 *)p + q, p->res, 13);
             }
             e->f13++;
