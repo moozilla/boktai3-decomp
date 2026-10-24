@@ -124,6 +124,7 @@ The first subsystem is **Bosses** (160 KB of code: 42% natural, 13% pinned,
 python3 tools/scope/scope.py FILE.c [FUNC]        real differences, one call
 python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented knobs (a what-if)
 python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
+python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
 ```
 
 It re-executes itself under `build/venv` for capstone. FUNC defaults to the
@@ -151,9 +152,30 @@ Artifacts in `build/scope/FUNC/`: `diff.txt` (whole aligned listing),
 
 Knobs of the instrumented compiler (`tools/agbcc-instr.sh`): `CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
-`CSE_DEBUG=N` (trace `make_regs_eqv` for new >= N), `AGBCC_GCSE_T=N` (gcse
-hash table size), `AGBCC_PRI`, `AGBCC_FORCE`, `AGBCC_DUMPPRI`,
-`AGBCC_SPILL` (local-alloc / reload; see the sources for syntax).
+`CSE_DEBUG=N` (trace `make_regs_eqv` for new >= N), `CSE_PATH=1` (trace each
+jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
+`AGBCC_GCSE_T=N` (gcse hash table size), `AGBCC_PRI`, `AGBCC_FORCE`,
+`AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
+syntax). Added in this thread (in `tools/patches/agbcc-instr.patch`):
+
+* `CSE_WHY=UID`: for each SET of insn UID, every time cse processes it, print
+  the candidates (`src`, `src_folded`, `src_eqv`, `src_related`) with costs
+  and the equivalence class in order, each member tagged with the insn at
+  which it entered the table. This is the "why" for a cse substitution.
+* `CSE_NOFOLLOW_JUMP=UID[:PASS],...`: refuse every follow of those jumps,
+  optionally only in cse pass 1 or 2.
+
+With no knobs set the instrumented compiler emits the same code as agbcc
+(checked on 62 files, default and NONMATCHING, after these additions).
+
+**The shared `build/agbcc-instr` in the main checkout can be stale**: on
+2026-10-24 it predated the patch's `CSE_PATH`/`CSE_NOFOLLOW`. Rebuild with
+`sh tools/agbcc-instr.sh` (20 s) after the patch changes; this worktree keeps a
+private build so a rebuild never disturbs other threads. Incremental rebuild
+after editing one file: `make -s normal BASE_CFLAGS="-O2 -std=gnu11
+-Werror-implicit-function-declaration -Wno-error=incompatible-pointer-types
+-Wno-everything"` in `build/agbcc-instr/gcc` (2.5 s); then regenerate that
+file's section of the patch (`diff -u --label a/F --label b/F`).
 
 ### Speed (measured on an M-series Mac)
 
@@ -172,6 +194,9 @@ steps when it matters: resolve relocations in Python instead of linking
 
 ### Gaps (next work on the tool)
 
+* Summarize `CSE_DEBUG`/`CSE_WHY` traces: "pseudo 23 (result) became head of
+  phase's class at the switch compare, last use line 104 > 95". Reading raw
+  traces took most of the calls in the RepeatedPairAttack investigation.
 * Name pseudos by their C variable in every view (the RTL has `reg/v` user
   vars; `AGBCC_DUMPPRI` and whyreg.py know how).
 * Summarize decision traces: read `CSE_DEBUG` output and say which register
@@ -217,6 +242,27 @@ Each was read from the compiler source and confirmed on a live draft.
    the load (182). Writing literal zeros instead removes that tie but makes
    things worse (5 hunks), so the ROM's `str r5` really stores `phase`.
 
+5. **Byte stores into struct fields expand as a bitfield read-modify-write.**
+   `p->phase = 1` (u8 member) becomes `t = *addr; t = (t & 0) | 1; *addr = t`
+   at expand, even for `struct { u8 phase; }`; an array element store
+   (`p[0xA2] = 1`) does not. combine reduces it to a plain `strb` later, but
+   cse1/cse2 see `t & 0` as a known zero and enter a fresh register into the
+   zero class at every such store. Expect u8 field stores to perturb which
+   register cse uses for 0 nearby.
+6. **cse's equivalence classes: order decides substitution.** `insert` keeps a
+   class in cost order and puts a new member *before* existing members of
+   equal cost (only strictly cheaper members precede it). `cse_insn` prunes
+   the written source if it is already in the class, then takes the first
+   valid member of the cheapest cost ("prefer items not in the hash table" only
+   applies to sources not in the class). `record_jump_cond` on `x == C` calls
+   `merge_equiv_classes(class(x), class(C))`, re-inserting C's members into
+   x's class, so they land in front of x. A register merged at a jump almost
+   never wins against registers already known equal to the constant.
+7. **Canonicity is re-decided in cse2.** After cse1 substitutes a known-zero
+   register for literal zeros further down, that register lives longer, so in
+   cse2 `make_regs_eqv` can make it head over a variable cse1 kept. A fix that
+   makes cse1 right can be undone by cse1's own substitutions elsewhere.
+
 ## Live investigations
 
 * **Vanargand_UpdatePartGroundStrike** (src/fn/sub_081B28D8.c, 1 insn). ROM
@@ -225,9 +271,22 @@ Each was read from the compiler source and confirmed on a live draft.
   entirely (fact 2). Open: what C makes `&p->enter` shared yet copied after
   the gcse insertion.
 * **Vanargand_UpdateRepeatedPairAttack** (src/fn/sub_081AA178.c, 1 insn). ROM
-  stores `phase` (r5) to `p->timer` in case 0; the draft's cse substitutes
-  `result` (r7). Next: cse's tie-break among registers known equal to a
-  constant (`insert` ordering and `CHEAPER` in cse.c).
+  stores `phase` (r5) to `p->timer` in case 0 (line 76); the draft stores the
+  call result (r7). `CSE_KEEP=24` (keep `phase` canonical) matches exactly, so
+  this is cse canonicity (facts 4, 6, 7). Chain in the draft: at the switch
+  compare `phase == 0` the zero class (holding `result`) merges into phase's
+  class; `result` lives longer (used as a zero at lines 96 and 104), so
+  `make_regs_eqv` makes it head. Literal zeros at 96/104 move the takeover to
+  cse2, because cse1 substitutes the known-zero call value there anyway. The
+  fully natural form (no `result`, literal zeros, no asm) gets cse1 right
+  (`phase`) but cse2 wrong, and differs in 5 hunks (9 insns).
+  The ROM's facts: literal `movs r0, #0` at line 88, r7 at lines 96 and 104,
+  r5 at line 76, and `phase` reused as the constant 1 in case 1. Consistent
+  story: cse1 does not know "call == 0" in cases 1 and 2, cse2 knows it at
+  96/104 but not 88. Refusing cse1 jumps into the cases
+  (`CSE_NOFOLLOW_JUMP=...:1`) does not reproduce it (it loses other
+  knowledge too). Open: what C shape limits cse1's knowledge that way
+  (label use counts at cse1 time, mode of the tested value, switch shape).
 
 ## Paper cuts found in older tools
 
@@ -236,3 +295,4 @@ Each was read from the compiler source and confirmed on a live draft.
 * check.py prints raw hex when run outside the venv (no capstone).
 * agbccsrc.py keyword lookup returns unrelated sections.
 * `tools/worktree.sh` does not link `build/agbcc-instr` into new worktrees.
+* The shared instrumented compiler was older than its patch (see above).

@@ -4,6 +4,7 @@
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
+  scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
 One compile with the instrumented agbcc (-g -dp -da) gives the code, the C line of every
 instruction (DWARF), the RTL insn behind it (-dp) and the RTL after every pass (-da). Both
@@ -459,7 +460,8 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             mark = {"=": " ", "~": "!", "-": "-", "+": "+", "→": ">"}[t]
             bp_s = PASS_NOTE.get(bp, bp)
             print(f"{mark} {r:34} {m:34} {lt:>5} {u or '':>5}  {bp_s}")
-    print(f"\nnext: scope.py insn UID   (an insn's RTL through every pass)")
+    print(f"\nnext: scope.py insn UID (an insn through the passes) | uses REG (who uses a pseudo) | "
+          f"FILE.c CSE_WHY=UID (what cse weighed)")
     return 1
 
 
@@ -479,6 +481,27 @@ def cmd_insn(uid, func):
             last = cur
 
 
+def cmd_uses(regs, func, passes):
+    """For each pseudo, the insns (uid@C line) that mention it after each pass."""
+    wd = workdir(func)
+    for reg in regs:
+        print(f"pseudo {reg} in {func}:")
+        for p in passes:
+            path = os.path.join(wd, "u.i." + p)
+            if not os.path.exists(path):
+                continue
+            line, out = 0, []
+            for blk in re.split(r"\n\n", open(path).read()):
+                m = re.search(r'\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+                if m:
+                    line = int(m.group(1))
+                    continue
+                m = re.match(r"\((?:insn|jump_insn|call_insn) (\d+)", blk)
+                if m and re.search(r"\(reg(?:/[a-z]+)*:\w+ %d\)" % reg, blk):
+                    out.append(f"{m.group(1)}@{line}")
+            print(f"  after {p:8} {' '.join(out) or '(none)'}")
+
+
 def last_func():
     p = os.path.join(ROOT, "build", "scope", "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
@@ -488,6 +511,13 @@ def main():
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
+        return 0
+    if args[0] == "uses":
+        regs = [int(a) for a in args[1:] if a.isdigit()]
+        names = [a for a in args[1:] if not a.isdigit()]
+        passes = [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"]
+        func = next((a for a in names if a not in PASSES), None) or last_func()
+        cmd_uses(regs, func, passes)
         return 0
     if args[0] == "insn":
         func = args[2] if len(args) > 2 else last_func()

@@ -894,7 +894,36 @@
  		    {
 --- a/cse.c
 +++ b/cse.c
-@@ -835,6 +835,43 @@
+@@ -435,11 +435,28 @@
+   char in_struct;
+   char is_const;
+   char flag;
++  int born_uid;		/* instrumentation: insn being processed when this entry was made */
+ };
+ 
+ /* We don't want a lot of buckets, because we rarely have very many
+    things stored in the hash table, and a lot of buckets slows
+    down a lot of loops that happen frequently.  */
++/* Instrumentation: the insn cse_insn is working on (for table_elt.born_uid),
++   and CSE_WHY=UID: print the candidates and the equivalence class cse weighs
++   for each SET of that insn, before it picks the cheapest.  */
++static int cse_cur_uid;
++
++static void
++cse_why_print (what, x, cost)
++     const char *what;
++     rtx x;
++     int cost;
++{
++  fprintf (stderr, "  %-12s cost %5d  ", what, cost);
++  print_inline_rtx (stderr, x, 0);
++  fprintf (stderr, "\n");
++}
++
+ #define NBUCKETS 31
+ 
+ /* Compute hash code of X in mode M.  Special-case case where X is a pseudo
+@@ -835,6 +852,43 @@
  /* Make reg NEW equivalent to reg OLD.
     OLD is not changing; NEW is.  */
  
@@ -938,7 +967,7 @@
  static void
  make_regs_eqv (new, old)
       register int new, old;
-@@ -854,7 +891,14 @@
+@@ -854,7 +908,14 @@
       hard regs.  Among pseudos, if NEW will live longer than any other reg
       of the same qty, and that is beyond the current basic block,
       make it the new canonical replacement for this qty.  */
@@ -954,7 +983,49 @@
        /* Certain fixed registers might be of the class NO_REGS.  This means
  	 that not only can they not be allocated by the compiler, but
  	 they cannot be used in substitutions or canonicalizations
-@@ -8187,6 +8231,19 @@
+@@ -1362,6 +1423,7 @@
+   elt = get_element ();
+   elt->exp = x;
+   elt->cost = COST (x);
++  elt->born_uid = cse_cur_uid;
+   elt->next_same_value = 0;
+   elt->prev_same_value = 0;
+   elt->next_same_hash = table[hash];
+@@ -6040,6 +6102,8 @@
+   rtx tem;
+   register int n_sets = 0;
+ 
++  cse_cur_uid = INSN_UID (insn);
++
+ #ifdef HAVE_cc0
+   /* Records what this insn does to set CC0.  */
+   rtx this_insn_cc0 = 0;
+@@ -6722,6 +6786,24 @@
+       if (dest == pc_rtx && src_const && GET_CODE (src_const) == LABEL_REF)
+ 	src_folded = src_const, src_folded_cost = -1;
+ 	  
++      if (getenv ("CSE_WHY") && atoi (getenv ("CSE_WHY")) == INSN_UID (insn))
++	{
++	  struct table_elt *q;
++	  fprintf (stderr, "cse_why insn %d set %d (block cuid %d..%d)\n", INSN_UID (insn), i,
++		   cse_basic_block_start, cse_basic_block_end);
++	  if (src) cse_why_print ("src", src, src_cost);
++	  if (src_folded) cse_why_print ("src_folded", src_folded, src_folded_cost);
++	  if (src_eqv_here) cse_why_print ("src_eqv", src_eqv_here, src_eqv_cost);
++	  if (src_related) cse_why_print ("src_related", src_related, src_related_cost);
++	  for (q = elt; q; q = q->next_same_value)
++	    {
++	      fprintf (stderr, "  class        cost %5d  entered at insn %5d  ", q->cost, q->born_uid);
++	      print_inline_rtx (stderr, q->exp, 0);
++	      fprintf (stderr, "\n");
++	    }
++	  fprintf (stderr, "  (equal cost order: src_folded, src, src_eqv, src_related, then class in the order above)\n");
++	}
++
+       /* Terminate loop when replacement made.  This must terminate since
+          the current contents will be tested and will always be valid.  */
+       while (1)
+@@ -8187,6 +8269,39 @@
  	        && (GET_CODE (q) != CODE_LABEL || LABEL_NUSES (q) != 0))
  	      break;
  
@@ -962,7 +1033,7 @@
 +	     into its target; CSE_NOFOLLOW=K refuses the K-th of them (counted
 +	     from 1 over the function, in the order they are met).  */
 +	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER
-+	      && (getenv ("CSE_PATH") || getenv ("CSE_NOFOLLOW")))
++	      && (getenv ("CSE_PATH") || getenv ("CSE_NOFOLLOW") || getenv ("CSE_NOFOLLOW_JUMP")))
 +	    {
 +	      follow_count++;
 +	      if (getenv ("CSE_PATH"))
@@ -970,11 +1041,31 @@
 +			 after_loop ? 2 : 1, INSN_UID (p), INSN_UID (JUMP_LABEL (p)), cse_line_of (p));
 +	      if (getenv ("CSE_NOFOLLOW") && atoi (getenv ("CSE_NOFOLLOW")) == follow_count)
 +		q = 0;
++	      /* CSE_NOFOLLOW_JUMP=UID[:PASS],... refuses every follow of those
++		 jumps (in that cse pass only, 1 or 2, when given).  */
++	      if (getenv ("CSE_NOFOLLOW_JUMP"))
++		{
++		  char *e = getenv ("CSE_NOFOLLOW_JUMP");
++		  while (*e)
++		    {
++		      int uid = atoi (e), pass = 0;
++		      while (*e && *e != ':' && *e != ',')
++			e++;
++		      if (*e == ':')
++			pass = atoi (++e);
++		      while (*e && *e != ',')
++			e++;
++		      if (*e == ',')
++			e++;
++		      if (uid == INSN_UID (p) && (pass == 0 || pass == (after_loop ? 2 : 1)))
++			q = 0;
++		    }
++		}
 +	    }
  	  /* If we ran into a BARRIER, this code is an extension of the
  	     basic block when the branch is taken.  */
  	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)
-@@ -8302,6 +8359,7 @@
+@@ -8302,6 +8417,7 @@
    register int i;
  
    cse_jumps_altered = 0;
