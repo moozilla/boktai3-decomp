@@ -1,11 +1,36 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
-#ifdef NONMATCHING
-// fuzzy: 84.2%
-// Remaining differences: flag-load scheduling and reset-address reuse.
 void Vorn_ClearRouteResumeFlag(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 u8 sub_0812F3CC(void *);
+static inline u32 *Route_SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+{
+    void *callback = cb;
+    u32 kind = k;
+    u32 *field;
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = callback;
+    actor->field2C8 = 0;
+    field = &actor->flags114;
+    {
+        u32 mask = ~1;
+        *field &= mask;
+    }
+    actor->word104 = 0;
+    return field;
+}
+static inline void Route_RestoreMotion(struct SceneActorRegistryResetView *actor, u32 result,
+                                       u32 *flags)
+{
+    /* Restore the saved target as its stored 32-bit control value. */
+    actor->word104 = *(u32 *)&actor->entryTarget228;
+    actor->word108 = result;
+    actor->word10C = result;
+    actor->word110 = 1;
+    *flags = 1;
+}
 // confidence=low: restores route control and movement after an action completes.
 #define Vorn_RestoreRouteMovement sub_080B0038
 void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
@@ -14,6 +39,7 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
     u8 *group = context + 0x3D4;
     u32 *action;
     u8 result;
+    u32 *flags;
     asm("" : "+r"(group));
     if (a->field2B1)
         a->field2B1 = 0;
@@ -24,22 +50,27 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
         return;
     if (a->field2B0) {
         struct SceneActorRegistryControl *control;
+        u32 actionMask;
         Vorn_ClearRouteResumeFlag(context);
         SceneActorMovement_ResolveRoutePosition(a);
         control = (void *)(group + 0x4C);
+        actionMask = 0x200000;
         action = &a->flags2CC;
-        if (Chase_Bits32(action, 0x200000)) {
+        if (Chase_Bits32(action, actionMask)) {
             s32 mask;
             u16 *motion;
             u32 *state = &a->flags2D0;
             mask = ~0x1000000;
             *state = mask & *state;
             motion = &a->flags2D4;
-            Chase_ClearBits(motion, 0x200);
             {
-                register u32 zero asm("r1") = 0;
-                asm("" : "+r"(zero));
-                control->mode = zero;
+                u32 motionMask = ~0x200;
+                motionMask &= *motion;
+                {
+                    register u32 zero asm("r1") = 0;
+                    *motion = motionMask;
+                    control->mode = zero;
+                }
             }
             control->counter = result;
             control->timer = result;
@@ -51,16 +82,8 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
         a->field2C2 = 64;
         Memory_Clear(*(void **)(group + 0x200), 8);
         Chase_SetBehavior(a, 2);
-        Chase_SetCtl(a, *(void **)((u8 *)a + 0x22C), 0);
-        a->word104 = (u32)a->entryTarget228;
-        a->word108 = result;
-        a->word10C = result;
-        a->word110 = 1;
-        a->flags114 = 1;
+        flags = Route_SetCtl(a, *(void **)((u8 *)a + 0x22C), 0);
+        Route_RestoreMotion(a, result, flags);
     } else
         a->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080B0038);
-#endif
