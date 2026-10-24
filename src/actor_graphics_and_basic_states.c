@@ -433,19 +433,18 @@ s32 sub_08022624(u8 *p, s32 count, s16 *min, s16 *max)
     i = 0;
     if (i >= count)
         goto end;
-loop:
-    {
-        s16 **list = (s16 **)(p + 0x110);
-        s16 *pos = list[i];
-        if (pos) {
-            s32 x = pos[0];
-            u8 inside = 0;
-            if (x >= min[0] && x <= max[0] && pos[2] >= min[2] && pos[2] <= max[2])
-                inside = 1;
-            if (inside)
-                return i;
-        }
+loop: {
+    s16 **list = (s16 **)(p + 0x110);
+    s16 *pos = list[i];
+    if (pos) {
+        s32 x = pos[0];
+        u8 inside = 0;
+        if (x >= min[0] && x <= max[0] && pos[2] >= min[2] && pos[2] <= max[2])
+            inside = 1;
+        if (inside)
+            return i;
     }
+}
     i++;
     if (i < count)
         goto loop;
