@@ -225,7 +225,10 @@ Knobs of the instrumented compiler (`tools/agbcc-instr.sh`): `AGBCC_NOGIV=U1,U2`
 `AGBCC_GIV=U1,U2` (loop.c: keep the giv set by insn U unreduced / reduce it anyway;
 `AGBCC_LOOP_TRACE=1` lists each giv with `fn=`, type, benefit and decision; added after
 sub_0803D430's worker asked for a strength-reduction explainer, where NOGIV=66 alone takes
-26 to 23 ROM insns; no-knob output identical on 400 loop units and 458 NONMATCHING files),
+26 to 23 ROM insns; no-knob output identical on 400 loop units and 458 NONMATCHING files; caveat from that worker's second round: the NOGIV=66 hit was the player-slot
+address, which the ROM *does* step, so the gain came from allocation side effects; a probe hit on
+a giv says the decision matters, not which side the ROM is on: check the ROM listing for a
+post-increment or a stepped register before writing C; it reached 24/25 by C, not a match),
 `CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
 `CSE_DEBUG=N` (trace `make_regs_eqv` for new >= N), `CSE_PATH=1` (trace each

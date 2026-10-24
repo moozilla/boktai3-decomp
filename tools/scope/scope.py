@@ -1693,8 +1693,10 @@ def cmd_probe(src, func, env):
                           " ROM recomputed it: spell it differently (another base or offset form) so"
                           " PRE does not see the same expression.",
            "AGBCC_NOGIV": "loop.c turned this per-iteration computation into its own register stepped"
-                          " each pass (strength reduction; often a post-increment address). The ROM"
-                          " recomputes it from the index: in C index the array where it is used"
+                          " each pass (strength reduction; often a post-increment address). First check"
+                          " the ROM listing: if the ROM also steps it (a post-increment or an add of the"
+                          " element size each pass), the gain is an allocation side effect, not the cause."
+                          " If the ROM recomputes it from the index: in C index the array where it is used"
                           " (base[i], base + i * size) instead of walking a pointer, keep one loop"
                           " counter, or make the step not a constant multiple of the counter.",
            "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
