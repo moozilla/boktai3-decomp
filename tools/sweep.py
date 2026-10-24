@@ -52,10 +52,18 @@ def sweep_one(job):
             row["start"] = base and base[0]
             best = None
             for sp in sps:
-                try:
-                    outs = list(sp(d.fn, d.helpers) if sp in spellings.HELPER_SPELLINGS else sp(d.fn))
-                except Exception:
-                    continue
+                # the function, and (a plain spelling) each inline helper it calls, as fix.py does
+                targets = [(None, d.fn)] + ([] if sp in spellings.HELPER_SPELLINGS else list(d.helpers.items()))
+                outs = []
+                for name, node in targets:
+                    try:
+                        got = list(sp(d.fn, d.helpers) if sp in spellings.HELPER_SPELLINGS else sp(node))
+                    except Exception:
+                        continue
+                    for desc, n2 in got:
+                        if name:  # an edited helper (and any helpers the spelling added)
+                            n2 = (d.fn, [n2[0]] + list(n2[1])) if isinstance(n2, tuple) else (d.fn, [n2])
+                        outs.append((desc + (f" in {name}" if name else ""), n2))
                 for desc, f2 in outs:
                     helpers = {}
                     if isinstance(f2, tuple):

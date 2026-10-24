@@ -446,7 +446,34 @@
  static int allocno_compare	(const void *, const void *);
  static void global_conflicts	(void);
  static void expand_preferences	(void);
-@@ -562,6 +569,13 @@
+@@ -497,6 +504,26 @@
+ 
+       /* Try to expand the preferences by merging them between allocnos.  */
+ 
++      /* AGBCC_PREF="pseudo:hard,...": add HARD to pseudo's preferences,
++	 as a copy from or to that hard register would.  */
++      {
++	char *e = getenv ("AGBCC_PREF");
++	while (e && *e)
++	  {
++	    int r, h, n = 0;
++	    if (sscanf (e, "%d:%d%n", &r, &h, &n) < 2 || n == 0)
++	      break;
++	    if (r < max_regno && reg_allocno[r] >= 0)
++	      {
++		SET_HARD_REG_BIT (hard_reg_preferences[reg_allocno[r]], h);
++		SET_HARD_REG_BIT (hard_reg_copy_preferences[reg_allocno[r]], h);
++		SET_HARD_REG_BIT (hard_reg_full_preferences[reg_allocno[r]], h);
++	      }
++	    e += n;
++	    if (*e == ',')
++	      e++;
++	  }
++      }
+       expand_preferences ();
+ 
+       /* Determine the order to allocate the remaining pseudo registers.  */
+@@ -562,6 +589,13 @@
      gcc_obstack_init (&global_obstack);
  
      global_init (file);
@@ -460,7 +487,7 @@
    
      for (i = 0; i < (size_t) max_allocno; i++)
      {
-@@ -583,6 +597,22 @@
+@@ -583,6 +617,22 @@
          }
      }
  
@@ -483,7 +510,7 @@
      /* Do the reloads now while the allocno data still exist, so that we can
         try to assign new hard regs to any pseudo regs that are spilled.  */
  
-@@ -622,6 +652,10 @@
+@@ -622,6 +672,10 @@
      = (((double) (floor_log2 (allocno_n_refs[v2]) * allocno_n_refs[v2])
  	/ allocno_live_length[v2])
         * 10000 * allocno_size[v2]);
@@ -494,7 +521,74 @@
    if (pri2 - pri1)
      return pri2 - pri1;
  
-@@ -1221,6 +1255,23 @@
+@@ -851,6 +905,30 @@
+    that are preferred by conflicting registers of lower priority.  If possible,
+    we will avoid using these registers.  */
+    
++/* AGBCC_WHYREG=PSEUDO: print to stderr what find_reg saw for PSEUDO (its
++   conflicts, the registers used so far, the registers lower-priority
++   conflicting pseudos prefer and which pseudo prefers each, its own
++   preferences) and what it chose.  */
++static int
++agbcc_whyreg_p (pseudo)
++     int pseudo;
++{
++  char *e = getenv ("AGBCC_WHYREG");
++  return e && atoi (e) == pseudo;
++}
++static void
++agbcc_print_set (name, set)
++     char *name;
++     HARD_REG_SET set;
++{
++  int r;
++  fprintf (stderr, " %s={", name);
++  for (r = 0; r < 16; r++)
++    if (TEST_HARD_REG_BIT (set, r))
++      fprintf (stderr, " r%d", r);
++  fprintf (stderr, " }");
++}
++
+ static void
+ prune_preferences ()
+ {
+@@ -900,6 +978,17 @@
+ 				      hard_reg_full_preferences[allocno]);
+ 			       
+ 	    IOR_HARD_REG_SET (regs_someone_prefers[allocno], temp);
++	    if (agbcc_whyreg_p (allocno_reg[allocno]))
++	      {
++		HARD_REG_SET empty;
++		CLEAR_HARD_REG_SET (empty);
++		GO_IF_HARD_REG_SUBSET (temp, empty, agbcc_skip);
++		fprintf (stderr, "WHYREG %d: pseudo %d (order %d) prefers",
++			 allocno_reg[allocno], allocno_reg[allocno_order[j]], j + 1);
++		agbcc_print_set ("", temp);
++		fprintf (stderr, "\n");
++	      agbcc_skip:;
++	      }
+ 	  }
+     }
+ }
+@@ -1187,6 +1276,17 @@
+ 
+   /* Did we find a register?  */
+ 
++  if (agbcc_whyreg_p (allocno_reg[allocno]))
++    {
++      fprintf (stderr, "WHYREG %d: chose r%d;", allocno_reg[allocno], best_reg);
++      agbcc_print_set ("conflicts", used1);
++      agbcc_print_set ("used_so_far", regs_used_so_far);
++      agbcc_print_set ("someone_prefers", regs_someone_prefers[allocno]);
++      agbcc_print_set ("prefs", hard_reg_preferences[allocno]);
++      agbcc_print_set ("copy_prefs", hard_reg_copy_preferences[allocno]);
++      fprintf (stderr, "\n");
++    }
++
+   if (best_reg >= 0)
+     {
+       register int lim, j;
+@@ -1221,6 +1321,23 @@
      }
  }
  

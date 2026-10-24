@@ -66,6 +66,15 @@ try-env  the same for any of the instrumented compiler's knobs, one quoted
       moves jump.c would delete as copies of a value already there: all three
       together on the use's insn match a ROM that copies a high register
       straight back (agbccsrc.py reload-mode).
+      AGBCC_WHYREG=N prints what global.c find_reg saw for pseudo N: its
+      conflicts, the registers used so far, the registers lower-priority
+      conflicting pseudos prefer (and which pseudo prefers each), its own
+      preferences and its choice. AGBCC_PREF=N:R[,N:R] adds hard register R
+      to pseudo N's preferences, as a copy would. When AGBCC_FORCE matches
+      but AGBCC_PRI cannot, try AGBCC_PREF on the pseudo and on the pseudos
+      it is copied to or computed into (sub_08137E28: PREF=cell:4 matched,
+      and the C was the cell index computed into x itself: fix.py
+      sp_result_into_arg).
 
 canon  finds the CSE canonical-register decision behind a difference, with no
       pseudo number to guess: one traced compile lists every pseudo that
@@ -358,7 +367,7 @@ def try_env(a, quiet=False):
     with concurrent.futures.ThreadPoolExecutor(a.j) as pool:
         texts = list(pool.map(run, specs))
     for spec, text in zip(specs, texts):
-        if 'CSE_DEBUG' in spec:  # check.py drops the compiler's stderr: compile once more for the trace
+        if 'CSE_DEBUG' in spec or 'AGBCC_WHYREG' in spec:  # check.py drops stderr: compile again for the trace
             work = compile_dumps(a.src, [], a.nonmatching)
             env = dict(os.environ, **dict(kv.split('=', 1) for kv in spec.split()))
             tr = subprocess.run([cc] + build.cflags_for(a.src) + ['u.i', '-o', '/dev/null'],

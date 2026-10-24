@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
 #include "scene_actor_chase.h"
 
 u8 *Path_GetPointData(u8 *);
@@ -19,7 +17,7 @@ static inline u32 Route_Random(void)
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + (u32)RANDOM_TABLE_ADDR);
 }
 
 static inline void Route_SelectRandom(u8 *cursor)
@@ -38,6 +36,28 @@ static inline void Route_SelectRandom(u8 *cursor)
 static inline s32 Dot(struct ContactPosition *a, struct ContactPosition *b)
 {
     return a->x * b->x + a->z * b->z;
+}
+
+/* Chase_CellAt, Chase_Height and Chase_SnapToRoute as this function spells them: the cell index is
+   computed into x itself (x = Chase_CellIndex(x, z)), so x, the index and the result share one
+   register (fix.py sp_result_into_arg). */
+static inline s32 Chase_CellAt_(struct ContactPosition *position)
+{
+    s32 x = position->x >> 8;
+    x = Chase_CellIndex(x, position->z >> 8);
+    return x;
+}
+
+static inline u32 Chase_Height_(struct ContactPosition *position)
+{
+    return Chase_HeightAt(Chase_CellAt_(position), position);
+}
+
+static inline void Chase_SnapToRoute_(struct ContactPosition *p, u8 *route)
+{
+    p->x = (*(u16 **)(route + 8))[0];
+    p->z = (*(u16 **)(route + 8))[1];
+    p->y = Chase_Height_(p);
 }
 
 void sub_08137E28(struct SceneActorRegistryResetView *actor)
@@ -83,7 +103,7 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
         route->entry = entry;
         cursor = group + 0x74;
     }
-    Chase_SnapToRoute(*((struct ContactPosition **)(group + 0x200)), cursor);
+    Chase_SnapToRoute_(*((struct ContactPosition **)(group + 0x200)), cursor);
     nav = *((void **)(group + 0x1FC));
     if (!Chase_TryRoute(actor, nav, &actor->position,
                         *((struct ContactPosition **)(group + 0x200)))) {
@@ -93,7 +113,3 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
         (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08137E28);
-#endif
