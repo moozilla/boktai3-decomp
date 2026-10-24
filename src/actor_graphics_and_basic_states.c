@@ -457,15 +457,61 @@ INCLUDE_ASM("asm/nonmatching", sub_08022624);
 
 INCLUDE_ASM("asm/nonmatching", sub_08022694);
 
-INCLUDE_ASM("asm/nonmatching", sub_08022790);
-
-INCLUDE_ASM("asm/nonmatching", sub_08022878);
-
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
 extern u32 gUnk_03005308;
+
+// confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
+// smaller one shifted by the facing kept at 0xA8.
+void sub_08022790(u8 *p, s32 big)
+{
+    struct ContactPosition pos;
+    struct Packed size;
+    struct ContactPosition *at = &pos;
+    s32 angle, count, speed;
+    u16 index;
+    u32 *indexPtr;
+    u32 mask;
+    int smallMask;
+    const u16 *table;
+    pos = *(struct ContactPosition *)(p + 0x260);
+    at->y += 300;
+    if (big) {
+        size.x = 164;
+        size.y = 32;
+        size.z = 164;
+    } else {
+        switch (p[0xA8]) {
+            case 1:
+                pos.x -= 0x80;
+                break;
+            case 2:
+                at->z -= 0x80;
+                break;
+        }
+        size.x = 128;
+        size.y = 16;
+        size.z = 128;
+    }
+    table = gUnk_0203B400;
+    indexPtr = &gUnk_03005308;
+    index = *indexPtr + 1;
+    mask = 1023;
+    index &= mask;
+    angle = (u8)table[index];
+    index = (index + 1) & mask;
+    count = table[index];
+    smallMask = 3;
+    count = (count & smallMask) + 2;
+    index = (index + 1) & mask;
+    *indexPtr = index;
+    speed = (table[index] & smallMask) + 20;
+    SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
+}
+
+INCLUDE_ASM("asm/nonmatching", sub_08022878);
 
 // MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
