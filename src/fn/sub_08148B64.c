@@ -2,9 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: action pulses a spiral effect while alternating the folded facing.
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// Remaining mismatch: duration-field address uses r0 where the ROM uses r3.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -50,7 +47,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r6");
         register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u8 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
@@ -184,15 +181,22 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
         register u16 *parameter asm("r1");
         asm("" : "+r"(offset));
         parameter = (u16 *)((u8 *)p + offset);
-        asm("" : "+r"(parameter));
         {
-            register u32 value asm("r0") = 0x2DD;
-            asm("" : "+r"(value));
+            register u32 value = 0x2DD;
             *parameter = value;
         }
     }
-    if ((p->actionEighteenDuration += 3) > 32)
-        p->actionEighteenDuration = 32;
+    {
+        register u32 durationOffset asm("r3") =
+            (u32) & ((struct Player *)0)->actionEighteenDuration;
+        struct Duration {
+            u16 actionEighteenDuration;
+        } *duration;
+        asm("" : "+r"(durationOffset));
+        duration = (struct Duration *)((u8 *)p + durationOffset);
+        if ((duration->actionEighteenDuration += 3) > 32)
+            duration->actionEighteenDuration = 32;
+    }
     if (++p->tetherFrame > 31) {
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;
@@ -200,7 +204,3 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
         ActorSequence_Begin(p, 0, 0);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralDisorientation);
-#endif
