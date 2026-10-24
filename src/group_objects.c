@@ -356,12 +356,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
     return 0;
 }
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// goto loop keeps loop.c from hoisting the table and the constants 0/1 (the ROM hoists only
-// index and mask, which are source-level here). Remaining (rasolve): y must rank below index,
-// mask and the constant 1 so it is spilled to the stack; one reload rotation step.
-static inline int step(const u16 *table, u32 *index, u32 mask)
+static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 mask)
 {
     u32 offset;
     *index = (*index + 1) & mask;
@@ -369,59 +364,64 @@ static inline int step(const u16 *table, u32 *index, u32 mask)
     return *(const u16 *)(offset + (u32)table);
 }
 
+// MATCHING_CONCESSION: register-pinning
 int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupActor *actor;
-    s32 y;
+    s32 duration;
     struct GroupVec position;
-    int i;
+    int remaining;
     struct GroupPiece *p;
     u32 *index;
     u32 mask;
-    typeof(p->target) t1;
     m->actorId = cmd->originX;
     actor = SceneBody_GetById(m->actorId);
     if (!actor)
         return -1;
     position = actor->position;
-    y = (s16)cmd->originY;
+    duration = (s16)cmd->originY;
     {
-        typeof(m->timer) *q1 = &m->timer;
-        u8 z1 = 1;
-        *q1 = 0;
+        register int enabled asm("r8");
+        m->timer = 0;
         index = &gUnk_03005308;
         mask = 1023;
-        i = 15;
+        remaining = 15;
         p = m->pieces;
     loop: {
         int angle;
+        int zero;
         const u16 *table;
         p->state = 3;
         do {
-            p->active = 1;
+            enabled = 1;
+            p->active = enabled;
         } while (0);
-        p->timer = 0;
-        p->target = (t1 = position);
-        angle = Math_Atan2(t1.x - p->position.x, p->target.z - p->position.z);
+        zero = 0;
+        p->timer = zero;
+        p->target = position;
+        asm("" : : "r"(zero), "r"(index), "r"(mask));
+        angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         p->direction = angle;
         table = gUnk_0203B400;
-        p->direction = (angle - 16) + (step(table, index, mask) & 31);
-        p->duration = y;
-        p->speed = (step(table, index, mask) & 7) + 7;
-        i--;
+        {
+            register int random asm("r3") = BoardPieces_NextRandomValue(table, index, mask);
+            angle -= 16;
+            random &= 31;
+            angle += random;
+            p->direction = angle;
+        }
+        p->duration = duration;
+        p->speed = (BoardPieces_NextRandomValue(table, index, mask) & 7) + 7;
+        remaining--;
         p++;
-        if (i >= 0)
+        if (remaining >= 0)
             goto loop;
     }
 
-        m->active = z1;
+        m->active = enabled;
         return 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010298);
-#endif
 
 static inline int count(struct GroupQueue *q)
 {
