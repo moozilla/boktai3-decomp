@@ -208,6 +208,8 @@ def cmd_tick(args):
         if res.get("match") or not m or int(m.group(1)) + int(m.group(2)) > 8:
             continue
         open(os.path.join(wd, ".second"), "w").write(res["counts"])
+        hint = os.path.join(wd, "hint.txt")  # a reviewer's note for this function, read once
+        hint = (" A reviewer adds: " + open(hint).read().strip()) if os.path.exists(hint) else ""
         if resume(r, model, note=(f"You stopped at {res['counts']}: very close. Take one more round of up to 80"
                                    " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
                                    " a pin is acceptable only as the last resort). scope has new commands since"
@@ -215,7 +217,7 @@ def cmd_tick(args):
                                    " (canonical register, jump follow, PRE) alone and names the one behind the"
                                    " difference, with the C lines involved; and a difference that is only a"
                                    " moved branch target is now explained (loop head or jump threading)."
-                                   " Rerun scope on your best file first. Update the deliverables.")):
+                                   " Rerun scope on your best file first. Update the deliverables." + hint)):
             running.add(r["func"])
     for r in rows:  # resume workers a model error stopped, before starting new ones
         if len(running) < workers and state(r["func"]) == "failed" and \
