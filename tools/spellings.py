@@ -932,6 +932,37 @@ def sp_narrow_mask(fn):
             yield f"({t})({text(n)[:28]})", f2
 
 
+def sp_copy_uses(fn):
+    """T *v = E; ... E ... v ...  ->  move single uses between the copy v and its source E
+    (Slot7_UpdateMotionPhase: `other = (struct PhaseState *)p`; which of the two pseudos gets the
+    higher allocation priority, and so the callee-saved register, follows their use counts). Sound
+    while neither v nor what E reads is reassigned. The C-level replacement for a `do { } while (0)`
+    loop-weight wrapper around one use."""
+    decls = [d for d in fn.body.block_items if isinstance(d, ca.Decl) and d.init is not None
+             and isinstance(d.type, ca.PtrDecl)]
+    assigned = {text(n.lvalue) for n, _, _ in walk(fn.body) if isinstance(n, ca.Assignment)} | \
+               {text(n.expr) for n, _, _ in walk(fn.body) if isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--", "&")}
+    for d in decls:
+        src = text(d.init)
+        reads = {x.name for x, _, _ in walk(d.init) if isinstance(x, ca.ID)}
+        if d.name in assigned or reads & assigned:
+            continue
+        def is_src(n, par, slot, src=src, d=d):
+            return text(n) == src and n is not d.init and not isinstance(par, ca.Decl)
+        def is_var(n, par, slot, d=d):
+            return isinstance(n, ca.ID) and n.name == d.name and not (isinstance(par, ca.StructRef) and slot == "field")
+        for k in range(sites(fn, is_src)):
+            f2 = copy.deepcopy(fn)
+            n, par, slot = nth(f2, is_src, k)
+            set_child(par, slot, ca.ID(d.name))
+            yield f"use {d.name} for {src[:24]} (use {k + 1})", f2
+        for k in range(sites(fn, is_var)):
+            f2 = copy.deepcopy(fn)
+            n, par, slot = nth(f2, is_var, k)
+            set_child(par, slot, copy.deepcopy(d.init))
+            yield f"use {src[:24]} for {d.name} (use {k + 1})", f2
+
+
 WORD_TYPES = {"u32", "s32", "int", "unsigned int", "vu32", "uintptr_t"}
 
 
@@ -1384,7 +1415,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct,
-             sp_field_extend, sp_narrow_mask, sp_alias_read]
+             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1409,8 +1440,8 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload": ["sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const"],
 }

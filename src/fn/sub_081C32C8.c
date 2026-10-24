@@ -64,6 +64,7 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 }
 
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // Full arc-motion reconstruction; pointer lifetimes, parameter spills and projection allocation differ.
 void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct Vec *source,
                            struct Vec *destination, s32 initialScale, u32 rampTo, u32 arcParameter,
@@ -82,52 +83,55 @@ void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct Vec *source
         return;
     if (from) {
         if (!effect->coordinateMode) {
-            struct Vec *out = (struct Vec *)&effect->worldX;
+            struct Vec *out = (struct Vec *)(&effect->worldX);
             FromScreen(out, from, 0);
             origin = out;
-            screen = (struct Vec *)&effect->screenX;
+            screen = (struct Vec *)(&effect->screenX);
         } else {
-            origin = (struct Vec *)&effect->worldX;
+            origin = (struct Vec *)(&effect->worldX);
             *origin = *from;
-            screen = (struct Vec *)&effect->screenX;
+            screen = (struct Vec *)(&effect->screenX);
         }
+    } else if (!effect->coordinateMode) {
+        origin = (struct Vec *)(&effect->worldX);
+        screen = (struct Vec *)(&effect->screenX);
+        FromScreen(origin, screen, 512);
     } else {
-        if (!effect->coordinateMode) {
-            origin = (struct Vec *)&effect->worldX;
-            screen = (struct Vec *)&effect->screenX;
-            FromScreen(origin, screen, 512);
-        } else {
-            s32 height;
-            origin = (struct Vec *)&effect->worldX;
-            screen = (struct Vec *)&effect->screenX;
-            height = to->y;
-            FromScreen(origin, screen, height);
-        }
+        s32 height;
+        origin = (struct Vec *)(&effect->worldX);
+        screen = (struct Vec *)(&effect->screenX);
+        height = to->y;
+        FromScreen(origin, screen, height);
     }
     if (!effect->coordinateMode) {
-        struct Vec *out = (struct Vec *)&effect->targetX;
+        struct Vec *out = (struct Vec *)(&effect->targetX);
         FromScreen(out, to, 0);
         target = out;
     } else {
-        target = (struct Vec *)&effect->targetX;
+        target = (struct Vec *)(&effect->targetX);
         *target = *to;
     }
     if (rampFrom < 0)
         effect->rampFrom = (s8)effect->byte3C;
     else
         effect->rampFrom = rampFrom;
-    effect->rampTo = rampTo;
-    ToScreen(screen, origin);
-    effect->byte3C = effect->rampFrom;
-    effect->byte3D = effect->rampFrom;
-    OrbitMotion_BeginArc((u8 *)effect + 0xA0, origin, target, arcParameter, trackMode);
-    effect->shakeThreshold = trackMode;
-    *(u32 *)((u8 *)effect + 0x34) &= ~1;
-    SetCallback(ContactImpactEffect_UpdateContact, (void *)((u8 *)effect + 0xF4));
-    effect->shakeTimer = 0;
-    effect->shakeFlag = 0;
-    Callback_InvokeActor(effect);
+    {
+        typeof(effect->rampTo) *q1 = &effect->rampTo;
+        u8 z1 = 0;
+        *q1 = rampTo;
+        ToScreen(screen, origin);
+        effect->byte3C = effect->rampFrom;
+        effect->byte3D = effect->rampFrom;
+        OrbitMotion_BeginArc(((u8 *)effect) + 0xA0, origin, target, arcParameter, trackMode);
+        effect->shakeThreshold = trackMode;
+        *((u32 *)(((u8 *)effect) + 0x34)) &= ~1;
+        SetCallback(ContactImpactEffect_UpdateContact, (void *)(((u8 *)effect) + 0xF4));
+        effect->shakeTimer = z1;
+        effect->shakeFlag = z1;
+        Callback_InvokeActor(effect);
+    }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneTarget_BeginMove);
 #endif
