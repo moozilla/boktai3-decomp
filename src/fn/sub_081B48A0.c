@@ -2,7 +2,7 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-// Matched with tools/scope by a gpt-6.1-sol worker; the pins and empty asm barriers are
+// Matched with tools/scope by gpt-6.1-sol workers; the pins and empty asm barriers are
 // temporary concessions.
 // confidence=low: moves the part along its stored retreat angle, then returns to idle.
 
@@ -27,6 +27,11 @@ struct VanargandPart {
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
+static inline s32 ScaleSequenceSpeed(s32 weight, s32 speed)
+{
+    return (speed * weight) >> 6;
+}
+
 static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
 {
     struct VanargandPart *owner = obj;
@@ -103,8 +108,8 @@ static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -126,10 +131,8 @@ static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed = ScaleSequenceSpeed(state->frameWeight, state->speed);
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
