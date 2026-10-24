@@ -49,9 +49,15 @@ scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
 scope.py FILE.c probe               is it one cse/gcse/loop decision? flips each alone (SCOPE_PROBE_MAX=150 compiles)
 scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
+scope.py FILE.c try V1.c V2.c ...   score whole-file variants, best first, with the lines each changed
+scope.py FILE.c try KNOB={a,b,c}    one variant per knob value (shell expansion makes the list)
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
+
+Compiles are cheap (~12 ms per variant in `try`, `probe`, `spill`, `pins`). When one hypothesis
+has several spellings (three declaration orders, two helper shapes), write them as files and `try`
+them in one call instead of one compile per edit; keep each variant a test of a stated hypothesis.
 
 Knobs take a pseudo number or a C variable name (`AGBCC_PRI=table:+214`);
 names survive edits, numbers do not, so prefer the name `why` prints.

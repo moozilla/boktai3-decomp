@@ -131,6 +131,7 @@ python3 tools/scope/scope.py FILE.c spill         is the whole difference reload
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
 python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
+python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first, ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 ```
@@ -322,7 +323,7 @@ in the patch.
   and the allocation explainer's "who held the register" scan is linear over
   the pseudo's insn span, not true liveness (`life` has the true liveness;
   use it there next).
-* A `vs OTHER.c` mode: allocation order, priorities and lives of named
+* Done: a `vs OTHER.c` mode: allocation order, priorities and lives of named
   pseudos in two drafts side by side. Done by hand twice this session; it is
   the usual question after an edit fixes one thing and breaks another.
 * Done: `why all`. It skips branches that only land elsewhere and says when an
@@ -331,8 +332,8 @@ in the patch.
   makes the ROM's reload count differ (insns needing reloads, by C line).
 * For gcse-born differences, automatically test bucket order with a few
   `AGBCC_GCSE_T` values (see below) and say whether order alone explains it.
-* A `try` mode: N variants of one hypothesis through the fork server (the server and the ~12 ms
-  per variant now exist).
+* Done: `try` (whole-file variants or one knob each, through the fork server; sub_0801A6D0's 32
+  historical drafts score in 1.3 s, a 13-value knob sweep in 0.23 s).
 * Pointers from each decision to the agbcc source function that makes it.
 
 ## agbcc facts established with scope
