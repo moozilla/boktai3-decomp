@@ -247,6 +247,17 @@ def one_round(d, keys, show, try_all, seeds, log, deadline=None):
     return base, good, compiles
 
 
+def canon_probe(path):
+    """The pseudo whose CSE canonicalisation alone explains a near match (tools/rtlprobe.py canon), or None."""
+    import subprocess
+    if not os.path.exists(os.path.join(ROOT, "build", "agbcc-instr", "gcc", "agbcc")):
+        return None
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "rtlprobe.py"), "canon", path, "-j", "2"],
+                       capture_output=True, text=True, cwd=ROOT)
+    m = re.search(r"CSE_NOCANON=(\d+):.*MATCH", r.stdout)
+    return int(m.group(1)) if m else None
+
+
 def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
     path = os.path.join(wd, f"{func}.c")
@@ -306,6 +317,12 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 total += n
                 if rnd == 0 and isinstance(kids, list) and start is None:
                     start = Draft(txt, func, wd).score()
+                    if start and start[0] <= 4:
+                        reg = canon_probe(os.path.join(wd, f"{func}.c"))
+                        if reg:
+                            log(f"   cause: CSE makes pseudo {reg} a canonical register (rtlprobe.py canon: "
+                                f"CSE_NOCANON={reg} matches); make the ROM-side value live longer, or keep "
+                                f"the copy into {reg} inside one block")
                 if kids == "match":
                     kids = [((0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:

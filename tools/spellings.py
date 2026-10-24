@@ -1286,6 +1286,10 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct]
+# type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
+# done unsigned), so they may change what the draft does. That is their job: a byte match proves the
+# ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
+TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
 HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
 

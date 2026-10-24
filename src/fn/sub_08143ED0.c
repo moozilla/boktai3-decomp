@@ -3,6 +3,7 @@
 // confidence=low: updates movement and step cues while constraining the tether target.
 #ifdef NONMATCHING
 // fuzzy: 99.9%
+// rtlprobe.py canon: CSE_NOCANON=265 (FlagFour's return register) matches, as in sub_08141C40.
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define S(n) (*(s16 *)(p + (n)))
