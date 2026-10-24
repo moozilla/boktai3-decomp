@@ -181,6 +181,11 @@ of the headline totals** (overall measures, register categories, PROGRESS.md) an
 reported only in the Intentional assembly category, so the headline percentage is of
 code that should become C. **Decompilable code** is kept as a category and now equals
 the headline. A function in these ranges that does get matched in C counts normally.
+C functions that call the BIOS in place through the SDK's `SystemCall(n)` macro
+(`include/gba/syscall.h`: Power_EnterSleep's Stop, m4a's `swi 0x2A`) are ordinary
+C, not intentional assembly: the macro is the original source, and a native port
+implements it once in its BIOS layer. A search of every unmatched function found
+no other in-place `swi` outside the syscall library and the m4a mixer.
 
 The ARM code after crt0 (`08000350-0800145C`, copied to IWRAM `03000000` by `AgbMain`)
 is *not* assembly: it is six agbcc ARM C functions (APCS frames, the same compiler as

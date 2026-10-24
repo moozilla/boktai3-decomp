@@ -6,6 +6,7 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
 {
     struct GroupResource *resource;
     struct GroupSprite *sprite;
+    struct GroupVec *position;
     {
         int zero = 0;
         asm("" : "+r"(zero));
@@ -25,19 +26,9 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
     sprite->mode = 2;
-    {
-        register struct GroupVec *position asm("r5") = &p->sprite.position;
-        {
-            u32 zero = 0;
-            {
-                register u32 *src asm("r0") = &zero;
-                struct GroupVec *dst = position;
-                asm("" : : "r"(src), "r"(dst));
-                CpuSet(src, dst, 0x05000002);
-            }
-        }
-        Shadow_Initialize(p->transform, position, 0);
-    }
+    position = &p->sprite.position;
+    ZeroFill8(position);
+    Shadow_Initialize(p->transform, position, 0);
     ActorShadow_Disable(p->transform);
 }
 
@@ -699,10 +690,6 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     }
 }
 
-static inline void CpuSet_2(u32 *a0, int a2, struct GroupVec *a1)
-{
-    CpuSet(a0, a1, a2);
-}
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -713,12 +700,10 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     active = p->active;
     offset = &p->offset;
     if (active) {
-        u32 zero;
         p->active = 0;
         p->anchor = p->position;
         p->direction = randomValue();
-        zero = 0;
-        CpuSet_2(&zero, 0x05000002, offset);
+        ZeroFill8(offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
