@@ -378,6 +378,7 @@ def evaluate(text):
     code = re.sub(r"^\s*\.(stab|loc|file|ident)[^\n]*\n|^\.?L[MBT]?\w*:\n", "",
                   _cc.last_asm or "", flags=re.M)
     feat["code"] = hashlib.sha1(code.encode()).hexdigest()
+    feat["bytes"] = _cc.last_bytes
     residual = b
     if _targets and _base_feat is not None:
         env = residual_env(feat, _targets, _base_feat)
@@ -385,6 +386,43 @@ def evaluate(text):
             r, _ = _cc.run(env=env)
             residual = r if r is not None else 10 ** 6
     return b, feat, residual
+
+
+class Guard:
+    """Rejects candidates that do not behave like the ROM function on
+    tools/semcheck.py's trial inputs (a reordered dependent statement, a read
+    before a store, a dropped store). Checked when a candidate is scored, so
+    a broken edit never enters the beam."""
+
+    def __init__(self, text, func):
+        import semcheck
+        self.oracle = semcheck.Oracle(func, 8, semcheck.returns_value(text, func),
+                                      arity=semcheck.arities(text), kinds=semcheck.param_kinds(text, func))
+        self.memo, self.checked, self.rejected, self.first = {}, 0, 0, None
+
+    def verdict(self, feat):
+        code = feat.get("code")
+        if code not in self.memo:
+            data = feat.get("bytes")
+            self.memo[code] = self.oracle.check(data) if data else ("NO CODE", None)
+            self.checked += 1
+        return self.memo[code][0]
+
+    def ok(self, feat):
+        v = self.verdict(feat)
+        if v in ("EQUIVALENT", "INCOMPLETE"):
+            return True
+        self.rejected += 1
+        self.first = self.first or self.memo[feat.get("code")][1]
+        return False
+
+
+def make_guard(text, func):
+    try:
+        return Guard(text, func)
+    except (ImportError, SystemExit, KeyError) as e:
+        print(f"guard unavailable: {e}")
+        return None
 
 
 def residual_env(feat, targets, base_feat):
@@ -540,6 +578,8 @@ def main():
                          "across all states, and stop at the first match")
     ap.add_argument("--shape", action="store_true",
                     help="beam also keeps the states whose code is closest to the ROM's with registers masked")
+    ap.add_argument("--guard", action="store_true",
+                    help="keep only states that behave like the ROM function (tools/semcheck.py)")
     ap.add_argument("--pass-order", default="",
                     help="comma-separated pass priority for --lazy (default: LEARNED_ORDER)")
     a = ap.parse_args()
@@ -589,6 +629,9 @@ def main():
     _init(src, func, targets)
     base_b, base_feat, _ = evaluate(base)
     g0 = gap(base_feat, targets, base_feat)
+    guard = make_guard(base, func) if a.guard else None
+    if guard:
+        print(f"guard: the start is {guard.verdict(base_feat)} (ROM blocks reached {guard.oracle.coverage:.0f}%)")
     print(f"base: {base_b} differing bytes (shape {base_feat.get('shape', 0)}), target gap {g0:.3f}")
     ctx = multiprocessing.get_context("spawn")
     with concurrent.futures.ProcessPoolExecutor(a.j, mp_context=ctx, initializer=_init,
@@ -667,6 +710,8 @@ def main():
                 if feat["code"] in seen_code:  # same code as a state already tried
                     continue
                 seen_code.add(feat["code"])
+                if guard and b and not guard.ok(feat):
+                    continue
                 scored.append((residual, gap(feat, targets, base_feat), b, cand, feat, hist))
             if not scored:
                 break
@@ -695,6 +740,8 @@ def main():
                   f"{by_path[0][0]} gap {by_path[0][1]:.3f} bytes {by_path[0][2]}; closest: gap {by_gap[0][1]:.3f} "
                   f"residual {by_gap[0][0]}; fewest bytes {by_bytes[0][2]}; "
                   f"{time.time() - t0:.0f}s; best shape {min(s[4].get('shape', 0) for s in scored)}", flush=True)
+    if guard:
+        print(f"guard: rejected {guard.rejected} of {guard.checked} states; first: {guard.first or '-'}")
     path = os.path.join(out_dir, "best.c")
     open(path, "w").write(best[3])
     print(f"\n{'MATCH' if best[2] == 0 else f'{best[2]} differing bytes'} after "

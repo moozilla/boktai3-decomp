@@ -32,9 +32,6 @@ static inline void show(struct PanelSprite *s)
 // confidence=low: hides (visible == 0) or places the row cursor and arrows, then refreshes the
 // three value digits.
 #define SelectionPanel_UpdateCursor sub_0817597C
-#ifdef NONMATCHING
-// fuzzy: 72.9%
-// Offset temporaries land in other registers, and rightArrow.y and the third keyframe index differ.
 void SelectionPanel_UpdateCursor(struct SelectionPanel *p, s32 visible)
 {
     if (visible == 0) {
@@ -59,8 +56,8 @@ void SelectionPanel_UpdateCursor(struct SelectionPanel *p, s32 visible)
     }
     Anim_LoadKeyframe(p->firstValue, p->keyframes, p->first + 0x4d, 1);
     Anim_LoadKeyframe(p->secondValue, p->keyframes, p->second + 0x4d, 1);
-    Anim_LoadKeyframe(p->thirdValue, p->keyframes, (u16)(0x4e - p->third), 1);
+    {
+        s8 first = 0x4e;
+        Anim_LoadKeyframe(p->thirdValue, p->keyframes, (u16)(first - p->third), 1);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0817597C);
-#endif
