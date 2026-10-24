@@ -128,7 +128,22 @@ python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use 
 python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
 python3 tools/scope/scope.py FILE.c why all       why on the first real difference of each hunk (<= 8)
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
+python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
+python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
+python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
+SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 ```
+
+`life` takes C variable names or pseudo numbers (names survive edits, numbers
+shift). It walks flow's block liveness backward with flow.c's own rule (one
+per insn where the register is live before it, plus one where it is set), so
+its count equals the `Register N used R times across L insns` line; compare
+two drafts by name to see which C line gained or lost an insn.
+
+`SCOPE_TRANSFORM` points at a module with `transform(text) -> text`, applied
+to the preprocessed source before compiling: a what-if that leaves the file
+alone. `transforms/random_table_literal.py` writes `gUnk_0203B400` as the
+integer address (see the literal survey below).
 
 `why UID` recompiles with `CSE_WHY=UID CSE_DEBUG=1 CSE_PATHS=1` and
 `AGBCC_DUMPPRI`, and prints in ~10 lines:
@@ -144,10 +159,28 @@ python3 tools/scope/scope.py FILE.c spill         is the whole difference reload
   "23 (result) became canonical over 24 (phase) at insn 622 (line 67): its last
   use, insn 583 (line 104), is later than ..." plus the three levers;
 * for an allocation difference: the pseudo's global/local record (rank,
-  priority, refs, live length, calls crossed), who already held the ROM's
-  register during its life (hard conflicts come from local alloc and fixed
-  uses), or which earlier-allocated conflicting pseudo took it, with
-  `AGBCC_PRI`/`AGBCC_FORCE` what-ifs;
+  priority, refs, live length, calls crossed), with flow's own live length
+  when allocation sees a different one (doubled for a constant register,
+  fact 10; changed by regmove), then the first of:
+  * reload evicted it from global alloc's choice and re-placed it (fact 13),
+    plus which value the ROM keeps in the draft's register and whether the
+    two are ever live together in the draft;
+  * who already held the ROM's register during its life (hard conflicts
+    come from local alloc and fixed uses);
+  * the rival: the conflicting pseudo the ROM keeps in the draft's register,
+    which global alloc ran after this one (and whether the draft's register
+    was a preference, fact 11), or an earlier-allocated pseudo that took the
+    ROM's register;
+  * where a preference came from: the insn where expand_preferences merged
+    it in, with that insn's REG_DEAD notes in order (fact 11);
+  * find_reg's own view (fact 16, from the compiler's F record): conflicts,
+    the registers pass 0 may reuse, the ones a later pseudo prefers, and which
+    test kept the ROM's register out. When the ROM's register was simply not
+    in use yet, it names the pseudo that takes it later (preferring one the
+    ROM also keeps there) and the arithmetic to allocate that one first;
+  * in both rival cases the arithmetic to flip the order: refs or live length
+    each side would need, live lengths in flow's units, and the
+    `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it;
 * for a reload register (operand not a pseudo before allocation): the reload
   choice number and the rotation explanation, pointing at `spill`.
 
@@ -238,7 +271,11 @@ steps when it matters: resolve relocations in Python instead of linking
   reproduces in one call what took ~15 calls of raw trace reading.
 * `why` has no explainer yet for combine, regmove or gcse changes (it says so),
   and the allocation explainer's "who held the register" scan is linear over
-  the pseudo's insn span, not true liveness.
+  the pseudo's insn span, not true liveness (`life` has the true liveness;
+  use it there next).
+* A `vs OTHER.c` mode: allocation order, priorities and lives of named
+  pseudos in two drafts side by side. Done by hand twice this session; it is
+  the usual question after an edit fixes one thing and breaks another.
 * Done: `why all`. It skips branches that only land elsewhere and says when an
   insn exists only in the final assembly or differs in shape, not registers.
 * The `spill` result is a classification, not a fix: next is a view of what
@@ -346,6 +383,88 @@ Each was read from the compiler source and confirmed on a live draft.
   do), reload loads it as choice #10 -> r2, and `&p->pair`'s constant moves to
   #11 -> r0, as in the ROM.
 
+10. **Constant registers get half priority.** `update_equiv_regs`
+   (local-alloc.c) turns a REG_EQUAL note on the single set of a register
+   into REG_EQUIV when the value is a constant (a symbol address or a number)
+   and doubles that register's `REG_LIVE_LENGTH`; its comment says this is to
+   lower its priority. Global priority is
+   `floor_log2(refs) * refs / live * 10000`, so every pointer to a table, a
+   constant mask or an address constant enters allocation at half the
+   priority its uses suggest. cse gives such registers the REG_EQUAL note even
+   through copies (a gcse copy of a symbol load, a local `table = gSym`, an
+   inline parameter), so writing the pointer differently does not escape it.
+11. **Register preferences spread along value chains.** `expand_preferences`
+   (global.c) merges preferences across every insn where one pseudo dies and
+   another is set (and they do not conflict). In
+   Hresvelgr_SetCosineScaledVelocity the table copy's copy-preference for r3
+   flows 97 -> address -> loaded value -> product, and at the last multiply
+   into `speed`, which is allocated first and takes r3.
+   **The REG_DEAD note order decides who receives it.** The loop walks an
+   insn's notes in order and each dying value swaps preferences with the set
+   value, so a value whose note comes after another's also receives what that
+   one brought in. At `(set 84 (mult 82 48))` with notes `82, 48`, `speed`
+   (48) gets the r3 that 82 brought; with notes `48, 82` it gets nothing.
+   flow writes the notes in operand order (it walks operands last to first and
+   prepends), so `radius * table` instead of `table * radius` reorders them;
+   combine rewrites the notes of an insn it changes (`distribute_notes`), which
+   is why the s16 variant (an extension folded into the multiply) had no leak.
+   The source operand order survives to RTL here because neither operand is a
+   constant (`expand_binop` only swaps a constant or a non-register first
+   operand).
+12. **A modulo or division hands its destination to the quotient.**
+   `expand_divmod` (expmed.c) uses the assignment's destination as the
+   quotient's register unless the destination appears in an operand or has
+   another mode. `x = t % 512;` computes the quotient in `x`, then the
+   remainder into `x` again; as a subexpression (`t - t / 512 * 512`, or a
+   `%` inside a call's arguments) the quotient gets a fresh register. An
+   inline helper also avoids it, but integration substitutes known constants
+   into their uses (`subst_constants`, integrate.c), so the 511 rounding
+   constant is no longer loaded into a register first: one RTL insn shorter,
+   which changes the lives of everything live across it.
+13. **Reload evicts and re-places pseudos.** When reload needs a register for
+   its spills it evicts the pseudos global alloc put there and re-places
+   them with `retry_global_alloc` -> `find_reg`. Pass 0 only reuses a
+   register already in use that no conflicting pseudo prefers; pass 1 takes
+   the first free register from r0 to r15 (Thumb has no `REG_ALLOC_ORDER`).
+   The G record shows global alloc's choice and the dispositions show the
+   final one; when they differ, the free register set at that point decides.
+14. **`regs_may_share` only comes from loop.c**: an invariant moved out of a
+   loop may share an allocno with the register it replaced. Outside loops
+   every pseudo is its own allocno.
+15. **Inline parameters are copied unless read-only.** `expand_inline_function`
+   copies each argument into a new pseudo unless the parameter is `const`
+   and the argument a register; the copies of `v`, `angle`, `radius` are what
+   gives an inlined `polar(&actor->velocity, ...)` its late-born `radius`.
+   (In the cosine twin, `const` changed nothing: the argument is a ternary's
+   result, which is copied anyway.)
+
+16. **Pass 0 of `find_reg` only reuses registers already in use.** With no
+   preference of its own, a pseudo first looks at `regs_used_so_far` (the
+   call-clobbered r0-r3, registers live in the RTL, local alloc's choices and
+   everything global alloc gave out before it) minus its conflicts and minus
+   `regs_someone_prefers` (preferences of conflicting pseudos allocated
+   later). Only if that is empty does pass 1 take the lowest free register.
+   So a pseudo's register depends on pseudos it does not conflict with: r5
+   is reachable in pass 0 only after some earlier pseudo got r5. In the
+   cosine twin, `actor` (r5 early) and `speed` (r5 later) never overlap; the
+   ROM allocated `actor` first, the draft allocates `speed` first (1250 vs
+   1153), finds {} in pass 0 and takes r3 in pass 1. The instrumented
+   compiler's F record (one per `find_reg` call, in the AGBCC_DUMPPRI file)
+   logs these sets; `why` explains from it.
+
+## Survey: random table as a literal address (2026-10-24)
+
+`SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
+file that reads `gUnk_0203B400`: of 207 matched files, 170 compile the same
+and 37 change, many of which already use a local `table = gUnk_0203B400`,
+so the original was not one universal spelling. Over the drafts: 27 better,
+51 worse, 38 the same, 1 match. Large wins left to look at: sub_080B2EEC
+18 -> 4, sub_081FF454 8 -> 4, sub_08137E28 69 -> 38,
+BossSlot2_SpawnBobbingFormation 10 -> 1. Matches that use the literal:
+#642, #643 (SceneHud_SelectUpgradeableStat), #644
+(SceneEffectSchedule_AddFromScript, with a `scaleUnlessFlagged` inline whose
+if/return leaves a label that stops reload's move2add).
+
 ## Survey: how much of Bosses is reload rotation (2026-10-24)
 
 `scope spill` on all 60 NONMATCHING boss drafts (22 skipped: over 40
@@ -370,6 +489,41 @@ which is exactly `10:1`. Not tested.
 
 ## Live investigations
 
+* **Solved: Hresvelgr_UpdateBoundaryBarrage** (#647, two pins fewer). Scope's
+  `why` on the two differing insns said the quotient of `(rawX >> 3) % 512`
+  was computed in `x` itself; expmed.c's target rule (fact 12) gave the
+  fix, `t - t / 512 * 512`. The helper alternative fixed the quotient but cost
+  `px` one insn of life (`life px`: 29 -> 28, the 511 constant folded), which
+  moved it ahead of `target` (priority 714 vs 697) and rotated r8/sb/ip.
+  With the modulo fixed, the SetHeading pin is unnecessary. Remaining
+  concessions, both diagnosed: without the `state` pin, `state` (10 refs,
+  life 41) outranks the flags pointer (9 refs, life 44); the pinned
+  SetHeading adds exactly the 8 insns (`life state`: 41 -> 49) that flip it,
+  via a temporary, a copy and an empty asm per half. Four natural SetHeading
+  forms (one expression, inline quantize helpers, a temporary per field) all
+  leave `state` at 41. The `aoff` keep-alive: reload evicts the 0x3FF mask
+  from r5 and re-places it (fact 13); in the ROM sl is taken because `aoff`
+  is live during the mask's life, in the draft it is not (only case 2 reads
+  it). Open: what keeps `aoff` live through case 1 in the original.
+* **Hresvelgr_SetCosineScaledVelocity and Hresvelgr_SetSineScaledVelocity**
+  (sub_0819C8F8, sub_0819C870; twins, 7 insns each). The table copy (gcse
+  pseudo, the ROM's r3) loses r3 to `speed` (polar's inlined `radius`):
+  priority 483 vs 1250. `AGBCC_PRI=97:+768` matches, but that is the long
+  way round. The real story has two parts, both found by `why`:
+  (1) `speed` inherits r3 at the z multiply because of the REG_DEAD note
+  order (fact 11); writing `radius * table` removes the preference.
+  (2) Then `speed` still takes r3, now in pass 1 of `find_reg` (fact 16): r5
+  is not in use yet because `actor`, which the ROM also keeps in r5, is
+  allocated after `speed` (1153 vs 1250). With the swap,
+  `AGBCC_PRI=22:+98` (actor first) gives a byte-for-byte MATCH. Needed in C:
+  `speed` living 27+ insns (has 24), or `actor` living 23 or fewer (has 26)
+  or with a fourth reference. Tried without effect: `const` parameters, the
+  matched siblings' helper idioms (`scale12(a, b)` with the multiply inside,
+  if/return `scale`), operand orders, `direction` inlined. A named `speed`
+  local moves its copy before `v` (8/9, worse). The s16 parameter variant
+  gets the allocation right because its extension lengthens both lives
+  (`vs`: actor 26 -> 30, speed 24 -> 32) and swaps their order. Open: the
+  C that gives `speed` 3 more insns of life.
 * **Solved: Hresvelgr_InitializeShots** (moozilla/boktai3-decomp#641, plain C,
   no pins). The hypothesis below was right except for the constant: it is a
   pre-loop variable `x = 0x708` assigned before `y` and `z`, so it lives
@@ -426,4 +580,17 @@ which is exactly `10:1`. Not tested.
 * check.py prints raw hex when run outside the venv (no capstone).
 * agbccsrc.py keyword lookup returns unrelated sections.
 * `tools/worktree.sh` does not link `build/agbcc-instr` into new worktrees.
-* The shared instrumented compiler was older than its patch (see above).
+* scope itself, fixed: `FILE.c insn UID` used to treat `insn` as the function
+  name; high registers (sb/sl/fp/ip) were not parsed, which mis-paired ROM and
+  draft operands; positional operand pairing reported reload registers as a
+  pseudo's home (dispositions now win); "allocated N of M" counted the wrong
+  list; the rival explanation claimed an order without checking it.
+* The shared instrumented compiler was older than its patch (see above);
+  the one in the scope worktree also lacked AGBCC_NOPRE until it was rebuilt
+  with `tools/agbcc-instr.sh` (150 files, plain and NONMATCHING, compile
+  identically to agbcc without knobs).
+* scope, fixed: `life`, `vs` and `insn` found no names or records when the
+  draft #defines a friendly name to the ROM symbol (records use the ROM
+  name; now they fall back to the only function in the dump), and a trailing
+  FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
+  the CSV has since renamed raised a KeyError.

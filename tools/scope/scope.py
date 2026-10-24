@@ -123,7 +123,10 @@ def rom_name(src, func):
     text = open(os.path.join(ROOT, src)).read()
     m = re.search(r"#ifdef NONMATCHING.*?#else(.*?)#endif", text, re.S)
     names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(1) if m else "")
-    return next((n for n in names if n in addr), func)
+    hit = next((n for n in names if n in addr), None)
+    if hit is None and re.fullmatch(r"sub_[0-9A-Fa-f]{8}", func):  # an address name renamed since
+        hit = next((n for n, a in addr.items() if a == int(func[4:], 16)), None)
+    return hit or func
 
 
 def compile_draft(src, func, env=None):
@@ -517,10 +520,189 @@ def cmd_uses(regs, func, passes):
             print(f"  after {p:8} {' '.join(out) or '(none)'}")
 
 
+def flow_blocks(wd):
+    """Basic blocks of flow's dump: [(live_at_start set, [(uid, kind, pattern text)], label uids, jump
+    targets, falls through)]."""
+    path = os.path.join(wd, "u.i.flow")
+    text = open(path).read() if os.path.exists(path) else ""
+    blocks, cur = [], None
+    for blk in re.split(r"\n(?=\(|;;)", text):
+        m = re.match(r";; Start of basic block \d+, registers live:(.*)", blk)
+        if m:
+            cur = [set(int(x) for x in re.findall(r"(?<!\[)\b(\d+)\b(?![^\[]*\])", m.group(1))), [], set(), set(), True]
+            blocks.append(cur)
+            continue
+        if cur is None:
+            continue
+        m = re.match(r"\((insn|jump_insn|call_insn|code_label|barrier)(?:/\w)* (\d+)", blk)
+        if not m:
+            continue
+        kind, uid = m.group(1), int(m.group(2))
+        flat = " ".join(blk.split())
+        if kind == "code_label":
+            if not cur[1]:
+                cur[2].add(uid)
+            continue
+        if kind == "barrier":
+            cur[4] = False
+            continue
+        pat = re.split(r" \((?:expr|insn)_list:REG_| \(insn_list ", flat)[0]
+        cur[1].append((uid, kind, pat))
+        if kind == "jump_insn":
+            cur[3].update(int(x) for x in re.findall(r"\(label_ref (\d+)\)", pat))
+            if "(return)" in pat or re.search(r"\(set \(pc\) \(label_ref", pat):
+                cur[4] = False
+    return blocks
+
+
+def live_insns(wd, reg):
+    """The insns flow counts toward REG's live length (flow.c: one per insn where it is live before the
+    insn, plus one where it is set), from block liveness walked backward."""
+    blocks = flow_blocks(wd)
+    by_label = {lab: i for i, b in enumerate(blocks) for lab in b[2]}
+    pat_reg = r"\(reg(?:/\w)*:\w+ %d\)" % reg
+    out = []
+    for i, (live_in, insns, _, targets, falls) in enumerate(blocks):
+        succ = {by_label[t] for t in targets if t in by_label}
+        if falls and i + 1 < len(blocks):
+            succ.add(i + 1)
+        live = any(reg in blocks[j][0] for j in succ)
+        counted = []
+        for uid, kind, pat in reversed(insns):
+            sets = re.findall(r"\((?:set|clobber) " + pat_reg, pat)
+            mentions = len(re.findall(pat_reg, pat))
+            uses = mentions - len(sets)
+            if sets and not uses:
+                live_before = False
+            else:
+                live_before = live or uses > 0
+            if live_before or sets:
+                counted.append((uid, bool(mentions)))
+            live = live_before
+        out.extend(reversed(counted))
+    return out
+
+
+def cmd_life(names, func):
+    """What makes up a pseudo's live length: the insns flow counted (liveness across branches), grouped
+    by C line. Pass pseudo numbers or C variable names (names survive edits; numbers shift)."""
+    wd = workdir(func)
+    pn = pseudo_names(wd, func)
+    lines = uid_lines(wd)
+    recs = alloc_records(wd, func)
+    flow = live_lengths(wd, "flow")
+    for name in names:
+        regs = [int(name)] if name.isdigit() else [r for r, n in pn.items() if n == name]
+        if not regs:
+            print(f"{name}: no pseudo by that name (known: {', '.join(sorted(set(pn.values())))[:300]})")
+            continue
+        for reg in regs:
+            ins = live_insns(wd, reg)
+            rec = recs.get(reg)
+            pri = f", priority {rec[2]} ({rec[3]} refs, live {rec[4]} at allocation)" if rec and rec[0] == "G" else ""
+            print(f"pseudo {reg} ({pn.get(reg, '-')}): flow live length {flow.get(reg, '?')}{pri};"
+                  f" counted here: {len(ins)}")
+            by, order = {}, []
+            for u, m in ins:
+                ln = lines.get(u, 0)
+                if ln not in by:
+                    by[ln] = []
+                    order.append(ln)
+                by[ln].append(f"{u}{'*' if m else ''}")
+            for ln in order:
+                print(f"  line {ln:4}: {len(by[ln]):3}  {' '.join(by[ln])}")
+            print("  (* = mentions it; compare two drafts by variable name to see which line gained or lost insns)")
+
+
+def alloc_table(wd, func):
+    """Named pseudos with their allocation facts, keyed by a label that survives edits: the C name or
+    constant label plus the C line of the first insn that mentions it (and a counter for repeats)."""
+    pn, lines, recs, prefs, hard = pseudo_names(wd, func), uid_lines(wd), alloc_records(wd, func), preferences(wd), hard_of(wd)
+    first = {}
+    for u, _, r in insn_list(wd, "lreg"):
+        for x in regs_of(r):
+            if x >= 16:
+                first.setdefault(x, u)
+    out, seen = {}, {}
+    for x in sorted(recs, key=lambda x: (first.get(x, 1 << 30), x)):
+        rec = recs[x]
+        name = pn.get(x, "-")
+        if name == "-" and (rec[0] == "L" or rec[4] < 8):
+            continue  # short-lived temporaries: renumbered by every edit, rarely the point
+        # named values match by name and order; unnamed ones (inline parameter copies, temporaries)
+        # by the C line where they first appear
+        key = (name, 0) if name != "-" else ("-", lines.get(first.get(x), 0))
+        seen[key] = seen.get(key, 0) + 1
+        key = key + (seen[key],)
+        out[key] = dict(pseudo=x, kind=rec[0], rank=rec[1] if rec[0] == "G" else None, pri=rec[2],
+                        refs=rec[3] if rec[0] == "G" else rec[5], live=rec[4] if rec[0] == "G" else None,
+                        prefs=prefs.get(x, []), hard=hard.get(x, rec[6]), galloc=rec[6])
+    return out
+
+
+def cmd_vs(src_a, src_b, func, env):
+    """Allocation of two drafts side by side: which named values moved, and what about them changed."""
+    import contextlib
+    import io
+    tabs = []
+    for src in (src_a, src_b):
+        mine, addr, info = compile_draft(src, func, env)
+        _, _, sizes = inventory()
+        rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            report(src, func, rom_code, addr, mine, info, 0)
+        head = buf.getvalue().splitlines()
+        print(f"{src}: {head[1] if len(head) > 1 else ''}")
+        tabs.append(alloc_table(info["wd"], info["obj_name"]))
+        # keep A's dumps: B's compile reuses the work directory
+        if src is src_a:
+            import shutil
+            keep = info["wd"] + ".A"
+            if os.path.exists(keep):
+                shutil.move(keep, os.path.join(os.path.expanduser("~/.Trash"), os.path.basename(keep) + f".{int(time.time())}"))
+            shutil.copytree(info["wd"], keep)
+    a, b = tabs
+    def fmt(d):
+        if not d:
+            return "(absent)"
+        g = f"#{d['rank'] + 1} " if d["rank"] is not None else "local "
+        pr = ("pref " + ",".join(rname(h) for h in d["prefs"]) + " ") if d["prefs"] else ""
+        ev = f" (was {rname(d['galloc'])})" if d["kind"] == "G" and d["galloc"] != d["hard"] and d["galloc"] >= 0 else ""
+        lv = f"/{d['live']}" if d["live"] is not None else ""
+        return f"{g}pri {d['pri']} ({d['refs']}{lv}) {pr}-> {rname(d['hard'])}{ev}"
+    rows = []
+    for k in sorted(set(a) | set(b), key=lambda k: (k[1], k[0], k[2])):  # named first, then by line
+        da, db = a.get(k), b.get(k)
+        if da and db and da["hard"] == db["hard"] and da["prefs"] == db["prefs"] and da["pri"] == db["pri"]:
+            continue
+        rows.append((k, da, db))
+    print(f"named values whose allocation differs (A = {src_a}, B = {src_b}); (refs/live), #rank in global alloc:")
+    for (name, line, n), da, db in rows:
+        tag = (name if line == 0 else f"(unnamed)@{line}") + (f" #{n}" if n > 1 else "")
+        print(f"  {tag:28} A: {fmt(da):44} B: {fmt(db)}")
+    if not rows:
+        print("  (none: the same allocation for every named value)")
+    return 0
+
+
 # ---------------------------------------------------------------- why
+
+def dump_func(wd, func):
+    """The function name AGBCC_DUMPPRI used in WD's names.txt: the draft may #define a friendly name to
+    the ROM symbol, so FUNC falls back to the only function recorded there."""
+    path = os.path.join(wd, "names.txt")
+    seen = []
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if len(p) > 1 and p[0] in "GLRF" and p[1] not in seen:
+            seen.append(p[1])
+    return func if func in seen or len(seen) != 1 else seen[0]
+
 
 def pseudo_names(wd, func):
     """pseudo -> C variable name, from AGBCC_DUMPPRI (local-alloc 'L' and global-alloc 'G' lines)."""
+    func = dump_func(wd, func)
     out = {}
     path = os.path.join(wd, "names.txt")
     if not os.path.exists(path):
@@ -625,11 +807,15 @@ def hard_of(wd):
             for x, y in zip(a, b):
                 if x >= 16 and y < 16:
                     out.setdefault(x, y)
+    # the operand can be a reload register (a value loaded into r2, then copied to ip): what global
+    # alloc decided wins for its pseudos
+    out.update(dispositions(wd))
     return out
 
 
 def alloc_records(wd, func):
     """pseudo -> ('G', rank, priority, refs, live, calls, hard) or ('L', block, priority, birth, death, refs, hard)."""
+    func = dump_func(wd, func)
     out = {}
     path = os.path.join(wd, "names.txt")
     rank = 0
@@ -655,21 +841,248 @@ def conflicts(wd):
     return out
 
 
+REG_ALIASES = {"sb": 9, "sl": 10, "fp": 11, "ip": 12, "sp": 13, "lr": 14, "pc": 15}
+
+
+def rname(n):
+    """The assembler's name for hard register N."""
+    return {v: k for k, v in REG_ALIASES.items()}.get(n, f"r{n}")
+
+
+def reg_nums(text):
+    """Register operands of an assembly line in order, as numbers (sb/sl/fp/ip/sp/lr/pc included)."""
+    out = []
+    for m in re.finditer(r"\b(?:r(\d+)|(sb|sl|fp|ip|sp|lr|pc))\b", (text or "").split(None, 1)[-1] if text else ""):
+        out.append(int(m.group(1)) if m.group(1) else REG_ALIASES[m.group(2)])
+    return out
+
+
+def preferences(wd):
+    """pseudo -> hard registers global alloc prefers for it (greg dump), after expand_preferences."""
+    path = os.path.join(wd, "u.i.greg")
+    text = open(path).read() if os.path.exists(path) else ""
+    return {int(m.group(1)): [int(x) for x in m.group(2).split()]
+            for m in re.finditer(r"^;; (\d+) preferences:(.*)$", text, re.M)}
+
+
+def pref_sources(wd, x, reg):
+    """Where X picked up a preference for hard register REG in expand_preferences (global.c): insns that
+    set an allocno while another dies, merging their preferences, walked in insn order and REG_DEAD note
+    order as global.c does. Returns [(uid, other pseudo, notes in order)]."""
+    prefs = preferences(wd)
+    out = []
+    path = os.path.join(wd, "u.i.lreg")
+    text = open(path).read() if os.path.exists(path) else ""
+    for m in re.finditer(r"^\((insn)(?:/\w)* (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
+        flat = " ".join(m.group(0).split())
+        d = re.match(r"\(insn(?:/\w)* \d+ \d+ \d+ \((?:parallel\[ \()?set \(reg(?:/\w)*:\w+ (\d+)\)", flat)
+        if not d:
+            continue
+        dest = int(d.group(1))
+        dead = [int(n) for n in re.findall(r"REG_DEAD \(reg(?:/\w)*:\w+ (\d+)\)", flat)]
+        if x == dest:
+            others = [n for n in dead if reg in prefs.get(n, [])]
+        elif x in dead and reg in prefs.get(dest, []):
+            others = [dest]
+        else:
+            continue
+        if others:
+            out.append((int(m.group(2)), others[0], dest, dead))
+    return out
+
+
+def rom_hard(wd):
+    """pseudo -> the ROM's register for it: every aligned row with the same mnemonic votes, operand by
+    operand, through the pseudos the lreg insn holds in the draft's register at that position."""
+    hmap = hard_of(wd)
+    pre = {u: r for u, _, r in insn_list(wd, "lreg")}
+    votes = {}
+    for row in json.load(open(os.path.join(wd, "diff.json"))):
+        if not row.get("uid") or not row.get("rom") or not row.get("draft"):
+            continue
+        if row["rom"].split()[0] != row["draft"].split()[0]:
+            continue
+        rr, dr = reg_nums(row["rom"]), reg_nums(row["draft"])
+        if len(rr) != len(dr):
+            continue
+        regs = regs_of(pre.get(row["uid"]))
+        for a, b in zip(rr, dr):
+            for x in regs:
+                if x >= 16 and hmap.get(x) == b:
+                    votes.setdefault(x, {}).setdefault(a, 0)
+                    votes[x][a] += 1
+    return {x: max(v, key=v.get) for x, v in votes.items()}
+
+
+def live_lengths(wd, p):
+    """pseudo -> REG_LIVE_LENGTH as the pass's dump prints it ('Register N used R times across L insns')."""
+    path = os.path.join(wd, "u.i." + p)
+    text = open(path).read() if os.path.exists(path) else ""
+    return {int(m.group(1)): int(m.group(2))
+            for m in re.finditer(r"^Register (\d+) used \d+ times across (\d+) insns", text, re.M)}
+
+
+def life_note(wd, x, live):
+    """Why global alloc's live length differs from flow's: update_equiv_regs (local-alloc.c) doubles the
+    length of a register equivalent to a constant (REG_EQUIV: a symbol address or a number), so it gets half
+    the priority, and regmove moves lengths between registers when it rewrites copies."""
+    fl = live_lengths(wd, "flow").get(x)
+    if fl is None or fl == live:
+        return ""
+    if live == 2 * fl:
+        return (f" [flow measured {fl}; doubled because it always holds a constant (REG_EQUIV):"
+                f" update_equiv_regs, local-alloc.c, halves constant registers' priority]")
+    return f" [flow measured {fl}; regmove changed it while rewriting copies]"
+
+
+def g_priority(refs, live):
+    """global.c allocno_compare: floor_log2(refs) * refs / live * 10000 (size 1)."""
+    return (max(refs, 1).bit_length() - 1) * refs * 10000 // max(live, 1)
+
+
+def find_reg_view(wd, func):
+    """pseudo -> [records] from AGBCC_DUMPPRI's F lines, one per find_reg call (global alloc, then reload's
+    retries): dict with used1 (conflicts and class limits), sofar (regs_used_so_far), someone
+    (regs_someone_prefers), cpref/pref (its preferences), first/pass (what the two passes found),
+    final (after preferences), as hard-register sets."""
+    func = dump_func(wd, func)
+    def bits(h):
+        v = int(h, 16)
+        return {i for i in range(16) if v >> i & 1}
+    out = {}
+    path = os.path.join(wd, "names.txt")
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "F" and p[1] == func:
+            out.setdefault(int(p[2]), []).append(dict(
+                retrying=int(p[3]), alt=int(p[4]), used1=bits(p[5]), sofar=bits(p[6]), someone=bits(p[7]),
+                cpref=bits(p[8]), pref=bits(p[9]), first=int(p[10]), passno=int(p[11]), final=int(p[12])))
+    return out
+
+
+def regset(rs):
+    return "{" + ", ".join(rname(r) for r in sorted(rs)) + "}" if rs else "{}"
+
+
+def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
+    """Walk find_reg (global.c) for PSEUDO as the compiler ran it: pass 0 reuses a register already in use
+    (regs_used_so_far) that it doesn't conflict with and no lower-priority conflicting pseudo prefers; pass 1
+    takes the first free one from r0; then a preferred register of the same class replaces that choice.
+    Says which test kept WANT out and what would let it in. Returns True if it printed."""
+    view = find_reg_view(wd, func).get(pseudo)
+    if not view or not rec or rec[0] != "G":
+        return False
+    f = view[0]
+    lo = set(range(8))
+    used = f["used1"] & lo
+    pass0 = (f["sofar"] - f["used1"] - f["someone"]) & lo
+    found = f"found {rname(f['first'])} in pass {f['passno']}" if f["first"] >= 0 else "found nothing"
+    print(f"    find_reg (global.c) for {nm(pseudo)}: conflicts {regset(used)}; pass 0 may reuse registers"
+          f" already in use {regset(f['sofar'] & lo)} minus conflicts and those a later conflicting pseudo"
+          f" prefers {regset(f['someone'] & lo)}, leaving {regset(pass0)}; it {found}"
+          + (f", then its preference moved it to {rname(f['final'])}" if f["final"] != f["first"] else "") + ".")
+    if want in f["used1"]:
+        print(f"      {rname(want)} conflicts: a pseudo allocated earlier or a hard-register use overlaps its life.")
+        return True
+    if want in f["pref"] | f["cpref"]:
+        return True
+    if want in f["someone"]:
+        print(f"      {rname(want)} is held back in pass 0 because a conflicting pseudo allocated later prefers it.")
+        return True
+    if want not in f["sofar"]:
+        hard = hard_of(wd)
+        later = sorted((x for x, r in recs.items() if r[0] == "G" and r[1] > rec[1] and
+                        hard.get(x, r[6]) == want), key=lambda x: recs[x][1])
+        rom = rom_hard(wd)
+        later.sort(key=lambda x: (rom.get(x) != want, recs[x][1]))
+        txt = (f"      {rname(want)} was not in use yet, so pass 0 could not reuse it, and pass 1 takes the lowest free"
+               f" register ({rname(f['first'])}).")
+        if later:
+            y = later[0]
+            txt += (f" {nm(y)} takes {rname(want)} later (allocated {recs[y][1] + 1}, priority {recs[y][2]}"
+                    + (", the ROM keeps it there too" if rom.get(y) == want else "") + f"). Had {nm(y)} been"
+                    f" allocated before {nm(pseudo)}, {rname(want)} would have been in use and pass 0 would have"
+                    f" picked it.")
+            print(txt)
+            print(f"      to flip the order (priority = floor_log2(refs) * refs / live * 10000): "
+                  + "; or ".join(flip_levers(nm, y, recs[y], pseudo, rec, wd)))
+            print(f"      what-if: AGBCC_PRI={y}:+{max(rec[2] - recs[y][2] + 1, 1)}")
+        else:
+            print(txt)
+        return True
+    return False
+
+
+def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
+    """What would let LO outrank HI in global alloc: LO's uses or life, or HI's. Lives are given as flow
+    counts them in the source; a constant register's is doubled before allocation (see life_note)."""
+    _, _, lpri, lrefs, llive, _, _ = lo_rec
+    _, _, hpri, hrefs, hlive, _, _ = hi_rec
+    fl = live_lengths(wd, "flow") if wd else {}
+    ld = 2 if fl.get(lo) and llive == 2 * fl[lo] else 1
+    hd = 2 if fl.get(hi) and hlive == 2 * fl[hi] else 1
+    out = []
+    r = next((r for r in range(lrefs + 1, lrefs + 40) if g_priority(r, llive) > hpri), None)
+    if r:
+        out.append(f"{nm(lo)} with {r} refs instead of {lrefs} ({g_priority(r, llive)})")
+    lb = lrefs.bit_length() - 1
+    if lb:
+        m = lb * lrefs * 10000 // (hpri + 1)
+        if 0 < m < llive:
+            out.append(f"{nm(lo)} living {m // ld} insns or fewer instead of {llive // ld}"
+                       + (" (flow's count; it is doubled as a constant register)" if ld == 2 else "")
+                       + (", or the same life if it were not a constant (killing REG_EQUIV)" if ld == 2
+                          and lb * lrefs * 10000 // (llive // 2) > hpri else ""))
+    hb = hrefs.bit_length() - 1
+    if hb:
+        m = hb * hrefs * 10000 // max(lpri, 1) + 1
+        out.append(f"{nm(hi)} living {-(-m // hd)}+ insns instead of {hlive // hd}"
+                   + (" (flow's count; doubled as a constant register)" if hd == 2 else ""))
+    if hrefs > 1:
+        r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
+        if r:
+            out.append(f"{nm(hi)} with {r} refs instead of {hrefs}")
+    return out
+
+
 def explain_alloc(wd, func, pseudo, want, got, nm, at):
     """Why PSEUDO got hard register GOT and not WANT (the ROM's)."""
     recs, conf, hard = alloc_records(wd, func), conflicts(wd), hard_of(wd)
     rec = recs.get(pseudo)
+    path = os.path.join(wd, "names.txt")
+    total = sum(1 for ln in (open(path) if os.path.exists(path) else [])
+                if ln.startswith("G " + dump_func(wd, func) + " "))
     if rec and rec[0] == "G":
         _, rank, pri, refs, live, calls, _ = rec
-        total = sum(1 for r in recs.values() if r[0] == "G")
         print(f"    {nm(pseudo)} is a global-alloc pseudo: allocated {rank + 1} of {total} by priority {pri}"
-              f" ({refs} refs, live {live} insns, crosses {calls} call(s)); it got r{got}, the ROM has r{want}.")
+              f" ({refs} refs, live {live} insns, crosses {calls} call(s)); it got {rname(got)}, the ROM has {rname(want)}."
+              + life_note(wd, pseudo, live))
     elif rec:
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
-              f" it got r{got}, the ROM has r{want}.")
+              f" it got {rname(got)}, the ROM has {rname(want)}.")
     else:
-        print(f"    {nm(pseudo)} has no allocation record; it got r{got}, the ROM has r{want}.")
+        print(f"    {nm(pseudo)} has no allocation record; it got {rname(got)}, the ROM has {rname(want)}.")
+    if rec and rec[0] == "G" and rec[6] != got:
+        before = "no register" if rec[6] < 0 else rname(rec[6])
+        print(f"    global alloc gave it {before}; reload then needed {before} for its own spill registers, evicted"
+              f" it and re-placed it in {rname(got)} (retry_global_alloc -> find_reg: pass 0 only reuses a register"
+              f" already in use that no conflicting pseudo prefers, pass 1 takes the first free one, r0 to r15)."
+              if rec[6] >= 0 else
+              f"    global alloc left it without a register; reload placed it in {rname(got)} afterwards"
+              f" (retry_global_alloc -> find_reg, first free register in r0 to r15 order).")
+        print(f"    so {rname(got)} vs {rname(want)} is decided by which registers are in use and free at that"
+              f" point. what-if: AGBCC_FORCE={pseudo}:{want}")
+        rom = rom_hard(wd)
+        pc0 = conf.get(pseudo, (set(), set()))[0]
+        for x in sorted(y for y in rom if rom[y] == got and y != pseudo)[:3]:
+            if x in pc0:
+                print(f"    the ROM keeps {nm(x)} in {rname(got)} too, and the two conflict in the draft as well")
+            else:
+                print(f"    the ROM keeps {nm(x)} in {rname(got)}; in the draft {nm(x)} and {nm(pseudo)} are never live"
+                      f" at the same time, so {rname(got)} was free. In the original {nm(x)} must still be live"
+                      f" somewhere during {nm(pseudo)}'s life (`life {x}` vs `life {pseudo}`)")
+        return
     if rec and rec[0] == "G" and rec[5] and want < 4:
         print(f"    it lives across a call, so r0-r3 are unavailable to it: the ROM's value does not cross that call.")
         return
@@ -688,22 +1101,73 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
         if calls:
             what.append(f"a call at {at(calls[0])}")
-        print(f"    r{want} was already taken during its life (local alloc or a fixed use runs first): "
+        print(f"    {rname(want)} was already taken during its life (local alloc or a fixed use runs first): "
               + (", ".join(what) if what else "holder not found in its span"))
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
-              f" r{want}; or make the other value land elsewhere")
+              f" {rname(want)}; or make the other value land elsewhere")
         return
     takers = [x for x in pc if hard.get(x, recs.get(x, (0,) * 7)[6]) == want and x != pseudo]
     before = [x for x in takers if recs.get(x, ("L",))[0] == "L" or
               (recs.get(x) and rec and rec[0] == "G" and recs[x][1] < rec[1])]
     if before:
-        ds = ", ".join(f"{nm(x)} (priority {recs[x][2]})" for x in sorted(before)[:5] if x in recs)
-        print(f"    r{want} went to a conflicting pseudo allocated earlier: {ds}")
-        print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end the"
-              f" overlap; what-if: AGBCC_PRI={pseudo}:+N or AGBCC_FORCE={pseudo}:{want}")
+        ds = ", ".join(f"{nm(x)} (priority {recs[x][2]}{life_note(wd, x, recs[x][4]) if recs[x][0] == 'G' else ''})"
+                       for x in sorted(before)[:5] if x in recs)
+        print(f"    {rname(want)} went to a conflicting pseudo allocated earlier: {ds}")
+        top = max((x for x in before if recs.get(x, ("L",))[0] == "G"), key=lambda x: recs[x][2], default=None)
+        if top is not None and rec[0] == "G":
+            print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
+                  f" inside loops weighted by depth): " + "; or ".join(flip_levers(nm, pseudo, rec, top, recs[top], wd)))
+            print(f"    what-if: AGBCC_PRI={pseudo}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={pseudo}:{want}")
+        else:
+            print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end"
+                  f" the overlap; what-if: AGBCC_PRI={pseudo}:+N or AGBCC_FORCE={pseudo}:{want}")
+        return
+    # the rival: a conflicting pseudo the ROM keeps in {rname(got)}; we took that register first
+    rom = rom_hard(wd)
+    rivals = [x for x in pc if rom.get(x) == got and hard.get(x, recs.get(x, (0,) * 7)[6]) != got]
+    if rec and rec[0] == "G":
+        for x in sorted(rivals, key=lambda x: -recs.get(x, (0, 0, 0))[2])[:2]:
+            xr = recs.get(x)
+            if not xr or xr[0] != "G":
+                continue
+            prefs = preferences(wd).get(pseudo, [])
+            if xr[1] < rec[1]:
+                print(f"    the ROM keeps {nm(x)} in {rname(got)}; it conflicts with {nm(pseudo)} and was allocated"
+                      f" first (priority {xr[2]} vs {pri}), but it took {rname(hard.get(x, xr[6]))}, so"
+                      f" {rname(got)} was left for {nm(pseudo)}. The first cause is {nm(x)}'s placement: ask `why`"
+                      f" on an insn that uses it.")
+                return
+            print(f"    the ROM keeps {nm(x)} in {rname(got)}; it conflicts with {nm(pseudo)}, and global alloc ran"
+                  f" {nm(pseudo)} first (priority {pri} vs {xr[2]}: {xr[3]} refs, live {xr[4]}{life_note(wd, x, xr[4])})," +
+                  (f" so it took {rname(got)}, its preferred register (preferences: {' '.join('r%d' % h for h in prefs)})."
+                   if got in prefs else f" so it took {rname(got)}.") +
+                  f" {nm(x)} then got {rname(hard.get(x, xr[6]))}.")
+            if got not in prefs:
+                explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec)
+            src = pref_sources(wd, pseudo, got) if got in prefs else []
+            if src:
+                u, other, dest, dead = src[-1]
+                print(f"      {nm(pseudo)} inherits {rname(got)} at {at(u)}: it sets {nm(dest)} while"
+                      f" {', '.join(nm(n) for n in dead)} die (REG_DEAD notes in that order). expand_preferences"
+                      f" (global.c) merges preferences across such an insn note by note: each dying value and the"
+                      f" set value swap preferences, so a value whose note comes after another's also receives what"
+                      f" that one brought in. Lever: a different note order (combine rewriting that insn rewrites"
+                      f" its notes), or {nm(pseudo)} not dying there.")
+            elif got in prefs and got not in preferences(wd).get(x, []):
+                print(f"      (the preference is inherited: expand_preferences, global.c, merges preferences"
+                      f" across an insn where one pseudo dies and another is set, so it spreads along value chains)")
+            elif got in prefs:
+                print(f"      (both prefer {rname(got)}: expand_preferences, global.c, merges preferences across an insn"
+                      f" where one pseudo dies and another is set, so a preference spreads along value chains)")
+            lev = flip_levers(nm, x, xr, pseudo, rec, wd)
+            print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
+                  f" inside loops weighted by depth): " + "; or ".join(lev))
+            print(f"    what-if: AGBCC_PRI={x}:+{max(pri - xr[2] + 1, 1)} (should match if this is the only cause)")
+            return
+    if explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return
     who = "local alloc" if rec and rec[0] == "L" else "global alloc"
-    print(f"    r{want} was free for it; {who} preferred r{got} (copy/tie preferences or register order)."
+    print(f"    {rname(want)} was free for it; {who} preferred {rname(got)} (copy/tie preferences or register order)."
           f" If the ROM's value was instead a constant that reload loaded (an integer address or offset"
           f" rather than a symbol, or a variable left without a register), it would take the rotation's"
           f" register: try `spill`. what-if: AGBCC_FORCE={pseudo}:{want}")
@@ -711,6 +1175,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
 
 def reload_records(wd, func):
     """[(k, uid, spill_reg, line, label)] from AGBCC_DUMPPRI's R lines: reload register choices in order."""
+    func = dump_func(wd, func)
     path = os.path.join(wd, "names.txt")
     out = []
     for ln in open(path) if os.path.exists(path) else []:
@@ -892,8 +1357,7 @@ def cmd_why(src, func, uid, env):
     print(f"why insn {uid}  line {ln}: {code}")
     if row:
         print(f"  ROM: {row['rom'] or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
-        rr = re.findall(r"\br(\d+)\b", row["rom"] or "")
-        dr = re.findall(r"\br(\d+)\b", row["draft"] or "")
+        rr, dr = reg_nums(row["rom"]), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
         for a, b in zip(rr, dr):
@@ -901,7 +1365,7 @@ def cmd_why(src, func, uid, env):
                 continue
             ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
             alloc_diffs.append((ps[0] if ps else None, int(a), int(b)))
-            print(f"  ROM r{a} where the draft has r{b}" + (f" = pseudo {nm(ps[0])}" if ps else ""))
+            print(f"  ROM {rname(a)} where the draft has {rname(b)}" + (f" = pseudo {nm(ps[0])}" if ps else ""))
     # operand through the passes
     trail, last, changes = [], None, []
     for p in PASSES:
@@ -980,10 +1444,8 @@ def cmd_why(src, func, uid, env):
                 shown += 1
         if not shown:
             print("    no class-head takeover found for these registers; see the raw trace")
-    changed = {r for _, _, new in changes for r in new}
     for ps, want, got in alloc_diffs:
-        if ps is not None and (ps in changed and any(p in ("cse", "cse2") for p, _, new in changes if ps in new)):
-            continue
+        # even when cse put this pseudo here, its register is allocation's choice: explain both
         if ps is not None:
             print(f"  allocation: {nm(ps)}")
             explain_alloc(wd, info["obj_name"], ps, want, got, nm, at)
@@ -998,13 +1460,13 @@ def cmd_why(src, func, uid, env):
         if rec:
             k, u, reg, line, lab = rec
             served = "" if u == uid else f" for {at(u)}"
-            print(f"  reload: r{got} is reload register choice #{k}{served} (value {lab}). Reload hands out"
-                  f" spill registers round-robin (last_spill_reg, reload1.c), so the ROM's r{want} means a"
+            print(f"  reload: {rname(got)} is reload register choice #{k}{served} (value {lab}). Reload hands out"
+                  f" spill registers round-robin (last_spill_reg, reload1.c), so the ROM's {rname(want)} means a"
                   f" different rotation state here: a different number of earlier reloads or spill set.")
             print(f"    what-if: AGBCC_SPILL={k}:D shifts the rotation before this choice;"
                   f" `scope.py FILE.c spill` searches all of them")
         else:
-            print(f"  r{got} is not a pseudo before allocation and no reload record names it here")
+            print(f"  {rname(got)} is not a pseudo before allocation and no reload record names it here")
     print(f"  raw traces: {os.path.relpath(wd, ROOT)}/stderr.txt")
     return 0
 
@@ -1038,6 +1500,29 @@ def main():
     env = dict(a.split("=", 1) for a in args[1:] if "=" in a)
     rest = [a for a in args[1:] if "=" not in a]
     why_uid = None
+    if rest and rest[0] == "vs":  # FILE.c vs OTHER.c: allocation side by side
+        other = rest[1]
+        other = os.path.relpath(os.path.join(ROOT, other) if not os.path.isabs(other) else other, ROOT)
+        func = rest[2] if len(rest) > 2 else nonmatching_func(src)
+        return cmd_vs(src, other, func, env)
+    if rest and rest[0] in ("insn", "uses", "life"):  # FILE.c insn UID / uses REG... / life NAME... [FUNC]
+        func = nonmatching_func(src)
+        if len(rest) > 2 and rest[-1] in (func, rom_name(src, func) if func else None):
+            rest = rest[:-1]
+        if not func:
+            sys.exit(f"name the function: scope.py {rest[0]} ... FUNC")
+        os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
+        open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
+        compile_draft(src, func, env)
+        if rest[0] == "insn":
+            cmd_insn(int(rest[1]), func)
+        elif rest[0] == "life":
+            cmd_life(rest[1:], func)
+        else:
+            names = [a for a in rest[1:] if not a.isdigit()]
+            cmd_uses([int(a) for a in rest[1:] if a.isdigit()], func,
+                     [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
+        return 0
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)
