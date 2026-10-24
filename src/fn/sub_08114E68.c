@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 struct ParticleVec {
     s16 x, y, z, pad;
 };
@@ -102,10 +99,7 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
                 sequence = 14;
             Anim_SetSequence(m->animations[e->index], m->resource, sequence, 0,
                              (u8)(Mod(random(&gUnk_03005304), 2) | animFlags));
-            {
-                u8 k1 = 0x11;
-                sprite->flags = (sprite->flags | k1) | spriteFlags;
-            }
+            sprite->flags |= 0x11 | spriteFlags;
             sprite->priority = priority;
             e->active = 1;
             e->tag = tag;
@@ -114,7 +108,3 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
 
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08114E68);
-#endif
