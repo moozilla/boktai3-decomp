@@ -17,7 +17,11 @@ write `~`). The hooks in `.githooks` and the CI job run `tools/pii_check.py`.
   `python3 tools/progress.py --markdown PROGRESS.md` (see `AGENTS.md`). Rebuild or
   run relocation/emulator tests again only when changes or failures justify it.
 * Matching means byte-identical. No hand-written instructions inside `asm()`
-  to force a match. `INCLUDE_ASM` is the placeholder for unfinished functions.
+  to force a match. The one exception is source the original authors wrote as
+  inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
+  in-place `swi n`, as in Power_EnterSleep and m4a). It counts as a normal match;
+  a native port implements `SystemCall` in its BIOS layer.
+  `INCLUDE_ASM` is the placeholder for unfinished functions.
   Nonmatching C goes on `main` only inside `#ifdef NONMATCHING` with an
   `INCLUDE_ASM` `#else` branch (see `docs/WORKER.md`). The default build never
   compiles it; it is reported as a fuzzy score, never as exact progress.
