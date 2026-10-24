@@ -714,6 +714,17 @@ which is exactly `10:1`. Not tested.
   10 s. That gives shape-only differences a confirming knob when the cause
   is a cse or gcse decision; differences from combine or fold still have
   none.
+  Worker feedback from the second rounds, addressed: `why` on the moved
+  branch still said "the code between differs" (it now says the target is
+  the whole difference and points at probe; `why all` says there is no
+  insn to explain), and probe's C lines were the call site for every
+  inlined set (it now names the inline body line and helper: `pseudo 50
+  set at line 24 (in FlagFour, inlined at line 57), 25 (...), made
+  canonical over pseudo 55 set at line 13 (in Mask, ...)`). Open: both
+  Player functions stay one branch off after ~260 compiles between them;
+  every C form that keeps FlagFour's `return 0` out of the tested value
+  breaks the layout (16-31 insns), so the ROM's helper differs some other
+  way.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
   (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
   progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly

@@ -1583,10 +1583,38 @@ def cmd_probe(src, func, env):
     lines = uid_lines(wd)
     rtl = open(os.path.join(wd, "u.i.rtl")).read()
 
-    def sets(n):  # C lines of the insns that set pseudo N in the first RTL
+    body = {}  # uid -> line of the inline body it came from (the note/i line notes uid_lines skips)
+    cur = None
+    for blk in re.split(r"\n\n", rtl):
+        m = re.search(r'\(note/i \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+        if m:
+            cur = int(m.group(1))
+            continue
+        if re.search(r'\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk):
+            cur = None
+            continue
+        m = re.match(r"\((?:insn|jump_insn|call_insn)(/i)?(?:/\w)* (\d+)", blk)
+        if m and m.group(1) and cur:
+            body[int(m.group(2))] = cur
+    src_lines = open(os.path.join(ROOT, src)).read().split("\n")
+
+    def owner(ln):  # the function whose definition encloses source line LN
+        for i in range(min(ln, len(src_lines)) - 1, -1, -1):
+            m = re.match(r"(?:static\s+)?(?:inline\s+)?[\w\s\*]+?\b(\w+)\s*\([^;]*$", src_lines[i])
+            if m and not src_lines[i].startswith((" ", "\t")):
+                return m.group(1)
+        return None
+
+    def sets(n):  # C lines of the insns that set pseudo N in the first RTL, with the inline they are in
         us = [int(m.group(1)) for m in re.finditer(r"\n\((?:insn|call_insn)(?:/\w)* (\d+) (?:(?!\n\().)*?"
                                                    rf"\(set \(reg(?:/\w)*:\w+ {n}\)", rtl, re.S)]
-        return sorted({str(lines[u]) for u in us if u in lines}, key=int)
+        out = []
+        for u in us:
+            if u in body and owner(body[u]):
+                out.append(f"{body[u]} (in {owner(body[u])}, inlined at line {lines.get(u, '?')})")
+            elif u in lines:
+                out.append(str(lines[u]))
+        return list(dict.fromkeys(out))
 
     def who(n):
         return f"pseudo {n}" + (f" `{names[n]}`" if n in names else "") + (
@@ -1650,6 +1678,10 @@ def cmd_why_all(src, func, env):
         if picks[-1] is None and r["uid"] and r["tag"] != "→":  # a branch that only lands elsewhere is no cause
             picks[-1] = r["uid"]
     picks = [u for u in picks if u][:8]
+    if not picks:
+        print(f"{func}: {count_text(rows)} differ; only branch targets moved, so there is no insn for why."
+              " The plain scope run names both targets; `scope.py FILE.c probe` finds the cse decision")
+        return 1
     print(f"{func}: {count_text(rows)} differ; why on the first of each hunk: {', '.join(map(str, picks))}\n")
     for u in picks:
         cmd_why(src, func, u, env)
@@ -1838,7 +1870,13 @@ def cmd_why(src, func, uid, env, via=None):
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
     if row and row["tag"] == "→":
-        print("  same branch; it lands somewhere else because the code between differs (see the other hunks)")
+        rows_all = json.load(open(os.path.join(wd, "diff.json")))
+        if all(r["tag"] in "=→" for r in rows_all):
+            print("  same branch, and nothing else differs: this target is the whole difference (a label"
+                  " sits before another insn). The plain scope run names both targets (loop head or jump"
+                  " threading); `scope.py FILE.c probe` finds the cse decision behind it")
+        else:
+            print("  same branch; it lands somewhere else because the code between differs (see the other hunks)")
     if not trail:
         print(f"  insn {uid} is in no RTL dump: final emitted it while writing assembly (an output-time"
               " split or branch), so its cause is the insns around it")
