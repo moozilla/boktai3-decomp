@@ -104,7 +104,11 @@ def _client():
 
 
 if __name__ == "__main__":
-    _code = _client()
+    try:
+        _code = _client()
+    except BrokenPipeError:  # `scope.py ... | head`
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        _code = 0
     if _code is not None:
         sys.exit(_code)
 
