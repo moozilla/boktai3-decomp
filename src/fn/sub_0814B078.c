@@ -1,10 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.6%
-// fix.py best version (reprinted C)
-// Remaining differences: projection temporaries, repeated flag test and register allocation.
 // confidence=low: chooses the closest visible list entry and derives its travel duration.
 // MATCHING_CONCESSION: register-pinning
 #define Player_SelectNearestMotionTarget sub_0814B078
@@ -36,43 +32,45 @@ static inline s32 Project(s32 input)
         return value >> 5;
     return -((-value) >> 5);
 }
-static inline void ProjectPosition(struct TargetPosition *dst, struct TargetPosition *src)
+static inline void ProjectPosition(struct TargetPosition *src, struct TargetPosition *dst)
 {
     s32 x;
     s32 z;
     s32 depth;
     s32 height;
     s32 y;
-    typeof(depth) c1;
-    typeof(z) t1;
+    s32 projectedDepth;
+    s32 projectedZ;
     asm("" : "+r"(src));
     x = src->x;
     z = src->z;
     dst->x = Project(x - z);
     depth = Project(x + z);
-    c1 = depth;
+    projectedDepth = depth;
     height = Project(src->y);
-    y = c1 - height;
-    z = (t1 = c1 + height);
+    y = projectedDepth - height;
+    projectedZ = projectedDepth + height;
     dst->x = (dst->x - gUnk_03005418[0]) + 120;
     dst->y = (y - gUnk_03005418[1]) + 80;
-    dst->z = t1 - gUnk_03005418[2];
+    dst->z = projectedZ - gUnk_03005418[2];
 }
 
 struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 limit)
 {
-    register struct Player *p asm("r8") = arg;
-    register u32 distance asm("ip") = limit;
-    register struct MotionTarget *best asm("sl");
-    register struct MotionTarget *entry asm("r6");
+    struct Player *p = arg;
+    u32 distance = limit;
+    struct MotionTarget *best;
+    struct MotionTarget *entry;
     if (!gUnk_02000598)
         return 0;
     entry = gUnk_02000598->first;
     best = 0;
     if (entry)
         do {
-            register u32 flags asm("r4") = entry->flags;
-            if (!(flags & 1)) {
+            register u32 rawFlags asm("r1") = entry->flags;
+            u32 inactive = rawFlags & 1;
+            u32 flags = rawFlags;
+            if (!inactive) {
                 s32 x;
                 s32 z;
                 u32 square;
@@ -88,6 +86,7 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
                     z = body->pos.z - p->position.z;
                 }
                 square = (x * x) + (z * z);
+                asm("" : "+r"(square));
                 if (square < distance) {
                     if (!(gUnk_030053F4 & 0x1000)) {
                         struct TargetPosition screen;
@@ -95,7 +94,7 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
                             u32 relative = flags & 16;
                             asm("" : : "r"(relative));
                         }
-                        ProjectPosition(&screen, &body->pos);
+                        ProjectPosition(&body->pos, &screen);
                         if ((((u16)(screen.x - 1)) > 238) || (((u16)(screen.y - 1)) > 158))
                             goto next;
                     }
@@ -107,10 +106,6 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
             entry = entry->next;
 
         } while (entry);
-    asm("" : "+r"(best), "+r"(p), "+r"(distance));
     *((u16 *)(((u8 *)p) + 0xA9C)) = Div(Sqrt(distance), *((u16 *)(((u8 *)p) + 0xA9E)));
     return best;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0814B078);
-#endif
