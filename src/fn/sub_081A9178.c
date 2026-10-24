@@ -1,12 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: vector alias lifetimes, timer/track spills and register allocation.
 // confidence=low: starts a target-directed motion track and emits afterimages.
 #define Vanargand_UpdateTargetDash sub_081A9178
+struct Vector {
+    s16 x, y, z, pad;
+};
 struct DashActor {
     u8 pad0[0x54];
     s16 position[4];
@@ -44,23 +42,22 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -(-x >> 12);
 }
-static inline void SetVector(s16 *v, s32 x, s32 y, s32 z)
+static inline void SetVector(struct Vector *v, s32 x, s32 y, s32 z)
 {
-    v[0] = x;
-    v[1] = y;
-    v[2] = z;
+    s16 *component = &v->x;
+    *component = x;
+    v->y = y;
+    v->z = z;
 }
-static inline void AddVector(s16 *v, s16 *a, s16 *b)
+static inline void AddVectorInPlace(struct Vector *v, struct Vector *a)
 {
-    u16 av = a[0];
-    s8 bv = b[0];
-    v[0] = av + bv;
-    av = b[1];
-    bv = a[1];
-    v[1] = av + bv;
-    av = a[2];
-    bv = b[2];
-    v[2] = av + bv;
+    u16 av;
+    u32 bv;
+    v->x += a->x;
+    av = v->y;
+    bv = (u16)a->y;
+    v->y = av + bv;
+    v->z += a->z;
 }
 
 static inline u8 IsComplete(struct DashActor *p)
@@ -70,52 +67,32 @@ static inline u8 IsComplete(struct DashActor *p)
         result = 1;
     return result;
 }
-inline static void SetVector_081A9178(s16 *v, s32 x, s32 y, s32 z)
+static inline void SetPolar(struct Vector *v, s32 angle, s32 radius)
 {
-    {
-        typeof(v[0]) *q1 = &v[0];
-        *q1 = x;
-    }
-    v[1] = y;
-    v[2] = z;
-}
-
-inline static void AddVector_081A9178(s16 *v, s16 *a, s16 *b)
-{
-    u16 av = a[0];
-    s8 bv = b[0];
-    v[0] = av + bv;
-    av = b[1];
-    bv = a[1];
-    v[1] = av + bv;
-    av = a[2];
-    {
-        typeof(v[2]) *q1 = &v[2];
-        *q1 = av + bv;
-    }
-    bv = b[2];
+    s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    s32 zero = 0;
+    v->x = x;
+    v->y = zero;
+    v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 
 void Vanargand_UpdateTargetDash(struct DashActor *p)
 {
-    register struct DashActor *self asm("r10") = p;
+    struct DashActor *self = p;
     u32 mask = 0x48;
     u8 result;
-    register u8 *phase asm("r9");
-    asm("" : "+r"(self));
     p->flags |= mask;
     Vanargand_SetPendingCue(p, 1);
     result = Callback_InvokeActor(p, p->callback);
     if (result)
         return;
-    phase = &p->phase;
-    asm("" : "+r"(&p->phase));
+
     if (p->pendingAnimation) {
         p->pendingAnimation = result;
-        *(&p->phase) = result;
+        p->phase = result;
         p->timer = result;
     }
-    switch (*(&p->phase)) {
+    switch (p->phase) {
         case 0:
             if (p->timer == 0) {
                 SceneActors_StartUnmirroredAnimation(p, p->animation, p->drawable, 4, 1, 0);
@@ -123,7 +100,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
                 p->timer++;
             }
             if (p->frame > 10) {
-                *(&p->phase) = 1;
+                p->phase = 1;
                 p->timer = 0;
             }
             break;
@@ -132,28 +109,23 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             if (p->timer == 0) {
                 void *track = p->track;
                 s16 *target = p->target;
-                s16 center[4];
-                s16 destination[4];
+                struct Vector center;
+                struct Vector destination;
                 s32 dx;
                 s32 dz;
                 s16 *first;
-                SetVector_081A9178(center, 640, 768, 640);
-                first = center;
-                asm("" : "+r"(first));
+                SetVector(&center, 640, 768, 640);
+                first = &center.x;
+
                 dx = first[0] - target[0];
                 dz = 640 - target[2];
                 if (((dx * dx) + (dz * dz)) <= 0x100000) {
                     MotionTrack_Initialize(track, p->position, target, 0, 3);
                 } else {
-                    s32 radius = 1024;
-                    s32 angle = Math_Atan2(target[0] - first[0], target[2] - 640);
-                    destination[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * 1024);
-                    destination[1] = 0;
-                    asm("" : "+r"(radius));
-                    destination[2] = Scale(gUnk_086149C4[angle & 255] * radius);
-                    AddVector_081A9178(destination, center, destination);
-                    destination[1] = target[1];
-                    MotionTrack_Initialize(track, p->position, destination, 0, 3);
+                    SetPolar(&destination, Math_Atan2(target[0] - first[0], target[2] - 640), 1024);
+                    AddVectorInPlace(&destination, &center);
+                    destination.y = target[1];
+                    MotionTrack_Initialize(track, p->position, &destination, 0, 3);
                 }
                 p->timer++;
             }
@@ -161,7 +133,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             if (IsComplete(self)) {
                 u8 next = 2;
                 u32 zero = 0;
-                *(&p->phase) = next;
+                p->phase = next;
                 p->timer = zero;
             } else {
                 VanargandAfterimagePool_Spawn(self->afterimages, p->position);
@@ -173,7 +145,3 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081A9178);
-#endif
