@@ -16,14 +16,16 @@ struct CallbackSlots {
     struct CallbackSlotB8 second[8];
 };
 // confidence=low: clears both slot pools, calling each slot's release callback once.
-#ifdef NONMATCHING
-// fuzzy: 78.6%
-// The ROM multiplies into a copy of the index; this multiplies into the size constant.
 s32 sub_0819A414(struct CallbackSlots *p)
 {
     s32 i;
     for (i = 0; i < 16; i++) {
-        struct CallbackSlotD4 *slot = (void *)((u8 *)p + i * sizeof(*slot) + 0x28);
+        u32 offset = i;
+        struct CallbackSlotD4 *slot;
+        offset *= sizeof(*slot);
+        offset += (u32)p;
+        offset += 0x28;
+        slot = (void *)offset;
         slot->active = 0;
         if (slot->release) {
             slot->release(slot);
@@ -31,7 +33,12 @@ s32 sub_0819A414(struct CallbackSlots *p)
         }
     }
     for (i = 0; i < 8; i++) {
-        struct CallbackSlotB8 *slot = (void *)((u8 *)p + i * sizeof(*slot) + 0xD68);
+        u32 offset = i;
+        struct CallbackSlotB8 *slot;
+        offset *= sizeof(*slot);
+        offset += (u32)p;
+        offset += 0xD68;
+        slot = (void *)offset;
         slot->active = 0;
         if (slot->release) {
             slot->release(slot);
@@ -40,6 +47,3 @@ s32 sub_0819A414(struct CallbackSlots *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0819A414);
-#endif
