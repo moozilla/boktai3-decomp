@@ -1423,10 +1423,103 @@ def reload_records(wd, func):
     return out
 
 
-def score(src, func, env):
-    """Compile with ENV and return the number of differing instructions (0 = MATCH), silently."""
+_FAST = {}
+_ROMDEC = {}
+
+
+_PRE = {}
+
+
+def preprocess(src, env=None):
+    """The unit's preprocessed text, memoised on its mtime and size (knob-only variants reuse it)."""
+    st = os.stat(os.path.join(ROOT, src))
+    tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
+    key = (src, st.st_mtime_ns, st.st_size, tf)
+    if key not in _PRE:
+        if len(_PRE) > 64:
+            _PRE.clear()
+        _PRE[key] = _preprocess(src, env)
+    return _PRE[key]
+
+
+def _preprocess(src, env=None):
+    defines = build.DEFINES + ["-DNONMATCHING"]
+    pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
+    tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
+    if tf:  # a what-if over the preprocessed source: a module with transform(text) -> text
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("scope_transform", os.path.join(ROOT, tf))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        pre = mod.transform(pre)
+    return pre
+
+
+def inline_macros(text):
+    """Inline the macros a top-level asm() includes (gas sometimes misreads the included file)."""
+    macros = open(os.path.join(ROOT, "asm", "macros.inc")).read()
+    return re.sub(r'^\s*\.include\s+"asm/macros\.inc"\s*$', lambda m: macros, text, flags=re.M)
+
+
+def fast_compile(src, func, env=None):
+    """(FUNC's bytes, address, data ranges) through scope's agbcc fork server (tools/scope/fast.py):
+    a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft)."""
+    import fast
+    env = resolve_knobs(src, func, env)
+    flags = tuple(build.cflags_for(src))
+    _, addr_all, _ = inventory()
+    addr = addr_all[rom_name(src, func)]
+    key = (flags, addr)
+    f = _FAST.get(key)
+    if f is None:
+        f = _FAST[key] = fast.Fast(INSTR, list(flags), build.AS, elf_syms(), addr,
+                                   os.path.join(WORK, "cache"), fixup=inline_macros)
+        os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
+    knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
+    code, err = f.bytes(preprocess(src, env), (func, rom_name(src, func)), knobs)
+    if code is None:
+        return None
+    return code, addr, f.data
+
+
+_ROMBYTES = []
+
+
+def rom_bytes():
+    if not _ROMBYTES:
+        _ROMBYTES.append(load_rom(verify=False))
+    return _ROMBYTES[0]
+
+
+def fast_score(src, func, env):
+    """(differing rows, count text) through the fork server, or None if the unit cannot be served."""
+    r = fast_compile(src, func, env)
+    if r is None:
+        return None
+    mine, addr, mdata = r
+    _, _, sizes = inventory()
+    rom_code = rom_bytes()[off(addr):off(addr) + sizes[rom_name(src, func)]]
+    if mine == rom_code:
+        return 0, "MATCH"
+    if addr not in _ROMDEC:
+        rdata = rom_data_ranges(rom_name(src, func), addr)
+        if rdata is None:
+            rdata = rom_pool_ranges(rom_code, addr)
+        _ROMDEC[addr] = decode(rom_code, addr, rdata)
+    pairs, _ = align(_ROMDEC[addr], decode(mine, addr, mdata))
+    rows = [{"tag": t} for _, _, t in pairs]
+    return sum(1 for r in rows if r["tag"] != "="), count_text(rows)
+
+
+def score(src, func, env, full=False):
+    """Compile with ENV and return the number of differing instructions (0 = MATCH), silently.
+    Through the fork server unless FULL (callers that read the compile's dumps or traces after)."""
     import contextlib
     import io
+    if not full and os.environ.get("SCOPE_FAST") != "0":  # SCOPE_FAST=0: one-shot compiles (A/B, debugging)
+        r = fast_score(src, func, env)
+        if r is not None:
+            return r[0], {"counts": r[1]}
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
@@ -1580,7 +1673,7 @@ def cmd_pins(src, func, env):
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
     each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
-    base, info = score(src, func, env)
+    base, info = score(src, func, env, full=True)
     wd = info["wd"]
     rel = reload_records(wd, info["obj_name"])
     order = [u for u, _, _ in insn_list(wd, "greg")]
@@ -1629,7 +1722,7 @@ def cmd_probe(src, func, env):
     values loop.c strength-reduces or not (AGBCC_NOGIV / AGBCC_GIV). Then each is
     flipped alone; a flip that matches or lowers the count names the decision (rtlprobe.py's
     canon / follow / pre, inside scope's loop and with its counts)."""
-    base, info = score(src, func, env)
+    base, info = score(src, func, env, full=True)
     wd = info["wd"]
     tr = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "u.i", "-o", "/dev/null"], cwd=wd,
                         capture_output=True, text=True,
@@ -1728,7 +1821,7 @@ def cmd_probe(src, func, env):
                           " counter, or make the step not a constant multiple of the counter.",
            "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
                         " it. In C walk a pointer (p++ / p += size) instead of indexing."}
-    score(src, func, env)  # leave the workdir's dumps at the unmodified draft
+    score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
     if not hits:
         print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
               " the difference is elsewhere (allocation: why; reload: spill).")
@@ -1748,7 +1841,7 @@ def cmd_probe(src, func, env):
 
 def cmd_why_all(src, func, env):
     """why for the first differing insn (with a uid) of each hunk, up to 8."""
-    n, info = score(src, func, env)
+    n, info = score(src, func, env, full=True)
     if n == 0:
         print(f"{func}: MATCH")
         return 0
@@ -2071,6 +2164,48 @@ def cmd_why(src, func, uid, env, via=None):
 
 
 
+def cmd_fastcheck(n):
+    """The fork-server path must give compile_draft's bytes: check N units (drafts first)."""
+    import glob
+    import random
+    srcs = sorted(glob.glob(os.path.join(ROOT, "src", "fn", "*.c")) + glob.glob(os.path.join(ROOT, "src", "*.c")))
+    drafts = [p for p in srcs if "#ifdef NONMATCHING" in open(p).read()]
+    random.seed(1)
+    pick = random.sample(drafts, min(n, len(drafts)))
+    pick += random.sample([p for p in srcs if p not in drafts], min(max(0, n - len(pick)), len(srcs)))
+    same = diff = skip = 0
+    t_fast = t_full = 0.0
+    for p in pick[:n]:
+        src = os.path.relpath(p, ROOT)
+        func = nonmatching_func(src) or next(iter(re.findall(r"^\w[^\n;=(]*\b(\w+)\s*\([^;{]*\)\s*\{",
+                                                         open(p).read(), re.M)), None)
+        if not func or rom_name(src, func) not in inventory()[1]:
+            skip += 1
+            continue
+        try:
+            t0 = time.perf_counter()
+            mine = compile_draft(src, func, {})[0]
+            t_full += time.perf_counter() - t0
+        except SystemExit:
+            skip += 1
+            continue
+        t0 = time.perf_counter()
+        r = fast_compile(src, func, {})
+        t_fast += time.perf_counter() - t0
+        if r is None:
+            skip += 1
+            print(f"  not served: {src} {func}")
+        elif r[0] == mine:
+            same += 1
+        else:
+            diff += 1
+            print(f"  DIFFERENT: {src} {func}")
+    k = max(1, same + diff)
+    print(f"{same} same, {diff} different, {skip} skipped; first compiles (server start included):"
+          f" fast {t_fast / k * 1000:.0f} ms, full {t_full / k * 1000:.0f} ms per unit")
+    return 1 if diff else 0
+
+
 def last_func():
     p = os.path.join(WORK, "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
@@ -2081,6 +2216,8 @@ def main():
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    if args[0] == "fastcheck":
+        return cmd_fastcheck(int(args[1]) if len(args) > 1 else 40)
     if args[0] == "uses":
         regs = [int(a) for a in args[1:] if a.isdigit()]
         names = [a for a in args[1:] if not a.isdigit()]
