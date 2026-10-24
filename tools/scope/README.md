@@ -674,6 +674,21 @@ which is exactly `10:1`. Not tested.
   makes when cse rewrites an `asm("" : "+r"(x))` input (found via `insn`).
   Takeaway: Haiku is enough for small drafts where `why` names one lever;
   pin-heavy functions need Sonnet or better, and still did not match.
+* Codex gpt-6.1-sol (2026-10-24, high effort) on the sidestep: MATCH (#654),
+  8 pins / 7 barriers, 76 compiles, 2.07M input tokens (1.999M cached),
+  15K output. Path: `why` + `AGBCC_FORCE=bit#2:7` (6 -> 3), `life`/`vs` to
+  keep the mask alive through an existing barrier in C, `AGBCC_SPILL=16:2`
+  then `AGBCC_FORCE=615:1` for the final address, pins for those, then
+  `pins` removed 6 barriers. Its feedback, addressed: `why all`, `pins` and
+  the display now print the same `N ROM / M draft (+B moved branches)`;
+  `pins` caches identical variants, only tries removals that are free alone
+  in its greedy pass (`--all` for the rest; 43 -> 17 compiles here), keeps
+  its output under SCOPE_RUN and names the real variant directory. Open:
+  explain reload-created copies and output-time splits through their source
+  pseudo (insns 1409/1453 had no pseudo or reload record); a concrete lever
+  for local-alloc choices (which dying operand it tied to); `life NAME`
+  picks an inline helper's variable silently (show every instance with its
+  declaration and call site); count the extra compile a named knob costs.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
   (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
   progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly

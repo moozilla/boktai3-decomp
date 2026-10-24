@@ -1326,7 +1326,16 @@ def score(src, func, env):
     with contextlib.redirect_stdout(io.StringIO()):
         report(src, func, rom_code, addr, mine, info, 0)
     rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    info["counts"] = count_text(rows)
     return sum(1 for r in rows if r["tag"] != "="), info
+
+
+def count_text(rows):
+    """'6 ROM / 6 draft (+2 moved branches)': the same count the main display prints, from diff.json rows."""
+    nr = sum(1 for r in rows if r["tag"] in "-~")
+    nm = sum(1 for r in rows if r["tag"] in "+~")
+    nb = sum(1 for r in rows if r["tag"] == "→")
+    return f"{nr} ROM / {nm} draft" + (f" (+{nb} moved branch{'es' if nb > 1 else ''})" if nb else "")
 
 
 def rotation_hints(src, wd, func, rel, k, d, regs, order):
@@ -1392,41 +1401,53 @@ def concession_sites(text):
 def cmd_pins(src, func, env):
     """Phase 3 helper: remove each concession (register pin or empty asm barrier) in turn and report the
     cost, then greedily remove every one that does not add differences, and write the result."""
+    pins_dir = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""))
+    memo, compiles, counts = {}, [0], {}
+
     def run(text, tag):
-        path = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""), f"{func}_{tag}.c")
+        if text in memo:  # the same variant again (greedy repeats single removals): no compile
+            return memo[text]
+        path = os.path.join(pins_dir, f"{func}_{tag}.c")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, "w").write(text)
+        compiles[0] += 1
         try:
-            n, _ = score(os.path.relpath(path, ROOT), func, env)
+            n, info = score(os.path.relpath(path, ROOT), func, env)
         except SystemExit:
-            return None
+            n, info = None, {}
+        memo[text] = n
+        counts[n] = info.get("counts", "MATCH" if n == 0 else "?")
         return n
+
+    def show(n):
+        return "compile fails" if n is None else f"{n} rows ({counts.get(n, '?')})"
     text = open(os.path.join(ROOT, src)).read()
     sites = concession_sites(text)
     if not sites:
         print(f"{src}: no register pins or empty asm barriers")
         return 0
     base = run(text, "base")
-    print(f"{func}: {base} differing insns with all {len(sites)} concessions"
+    print(f"{func}: {show(base)} with all {len(sites)} concessions"
           f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers)")
     lines = text.split("\n")
     cost = []
     for n, (i, kind, rm) in enumerate(sites):
         r = run("\n".join(rm(lines)), f"one{n}")
         cost.append(r)
-        d = "compile fails" if r is None else f"{r} differ ({r - base:+d})"
+        d = "compile fails" if r is None else f"{show(r)}, {r - base:+d}"
         print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> {d}")
     ls = lines
     for i, _, rm in sorted(sites, key=lambda t: -t[0]):
         ls = rm(ls)
     r = run("\n".join(ls), "none")
-    print(f"  all removed: {'compile fails' if r is None else f'{r} differ'}")
+    print(f"  all removed: {show(r)}")
     # greedy: cheapest first, keep a removal if the count does not grow; remove from the bottom up so
     # earlier line numbers stay valid
     order = sorted(range(len(sites)), key=lambda n: (cost[n] is None, cost[n] if cost[n] is not None else 0))
     keep_out, cur, best = set(), lines, base
+    tryall = "--all" in sys.argv  # by default only removals that are free alone join the greedy pass
     for n in order:
-        if cost[n] is None:
+        if cost[n] is None or (not tryall and base is not None and cost[n] > base):
             continue
         trial = set(keep_out) | {n}
         ls = lines
@@ -1435,13 +1456,15 @@ def cmd_pins(src, func, env):
         r = run("\n".join(ls), f"greedy{n}")
         if r is not None and r <= best:
             keep_out, cur, best = trial, ls, r
-    out = os.path.join(ROOT, "build", "scope", "drafts", f"{func}.fewer_pins.c")
+    out = os.path.join(ROOT, "build", "scope", "drafts", os.environ.get("SCOPE_RUN", ""), f"{func}.fewer_pins.c")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     open(out, "w").write("\n".join(cur))
     left = len(sites) - len(keep_out)
     print(f"  greedy: removed {len(keep_out)} of {len(sites)} with no added differences -> {best} differ,"
-          f" {left} concessions left; written to {os.path.relpath(out, ROOT)}")
+          f" {left} concessions left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
+          f" {'every removal tried' if tryall else 'only removals free alone tried greedily; --all tries the rest'}]")
     print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
-          " first new difference in that variant (build/scope/drafts/.pins/).")
+          f" first new difference in that variant ({os.path.relpath(pins_dir, ROOT)}/).")
     return 0
 
 
@@ -1502,7 +1525,7 @@ def cmd_why_all(src, func, env):
         if picks[-1] is None and r["uid"] and r["tag"] != "→":  # a branch that only lands elsewhere is no cause
             picks[-1] = r["uid"]
     picks = [u for u in picks if u][:8]
-    print(f"{func}: {n} differing insns; why on the first of each hunk: {', '.join(map(str, picks))}\n")
+    print(f"{func}: {count_text(rows)} differ; why on the first of each hunk: {', '.join(map(str, picks))}\n")
     for u in picks:
         cmd_why(src, func, u, env)
         print()
@@ -1755,6 +1778,7 @@ def main():
                      [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
         return 0
     if rest and rest[0] == "pins":  # FILE.c pins: cost of removing each pin / barrier, greedy removal
+        rest = [a for a in rest if a != "--all"]
         func = rest[1] if len(rest) > 1 else nonmatching_func(src) or os.path.basename(src)[:-2]
         return cmd_pins(src, func, env)
     if "spill" in rest:
