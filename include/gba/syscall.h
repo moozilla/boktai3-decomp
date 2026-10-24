@@ -13,6 +13,10 @@
 #define RESET_REGS       0x80
 #define RESET_ALL        0xFF
 
+// The AGB SDK's inline BIOS call (AgbDefine.h). Stop (3) and the other calls
+// that have no library wrapper in the ROM are emitted in place as `swi N`.
+#define SystemCall(n) asm("swi " #n)
+
 void SoftReset(u32 resetFlags);
 
 void RegisterRamReset(u32 resetFlags);

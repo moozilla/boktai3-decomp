@@ -1,31 +1,23 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.9%
-// foundry draft (worker best 91.9%); what differs is mostly register allocation and instruction order
-#define System_EnterSleep      Power_EnterSleep
-#define System_WaitFrame       InterruptsAndVideo_WaitForVBlank
-#define gDisplayRefreshPending gUnk_03005404
+#include "gba/syscall.h"
 
-void System_WaitFrame(void);
+// Sleeps in the BIOS Stop state until the keypad interrupt (KEYCNT 0xC304: L+R+Select) wakes it.
+void InterruptsAndVideo_WaitForVBlank(void);
 void SoundBiasReset(void);
 void SoundBiasSet(void);
-extern u32 gDisplayRefreshPending;
+extern u32 gUnk_03005404;
 
 void Power_EnterSleep(void)
 {
     *(vu16 *)0x04000000 |= 0x80;
-    System_WaitFrame();
-    System_WaitFrame();
+    InterruptsAndVideo_WaitForVBlank();
+    InterruptsAndVideo_WaitForVBlank();
     *(vu16 *)0x04000132 = 0xC304;
     SoundBiasReset();
-    /* Unrecovered BIOS Stop (svc 3): requires an inline SWI facility.
-     * Foundry forbids assembly, and this compiler has no SWI intrinsic. */
+    SystemCall(3);
     SoundBiasSet();
-    gDisplayRefreshPending = 1;
+    gUnk_03005404 = 1;
     *(vu16 *)0x04000000 &= 0xFF7F;
     *(vu16 *)0x04000132 = 0;
-    System_WaitFrame();
+    InterruptsAndVideo_WaitForVBlank();
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Power_EnterSleep);
-#endif
