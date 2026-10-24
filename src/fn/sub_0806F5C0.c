@@ -1,9 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-// Open: reload register choices around the difficulty scaling.
 struct SceneEffectEntry {
     s16 x, y, z;
     u8 pad6[2];
@@ -27,11 +24,17 @@ static inline u32 Random(void)
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline s32 scaleByDifficulty(s32 value)
 {
     return Div((10 - gUnk_02000710->unk876) * value, 10);
+}
+static inline s32 scaleUnlessFlagged(s32 value)
+{
+    if (gUnk_030053F4 & 0x800)
+        return value;
+    return scaleByDifficulty(value);
 }
 /* Registry routine FD6B: schedules a scene effect (unless engine flag 0x400 is
    set): -p position, -a vector, -f kind then a random delay in [min, max), -n,
@@ -77,23 +80,8 @@ void SceneEffectSchedule_AddFromScript(void)
     e->flagged = 0;
     if (Script_GetKeywordValue('s', 0))
         e->flagged = 1;
-    {
-        s32 t = e->time;
-        u32 copy;
-        if (gUnk_030053F4 & 0x800) {
-            copy = t;
-            time = copy;
-        } else {
-            copy = t;
-            time = scaleByDifficulty(copy);
-        }
-    }
-    delay = e->delay;
-    if (!(gUnk_030053F4 & 0x800))
-        delay = scaleByDifficulty(delay);
+    time = scaleUnlessFlagged(e->time);
+    delay = scaleUnlessFlagged(e->delay);
     e->effect =
         sub_08122B8C(e, e->name, time, e->d, e->f, -1, e->ax, e->ay, e->az, delay, e->flagged);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneEffectSchedule_AddFromScript);
-#endif
