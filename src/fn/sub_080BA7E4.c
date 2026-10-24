@@ -1,10 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.2%
-// remaining: step-pointer copy placement (r6/r3) and zero-constant hoist
 extern const s16 gUnk_086149C4[];
 void Skeleton_UpdateAlternateAttackRecovery(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
@@ -28,16 +24,23 @@ static inline void AddHalf(s16 *dst, const s16 *src)
 {
     *dst += *src;
 }
+static inline void Clear(const void *src, void *dst, u32 ctl)
+{
+    CpuSet(src, dst, ctl);
+}
+static inline void AddZ(s16 *dst, const struct ContactPosition *src)
+{
+    *dst += src->z;
+}
 static inline s32 Half(s32 value)
 {
     return value >= 0 ? value >> 1 : -((-value) >> 1);
 }
 
-void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick_)
+void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_)
 {
-    register u8 *context asm("r8");
-    struct SceneActorRegistryResetView *p = p_;
-    register s32 tick asm("sb") = tick_;
+    u8 *context;
+    s32 tick = tick_;
     struct {
         u32 zero;
         struct ContactPosition step;
@@ -52,33 +55,28 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
     }
     HeadingStep(&p->direction, context + 0x6D1, &scratch.step);
     {
-        register struct ContactPosition *v asm("r6") = &scratch.step;
-        asm("" : "+r"(v));
+        struct ContactPosition *v = &scratch.step;
         AddHalf(&p->motion.x, &v->x);
+        v = &p->motion;
+        AddZ(&v->z, &scratch.step);
     }
-    AddHalf(&p->motion.z, &scratch.step.z);
     {
         u32 mask = 0x2000;
         u32 *fl = &p->flags2CC;
         *fl |= mask;
     }
     if (Mod(tick, 4) == 0) {
-        register u32 z asm("r6");
+        u32 z;
         s32 h = Half(context[0x6D1]);
         u8 *cp = context + 0x6D1;
-        asm("" : "+r"(cp));
         z = 0;
-        asm("" : "+r"(z));
         *cp = h;
         jitter.x = 0x52;
         jitter.y = 0;
         jitter.z = 0x52;
         np = &empty;
         scratch.zero = z;
-        {
-            register u32 ctl asm("r2") = 0x05000002;
-            CpuSet(&scratch.zero, np, ctl);
-        }
+        Clear(&scratch.zero, np, 0x05000002);
         SceneParticleBurst_CreateWithPause(&p->position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
@@ -98,6 +96,3 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p_, s32 tick
         p->word104 = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Skeleton_TickDecayingLunge);
-#endif
