@@ -140,7 +140,7 @@ def failed_turn(wd):
     return m[-1] if m else None
 
 
-def resume(r, model):
+def resume(r, model, note=None):
     func = r["func"]
     wd = os.path.join(CAMP, func)
     head = open(os.path.join(wd, "codex.json")).read(4000)
@@ -151,8 +151,10 @@ def resume(r, model):
         print(f"gave up on {func} after {n} resumes")
         return False
     open(os.path.join(wd, "retries"), "w").write(str(n + 1))
-    note = (f"You were interrupted by an error ({failed_turn(wd)}). Continue the same task from where you"
-            f" stopped; your files are in {os.path.relpath(wd, ROOT)}. Finish with the deliverables.")
+    note = note or (f"You were interrupted by an error ({failed_turn(wd)}). Continue the same task from where"
+                    f" you stopped; your files are in {os.path.relpath(wd, ROOT)}. Finish with the deliverables.")
+    if os.path.exists(os.path.join(wd, ".reported")):
+        os.remove(os.path.join(wd, ".reported"))
     log = open(os.path.join(wd, "codex.json"), "a")
     p = subprocess.Popen(["codex", "exec", "resume", "-c", "model_reasoning_effort=high", "--json", "-o",
                           os.path.join(wd, "last.txt"), m.group(1), note],
@@ -194,6 +196,22 @@ def cmd_tick(args):
     model = args[args.index("--model") + 1] if "--model" in args else "gpt-6.1-sol"
     rows = json.load(open(QUEUE))
     running = {r["func"] for r in rows if state(r["func"]) == "running"}
+    for r in rows:  # one more round for near-misses (a few insns left), in the same session
+        wd = os.path.join(CAMP, r["func"])
+        if len(running) >= workers or state(r["func"]) != "done" or os.path.exists(os.path.join(wd, ".second")):
+            continue
+        try:
+            res = json.load(open(os.path.join(wd, "result.json")))
+        except (OSError, ValueError):
+            continue
+        m = re.match(r"(\d+) ROM / (\d+) draft", str(res.get("counts", "")))
+        if res.get("match") or not m or int(m.group(1)) + int(m.group(2)) > 8:
+            continue
+        open(os.path.join(wd, ".second"), "w").write(res["counts"])
+        if resume(r, model, note=(f"You stopped at {res['counts']}: very close. Take one more round of up to 80"
+                                   " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
+                                   " a pin is acceptable only as the last resort). Update the deliverables.")):
+            running.add(r["func"])
     for r in rows:  # resume workers a model error stopped, before starting new ones
         if len(running) < workers and state(r["func"]) == "failed" and \
                 not os.path.exists(os.path.join(CAMP, r["func"], "gave_up")) and resume(r, model):
