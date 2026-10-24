@@ -733,6 +733,18 @@ which is exactly `10:1`. Not tested.
   every C form that keeps FlagFour's `return 0` out of the tested value
   breaks the layout (16-31 insns), so the ROM's helper differs some other
   way.
+* Near-miss failures overnight (2026-10-24): of the drafts that started
+  within a few insns and failed both rounds, three are reload rotation
+  only (`spill` gives MATCH with one shift: Player_GetSmoothedDirection and
+  its twin sub_0823C4B4 `AGBCC_SPILL=6:1`, GridAttackActor_OnDamageCollision
+  `3:2`); SceneActorControl_UpdateWanderTarget, TickRandomMotion and
+  Skeleton_TickDecayingLunge are not. Workers spend 120-190 compiles on
+  rotation cases without finding the C that adds or removes one reload in
+  the span `spill` names. Open: a search over that span's C (the values in
+  high registers it lists, pins there) that reports which edit changes the
+  reload count by the needed amount, instead of leaving it to the worker.
+  Power_EnterSleep needs an inline `svc #3` (SDK SystemCall), which agbcc
+  cannot emit from C: a policy question, not a tool gap.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
   (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
   progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly
