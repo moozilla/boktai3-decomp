@@ -3360,6 +3360,7 @@ addr,name,mode,confidence,source,notes
 080AFD88,Vorn_UpdateDescriptorPursuit,thumb,low,src-alias,
 080AFEF0,Vorn_SelectPursuitAfterAction,thumb,low,src-alias,
 080B01A4,Vorn_UpdateRouteApproach,thumb,low,src-alias,
+080B03BC,SceneActorControl_WaitForRouteResult,thumb,low,src-alias,
 080B04F4,SceneActorControl_UpdateProbeApproach_080B04F4,thumb,low,src-alias,
 080B0728,SceneActorPhase_UpdateConditionalMotion,thumb,low,src-alias,
 080B0850,SceneActorPhase_BeginTimedMotion,thumb,low,src-alias,
