@@ -119,9 +119,9 @@ def state(func):
     pid = int(open(os.path.join(wd, "pid")).read())
     try:
         os.kill(pid, 0)
-        alive = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True,
+        alive = subprocess.run(["ps", "-o", "stat=,command=", "-p", str(pid)], capture_output=True,
                                text=True).stdout.strip()
-        if alive and not alive.startswith("Z"):
+        if alive and not alive.startswith("Z") and "codex" in alive:  # not a reused pid
             return "running"
     except OSError:
         pass
