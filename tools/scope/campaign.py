@@ -42,6 +42,8 @@ Task:
   effect: declaration or statement order, a temporary, a type, operand order, an inline helper, a variable
   reused for a later value, `x * 64` vs `x << 6`, splitting or joining an expression. Several changes often
   pay off only together (WORKER.md step 5).
+- Commands (WORKER.md, `scope.py --help`): why UID / why all, probe, spill, try (score several variant
+  files of one hypothesis in one call, ~12 ms each), life, vs, pins, insn, uses.
 - Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a last resort: use
   one only where a knob proved an allocation or reload decision that you could not reproduce in C after
   real attempts, and say so in the report. Never hand-written instructions. If the draft already has

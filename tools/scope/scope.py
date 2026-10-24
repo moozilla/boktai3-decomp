@@ -5,9 +5,14 @@
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
   scope.py FILE.c spill         is the whole difference reload's spill rotation? (searches AGBCC_SPILL)
   scope.py FILE.c probe         is it one cse/gcse decision? (CSE_NOCANON, CSE_NOFOLLOW, AGBCC_NOPRE)
+  scope.py FILE.c try V.c... | try KNOB=V...   score many variants (whole files, or one knob each;
+                                shell globs and {a,b} expansion make the list), ~12 ms each, best first
   scope.py FILE.c why all       why on the first differing insn of each hunk
   scope.py FILE.c why UID       why insn UID has the operands it has: pass by pass, and for cse the
                                 equivalence class and the canonical-register decision, with C lines
+  scope.py FILE.c life NAME...  the insns flow counts toward a value's live length, by C line
+  scope.py A.c vs B.c [FUNC]    two drafts' register allocation side by side (rank, priority, refs/live)
+  scope.py FILE.c pins          cost of removing each register pin / asm barrier; greedy free removal
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
@@ -17,6 +22,10 @@ sides are disassembled the same way; literal loads compare by value and branches
 they land after alignment, so offsets that only moved because code shifted are hidden and
 counted rather than listed. Each differing draft instruction is tagged with its C line,
 its insn uid and the pass that created that insn.
+
+Speed: the first call starts a resident server (scope.py serve; SCOPE_SERVER=0 opts out) that keeps
+the ROM and symbols loaded; search commands (probe, spill, pins, try) compile each variant through
+an agbcc fork server in ~12 ms. scope.py fastcheck N checks those paths against ld.
 
 Everything is kept in build/scope/FUNC/ for follow-up queries:
   diff.txt    the whole aligned listing     diff.json  the same rows, for jq
@@ -691,9 +700,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             mark = {"=": " ", "~": "!", "-": "-", "+": "+", "→": ">"}[t]
             bp_s = PASS_NOTE.get(bp, bp)
             print(f"{mark} {r:34} {m:34} {lt:>5} {u or '':>5}  {bp_s}")
-    print("\nnext: scope.py FILE.c why UID (why this insn has these registers) | FILE.c spill (only reload"
-          " rotation?) | probe (one cse/gcse decision?) | insn UID (RTL through the passes) | uses REG (who uses a"
-          " pseudo)")
+    print("\nnext: FILE.c why UID / why all (why these registers) | probe (one cse/gcse/loop decision?) | spill"
+          " (only reload rotation?) | try V1.c V2.c... (score variants, ~12 ms each) | life NAME (live length by"
+          " line) | A.c vs B.c (two drafts' allocation) | pins | insn UID | uses REG   (scope.py --help)")
     return 1
 
 
@@ -2361,6 +2370,59 @@ def cmd_serve():
     return 0
 
 
+def c_change(base_lines, path):
+    """'lines 105-112 (+3 -1)': where a variant's text differs from the base file."""
+    other = open(path).read().splitlines()
+    sm = difflib.SequenceMatcher(None, base_lines, other, autojunk=False)
+    ops = [o for o in sm.get_opcodes() if o[0] != "equal"]
+    if not ops:
+        return "same text"
+    plus = sum(j2 - j1 for _, _, _, j1, j2 in ops)
+    minus = sum(i2 - i1 for _, i1, i2, _, _ in ops)
+    lo, hi = ops[0][3] + 1, max(ops[-1][4], ops[-1][3] + 1)
+    return f"lines {lo}-{hi} (+{plus} -{minus})" if lo != hi else f"line {lo} (+{plus} -{minus})"
+
+
+def cmd_try(src, func, variants, env):
+    """Score each variant (a whole-file .c, or one KNOB=V) through the fork server, best first."""
+    t0 = time.perf_counter()
+    base_n, base_info = score(src, func, env)
+    rows = []
+    base_lines = open(os.path.join(ROOT, src)).read().splitlines()
+    for v in variants:
+        if "=" in v and not v.endswith(".c"):
+            k, val = v.split("=", 1)
+            prev = env.get(k)
+            try:
+                n, info = score(src, func, dict(env, **{k: f"{prev},{val}" if prev else val}))
+            except SystemExit as e:
+                n, info = None, {"counts": str(e.code).splitlines()[0][:60]}
+            rows.append((n, v, info.get("counts", "MATCH" if n == 0 else "?"), "knob"))
+            continue
+        path = v if os.path.isabs(v) else os.path.join(os.getcwd(), v)
+        if not os.path.exists(path):
+            path = os.path.join(ROOT, v)
+        rel = os.path.relpath(path, ROOT)
+        try:
+            n, info = score(rel, func, env)
+        except SystemExit as e:
+            n, info = None, {"counts": "compile fails: " + str(e.code).splitlines()[-1].strip()[:60]}
+        rows.append((n, rel, info.get("counts", "MATCH" if n == 0 else "?"), c_change(base_lines, path)))
+    dt = time.perf_counter() - t0
+    knobs = " ".join(f"{k}={v}" for k, v in env.items())
+    print(f"{func}: base {src}{' [' + knobs + ']' if knobs else ''}: {base_info.get('counts', 'MATCH')}."
+          f" {len(variants)} variants in {dt:.2f}s ({dt / max(1, len(variants) + 1) * 1000:.0f} ms each)")
+    rows.sort(key=lambda r: (r[0] is None, r[0] if r[0] is not None else 0))
+    for n, name, counts, change in rows:
+        mark = "MATCH" if n == 0 else ("better" if n is not None and n < base_n else
+                                       "same" if n == base_n else "worse" if n is not None else "")
+        print(f"  {mark:6} {counts:44} {name}" + ("" if change == "knob" else f"  [{change}]"))
+    best = rows[0] if rows else None
+    if best and best[0] is not None and best[3] != "knob":
+        print(f"\nnext: scope.py {best[1]} {func}   (the best variant's listing)")
+    return 0 if any(r[0] == 0 for r in rows) else 1
+
+
 def last_func():
     p = os.path.join(WORK, "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
@@ -2420,6 +2482,17 @@ def main():
         rest = [a for a in rest if a != "--all"]
         func = rest[1] if len(rest) > 1 else nonmatching_func(src) or os.path.basename(src)[:-2]
         return cmd_pins(src, func, env)
+    if "try" in rest:  # FILE.c [KNOB=V...] try VARIANT... [FUNC]: whole-file variants or single knobs
+        i = args.index("try")
+        before = [a for a in args[1:i] if "=" not in a]
+        env = dict(a.split("=", 1) for a in args[1:i] if "=" in a)
+        variants = args[i + 1:]
+        func = before[0] if before else nonmatching_func(src)
+        if variants and not variants[-1].endswith(".c") and "=" not in variants[-1]:
+            func = variants.pop()
+        if not func:
+            sys.exit("name the function: scope.py FILE.c try VARIANT... FUNC")
+        return cmd_try(src, func, variants, env)
     if "probe" in rest:
         rest.remove("probe")
         func = rest[0] if rest else nonmatching_func(src)
