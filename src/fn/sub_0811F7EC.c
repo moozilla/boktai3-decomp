@@ -1,63 +1,52 @@
+#define ActorAbility_IsReady Modifier_IsFourthSourceReady
+// Tentative descriptive names; inferred from static field accesses and callees.
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 82.8%
-// foundry draft (worker best 82.8%); what differs is mostly register allocation and instruction order
-struct ActionOwner {
-    u8 unknown0[0x18];
-    u8 actionState[0x10];
-    u8 position[0x28];
-    u8 direction[0x20];
-    s16 resource;
-    u8 unknown72[0x876];
-    u32 spawnData;
-    u8 unknown8EC[0xC];
-    s8 spawnKind;
-};
-struct ActorAction {
-    u8 unknown0[4];
-    u8 parameters[4];
-    u16 id;
+struct ActorAbility {
+    u8 unknown0[6];
+    u16 interval, cost;
     u8 unknownA[2];
     u16 duration;
-    u8 unknownE[3];
-    s8 spawnResult;
-    u8 unknown12[2];
-    u16 timer;
+    u8 unknownE[2];
+    u8 enabled, request;
+    u16 cooldown, remaining;
     u8 unknown16[2];
-    struct ActionOwner *owner;
+    u8 *owner;
 };
-u8 Modifier_IsFourthSourceReady(struct ActorAction *);
+u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
 s32 CallbackList_RunMatchingState(void *, u32, s32);
-void CallbackList_SubtractStateTenValue(void *, struct ActorAction *, s32);
-struct SpawnParameters {
-    u32 data;
-    s32 a, b;
+void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
+s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
+void PalFade_Start(void *, u32, u32, s32, u32, u32, u32, u32);
+void Sound_PlaySong(u32);
+struct ProjectileParameters {
+    u32 a, b, c, d;
 };
-s8 SpritePairPool_StartEntry(void *, void *, s32, void *, s32, struct SpawnParameters);
-s32 ActorAction_TrySpawn(struct ActorAction *action)
+s8 SpritePairPool_StartEntry(void *, void *, s32, void *, s32);
+// confidence=low: ActorAbility_SpawnAlternateProjectile for a sprite pair; keeps the pool slot.
+s32 ActorAction_TrySpawn(struct ActorAbility *ability)
 {
-    struct ActionOwner *owner;
-    void *state;
+    u8 *owner, *stats;
+    u32 offset;
     s32 cost;
-
-    if (!Modifier_IsFourthSourceReady(action))
+    struct ProjectileParameters args;
+    if (!Modifier_IsFourthSourceReady(ability))
         goto fail;
-    owner = action->owner;
-    state = owner->actionState;
-    cost = CallbackList_RunMatchingState(state, action->id, 10);
-    if (owner->resource < cost)
+    owner = ability->owner;
+    stats = owner + 0x18;
+    cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
+    if (*(s16 *)(owner + 0x70) < cost)
         goto fail;
-    action->spawnResult = SpritePairPool_StartEntry(
-        owner->position, owner->direction, 0, action->parameters, owner->spawnKind,
-        (struct SpawnParameters){owner->spawnData, 0, 0});
-    if (action->spawnResult < 0) {
+    offset = 0x8e8;
+    args.a = *(u32 *)(owner + offset);
+    args.b = 0;
+    args.c = 0;
+    ability->request = SpritePairPool_StartEntry(owner + 0x28, owner + 0x50, 0, (u8 *)ability + 4,
+                                                 (s8) * (u8 *)(owner + (offset + 0x10)));
+    if ((s8)ability->request < 0) {
     fail:
         return 0;
     }
-    CallbackList_SubtractStateTenValue(state, action, cost);
-    action->timer = action->duration;
+    CallbackList_SubtractStateTenValue(stats, ability, cost);
+    ability->remaining = ability->duration;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorAction_TrySpawn);
-#endif
