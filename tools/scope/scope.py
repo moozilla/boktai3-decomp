@@ -3,6 +3,9 @@
 
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
+  scope.py FILE.c spill         is the whole difference reload's spill rotation? (searches AGBCC_SPILL)
+  scope.py FILE.c why UID       why insn UID has the operands it has: pass by pass, and for cse the
+                                equivalence class and the canonical-register decision, with C lines
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
@@ -134,8 +137,12 @@ def compile_draft(src, func, env=None):
             os.remove(os.path.join(wd, "u.i." + p))
         except FileNotFoundError:
             pass
+    names = os.path.join(wd, "names.txt")  # AGBCC_DUMPPRI appends: pseudo numbers with C variable names
+    if os.path.exists(names):
+        os.remove(names)
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "u.i", "-o", "u.s"],
-                       cwd=wd, capture_output=True, text=True, env=dict(os.environ, **(env or {})))
+                       cwd=wd, capture_output=True, text=True,
+                       env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     if r.returncode or "error" in r.stderr:
         sys.exit(r.stderr.strip())
@@ -460,8 +467,8 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             mark = {"=": " ", "~": "!", "-": "-", "+": "+", "→": ">"}[t]
             bp_s = PASS_NOTE.get(bp, bp)
             print(f"{mark} {r:34} {m:34} {lt:>5} {u or '':>5}  {bp_s}")
-    print(f"\nnext: scope.py insn UID (an insn through the passes) | uses REG (who uses a pseudo) | "
-          f"FILE.c CSE_WHY=UID (what cse weighed)")
+    print("\nnext: scope.py FILE.c why UID (why this insn has these registers) | FILE.c spill (only reload"
+          " rotation?) | insn UID (RTL through the passes) | uses REG (who uses a pseudo)")
     return 1
 
 
@@ -502,6 +509,389 @@ def cmd_uses(regs, func, passes):
             print(f"  after {p:8} {' '.join(out) or '(none)'}")
 
 
+# ---------------------------------------------------------------- why
+
+def pseudo_names(wd, func):
+    """pseudo -> C variable name, from AGBCC_DUMPPRI (local-alloc 'L' and global-alloc 'G' lines)."""
+    out = {}
+    path = os.path.join(wd, "names.txt")
+    if not os.path.exists(path):
+        return out
+    for ln in open(path):
+        p = ln.split()
+        if len(p) > 11 and p[0] == "L" and p[1] == func and p[11] != "-":
+            out[int(p[3])] = p[11]
+        elif len(p) > 8 and p[0] == "G" and p[1] == func and p[8] != "-":
+            out[int(p[2])] = p[8]
+    return out
+
+
+def uid_lines(wd):
+    """insn uid -> C line, from the line notes in the RTL dumps."""
+    out = {}
+    for p in PASSES:
+        path = os.path.join(wd, "u.i." + p)
+        if not os.path.exists(path):
+            continue
+        line = 0
+        for blk in re.split(r"\n\n", open(path).read()):
+            m = re.search(r'\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+            if m:
+                line = int(m.group(1))
+                continue
+            m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note) (\d+)", blk)
+            if m:
+                out.setdefault(int(m.group(1)), line)
+    return out
+
+
+def dispositions(wd):
+    """pseudo -> hard register, from global-alloc's 'Register dispositions'."""
+    path = os.path.join(wd, "u.i.greg")
+    out = {}
+    if os.path.exists(path):
+        text = open(path).read()
+        m = re.search(r";; Register dispositions:\n(.*?)\n\n", text, re.S)
+        if m:
+            for a, b in re.findall(r"(\d+) in (\d+)", m.group(1)):
+                out[int(a)] = int(b)
+    return out
+
+
+def regs_of(rtl):
+    return [int(n) for n in re.findall(r"\(reg(?:/[a-z]+)*:\w+ (\d+)", rtl or "")]
+
+
+def parse_trace(text):
+    """Split CSE_WHY / CSE_DEBUG output into per-pass lists of eqv events and why-blocks."""
+    passes, cur = {}, None
+    block = None
+    for seq, ln in enumerate(text.splitlines()):
+        m = re.match(r"cse pass (\d)", ln)
+        if m:
+            cur = passes.setdefault(int(m.group(1)), {"eqv": [], "why": []})
+            continue
+        if cur is None:
+            continue
+        if ln.startswith("path "):
+            d = re.match(r"path pass=\d from=(\d+) to=(\d+) cuid=(\d+)\.\.(\d+) branches=\d+:(.*)", ln)
+            if d:
+                cur.setdefault("paths", {})[(int(d.group(3)), int(d.group(4)))] = (
+                    int(d.group(1)), int(d.group(2)), d.group(5).split())
+            continue
+        if ln.startswith("eqv "):
+            d = dict(re.findall(r"(\w+)=(-?\d+)", ln))
+            cur["eqv"].append(dict({k: int(v) for k, v in d.items()}, seq=seq))
+        elif ln.startswith("cse_why"):
+            block = {"head": ln, "rows": [], "seq": seq}
+            cur["why"].append(block)
+        elif block is not None and ln.startswith("  ") and not ln.startswith("  (equal"):
+            m = re.match(r"\s+(\w+)\s+cost\s+(-?\d+)\s+(?:entered at insn\s+(\d+)\s+)?(?:canon\s+(\d+)\s+)?(.*)", ln)
+            if m:
+                block["rows"].append({"kind": m.group(1), "cost": int(m.group(2)),
+                                      "entered": int(m.group(3)) if m.group(3) else None,
+                                      "canon": int(m.group(4)) if m.group(4) else None,
+                                      "exp": m.group(5).strip()})
+            elif block["rows"]:
+                block["rows"][-1]["exp"] += " " + ln.strip()
+    return passes
+
+
+def insn_list(wd, p):
+    """[(uid, kind, rtl)] for every insn in pass P's dump, in order."""
+    path = os.path.join(wd, "u.i." + p)
+    if not os.path.exists(path):
+        return []
+    return [(int(m.group(2)), m.group(1), one_line(m.group(0)))
+            for m in re.finditer(r"^\((insn|jump_insn|call_insn) (\d+) .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)]
+
+
+def hard_of(wd):
+    """pseudo -> hard register, read off the insns: each operand before allocation (lreg) against the
+    same operand after reload (greg). Covers local-alloc pseudos, which 'Register dispositions' omits."""
+    after = {u: r for u, _, r in insn_list(wd, "greg")}
+    out = {}
+    for u, _, r in insn_list(wd, "lreg"):
+        a, b = regs_of(r), regs_of(after.get(u))
+        if len(a) == len(b):
+            for x, y in zip(a, b):
+                if x >= 16 and y < 16:
+                    out.setdefault(x, y)
+    return out
+
+
+def alloc_records(wd, func):
+    """pseudo -> ('G', rank, priority, refs, live, calls, hard) or ('L', block, priority, birth, death, refs, hard)."""
+    out = {}
+    path = os.path.join(wd, "names.txt")
+    rank = 0
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "G" and p[1] == func:
+            out[int(p[2])] = ("G", rank, int(p[3]), int(p[4]), int(p[5]), int(p[6]), int(p[7]))
+            rank += 1
+        elif p[0] == "L" and p[1] == func:
+            out.setdefault(int(p[3]), ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10])))
+    return out
+
+
+def conflicts(wd):
+    """pseudo -> (pseudo conflicts, hard-register conflicts), from global-alloc's dump."""
+    out = {}
+    path = os.path.join(wd, "u.i.greg")
+    for m in re.finditer(r"^;; (\d+) conflicts:(.*)$", open(path).read() if os.path.exists(path) else "", re.M):
+        ns = [int(x) for x in m.group(2).split()]
+        out[int(m.group(1))] = ({n for n in ns if n >= 16}, {n for n in ns if n < 16})
+    return out
+
+
+def explain_alloc(wd, func, pseudo, want, got, nm, at):
+    """Why PSEUDO got hard register GOT and not WANT (the ROM's)."""
+    recs, conf, hard = alloc_records(wd, func), conflicts(wd), hard_of(wd)
+    rec = recs.get(pseudo)
+    if rec and rec[0] == "G":
+        _, rank, pri, refs, live, calls, _ = rec
+        total = sum(1 for r in recs.values() if r[0] == "G")
+        print(f"    {nm(pseudo)} is a global-alloc pseudo: allocated {rank + 1} of {total} by priority {pri}"
+              f" ({refs} refs, live {live} insns, crosses {calls} call(s)); it got r{got}, the ROM has r{want}.")
+    elif rec:
+        _, blk, pri, birth, death, refs, _ = rec
+        print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
+              f" it got r{got}, the ROM has r{want}.")
+    else:
+        print(f"    {nm(pseudo)} has no allocation record; it got r{got}, the ROM has r{want}.")
+    if rec and rec[0] == "G" and rec[5] and want < 4:
+        print(f"    it lives across a call, so r0-r3 are unavailable to it: the ROM's value does not cross that call.")
+        return
+    pc, hc = conf.get(pseudo, (set(), set()))
+    if want in hc:
+        seq = insn_list(wd, "lreg")
+        idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
+        holders, calls = {}, []
+        if idx:
+            for u, kind, r in seq[idx[0]:idx[-1] + 1]:
+                if kind == "call_insn" and want < 4:
+                    calls.append(u)
+                for x in regs_of(r):
+                    if x != pseudo and (x == want or hard.get(x) == want):
+                        holders.setdefault(x, u)
+        what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
+        if calls:
+            what.append(f"a call at {at(calls[0])}")
+        print(f"    r{want} was already taken during its life (local alloc or a fixed use runs first): "
+              + (", ".join(what) if what else "holder not found in its span"))
+        print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
+              f" r{want}; or make the other value land elsewhere")
+        return
+    takers = [x for x in pc if hard.get(x, recs.get(x, (0,) * 7)[6]) == want and x != pseudo]
+    before = [x for x in takers if recs.get(x, ("L",))[0] == "L" or
+              (recs.get(x) and rec and rec[0] == "G" and recs[x][1] < rec[1])]
+    if before:
+        ds = ", ".join(f"{nm(x)} (priority {recs[x][2]})" for x in sorted(before)[:5] if x in recs)
+        print(f"    r{want} went to a conflicting pseudo allocated earlier: {ds}")
+        print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end the"
+              f" overlap; what-if: AGBCC_PRI={pseudo}:+N or AGBCC_FORCE={pseudo}:{want}")
+        return
+    print(f"    r{want} was free for it; global alloc preferred r{got} (copy/tie preferences or register order)."
+          f" what-if: AGBCC_FORCE={pseudo}:{want}")
+
+
+def reload_records(wd, func):
+    """[(k, uid, spill_reg, line, label)] from AGBCC_DUMPPRI's R lines: reload register choices in order."""
+    path = os.path.join(wd, "names.txt")
+    out = []
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "R" and p[1] == func:
+            out.append((int(p[2]), int(p[3]), int(p[4]), int(p[5]), p[7] if len(p) > 7 else "-"))
+    return out
+
+
+def score(src, func, env):
+    """Compile with ENV and return the number of differing instructions (0 = MATCH), silently."""
+    import contextlib
+    import io
+    mine, addr, info = compile_draft(src, func, env)
+    _, _, sizes = inventory()
+    rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
+    with contextlib.redirect_stdout(io.StringIO()):
+        report(src, func, rom_code, addr, mine, info, 0)
+    rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    return sum(1 for r in rows if r["tag"] != "="), info
+
+
+def cmd_spill(src, func, env):
+    """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
+    each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
+    base, info = score(src, func, env)
+    wd = info["wd"]
+    rel = reload_records(wd, info["obj_name"])
+    order = [u for u, _, _ in insn_list(wd, "greg")]
+    pos = {u: i for i, u in enumerate(order)}
+    rows = json.load(open(os.path.join(wd, "diff.json")))
+    first = min((pos[r["uid"]] for r in rows if r["tag"] != "=" and r["uid"] in pos), default=0)
+    regs = sorted({r[2] for r in rel})
+    print(f"{func}: {base} differing insns; {len(rel)} reload register choices, spill registers seen"
+          f" {', '.join('r%d' % r for r in regs)}")
+    spec, best, tried = [], base, 0
+    for k, uid, reg, line, lab in rel:
+        if best == 0:
+            break
+        if pos.get(uid, 1 << 30) < first - 2:
+            continue
+        cand = None
+        for d in range(1, 8):
+            tried += 1
+            n, _ = score(src, func, dict(env, AGBCC_SPILL=",".join(spec + [f"{k}:{d}"])))
+            if n < best and (cand is None or n < cand[0]):
+                cand = (n, d)
+        if cand:
+            best = cand[0]
+            spec.append(f"{k}:{cand[1]}")
+            print(f"  reload {k} (insn {uid}, line {line}, {lab}, got r{reg}): shift {cand[1]} -> {best} differ")
+    print(f"  {tried} compiles. " + (f"MATCH with AGBCC_SPILL={','.join(spec)}: the C's shape is right; only"
+          " reload's round-robin spill choice differs (last_spill_reg, reload1.c). The ROM made a different"
+          " number of reload choices, or had a different spill set, before these points."
+          if best == 0 else f"best {best} differing with AGBCC_SPILL={','.join(spec) or '(none)'}:"
+          " the rotation is not the whole story."))
+    return 0
+
+
+def cmd_why(src, func, uid, env):
+    import contextlib
+    import io
+    env = dict(env, CSE_WHY=str(uid), CSE_DEBUG="1", CSE_PATHS="1")
+    mine, addr, info = compile_draft(src, func, env)
+    _, _, sizes = inventory()
+    rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
+    with contextlib.redirect_stdout(io.StringIO()):
+        report(src, func, rom_code, addr, mine, info, 0)
+    wd = info["wd"]
+    names = pseudo_names(wd, info["obj_name"])
+    lines = uid_lines(wd)
+    hard = dispositions(wd)
+    srclines = open(os.path.join(ROOT, src)).read().splitlines()
+
+    def nm(r):
+        return f"{r} ({names[r]})" if r in names else str(r)
+
+    def at(u):
+        ln = lines.get(u)
+        return f"insn {u} (line {ln})" if ln else f"insn {u}"
+
+    alloc_diffs = []
+    rows = json.load(open(os.path.join(wd, "diff.json")))
+    row = next((r for r in rows if r["uid"] == uid), None)
+    ln = lines.get(uid)
+    code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
+    print(f"why insn {uid}  line {ln}: {code}")
+    if row:
+        print(f"  ROM: {row['rom'] or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
+        rr = re.findall(r"\br(\d+)\b", row["rom"] or "")
+        dr = re.findall(r"\br(\d+)\b", row["draft"] or "")
+        hmap = hard_of(wd)
+        pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
+        for a, b in zip(rr, dr):
+            if a == b:
+                continue
+            ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
+            alloc_diffs.append((ps[0] if ps else None, int(a), int(b)))
+            print(f"  ROM r{a} where the draft has r{b}" + (f" = pseudo {nm(ps[0])}" if ps else ""))
+    # operand through the passes
+    trail, last, changes = [], None, []
+    for p in PASSES:
+        path = os.path.join(wd, "u.i." + p)
+        if not os.path.exists(path):
+            continue
+        m = re.search(r"^\((?:insn|jump_insn|call_insn) " + str(uid) + r" .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)
+        rtl = one_line(m.group(0)) if m else None
+        regs = regs_of(rtl)
+        if rtl and regs != last:
+            if last is not None:
+                changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
+            trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
+            last = regs
+    print("  registers through the passes: " + "  ->  ".join(trail))
+    trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read())
+    for p, gone, new in changes:
+        if p not in ("cse", "cse2") or not new:
+            if p not in ("greg", "lreg"):
+                print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}"
+                      " (no explainer for this pass yet)")
+            continue
+        n = 1 if p == "cse" else 2
+        t = trace.get(n, {"why": [], "eqv": []})
+        print(f"  cse pass {n} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}.")
+        if t["why"]:
+            b = t["why"][0]
+            cls = []
+            for r in b["rows"]:
+                if r["kind"] != "class":
+                    cls.append(f"{r['kind']} {r['exp']}")
+                    continue
+                mreg = re.match(r"\(reg(?:/[a-z]+)*:\w+ (\d+)\)$", r["exp"])
+                if mreg:
+                    g = int(mreg.group(1))
+                    cls.append(nm(g) + (f"->{r['canon']}" if r["canon"] and r["canon"] != g else ""))
+                else:
+                    cls.append(r["exp"][:40])
+            print(f"    values equal to the source here, cheapest first ({len(t['why'])} looks; first shown):")
+            print("      " + " | ".join(cls))
+            paths = t.get("paths", {})
+            for w in t["why"][:5]:
+                mc = re.search(r"block cuid (\d+)\.\.(\d+)", w["head"])
+                pth = paths.get((int(mc.group(1)), int(mc.group(2)))) if mc else None
+                if pth:
+                    br = " ".join(f"{b}({lines.get(int(b[:-1]), '?')})" for b in pth[2]) or "none"
+                    print(f"      look in the extended block from {at(pth[0])}, path {br}")
+            print("      (path: branch uid + T taken / N not taken / A skipped around, with its C line; the first"
+                  " look that substitutes wins, since it rewrites the insn)")
+        first_look = t["why"][0]["seq"] if t["why"] else 1 << 30
+        shown = 0
+        for target in new:
+            for g in gone:
+                # the takeover: g's class merged with target's and target won the head (make_regs_eqv)
+                evs = [e for e in t["eqv"] if e["head"] == target and g in (e["first"], e["old"])
+                       and e["seq"] < first_look]
+                if not evs:
+                    continue
+                e = evs[-1]
+                print(f"    {nm(target)} became canonical over {nm(g)} at {at(e['at'])}: its last use,"
+                      f" {at(e['newlastuid'])}, is later than {nm(g)}'s last use, {at(e['firstlastuid'])}."
+                      " make_regs_eqv (cse.c) keeps the register that lives longest as the class head.")
+                print(f"    lever: use {nm(g)} after line {lines.get(e['newlastuid'], '?')}, or stop using"
+                      f" {nm(target)} after line {lines.get(e['firstlastuid'], '?')}, or keep the two values"
+                      f" from being known equal at line {lines.get(e['at'], '?')}")
+                shown += 1
+        if not shown:
+            print("    no class-head takeover found for these registers; see the raw trace")
+    changed = {r for _, _, new in changes for r in new}
+    for ps, want, got in alloc_diffs:
+        if ps is not None and (ps in changed and any(p in ("cse", "cse2") for p, _, new in changes if ps in new)):
+            continue
+        if ps is not None:
+            print(f"  allocation: {nm(ps)}")
+            explain_alloc(wd, info["obj_name"], ps, want, got, nm, at)
+            continue
+        rel = reload_records(wd, info["obj_name"])
+        order = [u for u, _, _ in insn_list(wd, "greg")]
+        nxt = order[order.index(uid):] if uid in order else []
+        rec = next((r for u in nxt[:4] for r in rel if r[1] == u and r[2] == got), None)
+        if rec:
+            k, u, reg, line, lab = rec
+            served = "" if u == uid else f" for {at(u)}"
+            print(f"  reload: r{got} is reload register choice #{k}{served} (value {lab}). Reload hands out"
+                  f" spill registers round-robin (last_spill_reg, reload1.c), so the ROM's r{want} means a"
+                  f" different rotation state here: a different number of earlier reloads or spill set.")
+            print(f"    what-if: AGBCC_SPILL={k}:D shifts the rotation before this choice;"
+                  f" `scope.py FILE.c spill` searches all of them")
+        else:
+            print(f"  r{got} is not a pseudo before allocation and no reload record names it here")
+    print(f"  raw traces: {os.path.relpath(wd, ROOT)}/stderr.txt")
+    return 0
+
+
+
 def last_func():
     p = os.path.join(ROOT, "build", "scope", "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
@@ -529,11 +919,22 @@ def main():
     src = os.path.relpath(os.path.join(ROOT, src) if not os.path.isabs(src) else src, ROOT)
     env = dict(a.split("=", 1) for a in args[1:] if "=" in a)
     rest = [a for a in args[1:] if "=" not in a]
+    why_uid = None
+    if "spill" in rest:
+        rest.remove("spill")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_spill(src, func, env)
+    if "why" in rest:
+        i = rest.index("why")
+        why_uid = int(rest[i + 1])
+        rest = rest[:i] + rest[i + 2:]
     func = rest[0] if rest else nonmatching_func(src)
     if not func:
         sys.exit("name the function: scope.py FILE.c FUNC")
     os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
     open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
+    if why_uid is not None:
+        return cmd_why(src, func, why_uid, env)
     t0 = time.time()
     mine, addr, info = compile_draft(src, func, env)
     t1 = time.time() - t0

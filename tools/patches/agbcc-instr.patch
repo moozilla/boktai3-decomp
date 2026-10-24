@@ -923,14 +923,15 @@
  #define NBUCKETS 31
  
  /* Compute hash code of X in mode M.  Special-case case where X is a pseudo
-@@ -835,6 +852,43 @@
+@@ -834,7 +851,44 @@
+ 
  /* Make reg NEW equivalent to reg OLD.
     OLD is not changing; NEW is.  */
- 
++
 +/* Instrumentation: CSE_KEEP=r1,r2 never replaces those registers as a
 +   class's canonical register; CSE_NOCANON=N keeps pseudo N from becoming
 +   canonical; CSE_DEBUG=N traces make_regs_eqv for NEW >= N to stderr.  */
-+
+ 
 +static int
 +keep_reg_p (r)
 +     int r;
@@ -967,23 +968,35 @@
  static void
  make_regs_eqv (new, old)
       register int new, old;
-@@ -854,7 +908,14 @@
+@@ -854,7 +908,17 @@
       hard regs.  Among pseudos, if NEW will live longer than any other reg
       of the same qty, and that is beyond the current basic block,
       make it the new canonical replacement for this qty.  */
 -  if (! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
-+  if (getenv ("CSE_DEBUG") && *getenv ("CSE_DEBUG") && new >= atoi (getenv ("CSE_DEBUG")))
-+    fprintf (stderr, "eqv new=%d old=%d first=%d newlast=%d newfirst=%d firstlast=%d bb=%d..%d\n",
++  int debug_eqv = getenv ("CSE_DEBUG") && *getenv ("CSE_DEBUG") && new >= atoi (getenv ("CSE_DEBUG"));
++  if (debug_eqv)
++    fprintf (stderr, "eqv new=%d old=%d first=%d newlast=%d newfirst=%d firstlast=%d bb=%d..%d"
++	     " at=%d newlastuid=%d firstlastuid=%d",
 +	     new, old, firstr, uid_cuid[REGNO_LAST_UID (new)], uid_cuid[REGNO_FIRST_UID (new)],
 +	     firstr >= FIRST_PSEUDO_REGISTER ? uid_cuid[REGNO_LAST_UID (firstr)] : -1,
-+	     cse_basic_block_start, cse_basic_block_end);
++	     cse_basic_block_start, cse_basic_block_end, cse_cur_uid, REGNO_LAST_UID (new),
++	     firstr >= FIRST_PSEUDO_REGISTER ? REGNO_LAST_UID (firstr) : -1);
 +  if (!(getenv ("CSE_KEEP") && keep_reg_p (firstr))
 +      && !(getenv ("CSE_NOCANON") && *getenv ("CSE_NOCANON") && new == atoi (getenv ("CSE_NOCANON")))
 +      && ! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
        /* Certain fixed registers might be of the class NO_REGS.  This means
  	 that not only can they not be allocated by the compiler, but
  	 they cannot be used in substitutions or canonicalizations
-@@ -1362,6 +1423,7 @@
+@@ -892,6 +956,8 @@
+       reg_next_eqv[lastr] = new;
+       reg_prev_eqv[new] = lastr;
+     }
++  if (debug_eqv)
++    fprintf (stderr, " head=%d\n", qty_first_reg[q]);
+ }
+ 
+ /* Remove REG from its equivalence class.  */
+@@ -1362,6 +1428,7 @@
    elt = get_element ();
    elt->exp = x;
    elt->cost = COST (x);
@@ -991,16 +1004,16 @@
    elt->next_same_value = 0;
    elt->prev_same_value = 0;
    elt->next_same_hash = table[hash];
-@@ -6040,6 +6102,8 @@
+@@ -6039,6 +6106,8 @@
+   register int i;
    rtx tem;
    register int n_sets = 0;
- 
-+  cse_cur_uid = INSN_UID (insn);
 +
++  cse_cur_uid = INSN_UID (insn);
+ 
  #ifdef HAVE_cc0
    /* Records what this insn does to set CC0.  */
-   rtx this_insn_cc0 = 0;
-@@ -6722,6 +6786,24 @@
+@@ -6722,6 +6791,29 @@
        if (dest == pc_rtx && src_const && GET_CODE (src_const) == LABEL_REF)
  	src_folded = src_const, src_folded_cost = -1;
  	  
@@ -1016,6 +1029,11 @@
 +	  for (q = elt; q; q = q->next_same_value)
 +	    {
 +	      fprintf (stderr, "  class        cost %5d  entered at insn %5d  ", q->cost, q->born_uid);
++	      if (GET_CODE (q->exp) == REG && REGNO (q->exp) >= FIRST_PSEUDO_REGISTER
++		  && REGNO_QTY_VALID_P (REGNO (q->exp)))
++		fprintf (stderr, "canon %5d  ", qty_first_reg[reg_qty[REGNO (q->exp)]]);
++	      else
++		fprintf (stderr, "            ");
 +	      print_inline_rtx (stderr, q->exp, 0);
 +	      fprintf (stderr, "\n");
 +	    }
@@ -1025,7 +1043,7 @@
        /* Terminate loop when replacement made.  This must terminate since
           the current contents will be tested and will always be valid.  */
        while (1)
-@@ -8187,6 +8269,39 @@
+@@ -8187,6 +8279,39 @@
  	        && (GET_CODE (q) != CODE_LABEL || LABEL_NUSES (q) != 0))
  	      break;
  
@@ -1065,14 +1083,39 @@
  	  /* If we ran into a BARRIER, this code is an extension of the
  	     basic block when the branch is taken.  */
  	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)
-@@ -8302,6 +8417,7 @@
+@@ -8302,6 +8427,9 @@
    register int i;
  
    cse_jumps_altered = 0;
 +  follow_count = 0;
++  if (getenv ("CSE_DEBUG") || getenv ("CSE_WHY") || getenv ("CSE_PATH"))
++    fprintf (stderr, "cse pass %d %s\n", after_loop ? 2 : 1, current_function_name);
    recorded_label_ref = 0;
    constant_pool_entries_cost = 0;
    val.path_size = 0;
+@@ -8407,6 +8535,22 @@
+       cse_basic_block_start = val.low_cuid;
+       cse_basic_block_end = val.high_cuid;
+       max_qty = val.nsets * 2;
++
++      /* CSE_PATHS=1 prints each extended block: its first and last insn and
++	 the branches on its path (T taken, N not taken, A around).  */
++      if (getenv ("CSE_PATHS"))
++	{
++	  int i;
++	  fprintf (stderr, "path pass=%d from=%d to=%d cuid=%d..%d branches=%d:",
++		   after_loop ? 2 : 1, INSN_UID (insn),
++		   val.last ? INSN_UID (val.last) : 0, val.low_cuid, val.high_cuid,
++		   val.path_size);
++	  for (i = 0; i < val.path_size; i++)
++	    fprintf (stderr, " %d%c", INSN_UID (val.path[i].branch),
++		     val.path[i].status == TAKEN ? 'T'
++		     : val.path[i].status == NOT_TAKEN ? 'N' : 'A');
++	  fprintf (stderr, "\n");
++	}
+       
+       if (file)
+ 	fprintf (file, ";; Processing block from %d to %d, %d sets.\n",
 --- a/local-alloc.c
 +++ b/local-alloc.c
 @@ -1329,6 +1329,28 @@

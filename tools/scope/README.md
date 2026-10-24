@@ -125,7 +125,35 @@ python3 tools/scope/scope.py FILE.c [FUNC]        real differences, one call
 python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented knobs (a what-if)
 python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
 python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
+python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
+python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 ```
+
+`why UID` recompiles with `CSE_WHY=UID CSE_DEBUG=1 CSE_PATHS=1` and
+`AGBCC_DUMPPRI`, and prints in ~10 lines:
+
+* the ROM and draft instruction, and which pseudo holds the differing register
+  (operands matched by position between the lreg dump and the same insn after
+  reload, so local-alloc pseudos are covered);
+* the insn's registers after every pass that changed them, pseudos named by C
+  variable (`24 (phase)`);
+* for a cse change: the equivalence class at the first look (cheapest first,
+  each member with its class head), each look's extended block and branch
+  path with C lines, and the class-head takeover that decided it, phrased as
+  "23 (result) became canonical over 24 (phase) at insn 622 (line 67): its last
+  use, insn 583 (line 104), is later than ..." plus the three levers;
+* for an allocation difference: the pseudo's global/local record (rank,
+  priority, refs, live length, calls crossed), who already held the ROM's
+  register during its life (hard conflicts come from local alloc and fixed
+  uses), or which earlier-allocated conflicting pseudo took it, with
+  `AGBCC_PRI`/`AGBCC_FORCE` what-ifs;
+* for a reload register (operand not a pseudo before allocation): the reload
+  choice number and the rotation explanation, pointing at `spill`.
+
+`spill` greedily shifts reload's spill rotation (`AGBCC_SPILL=K:D`) before each
+reload choice from the first differing insn on, keeping shifts that shrink the
+diff (8-60 compiles, about 0.1 s each). A MATCH means the C has the right
+shape and pseudos and only reload's rotation state differs.
 
 It re-executes itself under `build/venv` for capstone. FUNC defaults to the
 function defined in the file's `#ifdef NONMATCHING` block; the ROM side is
@@ -163,10 +191,21 @@ syntax). Added in this thread (in `tools/patches/agbcc-instr.patch`):
   and the equivalence class in order, each member tagged with the insn at
   which it entered the table. This is the "why" for a cse substitution.
 * `CSE_NOFOLLOW_JUMP=UID[:PASS],...`: refuse every follow of those jumps,
-  optionally only in cse pass 1 or 2.
+  optionally only in cse pass 1 or 2. Only the follow across an unconditional
+  jump (the BARRIER case) is refused; conditional branches on a path and
+  skips around a block are path enumeration, which this knob does not touch.
+* `CSE_PATHS=1`: print every extended block cse processes, as
+  `path pass=P from=UID to=UID cuid=A..B branches=N: 21A 102A 620N 623T`
+  (T taken, N not taken, A skipped around).
+* Trace markers: `cse pass 1 FUNC` / `cse pass 2 FUNC` separate the passes in
+  stderr whenever a cse knob is set; `eqv` lines (CSE_DEBUG) carry `at=` (insn
+  being processed), `newlastuid=`/`firstlastuid=` (the last-use insns
+  compared) and `head=` (the class head after the decision); `CSE_WHY` class
+  rows carry `canon N`, the member's current class head.
 
 With no knobs set the instrumented compiler emits the same code as agbcc
-(checked on 62 files, default and NONMATCHING, after these additions).
+(checked on 62 files, default and NONMATCHING, after these additions; again
+on 80 compiles after the trace markers and `CSE_PATHS`).
 
 **The shared `build/agbcc-instr` in the main checkout can be stale**: on
 2026-10-24 it predated the patch's `CSE_PATH`/`CSE_NOFOLLOW`. Rebuild with
@@ -194,14 +233,14 @@ steps when it matters: resolve relocations in Python instead of linking
 
 ### Gaps (next work on the tool)
 
-* Summarize `CSE_DEBUG`/`CSE_WHY` traces: "pseudo 23 (result) became head of
-  phase's class at the switch compare, last use line 104 > 95". Reading raw
-  traces took most of the calls in the RepeatedPairAttack investigation.
-* Name pseudos by their C variable in every view (the RTL has `reg/v` user
-  vars; `AGBCC_DUMPPRI` and whyreg.py know how).
-* Summarize decision traces: read `CSE_DEBUG` output and say which register
-  became canonical and why (last-use cuid comparison), instead of the agent
-  reading raw lines.
+* Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
+  reproduces in one call what took ~15 calls of raw trace reading.
+* `why` has no explainer yet for combine, regmove or gcse changes (it says so),
+  and the allocation explainer's "who held the register" scan is linear over
+  the pseudo's insn span, not true liveness.
+* `why` on the first differing insn of every hunk, as one report (`why all`).
+* The `spill` result is a classification, not a fix: next is a view of what
+  makes the ROM's reload count differ (insns needing reloads, by C line).
 * For gcse-born differences, automatically test bucket order with a few
   `AGBCC_GCSE_T` values (see below) and say whether order alone explains it.
 * A `try` mode: N variants of one hypothesis through the fork server.
@@ -263,7 +302,36 @@ Each was read from the compiler source and confirmed on a live draft.
    cse2 `make_regs_eqv` can make it head over a variable cse1 kept. A fix that
    makes cse1 right can be undone by cse1's own substitutions elsewhere.
 
+8. **Reload hands out spill registers round-robin.** `allocate_reload_reg`
+   (reload1.c) starts its search after `last_spill_reg`, the index of the last
+   spill register it chose, reset per function. So the register a reload gets
+   depends on the previous reload's choice anywhere earlier in the function.
+   An earlier insn that needs one more (or one fewer) reload shifts every
+   later choice. Hard-register pins (`register asm("r1")`) remove a reload, so
+   they shift the rotation too. `AGBCC_SPILL=K:D` reproduces a shift; `scope
+   spill` searches for one.
+9. **cse's extended blocks skip around blocks without labels.** With
+   `-fcse-skip-blocks` (on at -O2), `cse_end_of_basic_block` treats a
+   conditional branch over a block with no CODE_LABEL inside as AROUND, so
+   knowledge from before the block (e.g. `result == 0` after
+   `if (result) return;`) survives past it, into the switch cases. Paths hold
+   at most 9 branches (`PATHLENGTH` 10). Each insn is looked at once per
+   extended block containing it; the first look that substitutes rewrites the
+   insn, so later looks see the substituted form. Unused labels are deleted
+   before cse1, so an empty label or `do {} while (0)` does not stop a skip.
+
 ## Live investigations
+
+* **Hresvelgr_InitializeShots** (src/fn/sub_081A3554.c, 4 insns). MATCH with
+  `AGBCC_SPILL=5:3`: everything is reload rotation (fact 8). Reload #5 (line
+  64, `zero` from r8) gets r1, the ROM r3, so the ROM made extra reload
+  choices before it. The likely spot is the inlined `SetPosition`: the draft
+  pins `y`/`z` to r1/r2 with `register asm`, so they need no reload. Removing
+  the pins turns them into reloads (r0, r1), but the ROM's state is one choice
+  further on (r1, r2, then r3), which fits the constant 0x708 being a reload in
+  the ROM too. In the draft it is a pseudo from expand (Thumb `movhi` forces
+  stored constants into a register), so that would need the pseudo to miss a
+  hard register. Open.
 
 * **Vanargand_UpdatePartGroundStrike** (src/fn/sub_081B28D8.c, 1 insn). ROM
   copies `&p->flags` (gcse copy) before `&p->enter` into r8; the draft's
@@ -287,6 +355,15 @@ Each was read from the compiler source and confirmed on a live draft.
   (`CSE_NOFOLLOW_JUMP=...:1`) does not reproduce it (it loses other
   knowledge too). Open: what C shape limits cse1's knowledge that way
   (label use counts at cse1 time, mode of the tested value, switch shape).
+  With `why` (literal zeros at 96/104): cse1 is right (`phase` heads the zero
+  class); in cse2 pseudo 50 (the zero-extended call value, the ROM's r7) takes
+  over because cse1 substituted it at line 104 (last use) while `phase`'s last
+  use is line 95 (cse1 substituted it for the literal 1). cse1 knew 50 == 0 at
+  line 104 because every look at it is in an extended block from before
+  `if (result) return` that skips AROUND the `if (p->pending)` block (fact 9):
+  path `21A 102A 620N 623T 631T`. Blocks starting after the pending block do
+  not know it. So the ROM's cse1 most likely could not skip that block, or
+  did not reach case 2 on such a path. Not the path length (5 of 9).
 
 ## Paper cuts found in older tools
 
