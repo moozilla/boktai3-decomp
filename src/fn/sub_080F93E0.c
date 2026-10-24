@@ -166,4 +166,3 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         Select(actor, selection, variant, flags);
     }
 }
-
