@@ -1,12 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.1%
-// fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: carries a player position request along a motion track
-// Remaining differences: Player-request calls remain duplicated; entry and flag-mask allocation differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -34,9 +30,10 @@ void Player_BeginPositionRequest(void *, const void *, u32, u32, u32, u32, u32, 
 static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequenceState *sequence,
                                struct ActorStatusPart *base, u32 one)
 {
-    register struct DisplaySequenceState *state asm("r4") = sequence;
+    register struct DisplaySequenceState *state = sequence;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
+    register u32 first asm("r1");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -46,8 +43,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
     owner->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = one;
+        register u32 maskBit = one;
         bit = maskBit;
         asm("" : "+r"(bit));
         first = bit;
@@ -60,7 +56,6 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm("r1");
         bit = 2;
         asm("" : "+r"(bit));
         first = bit;
@@ -109,8 +104,8 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -134,10 +129,11 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed *= weight;
+                speed >>= 6;
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
@@ -152,7 +148,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
 static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32 options)
 {
     void *data = *(void **)(boss + 0x4d0);
-    register struct DisplaySequenceState *seq asm("r4") = &p->sequence;
+    register struct DisplaySequenceState *seq = &p->sequence;
     Anim_SetSequence(seq, data, id, (u8)p->variant, options);
     StepPlayback(p, seq, p, 1);
 }
@@ -161,6 +157,10 @@ static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
     ((volatile s16 *)p)[0] = x;
     p->y = y;
     p->z = z;
+}
+static inline u32 TestFlags(u32 *flags, u32 mask)
+{
+    return *flags & mask;
 }
 static inline u8 MotionEnded(struct ActorStatusPart *p)
 {
@@ -180,8 +180,7 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
         p->reset = 0;
         SetAnimation(p, boss, 12, 0);
         {
-            register u32 zero asm("r1") = 0;
-            asm("" : "+r"(zero));
+            register u32 zero = 0;
             p->state = zero;
             p->timer = zero;
         }
@@ -190,23 +189,20 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
     mask = (t1 = 16);
     p->flags |= t1;
     {
-        register u32 currentState asm("r4");
-        register u32 offset asm("r1") = 0x164;
-        register u32 *stateAddress asm("r0");
+        register u32 currentState;
+        register u32 offset = 0x164;
+        register u32 *stateAddress;
         stateAddress = (u32 *)(((u8 *)p) + offset);
-        asm("" : "+r"(stateAddress));
         currentState = *stateAddress;
-        asm("" : "+r"(currentState));
         switch (currentState) {
             case 0: {
                 u8 *enter;
-                register u32 entered asm("r1");
+                u8 *motion;
+                register u32 entered;
                 {
-                    register u8 *address asm("r0") = &p->enter;
+                    register u8 *address = &p->enter;
                     entered = *address;
-                    asm("" : "+r"(address), "+r"(entered));
                     enter = address;
-                    asm("" : "+r"(enter));
                 }
                 if (entered) {
                     *enter = currentState;
@@ -221,21 +217,24 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                     out[2] = position->z;
                 }
                 if (!p->variant) {
-                    if ((*((u32 *)(gUnk_02000580 + 0x20))) & 0x40000)
+                    u8 *player = gUnk_02000580;
+                    u32 one = 1;
+                    if (TestFlags((u32 *)(player + 0x20), 0x40000))
                         goto complete;
-                    Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, 1, currentState,
-                                                currentState, currentState, 1);
+                    Player_BeginPositionRequest(player, &playerTarget, 0, 0, one, currentState,
+                                                currentState, currentState, one);
+                    motion = p->motion;
                 } else {
-                    if ((*((u32 *)(gUnk_02000580 + 0x20))) & 0x40000)
+                    if (TestFlags((u32 *)(gUnk_02000580 + 0x20), 0x40000))
                         goto complete;
                     Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, currentState,
                                                 currentState, currentState, currentState, 2);
+                    motion = p->motion;
                 }
-                MotionTrack_Update(p->motion);
+                MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
                 complete: {
-                    register u32 next asm("r2") = 1;
-                    asm("" : "+r"(next));
+                    register u32 next = 1;
                     p->state = next;
                     p->timer = 0;
                     *enter = next;
@@ -250,6 +249,3 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdatePlayerCapture);
-#endif
