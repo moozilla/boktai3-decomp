@@ -51,24 +51,25 @@ static inline void storeByte(u8 *p, u32 off, u32 value)
     ((u8 *)p)[off] = value;
 }
 #ifdef NONMATCHING
-// fuzzy: 96.9%
+// fix.py best version
 void Player_AdvanceScriptDestination(u8 *p)
 {
-    s32 dx = S(0x590) - S(0x30);
-    s32 dz = S(0x594) - S(0x34);
+    s32 dx = (*((s16 *)(p + 0x590))) - (*((s16 *)(p + 0x30)));
+    s32 dz = (*((s16 *)(p + 0x594))) - (*((s16 *)(p + 0x34)));
     s32 angle = Math_Atan2(dx, dz);
     s32 speed = 12;
+    s32 t1;
     Player_GetMovementRateScale(12);
     if (p && slowed(p))
-        speed = speed * ((struct PlayerCueFields *)p)->fC0 >> 6;
-    if (dx * dx + dz * dz <= speed * speed) {
-        H(0x30) = H(0x590);
-        H(0x34) = H(0x594);
-        if (*(s8 *)(p + 0x59D) >= 0) {
+        speed = (speed * ((struct PlayerCueFields *)p)->fC0) >> 6;
+    if (((dx * dx) + (dz * dz)) <= (speed * speed)) {
+        *((u16 *)(p + 0x30)) = *((u16 *)(p + 0x590));
+        *((u16 *)(p + 0x34)) = *((u16 *)(p + 0x594));
+        if ((*((s8 *)(p + 0x59D))) >= 0) {
             ((struct PlayerCueFields *)p)->f3A4 = ((struct PlayerCueFields *)p)->f59D;
             ((struct PlayerCueFields *)p)->f59D = 255;
         } else
-            ((struct PlayerCueFields *)p)->f3A4 = (((u16)angle + 0x70) >> 5) & 7;
+            ((struct PlayerCueFields *)p)->f3A4 = ((((u16)angle) + 0x70) >> 5) & 7;
         if (((struct PlayerCueFields *)p)->f3A4 > 4) {
             ((struct PlayerCueFields *)p)->f3A2 = 8 - ((struct PlayerCueFields *)p)->f3A4;
             ((struct PlayerCueFields *)p)->f3A3 = 1;
@@ -81,18 +82,18 @@ void Player_AdvanceScriptDestination(u8 *p)
         PlayerCue_EnterStandUpdate(p);
         PlayerCue_CompleteAction(p);
     } else {
-        H(0x38) = scale12(gUnk_086149C4[(angle + 64) & 255] * speed);
-        H(0x3C) = scale12(gUnk_086149C4[angle & 255] * speed);
+        *((u16 *)(p + 0x38)) = scale12(gUnk_086149C4[(angle + 64) & 255] * speed);
+        *((u16 *)(p + 0x3C)) = scale12(gUnk_086149C4[angle & 255] * speed);
         if (((struct PlayerCueFields *)p)->f28F == 1) {
-            if (S(0x3C) < 0)
-                H(0x3C) = scale6(S(0x3C) * 40);
+            if ((*((s16 *)(p + 0x3C))) < 0)
+                *((u16 *)(p + 0x3C)) = scale6((*((s16 *)(p + 0x3C))) * 40);
             else
-                H(0x3C) = scale6(S(0x3C) * 52);
+                *((u16 *)(p + 0x3C)) = scale6((*((s16 *)(p + 0x3C))) * 52);
         } else if (((struct PlayerCueFields *)p)->f28F == 2) {
-            if (S(0x38) < 0)
-                H(0x38) = scale6(S(0x38) * 40);
+            if ((*((s16 *)(p + 0x38))) < 0)
+                *((u16 *)(p + 0x38)) = scale6((*((s16 *)(p + 0x38))) * 40);
             else
-                H(0x38) = scale6(S(0x38) * 52);
+                *((u16 *)(p + 0x38)) = scale6((*((s16 *)(p + 0x38))) * 52);
         }
         ((struct PlayerCueFields *)p)->f3A4 = ((((angle + 16) & 255) >> 5) + 3) & 7;
         if (((struct PlayerCueFields *)p)->f3A4 > 4) {
@@ -102,24 +103,24 @@ void Player_AdvanceScriptDestination(u8 *p)
             ((struct PlayerCueFields *)p)->f3A2 = ((struct PlayerCueFields *)p)->f3A4;
             ((struct PlayerCueFields *)p)->f3A3 = 0;
         }
-        if (!(H(0xA0) & 3) && !H(0x98)) {
-            if (!(p && H(0x538) && !H(0x534)) && !(p && flags((u32 *)(p + 0x448), 4))) {
+        if ((!((*((u16 *)(p + 0xA0))) & 3)) && (!(*((u16 *)(p + 0x98))))) {
+            if ((!((p && (*((u16 *)(p + 0x538)))) && (!(*((u16 *)(p + 0x534)))))) &&
+                (!(p && ((u8)flags((u32 *)(p + 0x448), 4))))) {
+                t1 = 0x28E;
                 if (p && slowed(p)) {
-                    if (!H(0xA0))
+                    if (!(*((u16 *)(p + 0xA0))))
                         Sound_PlaySong(0xC8);
                     else
                         Sound_PlaySong(0xC7);
-                } else if (H(0x474) || !((struct PlayerCueFields *)p)->f28F) {
-                    if (!H(0xA0))
+                } else if ((*((u16 *)(p + 0x474))) || (!((struct PlayerCueFields *)p)->f28F)) {
+                    if (!(*((u16 *)(p + 0xA0))))
                         Sound_PlaySong(0xCA);
                     else
                         Sound_PlaySong(0xC9);
-                } else {
-                    if (!H(0xA0))
-                        Sound_PlaySong(0x28E);
-                    else
-                        Sound_PlaySong(0x28D);
-                }
+                } else if (!(*((u16 *)(p + 0xA0))))
+                    Sound_PlaySong(t1);
+                else
+                    Sound_PlaySong(0x28D);
             }
         }
         Player_SetAnimation(p, ActorVariant_GetTableValue(((struct PlayerCueFields *)p)->f418, 1),

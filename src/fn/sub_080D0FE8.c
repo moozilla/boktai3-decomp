@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.5%
+// fix.py best version
 // fix.py best version (reprinted C)
 // confidence=low: selects turn animation and rotates toward the route facing.
 // MATCHING_CONCESSION: register-pinning
@@ -200,7 +200,7 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 
         goto entryDone;
     forward: {
-        u32 mask = 0x10000;
+        s16 mask = 0x10000;
         mask |= actor->flags2CC;
         actor->flags2CC = mask;
     }
@@ -224,10 +224,13 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
         else
             direction[9] -= 0x15;
     }
-    if ((*motionFlags) & 0xA02F)
-        actor->field2C2 = 0x40;
-    else if (!actor->field2C2)
-        actor->field2C2 = 0x40;
+    {
+        u32 k1 = 0xA02F;
+        if ((*motionFlags) & k1)
+            actor->field2C2 = 0x40;
+        else if (!actor->field2C2)
+            actor->field2C2 = 0x40;
+    }
     if (!actor->drawableKind)
         Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, actor->field2C2);
     else
@@ -249,6 +252,7 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             Chase_SetCtl(actor, actor->entryTarget224, 2);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_TurnTowardRoute);
 #endif

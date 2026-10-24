@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.4%
+// fix.py best version
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
@@ -44,7 +44,9 @@ void Sword_UpdateDepthWaveFlight(void);
 void ActorPhase_BeginLunge(struct PhaseActor *p)
 {
     struct PhaseParent *parent = p->parent;
-    s32 speed, x, z;
+    s32 speed;
+    s32 x;
+    s32 z;
     if (!(parent->flags & 3))
         --p->angularSpeed;
     p->angle += (u8)p->angularSpeed;
@@ -65,11 +67,11 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
         p->delta[1] = p->destination[1] - p->start[1];
         p->delta[2] = p->destination[2] - p->start[2];
         p->timer = 0;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        offset = gRandomIndex * 2;
+        gUnk_03005308 = (u16)((gUnk_03005308 + 1) & 1023);
+        offset = gUnk_03005308 * 2;
         {
-            register u32 tb asm("r2") = (u32)gRandomTable;
-            random = *(const u16 *)(offset + tb);
+            register u32 tb asm("r2") = (u32)gUnk_0203B400;
+            random = *((const u16 *)(offset + tb));
         }
         random &= 1;
         direction = 1;
@@ -97,6 +99,7 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
             p->update174 = Sword_UpdateDepthWaveFlight;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_BeginLunge);
 #endif

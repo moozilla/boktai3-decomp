@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.8%
+// fix.py best version
 // fix.py best version (reprinted C)
 // Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.
 // MATCHING_CONCESSION: register-pinning
@@ -70,6 +70,12 @@ static inline u32 TurnFlags(u16 *field, u32 mask)
     return *field & mask;
 }
 // confidence=low: rotates the Ghoul toward the route point facing using animation nine.
+inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32 mask)
+{
+    u32 *field = &actor_->flags2CC;
+    return (*field) & mask;
+}
+
 void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
@@ -164,16 +170,19 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                 difference = -difference;
             if (difference <= 0x20)
                 direction[9] = desired;
-            else if (Chase_Bits32(&actor->flags2CC, 0x10000))
+            else if (Chase_Bits32_1(actor, 0x10000))
                 direction[9] += 0x20;
             else
                 direction[9] -= 0x20;
         }
     }
-    if ((*motionFlags) & 0xA02F)
-        actor->field2C2 = 0x40;
-    else if (!actor->field2C2)
-        actor->field2C2 = 0x40;
+    {
+        u32 k1 = 0xA02F;
+        if ((*motionFlags) & k1)
+            actor->field2C2 = 0x40;
+        else if (!actor->field2C2)
+            actor->field2C2 = 0x40;
+    }
     if (!actor->drawableKind)
         Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, actor->field2C2);
     else
@@ -195,6 +204,7 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             Chase_SetCtl(actor, actor->entryTarget224, 2);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Ghoul_TurnTowardRoute);
 #endif
