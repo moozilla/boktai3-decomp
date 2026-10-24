@@ -14,6 +14,9 @@ agbcc. The real build never uses it.
 1. Force the registers the ROM uses (from tools/regdiag.py) onto the
    pseudos that differ. If the bytes then match, the C is right except for
    allocation, and the problem is only which pseudo outranks which.
+   If they do, try a register preference on each global pseudo
+   (AGBCC_PREF): a match names a missing copy or a value computed into
+   another variable (agbccsrc.py inline-result), not a priority.
 2. Search priority adjustments, inside the compiler, that make the bytes
    match: each step moves one pseudo just above or below another pseudo it
    competes with. Every try is one real compile, so the answer is exact.
@@ -260,6 +263,30 @@ def main():
     if wants:
         print(f"forcing the ROM's registers on {len(wants)} pseudo(s): {forced} differing bytes")
 
+    # 1b. Forcing works: is a register preference what is missing? global.c find_reg takes a pseudo's
+    # preferred register (set_preference: a copy or operation with a value already in a hard register,
+    # shared along copies by expand_preferences) before its first free one, so a preference on the
+    # pseudo, or on a global it is copied or computed into, can change the register with no change of
+    # priority. agbccsrc.py inline-result names one C cause (sub_08137E28).
+    prefs = []
+    if wants and forced == 0:
+        for r, want in wants.items():
+            for o in sorted(ps.values(), key=lambda o: (o.reg != r, o.reg)):
+                if o.kind != "G" or ps[r].kind != "G":
+                    continue
+                sc, _ = cc.run(env={"AGBCC_PREF": f"{o.reg}:{want}"})
+                if sc == 0:
+                    prefs.append((r, o, want))
+        if prefs:
+            names = ", ".join(f"{o.name if o.name != '-' else 'pseudo'} ({o.reg})" for _, o, _ in prefs[:8])
+            r, _, want = prefs[0]
+            print(f"  a preference for r{want} matches on any of: {names}"
+                  f"{f' and {len(prefs) - 8} more' if len(prefs) > 8 else ''}. The ROM's value shares r{want}"
+                  f" with one of them: a copy to or from it, or the same variable (x = H(x, ...):"
+                  f" spellings.sp_result_into_arg); AGBCC_WHYREG={r} shows what the allocator saw")
+        else:
+            print("  no single preference matches")
+
     # 2. Search priorities and reload rotation, in the compiler.
     involved = set(wants)
     for r, want in wants.items():
@@ -353,8 +380,11 @@ def main():
                                    + (f" ({ps[r].name})" if k == "pri" and ps[r].name != "-" else "")
                                    for k, r, d in sol))
     if not state:
-        print("no priority or reload-rotation change helps: instruction selection or CSE differs, "
-              "not allocation (see regdiag's listing)")
+        if wants and forced == 0 and prefs:
+            print("no priority or reload-rotation change helps: a preference does (above)")
+        else:
+            print("no priority or reload-rotation change helps: instruction selection or CSE differs, "
+                  "not allocation (see regdiag's listing)")
         return
     # Drop changes that do not matter.
     for item in list(state):
