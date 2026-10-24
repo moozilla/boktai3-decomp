@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 80.4%
-// foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
 #define Callback_Invoke Callback_InvokeActor
 #define gCallbackPool   gUnk_02000218
 struct CallbackPoolEntry {
@@ -19,25 +16,18 @@ struct CallbackPool {
     struct CallbackPoolEntry entries[1];
     struct CallbackPoolSlot slots[4];
 };
-struct CallbackPoolLargeRecord {
-    u8 prefix[0x34];
-    u32 active;
-    void *destroy;
-    u8 tail[0x11c];
-};
-struct CallbackPoolSmallRecord {
-    u8 prefix[0x18c];
-    u32 active;
-    void *destroy;
-};
 extern struct CallbackPool *gUnk_02000218;
 void Callback_InvokeActor(void *, void *);
 s32 CallbackPool_Destroy(struct CallbackPool *pool)
 {
     s32 i;
     for (i = 0; i <= 0; i++) {
-        struct CallbackPoolEntry *entry =
-            (struct CallbackPoolEntry *)&((struct CallbackPoolLargeRecord *)pool)[i].active;
+        u32 address = i;
+        struct CallbackPoolEntry *entry;
+        address *= sizeof(struct CallbackPoolEntry);
+        address += (u32)pool;
+        address += sizeof(pool->unknown);
+        entry = (struct CallbackPoolEntry *)address;
         entry->active = 0;
         if (entry->destroy) {
             Callback_InvokeActor(entry, entry->destroy);
@@ -45,7 +35,12 @@ s32 CallbackPool_Destroy(struct CallbackPool *pool)
         }
     }
     for (i = 0; i <= 3; i++) {
-        struct CallbackPoolSlot *slot = (struct CallbackPoolSlot *)(0xb8 * i + (u32)pool + 0x18c);
+        u32 address = i;
+        struct CallbackPoolSlot *slot;
+        address *= sizeof(struct CallbackPoolSlot);
+        address += (u32)pool;
+        address += sizeof(pool->unknown) + sizeof(pool->entries);
+        slot = (struct CallbackPoolSlot *)address;
         slot->active = 0;
         if (slot->destroy) {
             Callback_InvokeActor(slot, slot->destroy);
@@ -54,6 +49,3 @@ s32 CallbackPool_Destroy(struct CallbackPool *pool)
     }
     return (u32)(gUnk_02000218 = 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", CallbackPool_Destroy);
-#endif
