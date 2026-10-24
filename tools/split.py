@@ -135,13 +135,16 @@ def c_functions(path, with_asm=True):
     alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", raw, re.M))
     src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
     src = re.sub(r"//[^\n]*", "", src)
-    src = re.sub(r"^#.*$", "", src, flags=re.M)
+    src = re.sub(r"^#(?:[^\n]*\\\n)*[^\n]*$", "", src, flags=re.M)  # with backslash continuations
     found = []
+    depth, upto = 0, 0
     # a definition: identifier( ... ) followed (possibly after newline) by {
     for m in re.finditer(r"\b(\w+)\s*\(([^;{}()]|\([^()]*\))*\)\s*\{", src):
         name = m.group(1)
-        if name in ("if", "for", "while", "switch", "return", "sizeof"):
-            continue
+        depth += src.count("{", upto, m.start()) - src.count("}", upto, m.start())
+        upto = m.start()
+        if name in ("if", "for", "while", "switch", "return", "sizeof") or depth > 0:
+            continue  # a statement or a macro use inside a body, e.g. STEP(x) { ... }
         # Storage class/return type may be on preceding lines. Stop at the
         # previous declaration or body boundary, not merely the last newline.
         decl_start = max(src.rfind(c, 0, m.start()) for c in ";{}") + 1

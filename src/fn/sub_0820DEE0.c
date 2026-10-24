@@ -1,8 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.1%
-// Remaining: polar-output pointer scheduling, scratch registers and derived effect-offset constant.
 #include "scene_vec.h"
 struct PoisonHandBurst {
     u8 pad0[0x18];
@@ -62,12 +58,11 @@ static inline s32 Scale(s32 x)
 struct Velocity {
     s16 x, y, z, pad;
 };
-static inline void Polar(struct Velocity *v, s32 angle, s32 magnitude)
+static inline void Polar(struct Velocity *v, u8 angle, s32 magnitude)
 {
-    register const s16 *sine asm("r1") = gUnk_086149C4;
-    v->x = Scale(sine[(angle + 64) & 255] * magnitude);
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * magnitude);
     v->y = 0;
-    v->z = Scale(sine[angle] * magnitude);
+    v->z = Scale(gUnk_086149C4[angle] * magnitude);
 }
 static inline s32 Distance(struct SceneVec *a, struct SceneVec *b)
 {
@@ -79,30 +74,29 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     struct PoisonHandBurst *p = input;
     struct SceneVec position;
     struct Velocity velocity;
-    register s32 angle asm("r5");
-    register s32 magnitude asm("r2");
+    s32 angle;
+    s32 magnitude;
+    s32 jitter;
     u32 attributes;
     u32 palette;
-    struct Velocity *v;
     PoisonHand_CopyPosition(&position, &p->position);
     PoisonHand_RaiseOrigin(&position);
     angle = PoisonHand_NextSpread(gUnk_0203B400) & 255;
-    magnitude = p->spread + (PoisonHand_NextSpread(gUnk_0203B400) & 15) - 8;
-    Polar(&velocity, angle, magnitude);
-    v = &velocity;
-    asm("" : "+r"(v));
+    jitter = PoisonHand_NextSpread(gUnk_0203B400);
+    magnitude = p->spread;
+    jitter &= 15;
+    Polar(&velocity, angle, magnitude + jitter - 8);
     attributes = 0x8000;
     palette = 0x1c5;
-    asm("" : "+r"(attributes), "+r"(palette));
     if (Mod(p->countdown, 10) == 0 && p->countdown > 90) {
         if (Mod(p->countdown, 20) == 0)
-            SpriteEffectController_Create(&position, v, 0x61f9, 0x31f4, 8, 0x200, 9, palette, 2, 0,
-                                          0, 0, p->effectX, p->effectY, attributes, p->effectZ, 0,
-                                          0);
+            SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x200, 9,
+                                          palette, 2, 0, 0, 0, p->effectX, p->effectY, attributes,
+                                          p->effectZ, 0, 0);
         else
-            SpriteEffectController_Create(&position, v, 0x61f9, 0x31f4, 8, 0x400, 9, palette, 2, 0,
-                                          0, 0, p->effectX, p->effectY, attributes, p->effectZ, 0,
-                                          0);
+            SpriteEffectController_Create(&position, &velocity, 0x61f9, 0x31f4, 8, 0x400, 9,
+                                          palette, 2, 0, 0, 0, p->effectX, p->effectY, attributes,
+                                          p->effectZ, 0, 0);
     }
     if (p->countdown > 0) {
         p->countdown--;
@@ -123,7 +117,3 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     }
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PoisonHand_UpdateEmergence);
-#endif

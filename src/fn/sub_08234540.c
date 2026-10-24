@@ -39,54 +39,58 @@ static inline u32 randomValue(const u16 *table, u32 mask)
     return *(const u16 *)(offset + (u32)table);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// still differs: the table and mask constants are loaded once and copied (r5 -> r6, r1 -> sb) in the ROM; the sine table literal is pooled twice
+// MATCHING_CONCESSION: register-pinning
 void SpiralBurst_InitParticles(u8 *p)
 {
     register u32 mask asm("sb");
     s32 i;
     u32 base;
     u8 *s;
-    register struct SbE88 *e asm("r5");
-    base = (u8)randomValue(gUnk_0203B400, mask = 1023);
+    register const u16 *table asm("r5");
+    register const u16 *randomTable asm("r6");
+    struct SbE88 *e;
+    {
+        u32 next;
+        table = gUnk_0203B400;
+        next = gUnk_03005308 + 1;
+        mask = 1023;
+        gUnk_03005308 = next & mask;
+        base = (u8)table[gUnk_03005308];
+    }
     *(u32 *)(p + 0x1F8) = AnimData_FindEntry(0x1C1E);
     i = 0;
+    randomTable = table;
     e = (struct SbE88 *)(p + 0x88);
     s = p + 0x78;
     for (; i < 8; i++) {
         ParticleSprite_Initialize(s, *(u32 *)(p + 0x1F8), 0);
         Effect_SetOrigin(s, -4, -4);
         Effect_SetPalette(s, 1);
-        e->angle = base + (i << 5) + (randomValue(gUnk_0203B400, mask) & 15);
+        e->angle = base + (i << 5) + (randomValue(randomTable, mask) & 15);
         e->f19 = ((i & 3) << 1) + 3;
-        e->f1E = (randomValue(gUnk_0203B400, mask) & 31) + 64;
-        e->f1Aa = (randomValue(gUnk_0203B400, mask) & 15) + 12;
+        e->f1E = (randomValue(randomTable, mask) & 31) + 64;
+        e->f1Aa = (randomValue(randomTable, mask) & 15) + 12;
         e->f1C = 7;
-        asm("" ::: "memory");
         e->x = *(u16 *)(p + 0x1C) + scale(e->f1E * gUnk_086149C4[(e->angle + 64) & 255]);
         e->f1A = *(u16 *)(p + 0x1E);
-        asm("" ::: "memory");
         {
+            s32 radius = e->f1E;
             const s16 *sn = gUnk_086149C4;
             asm("" : "+r"(sn));
-            e->y = *(u16 *)(p + 0x20) + scale(e->f1E * sn[e->angle]);
+            e->y = *(u16 *)(p + 0x20) + scale(radius * sn[e->angle]);
         }
         s[0xF] = 2;
         e->f0 = 0xEC;
         {
-            u32 v = randomValue(gUnk_0203B400, mask) & 7;
+            u32 v = randomValue(randomTable, mask) & 7;
             e->f1B = v;
             if (v <= 3)
                 SpriteDrawable_SelectTileFrame(s, *(u32 *)(p + 0x1F8), 12);
             else
                 SpriteDrawable_SelectTileFrame(s, *(u32 *)(p + 0x1F8), 13);
         }
-        e->f1D = (randomValue(gUnk_0203B400, mask) & 15) + 0x38;
+        e->f1D = (randomValue(randomTable, mask) & 15) + 0x38;
         e++;
         s += 0x30;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpiralBurst_InitParticles);
-#endif

@@ -434,40 +434,51 @@ void SceneActors_AddResourceCost(int amount)
 
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// The ROM recomputes p + 0x110 + i * 4 on every pass (no loop optimization), which the goto
-// loop reproduces; the remaining difference is allocation: inside needs about 3x its priority
-// (translate.py) to take r4 ahead of count.
-s32 sub_08022624(u8 *p, u8 count, s16 *min, s16 *max)
+struct BoxSearchPosition {
+    s16 x, y, z;
+};
+
+static inline s32 ReadPositionReference(u32 *entry, struct BoxSearchPosition **out)
 {
+    *out = (struct BoxSearchPosition *)*entry;
+    return *out != NULL;
+}
+
+// MATCHING_CONCESSION: register-pinning
+// Finds the first tracked position inside the inclusive x/z bounds.
+s32 sub_08022624(void *actor, s32 count, struct BoxSearchPosition *min,
+                 struct BoxSearchPosition *max)
+{
+    u8 *bytes = actor;
     s32 i;
+
     i = 0;
     if (i >= count)
         goto end;
 loop: {
-    s16 **list = (s16 **)(p + 0x110);
-    s16 *pos = list[i];
+    s32 offset = i * 4;
+    struct BoxSearchPosition *pos;
+    u32 address = (u32)(bytes + 0x110);
+
+    address += offset;
+    ReadPositionReference((u32 *)address, &pos);
     if (pos) {
-        s32 x = pos[0];
-        u8 inside = 0;
-        if ((((x >= min[0]) && (x <= max[0])) && (pos[2] >= min[2])) && (pos[2] <= max[2]))
+        s32 x = pos->x;
+        s32 minX = min->x;
+        register s32 inside asm("r4") = 0;
+
+        if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
             inside = 1;
         if (inside)
             return i;
     }
 }
-
     i++;
     if (i < count)
         goto loop;
 end:
     return -1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08022624);
-#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_08022694);
 

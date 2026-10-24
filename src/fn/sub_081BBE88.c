@@ -1,10 +1,7 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.3%
-// fix.py best version (reprinted C)
-// Provisional: SolarBank rate display setup (loads CB05 resources 32BA/530D,
-// rate digits, widget rows, two A47C sprites). Remaining: resA/resB spill
-// slots swapped and loop zero/counter registers swapped.
+// MATCHING_CONCESSION: register-pinning
+// Provisional: SolarBank rate display setup, including rate digits,
+// widget rows and two palette-selected sprites.
 struct Res {
     u32 words[8];
 };
@@ -64,11 +61,14 @@ s32 Div(s32, s32);
 void sub_081BBE88(struct SolarBankDisplay *p)
 {
     struct Res *res;
+    struct Res *resB;
+    struct Res *resA;
     struct Pos pos;
     s32 v;
     s32 tens;
     s32 i;
-    s32 j;
+    // Keep the widget coordinate zero separate from the packed position reset.
+    register s32 zero asm("r1");
     res = ScriptProc_Start(0xCB05, 0x32BA);
     p->resA = *res;
     ResourceHeader_Relocate(&p->resA, res);
@@ -78,8 +78,8 @@ void sub_081BBE88(struct SolarBankDisplay *p)
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
-    Widget_InitLinked(&p->w58, &p->resA, 0, 0x30, j, j, 0x3C, &pos);
-    j = 0;
+    zero = 0;
+    Widget_InitLinked(&p->w58, &p->resA, 0, 0x30, zero, zero, 0x3C, &pos);
     if (Script_SeekToKeyword(0x52)) {
         s32 rate = Script_GetValue();
         if (rate < 0)
@@ -106,15 +106,21 @@ void sub_081BBE88(struct SolarBankDisplay *p)
     *((void **)(((u8 *)p) + 0x100)) = ((u8 *)p) + 0x710;
     pos.x = 0x28;
     pos.y = 0x28;
-    for (j = 0; j < 4; j++) {
-        Widget_InitLinked(&p->w238[j], &p->resB, 0, 0x30, 0, 0, 0x3C, &pos);
+    resA = &p->resA;
+    resB = &p->resB;
+    for (i = 0; i < 4; i++) {
+        struct Pos *position = &pos;
+        struct Wgt *widget = &p->w238[i];
+        Widget_InitLinked(widget, resB, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
     pos.x = 0x88;
     pos.y = 0x28;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked(&p->w3B8[i], &p->resB, 0, 0x30, 0, 0, 0x3C, &pos);
+        struct Pos *position = &pos;
+        struct Wgt *widget = &p->w3B8[i];
+        Widget_InitLinked(widget, resB, 0, 0x30, 0, 0, 0x3C, position);
         pos.x += 8;
     }
 
@@ -132,11 +138,8 @@ void sub_081BBE88(struct SolarBankDisplay *p)
         p->sprites[i].z = 0;
     }
 
-    Widget_InitLinked(&p->w538, &p->resA, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
+    Widget_InitLinked(&p->w538, resA, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
     Pos_Set(&pos, -0x85, -0x18, 0);
-    Widget_InitLinked(&p->w598, &p->resB, 0x7E, 0x30, 0, 0, 0x3C, &pos);
-    Widget_InitLinked(&p->w5F8, &p->resB, 0x7F, 0x30, 0, 0, 0x3C, &pos);
+    Widget_InitLinked(&p->w598, resB, 0x7E, 0x30, 0, 0, 0x3C, &pos);
+    Widget_InitLinked(&p->w5F8, resB, 0x7F, 0x30, 0, 0, 0x3C, &pos);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081BBE88);
-#endif

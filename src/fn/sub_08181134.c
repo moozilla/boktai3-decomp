@@ -1,9 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.2%
-// fix.py best version (reprinted C)
-// foundry draft (worker best 83.8%); what differs is mostly register allocation and instruction order
 struct ActorMarker {
     u8 pad0[0xd4];
     u16 position[3];
@@ -46,8 +42,10 @@ void ActorMarker_InitOffsetPosition(struct ActorMarker *p)
             break;
 
         case 0:
+            p->offsetPosition[0] = p->position[0] - 200;
+            p->offsetPosition[1] = p->position[1] + 100;
+            p->offsetPosition[2] = p->position[2] - 200;
+            p->state = 0;
+            break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMarker_InitOffsetPosition);
-#endif

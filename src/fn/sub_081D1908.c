@@ -1,8 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: channel spills, loop setup and register allocation.
 // The palette binding at actor offset 0x148 is distinct from the main graphics palette.
 extern u8 *gUnk_030042E4;
 extern u16 gUnk_02000278[];
@@ -20,12 +16,12 @@ void SceneNpc_BlendPalette(u8 *actor, s32 step, s32 length)
     const u16 *source = (u16 *)(gUnk_030042E4 + 0x6120);
     const u16 *target = (u16 *)(gUnk_030042E4 + 0x6140);
     u16 *output = gUnk_02000278;
+    s32 i;
     s32 inverse;
     s32 tr;
     s32 tg;
     s32 tb;
     u32 mask;
-    s32 i;
     s32 tg_2;
     u32 k1 = 31;
     SetPalette((struct PaletteBinding *)(actor + 0xe0), output);
@@ -61,7 +57,3 @@ void SceneNpc_BlendPalette(u8 *actor, s32 step, s32 length)
         output++;
     } while ((--i) >= 0);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_BlendPalette);
-#endif
