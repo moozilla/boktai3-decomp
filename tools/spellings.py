@@ -366,6 +366,22 @@ def sp_ternary(fn):
                 b2.block_items[i - 1:i + 1] = [ca.Assignment("=", t2.lvalue, ca.TernaryOp(s2.cond, t2.rvalue,
                                                                                           a2.rvalue))]
                 yield f"{text(t.lvalue)} = c ? B : A (default then if)", f2
+                # and straight into its one use: `v = A; if (c) v = B; x = v;` -> `x = c ? B : A;`
+                # (ActorPhase_ApproachNeutral: the ternary alone is neutral, so the beam drops it)
+                nxt = b2.block_items[i] if i < len(b2.block_items) else None
+                v = t2.lvalue
+                if isinstance(v, ca.ID) and isinstance(nxt, ca.Assignment) and nxt.op == "=" and \
+                        text(nxt.rvalue) == v.name and sum(isinstance(x, ca.ID) and x.name == v.name and not (
+                        isinstance(par, ca.StructRef) and slot == "field") for x, par, slot in walk(f2)) == 2:
+                    f3 = copy.deepcopy(f2)
+                    b3 = blocks(f3)[bi]
+                    tern, use = b3.block_items[i - 1], b3.block_items[i]
+                    use.rvalue = tern.rvalue
+                    del b3.block_items[i - 1]
+                    for b4 in blocks(f3):
+                        b4.block_items = [d for d in b4.block_items
+                                          if not (isinstance(d, ca.Decl) and d.name == v.name)]
+                    yield f"{text(nxt.lvalue)[:24]} = c ? B : A (default then if, {v.name} inlined)", f3
 
 
 def sp_into_loop(fn):
@@ -916,6 +932,28 @@ def sp_narrow_mask(fn):
             yield f"({t})({text(n)[:28]})", f2
 
 
+WORD_TYPES = {"u32", "s32", "int", "unsigned int", "vu32", "uintptr_t"}
+
+
+def sp_alias_read(fn):
+    """(T)x->f  ->  *(T *)&x->f  (sub_080B03BC: `actor->word104 = 0; actor->word104 =
+    *(u32 *)&actor->entryTarget228;`). agbcc -O2 gives each type an alias set and flow.c deletes a
+    store as dead when a later store writes the same address and no read between them may alias it;
+    a read of another type (the void * field) never aliases a u32 store, so the ROM's surviving
+    first store means the read was a u32. A type hypothesis: the field was declared T."""
+    def pred(n, p, s):
+        return (isinstance(n, ca.Cast) and isinstance(n.to_type.type, ca.TypeDecl)
+                and " ".join(getattr(n.to_type.type.type, "names", [])) in WORD_TYPES
+                and isinstance(n.expr, (ca.StructRef, ca.ArrayRef)))
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        n, par, slot = nth(f2, pred, k)
+        t = " ".join(n.to_type.type.type.names)
+        ptr = ca.Typename(None, [], None, [], ca.PtrDecl([], ca.TypeDecl(None, [], None, ca.IdentifierType(t.split()))))
+        set_child(par, slot, ca.UnaryOp("*", ca.Cast(ptr, ca.UnaryOp("&", n.expr))))
+        yield f"read {text(n.expr)[:28]} as {t} (alias set)", f2
+
+
 def _after(fn, node):
     """Statements that can run after NODE finishes: the items after it and after each enclosing
     statement in their blocks (an if's other branch is not among them). None inside a loop."""
@@ -1346,17 +1384,18 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct,
-             sp_field_extend, sp_narrow_mask]
+             sp_field_extend, sp_narrow_mask, sp_alias_read]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
-TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend]
+TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend, sp_alias_read]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
 HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
+    "dead store": ["sp_alias_read"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift", "sp_field_extend"],
     "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",

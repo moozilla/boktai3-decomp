@@ -85,7 +85,7 @@ def compile_dumps(src, wd):
 def one_line(rtl):
     rtl = re.sub(r"\(insn_list.*", "", rtl, flags=re.S)  # drop LOG_LINKS and notes
     rtl = re.sub(r"\(expr_list.*", "", rtl, flags=re.S)
-    rtl = re.sub(r"^\((?:insn|jump_insn|call_insn) \d+ \d+ \d+ ", "", rtl)
+    rtl = re.sub(r"^\((?:insn|jump_insn|call_insn)(?:/\w+)* \d+ \d+ \d+ ", "", rtl)
     rtl = re.sub(r"\s+", " ", rtl).strip()
     rtl = re.sub(r"( \(nil\))+\)?$", "", rtl)
     rtl = re.sub(r" (\d+ \{[^}]*\}|-1)$", "", rtl)

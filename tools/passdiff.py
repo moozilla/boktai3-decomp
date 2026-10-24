@@ -82,7 +82,7 @@ def normalize(text, hard=False):
         return f"(reg{m.group(1)} {regs[key]})"
 
     lines = []
-    for chunk in re.split(r"\n(?=\((?:insn|jump_insn|call_insn|code_label|barrier|note))", text):
+    for chunk in re.split(r"\n(?=\((?:insn|jump_insn|call_insn|code_label|barrier|note)[/ ])", text):
         chunk = chunk.strip()
         if not chunk.startswith("(") or chunk.startswith("(note") or chunk.startswith("(barrier"):
             continue

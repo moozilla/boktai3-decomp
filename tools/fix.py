@@ -179,7 +179,7 @@ def decision(path, func):
     e = st.entries[0]
     keys = []
     note = e["note"] or ""
-    for k in ("frame", "call result", "comparison type", "order"):
+    for k in ("frame", "call result", "comparison type", "order", "dead store"):
         if note.startswith(k) or e["kind"] == k:
             keys.append(k)
     keys += [t for t in hint.topics_for(st, e) if t not in keys]

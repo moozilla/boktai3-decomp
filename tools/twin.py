@@ -2,6 +2,7 @@
 """Port a matched twin's spelling into a draft, one differing hunk at a time.
 
   twin.py DRAFT.c FUNC TWIN.c TWINFUNC [--nonmatching] [--keep K]
+  twin.py --seed FUNC TWIN.c TWINFUNC     (FUNC has no C yet: start it from the twin)
 
 Families of functions (Ghost/Lun/Axe_TurnToward..., Skeleton/Mummy...) share
 code over other struct fields. Once one member matches, its spelling usually
@@ -269,7 +270,131 @@ def renamed(node, names):
     return node
 
 
+def rom_asm(addr):
+    """The ROM disassembly of the function at ADDR (gen/code.s lines up to the next function)."""
+    lines = open(os.path.join(ROOT, "gen", "code.s")).read().split("\n")
+    at = f"@ 0x{addr:08X}"
+    i = next(k for k, l in enumerate(lines) if l.endswith(at) and not l.startswith("_"))
+    out = []
+    for l in lines[i + 1:]:
+        if re.match(r"\t\w*_func_start ", l):
+            break
+        out.append(l.split("@")[0].strip() if "@ =" not in l else l.strip())
+    return [l for l in out if l and not l.startswith(".align")]
+
+
+def asm_map(twin_asm, target_asm):
+    """Name and constant correspondences between two ROM functions of the same shape:
+    ({twin symbol: target symbol} from aligned `bl` and literal-pool symbols,
+    [(twin value, target value)] from aligned immediates that differ)."""
+    def norm(l):
+        l = re.sub(r"\br\d+\b|\b(sb|sl|fp|ip|sp|lr)\b", "R", l)
+        l = re.sub(r"#0x[0-9a-f]+|#\d+", "#K", l)
+        l = re.sub(r"\b_[0-9A-F]{8}\b", "L", l)
+        l = re.sub(r"=\w+", "=S", l)
+        return re.sub(r"^bl \w+", "bl F", l)
+    a, b = [norm(l) for l in twin_asm], [norm(l) for l in target_asm]
+    names, consts = collections.Counter(), collections.Counter()
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        if tag not in ("equal", "replace") or i2 - i1 != j2 - j1:
+            continue
+        for x, y in zip(twin_asm[i1:i2], target_asm[j1:j2]):
+            if norm(x) != norm(y):
+                continue
+            mx, my = re.match(r"bl (\w+)", x), re.match(r"bl (\w+)", y)
+            if mx and my and mx.group(1) != my.group(1):
+                names[(mx.group(1), my.group(1))] += 1
+            sx, sy = re.search(r"=([A-Za-z_]\w*)", x), re.search(r"=([A-Za-z_]\w*)", y)
+            if sx and sy and sx.group(1) != sy.group(1):
+                names[(sx.group(1), sy.group(1))] += 1
+            kx, ky = re.findall(r"#(0x[0-9a-f]+|\d+)", x), re.findall(r"#(0x[0-9a-f]+|\d+)", y)
+            if x.split()[0] in ("movs", "cmp") and kx and ky and kx != ky:
+                consts[(int(kx[-1], 0), int(ky[-1], 0))] += 1
+    best = {}
+    for (x, y), n in names.most_common():
+        best.setdefault(x, y)
+    return best, [k for k, _ in consts.most_common()]
+
+
+def check_name(addr, name):
+    """The function's symbol in build/boktai3.elf (the name it was built under)."""
+    import subprocess
+    out = subprocess.run(["arm-none-eabi-nm", os.path.join(ROOT, "build", "boktai3.elf")],
+                         capture_output=True, text=True).stdout
+    for l in out.splitlines():
+        a, _, s = l.split(" ", 2)
+        if int(a, 16) & ~1 == addr and not s.startswith(("_", "$")):
+            return s
+    return name
+
+
+def seed(func, twin, twin_func, keep):
+    """Start a draft of FUNC (no C yet) from its matched near-clone TWIN_FUNC: the twin's unit
+    with the function renamed, callees and globals mapped from the two ROM listings, and each
+    differing immediate tried in the C. Writes build/twin/FUNC.seed.c."""
+    import isolate
+    addrs = {r.split(",")[1]: int(r.split(",")[0], 16) for r in open(os.path.join(ROOT, "symbols", "functions.csv"))
+             if re.match(r"[0-9A-F]{8},", r)}
+    names_at = {v: k for k, v in addrs.items()}
+    alias = dict(re.findall(r"^#define\s+(\w+)\s+sub_([0-9A-F]{8})\s*$", open(twin).read(), re.M))
+    taddr = addrs.get(twin_func) or (int(alias[twin_func], 16) if twin_func in alias else int(twin_func[4:], 16))
+    faddr = addrs.get(func) or int(func[4:], 16)
+    names, consts = asm_map(rom_asm(taddr), rom_asm(faddr))
+    text = fix.strip_draft(open(os.path.join(ROOT, isolate.ensure(twin, twin_func))).read())
+    elf = check_name(faddr, names_at.get(faddr, func))
+    text = re.sub(r"^#define\s+%s\s+sub_[0-9A-F]{8}\s*\n" % re.escape(twin_func), "", text, flags=re.M)
+    text = re.sub(r"\b(%s|sub_%08X)\b" % (re.escape(twin_func), taddr), elf, text)
+    for x, y in names.items():
+        if re.search(r"\b%s\b" % re.escape(y), text) is None:
+            proto = re.search(r"^[^\n;{}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(x), text, re.M)
+            text = re.sub(r"\b%s\b" % re.escape(x), y, text)
+            if proto is None:
+                print(f"   {x} -> {y}: no prototype to copy; declare {y}")
+        print(f"   map {x} -> {y}")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, f"{func}.seed.c")
+    with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
+        d = fix.Draft(text, elf, wd)
+        best = d.score()
+        print(f"{func}: seeded from {twin_func}: {best[0]} differing insns ({best[2]} beyond registers)")
+        span = fix.find_def(d.text, d.src_name)
+        for x, y in consts:
+            body = d.text[span[0]:span[1]]
+            pat = re.compile(r"(?<![\w.])(%d|0x%X|0x%x)(?![\w.])" % (x, x, x))
+            hits = list(pat.finditer(body))
+            if len(hits) != 1:
+                continue
+            m = hits[0]
+            cand = d.text[:span[0]] + body[:m.start()] + (hex(y) if y > 9 else str(y)) + body[m.end():] + d.text[span[1]:]
+            cpath = os.path.join(wd, "cand", f"{func}.c")
+            os.makedirs(os.path.dirname(cpath), exist_ok=True)
+            open(cpath, "w").write(cand)
+            try:
+                _, _, cfn, _ = fixsearch.prepare(cpath, elf)
+            except (Exception, SystemExit):
+                continue
+            sc = d.score(cfn)
+            if sc and sc[0] < best[0]:
+                print(f"   constant {x} -> {y}: {sc[0]} insns")
+                best, text = sc, cand
+                d = fix.Draft(text, elf, wd)
+                span = fix.find_def(d.text, d.src_name)
+        open(out, "w").write(text)
+    print(f"seed: {os.path.relpath(out, ROOT)}; next: tools/step.py {os.path.relpath(out, ROOT)} --all, "
+          f"then tools/fix.py on it")
+    return 0 if best[0] == 0 else 1
+
+
 def main():
+    if sys.argv[1:2] == ["--seed"]:
+        ap = argparse.ArgumentParser(description="seed a draft from a matched near-clone")
+        ap.add_argument("--seed", action="store_true")
+        ap.add_argument("func")
+        ap.add_argument("twin")
+        ap.add_argument("twin_func")
+        ap.add_argument("--keep", type=int, default=5)
+        a = ap.parse_args()
+        return seed(a.func, a.twin, a.twin_func, a.keep)
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("draft")
     ap.add_argument("func")

@@ -68,7 +68,7 @@ def functions_of(dump):
 def insns_by_uid(dump):
     """{uid: rtl text} for insn/call_insn/jump_insn expressions."""
     out = {}
-    for m in re.finditer(r"^\((insn|call_insn|jump_insn) (\d+) .*?(?=^\(|^;;|\Z)", dump, re.S | re.M):
+    for m in re.finditer(r"^\((insn|call_insn|jump_insn)(?:/\w+)* (\d+) .*?(?=^\(|^;;|\Z)", dump, re.S | re.M):
         out[int(m.group(2))] = m.group(0)
     return out
 
@@ -76,7 +76,7 @@ def insns_by_uid(dump):
 def insn_lines(dump):
     """{uid: source line} from the line-number notes preceding each insn."""
     out, line = {}, None
-    for m in re.finditer(r'^\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)|^\((?:insn|call_insn|jump_insn) (\d+) ', dump, re.M):
+    for m in re.finditer(r'^\(note(?:/\w+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)|^\((?:insn|call_insn|jump_insn)(?:/\w+)* (\d+) ', dump, re.M):
         if m.group(1):
             line = int(m.group(1))
         elif line is not None:
