@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 80.4%
-// foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
+// Exact scope match in plain C.
 #define gVanargandProjectileProperties gUnk_08612114
 struct ProjectilePosition {
     s16 x, y, z, pad;
@@ -80,18 +78,25 @@ s32 VanargandProjectile_Create(struct VanargandProjectilePool *pool,
         projectile->unknown58 = zero;
     }
     projectile->position = *position;
+    sprite = projectile->sprites;
     i = 0;
     attack = &projectile->collider;
     pos = &projectile->position;
     body = &projectile->healthCollider;
-    for (; i <= 5; i++) {
-        sprite = &projectile->sprites[i];
-        projectile->history[i] = projectile->position;
-        sprite->position = projectile->position;
-        sprite->flags &= ~1;
-        Sprite_LinkToList(sprite, 0);
+initializeSprite:
+    *(i + projectile->history) = projectile->position;
+    sprite->position = projectile->position;
+    sprite->flags &= ~1;
+    Sprite_LinkToList(sprite, 0);
+    i++;
+    sprite++;
+    if (i <= 5)
+        goto initializeSprite;
+    {
+        void *animation = projectile->animation;
+        u32 palette = projectile->type + 0x1db;
+        AnimData_SelectPaletteBank(animation, (u16)palette);
     }
-    AnimData_SelectPaletteBank(projectile->animation, projectile->type + 0x1db);
     Collider_SetPosition(attack, pos, 0);
     Collider_SetPosition(body, pos, 0);
     body->flags |= 4;
@@ -106,6 +111,3 @@ s32 VanargandProjectile_Create(struct VanargandProjectilePool *pool,
     pool->activeMask |= 1 << index;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", VanargandProjectile_Create);
-#endif
