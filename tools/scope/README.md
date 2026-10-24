@@ -481,15 +481,23 @@ Each was read from the compiler source and confirmed on a live draft.
    a variable (`s32 offset = y % 32 + 112;`) is a boundary fold cannot see
    through. Keep statement order as the ROM's evaluation order when you split.
 
-20. **A variable set twice is not a constant register.** update_equiv_regs
-   (local-alloc.c) marks a pseudo REG_EQUIV only if every set stores the
-   same invariant; then its priority is halved (fact 10). The ROM's
-   `table = gUnk_0203B400` often wins a register the C draft loses to a
-   mask constant: the original reused the variable. In
+20. **Constant registers and a second set: order matters.** update_equiv_regs
+   (local-alloc.c) walks the insns in order. At a set whose value is an
+   invariant (REG_EQUAL constant) it accepts a multiply-set pseudo, turns
+   the note into REG_EQUIV and doubles its live length on the spot (half
+   priority, fact 10). A later set to a non-constant drops the equivalence
+   (`no_equiv`) but does not undo the doubling; a non-constant set *first*
+   marks the pseudo `const0_rtx` and the constant set is then refused before
+   doubling. Checked on a two-line file: constant then `t = p + 9`, 7 -> 14
+   insns; `t = p + 9` then the constant, 7 -> 7. In
    Hresvelgr_SetRandomTravelTarget `u32 t = (u32)gUnk_0203B400; ... t = base
-   + offset; t &= 255;` (the angle, which the ROM keeps in the same r4)
-   matches with no pin. `why` points here when killing REG_EQUIV would flip
-   the order.
+   + offset; t &= 255;` matches with no pin although the constant set comes
+   first: what reusing the variable bought there is the refs of both values
+   on one pseudo (more refs, higher priority), not the end of the doubling.
+   `why` reports which case applies (it checks the REG_EQUIV note after
+   local-alloc) and asks for the non-constant set before the constant one.
+   ContactActorPool_Start's worker showed the earlier version of this fact
+   (and of `why`) wrong: `table` set twice, no REG_EQUIV note, life doubled.
 
 ## Survey: random table as a literal address (2026-10-24)
 

@@ -215,6 +215,14 @@ def compile_draft(src, func, env=None):
     # failed or assembled depending on the -g/-dp output's size.
     macros = open(os.path.join(ROOT, "asm", "macros.inc")).read()
     text = re.sub(r'^\s*\.include\s+"asm/macros\.inc"\s*$', lambda m: macros, text, flags=re.M)
+    # agbcc -g can leave a DWARF location naming a label it deleted (`.4byte .LC2` in .debug_info
+    # only); the real build has no -g, so define such labels when no code refers to them.
+    dbg = text.find("\t.section\t.debug")
+    if dbg >= 0:
+        defined = set(re.findall(r"^(\.L\w+):", text, re.M))
+        code_refs = set(re.findall(r"(\.L\w+)\b", text[:dbg]))
+        dangling = sorted(set(re.findall(r"(\.L\w+)\b", text[dbg:])) - defined - code_refs)
+        text += "".join(f"\t.set\t{n}, 0\n" for n in dangling)
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
@@ -1031,9 +1039,22 @@ def life_note(wd, x, live):
     if fl is None or fl == live:
         return ""
     if live == 2 * fl:
+        if not has_equiv_note(wd, x):
+            return (f" [flow measured {fl}; doubled by update_equiv_regs (local-alloc.c) at its first set,"
+                    f" a constant; a later non-constant set dropped the equivalence but not the doubling."
+                    f" The doubling goes away only if the non-constant set comes first in the code]")
         return (f" [flow measured {fl}; doubled because it always holds a constant (REG_EQUIV):"
                 f" update_equiv_regs, local-alloc.c, halves constant registers' priority]")
     return f" [flow measured {fl}; regmove changed it while rewriting copies]"
+
+
+def has_equiv_note(wd, x):
+    """Pseudo X still carries a REG_EQUIV note on one of its sets after local-alloc."""
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return True
+    return any(re.search(rf"\(set \(reg(?:/\w)*:\w+ {x}\)", b) and "REG_EQUIV" in b
+               for b in re.split(r"\n\n", open(path).read()))
 
 
 def g_priority(refs, live):
@@ -1185,9 +1206,10 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         if 0 < m < llive:
             out.append(f"{nm(lo)} living {m // ld} insns or fewer instead of {llive // ld}"
                        + (" (flow's count; it is doubled as a constant register)" if ld == 2 else "")
-                       + (", or the same life if it were not a constant (killing REG_EQUIV: in C, give"
-                          " its variable a second, non-constant value after its last use, e.g. reuse it"
-                          " for the next value the ROM keeps in the same register; fact 20)" if ld == 2
+                       + (", or the same life if it were not a constant (in C, give its variable a"
+                          " non-constant value *before* the constant one in the code, e.g. reuse it for"
+                          " an earlier value the ROM keeps in the same register; a non-constant set"
+                          " after it drops the equivalence but keeps the doubled life; fact 20)" if ld == 2
                           and lb * lrefs * 10000 // (llive // 2) > hpri else ""))
     hb = hrefs.bit_length() - 1
     if hb:
