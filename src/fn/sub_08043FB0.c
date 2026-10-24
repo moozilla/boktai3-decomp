@@ -9,14 +9,13 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot)
 {
-    u32 zero;
     struct ContactPackedVector bounds;
     struct ContactPackedVector offset;
     void *graphics;
     struct ContactSwarmSprite *sprite;
     void *shadow;
     struct ContactCollider *collider;
-    register const struct ContactPosition *position asm("r9");
+    const struct ContactPosition *position;
     slot->direction = 0;
     slot->speed = 0;
     slot->state = 0;
@@ -32,18 +31,8 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     sprite = &slot->display.animation.draw.sprite;
     Sprite_Init(sprite, graphics, 1);
     sprite->priority = 2;
-    {
-        u32 offset = 0xE8;
-        struct ContactPosition *destination;
-        const u32 *source;
-        asm("" : "+r"(offset));
-        destination = (void *)(offset + (u32)slot);
-        position = destination;
-        zero = 0;
-        source = &zero;
-        asm("" : "+r"(source));
-        CpuSet(source, destination, 0x05000002);
-    }
+    position = &sprite->position;
+    ZeroFill8((void *)position);
     shadow = slot->shadow;
     Shadow_Initialize(shadow, (void *)position, 0);
     ActorShadow_Disable(shadow);
