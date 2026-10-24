@@ -452,6 +452,15 @@ Each was read from the compiler source and confirmed on a live draft.
    compiler's F record (one per `find_reg` call, in the AGBCC_DUMPPRI file)
    logs these sets; `why` explains from it.
 
+17. **flow measures lives before combine.** The pass order is cse2, flow,
+   combine, regmove, lreg: REG_LIVE_LENGTH and REG_N_REFS come from the RTL
+   as expand and cse left it. RTL that combine later folds away (a type
+   conversion's extension whose result is known narrow, a copy combine
+   merges) still lengthens every value live across it. That makes parameter
+   and variable types a lever on allocation order that leaves the
+   instructions unchanged: in the cosine twins an `s16` parameter added 6 insns
+   to `speed`'s life and 2 to `actor`'s, which flipped their order.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
@@ -505,25 +514,25 @@ which is exactly `10:1`. Not tested.
   from r5 and re-places it (fact 13); in the ROM sl is taken because `aoff`
   is live during the mask's life, in the draft it is not (only case 2 reads
   it). Open: what keeps `aoff` live through case 1 in the original.
-* **Hresvelgr_SetCosineScaledVelocity and Hresvelgr_SetSineScaledVelocity**
-  (sub_0819C8F8, sub_0819C870; twins, 7 insns each). The table copy (gcse
-  pseudo, the ROM's r3) loses r3 to `speed` (polar's inlined `radius`):
-  priority 483 vs 1250. `AGBCC_PRI=97:+768` matches, but that is the long
-  way round. The real story has two parts, both found by `why`:
-  (1) `speed` inherits r3 at the z multiply because of the REG_DEAD note
-  order (fact 11); writing `radius * table` removes the preference.
-  (2) Then `speed` still takes r3, now in pass 1 of `find_reg` (fact 16): r5
-  is not in use yet because `actor`, which the ROM also keeps in r5, is
-  allocated after `speed` (1153 vs 1250). With the swap,
-  `AGBCC_PRI=22:+98` (actor first) gives a byte-for-byte MATCH. Needed in C:
-  `speed` living 27+ insns (has 24), or `actor` living 23 or fewer (has 26)
-  or with a fourth reference. Tried without effect: `const` parameters, the
-  matched siblings' helper idioms (`scale12(a, b)` with the multiply inside,
-  if/return `scale`), operand orders, `direction` inlined. A named `speed`
-  local moves its copy before `v` (8/9, worse). The s16 parameter variant
-  gets the allocation right because its extension lengthens both lives
-  (`vs`: actor 26 -> 30, speed 24 -> 32) and swaps their order. Open: the
-  C that gives `speed` 3 more insns of life.
+* **Solved: Hresvelgr_SetCosineScaledVelocity and Hresvelgr_SetSineScaledVelocity**
+  (sub_0819C8F8 #648, sub_0819C870 #649; plain C, no pins). One value in r3
+  instead of r5, found by `why` in two steps:
+  (1) `speed` inherited the table copy's r3 preference at the z multiply
+  through the REG_DEAD note order (fact 11); `radius * table` fixes it.
+  (2) Then `speed` took r3 in pass 1 of `find_reg` (fact 16): r5 was not in
+  use yet because `actor`, which the ROM also keeps in r5, was allocated
+  after it (1153 vs 1250). `AGBCC_PRI=22:+98` confirmed it (MATCH), and the
+  explainer's arithmetic said `speed` needed 27+ insns of life (it had 24).
+  polar's `angle` as `s16` gives that (fact 17): the conversion's RTL counts
+  toward flow's lives and is folded away by combine, so the output is
+  unchanged except for the allocation (`vs`: speed 24 -> 30, actor 26 -> 28,
+  actor now first). Both changes are needed. The original draft had already
+  tried `s16 angle` (with an `s8 radius` and odd z index), so the shape was
+  close; what the tool added was knowing which property to aim for.
+  Without the tool, `const` parameters, the matched siblings' helper idioms,
+  a named `speed` local and other operand orders were all tried with no effect.
+  The sine twin also needed a reviewed `replacement_end` in
+  `symbols/build_extra_functions.csv`: gbadisasm leaves it as a blob.
 * **Solved: Hresvelgr_InitializeShots** (moozilla/boktai3-decomp#641, plain C,
   no pins). The hypothesis below was right except for the constant: it is a
   pre-loop variable `x = 0x708` assigned before `y` and `z`, so it lives
