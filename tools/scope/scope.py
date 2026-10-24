@@ -1153,8 +1153,25 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     if hrefs > 1:
         r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
         if r:
-            out.append(f"{nm(hi)} with {r} refs instead of {hrefs}")
+            out.append(f"{nm(hi)} with {r} refs instead of {hrefs}" + (mention_lines(wd, hi) if wd else ""))
     return out
+
+
+def mention_lines(wd, reg):
+    """' (counted at line 43 x2 in a shift, line 47 x2)': where REG's refs come from, by C line, so a worker
+    can see which mention to drop. A shift is marked: `i << 6` and `i * 64` count differently once cse and
+    combine are done with them (WORKER.md)."""
+    ms = ref_mentions(wd, reg)
+    if not ms:
+        return ""
+    lines = uid_lines(wd)
+    pats = {u: r for u, _, r in insn_list(wd, "regmove")}
+    parts = []
+    for u, d in ms:
+        shift = re.search(r"\((?:ashift|ashiftrt|lshiftrt):SI \(reg(?:/\w)*:SI %d\)" % reg, pats.get(u, "")) \
+            or re.search(r"\(set \(reg(?:/\w)*:SI %d\) \((?:ashift|ashiftrt|lshiftrt):" % reg, pats.get(u, ""))
+        parts.append(f"line {lines.get(u, '?')}" + (f" x{d}" if d > 1 else "") + (" in a shift" if shift else ""))
+    return " (counted at " + ", ".join(parts) + ")"
 
 
 def explain_alloc(wd, func, pseudo, want, got, nm, at):
@@ -1516,7 +1533,26 @@ def explain_move2add(wd, uid, row, at):
           " with if/return instead of a plain if)")
 
 
-def cmd_why(src, func, uid, env):
+def pool_load_origin(wd, draft, line):
+    """A constant-pool load born in the final pass (`ldr rN, =X`) is final's copy of an insn that loaded rN
+    from the pool before then; return that insn's uid (same constant, nearest C line)."""
+    m = re.match(r"ldr r(\d+), =(0x[0-9A-Fa-f]+|\d+)", draft or "")
+    if not m:
+        return None
+    n, value = int(m.group(1)), int(m.group(2), 0)
+    lines = uid_lines(wd)
+    cands = []
+    for u, _, r in insn_list(wd, "greg"):
+        if not re.search(r"\(set \(reg(?:/\w)*:SI %d r%d\) \(mem/u:SI \(symbol_ref/u:SI" % (n, n), r):
+            continue
+        c = re.search(r"REG_EQU(?:IV|AL) \(const_int (-?\d+)", r)
+        if c and int(c.group(1)) & 0xFFFFFFFF != value:
+            continue
+        cands.append(u)
+    return min(cands, key=lambda u: abs((lines.get(u) or 0) - (line or 0))) if cands else None
+
+
+def cmd_why(src, func, uid, env, via=None):
     import contextlib
     import io
     env = dict(env, CSE_WHY=str(uid), CSE_DEBUG="1", CSE_PATHS="1")
@@ -1540,7 +1576,13 @@ def cmd_why(src, func, uid, env):
 
     alloc_diffs = []
     rows = json.load(open(os.path.join(wd, "diff.json")))
-    row = next((r for r in rows if r["uid"] == uid), None)
+    row = via or next((r for r in rows if r["uid"] == uid), None)
+    if row and not via and uid not in {u for u, _, _ in insn_list(wd, "greg")}:
+        v = pool_load_origin(wd, row["draft"], lines.get(uid))
+        if v:
+            print(f"insn {uid} ({row['draft']}) is the final pass's copy of insn {v}, which loads the same"
+                  f" constant before reload; explaining {v}:")
+            return cmd_why(src, func, v, env, dict(row, uid=v))
     ln = lines.get(uid)
     code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
     print(f"why insn {uid}  line {ln}: {code}")
