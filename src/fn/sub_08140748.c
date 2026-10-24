@@ -1,14 +1,7 @@
 #include "global.h"
 #include "player.h"
 
-// fix.py best version (reprinted C)
-// Timer-address constant reuse and mask-load order still differ.
 s32 Math_Atan2(s32, s32);
-static inline s32 Player_QuantizeTerrainFacing(u16 angle)
-{
-    return ((((angle + 0x60) >> 6) & 3) * 2) + 1;
-}
-
 s32 Player_BeginTerrainFacingAction(struct Player *p)
 {
     u32 direction;
