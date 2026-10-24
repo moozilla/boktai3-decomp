@@ -4,6 +4,7 @@
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
   scope.py FILE.c spill         is the whole difference reload's spill rotation? (searches AGBCC_SPILL)
+  scope.py FILE.c why all       why on the first differing insn of each hunk
   scope.py FILE.c why UID       why insn UID has the operands it has: pass by pass, and for cse the
                                 equivalence class and the canonical-register decision, with C lines
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
@@ -338,7 +339,7 @@ def born_passes(wd):
         if not os.path.exists(path):
             continue
         text = open(path).read()
-        for m in re.finditer(r"^\((?:insn|jump_insn|call_insn) (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
+        for m in re.finditer(r"^\((?:insn|jump_insn|call_insn)(?:/\w)* (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
             u = int(m.group(1))
             if u not in born:
                 born[u] = (p, one_line(m.group(0)))
@@ -347,7 +348,7 @@ def born_passes(wd):
 
 def one_line(rtl):
     rtl = re.sub(r"\(insn_list.*|\(expr_list.*", "", rtl, flags=re.S)
-    rtl = re.sub(r"^\((?:insn|jump_insn|call_insn) \d+ \d+ \d+ ", "", rtl)
+    rtl = re.sub(r"^\((?:insn|jump_insn|call_insn)(?:/\w)* \d+ \d+ \d+ ", "", rtl)
     rtl = re.sub(r"\s+", " ", rtl).strip()
     rtl = re.sub(r"( \(nil\))+\)?$", "", rtl)
     return re.sub(r" (\d+ \{[^}]*\}|-1)$", "", rtl)
@@ -481,7 +482,7 @@ def cmd_insn(uid, func):
         if not os.path.exists(path):
             continue
         text = open(path).read()
-        m = re.search(r"^\((?:insn|jump_insn|call_insn) " + str(uid) + r" .*?(?=^\(|\Z)", text, re.S | re.M)
+        m = re.search(r"^\((?:insn|jump_insn|call_insn)(?:/\w)* " + str(uid) + r" .*?(?=^\(|\Z)", text, re.S | re.M)
         cur = one_line(m.group(0)) if m else None
         if cur != last:
             print(f"  {PASS_NOTE.get(p, p):12} {cur if cur else '(gone)'}")
@@ -503,7 +504,7 @@ def cmd_uses(regs, func, passes):
                 if m:
                     line = int(m.group(1))
                     continue
-                m = re.match(r"\((?:insn|jump_insn|call_insn) (\d+)", blk)
+                m = re.match(r"\((?:insn|jump_insn|call_insn)(?:/\w)* (\d+)", blk)
                 if m and re.search(r"\(reg(?:/[a-z]+)*:\w+ %d\)" % reg, blk):
                     out.append(f"{m.group(1)}@{line}")
             print(f"  after {p:8} {' '.join(out) or '(none)'}")
@@ -539,7 +540,7 @@ def uid_lines(wd):
             if m:
                 line = int(m.group(1))
                 continue
-            m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note) (\d+)", blk)
+            m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note)(?:/\w)* (\d+)", blk)
             if m:
                 out.setdefault(int(m.group(1)), line)
     return out
@@ -603,7 +604,7 @@ def insn_list(wd, p):
     if not os.path.exists(path):
         return []
     return [(int(m.group(2)), m.group(1), one_line(m.group(0)))
-            for m in re.finditer(r"^\((insn|jump_insn|call_insn) (\d+) .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)]
+            for m in re.finditer(r"^\((insn|jump_insn|call_insn)(?:/\w)* (\d+) .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)]
 
 
 def hard_of(wd):
@@ -757,6 +758,30 @@ def cmd_spill(src, func, env):
     return 0
 
 
+def cmd_why_all(src, func, env):
+    """why for the first differing insn (with a uid) of each hunk, up to 8."""
+    n, info = score(src, func, env)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    picks, last = [], -10
+    for i, r in enumerate(rows):
+        if r["tag"] == "=":
+            continue
+        if i - last > 4:  # a new hunk (same rule as the diff view)
+            picks.append(None)
+        last = i
+        if picks[-1] is None and r["uid"] and r["tag"] != "→":  # a branch that only lands elsewhere is no cause
+            picks[-1] = r["uid"]
+    picks = [u for u in picks if u][:8]
+    print(f"{func}: {n} differing insns; why on the first of each hunk: {', '.join(map(str, picks))}\n")
+    for u in picks:
+        cmd_why(src, func, u, env)
+        print()
+    return 1
+
+
 def cmd_why(src, func, uid, env):
     import contextlib
     import io
@@ -803,7 +828,7 @@ def cmd_why(src, func, uid, env):
         path = os.path.join(wd, "u.i." + p)
         if not os.path.exists(path):
             continue
-        m = re.search(r"^\((?:insn|jump_insn|call_insn) " + str(uid) + r" .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)
+        m = re.search(r"^\((?:insn|jump_insn|call_insn)(?:/\w)* " + str(uid) + r" .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)
         rtl = one_line(m.group(0)) if m else None
         regs = regs_of(rtl)
         if rtl and regs != last:
@@ -811,7 +836,16 @@ def cmd_why(src, func, uid, env):
                 changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
-    print("  registers through the passes: " + "  ->  ".join(trail))
+    if row and row["tag"] == "→":
+        print("  same branch; it lands somewhere else because the code between differs (see the other hunks)")
+    if not trail:
+        print(f"  insn {uid} is in no RTL dump: final emitted it while writing assembly (an output-time"
+              " split or branch), so its cause is the insns around it")
+    else:
+        print("  registers through the passes: " + "  ->  ".join(trail))
+    if row and row["rom"] and row["draft"] and row["rom"].split()[0] != row["draft"].split()[0]:
+        print(f"  this is a shape difference ({row['rom'].split()[0]} vs {row['draft'].split()[0]}), not a"
+              " register choice: compare the RTL (`scope.py insn UID`) with what the ROM implies")
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read())
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
@@ -875,8 +909,11 @@ def cmd_why(src, func, uid, env):
             continue
         rel = reload_records(wd, info["obj_name"])
         order = [u for u, _, _ in insn_list(wd, "greg")]
-        nxt = order[order.index(uid):] if uid in order else []
-        rec = next((r for u in nxt[:4] for r in rel if r[1] == u and r[2] == got), None)
+        nxt = order[order.index(uid):][:4] if uid in order else []
+        if row:  # an insn split after reload (mach) serves the next insns in the listing
+            i = rows.index(row)
+            nxt += [r["uid"] for r in rows[i + 1:i + 4] if r["uid"]]
+        rec = next((r for u in nxt for r in rel if r[1] == u and r[2] == got), None)
         if rec:
             k, u, reg, line, lab = rec
             served = "" if u == uid else f" for {at(u)}"
@@ -926,13 +963,15 @@ def main():
         return cmd_spill(src, func, env)
     if "why" in rest:
         i = rest.index("why")
-        why_uid = int(rest[i + 1])
+        why_uid = -1 if rest[i + 1] == "all" else int(rest[i + 1])
         rest = rest[:i] + rest[i + 2:]
     func = rest[0] if rest else nonmatching_func(src)
     if not func:
         sys.exit("name the function: scope.py FILE.c FUNC")
     os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
     open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
+    if why_uid == -1:
+        return cmd_why_all(src, func, env)
     if why_uid is not None:
         return cmd_why(src, func, why_uid, env)
     t0 = time.time()

@@ -126,6 +126,7 @@ python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented
 python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
 python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
 python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
+python3 tools/scope/scope.py FILE.c why all       why on the first real difference of each hunk (<= 8)
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 ```
 
@@ -238,7 +239,8 @@ steps when it matters: resolve relocations in Python instead of linking
 * `why` has no explainer yet for combine, regmove or gcse changes (it says so),
   and the allocation explainer's "who held the register" scan is linear over
   the pseudo's insn span, not true liveness.
-* `why` on the first differing insn of every hunk, as one report (`why all`).
+* Done: `why all`. It skips branches that only land elsewhere and says when an
+  insn exists only in the final assembly or differs in shape, not registers.
 * The `spill` result is a classification, not a fix: next is a view of what
   makes the ROM's reload count differ (insns needing reloads, by C line).
 * For gcse-born differences, automatically test bucket order with a few
