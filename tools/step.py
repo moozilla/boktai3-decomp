@@ -119,6 +119,17 @@ def vanished(dumps, func, lines):
     return out
 
 
+def dead_stores(dumps, func):
+    """[(uid, rtl as written, source line)] for memory stores that flow.c deleted as dead."""
+    rtl = dumps.get("rtl", {}).get(func, "")
+    out = []
+    for uid, ln in sorted(regdiag.insn_lines(rtl).items()):
+        tr = why.trail(dumps, func, uid)
+        if tr and tr[-1] == ("flow", "(deleted)") and tr[0][1].startswith("(set (mem"):
+            out.append((uid, tr[0][1], ln))
+    return out
+
+
 class Step:
     """The explained differences of one draft: entries sorted first-divergence first.
     Each entry is a dict: rank, idx, kind (order/registers/insert/delete/replace), cand and
@@ -239,6 +250,19 @@ def analyze(src, func=None, nonmatching=False):
             for u, first, p in gone[:3]:
                 evs.append((u, p, "deleted", f"your insn `{first[:70]}` was deleted by {p}: "
                                              + DELETED_BY.get(p, "")))
+        n_str = lambda xs: sum(t.startswith("str") for _, t in xs)
+        if kind in ("insert", "replace") and n_str(orig) > n_str(cand) and not note:
+            gone = dead_stores(dumps, func)
+            near = [an.off_line.get(an.cd[k][0]) for k in (idx - 1, idx) if 0 <= k < len(an.cd)]
+            near = [x for x in near if x]
+            if gone:
+                u, first, ln = min(gone, key=lambda g: min((abs(g[2] - x) for x in near), default=0))
+                note = (f"dead store: the ROM keeps a store that flow.c deleted as dead in yours, insn {u} "
+                        f"`{first[:60]}` ({show(ln)}). flow deletes a store when a later store in the block "
+                        f"writes the same address and nothing between them may read it. agbcc -O2 gives each "
+                        f"type an alias set: a read of another type (a pointer field read into a u32) never "
+                        f"aliases, so the original's read between the two stores had the stored type: "
+                        f"`*(u32 *)&x->f`, or the field declared that type.")
         rank = min([PASS_RANK.get(e[1], 99) for e in evs] or [PASS_RANK["greg"] + (kind == "registers")])
         # shape differences in code order, then register-only ones (usually consequences)
         rank = 100 if kind == "registers" else 0
@@ -302,7 +326,7 @@ def render(st, e, title, trails=2):
         out.append(f"   {e['note']}")
     if e["kind"] == "order":
         pass
-    elif e["note"] and e["note"].startswith("call result"):
+    elif e["note"] and e["note"].startswith(("call result", "dead store")):
         pass
     elif e["evs"]:
         for u, p, k, text in sorted(e["evs"], key=lambda x: PASS_RANK.get(x[1], 99)):

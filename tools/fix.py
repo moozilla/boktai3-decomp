@@ -179,7 +179,7 @@ def decision(path, func):
     e = st.entries[0]
     keys = []
     note = e["note"] or ""
-    for k in ("frame", "call result", "comparison type", "order"):
+    for k in ("frame", "call result", "comparison type", "order", "dead store"):
         if note.startswith(k) or e["kind"] == k:
             keys.append(k)
     keys += [t for t in hint.topics_for(st, e) if t not in keys]
@@ -264,6 +264,10 @@ def cse_probe(path):
         reg = m.group(1)
         return (f"CSE makes pseudo {reg} a canonical register (rtlprobe.py canon: CSE_NOCANON={reg} matches); "
                 f"make the ROM-side value live longer, or keep the copy into {reg} inside one block")
+    r = subprocess.run([sys.executable, probe, "alias", path, "-j", "2"], capture_output=True, text=True, cwd=ROOT)
+    if "no alias sets" in r.stdout and "MATCH" in r.stdout.split("no alias sets")[1].split("\n")[0]:
+        return ("a type-based alias decision (rtlprobe.py alias: AGBCC_NOSTRICT=1 matches): two accesses of "
+                "different types that the original made the same type (sp_alias_read, or the field's type)")
     r = subprocess.run([sys.executable, probe, "follow", path, "-j", "2"], capture_output=True, text=True, cwd=ROOT)
     m = re.search(r"CSE_NOFOLLOW=(\d+):.*MATCH\n\s*jump at line (\d+): (.*)", r.stdout)
     if m:

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.9%
+// twin.py transplant from a matched near-clone
 // fix.py best version (reprinted C)
 // Remaining differences: random-table constant registers (0xFFFF0000/0xFFFC/3/0x3FF),
 // the collider pointer copy in the disabled-collider branch, and the resulting branch reach.
@@ -128,6 +128,95 @@ static inline void DragonPuppy_StepAnimation(u8 *p, void *sprite, struct FanSeq 
         }
     }
 }
+static inline void DragonPuppy_StepAnimation_UpdateCombat(u8 *p, void *sprite, struct FanSeq *s)
+{
+    u32 flags;
+    u32 elapsed;
+    u32 duration;
+    register u32 mask asm("r6");
+    register u32 savedDuration asm("r4");
+    const volatile u16 *c = s->commands + s->index;
+    *(u16 *)((u8 *)sprite + 0x10) = *c >> 6;
+    {
+        u32 input = s->flags, bit = 1;
+        register u32 first asm("r2");
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != (((*c & 0x30) >> 4) & bit))
+            *(u32 *)(p + 0x24) |= 4;
+        else
+            *(u32 *)(p + 0x24) &= ~4;
+    }
+    {
+        u32 input = s->flags, bit = 2;
+        register u32 first asm("r2");
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*c & 0x30) >> 4) & bit))
+            *(u32 *)sprite |= 8;
+        else
+            *(u32 *)sprite &= ~8;
+    }
+    elapsed = s->elapsed + 1;
+    s->elapsed = elapsed;
+    {
+        register u32 temp asm("r2") = 0xffff;
+        asm("" : "+r"(temp));
+        mask = temp;
+    }
+    duration = s->duration;
+    elapsed = (u16)elapsed;
+    savedDuration = duration;
+    asm("" : "+r"(savedDuration) : "r"(elapsed));
+    if ((u16)elapsed >= duration) {
+        s->elapsed = 0;
+        flags = s->flags;
+        if (flags & 4) {
+            u32 i = s->index;
+            if (!i) {
+                {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold)
+                        s->elapsed = savedDuration;
+                    else
+                        s->index = s->count - 1;
+                }
+            } else
+                s->index = i - 1;
+        } else {
+            u32 i = s->index + 1, n;
+            s->index = i;
+            n = s->count;
+            if ((i & mask) >= n) {
+                {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if ((u8)hold) {
+                        s->elapsed = duration;
+                        s->index = n - 1;
+                    } else
+                        s->index = 0;
+                }
+            }
+        }
+        c = s->commands + s->index;
+        s->weight = *c & 15;
+        {
+            register s32 w asm("r2") = s->weight;
+            s32 speed = s->speed;
+            speed = (speed * w) >> 6;
+            s->duration = speed;
+            if (!(u8)speed)
+                s->duration = 1;
+        }
+    }
+}
+
 s32 DragonPuppy_UpdateCombat(u8 *p)
 {
     struct SceneVec position;
@@ -148,8 +237,8 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
     if ((*((s16 *)(p + 0x12e))) == 0) {
         collider = (void *)(p + 0x6c);
         {
-            u16 f = collider->flags;
-            collider->flags = 0xfffb & f;
+            register u32 flags asm("r1") = collider->flags;
+            collider->flags = 0xfffb & flags;
         }
         Collider_SetPosition(collider, p + 0x40, 0);
     } else {
@@ -230,10 +319,11 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
     }
     {
         register void *sprite asm("r8") = p + 0x24;
-        DragonPuppy_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
+        DragonPuppy_StepAnimation_UpdateCombat(p, sprite, (struct FanSeq *)(p + 0x10c));
     }
     (*((u32 *)(p + 0x18)))++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", DragonPuppy_UpdateCombat);
 #endif

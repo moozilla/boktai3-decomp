@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 98.6%
+// fix.py best after the inlined-insn fix
 // Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
@@ -116,11 +116,17 @@ inline static void polar_2(u8 a1, struct Vec *a0, int a2)
 {
     polar(a0, a1, a2);
 }
+inline static void polar_2_1(s16 a1, struct Vec *a0)
+{
+    polar(a0, a1, 180);
+}
+
 void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
     int new_var;
     u8 params[0x58];
-    struct Vec delta, spawn;
+    struct Vec delta;
+    struct Vec spawn;
     s16 k2;
     unsigned char new_var2;
     struct Actor *p2 = p;
@@ -140,6 +146,7 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 p2->phase++;
             }
             break;
+
         case 1:
             if (tick > 33) {
                 SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 19, 1, 4,
@@ -147,6 +154,7 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 p2->phase++;
             }
             break;
+
         case 2:
             if (tick > 36) {
                 SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 20, 1, 4,
@@ -154,6 +162,7 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 p2->phase++;
             }
             break;
+
         case 3:
             if (tick > 42) {
                 struct Vec *target = Player_GetEffectivePosition(0);
@@ -165,15 +174,15 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 new_var = 16;
                 if (difference > 128)
                     difference = 255 - difference;
-                else if (difference < -128)
+                else if (difference < (-128))
                     difference += 255;
                 if (difference > 32)
                     angle = facingAngle - (k2 = 32);
-                else if (difference < -32) {
+                else if (difference < (-32)) {
                     angle = 32;
                     angle |= facingAngle;
                 }
-                polar_2((u8)((p->facing << 6) - 64), &delta, 180);
+                polar_2_1((u8)((p->facing << 6) - 64), &delta);
                 sum(&spawn, &delta, &p2->anchor);
                 spawn.y += 200;
                 angle -= new_var;
@@ -190,18 +199,20 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                         Projectile_SetBehaviorMode(params, 1);
                         Projectile_SpawnAtPosition(params, spawnPtr);
                         angle += new_var;
-                    } while (--i >= 0);
+                    } while ((--i) >= 0);
                 }
                 p2->phase++;
             }
             break;
+
         case 4:
-            if (SceneProjectile_ConsumeHitEvent() && p2->hitTimer == 0) {
+            if (SceneProjectile_ConsumeHitEvent() && (p2->hitTimer == 0)) {
                 p2->hitTimer = 120;
                 p->finished = 1;
             }
             break;
     }
+
     if (tick > 119) {
         p2->phase = 0;
         p->finished = 1;
