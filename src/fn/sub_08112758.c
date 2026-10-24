@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.4%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
 struct MessagePanel {
     u8 pad0[0x20];
@@ -39,9 +39,13 @@ void sub_08112508(void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
 {
-    s32 i, value, found, zero;
+    s32 i;
+    s32 value;
+    s32 found;
+    s32 zero;
     void (**callback)(void *);
-    u8 *entering, *state;
+    u8 *entering;
+    u8 *state;
     if (Script_SeekToKeyword(0x6E)) {
         p->script = Script_GetPc();
         if (!p->script)
@@ -55,7 +59,7 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     found = Script_SeekToKeyword(0x62);
     callback = &p->callback;
     entering = &p->entering;
-    state = (u8 *)((u32)p + 0x11C8);
+    state = (u8 *)(((u32)p) + 0x11C8);
     if (found) {
         value = Script_GetValueSafe();
         if (!value) {
@@ -64,15 +68,15 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
             i = 11;
             q = &p->parameters[11];
             do {
-                *q-- = initial;
-            } while (--i >= 0);
+                *(q--) = initial;
+            } while ((--i) >= 0);
         } else {
             Script_SetPc(value);
             for (i = 0; i <= 10; i++) {
                 value = Script_GetValue();
                 if (value < 0)
                     break;
-                *(s32 *)((u32)p + 0x11D8 + (i << 2)) = value;
+                *((s32 *)((((u32)p) + 0x11D8) + (i << 2))) = value;
             }
         }
     }
@@ -86,17 +90,18 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     MessagePanel_InitSprites(p);
     StageResults_InitPortraitDisplay(p);
     StageResults_InitCursorPositions(p);
-    ModifierMenu_InitSelectionSnapshot((u8 *)p + 0x944, p->palette);
+    ModifierMenu_InitSelectionSnapshot(((u8 *)p) + 0x944, p->palette);
     StageResults_CreateTextWindows(p);
     StageResults_ShowSummaryText(p);
     zero = 0;
-    *callback = sub_08112508;
+    *(&p->callback) = sub_08112508;
     *entering = 1;
     *state = zero;
     if (Script_GetKeywordValue(0x66, 0))
         ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", MessagePanel_ConfigureFromScript);
 #endif

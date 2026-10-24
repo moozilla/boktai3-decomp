@@ -3,7 +3,7 @@
 // confidence=low: disables contact and sequences bursts before recording a defeat event.
 #define Ivy_UpdateDefeatBurst sub_080F421C
 #ifdef NONMATCHING
-// fuzzy: 68.7%
+// fix.py best (sweep after the inlined-insn fix)
 // Complete defeat flow; child-loop induction and local allocation still differ.
 #include "engine.h"
 #include "script_utility.h"
@@ -76,109 +76,122 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
     s32 remainder;
     if (Ivy_TakeBurstStart(actor)) {
         s32 i;
-        struct IvyBurstPart *parts = (void *)((u8 *)actor + 0xA8);
+        struct IvyBurstPart *parts = (void *)(((u8 *)actor) + 0xA8);
         u8 *head = ((u8 *)actor) + 0x5D5;
         u8 *child = ((u8 *)actor) + 0x5AC;
         for (i = 0; i <= 3; i++, head += 0x194, child += 0x194) {
-            if (((u8 *)actor)[0x5DA + i * 0x194]) {
+            if (((u8 *)actor)[0x5DA + (i * 0x194)]) {
                 head[5] = 1;
                 head[6] = 5;
-                head[0] |= 1;
-                *(void **)(child + 0x74) = TargetMotion_UpdateFlashingExit;
+                {
+                    u8 k1 = 1;
+                    head[0] |= k1;
+                }
+                *((void **)(child + 0x74)) = TargetMotion_UpdateFlashingExit;
             }
         }
+
         for (i = 0; i <= 3; i++) {
             u32 *flags;
             asm("" : "+r"(i));
             flags = &parts[i].flags;
-            if (!(*flags & 1)) {
+            if (!((*flags) & 1)) {
                 *flags |= 1;
-                *(u16 *)(((u8 *)actor) + 0x1CE + i * 0x54) |= 4;
-                *(u16 *)(((u8 *)actor) + 0x31E + i * 0x54) |= 4;
+                *((u16 *)((((u8 *)actor) + 0x1CE) + (i * 0x54))) |= 4;
+                *((u16 *)((((u8 *)actor) + 0x31E) + (i * 0x54))) |= 4;
             }
         }
-        *(u16 *)(((u8 *)actor) + 0xC22) |= 4;
-        *(u16 *)(((u8 *)actor) + 0xC76) |= 4;
-        *(u16 *)(((u8 *)actor) + 0xD2E) = 0;
+
+        *((u16 *)(((u8 *)actor) + 0xC22)) |= 4;
+        *((u16 *)(((u8 *)actor) + 0xC76)) |= 4;
+        *((u16 *)(((u8 *)actor) + 0xD2E)) = 0;
         ((u8 *)actor)[0xD5F] = 0;
         actor->flash = 0;
         actor->bursts = 30;
         sub_08159164(actor->lifeValue);
-        Player_RefreshLifeState(*(void **)(((u8 *)actor) + 0xD60), actor->lifeParameter);
+        Player_RefreshLifeState(*((void **)(((u8 *)actor) + 0xD60)), actor->lifeParameter);
         ((u8 *)actor)[0xD54] = 1;
     }
-    if (*(void **)(((u8 *)actor) + 0xCF0))
-        Callback_InvokeActor(actor, *(void **)(((u8 *)actor) + 0xCF0));
-    remainder = Mod(*(u16 *)(((u8 *)actor) + 0xD2E), 2);
+    if (*((void **)(((u8 *)actor) + 0xCF0)))
+        Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0xCF0)));
+    remainder = Mod(*((u16 *)(((u8 *)actor) + 0xD2E)), 2);
     if (remainder == 0) {
-        struct IvyBurstVector range, position;
+        struct IvyBurstVector range;
+        struct IvyBurstVector position;
         struct SceneVec offset;
         u32 zero;
-        *(u32 *)(((u8 *)actor) + 0xB68) |= 1;
+        *((u32 *)(((u8 *)actor) + 0xB68)) |= 1;
         actor->flash = 0;
         actor->bursts--;
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        position = *(struct IvyBurstVector *)(((u8 *)actor) + 0xB84);
+        position = *((struct IvyBurstVector *)(((u8 *)actor) + 0xB84));
         zero = remainder;
         CpuSet(&zero, &offset, 0x05000002);
         switch (((u8 *)actor)[0xD5F]) {
             case 0:
-                offset.z = offset.x = -120;
+                offset.z = (offset.x = -120);
                 ((u8 *)actor)[0xD5F]++;
                 Sound_PlaySong(366);
                 break;
+
             case 1:
-                offset.z = offset.x = -75;
+                offset.z = (offset.x = -75);
                 ((u8 *)actor)[0xD5F]++;
                 break;
+
             case 2:
-                offset.z = offset.x = -30;
+                offset.z = (offset.x = -30);
                 ((u8 *)actor)[0xD5F]++;
                 break;
+
             case 3:
-                offset.z = offset.x = 15;
+                offset.z = (offset.x = 15);
                 ((u8 *)actor)[0xD5F]++;
                 break;
+
             case 4:
-                offset.z = offset.x = 60;
+                offset.z = (offset.x = 60);
                 ((u8 *)actor)[0xD5F] = 0;
                 break;
         }
-        position.x = Ivy_ScaleOffset(offset.x * gUnk_086149C4[(((u8 *)actor)[0xB6E] + 64) & 255]) +
-                     Ivy_ScaleOffset(offset.z * gUnk_086149C4[((u8 *)actor)[0xB6E]]) + position.x;
-        position.z = Ivy_ScaleOffset(-(offset.x * gUnk_086149C4[((u8 *)actor)[0xB6E]])) +
-                     Ivy_ScaleOffset(offset.z * gUnk_086149C4[(((u8 *)actor)[0xB6E] + 64) & 255]) +
-                     position.z;
+
+        position.x = (Ivy_ScaleOffset(offset.x * gUnk_086149C4[(((u8 *)actor)[0xB6E] + 64) & 255]) +
+                      Ivy_ScaleOffset(offset.z * gUnk_086149C4[((u8 *)actor)[0xB6E]])) +
+                     position.x;
+        position.z =
+            (Ivy_ScaleOffset(-(offset.x * gUnk_086149C4[((u8 *)actor)[0xB6E]])) +
+             Ivy_ScaleOffset(offset.z * gUnk_086149C4[(((u8 *)actor)[0xB6E] + 64) & 255])) +
+            position.z;
         SparkParticle_Spawn(&position, 2, &range, 0, 0, 22, 2, 1);
         if (!actor->bursts) {
             ScaledShadow_Disable(((u8 *)actor) + 0xBB0);
             actor->state = 0;
             actor->phase = 0;
             actor->flags |= 1;
-            if (actor->scene->mode != 4 && *(u32 *)(((u8 *)actor) + 0xD6C)) {
+            if ((actor->scene->mode != 4) && (*((u32 *)(((u8 *)actor) + 0xD6C)))) {
                 s32 values[8];
                 struct ScriptUtilityArguments arguments;
-                values[0] = *(s16 *)(((u8 *)actor) + 0xB84);
-                values[1] = *(s16 *)(((u8 *)actor) + 0xB86);
-                values[2] = *(s16 *)(((u8 *)actor) + 0xB88);
-                values[3] = *(s32 *)(((u8 *)actor) + 0xD70);
-                values[4] = *(s32 *)(((u8 *)actor) + 0xD74);
+                values[0] = *((s16 *)(((u8 *)actor) + 0xB84));
+                values[1] = *((s16 *)(((u8 *)actor) + 0xB86));
+                values[2] = *((s16 *)(((u8 *)actor) + 0xB88));
+                values[3] = *((s32 *)(((u8 *)actor) + 0xD70));
+                values[4] = *((s32 *)(((u8 *)actor) + 0xD74));
                 values[5] = -1;
                 values[6] = -1;
                 values[7] = -1;
                 arguments.count = 8;
                 arguments.values = values;
-                Script_Call(*(u32 *)(((u8 *)actor) + 0xD6C), &arguments);
+                Script_Call(*((u32 *)(((u8 *)actor) + 0xD6C)), &arguments);
                 GameState_SetEventFlag(BestiaryDisplay_GetEntryForActor(11, ((u8 *)actor)[0xD55]));
             }
         }
     } else {
-        *(u32 *)(((u8 *)actor) + 0xB68) &= ~1;
+        *((u32 *)(((u8 *)actor) + 0xB68)) &= ~1;
         actor->flash++;
     }
-    (*(u16 *)(((u8 *)actor) + 0xD2E))++;
+    (*((u16 *)(((u8 *)actor) + 0xD2E)))++;
 }
 
 #else

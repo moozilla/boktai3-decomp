@@ -54,7 +54,7 @@ struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 #ifdef NONMATCHING
-// fuzzy: 81.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Loop pointer lifetimes, stack allocation, and some inline arithmetic still differ.
 static inline s32 Random(u16 *table, u32 *rng)
 {
@@ -90,9 +90,14 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
     struct Group *g;
     struct Group *pool;
     u32 *rng;
-    s32 priority, j, halfRange, palette, angleOffset;
+    s32 priority;
+    s32 j;
+    s32 halfRange;
+    s32 palette;
+    s32 angleOffset;
     s32 i;
     u8 *resource;
+    typeof(i) c1;
     if (!m) {
         m = ParticleManager_Create(0, 0);
         if (!m)
@@ -104,10 +109,10 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
         count = 8;
     if (options <= 20) {
         resource = m->small;
-        palette = *(u16 *)(resource + 6);
+        palette = *((u16 *)(resource + 6));
     } else {
         resource = m->large;
-        palette = *(u16 *)(resource + 6) + 1;
+        palette = (*((u16 *)(resource + 6))) + 1;
     }
     halfRange = angleRange >> 1;
     j = 0;
@@ -118,8 +123,8 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
     for (; j < 6; g++, pool++, j++) {
         if (!g->active) {
             g->active = 1;
-            g->type = *(u8 *)&options;
-            g->count = *(u8 *)&count;
+            g->type = *((u8 *)(&options));
+            g->count = *((u8 *)(&count));
             if (priority > 0)
                 g->priority = priority - 1;
             else {
@@ -127,17 +132,18 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
             }
             i = 0;
             if (i < count) {
-                u16 *table = gUnk_0203B400;
-                register struct Vec *vector asm("sb") = (void *)((u8 *)pool + 12);
+                u16 *table = (u16 *)0x0203B400;
+                register struct Vec *vector asm("sb") = (void *)(((u8 *)pool) + 12);
                 struct Particle *p;
                 u8 *sprite;
                 asm("" : "+r"(vector));
                 p = pool->particles;
-                sprite = (u8 *)pool + 20;
+                sprite = ((u8 *)pool) + 20;
                 asm("" : "+r"(table));
                 angleOffset = (angle & 255) * 2;
                 i = count;
-                asm("" : "+r"(i));
+                c1 = i;
+                asm("" : "+r"(c1));
                 do {
                     p->active = 1;
                     p->pad = 1;
@@ -155,13 +161,13 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
                         if (angleRange) {
                             s32 r = Random(table, rng);
                             s32 offset = Mod(r, angleRange);
-                            Direction(vector, angle - halfRange + offset, magnitude);
+                            Direction(vector, (angle - halfRange) + offset, magnitude);
                         } else {
                             struct Vec *out = vector;
                             asm("" : "+r"(out));
                             out->x = FixedMultiply(gUnk_086149C4[(angle + 64) & 255], magnitude);
                             out->y = 0;
-                            out->z = FixedMultiply(*(s16 *)((u8 *)gUnk_086149C4 + angleOffset),
+                            out->z = FixedMultiply(*((s16 *)(((u8 *)gUnk_086149C4) + angleOffset)),
                                                    magnitude);
                         }
                     }
@@ -177,22 +183,22 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
                     ClearFlag(&p->flags, 1);
                     {
                         struct Vec *source = position;
-                        u32 a = *(u32 *)source;
-                        u32 b = *((u32 *)source + 1);
-                        *(u32 *)&p->position = a;
-                        *((u32 *)&p->position + 1) = b;
+                        u32 a = *((u32 *)source);
+                        u32 b = *(((u32 *)source) + 1);
+                        *((u32 *)(&p->position)) = a;
+                        *(((u32 *)(&p->position)) + 1) = b;
                     }
                     p->palette = palette;
-                    p->tile = *(u16 *)(resource + 4) + gUnk_08604B90[options];
+                    p->tile = (*((u16 *)(resource + 4))) + gUnk_08604B90[options];
                     p->priority = g->priority;
                     sub_08217E40(sprite, 0);
                     vector++;
-                    vector = (void *)((u8 *)vector + 48);
+                    vector = (void *)(((u8 *)vector) + 48);
                     asm("" : "+r"(vector));
                     p++;
                     sprite += 56;
-                    asm("" : "+r"(i));
-                } while (--i);
+                    asm("" : "+r"(c1));
+                } while (--c1);
                 i = count;
             }
             if (i < 8) {
@@ -207,6 +213,7 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
             break;
         }
     }
+
     return 0;
 }
 

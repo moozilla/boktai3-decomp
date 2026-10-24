@@ -2,7 +2,7 @@
 #include "directional_particles.h"
 
 #ifdef NONMATCHING
-// fuzzy: 68.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern u32 gUnk_03005308;
 s32 DirectionalParticle_Update(void *, struct DirectionalParticle *);
@@ -29,6 +29,7 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     u16 randomIndex;
     typeof(motion) c1;
     typeof(point) c2;
+    typeof(point) c3;
     if (!particle)
         return -1;
     motion = &particle->motion;
@@ -39,16 +40,23 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     c1->velocity.y = 0;
     motion->velocity.z = scaleVelocity(gUnk_086149C4[direction & 255] * speed);
     point = &position;
-    c2 = point;
-    asm("" : "+r"(point));
+    c3 = point;
+    c2 = c3;
+    asm("" : "+r"(c3));
     *c2 = *source->position;
     randomIndex = (gUnk_03005308 + 1) & 1023;
     c2->x = (c2->x - 64) + (((const u16 *)0x0203B400)[randomIndex] & 127);
     randomIndex = (randomIndex + 1) & 1023;
-    point->y = (point->y + 16) + (((const u16 *)0x0203B400)[randomIndex] & 31);
+    {
+        typeof(((const u16 *)0x0203B400)[randomIndex]) v2 = ((const u16 *)0x0203B400)[randomIndex];
+        c3->y = (c3->y + 16) + (v2 & 31);
+    }
     randomIndex = (randomIndex + 1) & 1023;
     gUnk_03005308 = randomIndex;
-    point->z = (point->z - 64) + (((const u16 *)0x0203B400)[randomIndex] & 127);
+    {
+        typeof(((const u16 *)0x0203B400)[randomIndex]) v1 = ((const u16 *)0x0203B400)[randomIndex];
+        c3->z = (c3->z - 64) + (v1 & 127);
+    }
     particle->visible = 1;
     SpritePool_SetResource(particle, 0x4147);
     SpritePool_SetFrame(particle, frame);
@@ -57,6 +65,7 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     SpritePool_Activate(particle, (void *)DirectionalParticle_Update, source);
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", DirectionalParticle_Spawn);
 #endif

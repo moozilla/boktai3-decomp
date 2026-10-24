@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 66.9%
+// fix.py best (sweep after the inlined-insn fix)
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
@@ -18,7 +18,8 @@ static inline u32 nextRandom(void)
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
-    struct ContactPosition *destination, *position;
+    struct ContactPosition *destination;
+    struct ContactPosition *position;
     if (slot->enter) {
         slot->enter = 0;
         destination = &slot->destination;
@@ -92,9 +93,13 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         struct ContactPosition *write = &delta;
         u32 direction = slot->direction;
         u32 speed = slot->speed;
-        write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
-        write->y = 0;
-        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
+        {
+            typeof(write->x) *q1 = &write->x;
+            u8 z1 = 0;
+            *q1 = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+            write->y = z1;
+            write->z = truncateShift12(gUnk_086149C4[direction] * speed);
+        }
     }
     {
         const struct ContactPosition *read = &delta;
@@ -108,14 +113,14 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     {
         s32 dx = slot->destination.x - slot->position.x;
         s32 dz = destination->z - position->z;
-        if (dx * dx + dz * dz <= 16383) {
+        if (((dx * dx) + (dz * dz)) <= 16383) {
             slot->state = 2;
             slot->enter = 1;
             slot->stateFrame = 0;
         } else {
-            if (slot->retargetTimer && !--slot->retargetTimer) {
+            if (slot->retargetTimer && (!(--slot->retargetTimer))) {
                 if (pool->mode == 2)
-                    slot->targetIndex = index > 7 ? 0 : 1;
+                    slot->targetIndex = (index > 7) ? (0) : (1);
                 else if (pool->mode == 1)
                     slot->targetIndex = 0;
                 else

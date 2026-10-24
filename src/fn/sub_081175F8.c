@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 76.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Motion-pointer lifetimes and register allocation still differ.
 struct Obj {
@@ -98,6 +98,7 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
     s32 dz;
     u32 a;
     u32 b;
+    typeof(dx) t1;
     if (p->active) {
         p->active = 0;
         p->launchPhase = 0;
@@ -154,7 +155,7 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
         self->outX = (h + self->x) - self->prevX;
         self->outY = self->y + self->dy;
         self->outZ = self->vz + self->dz;
-        dx = (self->x - self->prevX) >> 12;
+        dx = (t1 = (self->x - self->prevX) >> 12);
         dz = (self->z - self->prevZ) >> 12;
         lim = 0x3000;
         px = &self->x;
@@ -164,7 +165,7 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
         pvz = &self->vz;
         if (h > lim)
             dx = 0x80;
-        if ((dx == 0) && (dz == 0))
+        if ((t1 == 0) && (dz == 0))
             self->angle = 0xFFFF;
         else
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
@@ -198,6 +199,7 @@ void Glove_UpdateLaunchSlowdown(struct Glove *p)
     CharacterModel_UpdateAccessoryAnimations(p->model);
     p->timer++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081175F8);
 #endif

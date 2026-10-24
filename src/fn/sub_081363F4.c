@@ -178,11 +178,16 @@ static inline u8 HasPendingHitSave(struct SceneActorRegistryResetView *actor, u1
 }
 
 #ifdef NONMATCHING
-// fuzzy: 81.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Full reconstruction; route reset, shared hit flags, HUD argument ordering and pointer lifetimes still differ.
+inline static u32 Arg1(u32 k_, u16 *flags2D4)
+{
+    return (*flags2D4) & k_;
+}
+
 u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)actor + 0x3D4;
+    u8 *group = ((u8 *)actor) + 0x3D4;
     u16 *pending;
     u16 *flags2D4;
     u32 *flags2CC;
@@ -206,12 +211,12 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
         flags2D4 = &actor->flags2D4;
         {
             register u32 bit asm("sb") = 0x1000;
-            if (*flags2D4 & bit) {
-                void **node = (void **)((u8 *)actor + 0x45C);
+            if ((*flags2D4) & bit) {
+                void **node = (void **)(((u8 *)actor) + 0x45C);
                 SceneActorContacts_ReleaseNode(*node);
                 asm("" : "+r"(bit));
                 *flags2D4 &= ~bit;
-                *node = NULL;
+                *node = (void *)0;
             }
         }
         UpdateHitFlagsShared(actor, flags2D4, flags2CC);
@@ -223,7 +228,8 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
     if (SceneActorReaction_TryBeginControl29(actor))
         return 1;
     SceneActor_ClearReactionFlags(actor);
-    SceneActorMovement_ProjectProbe(actor, FIELD(actor, 0x174, u16), FIELD(actor, 0x174, u16));
+    SceneActorMovement_ProjectProbe(actor, *((u16 *)(((u8 *)actor) + 0x174)),
+                                    *((u16 *)(((u8 *)actor) + 0x174)));
     SceneActorPlacement_BeginDestinationJump(actor);
     {
         u32 damage = actor->reactionSoundVariant;
@@ -233,42 +239,42 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
     {
         u32 applied = SceneActorReaction_ApplyEscalatingHit(actor);
         flags2D4 = &actor->flags2D4;
-        if (!applied && !(actor->field2D8 & 0x20000)) {
+        if ((!applied) && (!(actor->field2D8 & 0x20000))) {
             u32 bit = 0x20;
-            *flags2D4 = bit | *flags2D4;
+            *flags2D4 = bit | (*flags2D4);
         }
     }
     {
-        u32 bits = *pending & 4;
+        u32 bits = (*pending) & 4;
         mode = 1;
         if (bits)
             mode = 4;
     }
     flags2D8 = &actor->field2D8;
     {
-        u32 blocked = *flags2D8 & 0x20000;
+        u32 blocked = (*flags2D8) & 0x20000;
         flags2CC = &actor->flags2CC;
         collider = &actor->colliderA;
         if (!blocked) {
-            if ((mode & 4) && !(*flags2D4 & 4)) {
+            if ((mode & 4) && (!Arg1(4, flags2D4))) {
                 SceneActorBehavior_PlayReactionSound(actor);
-                FIELD(actor, 0x30C, u16) = 12;
+                *((u16 *)(((u8 *)actor) + 0x30C)) = 12;
             }
             flags2CC = &actor->flags2CC;
             collider = &actor->colliderA;
             if (mode) {
                 u32 show;
-                u16 bank = FIELD(actor, 0x1E2, u16);
+                u16 bank = *((u16 *)(((u8 *)actor) + 0x1E2));
                 if (actor->drawableKind == 0)
-                    AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+                    AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
                 else
-                    FIELD(actor->drawable, 0x68, u8 *) = gUnk_030042E4 + bank * 32;
+                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * 32);
                 {
                     u32 eight = 8;
                     actor->field1E8 = eight;
                 }
                 flags2CC = &actor->flags2CC;
-                if ((mode & 4) && actor->category == 0x19) {
+                if ((mode & 4) && (actor->category == 0x19)) {
                     u32 bit = 0x2000000;
                     *flags2CC |= bit;
                     actor->field1EA = 0x41;
@@ -285,14 +291,14 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
                     u32 buffer[2];
                     register u32 one asm("sb");
                     s32 h = *health;
-                    s32 maxh = FIELD(actor, 0xB0, u16);
-                    s32 kind = FIELD(actor, 0xB2, s16);
-                    s32 param = FIELD(actor, 0x9A, s16);
+                    s32 maxh = *((u16 *)(((u8 *)actor) + 0xB0));
+                    s32 kind = *((s16 *)(((u8 *)actor) + 0xB2));
+                    s32 param = *((s16 *)(((u8 *)actor) + 0x9A));
                     one = 1;
                     asm("" : "+r"(one));
                     SceneHud_SetTimedState(actor->id, h, maxh, kind, mode >> 2, param);
                     Fill(&zero, buffer);
-                    if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
+                    if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                         DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
                                                  &actor->position, buffer, one);
                 }
@@ -301,7 +307,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
     }
     {
         u32 flags = *flags2D4;
-        if ((flags & 0x10) || (*flags2CC & 0x200))
+        if ((flags & 0x10) || ((*flags2CC) & 0x200))
             actor->fieldAA = 0;
         else if (flags & 6) {
             s32 current = (s16)actor->fieldAA;
@@ -311,7 +317,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
         }
     }
     {
-        u32 keep = *flags2CC & 0x80;
+        u32 keep = (*flags2CC) & 0x80;
         u8 *control = group + 0x4C;
         *flags2CC &= 0xFFFEBE3F;
         ResetMotion(control);
@@ -322,12 +328,13 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
     SceneActorTerrain_ClearCollisionTimers(actor);
     if (Test(actor->flags2C0, 0x40))
         collider->flags &= ~0x100;
-    else if ((actor->field2DC & 0x84000) || (*flags2D4 & 0x2016))
+    else if ((actor->field2DC & 0x84000) || ((*flags2D4) & 0x2016))
         collider->flags &= ~0x100;
     else
         collider->flags |= 0x100;
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081363F4);
 #endif

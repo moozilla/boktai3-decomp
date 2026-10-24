@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 69.3%
+// fix.py best (sweep after the inlined-insn fix)
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: contact healing updates health feedback and selects a recovery phase.
 #define SceneActorControl_ApplyRecoveryContact sub_08082648
@@ -122,49 +122,50 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     a = input;
     if (Unavailable(a))
         return;
-    if (!Unavailable(input) && (hit->kind & 15)) {
-        input->field304 = *(u16 *)((u8 *)hit + 4);
+    if ((!Unavailable(input)) && (hit->kind & 15)) {
+        input->field304 = *((u16 *)(((u8 *)hit) + 4));
         input->flags2D0 &= ~0x1000000;
     }
     Collision_CalculateDamageResponse(source, hit);
     {
-        u32 type = *(u16 *)((u8 *)a + 0x1e6);
-        if ((type == 1 || type - 12 <= 3) && hit->remaining) {
+        u32 type = *((u16 *)(((u8 *)a) + 0x1e6));
+        if (((type == 1) || ((type - 12) <= 3)) && hit->remaining) {
             s32 health = a->health;
             u16 amount = hit->remaining;
-            u16 *maximum = (void *)((u8 *)a + 0xb0);
+            u16 *maximum = (void *)(((u8 *)a) + 0xb0);
             struct ContactCollider *collider;
-            if (health + amount > *maximum) {
+            if ((health + amount) > (*maximum)) {
                 collider = &a->colliderA;
-                *(u16 *)((u8 *)collider + 0x3e) = *maximum - health;
+                *((u16 *)(((u8 *)collider) + 0x3e)) = (*maximum) - health;
                 {
-                    s32 cap = *(s16 *)maximum;
+                    s32 cap = *((s16 *)maximum);
                     if (cap <= 0)
                         cap = 0;
                     a->health = cap;
                 }
             } else {
                 collider = &a->colliderA;
-                *(u16 *)((u8 *)collider + 0x3e) = amount;
+                *((u16 *)(((u8 *)collider) + 0x3e)) = amount;
                 a->health += hit->remaining;
             }
-            a->reactionSoundVariant = *(u16 *)((u8 *)collider + 0x3e);
+            a->reactionSoundVariant = *((u16 *)(((u8 *)collider) + 0x3e));
             if (a->reactionSoundVariant && ShouldShowDamage(a)) {
-                u32 zero, buffer[2];
+                u32 zero;
+                u32 buffer[2];
                 s32 hp = a->health;
                 u32 max = *maximum;
-                s32 kind = *(s16 *)((u8 *)a + 0xb2);
-                s32 param = *(s16 *)((u8 *)a + 0x9a);
+                s32 kind = *((s16 *)(((u8 *)a) + 0xb2));
+                s32 param = *((s16 *)(((u8 *)a) + 0x9a));
                 SceneHud_SetTimedState(a->id, hp, max, kind, 0, param);
                 Fill(&zero, buffer);
-                if (a->reactionSoundVariant || !(a->field2D8 & 0x20000))
+                if (a->reactionSoundVariant || (!(a->field2D8 & 0x20000)))
                     DamageNumberDisplay_Show(collider, a->reactionSoundVariant, 1, &a->position,
                                              buffer, 1);
             }
         }
     }
     {
-        u16 *p = (void *)((u8 *)&a->colliderB + 6);
+        u16 *p = (void *)(((u8 *)(&a->colliderB)) + 6);
         SetHit(p, 4);
     }
     {
@@ -184,8 +185,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         a->flagsEB = bit | a->flagsEB;
         {
             u16 *p = &a->flags2D4;
-            u32 bit = 0x100;
-            *p = bit | *p;
+            *p = 0x100 | (*p);
         }
         Phase(a, 0, 0, 3, zero);
         SceneActorControl_ResetCollisionPhase(a);

@@ -2,7 +2,7 @@
 // confidence=low: settles reaction displacement and restores normal actor control.
 #define SceneActorReaction_SettleDisplacement sub_0808170C
 #ifdef NONMATCHING
-// fuzzy: 73.9%
+// fix.py best (sweep after the inlined-insn fix)
 // Full flow recovered; reset-field and motion-pointer lifetimes still differ.
 #include "scene_actor_chase.h"
 #include "scene_actor_reaction.h"
@@ -79,10 +79,11 @@ static inline u8 Reaction_Test(u32 value, u32 mask)
 }
 void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     s32 counter;
     struct ReactionFollowMotion *follow;
-    s32 x, z;
+    s32 x;
+    s32 z;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 category = actor->category;
         u32 *word;
@@ -95,6 +96,7 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
         original = Reaction_ActorWord(actor, ~0U);
         word = &actor->flags2D0;
+        word = &actor->flags2D0;
         if (!(original & 2)) {
             if (original & 1) {
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 2, category);
@@ -106,45 +108,51 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
                 case 4:
                     Sound_PlaySong(237);
                     break;
+
                 case 1:
                     Sound_PlaySong(254);
                     break;
+
                 case 3:
                     SceneActorPlacement_PlayVariantEventSound((void *)actor, 2);
                     break;
+
                 case 25:
                     Sound_PlaySong(460);
                     break;
+
                 case 5:
+
                 case 6:
+
                 case 7:
                     Sound_PlaySong(316);
                     break;
+
                 case 21:
                     Sound_PlaySong(316);
                     break;
             }
         }
-        word = &actor->flags2D0;
         Reaction_SetMotion(actor, 2, ~0x17A9);
         motion = &actor->flags2D4;
         actor->field2C2 = 64;
-        *(u16 *)((u8 *)actor + 0x414) = 0;
-        *(u16 *)((u8 *)actor + 0x418) = 0;
+        *((u16 *)(((u8 *)actor) + 0x414)) = 0;
+        *((u16 *)(((u8 *)actor) + 0x418)) = 0;
         Reaction_ClearHalf(motion, ~0x380);
-        reaction = (void *)((u8 *)actor + 0xDC);
+        reaction = (void *)(((u8 *)actor) + 0xDC);
         Reaction_ClearMotion(reaction, ~0x18);
-        control = (void *)((u8 *)actor + 0x420);
+        control = (void *)(((u8 *)actor) + 0x420);
         if (Reaction_ActorFlags(actor, 0x200000)) {
             Reaction_ClearWord(word, ~0x1000000);
             Reaction_ClearHalf(motion, ~0x200);
-            *(u8 *)((u8 *)control + 0xA) = 0;
+            *((u8 *)(((u8 *)control) + 0xA)) = 0;
             control->counter = 0;
             control->timer = 0;
         }
         flags = &actor->flags2CC;
         Reaction_ClearHalf(motion, ~0x400);
-        *(u8 *)(group + 0x206) = 255;
+        *((u8 *)(group + 0x206)) = 255;
         Reaction_ClearWord(flags, ~0x80);
         actor->field2C2 = 64;
         Reaction_ClearMotion(reaction, ~0x18);
@@ -152,16 +160,17 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         control = (void *)(group + 0x4C);
         Reaction_ClearWord(flags, ~0x141C0);
         control->counter = 0;
-        *(u16 *)((u8 *)control + 0x14) = 0;
+        *((u16 *)(((u8 *)control) + 0x14)) = 0;
         control->timer = 0;
     }
     if (!actor->drawableKind) {
-        struct ReactionAnimationStatus *status = (void *)((u8 *)actor->drawable + 0x48);
-        if (status->mode == 2 && status->frame == !!status->active && status->active != 1)
+        struct ReactionAnimationStatus *status = (void *)(((u8 *)actor->drawable) + 0x48);
+        if (((status->mode == 2) && (status->frame == (!(!status->active)))) &&
+            (status->active != 1))
             status->frame = 0;
     }
-    counter = *(s16 *)&actor->fieldAA;
-    if ((u32)(counter - 30) <= 89) {
+    counter = *((s16 *)(&actor->fieldAA));
+    if (((u32)(counter - 30)) <= 89) {
         s32 remainder = Mod(counter, 30);
         s32 limit = 15 - Div(counter, 10);
         if (remainder < limit) {
@@ -169,7 +178,7 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
             actor->flags2D6 = mask | actor->flags2D6;
         }
     }
-    follow = (void *)((u8 *)actor + 0x310);
+    follow = (void *)(((u8 *)actor) + 0x310);
     x = Reaction_Quarter(follow->target.x - follow->current.x);
     z = Reaction_Quarter(follow->target.z - follow->current.z);
     x = Reaction_ClampMotion(x);
@@ -178,12 +187,12 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
     actor->motion.z += z;
     follow->current.x += x;
     follow->current.z += z;
-    if (Reaction_MotionStopped(x, z) && counter <= 0) {
+    if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
         actor->fieldAA = 0;
         actor->field2B6 = (Reaction_ThirtySecond(actor->direction) + 7) & 7;
         Chase_SetState(actor, 3, 1, 0);
-        Chase_SetCtl(actor, *(void **)(group + 0x20C), 8);
+        Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
         Reaction_ClearWord(&actor->flags2D0, ~2);
         Reaction_ClearHalf(&actor->flags2D4, ~0x3A);
         Chase_SetState(actor, 3, 1, 0);

@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 73.8%
+// fix.py best (sweep after the inlined-insn fix)
 // Complete transition; flag setters and reset offsets still allocate differently.
 #include "ivy_phase.h"
 
@@ -61,9 +61,16 @@ static inline void Ivy_EnterActive(u8 *p, void (*callback)(void), u32 kind)
     Ivy_ResetPhase(p);
 }
 
+inline static void Ivy_ClearHalf_UpdateAnimationTransition(u8 *p, u8 offset, u32 bits)
+{
+    u16 *field = (void *)(p + offset);
+    s32 mask = ~bits;
+    *field &= mask;
+}
+
 void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 {
-    struct IvyTransitionAnimation *animation = (void *)(*(u8 **)(p + 4) + 0x48);
+    struct IvyTransitionAnimation *animation = (void *)((*((u8 **)(p + 4))) + 0x48);
     if (SceneActorControl_TakeFlag(&p[0x2B2])) {
         SceneActorAnimation_SelectDirectionalFlags(p, 3);
         p[0x2B3] = 0;
@@ -72,12 +79,13 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
         Ivy_SetHalf(p, 0x2D4, 0x20);
     }
     Ivy_SetHalf(p, 0x2D6, 0x10);
-    if (frame <= 17 && animation->count == 0 && animation->frame == (animation->mode != 0) &&
-        animation->mode != 1)
+    if ((((frame <= 17) && (animation->count == 0)) &&
+         (animation->frame == (animation->mode != 0))) &&
+        (animation->mode != 1))
         animation->frame = 0;
     if (p[0x2B3]) {
         p[0x2B0] = 0;
-        Ivy_ClearHalf(p, 0x2D4, 0x20);
+        Ivy_ClearHalf_UpdateAnimationTransition(p, 0x2D4, 0x20);
         Ivy_ClearWord(p, 0x2CC, 0x80);
         Ivy_EnterActive(p, Ivy_UpdateActiveState, 0x22);
         {

@@ -3,7 +3,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 79.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, state scheduling, and register allocation.
 u8 Skeleton_RerouteToTarget(void *);
@@ -75,6 +75,16 @@ static inline void Chase_SetCtl_(struct SceneActorRegistryResetView *actor, void
 static inline u32 Arg1(u32 k_, u8 *anim)
 {
     return anim + k_;
+}
+
+inline static u8 ContextFlags_080AD75C(u8 *ctx)
+{
+    {
+        u8 k1 = 0x1D;
+        if ((*((u16 *)(ctx + 0x6D4))) & k1)
+            return 1;
+    }
+    return 0;
 }
 
 void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 tick)
@@ -164,7 +174,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
                 *flags = mask & (*flags);
             }
             actor->field2C2 = 64;
-        } else if (ContextFlags(ctx))
+        } else if (ContextFlags_080AD75C(ctx))
             SceneActor_DispatchContextAction(ctx, 1);
         else {
             actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
@@ -182,6 +192,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080AD75C);
 #endif

@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 84.7%
+// fix.py best (sweep after the inlined-insn fix)
 struct Vec16 {
     s16 x, y, z;
 };
@@ -74,20 +74,20 @@ void Glove_UpdatePostState(u8 *p)
         Character_GetHeightAdjustedPosition(self, &pos);
         SpatialIndex_SetPosition(self + 0x56C, pos.x, pos.y, pos.z);
         motion = (u32 *)(self + 0x56C);
-        if (S16(self, 0x5F0) < 0) {
+        if ((*((s16 *)(((u8 *)self) + 0x5F0))) < 0) {
             SpatialIndex_SetPosition(self + 0x52C, pos.x, pos.y, pos.z);
         } else {
             struct Vec16 off;
             struct Vec16 *o = &off;
-            s32 angle = S16(self, 0x5F0);
+            s32 angle = *((s16 *)(((u8 *)self) + 0x5F0));
             s32 radius = 20;
             o->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
             o->y = 0;
             o->z = Scale(gUnk_086149C4[angle & 255] * radius);
             SpatialIndex_SetPosition(self + 0x52C, pos.x + off.x, pos.y, pos.z + off.z);
         }
-        if (U16(self, 0x59E)) {
-            U16(self, 0x59E)--;
+        if (*((u16 *)(((u8 *)self) + 0x59E))) {
+            (*((u16 *)(((u8 *)self) + 0x59E)))--;
             *motion |= 1;
         } else
             *motion &= ~1;
@@ -96,72 +96,79 @@ void Glove_UpdatePostState(u8 *p)
     {
         register u8 *view asm("r6") = p + 0x18;
         if (LinkMode(0x800)) {
-            if (S8(p, 0x8F8) == LocalParticipant()) {
-                gUnk_020004E0[0] = (S32(view, 0x10) - S32(view, 0x5DC)) >> 12;
-                gUnk_020004E0[2] = S32(view, 0x18) >> 12;
-                if (Flag(p, 4))
+            if ((*((s8 *)(((u8 *)p) + 0x8F8))) == LocalParticipant()) {
+                gUnk_020004E0[0] =
+                    ((*((s32 *)(((u8 *)view) + 0x10))) - (*((s32 *)(((u8 *)view) + 0x5DC)))) >> 12;
+                gUnk_020004E0[2] = (*((s32 *)(((u8 *)view) + 0x18))) >> 12;
+                if (p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 4))
                     PaletteFade_SetScrollPosition(0, 0);
                 else
-                    PaletteFade_SetScrollPosition(S32(p, 0x8E8) >> 12, 0);
+                    PaletteFade_SetScrollPosition((*((s32 *)(((u8 *)p) + 0x8E8))) >> 12, 0);
             }
         } else {
-            gUnk_020004E0[0] = (S32(view, 0x10) - S32(p, 0x5F4)) >> 12;
-            gUnk_020004E0[2] = S32(view, 0x18) >> 12;
-            if (Flag(p, 4))
+            gUnk_020004E0[0] =
+                ((*((s32 *)(((u8 *)view) + 0x10))) - (*((s32 *)(((u8 *)p) + 0x5F4)))) >> 12;
+            gUnk_020004E0[2] = (*((s32 *)(((u8 *)view) + 0x18))) >> 12;
+            if (p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 4))
                 PaletteFade_SetScrollPosition(0, 0);
             else
-                PaletteFade_SetScrollPosition(S32(p, 0x8E8) >> 12, 0);
+                PaletteFade_SetScrollPosition((*((s32 *)(((u8 *)p) + 0x8E8))) >> 12, 0);
         }
-        if (!Flag(p, 0x14))
+        if (!(p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 0x14)))
             ActorStats_ApplyPendingDamage(self);
         Character_UpdateTimedEffect(self + 0x68);
-        if (!Inactive(p) && !Flag(p, 0x10))
-            ActorParticles_UpdateEmitter(self, self + 0x44, U32(self, 0x5C));
-        if (Flag(p, 1)) {
-            U32(p, 0x8FC) = 0;
-            U16(p, 0x33E) = 0;
-        } else if (Flag(p, 2)) {
+        if ((!Inactive(p)) && (!(p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 0x10))))
+            ActorParticles_UpdateEmitter(self, self + 0x44, *((u32 *)(((u8 *)self) + 0x5C)));
+        if (p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 1)) {
+            *((u32 *)(((u8 *)p) + 0x8FC)) = 0;
+            *((u16 *)(((u8 *)p) + 0x33E)) = 0;
+        } else if (p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 2)) {
             if (LinkMode(0x800)) {
-                if (S8(p, 0x8F8) == LocalParticipant()) {
+                if ((*((s8 *)(((u8 *)p) + 0x8F8))) == LocalParticipant()) {
                     CharacterModel_SetAnimationFlags(p + 0x610, 0x200);
                 } else {
                     CharacterModel_SetAnimationFlags(p + 0x610, 1);
-                    ActorMarkerPool_HideMarker(S8(p, 0x860));
+                    ActorMarkerPool_HideMarker(*((s8 *)(((u8 *)p) + 0x860)));
                 }
             } else
                 CharacterModel_SetAnimationFlags(p + 0x610, 0x200);
         } else {
             CharacterModel_ClearAnimationFlags(p + 0x610, 0x200);
             CharacterModel_ClearAnimationFlags(p + 0x610, 1);
-            ActorMarkerPool_ShowMarker(S8(p, 0x860));
+            ActorMarkerPool_ShowMarker(*((s8 *)(((u8 *)p) + 0x860)));
         }
-        if (!Inactive(p) && !Flag(p, 4)) {
+        if ((!Inactive(p)) && (!(p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 4)))) {
             s32 amount;
             s32 *accumulator;
             s16 *resource;
             if (LinkMode(0x800))
-                amount = ModifierStats_ApplyKind11(view, ParticipantStat(S8(p, 0x8F8)));
+                amount =
+                    ModifierStats_ApplyKind11(view, ParticipantStat(*((s8 *)(((u8 *)p) + 0x8F8))));
             else
-                amount = ModifierStats_ApplyKind11(view, S16(gUnk_02000710, 0x876));
+                amount = ModifierStats_ApplyKind11(view, *((s16 *)(((u8 *)gUnk_02000710) + 0x876)));
             accumulator = (s32 *)(p + 0x8FC);
             *accumulator += amount;
             resource = (s16 *)(view + 0x58);
-            if (*accumulator > 6) {
+            if ((*accumulator) > 6) {
                 s32 delta = Div(*accumulator, 6);
-                *resource += delta;
+                {
+                    s32 v1 = (*resource) + delta;
+                    *resource = v1;
+                }
                 *accumulator -= delta * 6;
-                if (*accumulator < 0)
+                if ((*accumulator) < 0)
                     *accumulator = 0;
             }
             *resource += ModifierStats_ApplyKinds2And5(view, 0);
-            if (*resource > S16(view, 0x5A))
-                *resource = S16(view, 0x5A);
+            if ((*resource) > (*((s16 *)(((u8 *)view) + 0x5A))))
+                *resource = *((s16 *)(((u8 *)view) + 0x5A));
         }
     }
-    U32(p, 0x8E4) = **(u16 **)(p + 0x8C4);
-    if (!Flag(p, 0x14))
-        U32(p, 0x900)++;
+    *((u32 *)(((u8 *)p) + 0x8E4)) = *(*((u16 **)(p + 0x8C4)));
+    if (!(p && ((*((u16 *)(((u8 *)p) + 0x8F4))) & 0x14)))
+        (*((u32 *)(((u8 *)p) + 0x900)))++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0811A158);
 #endif

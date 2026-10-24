@@ -2,7 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
-// fuzzy: 77.8%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: projection temporaries, repeated flag test and register allocation.
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
 // MATCHING_CONCESSION: register-pinning
@@ -51,6 +51,27 @@ static inline void ProjectPosition(struct TargetPosition *dst, struct TargetPosi
     dst->y = y - gUnk_03005418[1] + 80;
     dst->z = z - gUnk_03005418[2];
 }
+inline static void ProjectPosition_0814C248(struct TargetPosition *dst, struct TargetPosition *src)
+{
+    s32 x;
+    s32 z;
+    u8 depth;
+    s32 height;
+    s32 y;
+    typeof(z) t1;
+    asm("" : "+r"(src));
+    x = src->x;
+    z = src->z;
+    dst->x = Project(x - z);
+    depth = Project(x + z);
+    height = Project(src->y);
+    y = depth - height;
+    z = (t1 = depth + height);
+    dst->x = (dst->x - gUnk_03005418[0]) + 120;
+    dst->y = (y - gUnk_03005418[1]) + 80;
+    dst->z = t1 - gUnk_03005418[2];
+}
+
 struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
 {
     register struct Player *p asm("ip") = arg;
@@ -65,20 +86,21 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
         do {
             register u32 flags asm("r4") = entry->flags;
             if (!(flags & 1)) {
-                s32 x, z;
+                s32 x;
+                s32 z;
                 s32 square;
                 struct TargetBody *body;
                 if (flags & 16) {
                     body = entry->body;
-                    asm("" : "+r"(body));
                     x = body->pos.x - p->position.x;
+                    asm("" : "+r"(body));
                     z = body->pos.z - p->position.z;
                 } else {
                     body = entry->body;
                     x = body->pos.x - p->position.x;
                     z = body->pos.z - p->position.z;
                 }
-                square = x * x + z * z;
+                square = (x * x) + (z * z);
                 if (square < distance) {
                     if (!(gUnk_030053F4 & 0x1000)) {
                         struct TargetPosition screen;
@@ -86,8 +108,8 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                             u32 relative = flags & 16;
                             asm("" : : "r"(relative));
                         }
-                        ProjectPosition(&screen, &body->pos);
-                        if ((u16)(screen.x - 1) > 238 || (u16)(screen.y - 1) > 158)
+                        ProjectPosition_0814C248(&screen, &body->pos);
+                        if ((((u16)(screen.x - 1)) > 238) || (((u16)(screen.y - 1)) > 158))
                             goto next;
                     }
                     distance = square;
@@ -96,6 +118,7 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
             }
         next:
             entry = entry->next;
+
         } while (entry);
     asm("" : "+r"(best), "+r"(p), "+r"(distance));
     return best;
