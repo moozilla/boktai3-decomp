@@ -86,6 +86,20 @@ TOPICS = {
         "shifts. Value-before-address order of a far store is an inline setter (spellings.sp_outline_setter).",
         [("reload1.c", "/* I is the index in spill_regs.", 0, 30),
          ("reload1.c", "  /* Prefer registers not so far used, for use in temporary loading.", 0, 16)]),
+    "reload-mode": (
+        "reload inheritance find_equiv_reg mode copy back high register mov ip r0 HImode SImode reload_cse no-op move",
+        "A value set into a high register through a low one (`movs r0, #7; mov ip, r0`) and used at once is "
+        "normally read from the low register: reload inherits it (choose_reload_regs, find_equiv_reg), or "
+        "reload_cse_regs or jump's no-op move deletion (jump.c) drops the copy back. All three compare modes "
+        "(find_equiv_reg: \"the copy-insn moved the wrong sort of datum\"), so the ROM's `mov ip, r0; mov r0, "
+        "ip` means the set and the use differ in mode: an HImode constant pseudo (`x & 7` narrowed to a "
+        "16-bit field) used through a paradoxical SImode subreg. It survives cse only when the constant is a "
+        "literal and the other operand is a word (an inline helper returning s32, not u16): "
+        "spellings.sp_helper_ret_word, sp_const_literal (ActorParticles_SpawnWideBurst; the matched "
+        "sub_08239D38 has the same helper). fix.py detects the copy and tries these first; the instrumented "
+        "compiler's AGBCC_NOINHERIT=UID, AGBCC_NORCSE=1 and AGBCC_NOEQUIVMOVE=all turn the three off.",
+        [("reload.c", "  /* Reject VALUE if the copy-insn moved the wrong sort of datum.  */", 0, 3),
+         ("jump.c", "	  /* Detect and ignore no-op move instructions", 0, 20)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "

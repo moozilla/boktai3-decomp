@@ -746,6 +746,41 @@
  	    return 1;
  	  }
      }
+@@ -5236,6 +5427,24 @@
+    For machines with register classes, we are responsible for
+    finding a reload reg in the proper class.  */
+ 
++/* AGBCC_NOINHERIT=UID[,UID...]: no reload inheritance (reg_last_reload_reg,
++   find_equiv_reg) for those insns, as if each reload loaded its value anew.  */
++static int
++agbcc_noinherit_p (uid)
++     int uid;
++{
++  const char *e = getenv ("AGBCC_NOINHERIT");
++  while (e && *e)
++    {
++      if (atoi (e) == uid)
++	return 1;
++      e = strchr (e, ',');
++      if (e)
++	e++;
++    }
++  return 0;
++}
++
+ static void
+ choose_reload_regs (chain)
+      struct insn_chain *chain;
+@@ -5403,7 +5612,8 @@
+      with fp on the 68k: fp numbers (not NaNs) fail to be equal to themselves
+      because one side of the comparison might be inherited.  */
+ 
+-  for (inheritance = optimize > 0; inheritance >= 0; inheritance--)
++  for (inheritance = optimize > 0 && ! agbcc_noinherit_p (INSN_UID (insn));
++       inheritance >= 0; inheritance--)
+     {
+       /* Process the reloads in order of preference just found.
+ 	 Beyond this point, subregs can be found in reload_reg_rtx.
 --- a/stmt.c
 +++ b/stmt.c
 @@ -49,6 +49,7 @@
@@ -1141,6 +1176,15 @@
  	  /* Now scan through the operands looking for a destination operand
 --- a/toplev.c
 +++ b/toplev.c
+@@ -3104,7 +3104,7 @@
+         goto exit_rest_of_compilation;
+ 
+     /* Do a very simple CSE pass over just the hard registers.  */
+-    if (optimize > 0)
++    if (optimize > 0 && !getenv("AGBCC_NORCSE"))
+         reload_cse_regs(insns);
+ 
+     /* Re-create the death notes which were deleted during reload.  */
 @@ -3613,7 +3613,9 @@
          flag_caller_saves = 1;
          flag_force_mem = 1;
@@ -1152,3 +1196,16 @@
      }
  
      if (optimize >= 3)
+--- a/jump.c
++++ b/jump.c
+@@ -2237,7 +2237,9 @@
+ 
+ 	      if (sreg == dreg && sreg >= 0)
+ 		delete_insn (insn);
+-	      else if (sreg >= 0 && dreg >= 0)
++	      else if (sreg >= 0 && dreg >= 0
++		       && ! (getenv ("AGBCC_NOEQUIVMOVE")
++			     && strstr (getenv ("AGBCC_NOEQUIVMOVE"), "all")))
+ 		{
+ 		  rtx trial;
+ 		  rtx tem = find_equiv_reg (NULL_RTX, insn, 0,

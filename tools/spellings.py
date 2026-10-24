@@ -1468,6 +1468,73 @@ def sp_arg_to_local(fn, helpers):
             yield f"{h0.decl.name} takes {b} and computes {text(arg)[:24]} itself", (f2, [h])
 
 
+SUBWORD = ("u8", "s8", "u16", "s16", "char", "short")
+
+
+def sp_const_literal(fn):
+    """v = 7; ... x & v ...  ->  ... x & 7 ... for a local only ever set to one constant (the inverse of
+    sp_const_local; ActorParticles_SpawnWideBurst). A local is promoted to SImode (PROMOTE_MODE), so
+    cse folds it to the constant at each use; a literal in a 16-bit expression gets an HImode pseudo
+    of its own (see sp_helper_ret_word)."""
+    decls = [n for n, _, _ in walk(fn) if isinstance(n, ca.Decl) and n is not fn.decl]
+    names = [d.name for d in decls]
+    for d in decls:
+        v = d.name
+        if names.count(v) != 1 or not isinstance(d.type, ca.TypeDecl) or d in (fn.decl.type.args.params
+                                                                                 if fn.decl.type.args else []):
+            continue
+        vals, ok = [], True
+        if d.init is not None:
+            vals.append(d.init)
+        for n, par, sl in walk(fn.body):
+            if isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID) and n.lvalue.name == v:
+                if n.op != "=" or not isinstance(par, ca.Compound):
+                    ok = False
+                vals.append(n.rvalue)
+            elif (isinstance(n, ca.UnaryOp) and n.op in ("&", "++", "--", "p++", "p--")
+                  and isinstance(n.expr, ca.ID) and n.expr.name == v):
+                ok = False
+        if not ok or not vals or not all(isinstance(x, ca.Constant) and x.value == vals[0].value for x in vals):
+            continue
+        f2 = copy.deepcopy(fn)
+        for n, par, sl in list(walk(f2.body)):
+            if isinstance(n, ca.Compound) and n.block_items:
+                n.block_items = [x for x in n.block_items
+                                 if not (isinstance(x, ca.Decl) and x.name == v)
+                                 and not (isinstance(x, ca.Assignment) and isinstance(x.lvalue, ca.ID)
+                                          and x.lvalue.name == v)]
+        for n, par, sl in list(walk(f2.body)):
+            if isinstance(n, ca.ID) and n.name == v and par is not None and not (
+                    isinstance(par, ca.StructRef) and sl == "field"):
+                set_child(par, sl, copy.deepcopy(vals[0]))
+        yield f"literal {vals[0].value} for {v}", f2
+
+
+def sp_helper_ret_word(fn, helpers):
+    """static inline u16 H(void)  ->  static inline s32 H(void) (ActorParticles_SpawnWideBurst, like the
+    matched sub_08239D38: the random-table helper returned a word). Rule (optabs.c widen_operand,
+    reload.c find_equiv_reg, jump.c no-op moves): `s->y = H() & 7` with a 16-bit field is done in
+    HImode and widened to SImode for andsi3. With a u16 H the constant's HImode pseudo is the operand
+    that andsi3 forces into an SImode copy, and cse folds that copy to the constant. With a word H the
+    constant's HImode pseudo stays an operand through a paradoxical subreg, which cse cannot fold.
+    Allocated to a high register it is set in HImode and reloaded in SImode, and reload, reload_cse and
+    jump's no-op move deletion all refuse to reuse the low register that set it (another mode): the
+    ROM's `movs rN, #C; mov H, rN; mov rN, H`."""
+    called = {n.name.name for n, _, _ in walk(fn) if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID)}
+    for name, h in helpers.items():
+        if name not in called or not isinstance(h.decl.type, ca.FuncDecl):
+            continue
+        ret = h.decl.type.type
+        if not (isinstance(ret, ca.TypeDecl) and isinstance(ret.type, ca.IdentifierType)
+                and ret.type.names[-1] in SUBWORD):
+            continue
+        cur = " ".join(ret.type.names)
+        for t in ("s32", "u32"):
+            h2 = copy.deepcopy(h)
+            h2.decl.type.type.type = ca.IdentifierType([t])
+            yield f"{name} returns {t} (was {cur})", (copy.deepcopy(fn), [h2])
+
+
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
              sp_split_offset, sp_addr_local, sp_goto_loop,
@@ -1475,13 +1542,13 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
-             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy]
+             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
 TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend, sp_alias_read]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
-HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
+HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local, sp_helper_ret_word]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
@@ -1504,6 +1571,7 @@ DECISIONS = {
     "local-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
     "global-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
+    "reload-mode": ["sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
     "reload": ["sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
                "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }

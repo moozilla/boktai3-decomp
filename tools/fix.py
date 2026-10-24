@@ -283,6 +283,29 @@ def cse_probe(path):
     return None
 
 
+HIGH = ("r8", "r9", "r10", "r11", "ip", "sb", "sl", "fp")
+
+
+def kept_copy(rom, mine):
+    """A cause line when the ROM sets a high register and copies it straight back (`mov ip, r0;
+    mov r0, ip`) more often than the candidate, else None. reload, reload_cse and jump's no-op move
+    deletion drop that copy back unless the set and the use differ in mode (an HImode set, an SImode
+    use): agbccsrc.py reload-mode, spellings.sp_helper_ret_word."""
+    def pairs(t):
+        out = 0
+        for a, b in zip(t, t[1:]):
+            m = re.match(r"mov (\w+), (r[0-7])$", a)
+            if m and m.group(1) in HIGH and b == f"mov {m.group(2)}, {m.group(1)}":
+                out += 1
+        return out
+    n, k = pairs(rom), pairs(mine or [])
+    if n > k:
+        return (f"the ROM copies a high register straight back {n - k} more time(s) (`mov H, rN; mov rN, H`): "
+                "the value was set in another mode than it is used in (an HImode constant used as SImode), "
+                "so reload could not reuse rN")
+    return None
+
+
 def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None, extra=()):
     """Children of one state: (score, new text, desc, fam), plus the compiles spent. EXTRA: decision
     keys known from a compiler probe (cse_probe), tried before step.py's."""
@@ -348,7 +371,12 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
         except (Exception, SystemExit):
             start = None
         if start and 0 < start[0] <= 4:
-            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+            d0 = Draft(text, func, wd)
+            cause = kept_copy(d0.rom, atlas.texts_of(d0.source()))
+            if cause:
+                extra = ["reload-mode"]
+            else:
+                cause = cse_probe(os.path.join(wd, f"{func}.c"))
             if cause:
                 log(f"   cause: {cause}")
                 if "canonical register" in cause:
