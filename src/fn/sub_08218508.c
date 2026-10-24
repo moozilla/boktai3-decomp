@@ -61,12 +61,12 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         return;
     matrixCount = &gUnk_03004BA0;
     do {
-        s32 x, y asm("r3");
+        s32 x, y;
         s32 z;
         u32 flags;
         u32 attr;
         s32 depth;
-        s32 ox, oy asm("r8");
+        s32 ox, oy;
         u32 initialFlags = p->flags;
         if (initialFlags & skip)
             goto next;

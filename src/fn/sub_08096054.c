@@ -28,7 +28,7 @@ static inline u8 AtRest(s32 x, s32 z)
 }
 static inline u32 Test(u16 *f, u32 maskInput)
 {
-    register u32 mask asm("r1") = maskInput;
+    u32 mask = maskInput;
     return *f & mask;
 }
 static inline u32 Random4(void)
@@ -144,7 +144,7 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
         }
         {
             u32 phase = 2;
-            register u32 offset asm("r2") = 0x2A8;
+            u32 offset = 0x2A8;
             u8 *field = (u8 *)actor + offset;
             *field = stateTest;
             *((u8 *)actor + 0x2A9) = phase;

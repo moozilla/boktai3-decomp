@@ -26,7 +26,6 @@ void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
 {
     register u32 m asm("r1") = mask;
-    asm("" : "+r"(m));
     if (*(volatile u8 *)&p->status & m)
         return 1;
     return 0;
@@ -34,16 +33,14 @@ static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
 static inline u8 TestMask(struct SegmentAnim *p, u32 mask)
 {
     u32 f = p->status;
-    asm("" : "+r"(f));
     if (f & mask)
         return 1;
     return 0;
 }
 static inline void *ScriptAt(u8 *body, s32 offset)
 {
-    register u32 address asm("r0") = 0x4d4;
+    u32 address = 0x4d4;
     address += (u32)body;
-    asm("" : "+r"(address));
     address += offset;
     return *(void **)address;
 }
@@ -52,9 +49,8 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
     register struct Segment *sp asm("r8") = sprite;
     register struct Segment *o asm("r6") = sp;
     struct SegmentAnim *a = input;
-    register struct SegmentAnim *b asm("r4") = input;
+    struct SegmentAnim *b = input;
     const volatile u16 *entry;
-    asm("" : "+r"(o), "+r"(b));
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
@@ -65,7 +61,7 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
         if (left != (((*entry & 0x30) >> 4) & mask))
             o->flags |= 4;
         else {
-            register u32 *fl asm("r2") = &sp->flags;
+            u32 *fl = &sp->flags;
             register u32 v asm("r0") = *fl;
             v &= ~4;
             *fl = v;
@@ -99,7 +95,7 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
             if (flags & 4) {
                 u32 index = b->frame;
                 if (index == 0) {
-                    register u32 f8 asm("r0") = 8;
+                    u32 f8 = 8;
                     f8 &= flags;
                     if (f8)
                         b->timer = savedDuration;
@@ -137,13 +133,13 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
 }
 void TentacleBody_ResetDirectionalAnimations(u8 *input, s32 inputKind)
 {
-    register u8 *body asm("r9") = input;
+    u8 *body = input;
     struct {
         s32 row, flags, kind;
         u8 *profile, *actor;
         s32 i;
     } frame;
-    register s32 offset asm("r10");
+    s32 offset;
     s32 four;
     struct SegmentAnim *a;
     register struct Segment *s asm("r8");
@@ -177,9 +173,7 @@ void TentacleBody_ResetDirectionalAnimations(u8 *input, s32 inputKind)
                 {
                     register u8 *act asm("r1") = frame.actor;
                     register u16 *ad asm("r0");
-                    asm("" : "+r"(act));
                     ad = (u16 *)(act + 0x2c2);
-                    asm("" : "+r"(ad));
                     Anim_SetDurationScale(a, *ad);
                 }
             }
@@ -187,7 +181,6 @@ void TentacleBody_ResetDirectionalAnimations(u8 *input, s32 inputKind)
         }
         {
             register u32 step asm("r1") = 0x128;
-            asm("" : "+r"(step));
             offset += step;
             a = (void *)((u8 *)a + step);
             s = (void *)((u8 *)s + step);

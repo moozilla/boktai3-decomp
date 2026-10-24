@@ -42,8 +42,7 @@ struct EffectVector {
 };
 static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg, u32 flipMask)
 {
-    struct DisplaySequenceSprite *sprite =
-        (struct DisplaySequenceSprite *)(owner + 0x24);
+    struct DisplaySequenceSprite *sprite = (struct DisplaySequenceSprite *)(owner + 0x24);
     struct DisplaySequenceState *state = stateArg;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;

@@ -60,12 +60,12 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         return;
     matrixCount = &gUnk_03004BA0;
     do {
-        s32 x, y asm("r2");
+        s32 x, y;
         s32 z;
         register u32 flags asm("r6");
         register u32 attr asm("r5");
         s32 depth;
-        s32 ox, oy asm("r8");
+        s32 ox, oy;
         register u32 initialFlags asm("r1") = p->flags;
         u32 t = initialFlags;
         asm("" : "+r"(t));

@@ -137,7 +137,7 @@ s32 PoisonHand_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     register void *sprite asm("r8");
-    register void *earlySprite asm("r5");
+    void *earlySprite;
     register void **slot asm("r4");
     s32 found;
     s32 dead;
@@ -214,7 +214,6 @@ s32 PoisonHand_InitializeFromScript(u8 *p, void *parent)
     AnimData_SelectPaletteBank(p + 0x50, 0x1c5);
     resource = ScriptProc_Start(0x922e, 0x5184);
     slot = (void **)(p + 0x168);
-    asm("" : "+r"(slot));
     *slot = resource;
     dead = H(0x144);
     sprite = earlySprite;
@@ -224,15 +223,12 @@ s32 PoisonHand_InitializeFromScript(u8 *p, void *parent)
     } else {
         *(void (**)(void))(p + 0x108) = PoisonHand_UpdateDefeatBurst;
         {
-            register u32 zero asm("r2");
+            u32 zero;
             s16 *q = &H(0x132);
             zero = 0;
-            asm("" : "+r"(zero));
             *q = 1;
-            asm("" : : : "memory");
             Anim_SetSequence(p + 0x10c, ({
                                  void *r = *slot;
-                                 asm("" : "+r"(r));
                                  r;
                              }),
                              0x19, 0, zero);

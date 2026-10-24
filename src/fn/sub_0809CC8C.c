@@ -5,7 +5,7 @@ extern const u32 gUnk_08605E48[8];
 u32 Lun_GetRouteProgressRate(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x3D0);
-    register u32 phase asm("r0") = *(u16 *)(q + 0x3E0) >> 7;
+    u32 phase = *(u16 *)(q + 0x3E0) >> 7;
     s32 i;
     asm("" : : "r"(phase));
     i = phase;

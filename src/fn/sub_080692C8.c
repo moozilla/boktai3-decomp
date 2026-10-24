@@ -24,7 +24,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
 {
     register struct ContactPosition *delta asm("r8") = inDelta;
     register struct ContactPosition *target asm("r4") = inTarget;
-    register u32 shot asm("sl") = inShot;
+    u32 shot = inShot;
     struct BouncingPool *pool;
     pool = gUnk_0200014C;
     if (!pool) {
@@ -48,7 +48,6 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
             zero = gUnk_02000560;
             {
                 register u32 blockedMask asm("r2") = 4;
-                asm("" : "+r"(blockedMask));
                 zero &= blockedMask;
             }
         }
@@ -58,13 +57,11 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
         if (!object)
             return NULL;
         {
-            register u32 off asm("r3") = 0x136;
+            u32 off = 0x136;
             u32 base = (u32)object;
-            asm("" : "+r"(off));
             {
                 u8 *q = (u8 *)(base + off);
                 register u32 d asm("r2");
-                asm("" : "=r"(d));
                 one = 1;
                 asm("" ::"r"(d));
                 *q = one;
@@ -75,13 +72,12 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
             object->enter = one;
             off -= 0x10;
             {
-                register struct ContactPosition *dst asm("r2") = (void *)(base + off);
+                struct ContactPosition *dst = (void *)(base + off);
                 register struct ContactPosition *src asm("r3") = delta;
                 *dst = *src;
             }
             object->spawnParameterA = shot;
             off = 0x140;
-            asm("" : "+r"(off));
             *(u16 *)(base + off) = category;
             object->initialTimer = (u16)strength;
             off -= 6;
@@ -89,7 +85,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
             object->collisionDelay = 30;
             off += 0xa;
             {
-                register u32 *dst asm("r1") = (void *)(base + off);
+                u32 *dst = (void *)(base + off);
                 *dst = id;
             }
             object->animation = one;
@@ -139,14 +135,12 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
                 asm("" : "+r"(first));
                 first = (u8)first;
                 if (first != (((*command & 0x30) >> 4) & bit)) {
-                    register struct BouncingObject *read asm("r1") = sprite;
-                    register u32 value asm("r0");
-                    asm("" : "+r"(read));
+                    struct BouncingObject *read = sprite;
+                    u32 value;
                     value = read->sprite.flags;
                     value |= 8;
                     {
-                        register struct BouncingObject *write asm("r2") = sprite;
-                        asm("" : "+r"(write));
+                        struct BouncingObject *write = sprite;
                         write->sprite.flags = value;
                     }
                 } else {

@@ -13,7 +13,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
         if (*(u16 *)((u8 *)actor + offset) & mask)
             return 1;
         mask = 0x20000;
-        asm("" : "+r"(offset));
         offset -= 4;
         {
             register u8 *q asm("r0");

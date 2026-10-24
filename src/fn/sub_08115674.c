@@ -184,7 +184,6 @@ void Collectible_UpdateEntry(struct Col *p)
         m = ~1;
         *f &= m;
         flagsPtr = f;
-        asm("" : "+r"(flagsPtr));
     } else {
         u32 *f = &p->entryFlags;
         u32 one = 1;

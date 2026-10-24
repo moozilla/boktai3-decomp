@@ -150,7 +150,7 @@ void TileTrigger_StepActivation(struct TileTrigger *p)
     struct TileTrigger *self = p;
     struct TileTriggerManager *manager = gTileTriggerManager;
     if (p->timer > 30) {
-        register u8 *forced asm("r5") = &p->forced;
+        u8 *forced = &p->forced;
         if (*forced) {
             Anim_RestartSequence(&p->animation, manager->animationData, 0, (u8)p->sequence, 4);
             *forced = 0;
@@ -178,12 +178,11 @@ void TileTrigger_StepRelease(struct TileTrigger *p)
 {
     struct TileTrigger *self;
     struct TileTriggerManager *manager;
-    asm("" : "+r"(p));
     self = p;
     manager = gTileTriggerManager;
     p->flags &= ~1;
     if (p->triggerFlags & 0x40) {
-        register u8 *forced asm("r5") = &p->forced;
+        u8 *forced = &p->forced;
         if (*forced) {
             Anim_RestartSequence(&p->animation, manager->animationData, 0, (u8)p->sequence, 4);
             *forced = 0;

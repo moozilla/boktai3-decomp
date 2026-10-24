@@ -44,7 +44,6 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
 static inline s32 Abs(s32 x)
 {
     s32 r = x;
-    asm("" : "+r"(x));
     if (x < 0)
         r = -x;
     return r;
@@ -52,7 +51,7 @@ static inline s32 Abs(s32 x)
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
-    register s32 k asm("r2") = 0x6400;
+    s32 k = 0x6400;
     asm("" : "+r"(k));
     sub_080A9DB0(p, 4, k);
 }
@@ -84,7 +83,7 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
         SetControl(s, s->entryTarget228, 1);
         zero = 0;
         {
-            register u32 phase asm("r1") = 2;
+            u32 phase = 2;
             register u32 offset asm("r2") = 0x2a8;
             *((u8 *)s + offset) = zero;
             offset++;

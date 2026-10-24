@@ -157,7 +157,7 @@ void TileTrigger_StepHold(struct TileTrigger *p)
     if (p->triggerFlags & 0x20) {
         p->flags &= ~1;
         {
-            register u8 *forced asm("r8") = &p->forced;
+            u8 *forced = &p->forced;
             if (*forced) {
                 sub_08107398(p);
                 Anim_SetSequence(&p->animation, manager->animationData, 0, (u8)p->sequence, 0);

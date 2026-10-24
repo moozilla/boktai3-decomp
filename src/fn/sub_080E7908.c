@@ -86,7 +86,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z) && actor->field2B3) {
-        register u16 *flags2D4 asm("r8");
+        u16 *flags2D4;
         register u32 *p asm("r6");
         u16 *f = &actor->flags2D4;
         u8 t;
@@ -120,9 +120,9 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 struct ContactPosition *target;
                 struct ContactPosition d;
                 s16 dx;
-                register u16 *fp asm("r4");
+                u16 *fp;
                 u32 one;
-                register u32 z4 asm("r5");
+                u32 z4;
                 register u32 z6 asm("r9");
                 struct ContactPosition *out = &d;
                 struct ContactPosition *from = &actor->position;
@@ -131,7 +131,6 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 z4 = 0;
                 asm("" : "+r"(z4));
                 z6 = 0;
-                asm("" : "+r"(z6));
                 out->x = dx;
                 out->y = target->y - from->y;
                 out->z = target->z - from->z;
@@ -147,7 +146,6 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                     *fp = mask | *fp;
                 }
                 actor->group.field418 = actor->group.field416;
-                asm("" ::"r"(fp));
                 {
                     u16 *mode = (u16 *)((u8 *)actor->context + 0x65C);
                     u32 mask;
@@ -161,23 +159,20 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                     ((u8 *)p)[15] = mask | ((u8 *)p)[15];
                 }
                 {
-                    register u32 two asm("r1") = 2;
+                    u32 two = 2;
                     register u32 o asm("r2") = 0x2A8;
                     register u32 o2 asm("r4");
                     *((u8 *)actor + o) = z4;
                     o2 = 0x2A9;
                     *((u8 *)actor + o2) = z4;
                     o += 2;
-                    asm("" : "+r"(o));
                     *((u8 *)actor + o) = two;
                     o2 += 3;
-                    asm("" : "+r"(o2));
                     {
                         register u32 *w asm("r0") = (u32 *)((u8 *)actor + o2);
                         *w = z6;
                     }
                     o += 7;
-                    asm("" : "+r"(o));
                     {
                         register u8 *b asm("r0") = (u8 *)actor + o;
                         *b = one;
@@ -199,7 +194,6 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                     *w = zero;
                 }
                 o2 += 8;
-                asm("" : "+r"(o2));
                 {
                     register u8 *b asm("r1") = (u8 *)actor + o2;
                     *b = 1;

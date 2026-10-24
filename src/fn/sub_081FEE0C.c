@@ -50,7 +50,7 @@ s32 SpriteParticle_UpdateManager(struct Pool *pool)
     s32 i;
     for (i = 0, cursor = base; i <= 31; i++, cursor++, base++) {
         if (pool->mask & (1 << i)) {
-            register struct Obj *o asm("r4") = &base->sprite;
+            struct Obj *o = &base->sprite;
             int done = 0;
             struct Anim *a;
             const u16 *entry;
@@ -67,7 +67,7 @@ s32 SpriteParticle_UpdateManager(struct Pool *pool)
             o->z = cursor->z >> 12;
             if (cursor->script) {
                 int d;
-                register struct Obj *s asm("r5") = o;
+                struct Obj *s = o;
                 a = &base->anim;
                 entry = cursor->anim.data + cursor->anim.frame;
                 s->frame = *entry >> 6;
@@ -84,7 +84,7 @@ s32 SpriteParticle_UpdateManager(struct Pool *pool)
                 {
                     register u32 input asm("r0") = a->flags;
                     u32 mask = 2;
-                    register u32 left asm("r1") = (u8)(mask & input);
+                    u32 left = (u8)(mask & input);
                     if (left != (((*entry & 0x30) >> 4) & mask))
                         s->flags |= 8;
                     else

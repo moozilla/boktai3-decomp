@@ -206,7 +206,7 @@ void Player_UpdateChargeSpin(struct PRecover *p)
         *tp = t;
         t = (u16)t;
         if (t > 0x1F) {
-            u32 o1 = 0x464, o2 asm("r0");
+            u32 o1 = 0x464, o2;
             u8 *a1;
             register u32 v asm("r0");
             a1 = (u8 *)p + o1;

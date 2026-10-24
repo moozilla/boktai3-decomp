@@ -73,10 +73,8 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         {
             u16 reaction;
             {
-                register u32 d asm("r1");
-                asm("" : "=r"(d));
+                u32 d;
                 reaction = source->reaction;
-                asm("" : : "r"(d));
             }
             {
                 register u32 d asm("r0");
@@ -88,18 +86,16 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         {
             u32 flags = source->flags;
             {
-                register u32 t asm("r3") = 0x40;
-                asm("" : "+r"(t));
+                u32 t = 0x40;
                 m40 = t;
             }
             hitFlags = flags;
         }
         if (hitFlags & m40) {
             {
-                register u32 off asm("r0") = 0x130;
-                asm("" : "+r"(off));
+                u32 off = 0x130;
                 {
-                    register u8 *addr asm("r1") = (u8 *)target + off;
+                    u8 *addr = (u8 *)target + off;
                     *(u16 *)addr = 8;
                 }
             }
@@ -108,31 +104,26 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 s32 damage;
                 void *col = target->collider;
                 {
-                    register u32 d asm("r3");
-                    asm("" : "=r"(d));
+                    u32 d;
                     damage = target->damage;
-                    asm("" : : "r"(d));
                 }
                 DamageNumberDisplay_Show(col, damage, 0, &target->displayPosition,
                                          (u8 *)target + 0x80, 1);
             }
             {
-                register void *hud asm("r8");
+                void *hud;
                 s32 health;
                 s32 a, b, direction;
                 {
-                    register u32 off asm("r3") = 0x14c;
-                    asm("" : "+r"(off));
+                    u32 off = 0x14c;
                     {
-                        register u8 *addr asm("r0") = (u8 *)target + off;
+                        u8 *addr = (u8 *)target + off;
                         hud = *(void **)addr;
                     }
                 }
                 {
-                    register u32 d asm("r3");
-                    asm("" : "=r"(d));
+                    u32 d;
                     health = target->health;
-                    asm("" : : "r"(d));
                 }
                 {
                     register u32 d asm("r1");
@@ -155,7 +146,7 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             register s32 i asm("r6");
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            register u32 *index asm("r9") = &gUnk_03005308;
+            u32 *index = &gUnk_03005308;
             u32 mask = 0x7f;
             i = 2;
             do {
@@ -167,9 +158,8 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 frame.position = target->position;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 {
-                    register u32 *cursor asm("r2") = index;
+                    u32 *cursor = index;
                     random = (*cursor + 1) & 0x3ff;
-                    asm("" : : "r"(cursor));
                 }
                 sample = table[random];
                 x = pos->x - 0x40;
@@ -180,14 +170,13 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 pos->y += (u8)table[random];
                 random = (random + 1) & 0x3ff;
                 {
-                    register u32 *cursor asm("r7") = index;
+                    u32 *cursor = index;
                     *cursor = random;
                 }
                 {
                     u32 last = table[random];
                     x = pos->z - 0x40;
                     last &= mask;
-                    asm("" : : "r"(table));
                     x += last;
                     pos->z = x;
                 }

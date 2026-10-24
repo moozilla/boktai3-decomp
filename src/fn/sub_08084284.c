@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_control_helpers.h"
@@ -58,7 +57,7 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
                           s32 inSpeed)
 {
     u8 *motion = (u8 *)actor + 0x50;
-    register s32 speed asm("r5") = inSpeed;
+    s32 speed = inSpeed;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
     s16 dz = saved->position.z - *(u16 *)(motion + 16);
     if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)

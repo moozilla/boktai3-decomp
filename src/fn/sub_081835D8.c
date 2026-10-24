@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: uses heavy-attack animation records and per-frame collider tables.
@@ -38,7 +37,6 @@ void Sound_PlaySongChecked(u32 a);
 static inline s32 ScaleHeavyAttack(s32 n)
 {
     s32 m = 0xaaa * n;
-    asm("" : "+r"(m));
     return m >= 0 ? m >> 12 : -((-m) >> 12);
 }
 

@@ -84,13 +84,11 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
         p->rotation = 128;
         p->byte8 = 127;
         one = 1;
-        asm("" : "+r"(one));
         p->byte9 = one;
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         {
             u32 offset = gUnk_03005308 * 2;
             register u32 table asm("r2") = (u32)gUnk_0203B400;
-            asm("" : "+r"(table));
             choice = *(const u16 *)(offset + table);
         }
         choice &= one;
@@ -106,20 +104,17 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
         p->paramA6 = 16;
         p->param52 = 16;
         {
-            register u32 off asm("r2") = 0x16C;
-            register u32 addr asm("r1");
-            asm("" : "+r"(off));
+            u32 off = 0x16C;
+            u32 addr;
             addr = (u32)p + off;
             *(void **)addr = Ivy_BeginChildPulse;
         }
     }
     {
-        register u32 off asm("r3") = 0x16c;
-        register u8 *address asm("r0");
+        u32 off = 0x16c;
+        u8 *address;
         void *callback;
-        asm("" : "+r"(off));
         address = (u8 *)p + off;
-        asm("" : "+r"(address));
         callback = *(void **)address;
         if (callback)
             Callback_InvokeActor(p, callback);

@@ -174,7 +174,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 s->frame = *entry >> 6;
                 {
                     u32 input = cursor->anim.flags;
-                    register u32 left asm("r2") = 1;
+                    u32 left = 1;
                     u32 mask = 1;
                     left &= input;
                     if (left != (((*entry & 0x30) >> 4) & mask))
@@ -183,7 +183,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                         s->flags &= ~4;
                 }
                 {
-                    register u32 left asm("r1") = (u8)(a->flags & 2);
+                    u32 left = (u8)(a->flags & 2);
                     register u32 cmd asm("r2") = *entry;
                     asm("" : "+r"(cmd));
                     if (left != (FlipBits(cmd) & 2))

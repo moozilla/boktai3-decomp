@@ -57,7 +57,6 @@ void Vanargand_UpdatePartAnimation(void *boss, struct RouteSpriteActor *part)
                 temp = 0xFFFF;
                 asm("" : "+r"(temp));
                 mask = temp;
-                asm("" : "+&r"(mask) : "r"(temp));
                 duration = state->duration;
                 elapsed = (u16)elapsed;
                 savedDuration = duration;

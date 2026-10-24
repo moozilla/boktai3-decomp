@@ -47,7 +47,6 @@ void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 di
     g->count = 4;
     {
         register u32 m asm("r2");
-        asm("" : "=r"(m));
         m = 4;
         g->mode = m;
     }

@@ -9,7 +9,6 @@ void ActorContact_TickAuxiliaryTimers(u8 *actor)
     u8 *entry = context;
     u32 offset = 0x430;
     s32 i;
-    asm("" : "+r"(offset));
     i = 3;
     do {
         u16 *timer = (u16 *)(entry + offset);
@@ -18,7 +17,6 @@ void ActorContact_TickAuxiliaryTimers(u8 *actor)
             if (*timer == 0) {
                 u32 value = *flags;
                 register u32 bit asm("r1") = 1;
-                asm("" : "+r"(bit));
                 *flags = value | bit;
             }
         }

@@ -23,14 +23,14 @@ void *ActorAttachment_ReleaseResource(void *, u32, void *);
 #define ADC(x)                                                                                     \
     ({                                                                                             \
         u32 o_ = 0xADC;                                                                            \
-                                                                                \
+                                                                                                   \
         (void *)((x) + o_);                                                                        \
     })
 
 #define B(x, o)                                                                                    \
     ({                                                                                             \
         u8 *t_ = (x);                                                                              \
-                                                                                \
+                                                                                                   \
         t_ + (o);                                                                                  \
     })
 

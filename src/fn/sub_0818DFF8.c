@@ -105,9 +105,8 @@ void Armor_InitPartStretch(struct StretchPart *p)
         p->paramA6 = 16;
         p->param52 = 16;
         {
-            register u32 off asm("r0") = 0x1D0;
-            register u32 addr asm("r1");
-            asm("" : "+r"(off));
+            u32 off = 0x1D0;
+            u32 addr;
             addr = (u32)p + off;
             *(void **)addr = Armor_BeginPartStretch;
         }

@@ -135,7 +135,7 @@ void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
 {
     u32 zero4;
     u8 *bytes;
-    register u8 *context asm("r5") = actor->context;
+    u8 *context = actor->context;
     struct ContactPosition *source;
     u32 zero;
     s32 height, slope;

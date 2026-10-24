@@ -26,8 +26,8 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
         if (pin == 1)
             asm("" : "+r"(bit));
         if (pin == 2) {
-            register u32 f2 asm("r1");
-            register u32 inp asm("r0") = input;
+            u32 f2;
+            u32 inp = input;
             asm("" : "=r"(f2) : "0"(bit));
             f2 &= inp;
             if (f2 != (((*command & 0x30) >> 4) & bit))

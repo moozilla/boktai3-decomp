@@ -29,8 +29,8 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             break;
         case 1: {
             u32 t = *(u32 *)(p + 0x74);
-            register const u16 *tab asm("r6");
-            register u32 *cur asm("r4");
+            const u16 *tab;
+            u32 *cur;
             u32 zero = 0;
             *(u32 *)(p + 0x74) = zero;
             if (t != 0)

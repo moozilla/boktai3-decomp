@@ -48,11 +48,10 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
     zero8 = 0;
     actor->direction = actor->fieldE9;
     if (!({
-            register u32 buttons asm("r1") = gUnk_03005260[1];
+            u32 buttons = gUnk_03005260[1];
             register u32 m asm("r0");
             one = 1;
             m = 1;
-            asm("" : "+r"(m));
             m &= buttons;
             m;
         }))

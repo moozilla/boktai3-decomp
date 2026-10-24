@@ -58,7 +58,7 @@ void VulcanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
     struct {
         struct Vec position, velocity;
     } frame;
-    register struct Source *source asm("r5") = sourceInput;
+    struct Source *source = sourceInput;
     struct Hit *hit = input;
     struct Target *target = targetInput;
     Collision_CalculateDamageResponse(source);
@@ -70,7 +70,7 @@ void VulcanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
         target->damageType = source->type;
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
-            register void *hud asm("ip");
+            void *hud;
             s32 health;
             s32 a, b, direction;
             target->reaction = 0x26;

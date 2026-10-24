@@ -78,54 +78,45 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
     struct ContactPosition *motion;
     if (Take(&actor->field2B1)) {
         u8 *body = actor->context;
-        register u32 angle asm("r3");
-        register u32 o1 asm("r4");
+        u32 angle;
+        u32 o1;
         Control(actor, actor->entryTarget228, 1);
         Clear(&zero, body + 0x480);
         angle = (u8)Rand();
-        asm("" : "+r"(angle));
         {
-            register const s16 *tab1 asm("r1") = gUnk_086149C4;
-            register s32 vx asm("r1");
-            register s16 *q asm("r0");
+            const s16 *tab1 = gUnk_086149C4;
+            s32 vx;
+            s16 *q;
             s32 t;
-            asm("" : "+r"(tab1));
             t = tab1[angle];
             asm("" ::"r"(tab1));
             vx = Shift(t, 6);
             o1 = 0x2EC;
-            asm("" : "+r"(o1));
             q = (s16 *)((u8 *)actor + o1);
             *q = vx;
         }
         {
-            register const s16 *tab asm("r2") = gUnk_086149C4;
-            register u32 idx asm("r0");
-            register u32 msk asm("r1");
+            const s16 *tab = gUnk_086149C4;
+            u32 idx;
+            u32 msk;
             s32 vz;
             register u32 o asm("r2");
             register s16 *q asm("r0");
-            asm("" : "+r"(tab));
             idx = angle + 64;
             msk = 255;
-            asm("" : "+r"(msk));
             idx &= msk;
             vz = Shift(tab[idx], 6);
-            asm("" ::"r"(tab));
             o = 0x2F0;
             asm("" : "+r"(o));
             q = (s16 *)((u8 *)actor + o);
             *q = vz;
         }
-        asm("" ::"r"(angle));
-        asm("" ::"r"(o1));
     }
     {
         register u32 mo asm("r6") = 0x2EC;
-        register u8 *ma asm("r4");
+        u8 *ma;
         asm("" : "+r"(mo));
         ma = (u8 *)actor + mo;
-        asm("" : "+r"(ma));
         motion = (struct ContactPosition *)ma;
     }
     length = motion->x * motion->x + motion->z * motion->z;

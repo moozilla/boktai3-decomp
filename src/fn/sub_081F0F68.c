@@ -55,10 +55,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -152,7 +150,6 @@ void SingletonSlot7_InitDisplaySprites(u8 *p)
     StepPlayback(foreground, state, one);
     {
         register u32 d asm("r1");
-        asm("" : "=r"(d));
         zero = 0;
         foreground->sprite.position.x = zero;
         foreground->sprite.position.y = zero;
@@ -178,7 +175,6 @@ void SingletonSlot7_InitDisplaySprites(u8 *p)
         StepPlayback(accent, state, one);
         {
             register u32 d asm("r1");
-            asm("" : "=r"(d));
             accent->sprite.position.x = 0;
             accent->sprite.position.y = 0;
             accent->sprite.position.z = 0;

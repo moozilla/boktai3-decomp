@@ -79,7 +79,6 @@ static inline void DragonPuppy_StepAnimation(u8 *p, void *sprite, struct FanSeq 
         if (first != (((*c & 0x30) >> 4) & bit)) {
             register u32 d asm("r2");
             u32 x;
-            asm("" : "=r"(d));
             x = *(u32 *)sprite;
             asm("" : : "r"(d));
             *(u32 *)sprite = x | 8;
@@ -145,7 +144,7 @@ s32 DragonPuppy_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
     register void *sprite asm("r8");
-    register void *earlySprite asm("r5");
+    void *earlySprite;
     s32 found;
     s32 dead;
     s16 *deadp;

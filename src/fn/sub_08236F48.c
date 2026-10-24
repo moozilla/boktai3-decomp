@@ -34,7 +34,7 @@ void sub_08236F48(struct Burst *p)
         u32 limit;
         register u32 l0 asm("r0") = p->limit2A;
         u32 tm = p->timer;
-        u32 ta, tb asm("r1");
+        u32 ta, tb;
         asm("" : "+r"(l0));
         limit = l0;
         if (tm < limit && p->variant != p->parent->variant)
