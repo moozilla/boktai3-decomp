@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// foundry draft (worker best 80.4%); what differs is mostly register allocation and instruction order
 struct MessagePanel {
     u8 pad0[0x20];
     void *palette;
@@ -44,8 +41,10 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     s32 found;
     s32 zero;
     void (**callback)(void *);
+    void (*nextCallback)(void *);
     u8 *entering;
     u8 *state;
+    struct MessagePanel *owner;
     if (Script_SeekToKeyword(0x6E)) {
         p->script = Script_GetPc();
         if (!p->script)
@@ -58,11 +57,13 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     }
     found = Script_SeekToKeyword(0x62);
     callback = &p->callback;
-    entering = &p->entering;
-    state = (u8 *)(((u32)p) + 0x11C8);
+    // Recover the panel that owns the callback slot.
+    owner = (struct MessagePanel *)((u8 *)callback - (u32) & ((struct MessagePanel *)0)->callback);
+    entering = &owner->entering;
+    state = &p->state;
     if (found) {
-        value = Script_GetValueSafe();
-        if (!value) {
+        s32 scriptPc = Script_GetValueSafe();
+        if (!scriptPc) {
             s32 *q;
             s32 initial = 6000;
             i = 11;
@@ -71,12 +72,17 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
                 *(q--) = initial;
             } while ((--i) >= 0);
         } else {
-            Script_SetPc(value);
-            for (i = 0; i <= 10; i++) {
+            Script_SetPc(scriptPc);
+            i = 0;
+            goto read_parameter;
+        store_parameter:
+            p->parameters[i] = value;
+            i++;
+        read_parameter:
+            if (i <= 10) {
                 value = Script_GetValue();
-                if (value < 0)
-                    break;
-                *((s32 *)((((u32)p) + 0x11D8) + (i << 2))) = value;
+                if (value >= 0)
+                    goto store_parameter;
             }
         }
     }
@@ -93,15 +99,12 @@ s32 MessagePanel_ConfigureFromScript(struct MessagePanel *p)
     ModifierMenu_InitSelectionSnapshot(((u8 *)p) + 0x944, p->palette);
     StageResults_CreateTextWindows(p);
     StageResults_ShowSummaryText(p);
+    nextCallback = sub_08112508;
     zero = 0;
-    *(&p->callback) = sub_08112508;
+    *callback = nextCallback;
     *entering = 1;
     *state = zero;
     if (Script_GetKeywordValue(0x66, 0))
         ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", MessagePanel_ConfigureFromScript);
-#endif

@@ -1,8 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 84.5%
-// Remaining differences: literal-pool/temp register numbering and the loop entry test.
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
 typedef struct {
@@ -34,24 +31,27 @@ void *ActorAttachment_ReleaseResource(void *, u32, void *);
         t_ + (o);                                                                                  \
     })
 
+typedef struct {
+    u16 flags;
+} ArmorFlags;
+
 static inline void SETF_(u16 *fp)
 {
-    u16 f = *fp;
-    *fp = f | 0x400;
+    ((ArmorFlags *)fp)->flags |= 0x400;
 }
 #define SETF(p) SETF_((u16 *)((p) + 0xB32))
 
 void Armor_ApplySceneCommands(u8 *arg)
 {
-    register u8 *pp asm("r6") = arg;
-    register ArmorQueue *q asm("r9") = (ArmorQueue *)(pp + 0xADC);
-    register s32 i asm("r8");
-    u8 *p;
-
+    u8 *p = arg;
+    ArmorQueue *q = (ArmorQueue *)(p + 0xADC);
+    s32 i;
     i = 0;
-    p = pp;
-    for (i = 0; i < q->count[gUnk_0200047C[0x24]]; i++) {
-        s16 *m = q->messages[gUnk_0200047C[0x24]][i];
+    if (i >= q->count[gUnk_0200047C[0x24]])
+        return;
+    do {
+        u8 *scene = gUnk_0200047C;
+        s16 *m = q->messages[scene[0x24]][i];
         SceneMessages_SetPendingTrigger(q, m);
         switch (((u8 *)m)[6]) {
             case 1:
@@ -66,7 +66,10 @@ void Armor_ApplySceneCommands(u8 *arg)
                 ActorController_SetBehavior(p, 0);
                 {
                     u32 v = (((u8)m[4] + 5) & 7) << 5;
-                    u8 *d = p + 0xB39;
+                    u32 offset = 0xB39;
+                    register u8 *d asm("r2");
+                    asm("" : "+r"(offset) : : "r1", "r2");
+                    d = p + offset;
                     *d = v & 0xc0;
                 }
                 goto consume;
@@ -117,20 +120,26 @@ void Armor_ApplySceneCommands(u8 *arg)
                 }
                 goto consume;
             }
-            case 12:
-                if (m[4] != 0)
+            case 12: {
+                // Keep r1 unavailable across the signed argument load.
+                register u32 reserved asm("r1");
+                s32 active;
+                asm("" : "=r"(reserved));
+                active = m[4];
+                asm("" : : "r"(reserved));
+                if (active != 0)
                     SETF(p);
                 else
                     *(u16 *)(p + 0xB32) &= 0xFBFF;
             consume:
                 Trigger_ConsumePending(ADC(p), 1);
                 break;
+            }
             case 13:
                 ActorController_SetBehavior(p, 0x2b);
                 if (m[4] != 0) {
                     {
                         u32 *w = (u32 *)(p + 0xB4);
-                        asm("" : "+r"(w));
                         w[2] &= ~1;
                     }
                     SETF(p);
@@ -138,7 +147,6 @@ void Armor_ApplySceneCommands(u8 *arg)
                 } else {
                     {
                         u32 *w = (u32 *)(p + 0xB4);
-                        asm("" : "+r"(w));
                         w[2] &= ~1;
                     }
                     SETF(p);
@@ -162,8 +170,5 @@ void Armor_ApplySceneCommands(u8 *arg)
                 }
                 break;
         }
-    }
+    } while (++i < q->count[gUnk_0200047C[0x24]]);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_ApplySceneCommands);
-#endif

@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "orbit_motion.h"
-#ifdef NONMATCHING
-// fuzzy: 89.2%
-// Remaining differences: saved-pointer placement and squared-distance register allocation.
 s32 ScalarApproach_StepHalf(s32, s32);
 s32 ScalarApproach_StepQuarter(s32, s32);
 s32 ScalarApproach_StepEighth(s32, s32);
@@ -18,32 +15,25 @@ static inline s32 Square(s32 a)
 {
     return a * a;
 }
-static inline s32 Distance(struct OrbitVector *a, struct OrbitVector *b)
-{
-    s32 x = a->x - b->x;
-    s32 z = a->z - b->z;
-    return Square(x) + Square(z);
-}
 s32 MotionTrack_Update(struct OrbitMotion *argument)
 {
     struct OrbitMotion *p = argument;
     struct OrbitVector *out;
     struct OrbitVector *target;
-    register struct OrbitVector *step asm("r6");
+    struct OrbitVector *step;
     struct OrbitVector *savedTarget;
     struct OrbitVector *savedStep;
-    s32 a, b, c, d;
+    s32 horizontalX, horizontalZ, stepDistanceSquared, stepYSquared, verticalY;
+    u32 mode;
     if (p->state != 1)
         return 0;
     out = p->position;
     target = &p->base;
     step = &p->offset;
-    switch (({
-        u32 k = p->unk28;
-        savedTarget = target;
-        savedStep = step;
-        k;
-    })) {
+    mode = p->unk28;
+    savedTarget = target;
+    savedStep = step;
+    switch (mode) {
         case 0:
             add(out, step, out);
             break;
@@ -67,9 +57,16 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             out->y = ScalarApproach_StepSixteenth(out->y, target->y);
             out->z = ScalarApproach_StepSixteenth(out->z, target->z);
             break;
-        case 6:
-            out->y = ScalarApproach_StepEighth(out->y, target->y);
+        case 6: {
+            /* Reserve the scratch register across the signed coordinate load. */
+            register s32 scratch asm("r3");
+            s32 current;
+            asm("" : "=r"(scratch));
+            current = out->y;
+            asm volatile("" : : "r"(scratch));
+            out->y = ScalarApproach_StepEighth(current, target->y);
             return SceneMover_SteerXZ(p);
+        }
         case 7:
             return SceneMover_SteerXY(p);
         case 8:
@@ -78,23 +75,26 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             return OrbitMotion_UpdateCrossedSines(p);
         case 10:
             OrbitMotion_UpdateAbsoluteSines(p);
-        case 5:
+        case 5: {
+            s16 value;
             out->x = Math_StepTowardTarget(out->x, target->x, step->x);
-            out->y = Math_StepTowardTarget(out->y, target->y, step->y);
+            value = Math_StepTowardTarget(out->y, target->y, step->y);
+            out->y = value;
             out->z = Math_StepTowardTarget(out->z, target->z, step->z);
             break;
+        }
         case 12:
             return OrbitMotion_InterpolatePosition(p);
     }
     if (target) {
-        c = Square(p->offset.x) + Square(savedStep->z);
+        stepDistanceSquared = Square(p->offset.x) + Square(savedStep->z);
         out = p->position;
-        a = p->base.x - out->x;
-        b = savedTarget->z - out->z;
-        if (Square(a) + Square(b) <= c) {
-            d = Square(savedStep->y);
-            a = out->y - p->base.y;
-            if (Square(a) <= d) {
+        horizontalX = p->base.x - out->x;
+        horizontalZ = savedTarget->z - out->z;
+        if (Square(horizontalX) + Square(horizontalZ) <= stepDistanceSquared) {
+            stepYSquared = Square(savedStep->y);
+            verticalY = out->y - p->base.y;
+            if (Square(verticalY) <= stepYSquared) {
                 p->state = 2;
                 p->timer++;
                 return 1;
@@ -104,7 +104,3 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
     p->timer++;
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", MotionTrack_Update);
-#endif

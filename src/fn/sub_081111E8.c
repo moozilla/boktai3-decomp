@@ -28,31 +28,25 @@ static inline u8 IsPlayerScrollBlocked(void)
 
 // confidence=low: advances each scanline's wave phase, by speedTop above the split line and
 // speedBottom below it, and derives the line's scroll offset.
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Same shape; register allocation differs (ROM keeps p in r5, i in r4) and the ROM derives &speedTop from the split address.
 void ScanlineScroll_AdvancePhases(struct ScanlineScroll *p)
 {
     s32 i;
-    typeof((p->speedTop + p->phases[i]) & 0xFFF) t1;
-    typeof((p->speedBottom + p->phases[i]) & 0xFFF) t2;
+    s32 speed;
+    u16 topPhase;
+    u16 bottomPhase;
     if (IsPlayerScrollBlocked())
         return;
     for (i = 0; i < p->split; i++) {
-        t1 = (p->speedTop + p->phases[i]) & 0xFFF;
-        p->phases[i] = t1;
+        speed = p->speedTop;
+        topPhase = (p->phases[i] + speed) & 0xFFF;
+        p->phases[i] = topPhase;
         p->offsets[i] = p->phases[i] >> 7;
     }
 
     for (; i < 160; i++) {
-        t2 = (p->speedBottom + p->phases[i]) & 0xFFF;
-        do {
-            p->phases[i] = t2;
-        } while (0);
+        speed = p->speedBottom;
+        bottomPhase = (p->phases[i] + speed) & 0xFFF;
+        p->phases[i] = bottomPhase;
         p->offsets[i] = p->phases[i] >> 7;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ScanlineScroll_AdvancePhases);
-#endif

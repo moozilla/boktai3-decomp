@@ -25,11 +25,12 @@ void FloatingEffect_Project(struct Effect *);
 void FloatingEffect_Init(struct Effect *);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
+static inline u32 FloatingEffect_RandomAt(const u16 *table, u16 index)
+{
+    return table[index];
+}
 // confidence=low: rises for the first few frames, then sinks (shaking in mode 3) and moves to
 // state 4 after 8 (mode 3: 9) frames.
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// The shaking jitter differs: the ROM keeps the table in r8 and computes x - 1 before adding the random bits.
 void sub_08016AA0(u8 *m, struct Effect *p)
 {
     if (p->entered) {
@@ -49,26 +50,38 @@ void sub_08016AA0(u8 *m, struct Effect *p)
     if ((p->mode == 3) && (p->timer > 3)) {
         const u16 *table = gUnk_0203B400;
         u32 *seed = &gUnk_03005308;
-        u16 index = ((*seed) + 1) & 0x3FF;
+        u32 mask;
+        u16 index = *seed + 1;
+        mask = 0x3FF;
+        index &= mask;
         *seed = index;
         {
-            typeof(table[index]) v1 = table[index];
-            p->sprite.position.x += (v1 & 3) - 1;
+            u32 bits = FloatingEffect_RandomAt(table, index);
+            s32 x = (u16)p->sprite.position.x - 1;
+            p->sprite.position.x = x + (bits & 3);
         }
-        index = (index + 1) & 0x3FF;
+        index = (index + 1) & mask;
         *seed = index;
-        p->sprite.position.y += (table[index] & 3) - 1;
+        {
+            u32 bits = FloatingEffect_RandomAt(table, index);
+            s32 y = (u16)p->sprite.position.y - 1;
+            p->sprite.position.y = y + (bits & 3);
+        }
     }
-    if ((p->mode == 3) ? (p->timer > 8) : (p->timer > 7)) {
-        do {
-            p->state = 4;
-        } while (0);
+    if (p->mode == 3) {
+        if (p->timer <= 8)
+            goto increment;
+    } else if (p->timer <= 7)
+        goto increment;
+    {
+        u32 nextState = 4;
+        u32 zero = 0;
+        p->state = nextState;
         p->entered = 1;
-        p->timer = 0;
-    } else
-        p->timer++;
+        p->timer = zero;
+    }
+    goto done;
+increment:
+    p->timer++;
+done:;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08016AA0);
-#endif

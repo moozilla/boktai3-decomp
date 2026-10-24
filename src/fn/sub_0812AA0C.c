@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.3%
-// Open: entry vector pointer allocation, reset offsets, and six structural differences.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -69,7 +66,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
+        /* Retain the command mask while advancing the frame. */
 
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -166,11 +163,11 @@ s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void LinkedEffect_UpdateColliders(struct Effect *);
-static inline u32 RandomValue(void)
+static inline const u16 *RandomEntry(void)
 {
     u32 index = (gUnk_03005308 + 1) & 1023;
     gUnk_03005308 = index;
-    return *(const u16 *)((index << 1) + (u32)gUnk_0203B400);
+    return (const u16 *)((index << 1) + (u32)gUnk_0203B400);
 }
 static inline s32 Truncate(s32 v)
 {
@@ -185,31 +182,30 @@ void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {
         u32 heading;
-        u32 sample;
+        u32 sample, value;
+        const u16 *random;
         register u32 distance asm("r4");
         struct UnsignedVector *velocity;
-        struct Vec *position;
         p->sprite.flags = (p->sprite.flags & ~1) | 2;
         p->ended = 0;
         heading = p->heading;
-        sample = (u8)RandomValue();
-        velocity = (void *)&p->velocity;
-        asm("" : "+r"(velocity));
-        distance = sample + 64;
-        asm("" : "+r"(heading), "+r"(distance));
+        random = RandomEntry();
         sample = 255;
+        value = (u8)*random;
+        /* Keep the random sample separate from the travel distance. */
+        asm("" : "+r"(value));
+        velocity = (void *)&p->velocity;
+        distance = value + 64;
         velocity->x = Truncate(distance * gUnk_086149C4[(heading + 64) & sample]);
         velocity->y = 0;
         velocity->z = Truncate(distance * gUnk_086149C4[heading]);
-        velocity = (void *)&p->velocity;
-        position = &p->sprite.position;
         {
-            u32 x = velocity->x;
-            asm("" : "+r"(x));
-            velocity->x = x + position->x;
+            struct Vec *destination = (void *)&p->velocity;
+            struct Vec *source = (void *)&p->sprite.position;
+            destination->x = source->x + destination->x;
+            destination->y = source->y + destination->y;
+            destination->z = source->z + destination->z;
         }
-        velocity->y = velocity->y + position->y;
-        velocity->z = velocity->z + position->z;
         p->velocity.y = p->sprite.position.y + 512;
         p->riseTimer = 15;
         p->frame = 0;
@@ -224,15 +220,19 @@ void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
         p->sprite.scaleY += Div(64 - p->sprite.scaleY, p->riseTimer);
         p->riseTimer--;
     }
-    p->ended = Step(&p->sprite, &p->anim);
-    if (p->ended && !p->riseTimer) {
-        p->state = 2;
-        p->sprite.flags &= ~2;
-        p->entered = 1;
-    } else
-        p->frame++;
+    {
+        u32 ended = Step(&p->sprite, &p->anim);
+        /* Retain the related state-field offset through the transition. */
+        register u32 endedOffset asm("r6") = (u32) & ((struct Effect *)0)->ended;
+        *(u8 *)((u32)p + endedOffset) = ended;
+        if (ended && !p->riseTimer) {
+            p->state = 2;
+            p->sprite.flags &= ~2;
+            endedOffset -=
+                (u32) & ((struct Effect *)0)->ended - (u32) & ((struct Effect *)0)->entered;
+            *(u8 *)((u32)p + endedOffset) = 1;
+        } else
+            p->frame++;
+        asm("" : : "r"(endedOffset));
+    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", LinkedEffect_BeginRisingTravel);
-#endif
