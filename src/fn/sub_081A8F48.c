@@ -1,12 +1,10 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
-// Remaining differences: initial vector aliases, register choices and constant scheduling.
+struct DrainPosition {
+    s16 x, y, z, pad;
+};
 struct PlayerDrainTarget {
     u8 pad0[0x20];
     u32 flags;
@@ -17,7 +15,7 @@ struct PlayerDrainTarget {
 };
 struct DrainActor {
     u8 pad0[0x54];
-    u16 position[4];
+    struct DrainPosition position;
     u8 pad5C[0x94 - 0x5C];
     s16 health;
     u8 pad96[6];
@@ -53,80 +51,50 @@ static inline u32 TestFlags(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-static inline void OffsetPosition(s16 *out, u16 *in)
+static inline void OffsetPosition(struct DrainPosition *out, struct DrainPosition *in)
 {
-    out[0] = in[0] + 128;
-    out[1] = in[1];
-    out[2] = in[2] + 128;
+    out->x = in->x + 128;
+    out->y = in->y;
+    out->z = in->z + 128;
 }
-static inline void SetPosition(s16 *out, s32 x, s32 y, s32 z)
+static inline void SetPosition(struct DrainPosition *out, s32 x, s32 y, s32 z)
 {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
+    out->x = x;
+    out->y = y;
+    out->z = z;
 }
-static inline void AddPosition(s16 *out, s16 *a, s16 *b)
+static inline void AddPosition(struct DrainPosition *out, struct DrainPosition *a,
+                               struct DrainPosition *b)
 {
-    u16 av = a[0];
-    u16 bv = b[0];
-    typeof(bv) c1;
-    out[0] = av + bv;
-    av = a[1];
-    bv = b[1];
-    c1 = bv;
-    out[1] = av + c1;
-    av = a[2];
-    bv = b[2];
-    out[2] = av + c1;
-}
-
-inline static void SetPosition_UpdatePlayerDrain(s16 *out, s32 x, s32 y, s32 z)
-{
-    out[1] = y;
-    out[0] = x;
-    out[2] = z;
-}
-
-inline static void AddPosition_UpdatePlayerDrain(s16 *out, s16 *a, s16 *b)
-{
-    u16 av = a[0];
-    u16 bv = b[0];
-    typeof(bv) c1;
-    out[0] = av + bv;
-    av = a[1];
-    c1 = bv;
-    bv = b[1];
-    out[1] = av + c1;
-    av = a[2];
-    bv = b[2];
-    out[2] = av + c1;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
 }
 
 void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
 {
     struct DrainActor *self = p;
-    s16 initial[4];
-    s16 position[4];
-    s16 *initialBase;
-    s32 t1;
+    struct DrainPosition initial;
+    struct DrainPosition position;
+    struct DrainPosition *initialBase;
     {
         u32 mask = 12;
         p->flags |= mask;
     }
     Vanargand_SetPendingCue(p, 1);
     if (p->pendingAnimation) {
-        register u32 one asm("r5");
+        u32 one;
+        struct PlayerDrainTarget *target;
         p->pendingAnimation = 0;
-        SetPosition_UpdatePlayerDrain(initial, 128, 0, 128);
-        initialBase = initial;
-        asm("" : "+r"(initialBase));
-        AddPosition_UpdatePlayerDrain(initial, p->position, initialBase);
+        SetPosition(&initial, 128, 0, 128);
+        initialBase = &initial;
+        AddPosition(&initial, &p->position, initialBase);
+        target = gUnk_02000580[0];
         one = 1;
-        asm("" : "+r"(one));
-        if (!TestFlags(&gUnk_02000580[0]->flags, 0x40000)) {
+        if (!TestFlags(&target->flags, 0x40000)) {
             void *animation;
             void *drawable;
-            Player_BeginPositionRequest(gUnk_02000580[0], initial, 0, 0, 0, 0, one, 0, 2);
+            Player_BeginPositionRequest(gUnk_02000580[0], &initial, 0, 0, 0, 0, one, 0, 2);
             animation = p->animation;
             drawable = p->drawable;
             switch ((s32)p->player->mode) {
@@ -158,25 +126,26 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         s32 current = player->frame;
         s32 bias = -256;
         start += bias;
-        asm("" : "+r"(bias));
         if (((current - start) & 255) <= 19) {
             if (p->ready) {
                 s32 amount;
                 s32 health;
-                OffsetPosition(position, p->position);
+                OffsetPosition(&position, &p->position);
                 if (!TestFlags(&p->player->flags, 0x40000)) {
-                    amount = Player_BeginPositionRequest(p->player, position, 0, 0, 0, 0, 1,
+                    amount = Player_BeginPositionRequest(p->player, &position, 0, 0, 0, 0, 1,
                                                          self->damage, 2);
                     health = self->health;
                     SceneActors_SetHealth(self, health + amount);
                     if (health != self->health)
                         DamageNumberDisplay_ShowWithDefaultScale(((u8 *)self) + 0x6C4, amount, 1,
-                                                                 self->position, 1);
+                                                                 &self->position, 1);
                     sub_081A6398(self);
                     Sound_PlaySongChecked(0x225);
-                    t1 = 4;
-                    if ((!TestFlags(&gUnk_02000560, t1)) && (p->action <= 4))
-                        return;
+                    {
+                        u32 mask = 4;
+                        if ((!TestFlags(&gUnk_02000560, mask)) && (p->action <= 4))
+                            return;
+                    }
                 }
                 p->finished = 1;
             }
@@ -185,7 +154,3 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePlayerDrain);
-#endif

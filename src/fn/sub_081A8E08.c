@@ -1,19 +1,18 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: stack-vector aliases, zero lifetimes and constant scheduling.
 // confidence=low: selects a player-mode collision copy and completes a position request.
 #define Vanargand_UpdateCaptureSetup sub_081A8E08
+struct CapturePosition {
+    s16 x, y, z, pad;
+};
 struct CaptureTarget {
     u8 pad0[0x418];
     u8 mode;
 };
 struct CaptureActor {
     u8 pad0[0x54];
-    s16 position[4];
+    struct CapturePosition position;
     u8 pad5C[0x9C - 0x5C];
     u32 flags;
     u8 padA0[0xAF - 0xA0];
@@ -31,84 +30,54 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32)
 void *Player_GetCollisionData(void);
 void CpuSet(const void *, void *, u32);
 void Player_ApplyPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32);
-static inline void SetPosition(s16 *out, s32 x, s32 y, s32 z)
+static inline s32 SetPositionAndGetHeight(struct CapturePosition *out, s32 x, s32 y, s32 z)
 {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
+    // Preserve the initialized height separately from the pending-animation zero.
+    register s32 height asm("r4") = y;
+    out->x = x;
+    (&out->y)[0] = height;
+    out->z = z;
+    return height;
 }
-static inline void AddPosition(s16 *out, s16 *a, s16 *b)
+static inline void AddPosition(struct CapturePosition *out, struct CapturePosition *a,
+                               struct CapturePosition *b)
 {
-    s8 av = a[0];
-    u16 bv = b[0];
-    typeof(bv) c1;
-    out[0] = av + bv;
-    av = a[1];
-    bv = b[1];
-    c1 = bv;
-    out[1] = a[1] + c1;
-    av = a[2];
-    bv = b[2];
-    out[2] = a[2] + c1;
-}
-
-inline static void SetPosition_081A8E08(s16 *out, s32 x, s32 y, s32 z)
-{
-    out[1] = y;
-    out[0] = x;
-    out[2] = z;
-}
-
-inline static void AddPosition_081A8E08(s16 *out, s16 *a, s16 *b)
-{
-    s8 av = a[0];
-    u16 bv = b[0];
-    typeof(bv) c1;
-    out[0] = av + bv;
-    av = a[1];
-    do {
-        bv = b[1];
-    } while (0);
-    c1 = bv;
-    out[1] = a[1] + c1;
-    av = a[2];
-    bv = b[2];
-    out[2] = a[2] + c1;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
 }
 
 void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
 {
-    register struct CaptureActor *q asm("r6") = p;
-    s16 position[4];
+    struct CaptureActor *q = p;
+    struct CapturePosition position;
     u32 mask = 4;
-    asm("" : "+r"(q));
     p->flags |= mask;
     Vanargand_SetPendingCue(p, 0);
     if (p->pendingAnimation) {
         void *animation;
         void *drawable;
-        s16 *base;
+        struct CapturePosition *base;
         u32 two;
-        register u32 zero asm("r12") = 0;
-        asm("" : "+r"(zero));
-        do {
-            p->pendingAnimation = zero;
-        } while (0);
-        SetPosition_081A8E08(position, 128, 0, 128);
-        base = position;
-        asm("" : "+r"(base));
-        AddPosition_081A8E08(position, p->position, base);
-        two = 2;
+        s32 animationFlags;
+        u32 zero = 0;
+        (&p->pendingAnimation)[0] = zero;
+        animationFlags = SetPositionAndGetHeight(&position, 128, 0, 128);
+        base = &position;
+        AddPosition(&position, &p->position, base);
         animation = p->animation;
         drawable = p->drawable;
+        two = 2;
         switch ((s32)p->target->mode) {
             case 0:
-                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 12, two, 0);
+                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 12, two,
+                                                     animationFlags);
                 CpuSet(Player_GetCollisionData(), p->collision[0], 0x4000008);
                 break;
 
             case 1:
-                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 13, two, 0);
+                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 13, two,
+                                                     animationFlags);
                 CpuSet(Player_GetCollisionData(), p->collision[1], 0x4000008);
                 break;
 
@@ -124,7 +93,3 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
         p->active = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081A8E08);
-#endif

@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// Remaining difference: shared zero initialization is emitted before the direction load.
+// MATCHING_CONCESSION: register-pinning
+// One empty frame-use barrier preserves the ROM register allocation.
 struct DirectionalActor {
     u8 pad0[0x51];
     u8 angle;
@@ -60,8 +59,9 @@ static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8
 void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 frame)
 {
     struct DirectionalActor *q = p;
-    u32 zero = 0;
+    u32 zero;
     facing(p, p->requestedAngle);
+    zero = 0;
     if (p->changed) {
         p->changed = zero;
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
@@ -70,6 +70,8 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 fra
         q->motionE54 = 0;
         q->motionE58 = 0;
     }
+    // Keep the frame value in its own register through the palette setup.
+    asm("" : : "r"(frame));
     if (frame > 299) {
         p->finished = 1;
         PaletteEffect_RefreshPalette(q);
@@ -96,6 +98,3 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 fra
     }
     Callback_InvokeActor(p, p->callback);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMotion_UpdateTimedPaletteAnimation);
-#endif

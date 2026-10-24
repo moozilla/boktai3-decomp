@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -31,8 +30,7 @@ static inline u32 Random(void)
     gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
     {
         u32 offset = gRandomTableIndex * 2;
-        register const u16 *table asm("r3") = gRandomTable;
-        asm("" : "+r"(table));
+        const u16 *table = gRandomTable;
         return *(u16 *)(offset + (u32)table);
     }
 }
@@ -41,9 +39,8 @@ inline static u32 Random_SelectDistantWaypoint(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
         u32 offset = gUnk_03005308 * 2;
-        register const u16 *table asm("r3") = *((typeof(gUnk_0203B400) *)0x0203B400);
+        const u16 *table = *((typeof(gUnk_0203B400) *)0x0203B400);
         return *((u16 *)(offset + ((u32)table)));
-        asm("" : "+r"(table));
     }
 }
 
@@ -87,9 +84,8 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
         bestIndex.value = Mod(Random_SelectDistantWaypoint(), *route.data);
     Axe_RecordRoutePoint(actor, bestIndex.value);
     {
-        register struct RoutePointSelection *dst asm("r0") = &route;
-        register u32 mode asm("r1") = 0;
-        asm("" : "+r"(dst), "+r"(mode));
+        struct RoutePointSelection *dst = &route;
+        u32 mode = 0;
         dst->index = bestIndex.bytes[0];
         dst->mode = mode;
     }

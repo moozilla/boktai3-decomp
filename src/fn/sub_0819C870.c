@@ -26,39 +26,20 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-static inline void polar(struct BurstVector *v, s32 angle, s32 radius)
+// angle is s16 and the z product reads radius * table: both shape the
+// allocation. The s16 conversion adds RTL that combine folds away later, but
+// flow counts it, so speed outlives actor and is allocated after it; the
+// operand order puts speed's REG_DEAD note first, so it does not inherit the
+// table's r3 preference (tools/scope/README.md, facts 11 and 16).
+static inline void polar(struct BurstVector *v, s16 angle, s32 radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
-    v->z = scale(gUnk_086149C4[angle & 255] * radius);
-}
-static inline void add(struct BurstVector *d, struct BurstVector *a, struct BurstVector *b)
-{
-    d->x = b->x + a->x;
-    d->y = b->y + a->y;
-    d->z = b->z + a->z;
-}
-static inline s32 sineScale(s32 angle, s32 radius)
-{
-    return scale(gUnk_086149C4[angle & 255] * radius);
-}
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: inlined vector-helper register and constant lifetimes.
-inline static void polar_0819C870(struct BurstVector *v, s32 angle, s8 radius)
-{
-    v->x = (u16)scale(gUnk_086149C4[(angle + 64) & 255] * radius);
-    v->y = 0;
-    v->z = scale(gUnk_086149C4[(u16)(angle & 255)] * radius);
+    v->z = scale(radius * gUnk_086149C4[angle & 255]);
 }
 
 void Hresvelgr_SetSineScaledVelocity(struct BurstActor *actor, s32 radius, s32 angle)
 {
-    s32 direction = ((actor->side << 6) + 128) & 255;
-    s32 speed = sineScale(angle, radius);
-    polar_0819C870(&actor->velocity, direction, speed);
+    u32 direction = ((actor->side << 6) + 128) & 255;
+    polar(&actor->velocity, direction, scale(gUnk_086149C4[angle & 255] * radius));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0819C870);
-#endif

@@ -37,40 +37,30 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
-static inline s32 randomValue(void)
+static inline s32 randomValue(u32 table)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + table);
 }
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: inlined vector-helper register and constant lifetimes.
-inline static s32 randomValue_0819C6AC(void)
-{
-    u32 offset;
-    {
-        u16 k1 = 1023;
-        gUnk_03005308 = (gUnk_03005308 + 1) & k1;
-    }
-    offset = gUnk_03005308 * 2;
-    return *((const u16 *)(offset + ((u32)gUnk_0203B400)));
-}
-
+// One variable holds the table address and later the angle (the ROM keeps both in r4): set twice,
+// it is not a constant register, so its priority is not halved and it wins r4 over the 1023 mask
+// (update_equiv_regs in local-alloc.c only marks a pseudo whose every set stores one constant).
 void Hresvelgr_SetRandomTravelTarget(struct BurstActor *actor)
 {
     struct BurstActor *saved = actor;
-    s32 radius = ((randomValue_0819C6AC() >> 3) % 512) + 256;
-    s32 sample = randomValue_0819C6AC();
-    s32 angle = ((actor->side << 6) + (((sample >> 3) % 32) + 112)) & 255;
-    typeof(saved->target) t1;
-    polar(&actor->travelTarget, angle, radius);
-    t1 = saved->target;
-    add(&actor->travelTarget, t1, &actor->travelTarget);
+    u32 work = (u32)gUnk_0203B400;
+    s32 radius = (randomValue(work) >> 3) % 512 + 256;
+    s32 sample = randomValue(work);
+    s32 base = actor->side << 6;
+    s32 offset = (sample >> 3) % 32 + 112;
+    work = base + offset;
+    work &= 255;
+    polar(&actor->travelTarget, work, radius);
+    {
+        struct BurstVector *target = saved->target;
+        add(&actor->travelTarget, target, &actor->travelTarget);
+    }
     actor->travelTarget.y = 832;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0819C6AC);
-#endif

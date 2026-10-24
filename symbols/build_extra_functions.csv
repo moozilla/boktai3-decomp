@@ -467,7 +467,7 @@ address,isa,evidence,replacement_end
 0819B86C,thumb,Snapping array approach helper in the math helper block; exact standalone C,0819B8B4
 0819B8B4,thumb,Angle array lerp helper in the math helper block (own literal pool); retained assembly (not yet matched),0819B930
 0819BB18,thumb,Hidden tail after Hresvelgr_HasAdjacentOverride,
-0819C870,thumb,Hidden raw-tail function (retained),
+0819C870,thumb,Hidden raw-tail function (retained); exact 136-byte C body up to the cosine twin at 0819C8F8,0819C8F8
 0819D190,thumb,Hidden raw-tail function,0819D1D0
 0819E7B0,thumb,Hidden raw-tail function,0819E7F0
 0819EB84,thumb,Hidden raw-tail function: emits a centred fan of direction bursts,0819EBD0

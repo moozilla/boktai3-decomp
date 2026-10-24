@@ -1,9 +1,7 @@
 #include "global.h"
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// Remaining difference: phase-zero timer reset uses r7 instead of r5.
+// Scope: byte-for-byte match with one retained register pin.
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;
@@ -43,7 +41,11 @@ static inline s32 RandomValue(void)
 void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 {
     u8 result;
-    s32 phase;
+    /* Reuse the dispatch scratch storage once the phase value is no longer needed. */
+    union {
+        s32 phase;
+        u32 *timer;
+    } state;
     if (p->mode == 1) {
         u32 mask = 0x40000;
         p->flags |= mask;
@@ -63,8 +65,8 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
         p->repeats = result;
         Vanargand_SetPairedMotionParameter(p->pair, p->parameter);
     }
-    phase = p->phase;
-    switch (phase) {
+    state.phase = p->phase;
+    switch (state.phase) {
         case 0:
             if (p->timer == 0) {
                 PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 7);
@@ -72,8 +74,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 p->selected = (RandomValue() >> 4) & 1;
                 p->phase = 1;
-                asm("" : : "r"(phase));
-                p->timer = phase;
+                p->timer = state.phase;
             }
             break;
         case 1:
@@ -85,6 +86,7 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
                         u8 next = 2;
                         p->phase = next;
                         {
+                            /* Keep the separate zero load for the sixth-repeat reset. */
                             register u32 zero asm("r0") = 0;
                             asm("" : "+r"(zero));
                             p->timer = zero;
@@ -101,7 +103,8 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                 if (++p->timer > 15) {
                     p->phase = 3;
-                    p->timer = result;
+                    state.timer = &p->timer;
+                    *state.timer = result;
                 }
             }
             break;
@@ -110,7 +113,3 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateRepeatedPairAttack);
-#endif

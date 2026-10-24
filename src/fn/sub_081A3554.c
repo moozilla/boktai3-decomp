@@ -24,12 +24,6 @@ s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
 s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *, s32, s32, s32);
-static inline void SetPosition(struct HresvelgrShotSprite *sprite, s32 x, s32 y, s32 z)
-{
-    sprite->x = x;
-    sprite->y = y;
-    sprite->z = z;
-}
 s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
 {
     struct HresvelgrShot *shot;
@@ -44,13 +38,16 @@ s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
     sprite = &shot->sprite;
     // The order matters: x lives longest, gets no register, and is
     // rematerialized in the loop, which sets reload's register rotation.
+    // zero is a variable in the original too: the ROM keeps it in r8.
     x = 0x708;
     y = 0x100;
     z = 0x4B0;
     do {
         Sprite_Init(shot, pool->animationData, 0);
         sprite->animation = zero;
-        SetPosition(sprite, x, y, z);
+        sprite->x = x;
+        sprite->y = y;
+        sprite->z = z;
         sprite->flags |= 1;
         shot->lifetime = zero;
         Hresvelgr_InitShotCollider(shot, pool->attackA, pool->attackB, pool->attackC);

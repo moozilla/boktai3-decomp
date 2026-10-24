@@ -396,7 +396,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
 
 static inline u32 Item_NextRandom(void)
 {
-    register const u16 *t asm("r6") = gUnk_0203B400;
+    const u16 *t = gUnk_0203B400;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return t[gUnk_03005308];
 }

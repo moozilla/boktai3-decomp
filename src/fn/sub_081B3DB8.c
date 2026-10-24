@@ -2,14 +2,15 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: emits six radial effects, waits for animation 10, then deactivates the part.
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
-// Remaining differences: radial-loop allocation and animation-step register lifetimes.
+// Exact with register-pinning and empty-asm concessions.
+struct VanargandState {
+    u32 state;
+    u32 timer;
+};
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -21,8 +22,7 @@ struct VanargandPart {
     u8 unknownAE[0xae];
     u32 variant;
     u32 flags;
-    u32 state;
-    u32 timer;
+    struct VanargandState control;
     u8 unknown16C[2];
     u8 reset, enter, finished;
 };
@@ -46,6 +46,10 @@ static inline void AddVector(struct SceneVec *dst, struct SceneVec *a, struct Sc
     dst->x = b->x + a->x;
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
+}
+static inline s32 WeightSpeed(s32 weight, s32 speed)
+{
+    return (speed * weight) >> 6;
 }
 static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequenceState *state,
                                struct VanargandPart *base, u32 one)
@@ -95,10 +99,12 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         u32 elapsed = state->elapsed + 1;
         u32 mask;
         register u32 temp asm("r2");
-        register u32 savedDuration asm("r3");
+        u8 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
         mask = temp;
+        /* Keep the mask copy before the duration load overwrites r2. */
+        asm("" : : "r"(temp), "r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -106,7 +112,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
             state->elapsed = 0;
             flags = state->flags;
             if (flags & 4) {
-                s16 index = state->index;
+                u16 index = state->index;
                 if (index == 0) {
                     u32 hold = 8;
                     hold &= flags;
@@ -152,10 +158,10 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
             }
             state->frameWeight = (*command) & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed = WeightSpeed(weight, speed);
                 state->duration = speed;
                 if (!((u8)speed))
                     state->duration = 1;
@@ -167,48 +173,46 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     return ended;
 }
 
+static inline void ClearVector(struct SceneVec *dst)
+{
+    volatile u32 zero = 0;
+    CpuSet((const void *)&zero, dst, 0x05000002);
+}
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
-    p->state = state;
-    p->timer = 0;
+    p->control.state = state;
+    p->control.timer = 0;
 }
 void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
 {
     u32 mask = 12;
-    u32 *new_var;
     p->flags |= mask;
     if (p->reset) {
-        u32 zero;
         struct SceneVec velocity;
         struct SceneVec position;
         s32 i;
-        s32 phase;
-        u32 *state;
+        struct VanargandState *state;
         u32 *timer;
         u8 *entered;
         p->reset = 0;
         Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 10, (u8)p->variant, 0);
-        CpuSet(&zero, &velocity, 0x05000002);
-        new_var = &p->timer;
-        zero = 0;
+        ClearVector(&velocity);
         i = 0;
-        state = &p->state;
-        timer = new_var;
+        state = &p->control;
+        timer = &state->timer;
         entered = &p->enter;
-        phase = 0;
         do {
-            MakeVector(&position, phase / 6, 128);
+            MakeVector(&position, (i * 255) / 6, 128);
             AddVector(&position, (struct SceneVec *)(&p->sprite.position), &position);
             VanargandEffect_Create(1, i << 1, &position, &velocity, p->variant);
-            phase += 255;
             i++;
         } while (i <= 5);
         Sound_PlaySong(0x58c);
-        *state = 0;
+        state->state = 0;
         *timer = 0;
         *entered = 1;
     }
-    switch (p->state) {
+    switch (p->control.state) {
         case 0:
             if (StepPlayback(p, &p->sequence, p, 1)) {
                 SetState(p, 1);
@@ -222,7 +226,3 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_ReleaseRadialEffects);
-#endif

@@ -2,11 +2,9 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fix.py best after the inlined-insn fix
-// fix.py best version (reprinted C)
+// Matched with tools/scope by gpt-6.1-sol workers; the pins and empty asm barriers are
+// temporary concessions.
 // confidence=low: moves the part along its stored retreat angle, then returns to idle.
-// Remaining differences: register lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -29,10 +27,15 @@ struct VanargandPart {
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
-static inline void StepSequence(void *obj, u32 firstMask)
+static inline s32 ScaleSequenceSpeed(s32 weight, s32 speed)
+{
+    return (speed * weight) >> 6;
+}
+
+static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
 {
     struct VanargandPart *owner = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;
@@ -77,7 +80,7 @@ static inline void StepSequence(void *obj, u32 firstMask)
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
+        asm("" : "+r"(temp) : "r"(preserveMask ? bit : temp));
         mask = temp;
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -105,8 +108,8 @@ static inline void StepSequence(void *obj, u32 firstMask)
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -128,10 +131,8 @@ static inline void StepSequence(void *obj, u32 firstMask)
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed = ScaleSequenceSpeed(state->frameWeight, state->speed);
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
@@ -173,13 +174,11 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
         p->reset = 0;
         {
             void *resource = *((void **)(bossArg + 0x4d0));
-            asm("" : "+r"(resource));
             Anim_SetSequence(&p->sequence, resource, 11, (u8)p->variant, 0);
         }
-        StepSequence(p, 1);
+        StepSequence(p, 1, 0);
         {
-            register u32 zero asm("r1") = 0;
-            asm("" : "+r"(zero));
+            u32 zero = 0;
             p->state = zero;
             p->timer = zero;
         }
@@ -187,13 +186,11 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
     }
     {
         u32 state = p->state;
-        asm("" : "+r"(state));
         switch (state) {
             case 0: {
                 struct SceneVec target;
                 u32 entering = p->enter;
                 u8 *enter;
-                asm("" : "+r"(entering));
                 enter = &p->enter;
                 if (entering) {
                     *enter = 0;
@@ -204,17 +201,10 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
                 }
                 MotionTrack_Update(p->motion);
                 if (Ended(p)) {
-                    {
-                        register u32 next asm("r2") = 1;
-                        p->state = next;
-                        asm("" : "+r"(next));
-                    }
-                    {
-                        typeof(p->timer) *q1 = &p->timer;
-                        u8 z1 = 1;
-                        *q1 = 0;
-                        *enter = z1;
-                    }
+                    u32 next = 1;
+                    p->state = next;
+                    p->timer = 0;
+                    *enter = next;
                 }
                 break;
             }
@@ -225,17 +215,18 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
                     asm("" : "+r"(state));
                     {
                         void *resource = *((void **)(bossArg + 0x4d0));
-                        asm("" : "+r"(resource));
                         Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
                     }
-                    StepSequence(p, state);
+                    StepSequence(p, state, 1);
                 }
-                p->finished = 1;
+                {
+                    register u32 finishedOffset asm("r2") = 0x170;
+                    register u8 *finished asm("r1");
+                    asm("" : "+r"(finishedOffset));
+                    finished = (u8 *)p + finishedOffset;
+                    *finished = 1;
+                }
                 break;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSidestep);
-#endif

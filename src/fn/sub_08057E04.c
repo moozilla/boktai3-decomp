@@ -101,7 +101,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
                     u32 endColor;
                     s32 greenEnd;
                     register s32 channelMask asm("r5");
-                    register s32 red asm("r5"), green asm("r2"), blue asm("r0");
+                    register s32 red, green asm("r2"), blue asm("r0");
                     redStart &= startColor;
                     startColor <<= 16;
                     greenStart = startColor >> 21;
