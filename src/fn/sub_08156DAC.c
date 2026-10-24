@@ -1,68 +1,81 @@
 #include "global.h"
-#include "terrain_cell_probe.h"
+#include "engine.h"
+#include "player.h"
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void Player_UpdateFacingSide(struct Player *);
+void ActorSequence_Begin(void *, s32, s32);
 extern const s16 gUnk_086149C4[];
-void Player_UpdateFacingSide(void *);
-void ActorSequence_Begin(void *, u32, u32);
-struct FacingPosition {
-    s32 x : 16, y : 16, z : 16, pad : 16;
+
+struct FloorPoint {
+    s16 x, y, z, pad;
 };
-static inline s32 scale(s32 v)
+struct PackedVec {
+    u32 x : 16, y : 16, z : 16, pad : 16;
+};
+static inline s32 Scale(int x)
 {
-    return v >= 0 ? v >> 12 : -((-v) >> 12);
+    if (x >= 0)
+        return x >> 12;
+    return -(-x >> 12);
 }
-static inline u32 Height(struct Pos16 *p)
+static inline s32 cellIndex(struct FloorPoint *pos)
 {
-    u8 *props = cellProps(cellIndexAt(p));
-    u32 kind = *props >> 4;
-    u32 h = (*props & 15) << 8;
-    if (kind == 1)
-        goto slopeZ;
-    if (kind == 2)
-        goto slopeX;
-    goto done;
-slopeZ:
-    h -= *(u8 *)&p->z;
-    goto done;
-slopeX:
-    h -= *(u8 *)&p->x;
-done:
-    return h;
+    s32 x = pos->x >> 8, z = pos->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
 }
-#ifdef NONMATCHING
-// fuzzy: 89.5%
-// Remaining differences: heading allocation and CSE across the reversing-facing tail.
-// confidence=low: compares nearby terrain height and input heading before reversing facing.
+static inline u32 groundHeight(struct FloorPoint *position)
+{
+    s32 index = cellIndex(position), height;
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+    u32 kind;
+    if (cell)
+        cell += 4;
+    else
+        cell = gUnk_030052F4->cells + 12 + index * 4;
+    kind = *cell >> 4;
+    height = (*cell & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
+    }
+    return height;
+}
+
+// confidence=low: compares nearby terrain height and input heading before reversing facing;
+// Player_TryStepForward (sub_08242120) with a facing update and sequence restart at the end.
 #define Player_CheckFacingTerrainClearance sub_08156DAC
-s32 Player_CheckFacingTerrainClearance(u8 *p)
+s32 Player_CheckFacingTerrainClearance(struct Player *p)
 {
-    struct FacingPosition pos;
-    s32 direction, left, right, input;
-    if (*(u8 *)(p + 0x4E3))
+    u32 zero = *((u8 *)p + 0x4E3);
+    if (zero != 0)
         return 1;
-    direction = *(u8 *)(p + 0x4A5);
-    left = (direction + 7) & 7;
-    right = (direction + 9) & 7;
-    input = *(s16 *)(p + 0x34C);
-    if (input == direction || input == left || input == right) {
-        s32 angle = ((*(u8 *)(p + 0x4A5) + 1) & 7) << 5;
-        pos = *(struct FacingPosition *)(p + 0x30);
-        pos.x -= scale(50 * gUnk_086149C4[(angle + 64) & 255]);
-        pos.z -= scale(50 * gUnk_086149C4[angle]);
-        if (Height((struct Pos16 *)&pos) >= (u32)(*(s16 *)(p + 0x32) + 200))
-            return 1;
-        {
-            s32 facing = (*(u8 *)(p + 0x4A5) + 4) & 7;
-            *(u8 *)(p + 0x3A4) = facing;
+    {
+        u8 axis = p->coordinateAxis;
+        u32 a = (axis + 7) & 7;
+        u32 b = (axis + 9) & 7;
+        s32 h = (s16)p->directionHistory[0];
+        if (h == axis || h == a || h == b) {
+            struct PackedVec pt;
+            u32 ang = ((p->coordinateAxis + 1) & 7) << 5;
+            u32 height;
+            pt = *(struct PackedVec *)&p->position;
+            pt.x += -Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * 0x32);
+            pt.z += -Scale(gUnk_086149C4[ang] * 0x32);
+            height = groundHeight((struct FloorPoint *)&pt);
+            if (height >= (u32)(p->position.y + 0xc8))
+                return 1;
+            p->facing = (p->coordinateAxis + 4) & 7;
+        } else {
+            p->facing = (axis + 4) & 7;
         }
-    } else {
-        s32 facing = (direction + 4) & 7;
-        *(u8 *)(p + 0x3A4) = facing;
     }
     Player_UpdateFacingSide(p);
     ActorSequence_Begin(p, 0, 0);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08156DAC);
-#endif
