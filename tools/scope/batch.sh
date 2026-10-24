@@ -72,5 +72,9 @@ $list
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)" | tail -1)
 echo "$url"
-gh pr merge "$url" --merge
+# GitHub briefly refuses ("Base branch was modified") right after the previous batch merged
+for try in 1 2 3; do
+    gh pr merge "$url" --merge && break
+    sleep 20
+done
 gh pr view "$url" --json state -q .state
