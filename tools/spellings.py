@@ -1021,6 +1021,41 @@ def sp_param_alias(fn):
                 yield f"{v} = {prm.name} at entry, used in the {which} arm of `if ({text(node.cond)[:24]})`", f2
 
 
+ASSOC = ("|", "&", "^", "+", "*")
+
+
+def sp_compound_assign(fn):
+    """L = (L op A) op B  ->  L op= A op B, L = L op A  ->  L op= A, and L op= A  ->  L = L op A
+    (sub_08114E68: `sprite->flags |= 0x11 | spriteFlags;`). c-typeck.c build_modify_expr builds a
+    compound assignment's L once, through stabilize_reference: its address (here a pointer spilled
+    to the stack) is computed one time and serves both the load and the store, and L's load comes
+    before the right side is expanded. Written out, L is a second expression with its own address
+    computation and its own place in the evaluation order. Sound for the associative operators."""
+    pred = lambda n, p, s: isinstance(n, ca.Assignment) and isinstance(n.rvalue, ca.BinaryOp)
+    for k in range(sites(fn, pred)):
+        n, _, _ = nth(fn, pred, k)
+        if n.op == "=":
+            lv, rv = text(n.lvalue), n.rvalue
+            if rv.op in ASSOC + ("-", "<<", ">>") and text(rv.left) == lv:
+                f2 = copy.deepcopy(fn)
+                a, _, _ = nth(f2, pred, k)
+                a.op, a.rvalue = rv.op + "=", a.rvalue.right
+                yield f"{lv} {rv.op}= ... (one address for load and store)", f2
+            if rv.op in ASSOC and isinstance(rv.left, ca.BinaryOp) and rv.left.op == rv.op and text(rv.left.left) == lv:
+                f2 = copy.deepcopy(fn)
+                a, _, _ = nth(f2, pred, k)
+                inner = a.rvalue.left
+                a.op, a.rvalue = rv.op + "=", ca.BinaryOp(rv.op, inner.right, a.rvalue.right)
+                yield f"{lv} {rv.op}= A {rv.op} B (one address for load and store)", f2
+    pred2 = lambda n, p, s: isinstance(n, ca.Assignment) and n.op[:-1] in ASSOC + ("-", "<<", ">>")
+    for k in range(sites(fn, pred2)):
+        f2 = copy.deepcopy(fn)
+        a, _, _ = nth(f2, pred2, k)
+        op = a.op[:-1]
+        a.op, a.rvalue = "=", ca.BinaryOp(op, copy.deepcopy(a.lvalue), a.rvalue)
+        yield f"{text(a.lvalue)[:24]} = {text(a.lvalue)[:24]} {op} ... written out", f2
+
+
 WORD_TYPES = {"u32", "s32", "int", "unsigned int", "vu32", "uintptr_t"}
 
 
@@ -1667,7 +1702,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
              sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
-             sp_param_alias]
+             sp_param_alias, sp_compound_assign]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1682,7 +1717,7 @@ DECISIONS = {
     "cse-canon": ["sp_fold_copy", "sp_copy_uses", "sp_param_alias", "rw_copy_var", "sp_inline_decl"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift", "sp_field_extend"],
-    "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
+    "order": ["sp_compound_assign", "sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "sp_offset_local", "sp_const_local", "sp_load_local", "sp_outline_store", "sp_outline_setter", "sp_rmw_temp", "sp_chain_assign", "sp_fresh_var", "sp_member_ptr",
               "rw_commute", "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
     "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl", "sp_ptr_walk", "sp_ptr_index"],
@@ -1698,7 +1733,7 @@ DECISIONS = {
     "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
-    "reload": ["sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
+    "reload": ["sp_compound_assign", "sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
                "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }
 
