@@ -1,10 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.7%
-// fix.py best version (reprinted C)
-// Remaining differences: owner allocation, packed-coordinate temporaries and pointer copies.
+// Exact with register-pinning and empty-asm concessions.
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
@@ -70,7 +67,7 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
         u32 elapsed = state->elapsed + 1;
         u32 mask;
         register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u8 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
@@ -101,8 +98,8 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -114,11 +111,11 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
             command = state->commands + state->index;
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
+                s32 weight = state->frameWeight;
+                u16 speed = state->speed;
+                s32 ticks = (speed * weight) >> 6;
+                state->duration = ticks;
+                if (!(u8)ticks)
                     state->duration = 1;
             }
         }
@@ -130,14 +127,18 @@ struct EffectDelta {
     s32 y : 16;
     s32 z : 16;
 };
+static inline void AddMotion(struct NidhoggrEffectMotion *motion,
+                             const struct NidhoggrEffectMotion *delta)
+{
+    motion->x += delta->x;
+    motion->y += delta->y;
+    motion->z += delta->z;
+}
+
 void Nidhoggr_StepMovingSpriteEffect(struct NidhoggrAnimatedSlot *ownerArg)
 {
     struct NidhoggrAnimatedSlot *owner = ownerArg;
-    union {
-        struct EffectDelta bits;
-        struct NidhoggrEffectMotion words;
-        u32 packed[2];
-    } delta;
+    struct EffectDelta delta;
     struct NidhoggrEffectMotion *motion;
     struct NidhoggrEffectMotion *position;
     StepSequence(owner);
@@ -146,15 +147,10 @@ void Nidhoggr_StepMovingSpriteEffect(struct NidhoggrAnimatedSlot *ownerArg)
     position->x = position->x + motion->x;
     position->y = position->y + motion->y;
     position->z = position->z + motion->z;
-    {
-        u32 low = ((u32)(-(((s16)motion->x) >> 4))) << 16;
-        u32 high = ((u32)((-(((s16)owner->motion.y) >> 4)) - 8)) << 16;
-        asm("" : "+r"(low), "+r"(high));
-        delta.packed[0] = (low >> 16) | high;
-    }
-    delta.bits.z = -(((s16)owner->motion.z) >> 4);
-    motion->x = delta.words.x + motion->x;
-    motion->y = delta.words.y + motion->y;
+    delta.x = -(((s16)motion->x) >> 4);
+    delta.y = -(((s16)owner->motion.y) >> 4) - 8;
+    delta.z = -(((s16)owner->motion.z) >> 4);
+    AddMotion(motion, (struct NidhoggrEffectMotion *)&delta);
     if ((--owner->lifetime) == 0) {
         owner->update = 0;
         if (owner->onComplete) {
@@ -162,8 +158,4 @@ void Nidhoggr_StepMovingSpriteEffect(struct NidhoggrAnimatedSlot *ownerArg)
             owner->onComplete = 0;
         }
     }
-    motion->z = delta.words.z + motion->z;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nidhoggr_StepMovingSpriteEffect);
-#endif
