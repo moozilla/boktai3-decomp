@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: BossSlot2 pending-damage handler: applies damage, shows numbers, picks hurt/knockback/death state.
 #define H(o) (*(s16 *)(q + (o)))
 #define B(o) (*(u8 *)(q + (o)))
@@ -31,11 +30,33 @@ static inline u32 TestFlags(struct FlagsHolder *f, u32 mask)
     return f->flags & mask;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.8%
+struct DamageActor {
+    u8 pad00[0x90];
+    u32 stateValue;
+    s16 health;
+    u8 pad96[6];
+    u32 flags;
+    u8 padA0[2];
+    u8 phase;
+    u8 padA3;
+    u32 timer;
+    u8 padA8[3];
+    u8 state;
+    u8 reaction;
+    u8 reactionPhase;
+    u8 reactionMode;
+    u8 padAF;
+    u8 active;
+    u8 stateReady;
+    u8 padB2[0x12];
+    u32 reactionTimer;
+    u8 padC8[0x38];
+    u32 callback;
+};
+
 int BossSlot2_ApplyPendingDamage(u8 *p)
 {
-    u8 *base = p;
+    struct DamageActor *base = (struct DamageActor *)p;
     u8 *q = p;
     u32 special;
     u8 *position = p + 0x48;
@@ -43,22 +64,23 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
     u32 off = 0x46a;
     s32 damage;
     u8 *specialPtr;
-    u32 flags2;
-    u32 halve;
+    union {
+        u32 flags;
+        s16 *health;
+    } pending;
     u32 sound;
-    asm("" : "+r"(off));
     damage = *(s16 *)(q + off);
     specialPtr = q + 0x470;
     special = *specialPtr;
     off += 2;
-    flags2 = *(u32 *)(q + off);
+    pending.flags = *(u32 *)(q + off);
     ActorExtension_ResetState(base);
     *specialPtr = 0;
-    halve = TestFlags((struct FlagsHolder *)base, 0x100000);
-    if (halve) {
+    off = TestFlags((struct FlagsHolder *)base, 0x100000);
+    if (off) {
         damage = damage >= 0 ? damage >> 1 : -(-damage >> 1);
     }
-    if (flags2 & 0x40) {
+    if (pending.flags & 0x40) {
         special = 0;
         sound = 0x211;
     } else
@@ -66,7 +88,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
     {
         u16 *hitstun = (u16 *)(q + 0x4f0);
         if (*hitstun == 0) {
-            if (*(u16 *)(q + 0x4ee) == 0 && !halve && SceneActors_GetEffectiveTimeStep(q)) {
+            if (*(u16 *)(q + 0x4ee) == 0 && !off && SceneActors_GetEffectiveTimeStep(q)) {
                 damage = *(s16 *)(gUnk_02000710 + 0x876) * 5;
                 SceneActors_SpawnDestructionParticles_0817ABEC(q + 0x2ec);
                 sound = 0x12a;
@@ -77,15 +99,14 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         } else
             (*hitstun)--;
     }
-    if (damage > 0 || (flags2 & 0x40)) {
-        register s32 knockback asm("sl") = 0;
-        s16 *health;
+    if (damage > 0 || ((s16)pending.flags & 0x40)) {
+        s32 knockback = 0;
         struct Packed size;
         damage = ActorResource_ClampDecrease(base, damage);
-        health = (s16 *)(base + 0x94);
-        *health -= damage;
+        base->health -= damage;
         Sound_PlaySong(sound);
-        if (damage > 0 && *(u8 *)(base + 0xab) != 0xb) {
+        pending.health = &base->health;
+        if (damage > 0 && base->state != 0xb) {
             B(0x475) = 0;
             B(0x474)++;
         }
@@ -93,7 +114,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
             B(0x474) = 0;
             knockback = 1;
         }
-        if (ActorResource_IsBelowSelectedLimit(q, *health))
+        if (ActorResource_IsBelowSelectedLimit(q, *pending.health))
             knockback = 1;
         H(0x4ec) = 10;
         if (special) {
@@ -105,37 +126,48 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         size.y = 0;
         size.z = 16;
         DamageNumberDisplay_Show(collider, damage, 0, position + 0xc, &size, 1);
-        if (*health <= 0) {
-            int zero = 0;
-            *health = 0;
+        if (*pending.health <= 0) {
+            s16 clearedHealth[1];
+            int zero;
+            u32 callback;
+            int state;
+            clearedHealth[0] = 0;
+            zero = 0;
+            *pending.health = clearedHealth[0];
             SetFlags((struct FlagsHolder *)base, 2);
-            *(u8 *)(base + 0xab) = 0xd;
-            W(0x100) = (u32)SceneEventActor_UpdateRemovalSequence;
-            *(u32 *)(base + 0x90) = zero;
-            *(u8 *)(base + 0xb1) = 1;
-            *(u8 *)(base + 0xa2) = zero;
-            *(u32 *)(base + 0xa4) = zero;
+            callback = (u32)SceneEventActor_UpdateRemovalSequence;
+            state = 0xd;
+            base->state = state;
+            base->callback = callback;
+            base->stateValue = 0;
+            base->stateReady = 1;
+            base->phase = zero;
+            base->timer = 0;
             return 1;
         }
         if (knockback) {
-            int zero = 0;
+            int zero;
+            int mode;
+            u32 callback;
+            int state;
             SetFlags((struct FlagsHolder *)base, 1);
-            *(u8 *)(base + 0xac) = 1;
-            *(u8 *)(base + 0xad) = zero;
-            *(u8 *)(base + 0xae) = 2;
-            *(u32 *)(base + 0xc4) = zero;
-            *(u8 *)(base + 0xb0) = 1;
-            *(u8 *)(base + 0xab) = 0xc;
-            W(0x100) = (u32)SceneVolume_UpdateKnockbackLanding;
-            *(u32 *)(base + 0x90) = zero;
-            *(u8 *)(base + 0xb1) = 1;
-            *(u8 *)(base + 0xa2) = zero;
-            *(u32 *)(base + 0xa4) = zero;
+            zero = 0;
+            mode = 2;
+            base->reaction = 1;
+            base->reactionPhase = zero;
+            base->reactionMode = mode;
+            base->reactionTimer = zero;
+            base->active = 1;
+            callback = (u32)SceneVolume_UpdateKnockbackLanding;
+            state = 0xc;
+            base->state = state;
+            base->callback = callback;
+            base->stateValue = zero;
+            base->stateReady = 1;
+            base->phase = zero;
+            base->timer = zero;
             return 1;
         }
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_ApplyPendingDamage);
-#endif
