@@ -254,6 +254,15 @@ def cmd_status(args):
     print(f"pending: {sum(1 for r in rows if state(r['func']) == 'pending')}; quota {quota()}%")
 
 
+def block_span(text, func, addr):
+    """(start, end) of FUNC's #ifdef NONMATCHING ... #endif block in TEXT."""
+    for m in re.finditer(r"#ifdef NONMATCHING\n(.*?)#else\n(.*?)#endif\n?", text, re.S):
+        names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2))
+        if func in names or "sub_" + addr in names:
+            return m.start(), m.end()
+    return None
+
+
 def unwrap(text, func, addr):
     """The matching C without its #ifdef NONMATCHING / #else INCLUDE_ASM / #endif wrapper and fuzzy notes."""
     for m in re.finditer(r"#ifdef NONMATCHING\n(.*?)#else\n(.*?)#endif\n?", text, re.S):
@@ -296,8 +305,20 @@ def cmd_land(args):
         open(c, "w").write(new)
         rc = subprocess.run(["git", "merge-file", a, b, c]).returncode
         if rc:
-            sys.exit(f"{func}: merge conflict against the current {r['src']}; land by hand")
-        merged = open(a).read()
+            # main changed the draft itself meanwhile (e.g. a fix.py sweep): a match supersedes any draft,
+            # so if everything outside this function's NONMATCHING block is as the worker saw it, swap
+            # the block for the worker's matching C
+            span = block_span(cur, func, r["addr"])
+            bspan = block_span(btext, func, r["addr"])
+            nspan = block_span(open(cand).read(), func, r["addr"])
+            if not (span and bspan and nspan) or cur[:span[0]] + cur[span[1]:] != btext[:bspan[0]] + btext[bspan[1]:]:
+                sys.exit(f"{func}: merge conflict against the current {r['src']}; land by hand")
+            wtext = open(cand).read()
+            wun = unwrap(wtext[nspan[0]:nspan[1]], func, r["addr"])
+            merged = cur[:span[0]] + wun + cur[span[1]:]
+            print(f"{func}: main changed the draft since the worker started; replaced the draft with the match")
+        else:
+            merged = open(a).read()
     # worker notes pointing at their own REPORT.md / build paths do not belong in src
     merged = re.sub(r"^\s*//[^\n]*(REPORT\.md|build/scope)[^\n]*\n", "", merged, flags=re.M)
     pins = len(re.findall(r'\basm\("r\d+"\)', merged))
