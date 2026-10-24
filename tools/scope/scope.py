@@ -553,7 +553,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             elif back:
                 print("  Loop head: the insns between the two targets run on every pass in the ROM but once"
                       " in the draft. Move that assignment into the loop body.")
-            elif re.match(r"(cmp|tst|cmn)\b", dr[im][2]):
+            elif re.match(r"(cmp|tst|cmn)\b", dr[im][2]) or (
+                    re.match(r"movs (r\d+), #", dr[im][2]) and im + 1 < len(dr)
+                    and re.match(rf"cmp {re.match(r'movs (r[0-9]+)', dr[im][2]).group(1)}, ", dr[im + 1][2])):
                 print("  Jump threading: the draft's branch lands on a second test of a value it has already"
                       " tested; the ROM's skips that test and goes where it leads. Which repeated tests"
                       " GCC threads depends on how each reaches RTL (an inline helper's parameter, a"
