@@ -156,7 +156,10 @@ def compile_draft(src, func, env=None):
                        env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     if r.returncode or "error" in r.stderr:
-        sys.exit(r.stderr.strip())
+        errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
+        hint = ("\n  (agbcc is C89: in each block, declarations come before statements)"
+                if any("parse error" in e or "syntax error" in e for e in errs) else "")
+        sys.exit(f"COMPILE FAILED: agbcc rejected {src}:\n" + "\n".join("  " + e for e in errs[:15]) + hint)
     asm = open(os.path.join(wd, "u.s")).read()
     text = re.sub(r"^(\w+):\n", lambda m: f"{m.group(1)}:\n\t.global {m.group(1)}__addr\n{m.group(1)}__addr:\n"
                   if not m.group(1).startswith(".") else m.group(0), asm, flags=re.M)
@@ -599,7 +602,8 @@ def cmd_life(names, func):
         for reg in regs:
             ins = live_insns(wd, reg)
             rec = recs.get(reg)
-            pri = f", priority {rec[2]} ({rec[3]} refs, live {rec[4]} at allocation)" if rec and rec[0] == "G" else ""
+            pri = (f", priority {rec[2]} ({rec[3]} refs{ref_note(wd, reg, rec[3])}, live {rec[4]} at allocation)"
+                   if rec and rec[0] == "G" else "")
             print(f"pseudo {reg} ({pn.get(reg, '-')}): flow live length {flow.get(reg, '?')}{pri};"
                   f" counted here: {len(ins)}")
             by, order = {}, []
@@ -940,6 +944,59 @@ def g_priority(refs, live):
     return (max(refs, 1).bit_length() - 1) * refs * 10000 // max(live, 1)
 
 
+def _sexp_end(t, i):
+    d = 0
+    while i < len(t):
+        c = t[i]
+        if c == '"':
+            i = t.index('"', i + 1)
+        elif c == "(":
+            d += 1
+        elif c == ")":
+            d -= 1
+            if d == 0:
+                return i + 1
+        i += 1
+    return i
+
+
+def ref_mentions(wd, reg, dump="regmove"):
+    """[(uid, loop depth)] for each mention of REG in insn patterns of a dump (notes excluded). flow.c adds
+    the loop depth (1 outside loops, +1 per enclosing loop) to REG_N_REFS for every use and set, so a
+    mention inside a loop counts 2; combine and regmove adjust the count afterwards."""
+    path = os.path.join(wd, "u.i." + dump)
+    t = open(path).read() if os.path.exists(path) else ""
+    out, depth = [], 1
+    for m in re.finditer(r"^\((insn|jump_insn|call_insn|note)(?:/\w)* (\d+) \d+ \d+ ", t, re.M):
+        if m.group(1) == "note":
+            line = t[m.start():t.find("\n", m.end())]
+            depth += ("NOTE_INSN_LOOP_BEG" in line) - ("NOTE_INSN_LOOP_END" in line)
+            continue
+        i = m.end()
+        while t[i] in " \n\t":
+            i += 1
+        pat = t[i:_sexp_end(t, i)]
+        out += [(int(m.group(2)), depth)] * len(re.findall(r"\(reg(?:/\w)*:\w+ %d\)" % reg, pat))
+    return out
+
+
+def ref_note(wd, reg, refs):
+    """' = 3 mentions in a loop (x2) + 1 outside'-style breakdown of an allocation ref count."""
+    ms = ref_mentions(wd, reg)
+    if not ms:
+        return ""
+    by = {}
+    for _, d in ms:
+        by[d] = by.get(d, 0) + 1
+    parts = [f"{n} mention{'s' if n > 1 else ''} " + ("outside loops" if d == 1 else f"in a loop (x{d})")
+             for d, n in sorted(by.items())]
+    total = sum(d for _, d in ms)
+    txt = f"; refs = {' + '.join(parts)}"
+    if total != refs:
+        txt += f" = {total} in the regmove dump; combine/regmove adjusted the allocator's count to {refs}"
+    return txt
+
+
 def find_reg_view(wd, func):
     """pseudo -> [records] from AGBCC_DUMPPRI's F lines, one per find_reg call (global alloc, then reload's
     retries): dict with used1 (conflicts and class limits), sofar (regs_used_so_far), someone
@@ -1055,8 +1112,8 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
     if rec and rec[0] == "G":
         _, rank, pri, refs, live, calls, _ = rec
         print(f"    {nm(pseudo)} is a global-alloc pseudo: allocated {rank + 1} of {total} by priority {pri}"
-              f" ({refs} refs, live {live} insns, crosses {calls} call(s)); it got {rname(got)}, the ROM has {rname(want)}."
-              + life_note(wd, pseudo, live))
+              f" ({refs} refs{ref_note(wd, pseudo, refs)}, live {live} insns, crosses {calls} call(s)); it got"
+              f" {rname(got)}, the ROM has {rname(want)}." + life_note(wd, pseudo, live))
     elif rec:
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"

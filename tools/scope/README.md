@@ -461,6 +461,17 @@ Each was read from the compiler source and confirmed on a live draft.
    instructions unchanged: in the cosine twins an `s16` parameter added 6 insns
    to `speed`'s life and 2 to `actor`'s, which flipped their order.
 
+18. **combine drops a redundant mask only for a register set once.**
+   `nonzero_bits` of a pseudo is tracked only when it has a single set, so
+   `angle = (a + b) & 255;` lets combine delete a later `angle & 255` (an
+   inline's index), while `angle = a + b; angle &= 255;` keeps it. In
+   Hresvelgr_GetTravelTarget the ROM masks twice, so the original used the
+   second form.
+19. **fold reassociates constants within one expression.**
+   `(x << 6) + (y % 32 + 112)` is computed as `((x << 6) + 112) + y % 32`;
+   a variable (`s32 offset = y % 32 + 112;`) is a boundary fold cannot see
+   through. Keep statement order as the ROM's evaluation order when you split.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
@@ -533,6 +544,17 @@ which is exactly `10:1`. Not tested.
   a named `speed` local and other operand orders were all tried with no effect.
   The sine twin also needed a reviewed `replacement_end` in
   `symbols/build_extra_functions.csv`: gbadisasm leaves it as a blob.
+* **Hresvelgr_GetTravelTarget** (sub_0819C5D4): 8/6 -> 3/3 in plain C
+  (`build/scope/drafts/gtt_best_natural.c`, not landed). Facts 18 and 19 fixed
+  the `+ 112` placement and the double mask. Left: (a) the ROM loads the
+  random table's address before the index update: a `u32 table =
+  (u32)gUnk_0203B400;` first in the helper places it, but then the table
+  (constant register, half priority) loses r4 to the 1023 mask constant
+  (576 vs 789); `AGBCC_PRI=26:+214` leaves only (b); passing the table in as a
+  helper argument changes nothing. (b) The ROM copies `out` (r1 -> r5)
+  before `actor` (r0 -> ip); RTL generation emits parameter copies in
+  declaration order and an inline wrapper with `(out, actor)` does not change
+  it. No scope explainer covers either: they are decided at RTL generation.
 * **Solved: Hresvelgr_InitializeShots** (moozilla/boktai3-decomp#641, plain C,
   no pins). The hypothesis below was right except for the constant: it is a
   pre-loop variable `x = 0x708` assigned before `y` and `z`, so it lives
@@ -594,6 +616,19 @@ which is exactly `10:1`. Not tested.
   draft operands; positional operand pairing reported reload registers as a
   pseudo's home (dispositions now win); "allocated N of M" counted the wrong
   list; the rival explanation claimed an order without checking it.
+* scope gaps found on GetTravelTarget: no explainer for expression shape
+  decided by fold/expand (reassociation, statement order, parameter copy
+  order); `why`'s header line for an inlined insn can name the inline's line
+  rather than the caller's; `insn UID` only shows passes that changed the
+  insn, so "rtl ... combine (gone)" hides the passes in between.
+* First cheap-model trial (2026-10-24): Haiku, given WORKER.md, matched
+  Hresvelgr_InitializeRadialOffsets (#650) in about 30 compiles and 5
+  minutes. `why` gave the allocation lever (angle needed fewer refs); it found
+  the address shape by trying forms. Its complaints, addressed: refs did not
+  match any count it could see (now broken down as mentions x loop depth in
+  `why` and `life`), compile errors looked like empty output (now
+  `COMPILE FAILED` with a C89 hint); open: no shape explainer, no RTL diff
+  between two drafts, "no explainer for this pass" for loop and regmove.
 * The shared instrumented compiler was older than its patch (see above);
   the one in the scope worktree also lacked AGBCC_NOPRE until it was rebuilt
   with `tools/agbcc-instr.sh` (150 files, plain and NONMATCHING, compile
