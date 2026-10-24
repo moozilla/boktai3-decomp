@@ -47,7 +47,8 @@ Task:
   real attempts, and say so in the report. Never hand-written instructions. If the draft already has
   pins or barriers, try to remove them (`pins` shows the cost of each).
 - Goal 2: if you matched with concessions, remove as many as you can while keeping MATCH.
-- Keep the C readable: struct fields and names, no magic offsets where the draft has fields.
+- Keep the C readable: struct fields and names, no magic offsets where the draft has fields. Comments in
+  the C must stand alone: do not mention REPORT.md, your directory or your experiments.
 - Do not edit anything outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run
   make. Never use `rm -rf` (move files to ~/.Trash). agbcc is C89 (declarations first in each block).
 - Budget: about 120 compiles; stop earlier when you run out of ideas backed by `why`.
@@ -297,6 +298,8 @@ def cmd_land(args):
         if rc:
             sys.exit(f"{func}: merge conflict against the current {r['src']}; land by hand")
         merged = open(a).read()
+    # worker notes pointing at their own REPORT.md / build paths do not belong in src
+    merged = re.sub(r"^\s*//[^\n]*(REPORT\.md|build/scope)[^\n]*\n", "", merged, flags=re.M)
     pins = len(re.findall(r'\basm\("r\d+"\)', merged))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', merged))
     marker = "// MATCHING_CONCESSION: register-pinning"
