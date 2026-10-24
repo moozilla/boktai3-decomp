@@ -2,13 +2,10 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 97.7%
-// fix.py best version (reprinted C)
-// Remaining differences: keyframe pointer allocation, vector lifetimes and projection stores.
+// Exact with register-pinning and empty-asm concessions.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
-    u8 unknown2C[0x1c];
+    struct ContactSwarmGraphics graphics;
     struct DisplaySequenceState sequence;
     u8 motion[0x38];
     struct SceneVec *basePosition;
@@ -21,7 +18,9 @@ struct VanargandPart {
     u8 currentAction, previousAction, reset, enter, finished;
     u8 unknown171[7];
     u32 actionTimer;
-    u8 unknown17C[0x20];
+    u8 unknown17C[0x14];
+    void *paletteSource; /* Tentative: source of the 32-byte graphics palette copy. */
+    u8 unknown194[8];
     u32 flashTimer;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
@@ -71,7 +70,7 @@ static inline void StepSequence(void *obj)
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r3");
+        register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -82,12 +81,12 @@ static inline void StepSequence(void *obj)
         savedDuration = duration;
         if (elapsed >= duration) {
             state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
+            temp = state->flags;
+            if (temp & 4) {
                 u32 index = state->index;
                 if (index == 0) {
                     u32 hold = 8;
-                    hold &= flags;
+                    hold &= temp;
                     if (hold) {
                         state->elapsed = savedDuration;
                     } else {
@@ -103,8 +102,7 @@ static inline void StepSequence(void *obj)
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = temp & 8;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -195,11 +193,14 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
 {
     struct EmergenceProjection projected;
     u8 *enter;
+    u8 *animation;
+    /* Preserve the keyframe-data allocation when animation is also live. */
+    register u8 *keyframes asm("r4");
     u32 entering;
     u32 state;
     u32 mask = 12;
-    typeof(*((void **)(((u8 *)p) + 0x190))) t1;
-    typeof(*((void **)(((u8 *)p) + 0x38))) t2;
+    void *paletteSource;
+    void *paletteDestination;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -217,14 +218,26 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
         {
             void *data = *((void **)(boss + 0x4d0));
             u32 zero = 0;
-            asm("" : "+r"(zero));
             Anim_SetSequence(&p->sequence, data, 9, (u8)p->variant, zero);
         }
         StepSequence(p);
-        t2 = *((void **)(((u8 *)p) + 0x38));
-        t1 = *((void **)(((u8 *)p) + 0x190));
-        CpuSet(t1, t2, 0x04000008);
-        SetState(p, 0);
+        {
+            /* Field-derived offsets retain the diagnosed reload allocation. */
+            register u32 sourceOffset asm("r2") =
+                (u32) & ((struct VanargandPart *)0)->paletteSource;
+            paletteSource = *(void **)((u8 *)p + sourceOffset);
+            asm volatile("" : : "r"(sourceOffset));
+        }
+        paletteDestination = (void *)p->graphics.paletteData;
+        CpuSet(paletteSource, paletteDestination, 0x04000008);
+        {
+            /* Keep zero before the state address, then preserve the offset through the store. */
+            u32 zero = 0;
+            register u32 stateOffset asm("r3") = (u32) & ((struct VanargandPart *)0)->state;
+            *(u32 *)((u8 *)p + stateOffset) = zero;
+            asm volatile("" : : "r"(stateOffset));
+            p->timer = zero;
+        }
         p->enter = 1;
     }
     state = p->state;
@@ -232,12 +245,14 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
         case 0:
             entering = p->enter;
             enter = &p->enter;
+            animation = boss + 0x18;
+            keyframes = boss + 0x78;
             if (entering) {
-                *enter = 0;
-                Anim_SetKeyframes(boss + 0x18, boss + 0x78, 0, 2, 0);
+                p->enter = 0;
+                Anim_SetKeyframes(animation, keyframes, 0, 2, 0);
                 Sound_PlaySong(0x58d);
             }
-            if (Anim_Step(boss + 0x18, boss + 0x78)) {
+            if (Anim_Step(animation, keyframes)) {
                 SetState(p, 1);
                 *enter = 1;
             }
@@ -247,11 +262,13 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
         case 1:
             entering = p->enter;
             enter = &p->enter;
+            animation = boss + 0x18;
+            keyframes = boss + 0x78;
             if (entering) {
-                *enter = 0;
-                Anim_SetKeyframes(boss + 0x18, boss + 0x78, 1, 2, 0);
+                p->enter = 0;
+                Anim_SetKeyframes(animation, keyframes, 1, 2, 0);
             }
-            if (Anim_Step(boss + 0x18, boss + 0x78)) {
+            if (Anim_Step(animation, keyframes)) {
                 SetState(p, 2);
                 *enter = 1;
                 *((u32 *)(boss + 0x20)) |= 1;
@@ -264,7 +281,7 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
             entering = p->enter;
             enter = &p->enter;
             if (entering) {
-                *enter = 0;
+                p->enter = 0;
                 p->sprite.flags &= ~1;
                 Vector(&p->origin, p->heading, 640);
                 Vector(&target, p->heading, p->distance);
@@ -290,6 +307,3 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
     projected.y = (projected.y - gUnk_03005418[1]) + 92;
     *((struct EmergenceProjection *)(boss + 0x38)) = projected;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081B562C);
-#endif
