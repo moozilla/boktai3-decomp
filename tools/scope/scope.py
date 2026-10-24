@@ -105,12 +105,16 @@ def compile_draft(src, func, env=None):
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", f"{rel}/u.elf", f"{rel}/u.bin"])
     whole = open(os.path.join(wd, "u.bin"), "rb").read()
     syms = sorted((v, n) for n, (v, t) in symtab(os.path.join(wd, "u.o")).items() if t == "FUNC")
-    start = next(v for v, n in syms if n == func) & ~1
+    names = [n for _, n in syms]
+    obj_name = next((n for n in (func, rom_name(src, func)) if n in names), names[0] if len(names) == 1 else None)
+    if obj_name is None:
+        sys.exit(f"{func} is not in the object (functions: {', '.join(names)})")
+    start = next(v for v, n in syms if n == obj_name) & ~1
     end = next((v & ~1 for v, n in syms if (v & ~1) > start), len(whole))
     base = syms[0][0] & ~1
     _, addr, _ = check.inventory()
     a = addr[rom_name(src, func)]
-    return whole[start - base:end - base], a, {"obj_offset": start, "wd": wd, "env": env or {}}
+    return whole[start - base:end - base], a, {"obj_offset": start, "wd": wd, "env": env or {}, "obj_name": obj_name}
 
 
 def symtab(obj):
@@ -343,7 +347,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     rom = decode(rom_code, addr, rdata)
     mdata = mapping_ranges(os.path.join(wd, "u.o"), info["obj_offset"], len(mine))
     dr = decode(mine, addr, mdata)
-    ann = draft_annotations(wd, func, dr, info["obj_offset"])
+    ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"])
     born = born_passes(wd)
     pairs, shifted = align(rom, dr)
 
