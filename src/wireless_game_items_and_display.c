@@ -367,10 +367,7 @@ void WirelessGameItems_UpdateHiddenItem(struct WirelessGameItems *p, struct Wire
 
 extern const u16 gUnk_0824DE7C[];
 
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// Uses register pinning for the random-table pointer (r6).
-// Open: the zero for pos->z in the second placement is kept in r1 in ROM.
+// MATCHING_CONCESSION: register-pinning
 extern const u16 gUnk_0824DE8C[];
 
 static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct WirelessGameItem *p,
@@ -396,7 +393,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
 
 static inline u32 Item_NextRandom(void)
 {
-    const u16 *t = gUnk_0203B400;
+    register const u16 *t asm("r6") = gUnk_0203B400;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return t[gUnk_03005308];
 }
@@ -438,7 +435,8 @@ void sub_080399F4(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         int slot = index & 3;
         int ticks = p->shakeTicks;
         if (ticks) {
-            p->shakeTicks = ticks - 1;
+            u8 *shakeTicks = &p->shakeTicks;
+            *shakeTicks = ticks - 1;
             Item_Place(p, &p->sprite, &p->drawing, index);
         }
         if (p->timer > 29) {
@@ -466,9 +464,6 @@ void sub_080399F4(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
     }
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080399F4);
-#endif
 
 void WirelessGameItems_UpdateBlinkingItem(struct WirelessGameItems *p, struct WirelessGameItem *q,
                                           int index)
