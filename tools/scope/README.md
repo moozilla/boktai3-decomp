@@ -322,6 +322,28 @@ Each was read from the compiler source and confirmed on a live draft.
    insn, so later looks see the substituted form. Unused labels are deleted
    before cse1, so an empty label or `do {} while (0)` does not stop a skip.
 
+## Survey: how much of Bosses is reload rotation (2026-10-24)
+
+`scope spill` on all 60 NONMATCHING boss drafts (22 skipped: over 40
+differing insns). Of the 38 searched:
+
+* 2 match exactly by rotation alone: Hresvelgr_InitializeShots
+  (`AGBCC_SPILL=5:3`) and Vanargand_UpdateFacingPairAttack (`10:1`).
+* 5 shrink a lot: BossSlot2_SpawnBobbingFormation 12 -> 2,
+  Vanargand_UpdatePartSweepingStrike 33 -> 10, Nidhoggr_UpdateFallingAttackEffect
+  42 -> 10, Vanargand_UpdatePartSidestep 11 -> 5, EffectPool_UpdateEntry 10 -> 6.
+  Rotation is one of their causes; `why all` after applying the shift shows
+  the rest.
+* 13 shrink a little (1-15 insns), 18 not at all (rotation is not involved).
+
+The search is greedy (one shift per reload, kept if it helps), so "not at
+all" is a strong no and "a little" is a lower bound. A rotation shift is a
+diagnosis: the C still has to produce the ROM's reload count. In FacingPairAttack
+the candidate is line 106: `adds r0, r4, #0; adds r0, #0xa4` is born in reload
+yet logs no spill choice (reload reused the insn's own register). If the ROM's
+compiler allocated it through the rotation, the state would be one step on,
+which is exactly `10:1`. Not tested.
+
 ## Live investigations
 
 * **Hresvelgr_InitializeShots** (src/fn/sub_081A3554.c, 4 insns). MATCH with
