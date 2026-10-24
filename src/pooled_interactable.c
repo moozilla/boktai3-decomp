@@ -53,27 +53,15 @@ void Breakable_OnHit(struct SceneCollider *other, u32 unused, struct PooledInter
 
 s32 Breakable_InitSlot(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
 {
-    u32 fill;
     struct SceneExtent dimensions, scale, offset;
     void *resource;
     void *drawable;
     void *collider;
-    register struct SceneExtent *d asm("r5");
     slot->resource = manager->resources;
     resource = slot->resource;
-    asm("" : "=m"(fill));
-    {
-        d = &dimensions;
-        fill = 0;
-        {
-            u32 *source = &fill;
-            struct SceneExtent *dest = d;
-            asm("" : : "r"(source), "r"(dest));
-            CpuSet(source, dest, 0x05000002);
-        }
-    }
+    ZeroFill8(&dimensions);
     drawable = &slot->drawable;
-    Widget_InitCleared(drawable, resource, 0, 1, 2, 0, 60, d);
+    Widget_InitCleared(drawable, resource, 0, 1, 2, 0, 60, &dimensions);
     Anim_SetKeyframes(drawable, slot->resource, 0, 1, 0);
     collider = &slot->collider;
     scale.x = 128;
