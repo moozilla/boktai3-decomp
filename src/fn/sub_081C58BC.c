@@ -1,9 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 93.6%
-// Open: the ROM rebuilds 0x2FC from scratch where this draft derives it from
-// 0x300 - 4, and the first branch stores the position through r1.
+// MATCHING_CONCESSION: register-pinning
 struct ChallengePosition {
     s16 x, y;
 };
@@ -21,30 +18,36 @@ s32 sub_081C58BC(u8 *p)
 {
     s32 *selection = (s32 *)(p + 0x300);
     s32 rank;
+    struct ChallengePosition *position;
     if (*selection == 0) {
         Anim_LoadKeyframe(p + 0xd8, p + 0x38, 0x55, 0);
-        ((struct ChallengePosition *)(p + 0xf8))->x = 0;
-        ((struct ChallengePosition *)(p + 0xf8))->y = 0;
+        position = (struct ChallengePosition *)(p + 0xf8);
+        position->x = 0;
+        position->y = 0;
     } else if (*selection <= 3) {
         Anim_LoadKeyframe(p + 0xd8, p + 0x38, 0x56, 0);
-        ((struct ChallengePosition *)(p + 0xf8))->x = 0;
-        ((struct ChallengePosition *)(p + 0xf8))->y = (*selection - 1) << 4;
+        position = (struct ChallengePosition *)(p + 0xf8);
+        position->x = 0;
+        position->y = (*selection - 1) << 4;
     }
     Palette_UpdateHighlightPulse((u16 *)(p + 0x2d8), p + 0x2e0);
     ((struct ChallengeWidget *)(p + 0x198))->flags &= ~1;
-    if (*(s32 *)(p + 0x300) != 0) {
-        if (*(s32 *)(p + 0x300) > 3)
-            return;
-        rank = ChallengeMenu_GetRankKeyframe(
-            GameState_GetPackedTripletValue(*(u32 *)(p + 0x2fc), *(s32 *)(p + 0x300) - 1));
-        if (rank >= 0) {
-            Anim_LoadKeyframe(p + 0x138, p + 0x38, (u16)rank, 0);
-            ((struct ChallengeWidget *)(p + 0x138))->flags &= ~1;
-            return;
+    {
+        u32 selectionOffset = 0x300;
+        s32 selectionValue = *(s32 *)(p + selectionOffset);
+        if (selectionValue != 0) {
+            // Keep the selection offset distinct from the packed-triplet offset.
+            asm volatile("" : "+r"(selectionOffset));
+            if (selectionValue > 3)
+                return;
+            rank = ChallengeMenu_GetRankKeyframe(
+                GameState_GetPackedTripletValue(*(u32 *)(p + 0x2fc), selectionValue - 1));
+            if (rank >= 0) {
+                Anim_LoadKeyframe(p + 0x138, p + 0x38, (u16)rank, 0);
+                ((struct ChallengeWidget *)(p + 0x138))->flags &= ~1;
+                return;
+            }
         }
     }
     ((struct ChallengeWidget *)(p + 0x138))->flags |= 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C58BC);
-#endif
