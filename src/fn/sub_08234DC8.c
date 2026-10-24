@@ -21,29 +21,29 @@ static inline s32 scale12(s32 v)
 // the sprite from its start to its target position with a sine bob; afterwards it starts the
 // shake.
 #ifdef NONMATCHING
-// fuzzy: 98.4%
+// fix.py best after the inlined-insn fix
 // ROM keeps the incremented timer untruncated in a copy for the 0x50/0x51 bytes; u8 t adds a truncation and wider types fold +1+0x22.
 void sub_08234DC8(u8 *p)
 {
     u16 *timer;
     s32 y;
-    u8 t;
-    if (H(0x270) == 0) {
+    u16 t;
+    if ((*((u16 *)(p + 0x270))) == 0) {
         MusicSlots_StopAllAndRetainResumable();
         {
             s32 four = 4;
             gUnk_0300523C |= four;
         }
-    } else if (H(0x270) == 1) {
+    } else if ((*((u16 *)(p + 0x270))) == 1) {
         Sound_PlaySong(0xE6);
-        W(0x24) &= ~1;
+        *((u32 *)(p + 0x24)) &= ~1;
     }
-    timer = &H(0x270);
-    t = ++*timer;
-    if (*timer > 15) {
-        W(0x24) &= ~2;
+    timer = &(*((u16 *)(p + 0x270)));
+    t = ++(*timer);
+    if ((*timer) > 15) {
+        *((u32 *)(p + 0x24)) &= ~2;
         sub_08234868(p);
-        *(void (**)(u8 *))(p + 0x274) = HealthRestoreEffect_UpdateShake;
+        *((void (**)(u8 *))(p + 0x274)) = HealthRestoreEffect_UpdateShake;
         *timer = 0;
         Sound_PlaySong(0x284);
         return;
@@ -53,10 +53,12 @@ void sub_08234DC8(u8 *p)
         p[0x51] = v;
         p[0x50] = v;
     }
-    H(0x3C) = Div(S(0x7C) * *timer + S(0x84) * (16 - *timer), 16);
-    y = Div(S(0x7E) * *timer + S(0x86) * (16 - *timer), 16);
-    H(0x3E) = y - scale12(gUnk_086149C4[Div(*timer << 7, 20) & 0xFF] << 4);
+    *((u16 *)(p + 0x3C)) =
+        Div(((*((s16 *)(p + 0x7C))) * (*timer)) + ((*((s16 *)(p + 0x84))) * (16 - (*timer))), 16);
+    y = Div(((*((s16 *)(p + 0x7E))) * (*timer)) + ((*((s16 *)(p + 0x86))) * (16 - (*timer))), 16);
+    *((u16 *)(p + 0x3E)) = y - scale12(gUnk_086149C4[Div((*timer) << 7, 20) & 0xFF] << 4);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08234DC8);
 #endif
