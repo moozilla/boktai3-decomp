@@ -283,8 +283,36 @@ def cse_probe(path):
     return None
 
 
-def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
-    """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
+HIGH = ("r8", "r9", "r10", "r11", "ip", "sb", "sl", "fp")
+
+
+def kept_copy(rom, mine):
+    """A cause line when the ROM sets a high register and copies it straight back (`mov ip, r0;
+    mov r0, ip`) more often than the candidate, else None. reload, reload_cse and jump's no-op move
+    deletion drop that copy back unless the set and the use differ in mode (an HImode set, an SImode
+    use): agbccsrc.py reload-mode, spellings.sp_helper_ret_word."""
+    def pairs(t):
+        out = 0
+        for a, b in zip(t, t[1:]):
+            m = re.match(r"mov (\w+), (r[0-7])$", a)
+            if m and m.group(1) in HIGH and b == f"mov {m.group(2)}, {m.group(1)}":
+                out += 1
+        return out
+    n, k = pairs(rom), pairs(mine or [])
+    if n > k:
+        return (f"the ROM copies a high register straight back {n - k} more time(s) (`mov H, rN; mov rN, H`): "
+                "the value was set in another mode than it is used in (an HImode constant used as SImode), "
+                "so reload could not reuse rN")
+    if k > n:
+        return (f"the candidate copies a high register straight back {k - n} more time(s) (`mov H, rN; mov rN, "
+                "H`) where the ROM reuses rN: the candidate sets the value in another mode than it uses it in "
+                "(an HImode constant used as SImode); in the ROM both were one mode")
+    return None
+
+
+def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None, extra=()):
+    """Children of one state: (score, new text, desc, fam), plus the compiles spent. EXTRA: decision
+    keys known from a compiler probe (cse_probe), tried before step.py's."""
     path = os.path.join(wd, f"{func}.c")
     open(path, "w").write(text)
     try:
@@ -292,6 +320,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     except (Exception, SystemExit) as ex:  # a state step.py cannot compile: drop it
         log(f"   (step.py failed on a state: {type(ex).__name__})")
         return [], 0
+    keys = list(extra) + [k for k in keys if k not in extra]
     d = Draft(text, func, wd)
     if dec is None:
         sc = d.score()
@@ -299,7 +328,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
             return "match", 0
         # only a branch offset differs: a label moved (a statement into or out of a loop, a
         # hoisted invariant), which step.py does not see as a differing instruction
-        keys = ["loop-invariant", "order"]
+        keys = list(extra) + ["loop-invariant", "order"]
         dec = (None, {"lines": [], "note": "only a branch target differs (a label moved)"})
     st, e = dec
     base, good, n = one_round(d, keys, show, try_all, seeds, log, deadline)
@@ -336,7 +365,28 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
     start = None
     seen = {text}
     best = best_shape = states[0]
+    extra = []
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
+        # a near match: ask the instrumented compiler first whether one CSE decision explains it,
+        # and try that decision's spellings first in every round
+        open(os.path.join(wd, f"{func}.c"), "w").write(text)
+        try:
+            start = Draft(text, func, wd).score()
+        except (Exception, SystemExit):
+            start = None
+        cause = None
+        if start and start[0] > 0:
+            # a copy back through a high register is visible in any draft: no compile needed
+            d0 = Draft(text, func, wd)
+            cause = kept_copy(d0.rom, atlas.texts_of(d0.source()))
+            if cause:
+                extra = ["reload-mode"]
+        if not cause and start and 0 < start[0] <= 4:
+            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+        if cause:
+            log(f"   cause: {cause}")
+            if "canonical register" in cause:
+                extra = ["cse-canon"]
         for rnd in range(depth):
             log(f"\n== round {rnd + 1}")
             children = []
@@ -344,14 +394,8 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 if budget and time.time() - t0 > budget:
                     break
                 kids, n = expand(txt, func, wd, show, try_all, seeds, log, verbose=(i == 0),
-                                 deadline=budget and t0 + budget)
+                                 deadline=budget and t0 + budget, extra=extra)
                 total += n
-                if rnd == 0 and isinstance(kids, list) and start is None:
-                    start = Draft(txt, func, wd).score()
-                    if start and start[0] <= 4:
-                        cause = cse_probe(os.path.join(wd, f"{func}.c"))
-                        if cause:
-                            log(f"   cause: {cause}")
                 if kids == "match":
                     kids = [((0, 0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:

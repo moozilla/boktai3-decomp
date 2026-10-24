@@ -865,6 +865,28 @@ def sp_chain_assign(fn):
                 yield f"{text(f.lvalue)[:16]} = {text(s_.lvalue)[:16]} = {text(s_.rvalue)}", f2
 
 
+def sp_fold_copy(fn):
+    """v = E1; v op= E2;  ->  v = E1 op E2;  (SceneActorControl_UpdateHeightReturn: `delta = ground;
+    delta -= y;`. cse.c make_regs_eqv makes the copy's destination the canonical register of E1's
+    value when it outlives the block, so E1's computation moves to the copy; with no copy E1 keeps
+    its own pseudo and place. The `cse-canon` decision, rtlprobe.py canon)."""
+    for bi, b in enumerate(blocks(fn)):
+        it = b.block_items
+        for i in range(len(it) - 1):
+            x, y = it[i], it[i + 1]
+            if not (isinstance(x, ca.Assignment) and x.op == "=" and isinstance(x.lvalue, ca.ID)
+                    and isinstance(y, ca.Assignment) and y.op in ("+=", "-=", "|=", "&=", "^=", "<<=", ">>=")
+                    and isinstance(y.lvalue, ca.ID) and y.lvalue.name == x.lvalue.name
+                    and not isinstance(x.rvalue, ca.Assignment)
+                    and not any(isinstance(n, ca.ID) and n.name == x.lvalue.name for n, _, _ in walk(y.rvalue))):
+                continue
+            f2 = copy.deepcopy(fn)
+            it2 = blocks(f2)[bi].block_items
+            x2, y2 = it2[i], it2[i + 1]
+            it2[i:i + 2] = [ca.Assignment("=", x2.lvalue, ca.BinaryOp(y2.op[:-1], x2.rvalue, y2.rvalue))]
+            yield f"{x2.lvalue.name} = {text(x2.rvalue)[:16]} {y2.op[:-1]} {text(y2.rvalue)[:16]} in one assignment", f2
+
+
 def sp_sign_shift(fn):
     """E < 0  ->  (u32)E >> 31,  E >= 0  ->  !((u32)E >> 31)  (sub_08222A04: the sign bit tested by
     a shift, not a compare)."""
@@ -1197,6 +1219,44 @@ def sp_outline_store(fn):
             yield f"{text(a)[:30]} through an inline store helper ({vt})", (f2, [h])
 
 
+def sp_outline_setter(fn):
+    """b->f op= E  ->  Set(b, E) with static inline void Set(T *o, typeof(b->f) v) { o->f op= v; }
+    (PanelSequence_InitializeFromScript: the ROM loads the stored value before it adds the field's
+    offset. expand_assignment computes the destination address first; an inline helper's arguments
+    are evaluated into its parameters before the body, so the value comes first. The mirror of
+    sp_outline_store, whose helper takes the address)."""
+    ops = ("=", "|=", "&=", "+=", "-=", "^=")
+    types = {n.name: n.type for n, _, _ in walk(fn) if isinstance(n, ca.Decl) and n is not fn.decl}
+    if isinstance(fn.decl.type.args, ca.ParamList):
+        types.update({p.name: p.type for p in fn.decl.type.args.params if isinstance(p, ca.Decl) and p.name})
+    pred = lambda n, p, s: (isinstance(n, ca.Assignment) and n.op in ops and isinstance(p, ca.Compound)
+                            and isinstance(n.lvalue, ca.StructRef) and n.lvalue.type == "->"
+                            and isinstance(n.lvalue.name, ca.ID) and n.lvalue.name.name in types
+                            and isinstance(types[n.lvalue.name.name], ca.PtrDecl)
+                            and not isinstance(n.rvalue, ca.Assignment))
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        a, par, s_ = nth(f2, pred, k)
+        b = a.lvalue.name.name
+        name = new_name(f2, "Set")
+        po = _renamed(types[b], "o_")
+        for n_, _, _ in walk(po):
+            if isinstance(n_, ca.TypeDecl):
+                n_.quals = [q for q in n_.quals if q != "const"]
+        null = ca.Cast(ca.Typename(None, [], None, [], _renamed(types[b], None)), ca.Constant("int", "0"))
+        pv = ca.TypeDecl("v_", [], None, ca.Typeof(ca.StructRef(null, "->", copy.deepcopy(a.lvalue.field))))
+        plist = ca.ParamList([ca.Decl(name=n_, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                                      type=t_, init=None, bitsize=None, asmlabel=None)
+                              for n_, t_ in (("o_", po), ("v_", pv))])
+        ftype = ca.FuncDecl(plist, ca.TypeDecl(name, [], None, ca.IdentifierType(["void"])))
+        decl = ca.Decl(name=name, quals=[], align=[], storage=["static"], funcspec=["inline"],
+                       gcc_attributes=[], type=ftype, init=None, bitsize=None, asmlabel=None)
+        body = ca.Assignment(a.op, ca.StructRef(ca.ID("o_"), "->", copy.deepcopy(a.lvalue.field)), ca.ID("v_"))
+        h = ca.FuncDef(decl, None, ca.Compound([body]))
+        set_child(par, s_, ca.FuncCall(ca.ID(name), ca.ExprList([ca.ID(b), a.rvalue])))
+        yield f"{text(a)[:30]} through an inline setter (value first)", (f2, [h])
+
+
 def _trip(items, i):
     """(counter, trip count expr, body list, statements to drop) when items[i] is a counting loop whose
     counter is not read in its body: for (c = N; c != 0 / c > 0; c--), for (c = K; c >= 0; c--),
@@ -1408,29 +1468,99 @@ def sp_arg_to_local(fn, helpers):
             yield f"{h0.decl.name} takes {b} and computes {text(arg)[:24]} itself", (f2, [h])
 
 
+SUBWORD = ("u8", "s8", "u16", "s16", "char", "short")
+
+
+def sp_const_literal(fn):
+    """v = 7; ... x & v ...  ->  ... x & 7 ... for a local only ever set to one constant (the inverse of
+    sp_const_local; ActorParticles_SpawnWideBurst). A local is promoted to SImode (PROMOTE_MODE), so
+    cse folds it to the constant at each use; a literal in a 16-bit expression gets an HImode pseudo
+    of its own (see sp_helper_ret_word)."""
+    decls = [n for n, _, _ in walk(fn) if isinstance(n, ca.Decl) and n is not fn.decl]
+    names = [d.name for d in decls]
+    for d in decls:
+        v = d.name
+        if names.count(v) != 1 or not isinstance(d.type, ca.TypeDecl) or d in (fn.decl.type.args.params
+                                                                                 if fn.decl.type.args else []):
+            continue
+        vals, ok = [], True
+        if d.init is not None:
+            vals.append(d.init)
+        for n, par, sl in walk(fn.body):
+            if isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID) and n.lvalue.name == v:
+                if n.op != "=" or not isinstance(par, ca.Compound):
+                    ok = False
+                vals.append(n.rvalue)
+            elif (isinstance(n, ca.UnaryOp) and n.op in ("&", "++", "--", "p++", "p--")
+                  and isinstance(n.expr, ca.ID) and n.expr.name == v):
+                ok = False
+        if not ok or not vals or not all(isinstance(x, ca.Constant) and x.value == vals[0].value for x in vals):
+            continue
+        f2 = copy.deepcopy(fn)
+        for n, par, sl in list(walk(f2.body)):
+            if isinstance(n, ca.Compound) and n.block_items:
+                n.block_items = [x for x in n.block_items
+                                 if not (isinstance(x, ca.Decl) and x.name == v)
+                                 and not (isinstance(x, ca.Assignment) and isinstance(x.lvalue, ca.ID)
+                                          and x.lvalue.name == v)]
+        for n, par, sl in list(walk(f2.body)):
+            if isinstance(n, ca.ID) and n.name == v and par is not None and not (
+                    isinstance(par, ca.StructRef) and sl == "field"):
+                set_child(par, sl, copy.deepcopy(vals[0]))
+        yield f"literal {vals[0].value} for {v}", f2
+
+
+def sp_helper_ret_word(fn, helpers):
+    """static inline u16 H(void)  ->  static inline s32 H(void) (ActorParticles_SpawnWideBurst, like the
+    matched sub_08239D38: the random-table helper returned a word). Rule (optabs.c widen_operand,
+    reload.c find_equiv_reg, jump.c no-op moves): `s->y = H() & 7` with a 16-bit field is done in
+    HImode and widened to SImode for andsi3. With a u16 H the constant's HImode pseudo is the operand
+    that andsi3 forces into an SImode copy, and cse folds that copy to the constant. With a word H the
+    constant's HImode pseudo stays an operand through a paradoxical subreg, which cse cannot fold.
+    Allocated to a high register it is set in HImode and reloaded in SImode, and reload, reload_cse and
+    jump's no-op move deletion all refuse to reuse the low register that set it (another mode): the
+    ROM's `movs rN, #C; mov H, rN; mov rN, H`. A word-returning helper is tried as u16/s16 too."""
+    called = {n.name.name for n, _, _ in walk(fn) if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID)}
+    for name, h in helpers.items():
+        if name not in called or not isinstance(h.decl.type, ca.FuncDecl):
+            continue
+        ret = h.decl.type.type
+        if not (isinstance(ret, ca.TypeDecl) and isinstance(ret.type, ca.IdentifierType)):
+            continue
+        cur = " ".join(ret.type.names)
+        # and the inverse, for a candidate that keeps the copy where the ROM reuses the register
+        widths = (("s32", "u32") if ret.type.names[-1] in SUBWORD else
+                  ("u16", "s16") if ret.type.names[-1] in ("s32", "u32", "int") else ())
+        for t in widths:
+            h2 = copy.deepcopy(h)
+            h2.decl.type.type.type = ca.IdentifierType([t])
+            yield f"{name} returns {t} (was {cur})", (copy.deepcopy(fn), [h2])
+
+
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
              sp_split_offset, sp_addr_local, sp_goto_loop,
              sp_addr_before_next, sp_loop_weight,
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
-             sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct,
-             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses]
+             sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
+             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
 TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend, sp_alias_read]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
-HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
+HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local, sp_helper_ret_word]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "dead store": ["sp_alias_read"],
+    "cse-canon": ["sp_fold_copy", "sp_copy_uses", "rw_copy_var", "sp_inline_decl"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift", "sp_field_extend"],
     "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
-              "sp_offset_local", "sp_const_local", "sp_load_local", "sp_outline_store", "sp_rmw_temp", "sp_chain_assign", "sp_fresh_var", "sp_member_ptr",
+              "sp_offset_local", "sp_const_local", "sp_load_local", "sp_outline_store", "sp_outline_setter", "sp_rmw_temp", "sp_chain_assign", "sp_fresh_var", "sp_member_ptr",
               "rw_commute", "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
     "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl", "sp_ptr_walk", "sp_ptr_index"],
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form", "sp_ptr_walk", "sp_ptr_index",
@@ -1440,10 +1570,12 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
-    "reload": ["sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const"],
+    "reload-mode": ["sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
+    "reload": ["sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
+               "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }
 
 

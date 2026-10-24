@@ -61,6 +61,45 @@ TOPICS = {
         "(AGBCC_NOSTRICT=1) to tell whether any difference is an alias decision.",
         [("flow.c", "this memory write is dead (remember", -8, 14),
          ("alias.c", "if (!writep && RTX_UNCHANGING_P (mem))", -12, 24)]),
+    "cse-canon": (
+        "cse canonical register class head copy make_regs_eqv outlives block longer lived replacement",
+        "When cse records a copy `new = old` it puts NEW in OLD's equivalence class, and NEW becomes the "
+        "class's canonical register (every later use of the value is rewritten to it) if NEW lives past "
+        "the current extended block, or was set before it, and its last use is later than the current "
+        "head's. So `v = t; v -= y;` with v used after a branch makes v canonical for t's value, and t's "
+        "computation moves to the copy. Without the copy t keeps its pseudo and its place "
+        "(spellings.sp_fold_copy: `v = t - y`; SceneActorControl_UpdateHeightReturn). An inline "
+        "function's return value is such a copy too: `if (!p) return 0; return x & m;` sets the return "
+        "pseudo before the block that copies x & m into it (sub_08141C40, sub_08143ED0, still open). "
+        "rtlprobe.py canon tries CSE_NOCANON=N per class head; fix.py runs it on near matches and then "
+        "tries this decision's spellings first.",
+        [("cse.c", "  /* Prefer fixed hard registers to anything.  Prefer pseudo regs to other", 0, 24)]),
+    "reload": (
+        "reload spill rotation reload register choose last_spill_reg ldrsh zero index scratch constant offset",
+        "Reload picks a register for a constant operand, a spilled pseudo or an insn's scratch (the zero "
+        "index of `ldrsh rD, [rB, rI]`) by rotation (reload1.c allocate_reload_reg): it starts after the "
+        "register the previous reload took and takes the first spill register that no live pseudo holds "
+        "and no other reload of the insn took. The spill registers are those some insn needing a reload "
+        "chose (order_regs_for_reload: free call-clobbered r0-r3 first, lowest number first), over the "
+        "whole function. tools/reloaddbg.py prints, for each reload register that differs from the ROM, "
+        "the rotation state and the pseudo that held a skipped register; tools/rasolve.py searches rotation "
+        "shifts. Value-before-address order of a far store is an inline setter (spellings.sp_outline_setter).",
+        [("reload1.c", "/* I is the index in spill_regs.", 0, 30),
+         ("reload1.c", "  /* Prefer registers not so far used, for use in temporary loading.", 0, 16)]),
+    "reload-mode": (
+        "reload inheritance find_equiv_reg mode copy back high register mov ip r0 HImode SImode reload_cse no-op move",
+        "A value set into a high register through a low one (`movs r0, #7; mov ip, r0`) and used at once is "
+        "normally read from the low register: reload inherits it (choose_reload_regs, find_equiv_reg), or "
+        "reload_cse_regs or jump's no-op move deletion (jump.c) drops the copy back. All three compare modes "
+        "(find_equiv_reg: \"the copy-insn moved the wrong sort of datum\"), so the ROM's `mov ip, r0; mov r0, "
+        "ip` means the set and the use differ in mode: an HImode constant pseudo (`x & 7` narrowed to a "
+        "16-bit field) used through a paradoxical SImode subreg. It survives cse only when the constant is a "
+        "literal and the other operand is a word (an inline helper returning s32, not u16): "
+        "spellings.sp_helper_ret_word, sp_const_literal (ActorParticles_SpawnWideBurst; the matched "
+        "sub_08239D38 has the same helper). fix.py detects the copy and tries these first; the instrumented "
+        "compiler's AGBCC_NOINHERIT=UID, AGBCC_NORCSE=1 and AGBCC_NOEQUIVMOVE=all turn the three off.",
+        [("reload.c", "  /* Reject VALUE if the copy-insn moved the wrong sort of datum.  */", 0, 3),
+         ("jump.c", "	  /* Detect and ignore no-op move instructions", 0, 20)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "
@@ -131,12 +170,6 @@ TOPICS = {
         "from an earlier constant, with no label in between. Whether that happens depends on which register "
         "reload picked earlier (see reload).",
         [("reload1.c", "/* Try to transform (set (REGX) (CONST_INT A))", 0, 30)]),
-    "reload": (
-        "reload spill rotation reload register choose last_spill_reg",
-        "reload picks registers for reloads (constants, addresses, spills) by rotating through the spill "
-        "registers, starting after the last one used (last_spill_reg). One reload more or less before a point "
-        "shifts every later choice; tools/rasolve.py tries this.",
-        [("reload1.c", "/* I is the index in spill_regs.", 0, 17)]),
 }
 
 

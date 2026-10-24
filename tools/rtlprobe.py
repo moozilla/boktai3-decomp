@@ -61,6 +61,11 @@ try-env  the same for any of the instrumented compiler's knobs, one quoted
       keeping the ROM-side pseudo canonical gives 0 diffs, write C that makes
       that pseudo live longer (sub_08123194: one shared `target` variable for
       both Seek calls of a path).
+      AGBCC_NOINHERIT=UID[,UID] turns off reload inheritance at those insns,
+      AGBCC_NORCSE=1 skips reload_cse_regs and AGBCC_NOEQUIVMOVE=all keeps the
+      moves jump.c would delete as copies of a value already there: all three
+      together on the use's insn match a ROM that copies a high register
+      straight back (agbccsrc.py reload-mode).
 
 canon  finds the CSE canonical-register decision behind a difference, with no
       pseudo number to guess: one traced compile lists every pseudo that
