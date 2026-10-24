@@ -4,6 +4,7 @@
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
   scope.py FILE.c spill         is the whole difference reload's spill rotation? (searches AGBCC_SPILL)
+  scope.py FILE.c probe         is it one cse/gcse decision? (CSE_NOCANON, CSE_NOFOLLOW, AGBCC_NOPRE)
   scope.py FILE.c why all       why on the first differing insn of each hunk
   scope.py FILE.c why UID       why insn UID has the operands it has: pass by pass, and for cse the
                                 equivalence class and the canonical-register decision, with C lines
@@ -550,7 +551,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
                       " GCC threads depends on how each reaches RTL (an inline helper's parameter, a"
                       " macro, an explicit `p && ...`), and rewriting one test can change whether another"
                       " branch is threaded. Try the repeated tests of that value written the other way,"
-                      " one at a time; a version that threads too much drops the ROM's cmp/branch pairs.")
+                      " one at a time; a version that threads too much drops the ROM's cmp/branch pairs."
+                      " First run `scope.py FILE.c probe`: threading usually follows a cse"
+                      " canonical-register choice it can name.")
             else:
                 print("  The join or block order differs: the insns between the two targets belong to"
                       " different blocks in the ROM and the draft. Compare the C around both lines.")
@@ -575,7 +578,8 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             bp_s = PASS_NOTE.get(bp, bp)
             print(f"{mark} {r:34} {m:34} {lt:>5} {u or '':>5}  {bp_s}")
     print("\nnext: scope.py FILE.c why UID (why this insn has these registers) | FILE.c spill (only reload"
-          " rotation?) | insn UID (RTL through the passes) | uses REG (who uses a pseudo)")
+          " rotation?) | probe (one cse/gcse decision?) | insn UID (RTL through the passes) | uses REG (who uses a"
+          " pseudo)")
     return 1
 
 
@@ -1553,6 +1557,82 @@ def cmd_spill(src, func, env):
     return 0
 
 
+def cmd_probe(src, func, env):
+    """Which cse / gcse decision is the difference? One traced compile lists the decisions: pseudos
+    make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
+    target (CSE_NOFOLLOW), computations gcse's PRE replaces with a copy (AGBCC_NOPRE). Then each is
+    flipped alone; a flip that matches or lowers the count names the decision (rtlprobe.py's
+    canon / follow / pre, inside scope's loop and with its counts)."""
+    base, info = score(src, func, env)
+    wd = info["wd"]
+    tr = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "u.i", "-o", "/dev/null"], cwd=wd,
+                        capture_output=True, text=True,
+                        env=dict(os.environ, CSE_DEBUG="1", CSE_PATH="1", AGBCC_PRE_TRACE="1",
+                                 **{k: v for k, v in info["env"].items()})).stderr
+    heads, copied = set(), {}
+    for m in re.finditer(r"eqv new=(\d+) old=(\d+) first=(\d+) newlast=(\d+) newfirst=(\d+) "
+                         r"firstlast=(-?\d+) bb=(\d+)\.\.(\d+)", tr):
+        new, old, first, nl, nf, fl, b0, b1 = map(int, m.groups())
+        if fl >= 0 and (nl > b1 or nf < b0) and nl > fl:
+            heads.add(new)
+            copied.setdefault(new, old)
+    follows = {int(m.group(1)): int(m.group(2))
+               for m in re.finditer(r"follow k=(\d+) pass=1 jump=\d+ label=\d+ line=(\d+)", tr)}
+    pres = [int(m.group(1)) for m in re.finditer(r"pre k=(\d+) insn=(\d+) expr=\d+", tr)]
+    names = pseudo_names(wd, info["obj_name"])
+    lines = uid_lines(wd)
+    rtl = open(os.path.join(wd, "u.i.rtl")).read()
+
+    def sets(n):  # C lines of the insns that set pseudo N in the first RTL
+        us = [int(m.group(1)) for m in re.finditer(r"\n\((?:insn|call_insn)(?:/\w)* (\d+) (?:(?!\n\().)*?"
+                                                   rf"\(set \(reg(?:/\w)*:\w+ {n}\)", rtl, re.S)]
+        return sorted({str(lines[u]) for u in us if u in lines}, key=int)
+
+    def who(n):
+        return f"pseudo {n}" + (f" `{names[n]}`" if n in names else "") + (
+            f" set at line {', '.join(sets(n))}" if sets(n) else "")
+    cands = ([("CSE_NOCANON", str(n), who(n) + (f", made canonical over {who(copied[n])}" if n in copied else ""))
+              for n in sorted(heads)]
+             + [("CSE_NOFOLLOW", str(k), f"cse follow of the jump at line {ln}") for k, ln in sorted(follows.items())]
+             + [("AGBCC_NOPRE", str(k), f"PRE replacement {k}") for k in pres])
+    budget = int(os.environ.get("SCOPE_PROBE_MAX", "150"))
+    print(f"{func}: {info.get('counts') or base} differ; {len(heads)} cse canonical-register choices,"
+          f" {len(follows)} cse jump follows, {len(pres)} PRE replacements"
+          + (f"; trying the first {budget} (SCOPE_PROBE_MAX=N)" if len(cands) > budget else ""))
+    hits = []
+    for knob, val, what in cands[:budget]:
+        prev = env.get(knob)
+        n, inf = score(src, func, dict(env, **{knob: f"{prev},{val}" if prev else val}))
+        if n < base:
+            hits.append((n, knob, val, what, inf.get("counts", "MATCH") if n else "MATCH"))
+    fix = {"CSE_NOCANON": "cse made this value the canonical register of a copy class (it lives longer"
+                          " than the value it was copied from), so later tests and uses read it. In C make"
+                          " the ROM-side value the longer-lived one (one shared variable, the copy kept"
+                          " inside one block, an inline's result tested where it is returned).",
+           "CSE_NOFOLLOW": "cse carried what it knew (a constant in a register, an equal value) past"
+                           " this jump into its target. In C keep the value from being known there:"
+                           " another mode (a `(u8)` narrow constant), or recompute it after the branch.",
+           "AGBCC_NOPRE": "gcse found this computation redundant and reused an earlier register. The"
+                          " ROM recomputed it: spell it differently (another base or offset form) so"
+                          " PRE does not see the same expression."}
+    score(src, func, env)  # leave the workdir's dumps at the unmodified draft
+    if not hits:
+        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse decision changes the count;"
+              " the difference is elsewhere (allocation: why; reload: spill).")
+        return 0
+    hits.sort()
+    for n, knob, val, what, counts in hits[:8]:
+        print(f"  {knob}={val}: {counts}  ({what})")
+    seen = []
+    for _, knob, *_ in hits[:8]:
+        if knob not in seen:
+            seen.append(knob)
+            print(f"  {knob}: {fix[knob]}")
+    print(f"  {min(len(cands), budget)} compiles. A knob is a what-if: confirm the decision with it, then"
+          " write C with the same effect.")
+    return 0
+
+
 def cmd_why_all(src, func, env):
     """why for the first differing insn (with a uid) of each hunk, up to 8."""
     n, info = score(src, func, env)
@@ -1910,6 +1990,10 @@ def main():
         rest = [a for a in rest if a != "--all"]
         func = rest[1] if len(rest) > 1 else nonmatching_func(src) or os.path.basename(src)[:-2]
         return cmd_pins(src, func, env)
+    if "probe" in rest:
+        rest.remove("probe")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_probe(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)

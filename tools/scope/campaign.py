@@ -210,7 +210,12 @@ def cmd_tick(args):
         open(os.path.join(wd, ".second"), "w").write(res["counts"])
         if resume(r, model, note=(f"You stopped at {res['counts']}: very close. Take one more round of up to 80"
                                    " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
-                                   " a pin is acceptable only as the last resort). Update the deliverables.")):
+                                   " a pin is acceptable only as the last resort). scope has new commands since"
+                                   " you started: `scope.py FILE.c probe` flips each cse/gcse decision"
+                                   " (canonical register, jump follow, PRE) alone and names the one behind the"
+                                   " difference, with the C lines involved; and a difference that is only a"
+                                   " moved branch target is now explained (loop head or jump threading)."
+                                   " Rerun scope on your best file first. Update the deliverables.")):
             running.add(r["func"])
     for r in rows:  # resume workers a model error stopped, before starting new ones
         if len(running) < workers and state(r["func"]) == "failed" and \

@@ -699,6 +699,21 @@ which is exactly `10:1`. Not tested.
   lever; shape-only differences (an immediate load instead of a mask copy,
   dropped byte extensions) have no confirming knob; misaligned rows can
   suggest misleading register diagnoses; `why all` recompiles per hunk.
+* Overnight campaign, label-only drafts (2026-10-24): three queued drafts
+  (ContactActorPool_Start, Player_EmitMovementEffects,
+  Player_UpdateTetherMovement) compiled to the ROM's instructions with one
+  branch landing elsewhere, and scope said that branch "follows from the
+  others" when there were none. A worker spent 77 compiles on
+  EmitMovementEffects and found the cause by hand (`CSE_NOCANON=50`
+  matches). scope now names both targets of a label-only difference with
+  their C lines and says loop head (an invariant hoisted in one side only)
+  or jump threading (a branch onto a repeated test), and `probe` runs
+  rtlprobe's canon / follow / pre searches through scope's scoring:
+  `CSE_NOCANON=265: MATCH (pseudo 265 set at line 127, made canonical over
+  pseudo 270 set at line 127)` for UpdateTetherMovement in 68 compiles,
+  10 s. That gives shape-only differences a confirming knob when the cause
+  is a cse or gcse decision; differences from combine or fold still have
+  none.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
   (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
   progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly
