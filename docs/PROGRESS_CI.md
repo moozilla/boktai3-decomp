@@ -29,6 +29,9 @@ libgcc, RTC, EEPROM and RFU audits add further explicit boundaries, including
 unmatched entries needed to avoid crediting retained assembly blobs. RFU ARM
 entries used by the splitter are separately reviewed in
 `symbols/build_extra_functions.csv`; see `docs/RFU.md`.
+A hidden function named in `symbols/functions.csv` keeps its start in
+`build_extra_functions.csv`: `tools/disasm.py` does not seed it (the splitter
+cuts it), and the C file may define it by that name or as `sub_XXXXXXXX`.
 
 The same `split.c_functions` scanner used by the build identifies non-static C
 definitions and address aliases. `INCLUDE_ASM` placeholders and static helpers

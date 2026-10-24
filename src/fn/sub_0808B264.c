@@ -42,7 +42,7 @@ static inline void StartRoute(void *body, void *path, u8 *group)
     SceneBody_StartRoute(body, path, routes[index], 0, 0);
 }
 
-void sub_0808B264(struct SceneActorRegistryResetView *actor)
+void Ghoul_BeginAlternateRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
     {
