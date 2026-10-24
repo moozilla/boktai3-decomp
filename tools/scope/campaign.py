@@ -1,0 +1,268 @@
+#!/usr/bin/env python3
+"""Run scope workers (Codex) over a queue of NONMATCHING drafts, a few at a time.
+
+  campaign.py queue [--category Bosses] [--all]    write build/scope/campaign/queue.json from origin/main
+  campaign.py tick [--workers 4] [--model M]       keep WORKERS running; return when one finishes
+  campaign.py status                               what ran, what matched, what is in flight
+  campaign.py land FUNC WORKTREE                   verify FUNC's best_match.c, unwrap its NONMATCHING block,
+                                                   three-way merge it into WORKTREE's file, check the unit
+
+Each worker gets its own directory build/scope/campaign/FUNC/ (start.c = the draft as on origin/main,
+base.c = the same, kept for a three-way merge at landing) and SCOPE_RUN=FUNC. Workers are detached:
+`tick` returns as soon as any worker finishes (so whoever drives the campaign can land results) and
+the others keep running; the next `tick` counts them. No worker starts below the quota floor.
+"""
+import glob
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CAMP = os.path.join(ROOT, "build", "scope", "campaign")
+QUEUE = os.path.join(CAMP, "queue.json")
+FLOOR = 15  # percent of the weekly Codex quota that must stay unused
+
+BRIEF = """You are a worker on a GBA decompilation project (Boktai 3). Your job: make one C function compile
+byte-for-byte identical to the original ROM, using the `scope` tool, in C the original authors could have
+written.
+
+First read the worker brief: tools/scope/WORKER.md (you are in the scope checkout; run every command from
+its root). Compiler facts: tools/scope/README.md, section "agbcc facts established with scope" (grep it).
+
+Task:
+- Function: {func} ({size} bytes, currently {counts}). Your directory: {wd}. The draft is {wd}/start.c (a
+  copy of {src}); work on copies in your directory only.
+- Prefix every scope command with SCOPE_RUN={run}, e.g. `SCOPE_RUN={run} python3 tools/scope/scope.py
+  {wd}/start.c`. Other workers run at the same time on other functions.
+- Goal 1: MATCH in plain C. Use `why` on the first difference of each hunk, confirm the diagnosis with a
+  what-if knob (`AGBCC_PRI=name:+N`, `AGBCC_FORCE=name:REG`, `AGBCC_SPILL=K:REG`), then find C with the same
+  effect: declaration or statement order, a temporary, a type, operand order, an inline helper, a variable
+  reused for a later value, `x * 64` vs `x << 6`, splitting or joining an expression. Several changes often
+  pay off only together (WORKER.md step 5).
+- Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a last resort: use
+  one only where a knob proved an allocation or reload decision that you could not reproduce in C after
+  real attempts, and say so in the report. Never hand-written instructions. If the draft already has
+  pins or barriers, try to remove them (`pins` shows the cost of each).
+- Goal 2: if you matched with concessions, remove as many as you can while keeping MATCH.
+- Keep the C readable: struct fields and names, no magic offsets where the draft has fields.
+- Do not edit anything outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run
+  make. Never use `rm -rf` (move files to ~/.Trash). agbcc is C89 (declarations first in each block).
+- Budget: about 120 compiles; stop earlier when you run out of ideas backed by `why`.
+
+Deliverables in {wd}:
+- best_match.c: your best MATCHing file, if any (the whole file, NONMATCHING block kept as it is in
+  start.c: the #ifdef/#else/#endif stay; the landing step removes them).
+- best.c: your best non-matching file (fewest differing instructions), if you did not match.
+- result.json: {{"match": true/false, "counts": "N ROM / M draft" (best non-match, or "MATCH"),
+  "pins": P, "barriers": B, "compiles": C}}
+- REPORT.md: what `why` said and what C change it led to, for each step that helped; what you could not
+  fix and the diagnosis; where scope's output was confusing, wrong or missing.
+Your last message: a five-line summary of the same.
+"""
+
+
+def sh(*a, **k):
+    return subprocess.run(a, cwd=ROOT, capture_output=True, text=True, **k).stdout
+
+
+def drafts_on_main():
+    """function name -> src path, for every INCLUDE_ASM in the #else branch of a NONMATCHING block."""
+    out = {}
+    for f in sh("git", "ls-tree", "-r", "--name-only", "origin/main", "src").split():
+        if not f.endswith(".c"):
+            continue
+        t = sh("git", "show", f"origin/main:{f}")
+        for m in re.finditer(r"#ifdef NONMATCHING(.*?)#else(.*?)#endif", t, re.S):
+            for n in re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2)):
+                out[n] = f
+    return out
+
+
+def cmd_queue(args):
+    prog = json.loads(sh("git", "show", "origin/main:PROGRESS.json"))
+    drafts = drafts_on_main()
+    want = None if "--all" in args else (args[args.index("--category") + 1] if "--category" in args else "Bosses")
+    rows = []
+    for c in prog["categories"]:
+        if want and c["name"] != want:
+            continue
+        for u in c["units"]:
+            for name, addr, size, fuzzy, *_ in u["functions"]:
+                src = drafts.get(name) or drafts.get("sub_" + addr)
+                if fuzzy < 100 and src:
+                    rows.append({"func": name, "addr": addr, "size": size, "fuzzy": fuzzy, "src": src,
+                                 "category": c["name"], "unit": u["name"]})
+    # likely wins first: high fuzzy per byte left, small before large
+    rows.sort(key=lambda r: (100 - r["fuzzy"]) * r["size"])
+    os.makedirs(CAMP, exist_ok=True)
+    old = json.load(open(QUEUE)) if os.path.exists(QUEUE) else []
+    seen = {r["func"] for r in old}
+    merged = old + [r for r in rows if r["func"] not in seen]
+    json.dump(merged, open(QUEUE, "w"), indent=1)
+    print(f"{len(rows)} drafts ({want or 'all categories'}); queue now {len(merged)}")
+
+
+def quota():
+    out = sh("python3", "tools/codex_quota.py")
+    m = re.search(r"(\d+)% left", out)
+    return int(m.group(1)) if m else None
+
+
+def state(func):
+    wd = os.path.join(CAMP, func)
+    if not os.path.exists(os.path.join(wd, "pid")):
+        return "pending"
+    pid = int(open(os.path.join(wd, "pid")).read())
+    try:
+        os.kill(pid, 0)
+        alive = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True,
+                               text=True).stdout.strip()
+        if alive and not alive.startswith("Z"):
+            return "running"
+    except OSError:
+        pass
+    return "done"
+
+
+def start(r, model):
+    func = r["func"]
+    wd = os.path.join(CAMP, func)
+    os.makedirs(wd, exist_ok=True)
+    text = sh("git", "show", f"origin/main:{r['src']}")
+    open(os.path.join(wd, "base.c"), "w").write(text)
+    open(os.path.join(wd, "start.c"), "w").write(text)
+    rel = os.path.relpath(wd, ROOT)
+    env = dict(os.environ, SCOPE_RUN=func)
+    counts = sh("python3", "tools/scope/scope.py", f"{rel}/start.c", func, env=env)
+    m = re.search(r"(\d+ ROM / \d+ draft[^;]*)", counts)
+    counts = m.group(1) if m else ("MATCH already" if "MATCH" in counts else "see scope")
+    r["start_counts"] = counts
+    brief = BRIEF.format(func=func, size=r["size"], counts=counts, wd=rel, src=r["src"], run=func)
+    open(os.path.join(wd, "brief.txt"), "w").write(brief)
+    log = open(os.path.join(wd, "codex.json"), "w")
+    p = subprocess.Popen(["codex", "exec", "-m", model, "-s", "workspace-write", "-C", ROOT, "-c",
+                          "model_reasoning_effort=high", "--json", "-o", os.path.join(wd, "last.txt"), brief],
+                         cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                         start_new_session=True)
+    open(os.path.join(wd, "pid"), "w").write(str(p.pid))
+    open(os.path.join(wd, "started"), "w").write(time.strftime("%Y-%m-%d %H:%M:%S"))
+    print(f"started {func} ({r['size']} B, {counts})", flush=True)
+
+
+def cmd_tick(args):
+    workers = int(args[args.index("--workers") + 1]) if "--workers" in args else 4
+    model = args[args.index("--model") + 1] if "--model" in args else "gpt-6.1-sol"
+    rows = json.load(open(QUEUE))
+    running = {r["func"] for r in rows if state(r["func"]) == "running"}
+    for r in rows:
+        if len(running) >= workers:
+            break
+        if state(r["func"]) != "pending" or r.get("skip"):
+            continue
+        q = quota()
+        if q is not None and q <= FLOOR:
+            print(f"quota {q}% <= floor {FLOOR}%: not starting more workers")
+            break
+        start(r, model)
+        running.add(r["func"])
+    json.dump(rows, open(QUEUE, "w"), indent=1)
+    if not running:
+        print("nothing running; queue " + ("empty" if all(state(r["func"]) != "pending" for r in rows)
+                                           else "has pending items (quota?)"))
+        return 0
+    print(f"{len(running)} running: {', '.join(sorted(running))}", flush=True)
+    while True:
+        done = [f for f in running if state(f) == "done"]
+        if done:
+            for f in done:
+                print(f"finished {f}: {summary(f)}")
+            return 0
+        time.sleep(30)
+
+
+def summary(func):
+    wd = os.path.join(CAMP, func)
+    try:
+        r = json.load(open(os.path.join(wd, "result.json")))
+        return (f"MATCH ({r.get('pins', '?')} pins, {r.get('barriers', '?')} barriers)" if r.get("match")
+                else f"best {r.get('counts')}") + f", {r.get('compiles', '?')} compiles"
+    except (OSError, ValueError):
+        return "no result.json"
+
+
+def cmd_status(args):
+    rows = json.load(open(QUEUE))
+    for r in rows:
+        s = state(r["func"])
+        if s == "pending":
+            continue
+        landed = os.path.exists(os.path.join(CAMP, r["func"], "landed"))
+        print(f"{s:8s} {r['func']:45s} {r['size']:5d} B  {r.get('start_counts', ''):28s} "
+              + (summary(r["func"]) if s == "done" else "") + ("  [landed]" if landed else ""))
+    print(f"pending: {sum(1 for r in rows if state(r['func']) == 'pending')}; quota {quota()}%")
+
+
+def unwrap(text, func, addr):
+    """The matching C without its #ifdef NONMATCHING / #else INCLUDE_ASM / #endif wrapper and fuzzy notes."""
+    for m in re.finditer(r"#ifdef NONMATCHING\n(.*?)#else\n(.*?)#endif\n?", text, re.S):
+        names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2))
+        if func in names or "sub_" + addr in names:
+            body = "".join(ln for ln in m.group(1).splitlines(True)
+                           if not re.match(r"\s*// (fuzzy:|Remaining differences)", ln))
+            return text[:m.start()] + body + text[m.end():]
+    return None
+
+
+def cmd_land(args):
+    func, tree = args[0], os.path.abspath(os.path.expanduser(args[1]))
+    rows = {r["func"]: r for r in json.load(open(QUEUE))}
+    r = rows[func]
+    wd = os.path.join(CAMP, func)
+    cand = os.path.join(wd, "best_match.c")
+    rel = os.path.relpath(cand, ROOT)
+    out = sh("python3", "tools/scope/scope.py", rel, func, env=dict(os.environ, SCOPE_RUN=func))
+    if "\nMATCH" not in out:
+        sys.exit(f"{func}: best_match.c does not match:\n{out[:600]}")
+    new = unwrap(open(cand).read(), func, r["addr"])
+    if new is None:
+        sys.exit(f"{func}: no NONMATCHING block for it in best_match.c")
+    base = unwrap(open(os.path.join(wd, "base.c")).read(), func, r["addr"]) or open(os.path.join(wd, "base.c")).read()
+    target = os.path.join(tree, r["src"])
+    cur = open(target).read()
+    curu = unwrap(cur, func, r["addr"])
+    if curu is None:
+        sys.exit(f"{func}: {r['src']} in {tree} has no NONMATCHING block for it (landed already?)")
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        a, b, c = (os.path.join(tmp, n) for n in ("cur", "base", "new"))
+        open(a, "w").write(curu)
+        open(b, "w").write(base)
+        open(c, "w").write(new)
+        rc = subprocess.run(["git", "merge-file", a, b, c]).returncode
+        if rc:
+            sys.exit(f"{func}: merge conflict against the current {r['src']}; land by hand")
+        merged = open(a).read()
+    pins = len(re.findall(r'\basm\("r\d+"\)', merged))
+    bars = len(re.findall(r'\basm\(\s*""', merged))
+    marker = "// MATCHING_CONCESSION: register-pinning"
+    if (pins or bars) and marker not in merged:
+        merged = marker + "\n" + merged
+    if not (pins or bars) and marker in merged:
+        merged = re.sub(r"^// MATCHING_CONCESSION: register-pinning\n", "", merged, flags=re.M)
+    open(target, "w").write(merged)
+    subprocess.run(["make", "format"], cwd=tree, capture_output=True)
+    chk = subprocess.run(["python3", "tools/check.py", r["src"]], cwd=tree, capture_output=True, text=True)
+    last = (chk.stdout + chk.stderr).strip().splitlines()[-1:]
+    ok = bool(last) and ": MATCH" in last[0]
+    print(f"{func}: {'unit MATCH' if ok else 'UNIT MISMATCH'} in {tree} ({pins} pins, {bars} barriers in the file)")
+    if ok:
+        open(os.path.join(wd, "landed"), "w").write(tree)
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
+    sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land}[cmd](sys.argv[2:]))
