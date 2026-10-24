@@ -838,6 +838,30 @@ def cmd_why_all(src, func, env):
     return 1
 
 
+def explain_move2add(wd, uid, row, at):
+    """ROM loads a constant where the draft adds to a register: reload's move2add (reload1.c)."""
+    md = re.match(r"(?:adds|subs) r(\d+), #(0x[0-9a-f]+|\d+)$", row["draft"] or "")
+    mr = re.match(r"(?:ldr r(\d+), =|movs r(\d+), #)", row["rom"] or "")
+    if not (md and mr):
+        return
+    reg = int(md.group(1))
+    seq = insn_list(wd, "greg")
+    idx = next((i for i, (u, _, _) in enumerate(seq) if u == uid), None)
+    if idx is None:
+        return
+    src = None
+    for u, _, r in reversed(seq[:idx]):
+        if re.match(r"\(set \(reg:\w+ %d r%d\) \(const_int (-?\d+)" % (reg, reg), r):
+            src = (u, int(re.match(r".*?\(const_int (-?\d+)", r).group(1)))
+            break
+    known = f", set to {src[1]:#x} at {at(src[0])}" if src else ""
+    print(f"  reload's move2add (reload_cse_move2add, reload1.c) rewrote a constant load as an add from"
+          f" r{reg}, which still held a known constant{known}. It forgets everything at a CODE_LABEL, so"
+          " the ROM had a label in between: an if/else arm, an inline function's early return, or a loop"
+          " start. lever: restructure that stretch so control flow joins there (e.g. an inline helper"
+          " with if/return instead of a plain if)")
+
+
 def cmd_why(src, func, uid, env):
     import contextlib
     import io
@@ -902,6 +926,7 @@ def cmd_why(src, func, uid, env):
     if row and row["rom"] and row["draft"] and row["rom"].split()[0] != row["draft"].split()[0]:
         print(f"  this is a shape difference ({row['rom'].split()[0]} vs {row['draft'].split()[0]}), not a"
               " register choice: compare the RTL (`scope.py insn UID`) with what the ROM implies")
+        explain_move2add(wd, uid, row, at)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read())
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
