@@ -226,7 +226,18 @@ def compile_draft(src, func, env=None):
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
-    check.link_object(f"{rel}/u.o", f"{rel}/u.elf", syms=elf_syms())
+    # Link so FUNC itself sits at its ROM address: the drafts before it in a multi-function unit
+    # compile to their own sizes, and linking the first function at its address would shift every
+    # call FUNC makes to an outside symbol (bl targets off by the size difference).
+    pre_syms = sorted((v & ~1, n) for n, (v, t) in symtab(os.path.join(wd, "u.o")).items() if t == "FUNC")
+    want = next((v for v, n in pre_syms if n in (func, rom_name(src, func))), None)
+    link_at = None
+    if want is not None and pre_syms:
+        _, addr0, _ = inventory()
+        a0 = addr0.get(rom_name(src, func))
+        if a0 is not None:
+            link_at = a0 - (want - pre_syms[0][0])
+    check.link_object(f"{rel}/u.o", f"{rel}/u.elf", syms=elf_syms(), address=link_at)
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", f"{rel}/u.elf", f"{rel}/u.bin"])
     whole = open(os.path.join(wd, "u.bin"), "rb").read()
     syms = sorted((v, n) for n, (v, t) in symtab(os.path.join(wd, "u.o")).items() if t == "FUNC")
