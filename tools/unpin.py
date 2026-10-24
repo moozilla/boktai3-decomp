@@ -8,6 +8,16 @@ of src/), strip every `register T x asm("rN")` pin (keeping a plain
 declaration) and every `asm("")` barrier, compile with tools/check.py, and
 report whether the file still matches. With --write, a file that still matches
 is rewritten without the hints and without the marker.
+
+  unpin.py --drafts [FILE.c ...] [--write] [-j N]
+
+The same for `#ifdef NONMATCHING` drafts that carry hints: compile the draft
+with every hint removed, then (if that does not match) remove the hints one at
+a time, keeping each removal that does not make the draft worse. Pins are often
+added while other differences remain and outlive their reason: two drafts that
+were 1 instruction off with pins matched with none. With --write, an improved
+draft replaces the old one (still inside its #ifdef; promote a match with
+promote_draft.py).
 """
 import argparse
 import os
@@ -126,6 +136,73 @@ def per_function(files, write):
     print(f"{total} functions unpinned")
 
 
+HINT = re.compile(PIN.pattern + "|" + BARRIER.pattern + "|" + BARRIER_INLINE.pattern, re.M)
+
+
+def check_draft(path, text):
+    """(differing bytes, matched function names) for the file's drafts."""
+    fd, tmp = tempfile.mkstemp(suffix=".c", prefix=".unpin_", dir=path.parent)
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools/check.py"), tmp, "--nonmatching"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=300)
+        out = r.stdout + r.stderr
+    except subprocess.TimeoutExpired:
+        return 10 ** 9, []
+    finally:
+        os.unlink(tmp)
+    m = re.search(r"(\d+) differing bytes", out)
+    return (int(m.group(1)) if m else 10 ** 9), re.findall(r"^(\w+): MATCH", out, re.M)
+
+
+def remove_hint(m):
+    # a pin keeps its declaration; a barrier goes
+    return m.group(1) if m.group(1) is not None else ""
+
+
+def depin_draft(p, write):
+    text = p.read_text()
+    blocks = [m for m in DRAFT.finditer(text) if HINT.search(m.group(0))]
+    if not blocks:
+        return p, None, "no pinned drafts"
+    base, _ = check_draft(p, text)
+    best, best_text = base, text
+    # 1. every hint in every draft
+    allstrip = text
+    for m in reversed(blocks):
+        allstrip = allstrip[:m.start()] + HINT.sub(remove_hint, m.group(0)) + allstrip[m.end():]
+    d, matched = check_draft(p, allstrip)
+    tried = 1
+    if d < best:
+        best, best_text = d, allstrip
+    if d and d >= base:
+        # 2. one hint at a time, keeping removals that do not make it worse
+        cur = text
+        i = 0
+        while True:
+            spans = [h for m in DRAFT.finditer(cur) if HINT.search(m.group(0))
+                     for h in HINT.finditer(cur, m.start(), m.end())]
+            if i >= len(spans):
+                break
+            h = spans[i]
+            cand = cur[:h.start()] + remove_hint(h) + cur[h.end():]
+            dd, mm = check_draft(p, cand)
+            tried += 1
+            if dd <= best:
+                best, best_text, cur, matched = dd, cand, cand, mm
+                if not dd:
+                    break
+            else:
+                i += 1
+    if write and best < base:
+        p.write_text(best_text)
+    left = sum(len(HINT.findall(m.group(0))) for m in DRAFT.finditer(best_text))
+    state = "MATCH" if best == 0 else f"{best} bytes"
+    return p, best == 0, f"{base} -> {state} ({left} hints left, {tried} compiles)" + \
+        (f"; matches: {' '.join(matched)}" if matched else "")
+
+
 def literalize_item(item, whole):
     for typ, sym, _ in RAM_ARRAY.findall(whole):
         item = re.sub(r"\b" + sym + r"\b", f"(({typ} *)0x{sym[5:]})", item)
@@ -139,7 +216,20 @@ def main():
     ap.add_argument("-j", type=int, default=6)
     ap.add_argument("--per-function", action="store_true",
                     help="in multi-function units, strip one function's hints at a time")
+    ap.add_argument("--drafts", action="store_true",
+                    help="remove hints from #ifdef NONMATCHING drafts instead")
     a = ap.parse_args()
+    if a.drafts:
+        files = [Path(f).resolve() for f in a.files] or sorted(
+            p for p in (ROOT / "src").rglob("*.c")
+            if any(HINT.search(m.group(0)) for m in DRAFT.finditer(p.read_text())))
+        n = 0
+        with ThreadPoolExecutor(a.j) as ex:
+            for p, ok, msg in ex.map(lambda q: depin_draft(q, a.write), files):
+                n += bool(ok)
+                print(f"{'OK  ' if ok else '--  '}{p.relative_to(ROOT)}: {msg}", flush=True)
+        print(f"{n}/{len(files)} pinned drafts match without (some) hints")
+        return
     files = [Path(f).resolve() for f in a.files] or sorted(
         p for p in (ROOT / "src").rglob("*.c") if MARK in p.read_text())
 
