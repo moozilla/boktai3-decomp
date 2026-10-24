@@ -25,8 +25,11 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
     p->dirty |= 4;
 }
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
+static inline int StatusScreen_MapWidth(int bg)
+{
+    return gUnk_03004C30[bg].width;
+}
+
 void sub_0800E974(struct StatusScreen *p)
 {
     u16 zero = p->timer;
@@ -46,32 +49,22 @@ void sub_0800E974(struct StatusScreen *p)
     }
     if (p->timer == 48) {
         u16 *tiles = StatusScreen_GetTilePtr(0, 0, 0);
-        int row = 0;
-        for (; row < 15;) {
-            int col = 0;
-            int next = row + 1;
-            for (; col < (gUnk_03004C30[0].width * 2); col++)
-                *(tiles++) = 0xD000;
-
-            do {
-                row = next;
-            } while (0);
+        int row, col;
+        for (row = 0; row < 15; row++) {
+            for (col = 0; col < StatusScreen_MapWidth(0) * 2; col++)
+                *tiles++ = 0xD000;
         }
     }
-    if ((p->timer++) >= p->times[3]) {
-        {
-            typeof(p->state) *q1 = &p->state;
-            u8 z1 = 0;
-            p->timer = z1;
-            *q1 = StatusScreen_BeginClose;
+    {
+        register struct StatusScreen *phase asm("r4") = p;
+        if (phase->timer++ >= phase->times[3]) {
+            StatusScreenFn state = StatusScreen_BeginClose;
+            phase->state = state;
+            phase->timer = 0;
         }
+        phase->dirty |= 15;
     }
-    p->dirty |= 15;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800E974);
-#endif
 
 void StatusScreen_WaitForClose(struct StatusScreen *p)
 {
