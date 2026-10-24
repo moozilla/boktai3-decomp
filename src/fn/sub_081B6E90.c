@@ -1,8 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.7%
-// foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gEffectRandomTable gUnk_0203B400
 #define gEffectRandomIndex gUnk_03005308
 struct EffectPosition {
@@ -34,12 +32,12 @@ extern u32 gUnk_03005308;
 s32 Math_Atan2(s32, s32);
 void ActorEffect_UpdateRadialTrail(struct ActorEffect *);
 u32 ActorEffect_RemoveSprites(struct EffectOwner *, struct ActorEffect *, u32);
-static inline s32 NextRandom(void)
+static inline s32 NextRandom(u32 *randomIndex, const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    *randomIndex = (*randomIndex + 1) & 1023;
+    offset = *randomIndex * 2;
+    return *(const u16 *)(offset + (u32)table);
 }
 void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffect *effect,
                                     u32 index)
@@ -56,9 +54,21 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
             struct EffectPosition *head = &effect->trails[0].position;
             effect->direction = Math_Atan2(head->x - tail->x, head->z - tail->z);
         }
-        for (i = 0; i <= 5; i++) {
-            effect->angles[i] = (NextRandom() & 31) + 240 + effect->direction;
-            effect->radii[i] = (NextRandom() & 15) + 24;
+        {
+            u8 *angles;
+            u8 *radii;
+            const u16 *table;
+            u32 *randomIndex;
+            i = 0;
+            angles = effect->angles;
+            radii = effect->radii;
+            table = gUnk_0203B400;
+            randomIndex = &gUnk_03005308;
+            for (; i <= 5; i++) {
+                angles[i] = (s16)((NextRandom(randomIndex, table) & 31) + 240) + effect->direction;
+                radii[i] = (NextRandom(randomIndex, table) & 15) + 24;
+                asm("" : : "r"(randomIndex), "r"(table));
+            }
         }
     }
     ActorEffect_UpdateRadialTrail(effect);
@@ -67,6 +77,3 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
     else
         effect->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateRadialExpiry);
-#endif

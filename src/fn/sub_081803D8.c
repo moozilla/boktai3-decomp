@@ -1,9 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.9%
-// fix.py best version (reprinted C)
-// Open: the step address is kept in a callee-saved register; the original
-// recomputes it per branch, and the zero/one constants reuse the step value.
 struct BossTask {
     u8 pad0[0xAC];
     u8 fieldAC, fieldAD, fieldAE;
@@ -32,6 +27,11 @@ static inline void setState(struct BossTask *p, u8 state)
     p->fieldB0 = 1;
 }
 
+static inline void setStep(struct BossTask *p, u32 step)
+{
+    p->step = step;
+}
+
 /* Registry routine 4EC9: cycles the singleton in slot 2 through steps 0-2
    (+0x4EA), entering state 8, 10 or 3, then clears +0xB3, +0x4EB, +0x4E8. */
 void BossSlot2_AdvanceStepFromScript(void)
@@ -40,13 +40,13 @@ void BossSlot2_AdvanceStepFromScript(void)
     struct BossTask *p = task;
     if (p) {
         if (p->step == 0) {
-            p->step = 1;
+            setStep(p, 1);
             setState(p, 8);
         } else if (p->step == 1) {
+            setStep(p, 2);
             setState(p, 10);
-            p->step = 2;
         } else {
-            p->step = 0;
+            setStep(p, 0);
             setState(p, 3);
         }
         {
@@ -57,6 +57,3 @@ void BossSlot2_AdvanceStepFromScript(void)
         p->field4E8 = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_AdvanceStepFromScript);
-#endif
