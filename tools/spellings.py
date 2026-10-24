@@ -396,7 +396,11 @@ def sp_into_loop(fn):
                     continue  # a store through memory in the loop could change the target
                 if any(_assigns(lp, nm) for nm in names):
                     continue
-                reads = lambda node: any(text(x) == target for x, _, _ in walk(node)) if node is not None else False
+                mem = not isinstance(st0.lvalue, ca.ID)  # a callee can read a store through memory
+
+                def reads(node):
+                    return node is not None and any(text(x) == target or mem and isinstance(x, ca.FuncCall)
+                                                    for x, _, _ in walk(node))
                 if any(reads(x) for x in items[si + 1:li]):
                     continue
                 if isinstance(lp, (ca.For, ca.While)):
@@ -857,6 +861,61 @@ def sp_sign_shift(fn):
         yield f"sign of {text(c.left)[:24]} by a shift", f2
 
 
+def sp_field_extend(fn):
+    """(E << k) >> k  <->  E & (2^(32-k) - 1)  (Ghost_TurnTowardHeading: `((cur - want) & 7) <= 4`, the
+    octant difference masked, not sign-extended). A type hypothesis: a field read signed or unsigned."""
+    def shifted(n):
+        return isinstance(n, ca.BinaryOp) and n.op == ">>" and isinstance(n.left, ca.BinaryOp) and \
+            n.left.op == "<<" and isinstance(n.right, ca.Constant) and _same(n.right, n.left.right)
+
+    def masked(n):
+        if not (isinstance(n, ca.BinaryOp) and n.op == "&" and isinstance(n.right, ca.Constant)):
+            return False
+        try:
+            m = int(n.right.value.rstrip("uUlL"), 0)
+        except ValueError:
+            return False
+        return 1 < m < 0x80000000 and m & (m + 1) == 0
+    pred = lambda n, p, s: shifted(n) or masked(n)
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        n, par, slot = nth(f2, pred, k)
+        if shifted(n):
+            bits = 32 - int(n.right.value, 0)
+            new = ca.BinaryOp("&", n.left.left, ca.Constant("int", str((1 << bits) - 1)))
+            desc = f"{text(n)[:24]} masked to {bits} bits"
+        else:
+            bits = int(n.right.value.rstrip("uUlL"), 0).bit_length()
+            sh = ca.Constant("int", str(32 - bits))
+            new = ca.BinaryOp(">>", ca.BinaryOp("<<", n.left, sh), copy.deepcopy(sh))
+            desc = f"{text(n)[:24]} sign-extended from {bits} bits"
+        set_child(par, slot, new)
+        yield desc, f2
+
+
+def sp_narrow_mask(fn):
+    """E & K  ->  (u8)(E & K)  (Ghost_TurnTowardHeading and Lun_TurnTowardSavedDirection:
+    `s32 current = (u8)(((dir + 0x70) >> 5) & 7)`). The narrowed AND is done in QImode, so its
+    constant K is a QImode register, and cse shares a constant only within one mode: a later int
+    `& K` loads K again instead of reusing it, as the ROM does. Sound: E & K fits the narrow type."""
+    def mask(n):
+        if not (isinstance(n, ca.BinaryOp) and n.op == "&" and isinstance(n.right, ca.Constant)):
+            return None
+        try:
+            return int(n.right.value.rstrip("uUlL"), 0)
+        except ValueError:
+            return None
+    pred = lambda n, p, s: mask(n) is not None and 0 < mask(n) <= 0xFFFF and not isinstance(p, ca.Cast)
+    for k in range(sites(fn, pred)):
+        for t, top in (("u8", 0xFF), ("u16", 0xFFFF)):
+            f2 = copy.deepcopy(fn)
+            n, par, slot = nth(f2, pred, k)
+            if mask(n) > top:
+                continue
+            set_child(par, slot, ca.Cast(tname(t), n))
+            yield f"({t})({text(n)[:28]})", f2
+
+
 def _after(fn, node):
     """Statements that can run after NODE finishes: the items after it and after each enclosing
     statement in their blocks (an if's other branch is not among them). None inside a loop."""
@@ -986,7 +1045,8 @@ def sp_const_local(fn):
         cs = [x for x in walk(owners[oi]) if pred(*x)]
         for ci in range(len(cs)):
             for t in ("u32", "s32", "u16", "u8"):
-                if not _fits(cs[ci][0], t):
+                # an unsigned int operand makes the comparison, division or shift unsigned (u8/u16 promote to int)
+                if not _fits(cs[ci][0], t) or t == "u32" and cs[ci][1].op in ("<", ">", "<=", ">=", "/", "%", ">>"):
                     continue
                 f2 = copy.deepcopy(fn)
                 own2 = []
@@ -1285,7 +1345,12 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_addr_before_next, sp_loop_weight,
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
-             sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct]
+             sp_load_local, sp_symbol_literal, sp_outline_store, sp_loop_normal, sp_ptr_deinduct,
+             sp_field_extend, sp_narrow_mask]
+# type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
+# done unsigned), so they may change what the draft does. That is their job: a byte match proves the
+# ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
+TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
 HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
 
@@ -1293,7 +1358,7 @@ HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local]
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "call result": ["sp_call_narrow"],
-    "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift"],
+    "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift", "sp_field_extend"],
     "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "sp_offset_local", "sp_const_local", "sp_load_local", "sp_outline_store", "sp_rmw_temp", "sp_chain_assign", "sp_fresh_var", "sp_member_ptr",
               "rw_commute", "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
@@ -1301,11 +1366,12 @@ DECISIONS = {
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form", "sp_ptr_walk", "sp_ptr_index",
                         "sp_count_up", "sp_count_down", "sp_loop_normal", "sp_ptr_deinduct"],
     "cse-skip": ["sp_arg_to_local", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
-    "cse-reuse": ["sp_arg_to_local", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
+    "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
+    "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_loop_weight", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_loop_weight", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload": ["sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const"],
 }

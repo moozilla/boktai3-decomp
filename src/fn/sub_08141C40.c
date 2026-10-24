@@ -3,6 +3,8 @@
 #ifdef NONMATCHING
 // fuzzy: 99.9%
 // The first null-player branch targets the next null check rather than the shared effect path.
+// rtlprobe.py canon: CSE_NOCANON=51 (FlagFour's return register) matches; CSE makes it canonical
+// because its `return 0` set precedes the block that copies Mask's value into it.
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 extern u8 *gUnk_02000710;

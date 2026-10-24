@@ -16,7 +16,9 @@ code does. N matched, pin-free functions are sampled; every output of every
 spelling on them is compiled and run against the ROM function with
 tools/semcheck.py (run with build/venv/bin/python). A DIFFERENT verdict on a
 matched function is a bug in the spelling (it changed the program), reported
-with the edit and the first disagreement.
+with the edit and the first disagreement. Type-hypothesis spellings
+(spellings.TYPE_SPELLINGS: sp_cmp_sign, sp_call_narrow) assert a type the C
+does not show and are expected to differ; they are reported but marked.
 """
 import argparse
 import os
@@ -95,8 +97,10 @@ def soundness(sps, n, seed):
                         bad.setdefault(sp.__name__, []).append((name, desc, detail))
                         print(f"  {sp.__name__} on {name}: {desc[:50]}: {detail[:140]}", flush=True)
         print(f"{taken}/{n} {name}", flush=True)
+    types = {sp.__name__ for sp in spellings.TYPE_SPELLINGS}
     for nm in sorted(checked):
-        print(f"{nm:22} {checked[nm]:4} outputs checked, {len(bad.get(nm, [])):3} DIFFERENT")
+        note = "  (type hypothesis: expected)" if nm in types and bad.get(nm) else ""
+        print(f"{nm:22} {checked[nm]:4} outputs checked, {len(bad.get(nm, [])):3} DIFFERENT{note}")
 
 
 def main():

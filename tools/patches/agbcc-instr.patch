@@ -870,7 +870,7 @@
  }
 --- a/cse.c
 +++ b/cse.c
-@@ -835,6 +835,27 @@
+@@ -835,6 +835,43 @@
  /* Make reg NEW equivalent to reg OLD.
     OLD is not changing; NEW is.  */
  
@@ -895,10 +895,26 @@
 +  return 0;
 +}
 +
++/* Jumps cse could follow so far in this pass (CSE_PATH, CSE_NOFOLLOW).  */
++
++static int follow_count;
++
++/* The source line of INSN: the nearest line-number note before it.  */
++
++static int
++cse_line_of (insn)
++     rtx insn;
++{
++  for (; insn; insn = PREV_INSN (insn))
++    if (GET_CODE (insn) == NOTE && NOTE_LINE_NUMBER (insn) > 0)
++      return NOTE_LINE_NUMBER (insn);
++  return 0;
++}
++
  static void
  make_regs_eqv (new, old)
       register int new, old;
-@@ -854,7 +875,14 @@
+@@ -854,7 +891,14 @@
       hard regs.  Among pseudos, if NEW will live longer than any other reg
       of the same qty, and that is beyond the current basic block,
       make it the new canonical replacement for this qty.  */
@@ -914,6 +930,34 @@
        /* Certain fixed registers might be of the class NO_REGS.  This means
  	 that not only can they not be allocated by the compiler, but
  	 they cannot be used in substitutions or canonicalizations
+@@ -8187,6 +8231,19 @@
+ 	        && (GET_CODE (q) != CODE_LABEL || LABEL_NUSES (q) != 0))
+ 	      break;
+ 
++	  /* Instrumentation: CSE_PATH=1 traces each jump cse could follow
++	     into its target; CSE_NOFOLLOW=K refuses the K-th of them (counted
++	     from 1 over the function, in the order they are met).  */
++	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER
++	      && (getenv ("CSE_PATH") || getenv ("CSE_NOFOLLOW")))
++	    {
++	      follow_count++;
++	      if (getenv ("CSE_PATH"))
++		fprintf (stderr, "follow k=%d pass=%d jump=%d label=%d line=%d\n", follow_count,
++			 after_loop ? 2 : 1, INSN_UID (p), INSN_UID (JUMP_LABEL (p)), cse_line_of (p));
++	      if (getenv ("CSE_NOFOLLOW") && atoi (getenv ("CSE_NOFOLLOW")) == follow_count)
++		q = 0;
++	    }
+ 	  /* If we ran into a BARRIER, this code is an extension of the
+ 	     basic block when the branch is taken.  */
+ 	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)
+@@ -8302,6 +8359,7 @@
+   register int i;
+ 
+   cse_jumps_altered = 0;
++  follow_count = 0;
+   recorded_label_ref = 0;
+   constant_pool_entries_cost = 0;
+   val.path_size = 0;
 --- a/local-alloc.c
 +++ b/local-alloc.c
 @@ -1329,6 +1329,28 @@

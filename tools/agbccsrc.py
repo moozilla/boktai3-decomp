@@ -44,15 +44,18 @@ TOPICS = {
          ("cse.c", "/* Detect a branch around a block of code.  */", 0, 38)]),
     "cse-follow": (
         "cse follow jump follow-jumps barrier target",
-        "cse follows an unconditional jump into its target (path status TAKEN) when the jump is followed by a "
-        "barrier and the target label is used only once, carrying what it knew into the target block.",
+        "cse follows a conditional jump into its target (path status TAKEN) when the target label is used only "
+        "once and a barrier precedes it (the block before ends in a jump or return), carrying what it knew "
+        "into the target block. rtlprobe.py follow finds the jump (CSE_NOFOLLOW=K). Values are shared only "
+        "within one machine mode: a constant made in QImode by `(u8)(x & 7)` is not reused for an int "
+        "`& 7` (spellings.sp_narrow_mask).",
         [("cse.c", "if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)", -2, 26)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "
         "block (a block plus the jumps it follows or skips). To make agbcc recompute it as the ROM does, the "
         "expression must differ (another type, base, or offset spelling), or the block must end before it "
-        "(see cse-skip, cse-follow).",
+        "(see cse-skip, cse-follow). A constant is reused only by an expression of the same machine mode.",
         [("cse.c", "/* Find the end of INSN's basic block and return its range,", 0, 13)]),
     "cse-swap": (
         "swap operand order commutative constant second canonical copy two-operand and orr",

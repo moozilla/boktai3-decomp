@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 // fix.py best version (reprinted C)
 // Remaining differences include octant-mask lifetime, control initialization and registers.
 #include "scene_actor_reaction.h"
@@ -113,13 +111,16 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
             return;
         }
         target -= 8;
-        if ((((current - target) << 29) >> 29) <= 4) {
-            u32 *p = &actor->flags2CC;
-            u32 mask = ~0x10000;
-            *p &= mask;
-        } else {
-            u32 mask = 0x10000;
-            actor->flags2CC |= mask;
+        {
+            s32 k1 = 4;
+            if (((u8)((current - target) & 7)) <= k1) {
+                u32 *p = &actor->flags2CC;
+                u32 mask = ~0x10000;
+                *p &= mask;
+            } else {
+                u32 mask = 0x10000;
+                actor->flags2CC |= mask;
+            }
         }
     }
     sequence = (*((u8 **)(((u8 *)actor) + 4))) + 0x48;
@@ -158,6 +159,3 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
         Select((void *)actor, selection, variant, flags);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Lun_TurnTowardSavedDirection);
-#endif

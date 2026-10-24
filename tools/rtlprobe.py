@@ -7,6 +7,8 @@
   rtlprobe.py try-t FILE.c T|LO:HI ... [--nonmatching] [-j N]
   rtlprobe.py try-env FILE.c 'VAR=V [VAR=V ...]' ... [--nonmatching]
   rtlprobe.py perline FILE.c [--nonmatching] [--func NAME] [--top N]
+  rtlprobe.py canon FILE.c [--nonmatching] [-j N]
+  rtlprobe.py follow FILE.c [--nonmatching] [-j N]
 
 Each command compiles FILE.c as build.py does (preprocessed the same way),
 with `-dp` and the pass dumps, into build/rtlprobe/<stem>/, in under a second
@@ -57,6 +59,33 @@ try-env  the same for any of the instrumented compiler's knobs, one quoted
       keeping the ROM-side pseudo canonical gives 0 diffs, write C that makes
       that pseudo live longer (sub_08123194: one shared `target` variable for
       both Seek calls of a path).
+
+canon  finds the CSE canonical-register decision behind a difference, with no
+      pseudo number to guess: one traced compile lists every pseudo that
+      make_regs_eqv made a class's canonical register (it lives past the
+      extended basic block and longer than the old head), then each is
+      checked with CSE_NOCANON=N. A pseudo whose demotion matches (or gets
+      closer) is the decision: its sets and uses in the .cse dump say which
+      C value it is. Typical case (Player_EmitMovementEffects): an inline
+      helper's return register set on a `return 0` path and on the main path
+      becomes canonical, so `if (helper())` keeps testing it, its `= 0` set is
+      not trivially dead, and the jump around it is threaded one pass too
+      late (a null-check branch targets the next null check, not the shared
+      path). Fix in C: make the ROM-side value the longer-lived one, or keep
+      the copy inside one block.
+
+follow  finds a CSE path decision behind a difference: cse extends a block into
+      the target of a conditional jump (cse.c cse_end_of_basic_block) when the
+      label is used once and a BARRIER precedes it, carrying what it knows
+      (constants in registers, equal values) into the target. One traced
+      compile (CSE_PATH=1) lists each such jump with its source line, then
+      each is refused in turn (CSE_NOFOLLOW=K). A refusal that matches names
+      the jump. Typical case (Ghost_TurnTowardHeading): the ROM loads a
+      constant again after `if (a == b) { ...; return; }` and the draft
+      reuses it. The C fix need not refuse the jump; it only has to keep the
+      value from being known there, e.g. tools/spellings.py sp_narrow_mask:
+      a QImode `(u8)(x & 7)` puts 7 in a QImode register, which an int
+      `& 7` cannot reuse, since cse shares a constant only within one mode.
 
 perline  insns per source line in the RTL after CSE (what GCSE sees, and so
       what sets T) against after local-alloc (what survives), largest
@@ -327,6 +356,50 @@ def try_env(a, quiet=False):
     return list(zip(specs, texts))
 
 
+def canon(a):
+    cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
+    work = compile_dumps(a.src, [], a.nonmatching)
+    tr = subprocess.run([cc] + build.cflags_for(a.src) + ['u.i', '-o', '/dev/null'], cwd=work,
+                        env=dict(os.environ, CSE_DEBUG='1'), capture_output=True, text=True).stderr
+    heads = {}
+    for m in re.finditer(r'eqv new=(\d+) old=(\d+) first=(\d+) newlast=(\d+) newfirst=(\d+) '
+                         r'firstlast=(-?\d+) bb=(\d+)\.\.(\d+)', tr):
+        new, old, first, nl, nf, fl, b0, b1 = map(int, m.groups())
+        if fl >= 0 and (nl > b1 or nf < b0) and nl > fl:
+            heads[new] = heads.get(new, 0) + 1
+    print(f'{len(heads)} pseudos become a CSE class head; trying CSE_NOCANON on each')
+    a.envs = [f'CSE_NOCANON={n}' for n in sorted(heads)]
+    base = None
+    for spec, text in try_env(a, quiet=True):
+        if not spec:
+            base = text
+            print(f'{"default":>20}: {text}')
+        elif text != base:
+            print(f'{spec:>20}: {text}')
+
+
+def follow(a):
+    cc = os.path.join(ROOT, 'build', 'agbcc-instr', 'gcc', 'agbcc')
+    work = compile_dumps(a.src, [], a.nonmatching, lines=True)  # -g only for the line notes
+    tr = subprocess.run([cc] + build.cflags_for(a.src) + ['-g', 'u.i', '-o', '/dev/null'], cwd=work,
+                        env=dict(os.environ, CSE_PATH='1'), capture_output=True, text=True).stderr
+    where = {}
+    for m in re.finditer(r'follow k=(\d+) pass=1 jump=\d+ label=\d+ line=(\d+)', tr):
+        where[int(m.group(1))] = int(m.group(2))
+    lines = open(os.path.join(ROOT, a.src)).read().split('\n')
+    print(f'cse follows {len(where)} jumps into their targets; refusing each in turn (CSE_NOFOLLOW=K)')
+    a.envs = [f'CSE_NOFOLLOW={k}' for k in sorted(where)]
+    base = None
+    for spec, text in try_env(a, quiet=True):
+        if not spec:
+            base = text
+            print(f'{"default":>16}: {text}')
+        elif text != base:
+            ln = where[int(spec.split('=')[1])]
+            src = lines[ln - 1].strip()[:60] if 0 < ln <= len(lines) else ''
+            print(f'{spec:>16}: {text}\n{"":>18}jump at line {ln}: {src}')
+
+
 def perline(a):
     work = compile_dumps(a.src, ['-g', '-ds', '-dl'], a.nonmatching, lines=True)
 
@@ -364,7 +437,7 @@ def dump(a):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline'):
+    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline', 'canon', 'follow'):
         p = sub.add_parser(name)
         p.add_argument('src')
         p.add_argument('--nonmatching', action='store_true')
@@ -377,7 +450,7 @@ def main():
     sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
                                      help='expression indices in the bucket order wanted: print the T windows')
     sub.choices['try-t'].add_argument('t', nargs='+', help='table sizes, or LO:HI to sweep the odd sizes')
-    for name in ('try-t', 'try-env'):
+    for name in ('try-t', 'try-env', 'canon', 'follow'):
         sub.choices[name].add_argument('-j', type=int, default=os.cpu_count() or 4)
     sub.choices['try-env'].add_argument('envs', nargs='+')
     sub.choices['perline'].add_argument('--func')
@@ -385,7 +458,7 @@ def main():
     a = ap.parse_args()
     a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
     {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t, 'try-env': try_env,
-     'perline': perline}[a.cmd](a)
+     'perline': perline, 'canon': canon, 'follow': follow}[a.cmd](a)
 
 
 if __name__ == '__main__':
