@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// Remaining difference: recovery timer offset reload uses r3 instead of r0.
 #include "screamer_playback.h"
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
@@ -28,7 +25,6 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
         register u32 first asm(SCREAMER_FIRST);
         u32 maskBit = initialBit;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -136,7 +132,8 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     struct ScreamerSprite *sprite = &owner->sprite;
     struct DisplaySequenceState *state = &owner->sequence;
     const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
+    u32 duration, flags, bit;
+    register u32 playbackLimit asm("r3");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -174,9 +171,8 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm(SCREAMER_MASK);
+        u32 mask;
         register u32 temp asm("r3");
-        register u32 savedDuration asm(SCREAMER_DURATION);
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
@@ -185,7 +181,7 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
 
         duration = state->duration;
         elapsed = (u16)elapsed;
-        savedDuration = duration;
+        playbackLimit = duration;
         if (elapsed >= duration) {
             state->elapsed = 0;
             flags = state->flags;
@@ -195,37 +191,31 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
                     u32 hold = 8;
                     hold &= flags;
                     if (hold) {
-                        state->elapsed = savedDuration;
+                        state->elapsed = playbackLimit;
                     } else {
                         state->index = state->frameCount - 1;
                     }
-                    ended = 1;
                 } else {
                     state->index = index - 1;
-                    ended = 0;
                 }
             } else {
                 u32 index = state->index + 1;
-                u32 frameCount;
                 u32 endFlag;
                 state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
+                playbackLimit = state->frameCount;
+                if ((index & mask) >= playbackLimit) {
                     endFlag = flags & 8;
                     asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
                         {
-                            u32 lastIndex = frameCount - 1;
+                            u32 lastIndex = playbackLimit - 1;
                             state->index = lastIndex;
                         }
                     } else {
                         state->index = 0;
                     }
-                    ended = 1;
-                } else {
-                    ended = 0;
                 }
             }
             {
@@ -244,11 +234,9 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
                 if (!(u8)speed)
                     state->duration = 1;
             }
-        } else {
-            ended = 0;
         }
     }
-    return ended;
+    return playbackLimit;
 }
 
 s32 Screamer_UpdateScream(struct ScreamerState *p)
@@ -256,7 +244,6 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     register s32 phase asm("r3");
     p->sprite.flags &= ~1;
     phase = p->f1D6;
-    asm("" : "+r"(phase));
     switch (phase) {
         case 0:
             Screamer_StepAnimation(p);
@@ -265,14 +252,12 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                     register s16 *field asm("r1");
                     asm("" : "+r"(off));
                     field = (void *)((u8 *)p + off);
-                    asm("" : : "r"(field));
                     *field;
                 }) > ({
                     register u32 off asm("r3") = 0x1d4;
                     register s16 *field asm("r0");
                     asm("" : "+r"(off));
                     field = (void *)((u8 *)p + off);
-                    asm("" : : "r"(field));
                     *field;
                 })) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1B, (u8)p->f1D8, 0);
@@ -290,20 +275,16 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                     register u32 countOffset asm("r3") = 0x1D2;
                     register u16 *count asm("r1");
                     u32 next;
-                    register u32 limitOffset asm("r2");
-                    register s16 *limit asm("r1");
+                    u32 limitOffset;
+                    s16 *limit;
                     asm("" : "+r"(countOffset));
                     count = (void *)((u8 *)p + countOffset);
-                    asm("" : : "r"(count));
                     next = *count + 1;
                     *count = next;
                     limitOffset = 0x1D0;
-                    asm("" : : "r"(limitOffset));
                     limit = (void *)((u8 *)p + limitOffset);
-                    asm("" : : "r"(limit));
                     if ((s16)next >= ({
                             s32 value;
-                            asm("" : : "r"(limit));
                             value = *limit;
                             asm("" : : "r"(limitOffset));
                             value;
@@ -318,25 +299,29 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
             p->colliderFlags &= ~4;
             p->contactFlags |= 4;
             break;
-        case 2:
-            Screamer_StepRecovery(p);
-            if (p->f1CA > p->f1CC) {
+        case 2: {
+            u32 playbackLimit;
+            s16 *timer;
+            s16 *limit;
+            playbackLimit = Screamer_StepRecovery(p);
+            timer = &p->f1CA;
+            limit = &p->f1CC;
+            /* Keep the playback limit live through recovery-field address setup. */
+            asm("" : : "r"(playbackLimit));
+            if (*timer > *limit) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 0);
                 p->update = Screamer_WaitForPlayerApproach;
                 p->f1D6 = 0;
-                p->f1CA = 0;
+                *timer = 0;
                 p->f1D2 = 0;
             }
             p->colliderFlags &= ~4;
             Collider_SetPosition(p->bodyCollider, &p->sprite.position, 0);
             p->contactFlags |= 4;
             break;
+        }
     }
     p->sprite.flags &= ~1;
     p->f1CA++;
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Screamer_UpdateScream);
-#endif

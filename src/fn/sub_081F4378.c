@@ -1,13 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best after the inlined-insn fix
-// Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
     s16 x, y, z, pad;
-};
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
 };
 struct Actor {
     u8 pad0[0x51];
@@ -48,26 +42,12 @@ struct Actor {
     u8 motionFlag, padE71, targetAngle, phaseTimer;
     s16 hitTimer, terrainTimer;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
-extern u32 gUnk_03005304;
-extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
-void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
-void SceneActors_StartAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void Sound_StopSong(u32);
 u8 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
-static inline u32 randomA(void)
-{
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
-}
-static inline void facing(struct Actor *p, s32 angle)
+static inline void Ratatosk_SetFacing(struct Actor *p, s32 angle)
 {
     u32 v;
     s32 shift;
@@ -81,28 +61,24 @@ static inline void facing(struct Actor *p, s32 angle)
     v &= shift;
     p->facing8 = v;
 }
-static inline s32 trunc12(s32 v)
+static inline s32 Fixed_Truncate12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void Vec_SetPolar(struct Vec *v, s32 angle, s32 radius)
 {
-    s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    s32 x = Fixed_Truncate12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
     v->x = x;
     v->y = zero;
-    v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
+    v->z = Fixed_Truncate12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void Vec_Add(struct Vec *d, struct Vec *a, struct Vec *b)
 {
     d->x = b->x + a->x;
     d->y = a->y + b->y;
-    d->z = a->z + b->z;
+    d->z = b->z + a->z;
 }
-void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
-void sub_081FC26C(void *, struct Vec *);
-// confidence=low: staged attack animation culminates in a three-projectile volley.
 struct Vec *Player_GetEffectivePosition(s32);
 void Projectile_InitParameters(void *);
 void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
@@ -112,29 +88,23 @@ void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, struct Vec *);
 s32 SceneProjectile_ConsumeHitEvent(void);
-inline static void polar_2(u8 a1, struct Vec *a0, int a2)
+static inline void Vec_SetVolleyOffset(s16 angle, struct Vec *offset)
 {
-    polar(a0, a1, a2);
-}
-inline static void polar_2_1(s16 a1, struct Vec *a0)
-{
-    polar(a0, a1, 180);
+    Vec_SetPolar(offset, angle, 180);
 }
 
+// Advance the attack animation and fire three projectiles toward the player.
 void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
 {
-    int new_var;
+    int angleStep;
     u8 params[0x58];
     struct Vec delta;
     struct Vec spawn;
-    s16 k2;
-    unsigned char new_var2;
     struct Actor *p2 = p;
-    new_var2 = 15;
     if (p->changed) {
         u32 zero = 0;
         p->changed = zero;
-        facing(p, p->requestedAngle);
+        Ratatosk_SetFacing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 17, 1, 4, 4);
         p->phase = zero;
     }
@@ -171,21 +141,21 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                 u8 facingAngle = (p->facing << 6) - 64;
                 s32 difference = facingAngle - angle;
                 s32 i;
-                new_var = 16;
+                angleStep = 16;
                 if (difference > 128)
                     difference = 255 - difference;
                 else if (difference < (-128))
                     difference += 255;
                 if (difference > 32)
-                    angle = facingAngle - (k2 = 32);
+                    angle = facingAngle - 32;
                 else if (difference < (-32)) {
                     angle = 32;
                     angle |= facingAngle;
                 }
-                polar_2_1((u8)((p->facing << 6) - 64), &delta);
-                sum(&spawn, &delta, &p2->anchor);
+                Vec_SetVolleyOffset((u8)((p->facing << 6) - 64), &delta);
+                Vec_Add(&spawn, &delta, &p2->anchor);
                 spawn.y += 200;
-                angle -= new_var;
+                angle -= angleStep;
                 Sound_PlaySong(0x568);
                 {
                     struct Vec *spawnPtr = &spawn;
@@ -195,10 +165,10 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
                         Projectile_SetLaunchParameters(params, 0, 150, angle, 24);
                         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 498);
                         Projectile_SetScriptProcedure(params, 0x4363, 0);
-                        Projectile_SetCollisionParameters(params, 0, 0, 30, new_var2, 30);
+                        Projectile_SetCollisionParameters(params, 0, 0, 30, 15, 30);
                         Projectile_SetBehaviorMode(params, 1);
                         Projectile_SpawnAtPosition(params, spawnPtr);
-                        angle += new_var;
+                        angle += angleStep;
                     } while ((--i) >= 0);
                 }
                 p2->phase++;
@@ -219,7 +189,3 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
     }
     Callback_InvokeActor(p, p->callback);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateProjectileVolley);
-#endif

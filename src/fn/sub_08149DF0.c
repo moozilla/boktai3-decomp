@@ -12,14 +12,16 @@ void Player_AddControlFlags(struct Player *, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 extern u8 *gUnk_030042E4;
 void ActorSequence_Begin(struct Player *, s32, s32);
+static inline s32 ScaleSequenceFrame(s32 weight, s32 speed)
+{
+    speed = speed * weight;
+    return speed >> 6;
+}
 static inline void addFlags(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-// Two address-selection instructions still use r0 instead of r3.
 // confidence=low: provisional action interpretation from retained C and assembly.
-#ifdef NONMATCHING
-// fuzzy: 99.3%
 void Player_UpdateSpiralTrailAction(struct Player *p)
 {
     struct ContactSwarmSprite *sprite;
@@ -40,10 +42,9 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
     }
     Player_SetAnimation(p, 0x9A, 64, 1);
     {
-        register u16 *resource asm("r0") = &p->spriteResource;
-        register u32 id asm("r1") = 0x16F;
+        u16 *resource = &p->spriteResource;
+        u32 id = 0x16F;
         *resource = id;
-        asm("" : "+r"(id));
         p->actionVariantResource = (u32)(gUnk_030042E4 + id * 32);
     }
     state = (void *)((u8 *)p + 0x3FC);
@@ -119,8 +120,8 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -142,36 +143,35 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed = ScaleSequenceFrame(state->frameWeight, state->speed);
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
             }
         }
+        {
+            register u32 offset asm("r2") = (u32)&p->actionEighteenParameter - (u32)p;
+            register u16 *target asm("r1");
+            u32 value;
+            asm("" : "+r"(offset));
+            target = (u16 *)((u8 *)p + offset);
+            value = 0x16F;
+            *target = value;
+        }
+        savedDuration = (u32)&p->actionEighteenDuration - (u32)p;
+        asm("" : "+r"(savedDuration));
+        {
+            struct {
+                u16 duration;
+            } *durationPtr = (void *)((u8 *)p + savedDuration);
+            if ((durationPtr->duration += 3) > 32)
+                durationPtr->duration = 32;
+        }
     }
-    {
-        register u32 offset asm("r2") = 0xAD6;
-        register u16 *target asm("r1");
-        register u32 value asm("r0");
-        asm("" : "+r"(offset));
-        target = (u16 *)((u8 *)p + offset);
-        asm("" : "+r"(target));
-        value = 0x16F;
-        asm("" : "+r"(value));
-        *target = value;
-    }
-    if ((p->actionEighteenDuration += 3) > 32)
-        p->actionEighteenDuration = 32;
     if (++p->tetherFrame > 31) {
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;
         ActorSequence_Begin(p, 0, 0);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateSpiralTrailAction);
-#endif

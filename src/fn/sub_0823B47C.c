@@ -2,13 +2,12 @@
 
 /* tentative: drifts an offset along an 8-way heading and sets facing from it */
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// 4 bytes off: ROM places the `adds r2, r1, #0` copy before the facing strb;
-// agbcc always emits it after (byte-field store path). ~3000 variants tried.
-
 s32 Math_Atan2(s32, s32);
 extern const s16 gUnk_086149C4[];
+
+struct ActorMotionDirection {
+    u8 index;
+} __attribute__((packed));
 
 struct Obj {
     u8 unk0[0x30];
@@ -18,7 +17,7 @@ struct Obj {
     u8 unk34E[0x3A2 - 0x34E];
     u8 frame;
     u8 flip;
-    u8 dir;
+    struct ActorMotionDirection dir;
     u8 unk3A5[0x4A8 - 0x3A5];
     s16 baseX, baseY, baseZ;
     u8 unk4AE[2];
@@ -56,20 +55,20 @@ void ActorMotion_ApplyHeadingDrift(struct Obj *p)
         Player_ClampCameraOffsets_0823B3C4(p);
     }
     if ((p->offX != 0 || p->offZ != 0) && p->enabled) {
-        s32 a = ((u16)Math_Atan2(p->offX, p->offZ) + 0x70) >> 5;
-        u32 d = 7;
-        s8 f;
-        d &= a;
-        f = p->dir = d;
-        if ((u16)f > 4) {
-            p->frame = 8 - f;
+        s32 angle = ((u16)Math_Atan2(p->offX, p->offZ) + 0x70) >> 5;
+        u32 direction = 7;
+        s32 signedDirection;
+        struct ActorMotionDirection *dir;
+        direction &= angle;
+        dir = &p->dir;
+        signedDirection = (s8)direction;
+        dir->index = direction;
+        if ((u16)signedDirection > 4) {
+            p->frame = 8 - signedDirection;
             p->flip = 1;
         } else {
-            p->frame = f;
+            p->frame = direction;
             p->flip = 0;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMotion_ApplyHeadingDrift);
-#endif

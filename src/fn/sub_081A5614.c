@@ -1,16 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 82.3%
-// fix.py best version (reprinted C)
-// confidence=low: blends the boss palette banks and stage colors.
-
-// confidence=low: palette transitions and stage colors follow adjacent Vanargand routines.
-// MATCHING_CONCESSION: register-pinning
-
-// Remaining differences: interpolation temporaries, spill placement and argument setup.
-
-// confidence=low: palette ownership follows adjacent Vanargand transition routines.
+// Tentative: palette ownership follows adjacent Vanargand transition routines.
 struct PaletteTransition {
     u8 pad0[0x718];
     u8 output[0x200];
@@ -56,18 +46,22 @@ static inline void SetStageColors(s32 stage)
     color = red | (green << 5) | (blue << 10);
     gUnk_03004FC0[0x56 / 2] = color;
     gUnk_03004FC0[0x10c / 2] = color;
-    red = Interpolate(21, 24, stage, 3);
-    green = Interpolate(0, 29, stage, 3);
-    blue = Interpolate(0, 31, stage, 3);
-    color = red | (green << 5) | (blue << 10);
-    gUnk_03004FC0[0x5a / 2] = color;
-    gUnk_03004FC0[0x10e / 2] = color;
+    {
+        s32 red, green, blue;
+        u16 nextColor;
+        red = Interpolate(21, 24, stage, 3);
+        green = Interpolate(0, 29, stage, 3);
+        blue = Interpolate(0, 31, stage, 3);
+        nextColor = red | (green << 5) | (blue << 10);
+        gUnk_03004FC0[0x5a / 2] = nextColor;
+        gUnk_03004FC0[0x10e / 2] = nextColor;
+    }
 }
 
 static inline void RestorePalette(struct PaletteTransition *p)
 {
-    u32 alternate = p->alternate;
     s32 selector = 0x6f;
+    u32 alternate = p->alternate;
     if (!alternate)
         selector = 0x7f;
     switch (selector) {
@@ -91,42 +85,41 @@ static inline void RestorePalette(struct PaletteTransition *p)
     Vanargand_ResetPaletteTransition(p);
 }
 
-static inline void BlendStageColors(s32 stage, s32 frame, s32 duration)
+static inline void BlendStageColors(s32 frame, s32 stage, s32 duration)
 {
     s32 red;
     s32 green;
     s32 blue;
-    s32 r0;
-    s32 r1;
-    s32 g0;
-    s32 g1;
-    s32 b0;
-    s32 b1;
+    s32 startRed;
+    s32 endRed;
+    s32 startGreen;
+    s32 endGreen;
+    s32 startBlue;
+    s32 endBlue;
     u16 color;
-    typeof(red) c1;
-    r0 = Interpolate(7, 19, stage, 3);
-    r1 = Interpolate(7, 19, stage + 1, 3);
-    g0 = Interpolate(0, 18, stage, 3);
-    g1 = Interpolate(0, 18, stage + 1, 3);
-    b0 = Interpolate(0, 19, stage, 3);
-    b1 = Interpolate(0, 19, stage + 1, 3);
-    red = Interpolate(r0, r1, frame, duration);
-    c1 = red;
-    green = Interpolate(g0, g1, frame, duration);
-    blue = Interpolate(b0, b1, frame, duration);
+    s32 nextRed, nextGreen, nextBlue;
+    startRed = Interpolate(7, 19, stage, 3);
+    endRed = Interpolate(7, 19, stage + 1, 3);
+    startGreen = Interpolate(0, 18, stage, 3);
+    endGreen = Interpolate(0, 18, stage + 1, 3);
+    startBlue = Interpolate(0, 19, stage, 3);
+    endBlue = Interpolate(0, 19, stage + 1, 3);
+    red = Interpolate(startRed, endRed, frame, duration);
+    green = Interpolate(startGreen, endGreen, frame, duration);
+    blue = Interpolate(startBlue, endBlue, frame, duration);
     color = (red | (green << 5)) | (blue << 10);
     gUnk_03004FC0[0x56 / 2] = color;
     gUnk_03004FC0[0x10c / 2] = color;
-    r0 = Interpolate(21, 24, stage, 3);
-    r1 = Interpolate(21, 24, stage + 1, 3);
-    g0 = Interpolate(0, 29, stage, 3);
-    g1 = Interpolate(0, 29, stage + 1, 3);
-    b0 = Interpolate(0, 31, stage, 3);
-    b1 = Interpolate(0, 31, stage + 1, 3);
-    red = Interpolate(r0, r1, frame, duration);
-    green = Interpolate(g0, g1, frame, duration);
-    blue = Interpolate(b0, b1, frame, duration);
-    color = (c1 | (green << 5)) | (blue << 10);
+    startRed = Interpolate(21, 24, stage, 3);
+    endRed = Interpolate(21, 24, stage + 1, 3);
+    startGreen = Interpolate(0, 29, stage, 3);
+    endGreen = Interpolate(0, 29, stage + 1, 3);
+    startBlue = Interpolate(0, 31, stage, 3);
+    endBlue = Interpolate(0, 31, stage + 1, 3);
+    nextRed = Interpolate(startRed, endRed, frame, duration);
+    nextGreen = Interpolate(startGreen, endGreen, frame, duration);
+    nextBlue = Interpolate(startBlue, endBlue, frame, duration);
+    color = (nextRed | (nextGreen << 5)) | (nextBlue << 10);
     gUnk_03004FC0[0x5a / 2] = color;
     gUnk_03004FC0[0x10e / 2] = color;
 }
@@ -134,15 +127,18 @@ static inline void BlendStageColors(s32 stage, s32 frame, s32 duration)
 void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 {
     u32 alternate = p->alternate;
-    register s32 selector asm("r8") = 0x6f;
+    s32 selector = 0x6f;
     if (!alternate)
         selector = 0x7f;
     switch (p->mode) {
         case 1:
             if (p->frame < (1 << p->shift)) {
+                u8 *source;
+                u8 *target;
                 p->frame++;
-                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + (selector * 32),
-                                            gUnk_030042E4 + 0x1040, p->frame, p->shift, 4);
+                source = gUnk_030042E4 + (selector * 32);
+                target = gUnk_030042E4 + 0x1040;
+                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 4);
                 Vanargand_BlendPaletteBanks(gUnk_03004FC0, p->first, p->second, p->frame, p->shift,
                                             13);
             } else {
@@ -152,9 +148,12 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 
         case 2:
             if (p->frame < (1 << p->shift)) {
+                u8 *source;
+                u8 *target;
                 p->frame++;
-                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + (selector * 32),
-                                            gUnk_030042E4 + 0xf60, p->frame, p->shift, 1);
+                source = gUnk_030042E4 + (selector * 32);
+                target = gUnk_030042E4 + 0xf60;
+                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }
@@ -162,9 +161,12 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 
         case 3:
             if (p->frame < (1 << p->shift)) {
+                u8 *source;
+                u8 *target;
                 p->frame++;
-                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + (selector * 32),
-                                            gUnk_030042E4 + 0xf80, p->frame, p->shift, 1);
+                source = gUnk_030042E4 + (selector * 32);
+                target = gUnk_030042E4 + 0xf80;
+                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }
@@ -172,9 +174,12 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 
         case 4:
             if (p->frame < (1 << p->shift)) {
+                u8 *source;
+                u8 *target;
                 p->frame++;
-                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf60,
-                                            gUnk_030042E4 + (selector * 32), p->frame, p->shift, 1);
+                source = gUnk_030042E4 + 0xf60;
+                target = gUnk_030042E4 + (selector * 32);
+                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 RestorePalette(p);
                 Vanargand_ResetPaletteTransition(p);
@@ -183,9 +188,12 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
 
         case 5:
             if (p->frame < (1 << p->shift)) {
+                u8 *source;
+                u8 *target;
                 p->frame++;
-                Vanargand_BlendPaletteBanks(p->output, gUnk_030042E4 + 0xf80,
-                                            gUnk_030042E4 + (selector * 32), p->frame, p->shift, 1);
+                source = gUnk_030042E4 + 0xf80;
+                target = gUnk_030042E4 + (selector * 32);
+                Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 RestorePalette(p);
                 Vanargand_ResetPaletteTransition(p);
@@ -195,7 +203,7 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
         case 6:
             if (p->frame < (1 << p->shift)) {
                 p->frame++;
-                BlendStageColors(p->stage, p->frame, 1 << p->shift);
+                BlendStageColors(p->frame, p->stage, 1 << p->shift);
             } else {
                 SetStageColors(p->stage + 1);
                 Vanargand_ResetPaletteTransition(p);
@@ -203,6 +211,3 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePaletteTransition);
-#endif

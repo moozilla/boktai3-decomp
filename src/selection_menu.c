@@ -720,14 +720,14 @@ void SelectionMenu_RefreshItemPage(struct SelectionMenu *p)
         p, (u32)Text_LookupString(Script_ParseStringRef((void *)p->promptMessages)));
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// Only the first held-input read in the repeat branch differs: the ROM reloads the input pointer from ip.
+// MATCHING_CONCESSION: register-pinning
 int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 {
     int index = p->selectedSlot;
     int direction = 0;
-    if (gUnk_03005260[1] & 0x40)
+    int pressedUp = gUnk_03005260[1] & 0x40;
+    u16 *held = gUnk_03005260;
+    if (pressedUp)
         direction = 1;
     else if (gUnk_03005260[1] & 0x80)
         direction = 2;
@@ -737,14 +737,15 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
         direction = 8;
     if (!direction) {
         if (p->repeatTicks > 7) {
-            u16 *held = gUnk_03005260;
             if (*held & 0x40)
                 direction = 1;
             else if (*held & 0x80)
                 direction = 2;
-            if (gUnk_03005260[0] & 0x20)
+            /* Read held input again for horizontal navigation. */
+            asm("" ::: "memory");
+            if (held[0] & 0x20)
                 direction |= 4;
-            else if (gUnk_03005260[0] & 0x10)
+            else if (held[0] & 0x10)
                 direction |= 8;
         } else if (gUnk_03005260[0] & 0xf0)
             p->repeatTicks++;
@@ -777,9 +778,6 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
     }
     return index;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SelectionMenu_NavigateGrid);
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SelectionMenu_Choose(struct SelectionMenu *p)

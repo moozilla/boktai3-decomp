@@ -1,10 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// Remaining differences: palette setup register lifetimes and shared-tail scheduling.
-
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -87,17 +83,29 @@ static inline void clearAnim(struct Anim *a)
 {
     a->flags &= ~1;
 }
-static inline void setupPalette(struct Palette *p, u8 mode, u32 duration, u8 rate, s32 zero)
+static inline void setupPalette(struct Palette *p, u8 mode, u32 duration, u8 rate)
 {
     p->timer = duration;
     p->mode = mode;
     p->rate = rate;
     if (p->mode == 2) {
         u32 value = 32;
-        asm("" : "+r"(value));
         p->value = value;
     } else if (p->mode == 1)
-        p->value = zero;
+        p->value = 0;
+}
+static inline void Palette_SelectResource(u8 *p, u32 id)
+{
+    struct Palette *palette = (void *)p;
+    const u32 originalId = id;
+    if (originalId == 0)
+        palette->data = p + 0x8b8;
+    else if (originalId == 501)
+        palette->data = p + 0xab8;
+    else {
+        CpuSet(gUnk_030042E4 + (id *= 32), palette->buffer, 0x04000008);
+        palette->data = palette->buffer;
+    }
 }
 // confidence=low: dispatches queued scene-message commands to Ratatosk states and effects.
 #define Ratatosk_DispatchSceneCommands sub_081F6B90
@@ -113,7 +121,7 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
     if (i < entry->count[gUnk_0200047C[0x24]])
         do {
             u8 *controller = gUnk_0200047C;
-            register s16 *message asm("r5") = entry->messages[controller[0x24]][i];
+            s16 *message = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, message);
             switch (((u8 *)message)[6]) {
                 case 0:
@@ -173,37 +181,39 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     else
                         setState(q, 2, 0, 14);
                     break;
-                case 15:
+                case 15: {
+                    s32 paletteValue;
                     if (message[4] == 0) {
-                        register u32 id asm("r2");
+                        u32 id;
                         ((struct Palette *)p)->value = 0;
                         ((struct Palette *)p)->mode = 0;
                         ((struct Palette *)p)->timer = ActorResource_GetFixedId(p);
                         id = ActorResource_GetFixedId(p);
-                        if (id == 0)
-                            ((struct Palette *)p)->data = p + 0x8b8;
-                        else if (id == 501)
-                            ((struct Palette *)p)->data = p + 0xab8;
-                        else {
-                            CpuSet(gUnk_030042E4 + id * 32, ((struct Palette *)p)->buffer,
-                                   0x04000008);
-                            ((struct Palette *)p)->data = ((struct Palette *)p)->buffer;
-                        }
-                    } else if (message[5] == 0)
-                        setupPalette((void *)p, 3, 501, 5, message[5]);
-                    else
-                        setupPalette((void *)p, 3, 500, 5, 0);
+                        Palette_SelectResource(p, id);
+                    } else {
+                        paletteValue = message[5];
+                        if (paletteValue == 0)
+                            setupPalette((void *)p, 3, 501, 5);
+                        else
+                            setupPalette((void *)p, 3, 500, 5);
+                    }
                     Trigger_ConsumePending(&q->entry, 1);
                     break;
-                case 16:
-                    if (message[4] == 0)
-                        setupPalette((void *)p, 1, 498, 5, message[4]);
-                    else if (message[5] == 0)
-                        setupPalette((void *)p, 2, 501, 5, message[5]);
-                    else
-                        setupPalette((void *)p, 2, 500, 5, 0);
+                }
+                case 16: {
+                    s32 paletteValue = message[4];
+                    if (paletteValue == 0)
+                        setupPalette((void *)p, 1, 498, 5);
+                    else {
+                        paletteValue = message[5];
+                        if (paletteValue == 0)
+                            setupPalette((void *)p, 2, 501, 5);
+                        else
+                            setupPalette((void *)p, 2, 500, 5);
+                    }
                     Trigger_ConsumePending(&q->entry, 1);
                     break;
+                }
                 case 9:
                     Ratatosk_PlayAttachmentEffect(q, message[4], 180, 180, 250, 100);
                     Trigger_ConsumePending(&q->entry, 1);
@@ -215,8 +225,8 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     ((struct Anchor *)p)->position.x = q->position.x;
                     {
                         register s32 lift asm("r0") = ((struct Extension *)p)->anchorLift;
-                        asm("" : "+r"(lift));
-                        ((struct Anchor *)p)->position.y = lift + q->position.y;
+                        register u32 y asm("r3") = (u16)q->position.y;
+                        ((struct Anchor *)p)->position.y = lift + y;
                     }
                     ((struct Anchor *)p)->position.z = q->position.z;
                     Trigger_ConsumePending(&q->entry, 1);
@@ -269,7 +279,3 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
             ScaledShadow_Enable(p + 0x40c);
         } while (++i < entry->count[gUnk_0200047C[0x24]]);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F6B90);
-#endif

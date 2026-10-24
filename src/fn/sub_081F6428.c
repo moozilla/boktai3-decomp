@@ -1,10 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: register allocation, scheduling and random-source lifetimes.
 struct Vec {
-    s16 x, y, z, pad;
+    u16 x, y, z, pad;
 };
 struct Actor {
     u8 pad0[0x51];
@@ -56,11 +53,7 @@ struct Actor {
     u8 padEd8[0x10];
     u32 savedPhase, savedTime, savedState, savedExtra;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
 #define W(o) (*(u32 *)((u8 *)p2 + (o)))
-void Sound_PlaySong(u32);
 void GameState_SetEventFlag(s32);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -72,38 +65,58 @@ void sub_081F5290(void);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void Sound_PlaySongChecked(u32);
+static inline u32 randomTable(u32 table, u32 *index, u32 fullMask)
+{
+    *index = (*index + 1) & fullMask;
+    return ((const u16 *)table)[*index];
+}
 static inline u32 randomB(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+}
+static inline void setState(struct Actor *p, void (*update)(void), u8 state)
+{
+    p->animationId = state;
+    p->update = update;
+    p->timer = 0;
+    p->changed = 1;
+    p->mode = 0;
+    p->modeTime = 0;
+}
+static inline u32 testFlags(struct Actor *p, u32 mask)
+{
+    return p->flags & mask;
 }
 // confidence=low: consumes queued damage and transitions to recoil or defeat.
 #define Ratatosk_ApplyQueuedDamage sub_081F6428
 s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
 {
-    volatile struct Vec spawn;
-    struct Vec velocity;
+    struct {
+        struct Vec spawn, velocity;
+    } scratch;
     struct Actor *p2 = p;
     s32 react = 0;
     s32 damage = (s16)p2->motion;
     u32 particles = p2->motionFlag;
     s32 oldPhase;
+    u32 changed;
     p2->motion = react;
     p2->padE71 = 0;
     p2->motionFlag = 0;
     oldPhase = p2->healthPhase;
-    if ((!oldPhase) &&
-        (p->health < (((p->maxHealth >> 1) + (p->maxHealth >> 3)) + (p->maxHealth >> 4))))
+    if (!p2->healthPhase &&
+        p->health < ((p->maxHealth >> 1) + (p->maxHealth >> 3) + (p->maxHealth >> 4)))
         p2->healthPhase = 1;
-    else if ((p2->healthPhase <= 1) &&
-             (p->health < (((p->maxHealth >> 2) + (p->maxHealth >> 4)) + (p->maxHealth >> 5))))
+    else if (p2->healthPhase <= 1 &&
+             p->health < ((p->maxHealth >> 2) + (p->maxHealth >> 4) + (p->maxHealth >> 5)))
         p2->healthPhase = 2;
     if (oldPhase != p2->healthPhase) {
-        *((struct Vec *)(((u8 *)p2) + 0xe5c)) = *Ratatosk_GetRandomMovementPoint(p2);
+        *(struct Vec *)((u8 *)p2 + 0xe5c) = *Ratatosk_GetRandomMovementPoint(p2);
         p2->savedState = 2;
     }
     if (damage > 0) {
-        if ((p->flags & 16) || (p2->vulnerability > 0)) {
+        if (testFlags(p, 16) || p2->vulnerability > 0) {
             react = 1;
             if (!Player_IsSlotInActionTwelveOrThirtyEight(0))
                 damage *= 3;
@@ -118,54 +131,76 @@ s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
             p->health = zero;
             {
                 u32 mask = 2;
-                p->flags |= mask;
+                changed = p->flags | mask;
+                p->flags = changed;
             }
-            p->animationId = 15;
-            p->update = Ratatosk_UpdateDefeatSequence;
-            p->timer = zero;
-            p->changed = 1;
-            p->mode = 0;
-            p->modeTime = zero;
+            {
+                void (*update)(void);
+                u32 animation;
+                changed = 1;
+                update = Ratatosk_UpdateDefeatSequence;
+                animation = 15;
+                p->animationId = animation;
+                p->update = update;
+                p->timer = zero;
+                p->changed = changed;
+                p->mode = 0;
+                p->modeTime = zero;
+            }
             GameState_SetEventFlag(1);
             return 1;
         }
         if (damage > 0)
-            DamageNumberDisplay_Show(((u8 *)p2) + 0x188, damage, 0, ((u8 *)p2) + 0x194,
-                                     ((u8 *)p2) + 0x19c, 1);
+            DamageNumberDisplay_Show((u8 *)p2 + 0x188, damage, 0, (u8 *)p2 + 0x194,
+                                     (u8 *)p2 + 0x19c, 1);
         if (particles) {
-            s32 i = 2;
+            s32 i;
+            u8 *angle;
+            struct Vec *vel;
+            struct Vec *pos;
+            u32 *index;
+            u32 fullMask, mask;
+            vel = &scratch.velocity;
+            angle = &p->angle;
+            pos = &scratch.spawn;
+            index = &gUnk_03005308;
+            fullMask = 1023;
+            mask = 127;
+            i = 2;
             do {
-                velocity = gUnk_0824FDF0;
-                *((struct Vec *)(&spawn)) = p->position;
-                spawn.x = (spawn.x - 64) + (randomB() & 127);
-                spawn.y += (u8)randomB();
-                spawn.z = (spawn.z - 64) + (randomB() & 127);
-                do {
-                    SparkParticle_Spawn(&spawn, 1, &velocity, p->angle + 128, 3, 8, 2, 2);
-                } while (0);
-            } while ((--i) >= 0);
+                u32 sample, x;
+                u32 value;
+                scratch.velocity = gUnk_0824FDF0;
+                scratch.spawn = p->position;
+                value = (u32)gUnk_0203B400;
+                sample = randomTable(value, index, fullMask);
+                x = pos->x - 64;
+                sample &= mask;
+                x += sample;
+                pos->x = x;
+                pos->y += (u8)randomTable(value, index, fullMask);
+                sample = randomTable(value, index, fullMask);
+                x = pos->z - 64;
+                sample &= mask;
+                x += sample;
+                pos->z = x;
+                value = *angle;
+                value += 128;
+                SparkParticle_Spawn(&scratch.spawn, 1, vel, value, 3, 8, 2, 2);
+            } while (--i >= 0);
         }
         if (react) {
-            u32 one = 1;
-            u32 zero = 0;
+            u32 one;
             p2->savedPhase = p2->phase;
             p2->savedTime = p->timer;
             p2->savedState = p->active;
-            p2->savedExtra = *((u32 *)(((u8 *)p2) + 0x180));
+            p2->savedExtra = W(0x180);
+            one = 1;
             p->flags |= one;
-            p->animationId = 18;
-            p->update = sub_081F5290;
-            p->timer = zero;
-            p->changed = one;
-            p->mode = zero;
-            p->modeTime = zero;
+            setState(p, sub_081F5290, 18);
             return 1;
         }
         Sound_PlaySongChecked(318);
     }
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F6428);
-#endif

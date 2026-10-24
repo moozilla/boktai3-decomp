@@ -2,12 +2,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
-// The ROM recomputes &scratch.step (add r5, sp, #0xc; ldrh [r5, #4]) for the z add. An inline
-// AddZ(s16 *, const struct ContactPosition *) gives that form, but gcse PRE then replaces it with
-// the reaching copy of v; no single canon/follow/pre knob (tools/rtlprobe.py) matches.
 extern const s16 gUnk_086149C4[];
 void Skeleton_TickDecayingLunge(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
@@ -31,35 +25,45 @@ static inline void AddHalf(s16 *dst, const s16 *src)
 {
     *dst += *src;
 }
+static inline void AddZ(s16 *dst, const struct ContactPosition *src)
+{
+    *dst += src->z;
+}
 void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
 {
-    u8 *new_var;
-    register struct SceneActorRegistryResetView *p asm("r6") = p_;
+    u8 *heading;
+    struct SceneActorRegistryResetView *p = p_;
     struct {
         u32 zero;
         struct ContactPosition step;
     } scratch;
     struct ContactPackedVector jitter;
-    u32 direction;
+    struct ContactPosition *step;
+    s16 *motionZ;
     if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
-    new_var = &p->direction;
-    HeadingStep(&scratch.step, new_var, 32);
-    AddHalf(&p->motion.x, &scratch.step.x);
-    AddHalf(&p->motion.z, &scratch.step.z);
+    heading = &p->direction;
+    HeadingStep(&scratch.step, heading, 32);
+    step = &scratch.step;
+    /* Keep the motion source separate from the vector cleared for the burst. */
+    asm("" : "+r"(step));
+    AddHalf(&p->motion.x, &step->x);
+    motionZ = &p->motion.z;
+    step = &scratch.step;
+    AddZ(motionZ, step);
     {
         u32 mask = 0x2000;
         u32 *fl = &p->flags2CC;
         *fl |= mask;
     }
     scratch.zero = 0;
-    CpuSet_2(0x05000002, &scratch.zero, &scratch.step);
+    CpuSet_2(0x05000002, &scratch.zero, step);
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
-    SceneParticleBurst_CreateWithPause(&p->position, &scratch.step, &jitter, 1, 2, 4);
+    SceneParticleBurst_CreateWithPause(&p->position, step, &jitter, 1, 2, 4);
     if (p->field2B3) {
         void (*f)(void) = Skeleton_TickDecayingLunge;
         u32 k = 0x29;
@@ -75,8 +79,4 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         *w = m & *w;
         p->word104 = 0;
     }
-    asm("" ::"r"(p));
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_TickForwardBurst);
-#endif

@@ -1,9 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: register allocation, scheduling and random-source lifetimes.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -23,16 +19,22 @@ struct Actor {
     u32 modeTime;
     u8 facing, facing8, padAA, animationId, state, nextState, active, finished, padB0, changed,
         padB2, locked;
-    u8 padB4[0x18];
+    u8 padB4[8];
+    u32 contactAttack, contactFlags;
+    u8 padC4[8];
     u8 requestedAngle;
-    u8 padCD[0x33];
+    u8 padCD[0x15];
+    u8 contactHundredths;
+    u8 padE3[0x1d];
     void (*update)(void);
     void *callback;
     u8 pad108[0xc];
     s8 savedAngle;
     u8 pad115[0x67];
     u32 phase;
-    u8 pad180[0x1ac];
+    u8 pad180[0x4c];
+    u16 hitEffect;
+    u8 pad1CE[0x15e];
     u8 animation[0x20];
     u8 animationData[0x20];
     struct Vec anchor;
@@ -56,11 +58,17 @@ struct Actor {
     s16 damageTimer;
     u8 padEd8[0x10];
     u32 savedPhase, savedTime, savedState, savedExtra;
+    u8 padEF8[0x10];
+    u32 incomingDamage;
+    s16 contactValue;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
+struct HitResponse {
+    u8 pad0[0x3e];
+    u16 motion;
+    u8 pad40[3];
+    u8 state;
+    u16 effect;
+};
 void Sound_PlaySong(u32);
 s32 Math_Atan2(s32, s32);
 void Collision_CalculateDamageResponse(void *, void *);
@@ -72,63 +80,62 @@ void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Actor *owner)
 {
     struct Actor *p2 = owner;
     struct Actor *p = owner;
-    typeof(*((u16 *)(hit + 0x44))) t1;
     Collision_CalculateDamageResponse(hit, response);
-    if (*((u16 *)(response + 0x44))) {
-        {
-            typeof(*((u16 *)(response + 0x3e))) *q1 = &(*((u16 *)(response + 0x3e)));
-            u8 z1 = 0;
-            *q1 = z1;
-            response[0x43] = z1;
-        }
+    if (((struct HitResponse *)response)->effect) {
+        ((struct HitResponse *)response)->motion = 0;
+        ((struct HitResponse *)response)->state = 0;
     } else {
         u32 attack;
         u32 flags;
-        p2->motion = *((u16 *)(response + 0x3e));
-        *((u32 *)(((u8 *)p2) + 0xf08)) = *((u16 *)(hit + 10));
-        t1 = *((u16 *)(hit + 0x44));
-        *((u16 *)(((u8 *)p2) + 0x1cc)) = t1;
-        if (p->flags & 0x80000)
+        u32 contactFlags;
+        u32 actorMask, angleMask, repeatMask, contactMask;
+        s32 motion;
+        p2->motion = ((struct HitResponse *)response)->motion;
+        p2->incomingDamage = *((u16 *)(hit + 10));
+        p2->hitEffect = *((u16 *)(hit + 0x44));
+        actorMask = 0x80000;
+        if (p->flags & actorMask)
             p2->motion = 0;
-        if ((*((u16 *)(hit + 6))) & 0x100)
+        angleMask = 0x100;
+        if ((*((u16 *)(hit + 6))) & angleMask)
             p2->targetAngle = hit[0x42];
         else
             p2->targetAngle = Math_Atan2((*((s16 *)(response + 0x24))) - (*((s16 *)(hit + 0x24))),
                                          (*((s16 *)(response + 0x28))) - (*((s16 *)(hit + 0x28))));
+        motion = (s16)p2->motion;
         attack = *((u32 *)(hit + 0x34));
         flags = *((u32 *)(hit + 0x38));
-        if (((((s16)p2->motion) > 0) && (p2->lastAttack == attack)) && (p2->damageWindow > 0)) {
+        if (motion > 0 && p2->lastAttack == attack && p2->damageWindow > 0) {
             if (flags & 0x100)
                 goto contact;
-            if (((u8)(p->active - 9)) > 1) {
+            if ((u8)(p->active - 9) > 1) {
                 if (attack & 16) {
-                    if ((++p2->repeatHits) > 0) {
-                        u8 mask = 0x200000;
+                    if (++p2->repeatHits > 0) {
                         p2->damageWindow = 0;
-                        p->flags |= mask;
+                        repeatMask = 0x200000;
+                        p->flags |= repeatMask;
                     }
-                } else if ((++p2->repeatHits) > 1) {
+                } else if (++p2->repeatHits > 1) {
                     p2->damageWindow = 0;
-                    {
-                        u32 k1 = 0x400000;
-                        p->flags |= k1;
-                    }
+                    repeatMask = 0x400000;
+                    p->flags |= repeatMask;
                 }
             }
         }
-        if ((!(flags & 0x100)) && (((s16)p2->motion) > 0)) {
+        if (!(flags & 0x100) && (s16)p2->motion > 0) {
             p2->damageWindow = 120;
             p2->lastAttack = attack;
         }
     contact:
-        *((u32 *)(((u8 *)p2) + 0xbc)) = attack;
-
-        *((u32 *)(((u8 *)p2) + 0xc0)) = *((u32 *)(hit + 0x38));
-        PlayerStats_AddContactHundredths(hit, response, *((u8 *)(((u8 *)p2) + 0xe2)));
-        if ((*((u32 *)(hit + 0x38))) & 8)
+        p->contactAttack = attack;
+        contactFlags = *((u32 *)(hit + 0x38));
+        p->contactFlags = contactFlags;
+        PlayerStats_AddContactHundredths(hit, response, p->contactHundredths);
+        contactMask = 8;
+        if ((*((u32 *)(hit + 0x38))) & contactMask)
             p2->motionFlag = 1;
         if ((*((u32 *)(hit + 0x38))) & 64) {
-            *((u16 *)(((u8 *)p2) + 0x1cc)) = 38;
+            p2->hitEffect = 38;
             p2->damageTimer = 8;
             Sound_PlaySong(0x211);
             DamageNumberDisplay_Show(((u8 *)p2) + 0x188, (s16)p2->motion, 0, ((u8 *)p2) + 0x194,
@@ -136,10 +143,6 @@ void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Actor *owner)
             if ((*((u32 *)(hit + 0x38))) & 64)
                 return;
         }
-        PlayerStats_AddContactHundredths(hit, response, *((s16 *)(((u8 *)p2) + 0xf0c)));
+        PlayerStats_AddContactHundredths(hit, response, p2->contactValue);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F9BEC);
-#endif

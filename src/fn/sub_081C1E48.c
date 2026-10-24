@@ -1,8 +1,6 @@
 #include "global.h"
 #include "script_utility.h"
-#ifdef NONMATCHING
-// fuzzy: 98.0%
-// only the (*level - 2) temporary is allocated to r1; the ROM puts it in r7 (step's register)
+// MATCHING_CONCESSION: register-pinning
 
 struct ControlPanelCounter {
     u8 unknown0[0x590];
@@ -26,17 +24,20 @@ s32 sub_081C1E48(struct ControlPanelCounter *p)
         step = 0;
     else if (*level <= 3)
         step = 1;
-    else
-        step = ((*level - 2) * (*level - 3)) >> 1;
+    else {
+        register s32 factor asm("r7") = *level - 2;
+        step = (factor * (*level - 3)) >> 1;
+    }
     multiplier = ControlPanel_GetInputMultiplier(p);
     if (p->multiplier != multiplier) {
-        if (p->multiplierScript) {
+        u32 script = p->multiplierScript;
+        if (script) {
             s32 value;
             struct ScriptUtilityArguments args;
             args.count = 1;
             args.values = &value;
             value = multiplier;
-            Script_Call(p->multiplierScript, &args);
+            Script_Call(script, &args);
         }
         p->multiplier = multiplier;
         ControlPanel_ApplyMultiplierMode(p);
@@ -54,6 +55,3 @@ s32 sub_081C1E48(struct ControlPanelCounter *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C1E48);
-#endif

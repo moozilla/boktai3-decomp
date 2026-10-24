@@ -1,13 +1,14 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: reset widths, loop invariant order, and collider pointer allocation.
 struct ProjectilePosition {
     s16 x, y, z, pad;
 };
 struct ProjectileSprite {
     u32 flags;
-    u8 pad4[0x18];
+    u8 pad4[3];
+    u8 unknown7;
+    u8 pad8[8];
+    u16 trailOrder;
+    u8 pad12[10];
     struct ProjectilePosition position;
     u8 tail[8];
 };
@@ -53,38 +54,39 @@ void ActorReaction_Idle(void);
 struct PackedVector {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
+static inline u16 VanargandProjectile_GetResetValue(void)
+{
+    return 0;
+}
+static inline void VanargandProjectile_FillPosition(u32 fill, struct ProjectilePosition *pos)
+{
+    vu32 zero = fill;
+    CpuSet((const void *)&zero, pos, 0x05000002);
+}
 // confidence=low: initializes the six trail sprites and two projectile colliders.
 #define VanargandProjectile_Initialize sub_081B6888
 s32 VanargandProjectile_Initialize(struct VanargandProjectilePool *pool,
                                    struct VanargandProjectile *p, s32 index)
 {
     struct ProjectileSprite *sprite;
-    struct PackedVector size;
-    struct PackedVector offset;
-    struct VanargandProjectile *new_var;
+    struct PackedVector size, offset;
     struct ProjectileCollider *c;
     s32 i;
-    typeof(c) t1;
+    u16 reset = VanargandProjectile_GetResetValue();
     p->state = 0;
     p->entered = 1;
-    p->timer = 0;
+    p->timer = reset;
     p->direction = 0;
-    p->targetAngle = 0;
+    p->targetAngle = reset;
     AnimData_Load(p->animation, 0x8202);
     AnimData_SelectPaletteBank(p->animation, 0x1DB);
     sprite = p->sprites;
-    new_var = p;
     for (i = 0; i <= 5; i++, sprite++) {
-        vu32 zero;
-        Sprite_InitUnlinked(sprite, new_var->animation, 1);
-        *((u16 *)(((u8 *)sprite) + 0x10)) = 5 - i;
-        *(((u8 *)sprite) + 7) = 1;
-        do {
-            zero = 0;
-        } while (0);
-        CpuSet((const void *)(&zero), &sprite->position, 0x05000002);
+        Sprite_InitUnlinked(sprite, p->animation, 1);
+        sprite->trailOrder = 5 - i;
+        sprite->unknown7 = 1;
+        VanargandProjectile_FillPosition(0, &sprite->position);
     }
-
     c = &p->healthCollider;
     size.x = 128;
     size.y = 512;
@@ -97,19 +99,15 @@ s32 VanargandProjectile_Initialize(struct VanargandProjectilePool *pool,
     Collider_SetCallback(c, ActorReaction_BeginOnContact, p);
     Collider_SetBodyProperties(c, 0, 0, 0);
     Collider_Refresh(c);
-    c = (t1 = &p->collider);
+    c = &p->collider;
     size.x = 16;
     size.y = 100;
     size.z = 16;
     offset.x = 0;
     offset.y = 0;
     offset.z = 0;
-    Collider_Init(t1, 0, 0x2001, 0, 16, &size, &offset);
-    Collider_SetPosition(t1, &p->position, 0);
-    Collider_SetCallback(t1, ActorReaction_Idle, p);
-    Collider_SetAttackProperties(t1, pool->attack, 30, 16, 0, 15);
+    Collider_Init(c, 0, 0x2001, 0, 16, &size, &offset);
+    Collider_SetPosition(c, &p->position, 0);
+    Collider_SetCallback(c, ActorReaction_Idle, p);
+    Collider_SetAttackProperties(c, pool->attack, 30, 16, 0, 15);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081B6888);
-#endif
