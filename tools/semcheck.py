@@ -268,7 +268,8 @@ class Run:
 def arities(text):
     """Parameter counts of the functions declared in preprocessed C, so a
     call compares only the argument registers its callee reads."""
-    out = {}
+    # libgcc helpers the compiler calls for `/` and `%`
+    out = {n: 2 for n in ("__divsi3", "__udivsi3", "__modsi3", "__umodsi3")}
     for m in re.finditer(r"\b(\w+)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*(?:;|\{|__attribute__)", text):
         name, params = m.group(1), m.group(2).strip()
         if name in ("if", "while", "for", "switch", "return", "sizeof"):

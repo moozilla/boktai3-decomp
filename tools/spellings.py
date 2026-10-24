@@ -58,6 +58,12 @@ def _put_before(fn, node, decl):
     if not found:
         return False
     p, s, st = found
+    if isinstance(st, ca.Decl):
+        # wrapping a declaration in a block would end its scope: put DECL before it instead
+        if not isinstance(p, ca.Compound):
+            return False
+        p.block_items.insert(p.block_items.index(st), decl)
+        return True
     set_child(p, s, ca.Compound([decl, st]))
     return True
 
@@ -375,7 +381,32 @@ def sp_into_loop(fn):
                 si = li - back
                 if si < 0 or not isinstance(items[si], ca.Assignment):
                     break
-                n = len(lp.stmt.block_items or [])
+                st0 = items[si]
+                # sound only for an invariant store: its operands and target unchanged by the loop,
+                # nothing between it and its new place reading the target, no side effects
+                if st0.op != "=" or any(isinstance(x, (ca.FuncCall, ca.Assignment)) or
+                                        isinstance(x, ca.UnaryOp) and x.op in ("++", "--", "p++", "p--")
+                                        for x, _, _ in walk(st0.rvalue)):
+                    continue
+                target = text(st0.lvalue)
+                names = {x.name for x, _, _ in walk(st0.rvalue) if isinstance(x, ca.ID)}
+                if isinstance(st0.lvalue, ca.ID):
+                    names.add(st0.lvalue.name)
+                elif any(isinstance(x, ca.Assignment) and not isinstance(x.lvalue, ca.ID) for x, _, _ in walk(lp)):
+                    continue  # a store through memory in the loop could change the target
+                if any(_assigns(lp, nm) for nm in names):
+                    continue
+                reads = lambda node: any(text(x) == target for x, _, _ in walk(node)) if node is not None else False
+                if any(reads(x) for x in items[si + 1:li]):
+                    continue
+                if isinstance(lp, (ca.For, ca.While)):
+                    if reads(lp.cond) or reads(getattr(lp, "next", None)):
+                        continue
+                    rest = _after(fn, lp)  # a loop that may not run must not hold what follows it
+                    if rest is None or any(reads(x) for x in rest):
+                        continue
+                body0 = lp.stmt.block_items or []
+                n = next((k for k, x in enumerate(body0) if reads(x)), len(body0))
                 for pos in range(n + 1):
                     f2 = copy.deepcopy(fn)
                     b2 = blocks(f2)[bi]

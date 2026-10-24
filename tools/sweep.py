@@ -87,13 +87,21 @@ def follow_one(job):
     out = {"func": row["func"], "src": row["src"], "sweep": row.get("best")}
     path = os.path.join(OUT, row["func"] + ".closer.c")
     venv = os.path.join(ROOT, "build", "venv", "bin", "python")
-    r = subprocess.run([venv if os.path.exists(venv) else sys.executable, os.path.join(ROOT, "tools", "semcheck.py"),
-                        os.path.relpath(path, ROOT), row["func"]], capture_output=True, text=True, cwd=ROOT)
-    verdict = (r.stdout.strip().splitlines() or ["?"])[-1]
+
+    def check(src, *flags):
+        r = subprocess.run([venv if os.path.exists(venv) else sys.executable, os.path.join(ROOT, "tools", "semcheck.py"),
+                            os.path.relpath(src, ROOT), row["func"], *flags], capture_output=True, text=True, cwd=ROOT)
+        return (r.stdout.strip().splitlines() or ["?"])[-1]
+
+    verdict = check(path)
     out["semcheck"] = verdict.split(": ")[1].split(" ")[0] if ": " in verdict else verdict
     if "DIFFERENT" in verdict:
         out["semcheck_detail"] = verdict[:300]
-        return out
+        # a spelling must not break a draft that was right; a draft that was
+        # already wrong cannot judge it, so carry on and say so
+        if "DIFFERENT" not in check(os.path.join(ROOT, row["src"]), "--nonmatching"):
+            return out
+        out["semcheck"] = "DIFFERENT (as the draft)"
     t0 = time.time()
     lines = []
     try:
