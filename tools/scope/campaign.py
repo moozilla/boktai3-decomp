@@ -295,6 +295,23 @@ def unwrap(text, func, addr):
         if func in names or "sub_" + addr in names:
             body = "".join(ln for ln in m.group(1).splitlines(True)
                            if not re.match(r"\s*// (fuzzy:|Remaining differences)", ln))
+            # a block can hold several functions (one file-wide #ifdef): the others stay nonmatching,
+            # each in its own #ifdef NONMATCHING / #else INCLUDE_ASM / #endif
+            for other in names:
+                if other in (func, "sub_" + addr):
+                    continue
+                d = re.search(r"^[A-Za-z_][^\n;=]*\b" + other + r"\s*\([^;{]*\)\s*\{.*?^\}\n", body, re.S | re.M)
+                if not d:
+                    return None
+                start = d.start()
+                while True:  # take the comment lines directly above the definition along
+                    prev = body.rfind("\n", 0, start - 1) + 1
+                    if start == 0 or not body[prev:start].lstrip().startswith("//"):
+                        break
+                    start = prev
+                inc = re.search(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*' + other + r"\s*\);", m.group(2)).group(0)
+                body = (body[:start] + "#ifdef NONMATCHING\n" + body[start:d.end()] + "#else\n" + inc
+                        + "\n#endif\n" + body[d.end():])
             return text[:m.start()] + body + text[m.end():]
     return None
 
@@ -359,9 +376,12 @@ def cmd_land(args):
     last = (chk.stdout + chk.stderr).strip().splitlines()[-1:]
     ok = bool(last) and ": MATCH" in last[0]
     print(f"{func}: {'unit MATCH' if ok else 'UNIT MISMATCH'} in {tree} ({pins} pins, {bars} barriers in the file)")
-    if ok:
-        open(os.path.join(wd, "landed"), "w").write(tree)
-    return 0 if ok else 1
+    if not ok:
+        # never leave a mismatching unit in the tree for a later commit to pick up
+        open(target, "w").write(cur)
+        sys.exit(f"{func}: restored {r['src']}; land by hand")
+    open(os.path.join(wd, "landed"), "w").write(tree)
+    return 0
 
 
 if __name__ == "__main__":
