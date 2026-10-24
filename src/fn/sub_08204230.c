@@ -2,9 +2,6 @@
 #include "global.h"
 // confidence=low: parses the spawn script (position, attack, health, timing keywords), loads
 // graphics and the first animation frame, and installs the idle callback.
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// The bit-3 clear branch of the inlined animation step shares its store with the set branch (ROM keeps a separate store via r4); the next offset constant then lands in r1 instead of r3.
 #include "scene_vec.h"
 struct PHVec {
     s16 x, y, z, pad;
@@ -48,14 +45,15 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
 {
     u32 flags, elapsed;
     u32 duration;
-    register u32 mask asm("r7");
+    // Reuse the command address temporary as the index wrap mask.
+    u32 commandOrMask;
     register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
+    commandOrMask = (u32)(s->commands + s->index);
     {
         u32 frame;
         register void *highSprite asm("r8") = sprite;
         void *frameSprite;
-        frame = *c >> 6;
+        frame = *(const volatile u16 *)commandOrMask >> 6;
         frameSprite = highSprite;
         asm("" : "+r"(frameSprite));
         *(u16 *)((u8 *)frameSprite + 0x10) = frame;
@@ -66,7 +64,7 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
+        if (first != (((*(const volatile u16 *)commandOrMask & 0x30) >> 4) & bit))
             *(u32 *)(p + 0x24) |= 4;
         else
             *(u32 *)(p + 0x24) &= ~4;
@@ -79,11 +77,12 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
         first &= input;
         asm("" : "+r"(first));
         first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit)) {
+        if (first != (((*(const volatile u16 *)commandOrMask & 0x30) >> 4) & bit)) {
             register u32 *f asm("r3") = sprite;
             *f |= 8;
         } else {
-            *(u32 *)sprite &= ~8;
+            register u32 *f asm("r4") = sprite;
+            *f &= ~8;
         }
     }
     elapsed = s->elapsed + 1;
@@ -91,7 +90,7 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
     {
         register u32 temp asm("r2") = 0xffff;
         asm("" : "+r"(temp));
-        mask = temp;
+        commandOrMask = temp;
     }
     duration = s->duration;
     elapsed = (u16)elapsed;
@@ -117,7 +116,7 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
             u32 i = s->index + 1, n;
             s->index = i;
             n = s->count;
-            if ((i & mask) >= n) {
+            if ((i & commandOrMask) >= n) {
                 {
                     u32 hold = 8;
                     hold &= flags;
@@ -129,8 +128,8 @@ static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s
                 }
             }
         }
-        c = s->commands + s->index;
-        s->weight = *c & 15;
+        commandOrMask = (u32)(s->commands + s->index);
+        s->weight = *(const volatile u16 *)commandOrMask & 15;
         {
             register s32 w asm("r2") = s->weight;
             s32 speed = s->speed;
@@ -235,21 +234,26 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
     if (dead == 0) {
         Anim_SetSequence(p + 0x10c, resource, 0, *(u8 *)(p + 0x132), dead);
     } else {
-        register u32 zero asm("r2");
+        register u32 zero;
         s16 *q = &H(0x12e);
         s32 four = 4;
         zero = 0;
-        asm("" : "+r"(zero));
         *q = 1;
         asm("" : : : "memory");
         Anim_SetSequence(p + 0x10c, *slot, 1, *(u8 *)((u8 *)q + four), zero);
     }
     EnemyF426_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
-    if (H(0x144) == 0)
-        EnemyF426_InitCollider(p);
-    if (W(0x150) && H(0x144) == 0) {
-        s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
-        TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
+    {
+        register u32 offset asm("r3") = 0x144;
+        s16 *deadPtr;
+        asm("" : "+r"(offset));
+        deadPtr = (s16 *)(p + offset);
+        if (*deadPtr == 0)
+            EnemyF426_InitCollider(p);
+        if (W(0x150) && *deadPtr == 0) {
+            s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
+            TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
+        }
     }
     if (H(0x140)) {
         u8 *body = p + 0xc0;
@@ -261,6 +265,3 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
         EnemyF426_ReadScriptValueList(p);
     *(void (**)(void))(p + 0x108) = sub_08203CA0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", EnemyF426_InitializeFromScript);
-#endif
