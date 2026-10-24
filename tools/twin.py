@@ -33,7 +33,7 @@ import fix  # noqa: E402  (puts the permuter on sys.path)
 import fixsearch  # noqa: E402
 from romlib import ROOT  # noqa: E402
 from perm_pycparser import c_ast as ca  # noqa: E402
-from rewrites import walk  # noqa: E402
+from rewrites import set_child, walk  # noqa: E402
 from src import ast_util  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "twin")
@@ -116,6 +116,149 @@ def inside(t, dd, sites, pairs):
         align(t.stmt.block_items, dd.stmt.block_items, sites, pairs)
 
 
+SCALAR = {"char": 1, "u8": 1, "s8": 1, "vu8": 1, "bool8": 1, "short": 2, "u16": 2, "s16": 2, "vu16": 2,
+          "bool16": 2, "int": 4, "long": 4, "u32": 4, "s32": 4, "vu32": 4, "bool32": 4, "unsigned": 4,
+          "signed": 4, "float": 4, "u64": 8, "s64": 8}
+
+
+class Layout:
+    """Struct layouts of one translation unit (GBA: natural alignment up to 4), enough to say which
+    field sits at which offset. Bit-fields make a struct unknown."""
+
+    def __init__(self, ast):
+        self.typedefs, self.structs, self.cache = {}, {}, {}
+        for n, _, _ in walk(ast):
+            if isinstance(n, ca.Typedef):
+                self.typedefs[n.name] = n.type
+            if isinstance(n, (ca.Struct, ca.Union)) and n.name and n.decls is not None:
+                self.structs.setdefault((type(n).__name__, n.name), n)
+
+    def resolve(self, t):
+        while isinstance(t, ca.TypeDecl) and isinstance(t.type, ca.IdentifierType) \
+                and t.type.names[-1] in self.typedefs:
+            t = self.typedefs[t.type.names[-1]]
+        return t
+
+    def struct_of(self, t):
+        t = self.resolve(t)
+        if isinstance(t, ca.TypeDecl) and isinstance(t.type, (ca.Struct, ca.Union)):
+            s = t.type
+            if s.decls is None and s.name:
+                s = self.structs.get((type(s).__name__, s.name))
+            return s
+        return None
+
+    def size_align(self, t):
+        t = self.resolve(t)
+        if isinstance(t, ca.PtrDecl):
+            return 4, 4
+        if isinstance(t, ca.ArrayDecl):
+            sz, al = self.size_align(t.type)
+            try:
+                return sz * int(t.dim.value, 0), al
+            except (AttributeError, ValueError, TypeError):
+                return None
+        if isinstance(t, ca.TypeDecl):
+            if isinstance(t.type, ca.IdentifierType):
+                names = t.type.names
+                sz = 2 if "short" in names else 1 if "char" in names else SCALAR.get(names[-1])
+                return (sz, min(sz, 4)) if sz else None
+            if isinstance(t.type, ca.Enum):
+                return 4, 4
+            s = self.struct_of(t)
+            fields = self.fields(s) if s is not None else None
+            return (fields["$size"], fields["$align"]) if fields else None
+        return None
+
+    def fields(self, s):
+        """{field: (offset, size, type)} plus $size and $align, or None."""
+        if s is None or s.decls is None:
+            return None
+        if id(s) in self.cache:
+            return self.cache[id(s)]
+        self.cache[id(s)] = None  # recursion guard
+        out, off, align = {}, 0, 1
+        for dcl in s.decls:
+            if dcl.bitsize is not None:
+                return None
+            sa = self.size_align(dcl.type)
+            if sa is None:
+                return None
+            sz, al = sa
+            align = max(align, al)
+            if isinstance(s, ca.Union):
+                out[dcl.name] = (0, sz, dcl.type)
+                off = max(off, sz)
+            else:
+                off = (off + al - 1) // al * al
+                if dcl.name:
+                    out[dcl.name] = (off, sz, dcl.type)
+                else:  # an anonymous struct or union: its fields are this one's
+                    inner = self.fields(self.struct_of(dcl.type))
+                    for k, v in (inner or {}).items():
+                        if not k.startswith("$"):
+                            out[k] = (off + v[0], v[1], v[2])
+                off += sz
+        out["$size"], out["$align"] = (off + align - 1) // align * align, align
+        self.cache[id(s)] = out
+        return out
+
+
+def local_types(fn):
+    """{name: declared type} for a function's parameters and locals."""
+    out = {}
+    for n, _, _ in walk(fn):
+        if isinstance(n, ca.Decl) and n.name and not isinstance(n.type, ca.FuncDecl):
+            out[n.name] = n.type
+    params = fn.decl.type.args.params if fn.decl.type.args else []
+    for prm in params:
+        if isinstance(prm, ca.Decl) and prm.name:
+            out[prm.name] = prm.type
+    return out
+
+
+def retarget_fields(node, tl, tlocals, dl, dlocals, names):
+    """Rewrite the twin's `v->field` (v a pointer to a struct) for the draft's struct: the same name if
+    the draft's struct has it, else the draft's field at the same offset and size, else a cast."""
+    for n, parent, slot in list(walk(node)):
+        if not (isinstance(n, ca.StructRef) and n.type == "->" and isinstance(n.name, ca.ID)):
+            continue
+        tt, dt = tlocals.get(n.name.name), dlocals.get(names.get(n.name.name, n.name.name))
+        if not isinstance(tt, ca.PtrDecl) or not isinstance(dt, ca.PtrDecl):
+            continue
+        tf, df = tl.fields(tl.struct_of(tt.type)), dl.fields(dl.struct_of(dt.type))
+        if not tf or n.field.name not in tf:
+            continue
+        if df and n.field.name in df and df[n.field.name][:2] == tf[n.field.name][:2]:
+            continue
+        off, sz, ftype = tf[n.field.name]
+        same = [k for k, v in (df or {}).items() if not k.startswith("$") and v[0] == off and v[1] == sz]
+        if same:
+            n.field.name = same[0]
+            names.pop(n.field.name, None)  # keep the draft's own field name through the renaming
+            continue
+        if not isinstance(tl.resolve(ftype), (ca.TypeDecl, ca.PtrDecl)) or tl.struct_of(ftype) is not None:
+            continue
+        base = ca.Cast(ca.Typename(None, [], None, [], ca.PtrDecl([], ca.TypeDecl(None, [], None,
+                                                                                    ca.IdentifierType(["u8"])))),
+                       ca.ID(n.name.name))
+        addr = ca.BinaryOp("+", base, ca.Constant("int", hex(off)))
+        ptr_t = copy.deepcopy(ftype)
+        ptr = ca.Typename(None, [], None, [], ca.PtrDecl([], ptr_t))
+        _set_declname(ptr_t)
+        repl = ca.UnaryOp("*", ca.Cast(ptr, addr))
+        set_child(parent, slot, repl)
+    return node
+
+
+def _set_declname(t):
+    while t is not None:
+        if isinstance(t, ca.TypeDecl):
+            t.declname = None
+            return
+        t = getattr(t, "type", None)
+
+
 def renamed(node, names):
     node = copy.deepcopy(node)
     for n, _, _ in walk(node):
@@ -145,7 +288,9 @@ def main():
         os.makedirs(tdir)
         tpath = os.path.join(tdir, f"{a.twin_func}.c")
         open(tpath, "w").write(twin_text)
-        _, _, tfn, _ = fixsearch.prepare(tpath, a.twin_func)
+        _, tast, tfn, _ = fixsearch.prepare(tpath, a.twin_func)
+        tlay, dlay = Layout(tast), Layout(d.ast)
+        tlocals, dlocals = local_types(tfn), local_types(d.fn)
         sites, pairs = [], []
         align(tfn.body.block_items, d.fn.body.block_items, sites, pairs)
         votes = collections.defaultdict(collections.Counter)
@@ -165,7 +310,8 @@ def main():
             saved = []
             for lst, j1, j2, tnodes in sorted(chosen, key=lambda c: -c[1]):  # later runs first
                 saved.append((lst, j1, list(lst)))
-                lst[j1:j2] = [renamed(x, names) for x in tnodes]
+                lst[j1:j2] = [renamed(retarget_fields(copy.deepcopy(x), tlay, tlocals, dlay, dlocals, names), names)
+                              for x in tnodes]
             fn_text = ast_util.to_c(d.fn).strip()
             for lst, _, old in reversed(saved):
                 lst[:] = old
