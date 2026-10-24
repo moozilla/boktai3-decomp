@@ -291,6 +291,46 @@ The rules and worked examples are in notes/compiler-debugger-2026-10-23.md.
 * Multiplications by constants appear as shift/add sequences, and
   divisions as `bl __divsi3` / `Div` (svc 6).
 
+## Asm-only functions from scratch (October 24)
+
+PRs #634 and #636 wrote never-tried functions of 30 to 150 instructions
+with a neighbouring family's structs: 30 to 50% matched exactly at first,
+about 1 in 6 once the easy ones ran out. What worked, in order:
+
+1. **Borrow a neighbour's spelling first.** Grep the callers and the
+   functions on either side for the same offsets, callees or script ids
+   (`grep -rn 0xC091 src`). A matched sibling's struct, inline helpers and
+   local declaration order usually carry over verbatim (sub_08022790 from
+   SceneActors_SpawnAmbientParticlePair, sub_0800F6F8 from
+   StatusScreen_Initialize).
+2. **Write it, then run `tools/translate.py FILE FUNC --natural --lazy
+   --seconds 240 -j 1`** on the closest version. It searches spellings and
+   types, not just registers, and finds things by hand rarely tries:
+   it matched sub_08022790 by making the RNG index `u16`. Its `best.c` can
+   be semantically wrong (it reorders statements past their uses and wraps
+   blocks in `do {} while (0)`): read it before copying, and take only the
+   idea.
+3. **Known idioms**:
+   * Shared RNG (`gUnk_03005308` index, `gUnk_0203B400` table): `u16 index`,
+     locals `table`, `indexPtr`, `mask = 1023` declared in that order, and a
+     `smallMask = 3` assigned just before its first use.
+   * `a |= 4` on a global where the ROM loads the constant before the
+     address: `s32 four = 4; gUnk_X |= four;`.
+   * Two byte fields set to one value in the ROM's store order:
+     `s32 v = t + 0x22; p[0x51] = v; p[0x50] = v;`.
+   * A loop that recomputes `p + 0x110 + i * 4` on every pass (no hoisting,
+     no strength reduction) was not optimized as a loop; a `goto` loop
+     reproduces that (draft sub_08022624).
+4. **Score a function inside a unit** by copying it into a scratch
+   `src/fn/sub_X.c` with its declarations and running `check.py` there; the
+   unit's own score covers every function in it. Delete the scratch file.
+
+What still fails, and is worth knowing before starting: the ROM keeping a
+value in a different callee-saved register than agbcc picks (translate's
+"no compiler-space solution"), an inner-loop reload of a global that agbcc
+merges with the outer loop's copy (sub_0800F6F8), and an incremented
+counter kept untruncated in a copy (sub_08234DC8 at 98.4%).
+
 ## Finishing
 
 Stop when your assigned budget is reached or your range has no easy
