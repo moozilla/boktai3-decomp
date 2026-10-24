@@ -140,7 +140,10 @@ HINT = re.compile(PIN.pattern + "|" + BARRIER.pattern + "|" + BARRIER_INLINE.pat
 
 
 def check_draft(path, text):
-    """(differing bytes, matched function names) for the file's drafts."""
+    """(score, matched function names) for the file's drafts. The score is
+    (-fuzzy %, differing bytes), lower is better, (-100, 0) a match: differing
+    bytes alone count a one-instruction shift as a mismatch to the end, and
+    rank a pinned 99% draft below an unpinned 94% one."""
     fd, tmp = tempfile.mkstemp(suffix=".c", prefix=".unpin_", dir=path.parent)
     with os.fdopen(fd, "w") as f:
         f.write(text)
@@ -149,11 +152,20 @@ def check_draft(path, text):
                            cwd=ROOT, capture_output=True, text=True, timeout=300)
         out = r.stdout + r.stderr
     except subprocess.TimeoutExpired:
-        return 10 ** 9, []
+        return WORST, []
     finally:
         os.unlink(tmp)
-    m = re.search(r"(\d+) differing bytes", out)
-    return (int(m.group(1)) if m else 10 ** 9), re.findall(r"^(\w+): MATCH", out, re.M)
+    m = re.search(r"(\d+) differing bytes; fuzzy ([\d.]+)%", out)
+    score = (-float(m.group(2)), int(m.group(1))) if m else WORST
+    return score, re.findall(r"^(\w+): MATCH", out, re.M)
+
+
+WORST = (0.0, 10 ** 9)
+MATCH = (-100.0, 0)
+
+
+def show(score):
+    return "MATCH" if score == MATCH else f"{-score[0]:.1f}% ({score[1]} bytes)"
 
 
 def remove_hint(m):
@@ -176,9 +188,9 @@ def depin_draft(p, write):
     tried = 1
     if d < best:
         best, best_text = d, allstrip
-    if d and d >= base:
+    if d != MATCH:
         # 2. one hint at a time, keeping removals that do not make it worse
-        cur = text
+        cur, cur_score = text, base
         i = 0
         while True:
             spans = [h for m in DRAFT.finditer(cur) if HINT.search(m.group(0))
@@ -189,17 +201,18 @@ def depin_draft(p, write):
             cand = cur[:h.start()] + remove_hint(h) + cur[h.end():]
             dd, mm = check_draft(p, cand)
             tried += 1
-            if dd <= best:
-                best, best_text, cur, matched = dd, cand, cand, mm
-                if not dd:
+            if dd <= cur_score:
+                cur, cur_score = cand, dd
+                if dd < best:
+                    best, best_text, matched = dd, cand, mm
+                if dd == MATCH:
                     break
             else:
                 i += 1
     if write and best < base:
         p.write_text(best_text)
     left = sum(len(HINT.findall(m.group(0))) for m in DRAFT.finditer(best_text))
-    state = "MATCH" if best == 0 else f"{best} bytes"
-    return p, best == 0, f"{base} -> {state} ({left} hints left, {tried} compiles)" + \
+    return p, best == MATCH, f"{show(base)} -> {show(best)} ({left} hints left, {tried} compiles)" + \
         (f"; matches: {' '.join(matched)}" if matched else "")
 
 
