@@ -110,6 +110,10 @@ def workdir(func):
 def nonmatching_func(src):
     """The function a draft file is about: the first definition inside #ifdef NONMATCHING."""
     text = open(os.path.join(ROOT, src)).read()
+    run = os.environ.get("SCOPE_RUN")  # a campaign worker's assignment, when it is drafted in this file
+    if run and any(re.search(rf"^[A-Za-z_][\w \*]*?\b{re.escape(run)}\s*\(", b, re.M)
+                   for b in re.findall(r"#ifdef NONMATCHING(.*?)#else", text, re.S)):
+        return run
     m = re.search(r"#ifdef NONMATCHING(.*?)#else", text, re.S)
     body = m.group(1) if m else text  # a matched file: its last non-inline, non-static definition
     defs = re.findall(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", body, re.M)
@@ -207,6 +211,18 @@ def compile_draft(src, func, env=None):
         hint = ("\n  (agbcc is C89: in each block, declarations come before statements)"
                 if any("parse error" in e or "syntax error" in e for e in errs) else "")
         sys.exit(f"COMPILE FAILED: agbcc rejected {src}:\n" + "\n".join("  " + e for e in errs[:15]) + hint)
+    # The dumps hold every function of the unit, and insn uids restart in each one: keep only FUNC's
+    # section, so uid lookups (why, insn, probe, uses) cannot land in another function.
+    for p in PASSES:
+        path = os.path.join(wd, "u.i." + p)
+        if not os.path.exists(path):
+            continue
+        dump = open(path).read()
+        parts = re.split(r"(?m)^(?=;; Function \w+)", dump)
+        mine = [x for x in parts if re.match(r";; Function (\w+)", x)
+                and re.match(r";; Function (\w+)", x).group(1) in (func, rom_name(src, func))]
+        if mine and len(parts) > 2:
+            open(path, "w").write(parts[0] + "".join(mine))
     asm = open(os.path.join(wd, "u.s")).read()
     text = re.sub(r"^(\w+):\n", lambda m: f"{m.group(1)}:\n\t.global {m.group(1)}__addr\n{m.group(1)}__addr:\n"
                   if not m.group(1).startswith(".") else m.group(0), asm, flags=re.M)
@@ -223,6 +239,17 @@ def compile_draft(src, func, env=None):
         code_refs = set(re.findall(r"(\.L\w+)\b", text[:dbg]))
         dangling = sorted(set(re.findall(r"(\.L\w+)\b", text[dbg:])) - defined - code_refs)
         text += "".join(f"\t.set\t{n}, 0\n" for n in dangling)
+    # A call to another function defined in this unit lands where that function's draft sits, which
+    # earlier drafts of other sizes move: send such calls to the callee's ROM address instead, so
+    # they compare like calls to outside symbols (a phantom bl difference otherwise).
+    _, addr_all, _ = inventory()
+    own = (func, rom_name(src, func))
+    local = set(re.findall(r"^\t\.type\t\s*(\w+),function", text, re.M)) - set(own)
+    for n in sorted(local):
+        a_rom = addr_all.get(n)
+        if a_rom is not None and re.search(rf"^\tbl\t{n}\b", text, re.M):
+            text = re.sub(rf"^(\tbl\t){n}\b", rf"\g<1>{n}__rom", text, flags=re.M)
+            text += f"\t.set\t{n}__rom, 0x{a_rom | 1:08X}\n"
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
@@ -1671,7 +1698,7 @@ def cmd_probe(src, func, env):
                  f"loop strength reduction of the {'address' if t == 'addr' else 'value'} computed at line"
                  f" {lines.get(u, '?')} (insn {u}, {'reduced' if red else 'not reduced'})")
                 for u, (t, red) in sorted(givs.items())])
-    budget = int(os.environ.get("SCOPE_PROBE_MAX", "150"))
+    budget = int(env.get("SCOPE_PROBE_MAX") or os.environ.get("SCOPE_PROBE_MAX", "150"))
     print(f"{func}: {info.get('counts') or base} differ; {len(heads)} cse canonical-register choices,"
           f" {len(follows)} cse jump follows, {len(pres)} PRE replacements"
           + f", {len(givs)} loop induction values"
