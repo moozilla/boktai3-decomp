@@ -1,13 +1,10 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.8%
-// fix.py best version (reprinted C)
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: coordinates a part strike with its opposite part.
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
-// Remaining differences: register lifetimes, inline setup order, and literal-pool placement.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -63,6 +60,24 @@ static inline void SetState(struct VanargandPart *p, u32 state)
     p->state = state;
     p->timer = 0;
 }
+/* Retain the field offsets in these registers through the stores. This keeps
+ * them out of reload's round-robin choices before the following burst. */
+static inline void SetRecoveryState(struct VanargandPart *p, u32 state)
+{
+    register u32 stateOffset asm("r3");
+    register u32 timerOffset asm("r6");
+    stateOffset = (u32) & ((struct VanargandPart *)0)->state;
+    p->state = state;
+    timerOffset = (u32) & ((struct VanargandPart *)0)->timer;
+    p->timer = 0;
+    asm volatile("" : : "r"(stateOffset), "r"(timerOffset));
+}
+static inline u32 ReadEnter(u8 *flag, u8 **saved)
+{
+    u32 value = *flag;
+    *saved = flag;
+    return value;
+}
 static inline u8 MotionEnded(struct VanargandPart *p)
 {
     return p->motion[0x29] == 2;
@@ -72,7 +87,6 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
 {
     u8 *enter;
     u32 mask = 0x20;
-    s32 t1;
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -100,14 +114,13 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
     switch (p->state) {
         case 0: {
             struct SceneVec delta;
-            enter = &p->enter;
-            if (p->enter) {
+            if (ReadEnter(&p->enter, &enter)) {
                 *enter = 0;
                 if (p->variant == 1)
                     MakeVector(&delta, 224, 256);
                 else
                     MakeVector(&delta, 96, 256);
-                AddVector(&delta, &p->origin, &delta);
+                AddVector(&delta, &delta, &p->origin);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 2);
             }
             MotionTrack_Update(p->motion);
@@ -119,8 +132,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
         }
 
         case 1:
-            enter = &p->enter;
-            if (p->enter) {
+            if (ReadEnter(&p->enter, &enter)) {
                 u32 zero = 0;
                 *enter = zero;
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 1);
@@ -144,18 +156,20 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                         MakeVector(&delta, 224, 256);
                     else
                         MakeVector(&delta, 96, 256);
-                    AddVector(&delta, &p->origin, &delta);
+                    AddVector(&delta, &delta, &p->origin);
                     MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 2);
                     Sound_PlaySong(0x1ba);
                     AddVector(&position, &p->target, p->base);
                     AnimatedParticles_EmitBurst(&position, *((s16 *)(((u8 *)p) + 0xb0)), 0, 64, 4,
                                                 4, 4, 4);
-                    SetState(p, 6);
+                    SetRecoveryState(p, 6);
                 } else {
                     Sound_PlaySong(0x3d9);
-                    t1 = 4;
-                    AnimatedParticles_EmitBurst(&p->sprite.position, *((s16 *)(((u8 *)p) + 0xb0)),
-                                                0, 64, t1, 4, 4, 4);
+                    {
+                        struct SceneVec *position = &p->sprite.position;
+                        s16 heading = *((s16 *)(((u8 *)p) + 0xb0));
+                        AnimatedParticles_EmitBurst(position, heading, 0, 64, 4, 4, 4, 4);
+                    }
                     SetState(p, 6);
                 }
                 p->enter = 1;
@@ -165,8 +179,7 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
 
         case 3:
-            enter = &p->enter;
-            if (p->enter) {
+            if (ReadEnter(&p->enter, &enter)) {
                 *enter = 0;
                 SetFlags(p, 8);
                 {
@@ -210,6 +223,3 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartPairedStrike);
-#endif
