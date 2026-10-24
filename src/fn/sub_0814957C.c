@@ -12,9 +12,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     {
         register u32 offset asm("r0") = state->index << 1;
         register const volatile u16 *table asm("r1");
-        asm("" : "+r"(offset));
         table = state->commands;
-        asm("" : "+r"(table));
         command = (const volatile u16 *)((u32)table + offset);
     }
     sprite->frame = *command >> 6;
@@ -99,9 +97,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
             {
                 register u32 offset asm("r0") = state->index << 1;
                 register const volatile u16 *table asm("r1");
-                asm("" : "+r"(offset));
                 table = state->commands;
-                asm("" : "+r"(table));
                 command = (const volatile u16 *)((u32)table + offset);
             }
             state->frameWeight = *command & 15;
