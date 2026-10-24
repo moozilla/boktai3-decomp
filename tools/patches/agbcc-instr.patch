@@ -520,7 +520,7 @@
     or perhaps its old hard reg has been commandeered for reloads.
 --- a/reload1.c
 +++ b/reload1.c
-@@ -208,6 +208,85 @@
+@@ -208,6 +208,87 @@
  /* Index of last register assigned as a spill register.  We allocate in
     a round-robin fashion.  */
  static int last_spill_reg;
@@ -528,6 +528,8 @@
 +   spill rotation by D before the K-th reload register choice in a function;
 +   AGBCC_DUMPPRI also logs each choice.  */
 +static int agbcc_reload_count;
++static int agbcc_rot_start;
++static char agbcc_rot_state[32];
 +/* AGBCC_SPILL_LABEL="label#n:d,...": shift the rotation by D before the
 +   N-th successful reload of a value labelled LABEL (see AGBCC_DUMPPRI).  */
 +#define AGBCC_MAXLAB 256
@@ -606,7 +608,7 @@
  
  /* Describes order of preference for putting regs into spill_regs.
     Contains the numbers of all the hard regs, in order most preferred first.
-@@ -815,6 +894,9 @@
+@@ -815,6 +896,9 @@
    
    /* Initialize to -1, which means take the first spill register.  */
    last_spill_reg = -1;
@@ -616,11 +618,10 @@
  
    spilled_pseudos = ALLOCA_REG_SET ();
  
-@@ -5027,6 +5109,28 @@
- 
+@@ -5028,6 +5112,28 @@
     If NOERROR is nonzero, we return 1 if successful,
     or 0 if we couldn't find a spill reg and we didn't change anything.  */
-+
+ 
 +/* The label of reload R's value: "=constant", "regN" or "-".  */
 +static char *
 +agbcc_reload_label (r)
@@ -642,10 +643,11 @@
 +    }
 +  return "-";
 +}
- 
++
  static int
  allocate_reload_reg (chain, r, last_reload, noerror)
-@@ -5066,6 +5170,27 @@
+      struct insn_chain *chain;
+@@ -5066,6 +5172,47 @@
       reloads A and B can share regs.  These need two regs.
       Suppose A and B are given different regs.
       That leaves none for C.  */
@@ -669,11 +671,31 @@
 +    if (d && n_spills)
 +      last_spill_reg = ((last_spill_reg + d) % n_spills + n_spills) % n_spills;
 +    agbcc_reload_count++;
++    /* State of the rotation before this choice, for the RS dump line:
++       per spill register U = holds a live pseudo here (not a spill reg of
++       this insn), b = taken by another reload of this insn, c = wrong
++       class or mode, . = free.  */
++    if (agbcc_dump)
++      {
++	int j;
++	agbcc_rot_start = last_spill_reg;
++	for (j = 0; j < n_spills && j < 31; j++)
++	  {
++	    int rn = spill_regs[j];
++	    agbcc_rot_state[j]
++	      = TEST_HARD_REG_BIT (reload_reg_used, rn) ? 'U'
++	      : ! (TEST_HARD_REG_BIT (reg_class_contents[(int) reload_reg_class[r]], rn)
++		   && HARD_REGNO_MODE_OK (rn, reload_mode[r])) ? 'c'
++	      : ! reload_reg_free_p (rn, reload_opnum[r], reload_when_needed[r]) ? 'b'
++	      : '.';
++	  }
++	agbcc_rot_state[j] = 0;
++      }
 +  }
    for (pass = 0; pass < 2; pass++)
      {
        /* I is the index in spill_regs.
-@@ -5203,6 +5328,28 @@
+@@ -5203,6 +5350,50 @@
  
  	    reload_reg_rtx[r] = new;
  	    reload_spill_index[r] = spill_regs[i];
@@ -698,6 +720,28 @@
 +		fprintf (agbcc_dump, "R %s %d %d %d %d %s %s\n", current_function_name,
 +			 agbcc_reload_count - 1, INSN_UID (insn), spill_regs[i], line, file,
 +			 v);
++		{
++		  int j, pn;
++		  fprintf (agbcc_dump, "RS %s %d %d %d %d %d ", current_function_name,
++			   agbcc_reload_count - 1, INSN_UID (insn), spill_regs[i],
++			   agbcc_rot_start >= 0 ? spill_regs[agbcc_rot_start] : -1, pass);
++		  for (j = 0; j < n_spills && j < 31; j++)
++		    fprintf (agbcc_dump, "%d%c", spill_regs[j], agbcc_rot_state[j]);
++		  fprintf (agbcc_dump, " when=%d op=%d",
++			   (int) reload_when_needed[r], reload_opnum[r]);
++		  EXECUTE_IF_SET_IN_REG_SET (chain->live_before, FIRST_PSEUDO_REGISTER, pn,
++		    {
++		      if (reg_renumber[pn] >= 0)
++			fprintf (agbcc_dump, " r%d=p%d", reg_renumber[pn], pn);
++		    });
++		  fprintf (agbcc_dump, " |");
++		  EXECUTE_IF_SET_IN_REG_SET (chain->live_after, FIRST_PSEUDO_REGISTER, pn,
++		    {
++		      if (reg_renumber[pn] >= 0)
++			fprintf (agbcc_dump, " r%d=p%d", reg_renumber[pn], pn);
++		    });
++		  fprintf (agbcc_dump, "\n");
++		}
 +	      }
  	    return 1;
  	  }

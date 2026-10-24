@@ -283,8 +283,9 @@ def cse_probe(path):
     return None
 
 
-def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
-    """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
+def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None, extra=()):
+    """Children of one state: (score, new text, desc, fam), plus the compiles spent. EXTRA: decision
+    keys known from a compiler probe (cse_probe), tried before step.py's."""
     path = os.path.join(wd, f"{func}.c")
     open(path, "w").write(text)
     try:
@@ -292,6 +293,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     except (Exception, SystemExit) as ex:  # a state step.py cannot compile: drop it
         log(f"   (step.py failed on a state: {type(ex).__name__})")
         return [], 0
+    keys = list(extra) + [k for k in keys if k not in extra]
     d = Draft(text, func, wd)
     if dec is None:
         sc = d.score()
@@ -299,7 +301,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
             return "match", 0
         # only a branch offset differs: a label moved (a statement into or out of a loop, a
         # hoisted invariant), which step.py does not see as a differing instruction
-        keys = ["loop-invariant", "order"]
+        keys = list(extra) + ["loop-invariant", "order"]
         dec = (None, {"lines": [], "note": "only a branch target differs (a label moved)"})
     st, e = dec
     base, good, n = one_round(d, keys, show, try_all, seeds, log, deadline)
@@ -336,7 +338,21 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
     start = None
     seen = {text}
     best = best_shape = states[0]
+    extra = []
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
+        # a near match: ask the instrumented compiler first whether one CSE decision explains it,
+        # and try that decision's spellings first in every round
+        open(os.path.join(wd, f"{func}.c"), "w").write(text)
+        try:
+            start = Draft(text, func, wd).score()
+        except (Exception, SystemExit):
+            start = None
+        if start and 0 < start[0] <= 4:
+            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+            if cause:
+                log(f"   cause: {cause}")
+                if "canonical register" in cause:
+                    extra = ["cse-canon"]
         for rnd in range(depth):
             log(f"\n== round {rnd + 1}")
             children = []
@@ -344,14 +360,8 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 if budget and time.time() - t0 > budget:
                     break
                 kids, n = expand(txt, func, wd, show, try_all, seeds, log, verbose=(i == 0),
-                                 deadline=budget and t0 + budget)
+                                 deadline=budget and t0 + budget, extra=extra)
                 total += n
-                if rnd == 0 and isinstance(kids, list) and start is None:
-                    start = Draft(txt, func, wd).score()
-                    if start and start[0] <= 4:
-                        cause = cse_probe(os.path.join(wd, f"{func}.c"))
-                        if cause:
-                            log(f"   cause: {cause}")
                 if kids == "match":
                     kids = [((0, 0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:
