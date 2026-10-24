@@ -170,6 +170,11 @@ def start(r, model):
     wd = os.path.join(CAMP, func)
     os.makedirs(wd, exist_ok=True)
     text = sh("git", "show", f"origin/main:{r['src']}")
+    if block_span(text, func, r["addr"]) is None:  # matched on main since the queue was built
+        r["skip"] = "matched on main"
+        open(os.path.join(wd, "landed"), "w").write("main")
+        print(f"skip {func}: no NONMATCHING block for it on main (matched already)", flush=True)
+        return False
     open(os.path.join(wd, "base.c"), "w").write(text)
     open(os.path.join(wd, ".main_rev"), "w").write(sh("git", "rev-parse", "origin/main").strip())
     open(os.path.join(wd, "start.c"), "w").write(text)
@@ -189,6 +194,7 @@ def start(r, model):
     open(os.path.join(wd, "pid"), "w").write(str(p.pid))
     open(os.path.join(wd, "started"), "w").write(time.strftime("%Y-%m-%d %H:%M:%S"))
     print(f"started {func} ({r['size']} B, {counts})", flush=True)
+    return True
 
 
 def cmd_tick(args):
@@ -232,8 +238,8 @@ def cmd_tick(args):
         if q is not None and q <= FLOOR:
             print(f"quota {q}% <= floor {FLOOR}%: not starting more workers")
             break
-        start(r, model)
-        running.add(r["func"])
+        if start(r, model):
+            running.add(r["func"])
     json.dump(rows, open(QUEUE, "w"), indent=1)
     if not running:
         print("nothing running; queue " + ("empty" if all(state(r["func"]) != "pending" for r in rows)
