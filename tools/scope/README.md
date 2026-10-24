@@ -273,18 +273,46 @@ ported here deliberately. Incremental rebuild after editing one file:
 
 ### Speed (measured on an M-series Mac)
 
+The target agreed for the tool: interactive questions well under a second,
+and milliseconds per variant when a hypothesis has many variants.
+
 | Stage | Time |
 |---|---|
 | agbcc, plain / with all 14 RTL dumps | 7 ms / 19 ms |
-| preprocess (`clang -E` direct; the `cc` shim adds ~8 ms) | 14 ms |
-| whole command, warm cache | 0.27 s (was 0.7 s; 0.34 s of that was readelf on the ROM ELF) |
+| agbcc fork-server child (declarations parsed once) | ~3 ms |
+| preprocess (`clang -E` direct; memoised per file mtime) | 14 ms |
+| one search variant (fork server, `as`, Python placement, align) | ~12 ms (was ~120 ms) |
+| a diff with all dumps, through the resident server | 0.12 s (was 0.30 s; 0.7 s before that) |
+| `probe` (25 variants) / `spill` (42 variants) | 0.36 s / 0.60 s (were 2.6 s / 4.9 s) |
 
-agbcc's own startup is not the cost for units this size, so a fork server
-buys little for single queries. Remaining overhead is ~10 subprocesses (as,
-ld for the stub, objcopy, readelf, objdump) and two Python startups. Next
-steps when it matters: resolve relocations in Python instead of linking
-(`tools/agbserve.py` has a `Resolver`), and for parameterized search drive
-`agbserve.py`'s fork server without dumps (target ~10-20 ms per variant).
+How (2026-10-24):
+
+* **Resident server** (`scope.py serve`, started automatically by the first
+  call; `SCOPE_SERVER=0` opts out). It keeps the ROM, ELF symbols, inventory
+  and capstone loaded, and forks one child per command, so commands from
+  several workers run side by side. The client is the top of scope.py:
+  stdlib only, it forwards argv, cwd and the `SCOPE_`/`AGBCC_`/`CSE_`
+  environment and prints what comes back. The server restarts itself when
+  scope.py or fast.py changes and exits after 30 idle minutes
+  (`SCOPE_SERVE_IDLE`). Log: `build/scope/serve.log`.
+* **Fork server** (`fast.py`, scope's own copy of the idea in
+  tools/agbserve.py): the instrumented agbcc parses everything before FUNC's
+  definition once and forks a child per variant with that variant's knobs.
+  It gives bytes only (children share the parent's dump files), so `score()`
+  uses it for every variant of `probe`, `pins` and `spill`, and the
+  commands that read dumps or traces compile once the old way (`full=True`).
+* **No ld, objcopy, readelf or objdump**: `fast.place` resolves the
+  object's relocations (BL, ABS32, Thumb b/b<cond>) at FUNC's ROM address
+  and reads its `$d`/`$t` mapping symbols; `fast.dwarf_lines` decodes the
+  DWARF 2 line program. `SCOPE_LINK=1` runs the old linker path.
+* **Checked**: `scope.py fastcheck N` compiles N units both ways and compares
+  each path's bytes with ld's (148/148 identical; the full report was
+  identical on 40 drafts). Run it after changing fast.py or the patch.
+
+What remains in a 0.12 s diff: the client's Python startup (~30 ms), cpp
+on an edited file, agbcc with dumps, `as`, and reading the dumps for the
+listing. A diff through the fork server would need per-request dump files
+in the patch.
 
 ### Gaps (next work on the tool)
 
@@ -303,7 +331,8 @@ steps when it matters: resolve relocations in Python instead of linking
   makes the ROM's reload count differ (insns needing reloads, by C line).
 * For gcse-born differences, automatically test bucket order with a few
   `AGBCC_GCSE_T` values (see below) and say whether order alone explains it.
-* A `try` mode: N variants of one hypothesis through the fork server.
+* A `try` mode: N variants of one hypothesis through the fork server (the server and the ~12 ms
+  per variant now exist).
 * Pointers from each decision to the agbcc source function that makes it.
 
 ## agbcc facts established with scope
