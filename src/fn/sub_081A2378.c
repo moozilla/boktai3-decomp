@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.7%
-// foundry draft (worker best 85.6%); what differs is mostly register allocation and instruction order
 #define gRadialSineTable gUnk_086149C4
 struct MotionPosition {
     s16 x, y, z, pad;
@@ -39,9 +36,16 @@ void Hresvelgr_InitializeRadialOffsets(struct Hresvelgr *actor)
     i = 0;
     radius = 128;
     for (; i <= 3; i++) {
-        struct MotionPosition *position = &actor->radial[i];
-        s32 angle = i << 6;
+        struct MotionPosition *position;
+        s32 angle;
         s32 z;
+        // actor + i * 8 first, then the field offset: as one expression
+        // (&actor->radial[i]) fold moves 0x338 into the index sum. angle as a
+        // multiply (not i << 6) has fewer references, so position outranks
+        // it in register allocation.
+        position = (struct MotionPosition *)(i * 8 + (u32)actor);
+        position = (struct MotionPosition *)((u8 *)position + 0x338);
+        angle = i * 64;
         position->x = TruncateFixed(gUnk_086149C4[(angle + 64) & 255] << 7);
         position->y = 0;
         z = gUnk_086149C4[angle & 255];
@@ -49,6 +53,3 @@ void Hresvelgr_InitializeRadialOffsets(struct Hresvelgr *actor)
         position->z = TruncateFixed(z);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_InitializeRadialOffsets);
-#endif
