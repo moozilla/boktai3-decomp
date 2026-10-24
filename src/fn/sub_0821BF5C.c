@@ -3,7 +3,7 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 struct TerrainPos {
     s16 x, y, z;
@@ -137,10 +137,10 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
                 n = fromIndex + 1;
                 found = TerrainModifiers_FindCellOverride(n, 1);
             }
-            if (found)
-                cell = found + 4;
-            else
+            if (!found)
                 cell = (gUnk_030052F4->cells + 12) + (n * 4);
+            else
+                cell = found + 4;
         } else if ((diff == 1) || (diff == (-1))) {
             if (toKind != 1)
                 return 1;
@@ -168,6 +168,7 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
 ret1:
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0821BF5C);
 #endif

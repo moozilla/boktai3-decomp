@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 95.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: emits six radial effects, waits for animation 10, then deactivates the part.
 
@@ -175,6 +175,7 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
 {
     u32 mask = 12;
+    u32 *new_var;
     p->flags |= mask;
     if (p->reset) {
         u32 zero;
@@ -188,10 +189,11 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
         p->reset = 0;
         Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 10, (u8)p->variant, 0);
         CpuSet(&zero, &velocity, 0x05000002);
+        new_var = &p->timer;
         zero = 0;
         i = 0;
         state = &p->state;
-        timer = &p->timer;
+        timer = new_var;
         entered = &p->enter;
         phase = 0;
         do {
@@ -220,6 +222,7 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_ReleaseRadialEffects);
 #endif

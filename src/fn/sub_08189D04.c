@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 85.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: shared strike tails, zero/address scheduling and delta register allocation.
 struct ArmorDecisionActor {
@@ -41,7 +41,7 @@ s32 Math_Atan2(s32, s32);
 void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
 {
     register s32 dx asm("r5");
-    s32 dy;
+    u32 dy;
     register s32 dz asm("r1");
     register s32 ax asm("r7");
     s32 ay;
@@ -49,6 +49,7 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
     register u32 mode asm("r8");
     u8 *decision;
     s16 *cooldown = &p->attackCooldown;
+    typeof(dz) c1;
     if ((*cooldown) > 0)
         --(*cooldown);
     if ((((p->phase != 255) && (p->behavior != 20)) && (p->behavior != 2)) && (p->behavior != 19))
@@ -56,8 +57,9 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
     dx = gUnk_02000710->x - p->x;
     dy = gUnk_02000710->y - p->y;
     dz = gUnk_02000710->z - p->z;
+    c1 = dz;
     dx = (dx + 128) >> 8;
-    dz = (dz + 128) >> 8;
+    dz = (c1 + 128) >> 8;
     ax = dx;
     ay = dy;
     az = dz;
@@ -196,6 +198,7 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
     }
     return;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedStrikeDecision);
 #endif

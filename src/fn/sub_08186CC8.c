@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: behavior selection aligns the actor with the player and remembers attack origins.
 // MATCHING_CONCESSION: register-pinning
@@ -53,13 +53,13 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
         ax = -ax;
     if (y < 0)
         y = -y;
+    flags = p->fb32;
     if (z < 0)
         az = -z;
-    flags = p->fb32;
-    if (flags & 1) {
+    if (p->fb32 & 1) {
         switch (p->f1120) {
             case 0:
-                if (flags & 2) {
+                if ((u8)(p->fb32 & 2)) {
                     ActorController_SetBehavior(p, 12);
                     break;
                 }
@@ -128,6 +128,7 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
     else
         ActorController_SetBehaviorIfFinished(p, 2);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_SelectAlignedAttack);
 #endif

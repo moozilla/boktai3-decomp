@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
@@ -182,6 +182,7 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
 }
 void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
 {
+    struct SceneVec *new_var;
     struct SceneVec rise;
     struct SceneVec target;
     struct SceneVec speed;
@@ -243,7 +244,10 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
                     enter = address;
                 }
                 if (entered) {
-                    *enter = 0;
+                    {
+                        u8 k2 = 0;
+                        *enter = k2;
+                    }
                     Sound_PlaySong(0x596);
                     p->countdown = 60;
                 }
@@ -271,11 +275,12 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
                 if (entered) {
                     register u32 zero asm("r5") = 0;
                     asm("" : "+r"(zero));
+                    new_var = &target;
                     *enter = zero;
                     target = p->offset;
-                    ((volatile s16 *)(&target))[1] = -((u16)p->anchor->y);
+                    ((volatile s16 *)new_var)[1] = -((u16)p->anchor->y);
                     SetVector(&speed, zero, 64, zero);
-                    MotionTrack_Initialize(motion, &p->offset, &target, &speed, 1);
+                    MotionTrack_Initialize(motion, &p->offset, new_var, &speed, 1);
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
@@ -296,6 +301,7 @@ void ActorStatus_UpdateRisingStrike(u8 *boss, struct ActorStatusPart *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateRisingStrike);
 #endif

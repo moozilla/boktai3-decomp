@@ -1,7 +1,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative player cue role; see callback body.
 // Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.
@@ -72,6 +72,11 @@ static inline u32 Arg1(u32 k_, struct P *p)
     return p->timer >> k_;
 }
 
+inline static u32 Arg1_1(struct P *p)
+{
+    return p->timer >> 2;
+}
+
 void PlayerCue_UpdateFormChange(struct P *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -130,7 +135,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
             break;
 
         case 2:
-            if ((p->timer & 7) < (7 - Arg1(2, p)))
+            if ((p->timer & 7) < (7 - ((u16)Arg1_1(p))))
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 10), 64, 1);
             else if (p->variant != 1) {
                 Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0xE4, 0, 0);
@@ -185,6 +190,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
 #endif

@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
 
@@ -78,16 +78,19 @@ s32 VanargandEffect_Initialize(struct VanargandEffect *effect, s32 variant, s32 
     }
     {
         typeof(effect->position) *q4 = &effect->position;
-        u8 z1 = 0;
         *q4 = *position;
-        effect->motion.data = z1;
-        effect->motion.active = z1;
-        effect->motion.mode = z1;
-        effect->motion.cursor = z1;
+        {
+            typeof(effect->motion.data) *q5 = &effect->motion.data;
+            *q5 = 0;
+        }
+        effect->motion.active = 0;
+        effect->motion.mode = 0;
+        effect->motion.cursor = 0;
         MotionTrack_Initialize(&effect->motion, &effect->position, 0, target, 0);
         return 0;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", VanargandEffect_Initialize);
 #endif

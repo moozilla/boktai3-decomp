@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Parameter-save order and the first signed-load scratch still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -42,38 +42,42 @@ struct ActorStatus {
 void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactActor *other,
                                    struct ActorStatus *status)
 {
-    register struct ContactActor *actor asm("r5") = input;
     u8 *world = gUnk_02000580;
-    s32 strength, shift, scaled;
+    s32 strength;
+    s32 shift;
+    s32 scaled;
     u32 value;
     u32 direction;
-    Collision_CalculateDamageResponse(actor);
+    Collision_CalculateDamageResponse(input);
     strength = other->strength;
     shift = status->strengthShift;
     if (strength >= 0)
         scaled = strength >> shift;
     else
-        scaled = -(-strength >> shift);
+        scaled = -((-strength) >> shift);
     status->contactStrength = scaled;
-    value = actor->value38;
-    status->contactValue = value;
-    status->contactKind = actor->value44;
-    if (status->mode == 1 && Player_IsSlotInActionTwelveOrThirtyEight(0) && world[0x418] == 2) {
+    value = input->value38;
+    do {
+        status->contactValue = value;
+    } while (0);
+    status->contactKind = input->value44;
+    if (((status->mode == 1) && Player_IsSlotInActionTwelveOrThirtyEight(0)) &&
+        (world[0x418] == 2)) {
         if (status->contactStrength < status->duration)
             status->contactStrength = status->duration;
     }
     {
         u32 mask = 0x100;
-        if (actor->flags & mask)
-            direction = actor->direction;
+        if (input->flags & mask)
+            direction = input->direction;
         else {
-            s32 dx = other->x - actor->x;
-            s32 dy = other->y - actor->y;
+            s32 dx = other->x - input->x;
+            s32 dy = other->y - input->y;
             direction = Math_Atan2(dx, dy);
         }
     }
     status->contactDirection = direction;
-    PlayerStats_AddContactHundredths(actor, other, 5);
+    PlayerStats_AddContactHundredths(input, other, 5);
 }
 
 #else

@@ -2,7 +2,7 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Structure matches; left: 'to' and the grid pointer swap r5/r6, one add operand order.
 struct Pos {
     s16 x, y, z, w;
@@ -34,145 +34,156 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *to, u8 ki
     u8 *grid;
     u16 idx;
     s32 diff;
-
     if (gUnk_030052F4->cells == 0)
         return 0;
     grid = gUnk_030052F4->cells;
-    idx = cellIndex(to);
-    if (t->cell == idx || sub_0821BF5C(from, to, kind))
+    do {
+        idx = cellIndex(to);
+    } while (0);
+    if ((t->cell == idx) || sub_0821BF5C(from, to, kind))
         return 0;
     diff = idx - t->cell;
-    if (diff <= -WIDTH + 1)
-        diff = (diff + 1) + WIDTH;
-    else if (diff == -1)
+    if (diff <= ((-(*((s16 *)(grid + 4)))) + 1))
+        diff = (diff + 1) + (*((s16 *)(grid + 4)));
+    else if (diff == (-1))
         diff = 3;
     else if (diff == 1)
         diff = 4;
-    else if (diff >= WIDTH - 1)
-        diff = diff + (6 - WIDTH);
+    else if (diff >= ((*((s16 *)(grid + 4))) - 1))
+        diff = diff + (6 - (*((s16 *)(grid + 4))));
     switch ((u32)diff) {
         case 0:
-            if (t->prevCell == idx + 1) {
+            if (t->prevCell == (idx + 1)) {
                 p = *to;
-                p.x = LO(Mod(t->cell, WIDTH));
+                p.x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.z = LO(Div(t->cell, WIDTH));
+                p.z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = LO(Mod(t->cell, WIDTH));
-                to->z = LO(Div(t->cell, WIDTH));
+                to->x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
+                to->z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 break;
             } else {
                 p = *to;
-                p.z = LO(Div(t->cell, WIDTH));
+                p.z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.x = LO(Mod(t->cell, WIDTH));
+                p.x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = LO(Mod(t->cell, WIDTH));
-                to->z = LO(Div(t->cell, WIDTH));
+                to->x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
+                to->z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 break;
             }
             break;
+
         case 1:
-            to->z = LO(Div(t->cell, WIDTH));
+            to->z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
             break;
+
         case 2:
-            if (t->prevCell == idx - 1) {
+            if (t->prevCell == (idx - 1)) {
                 p = *to;
-                p.x = HI(Mod(t->cell, WIDTH));
+                p.x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.z = LO(Div(t->cell, WIDTH));
+                p.z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = HI(Mod(t->cell, WIDTH));
-                to->z = LO(Div(t->cell, WIDTH));
+                to->x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
+                to->z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 break;
             } else {
                 p = *to;
-                p.z = LO(Div(t->cell, WIDTH));
+                p.z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.x = HI(Mod(t->cell, WIDTH));
+                p.x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = HI(Mod(t->cell, WIDTH));
-                to->z = LO(Div(t->cell, WIDTH));
+                to->x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
+                to->z = (Div(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 break;
             }
             break;
+
         case 3:
-            to->x = LO(Mod(t->cell, WIDTH));
+            to->x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
             break;
+
         case 4:
-            to->x = HI(Mod(t->cell, WIDTH));
+            to->x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
             break;
+
         case 5:
-            if (t->prevCell == idx + 1) {
+            if (t->prevCell == (idx + 1)) {
                 p = *to;
-                p.x = LO(Mod(t->cell, WIDTH));
+                p.x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.z = HI(Div(t->cell, WIDTH));
+                p.z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = LO(Mod(t->cell, WIDTH));
-                to->z = HI(Div(t->cell, WIDTH));
+                to->x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
+                to->z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 break;
             } else {
                 p = *to;
-                p.z = HI(Div(t->cell, WIDTH));
+                p.z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.x = LO(Mod(t->cell, WIDTH));
+                p.x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
-                to->x = LO(Mod(t->cell, WIDTH));
-                to->z = HI(Div(t->cell, WIDTH));
+                to->x = (Mod(t->cell, *((s16 *)(grid + 4))) << 8) + 1;
+                to->z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 break;
             }
             break;
+
         case 6:
-            to->z = HI(Div(t->cell, WIDTH));
+            to->z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
             break;
+
         case 7:
-            if (t->prevCell == idx - 1) {
+            if (t->prevCell == (idx - 1)) {
                 p = *to;
-                p.x = HI(Mod(t->cell, WIDTH));
+                p.x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.z = HI(Div(t->cell, WIDTH));
+                p.z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
             } else {
                 p = *to;
-                p.z = HI(Div(t->cell, WIDTH));
+                p.z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
                     goto copy;
                 p = *to;
-                p.x = HI(Mod(t->cell, WIDTH));
+                p.x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind)) {
                 copy:
                     *to = p;
+
                     break;
                 }
             }
-            to->x = HI(Mod(t->cell, WIDTH));
-            to->z = HI(Div(t->cell, WIDTH));
+            to->x = ((Mod(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
+            to->z = ((Div(t->cell, *((s16 *)(grid + 4))) + 1) << 8) - 1;
             break;
     }
+
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0821C254);
 #endif

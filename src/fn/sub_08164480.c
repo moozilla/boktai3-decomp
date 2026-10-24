@@ -2,7 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 91.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: energy meter plus a 4-digit timer shown below it.
 // Remaining differences: register choice for the tile cursor and repeated player-pointer reloads in the timer test.
@@ -21,6 +21,11 @@ static inline u32 TestBits(u32 v, u32 mask)
 #define PLAYER (*(u8 **)(p + 0xa40))
 
 static inline u32 Arg1(u32 k_, u8 *p)
+{
+    return p + k_;
+}
+
+inline static u32 Arg2(u32 k_, u8 *p)
 {
     return p + k_;
 }
@@ -106,7 +111,7 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         (mode == 0)) {
         if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x444))) & 0x40))
             goto digits;
-        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x44c))) & 0x10))
+        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)Arg2(0xa40, p))) + 0x44c))) & 0x10))
             goto digits;
         if ((*((u8 *)((*((u8 **)Arg1(0xa40, p))) + 0xc18))) == 7) {
         digits:
@@ -120,7 +125,7 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             digits[3] = rem;
             cell = Hud_GetTilemapCell(0, 9, 4);
             dp = digits;
-            for (i = 3; i >= 0; i--) {
+            for (i = 0; i < 4; i++) {
                 *(cell++) = Hud_GetStyleTileIndex(*(dp++), 0) | (-0x3000);
             }
 
@@ -134,6 +139,7 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08164480);
 #endif

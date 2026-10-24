@@ -2,7 +2,7 @@
 #include "global.h"
 // confidence=low: background, labels, animations and menu selection initialization.
 #ifdef NONMATCHING
-// fuzzy: 85.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: sprite/resource lifetimes, text-rectangle setup, palette reload.
 struct Rect {
     u16 x, y, width, height;
@@ -33,6 +33,7 @@ s32 Options_InitScreen(u8 *arg)
     void *sprite;
     s32 layer;
     struct Rect rect;
+    typeof(resource) c1;
     Bg_ClearTilemap(0);
     zero = 0;
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
@@ -45,22 +46,23 @@ s32 Options_InitScreen(u8 *arg)
     Bg_SetupLayers(2, 0, background, 0, zero, one, &layer);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     palette = ScriptProc_Start(0x92B3, 0x204);
-    CpuSet((u8 *)palette + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(((u8 *)palette) + 0x14, gUnk_03004FC0, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     asm volatile("" : "+r"(resource) : "r"(p));
     graphics = p + 0x84;
     ResourceHeader_Relocate(graphics, resource);
     Widget_InitLinked(p + 0x24, graphics, 0x3A, 0x10, zero, zero, zero, zero);
     resource = ScriptProc_Start(0xCB05, 0x530D);
-    asm volatile("" : "+r"(resource) : "r"(p));
+    c1 = resource;
+    asm volatile("" : "+r"(c1) : "r"(p));
     graphics = p + 0x10C;
-    ResourceHeader_Relocate(graphics, resource);
+    ResourceHeader_Relocate(graphics, c1);
     Widget_InitLinked(p + 0xAC, graphics, 0x8A, 0x10, zero, zero, zero, zero);
     graphics = p + 0x194;
-    ResourceHeader_Relocate(graphics, resource);
+    ResourceHeader_Relocate(graphics, c1);
     Widget_InitLinked(p + 0x134, graphics, 0x47, 0x10, zero, zero, zero, zero);
     graphics = p + 0x21C;
-    ResourceHeader_Relocate(graphics, resource);
+    ResourceHeader_Relocate(graphics, c1);
     sprite = p + 0x1BC;
     Widget_InitLinked(sprite, graphics, 0x45, 0x10, zero, zero, zero, zero);
     rect.x = 0x40;
@@ -68,37 +70,38 @@ s32 Options_InitScreen(u8 *arg)
     rect.width = 0;
     Menu_SetTextRect(sprite, &rect);
     graphics = p + 0x2A4;
-    ResourceHeader_Relocate(graphics, resource);
+    ResourceHeader_Relocate(p + 0x2A4, c1);
     sprite = p + 0x244;
-    Widget_InitLinked(sprite, graphics, 0x46, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(sprite, p + 0x2A4, 0x46, 0x10, zero, zero, zero, zero);
     rect.x = 0xD8;
     rect.y = 0x60;
     rect.width = 0;
     Menu_SetTextRect(sprite, &rect);
-    W(0x13C) |= one;
-    W(0x1C4) |= one;
-    W(0x24C) |= one;
-    W(0x2DC) = W(0x17C);
+    *((u32 *)(p + 0x13C)) |= one;
+    *((u32 *)(p + 0x1C4)) |= one;
+    *((u32 *)(p + 0x24C)) |= one;
+    *((u32 *)(p + 0x2DC)) = *((u32 *)(p + 0x17C));
     graphics = p + 0x2E0;
-    CpuSet((void *)W(0x17C), graphics, 0x10);
-    W(0x17C) = (u32)graphics;
-    *(u16 *)(p + 0x16E) = 0xE010;
+    CpuSet((void *)(*((u32 *)(p + 0x17C))), graphics, 0x10);
+    *((u32 *)(p + 0x17C)) = (u32)graphics;
+    *((u16 *)(p + 0x16E)) = 0xE010;
     Menu_EraseRect(4, 4, 24, 6);
     Menu_EraseRect(4, 12, 4, 2);
     Menu_DrawStringRef(4, 4, gUnk_020002C0[0], 0);
     Menu_DrawStringRef(4, 8, gUnk_020002C0[0], 1);
     Menu_DrawStringRef(4, 12, gUnk_020002C0[0], 2);
-    W(0x20) = gUnk_020002C0[8];
+    *((u32 *)(p + 0x20)) = gUnk_020002C0[8];
     Menu_EraseRect(9, 12, 18, 2);
-    Menu_DrawStringRef(9, 12, gUnk_020002C0[1], W(0x20));
-    if (gUnk_020002C0[7] == 0 || gUnk_020002C0[6] == 2)
-        W(0x2D8) = 3;
+    Menu_DrawStringRef(9, 12, gUnk_020002C0[1], *((u32 *)(p + 0x20)));
+    if ((gUnk_020002C0[7] == 0) || (gUnk_020002C0[6] == 2))
+        *((u32 *)(p + 0x2D8)) = 3;
     else
-        W(0x2D8) = zero;
-    Menu_StartFadeIn(W(0x2D8));
-    W(0x1C) = gUnk_020002C0[6];
+        *((u32 *)(p + 0x2D8)) = zero;
+    Menu_StartFadeIn(*((u32 *)(p + 0x2D8)));
+    *((u32 *)(p + 0x1C)) = gUnk_020002C0[6];
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Options_InitScreen);
 #endif

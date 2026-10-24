@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 93.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
@@ -80,12 +80,35 @@ static inline void AddPosition(s16 *out, s16 *a, s16 *b)
     out[2] = av + c1;
 }
 
+inline static void SetPosition_UpdatePlayerDrain(s16 *out, s32 x, s32 y, s32 z)
+{
+    out[1] = y;
+    out[0] = x;
+    out[2] = z;
+}
+
+inline static void AddPosition_UpdatePlayerDrain(s16 *out, s16 *a, s16 *b)
+{
+    u16 av = a[0];
+    u16 bv = b[0];
+    typeof(bv) c1;
+    out[0] = av + bv;
+    av = a[1];
+    c1 = bv;
+    bv = b[1];
+    out[1] = av + c1;
+    av = a[2];
+    bv = b[2];
+    out[2] = av + c1;
+}
+
 void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
 {
     struct DrainActor *self = p;
     s16 initial[4];
     s16 position[4];
     s16 *initialBase;
+    s32 t1;
     {
         u32 mask = 12;
         p->flags |= mask;
@@ -94,10 +117,10 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
     if (p->pendingAnimation) {
         register u32 one asm("r5");
         p->pendingAnimation = 0;
-        SetPosition(initial, 128, 0, 128);
+        SetPosition_UpdatePlayerDrain(initial, 128, 0, 128);
         initialBase = initial;
         asm("" : "+r"(initialBase));
-        AddPosition(initial, p->position, initialBase);
+        AddPosition_UpdatePlayerDrain(initial, p->position, initialBase);
         one = 1;
         asm("" : "+r"(one));
         if (!TestFlags(&gUnk_02000580[0]->flags, 0x40000)) {
@@ -151,7 +174,8 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
                                                                  self->position, 1);
                     sub_081A6398(self);
                     Sound_PlaySongChecked(0x225);
-                    if ((!TestFlags(&gUnk_02000560, 4)) && (p->action <= 4))
+                    t1 = 4;
+                    if ((!TestFlags(&gUnk_02000560, t1)) && (p->action <= 4))
                         return;
                 }
                 p->finished = 1;
@@ -161,6 +185,7 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePlayerDrain);
 #endif

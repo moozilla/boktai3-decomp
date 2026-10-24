@@ -3,7 +3,7 @@
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
-// fuzzy: 96.9%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: collider flag-update registers and one copy of the constant 7 from sl.
 struct DisplaySequenceState {
     const u16 *commands;
@@ -93,23 +93,32 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 {
     return *p & mask;
 }
+inline static u32 TestFlag_UpdateDamageState(s16 mask, u32 *p)
+{
+    return (*p) & mask;
+}
+
 u32 EnemyF426_UpdateDamageState(struct S *p)
 {
     struct Col *c;
-    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) ||
+        TestFlag_UpdateDamageState(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->fn);
     p->spr.flags &= ~1;
     if (p->dead == 0) {
         c = &p->col;
-        c->flags &= ~4;
+        {
+            s32 v1 = c->flags & (~4);
+            c->flags = v1;
+        }
         Collider_SetPosition(c, &p->pos, 0);
     } else {
         c = &p->col;
         c->flags |= 4;
     }
     {
-        if (p->damage > 0 && !p->dead) {
+        if ((p->damage > 0) && (!p->dead)) {
             p->hp -= p->damage;
             p->hitFlags = p->colliderHitFlags;
             Sound_PlaySong(0x13e);
@@ -119,9 +128,11 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
                                        p->hudTime);
             }
             if (p->hp <= 0) {
-                struct {
-                    struct Pair a, b;
-                } spread, velocity;
+                struct _PermuterAnon1 {
+                    struct Pair a;
+                    struct Pair b;
+                } spread;
+                struct _PermuterAnon1 velocity;
                 struct Vec4 center;
                 const u16 *table;
                 u16 sample;
@@ -162,7 +173,7 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
             p->damage = 0;
         }
     }
-    if (p->flash > 0 && p->dead == 0) {
+    if ((p->flash > 0) && (p->dead == 0)) {
         AnimData_SelectPaletteBank(p->anim, 0x192);
         p->flash--;
     } else {
@@ -179,14 +190,14 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
         struct Spr *sp = &p->spr;
         struct DisplaySequenceState *s = &p->seq;
         const u16 *c = s->commands + s->index;
-        sp->frame = *c >> 6;
+        sp->frame = (*c) >> 6;
         {
             u32 flags = s->flags;
             u32 bit = 1;
             u32 lhs = bit;
             asm("" : "+r"(lhs));
             lhs &= flags;
-            if (lhs != (((*c & 0x30) >> 4) & bit))
+            if (lhs != ((((*c) & 0x30) >> 4) & bit))
                 p->spr.flags |= 4;
             else
                 p->spr.flags &= ~4;
@@ -198,14 +209,15 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
             asm("" : "+r"(lhs));
             lhs &= flags;
             asm("" : "+r"(lhs));
-            if ((u8)lhs != (((*c & 0x30) >> 4) & bit))
+            if (((u8)lhs) != ((((*c) & 0x30) >> 4) & bit))
                 sp->flags |= 8;
             else
                 sp->flags &= ~8;
         }
         {
             u32 elapsed = s->elapsed + 1;
-            u32 mask, duration;
+            u32 mask;
+            u32 duration;
             register u32 saved asm("r4");
             s->elapsed = elapsed;
             {
@@ -218,7 +230,8 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
             elapsed = (u16)elapsed;
             saved = duration;
             if (elapsed >= duration) {
-                u32 flags, idx;
+                u32 flags;
+                u32 idx;
                 s->elapsed = 0;
                 flags = s->flags;
                 if (flags & 4) {
@@ -251,7 +264,8 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
                 s->index = idx;
             frame_ready:
                 c = s->commands + s->index;
-                s->frameWeight = *(const volatile u16 *)c & 15;
+
+                s->frameWeight = (*((const volatile u16 *)c)) & 15;
                 s->duration = (s->frameWeight * s->speed) >> 6;
                 if (s->duration == 0)
                     s->duration = 1;
@@ -260,6 +274,7 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
     }
     p->timer++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", EnemyF426_UpdateDamageState);
 #endif

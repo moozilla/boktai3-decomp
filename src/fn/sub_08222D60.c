@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern s32 gUnk_03005324, gUnk_0300531C;
 extern u32 gUnk_0300172C, gUnk_03001730, gUnk_03001734;
@@ -42,11 +42,12 @@ void Serial_ServiceInterrupt(void)
 {
     u32 control;
     typeof(gUnk_03005380) t1;
+    u32 k2 = 2;
     *((volatile u16 *)0x04000120);
     gUnk_03005324 = 0;
     control = *((volatile u16 *)0x04000128);
     if ((control & 0x40) || ((control & 0xb0) == 0x80))
-        gUnk_03005324 = -2;
+        gUnk_03005324 = -k2;
     else {
         u32 bits = 0;
         u16 *receive = &gUnk_03005370[(1 - gUnk_0300172C) * 4];
@@ -61,7 +62,7 @@ void Serial_ServiceInterrupt(void)
         if (!(word & 0x8000))
             bits |= word;
         word = *((volatile u16 *)0x04000124);
-        latest[2] = word;
+        latest[k2] = word;
         if (!(word & 0x8000))
             bits |= word;
         word = *((volatile u16 *)0x04000126);
@@ -73,7 +74,7 @@ void Serial_ServiceInterrupt(void)
                 u32 pos = (gUnk_03005380 + gUnk_03005330) & 3;
                 gUnk_03005350[pos * 4] = first;
                 *((pos * 4) + (&gUnk_03005350[1])) = latest[1];
-                *((pos * 4) + (&gUnk_03005350[2])) = latest[2];
+                *((pos * 4) + (&gUnk_03005350[k2])) = latest[k2];
                 *((pos * 4) + (&gUnk_03005350[3])) = latest[3];
                 ++gUnk_03005330;
                 gUnk_0300172A = 0x4000;
@@ -92,7 +93,7 @@ void Serial_ServiceInterrupt(void)
                 } else {
                     receive[0] = first;
                     receive[1] = latest[1];
-                    receive[2] = latest[2];
+                    receive[k2] = latest[k2];
                     receive[3] = latest[3];
                 }
                 gUnk_0300172A = gUnk_03001728;
@@ -115,6 +116,7 @@ void Serial_ServiceInterrupt(void)
     }
     *((volatile u16 *)0x03007FF8) = 0x80;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Serial_ServiceInterrupt);
 #endif

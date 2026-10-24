@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.7%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 85.7%); what differs is mostly register allocation and instruction order
 #define gEffectRandomTable gUnk_0203B400
 #define gEffectRandomIndex gUnk_03005308
@@ -41,6 +41,16 @@ static inline s32 NextRandom(void)
     offset = gUnk_03005308 * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
+inline static s32 NextRandom_UpdateRadialExpiry(void)
+{
+    u32 offset;
+    do {
+        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    } while (0);
+    offset = gUnk_03005308 * 2;
+    return *((const u16 *)(offset + ((u32)gUnk_0203B400)));
+}
+
 void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffect *effect,
                                     u32 index)
 {
@@ -57,8 +67,8 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
             effect->direction = Math_Atan2(head->x - tail->x, head->z - tail->z);
         }
         for (i = 0; i <= 5; i++) {
-            effect->angles[i] = (NextRandom() & 31) + 240 + effect->direction;
-            effect->radii[i] = (NextRandom() & 15) + 24;
+            effect->angles[i] = ((NextRandom_UpdateRadialExpiry() & 31) + 240) + effect->direction;
+            effect->radii[i] = (NextRandom_UpdateRadialExpiry() & 15) + 24;
         }
     }
     ActorEffect_UpdateRadialTrail(effect);
@@ -67,6 +77,7 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
     else
         effect->timer++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorEffect_UpdateRadialExpiry);
 #endif

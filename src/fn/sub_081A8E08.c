@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: stack-vector aliases, zero lifetimes and constant scheduling.
 // confidence=low: selects a player-mode collision copy and completes a position request.
@@ -52,6 +52,30 @@ static inline void AddPosition(s16 *out, s16 *a, s16 *b)
     out[2] = a[2] + c1;
 }
 
+inline static void SetPosition_081A8E08(s16 *out, s32 x, s32 y, s32 z)
+{
+    out[1] = y;
+    out[0] = x;
+    out[2] = z;
+}
+
+inline static void AddPosition_081A8E08(s16 *out, s16 *a, s16 *b)
+{
+    s8 av = a[0];
+    u16 bv = b[0];
+    typeof(bv) c1;
+    out[0] = av + bv;
+    av = a[1];
+    do {
+        bv = b[1];
+    } while (0);
+    c1 = bv;
+    out[1] = a[1] + c1;
+    av = a[2];
+    bv = b[2];
+    out[2] = a[2] + c1;
+}
+
 void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
 {
     register struct CaptureActor *q asm("r6") = p;
@@ -67,11 +91,13 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
         u32 two;
         register u32 zero asm("r12") = 0;
         asm("" : "+r"(zero));
-        p->pendingAnimation = zero;
-        SetPosition(position, 128, 0, 128);
+        do {
+            p->pendingAnimation = zero;
+        } while (0);
+        SetPosition_081A8E08(position, 128, 0, 128);
         base = position;
         asm("" : "+r"(base));
-        AddPosition(position, p->position, base);
+        AddPosition_081A8E08(position, p->position, base);
         two = 2;
         animation = p->animation;
         drawable = p->drawable;
@@ -98,6 +124,7 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
         p->active = 1;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081A8E08);
 #endif

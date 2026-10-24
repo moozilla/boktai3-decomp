@@ -7,7 +7,7 @@
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
 #ifdef NONMATCHING
-// fuzzy: 96.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -95,28 +95,36 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
             }
             break;
         }
+
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
             asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
-                struct SceneVec *player, *base;
-                *enter = 0;
+                struct SceneVec *player;
+                struct SceneVec *base;
+                {
+                    u8 k1 = 0;
+                    *enter = k1;
+                }
                 player = Player_GetEffectivePosition(0);
-                base = *(struct SceneVec **)((u8 *)p + 0x90);
+                do {
+                    base = *((struct SceneVec **)(((u8 *)p) + 0x90));
+                } while (0);
                 Difference(&delta, player, base);
                 delta.x = TruncateShift(delta.x, 1);
                 delta.y = p->origin.y;
                 delta.z = TruncateShift(delta.z, 1);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 3);
             }
-            if (++p->timer > 16) {
+            if ((++p->timer) > 16) {
                 SetState(p, 2);
                 *enter = 1;
             }
             break;
         }
+
         case 2:
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
@@ -124,12 +132,14 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
                 p->enter = 1;
             }
             break;
+
         case 3:
-            if (++p->timer > 30) {
+            if ((++p->timer) > 30) {
                 SetState(p, 4);
                 p->enter = 1;
             }
             break;
+
         case 4: {
             struct SceneVec delta;
             entering = p->enter;
@@ -147,6 +157,7 @@ void Vanargand_UpdatePartLunge(void *unused, struct VanargandPart *p)
             }
             break;
         }
+
         case 5:
             p->finished = 1;
             break;

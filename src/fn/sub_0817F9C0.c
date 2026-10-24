@@ -74,7 +74,7 @@ void SceneActors_EmitRandomBursts(void *);
 void BossSlot2_UpdateSequencePalette(void *);
 
 #ifdef NONMATCHING
-// fuzzy: 95.2%
+// fix.py best (sweep after the inlined-insn fix)
 void BossSlot2_UpdatePresentation(u8 *p)
 {
     u8 *q = p;
@@ -84,11 +84,11 @@ void BossSlot2_UpdatePresentation(u8 *p)
     u8 *grounded;
     SceneActors_UpdateEffects(p);
     SceneActors_UpdateConvergingParticles(p);
-    if ((*(u8 *)(p + 0xab)) == 10) {
-        if (H(0x150) > 0)
-            H(0x150)--;
+    if ((*((u8 *)(p + 0xab))) == 10) {
+        if ((*((s16 *)(q + 0x150))) > 0)
+            (*((s16 *)(q + 0x150)))--;
     } else
-        H(0x150) = 0;
+        *((s16 *)(q + 0x150)) = 0;
     {
         struct A *a = (struct A *)q;
         u32 v = a->t4ee;
@@ -107,7 +107,7 @@ void BossSlot2_UpdatePresentation(u8 *p)
         Collider_SetPosition(collider, q + 0x2ec, 0);
         {
             u32 direction = sprite->direction;
-            B(0x20e) = direction;
+            *((u8 *)(q + 0x20e)) = direction;
         }
     }
     collider = (struct Collider *)(q + 0x220);
@@ -118,7 +118,7 @@ void BossSlot2_UpdatePresentation(u8 *p)
         Collider_SetPosition(collider, q + 0x2ec, 0);
         {
             u32 direction = sprite->direction;
-            B(0x262) = direction;
+            *((u8 *)(q + 0x262)) = direction;
         }
     }
     if (TestFlags(flags, 0x100000))
@@ -126,11 +126,11 @@ void BossSlot2_UpdatePresentation(u8 *p)
     else
         SpriteComponent_Suspend(q + 0x32c);
     ProximityVolume_DispatchUpdate(q + 0x428);
-    B(0x477) = ActorPosition_SaveSelectedPoint(q);
+    *((u8 *)(q + 0x477)) = ActorPosition_SaveSelectedPoint(q);
     if (TestFlags(flags, 0x200000))
-        FrostEmitter_StartEmission(*(void **)(q + 0x41c), p + 0x54);
+        FrostEmitter_StartEmission(*((void **)(q + 0x41c)), p + 0x54);
     else
-        FrostEmitter_StopEmission(*(void **)(q + 0x41c));
+        FrostEmitter_StopEmission(*((void **)(q + 0x41c)));
     if (TestFlags(flags, 0x10)) {
         hide((struct Anim *)(q + 0x2cc));
         ActorShadow_Disable(q + 0x3dc);
@@ -147,9 +147,12 @@ void BossSlot2_UpdatePresentation(u8 *p)
         unfade((struct Anim *)(q + 0x2cc));
         {
             u8 *q2 = q;
-            u32 val = *(u8 *)(p + 0xb3);
+            u32 val = *((u8 *)(p + 0xb3));
             grounded = p + 0xb3;
-            ActorShadow_Enable(val ? q2 + 0x3dc : q + 0x3dc);
+            {
+                u8 k1 = 0x3dc;
+                ActorShadow_Enable((val) ? (q2 + k1) : (q + 0x3dc));
+            }
         }
         clearCameraFlags((struct Camera *)(q + 0xc30), 1);
         if (TestFlags(flags, 0x20))
@@ -157,44 +160,45 @@ void BossSlot2_UpdatePresentation(u8 *p)
         else
             ClearColliderFlags((struct Collider *)(q + 0x1cc), 8);
     }
-    if (B(0x51f)) {
-        u32 n = B(0x51f);
-        Camera_RequestShake((s32)(n * n) >> 2);
-        B(0x51f)--;
+    if (*((u8 *)(q + 0x51f))) {
+        u32 n = *((u8 *)(q + 0x51f));
+        Camera_RequestShake(((s32)(n * n)) >> 2);
+        (*((u8 *)(q + 0x51f)))--;
     }
-    if (B(0x511)) {
-        B(0x511)--;
+    if (*((u8 *)(q + 0x511))) {
+        (*((u8 *)(q + 0x511)))--;
         SetFlags(flags, 0x20000);
     }
-    if (H(0x4ec) > 0) {
-        H(0x4ec)--;
-        if (H(0x4ec) <= 0) {
+    if ((*((s16 *)(q + 0x4ec))) > 0) {
+        (*((s16 *)(q + 0x4ec)))--;
+        if ((*((s16 *)(q + 0x4ec))) <= 0) {
             s32 k = ActorProperty_GetConstant34(q);
             if (k == 0)
-                W(0x314) = (u32)(q + 0x800);
+                *((u32 *)(q + 0x314)) = (u32)(q + 0x800);
             else if (k == 1)
-                W(0x314) = (u32)(q + 0xa00);
+                *((u32 *)(q + 0x314)) = (u32)(q + 0xa00);
             else if (k == 2)
-                W(0x314) = (u32)(q + 0xc00);
+                *((u32 *)(q + 0x314)) = (u32)(q + 0xc00);
             else
-                W(0x314) = (u32)(q + 0x600);
-            H(0x4ec) = 0;
+                *((u32 *)(q + 0x314)) = (u32)(q + 0x600);
+            *((s16 *)(q + 0x4ec)) = 0;
         }
-    } else if (B(0x506))
+    } else if (*((u8 *)(q + 0x506)))
         BossSlot2_UpdateSequencePalette(q);
-    if (!*grounded) {
-        if ((*(u8 *)(p + 0xab)) == 0xb)
+    if (!(*grounded)) {
+        if ((*((u8 *)(p + 0xab))) == 0xb)
             Camera_SetOffset(0xf, q + 0x2ec);
         else
             CameraTracking_Update(q + 0xc30);
     } else
         Camera_SetOffset(0x1e, q + 0x2ec);
-    if (*grounded && B(0x51e) && !((*(u32 *)(p + 0xe4)) & 0xf))
+    if (((*grounded) && (*((u8 *)(q + 0x51e)))) && (!((*((u32 *)(p + 0xe4))) & 0xf)))
         SceneActors_EmitRandomBursts(q);
-    (*(u32 *)(p + 0xbc)) = 0;
-    (*(u32 *)(p + 0xc0)) = 0;
-    (*(u32 *)(p + 0xe4))++;
+    *((u32 *)(p + 0xbc)) = 0;
+    *((u32 *)(p + 0xc0)) = 0;
+    (*((u32 *)(p + 0xe4)))++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdatePresentation);
 #endif

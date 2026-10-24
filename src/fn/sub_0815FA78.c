@@ -2,7 +2,7 @@
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.5%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 87.1%); what differs is mostly register allocation and instruction order
 #define PlayerOrbitEffect_MoveParticle PlayerBurst_UpdateParticle
 struct PlayerOrbitParticle {
@@ -24,14 +24,14 @@ void PlayerOrbitEffect_UpdateParticle(struct PlayerOrbitEffect *, struct PlayerO
 void PlayerBurst_UpdateParticle(struct PlayerOrbitEffect *, struct PlayerOrbitParticle *);
 void PlayerOrbitEffect_UpdateParticles(struct PlayerOrbitEffect *effect)
 {
-    s32 remaining, i;
+    s32 remaining;
+    s32 i;
     struct PlayerOrbitParticle *p = effect->particles;
     u8 *active = &p->active;
     i = 0;
-    remaining = 15;
     do {
         if (active[0]) {
-            if (--active[6] == 0) {
+            if ((--active[6]) == 0) {
                 effect->particles[i].flags |= 1;
                 active[0] = 0;
             } else if (active[7] == 0)
@@ -42,9 +42,11 @@ void PlayerOrbitEffect_UpdateParticles(struct PlayerOrbitEffect *effect)
         p++;
         active += sizeof(*p);
         i++;
-    } while (--remaining >= 0);
+    } while ((--remaining) >= 0);
+    remaining = 15;
     effect->frame++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerOrbitEffect_UpdateParticles);
 #endif

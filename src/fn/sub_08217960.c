@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
 extern s32 gUnk_03004DA0, gUnk_030051D8, gUnk_03004DA8;
@@ -55,9 +55,9 @@ void Palette_ApplyBackgroundFade(void)
             if ((gUnk_030051C4 >> i) & 1) {
                 for (j = 0; j < 16; j++) {
                     u32 c = *src;
-                    *dst =
-                        (((level * (c & 0x7c1f)) & 0xf83e0) | ((level * (c & 0x3e0)) & 0x7c00)) >>
-                        5;
+                    *dst = (((level * (c & 0x7c1f)) & 0xf83e0) |
+                            ((level * ((u16)(c & 0x3e0))) & 0x7c00)) >>
+                           5;
                     src++;
                     dst++;
                 }
@@ -81,7 +81,7 @@ void Palette_ApplyBackgroundFade(void)
             if ((gUnk_030051C4 >> i) & 1) {
                 register u32 green asm("r8") = g * other;
                 register u32 mask asm("r9") = 0x7c1f;
-                register u32 redblue asm("r7") = rb * other;
+                register u8 redblue asm("r7") = other * rb;
                 for (j = 0; j < 16; j++) {
                     u32 c = *src;
                     register u32 redTerm asm("r2") = (level * (c & mask)) + redblue;
@@ -110,6 +110,7 @@ void Palette_ApplyBackgroundFade(void)
     }
     gUnk_03004DA8 = value;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
 #endif

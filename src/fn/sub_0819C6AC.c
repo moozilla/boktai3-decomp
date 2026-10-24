@@ -45,16 +45,29 @@ static inline s32 randomValue(void)
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 #ifdef NONMATCHING
-// fuzzy: 89.7%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: inlined vector-helper register and constant lifetimes.
+inline static s32 randomValue_0819C6AC(void)
+{
+    u32 offset;
+    {
+        u16 k1 = 1023;
+        gUnk_03005308 = (gUnk_03005308 + 1) & k1;
+    }
+    offset = gUnk_03005308 * 2;
+    return *((const u16 *)(offset + ((u32)gUnk_0203B400)));
+}
+
 void Hresvelgr_SetRandomTravelTarget(struct BurstActor *actor)
 {
     struct BurstActor *saved = actor;
-    s32 radius = (randomValue() >> 3) % 512 + 256;
-    s32 sample = randomValue();
-    s32 angle = ((actor->side << 6) + ((sample >> 3) % 32 + 112)) & 255;
+    s32 radius = ((randomValue_0819C6AC() >> 3) % 512) + 256;
+    s32 sample = randomValue_0819C6AC();
+    s32 angle = ((actor->side << 6) + (((sample >> 3) % 32) + 112)) & 255;
+    typeof(saved->target) t1;
     polar(&actor->travelTarget, angle, radius);
-    add(&actor->travelTarget, saved->target, &actor->travelTarget);
+    t1 = saved->target;
+    add(&actor->travelTarget, t1, &actor->travelTarget);
     actor->travelTarget.y = 832;
 }
 

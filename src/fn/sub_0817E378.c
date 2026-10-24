@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.0%
+// fix.py best (sweep after the inlined-insn fix)
 // register allocation: flags/count pointers swap (r3/r5); asrs ok
 struct A {
     u8 pad0[0x9c];
@@ -33,13 +33,20 @@ void sub_0817E378(struct A *p)
     }
     if (p->count) {
         p->rnd = Rand16() >> 8;
+        {
+            u32 k1 = 0x20000;
+            p->flags |= k1;
+        }
         p->count--;
-        p->flags |= 0x20000;
     }
-    p->flags |= 0x400005;
+    {
+        u32 k2 = 0x400005;
+        p->flags |= k2;
+    }
     p->flags |= 0x40;
     Callback_InvokeActor(p, p->callback);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0817E378);
 #endif

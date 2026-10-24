@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: vector alias lifetimes, timer/track spills and register allocation.
 // confidence=low: starts a target-directed motion track and emits afterimages.
@@ -70,6 +70,32 @@ static inline u8 IsComplete(struct DashActor *p)
         result = 1;
     return result;
 }
+inline static void SetVector_081A9178(s16 *v, s32 x, s32 y, s32 z)
+{
+    {
+        typeof(v[0]) *q1 = &v[0];
+        *q1 = x;
+    }
+    v[1] = y;
+    v[2] = z;
+}
+
+inline static void AddVector_081A9178(s16 *v, s16 *a, s16 *b)
+{
+    u16 av = a[0];
+    s8 bv = b[0];
+    v[0] = av + bv;
+    av = b[1];
+    bv = a[1];
+    v[1] = av + bv;
+    av = a[2];
+    {
+        typeof(v[2]) *q1 = &v[2];
+        *q1 = av + bv;
+    }
+    bv = b[2];
+}
+
 void Vanargand_UpdateTargetDash(struct DashActor *p)
 {
     register struct DashActor *self asm("r10") = p;
@@ -111,7 +137,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
                 s32 dx;
                 s32 dz;
                 s16 *first;
-                SetVector(center, 640, 768, 640);
+                SetVector_081A9178(center, 640, 768, 640);
                 first = center;
                 asm("" : "+r"(first));
                 dx = first[0] - target[0];
@@ -125,7 +151,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
                     destination[1] = 0;
                     asm("" : "+r"(radius));
                     destination[2] = Scale(gUnk_086149C4[angle & 255] * radius);
-                    AddVector(destination, center, destination);
+                    AddVector_081A9178(destination, center, destination);
                     destination[1] = target[1];
                     MotionTrack_Initialize(track, p->position, destination, 0, 3);
                 }
@@ -147,6 +173,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081A9178);
 #endif

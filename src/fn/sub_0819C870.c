@@ -43,13 +43,20 @@ static inline s32 sineScale(s32 angle, s32 radius)
     return scale(gUnk_086149C4[angle & 255] * radius);
 }
 #ifdef NONMATCHING
-// fuzzy: 88.2%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: inlined vector-helper register and constant lifetimes.
+inline static void polar_0819C870(struct BurstVector *v, s32 angle, s8 radius)
+{
+    v->x = (u16)scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    v->y = 0;
+    v->z = scale(gUnk_086149C4[(u16)(angle & 255)] * radius);
+}
+
 void Hresvelgr_SetSineScaledVelocity(struct BurstActor *actor, s32 radius, s32 angle)
 {
     s32 direction = ((actor->side << 6) + 128) & 255;
     s32 speed = sineScale(angle, radius);
-    polar(&actor->velocity, direction, speed);
+    polar_0819C870(&actor->velocity, direction, speed);
 }
 
 #else

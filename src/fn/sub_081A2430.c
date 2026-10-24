@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: dispatches pending scene messages into action and animation state.
 
@@ -116,6 +116,20 @@ static inline void SetAction_1(struct Hresvelgr *p, void (*callback)(void *))
     p->phaseFrame = 0;
 }
 
+inline static void SetAction_(struct Hresvelgr *p, u8 action, void (*callback)(void *))
+{
+    p->action = action;
+    p->callback = callback;
+    {
+        typeof(p->actionFrame) *q1 = &p->actionFrame;
+        u8 z1 = 1;
+        *q1 = 0;
+        p->entered = z1;
+        p->phase = 0;
+        p->phaseFrame = 0;
+    }
+}
+
 void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
 {
     struct Hresvelgr *actor = p;
@@ -124,8 +138,9 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
     for (; i < trigger->count[gUnk_0200047C->active]; i++) {
         register void (*callback)(void *) asm("r1");
         register u32 action asm("r0");
-        struct Message *message = *(
-            (struct Message **)((((gUnk_0200047C->active << 4) + (i << 2)) + ((u8 *)trigger)) + 8));
+        s32 off1 = i << 2;
+        struct Message *message =
+            *((struct Message **)((((gUnk_0200047C->active << 4) + off1) + ((u8 *)trigger)) + 8));
         SceneMessages_SetPendingTrigger(trigger, message);
         switch (message->command) {
             case 0:
@@ -145,7 +160,7 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
                 callback = Hresvelgr_UpdateRandomAnimation;
                 action = 0x1e;
             setAction:
-                SetAction(p, action, callback);
+                SetAction_(p, action, callback);
 
                 break;
 
@@ -182,6 +197,7 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Hresvelgr_DispatchSceneMessages);
 #endif

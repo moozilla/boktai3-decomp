@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // fix.py best version (reprinted C)
 // Remaining differences: random-table constant registers (0xFFFF0000/0xFFFC/3/0x3FF),
@@ -217,6 +218,95 @@ static inline void DragonPuppy_StepAnimation_UpdateCombat(u8 *p, void *sprite, s
     }
 }
 
+static inline void DragonPuppy_StepAnimation_UpdateCombat(u8 *p, void *sprite, struct FanSeq *s)
+{
+    u32 flags;
+    u32 elapsed;
+    u32 duration;
+    register u32 mask asm("r6");
+    register u32 savedDuration asm("r4");
+    const volatile u16 *c = s->commands + s->index;
+    *(u16 *)((u8 *)sprite + 0x10) = *c >> 6;
+    {
+        u32 input = s->flags, bit = 1;
+        register u32 first asm("r2");
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != (((*c & 0x30) >> 4) & bit))
+            *(u32 *)(p + 0x24) |= 4;
+        else
+            *(u32 *)(p + 0x24) &= ~4;
+    }
+    {
+        u32 input = s->flags, bit = 2;
+        register u32 first asm("r2");
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*c & 0x30) >> 4) & bit))
+            *(u32 *)sprite |= 8;
+        else
+            *(u32 *)sprite &= ~8;
+    }
+    elapsed = s->elapsed + 1;
+    s->elapsed = elapsed;
+    {
+        register u32 temp asm("r2") = 0xffff;
+        asm("" : "+r"(temp));
+        mask = temp;
+    }
+    duration = s->duration;
+    elapsed = (u16)elapsed;
+    savedDuration = duration;
+    asm("" : "+r"(savedDuration) : "r"(elapsed));
+    if ((u16)elapsed >= duration) {
+        s->elapsed = 0;
+        flags = s->flags;
+        if (flags & 4) {
+            u32 i = s->index;
+            if (!i) {
+                {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold)
+                        s->elapsed = savedDuration;
+                    else
+                        s->index = s->count - 1;
+                }
+            } else
+                s->index = i - 1;
+        } else {
+            u32 i = s->index + 1, n;
+            s->index = i;
+            n = s->count;
+            if ((i & mask) >= n) {
+                {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if ((u8)hold) {
+                        s->elapsed = duration;
+                        s->index = n - 1;
+                    } else
+                        s->index = 0;
+                }
+            }
+        }
+        c = s->commands + s->index;
+        s->weight = *c & 15;
+        {
+            register s32 w asm("r2") = s->weight;
+            s32 speed = s->speed;
+            speed = (speed * w) >> 6;
+            s->duration = speed;
+            if (!(u8)speed)
+                s->duration = 1;
+        }
+    }
+}
+
 s32 DragonPuppy_UpdateCombat(u8 *p)
 {
     struct SceneVec position;
@@ -271,11 +361,11 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
                 velocity.x = -4;
                 table = (const u16 *)0x0203B400;
                 idxp = &gUnk_03005308;
-                asm("" : "+r"(table), "+r"(idxp));
                 {
                     u8 k1 = 0x3ff;
                     r = ((*idxp) + 1) & k1;
                 }
+                asm("" : "+r"(table), "+r"(idxp));
                 velocity.y = table[r] & 3;
                 velocity.z = -4;
                 size.x = 24;

@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: selects approach, attack and recovery behaviors along a shared X/Z axis.
 
@@ -71,7 +71,10 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
         ay = -dy;
     if (dz < 0)
         az = -dz;
-    mode = p->flags & 1;
+    {
+        u16 k3 = 1;
+        mode = p->flags & k3;
+    }
     asm("" : "+r"(mode));
     if (mode) {
         u8 *decision = &p->decision;
@@ -219,6 +222,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedAttackDecision);
 #endif

@@ -1477,7 +1477,7 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 85.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Packed playback, coordinate addressing and target-array allocation still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
@@ -1613,51 +1613,177 @@ static inline s32 GridAttack_Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
+static inline u32
+GridAttack_StepPlayback_UpdateAnimationAndTargets(struct Drawable *owner,
+                                                  struct DisplaySequenceState *state)
+{
+    struct ContactSwarmSprite *sprite = &owner->sprite;
+    const volatile u16 *command; /* preserve observed packed-command reads */
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)((u32)table + offset);
+    }
+    sprite->frame = *command >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r1");
+        register u32 maskBit asm("r3") = 1;
+        bit = maskBit;
+        first = bit;
+        first &= input;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->sprite.flags |= 4;
+        else
+            owner->sprite.flags &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        register u32 bit asm("r3");
+        register u32 first asm("r1");
+        bit = 2;
+        first = bit;
+        first &= input;
+        first = (u8)first;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->sprite.flags |= 8;
+        else
+            owner->sprite.flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 mask;
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        /* Keep the live mask distinct from its source without binding r7. */
+        asm("" : "+&r"(mask) : "r"(temp));
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                    ended = 1;
+                } else {
+                    state->index = index - 1;
+                    ended = 0;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    ended = 1;
+                } else {
+                    ended = 0;
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)((u32)table + offset);
+            }
+            state->frameWeight = *command & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
 void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
 {
     struct GridAttackActor *p = input;
     register struct GridAttackActor *base asm("sb") = p;
     struct GridAttackTransform *transform = &p->transform;
-    struct SceneVec *position = (void *)&transform->coordinates;
+    struct SceneVec *position = (void *)(&transform->coordinates);
     struct SceneVec *draw = (void *)p->drawable.position;
     s32 height;
     u32 i;
     asm("" : "+r"(p), "+r"(base));
     GridAttack_ProcessMessages(p);
     Obj_StepPosition(transform);
-    base->animationEnded = GridAttack_StepPlayback((struct Drawable *)&p->drawable, &p->animation);
+    base->animationEnded = GridAttack_StepPlayback_UpdateAnimationAndTargets(
+        (struct Drawable *)(&p->drawable), &p->animation);
     if (p->projectedDisplay)
         height = ProjectedDisplay_GetHeight(p->projectedDisplay);
     else
         height = 0;
-    (*(s16 *)((u8 *)p + 0x8A4)) = position->x;
-    (*(s16 *)((u8 *)p + 0x8A6)) = position->y + height + 128;
-    (*(s16 *)((u8 *)p + 0x8A8)) = position->z;
-    p->shadowPosition = *(struct GridAttackPoint *)draw;
+    *((s16 *)(((u8 *)p) + 0x8A4)) = position->x;
+    *((s16 *)(((u8 *)p) + 0x8A6)) = (position->y + height) + 128;
+    *((s16 *)(((u8 *)p) + 0x8A8)) = position->z;
+    p->shadowPosition = *((struct GridAttackPoint *)draw);
     if (base->flags & 0x20000) {
-        (*(s16 *)((u8 *)p + 0x8A4)) +=
+        *((s16 *)(((u8 *)p) + 0x8A4)) +=
             GridAttack_Truncate12(gUnk_086149C4[(p->shakeAngle + 64) & 255] * (p->shake << 2));
-        (*(s16 *)((u8 *)p + 0x8A8)) +=
+        *((s16 *)(((u8 *)p) + 0x8A8)) +=
             GridAttack_Truncate12(gUnk_086149C4[p->shakeAngle] * (p->shake << 2));
     }
     if (p->reactionCooldown) {
         u32 angle;
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         angle = gUnk_0203B400[gUnk_03005308];
-        (*(s16 *)((u8 *)p + 0x8A4)) +=
+        *((s16 *)(((u8 *)p) + 0x8A4)) +=
             GridAttack_Truncate12(gUnk_086149C4[(angle + 64) & 255] * (p->reactionCooldown << 2));
-        (*(s16 *)((u8 *)p + 0x8A8)) +=
+        *((s16 *)(((u8 *)p) + 0x8A8)) +=
             GridAttack_Truncate12(gUnk_086149C4[angle & 255] * (p->reactionCooldown << 2));
         p->reactionCooldown--;
     }
     SceneActors_UpdateTargetMetrics(base);
     for (i = 0; i < p->targetCount; i++) {
-        s16 *target = ((s16 **)((u8 *)base + 0x110))[i];
+        s16 *target = ((s16 **)(((u8 *)base) + 0x110))[i];
         if (target) {
             s32 x = target[0] - position->x;
             s32 z = target[2] - position->z;
-            ((u8 *)base + 0xCC)[i] = Math_Atan2(x, z);
-            ((s32 *)((u8 *)base + 0xC8))[i] = x * x + z * z;
+            do {
+                (((u8 *)base) + 0xCC)[i] = Math_Atan2(x, z);
+            } while (0);
+            do {
+                ((s32 *)(((u8 *)base) + 0xC8))[i] = (x * x) + (z * z);
+            } while (0);
         }
     }
 }

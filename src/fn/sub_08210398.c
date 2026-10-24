@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: pause branch layout, flags allocation and the defined callback return differ.
 #include "pink_spine_playback.h"
@@ -20,7 +20,9 @@ static inline u32 TestFlags(u32 *flags, u32 mask)
 }
 s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
 {
-    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, 4))
+    s32 t1;
+    t1 = 4;
+    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, t1))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;
@@ -71,6 +73,7 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
     return 0;
     p->age++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PinkSpine_UpdateDamageAnimation);
 #endif
