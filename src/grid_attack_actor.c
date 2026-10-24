@@ -224,55 +224,52 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
     p->entered = one;
 }
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Stack copy scheduling, random masks and register lifetimes still differ.
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
+static inline void GridAttack_ClearPoint(const void *source, struct GridAttackPoint *dest)
+{
+    CpuSet(source, dest, 0x05000002);
+}
+
+static inline u32 GridAttack_RandomValue(void)
+{
+    const u16 *table = gUnk_0203B400;
+    u32 *index = &gUnk_03005308;
+    *index = (*index + 1) & 1023;
+    return table[*index];
+}
+static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 random)
+{
+    u16 value = *coordinate;
+    s32 upper = ~255;
+    u32 rounded = upper & value;
+    u32 mask = 63;
+    u8 center = 128;
+    *coordinate = (rounded + ((random & mask) + center)) - 32;
+}
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
                                              struct GridAttackPoint *point, int kind)
 {
-    struct GridAttackActor *p = actor;
-    u32 zero;
+    volatile u32 zero;
     struct GridAttackPoint velocity;
     struct SceneVec position;
     struct GridAttackPoint target;
     struct GridAttackPoint original;
-    register struct GridAttackPoint *vel asm("r7") = &velocity;
+    struct GridAttackPoint *vel = &velocity;
     volatile s16 *pos;
     zero = 0;
-    CpuSet(&zero, vel, 0x05000002);
-    pos = (volatile s16 *)(&position);
+    GridAttack_ClearPoint((const void *)&zero, vel);
+    pos = (volatile s16 *)&position;
     original = *point;
-    *((struct GridAttackPoint *)(&position)) = original;
+    *(struct GridAttackPoint *)&position = original;
+    GridAttack_OffsetCoordinate(&pos[0], GridAttack_RandomValue());
+    pos[1] += 1024;
+    GridAttack_OffsetCoordinate(&pos[2], GridAttack_RandomValue());
     {
-        const u16 *table = gUnk_0203B400;
-        register u32 *randomIndex asm("r8") = &gUnk_03005308;
-        register u32 index asm("r2");
-        register s32 upper asm("r4") = ~255;
-        register u32 mask asm("r5") = 63;
-        u32 sample;
-        index = ((*randomIndex) + 1) & 1023;
-        sample = table[index];
-        {
-            u8 k2 = 128;
-            pos[0] = ((pos[0] & upper) + ((sample & mask) + k2)) - 32;
-        }
-        pos[1] += 1024;
-        index = (index + 1) & 1023;
-        *randomIndex = index;
-        sample = table[index];
-        {
-            u8 k1 = 128;
-            pos[2] = ((pos[2] & upper) + ((sample & mask) + k1)) - 32;
-        }
+        struct GridAttackPoint *dest = &target;
+        *dest = original;
+        BouncingObject_Spawn(&position, vel, dest, actor->projectileDamage, 50, kind, 0);
     }
-    target = original;
-    BouncingObject_Spawn(&position, vel, &target, p->projectileDamage, 50, kind, 0);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttackActor_SpawnTargetedProjectile);
-#endif
 
 int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
 {
