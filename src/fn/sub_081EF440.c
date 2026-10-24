@@ -2,6 +2,8 @@
 #include "global.h"
 
 // Remaining difference: the first two pointer copies use the opposite register order.
+// fix.py --allow sp_loop_weight matches it with `do { other->entered = 1; } while (0)` (loop weight
+// raises the priority of `other`); kept as a draft until a plain-C spelling does the same.
 #ifdef NONMATCHING
 struct Slot7Motion {
     u8 pad0[0xAE];

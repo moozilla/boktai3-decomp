@@ -25,24 +25,34 @@ static inline s32 Shift13(s32 v)
 // confidence=low: places six parts at fixed offsets from the anchor and sways each one in x by
 // a sine wave whose amplitude shrinks along the chain.
 #ifdef NONMATCHING
-// fuzzy: 27.1%
+// fix.py best (sweep after the inlined-insn fix)
 // The ROM reloads p->phase every iteration (not hoisted) and keeps the anchor coordinate addresses in registers.
+inline static s32 Shift5_081D3C90(s32 v)
+{
+    u32 k1;
+    return (v >= 0) ? (v >> (k1 = 5)) : (-((-v) >> k1));
+}
+
 void sub_081D3C90(struct WaveChain *p)
 {
     s32 i;
     p->phase += 0x20;
     for (i = 0; i < 6; i++) {
         s32 x = p->x + gUnk_086126CC[i * 2];
-        s32 y = p->y + gUnk_086126CC[i * 2 + 1];
+        s32 y = p->y + gUnk_086126CC[(i * 2) + 1];
         s32 z = p->z;
         s16 *position = p->parts[i].position;
         position[0] = x;
         position[1] = y;
         position[2] = z;
-        p->parts[i].position[0] +=
-            Shift13(gUnk_086149C4[(Shift5(p->phase) + i * 32) & 0xFF] * (8 - i));
+        {
+            u8 k1 = 8;
+            p->parts[i].position[0] +=
+                Shift13((k1 - i) * gUnk_086149C4[(Shift5_081D3C90(p->phase) + (i * 32)) & 0xFF]);
+        }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081D3C90);
 #endif

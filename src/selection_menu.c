@@ -452,7 +452,7 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 
 // confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
 #ifdef NONMATCHING
-// fuzzy: 59.2%
+// fix.py best (sweep after the inlined-insn fix)
 // The ROM keeps the position pointer in one register (sb) and recomputes sp + 0x14 after the loop; here it stays in a second register (sl), so an extra callee-saved register is pushed.
 void sub_0801A6D0(struct SelectionMenu *p)
 {
@@ -465,6 +465,7 @@ void sub_0801A6D0(struct SelectionMenu *p)
     struct ContactPosition *pos = &scratch.position;
     struct ContactPosition *saved;
     int clear;
+    typeof(&p->panelResource) t1;
     scratch.zero = 0;
     SelectionMenu_ClearPosition(&scratch.zero, pos);
     i = 18;
@@ -472,14 +473,20 @@ void sub_0801A6D0(struct SelectionMenu *p)
     clear = 0;
     g = &p->icons[18];
     do {
-        Widget_InitLinked(g, &p->iconResource, 0, 0x11, clear, clear, 0x3c, saved);
+        do {
+            Widget_InitLinked(g, &p->iconResource, 0, 0x11, clear, clear, 0x3c, saved);
+        } while (0);
         g--;
-        i--;
+        do {
+            i--;
+        } while (0);
     } while (i >= 0);
     saved->x = 0x20;
     scratch.position.y = 0;
-    Widget_InitLinked(&p->heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &scratch.position);
+    t1 = &p->panelResource;
+    Widget_InitLinked(&p->heading, t1, 0, 0x11, 0, 0, 0x3c, &scratch.position);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0801A6D0);
 #endif

@@ -1,7 +1,7 @@
 #include "global.h"
 // confidence=low: refreshes inventory icons and equipped-slot markers.
 #ifdef NONMATCHING
-// fuzzy: 51.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: loop induction, marker pointers and register allocation.
 struct PauseWidget {
     u8 unknown0[8];
@@ -24,12 +24,27 @@ s32 Inventory_CanAssignEquipment(u32);
 s32 Inventory_IsEquipmentAssigned(u32);
 void SceneHud_RefreshEquipmentIcons(u8 *p, u32 mode)
 {
-    s32 i, markers;
+    s32 i;
+    s32 markers;
     u32 offset;
     struct PauseWidget *widget;
     u8 *flagBase;
-    for (i = 0; i < 8; i++)
-        p[0x4D90 + i] |= 255;
+    u8 t1;
+    {
+        i = 0;
+        if (!(i < 8))
+            goto done1;
+    loop1: {
+        p[0x4D90 + i] |= (t1 = 255);
+    }
+
+        i++;
+        if (i < 8)
+            goto loop1;
+    done1:;
+
+        ;
+    }
     markers = 0;
     i = 0;
     widget = (void *)(p + 0x17E0);
@@ -41,9 +56,9 @@ void SceneHud_RefreshEquipmentIcons(u8 *p, u32 mode)
             widget->flags |= 1;
         else {
             ((struct PauseWidget *)(flagBase + 0x17E0))->flags &= ~1;
-            Anim_LoadKeyframe(p + offset + 0x17E0, p + 0xA4, (u16)(id + 0xF0), 0);
-            if ((mode == 0 && !ItemRecord_MeetsLevelRequirement(i)) ||
-                (mode == 1 && !Inventory_CanAssignEquipment(i)))
+            Anim_LoadKeyframe((p + offset) + 0x17E0, p + 0xA4, (u16)(id + 0xF0), 0);
+            if (((mode == 0) && (!ItemRecord_MeetsLevelRequirement(i))) ||
+                ((mode == 1) && (!Inventory_CanAssignEquipment(i))))
                 PauseMenu_SetSpritePalette(widget, 0x374);
             else
                 PauseMenu_SetSpritePalette(widget, 0x373);
@@ -56,7 +71,7 @@ void SceneHud_RefreshEquipmentIcons(u8 *p, u32 mode)
             }
         }
         widget++;
-        offset += 0x60;
+        offset += t1 - 159;
         flagBase += 0x60;
         i++;
     } while (i <= 15);

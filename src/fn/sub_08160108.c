@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 56.8%
+// fix.py best (sweep after the inlined-insn fix)
 struct BurstPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -50,20 +50,22 @@ static inline s32 Truncate(s32 value)
 #define PlayerBurst_InitializeParticles sub_08160108
 void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
 {
-    const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+    const u16 *table = (const u16 *)0x0203B400;
     u32 initial = RandomValue(table) & 255;
     struct BurstRecord *particle;
     struct BurstData *data;
     s32 i;
     u32 phase = 0;
+    typeof(i++) t1;
     p->sheet = AnimData_FindEntry(0x1C1E);
     particle = p->particles;
     data = &particle->data;
-    for (i = 0; i <= 15; i++, phase += 16, particle++, data = (void *)((u8 *)data + 0x3C)) {
+    t1 = i++;
+    for (i = 0; i <= 15; t1, phase += 16, particle++, data = (void *)(((u8 *)data) + 0x3C)) {
         ParticleSprite_Initialize(particle, p->sheet, 0);
         Effect_SetOrigin(particle, -4, -4);
         Effect_SetPalette(particle, 1);
-        data->angle = initial + phase + (RandomValue(table) & 7);
+        data->angle = (initial + phase) + (RandomValue(table) & 7);
         data->period = (RandomValue(table) & 3) + 7;
         data->radius = ((RandomValue(table) >> 3) & 0x5F) + 0x60;
         data->variant = ((i & 3) << 1) + 1;
@@ -74,7 +76,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         }
         data->position.y = p->owner->position.y;
         data->position.z =
-            p->owner->position.z + Truncate(gUnk_086149C4[data->angle] * data->radius);
+            p->owner->position.z + Truncate(data->radius * gUnk_086149C4[data->angle]);
         particle->priority = 2;
         data->attribute = 0xEC;
         data->frame = RandomValue(table) & 7;
@@ -88,6 +90,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         data->active = 1;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08160108);
 #endif
