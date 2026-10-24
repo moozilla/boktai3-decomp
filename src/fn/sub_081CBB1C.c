@@ -1,75 +1,152 @@
-#include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 70.8%
-// fix.py best version (reprinted C)
-// register allocation: the original keeps pos/target/heading/velocity in r6/r8/sb/sl
-struct Vec081CBB1C {
+#include "global.h"
+
+struct Vec {
     s16 x, y, z, pad;
 };
-struct Pair081CBB1C {
-    u32 a, b;
+struct Actor {
+    u8 pad0[7];
+    u8 done;
+    u8 pad8[1];
+    u8 entered;
+    u8 pada[4];
+    u16 flags;
+    u8 pad10[8];
+    u8 phase;
+    u8 facing4;
+    u8 facing8;
+    u8 targetAngle;
+    u8 pad1c[56];
+    struct Vec target;
+    u8 body[9];
+    u8 angle;
+    u8 pad66[2];
+    struct Vec pos;
+    struct Vec velocity;
+    u8 pad78[92];
+    u32 drawable;
+    u8 padd8[80];
+    struct Vec *sourcePos;
+    u8 pad12c[52];
+    struct Vec *drawPos;
+    u8 pad164[164];
+    int speed;
+    u32 speedSquared;
+    u8 pad210[212];
+    int (*callback)(struct Actor *);
 };
+struct Map {
+    u32 pad;
+    u8 *cells;
+    u8 pad8[28];
+    u16 rows[1];
+};
+extern struct Map *gUnk_030052F4;
+extern u32 gUnk_030052F8, gUnk_030052FC;
+u8 *TerrainModifiers_FindCellOverride(int, int);
 extern const s16 gUnk_086149C4[];
-u8 Math_Atan2(s32, s32);
-static inline s32 shift12(s32 x)
+int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
+void Actor_PlayFootstepSound(struct Actor *, int);
+void DisplayAnimation_SetFlags(void *, int);
+void DisplayAnimation_ClearFlags(void *, int);
+void DisplayAnimation_SetPalette(void *, int, int, int);
+void Sound_PlaySong(int);
+int Math_Atan2(int, int);
+static inline int scale(int v)
 {
-    u32 k1;
-    if (x >= 0)
-        return x >> (k1 = 12);
-    return -((-x) >> k1);
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
 }
+static inline u8 *cell(int i)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
+    if (p)
+        return p + 4;
+    return gUnk_030052F4->cells + 12 + i * 4;
+}
+static inline int height(struct Vec *pos)
+{
+    int x = pos->x >> 8, z = pos->z >> 8, index;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        index = 0;
+    else
+        index = gUnk_030052F4->rows[z] + x;
+    return (*cell(index) & 15) << 8;
+}
+// confidence=low: SceneActorAnimation_UpdateWalkToPosition (sub_0802EA90) without the entry animation,
+// callback test or footsteps; it moves by the new velocity itself.
+void sub_081CBB1C(void *unused, struct Actor *arg)
+{
+    struct Actor *p = arg;
+    if (p->entered) {
+        int zero = 0;
+        p->entered = zero;
+        p->done = zero;
+    }
+    {
+        struct Vec *pos = &p->pos;
+        struct Vec *target = &p->target;
+        int dx = target->x - pos->x;
+        int dz = target->z - pos->z;
+        u32 distance = dx * dx + dz * dz;
+        u32 limit = p->speedSquared;
+        struct Vec *savedPos = pos;
+        struct Vec *savedTarget = target;
 
-static inline void Polar(struct Vec081CBB1C *v, u32 angle, s32 speed)
-{
-    v->x = shift12(speed * gUnk_086149C4[(angle + 64) & 255]);
-    v->y = 0;
-    v->z = shift12(speed * gUnk_086149C4[angle]);
-}
-/* Walk toward the target at +0x54: snap and finish when within the squared
- * radius at +0x20C, else step along the heading and turn toward the target. */
-void sub_081CBB1C(u8 *a, u8 *input)
-{
-    register u8 *b asm("r5") = input;
-    struct Vec081CBB1C *pos;
-    struct Vec081CBB1C *target;
-    struct Vec081CBB1C *vel;
-    register struct Vec081CBB1C *savedPos asm("r6");
-    register struct Vec081CBB1C *savedTarget asm("r8");
-    u32 distance;
-    u32 limit;
-    u8 *heading;
-    s32 dx;
-    s32 dz;
-    typeof(*heading) t1;
-    if (b[9]) {
-        b[9] = 0;
-        b[7] = 0;
+        if (distance <= limit) {
+            p->pos = p->target;
+            p->done = 1;
+        } else {
+            u8 *ap = &p->angle;
+            struct Vec *vel = &p->velocity;
+            int angle = *ap;
+            int speed = p->speed;
+
+            s32 product = speed * gUnk_086149C4[(angle + 64) & 255];
+            u8 *savedAngle = ap;
+            struct Vec *savedVel = vel;
+
+            vel->x = scale(product);
+            vel->y = 0;
+            vel->z = scale(speed * gUnk_086149C4[angle]);
+            {
+                struct Vec *target = savedTarget;
+                s32 x;
+                struct Vec *pos;
+                s32 z;
+
+                x = target->x;
+                pos = savedPos;
+
+                x -= pos->x;
+
+                z = target->z - pos->z;
+                p->targetAngle = Math_Atan2(x, z);
+            }
+            {
+                int value = p->targetAngle;
+                u8 *out = savedAngle;
+
+                *out = value;
+                {
+                    register s32 shifted asm("r2") = value + 112;
+                    s32 mask;
+                    asm("" : "+r"(shifted));
+                    shifted >>= 5;
+                    mask = 7;
+                    p->facing8 = mask & shifted;
+                }
+                {
+                    s32 mask;
+                    s32 shifted = (value + 96) >> 6;
+                    mask = 3;
+                    mask &= shifted;
+                    p->facing4 = mask;
+                }
+            }
+            savedPos->x += savedVel->x;
+            p->pos.z += p->velocity.z;
+        }
     }
-    pos = (struct Vec081CBB1C *)(b + 0x68);
-    target = (struct Vec081CBB1C *)(b + 0x54);
-    dx = target->x - pos->x;
-    dz = target->z - pos->z;
-    distance = (((u32)dx) * dx) + (((u32)dz) * dz);
-    limit = *((u32 *)(b + 0x20C));
-    savedPos = pos;
-    savedTarget = target;
-    if (distance <= limit) {
-        *((struct Pair081CBB1C *)pos) = *((struct Pair081CBB1C *)target);
-        b[7] = 1;
-        return;
-    }
-    heading = b + 0x65;
-    vel = (struct Vec081CBB1C *)(b + 0x70);
-    t1 = *heading;
-    Polar(vel, t1, *((s32 *)(b + 0x208)));
-    b[0x1b] = Math_Atan2(target->x - savedPos->x, target->z - savedPos->z);
-    *heading = b[0x1b];
-    b[0x1a] = ((b[0x1b] + 0x70) >> 5) & 7;
-    b[0x19] = ((b[0x1b] + 0x60) >> 6) & 3;
-    savedPos->x += vel->x;
-    savedPos->z += vel->z;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081CBB1C);
-#endif
