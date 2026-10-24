@@ -18,36 +18,35 @@ s32 Div(s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 // confidence=low: pulls each live spark toward the target by 1/(9 - t) of the gap per frame,
 // switches it to frame 9 at tick 4 and hides it after tick 5.
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// The ROM steps a separate s16 pointer through x, y, z and spills i to the stack; this C folds the steps into offsets.
+static inline s16 *AdvanceCoordinate(s16 *position, struct HomingSparkSet *p, s32 axis, s32 weight,
+                                     s32 divisor)
+{
+    s32 product = *position * weight;
+    s16 *target = &p->targetX;
+    *position = Div(product + target[axis], divisor);
+    return position + 1;
+}
+
 void sub_0823350C(struct HomingSparkSet *p)
 {
-    s8 i;
-    u32 k1 = 8;
-    for (i = 0; i < k1; i++) {
-        if (p->sparks[i].active) {
-            if ((++p->sparks[i].timer) > 5) {
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        /* The first spark in this view is the indexed spark in the set. */
+        struct HomingSparkSet *slot = (void *)((u8 *)p + i * sizeof(struct HomingSpark));
+        if (slot->sparks[0].active) {
+            if ((++slot->sparks[0].timer) > 5) {
                 p->sparks[i].flags |= 1;
-                p->sparks[i].active = 0;
+                slot->sparks[0].active = 0;
             } else {
-                s32 weight = k1 - p->sparks[i].timer;
+                s32 weight = 8 - slot->sparks[0].timer;
                 s32 divisor = weight + 1;
-                s16 *position = &p->sparks[i].x;
-                do {
-                    position[0] = Div((position[0] * weight) + p->targetX, divisor);
-                } while (0);
-                position++;
-                position[0] = Div((position[0] * weight) + p->targetY, divisor);
-                position++;
-                position[0] = Div((position[0] * weight) + p->targetZ, divisor);
-                if (p->sparks[i].timer == 4)
+                s16 *position = &slot->sparks[0].x;
+                position = AdvanceCoordinate(position, p, 0, weight, divisor);
+                position = AdvanceCoordinate(position, p, 1, weight, divisor);
+                AdvanceCoordinate(position, p, 2, weight, divisor);
+                if (slot->sparks[0].timer == 4)
                     SpriteDrawable_SelectTileFrame(&p->sparks[i], p->frames, 9);
             }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823350C);
-#endif
