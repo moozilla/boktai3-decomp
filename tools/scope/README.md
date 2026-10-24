@@ -221,7 +221,12 @@ Artifacts in `build/scope/FUNC/`: `diff.txt` (whole aligned listing),
 `CSE_DEBUG` land here). ROM symbols and the function inventory are cached in
 `build/scope/cache/`.
 
-Knobs of the instrumented compiler (`tools/agbcc-instr.sh`): `CSE_NOCANON=N`
+Knobs of the instrumented compiler (`tools/agbcc-instr.sh`): `AGBCC_NOGIV=U1,U2` /
+`AGBCC_GIV=U1,U2` (loop.c: keep the giv set by insn U unreduced / reduce it anyway;
+`AGBCC_LOOP_TRACE=1` lists each giv with `fn=`, type, benefit and decision; added after
+sub_0803D430's worker asked for a strength-reduction explainer, where NOGIV=66 alone takes
+26 to 23 ROM insns; no-knob output identical on 400 loop units and 458 NONMATCHING files),
+`CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
 `CSE_DEBUG=N` (trace `make_regs_eqv` for new >= N), `CSE_PATH=1` (trace each
 jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),

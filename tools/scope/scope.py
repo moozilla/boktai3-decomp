@@ -1596,16 +1596,17 @@ def cmd_spill(src, func, env):
 
 
 def cmd_probe(src, func, env):
-    """Which cse / gcse decision is the difference? One traced compile lists the decisions: pseudos
+    """Which cse / gcse / loop decision is the difference? One traced compile lists the decisions: pseudos
     make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
-    target (CSE_NOFOLLOW), computations gcse's PRE replaces with a copy (AGBCC_NOPRE). Then each is
+    target (CSE_NOFOLLOW), computations gcse's PRE replaces with a copy (AGBCC_NOPRE), induction
+    values loop.c strength-reduces or not (AGBCC_NOGIV / AGBCC_GIV). Then each is
     flipped alone; a flip that matches or lowers the count names the decision (rtlprobe.py's
     canon / follow / pre, inside scope's loop and with its counts)."""
     base, info = score(src, func, env)
     wd = info["wd"]
     tr = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "u.i", "-o", "/dev/null"], cwd=wd,
                         capture_output=True, text=True,
-                        env=dict(os.environ, CSE_DEBUG="1", CSE_PATH="1", AGBCC_PRE_TRACE="1",
+                        env=dict(os.environ, CSE_DEBUG="1", CSE_PATH="1", AGBCC_PRE_TRACE="1", AGBCC_LOOP_TRACE="1",
                                  **{k: v for k, v in info["env"].items()})).stderr
     heads, copied = set(), {}
     for m in re.finditer(r"eqv new=(\d+) old=(\d+) first=(\d+) newlast=(\d+) newfirst=(\d+) "
@@ -1617,6 +1618,11 @@ def cmd_probe(src, func, env):
     follows = {int(m.group(1)): int(m.group(2))
                for m in re.finditer(r"follow k=(\d+) pass=1 jump=\d+ label=\d+ line=(\d+)", tr)}
     pres = [int(m.group(1)) for m in re.finditer(r"pre k=(\d+) insn=(\d+) expr=\d+", tr)]
+    fnames = (func, rom_name(src, func))
+    givs = {}  # insn uid -> (addr|reg, reduced?) for loop strength reduction in this function
+    for m in re.finditer(r"giv fn=(\w+) insn=(\d+) type=(\w+) (?:benefit=-?\d+ lifetime=\d+ )?reduce=(\w+)", tr):
+        if m.group(1) in fnames:
+            givs[int(m.group(2))] = (m.group(3), m.group(4) in ("1", "combined"))
     names = pseudo_names(wd, info["obj_name"])
     lines = uid_lines(wd)
     rtl = open(os.path.join(wd, "u.i.rtl")).read()
@@ -1660,10 +1666,15 @@ def cmd_probe(src, func, env):
     cands = ([("CSE_NOCANON", str(n), who(n) + (f", made canonical over {who(copied[n])}" if n in copied else ""))
               for n in sorted(heads)]
              + [("CSE_NOFOLLOW", str(k), f"cse follow of the jump at line {ln}") for k, ln in sorted(follows.items())]
-             + [("AGBCC_NOPRE", str(k), f"PRE replacement {k}") for k in pres])
+             + [("AGBCC_NOPRE", str(k), f"PRE replacement {k}") for k in pres]
+             + [("AGBCC_NOGIV" if red else "AGBCC_GIV", str(u),
+                 f"loop strength reduction of the {'address' if t == 'addr' else 'value'} computed at line"
+                 f" {lines.get(u, '?')} (insn {u}, {'reduced' if red else 'not reduced'})")
+                for u, (t, red) in sorted(givs.items())])
     budget = int(os.environ.get("SCOPE_PROBE_MAX", "150"))
     print(f"{func}: {info.get('counts') or base} differ; {len(heads)} cse canonical-register choices,"
           f" {len(follows)} cse jump follows, {len(pres)} PRE replacements"
+          + f", {len(givs)} loop induction values"
           + (f"; trying the first {budget} (SCOPE_PROBE_MAX=N)" if len(cands) > budget else ""))
     hits = []
     for knob, val, what in cands[:budget]:
@@ -1680,10 +1691,17 @@ def cmd_probe(src, func, env):
                            " another mode (a `(u8)` narrow constant), or recompute it after the branch.",
            "AGBCC_NOPRE": "gcse found this computation redundant and reused an earlier register. The"
                           " ROM recomputed it: spell it differently (another base or offset form) so"
-                          " PRE does not see the same expression."}
+                          " PRE does not see the same expression.",
+           "AGBCC_NOGIV": "loop.c turned this per-iteration computation into its own register stepped"
+                          " each pass (strength reduction; often a post-increment address). The ROM"
+                          " recomputes it from the index: in C index the array where it is used"
+                          " (base[i], base + i * size) instead of walking a pointer, keep one loop"
+                          " counter, or make the step not a constant multiple of the counter.",
+           "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
+                        " it. In C walk a pointer (p++ / p += size) instead of indexing."}
     score(src, func, env)  # leave the workdir's dumps at the unmodified draft
     if not hits:
-        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse decision changes the count;"
+        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
               " the difference is elsewhere (allocation: why; reload: spill).")
         return 0
     hits.sort()

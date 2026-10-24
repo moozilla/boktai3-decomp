@@ -47,7 +47,7 @@ Other commands:
 scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
 scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
-scope.py FILE.c probe               is it one cse/gcse decision? flips each alone (SCOPE_PROBE_MAX=150 compiles)
+scope.py FILE.c probe               is it one cse/gcse/loop decision? flips each alone (SCOPE_PROBE_MAX=150 compiles)
 scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
@@ -105,6 +105,9 @@ register canonical in cse).
   Run `probe`: threading usually depends on cse's canonical register
   (`CSE_NOCANON=N` matches), which means an inline helper's return value outlives the
   value it was copied from; probe prints the C lines that set both.
+* **A loop walks a pointer where the ROM indexes (or the reverse):** probe also flips loop.c's
+  strength reduction of each induction value (`AGBCC_NOGIV=UID` keeps it recomputed from the
+  index, `AGBCC_GIV=UID` steps it); a hit names the C line. `AGBCC_LOOP_TRACE=1` lists them.
 * **Expression shape with no `why` answer:** run `probe` before trying C forms; a
   matching `CSE_NOFOLLOW` or `AGBCC_NOPRE` says which cse/gcse decision it is.
 * **Reload rotation:** if `spill` says the difference is only reload's

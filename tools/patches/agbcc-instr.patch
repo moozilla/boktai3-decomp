@@ -1303,3 +1303,76 @@
      }
  
      if (optimize >= 3)
+--- a/loop.c
++++ b/loop.c
+@@ -308,6 +308,30 @@
+ static void add_label_notes (rtx, rtx);
+ static void move_movables (struct movable *, int, int, rtx, rtx, int);
+ static int count_nonfixed_reads (rtx);
++/* Instrumentation: AGBCC_NOGIV=U1,U2 keeps the giv computed by insn U from being
++   strength reduced (it is recomputed from the biv instead); AGBCC_GIV=U1,U2
++   reduces it even when it is not worth while; AGBCC_LOOP_TRACE=1 lists each
++   candidate giv and the decision to stderr.  */
++extern char *current_function_name;
++
++static int
++uid_listed (const char *list, int uid)
++{
++  const char *p = list;
++  if (! p)
++    return 0;
++  while (*p)
++    {
++      if (atoi (p) == uid)
++	return 1;
++      while (*p && *p != ',')
++	p++;
++      if (*p == ',')
++	p++;
++    }
++  return 0;
++}
++
+ static void strength_reduce (rtx, rtx, rtx, int, rtx, rtx, rtx, int, int);
+ static void find_single_use_in_loop (rtx, rtx, varray_type);
+ static int valid_initial_value_p (rtx, rtx, int, rtx);
+@@ -4533,6 +4557,12 @@
+ 	{
+ 	  struct induction *tv;
+ 
++	  if (v->same && uid_listed (getenv ("AGBCC_NOGIV"), INSN_UID (v->insn)))
++	    v->same = 0;  /* un-combine it, so the forced keep below applies */
++	  if ((v->ignore || v->same) && getenv ("AGBCC_LOOP_TRACE"))
++	    fprintf (stderr, "giv fn=%s insn=%d type=%s reduce=%s\n", current_function_name, INSN_UID (v->insn),
++		     v->giv_type == DEST_ADDR ? "addr" : "reg",
++		     v->same ? "combined" : "0 ignored");
+ 	  if (v->ignore || v->same)
+ 	    continue;
+ 
+@@ -4591,8 +4621,25 @@
+ 	     of such giv's whether or not we know they are used after the loop
+ 	     exit.  */
+ 
++	  if (uid_listed (getenv ("AGBCC_NOGIV"), INSN_UID (v->insn)))
++	    {
++	      if (getenv ("AGBCC_LOOP_TRACE"))
++		fprintf (stderr, "giv fn=%s insn=%d type=%s benefit=%d lifetime=%d reduce=0 forced\n",
++			 current_function_name, INSN_UID (v->insn), v->giv_type == DEST_ADDR ? "addr" : "reg",
++			 benefit, v->lifetime);
++	      v->ignore = 1;
++	      all_reduced = 0;
++	      continue;
++	    }
++	  if (getenv ("AGBCC_LOOP_TRACE"))
++	    fprintf (stderr, "giv fn=%s insn=%d type=%s benefit=%d lifetime=%d reduce=%d\n",
++		     current_function_name, INSN_UID (v->insn), v->giv_type == DEST_ADDR ? "addr" : "reg",
++		     benefit, v->lifetime,
++		     flag_reduce_all_givs || bl->reversed
++		     || v->lifetime * threshold * benefit >= insn_count
++		     || uid_listed (getenv ("AGBCC_GIV"), INSN_UID (v->insn)));
+ 	  if ( ! flag_reduce_all_givs && v->lifetime * threshold * benefit < insn_count
+-	      && ! bl->reversed )
++	      && ! bl->reversed && ! uid_listed (getenv ("AGBCC_GIV"), INSN_UID (v->insn)))
+ 	    {
+ 	      if (loop_dump_stream)
+ 		fprintf (loop_dump_stream,
