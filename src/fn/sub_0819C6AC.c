@@ -1,5 +1,7 @@
 #include "global.h"
 
+// MATCHING_CONCESSION: register-pinning
+
 // confidence=low: stores a randomized elevated travel point in the actor.
 #define Hresvelgr_SetRandomTravelTarget sub_0819C6AC
 struct BurstVector {
@@ -37,27 +39,30 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
-static inline s32 randomValue(void)
+static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + (u32)table);
 }
-#ifdef NONMATCHING
-// fuzzy: 89.7%
-// Remaining differences: inlined vector-helper register and constant lifetimes.
+// The table pin is the one concession (as in Hresvelgr_EmitRandomMotionBurst):
+// unpinned, the table loses r4 to the 1023 mask constant (priority 576 vs
+// 789; AGBCC_PRI=26:+214 matches). See tools/scope/README.md.
 void Hresvelgr_SetRandomTravelTarget(struct BurstActor *actor)
 {
     struct BurstActor *saved = actor;
-    s32 radius = (randomValue() >> 3) % 512 + 256;
-    s32 sample = randomValue();
-    s32 angle = ((actor->side << 6) + ((sample >> 3) % 32 + 112)) & 255;
+    register const u16 *table asm("r4") = gUnk_0203B400;
+    s32 radius = (randomValue(table) >> 3) % 512 + 256;
+    s32 sample = randomValue(table);
+    s32 base = actor->side << 6;
+    s32 offset = (sample >> 3) % 32 + 112;
+    s32 angle = base + offset;
+    angle &= 255;
     polar(&actor->travelTarget, angle, radius);
-    add(&actor->travelTarget, saved->target, &actor->travelTarget);
+    {
+        struct BurstVector *target = saved->target;
+        add(&actor->travelTarget, target, &actor->travelTarget);
+    }
     actor->travelTarget.y = 832;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0819C6AC);
-#endif
