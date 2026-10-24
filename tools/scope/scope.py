@@ -132,6 +132,13 @@ def compile_draft(src, func, env=None):
     wd = workdir(func)
     defines = build.DEFINES + ["-DNONMATCHING"]
     pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
+    tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
+    if tf:  # a what-if over the preprocessed source: a module with transform(text) -> text
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("scope_transform", os.path.join(ROOT, tf))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        pre = mod.transform(pre)
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
