@@ -1,4 +1,6 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#define FIELD_OFFSET(type, field) ((u32) & ((type *)0)->field)
 // confidence=low: BossSlot2 late per-frame update: collider/shadow/camera flags and shake counters.
 #define H(o) (*(s16 *)(q + (o)))
 #define U(o) (*(u16 *)(q + (o)))
@@ -73,8 +75,6 @@ void CameraTracking_Update(void *);
 void SceneActors_EmitRandomBursts(void *);
 void BossSlot2_UpdateSequencePalette(void *);
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
 void BossSlot2_UpdatePresentation(u8 *p)
 {
     u8 *q = p;
@@ -133,23 +133,32 @@ void BossSlot2_UpdatePresentation(u8 *p)
         FrostEmitter_StopEmission(*(void **)(q + 0x41c));
     if (TestFlags(flags, 0x10)) {
         hide((struct Anim *)(q + 0x2cc));
-        ActorShadow_Disable(q + 0x3dc);
+        ActorShadow_Disable(&((struct A *)q)->shadow);
         clearCameraFlags((struct Camera *)(q + 0xc30), 1);
         ClearColliderFlags((struct Collider *)(q + 0x1cc), 8);
         grounded = p + 0xb3;
     } else if (TestFlags(flags, 0x40000)) {
         fade((struct Anim *)(q + 0x2cc));
-        ActorShadow_Disable(q + 0x3dc);
+        ActorShadow_Disable(&((struct A *)q)->shadow);
         clearCameraFlags((struct Camera *)(q + 0xc30), 1);
         ClearColliderFlags((struct Collider *)(q + 0x1cc), 8);
         grounded = p + 0xb3;
     } else {
         unfade((struct Anim *)(q + 0x2cc));
         {
-            u8 *q2 = q;
+            struct A *shadowActor = (struct A *)q;
             u32 val = *(u8 *)(p + 0xb3);
+            u8 *shadow;
             grounded = p + 0xb3;
-            ActorShadow_Enable(val ? q2 + 0x3dc : q + 0x3dc);
+            if (val)
+                shadow = &shadowActor->shadow;
+            else {
+                u32 shadowOffset = FIELD_OFFSET(struct A, shadow);
+                /* Keep this offset out of reload; r0 holds the resulting address. */
+                asm("" : "+r"(shadowOffset) : : "r0");
+                shadow = q + shadowOffset;
+            }
+            ActorShadow_Enable(shadow);
         }
         clearCameraFlags((struct Camera *)(q + 0xc30), 1);
         if (TestFlags(flags, 0x20))
@@ -195,6 +204,3 @@ void BossSlot2_UpdatePresentation(u8 *p)
     (*(u32 *)(p + 0xc0)) = 0;
     (*(u32 *)(p + 0xe4))++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdatePresentation);
-#endif
