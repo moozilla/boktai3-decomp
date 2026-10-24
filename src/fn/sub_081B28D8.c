@@ -7,9 +7,6 @@
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
-#ifdef NONMATCHING
-// fuzzy: 99.9%
-// Remaining differences: two register copies are scheduled in the opposite order in state four.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -127,7 +124,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        register u32 mask;
         register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -188,10 +185,11 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                register s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed *= weight;
+                speed >>= 6;
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
@@ -207,7 +205,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
 void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
     u8 *enter;
-    register u32 entering asm("r1");
+    register u32 entering;
     u32 mask = 0x20;
     p->flags |= mask;
     if (p->reset) {
@@ -220,7 +218,6 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
         case 0: {
             struct SceneVec delta;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
 
             if (entering) {
@@ -229,9 +226,8 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
                 AddVector(&delta, &p->origin, &delta);
                 {
                     void *data = *(void **)(boss + 0x4d0);
-                    register u32 flip asm("r9") = 4;
+                    register u32 flip = 4;
                     struct DisplaySequenceState *seq;
-                    asm("" : "+r"(flip));
                     seq = &p->sequence;
                     Anim_SetSequence(seq, data, 7, (u8)p->variant, flip);
                     StepPlayback(p, &p->sequence, p, 1, flip);
@@ -249,7 +245,6 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
 
             if (entering) {
@@ -267,7 +262,6 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
         }
         case 2:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
 
             if (entering) {
@@ -301,8 +295,15 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
         case 4: {
             u32 entering;
-            SetFlags(p, 8);
+            u32 *flags;
+            /* Keep the flags address for the update after the entry effect. */
+            {
+                u32 mask = 8;
+                u32 *initialFlags = &p->flags;
+                *initialFlags |= mask;
+            }
             entering = p->enter;
+            flags = &p->flags;
             enter = &p->enter;
 
             if (entering) {
@@ -316,7 +317,10 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             if (!(p->timer & 15) && p->timer <= 44)
                 AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4,
                                             4, 4, 4);
-            SetFlags(p, 128);
+            {
+                u32 mask = 128;
+                *flags |= mask;
+            }
             if (++p->timer > 89) {
                 SetState(p, 5);
                 *enter = 1;
@@ -327,7 +331,6 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             struct SceneVec delta;
             SetFlags(p, 8);
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
 
             if (entering) {
@@ -348,7 +351,3 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartGroundStrike);
-#endif
