@@ -34,6 +34,12 @@ the way it did. Work from those explanations; do not try C forms blindly.
    shorter life for a named value, a different operand order, a different
    type, a value computed earlier or later). Re-run step 1. Keep a short log
    of what each change did to the count of differing insns.
+5. **Changes interact.** A change that fixes what `why` diagnosed can leave
+   the count unchanged while another difference hides its effect (a shape
+   fix whose hunk is still wrong because of allocation). Keep a change
+   `why` asked for unless it makes the count worse, and stack the next one
+   on top; `A.c vs B.c` shows what moved. Matches usually need two or three
+   such changes together.
 
 Other commands:
 
