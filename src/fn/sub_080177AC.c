@@ -1,4 +1,5 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: creates weather particles with two terrain-adjusted endpoints.
 #define Weather_SpawnTerrainParticles sub_080177AC
 struct Vec {
@@ -37,9 +38,6 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_LinkToList(void *, u32);
 s32 Mod(s32, s32);
-#ifdef NONMATCHING
-// fuzzy: 82.0%
-// Loop counter spills, setup order, and register choices still differ.
 static inline u32 Random(void)
 {
     u32 n = (gUnk_03005308 + 1) & 0x3ff;
@@ -73,12 +71,12 @@ static inline s32 GroundHeight(struct Vec *position, s16 x, s16 z)
     }
     return height;
 }
-#define RandomAt(table)                                                                            \
-    ({                                                                                             \
-        u32 n = (gUnk_03005308 + 1) & 0x3ff;                                                       \
-        gUnk_03005308 = n;                                                                         \
-        (table)[n];                                                                                \
-    })
+static inline u32 RandomAt(u16 *table)
+{
+    u32 n = (gUnk_03005308 + 1) & 0x3ff;
+    gUnk_03005308 = n;
+    return table[n];
+}
 static inline void SetPoint(struct Part *out, struct Part *sample, struct Camera *camera, u32 index)
 {
     register u16 *table asm("r3") = RANDOM_TABLE;
@@ -102,22 +100,26 @@ s32 Weather_SpawnTerrainParticles(struct Weather *p, s32 count, s32 delay, s32 d
 {
     struct Camera *camera = gUnk_02000580;
     s32 i;
+    u16 *timer;
+    u32 remaining;
     if (Weather_TestFlags(p->flags, 4))
         return 0;
-    if (p->delay) {
-        p->delay--;
+    remaining = p->delay;
+    timer = &p->delay;
+    if (remaining) {
+        *timer = remaining - 1;
         return 0;
     }
     for (i = 0; i < count;) {
         struct Part *sample = p->parts;
-        struct Part *e = sample;
-        s32 j;
-        i++;
-        asm("" : "+r"(i));
-        for (j = 0; j < 32; j++, e++, sample++) {
+        struct Part *e;
+        s32 j = 0;
+        s32 next = i + 1;
+        e = sample;
+        for (; j < 32; j++, e++, sample++) {
             if (!e->active) {
                 u8 *drawable;
-                register u32 one asm("r4");
+                u32 one;
                 e->c = 0;
                 e->b = 0;
                 e->selected = 0;
@@ -127,7 +129,6 @@ s32 Weather_SpawnTerrainParticles(struct Weather *p, s32 count, s32 delay, s32 d
                 *(struct Vec *)(e->drawable + 24) = ((struct Vec *)((u8 *)sample + 4))[e->selected];
                 SpriteDrawable_SelectTileFrame(drawable, p->animation, 30);
                 one = 1;
-                asm("" : "+r"(one));
                 drawable[15] = one;
                 *(u32 *)e->drawable &= ~1;
                 Effect_LinkToList(drawable, 0);
@@ -135,13 +136,10 @@ s32 Weather_SpawnTerrainParticles(struct Weather *p, s32 count, s32 delay, s32 d
                 break;
             }
         }
+        i = next;
     }
-    p->delay = *(u16 *)&delay;
+    *timer = delay;
     if (delayRange)
-        p->delay += Mod(Random(), delayRange);
+        *timer += Mod(Random(), delayRange);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080177AC);
-#endif
