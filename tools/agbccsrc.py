@@ -100,6 +100,18 @@ TOPICS = {
         "compiler's AGBCC_NOINHERIT=UID, AGBCC_NORCSE=1 and AGBCC_NOEQUIVMOVE=all turn the three off.",
         [("reload.c", "  /* Reject VALUE if the copy-insn moved the wrong sort of datum.  */", 0, 3),
          ("jump.c", "	  /* Detect and ignore no-op move instructions", 0, 20)]),
+    "inline-result": (
+        "inline return value target result argument same register call-saved integrate shares register",
+        "An inlined call's return value is stored straight into the target of the assignment it feeds "
+        "(integrate.c: map->inline_target), not into a pseudo of its own. An argument that overlaps the "
+        "target is first copied to a fresh pseudo, but cse sees the variable still holds that value and "
+        "rewrites the copy's uses back to it. So `x = H(x, ...)` makes x, H's parameter and H's result one "
+        "pseudo: it lives as long as the result (crossing its calls, so a call-saved register) and the "
+        "inline body keeps its own operand order. The ROM's sign: an argument and the value computed from "
+        "it in one register (sub_08137E28: x and the cell index both r4). spellings.sp_result_into_arg; "
+        "rtlprobe.py try-env AGBCC_PREF=N:R confirms it as a preference.",
+        [("integrate.c", "		  && reg_overlap_mentioned_p (arg_vals[i], target))", -4, 8),
+         ("integrate.c", "      if (REG_FUNCTION_VALUE_P (loc))", -2, 5)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "

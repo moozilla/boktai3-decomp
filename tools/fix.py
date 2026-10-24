@@ -122,7 +122,11 @@ class Draft:
         return "\n".join(out)
 
     def score(self, fn=None, helpers=None):
-        mine = atlas.texts_of(self.source(fn, helpers))
+        return self.score_source(self.source(fn, helpers))
+
+    def score_source(self, src):
+        """(differing insns, first divergence, differences beyond registers) of a whole source."""
+        mine = atlas.texts_of(src)
         if mine is None:
             return None
         regs = atlas.regions(self.rom, mine)
@@ -141,24 +145,43 @@ class Draft:
     def materialize(self, fn, helpers):
         """The source file with FN and the edited HELPERS written back."""
         text = self.text
+        # a header's helper edited: local copies under other names of it and of the header helpers
+        # that reach it from the function (Chase_SnapToRoute -> Chase_Height -> Chase_CellAt)
+        header = {n for n in self.helpers if not find_def(text, n)}
+        copies = {n for n in helpers if n in header}
+        grew = bool(copies)
+        while grew:
+            grew = False
+            for n in header - copies:
+                if any(isinstance(c, ca.FuncCall) and isinstance(c.name, ca.ID) and c.name.name in copies
+                       for c, _, _ in rewrites.walk(helpers.get(n, self.helpers[n]))):
+                    copies.add(n)
+                    grew = True
+
+        def renamed(node):
+            node = __import__("copy").deepcopy(node)
+            for c, _, _ in rewrites.walk(node):
+                if isinstance(c, ca.FuncCall) and isinstance(c.name, ca.ID) and c.name.name in copies:
+                    c.name.name += "_"
+            return node
+        if copies:
+            fn = renamed(fn)
+            order = [h for _, h in self.segments]
+            for name in sorted(copies, key=order.index):
+                h2 = renamed(helpers.get(name, self.helpers[name]))
+                h2.decl.name = name + "_"
+                h2.decl.type.type.declname = name + "_"
+                span = find_def(text, self.src_name)
+                text = text[:span[0]] + ast_util.to_c(h2).strip() + "\n\n" + text[span[0]:]
         for name, h in helpers.items():
+            if name in copies:
+                continue
             span = find_def(text, name) if name in self.helpers else None
             if name not in self.helpers:  # a new helper: before the function
                 span = find_def(text, self.src_name)
-                text = text[:span[0]] + ast_util.to_c(h).strip() + "\n\n" + text[span[0]:]
+                text = text[:span[0]] + ast_util.to_c(renamed(h)).strip() + "\n\n" + text[span[0]:]
             elif span:
-                text = text[:span[0]] + ast_util.to_c(h).strip() + "\n" + text[span[1]:]
-            else:  # a header's helper: a local copy under another name
-                new = name + "_"
-                h2 = __import__("copy").deepcopy(h)
-                h2.decl.name = new
-                h2.decl.type.type.declname = new
-                fn = __import__("copy").deepcopy(fn)
-                for n, _, _ in rewrites.walk(fn):
-                    if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID) and n.name.name == name:
-                        n.name.name = new
-                span = find_def(text, self.src_name)
-                text = text[:span[0]] + ast_util.to_c(h2).strip() + "\n\n" + text[span[0]:]
+                text = text[:span[0]] + ast_util.to_c(renamed(h)).strip() + "\n" + text[span[1]:]
         if self.take == "TakeFlag_" and "TakeFlag_(" in ast_util.to_c(fn) and "TakeFlag_(u8" not in text:
             span = find_def(text, self.src_name)
             text = text[:span[0]] + TAKE + "\n" + text[span[0]:]
@@ -219,9 +242,44 @@ def candidates(d, seeds):
         except Exception as ex:
             if os.environ.get("FIX_DEBUG"):
                 print(f"   ({sp.__name__}: {type(ex).__name__}: {ex})")
+    for name, node, desc in corpus_helpers(d):
+        yield "sp_corpus_helper", desc, d.fn, {name: node}
     for t, (fam, desc, f2) in atlas.edits(d.fn, d.ast, d.func, seeds).items():
         if fam not in {r.__name__ for r in rewrites.REWRITES}:
             yield fam, desc, f2, {}
+
+
+_CORPUS = []
+
+
+def corpus_helpers(d):
+    """(helper, FuncDef, description) for each matched helper in src/ that spells one of D's helpers
+    another way (tools/helperswap.py: same globals, callees, constants and arity), parsed in D's
+    context. The original's helper is often in the corpus already (the random-table step returning
+    s32: CallbackPool_SpawnHitParticles)."""
+    import helperswap
+    if not _CORPUS:
+        _CORPUS.append(helperswap.corpus())
+    out = []
+    names = list(d.helpers)
+    own = re.compile(r"\b(?:%s)\s*\(" % "|".join({re.escape(d.func), re.escape(d.src_name)}))
+    for name, f, cname, raw in helperswap.variants(d, _CORPUS[0]):
+        # not the unit that already has this function matched (a regression draft's own answer)
+        if own.search(helperswap.matched_text(open(os.path.join(ROOT, f)).read())):
+            continue
+        i = [h for _, h in d.segments].index(name) if name in [h for _, h in d.segments] else None
+        if i is None:
+            continue
+        prefix = "\n".join(seg + "\n" + (ast_util.to_c(d.helpers[h]) if h != name else "")
+                           for seg, h in d.segments[:i + 1])
+        try:
+            ast = ast_util.parse_c(prefix + "\n" + raw)
+        except Exception:
+            continue
+        node = next((e for e in reversed(ast.ext) if isinstance(e, ca.FuncDef) and e.decl.name == name), None)
+        if node is not None and name in names:
+            out.append((name, node, f"{name} spelled as {cname} ({f})"))
+    return out
 
 
 def one_round(d, keys, show, try_all, seeds, log, deadline=None):

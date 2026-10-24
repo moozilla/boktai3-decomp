@@ -1537,6 +1537,92 @@ def sp_helper_ret_word(fn, helpers):
             yield f"{name} returns {t} (was {cur})", (copy.deepcopy(fn), [h2])
 
 
+
+def sp_result_into_arg(fn, helpers):
+    """return H(E, ...);  ->  { T v = E; v = H(v, ...); return v; }, and y = H(E, ...);  ->  y = E;
+    y = H(y, ...);  for an inline helper H whose parameter and result have type T (y of type T too),
+    in the function or in the helpers it calls (sub_08137E28: `x = position->x >> 8; x =
+    Chase_CellIndex(x, z); return x;` in Chase_CellAt). Rule (integrate.c expand_inline_function;
+    agbccsrc.py inline-result): an inlined call's return value is stored straight into the
+    assignment's target register (map->inline_target). An argument that overlaps the target is first
+    copied to a fresh pseudo, but cse sees that the variable still holds that value and rewrites the
+    copy's uses back to it. So x, the index and the result end up one pseudo: it lives as long as the
+    result, crosses the calls the result crosses and takes a call-saved register (the ROM's x and cell
+    both r4), and the add keeps the operand order of the inline body's saved RTL (`adds r4, r0, r4`;
+    `x = rows[z] + x` written out gives `adds r4, r4, r0`, since optabs.c expand_binop puts the
+    target's operand first). With E passed as an expression it gets a pseudo of its own, allocated
+    apart from the result (AGBCC_PREF=cell:4 gives the same match). The types must agree so that E
+    reaches H converted exactly as before."""
+    def tname_of(t):
+        return text(t).replace("\n", " ").strip() if t is not None else None
+
+    def params_of(h):
+        args = h.decl.type.args
+        return [x for x in (args.params if args else []) if isinstance(x, ca.Decl)]
+
+    def var_type(f, name):
+        for n, _, _ in walk(f):
+            if isinstance(n, ca.Decl) and n.name == name and isinstance(n.type, ca.TypeDecl):
+                return n.type
+        return None
+
+    def name_for(e, f):
+        fields = [n.field.name for n, _, _ in walk(e) if isinstance(n, ca.StructRef)]
+        used = {n.name for n, p, slot in walk(f) if isinstance(n, (ca.ID, ca.Decl)) and getattr(n, "name", None)
+                and not (isinstance(p, ca.StructRef) and slot == "field")}
+        if fields and fields[-1] not in used and fields[-1].isidentifier():
+            return fields[-1]
+        return new_name(f, "v")
+
+    for tname, target in [(None, fn)] + list(helpers.items()):
+        for bi, b in enumerate(blocks(target)):
+            for si, st in enumerate(b.block_items):
+                call = None
+                if isinstance(st, ca.Return) and isinstance(st.expr, ca.FuncCall):
+                    call = st.expr
+                elif (isinstance(st, ca.Assignment) and st.op == "=" and isinstance(st.lvalue, ca.ID)
+                      and isinstance(st.rvalue, ca.FuncCall)):
+                    call = st.rvalue
+                    if any(isinstance(n, ca.ID) and n.name == st.lvalue.name for n, _, _ in walk(call)):
+                        continue
+                if call is None or not isinstance(call.name, ca.ID) or call.name.name not in helpers \
+                        or not call.args:
+                    continue
+                h = helpers[call.name.name]
+                ps = params_of(h)
+                if len(ps) != len(call.args.exprs):
+                    continue
+                ret = tname_of(getattr(h.decl.type.type, "type", None))
+                for ai, arg in enumerate(call.args.exprs):
+                    pt = tname_of(getattr(ps[ai].type, "type", None))
+                    if isinstance(arg, (ca.ID, ca.Constant)) or pt is None or pt != ret:
+                        continue
+                    if isinstance(st, ca.Assignment):
+                        vt = var_type(target, st.lvalue.name)
+                        if vt is None or tname_of(vt.type) != pt:
+                            continue
+                    t2 = copy.deepcopy(target)
+                    b2 = blocks(t2)[bi]
+                    st2 = b2.block_items[si]
+                    if isinstance(st2, ca.Return):
+                        v = name_for(arg, t2)
+                        c2 = st2.expr
+                        e = c2.args.exprs[ai]
+                        c2.args.exprs[ai] = ca.ID(v)
+                        d = copy.deepcopy(ps[ai])
+                        d.name, d.init = v, e
+                        d.type.declname = v
+                        b2.block_items[si] = ca.Compound([d, ca.Assignment("=", ca.ID(v), c2), ca.Return(ca.ID(v))])
+                    else:
+                        v = st2.lvalue.name
+                        c2 = st2.rvalue
+                        e = c2.args.exprs[ai]
+                        c2.args.exprs[ai] = ca.ID(v)
+                        b2.block_items[si:si + 1] = [ca.Assignment("=", ca.ID(v), e), st2]
+                    where = f" in {tname}" if tname else ""
+                    desc = f"{v} = {text(arg)[:24]}; {v} = {call.name.name}({v}, ...){where}"
+                    yield desc, ((t2, []) if tname is None else (copy.deepcopy(fn), [t2]))
+
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
              sp_split_offset, sp_addr_local, sp_goto_loop,
@@ -1550,7 +1636,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
 TYPE_SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_field_extend, sp_alias_read]
 # spellings that also edit or add the inline helpers the function calls: sp(fn, helpers)
-HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local, sp_helper_ret_word]
+HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local, sp_helper_ret_word, sp_result_into_arg]
 
 # decision -> spellings and generic rewrites to try first (names)
 DECISIONS = {
@@ -1570,11 +1656,11 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
-    "reload-mode": ["sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
-    "reload": ["sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
+    "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
+    "reload": ["sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
                "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }
 

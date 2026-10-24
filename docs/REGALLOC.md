@@ -25,6 +25,19 @@ that moved them. Use it before reaching for register pins.
   out of a unit, so `check.py`, `regdiag.py` and `permute.py` see a file
   with one ROM function. It also splits `int a, b;` declarations, which
   decomp-permuter otherwise crashes on ("nodes should only appear once").
+* `tools/reloaddbg.py FILE.c [FUNC] [--nonmatching]`: for each reload register
+  that differs from the ROM, the rotation state and why reload skipped the
+  ROM's register. `python3 tools/agbccsrc.py reload` and `reload-mode` give the
+  rules (a high register copied straight back means a mode change).
+* `tools/helperswap.py [--files SRC...]` tries the matched corpus's spellings
+  of each inline helper a draft calls. A helper's types often decide the
+  allocation (fix.py tries them as `sp_corpus_helper`).
+* `rtlprobe.py try-env FILE.c 'AGBCC_WHYREG=N'` prints what global.c saw for
+  pseudo N (conflicts, registers used so far, which lower-priority pseudo
+  prefers which register, its own preferences). When `AGBCC_FORCE=N:R`
+  matches and `AGBCC_PRI` cannot, try `AGBCC_PREF=M:R` on N and on the pseudos
+  it is copied or computed into: a match names the missing preference
+  (`agbccsrc.py inline-result` for one case).
 * `tools/promote_draft.py FILE.c FUNC` drops a draft's NONMATCHING guard once
   it matches.
 * Raw dumps: `agbcc u.i -O2 -mthumb-interwork -da` writes one file per pass
@@ -63,6 +76,12 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
   reload register.
 
 ## Fixes that worked
+
+* **Inline result into its argument's variable.** `sub_08137E28` differed only
+  in x (`position->x >> 8`), r2 for r4: the ROM keeps x and the cell index
+  computed from it in one call-saved register. `AGBCC_PREF=cell:4` matched;
+  the C is `x = Chase_CellIndex(x, z)`, which makes x, the parameter and the
+  result one pseudo (`agbccsrc.py inline-result`, fix.py `sp_result_into_arg`).
 
 * **Reload rotation.** `sub_08160EA4` differed only in r3/r4. Writing the
   random table as the literal `0x0203B400` instead of
