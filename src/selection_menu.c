@@ -92,6 +92,13 @@ static inline void SelectionMenu_ClearPosition(void *source, void *destination)
     CpuSet(source, destination, 0x05000002);
 }
 
+// CpuFill32(0, position, 8), but the destination is evaluated before the zero is stored.
+static inline void Position_Clear(struct ContactPosition *position)
+{
+    vu32 zero = 0;
+    CpuSet((void *)&zero, position, 0x05000002);
+}
+
 u8 *SelectionMenu_GetIconPalette(s32 i)
 {
     return gUnk_030042E4 + (i + 0x373) * 0x20;
@@ -451,45 +458,20 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 }
 
 // confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// The ROM keeps the position pointer in one register (sb) and recomputes sp + 0x14 after the loop; here it stays in a second register (sl), so an extra callee-saved register is pushed.
 void sub_0801A6D0(struct SelectionMenu *p)
 {
-    struct {
-        u32 zero;
-        struct ContactPosition position;
-    } scratch;
-    struct SceneInputWidget *g;
+    struct ContactPosition position;
+    struct SceneInputWidget *heading;
     int i;
-    struct ContactPosition *pos = &scratch.position;
-    struct ContactPosition *saved;
-    int clear;
-    typeof(&p->panelResource) t1;
-    scratch.zero = 0;
-    SelectionMenu_ClearPosition(&scratch.zero, pos);
-    i = 18;
-    saved = pos;
-    clear = 0;
-    g = &p->icons[18];
-    do {
-        do {
-            Widget_InitLinked(g, &p->iconResource, 0, 0x11, clear, clear, 0x3c, saved);
-        } while (0);
-        g--;
-        do {
-            i--;
-        } while (0);
-    } while (i >= 0);
-    saved->x = 0x20;
-    scratch.position.y = 0;
-    t1 = &p->panelResource;
-    Widget_InitLinked(&p->heading, t1, 0, 0x11, 0, 0, 0x3c, &scratch.position);
-}
 
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801A6D0);
-#endif
+    Position_Clear(&position);
+    for (i = 18; i >= 0; i--)
+        Widget_InitLinked(&p->icons[i], &p->iconResource, 0, 0x11, 0, 0, 0x3c, &position);
+    heading = &p->heading;
+    position.x = 0x20;
+    position.y = 0;
+    Widget_InitLinked(heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &position);
+}
 
 void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
