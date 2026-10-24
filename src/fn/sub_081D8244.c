@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.3%
-// fix.py best version (reprinted C)
-// Remaining differences: center-vector stack layout, branch sharing and registers.
 #include "scene_actor_terrain.h"
 
 static inline s32 CellIndex(u16 *a)
@@ -15,7 +11,7 @@ static inline s32 CellIndex(u16 *a)
 }
 s32 Task4E01_ResolveTerrainDirection(u16 *, s32);
 s32 sub_08249350(s32, s32);
-static inline s16 inline_fn(u16 arg0)
+static inline s16 SignedCoordinate(u16 arg0)
 {
     return (s16)arg0;
 }
@@ -23,26 +19,24 @@ static inline s16 inline_fn(u16 arg0)
 // confidence=low: turns a projectile around the current terrain cell using its travel angle.
 s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
 {
-    u16 *new_var;
-    u16 direction = original;
+    u16 *centerCoords;
+    s16 direction = original;
     s32 next = 0;
     s32 cell;
     s32 other;
     s32 width;
     s32 far;
-    u16 center[3];
-    s8 k2;
+    struct ContactPosition center;
     u32 angle;
-    typeof(Math_Atan2(inline_fn(a[0]) - inline_fn(new_var[0]),
-                      inline_fn(a[2]) - inline_fn(new_var[2]))) t1;
-    typeof((sub_08249350(cell, width) << 8) + 128) t2;
+    s32 turnAngle;
+    s32 centerX;
     TerrainModifiers_FindCellOverride(CellIndex(a), 1);
-    if (inline_fn(direction) & (k2 = 1)) {
+    if (direction & 1) {
         direction += 4;
-        if (inline_fn(direction) > 7) {
+        if (direction > 7) {
             direction -= 8;
         }
-        return inline_fn(direction);
+        return direction;
     }
     cell = CellIndex(a);
     other = CellIndex(b);
@@ -53,14 +47,15 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
     } else {
         far = 1;
     }
-    t2 = (sub_08249350(cell, width) << 8) + 128;
-    center[0] = t2;
-    center[2] = ((cell / width) << 8) + 128;
-    new_var = center;
-    t1 = Math_Atan2(inline_fn(a[0]) - inline_fn(new_var[0]),
-                    inline_fn(a[2]) - inline_fn(new_var[2]));
-    angle = t1;
-    if (inline_fn(direction) == 0) {
+    centerX = (sub_08249350(cell, width) << 8) + 128;
+    center.x = centerX;
+    center.y = 0;
+    center.z = ((cell / width) << 8) + 128;
+    centerCoords = (u16 *)&center;
+    turnAngle = Math_Atan2(SignedCoordinate(a[0]) - SignedCoordinate(centerCoords[0]),
+                           SignedCoordinate(a[2]) - SignedCoordinate(centerCoords[2]));
+    angle = turnAngle;
+    if (direction == 0) {
         if ((angle - 33) <= 126) {
             direction -= 2;
             next = cell + width;
@@ -70,7 +65,7 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
         } else {
             direction = Task4E01_ResolveTerrainDirection(a, 0);
         }
-    } else if (inline_fn(direction) == 2) {
+    } else if (direction == 2) {
         if ((angle - 97) <= 126) {
             direction = 0;
             next = cell - 1;
@@ -80,11 +75,11 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
         } else {
             direction = Task4E01_ResolveTerrainDirection(a, 2);
         }
-    } else if (inline_fn(direction) == 4) {
+    } else if (direction == 4) {
         if ((angle - 32) > 128) {
             direction = 2;
             next = cell - width;
-        } else if ((angle + (-33)) <= 126) {
+        } else if ((angle - 33) <= 126) {
             direction = 6;
             next = cell - 1;
         } else {
@@ -97,24 +92,21 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
         direction += 2;
         next = cell - width;
     } else {
-        direction = Task4E01_ResolveTerrainDirection(a, inline_fn(direction));
+        direction = Task4E01_ResolveTerrainDirection(a, direction);
     }
-    if (((s16)direction) > 7) {
+    if (direction > 7) {
         direction -= 8;
-    } else if (0 > ((s16)direction)) {
+    } else if (0 > direction) {
         direction += 8;
     }
-    if (((((s16)direction) - original) != 4) && ((original - ((s16)direction)) != 4)) {
+    if (((direction - original) != 4) && ((original - direction) != 4)) {
         if (far) {
-            u32 height = inline_fn(a[1]);
+            u32 height = SignedCoordinate(a[1]);
             if (height <= (((*SceneActorTerrain_GetCell(next)) & 15) << 8)) {
                 direction += 4;
             }
         }
-        direction = Mod(inline_fn(direction), 8);
+        direction = Mod(direction, 8);
     }
-    return (s16)direction;
+    return direction;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Task4E01_SelectTerrainTurn);
-#endif
