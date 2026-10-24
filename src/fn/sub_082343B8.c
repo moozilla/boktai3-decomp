@@ -60,12 +60,10 @@ static inline s32 scale(s32 product)
     return product >= 0 ? product >> 12 : -((-product) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
 // still differs: pool constant 0x202 is shared across the call and the loop-back branch layout
 void SpiralBurst_UpdateParticles(struct SbOwner *p)
 {
-    register u32 alive asm("sl") = 0;
+    u32 alive = 0;
     s32 i;
     register u8 *s asm("r6");
     u32 off;
@@ -74,7 +72,6 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
     {
         register u32 offset asm("r1") = 0x202;
         register u16 *address asm("r0");
-        asm("" : "+r"(offset));
         address = (void *)((u8 *)p + offset);
         if (*address <= 11)
             Collider_Refresh(p->collider);
@@ -86,10 +83,8 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
     e = (struct SbPart *)((u8 *)p + 0x90);
     i = 7;
     do {
-        asm("" : "+r"(off));
         if (*tp >= e->f15) {
             u8 *q = (u8 *)p + 0x78;
-            asm("" : "+r"(q));
             *(u32 *)(q + off) |= 1;
         } else {
             alive = 1;
@@ -121,6 +116,3 @@ void SpiralBurst_UpdateParticles(struct SbOwner *p)
     if (!alive)
         Task_Kill(p);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpiralBurst_UpdateParticles);
-#endif
