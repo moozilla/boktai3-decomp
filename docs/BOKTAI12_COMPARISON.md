@@ -240,20 +240,44 @@ and `akatsuki105/agbcc` and looked at both.
   a read; his policy is stricter than ours (no `register asm("rN")` pinning; we allow it
   as a marked concession).
 
-### 6.1 `thumb_patch03-OCT-03`: is it worth it for Boktai 3?
+### 6.1 Which compiler built the games (and `thumb_patch03-OCT-03`)
 
-What it is: Nintendo's official patch to the AGB SDK's `cc1` (Thumb), revision of
-3 Oct 2003, with an earlier 30 May 2003 change. akatsuki disassembled the shipped `cc1.exe`
-and added two flags to pret's agbcc (`akatsuki105/agbcc`, one commit on pret's `da598c1`,
-which is the commit our `tools/setup.sh` pins, so the diff is exactly that commit):
+**Conclusion: Boktai 1, 2 and 3 were built with the stock AGB SDK 3.x GCC (2.9-arm-000512).
+Our pinned pret agbcc with default flags reproduces it; neither of the 2003 "thumb patches"
+nor `-fprologue-bugfix` applies.** Evidence, strongest first:
 
-* `-fsigned-narrow-modes`: `PROMOTE_MODE` stops forcing `UNSIGNEDP = 1`, so `s8`/`s16` values
-  keep their declared signedness in registers (e.g. `ldrsh` instead of `ldrh`).
+1. **The real compiler agrees with ours** (6.2). The GNUPro source shipped with the SDK
+   (Dec 2002 snapshot), built as `cc1`, produces assembly byte-identical to pret agbcc on all
+   ~9,700 compilable units (differences that remained were traced to building a 2002 compiler
+   on a 64-bit host).
+2. **ROM-wide patterns that do not depend on our C** (`tools/flagpatterns.py`). For the 99
+   matched units that `-fsigned-narrow-modes` would change, the code blocks where stock and
+   patched output differ were searched in the ROMs. Blocks of 7+ halfwords: the stock form
+   occurs in Boktai 3 (160 of 160), Boktai 2 US (38) and Boktai 1 US (56); the patched form
+   occurs in none. Boktai 1/2 contain none of our C, so this is not circular.
+3. **Prologue behavior.** Stock agbcc pushes LR in leaf functions that contain a branch (a far-jump
+   result cached across functions in `thumb.c`); `-fprologue-bugfix` and `old_agbcc` do not.
+   Of ~1,300 branchy functions without `bl` in Boktai 3, all push LR; so do the 264 and 78
+   shared ones in Boktai 2 and 1. The SDK sources show where this comes from: the Jan 2001
+   `ThumbPatch` snapshot has no far-jump cache (old_agbcc behavior) and differs from the
+   ROM on 746 units, while the Oct 2001 (3.1jp) and Dec 2002 (3.0us) snapshots have the cache.
+   (mid-kid's PR comment ties `ThumbPatch_en` to the extra-LR behavior; the snapshot he
+   restored from it does the opposite, so trust the sources and the ROM.)
+4. **The patches post-date every snapshot.** Neither `PROMOTE_MODE` signedness nor the
+   shift-compare fold changes in any SDK snapshot up to Dec 2002; both come only from
+   akatsuki's fork (below), which attributes them to revisions of 30 May and 3 Oct 2003.
+   The 2003 patch itself is not in mid-kid's repo, so its description rests on akatsuki.
+
+What the patch is: akatsuki disassembled the shipped `cc1.exe` and added two flags to pret's
+agbcc (`akatsuki105/agbcc`, one commit on pret's `da598c1`, which is the commit our
+`tools/setup.sh` pins):
+
+* `-fsigned-narrow-modes`: `PROMOTE_MODE` stops forcing `UNSIGNEDP = 1`, so `s8`/`s16`
+  values keep their declared signedness in registers (e.g. `ldrsh` instead of `ldrh`).
 * `-ffix-shift-compare`: a different rule when `simplify_comparison` folds a compare
-  against a shifted value (also converts the condition to unsigned for `LSHIFTRT`).
+  against a shifted value.
 
-**Tested here** (`tools/flagsurvey.py`: compile every unit, 9,602 `src/*.c`+`src/fn/*.c`, with
-the pinned agbcc and with the fork plus each flag, compare assembly):
+Survey (`tools/flagsurvey.py`, compile every unit with the pinned agbcc and the fork + flag):
 
 | flag set | matched units whose output changes | NONMATCHING units that change |
 |---|---|---|
@@ -261,21 +285,40 @@ the pinned agbcc and with the fork plus each flag, compare assembly):
 | `-fsigned-narrow-modes` | **99 of 9,473** | 11 of 454 |
 | `-ffix-shift-compare` | 2 | 0 |
 
-Any matched unit that changes would stop matching, so **Boktai 3 was not built with the
-patched narrow-mode behavior** (nor the shift fix in those 2 units). For the 11 NONMATCHING
-units that change, `tools/check.py --nonmatching` with the flag made 9 of 11 worse
-(for example `sub_08084BCC` 8 differing bytes to 243, `sub_081376EC` 8 to 804), left `player_3`
-unchanged and nudged `sub_081C85F4` from 184 to 176 differing bytes (a 77% fuzzy draft, so not
-informative); none became exact. The same conclusion akatsuki reached for Boktai 2
-(2 of 283 objects change; his `SwapArmorSlot` wants `ldrh`, which is the unpatched result),
-so both games appear to have been built with the unpatched compiler despite shipping after
-the patch date.
+This survey alone is circular (our C was written against the stock compiler); the three
+items above are what make the conclusion firm. The same flags made 9 of the 11 NONMATCHING
+units worse and none exact. akatsuki reached the same result for Boktai 2 (2 of 283 objects
+change, and his `SwapArmorSlot` wants the unpatched `ldrh`). Remaining uncertainty: a later
+patched compiler that happens not to trigger on this code cannot be excluded, and we have no
+SDK snapshot after Dec 2002; Oct 2001 (3.1jp) and Dec 2002 (3.0us) cannot be told apart (the
+only code differences are a crash guard in `loop.c` and `-mlong-calls`).
 
-Verdict: **not worth pursuing for the compiler.** What is worth taking from his repo is
-the documentation of agbcc's decision rules and the Boktai 2 names and structure.
-(A caveat: only flags that are encoded in the compiler are tested; if different units
-were built with different SDK revisions the survey would show some units *improving*, and
-none do.)
+Verdict: **nothing to change in our compiler setup.** What is worth taking from akatsuki's
+repo is the documentation of agbcc's decision rules and the Boktai 2 names and structure.
+
+### 6.2 Building the real SDK compiler (audit tool, not the build compiler)
+
+`github.com/mid-kid/arm-000512` holds the GNUPro toolchain source shipped with the AGB SDK
+(GPL-2.0), as one branch per snapshot (`011025-sdk3.1jp`, `021206-sdk3.0us`,
+`010110-ThumbPatch`). Only `gcc/` is needed: `gcc/configure --target=thumb-elf
+--host=alpha-unknown-linux-gnu --disable-nls --without-headers`, then `make cc1`. Run it
+as `cc1 -quiet -O2 -mthumb-interwork in.i -o out.s`. Getting it to behave on a modern Mac took
+work, and pret's agbcc already contains the equivalent fixes, which is why the project keeps
+using pret:
+
+* Modern bison emits `enum yytokentype`, which collides with `RETURN` in `rtl.def`: rewrite
+  it to `#define`s in `c-parse.h`/`c-parse.c`. Stub `libiberty`'s `strerror.o`.
+* Build `x86_64` under Rosetta without optimization (`-O1` generators hang); arm64 crashes in
+  `copy_rtx_if_shared` (unprototyped variadic `gen_rtx` calls).
+* The code assumes a 32-bit host. On 64-bit `HOST_WIDE_INT`, `thumb_shiftable_const` and the
+  `thumb.md` split reject `0x80000000`, unsigned 32-bit constants are not sign-extended and
+  `(x - 64) & 31` is folded wrongly. Emulate 32 bits by truncating in `gen_rtx_CONST_INT` and
+  using `unsigned int` in those two places; a true 32-bit `HOST_WIDE_INT` also works but needs
+  `insn-attrtab.c` regenerated elsewhere (genattrtab prints negatives unsigned) and breaks
+  `double` constants in `real.c`.
+
+Compare with `tools/sdkcmp.py SDK_CC1 out.json`. The assembler fills alignment with `nop`
+for the SDK and zeros for pret; the tool normalizes that.
 
 ## 7. Not done / next steps
 
@@ -287,4 +330,5 @@ none do.)
 
 Tools: `tools/crossgame.py OTHER.gba [--shape] [--win N] [--out f.csv]`,
 `tools/romalign.py A.gba B.gba [--csv f]`, `tools/b12text.py {font|gcx|escapes}`
-(all need numpy except `b12text.py`), `tools/flagsurvey.py FORK_AGBCC OUT.json`.
+(all need numpy except `b12text.py`), `tools/flagsurvey.py FORK_AGBCC OUT.json`,
+`tools/flagpatterns.py FORK_AGBCC FLAG SURVEY.json`, `tools/sdkcmp.py SDK_CC1 OUT.json`.
