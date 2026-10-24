@@ -1701,8 +1701,21 @@ def cmd_why_all(src, func, env):
             picks[-1] = r["uid"]
     picks = [u for u in picks if u][:8]
     if not picks:
-        print(f"{func}: {count_text(rows)} differ; only branch targets moved, so there is no insn for why."
-              " The plain scope run names both targets; `scope.py FILE.c probe` finds the cse decision")
+        rom_only = [r for r in rows if r["tag"] == "-" and r["rom"]]
+        if not rom_only:
+            print(f"{func}: {count_text(rows)} differ; only branch targets moved, so there is no insn for why."
+                  " The plain scope run names both targets; `scope.py FILE.c probe` finds the cse decision")
+            return 1
+        print(f"{func}: {count_text(rows)} differ; no differing draft insn has an RTL uid, so there is nothing"
+              " for why. The ROM has insns the draft does not produce at all:")
+        for r in rom_only[:8]:
+            print(f"  {r['rom_addr']} {r['rom']}")
+        if any(re.match(r"(svc|swi)\b", r["rom"]) for r in rom_only):
+            print("  `svc`/`swi` is a BIOS call written inline (the SDK's SystemCall macro: an asm statement);"
+                  " agbcc has no C construct that emits it. Not a register or order problem: no knob applies.")
+        else:
+            print("  Find the C that produces them (a missing statement, a different expression shape); a"
+                  " draft-only row that is alignment padding follows from the size change.")
         return 1
     print(f"{func}: {count_text(rows)} differ; why on the first of each hunk: {', '.join(map(str, picks))}\n")
     for u in picks:
