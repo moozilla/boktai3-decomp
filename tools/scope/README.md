@@ -130,6 +130,7 @@ python3 tools/scope/scope.py FILE.c why all       why on the first real differen
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
+python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 ```
@@ -139,6 +140,14 @@ shift). It walks flow's block liveness backward with flow.c's own rule (one
 per insn where the register is live before it, plus one where it is set), so
 its count equals the `Register N used R times across L insns` line; compare
 two drafts by name to see which C line gained or lost an insn.
+
+`pins` (phase 3) compiles the file once per concession with that one
+removed and prints the change in differing insns, then removes greedily
+(cheapest first, keeping each removal that adds nothing) and writes
+`build/scope/drafts/FUNC.fewer_pins.c`. Variants stay in
+`build/scope/drafts/.pins/` for `why`. It handles one-line pins
+(`register T x asm("rN")`, the `register` keyword is kept) and one-line
+`asm("" ...)` statements; suggested by the second Haiku trial.
 
 `SCOPE_TRANSFORM` points at a module with `transform(text) -> text`, applied
 to the preprocessed source before compiling: a what-if that leaves the file
@@ -555,6 +564,19 @@ which is exactly `10:1`. Not tested.
   before `actor` (r0 -> ip); RTL generation emits parameter copies in
   declaration order and an inline wrapper with `(out, actor)` does not change
   it. No scope explainer covers either: they are decided at RTL generation.
+* **Hresvelgr_SetRandomTravelTarget** (sub_0819C6AC): 9/9 -> 2/2 in plain C
+  (`build/scope/drafts/srt_best_natural.c`, not landed). Facts 18 and 19 as
+  in GetTravelTarget, plus `add`'s source loaded into a temporary first
+  (`target = saved->target;`): the ROM loads it before computing
+  `&actor->travelTarget`. With the table-first helper the only cause left is
+  the shared one, table vs the 1023 mask (`AGBCC_PRI=26:+214` -> MATCH). The
+  levers scope gives: the table with a 4th ref, a life of 18 or fewer (has
+  26), or not a constant register (then 1153 > 789). Tried without effect:
+  `const u16 *table` local, `table + offset` order, `table += ...` (the
+  table set twice kills REG_EQUIV but costs a second load), a named index.
+  A `register asm("r4")` pin on the table makes it worse (4/6). Solving this
+  helper likely solves both siblings and maybe other callers of the random
+  table helper.
 * **Solved: Hresvelgr_InitializeShots** (moozilla/boktai3-decomp#641, plain C,
   no pins). The hypothesis below was right except for the constant: it is a
   pre-loop variable `x = 0x708` assigned before `y` and `z`, so it lives

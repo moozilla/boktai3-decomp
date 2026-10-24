@@ -41,6 +41,7 @@ Other commands:
 scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
 scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation?
+scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```

@@ -1296,6 +1296,81 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
           " removes them")
 
 
+PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
+
+
+def concession_sites(text):
+    """[(line index, kind, removal)] for each register pin (`register T x asm("rN")`) and each empty asm
+    barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) returns the lines without it."""
+    lines = text.split("\n")
+    out = []
+    for i, ln in enumerate(lines):
+        if ln.lstrip().startswith("//"):
+            continue
+        if PIN_RE.search(ln) and "register" in ln:
+            out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+        elif BARRIER_RE.match(ln):
+            out.append((i, "barrier", lambda ls, i=i: ls[:i] + ls[i + 1:]))
+    return out
+
+
+def cmd_pins(src, func, env):
+    """Phase 3 helper: remove each concession (register pin or empty asm barrier) in turn and report the
+    cost, then greedily remove every one that does not add differences, and write the result."""
+    def run(text, tag):
+        path = os.path.join(ROOT, "build", "scope", "drafts", ".pins", f"{func}_{tag}.c")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        open(path, "w").write(text)
+        try:
+            n, _ = score(os.path.relpath(path, ROOT), func, env)
+        except SystemExit:
+            return None
+        return n
+    text = open(os.path.join(ROOT, src)).read()
+    sites = concession_sites(text)
+    if not sites:
+        print(f"{src}: no register pins or empty asm barriers")
+        return 0
+    base = run(text, "base")
+    print(f"{func}: {base} differing insns with all {len(sites)} concessions"
+          f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers)")
+    lines = text.split("\n")
+    cost = []
+    for n, (i, kind, rm) in enumerate(sites):
+        r = run("\n".join(rm(lines)), f"one{n}")
+        cost.append(r)
+        d = "compile fails" if r is None else f"{r} differ ({r - base:+d})"
+        print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> {d}")
+    ls = lines
+    for i, _, rm in sorted(sites, key=lambda t: -t[0]):
+        ls = rm(ls)
+    r = run("\n".join(ls), "none")
+    print(f"  all removed: {'compile fails' if r is None else f'{r} differ'}")
+    # greedy: cheapest first, keep a removal if the count does not grow; remove from the bottom up so
+    # earlier line numbers stay valid
+    order = sorted(range(len(sites)), key=lambda n: (cost[n] is None, cost[n] if cost[n] is not None else 0))
+    keep_out, cur, best = set(), lines, base
+    for n in order:
+        if cost[n] is None:
+            continue
+        trial = set(keep_out) | {n}
+        ls = lines
+        for m in sorted(trial, key=lambda m: -sites[m][0]):
+            ls = sites[m][2](ls)
+        r = run("\n".join(ls), f"greedy{n}")
+        if r is not None and r <= best:
+            keep_out, cur, best = trial, ls, r
+    out = os.path.join(ROOT, "build", "scope", "drafts", f"{func}.fewer_pins.c")
+    open(out, "w").write("\n".join(cur))
+    left = len(sites) - len(keep_out)
+    print(f"  greedy: removed {len(keep_out)} of {len(sites)} with no added differences -> {best} differ,"
+          f" {left} concessions left; written to {os.path.relpath(out, ROOT)}")
+    print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
+          " first new difference in that variant (build/scope/drafts/.pins/).")
+    return 0
+
+
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
     each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
@@ -1580,6 +1655,9 @@ def main():
             cmd_uses([int(a) for a in rest[1:] if a.isdigit()], func,
                      [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
         return 0
+    if rest and rest[0] == "pins":  # FILE.c pins: cost of removing each pin / barrier, greedy removal
+        func = rest[1] if len(rest) > 1 else nonmatching_func(src) or os.path.basename(src)[:-2]
+        return cmd_pins(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)
