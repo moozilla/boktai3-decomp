@@ -25,6 +25,13 @@ that moved them. Use it before reaching for register pins.
   out of a unit, so `check.py`, `regdiag.py` and `permute.py` see a file
   with one ROM function. It also splits `int a, b;` declarations, which
   decomp-permuter otherwise crashes on ("nodes should only appear once").
+* `tools/reloaddbg.py FILE.c [FUNC] [--nonmatching]`: for each reload register
+  that differs from the ROM, the rotation state and why reload skipped the
+  ROM's register. `python3 tools/agbccsrc.py reload` and `reload-mode` give the
+  rules (a high register copied straight back means a mode change).
+* `tools/helperswap.py [--files SRC...]` tries the matched corpus's spellings
+  of each inline helper a draft calls. A helper's types often decide the
+  allocation (fix.py tries them as `sp_corpus_helper`).
 * `tools/promote_draft.py FILE.c FUNC` drops a draft's NONMATCHING guard once
   it matches.
 * Raw dumps: `agbcc u.i -O2 -mthumb-interwork -da` writes one file per pass

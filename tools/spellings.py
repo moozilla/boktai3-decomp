@@ -1570,11 +1570,11 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
-    "reload-mode": ["sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
-    "reload": ["sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
+    "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
+    "reload": ["sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
                "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }
 

@@ -122,7 +122,11 @@ class Draft:
         return "\n".join(out)
 
     def score(self, fn=None, helpers=None):
-        mine = atlas.texts_of(self.source(fn, helpers))
+        return self.score_source(self.source(fn, helpers))
+
+    def score_source(self, src):
+        """(differing insns, first divergence, differences beyond registers) of a whole source."""
+        mine = atlas.texts_of(src)
         if mine is None:
             return None
         regs = atlas.regions(self.rom, mine)
@@ -219,9 +223,40 @@ def candidates(d, seeds):
         except Exception as ex:
             if os.environ.get("FIX_DEBUG"):
                 print(f"   ({sp.__name__}: {type(ex).__name__}: {ex})")
+    for name, node, desc in corpus_helpers(d):
+        yield "sp_corpus_helper", desc, d.fn, {name: node}
     for t, (fam, desc, f2) in atlas.edits(d.fn, d.ast, d.func, seeds).items():
         if fam not in {r.__name__ for r in rewrites.REWRITES}:
             yield fam, desc, f2, {}
+
+
+_CORPUS = []
+
+
+def corpus_helpers(d):
+    """(helper, FuncDef, description) for each matched helper in src/ that spells one of D's helpers
+    another way (tools/helperswap.py: same globals, callees, constants and arity), parsed in D's
+    context. The original's helper is often in the corpus already (the random-table step returning
+    s32: CallbackPool_SpawnHitParticles)."""
+    import helperswap
+    if not _CORPUS:
+        _CORPUS.append(helperswap.corpus())
+    out = []
+    names = list(d.helpers)
+    for name, f, cname, raw in helperswap.variants(d, _CORPUS[0]):
+        i = [h for _, h in d.segments].index(name) if name in [h for _, h in d.segments] else None
+        if i is None:
+            continue
+        prefix = "\n".join(seg + "\n" + (ast_util.to_c(d.helpers[h]) if h != name else "")
+                           for seg, h in d.segments[:i + 1])
+        try:
+            ast = ast_util.parse_c(prefix + "\n" + raw)
+        except Exception:
+            continue
+        node = next((e for e in reversed(ast.ext) if isinstance(e, ca.FuncDef) and e.decl.name == name), None)
+        if node is not None and name in names:
+            out.append((name, node, f"{name} spelled as {cname} ({f})"))
+    return out
 
 
 def one_round(d, keys, show, try_all, seeds, log, deadline=None):
