@@ -7,7 +7,7 @@ static inline void SelectAnimation(struct SceneActorAnimationView *actor, s32 in
     u32 selection = entry->value;
     u8 *restart;
     u32 flags = inputFlags;
-    register u32 spare asm("r8");
+    u32 spare;
     asm volatile("" : "=r"(spare));
     asm volatile("" : "+r"(flags));
     if (!actor->drawableKind) {

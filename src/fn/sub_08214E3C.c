@@ -67,7 +67,7 @@ void Sprite_RenderFlipAwareList(void)
         return;
     }
     do {
-        s32 x, y asm("r7"), z asm("r8");
+        s32 x, y, z;
         struct SpriteResource *resource;
         if (p->flags & skip) {
             goto next;

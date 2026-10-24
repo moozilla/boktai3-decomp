@@ -14,9 +14,8 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
 static inline u32 HasFinishedControl(struct SceneActorRegistryResetView *actor)
 {
     register u32 offset asm("r1") = 0x2B0;
-    register u8 *field asm("r0");
+    u8 *field;
     /* Keep the completion-field address local to this check. */
-    asm("" : "+r"(offset));
     field = (u8 *)actor + offset;
     return *field;
 }

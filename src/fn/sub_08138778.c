@@ -45,9 +45,9 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
         u16 stopOnEnd, active;
         u8 pad34[0x2c];
     };
-    register struct Manager *owner asm("r8") = m;
+    struct Manager *owner = m;
     register struct Manager *base asm("r12") = owner;
-    register s32 offset asm("r10") = 0;
+    s32 offset = 0;
     struct Cursor *cursor = (void *)((u8 *)owner + 0x44);
     struct Anim *sequence = (void *)((u8 *)owner + 0x60);
     struct Obj *sprites = (void *)((u8 *)owner + 0x34);
@@ -61,7 +61,6 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
             int done;
             {
                 u8 *address = (u8 *)owner + 0x70;
-                asm("" : "+r"(address));
                 cursor->position = **(const struct Vec **)(address + offset);
             }
             o = sprites;
@@ -70,12 +69,11 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
             cursor->frame = *entry >> 6;
             {
                 u32 input = a->flags;
-                register u32 left asm("r2") = 1;
+                u32 left = 1;
                 u32 mask = 1;
                 left &= input;
                 if (left != (((*entry & 0x30) >> 4) & mask)) {
                     register struct Manager *write asm("r2") = base;
-                    asm("" : "+r"(write));
                     write->slots[0].sprite.flags |= 4;
                 } else
                     o->flags &= ~4;
@@ -83,7 +81,7 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
             {
                 register u32 input asm("r0") = a->flags;
                 u32 mask = 2;
-                register u32 left asm("r1") = (u8)(mask & input);
+                u32 left = (u8)(mask & input);
                 if (left != (((*entry & 0x30) >> 4) & mask))
                     o->flags |= 8;
                 else
@@ -121,7 +119,6 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 a->rate = (a->factor * a->scale) >> 6;
                 if (!a->rate) {
                     u32 one = 1;
-                    asm("" : "+r"(one));
                     a->rate = one;
                 }
             } else
@@ -130,9 +127,8 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
             if (done && cursor->stopOnEnd) {
                 {
                     u8 *address = (u8 *)owner + 0x34;
-                    asm("" : "+r"(address));
                     {
-                        register struct Obj *dst asm("r0") = (void *)(address + offset);
+                        struct Obj *dst = (void *)(address + offset);
                         dst->flags |= 1;
                     }
                 }

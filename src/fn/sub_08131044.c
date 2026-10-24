@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
@@ -50,8 +49,7 @@ static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior
     a->phase2A9 = zero;
     a->behavior2AA = behavior;
     {
-        register u32 *counter asm("r0") = &a->counter2AC;
-        asm("" : "+r"(counter));
+        u32 *counter = &a->counter2AC;
         *counter = zero;
     }
     a->field2B1 = 1;
@@ -134,8 +132,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
                 SceneActorMovement_ResolveRoutePosition(actor);
                 control = group + 0x4C;
                 {
-                    register u32 mask asm("r1") = 0x200000;
-                    asm("" : : "r"(mask));
+                    u32 mask = 0x200000;
                     if (actor->flags2CC & mask) {
                         {
                             u32 *flags = &actor->flags2D0;

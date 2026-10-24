@@ -27,7 +27,6 @@ void Sword_BeginTargetOrbit(u8 *p)
     p[0x11a] = angle;
     {
         s32 rotation = 0xa0 - angle;
-        asm("" : "+r"(rotation));
         p[0x188] = rotation;
     }
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;

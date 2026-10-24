@@ -2,7 +2,6 @@
 
 // confidence=low: synchronizes collision, shadow and camera presentation.
 
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -189,8 +188,7 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
         }
     }
     if (test(flags, 0x200000)) {
-        register u32 cameraMask asm("r1") = 4;
-        asm("" : "+r"(cameraMask));
+        u32 cameraMask = 4;
         if (gUnk_02000560 & cameraMask)
             goto defaultCamera;
         if (!(p2->cameraFlags & cameraMask)) {

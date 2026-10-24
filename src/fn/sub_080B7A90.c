@@ -17,7 +17,6 @@ static inline u8 TargetHasFlag(struct SceneActorTargetLink *state,
     register struct SceneActorTargetLink *input asm("r2") = state;
     u32 mask = 2;
     u32 value;
-    asm("" : "+r"(input));
     value = input->flags & mask;
     {
         register struct SceneActorTargetLink *copy asm("r4") = input;

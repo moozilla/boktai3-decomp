@@ -31,7 +31,7 @@ u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
 void Actor_OnPathFollowUpdate(void *unused, struct Actor *p)
 {
     u8 *path = PTR(p, 0x5c);
-    register struct PathCtx *ctx asm("r8") = PTR(p, 0x19c);
+    struct PathCtx *ctx = PTR(p, 0x19c);
     struct Vec *pos = PTR(p, 0x68);
     u32 *anim = PTR(p, 0xd4);
     if (U8(p, 9)) {
@@ -39,7 +39,7 @@ void Actor_OnPathFollowUpdate(void *unused, struct Actor *p)
         U8(p, 9) = zero;
         U8(p, 7) = zero;
         {
-            register struct PathCtx *c3 asm("r3") = ctx;
+            struct PathCtx *c3 = ctx;
             u16 *t = c3->target;
             int r = Math_Atan2(t[0] - pos->x, t[1] - pos->z);
             u16 a;
@@ -53,8 +53,7 @@ void Actor_OnPathFollowUpdate(void *unused, struct Actor *p)
             }
             {
                 int t2 = a + 96;
-                register int k asm("r1");
-                asm("" : "+r"(t2));
+                int k;
                 t2 >>= 6;
                 k = 3;
                 k &= t2;
@@ -89,7 +88,6 @@ void Actor_OnPathFollowUpdate(void *unused, struct Actor *p)
             if (*anim == 2) {
                 if (({
                         struct AnimSub *sa = (struct AnimSub *)((u8 *)anim + 0x2c);
-                        asm("" : "+r"(sa));
                         sa->state;
                     }) &
                     2)

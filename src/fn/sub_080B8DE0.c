@@ -42,18 +42,15 @@ void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
     u32 *flags;
     u8 *base = ctx;
     register u32 *state asm("r4") = *(u32 **)(ctx + 0x3D0);
-    asm("" : "+r"(state));
     if (blocked2048(ctx))
         return;
     {
         u32 bit = 0x10;
         register u32 *sp asm("r1") = (u32 *)((u8 *)state + 0x6DC);
-        register u32 *held asm("r2");
+        u32 *held;
         u32 v;
-        asm("" : "+r"(sp));
         v = *sp & bit;
         held = sp;
-        asm("" : "+r"(held), "+r"(v));
 
         if (Test(v, ~0)) {
             u32 bit = 0x800;

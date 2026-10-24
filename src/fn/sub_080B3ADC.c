@@ -37,13 +37,12 @@ u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32
     u32 reset;
     {
         register struct SceneActorRegistryResetView *input asm("r3") = p0;
-        register u32 incomingReset asm("r1") = reset0;
+        u32 incomingReset = reset0;
         asm("" : "+r"(input), "+r"(incomingReset));
         reset = incomingReset;
         q = input;
     }
     p = q;
-    asm("" : "+r"(q));
     if (TestActor(p, 1)) {
         if (reset == 1) {
             u32 mask = 2;

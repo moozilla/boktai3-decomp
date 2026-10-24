@@ -20,10 +20,9 @@ struct ActorTrail {
 };
 static inline u8 *CountAddress(struct ActorTrail *trail)
 {
-    register u32 offset asm("r0") = 0x8ea;
+    u32 offset = 0x8ea;
     register u8 *p asm("r1");
     p = (u8 *)trail + offset;
-    asm("" : "+r"(p));
     return p;
 }
 static inline u8 isRemoved(struct TrailSegment *segment)

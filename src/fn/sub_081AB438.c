@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct MotionTrackVector {
@@ -34,7 +33,7 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
     Vanargand_SetPendingCue(p, 1);
     if (p->pending) {
         s16 target[3];
-        register s16 *v asm("r4");
+        s16 *v;
         s16 *first;
         struct MotionTrack *track;
         s32 x, y, z;
@@ -47,9 +46,7 @@ void Vanargand_UpdateOffsetMotion(struct Vanargand *p)
         x -= 256;
         z -= 256;
         v = target;
-        asm("" : "+r"(v));
         first = v;
-        asm("" : "+r"(first));
         first[0] = x;
         v[1] = y;
         v[2] = z;

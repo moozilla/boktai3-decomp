@@ -66,14 +66,12 @@ void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
     s32 playerKind;
     {
         s32 scratch = pressed;
-        asm("" ::"r"(scratch));
         scratch &= buttons;
         pressed = scratch;
     }
     playerKind = PlayerKind();
     if (playerKind == 10)
         goto disableInput;
-    asm("" : "+r"(playerKind));
     if (playerKind != 11)
         goto inputReady;
 disableInput: {
@@ -85,7 +83,6 @@ inputReady:;
     {
         register u8 *rawTarget asm("r0") = context->targetActor;
         u8 *target;
-        asm("" ::"r"(rawTarget));
         if (!rawTarget)
             goto blocked;
         target = rawTarget;
@@ -143,13 +140,11 @@ selected:
     if (nearest && !pressed) {
         actor = context->head;
         if (actor) {
-            register s8 *base asm("r0") = nearest->cues;
-            register s32 index asm("r1");
-            register s8 *cue asm("r6");
-            register u32 blockedMask asm("r7");
-            asm("" : "+r"(base));
+            s8 *base = nearest->cues;
+            s32 index;
+            s8 *cue;
+            u32 blockedMask;
             index = kind;
-            asm("" ::"r"(index));
             cue = base + index;
             blockedMask = 0x2000;
             asm("" ::"r"(cue), "r"(blockedMask));
@@ -195,9 +190,6 @@ selected:
             } while (--count >= 0);
         }
         // The prepared operands are retained even though dispatch uses a null argument block.
-        asm("" ::"m"(operands.identity), "m"(operands.x), "m"(operands.y), "m"(operands.z),
-            "m"(operands.parameters.values[0]), "m"(operands.parameters.values[1]),
-            "m"(operands.parameters.values[2]), "m"(operands.parameters.values[3]));
         Script_Call(nearest->script, 0);
     }
 }

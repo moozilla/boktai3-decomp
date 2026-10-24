@@ -178,7 +178,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
                 asm("" : "+r"(current));
                 if (current->activeMask & mask) {
                     register void (*const *table)(struct ContactSwarm *, struct ContactSwarmSlot *,
-                                                  s32) asm("r1") = gUnk_08605920;
+                                                  s32) = gUnk_08605920;
                     register const struct ContactSwarmSlot *currentSlot asm("r2");
                     currentSlot = slot;
                     asm("" : "+r"(currentSlot));
