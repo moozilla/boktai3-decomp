@@ -3,8 +3,6 @@
 
 // Remaining differences: playback pointer lifetimes and a few operand/order choices.
 
-#ifdef NONMATCHING
-// fuzzy: 99.9%
 #include "contact_swarm.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
@@ -347,10 +345,11 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 *field = zero;
                 *(u32 *)(p + 0x2FC) = 3;
                 {
-                    u32 mask = 4;
                     u8 *field = p + 0x2F0;
+                    u32 v = *field;
+                    u32 mask = 4;
                     asm("" : "+r"(mask));
-                    *field = mask | *field;
+                    *field = mask | v;
                 }
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
                 Anim_RestartSequence(state, *(void **)(p + 0x390), *(u16 *)(p + 0x2FC), 0, zero);
@@ -395,7 +394,3 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
     }
     (*(u32 *)(context + 0xC4))++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SingletonSlot7_UpdateEndingScene);
-#endif
