@@ -325,7 +325,9 @@ def cmd_land(args):
     rel = os.path.relpath(cand, ROOT)
     out = sh("python3", "tools/scope/scope.py", rel, func, env=dict(os.environ, SCOPE_RUN=func))
     if "\nMATCH" not in out:
-        sys.exit(f"{func}: best_match.c does not match:\n{out[:600]}")
+        # main may have changed headers or other functions since the worker started, so the worker's
+        # whole file can stop compiling; the unit check on the merged tree below decides
+        print(f"{func}: best_match.c no longer checks out on its own (main moved on); merging anyway")
     new = unwrap(open(cand).read(), func, r["addr"])
     if new is None:
         sys.exit(f"{func}: no NONMATCHING block for it in best_match.c")
