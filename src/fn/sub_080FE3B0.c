@@ -2,11 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
-// fix.py best version (reprinted C)
 // confidence=low: after the wait, selects a route point and starts the stored movement spline.
-// Remaining differences: pointer register allocation (target/copy/zero use r7/r8/r5 instead of r7/r5/r8).
 
 void Axe_SelectRandomRoutePoint(void *);
 void Axe_SetMovementEndpoints(void *, void *);
@@ -35,9 +31,8 @@ struct AxeContext {
     u32 clearF14[2];
 };
 
-static inline u32 CellIndex(struct AxeVec *p)
+static inline u32 CellIndex(s32 x, s32 z)
 {
-    s32 x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
         return 0;
     return gUnk_030052F4->rows[z] + x;
@@ -78,6 +73,11 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 
+static inline void SetWords(const void *source, void *destination, u32 control)
+{
+    CpuSet(source, destination, control);
+}
+
 void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
     struct AxeContext *context = actor->context;
@@ -88,8 +88,8 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
     struct AxeVec *copy;
     struct AxeRoutePoint *point;
     struct AxeLink *link;
-    typeof(target->x) t1;
-    typeof(copy->z) t2;
+    s16 deltaX;
+    s16 deltaZ;
     if (actor->field2B1)
         actor->field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, actor->update270))
@@ -99,28 +99,32 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         target = &targetStorage;
         link = (struct AxeLink *)(((u8 *)actor) + 0x448);
         point = link->point;
-        copy = target;
         target->x = point->x;
         target->z = point->z;
-        target->y = CellHeight(target, CellIndex(target));
+        {
+            s32 cellX = target->x >> 8, cellZ = target->z >> 8;
+            copy = target;
+            target->y = CellHeight(target, CellIndex(cellX, cellZ));
+        }
         zero = 0;
         Axe_SetMovementEndpoints(actor, copy);
         sub_080FAA5C(actor);
         SetState(actor, 0, 0, 1, zero);
         {
             struct AxeVec *position = (struct AxeVec *)(&actor->position);
+            target = &targetStorage;
             target->x -= position->x;
             copy->y -= position->y;
             copy->z -= position->z;
         }
-        t2 = copy->z;
-        t1 = target->x;
-        *(((u8 *)actor) + 0x3cd) = Math_Atan2(t1, t2);
-        tmp = zero;
-        CpuSet((void *)(&tmp), context->clearF14, 0x05000002);
+        deltaZ = copy->z;
+        deltaX = target->x;
+        *(((u8 *)actor) + 0x3cd) = Math_Atan2(deltaX, deltaZ);
+        {
+            u32 *clear = context->clearF14;
+            tmp = zero;
+            SetWords((void *)(&tmp), clear, 0x05000002);
+        }
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateRouteDestinationPhase);
-#endif
