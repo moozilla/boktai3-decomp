@@ -1,11 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.0%
-// fix.py best version (reprinted C)
-// Remaining differences: outer switch layout, frame setup, and packed animation register allocation.
-
 #include "contact_swarm.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
@@ -16,9 +11,15 @@ struct Drawable {
     s32 ended;
     u32 mode;
 };
-static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState *inputState)
+static inline void SetFrame(struct Drawable *owner, u16 frame)
 {
-    register struct DisplaySequenceState *state asm("r5") = inputState;
+    owner->sprite.frame = frame;
+}
+
+static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState *inputState,
+                            u32 initialBit)
+{
+    struct DisplaySequenceState *state = inputState;
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command;
     u32 ended;
@@ -35,7 +36,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        bit = 1;
+        bit = initialBit;
         first = bit;
         first &= input;
         if (first != ((((*command) & 0x30) >> 4) & bit))
@@ -136,7 +137,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
 
 static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState *inputState)
 {
-    register struct DisplaySequenceState *state asm("r4") = inputState;
+    struct DisplaySequenceState *state = inputState;
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, bit;
@@ -298,19 +299,19 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
         case 6:
 
         case 10:
-            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
+            SetFrame((struct Drawable *)(input + 0x8c), 29);
             Projectile_SetUpdateCallback(config, Task4E01_OnDefaultDirectionalAnimation);
             ((struct ImpactHeader *)input)->time = 0;
-            break;
-
-        case 7:
-            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
-            Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
             break;
 
         case 8:
             ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
             Projectile_SetUpdateCallback(config, Task4E01_OnType8DirectionalAnimation);
+            break;
+
+        case 7:
+            ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
+            Projectile_SetUpdateCallback(config, Task4E01_OnType7DirectionalAnimation);
             break;
 
         case 4:
@@ -319,9 +320,11 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
 
         case 3:
             if ((*((u16 *)config)) & 0x10) {
-                *((u32 *)(input + 0x194)) = 1;
+                u32 *animationField = (u32 *)(input + 0x194);
+                register u32 animationId asm("r4") = 1;
+                *animationField = animationId;
                 Anim_RestartSequence(input + 0x180, *((void **)(input + 0x19c)), 1, 0, 0);
-                StepFirst((void *)(input + 0x8c), (void *)(input + 0x180));
+                StepFirst((void *)(input + 0x8c), (void *)(input + 0x180), animationId);
             } else {
                 *((u32 *)(input + 0x194)) = 6;
                 Anim_RestartSequence(input + 0x180, *((void **)(input + 0x19c)), 6, 0, 0);
@@ -330,11 +333,14 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
             Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;
 
-        case 11:
-            if (!((*((u16 *)config)) & 0x2000))
+        case 11: {
+            u16 *impactFlags = (u16 *)config;
+            asm("" : "+r"(impactFlags));
+            if (!(*impactFlags & 0x2000))
                 ((struct Drawable *)(input + 0x8c))->sprite.frame = 31;
             Projectile_SetUpdateCallback(config, sub_081D9D3C);
             break;
+        }
 
         case 9:
 
@@ -348,6 +354,3 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Task4E01_BeginImpactAnimation);
-#endif
