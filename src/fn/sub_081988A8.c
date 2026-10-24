@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: register allocation, stack lifetimes and instruction ordering.
 struct Pair {
     u32 a, b;
 };
@@ -30,12 +27,14 @@ struct Actor {
 extern const struct Pair gUnk_0824F65C, gUnk_0824F63C, gUnk_0824F664, gUnk_0824F644, gUnk_0824F66C,
     gUnk_0824F64C, gUnk_0824F674, gUnk_0824F654;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
+static inline u8 *SceneEffect_GetRecoilTimer(struct Actor *a)
+{
+    return &a->timer;
+}
 void SceneEffect_UpdateRecoil(struct Actor *a)
 {
     s32 state = a->entered;
-    u16 k;
-    u8 *t;
-    typeof(a->timer) *q1 = &a->timer;
+    u16 nextState;
     switch (state) {
         case 0:
             Anim_SetKeyframes(a->anim, a->resource, 4, 2, 0);
@@ -43,13 +42,12 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
             break;
 
         case 1:
-            t = q1;
-            if ((*t) <= 7)
-                goto increment;
+            if (a->timer <= 7)
+                a->timer++;
             else {
                 {
-                    u8 k1 = 2;
-                    a->entered = k1;
+                    u8 nextPhase = 2;
+                    a->entered = nextPhase;
                 }
                 a->timer = 0;
                 if (a->flags & 4) {
@@ -88,64 +86,68 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
             }
             break;
 
-        default:
-            t = q1;
-            if ((*t) <= 3) {
-            increment:
-                (*t)++;
-
+        default: {
+            u8 *timer = SceneEffect_GetRecoilTimer(a);
+            if (*timer <= 3) {
+                (*timer)++;
             } else {
-                k = 8;
-                a->state = k;
+                nextState = 8;
+                a->state = nextState;
                 a->entered = 0;
                 a->timer = 0;
             }
             break;
+        }
     }
 
     {
-        struct Collider *c = &a->collider;
         switch (a->frame) {
             case 5:
-
-            case 7:
-                if (a->flags & 4)
-                    c->bounds = gUnk_0824F664;
-                else
-                    c->bounds = gUnk_0824F644;
-                break;
-
             case 6: {
-                u32 mask = ~4;
-                c->flags = mask & c->flags;
-            }
-                if (a->flags & 4)
+                struct Collider *c = &a->collider;
+                u32 mask = 4;
+                c->flags = ~mask & c->flags;
+                if (a->flags & mask)
                     c->bounds = gUnk_0824F65C;
                 else
                     c->bounds = gUnk_0824F63C;
                 break;
-
-            case 15:
-                if (a->flags & 4)
+            }
+            case 7: {
+                if (a->flags & 4) {
+                    struct Collider *c = &a->collider;
+                    c->bounds = gUnk_0824F664;
+                } else {
+                    struct Collider *c = &a->collider;
+                    c->bounds = gUnk_0824F644;
+                }
+                break;
+            }
+            case 15: {
+                if (a->flags & 4) {
+                    struct Collider *c = &a->collider;
                     c->bounds = gUnk_0824F66C;
-                else
+                } else {
+                    struct Collider *c = &a->collider;
                     c->bounds = gUnk_0824F64C;
+                }
                 break;
-
-            case 16:
-                if (a->flags & 4)
+            }
+            case 16: {
+                if (a->flags & 4) {
+                    struct Collider *c = &a->collider;
                     c->bounds = gUnk_0824F674;
-                else
+                } else {
+                    struct Collider *c = &a->collider;
                     c->bounds = gUnk_0824F654;
+                }
                 break;
-
-            default:
+            }
+            default: {
+                struct Collider *c = &a->collider;
                 c->flags |= 4;
                 break;
+            }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneEffect_UpdateRecoil);
-#endif
