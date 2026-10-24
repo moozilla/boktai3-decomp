@@ -450,7 +450,39 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
     Anim_Remove(&p->highlight);
 }
 
+// confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
+#ifdef NONMATCHING
+// fuzzy: 59.2%
+// The ROM keeps the position pointer in one register (sb) and recomputes sp + 0x14 after the loop; here it stays in a second register (sl), so an extra callee-saved register is pushed.
+void sub_0801A6D0(struct SelectionMenu *p)
+{
+    struct {
+        u32 zero;
+        struct ContactPosition position;
+    } scratch;
+    struct SceneInputWidget *g;
+    int i;
+    struct ContactPosition *pos = &scratch.position;
+    struct ContactPosition *saved;
+    int clear;
+    scratch.zero = 0;
+    SelectionMenu_ClearPosition(&scratch.zero, pos);
+    i = 18;
+    saved = pos;
+    clear = 0;
+    g = &p->icons[18];
+    do {
+        Widget_InitLinked(g, &p->iconResource, 0, 0x11, clear, clear, 0x3c, saved);
+        g--;
+        i--;
+    } while (i >= 0);
+    saved->x = 0x20;
+    scratch.position.y = 0;
+    Widget_InitLinked(&p->heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &scratch.position);
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0801A6D0);
+#endif
 
 void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
