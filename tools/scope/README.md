@@ -748,6 +748,8 @@ which is exactly `10:1`. Not tested.
   the `mov r0, ip` (reload inherits r0's 7 for the `ands`; the ROM's did
   not). No command explains inheritance yet (reload1.c reg_reloaded_*:
   which reload kept r0's contents, and what invalidated them in the ROM).
+  Its second round matched with one empty barrier after `mask = 7`, which
+  confirms the inheritance diagnosis; the plain-C form is still unknown.
   Power_EnterSleep needs an inline `svc #3` (SDK SystemCall), which agbcc
   cannot emit from C: a policy question, not a tool gap.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
