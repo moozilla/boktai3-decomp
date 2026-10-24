@@ -22,6 +22,12 @@ struct AttackCollider {
     u32 flags;
 };
 
+struct ActorColliderGroup {
+    struct ActorRenderFlags render;
+    u8 unknown8[8];
+    struct AttackCollider attack;
+};
+
 // confidence=low: animation transition arms a stronger attack and updates per-frame collider bounds.
 extern const u32 gUnk_0824ECC4[], gUnk_0824ECC8[];
 extern const struct HitBox gUnk_0824ED0C[], gUnk_0824ECCC[];
@@ -40,9 +46,6 @@ static inline s32 ScaleHeavyAttack(s32 n)
     return m >= 0 ? m >> 12 : -((-m) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// Remaining differences: collider-base reuse, address selection, and multiply-result register.
 void ActorController_UpdateHeavyAttackCollider(u8 *p)
 {
     u8 *s = p + 0xb40;
@@ -75,7 +78,7 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
                 ((struct ActorAnimationLayer *)(p + 0x238))->flags |= four;
                 ((struct ActorAnimationLayer *)(p + 0x1e4))->flags &= ~four;
                 ((struct ActorAnimationLayer *)(p + 0x28c))->flags &= ~four;
-                *(u16 *)(p + 0x196) &= ~four;
+                ((struct ActorAnimationLayer *)(p + 0x190))->flags &= ~four;
                 {
                     struct ActorRenderFlags *r = (void *)(p + 0x180);
                     u32 one = 1;
@@ -83,8 +86,11 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
                 }
                 *(u16 *)(p + 0xb32) &= ~0x20;
                 {
-                    struct AttackCollider *t = (void *)(p + 0x190);
-                    u32 mask = 0x60000;
+                    struct ActorColliderGroup *group = (void *)(p + 0x180);
+                    struct AttackCollider *t;
+                    u32 mask;
+                    t = &group->attack;
+                    mask = 0x60000;
                     t->flags |= mask;
                     c = t;
                 }
@@ -112,6 +118,3 @@ void ActorController_UpdateHeavyAttackCollider(u8 *p)
             Sound_PlaySongChecked(0xbe);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorController_UpdateHeavyAttackCollider);
-#endif
