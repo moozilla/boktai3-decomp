@@ -7,7 +7,6 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
     struct ModifierGraphicsResource *resource;
     struct SceneVec origin;
-    u32 zero;
     register u32 attribute asm("r8");
     struct SceneVec *originPointer;
     struct ModifierDisplayObject *object;
@@ -19,15 +18,8 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     resource = ScriptProc_Start(0xcb05, 0x1289);
     menu->graphicsB = *resource;
     ResourceHeader_Relocate(&menu->graphicsB, resource);
-    asm("" : "=m"(zero));
     originPointer = &origin;
-    zero = 0;
-    {
-        u32 *source = &zero;
-        void *destination = originPointer;
-        asm("" : "+r"(source), "+r"(destination));
-        CpuSet(source, destination, 0x05000002);
-    }
+    ZeroFill8(originPointer);
     object = menu->displays;
     remaining = 17;
     do {
