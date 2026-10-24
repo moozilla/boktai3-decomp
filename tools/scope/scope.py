@@ -20,6 +20,7 @@ Everything is kept in build/scope/FUNC/ for follow-up queries:
 import difflib
 import json
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -50,6 +51,48 @@ CS = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
 
 # ---------------------------------------------------------------- compile
 
+CACHE = os.path.join(ROOT, "build", "scope", "cache")
+CLANG = "/Library/Developer/CommandLineTools/usr/bin/clang"
+if sys.platform == "darwin" and "CPP" not in os.environ and os.path.exists(CLANG):
+    build.CPP = [CLANG, "-E"]  # same output as `cc -E`, without the xcrun shim
+
+
+_MEMO = {}
+
+
+def cached(name, key_paths, make):
+    """make() memoised in memory and on disk, keyed by the paths' mtimes and sizes
+    (the ROM ELF changes only on a full build)."""
+    key = "|".join(f"{p}:{os.stat(p).st_mtime_ns}:{os.stat(p).st_size}" for p in key_paths)
+    if _MEMO.get(name, (None,))[0] == key:
+        return _MEMO[name][1]
+    path = os.path.join(CACHE, name + ".pickle")
+    try:
+        with open(path, "rb") as f:
+            k, value = pickle.load(f)
+        if k != key:
+            raise ValueError
+    except (OSError, ValueError, EOFError, pickle.UnpicklingError):
+        value = make()
+        os.makedirs(CACHE, exist_ok=True)
+        with open(path, "wb") as f:
+            pickle.dump((key, value), f)
+    _MEMO[name] = (key, value)
+    return value
+
+
+def elf_syms():
+    elf = os.path.join(ROOT, "build", "boktai3.elf")
+    return cached("elf_symbols", [elf], check.elf_symbols)
+
+
+def inventory():
+    csv = os.path.join(ROOT, "symbols", "functions.csv")
+    by_label, addr, sizes = cached("inventory", [csv, os.path.join(ROOT, "build", "boktai3.elf")],
+                                   lambda: tuple(check.inventory()))
+    return by_label, addr, sizes
+
+
 def workdir(func):
     d = os.path.join(ROOT, "build", "scope", func)
     os.makedirs(d, exist_ok=True)
@@ -69,7 +112,7 @@ def nonmatching_func(src):
 
 def rom_name(src, func):
     """The ROM-side name of the draft: its INCLUDE_ASM in the #else branch (names may lag the C)."""
-    _, addr, _ = check.inventory()
+    _, addr, _ = inventory()
     if func in addr:
         return func
     text = open(os.path.join(ROOT, src)).read()
@@ -101,7 +144,7 @@ def compile_draft(src, func, env=None):
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
-    check.link_object(f"{rel}/u.o", f"{rel}/u.elf")
+    check.link_object(f"{rel}/u.o", f"{rel}/u.elf", syms=elf_syms())
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", f"{rel}/u.elf", f"{rel}/u.bin"])
     whole = open(os.path.join(wd, "u.bin"), "rb").read()
     syms = sorted((v, n) for n, (v, t) in symtab(os.path.join(wd, "u.o")).items() if t == "FUNC")
@@ -112,7 +155,7 @@ def compile_draft(src, func, env=None):
     start = next(v for v, n in syms if n == obj_name) & ~1
     end = next((v & ~1 for v, n in syms if (v & ~1) > start), len(whole))
     base = syms[0][0] & ~1
-    _, addr, _ = check.inventory()
+    _, addr, _ = inventory()
     a = addr[rom_name(src, func)]
     return whole[start - base:end - base], a, {"obj_offset": start, "wd": wd, "env": env or {}, "obj_name": obj_name}
 
@@ -464,7 +507,7 @@ def main():
     t0 = time.time()
     mine, addr, info = compile_draft(src, func, env)
     t1 = time.time() - t0
-    _, _, sizes = check.inventory()
+    _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
     return report(src, func, rom_code, addr, mine, info, t1)
 
